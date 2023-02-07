@@ -15,3 +15,4 @@ global using System.Threading;
 global using System.Threading.Tasks;
 
 global using Dev.Tools;
+global using Yotei.Tools;

@@ -1,27 +1,26 @@
-﻿namespace Dev.Tools;
+﻿namespace Dev.Builder;
 
 // ========================================================
 /// <summary>
-/// Represent the scenario where the execution path has reached an unexpected situation, that
-/// was supposed not to happen.
+/// Represents an invalid operation with a <see cref="SemanticVersion"/> instance.
 /// </summary>
-public class UnExpectedException : Exception
+public class SemanticException : Exception
 {
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
-    public UnExpectedException() { }
+    public SemanticException() { }
 
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
     /// <param name="message"></param>
-    public UnExpectedException(string message) : base(message) { }
+    public SemanticException(string message) : base(message) { }
 
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
     /// <param name="message"></param>
     /// <param name="inner"></param>
-    public UnExpectedException(string message, Exception inner) : base(message, inner) { }
+    public SemanticException(string message, Exception inner) : base(message, inner) { }
 }

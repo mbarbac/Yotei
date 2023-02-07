@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Dev.Builder": {
+      "commandName": "Project",
+      "commandLineArgs": "C:\\Dev\\Yotei\r\nC:\\DEV\\Yotei\\0-Dev\\Dev.Builder"
+    }
+  }
+}

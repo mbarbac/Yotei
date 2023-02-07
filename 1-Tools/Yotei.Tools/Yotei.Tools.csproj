@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+   <PropertyGroup>
+      <TargetFramework>net7.0</TargetFramework>
+      <ImplicitUsings>disable</ImplicitUsings>
+      <Nullable>enable</Nullable>
+      <LangVersion>latest</LangVersion>
+      <NoWarn>$(NoWarn);IDE0058</NoWarn>
+   </PropertyGroup>
+
+   <PropertyGroup>
+      <IsPackable>true</IsPackable>
+      <Version>0.2.1-v0001</Version>
+      <Authors>mbarbac@hotmail.com</Authors>
+      <Description>Common tools for the Yotei framework.</Description>
+      <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
+      <PackageLicenseExpression>MIT</PackageLicenseExpression>
+      <IncludeSymbols>True</IncludeSymbols>
+      <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+      <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+      <AssemblyVersion>9.9.9.9</AssemblyVersion>
+      <FileVersion>9.9.9.9</FileVersion>
+   </PropertyGroup>
+
+</Project>

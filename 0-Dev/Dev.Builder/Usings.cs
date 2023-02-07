@@ -14,4 +14,11 @@ global using System.Text;
 global using System.Threading;
 global using System.Threading.Tasks;
 
+global using Color = System.ConsoleColor;
+global using static Dev.Tools.ConsoleWrapper;
+
+global using _Directory = System.IO.Directory;
+global using _File = System.IO.File;
+
 global using Dev.Tools;
+global using Yotei.Tools;

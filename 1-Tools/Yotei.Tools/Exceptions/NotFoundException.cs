@@ -1,4 +1,4 @@
-﻿namespace Dev.Tools;
+﻿namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>

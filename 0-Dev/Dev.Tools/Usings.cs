@@ -17,3 +17,5 @@ global using System.Threading.Tasks;
 global using Color = System.ConsoleColor;
 global using Console = Dev.Tools.ConsoleWrapper;
 global using Debug = Dev.Tools.DebugWrapper;
+
+global using Yotei.Tools;

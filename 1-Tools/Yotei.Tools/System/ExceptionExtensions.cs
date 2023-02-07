@@ -1,4 +1,4 @@
-﻿namespace Dev.Tools;
+﻿namespace Yotei.Tools;
 
 // ========================================================
 public static class ExceptionExtensions
@@ -23,6 +23,33 @@ public static class ExceptionExtensions
 
         return value;
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Adds or replaces in the exception's data dictionary the entry whose name and value are
+    /// given. By default, the entry name is the caller argument expression.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="exception"></param>
+    /// <param name="value"></param>
+    /// <param name="valueName"></param>
+    /// <returns></returns>
+    public static T WithData<T>(
+        this T exception,
+        object? value,
+        [CallerArgumentExpression(nameof(value))] string? name = default)
+        where T : Exception
+    {
+        exception = exception.ThrowIfNull();
+
+        name = name.NullWhenEmpty() ?? nameof(value);
+
+        exception.Data[name] = value;
+        return exception;
+    }
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// Returns a string representation of the given exception, suitable for display purposes.
