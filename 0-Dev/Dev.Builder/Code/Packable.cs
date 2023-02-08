@@ -1,56 +1,43 @@
 ﻿namespace Dev.Builder;
 
 // ========================================================
-/// <summary>
-/// Represents a packable project.
-/// </summary>
-public record Packable : Project
+public record Packable
 {
     /// <summary>
     /// An empty instance.
     /// </summary>
-    public static new Packable Empty { get; } = new();
+    public static Packable Empty { get; } = new();
     protected Packable() { }
 
     /// <summary>
-    /// Initializes a new instance using the given path, which can either be null, or empty, or
-    /// an existing project path.
+    /// Initializes a new instance.
     /// </summary>
-    /// <param name="path"></param>
-    public Packable(string path) : base(path)
+    /// <param name="project"></param>
+    public Packable(Project project)
     {
-        if (!this.IsPackable(out var version))
-            throw new ArgumentException($"Project '{path}' is not a packable one.");
+        if (!project.IsPackable(out var version))
+            throw new ArgumentException($"Project is not a packable one: {project}");
 
-        Version = version!;
-    }
-
-    /// <summary>
-    /// Initializes a new instance using its directory, name and extension.
-    /// </summary>
-    /// <param name="directory"></param>
-    /// <param name="name"></param>
-    /// <param name="extension"></param>
-    public Packable(Directory directory, string name, string extension)
-        : base(directory, name, extension)
-    {
-        if (!this.IsPackable(out var version))
-            throw new ArgumentException($"Project '{FullName}' is not a packable one.");
-
+        Project = project;
         Version = version!;
     }
 
     /// <inheritdoc>
     /// </inheritdoc>
-    public override string ToString() => $"{Name}.{Version}";
+    public override string ToString() => $"{Project}: {Version}";
 
     /// <summary>
-    /// Determines if this instance is an empty one.
+    /// The project this instance refers to.
     /// </summary>
-    public override bool IsEmpty => base.IsEmpty && Version.IsEmpty;
+    public Project Project
+    {
+        get => _Project;
+        init => _Project = value.ThrowIfNull();
+    }
+    Project _Project = Project.Empty;
 
     /// <summary>
-    /// The version of this package.
+    /// The version of this instance.
     /// </summary>
     public SemanticVersion Version
     {
@@ -63,81 +50,148 @@ public record Packable : Project
 // ========================================================
 public static class PackableExtensions
 {
-    static StringComparison Comparison = StringComparison.OrdinalIgnoreCase;
+    /// <summary>
+    /// Determines if the given project is a packable one, or not.
+    /// </summary>
+    /// <param name="project"></param>
+    /// <param name="version"></param>
+    /// <returns></returns>
+    public static bool IsPackable(this Project project, out SemanticVersion? version)
+    {
+        project = project.ThrowIfNull();
+
+        version = project.FindVersion();
+        if (version != null)
+        {
+            var lines = _File.ReadAllLines(project.File.Path);
+            foreach (var line in lines)
+            {
+                var ini = line.IndexOf(PackableHead, Program.Comparison);
+                if (ini < 0) continue;
+                ini += PackableHead.Length;
+
+                var end = line.IndexOf(PackableTail, ini, Program.Comparison);
+                if (end < 0) continue;
+
+                var value = line[ini..end].Trim();
+                return bool.TryParse(value, out var temp) && temp;
+            }
+        }
+
+        return false;
+    }
+    const string PackableHead = "<IsPackable>";
+    const string PackableTail = "</IsPackable>";
+
+    /// <summary>
+    /// Returns the version found in the given project, or null if any.
+    /// </summary>
+    /// <param name="project"></param>
+    /// <returns></returns>
+    public static SemanticVersion? FindVersion(this Project project)
+    {
+        project = project.ThrowIfNull();
+
+        var lines = _File.ReadAllLines(project.File.Path);
+        foreach (var line in lines)
+        {
+            var ini = line.IndexOf(VersionHead, Program.Comparison);
+            if (ini < 0) continue;
+            ini += VersionHead.Length;
+
+            var end = line.IndexOf(VersionTail, ini, Program.Comparison);
+            if (end < 0) continue;
+
+            var value = line[ini..end].Trim();
+            if (value.Length > 0) return new SemanticVersion(value);
+        }
+
+        return null;
+    }
+    const string VersionHead = "<Version>";
+    const string VersionTail = "</Version>";
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns the collection of packable projects found among the given ones.
+    /// Resets the project version to the given one, provided a valid version line is found.
+    /// </summary>
+    /// <param name="project"></param>
+    /// <param name="version"></param>
+    public static bool ResetVersion(this Project project, SemanticVersion version)
+    {
+        project = project.ThrowIfNull();
+
+        var lines = _File.ReadAllLines(project.File.Path);
+        var done = false;
+
+        for (int i = 0; i< lines.Length; i++)
+        {
+            var line = lines[i];
+
+            var ini = line.IndexOf(VersionHead, Program.Comparison);
+            if (ini < 0) continue;
+            ini += VersionHead.Length;
+
+            var end = line.IndexOf(VersionTail, ini, Program.Comparison);
+            if (end < 0) continue;
+
+            var value = line[ini..end].Trim();
+            if (value.Length == 0) continue;
+
+            lines[i] = line.Replace(value, version);
+            done = true;
+            break;
+        }
+
+        if (done) _File.WriteAllLines(project.File.Path, lines);
+        return done;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Selects from the given collection of projects those that are packable ones.
     /// </summary>
     /// <param name="projects"></param>
     /// <returns></returns>
-    public static ImmutableList<Packable> SelectPackables(this IEnumerable<Project> projects)
+    public static ImmutableArray<Packable> SelectPackables(this IEnumerable<Project> projects)
     {
         projects = projects.ThrowIfNull();
 
         var list = new List<Packable>();
         foreach (var project in projects)
         {
-            if (project.IsPackable(out var version))
-            {
-                var item = new Packable(project.FullName);
-                list.Add(item);
-            }
+            if (project.IsPackable(out _)) list.Add(new(project));
         }
-
-        return list.ToImmutableList();
-    }
-
-    /// <summary>
-    /// Removes from the given collection of projects the given packable ones.
-    /// </summary>
-    /// <param name="projects"></param>
-    /// <param name="packables"></param>
-    /// <returns></returns>
-    public static ImmutableList<Project> RemovePackables(
-        this IEnumerable<Project> projects,
-        IEnumerable<Packable> packables)
-    {
-        projects = projects.ThrowIfNull();
-        packables = packables.ThrowIfNull();
-
-        var list = projects.ToList();
-        foreach (var packable in packables)
-        {
-            var item = list.Find(x => string.Compare(x.FullName, packable.FullName, Comparison) == 0);
-            if (item != null) list.Remove(item);
-        }
-
-        return list.ToImmutableList();
+        return list.ToImmutableArray();
     }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Gets the collection of package files on disk that depend on the given packable project.
+    /// Gets the collection of files on disk the given packable has generated.
     /// </summary>
     /// <param name="packable"></param>
     /// <returns></returns>
-    public static ImmutableList<File> GetPackageFiles(this Packable packable)
+    public static ImmutableArray<File> GetPackageFiles(this Packable packable)
     {
         packable = packable.ThrowIfNull();
 
-        var list = new List<File>();
-        if (!packable.IsEmpty) Populate(list, packable.Directory.Value);
-        return list.ToImmutableList();
+        var list = new List<File>(); Populate(list, packable.Project.File.Directory);
+        return list.ToImmutableArray();
 
         /// <summary> Invoked to populate the list...
         /// </summary>
-        static void Populate(List<File> list, string path)
+        static void Populate(List<File> list, Directory directory)
         {
-            var files = _Directory.GetFiles(path, "*.nupkg");
-            foreach (var file in files) list.Add(new File(file));
+            var files = directory.GetFiles("*.nupkg");
+            foreach (var file in files) list.Add(file);
 
-            var symbols = _Directory.GetFiles(path, "*.snupkg");
-            foreach (var symbol in symbols) list.Add(new File(symbol));
+            var symbols = directory.GetFiles("*.snupkg");
+            foreach (var symbol in symbols) list.Add(symbol);
 
-            var dirs = _Directory.GetDirectories(path);
+            var dirs = directory.GetDirectories();
             foreach (var dir in dirs) Populate(list, dir);
         }
     }
@@ -145,63 +199,105 @@ public static class PackableExtensions
     // ----------------------------------------------------
 
     /// <summary>
-    /// Pushes the given package according to the given mode. Returns the collection of files
-    /// that have been pushed.
+    /// Pushes the files of the given package, according to the given mode.
     /// </summary>
     /// <param name="packable"></param>
     /// <param name="mode"></param>
     /// <returns></returns>
-    public static ImmutableList<File> Push(this Packable packable, PushMode mode)
+    public static bool Push(this Packable packable, PushMode mode, bool deleteOld)
     {
         packable = packable.ThrowIfNull();
 
-        var list = packable.GetPackageFiles();
-        var files = list.Where(x =>
+        var list = packable.GetPackageFiles().Where(x =>
             (mode == PushMode.Local && x.IsDebug) ||
-            (mode == PushMode.NuGet && x.IsRelease));
+            (mode == PushMode.NuGet && x.IsRelease))
+            .ToList();
 
-        var regular = files
-            .Where(x => string.Compare(x.Extension, "nupkg", Comparison) == 0)
-            .OrderBy(x => x.Name)
+        var regular = list
+            .Where(x => string.Compare(x.Extension, "nupkg", Program.Comparison) == 0)
+            .OrderByDescending(x => x.Name)
             .FirstOrDefault();
 
-        if (regular != null)
-        {
-            PushFile(regular, mode);
-            list.Add(regular);
-        }
+        var done = false;
+        if (regular != null) done = PushFile(regular, mode);
 
-        var symbols = files
-            .Where(x => string.Compare(x.Extension, "snupkg", Comparison) == 0)
-            .OrderBy(x => x.Name)
+        var symbols = list
+            .Where(x => string.Compare(x.Extension, "snupkg", Program.Comparison) == 0)
+            .OrderByDescending(x => x.Name)
             .FirstOrDefault();
 
-        if (symbols != null)
+        if (symbols != null) PushFile(symbols, mode);
+
+        if (done && deleteOld)
         {
-            PushFile(symbols, mode);
-            list.Add(symbols);
+            if (regular != null) list.Remove(regular);
+            if (symbols != null) list.Remove(symbols);
+            if (list.Count > 0)
+            {
+                WriteLine();
+                WriteLine(Color.Green, "Deleting files:");
+                list.DeleteMany();
+            }
         }
 
-        return list.ToImmutableList();
+        return done;
 
-        /// <summary> Pushes the given file...
+        /// <summary> Invoked to push the given file...
         /// </summary>
-        static void PushFile(File file, PushMode mode)
+        static bool PushFile(File file, PushMode mode)
         {
             WriteLine();
-            Write(Color.Green, "Pushing file: "); Write(file.FullName);
+            Write(Color.Green, "Pushing file: "); Write(file.Path);
             Write(Color.Green, " For mode: "); WriteLine(mode.ToString());
 
-            var source = mode == PushMode.Local
-                ? "local"
-                : "https://api.nuget.org/v3/index.json";
+            var source = mode == PushMode.Local ? "local" : "https://api.nuget.org/v3/index.json";
 
             var p = new Process();
             p.StartInfo.FileName = Program.NuGetExe;
-            p.StartInfo.WorkingDirectory = file.Directory.Value;
+            p.StartInfo.WorkingDirectory = file.Directory.Path;
             p.StartInfo.Arguments = $"push {file.NameAndExtension} -Source {source}";
             p.Start();
             p.WaitForExit();
+
+            return p.ExitCode == 0;
         }
+    }
+
+    // ----------------------------------------------------
+
+    class Weighted
+    {
+        public Weighted(Packable packable) => Packable = packable;
+        public override string ToString() => $"{Packable.Project.File.Name}: {Count}";
+        public int Count { get; set; }
+        public Packable Packable { get; }
+    }
+
+    /// <summary>
+    /// Orders the collection of packable projects by their cross dependencies.
+    /// </summary>
+    /// <param name="packables"></param>
+    /// <returns></returns>
+    public static ImmutableArray<Packable> OrderByDependencies(this IEnumerable<Packable> packables)
+    {
+        packables = packables.ThrowIfNull();
+
+        var list = packables.Select(x => new Weighted(x)).ToList();
+
+        foreach (var item in list)
+        {
+            var references = item.Packable.Project.GetReferences();
+            foreach (var reference in references)
+            {
+                var temp = list.Find(x => string.Compare(
+                    x.Packable.Project.File.Name, reference.Name, Program.Comparison) == 0);
+
+                if (temp != null) temp.Count++;
+            }
+        }
+
+        var order = list.OrderBy(x => x.Count).ToList();
+        order.Reverse();
+        return order.Select(x => x.Packable).ToImmutableArray();
     }
 }

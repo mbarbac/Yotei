@@ -19,6 +19,7 @@ global using static Dev.Tools.ConsoleWrapper;
 
 global using _Directory = System.IO.Directory;
 global using _File = System.IO.File;
+global using _Path = System.IO.Path;
 
 global using Dev.Tools;
 global using Yotei.Tools;

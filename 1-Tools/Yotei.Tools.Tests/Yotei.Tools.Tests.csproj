@@ -23,7 +23,7 @@
    </ItemGroup>
 
    <ItemGroup>
-      <PackageReference Include="Yotei.Tools" Version="0.2.1-v0001" />
+      <PackageReference Include="Yotei.Tools" Version="0.2.1-v0002" />
    </ItemGroup>
 
 </Project>

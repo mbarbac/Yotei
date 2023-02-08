@@ -6,8 +6,6 @@
 /// </summary>
 public record File
 {
-    protected static StringComparison Comparison = StringComparison.OrdinalIgnoreCase;
-
     /// <summary>
     /// An empty instance.
     /// </summary>
@@ -15,35 +13,22 @@ public record File
     protected File() { }
 
     /// <summary>
-    /// Initializes a new instance using the given path, which can either be null, or empty, or
-    /// an existing file path.
+    /// Initializes a new instance using a valid file path on disk.
     /// </summary>
     /// <param name="path"></param>
     public File(string path)
     {
-        if (path == null || path.Length == 0) return;
-        path = path.NotNullNotEmpty();
+        path = path.ThrowIfNull().Trim();
 
-        if (!_File.Exists(path)) throw new ArgumentException($"Cannot find file: {path}");
+        if (!_File.Exists(path))
+            throw new ArgumentException($"Cannot find file on disk: {path}");
 
-        Directory = new Directory(path);
-        path = path.Replace($"{Directory.Value}\\", string.Empty);
+        Directory = path;
+        path = path.Replace($"{Directory}\\", string.Empty);
 
-        Name = Path.GetFileNameWithoutExtension(path) ?? string.Empty;
-        Extension = path.Replace($"{Name}.", string.Empty);
-    }
-
-    /// <summary>
-    /// Initializes a new instance using its directory, name and extension.
-    /// </summary>
-    /// <param name="directory"></param>
-    /// <param name="name"></param>
-    /// <param name="extension"></param>
-    public File(Directory directory, string name, string extension)
-    {
-        Directory = directory;
-        Name = name;
-        Extension = extension;
+        Name = _Path.GetFileNameWithoutExtension(path) ?? string.Empty;
+        Extension = _Path.GetExtension(path) ?? string.Empty;
+        if (Extension.StartsWith('.')) Extension = Extension[1..];
     }
 
     /// <inheritdoc>
@@ -51,26 +36,28 @@ public record File
     public override string ToString() => NameAndExtension;
 
     /// <summary>
-    /// Determines if this instance is an empty one.
+    /// Implicit conversion operator.
     /// </summary>
-    public virtual bool IsEmpty =>
-        Directory.IsEmpty &&
-        Name.Length == 0 &&
-        Extension.Length == 0;
+    public static implicit operator string(File directory) => directory.Path;
 
     /// <summary>
-    /// The full name of this file, including its directory, name and extension, if any.
+    /// Implicit conversion operator.
     /// </summary>
-    public string FullName => IsEmpty
-        ? string.Empty
-        : Directory.IsEmpty ? NameAndExtension : $"{Directory}\\{NameAndExtension}";
+    public static implicit operator File(string path) => new(path);
+
+    /// <summary>
+    /// The path of this file, including its directory, name and extension.
+    /// </summary>
+    public string Path => Directory.Path.Length == 0
+        ? NameAndExtension
+        : $"{Directory}\\{NameAndExtension}";
 
     /// <summary>
     /// The name and extension of this file.
     /// </summary>
-    public string NameAndExtension => IsEmpty
-        ? string.Empty
-        : Extension.Length == 0 ? Name : $"{Name}.{Extension}";
+    public string NameAndExtension => Name.Length == 0
+        ? Extension
+        : Name + (Extension.Length == 0 ? string.Empty : $".{Extension}");
 
     /// <summary>
     /// The directory where to find this file.
@@ -78,7 +65,7 @@ public record File
     public Directory Directory
     {
         get => _Directory;
-        init => _Directory = value.ThrowIfNull(nameof(Directory));
+        init => _Directory = value.ThrowIfNull();
     }
     Directory _Directory = Directory.Empty;
 
@@ -88,7 +75,7 @@ public record File
     public string Name
     {
         get => _Name;
-        init => _Name = value.NotNullNotEmpty(valueName: nameof(Name));
+        init => _Name = value.ThrowIfNull().Trim();
     }
     string _Name = string.Empty;
 
@@ -98,75 +85,72 @@ public record File
     public virtual string Extension
     {
         get => _Extension;
-        init => _Extension = value == null
-            ? string.Empty
-            : value.NullWhenEmpty() ?? string.Empty;
+        init => _Extension = value.ThrowIfNull().Trim();
     }
     string _Extension = string.Empty;
 
     /// <summary>
     /// Determines if this file is a debug one, or not.
     /// </summary>
-    public bool IsDebug => FullName.Contains("\\debug\\", Comparison);
+    public bool IsDebug =>
+        Path.EndsWith("\\debug", Program.Comparison) ||
+        Path.Contains("\\debug\\", Program.Comparison);
 
     /// <summary>
     /// Determines if this file is a release one, or not.
     /// </summary>
-    public bool IsRelease => FullName.Contains("\\release\\", Comparison);
+    public bool IsRelease =>
+        Path.EndsWith("\\release", Program.Comparison) ||
+        Path.Contains("\\release\\", Program.Comparison);
 
     /// <summary>
-    /// Determines if this instance is equivalent to the other given one.
+    /// Determines if this instance is equivalent to the given other one, or not.
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
-    public bool EquivalentTo(File? other) => other != null && EquivalentTo(other.FullName);
+    public bool EquivalentTo(File other)
+    {
+        other = other.ThrowIfNull();
+        return EquivalentTo(other.Path);
+    }
 
     /// <summary>
-    /// Determines if this instance is equivalent to the given path.
+    /// Determines if this instance is equivalent to the given path, or not.
     /// </summary>
     /// <param name="path"></param>
     /// <returns></returns>
-    public bool EquivalentTo(string? path)
+    public bool EquivalentTo(string path)
     {
-        path = path.NullWhenEmpty() ?? string.Empty;
-        return string.Compare(FullName, path, Comparison) == 0;
+        path = path.ThrowIfNull();
+        return string.Compare(path, Path, Program.Comparison) == 0;
     }
-
+    
     /// <summary>
     /// Determines if this instance exists on disk, or not.
     /// </summary>
     /// <returns></returns>
-    public bool Exists() => !IsEmpty && _File.Exists(FullName);
+    public bool Exists() => _File.Exists(Path);
 
     /// <summary>
-    /// Deletes this instance from disk.
+    /// Deletes from disk this directory, provided is an empty one with no files or child
+    /// directories.
     /// </summary>
-    public void Delete() { if (!IsEmpty) _File.Delete(FullName); }
+    public void Delete() => _File.Delete(Path);
 }
 
 // ========================================================
 public static class FileExtensions
 {
-    static StringComparison Comparison = StringComparison.OrdinalIgnoreCase;
-
-    // ----------------------------------------------------
-
     /// <summary>
-    /// Deletes the given collection of files.
+    /// Deletes from disk the given collection of files.
     /// </summary>
     /// <param name="files"></param>
-    /// <param name="head"></param>
-    public static void Delete(this IEnumerable<File> files, bool head)
+    public static void DeleteMany(this IEnumerable<File> files)
     {
-        if (head)
-        {
-            WriteLine();
-            WriteLine(Color.Green, "Deleting files:");
-        }
-
+        files = files.ThrowIfNull();
         foreach (var file in files)
         {
-            Write(Color.Cyan, $"- Deleting: "); WriteLine(file.FullName);
+            Write(Color.Cyan, "Deleting file: "); WriteLine(file.Path);
             file.Delete();
         }
     }

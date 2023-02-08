@@ -1,13 +1,13 @@
-﻿namespace Dev.Builder;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Dev.Builder;
 
 // ========================================================
 /// <summary>
-/// Represents a reference to a package found in a project file.
+/// Represents a package reference, as found in a project file.
 /// </summary>
 public record PackageReference
 {
-    protected static StringComparison Comparison = StringComparison.OrdinalIgnoreCase;
-
     /// <summary>
     /// An empty instance.
     /// </summary>
@@ -27,17 +27,7 @@ public record PackageReference
 
     /// <inheritdoc>
     /// </inheritdoc>
-    public override string ToString() => FullName;
-
-    /// <summary>
-    /// Determines if this instance is an empty one.
-    /// </summary>
-    public virtual bool IsEmpty => Name.Length == 0 && Version.IsEmpty;
-
-    /// <summary>
-    /// The full name of this package, including its public name and version.
-    /// </summary>
-    public string FullName => $"{Name}.{Version}";
+    public override string ToString() => $"{Name}.{Version}";
 
     /// <summary>
     /// The name of the package this instance refers to.
@@ -45,12 +35,12 @@ public record PackageReference
     public string Name
     {
         get => _Name;
-        init => _Name = value.NotNullNotEmpty(valueName: nameof(Name));
+        init => _Name = value.ThrowIfNull().Trim();
     }
     string _Name = string.Empty;
 
     /// <summary>
-    /// The version of the package this instance refers to.
+    /// The version of this package this instace refers to.
     /// </summary>
     public SemanticVersion Version
     {
@@ -63,160 +53,196 @@ public record PackageReference
 // ========================================================
 public static class PackageReferenceExtensions
 {
-    static StringComparison Comparison = StringComparison.OrdinalIgnoreCase;
-
-    // ----------------------------------------------------
-
     /// <summary>
     /// Gets the collection of package references contained in the given project.
     /// </summary>
     /// <param name="project"></param>
     /// <returns></returns>
-    public static ImmutableList<PackageReference> GetReferences(this Project project)
+    public static ImmutableArray<PackageReference> GetReferences(this Project project)
     {
         project = project.ThrowIfNull();
 
         var list = new List<PackageReference>();
-        if (!project.IsEmpty)
+        var lines = _File.ReadAllLines(project.File.Path);
+
+        for (int i = 0; i < lines.Length; i++)
         {
-            var lines = _File.ReadAllLines(project.FullName);
-            foreach (var line in lines)
-            {
-                if (!line.Contains("<PackageReference", Comparison)) continue;
+            var line = lines[i];
 
-                var head = $"Include=\"";
-                var ini = line.IndexOf(head, Comparison); if (ini < 0) continue;
-                ini += head.Length;
-                var end = line.IndexOf("\"", ini, Comparison); if (end < 0) continue;
+            if (!line.Contains("<PackageReference", Program.Comparison)) continue;
 
-                var name = line[ini..end].Trim();
-                if (name.Length == 0) continue;
+            var head = $"Include=\"";
+            var ini = line.IndexOf(head, Program.Comparison); if (ini < 0) continue;
+            ini += head.Length;
+            var end = line.IndexOf("\"", ini, Program.Comparison); if (end < 0) continue;
 
-                head = $"Version=\"";
-                ini = line.IndexOf(head, Comparison); if (ini < 0) continue;
-                ini += head.Length;
-                end = line.IndexOf("\"", ini, Comparison); if (end < 0) continue;
+            var name = line[ini..end].Trim();
+            if (name.Length == 0) continue;
 
-                var version = line[ini..end].Trim();
-                if (version.Length == 0) continue;
+            head = $"Version=\"";
+            ini = line.IndexOf(head, Program.Comparison); if (ini < 0) continue;
+            ini += head.Length;
+            end = line.IndexOf("\"", ini, Program.Comparison); if (end < 0) continue;
 
-                var item = new PackageReference(name, new SemanticVersion(version));
-                list.Add(item);
-            }
+            var version = line[ini..end].Trim();
+            if (version.Length == 0) continue;
+
+            var item = new PackageReference(name, version);
+            list.Add(item);
         }
 
-        return list.ToImmutableList();
+        return list.ToImmutableArray();
     }
 
     /// <summary>
     /// Gets the collection of package references contained in the given projects.
     /// </summary>
-    /// <param name="project"></param>
+    /// <param name="projects"></param>
     /// <returns></returns>
-    public static ImmutableList<PackageReference> GetReferences(this IEnumerable<Project> projects)
+    public static ImmutableArray<PackageReference> GetReferences(this IEnumerable<Project> projects)
     {
         projects = projects.ThrowIfNull();
 
         var list = new List<PackageReference>();
         foreach (var project in projects)
         {
-            var temps = project.GetReferences();
-            foreach (var temp in temps)
+            var items = project.GetReferences();
+            foreach (var item in items)
             {
-                var item = list.Find(x => string.Compare(x.Name, temp.Name, Comparison) == 0);
-                if (item == null) list.Add(temp);
+                var temp = list.Find(x => string.Compare(x.Name, item.Name, Program.Comparison) == 0);
+                if (temp == null) list.Add(item);
             }
         }
 
-        return list.ToImmutableList();
+        return list.ToImmutableArray();
     }
 
     // ----------------------------------------------------
 
-    class Weighted
+    /// <summary>
+    /// Gets the collection of package references contained in the given project, provided their
+    /// names match with the name of any of the given packable ones.
+    /// </summary>
+    /// <param name="project"></param>
+    /// <param name="packables"></param>
+    /// <returns></returns>
+    public static ImmutableArray<PackageReference> GetReferences(
+        this Project project,
+        IEnumerable<Packable> packables)
     {
-        public Weighted() { }
-        public int Count = 0;
-        public Packable Packable = Packable.Empty;
-        public override string ToString() => $"{Packable.Name}: {Count}";
+        project = project.ThrowIfNull();
+        packables = packables.ThrowIfNull();
+
+        var list = new List<PackageReference>();
+        var items = project.GetReferences();
+        foreach (var item in items)
+        {
+            var temp = packables.FirstOrDefault(x =>
+                string.Compare(item.Name, x.Project.File.Name, Program.Comparison) == 0);
+
+            if (temp != null) list.Add(item);
+        }
+
+        return list.ToImmutableArray();
     }
 
     /// <summary>
-    /// Orders the given collection of packable projects by its cross dependencies.
+    /// Gets the collection of package references contained in the given projects, provided their
+    /// names match with the name of any of the given packable ones.
     /// </summary>
+    /// <param name="projects"></param>
     /// <param name="packables"></param>
     /// <returns></returns>
-    public static ImmutableList<Packable> OrderByDependencies(this IEnumerable<Packable> packables)
+    public static ImmutableArray<PackageReference> GetReferences(
+        this IEnumerable<Project> projects,
+        IEnumerable<Packable> packables)
     {
+        projects = projects.ThrowIfNull();
         packables = packables.ThrowIfNull();
 
-        // Phase 1: populating the weighted list keeping original order...
-        var list = new List<Weighted>();
-        foreach (var packable in packables)
+        var list = new List<PackageReference>();
+        foreach (var project in projects)
         {
-            // Adding by finding a cross reference...
-            var rs = packable.GetReferences();
-            foreach (var r in rs)
+            var items = project.GetReferences(packables);
+            foreach (var item in items)
             {
-                // If the list does not contain the reference...
-                var w1 = list.Find(x => string.Compare(x.Packable.Name, r.Name, Comparison) == 0);
-                if (w1 == null)
-                {
-                    // And that reference is among the given ones...
-                    var p = packables.FirstOrDefault(x => string.Compare(x.Name, r.Name, Comparison) == 0);
-                    if (p != null)
-                    {
-                        w1 = new Weighted() { Packable = p };
-                        list.Add(w1);
-                    }
-                }
-            }
-
-            // We still may need to add the package...
-            var w2 = list.Find(x => string.Compare(x.Packable.Name, packable.Name, Comparison) == 0);
-            if (w2 == null)
-            {
-                w2 = new Weighted() { Packable = packable };
-                list.Add(w2);
+                var temp = list.Find(x => string.Compare(x.Name, item.Name, Program.Comparison) == 0);
+                if (temp == null) list.Add(item);
             }
         }
 
-        // Phase 2: increasing counts as needed...
-        foreach (var w in list)
+        return list.ToImmutableArray();
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Updates, in the given project, the references to the given with the new version.
+    /// </summary>
+    /// <param name="project"></param>
+    /// <param name="reference"></param>
+    /// <param name="version"></param>
+    public static bool UpdateReference(
+        this Project project,
+        PackageReference reference, SemanticVersion version)
+    {
+        project = project.ThrowIfNull();
+        reference = reference.ThrowIfNull();
+        version = version.ThrowIfNull();
+
+        var lines = _File.ReadAllLines(project.File.Path);
+        var done = false;
+
+        for (int i = 0; i < lines.Length; i++)
         {
-            var rs = w.Packable.GetReferences();
-            foreach (var r in rs)
-            {
-                var wp = list.Find(x => string.Compare(x.Packable.Name, r.Name, Comparison) == 0);
-                if (wp != null) wp.Count++;
-            }
+            var line = lines[i];
+
+            if (!line.Contains("<PackageReference", Program.Comparison)) continue;
+
+            var head = $"Include=\"";
+            var ini = line.IndexOf(head, Program.Comparison); if (ini < 0) continue;
+            ini += head.Length;
+            var end = line.IndexOf("\"", ini, Program.Comparison); if (end < 0) continue;
+
+            var name = line[ini..end].Trim();
+            if (name.Length == 0) continue;
+
+            head = $"Version=\"";
+            ini = line.IndexOf(head, Program.Comparison); if (ini < 0) continue;
+            ini += head.Length;
+            end = line.IndexOf("\"", ini, Program.Comparison); if (end < 0) continue;
+
+            var value = line[ini..end].Trim();
+            if (value.Length == 0) continue;
+
+            if (string.Compare(name, reference.Name, Program.Comparison) != 0) continue;
+            lines[i] = line.Replace(value, version);
+            done = true;
+            break;
         }
 
-        // Phase 3: the ones with bigger counts shall appear first...
-        var items = new List<Weighted>();
-        foreach (var temp in list)
-        {
-            // If it already appears in items...
-            var done = false;
-            for (int i = 0; i < items.Count; i++)
-            {
-                var item = items[i];
-                if (!ReferenceEquals(temp, item))
-                {
-                    if (temp.Count > item.Count)
-                    {
-                        items.Insert(i, temp);
-                        done = true;
-                        break;
-                    }
-                }
-            }
-
-            // If not, adding it...
-            if (!done) items.Add(temp);
-        }
-
-        // Returning...
-        return items.Select(x => x.Packable).ToImmutableList();
+        if (done) _File.WriteAllLines(project.File.Path, lines);
+        return done;
     }
 }
+/*
+    project = project.ThrowIfNull();
+
+        var list = new List<PackageReference>();
+        var lines = _File.ReadAllLines(project.File.Path);
+
+        for (int i = 0; i < lines.Length; i++)
+        {
+            var line = lines[i];
+
+            
+
+            var version = 
+
+            var item = new PackageReference(name, version);
+            list.Add(item);
+        }
+
+        return list.ToImmutableArray();
+    }
+ */

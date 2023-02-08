@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
    <PropertyGroup>
       <TargetFramework>net7.0</TargetFramework>
@@ -23,11 +23,7 @@
    </ItemGroup>
 
    <ItemGroup>
-      <PackageReference Include="Yotei.Tools.DynamicParser" Version="0.2.1-v0001" />
-   </ItemGroup>
-
-   <ItemGroup>
-     <Folder Include="Tests\" />
+      <PackageReference Include="Yotei.Tools.DynamicParser" Version="0.2.1-v0002" />
    </ItemGroup>
    
 </Project>

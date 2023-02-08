@@ -13,5 +13,4 @@ public enum SemanticOptions
     Patch = 0b000_100,
     Beta = 0b001_000,
     BetaExpand = 0b010_000,
-    BetaExpandPatch = 0b100_000,
 }
