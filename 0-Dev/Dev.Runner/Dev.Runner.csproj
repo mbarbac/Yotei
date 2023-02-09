@@ -10,10 +10,10 @@
    </PropertyGroup>
 
    <ItemGroup>
-     <ProjectReference Include="..\..\0-Experimental\Experimental.Tests\Experimental.Tests.csproj" />
-     <ProjectReference Include="..\..\1-Tools\Yotei.Tools.DynamicParser.Tests\Yotei.Tools.DynamicParser.Tests.csproj" />
-     <ProjectReference Include="..\..\1-Tools\Yotei.Tools.Tests\Yotei.Tools.Tests.csproj" />
-     <ProjectReference Include="..\Dev.Tools\Dev.Tools.csproj" />
+      <ProjectReference Include="..\..\0-Experimental\Experimental.Tests\Experimental.Tests.csproj" />
+      <ProjectReference Include="..\..\1-Tools\Yotei.Tools.DynamicParser.Tests\Yotei.Tools.DynamicParser.Tests.csproj" />
+      <ProjectReference Include="..\..\1-Tools\Yotei.Tools.Tests\Yotei.Tools.Tests.csproj" />
+      <ProjectReference Include="..\Dev.Tools\Dev.Tools.csproj" />
    </ItemGroup>
 
 </Project>

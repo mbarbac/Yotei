@@ -10,7 +10,7 @@
    </PropertyGroup>
 
    <ItemGroup>
-     <ProjectReference Include="..\Dev.Tools\Dev.Tools.csproj" />
+      <ProjectReference Include="..\Dev.Tools\Dev.Tools.csproj" />
    </ItemGroup>
 
 </Project>

@@ -15,8 +15,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0-Dev", "0-Dev", "{1B251C47
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1-Tools", "1-Tools", "{490438CE-AFEC-41BB-89C8-4D95407085AD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dev.Builder", "0-Dev\Dev.Builder\Dev.Builder.csproj", "{7D0D168B-93E7-4375-BAD1-EF0DA382B5C4}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dev.Janitor", "0-Dev\Dev.Janitor\Dev.Janitor.csproj", "{C4D50B26-6462-44F0-AAA1-7D3596784DAD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dev.Runner", "0-Dev\Dev.Runner\Dev.Runner.csproj", "{6297A856-A500-414F-A3EA-773C0B97F060}"
@@ -33,13 +31,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yotei.Tools.DynamicParser.T
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1-Generators", "1-Generators", "{D755D0DC-E7F0-457F-85AE-1657B3D9D154}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yotei.Generator.Core", "1-Generators\Yotei.Generator.Core\Yotei.Generator.Core.csproj", "{F0F9BD16-C07D-48F0-B9D9-EE3D170D5510}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yotei.Generator.Core", "1-Generators\Yotei.Generator.Core\Yotei.Generator.Core.csproj", "{F0F9BD16-C07D-48F0-B9D9-EE3D170D5510}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0-Experimental", "0-Experimental", "{E8D3C7C0-41A5-46F4-94C5-C01EDB62279A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Experimental", "0-Experimental\Experimental\Experimental.csproj", "{6706A5D3-CCEA-4E5C-A3FA-730A4A6741E8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Experimental", "0-Experimental\Experimental\Experimental.csproj", "{6706A5D3-CCEA-4E5C-A3FA-730A4A6741E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Experimental.Tests", "0-Experimental\Experimental.Tests\Experimental.Tests.csproj", "{B3741E8D-7E64-403B-9FAE-8B5BA9FAA37B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Experimental.Tests", "0-Experimental\Experimental.Tests\Experimental.Tests.csproj", "{B3741E8D-7E64-403B-9FAE-8B5BA9FAA37B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,10 +45,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7D0D168B-93E7-4375-BAD1-EF0DA382B5C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7D0D168B-93E7-4375-BAD1-EF0DA382B5C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7D0D168B-93E7-4375-BAD1-EF0DA382B5C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7D0D168B-93E7-4375-BAD1-EF0DA382B5C4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C4D50B26-6462-44F0-AAA1-7D3596784DAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C4D50B26-6462-44F0-AAA1-7D3596784DAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4D50B26-6462-44F0-AAA1-7D3596784DAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -96,7 +90,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{7D0D168B-93E7-4375-BAD1-EF0DA382B5C4} = {1B251C47-59CF-4967-AD4F-71E4B1C5E220}
 		{C4D50B26-6462-44F0-AAA1-7D3596784DAD} = {1B251C47-59CF-4967-AD4F-71E4B1C5E220}
 		{6297A856-A500-414F-A3EA-773C0B97F060} = {1B251C47-59CF-4967-AD4F-71E4B1C5E220}
 		{66005E6A-EBFC-4E7C-89ED-D24221776E57} = {1B251C47-59CF-4967-AD4F-71E4B1C5E220}
