@@ -2,10 +2,9 @@
 
    <PropertyGroup>
       <TargetFramework>net7.0</TargetFramework>
-      <ImplicitUsings>disable</ImplicitUsings>
+      <ImplicitUsings>enable</ImplicitUsings>
       <Nullable>enable</Nullable>
-      <LangVersion>latest</LangVersion>
-      <NoWarn>$(NoWarn);IDE0058</NoWarn>
+
       <IsPackable>false</IsPackable>
    </PropertyGroup>
 
@@ -20,7 +19,10 @@
          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
          <PrivateAssets>all</PrivateAssets>
       </PackageReference>
-      <PackageReference Include="Yotei.Tools" Version="0.2.2-v0002" />
+   </ItemGroup>
+
+   <ItemGroup>
+      <ProjectReference Include="..\Experimental\Experimental.csproj" />
    </ItemGroup>
 
 </Project>

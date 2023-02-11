@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+     <TargetFramework>net7.0</TargetFramework>
+     <ImplicitUsings>disable</ImplicitUsings>
+     <Nullable>enable</Nullable>
+     <LangVersion>latest</LangVersion>
+     <NoWarn>$(NoWarn);IDE0058</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Yotei.Tools" Version="0.2.2-v0001" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\1-Tools\Yotei.Tools.DynamicParser.Tests\Yotei.Tools.DynamicParser.Tests.csproj" />
+    <ProjectReference Include="..\..\1-Tools\Yotei.Tools.Tests\Yotei.Tools.Tests.csproj" />
+    <ProjectReference Include="..\Experimental.Tests\Experimental.Tests.csproj" />
+  </ItemGroup>
+
+</Project>
