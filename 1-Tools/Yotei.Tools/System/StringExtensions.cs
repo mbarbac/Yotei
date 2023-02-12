@@ -134,6 +134,77 @@ public static class StringExtensions
     // ----------------------------------------------------
 
     /// <summary>
+    /// Removes the given <paramref name="remove"/> string from the source one, returning the
+    /// new string.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="remove"></param>
+    /// <returns></returns>
+    public static string Remove(this string source, string remove) => source.Remove(remove, out _);
+
+    /// <summary>
+    /// Removes the given <paramref name="remove"/> string from the source one, returning the
+    /// new string. The out <paramref name="removed"/> determines if it has been found and
+    /// removed, or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="remove"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string Remove(this string source, string remove, out bool removed)
+    {
+        removed = false;
+
+        source = source.ThrowIfNull(); if (source.Length == 0) return source;
+        remove = remove.ThrowIfNull(); if (remove.Length == 0) return source;
+
+        var index = source.IndexOf(remove);
+        if (index < 0) return source;
+
+        removed = true;
+        return source.Remove(index, remove.Length);
+    }
+
+    /// <summary>
+    /// Removes the given <paramref name="remove"/> string from the source one, using the given
+    /// comparison to find it, returning the new string. The out <paramref name="removed"/>
+    /// determines if it has been found and removed, or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="remove"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static string Remove(
+        this string source, string remove, StringComparison comparison)
+        => source.Remove(remove, comparison);
+
+    /// <summary>
+    /// Removes the given <paramref name="remove"/> string from the source one, using the given
+    /// comparison to find it, returning the new string. The out <paramref name="removed"/>
+    /// determines if it has been found and removed, or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="remove"></param>
+    /// <param name="comparison"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string Remove(this string source, string remove, StringComparison comparison, out bool removed)
+    {
+        removed = false;
+
+        source = source.ThrowIfNull(); if (source.Length == 0) return source;
+        remove = remove.ThrowIfNull(); if (remove.Length == 0) return source;
+
+        var index = source.IndexOf(remove, comparison);
+        if (index < 0) return source;
+
+        removed = true;
+        return source.Remove(index, remove.Length);
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Wraps the given string with the given head and tail characters, provided it was not null
     /// and not empty after trimming, if such is requested.
     /// </summary>

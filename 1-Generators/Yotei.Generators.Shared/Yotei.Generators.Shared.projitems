@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>aa138843-46ff-44ec-9f64-cfa63776dbff</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Yotei.Generators.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\DuplicateException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\EmptyException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\NotFoundException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\UnreachableException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\Deprecated\Miscelanea.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\Deprecated\NamespaceSyntaxExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\Deprecated\TypeSyntaxExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\Extensions\AttributeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\Extensions\ChainExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\Extensions\ISymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\Extensions\ITypeSymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\Extensions\NameExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\Miscelanea\NamedTypeBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\CodeBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\DebugExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\ExceptionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\NoDuplicatesList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\StringExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Api\ICaptured.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Api\ICapturedField.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Api\ICapturedProperty.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Api\ICapturedType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Api\IGenerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Code\TreeLevel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Code\CapturedField.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Code\CapturedProperty.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Code\CapturedType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Code\Generator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Extensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\NamespaceNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\FileNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\TypeNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Usings.cs" />
+  </ItemGroup>
+</Project>
