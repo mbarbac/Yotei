@@ -3,6 +3,8 @@
 // ========================================================
 public static class Program
 {
+    public static StringComparison Comparison = StringComparison.OrdinalIgnoreCase;
+
     /// <summary>
     /// Returns the solution root.
     /// </summary>

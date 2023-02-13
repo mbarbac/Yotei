@@ -10,7 +10,7 @@
 
    <PropertyGroup>
       <IsPackable>true</IsPackable>
-      <Version>0.2.2-v0002</Version>
+      <Version>0.2.2-v0003</Version>
       <Authors>mbarbac@hotmail.com</Authors>
       <Description>Common tools for the Yotei framework.</Description>
       <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>

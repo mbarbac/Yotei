@@ -32,6 +32,7 @@ public static class Menu
 
             while (true)
             {
+                WriteLine();
                 Write(Color.Green, "Please enter value of selection: ");
 
                 var str = ReadLine();

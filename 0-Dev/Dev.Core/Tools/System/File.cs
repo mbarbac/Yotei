@@ -91,8 +91,6 @@ public record File
 // ========================================================
 public static class FileExtensions
 {
-    public static StringComparison Comparison = StringComparison.OrdinalIgnoreCase;
-
     /// <summary>
     /// Determines if this file is a debug one, or not.
     /// </summary>
@@ -103,8 +101,8 @@ public static class FileExtensions
         file = file.ThrowIfNull();
 
         return
-            file.Path.EndsWith("\\debug", Comparison) ||
-            file.Path.Contains("\\debug\\", Comparison);
+            file.Path.EndsWith("\\debug", Program.Comparison) ||
+            file.Path.Contains("\\debug\\", Program.Comparison);
     }
 
     /// <summary>
@@ -117,8 +115,8 @@ public static class FileExtensions
         file = file.ThrowIfNull();
 
         return
-            file.Path.EndsWith("\\release", Comparison) ||
-            file.Path.Contains("\\release\\", Comparison);
+            file.Path.EndsWith("\\release", Program.Comparison) ||
+            file.Path.Contains("\\release\\", Program.Comparison);
     }
 
     /// <summary>
@@ -147,7 +145,7 @@ public static class FileExtensions
         path = path.ThrowIfNull();
 
         path = path.Trim();
-        return string.Compare(path, file.Path, Comparison) == 0;
+        return string.Compare(path, file.Path, Program.Comparison) == 0;
     }
 
     /// <summary>

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
    <PropertyGroup>
       <TargetFramework>net7.0</TargetFramework>
@@ -20,7 +20,7 @@
          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
          <PrivateAssets>all</PrivateAssets>
       </PackageReference>
-      <PackageReference Include="Yotei.Tools" Version="0.2.2-v0002" />
+      <PackageReference Include="Yotei.Tools" Version="0.2.2-v0003" />
    </ItemGroup>
 
    <ItemGroup>

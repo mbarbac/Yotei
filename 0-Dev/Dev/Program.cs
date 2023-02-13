@@ -14,7 +14,7 @@ internal class Program
     {
         Menu.Run(
             new Tester.MenuTester(),
-            new Packages.MenuPackages(),
+            new Builder.MenuBuilder(),
             new Janitor.MenuJanitor());
     }
 }

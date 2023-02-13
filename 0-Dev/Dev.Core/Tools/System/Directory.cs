@@ -59,8 +59,6 @@ public record Directory
 // ========================================================
 public static class DirectoryExtensions
 {
-    public static StringComparison Comparison = StringComparison.OrdinalIgnoreCase;
-
     /// <summary>
     /// Determines if this directory is a debug one, or not.
     /// </summary>
@@ -71,8 +69,8 @@ public static class DirectoryExtensions
         directory = directory.ThrowIfNull();
 
         return
-            directory.Path.EndsWith("\\debug", Comparison) ||
-            directory.Path.Contains("\\debug\\", Comparison);
+            directory.Path.EndsWith("\\debug", Program.Comparison) ||
+            directory.Path.Contains("\\debug\\", Program.Comparison);
     }
 
     /// <summary>
@@ -85,8 +83,8 @@ public static class DirectoryExtensions
         directory = directory.ThrowIfNull();
 
         return
-            directory.Path.EndsWith("\\release", Comparison) ||
-            directory.Path.Contains("\\release\\", Comparison);
+            directory.Path.EndsWith("\\release", Program.Comparison) ||
+            directory.Path.Contains("\\release\\", Program.Comparison);
     }
 
     /// <summary>
@@ -115,7 +113,7 @@ public static class DirectoryExtensions
         path = path.ThrowIfNull();
 
         path = path.Trim();
-        return string.Compare(path, directory.Path, Comparison) == 0;
+        return string.Compare(path, directory.Path, Program.Comparison) == 0;
     }
 
     /// <summary>
