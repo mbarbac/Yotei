@@ -100,7 +100,7 @@ public class ElementType : Tree.CapturedType
                 var neo = NeedsNew ? "new " : string.Empty;
 
                 AddDocumentation(cb);
-                cb.AppendLine($"{neo}{Name} Clone()");
+                cb.AppendLine($"public {neo}{Name} Clone()");
                 cb.AppendLine("{");
                 cb.Tabs++;
 

@@ -8,7 +8,7 @@ namespace Yotei.Generators.Cloneable;
 /// <inheritdoc cref="TreeGenerator">
 /// </inheritdoc>
 [Generator(LanguageNames.CSharp)]
-public class ElementGenerator : Tree.Generator, IIncrementalGenerator
+public class Generator : Tree.Generator, IIncrementalGenerator
 {
     const string NAMESPACE = "Yotei.Generators.Cloneable";
 

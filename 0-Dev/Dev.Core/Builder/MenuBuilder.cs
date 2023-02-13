@@ -40,7 +40,8 @@ public class MenuBuilder : MenuItem
 
         Menu.Run(
             new MenuBuilderLocal(this),
-            new MenuBuilderRemote(this));
+            new MenuBuilderRemote(this),
+            new ClearNuGetData());
     }
     public Directory Root = Directory.Empty;
     public Directory Exclude = Directory.Empty;
@@ -105,5 +106,39 @@ public class MenuBuilderRemote : MenuItem
         WriteLine();
         WriteLine(Color.Green, "Managing remote solution packages...");
         WriteLine(Color.Magenta, "Not implemented...");
+    }
+}
+
+// ========================================================
+/// <summary>
+/// Clears local nuget data
+/// </summary>
+public class ClearNuGetData : MenuItem
+{
+    /// <summary>
+    /// Print the head title of this menu item, which must end with a new line.
+    /// </summary>
+    public override void PrintHead() => WriteLine("Clears NuGet Local cached data.");
+
+    /// <summary>
+    /// Executes the actions in this menu item.
+    /// </summary>
+    public override void Execute()
+    {
+        WriteLine();
+        WriteLine(Color.Green, Menu.SeparatorLine);
+        WriteLine(Color.Green, "Clearing local NuGet cached data...");
+        WriteLine();
+
+        var p = new Process();
+        p.StartInfo.FileName = MenuBuilder.DotNetExe;
+        p.StartInfo.WorkingDirectory = Program.ProjectRoot();
+        p.StartInfo.Arguments = "nuget locals all --clear";
+        p.Start();
+        p.WaitForExit();
+
+        Directory dir = MenuBuilder.LocalRepoPath;
+        var files = dir.GetFiles();
+        foreach (var file in files) file.Delete();
     }
 }

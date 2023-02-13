@@ -6,7 +6,7 @@
 /// </summary>
 public static class CloneableTypeSource
 {
-    public static string Name { get; } = nameof(CloneableTypeSource).Remove("Source");
+    public static string Name { get; } = nameof(CloneableTypeSource).Remove("Source") + "Attribute";
     public static string ExplicitMode { get; } = nameof(ExplicitMode);
     public static string PreventAddICloneable { get; } = nameof(PreventAddICloneable);
 

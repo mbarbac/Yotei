@@ -29,8 +29,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Experimental", "0-Miscelane
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Experimental.Tests", "0-Miscelanea\Experimental.Tests\Experimental.Tests.csproj", "{CFBE00DF-4A17-45A3-A4A6-E55F559BF283}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Yotei.Generators.Shared", "1-Generators\Yotei.Generators.Shared\Yotei.Generators.Shared.shproj", "{AA138843-46FF-44EC-9F64-CFA63776DBFF}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yotei.Generators.Cloneable", "1-Generators\Yotei.Generators.Cloneable\Yotei.Generators.Cloneable.csproj", "{C79F18B6-9148-4BF7-B64B-A7ECD7C881BC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yotei.Generators.Tests", "1-Generators\Yotei.Generators.Tests\Yotei.Generators.Tests.csproj", "{2897049F-D529-46AF-BC07-F3FA274BEE09}"
@@ -98,7 +96,6 @@ Global
 		{B09C6AA1-F43A-4689-B692-8EA72A58E617} = {490438CE-AFEC-41BB-89C8-4D95407085AD}
 		{46611017-9983-49E7-B79D-E15A1D398DAF} = {359C805D-5E31-4B41-992A-3B4DB9408074}
 		{CFBE00DF-4A17-45A3-A4A6-E55F559BF283} = {359C805D-5E31-4B41-992A-3B4DB9408074}
-		{AA138843-46FF-44EC-9F64-CFA63776DBFF} = {D755D0DC-E7F0-457F-85AE-1657B3D9D154}
 		{C79F18B6-9148-4BF7-B64B-A7ECD7C881BC} = {D755D0DC-E7F0-457F-85AE-1657B3D9D154}
 		{2897049F-D529-46AF-BC07-F3FA274BEE09} = {D755D0DC-E7F0-457F-85AE-1657B3D9D154}
 		{551386A3-FD6C-4C49-8E6E-5EC1AFF79230} = {F9A702D2-9059-47AC-8C2B-293D25B0F561}
@@ -106,9 +103,5 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {607ADF94-45B4-4A19-BEEB-A6E8DA8A2757}
-	EndGlobalSection
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		1-Generators\Yotei.Generators.Shared\Yotei.Generators.Shared.projitems*{aa138843-46ff-44ec-9f64-cfa63776dbff}*SharedItemsImports = 13
-		1-Generators\Yotei.Generators.Shared\Yotei.Generators.Shared.projitems*{c79f18b6-9148-4bf7-b64b-a7ecd7c881bc}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
    <PropertyGroup>
       <TargetFramework>netstandard2.0</TargetFramework>
@@ -8,7 +8,7 @@
       <NoWarn>$(NoWarn);IDE0058</NoWarn>
    </PropertyGroup>
 
-   <PropertyGroup>
+   <!--<PropertyGroup>
       <IsPackable>true</IsPackable>
       <Version>0.0.1-v0001</Version>
       <Authors>mbarbac@hotmail.com</Authors>
@@ -20,13 +20,11 @@
       <SymbolPackageFormat>snupkg</SymbolPackageFormat>
       <AssemblyVersion>9.9.9.9</AssemblyVersion>
       <FileVersion>9.9.9.9</FileVersion>
-   </PropertyGroup>
+   </PropertyGroup>-->
 
    <PropertyGroup>
       <DefineConstants>$(DefineConstants);DEBUG_CLONEABLE_GENERATOR</DefineConstants>
    </PropertyGroup>
-
-   <Import Project="..\Yotei.Generators.Shared\Yotei.Generators.Shared.projitems" Label="Shared" />
 
    <ItemGroup>
       <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.4.0" />

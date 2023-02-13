@@ -22,7 +22,7 @@ public class LocalPush : MenuItem
     /// </summary>
     public override void PrintHead()
     {
-        Write("Push local package: "); WriteLine(Color.Cyan, $"{Packable}");
+        Write("Push LOCAL package: "); WriteLine(Color.Cyan, $"{Packable}");
     }
 
     /// <summary>
@@ -32,13 +32,13 @@ public class LocalPush : MenuItem
     {
         WriteLine();
         WriteLine(Color.Green, Menu.SeparatorLine);
-        Write(Color.Green, "Pushing local package: "); WriteLine($"{Packable}");
+        Write(Color.Green, "Pushing local package: "); WriteLine(Color.Cyan, $"{Packable}");
         var files = Packable.Push(PushMode.Local);
 
         WriteLine();
         foreach (var file in files)
         {
-            Write(Color.Green, "Deleting file: "); WriteLine(file.NameAndExtension);
+            Write(Color.Magenta, "Deleting file: "); WriteLine(file.NameAndExtension);
             file.Delete();
         }
         if (files.Length == 0) WriteLine(Color.Red, "No files were deleted...");
@@ -53,9 +53,14 @@ public class LocalPush : MenuItem
                 {
                     WriteLine();
                     WriteLine(Color.Green, Menu.SeparatorLine);
-                    Write(Color.Green, "Updating reference at project: ");
+                    Write(Color.Green, "Updating reference of package: ");
+                    Write(Color.Cyan, $"{Packable}");
+                    Write(Color.Green, " In project: ");
                     Write(Color.Cyan, project.File.NameAndExtension);
                     WriteLine();
+                    
+                    WriteLine(Color.Blue, "Please do not interrupt this update process.");
+                    WriteLine(Color.Blue, "Otherwise, the project file may be left in an inconsistent state.");
 
                     var name = Packable.Project.File.Name;
                     var version = Packable.Version;
@@ -82,7 +87,7 @@ public class LocalPushAll : MenuItem
     /// <summary>
     /// Print the head title of this menu item, which must end with a new line.
     /// </summary>
-    public override void PrintHead() => WriteLine("Pushes all Local packages.");
+    public override void PrintHead() => WriteLine("Pushes all LOCAL packages.");
 
     /// <summary>
     /// Executes the actions in this menu item.
@@ -109,7 +114,7 @@ public class LocalPushSelect : MenuItem
     /// <summary>
     /// Print the head title of this menu item, which must end with a new line.
     /// </summary>
-    public override void PrintHead() => WriteLine("Select Local package to push.");
+    public override void PrintHead() => WriteLine("Select LOCAL package to push.");
 
     /// <summary>
     /// Executes the actions in this menu item.

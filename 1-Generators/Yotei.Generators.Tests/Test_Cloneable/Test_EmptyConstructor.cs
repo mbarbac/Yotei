@@ -1,29 +1,35 @@
 namespace Yotei.Generators.Tests.Cloneable
 {
-    using CopyConstructor;
-    using ICopyConstructor;
+    using EmptyConstructor;
+    using IEmptyConstructor;
 
     // ====================================================
     [Enforced]
-    public static class Test_CopyConstructor
+    public static class Test_EmptyConstructor
     {
         [Fact]
         public static void Test()
         {
-            var source = new Other.Persona("James", "Bond", 50, "High");
+            var source = new Other.Persona()
+            {
+                FirstName = "James",
+                LastName = "Bond",
+                Age = 50,
+                Level = "High"
+            };
             var target = (Other.Persona)source.Clone();
 
             Assert.NotSame(source, target);
             Assert.Equal(source.FirstName, target.FirstName);
             Assert.Equal(source.LastName, target.LastName);
             Assert.Equal(source.Age, target.Age);
-            Assert.NotEqual(source.Level, target.Level); // Not equal expected...
-            Assert.Equal(source.Another, target.Another); // Both cero as not set...
+            Assert.Equal(source.Level, target.Level);
+            Assert.Equal(source.Another, target.Another); // Equal expected as we aren't setting...
         }
     }
 
     // ====================================================
-    namespace ICopyConstructor
+    namespace IEmptyConstructor
     {
         public partial interface IOther
         {
@@ -38,26 +44,13 @@ namespace Yotei.Generators.Tests.Cloneable
     }
 
     // ====================================================
-    namespace CopyConstructor
+    namespace EmptyConstructor
     {
         public partial class Other
         {
             [CloneableType]
             public partial class Persona : BasePersona, IOther.IPersona
             {
-                public Persona(string first, string last, int age, string level)
-                    : base(first, last)
-                {
-                    Age = age;
-                    Level = level;
-                }
-
-                public Persona(IOther.IPersona source)
-                    : base(source.FirstName, source.LastName)
-                {
-                    Age = source.Age;
-                }
-
                 public override string ToString()
                     => $"{base.ToString()}, Age:{Age}, Level:{Level}";
 
@@ -70,24 +63,18 @@ namespace Yotei.Generators.Tests.Cloneable
         // ------------------------------------------------
         public class BasePersona
         {
-            public BasePersona(string firstName, string lastName)
-                : this(firstName, lastName, 0) { }
-
-            public BasePersona(string firstName, string lastName, int another)
+            public BasePersona Clone() => new()
             {
-                FirstName = firstName;
-                LastName = lastName;
-                Another = another;
-            }
-
-            public BasePersona Clone() => new(FirstName, LastName, Another);
+                FirstName = this.FirstName,
+                LastName = this.LastName,
+            };
 
             public override string ToString()
                 => $"First:{FirstName}, Last:{LastName}, Another:{Another}";
 
-            public string FirstName { get; set; }
+            public string FirstName { get; set; } = default!;
 
-            public string LastName { get; set; }
+            public string LastName { get; set; } = default!;
 
             public readonly int Another;
         }

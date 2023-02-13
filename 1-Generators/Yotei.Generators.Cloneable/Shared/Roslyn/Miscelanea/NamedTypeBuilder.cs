@@ -179,7 +179,7 @@
             var cons = GetConstructors().ToImmutableArray();
             if (ForCopy()) return true;
             if (ForMany()) return true;
-            if (ForNone()) return true;
+            if (ForEmpty()) return true;
 
             return false;
 
@@ -209,7 +209,7 @@
             /// <summary>
             /// Emits code for a parameterless constructor.
             /// </summary>
-            bool ForNone()
+            bool ForEmpty()
             {
                 for (int c = 0; c < cons.Length; c++)
                 {

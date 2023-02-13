@@ -6,7 +6,7 @@
 /// </summary>
 public static class CloneableMemberSource
 {
-    public static string Name { get; } = nameof(CloneableMemberSource).Remove("Source");
+    public static string Name { get; } = nameof(CloneableMemberSource).Remove("Source") + "Attribute";
     public static string Deep { get; } = nameof(Deep);
     public static string Ignore { get; } = nameof(Ignore);
 

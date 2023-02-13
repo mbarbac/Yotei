@@ -20,11 +20,20 @@
          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
          <PrivateAssets>all</PrivateAssets>
       </PackageReference>
-      <PackageReference Include="Yotei.Tools" Version="0.2.2-v0003" />
+      <PackageReference Include="Yotei.Tools" Version="0.2.3-v0001" />
    </ItemGroup>
 
    <ItemGroup>
-     <ProjectReference Include="..\Yotei.Generators.Cloneable\Yotei.Generators.Cloneable.csproj" />
+      <ProjectReference Include="..\Yotei.Generators.Cloneable\Yotei.Generators.Cloneable.csproj">
+         <OutputItemType>Analyzer</OutputItemType>
+         <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      </ProjectReference>
+      <Compile Remove="Generated\$(TargetFramework)\**" />
+      <None Include="Generated\$(TargetFramework)\**" />
    </ItemGroup>
+   <PropertyGroup>
+      <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+      <CompilerGeneratedFilesOutputPath>Generated\$(TargetFramework)</CompilerGeneratedFilesOutputPath>
+   </PropertyGroup>
 
 </Project>

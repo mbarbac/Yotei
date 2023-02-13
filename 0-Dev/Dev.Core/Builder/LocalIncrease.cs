@@ -22,7 +22,7 @@ public class LocalIncrease : MenuItem
     /// </summary>
     public override void PrintHead()
     {
-        Write("Increase and Push local package: "); WriteLine(Color.Cyan, $"{Packable}");
+        Write("Increase and Push LOCAL package: "); WriteLine(Color.Cyan, $"{Packable}");
     }
 
     /// <summary>
@@ -32,7 +32,8 @@ public class LocalIncrease : MenuItem
     {
         WriteLine();
         WriteLine(Color.Green, Menu.SeparatorLine);
-        Write(Color.Green, "Increasing and Pushing local package: "); WriteLine($"{Packable}");
+        Write(Color.Green, "Increasing and Pushing local package: ");
+        WriteLine(Color.Cyan, Packable.Project.File.Name);
 
         var oldversion = Packable.Version;
         var newversion = oldversion.Beta.Value.Length == 0
@@ -83,7 +84,7 @@ public class LocalIncreaseAll : MenuItem
     /// <summary>
     /// Print the head title of this menu item, which must end with a new line.
     /// </summary>
-    public override void PrintHead() => WriteLine("Increase and Push all Local packages.");
+    public override void PrintHead() => WriteLine("Increase and Push all LOCAL packages.");
 
     /// <summary>
     /// Executes the actions in this menu item.
@@ -110,7 +111,7 @@ public class LocalIncreaseSelect : MenuItem
     /// <summary>
     /// Print the head title of this menu item, which must end with a new line.
     /// </summary>
-    public override void PrintHead() => WriteLine("Select Local package to Increase and Push.");
+    public override void PrintHead() => WriteLine("Select LOCAL package to Increase and Push.");
 
     /// <summary>
     /// Executes the actions in this menu item.
