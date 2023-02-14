@@ -1,4 +1,4 @@
-namespace Experimental.Tests;
+namespace Yotei.Tools.Tests;
 
 // ========================================================
 //[Enforced]

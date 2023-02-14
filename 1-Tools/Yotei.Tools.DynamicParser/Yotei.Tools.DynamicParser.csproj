@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
    <PropertyGroup>
       <TargetFramework>net7.0</TargetFramework>
@@ -10,7 +10,7 @@
 
    <PropertyGroup>
       <IsPackable>true</IsPackable>
-      <Version>0.2.3-v0001</Version>
+      <Version>0.2.4-v0001</Version>
       <Authors>mbarbac@hotmail.com</Authors>
       <Description>Parsing of Dynamic Lambda Expressions.</Description>
       <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
@@ -22,8 +22,12 @@
       <FileVersion>9.9.9.9</FileVersion>
    </PropertyGroup>
 
+   <!--<PropertyGroup>
+      <DefineConstants>$(DefineConstants);DEBUG_PARSER</DefineConstants>
+   </PropertyGroup>-->
+
    <ItemGroup>
-     <PackageReference Include="Yotei.Tools" Version="0.2.3-v0001" />
+     <PackageReference Include="Yotei.Tools" Version="0.2.3" />
    </ItemGroup>
 
 </Project>

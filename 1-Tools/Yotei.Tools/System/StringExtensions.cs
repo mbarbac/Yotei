@@ -73,6 +73,25 @@ public static class StringExtensions
 
     /// <summary>
     /// Determines if the given string contains any character in the given array, using the given
+    /// locale.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="array"></param>
+    /// <param name="locale"></param>
+    /// <returns></returns>
+    public static bool ContainsAny(
+        this string source, IEnumerable<char> array, Locale locale)
+    {
+        source = source.ThrowIfNull();
+        array = array.ThrowIfNull();
+        locale = locale.ThrowIfNull();
+
+        foreach (var c in array) if (locale.IndexOf(source, c) >= 0) return true;
+        return false;
+    }
+
+    /// <summary>
+    /// Determines if the given string contains any character in the given array, using the given
     /// comparison value.
     /// </summary>
     /// <param name="source"></param>
@@ -134,8 +153,8 @@ public static class StringExtensions
     // ----------------------------------------------------
 
     /// <summary>
-    /// Removes the given <paramref name="remove"/> string from the source one, returning the
-    /// new string.
+    /// Removes the first ocurrence of the the <paramref name="remove"/> string in the given
+    /// <paramref name="source"/> one, returning the resulting string.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="remove"></param>
@@ -143,9 +162,9 @@ public static class StringExtensions
     public static string Remove(this string source, string remove) => source.Remove(remove, out _);
 
     /// <summary>
-    /// Removes the given <paramref name="remove"/> string from the source one, returning the
-    /// new string. The out <paramref name="removed"/> determines if it has been found and
-    /// removed, or not.
+    /// Removes the first ocurrence of the the <paramref name="remove"/> string in the given
+    /// <paramref name="source"/> one, returning the resulting string. The out arguent
+    /// <paramref name="removed"/> indicates if the string has been removed, or not.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="remove"></param>
@@ -166,9 +185,44 @@ public static class StringExtensions
     }
 
     /// <summary>
-    /// Removes the given <paramref name="remove"/> string from the source one, using the given
-    /// comparison to find it, returning the new string. The out <paramref name="removed"/>
-    /// determines if it has been found and removed, or not.
+    /// Removes the last ocurrence of the the <paramref name="remove"/> string in the given
+    /// <paramref name="source"/> one, returning the resulting string.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="remove"></param>
+    /// <returns></returns>
+    public static string RemoveLast(
+        this string source, string remove) => source.RemoveLast(remove, out _);
+
+    /// <summary>
+    /// Removes the last ocurrence of the the <paramref name="remove"/> string in the given
+    /// <paramref name="source"/> one, returning the resulting string. The out arguent
+    /// <paramref name="removed"/> indicates if the string has been removed, or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="remove"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string RemoveLast(this string source, string remove, out bool removed)
+    {
+        removed = false;
+
+        source = source.ThrowIfNull(); if (source.Length == 0) return source;
+        remove = remove.ThrowIfNull(); if (remove.Length == 0) return source;
+
+        var index = source.LastIndexOf(remove);
+        if (index < 0) return source;
+
+        removed = true;
+        return source.Remove(index, remove.Length);
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Removes the first ocurrence of the the <paramref name="remove"/> string in the given
+    /// <paramref name="source"/> one, using the given comparison mode, returning the resulting
+    /// string.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="remove"></param>
@@ -176,19 +230,21 @@ public static class StringExtensions
     /// <returns></returns>
     public static string Remove(
         this string source, string remove, StringComparison comparison)
-        => source.Remove(remove, comparison);
+        => source.Remove(remove, comparison, out _);
 
     /// <summary>
-    /// Removes the given <paramref name="remove"/> string from the source one, using the given
-    /// comparison to find it, returning the new string. The out <paramref name="removed"/>
-    /// determines if it has been found and removed, or not.
+    /// Removes the first ocurrence of the the <paramref name="remove"/> string in the given
+    /// <paramref name="source"/> one, using the given comparison mode, returning the resulting
+    /// string. The out arguent <paramref name="removed"/> indicates if the string has been
+    /// removed, or not.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="remove"></param>
     /// <param name="comparison"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    public static string Remove(this string source, string remove, StringComparison comparison, out bool removed)
+    public static string Remove(
+        this string source, string remove, StringComparison comparison, out bool removed)
     {
         removed = false;
 
@@ -196,6 +252,121 @@ public static class StringExtensions
         remove = remove.ThrowIfNull(); if (remove.Length == 0) return source;
 
         var index = source.IndexOf(remove, comparison);
+        if (index < 0) return source;
+
+        removed = true;
+        return source.Remove(index, remove.Length);
+    }
+
+    /// <summary>
+    /// Removes the last ocurrence of the the <paramref name="remove"/> string in the given
+    /// <paramref name="source"/> one, using the given comparison mode, returning the resulting
+    /// string.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="remove"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static string RemoveLast(
+        this string source, string remove, StringComparison comparison)
+        => source.RemoveLast(remove, comparison, out _);
+
+    /// <summary>
+    /// Removes the last ocurrence of the the <paramref name="remove"/> string in the given
+    /// <paramref name="source"/> one, using the given comparison mode, returning the resulting
+    /// string. The out arguent <paramref name="removed"/> indicates if the string has been
+    /// removed, or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="remove"></param>
+    /// <param name="comparison"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string RemoveLast(
+        this string source, string remove, StringComparison comparison, out bool removed)
+    {
+        removed = false;
+
+        source = source.ThrowIfNull(); if (source.Length == 0) return source;
+        remove = remove.ThrowIfNull(); if (remove.Length == 0) return source;
+
+        var index = source.LastIndexOf(remove, comparison);
+        if (index < 0) return source;
+
+        removed = true;
+        return source.Remove(index, remove.Length);
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Removes the first ocurrence of the the <paramref name="remove"/> string in the given
+    /// <paramref name="source"/> one, using the given locale, returning the resulting string.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="remove"></param>
+    /// <param name="locale"></param>
+    /// <returns></returns>
+    public static string Remove(this string source, string remove, Locale locale)
+        => source.Remove(remove, locale, out _);
+
+    /// <summary>
+    /// Removes the first ocurrence of the the <paramref name="remove"/> string in the given
+    /// <paramref name="source"/> one, using the given locale, returning the resulting string.
+    /// The out arguent <paramref name="removed"/> indicates if the string has been removed,
+    /// or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="remove"></param>
+    /// <param name="locale"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string Remove(
+        this string source, string remove, Locale locale, out bool removed)
+    {
+        removed = false;
+
+        source = source.ThrowIfNull(); if (source.Length == 0) return source;
+        remove = remove.ThrowIfNull(); if (remove.Length == 0) return source;
+
+        var index = locale.IndexOf(source, remove);
+        if (index < 0) return source;
+
+        removed = true;
+        return source.Remove(index, remove.Length);
+    }
+
+    /// <summary>
+    /// Removes the last ocurrence of the the <paramref name="remove"/> string in the given
+    /// <paramref name="source"/> one, using the given locale, returning the resulting string.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="remove"></param>
+    /// <param name="locale"></param>
+    /// <returns></returns>
+    public static string RemoveLast(this string source, string remove, Locale locale)
+        => source.RemoveLast(remove, locale, out _);
+
+    /// <summary>
+    /// Removes the last ocurrence of the the <paramref name="remove"/> string in the given
+    /// <paramref name="source"/> one, using the given locale, returning the resulting string.
+    /// The out arguent <paramref name="removed"/> indicates if the string has been removed,
+    /// or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="remove"></param>
+    /// <param name="locale"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string RemoveLast(
+        this string source, string remove, Locale locale, out bool removed)
+    {
+        removed = false;
+
+        source = source.ThrowIfNull(); if (source.Length == 0) return source;
+        remove = remove.ThrowIfNull(); if (remove.Length == 0) return source;
+
+        var index = locale.LastIndexOf(source, remove);
         if (index < 0) return source;
 
         removed = true;

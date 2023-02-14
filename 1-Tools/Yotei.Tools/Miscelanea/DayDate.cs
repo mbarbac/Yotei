@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents an arbitrary date in a gregorian calendar format.
 /// </summary>
-public class CalendarDate : ICloneable, IComparable<CalendarDate>, IEquatable<CalendarDate>
+public class DayDate : ICloneable, IComparable<DayDate>, IEquatable<DayDate>
 {
     /// <summary>
     /// Initializes a new instance.
@@ -12,7 +12,7 @@ public class CalendarDate : ICloneable, IComparable<CalendarDate>, IEquatable<Ca
     /// <param name="year"></param>
     /// <param name="month"></param>
     /// <param name="day"></param>
-    public CalendarDate(int year, int month, int day)
+    public DayDate(int year, int month, int day)
     {
         ValidateDay(year, month, day);
 
@@ -25,13 +25,13 @@ public class CalendarDate : ICloneable, IComparable<CalendarDate>, IEquatable<Ca
     /// Initializes a new instance.
     /// </summary>
     /// <param name="item"></param>
-    public CalendarDate(DateTime item) : this(item.Year, item.Month, item.Day) { }
+    public DayDate(DateTime item) : this(item.Year, item.Month, item.Day) { }
 
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
     /// <param name="item"></param>
-    public CalendarDate(DateOnly item) : this(item.Year, item.Month, item.Day) { }
+    public DayDate(DateOnly item) : this(item.Year, item.Month, item.Day) { }
 
     /// <inheritdoc>
     /// </inheritdoc>
@@ -116,7 +116,7 @@ public class CalendarDate : ICloneable, IComparable<CalendarDate>, IEquatable<Ca
 
     /// <inheritdoc cref="ICloneable.Clone">
     /// </inheritdoc>
-    public CalendarDate Clone() => new(Year, Month, Day);
+    public DayDate Clone() => new(Year, Month, Day);
 
     object ICloneable.Clone() => Clone();
 
@@ -126,7 +126,7 @@ public class CalendarDate : ICloneable, IComparable<CalendarDate>, IEquatable<Ca
     /// </summary>
     /// <param name="year"></param>
     /// <returns></returns>
-    public CalendarDate WithYear(int year) => new(year, Month, Day);
+    public DayDate WithYear(int year) => new(year, Month, Day);
 
     /// <summary>
     /// Returns a new instance with the original value of the 'Month' property replaced by the
@@ -134,7 +134,7 @@ public class CalendarDate : ICloneable, IComparable<CalendarDate>, IEquatable<Ca
     /// </summary>
     /// <param name="month"></param>
     /// <returns></returns>
-    public CalendarDate WithMonth(int month) => new(Year, month, Day);
+    public DayDate WithMonth(int month) => new(Year, month, Day);
 
     /// <summary>
     /// Returns a new instance with the original value of the 'Day' property replaced by the
@@ -142,7 +142,7 @@ public class CalendarDate : ICloneable, IComparable<CalendarDate>, IEquatable<Ca
     /// </summary>
     /// <param name="day"></param>
     /// <returns></returns>
-    public CalendarDate WithDay(int day) => new(Year, Month, day);
+    public DayDate WithDay(int day) => new(Year, Month, day);
 
     /// <summary>
     /// Returns a new instance based upon the values on this one.
@@ -162,30 +162,30 @@ public class CalendarDate : ICloneable, IComparable<CalendarDate>, IEquatable<Ca
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
-    public int CompareTo(CalendarDate? other) => Compare(this, other);
+    public int CompareTo(DayDate? other) => Compare(this, other);
 
-    public static bool operator ==(CalendarDate? x, CalendarDate? y) => Compare(x, y) == 0;
+    public static bool operator ==(DayDate? x, DayDate? y) => Compare(x, y) == 0;
 
-    public static bool operator !=(CalendarDate? x, CalendarDate? y) => Compare(x, y) != 0;
+    public static bool operator !=(DayDate? x, DayDate? y) => Compare(x, y) != 0;
 
-    public static bool operator >(CalendarDate? x, CalendarDate? y) => Compare(x, y) > 0;
+    public static bool operator >(DayDate? x, DayDate? y) => Compare(x, y) > 0;
 
-    public static bool operator <(CalendarDate? x, CalendarDate? y) => Compare(x, y) < 0;
+    public static bool operator <(DayDate? x, DayDate? y) => Compare(x, y) < 0;
 
-    public static bool operator >=(CalendarDate? x, CalendarDate? y) => Compare(x, y) >= 0;
+    public static bool operator >=(DayDate? x, DayDate? y) => Compare(x, y) >= 0;
 
-    public static bool operator <=(CalendarDate? x, CalendarDate? y) => Compare(x, y) <= 0;
+    public static bool operator <=(DayDate? x, DayDate? y) => Compare(x, y) <= 0;
 
     /// <inheritdoc>
     /// </inheritdoc>
-    public bool Equals(CalendarDate? other) => Compare(this, other) == 0;
+    public bool Equals(DayDate? other) => Compare(this, other) == 0;
 
     public override bool Equals(object? obj)
     {
         if (ReferenceEquals(this, obj)) return true;
         if (obj is null) return false;
 
-        return obj is CalendarDate item && Compare(this, item) == 0;
+        return obj is DayDate item && Compare(this, item) == 0;
     }
 
     /// <inheritdoc>
@@ -197,7 +197,7 @@ public class CalendarDate : ICloneable, IComparable<CalendarDate>, IEquatable<Ca
     /// </summary>
     /// <param name="days"></param>
     /// <returns></returns>
-    public CalendarDate Add(int days)
+    public DayDate Add(int days)
     {
         int year = Year;
         int month = Month;
@@ -353,7 +353,7 @@ public class CalendarDate : ICloneable, IComparable<CalendarDate>, IEquatable<Ca
     /// <param name="x"></param>
     /// <param name="y"></param>
     /// <returns></returns>
-    public static int Compare(CalendarDate? x, CalendarDate? y)
+    public static int Compare(DayDate? x, DayDate? y)
     {
         if (x is null && y is null) return 0;
         if (x is null) return -1;
@@ -370,19 +370,19 @@ public class CalendarDate : ICloneable, IComparable<CalendarDate>, IEquatable<Ca
     /// Returns a new instance that represents the current date, in local coordinates.
     /// </summary>
     /// <returns></returns>
-    public static CalendarDate Now => new(DateTime.Now);
+    public static DayDate Now => new(DateTime.Now);
 
     /// <summary>
     /// Returns a new instance that represents the current date, in UTC coordinates.
     /// </summary>
     /// <returns></returns>
-    public static CalendarDate NowUTC => new(DateTime.UtcNow);
+    public static DayDate NowUTC => new(DateTime.UtcNow);
 
     /// <summary>
     /// Conversion operator.
     /// </summary>
     /// <param name="source"></param>
-    public static implicit operator DateTime(CalendarDate source)
+    public static implicit operator DateTime(DayDate source)
     {
         source = source.ThrowIfNull();
         return source.ToDateTime();
@@ -392,13 +392,13 @@ public class CalendarDate : ICloneable, IComparable<CalendarDate>, IEquatable<Ca
     /// Conversion operator.
     /// </summary>
     /// <param name="item"></param>
-    public static implicit operator CalendarDate(DateTime item) => new(item);
+    public static implicit operator DayDate(DateTime item) => new(item);
 
     /// <summary>
     /// Conversion operator.
     /// </summary>
     /// <param name="source"></param>
-    public static implicit operator DateOnly(CalendarDate source)
+    public static implicit operator DateOnly(DayDate source)
     {
         source = source.ThrowIfNull();
         return source.ToDateOnly();
@@ -408,5 +408,5 @@ public class CalendarDate : ICloneable, IComparable<CalendarDate>, IEquatable<Ca
     /// Conversion operator.
     /// </summary>
     /// <param name="item"></param>
-    public static implicit operator CalendarDate(DateOnly item) => new(item);
+    public static implicit operator DayDate(DateOnly item) => new(item);
 }

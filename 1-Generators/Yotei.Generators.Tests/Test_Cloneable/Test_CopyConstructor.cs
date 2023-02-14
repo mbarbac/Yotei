@@ -4,7 +4,7 @@ namespace Yotei.Generators.Tests.Cloneable
     using ICopyConstructor;
 
     // ====================================================
-    [Enforced]
+    //[Enforced]
     public static class Test_CopyConstructor
     {
         [Fact]

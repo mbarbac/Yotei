@@ -8,9 +8,9 @@
       <NoWarn>$(NoWarn);IDE0058</NoWarn>
    </PropertyGroup>
 
-   <PropertyGroup>
+   <!--<PropertyGroup>
       <DefineConstants>$(DefineConstants);DEBUG_CLONEABLE_GENERATOR</DefineConstants>
-   </PropertyGroup>
+   </PropertyGroup>-->
 
    <ItemGroup>
       <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.4.0" />

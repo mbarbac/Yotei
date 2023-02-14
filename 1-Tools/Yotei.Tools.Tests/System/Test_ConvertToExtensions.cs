@@ -103,12 +103,12 @@ public static class Test_ConvertToExtensions
 
     //[Enforced]
     [Fact]
-    public static void Test_CalendarDate_To_DateTime()
+    public static void Test_DayDate_To_DateTime()
     {
-        var source = new CalendarDate(2001, 12, 31);
+        var source = new DayDate(2001, 12, 31);
         DateTime target;
 
-        target = source.ConvertTo<CalendarDate, DateTime>();
+        target = source.ConvertTo<DayDate, DateTime>();
         Assert.Equal(source.Year, target.Year);
         Assert.Equal(source.Month, target.Month);
         Assert.Equal(source.Day, target.Day);
@@ -126,22 +126,22 @@ public static class Test_ConvertToExtensions
 
     //[Enforced]
     [Fact]
-    public static void Test_DateTime_To_CalendarDate()
+    public static void Test_DateTime_To_DayDate()
     {
         var source = new DateTime(2001, 12, 31);
-        CalendarDate target;
+        DayDate target;
 
-        target = source.ConvertTo<DateTime, CalendarDate>()!;
+        target = source.ConvertTo<DateTime, DayDate>()!;
         Assert.Equal(source.Year, target.Year);
         Assert.Equal(source.Month, target.Month);
         Assert.Equal(source.Day, target.Day);
 
-        target = source.ConvertTo<CalendarDate>()!;
+        target = source.ConvertTo<DayDate>()!;
         Assert.Equal(source.Year, target.Year);
         Assert.Equal(source.Month, target.Month);
         Assert.Equal(source.Day, target.Day);
 
-        target = (CalendarDate)source.ConvertTo(typeof(CalendarDate))!;
+        target = (DayDate)source.ConvertTo(typeof(DayDate))!;
         Assert.Equal(source.Year, target.Year);
         Assert.Equal(source.Month, target.Month);
         Assert.Equal(source.Day, target.Day);

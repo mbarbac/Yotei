@@ -94,6 +94,19 @@ public static class Test_StringExtensions
         Assert.True(source.ContainsAny(array, StringComparison.OrdinalIgnoreCase));
     }
 
+    //[Enforced]
+    [Fact]
+    public static void Test_ContainsAny_Locale()
+    {
+        var locale = Locale.Invariant with { CompareOptions = CompareOptions.IgnoreCase };
+        var source = "xyz";
+        var target = "abc";
+        Assert.False(source.ContainsAny(target, locale));
+
+        target = "abcX";
+        Assert.True(source.ContainsAny(target, locale));
+    }
+
     // --------------------------------------------------
 
     //[Enforced]
