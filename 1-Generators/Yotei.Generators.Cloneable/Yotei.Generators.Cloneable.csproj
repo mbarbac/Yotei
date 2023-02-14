@@ -8,20 +8,6 @@
       <NoWarn>$(NoWarn);IDE0058</NoWarn>
    </PropertyGroup>
 
-   <!--<PropertyGroup>
-      <IsPackable>true</IsPackable>
-      <Version>0.0.1-v0001</Version>
-      <Authors>mbarbac@hotmail.com</Authors>
-      <Description>Yotei Cloneable source code generator.</Description>
-      <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
-      <PackageLicenseExpression>MIT</PackageLicenseExpression>
-      <IncludeSymbols>True</IncludeSymbols>
-      <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-      <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-      <AssemblyVersion>9.9.9.9</AssemblyVersion>
-      <FileVersion>9.9.9.9</FileVersion>
-   </PropertyGroup>-->
-
    <PropertyGroup>
       <DefineConstants>$(DefineConstants);DEBUG_CLONEABLE_GENERATOR</DefineConstants>
    </PropertyGroup>
@@ -30,4 +16,59 @@
       <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.4.0" />
    </ItemGroup>
 
+   <ItemGroup>
+     <ProjectReference Include="..\Yotei.Generators.Common\Yotei.Generators.Common.csproj" />
+   </ItemGroup>
+
 </Project>
+
+<!-- SCENARIO: TO BE USED AS A REFERENCED PROJECT...
+
+   <ItemGroup>
+      <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.4.0" />
+   </ItemGroup>
+   
+-->
+
+<!-- SCENARIO: TO BE USED AS A NUGET PACKAGE...
+
+   <PropertyGroup>
+      <IsPackable>true</IsPackable>
+      <IsRoslynComponent>true</IsRoslynComponent>
+      <IncludeBuildOutput>false</IncludeBuildOutput>
+   </PropertyGroup>
+
+   <ItemGroup>
+      <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.4.0" />
+   </ItemGroup>
+   
+   <PropertyGroup>     
+      <Version>0.1.0-v0001</Version>
+      <Authors>mbarbac@hotmail.com</Authors>
+      <Description>Yotei Cloneable Source Code Generator.</Description>
+      <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
+      <PackageLicenseExpression>MIT</PackageLicenseExpression>
+      <IncludeSymbols>True</IncludeSymbols>
+      <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+      <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+      <AssemblyVersion>9.9.9.9</AssemblyVersion>
+      <FileVersion>9.9.9.9</FileVersion>
+   </PropertyGroup>
+
+   <ItemGroup>
+      <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.4.0" PrivateAssets="all" />
+   </ItemGroup>  
+   
+   <PropertyGroup>      
+      <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
+   </PropertyGroup>
+   
+   <Target Name="GetDependencyTargetPaths" AfterTargets="ResolvePackageDependenciesForBuild">
+      <ItemGroup>
+         <TargetPathWithTargetPlatformMoniker
+            Include="@(ResolveCompilerFileDefinitions)"
+            IncludeRuntimeDependencies="true" />
+      </ItemGroup>
+   </Target>
+   
+-->

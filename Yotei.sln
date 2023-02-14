@@ -39,6 +39,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dev", "0-Dev\Dev\Dev.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dev.Core", "0-Dev\Dev.Core\Dev.Core.csproj", "{46FEAFD0-2659-4F9B-806D-C85B1F1E17D4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yotei.Generators.Common", "1-Generators\Yotei.Generators.Common\Yotei.Generators.Common.csproj", "{C4E16A2D-7CC9-4E75-B646-C9DE669AF83B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -85,6 +87,10 @@ Global
 		{46FEAFD0-2659-4F9B-806D-C85B1F1E17D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{46FEAFD0-2659-4F9B-806D-C85B1F1E17D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{46FEAFD0-2659-4F9B-806D-C85B1F1E17D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4E16A2D-7CC9-4E75-B646-C9DE669AF83B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4E16A2D-7CC9-4E75-B646-C9DE669AF83B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4E16A2D-7CC9-4E75-B646-C9DE669AF83B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4E16A2D-7CC9-4E75-B646-C9DE669AF83B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -100,6 +106,7 @@ Global
 		{2897049F-D529-46AF-BC07-F3FA274BEE09} = {D755D0DC-E7F0-457F-85AE-1657B3D9D154}
 		{551386A3-FD6C-4C49-8E6E-5EC1AFF79230} = {F9A702D2-9059-47AC-8C2B-293D25B0F561}
 		{46FEAFD0-2659-4F9B-806D-C85B1F1E17D4} = {F9A702D2-9059-47AC-8C2B-293D25B0F561}
+		{C4E16A2D-7CC9-4E75-B646-C9DE669AF83B} = {D755D0DC-E7F0-457F-85AE-1657B3D9D154}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {607ADF94-45B4-4A19-BEEB-A6E8DA8A2757}
