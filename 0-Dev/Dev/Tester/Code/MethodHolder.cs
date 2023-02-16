@@ -57,7 +57,7 @@ internal static class MethodExtensions
             return false;
         }
 
-        var ats = method.GetAttributes(MenuTester.FactAttribute, true);
+        var ats = method.GetAttributes(Tester.FactAttribute, true);
         if (ats.Length == 0)
         {
             ex = new ArgumentException("Method has not the [Fact] attribute.").WithData(method);
@@ -78,7 +78,7 @@ internal static class MethodExtensions
     {
         ArgumentNullException.ThrowIfNull(method);
 
-        var ats = method.GetAttributes(MenuTester.EnforcedAttribute, true);
+        var ats = method.GetAttributes(Tester.EnforcedAttribute, true);
         return ats.Length != 0;
     }
 }

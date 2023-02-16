@@ -1,10 +1,7 @@
 ﻿namespace Dev.Tester;
 
 // ========================================================
-/// <summary>
-/// Executes solution tests.
-/// </summary>
-public class MenuTester : MenuItem
+public class Tester : MenuItem
 {
     public const string FactAttribute = nameof(FactAttribute);
     public const string EnforcedAttribute = nameof(EnforcedAttribute);
@@ -16,19 +13,17 @@ public class MenuTester : MenuItem
     static ElementList Excludes = new();
     static AssemblyHolderList AssemblyHolders = new();
 
-    /// <summary>
-    /// Print the head title of this menu item, which must end with a new line.
-    /// </summary>
-    public override void PrintHead() => WriteLine("Executes solution tests.");
+    /// <inheritdoc>
+    /// </inheritdoc>
+    public override void Print() => WriteLine("Execute solution tests.");
 
-    /// <summary>
-    /// Executes the actions in this menu item.
-    /// </summary>
+    /// <inheritdoc>
+    /// </inheritdoc>
     public override void Execute()
     {
         WriteLine();
-        WriteLine(Color.Green, Menu.SeparatorLine);
-        WriteLine(Color.Green, "Executing solution tests...");
+        WriteLine(Program.Color, Program.Separator);
+        WriteLine(Program.Color, "Execute solution tests.");
 
         Execute(breakOnError: true);
     }
@@ -53,14 +48,14 @@ public class MenuTester : MenuItem
     /// <param name="ts"></param>
     void PrintResults(int num, TimeSpan ts)
     {
-        WriteLine(Color.Green, Menu.SeparatorLine);
-        WriteLine(Color.Green, "Execution summary...");
-        WriteLine(Color.Green, Menu.SeparatorLine);
+        WriteLine(Program.Color, Program.Separator);
+        WriteLine(Program.Color, "Execution summary...");
+        WriteLine(Program.Color, Program.Separator);
         Write("Number of tests executed: ");
         WriteLine(Color.Cyan, num.ToString());
 
         PrintResults(ts);
-        WriteLine(Color.Green, Menu.SeparatorLine);
+        WriteLine(Program.Color, Program.Separator);
     }
 
     // ----------------------------------------------------
@@ -103,9 +98,9 @@ public class MenuTester : MenuItem
                 {
                     var method = methodHolder.MethodInfo;
                     WriteLine();
-                    WriteLine(Color.Green, Menu.SeparatorLine);
-                    WriteLine(Color.Green, $"{assemblyHolder.Name}.{typeHolder.Name}.{methodHolder.Name}");
-                    WriteLine(Color.Green, Menu.SeparatorLine);
+                    WriteLine(Program.Color, Program.Separator);
+                    WriteLine(Program.Color, $"{assemblyHolder.Name}.{typeHolder.Name}.{methodHolder.Name}");
+                    WriteLine(Program.Color, Program.Separator);
 
                     var span = Execute(breakOnError, instance, method);
                     ts = ts.Add(span);
@@ -165,15 +160,15 @@ public class MenuTester : MenuItem
         catch (Exception e)
         {
             WriteLine();
-            WriteLine(Color.Red, Menu.SeparatorLine);
+            WriteLine(Color.Red, Program.Separator);
             WriteLine(Color.Red, e.ToDisplayString());
-            WriteLine(Color.Red, Menu.SeparatorLine);
+            WriteLine(Color.Red, Program.Separator);
             WriteLine();
 
             if (breakOnError)
             {
                 WriteLine();
-                ReadLine("Executor cannot proceed further and will finish.");
+                WriteLine("Executor cannot proceed further and will finish.");
                 Environment.FailFast(null);
             }
         }
@@ -191,7 +186,7 @@ public class MenuTester : MenuItem
     {
         var root = AppContext.BaseDirectory;
         WriteLine();
-        Write(Color.Green, $"Populating from: {root} ");
+        Write(Program.Color, $"Populating from: {root} ");
 
         var files = System.IO.Directory.EnumerateFiles(root);
         foreach (var file in files)
@@ -225,7 +220,7 @@ public class MenuTester : MenuItem
     void PopulateFromIncludes()
     {
         WriteLine();
-        Write(Color.Green, "Populating explicit includes: ");
+        Write(Program.Color, "Populating explicit includes: ");
 
         foreach (var item in Includes)
         {
@@ -254,7 +249,7 @@ public class MenuTester : MenuItem
     void PurgeExcludes()
     {
         WriteLine();
-        Write(Color.Green, "Purging explicit includes: ");
+        Write(Program.Color, "Purging explicit includes: ");
 
         foreach (var item in Excludes)
         {
@@ -304,7 +299,7 @@ public class MenuTester : MenuItem
     void EnsureEnforced()
     {
         WriteLine();
-        Write(Color.Green, "Ensuring enforced elements: ");
+        Write(Program.Color, "Ensuring enforced elements: ");
 
         EnsureEnforcedTypes();
         EnsureEnforcedMethods();

@@ -7,5 +7,5 @@
 public enum PushMode
 {
     Local,
-    NuGet,
+    Remote,
 }

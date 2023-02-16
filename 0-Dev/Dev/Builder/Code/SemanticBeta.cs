@@ -46,6 +46,11 @@ public record SemanticBeta
     }
     string _Value = string.Empty;
 
+    /// <summary>
+    /// Determines if this instance is an empty one or not.
+    /// </summary>
+    public bool IsEmpty => _Value.Length == 0;
+
     // ----------------------------------------------------
 
     /// <summary>

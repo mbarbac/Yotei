@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// Represents a solution project.
+/// Represents a solution's project.
 /// </summary>
 public record Project
 {
@@ -47,6 +47,16 @@ public record Project
         init => _Value = value.ThrowIfNull();
     }
     File _Value = File.Empty;
+
+    /// <summary>
+    /// The name of this project.
+    /// </summary>
+    public string Name => File.Name;
+
+    /// <summary>
+    /// The path of this project.
+    /// </summary>
+    public string Path => File.Path;
 }
 
 // ========================================================
@@ -65,7 +75,7 @@ public static class ProjectExtensions
         version = project.FindVersion();
         if (version != null)
         {
-            var lines = _File.ReadAllLines(project.File.Path);
+            var lines = _File.ReadAllLines(project.Path);
             foreach (var line in lines)
             {
                 var ini = line.IndexOf(IsPackableHead, Program.Comparison);
@@ -96,7 +106,7 @@ public static class ProjectExtensions
     {
         project = project.ThrowIfNull();
 
-        var lines = _File.ReadAllLines(project.File.Path);
+        var lines = _File.ReadAllLines(project.Path);
         foreach (var line in lines)
         {
             var ini = line.IndexOf(VersionHead, Program.Comparison);
@@ -116,7 +126,7 @@ public static class ProjectExtensions
     const string VersionTail = "</Version>";
 
     /// <summary>
-    /// Resets the version of this project to the given one.
+    /// Sets the version of this project to the given one.
     /// </summary>
     /// <param name="project"></param>
     /// <param name="version"></param>
@@ -126,7 +136,7 @@ public static class ProjectExtensions
         project = project.ThrowIfNull();
         version = version.ThrowIfNull();
 
-        var lines = _File.ReadAllLines(project.File.Path);
+        var lines = _File.ReadAllLines(project.Path);
         var done = false;
 
         for (int i = 0; i < lines.Length; i++)
@@ -155,7 +165,7 @@ public static class ProjectExtensions
     // ----------------------------------------------------
 
     /// <summary>
-    /// Selects from the given list of projects those that are packable ones.
+    /// Returns from the given list of projects those that are packable ones.
     /// </summary>
     /// <param name="projects"></param>
     /// <returns></returns>
@@ -184,7 +194,7 @@ public static class ProjectExtensions
         project = project.ThrowIfNull();
 
         var list = new List<PackageReference>();
-        var lines = _File.ReadAllLines(project.File.Path);
+        var lines = _File.ReadAllLines(project.Path);
 
         for (int i = 0; i < lines.Length; i++)
         {
@@ -241,32 +251,58 @@ public static class ProjectExtensions
     // ----------------------------------------------------
 
     /// <summary>
-    /// Reloads into this project the package whose name and version are given, by removing and
-    /// then adding it again from the source specified by the given mode. This methods keeps any
-    /// original attributes and xml nodes for that reference.
+    /// Compiles the given project.
+    /// </summary>
+    /// <param name="project"></param>
+    /// <param name="mode"></param>
+    /// <returns></returns>
+    public static bool Compile(this Project project, CompileMode mode)
+    {
+        project = project.ThrowIfNull();
+
+        var p = new Process();
+        p.StartInfo.FileName = Builder.DotNetExe;
+        p.StartInfo.WorkingDirectory = project.File.Directory.Path;
+        p.StartInfo.Arguments = $"build -c {mode} {project.File.NameAndExtension}";
+
+        p.Start();
+        p.WaitForExit();
+        return p.ExitCode == 0;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Reloads into this project the package whose name and version are given, from the source
+    /// specified by the given push mode.
     /// </summary>
     /// <param name="project"></param>
     /// <param name="name"></param>
     /// <param name="version"></param>
     /// <param name="mode"></param>
     /// <returns></returns>
-    public static bool ReloadPackage(this Project project, string name, string version, PushMode mode)
+    public static bool ReLoadPackage(
+        this Project project, string name, string version, PushMode mode)
     {
         project = project.ThrowIfNull();
         name = name.NotNullNotEmpty();
         version = version.NotNullNotEmpty();
 
-        var lines = _File.ReadAllLines(project.File.Path);
+        var source = mode == PushMode.Local
+            ? Builder.LocalRepoPath
+            : Builder.NuGetRepoSource;
+
+        var lines = _File.ReadAllLines(project.Path);
         var done = false;
 
         WriteLine();
-        WriteLine(Color.Green, "Removing package...");
-        done = project.RemovePackage(name);
+        WriteLine(Program.Color, "Removing package...");
+        done = Remove();
         if (!done) WriteLine(Color.Red, "Cannot remove package!");
 
         WriteLine();
-        WriteLine(Color.Green, "Adding package...");
-        done = project.AddPackage(name, version, mode);
+        WriteLine(Program.Color, "Adding package...");
+        done = Add();
         if (!done) WriteLine(Color.Red, "Cannot add package!");
 
         if (done)
@@ -299,78 +335,35 @@ public static class ProjectExtensions
             }
         }
 
-        _File.WriteAllLines(project.File.Path, lines);
+        _File.WriteAllLines(project.Path, lines);
         return done;
-    }
 
-    /// <summary>
-    /// Removes from this project the package whose name is given.
-    /// </summary>
-    /// <param name="project"></param>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    public static bool RemovePackage(this Project project, string name)
-    {
-        project = project.ThrowIfNull();
-        name = name.NotNullNotEmpty();
+        /// <summary> Invoked to remove the current package...
+        /// </summary>
+        bool Remove()
+        {
+            var p = new Process();
+            p.StartInfo.FileName = Builder.DotNetExe;
+            p.StartInfo.WorkingDirectory = project.File.Directory;
+            p.StartInfo.Arguments = $"remove package {name}";
 
-        var p = new Process();
-        p.StartInfo.FileName = MenuBuilder.DotNetExe;
-        p.StartInfo.WorkingDirectory = project.File.Directory;
-        p.StartInfo.Arguments = $"remove package {name}";
+            p.Start();
+            p.WaitForExit();
+            return p.ExitCode == 0;
+        }
 
-        p.Start();
-        p.WaitForExit();
-        return p.ExitCode == 0;
-    }
+        /// <summary> Invoked to add the specified package...
+        /// </summary>
+        bool Add()
+        {
+            var p = new Process();
+            p.StartInfo.FileName = Builder.DotNetExe;
+            p.StartInfo.WorkingDirectory = project.File.Directory;
+            p.StartInfo.Arguments = $"add package {name} -v {version} -s {source}";
 
-    /// <summary>
-    /// Adds to this project a reference to the package whose name and version is given, from
-    /// the source specified by the given mode.
-    /// </summary>
-    /// <param name="project"></param>
-    /// <param name="name"></param>
-    /// <param name="version"></param>
-    /// <param name="mode"></param>
-    /// <returns></returns>
-    public static bool AddPackage(this Project project, string name, string version, PushMode mode)
-    {
-        project = project.ThrowIfNull();
-        name = name.NotNullNotEmpty();
-        version = version.NotNullNotEmpty();
-
-        var source = mode == PushMode.Local ? MenuBuilder.LocalRepoPath : MenuBuilder.NuGetRepoSource;
-        var p = new Process();
-        p.StartInfo.FileName = MenuBuilder.DotNetExe;
-        p.StartInfo.WorkingDirectory = project.File.Directory;
-        p.StartInfo.Arguments = $"add package {name} -v {version} -s {source}";
-
-        p.Start();
-        p.WaitForExit();
-        var done = p.ExitCode == 0;
-
-        return done;
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Compiles the given project.
-    /// </summary>
-    /// <param name="project"></param>
-    /// <param name="mode"></param>
-    /// <returns></returns>
-    public static bool Compile(this Project project, CompileMode mode)
-    {
-        project = project.ThrowIfNull();
-
-        var p = new Process();
-        p.StartInfo.FileName = MenuBuilder.DotNetExe;
-        p.StartInfo.WorkingDirectory = project.File.Directory.Path;
-        p.StartInfo.Arguments = $"build -c {mode} {project.File.NameAndExtension}";
-
-        p.Start();
-        p.WaitForExit();
-        return p.ExitCode == 0;
+            p.Start();
+            p.WaitForExit();
+            return p.ExitCode == 0;
+        }
     }
 }

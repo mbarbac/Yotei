@@ -4,6 +4,34 @@
 public static class DirectoryExtensions
 {
     /// <summary>
+    /// Determines if this directory is a debug one, or not.
+    /// </summary>
+    /// <param name="directory"></param>
+    /// <returns></returns>
+    public static bool IsDebug(this Directory directory)
+    {
+        directory = directory.ThrowIfNull();
+
+        return
+            directory.Path.EndsWith("\\debug", Program.Comparison) ||
+            directory.Path.Contains("\\debug\\", Program.Comparison);
+    }
+
+    /// <summary>
+    /// Determines if this directory is a release one, or not.
+    /// </summary>
+    /// <param name="directory"></param>
+    /// <returns></returns>
+    public static bool IsRelease(this Directory directory)
+    {
+        directory = directory.ThrowIfNull();
+
+        return
+            directory.Path.EndsWith("\\release", Program.Comparison) ||
+            directory.Path.Contains("\\release\\", Program.Comparison);
+    }
+
+    /// <summary>
     /// Find all projects in the given directory and subdirectories, provided the path do not
     /// beguin with the exclude, if it is not empty.
     /// </summary>

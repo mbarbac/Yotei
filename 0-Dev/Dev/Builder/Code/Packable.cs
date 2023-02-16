@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// Represents a solution project that produces a NuGet package.
+/// Represents a solution project that can produce a package.
 /// </summary>
 public record Packable
 {
@@ -38,7 +38,12 @@ public record Packable
 
     /// <inheritdoc>
     /// </inheritdoc>
-    public override string ToString() => $"{Project}: {Version}";
+    public override string ToString() => $"{Project} ({Version})";
+
+    /// <summary>
+    /// Implicit conversion operator.
+    /// </summary>
+    public static implicit operator string(Packable packable) => packable.ToString();
 
     /// <summary>
     /// The project this instance refers to.
@@ -59,6 +64,16 @@ public record Packable
         init => _Version = value.ThrowIfNull(nameof(Version));
     }
     SemanticVersion _Version = SemanticVersion.Empty;
+
+    /// <summary>
+    /// The name of this packable project.
+    /// </summary>
+    public string Name => Project.Name;
+
+    /// <summary>
+    /// The path of this packable project.
+    /// </summary>
+    public string Path => Project.Path;
 }
 
 // ========================================================
@@ -80,7 +95,7 @@ public static class PackageExtensions
             foreach (var reference in references)
             {
                 var temp = list.Find(x => string.Compare(
-                    x.Packable.Project.File.Name, reference.Name, Program.Comparison) == 0);
+                    x.Packable.Name, reference.Name, Program.Comparison) == 0);
 
                 if (temp != null) temp.Count++;
             }
@@ -96,13 +111,14 @@ public static class PackageExtensions
         public int Count = 0;
         public Packable Packable = Packable.Empty;
         public Weighted(Packable packable) => Packable = packable.ThrowIfNull();
-        public override string ToString() => $"{Packable.Project.File.Name}: {Count}";
+        public override string ToString() => $"{Packable}: {Count}";
     }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Gets the collection of package files found for the given packable project and mode.
+    /// Gets the collection of package files found for the given packable project name, version
+    /// and mode.
     /// </summary>
     /// <param name="packable"></param>
     /// <param name="mode"></param>
@@ -111,7 +127,7 @@ public static class PackageExtensions
     {
         packable = packable.ThrowIfNull();
 
-        var name = $"{packable.Project.File.Name}.{packable.Version}";
+        var name = $"{packable.Name}.{packable.Version}";
         var list = new List<File>(); Populate(packable.Project.File.Directory);
         return list.ToImmutableArray();
 
@@ -120,7 +136,7 @@ public static class PackageExtensions
         void Populate(Directory directory)
         {
             if ((mode == PushMode.Local && directory.IsDebug()) ||
-                (mode == PushMode.NuGet && directory.IsRelease()))
+                (mode == PushMode.Remote && directory.IsRelease()))
             {
                 var files = directory.GetFiles($"*{name}.nupkg");
                 foreach (var file in files) list.Add(file);
@@ -143,21 +159,27 @@ public static class PackageExtensions
     /// <returns></returns>
     public static ImmutableArray<File> Push(this Packable packable, PushMode mode)
     {
-        packable = packable.ThrowIfNull();
+        var source = mode == PushMode.Local
+            ? Builder.LocalRepoSource
+            : Builder.NuGetRepoSource;
 
-        var source = mode == PushMode.Local ? MenuBuilder.LocalRepoSource : MenuBuilder.NuGetRepoSource;
         var files = packable.GetPackageFiles(mode);
         var list = new List<File>();
 
         var regulars = files.Where(x => string.Compare(x.Extension, "nupkg", Program.Comparison) == 0);
         foreach (var file in regulars)
         {
+            WriteLine();
+            Write(Program.Color, "Pushing regular package: "); WriteLine(file.NameAndExtension);
             var done = PushFile(file);
             if (done) list.Add(file);
         }
+
         var symbols = files.Where(x => string.Compare(x.Extension, "snupkg", Program.Comparison) == 0);
         foreach (var file in symbols)
         {
+            WriteLine();
+            Write(Program.Color, "Pushing regular symbols: "); WriteLine(file.NameAndExtension);
             var done = PushFile(file);
             if (done) list.Add(file);
         }
@@ -168,7 +190,7 @@ public static class PackageExtensions
         bool PushFile(File file)
         {
             var p = new Process();
-            p.StartInfo.FileName = MenuBuilder.DotNetExe;
+            p.StartInfo.FileName = Builder.DotNetExe;
             p.StartInfo.WorkingDirectory = file.Directory;
             p.StartInfo.Arguments = $"nuget push {file.NameAndExtension} -s {source}";
 

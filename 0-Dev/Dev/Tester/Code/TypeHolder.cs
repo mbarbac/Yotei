@@ -54,7 +54,7 @@ internal class TypeHolder
         // All methods...
         if (methodName == null)
         {
-            var methods = Type.GetMethods(MenuTester.Flags);
+            var methods = Type.GetMethods(Tester.Flags);
             foreach (var method in methods)
             {
                 if (!method.IsValidTest(out _)) continue;
@@ -65,7 +65,7 @@ internal class TypeHolder
         // Requested one...
         else
         {
-            var method = Type.GetMethods(MenuTester.Flags)
+            var method = Type.GetMethods(Tester.Flags)
                 .Where(x => x.Name == methodName)
                 .SingleOrDefault();
 
@@ -116,7 +116,7 @@ internal static class TypeExtensions
 
         if (type.IsClass)
         {
-            var methods = type.GetMethods(MenuTester.Flags);
+            var methods = type.GetMethods(Tester.Flags);
             var any = methods.Any(x => x.IsValidTest(out _));
 
             ex = null;
@@ -139,7 +139,7 @@ internal static class TypeExtensions
     {
         ArgumentNullException.ThrowIfNull(type);
 
-        var ats = type.GetAttributes(MenuTester.EnforcedAttribute, true);
+        var ats = type.GetAttributes(Tester.EnforcedAttribute, true);
         return ats.Length != 0;
     }
 }

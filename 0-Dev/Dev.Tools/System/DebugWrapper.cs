@@ -7,6 +7,19 @@
 public static class DebugWrapper
 {
     /// <summary>
+    /// Invoked to obtain a formatted message.
+    /// </summary>
+    static string FormatMessage(this string message, params object?[] args)
+    {
+        message ??= string.Empty;
+        args ??= new object?[] { null };
+
+        return args.Length > 0 ? string.Format(message, args) : message;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// The indentation size.
     /// </summary>
     public static int IndentSize
@@ -169,18 +182,5 @@ public static class DebugWrapper
     {
         Indent();
         WriteLine(color, message, args);
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Invoked to obtain a formatted message.
-    /// </summary>
-    static string FormatMessage(this string message, params object?[] args)
-    {
-        message ??= string.Empty;
-        args ??= new object?[] { null };
-
-        return args.Length > 0 ? string.Format(message, args) : message;
     }
 }

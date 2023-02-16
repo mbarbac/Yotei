@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
    <PropertyGroup>
       <TargetFramework>net7.0</TargetFramework>
@@ -9,7 +9,7 @@
    </PropertyGroup>
 
    <ItemGroup>
-     <ProjectReference Include="..\..\1-Tools\Yotei.Tools\Yotei.Tools.csproj" />
+      <PackageReference Include="Yotei.Tools" Version="0.2.4-v0003" />
    </ItemGroup>
 
-</Project>
+   </Project>
