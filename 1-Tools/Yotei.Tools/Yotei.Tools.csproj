@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
    <PropertyGroup>
       <TargetFramework>net7.0</TargetFramework>
@@ -10,16 +10,20 @@
 
    <PropertyGroup>
       <IsPackable>true</IsPackable>
-      <Version>0.2.4-v0004</Version>
+      <Version>0.5.0-v0001</Version>
       <Authors>mbarbac@hotmail.com</Authors>
       <Description>Common Tools for the Yotei framework.</Description>
       <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
       <PackageLicenseExpression>MIT</PackageLicenseExpression>
+      <PackageReadmeFile>README.md</PackageReadmeFile>
       <IncludeSymbols>True</IncludeSymbols>
       <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
       <SymbolPackageFormat>snupkg</SymbolPackageFormat>
       <AssemblyVersion>9.9.9.9</AssemblyVersion>
       <FileVersion>9.9.9.9</FileVersion>
    </PropertyGroup>
+   <ItemGroup>
+      <None Include="README.md" Pack="true" PackagePath="\" />
+   </ItemGroup>
 
 </Project>

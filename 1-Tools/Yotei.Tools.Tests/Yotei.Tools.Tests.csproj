@@ -20,7 +20,7 @@
          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
          <PrivateAssets>all</PrivateAssets>
       </PackageReference>
-      <PackageReference Include="Yotei.Tools" Version="0.2.4-v0003" />
+      <PackageReference Include="Yotei.Tools" Version="0.5.0-v0001" />
    </ItemGroup>
 
 </Project>
