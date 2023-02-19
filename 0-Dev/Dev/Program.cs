@@ -7,9 +7,16 @@
 internal class Program
 {
     public static StringComparison Comparison = StringComparison.OrdinalIgnoreCase;
-
-    public static string Separator = "******************************";
+    public static string FatSeparator = "******************************";
+    public static string SlimSeparator = "--------------------";
     public static ConsoleColor Color = ConsoleColor.Green;
+
+    public static string DotNetExe = "dotnet";
+    public static string LocalRepoPath = @"C:\Users\mbarb\AppData\Roaming\NuGet\local";
+    public static string LocalRepoSource = "local";
+    public static string NuGetRepoSource = @"https://api.nuget.org/v3/index.json";
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// Program's entry point.
@@ -17,16 +24,21 @@ internal class Program
     /// <param name="args"></param>
     static void Main(string[] args)
     {
-        new Menu().Run(() =>
+        var done = -1; do
         {
             WriteLine();
-            WriteLine(Color, Separator);
+            WriteLine(Color, FatSeparator);
             WriteLine(Color, "Main menu.");
             WriteLine();
-        },
-        new Tester.Tester(),
-        new Builder.Builder(),
-        new Janitor.Janitor());
+
+            done = Menu.Run(
+                Color,
+                new MenuEntry(() => WriteLine("Exit")),
+                new Tester.Tester(),
+                new Builder.LocalBuilder(),
+                new Janitor.Janitor());
+        }
+        while (done > 0);
     }
 
     // ----------------------------------------------------

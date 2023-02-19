@@ -1,4 +1,4 @@
-﻿namespace Yotei.Generators.Cloneable;
+﻿namespace Yotei.Generators.MemberWith;
 
 // ========================================================
 

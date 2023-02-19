@@ -29,5 +29,5 @@ public static class FileExtensions
         return
             file.Path.EndsWith("\\release", Program.Comparison) ||
             file.Path.Contains("\\release\\", Program.Comparison);
-    }
+    }   
 }

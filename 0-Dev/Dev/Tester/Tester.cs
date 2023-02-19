@@ -1,7 +1,7 @@
 ﻿namespace Dev.Tester;
 
 // ========================================================
-public class Tester : MenuItem
+public class Tester : MenuEntry
 {
     public const string FactAttribute = nameof(FactAttribute);
     public const string EnforcedAttribute = nameof(EnforcedAttribute);
@@ -9,23 +9,25 @@ public class Tester : MenuItem
         BindingFlags.Instance | BindingFlags.Static |
         BindingFlags.Public | BindingFlags.NonPublic;
 
-    static ElementList Includes = new();
-    static ElementList Excludes = new();
-    static AssemblyHolderList AssemblyHolders = new();
+    readonly ElementList Includes = new();
+    readonly ElementList Excludes = new();
+    readonly AssemblyHolderList AssemblyHolders = new();
+
+    public string Header => "Execute Solution Tests.";
 
     /// <inheritdoc>
     /// </inheritdoc>
-    public override void Print() => WriteLine("Execute solution tests.");
+    public override void OnPrint() => WriteLine(Header);
 
     /// <inheritdoc>
     /// </inheritdoc>
-    public override void Execute()
+    public override void OnExecute()
     {
         WriteLine();
-        WriteLine(Program.Color, Program.Separator);
-        WriteLine(Program.Color, "Execute solution tests.");
+        WriteLine(Program.Color, Program.FatSeparator);
+        WriteLine(Program.Color, Header);
 
-        Execute(breakOnError: true);
+        Executor(breakOnError: true);
     }
 
     // ----------------------------------------------------
@@ -48,23 +50,23 @@ public class Tester : MenuItem
     /// <param name="ts"></param>
     void PrintResults(int num, TimeSpan ts)
     {
-        WriteLine(Program.Color, Program.Separator);
+        WriteLine(Program.Color, Program.FatSeparator);
         WriteLine(Program.Color, "Execution summary...");
-        WriteLine(Program.Color, Program.Separator);
-        Write("Number of tests executed: ");
+        WriteLine(Program.Color, Program.FatSeparator);
+        Write("Number of tests Executord: ");
         WriteLine(Color.Cyan, num.ToString());
 
         PrintResults(ts);
-        WriteLine(Program.Color, Program.Separator);
+        WriteLine(Program.Color, Program.FatSeparator);
     }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Executes the tests.
+    /// Executors the tests.
     /// </summary>
     /// <param name="breakOnError"></param>
-    void Execute(bool breakOnError)
+    void Executor(bool breakOnError)
     {
         var listener = new ConsoleTraceListener();
         Trace.Listeners.Add(listener);
@@ -98,11 +100,11 @@ public class Tester : MenuItem
                 {
                     var method = methodHolder.MethodInfo;
                     WriteLine();
-                    WriteLine(Program.Color, Program.Separator);
+                    WriteLine(Program.Color, Program.FatSeparator);
                     WriteLine(Program.Color, $"{assemblyHolder.Name}.{typeHolder.Name}.{methodHolder.Name}");
-                    WriteLine(Program.Color, Program.Separator);
+                    WriteLine(Program.Color, Program.FatSeparator);
 
-                    var span = Execute(breakOnError, instance, method);
+                    var span = Executor(breakOnError, instance, method);
                     ts = ts.Add(span);
                     num++;
 
@@ -120,13 +122,13 @@ public class Tester : MenuItem
     }
 
     /// <summary>
-    /// Executes the given method of the given host, or if it is null, a static one.
+    /// Executors the given method of the given host, or if it is null, a static one.
     /// </summary>
     /// <param name="breakOnError"></param>
     /// <param name="host"></param>
     /// <param name="method"></param>
     /// <returns></returns>
-    TimeSpan Execute(bool breakOnError, object? host, MethodInfo method)
+    TimeSpan Executor(bool breakOnError, object? host, MethodInfo method)
     {
         var watch = new Stopwatch();
         watch.Start();
@@ -160,9 +162,9 @@ public class Tester : MenuItem
         catch (Exception e)
         {
             WriteLine();
-            WriteLine(Color.Red, Program.Separator);
+            WriteLine(Color.Red, Program.FatSeparator);
             WriteLine(Color.Red, e.ToDisplayString());
-            WriteLine(Color.Red, Program.Separator);
+            WriteLine(Color.Red, Program.FatSeparator);
             WriteLine();
 
             if (breakOnError)
@@ -294,7 +296,7 @@ public class Tester : MenuItem
 
     /// <summary>
     /// Ensures that, if an 'Enforced' attribute is used, then only the test classes and methods
-    /// decorates with it are executed.
+    /// decorates with it are Executord.
     /// </summary>
     void EnsureEnforced()
     {
@@ -324,7 +326,7 @@ public class Tester : MenuItem
     /// Determines if there are enforced types, or not.
     /// </summary>
     /// <returns></returns>
-    static bool AreEnforcedTypes()
+    bool AreEnforcedTypes()
     {
         foreach (var assemblyHolder in AssemblyHolders)
             foreach (var typeHolder in assemblyHolder.TypeHolders)

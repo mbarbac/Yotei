@@ -31,6 +31,8 @@ public static class DirectoryExtensions
             directory.Path.Contains("\\release\\", Program.Comparison);
     }
 
+    // ----------------------------------------------------
+
     /// <summary>
     /// Find all projects in the given directory and subdirectories, provided the path do not
     /// beguin with the exclude, if it is not empty.

@@ -1,4 +1,7 @@
-﻿namespace Dev.Tools;
+﻿using System.Net;
+using System.Net.Mail;
+
+namespace Dev.Tools;
 
 // ========================================================
 public record Directory
@@ -153,6 +156,34 @@ public record Directory
         }
         catch { }
         return ImmutableArray<File>.Empty;
+    }
+
+    /// <summary>
+    /// Gets the collection of files in this directory, optionally only those whose names
+    /// match the given search pattern, if it is not null, and optionally recursing through
+    /// its subdirectories.
+    /// </summary>
+    /// <param name="recursive"></param>
+    /// <param name="search"></param>
+    /// <returns></returns>
+    public ImmutableArray<File> GetFiles(bool recursive, string? search = null)
+    {
+        search = search?.NotNullNotEmpty();
+
+        var list = new List<File>(); Populate(list, this);
+        return list.ToImmutableArray();
+
+        void Populate(List<File> list, Directory directory)
+        {
+            var paths = search == null
+                ? _Directory.GetFiles(directory.Path)
+                : _Directory.GetFiles(directory.Path, search);
+
+            list.AddRange(paths.Select(x => new File(x)));
+
+            if (recursive)
+                foreach (var dir in directory.GetDirectories()) Populate(list, dir);
+        }
     }
 }
 
