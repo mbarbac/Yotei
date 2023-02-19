@@ -53,7 +53,7 @@ public class Tester : MenuEntry
         WriteLine(Program.Color, Program.FatSeparator);
         WriteLine(Program.Color, "Execution summary...");
         WriteLine(Program.Color, Program.FatSeparator);
-        Write("Number of tests Executord: ");
+        Write("Number of tests executed: ");
         WriteLine(Color.Cyan, num.ToString());
 
         PrintResults(ts);
