@@ -10,7 +10,7 @@
 
    <PropertyGroup>
       <IsPackable>true</IsPackable>
-      <Version>0.5.0-v0001</Version>
+      <Version>0.5.1-v0001</Version>
       <Authors>mbarbac@hotmail.com</Authors>
       <Description>Parsing of Dynamic Lambda Expressions.</Description>
       <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
@@ -26,7 +26,7 @@
       <None Include="README.md" Pack="true" PackagePath="\" />
    </ItemGroup>
    <ItemGroup>
-     <PackageReference Include="Yotei.Tools" Version="0.5.0-v0001" />
+     <PackageReference Include="Yotei.Tools" Version="0.5.1-v0001" />
    </ItemGroup>
 
    <!--<PropertyGroup>

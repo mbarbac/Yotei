@@ -9,6 +9,36 @@
     <Import_RootNamespace>Yotei.Generators.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\UnreachableException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\EmptyException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\NotFoundException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\DuplicateException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Miscelanea\NamedTypeBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\AttributeDataExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\ISymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\ITypeSymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\ChainExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\NameSyntaxExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\CodeBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\DebugExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\ExceptionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\NoDuplicatesList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\StringExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Api\ICaptured.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Api\IGenerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Api\ICapturedField.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Api\ICapturedProperty.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Api\ICapturedType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Code\CaptureLevel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Code\CapturedField.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Code\CapturedProperty.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Code\CapturedType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Code\Generator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Extensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\FileNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\NamespaceNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\TypeNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\__.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Usings.cs" />
   </ItemGroup>

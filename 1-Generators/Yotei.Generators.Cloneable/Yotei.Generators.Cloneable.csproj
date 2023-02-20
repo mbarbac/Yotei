@@ -10,9 +10,9 @@
 
    <PropertyGroup>
       <IsPackable>true</IsPackable>
-      <Version>0.5.0-v0001</Version>
+      <Version>0.5.1-v0001</Version>
       <Authors>mbarbac@hotmail.com</Authors>
-      <Description>Yotei Cloneable source code generator..</Description>
+      <Description>Yotei Source Code Generator for Cloneable Attributes.</Description>
       <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
       <PackageLicenseExpression>MIT</PackageLicenseExpression>
       <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -26,7 +26,16 @@
       <None Include="README.md" Pack="true" PackagePath="\" />
    </ItemGroup>
    <ItemGroup>
+      <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+   </ItemGroup>
+
+   <!--<PropertyGroup>
+      <DefineConstants>$(DefineConstants);DEBUG_CLONEABLE_GENERATOR</DefineConstants>
+   </PropertyGroup>-->
+   
+   <ItemGroup>
       <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.4.0" />
    </ItemGroup>
+   <Import Project="..\Yotei.Generators.Shared\Yotei.Generators.Shared.projitems" Label="Shared" />
 
 </Project>
