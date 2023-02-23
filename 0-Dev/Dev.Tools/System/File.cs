@@ -31,8 +31,10 @@ public record File
         if (Extension.StartsWith('.')) Extension = Extension[1..];
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => NameAndExtension;
 
     /// <summary>

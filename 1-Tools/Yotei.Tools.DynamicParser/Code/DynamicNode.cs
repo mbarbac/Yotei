@@ -115,8 +115,10 @@ public abstract class DynamicNode : DynamicObject
 
     // ----------------------------------------------------
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override DynamicMetaObject GetMetaObject(Expression expression)
     {
         var master = base.GetMetaObject(expression);
@@ -192,8 +194,10 @@ public abstract class DynamicNode : DynamicObject
 
     // ----------------------------------------------------
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override bool TryGetMember(GetMemberBinder binder, out object? result)
     {
         DynamicParser.DebugPrint($"- GetMember:");
@@ -207,8 +211,10 @@ public abstract class DynamicNode : DynamicObject
         return true;
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object? result)
     {
         DynamicParser.DebugPrint($"- GetIndex:");
@@ -224,8 +230,10 @@ public abstract class DynamicNode : DynamicObject
         return true;
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override bool TryInvoke(InvokeBinder binder, object?[]? args, out object? result)
     {
         DynamicParser.DebugPrint($"- Invoke:");
@@ -241,8 +249,10 @@ public abstract class DynamicNode : DynamicObject
         return true;
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override bool TryInvokeMember(InvokeMemberBinder binder, object?[]? args, out object? result)
     {
         DynamicParser.DebugPrint($"- Method:");

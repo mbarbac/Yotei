@@ -14,8 +14,7 @@ internal static class NameSyntaxExtensions
     {
         nameSyntax = nameSyntax.ThrowIfNull(nameof(nameSyntax));
 
-        return nameSyntax switch
-        {
+        return nameSyntax switch {
             SimpleNameSyntax item => item.Identifier.Text,
             QualifiedNameSyntax item => ShortName(item.Right, useAlias),
             AliasQualifiedNameSyntax item => ShortName(useAlias ? item.Alias : item.Name, false),
@@ -35,8 +34,7 @@ internal static class NameSyntaxExtensions
     {
         nameSyntax = nameSyntax.ThrowIfNull(nameof(nameSyntax));
 
-        return nameSyntax switch
-        {
+        return nameSyntax switch {
             SimpleNameSyntax item => item.Identifier.Text,
             QualifiedNameSyntax item => item.ToString(),
             AliasQualifiedNameSyntax item => LongName(useAlias ? item.Alias : item.Name, false),

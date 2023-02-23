@@ -36,8 +36,10 @@ public record Packable
     public static Packable Empty { get; } = new();
     protected Packable() { }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => $"{Project} ({Version})";
 
     /// <summary>

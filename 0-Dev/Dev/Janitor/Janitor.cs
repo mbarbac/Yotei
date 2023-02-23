@@ -5,12 +5,14 @@ public class Janitor : MenuEntry
 {
     public string Header => "Manage Local Artifacts.";
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public override void OnPrint() => WriteLine(Header);
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public override void OnExecute()
     {
         var done = -1; do

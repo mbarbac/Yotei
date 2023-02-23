@@ -55,8 +55,10 @@ public class DynamicNodeMethod : DynamicNodeHosted
         return items.ToImmutableList();
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString()
     {
         var sb = new StringBuilder($"{DynamicHost}.{DynamicName}");
@@ -90,7 +92,9 @@ public class DynamicNodeMethod : DynamicNodeHosted
     /// </summary>
     public IImmutableList<DynamicNode> DynamicArguments { get; }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override DynamicNodeArgument? GetArgument() => DynamicHost.GetArgument();
 }

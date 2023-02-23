@@ -22,8 +22,10 @@ internal class NoDuplicatesList<T> : IList<T>
         if (validator != null) Validator = validator;
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => $"Count: {Count}";
 
     /// <summary>
@@ -37,27 +39,28 @@ internal class NoDuplicatesList<T> : IList<T>
     public Func<T, T> Validator { get; } = (element) => element.ThrowIfNull(nameof(element));
 
     /// <summary>
-    /// Determines if this collection is a read-only one, or not.
+    /// <inheritdoc/>
     /// </summary>
+    /// <returns><inheritdoc/></returns>
     public bool IsReadOnly => false;
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public IEnumerator<T> GetEnumerator() => _Elements.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /// <summary>
-    /// Gets the number of elements in this collection.
+    /// <inheritdoc/>
     /// </summary>
+    /// <returns><inheritdoc/></returns>
     public int Count => _Elements.Count;
 
     /// <summary>
-    /// Gets or sets the element stored at the given index. If the setter finds an equivalent
-    /// element at the given index, then the old value is replaced by the new given one. If an
-    /// equivalent element is found in any other place, then a duplicate exception is thrown.
+    /// <inheritdoc/>
     /// </summary>
-    /// <param name="index"></param>
-    /// <returns></returns>
+    /// <returns><inheritdoc/></returns>
     public T this[int index]
     {
         get => _Elements[index];

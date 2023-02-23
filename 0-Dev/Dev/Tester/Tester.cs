@@ -15,12 +15,14 @@ public class Tester : MenuEntry
 
     public string Header => "Execute Solution Tests.";
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public override void OnPrint() => WriteLine(Header);
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public override void OnExecute()
     {
         WriteLine();

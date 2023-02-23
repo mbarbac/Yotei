@@ -1,38 +1,51 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-   <PropertyGroup>
-      <TargetFramework>netstandard2.0</TargetFramework>
-      <ImplicitUsings>disable</ImplicitUsings>
-      <Nullable>enable</Nullable>
-      <LangVersion>latest</LangVersion>
-      <NoWarn>$(NoWarn);IDE0058</NoWarn>
-   </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+        <NoWarn>$(NoWarn);IDE0058</NoWarn>
+    </PropertyGroup>
 
-   <PropertyGroup>
-      <IsPackable>true</IsPackable>
-      <Version>0.5.0-v0001</Version>
-      <Authors>mbarbac@hotmail.com</Authors>
-      <Description>Yotei MemberWith source code generator..</Description>
-      <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
-      <PackageLicenseExpression>MIT</PackageLicenseExpression>
-      <PackageReadmeFile>README.md</PackageReadmeFile>
-      <IncludeSymbols>True</IncludeSymbols>
-      <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-      <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-      <AssemblyVersion>9.9.9.9</AssemblyVersion>
-      <FileVersion>9.9.9.9</FileVersion>
-   </PropertyGroup>
-   <ItemGroup>
-      <None Include="README.md" Pack="true" PackagePath="\" />
-   </ItemGroup>
+    <PropertyGroup>
+        <IsPackable>true</IsPackable>
+        <Version>0.2.0-v0001</Version>
+        <Authors>mbarbac@hotmail.com</Authors>
+        <Description>Yotei Source Code Generator for the MemberWith attribute.</Description>
+        <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <IncludeSymbols>True</IncludeSymbols>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <AssemblyVersion>9.9.9.9</AssemblyVersion>
+        <FileVersion>9.9.9.9</FileVersion>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
 
-   <PropertyGroup>
+    <!-- COMPONENTS NEEDED FOR SOURCE CODE GENERATION -->
+    
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.4.0" />
+    </ItemGroup>
+    <Import Project="..\Yotei.Generators.Shared\Yotei.Generators.Shared.projitems" Label="Shared" />
+
+    <!-- NEEDED FOR GENERATING A WORKING SOURCE CODE GENERATOR PACKAGE -->
+
+    <PropertyGroup>
+        <MakePackage>false</MakePackage>
+    </PropertyGroup>
+    <ItemGroup Condition="'$(MakePackage)'=='true'">
+        <None Remove="bin\Debug\netstandard2.0\Yotei.Generators.MemberWith.dll" />
+        <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    </ItemGroup>
+
+    <!-- UNCOMMENT FOR SOURCE CODE GENERATOR DEBUGGING -->
+    <PropertyGroup>
       <DefineConstants>$(DefineConstants);DEBUG_MEMBERWITH_GENERATOR</DefineConstants>
    </PropertyGroup>
-
-   <ItemGroup>
-      <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.4.0" />
-   </ItemGroup>
-   <Import Project="..\Yotei.Generators.Shared\Yotei.Generators.Shared.projitems" Label="Shared" />
 
 </Project>

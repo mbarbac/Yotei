@@ -45,8 +45,10 @@ public record Locale : IComparer<string>
         CompareOptions = options;
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString()
     {
         var sb = new StringBuilder();
@@ -86,113 +88,153 @@ public record Locale : IComparer<string>
 
     // ----------------------------------------------------
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public int Compare(
         string? x, string? y)
         => CultureInfo.CompareInfo.Compare(x, y, CompareOptions);
 
-    /// <inheritdoc cref="Compare(string?, string?)">
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc cref="Compare(string, string)"/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public int Compare(
         ReadOnlySpan<char> x, ReadOnlySpan<char> y)
         => CultureInfo.CompareInfo.Compare(x, y, CompareOptions);
 
-    /// <inheritdoc cref="Compare(string?, string?)">
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc cref="Compare(string, string)"/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public int Compare(
         char x, char y)
         => CultureInfo.CompareInfo.Compare(x.ToString(), y.ToString(), CompareOptions);
 
-    /// <inheritdoc cref="CompareInfo.IsPrefix(string, string)">
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc cref="CompareInfo.IsPrefix(string, string)"/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public bool HasPrefix(
         string source, string prefix)
         => CultureInfo.CompareInfo.IsPrefix(source, prefix, CompareOptions);
 
-    /// <inheritdoc cref="HasPrefix(string, string)">
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc cref="HasPrefix(string, string)"/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public bool HasPrefix(
         ReadOnlySpan<char> source, ReadOnlySpan<char> prefix)
         => CultureInfo.CompareInfo.IsPrefix(source, prefix, CompareOptions);
 
-    /// <inheritdoc cref="CompareInfo.IsSuffix(string, string)">
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc cref="CompareInfo.IsSuffix(string, string)"/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public bool HasSuffix(
         string source, string suffix)
         => CultureInfo.CompareInfo.IsSuffix(source, suffix, CompareOptions);
 
-    /// <inheritdoc cref="HasSuffix(string, string)">
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc cref="HasSuffix(string, string)"/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public bool HasSuffix(
         ReadOnlySpan<char> source, ReadOnlySpan<char> suffix)
         => CultureInfo.CompareInfo.IsSuffix(source, suffix, CompareOptions);
 
-    /// <inheritdoc cref="CompareInfo.IndexOf(string, string)">
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc cref="CompareInfo.IndexOf(string, string)"/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public int IndexOf(
         string source, string value)
         => CultureInfo.CompareInfo.IndexOf(source, value, CompareOptions);
 
-    /// <inheritdoc cref="IndexOf(string, string)">
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc cref="IndexOf(string, string)"/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public int IndexOf(
         ReadOnlySpan<char> source, ReadOnlySpan<char> value)
         => CultureInfo.CompareInfo.IndexOf(source, value, CompareOptions);
 
-    /// <inheritdoc cref="CompareInfo.IndexOf(string, char)">
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc cref="CompareInfo.IndexOf(string, char)"/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public int IndexOf(
         string source, char value)
         => CultureInfo.CompareInfo.IndexOf(source, value, CompareOptions);
 
-    /// <inheritdoc cref="IndexOf(string, char)">
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc cref="IndexOf(string, char)"/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public int IndexOf(
         ReadOnlySpan<char> source, char value)
         => CultureInfo.CompareInfo.IndexOf(source, value.ToString(), CompareOptions);
 
-    /// <inheritdoc cref="CompareInfo.LastIndexOf(string, string)">
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc cref="CompareInfo.LastIndexOf(string, string)"/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public int LastIndexOf(
         string source, string value)
         => CultureInfo.CompareInfo.LastIndexOf(source, value, CompareOptions);
 
-    /// <inheritdoc cref="LastIndexOf(string, string)">
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc cref="LastIndexOf(string, string)"/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public int LastIndexOf(
         ReadOnlySpan<char> source, ReadOnlySpan<char> value)
         => CultureInfo.CompareInfo.LastIndexOf(source, value, CompareOptions);
 
-    /// <inheritdoc cref="CompareInfo.LastIndexOf(string, char)">
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc cref="CompareInfo.LastIndexOf(string, char)"/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public int LastIndexOf(
         string source, char value)
         => CultureInfo.CompareInfo.LastIndexOf(source, value, CompareOptions);
 
-    /// <inheritdoc cref="LastIndexOf(string, char)">
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc cref="LastIndexOf(string, char)"/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public int LastIndexOf(
         ReadOnlySpan<char> source, char value)
        => CultureInfo.CompareInfo.LastIndexOf(source, value.ToString(), CompareOptions);
 
-    /// <inheritdoc cref="TextInfo.ToUpper(string)">
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc cref="TextInfo.ToUpper(string)"/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public string ToUpper(string value) => CultureInfo.TextInfo.ToUpper(value);
 
-    /// <inheritdoc cref="TextInfo.ToUpper(char)">
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc cref="TextInfo.ToUpper(char)"/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public char ToUpper(char value) => CultureInfo.TextInfo.ToUpper(value);
 
-    /// <inheritdoc cref="TextInfo.ToLower(string)">
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc cref="TextInfo.ToLower(string)"/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public string ToLower(string value) => CultureInfo.TextInfo.ToLower(value);
 
-    /// <inheritdoc cref="TextInfo.ToLower(char)">
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc cref="TextInfo.ToLower(char)"/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public char ToLower(char value) => CultureInfo.TextInfo.ToLower(value);
 
-    /// <inheritdoc cref="TextInfo.ToTitleCase(string)">
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc cref="TextInfo.ToTitleCase(string)"/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public string ToTitleCase(string value) => CultureInfo.TextInfo.ToTitleCase(value);
 }

@@ -39,8 +39,10 @@ public record SemanticVersion
         Beta = beta;
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => Value;
 
     /// <summary>

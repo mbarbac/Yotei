@@ -15,7 +15,7 @@ public class PackageFiles
         packable = packable.ThrowIfNull();
         RegularFiles = GetFiles($"{packable.Name}.{packable.Version}.nupkg");
         SymbolFiles = GetFiles($"{packable.Name}.{packable.Version}.snupkg");
-        
+
         /// <summary> Invoked to get the list of files for the given pattern.
         /// </summary>
         ImmutableArray<File> GetFiles(string pattern)

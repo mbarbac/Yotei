@@ -1,7 +1,4 @@
-﻿using System.Net;
-using System.Net.Mail;
-
-namespace Dev.Tools;
+﻿namespace Dev.Tools;
 
 // ========================================================
 public record Directory
@@ -32,8 +29,10 @@ public record Directory
         Path = path;
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => Path;
 
     /// <summary>

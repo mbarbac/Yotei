@@ -1,6 +1,4 @@
-﻿using Microsoft.Win32.SafeHandles;
-
-namespace Dev.Tools;
+﻿namespace Dev.Tools;
 
 // ========================================================
 /// <summary>
@@ -12,7 +10,7 @@ public static class ConsoleWrapper
     /// Determines if the console output shall also be emitted into debug, or not.
     /// </summary>
     public static bool UseDebug { get; set; } = false;
-    static bool ForDebug => Ambient.IsDebug && UseDebug;
+    static bool ForDebug => Ambient.IsDebugAttached && UseDebug;
 
     /// <summary>
     /// Invoked to obtain a formatted message.
@@ -313,7 +311,7 @@ public static class ConsoleWrapper
         bool IsValid(char c)
         {
             if (char.IsLetterOrDigit(c)) return true;
-            if (Array.IndexOf(ValidChars, c) >= 0) return true;            
+            if (Array.IndexOf(ValidChars, c) >= 0) return true;
             return false;
         }
     }

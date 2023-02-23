@@ -16,6 +16,7 @@ internal class TypeHolderList : IEnumerable<TypeHolder>
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => $"Count:{Count}";
 
     /// <summary>

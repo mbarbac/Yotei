@@ -16,12 +16,13 @@ internal class AssemblyHolderList : IEnumerable<AssemblyHolder>
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => $"Count:{Count}";
 
     /// <summary>
-    /// Returns an enumerator that can iterate through the elements in this collection.
+    /// <inheritdoc/>
     /// </summary>
-    /// <returns></returns>
+    /// <returns><inheritdoc/></returns>
     public IEnumerator<AssemblyHolder> GetEnumerator() => _Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 

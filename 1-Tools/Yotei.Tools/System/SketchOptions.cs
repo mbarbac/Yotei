@@ -112,8 +112,7 @@ public record SketchOptions
     /// <summary>
     /// Returns a new EasyNameOptions instance based upon the contents of this one.
     /// </summary>
-    public EasyNameOptions EasyNameOptions => new EasyNameOptions() with
-    {
+    public EasyNameOptions EasyNameOptions => new EasyNameOptions() with {
         PreventGenericTypeNames = PreventGenericTypeNames,
         UseNameSpace = UseNameSpace,
         UseTypeName = UseTypeName,

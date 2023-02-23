@@ -9,7 +9,7 @@ public static class Ambient
     /// <summary>
     /// Determines whether a debugger is attached to this process.
     /// </summary>
-    public static bool IsDebug => Debugger.IsAttached;
+    public static bool IsDebugAttached => Debugger.IsAttached;
 
     /// <summary>
     /// Determines if debug output is emitted to the console, or not.

@@ -23,8 +23,10 @@ internal class DynamicMetaNode : DynamicMetaObject
         DynamicParser.DebugPrint($"- New: {this}");
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     override public string ToString() => $"Meta#{DynamicId}:{DynamicNode.ToDebugString()}";
 
     /// <summary>
@@ -55,16 +57,20 @@ internal class DynamicMetaNode : DynamicMetaObject
 
     // ----------------------------------------------------
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override DynamicMetaObject BindGetMember(
         GetMemberBinder binder)
     {
         var meta = DynamicMaster.BindGetMember(binder); return meta;
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override DynamicMetaObject BindSetMember(
         SetMemberBinder binder, DynamicMetaObject value)
     {
@@ -93,16 +99,20 @@ internal class DynamicMetaNode : DynamicMetaObject
         return meta;
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override DynamicMetaObject BindGetIndex(
         GetIndexBinder binder, DynamicMetaObject[] indexes)
     {
         var meta = DynamicMaster.BindGetIndex(binder, indexes); return meta;
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override DynamicMetaObject BindSetIndex(
         SetIndexBinder binder, DynamicMetaObject[] indexes, DynamicMetaObject value)
     {
@@ -133,24 +143,30 @@ internal class DynamicMetaNode : DynamicMetaObject
         return meta;
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override DynamicMetaObject BindInvoke(
         InvokeBinder binder, DynamicMetaObject[] args)
     {
         var meta = DynamicMaster.BindInvoke(binder, args); return meta;
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override DynamicMetaObject BindInvokeMember(
         InvokeMemberBinder binder, DynamicMetaObject[] args)
     {
         var meta = DynamicMaster.BindInvokeMember(binder, args); return meta;
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override DynamicMetaObject BindBinaryOperation(
         BinaryOperationBinder binder, DynamicMetaObject arg)
     {
@@ -178,8 +194,10 @@ internal class DynamicMetaNode : DynamicMetaObject
         return meta;
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override DynamicMetaObject BindUnaryOperation(
         UnaryOperationBinder binder)
     {
@@ -228,9 +246,11 @@ internal class DynamicMetaNode : DynamicMetaObject
 
     // ----------------------------------------------------
 
-    /// <inheritdoc>
-    /// </inheritdoc>
-    /// <remarks>This operation is not supported.</remarks>
+    /// <summary>
+    /// <inheritdoc/>
+    /// This operation is not supported.
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override DynamicMetaObject BindConvert(
         ConvertBinder binder)
     {
@@ -239,9 +259,11 @@ internal class DynamicMetaNode : DynamicMetaObject
             "Please use 'x.Cast(type, expr)' or 'x.Cast<Type>(expr)' instead.");
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
-    /// <remarks>This operation is not supported.</remarks>
+    /// <summary>
+    /// <inheritdoc/>
+    /// This operation is not supported.
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override DynamicMetaObject BindCreateInstance(
         CreateInstanceBinder binder, DynamicMetaObject[] args)
     {
@@ -249,9 +271,11 @@ internal class DynamicMetaNode : DynamicMetaObject
             "Dynamic 'Create Instance' operations are not supported.");
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
-    /// <remarks>This operation is not supported.</remarks>
+    /// <summary>
+    /// <inheritdoc/>
+    /// This operation is not supported.
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override DynamicMetaObject BindDeleteIndex(
         DeleteIndexBinder binder, DynamicMetaObject[] indexes)
     {
@@ -259,9 +283,11 @@ internal class DynamicMetaNode : DynamicMetaObject
             "Dynamic 'Delete Index' operations are not supported.");
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
-    /// <remarks>This operation is not supported.</remarks>
+    /// <summary>
+    /// <inheritdoc/>
+    /// This operation is not supported.
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override DynamicMetaObject BindDeleteMember(
         DeleteMemberBinder binder)
     {

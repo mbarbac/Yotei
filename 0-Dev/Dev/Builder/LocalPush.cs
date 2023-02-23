@@ -11,16 +11,18 @@ public class LocalPush : MenuEntry
     LocalBuilder Builder;
     Packable Packable;
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public override void OnPrint()
     {
         Write(Program.Color, "Push Local Package: ");
         WriteLine(Packable);
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public override void OnExecute()
     {
         WriteLine();
@@ -114,7 +116,7 @@ public class LocalPush : MenuEntry
     {
         WriteLine();
         WriteLine(Program.Color, Program.FatSeparator);
-        Write(Program.Color, "Reload: "); WriteLine(Packable);        
+        Write(Program.Color, "Reload: "); WriteLine(Packable);
 
         var projects = Builder.Projects.Remove(Packable.Project);
         foreach (var project in projects)

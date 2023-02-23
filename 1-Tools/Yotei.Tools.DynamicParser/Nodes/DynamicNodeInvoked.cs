@@ -18,8 +18,10 @@ public class DynamicNodeInvoked : DynamicNodeHosted
         DebugPrintNew();
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString()
         => $"{DynamicHost}({string.Join(", ", DynamicArguments.Select(x => x.ToString()))})";
 
@@ -28,7 +30,9 @@ public class DynamicNodeInvoked : DynamicNodeHosted
     /// </summary>
     public IImmutableList<DynamicNode> DynamicArguments { get; }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override DynamicNodeArgument? GetArgument() => DynamicHost.GetArgument();
 }

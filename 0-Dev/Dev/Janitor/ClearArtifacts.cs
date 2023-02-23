@@ -5,12 +5,14 @@ public class ClearArtifacts : MenuEntry
 {
     public string Header => "Clear Development Artifacts.";
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public override void OnPrint() => WriteLine(Header);
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public override void OnExecute()
     {
         WriteLine();
@@ -36,7 +38,11 @@ public class ClearArtifacts : MenuEntry
         foreach (var dir in dirs)
         {
             var temp = dir.Path.ToUpper();
-            var remove = delete || temp.EndsWith("\\BIN") || temp.EndsWith("\\OBJ");
+            var remove =
+                delete ||
+                temp.EndsWith("\\BIN") || temp.EndsWith("\\OBJ") ||
+                temp.EndsWith("\\GENERATED");
+
             Executor(root, dir, remove, indent + 1);
             if (delete) Delete(root, dir);
         }

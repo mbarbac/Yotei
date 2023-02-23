@@ -33,12 +33,14 @@ public class DayDate : ICloneable, IComparable<DayDate>, IEquatable<DayDate>
     /// <param name="item"></param>
     public DayDate(DateOnly item) : this(item.Year, item.Month, item.Day) { }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => $"{Year:0000}-{Month:00}-{Day:00}";
 
     /// <summary>
-    /// Returns the string representation of this instance.
+    /// Returns a string representation of this instance.
     /// </summary>
     /// <param name="provider"></param>
     /// <returns></returns>
@@ -55,7 +57,7 @@ public class DayDate : ICloneable, IComparable<DayDate>, IEquatable<DayDate>
     }
 
     /// <summary>
-    /// Returns the string representation of this instance.
+    /// Returns a string representation of this instance.
     /// <para>Valid specifications are: YYYY, YY, MM, M, DD, and D.</para>
     /// </summary>
     /// <param name="format"></param>
@@ -114,8 +116,10 @@ public class DayDate : ICloneable, IComparable<DayDate>, IEquatable<DayDate>
         return format;
     }
 
-    /// <inheritdoc cref="ICloneable.Clone">
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc cref="ICloneable.Clone"/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public DayDate Clone() => new(Year, Month, Day);
 
     object ICloneable.Clone() => Clone();
@@ -157,11 +161,9 @@ public class DayDate : ICloneable, IComparable<DayDate>, IEquatable<DayDate>
     public DateOnly ToDateOnly() => new(Year, Month, Day);
 
     /// <summary>
-    /// Compares this instance and returns an integer that indicates their relative position
-    /// in sort order.
+    /// <inheritdoc/>
     /// </summary>
-    /// <param name="other"></param>
-    /// <returns></returns>
+    /// <returns><inheritdoc/></returns>
     public int CompareTo(DayDate? other) => Compare(this, other);
 
     public static bool operator ==(DayDate? x, DayDate? y) => Compare(x, y) == 0;
@@ -176,8 +178,10 @@ public class DayDate : ICloneable, IComparable<DayDate>, IEquatable<DayDate>
 
     public static bool operator <=(DayDate? x, DayDate? y) => Compare(x, y) <= 0;
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public bool Equals(DayDate? other) => Compare(this, other) == 0;
 
     public override bool Equals(object? obj)
@@ -188,8 +192,10 @@ public class DayDate : ICloneable, IComparable<DayDate>, IEquatable<DayDate>
         return obj is DayDate item && Compare(this, item) == 0;
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override int GetHashCode() => HashCode.Combine(Year, Month, Day);
 
     /// <summary>
@@ -303,8 +309,7 @@ public class DayDate : ICloneable, IComparable<DayDate>, IEquatable<DayDate>
         ValidateYear(year);
         ValidateMonth(month);
 
-        return month switch
-        {
+        return month switch {
             1 or 3 or 5 or 7 or 8 or 10 or 12 => 31,
             4 or 6 or 9 or 11 => 30,
             _ => IsLeapYear(year) ? 29 : 28,
@@ -316,7 +321,6 @@ public class DayDate : ICloneable, IComparable<DayDate>, IEquatable<DayDate>
     /// </summary>
     /// <param name="year"></param>
     /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
     public static bool IsLeapYear(int year)
     {
         ValidateYear(year);

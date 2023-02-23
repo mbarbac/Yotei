@@ -32,12 +32,16 @@ public readonly struct Maybe<T> : IComparable<Maybe<T>>, IEquatable<Maybe<T>>
         _IsValid = true;
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => _IsValid ? $"'{_Value}'" : "<Invalid>";
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public int CompareTo(Maybe<T> other)
     {
         if (!IsValid && !other.IsValid) return 0;
@@ -69,8 +73,10 @@ public readonly struct Maybe<T> : IComparable<Maybe<T>>, IEquatable<Maybe<T>>
     public static bool operator <=(Maybe<T> x, Maybe<T> y) => x.CompareTo(y) <= 0;
     public static bool operator >=(Maybe<T> x, Maybe<T> y) => x.CompareTo(y) >= 0;
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public bool Equals(Maybe<T> other) => CompareTo(other) == 0;
 
     public override bool Equals([NotNullWhen(true)] object? obj)
@@ -82,8 +88,10 @@ public readonly struct Maybe<T> : IComparable<Maybe<T>>, IEquatable<Maybe<T>>
     public static bool operator ==(Maybe<T> x, Maybe<T> y) => x.Equals(y);
     public static bool operator !=(Maybe<T> x, Maybe<T> y) => !x.Equals(y);
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override int GetHashCode()
     {
         return _IsValid

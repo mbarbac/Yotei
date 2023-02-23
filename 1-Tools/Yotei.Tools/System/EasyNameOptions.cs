@@ -16,8 +16,10 @@ public struct EasyNameOptions
     /// </summary>
     public EasyNameOptions() { }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString()
     {
         var sb = new StringBuilder();

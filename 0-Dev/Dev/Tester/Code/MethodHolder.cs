@@ -19,6 +19,7 @@ internal class MethodHolder
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => Name;
 
     /// <summary>

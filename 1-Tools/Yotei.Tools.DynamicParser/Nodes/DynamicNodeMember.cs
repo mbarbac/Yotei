@@ -18,8 +18,10 @@ public class DynamicNodeMember : DynamicNodeHosted
         DebugPrintNew();
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => $"{DynamicHost}.{DynamicName}";
 
     /// <summary>
@@ -27,7 +29,9 @@ public class DynamicNodeMember : DynamicNodeHosted
     /// </summary>
     public string DynamicName { get; }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override DynamicNodeArgument? GetArgument() => DynamicHost.GetArgument();
 }

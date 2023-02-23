@@ -23,8 +23,10 @@ public record Reference
         Version = version;
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => $"{Name}.{Version}";
 
     /// <summary>

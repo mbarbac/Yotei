@@ -22,8 +22,10 @@ public record SemanticBeta
     /// <param name="value"></param>
     public SemanticBeta(string value) => Value = value;
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => Value;
 
     /// <summary>

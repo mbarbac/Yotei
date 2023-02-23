@@ -19,8 +19,10 @@ public class DynamicNodeSetter : DynamicNode
         DebugPrintNew();
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => $"({DynamicTarget} = {DynamicValue})";
 
     /// <summary>
@@ -33,8 +35,10 @@ public class DynamicNodeSetter : DynamicNode
     /// </summary>
     public DynamicNode DynamicValue { get; }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override DynamicNodeArgument? GetArgument() =>
         DynamicTarget.GetArgument() ??
         DynamicValue.GetArgument();

@@ -4,13 +4,14 @@
 /// <summary>
 /// Represents a <see cref="StringBuilder"/>-alike class used to emit source code.
 /// </summary>
-public class CodeBuilder
+internal class CodeBuilder
 {
     readonly StringBuilder sb = new();
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => sb.ToString();
 
     /// <summary>

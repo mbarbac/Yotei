@@ -19,8 +19,10 @@ public class DynamicNodeUnary : DynamicNode
         DebugPrintNew();
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => $"({DynamicOperation} {DynamicTarget})";
 
     /// <summary>
@@ -33,7 +35,9 @@ public class DynamicNodeUnary : DynamicNode
     /// </summary>
     public DynamicNode DynamicTarget { get; }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override DynamicNodeArgument? GetArgument() => DynamicTarget.GetArgument();
 }

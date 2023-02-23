@@ -30,8 +30,10 @@ public class Element
                 .WithData(methodName);
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString()
     {
         var sb = new StringBuilder();

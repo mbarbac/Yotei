@@ -10,12 +10,14 @@ public class LocalBuilder : MenuEntry
 
     public string Header => "Manage Local Packages.";
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public override void OnPrint() => WriteLine(Header);
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public override void OnExecute()
     {
         var first = true;
@@ -39,7 +41,7 @@ public class LocalBuilder : MenuEntry
                 GetExcludeDirectory(first);
                 ResetElements();
                 first = false;
-            }            
+            }
 
             WriteLine();
             done = Menu.Run(Program.Color, entries.ToArray());
@@ -88,8 +90,9 @@ public class ReCaptureDirectories : MenuEntry
 {
     public string Header => "Recapture Solution Directories.";
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public override void OnPrint() => WriteLine(Header);
 }
 
@@ -101,12 +104,14 @@ public class LocalPushSelect : MenuEntry
 
     public string Header => "Select Local Package to Push.";
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public override void OnPrint() => WriteLine(Header);
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public override void OnExecute()
     {
         var done = false; do
@@ -139,12 +144,14 @@ public class LocalPushAll : MenuEntry
 
     public string Header => "Build & Push All Local Packages.";
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public override void OnPrint() => WriteLine(Header);
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public override void OnExecute()
     {
         WriteLine();

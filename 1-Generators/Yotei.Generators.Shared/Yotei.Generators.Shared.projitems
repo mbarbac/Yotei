@@ -13,7 +13,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\EmptyException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\NotFoundException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\DuplicateException.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Miscelanea\NamedTypeBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Miscelanea\NewItemBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Miscelanea\NewItemArgument.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Miscelanea\NewItemInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\AttributeDataExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\ISymbolExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\ITypeSymbolExtensions.cs" />
@@ -24,22 +26,35 @@
     <Compile Include="$(MSBuildThisFileDirectory)System\ExceptionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\NoDuplicatesList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\StringExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Api\ICaptured.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Api\IGenerator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Api\ICapturedField.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Api\ICapturedProperty.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Api\ICapturedType.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Code\CaptureLevel.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Code\CapturedField.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Code\CapturedProperty.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Code\CapturedType.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Code\Generator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Extensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\FileNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\NamespaceNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\TypeNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\__.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Captured\Api\ICapturedField.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Captured\Api\ICapturedProperty.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Captured\Api\ICapturedType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Api\IPropertyNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Api\IFieldNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Api\ITypeNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Api\INamespaceNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Api\IFileNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Api\INode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Captured\Api\ICaptured.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Api\IGenerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Captured\Code\CapturedField.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Captured\Code\CapturedType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Captured\Code\CapturedProperty.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Code\FileNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Code\FieldNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Code\PropertyNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Code\TypeNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Code\NamespaceNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Code\Generator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Captured\Code\CaptureLevel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Code\Extensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\__.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Usings.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Tree\Captured\Api\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Tree\Captured\Code\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Tree\Nodes\Api\" />
   </ItemGroup>
 </Project>

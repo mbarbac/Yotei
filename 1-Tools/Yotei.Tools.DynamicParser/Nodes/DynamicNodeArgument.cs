@@ -17,8 +17,10 @@ public class DynamicNodeArgument : DynamicNode
         DebugPrintNew();
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => DynamicName;
 
     /// <summary>
@@ -26,7 +28,9 @@ public class DynamicNodeArgument : DynamicNode
     /// </summary>
     public string DynamicName { get; }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override DynamicNodeArgument? GetArgument() => this;
 }

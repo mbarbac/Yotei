@@ -16,11 +16,13 @@ internal class MethodHolderList : IEnumerable<MethodHolder>
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => $"Count:{Count}";
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    /// <returns><inheritdoc/></returns>
     public IEnumerator<MethodHolder> GetEnumerator() => _Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 

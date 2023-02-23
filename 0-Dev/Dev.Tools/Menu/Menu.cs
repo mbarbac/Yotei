@@ -37,7 +37,7 @@ public static class Menu
         var pos = 0;
         var ini = GetCursorTop();
         foreach (var entry in entries) { Write(color, "[ ] "); entry.Print(); }
-        
+
         while (true)
         {
             SetCursorTop(ini + pos);

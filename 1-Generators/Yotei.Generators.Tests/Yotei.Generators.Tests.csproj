@@ -1,65 +1,70 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
-   <PropertyGroup>
-      <TargetFramework>net7.0</TargetFramework>
-      <ImplicitUsings>disable</ImplicitUsings>
-      <Nullable>enable</Nullable>
-      <LangVersion>latest</LangVersion>
-      <NoWarn>$(NoWarn);IDE0058</NoWarn>
-      <IsPackable>false</IsPackable>
-   </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+        <NoWarn>$(NoWarn);IDE0058</NoWarn>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
 
-   <ItemGroup>
-      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
-      <PackageReference Include="xunit" Version="2.4.2" />
-      <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
-         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-         <PrivateAssets>all</PrivateAssets>
-      </PackageReference>
-      <PackageReference Include="coverlet.collector" Version="3.1.2">
-         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-         <PrivateAssets>all</PrivateAssets>
-      </PackageReference>
-      <PackageReference Include="Yotei.Tools" Version="0.5.1-v0001" />
-   </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
+        <PackageReference Include="xunit" Version="2.4.2" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="coverlet.collector" Version="3.1.2">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Yotei.Tools" Version="0.5.1-v0001" />
+    </ItemGroup>
 
-   <PropertyGroup>
-      <RunMode>Release</RunMode>
-   </PropertyGroup>
-   <ItemGroup Condition="'$(RunMode)'=='Release'">
-      <PackageReference Include="Yotei.Generators.Cloneable" Version="0.5.1-v0001" />
-   </ItemGroup>
-   <ItemGroup Condition="'$(RunMode)'=='Debug'">
-      <ProjectReference Include="..\Yotei.Generators.Cloneable\Yotei.Generators.Cloneable.csproj">
-         <OutputItemType>Analyzer</OutputItemType>
-         <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      </ProjectReference>
-   </ItemGroup>
-   
-   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-      <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-      <CompilerGeneratedFilesOutputPath>Generated\$(TargetFramework)</CompilerGeneratedFilesOutputPath>
-   </PropertyGroup>
-   <ItemGroup Condition="'$(Configuration)'=='Debug'">
-      <Compile Remove="Generated\$(TargetFramework)\**" />
-      <None Include="Generated\$(TargetFramework)\**" />
-   </ItemGroup>
+    <!-- CLONEABLE GENERATOR -->
 
+    <PropertyGroup>
+        <CloneableImportMode>Project</CloneableImportMode>
+    </PropertyGroup>
+    <ItemGroup Condition="'$(CloneableImportMode)'=='Package'">
+        <PackageReference Include="Yotei.Generators.Cloneable" Version="0.2.0-v0001" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(CloneableImportMode)'=='Project'">
+        <ProjectReference Include="..\Yotei.Generators.Cloneable\Yotei.Generators.Cloneable.csproj">
+            <OutputItemType>Analyzer</OutputItemType>
+            <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+        </ProjectReference>
+    </ItemGroup>
+
+    <!-- MEMBERWITH GENERATOR -->
+
+    <PropertyGroup>
+        <MemberWithImportMode>Project</MemberWithImportMode>
+    </PropertyGroup>
+    <ItemGroup Condition="'$(MemberWithImportMode)'=='Package'">
+        <PackageReference Include="Yotei.Generators.MemberWith" Version="0.2.0-v0001" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(MemberWithImportMode)'=='Project'">
+        <ProjectReference Include="..\Yotei.Generators.MemberWith\Yotei.Generators.MemberWith.csproj">
+            <OutputItemType>Analyzer</OutputItemType>
+            <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+        </ProjectReference>
+    </ItemGroup>
+
+    <!-- ALL YOTEI GENERATORS -->
+
+    <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+        <CompilerGeneratedFilesOutputPath>Generated\$(TargetFramework)</CompilerGeneratedFilesOutputPath>
+    </PropertyGroup>
+    <ItemGroup Condition="'$(Configuration)'=='Debug'">
+        <Compile Remove="Generated\$(TargetFramework)\**" />
+        <None Include="Generated\$(TargetFramework)\**" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Generated\net7.0\Yotei.Generators.MemberWith\" />
+    </ItemGroup>
+    
 </Project>
-
-<!-- DEBUG CONFIGURATION:
-   <ItemGroup Condition="'$(Configuration)'=='Debug'">
-      <ProjectReference Include="..\Yotei.Generators.Cloneable\Yotei.Generators.Cloneable.csproj" >
-         <OutputItemType>Analyzer</OutputItemType>
-         <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      </ProjectReference>
-   </ItemGroup>
-   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-      <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-      <CompilerGeneratedFilesOutputPath>Generated\$(TargetFramework)</CompilerGeneratedFilesOutputPath>
-   </PropertyGroup>
-   <ItemGroup>
-      <Compile Remove="Generated\$(TargetFramework)\**" />
-      <None Include="Generated\$(TargetFramework)\**" />
-   </ItemGroup>
--->

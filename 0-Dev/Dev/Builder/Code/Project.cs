@@ -24,8 +24,10 @@ public record Project
             throw new ArgumentException($"File extension is not 'csproj': {File}");
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => File.Name;
 
     /// <summary>

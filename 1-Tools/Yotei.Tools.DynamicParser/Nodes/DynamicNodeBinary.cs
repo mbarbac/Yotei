@@ -21,8 +21,10 @@ public class DynamicNodeBinary : DynamicNode
         DebugPrintNew();
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString()
         => $"({DynamicLeft} {DynamicOperation} {DynamicRight})";
 
@@ -41,8 +43,10 @@ public class DynamicNodeBinary : DynamicNode
     /// </summary>
     public DynamicNode DynamicRight { get; }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override DynamicNodeArgument? GetArgument() =>
         DynamicLeft.GetArgument() ??
         DynamicRight.GetArgument();

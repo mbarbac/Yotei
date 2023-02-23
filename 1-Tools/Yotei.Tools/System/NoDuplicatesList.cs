@@ -22,8 +22,10 @@ public class NoDuplicatesList<T> : IList<T>
         if (validator != null) Validator = validator;
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => $"Count: {Count}";
 
     /// <summary>
@@ -41,8 +43,10 @@ public class NoDuplicatesList<T> : IList<T>
     /// </summary>
     public bool IsReadOnly => false;
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public IEnumerator<T> GetEnumerator() => _Elements.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 

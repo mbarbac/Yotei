@@ -11,8 +11,10 @@ public class DynamicParser
     // Prevents creation.
     private DynamicParser() { }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => $"({Argument}) => {Result}";
 
     /// <summary>
@@ -38,8 +40,7 @@ public class DynamicParser
         if (name == null) throw new ArgumentException(
             "The dynamic argument of the dynamic lambda expression has no name.");
 
-        var parser = new DynamicParser()
-        {
+        var parser = new DynamicParser() {
             Argument = new DynamicNodeArgument(name)
         };
 
@@ -116,8 +117,7 @@ public class DynamicParser
     /// </summary>
     public static DynamicNode ValueToDynamicNode(object? value)
     {
-        return value switch
-        {
+        return value switch {
             DynamicNode item => item,
             DynamicMetaNode item => item.DynamicNode,
             DynamicMetaObject item => ValueToDynamicNode(item.Value),

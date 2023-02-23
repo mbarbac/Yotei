@@ -22,8 +22,10 @@ public class DynamicNodeValued : DynamicNode
         DebugPrintNew();
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => DynamicValue == null
         ? "'NULL'"
         : $"'{DynamicValue.Sketch()}'";
@@ -33,7 +35,9 @@ public class DynamicNodeValued : DynamicNode
     /// </summary>
     public object? DynamicValue { get; }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override DynamicNodeArgument? GetArgument() => null;
 }

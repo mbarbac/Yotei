@@ -44,8 +44,10 @@ public class ClockTime : ICloneable, IComparable<ClockTime>, IEquatable<ClockTim
     /// <param name="item"></param>
     public ClockTime(TimeSpan item) : this(item.Hours, item.Minutes, item.Seconds, item.Milliseconds) { }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => ToStringSeparated(":");
 
     string ToStringSeparated(string separator)
@@ -59,7 +61,7 @@ public class ClockTime : ICloneable, IComparable<ClockTime>, IEquatable<ClockTim
     }
 
     /// <summary>
-    /// Returns the string representation of this instance.
+    /// Returns a string representation of this instance.
     /// </summary>
     /// <param name="provider"></param>
     /// <returns></returns>
@@ -72,7 +74,7 @@ public class ClockTime : ICloneable, IComparable<ClockTime>, IEquatable<ClockTim
     }
 
     /// <summary>
-    /// Returns the string representation of this instance.
+    /// Returns a string representation of this instance.
     /// <para>Valid specifications are: HH, H, MM, M, SS, S, and NNN or N.</para>
     /// </summary>
     /// <param name="format"></param>
@@ -143,8 +145,10 @@ public class ClockTime : ICloneable, IComparable<ClockTime>, IEquatable<ClockTim
         return format;
     }
 
-    /// <inheritdoc cref="ICloneable.Clone">
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc cref="ICloneable.Clone"/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public ClockTime Clone() => new(Hour, Minute, Second, Millisecond);
 
     object ICloneable.Clone() => Clone();
@@ -193,8 +197,10 @@ public class ClockTime : ICloneable, IComparable<ClockTime>, IEquatable<ClockTim
     /// <returns></returns>
     public TimeOnly ToTimeOnly() => new(Hour, Minute, Second, Millisecond);
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public int CompareTo(ClockTime? other) => Compare(this, other);
 
     public static bool operator ==(ClockTime? x, ClockTime? y) => Compare(x, y) == 0;
@@ -209,8 +215,10 @@ public class ClockTime : ICloneable, IComparable<ClockTime>, IEquatable<ClockTim
 
     public static bool operator <=(ClockTime? x, ClockTime? y) => Compare(x, y) <= 0;
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public bool Equals(ClockTime? other) => Compare(this, other) == 0;
 
     public override bool Equals(object? obj)
@@ -221,8 +229,10 @@ public class ClockTime : ICloneable, IComparable<ClockTime>, IEquatable<ClockTim
         return obj is ClockTime item && Compare(this, item) == 0;
     }
 
-    /// <inheritdoc>
-    /// </inheritdoc>
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override int GetHashCode() => HashCode.Combine(Hour, Minute, Second, Millisecond);
 
     /// <summary>

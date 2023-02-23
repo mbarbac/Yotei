@@ -16,12 +16,13 @@ public class ElementList : IEnumerable<Element>
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => $"Count:{Count}";
 
     /// <summary>
-    /// Returns an enumerator that can iterate through the elements in this collection.
+    /// <inheritdoc/>
     /// </summary>
-    /// <returns></returns>
+    /// <returns><inheritdoc/></returns>
     public IEnumerator<Element> GetEnumerator() => _Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
