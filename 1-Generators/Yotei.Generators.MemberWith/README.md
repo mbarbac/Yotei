@@ -3,14 +3,15 @@
 Source code generator for the MemberWith attribute.
 
 `Records` in C# provide very useful things. Among them, the ability to use the `with`
-keyword to obtain a clone of an instance modifying the value of the members used in
+keyword to obtain a clone of an instance modifying the value of the member(s) used in
 that expression. But it cannot be used with classes nor with structs, which is very
 unfortunate as we often have hierarchies we cannot modify.
 
 When a member of a type is decorated with the `[MemberWith]` attribute, the generator
 will generate either a `WithXXX()` method declaration (for interfaces), or a method
 implementation(for classes or structs), where the `XXX` part of the method name is
-just the name of the member (it being either a property or a field).
+just the name of the member (it being either a property or a field). Note that each
+method covers just a single member, not several as the `with` keyword does.
 
 ### Example
 
@@ -38,4 +39,4 @@ then, we can write code as the following:
 ### Caveats
 
 It is not, of course, a complete emulation of the `with` keyword for classes and
-structs, but it will suffice in many scenarios.
+structs, but it will suffice in the most common scenarios.

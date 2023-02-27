@@ -107,7 +107,7 @@ internal abstract class Generator : IGenerator
             case CaptureLevel.Field: if (ForField()) return true; break;
             case CaptureLevel.PropertyOrField: if (ForPropertyOrField()) return true; break;
 
-            default: throw new UnreachableException($"Unknown Level: {CaptureLevel}");
+            default: throw new UnexpectedException($"Unknown Level: {CaptureLevel}");
         }
 
         // Cannot validate...
@@ -122,7 +122,18 @@ internal abstract class Generator : IGenerator
         bool ForProperty() => node is PropertyDeclarationSyntax;
 
         // Validates a field-alike node...
-        bool ForField() => node is FieldDeclarationSyntax;
+        //bool ForField() => node is FieldDeclarationSyntax;
+        bool ForField()
+        {
+            SyntaxNode? temp = node;
+            while (true)
+            {
+                if (temp is FieldDeclarationSyntax) return true;
+                temp = temp!.Parent;
+                if (temp == null) break;
+            }
+            return false;
+        }
 
         // Validates a property-alike or field-alike node...
         bool ForPropertyOrField() => ForProperty() || ForField();
@@ -153,7 +164,7 @@ internal abstract class Generator : IGenerator
             case CaptureLevel.Field: if ((captured = ToField()) != null) return captured; break;
             case CaptureLevel.PropertyOrField: if ((captured = ToPropertyOrField()) != null) return captured; break;
 
-            default: throw new UnreachableException($"Unknown level: {CaptureLevel}");
+            default: throw new UnexpectedException($"Unknown level: {CaptureLevel}");
         }
 
         return null;
@@ -192,9 +203,19 @@ internal abstract class Generator : IGenerator
         // Creates a field-alike element...
         ICapturedField? ToField()
         {
+            while (syntax is not FieldDeclarationSyntax)
+            {
+                syntax = syntax!.Parent;
+                if (syntax == null) return null;
+            }
             var itemSyntax = syntax as FieldDeclarationSyntax;
             if (itemSyntax == null) return null;
 
+            while (symbol is not IFieldSymbol)
+            {
+                symbol = symbol.ContainingSymbol;
+                if (symbol == null) return null;
+            }
             var itemSymbol = symbol as IFieldSymbol;
             if (itemSymbol == null) return null;
 

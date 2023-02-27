@@ -9,7 +9,7 @@
     <Import_RootNamespace>Yotei.Generators.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\UnreachableException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\UnexpectedException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\EmptyException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\NotFoundException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\DuplicateException.cs" />

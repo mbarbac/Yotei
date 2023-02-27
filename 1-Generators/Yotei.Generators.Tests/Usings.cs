@@ -17,5 +17,5 @@ global using System.Threading.Tasks;
 
 global using Xunit;
 global using Yotei.Tools;
-//global using Yotei.Generators.Cloneable;
+global using Yotei.Generators.Cloneable;
 global using Yotei.Generators.MemberWith;

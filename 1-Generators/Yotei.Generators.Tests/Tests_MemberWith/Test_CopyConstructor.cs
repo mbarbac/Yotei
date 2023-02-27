@@ -1,17 +1,17 @@
 ﻿namespace Yotei.Generators.Tests.MemberWith
 {
-    using IManyConstructor;
-    using ManyConstructor;
+    using ICopyConstructor;
+    using CopyConstructor;
 
     // ====================================================
     //[Enforced]
-    public static class Test_ManyConstructor
+    public static class Test_CopyConstructor
     {
         //[Enforced]
         [Fact]
         public static void Test()
         {
-            var source = new Other.Persona("James") { LastName = "Bond" };
+            var source = new Other.Persona() { FirstName = "James", LastName = "Bond" };
             var target = source.WithFirstName("Other");
 
             Assert.NotSame(source, target);
@@ -27,7 +27,7 @@
     }
 
     // ====================================================
-    namespace IManyConstructor
+    namespace ICopyConstructor
     {
         public partial interface IOther
         {
@@ -40,16 +40,18 @@
     }
 
     // ====================================================
-    namespace ManyConstructor
+    namespace CopyConstructor
     {
         public partial class Other
         {
             public partial class Persona : IOther.IPersona
             {
-                public Persona(string firstName)
+                public Persona(IOther.IPersona other)
                 {
-                    FirstName = firstName;
+                    FirstName = other.FirstName;
+                    LastName = other.LastName;
                 }
+                public Persona() { }
 
                 public override string ToString() => $"{FirstName} {LastName}";
 

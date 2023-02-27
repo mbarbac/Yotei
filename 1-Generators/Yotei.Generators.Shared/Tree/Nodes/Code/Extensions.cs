@@ -17,7 +17,7 @@ internal static class Extensions
             ICapturedProperty item => item.Parent,
             ICapturedField item => item.Parent,
 
-            _ => throw new UnreachableException($"Unknown element: {captured}")
+            _ => throw new UnexpectedException($"Unknown element: {captured}")
         };
     }
 }

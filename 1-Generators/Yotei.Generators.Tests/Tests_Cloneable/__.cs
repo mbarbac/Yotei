@@ -1,4 +1,4 @@
-﻿namespace Yotei.Generators.Tests.MemberWith
+﻿namespace Yotei.Generators.Tests.Cloneable
 {
     // ====================================================
     //[Enforced]

@@ -52,7 +52,7 @@ internal class NewItemBuilder
         .OfType<IMethodSymbol>()
         .Where(x => x.MethodKind == MethodKind.Constructor);
 
-    IEnumerable<IMethodSymbol> GetValidConstructors(IEnumerable<IMethodSymbol> items) =>
+    public IEnumerable<IMethodSymbol> GetValidConstructors(IEnumerable<IMethodSymbol> items) =>
         items
         .Where(x => x.IsStatic == false)
         .OrderByDescending(x => x.Parameters.Length);
@@ -61,11 +61,35 @@ internal class NewItemBuilder
     /// Returns the collection of suitable properties of this type.
     /// </summary>
     /// <returns></returns>
-    public virtual IEnumerable<IPropertySymbol> GetProperties() =>
-        TypeSymbol.GetMembers()
-        .OfType<IPropertySymbol>();
+    public virtual IEnumerable<IPropertySymbol> GetProperties()
+    {
+        var list = new NoDuplicatesList<IPropertySymbol>(new PropertyComparer());
+        Populate(list, TypeSymbol);
+        return list;
 
-    IEnumerable<IPropertySymbol> GetReadProperties(IEnumerable<IPropertySymbol> items) =>
+        void Populate(NoDuplicatesList<IPropertySymbol> list, INamedTypeSymbol type)
+        {
+            var members = type.GetMembers().OfType<IPropertySymbol>();
+            list.AddRange(members);
+
+            type = type.BaseType!; if (type == null) return;
+            Populate(list, type);
+        }
+    }
+    internal class PropertyComparer : IEqualityComparer<IPropertySymbol>
+    {
+        public bool Equals(IPropertySymbol x, IPropertySymbol y)
+        {
+            var typecomp = SymbolEqualityComparer.Default;
+            if (!typecomp.Equals(x.Type, y.Type)) return false;
+            if (x.Name != y.Name) return false;
+            return true;
+        }
+        public int GetHashCode(IPropertySymbol obj)
+            => SymbolEqualityComparer.Default.GetHashCode(obj);
+    }
+
+    public IEnumerable<IPropertySymbol> GetReadProperties(IEnumerable<IPropertySymbol> items) =>
         items.Where(x =>
         x.CanBeReferencedByName &&
         x.GetMethod != null &&
@@ -73,7 +97,7 @@ internal class NewItemBuilder
         x.DeclaredAccessibility == Accessibility.Public ||
         x.DeclaredAccessibility == Accessibility.Protected));
 
-    IEnumerable<IPropertySymbol> GetWriteProperties(IEnumerable<IPropertySymbol> items) =>
+    public IEnumerable<IPropertySymbol> GetWriteProperties(IEnumerable<IPropertySymbol> items) =>
         items.Where(x =>
         x.SetMethod != null);
 
@@ -81,11 +105,35 @@ internal class NewItemBuilder
     /// Gets the collection of suitable fields of this type.
     /// </summary>
     /// <returns></returns>
-    public virtual IEnumerable<IFieldSymbol> GetFields() =>
-        TypeSymbol.GetMembers()
-        .OfType<IFieldSymbol>();
+    public virtual IEnumerable<IFieldSymbol> GetFields()
+    {
+        var list = new NoDuplicatesList<IFieldSymbol>(new FieldComparer());
+        Populate(list, TypeSymbol);
+        return list;
 
-    IEnumerable<IFieldSymbol> GetReadFields(IEnumerable<IFieldSymbol> items) =>
+        void Populate(NoDuplicatesList<IFieldSymbol> list, INamedTypeSymbol type)
+        {
+            var members = type.GetMembers().OfType<IFieldSymbol>();
+            list.AddRange(members);
+
+            type = type.BaseType!; if (type == null) return;
+            Populate(list, type);
+        }
+    }
+    internal class FieldComparer : IEqualityComparer<IFieldSymbol>
+    {
+        public bool Equals(IFieldSymbol x, IFieldSymbol y)
+        {
+            var typecomp = SymbolEqualityComparer.Default;
+            if (!typecomp.Equals(x.Type, y.Type)) return false;
+            if (x.Name != y.Name) return false;
+            return true;
+        }
+        public int GetHashCode(IFieldSymbol obj)
+            => SymbolEqualityComparer.Default.GetHashCode(obj);
+    }
+
+    public IEnumerable<IFieldSymbol> GetReadFields(IEnumerable<IFieldSymbol> items) =>
         items.Where(x =>
         x.CanBeReferencedByName &&
         x.AssociatedSymbol == null &&
@@ -93,7 +141,7 @@ internal class NewItemBuilder
         x.DeclaredAccessibility == Accessibility.Public ||
         x.DeclaredAccessibility == Accessibility.Protected));
 
-    IEnumerable<IFieldSymbol> GetWriteFields(IEnumerable<IFieldSymbol> items) =>
+    public IEnumerable<IFieldSymbol> GetWriteFields(IEnumerable<IFieldSymbol> items) =>
         items.Where(x =>
         x.IsConst == false &&
         x.IsReadOnly == false);
@@ -119,10 +167,10 @@ internal class NewItemBuilder
         cb = cb.ThrowIfNull(nameof(cb));
         args = args.ThrowIfNull(nameof(args));
 
-        if (RegularConstructor(varName, context, cb, args)) return true;
-        if (CopyConstructor(false, varName, context, cb, args)) return true;
-        if (CopyConstructor(true, varName, context, cb, args)) return true;
-        if (EmptyConstructor(varName, context, cb, args)) return true;
+        if (RegularConstructor(varName, cb, args)) return true;
+        if (CopyConstructor(false, varName, cb, args)) return true;
+        if (CopyConstructor(true, varName, cb, args)) return true;
+        if (EmptyConstructor(varName, cb, args)) return true;
 
         var str = args.Length == 0
             ? "<none>"
@@ -146,13 +194,13 @@ internal class NewItemBuilder
     /// Emits code for a constructor with many arguments.
     /// </summary>
     /// <returns></returns>
-    bool RegularConstructor(
-        string varName, SourceProductionContext context, CodeBuilder cb,
-        params NewItemArgument[] args)
+    bool RegularConstructor(string varName, CodeBuilder cb, params NewItemArgument[] args)
     {
         var cons = GetValidConstructors(GetConstructors()).ToArray();
         foreach (var con in cons)
         {
+            if (con.Parameters.Length == 0) continue;
+
             var props = GetReadProperties(GetProperties()).ToList();
             var fields = GetReadFields(GetFields()).ToList();
             var xargs = args.ToList();
@@ -161,7 +209,7 @@ internal class NewItemBuilder
 
             props = GetWriteProperties(props).ToList();
             fields = GetWriteFields(fields).ToList();
-            var inits = GetInits(xargs, props, fields);
+            var inits = GetInits(true, xargs, props, fields);
             if (xargs.Count > 0) continue;
 
             var str = string.Join(", ", pars.Select(x => x.Generate()));
@@ -194,10 +242,46 @@ internal class NewItemBuilder
     /// </summary>
     /// <returns></returns>
     bool CopyConstructor(
-        bool allowInterface,
-        string varName, SourceProductionContext context, CodeBuilder cb,
-        params NewItemArgument[] args)
+        bool allowInterface, string varName, CodeBuilder cb, params NewItemArgument[] args)
     {
+        var cons = GetValidConstructors(GetConstructors()).ToArray();
+        foreach (var con in cons)
+        {
+            if (con.Parameters.Length != 1) continue;
+
+            var par = con.Parameters[0];
+            var valid = allowInterface
+                ? TypeSymbol.IsAssignableTo(par.Type)
+                : SymbolEqualityComparer.Default.Equals(TypeSymbol, par.Type);
+
+            if (!valid) continue;
+
+            var props = GetWriteProperties(GetReadProperties(GetProperties())).ToList();
+            var fields = GetWriteFields(GetReadFields(GetFields())).ToList();
+            var xargs = args.ToList();
+            var inits = GetInits(false, xargs, props, fields);
+            if (xargs.Count > 0) continue;
+
+            cb.Append($"var {varName} = new {TypeName}(this)");
+            if (inits.Count > 0)
+            {
+                cb.AppendLine();
+                cb.AppendLine("{");
+                cb.Tabs++;
+
+                foreach (var item in inits)
+                {
+                    var code = item.Generate();
+                    cb.AppendLine($"{item.MatchName} = {code},");
+                }
+
+                cb.Tabs--;
+                cb.Append("}");
+            }
+            cb.AppendLine(";");
+            return true;
+        }
+
         // Not found...
         return false;
     }
@@ -206,10 +290,39 @@ internal class NewItemBuilder
     /// Emits code for a parameterless constructor.
     /// </summary>
     /// <returns></returns>
-    bool EmptyConstructor(
-        string varName, SourceProductionContext context, CodeBuilder cb,
-        params NewItemArgument[] args)
+    bool EmptyConstructor(string varName, CodeBuilder cb, params NewItemArgument[] args)
     {
+        var cons = GetValidConstructors(GetConstructors()).ToArray();
+        foreach (var con in cons)
+        {
+            if (con.Parameters.Length != 0) continue;
+
+            var props = GetWriteProperties(GetReadProperties(GetProperties())).ToList();
+            var fields = GetWriteFields(GetReadFields(GetFields())).ToList();
+            var xargs = args.ToList();
+            var inits = GetInits(true, xargs, props, fields);
+            if (xargs.Count > 0) continue;
+
+            cb.Append($"var {varName} = new {TypeName}()");
+            if (inits.Count > 0)
+            {
+                cb.AppendLine();
+                cb.AppendLine("{");
+                cb.Tabs++;
+
+                foreach (var item in inits)
+                {
+                    var code = item.Generate();
+                    cb.AppendLine($"{item.MatchName} = {code},");
+                }
+
+                cb.Tabs--;
+                cb.Append("}");
+            }
+            cb.AppendLine(";");
+            return true;
+        }
+
         // Not found...
         return false;
     }
@@ -284,11 +397,13 @@ internal class NewItemBuilder
     }
 
     /// <summary>
-    /// Gets the init parameters, adjusting the given lists.
-    /// This method assumes the properties and fields are writtable/init ones.
+    /// Gets the init parameters, adjusting the given lists. The <paramref name="addMembers"/>
+    /// governs whether to add the remaining properties and fields, or not. This method assumes
+    /// the properties and fields are writtable/init ones.
     /// </summary>
     /// <returns></returns>
     List<NewItemArgument> GetInits(
+        bool addMembers,
         List<NewItemArgument> xargs,
         List<IPropertySymbol> props, List<IFieldSymbol> fields)
     {
@@ -322,8 +437,11 @@ internal class NewItemBuilder
             }
         }
 
-        foreach (var prop in props) list.Add(new NewItemArgument(prop)); props.Clear();
-        foreach (var field in fields) list.Add(new NewItemArgument(field)); fields.Clear();
+        if (addMembers)
+        {
+            foreach (var prop in props) list.Add(new NewItemArgument(prop)); props.Clear();
+            foreach (var field in fields) list.Add(new NewItemArgument(field)); fields.Clear();
+        }
         return list;
     }
 

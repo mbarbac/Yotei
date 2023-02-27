@@ -30,30 +30,40 @@ internal class NewItemArgument
     /// Initializes a new instance.
     /// </summary>
     /// <param name="symbol"></param>
-    public NewItemArgument(IPropertySymbol symbol)
+    /// <param name="clone"></param>
+    /// <param name="nullable"></param>
+    public NewItemArgument(
+        IPropertySymbol symbol,
+        bool? clone = null,
+        bool? nullable = null)
     {
         symbol = symbol.ThrowIfNull(nameof(symbol));
 
         SourceName = symbol.Name;
         MatchName = symbol.Name;
         Type = symbol.Type;
-        IsCloneable = NewItemInfo.IsCloneable(Type);
-        IsNullable = NewItemInfo.IsNullable(Type);
+        IsCloneable = clone ?? NewItemInfo.IsCloneable(Type);
+        IsNullable = nullable ?? Type.NullableAnnotation == NullableAnnotation.Annotated;
     }
 
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
     /// <param name="symbol"></param>
-    public NewItemArgument(IFieldSymbol symbol)
+    /// <param name="clone"></param>
+    /// <param name="nullable"></param>
+    public NewItemArgument(
+        IFieldSymbol symbol,
+        bool? clone = null,
+        bool? nullable = null)
     {
         symbol = symbol.ThrowIfNull(nameof(symbol));
 
         SourceName = symbol.Name;
         MatchName = symbol.Name;
         Type = symbol.Type;
-        IsCloneable = NewItemInfo.IsCloneable(Type);
-        IsNullable = NewItemInfo.IsNullable(Type);
+        IsCloneable = clone ?? NewItemInfo.IsCloneable(Type);
+        IsNullable = nullable ?? Type.NullableAnnotation == NullableAnnotation.Annotated;
     }
 
     // ----------------------------------------------------

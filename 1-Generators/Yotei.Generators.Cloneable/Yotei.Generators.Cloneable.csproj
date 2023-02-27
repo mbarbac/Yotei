@@ -36,7 +36,7 @@
     <!-- NEEDED FOR GENERATING A WORKING SOURCE CODE GENERATOR PACKAGE -->
 
     <PropertyGroup>
-        <MakePackage>true</MakePackage>
+        <MakePackage>false</MakePackage>
     </PropertyGroup>    
     <ItemGroup Condition="'$(MakePackage)'=='true'">
         <None Remove="bin\Debug\netstandard2.0\Yotei.Generators.Cloneable.dll" />
@@ -44,8 +44,8 @@
     </ItemGroup>
 
     <!-- UNCOMMENT FOR SOURCE CODE GENERATOR DEBUGGING -->
-    <!--<PropertyGroup>
+    <PropertyGroup>
       <DefineConstants>$(DefineConstants);DEBUG_CLONEABLE_GENERATOR</DefineConstants>
-   </PropertyGroup>-->
+   </PropertyGroup>
 
 </Project>

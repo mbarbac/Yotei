@@ -63,8 +63,5 @@
         <Compile Remove="Generated\$(TargetFramework)\**" />
         <None Include="Generated\$(TargetFramework)\**" />
     </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Generated\net7.0\Yotei.Generators.MemberWith\" />
-    </ItemGroup>
     
 </Project>

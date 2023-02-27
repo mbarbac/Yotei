@@ -157,6 +157,8 @@ internal class TypeNode : ITypeNode
         // Terminal type...
         if (tpIndex == (tpLen - 1) && level == CaptureLevel.Type)
         {
+            var node = captured.Generator.CreateType(this, type.Syntax, type.Symbol, type.SemanticModel);
+            _ChildTypes.Add(node);
             return;
         }
 
