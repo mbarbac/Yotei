@@ -1,17 +1,17 @@
 namespace Yotei.Generators.Tests.MemberWith
 {
-    using ICopyConstructor;
-    using CopyConstructor;
+    using IRegularConstructor;
+    using RegularConstructor;
 
     // ====================================================
     //[Enforced]
-    public static class Test_CopyConstructor
+    public static class Test_RegularConstructor
     {
         [Enforced]
         [Fact]
         public static void Test_Interface()
         {
-            IOther.IManager source = new Other.Manager() { FirstName = "James", LastName = "Bond", Age = 50, Branch = "MI6" };
+            IOther.IManager source = new Other.Manager("James", "Bond", "MI6") { Age = 50 };
 
             var target = source.WithFirstName("Other");
             Assert.NotSame(target, source);
@@ -32,7 +32,7 @@ namespace Yotei.Generators.Tests.MemberWith
         [Fact]
         public static void Test_Concrete()
         {
-            var source = new Other.Manager() { FirstName = "James", LastName = "Bond", Age = 50, Branch = "MI6" };
+            var source = new Other.Manager("James", "Bond", "MI6") { Age = 50 };
 
             var target = source.WithFirstName("Other");
             Assert.NotSame(target, source);
@@ -60,7 +60,7 @@ namespace Yotei.Generators.Tests.MemberWith
     }
 
     // ====================================================
-    namespace ICopyConstructor
+    namespace IRegularConstructor
     {
         public partial interface IOther
         {
@@ -80,18 +80,17 @@ namespace Yotei.Generators.Tests.MemberWith
     }
 
     // ====================================================
-    namespace CopyConstructor
+    namespace RegularConstructor
     {
         public partial class Other
         {
             public partial class Persona : IOther.IPersona
             {
-                public Persona(IOther.IPersona source)
+                public Persona(string firstName, string lastName)
                 {
-                    FirstName = source.FirstName;
-                    LastName = source.LastName;
+                    FirstName = firstName;
+                    LastName = lastName;
                 }
-                public Persona() { }
                 public override string ToString() => $"{FirstName} {LastName} {Age}";
 
                 [MemberWith] public string FirstName { get; init; } = default!;
@@ -102,11 +101,11 @@ namespace Yotei.Generators.Tests.MemberWith
 
             public partial class Manager : Persona, IOther.IManager
             {
-                public Manager(IOther.IManager source) : base(source)
+                public Manager(string firstName, string lastName, string branch)
+                    : base(firstName, lastName)
                 {
-                    Branch = source.Branch;
+                    Branch = branch;
                 }
-                public Manager() { }
                 public override string ToString() => $"{base.ToString()} {Branch}";
 
                 [MemberWith] public new string FirstName { get => base.FirstName; init => base.FirstName = value; }

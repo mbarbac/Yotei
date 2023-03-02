@@ -6,13 +6,6 @@
 /// </summary>
 internal class XProperty : Tree.PropertyNode
 {
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="parent"></param>
-    /// <param name="syntax"></param>
-    /// <param name="symbol"></param>
-    /// <param name="model"></param>
     public XProperty(
         Tree.ITypeNode parent,
         PropertyDeclarationSyntax syntax, IPropertySymbol symbol, SemanticModel model)
@@ -49,6 +42,8 @@ internal class XProperty : Tree.PropertyNode
         return true;
     }
 
+    // ----------------------------------------------------
+
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
@@ -57,33 +52,47 @@ internal class XProperty : Tree.PropertyNode
         var parentType = Parent.Name;
         var methodName = $"With{Name}";
         var itemType = Symbol.Type.FullyQualifiedName();
-        var itemNullable = Symbol.Type.NullableAnnotation == NullableAnnotation.Annotated;
-        if (itemNullable) itemType += "?";
+        var nullable = Symbol.Type.NullableAnnotation == NullableAnnotation.Annotated;
+        if (nullable) itemType += "?";
 
         cb.AppendLine($"/// <summary>");
-        cb.AppendLine($"/// Returns a new instance where the original value of the <see cref=\"{Name}\"/>");
+        cb.AppendLine($"/// Returns a new instance where the original value of <see cref=\"{Name}\"/>");
         cb.AppendLine($"/// property is replaced by the new given one.");
         cb.AppendLine($"/// </summary>");
         cb.AppendLine($"/// <param name=\"value\"></param>");
         cb.AppendLine($"/// <returns></returns>");
 
-        // For declaration purposes...
+        var newstr = NeedNew() ? "new " : string.Empty;
+
+        // Interfaces...
         if (Parent.IsInterface)
         {
-            cb.AppendLine($"{parentType} {methodName}({itemType} value);");
+            cb.AppendLine($"{newstr}{parentType} {methodName}({itemType} value);");
         }
 
-        // For implementation purposes...
+        // Implementation...
         else
         {
-            cb.AppendLine($"public {parentType} {methodName}({itemType} value)");
+            cb.AppendLine($"public {newstr}{parentType} {methodName}({itemType} value)");
             cb.AppendLine("{");
             cb.Tabs++;
 
-            var builder = new NewItemBuilder(Parent.Syntax, Parent.Symbol);
-            var arg = new NewItemArgument("value", Name, Symbol.Type);
-            var done = builder.Print("item", context, cb, arg);
-            if (done) cb.AppendLine($"return item;");
+            var arg = new NewArgument(Symbol.Type, "value", Symbol.Name);
+            var builder = new NewBuilder(Parent.Symbol);
+            var done = builder.Print("item", cb, arg);
+            if (done) cb.AppendLine("return item;");
+            else
+            {
+                context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor(
+                    "Kerosene",
+                    "Cannot generate a new instance.",
+                    "Cannot generate a new instance of type '{0}' with arguments '{1}'.",
+                    "Build",
+                    DiagnosticSeverity.Error,
+                    true),
+                    Syntax.GetLocation(),
+                    new object[] { Symbol.Name, arg.ArgumentName }));
+            }
 
             cb.Tabs--;
             cb.AppendLine("}");
@@ -100,28 +109,64 @@ internal class XProperty : Tree.PropertyNode
     }
 
     /// <summary>
-    /// Gets the interfaces to implement. Assumes it is invoked from a non-interface type.
+    /// Determines if the method needs a "new" modifier, or not.
     /// </summary>
+    /// <returns></returns>
+    bool NeedNew()
+    {
+        var parent = Parent.Symbol.BaseType;
+        if (parent != null && NeedNew(parent)) return true;
+
+        foreach (var iface in Parent.Symbol.Interfaces) if (NeedNew(iface)) return true;
+        return false;
+    }
+    bool NeedNew(INamedTypeSymbol type)
+    {
+        var members = type.GetMembers().OfType<IPropertySymbol>().ToDebugArray();
+        var member = members.SingleOrDefault(x => x.Name == Name);
+        if (member != null)
+        {
+            var done = member.HasAttribute(MemberWithSource.AttributeLongName);
+            if (done) return true;
+        }
+
+        var ifaces = type.Interfaces;
+        foreach (var iface in ifaces) if (NeedNew(iface)) return true;
+
+        var parent = type.BaseType;
+        if (parent != null && NeedNew(parent)) return true;
+
+        return false;
+    }
+
+    /// <summary>
+    /// Gets the collection of interfaces to implement, when it is invoked for a non-interface
+    /// type.
+    /// </summary>
+    /// <returns></returns>
     IEnumerable<INamedTypeSymbol> InterfacesToImplement()
     {
+        if (Parent.IsInterface) return Array.Empty<INamedTypeSymbol>();
+
         var comp = SymbolEqualityComparer.Default;
         var list = new NoDuplicatesList<INamedTypeSymbol>(comp);
 
         var ifaces = Parent.Symbol.Interfaces;
-        foreach (var iface in ifaces) Populate(list, iface);
+        foreach (var iface in ifaces) Populate(list, iface, Name);
         return list;
 
-        void Populate(NoDuplicatesList<INamedTypeSymbol> list, INamedTypeSymbol type)
+        static void Populate(
+            NoDuplicatesList<INamedTypeSymbol> list, INamedTypeSymbol type, string name)
         {
             var members = type.GetMembers().OfType<IPropertySymbol>().Where(x =>
-                x.Name == Name &&
+                x.Name == name &&
                 x.HasAttribute(MemberWithSource.AttributeLongName))
                 .ToArray();
 
             if (members.Length > 0) list.Add(type);
 
             var ifaces = type.Interfaces;
-            foreach (var iface in ifaces) Populate(list, iface);
+            foreach (var iface in ifaces) Populate(list, iface, name);
         }
     }
 }

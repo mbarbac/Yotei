@@ -7,29 +7,39 @@
 public static class Ambient
 {
     /// <summary>
-    /// Determines whether a debugger is attached to this process.
+    /// Determines whether we are in DEBUG mode, or not.
     /// </summary>
-    public static bool IsDebugAttached => Debugger.IsAttached;
+    public static bool IsDebug =>
+#if DEBUG
+        true;
+#else
+        false;
+#endif
 
     /// <summary>
-    /// Determines if debug output is emitted to the console, or not.
+    /// Determines if there is a <see cref="ConsoleTraceListener"/> listener among the registered
+    /// trace listeners, or not.
     /// </summary>
     /// <param name="recompute"></param>
     /// <returns></returns>
-    public static bool IsDebugOnConsole(bool recompute = false)
+    public static bool IsConsoleListener(bool recompute = false)
     {
-        if (!_DebugOnConsoleInitialized || recompute)
+        if (!_IsConsoleListenerInitialized || recompute)
         {
-            _DebugOnConsoleInitialized = true;
-            _IsDebugOnConsole = false;
+            _IsConsoleListenerInitialized = true;
+            _IsConsoleListener = false;
 
             foreach (var item in Trace.Listeners)
+            {
                 if (item.GetType().IsAssignableTo(typeof(ConsoleTraceListener)))
-                    _IsDebugOnConsole = true;
+                {
+                    _IsConsoleListener = true;
+                    break;
+                }
+            }
         }
-        return _IsDebugOnConsole;
+        return _IsConsoleListener;
     }
-
-    static bool _IsDebugOnConsole = default!;
-    static bool _DebugOnConsoleInitialized = false;
+    static bool _IsConsoleListener = default!;
+    static bool _IsConsoleListenerInitialized = false;
 }

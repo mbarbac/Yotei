@@ -64,6 +64,12 @@ public static class DebugWrapper
     [Conditional("DEBUG")]
     public static void Unindent() => _Debug.Unindent();
 
+    /// <summary>
+    /// If true, emits the debug messages also in the console. The value of this property is
+    /// false by default.
+    /// </summary>
+    public static bool ForConsole { get; set; } = false;
+
     // ----------------------------------------------------
 
     /// <summary>
@@ -76,8 +82,8 @@ public static class DebugWrapper
     {
         message = message.FormatMessage(args);
 
-        _Debug.Write(message);
-        if (!Ambient.IsDebugOnConsole()) _Console.Write(message);
+        _Debug.Print(message);
+        if (ForConsole) _Console.Write(message);
     }
 
     /// <summary>
@@ -111,9 +117,9 @@ public static class DebugWrapper
     public static void WriteLine(string message, params object?[] args)
     {
         message = message.FormatMessage(args);
-
+        
         _Debug.WriteLine(message);
-        if (!Ambient.IsDebugOnConsole()) _Console.WriteLine(message);
+        if (ForConsole) _Console.WriteLine(message);
     }
 
     /// <summary>

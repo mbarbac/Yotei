@@ -13,9 +13,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\EmptyException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\NotFoundException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\DuplicateException.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Miscelanea\NewItemBuilder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Miscelanea\NewItemArgument.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Miscelanea\NewItemInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Miscelanea\NewBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Miscelanea\NewArgument.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\AttributeDataExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\ISymbolExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\ITypeSymbolExtensions.cs" />

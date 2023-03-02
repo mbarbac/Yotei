@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
@@ -23,38 +23,7 @@
         <PackageReference Include="Yotei.Tools" Version="0.5.1-v0001" />
     </ItemGroup>
 
-    <!-- CLONEABLE GENERATOR -->
-
-    <PropertyGroup>
-        <CloneableImportMode>Project</CloneableImportMode>
-    </PropertyGroup>
-    <ItemGroup Condition="'$(CloneableImportMode)'=='Package'">
-        <PackageReference Include="Yotei.Generators.Cloneable" Version="0.2.0-v0001" />
-    </ItemGroup>
-    <ItemGroup Condition="'$(CloneableImportMode)'=='Project'">
-        <ProjectReference Include="..\Yotei.Generators.Cloneable\Yotei.Generators.Cloneable.csproj">
-            <OutputItemType>Analyzer</OutputItemType>
-            <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-        </ProjectReference>
-    </ItemGroup>
-
-    <!-- MEMBERWITH GENERATOR -->
-
-    <PropertyGroup>
-        <MemberWithImportMode>Project</MemberWithImportMode>
-    </PropertyGroup>
-    <ItemGroup Condition="'$(MemberWithImportMode)'=='Package'">
-        <PackageReference Include="Yotei.Generators.MemberWith" Version="0.2.0-v0001" />
-    </ItemGroup>
-    <ItemGroup Condition="'$(MemberWithImportMode)'=='Project'">
-        <ProjectReference Include="..\Yotei.Generators.MemberWith\Yotei.Generators.MemberWith.csproj">
-            <OutputItemType>Analyzer</OutputItemType>
-            <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-        </ProjectReference>
-    </ItemGroup>
-
     <!-- ALL YOTEI GENERATORS -->
-
     <PropertyGroup Condition="'$(Configuration)'=='Debug'">
         <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
         <CompilerGeneratedFilesOutputPath>Generated\$(TargetFramework)</CompilerGeneratedFilesOutputPath>
@@ -63,5 +32,19 @@
         <Compile Remove="Generated\$(TargetFramework)\**" />
         <None Include="Generated\$(TargetFramework)\**" />
     </ItemGroup>
-    
+
+    <!-- MEMBERWITH SOURCE CODE GENERATOR -->
+    <PropertyGroup>
+        <MemberWithMode>Project</MemberWithMode>
+    </PropertyGroup>
+    <ItemGroup Condition="'$(MemberWithMode)'=='Package'">
+        <PackageReference Include="Yotei.Generators.MemberWith" Version="0.2.0-v0001" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(MemberWithMode)'=='Project'">
+        <ProjectReference Include="..\Yotei.Generators.MemberWith\Yotei.Generators.MemberWith.csproj">
+            <OutputItemType>Analyzer</OutputItemType>
+            <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+        </ProjectReference>
+    </ItemGroup>
+
 </Project>

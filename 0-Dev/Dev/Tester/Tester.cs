@@ -29,6 +29,9 @@ public class Tester : MenuEntry
         WriteLine(Program.Color, Program.FatSeparator);
         WriteLine(Program.Color, Header);
 
+        //Excludes.Add("Experimental.Tests");
+        Excludes.Add("Yotei.Tools.Tests");
+        Excludes.Add("Yotei.Tools.DynamicParser.Tests");
         Executor(breakOnError: true);
     }
 
@@ -70,11 +73,6 @@ public class Tester : MenuEntry
     /// <param name="breakOnError"></param>
     void Executor(bool breakOnError)
     {
-        var listener = new ConsoleTraceListener();
-        Trace.Listeners.Add(listener);
-        Debug.IndentSize = 3;
-        Debug.AutoFlush = true;
-
         if (Includes.Count == 0) PopulateFromRoot();
         else PopulateFromIncludes();
 
@@ -192,27 +190,32 @@ public class Tester : MenuEntry
         WriteLine();
         Write(Program.Color, $"Populating from: {root} ");
 
-        var files = System.IO.Directory.EnumerateFiles(root);
+        var files = _Directory.EnumerateFiles(root);
         foreach (var file in files)
         {
             var upper = file.ToUpper();
             if (!upper.EndsWith(".DLL") && !upper.EndsWith(".EXE")) continue;
 
             Write(Color.Magenta, ".");
-            var name = Path.GetFileNameWithoutExtension(file);
+            var name = _Path.GetFileNameWithoutExtension(file);
 
             try
             {
                 var holder = AssemblyHolders.Find(name);
                 if (holder == null)
                 {
+                    Debug.WriteLine($"- Loading assembly: {name}");
+
                     var assembly = Assembly.Load(new AssemblyName(name));
                     holder = AssemblyHolders.Add(assembly);
                 }
 
                 holder.Populate();
             }
-            catch { }
+            catch
+            {
+                Debug.WriteLine($"** Error loading assembly: {name}");
+            }
         }
 
         WriteLine();
@@ -235,6 +238,8 @@ public class Tester : MenuEntry
 
             if (holder == null)
             {
+                Debug.WriteLine($"- Loading assembly: {name}");
+
                 var assembly = Assembly.Load(new AssemblyName(name));
                 holder = AssemblyHolders.Add(assembly);
             }
@@ -253,7 +258,7 @@ public class Tester : MenuEntry
     void PurgeExcludes()
     {
         WriteLine();
-        Write(Program.Color, "Purging explicit includes: ");
+        Write(Program.Color, "Purging explicit excludes: ");
 
         foreach (var item in Excludes)
         {
@@ -348,6 +353,7 @@ public class Tester : MenuEntry
             foreach (var typeHolder in assemblyHolder.TypeHolders)
                 if (typeHolder.MethodHolders.Any(x => x.IsEnforced))
                     typeHolder.IsEnforced = true;
+
         EnsureEnforcedTypes();
 
         foreach (var assemblyHolder in AssemblyHolders)

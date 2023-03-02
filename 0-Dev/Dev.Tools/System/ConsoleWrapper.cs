@@ -7,12 +7,6 @@
 public static class ConsoleWrapper
 {
     /// <summary>
-    /// Determines if the console output shall also be emitted into debug, or not.
-    /// </summary>
-    public static bool UseDebug { get; set; } = false;
-    static bool ForDebug => Ambient.IsDebugAttached && UseDebug;
-
-    /// <summary>
     /// Invoked to obtain a formatted message.
     /// </summary>
     static string FormatMessage(this string message, params object?[] args)
@@ -34,12 +28,9 @@ public static class ConsoleWrapper
     {
         message = message.FormatMessage(args);
 
-        if (ForDebug)
-        {
-            _Debug.Write(message);
-            if (!Ambient.IsDebugOnConsole()) _Console.Write(message);
-        }
-        else _Console.Write(message);
+        _Debug.Write(message);
+        if (!Ambient.IsConsoleListener()) _Console.Write(message);
+
     }
 
     /// <summary>
@@ -60,15 +51,7 @@ public static class ConsoleWrapper
     /// <summary>
     /// Writes a new line.
     /// </summary>
-    public static void WriteLine()
-    {
-        if (ForDebug)
-        {
-            _Debug.WriteLine(string.Empty);
-            if (!Ambient.IsDebugOnConsole()) _Console.WriteLine(string.Empty);
-        }
-        else _Console.WriteLine(string.Empty);
-    }
+    public static void WriteLine() => WriteLine(string.Empty);
 
     /// <summary>
     /// Writes a formatted message, followed by a new line.
@@ -79,12 +62,9 @@ public static class ConsoleWrapper
     {
         message = message.FormatMessage(args);
 
-        if (ForDebug)
-        {
-            _Debug.WriteLine(message);
-            if (!Ambient.IsDebugOnConsole()) _Console.WriteLine(message);
-        }
-        else _Console.WriteLine(message);
+        _Debug.WriteLine(message);
+        if (!Ambient.IsConsoleListener()) _Console.WriteLine(message);
+
     }
 
     /// <summary>
