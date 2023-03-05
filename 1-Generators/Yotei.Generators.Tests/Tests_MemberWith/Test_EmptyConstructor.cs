@@ -4,10 +4,10 @@ namespace Yotei.Generators.Tests.MemberWith
     using EmptyConstructor;
 
     // ====================================================
-    //[Enforced]
+    [Enforced]
     public static class Test_EmptyConstructor
     {
-        [Enforced]
+        //[Enforced]
         [Fact]
         public static void Test_Interface()
         {
@@ -28,7 +28,7 @@ namespace Yotei.Generators.Tests.MemberWith
             Assert.Equal("Other", target.Branch);
         }
 
-        [Enforced]
+        //[Enforced]
         [Fact]
         public static void Test_Concrete()
         {

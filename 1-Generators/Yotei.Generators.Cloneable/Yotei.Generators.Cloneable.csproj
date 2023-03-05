@@ -15,7 +15,7 @@
         <IncludeSymbols>True</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <Description>Yotei MemberWith source code generator.</Description>
+        <Description>Yotei Cloneable source code generator.</Description>
         <Authors>mbarbac@hotmail.com</Authors>
         <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -25,7 +25,7 @@
 
     <!-- DEBUG -->
     <!--<PropertyGroup>
-        <DefineConstants>$(DefineConstants);DEBUG_MEMBERWITH_GENERATOR</DefineConstants>
+        <DefineConstants>$(DefineConstants);DEBUG_CLONEABLE_GENERATOR</DefineConstants>
     </PropertyGroup>-->
 
     <!-- ROSLYN AND UTILITIES -->
@@ -39,7 +39,7 @@
         <Create_Package>true</Create_Package>
     </PropertyGroup>
     <ItemGroup Condition="'$(Create_Package)'=='true'">
-        <None Remove="bin\Debug\netstandard2.0\Yotei.Generators.MemberWith.dll" />
+        <None Remove="bin\Debug\netstandard2.0\Yotei.Generators.Cloneable.dll" />
         <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     </ItemGroup>
     <ItemGroup>

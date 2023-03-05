@@ -24,9 +24,6 @@ internal class Program
     /// <param name="args"></param>
     static void Main(string[] args)
     {
-        //var listener = new ConsoleTraceListener();
-        //Trace.Listeners.Clear();
-        //Trace.Listeners.Add(listener);
         Debug.IndentSize = 3;
         Debug.AutoFlush = true;
 

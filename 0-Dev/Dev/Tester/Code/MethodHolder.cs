@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// Represents a holder for a given method.
+/// A holder for a given test method.
 /// </summary>
 internal class MethodHolder
 {
@@ -12,8 +12,11 @@ internal class MethodHolder
     /// <param name="method"></param>
     public MethodHolder(MethodInfo method)
     {
-        MethodInfo = method.ThrowIfNull();
-        IsEnforced = method.IsEnforced();
+        Method = method.ThrowIfNull();
+        Enforced = method.IsEnforced();
+
+        if (!method.IsValid()) throw new ArgumentException(
+            $"Method '{Method.Name}' is not a valid test.");
     }
 
     /// <summary>
@@ -25,61 +28,50 @@ internal class MethodHolder
     /// <summary>
     /// The method this instance refers to.
     /// </summary>
-    public MethodInfo MethodInfo { get; }
+    public MethodInfo Method { get; }
 
     /// <summary>
-    /// The name of the method this instance refers to.
+    /// The name of this method.
     /// </summary>
-    public string Name => MethodInfo.Name;
+    public string Name => Method.Name;
 
     /// <summary>
-    /// Whether this instance is enforced, or not.
+    /// Determines if this method is enforced, or not.
     /// </summary>
-    public bool IsEnforced { get; set; } = false;
+    public bool Enforced { get; set; }
 }
 
 // ========================================================
-internal static class MethodExtensions
+internal static class MethodHolderExtensions
 {
     /// <summary>
-    /// Determines if the given type is a valid test one, or not.
-    /// </summary>
-    /// <param name="method"></param>
-    /// <param name="ex"></param>
-    /// <returns></returns>
-    public static bool IsValidTest(this MethodInfo method, [NotNullWhen(false)] out Exception? ex)
-    {
-        method = method.ThrowIfNull();
-
-        var pars = method.GetParameters();
-        if (pars.Length != 0)
-        {
-            ex = new ArgumentException("Method is not a parameterless one.").WithData(method);
-            return false;
-        }
-
-        var ats = method.GetAttributes(Tester.FactAttribute, true);
-        if (ats.Length == 0)
-        {
-            ex = new ArgumentException("Method has not the [Fact] attribute.").WithData(method);
-            return false;
-        }
-
-        ex = null;
-        return true;
-    }
-
-    /// <summary>
-    /// Determines if the given method is decorated with the <see cref="EnforcedAttribute"/>
-    /// attribute, or not.
+    /// Determines if this Method is enforced, or not.
     /// </summary>
     /// <param name="method"></param>
     /// <returns></returns>
     public static bool IsEnforced(this MethodInfo method)
     {
-        ArgumentNullException.ThrowIfNull(method);
+        method = method.ThrowIfNull();
 
         var ats = method.GetAttributes(Tester.EnforcedAttribute, true);
         return ats.Length != 0;
+    }
+
+    /// <summary>
+    /// Determines if this method is a valid test, or not.
+    /// </summary>
+    /// <param name="method"></param>
+    /// <returns></returns>
+    public static bool IsValid(this MethodInfo method)
+    {
+        method = method.ThrowIfNull();
+
+        var pars = method.GetParameters();
+        if (pars.Length != 0) return false;
+
+        var ats = method.GetAttributes(Tester.FactAttribute, true);
+        if (ats.Length == 0) return false;
+
+        return true;
     }
 }

@@ -140,8 +140,7 @@ internal class XProperty : Tree.PropertyNode
     }
 
     /// <summary>
-    /// Gets the collection of interfaces to implement, when it is invoked for a non-interface
-    /// type.
+    /// Gets the collection of interfaces to implement, or an empty one is this is an interface.
     /// </summary>
     /// <returns></returns>
     IEnumerable<INamedTypeSymbol> InterfacesToImplement()

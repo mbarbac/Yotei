@@ -35,16 +35,33 @@
 
     <!-- MEMBERWITH SOURCE CODE GENERATOR -->
     <PropertyGroup>
-        <MemberWithMode>Project</MemberWithMode>
+        <MemberWith_Mode>Package</MemberWith_Mode>
     </PropertyGroup>
-    <ItemGroup Condition="'$(MemberWithMode)'=='Package'">
-        <PackageReference Include="Yotei.Generators.MemberWith" Version="0.2.0-v0001" />
+    <ItemGroup Condition="'$(MemberWith_Mode)'=='Package'">
+        <PackageReference Include="Yotei.Generators.MemberWith" Version="0.5.2-v0001" />
     </ItemGroup>
-    <ItemGroup Condition="'$(MemberWithMode)'=='Project'">
+    <ItemGroup Condition="'$(MemberWith_Mode)'=='Project'">
         <ProjectReference Include="..\Yotei.Generators.MemberWith\Yotei.Generators.MemberWith.csproj">
             <OutputItemType>Analyzer</OutputItemType>
             <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
         </ProjectReference>
+    </ItemGroup>
+
+    <!-- CLONEABLE SOURCE CODE GENERATOR -->
+    <PropertyGroup>
+        <Cloneable_Mode>Package</Cloneable_Mode>
+    </PropertyGroup>
+    <ItemGroup Condition="'$(Cloneable_Mode)'=='Package'">
+        <PackageReference Include="Yotei.Generators.Cloneable" Version="0.5.2-v0001" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(Cloneable_Mode)'=='Project'">
+        <ProjectReference Include="..\Yotei.Generators.Cloneable\Yotei.Generators.Cloneable.csproj">
+            <OutputItemType>Analyzer</OutputItemType>
+            <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+        </ProjectReference>
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Generated\net7.0\" />
     </ItemGroup>
 
 </Project>

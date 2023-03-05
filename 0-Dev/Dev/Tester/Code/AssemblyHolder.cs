@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// Represents a holder for a given assembly.
+/// A holder for a given assembly.
 /// </summary>
 internal class AssemblyHolder
 {
@@ -10,10 +10,7 @@ internal class AssemblyHolder
     /// Initializes a new instance.
     /// </summary>
     /// <param name="assembly"></param>
-    public AssemblyHolder(Assembly assembly)
-    {
-        Assembly = assembly.ThrowIfNull();
-    }
+    public AssemblyHolder(Assembly assembly) => Assembly = assembly.ThrowIfNull();
 
     /// <summary>
     /// <inheritdoc/>
@@ -27,82 +24,48 @@ internal class AssemblyHolder
     public Assembly Assembly { get; }
 
     /// <summary>
-    /// The name of the assembly this instance refers to.
+    /// The name of this assembly.
     /// </summary>
     public string Name => Assembly.GetName().Name!;
 
-    // ----------------------------------------------------
-
     /// <summary>
-    /// The collection of child holders maintained by this instance.
+    /// The collection of type holders in this instance.
     /// </summary>
     public TypeHolderList TypeHolders { get; } = new();
 
     /// <summary>
-    /// Populates the child holders of this instance using the given specifications.
+    /// Populates the collection of type holders.
     /// </summary>
-    /// <param name="typeName"></param>
-    /// <param name="methodName"></param>
-    public void Populate(string? typeName = null, string? methodName = null)
+    public void Populate()
     {
-        typeName = typeName?.NotNullNotEmpty();
-        methodName = methodName?.NotNullNotEmpty();
-
-        // All types...
-        if (typeName == null)
+        var types = Assembly.DefinedTypes;
+        foreach (var type in types)
         {
-            var types = Assembly.DefinedTypes;
-            foreach (var type in types)
-            {
-                if (!type.IsValidTest(out _)) continue;
+            if (!type.IsValid()) continue;
 
-                var holder = TypeHolders.Add(type);
-                holder.Populate(methodName);
-            }
-        }
-
-        // Requested type...
-        else
-        {
-            var type = Assembly.DefinedTypes
-                .Where(x => x.Name == typeName)
-                .SingleOrDefault();
-
-            if (type == null) throw new NotFoundException(
-                "Requested type not found.")
-                .WithData(typeName);
-
-            if (!type.IsValidTest(out var ex)) throw ex;
-            var holder = TypeHolders.Add(type);
-            holder.Populate(methodName);
+            var holder = new TypeHolder(type);
+            TypeHolders.Add(holder);
+            holder.Populate();
         }
     }
 
     /// <summary>
-    /// Purges the child holders of this instance using the given specifications.
+    /// Ensures that only the decorated elements are taken into consideration, if any is
+    /// decorated.
     /// </summary>
-    /// <param name="typeName"></param>
-    /// <param name="methodName"></param>
-    public void Purge(string? typeName = null, string? methodName = null)
+    public void EnsureEnforced()
     {
-        typeName = typeName?.NotNullNotEmpty();
-        methodName = methodName?.NotNullNotEmpty();
+        foreach (var typeHolder in TypeHolders) typeHolder.EnsureEnforced();
+    }
 
-        // All types...
-        if (typeName == null)
-        {
-            TypeHolders.Clear();
-        }
+    /// <summary>
+    /// Purges not enforced elements.
+    /// </summary>
+    public void PurgeNotEnforced()
+    {
+        foreach (var typeHolder in TypeHolders) typeHolder.PurgeNotEnforced();
 
-        // Requested type...
-        else
-        {
-            var holder = TypeHolders.Find(typeName);
-            if (holder != null)
-            {
-                holder.Purge(methodName);
-                if (holder.MethodHolders.Count == 0) TypeHolders.Remove(holder);
-            }
-        }
+        var items = TypeHolders.Where(x => x.MethodHolders.Count == 0).ToList();
+        foreach (var item in items) TypeHolders.Remove(item);
     }
 }

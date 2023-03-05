@@ -1,4 +1,4 @@
-namespace Yotei.Generators.Tests.MemberWith
+namespace Yotei.Generators.Tests.Cloneable
 {
     using IRegularConstructor;
     using RegularConstructor;
@@ -13,19 +13,12 @@ namespace Yotei.Generators.Tests.MemberWith
         {
             IOther.IManager source = new Other.Manager("James", "Bond", "MI6") { Age = 50 };
 
-            var target = source.WithFirstName("Other");
+            var target = source.Clone();
             Assert.NotSame(target, source);
-            Assert.IsAssignableFrom<IOther.IManager>(target);
-            Assert.Equal("Other", target.FirstName);
-            Assert.Equal(source.LastName, target.LastName);
-            Assert.Equal(source.Branch, target.Branch);
-
-            target = source.WithBranch("Other");
-            Assert.NotSame(target, source);
-            Assert.IsAssignableFrom<IOther.IManager>(target);
+            Assert.IsType<Other.Manager>(target);
             Assert.Equal(source.FirstName, target.FirstName);
             Assert.Equal(source.LastName, target.LastName);
-            Assert.Equal("Other", target.Branch);
+            Assert.Equal(source.Branch, target.Branch);
         }
 
         //[Enforced]
@@ -34,28 +27,13 @@ namespace Yotei.Generators.Tests.MemberWith
         {
             var source = new Other.Manager("James", "Bond", "MI6") { Age = 50 };
 
-            var target = source.WithFirstName("Other");
-            Assert.NotSame(target, source);
-            Assert.IsType<Other.Manager>(target);
-            Assert.Equal("Other", target.FirstName);
-            Assert.Equal(source.LastName, target.LastName);
-            Assert.Equal(source.Age, target.Age);
-            Assert.Equal(source.Branch, target.Branch);
-
-            target = source.WithBranch("Other");
+            var target = source.Clone();
             Assert.NotSame(target, source);
             Assert.IsType<Other.Manager>(target);
             Assert.Equal(source.FirstName, target.FirstName);
             Assert.Equal(source.LastName, target.LastName);
             Assert.Equal(source.Age, target.Age);
-            Assert.Equal("Other", target.Branch);
-
-            var other = source.WithAge(55);
-            Assert.NotSame(other, source);
-            Assert.IsType<Other.Persona>(other);
-            Assert.Equal(source.FirstName, other.FirstName);
-            Assert.Equal(source.LastName, other.LastName);
-            Assert.Equal(55, other.Age);
+            Assert.Equal(source.Branch, target.Branch);
         }
     }
 
@@ -64,17 +42,19 @@ namespace Yotei.Generators.Tests.MemberWith
     {
         public partial interface IOther
         {
+            [CloneableType]
             public partial interface IPersona
             {
-                [MemberWith] string FirstName { get; }
-                [MemberWith] string LastName { get; }
+                string FirstName { get; }
+                string LastName { get; }
             }
 
+            [CloneableType]
             public partial interface IManager : IPersona
             {
-                [MemberWith] new string FirstName { get; }
-                [MemberWith] new string LastName { get; }
-                [MemberWith] string Branch { get; }
+                new string FirstName { get; }
+                new string LastName { get; }
+                string Branch { get; }
             }
         }
     }
@@ -84,6 +64,7 @@ namespace Yotei.Generators.Tests.MemberWith
     {
         public partial class Other
         {
+            [CloneableType]
             public partial class Persona : IOther.IPersona
             {
                 public Persona(string firstName, string lastName)
@@ -93,12 +74,13 @@ namespace Yotei.Generators.Tests.MemberWith
                 }
                 public override string ToString() => $"{FirstName} {LastName} {Age}";
 
-                [MemberWith] public string FirstName { get; init; } = default!;
-                [MemberWith] public string LastName { get; init; } = default!;
+                public string FirstName { get; init; } = default!;
+                public string LastName { get; init; } = default!;
 
-                [MemberWith] public int Age = 0;
+                public int Age = 0;
             }
 
+            [CloneableType]
             public partial class Manager : Persona, IOther.IManager
             {
                 public Manager(string firstName, string lastName, string branch)
@@ -108,9 +90,9 @@ namespace Yotei.Generators.Tests.MemberWith
                 }
                 public override string ToString() => $"{base.ToString()} {Branch}";
 
-                [MemberWith] public new string FirstName { get => base.FirstName; init => base.FirstName = value; }
-                [MemberWith] public new string LastName { get => base.LastName; init => base.LastName = value; }
-                [MemberWith] public string Branch { get; init; } = default!;
+                public new string FirstName { get => base.FirstName; init => base.FirstName = value; }
+                public new string LastName { get => base.LastName; init => base.LastName = value; }
+                public string Branch { get; init; } = default!;
             }
         }
     }

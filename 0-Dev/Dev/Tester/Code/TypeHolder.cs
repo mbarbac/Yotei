@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// Represents a holder for a given type.
+/// A holder for a given test class.
 /// </summary>
 internal class TypeHolder
 {
@@ -13,134 +13,104 @@ internal class TypeHolder
     public TypeHolder(Type type)
     {
         Type = type.ThrowIfNull();
-        IsEnforced = type.IsEnforced();
+        Enforced = type.IsEnforced();
+
+        if (!Type.IsValid()) throw new ArgumentException(
+            $"Method '{Type.Name}' is not a valid test.");
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns><inheritdoc/></returns>
-    public override string ToString() => Name;
+    public override string ToString() => Type.Name;
 
     /// <summary>
-    /// The type this instance refers to.
+    /// The class this instance refers to.
     /// </summary>
     public Type Type { get; }
 
     /// <summary>
-    /// The name of the type this instance refers to.
+    /// The full name of this type, including its namespace.
     /// </summary>
-    public string Name => Type.Name;
+    public string FullName => Type.FullName!;
 
     /// <summary>
-    /// Whether this instance is enforced, or not.
+    /// The assembly qualified full name of this type.
     /// </summary>
-    public bool IsEnforced { get; set; } = false;
-
-    // ----------------------------------------------------
+    public string AssemblyQualifiedName => Type.AssemblyQualifiedName!;
 
     /// <summary>
-    /// The collection of child holders maintained by this instance.
+    /// Determines if this type is enforced, or not.
+    /// </summary>
+    public bool Enforced { get; }
+
+    /// <summary>
+    /// The collection of method holders in this instance.
     /// </summary>
     public MethodHolderList MethodHolders { get; } = new();
 
     /// <summary>
-    /// Populates the child holders of this instance using the given specifications.
+    /// Populates the collection of method holders.
     /// </summary>
-    /// <param name="methodName"></param>
-    public void Populate(string? methodName = null)
+    public void Populate()
     {
-        methodName = methodName?.NotNullNotEmpty();
-
-        // All methods...
-        if (methodName == null)
+        var methods = Type.GetMethods(Tester.Flags);
+        foreach (var method in methods)
         {
-            var methods = Type.GetMethods(Tester.Flags);
-            foreach (var method in methods)
-            {
-                if (!method.IsValidTest(out _)) continue;
-                MethodHolders.Add(method);
-            }
-        }
+            if (!method.IsValid()) continue;
 
-        // Requested one...
-        else
-        {
-            var method = Type.GetMethods(Tester.Flags)
-                .Where(x => x.Name == methodName)
-                .SingleOrDefault();
-
-            if (method == null) throw new NotFoundException(
-                "Requested method not found.")
-                .WithData(methodName);
-
-            if (!method.IsValidTest(out var ex)) throw ex;
-            MethodHolders.Add(method);
+            var holder = new MethodHolder(method);
+            MethodHolders.Add(holder);
         }
     }
 
     /// <summary>
-    /// Purges the child holders of this instance using the given specifications.
+    /// Ensures that only the decorated elements are taken into consideration, if any is
+    /// decorated.
     /// </summary>
-    /// <param name="methodName"></param>
-    public void Purge(string? methodName = null)
+    public void EnsureEnforced()
     {
-        methodName = methodName?.NotNullNotEmpty();
+        if (Enforced)
+            foreach (var holder in MethodHolders) holder.Enforced = true;
+    }
 
-        // All methods...
-        if (methodName == null)
-        {
-            MethodHolders.Clear();
-        }
-
-        // Requested one...
-        else
-        {
-            var holder = MethodHolders.Find(methodName);
-            if (holder != null) MethodHolders.Remove(holder);
-        }
+    /// <summary>
+    /// Purges not enforced elements.
+    /// </summary>
+    public void PurgeNotEnforced()
+    {
+        var items = MethodHolders.Where(x => !x.Enforced).ToList();
+        foreach (var item in items) MethodHolders.Remove(item);
     }
 }
 
 // ========================================================
-internal static class TypeExtensions
+internal static class TypeHolderExtensions
 {
     /// <summary>
-    /// Determines if the given type is a valid test one, or not.
-    /// </summary>
-    /// <param name="type"></param>
-    /// <param name="ex"></param>
-    /// <returns></returns>
-    public static bool IsValidTest(this Type type, [NotNullWhen(false)] out Exception? ex)
-    {
-        type = type.ThrowIfNull();
-
-        if (type.IsClass)
-        {
-            var methods = type.GetMethods(Tester.Flags);
-            var any = methods.Any(x => x.IsValidTest(out _));
-
-            ex = null;
-            return any;
-        }
-        else
-        {
-            ex = new ArgumentException("Type is not a class.").WithData(type);
-            return false;
-        }
-    }
-
-    /// <summary>
-    /// Determines if the given type is decorated with the <see cref="EnforcedAttribute"/>
-    /// attribute, or not.
+    /// Determines if this type is enforced, or not.
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
     public static bool IsEnforced(this Type type)
     {
-        ArgumentNullException.ThrowIfNull(type);
+        type = type.ThrowIfNull();
 
         var ats = type.GetAttributes(Tester.EnforcedAttribute, true);
         return ats.Length != 0;
+    }
+
+    /// <summary>
+    /// Determines if this type is a valid test, or not.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    public static bool IsValid(this Type type)
+    {
+        type = type.ThrowIfNull();
+
+        if (!type.IsClass) return false;
+        return true;
     }
 }
