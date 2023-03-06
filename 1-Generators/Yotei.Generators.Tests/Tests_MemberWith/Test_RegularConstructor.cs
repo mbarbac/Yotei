@@ -4,7 +4,7 @@ namespace Yotei.Generators.Tests.MemberWith
     using RegularConstructor;
 
     // ====================================================
-    [Enforced]
+    //[Enforced]
     public static class Test_RegularConstructor
     {
         //[Enforced]

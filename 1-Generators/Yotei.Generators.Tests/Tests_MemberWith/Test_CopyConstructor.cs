@@ -4,7 +4,7 @@ namespace Yotei.Generators.Tests.MemberWith
     using CopyConstructor;
 
     // ====================================================
-    [Enforced]
+    //[Enforced]
     public static class Test_CopyConstructor
     {
         //[Enforced]

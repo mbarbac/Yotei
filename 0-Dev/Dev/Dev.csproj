@@ -14,6 +14,7 @@
       <ProjectReference Include="..\..\1-Generators\Yotei.Generators.Tests\Yotei.Generators.Tests.csproj" />
       <ProjectReference Include="..\..\1-Tools\Yotei.Tools.DynamicParser.Tests\Yotei.Tools.DynamicParser.Tests.csproj" />
       <ProjectReference Include="..\..\1-Tools\Yotei.Tools.Tests\Yotei.Tools.Tests.csproj" />
+      <ProjectReference Include="..\..\8-Kappa\Kappa.Traverse.Tests\Kappa.Traverse.Tests.csproj" />
       <ProjectReference Include="..\Dev.Tools\Dev.Tools.csproj" />
    </ItemGroup>
 

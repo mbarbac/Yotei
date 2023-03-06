@@ -1,17 +1,17 @@
 namespace Yotei.Generators.Tests.Cloneable
 {
-    using IRegularConstructor;
-    using RegularConstructor;
+    using ICopyConstructor;
+    using CopyConstructor;
 
     // ====================================================
     //[Enforced]
-    public static class Test_RegularConstructor
+    public static class Test_CopyConstructor
     {
         //[Enforced]
         [Fact]
         public static void Test_Interface()
         {
-            IOther.IManager source = new Other.Manager("James", "Bond", "MI6") { Age = 50 };
+            IOther.IManager source = new Other.Manager() { FirstName = "James", LastName = "Bond", Age = 50, Branch = "MI6" };
 
             var target = source.Clone();
             Assert.NotSame(target, source);
@@ -25,7 +25,7 @@ namespace Yotei.Generators.Tests.Cloneable
         [Fact]
         public static void Test_Concrete()
         {
-            var source = new Other.Manager("James", "Bond", "MI6") { Age = 50 };
+            var source = new Other.Manager() { FirstName = "James", LastName = "Bond", Age = 50, Branch = "MI6" };
 
             var target = source.Clone();
             Assert.NotSame(target, source);
@@ -38,7 +38,7 @@ namespace Yotei.Generators.Tests.Cloneable
     }
 
     // ====================================================
-    namespace IRegularConstructor
+    namespace ICopyConstructor
     {
         public partial interface IOther
         {
@@ -60,18 +60,19 @@ namespace Yotei.Generators.Tests.Cloneable
     }
 
     // ====================================================
-    namespace RegularConstructor
+    namespace CopyConstructor
     {
         public partial class Other
         {
             [CloneableType]
             public partial class Persona : IOther.IPersona
             {
-                public Persona(string firstName, string lastName)
+                public Persona(IOther.IPersona source)
                 {
-                    FirstName = firstName;
-                    LastName = lastName;
+                    FirstName = source.FirstName;
+                    LastName = source.LastName;
                 }
+                public Persona() { }
                 public override string ToString() => $"{FirstName} {LastName} {Age}";
 
                 public string FirstName { get; init; } = default!;
@@ -83,11 +84,11 @@ namespace Yotei.Generators.Tests.Cloneable
             [CloneableType]
             public partial class Manager : Persona, IOther.IManager
             {
-                public Manager(string firstName, string lastName, string branch)
-                    : base(firstName, lastName)
+                public Manager(IOther.IManager source) : base(source)
                 {
-                    Branch = branch;
+                    Branch = source.Branch;
                 }
+                public Manager() { }
                 public override string ToString() => $"{base.ToString()} {Branch}";
 
                 public new string FirstName { get => base.FirstName; init => base.FirstName = value; }

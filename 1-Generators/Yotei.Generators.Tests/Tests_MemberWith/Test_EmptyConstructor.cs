@@ -4,7 +4,7 @@ namespace Yotei.Generators.Tests.MemberWith
     using EmptyConstructor;
 
     // ====================================================
-    [Enforced]
+    //[Enforced]
     public static class Test_EmptyConstructor
     {
         //[Enforced]

@@ -27,6 +27,7 @@ public class Tester : MenuEntry
 
         var assemblyHolders = Populate();
         EnsureEnforced(assemblyHolders);
+        RemoveEmpty(assemblyHolders);
 
         var breakOnError = false;
         Executor(breakOnError, assemblyHolders);
@@ -122,6 +123,27 @@ public class Tester : MenuEntry
     // ----------------------------------------------------
 
     /// <summary>
+    /// Removes empty elements.
+    /// </summary>
+    /// <param name="assemblyHolders"></param>
+    void RemoveEmpty(AssemblyHolderList assemblyHolders)
+    {
+        foreach (var assemblyHolder in assemblyHolders)
+            RemoveEmpty(assemblyHolder.TypeHolders);
+
+        var items = assemblyHolders.Where(x => x.TypeHolders.Count == 0).ToList();
+        foreach (var item in items) assemblyHolders.Remove(item);
+    }
+
+    void RemoveEmpty(TypeHolderList typeHolders)
+    {
+        var items = typeHolders.Where(x => x.MethodHolders.Count == 0).ToList();
+        foreach (var item in items) typeHolders.Remove(item);
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Executes the tests.
     /// </summary>
     /// <param name="assemblyHolders"></param>
@@ -145,6 +167,7 @@ public class Tester : MenuEntry
                     WriteLine(Program.Color, Program.FatSeparator);
 
                     var span = Executor(breakOnError, instance, methodHolder.Method);
+                    WriteLine();
                     PrintResults(span);
 
                     ts = ts.Add(span);
@@ -239,10 +262,13 @@ public class Tester : MenuEntry
         WriteLine(Program.Color, Program.FatSeparator);
         WriteLine(Program.Color, "Execution summary...");
         WriteLine(Program.Color, Program.FatSeparator);
+
+        WriteLine();
         Write("Number of tests executed: ");
         WriteLine(Color.Cyan, num.ToString());
-
         PrintResults(ts);
+        WriteLine();
+
         WriteLine(Program.Color, Program.FatSeparator);
     }
 }
