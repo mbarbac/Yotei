@@ -9,18 +9,18 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <Version>0.5.1-v0001</Version>
+        <Description>Tools for the Yotei framework.</Description>
+        <Version>0.5.1-v0005</Version>
+        <Authors>mbarbac@hotmail.com</Authors>
+        <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <AssemblyVersion>9.9.9.9</AssemblyVersion>
+        <FileVersion>9.9.9.9</FileVersion>
         <IsPackable>true</IsPackable>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>        
         <IncludeSymbols>True</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <Description>Common Tools for the Yotei framework.</Description>
-        <Authors>mbarbac@hotmail.com</Authors>        
-        <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <AssemblyVersion>9.9.9.9</AssemblyVersion>
-        <FileVersion>9.9.9.9</FileVersion>
     </PropertyGroup>
     <ItemGroup>
         <None Include="README.md" Pack="true" PackagePath="\" />

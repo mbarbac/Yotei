@@ -4,7 +4,7 @@
 /// <summary>
 /// A collection of method holders.
 /// </summary>
-internal class MethodHolderList : IEnumerable<MethodHolder>
+public class MethodHolderList : IEnumerable<MethodHolder>
 {
     readonly List<MethodHolder> Items = new();
 

@@ -4,7 +4,7 @@
 /// <summary>
 /// A holder for a given assembly.
 /// </summary>
-internal class AssemblyHolder
+public class AssemblyHolder
 {
     /// <summary>
     /// Initializes a new instance.

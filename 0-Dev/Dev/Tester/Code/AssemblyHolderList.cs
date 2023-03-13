@@ -4,7 +4,7 @@
 /// <summary>
 /// A collection of assembly holders.
 /// </summary>
-internal class AssemblyHolderList : IEnumerable<AssemblyHolder>
+public class AssemblyHolderList : IEnumerable<AssemblyHolder>
 {
     readonly List<AssemblyHolder> Items = new();
 

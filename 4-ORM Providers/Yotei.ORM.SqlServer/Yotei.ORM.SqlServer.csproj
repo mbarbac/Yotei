@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+        <NoWarn>$(NoWarn);IDE0058</NoWarn>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Version>0.1.0-v0001</Version>
+        <IsPackable>true</IsPackable>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <IncludeSymbols>True</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <Description>Yotei ORM framework Sql Server provider.</Description>
+        <Authors>mbarbac@hotmail.com</Authors>
+        <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <AssemblyVersion>9.9.9.9</AssemblyVersion>
+        <FileVersion>9.9.9.9</FileVersion>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.0" />
+        <PackageReference Include="Yotei.Tools" Version="0.5.1-v0005" />
+        <PackageReference Include="Yotei.Tools.DynamicParser" Version="0.5.1-v0002" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\2-ORM\Yotei.ORM\Yotei.ORM.csproj" />
+        <ProjectReference Include="..\..\3-ORM Engines\Yotei.ORM.Relational\Yotei.ORM.Relational.csproj" />
+    </ItemGroup>
+
+</Project>

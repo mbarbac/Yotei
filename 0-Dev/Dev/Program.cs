@@ -1,4 +1,6 @@
-﻿namespace Dev;
+﻿using Dev.Tester;
+
+namespace Dev;
 
 // ========================================================
 /// <summary>
@@ -18,15 +20,23 @@ internal class Program
 
     // ----------------------------------------------------
 
+    public static ElementList Includes { get; } = new();
+    public static ElementList Excludes { get; } = new();
+
     /// <summary>
     /// Program's entry point.
     /// </summary>
     /// <param name="args"></param>
     static void Main(string[] args)
     {
+        // Prepare debug environment...
         Debug.IndentSize = 3;
         Debug.AutoFlush = true;
 
+        // Set explicit includes and excludes...
+        Excludes.Add("Experimental.Tests", null, null);
+
+        // Execute menu...
         var done = -1; do
         {
             WriteLine();
@@ -37,7 +47,7 @@ internal class Program
             done = Menu.Run(
                 Color,
                 new MenuEntry(() => WriteLine("Exit")),
-                new Tester.Tester(),
+                new Tester.Tester(Includes, Excludes),
                 new Builder.LocalBuilder(),
                 new Janitor.Janitor());
         }

@@ -1,7 +1,7 @@
 namespace Kappa.Traverse.Tests;
 
 // ====================================================
-[Enforced]
+//[Enforced]
 public static class Test_Employee
 {
     //[Enforced]

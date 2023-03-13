@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
@@ -9,28 +9,25 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <Description>Yotei Dynamic Lambda Expressions' Parser.</Description>
-        <Version>0.5.1-v0002</Version>
-        <Authors>mbarbac@hotmail.com</Authors>
-        <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <AssemblyVersion>9.9.9.9</AssemblyVersion>
+        <Version>0.1.0-v0001</Version>
         <IsPackable>true</IsPackable>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
         <IncludeSymbols>True</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PackageReadmeFile>README.md</PackageReadmeFile>
+        <Description>Yotei ORM framework Core components.</Description>
+        <Authors>mbarbac@hotmail.com</Authors>
+        <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <AssemblyVersion>9.9.9.9</AssemblyVersion>
+        <FileVersion>9.9.9.9</FileVersion>
     </PropertyGroup>
     <ItemGroup>
         <None Include="README.md" Pack="true" PackagePath="\" />
     </ItemGroup>
-    
     <ItemGroup>
-        <PackageReference Include="Yotei.Tools" Version="0.5.1-v0005" />
+      <PackageReference Include="Yotei.Tools" Version="0.5.1-v0005" />
+      <PackageReference Include="Yotei.Tools.DynamicParser" Version="0.5.1-v0002" />
     </ItemGroup>
-
-    <!--<PropertyGroup>
-      <DefineConstants>$(DefineConstants);DEBUG_PARSER</DefineConstants>
-   </PropertyGroup>-->
 
 </Project>

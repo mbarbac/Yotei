@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Yotei.Tools" Version="0.5.1-v0001" />
+        <PackageReference Include="Yotei.Tools" Version="0.5.1-v0005" />
     </ItemGroup>
 
 </Project>

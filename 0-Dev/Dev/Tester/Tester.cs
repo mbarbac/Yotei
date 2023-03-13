@@ -12,6 +12,19 @@ public class Tester : MenuEntry
     public string Header => "Execute Solution Tests.";
 
     /// <summary>
+    /// Initializes a new instance.
+    /// </summary>
+    /// <param name="includes"></param>
+    /// <param name="excludes"></param>
+    public Tester(ElementList includes, ElementList excludes)
+    {
+        Includes = includes.ThrowIfNull();
+        Excludes = excludes.ThrowIfNull();
+    }
+    public ElementList Includes { get; }
+    public ElementList Excludes { get; }
+
+    /// <summary>
     /// <inheritdoc/>
     /// </summary>
     public override void OnPrint() => WriteLine(Header);
@@ -26,6 +39,7 @@ public class Tester : MenuEntry
         WriteLine(Program.Color, Header);
 
         var assemblyHolders = Populate();
+        PurgeExcludes(assemblyHolders);
         EnsureEnforced(assemblyHolders);
         RemoveEmpty(assemblyHolders);
 
@@ -38,7 +52,15 @@ public class Tester : MenuEntry
     /// <summary>
     /// Populates the assemblies.
     /// </summary>
-    AssemblyHolderList Populate()
+    AssemblyHolderList Populate() => Includes.Count == 0
+        ? PopulateFromRoot()
+        : PopulateFromIncludes();
+
+    /// <summary>
+    /// Populates the assemblies from the root directory.
+    /// </summary>
+    /// <returns></returns>
+    AssemblyHolderList PopulateFromRoot()
     {
         var assemblyHolders = new AssemblyHolderList();
         var root = AppContext.BaseDirectory;
@@ -70,6 +92,82 @@ public class Tester : MenuEntry
 
         WriteLine();
         return assemblyHolders;
+    }
+
+    /// <summary>
+    /// Populates the assemblies from the collection of explicit includes.
+    /// </summary>
+    /// <returns></returns>
+    AssemblyHolderList PopulateFromIncludes()
+    {
+        var assemblyHolders = new AssemblyHolderList();
+        WriteLine();
+        Write(Program.Color, $"Populating from explicit includes ");
+
+        foreach (var item in Includes)
+        {
+            Write(Color.Magenta, ".");
+
+            var name = item.AssemblyName ?? throw new ArgumentException(
+                $"Assembly name of explicit include cannot be null: {item}");
+
+            var holder = assemblyHolders.Find(name);
+            if (holder == null)
+            {
+                var assembly = Assembly.Load(new AssemblyName(name));
+                holder = new AssemblyHolder(assembly);
+                assemblyHolders.Add(holder);
+                holder.Populate();
+            }
+        }
+
+        WriteLine();
+        return assemblyHolders;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Purges the explicit exclude specifications.
+    /// </summary>
+    void PurgeExcludes(AssemblyHolderList assemblyHolders)
+    {
+        if (Excludes.Count == 0) return;
+
+        Element specs;
+        WriteLine();
+        Write(Program.Color, $"Purging explicit excludes ");
+
+        foreach (var assemblyHolder in assemblyHolders.ToList())
+        {
+            Write(Color.Magenta, ".");
+
+            specs = new Element(assemblyHolder.Name, null, null);
+            foreach (var item in Excludes)
+                if (specs.Match(item)) assemblyHolders.Remove(assemblyHolder);
+        }
+
+        foreach (var assemblyHolder in assemblyHolders)
+        {
+            foreach (var typeHolder in assemblyHolder.TypeHolders.ToList())
+            {
+                specs = new Element(assemblyHolder.Name, typeHolder.FullName, null);
+                foreach (var item in Excludes)
+                    if (specs.Match(item)) assemblyHolder.TypeHolders.Remove(typeHolder);
+            }
+
+            foreach (var typeHolder in assemblyHolder.TypeHolders)
+            {
+                foreach (var methodHolder in typeHolder.MethodHolders.ToList())
+                {
+                    specs = new Element(assemblyHolder.Name, typeHolder.FullName, methodHolder.Name);
+                    foreach (var item in Excludes)
+                        if (specs.Match(item)) typeHolder.MethodHolders.Remove(methodHolder);
+                }
+            }
+        }
+
+        WriteLine();
     }
 
     // ----------------------------------------------------

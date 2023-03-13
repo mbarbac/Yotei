@@ -4,7 +4,7 @@
 /// <summary>
 /// A collection of type holders.
 /// </summary>
-internal class TypeHolderList : IEnumerable<TypeHolder>
+public class TypeHolderList : IEnumerable<TypeHolder>
 {
     readonly List<TypeHolder> Items = new();
 

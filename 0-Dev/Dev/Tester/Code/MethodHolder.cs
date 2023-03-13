@@ -4,7 +4,7 @@
 /// <summary>
 /// A holder for a given test method.
 /// </summary>
-internal class MethodHolder
+public class MethodHolder
 {
     /// <summary>
     /// Initializes a new instance.

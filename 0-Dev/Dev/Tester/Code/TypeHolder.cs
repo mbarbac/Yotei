@@ -4,7 +4,7 @@
 /// <summary>
 /// A holder for a given test class.
 /// </summary>
-internal class TypeHolder
+public class TypeHolder
 {
     /// <summary>
     /// Initializes a new instance.
