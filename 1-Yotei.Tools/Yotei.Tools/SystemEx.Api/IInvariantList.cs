@@ -54,17 +54,17 @@ public interface IInvariantList<T> : IEnumerable<T>, ICloneable
     IInvariantList<T> WithBehavior(CoreListBehavior value);
 
     /// <summary>
-    /// <inheritdoc cref="ICoreList{T}.FlatCollection"/>
+    /// <inheritdoc cref="ICoreList{T}.Flatten"/>
     /// </summary>
-    bool FlatCollection { get; }
+    bool Flatten { get; }
 
     /// <summary>
-    /// Returns a copy of this instance where the value of the <see cref="FlatCollection"/>
-    /// property has been replaced by the new given one.
+    /// Returns a copy of this instance where the value of the <see cref="Flatten"/> property
+    /// has been replaced by the new given one.
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    IInvariantList<T> WithFlatCollection(bool value);
+    IInvariantList<T> WithFlatten(bool value);
 
     // ----------------------------------------------------
 

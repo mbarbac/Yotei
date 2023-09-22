@@ -38,7 +38,7 @@ public class InvariantList<T> : IInvariantList<T>
         temp.Items.Validator = Validator;
         temp.Items.Comparer = Comparer;
         temp.Items.Behavior = Behavior;
-        temp.Items.FlatCollection = FlatCollection;
+        temp.Items.Flatten = Flatten;
 
         temp.Items.AddRange(Items);
         return temp;
@@ -129,12 +129,12 @@ public class InvariantList<T> : IInvariantList<T>
     IInvariantList<T> IInvariantList<T>.WithBehavior(CoreListBehavior value) => WithBehavior(value);
 
     /// <summary>
-    /// <inheritdoc cref="ICoreList{T}.FlatCollection"/>
+    /// <inheritdoc cref="ICoreList{T}.Flatten"/>
     /// </summary>
-    public bool FlatCollection
+    public bool Flatten
     {
-        get => Items.FlatCollection;
-        init => Items.FlatCollection = value;
+        get => Items.Flatten;
+        init => Items.Flatten = value;
     }
 
     /// <summary>
@@ -142,15 +142,15 @@ public class InvariantList<T> : IInvariantList<T>
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public IInvariantList<T> WithFlatCollection(bool value)
+    public IInvariantList<T> WithFlatten(bool value)
     {
-        if (FlatCollection == value) return this;
+        if (Flatten == value) return this;
 
         var temp = Clone();
-        temp.Items.FlatCollection = value;
+        temp.Items.Flatten = value;
         return temp;
     }
-    IInvariantList<T> IInvariantList<T>.WithFlatCollection(bool value) => WithFlatCollection(value);
+    IInvariantList<T> IInvariantList<T>.WithFlatten(bool value) => WithFlatten(value);
 
     // ----------------------------------------------------
 

@@ -15,6 +15,14 @@ public interface ICoreList<T>
     new ICoreList<T> Clone();
 
     /// <summary>
+    /// Invoked to copy the configuration settings from the given source to this instance. This
+    /// is clone contexts by overriding it to copy any arbitrary configuration state that may be
+    /// necessary.
+    /// </summary>
+    /// <param name="source"></param>
+    void CopySettings(ICoreList<T> source);
+
+    /// <summary>
     /// The (item, add) delegate invoked to determine if the given item is valid for this instance
     /// or not. Its second argument determines if the item is to be added or inserted, or not. The
     /// default value of this setting just returns the given item.
@@ -34,11 +42,11 @@ public interface ICoreList<T>
     CoreListBehavior Behavior { get; set; }
 
     /// <summary>
-    /// Determines if this collection is a flat one, or not. Flat collections intercepts attempts
-    /// of adding or inserting elements that are themselves an enumeration of the type of its
-    /// elements, adding or inserting their own elements instead. Its default value is false.
+    /// Determines if this collection shall be a flat one or not. Flat collections intercepts any
+    /// attempts of adding or inserting elements that are themselves an enumeration of the type of
+    /// its elements, adding or inserting their own elements instead. Its default value is false.
     /// </summary>
-    bool FlatCollection { get; set; }
+    bool Flatten { get; set; }
 
     // ----------------------------------------------------
 

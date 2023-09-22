@@ -32,18 +32,27 @@ public class CoreList<T> : ICoreList<T>
     /// <returns></returns>
     public virtual CoreList<T> Clone()
     {
-        var temp = new CoreList<T>
-        {
-            Validator = Validator,
-            Comparer = Comparer,
-            Behavior = Behavior,
-            FlatCollection = FlatCollection,
-        };
+        var temp = new CoreList<T>();
+        temp.CopySettings(this);
         temp.AddRange(Items);
         return temp;
     }
     ICoreList<T> ICoreList<T>.Clone() => Clone();
     object ICloneable.Clone() => Clone();
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="source"></param>
+    public virtual void CopySettings(ICoreList<T> source)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+
+        Validator = source.Validator;
+        Comparer = source.Comparer;
+        Behavior = source.Behavior;
+        Flatten = source.Flatten;
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -118,14 +127,14 @@ public class CoreList<T> : ICoreList<T>
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public bool FlatCollection
+    public bool Flatten
     {
-        get => _FlatCollection;
+        get => _Flatten;
         set
         {
-            if (_FlatCollection == value) return;
+            if (_Flatten == value) return;
 
-            _FlatCollection = value; if (Count > 0)
+            _Flatten = value; if (Count > 0)
             {
                 var range = ToArray();
                 Clear();
@@ -133,7 +142,7 @@ public class CoreList<T> : ICoreList<T>
             }
         }
     }
-    bool _FlatCollection = false;
+    bool _Flatten = false;
 
     // ----------------------------------------------------
 
@@ -340,6 +349,7 @@ public class CoreList<T> : ICoreList<T>
         {
             Clear();
             AddRange(range);
+            return 0;
         }
         return temp;
     }
@@ -351,7 +361,7 @@ public class CoreList<T> : ICoreList<T>
     /// <returns></returns>
     public int Add(T item)
     {
-        if (FlatCollection && item is IEnumerable<T> range) return AddRange(range);
+        if (Flatten && item is IEnumerable<T> range) return AddRange(range);
 
         item = Validator(item, true);
 
@@ -404,7 +414,7 @@ public class CoreList<T> : ICoreList<T>
     /// <returns></returns>
     public int Insert(int index, T item)
     {
-        if (FlatCollection && item is IEnumerable<T> range) return InsertRange(index, range);
+        if (Flatten && item is IEnumerable<T> range) return InsertRange(index, range);
 
         item = Validator(item, true);
 
@@ -467,7 +477,7 @@ public class CoreList<T> : ICoreList<T>
     /// <returns></returns>
     public int Remove(T item)
     {
-        if (FlatCollection && item is IEnumerable<T> range)
+        if (Flatten && item is IEnumerable<T> range)
         {
             var count = 0; foreach (var temp in range)
             {
@@ -492,7 +502,7 @@ public class CoreList<T> : ICoreList<T>
     /// <returns></returns>
     public int RemoveLast(T item)
     {
-        if (FlatCollection && item is IEnumerable<T> range)
+        if (Flatten && item is IEnumerable<T> range)
         {
             var count = 0; foreach (var temp in range)
             {
@@ -515,7 +525,7 @@ public class CoreList<T> : ICoreList<T>
     /// <returns></returns>
     public int RemoveAll(T item)
     {
-        if (FlatCollection && item is IEnumerable<T> range)
+        if (Flatten && item is IEnumerable<T> range)
         {
             var count = 0; foreach (var temp in range)
             {
