@@ -26,14 +26,13 @@ public class CoreList<T> : ICoreList<T>
     /// <param name="range"></param>
     public CoreList(IEnumerable<T> range) => AddRange(range);
 
-    /// <summary>
+    // <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
     public virtual CoreList<T> Clone()
     {
-        var temp = new CoreList<T>();
-        temp.CopySettings(this);
+        var temp = OnClone();
         temp.AddRange(Items);
         return temp;
     }
@@ -41,18 +40,16 @@ public class CoreList<T> : ICoreList<T>
     object ICloneable.Clone() => Clone();
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Invoked while cloning to obtain a new empty instance but with the appropriate settings.
     /// </summary>
-    /// <param name="source"></param>
-    public virtual void CopySettings(ICoreList<T> source)
+    /// <returns></returns>
+    protected virtual CoreList<T> OnClone() => new()
     {
-        ArgumentNullException.ThrowIfNull(source);
-
-        Validator = source.Validator;
-        Comparer = source.Comparer;
-        Behavior = source.Behavior;
-        Flatten = source.Flatten;
-    }
+        Validator = Validator,
+        Comparer = Comparer,
+        Behavior = Behavior,
+        Flatten = Flatten,
+    };
 
     /// <summary>
     /// <inheritdoc/>

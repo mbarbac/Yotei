@@ -12,40 +12,37 @@ public interface ICoreList<T>
     /// <inheritdoc cref="ICloneable.Clone"/>
     /// </summary>
     /// <returns></returns>
+    /// <remarks>Derived types must override this method to copy the relevant settings along
+    /// with its contents.</remarks>
     new ICoreList<T> Clone();
 
     /// <summary>
-    /// Invoked to copy the configuration settings from the given source to this instance. This
-    /// is clone contexts by overriding it to copy any arbitrary configuration state that may be
-    /// necessary.
-    /// </summary>
-    /// <param name="source"></param>
-    void CopySettings(ICoreList<T> source);
-
-    /// <summary>
     /// The (item, add) delegate invoked to determine if the given item is valid for this instance
-    /// or not. Its second argument determines if the item is to be added or inserted, or not. The
-    /// default value of this setting just returns the given item.
+    /// or not. Its second argument determines if the item is to be added or inserted, or not.
     /// </summary>
+    /// <remarks>The default value of this setting just returns the given item.</remarks>
     Func<T, bool, T> Validator { get; set; }
 
     /// <summary>
     /// The (x, y) delegate invoked to determine if the two given items shall be considered equal
-    /// or not. The default value of this setting just invokes the default comparer of the type of
-    /// the elements in this collection.
+    /// or not.
     /// </summary>
+    /// <remarks>The default value of this setting just invokes the default comparer of the type
+    /// of the elements in this collection.</remarks>
     Func<T, T, bool> Comparer { get; set; }
 
     /// <summary>
     /// Determines the behavior of this collection when adding or inserting duplicate elements.
     /// </summary>
+    /// <remarks>The default value of this setting is just to add duplicate elements.</remarks>
     CoreListBehavior Behavior { get; set; }
 
     /// <summary>
-    /// Determines if this collection shall be a flat one or not. Flat collections intercepts any
-    /// attempts of adding or inserting elements that are themselves an enumeration of the type of
-    /// its elements, adding or inserting their own elements instead. Its default value is false.
+    /// Determines if this collection shall intercept attempts of adding or inserting elements
+    /// that are themselves an enumeration of the type of its elements, adding or inserting their
+    /// owned elements instead.
     /// </summary>
+    /// <remarks>The default value of this setting is false.</remarks>
     bool Flatten { get; set; }
 
     // ----------------------------------------------------

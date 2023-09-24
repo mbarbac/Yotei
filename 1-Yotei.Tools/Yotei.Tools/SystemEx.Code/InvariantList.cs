@@ -1,6 +1,4 @@
-﻿using System.Collections.Specialized;
-
-namespace Yotei.Tools;
+﻿namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>
@@ -20,42 +18,49 @@ public class InvariantList<T> : IInvariantList<T>
     /// Initializes a new instance that carries the given element.
     /// </summary>
     /// <param name="item"></param>
-    public InvariantList(T item) : this() => Items.Add(item);
+    public InvariantList(T item) : this() => AddInternal(item);
 
     /// <summary>
     /// Initializes a new instance that carries the elements from the given range.
     /// </summary>
     /// <param name="range"></param>
-    public InvariantList(IEnumerable<T> range) : this() => Items.AddRange(range);
+    public InvariantList(IEnumerable<T> range) : this() => AddRangeInternal(range);
 
     /// <summary>
-    /// <inheritdoc/>
+    /// <inheritdoc cref="IInvariantList{T}.Clone"/>
     /// </summary>
     /// <returns></returns>
     public virtual InvariantList<T> Clone()
     {
-        var temp = new InvariantList<T>();
-        temp.Items.Validator = Validator;
-        temp.Items.Comparer = Comparer;
-        temp.Items.Behavior = Behavior;
-        temp.Items.Flatten = Flatten;
-
-        temp.Items.AddRange(Items);
+        var temp = OnClone();
+        temp.Items.AddRange(this);
         return temp;
     }
     IInvariantList<T> IInvariantList<T>.Clone() => Clone();
     object ICloneable.Clone() => Clone();
 
     /// <summary>
+    /// Invoked while cloning to obtain a new empty instance but with the appropriate settings.
+    /// </summary>
+    /// <returns></returns>
+    protected virtual InvariantList<T> OnClone() => new()
+    {
+        Validator = Validator,
+        Comparer = Comparer,
+        Behavior = Behavior,
+        Flatten = Flatten,
+    };
+
+    /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => Items.ToString();
+    public override string ToString() => $"Count: {Count}";
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// <inheritdoc cref="ICoreList{T}.Validator"/>
+    /// <inheritdoc/>
     /// </summary>
     public Func<T, bool, T> Validator
     {
@@ -68,19 +73,24 @@ public class InvariantList<T> : IInvariantList<T>
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public InvariantList<T> WithValidator(Func<T, bool, T> value)
+    public IInvariantList<T> WithValidator(Func<T, bool, T> value)
+    {
+        var temp = Clone();
+        var done = temp.WithValidatorInternal(value);
+        return done ? temp : this;
+    }
+    protected bool WithValidatorInternal(Func<T, bool, T> value)
     {
         ArgumentNullException.ThrowIfNull(value);
-        if (ReferenceEquals(Validator, value)) return this;
 
-        var temp = Clone();
-        temp.Items.Validator = value;
-        return temp;
+        if (ReferenceEquals(Validator, value)) return false;
+
+        Items.Validator = value;
+        return true;
     }
-    IInvariantList<T> IInvariantList<T>.WithValidator(Func<T, bool, T> value) => WithValidator(value);
 
     /// <summary>
-    /// <inheritdoc cref="ICoreList{T}.Comparer"/>
+    /// <inheritdoc/>
     /// </summary>
     public Func<T, T, bool> Comparer
     {
@@ -93,16 +103,21 @@ public class InvariantList<T> : IInvariantList<T>
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public InvariantList<T> WithComparer(Func<T, T, bool> value)
+    public IInvariantList<T> WithComparer(Func<T, T, bool> value)
+    {
+        var temp = Clone();
+        var done = temp.WithComparerInternal(value);
+        return done ? temp : this;
+    }
+    protected bool WithComparerInternal(Func<T, T, bool> value)
     {
         ArgumentNullException.ThrowIfNull(value);
-        if (ReferenceEquals(Comparer, value)) return this;
 
-        var temp = Clone();
-        temp.Items.Comparer = value;
-        return temp;
+        if (ReferenceEquals(Comparer, value)) return false;
+
+        Items.Comparer = value;
+        return true;
     }
-    IInvariantList<T> IInvariantList<T>.WithComparer(Func<T, T, bool> value) => WithComparer(value);
 
     /// <summary>
     /// <inheritdoc cref="ICoreList{T}.Behavior"/>
@@ -114,19 +129,24 @@ public class InvariantList<T> : IInvariantList<T>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Returns a copy of this instance where the value of the <see cref="Behavior"/> property
+    /// has been replaced by the new given one.
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public InvariantList<T> WithBehavior(CoreListBehavior value)
+    public IInvariantList<T> WithBehavior(CoreListBehavior value)
     {
-        if (Behavior == value) return this;
-
         var temp = Clone();
-        temp.Items.Behavior = value;
-        return temp;
+        var done = temp.WithBehaviorInternal(value);
+        return done ? temp : this;
     }
-    IInvariantList<T> IInvariantList<T>.WithBehavior(CoreListBehavior value) => WithBehavior(value);
+    protected bool WithBehaviorInternal(CoreListBehavior value)
+    {
+        if (Behavior == value) return false;
+
+        Items.Behavior = value;
+        return true;
+    }
 
     /// <summary>
     /// <inheritdoc cref="ICoreList{T}.Flatten"/>
@@ -144,13 +164,17 @@ public class InvariantList<T> : IInvariantList<T>
     /// <returns></returns>
     public IInvariantList<T> WithFlatten(bool value)
     {
-        if (Flatten == value) return this;
-
         var temp = Clone();
-        temp.Items.Flatten = value;
-        return temp;
+        var done = temp.WithFlattenInternal(value);
+        return done ? temp : this;
     }
-    IInvariantList<T> IInvariantList<T>.WithFlatten(bool value) => WithFlatten(value);
+    protected bool WithFlattenInternal(bool value)
+    {
+        if (Flatten == value) return false;
+
+        Items.Flatten = value;
+        return true;
+    }
 
     // ----------------------------------------------------
 
@@ -254,7 +278,7 @@ public class InvariantList<T> : IInvariantList<T>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual InvariantList<T> GetRange(int index, int count)
+    public IInvariantList<T> GetRange(int index, int count)
     {
         if (count == 0) return this;
 
@@ -264,7 +288,6 @@ public class InvariantList<T> : IInvariantList<T>
         temp.Items.AddRange(range);
         return temp;
     }
-    IInvariantList<T> IInvariantList<T>.GetRange(int index, int count) => GetRange(index, count);
 
     /// <summary>
     /// <inheritdoc/>
@@ -272,39 +295,39 @@ public class InvariantList<T> : IInvariantList<T>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual InvariantList<T> ReplaceItem(int index, T item)
+    public IInvariantList<T> ReplaceItem(int index, T item)
     {
         var temp = Clone();
-        var done = temp.Items.ReplaceItem(index, item);
+        var done = temp.ReplaceItemInternal(index, item);
         return done == 0 ? this : temp;
     }
-    IInvariantList<T> IInvariantList<T>.ReplaceItem(int index, T item) => ReplaceItem(index, item);
+    protected int ReplaceItemInternal(int index, T item) => Items.ReplaceItem(index, item);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual InvariantList<T> Add(T item)
+    public IInvariantList<T> Add(T item)
     {
         var temp = Clone();
-        var done = temp.Items.Add(item);
+        var done = temp.AddInternal(item);
         return done == 0 ? this : temp;
     }
-    IInvariantList<T> IInvariantList<T>.Add(T item) => Add(item);
+    protected int AddInternal(T item) => Items.Add(item);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual InvariantList<T> AddRange(IEnumerable<T> range)
+    public IInvariantList<T> AddRange(IEnumerable<T> range)
     {
         var temp = Clone();
-        var done = temp.Items.AddRange(range);
+        var done = temp.AddRangeInternal(range);
         return done == 0 ? this : temp;
     }
-    IInvariantList<T> IInvariantList<T>.AddRange(IEnumerable<T> range) => AddRange(range);
+    protected int AddRangeInternal(IEnumerable<T> range) => Items.AddRange(range);
 
     /// <summary>
     /// <inheritdoc/>
@@ -312,13 +335,13 @@ public class InvariantList<T> : IInvariantList<T>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual InvariantList<T> Insert(int index, T item)
+    public IInvariantList<T> Insert(int index, T item)
     {
         var temp = Clone();
-        var done = temp.Items.Insert(index, item);
+        var done = temp.InsertInternal(index, item);
         return done == 0 ? this : temp;
     }
-    IInvariantList<T> IInvariantList<T>.Insert(int index, T item) => Insert(index, item);
+    protected int InsertInternal(int index, T item) => Items.Insert(index, item);
 
     /// <summary>
     /// <inheritdoc/>
@@ -326,65 +349,65 @@ public class InvariantList<T> : IInvariantList<T>
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual InvariantList<T> InsertRange(int index, IEnumerable<T> range)
+    public IInvariantList<T> InsertRange(int index, IEnumerable<T> range)
     {
         var temp = Clone();
-        var done = temp.Items.InsertRange(index, range);
+        var done = temp.InsertRangeInternal(index, range);
         return done == 0 ? this : temp;
     }
-    IInvariantList<T> IInvariantList<T>.InsertRange(int index, IEnumerable<T> range) => InsertRange(index, range);
+    protected int InsertRangeInternal(int index, IEnumerable<T> range) => Items.InsertRange(index, range);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public virtual InvariantList<T> RemoveAt(int index)
+    public IInvariantList<T> RemoveAt(int index)
     {
         var temp = Clone();
-        var done = temp.Items.RemoveAt(index);
+        var done = temp.RemoveAtInternal(index);
         return done == 0 ? this : temp;
     }
-    IInvariantList<T> IInvariantList<T>.RemoveAt(int index) => RemoveAt(index);
+    protected int RemoveAtInternal(int index) => Items.RemoveAt(index);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual InvariantList<T> Remove(T item)
+    public IInvariantList<T> Remove(T item)
     {
         var temp = Clone();
-        var done = temp.Items.Remove(item);
+        var done = temp.RemoveInternal(item);
         return done == 0 ? this : temp;
     }
-    IInvariantList<T> IInvariantList<T>.Remove(T item) => Remove(item);
+    protected int RemoveInternal(T item) => Items.Remove(item);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual InvariantList<T> RemoveLast(T item)
+    public IInvariantList<T> RemoveLast(T item)
     {
         var temp = Clone();
-        var done = temp.Items.RemoveLast(item);
+        var done = temp.RemoveLastInternal(item);
         return done == 0 ? this : temp;
     }
-    IInvariantList<T> IInvariantList<T>.RemoveLast(T item) => RemoveLast(item);
+    protected int RemoveLastInternal(T item) => Items.RemoveLast(item);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual InvariantList<T> RemoveAll(T item)
+    public IInvariantList<T> RemoveAll(T item)
     {
         var temp = Clone();
-        var done = temp.Items.RemoveAll(item);
+        var done = temp.RemoveAllInternal(item);
         return done == 0 ? this : temp;
     }
-    IInvariantList<T> IInvariantList<T>.RemoveAll(T item) => RemoveAll(item);
+    protected int RemoveAllInternal(T item) => Items.RemoveAll(item);
 
     /// <summary>
     /// <inheritdoc/>
@@ -392,62 +415,62 @@ public class InvariantList<T> : IInvariantList<T>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual InvariantList<T> RemoveRange(int index, int count)
+    public IInvariantList<T> RemoveRange(int index, int count)
     {
         var temp = Clone();
-        var done = temp.Items.RemoveRange(index, count);
+        var done = temp.RemoveRangeInternal(index, count);
         return done == 0 ? this : temp;
     }
-    IInvariantList<T> IInvariantList<T>.RemoveRange(int index, int count) => RemoveRange(index, count);
+    protected int RemoveRangeInternal(int index, int count) => Items.RemoveRange(index, count);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual InvariantList<T> Remove(Predicate<T> predicate)
+    public IInvariantList<T> Remove(Predicate<T> predicate)
     {
         var temp = Clone();
-        var done = temp.Items.Remove(predicate);
+        var done = temp.RemoveInternal(predicate);
         return done == 0 ? this : temp;
     }
-    IInvariantList<T> IInvariantList<T>.Remove(Predicate<T> predicate) => Remove(predicate);
+    protected int RemoveInternal(Predicate<T> predicate) => Items.Remove(predicate);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual InvariantList<T> RemoveLast(Predicate<T> predicate)
+    public IInvariantList<T> RemoveLast(Predicate<T> predicate)
     {
         var temp = Clone();
-        var done = temp.Items.RemoveLast(predicate);
+        var done = temp.RemoveLastInternal(predicate);
         return done == 0 ? this : temp;
     }
-    IInvariantList<T> IInvariantList<T>.RemoveLast(Predicate<T> predicate) => RemoveLast(predicate);
+    protected int RemoveLastInternal(Predicate<T> predicate) => Items.RemoveLast(predicate);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual InvariantList<T> RemoveAll(Predicate<T> predicate)
+    public IInvariantList<T> RemoveAll(Predicate<T> predicate)
     {
         var temp = Clone();
-        var done = temp.Items.RemoveAll(predicate);
+        var done = temp.RemoveAllInternal(predicate);
         return done == 0 ? this : temp;
     }
-    IInvariantList<T> IInvariantList<T>.RemoveAll(Predicate<T> predicate) => RemoveAll(predicate);
+    protected int RemoveAllInternal(Predicate<T> predicate) => Items.RemoveAll(predicate);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual InvariantList<T> Clear()
+    public IInvariantList<T> Clear()
     {
         var temp = Clone();
-        var done = temp.Items.Clear();
+        var done = temp.ClearInternal();
         return done == 0 ? this : temp;
     }
-    IInvariantList<T> IInvariantList<T>.Clear() => Clear();
+    protected int ClearInternal() => Items.Clear();
 }

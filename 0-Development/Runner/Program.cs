@@ -48,7 +48,7 @@ internal class Program
                 new MenuEntry("Exit"),
                 new Tester.MenuTester(breakOnError: true),
                 new Artifacts.MenuArtifacts(),
-                new MenuEntry("Menu Builder"));
+                new Builder.MenuBuilder());
         }
         while (done > 0);
     }
@@ -108,5 +108,29 @@ internal class Program
             catch (ArgumentException) { }
             catch (FileNotFoundException) { }
         }
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Captures the desired build mode.
+    /// </summary>
+    /// <param name="mode"></param>
+    /// <returns></returns>
+    public static bool CaptureBuildMode(out Builder.BuildMode mode)
+    {
+        var done = Menu.Run(
+            Green, Timeout,
+            new MenuEntry(nameof(Builder.BuildMode.Debug)),
+            new MenuEntry(nameof(Builder.BuildMode.Release)));
+
+        switch (done)
+        {
+            case 0: mode = Builder.BuildMode.Debug; return true;
+            case 1: mode = Builder.BuildMode.Release; return true;
+        }
+
+        mode = default;
+        return false;
     }
 }

@@ -14,7 +14,7 @@ public interface IBaseDisposable : IDisposable, IAsyncDisposable
     /// <summary>
     /// Throws an exception if this instance has been disposed.
     /// </summary>
-    void ThrowIfDisposed();
+    void ThrowWhenDisposed();
 
     /// <summary>
     /// Determines if this instance is being disposed, or not.
@@ -24,5 +24,5 @@ public interface IBaseDisposable : IDisposable, IAsyncDisposable
     /// <summary>
     /// Throws an exception if this instance is being disposed.
     /// </summary>
-    void ThrowOnDisposing();
+    void ThrowWhenDisposing();
 }

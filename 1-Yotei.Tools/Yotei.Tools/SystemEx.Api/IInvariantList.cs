@@ -12,6 +12,8 @@ public interface IInvariantList<T> : IEnumerable<T>, ICloneable
     /// <inheritdoc cref="ICloneable.Clone"/>
     /// </summary>
     /// <returns></returns>
+    /// <remarks>Derived types must override this method to copy the relevant settings along
+    /// with its contents.</remarks>
     new IInvariantList<T> Clone();
 
     /// <summary>
