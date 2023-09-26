@@ -23,7 +23,7 @@ public class ProjectLine
     /// </summary>
     public static implicit operator string(ProjectLine item)
     {
-        ArgumentNullException.ThrowIfNull(item);
+        item = item.ThrowWhenNull();
         return item.Value;
     }
 
@@ -121,7 +121,7 @@ public class ProjectLine
     {
         head = head.NotNullNotEmpty();
         tail = tail.NotNullNotEmpty();
-        ArgumentNullException.ThrowIfNull(value);
+        value = value.ThrowWhenNull();
 
         var ini = Value.IndexOf(head, comparison);
         if (ini < 0) return false;

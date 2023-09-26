@@ -6,8 +6,8 @@ public static class AttributeExtensions
     public static Attribute[] GetCustomAttributes(
         this Type type, Type attributeType, bool inherit)
     {
-        ArgumentNullException.ThrowIfNull(type);
-        ArgumentNullException.ThrowIfNull(attributeType);
+        type = type.ThrowWhenNull();
+        attributeType = attributeType.ThrowWhenNull();
 
         var name = attributeType.FullName;
         if (name == null) throw new ArgumentException(
@@ -34,8 +34,8 @@ public static class AttributeExtensions
     public static Attribute[] GetCustomAttributes(
         this MethodInfo method, Type attributeType, bool inherit)
     {
-        ArgumentNullException.ThrowIfNull(method);
-        ArgumentNullException.ThrowIfNull(attributeType);
+        method = method.ThrowWhenNull();
+        attributeType = attributeType.ThrowWhenNull();
 
         var name = attributeType.FullName;
         if (name == null) throw new ArgumentException(

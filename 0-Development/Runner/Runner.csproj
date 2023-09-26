@@ -24,6 +24,7 @@
    </ItemGroup>
 
    <ItemGroup>
+	  <ProjectReference Include="..\..\1-Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser.Tests\Yotei.Tools.LambdaParser.Tests.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Tests\Yotei.Tools.Tests.csproj" />
    </ItemGroup>
 

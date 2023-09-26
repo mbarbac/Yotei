@@ -11,7 +11,7 @@ public static class TypeExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsStatic(this Type type)
     {
-        ArgumentNullException.ThrowIfNull(type);
+        type = type.ThrowWhenNull();
 
         return
            type.Attributes.HasFlag(TypeAttributes.Abstract) &&
@@ -26,7 +26,7 @@ public static class TypeExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsNullable(this Type type)
     {
-        ArgumentNullException.ThrowIfNull(type);
+        type = type.ThrowWhenNull();
 
         if (type.IsClass || type.IsInterface || type.IsArray) return true;
 
@@ -47,7 +47,7 @@ public static class TypeExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsCompilerGenerated(this Type type)
     {
-        ArgumentNullException.ThrowIfNull(type);
+        type = type.ThrowWhenNull();
 
         return type.GetCustomAttributes(
             typeof(CompilerGeneratedAttribute), true)
@@ -62,7 +62,7 @@ public static class TypeExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsAnonymous(this Type type)
     {
-        ArgumentNullException.ThrowIfNull(type);
+        type = type.ThrowWhenNull();
 
         return
             type.IsCompilerGenerated() &&

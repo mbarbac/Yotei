@@ -46,7 +46,7 @@ public class RequestList : IEnumerable<Request>
     /// <param name="item"></param>
     public void Add(Request item)
     {
-        ArgumentNullException.ThrowIfNull(item);
+        item = item.ThrowWhenNull();
         _Items.Add(item);
     }
 
@@ -57,7 +57,7 @@ public class RequestList : IEnumerable<Request>
     /// <returns></returns>
     public bool Remove(Request item)
     {
-        ArgumentNullException.ThrowIfNull(item);
+        item = item.ThrowWhenNull();
         return _Items.Remove(item);
     }
 

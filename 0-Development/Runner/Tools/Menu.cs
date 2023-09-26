@@ -63,7 +63,7 @@ public static class Menu
     /// <returns></returns>
     public static int Run(ConsoleColor color, TimeSpan timeout, params MenuEntry[] entries)
     {
-        ArgumentNullException.ThrowIfNull(entries);
+        entries = entries.ThrowWhenNull();
 
         if (entries.Length == 0) return -1;
 

@@ -66,7 +66,7 @@ public class TypeHolder
     /// <returns></returns>
     public static bool IsValid(Type type)
     {
-        ArgumentNullException.ThrowIfNull(type);
+        type = type.ThrowWhenNull();
         return type.IsClass;
     }
 

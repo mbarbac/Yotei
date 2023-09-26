@@ -12,7 +12,7 @@ public static class ArrayExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T[] Duplicate<T>(this T[] source)
     {
-        ArgumentNullException.ThrowIfNull(source);
+        source = source.ThrowWhenNull();
 
         if (source.Length == 0) return [];
 
@@ -29,7 +29,7 @@ public static class ArrayExtensions
     /// <returns></returns>
     public static IEnumerator<T> GetTypedEnumerator<T>(this T[] source)
     {
-        ArgumentNullException.ThrowIfNull(source);
+        source = source.ThrowWhenNull();
 
         foreach (var value in source) yield return value;
     }
@@ -46,7 +46,7 @@ public static class ArrayExtensions
     /// <returns></returns>
     public static T[] GetRange<T>(this T[] source, int index, int count)
     {
-        ArgumentNullException.ThrowIfNull(source);
+        source = source.ThrowWhenNull();
 
         if (count == 0) return [];
 
@@ -66,7 +66,7 @@ public static class ArrayExtensions
     /// <returns></returns>
     public static T[] ReplaceItem<T>(this T[] source, int index, T item)
     {
-        ArgumentNullException.ThrowIfNull(source);
+        source = source.ThrowWhenNull();
 
         source = source.Duplicate();
         source[index] = item;
@@ -82,7 +82,7 @@ public static class ArrayExtensions
     /// <returns></returns>
     public static T[] Add<T>(this T[] source, T item)
     {
-        ArgumentNullException.ThrowIfNull(source);
+        source = source.ThrowWhenNull();
 
         if (source.Length == 0) return [item];
 
@@ -102,8 +102,8 @@ public static class ArrayExtensions
     /// <returns></returns>
     public static T[] AddRange<T>(this T[] source, IEnumerable<T> range)
     {
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(range);
+        source = source.ThrowWhenNull();
+        range = range.ThrowWhenNull();
 
         var temps = range is T[] others ? others : range.ToArray();
 
@@ -126,7 +126,7 @@ public static class ArrayExtensions
     /// <returns></returns>
     public static T[] Insert<T>(this T[] source, int index, T item)
     {
-        ArgumentNullException.ThrowIfNull(source);
+        source = source.ThrowWhenNull();
 
         if (source.Length == 0)
         {
@@ -153,8 +153,8 @@ public static class ArrayExtensions
     /// <returns></returns>
     public static T[] InsertRange<T>(this T[] source, int index, IEnumerable<T> range)
     {
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(range);
+        source = source.ThrowWhenNull();
+        range = range.ThrowWhenNull();
 
         var temps = range is T[] others ? others : range.ToArray();
 
@@ -180,7 +180,7 @@ public static class ArrayExtensions
     /// <returns></returns>
     public static T[] RemoveAt<T>(this T[] source, int index)
     {
-        ArgumentNullException.ThrowIfNull(source);
+        source = source.ThrowWhenNull();
 
         var span1 = new ArraySegment<T>(source, 0, index);
         var span2 = new ArraySegment<T>(source, index + 1, source.Length - index - 1);
@@ -198,7 +198,7 @@ public static class ArrayExtensions
     /// <returns></returns>
     public static T[] RemoveRange<T>(this T[] source, int index, int count)
     {
-        ArgumentNullException.ThrowIfNull(source);
+        source = source.ThrowWhenNull();
 
         if (count == 0) return source.Duplicate();
 
@@ -217,7 +217,7 @@ public static class ArrayExtensions
     /// <returns></returns>
     public static T[] Remove<T>(this T[] source, T item)
     {
-        ArgumentNullException.ThrowIfNull(source);
+        source = source.ThrowWhenNull();
 
         var index = Array.IndexOf(source, item);
         return index >= 0 ? source.RemoveAt(index) : source.Duplicate();
@@ -233,7 +233,7 @@ public static class ArrayExtensions
     /// <returns></returns>
     public static T[] RemoveLast<T>(this T[] source, T item)
     {
-        ArgumentNullException.ThrowIfNull(source);
+        source = source.ThrowWhenNull();
 
         var index = Array.LastIndexOf(source, item);
         return index >= 0 ? source.RemoveAt(index) : source.Duplicate();
@@ -249,7 +249,7 @@ public static class ArrayExtensions
     /// <returns></returns>
     public static T[] RemoveAll<T>(this T[] source, T item)
     {
-        ArgumentNullException.ThrowIfNull(source);
+        source = source.ThrowWhenNull();
 
         while (true)
         {
@@ -271,8 +271,8 @@ public static class ArrayExtensions
     /// <returns></returns>
     public static T[] Remove<T>(this T[] source, Predicate<T> predicate)
     {
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(predicate);
+        source = source.ThrowWhenNull();
+        predicate = predicate.ThrowWhenNull();
 
         var index = Array.FindIndex(source, predicate);
         return index >= 0 ? source.RemoveAt(index) : source.Duplicate();
@@ -288,8 +288,8 @@ public static class ArrayExtensions
     /// <returns></returns>
     public static T[] RemoveLast<T>(this T[] source, Predicate<T> predicate)
     {
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(predicate);
+        source = source.ThrowWhenNull();
+        predicate = predicate.ThrowWhenNull();
 
         var index = Array.FindLastIndex(source, predicate);
         return index >= 0 ? source.RemoveAt(index) : source.Duplicate();
@@ -305,8 +305,8 @@ public static class ArrayExtensions
     /// <returns></returns>
     public static T[] RemoveAll<T>(this T[] source, Predicate<T> predicate)
     {
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(predicate);
+        source = source.ThrowWhenNull();
+        predicate = predicate.ThrowWhenNull();
 
         while (true)
         {
@@ -343,7 +343,7 @@ public static class ArrayExtensions
     /// <returns></returns>
     public static T[] ResizeHead<T>(this T[] source, int len, T pad = default!)
     {
-        ArgumentNullException.ThrowIfNull(source);
+        source = source.ThrowWhenNull();
 
         if (len < 0) throw new ArgumentException(
             $"Requested length '{len}' cannot be less than cero.");
@@ -370,7 +370,7 @@ public static class ArrayExtensions
     /// <returns></returns>
     public static T[] ResizeTail<T>(this T[] source, int len, T pad = default!)
     {
-        ArgumentNullException.ThrowIfNull(source);
+        source = source.ThrowWhenNull();
 
         if (len < 0) throw new ArgumentException(
             $"Requested length '{len}' cannot be less than cero.");

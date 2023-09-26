@@ -24,7 +24,7 @@ public record SemanticRelease : IComparable<SemanticRelease>, IEquatable<Semanti
     /// <param name="source"></param>
     public SemanticRelease(string source)
     {
-        ArgumentNullException.ThrowIfNull(source);
+        source = source.ThrowWhenNull();
         if (source.Length > 0) Value = source;
     }
 
@@ -45,7 +45,7 @@ public record SemanticRelease : IComparable<SemanticRelease>, IEquatable<Semanti
     /// <param name="value"></param>
     public static implicit operator string(SemanticRelease value)
     {
-        ArgumentNullException.ThrowIfNull(value);
+        value = value.ThrowWhenNull();
         return value.ToString();
     }
 
@@ -55,7 +55,7 @@ public record SemanticRelease : IComparable<SemanticRelease>, IEquatable<Semanti
     /// <param name="value"></param>
     public static implicit operator SemanticRelease(string value)
     {
-        ArgumentNullException.ThrowIfNull(value);
+        value = value.ThrowWhenNull();
         return new(value);
     }
 
@@ -78,7 +78,7 @@ public record SemanticRelease : IComparable<SemanticRelease>, IEquatable<Semanti
     // Validates the given value portion...
     static string ValidateValue(string value, out string[] parts, out string metadata)
     {
-        ArgumentNullException.ThrowIfNull(value);
+        value = value.ThrowWhenNull();
         parts = [];
         metadata = string.Empty;
 
@@ -117,7 +117,7 @@ public record SemanticRelease : IComparable<SemanticRelease>, IEquatable<Semanti
     // Validates the chars of the given part...
     static void ValidatePart(string part)
     {
-        ArgumentNullException.ThrowIfNull(part);
+        part = part.ThrowWhenNull();
         if (part.Length == 0) throw new EmptyException("Part is empty.");
 
         if (part[0] == '-') throw new ArgumentException(
@@ -149,7 +149,7 @@ public record SemanticRelease : IComparable<SemanticRelease>, IEquatable<Semanti
         get => _Metadata;
         init
         {
-            ArgumentNullException.ThrowIfNull(value);
+            value = value.ThrowWhenNull();
 
             if (value.Length > 0 && value[0] == '+') value = value[1..];
             if (value.Length > 0)

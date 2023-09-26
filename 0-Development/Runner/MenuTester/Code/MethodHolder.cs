@@ -56,7 +56,7 @@ public class MethodHolder
     /// <returns></returns>
     public static bool IsValid(MethodInfo method)
     {
-        ArgumentNullException.ThrowIfNull(method);
+        method = method.ThrowWhenNull();
 
         // Parameter-less method...
         var pars = method.GetParameters();

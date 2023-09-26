@@ -58,7 +58,7 @@ public class AssemblyHolderList : IEnumerable<AssemblyHolder>
     /// <returns></returns>
     public AssemblyHolder? Find(Assembly assembly)
     {
-        ArgumentNullException.ThrowIfNull(assembly);
+        assembly = assembly.ThrowWhenNull();
 
         var name = assembly.GetName().Name;
         if (name == null) throw new ArgumentException(
@@ -74,7 +74,7 @@ public class AssemblyHolderList : IEnumerable<AssemblyHolder>
     /// <param name="holder"></param>
     public void Add(AssemblyHolder holder)
     {
-        ArgumentNullException.ThrowIfNull(holder);
+        holder = holder.ThrowWhenNull();
 
         if (Find(holder.Assembly) != null) throw new DuplicateException(
             "This collection already contains the given metadata.")
@@ -90,7 +90,7 @@ public class AssemblyHolderList : IEnumerable<AssemblyHolder>
     /// <returns></returns>
     public bool Remove(AssemblyHolder holder)
     {
-        ArgumentNullException.ThrowIfNull(holder);
+        holder = holder.ThrowWhenNull();
         return _Items.Remove(holder);
     }
 

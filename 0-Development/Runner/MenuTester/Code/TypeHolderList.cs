@@ -58,7 +58,7 @@ public class TypeHolderList : IEnumerable<TypeHolder>
     /// <returns></returns>
     public TypeHolder? Find(Type type)
     {
-        ArgumentNullException.ThrowIfNull(type);
+        type = type.ThrowWhenNull();
 
         if (type.FullName == null) throw new ArgumentException(
             "Type has not a valid full name.")
@@ -73,7 +73,7 @@ public class TypeHolderList : IEnumerable<TypeHolder>
     /// <param name="holder"></param>
     public void Add(TypeHolder holder)
     {
-        ArgumentNullException.ThrowIfNull(holder);
+        holder = holder.ThrowWhenNull();
 
         if (Find(holder.Type) != null) throw new DuplicateException(
             "This collection already contains the given metadata.")
@@ -89,7 +89,7 @@ public class TypeHolderList : IEnumerable<TypeHolder>
     /// <returns></returns>
     public bool Remove(TypeHolder holder)
     {
-        ArgumentNullException.ThrowIfNull(holder);
+        holder = holder.ThrowWhenNull();
         return _Items.Remove(holder);
     }
 

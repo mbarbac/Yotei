@@ -12,7 +12,7 @@ public class Project
     /// <param name="source"></param>
     public Project(string source)
     {
-        ArgumentNullException.ThrowIfNull(source);
+        source = source.ThrowWhenNull(source);
 
         Directory = Path.GetDirectoryName(source) ?? string.Empty;
         if (Directory.Length > 0 && Directory.EndsWith('\\')) Directory = Directory[..^1];
@@ -46,7 +46,7 @@ public class Project
     /// </summary>
     public static implicit operator string(Project item)
     {
-        ArgumentNullException.ThrowIfNull(item);
+        item = item.ThrowWhenNull();
         return item.FullName;
     }
 
@@ -106,7 +106,8 @@ public class Project
     /// <param name="lines"></param>
     public void RestoreLines(List<ProjectLine> lines)
     {
-        ArgumentNullException.ThrowIfNull(lines);
+        lines = lines.ThrowWhenNull();
+
         Lines.Clear();
         Lines.AddRange(lines);
     }
@@ -180,7 +181,7 @@ public class Project
     /// <returns></returns>
     public bool SetVersion(SemanticVersion version, [NotNullWhen(true)] out SemanticVersion? old)
     {
-        ArgumentNullException.ThrowIfNull(version);
+        version = version.ThrowWhenNull();
 
         foreach (var line in Lines)
         {

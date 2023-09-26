@@ -58,7 +58,7 @@ public class MethodHolderList : IEnumerable<MethodHolder>
     /// <returns></returns>
     public MethodHolder? Find(MethodInfo method)
     {
-        ArgumentNullException.ThrowIfNull(method);
+        method = method.ThrowWhenNull();
         return Find(method.Name);
     }
 
@@ -68,7 +68,7 @@ public class MethodHolderList : IEnumerable<MethodHolder>
     /// <param name="holder"></param>
     public void Add(MethodHolder holder)
     {
-        ArgumentNullException.ThrowIfNull(holder);
+        holder = holder.ThrowWhenNull();
 
         if (Find(holder.Method) != null) throw new DuplicateException(
             "This collection already contains the given metadata.")
@@ -84,7 +84,7 @@ public class MethodHolderList : IEnumerable<MethodHolder>
     /// <returns></returns>
     public bool Remove(MethodHolder holder)
     {
-        ArgumentNullException.ThrowIfNull(holder);
+        holder = holder.ThrowWhenNull();
         return _Items.Remove(holder);
     }
 

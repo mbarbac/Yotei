@@ -21,7 +21,7 @@ public static class EasyNameExtensions
     /// <returns></returns>
     public static string EasyName(this Type type, EasyNameOptions options)
     {
-        ArgumentNullException.ThrowIfNull(type);
+        type = type.ThrowWhenNull();
 
         var gens = type.GetGenericArguments();
         return EasyName(type, options, gens);
@@ -112,7 +112,7 @@ public static class EasyNameExtensions
     /// <returns></returns>
     public static string EasyName(this ConstructorInfo info, EasyNameOptions options)
     {
-        ArgumentNullException.ThrowIfNull(info);
+        info = info.ThrowWhenNull();
 
         var sb = new StringBuilder();
         string str;
@@ -171,7 +171,7 @@ public static class EasyNameExtensions
     /// <returns></returns>
     public static string EasyName(this MethodInfo info, EasyNameOptions options)
     {
-        ArgumentNullException.ThrowIfNull(info);
+        info = info.ThrowWhenNull();
 
         var sb = new StringBuilder();
         string str;
@@ -251,7 +251,7 @@ public static class EasyNameExtensions
     /// <returns></returns>
     public static string EasyName(this PropertyInfo info, EasyNameOptions options)
     {
-        ArgumentNullException.ThrowIfNull(info);
+        info = info.ThrowWhenNull();
 
         var sb = new StringBuilder();
         string str;
@@ -327,7 +327,7 @@ public static class EasyNameExtensions
     /// <returns></returns>
     public static string EasyName(this FieldInfo info, EasyNameOptions options)
     {
-        ArgumentNullException.ThrowIfNull(info);
+        info = info.ThrowWhenNull();
 
         var sb = new StringBuilder();
         string str;

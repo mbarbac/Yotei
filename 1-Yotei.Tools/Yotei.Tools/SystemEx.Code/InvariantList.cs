@@ -81,7 +81,7 @@ public class InvariantList<T> : IInvariantList<T>
     }
     protected bool WithValidatorInternal(Func<T, bool, T> value)
     {
-        ArgumentNullException.ThrowIfNull(value);
+        value = value.ThrowWhenNull();
 
         if (ReferenceEquals(Validator, value)) return false;
 
@@ -111,7 +111,7 @@ public class InvariantList<T> : IInvariantList<T>
     }
     protected bool WithComparerInternal(Func<T, T, bool> value)
     {
-        ArgumentNullException.ThrowIfNull(value);
+        value = value.ThrowWhenNull();
 
         if (ReferenceEquals(Comparer, value)) return false;
 

@@ -198,7 +198,7 @@ public static partial class ConvertToExtensions
     {
         Type sourceType = source is null ? null! : source.GetType();
 
-        ArgumentNullException.ThrowIfNull(targetType);
+        targetType = targetType.ThrowWhenNull();
         target = default!;
 
         // Null source...
@@ -295,7 +295,7 @@ public static partial class ConvertToExtensions
         Type sourceType = source is null ? typeof(TSource) : source.GetType();
         Type targetType = typeof(TTarget);
 
-        ArgumentNullException.ThrowIfNull(provider);
+        provider = provider.ThrowWhenNull();
         target = default!;
 
         // Null source...
@@ -419,7 +419,7 @@ public static partial class ConvertToExtensions
         Type sourceType = source is null ? null! : source.GetType();
         Type targetType = typeof(TTarget);
 
-        ArgumentNullException.ThrowIfNull(provider);
+        provider = provider.ThrowWhenNull();
         target = default!;
 
         // Null source...
@@ -543,8 +543,8 @@ public static partial class ConvertToExtensions
     {
         Type sourceType = source is null ? null! : source.GetType();
 
-        ArgumentNullException.ThrowIfNull(targetType);
-        ArgumentNullException.ThrowIfNull(provider);
+        targetType = targetType.ThrowWhenNull();
+        provider = provider.ThrowWhenNull();
 
         target = default!;
 

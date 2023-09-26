@@ -41,7 +41,7 @@ public static class StringExtensions
     {
         description ??= nameof(source);
 
-        ArgumentNullException.ThrowIfNull(source);
+        source = source.ThrowWhenNull();
         if (trim)
         {
             source = source.NullWhenEmpty();
@@ -60,8 +60,8 @@ public static class StringExtensions
     /// <returns></returns>
     public static bool ContainsAny(this string source, IEnumerable<char> array)
     {
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(array);
+        source = source.ThrowWhenNull();
+        array = array.ThrowWhenNull();
 
         foreach (var c in array) if (source.Contains(c)) return true;
         return false;
@@ -77,8 +77,8 @@ public static class StringExtensions
     public static bool ContainsAny(
         this string source, IEnumerable<char> array, StringComparison comparison)
     {
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(array);
+        source = source.ThrowWhenNull();
+        array = array.ThrowWhenNull();
 
         foreach (var c in array) if (source.Contains(c, comparison)) return true;
         return false;
@@ -94,9 +94,9 @@ public static class StringExtensions
     public static bool ContainsAny(
         this string source, IEnumerable<char> array, IEqualityComparer<char> comparer)
     {
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(array);
-        ArgumentNullException.ThrowIfNull(comparer);
+        source = source.ThrowWhenNull();
+        array = array.ThrowWhenNull();
+        comparer = comparer.ThrowWhenNull();
 
         foreach (var c in array) if (source.Contains(c, comparer)) return true;
         return false;
@@ -111,7 +111,7 @@ public static class StringExtensions
     /// <returns></returns>
     public static string RemoveDiacritics(this string source)
     {
-        ArgumentNullException.ThrowIfNull(source);
+        source = source.ThrowWhenNull();
 
         var temp = source.Normalize(NormalizationForm.FormD);
         var sb = new StringBuilder();
@@ -151,8 +151,8 @@ public static class StringExtensions
     /// <returns></returns>
     public static string Remove(this string source, string value, out bool removed)
     {
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(value);
+        source = source.ThrowWhenNull();
+        value = value.ThrowWhenNull();
 
         removed = false;
         if (source.Length == 0 || value.Length == 0) return source;
@@ -188,8 +188,8 @@ public static class StringExtensions
     /// <returns></returns>
     public static string RemoveLast(this string source, string value, out bool removed)
     {
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(value);
+        source = source.ThrowWhenNull();
+        value = value.ThrowWhenNull();
 
         removed = false;
         if (source.Length == 0 || value.Length == 0) return source;
@@ -224,8 +224,8 @@ public static class StringExtensions
     /// <returns></returns>
     public static string RemoveAll(this string source, string value, out bool removed)
     {
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(value);
+        source = source.ThrowWhenNull();
+        value = value.ThrowWhenNull();
 
         removed = false;
         if (source.Length == 0 || value.Length == 0) return source;
@@ -268,8 +268,8 @@ public static class StringExtensions
     public static string Remove(
         this string source, string value, StringComparison comparison, out bool removed)
     {
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(value);
+        source = source.ThrowWhenNull();
+        value = value.ThrowWhenNull();
 
         removed = false;
         if (source.Length == 0 || value.Length == 0) return source;
@@ -308,8 +308,8 @@ public static class StringExtensions
     public static string RemoveLast(
         this string source, string value, StringComparison comparison, out bool removed)
     {
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(value);
+        source = source.ThrowWhenNull();
+        value = value.ThrowWhenNull();
 
         removed = false;
         if (source.Length == 0 || value.Length == 0) return source;
@@ -348,8 +348,8 @@ public static class StringExtensions
     public static string RemoveAll(
         this string source, string value, StringComparison comparison, out bool removed)
     {
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(value);
+        source = source.ThrowWhenNull();
+        value = value.ThrowWhenNull();
 
         removed = false;
         if (source.Length == 0 || value.Length == 0) return source;
@@ -392,8 +392,8 @@ public static class StringExtensions
     public static string Remove(
         this string source, string value, IEqualityComparer<char> comparer, out bool removed)
     {
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(value);
+        source = source.ThrowWhenNull();
+        value = value.ThrowWhenNull();
 
         removed = false;
         if (source.Length == 0 || value.Length == 0) return source;
@@ -432,8 +432,8 @@ public static class StringExtensions
     public static string RemoveLast(
         this string source, string value, IEqualityComparer<char> comparer, out bool removed)
     {
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(value);
+        source = source.ThrowWhenNull();
+        value = value.ThrowWhenNull();
 
         removed = false;
         if (source.Length == 0 || value.Length == 0) return source;
@@ -472,8 +472,8 @@ public static class StringExtensions
     public static string RemoveAll(
         this string source, string value, IEqualityComparer<char> comparer, out bool removed)
     {
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(value);
+        source = source.ThrowWhenNull();
+        value = value.ThrowWhenNull();
 
         removed = false;
         if (source.Length == 0 || value.Length == 0) return source;
@@ -516,8 +516,8 @@ public static class StringExtensions
     public static string Remove(
         this string source, string value, IComparer<string> comparer, out bool removed)
     {
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(value);
+        source = source.ThrowWhenNull();
+        value = value.ThrowWhenNull();
 
         removed = false;
         if (source.Length == 0 || value.Length == 0) return source;
@@ -556,8 +556,8 @@ public static class StringExtensions
     public static string RemoveLast(
         this string source, string value, IComparer<string> comparer, out bool removed)
     {
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(value);
+        source = source.ThrowWhenNull();
+        value = value.ThrowWhenNull();
 
         removed = false;
         if (source.Length == 0 || value.Length == 0) return source;
@@ -596,8 +596,8 @@ public static class StringExtensions
     public static string RemoveAll(
         this string source, string value, IComparer<string> comparer, out bool removed)
     {
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(value);
+        source = source.ThrowWhenNull();
+        value = value.ThrowWhenNull();
 
         removed = false;
         if (source.Length == 0 || value.Length == 0) return source;
@@ -640,8 +640,8 @@ public static class StringExtensions
     public static string Remove(
         this string source, string value, Locale comparer, out bool removed)
     {
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(value);
+        source = source.ThrowWhenNull();
+        value = value.ThrowWhenNull();
 
         removed = false;
         if (source.Length == 0 || value.Length == 0) return source;
@@ -680,8 +680,8 @@ public static class StringExtensions
     public static string RemoveLast(
         this string source, string value, Locale comparer, out bool removed)
     {
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(value);
+        source = source.ThrowWhenNull();
+        value = value.ThrowWhenNull();
 
         removed = false;
         if (source.Length == 0 || value.Length == 0) return source;
@@ -720,8 +720,8 @@ public static class StringExtensions
     public static string RemoveAll(
         this string source, string value, Locale comparer, out bool removed)
     {
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(value);
+        source = source.ThrowWhenNull();
+        value = value.ThrowWhenNull();
 
         removed = false;
         if (source.Length == 0 || value.Length == 0) return source;
@@ -747,9 +747,9 @@ public static class StringExtensions
     /// <returns></returns>
     public static int IndexOf(this string source, string value, IEqualityComparer<char> comparer)
     {
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(value);
-        ArgumentNullException.ThrowIfNull(comparer);
+        source = source.ThrowWhenNull();
+        value = value.ThrowWhenNull();
+        comparer = comparer.ThrowWhenNull();
 
         if (value.Length == 0) return 0;
         if (value.Length > source.Length) return -1;
@@ -780,9 +780,9 @@ public static class StringExtensions
     /// <returns></returns>
     public static int LastIndexOf(this string source, string value, IEqualityComparer<char> comparer)
     {
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(value);
-        ArgumentNullException.ThrowIfNull(comparer);
+        source = source.ThrowWhenNull();
+        value = value.ThrowWhenNull();
+        comparer = comparer.ThrowWhenNull();
 
         if (value.Length == 0) return 0;
         if (value.Length > source.Length) return -1;
@@ -815,9 +815,9 @@ public static class StringExtensions
     /// <returns></returns>
     public static int IndexOf(this string source, string value, IComparer<string> comparer)
     {
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(value);
-        ArgumentNullException.ThrowIfNull(comparer);
+        source = source.ThrowWhenNull();
+        value = value.ThrowWhenNull();
+        comparer = comparer.ThrowWhenNull();
 
         if (value.Length == 0) return 0;
         if (value.Length > source.Length) return -1;
@@ -842,9 +842,9 @@ public static class StringExtensions
     /// <returns></returns>
     public static int LastIndexOf(this string source, string value, IComparer<string> comparer)
     {
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(value);
-        ArgumentNullException.ThrowIfNull(comparer);
+        source = source.ThrowWhenNull();
+        value = value.ThrowWhenNull();
+        comparer = comparer.ThrowWhenNull();
 
         if (value.Length == 0) return 0;
         if (value.Length > source.Length) return -1;

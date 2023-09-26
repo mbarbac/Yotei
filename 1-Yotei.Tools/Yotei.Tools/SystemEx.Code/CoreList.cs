@@ -259,7 +259,7 @@ public class CoreList<T> : ICoreList<T>
     /// <returns></returns>
     public int IndexOf(Predicate<T> predicate)
     {
-        ArgumentNullException.ThrowIfNull(predicate);
+        predicate = predicate.ThrowWhenNull();
 
         for (int i = 0; i < Items.Count; i++)
         {
@@ -276,7 +276,7 @@ public class CoreList<T> : ICoreList<T>
     /// <returns></returns>
     public int LastIndexOf(Predicate<T> predicate)
     {
-        ArgumentNullException.ThrowIfNull(predicate);
+        predicate = predicate.ThrowWhenNull();
 
         for (int i = Items.Count - 1; i >= 0; i--)
         {
@@ -293,7 +293,7 @@ public class CoreList<T> : ICoreList<T>
     /// <returns></returns>
     public List<int> IndexesOf(Predicate<T> predicate)
     {
-        ArgumentNullException.ThrowIfNull(predicate);
+        predicate = predicate.ThrowWhenNull();
 
         var list = new List<int>(); for (int i = 0; i < Items.Count; i++)
         {
@@ -393,7 +393,7 @@ public class CoreList<T> : ICoreList<T>
     /// <returns></returns>
     public int AddRange(IEnumerable<T> range)
     {
-        ArgumentNullException.ThrowIfNull(range);
+        range = range.ThrowWhenNull();
 
         var count = 0; foreach (var item in range)
         {
@@ -443,7 +443,7 @@ public class CoreList<T> : ICoreList<T>
     /// <returns></returns>
     public int InsertRange(int index, IEnumerable<T> range)
     {
-        ArgumentNullException.ThrowIfNull(range);
+        range = range.ThrowWhenNull();
 
         var count = 0; foreach (var item in range)
         {
@@ -563,7 +563,7 @@ public class CoreList<T> : ICoreList<T>
     /// <returns></returns>
     public int Remove(Predicate<T> predicate)
     {
-        ArgumentNullException.ThrowIfNull(predicate);
+        predicate = predicate.ThrowWhenNull();
 
         var index = IndexOf(predicate);
         return index >= 0 ? RemoveAt(index) : 0;
@@ -576,7 +576,7 @@ public class CoreList<T> : ICoreList<T>
     /// <returns></returns>
     public int RemoveLast(Predicate<T> predicate)
     {
-        ArgumentNullException.ThrowIfNull(predicate);
+        predicate = predicate.ThrowWhenNull();
 
         var index = LastIndexOf(predicate);
         return index >= 0 ? RemoveAt(index) : 0;
@@ -589,7 +589,7 @@ public class CoreList<T> : ICoreList<T>
     /// <returns></returns>
     public int RemoveAll(Predicate<T> predicate)
     {
-        ArgumentNullException.ThrowIfNull(predicate);
+        predicate = predicate.ThrowWhenNull();
 
         var count = 0; while (true)
         {

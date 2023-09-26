@@ -108,22 +108,21 @@ public class MenuTester : MenuEntry
                 "Assembly name of an explicit include cannot be null.")
                 .WithData(item);
 
-            try
+            if (!name.EndsWith(".DLL", StringComparison.OrdinalIgnoreCase))
+                name += ".DLL";
+
+            var assembly = Assembly.LoadFrom(name);
+
+            if (assemblyHolders.Find(assembly) == null)
             {
-                var assembly = Assembly.LoadFrom(name);
+                var holder = new AssemblyHolder(assembly);
+                holder.Populate();
 
-                if (assemblyHolders.Find(assembly) == null)
+                if (holder.TypeHolders.Count > 0)
                 {
-                    var holder = new AssemblyHolder(assembly);
-                    holder.Populate();
-
-                    if (holder.TypeHolders.Count > 0)
-                    {
-                        assemblyHolders.Add(holder);
-                    }
+                    assemblyHolders.Add(holder);
                 }
             }
-            catch { }
         }
     }
 

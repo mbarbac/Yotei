@@ -10,7 +10,7 @@ public static class ExceptionExtensions
     /// <returns></returns>
     public static string ToDisplayString(this Exception exception)
     {
-        ArgumentNullException.ThrowIfNull(exception);
+        exception = exception.ThrowWhenNull();
 
         var sb = new StringBuilder();
         sb.AppendLine();

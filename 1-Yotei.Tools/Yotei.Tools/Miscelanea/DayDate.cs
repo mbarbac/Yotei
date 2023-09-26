@@ -26,7 +26,7 @@ public sealed record class DayDate : IComparable<DayDate>, IEquatable<DayDate>
     /// <param name="source"></param>
     public DayDate(DayDate source)
     {
-        ArgumentNullException.ThrowIfNull(source);
+        source = source.ThrowWhenNull();
 
         _Year = source.Year;
         _Month = source.Month;
@@ -112,7 +112,7 @@ public sealed record class DayDate : IComparable<DayDate>, IEquatable<DayDate>
     /// <returns></returns>
     public string ToString(CultureInfo info)
     {
-        ArgumentNullException.ThrowIfNull(info);
+        info = info.ThrowWhenNull();
 
         var pattern = info.DateTimeFormat.ShortDatePattern;
         var separator = info.DateTimeFormat.DateSeparator;
@@ -130,7 +130,7 @@ public sealed record class DayDate : IComparable<DayDate>, IEquatable<DayDate>
     /// <returns></returns>
     public string ToString(string format)
     {
-        ArgumentNullException.ThrowIfNull(format);
+        format = format.ThrowWhenNull();
 
         var comparison = StringComparison.OrdinalIgnoreCase;
         int pos;
@@ -212,7 +212,7 @@ public sealed record class DayDate : IComparable<DayDate>, IEquatable<DayDate>
     /// <param name="source"></param>
     public static implicit operator DateTime(DayDate source)
     {
-        ArgumentNullException.ThrowIfNull(source);
+        source = source.ThrowWhenNull();
         return source.ToDateTime();
     }
 
@@ -234,7 +234,7 @@ public sealed record class DayDate : IComparable<DayDate>, IEquatable<DayDate>
     /// <param name="source"></param>
     public static implicit operator DateOnly(DayDate source)
     {
-        ArgumentNullException.ThrowIfNull(source);
+        source = source.ThrowWhenNull();
         return source.ToDateOnly();
     }
 

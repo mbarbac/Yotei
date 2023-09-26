@@ -66,7 +66,7 @@ public record SemanticVersion : IComparable<SemanticVersion>, IEquatable<Semanti
     /// <param name="value"></param>
     public SemanticVersion(string value)
     {
-        ArgumentNullException.ThrowIfNull(value);
+        value = value.ThrowWhenNull();
 
         if (value.Length == 0) return;
         int index;
@@ -166,7 +166,7 @@ public record SemanticVersion : IComparable<SemanticVersion>, IEquatable<Semanti
     /// <param name="value"></param>
     public static implicit operator string(SemanticVersion value)
     {
-        ArgumentNullException.ThrowIfNull(value);
+        value = value.ThrowWhenNull();
         return value.ToString();
     }
 

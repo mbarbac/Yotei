@@ -39,7 +39,7 @@ public static class ExceptionExtensions
         object? value,
         [CallerArgumentExpression(nameof(value))] string? name = default) where T : Exception
     {
-        ArgumentNullException.ThrowIfNull(exception);        
+        exception.ThrowWhenNull();
 
         name = name.NullWhenEmpty() ?? nameof(value);
         exception.Data[name] = value;

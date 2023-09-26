@@ -32,7 +32,7 @@ public sealed record class ClockTime : IComparable<ClockTime>, IEquatable<ClockT
     /// <param name="source"></param>
     public ClockTime(ClockTime source)
     {
-        ArgumentNullException.ThrowIfNull(source);
+        source = source.ThrowWhenNull();
 
         _Hour = source.Hour;
         _Minute = source.Minute;
@@ -148,7 +148,7 @@ public sealed record class ClockTime : IComparable<ClockTime>, IEquatable<ClockT
     /// <returns></returns>
     public string ToString(CultureInfo info)
     {
-        ArgumentNullException.ThrowIfNull(info);
+        info = info.ThrowWhenNull();
 
         var separator = info.DateTimeFormat.TimeSeparator;
         return ToStringSeparated(separator);
@@ -162,7 +162,7 @@ public sealed record class ClockTime : IComparable<ClockTime>, IEquatable<ClockT
     /// <returns></returns>
     public string ToString(string format)
     {
-        ArgumentNullException.ThrowIfNull(format);
+        format = format.ThrowWhenNull();
 
         var comparison = StringComparison.OrdinalIgnoreCase;
         int pos;
@@ -276,7 +276,7 @@ public sealed record class ClockTime : IComparable<ClockTime>, IEquatable<ClockT
     /// <param name="source"></param>
     public static implicit operator TimeOnly(ClockTime source)
     {
-        ArgumentNullException.ThrowIfNull(source);
+        source = source.ThrowWhenNull();
         return source.ToTimeOnly();
     }
 
@@ -286,7 +286,7 @@ public sealed record class ClockTime : IComparable<ClockTime>, IEquatable<ClockT
     /// <param name="source"></param>
     public static implicit operator TimeSpan(ClockTime source)
     {
-        ArgumentNullException.ThrowIfNull(source);
+        source = source.ThrowWhenNull();
         return source.ToTimeSpan();
     }
 
