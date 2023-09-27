@@ -39,9 +39,9 @@ public static class StringExtensions
         bool trim = true,
         [CallerArgumentExpression(nameof(source))] string? description = default)
     {
-        description ??= nameof(source);
+        description = description.NullWhenEmpty() ?? nameof(source);
 
-        source = source.ThrowWhenNull();
+        if (source == null) throw new ArgumentNullException($"'{description}' is null.");
         if (trim)
         {
             source = source.NullWhenEmpty();

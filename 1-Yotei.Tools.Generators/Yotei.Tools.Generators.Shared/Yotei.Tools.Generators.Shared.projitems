@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>032e2c3f-beeb-4a9a-a415-3001b9c66ff9</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Yotei.Tools.Generators.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\DuplicateException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\EmptyException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\NotFoundException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\UnExpectedException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RolslynEx\AttributeDataExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RolslynEx\ChainExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RolslynEx\MemberSymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RolslynEx\SymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RolslynEx\TypeSymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RolslynEx\NameSyntaxExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RolslynEx\SyntaxListExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RolslynEx\SyntaxNodeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RolslynEx\ToStringEx.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\DebugExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\StringExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\ExceptionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CodeBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\NoDuplicatesList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\Candidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\FieldCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\MethodCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\PropertyCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\TypeCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Childs\ChildMethods.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Childs\ChildFields.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Childs\ChildProperties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Childs\ChildTypes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Childs\ChildNamespaces.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Childs\ChildFiles.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\FileNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\NamespaceNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\TypeNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\PropertyNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\FieldNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\MethodNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Node.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\TypeNodeEx.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeGenerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeDiagnostics.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
+  </ItemGroup>
+</Project>

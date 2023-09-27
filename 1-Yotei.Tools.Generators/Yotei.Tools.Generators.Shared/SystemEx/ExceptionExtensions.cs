@@ -1,7 +1,7 @@
-﻿namespace Yotei.Tools;
+﻿namespace Yotei.Tools.Generators;
 
 // ========================================================
-public static class ExceptionExtensions
+internal static class ExceptionExtensions
 {
     /// <summary>
     /// Throws an <see cref="ArgumentNullException"/> exception if the given value is a null one.
@@ -12,10 +12,7 @@ public static class ExceptionExtensions
     /// <param name="description"></param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    [return: NotNull]
-    public static T ThrowWhenNull<T>(
-        [AllowNull] this T value,
-        [CallerArgumentExpression(nameof(value))] string? description = default)
+    public static T ThrowWhenNull<T>(this T? value, string description)
     {
         description = description.NullWhenEmpty() ?? nameof(value);
 
@@ -40,10 +37,10 @@ public static class ExceptionExtensions
     public static T WithData<T>(
         this T exception,
         object? value,
-        [CallerArgumentExpression(nameof(value))] string? name = default) where T : Exception
+        string name) where T : Exception
     {
         name = name.NullWhenEmpty() ?? nameof(value);
-        exception.ThrowWhenNull();
+        exception.ThrowWhenNull(name);
 
         exception.Data[name] = value;
         return exception;

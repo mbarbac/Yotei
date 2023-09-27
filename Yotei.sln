@@ -23,9 +23,23 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Runner", "0-Development\Run
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1-Yotei.Tools.LambdaParser", "1-Yotei.Tools.LambdaParser", "{5D36B9A2-A106-4EF4-893C-5082ECB94BCB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yotei.Tools.LambdaParser", "1-Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser.csproj", "{F1B93F0C-237B-4500-8D6F-F305C43DC2D0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yotei.Tools.LambdaParser", "1-Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser.csproj", "{F1B93F0C-237B-4500-8D6F-F305C43DC2D0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yotei.Tools.LambdaParser.Tests", "1-Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser.Tests\Yotei.Tools.LambdaParser.Tests.csproj", "{ACA5BF90-DFD0-4258-86E6-AED484ED9412}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yotei.Tools.LambdaParser.Tests", "1-Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser.Tests\Yotei.Tools.LambdaParser.Tests.csproj", "{ACA5BF90-DFD0-4258-86E6-AED484ED9412}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1-Yotei.Tools.Generators", "1-Yotei.Tools.Generators", "{A5DB9100-4A26-4DE0-BB86-BAA00E2748EC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Helpers", "Helpers", "{D772B996-0D9F-4A8E-92F9-3C23488A5A1A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Generators", "Generators", "{950F8CAD-EBC7-431E-B4F3-C9B6E4931012}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Yotei.Tools.Generators.Shared", "1-Yotei.Tools.Generators\Yotei.Tools.Generators.Shared\Yotei.Tools.Generators.Shared.shproj", "{032E2C3F-BEEB-4A9A-A415-3001B9C66FF9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yotei.Tools.CloneGenerator", "1-Yotei.Tools.Generators\Yotei.Tools.CloneGenerator\Yotei.Tools.CloneGenerator.csproj", "{93BB8519-E53C-4070-89AD-8DE988D15A33}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yotei.Tools.Generators.Tests", "1-Yotei.Tools.Generators\Yotei.Tools.Generators.Tests\Yotei.Tools.Generators.Tests.csproj", "{660127C6-58A1-4256-A16C-D12B90E7B335}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yotei.Tools.WithGenerator", "1-Yotei.Tools.Generators\Yotei.Tools.WithGenerator\Yotei.Tools.WithGenerator.csproj", "{66B58120-BFBE-4597-B5E5-D9FA3C3CE5B4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,22 +62,40 @@ Global
 		{09ED4A91-D269-494C-8C38-9FF8475D4948}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EF728DA7-2B0A-4FE1-9ACE-CA1436EBFFF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EF728DA7-2B0A-4FE1-9ACE-CA1436EBFFF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EF728DA7-2B0A-4FE1-9ACE-CA1436EBFFF2}.Local|Any CPU.ActiveCfg = Debug|Any CPU
-		{EF728DA7-2B0A-4FE1-9ACE-CA1436EBFFF2}.Local|Any CPU.Build.0 = Debug|Any CPU
+		{EF728DA7-2B0A-4FE1-9ACE-CA1436EBFFF2}.Local|Any CPU.ActiveCfg = Local|Any CPU
+		{EF728DA7-2B0A-4FE1-9ACE-CA1436EBFFF2}.Local|Any CPU.Build.0 = Local|Any CPU
 		{EF728DA7-2B0A-4FE1-9ACE-CA1436EBFFF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF728DA7-2B0A-4FE1-9ACE-CA1436EBFFF2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F1B93F0C-237B-4500-8D6F-F305C43DC2D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F1B93F0C-237B-4500-8D6F-F305C43DC2D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F1B93F0C-237B-4500-8D6F-F305C43DC2D0}.Local|Any CPU.ActiveCfg = Debug|Any CPU
-		{F1B93F0C-237B-4500-8D6F-F305C43DC2D0}.Local|Any CPU.Build.0 = Debug|Any CPU
+		{F1B93F0C-237B-4500-8D6F-F305C43DC2D0}.Local|Any CPU.ActiveCfg = Local|Any CPU
+		{F1B93F0C-237B-4500-8D6F-F305C43DC2D0}.Local|Any CPU.Build.0 = Local|Any CPU
 		{F1B93F0C-237B-4500-8D6F-F305C43DC2D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F1B93F0C-237B-4500-8D6F-F305C43DC2D0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{ACA5BF90-DFD0-4258-86E6-AED484ED9412}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{ACA5BF90-DFD0-4258-86E6-AED484ED9412}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ACA5BF90-DFD0-4258-86E6-AED484ED9412}.Local|Any CPU.ActiveCfg = Debug|Any CPU
-		{ACA5BF90-DFD0-4258-86E6-AED484ED9412}.Local|Any CPU.Build.0 = Debug|Any CPU
+		{ACA5BF90-DFD0-4258-86E6-AED484ED9412}.Local|Any CPU.ActiveCfg = Local|Any CPU
+		{ACA5BF90-DFD0-4258-86E6-AED484ED9412}.Local|Any CPU.Build.0 = Local|Any CPU
 		{ACA5BF90-DFD0-4258-86E6-AED484ED9412}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ACA5BF90-DFD0-4258-86E6-AED484ED9412}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93BB8519-E53C-4070-89AD-8DE988D15A33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93BB8519-E53C-4070-89AD-8DE988D15A33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93BB8519-E53C-4070-89AD-8DE988D15A33}.Local|Any CPU.ActiveCfg = Local|Any CPU
+		{93BB8519-E53C-4070-89AD-8DE988D15A33}.Local|Any CPU.Build.0 = Local|Any CPU
+		{93BB8519-E53C-4070-89AD-8DE988D15A33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93BB8519-E53C-4070-89AD-8DE988D15A33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{660127C6-58A1-4256-A16C-D12B90E7B335}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{660127C6-58A1-4256-A16C-D12B90E7B335}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{660127C6-58A1-4256-A16C-D12B90E7B335}.Local|Any CPU.ActiveCfg = Local|Any CPU
+		{660127C6-58A1-4256-A16C-D12B90E7B335}.Local|Any CPU.Build.0 = Local|Any CPU
+		{660127C6-58A1-4256-A16C-D12B90E7B335}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{660127C6-58A1-4256-A16C-D12B90E7B335}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66B58120-BFBE-4597-B5E5-D9FA3C3CE5B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66B58120-BFBE-4597-B5E5-D9FA3C3CE5B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66B58120-BFBE-4597-B5E5-D9FA3C3CE5B4}.Local|Any CPU.ActiveCfg = Debug|Any CPU
+		{66B58120-BFBE-4597-B5E5-D9FA3C3CE5B4}.Local|Any CPU.Build.0 = Debug|Any CPU
+		{66B58120-BFBE-4597-B5E5-D9FA3C3CE5B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66B58120-BFBE-4597-B5E5-D9FA3C3CE5B4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -74,8 +106,19 @@ Global
 		{EF728DA7-2B0A-4FE1-9ACE-CA1436EBFFF2} = {1E09FBD3-158C-4A9F-9BBC-52E35D712EB2}
 		{F1B93F0C-237B-4500-8D6F-F305C43DC2D0} = {5D36B9A2-A106-4EF4-893C-5082ECB94BCB}
 		{ACA5BF90-DFD0-4258-86E6-AED484ED9412} = {5D36B9A2-A106-4EF4-893C-5082ECB94BCB}
+		{D772B996-0D9F-4A8E-92F9-3C23488A5A1A} = {A5DB9100-4A26-4DE0-BB86-BAA00E2748EC}
+		{950F8CAD-EBC7-431E-B4F3-C9B6E4931012} = {A5DB9100-4A26-4DE0-BB86-BAA00E2748EC}
+		{032E2C3F-BEEB-4A9A-A415-3001B9C66FF9} = {D772B996-0D9F-4A8E-92F9-3C23488A5A1A}
+		{93BB8519-E53C-4070-89AD-8DE988D15A33} = {950F8CAD-EBC7-431E-B4F3-C9B6E4931012}
+		{660127C6-58A1-4256-A16C-D12B90E7B335} = {D772B996-0D9F-4A8E-92F9-3C23488A5A1A}
+		{66B58120-BFBE-4597-B5E5-D9FA3C3CE5B4} = {950F8CAD-EBC7-431E-B4F3-C9B6E4931012}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0821CEE0-4168-45F2-B34E-41BD1B7B942E}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		1-Yotei.Tools.Generators\Yotei.Tools.Generators.Shared\Yotei.Tools.Generators.Shared.projitems*{032e2c3f-beeb-4a9a-a415-3001b9c66ff9}*SharedItemsImports = 13
+		1-Yotei.Tools.Generators\Yotei.Tools.Generators.Shared\Yotei.Tools.Generators.Shared.projitems*{66b58120-bfbe-4597-b5e5-d9fa3c3ce5b4}*SharedItemsImports = 5
+		1-Yotei.Tools.Generators\Yotei.Tools.Generators.Shared\Yotei.Tools.Generators.Shared.projitems*{93bb8519-e53c-4070-89ad-8de988d15a33}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal
