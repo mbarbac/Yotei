@@ -34,7 +34,7 @@ namespace Yotei.Tools.WithGenerator.Tests
         public partial class Other
         {
             // --------------------------------------------
-            [WithGenerator]
+            [WithGenerator("()-info")]
             public partial class Persona : IOther.IPersona
             {
                 public string Info = string.Empty;
@@ -65,6 +65,12 @@ namespace Yotei.Tools.WithGenerator.Tests
                     Age = age;
                 }
 
+                public virtual Persona Creator()
+                {
+                    var temp = new Persona(this); temp.Info = "Persona.Creator";
+                    return temp;
+                }
+
                 public string FirstName { get; set; } = default!;
 
                 public virtual string? LastName { get; set; } = null;
@@ -73,7 +79,7 @@ namespace Yotei.Tools.WithGenerator.Tests
             }
 
             // --------------------------------------------
-            [WithGenerator]
+            [WithGenerator("()-info")]
             public partial class Manager : Persona, IOther.IManager
             {
                 public Manager() => Info = "Manager.Empty";
@@ -96,6 +102,12 @@ namespace Yotei.Tools.WithGenerator.Tests
                 {
                     Info = "Manager.Inverse";
                     Branch = branch;
+                }
+
+                public override Manager Creator()
+                {
+                    var temp = new Manager(this); temp.Info = "Manager.Creator";
+                    return temp;
                 }
 
                 public override string? LastName

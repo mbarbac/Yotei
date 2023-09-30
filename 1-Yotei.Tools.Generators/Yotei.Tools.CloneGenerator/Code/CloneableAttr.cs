@@ -5,7 +5,7 @@ internal static class CloneableAttr
 {
     public static string ShortName { get; } = "Cloneable";
     public static string LongName { get; } = ShortName + "Attribute";
-    public static string Tag { get; } = nameof(Tag);
+    public static string Specs { get; } = nameof(Specs);
     public static string PreventVirtual { get; } = nameof(PreventVirtual);
 
     public static string Code(string nsName) => $$"""
@@ -24,18 +24,18 @@ internal static class CloneableAttr
                 /// <summary>
                 /// Initializes a new instance.
                 /// </summary>
-                /// <param name="tag"></param>
-                public {{LongName}}(string? tag = null)
+                /// <param name="specs"></param>
+                public {{LongName}}(string? specs = null)
                 {
-                    {{Tag}} = tag == null || (tag = tag.Trim()).Length == 0 ? null : tag;
+                    {{Specs}} = specs == null || (specs = specs.Trim()).Length == 0 ? null : specs;
                 }
                 
                 /// <summary>
-                /// If not null describes the method to use to generate a new instance of the
-                /// host type. If null, then only the available constructors will be taken into
-                /// consideration.
+                /// If not null contains the specifications of the  method to use to generate a
+                /// new instance of the host type. If null, then only the available constructors
+                /// will be taken into consideration.
                 /// </summary>
-                public string? {{Tag}} { get; }
+                public string? {{Specs}} { get; }
                 
                 /// <summary>
                 /// If true instructs the generator not to use virtual-alike methods, but rather
@@ -49,11 +49,11 @@ internal static class CloneableAttr
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns the value of the <see cref="Tag"/> setting, or null if any.
+    /// Returns the value of the <see cref="Specs"/> setting, or null if any.
     /// </summary>
     /// <param name="symbol"></param>
     /// <returns></returns>
-    public static string? GetTag(ISymbol symbol)
+    public static string? GetSpecs(ISymbol symbol)
     {
         var attrs = symbol.GetAttributes(LongName);
         foreach (var attr in attrs)

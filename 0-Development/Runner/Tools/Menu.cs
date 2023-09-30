@@ -25,7 +25,7 @@ public static class Menu
     /// action. Returns the index of the selected menu entry, or -1 if the [Escape] key was
     /// pressed, if the timeout period has expired, or if the collection of entries was an
     /// empty one.
-    /// <para>A timeout period of -1 milliseconds means wait indefinitely.</para>
+    /// <br/>A timeout period of -1 milliseconds means wait indefinitely.
     /// </summary>
     /// <param name="timeout"></param>
     /// <param name="entries"></param>
@@ -55,7 +55,7 @@ public static class Menu
     /// action. Returns the index of the selected menu entry, or -1 if the [Escape] key was
     /// pressed, if the timeout period has expired, or if the collection of entries was an
     /// empty one.
-    /// <para>A timeout period of -1 milliseconds means wait indefinitely.</para>
+    /// <br/>A timeout period of -1 milliseconds means wait indefinitely.
     /// </summary>
     /// <param name="color"></param>
     /// <param name="timeout"></param>

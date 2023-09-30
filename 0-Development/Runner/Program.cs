@@ -34,7 +34,6 @@ internal class Program
 
         // Customizing the tests...
         // Excludes.Add(new("Experimental.Tests", null, null));
-        Includes.Add(new("Yotei.Tools.LambdaParser.Tests", null, null));
 
         // Main menu...
         var done = -1; do

@@ -29,8 +29,8 @@ public static class ExceptionExtensions
     /// Adds to the data dictionary of the given exception an entry for the given name and value
     /// pair. If that entry already exists, it is replaced with the new one. Returns the original
     /// exception to support fluent syntax.
-    /// <para>If the 'name' argument was omitted, then the 'value' name is used, which may cause
-    /// to overwrite previous entries.</para>
+    /// <br/> If the 'name' argument was omitted, then the 'value' name is used, which may cause
+    /// to overwrite previous entries.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="exception"></param>

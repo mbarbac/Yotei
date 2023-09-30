@@ -142,9 +142,9 @@ internal partial class TypeNode : Node
 
     /// <summary>
     /// <inheritdoc/>
-    /// <para>This method delegates the printing of the type specific code to the new 'OnPrint'
+    /// <br/> This method delegates the printing of the type specific code to the new 'OnPrint'
     /// method, which shall be the one overriden, instead of this one, except for very rare
-    /// circumstances.</para>
+    /// circumstances.
     /// </summary>
     /// <param name="context"></param>
     /// <param name="cb"></param>

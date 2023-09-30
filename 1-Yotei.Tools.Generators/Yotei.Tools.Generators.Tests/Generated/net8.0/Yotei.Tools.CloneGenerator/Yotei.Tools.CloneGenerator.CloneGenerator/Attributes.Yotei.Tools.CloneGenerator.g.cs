@@ -17,18 +17,18 @@ namespace Yotei.Tools.CloneGenerator
         /// <summary>
         /// Initializes a new instance.
         /// </summary>
-        /// <param name="tag"></param>
-        public CloneableAttribute(string? tag = null)
+        /// <param name="specs"></param>
+        public CloneableAttribute(string? specs = null)
         {
-            Tag = tag == null || (tag = tag.Trim()).Length == 0 ? null : tag;
+            Specs = specs == null || (specs = specs.Trim()).Length == 0 ? null : specs;
         }
         
         /// <summary>
-        /// If not null describes the method to use to generate a new instance of the
-        /// host type. If null, then only the available constructors will be taken into
-        /// consideration.
+        /// If not null contains the specifications of the  method to use to generate a
+        /// new instance of the host type. If null, then only the available constructors
+        /// will be taken into consideration.
         /// </summary>
-        public string? Tag { get; }
+        public string? Specs { get; }
         
         /// <summary>
         /// If true instructs the generator not to use virtual-alike methods, but rather

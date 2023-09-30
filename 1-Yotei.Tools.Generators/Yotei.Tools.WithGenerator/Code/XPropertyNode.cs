@@ -94,7 +94,24 @@ internal class XPropertyNode : PropertyNode
             cb.AppendLine("{");
             cb.IndentLevel++;
 
-            cb.AppendLine("throw new NotImplementedException();");
+            var specs = WithGeneratorAttr.GetSpecs(Symbol);
+            specs ??= WithGeneratorAttr.GetSpecs(Parent.Symbol);
+
+            var builder = new TypeBuilder(Parent.Symbol, context);
+            var enforced = new EnforcedMember(Symbol, valueName);
+            var receiver = "v_temp";
+            var code = builder.GetCode(receiver, specs, enforced);
+
+            if (code == null)
+            {
+                context.WarningCannotGenerateCode(Symbol);
+                cb.AppendLine("throw new NotImplementedException();");
+            }
+            else
+            {
+                cb.AppendLine(code);
+                cb.AppendLine($"return {receiver};");
+            }
 
             cb.IndentLevel--;
             cb.AppendLine("}");

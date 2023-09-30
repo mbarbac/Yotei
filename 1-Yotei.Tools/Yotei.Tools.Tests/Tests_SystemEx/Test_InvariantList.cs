@@ -3,10 +3,10 @@ namespace Yotei.Tools.Tests;
 // ========================================================
 /// <summary>
 /// Base scenario:
-/// <para>- Validation: not null elements.<</para>
-/// <para>- Comparer: by name using the case sensitive settings.</para>
-/// <para>- Behavior: throw when duplicates.</para>
-/// <para>- Flatten: yes</para>
+/// <br/>- Validation: not null elements.
+/// <br/>- Comparer: by name using the case sensitive settings.
+/// <br/>- Behavior: throw when duplicates.
+/// <br/>- Flatten: yes.
 /// </summary>
 //[Enforced]
 public static class Test_InvariantList

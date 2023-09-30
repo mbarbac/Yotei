@@ -35,7 +35,7 @@ namespace Yotei.Tools.CloneGenerator.Tests
         public partial class Other
         {
             // --------------------------------------------
-            [Cloneable]
+            [Cloneable("()-info")]
             public partial class Persona : IOther.IPersona
             {
                 public string Info = string.Empty;
@@ -74,7 +74,7 @@ namespace Yotei.Tools.CloneGenerator.Tests
             }
 
             // --------------------------------------------
-            [Cloneable]
+            [Cloneable("()-info")]
             public partial class Manager : Persona, IOther.IManager
             {
                 public Manager() => Info = "Manager.Empty";

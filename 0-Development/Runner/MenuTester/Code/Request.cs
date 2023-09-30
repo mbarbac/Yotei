@@ -38,7 +38,7 @@ public class Request
 
     /// <summary>
     /// The type name, or null if this filter is not used.
-    /// <para> Type names that end with this value are considered a match.</para>
+    /// <br/> Type names that end with this value are considered a match.
     /// </summary>
     public string? TypeName { get; }
 

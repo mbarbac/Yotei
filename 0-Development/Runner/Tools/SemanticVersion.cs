@@ -4,34 +4,28 @@
 /// <summary>
 /// Represents the optional pre-release portion of a semantic version, composed by its value and
 /// metadata parts. From 'https://semver.org':
-/// <para>
-/// A normal version must take the form 'X.Y.Z', where X, Y and Z are are non-negative integers,
-/// and must NOT contain leading zeroes. X is the major version, Y is the minor version, and Z is
-/// the patch version. </para>
-/// <para>
-/// A pre-release version may be denoted by appending a hyphen and a series of dot separated
+/// <br/> A normal version must take the form 'X.Y.Z', where X, Y and Z are are non-negative
+/// integers, and must NOT contain leading zeroes. X is the major version, Y is the minor version,
+/// and Z is the patch version.
+/// <br/> A pre-release version may be denoted by appending a hyphen and a series of dot separated
 /// identifiers immediately following the patch version.Identifiers must comprise only ASCII
 /// alphanumerics and hyphens[0 - 9A - Za - z -], and must not be empty. Numeric identifiers must
 /// not  include leading zeroes. Pre-release versions have a lower precedence than the associated
-/// normal version.</para>
-/// <para>
-/// Metadata may be denoted by appending a plus sign and a series of dot separated identifiers
-/// immediately following the patch or pre-release version.Identifiers must comprise only ASCII
-/// alphanumerics and hyphens[0 - 9A - Za - z -]. Identifiers must not be empty.</para>
-/// <para>
-/// Precedence must be calculated by separating the version into major, minor, patch and
+/// normal version.
+/// <br/> Metadata may be denoted by appending a plus sign and a series of dot separated
+/// identifiers immediately following the patch or pre-release version.Identifiers must comprise
+/// only ASCII alphanumerics and hyphens[0 - 9A - Za - z -]. Identifiers must not be empty.
+/// <br/> Precedence must be calculated by separating the version into major, minor, patch and
 /// pre-release identifiers in that order.Precedence is determined by the first difference when
 /// comparing each of these identifiers from left to right.Major, minor, and patch versions are
-/// always compared numerically.</para>
-/// <para>
-/// Precedence for two pre-release versions is determined by comparing each dot separated
+/// always compared numerically.
+/// <br/> Precedence for two pre-release versions is determined by comparing each dot separated
 /// identifier from left to right until a difference is found.Identifiers consisting of only
 /// digits are compared numerically.Identifiers with letters or hyphens are compared lexically
 /// in ASCII sort order.Numeric identifiers always have lower precedence than non-numeric
 /// identifiers.A larger set of pre-release fields has a higher precedence than a smaller set,
-/// if all of the preceding identifiers are equal.</para>
-/// <para>
-/// When comparing precedence, build metadata shall be ignored.</para>
+/// if all of the preceding identifiers are equal.
+/// <br/> When comparing precedence, build metadata shall be ignored.
 /// </summary>
 public record SemanticVersion : IComparable<SemanticVersion>, IEquatable<SemanticVersion>
 {

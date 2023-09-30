@@ -27,7 +27,7 @@ internal static class StringExtensions
     /// <summary>
     /// Throws an appropriate exception if the given source string is null, or empty after
     /// trimming it if such was requested. Otherwise, returns the validated string.
-    /// <para>If the 'description' argument was omitted, then the source name is used.</para>
+    /// <br/> If the 'description' argument was omitted, then the source name is used.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="description"></param>
