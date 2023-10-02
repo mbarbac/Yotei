@@ -6,142 +6,120 @@ public static class Test_BuilderOptional
 {
     //[Enforced]
     [Fact]
-    public static void Test_Errors()
+    public static void Test_Empty()
     {
         try { _ = new BuilderOptional(null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
 
         try { _ = new BuilderOptional(" "); Assert.Fail(); }
         catch (EmptyException) { }
+    }
 
-        try { _ = new BuilderOptional("any"); Assert.Fail(); }
+    //[Enforced]
+    [Fact]
+    public static void Test_Include_Or_Exclude()
+    {
+        try { _ = new BuilderOptional("whatever"); Assert.Fail(); }
         catch (ArgumentException) { }
     }
 
     //[Enforced]
     [Fact]
-    public static void Test_Creation_All_Specification()
+    public static void Test_Member_Asterisk()
     {
         var item = new BuilderOptional("+*");
         Assert.True(item.IsInclude);
-        Assert.Equal("*", item.Name);
-        Assert.Null(item.Member);
-        Assert.False(item.UseEnforced);
+        Assert.True(item.IsIncludeAll);
+        Assert.False(item.IsExclude);
+        Assert.False(item.IsExcludeAll);
+        Assert.Equal("*", item.Member);
+        Assert.True(item.IsMemberAsterisk);
+        Assert.False(item.IsMemberEnforced);
         Assert.False(item.UseClone);
 
-        item = new BuilderOptional("-*");
-        Assert.False(item.IsInclude);
-        Assert.Equal("*", item.Name);
-        Assert.Null(item.Member);
-        Assert.False(item.UseEnforced);
-        Assert.False(item.UseClone);
+        try { _ = new BuilderOptional("+*!"); Assert.Fail(); }
+        catch (ArgumentException) { }
 
-        try { _ = new BuilderOptional("+*="); Assert.Fail(); }
+        try { _ = new BuilderOptional("+*=any"); Assert.Fail(); }
+        catch (ArgumentException) { }
+
+        try { _ = new BuilderOptional("+*=@"); Assert.Fail(); }
         catch (ArgumentException) { }
     }
 
     //[Enforced]
     [Fact]
-    public static void Test_Creation_Not_Enforced()
+    public static void Test_Member_Name()
     {
         var item = new BuilderOptional("+any");
         Assert.True(item.IsInclude);
-        Assert.Equal("any", item.Name);
-        Assert.Null(item.Member);
-        Assert.False(item.UseEnforced);
+        Assert.False(item.IsIncludeAll);
+        Assert.False(item.IsExclude);
+        Assert.False(item.IsExcludeAll);
+        Assert.Equal("any", item.Member);
+        Assert.False(item.IsMemberAsterisk);
+        Assert.False(item.IsMemberEnforced);
         Assert.False(item.UseClone);
 
-        item = new BuilderOptional("-any");
-        Assert.False(item.IsInclude);
-        Assert.Equal("any", item.Name);
-        Assert.Null(item.Member);
-        Assert.False(item.UseEnforced);
-        Assert.False(item.UseClone);
+        item = new BuilderOptional("+any!");
+        Assert.True(item.IsInclude);
+        Assert.False(item.IsIncludeAll);
+        Assert.False(item.IsExclude);
+        Assert.False(item.IsExcludeAll);
+        Assert.Equal("any", item.Member);
+        Assert.False(item.IsMemberAsterisk);
+        Assert.False(item.IsMemberEnforced);
+        Assert.True(item.UseClone);
 
         try { _ = new BuilderOptional("+any="); Assert.Fail(); }
-        catch (ArgumentException) { }
+        catch (EmptyException) { }
 
-        try { _ = new BuilderOptional("-any="); Assert.Fail(); }
-        catch (ArgumentException) { }
+        try { _ = new BuilderOptional("+any=!"); Assert.Fail(); }
+        catch (EmptyException) { }
+    }
 
-        item = new BuilderOptional("+any=!");
+    //[Enforced]
+    [Fact]
+    public static void Test_Member_Enforced()
+    {
+        var item = new BuilderOptional("+any=@");
         Assert.True(item.IsInclude);
-        Assert.Equal("any", item.Name);
-        Assert.Null(item.Member);
-        Assert.False(item.UseEnforced);
-        Assert.True(item.UseClone);
-
-        try { _ = new BuilderOptional("-any=!"); Assert.Fail(); }
-        catch (ArgumentException) { }
-
-        item = new BuilderOptional("+any=member");
-        Assert.True(item.IsInclude);
-        Assert.Equal("any", item.Name);
-        Assert.Equal("member", item.Member);
-        Assert.False(item.UseEnforced);
+        Assert.False(item.IsIncludeAll);
+        Assert.False(item.IsExclude);
+        Assert.False(item.IsExcludeAll);
+        Assert.Equal("any", item.Member);
+        Assert.False(item.IsMemberAsterisk);
+        Assert.True(item.IsMemberEnforced);
         Assert.False(item.UseClone);
 
-        try { _ = new BuilderOptional("-any=member"); Assert.Fail(); }
-        catch (ArgumentException) { }
-
-        item = new BuilderOptional("+any=member!");
+        item = new BuilderOptional("+any=@!");
         Assert.True(item.IsInclude);
-        Assert.Equal("any", item.Name);
-        Assert.Equal("member", item.Member);
-        Assert.False(item.UseEnforced);
+        Assert.False(item.IsIncludeAll);
+        Assert.False(item.IsExclude);
+        Assert.False(item.IsExcludeAll);
+        Assert.Equal("any", item.Member);
+        Assert.False(item.IsMemberAsterisk);
+        Assert.True(item.IsMemberEnforced);
         Assert.True(item.UseClone);
 
-        try { _ = new BuilderOptional("-any=member!"); Assert.Fail(); }
+        try { _ = new BuilderOptional("+any=any"); Assert.Fail(); }
         catch (ArgumentException) { }
     }
 
     //[Enforced]
     [Fact]
-    public static void Test_Creation_Enforced()
+    public static void Test_Excluide_Specials()
     {
-        var item = new BuilderOptional("+any=@");
-        Assert.True(item.IsInclude);
-        Assert.Equal("any", item.Name);
-        Assert.Null(item.Member);
-        Assert.True(item.UseEnforced);
-        Assert.False(item.UseClone);
+        try { _ = new BuilderOptional("-any!"); Assert.Fail(); }
+        catch (ArgumentException) { }
 
         try { _ = new BuilderOptional("-any=@"); Assert.Fail(); }
         catch (ArgumentException) { }
 
-        item = new BuilderOptional("+any=@!");
-        Assert.True(item.IsInclude);
-        Assert.Equal("any", item.Name);
-        Assert.Null(item.Member);
-        Assert.True(item.UseEnforced);
-        Assert.True(item.UseClone);
-
         try { _ = new BuilderOptional("-any=@!"); Assert.Fail(); }
         catch (ArgumentException) { }
-    }
 
-    //[Enforced]
-    [Fact]
-    public static void Test_Creation_Enforced_Symbol_Used()
-    {
-        var item = new BuilderOptional("+any=@member");
-        Assert.True(item.IsInclude);
-        Assert.Equal("any", item.Name);
-        Assert.Equal("@member", item.Member);
-        Assert.False(item.UseEnforced);
-        Assert.False(item.UseClone);
-
-        try { _ = new BuilderOptional("-any=@member"); Assert.Fail(); }
-        catch (ArgumentException) { }
-
-        item = new BuilderOptional("+any=@member!");
-        Assert.True(item.IsInclude);
-        Assert.Equal("any", item.Name);
-        Assert.Equal("@member", item.Member);
-        Assert.False(item.UseEnforced);
-        Assert.True(item.UseClone);
-
-        try { _ = new BuilderOptional("-any=@member!"); Assert.Fail(); }
+        try { _ = new BuilderOptional("-any=other"); Assert.Fail(); }
         catch (ArgumentException) { }
     }
 }

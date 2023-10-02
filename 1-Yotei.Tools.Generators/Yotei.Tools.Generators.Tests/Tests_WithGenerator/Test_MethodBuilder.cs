@@ -1,41 +1,86 @@
-// File-level usings...
+/*// File-level usings...
 using System;
 
-namespace Yotei.Tools.CloneGenerator.Tests
+namespace Yotei.Tools.WithGenerator.Tests
 {
     // Namespace-level usings...
-    using IEmptyConstructor;
-    using EmptyConstructor;
+    using IMethodBuilder;
+    using MethodBuilder;
 
     // ====================================================
-    namespace IEmptyConstructor
+    //[Enforced]
+    public static class Test_MethodBuilder
+    {
+        //[Enforced]
+        [Fact]
+        public static void Test_Interface()
+        {
+            IOther.IManager source = new Other.Manager("James", "Bond", 50, "MI6");
+
+            var target = source.WithLastName("Other");
+            Assert.NotSame(source, target);
+            Assert.IsAssignableFrom<IOther.IManager>(target);
+            Assert.Equal(source.FirstName, target.FirstName);
+            Assert.Equal("Other", target.LastName);
+            Assert.Equal(((Other.Manager)source).Age, ((Other.Manager)target).Age);
+            Assert.Equal(source.Branch, target.Branch);
+            Assert.Equal("Manager.Creator", ((Other.Manager)target).Info);
+        }
+
+        //[Enforced]
+        [Fact]
+        public static void Test_Concrete()
+        {
+            var source = new Other.Manager("James", "Bond", 50, "MI6");
+
+            var target = source.WithLastName("Other");
+            Assert.NotSame(source, target);
+            Assert.IsType<Other.Manager>(target);
+            Assert.Equal(source.FirstName, target.FirstName);
+            Assert.Equal("Other", target.LastName);
+            Assert.Equal(source.Age, target.Age);
+            Assert.Equal(source.Branch, target.Branch);
+            Assert.Equal("Manager.Creator", target.Info);
+
+            target = source.WithAge(25);
+            Assert.NotSame(source, target);
+            Assert.IsType<Other.Manager>(target);
+            Assert.Equal(source.FirstName, target.FirstName);
+            Assert.Equal(source.LastName, target.LastName);
+            Assert.Equal(25, target.Age);
+            Assert.Equal(source.Branch, target.Branch);
+            Assert.Equal("Manager.Creator", target.Info);
+        }
+    }
+
+    // ====================================================
+    namespace IMethodBuilder
     {
         public partial interface IOther
         {
             // --------------------------------------------
-            [Cloneable]
             public partial interface IPersona
             {
-                string FirstName { get; }
-                string? LastName { get; }
+                [WithGenerator] string FirstName { get; }
+                [WithGenerator] string? LastName { get; }
             }
 
             // --------------------------------------------
-            [Cloneable]
+            [WithGenerator]
             public partial interface IManager : IPersona
             {
-                string Branch { get; }
+                [WithGenerator] string Branch { get; }
             }
         }
     }
 
     // ====================================================
-    namespace EmptyConstructor
+    namespace MethodBuilder
     {
         public partial class Other
         {
             // --------------------------------------------
-            [Cloneable("()-info")]
+            [WithGenerator("creator()+*-info")]
             public partial class Persona : IOther.IPersona
             {
                 public string Info = string.Empty;
@@ -66,15 +111,22 @@ namespace Yotei.Tools.CloneGenerator.Tests
                     Age = age;
                 }
 
+                public virtual Persona Creator()
+                {
+                    var temp = new Persona(this); temp.Info = "Persona.Creator";
+                    return temp;
+                }
+
                 public string FirstName { get; set; } = default!;
 
                 public virtual string? LastName { get; set; } = null;
 
+                [WithGenerator]
                 public int Age = 0;
             }
 
             // --------------------------------------------
-            [Cloneable("()-info")]
+            [WithGenerator("creator()+*-info")]
             public partial class Manager : Persona, IOther.IManager
             {
                 public Manager() => Info = "Manager.Empty";
@@ -99,6 +151,12 @@ namespace Yotei.Tools.CloneGenerator.Tests
                     Branch = branch;
                 }
 
+                public override Manager Creator()
+                {
+                    var temp = new Manager(this); temp.Info = "Manager.Creator";
+                    return temp;
+                }
+
                 public override string? LastName
                 {
                     get => base.LastName;
@@ -109,4 +167,4 @@ namespace Yotei.Tools.CloneGenerator.Tests
             }
         }
     }
-}
+}*/

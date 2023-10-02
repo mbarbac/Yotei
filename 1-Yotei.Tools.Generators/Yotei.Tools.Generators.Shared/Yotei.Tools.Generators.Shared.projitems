@@ -48,13 +48,13 @@
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\TypeNodeEx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeGenerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeDiagnostics.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TypeBuilder\EnforcedMember.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TypeBuilder\BuilderArgument.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TypeBuilder\BuilderOptional.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TypeBuilder\BuilderSpecs.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TypeBuilder\TypeBuilder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TypeBuilder\EnforcedMember.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TypeBuilder\BuilderDiagnostics.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TypeBuilder\TypeBuilderEx.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TypeBuilder\TypeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
   </ItemGroup>
 </Project>

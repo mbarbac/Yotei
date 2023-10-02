@@ -2,21 +2,15 @@
 
 // ========================================================
 /// <summary>
-/// Represents an optional init/set builder argument(s) from the remaining members not yet used
-/// in a given builder, with the format: '[+|-][*|name][=[@]|[member[!]]', where:
-/// <br/>- [+|-] indicates whether this is an include or exclude specification. Exclude ones only
-/// accept a [name] or a [*] element.
-/// <br/>- [name] is the actual name of the builder argument. If [*] is used it means that all
-/// possible remaining ones will be included or excluded. In addition, if [*] is used then no
-/// further specifications are allowed for this element.
-/// <br/>- [=[@]|[member[!]] indicates that the value of the parameter will be taken from the
-/// given source.
-/// <br/> If it is null, then the value of a corresponding member will be used.
-/// <br/> If it is [=!], then a clone of the value of that corresponding member will be used
-/// instead of its straight one.
-/// <br/> If it is [@], then the value of the external enforced value will be used.
-/// <br/> If it is [member], it is the name of the member from which to obtain the value of the
-/// parameter, and it can be followed by a [!] character to use its clone instead.
+/// Represents an optional init/set additional argument with the '[+|-][*|member][=@][!]' format
+/// where:
+/// <br/>>- [+|-]: determines if it is an include or exclude specification.
+/// <br/>>- [*|member]: if '*', the specification affects to all remaining members, and that any
+/// previous ones are erased. Otherwise, the name of the member to use from the set of remaining
+/// ones.
+/// <br/>>- [=@]: if used then the name of the value for the enforced member, if
+/// any, will be used.
+/// <br/>>- [!]: If used, then a clone of the value will be used instead.
 /// </summary>
 internal class BuilderOptional
 {
@@ -26,122 +20,155 @@ internal class BuilderOptional
     /// <param name="spec"></param>
     public BuilderOptional(string spec)
     {
-        spec = spec.NotNullNotEmpty(true, nameof(spec));
+        spec = spec.NotNullNotEmpty();
 
         switch (spec[0])
         {
             case '+': IsInclude = true; break;
             case '-': IsExclude = true; break;
 
-            default: throw new ArgumentException(
+            default:
+                throw new ArgumentException(
                 "Optional specification must beguin with '+' or '-'.")
-                .WithData(spec);
+                .WithData(spec, nameof(spec));
         }
-        spec = spec.Substring(1).NotNullNotEmpty(true, nameof(spec));
+        spec = spec.Substring(1).NotNullNotEmpty();
 
-        var n = spec.IndexOf('=');
-        Name = n < 0 ? spec : spec.Substring(0, n).NotNullNotEmpty(true, nameof(Name));
-
-        if (Name == "*")
+        if (spec.EndsWith('!'))
         {
-            if (n >= 0) throw new ArgumentException(
-                "No further specifications allowed after a '*' symbol.")
-                .WithData(spec);
-
-            return;
-        }
-
-        if (IsExclude)
-        {
-            if (n >= 0) throw new ArgumentException(
-                "Only name specification is allowed for 'Exclude' ones.")
-                .WithData(spec);
-
-            return;
-        }
-
-        if (n >= 0)
-        {
-            spec = spec.Substring(n + 1);
-
-            if (spec.Length == 0) throw new ArgumentException(
-                "Missed specification after the '=' symbol.")
+            if (IsExclude) throw new ArgumentException(
+                "No '!' allowed for exclude specification.")
                 .WithData(spec, nameof(spec));
 
-            if (spec == "@") { UseEnforced = true; }
-            else if (spec == "@!") { UseEnforced = true; UseClone = true; }
-            else
+            UseClone = true;
+            spec = spec.Substring(0, spec.Length - 1);
+        }
+
+        var n = spec.IndexOf('=');
+        Member = n < 0 ? spec : spec.Substring(0, n);
+
+        if (IsMemberAsterisk && UseClone) throw new ArgumentException(
+            "No '!' allowed after an asterisk.")
+            .WithData(spec);
+
+        if (n > 0)
+        {
+            if (IsMemberAsterisk) throw new ArgumentException(
+                "No '=...' allowed after an asterisk.")
+                .WithData(spec);
+
+            if (IsExclude) throw new ArgumentException(
+                "No '=...' allowed for exclude specification.")
+                .WithData(spec, nameof(spec));
+
+            var str = spec.Substring(n + 1).NotNullNotEmpty();
+            if (str == "@")
             {
-                if (spec.EndsWith("!"))
-                {
-                    spec = spec.Substring(0, spec.Length - 1);
-                    UseClone = true;
-                }
-                Member = spec.NullWhenEmpty();
+                IsMemberEnforced = true;
             }
+
+            else throw new ArgumentException(
+                "Only '@' allowed after an equal sign.")
+                .WithData(spec);
         }
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// <inheritdoc/> '[+|-][*|member][=@][!]'
     /// </summary>
     /// <returns></returns>
     public override string ToString()
     {
-        var s = IsInclude ? "+" : "-";
-        s += Name;
-
-        var eq = false;
-
-        if (Member != null)
-        {
-            s += $"={Member}";
-            eq = true;
-        }
-        if (UseEnforced)
-        {
-            if (!eq) s += "=";
-            s += "@";
-            eq = true;
-        }
-        if (UseClone)
-        {
-            if (!eq) s += "=";
-            s += "!";
-        }
-        return s;
+        var sb = new StringBuilder($"{(IsExclude ? "-" : "+")}{Member}");
+        if (IsMemberEnforced) sb.Append("=@");
+        if (UseClone) sb.Append("!");
+        return sb.ToString();
     }
 
     /// <summary>
-    /// Whether this is an include specification, or not.
+    /// Determines if this is an exclude specification, or not.
     /// </summary>
-    public bool IsInclude { get; } = false;
+    public bool IsExclude
+    {
+        get => _IsExclude;
+        set => _IsExclude = value;
+    }
+    bool _IsExclude = false;
 
     /// <summary>
-    /// Whether this is an exclude specification, or not.
+    /// Determines if this is an exclude-all specification, or not.
     /// </summary>
-    public bool IsExclude { get; } = false;
+    public bool IsExcludeAll => IsExclude && IsMemberAsterisk;
 
     /// <summary>
-    /// The actual name of the builder argument.
+    /// Determines if this is an include specification, or not.
     /// </summary>
-    public string Name { get; } = default!;
+    public bool IsInclude
+    {
+        get => !IsExclude;
+        set => IsExclude = !value;
+    }
 
     /// <summary>
-    /// The name of the member from which to obtain the value of this parameter. If it is null,
-    /// or it has a given value, then a corresponding member will be found. If it is [@], then
-    /// the value shall be obtained from an external enforced variable.
+    /// Determines if this is an include-all specification, or not.
     /// </summary>
-    public string? Member { get; } = null;
+    public bool IsIncludeAll => IsInclude && IsMemberAsterisk;
 
     /// <summary>
-    /// Whether a clone of the value of the corresponding member shall be used, instead of the
-    /// straight value of that member.
+    /// The actual name of the init/set member, or '*' to indicate that all ones shall be used.
+    /// If so, then no more modifiers can be specified.
     /// </summary>
-    public bool UseClone { get; } = false;
+    public string Member
+    {
+        get => _Member;
+        set => _Member = value.NotNullNotEmpty();
+    }
+    string _Member = default!;
 
     /// <summary>
-    /// Whether the value to use shall be obtained from an external enforced variable, or not.
+    /// Determines if the name is an '*' specification, or not.
     /// </summary>
-    public bool UseEnforced { get; } = false;
+    public bool IsMemberAsterisk => Member == "*";
+
+    /// <summary>
+    /// Returns the effective member name.
+    /// </summary>
+    /// <returns></returns>
+    public string GetMember() => IsMemberAsterisk
+        ? throw new InvalidOperationException("Member is asterisk.")
+        : Member;
+
+    /// <summary>
+    /// Determines if this must be associated with the name of the variable from which to obtain
+    /// the value, or not. If 'false', it can be still associated with that enforced member if
+    /// ther is a match in the member name.
+    /// </summary>
+    public bool IsMemberEnforced { get; set; }
+
+    /// <summary>
+    /// Whether to use a clone of the source value, or not.
+    /// </summary>
+    public bool UseClone { get; set; }
+
+    /// <summary>
+    /// Gets the code that represents the value to use with the init/set member, taken into
+    /// consideration if a clone shall be obtained, or not.
+    /// </summary>
+    /// <param name="enforcedMember"></param>
+    /// <returns></returns>
+    public string GetValue(EnforcedMember? enforcedMember)
+    {
+        var value = TheValue(); return UseClone
+            ? $"({value} is null) ? null : {value}.Clone()"
+            : value;
+
+        string TheValue()
+        {
+            if (IsMemberEnforced && enforcedMember != null) return enforcedMember.ValueName;
+
+            return IsMemberAsterisk
+                ? throw new InvalidOperationException("Member is asterisk.")
+                : Member;
+        }
+    }
 }

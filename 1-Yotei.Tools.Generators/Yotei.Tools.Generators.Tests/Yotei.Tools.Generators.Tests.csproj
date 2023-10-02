@@ -10,6 +10,7 @@
 	  <IsPackable>false</IsPackable>
 	  <IsTestProject>true</IsTestProject>
 	  <Configurations>Debug;Release;Local</Configurations>
+	  <WarningsAsErrors>CS8785</WarningsAsErrors>
    </PropertyGroup>
 
    <ItemGroup>

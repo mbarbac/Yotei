@@ -2,63 +2,42 @@
 
 // ========================================================
 /// <summary>
-/// Represents an optional enforced member whose value will be replaced while obtaining a new
-/// instance of its hosting type.
+/// Represents an enforced member of the type being built, whose value will be modified with the
+/// one obtained from an external variable.
 /// </summary>
 internal class EnforcedMember
 {
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
-    /// <param name="symbol"></param>
+    /// <param name="member"></param>
     /// <param name="valueName"></param>
-    public EnforcedMember(IPropertySymbol symbol, string valueName)
+    public EnforcedMember(ISymbol member, string valueName)
     {
-        Property = symbol.ThrowWhenNull(nameof(symbol));
-        ValueName = valueName.NotNullNotEmpty(nameof(valueName));
+        Member = member.ThrowWhenNull(nameof(member));
+        ValueName = valueName.NotNullNotEmpty(nameof(ValueName));
+
+        if (member is not IPropertySymbol and not IFieldSymbol)
+            throw new ArgumentException(
+                $"Member '{member.Name}' is neither a property nor a field.");
     }
-
-    /// <summary>
-    /// Initializes a new instance.
-    /// </summary>
-    /// <param name="symbol"></param>
-    /// <param name="valueName"></param>
-    public EnforcedMember(IFieldSymbol symbol, string valueName)
-    {
-        Field = symbol.ThrowWhenNull(nameof(symbol));
-        ValueName = valueName.NotNullNotEmpty(nameof(valueName));
-    }
-
-    /// <summary>
-    /// The symbol of the property member, or null.
-    /// </summary>
-    IPropertySymbol? Property { get; }
-
-    /// <summary>
-    /// The symbol of the field member, or null.
-    /// </summary>
-    IFieldSymbol? Field { get; }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"({Name}={ValueName})";
-
-    // ----------------------------------------------------
+    public override string ToString() => $"({Member}={ValueName})";
 
     /// <summary>
-    /// The symbol of the member this instance refers to.
+    /// The member this instance refers to.
     /// </summary>
-    public ISymbol Symbol => (ISymbol)Property! ?? (ISymbol)Field!;
+    public ISymbol Member { get; }
+    public IPropertySymbol? Property => Member is IPropertySymbol item ? item : null;
+    public IFieldSymbol? Field => Member is IFieldSymbol item ? item : null;
 
     /// <summary>
-    /// The name of the member this instance refers to.
-    /// </summary>
-    public string Name => Symbol.Name;
-
-    /// <summary>
-    /// The external variable name from which to obtain the new value of this member.
+    /// The name of the external variable from which to obtain the new value of the associated
+    /// member.
     /// </summary>
     public string ValueName { get; }
 }

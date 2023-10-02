@@ -1,40 +1,78 @@
-// File-level usings...
+/*// File-level usings...
 using System;
 
-namespace Yotei.Tools.WithGenerator.Tests
+namespace Yotei.Tools.CloneGenerator.Tests
 {
     // Namespace-level usings...
-    using IEmptyConstructor;
-    using EmptyConstructor;
+    using ICopyBuilder;
+    using CopyBuilder;
 
     // ====================================================
-    namespace IEmptyConstructor
+    //[Enforced]
+    public static class Test_CopyBuilder
+    {
+        //[Enforced]
+        [Fact]
+        public static void Test_Interface()
+        {
+            IOther.IManager source = new Other.Manager("James", "Bond", 50, "MI6");
+
+            var target = source.Clone();
+            Assert.NotSame(source, target);
+            Assert.IsAssignableFrom<IOther.IManager>(target);
+            Assert.Equal(source.FirstName, target.FirstName);
+            Assert.Equal(source.LastName, target.LastName);
+            Assert.Equal(((Other.Manager)source).Age, ((Other.Manager)target).Age);
+            Assert.Equal(source.Branch, target.Branch);
+            Assert.Equal("Manager.Copy", ((Other.Manager)target).Info);
+        }
+
+        //[Enforced]
+        [Fact]
+        public static void Test_Concrete()
+        {
+            var source = new Other.Manager("James", "Bond", 50, "MI6");
+
+            var target = source.Clone();
+            Assert.NotSame(source, target);
+            Assert.IsType<Other.Manager>(target);
+            Assert.Equal(source.FirstName, target.FirstName);
+            Assert.Equal(source.LastName, target.LastName);
+            Assert.Equal(source.Age, target.Age);
+            Assert.Equal(source.Branch, target.Branch);
+            Assert.Equal("Manager.Copy", target.Info);
+        }
+    }
+
+    // ====================================================
+    namespace ICopyBuilder
     {
         public partial interface IOther
         {
             // --------------------------------------------
+            [Cloneable]
             public partial interface IPersona
             {
-                [WithGenerator] string FirstName { get; }
-                [WithGenerator] string? LastName { get; }
+                string FirstName { get; }
+                string? LastName { get; }
             }
 
             // --------------------------------------------
-            [WithGenerator]
+            [Cloneable]
             public partial interface IManager : IPersona
             {
-                [WithGenerator] string Branch { get; }
+                string Branch { get; }
             }
         }
     }
 
     // ====================================================
-    namespace EmptyConstructor
+    namespace CopyBuilder
     {
         public partial class Other
         {
             // --------------------------------------------
-            [WithGenerator("()-info")]
+            [Cloneable("(source)+*-info")]
             public partial class Persona : IOther.IPersona
             {
                 public string Info = string.Empty;
@@ -71,15 +109,15 @@ namespace Yotei.Tools.WithGenerator.Tests
                     return temp;
                 }
 
-                public string FirstName { get; set; } = default!;
+                public string FirstName { get; init; } = default!;
 
                 public virtual string? LastName { get; set; } = null;
 
-                [WithGenerator] public int Age = 0;
+                public int Age = 0;
             }
 
             // --------------------------------------------
-            [WithGenerator("()-info")]
+            [Cloneable("(source)+*-info")]
             public partial class Manager : Persona, IOther.IManager
             {
                 public Manager() => Info = "Manager.Empty";
@@ -120,4 +158,4 @@ namespace Yotei.Tools.WithGenerator.Tests
             }
         }
     }
-}
+}*/

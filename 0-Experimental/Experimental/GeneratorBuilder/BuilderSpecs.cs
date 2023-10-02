@@ -2,63 +2,85 @@
 
 // ========================================================
 /// <summary>
-/// Represents a set of builder specifications with the format '[name][(...)][[+|-]optionals]',
-/// where:
-/// <br/>- [name] is the name of the builder method(s) to consider. If it is null, then only the
-/// type constructors will be considered. Otherwise, the name of the method(s) that returns an
-/// instance compatible with the value of the associated type.
-/// <br/>- [(...)] is the comma-separated list of builder arguments. If not used, or if its value
-/// is '(*)', then all possible argumens will be taken into consideration. If it is '()', then
-/// only parameterless builders will be considered. Otherwise, the list of specs with the format
-/// '[name][=[@|member][!]]', where:
-/// <br/>.[name] is the name of the builder parameter,
-/// <br/>.[=...] specifies the source of the value to use for that parameter, if null then a
-/// member with a corresponding name will be found, if [member] a member with a matching name
-/// will be found, and if [@] then the value is obtained from an external enforced variable. In
-/// any case, if '!' is used then the value to use will be a clone of the given one.
-/// <br/>- [+|-[*|spec]] is comma-separated chain of optional init/set arguments. If not used or
-/// if '+*', erases previous specs and then all possible ones are considered. If '-*', erases all
-/// previous specs. Otherwise the chain of specifications that follows the same rules as the ones
-/// for the arguments.
+/// Represents the specifications given to a builder.
 /// </summary>
 internal class BuilderSpecs
 {
     /// <summary>
-    /// Contains a given set of builder specifications.
+    /// Initializes a a new instance.
     /// </summary>
-    /// <param name="specs"></param>
-    public BuilderSpecs(string? specs)
+    /// <param name="specs">
+    /// If not null, the specifications that describe how to obtain a new instance of the host
+    /// type, using the '[builder][(arguments)][optionals]' format, where:
+    /// <para>
+    /// - [builder]: null to only take into consideration the type constructors, or the name of
+    /// the builder method(s) to take into consideration. If so, they must return an object whose
+    /// type must be compatible with the host one.
+    /// </para>
+    /// <para>
+    /// - [(arguments)]: the comma-separated list of arguments to use by the builders. If not
+    /// used, or if it is '(*)', then all builders will be tried. If it is '()', then only the
+    /// parameterless ones will be tried. Otherwise, elements with the '[name][=@|member][!]'
+    /// format, where:
+    /// <br/>- [name]: the actual name of the builder argument, or '*' to indicate that all
+    /// arguments shall be taken into consideration.
+    /// <br/>- [=@|member]: the source from which to obtain the value of that argument. If it
+    /// is not used, the name of a matching member will be used. If '=@', then the name of the
+    /// variable for the the enforced member (if any) will be used instead. Otherwise, the
+    /// actual name of the member that becomes the source of that value.
+    /// <br/>>- [!]: If used, then a clone of the value will be used instead.
+    /// </para>
+    /// <para>
+    /// - [optionals]: the optional chain of comma-separated specs of the remaining init/set
+    /// elements not yet used by the builder. If not used, no optional element is injected.
+    /// Otherwise, each follows the '[+|-][*|member][=@][!]' format where:
+    /// <br/>>- [+|-]: determines if it is an include or exclude specification.
+    /// <br/>>- [*|member]: if '*', the specification affects to all remaining members, and any
+    /// previous ones are erased. Otherwise, the name of the member to use from the set of
+    /// remaining ones.
+    /// <br/>>- [=@]: if used then the name of the value for the enforced member, if any, will
+    /// be used.
+    /// <br/>>- [!]: If used, then a clone of the value will be used instead.
+    /// </para>
+    /// <para>
+    /// Some generators permit the use of 'enforced' members to modify their value while
+    /// building the new instance of the type to return. If so, the name of the external
+    /// variable representing that value is used as needed.
+    /// </para>
+    /// </param>
+    public BuilderSpecs(string? specs = null)
     {
-        specs = specs.NullWhenEmpty();
-        if (specs == null) return;
+        if ((specs = specs.NullWhenEmpty()) == null) return;
+        int n, m;
+        string s;
 
-        int n = 0;
-        int m = 0;
-        string s = default!;
-
-        // Case: we have an argument spec...
-        n = specs.IndexOf('('); if (n >= 0)
+        // Case: having an arguments' section...
+        n = specs.IndexOf('(');
+        if (n >= 0)
         {
-            Name = specs.Substring(0, n).Trim();
-            TheArguments.Clear();
+            Name = specs.Substring(0, n).NullWhenEmpty();
+            Arguments.Clear();
 
-            m = specs.IndexOf(')', n); if (m >= 0)
+            m = specs.IndexOf(')');
+            if (m > 0)
             {
                 s = specs.Substring(n + 1, m - n - 1).Trim();
                 if (s.Length > 0)
                 {
                     var parts = s.Split(',');
-                    foreach (var part in parts) AddArgument(new(part));
+                    foreach (var part in parts) Arguments.Add(new(part));
                 }
-
                 specs = specs.Substring(m + 1);
             }
-            else throw new ArgumentException(
-                "Not matching ')' specification.")
-                .WithData(specs, nameof(specs));
+            else
+            {
+                throw new ArgumentException
+                    ("Specifications contain no closing ')' character.")
+                    .WithData(specs);
+            }
         }
 
-        // Case: no arguments spec...
+        // Case: no arguments' section...
         else
         {
             n = specs.IndexOfAny(new[] { '+', '-' });
@@ -67,14 +89,13 @@ internal class BuilderSpecs
                 Name = specs;
                 return;
             }
-            Name = specs.Substring(0, n).Trim();
+            Name = specs.Substring(0, n).NullWhenEmpty();
             specs = specs.Substring(n);
         }
 
-        // Parsing optionals...
-        if (specs.Contains("+")) TheOptionals.Clear();
-
-        n = 0; while (n < specs.Length)
+        // Parsing optionals, if any...
+        n = 0;
+        while (n < specs.Length)
         {
             n = specs.IndexOfAny(new[] { '+', '-' }, n);
             if (n < 0) break;
@@ -82,26 +103,26 @@ internal class BuilderSpecs
             m = specs.IndexOfAny(new[] { '+', '-' }, n + 1);
             if (m < 0)
             {
-                s = specs.Substring(n);
-                if (s.Length <= 1) throw new ArgumentException(
-                    "Empty optional specification found.")
-                    .WithData(specs, nameof(specs));
+                if ((s = specs.Substring(n)).Length <= 1) throw new ArgumentException(
+                    "Empty optionals chain found.")
+                    .WithData(specs);
 
-                AddOptional(new(s));
+                Optionals.Add(new(s));
                 return;
             }
             else
             {
-                s = specs.Substring(n, m - n);
-                if (s.Length <= 1) throw new ArgumentException(
-                    "Empty optional specification found.")
-                    .WithData(specs, nameof(specs));
+                if ((s = specs.Substring(n, m - n)).Length <= 1) throw new ArgumentException(
+                    "Empty optionals chain found.")
+                    .WithData(specs);
 
-                AddOptional(new(s));
+                Optionals.Add(new(s));
                 n = m;
             }
         }
     }
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// <inheritdoc/>
@@ -113,7 +134,7 @@ internal class BuilderSpecs
         sb.Append(Name);
 
         sb.Append("(");
-        if (TheArguments.Count > 0) sb.Append(string.Join(",", Arguments));
+        if (Arguments.Count > 0) sb.Append(string.Join(",", Arguments));
         sb.Append(")");
 
         sb.Append(string.Concat(Optionals));
@@ -122,80 +143,130 @@ internal class BuilderSpecs
     }
 
     /// <summary>
-    /// The name of the builder method(s) to use. If it is empty, then only the type constructors
+    /// The name of the builder method(s) to use. If it is null then only the type constructors
     /// will be taken into consideration.
     /// </summary>
-    public string Name { get; } = string.Empty;
-
-    /// <summary>
-    /// The collection of builder argument specifications. If it is an empty one, then only the
-    /// parameterless builders will be considered. If the value of its single element is "*",
-    /// then all builders will be considered despite their actual arguments.
-    /// </summary>
-    public IEnumerable<BuilderArgument> Arguments => TheArguments;
-    List<BuilderArgument> TheArguments = new() { new("*") };
-
-    /// <summary>
-    /// The collection of optional init/set argument specifications. By default this collection
-    /// contains a single element that indicates that all possible ones will be considered.
-    /// </summary>
-    public IEnumerable<BuilderOptional> Optionals => TheOptionals;
-    List<BuilderOptional> TheOptionals = new() { new("+*") };
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Adds the given argument specification to this instance. If it is a '*', then it must be
-    /// an unique one in the collection of arguments.
-    /// </summary>
-    /// <param name="item"></param>
-    public void AddArgument(BuilderArgument item)
+    public string? Name
     {
-        item = item.ThrowWhenNull(nameof(item));
+        get => _Name;
+        set => _Name = value?.NotNullNotEmpty();
+    }
+    string? _Name = null;
 
-        if (item.Name == "*")
+    /// <summary>
+    /// The collection of argument specifications. If it is an empty one, then only parameterless
+    /// builders are be considered. If its unique element is '*', then all filtered builders are
+    /// considered despite their actual arguments. Otherwise, the actual list of arguments to be
+    /// matched.
+    /// </summary>
+    public ArgumentsList Arguments { get; } = new(new("*"));
+
+    /// <summary>
+    /// Determines if all arguments are requested.
+    /// </summary>
+    public bool AllArguments => Arguments.Count == 1 && Arguments[0].Name == "*";
+
+    /// <summary>
+    /// The collection of init/set optional specifications. By default this collection is empty.
+    /// </summary>
+    public OptionalsList Optionals { get; } = new();
+
+    // ====================================================
+    /// <summary>
+    /// Represents the list of builder arguments.
+    /// </summary>
+    internal class ArgumentsList : SimpleList<BuilderArgument>
+    {
+        /// <summary>
+        /// Initializes a new empty instance.
+        /// </summary>
+        public ArgumentsList() { }
+
+        /// <summary>
+        /// Initializes a new instance with the given element.
+        /// </summary>
+        /// <param name="item"></param>
+        public ArgumentsList(BuilderArgument item) => Add(item);
+
+        /// <summary>
+        /// Adds the given element to this collection. If a '*' specification is added, then it
+        /// is intercepted to guarantee it is the only element in the collection.
+        /// </summary>
+        /// <param name="item"></param>
+        public override void Add(BuilderArgument item)
         {
-            if (TheArguments.Count > 0)
-                throw new ArgumentException("The '*' argument specification must be unique.");
+            item.ThrowWhenNull(nameof(item));
 
-            TheArguments.Add(item);
-        }
-        else
-        {
-            if (TheArguments.Any(x => x.Name == "*"))
-                throw new ArgumentException("The '*' argument specification must be unique.");
+            // Special case: '*' must be unique...
+            if (item.IsNameAsterisk)
+            {
+                if (Items.Count > 0)
+                    throw new ArgumentException("The '*' specification must be unique.");
+            }
 
-            TheArguments.Add(item);
+            // Others: name must no be duplicated...
+            if (Items.Any(x => x.Name == item.Name)) throw new DuplicateException(
+                $"Name '{item.Name}' is already used.")
+                .WithData(item.Name)
+                .WithData(this);
+
+            Items.Add(item);
         }
     }
 
+    // ====================================================
     /// <summary>
-    /// Clears the collection of argument specifications.
+    /// Represents a list of optionals init/set members.
     /// </summary>
-    public void ClearArguments() => TheArguments.Clear();
-
-    /// <summary>
-    /// Adds the given optional init/set specification to this instance. If it is '-*' or '+*',
-    /// then the original collection is cleared before adding the given one (only if '+*').
-    /// </summary>
-    /// <param name="item"></param>
-    public void AddOptional(BuilderOptional item)
+    internal class OptionalsList : SimpleList<BuilderOptional>
     {
-        item = item.ThrowWhenNull(nameof(item));
+        /// <summary>
+        /// Initializes a new empty instance.
+        /// </summary>
+        public OptionalsList() { }
 
-        if (item.Name == "*")
+        /// <summary>
+        /// Initializes a new instance with the given element.
+        /// </summary>
+        /// <param name="item"></param>
+        public OptionalsList(BuilderOptional item) => Add(item);
+
+        /// <summary>
+        /// Adds the given element to this collection. If a '-*' or an '+*' element is added, then
+        /// all specifications in the chain are erased - and the '+*' is added as needed, but not
+        /// the '-*' one.
+        /// </summary>
+        /// <param name="item"></param>
+        public override void Add(BuilderOptional item)
         {
-            TheOptionals.Clear();
-            if (item.IsInclude) TheOptionals.Add(item);
-        }
-        else
-        {
-            TheOptionals.Add(item);
+            item.ThrowWhenNull(nameof(item));
+
+            if (item.IsMemberAsterisk)
+            {
+                Items.Clear();
+                if (item.IsInclude) Items.Add(item);
+            }
+            else
+            {
+                Items.Add(item);
+            }
         }
     }
 
-    /// <summary>
-    /// Clears the collection of optional init/set specifications.
-    /// </summary>
-    public void ClearOptionals() => TheOptionals.Clear();
+    // ====================================================
+    internal class SimpleList<T> : IEnumerable<T>
+    {
+        protected List<T> Items { get; } = new();
+
+        protected SimpleList() { }
+        public override string ToString() => $"Count: {Count}";
+
+        public IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => Items.GetEnumerator();
+
+        public int Count => Items.Count;
+        public T this[int index] => Items[index];
+        public virtual void Add(T item) => Items.Add(item);
+        public void Clear() => Items.Clear();
+    }
 }

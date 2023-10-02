@@ -14,13 +14,12 @@ internal static class TreeDiagnostics
     {
         var id = "TreeGen01";
         var head = "Type is not partial.";
-        var desc = "The type '{0}' is not a partial one.";
+        var desc = $"The type '{symbol.Name}' is not a partial one.";
 
         context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor(
             id, head, desc,
             "Yotei", DiagnosticSeverity.Error, isEnabledByDefault: true),
-            symbol.Locations.FirstOrDefault(),
-            new object[] { symbol.Name }));
+            symbol.Locations.FirstOrDefault()));
     }
 
     /// <summary>
@@ -34,13 +33,12 @@ internal static class TreeDiagnostics
     {
         var id = "TreeGen02";
         var head = "Kind of type is not supported.";
-        var desc = "The kind of type '{0}' is not supported in this context.";
+        var desc = $"The kind of type '{symbol.Name}' is not supported in this context.";
 
         context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor(
             id, head, desc,
             "Yotei", DiagnosticSeverity.Error, isEnabledByDefault: true),
-            symbol.Locations.FirstOrDefault(),
-            new object[] { symbol.Name }));
+            symbol.Locations.FirstOrDefault()));
     }
 
     /// <summary>
@@ -54,12 +52,11 @@ internal static class TreeDiagnostics
     {
         var id = "TreeGen03";
         var head = "Type is a record.";
-        var desc = "The type '{0}' is a record, which is not supported in this context.";
+        var desc = $"The type '{symbol.Name}' is a record, which is not supported in this context.";
 
         context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor(
             id, head, desc,
             "Yotei", DiagnosticSeverity.Error, isEnabledByDefault: true),
-            symbol.Locations.FirstOrDefault(),
-            new object[] { symbol.Name }));
+            symbol.Locations.FirstOrDefault()));
     }
 }

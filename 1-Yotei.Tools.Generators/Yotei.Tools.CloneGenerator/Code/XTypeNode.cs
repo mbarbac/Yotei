@@ -70,22 +70,23 @@ internal class XTypeNode : TypeNode
             cb.AppendLine("{");
             cb.IndentLevel++;
 
-            var specs = CloneableAttr.GetSpecs(Symbol);
+            //var specs = CloneableAttr.GetSpecs(Symbol);
 
-            var builder = new TypeBuilder(Symbol, context);
-            var receiver = "v_temp";
-            var code = builder.GetCode(receiver, specs);
+            //var builder = new TypeBuilder(context, Symbol);
+            //var receiver = "v_temp";
+            //var code = builder.GetCode(receiver, specs);
 
-            if (code == null)
-            {
-                context.WarningCannotGenerateCode(Symbol);
-                cb.AppendLine("throw new NotImplementedException();");
-            }
-            else
-            {
-                cb.AppendLine(code);
-                cb.AppendLine($"return {receiver};");
-            }
+            //if (code == null)
+            //{
+            //    context.WarningCannotGenerateCode(Symbol);
+            //    cb.AppendLine("throw new NotImplementedException();");
+            //}
+            //else
+            //{
+            //    cb.AppendLine(code);
+            //    cb.AppendLine($"return {receiver};");
+            //}
+            cb.AppendLine("throw new NotImplementedException();");
 
             cb.IndentLevel--;
             cb.AppendLine("}");

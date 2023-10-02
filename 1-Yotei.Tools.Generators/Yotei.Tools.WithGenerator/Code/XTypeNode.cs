@@ -53,25 +53,37 @@ internal class XTypeNode : TypeNode
     /// </summary>
     public void CaptureInheritedProperties()
     {
-        foreach (var type in Symbol.AllBaseTypes()) Capture(type);
-        foreach (var iface in Symbol.AllInterfaces) Capture(iface);
+        foreach (var type in Symbol.AllBaseTypes()) IdentifyAt(type);
+        foreach (var iface in Symbol.AllInterfaces) IdentifyAt(iface);
 
-        // Captures the decorated members of the given type...
-        void Capture(ITypeSymbol type)
+        // Identify inherited members on the base type or interface, not yet considered...
+        void IdentifyAt(ITypeSymbol type)
         {
-            var members = type.GetMembers().OfType<IPropertySymbol>().Where(x =>
-                x.HasAttributes(WithGeneratorAttr.LongName))
+            var members = type.GetMembers().OfType<IPropertySymbol>()
+                .Where(x => x.HasAttributes(WithGeneratorAttr.LongName))
                 .ToDebugArray();
 
             foreach (var member in members)
             {
                 var temp = ChildProperties.Contains(x => x.Symbol.Name == member.Name);
-                if (!temp)
-                {
-                    var node = new XPropertyNode(this, member);
-                    ChildProperties.Add(node);
-                }
+                if (!temp) Capture(member, Symbol);
             }
+        }
+
+        // Captures the given member...
+        bool Capture(IPropertySymbol member, ITypeSymbol type)
+        {
+            var item = type.GetMembers().OfType<IPropertySymbol>().FirstOrDefault(x => x.Name == member.Name);
+            if (item != null)
+            {
+                var node = new XPropertyNode(this, item);
+                ChildProperties.Add(node);
+                return true;
+            }
+
+            foreach (var child in type.AllBaseTypes()) if (Capture(member, child)) return true;
+            foreach (var iface in type.AllInterfaces) if (Capture(member, iface)) return true;
+            return false;
         }
     }
 
@@ -80,25 +92,37 @@ internal class XTypeNode : TypeNode
     /// </summary>
     public void CaptureInheritedFields()
     {
-        foreach (var type in Symbol.AllBaseTypes()) Capture(type);
-        foreach (var iface in Symbol.AllInterfaces) Capture(iface);
+        foreach (var type in Symbol.AllBaseTypes()) IdentifyAt(type);
+        foreach (var iface in Symbol.AllInterfaces) IdentifyAt(iface);
 
-        // Captures the decorated members of the given type...
-        void Capture(ITypeSymbol type)
+        // Identify inherited members on the base type or interface, not yet considered...
+        void IdentifyAt(ITypeSymbol type)
         {
-            var members = type.GetMembers().OfType<IFieldSymbol>().Where(x =>
-                x.HasAttributes(WithGeneratorAttr.LongName))
+            var members = type.GetMembers().OfType<IFieldSymbol>()
+                .Where(x => x.HasAttributes(WithGeneratorAttr.LongName))
                 .ToDebugArray();
 
             foreach (var member in members)
             {
                 var temp = ChildFields.Contains(x => x.Symbol.Name == member.Name);
-                if (!temp)
-                {
-                    var node = new XFieldNode(this, member);
-                    ChildFields.Add(node);
-                }
+                if (!temp) Capture(member, Symbol);
             }
+        }
+
+        // Captures the given member...
+        bool Capture(IFieldSymbol member, ITypeSymbol type)
+        {
+            var item = type.GetMembers().OfType<IFieldSymbol>().FirstOrDefault(x => x.Name == member.Name);
+            if (item != null)
+            {
+                var node = new XFieldNode(this, item);
+                ChildFields.Add(node);
+                return true;
+            }
+
+            foreach (var child in type.AllBaseTypes()) if (Capture(member, child)) return true;
+            foreach (var iface in type.AllInterfaces) if (Capture(member, iface)) return true;
+            return false;
         }
     }
 }
