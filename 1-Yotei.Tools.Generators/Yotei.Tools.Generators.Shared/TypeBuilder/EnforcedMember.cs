@@ -36,6 +36,11 @@ internal class EnforcedMember
     public IFieldSymbol? Field => Member is IFieldSymbol item ? item : null;
 
     /// <summary>
+    /// The name of the member this instance refers to.
+    /// </summary>
+    public string Name => Member.Name;
+
+    /// <summary>
     /// The name of the external variable from which to obtain the new value of the associated
     /// member.
     /// </summary>

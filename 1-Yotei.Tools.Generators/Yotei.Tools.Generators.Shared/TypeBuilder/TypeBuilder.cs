@@ -243,4 +243,96 @@ internal partial class TypeBuilder
             x.IsReadOnly == false)
             .ToList();
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Captures the appropriate builders for the given name specifications, null to only use
+    /// the type constructors, or the name of a regular method that returns a type compatible
+    /// with the type associated with this instance.
+    /// </summary>
+    /// <returns></returns>
+    List<IMethodSymbol> CaptureBuilders()
+    {
+        var methods = Specs.Name == null ? GetTypeConstructors() : GetTypeMethods();
+
+        if (Specs.Name != null)
+        {
+            var matches = methods.Where(x => x.Name == Specs.Name).ToList();
+
+            methods = matches.Count > 0 ? matches : methods.Where(
+                x => string.Compare(x.Name, Specs.Name, ignoreCase: true) == 0).ToList();
+        }
+
+        methods = methods.OrderByDescending(x => x.Parameters.Length).ToList();
+        return methods;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Tries to find a member with a matching name in the given lists of members. Returns the
+    /// member found or null if any. If several are found, an ambiguous error is reported.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="error"></param>
+    /// <param name="properties"></param>
+    /// <param name="fields"></param>
+    /// <returns></returns>
+    ISymbol? MatchMember(
+        string name, out bool error,
+        List<IPropertySymbol> properties, List<IFieldSymbol> fields)
+    {
+        error = false;
+
+        // Case sensitive...
+        var prop = properties.Find(x => x.Name == name); if (prop != null) return prop;
+        var field = fields.Find(x => x.Name == name); if (field != null) return field;
+
+        // Relaxed...
+        var tprops = properties.Where(x => string.Compare(x.Name, name, true) == 0).ToList();
+        var tfields = fields.Where(x => string.Compare(x.Name, name, true) == 0).ToList();
+
+        if ((tprops.Count + tfields.Count) > 1) // Ambiguous match...
+        {
+            error = true;
+            return null;
+        }
+
+        if (tprops.Count == 1) return tprops[0];
+        if (tfields.Count == 1) return tfields[0];
+        return null;
+    }
+
+    /// <summary>
+    /// Determines if the given builder argument matches with the given parameter, in the context
+    /// of the given method. Returns true if so, or false is there is no match. In the later case
+    /// an error might be reported is there is an ambiguous match.
+    /// </summary>
+    /// <param name="arg"></param>
+    /// <param name="par"></param>
+    /// <param name="method"></param>
+    /// <param name="error"></param>
+    /// <returns></returns>
+    bool MatchArgument(
+        BuilderArgument arg, IParameterSymbol par, IMethodSymbol method, out bool error)
+    {
+        error = false;
+
+        // Case sensitive...
+        if (arg.Name == par.Name) return true;
+
+        // Relaxed...
+        if (string.Compare(arg.Name, par.Name, ignoreCase: true) == 0)
+        {
+            var pars = method.Parameters.Where(
+                x => string.Compare(x.Name, arg.Name, ignoreCase: true) == 0)
+                .ToList();
+
+            if (pars.Count == 1) return true;
+            error = true;
+        }
+
+        return false;
+    }
 }

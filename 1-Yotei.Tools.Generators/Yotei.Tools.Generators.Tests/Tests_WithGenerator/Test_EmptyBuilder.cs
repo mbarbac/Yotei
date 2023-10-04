@@ -1,4 +1,4 @@
-/*// File-level usings...
+// File-level usings...
 using System;
 
 namespace Yotei.Tools.WithGenerator.Tests
@@ -8,7 +8,7 @@ namespace Yotei.Tools.WithGenerator.Tests
     using EmptyBuilder;
 
     // ====================================================
-    //[Enforced]
+    //S[Enforced]
     public static class Test_EmptyBuilder
     {
         //[Enforced]
@@ -167,4 +167,4 @@ namespace Yotei.Tools.WithGenerator.Tests
             }
         }
     }
-}*/
+}

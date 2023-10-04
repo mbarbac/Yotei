@@ -45,7 +45,7 @@ internal class BuilderOptional
         }
 
         var n = spec.IndexOf('=');
-        Member = n < 0 ? spec : spec.Substring(0, n);
+        MemberName = n < 0 ? spec : spec.Substring(0, n);
 
         if (IsMemberAsterisk && UseClone) throw new ArgumentException(
             "No '!' allowed after an asterisk.")
@@ -76,7 +76,7 @@ internal class BuilderOptional
     /// <returns></returns>
     public override string ToString()
     {
-        var sb = new StringBuilder($"{(IsExclude ? "-" : "+")}{Member}");
+        var sb = new StringBuilder($"{(IsExclude ? "-" : "+")}{MemberName}");
         if (IsMemberEnforced) sb.Append("=@");
         if (UseClone) sb.Append("!");
         return sb.ToString();
@@ -115,25 +115,25 @@ internal class BuilderOptional
     /// The actual name of the init/set member, or '*' to indicate that all ones shall be used.
     /// If so, then no more modifiers can be specified.
     /// </summary>
-    public string Member
+    public string MemberName
     {
-        get => _Member;
-        set => _Member = value.NotNullNotEmpty(nameof(Member));
+        get => _MemberName;
+        set => _MemberName = value.NotNullNotEmpty(nameof(MemberName));
     }
-    string _Member = default!;
+    string _MemberName = default!;
 
     /// <summary>
     /// Determines if the name is an '*' specification, or not.
     /// </summary>
-    public bool IsMemberAsterisk => Member == "*";
+    public bool IsMemberAsterisk => MemberName == "*";
 
     /// <summary>
     /// Returns the effective member name.
     /// </summary>
     /// <returns></returns>
-    public string GetMember() => IsMemberAsterisk
+    public string GetMemberName() => IsMemberAsterisk
         ? throw new InvalidOperationException("Member is asterisk.")
-        : Member;
+        : MemberName;
 
     /// <summary>
     /// Determines if this must be associated with the name of the variable from which to obtain
@@ -146,27 +146,4 @@ internal class BuilderOptional
     /// Whether to use a clone of the source value, or not.
     /// </summary>
     public bool UseClone { get; set; }
-
-    /// <summary>
-    /// Gets the code that represents the value to use with the init/set member, taken into
-    /// consideration if a clone shall be obtained, or not.
-    /// </summary>
-    /// <param name="enforcedMember"></param>
-    /// <returns></returns>
-    public string GetValue(EnforcedMember? enforcedMember)
-    {
-        var value = TheValue(); return UseClone
-            ? $"({value} is null) ? null : {value}.Clone()"
-            : value;
-
-        string TheValue()
-        {
-            if (IsMemberEnforced &&
-                enforcedMember != null) return enforcedMember.ValueName;
-
-            return IsMemberAsterisk
-                ? throw new InvalidOperationException("Member is asterisk.")
-                : Member;
-        }
-    }
 }

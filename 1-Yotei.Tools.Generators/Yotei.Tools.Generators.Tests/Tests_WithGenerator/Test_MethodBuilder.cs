@@ -1,4 +1,4 @@
-/*// File-level usings...
+// File-level usings...
 using System;
 
 namespace Yotei.Tools.WithGenerator.Tests
@@ -167,4 +167,4 @@ namespace Yotei.Tools.WithGenerator.Tests
             }
         }
     }
-}*/
+}

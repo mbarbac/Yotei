@@ -1,4 +1,4 @@
-/*// File-level usings...
+// File-level usings...
 using System;
 
 namespace Yotei.Tools.CloneGenerator.Tests
@@ -190,4 +190,4 @@ namespace Yotei.Tools.CloneGenerator.Tests
             }
         }
     }
-}*/
+}

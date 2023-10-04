@@ -40,4 +40,110 @@ internal static class BuilderDiagnostics
             "Yotei", DiagnosticSeverity.Error, isEnabledByDefault: true),
             symbol.Locations.FirstOrDefault()));
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Reports an error when there is not a match for a required element.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="symbol"></param>
+    /// <param name="name"></param>
+    public static void ErrorNoMatch(
+        this SourceProductionContext context,
+        ISymbol symbol,
+        string name)
+    {
+        var id = "TypeGen03";
+        var head = "No match found.";
+        var desc = $"No match for '{name}' at '{symbol.Name}'.";
+
+        context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor(
+            id, head, desc,
+            "Yotei", DiagnosticSeverity.Error, isEnabledByDefault: true),
+            symbol.Locations.FirstOrDefault()));
+    }
+
+    /// <summary>
+    /// Reports an error when there is an ambiguous match for a required element.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="symbol"></param>
+    /// <param name="name"></param>
+    public static void ErrorAmbiguousMatch(
+        this SourceProductionContext context,
+        ISymbol symbol,
+        string name)
+    {
+        var id = "TypeGen04";
+        var head = "Ambiguous match.";
+        var desc = $"Ambiguous match for '{name}' at '{symbol.Name}'.";
+
+        context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor(
+            id, head, desc,
+            "Yotei", DiagnosticSeverity.Error, isEnabledByDefault: true),
+            symbol.Locations.FirstOrDefault()));
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Reports an error when the enforced element was not used.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="typeSymbol"></param>
+    /// <param name="symbol"></param>
+    /// <param name="name"></param>
+    public static void ErrorEnforcedNotUsed(
+        this SourceProductionContext context,
+        ITypeSymbol typeSymbol,
+        ISymbol symbol)
+    {
+        var id = "TypeGen05";
+        var head = "Enforced not used.";
+        var desc = $"Enforced '{symbol.Name}' not used at '{typeSymbol.Name}'.";
+
+        context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor(
+            id, head, desc,
+            "Yotei", DiagnosticSeverity.Error, isEnabledByDefault: true),
+            symbol.Locations.FirstOrDefault()));
+    }
+
+    /// <summary>
+    /// Reports an error when the property is init-only.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="symbol"></param>
+    public static void ErrorInitOnly(
+        this SourceProductionContext context,
+        ISymbol symbol)
+    {
+        var id = "TypeGen06";
+        var head = "Property is init only.";
+        var desc = $"The property '{symbol.Name}' is init only.";
+
+        context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor(
+            id, head, desc,
+            "Yotei", DiagnosticSeverity.Error, isEnabledByDefault: true),
+            symbol.Locations.FirstOrDefault()));
+    }
+
+    /// <summary>
+    /// Reports a warning when the code for the associated symbol cannot be generated.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="symbol"></param>
+    public static void WarningCannotGenerateCode(
+        this SourceProductionContext context,
+        ISymbol symbol)
+    {
+        var id = "TypeGen07";
+        var head = "Cannot generate code.";
+        var desc = $"Cannot generate code for '{symbol.Name}'.";
+
+        context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor(
+            id, head, desc,
+            "Yotei", DiagnosticSeverity.Warning, isEnabledByDefault: true),
+            symbol.Locations.FirstOrDefault()));
+    }
 }

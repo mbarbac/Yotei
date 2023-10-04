@@ -1,4 +1,4 @@
-/*// File-level usings...
+// File-level usings...
 using System;
 
 namespace Yotei.Tools.WithGenerator.Tests
@@ -23,7 +23,7 @@ namespace Yotei.Tools.WithGenerator.Tests
             Assert.Equal(source.FirstName, target.FirstName);
             Assert.Equal("Other", target.LastName);
             Assert.Equal(((Other.Persona)source).Age, ((Other.Persona)target).Age);
-            Assert.Equal("Persona.Inverse", ((Other.Manager)target).Info);
+            Assert.Equal("Persona.Inverse", ((Other.Persona)target).Info);
         }
 
         //[Enforced]
@@ -38,7 +38,7 @@ namespace Yotei.Tools.WithGenerator.Tests
             Assert.Equal(source.FirstName, target.FirstName);
             Assert.Equal("Other", target.LastName);
             Assert.Equal(source.Age, target.Age);
-            Assert.Equal("Persona.Regular", target.Info);
+            Assert.Equal("Persona.Inverse", target.Info);
 
             target = source.WithAge(25);
             Assert.NotSame(source, target);
@@ -46,7 +46,7 @@ namespace Yotei.Tools.WithGenerator.Tests
             Assert.Equal(source.FirstName, target.FirstName);
             Assert.Equal(source.LastName, target.LastName);
             Assert.Equal(25, target.Age);
-            Assert.Equal("Persona.Regular", target.Info);
+            Assert.Equal("Persona.Inverse", target.Info);
         }
 
         // ------------------------------------------------
@@ -207,4 +207,4 @@ namespace Yotei.Tools.WithGenerator.Tests
             }
         }
     }
-}*/
+}

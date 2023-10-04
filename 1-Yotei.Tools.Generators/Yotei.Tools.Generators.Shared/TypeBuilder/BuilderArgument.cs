@@ -111,27 +111,4 @@ internal class BuilderArgument
     /// Whether to use a clone of the source value, or not.
     /// </summary>
     public bool UseClone { get; set; }
-
-    /// <summary>
-    /// Gets the code that represents the value to use with the builder argument, taken into
-    /// consideration if a clone shall be obtained, or not.
-    /// </summary>
-    /// <param name="enforcedMember"></param>
-    /// <returns></returns>
-    public string GetValue(EnforcedMember? enforcedMember)
-    {
-        var value = TheValue(); return UseClone
-            ? $"({value} is null) ? null : {value}.Clone()"
-            : value;
-
-        string TheValue()
-        {
-            if (IsMemberEnforced && enforcedMember != null) return enforcedMember.ValueName;
-            if (Member != null && !IsMemberEnforced) return Member;
-
-            return IsNameAsterisk
-                ? throw new InvalidOperationException("Name is asterisk.")
-                : Name;
-        }
-    }
 }

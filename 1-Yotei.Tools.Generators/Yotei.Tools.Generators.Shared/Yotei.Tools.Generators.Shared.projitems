@@ -55,6 +55,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)TypeBuilder\BuilderDiagnostics.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TypeBuilder\TypeBuilderEx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TypeBuilder\TypeBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TypeBuilder\InitElement.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
   </ItemGroup>
 </Project>
