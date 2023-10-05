@@ -58,4 +58,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)TypeBuilder\InitElement.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)LICENSE" />
+  </ItemGroup>
 </Project>

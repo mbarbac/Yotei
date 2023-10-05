@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools.WithGenerator;
+﻿using System.Data;
+
+namespace Yotei.Tools.WithGenerator;
 
 // ========================================================
 /// <summary>
@@ -98,14 +100,20 @@ internal class XPropertyNode : PropertyNode
             specs ??= WithGeneratorAttr.GetSpecs(Parent.Symbol);
 
             var builder = new TypeBuilder(context, Parent.Symbol);
+            var underscores = IncludeUnderscores();
             var receiver = "v_temp";
             var enforced = new EnforcedMember(Symbol, valueName);
-            var code = builder.GetCode(receiver, specs, enforced);
+            var code = builder.GetCode(receiver, specs, enforced, underscores);
 
             if (code == null)
             {
                 context.WarningCannotGenerateCode(Symbol);
                 cb.AppendLine("throw new NotImplementedException();");
+            }
+            else if (code == "this")
+            {
+                cb.AppendLine($"{Symbol.Name} = {valueName};");
+                cb.AppendLine($"return this;");
             }
             else
             {
@@ -293,5 +301,29 @@ internal class XPropertyNode : PropertyNode
             x.Name == MethodName &&
             x.Parameters.Length == 1 &&
             Symbol.Type.IsAssignableTo(x.Parameters[0].Type));
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines the value of the <see cref="CloneableAttr.IncludeUnderscore"/> setting.
+    /// </summary>
+    /// <returns></returns>
+    bool IncludeUnderscores()
+    {
+        return !Parent.IsInterface && Recursive(Parent.Symbol);
+
+        bool Recursive(ITypeSymbol type)
+        {
+            var member = HasDecoratedMember(type);
+            if (member != null &&
+                WithGeneratorAttr.GetIncludeUnderscores(member)) return true;
+
+            if (type.HasAttributes(WithGeneratorAttr.LongName) &&
+                WithGeneratorAttr.GetIncludeUnderscores(type))
+                return true;
+
+            return type.BaseType != null && Recursive(type.BaseType);
+        }
     }
 }

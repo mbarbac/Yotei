@@ -11,6 +11,7 @@ internal partial class TypeBuilder
     BuilderSpecs Specs = default!;
     EnforcedMember? EnforcedMember = default;
     bool EnforcedUsed = default;
+    bool IncludeUnderscores = false;
     List<IMethodSymbol> TypeMethods = default!;
     List<IPropertySymbol> TypeProperties = default!;
     List<IFieldSymbol> TypeFields = default!;
@@ -23,8 +24,11 @@ internal partial class TypeBuilder
     /// <param name="receiver"></param>
     /// <param name="specs"></param>
     /// <param name="enforced"></param>
+    /// <param name="underscores"></param>
     /// <returns></returns>
-    public string? GetCode(string receiver, string? specs, EnforcedMember? enforced = null)
+    public string? GetCode(
+        string receiver,
+        string? specs, EnforcedMember? enforced, bool underscores)
     {
         string? code;
 
@@ -32,6 +36,10 @@ internal partial class TypeBuilder
         Specs = new BuilderSpecs(specs);
         EnforcedMember = enforced;
         EnforcedUsed = false;
+        IncludeUnderscores = underscores;
+
+        if (string.Compare(Specs.Name, "this", ignoreCase: true) == 0) return "this";
+        if (string.Compare(Specs.Name, "base", ignoreCase: true) == 0) return "base";
 
         TypeMethods = CaptureBuilders(); if (TypeMethods.Count == 0)
         {
@@ -253,7 +261,7 @@ internal partial class TypeBuilder
                 }
                 sb.AppendLine("};");
             }
-            else sb.Append(";");
+            else sb.AppendLine(";");
 
             foreach (var item in items)
             {
@@ -301,6 +309,17 @@ internal partial class TypeBuilder
     /// <returns></returns>
     List<InitElement>? GetInits(List<IPropertySymbol> properties, List<IFieldSymbol> fields)
     {
+        // Preventing members with underscores, if requested...
+        if (!IncludeUnderscores)
+        {
+            var ps = properties.Where(x => x.Name.StartsWith("_")).ToList();
+            foreach (var prop in ps) properties.Remove(prop);
+
+            var fs = fields.Where(x => x.Name.StartsWith("_")).ToList();
+            foreach (var field in fs) fields.Remove(field);
+        }
+
+        // Parsing the list of inits...
         var list = new List<InitElement>();
         foreach (var optional in Specs.Optionals)
         {

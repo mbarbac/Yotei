@@ -73,8 +73,9 @@ internal class XTypeNode : TypeNode
             var specs = CloneableAttr.GetSpecs(Symbol);
 
             var builder = new TypeBuilder(context, Symbol);
+            var underscores = IncludeUnderscores();
             var receiver = "v_temp";
-            var code = builder.GetCode(receiver, specs);
+            var code = builder.GetCode(receiver, specs, null, underscores);
 
             if (code == null)
             {
@@ -200,5 +201,25 @@ internal class XTypeNode : TypeNode
         return type.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(x =>
             x.Name == "Clone" &&
             x.Parameters.Length == 0);
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines the value of the <see cref="CloneableAttr.IncludeUnderscores"/> setting.
+    /// </summary>
+    /// <returns></returns>
+    bool IncludeUnderscores()
+    {
+        return !IsInterface && Recursive(Symbol);
+
+        static bool Recursive(ITypeSymbol type)
+        {
+            if (type.HasAttributes(CloneableAttr.LongName) &&
+                CloneableAttr.GetIncludeUnderscores(type))
+                return true;
+
+            return type.BaseType != null && Recursive(type.BaseType);
+        }
     }
 }

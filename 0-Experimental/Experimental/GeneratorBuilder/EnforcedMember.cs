@@ -7,7 +7,6 @@
 /// </summary>
 internal class EnforcedMember
 {
-    public string Name;
-
-    public string ValueName;
+    public string Name = default!;
+    public string ValueName = default!;
 }

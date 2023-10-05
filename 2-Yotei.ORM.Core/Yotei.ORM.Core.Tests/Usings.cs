@@ -1,4 +1,4 @@
-﻿global using System;
+global using System;
 global using System.Collections;
 global using System.Collections.Generic;
 global using System.Collections.Immutable;
@@ -15,7 +15,10 @@ global using System.Text;
 global using System.Threading;
 global using System.Threading.Tasks;
 
+global using Xunit;
 global using Yotei.Tools;
 global using Yotei.Tools.Diagnostics;
-
-[assembly: InternalsVisibleTo("Yotei.Tools.LambdaParser.Tests")]
+global using Yotei.Tools.CloneGenerator;
+global using Yotei.Tools.WithGenerator;
+global using Yotei.ORM.Core;
+global using Yotei.ORM.Core.Code;

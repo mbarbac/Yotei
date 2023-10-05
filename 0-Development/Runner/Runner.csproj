@@ -30,8 +30,4 @@
 	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.Generators.Tests\Yotei.Tools.Generators.Tests.csproj" />
    </ItemGroup>
 
-   <ItemGroup>
-	  <Folder Include="MenuTester\Code\" />
-   </ItemGroup>
-
 </Project>

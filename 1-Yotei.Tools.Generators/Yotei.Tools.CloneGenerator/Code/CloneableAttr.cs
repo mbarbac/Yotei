@@ -7,6 +7,7 @@ internal static class CloneableAttr
     public static string LongName { get; } = ShortName + "Attribute";
     public static string Specs { get; } = nameof(Specs);
     public static string PreventVirtual { get; } = nameof(PreventVirtual);
+    public static string IncludeUnderscores { get; } = nameof(IncludeUnderscores);
 
     public static string Code(string nsName) => $$"""
         namespace {{nsName}}
@@ -82,6 +83,12 @@ internal static class CloneableAttr
                 /// regular or new ones. The default value of this setting is false.
                 /// </summary>
                 public bool {{PreventVirtual}} { get; set; }
+
+                /// <summary>
+                /// If true instructs the generator to take into consideration type members whose
+                /// names begin with an underscore. The default value of this setting is false.
+                /// </summary>
+                public bool {{IncludeUnderscores}} { get; set; }
             }
         }
         """;
@@ -118,6 +125,23 @@ internal static class CloneableAttr
         foreach (var attr in attrs)
         {
             var arg = attr.GetNamedArgument(PreventVirtual);
+            if (arg != null &&
+                arg.Value.Value is bool value && value) return value;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Gets the value of the <see cref="IncludeUnderscores"/> setting, or false if any.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <returns></returns>
+    public static bool GetIncludeUnderscores(ISymbol symbol)
+    {
+        var attrs = symbol.GetAttributes(LongName);
+        foreach (var attr in attrs)
+        {
+            var arg = attr.GetNamedArgument(IncludeUnderscores);
             if (arg != null &&
                 arg.Value.Value is bool value && value) return value;
         }

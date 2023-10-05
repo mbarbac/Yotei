@@ -17,5 +17,7 @@ global using System.Threading.Tasks;
 
 global using Yotei.Tools;
 global using Yotei.Tools.Diagnostics;
+global using Yotei.Tools.CloneGenerator;
+global using Yotei.Tools.WithGenerator;
 
-[assembly: InternalsVisibleTo("Yotei.Tools.LambdaParser.Tests")]
+[assembly: InternalsVisibleTo("Yotei.ORM.Tests")]
