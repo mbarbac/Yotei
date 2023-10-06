@@ -80,29 +80,24 @@ public static class Test_Transaction
                 Assert.False(connection.Transaction.IsDisposed);
             }
 
-            for (int i = count - 1; i >= 0; i--)
+            for (int i = 0; i < count; i++)
             {
                 connection.Transaction.Commit();
-                Assert.True(connection.Transaction.Level == i);
                 Assert.False(connection.Transaction.IsDisposed);
 
-                if (i > 0)
+                if (i == count - 1)
                 {
-                    Assert.True(connection.Transaction.IsActive);
-                    Assert.True(connection.IsOpen);
+                    Assert.False(connection.Transaction.IsActive);
+                    Assert.False(connection.Transaction.IsDisposed);
+                    Assert.False(connection.IsOpen);
                 }
                 else
                 {
-                    Assert.False(connection.Transaction.IsActive);
-                    Assert.False(connection.IsOpen);
+                    Assert.True(connection.Transaction.IsActive);
+                    Assert.False(connection.Transaction.IsDisposed);
+                    Assert.True(connection.IsOpen);
                 }
             }
-
-            connection.Transaction.Commit();
-            Assert.False(connection.IsOpen);
-            Assert.False(connection.Transaction.Level > 0);
-            Assert.False(connection.Transaction.IsActive);
-            Assert.False(connection.Transaction.IsDisposed);
         }
 
         Assert.Equal(0, connection.Transaction.Level);

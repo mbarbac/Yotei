@@ -1,4 +1,4 @@
-namespace Yotei.ORM.Core.Tests;
+namespace Yotei.ORM.Entities.Tests;
 
 // ========================================================
 //[Enforced]

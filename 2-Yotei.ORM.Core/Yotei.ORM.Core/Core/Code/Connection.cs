@@ -6,7 +6,7 @@
 /// </summary>
 [Cloneable]
 [WithGenerator("this")]
-public abstract partial class Connection : BaseDisposable, IConnection
+public abstract partial class Connection : DisposableClass, IConnection
 {
     public const int RETRIES = 4;
     public const int RETRYINTERVAL = 250;

@@ -4,7 +4,7 @@
 /// <summary>
 /// <inheritdoc cref="IBaseDisposable"/>
 /// </summary>
-public abstract class BaseDisposable : IBaseDisposable
+public abstract class DisposableRecord : IBaseDisposable
 {
     /// <summary>
     /// <inheritdoc/>

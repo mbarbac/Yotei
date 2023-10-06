@@ -3,44 +3,32 @@
 
 using System;
 
-namespace Yotei.ORM.Core.Tests
+namespace Yotei.ORM.Entities
 {
-    partial class FakeConnection
+    partial interface IRepository
     {
         /// <summary>
         /// Returns an instance of the hosting type where the value of the decorated member
         /// has been replaced by the new given one.
         /// </summary>
         /// <returns></returns>
-        public override Yotei.ORM.Core.Tests.FakeConnection
-        WithRetries(System.Int32 v_Retries)
-        {
-            Retries = v_Retries;
-            return this;
-        }
+        new Yotei.ORM.Entities.IRepository
+        WithRetries(System.Int32 v_Retries);
         
         /// <summary>
         /// Returns an instance of the hosting type where the value of the decorated member
         /// has been replaced by the new given one.
         /// </summary>
         /// <returns></returns>
-        public override Yotei.ORM.Core.Tests.FakeConnection
-        WithRetryInterval(System.TimeSpan v_RetryInterval)
-        {
-            RetryInterval = v_RetryInterval;
-            return this;
-        }
+        new Yotei.ORM.Entities.IRepository
+        WithRetryInterval(System.TimeSpan v_RetryInterval);
         
         /// <summary>
         /// Returns an instance of the hosting type where the value of the decorated member
         /// has been replaced by the new given one.
         /// </summary>
         /// <returns></returns>
-        public override Yotei.ORM.Core.Tests.FakeConnection
-        WithLocale(Yotei.Tools.Locale v_Locale)
-        {
-            Locale = v_Locale;
-            return this;
-        }
+        new Yotei.ORM.Entities.IRepository
+        WithLocale(Yotei.Tools.Locale v_Locale);
     }
 }

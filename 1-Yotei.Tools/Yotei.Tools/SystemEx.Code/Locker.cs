@@ -14,7 +14,7 @@ namespace Yotei.Tools;
 /// <c>Lock</c> family of methods return, as the result of their operation, a disposable object
 /// that, when disposed, either release its parent lock or decrease its reentrancy count.
 /// </summary>
-public class Locker : BaseDisposable
+public class Locker : DisposableClass
 {
     static int EnvironmentId => Environment.CurrentManagedThreadId;
     static AsyncLocal<long> AsyncHolder = new() { Value = 0 };
@@ -164,7 +164,7 @@ public class Locker : BaseDisposable
     /// Represents a captured lock. When instances of this class are disposed, they either
     /// release its parent lock, or decreases its reentrancy count.
     /// </summary>
-    public class Surrogate : BaseDisposable
+    public class Surrogate : DisposableClass
     {
         readonly int OldThreadId;
         readonly long OldAsyncId;

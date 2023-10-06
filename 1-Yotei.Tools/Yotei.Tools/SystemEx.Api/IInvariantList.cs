@@ -12,71 +12,15 @@ public interface IInvariantList<T> : IEnumerable<T>, ICloneable
     /// <inheritdoc cref="ICloneable.Clone"/>
     /// </summary>
     /// <returns></returns>
-    /// <remarks>Derived types must override this method to copy the relevant settings along
-    /// with its contents.</remarks>
     new IInvariantList<T> Clone();
 
     /// <summary>
-    /// <inheritdoc cref="ICoreList{T}.Validator"/>
-    /// </summary>
-    Func<T, bool, T> Validator { get; }
-
-    /// <summary>
-    /// Returns a copy of this instance where the value of the <see cref="Validator"/> property
-    /// has been replaced by the new given one.
-    /// </summary>
-    /// <param name="value"></param>
-    /// <returns></returns>
-    IInvariantList<T> WithValidator(Func<T, bool, T> value);
-
-    /// <summary>
-    /// <inheritdoc cref="ICoreList{T}.Comparer"/>
-    /// </summary>
-    Func<T, T, bool> Comparer { get; }
-
-    /// <summary>
-    /// Returns a copy of this instance where the value of the <see cref="Comparer"/> property
-    /// has been replaced by the new given one.
-    /// </summary>
-    /// <param name="value"></param>
-    /// <returns></returns>
-    IInvariantList<T> WithComparer(Func<T, T, bool> value);
-
-    /// <summary>
-    /// <inheritdoc cref="ICoreList{T}.Behavior"/>
-    /// </summary>
-    CoreListBehavior Behavior { get; }
-
-    /// <summary>
-    /// Returns a copy of this instance where the value of the <see cref="Behavior"/> property
-    /// has been replaced by the new given one.
-    /// </summary>
-    /// <param name="value"></param>
-    /// <returns></returns>
-    IInvariantList<T> WithBehavior(CoreListBehavior value);
-
-    /// <summary>
-    /// <inheritdoc cref="ICoreList{T}.Flatten"/>
-    /// </summary>
-    bool Flatten { get; }
-
-    /// <summary>
-    /// Returns a copy of this instance where the value of the <see cref="Flatten"/> property
-    /// has been replaced by the new given one.
-    /// </summary>
-    /// <param name="value"></param>
-    /// <returns></returns>
-    IInvariantList<T> WithFlatten(bool value);
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// <inheritdoc cref="ICoreList{T}.Count"/>
+    /// Gets the number of elements in this instance.
     /// </summary>
     int Count { get; }
 
     /// <summary>
-    /// <inheritdoc cref="ICoreList{T}.Trim"/>
+    /// Minimizes the memory footprint of this instance.
     /// </summary>
     void Trim();
 
@@ -88,69 +32,75 @@ public interface IInvariantList<T> : IEnumerable<T>, ICloneable
     T this[int index] { get; }
 
     /// <summary>
-    /// <inheritdoc cref="ICoreList{T}.Contains(T)"/>
+    /// Determines if this instance contains the given element, or not.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
     bool Contains(T item);
 
     /// <summary>
-    /// <inheritdoc cref="ICoreList{T}.IndexOf(T)"/>
+    /// Returns the index of the first ocurrence of the given element in this collection, or
+    /// -1 if it cannot be found.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
     int IndexOf(T item);
 
     /// <summary>
-    /// <inheritdoc cref="ICoreList{T}.LastIndexOf(T)"/>
+    /// Returns the index of the last ocurrence of the given element in this collection, or
+    /// -1 if it cannot be found.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
     int LastIndexOf(T item);
 
     /// <summary>
-    /// <inheritdoc cref="ICoreList{T}.IndexesOf(T)"/>
+    /// Returns a list containing the indexes of all the ocurrences of the given element in this
+    /// collection.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
     List<int> IndexesOf(T item);
 
     /// <summary>
-    /// <inheritdoc cref="ICoreList{T}.Contains(Predicate{T})"/>
+    /// Determines if this instance contains an element that matches the given predicate, or not.
     /// </summary>
-    /// <param name="predicate"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
     bool Contains(Predicate<T> predicate);
 
     /// <summary>
-    /// <inheritdoc cref="ICoreList{T}.IndexOf(Predicate{T})"/>
+    /// Returns the index of the first ocurrence of an element in this collection that matches
+    /// the given predicate, or -1 if any can be found.
     /// </summary>
-    /// <param name="predicate"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
     int IndexOf(Predicate<T> predicate);
 
     /// <summary>
-    /// <inheritdoc cref="ICoreList{T}.LastIndexOf(Predicate{T})"/>
+    /// Returns the index of the last ocurrence of an element in this collection that matches
+    /// the given predicate, or -1 if any can be found.
     /// </summary>
-    /// <param name="predicate"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
     int LastIndexOf(Predicate<T> predicate);
 
     /// <summary>
-    /// <inheritdoc cref="ICoreList{T}.IndexesOf(Predicate{T})"/>
+    /// Returns a list containing the indexes of all the elements in this collection that match
+    /// the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
     List<int> IndexesOf(Predicate<T> predicate);
 
     /// <summary>
-    /// <inheritdoc cref="ICoreList{T}.ToList"/>
+    /// Returns a list with the elements in this collection.
     /// </summary>
     /// <returns></returns>
     List<T> ToList();
 
     /// <summary>
-    /// <inheritdoc cref="ICoreList{T}.ToArray"/>
+    /// Returns an array with the elements in this collection.
     /// </summary>
     /// <returns></returns>
     T[] ToArray();
@@ -158,8 +108,8 @@ public interface IInvariantList<T> : IEnumerable<T>, ICloneable
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a copy of this instance that contains the given number of elements from the
-    /// given index.
+    /// Returns a new instance that contains the given number of elements from the original
+    /// collection, starting from the given index.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
@@ -167,8 +117,8 @@ public interface IInvariantList<T> : IEnumerable<T>, ICloneable
     IInvariantList<T> GetRange(int index, int count);
 
     /// <summary>
-    /// Returns a copy of this instance where the element at the given index has been replaced
-    /// by the new given one.
+    /// Returns a new instance where the original element at the given index has been replaced by
+    /// the new given one.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
@@ -176,23 +126,23 @@ public interface IInvariantList<T> : IEnumerable<T>, ICloneable
     IInvariantList<T> ReplaceItem(int index, T item);
 
     /// <summary>
-    /// Returns a copy of this instance where the given element has been added to it.
+    /// Returns a new instance where the given element has been added to the original collection.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
     IInvariantList<T> Add(T item);
 
     /// <summary>
-    /// Returns a copy of this instance where the elements from the given range have been added
-    /// to it.
+    /// Returns a new instance where the elements from the given range have been added to the
+    /// original collection.
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
     IInvariantList<T> AddRange(IEnumerable<T> range);
 
     /// <summary>
-    /// Returns a copy of this instance where the given element has been inserted into it, at
-    /// the given index.
+    /// Returns a new instance where the given element has been inserted into the original
+    /// collection at the given index.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
@@ -200,8 +150,8 @@ public interface IInvariantList<T> : IEnumerable<T>, ICloneable
     IInvariantList<T> Insert(int index, T item);
 
     /// <summary>
-    /// Returns a copy of this instance where the elements from the given range have been inserted
-    /// into it, starting at the given index.
+    /// Returns a new instance where the elements from the given range have been inserted into
+    /// the original collection, starting from the given index.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="range"></param>
@@ -209,39 +159,40 @@ public interface IInvariantList<T> : IEnumerable<T>, ICloneable
     IInvariantList<T> InsertRange(int index, IEnumerable<T> range);
 
     /// <summary>
-    /// Returns a copy of this instance where the element at the given index has been removed.
+    /// Returns a new instance where the original element at the given index has been removed
+    /// from the original collection.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
     IInvariantList<T> RemoveAt(int index);
 
     /// <summary>
-    /// Returns a copy of this instance where the first ocurrence of the given element, or an
-    /// equivalent one, has been removed.
+    /// Returns a new instance where the first ocurrence of the given element has been removed
+    /// from the original collection.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
     IInvariantList<T> Remove(T item);
 
     /// <summary>
-    /// Returns a copy of this instance where the last ocurrence of the given element, or an
-    /// equivalent one, has been removed.
+    /// Returns a new instance where the last ocurrence of the given element has been removed
+    /// from the original collection.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
     IInvariantList<T> RemoveLast(T item);
 
     /// <summary>
-    /// Returns a copy of this instance where all the ocurrences of the given element, or the
-    /// equivalent ones, have been removed.
+    /// Returns a new instance where all the ocurrences of the given element have been removed
+    /// from the original collection.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
     IInvariantList<T> RemoveAll(T item);
 
     /// <summary>
-    /// Returns a copy of this instance where the given number of elements, starting at the given
-    /// index, have been removed.
+    /// Returns a new instance where the given number of element, starting from the given index,
+    /// have been removed from the original collection.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
@@ -249,31 +200,31 @@ public interface IInvariantList<T> : IEnumerable<T>, ICloneable
     IInvariantList<T> RemoveRange(int index, int count);
 
     /// <summary>
-    /// Returns a copy of this instance where the first ocurrence of an element that matches the
-    /// given predicate has been removed.
+    /// Returns a new instance where the first ocurrence of an element that matches the given
+    /// predicate has been removed from the original collection.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
     IInvariantList<T> Remove(Predicate<T> predicate);
 
     /// <summary>
-    /// Returns a copy of this instance where the first ocurrence of an element that matches the
-    /// given predicate has been removed.
+    /// Returns a new instance where the last ocurrence of an element that matches the given
+    /// predicate has been removed from the original collection.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
     IInvariantList<T> RemoveLast(Predicate<T> predicate);
 
     /// <summary>
-    /// Returns a copy of this instance where all the ocurrences of elements that match the given
-    /// predicate have been removed.
+    /// Returns a new instance where all the ocurrences of elements matching the given predicate
+    /// have been removed from the original collection.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
     IInvariantList<T> RemoveAll(Predicate<T> predicate);
 
     /// <summary>
-    /// Returns a copy of this instance where all the original elements have been removed.
+    /// Returns a new instance where all the original elements have been removed.
     /// </summary>
     /// <returns></returns>
     IInvariantList<T> Clear();

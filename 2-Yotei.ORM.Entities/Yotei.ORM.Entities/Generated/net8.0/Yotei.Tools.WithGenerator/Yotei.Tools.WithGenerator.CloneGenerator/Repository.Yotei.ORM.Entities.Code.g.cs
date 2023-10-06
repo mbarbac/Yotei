@@ -3,41 +3,62 @@
 
 using System;
 
-namespace Yotei.ORM.Core.Code
+namespace Yotei.ORM.Entities.Code
 {
-    partial class Connection
+    partial class Repository
     {
         /// <summary>
         /// Returns an instance of the hosting type where the value of the decorated member
         /// has been replaced by the new given one.
         /// </summary>
         /// <returns></returns>
-        public abstract Yotei.ORM.Core.Code.Connection
-        WithRetries(System.Int32 v_Retries);
+        public virtual Yotei.ORM.Entities.Code.Repository
+        WithRetries(System.Int32 v_Retries)
+        {
+            Retries = v_Retries;
+            return this;
+        }
         
         Yotei.ORM.Core.IConnection
         Yotei.ORM.Core.IConnection.WithRetries(System.Int32 value) => WithRetries(value);
         
+        Yotei.ORM.Entities.IRepository
+        Yotei.ORM.Entities.IRepository.WithRetries(System.Int32 value) => WithRetries(value);
+        
         /// <summary>
         /// Returns an instance of the hosting type where the value of the decorated member
         /// has been replaced by the new given one.
         /// </summary>
         /// <returns></returns>
-        public abstract Yotei.ORM.Core.Code.Connection
-        WithRetryInterval(System.TimeSpan v_RetryInterval);
+        public virtual Yotei.ORM.Entities.Code.Repository
+        WithRetryInterval(System.TimeSpan v_RetryInterval)
+        {
+            RetryInterval = v_RetryInterval;
+            return this;
+        }
         
         Yotei.ORM.Core.IConnection
         Yotei.ORM.Core.IConnection.WithRetryInterval(System.TimeSpan value) => WithRetryInterval(value);
         
+        Yotei.ORM.Entities.IRepository
+        Yotei.ORM.Entities.IRepository.WithRetryInterval(System.TimeSpan value) => WithRetryInterval(value);
+        
         /// <summary>
         /// Returns an instance of the hosting type where the value of the decorated member
         /// has been replaced by the new given one.
         /// </summary>
         /// <returns></returns>
-        public abstract Yotei.ORM.Core.Code.Connection
-        WithLocale(Yotei.Tools.Locale v_Locale);
+        public virtual Yotei.ORM.Entities.Code.Repository
+        WithLocale(Yotei.Tools.Locale v_Locale)
+        {
+            Locale = v_Locale;
+            return this;
+        }
         
         Yotei.ORM.Core.IConnection
         Yotei.ORM.Core.IConnection.WithLocale(Yotei.Tools.Locale value) => WithLocale(value);
+        
+        Yotei.ORM.Entities.IRepository
+        Yotei.ORM.Entities.IRepository.WithLocale(Yotei.Tools.Locale value) => WithLocale(value);
     }
 }

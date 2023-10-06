@@ -115,6 +115,11 @@ internal class XPropertyNode : PropertyNode
                 cb.AppendLine($"{Symbol.Name} = {valueName};");
                 cb.AppendLine($"return this;");
             }
+            else if (code == "base")
+            {
+                cb.AppendLine($"var {receiver} = base.{MethodName}({valueName});");
+                cb.AppendLine($"return ({Parent.Symbol.Name}){receiver};");
+            }
             else
             {
                 cb.AppendLine(code);

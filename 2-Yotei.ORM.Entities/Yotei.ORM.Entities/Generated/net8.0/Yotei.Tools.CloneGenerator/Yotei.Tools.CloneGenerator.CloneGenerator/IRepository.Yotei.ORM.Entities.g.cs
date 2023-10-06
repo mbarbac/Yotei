@@ -3,14 +3,14 @@
 
 using System;
 
-namespace Yotei.ORM.Core
+namespace Yotei.ORM.Entities
 {
-    partial interface IConnection
+    partial interface IRepository
     {
         /// <summary>
         /// <inheritdoc cref="ICloneable.Clone"/>
         /// </summary>
         /// <returns></returns>
-        IConnection Clone();
+        new IRepository Clone();
     }
 }

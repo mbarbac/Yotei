@@ -16,20 +16,20 @@ public partial interface IConnection : IBaseDisposable
     /// The number of times this instance tries to recover from a transient connection error.
     /// </summary>
     [WithGenerator]
-    int Retries { get; }
+    int Retries { get; set; }
 
     /// <summary>
     /// The amount of time this instance waits before a new attempt of recover from a transient
     /// connectivity error.
     /// </summary>
     [WithGenerator]
-    TimeSpan RetryInterval { get; }
+    TimeSpan RetryInterval { get; set; }
 
     /// <summary>
     /// The default locale used with culture-sensitive elements in the database.
     /// </summary>
     [WithGenerator]
-    Locale Locale { get; }
+    Locale Locale { get; set; }
 
     // ----------------------------------------------------
 

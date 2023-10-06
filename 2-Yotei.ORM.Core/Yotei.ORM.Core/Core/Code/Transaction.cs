@@ -4,7 +4,7 @@
 /// <summary>
 /// <inheritdoc cref="ITransaction"/>
 /// </summary>
-public abstract class Transaction : BaseDisposable, ITransaction
+public abstract class Transaction : DisposableClass, ITransaction
 {
     /// <summary>
     /// Initializes a new instance.

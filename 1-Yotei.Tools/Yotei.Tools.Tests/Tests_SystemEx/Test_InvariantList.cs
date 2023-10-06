@@ -1,13 +1,6 @@
 namespace Yotei.Tools.Tests;
 
 // ========================================================
-/// <summary>
-/// Base scenario:
-/// <br/>- Validation: not null elements.
-/// <br/>- Comparer: by name using the case sensitive settings.
-/// <br/>- Behavior: throw when duplicates.
-/// <br/>- Flatten: yes.
-/// </summary>
 //[Enforced]
 public static class Test_InvariantList
 {
@@ -20,52 +13,38 @@ public static class Test_InvariantList
     }
     public class ChainElement : InvariantList<IElement>, IElement
     {
-        public ChainElement(bool sensitive)
-        {
-            Validator = (item, _) => item.ThrowWhenNull();
-            Comparer = (x, y) => x is NameElement nx && y is NameElement ny
-                ? string.Compare(nx.Name, ny.Name, !CaseSensitive) == 0
-                : ReferenceEquals(x, y);
-            Behavior = CoreListBehavior.Throw;
-            Flatten = true;
-            CaseSensitive = sensitive;
-        }
-        public ChainElement(bool caseSensitive, IElement item) : this(caseSensitive) => AddInternal(item);
-        public ChainElement(bool caseSensitive, IEnumerable<IElement> range) : this(caseSensitive) => AddRangeInternal(range);
-        public override ChainElement Clone() => (ChainElement)base.Clone();
-        protected override ChainElement OnClone() => new(CaseSensitive)
-        {
-            Validator = Validator,
-            Behavior = Behavior,
-            Flatten = Flatten,
-        };
+        public ChainElement(bool sensitive) : base() => CaseSensitive = sensitive;
+        public ChainElement(bool sensitive, IElement item) : this(sensitive) => AddInternal(item);
+        public ChainElement(bool sensitive, IEnumerable<IElement> range) : this(sensitive) => AddRangeInternal(range);
+        public override ChainElement Clone() => new(CaseSensitive, (IEnumerable<IElement>)this);
+
         public bool CaseSensitive
         {
             get => _CaseSensitive;
-            init => WithCaseSensitiveInternal(value);
-        }
-        bool _CaseSensitive = default!;
-        public virtual ChainElement WithCaseSensitive(bool value)
-        {
-            var temp = Clone();
-            var done = temp.WithCaseSensitiveInternal(value);
-            return done ? temp : this;
-        }
-        protected bool WithCaseSensitiveInternal(bool value)
-        {
-            if (CaseSensitive == value) return false;
-
-            _CaseSensitive = value; if (Count > 0)
+            init
             {
+                if (_CaseSensitive == value) return;
+                _CaseSensitive = value;
+
                 var range = ToList();
                 ClearInternal();
                 AddRangeInternal(range);
             }
-            return true;
         }
+        bool _CaseSensitive = false;
+
+        protected override IElement Validate(IElement item, bool _) => item.ThrowWhenNull();
+        protected override bool Compare(IElement x, IElement y)
+            => x is NameElement nx && y is NameElement ny
+            ? string.Compare(nx.Name, ny.Name, !CaseSensitive) == 0
+            : ReferenceEquals(x, y);
+        protected override bool IgnoreDuplicate(IElement _) => false;
+        protected override void ThrowWhenDuplicate(IElement item)
+            => throw new DuplicateException("Duplicate item.").WithData(item);
+        protected override bool ExpandNested => true;
     }
 
-    // ====================================================
+    // ----------------------------------------------------
 
     readonly static NameElement XOne = new("one");
     readonly static NameElement XTwo = new("two");
@@ -134,41 +113,24 @@ public static class Test_InvariantList
     {
         var source = new ChainElement(false, new[] { XOne, XTwo, XThree });
         var target = source.Clone();
-
-        Assert.NotSame(source, target);
         Assert.Equal(source.CaseSensitive, target.CaseSensitive);
-        Assert.Same(source[0], target[0]);
-        Assert.Same(source[1], target[1]);
-        Assert.Same(source[2], target[2]);
-
-        source = new ChainElement(true, new[] { XOne, new NameElement("ONE") });
-        target = source.Clone();
-        Assert.NotSame(source, target);
-        Assert.Equal(source.CaseSensitive, target.CaseSensitive);
-        Assert.Same(source[0], target[0]);
-        Assert.Same(source[1], target[1]);
+        Assert.Same(XOne, target[0]);
+        Assert.Same(XTwo, target[1]);
+        Assert.Same(XThree, target[2]);
     }
 
     //[Enforced]
     [Fact]
     public static void Test_Change_Settings()
     {
-        var source = new ChainElement(false, new[] { XOne, XTwo, XThree });
-        var target = source.WithValidator((item, _) => item);
-        target = target.Add(null!);
-        Assert.Same(XOne, target[0]);
-        Assert.Same(XTwo, target[1]);
-        Assert.Same(XThree, target[2]);
-        Assert.Null(target[3]);
-
-        source = new ChainElement(true, new[] { XOne, new NameElement("ONE") });
-        target = source.WithBehavior(CoreListBehavior.Ignore);
-        target = target.Add(XOne);
-        Assert.Equal(2, target.Count);
-
-        source = new ChainElement(true, new[] { XOne, new NameElement("ONE") });
-        try { target = source.WithCaseSensitive(false); Assert.Fail(); }
-        catch (DuplicateException) { }
+        var source = new ChainElement(false, new[] { XOne, XTwo, XThree })
+        {
+            CaseSensitive = true
+        };
+        Assert.Equal(3, source.Count);
+        Assert.Same(XOne, source[0]);
+        Assert.Same(XTwo, source[1]);
+        Assert.Same(XThree, source[2]);
     }
 
     //[Enforced]
@@ -202,35 +164,6 @@ public static class Test_InvariantList
 
     //[Enforced]
     [Fact]
-    public static void Test_ReplaceItems_IgnoreDuplicates()
-    {
-        var source = new ChainElement(false, new[] { XOne, XTwo, XThree });
-        var target = source.WithBehavior(CoreListBehavior.Ignore);
-        Assert.NotSame(source, target);
-
-        target = target.ReplaceItem(0, new NameElement("THREE"));
-        Assert.NotSame(source, target);
-        Assert.Same(XOne, target[0]);
-        Assert.Same(XTwo, target[1]);
-        Assert.Same(XThree, target[2]);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_ReplaceItems_AddDuplicates()
-    {
-        var source = new ChainElement(false, new[] { XOne, XTwo, XThree });
-        var target = source.WithBehavior(CoreListBehavior.Add);
-
-        target = target.ReplaceItem(0, new NameElement("THREE"));
-        Assert.NotSame(source, target);
-        Assert.Equal("THREE", (((NameElement)target[0]).Name));
-        Assert.Same(XTwo, target[1]);
-        Assert.Same(XThree, target[2]);
-    }
-
-    //[Enforced]
-    [Fact]
     public static void Test_ReplaceItemsMany()
     {
         var source = new ChainElement(false, new[] { XOne, XTwo, XThree });
@@ -240,35 +173,6 @@ public static class Test_InvariantList
         Assert.NotSame(source, target);
         Assert.Same(XFour, target[0]);
         Assert.Same(XFive, target[1]);
-        Assert.Same(XTwo, target[2]);
-        Assert.Same(XThree, target[3]);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_ReplaceItemsMany_IgnoreDuplicates()
-    {
-        var source = new ChainElement(false, new[] { XOne, XTwo, XThree });
-        var other = new ChainElement(false, new[] { XTwo, new NameElement("THREE") });
-
-        var target = source.WithBehavior(CoreListBehavior.Ignore);
-        target = target.ReplaceItem(0, other);
-        Assert.Same(XOne, target[0]);
-        Assert.Same(XTwo, target[1]);
-        Assert.Same(XThree, target[2]);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_ReplaceItemsMany_AddDuplicates()
-    {
-        var source = new ChainElement(false, new[] { XOne, XTwo, XThree });
-        var other = new ChainElement(false, new[] { XTwo, new NameElement("THREE") });
-
-        var target = source.WithBehavior(CoreListBehavior.Add);
-        target = target.ReplaceItem(0, other);
-        Assert.Same(XTwo, target[0]);
-        Assert.Equal("THREE", ((NameElement)target[1]).Name);
         Assert.Same(XTwo, target[2]);
         Assert.Same(XThree, target[3]);
     }
@@ -293,33 +197,6 @@ public static class Test_InvariantList
 
     //[Enforced]
     [Fact]
-    public static void Test_Add_IgnoreDuplicates()
-    {
-        var source = new ChainElement(false, new[] { XOne, XTwo, XThree });
-        var target = source.WithBehavior(CoreListBehavior.Ignore);
-
-        target = target.Add(new NameElement("TWO"));
-        Assert.Same(XOne, target[0]);
-        Assert.Same(XTwo, target[1]);
-        Assert.Same(XThree, target[2]);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_Add_AddDuplicates()
-    {
-        var source = new ChainElement(false, new[] { XOne, XTwo, XThree });
-        var target = source.WithBehavior(CoreListBehavior.Add);
-
-        target = target.Add(new NameElement("TWO"));
-        Assert.Same(XOne, target[0]);
-        Assert.Same(XTwo, target[1]);
-        Assert.Same(XThree, target[2]);
-        Assert.Same("TWO", ((NameElement)target[3]).Name);
-    }
-
-    //[Enforced]
-    [Fact]
     public static void Test_AddMany()
     {
         var source = new ChainElement(false, new[] { XOne, XTwo, XThree });
@@ -336,39 +213,6 @@ public static class Test_InvariantList
 
     //[Enforced]
     [Fact]
-    public static void Test_AddMany_IgnoreDuplicates()
-    {
-        var source = new ChainElement(false, new[] { XOne, XTwo, XThree });
-        var target = source.WithBehavior(CoreListBehavior.Ignore);
-
-        var other = new ChainElement(false, new[] { XOne, XFour });
-        target = target.Add(other);
-        Assert.Equal(4, target.Count);
-        Assert.Same(XOne, target[0]);
-        Assert.Same(XTwo, target[1]);
-        Assert.Same(XThree, target[2]);
-        Assert.Same(XFour, target[3]);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_AddMany_AddDuplicates()
-    {
-        var source = new ChainElement(false, new[] { XOne, XTwo, XThree });
-        var target = source.WithBehavior(CoreListBehavior.Add);
-
-        var other = new ChainElement(false, new[] { XOne, XFour });
-        target = target.Add(other);
-        Assert.Equal(5, target.Count);
-        Assert.Same(XOne, target[0]);
-        Assert.Same(XTwo, target[1]);
-        Assert.Same(XThree, target[2]);
-        Assert.Same(XOne, target[3]);
-        Assert.Same(XFour, target[4]);
-    }
-
-    //[Enforced]
-    [Fact]
     public static void Test_AddRange()
     {
         var source = new ChainElement(false, new[] { XOne, XTwo, XThree });
@@ -379,37 +223,6 @@ public static class Test_InvariantList
         Assert.Same(XThree, target[2]);
         Assert.Same(XFour, target[3]);
         Assert.Same(XFive, target[4]);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_AddRange_IgnoreDuplicates()
-    {
-        var source = new ChainElement(false, new[] { XOne, XTwo, XThree });
-        var target = source.WithBehavior(CoreListBehavior.Ignore);
-
-        target = target.AddRange(new[] { XOne, XFour });
-        Assert.Equal(4, target.Count);
-        Assert.Same(XOne, target[0]);
-        Assert.Same(XTwo, target[1]);
-        Assert.Same(XThree, target[2]);
-        Assert.Same(XFour, target[3]);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_AddRange_AddDuplicates()
-    {
-        var source = new ChainElement(false, new[] { XOne, XTwo, XThree });
-        var target = source.WithBehavior(CoreListBehavior.Add);
-
-        target = target.AddRange(new[] { XOne, XFour });
-        Assert.Equal(5, target.Count);
-        Assert.Same(XOne, target[0]);
-        Assert.Same(XTwo, target[1]);
-        Assert.Same(XThree, target[2]);
-        Assert.Same(XOne, target[3]);
-        Assert.Same(XFour, target[4]);
     }
 
     //[Enforced]
@@ -430,35 +243,6 @@ public static class Test_InvariantList
 
     //[Enforced]
     [Fact]
-    public static void Test_Insert_IgnoreDuplicates()
-    {
-        var source = new ChainElement(false, new[] { XOne, XTwo, XThree });
-        var target = source.WithBehavior(CoreListBehavior.Ignore);
-
-        target = target.Insert(0, XThree);
-        Assert.Equal(3, target.Count);
-        Assert.Same(XOne, target[0]);
-        Assert.Same(XTwo, target[1]);
-        Assert.Same(XThree, target[2]);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_Insert_AddDuplicates()
-    {
-        var source = new ChainElement(false, new[] { XOne, XTwo, XThree });
-        var target = source.WithBehavior(CoreListBehavior.Add);
-
-        target = target.Insert(3, XThree);
-        Assert.Equal(4, target.Count);
-        Assert.Same(XOne, target[0]);
-        Assert.Same(XTwo, target[1]);
-        Assert.Same(XThree, target[2]);
-        Assert.Same(XThree, target[3]);
-    }
-
-    //[Enforced]
-    [Fact]
     public static void Test_InsertMany()
     {
         var source = new ChainElement(false, new[] { XOne, XTwo, XThree });
@@ -475,39 +259,6 @@ public static class Test_InvariantList
 
     //[Enforced]
     [Fact]
-    public static void Test_InsertMany_IgnoreDuplicates()
-    {
-        var source = new ChainElement(false, new[] { XOne, XTwo, XThree });
-        var target = source.WithBehavior(CoreListBehavior.Ignore);
-
-        var other = new ChainElement(false, new[] { XOne, XFour });
-        target = target.Insert(0, other);
-        Assert.Equal(4, target.Count);
-        Assert.Same(XFour, target[0]);
-        Assert.Same(XOne, target[1]);
-        Assert.Same(XTwo, target[2]);
-        Assert.Same(XThree, target[3]);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_InsertMany_AddDuplicates()
-    {
-        var source = new ChainElement(false, new[] { XOne, XTwo, XThree });
-        var target = source.WithBehavior(CoreListBehavior.Add);
-
-        var other = new ChainElement(false, new[] { XOne, XFour });
-        target = target.Insert(0, other);
-        Assert.Equal(5, target.Count);
-        Assert.Same(XOne, target[0]);
-        Assert.Same(XFour, target[1]);
-        Assert.Same(XOne, target[2]);
-        Assert.Same(XTwo, target[3]);
-        Assert.Same(XThree, target[4]);
-    }
-
-    //[Enforced]
-    [Fact]
     public static void Test_InsertRange()
     {
         var source = new ChainElement(false, new[] { XOne, XTwo, XThree });
@@ -515,37 +266,6 @@ public static class Test_InvariantList
         Assert.Equal(5, target.Count);
         Assert.Same(XFour, target[0]);
         Assert.Same(XFive, target[1]);
-        Assert.Same(XOne, target[2]);
-        Assert.Same(XTwo, target[3]);
-        Assert.Same(XThree, target[4]);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_InsertRange_IgnoreDuplicates()
-    {
-        var source = new ChainElement(false, new[] { XOne, XTwo, XThree });
-        var target = source.WithBehavior(CoreListBehavior.Ignore);
-
-        target = target.InsertRange(0, new[] { XOne, XFour });
-        Assert.Equal(4, target.Count);
-        Assert.Same(XFour, target[0]);
-        Assert.Same(XOne, target[1]);
-        Assert.Same(XTwo, target[2]);
-        Assert.Same(XThree, target[3]);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_InsertRange_AddDuplicates()
-    {
-        var source = new ChainElement(false, new[] { XOne, XTwo, XThree });
-        var target = source.WithBehavior(CoreListBehavior.Add);
-
-        target = target.InsertRange(0, new[] { XOne, XFour });
-        Assert.Equal(5, target.Count);
-        Assert.Same(XOne, target[0]);
-        Assert.Same(XFour, target[1]);
         Assert.Same(XOne, target[2]);
         Assert.Same(XTwo, target[3]);
         Assert.Same(XThree, target[4]);
