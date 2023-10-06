@@ -20,4 +20,7 @@ global using Yotei.Tools.Diagnostics;
 global using Yotei.Tools.CloneGenerator;
 global using Yotei.Tools.WithGenerator;
 
+global using Yotei.ORM.Core;
+global using Yotei.ORM.Core.Code;
+
 [assembly: InternalsVisibleTo("Yotei.ORM.Tests")]

@@ -128,6 +128,17 @@ public class IdentifierMultiPart : Identifier, IHost
     }
 
     /// <summary>
+    /// Reduces this instance to a simpler one, if such is possible.
+    /// </summary>
+    /// <returns></returns>
+    public override IIdentifier Reduce() => Count switch
+    {
+        0 => new IdentifierSinglePart(Engine),
+        1 => Items[0],
+        _ => this,
+    };
+
+    /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns><inheritdoc/></returns>

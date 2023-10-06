@@ -74,4 +74,10 @@ public class IdentifierSinglePart : Identifier, IIdentifierSinglePart
         get => _NonTerminatedValue;
         init => Value = value;
     }
+
+    /// <summary>
+    /// Reduces this instance to a simpler one, if such is possible.
+    /// </summary>
+    /// <returns></returns>
+    public override IIdentifier Reduce() => this;
 }

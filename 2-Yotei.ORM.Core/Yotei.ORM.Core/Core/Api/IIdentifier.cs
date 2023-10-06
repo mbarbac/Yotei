@@ -15,4 +15,10 @@ public interface IIdentifier
     /// The value carried by this identifier, or null if it is an empty or missed one.
     /// </summary>
     string? Value { get; }
+
+    /// <summary>
+    /// Reduces this instance to a simpler one, if such is possible.
+    /// </summary>
+    /// <returns></returns>
+    IIdentifier Reduce();
 }

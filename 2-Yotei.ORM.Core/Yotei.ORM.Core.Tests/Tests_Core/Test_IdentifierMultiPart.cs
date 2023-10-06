@@ -4,7 +4,7 @@ using TItem = Yotei.ORM.Core.Code.IdentifierSinglePart;
 namespace Yotei.ORM.Core.Tests;
 
 // ========================================================
-[Enforced]
+//[Enforced]
 public static class Test_IdentifierMultiPart
 {
     //[Enforced]
