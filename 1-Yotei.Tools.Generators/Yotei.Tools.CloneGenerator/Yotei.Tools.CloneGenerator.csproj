@@ -10,7 +10,7 @@
 
    <PropertyGroup>
 	  <Description>Yotei Tools Clone Methods Generator</Description>
-	  <Version>0.5.11-v0001</Version>
+	  <Version>0.5.12-v0001</Version>
 	  <Authors>mbarbac@hotmail.com</Authors>
 	  <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
 	  <IsPackable>true</IsPackable>

@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Yotei.ORM.Core.Code;
+﻿namespace Yotei.ORM.Core.Code;
 
 // ========================================================
 /// <summary>
