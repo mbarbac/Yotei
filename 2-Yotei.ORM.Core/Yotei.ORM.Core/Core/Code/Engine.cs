@@ -122,15 +122,11 @@ public partial class Engine : IEngine
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public string?[] GetParts(string? value)
+    public string[] GetDotted(string? value)
     {
         if (value == null) return [];
-
-        value = value.NullWhenEmpty();
-        if (value == null) return [null];
-
-        if (!UseTerminators)
-            return value.Split('.').Select(x => x.NullWhenEmpty()).ToArray();
+        if (!value.Contains('.')) return [value];
+        if (!UseTerminators) return value.Split('.');
 
         var dots = new List<int>();
         var deep = 0;
@@ -140,32 +136,23 @@ public partial class Engine : IEngine
             if (value[i] == RightTerminator) { deep--; if (deep < 0) deep = 0; continue; }
             if (value[i] == '.' && deep == 0) dots.Add(i);
         }
-
-        if (dots.Count == 0)
-        {
-            value = value.UnWrap(LeftTerminator, RightTerminator).NullWhenEmpty();
-            return [value];
-        }
+        if (dots.Count == 0) return [value];
 
         string? str;
         int len;
         var head = 0;
-        var items = new List<string?>();
+        var items = new List<string>();
 
         for (int i = 0; i < dots.Count; i++)
         {
             str = value[head..dots[i]];
-            str = str.UnWrap(LeftTerminator, RightTerminator).NullWhenEmpty();
             items.Add(str);
             head = dots[i] + 1;
         }
 
         len = value.Length - head;
         str = len == 0 ? string.Empty : value.Substring(dots[^1] + 1, len);
-        str = str.UnWrap(LeftTerminator, RightTerminator).NullWhenEmpty();
         items.Add(str);
-
-        if (items.Count == 0) items.Add(null);
         return items.ToArray();
     }
 }

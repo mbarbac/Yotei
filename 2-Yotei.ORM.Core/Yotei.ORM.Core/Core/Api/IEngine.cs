@@ -46,13 +46,15 @@ public partial interface IEngine
     bool UseTerminators { get; }
 
     /// <summary>
-    /// Determines the left terminator to use when wrapping database identifiers, if used.
+    /// Determines the left terminator to use when wrapping database identifiers, if terminators
+    /// are used.
     /// </summary>
     [WithGenerator]
     char LeftTerminator { get; }
 
     /// <summary>
-    /// Determines the right terminator to use when wrapping database identifiers, if used.
+    /// Determines the right terminator to use when wrapping database identifiers, if terminators
+    /// are used.
     /// </summary>
     [WithGenerator]
     char RightTerminator { get; }
@@ -61,11 +63,10 @@ public partial interface IEngine
 
     /// <summary>
     /// Splits the given source string into its dot-separated parts using the terminator rules
-    /// of this instance. The returned array is empty only if the source string was a null one.
-    /// Otherwise, each element contains the normalized part, not containing terminators, and
-    /// being null if it was empty after trimming.
+    /// of this instance. So, embedded dots are not taken into consideration if this engine uses
+    /// terminators. The returned array is empty only if the given value is a null one.
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    string?[] GetParts(string? value);
+    string[] GetDotted(string? value);
 }

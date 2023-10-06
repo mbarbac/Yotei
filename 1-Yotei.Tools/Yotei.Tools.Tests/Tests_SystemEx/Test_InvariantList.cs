@@ -14,8 +14,8 @@ public static class Test_InvariantList
     public class ChainElement : InvariantList<IElement>, IElement
     {
         public ChainElement(bool sensitive) : base() => CaseSensitive = sensitive;
-        public ChainElement(bool sensitive, IElement item) : this(sensitive) => AddInternal(item);
-        public ChainElement(bool sensitive, IEnumerable<IElement> range) : this(sensitive) => AddRangeInternal(range);
+        public ChainElement(bool sensitive, IElement item) : this(sensitive) => Items.Add(item);
+        public ChainElement(bool sensitive, IEnumerable<IElement> range) : this(sensitive) => Items.AddRange(range);
         public override ChainElement Clone() => new(CaseSensitive, (IEnumerable<IElement>)this);
 
         public bool CaseSensitive
@@ -27,8 +27,8 @@ public static class Test_InvariantList
                 _CaseSensitive = value;
 
                 var range = ToList();
-                ClearInternal();
-                AddRangeInternal(range);
+                Items.Clear();
+                Items.AddRange(range);
             }
         }
         bool _CaseSensitive = false;

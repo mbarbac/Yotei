@@ -63,119 +63,58 @@ public static class Test_Engine
 
     //[Enforced]
     [Fact]
-    public static void Test_GetParts_Null()
+    public static void Test_GetDotted_Null()
     {
         var engine = new FakeEngine();
-        string? source;
-        string?[] target;
-
-        source = null!;
-        target = engine.GetParts(source);
-        Assert.Empty(target);
+        var parts = engine.GetDotted(null);
+        Assert.Empty(parts);
     }
 
     //[Enforced]
     [Fact]
-    public static void Test_GetParts_Empty()
+    public static void Test_GetDotted_With_Terminators()
     {
         var engine = new FakeEngine();
-        string? source;
-        string?[] target;
+        var parts = engine.GetDotted(string.Empty);
+        Assert.Single(parts);
+        Assert.Equal(string.Empty, parts[0]);
 
-        source = string.Empty;
-        target = engine.GetParts(source);
-        Assert.Single(target);
-        Assert.Null(target[0]);
+        parts = engine.GetDotted(" ");
+        Assert.Single(parts);
+        Assert.Equal(" ", parts[0]);
 
-        source = " ";
-        target = engine.GetParts(source);
-        Assert.Single(target);
-        Assert.Null(target[0]);
+        parts = engine.GetDotted(" [ one.two ] ");
+        Assert.Single(parts);
+        Assert.Equal(" [ one.two ] ", parts[0]);
+
+        parts = engine.GetDotted(" [ one.two ] .[three] ");
+        Assert.Equal(2, parts.Length);
+        Assert.Equal(" [ one.two ] ", parts[0]);
+        Assert.Equal("[three] ", parts[1]);
     }
 
     //[Enforced]
     [Fact]
-    public static void Test_GetParts_Simple()
+    public static void Test_GetDotted_No_Terminators()
     {
-        var engine = new FakeEngine();
-        string? source;
-        string?[] target;
+        var engine = new FakeEngine() { UseTerminators = false };
+        var parts = engine.GetDotted(string.Empty);
+        Assert.Single(parts);
+        Assert.Equal(string.Empty, parts[0]);
 
-        source = " one ";
-        target = engine.GetParts(source);
-        Assert.Single(target);
-        Assert.Equal("one", target[0]);
+        parts = engine.GetDotted(" ");
+        Assert.Single(parts);
+        Assert.Equal(" ", parts[0]);
 
-        source = " one . two ";
-        target = engine.GetParts(source);
-        Assert.Equal(2, target.Length);
-        Assert.Equal("one", target[0]);
-        Assert.Equal("two", target[1]);
+        parts = engine.GetDotted(" [ one.two ] ");
+        Assert.Equal(2, parts.Length);
+        Assert.Equal(" [ one", parts[0]);
+        Assert.Equal("two ] ", parts[1]);
 
-        source = " one . . three ";
-        target = engine.GetParts(source);
-        Assert.Equal(3, target.Length);
-        Assert.Equal("one", target[0]);
-        Assert.Null(target[1]);
-        Assert.Equal("three", target[2]);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_GetParts_WithTerminators()
-    {
-        var engine = new FakeEngine();
-        string? source;
-        string?[] target;
-
-        source = " [ ] ";
-        target = engine.GetParts(source);
-        Assert.Single(target);
-        Assert.Null(target[0]);
-
-        source = " [ . ] ";
-        target = engine.GetParts(source);
-        Assert.Single(target);
-        Assert.Equal(".", target[0]);
-
-        source = " [ one.two ] ";
-        target = engine.GetParts(source);
-        Assert.Single(target);
-        Assert.Equal("one.two", target[0]);
-
-        source = " one . [ two.three ] ";
-        target = engine.GetParts(source);
-        Assert.Equal(2, target.Length);
-        Assert.Equal("one", target[0]);
-        Assert.Equal("two.three", target[1]);
-
-        source = " one . . [ three.four ] . five ";
-        target = engine.GetParts(source);
-        Assert.Equal(4, target.Length);
-        Assert.Equal("one", target[0]);
-        Assert.Null(target[1]);
-        Assert.Equal("three.four", target[2]);
-        Assert.Equal("five", target[3]);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_GetParts_WithTerminators_Embedded()
-    {
-        var engine = new FakeEngine();
-        string? source;
-        string?[] target;
-
-        source = " [ one [ two.three ] ] ";
-        target = engine.GetParts(source);
-        Assert.Single(target);
-        Assert.Equal("one [ two.three ]", target[0]);
-
-        source = " one . . [ three [ five.six ] ] ";
-        target = engine.GetParts(source);
-        Assert.Equal(3, target.Length);
-        Assert.Equal("one", target[0]);
-        Assert.Null(target[1]);
-        Assert.Equal("three [ five.six ]", target[2]);
+        parts = engine.GetDotted(" [ one.two ] .[three] ");
+        Assert.Equal(3, parts.Length);
+        Assert.Equal(" [ one", parts[0]);
+        Assert.Equal("two ] ", parts[1]);
+        Assert.Equal("[three] ", parts[2]);
     }
 }

@@ -191,7 +191,7 @@ public interface IInvariantList<T> : IEnumerable<T>, ICloneable
     IInvariantList<T> RemoveAll(T item);
 
     /// <summary>
-    /// Returns a new instance where the given number of element, starting from the given index,
+    /// Returns a new instance where the given number of elements, starting from the given index,
     /// have been removed from the original collection.
     /// </summary>
     /// <param name="index"></param>

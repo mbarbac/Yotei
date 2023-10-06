@@ -1,3 +1,6 @@
+using TItem = Yotei.ORM.Core.Code.IdentifierSinglePart;
+using IItem = Yotei.ORM.Core.IIdentifierSinglePart;
+
 namespace Yotei.ORM.Core.Tests;
 
 // ========================================================
@@ -8,30 +11,30 @@ public static class Test_IdentifierSinglePart
     [Fact]
     public static void Test_Create_WithTerminators_Empty()
     {
-        IIdentifierSinglePart item;
+        IItem item;
         var engine = new FakeEngine();
 
-        item = new IdentifierSinglePart(engine);
+        item = new TItem(engine);
         Assert.Null(item.Value);
         Assert.Null(item.NonTerminatedValue);
 
-        item = new IdentifierSinglePart(engine, null);
+        item = new TItem(engine, null);
         Assert.Null(item.Value);
         Assert.Null(item.NonTerminatedValue);
 
-        item = new IdentifierSinglePart(engine, string.Empty);
+        item = new TItem(engine, string.Empty);
         Assert.Null(item.Value);
         Assert.Null(item.NonTerminatedValue);
 
-        item = new IdentifierSinglePart(engine, " ");
+        item = new TItem(engine, " ");
         Assert.Null(item.Value);
         Assert.Null(item.NonTerminatedValue);
 
-        item = new IdentifierSinglePart(engine, " [ ] ");
+        item = new TItem(engine, " [ ] ");
         Assert.Null(item.Value);
         Assert.Null(item.NonTerminatedValue);
 
-        item = new IdentifierSinglePart(engine, " [ [ ] ] ");
+        item = new TItem(engine, " [ [ ] ] ");
         Assert.Null(item.Value);
         Assert.Null(item.NonTerminatedValue);
     }
@@ -40,68 +43,70 @@ public static class Test_IdentifierSinglePart
     [Fact]
     public static void Test_Create_WithTerminators_Populated()
     {
-        IIdentifierSinglePart item;
+        IItem item;
         var engine = new FakeEngine();
 
-        item = new IdentifierSinglePart(engine, "one");
+        item = new TItem(engine, "one");
         Assert.Equal("[one]", item.Value);
         Assert.Equal("one", item.NonTerminatedValue);
 
-        try { _ = new IdentifierSinglePart(engine, "one.two"); Assert.Fail(); }
+        try { _ = new TItem(engine, "one.two"); Assert.Fail(); }
         catch (ArgumentException) { }
 
-        item = new IdentifierSinglePart(engine, "one two");
+        item = new TItem(engine, "one two");
         Assert.Equal("[one two]", item.Value);
         Assert.Equal("one two", item.NonTerminatedValue);
 
-        item = new IdentifierSinglePart(engine, " [ one ] ");
+        item = new TItem(engine, " [ one ] ");
         Assert.Equal("[one]", item.Value);
         Assert.Equal("one", item.NonTerminatedValue);
 
-        item = new IdentifierSinglePart(engine, " [ [ one ] ] ");
+        item = new TItem(engine, " [ [ one ] ] ");
         Assert.Equal("[one]", item.Value);
         Assert.Equal("one", item.NonTerminatedValue);
 
-        item = new IdentifierSinglePart(engine, " [ one.two ] ");
+        item = new TItem(engine, " [ one.two ] ");
         Assert.Equal("[one.two]", item.Value);
         Assert.Equal("one.two", item.NonTerminatedValue);
 
-        item = new IdentifierSinglePart(engine, " [ one two ] ");
+        item = new TItem(engine, " [ one two ] ");
         Assert.Equal("[one two]", item.Value);
         Assert.Equal("one two", item.NonTerminatedValue);
 
-        item = new IdentifierSinglePart(engine, " [ one [ two.three ] ] ");
+        item = new TItem(engine, " [ one [ two.three ] ] ");
         Assert.Equal("[one [ two.three ]]", item.Value);
         Assert.Equal("one [ two.three ]", item.NonTerminatedValue);
     }
+
+    // ----------------------------------------------------
 
     //[Enforced]
     [Fact]
     public static void Test_Create_NoTerminators_Empty()
     {
-        IIdentifierSinglePart item;
+        IItem item;
         var engine = new FakeEngine { UseTerminators = false };
 
-        item = new IdentifierSinglePart(engine);
+        item = new TItem(engine);
         Assert.Null(item.Value);
         Assert.Null(item.NonTerminatedValue);
 
-        item = new IdentifierSinglePart(engine, null);
+        item = new TItem(engine, null);
         Assert.Null(item.Value);
         Assert.Null(item.NonTerminatedValue);
 
-        item = new IdentifierSinglePart(engine, string.Empty);
+        item = new TItem(engine, string.Empty);
         Assert.Null(item.Value);
         Assert.Null(item.NonTerminatedValue);
 
-        item = new IdentifierSinglePart(engine, " ");
+        item = new TItem(engine, " ");
         Assert.Null(item.Value);
         Assert.Null(item.NonTerminatedValue);
 
-        try { _ = new IdentifierSinglePart(engine, " [ ] "); Assert.Fail(); }
+        try { _ = new TItem(engine, " [ ] "); Assert.Fail(); }
         catch (ArgumentException) { }
 
-        try { _ = new IdentifierSinglePart(engine, " [ [ ] ] "); Assert.Fail(); }
+        try { _ = new TItem(engine, " [ [ ] ] "); Assert.Fail(); }
         catch (ArgumentException) { }
     }
 
@@ -109,36 +114,36 @@ public static class Test_IdentifierSinglePart
     [Fact]
     public static void Test_Create_NoTerminators_Populated()
     {
-        IIdentifierSinglePart item;
+        IItem item;
         var engine = new FakeEngine { UseTerminators = false };
 
-        item = new IdentifierSinglePart(engine, "one");
+        item = new TItem(engine, "one");
         Assert.Equal("one", item.Value);
         Assert.Equal("one", item.NonTerminatedValue);
 
-        try { _ = new IdentifierSinglePart(engine, "one.two"); Assert.Fail(); }
+        try { _ = new TItem(engine, "one.two"); Assert.Fail(); }
         catch (ArgumentException) { }
 
-        try { _ = new IdentifierSinglePart(engine, "one two"); Assert.Fail(); }
+        try { _ = new TItem(engine, "one two"); Assert.Fail(); }
         catch (ArgumentException) { }
 
-        item = new IdentifierSinglePart(engine, "[one]");
+        item = new TItem(engine, "[one]");
         Assert.Equal("[one]", item.Value);
         Assert.Equal("[one]", item.NonTerminatedValue);
 
-        try { _ = new IdentifierSinglePart(engine, "[one two]"); Assert.Fail(); }
+        try { _ = new TItem(engine, "[one two]"); Assert.Fail(); }
         catch (ArgumentException) { }
 
-        try { _ = new IdentifierSinglePart(engine, " [ [ one ] ] "); Assert.Fail(); }
+        try { _ = new TItem(engine, " [ [ one ] ] "); Assert.Fail(); }
         catch (ArgumentException) { }
 
-        try { _ = new IdentifierSinglePart(engine, " [ one.two ] "); Assert.Fail(); }
+        try { _ = new TItem(engine, " [ one.two ] "); Assert.Fail(); }
         catch (ArgumentException) { }
 
-        try { _ = new IdentifierSinglePart(engine, " [ one two ] "); Assert.Fail(); }
+        try { _ = new TItem(engine, " [ one two ] "); Assert.Fail(); }
         catch (ArgumentException) { }
 
-        try { _ = new IdentifierSinglePart(engine, " [ one [ two.three ] ] "); Assert.Fail(); }
+        try { _ = new TItem(engine, " [ one [ two.three ] ] "); Assert.Fail(); }
         catch (ArgumentException) { }
     }
 }

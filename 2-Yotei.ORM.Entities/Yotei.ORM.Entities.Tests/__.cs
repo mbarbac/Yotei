@@ -10,3 +10,5 @@ namespace Yotei.ORM.Entities.Tests;
 //    {
 //    }
 //}
+
+public interface IFake { }

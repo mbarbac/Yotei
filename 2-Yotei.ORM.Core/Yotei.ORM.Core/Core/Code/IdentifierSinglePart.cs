@@ -30,31 +30,39 @@ public class IdentifierSinglePart : Identifier, IIdentifierSinglePart
         get => _Value;
         init
         {
-            var parts = Engine.GetParts(value);
+            var parts = Engine.GetDotted(value);
             _Value = null;
             _NonTerminatedValue = null;
 
-            if (parts.Length > 1) throw new ArgumentException(
-                "Single-part identifiers cannot contain dot-separated parts.")
-                .WithData(value);
+            if (parts.Length == 0) return;
 
-            value = parts.Length == 0 ? null : parts[0];
-
-            if (value != null && !Engine.UseTerminators)
+            if (parts.Length == 1)
             {
-                if (value.Contains('.')) throw new ArgumentException(
-                    "Non-terminated identifiers cannot contain embedded dots.")
-                    .WithData(value);
+                if (Engine.UseTerminators) value = value.UnWrap(Engine.LeftTerminator, Engine.RightTerminator);
+                value = value.NullWhenEmpty();
 
-                if (value.Contains(' ')) throw new ArgumentException(
-                    "Non-terminated identifiers cannot contain embedded spaces.")
-                    .WithData(value);
+                if (value != null && !Engine.UseTerminators)
+                {
+                    if (value.Contains('.')) throw new ArgumentException(
+                        "Non-terminated identifiers cannot contain embedded dots.")
+                        .WithData(value);
+
+                    if (value.Contains(' ')) throw new ArgumentException(
+                        "Non-terminated identifiers cannot contain embedded spaces.")
+                        .WithData(value);
+                }
+
+                _NonTerminatedValue = value;
+                _Value = Engine.UseTerminators && value != null
+                    ? $"{Engine.LeftTerminator}{value}{Engine.RightTerminator}"
+                    : value;
+
+                return;
             }
 
-            _NonTerminatedValue = value;
-            _Value = Engine.UseTerminators && value != null
-                ? $"{Engine.LeftTerminator}{value}{Engine.RightTerminator}"
-                : value;
+            throw new ArgumentException(
+                "Single-part identifiers cannot contain dot-separated parts.")
+                .WithData(value);
         }
     }
 
