@@ -25,9 +25,9 @@ namespace Yotei.Tools.WithGenerator.Tests
                     var v_temp = new Persona()
                     {
                       FirstName = FirstName,
+                      LastName = LastName,
                       Age = v_Age,
                     };
-                    v_temp.LastName = LastName;
                     
                     return v_temp;
                 }
@@ -43,9 +43,9 @@ namespace Yotei.Tools.WithGenerator.Tests
                     var v_temp = new Persona()
                     {
                       FirstName = v_FirstName,
+                      LastName = LastName,
                       Age = Age,
                     };
-                    v_temp.LastName = LastName;
                     
                     return v_temp;
                 }
@@ -64,9 +64,9 @@ namespace Yotei.Tools.WithGenerator.Tests
                     var v_temp = new Persona()
                     {
                       FirstName = FirstName,
+                      LastName = v_LastName,
                       Age = Age,
                     };
-                    v_temp.LastName = v_LastName;
                     
                     return v_temp;
                 }

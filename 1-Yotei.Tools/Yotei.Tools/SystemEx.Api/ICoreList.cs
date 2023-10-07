@@ -70,7 +70,7 @@ public interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollection, IE
     /// <summary>
     /// Determines if this instance contains an element that matches the given predicate, or not.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="predicate"></param>
     /// <returns></returns>
     bool Contains(Predicate<T> predicate);
 
@@ -78,7 +78,7 @@ public interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollection, IE
     /// Returns the index of the first ocurrence of an element in this collection that matches
     /// the given predicate, or -1 if any can be found.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="predicate"></param>
     /// <returns></returns>
     int IndexOf(Predicate<T> predicate);
 
@@ -86,7 +86,7 @@ public interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollection, IE
     /// Returns the index of the last ocurrence of an element in this collection that matches
     /// the given predicate, or -1 if any can be found.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="predicate"></param>
     /// <returns></returns>
     int LastIndexOf(Predicate<T> predicate);
 

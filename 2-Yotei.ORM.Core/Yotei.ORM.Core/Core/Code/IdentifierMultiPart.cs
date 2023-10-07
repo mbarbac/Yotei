@@ -216,7 +216,7 @@ public class IdentifierMultiPart : Identifier, IHost
     {
         var parts = ValueToParts(value);
 
-        for (int i = parts.Length -1; i >= 0; i--)
+        for (int i = parts.Length - 1; i >= 0; i--)
         {
             var temp = LastIndexOf(parts[i]);
             if (temp >= 0) return temp;

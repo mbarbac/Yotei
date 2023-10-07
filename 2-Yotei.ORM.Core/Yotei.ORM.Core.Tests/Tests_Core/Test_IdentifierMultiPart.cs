@@ -109,6 +109,46 @@ public static class Test_IdentifierMultiPart
 
     //[Enforced]
     [Fact]
+    public static void Test_Find_No_CaseSensitive()
+    {
+        var sensitive = false;
+        var engine = new FakeEngine() { CaseSensitiveNames = sensitive };
+        var items = new THost(engine, new TItem(engine, "one"));
+        Assert.True(items.Contains("one"));
+        Assert.True(items.Contains("ONE"));
+
+        items = new THost(engine, "one");
+        Assert.True(items.Contains("one"));
+        Assert.True(items.Contains("ONE"));
+
+        items = new THost(engine, "one.two.three");
+        Assert.Equal(0, items.IndexOf("one")); Assert.Equal(0, items.IndexOf("ONE"));
+        Assert.Equal(1, items.IndexOf("two")); Assert.Equal(1, items.IndexOf("TWO"));
+        Assert.Equal(2, items.IndexOf("three")); Assert.Equal(2, items.IndexOf("THREE"));
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Find_CaseSensitive()
+    {
+        var sensitive = true;
+        var engine = new FakeEngine() { CaseSensitiveNames = sensitive };
+        var items = new THost(engine, new TItem(engine, "one"));
+        Assert.True(items.Contains("one"));
+        Assert.False(items.Contains("ONE"));
+
+        items = new THost(engine, "one");
+        Assert.True(items.Contains("one"));
+        Assert.False(items.Contains("ONE"));
+
+        items = new THost(engine, "one.two.three");
+        Assert.Equal(0, items.IndexOf("one")); Assert.Equal(-1, items.IndexOf("ONE"));
+        Assert.Equal(1, items.IndexOf("two")); Assert.Equal(-1, items.IndexOf("TWO"));
+        Assert.Equal(2, items.IndexOf("three")); Assert.Equal(-1, items.IndexOf("THREE"));
+    }
+
+    //[Enforced]
+    [Fact]
     public static void Test_Find()
     {
         var engine = new FakeEngine();
@@ -116,7 +156,7 @@ public static class Test_IdentifierMultiPart
 
         Assert.Equal(0, items.IndexOf("ONE"));
         Assert.Equal(2, items.LastIndexOf("ONE"));
-        
+
         var list = items.IndexesOf("ONE");
         Assert.Equal(2, list.Count);
         Assert.Equal(0, list[0]);
@@ -399,5 +439,27 @@ public static class Test_IdentifierMultiPart
         var target = source.RemoveAllValues("TWO");
         Assert.Equal(2, target.Count);
         Assert.Equal("[one].[three]", target.Value);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Reduce()
+    {
+        var engine = new FakeEngine();
+        var source = new THost(engine);
+        var target = source.Reduce();
+        Assert.NotSame(source, target);
+        Assert.IsType<TItem>(target);
+
+        source = new THost(engine, "one");
+        target = source.Reduce();
+        Assert.NotSame(source, target);
+        Assert.IsType<TItem>(target);
+
+        source = new THost(engine, "one.two");
+        target = source.Reduce();
+        Assert.Same(source, target);
     }
 }

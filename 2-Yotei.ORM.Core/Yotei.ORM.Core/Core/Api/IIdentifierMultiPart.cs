@@ -1,6 +1,5 @@
 ﻿using IHost = Yotei.ORM.Core.IIdentifierMultiPart;
 using IItem = Yotei.ORM.Core.IIdentifierSinglePart;
-
 namespace Yotei.ORM.Core;
 
 // ========================================================

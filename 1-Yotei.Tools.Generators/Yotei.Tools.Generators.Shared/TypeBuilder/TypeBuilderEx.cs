@@ -1,6 +1,4 @@
-﻿using System.Net.Mail;
-
-namespace Yotei.Tools.Generators;
+﻿namespace Yotei.Tools.Generators;
 
 // ========================================================
 internal partial class TypeBuilder
@@ -156,9 +154,21 @@ internal partial class TypeBuilder
                     if (error) Context.ErrorAmbiguousMatch(EnforcedMember?.Member ?? TypeSymbol, par.Name);
                     if (member == null) { valid = false; break; }
 
+                    var name = member.Name; if (EnforcedMember != null)
+                    {
+                        var match = MatchArgument(name, par, method, out error);
+                        if (error)
+                        {
+                            Context.ErrorAmbiguousMatch(EnforcedMember?.Member ?? TypeSymbol, name);
+                            valid = false;
+                            break;
+                        }
+                        if (match) name = EnforcedMember.ValueName;
+                    }
+
                     members.Add(member);
                     if (i > 0) sb.Append(", ");
-                    sb.Append(member.Name);
+                    sb.Append(name);
                 }
                 if (!valid) continue;
             }
@@ -171,7 +181,7 @@ internal partial class TypeBuilder
                 {
                     var par = method.Parameters[i];
                     var arg = Specs.Arguments[i];
-                    var match = MatchArgument(arg, par, method, out var error);
+                    var match = MatchArgument(arg.Name, par, method, out var error);
                     if (error) Context.ErrorAmbiguousMatch(EnforcedMember?.Member ?? TypeSymbol, arg.Name);
                     if (!match) { valid = false; break; }
 
@@ -242,52 +252,39 @@ internal partial class TypeBuilder
 
         // Generating code...
         var sb = new StringBuilder($"var {Receiver} = {code}");
-
-        if (!regular) // Constructors...
+        if (items.Count == 0) sb.AppendLine(";");
+        else
         {
-            var inits = items.Where(x => x.IsInit).ToList();
-            if (inits.Count > 0)
+            if (!regular) // Constructors...
             {
                 sb.AppendLine();
-                sb.AppendLine("{"); foreach (var init in inits)
+                sb.AppendLine("{"); foreach (var item in items)
                 {
-                    code = init.GetValue(EnforcedMember, out var used);
+                    code = item.GetValue(EnforcedMember, out var used);
                     if (used) EnforcedUsed = true;
 
-                    code = $"  {init.Member.Name} = {code},";
+                    code = $"  {item.Member.Name} = {code},";
                     sb.AppendLine(code);
-
-                    items.Remove(init);
                 }
                 sb.AppendLine("};");
             }
-            else sb.AppendLine(";");
-
-            foreach (var item in items)
+            else // Regular methods...
             {
-                code = item.GetValue(EnforcedMember, out var used);
-                if (used) EnforcedUsed = true;
-
-                code = $"{Receiver}.{item.Member.Name} = {code};";
-                sb.AppendLine(code);
-            }
-        }
-        else // Regular methods...
-        {
-            sb.AppendLine(";");
-            foreach (var item in items)
-            {
-                if (item.Property != null && item.IsInit)
+                sb.AppendLine(";");
+                foreach (var item in items)
                 {
-                    Context.ErrorInitOnly(item.Member);
-                    return null;
+                    if (item.IsInitOnly)
+                    {
+                        Context.ErrorInitOnly(item.Member);
+                        return null;
+                    }
+
+                    code = item.GetValue(EnforcedMember, out var used);
+                    if (used) EnforcedUsed = true;
+
+                    code = $"{Receiver}.{item.Member.Name} = {code};";
+                    sb.AppendLine(code);
                 }
-
-                code = item.GetValue(EnforcedMember, out var used);
-                if (used) EnforcedUsed = true;
-
-                code = $"{Receiver}.{item.Member.Name} = {code};";
-                sb.AppendLine(code);
             }
         }
 

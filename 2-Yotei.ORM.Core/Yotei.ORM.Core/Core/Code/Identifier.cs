@@ -19,38 +19,77 @@ public abstract class Identifier : IIdentifier
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
-    /// The engine this instance is associated with.
+    /// <inheritdoc/>
     /// </summary>
     public IEngine Engine { get; }
 
     /// <summary>
-    /// The value carried by this identifier, or null if it is an empty or missed one.
+    /// <inheritdoc/>
     /// </summary>
     public abstract string? Value { get; init; }
 
     /// <summary>
-    /// Reduces this instance to a simpler one, if such is possible.
+    /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
     public abstract IIdentifier Reduce();
 
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="target"></param>
+    /// <returns></returns>
+    public virtual bool Match(IIdentifier target)
+    {
+        ArgumentNullException.ThrowIfNull(target);
+
+        if (this is IIdentifierSinglePart sitem && target is IIdentifierSinglePart starget)
+        {
+            var vsource = sitem.NonTerminatedValue;
+            var vtarget = starget.NonTerminatedValue;
+
+            return vsource == null || vtarget == null
+                ? true
+                : string.Compare(vsource, vtarget, !Engine.CaseSensitiveNames) == 0;
+        }
+
+        var sources = GetArray(this);
+        var targets = GetArray(target);
+        var max = sources.Length > targets.Length ? sources.Length : targets.Length;
+
+        if (sources.Length < max) sources = sources.ResizeHead(max, new IdentifierSinglePart(Engine));
+        if (targets.Length < max) targets = targets.ResizeHead(max, new IdentifierSinglePart(target.Engine));
+
+        for (int i = max - 1; i >= 0; i--)
+        {
+            var vsource = sources[i].NonTerminatedValue; if (vsource == null) continue;
+            var vtarget = targets[i].NonTerminatedValue; if (vtarget == null) continue;
+
+            if (string.Compare(vsource, vtarget, !Engine.CaseSensitiveNames) != 0)
+                return false;
+        }
+        return true;
+
+        // Obtains an array from the given identifier...
+        static IIdentifierSinglePart[] GetArray(IIdentifier item) => item switch
+        {
+            IIdentifierSinglePart temp => [temp],
+            IIdentifierMultiPart temp => temp.ToArray(),
+            _ => throw new UnExpectedException("Invalid identifier type.").WithData(item)
+        };
+    }
+
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a single part instance if the given value was null, or a single-part one, or a
-    /// multipart instance otherwise.
+    /// Creates a new instance of the simpler possible form.
     /// </summary>
     /// <param name="engine"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static IIdentifier Create(IEngine engine, string? value)
+    public static IIdentifier Create(IEngine engine, string? value = null)
     {
         var items = new IdentifierMultiPart(engine, value);
-        return items.Count switch
-        {
-            0 => new IdentifierSinglePart(engine),
-            1 => items[0],
-            _ => items,
-        };
+        return items.Reduce();
     }
 }

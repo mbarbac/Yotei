@@ -21,4 +21,13 @@ public interface IIdentifier
     /// </summary>
     /// <returns></returns>
     IIdentifier Reduce();
+
+    /// <summary>
+    /// Determines if this instance matches the given target one, or not. Matching is performed
+    /// from right to left, comparing the non-termnated value of each part where empty or missed
+    /// ones are considered an implicit match.
+    /// </summary>
+    /// <param name="target"></param>
+    /// <returns></returns>
+    bool Match(IIdentifier target);
 }

@@ -23,9 +23,9 @@ namespace Yotei.Tools.CloneGenerator.Tests
                     var v_temp = new Persona(this)
                     {
                       FirstName = FirstName,
+                      LastName = LastName,
                       Age = Age,
                     };
-                    v_temp.LastName = LastName;
                     
                     return v_temp;
                 }

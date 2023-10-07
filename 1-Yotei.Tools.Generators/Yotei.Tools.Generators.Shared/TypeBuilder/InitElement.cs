@@ -23,7 +23,7 @@ internal class InitElement
     /// <returns></returns>
     public override string ToString() => Member.Name
         + (UseClone ? ":Clone" : string.Empty)
-        + (IsInit ? ":Init" : string.Empty);
+        + (IsInitOnly ? ":InitOnly" : string.Empty);
 
     /// <summary>
     /// The member this instance refers to.
@@ -38,11 +38,10 @@ internal class InitElement
     public bool UseClone { get; set; }
 
     /// <summary>
-    /// Determines if this instance can be used as a init element, or not.
+    /// Determines if this element is an init-only property, or not.
     /// </summary>
-    public bool IsInit
-        => Field != null
-        || (Property != null && Property.SetMethod != null && Property.SetMethod.IsInitOnly);
+    public bool IsInitOnly
+        => Property != null && Property.SetMethod != null && Property.SetMethod.IsInitOnly;
 
     /// <summary>
     /// Gets the code that represents the value of this init/set argument.

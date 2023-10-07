@@ -191,14 +191,14 @@ public class CoreList<T> : ICoreList<T>
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="predicate"></param>
     /// <returns></returns>
     public bool Contains(Predicate<T> predicate) => IndexOf(predicate) >= 0;
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="predicate"></param>
     /// <returns></returns>
     public int IndexOf(Predicate<T> predicate)
     {
@@ -215,7 +215,7 @@ public class CoreList<T> : ICoreList<T>
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="predicate"></param>
     /// <returns></returns>
     public int LastIndexOf(Predicate<T> predicate)
     {

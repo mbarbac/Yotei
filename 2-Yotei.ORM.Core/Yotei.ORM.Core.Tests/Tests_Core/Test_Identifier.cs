@@ -11,7 +11,7 @@ public static class Test_Identifier
         IIdentifierSinglePart spart;
 
         var engine = new FakeEngine();
-        var item = Identifier.Create(engine, null);
+        var item = Identifier.Create(engine);
         spart = Assert.IsAssignableFrom<IIdentifierSinglePart>(item);
         Assert.Null(spart.Value);
 
@@ -48,16 +48,18 @@ public static class Test_Identifier
 
     //[Enforced]
     [Fact]
-    public static void Test_Single_Match()
+    public static void Test_Match_Single_No_CaseSensitive()
     {
-        var engine = new FakeEngine();
-        var source = Identifier.Create(engine, null);
-        var target = Identifier.Create(engine, null);
+        var sensitive = false;
+        var engine = new FakeEngine() { CaseSensitiveNames = sensitive };
+
+        var source = Identifier.Create(engine);
+        var target = Identifier.Create(engine);
         Assert.True(source.Match(target));
         Assert.True(target.Match(source));
 
         source = Identifier.Create(engine, "one");
-        target = Identifier.Create(engine, null);
+        target = Identifier.Create(engine);
         Assert.True(source.Match(target));
         Assert.True(target.Match(source));
 
@@ -69,12 +71,23 @@ public static class Test_Identifier
 
     //[Enforced]
     [Fact]
-    public static void Test_Single_No_Match()
+    public static void Test_Match_Single_CaseSensitive()
     {
-        var engine = new FakeEngine();
+        var sensitive = true;
+        var engine = new FakeEngine() { CaseSensitiveNames = sensitive };
 
-        var source = Identifier.Create(engine, "one");
-        var target = Identifier.Create(engine, "two");
+        var source = Identifier.Create(engine);
+        var target = Identifier.Create(engine);
+        Assert.True(source.Match(target));
+        Assert.True(target.Match(source));
+
+        source = Identifier.Create(engine, "one");
+        target = Identifier.Create(engine);
+        Assert.True(source.Match(target));
+        Assert.True(target.Match(source));
+
+        source = Identifier.Create(engine, "one");
+        target = Identifier.Create(engine, "ONE");
         Assert.False(source.Match(target));
         Assert.False(target.Match(source));
     }
@@ -83,72 +96,76 @@ public static class Test_Identifier
 
     //[Enforced]
     [Fact]
-    public static void Test_Mixed_Match()
+    public static void Test_Match_Mixed_No_CaseSensitive()
     {
-        var engine = new FakeEngine();
+        var sensitive = false;
+        var engine = new FakeEngine() { CaseSensitiveNames = sensitive };
+
         var source = Identifier.Create(engine, "one");
         var target = Identifier.Create(engine, "..ONE");
         Assert.True(source.Match(target));
         Assert.True(target.Match(source));
 
         source = Identifier.Create(engine, "one");
-        target = Identifier.Create(engine, "two.ONE");
+        target = Identifier.Create(engine, "x.ONE");
         Assert.True(source.Match(target));
         Assert.True(target.Match(source));
 
         source = Identifier.Create(engine, ".one");
-        target = Identifier.Create(engine, "THREE.TWO.ONE");
+        target = Identifier.Create(engine, "x.y.ONE");
         Assert.True(source.Match(target));
         Assert.True(target.Match(source));
 
         source = Identifier.Create(engine, "two.one");
-        target = Identifier.Create(engine, "THREE.TWO.ONE");
+        target = Identifier.Create(engine, "x.TWO.ONE");
         Assert.True(source.Match(target));
         Assert.True(target.Match(source));
 
         source = Identifier.Create(engine, "two.one");
-        target = Identifier.Create(engine, "THREE..ONE");
+        target = Identifier.Create(engine, "x..ONE");
         Assert.True(source.Match(target));
         Assert.True(target.Match(source));
 
-        source = Identifier.Create(engine, "one.two.three");
-        target = Identifier.Create(engine, "ONE.TWO.");
+        source = Identifier.Create(engine, "three.two.one");
+        target = Identifier.Create(engine, "THREE.TWO.");
         Assert.True(source.Match(target));
         Assert.True(target.Match(source));
     }
 
     //[Enforced]
     [Fact]
-    public static void Test_Mixed_No_Match()
+    public static void Test_Match_Mixed_CaseSensitive()
     {
-        var engine = new FakeEngine();
+        var sensitive = true;
+        var engine = new FakeEngine() { CaseSensitiveNames = sensitive };
+
         var source = Identifier.Create(engine, "one");
-        var target = Identifier.Create(engine, "ONE.two");
+        var target = Identifier.Create(engine, "..ONE");
         Assert.False(source.Match(target));
         Assert.False(target.Match(source));
 
-        source = Identifier.Create(engine, "one.x");
-        target = Identifier.Create(engine, "one.two");
+        source = Identifier.Create(engine, "one");
+        target = Identifier.Create(engine, "x.ONE");
         Assert.False(source.Match(target));
         Assert.False(target.Match(source));
 
-        source = Identifier.Create(engine, "x.one");
-        target = Identifier.Create(engine, "two.one");
+        source = Identifier.Create(engine, ".one");
+        target = Identifier.Create(engine, "x.y.ONE");
         Assert.False(source.Match(target));
         Assert.False(target.Match(source));
 
-        source = Identifier.Create(engine, "one.two.three");
-        target = Identifier.Create(engine, "one.x.three");
+        source = Identifier.Create(engine, "two.one");
+        target = Identifier.Create(engine, "x.TWO.ONE");
         Assert.False(source.Match(target));
         Assert.False(target.Match(source));
 
-        source = Identifier.Create(engine, "one.two.three");
-        target = Identifier.Create(engine, "one.x.");
+        source = Identifier.Create(engine, "two.one");
+        target = Identifier.Create(engine, "x..ONE");
         Assert.False(source.Match(target));
         Assert.False(target.Match(source));
 
-        source = Identifier.Create(engine, "one.two.three");
-        target = Identifier.Create(engine, "x.three");
+        source = Identifier.Create(engine, "three.two.one");
+        target = Identifier.Create(engine, "THREE.TWO.");
         Assert.False(source.Match(target));
         Assert.False(target.Match(source));
     }

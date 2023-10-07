@@ -156,21 +156,21 @@ public class InvariantList<T> : IInvariantList<T>
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="predicate"></param>
     /// <returns></returns>
     public bool Contains(Predicate<T> predicate) => Items.Contains(predicate);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="predicate"></param>
     /// <returns></returns>
     public int IndexOf(Predicate<T> predicate) => Items.IndexOf(predicate);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="predicate"></param>
     /// <returns></returns>
     public int LastIndexOf(Predicate<T> predicate) => Items.LastIndexOf(predicate);
 

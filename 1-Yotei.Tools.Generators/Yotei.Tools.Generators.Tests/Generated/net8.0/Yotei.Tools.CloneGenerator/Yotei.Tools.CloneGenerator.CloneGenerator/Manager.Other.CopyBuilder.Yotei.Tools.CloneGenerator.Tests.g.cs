@@ -22,11 +22,11 @@ namespace Yotei.Tools.CloneGenerator.Tests
                 {
                     var v_temp = new Manager(this)
                     {
+                      LastName = LastName,
+                      Branch = Branch,
                       FirstName = FirstName,
                       Age = Age,
                     };
-                    v_temp.LastName = LastName;
-                    v_temp.Branch = Branch;
                     
                     return v_temp;
                 }
