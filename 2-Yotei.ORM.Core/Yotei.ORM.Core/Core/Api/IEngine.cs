@@ -1,8 +1,10 @@
-﻿namespace Yotei.ORM.Core;
+﻿using Yotei.ORM.Records;
+
+namespace Yotei.ORM.Core;
 
 // ========================================================
 /// <summary>
-/// Represents an underlying database engine.
+/// The immutable object that represents an underlying database engine.
 /// </summary>
 public partial interface IEngine
 {
@@ -58,6 +60,13 @@ public partial interface IEngine
     /// </summary>
     [WithGenerator]
     char RightTerminator { get; }
+
+    /// <summary>
+    /// The metadata tags that are well known to this instance, used to identify metadata contents
+    /// of the elements of records obtained from or persisted to the underlying database.
+    /// </summary>
+    [WithGenerator]
+    IKnownTags KnownTags { get; }
 
     // ----------------------------------------------------
 

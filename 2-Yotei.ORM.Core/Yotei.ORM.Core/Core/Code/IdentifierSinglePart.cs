@@ -4,7 +4,7 @@
 /// <summary>
 /// <inheritdoc cref="IIdentifierSinglePart"/>
 /// </summary>
-public class IdentifierSinglePart : Identifier, IIdentifierSinglePart
+public sealed class IdentifierSinglePart : Identifier, IIdentifierSinglePart
 {
     string? _Value = null;
     string? _NonTerminatedValue = null;

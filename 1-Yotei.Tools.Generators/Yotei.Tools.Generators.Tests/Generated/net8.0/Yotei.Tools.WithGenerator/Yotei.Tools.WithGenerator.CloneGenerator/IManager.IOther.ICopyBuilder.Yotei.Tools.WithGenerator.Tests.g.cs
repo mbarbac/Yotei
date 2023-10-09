@@ -18,6 +18,7 @@ namespace Yotei.Tools.WithGenerator.Tests
                 /// Returns an instance of the hosting type where the value of the decorated member
                 /// has been replaced by the new given one.
                 /// </summary>
+                /// <param name="v_Branch"></param>
                 /// <returns></returns>
                 Yotei.Tools.WithGenerator.Tests.ICopyBuilder.IOther.IManager
                 WithBranch(System.String v_Branch);
@@ -26,6 +27,7 @@ namespace Yotei.Tools.WithGenerator.Tests
                 /// Returns an instance of the hosting type where the value of the decorated member
                 /// has been replaced by the new given one.
                 /// </summary>
+                /// <param name="v_FirstName"></param>
                 /// <returns></returns>
                 new Yotei.Tools.WithGenerator.Tests.ICopyBuilder.IOther.IManager
                 WithFirstName(System.String v_FirstName);
@@ -34,6 +36,7 @@ namespace Yotei.Tools.WithGenerator.Tests
                 /// Returns an instance of the hosting type where the value of the decorated member
                 /// has been replaced by the new given one.
                 /// </summary>
+                /// <param name="v_LastName"></param>
                 /// <returns></returns>
                 new Yotei.Tools.WithGenerator.Tests.ICopyBuilder.IOther.IManager
                 WithLastName(System.String? v_LastName);

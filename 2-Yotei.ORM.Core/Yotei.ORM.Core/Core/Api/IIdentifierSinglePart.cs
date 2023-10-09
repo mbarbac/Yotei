@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// Represents a single-part database identifier.
+/// The immutable object that represents a single-part database identifier.
 /// </summary>
 public interface IIdentifierSinglePart : IIdentifier
 {

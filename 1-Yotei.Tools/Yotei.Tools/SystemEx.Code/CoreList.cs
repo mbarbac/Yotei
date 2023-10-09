@@ -281,7 +281,9 @@ public class CoreList<T> : ICoreList<T>
         var temp = IndexOf(item);
         if (temp == index) return 0;
 
-        var range = ToArray(); RemoveAt(index);
+        var range = ToArray();
+        RemoveAt(index);
+            
         var count = Insert(index, item);
         if (count == 0)
         {

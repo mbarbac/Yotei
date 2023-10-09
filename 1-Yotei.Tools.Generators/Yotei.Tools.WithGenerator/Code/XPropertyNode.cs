@@ -50,11 +50,12 @@ internal class XPropertyNode : PropertyNode
     /// <summary>
     /// Prints the appropriate documentation.
     /// </summary>
-    void PrintDocumentation(CodeBuilder cb) => cb.AppendLine($$"""
+    void PrintDocumentation(CodeBuilder cb, string name) => cb.AppendLine($$"""
         /// <summary>
         /// Returns an instance of the hosting type where the value of the decorated member
         /// has been replaced by the new given one.
         /// </summary>
+        /// <param name="{{name}}"></param>
         /// <returns></returns>
         """);
 
@@ -67,12 +68,12 @@ internal class XPropertyNode : PropertyNode
     {
         // Initiating...
         if (HasMethod(Parent.Symbol) != null) return;
-        PrintDocumentation(cb);
-
-        var modifiers = GetModifiers();
+        
         var valueName = $"v_{Symbol.Name}";
         var parentType = Parent.Symbol.FullyQualifiedName(addNullable: false);
         var memberType = Symbol.Type.FullyQualifiedName(addNullable: true);
+        var modifiers = GetModifiers();
+        PrintDocumentation(cb, valueName);
 
         // Interfaces...
         if (Parent.IsInterface)

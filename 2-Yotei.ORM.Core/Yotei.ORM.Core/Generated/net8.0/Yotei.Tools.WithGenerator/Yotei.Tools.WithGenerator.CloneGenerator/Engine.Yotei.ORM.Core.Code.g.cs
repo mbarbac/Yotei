@@ -11,6 +11,7 @@ namespace Yotei.ORM.Core.Code
         /// Returns an instance of the hosting type where the value of the decorated member
         /// has been replaced by the new given one.
         /// </summary>
+        /// <param name="v_CaseSensitiveNames"></param>
         /// <returns></returns>
         public virtual Yotei.ORM.Core.Code.Engine
         WithCaseSensitiveNames(System.Boolean v_CaseSensitiveNames)
@@ -18,13 +19,6 @@ namespace Yotei.ORM.Core.Code
             var v_temp = new Engine(this)
             {
               CaseSensitiveNames = v_CaseSensitiveNames,
-              NullValueLiteral = NullValueLiteral,
-              NativePaging = NativePaging,
-              ParameterPrefix = ParameterPrefix,
-              PositionalParameters = PositionalParameters,
-              UseTerminators = UseTerminators,
-              LeftTerminator = LeftTerminator,
-              RightTerminator = RightTerminator,
             };
             
             return v_temp;
@@ -37,20 +31,14 @@ namespace Yotei.ORM.Core.Code
         /// Returns an instance of the hosting type where the value of the decorated member
         /// has been replaced by the new given one.
         /// </summary>
+        /// <param name="v_NullValueLiteral"></param>
         /// <returns></returns>
         public virtual Yotei.ORM.Core.Code.Engine
         WithNullValueLiteral(System.String v_NullValueLiteral)
         {
             var v_temp = new Engine(this)
             {
-              CaseSensitiveNames = CaseSensitiveNames,
               NullValueLiteral = v_NullValueLiteral,
-              NativePaging = NativePaging,
-              ParameterPrefix = ParameterPrefix,
-              PositionalParameters = PositionalParameters,
-              UseTerminators = UseTerminators,
-              LeftTerminator = LeftTerminator,
-              RightTerminator = RightTerminator,
             };
             
             return v_temp;
@@ -63,20 +51,14 @@ namespace Yotei.ORM.Core.Code
         /// Returns an instance of the hosting type where the value of the decorated member
         /// has been replaced by the new given one.
         /// </summary>
+        /// <param name="v_NativePaging"></param>
         /// <returns></returns>
         public virtual Yotei.ORM.Core.Code.Engine
         WithNativePaging(System.Boolean v_NativePaging)
         {
             var v_temp = new Engine(this)
             {
-              CaseSensitiveNames = CaseSensitiveNames,
-              NullValueLiteral = NullValueLiteral,
               NativePaging = v_NativePaging,
-              ParameterPrefix = ParameterPrefix,
-              PositionalParameters = PositionalParameters,
-              UseTerminators = UseTerminators,
-              LeftTerminator = LeftTerminator,
-              RightTerminator = RightTerminator,
             };
             
             return v_temp;
@@ -89,20 +71,14 @@ namespace Yotei.ORM.Core.Code
         /// Returns an instance of the hosting type where the value of the decorated member
         /// has been replaced by the new given one.
         /// </summary>
+        /// <param name="v_ParameterPrefix"></param>
         /// <returns></returns>
         public virtual Yotei.ORM.Core.Code.Engine
         WithParameterPrefix(System.String v_ParameterPrefix)
         {
             var v_temp = new Engine(this)
             {
-              CaseSensitiveNames = CaseSensitiveNames,
-              NullValueLiteral = NullValueLiteral,
-              NativePaging = NativePaging,
               ParameterPrefix = v_ParameterPrefix,
-              PositionalParameters = PositionalParameters,
-              UseTerminators = UseTerminators,
-              LeftTerminator = LeftTerminator,
-              RightTerminator = RightTerminator,
             };
             
             return v_temp;
@@ -115,20 +91,14 @@ namespace Yotei.ORM.Core.Code
         /// Returns an instance of the hosting type where the value of the decorated member
         /// has been replaced by the new given one.
         /// </summary>
+        /// <param name="v_PositionalParameters"></param>
         /// <returns></returns>
         public virtual Yotei.ORM.Core.Code.Engine
         WithPositionalParameters(System.Boolean v_PositionalParameters)
         {
             var v_temp = new Engine(this)
             {
-              CaseSensitiveNames = CaseSensitiveNames,
-              NullValueLiteral = NullValueLiteral,
-              NativePaging = NativePaging,
-              ParameterPrefix = ParameterPrefix,
               PositionalParameters = v_PositionalParameters,
-              UseTerminators = UseTerminators,
-              LeftTerminator = LeftTerminator,
-              RightTerminator = RightTerminator,
             };
             
             return v_temp;
@@ -141,20 +111,14 @@ namespace Yotei.ORM.Core.Code
         /// Returns an instance of the hosting type where the value of the decorated member
         /// has been replaced by the new given one.
         /// </summary>
+        /// <param name="v_UseTerminators"></param>
         /// <returns></returns>
         public virtual Yotei.ORM.Core.Code.Engine
         WithUseTerminators(System.Boolean v_UseTerminators)
         {
             var v_temp = new Engine(this)
             {
-              CaseSensitiveNames = CaseSensitiveNames,
-              NullValueLiteral = NullValueLiteral,
-              NativePaging = NativePaging,
-              ParameterPrefix = ParameterPrefix,
-              PositionalParameters = PositionalParameters,
               UseTerminators = v_UseTerminators,
-              LeftTerminator = LeftTerminator,
-              RightTerminator = RightTerminator,
             };
             
             return v_temp;
@@ -167,20 +131,14 @@ namespace Yotei.ORM.Core.Code
         /// Returns an instance of the hosting type where the value of the decorated member
         /// has been replaced by the new given one.
         /// </summary>
+        /// <param name="v_LeftTerminator"></param>
         /// <returns></returns>
         public virtual Yotei.ORM.Core.Code.Engine
         WithLeftTerminator(System.Char v_LeftTerminator)
         {
             var v_temp = new Engine(this)
             {
-              CaseSensitiveNames = CaseSensitiveNames,
-              NullValueLiteral = NullValueLiteral,
-              NativePaging = NativePaging,
-              ParameterPrefix = ParameterPrefix,
-              PositionalParameters = PositionalParameters,
-              UseTerminators = UseTerminators,
               LeftTerminator = v_LeftTerminator,
-              RightTerminator = RightTerminator,
             };
             
             return v_temp;
@@ -193,19 +151,13 @@ namespace Yotei.ORM.Core.Code
         /// Returns an instance of the hosting type where the value of the decorated member
         /// has been replaced by the new given one.
         /// </summary>
+        /// <param name="v_RightTerminator"></param>
         /// <returns></returns>
         public virtual Yotei.ORM.Core.Code.Engine
         WithRightTerminator(System.Char v_RightTerminator)
         {
             var v_temp = new Engine(this)
             {
-              CaseSensitiveNames = CaseSensitiveNames,
-              NullValueLiteral = NullValueLiteral,
-              NativePaging = NativePaging,
-              ParameterPrefix = ParameterPrefix,
-              PositionalParameters = PositionalParameters,
-              UseTerminators = UseTerminators,
-              LeftTerminator = LeftTerminator,
               RightTerminator = v_RightTerminator,
             };
             
@@ -214,5 +166,25 @@ namespace Yotei.ORM.Core.Code
         
         Yotei.ORM.Core.IEngine
         Yotei.ORM.Core.IEngine.WithRightTerminator(System.Char value) => WithRightTerminator(value);
+        
+        /// <summary>
+        /// Returns an instance of the hosting type where the value of the decorated member
+        /// has been replaced by the new given one.
+        /// </summary>
+        /// <param name="v_KnownTags"></param>
+        /// <returns></returns>
+        public virtual Yotei.ORM.Core.Code.Engine
+        WithKnownTags(Yotei.ORM.Records.IKnownTags v_KnownTags)
+        {
+            var v_temp = new Engine(this)
+            {
+              KnownTags = v_KnownTags,
+            };
+            
+            return v_temp;
+        }
+        
+        Yotei.ORM.Core.IEngine
+        Yotei.ORM.Core.IEngine.WithKnownTags(Yotei.ORM.Records.IKnownTags value) => WithKnownTags(value);
     }
 }

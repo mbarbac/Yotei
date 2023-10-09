@@ -7,12 +7,12 @@ namespace Yotei.ORM.Core.Code;
 /// <summary>
 /// <inheritdoc cref="IHost"/>
 /// </summary>
-public class IdentifierMultiPart : Identifier, IHost
+public sealed class IdentifierMultiPart : Identifier, IHost
 {
     /// <summary>
     /// Represents an internal surrogate collection of elements.
     /// </summary>
-    protected class Surrogate : CoreList<IItem>
+    class Surrogate : CoreList<IItem>
     {
         public Surrogate(IHost master) => Master = master;
         readonly IHost Master;
@@ -42,7 +42,7 @@ public class IdentifierMultiPart : Identifier, IHost
     /// <summary>
     /// The internal surrogate collection of elements.
     /// </summary>
-    protected Surrogate Items { get; }
+    Surrogate Items { get; }
 
     // ----------------------------------------------------
 
@@ -77,11 +77,10 @@ public class IdentifierMultiPart : Identifier, IHost
         => AddValueInternal(value);
 
     /// <summary>
-    /// <inheritdoc cref="IHost.Clone"/>
+    /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual IdentifierMultiPart Clone() => new(Engine, this);
-    IHost IHost.Clone() => Clone();
+    public override string ToString() => Items.ToString();
 
     // ----------------------------------------------------
 
@@ -292,12 +291,18 @@ public class IdentifierMultiPart : Identifier, IHost
     // ----------------------------------------------------
 
     /// <summary>
+    /// Invoked to obtain a clone of this instance.
+    /// </summary>
+    /// <returns></returns>
+    IdentifierMultiPart Clone() => new(Engine, this);
+
+    /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual IHost GetRange(int index, int count)
+    public IHost GetRange(int index, int count)
     {
         if (count > 0)
         {
@@ -316,7 +321,7 @@ public class IdentifierMultiPart : Identifier, IHost
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IHost ReplaceItem(int index, IItem item)
+    public IHost ReplaceItem(int index, IItem item)
     {
         var temp = Clone();
         var done = temp.Items.ReplaceItem(index, item);
@@ -329,13 +334,13 @@ public class IdentifierMultiPart : Identifier, IHost
     /// <param name="index"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public virtual IHost ReplaceValue(int index, string? value)
+    public IHost ReplaceValue(int index, string? value)
     {
         var temp = Clone();
         var done = temp.ReplaceValueInternal(index, value);
         return done == 0 ? this : temp;
     }
-    protected int ReplaceValueInternal(int index, string? value)
+    int ReplaceValueInternal(int index, string? value)
     {
         var parts = ValueToParts(value);
 
@@ -356,7 +361,7 @@ public class IdentifierMultiPart : Identifier, IHost
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IHost Add(IItem item)
+    public IHost Add(IItem item)
     {
         var temp = Clone();
         var done = temp.Items.Add(item);
@@ -368,13 +373,13 @@ public class IdentifierMultiPart : Identifier, IHost
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public virtual IHost AddValue(string? value)
+    public IHost AddValue(string? value)
     {
         var temp = Clone();
         var done = temp.AddValueInternal(value);
         return done == 0 ? this : temp;
     }
-    protected int AddValueInternal(string? value)
+    int AddValueInternal(string? value)
     {
         var parts = ValueToParts(value);
 
@@ -387,7 +392,7 @@ public class IdentifierMultiPart : Identifier, IHost
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual IHost AddRange(IEnumerable<IItem> range)
+    public IHost AddRange(IEnumerable<IItem> range)
     {
         var temp = Clone();
         var done = temp.Items.AddRange(range);
@@ -399,13 +404,13 @@ public class IdentifierMultiPart : Identifier, IHost
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual IHost AddValueRange(IEnumerable<string?> range)
+    public IHost AddValueRange(IEnumerable<string?> range)
     {
         var temp = Clone();
         var done = temp.AddValueRangeInternal(range);
         return done == 0 ? this : temp;
     }
-    protected int AddValueRangeInternal(IEnumerable<string?> range)
+    int AddValueRangeInternal(IEnumerable<string?> range)
     {
         ArgumentNullException.ThrowIfNull(range);
 
@@ -423,7 +428,7 @@ public class IdentifierMultiPart : Identifier, IHost
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IHost Insert(int index, IItem item)
+    public IHost Insert(int index, IItem item)
     {
         var temp = Clone();
         var done = temp.Items.Insert(index, item);
@@ -436,13 +441,13 @@ public class IdentifierMultiPart : Identifier, IHost
     /// <param name="index"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public virtual IHost InsertValue(int index, string? value)
+    public IHost InsertValue(int index, string? value)
     {
         var temp = Clone();
         var done = temp.InsertValueInternal(index, value);
         return done == 0 ? this : temp;
     }
-    protected int InsertValueInternal(int index, string? value)
+    int InsertValueInternal(int index, string? value)
     {
         var parts = ValueToParts(value);
 
@@ -461,7 +466,7 @@ public class IdentifierMultiPart : Identifier, IHost
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual IHost InsertRange(int index, IEnumerable<IItem> range)
+    public IHost InsertRange(int index, IEnumerable<IItem> range)
     {
         var temp = Clone();
         var done = temp.Items.InsertRange(index, range);
@@ -474,13 +479,13 @@ public class IdentifierMultiPart : Identifier, IHost
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual IHost InsertValueRange(int index, IEnumerable<string?> range)
+    public IHost InsertValueRange(int index, IEnumerable<string?> range)
     {
         var temp = Clone();
         var done = temp.InsertValueRangeInternal(index, range);
         return done == 0 ? this : temp;
     }
-    protected int InsertValueRangeInternal(int index, IEnumerable<string?> range)
+    int InsertValueRangeInternal(int index, IEnumerable<string?> range)
     {
         ArgumentNullException.ThrowIfNull(range);
 
@@ -502,7 +507,7 @@ public class IdentifierMultiPart : Identifier, IHost
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public virtual IHost RemoveAt(int index)
+    public IHost RemoveAt(int index)
     {
         var temp = Clone();
         var done = temp.Items.RemoveAt(index);
@@ -514,7 +519,7 @@ public class IdentifierMultiPart : Identifier, IHost
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IHost Remove(IItem item)
+    public IHost Remove(IItem item)
     {
         var temp = Clone();
         var done = temp.Items.Remove(item);
@@ -526,13 +531,13 @@ public class IdentifierMultiPart : Identifier, IHost
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public virtual IHost RemoveValue(string? value)
+    public IHost RemoveValue(string? value)
     {
         var temp = Clone();
         var done = temp.RemoveValueInternal(value);
         return done == 0 ? this : temp;
     }
-    protected int RemoveValueInternal(string? value)
+    int RemoveValueInternal(string? value)
     {
         var parts = ValueToParts(value);
 
@@ -545,7 +550,7 @@ public class IdentifierMultiPart : Identifier, IHost
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IHost RemoveLast(IItem item)
+    public IHost RemoveLast(IItem item)
     {
         var temp = Clone();
         var done = temp.Items.RemoveLast(item);
@@ -557,13 +562,13 @@ public class IdentifierMultiPart : Identifier, IHost
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public virtual IHost RemoveLastValue(string? value)
+    public IHost RemoveLastValue(string? value)
     {
         var temp = Clone();
         var done = temp.RemoveLastValueInternal(value);
         return done == 0 ? this : temp;
     }
-    protected int RemoveLastValueInternal(string? value)
+    int RemoveLastValueInternal(string? value)
     {
         var parts = ValueToParts(value);
 
@@ -576,7 +581,7 @@ public class IdentifierMultiPart : Identifier, IHost
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IHost RemoveAll(IItem item)
+    public IHost RemoveAll(IItem item)
     {
         var temp = Clone();
         var done = temp.Items.RemoveAll(item);
@@ -588,13 +593,13 @@ public class IdentifierMultiPart : Identifier, IHost
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public virtual IHost RemoveAllValues(string? value)
+    public IHost RemoveAllValues(string? value)
     {
         var temp = Clone();
         var done = temp.RemoveAllValuesInternal(value);
         return done == 0 ? this : temp;
     }
-    protected int RemoveAllValuesInternal(string? value)
+    int RemoveAllValuesInternal(string? value)
     {
         var parts = ValueToParts(value);
 
@@ -608,7 +613,7 @@ public class IdentifierMultiPart : Identifier, IHost
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual IHost RemoveRange(int index, int count)
+    public IHost RemoveRange(int index, int count)
     {
         var temp = Clone();
         var done = temp.Items.RemoveRange(index, count);
@@ -620,7 +625,7 @@ public class IdentifierMultiPart : Identifier, IHost
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IHost Remove(Predicate<IItem> predicate)
+    public IHost Remove(Predicate<IItem> predicate)
     {
         var temp = Clone();
         var done = temp.Items.Remove(predicate);
@@ -632,7 +637,7 @@ public class IdentifierMultiPart : Identifier, IHost
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IHost RemoveLast(Predicate<IItem> predicate)
+    public IHost RemoveLast(Predicate<IItem> predicate)
     {
         var temp = Clone();
         var done = temp.Items.RemoveLast(predicate);
@@ -644,7 +649,7 @@ public class IdentifierMultiPart : Identifier, IHost
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IHost RemoveAll(Predicate<IItem> predicate)
+    public IHost RemoveAll(Predicate<IItem> predicate)
     {
         var temp = Clone();
         var done = temp.Items.RemoveAll(predicate);
@@ -655,7 +660,7 @@ public class IdentifierMultiPart : Identifier, IHost
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual IHost Clear()
+    public IHost Clear()
     {
         var temp = Clone();
         var done = temp.Items.Clear();

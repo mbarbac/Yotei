@@ -18,6 +18,14 @@ public static class Test_Engine
         Assert.Equal(Engine.USETERMINATORS, engine.UseTerminators);
         Assert.Equal(Engine.LEFTERMINATOR, engine.LeftTerminator);
         Assert.Equal(Engine.RIGHTTERMINATOR, engine.RightTerminator);
+
+        Assert.Equal(3, engine.KnownTags.IdentifierTags.Count);
+        Assert.Equal("SchemaTag", engine.KnownTags.IdentifierTags[0]);
+        Assert.Equal("TableTag", engine.KnownTags.IdentifierTags[1]);
+        Assert.Equal("ColumnTag", engine.KnownTags.IdentifierTags[2]);
+        Assert.Equal("PrimaryTag", engine.KnownTags.PrimaryKeyTag);
+        Assert.Equal("UniqueTag", engine.KnownTags.UniqueValuedTag);
+        Assert.Equal("ReadOnlyTag", engine.KnownTags.ReadOnlyTag);
     }
 
     //[Enforced]

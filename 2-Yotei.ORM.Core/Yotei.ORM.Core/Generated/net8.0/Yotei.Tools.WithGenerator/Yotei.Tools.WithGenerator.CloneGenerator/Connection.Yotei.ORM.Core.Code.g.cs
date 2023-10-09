@@ -11,6 +11,7 @@ namespace Yotei.ORM.Core.Code
         /// Returns an instance of the hosting type where the value of the decorated member
         /// has been replaced by the new given one.
         /// </summary>
+        /// <param name="v_Retries"></param>
         /// <returns></returns>
         public abstract Yotei.ORM.Core.Code.Connection
         WithRetries(System.Int32 v_Retries);
@@ -22,6 +23,7 @@ namespace Yotei.ORM.Core.Code
         /// Returns an instance of the hosting type where the value of the decorated member
         /// has been replaced by the new given one.
         /// </summary>
+        /// <param name="v_RetryInterval"></param>
         /// <returns></returns>
         public abstract Yotei.ORM.Core.Code.Connection
         WithRetryInterval(System.TimeSpan v_RetryInterval);
@@ -33,6 +35,7 @@ namespace Yotei.ORM.Core.Code
         /// Returns an instance of the hosting type where the value of the decorated member
         /// has been replaced by the new given one.
         /// </summary>
+        /// <param name="v_Locale"></param>
         /// <returns></returns>
         public abstract Yotei.ORM.Core.Code.Connection
         WithLocale(Yotei.Tools.Locale v_Locale);

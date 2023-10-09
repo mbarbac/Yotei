@@ -18,6 +18,7 @@ namespace Yotei.Tools.WithGenerator.Tests
                 /// Returns an instance of the hosting type where the value of the decorated member
                 /// has been replaced by the new given one.
                 /// </summary>
+                /// <param name="v_FirstName"></param>
                 /// <returns></returns>
                 Yotei.Tools.WithGenerator.Tests.ICopyBuilder.IOther.IPersona
                 WithFirstName(System.String v_FirstName);
@@ -26,6 +27,7 @@ namespace Yotei.Tools.WithGenerator.Tests
                 /// Returns an instance of the hosting type where the value of the decorated member
                 /// has been replaced by the new given one.
                 /// </summary>
+                /// <param name="v_LastName"></param>
                 /// <returns></returns>
                 Yotei.Tools.WithGenerator.Tests.ICopyBuilder.IOther.IPersona
                 WithLastName(System.String? v_LastName);

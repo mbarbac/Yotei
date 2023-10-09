@@ -4,16 +4,10 @@ namespace Yotei.ORM.Core;
 
 // ========================================================
 /// <summary>
-/// Represents a multi-part database identifier.
+/// The immutable object that represents a multi-part database identifier.
 /// </summary>
 public interface IIdentifierMultiPart : IIdentifier, IEnumerable<IItem>
 {
-    /// <summary>
-    /// <inheritdoc cref="IHost.Clone"/>
-    /// </summary>
-    /// <returns></returns>
-    IHost Clone();
-
     /// <summary>
     /// Gets the number of elements in this instance.
     /// </summary>

@@ -39,7 +39,7 @@ public abstract class Identifier : IIdentifier
     /// </summary>
     /// <param name="target"></param>
     /// <returns></returns>
-    public virtual bool Match(IIdentifier target)
+    public bool Match(IIdentifier target)
     {
         ArgumentNullException.ThrowIfNull(target);
 

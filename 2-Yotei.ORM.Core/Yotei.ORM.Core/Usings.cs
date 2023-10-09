@@ -22,5 +22,7 @@ global using Yotei.Tools.WithGenerator;
 
 global using Yotei.ORM.Core;
 global using Yotei.ORM.Core.Code;
+global using Yotei.ORM.Records;
+global using Yotei.ORM.Records.Code;
 
 [assembly: InternalsVisibleTo("Yotei.ORM.Tests")]

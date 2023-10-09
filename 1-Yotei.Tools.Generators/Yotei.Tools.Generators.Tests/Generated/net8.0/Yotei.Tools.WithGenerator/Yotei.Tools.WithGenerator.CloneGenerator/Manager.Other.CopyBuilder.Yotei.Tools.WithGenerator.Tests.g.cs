@@ -18,6 +18,7 @@ namespace Yotei.Tools.WithGenerator.Tests
                 /// Returns an instance of the hosting type where the value of the decorated member
                 /// has been replaced by the new given one.
                 /// </summary>
+                /// <param name="v_Age"></param>
                 /// <returns></returns>
                 public override Yotei.Tools.WithGenerator.Tests.CopyBuilder.Other.Manager
                 WithAge(System.Int32 v_Age)
@@ -37,6 +38,7 @@ namespace Yotei.Tools.WithGenerator.Tests
                 /// Returns an instance of the hosting type where the value of the decorated member
                 /// has been replaced by the new given one.
                 /// </summary>
+                /// <param name="v_Branch"></param>
                 /// <returns></returns>
                 public virtual Yotei.Tools.WithGenerator.Tests.CopyBuilder.Other.Manager
                 WithBranch(System.String v_Branch)
@@ -59,6 +61,7 @@ namespace Yotei.Tools.WithGenerator.Tests
                 /// Returns an instance of the hosting type where the value of the decorated member
                 /// has been replaced by the new given one.
                 /// </summary>
+                /// <param name="v_FirstName"></param>
                 /// <returns></returns>
                 public override Yotei.Tools.WithGenerator.Tests.CopyBuilder.Other.Manager
                 WithFirstName(System.String v_FirstName)
@@ -84,6 +87,7 @@ namespace Yotei.Tools.WithGenerator.Tests
                 /// Returns an instance of the hosting type where the value of the decorated member
                 /// has been replaced by the new given one.
                 /// </summary>
+                /// <param name="v_LastName"></param>
                 /// <returns></returns>
                 public override Yotei.Tools.WithGenerator.Tests.CopyBuilder.Other.Manager
                 WithLastName(System.String? v_LastName)

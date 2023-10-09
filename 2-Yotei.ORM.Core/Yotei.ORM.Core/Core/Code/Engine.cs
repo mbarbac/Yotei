@@ -4,7 +4,6 @@
 /// <summary>
 /// <inheritdoc cref="IEngine"/>
 /// </summary>
-[WithGenerator("(source)+*")]
 public partial class Engine : IEngine
 {
     public const bool CASESENSITIVENAMES = false;
@@ -39,6 +38,7 @@ public partial class Engine : IEngine
         UseTerminators = source.UseTerminators;
         LeftTerminator = source.LeftTerminator;
         RightTerminator = source.RightTerminator;
+        KnownTags = source.KnownTags;
     }
 
     /// <summary>
@@ -50,11 +50,13 @@ public partial class Engine : IEngine
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    [WithGenerator("(source)+CaseSensitiveNames")]
     public bool CaseSensitiveNames { get; init; } = CASESENSITIVENAMES;
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    [WithGenerator("(source)+NullValueLiteral")]
     public string NullValueLiteral
     {
         get => _NullValueLiteral;
@@ -65,11 +67,13 @@ public partial class Engine : IEngine
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    [WithGenerator("(source)+NativePaging")]
     public bool NativePaging { get; init; } = NATIVEPAGING;
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    [WithGenerator("(source)+ParameterPrefix")]
     public string ParameterPrefix
     {
         get => _ParameterPrefix;
@@ -80,11 +84,13 @@ public partial class Engine : IEngine
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    [WithGenerator("(source)+PositionalParameters")]
     public bool PositionalParameters { get; init; } = POSITIONALPARAMETERS;
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    [WithGenerator("(source)+UseTerminators")]
     public bool UseTerminators { get; init; } = USETERMINATORS;
 
     static char ValidateTerminator(char value)
@@ -98,6 +104,7 @@ public partial class Engine : IEngine
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    [WithGenerator("(source)+LeftTerminator")]
     public char LeftTerminator
     {
         get => _LeftTerminator;
@@ -108,12 +115,24 @@ public partial class Engine : IEngine
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    [WithGenerator("(source)+RightTerminator")]
     public char RightTerminator
     {
         get => _RightTerminator;
         init => _RightTerminator = ValidateTerminator(value);
     }
     char _RightTerminator = RIGHTTERMINATOR;
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    [WithGenerator("(source)+KnownTags")]
+    public IKnownTags KnownTags
+    {
+        get => _KnownTags;
+        init => _KnownTags = value.ThrowWhenNull();
+    }
+    IKnownTags _KnownTags = new KnownTags(false);
 
     // ----------------------------------------------------
 

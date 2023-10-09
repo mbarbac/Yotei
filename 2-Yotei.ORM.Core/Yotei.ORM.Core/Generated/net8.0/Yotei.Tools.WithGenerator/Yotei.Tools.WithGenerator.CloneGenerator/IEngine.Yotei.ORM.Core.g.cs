@@ -2,6 +2,7 @@
 #nullable enable
 
 using System;
+using Yotei.ORM.Records;
 
 namespace Yotei.ORM.Core
 {
@@ -11,6 +12,7 @@ namespace Yotei.ORM.Core
         /// Returns an instance of the hosting type where the value of the decorated member
         /// has been replaced by the new given one.
         /// </summary>
+        /// <param name="v_CaseSensitiveNames"></param>
         /// <returns></returns>
         Yotei.ORM.Core.IEngine
         WithCaseSensitiveNames(System.Boolean v_CaseSensitiveNames);
@@ -19,6 +21,7 @@ namespace Yotei.ORM.Core
         /// Returns an instance of the hosting type where the value of the decorated member
         /// has been replaced by the new given one.
         /// </summary>
+        /// <param name="v_NullValueLiteral"></param>
         /// <returns></returns>
         Yotei.ORM.Core.IEngine
         WithNullValueLiteral(System.String v_NullValueLiteral);
@@ -27,6 +30,7 @@ namespace Yotei.ORM.Core
         /// Returns an instance of the hosting type where the value of the decorated member
         /// has been replaced by the new given one.
         /// </summary>
+        /// <param name="v_NativePaging"></param>
         /// <returns></returns>
         Yotei.ORM.Core.IEngine
         WithNativePaging(System.Boolean v_NativePaging);
@@ -35,6 +39,7 @@ namespace Yotei.ORM.Core
         /// Returns an instance of the hosting type where the value of the decorated member
         /// has been replaced by the new given one.
         /// </summary>
+        /// <param name="v_ParameterPrefix"></param>
         /// <returns></returns>
         Yotei.ORM.Core.IEngine
         WithParameterPrefix(System.String v_ParameterPrefix);
@@ -43,6 +48,7 @@ namespace Yotei.ORM.Core
         /// Returns an instance of the hosting type where the value of the decorated member
         /// has been replaced by the new given one.
         /// </summary>
+        /// <param name="v_PositionalParameters"></param>
         /// <returns></returns>
         Yotei.ORM.Core.IEngine
         WithPositionalParameters(System.Boolean v_PositionalParameters);
@@ -51,6 +57,7 @@ namespace Yotei.ORM.Core
         /// Returns an instance of the hosting type where the value of the decorated member
         /// has been replaced by the new given one.
         /// </summary>
+        /// <param name="v_UseTerminators"></param>
         /// <returns></returns>
         Yotei.ORM.Core.IEngine
         WithUseTerminators(System.Boolean v_UseTerminators);
@@ -59,6 +66,7 @@ namespace Yotei.ORM.Core
         /// Returns an instance of the hosting type where the value of the decorated member
         /// has been replaced by the new given one.
         /// </summary>
+        /// <param name="v_LeftTerminator"></param>
         /// <returns></returns>
         Yotei.ORM.Core.IEngine
         WithLeftTerminator(System.Char v_LeftTerminator);
@@ -67,8 +75,18 @@ namespace Yotei.ORM.Core
         /// Returns an instance of the hosting type where the value of the decorated member
         /// has been replaced by the new given one.
         /// </summary>
+        /// <param name="v_RightTerminator"></param>
         /// <returns></returns>
         Yotei.ORM.Core.IEngine
         WithRightTerminator(System.Char v_RightTerminator);
+        
+        /// <summary>
+        /// Returns an instance of the hosting type where the value of the decorated member
+        /// has been replaced by the new given one.
+        /// </summary>
+        /// <param name="v_KnownTags"></param>
+        /// <returns></returns>
+        Yotei.ORM.Core.IEngine
+        WithKnownTags(Yotei.ORM.Records.IKnownTags v_KnownTags);
     }
 }

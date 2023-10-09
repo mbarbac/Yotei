@@ -336,36 +336,4 @@ internal partial class TypeBuilder
 
         return false;
     }
-
-    /// <summary>
-    /// Determines if the given builder argument matches with the given parameter, in the context
-    /// of the given method. Returns true if so, or false is there is no match. In the later case
-    /// an error might be reported is there is an ambiguous match.
-    /// </summary>
-    /// <param name="arg"></param>
-    /// <param name="par"></param>
-    /// <param name="method"></param>
-    /// <param name="error"></param>
-    /// <returns></returns>
-    //bool MatchArgument(
-    //    BuilderArgument arg, IParameterSymbol par, IMethodSymbol method, out bool error)
-    //{
-    //    error = false;
-
-    //    // Case sensitive...
-    //    if (arg.Name == par.Name) return true;
-
-    //    // Relaxed...
-    //    if (string.Compare(arg.Name, par.Name, ignoreCase: true) == 0)
-    //    {
-    //        var pars = method.Parameters.Where(
-    //            x => string.Compare(x.Name, arg.Name, ignoreCase: true) == 0)
-    //            .ToList();
-
-    //        if (pars.Count == 1) return true;
-    //        error = true;
-    //    }
-
-    //    return false;
-    //}
 }

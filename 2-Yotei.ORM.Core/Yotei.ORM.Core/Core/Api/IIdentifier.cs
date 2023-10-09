@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// Represents a database identifier.
+/// The immutable object that represents a database identifier.
 /// </summary>
 public interface IIdentifier
 {

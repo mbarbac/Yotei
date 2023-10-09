@@ -5,14 +5,15 @@ using System;
 
 namespace Yotei.ORM.Records
 {
-    partial interface IKnownOtherTags
+    partial interface IKnownIdentifierTags
     {
         /// <summary>
         /// Returns an instance of the hosting type where the value of the decorated member
         /// has been replaced by the new given one.
         /// </summary>
+        /// <param name="v_CaseSensitiveTags"></param>
         /// <returns></returns>
-        Yotei.ORM.Records.IKnownOtherTags
+        Yotei.ORM.Records.IKnownIdentifierTags
         WithCaseSensitiveTags(System.Boolean v_CaseSensitiveTags);
     }
 }
