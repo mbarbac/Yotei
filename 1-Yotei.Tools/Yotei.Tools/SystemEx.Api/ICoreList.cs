@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// Represents a list-alike collection of arbitrary elements whose behavior can be customized.
+/// Represents a list-alike collection with customizable behavior.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 public interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollection, IEnumerable<T>, ICloneable
@@ -17,12 +17,6 @@ public interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollection, IE
     /// Gets the number of elements in this instance.
     /// </summary>
     new int Count { get; }
-
-    /// <summary>
-    /// Gets or sets the maximun number of elements that the internal data structures can hold
-    /// without resizing.
-    /// </summary>
-    int Capacity { get; set; }
 
     /// <summary>
     /// Minimizes the memory footprint of this instance.
@@ -99,18 +93,16 @@ public interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollection, IE
     List<int> IndexesOf(Predicate<T> predicate);
 
     /// <summary>
-    /// Returns a list with the elements in this collection.
-    /// </summary>
-    /// <returns></returns>
-    List<T> ToList();
-
-    /// <summary>
     /// Returns an array with the elements in this collection.
     /// </summary>
     /// <returns></returns>
     T[] ToArray();
 
-    // ----------------------------------------------------
+    /// <summary>
+    /// Returns a list with the elements in this collection.
+    /// </summary>
+    /// <returns></returns>
+    List<T> ToList();
 
     /// <summary>
     /// Returns a list with the given number of elements starting from the given index.
@@ -119,7 +111,9 @@ public interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollection, IE
     /// <param name="count"></param>
     /// <returns></returns>
     List<T> GetRange(int index, int count);
-    
+
+    // ----------------------------------------------------
+
     /// <summary>
     /// Replaces the element stored at the given index with the new given one. Returns the number
     /// of elements inserted.
@@ -127,8 +121,8 @@ public interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollection, IE
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    int ReplaceItem(int index, T item);
-    
+    int Replace(int index, T item);
+
     /// <summary>
     /// Adds to this collection the given element. Returns the number of elements added.
     /// </summary>
