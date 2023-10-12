@@ -13,9 +13,9 @@ public class CoreList<T> : ICoreList<T>
     /// validations.
     /// </summary>
     /// <param name="item"></param>
-    /// <param name="adding"></param>
+    /// <param name="add"></param>
     /// <returns></returns>
-    protected virtual T Validate(T item, bool adding = false) => item;
+    public virtual T Validate(T item, bool add = false) => item;
 
     /// <summary>
     /// Invoked to determine if the external other element is equivalent to an existing inner one
@@ -25,20 +25,52 @@ public class CoreList<T> : ICoreList<T>
     /// <param name="inner"></param>
     /// <param name="other"></param>
     /// <returns></returns>
-    protected virtual bool Equivalent(T inner, T other) => EqualityComparer<T>.Default.Equals(inner, other);
+    public virtual bool Equivalent(T inner, T other) => EqualityComparer<T>.Default.Equals(inner, other);
 
     /// <summary>
     /// Invoked to determine the behavior of this instance when adding or inserting duplicate
     /// elements. By default they are just added into this collection.
     /// </summary>
-    protected virtual CoreList.Behavior Behavior => CoreList.Behavior.Add;
+    public CoreList.Behavior Behavior
+    {
+        get => _Behavior;
+        set
+        {
+            if (_Behavior == value) return;
+            _Behavior = value;
+
+            if (Count > 0)
+            {
+                var range = ToArray();
+                Clear();
+                AddRange(range);
+            }
+        }
+    }
+    CoreList.Behavior _Behavior = CoreList.Behavior.Add;
 
     /// <summary>
     /// Invoked to determine if this collection shall intercept attemps of adding or inserting
     /// elements that are themselves enumerations of the type of the elements of this instance.
     /// If so, then their own elements are added or inserted instead of the original one.
     /// </summary>
-    protected virtual bool ExpandNested => false;
+    public bool ExpandNested
+    {
+        get => _ExpandNested;
+        set
+        {
+            if (_ExpandNested == value) return;
+            _ExpandNested = value;
+
+            if (Count > 0)
+            {
+                var range = ToArray();
+                Clear();
+                AddRange(range);
+            }
+        }
+    }
+    bool _ExpandNested = false;
 
     // ----------------------------------------------------
 
