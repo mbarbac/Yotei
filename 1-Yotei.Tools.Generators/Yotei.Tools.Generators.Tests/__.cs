@@ -1,0 +1,15 @@
+using static Yotei.Tools.Diagnostics.ConsoleWrapper;
+using static System.ConsoleColor;
+
+namespace Yotei.Tools.Generators.Tests;
+
+// ========================================================
+//[Enforced]
+//public static class Test_
+//{
+//    //[Enforced]
+//    [Fact]
+//    public static void Test_()
+//    {
+//    }
+//}

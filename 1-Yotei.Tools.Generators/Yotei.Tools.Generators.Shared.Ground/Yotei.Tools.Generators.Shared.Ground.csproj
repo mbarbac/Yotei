@@ -1,0 +1,19 @@
+﻿<!--
+This project is just to export the contents of the shared one so that they can be tested in a
+regular way. It is not meant for creating a package or for any other purpose.
+-->
+
+<Project Sdk="Microsoft.NET.Sdk">
+
+   <PropertyGroup>
+	  <TargetFramework>netstandard2.0</TargetFramework>
+	  <ImplicitUsings>disable</ImplicitUsings>
+	  <Nullable>enable</Nullable>
+	  <LangVersion>latest</LangVersion>
+   </PropertyGroup>
+
+   <Import Project="..\Yotei.Tools.Generators.Shared\Yotei.Tools.Generators.Shared.projitems" Label="Shared" />
+   <ItemGroup>
+	  <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.7.0" PrivateAssets="all" />
+   </ItemGroup>
+</Project>

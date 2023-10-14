@@ -325,7 +325,7 @@ public class CoreList<T> : ICoreList<T>
                 case CoreList.Behavior.Ignore: return 0;
                 case CoreList.Behavior.Throw:
                     throw new DuplicateException(
-                        "Element is a duplicates one.")
+                        "Element to add is a duplicated one.")
                         .WithData(item)
                         .WithData(this);
             }
@@ -377,7 +377,7 @@ public class CoreList<T> : ICoreList<T>
                 case CoreList.Behavior.Ignore: return 0;
                 case CoreList.Behavior.Throw:
                     throw new DuplicateException(
-                        "Element is a duplicates one.")
+                        "Element to insert is a duplicated one.")
                         .WithData(item)
                         .WithData(this);
             }
