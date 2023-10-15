@@ -198,9 +198,17 @@ internal partial class TypeBuilder
             {
                 for (int i = 0; i < builder.Parameters.Length; i++)
                 {
-                    // Validating the parameter matches the spec argument...
-                    var par = builder.Parameters[i];
+                    // Special case for 'this'...
                     var arg = Specs.Arguments[i];
+                    if (arg.Name == "this")
+                    {
+                        if (i > 0) sb.Append(", ");
+                        sb.Append("this");
+                        continue;
+                    }
+
+                    // Validating the parameter matches the spec argument...
+                    var par = builder.Parameters[i];                    
                     var match = MatchParameter(out var error, arg.Name, par, builder);
                     if (error) Context.ErrorAmbiguousMatch(ErrorSymbol, arg.Name);
                     if (!match) return false;
@@ -239,7 +247,6 @@ internal partial class TypeBuilder
                     if (i > 0) sb.Append(", ");
                     sb.Append(name);
                     members.Add(member);
-
                 }
                 return true;
             }
@@ -385,14 +392,23 @@ internal partial class TypeBuilder
             }
             else if (optional.IsInclude)
             {
-                var member = MatchMember(out var error, optional.Member, properties, fields);
-                if (error) { Context.ErrorAmbiguousMatch(ErrorSymbol, optional.Member); return null; }
-                if (member == null) { Context.ErrorNoMatch(ErrorSymbol, optional.Member); return null; }
+                if (optional.Member == "@") // Match a member with the enforced name...
+                {
+                    if (Enforced == null) { Context.ErrorNoMatch(ErrorSymbol, optional.Member); return null; }
+                    var item = new InitElement(Enforced.Member);
+                    list.Add(item);
+                }
+                else // Standard specification...
+                {
+                    var member = MatchMember(out var error, optional.Member, properties, fields);
+                    if (error) { Context.ErrorAmbiguousMatch(ErrorSymbol, optional.Member); return null; }
+                    if (member == null) { Context.ErrorNoMatch(ErrorSymbol, optional.Member); return null; }
 
-                var item = new InitElement(member);
-                if (optional.UseClone) item.UseClone = true;
-                if (optional.IsMemberEnforced) item.UseEnforced = true;
-                list.Add(item);
+                    var item = new InitElement(member);
+                    if (optional.UseClone) item.UseClone = true;
+                    if (optional.IsMemberEnforced) item.UseEnforced = true;
+                    list.Add(item);
+                }
             }
         }
 

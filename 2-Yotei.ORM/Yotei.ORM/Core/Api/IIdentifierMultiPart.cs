@@ -1,21 +1,15 @@
-﻿using IHost = Experimental.IInvariantGroup;
-using IItem = string;
+﻿using IHost = Yotei.ORM.IIdentifierMultiPart;
+using IItem = Yotei.ORM.IIdentifierSinglePart;
 
-namespace Experimental;
+namespace Yotei.ORM;
 
 // ========================================================
 /// <summary>
-/// Represents ...
+/// Represents a multi-part database identifier.
 /// </summary>
-public interface IInvariantGroup : IEnumerable<IItem>, ICloneable
+public interface IIdentifierMultiPart : IIdentifier, IEnumerable<IItem>
 {
     /// <summary>
-    /// <inheritdoc cref="ICloneable.Clone"/>
-    /// </summary>
-    /// <returns></returns>
-    new IHost Clone();
-
-    // <summary>
     /// Gets the number of elements in this instance.
     /// </summary>
     int Count { get; }
@@ -33,36 +27,35 @@ public interface IInvariantGroup : IEnumerable<IItem>, ICloneable
     IItem this[int index] { get; }
 
     /// <summary>
-    /// Determines if this collection contains an element that matches the given criteria, or
-    /// not.
+    /// Determines if this collection contains an element that matches the given criteria.
     /// </summary>
-    /// <param name="criteria"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    bool Contains(object criteria);
+    bool Contains(string? value);
 
     /// <summary>
     /// Returns the index of the first ocurrence of an element in this collection that matches
     /// the given criteria.
     /// </summary>
-    /// <param name="criteria"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    int FindIndex(object criteria);
+    int IndexOf(string? value);
 
     /// <summary>
     /// Returns the index of the last ocurrence of an element in this collection that matches
     /// the given criteria.
     /// </summary>
-    /// <param name="criteria"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    int FindLastIndex(object criteria);
+    int LastIndexOf(string? value);
 
     /// <summary>
     /// Returns the index of all the ocurrence of an element in this collection that match the
     /// given criteria.
     /// </summary>
-    /// <param name="criteria"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    int FindAllIndexes(object criteria);
+    List<int> IndexesOf(string? value);
 
     /// <summary>
     /// Determines if this instance contains the given element, or not.
@@ -159,11 +152,28 @@ public interface IInvariantGroup : IEnumerable<IItem>, ICloneable
     IHost Replace(int index, IItem item);
 
     /// <summary>
+    /// Returns a new instance where the original element at the given index has been replaced by
+    /// a new one, or several, from the given value.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    IHost Replace(int index, string? value);
+
+    /// <summary>
     /// Returns a new instance where the given element has been added to the original collection.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
     IHost Add(IItem item);
+
+    /// <summary>
+    /// Returns a new instance where a new element with the given value has been added to the
+    /// original collection.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    IHost Add(string? value);
 
     /// <summary>
     /// Returns a new instance where the elements from the given range have been added into the
@@ -172,6 +182,14 @@ public interface IInvariantGroup : IEnumerable<IItem>, ICloneable
     /// <param name="range"></param>
     /// <returns></returns>
     IHost AddRange(IEnumerable<IItem> range);
+
+    /// <summary>
+    /// Returns a new instance where new elements from the given range of values have been added
+    /// into the original collection.
+    /// </summary>
+    /// <param name="range"></param>
+    /// <returns></returns>
+    IHost AddRange(IEnumerable<string?> range);
 
     /// <summary>
     /// Returns a new instance where the given element has been insert at the given index into
@@ -183,6 +201,15 @@ public interface IInvariantGroup : IEnumerable<IItem>, ICloneable
     IHost Insert(int index, IItem item);
 
     /// <summary>
+    /// Returns a new instance where a new given element with the given value has been insert at
+    /// the given index into the original collection.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    IHost Insert(int index, string? value);
+
+    /// <summary>
     /// Returns a new instance where the elements from the given range have been insert, starting
     /// at the given index, into the original collection.
     /// </summary>
@@ -190,6 +217,15 @@ public interface IInvariantGroup : IEnumerable<IItem>, ICloneable
     /// <param name="range"></param>
     /// <returns></returns>
     IHost InsertRange(int index, IEnumerable<IItem> range);
+
+    /// <summary>
+    /// Returns a new instance where new elements from the given range of values have been
+    /// inserted, starting at the given index, into the original collection.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="range"></param>
+    /// <returns></returns>
+    IHost InsertRange(int index, IEnumerable<string?> range);
 
     /// <summary>
     /// Returns a new instance where the element at the given index has been removed from the
@@ -208,6 +244,14 @@ public interface IInvariantGroup : IEnumerable<IItem>, ICloneable
     IHost Remove(IItem item);
 
     /// <summary>
+    /// Returns a new instance where the first ocurrence of an element with the given value has
+    /// been removed from the original collection.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    IHost Remove(string? value);
+
+    /// <summary>
     /// Returns a new instance where the last ocurrence of the given element has been removed
     /// from the original collection.
     /// </summary>
@@ -216,12 +260,28 @@ public interface IInvariantGroup : IEnumerable<IItem>, ICloneable
     IHost RemoveLast(IItem item);
 
     /// <summary>
+    /// Returns a new instance where the last ocurrence of an element with the given value has
+    /// been removed from the original collection.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    IHost RemoveLast(string? value);
+
+    /// <summary>
     /// Returns a new instance where all the ocurrences of the given element have been removed
     /// from the original collection.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
     IHost RemoveAll(IItem item);
+
+    /// <summary>
+    /// Returns a new instance where all ocurrences of elements with the given value have been
+    /// removed from the original collection.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    IHost RemoveAll(string? value);
 
     /// <summary>
     /// Returns a new instance where the given number of elements, starting from the given index,

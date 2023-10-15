@@ -1,40 +1,46 @@
-﻿using IHost = Experimental.IInvariantGroup;
-using IItem = string;
+﻿using IHost = Yotei.ORM.Records.IParameterList;
+using IItem = Yotei.ORM.Records.IParameter;
 
-namespace Experimental;
+namespace Yotei.ORM.Records;
 
 // ========================================================
 /// <summary>
 /// <inheritdoc cref="IHost"/>
 /// </summary>
-public class InvariantGroup : IHost
+public class ParameterList : IHost
 {
-    /// <summary>
-    /// Represents the actual contents carried by this instance.
-    /// </summary>
+    // Represents the actual contents carried by this instance.
     protected class InnerList : CoreList<IItem>
     {
-        public InnerList(InvariantGroup master)
+        public InnerList(ParameterList master)
         {
             Master = master.ThrowWhenNull();
-            Behavior = CoreList.Behavior.Add;
             ExpandNested = false;
         }
-        InvariantGroup Master;
+        ParameterList Master;
 
-        public override IItem Validate(IItem item, bool add = false) => base.Validate(item, add);
-        public override bool Equivalent(IItem inner, IItem other) => base.Equivalent(inner, other);
-
-        protected override int OnAdd(string item) => base.OnAdd(item);
-        protected override int OnInsert(int index, string item) => base.OnInsert(index, item);
-        protected override int OnRemoveAt(int index) => base.OnRemoveAt(index);
-        protected override int OnRemoveRange(int index, int count) => base.OnRemoveRange(index, count);
-        protected override int OnClear() => base.OnClear();
+        public override IItem Validate(IItem item, bool add)
+        {
+            ArgumentNullException.ThrowIfNull(item); if (add)
+            {
+                if (item.Name == null) throw new ArgumentException(
+                    "Name of the given element is null.")
+                    .WithData(item);
+            }
+            return item;
+        }
+        public override bool Equivalent(IItem inner, IItem other)
+        {
+            return EquivalentName(inner.Name, other.Name);
+        }
+        public bool EquivalentName(string inner, string other)
+        {
+            return string.Compare(inner, other, !Master.Engine.CaseSensitiveNames) == 0;
+        }
+        public override bool IgnoreDuplicate(IItem item) => base.IgnoreDuplicate(item);
     }
 
-    /// <summary>
-    /// The actual contents carried by this instance.
-    /// </summary>
+    // The actual contents carried by this instance.
     protected InnerList Items { get; }
 
     // ----------------------------------------------------
@@ -42,29 +48,45 @@ public class InvariantGroup : IHost
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    public InvariantGroup() => Items = new(this);
+    /// <param name="engine"></param>
+    public ParameterList(IEngine engine)
+    {
+        Engine = engine.ThrowWhenNull();
+        Items = new(this);
+    }
 
     /// <summary>
     /// Initializes a new instance with the given element.
     /// </summary>
+    /// <param name="engine"></param>
     /// <param name="item"></param>
-    public InvariantGroup(IItem item) : this() => Items.Add(item);
+    public ParameterList(IEngine engine, IItem item) : this(engine) => Items.Add(item);
 
     /// <summary>
     /// Initializes a new instance with the elements from the given range.
     /// </summary>
+    /// <param name="engine"></param>
     /// <param name="range"></param>
-    public InvariantGroup(IEnumerable<IItem> range) : this() => Items.AddRange(range);
+    public ParameterList(IEngine engine, IEnumerable<IItem> range) : this(engine) => Items.AddRange(range);
 
     /// <summary>
-    /// <inheritdoc cref="ICloneable.Clone"/>
+    /// Invoked to obtain a clone of this instance.
     /// </summary>
     /// <returns></returns>
-    public virtual InvariantGroup Clone() => new(this);
-    IHost IHost.Clone() => Clone();
-    object ICloneable.Clone() => Clone();
+    protected virtual ParameterList Clone() => new(Engine, this);
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public override string ToString() => Items.ToString();
 
     // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public IEngine Engine { get; }
 
     /// <summary>
     /// <inheritdoc/>
@@ -73,7 +95,7 @@ public class InvariantGroup : IHost
     public IEnumerator<IItem> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    // <summary>
+    /// <summary>
     /// <inheritdoc/>
     /// </summary>
     public int Count => Items.Count;
@@ -93,30 +115,20 @@ public class InvariantGroup : IHost
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="criteria"></param>
+    /// <param name="name"></param>
     /// <returns></returns>
-    public bool Contains(object criteria) => throw new NotImplementedException();
+    public bool Contains(string name) => IndexOf(name) >= 0;
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="criteria"></param>
     /// <returns></returns>
-    public int FindIndex(object criteria) => throw new NotImplementedException();
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="criteria"></param>
-    /// <returns></returns>
-    public int FindLastIndex(object criteria) => throw new NotImplementedException();
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="criteria"></param>
-    /// <returns></returns>
-    public int FindAllIndexes(object criteria) => throw new NotImplementedException();
+    public int IndexOf(string name)
+    {
+        name = name.NotNullNotEmpty();
+        return Items.IndexOf(x => Items.EquivalentName(x.Name, name));
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -131,20 +143,6 @@ public class InvariantGroup : IHost
     /// <param name="item"></param>
     /// <returns></returns>
     public int IndexOf(IItem item) => Items.IndexOf(item);
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    public int LastIndexOf(IItem item) => Items.LastIndexOf(item);
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    public List<int> IndexesOf(IItem item) => Items.IndexesOf(item);
 
     /// <summary>
     /// <inheritdoc/>
@@ -186,6 +184,21 @@ public class InvariantGroup : IHost
     /// <returns></returns>
     public List<IItem> ToList() => Items.ToList();
 
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public string NextName()
+    {
+        for (int i = Items.Count; i < int.MaxValue; i++)
+        {
+            var name = $"{Engine.ParameterPrefix}{i}";
+            var index = IndexOf(name);
+            if (index < 0) return name;
+        }
+        throw new UnExpectedException("Range of indexes exhausted.");
+    }
+
     // ----------------------------------------------------
 
     /// <summary>
@@ -196,15 +209,14 @@ public class InvariantGroup : IHost
     /// <returns></returns>
     public virtual IHost GetRange(int index, int count)
     {
+        if (count == 0) return this;
         if (index == 0 && count == Count) return this;
-        else
-        {
-            var range = Items.GetRange(index, count);
-            var temp = Clone();
-            temp.Items.Clear();
-            temp.Items.AddRange(range);
-            return temp;
-        }
+
+        var range = Items.GetRange(index, count);
+        var temp = Clone();
+        temp.Items.Clear();
+        temp.Items.AddRange(range);
+        return temp;
     }
 
     /// <summary>
@@ -291,30 +303,6 @@ public class InvariantGroup : IHost
     {
         var temp = Clone();
         var done = temp.Items.Remove(item);
-        return done > 0 ? temp : this;
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    public virtual IHost RemoveLast(IItem item)
-    {
-        var temp = Clone();
-        var done = temp.Items.RemoveLast(item);
-        return done > 0 ? temp : this;
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    public virtual IHost RemoveAll(IItem item)
-    {
-        var temp = Clone();
-        var done = temp.Items.RemoveAll(item);
         return done > 0 ? temp : this;
     }
 

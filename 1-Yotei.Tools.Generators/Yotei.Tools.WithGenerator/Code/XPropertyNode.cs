@@ -73,7 +73,7 @@ internal class XPropertyNode : PropertyNode
         }
 
         // Abstract...
-        if (Symbol.IsAbstract)
+        if (Parent.Symbol.IsAbstract)
         {
             modifiers = "public abstract ";
             cb.AppendLine($"{modifiers}{parentType}");

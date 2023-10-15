@@ -13,7 +13,7 @@
 internal class SpecsArgument
 {
     /// <summary>
-    /// Initializes a new instance with the format: '[name][=@|member[!]]'.
+    /// Initializes a new instance with the format: '[name][=@|member|this[!]]'.
     /// </summary>
     /// <param name="specs"></param>
     public SpecsArgument(string specs)
