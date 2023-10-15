@@ -1,4 +1,5 @@
-﻿using static System.ConsoleColor;
+﻿using Xunit.Sdk;
+using static System.ConsoleColor;
 using static Yotei.Tools.Diagnostics.ConsoleWrapper;
 using Debug = Yotei.Tools.Diagnostics.DebugWrapper;
 
@@ -34,6 +35,7 @@ internal class Program
 
         // Customizing the tests...
         // Excludes.Add(new("Experimental.Tests", null, null));
+        // Includes.Add(new("Yotei.Tools.Generators.Tests", null, null));
         // Includes.Add(new("Yotei.ORM.Core.Tests", null, null));
 
         // Main menu...

@@ -1,4 +1,4 @@
-/*// File-level usings...
+// File-level usings...
 using System;
 
 namespace Yotei.Tools.WithGenerator.Tests
@@ -121,7 +121,7 @@ namespace Yotei.Tools.WithGenerator.Tests
 
                 public virtual string? LastName { get; set; } = null;
 
-                [WithGenerator("creator()")]
+                [WithGenerator]
                 public int Age = 0;
             }
 
@@ -167,4 +167,4 @@ namespace Yotei.Tools.WithGenerator.Tests
             }
         }
     }
-}*/
+}

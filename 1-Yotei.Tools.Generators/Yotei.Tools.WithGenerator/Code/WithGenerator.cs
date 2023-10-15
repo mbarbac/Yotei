@@ -7,7 +7,7 @@
 [Generator(LanguageNames.CSharp)]
 internal class WithGenerator : TreeGenerator
 {
-#if DEBUG && DEBUG_WITHGENERATOR
+#if DEBUG_WITHGENERATOR //&& DEBUG
     /// <summary>
     /// <inheritdoc/>
     /// </summary>

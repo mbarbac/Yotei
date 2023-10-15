@@ -10,6 +10,7 @@ regular way. It is not meant for creating a package or for any other purpose.
 	  <ImplicitUsings>disable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
 	  <LangVersion>latest</LangVersion>
+	  <Configurations>Debug;Release;Local</Configurations>
    </PropertyGroup>
 
    <Import Project="..\Yotei.Tools.Generators.Shared\Yotei.Tools.Generators.Shared.projitems" Label="Shared" />

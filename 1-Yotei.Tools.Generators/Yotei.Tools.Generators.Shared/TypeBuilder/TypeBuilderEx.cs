@@ -419,6 +419,12 @@ internal partial class TypeBuilder
             items = temps;
         }
 
+        if (!Specs.AllArguments)
+        {
+            var temps = items.Where(x => x.Parameters.Length != Specs.Arguments.Count).ToList();
+            foreach (var temp in temps) items.Remove(temp);
+        }
+
         items = items.OrderByDescending(x => x.Parameters.Length).ToList();
         return items;
     }

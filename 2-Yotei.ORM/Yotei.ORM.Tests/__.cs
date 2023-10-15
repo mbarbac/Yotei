@@ -1,7 +1,8 @@
 using static Yotei.Tools.Diagnostics.ConsoleWrapper;
 using static System.ConsoleColor;
 
-namespace Yotei.ORM.Core.Tests;
+
+namespace Yotei.ORM.Tests;
 
 // ========================================================
 //[Enforced]

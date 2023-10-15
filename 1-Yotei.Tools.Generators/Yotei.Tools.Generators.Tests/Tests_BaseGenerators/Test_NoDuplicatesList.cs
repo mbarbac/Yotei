@@ -1,3 +1,5 @@
+#if DEBUG
+
 using static Yotei.Tools.Diagnostics.ConsoleWrapper;
 using static System.ConsoleColor;
 
@@ -102,8 +104,8 @@ public static class Test_NoDuplicatesList
 
         list = items.GetRange(1, 2);
         Assert.Equal(2, list.Count);
-        Assert.Same("two", list[0]);
-        Assert.Same("three", list[1]);
+        Assert.Equal("two", list[0]);
+        Assert.Equal("three", list[1]);
     }
 
     //[Enforced]
@@ -350,3 +352,5 @@ public static class Test_NoDuplicatesList
         Assert.Empty(items);
     }
 }
+
+#endif

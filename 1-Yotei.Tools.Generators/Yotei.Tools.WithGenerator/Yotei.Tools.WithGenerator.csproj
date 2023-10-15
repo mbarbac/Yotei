@@ -10,7 +10,7 @@
 
    <PropertyGroup>
 	  <Description>Yotei Tools With Methods Generator</Description>
-	  <Version>0.5.12-v0001</Version>
+	  <Version>0.5.16-v0001</Version>
 	  <Authors>mbarbac@hotmail.com</Authors>
 	  <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
 	  <IsPackable>true</IsPackable>
@@ -24,7 +24,7 @@
    <ItemGroup>
 	  <None Include="README.md" Pack="true" PackagePath="" />
 	  <None Include="LICENSE" Pack="true" PackagePath="" />
-	  <None Remove="$(OutputPath)\$(AssemblyName).dll" />
+	  <None Remove="bin\Release\netstandard2.0\\Yotei.Tools.WithGenerator.dll" />
 	  <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
    </ItemGroup>
 

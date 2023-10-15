@@ -77,8 +77,6 @@ internal class XFieldNode : FieldNode
         // Regular...
         else
         {
-            if (Parent.Symbol.Name == "Manager") { } // STOPDEBUG
-
             var builder = new TypeBuilder(context, Parent.Symbol);
             var enforced = new EnforcedMember(Symbol, valueName);
             var underscores = GetUnderscores();

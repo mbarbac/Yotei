@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
    <PropertyGroup>
 	  <TargetFramework>net8.0</TargetFramework>
@@ -31,37 +31,30 @@
 	  <CompilerGeneratedFilesOutputPath>Generated\$(TargetFramework)</CompilerGeneratedFilesOutputPath>
    </PropertyGroup>
 
-   <Import Project="..\Yotei.Tools.Generators.Shared\Yotei.Tools.Generators.Shared.projitems" Label="Shared" />
-
    <ItemGroup Condition="'$(Configuration)'=='Debug'">
-	  <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.7.0" PrivateAssets="all" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
-	  <ProjectReference Include="..\Yotei.Tools.CloneGenerator\Yotei.Tools.CloneGenerator.csproj">
+	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.CloneGenerator\Yotei.Tools.CloneGenerator.csproj">
 		 <OutputItemType>Analyzer</OutputItemType>
 		 <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
 	  </ProjectReference>
-	  <ProjectReference Include="..\Yotei.Tools.WithGenerator\Yotei.Tools.WithGenerator.csproj">
+	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.WithGenerator\Yotei.Tools.WithGenerator.csproj">
 		 <OutputItemType>Analyzer</OutputItemType>
 		 <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
 	  </ProjectReference>
    </ItemGroup>
 
    <ItemGroup Condition="'$(Configuration)'=='Local'">
-	  <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.7.0" PrivateAssets="all" />
-	  <PackageReference Include="Yotei.Tools" Version="0.5.23-v0001" />
+	  <PackageReference Include="Yotei.Tools" Version="0.5.24-v0001" />
 	  <PackageReference Include="Yotei.Tools.CloneGenerator" Version="0.5.16-v0001" />
 	  <PackageReference Include="Yotei.Tools.WithGenerator" Version="0.5.16-v0001" />
+	  <PackageReference Include="Yotei.ORM.Core" Version="0.2.4-v0001" />
    </ItemGroup>
 
    <ItemGroup Condition="'$(Configuration)'=='Release'">
-	  <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.7.0" PrivateAssets="all" />
-	  <PackageReference Include="Yotei.Tools" Version="0.5.22" />
+	  <PackageReference Include="Yotei.Tools" Version="0.5.23" />
 	  <PackageReference Include="Yotei.Tools.CloneGenerator" Version="0.5.15" />
 	  <PackageReference Include="Yotei.Tools.WithGenerator" Version="0.5.15" />
-   </ItemGroup>
-
-   <ItemGroup>
-     <Folder Include="Tests_CloneGenerator\" />
+	  <PackageReference Include="Yotei.ORM.Core" Version="0.2.3" />
    </ItemGroup>
 
    <!--Need to appear at the end of the file-->
