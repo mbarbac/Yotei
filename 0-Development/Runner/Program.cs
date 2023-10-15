@@ -36,7 +36,7 @@ internal class Program
         // Customizing the tests...
         // Excludes.Add(new("Experimental.Tests", null, null));
         // Includes.Add(new("Yotei.Tools.Generators.Tests", null, null));
-        Includes.Add(new("Yotei.ORM.Tests", null, null));
+        // Includes.Add(new("Yotei.ORM.Tests", null, null));
 
         // Main menu...
         var done = -1; do
