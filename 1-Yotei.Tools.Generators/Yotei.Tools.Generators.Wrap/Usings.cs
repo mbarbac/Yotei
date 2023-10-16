@@ -14,3 +14,7 @@ global using System.Runtime.CompilerServices;
 global using System.Text;
 global using System.Threading;
 global using System.Threading.Tasks;
+
+global using Microsoft.CodeAnalysis;
+global using Microsoft.CodeAnalysis.CSharp;
+global using Microsoft.CodeAnalysis.CSharp.Syntax;

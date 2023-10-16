@@ -30,7 +30,7 @@ public static class Test_InvariantList
                         ? string.Compare(inamed.Name, onamed.Name, !Master.CaseSensitive) == 0
                         : ReferenceEquals(inner, other);
                 };
-                AddDuplicate = (item) =>
+                AcceptDuplicate = (item) =>
                 {
                     throw new DuplicateException("Duplicated element.")
                         .WithData(item)

@@ -1,7 +1,7 @@
-namespace Yotei.Tools.Tests;
+namespace Yotei.Tools.Generators.Tests;
 
 // ========================================================
-//[Enforced]
+[Enforced]
 public static class Test_CoreList
 {
     public interface IElement { }
@@ -10,7 +10,7 @@ public static class Test_CoreList
         public override string ToString() => Name;
         public string Name { get; set; } = name;
     }
-    public class ChainElement : CoreList<IElement>, IElement
+    internal class ChainElement : CoreList<IElement>, IElement
     {
         public ChainElement(bool sensitive)
         {
@@ -27,10 +27,7 @@ public static class Test_CoreList
                     ? string.Compare(inamed.Name, onamed.Name, !CaseSensitive) == 0
                     : ReferenceEquals(inner, other);
             };
-            AcceptDuplicate = (item) =>
-            {
-                throw new DuplicateException("Duplicated element.").WithData(item).WithData(this);
-            };
+            AcceptDuplicate = (item) => false;
             ExpandNested = (item) => true;
         }
         public ChainElement(bool sensitive, IElement item) : this(sensitive) => Add(item);
@@ -87,7 +84,7 @@ public static class Test_CoreList
         catch (ArgumentNullException) { }
 
         try { _ = new ChainElement(false, new NameElement("")); Assert.Fail(); }
-        catch (EmptyException) { }
+        catch (Tools.EmptyException) { }
     }
 
     //[Enforced]
@@ -100,8 +97,10 @@ public static class Test_CoreList
         Assert.Same(xtwo, items[1]);
         Assert.Same(xthree, items[2]);
 
-        try { _ = new ChainElement(false, new NameElement[] { xone, new("ONE") }); Assert.Fail(); }
-        catch (DuplicateException) { }
+        // Ignoring duplicates...
+        items = new ChainElement(false, new NameElement[] { xone, new("ONE") });
+        Assert.Single(items);
+        Assert.Same(xone, items[0]);
     }
 
     //[Enforced]
@@ -123,8 +122,10 @@ public static class Test_CoreList
     {
         var items = new ChainElement(true, new[] { xone, new("ONE") });
 
-        try { items.CaseSensitive = false; Assert.Fail(); }
-        catch (DuplicateException) { }
+        // Ignoring duplicates...
+        items.CaseSensitive = false;
+        Assert.Single(items);
+        Assert.Same(xone, items[0]);
     }
 
     //[Enforced]
@@ -170,8 +171,12 @@ public static class Test_CoreList
         Assert.Same(xtwo, items[1]);
         Assert.Same(xthree, items[2]);
 
-        try { items[0] = new NameElement("THREE"); Assert.Fail(); }
-        catch (DuplicateException) { }
+        // Ignoring duplicates...
+        items[0] = new NameElement("THREE");
+        Assert.Equal(3, items.Count);
+        Assert.Same(xfour, items[0]);
+        Assert.Same(xtwo, items[1]);
+        Assert.Same(xthree, items[2]);
     }
 
     //[Enforced]
@@ -200,11 +205,16 @@ public static class Test_CoreList
         Assert.Same(xthree, items[2]);
         Assert.Same(xfour, items[3]);
 
+        // Ignoring duplicates...
+        items.Add(new NameElement("TWO"));
+        Assert.Equal(4, items.Count);
+        Assert.Same(xone, items[0]);
+        Assert.Same(xtwo, items[1]);
+        Assert.Same(xthree, items[2]);
+        Assert.Same(xfour, items[3]);
+
         try { items.Add(null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
-
-        try { items.Add(new NameElement("TWO")); Assert.Fail(); }
-        catch (DuplicateException) { }
     }
 
     //[Enforced]
@@ -273,11 +283,16 @@ public static class Test_CoreList
         Assert.Same(xtwo, items[2]);
         Assert.Same(xthree, items[3]);
 
+        // Ignoring duplicates...
+        items.Insert(0, new NameElement("TWO"));
+        Assert.Equal(4, items.Count);
+        Assert.Same(xfour, items[0]);
+        Assert.Same(xone, items[1]);
+        Assert.Same(xtwo, items[2]);
+        Assert.Same(xthree, items[3]);
+
         try { items.Insert(0, null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
-
-        try { items.Insert(0, new NameElement("TWO")); Assert.Fail(); }
-        catch (DuplicateException) { }
     }
 
     //[Enforced]

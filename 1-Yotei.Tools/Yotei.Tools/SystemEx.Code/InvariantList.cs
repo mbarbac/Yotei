@@ -56,7 +56,7 @@ public class InvariantList<T> : IInvariantList<T>
 
         Items.Validate = source.Items.Validate;
         Items.Compare = source.Items.Compare;
-        Items.AddDuplicate = source.Items.AddDuplicate;
+        Items.AcceptDuplicate = source.Items.AcceptDuplicate;
         Items.ExpandNested = source.Items.ExpandNested;
 
         Items.AddRange(source);

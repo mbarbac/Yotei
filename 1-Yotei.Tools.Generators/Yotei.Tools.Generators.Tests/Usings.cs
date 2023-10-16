@@ -1,4 +1,4 @@
-﻿global using System;
+global using System;
 global using System.Collections;
 global using System.Collections.Generic;
 global using System.Collections.Immutable;
@@ -14,3 +14,11 @@ global using System.Runtime.CompilerServices;
 global using System.Text;
 global using System.Threading;
 global using System.Threading.Tasks;
+
+global using Microsoft.CodeAnalysis;
+global using Microsoft.CodeAnalysis.CSharp;
+global using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+global using Xunit;
+global using Yotei.Tools;
+global using Yotei.Tools.Diagnostics;
