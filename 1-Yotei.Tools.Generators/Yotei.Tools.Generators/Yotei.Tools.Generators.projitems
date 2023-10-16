@@ -32,6 +32,22 @@
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\MethodCandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\FieldCandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\Candidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Childs\ChildFiles.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Childs\ChildMethods.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Childs\ChildFields.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Childs\ChildProperties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Childs\ChildTypes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Childs\ChildNamespaces.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\FileNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Node.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\MethodNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\FieldNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\PropertyNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\TypeNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\NamespaceNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\TypeNodeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeGenerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeDiagnostics.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
   </ItemGroup>
 </Project>
