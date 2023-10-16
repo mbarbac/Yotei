@@ -1,7 +1,7 @@
 namespace Yotei.Tools.Generators.Tests;
 
 // ========================================================
-[Enforced]
+//[Enforced]
 public static class Test_CoreList
 {
     public interface IElement { }
@@ -10,7 +10,7 @@ public static class Test_CoreList
         public override string ToString() => Name;
         public string Name { get; set; } = name;
     }
-    internal class ChainElement : CoreList<IElement>, IElement
+    internal class ChainElement : Shared.CoreList<IElement>, IElement
     {
         public ChainElement(bool sensitive)
         {

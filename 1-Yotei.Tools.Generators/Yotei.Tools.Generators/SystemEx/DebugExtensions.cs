@@ -1,4 +1,4 @@
-﻿namespace Yotei.Tools.Generators;
+﻿namespace Yotei.Tools.Generators.Shared;
 
 // ========================================================
 internal static class DebugExtensions
