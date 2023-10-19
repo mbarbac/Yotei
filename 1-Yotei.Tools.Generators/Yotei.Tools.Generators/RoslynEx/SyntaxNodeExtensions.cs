@@ -19,7 +19,7 @@ internal static class SyntaxNodeExtensions
             node = node.Parent!;
         }
 
-        throw new UnExpectedException(
+        throw new ArgumentException(
             $"Cannot get the compilation unit syntax of node: {node}");
     }
 }

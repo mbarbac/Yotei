@@ -1,4 +1,4 @@
-namespace Yotei.Tools.Generators.Tests;
+﻿namespace Yotei.Tools.Generators.Tests;
 
 // ========================================================
 //[Enforced]

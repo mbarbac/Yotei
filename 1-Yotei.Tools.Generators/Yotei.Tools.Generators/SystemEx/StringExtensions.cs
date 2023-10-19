@@ -45,12 +45,12 @@ internal static class StringExtensions
         if (trim)
         {
             source = source.NullWhenEmpty();
-            if (source is null) throw new EmptyException($"'{description}' cannot be empty.");
+            if (source is null) throw new ArgumentException($"'{description}' cannot be empty.");
         }
         else
         {
             if (source.All(x => x == ' '))
-                throw new EmptyException($"'{description}' cannot be empty.");
+                throw new ArgumentException($"'{description}' cannot be empty.");
         }
         return source;
     }

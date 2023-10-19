@@ -226,7 +226,7 @@ internal class TypeNode : Node
             TypeKind.Struct => $"{rec}struct",
             TypeKind.Interface => "interface",
 
-            _ => throw new UnExpectedException($"Invalid type kind for symbol: {Symbol}")
+            _ => throw new ArgumentException($"Invalid type kind for symbol: {Symbol}")
         };
     }
 

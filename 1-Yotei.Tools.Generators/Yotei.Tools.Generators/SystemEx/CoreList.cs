@@ -146,7 +146,7 @@ internal class CoreList<T> : IEnumerable<T>, ICloneable
             }
         }
     }
-    Func<T, bool> _AcceptDuplicate = (item) => throw new DuplicateException(
+    Func<T, bool> _AcceptDuplicate = (item) => throw new InvalidOperationException(
         "Duplicated element.")
         .WithData(item, nameof(item));
 

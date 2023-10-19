@@ -47,7 +47,8 @@ internal partial class MethodNode : Node
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"Method: {Symbol.ToStringEx(useReturnType: false)}";
+    public override string ToString()
+        => $"Method: ({Parent.Symbol.Name}) {Symbol.ToStringEx(useReturnType: false)}";
 
     /// <summary>
     /// The node in the hierarchy that contains this instance.

@@ -16,7 +16,7 @@ internal static class TypeNodeExtensions
         var syntax = candidate.Syntax;
         var done = syntax.Modifiers.Any(x => x.IsKind(SyntaxKind.PartialKeyword));
 
-        if (!done) context.ErrorTypeNotPartial(candidate.Symbol);
+        if (!done) context.TypeNotPartial(candidate.Symbol, DiagnosticSeverity.Error);
         return done;
     }
 
@@ -36,7 +36,7 @@ internal static class TypeNodeExtensions
         foreach (var node in nodes)
             if (node.Modifiers.Any(x => x.IsKind(SyntaxKind.PartialKeyword))) done = true;
 
-        if (!done) context.ErrorTypeNotPartial(symbol);
+        if (!done) context.TypeNotPartial(symbol, DiagnosticSeverity.Error);
         return done;
     }
 
@@ -56,7 +56,7 @@ internal static class TypeNodeExtensions
             and not TypeKind.Struct
             and not TypeKind.Interface)
         {
-            context.ErrorTypeNotSupported(symbol);
+            context.TypeNotSupported(symbol, DiagnosticSeverity.Error);
             return false;
         }
         return true;
@@ -74,7 +74,7 @@ internal static class TypeNodeExtensions
 
         if (symbol.IsRecord)
         {
-            context.ErrorTypeIsRecord(symbol);
+            context.TypeIsRecord(symbol, DiagnosticSeverity.Error);
             return false;
         }
         return true;

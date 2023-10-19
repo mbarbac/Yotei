@@ -141,7 +141,7 @@ internal partial class FileNode : Node
         }
 
         // Unknown...
-        throw new UnExpectedException(
+        throw new ArgumentException(
             "Unknown candidate.")
             .WithData(candidate, nameof(candidate));
     }

@@ -8,16 +8,19 @@
 	  <Configurations>Debug;Release;Local</Configurations>
    </PropertyGroup>
 
+   <!-- DEBUG configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Debug'">
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
    </ItemGroup>
 
+   <!-- LOCAL configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Local'">
 	  <PackageReference Include="Yotei.Tools" Version="0.5.24-v0001" />
    </ItemGroup>
 
+   <!-- RELEASE configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Release'">
 	  <PackageReference Include="Yotei.Tools" Version="0.5.23" />
    </ItemGroup>
-
+   
 </Project>

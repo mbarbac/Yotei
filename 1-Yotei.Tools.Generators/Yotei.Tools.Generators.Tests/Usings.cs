@@ -15,10 +15,6 @@ global using System.Text;
 global using System.Threading;
 global using System.Threading.Tasks;
 
-global using Microsoft.CodeAnalysis;
-global using Microsoft.CodeAnalysis.CSharp;
-global using Microsoft.CodeAnalysis.CSharp.Syntax;
-
 global using Xunit;
 global using Yotei.Tools;
 global using Yotei.Tools.Diagnostics;

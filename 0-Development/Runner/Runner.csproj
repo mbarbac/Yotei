@@ -26,6 +26,7 @@
    <ItemGroup>
 	  <ProjectReference Include="..\..\0-Experimental\Experimental.Tests\Experimental.Tests.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Tests\Yotei.Tools.Tests.csproj" />
+	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.Generators.WrapTests\Yotei.Tools.Generators.WrapTests.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.Generators.Tests\Yotei.Tools.Generators.Tests.csproj" />
    </ItemGroup>
 

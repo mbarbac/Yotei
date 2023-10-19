@@ -47,7 +47,8 @@ internal partial class FieldNode : Node
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"Field: {Symbol.ToStringEx(useSymbolType: false)}";
+    public override string ToString()
+        => $"Field: ({Parent.Symbol.Name}) {Symbol.ToStringEx(useSymbolType: false)}";
 
     /// <summary>
     /// The node in the hierarchy that contains this instance.

@@ -166,7 +166,7 @@ internal abstract class TreeGenerator : IIncrementalGenerator
             var symbol = model.GetDeclaredSymbol(typeSyntax);
             if (symbol != null) return new TypeCandidate(model, typeSyntax, symbol);
 
-            throw new NotFoundException(
+            throw new ArgumentException(
                 "No symbold found for the given type candidate.")
                 .WithData(typeSyntax.Identifier.Text, nameof(typeSyntax));
         }
@@ -177,7 +177,7 @@ internal abstract class TreeGenerator : IIncrementalGenerator
             var symbol = model.GetDeclaredSymbol(propertySyntax);
             if (symbol != null) return new PropertyCandidate(model, propertySyntax, symbol);
 
-            throw new NotFoundException(
+            throw new ArgumentException(
                 "No symbold found for the given property candidate.")
                 .WithData(propertySyntax.Identifier.Text, nameof(propertySyntax));
         }
@@ -192,7 +192,7 @@ internal abstract class TreeGenerator : IIncrementalGenerator
                 if (symbol != null) return new FieldCandidate(model, fieldSyntax, symbol);
             }
 
-            throw new NotFoundException(
+            throw new ArgumentException(
                 "No symbold found for the given field candidate.")
                 .WithData(fieldSyntax.Declaration.Variables[0].Identifier.Text, nameof(fieldSyntax));
         }
@@ -203,13 +203,13 @@ internal abstract class TreeGenerator : IIncrementalGenerator
             var symbol = model.GetDeclaredSymbol(methodSyntax);
             if (symbol != null) return new MethodCandidate(model, methodSyntax, symbol);
 
-            throw new NotFoundException(
+            throw new ArgumentException(
                 "No symbold found for the given method candidate.")
                 .WithData(methodSyntax.Identifier.Text, nameof(methodSyntax));
         }
 
         // Not supported...
-        throw new UnExpectedException(
+        throw new ArgumentException(
             "Unsupported syntax node.").WithData(node, nameof(node));
     }
 

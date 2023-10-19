@@ -20,7 +20,7 @@ internal static class NameSyntaxExtensions
             QualifiedNameSyntax item => ShortName(item.Right, useAlias),
             AliasQualifiedNameSyntax item => ShortName(useAlias ? item.Alias : item.Name, false),
 
-            _ => throw new UnExpectedException($"Unsupported name syntax: {nameSyntax}")
+            _ => throw new ArgumentException($"Unsupported name syntax: {nameSyntax}")
         };
     }
 
@@ -42,7 +42,7 @@ internal static class NameSyntaxExtensions
             QualifiedNameSyntax item => item.ToString(),
             AliasQualifiedNameSyntax item => LongName(useAlias ? item.Alias : item.Name, false),
 
-            _ => throw new UnExpectedException($"Unsupported name syntax: {nameSyntax}")
+            _ => throw new ArgumentException($"Unsupported name syntax: {nameSyntax}")
         };
     }
 }

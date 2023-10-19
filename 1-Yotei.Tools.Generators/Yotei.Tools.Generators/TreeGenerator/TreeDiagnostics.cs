@@ -4,13 +4,15 @@
 internal static class TreeDiagnostics
 {
     /// <summary>
-    /// Reports an error when the type is not a partial one.
+    /// Reports a diagnostic when the type is not a partial one.
     /// </summary>
     /// <param name="context"></param>
     /// <param name="symbol"></param>
-    public static void ErrorTypeNotPartial(
+    /// <param name="severity"></param>
+    public static void TypeNotPartial(
         this SourceProductionContext context,
-        ITypeSymbol symbol)
+        ITypeSymbol symbol,
+        DiagnosticSeverity severity)
     {
         var id = "TreeGen01";
         var head = "Type is not partial.";
@@ -18,18 +20,20 @@ internal static class TreeDiagnostics
 
         context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor(
             id, head, desc,
-            "Yotei", DiagnosticSeverity.Error, isEnabledByDefault: true),
+            "Yotei", severity, isEnabledByDefault: true),
             symbol.Locations.FirstOrDefault()));
     }
 
     /// <summary>
-    /// Reports an error when the type is not of a supported kind.
+    /// Reports a diagnostic when the type is not of a supported kind.
     /// </summary>
     /// <param name="context"></param>
     /// <param name="symbol"></param>
-    public static void ErrorTypeNotSupported(
+    /// <param name="severity"`></param>
+    public static void TypeNotSupported(
         this SourceProductionContext context,
-        ITypeSymbol symbol)
+        ITypeSymbol symbol,
+        DiagnosticSeverity severity)
     {
         var id = "TreeGen02";
         var head = "Kind of type is not supported.";
@@ -37,18 +41,20 @@ internal static class TreeDiagnostics
 
         context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor(
             id, head, desc,
-            "Yotei", DiagnosticSeverity.Error, isEnabledByDefault: true),
+            "Yotei", severity, isEnabledByDefault: true),
             symbol.Locations.FirstOrDefault()));
     }
 
     /// <summary>
-    /// Reports an error when the type is a record.
+    /// Reports a diagnostic when the type is a record.
     /// </summary>
     /// <param name="context"></param>
     /// <param name="symbol"></param>
-    public static void ErrorTypeIsRecord(
+    /// <param name="severity"></param>
+    public static void TypeIsRecord(
         this SourceProductionContext context,
-        ITypeSymbol symbol)
+        ITypeSymbol symbol,
+        DiagnosticSeverity severity)
     {
         var id = "TreeGen03";
         var head = "Type is a record.";
@@ -56,7 +62,7 @@ internal static class TreeDiagnostics
 
         context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor(
             id, head, desc,
-            "Yotei", DiagnosticSeverity.Error, isEnabledByDefault: true),
+            "Yotei", severity, isEnabledByDefault: true),
             symbol.Locations.FirstOrDefault()));
     }
 }

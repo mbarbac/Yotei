@@ -47,7 +47,8 @@ internal partial class PropertyNode : Node
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"Property: {Symbol.ToStringEx(useSymbolType: false)}";
+    public override string ToString()
+        => $"Property: ({Parent.Symbol.Name}) {Symbol.ToStringEx(useSymbolType: false)}";
 
     /// <summary>
     /// The node in the hierarchy that contains this instance.
