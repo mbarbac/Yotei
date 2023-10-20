@@ -15,7 +15,7 @@ public static class Test_CoreList
         public ChainElement(bool sensitive)
         {
             CaseSensitive = sensitive;
-            Validate = (item, add) =>
+            Validate = (item, _) =>
             {
                 ArgumentNullException.ThrowIfNull(item);
                 if (item is NameElement named) named.Name.NotNullNotEmpty();
@@ -77,11 +77,9 @@ public static class Test_CoreList
     [Fact]
     public static void Test_Create_Single()
     {
-        NameElement item;
-
         var items = new ChainElement(false, xone);
         Assert.Single(items);
-        item = Assert.IsType<NameElement>(items[0]); Assert.Equal("one", item.Name);
+        Assert.Same(xone, items[0]);
 
         try { _ = new ChainElement(false, (IElement)null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
@@ -94,13 +92,16 @@ public static class Test_CoreList
     [Fact]
     public static void Test_Create_Many()
     {
-        var items = new ChainElement(false, new[] { xone, xtwo, xthree });
+        var items = new ChainElement(false, [xone, xtwo, xthree]);
         Assert.Equal(3, items.Count);
         Assert.Same(xone, items[0]);
         Assert.Same(xtwo, items[1]);
         Assert.Same(xthree, items[2]);
 
-        try { _ = new ChainElement(false, new NameElement[] { xone, new("ONE") }); Assert.Fail(); }
+        try { _ = new ChainElement(false, (IEnumerable<IElement>)null!); Assert.Fail(); }
+        catch (ArgumentNullException) { }
+
+        try { _ = new ChainElement(false, [xone, new NameElement("ONE")]); Assert.Fail(); }
         catch (DuplicateException) { }
     }
 
@@ -108,21 +109,21 @@ public static class Test_CoreList
     [Fact]
     public static void Test_Clone()
     {
-        var source = new ChainElement(true, new[] { xone, xtwo, xthree });
+        var source = new ChainElement(false, [xone, xtwo, xthree]);
         var target = source.Clone();
+
         Assert.NotSame(source, target);
-        Assert.Equal(source.CaseSensitive, target.CaseSensitive);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
+        Assert.Equal(source.Count, target.Count);
+        Assert.Same(source[0], target[0]);
+        Assert.Same(source[1], target[1]);
+        Assert.Same(source[2], target[2]);
     }
 
     //[Enforced]
     [Fact]
-    public static void Test_Change_Settings()
+    public static void Test_ChangeBehaviors()
     {
-        var items = new ChainElement(true, new[] { xone, new("ONE") });
-
+        var items = new ChainElement(true, [xone, new NameElement("ONE")]);
         try { items.CaseSensitive = false; Assert.Fail(); }
         catch (DuplicateException) { }
     }
@@ -131,18 +132,32 @@ public static class Test_CoreList
     [Fact]
     public static void Test_Find()
     {
-        var items = new ChainElement(false, new[] { xone, xtwo, xthree });
+        var items = new ChainElement(false, [xone, xtwo, xthree]);
         Assert.Equal(0, items.IndexOf(new NameElement("one")));
         Assert.Equal(1, items.IndexOf(new NameElement("TWO")));
-        Assert.Equal(2, items.IndexOf(new NameElement("thrEE")));
+        Assert.Equal(2, items.IndexOf(new NameElement("THRee")));
 
         var list = items.IndexesOf(x => x is NameElement named && named.Name.Contains('e'));
         Assert.Equal(2, list.Count);
         Assert.Same(xone, items[list[0]]);
         Assert.Same(xthree, items[list[1]]);
 
-        items = new ChainElement(true, new NameElement[] { xone, new("ONE") });
+        items = new ChainElement(true, [xone, new NameElement("ONE")]);
         Assert.Equal(-1, items.LastIndexOf(new NameElement("OnE")));
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Find_Strict()
+    {
+        var items = new ChainElement(false, [xone, xtwo, xthree]);
+        Assert.Equal(0, items.IndexOf(xone, true));
+        Assert.Equal(1, items.IndexOf(xtwo, true));
+        Assert.Equal(2, items.IndexOf(xthree, true));
+
+        Assert.Equal(-1, items.IndexOf(new NameElement("one"), true));
+        Assert.Equal(-1, items.IndexOf(new NameElement("TWO"), true));
+        Assert.Equal(-1, items.IndexOf(new NameElement("THRee"), true));
     }
 
     //[Enforced]
@@ -150,6 +165,7 @@ public static class Test_CoreList
     public static void Test_GetRange()
     {
         var items = new ChainElement(false, new[] { xone, xtwo, xthree });
+
         var list = items.GetRange(1, 0);
         Assert.Empty(list);
 
@@ -161,7 +177,7 @@ public static class Test_CoreList
 
     //[Enforced]
     [Fact]
-    public static void Test_Replace()
+    public static void Test_Replace_Setter()
     {
         var items = new ChainElement(false, new[] { xone, xtwo, xthree });
         items[0] = xfour;
@@ -176,10 +192,33 @@ public static class Test_CoreList
 
     //[Enforced]
     [Fact]
-    public static void Test_Replace_Many()
+    public static void Test_Replace_Method()
     {
         var items = new ChainElement(false, new[] { xone, xtwo, xthree });
-        items[0] = new ChainElement(false, new[] { xfour, xfive });
+        var done = items.Replace(0, new NameElement("ONE"));
+        Assert.Equal(0, done);
+
+        done = items.Replace(0, new NameElement("ONE"), true);
+        Assert.Equal(1, done);
+        Assert.Equal(3, items.Count);
+        Assert.Same("ONE", ((NameElement)items[0]).Name);
+        Assert.Same(xtwo, items[1]);
+        Assert.Same(xthree, items[2]);
+
+        done = items.Replace(0, xfour);
+        Assert.Equal(1, done);
+        Assert.Equal(3, items.Count);
+        Assert.Same(xfour, items[0]);
+        Assert.Same(xtwo, items[1]);
+        Assert.Same(xthree, items[2]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Replace_Many()
+    {
+        var items = new ChainElement(false, [xone, xtwo, xthree]);
+        items[0] = new ChainElement(false, [xfour, xfive]);
         Assert.Equal(4, items.Count);
         Assert.Same(xfour, items[0]);
         Assert.Same(xfive, items[1]);
@@ -191,7 +230,7 @@ public static class Test_CoreList
     [Fact]
     public static void Test_Add()
     {
-        var items = new ChainElement(false, new[] { xone, xtwo, xthree });
+        var items = new ChainElement(false, [xone, xtwo, xthree]);
         var done = items.Add(xfour);
         Assert.Equal(1, done);
         Assert.Equal(4, items.Count);
@@ -211,7 +250,7 @@ public static class Test_CoreList
     [Fact]
     public static void Test_Add_Many()
     {
-        var items = new ChainElement(false, new[] { xone, xtwo, xthree });
+        var items = new ChainElement(false, [xone, xtwo, xthree]);
         var done = items.Add(new ChainElement(false));
         Assert.Equal(0, done);
         Assert.Equal(3, items.Count);
@@ -219,7 +258,7 @@ public static class Test_CoreList
         Assert.Same(xtwo, items[1]);
         Assert.Same(xthree, items[2]);
 
-        done = items.Add(new ChainElement(false, new[] { xfour, xfive }));
+        done = items.Add(new ChainElement(false, [xfour, xfive]));
         Assert.Equal(2, done);
         Assert.Equal(5, items.Count);
         Assert.Same(xone, items[0]);
@@ -233,8 +272,8 @@ public static class Test_CoreList
     [Fact]
     public static void Test_AddRange()
     {
-        var items = new ChainElement(false, new[] { xone, xtwo, xthree });
-        var done = items.AddRange(new[] { xfour, xfive });
+        var items = new ChainElement(false, [xone, xtwo, xthree]);
+        var done = items.AddRange([xfour, xfive]);
         Assert.Equal(2, done);
         Assert.Equal(5, items.Count);
         Assert.Same(xone, items[0]);
@@ -248,8 +287,8 @@ public static class Test_CoreList
     [Fact]
     public static void Test_AddRange_Many()
     {
-        var items = new ChainElement(false, new[] { xone, xtwo, xthree });
-        var done = items.AddRange(new IElement[] { xfour, new ChainElement(false, new[] { xfive, xsix }) });
+        var items = new ChainElement(false, [xone, xtwo, xthree]);
+        var done = items.AddRange([xfour, new ChainElement(false, [xfive, xsix])]);
         Assert.Equal(3, done);
         Assert.Equal(6, items.Count);
         Assert.Same(xone, items[0]);
@@ -264,7 +303,7 @@ public static class Test_CoreList
     [Fact]
     public static void Test_Insert()
     {
-        var items = new ChainElement(false, new[] { xone, xtwo, xthree });
+        var items = new ChainElement(false, [xone, xtwo, xthree]);
         var done = items.Insert(0, xfour);
         Assert.Equal(1, done);
         Assert.Equal(4, items.Count);
@@ -284,7 +323,7 @@ public static class Test_CoreList
     [Fact]
     public static void Test_Insert_Many()
     {
-        var items = new ChainElement(false, new[] { xone, xtwo, xthree });
+        var items = new ChainElement(false, [xone, xtwo, xthree]);
         var done = items.Insert(0, new ChainElement(false));
         Assert.Equal(0, done);
         Assert.Equal(3, items.Count);
@@ -292,7 +331,7 @@ public static class Test_CoreList
         Assert.Same(xtwo, items[1]);
         Assert.Same(xthree, items[2]);
 
-        done = items.Insert(0, new ChainElement(false, new[] { xfour, xfive }));
+        done = items.Insert(0, new ChainElement(false, [xfour, xfive]));
         Assert.Equal(2, done);
         Assert.Equal(5, items.Count);
         Assert.Same(xfour, items[0]);
@@ -306,7 +345,7 @@ public static class Test_CoreList
     [Fact]
     public static void Test_InsertRange()
     {
-        var items = new ChainElement(false, new[] { xone, xtwo, xthree });
+        var items = new ChainElement(false, [xone, xtwo, xthree]);
         var done = items.InsertRange(0, new[] { xfour, xfive });
         Assert.Equal(2, done);
         Assert.Equal(5, items.Count);
@@ -321,8 +360,8 @@ public static class Test_CoreList
     [Fact]
     public static void Test_InsertRange_Many()
     {
-        var items = new ChainElement(false, new[] { xone, xtwo, xthree });
-        var done = items.InsertRange(0, new IElement[] { xfour, new ChainElement(false, new[] { xfive, xsix }) });
+        var items = new ChainElement(false, [xone, xtwo, xthree]);
+        var done = items.InsertRange(0, [xfour, new ChainElement(false, [xfive, xsix])]);
         Assert.Equal(3, done);
         Assert.Equal(6, items.Count);
         Assert.Same(xfour, items[0]);
@@ -347,6 +386,24 @@ public static class Test_CoreList
 
     //[Enforced]
     [Fact]
+    public static void Test_RemoveRange()
+    {
+        var items = new ChainElement(false, new[] { xone, xtwo, xthree });
+        var done = items.RemoveRange(0, 0);
+        Assert.Equal(0, done);
+        Assert.Equal(3, items.Count);
+        Assert.Same(xone, items[0]);
+        Assert.Same(xtwo, items[1]);
+        Assert.Same(xthree, items[2]);
+
+        done = items.RemoveRange(0, 2);
+        Assert.Equal(2, done);
+        Assert.Single(items);
+        Assert.Same(xthree, items[0]);
+    }
+
+    //[Enforced]
+    [Fact]
     public static void Test_Remove()
     {
         var items = new ChainElement(false, new[] { xone, xtwo, xthree });
@@ -358,6 +415,25 @@ public static class Test_CoreList
         Assert.Same(xthree, items[2]);
 
         done = items.Remove(new NameElement("ONE"));
+        Assert.Equal(1, done);
+        Assert.Equal(2, items.Count);
+        Assert.Same(xtwo, items[0]);
+        Assert.Same(xthree, items[1]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Remove_Strict()
+    {
+        var items = new ChainElement(false, new[] { xone, xtwo, xthree });
+        var done = items.Remove(new NameElement("ONE"), true);
+        Assert.Equal(0, done);
+        Assert.Equal(3, items.Count);
+        Assert.Same(xone, items[0]);
+        Assert.Same(xtwo, items[1]);
+        Assert.Same(xthree, items[2]);
+
+        done = items.Remove(xone, true);
         Assert.Equal(1, done);
         Assert.Equal(2, items.Count);
         Assert.Same(xtwo, items[0]);
@@ -411,24 +487,6 @@ public static class Test_CoreList
         Assert.Equal(2, items.Count);
         Assert.Same(xtwo, items[0]);
         Assert.Same(xfour, items[1]);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_RemoveRange()
-    {
-        var items = new ChainElement(false, new[] { xone, xtwo, xthree });
-        var done = items.RemoveRange(0, 0);
-        Assert.Equal(0, done);
-        Assert.Equal(3, items.Count);
-        Assert.Same(xone, items[0]);
-        Assert.Same(xtwo, items[1]);
-        Assert.Same(xthree, items[2]);
-
-        done = items.RemoveRange(0, 2);
-        Assert.Equal(2, done);
-        Assert.Single(items);
-        Assert.Same(xthree, items[0]);
     }
 
     //[Enforced]

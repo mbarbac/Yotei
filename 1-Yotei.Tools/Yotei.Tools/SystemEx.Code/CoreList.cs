@@ -8,6 +8,7 @@
 public class CoreList<T> : ICoreList<T>
 {
     readonly List<T> Items = new(0);
+    const bool DEFAULT_STRICT = false;
 
     /// <summary>
     /// Initializes a new empty instance.
@@ -28,25 +29,32 @@ public class CoreList<T> : ICoreList<T>
 
     /// <summary>
     /// Copy constructor.
-    /// <br/> By default this method copies both the delegates and the original contents from
-    /// the source instance. If any delegate depends on the state of its concrete host instance,
-    /// then override this method appropriately.
+    /// <br/> By default this constructor copies the behavioral settings from the given source
+    /// instance. If this is not appropriate, either overrides this constructor, or override the
+    /// <see cref="CopyBehaviors(CoreList{T})"/> method.
     /// </summary>
     /// <param name="source"></param>
     protected CoreList(CoreList<T> source)
     {
         ArgumentNullException.ThrowIfNull(source);
-
-        Validate = source.Validate;
-        Compare = source.Compare;
-        AcceptDuplicate = source.AcceptDuplicate;
-        ExpandNested = source.ExpandNested;
-
+        CopyBehaviors(source);
         AddRange(source);
     }
 
     /// <summary>
-    /// <inheritdoc cref="ICloneable.Clone"/>
+    /// Invoked to copy the behavioral settings from the given source.
+    /// </summary>
+    /// <param name="source"></param>
+    protected virtual void CopyBehaviors(CoreList<T> source)
+    {
+        Validate = source.Validate;
+        Compare = source.Compare;
+        AcceptDuplicate = source.AcceptDuplicate;
+        ExpandNested = source.ExpandNested;
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="ICoreList{T}.Clone"/>
     /// </summary>
     /// <returns></returns>
     public virtual CoreList<T> Clone() => new(this);
@@ -62,10 +70,7 @@ public class CoreList<T> : ICoreList<T>
     // ----------------------------------------------------
 
     /// <summary>
-    /// The (item, add) delegate invoked to determine if the given element is a valid one for
-    /// the scenario where it will be used, it being 'true' when the element is to be added or
-    /// inserted into this collection, or 'false' otherwise. By default this delegate just
-    /// returns the given element.
+    /// <inheritdoc/>
     /// </summary>
     public Func<T, bool, T> Validate
     {
@@ -86,9 +91,7 @@ public class CoreList<T> : ICoreList<T>
     Func<T, bool, T> _Validate = (item, add) => item;
 
     /// <summary>
-    /// The (inner, other) delegate invoked to determine if the existing element and the other
-    /// one shall be considered equivalent or not. By default this delegate just invokes the
-    /// default comparer for the elements in this collection.
+    /// <inheritdoc/>
     /// </summary>
     public Func<T, T, bool> Compare
     {
@@ -109,10 +112,7 @@ public class CoreList<T> : ICoreList<T>
     Func<T, T, bool> _Compare = EqualityComparer<T>.Default.Equals;
 
     /// <summary>
-    /// The (item) delegate invoked to determine the behavior of this collection when adding
-    /// or inserting a duplicated element. By default this delegate returns 'true' to add the
-    /// duplicated element. If it returns 'false', then the duplicated element will be ignored.
-    /// This delegate can also throw a duplicate exception if it is needed.
+    /// <inheritdoc/>
     /// </summary>
     public Func<T, bool> AcceptDuplicate
     {
@@ -133,10 +133,7 @@ public class CoreList<T> : ICoreList<T>
     Func<T, bool> _AcceptDuplicate = (item) => true;
 
     /// <summary>
-    /// The (item) delegate invoked to determine if the given element, which is an enumeration
-    /// of the type of the elements of this collection, shall be expanded and its own elements
-    /// added or inserted instead of the original one, or not. By default this delegate returns
-    /// 'false'.
+    /// <inheritdoc/>
     /// </summary>
     public Func<T, bool> ExpandNested
     {
@@ -161,7 +158,7 @@ public class CoreList<T> : ICoreList<T>
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <returns><inheritdoc/></returns>
+    /// <returns></returns>
     public IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -183,7 +180,7 @@ public class CoreList<T> : ICoreList<T>
     public T this[int index]
     {
         get => Items[index];
-        set => Replace(index, value);
+        set => Replace(index, value, true);
     }
     object? IList.this[int index]
     {
@@ -196,39 +193,51 @@ public class CoreList<T> : ICoreList<T>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public bool Contains(T item) => IndexOf(item) >= 0;
-    bool IList.Contains(object? value) => Contains((T)value!);
+    public bool Contains(T item, bool strict = false) => IndexOf(item) >= 0;
+    bool IList.Contains(object? value) => Contains((T)value!, DEFAULT_STRICT);
+    bool ICollection<T>.Contains(T item) => Contains(item, DEFAULT_STRICT);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="item"></param>
+    /// <param name="strict"></param>
     /// <returns></returns>
-    public int IndexOf(T item)
+    public int IndexOf(T item, bool strict = false)
     {
         item = Validate(item, false);
 
         for (int i = 0; i < Items.Count; i++)
         {
-            var same = Compare(Items[i], item);
+            var inner = Items[i];
+            var same = strict
+                ? ((inner is null && item is null) || (inner is not null && inner.Equals(item)))
+                : Compare(inner, item);
+
             if (same) return i;
         }
         return -1;
     }
-    int IList.IndexOf(object? value) => IndexOf((T)value!);
+    int IList<T>.IndexOf(T item) => IndexOf(item, DEFAULT_STRICT);
+    int IList.IndexOf(object? value) => IndexOf((T)value!, DEFAULT_STRICT);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="item"></param>
+    /// <param name="strict"></param>
     /// <returns></returns>
-    public int LastIndexOf(T item)
+    public int LastIndexOf(T item, bool strict = false)
     {
         item = Validate(item, false);
 
         for (int i = Items.Count - 1; i >= 0; i--)
         {
-            var same = Compare(Items[i], item);
+            var inner = Items[i];
+            var same = strict
+                ? ((inner is null && item is null) || (inner is not null && inner.Equals(item)))
+                : Compare(inner, item);
+
             if (same) return i;
         }
         return -1;
@@ -238,15 +247,20 @@ public class CoreList<T> : ICoreList<T>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="item"></param>
+    /// <param name="strict"></param>
     /// <returns></returns>
-    public List<int> IndexesOf(T item)
+    public List<int> IndexesOf(T item, bool strict = false)
     {
         item = Validate(item, false);
 
         var list = new List<int>();
         for (int i = 0; i < Items.Count; i++)
         {
-            var same = Compare(Items[i], item);
+            var inner = Items[i];
+            var same = strict
+                ? ((inner is null && item is null) || (inner is not null && inner.Equals(item)))
+                : Compare(inner, item);
+
             if (same) list.Add(i);
         }
         return list;
@@ -338,12 +352,13 @@ public class CoreList<T> : ICoreList<T>
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
+    /// <param name="strict"></param>
     /// <returns></returns>
-    public virtual int Replace(int index, T item)
+    public virtual int Replace(int index, T item, bool strict = false)
     {
         item = Validate(item, true);
 
-        var temp = IndexOf(item);
+        var temp = IndexOf(item, strict);
         if (temp == index) return 0;
 
         var range = ToArray();
@@ -365,18 +380,23 @@ public class CoreList<T> : ICoreList<T>
     /// <returns></returns>
     public virtual int Add(T item)
     {
-        if (item is IEnumerable<T> range && ExpandNested(item)) return AddRange(range);
-
-        item = Validate(item, true);
-
-        var temp = IndexOf(item);
-        if (temp >= 0)
+        if (item is IEnumerable<T> range && ExpandNested(item))
         {
-            if (!AcceptDuplicate(item)) return 0;
+            return AddRange(range);
         }
+        else
+        {
+            item = Validate(item, true);
 
-        Items.Add(item);
-        return 1;
+            var temp = IndexOf(item);
+            if (temp >= 0)
+            {
+                if (!AcceptDuplicate(item)) return 0;
+            }
+
+            Items.Add(item);
+            return 1;
+        }
     }
     int IList.Add(object? value)
     {
@@ -406,18 +426,23 @@ public class CoreList<T> : ICoreList<T>
     /// <returns></returns>
     public virtual int Insert(int index, T item)
     {
-        if (item is IEnumerable<T> range && ExpandNested(item)) return InsertRange(index, range);
-
-        item = Validate(item, true);
-
-        var temp = IndexOf(item);
-        if (temp >= 0)
+        if (item is IEnumerable<T> range && ExpandNested(item))
         {
-            if (!AcceptDuplicate(item)) return 0;
+            return InsertRange(index, range);
         }
+        else
+        {
+            item = Validate(item, true);
 
-        Items.Insert(index, item);
-        return 1;
+            var temp = IndexOf(item);
+            if (temp >= 0)
+            {
+                if (!AcceptDuplicate(item)) return 0;
+            }
+
+            Items.Insert(index, item);
+            return 1;
+        }
     }
     void IList<T>.Insert(int index, T item) => Insert(index, item);
     void IList.Insert(int index, object? value) => Insert(index, (T)value!);
@@ -457,57 +482,72 @@ public class CoreList<T> : ICoreList<T>
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="index"></param>
+    /// <param name="count"></param>
     /// <returns></returns>
-    public virtual int Remove(T item)
+    public virtual int RemoveRange(int index, int count)
     {
-        if (item is IEnumerable<T> range && ExpandNested(item))
-        {
-            var count = 0; foreach (var temp in range) count += Remove(temp);
-            return count;
-        }
-        else
-        {
-            item = Validate(item, false);
-
-            var index = IndexOf(item);
-            return index >= 0 ? RemoveAt(index) : 0;
-        }
-    }
-    void IList.Remove(object? value) => Remove((T)value!);
-    bool ICollection<T>.Remove(T item) => Remove(item) > 0;
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    public virtual int RemoveLast(T item)
-    {
-        if (item is IEnumerable<T> range && ExpandNested(item))
-        {
-            var count = 0; foreach (var temp in range) count += RemoveLast(temp);
-            return count;
-        }
-        else
-        {
-            item = Validate(item, false);
-
-            var index = LastIndexOf(item);
-            return index >= 0 ? RemoveAt(index) : 0;
-        }
+        if (count > 0) Items.RemoveRange(index, count);
+        return count;
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="item"></param>
+    /// <param name="strict"></param>
     /// <returns></returns>
-    public virtual int RemoveAll(T item)
+    public virtual int Remove(T item, bool strict = false)
     {
         if (item is IEnumerable<T> range && ExpandNested(item))
         {
-            var count = 0; foreach (var temp in range) count += RemoveAll(temp);
+            var count = 0; foreach (var temp in range) count += Remove(temp, strict);
+            return count;
+        }
+        else
+        {
+            item = Validate(item, false);
+
+            var index = IndexOf(item, strict);
+            return index >= 0 ? RemoveAt(index) : 0;
+        }
+    }
+    void IList.Remove(object? value) => Remove((T)value!, DEFAULT_STRICT);
+    bool ICollection<T>.Remove(T item) => Remove(item, DEFAULT_STRICT) > 0;
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="strict"></param>
+    /// <returns></returns>
+    public virtual int RemoveLast(T item, bool strict = false)
+    {
+        if (item is IEnumerable<T> range && ExpandNested(item))
+        {
+            var count = 0; foreach (var temp in range) count += RemoveLast(temp, strict);
+            return count;
+        }
+        else
+        {
+            item = Validate(item, false);
+
+            var index = LastIndexOf(item, strict);
+            return index >= 0 ? RemoveAt(index) : 0;
+        }
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="strict"></param>
+    /// <returns></returns>
+    public virtual int RemoveAll(T item, bool strict = false)
+    {
+        if (item is IEnumerable<T> range && ExpandNested(item))
+        {
+            var count = 0; foreach (var temp in range) count += Remove(temp, strict);
             return count;
         }
         else
@@ -516,25 +556,13 @@ public class CoreList<T> : ICoreList<T>
 
             var count = 0; while (true)
             {
-                var index = IndexOf(item);
+                var index = IndexOf(item, strict);
 
                 if (index >= 0) count += RemoveAt(index);
                 else break;
             }
             return count;
         }
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="count"></param>
-    /// <returns></returns>
-    public virtual int RemoveRange(int index, int count)
-    {
-        if (count > 0) Items.RemoveRange(index, count);
-        return count;
     }
 
     /// <summary>
@@ -606,14 +634,6 @@ public class CoreList<T> : ICoreList<T>
     object ICollection.SyncRoot => ((ICollection)Items).SyncRoot;
     void ICollection.CopyTo(Array array, int index) => ((ICollection)Items).CopyTo(array, index);
 
-    public override bool Equals(object? obj)
-    {
-        return obj is CoreList<T> list &&
-               EqualityComparer<Func<T, bool>>.Default.Equals(_AcceptDuplicate, list._AcceptDuplicate);
-    }
-
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(_AcceptDuplicate);
-    }
+    public override bool Equals(object? obj) => ReferenceEquals(this, obj);
+    public override int GetHashCode() => Items.GetHashCode();
 }

@@ -38,11 +38,21 @@ public class LambdaParser
         var parser = new LambdaParser() { Argument = new LambdaNodeArgument(name) };
         parser.Argument.LambdaParser = parser;
 
-        var obj = expression(parser.Argument);
-        parser.Result = parser.LastNode ?? ToLambdaNode(obj, parser);
-
+        lock (CaveatsRoot)
+        {
+            var obj = expression(parser.Argument);
+            parser.Result = parser.LastNode ?? ToLambdaNode(obj, parser);
+        }
         return parser;
     }
+
+    /// <summary>
+    /// Used to protect the parsing so that only one is performed at the same time. When tests
+    /// are executed in parallel under xUnit, it seems there is some sort of interaction between
+    /// the DLR and xUnit that mix things together.
+    /// See notes in 'Test_Caveats.Setter_Concatenated_On_Same_Dynamic()'.
+    /// </summary>
+    static object CaveatsRoot = new();
 
     /// <summary>
     /// <inheritdoc/>

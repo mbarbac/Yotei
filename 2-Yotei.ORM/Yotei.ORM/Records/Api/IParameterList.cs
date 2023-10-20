@@ -1,37 +1,21 @@
-﻿namespace Yotei.Tools;
+﻿using IHost = Yotei.ORM.Records.IParameterList;
+using IItem = Yotei.ORM.Records.IParameter;
+
+namespace Yotei.ORM.Records;
 
 // ========================================================
 /// <summary>
-/// Represents an immutable list-alike collection with customizable behavior.
+/// Represents the ordered collection of parameters in a command. Duplicate elements are allowed
+/// only if they are the same instance. Otherwise, if two elements share the same name, then a
+/// duplicated exception is thrown.
 /// </summary>
-/// <typeparam name="T"></typeparam>
-public interface IInvariantList<T> : IEnumerable<T>, ICloneable
+[Cloneable]
+public partial interface IParameterList : IEnumerable<IItem>
 {
     /// <summary>
-    /// <inheritdoc cref="ICloneable.Clone"/>
+    /// The engine this instance is associated with.
     /// </summary>
-    /// <returns></returns>
-    new IInvariantList<T> Clone();
-
-    /// <summary>
-    /// <inheritdoc cref="ICoreList{T}.Validate"/>
-    /// </summary>
-    Func<T, bool, T> Validate { get; }
-
-    /// <summary>
-    /// <inheritdoc cref="ICoreList{T}.Compare"/>
-    /// </summary>
-    Func<T, T, bool> Compare { get; }
-
-    /// <summary>
-    /// <inheritdoc cref="ICoreList{T}.AcceptDuplicate"/>
-    /// </summary>
-    Func<T, bool> AcceptDuplicate { get; }
-
-    /// <summary>
-    /// <inheritdoc cref="ICoreList{T}.ExpandNested"/>
-    /// </summary>
-    Func<T, bool> ExpandNested { get; }
+    IEngine Engine { get; }
 
     /// <summary>
     /// Gets the number of elements in this instance.
@@ -48,91 +32,127 @@ public interface IInvariantList<T> : IEnumerable<T>, ICloneable
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    T this[int index] { get; }
+    IItem this[int index] { get; }
 
     /// <summary>
-    /// Determines if this instance contains the given element, or not.
-    /// <br/> If 'strict' mode is requested, comparison is made by value or reference, instead of
-    /// using comparison delegate.
+    /// Determines if this instance contains the given element, or not. If 'strict' mode is
+    /// requested, comparison is made by reference, instead of using the comparison criteria.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    bool Contains(T item, bool strict = false);
+    bool Contains(IItem item, bool strict = false);
 
     /// <summary>
-    /// Returns the index of the first ocurrence of the given element in this collection, or -1
-    /// if it cannot be found.
-    /// <br/> If 'strict' mode is requested, comparison is made by value or reference, instead of
-    /// using the comparison delegate.
-    /// </summary>
-    /// <param name="item"></param>
-    /// <param name="strict"></param>
-    /// <returns></returns>
-    int IndexOf(T item, bool strict = false);
-
-    /// <summary>
-    /// Returns the index of the last ocurrence of the given element in this collection, or -1
-    /// if it cannot be found.
-    /// <br/> If 'strict' mode is requested, comparison is made by value or reference, instead of
-    /// using the comparison delegate.
+    /// Returns the index of the first ocurrence of the given element in this instance, or -1
+    /// if it cannot be found. If 'strict' mode is requested, comparison is made by reference,
+    /// instead of using the comparison criteria.
     /// </summary>
     /// <param name="item"></param>
     /// <param name="strict"></param>
     /// <returns></returns>
-    int LastIndexOf(T item, bool strict = false);
+    int IndexOf(IItem item, bool strict = false);
 
     /// <summary>
-    /// Returns a list with the indexes of the ocurrences of the given element in this collection.
-    /// <br/> If 'strict' mode is requested, comparison is made by value or reference, instead of
-    /// using the comparison delegate.
+    /// Returns the index of the last ocurrence of the given element in this instance, or -1
+    /// if it cannot be found. If 'strict' mode is requested, comparison is made by reference,
+    /// instead of using the comparison criteria.
     /// </summary>
     /// <param name="item"></param>
     /// <param name="strict"></param>
     /// <returns></returns>
-    List<int> IndexesOf(T item, bool strict = false);
+    int LastIndexOf(IItem item, bool strict = false);
+
+    /// <summary>
+    /// Returns a list with the indexes of the ocurrences of the given element in this instance.
+    /// If 'strict' mode is requested, comparison is made by reference, instead of using the
+    /// comparison criteria.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="strict"></param>
+    /// <returns></returns>
+    List<int> IndexesOf(IItem item, bool strict = false);
 
     /// <summary>
     /// Determines if this instance contains an element that matches the given predicate, or not.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    bool Contains(Predicate<T> predicate);
+    bool Contains(Predicate<IItem> predicate);
 
     /// <summary>
-    /// Returns the index of the first ocurrence of an element in this collection that matches
-    /// the given predicate, or -1 if any can be found.
+    /// Returns the index of the first ocurrence of an element in this instance that matches the
+    /// given predicate, or -1 if any can be found.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int IndexOf(Predicate<T> predicate);
+    int IndexOf(Predicate<IItem> predicate);
 
     /// <summary>
-    /// Returns the index of the last ocurrence of an element in this collection that matches
-    /// the given predicate, or -1 if any can be found.
+    /// Returns the index of the last ocurrence of an element in this instance that matches the
+    /// given predicate, or -1 if any can be found.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int LastIndexOf(Predicate<T> predicate);
+    int LastIndexOf(Predicate<IItem> predicate);
 
     /// <summary>
-    /// Returns a list containing the indexes of all the elements in this collection that match
+    /// Returns a list containing the indexes of all the elements in this instance that match
     /// the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    List<int> IndexesOf(Predicate<T> predicate);
+    List<int> IndexesOf(Predicate<IItem> predicate);
 
     /// <summary>
     /// Returns an array with the elements in this collection.
     /// </summary>
     /// <returns></returns>
-    T[] ToArray();
+    IItem[] ToArray();
 
     /// <summary>
     /// Returns a list with the elements in this collection.
     /// </summary>
     /// <returns></returns>
-    List<T> ToList();
+    List<IItem> ToList();
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns the next suitable parameter name based upon the contents of this instance.
+    /// </summary>
+    /// <returns></returns>
+    string NextName();
+
+    /// <summary>
+    /// Determines if this instance contains an element that matches the given criteria, or not.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    bool Contains(string name);
+
+    /// <summary>
+    /// Returns the index of the first ocurrence of an element in this collection that matches
+    /// the given criteria, or -1 if it cannot be found.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    int IndexOf(string name);
+
+    /// <summary>
+    /// Returns the index of the last ocurrence of an element in this collection that matches
+    /// the given criteria, or -1 if it cannot be found.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    int LastIndexOf(string name);
+
+    /// <summary>
+    /// Returns a list containing the indexes of all ocurrences of elements in this collection
+    /// that match the given criteria.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    List<int> IndexesOf(string name);
 
     // ----------------------------------------------------
 
@@ -143,63 +163,63 @@ public interface IInvariantList<T> : IEnumerable<T>, ICloneable
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    IInvariantList<T> GetRange(int index, int count);
+    IHost GetRange(int index, int count);
 
     /// <summary>
     /// Returns a new instance where the item at the given index has been replaced by the new
-    /// given one. If 'strict' mode is requested, comparison is made by value or reference instead
-    /// of using the comparison delegate.
+    /// given one. If 'strict' mode is requested, comparison is made by reference instead
+    /// of using the comparison criteria.
+    /// <para>
+    /// By default, if the name of the existing element being replaced is the same as the name
+    /// of the given item, then both are considered the same and not replacement is done.
+    /// <br/>To guarantee the new item replaces any existing one, it is recommended to use
+    /// strict mode.</para>
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <param name="strict"></param>
     /// <returns></returns>
-    IInvariantList<T> Replace(int index, T item, bool strict = false);
+    IHost Replace(int index, IItem item, bool strict = false);
 
     /// <summary>
     /// Returns a new instance where the given element has been added to the original collection.
-    /// If it is a duplicated one, then this method invokes the '<see cref="AcceptDuplicate"/>
-    /// delegate to determine the appropriate behavior.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    IInvariantList<T> Add(T item);
+    IHost Add(IItem item);
 
     /// <summary>
     /// Returns a new instance where the elements from the given range have been added to the
-    /// original collection. If any is a duplicated one, then this method invokes the
-    /// '<see cref="AcceptDuplicate"/> delegate to determine the appropriate behavior.
+    /// original collection.
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    IInvariantList<T> AddRange(IEnumerable<T> range);
+    IHost AddRange(IEnumerable<IItem> range);
 
     /// <summary>
     /// Returns a new instance where the given element has been inserted, at the given index,
-    /// into the original collection.If it is a duplicated one, then this method invokes the
-    /// '<see cref="AcceptDuplicate"/> delegate to determine the appropriate behavior.
+    /// into the original collection.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    IInvariantList<T> Insert(int index, T item);
+    IHost Insert(int index, IItem item);
 
     /// <summary>
     /// Returns a new instance where the elements from the given range have been inserted, at
-    /// the given index, into the original collection.If it is a duplicated one, then this method
-    /// invokes the '<see cref="AcceptDuplicate"/> delegate to determine the appropriate behavior.
+    /// the given index, into the original collection.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    IInvariantList<T> InsertRange(int index, IEnumerable<T> range);
+    IHost InsertRange(int index, IEnumerable<IItem> range);
 
     /// <summary>
     /// Returns a new instance where element at the given index has been removed.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveAt(int index);
+    IHost RemoveAt(int index);
 
     /// <summary>
     /// Returns a new instance where the given number of elements, starting from the given index,
@@ -208,37 +228,36 @@ public interface IInvariantList<T> : IEnumerable<T>, ICloneable
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveRange(int index, int count);
+    IHost RemoveRange(int index, int count);
 
     /// <summary>
     /// Returns a new instance where the given element has been removed. If 'strict' mode is
-    /// requested, comparison is made by value or reference, instead of using the comparison
-    /// delegate.
+    /// requested, comparison is made by reference, instead of using the comparison criteria.
     /// </summary>
     /// <param name="item"></param>
     /// <param name="strict"></param>
     /// <returns></returns>
-    IInvariantList<T> Remove(T item, bool strict = false);
+    IHost Remove(IItem item, bool strict = false);
 
     /// <summary>
     /// Returns a new instance where the last ocurrence of the given element has been removed.
-    /// If 'strict' mode is requested, comparison is made by value or reference, instead of using
-    /// the comparison delegate.
+    /// If 'strict' mode is requested, comparison is made by reference, instead of using the
+    /// comparison criteria.
     /// </summary>
     /// <param name="item"></param>
     /// <param name="strict"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveLast(T item, bool strict = false);
+    IHost RemoveLast(IItem item, bool strict = false);
 
     /// <summary>
     /// Returns a new instance where all the ocurrences of the given element have been removed.
-    /// If 'strict' mode is requested, comparison is made by value or reference, instead of using
-    /// the comparison delegate.
+    /// If 'strict' mode is requested, comparison is made by reference, instead of using the
+    /// comparison criteria.
     /// </summary>
     /// <param name="item"></param>
     /// <param name="strict"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveAll(T item, bool strict = false);
+    IHost RemoveAll(IItem item, bool strict = false);
 
     /// <summary>
     /// Returns a new instance where the first ocurrence of an element that matches the given
@@ -246,7 +265,7 @@ public interface IInvariantList<T> : IEnumerable<T>, ICloneable
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IInvariantList<T> Remove(Predicate<T> predicate);
+    IHost Remove(Predicate<IItem> predicate);
 
     /// <summary>
     /// Returns a new instance where the last ocurrence of an element that matches the given
@@ -254,7 +273,7 @@ public interface IInvariantList<T> : IEnumerable<T>, ICloneable
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveLast(Predicate<T> predicate);
+    IHost RemoveLast(Predicate<IItem> predicate);
 
     /// <summary>
     /// Returns a new instance where all the elements that match the given predicate have been
@@ -262,11 +281,11 @@ public interface IInvariantList<T> : IEnumerable<T>, ICloneable
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveAll(Predicate<T> predicate);
+    IHost RemoveAll(Predicate<IItem> predicate);
 
     /// <summary>
     /// Returns a new instance where all the elements have been removed.
     /// </summary>
     /// <returns></returns>
-    IInvariantList<T> Clear();
+    IHost Clear();
 }

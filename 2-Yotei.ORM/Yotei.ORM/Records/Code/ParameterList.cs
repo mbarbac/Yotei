@@ -1,77 +1,90 @@
-﻿namespace Yotei.Tools;
+﻿using IHost = Yotei.ORM.Records.IParameterList;
+using IItem = Yotei.ORM.Records.IParameter;
+
+namespace Yotei.ORM.Records.Code;
 
 // ========================================================
 /// <summary>
-/// <inheritdoc cref="IInvariantList{T}"/>
+/// <inheritdoc cref="IHost"/>
 /// </summary>
-/// <typeparam name="T"></typeparam>
-public class InvariantList<T> : IInvariantList<T>
+[Cloneable(Specs = "(source)")]
+public partial class ParameterList : IHost
 {
     /// <summary>
-    /// Invoked to create a new internal collection.
+    /// Represents the internal collection of elements carried by this instance.
     /// </summary>
-    /// <returns></returns>
-    protected virtual CoreList<T> CreateItems() => new();
+    protected class InnerList : CoreList<IItem>
+    {
+        IHost Master;
+        public InnerList(IHost master)
+        {
+            Master = master.ThrowWhenNull();
+            Validate = (item, _) =>
+            {
+                item.ThrowWhenNull();
+                item.Name.NotNullNotEmpty();
+                return item;
+            };
+            Compare = (inner, other) =>
+            {
+                return Equivalent(inner.Name, other.Name);
+            };
+            AcceptDuplicate = (item) =>
+            {
+                var index = IndexOf(item);
+                var temp = index >= 0 ? this[index] : null;
+                if (ReferenceEquals(item, temp)) return true;
+                throw new DuplicateException("Duplicated element.").WithData(item);
+            };
+            ExpandNested = (_) => false;
+        }
+        public bool Equivalent(string x, string y)
+        {
+            return string.Compare(x, y, !Master.Engine.CaseSensitiveNames) == 0;
+        }
+    }
 
     /// <summary>
     /// The internal collection of elements carried by this instance.
     /// </summary>
-    protected CoreList<T> Items { get; }
-
-    // ----------------------------------------------------
+    protected InnerList Items { get; }
 
     /// <summary>
-    /// Initializes a new empty instance.
+    /// Initializes a new instance.
     /// </summary>
-    public InvariantList()
-        => Items = CreateItems()
-        ?? throw new UnExpectedException("Cannot obtain an instance of the internal collection.");
+    /// <param name="engine"></param>
+    public ParameterList(IEngine engine)
+    {
+        Engine = engine.ThrowWhenNull();
+        Items = new(this);
+    }
 
     /// <summary>
     /// Initializes a new instance with the given element.
     /// </summary>
+    /// <param name="engine"></param>
     /// <param name="item"></param>
-    public InvariantList(T item) : this() => Items.Add(item);
+    public ParameterList(IEngine engine, IItem item) : this(engine) => Items.Add(item);
 
     /// <summary>
     /// Initializes a new instance with the elements from the given range.
     /// </summary>
+    /// <param name="engine"></param>
     /// <param name="range"></param>
-    public InvariantList(IEnumerable<T> range) : this() => Items.AddRange(range);
+    public ParameterList(IEngine engine, IEnumerable<IItem> range) : this(engine) => Items.AddRange(range);
 
     /// <summary>
     /// Copy constructor.
-    /// <br/> By default this constructor copies the behavioral settings from the given source
-    /// instance. If this is not appropriate, either overrides this constructor, or override the
-    /// <see cref="CopyBehaviors(CoreList{T})"/> method.
     /// </summary>
     /// <param name="source"></param>
-    protected InvariantList(CoreList<T> source) : this()
+    protected ParameterList(ParameterList source)
     {
         ArgumentNullException.ThrowIfNull(source);
-        CopyBehaviors(source);
+
+        Engine = source.Engine;
+        Items = new(this);
         Items.AddRange(source);
     }
-
-    /// <summary>
-    /// Invoked to copy the behavioral settings from the given source.
-    /// </summary>
-    /// <param name="source"></param>
-    protected virtual void CopyBehaviors(CoreList<T> source)
-    {
-        Items.Validate = source.Validate;
-        Items.Compare = source.Compare;
-        Items.AcceptDuplicate = source.AcceptDuplicate;
-        Items.ExpandNested = source.ExpandNested;
-    }
-
-    /// <summary>
-    /// <inheritdoc cref="IInvariantList{T}.Clone"/>
-    /// </summary>
-    /// <returns></returns>
-    public virtual InvariantList<T> Clone() => new(this);
-    IInvariantList<T> IInvariantList<T>.Clone() => Clone();
-    object ICloneable.Clone() => Clone();
 
     /// <summary>
     /// <inheritdoc/>
@@ -79,52 +92,19 @@ public class InvariantList<T> : IInvariantList<T>
     /// <returns></returns>
     public override string ToString() => Items.ToString();
 
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    public Func<T, bool, T> Validate
-    {
-        get => Items.Validate;
-        init => Items.Validate = value;
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    public Func<T, T, bool> Compare
-    {
-        get => Items.Compare;
-        init => Items.Compare = value;
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    public Func<T, bool> AcceptDuplicate
-    {
-        get => Items.AcceptDuplicate;
-        init => Items.AcceptDuplicate = value;
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    public Func<T, bool> ExpandNested
-    {
-        get => Items.ExpandNested;
-        init => Items.ExpandNested = value;
-    }
-
-    // ----------------------------------------------------
-
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
+    public IEnumerator<IItem> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public IEngine Engine { get; }
 
     /// <summary>
     /// <inheritdoc/>
@@ -141,22 +121,14 @@ public class InvariantList<T> : IInvariantList<T>
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public T this[int index] => Items[index];
+    public IItem this[int index] => Items[index];
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public bool Contains(T item, bool strict = false) => Items.Contains(item, strict);
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="item"></param>
-    /// <param name="strict"></param>
-    /// <returns></returns>
-    public int IndexOf(T item, bool strict = false) => Items.IndexOf(item, strict);
+    public bool Contains(IItem item, bool strict = false) => Items.Contains(item, strict);
 
     /// <summary>
     /// <inheritdoc/>
@@ -164,7 +136,7 @@ public class InvariantList<T> : IInvariantList<T>
     /// <param name="item"></param>
     /// <param name="strict"></param>
     /// <returns></returns>
-    public int LastIndexOf(T item, bool strict = false) => Items.LastIndexOf(item, strict);
+    public int IndexOf(IItem item, bool strict = false) => Items.IndexOf(item, strict);
 
     /// <summary>
     /// <inheritdoc/>
@@ -172,47 +144,112 @@ public class InvariantList<T> : IInvariantList<T>
     /// <param name="item"></param>
     /// <param name="strict"></param>
     /// <returns></returns>
-    public List<int> IndexesOf(T item, bool strict = false) => Items.IndexesOf(item, strict);
+    public int LastIndexOf(IItem item, bool strict = false) => Items.LastIndexOf(item, strict);
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="strict"></param>
+    /// <returns></returns>
+    public List<int> IndexesOf(IItem item, bool strict = false) => Items.IndexesOf(item, strict);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public bool Contains(Predicate<T> predicate) => Items.Contains(predicate);
+    public bool Contains(Predicate<IItem> predicate) => Items.Contains(predicate);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public int IndexOf(Predicate<T> predicate) => Items.IndexOf(predicate);
+    public int IndexOf(Predicate<IItem> predicate) => Items.IndexOf(predicate);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public int LastIndexOf(Predicate<T> predicate) => Items.LastIndexOf(predicate);
+    public int LastIndexOf(Predicate<IItem> predicate) => Items.LastIndexOf(predicate);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public List<int> IndexesOf(Predicate<T> predicate) => Items.IndexesOf(predicate);
+    public List<int> IndexesOf(Predicate<IItem> predicate) => Items.IndexesOf(predicate);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public T[] ToArray() => Items.ToArray();
+    public IItem[] ToArray() => Items.ToArray();
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public List<T> ToList() => Items.ToList();
+    public List<IItem> ToList() => Items.ToList();
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public string NextName()
+    {
+        for (int i = Items.Count; i < int.MaxValue; i++)
+        {
+            var name = $"{Engine.ParameterPrefix}{i}";
+            var index = IndexOf(name);
+            if (index < 0) return name;
+        }
+        throw new UnExpectedException("Range of indexes exhausted.");
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public bool Contains(string name) => IndexOf(name) >= 0;
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public int IndexOf(string name)
+    {
+        name = name.NotNullNotEmpty();
+        return Items.IndexOf(x => Items.Equivalent(x.Name, name));
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public int LastIndexOf(string name)
+    {
+        name = name.NotNullNotEmpty();
+        return Items.LastIndexOf(x => Items.Equivalent(x.Name, name));
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public List<int> IndexesOf(string name)
+    {
+        name = name.NotNullNotEmpty();
+        return Items.IndexesOf(x => Items.Equivalent(x.Name, name));
+    }
 
     // ----------------------------------------------------
 
@@ -222,7 +259,7 @@ public class InvariantList<T> : IInvariantList<T>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual IInvariantList<T> GetRange(int index, int count)
+    public virtual IHost GetRange(int index, int count)
     {
         if (index == 0 && count == Count) return this;
         if (count == 0)
@@ -247,7 +284,7 @@ public class InvariantList<T> : IInvariantList<T>
     /// <param name="item"></param>
     /// <param name="strict"></param>
     /// <returns></returns>
-    public virtual IInvariantList<T> Replace(int index, T item, bool strict = false)
+    public virtual IHost Replace(int index, IItem item, bool strict = false)
     {
         var temp = Clone();
         var num = temp.Items.Replace(index, item, strict);
@@ -259,7 +296,7 @@ public class InvariantList<T> : IInvariantList<T>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IInvariantList<T> Add(T item)
+    public virtual IHost Add(IItem item)
     {
         var temp = Clone();
         var num = temp.Items.Add(item);
@@ -271,7 +308,7 @@ public class InvariantList<T> : IInvariantList<T>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual IInvariantList<T> AddRange(IEnumerable<T> range)
+    public virtual IHost AddRange(IEnumerable<IItem> range)
     {
         var temp = Clone();
         var num = temp.Items.AddRange(range);
@@ -284,7 +321,7 @@ public class InvariantList<T> : IInvariantList<T>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IInvariantList<T> Insert(int index, T item)
+    public virtual IHost Insert(int index, IItem item)
     {
         var temp = Clone();
         var num = temp.Items.Insert(index, item);
@@ -297,7 +334,7 @@ public class InvariantList<T> : IInvariantList<T>
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual IInvariantList<T> InsertRange(int index, IEnumerable<T> range)
+    public virtual IHost InsertRange(int index, IEnumerable<IItem> range)
     {
         var temp = Clone();
         var num = temp.Items.InsertRange(index, range);
@@ -309,7 +346,7 @@ public class InvariantList<T> : IInvariantList<T>
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public virtual IInvariantList<T> RemoveAt(int index)
+    public virtual IHost RemoveAt(int index)
     {
         var temp = Clone();
         var num = temp.Items.RemoveAt(index);
@@ -322,7 +359,7 @@ public class InvariantList<T> : IInvariantList<T>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual IInvariantList<T> RemoveRange(int index, int count)
+    public virtual IHost RemoveRange(int index, int count)
     {
         var temp = Clone();
         var num = temp.Items.RemoveRange(index, count);
@@ -335,7 +372,7 @@ public class InvariantList<T> : IInvariantList<T>
     /// <param name="item"></param>
     /// <param name="strict"></param>
     /// <returns></returns>
-    public virtual IInvariantList<T> Remove(T item, bool strict = false)
+    public virtual IHost Remove(IItem item, bool strict = false)
     {
         var temp = Clone();
         var num = temp.Items.Remove(item, strict);
@@ -348,7 +385,7 @@ public class InvariantList<T> : IInvariantList<T>
     /// <param name="item"></param>
     /// <param name="strict"></param>
     /// <returns></returns>
-    public virtual IInvariantList<T> RemoveLast(T item, bool strict = false)
+    public virtual IHost RemoveLast(IItem item, bool strict = false)
     {
         var temp = Clone();
         var num = temp.Items.RemoveLast(item, strict);
@@ -361,7 +398,7 @@ public class InvariantList<T> : IInvariantList<T>
     /// <param name="item"></param>
     /// <param name="strict"></param>
     /// <returns></returns>
-    public virtual IInvariantList<T> RemoveAll(T item, bool strict = false)
+    public virtual IHost RemoveAll(IItem item, bool strict = false)
     {
         var temp = Clone();
         var num = temp.Items.RemoveAll(item, strict);
@@ -373,7 +410,7 @@ public class InvariantList<T> : IInvariantList<T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IInvariantList<T> Remove(Predicate<T> predicate)
+    public virtual IHost Remove(Predicate<IItem> predicate)
     {
         var temp = Clone();
         var num = temp.Items.Remove(predicate);
@@ -385,7 +422,7 @@ public class InvariantList<T> : IInvariantList<T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IInvariantList<T> RemoveLast(Predicate<T> predicate)
+    public virtual IHost RemoveLast(Predicate<IItem> predicate)
     {
         var temp = Clone();
         var num = temp.Items.RemoveLast(predicate);
@@ -397,7 +434,7 @@ public class InvariantList<T> : IInvariantList<T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IInvariantList<T> RemoveAll(Predicate<T> predicate)
+    public virtual IHost RemoveAll(Predicate<IItem> predicate)
     {
         var temp = Clone();
         var num = temp.Items.RemoveAll(predicate);
@@ -408,7 +445,7 @@ public class InvariantList<T> : IInvariantList<T>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual IInvariantList<T> Clear()
+    public virtual IHost Clear()
     {
         var temp = Clone();
         var num = temp.Items.Clear();
