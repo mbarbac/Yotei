@@ -60,21 +60,6 @@ public static class Test_ParameterList
 
     //[Enforced]
     [Fact]
-    public static void Test_Clone()
-    {
-        var engine = new FakeEngine();
-        var source = new THost(engine, [x007, xJames, xBond]);
-
-        var target = source.Clone();
-        Assert.NotSame(source, target);
-        Assert.Equal(source.Count, target.Count);
-        Assert.Same(source[0], target[0]);
-        Assert.Same(source[1], target[1]);
-        Assert.Same(source[2], target[2]);
-    }
-
-    //[Enforced]
-    [Fact]
     public static void Test_Find()
     {
         var engine = new FakeEngine();
@@ -95,6 +80,21 @@ public static class Test_ParameterList
 
         index = items.IndexOf(x008); Assert.Equal(0, index);
         index = items.IndexOf(x008, true); Assert.Equal(-1, index);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Clone()
+    {
+        var engine = new FakeEngine();
+        var source = new THost(engine, [x007, xJames, xBond]);
+
+        var target = source.Clone();
+        Assert.NotSame(source, target);
+        Assert.Equal(source.Count, target.Count);
+        Assert.Same(source[0], target[0]);
+        Assert.Same(source[1], target[1]);
+        Assert.Same(source[2], target[2]);
     }
 
     //[Enforced]

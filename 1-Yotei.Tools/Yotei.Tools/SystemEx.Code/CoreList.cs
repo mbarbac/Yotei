@@ -192,6 +192,7 @@ public class CoreList<T> : ICoreList<T>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="item"></param>
+    /// <param name="strict"></param>
     /// <returns></returns>
     public bool Contains(T item, bool strict = false) => IndexOf(item) >= 0;
     bool IList.Contains(object? value) => Contains((T)value!, DEFAULT_STRICT);

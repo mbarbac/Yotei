@@ -67,18 +67,19 @@ public interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollection, IE
 
     /// <summary>
     /// Determines if this instance contains the given element, or not.
-    /// <br/> If 'strict' mode is requested, comparison is made by value or reference, instead of
-    /// using the <see cref="Compare"/> delegate.
+    /// If strict mode is requested, comparison is made by value or reference, instead of using
+    /// the comparison criteria.
     /// </summary>
     /// <param name="item"></param>
+    /// <param name="strict"></param>
     /// <returns></returns>
     bool Contains(T item, bool strict = false);
 
     /// <summary>
     /// Returns the index of the first ocurrence of the given element in this collection, or -1
-    /// if it cannot be found.
-    /// <br/> If 'strict' mode is requested, comparison is made by value or reference, instead of
-    /// using the '<see cref="Compare"/>' delegate.
+    /// if it cannot be found. 
+    /// If strict mode is requested, comparison is made by value or reference, instead of using
+    /// the comparison criteria.
     /// </summary>
     /// <param name="item"></param>
     /// <param name="strict"></param>
@@ -88,8 +89,8 @@ public interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollection, IE
     /// <summary>
     /// Returns the index of the last ocurrence of the given element in this collection, or -1
     /// if it cannot be found.
-    /// <br/> If 'strict' mode is requested, comparison is made by value or reference, instead of
-    /// using the '<see cref="Compare"/>' delegate.
+    /// If strict mode is requested, comparison is made by value or reference, instead of using
+    /// the comparison criteria.
     /// </summary>
     /// <param name="item"></param>
     /// <param name="strict"></param>
@@ -98,8 +99,8 @@ public interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollection, IE
 
     /// <summary>
     /// Returns a list with the indexes of the ocurrences of the given element in this collection.
-    /// <br/> If 'strict' mode is requested, comparison is made by value or reference, instead of
-    /// using the '<see cref="Compare"/>' delegate.
+    /// If strict mode is requested, comparison is made by value or reference, instead of using
+    /// the comparison criteria.
     /// </summary>
     /// <param name="item"></param>
     /// <param name="strict"></param>
@@ -162,8 +163,8 @@ public interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollection, IE
     /// <summary>
     /// Replaces the element stored at the given index with the new given one.
     /// If they are the same then no replacement is performed.
-    /// If 'strict' mode is requested, comparison is made by value or reference, instead of using
-    /// the '<see cref="Compare"/>' delegate.
+    /// If strict mode is requested, comparison is made by value or reference, instead of using
+    /// the comparison criteria.
     /// Returns the number of elements inserted.
     /// </summary>
     /// <param name="index"></param>
@@ -174,8 +175,8 @@ public interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollection, IE
 
     /// <summary>
     /// Adds to this collection the given element.
-    /// If it is a duplicated one, then this method invokes the '<see cref="AcceptDuplicate"/>
-    /// delegate to determine the appropriate behavior.
+    /// If it is a duplicated one, then whether it is added or ignored is determined by the accept
+    /// duplicates setting in this instance.
     /// Returns the number of elements added.
     /// </summary>
     /// <param name="item"></param>
@@ -184,8 +185,8 @@ public interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollection, IE
 
     /// <summary>
     /// Adds to this collection the elements from the given range.
-    /// If any is a duplicated one, then this method invokes the '<see cref="AcceptDuplicate"/>
-    /// delegate to determine the appropriate behavior.
+    /// If any is a duplicated one, then whether it is added or ignored is determined by the accept
+    /// duplicates setting in this instance.
     /// Returns the number of elements added.
     /// </summary>
     /// <param name="range"></param>
@@ -194,8 +195,8 @@ public interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollection, IE
 
     /// <summary>
     /// Inserts into this collection the given element, at the given index.
-    /// If it is a duplicated one, then this method invokes the '<see cref="AcceptDuplicate"/>
-    /// delegate to determine the appropriate behavior.
+    /// If it is a duplicated one, then whether it is inserted or ignored is determined by the
+    /// accept duplicates setting in this instance.
     /// Returns the number of elements inserted.
     /// </summary>
     /// <param name="index"></param>
@@ -206,8 +207,8 @@ public interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollection, IE
     /// <summary>
     /// Inserts into this collection the elements from the given range, starting from the given
     /// index.
-    /// If any is a duplicated one, then this method invokes the '<see cref="AcceptDuplicate"/>
-    /// delegate to determine the appropriate behavior.
+    /// If any is a duplicated one, then whether it is inserted or ignored is determined by the
+    /// accept duplicates setting in this instance.
     /// Returns the number of elements inserted.
     /// </summary>
     /// <param name="index"></param>
@@ -234,8 +235,8 @@ public interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollection, IE
 
     /// <summary>
     /// Removes from this collection the first ocurrence of the given element.
-    /// If 'strict' mode is requested, comparison is made by value or reference, instead of using
-    /// the '<see cref="Compare"/>' delegate.
+    /// If strict mode is requested, comparison is made by value or reference, instead of using
+    /// the comparison criteria.
     /// Returns the number of elements removed.
     /// </summary>
     /// <param name="item"></param>
@@ -245,8 +246,8 @@ public interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollection, IE
 
     /// <summary>
     /// Removes from this collection the last ocurrence of the given element.
-    /// If 'strict' mode is requested, comparison is made by value or reference, instead of using
-    /// the '<see cref="Compare"/>' delegate.
+    /// If strict mode is requested, comparison is made by value or reference, instead of using
+    /// the comparison criteria.
     /// Returns the number of elements removed.
     /// </summary>
     /// <param name="item"></param>
@@ -256,8 +257,8 @@ public interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollection, IE
 
     /// <summary>
     /// Removes from this collection all the ocurrences of the given element.
-    /// If 'strict' mode is requested, comparison is made by value or reference, instead of using
-    /// the '<see cref="Compare"/>' delegate.
+    /// If strict mode is requested, comparison is made by value or reference, instead of using
+    /// the comparison criteria.
     /// Returns the number of elements removed.
     /// </summary>
     /// <param name="item"></param>
@@ -267,8 +268,7 @@ public interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollection, IE
 
     /// <summary>
     /// Removes from this collection the first ocurrence of an element that matches the given
-    /// predicate.
-    /// Returns the number of elements removed.
+    /// predicate. Returns the number of elements removed.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
@@ -276,8 +276,7 @@ public interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollection, IE
 
     /// <summary>
     /// Removes from this collection the last ocurrence of an element that matches the given
-    /// predicate.
-    /// Returns the number of elements removed.
+    /// predicate. Returns the number of elements removed.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>

@@ -1,21 +1,20 @@
-﻿using IHost = Yotei.ORM.Records.IParameterList;
-using IItem = Yotei.ORM.Records.IParameter;
+﻿using IHost = Yotei.ORM.Records.IIdentifierTags;
+using IItem = string;
 
 namespace Yotei.ORM.Records;
 
 // ========================================================
 /// <summary>
-/// Represents the ordered collection of parameters in a command. Duplicate elements are allowed
-/// only if they are the same instance. Otherwise, if two elements share the same name, then a
-/// duplicated exception is thrown.
+/// Represents the ordered collection of not-duplicated metadata tags that describe the maximal
+/// structure of the database identifiers associated with an underlying engine.
 /// </summary>
 [Cloneable]
-public partial interface IParameterList : IEnumerable<IItem>
+public partial interface IIdentifierTags : IEnumerable<IItem>
 {
     /// <summary>
-    /// The engine this instance is associated with.
+    /// Determines if the metadata tags in this collection are case sensitive, or not.
     /// </summary>
-    IEngine Engine { get; }
+    [WithGenerator] bool CaseSensitiveTags { get; }
 
     /// <summary>
     /// Gets the number of elements in this instance.
@@ -35,43 +34,18 @@ public partial interface IParameterList : IEnumerable<IItem>
     IItem this[int index] { get; }
 
     /// <summary>
-    /// Determines if this instance contains the given element, or not. If strict mode is
-    /// requested, comparison is made by reference, instead of using the comparison criteria.
+    /// Determines if this instance contains the given element, or not.
     /// </summary>
     /// <param name="item"></param>
-    /// <param name="strict"></param>
     /// <returns></returns>
-    bool Contains(IItem item, bool strict = false);
+    bool Contains(IItem item);
 
     /// <summary>
-    /// Returns the index of the first ocurrence of the given element in this instance, or -1
-    /// if it cannot be found. If strict mode is requested, comparison is made by reference,
-    /// instead of using the comparison criteria.
+    /// Returns the index of the the given element in this instance, or -1 if it cannot be found.
     /// </summary>
     /// <param name="item"></param>
-    /// <param name="strict"></param>
     /// <returns></returns>
-    int IndexOf(IItem item, bool strict = false);
-
-    /// <summary>
-    /// Returns the index of the last ocurrence of the given element in this instance, or -1
-    /// if it cannot be found. If strict mode is requested, comparison is made by reference,
-    /// instead of using the comparison criteria.
-    /// </summary>
-    /// <param name="item"></param>
-    /// <param name="strict"></param>
-    /// <returns></returns>
-    int LastIndexOf(IItem item, bool strict = false);
-
-    /// <summary>
-    /// Returns a list with the indexes of the ocurrences of the given element in this instance.
-    /// If strict mode is requested, comparison is made by reference, instead of using the
-    /// comparison criteria.
-    /// </summary>
-    /// <param name="item"></param>
-    /// <param name="strict"></param>
-    /// <returns></returns>
-    List<int> IndexesOf(IItem item, bool strict = false);
+    int IndexOf(IItem item);
 
     /// <summary>
     /// Determines if this instance contains an element that matches the given predicate, or not.
@@ -119,45 +93,6 @@ public partial interface IParameterList : IEnumerable<IItem>
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns the next suitable parameter name based upon the contents of this instance.
-    /// </summary>
-    /// <returns></returns>
-    string NextName();
-
-    /// <summary>
-    /// Determines if this instance contains an element that matches the given criteria, or not.
-    /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    bool Contains(string name);
-
-    /// <summary>
-    /// Returns the index of the first ocurrence of an element in this collection that matches
-    /// the given criteria, or -1 if it cannot be found.
-    /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    int IndexOf(string name);
-
-    /// <summary>
-    /// Returns the index of the last ocurrence of an element in this collection that matches the
-    /// given criteria, or -1 if it cannot be found.
-    /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    int LastIndexOf(string name);
-
-    /// <summary>
-    /// Returns a list containing the indexes of all ocurrences of elements in this collection
-    /// that match the given criteria.
-    /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    List<int> IndexesOf(string name);
-
-    // ----------------------------------------------------
-
-    /// <summary>
     /// Returns a new instance that contains the given number of elements, starting from the
     /// given index, from the original collection.
     /// </summary>
@@ -168,18 +103,12 @@ public partial interface IParameterList : IEnumerable<IItem>
 
     /// <summary>
     /// Returns a new instance where the item at the given index has been replaced by the new
-    /// given one. If strict mode is requested, comparison is made by reference instead
-    /// of using the comparison criteria.
-    /// <para>
-    /// By default, if the name of the existing element being replaced is the same as the name
-    /// of the given item, then both are considered the same and not replacement is done. Strict
-    /// mode is recommended to guarantee the new item replaces any existing one.</para>
+    /// given one.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
-    /// <param name="strict"></param>
     /// <returns></returns>
-    IHost Replace(int index, IItem item, bool strict = false);
+    IHost Replace(int index, IItem item);
 
     /// <summary>
     /// Returns a new instance where the given element has been added to the original collection.
@@ -231,33 +160,11 @@ public partial interface IParameterList : IEnumerable<IItem>
     IHost RemoveRange(int index, int count);
 
     /// <summary>
-    /// Returns a new instance where the given element has been removed. If strict mode is
-    /// requested, comparison is made by reference, instead of using the comparison criteria.
+    /// Returns a new instance where the given element has been removed.
     /// </summary>
     /// <param name="item"></param>
-    /// <param name="strict"></param>
     /// <returns></returns>
-    IHost Remove(IItem item, bool strict = false);
-
-    /// <summary>
-    /// Returns a new instance where the last ocurrence of the given element has been removed.
-    /// If strict mode is requested, comparison is made by reference, instead of using the
-    /// comparison criteria.
-    /// </summary>
-    /// <param name="item"></param>
-    /// <param name="strict"></param>
-    /// <returns></returns>
-    IHost RemoveLast(IItem item, bool strict = false);
-
-    /// <summary>
-    /// Returns a new instance where all the ocurrences of the given element have been removed.
-    /// If strict mode is requested, comparison is made by reference, instead of using the
-    /// comparison criteria.
-    /// </summary>
-    /// <param name="item"></param>
-    /// <param name="strict"></param>
-    /// <returns></returns>
-    IHost RemoveAll(IItem item, bool strict = false);
+    IHost Remove(IItem item);
 
     /// <summary>
     /// Returns a new instance where the first ocurrence of an element that matches the given

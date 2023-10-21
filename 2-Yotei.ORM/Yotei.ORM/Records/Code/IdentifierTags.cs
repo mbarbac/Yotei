@@ -1,5 +1,5 @@
-﻿using IHost = Yotei.ORM.Records.IParameterList;
-using IItem = Yotei.ORM.Records.IParameter;
+﻿using IHost = Yotei.ORM.Records.IIdentifierTags;
+using IItem = string;
 
 namespace Yotei.ORM.Records.Code;
 
@@ -8,7 +8,8 @@ namespace Yotei.ORM.Records.Code;
 /// <inheritdoc cref="IHost"/>
 /// </summary>
 [Cloneable(Specs = "(source)")]
-public partial class ParameterList : IHost
+[WithGenerator(Specs = "(source)+@")]
+public partial class IdentifierTags : IHost
 {
     /// <summary>
     /// Represents the internal collection of elements carried by this instance.
@@ -21,26 +22,55 @@ public partial class ParameterList : IHost
             Master = master.ThrowWhenNull();
             Validate = (item, _) =>
             {
-                item.ThrowWhenNull();
-                item.Name.NotNullNotEmpty();
-                return item;
+                return item.NotNullNotEmpty();
             };
             Compare = (inner, other) =>
             {
-                return Equivalent(inner.Name, other.Name);
+                return string.Compare(inner, other, !Master.CaseSensitiveTags) == 0;
             };
             AcceptDuplicate = (item) =>
             {
-                var index = IndexOf(item);
-                var temp = index >= 0 ? this[index] : null;
-                if (ReferenceEquals(item, temp)) return true;
                 throw new DuplicateException("Duplicated element.").WithData(item);
             };
             ExpandNested = (_) => false;
         }
-        public bool Equivalent(string x, string y)
+        public override int Add(string item)
         {
-            return string.Compare(x, y, !Master.Engine.CaseSensitiveNames) == 0;
+            if (item != null && item.Contains('.'))
+            {
+                var parts = item.Split('.');
+                var count = 0;
+                foreach (var part in parts) count += base.Add(part);
+                return count;
+            }
+            return base.Add(item!);
+        }
+        public override int Insert(int index, string item)
+        {
+            if (item != null && item.Contains('.'))
+            {
+                var parts = item.Split('.');
+                var count = 0;
+                foreach (var part in parts)
+                {
+                    var temp = base.Insert(index, part);
+                    count += temp;
+                    index += temp;
+                }
+                return count;
+            }
+            return base.Insert(index, item!);
+        }
+        public override int Remove(string item, bool strict = false)
+        {
+            if (item != null && item.Contains('.'))
+            {
+                var parts = item.Split('.');
+                var count = 0;
+                foreach (var part in parts) count += base.Remove(part, strict);
+                return count;
+            }
+            return base.Remove(item!, strict);
         }
     }
 
@@ -52,37 +82,37 @@ public partial class ParameterList : IHost
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
-    /// <param name="engine"></param>
-    public ParameterList(IEngine engine)
+    /// <param name="caseSensitiveTags"></param>
+    public IdentifierTags(bool caseSensitiveTags)
     {
         Items = new(this);
-        Engine = engine.ThrowWhenNull();
+        CaseSensitiveTags = caseSensitiveTags;
     }
 
     /// <summary>
     /// Initializes a new instance with the given element.
     /// </summary>
-    /// <param name="engine"></param>
+    /// <param name="caseSensitiveTags"></param>
     /// <param name="item"></param>
-    public ParameterList(IEngine engine, IItem item) : this(engine) => Items.Add(item);
+    public IdentifierTags(bool caseSensitiveTags, IItem item) : this(caseSensitiveTags) => Items.Add(item);
 
     /// <summary>
     /// Initializes a new instance with the elements from the given range.
     /// </summary>
     /// <param name="engine"></param>
     /// <param name="range"></param>
-    public ParameterList(IEngine engine, IEnumerable<IItem> range) : this(engine) => Items.AddRange(range);
+    public IdentifierTags(bool caseSensitiveTags, IEnumerable<IItem> range) : this(caseSensitiveTags) => Items.AddRange(range);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected ParameterList(ParameterList source)
+    protected IdentifierTags(IdentifierTags source)
     {
         ArgumentNullException.ThrowIfNull(source);
 
         Items = new(this);
-        Engine = source.Engine;
+        CaseSensitiveTags = source.CaseSensitiveTags;        
         Items.AddRange(source);
     }
 
@@ -90,7 +120,7 @@ public partial class ParameterList : IHost
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => Items.ToString();
+    public override string ToString() => string.Join('.', Items);
 
     /// <summary>
     /// <inheritdoc/>
@@ -104,7 +134,24 @@ public partial class ParameterList : IHost
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public IEngine Engine { get; }
+    [WithGenerator]
+    public bool CaseSensitiveTags
+    {
+        get => _CaseSensitiveTags;
+        init
+        {
+            if (_CaseSensitiveTags == value) return;
+            _CaseSensitiveTags = value;
+
+            if (Count > 0)
+            {
+                var range = ToArray();
+                Items.Clear();
+                Items.AddRange(range);
+            }
+        }
+    }
+    bool _CaseSensitiveTags = false;
 
     /// <summary>
     /// <inheritdoc/>
@@ -128,31 +175,14 @@ public partial class ParameterList : IHost
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public bool Contains(IItem item, bool strict = false) => Items.Contains(item, strict);
+    public bool Contains(IItem item) => Items.Contains(item, strict: false);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="item"></param>
-    /// <param name="strict"></param>
     /// <returns></returns>
-    public int IndexOf(IItem item, bool strict = false) => Items.IndexOf(item, strict);
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="item"></param>
-    /// <param name="strict"></param>
-    /// <returns></returns>
-    public int LastIndexOf(IItem item, bool strict = false) => Items.LastIndexOf(item, strict);
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="item"></param>
-    /// <param name="strict"></param>
-    /// <returns></returns>
-    public List<int> IndexesOf(IItem item, bool strict = false) => Items.IndexesOf(item, strict);
+    public int IndexOf(IItem item) => Items.IndexOf(item, strict: false);
 
     /// <summary>
     /// <inheritdoc/>
@@ -199,63 +229,6 @@ public partial class ParameterList : IHost
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <returns></returns>
-    public string NextName()
-    {
-        for (int i = Items.Count; i < int.MaxValue; i++)
-        {
-            var name = $"{Engine.ParameterPrefix}{i}";
-            var index = IndexOf(name);
-            if (index < 0) return name;
-        }
-        throw new UnExpectedException("Range of indexes exhausted.");
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    public bool Contains(string name) => IndexOf(name) >= 0;
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    public int IndexOf(string name)
-    {
-        name = name.NotNullNotEmpty();
-        return Items.IndexOf(x => Items.Equivalent(x.Name, name));
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    public int LastIndexOf(string name)
-    {
-        name = name.NotNullNotEmpty();
-        return Items.LastIndexOf(x => Items.Equivalent(x.Name, name));
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    public List<int> IndexesOf(string name)
-    {
-        name = name.NotNullNotEmpty();
-        return Items.IndexesOf(x => Items.Equivalent(x.Name, name));
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
@@ -282,12 +255,11 @@ public partial class ParameterList : IHost
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
-    /// <param name="strict"></param>
     /// <returns></returns>
-    public virtual IHost Replace(int index, IItem item, bool strict = false)
+    public virtual IHost Replace(int index, IItem item)
     {
         var temp = Clone();
-        var num = temp.Items.Replace(index, item, strict);
+        var num = temp.Items.Replace(index, item, strict: false);
         return num > 0 ? temp : this;
     }
 
@@ -370,38 +342,11 @@ public partial class ParameterList : IHost
     /// <inheritdoc/>
     /// </summary>
     /// <param name="item"></param>
-    /// <param name="strict"></param>
     /// <returns></returns>
-    public virtual IHost Remove(IItem item, bool strict = false)
+    public virtual IHost Remove(IItem item)
     {
         var temp = Clone();
-        var num = temp.Items.Remove(item, strict);
-        return num > 0 ? temp : this;
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="item"></param>
-    /// <param name="strict"></param>
-    /// <returns></returns>
-    public virtual IHost RemoveLast(IItem item, bool strict = false)
-    {
-        var temp = Clone();
-        var num = temp.Items.RemoveLast(item, strict);
-        return num > 0 ? temp : this;
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="item"></param>
-    /// <param name="strict"></param>
-    /// <returns></returns>
-    public virtual IHost RemoveAll(IItem item, bool strict = false)
-    {
-        var temp = Clone();
-        var num = temp.Items.RemoveAll(item, strict);
+        var num = temp.Items.Remove(item, strict: false);
         return num > 0 ? temp : this;
     }
 

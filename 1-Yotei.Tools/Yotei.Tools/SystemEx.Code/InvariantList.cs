@@ -147,6 +147,7 @@ public class InvariantList<T> : IInvariantList<T>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="item"></param>
+    /// <param name="strict"></param>
     /// <returns></returns>
     public bool Contains(T item, bool strict = false) => Items.Contains(item, strict);
 

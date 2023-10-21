@@ -52,18 +52,19 @@ public interface IInvariantList<T> : IEnumerable<T>, ICloneable
 
     /// <summary>
     /// Determines if this instance contains the given element, or not.
-    /// <br/> If 'strict' mode is requested, comparison is made by value or reference, instead of
-    /// using comparison delegate.
+    /// If strict mode is requested, comparison is made by value or reference, instead of using
+    /// the comparison criteria.
     /// </summary>
     /// <param name="item"></param>
+    /// <param name="strict"></param>
     /// <returns></returns>
     bool Contains(T item, bool strict = false);
 
     /// <summary>
     /// Returns the index of the first ocurrence of the given element in this collection, or -1
-    /// if it cannot be found.
-    /// <br/> If 'strict' mode is requested, comparison is made by value or reference, instead of
-    /// using the comparison delegate.
+    /// if it cannot be found. 
+    /// If strict mode is requested, comparison is made by value or reference, instead of using
+    /// the comparison criteria.
     /// </summary>
     /// <param name="item"></param>
     /// <param name="strict"></param>
@@ -73,8 +74,8 @@ public interface IInvariantList<T> : IEnumerable<T>, ICloneable
     /// <summary>
     /// Returns the index of the last ocurrence of the given element in this collection, or -1
     /// if it cannot be found.
-    /// <br/> If 'strict' mode is requested, comparison is made by value or reference, instead of
-    /// using the comparison delegate.
+    /// If strict mode is requested, comparison is made by value or reference, instead of using
+    /// the comparison criteria.
     /// </summary>
     /// <param name="item"></param>
     /// <param name="strict"></param>
@@ -83,8 +84,8 @@ public interface IInvariantList<T> : IEnumerable<T>, ICloneable
 
     /// <summary>
     /// Returns a list with the indexes of the ocurrences of the given element in this collection.
-    /// <br/> If 'strict' mode is requested, comparison is made by value or reference, instead of
-    /// using the comparison delegate.
+    /// If strict mode is requested, comparison is made by value or reference, instead of using
+    /// the comparison criteria.
     /// </summary>
     /// <param name="item"></param>
     /// <param name="strict"></param>
@@ -147,8 +148,8 @@ public interface IInvariantList<T> : IEnumerable<T>, ICloneable
 
     /// <summary>
     /// Returns a new instance where the item at the given index has been replaced by the new
-    /// given one. If 'strict' mode is requested, comparison is made by value or reference instead
-    /// of using the comparison delegate.
+    /// given one. If strict mode is requested, comparison is made by value or reference, instead
+    /// of using the comparison criteria.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
@@ -158,8 +159,8 @@ public interface IInvariantList<T> : IEnumerable<T>, ICloneable
 
     /// <summary>
     /// Returns a new instance where the given element has been added to the original collection.
-    /// If it is a duplicated one, then this method invokes the '<see cref="AcceptDuplicate"/>
-    /// delegate to determine the appropriate behavior.
+    /// If it is a duplicated one, then whether it is added or ignored is determined by the
+    /// accept duplicates setting of this instance.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
@@ -167,8 +168,9 @@ public interface IInvariantList<T> : IEnumerable<T>, ICloneable
 
     /// <summary>
     /// Returns a new instance where the elements from the given range have been added to the
-    /// original collection. If any is a duplicated one, then this method invokes the
-    /// '<see cref="AcceptDuplicate"/> delegate to determine the appropriate behavior.
+    /// original collection.
+    /// If any is a duplicated one, then whether it is added or ignored is determined by the
+    /// accept duplicates setting of this instance.
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
@@ -176,8 +178,9 @@ public interface IInvariantList<T> : IEnumerable<T>, ICloneable
 
     /// <summary>
     /// Returns a new instance where the given element has been inserted, at the given index,
-    /// into the original collection.If it is a duplicated one, then this method invokes the
-    /// '<see cref="AcceptDuplicate"/> delegate to determine the appropriate behavior.
+    /// into the original collection.
+    /// If it is a duplicated one, then whether it is inserted or ignored is determined by the
+    /// accept duplicates setting of this instance.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
@@ -186,8 +189,9 @@ public interface IInvariantList<T> : IEnumerable<T>, ICloneable
 
     /// <summary>
     /// Returns a new instance where the elements from the given range have been inserted, at
-    /// the given index, into the original collection.If it is a duplicated one, then this method
-    /// invokes the '<see cref="AcceptDuplicate"/> delegate to determine the appropriate behavior.
+    /// the given index, into the original collection.
+    /// If any is a duplicated one, then whether it is inserted or ignored is determined by the
+    /// accept duplicates setting of this instance.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="range"></param>
@@ -211,9 +215,9 @@ public interface IInvariantList<T> : IEnumerable<T>, ICloneable
     IInvariantList<T> RemoveRange(int index, int count);
 
     /// <summary>
-    /// Returns a new instance where the given element has been removed. If 'strict' mode is
-    /// requested, comparison is made by value or reference, instead of using the comparison
-    /// delegate.
+    /// Returns a new instance where the given element has been removed.
+    /// If strict mode is requested, comparison is made by value or reference, instead of using
+    /// the comparison criteria.
     /// </summary>
     /// <param name="item"></param>
     /// <param name="strict"></param>
@@ -222,8 +226,8 @@ public interface IInvariantList<T> : IEnumerable<T>, ICloneable
 
     /// <summary>
     /// Returns a new instance where the last ocurrence of the given element has been removed.
-    /// If 'strict' mode is requested, comparison is made by value or reference, instead of using
-    /// the comparison delegate.
+    /// If strict mode is requested, comparison is made by value or reference, instead of using
+    /// the comparison criteria.
     /// </summary>
     /// <param name="item"></param>
     /// <param name="strict"></param>
@@ -232,8 +236,8 @@ public interface IInvariantList<T> : IEnumerable<T>, ICloneable
 
     /// <summary>
     /// Returns a new instance where all the ocurrences of the given element have been removed.
-    /// If 'strict' mode is requested, comparison is made by value or reference, instead of using
-    /// the comparison delegate.
+    /// If strict mode is requested, comparison is made by value or reference, instead of using
+    /// the comparison criteria.
     /// </summary>
     /// <param name="item"></param>
     /// <param name="strict"></param>

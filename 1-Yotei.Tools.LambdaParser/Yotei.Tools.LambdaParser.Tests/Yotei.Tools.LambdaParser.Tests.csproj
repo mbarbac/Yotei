@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
    <PropertyGroup>
 	  <TargetFramework>net8.0</TargetFramework>
@@ -31,13 +31,13 @@
 
    <!-- LOCAL configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Local'">
-	  <PackageReference Include="Yotei.Tools" Version="0.5.24-v0001" />
+	  <PackageReference Include="Yotei.Tools" Version="0.5.25-v0001" />
 	  <PackageReference Include="Yotei.Tools.LambdaParser" Version="0.5.22-v0001" />
    </ItemGroup>
 
    <!-- RELEASE configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Release'">
-	  <PackageReference Include="Yotei.Tools" Version="0.5.23" />
+	  <PackageReference Include="Yotei.Tools" Version="0.5.24" />
 	  <PackageReference Include="Yotei.Tools.LambdaParser" Version="0.5.21" />
    </ItemGroup>
 
