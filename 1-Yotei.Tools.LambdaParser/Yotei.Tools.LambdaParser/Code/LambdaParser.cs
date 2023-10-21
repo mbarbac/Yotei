@@ -18,8 +18,14 @@ public class LambdaParser
     /// dynamic argument and the chain of dynamic operations binded to it.
     /// </summary>
     /// <param name="expression"></param>
+    /// <param name="fast">
+    /// In general, it is required that this method runs in isolation so that no other parsing
+    /// runs at the same time (some state kept by the DLR can be modified by a parsing which is
+    /// not this one). This flag permits a faster parsing when the caller can guarantee that
+    /// there are no parallel parsings working at the same time.
+    /// </param>
     /// <returns></returns>
-    public static LambdaParser Parse(Func<dynamic, object> expression)
+    public static LambdaParser Parse(Func<dynamic, object> expression, bool fast = false)
     {
         expression = expression.ThrowWhenNull();
 
@@ -38,21 +44,26 @@ public class LambdaParser
         var parser = new LambdaParser() { Argument = new LambdaNodeArgument(name) };
         parser.Argument.LambdaParser = parser;
 
-        lock (CaveatsRoot)
+        if (fast)
         {
             var obj = expression(parser.Argument);
             parser.Result = parser.LastNode ?? ToLambdaNode(obj, parser);
+        }
+        else
+        {
+            lock (FastRoot)
+            {
+                var obj = expression(parser.Argument);
+                parser.Result = parser.LastNode ?? ToLambdaNode(obj, parser);
+            }
         }
         return parser;
     }
 
     /// <summary>
-    /// Used to protect the parsing so that only one is performed at the same time. When tests
-    /// are executed in parallel under xUnit, it seems there is some sort of interaction between
-    /// the DLR and xUnit that mix things together.
-    /// See notes in 'Test_Caveats.Setter_Concatenated_On_Same_Dynamic()'.
+    /// Use to protect from parallel execution.
     /// </summary>
-    static object CaveatsRoot = new();
+    static object FastRoot = new();
 
     /// <summary>
     /// <inheritdoc/>

@@ -23,6 +23,8 @@ public partial class Parameter : IParameter
         Value = value;
     }
 
+    // ----------------------------------------------------
+
     /// <summary>
     /// Copy constructor.
     /// </summary>

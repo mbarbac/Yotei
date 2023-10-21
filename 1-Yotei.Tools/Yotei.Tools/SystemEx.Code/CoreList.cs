@@ -5,6 +5,7 @@
 /// <inheritdoc cref="ICoreList{T}"/>
 /// </summary>
 /// <typeparam name="T"></typeparam>
+[DebuggerDisplay("{ToDebugString()}")]
 public class CoreList<T> : ICoreList<T>
 {
     readonly List<T> Items = new(0);
@@ -66,6 +67,8 @@ public class CoreList<T> : ICoreList<T>
     /// </summary>
     /// <returns></returns>
     public override string ToString() => $"Count: {Count}";
+
+    string ToDebugString() => $"[{string.Join(", ", Items)}]";
 
     // ----------------------------------------------------
 

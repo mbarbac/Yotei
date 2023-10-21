@@ -12,7 +12,7 @@ public static class Test_ParameterList
     readonly static TItem xJames = new("FirstName", "James");
     readonly static TItem xBond = new("LastName", "Bond");
     readonly static TItem xMi6 = new("Organization", "Mi6");
-    
+
     //[Enforced]
     [Fact]
     public static void Test_Create_Empty()
@@ -95,6 +95,15 @@ public static class Test_ParameterList
         Assert.Same(source[0], target[0]);
         Assert.Same(source[1], target[1]);
         Assert.Same(source[2], target[2]);
+
+        source = new THost(engine, [x007, xJames, xBond, x007]);
+        target = source.Clone();
+        Assert.NotSame(source, target);
+        Assert.Equal(source.Count, target.Count);
+        Assert.Same(source[0], target[0]);
+        Assert.Same(source[1], target[1]);
+        Assert.Same(source[2], target[2]);
+        Assert.Same(source[3], target[3]);
     }
 
     //[Enforced]
@@ -130,25 +139,9 @@ public static class Test_ParameterList
         Assert.Same(xBond, target[1]);
         Assert.Same(xBond, target[2]);
 
-        try { _ = source.Replace(1, new TItem("Id", "value")); Assert.Fail(); }
-        catch (DuplicateException) { }
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_Replace_Strict()
-    {
-        var engine = new FakeEngine();
-        var source = new THost(engine, [x007, xJames, xBond]);
-
-        // No replacement because [0] is "Id", and matches with the new item...
-        var target = source.Replace(0, x008);
-        Assert.Same(source, target);
-
-        // In strict mode, [0] is not the same as x008...
-        target = source.Replace(0, x008, true);
+        target = source.Replace(0, new TItem("Id", "value"));
         Assert.NotSame(source, target);
-        Assert.Same(x008, target[0]);
+        Assert.Equal("value", target[0].Value);
         Assert.Same(xJames, target[1]);
         Assert.Same(xBond, target[2]);
 
@@ -277,7 +270,7 @@ public static class Test_ParameterList
         Assert.Same(x007, target[0]);
         Assert.Same(xBond, target[1]);
 
-        target = source.Remove(new TItem("FirstName", "any"));
+        target = source.Remove(new TItem("FirstName", "..."));
         Assert.NotSame(source, target);
         Assert.Same(x007, target[0]);
         Assert.Same(xBond, target[1]);
@@ -285,67 +278,30 @@ public static class Test_ParameterList
 
     //[Enforced]
     [Fact]
-    public static void Test_Remove_Strict()
-    {
-        var engine = new FakeEngine();
-        var source = new THost(engine, [x007, xJames, xBond]);
-
-        var target = source.Remove(new TItem("FirstName", "any"), true);
-        Assert.Same(source, target);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_Remove_Range()
-    {
-        var engine = new FakeEngine();
-        var source = new THost(engine, [x007, xJames, xBond]);
-
-        var target = source.RemoveRange(0, 2);
-        Assert.NotSame(source, target);
-        Assert.Same(xBond, target[0]);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_Remove_Item()
+    public static void Test_Remove_Duplicated()
     {
         var engine = new FakeEngine();
         var source = new THost(engine, [x007, xJames, xBond, x007]);
 
-        var target = source.Remove(new TItem("Id", "value"));
+        var target = source.Remove(new TItem("Id", "..."));
         Assert.NotSame(source, target);
+        Assert.Equal(3, target.Count);
         Assert.Same(xJames, target[0]);
         Assert.Same(xBond, target[1]);
         Assert.Same(x007, target[2]);
 
-        target = source.RemoveLast(new TItem("Id", "value"));
+        target = source.RemoveLast(new TItem("Id", "..."));
         Assert.NotSame(source, target);
+        Assert.Equal(3, target.Count);
         Assert.Same(x007, target[0]);
         Assert.Same(xJames, target[1]);
         Assert.Same(xBond, target[2]);
 
-        target = source.RemoveAll(new TItem("Id", "value"));
+        target = source.RemoveAll(new TItem("Id", "..."));
         Assert.NotSame(source, target);
+        Assert.Equal(2, target.Count);
         Assert.Same(xJames, target[0]);
         Assert.Same(xBond, target[1]);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_Remove_Item_Strict()
-    {
-        var engine = new FakeEngine();
-        var source = new THost(engine, [x007, xJames, xBond, x007]);
-
-        var target = source.Remove(new TItem("Id", "value"), true);
-        Assert.Same(source, target);
-
-        target = source.RemoveLast(new TItem("Id", "value"), true);
-        Assert.Same(source, target);
-
-        target = source.RemoveAll(new TItem("Id", "value"), true);
-        Assert.Same(source, target);
     }
 
     //[Enforced]

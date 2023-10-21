@@ -39,6 +39,7 @@ public abstract partial class Engine : IEngine
         UseTerminators = source.UseTerminators;
         LeftTerminator = source.LeftTerminator;
         RightTerminator = source.RightTerminator;
+        KnownTags = source.KnownTags;
     }
 
     /// <summary>
@@ -118,6 +119,16 @@ public abstract partial class Engine : IEngine
     char _RightTerminator = RIGHTTERMINATOR;
 
 
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public IKnownTags KnownTags
+    {
+        get => _KnownTags;
+        init => _KnownTags = value.ThrowWhenNull();
+    }
+    IKnownTags _KnownTags = new KnownTags(false);
 
     // ----------------------------------------------------
 

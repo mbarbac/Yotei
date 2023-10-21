@@ -30,7 +30,9 @@ public partial class IdentifierTags : IHost
             };
             AcceptDuplicate = (item) =>
             {
-                throw new DuplicateException("Duplicated element.").WithData(item);
+                throw new DuplicateException("Duplicated element.")
+                .WithData(item)
+                .WithData(Master);
             };
             ExpandNested = (_) => false;
         }
@@ -78,6 +80,8 @@ public partial class IdentifierTags : IHost
     /// The internal collection of elements carried by this instance.
     /// </summary>
     protected InnerList Items { get; }
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// Initializes a new instance.

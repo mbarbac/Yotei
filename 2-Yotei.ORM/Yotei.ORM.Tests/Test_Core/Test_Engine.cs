@@ -18,6 +18,14 @@ public static class Test_Engine
         Assert.Equal(Engine.USETERMINATORS, engine.UseTerminators);
         Assert.Equal(Engine.LEFTERMINATOR, engine.LeftTerminator);
         Assert.Equal(Engine.RIGHTTERMINATOR, engine.RightTerminator);
+
+        Assert.Equal(3, engine.KnownTags.IdentifierTags.Count);
+        Assert.Equal("SchemaTag", engine.KnownTags.IdentifierTags[0]);
+        Assert.Equal("TableTag", engine.KnownTags.IdentifierTags[1]);
+        Assert.Equal("ColumnTag", engine.KnownTags.IdentifierTags[2]);
+        Assert.Equal("PrimaryTag", engine.KnownTags.PrimaryKeyTag);
+        Assert.Equal("UniqueTag", engine.KnownTags.UniqueValuedTag);
+        Assert.Equal("ReadOnlyTag", engine.KnownTags.ReadOnlyTag);
     }
 
     //[Enforced]
@@ -57,5 +65,72 @@ public static class Test_Engine
         target = source.WithRightTerminator('x');
         Assert.NotSame(source, target);
         Assert.Equal('x', target.RightTerminator);
+
+        var tags = new KnownTags(false, new IdentifierTags(false), "another");
+        target = source.WithKnownTags(tags);
+        Assert.NotSame(source, target);
+        Assert.Empty(target.KnownTags.IdentifierTags);
+        Assert.Equal("another", target.KnownTags.PrimaryKeyTag);
+        Assert.Null(target.KnownTags.UniqueValuedTag);
+        Assert.Null(target.KnownTags.ReadOnlyTag);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_GetDotted_Null()
+    {
+        var engine = new FakeEngine();
+        var parts = engine.GetDotted(null);
+        Assert.Empty(parts);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_GetDotted_With_Terminators()
+    {
+        var engine = new FakeEngine();
+        var parts = engine.GetDotted(string.Empty);
+        Assert.Single(parts);
+        Assert.Equal(string.Empty, parts[0]);
+
+        parts = engine.GetDotted(" ");
+        Assert.Single(parts);
+        Assert.Equal(" ", parts[0]);
+
+        parts = engine.GetDotted(" [ one.two ] ");
+        Assert.Single(parts);
+        Assert.Equal(" [ one.two ] ", parts[0]);
+
+        parts = engine.GetDotted(" [ one.two ] .[three] ");
+        Assert.Equal(2, parts.Length);
+        Assert.Equal(" [ one.two ] ", parts[0]);
+        Assert.Equal("[three] ", parts[1]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_GetDotted_No_Terminators()
+    {
+        var engine = new FakeEngine() { UseTerminators = false };
+        var parts = engine.GetDotted(string.Empty);
+        Assert.Single(parts);
+        Assert.Equal(string.Empty, parts[0]);
+
+        parts = engine.GetDotted(" ");
+        Assert.Single(parts);
+        Assert.Equal(" ", parts[0]);
+
+        parts = engine.GetDotted(" [ one.two ] ");
+        Assert.Equal(2, parts.Length);
+        Assert.Equal(" [ one", parts[0]);
+        Assert.Equal("two ] ", parts[1]);
+
+        parts = engine.GetDotted(" [ one.two ] .[three] ");
+        Assert.Equal(3, parts.Length);
+        Assert.Equal(" [ one", parts[0]);
+        Assert.Equal("two ] ", parts[1]);
+        Assert.Equal("[three] ", parts[2]);
     }
 }
