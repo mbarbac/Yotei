@@ -98,6 +98,22 @@ public partial class IdentifierMultiPart : Identifier, IHost
     }
 
     /// <summary>
+    /// Initializes a new instance with the parts obtained from the given range of values.
+    /// </summary>
+    /// <param name="engine"></param>
+    /// <param name="range"></param>
+    public IdentifierMultiPart(IEngine engine, IEnumerable<string?> range) : this(engine)
+    {
+        ArgumentNullException.ThrowIfNull(range);
+
+        foreach (var value in range)
+        {
+            var parts = ValueToParts(value);
+            Items.AddRange(parts);
+        }
+    }
+
+    /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
@@ -124,12 +140,25 @@ public partial class IdentifierMultiPart : Identifier, IHost
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override IIdentifier Reduce() => Count switch
+    public override IIdentifier Reduce()
     {
-        0 => new IdentifierSinglePart(Engine),
-        1 => Items[0],
-        _ => this,
-    };
+        if (Count == 0) return new IdentifierSinglePart(Engine);
+        if (Count == 1) return Items[0];
+
+        if (Items[0].Value == null)
+        {
+            var values = Items.Select(x => x.NonTerminatedValue).ToList();
+            while (values.Count > 0)
+            {
+                if (values[0] == null) values.RemoveAt(0);
+                else break;
+            }
+            return values.Count == 0
+                ? new IdentifierSinglePart(Engine)
+                : new IdentifierMultiPart(Engine, values);
+        }
+        return this;
+    }
 
     /// <summary>
     /// <inheritdoc/>

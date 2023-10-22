@@ -4,7 +4,6 @@
 /// <summary>
 /// <inheritdoc cref="IKnownTags"/>
 /// </summary>
-[Cloneable(Specs = "(source)")]
 [WithGenerator(Specs = "(source)+@")]
 public partial class KnownTags : IKnownTags
 {

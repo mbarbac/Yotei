@@ -56,7 +56,11 @@ public static class Test_IdentifierMultiPart
     public static void Test_Create_Many()
     {
         var engine = new FakeEngine();
-        var items = new THost(engine, new[] { new TItem(engine) });
+        var items = new THost(engine, Array.Empty<IIdentifierSinglePart>());
+        Assert.Empty(items);
+        Assert.Null(items.Value);
+
+        items = new THost(engine, new[] { new TItem(engine) });
         Assert.Equal(1, items.Count);
         Assert.Null(items.Value);
 
