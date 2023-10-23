@@ -59,12 +59,6 @@ public partial interface IEngine
     [WithGenerator]
     char RightTerminator { get; }
 
-    /// <summary>
-    /// The collection of metadata tags that are well-known to this instance.
-    /// </summary>
-    [WithGenerator]
-    IKnownTags KnownTags { get; }
-
     // ----------------------------------------------------
 
     /// <summary>

@@ -21,7 +21,6 @@ public static class Test_ParameterList
         var items = new THost(engine);
         Assert.Empty(items);
     }
-
     //[Enforced]
     [Fact]
     public static void Test_Create_Single()
@@ -60,26 +59,44 @@ public static class Test_ParameterList
 
     //[Enforced]
     [Fact]
-    public static void Test_Find()
+    public static void Test_Find_Key()
     {
         var engine = new FakeEngine();
         var items = new THost(engine, [x007, xJames, xBond, x007]);
-        int index;
-        List<int> list;
+        Assert.Equal(0, items.IndexOf("ID"));
+        Assert.Equal(1, items.IndexOf("FIRSTname"));
+        Assert.Equal(-1, items.IndexOf("x"));
 
-        Assert.True(items.Contains("ID"));
-        Assert.True(items.Contains(new TItem("ID", null)));
-        Assert.True(items.Contains(x007));
+        Assert.Equal(3, items.LastIndexOf("ID"));
 
-        index = items.IndexOf(x007); Assert.Equal(0, index);
-        index = items.LastIndexOf(x007); Assert.Equal(3, index);
-        list = items.IndexesOf(x007);
+        var list = items.IndexesOf("ID");
         Assert.Equal(2, list.Count);
         Assert.Equal(0, list[0]);
         Assert.Equal(3, list[1]);
+    }
 
-        index = items.IndexOf(x008); Assert.Equal(0, index);
-        index = items.IndexOf(x008, true); Assert.Equal(-1, index);
+    //[Enforced]
+    [Fact]
+    public static void Test_Find_Predicate()
+    {
+        var engine = new FakeEngine();
+        var items = new THost(engine, [x007, xJames, xBond, x007]);
+
+        var list = items.IndexesOf(x => x.Name.Contains('d'));
+        Assert.Equal(2, list.Count);
+        Assert.Equal(0, list[0]);
+        Assert.Equal(3, list[1]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Next_Name()
+    {
+        var engine = new FakeEngine();
+        var items = new THost(engine, [x007, xJames, xBond, x007]);
+
+        var name = items.NextName();
+        Assert.Equal("#4", name);
     }
 
     //[Enforced]
@@ -113,7 +130,7 @@ public static class Test_ParameterList
         var engine = new FakeEngine();
         var source = new THost(engine, [x007, xJames, xBond]);
 
-        var target = source.GetRange(0, 0);
+        var target = source.GetRange(1, 0);
         Assert.Empty(target);
 
         target = source.GetRange(0, source.Count);
@@ -133,19 +150,22 @@ public static class Test_ParameterList
         var engine = new FakeEngine();
         var source = new THost(engine, [x007, xJames, xBond]);
 
-        var target = source.Replace(1, xBond);
+        var target = source.Replace(0, x007);
+        Assert.Same(source, target);
+        Assert.Same(source[0], target[0]);
+
+        target = source.Replace(0, new TItem("Id", "008"));
         Assert.NotSame(source, target);
+        Assert.Equal(source.Count, target.Count);
+        Assert.Equal("008", target[0].Value);
+
+        target = source.Replace(1, x007);
+        Assert.NotSame (source, target);
         Assert.Same(x007, target[0]);
-        Assert.Same(xBond, target[1]);
+        Assert.Same(x007, target[1]);
         Assert.Same(xBond, target[2]);
 
-        target = source.Replace(0, new TItem("Id", "value"));
-        Assert.NotSame(source, target);
-        Assert.Equal("value", target[0].Value);
-        Assert.Same(xJames, target[1]);
-        Assert.Same(xBond, target[2]);
-
-        try { _ = source.Replace(1, new TItem("Id", "value")); Assert.Fail(); }
+        try { source.Replace(0, new TItem("FirstName", "...")); Assert.Fail(); }
         catch (DuplicateException) { }
     }
 
@@ -158,6 +178,7 @@ public static class Test_ParameterList
 
         var target = source.Add(xMi6);
         Assert.NotSame(source, target);
+        Assert.Equal(4, target.Count);
         Assert.Same(x007, target[0]);
         Assert.Same(xJames, target[1]);
         Assert.Same(xBond, target[2]);
@@ -263,43 +284,59 @@ public static class Test_ParameterList
     public static void Test_Remove()
     {
         var engine = new FakeEngine();
-        var source = new THost(engine, [x007, xJames, xBond]);
+        var source = new THost(engine, [x007, xJames, xBond, x007]);
 
-        var target = source.Remove(xJames);
+        var target = source.Remove("ID");
         Assert.NotSame(source, target);
-        Assert.Same(x007, target[0]);
+        Assert.Equal(3, target.Count);
+        Assert.NotSame(source, target);
+        Assert.Same(xJames, target[0]);
         Assert.Same(xBond, target[1]);
+        Assert.Same(x007, target[2]);
 
-        target = source.Remove(new TItem("FirstName", "..."));
+        target = source.RemoveLast("ID");
+        Assert.NotSame(source, target);
+        Assert.Equal(3, target.Count);
         Assert.NotSame(source, target);
         Assert.Same(x007, target[0]);
+        Assert.Same(xJames, target[1]);
+        Assert.Same(xBond, target[2]);
+
+        target = source.RemoveAll("ID");
+        Assert.NotSame(source, target);
+        Assert.Equal(2, target.Count);
+        Assert.NotSame(source, target);
+        Assert.Same(xJames, target[0]);
         Assert.Same(xBond, target[1]);
     }
 
     //[Enforced]
     [Fact]
-    public static void Test_Remove_Duplicated()
+    public static void Test_Remove_Predicate()
     {
         var engine = new FakeEngine();
         var source = new THost(engine, [x007, xJames, xBond, x007]);
 
-        var target = source.Remove(new TItem("Id", "..."));
+        var target = source.Remove(x => x.Name.Contains('d'));
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
+        Assert.NotSame(source, target);
         Assert.Same(xJames, target[0]);
         Assert.Same(xBond, target[1]);
         Assert.Same(x007, target[2]);
 
-        target = source.RemoveLast(new TItem("Id", "..."));
+        target = source.RemoveLast(x => x.Name.Contains('d'));
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
+        Assert.NotSame(source, target);
         Assert.Same(x007, target[0]);
         Assert.Same(xJames, target[1]);
         Assert.Same(xBond, target[2]);
 
-        target = source.RemoveAll(new TItem("Id", "..."));
+        target = source.RemoveAll(x => x.Name.Contains('d'));
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
+        Assert.NotSame(source, target);
         Assert.Same(xJames, target[0]);
         Assert.Same(xBond, target[1]);
     }

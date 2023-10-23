@@ -1,78 +1,27 @@
-﻿namespace Yotei.Tools;
+﻿using IHost = Experimental.ITemplateList;
+using IItem = Experimental.ITemplate;
+using IKey = string;
+
+namespace Experimental;
 
 // ========================================================
 /// <summary>
-/// Represents a list-alike collection of elements identified by their respective keys.
+/// ...
 /// </summary>
-/// <typeparam name="IItem"></typeparam>
-/// <typeparam name="IKey"></typeparam>
-public interface ICoreList<IItem, IKey>
-    : IList<IItem>, IList, ICollection<IItem>, ICollection, IEnumerable<IItem>, ICloneable
+public interface ITemplateList : IEnumerable<ITemplate>, ICloneable
 {
     /// <summary>
     /// <inheritdoc cref="ICloneable.Clone"/>
     /// </summary>
     /// <returns></returns>
-    new ICoreList<IItem, IKey> Clone();
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Invoked to validate the given element for this collection. It is excepted that this
-    /// method throw an appropriate exception if not.
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    IItem ValidateItem(IItem item);
-
-    /// <summary>
-    /// Invoked to obtain the key associated with the given element. It is excepted that this
-    /// method throw an appropriate exception if the key cannot be obtained.
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    IKey GetKey(IItem item);
-
-    /// <summary>
-    /// Invoked to validate the given key. It is excepted that this method throw an appropriate
-    /// exception if not.
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    IKey ValidateKey(IKey key);
-
-    /// <summary>
-    /// Invoked to determine if the two given keys shall be considered equivalent ones, or not.
-    /// </summary>
-    /// <param name="inner"></param>
-    /// <param name="other"></param>
-    /// <returns></returns>
-    bool CompareKeys(IKey inner, IKey other);
-
-    /// <summary>
-    /// Invoked to determine if the given duplicated element shall be added or inserted into this
-    /// collection, or not. In addition, it is excepted that this method throws an appropriate
-    /// exception if duplicates are not allowed.
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    bool AcceptDuplicated(IItem item);
-
-    /// <summary>
-    /// Invoked to determines if the given element, which is an enumeration of the type of the
-    /// elements in this collection, shall be expanded or not. If so, then its child elements
-    /// are used instead of the original one.
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    bool ExpandNested(IItem item);
+    new IHost Clone();
 
     // ----------------------------------------------------
 
     /// <summary>
     /// Gets the number of elements in this instance.
     /// </summary>
-    new int Count { get; }
+    int Count { get; }
 
     /// <summary>
     /// Minimizes the memory consumption of this instance.
@@ -80,11 +29,11 @@ public interface ICoreList<IItem, IKey>
     void Trim();
 
     /// <summary>
-    /// Gets or sets the element stored at the given index.
+    /// Gets the element stored at the given index.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    new IItem this[int index] { get; set; }
+    IItem this[int index] { get; }
 
     /// <summary>
     /// Determines if this collection contains any elements with the given key, or not.
@@ -159,118 +108,123 @@ public interface ICoreList<IItem, IKey>
     /// <returns></returns>
     List<IItem> ToList();
 
-    /// <summary>
-    /// Returns a list with the given number of elements starting from the given index.
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="count"></param>
-    /// <returns></returns>
-    List<IItem> GetRange(int index, int count);
-
     // ----------------------------------------------------
 
     /// <summary>
-    /// Replaces the element at the given index with the new given one.
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    int Replace(int index, IItem item);
-
-    /// <summary>
-    /// Adds to this collection the given element.
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    new int Add(IItem item);
-
-    /// <summary>
-    /// Adds to this collection the elements from the given range.
-    /// </summary>
-    /// <param name="range"></param>
-    /// <returns></returns>
-    int AddRange(IEnumerable<IItem> range);
-
-    /// <summary>
-    /// Inserts into this collection the given element.
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    new int Insert(int index, IItem item);
-
-    /// <summary>
-    /// Inserts into this collection the elements from the given range, starting at the given
-    /// index.
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="range"></param>
-    /// <returns></returns>
-    int InsertRange(int index, IEnumerable<IItem> range);
-
-    /// <summary>
-    /// Removes from this collection the element at the given index.
-    /// </summary>
-    /// <param name="index"></param>
-    /// <returns></returns>
-    new int RemoveAt(int index);
-
-    /// <summary>
-    /// Removes from this collection the given number of elements, starting from the given index.
+    /// Obtains a new instance that contains the given number of elements starting from the
+    /// given index.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    int RemoveRange(int index, int count);
+    IHost GetRange(int index, int count);
 
     /// <summary>
-    /// Removes from this collection the first element with the given key.
+    /// Obtains a new instance where the element at the given index has been replaced with the
+    /// new given one.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    IHost Replace(int index, IItem item);
+
+    /// <summary>
+    /// Obtains a new instance where the given element has been added to the original one.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    IHost Add(IItem item);
+
+    /// <summary>
+    /// Obtains a new instance where the elements from the given range have been added to the
+    /// original one.
+    /// </summary>
+    /// <param name="range"></param>
+    /// <returns></returns>
+    IHost AddRange(IEnumerable<IItem> range);
+
+    /// <summary>
+    /// Obtains a new instance where the given element has been inserted into the original one,
+    /// at the given index.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    IHost Insert(int index, IItem item);
+
+    /// <summary>
+    /// Obtains a new instance where the elements from the given range have been inserted into
+    /// the original one, starting at the given index.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="range"></param>
+    /// <returns></returns>
+    IHost InsertRange(int index, IEnumerable<IItem> range);
+
+    /// <summary>
+    /// Obtains a new instance where the element at the given index has been removed.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <returns></returns>
+    IHost RemoveAt(int index);
+
+    /// <summary>
+    /// Obtains a new instance where the given number of elements have been inserted into the
+    /// original one, starting from the given index.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="count"></param>
+    /// <returns></returns>
+    IHost RemoveRange(int index, int count);
+
+    /// <summary>
+    /// Obtains a new instance where the first element with the given key has been removed.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    int Remove(IKey key);
+    IHost Remove(IKey key);
 
     /// <summary>
-    /// Removes from this collection the last element with the given key.
+    /// Obtains a new instance where the last element with the given key has been removed.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    int RemoveLast(IKey key);
+    IHost RemoveLast(IKey key);
 
     /// <summary>
-    /// Removes from this collection all the elements with the given key.
+    /// Obtains a new instance where all the elements with the given key have been removed.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    int RemoveAll(IKey key);
+    IHost RemoveAll(IKey key);
 
     /// <summary>
-    /// Removes from this collection the first ocurrence of an element that matches the given
-    /// predicate.
+    /// Obtains a new instance where the first ocurrence of an element that matches the given
+    /// predicate has been removed.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int Remove(Predicate<IItem> predicate);
+    IHost Remove(Predicate<IItem> predicate);
 
     /// <summary>
-    /// Removes from this collection the last ocurrence of an element that matches the given
-    /// predicate.
+    /// Obtains a new instance where the last ocurrence of an element that matches the given
+    /// predicate has been removed.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int RemoveLast(Predicate<IItem> predicate);
+    IHost RemoveLast(Predicate<IItem> predicate);
 
     /// <summary>
-    /// Removes from this collection all the ocurrences of elements that match the given
-    /// predicate.
+    /// Obtains a new instance where all the ocurrences of elements that match the given
+    /// predicate have been removed.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int RemoveAll(Predicate<IItem> predicate);
+    IHost RemoveAll(Predicate<IItem> predicate);
 
     /// <summary>
-    /// Clears this collection.
+    /// Obtains a new instance where all the original elements have been removed.
     /// </summary>
     /// <returns></returns>
-    new int Clear();
+    IHost Clear();
 }

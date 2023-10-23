@@ -1,5 +1,6 @@
 ﻿using IHost = Yotei.ORM.Records.IParameterList;
 using IItem = Yotei.ORM.Records.IParameter;
+using IKey = string;
 
 namespace Yotei.ORM.Records.Code;
 
@@ -9,66 +10,44 @@ namespace Yotei.ORM.Records.Code;
 /// </summary>
 [DebuggerDisplay("{ToDebugString()}")]
 [Cloneable(Specs = "(source)")]
-public partial class ParameterList : IParameterList
+public partial class ParameterList : IHost
 {
-    /// <summary>
-    /// Represents the internal collection of elements carried by this instance.
-    /// </summary>
-    protected class InnerList : CoreList<IItem>
+    // Represents the collection of contents of this instance.
+    protected class InnerList : CoreList<IItem, IKey>
     {
-        IHost Master;
-        public InnerList(IHost master)
-        {
-            Master = master.ThrowWhenNull();
-            Validate = (item, _) =>
-            {
-                item.ThrowWhenNull();
-                item.Name.NotNullNotEmpty();
-                return item;
-            };
-            Compare = (inner, other) =>
-            {
-                return Equivalent(inner.Name, other.Name);
-            };
-            AcceptDuplicate = (item) =>
-            {
-                var index = IndexOf(item, strict: true);
-                if (index >= 0) return true;
+        ParameterList Master;
+        public InnerList(ParameterList master) => Master = master.ThrowWhenNull();
+        protected InnerList(InnerList source) : this(source.Master) => AddRange(source);
+        public override InnerList Clone() => new(this);
 
-                throw new DuplicateException("Duplicated element.").WithData(item);
-            };
-            ExpandNested = (_) => false;
-        }
-        public bool Equivalent(string x, string y)
+        public override IItem ValidateItem(IItem item) => item.ThrowWhenNull();
+        public override string GetKey(IItem item) => item.Name;
+        public override IKey ValidateKey(IKey key) => key.NotNullNotEmpty();
+        public override bool CompareKeys(string inner, string other)
         {
-            return string.Compare(x, y, !Master.Engine.CaseSensitiveNames) == 0;
+            return string.Compare(inner, other, !Master.Engine.CaseSensitiveNames ) == 0;
         }
-        public override int Replace(int index, IItem item, bool strict = false)
+        public override bool AcceptDuplicated(IItem item)
         {
-            if (Equivalent(item.Name, this[index].Name))
-            {
-                RemoveAt(index);
-                return Insert(index, item);
-            }
-            return base.Replace(index, item, strict);
+            if (this.Any(x => ReferenceEquals(x, item))) return true;
+            throw new DuplicateException("Duplicated element.").WithData(item).WithData(Master);
         }
+        public override bool ExpandNested(IItem _) => false;
     }
 
-    /// <summary>
-    /// The internal collection of elements carried by this instance.
-    /// </summary>
+    // The actual contents carried by this instance.
     protected InnerList Items { get; }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Initializes a new instance.
+    /// Initializes a new empty instance.
     /// </summary>
     /// <param name="engine"></param>
     public ParameterList(IEngine engine)
     {
-        Items = new(this);
         Engine = engine.ThrowWhenNull();
+        Items = new(this);
     }
 
     /// <summary>
@@ -79,7 +58,7 @@ public partial class ParameterList : IParameterList
     public ParameterList(IEngine engine, IItem item) : this(engine) => Items.Add(item);
 
     /// <summary>
-    /// Initializes a new instance with the elements from the given range.
+    /// Initializes a new instance with elements from the given range.
     /// </summary>
     /// <param name="engine"></param>
     /// <param name="range"></param>
@@ -91,10 +70,10 @@ public partial class ParameterList : IParameterList
     /// <param name="source"></param>
     protected ParameterList(ParameterList source)
     {
-        ArgumentNullException.ThrowIfNull(source);
+        source.ThrowWhenNull();
 
-        Items = new(this);
         Engine = source.Engine;
+        Items = new(this);
         Items.AddRange(source);
     }
 
@@ -102,16 +81,22 @@ public partial class ParameterList : IParameterList
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => Items.ToString();
-
-    string ToDebugString() => $"[{string.Join(", ", Items)}]";
+    public IEnumerator<IItem> GetEnumerator() => Items.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public IEnumerator<IItem> GetEnumerator() => Items.GetEnumerator();
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    public override string ToString() => Items.ToString();
+
+    string ToDebugString()
+    {
+        return Items.Count < DEBUGCOUNT
+            ? $"[{string.Join(", ", Items)}]"
+            : $"[{string.Join(", ", Items.Take(DEBUGCOUNT))}, ...]";
+    }
+    static int DEBUGCOUNT = 8;
 
     // ----------------------------------------------------
 
@@ -140,34 +125,30 @@ public partial class ParameterList : IParameterList
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
-    /// <param name="strict"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    public bool Contains(IItem item, bool strict = false) => Items.Contains(item, strict);
+    public bool Contains(IKey key) => Items.Contains(key);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
-    /// <param name="strict"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    public int IndexOf(IItem item, bool strict = false) => Items.IndexOf(item, strict);
+    public int IndexOf(IKey key) => Items.IndexOf(key);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
-    /// <param name="strict"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    public int LastIndexOf(IItem item, bool strict = false) => Items.LastIndexOf(item, strict);
+    public int LastIndexOf(IKey key) => Items.LastIndexOf(key);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
-    /// <param name="strict"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    public List<int> IndexesOf(IItem item, bool strict = false) => Items.IndexesOf(item, strict);
+    public List<int> IndexesOf(IKey key) => Items.IndexesOf(key);
 
     /// <summary>
     /// <inheritdoc/>
@@ -209,8 +190,6 @@ public partial class ParameterList : IParameterList
     /// <returns></returns>
     public List<IItem> ToList() => Items.ToList();
 
-    // ----------------------------------------------------
-
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
@@ -226,46 +205,6 @@ public partial class ParameterList : IParameterList
         throw new UnExpectedException("Range of indexes exhausted.");
     }
 
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    public bool Contains(string name) => IndexOf(name) >= 0;
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    public int IndexOf(string name)
-    {
-        name = name.NotNullNotEmpty();
-        return Items.IndexOf(x => Items.Equivalent(x.Name, name));
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    public int LastIndexOf(string name)
-    {
-        name = name.NotNullNotEmpty();
-        return Items.LastIndexOf(x => Items.Equivalent(x.Name, name));
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    public List<int> IndexesOf(string name)
-    {
-        name = name.NotNullNotEmpty();
-        return Items.IndexesOf(x => Items.Equivalent(x.Name, name));
-    }
-
     // ----------------------------------------------------
 
     /// <summary>
@@ -276,14 +215,8 @@ public partial class ParameterList : IParameterList
     /// <returns></returns>
     public virtual IHost GetRange(int index, int count)
     {
-        if (index == 0 && count == Count) return this;
-        if (count == 0)
-        {
-            if (Count == 0) return this;
-
-            var other = Clone(); other.Items.Clear();
-            return other;
-        }
+        if (count == Count && index == 0) return this;
+        if (count == 0) return Clear();
 
         var range = Items.GetRange(index, count);
         var temp = Clone();
@@ -301,7 +234,7 @@ public partial class ParameterList : IParameterList
     public virtual IHost Replace(int index, IItem item)
     {
         var temp = Clone();
-        var num = temp.Items.Replace(index, item, strict: false);
+        var num = temp.Items.Replace(index, item);
         return num > 0 ? temp : this;
     }
 
@@ -383,36 +316,36 @@ public partial class ParameterList : IParameterList
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    public virtual IHost Remove(IItem item)
+    public virtual IHost Remove(IKey key)
     {
         var temp = Clone();
-        var num = temp.Items.Remove(item, strict: false);
+        var num = temp.Items.Remove(key);
         return num > 0 ? temp : this;
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    public virtual IHost RemoveLast(IItem item)
+    public virtual IHost RemoveLast(IKey key)
     {
         var temp = Clone();
-        var num = temp.Items.RemoveLast(item, strict: false);
+        var num = temp.Items.RemoveLast(key);
         return num > 0 ? temp : this;
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    public virtual IHost RemoveAll(IItem item)
+    public virtual IHost RemoveAll(IKey key)
     {
         var temp = Clone();
-        var num = temp.Items.RemoveAll(item, strict: false);
+        var num = temp.Items.RemoveAll(key);
         return num > 0 ? temp : this;
     }
 

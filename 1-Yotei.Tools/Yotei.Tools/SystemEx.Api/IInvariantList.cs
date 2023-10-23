@@ -2,36 +2,64 @@
 
 // ========================================================
 /// <summary>
-/// Represents an immutable list-alike collection with customizable behavior.
+/// Represents an immutable list-alike collection of elements identified by their respective keys.
 /// </summary>
-/// <typeparam name="T"></typeparam>
-public interface IInvariantList<T> : IEnumerable<T>, ICloneable
+/// <typeparam name="IItem"></typeparam>
+/// <typeparam name="IKey"></typeparam>
+public interface IInvariantList<IItem, IKey> : IEnumerable<IItem>, ICloneable
 {
     /// <summary>
     /// <inheritdoc cref="ICloneable.Clone"/>
     /// </summary>
     /// <returns></returns>
-    new IInvariantList<T> Clone();
+    new IInvariantList<IItem, IKey> Clone();
+
+    // ----------------------------------------------------
 
     /// <summary>
-    /// <inheritdoc cref="ICoreList{T}.Validate"/>
+    /// <inheritdoc cref="ICoreList{IItem, IKey}.ValidateItem(IItem)"/>
     /// </summary>
-    Func<T, bool, T> Validate { get; }
+    /// <param name="item"></param>
+    /// <returns></returns>
+    IItem ValidateItem(IItem item);
 
     /// <summary>
-    /// <inheritdoc cref="ICoreList{T}.Compare"/>
+    /// <inheritdoc cref="ICoreList{IItem, IKey}.GetKey(IItem)"/>
     /// </summary>
-    Func<T, T, bool> Compare { get; }
+    /// <param name="item"></param>
+    /// <returns></returns>
+    IKey GetKey(IItem item);
 
     /// <summary>
-    /// <inheritdoc cref="ICoreList{T}.AcceptDuplicate"/>
+    /// <inheritdoc cref="ICoreList{IItem, IKey}.ValidateKey(IKey)"/>
     /// </summary>
-    Func<T, bool> AcceptDuplicate { get; }
+    /// <param name="key"></param>
+    /// <returns></returns>
+    IKey ValidateKey(IKey key);
 
     /// <summary>
-    /// <inheritdoc cref="ICoreList{T}.ExpandNested"/>
+    /// <inheritdoc cref="ICoreList{IItem, IKey}.CompareKeys(IKey, IKey)"/>
     /// </summary>
-    Func<T, bool> ExpandNested { get; }
+    /// <param name="inner"></param>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    bool CompareKeys(IKey inner, IKey other);
+
+    /// <summary>
+    /// <inheritdoc cref="ICoreList{IItem, IKey}.AcceptDuplicated(IItem)"/>
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    bool AcceptDuplicated(IItem item);
+
+    /// <summary>
+    /// <inheritdoc cref="ExpandNested(IItem)"/>
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    bool ExpandNested(IItem item);
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// Gets the number of elements in this instance.
@@ -39,7 +67,7 @@ public interface IInvariantList<T> : IEnumerable<T>, ICloneable
     int Count { get; }
 
     /// <summary>
-    /// Minimizes the memory footprint of this instance.
+    /// Minimizes the memory consumption of this instance.
     /// </summary>
     void Trim();
 
@@ -48,229 +76,198 @@ public interface IInvariantList<T> : IEnumerable<T>, ICloneable
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    T this[int index] { get; }
+    IItem this[int index] { get; }
 
     /// <summary>
-    /// Determines if this instance contains the given element, or not.
-    /// If strict mode is requested, comparison is made by value or reference, instead of using
-    /// the comparison criteria.
+    /// Determines if this collection contains any elements with the given key, or not.
     /// </summary>
-    /// <param name="item"></param>
-    /// <param name="strict"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    bool Contains(T item, bool strict = false);
+    bool Contains(IKey key);
 
     /// <summary>
-    /// Returns the index of the first ocurrence of the given element in this collection, or -1
-    /// if it cannot be found. 
-    /// If strict mode is requested, comparison is made by value or reference, instead of using
-    /// the comparison criteria.
+    /// Returns the index of the first element in this collection with the given key, or -1 if
+    /// any can be found.
     /// </summary>
-    /// <param name="item"></param>
-    /// <param name="strict"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    int IndexOf(T item, bool strict = false);
+    int IndexOf(IKey key);
 
     /// <summary>
-    /// Returns the index of the last ocurrence of the given element in this collection, or -1
-    /// if it cannot be found.
-    /// If strict mode is requested, comparison is made by value or reference, instead of using
-    /// the comparison criteria.
+    /// Returns the index of the last element in this collection with the given key, or -1 if
+    /// any can be found.
     /// </summary>
-    /// <param name="item"></param>
-    /// <param name="strict"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    int LastIndexOf(T item, bool strict = false);
+    int LastIndexOf(IKey key);
 
     /// <summary>
-    /// Returns a list with the indexes of the ocurrences of the given element in this collection.
-    /// If strict mode is requested, comparison is made by value or reference, instead of using
-    /// the comparison criteria.
+    /// Returns the indexes of the elements in this collection with the given key.
     /// </summary>
-    /// <param name="item"></param>
-    /// <param name="strict"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    List<int> IndexesOf(T item, bool strict = false);
+    List<int> IndexesOf(IKey key);
 
     /// <summary>
-    /// Determines if this instance contains an element that matches the given predicate, or not.
+    /// Determines if this collection contains any elements that match the given predicate,
+    /// or not.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    bool Contains(Predicate<T> predicate);
+    bool Contains(Predicate<IItem> predicate);
 
     /// <summary>
-    /// Returns the index of the first ocurrence of an element in this collection that matches
-    /// the given predicate, or -1 if any can be found.
+    /// Returns the index of the first element in this collection that match the given predicate,
+    /// or -1 if any can be found.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int IndexOf(Predicate<T> predicate);
+    int IndexOf(Predicate<IItem> predicate);
 
     /// <summary>
-    /// Returns the index of the last ocurrence of an element in this collection that matches
-    /// the given predicate, or -1 if any can be found.
+    /// Returns the index of the last element in this collection that match the given predicate,
+    /// or -1 if any can be found.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int LastIndexOf(Predicate<T> predicate);
+    int LastIndexOf(Predicate<IItem> predicate);
 
     /// <summary>
-    /// Returns a list containing the indexes of all the elements in this collection that match
-    /// the given predicate.
+    /// Returns the indexes of the elements in this collection that match the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    List<int> IndexesOf(Predicate<T> predicate);
+    List<int> IndexesOf(Predicate<IItem> predicate);
 
     /// <summary>
     /// Returns an array with the elements in this collection.
     /// </summary>
     /// <returns></returns>
-    T[] ToArray();
+    IItem[] ToArray();
 
     /// <summary>
     /// Returns a list with the elements in this collection.
     /// </summary>
     /// <returns></returns>
-    List<T> ToList();
+    List<IItem> ToList();
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a new instance that contains the given number of elements, starting from the
-    /// given index, from the original collection.
+    /// Obtains a new instance that contains the given number of elements starting from the
+    /// given index.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    IInvariantList<T> GetRange(int index, int count);
+    IInvariantList<IItem, IKey> GetRange(int index, int count);
 
     /// <summary>
-    /// Returns a new instance where the item at the given index has been replaced by the new
-    /// given one. If strict mode is requested, comparison is made by value or reference, instead
-    /// of using the comparison criteria.
+    /// Obtains a new instance where the element at the given index has been replaced with the
+    /// new given one.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
-    /// <param name="strict"></param>
     /// <returns></returns>
-    IInvariantList<T> Replace(int index, T item, bool strict = false);
+    IInvariantList<IItem, IKey> Replace(int index, IItem item);
 
     /// <summary>
-    /// Returns a new instance where the given element has been added to the original collection.
-    /// If it is a duplicated one, then whether it is added or ignored is determined by the
-    /// accept duplicates setting of this instance.
+    /// Obtains a new instance where the given element has been added to the original one.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    IInvariantList<T> Add(T item);
+    IInvariantList<IItem, IKey> Add(IItem item);
 
     /// <summary>
-    /// Returns a new instance where the elements from the given range have been added to the
-    /// original collection.
-    /// If any is a duplicated one, then whether it is added or ignored is determined by the
-    /// accept duplicates setting of this instance.
+    /// Obtains a new instance where the elements from the given range have been added to the
+    /// original one.
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    IInvariantList<T> AddRange(IEnumerable<T> range);
+    IInvariantList<IItem, IKey> AddRange(IEnumerable<IItem> range);
 
     /// <summary>
-    /// Returns a new instance where the given element has been inserted, at the given index,
-    /// into the original collection.
-    /// If it is a duplicated one, then whether it is inserted or ignored is determined by the
-    /// accept duplicates setting of this instance.
+    /// Obtains a new instance where the given element has been inserted into the original one,
+    /// at the given index.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    IInvariantList<T> Insert(int index, T item);
+    IInvariantList<IItem, IKey> Insert(int index, IItem item);
 
     /// <summary>
-    /// Returns a new instance where the elements from the given range have been inserted, at
-    /// the given index, into the original collection.
-    /// If any is a duplicated one, then whether it is inserted or ignored is determined by the
-    /// accept duplicates setting of this instance.
+    /// Obtains a new instance where the elements from the given range have been inserted into
+    /// the original one, starting at the given index.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    IInvariantList<T> InsertRange(int index, IEnumerable<T> range);
+    IInvariantList<IItem, IKey> InsertRange(int index, IEnumerable<IItem> range);
 
     /// <summary>
-    /// Returns a new instance where element at the given index has been removed.
+    /// Obtains a new instance where the element at the given index has been removed.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveAt(int index);
+    IInvariantList<IItem, IKey> RemoveAt(int index);
 
     /// <summary>
-    /// Returns a new instance where the given number of elements, starting from the given index,
-    /// have been removed.
+    /// Obtains a new instance where the given number of elements have been inserted into the
+    /// original one, starting from the given index.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveRange(int index, int count);
+    IInvariantList<IItem, IKey> RemoveRange(int index, int count);
 
     /// <summary>
-    /// Returns a new instance where the given element has been removed.
-    /// If strict mode is requested, comparison is made by value or reference, instead of using
-    /// the comparison criteria.
+    /// Obtains a new instance where the first element with the given key has been removed.
     /// </summary>
-    /// <param name="item"></param>
-    /// <param name="strict"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    IInvariantList<T> Remove(T item, bool strict = false);
+    IInvariantList<IItem, IKey> Remove(IKey key);
 
     /// <summary>
-    /// Returns a new instance where the last ocurrence of the given element has been removed.
-    /// If strict mode is requested, comparison is made by value or reference, instead of using
-    /// the comparison criteria.
+    /// Obtains a new instance where the last element with the given key has been removed.
     /// </summary>
-    /// <param name="item"></param>
-    /// <param name="strict"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveLast(T item, bool strict = false);
+    IInvariantList<IItem, IKey> RemoveLast(IKey key);
 
     /// <summary>
-    /// Returns a new instance where all the ocurrences of the given element have been removed.
-    /// If strict mode is requested, comparison is made by value or reference, instead of using
-    /// the comparison criteria.
+    /// Obtains a new instance where all the elements with the given key have been removed.
     /// </summary>
-    /// <param name="item"></param>
-    /// <param name="strict"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveAll(T item, bool strict = false);
+    IInvariantList<IItem, IKey> RemoveAll(IKey key);
 
     /// <summary>
-    /// Returns a new instance where the first ocurrence of an element that matches the given
+    /// Obtains a new instance where the first ocurrence of an element that matches the given
     /// predicate has been removed.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IInvariantList<T> Remove(Predicate<T> predicate);
+    IInvariantList<IItem, IKey> Remove(Predicate<IItem> predicate);
 
     /// <summary>
-    /// Returns a new instance where the last ocurrence of an element that matches the given
+    /// Obtains a new instance where the last ocurrence of an element that matches the given
     /// predicate has been removed.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveLast(Predicate<T> predicate);
+    IInvariantList<IItem, IKey> RemoveLast(Predicate<IItem> predicate);
 
     /// <summary>
-    /// Returns a new instance where all the elements that match the given predicate have been
-    /// removed.
+    /// Obtains a new instance where all the ocurrences of elements that match the given
+    /// predicate have been removed.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveAll(Predicate<T> predicate);
+    IInvariantList<IItem, IKey> RemoveAll(Predicate<IItem> predicate);
 
     /// <summary>
-    /// Returns a new instance where all the elements have been removed.
+    /// Obtains a new instance where all the original elements have been removed.
     /// </summary>
     /// <returns></returns>
-    IInvariantList<T> Clear();
+    IInvariantList<IItem, IKey> Clear();
 }

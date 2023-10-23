@@ -1,130 +1,77 @@
-﻿using IHost = Yotei.ORM.Records.IIdentifierTags;
-using IItem = string;
+﻿using IHost = Experimental.ITemplateList;
+using IItem = Experimental.ITemplate;
+using IKey = string;
 
-namespace Yotei.ORM.Records.Code;
+namespace Experimental;
 
 // ========================================================
 /// <summary>
 /// <inheritdoc cref="IHost"/>
 /// </summary>
-[Cloneable(Specs = "(source)")]
-[WithGenerator(Specs = "(source)+@")]
-public partial class IdentifierTags : IHost
+[DebuggerDisplay("{ToDebugString()}")]
+public class TemplateList : IHost
 {
-    /// <summary>
-    /// Represents the internal collection of elements carried by this instance.
-    /// </summary>
-    protected class InnerList : CoreList<IItem>
+    // Represents the collection of contents of this instance.
+    protected class InnerList : CoreList<IItem, IKey>
     {
-        IHost Master;
-        public InnerList(IHost master)
+        TemplateList Master;
+        public InnerList(TemplateList master) => Master = master.ThrowWhenNull();
+        protected InnerList(InnerList source) : this(source.Master) => AddRange(source);
+        public override InnerList Clone() => new(this);
+
+        public override IItem ValidateItem(IItem item) => item.ThrowWhenNull();
+        public override string GetKey(IItem item) => item.Name;
+        public override IKey ValidateKey(IKey key) => key.NotNullNotEmpty();
+        public override bool CompareKeys(string inner, string other) => inner == other;
+        public override bool AcceptDuplicated(IItem item)
         {
-            Master = master.ThrowWhenNull();
-            Validate = (item, _) =>
-            {
-                return item.NotNullNotEmpty();
-            };
-            Compare = (inner, other) =>
-            {
-                return string.Compare(inner, other, !Master.CaseSensitiveTags) == 0;
-            };
-            AcceptDuplicate = (item) =>
-            {
-                throw new DuplicateException("Duplicated element.")
-                .WithData(item)
-                .WithData(Master);
-            };
-            ExpandNested = (_) => false;
+            if (this.Any(x => ReferenceEquals(x, item))) return true;
+            throw new DuplicateException("Duplicated element.").WithData(item).WithData(Master);
         }
-        public override int Add(string item)
-        {
-            if (item != null && item.Contains('.'))
-            {
-                var parts = item.Split('.');
-                var count = 0;
-                foreach (var part in parts) count += base.Add(part);
-                return count;
-            }
-            return base.Add(item!);
-        }
-        public override int Insert(int index, string item)
-        {
-            if (item != null && item.Contains('.'))
-            {
-                var parts = item.Split('.');
-                var count = 0;
-                foreach (var part in parts)
-                {
-                    var temp = base.Insert(index, part);
-                    count += temp;
-                    index += temp;
-                }
-                return count;
-            }
-            return base.Insert(index, item!);
-        }
-        public override int Remove(string item, bool strict = false)
-        {
-            if (item != null && item.Contains('.'))
-            {
-                var parts = item.Split('.');
-                var count = 0;
-                foreach (var part in parts) count += base.Remove(part, strict);
-                return count;
-            }
-            return base.Remove(item!, strict);
-        }
+        public override bool ExpandNested(IItem _) => false;
     }
 
-    /// <summary>
-    /// The internal collection of elements carried by this instance.
-    /// </summary>
+    // The actual contents carried by this instance.
     protected InnerList Items { get; }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Initializes a new instance.
+    /// Initializes a new empty instance.
     /// </summary>
-    /// <param name="caseSensitiveTags"></param>
-    public IdentifierTags(bool caseSensitiveTags)
-    {
-        Items = new(this);
-        CaseSensitiveTags = caseSensitiveTags;
-    }
+    public TemplateList() => Items = new(this);
 
     /// <summary>
     /// Initializes a new instance with the given element.
     /// </summary>
-    /// <param name="caseSensitiveTags"></param>
     /// <param name="item"></param>
-    public IdentifierTags(bool caseSensitiveTags, IItem item) : this(caseSensitiveTags) => Items.Add(item);
+    public TemplateList(IItem item) : this() => Items.Add(item);
 
     /// <summary>
-    /// Initializes a new instance with the elements from the given range.
+    /// Initializes a new instance with elements from the given range.
     /// </summary>
-    /// <param name="engine"></param>
     /// <param name="range"></param>
-    public IdentifierTags(bool caseSensitiveTags, IEnumerable<IItem> range) : this(caseSensitiveTags) => Items.AddRange(range);
+    public TemplateList(IEnumerable<IItem> range) : this() => Items.AddRange(range);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected IdentifierTags(IdentifierTags source)
+    protected TemplateList(TemplateList source)
     {
-        ArgumentNullException.ThrowIfNull(source);
+        source.ThrowWhenNull();
 
         Items = new(this);
-        CaseSensitiveTags = source.CaseSensitiveTags;        
         Items.AddRange(source);
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// <inheritdoc cref="ICloneable.Clone"/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => string.Join('.', Items);
+    public virtual TemplateList Clone() => new(this);
+    IHost IHost.Clone() => Clone();
+    object ICloneable.Clone() => Clone();
 
     /// <summary>
     /// <inheritdoc/>
@@ -133,29 +80,21 @@ public partial class IdentifierTags : IHost
     public IEnumerator<IItem> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    // ----------------------------------------------------
-
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    [WithGenerator]
-    public bool CaseSensitiveTags
-    {
-        get => _CaseSensitiveTags;
-        init
-        {
-            if (_CaseSensitiveTags == value) return;
-            _CaseSensitiveTags = value;
+    /// <returns></returns>
+    public override string ToString() => Items.ToString();
 
-            if (Count > 0)
-            {
-                var range = ToArray();
-                Items.Clear();
-                Items.AddRange(range);
-            }
-        }
+    string ToDebugString()
+    {
+        return Items.Count < DEBUGCOUNT
+            ? $"[{string.Join(", ", Items)}]"
+            : $"[{string.Join(", ", Items.Take(DEBUGCOUNT))}, ...]";
     }
-    bool _CaseSensitiveTags = false;
+    static int DEBUGCOUNT = 8;
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// <inheritdoc/>
@@ -177,16 +116,30 @@ public partial class IdentifierTags : IHost
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    public bool Contains(IItem item) => Items.Contains(item, strict: false);
+    public bool Contains(IKey key) => Items.Contains(key);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    public int IndexOf(IItem item) => Items.IndexOf(item, strict: false);
+    public int IndexOf(IKey key) => Items.IndexOf(key);
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    public int LastIndexOf(IKey key) => Items.LastIndexOf(key);
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    public List<int> IndexesOf(IKey key) => Items.IndexesOf(key);
 
     /// <summary>
     /// <inheritdoc/>
@@ -238,14 +191,8 @@ public partial class IdentifierTags : IHost
     /// <returns></returns>
     public virtual IHost GetRange(int index, int count)
     {
-        if (index == 0 && count == Count) return this;
-        if (count == 0)
-        {
-            if (Count == 0) return this;
-
-            var other = Clone(); other.Items.Clear();
-            return other;
-        }
+        if (count == Count && index == 0) return this;
+        if (count == 0) return Clear();
 
         var range = Items.GetRange(index, count);
         var temp = Clone();
@@ -263,7 +210,7 @@ public partial class IdentifierTags : IHost
     public virtual IHost Replace(int index, IItem item)
     {
         var temp = Clone();
-        var num = temp.Items.Replace(index, item, strict: false);
+        var num = temp.Items.Replace(index, item);
         return num > 0 ? temp : this;
     }
 
@@ -345,12 +292,36 @@ public partial class IdentifierTags : IHost
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    public virtual IHost Remove(IItem item)
+    public virtual IHost Remove(IKey key)
     {
         var temp = Clone();
-        var num = temp.Items.Remove(item, strict: false);
+        var num = temp.Items.Remove(key);
+        return num > 0 ? temp : this;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    public virtual IHost RemoveLast(IKey key)
+    {
+        var temp = Clone();
+        var num = temp.Items.RemoveLast(key);
+        return num > 0 ? temp : this;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    public virtual IHost RemoveAll(IKey key)
+    {
+        var temp = Clone();
+        var num = temp.Items.RemoveAll(key);
         return num > 0 ? temp : this;
     }
 
