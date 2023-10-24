@@ -6,8 +6,8 @@ namespace Yotei.ORM.Records;
 
 // ========================================================
 /// <summary>
-/// Represents the ordered collection of parameters in a command.
-/// Elements with duplicate names are allowed as far as they are exactly the same instance.
+/// Represents an immutable and ordered collection of parameters in a command. Elements with
+/// duplicate names are allowed as far as they are exactly the same instance.
 /// </summary>
 [Cloneable]
 public partial interface IParameterList : IEnumerable<IItem>

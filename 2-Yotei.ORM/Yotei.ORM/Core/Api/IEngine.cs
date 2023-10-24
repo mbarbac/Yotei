@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// Represents an underlying database engine.
+/// Represents an immutable collection of properties of an underlying database engine.
 /// </summary>
 public partial interface IEngine
 {
