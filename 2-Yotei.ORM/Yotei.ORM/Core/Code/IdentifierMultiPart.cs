@@ -1,37 +1,47 @@
-﻿using IHost = Yotei.ORM.Records.IParameterList;
-using IItem = Yotei.ORM.Records.IParameter;
+﻿using IHost = Yotei.ORM.IIdentifierMultiPart;
+using IItem = Yotei.ORM.IIdentifierSinglePart;
 using IKey = string;
 
-namespace Yotei.ORM.Records.Code;
+namespace Yotei.ORM.Code;
 
 // ========================================================
+// Clone: we need not to clone 'Value' because, firstly, it is computed on demand, and secondly,
+// if cloned, it will change the parts themselves with equivalent ones, but not with the original
+// ones.
 /// <summary>
 /// <inheritdoc cref="IHost"/>
 /// </summary>
-[DebuggerDisplay("{ToDebugString()}")]
-[Cloneable(Specs = "(source)")]
-public partial class ParameterList : IHost
+[Cloneable(Specs = "(source)-Value")]
+public partial class IdentifierMultiPart : Identifier, IHost
 {
     // Represents the collection of contents of this instance.
-    protected class InnerList : CoreList<IItem, IKey>
+    protected class InnerList : CoreList<IItem, IKey?>
     {
-        ParameterList Master;
-        public InnerList(ParameterList master) => Master = master.ThrowWhenNull();
+        IdentifierMultiPart Master;
+        public InnerList(IdentifierMultiPart master) => Master = master.ThrowWhenNull();
         protected InnerList(InnerList source) : this(source.Master) => AddRange(source);
         public override InnerList Clone() => new(this);
 
-        public override IItem ValidateItem(IItem item) => item.ThrowWhenNull();
-        public override IKey GetKey(IItem item) => item.Name;
-        public override IKey ValidateKey(IKey key) => key.NotNullNotEmpty();
-        public override bool CompareKeys(IKey inner, IKey other)
+        public override IItem ValidateItem(IItem item)
         {
-            return string.Compare(inner, other, !Master.Engine.CaseSensitiveNames ) == 0;
+            item = item.ThrowWhenNull();
+
+            if (!ReferenceEquals(Master.Engine, item.Engine)) throw new ArgumentException(
+                "Engine of the given element is not the engine of this instance.")
+                .WithData(item)
+                .WithData(Master);
+
+            return item;
         }
-        public override bool AcceptDuplicated(IItem item)
+        public override IKey? GetKey(IItem item) => item.NonTerminatedValue;
+        public override IKey? ValidateKey(IKey? key) => key;
+        public override bool CompareKeys(IKey? inner, IKey? other)
         {
-            if (this.Any(x => ReferenceEquals(x, item))) return true;
-            throw new DuplicateException("Duplicated element.").WithData(item).WithData(Master);
+            return inner is null && other is null
+                ? true
+                : string.Compare(inner, other, !Master.Engine.CaseSensitiveNames) == 0;
         }
+        public override bool AcceptDuplicated(IItem _) => true;
         public override bool ExpandNested(IItem _) => false;
     }
 
@@ -44,38 +54,41 @@ public partial class ParameterList : IHost
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="engine"></param>
-    public ParameterList(IEngine engine)
-    {
-        Engine = engine.ThrowWhenNull();
-        Items = new(this);
-    }
+    public IdentifierMultiPart(IEngine engine) : base(engine) => Items = new(this);
 
     /// <summary>
     /// Initializes a new instance with the given element.
     /// </summary>
     /// <param name="engine"></param>
     /// <param name="item"></param>
-    public ParameterList(IEngine engine, IItem item) : this(engine) => Items.Add(item);
+    public IdentifierMultiPart(IEngine engine, IItem item) : this(engine) => Items.Add(item);
 
     /// <summary>
     /// Initializes a new instance with elements from the given range.
     /// </summary>
     /// <param name="engine"></param>
     /// <param name="range"></param>
-    public ParameterList(IEngine engine, IEnumerable<IItem> range) : this(engine) => Items.AddRange(range);
+    public IdentifierMultiPart(IEngine engine, IEnumerable<IItem> range) : this(engine) => Items.AddRange(range);
+
+    /// <summary>
+    /// Initializes a new instance with elements from the parts obtained from the given value.
+    /// </summary>
+    /// <param name="engine"></param>
+    /// <param name="value"></param>
+    public IdentifierMultiPart(IEngine engine, string? value) : this(engine) => AddInternal(value);
+
+    /// <summary>
+    /// Initializes a new instance with elements from the parts obtained from the given range.
+    /// </summary>
+    /// <param name="engine"></param>
+    /// <param name="range"></param>
+    public IdentifierMultiPart(IEngine engine, IEnumerable<string?> range) : this(engine) => AddRangeInternal(range);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected ParameterList(ParameterList source)
-    {
-        source.ThrowWhenNull();
-
-        Engine = source.Engine;
-        Items = new(this);
-        Items.AddRange(source);
-    }
+    protected IdentifierMultiPart(IdentifierMultiPart source) : this(source.Engine) => Items.AddRange(source);
 
     /// <summary>
     /// <inheritdoc/>
@@ -88,22 +101,79 @@ public partial class ParameterList : IHost
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => Items.ToString();
-
-    string ToDebugString()
-    {
-        return Items.Count < DEBUGCOUNT
-            ? $"[{string.Join(", ", Items)}]"
-            : $"[{string.Join(", ", Items.Take(DEBUGCOUNT))}, ...]";
-    }
-    static int DEBUGCOUNT = 8;
+    public override string ToString() => string.Join('.', Items);
 
     // ----------------------------------------------------
 
     /// <summary>
+    /// Returns an array with the single-identifier parts extracted from the given value. If
+    /// that value is null or empty, then the returned array contains just one empty element.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    IItem[] ValueToParts(string? value)
+    {
+        return value == null
+            ? [new IdentifierSinglePart(Engine)]
+            : Engine.GetDotted(value).Select(x => new IdentifierSinglePart(Engine, x)).ToArray();
+    }
+
+    /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public IEngine Engine { get; }
+    /// <returns></returns>
+    public override IIdentifier Reduce()
+    {
+        if (Count == 0) return new IdentifierSinglePart(Engine);
+        if (Count == 1) return Items[0];
+
+        if (Items[0].Value == null)
+        {
+            var values = Items.Select(x => x.NonTerminatedValue).ToList();
+            while (values.Count > 0)
+            {
+                if (values[0] == null) values.RemoveAt(0);
+                else break;
+            }
+            return values.Count == 0
+                ? new IdentifierSinglePart(Engine)
+                : new IdentifierMultiPart(Engine, values);
+        }
+        return this;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public override string? Value
+    {
+        get // Removing empty heads...
+        {
+            var sb = new StringBuilder();
+            var num = 0;
+
+            foreach (var item in Items)
+            {
+                var value = item.Value; if (num > 0 || value != null)
+                {
+                    if (num > 0) sb.Append('.');
+                    sb.Append(value);
+                    num++;
+                }
+            }
+
+            return num == 0 ? null : sb.ToString();
+        }
+        init // Clearing and adding parts...
+        {
+            var parts = ValueToParts(value);
+
+            Items.Clear();
+            Items.AddRange(parts);
+        }
+    }
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// <inheritdoc/>
@@ -127,28 +197,28 @@ public partial class ParameterList : IHost
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public bool Contains(IKey key) => Items.Contains(key);
+    public bool Contains(IKey? key) => Items.Contains(key);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public int IndexOf(IKey key) => Items.IndexOf(key);
+    public int IndexOf(IKey? key) => Items.IndexOf(key);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public int LastIndexOf(IKey key) => Items.LastIndexOf(key);
+    public int LastIndexOf(IKey? key) => Items.LastIndexOf(key);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public List<int> IndexesOf(IKey key) => Items.IndexesOf(key);
+    public List<int> IndexesOf(IKey? key) => Items.IndexesOf(key);
 
     /// <summary>
     /// <inheritdoc/>
@@ -190,19 +260,118 @@ public partial class ParameterList : IHost
     /// <returns></returns>
     public List<IItem> ToList() => Items.ToList();
 
+    // ----------------------------------------------------
+
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    /// <param name="index"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    public string NextName()
+    public virtual IHost Replace(int index, IKey? value)
     {
-        for (int i = Items.Count; i < int.MaxValue; i++)
+        var temp = Clone();
+        var num = temp.ReplaceInternal(index, value);
+        return num > 0 ? temp : this;
+    }
+    int ReplaceInternal(int index, IKey? value)
+    {
+        Items.RemoveAt(index);
+        return InsertInternal(index, value);
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public virtual IHost Add(IKey? value)
+    {
+        var temp = Clone();
+        var num = temp.AddInternal(value);
+        return num > 0 ? temp : this;
+    }
+    int AddInternal(IKey? value)
+    {
+        var parts = ValueToParts(value);
+        var count = 0;
+
+        foreach (var part in parts) count += Items.Add(part);
+        return count;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="range"></param>
+    /// <returns></returns>
+    public virtual IHost AddRange(IEnumerable<IKey?> range)
+    {
+        var temp = Clone();
+        var num = temp.AddRangeInternal(range);
+        return num > 0 ? temp : this;
+    }
+    int AddRangeInternal(IEnumerable<IKey?> range)
+    {
+        range.ThrowWhenNull();
+
+        var count = 0; foreach (var item in range)
         {
-            var name = $"{Engine.ParameterPrefix}{i}";
-            var index = IndexOf(name);
-            if (index < 0) return name;
+            var num = AddInternal(item);
+            count += num;
         }
-        throw new UnExpectedException("Range of indexes exhausted.");
+        return count;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public virtual IHost Insert(int index, IKey? value)
+    {
+        var temp = Clone();
+        var num = temp.InsertInternal(index, value);
+        return num > 0 ? temp : this;
+    }
+    int InsertInternal(int index, IKey? value)
+    {
+        var parts = ValueToParts(value);
+        var count = 0;
+
+        foreach (var part in parts)
+        {
+            var num = Items.Insert(index, part);
+            count += num;
+            index += num;
+        }
+        return count;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="range"></param>
+    /// <returns></returns>
+    public virtual IHost InsertRange(int index, IEnumerable<IKey?> range)
+    {
+        var temp = Clone();
+        var num = temp.InsertRangeInternal(index, range);
+        return num > 0 ? temp : this;
+    }
+    int InsertRangeInternal(int index, IEnumerable<IKey?> range)
+    {
+        range.ThrowWhenNull();
+
+        var count = 0; foreach (var item in range)
+        {
+            var num = InsertInternal(index, item);
+            count += num;
+            index += num;
+        }
+        return count;
     }
 
     // ----------------------------------------------------
@@ -318,7 +487,7 @@ public partial class ParameterList : IHost
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public virtual IHost Remove(IKey key)
+    public virtual IHost Remove(IKey? key)
     {
         var temp = Clone();
         var num = temp.Items.Remove(key);
@@ -330,7 +499,7 @@ public partial class ParameterList : IHost
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public virtual IHost RemoveLast(IKey key)
+    public virtual IHost RemoveLast(IKey? key)
     {
         var temp = Clone();
         var num = temp.Items.RemoveLast(key);
@@ -342,7 +511,7 @@ public partial class ParameterList : IHost
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public virtual IHost RemoveAll(IKey key)
+    public virtual IHost RemoveAll(IKey? key)
     {
         var temp = Clone();
         var num = temp.Items.RemoveAll(key);

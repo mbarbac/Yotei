@@ -18,6 +18,14 @@ public static class Test_Engine
         Assert.Equal(Engine.USETERMINATORS, engine.UseTerminators);
         Assert.Equal(Engine.LEFTERMINATOR, engine.LeftTerminator);
         Assert.Equal(Engine.RIGHTTERMINATOR, engine.RightTerminator);
+
+        Assert.Equal(3, engine.KnownTags.IdentifierTags.Count);
+        Assert.Equal("SchemaTag", engine.KnownTags.IdentifierTags[0]);
+        Assert.Equal("TableTag", engine.KnownTags.IdentifierTags[1]);
+        Assert.Equal("ColumnTag", engine.KnownTags.IdentifierTags[2]);
+        Assert.Equal("PrimaryTag", engine.KnownTags.PrimaryKeyTag);
+        Assert.Equal("UniqueTag", engine.KnownTags.UniqueValuedTag);
+        Assert.Equal("ReadOnlyTag", engine.KnownTags.ReadOnlyTag);
     }
 
     //[Enforced]
@@ -57,6 +65,14 @@ public static class Test_Engine
         target = source.WithRightTerminator('x');
         Assert.NotSame(source, target);
         Assert.Equal('x', target.RightTerminator);
+
+        var tags = new KnownTags(false, new IdentifierTags(false), "another");
+        target = source.WithKnownTags(tags);
+        Assert.NotSame(source, target);
+        Assert.Empty(target.KnownTags.IdentifierTags);
+        Assert.Equal("another", target.KnownTags.PrimaryKeyTag);
+        Assert.Null(target.KnownTags.UniqueValuedTag);
+        Assert.Null(target.KnownTags.ReadOnlyTag);
     }
 
     // ----------------------------------------------------

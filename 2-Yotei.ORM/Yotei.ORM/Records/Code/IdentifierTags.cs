@@ -1,4 +1,5 @@
-﻿using IHost = Yotei.ORM.Records.IIdentifierTags;
+﻿using System.Reflection.Metadata;
+using IHost = Yotei.ORM.Records.IIdentifierTags;
 using IItem = string;
 using IKey = string;
 
@@ -10,7 +11,7 @@ namespace Yotei.ORM.Records.Code;
 /// </summary>
 [Cloneable(Specs = "(source)")]
 [WithGenerator(Specs = "(source)+@")]
-public partial class IdentifierTags : IHost
+public partial class IdentifierTags : IIdentifierTags
 {
     // Represents the collection of contents of this instance.
     protected class InnerList : CoreList<IItem, IKey>
@@ -21,18 +22,17 @@ public partial class IdentifierTags : IHost
         public override InnerList Clone() => new(this);
 
         public override IItem ValidateItem(IItem item) => ValidateKey(item);
-        public override string GetKey(IItem item) => item;
+        public override IKey GetKey(IItem item) => item;
         public override IKey ValidateKey(IKey key)
         {
             key.NotNullNotEmpty();
-
             if (key.Contains('.')) throw new ArgumentException(
                 "Identifier tags cannot contain embedded dots.")
                 .WithData(key);
 
             return key;
         }
-        public override bool CompareKeys(string inner, string other)
+        public override bool CompareKeys(IKey inner, IKey other)
         {
             return string.Compare(inner, other, !Master.CaseSensitiveTags) == 0;
         }
@@ -41,6 +41,51 @@ public partial class IdentifierTags : IHost
             throw new DuplicateException("Duplicated element.").WithData(item).WithData(Master);
         }
         public override bool ExpandNested(IItem _) => false;
+
+        string[] SplitKey(string key)
+        {
+            key.ThrowWhenNull();
+
+            if (key.Contains('.'))
+            {
+                var parts = key.Split('.');
+                for (int i = 0; i < parts.Length; i++) parts[i] = ValidateKey(parts[i]);
+                return parts;
+            }
+            else return [ValidateKey(key)];
+        }
+        public override int Replace(int index, string item)
+        {
+            RemoveAt(index);
+
+            var parts = SplitKey(item);
+            return InsertRange(index, parts);
+        }
+        public override int Add(string item)
+        {
+            var parts = SplitKey(item);
+            var count = 0;
+
+            foreach (var part in parts)
+            {
+                var num = base.Add(part);
+                count += num;
+            }
+            return count;
+        }
+        public override int Insert(int index, string item)
+        {
+            var parts = SplitKey(item);
+            var count = 0;
+
+            foreach (var part in parts)
+            {
+                var num = base.Insert(index, part);
+                count += num;
+                index += num;
+            }
+            return count;
+        }
     }
 
     // The actual contents carried by this instance.
@@ -65,7 +110,7 @@ public partial class IdentifierTags : IHost
     /// <param name="item"></param>
     public IdentifierTags(bool caseSensitiveTags, IItem item)
         : this(caseSensitiveTags)
-        => AddInternal(item);
+        => Items.Add(item);
 
     /// <summary>
     /// Initializes a new instance with elements from the given range.
@@ -74,7 +119,7 @@ public partial class IdentifierTags : IHost
     /// <param name="range"></param>
     public IdentifierTags(bool caseSensitiveTags, IEnumerable<IItem> range)
         : this(caseSensitiveTags)
-        => AddRangeInternal(range);
+        => Items.AddRange(range);
 
     /// <summary>
     /// Copy constructor.
@@ -199,34 +244,6 @@ public partial class IdentifierTags : IHost
     // ----------------------------------------------------
 
     /// <summary>
-    /// Splits the given key into its dot-separated parts. Empty or missed elements are not
-    /// allowed and throw an exception.
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    string[] SplitKey(string key)
-    {
-        key.ThrowWhenNull();
-
-        if (key.Contains('.'))
-        {
-            var parts = key.Split('.'); for (int i = 0; i < parts.Length; i++)
-            {
-                var part = Items.ValidateKey(parts[i]);
-                parts[i] = part;
-            }
-            return parts;
-        }
-        else
-        {
-            key = Items.ValidateKey(key);
-            return [key];
-        }
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="index"></param>
@@ -253,15 +270,8 @@ public partial class IdentifierTags : IHost
     public virtual IHost Replace(int index, IItem item)
     {
         var temp = Clone();
-        var num = temp.ReplaceInternal(index, item);
+        var num = temp.Items.Replace(index, item);
         return num > 0 ? temp : this;
-    }
-    int ReplaceInternal(int index, IItem item)
-    {
-        Items.RemoveAt(index);
-
-        var parts = SplitKey(item);
-        return InsertRangeInternal(index, parts);
     }
 
     /// <summary>
@@ -272,20 +282,8 @@ public partial class IdentifierTags : IHost
     public virtual IHost Add(IItem item)
     {
         var temp = Clone();
-        var num = temp.AddInternal(item);
+        var num = temp.Items.Add(item);
         return num > 0 ? temp : this;
-    }
-    int AddInternal(IItem item)
-    {
-        var parts = SplitKey(item);
-        var count = 0;
-
-        foreach (var part in parts)
-        {
-            var num = Items.Add(part);
-            count += num;
-        }
-        return count;
     }
 
     /// <summary>
@@ -296,15 +294,8 @@ public partial class IdentifierTags : IHost
     public virtual IHost AddRange(IEnumerable<IItem> range)
     {
         var temp = Clone();
-        var num = temp.AddRangeInternal(range);
+        var num = temp.Items.AddRange(range);
         return num > 0 ? temp : this;
-    }
-    int AddRangeInternal(IEnumerable<IItem> range)
-    {
-        range.ThrowWhenNull();
-
-        var num = 0; foreach (var item in range) num += AddInternal(item);
-        return num;
     }
 
     /// <summary>
@@ -316,21 +307,8 @@ public partial class IdentifierTags : IHost
     public virtual IHost Insert(int index, IItem item)
     {
         var temp = Clone();
-        var num = temp.InsertInternal(index, item);
+        var num = temp.Items.Insert(index, item);
         return num > 0 ? temp : this;
-    }
-    int InsertInternal(int index, IItem item)
-    {
-        var parts = SplitKey(item);
-        var count = 0;
-
-        foreach (var part in parts)
-        {
-            var num = Items.Insert(index, part);
-            count += num;
-            index += num;
-        }
-        return count;
     }
 
     /// <summary>
@@ -342,20 +320,8 @@ public partial class IdentifierTags : IHost
     public virtual IHost InsertRange(int index, IEnumerable<IItem> range)
     {
         var temp = Clone();
-        var num = temp.InsertRangeInternal(index, range);
+        var num = temp.Items.InsertRange(index, range);
         return num > 0 ? temp : this;
-    }
-    int InsertRangeInternal(int index, IEnumerable<IItem> range)
-    {
-        range.ThrowWhenNull();
-
-        var count = 0; foreach (var item in range)
-        {
-            var num = InsertInternal(index, item);
-            count += num;
-            index += num;
-        }
-        return count;
     }
 
     /// <summary>
@@ -395,7 +361,7 @@ public partial class IdentifierTags : IHost
         return num > 0 ? temp : this;
     }
 
-    ////// <summary>
+    /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
