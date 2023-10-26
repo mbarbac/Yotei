@@ -8,7 +8,7 @@ namespace Experimental;
 /// <summary>
 /// ...
 /// </summary>
-public interface ITemplateList : IEnumerable<ITemplate>, ICloneable
+public interface ITemplateList : IEnumerable<IItem>, ICloneable
 {
     /// <summary>
     /// <inheritdoc cref="ICloneable.Clone"/>
