@@ -243,6 +243,19 @@ public partial class KnownTags : IKnownTags
     }
 
     /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerator<string> GetEnumerator()
+    {
+        foreach (var tag in IdentifierTags) yield return tag;
+        if (PrimaryKeyTag != null) yield return PrimaryKeyTag;
+        if (UniqueValuedTag != null) yield return UniqueValuedTag;
+        if (ReadOnlyTag != null) yield return ReadOnlyTag;
+    }
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    /// <summary>
     /// Determines if this intance carries the given metadata tag, or not.
     /// </summary>
     /// <param name="tag"></param>

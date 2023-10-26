@@ -5,7 +5,7 @@
 /// Represents the collection of not-duplicated metadata tags that are well-known to a given
 /// underlying engine.
 /// </summary>
-public partial interface IKnownTags
+public partial interface IKnownTags : IEnumerable<string>
 {
     /// <summary>
     /// Determines if the metadata tags in this collection are case sensitive, or not.
