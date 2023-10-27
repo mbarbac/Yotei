@@ -1,4 +1,6 @@
-using THost = Yotei.ORM.Records.Code.IdentifierTags;
+using THost = Yotei.ORM.Code.IdentifierTags;
+using TItem = string;
+using TKey = string;
 
 namespace Yotei.ORM.Tests;
 
@@ -20,7 +22,7 @@ public static class Test_IdentifierTags
     {
         var items = new THost(false, "one");
         Assert.Single(items);
-        Assert.Equal("one", items[0]);
+        Assert.Same("one", items[0]);
 
         try { _ = new THost(false, (string?)null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
@@ -93,9 +95,19 @@ public static class Test_IdentifierTags
     [Fact]
     public static void Test_With_Methods()
     {
-        var source = new THost(true, "one.ONE");
+        var source = new THost(false, "one.two.three");
+        var target = source.WithCaseSensitiveTags(false);
+        Assert.Same(source, target);
 
-        try { _ = source.WithCaseSensitiveTags(false); Assert.Fail(); }
+        target = source.WithCaseSensitiveTags(true);
+        Assert.NotSame(source, target);
+        Assert.Equal(3, target.Count);
+        Assert.Equal("one", target[0]);
+        Assert.Equal("two", target[1]);
+        Assert.Equal("three", target[2]);
+
+        source = new THost(true, ["one", "two", new TItem("ONE")]);
+        try { source.WithCaseSensitiveTags(false); Assert.Fail(); }
         catch (DuplicateException) { }
     }
 
@@ -122,7 +134,10 @@ public static class Test_IdentifierTags
     public static void Test_Replace()
     {
         var source = new THost(false, "one.two.three");
-        var target = source.Replace(0, "ONE");
+        var target = source.Replace(0, "one");
+        Assert.Same(source, target);
+
+        target = source.Replace(0, "ONE");
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.Equal("ONE", target[0]);
@@ -139,6 +154,21 @@ public static class Test_IdentifierTags
 
         try { _ = source.Replace(0, "THREE"); Assert.Fail(); }
         catch (DuplicateException) { }
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Replace_Many()
+    {
+        var source = new THost(false, ["one", "two", "three"]);
+        var target = source.Replace(0, "four.five");
+
+        Assert.NotSame(source, target);
+        Assert.Equal(4, target.Count);
+        Assert.Equal("four", target[0]);
+        Assert.Equal("five", target[1]);
+        Assert.Equal("two", target[2]);
+        Assert.Equal("three", target[3]);
     }
 
     //[Enforced]
@@ -259,6 +289,23 @@ public static class Test_IdentifierTags
         Assert.Equal(2, target.Count);
         Assert.Equal("two", target[0]);
         Assert.Equal("three", target[1]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_RemoveRange()
+    {
+        var source = new THost(false, "one.two.three");
+        var target = source.RemoveRange(0, 0);
+        Assert.Same(source, target);
+
+        target = source.RemoveRange(0, source.Count);
+        Assert.Empty(target);
+
+        target = source.RemoveRange(0, 2);
+        Assert.NotSame(source, target);
+        Assert.Single(target);
+        Assert.Equal("three", target[0]);
     }
 
     //[Enforced]

@@ -4,68 +4,67 @@
 /// <summary>
 /// Represents a list-alike collection of elements identified by their respective keys.
 /// </summary>
-/// <typeparam name="IItem"></typeparam>
-/// <typeparam name="IKey"></typeparam>
-public interface ICoreList<IItem, IKey>
-    : IList<IItem>, IList, ICollection<IItem>, ICollection, IEnumerable<IItem>, ICloneable
+/// <typeparam name="TKey"></typeparam>
+/// <typeparam name="TItem"></typeparam>
+public interface ICoreList<TKey, TItem>
+    : IList<TItem>, IList, ICollection<TItem>, ICollection, IEnumerable<TItem>, ICloneable
 {
     /// <summary>
     /// <inheritdoc cref="ICloneable.Clone"/>
     /// </summary>
     /// <returns></returns>
-    new ICoreList<IItem, IKey> Clone();
+    new ICoreList<TKey, TItem> Clone();
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Invoked to validate the given element for this collection. It is excepted that this
-    /// method throw an appropriate exception if not.
+    /// Invoked to return a validated element. This method must throw an appropriate exception
+    /// if the element is invalid.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    IItem ValidateItem(IItem item);
+    TItem ValidateItem(TItem item);
 
     /// <summary>
-    /// Invoked to obtain the key associated with the given element. It is excepted that this
-    /// method throw an appropriate exception if the key cannot be obtained.
+    /// Invoked to obtain the key associated with the given element. This method must throw an
+    /// appropriate exception if the key cannot be obtained.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    IKey GetKey(IItem item);
+    TKey GetKey(TItem item);
 
     /// <summary>
-    /// Invoked to validate the given key. It is excepted that this method throw an appropriate
-    /// exception if not.
+    /// Invoked to return a validated key. This method must throw an appropriate exception if
+    /// the key is invalid.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    IKey ValidateKey(IKey key);
+    TKey ValidateKey(TKey key);
 
     /// <summary>
-    /// Invoked to determine if the two given keys shall be considered equivalent ones, or not.
+    /// Invoked to determine if the given 'other' key is equivalent to the existing 'inner' one.
     /// </summary>
     /// <param name="inner"></param>
-    /// <param name="other"></param>
+    /// <param name="y"></param>
     /// <returns></returns>
-    bool CompareKeys(IKey inner, IKey other);
+    bool CompareKeys(TKey inner, TKey other);
 
     /// <summary>
-    /// Invoked to determine if the given duplicated element shall be added or inserted into this
-    /// collection, or not. In addition, it is excepted that this method throws an appropriate
-    /// exception if duplicates are not allowed.
+    /// Invoked to determine if the given duplicated element can be added or inserted into this
+    /// collection. This method must throw an appropriate exception if duplicated items are not
+    /// allowed.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    bool AcceptDuplicated(IItem item);
+    bool AcceptDuplicated(TItem item);
 
     /// <summary>
-    /// Invoked to determines if the given element, which is an enumeration of the type of the
-    /// elements in this collection, shall be expanded or not. If so, then its child elements
-    /// are used instead of the original one.
+    /// Invoked to determine if the given element, which is itself an enumeration of elements,
+    /// shall be expanded. If so, then its child elements are used instead of the original one.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    bool ExpandNested(IItem item);
+    bool ExpandNexted(TItem item);
 
     // ----------------------------------------------------
 
@@ -84,14 +83,14 @@ public interface ICoreList<IItem, IKey>
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    new IItem this[int index] { get; set; }
+    new TItem this[int index] { get; set; }
 
     /// <summary>
-    /// Determines if this collection contains any elements with the given key, or not.
+    /// Determines if this collection contains any elements with the given key.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    bool Contains(IKey key);
+    bool Contains(TKey key);
 
     /// <summary>
     /// Returns the index of the first element in this collection with the given key, or -1 if
@@ -99,7 +98,7 @@ public interface ICoreList<IItem, IKey>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    int IndexOf(IKey key);
+    int IndexOf(TKey key);
 
     /// <summary>
     /// Returns the index of the last element in this collection with the given key, or -1 if
@@ -107,22 +106,21 @@ public interface ICoreList<IItem, IKey>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    int LastIndexOf(IKey key);
+    int LastIndexOf(TKey key);
 
     /// <summary>
     /// Returns the indexes of the elements in this collection with the given key.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    List<int> IndexesOf(IKey key);
+    List<int> IndexesOf(TKey key);
 
     /// <summary>
-    /// Determines if this collection contains any elements that match the given predicate,
-    /// or not.
+    /// Determines if this collection contains any elements that match the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    bool Contains(Predicate<IItem> predicate);
+    bool Contains(Predicate<TItem> predicate);
 
     /// <summary>
     /// Returns the index of the first element in this collection that match the given predicate,
@@ -130,7 +128,7 @@ public interface ICoreList<IItem, IKey>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int IndexOf(Predicate<IItem> predicate);
+    int IndexOf(Predicate<TItem> predicate);
 
     /// <summary>
     /// Returns the index of the last element in this collection that match the given predicate,
@@ -138,26 +136,26 @@ public interface ICoreList<IItem, IKey>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int LastIndexOf(Predicate<IItem> predicate);
+    int LastIndexOf(Predicate<TItem> predicate);
 
     /// <summary>
     /// Returns the indexes of the elements in this collection that match the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    List<int> IndexesOf(Predicate<IItem> predicate);
+    List<int> IndexesOf(Predicate<TItem> predicate);
 
     /// <summary>
     /// Returns an array with the elements in this collection.
     /// </summary>
     /// <returns></returns>
-    IItem[] ToArray();
+    TItem[] ToArray();
 
     /// <summary>
     /// Returns a list with the elements in this collection.
     /// </summary>
     /// <returns></returns>
-    List<IItem> ToList();
+    List<TItem> ToList();
 
     /// <summary>
     /// Returns a list with the given number of elements starting from the given index.
@@ -165,7 +163,7 @@ public interface ICoreList<IItem, IKey>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    List<IItem> GetRange(int index, int count);
+    List<TItem> GetRange(int index, int count);
 
     // ----------------------------------------------------
 
@@ -175,21 +173,21 @@ public interface ICoreList<IItem, IKey>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    int Replace(int index, IItem item);
+    int Replace(int index, TItem item);
 
     /// <summary>
     /// Adds to this collection the given element.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    new int Add(IItem item);
+    new int Add(TItem item);
 
     /// <summary>
     /// Adds to this collection the elements from the given range.
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    int AddRange(IEnumerable<IItem> range);
+    int AddRange(IEnumerable<TItem> range);
 
     /// <summary>
     /// Inserts into this collection the given element.
@@ -197,7 +195,7 @@ public interface ICoreList<IItem, IKey>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    new int Insert(int index, IItem item);
+    new int Insert(int index, TItem item);
 
     /// <summary>
     /// Inserts into this collection the elements from the given range, starting at the given
@@ -206,7 +204,7 @@ public interface ICoreList<IItem, IKey>
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    int InsertRange(int index, IEnumerable<IItem> range);
+    int InsertRange(int index, IEnumerable<TItem> range);
 
     /// <summary>
     /// Removes from this collection the element at the given index.
@@ -228,21 +226,21 @@ public interface ICoreList<IItem, IKey>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    int Remove(IKey key);
+    int Remove(TKey key);
 
     /// <summary>
     /// Removes from this collection the last element with the given key.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    int RemoveLast(IKey key);
+    int RemoveLast(TKey key);
 
     /// <summary>
     /// Removes from this collection all the elements with the given key.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    int RemoveAll(IKey key);
+    int RemoveAll(TKey key);
 
     /// <summary>
     /// Removes from this collection the first ocurrence of an element that matches the given
@@ -250,7 +248,7 @@ public interface ICoreList<IItem, IKey>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int Remove(Predicate<IItem> predicate);
+    int Remove(Predicate<TItem> predicate);
 
     /// <summary>
     /// Removes from this collection the last ocurrence of an element that matches the given
@@ -258,7 +256,7 @@ public interface ICoreList<IItem, IKey>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int RemoveLast(Predicate<IItem> predicate);
+    int RemoveLast(Predicate<TItem> predicate);
 
     /// <summary>
     /// Removes from this collection all the ocurrences of elements that match the given
@@ -266,7 +264,7 @@ public interface ICoreList<IItem, IKey>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int RemoveAll(Predicate<IItem> predicate);
+    int RemoveAll(Predicate<TItem> predicate);
 
     /// <summary>
     /// Clears this collection.

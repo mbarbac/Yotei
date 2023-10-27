@@ -322,6 +322,7 @@ internal partial class TypeBuilder
             }
         }
 
+        sb.AppendLine($"return {Receiver};");
         return sb.ToString();
     }
 

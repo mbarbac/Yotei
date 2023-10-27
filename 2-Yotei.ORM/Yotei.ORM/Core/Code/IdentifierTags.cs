@@ -1,30 +1,110 @@
-﻿namespace Yotei.Tools;
+﻿using THost = Yotei.ORM.IIdentifierTags;
+using TItem = string;
+using TKey = string;
+
+namespace Yotei.ORM.Code;
 
 // ========================================================
 /// <summary>
-/// <inheritdoc cref="IInvariantList{IItem, IKey}"/>
+/// <inheritdoc cref="THost"/>
 /// </summary>
-/// <typeparam name="IItem"></typeparam>
-/// <typeparam name="IKey"></typeparam>
-public abstract class InvariantList<IItem, IKey> : IInvariantList<IItem, IKey>
+[Cloneable(Specs = "(source)-*")]
+[WithGenerator(Specs = "(source)+@")]
+public partial class IdentifierTags : THost
 {
-    // Represents the contents of this instance.
-    protected class InnerList : CoreList<IItem, IKey>
+    /// <summary>
+    /// Represents the collection of contents in this instance.
+    /// </summary>
+    protected class InnerList : CoreList<TKey, TItem>
     {
-        InvariantList<IItem, IKey> Master;
-        public InnerList(InvariantList<IItem, IKey> master) => Master = master.ThrowWhenNull();
-        protected InnerList(InnerList source) : this(source.Master) => AddRange(source);
+        IdentifierTags Master { get; }
+        public InnerList(IdentifierTags master) => Master = master.ThrowWhenNull();
+        protected InnerList(InnerList source)
+        {
+            source.ThrowWhenNull();
+            Master = source.Master;
+            AddRange(source);
+        }
         public override InnerList Clone() => new(this);
 
-        public override IItem ValidateItem(IItem item) => Master.ValidateItem(item);
-        public override IKey GetKey(IItem item) => Master.GetKey(item);
-        public override IKey ValidateKey(IKey key) => Master.ValidateKey(key);
-        public override bool CompareKeys(IKey inner, IKey other) => Master.CompareKeys(inner, other);
-        public override bool AcceptDuplicated(IItem item) => Master.AcceptDuplicated(item);
-        public override bool ExpandNested(IItem item) => Master.ExpandNested(item);
+        // ------------------------------------------------
+
+        public override TItem ValidateItem(TItem item) => item.ThrowWhenNull();
+        public override TKey GetKey(TItem item) => item;
+        public override TKey ValidateKey(TKey key)
+        {
+            key = key.NotNullNotEmpty();
+
+            if (key.Contains('.')) throw new ArgumentException(
+                "Tags cannot contain embedded dots.")
+                .WithData(key);
+
+            return key;
+        }
+        public override bool CompareKeys(TKey inner, TKey other)
+        {
+            return string.Compare(inner, other, !Master.CaseSensitiveTags) == 0;
+        }
+        public override bool AcceptDuplicated(TItem item)
+        {
+            throw new DuplicateException("Duplicated element.").WithData(item);
+        }
+        public override bool ExpandNexted(TItem _) => false;
+
+        // ------------------------------------------------
+
+        string[] SplitKey(string key)
+        {
+            key = key.ThrowWhenNull();
+
+            var parts = key.Contains('.') ? key.Split('.') : [];
+            if (parts.Length > 1)
+            {
+                for (int i = 0; i < parts.Length; i++) parts[i] = ValidateKey(parts[i]);
+                return parts;
+            }
+            else return [key];
+        }
+        public override int Replace(int index, TItem item)
+        {
+            var parts = SplitKey(item);
+            if (parts.Length > 1)
+            {
+                RemoveAt(index);
+                return InsertRange(index, parts);
+            }
+            else return base.Replace(index, item);
+        }
+        public override int Add(TItem item)
+        {
+            var parts = SplitKey(item);
+            if (parts.Length > 1)
+            {
+                var count = 0; foreach (var part in parts) count += base.Add(part);
+                return count;
+            }
+            else return base.Add(item);
+        }
+        public override int Insert(int index, string item)
+        {
+            var parts = SplitKey(item);
+            if (parts.Length > 1)
+            {
+                var count = 0; foreach (var part in parts)
+                {
+                    var num = base.Insert(index, part);
+                    count += num;
+                    index += num;
+                }
+                return count;
+            }
+            else return base.Insert(index, item);
+        }
     }
 
-    // The actual contents carried by this instance.
+    /// <summary>
+    /// The actual collection of elements carried by this instance.
+    /// </summary>
     protected InnerList Items { get; }
 
     // ----------------------------------------------------
@@ -32,99 +112,81 @@ public abstract class InvariantList<IItem, IKey> : IInvariantList<IItem, IKey>
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    public InvariantList() => Items = new(this);
+    /// <param name="sensitiveTags"></param>
+    public IdentifierTags(bool sensitiveTags)
+    {
+        Items = new(this);
+        CaseSensitiveTags = sensitiveTags;
+    }
 
     /// <summary>
     /// Initializes a new instance with the given element.
     /// </summary>
+    /// <param name="sensitiveTags"></param>
     /// <param name="item"></param>
-    public InvariantList(IItem item) : this() => Items.Add(item);
+    public IdentifierTags(bool sensitiveTags, TItem item) : this(sensitiveTags)
+    {
+        Items.Add(item);
+    }
 
     /// <summary>
-    /// Initializes a new instance with elements from the given range.
+    /// Initializes a new instance with the elements from the given range.
     /// </summary>
+    /// <param name="sensitiveTags"></param>
     /// <param name="range"></param>
-    public InvariantList(IEnumerable<IItem> range) : this() => Items.AddRange(range);
+    public IdentifierTags(bool sensitiveTags, IEnumerable<TItem> range) : this(sensitiveTags)
+    {
+        Items.AddRange(range);
+    }
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected InvariantList(InvariantList<IItem, IKey> source)
+    protected IdentifierTags(IdentifierTags source)
     {
         source.ThrowWhenNull();
 
         Items = new(this);
+        CaseSensitiveTags = source.CaseSensitiveTags;
         Items.AddRange(source);
     }
-
-    /// <summary>
-    /// <inheritdoc cref="ICloneable.Clone"/>
-    /// </summary>
-    /// <returns></returns>
-    public abstract InvariantList<IItem, IKey> Clone();
-    IInvariantList<IItem, IKey> IInvariantList<IItem, IKey>.Clone() => Clone();
-    object ICloneable.Clone() => Clone();
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public IEnumerator<IItem> GetEnumerator() => Items.GetEnumerator();
+    public IEnumerator<TItem> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => Items.ToString();
+    public override string ToString() => string.Join('.', Items);
 
     // ----------------------------------------------------
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    public abstract IItem ValidateItem(IItem item);
+    public bool CaseSensitiveTags
+    {
+        get => _CaseSensitiveTags;
+        init
+        {
+            if (_CaseSensitiveTags == value) return;
 
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    public abstract IKey GetKey(IItem item);
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    public abstract IKey ValidateKey(IKey key);
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="inner"></param>
-    /// <param name="other"></param>
-    /// <returns></returns>
-    public abstract bool CompareKeys(IKey inner, IKey other);
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    public abstract bool AcceptDuplicated(IItem item);
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    public abstract bool ExpandNested(IItem item);
-
-    // ----------------------------------------------------
+            _CaseSensitiveTags = value;
+            if (Count > 0)
+            {
+                var range = Items.ToArray();
+                Items.Clear();
+                Items.AddRange(range);
+            }
+        }
+    }
+    bool _CaseSensitiveTags;
 
     /// <summary>
     /// <inheritdoc/>
@@ -141,75 +203,61 @@ public abstract class InvariantList<IItem, IKey> : IInvariantList<IItem, IKey>
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public IItem this[int index] => Items[index];
+    public TItem this[int index] => Items[index];
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public bool Contains(IKey key) => Items.Contains(key);
+    public bool Contains(TKey key) => Items.Contains(key);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public int IndexOf(IKey key) => Items.IndexOf(key);
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    public int LastIndexOf(IKey key) => Items.LastIndexOf(key);
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    public List<int> IndexesOf(IKey key) => Items.IndexesOf(key);
+    public int IndexOf(TKey key) => Items.IndexOf(key);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public bool Contains(Predicate<IItem> predicate) => Items.Contains(predicate);
+    public bool Contains(Predicate<TItem> predicate) => Items.Contains(predicate);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public int IndexOf(Predicate<IItem> predicate) => Items.IndexOf(predicate);
+    public int IndexOf(Predicate<TItem> predicate) => Items.IndexOf(predicate);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public int LastIndexOf(Predicate<IItem> predicate) => Items.LastIndexOf(predicate);
+    public int LastIndexOf(Predicate<TItem> predicate) => Items.LastIndexOf(predicate);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public List<int> IndexesOf(Predicate<IItem> predicate) => Items.IndexesOf(predicate);
+    public List<int> IndexesOf(Predicate<TItem> predicate) => Items.IndexesOf(predicate);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public IItem[] ToArray() => Items.ToArray();
+    public TItem[] ToArray() => Items.ToArray();
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public List<IItem> ToList() => Items.ToList();
+    public List<TItem> ToList() => Items.ToList();
 
     // ----------------------------------------------------
 
@@ -219,7 +267,7 @@ public abstract class InvariantList<IItem, IKey> : IInvariantList<IItem, IKey>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual IInvariantList<IItem, IKey> GetRange(int index, int count)
+    public virtual THost GetRange(int index, int count)
     {
         if (count == Count && index == 0) return this;
         if (count == 0) return Clear();
@@ -237,7 +285,7 @@ public abstract class InvariantList<IItem, IKey> : IInvariantList<IItem, IKey>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IInvariantList<IItem, IKey> Replace(int index, IItem item)
+    public virtual THost Replace(int index, TItem item)
     {
         var temp = Clone();
         var num = temp.Items.Replace(index, item);
@@ -249,7 +297,7 @@ public abstract class InvariantList<IItem, IKey> : IInvariantList<IItem, IKey>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IInvariantList<IItem, IKey> Add(IItem item)
+    public virtual THost Add(TItem item)
     {
         var temp = Clone();
         var num = temp.Items.Add(item);
@@ -261,7 +309,7 @@ public abstract class InvariantList<IItem, IKey> : IInvariantList<IItem, IKey>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual IInvariantList<IItem, IKey> AddRange(IEnumerable<IItem> range)
+    public virtual THost AddRange(IEnumerable<TItem> range)
     {
         var temp = Clone();
         var num = temp.Items.AddRange(range);
@@ -274,7 +322,7 @@ public abstract class InvariantList<IItem, IKey> : IInvariantList<IItem, IKey>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IInvariantList<IItem, IKey> Insert(int index, IItem item)
+    public virtual THost Insert(int index, TItem item)
     {
         var temp = Clone();
         var num = temp.Items.Insert(index, item);
@@ -287,7 +335,7 @@ public abstract class InvariantList<IItem, IKey> : IInvariantList<IItem, IKey>
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual IInvariantList<IItem, IKey> InsertRange(int index, IEnumerable<IItem> range)
+    public virtual THost InsertRange(int index, IEnumerable<TItem> range)
     {
         var temp = Clone();
         var num = temp.Items.InsertRange(index, range);
@@ -299,7 +347,7 @@ public abstract class InvariantList<IItem, IKey> : IInvariantList<IItem, IKey>
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public virtual IInvariantList<IItem, IKey> RemoveAt(int index)
+    public virtual THost RemoveAt(int index)
     {
         var temp = Clone();
         var num = temp.Items.RemoveAt(index);
@@ -312,7 +360,7 @@ public abstract class InvariantList<IItem, IKey> : IInvariantList<IItem, IKey>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual IInvariantList<IItem, IKey> RemoveRange(int index, int count)
+    public virtual THost RemoveRange(int index, int count)
     {
         var temp = Clone();
         var num = temp.Items.RemoveRange(index, count);
@@ -324,7 +372,7 @@ public abstract class InvariantList<IItem, IKey> : IInvariantList<IItem, IKey>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public virtual IInvariantList<IItem, IKey> Remove(IKey key)
+    public virtual THost Remove(TKey key)
     {
         var temp = Clone();
         var num = temp.Items.Remove(key);
@@ -334,33 +382,9 @@ public abstract class InvariantList<IItem, IKey> : IInvariantList<IItem, IKey>
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    public virtual IInvariantList<IItem, IKey> RemoveLast(IKey key)
-    {
-        var temp = Clone();
-        var num = temp.Items.RemoveLast(key);
-        return num > 0 ? temp : this;
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    public virtual IInvariantList<IItem, IKey> RemoveAll(IKey key)
-    {
-        var temp = Clone();
-        var num = temp.Items.RemoveAll(key);
-        return num > 0 ? temp : this;
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IInvariantList<IItem, IKey> Remove(Predicate<IItem> predicate)
+    public virtual THost Remove(Predicate<TItem> predicate)
     {
         var temp = Clone();
         var num = temp.Items.Remove(predicate);
@@ -372,7 +396,7 @@ public abstract class InvariantList<IItem, IKey> : IInvariantList<IItem, IKey>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IInvariantList<IItem, IKey> RemoveLast(Predicate<IItem> predicate)
+    public virtual THost RemoveLast(Predicate<TItem> predicate)
     {
         var temp = Clone();
         var num = temp.Items.RemoveLast(predicate);
@@ -384,7 +408,7 @@ public abstract class InvariantList<IItem, IKey> : IInvariantList<IItem, IKey>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IInvariantList<IItem, IKey> RemoveAll(Predicate<IItem> predicate)
+    public virtual THost RemoveAll(Predicate<TItem> predicate)
     {
         var temp = Clone();
         var num = temp.Items.RemoveAll(predicate);
@@ -395,7 +419,7 @@ public abstract class InvariantList<IItem, IKey> : IInvariantList<IItem, IKey>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual IInvariantList<IItem, IKey> Clear()
+    public virtual THost Clear()
     {
         var temp = Clone();
         var num = temp.Items.Clear();

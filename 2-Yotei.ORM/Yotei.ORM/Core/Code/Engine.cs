@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// Represents an underlying database engine.
+/// <inheritdoc cref="IEngine"/>
 /// </summary>
 [WithGenerator(Specs = "(source)+@")]
 public abstract partial class Engine : IEngine

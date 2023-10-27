@@ -1,65 +1,21 @@
-﻿namespace Yotei.Tools;
+﻿using THost = Yotei.ORM.IIdentifierTags;
+using TItem = string;
+using TKey = string;
+
+namespace Yotei.ORM;
 
 // ========================================================
 /// <summary>
-/// Represents an immutable list-alike collection of elements identified by their respective keys.
+/// Represents the immutable ordered collection of not-duplicated metadata tags that describes
+/// the maximal structure of the identifiers associated with an underlying engine.
 /// </summary>
-/// <typeparam name="IItem"></typeparam>
-/// <typeparam name="IKey"></typeparam>
-public interface IInvariantList<IItem, IKey> : IEnumerable<IItem>, ICloneable
+[Cloneable]
+public partial interface IIdentifierTags : IEnumerable<TItem>
 {
     /// <summary>
-    /// <inheritdoc cref="ICloneable.Clone"/>
+    /// Determines if the metadata tags in this collection are case sensitive, or not.
     /// </summary>
-    /// <returns></returns>
-    new IInvariantList<IItem, IKey> Clone();
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// <inheritdoc cref="ICoreList{IItem, IKey}.ValidateItem(IItem)"/>
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    IItem ValidateItem(IItem item);
-
-    /// <summary>
-    /// <inheritdoc cref="ICoreList{IItem, IKey}.GetKey(IItem)"/>
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    IKey GetKey(IItem item);
-
-    /// <summary>
-    /// <inheritdoc cref="ICoreList{IItem, IKey}.ValidateKey(IKey)"/>
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    IKey ValidateKey(IKey key);
-
-    /// <summary>
-    /// <inheritdoc cref="ICoreList{IItem, IKey}.CompareKeys(IKey, IKey)"/>
-    /// </summary>
-    /// <param name="inner"></param>
-    /// <param name="other"></param>
-    /// <returns></returns>
-    bool CompareKeys(IKey inner, IKey other);
-
-    /// <summary>
-    /// <inheritdoc cref="ICoreList{IItem, IKey}.AcceptDuplicated(IItem)"/>
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    bool AcceptDuplicated(IItem item);
-
-    /// <summary>
-    /// <inheritdoc cref="ExpandNested(IItem)"/>
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    bool ExpandNested(IItem item);
-
-    // ----------------------------------------------------
+    [WithGenerator] bool CaseSensitiveTags { get; }
 
     /// <summary>
     /// Gets the number of elements in this instance.
@@ -76,14 +32,14 @@ public interface IInvariantList<IItem, IKey> : IEnumerable<IItem>, ICloneable
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    IItem this[int index] { get; }
+    TItem this[int index] { get; }
 
     /// <summary>
-    /// Determines if this collection contains any elements with the given key, or not.
+    /// Determines if this collection contains any elements with the given key.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    bool Contains(IKey key);
+    bool Contains(TKey key);
 
     /// <summary>
     /// Returns the index of the first element in this collection with the given key, or -1 if
@@ -91,30 +47,14 @@ public interface IInvariantList<IItem, IKey> : IEnumerable<IItem>, ICloneable
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    int IndexOf(IKey key);
+    int IndexOf(TKey key);
 
     /// <summary>
-    /// Returns the index of the last element in this collection with the given key, or -1 if
-    /// any can be found.
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    int LastIndexOf(IKey key);
-
-    /// <summary>
-    /// Returns the indexes of the elements in this collection with the given key.
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    List<int> IndexesOf(IKey key);
-
-    /// <summary>
-    /// Determines if this collection contains any elements that match the given predicate,
-    /// or not.
+    /// Determines if this collection contains any elements that match the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    bool Contains(Predicate<IItem> predicate);
+    bool Contains(Predicate<TItem> predicate);
 
     /// <summary>
     /// Returns the index of the first element in this collection that match the given predicate,
@@ -122,7 +62,7 @@ public interface IInvariantList<IItem, IKey> : IEnumerable<IItem>, ICloneable
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int IndexOf(Predicate<IItem> predicate);
+    int IndexOf(Predicate<TItem> predicate);
 
     /// <summary>
     /// Returns the index of the last element in this collection that match the given predicate,
@@ -130,26 +70,26 @@ public interface IInvariantList<IItem, IKey> : IEnumerable<IItem>, ICloneable
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int LastIndexOf(Predicate<IItem> predicate);
+    int LastIndexOf(Predicate<TItem> predicate);
 
     /// <summary>
     /// Returns the indexes of the elements in this collection that match the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    List<int> IndexesOf(Predicate<IItem> predicate);
+    List<int> IndexesOf(Predicate<TItem> predicate);
 
     /// <summary>
     /// Returns an array with the elements in this collection.
     /// </summary>
     /// <returns></returns>
-    IItem[] ToArray();
+    TItem[] ToArray();
 
     /// <summary>
     /// Returns a list with the elements in this collection.
     /// </summary>
     /// <returns></returns>
-    List<IItem> ToList();
+    List<TItem> ToList();
 
     // ----------------------------------------------------
 
@@ -160,7 +100,7 @@ public interface IInvariantList<IItem, IKey> : IEnumerable<IItem>, ICloneable
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    IInvariantList<IItem, IKey> GetRange(int index, int count);
+    THost GetRange(int index, int count);
 
     /// <summary>
     /// Obtains a new instance where the element at the given index has been replaced with the
@@ -169,14 +109,14 @@ public interface IInvariantList<IItem, IKey> : IEnumerable<IItem>, ICloneable
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    IInvariantList<IItem, IKey> Replace(int index, IItem item);
+    THost Replace(int index, TItem item);
 
     /// <summary>
     /// Obtains a new instance where the given element has been added to the original one.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    IInvariantList<IItem, IKey> Add(IItem item);
+    THost Add(TItem item);
 
     /// <summary>
     /// Obtains a new instance where the elements from the given range have been added to the
@@ -184,7 +124,7 @@ public interface IInvariantList<IItem, IKey> : IEnumerable<IItem>, ICloneable
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    IInvariantList<IItem, IKey> AddRange(IEnumerable<IItem> range);
+    THost AddRange(IEnumerable<TItem> range);
 
     /// <summary>
     /// Obtains a new instance where the given element has been inserted into the original one,
@@ -193,7 +133,7 @@ public interface IInvariantList<IItem, IKey> : IEnumerable<IItem>, ICloneable
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    IInvariantList<IItem, IKey> Insert(int index, IItem item);
+    THost Insert(int index, TItem item);
 
     /// <summary>
     /// Obtains a new instance where the elements from the given range have been inserted into
@@ -202,14 +142,14 @@ public interface IInvariantList<IItem, IKey> : IEnumerable<IItem>, ICloneable
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    IInvariantList<IItem, IKey> InsertRange(int index, IEnumerable<IItem> range);
+    THost InsertRange(int index, IEnumerable<TItem> range);
 
     /// <summary>
     /// Obtains a new instance where the element at the given index has been removed.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    IInvariantList<IItem, IKey> RemoveAt(int index);
+    THost RemoveAt(int index);
 
     /// <summary>
     /// Obtains a new instance where the given number of elements have been inserted into the
@@ -218,28 +158,14 @@ public interface IInvariantList<IItem, IKey> : IEnumerable<IItem>, ICloneable
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    IInvariantList<IItem, IKey> RemoveRange(int index, int count);
+    THost RemoveRange(int index, int count);
 
     /// <summary>
     /// Obtains a new instance where the first element with the given key has been removed.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    IInvariantList<IItem, IKey> Remove(IKey key);
-
-    /// <summary>
-    /// Obtains a new instance where the last element with the given key has been removed.
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    IInvariantList<IItem, IKey> RemoveLast(IKey key);
-
-    /// <summary>
-    /// Obtains a new instance where all the elements with the given key have been removed.
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    IInvariantList<IItem, IKey> RemoveAll(IKey key);
+    THost Remove(TKey key);
 
     /// <summary>
     /// Obtains a new instance where the first ocurrence of an element that matches the given
@@ -247,7 +173,7 @@ public interface IInvariantList<IItem, IKey> : IEnumerable<IItem>, ICloneable
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IInvariantList<IItem, IKey> Remove(Predicate<IItem> predicate);
+    THost Remove(Predicate<TItem> predicate);
 
     /// <summary>
     /// Obtains a new instance where the last ocurrence of an element that matches the given
@@ -255,7 +181,7 @@ public interface IInvariantList<IItem, IKey> : IEnumerable<IItem>, ICloneable
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IInvariantList<IItem, IKey> RemoveLast(Predicate<IItem> predicate);
+    THost RemoveLast(Predicate<TItem> predicate);
 
     /// <summary>
     /// Obtains a new instance where all the ocurrences of elements that match the given
@@ -263,11 +189,11 @@ public interface IInvariantList<IItem, IKey> : IEnumerable<IItem>, ICloneable
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IInvariantList<IItem, IKey> RemoveAll(Predicate<IItem> predicate);
+    THost RemoveAll(Predicate<TItem> predicate);
 
     /// <summary>
     /// Obtains a new instance where all the original elements have been removed.
     /// </summary>
     /// <returns></returns>
-    IInvariantList<IItem, IKey> Clear();
+    THost Clear();
 }

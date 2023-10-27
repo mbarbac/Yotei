@@ -26,7 +26,7 @@ public interface IIdentifier
 
     /// <summary>
     /// Determines if this instance matches the filters expressed by the given target one, where
-    /// matching is performed from right to left, using the non-terminated values, and any null,
+    /// matching is performed from right to left using the non-terminated values, and any null,
     /// empty, or missed filter is considered as an implicit match.
     /// </summary>
     /// <param name="target"></param>

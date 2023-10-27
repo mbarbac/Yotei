@@ -1,16 +1,16 @@
-﻿using IHost = Yotei.ORM.IIdentifierMultiPart;
-using IItem = Yotei.ORM.IIdentifierSinglePart;
-using IKey = string;
+﻿using THost = Yotei.ORM.IIdentifierMultiPart;
+using TItem = Yotei.ORM.IIdentifierSinglePart;
+using TKey = string;
 
 namespace Yotei.ORM;
 
 // ========================================================
 /// <summary>
-/// Represents an immutable multi-part database identifier.
-/// Duplicate elements are allowed.
+/// Represents an immutable multi-part database identifier. Each instance is a collection of
+/// single part elements, where duplicated ones are allowed.
 /// </summary>
 [Cloneable]
-public partial interface IIdentifierMultiPart : IEnumerable<IItem>, IIdentifier
+public partial interface IIdentifierMultiPart : IEnumerable<TItem>, IIdentifier
 {
     /// <summary>
     /// Gets the number of elements in this instance.
@@ -27,14 +27,14 @@ public partial interface IIdentifierMultiPart : IEnumerable<IItem>, IIdentifier
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    IItem this[int index] { get; }
+    TItem this[int index] { get; }
 
     /// <summary>
-    /// Determines if this collection contains any elements with the given key, or not.
+    /// Determines if this collection contains any elements with the given key.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    bool Contains(IKey? key);
+    bool Contains(TKey? key);
 
     /// <summary>
     /// Returns the index of the first element in this collection with the given key, or -1 if
@@ -42,7 +42,7 @@ public partial interface IIdentifierMultiPart : IEnumerable<IItem>, IIdentifier
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    int IndexOf(IKey? key);
+    int IndexOf(TKey? key);
 
     /// <summary>
     /// Returns the index of the last element in this collection with the given key, or -1 if
@@ -50,22 +50,21 @@ public partial interface IIdentifierMultiPart : IEnumerable<IItem>, IIdentifier
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    int LastIndexOf(IKey? key);
+    int LastIndexOf(TKey? key);
 
     /// <summary>
     /// Returns the indexes of the elements in this collection with the given key.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    List<int> IndexesOf(IKey? key);
+    List<int> IndexesOf(TKey? key);
 
     /// <summary>
-    /// Determines if this collection contains any elements that match the given predicate,
-    /// or not.
+    /// Determines if this collection contains any elements that match the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    bool Contains(Predicate<IItem> predicate);
+    bool Contains(Predicate<TItem> predicate);
 
     /// <summary>
     /// Returns the index of the first element in this collection that match the given predicate,
@@ -73,7 +72,7 @@ public partial interface IIdentifierMultiPart : IEnumerable<IItem>, IIdentifier
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int IndexOf(Predicate<IItem> predicate);
+    int IndexOf(Predicate<TItem> predicate);
 
     /// <summary>
     /// Returns the index of the last element in this collection that match the given predicate,
@@ -81,71 +80,71 @@ public partial interface IIdentifierMultiPart : IEnumerable<IItem>, IIdentifier
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int LastIndexOf(Predicate<IItem> predicate);
+    int LastIndexOf(Predicate<TItem> predicate);
 
     /// <summary>
     /// Returns the indexes of the elements in this collection that match the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    List<int> IndexesOf(Predicate<IItem> predicate);
+    List<int> IndexesOf(Predicate<TItem> predicate);
 
     /// <summary>
     /// Returns an array with the elements in this collection.
     /// </summary>
     /// <returns></returns>
-    IItem[] ToArray();
+    TItem[] ToArray();
 
     /// <summary>
     /// Returns a list with the elements in this collection.
     /// </summary>
     /// <returns></returns>
-    List<IItem> ToList();
+    List<TItem> ToList();
 
     // ----------------------------------------------------
 
     /// <summary>
     /// Obtains a new instance where the element at the given index has been replaced with the
-    /// parts obtained from the given value.
+    /// new ones obtained from the given value..
     /// </summary>
     /// <param name="index"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    IHost Replace(int index, IKey? value);
+    THost Replace(int index, string? value);
 
     /// <summary>
-    /// Obtains a new instance where the parts obtained from the given value have been added to
-    /// the original one.
+    /// Obtains a new instance where the elements obtained from the given value have been added
+    /// to the original one.
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    IHost Add(IKey? value);
+    THost Add(string? value);
 
     /// <summary>
-    /// Obtains a new instance where the parts obtained from the given range have been added to
-    /// the original one.
+    /// Obtains a new instance where the elements obtained from the given range have been added
+    /// to the original one.
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    IHost AddRange(IEnumerable<IKey?> range);
+    THost AddRange(IEnumerable<string?> range);
 
     /// <summary>
-    /// Obtains a new instance where the parts obtained from the given value have been inserted
-    /// into the original one, starting at the given index.
+    /// Obtains a new instance where the elements obtained from the given value have been
+    /// inserted into the original one, starting at the given index.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    IHost Insert(int index, IKey? value);
+    THost Insert(int index, string? value);
 
     /// <summary>
-    /// Obtains a new instance where the parts obtained from the given range have been inserted
-    /// into the original one, starting at the given index.
+    /// Obtains a new instance where the elements obtained from the given range have been
+    /// inserted into the original one, starting at the given index.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    IHost InsertRange(int index, IEnumerable<IKey?> range);
+    THost InsertRange(int index, IEnumerable<string?> range);
 
     // ----------------------------------------------------
 
@@ -156,7 +155,7 @@ public partial interface IIdentifierMultiPart : IEnumerable<IItem>, IIdentifier
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    IHost GetRange(int index, int count);
+    THost GetRange(int index, int count);
 
     /// <summary>
     /// Obtains a new instance where the element at the given index has been replaced with the
@@ -165,14 +164,14 @@ public partial interface IIdentifierMultiPart : IEnumerable<IItem>, IIdentifier
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    IHost Replace(int index, IItem item);
+    THost Replace(int index, TItem item);
 
     /// <summary>
     /// Obtains a new instance where the given element has been added to the original one.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    IHost Add(IItem item);
+    THost Add(TItem item);
 
     /// <summary>
     /// Obtains a new instance where the elements from the given range have been added to the
@@ -180,7 +179,7 @@ public partial interface IIdentifierMultiPart : IEnumerable<IItem>, IIdentifier
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    IHost AddRange(IEnumerable<IItem> range);
+    THost AddRange(IEnumerable<TItem> range);
 
     /// <summary>
     /// Obtains a new instance where the given element has been inserted into the original one,
@@ -189,7 +188,7 @@ public partial interface IIdentifierMultiPart : IEnumerable<IItem>, IIdentifier
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    IHost Insert(int index, IItem item);
+    THost Insert(int index, TItem item);
 
     /// <summary>
     /// Obtains a new instance where the elements from the given range have been inserted into
@@ -198,14 +197,14 @@ public partial interface IIdentifierMultiPart : IEnumerable<IItem>, IIdentifier
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    IHost InsertRange(int index, IEnumerable<IItem> range);
+    THost InsertRange(int index, IEnumerable<TItem> range);
 
     /// <summary>
     /// Obtains a new instance where the element at the given index has been removed.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    IHost RemoveAt(int index);
+    THost RemoveAt(int index);
 
     /// <summary>
     /// Obtains a new instance where the given number of elements have been inserted into the
@@ -214,31 +213,28 @@ public partial interface IIdentifierMultiPart : IEnumerable<IItem>, IIdentifier
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    IHost RemoveRange(int index, int count);
+    THost RemoveRange(int index, int count);
 
     /// <summary>
     /// Obtains a new instance where the first element with the given key has been removed.
-    /// <br/> Multipart keys are not supported.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    IHost Remove(IKey? key);
+    THost Remove(TKey? key);
 
     /// <summary>
     /// Obtains a new instance where the last element with the given key has been removed.
-    /// <br/> Multipart keys are not supported.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    IHost RemoveLast(IKey? key);
+    THost RemoveLast(TKey? key);
 
     /// <summary>
     /// Obtains a new instance where all the elements with the given key have been removed.
-    /// <br/> Multipart keys are not supported.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    IHost RemoveAll(IKey? key);
+    THost RemoveAll(TKey? key);
 
     /// <summary>
     /// Obtains a new instance where the first ocurrence of an element that matches the given
@@ -246,7 +242,7 @@ public partial interface IIdentifierMultiPart : IEnumerable<IItem>, IIdentifier
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IHost Remove(Predicate<IItem> predicate);
+    THost Remove(Predicate<TItem> predicate);
 
     /// <summary>
     /// Obtains a new instance where the last ocurrence of an element that matches the given
@@ -254,7 +250,7 @@ public partial interface IIdentifierMultiPart : IEnumerable<IItem>, IIdentifier
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IHost RemoveLast(Predicate<IItem> predicate);
+    THost RemoveLast(Predicate<TItem> predicate);
 
     /// <summary>
     /// Obtains a new instance where all the ocurrences of elements that match the given
@@ -262,11 +258,11 @@ public partial interface IIdentifierMultiPart : IEnumerable<IItem>, IIdentifier
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IHost RemoveAll(Predicate<IItem> predicate);
+    THost RemoveAll(Predicate<TItem> predicate);
 
     /// <summary>
     /// Obtains a new instance where all the original elements have been removed.
     /// </summary>
     /// <returns></returns>
-    IHost Clear();
+    THost Clear();
 }

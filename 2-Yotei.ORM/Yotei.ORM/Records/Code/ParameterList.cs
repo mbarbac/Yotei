@@ -1,41 +1,52 @@
-﻿using IHost = Yotei.ORM.Records.IParameterList;
-using IItem = Yotei.ORM.Records.IParameter;
-using IKey = string;
+﻿using THost = Yotei.ORM.Records.IParameterList;
+using TItem = Yotei.ORM.Records.IParameter;
+using TKey = string;
 
 namespace Yotei.ORM.Records.Code;
 
 // ========================================================
 /// <summary>
-/// <inheritdoc cref="IHost"/>
+/// <inheritdoc cref="THost"/>
 /// </summary>
 [DebuggerDisplay("{ToDebugString()}")]
-[Cloneable(Specs = "(source)")]
-public partial class ParameterList : IHost
+[Cloneable(Specs = "(source)-*")]
+public partial class ParameterList : THost
 {
-    // Represents the collection of contents of this instance.
-    protected class InnerList : CoreList<IItem, IKey>
+    /// <summary>
+    /// Represents the collection of contents in this instance.
+    /// </summary>
+    protected class InnerList : CoreList<TKey, TItem>
     {
-        ParameterList Master;
+        ParameterList Master { get; }
         public InnerList(ParameterList master) => Master = master.ThrowWhenNull();
-        protected InnerList(InnerList source) : this(source.Master) => AddRange(source);
+        protected InnerList(InnerList source)
+        {
+            source.ThrowWhenNull();
+            Master = source.Master;
+            AddRange(source);
+        }
         public override InnerList Clone() => new(this);
 
-        public override IItem ValidateItem(IItem item) => item.ThrowWhenNull();
-        public override IKey GetKey(IItem item) => item.Name;
-        public override IKey ValidateKey(IKey key) => key.NotNullNotEmpty();
-        public override bool CompareKeys(IKey inner, IKey other)
+        // ------------------------------------------------
+
+        public override TItem ValidateItem(TItem item) => item.ThrowWhenNull();
+        public override TKey GetKey(TItem item) => item.Name;
+        public override TKey ValidateKey(TKey key) => key.NotNullNotEmpty();
+        public override bool CompareKeys(TKey inner, TKey other)
         {
-            return string.Compare(inner, other, !Master.Engine.CaseSensitiveNames ) == 0;
+            return string.Compare(inner, other, !Master.Engine.CaseSensitiveNames) == 0;
         }
-        public override bool AcceptDuplicated(IItem item)
+        public override bool AcceptDuplicated(TItem item)
         {
             if (this.Any(x => ReferenceEquals(x, item))) return true;
-            throw new DuplicateException("Duplicated element.").WithData(item).WithData(Master);
+            throw new DuplicateException("Duplicated element.").WithData(item);
         }
-        public override bool ExpandNested(IItem _) => false;
+        public override bool ExpandNexted(TItem _) => false;
     }
 
-    // The actual contents carried by this instance.
+    /// <summary>
+    /// The actual collection of elements carried by this instance.
+    /// </summary>
     protected InnerList Items { get; }
 
     // ----------------------------------------------------
@@ -46,8 +57,8 @@ public partial class ParameterList : IHost
     /// <param name="engine"></param>
     public ParameterList(IEngine engine)
     {
-        Engine = engine.ThrowWhenNull();
         Items = new(this);
+        Engine = engine.ThrowWhenNull();
     }
 
     /// <summary>
@@ -55,14 +66,20 @@ public partial class ParameterList : IHost
     /// </summary>
     /// <param name="engine"></param>
     /// <param name="item"></param>
-    public ParameterList(IEngine engine, IItem item) : this(engine) => Items.Add(item);
+    public ParameterList(IEngine engine, TItem item) : this(engine)
+    {
+        Items.Add(item);
+    }
 
     /// <summary>
-    /// Initializes a new instance with elements from the given range.
+    /// Initializes a new instance with the elements from the given range.
     /// </summary>
     /// <param name="engine"></param>
     /// <param name="range"></param>
-    public ParameterList(IEngine engine, IEnumerable<IItem> range) : this(engine) => Items.AddRange(range);
+    public ParameterList(IEngine engine, IEnumerable<TItem> range) : this(engine)
+    {
+        Items.AddRange(range);
+    }
 
     /// <summary>
     /// Copy constructor.
@@ -72,8 +89,8 @@ public partial class ParameterList : IHost
     {
         source.ThrowWhenNull();
 
-        Engine = source.Engine;
         Items = new(this);
+        Engine = source.Engine;
         Items.AddRange(source);
     }
 
@@ -81,22 +98,20 @@ public partial class ParameterList : IHost
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public IEnumerator<IItem> GetEnumerator() => Items.GetEnumerator();
+    public IEnumerator<TItem> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => Items.ToString();
+    public override string ToString() => $"Count: {Count}";
 
-    string ToDebugString()
-    {
-        return Items.Count < DEBUGCOUNT
-            ? $"[{string.Join(", ", Items)}]"
-            : $"[{string.Join(", ", Items.Take(DEBUGCOUNT))}, ...]";
-    }
-    static int DEBUGCOUNT = 8;
+    /// <summary>
+    /// Invoked to obtain a string representation of this instance for DEBUG purposes.
+    /// </summary>
+    /// <returns></returns>
+    string ToDebugString() => Items.ToDebugString();
 
     // ----------------------------------------------------
 
@@ -120,75 +135,75 @@ public partial class ParameterList : IHost
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public IItem this[int index] => Items[index];
+    public TItem this[int index] => Items[index];
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public bool Contains(IKey key) => Items.Contains(key);
+    public bool Contains(TKey key) => Items.Contains(key);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public int IndexOf(IKey key) => Items.IndexOf(key);
+    public int IndexOf(TKey key) => Items.IndexOf(key);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public int LastIndexOf(IKey key) => Items.LastIndexOf(key);
+    public int LastIndexOf(TKey key) => Items.LastIndexOf(key);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public List<int> IndexesOf(IKey key) => Items.IndexesOf(key);
+    public List<int> IndexesOf(TKey key) => Items.IndexesOf(key);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public bool Contains(Predicate<IItem> predicate) => Items.Contains(predicate);
+    public bool Contains(Predicate<TItem> predicate) => Items.Contains(predicate);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public int IndexOf(Predicate<IItem> predicate) => Items.IndexOf(predicate);
+    public int IndexOf(Predicate<TItem> predicate) => Items.IndexOf(predicate);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public int LastIndexOf(Predicate<IItem> predicate) => Items.LastIndexOf(predicate);
+    public int LastIndexOf(Predicate<TItem> predicate) => Items.LastIndexOf(predicate);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public List<int> IndexesOf(Predicate<IItem> predicate) => Items.IndexesOf(predicate);
+    public List<int> IndexesOf(Predicate<TItem> predicate) => Items.IndexesOf(predicate);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public IItem[] ToArray() => Items.ToArray();
+    public TItem[] ToArray() => Items.ToArray();
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public List<IItem> ToList() => Items.ToList();
+    public List<TItem> ToList() => Items.ToList();
 
     /// <summary>
     /// <inheritdoc/>
@@ -213,7 +228,7 @@ public partial class ParameterList : IHost
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual IHost GetRange(int index, int count)
+    public virtual THost GetRange(int index, int count)
     {
         if (count == Count && index == 0) return this;
         if (count == 0) return Clear();
@@ -231,7 +246,7 @@ public partial class ParameterList : IHost
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IHost Replace(int index, IItem item)
+    public virtual THost Replace(int index, TItem item)
     {
         var temp = Clone();
         var num = temp.Items.Replace(index, item);
@@ -243,7 +258,7 @@ public partial class ParameterList : IHost
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IHost Add(IItem item)
+    public virtual THost Add(TItem item)
     {
         var temp = Clone();
         var num = temp.Items.Add(item);
@@ -255,7 +270,7 @@ public partial class ParameterList : IHost
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual IHost AddRange(IEnumerable<IItem> range)
+    public virtual THost AddRange(IEnumerable<TItem> range)
     {
         var temp = Clone();
         var num = temp.Items.AddRange(range);
@@ -268,7 +283,7 @@ public partial class ParameterList : IHost
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IHost Insert(int index, IItem item)
+    public virtual THost Insert(int index, TItem item)
     {
         var temp = Clone();
         var num = temp.Items.Insert(index, item);
@@ -281,7 +296,7 @@ public partial class ParameterList : IHost
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual IHost InsertRange(int index, IEnumerable<IItem> range)
+    public virtual THost InsertRange(int index, IEnumerable<TItem> range)
     {
         var temp = Clone();
         var num = temp.Items.InsertRange(index, range);
@@ -293,7 +308,7 @@ public partial class ParameterList : IHost
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public virtual IHost RemoveAt(int index)
+    public virtual THost RemoveAt(int index)
     {
         var temp = Clone();
         var num = temp.Items.RemoveAt(index);
@@ -306,7 +321,7 @@ public partial class ParameterList : IHost
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual IHost RemoveRange(int index, int count)
+    public virtual THost RemoveRange(int index, int count)
     {
         var temp = Clone();
         var num = temp.Items.RemoveRange(index, count);
@@ -318,7 +333,7 @@ public partial class ParameterList : IHost
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public virtual IHost Remove(IKey key)
+    public virtual THost Remove(TKey key)
     {
         var temp = Clone();
         var num = temp.Items.Remove(key);
@@ -330,7 +345,7 @@ public partial class ParameterList : IHost
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public virtual IHost RemoveLast(IKey key)
+    public virtual THost RemoveLast(TKey key)
     {
         var temp = Clone();
         var num = temp.Items.RemoveLast(key);
@@ -342,7 +357,7 @@ public partial class ParameterList : IHost
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public virtual IHost RemoveAll(IKey key)
+    public virtual THost RemoveAll(TKey key)
     {
         var temp = Clone();
         var num = temp.Items.RemoveAll(key);
@@ -354,7 +369,7 @@ public partial class ParameterList : IHost
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IHost Remove(Predicate<IItem> predicate)
+    public virtual THost Remove(Predicate<TItem> predicate)
     {
         var temp = Clone();
         var num = temp.Items.Remove(predicate);
@@ -366,7 +381,7 @@ public partial class ParameterList : IHost
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IHost RemoveLast(Predicate<IItem> predicate)
+    public virtual THost RemoveLast(Predicate<TItem> predicate)
     {
         var temp = Clone();
         var num = temp.Items.RemoveLast(predicate);
@@ -378,7 +393,7 @@ public partial class ParameterList : IHost
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IHost RemoveAll(Predicate<IItem> predicate)
+    public virtual THost RemoveAll(Predicate<TItem> predicate)
     {
         var temp = Clone();
         var num = temp.Items.RemoveAll(predicate);
@@ -389,7 +404,7 @@ public partial class ParameterList : IHost
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual IHost Clear()
+    public virtual THost Clear()
     {
         var temp = Clone();
         var num = temp.Items.Clear();

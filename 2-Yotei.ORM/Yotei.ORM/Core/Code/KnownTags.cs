@@ -1,4 +1,4 @@
-﻿namespace Yotei.ORM.Records.Code;
+﻿namespace Yotei.ORM.Code;
 
 // ========================================================
 /// <summary>

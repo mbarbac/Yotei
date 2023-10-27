@@ -13,6 +13,8 @@ public static class Test_ParameterList
     readonly static TItem xBond = new("LastName", "Bond");
     readonly static TItem xMi6 = new("Organization", "Mi6");
 
+    // ----------------------------------------------------
+
     //[Enforced]
     [Fact]
     public static void Test_Create_Empty()
@@ -160,7 +162,7 @@ public static class Test_ParameterList
         Assert.Equal("008", target[0].Value);
 
         target = source.Replace(1, x007);
-        Assert.NotSame (source, target);
+        Assert.NotSame(source, target);
         Assert.Same(x007, target[0]);
         Assert.Same(x007, target[1]);
         Assert.Same(xBond, target[2]);

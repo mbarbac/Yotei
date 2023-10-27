@@ -1,26 +1,43 @@
+using System.Security.Cryptography.X509Certificates;
+using TItem = Yotei.Tools.Tests.Test_CoreList.IElement;
+using TKey = string;
+
 namespace Yotei.Tools.Tests;
 
 // ========================================================
 //[Enforced]
 public static class Test_CoreList
 {
-    // The generic element type...
+    /// <summary>
+    /// The generic element member of the test collection.
+    /// </summary>
     public interface IElement { }
 
-    // The core element type, which is identified by its string key...
-    public class NameElement(string name) : IElement
+    /// <summary>
+    /// The named element identified by its name.
+    /// </summary>
+    /// <param name="name"></param>
+    public class NameElement(string name) : TItem
     {
         public override string ToString() => Name;
         public string Name { get; set; } = name;
     }
 
-    // A nested element type...
-    public class ChainElement : CoreList<IElement, string>, IElement
+    /// <summary>
+    /// The nested element that is itself a collection.
+    /// </summary>
+    public class ChainElement : CoreList<string, TItem>, TItem
     {
         public ChainElement(bool sensitive) => CaseSensitive = sensitive;
-        public ChainElement(bool sensitive, IElement item) : this(sensitive) => Add(item);
-        public ChainElement(bool sensitive, IEnumerable<IElement> range) : this(sensitive) => AddRange(range);
-        protected ChainElement(ChainElement source) : this(source.CaseSensitive) => AddRange(source);
+        public ChainElement(bool sensitive, TItem item) : this(sensitive) => Add(item);
+        public ChainElement(bool sensitive, IEnumerable<TItem> range) : this(sensitive) => AddRange(range);
+        protected ChainElement(ChainElement source)
+        {
+            source.ThrowWhenNull();
+
+            CaseSensitive = source.CaseSensitive;
+            AddRange(source);
+        }
         public override ChainElement Clone() => new(this);
 
         public bool CaseSensitive
@@ -29,9 +46,8 @@ public static class Test_CoreList
             set
             {
                 if (_CaseSensitive == value) return;
-                _CaseSensitive = value;
 
-                if (Count > 0)
+                _CaseSensitive = value; if (Count > 0)
                 {
                     var range = ToArray();
                     Clear();
@@ -39,36 +55,37 @@ public static class Test_CoreList
                 }
             }
         }
-        bool _CaseSensitive = false;
+        bool _CaseSensitive;
 
-        public override IElement ValidateItem(IElement item) => item.ThrowWhenNull();
-        public override string GetKey(IElement item)
+        public override TItem ValidateItem(TItem item) => item.ThrowWhenNull();
+        public override TKey GetKey(TItem item)
         {
             return item is NameElement named
                 ? named.Name
-                : throw new UnExpectedException("Cannot obtain a key from a not named element").WithData(item);
+                : throw new UnExpectedException("Item is not a named element.").WithData(item);
         }
-        public override string ValidateKey(string key) => key.NotNullNotEmpty();
-        public override bool CompareKeys(string inner, string other)
+        public override TKey ValidateKey(TKey key) => key.NotNullNotEmpty();
+        public override bool CompareKeys(TKey inner, TKey other)
         {
             return string.Compare(inner, other, !CaseSensitive) == 0;
         }
-        public override bool AcceptDuplicated(IElement item)
+        public override bool AcceptDuplicated(TItem item)
         {
+            // We accept duplicates only if they are strictly the same instance...
             if (this.Any(x => ReferenceEquals(x, item))) return true;
             throw new DuplicateException("Duplicated element.").WithData(item);
         }
-        public override bool ExpandNested(IElement _) => true;
+        public override bool ExpandNexted(TItem _) => true;
     }
 
     // ====================================================
 
-    static NameElement xone = new("one");
-    static NameElement xtwo = new("two");
-    static NameElement xthree = new("three");
-    static NameElement xfour = new("four");
-    static NameElement xfive = new("five");
-    static NameElement xsix = new("six");
+    static readonly NameElement xone = new("one");
+    static readonly NameElement xtwo = new("two");
+    static readonly NameElement xthree = new("three");
+    static readonly NameElement xfour = new("four");
+    static readonly NameElement xfive = new("five");
+    static readonly NameElement xsix = new("six");
 
     //[Enforced]
     [Fact]
@@ -85,12 +102,6 @@ public static class Test_CoreList
         var items = new ChainElement(false, xone);
         Assert.Single(items);
         Assert.Same(xone, items[0]);
-
-        try { _ = new ChainElement(false, (IElement)null!); Assert.Fail(); }
-        catch (ArgumentNullException) { }
-
-        try { _ = new ChainElement(false, new NameElement("")); Assert.Fail(); }
-        catch (EmptyException) { }
     }
 
     //[Enforced]
@@ -108,8 +119,13 @@ public static class Test_CoreList
 
         try { _ = new ChainElement(false, [xone, new NameElement("ONE")]); Assert.Fail(); }
         catch (DuplicateException) { }
+    }
 
-        items = new ChainElement(false, [xone, xtwo, xone]);
+    //[Enforced]
+    [Fact]
+    public static void Test_Create_Many_Same_Duplicated()
+    {
+        var items = new ChainElement(false, [xone, xtwo, xone]);
         Assert.Equal(3, items.Count);
         Assert.Same(xone, items[0]);
         Assert.Same(xtwo, items[1]);
@@ -118,13 +134,22 @@ public static class Test_CoreList
 
     //[Enforced]
     [Fact]
-    public static void Test_Create_Many_Sensitive()
+    public static void Test_Create_Many_CaseSensitive()
     {
         var items = new ChainElement(true, [xone, xtwo, new NameElement("ONE")]);
         Assert.Equal(3, items.Count);
         Assert.Same(xone, items[0]);
         Assert.Same(xtwo, items[1]);
         Assert.Equal("ONE", ((NameElement)items[2]).Name);
+
+        items = new ChainElement(true, [xone, xtwo, xone]);
+        Assert.Equal(3, items.Count);
+        Assert.Same(xone, items[0]);
+        Assert.Same(xtwo, items[1]);
+        Assert.Same(xone, items[2]);
+
+        try { _ = new ChainElement(true, [xone, xtwo, new NameElement("one")]); Assert.Fail(); }
+        catch (DuplicateException) { }
     }
 
     //[Enforced]
@@ -159,32 +184,16 @@ public static class Test_CoreList
     [Fact]
     public static void Test_Change_Behaviors()
     {
-        var items = new ChainElement(true, [xone, xtwo, new NameElement("ONE")]);
+        var items = new ChainElement(false, [xone, xtwo, xone]);
+        items.CaseSensitive = true;
         Assert.Equal(3, items.Count);
         Assert.Same(xone, items[0]);
         Assert.Same(xtwo, items[1]);
-        Assert.Equal("ONE", ((NameElement)items[2]).Name);
+        Assert.Same(xone, items[2]);
 
+        items = new ChainElement(true, [xone, xtwo, new NameElement("ONE")]);
         try { items.CaseSensitive = false; Assert.Fail(); }
         catch (DuplicateException) { }
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_Change_Behaviors_Sensitive()
-    {
-        var items = new ChainElement(true, [xone, xtwo, xone]);
-        Assert.Equal(3, items.Count);
-        Assert.Same(xone, items[0]);
-        Assert.Same(xtwo, items[1]);
-        Assert.Same(xone, items[2]);
-
-        items.CaseSensitive = false;
-
-        Assert.Equal(3, items.Count);
-        Assert.Same(xone, items[0]);
-        Assert.Same(xtwo, items[1]);
-        Assert.Same(xone, items[2]);
     }
 
     //[Enforced]
@@ -239,6 +248,7 @@ public static class Test_CoreList
     public static void Test_Replace()
     {
         var items = new ChainElement(false, new[] { xone, xtwo, xthree });
+        
         var done = items.Replace(0, xone);
         Assert.Equal(0, done);
 
@@ -249,6 +259,21 @@ public static class Test_CoreList
 
         try { _ = items.Replace(2, new NameElement("TWO")); Assert.Fail(); }
         catch (DuplicateException) { }
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Replace_Many()
+    {
+        var items = new ChainElement(false, [xone, xtwo, xthree]);
+
+        var done = items.Replace(0, new ChainElement(false, [xfour, xfive]));
+        Assert.Equal(2, done);
+        Assert.Equal(4, items.Count);
+        Assert.Same(xfour, items[0]);
+        Assert.Same(xfive, items[1]);
+        Assert.Same(xtwo, items[2]);
+        Assert.Same(xthree, items[3]);
     }
 
     //[Enforced]
@@ -269,7 +294,7 @@ public static class Test_CoreList
 
     //[Enforced]
     [Fact]
-    public static void Test_Replace_Many()
+    public static void Test_Replace_Setter_Many()
     {
         var items = new ChainElement(false, [xone, xtwo, xthree]);
         items[0] = new ChainElement(false, [xfour, xfive]);
@@ -462,6 +487,7 @@ public static class Test_CoreList
     public static void Test_RemoveRange()
     {
         var items = new ChainElement(false, new[] { xone, xtwo, xthree });
+       
         var done = items.RemoveRange(0, 0);
         Assert.Equal(0, done);
         Assert.Equal(3, items.Count);

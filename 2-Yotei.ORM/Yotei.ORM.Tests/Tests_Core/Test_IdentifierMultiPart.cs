@@ -189,7 +189,7 @@ public static class Test_IdentifierMultiPart
         var source = new THost(engine, "one.two.one.three");
         var target = source.Replace(0, source[0]);
         Assert.Same(source, target);
-        
+
         target = source.Replace(0, new TItem(engine, "ONE"));
         Assert.NotSame(source, target);
         Assert.Equal("[ONE].[two].[one].[three]", target.Value);

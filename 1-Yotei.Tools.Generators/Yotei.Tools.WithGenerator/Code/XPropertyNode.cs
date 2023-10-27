@@ -105,8 +105,11 @@ internal class XPropertyNode : PropertyNode
             }
             else
             {
-                cb.Append(code);
-                cb.AppendLine($"return {receiver};");
+                cb.Append($$"""
+                    var x_comparer = EqualityComparer<{{memberType}}>.Default;
+                    if (x_comparer.Equals({{Symbol.Name}}, {{valueName}})) return this;
+                    {{code}}
+                    """);
             }
 
             cb.IndentLevel--;

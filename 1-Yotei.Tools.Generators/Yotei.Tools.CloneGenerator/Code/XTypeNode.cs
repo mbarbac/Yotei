@@ -73,7 +73,6 @@ internal class XTypeNode : TypeNode
             else
             {
                 cb.Append(code);
-                cb.AppendLine($"return {receiver};");
             }
 
             cb.IndentLevel--;

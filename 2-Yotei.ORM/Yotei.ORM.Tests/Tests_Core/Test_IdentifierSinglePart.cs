@@ -4,6 +4,7 @@ namespace Yotei.ORM.Tests;
 
 // ========================================================
 //[Enforced]
+//[Enforced]
 public static class Test_IdentifierSinglePart
 {
     //[Enforced]
