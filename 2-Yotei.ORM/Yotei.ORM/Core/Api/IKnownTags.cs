@@ -2,8 +2,8 @@
 
 // ========================================================
 /// <summary>
-/// Represents the collection of not-duplicated metadata tags that are well-known to a given
-/// underlying engine.
+/// Represents the immutable collection of not-duplicated metadata tags that are well-known to
+/// a given underlying engine.
 /// </summary>
 public partial interface IKnownTags : IEnumerable<string>
 {

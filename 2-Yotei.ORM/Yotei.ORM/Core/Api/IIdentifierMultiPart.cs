@@ -207,7 +207,7 @@ public partial interface IIdentifierMultiPart : IEnumerable<TItem>, IIdentifier
     THost RemoveAt(int index);
 
     /// <summary>
-    /// Obtains a new instance where the given number of elements have been inserted into the
+    /// Obtains a new instance where the given number of elements have been removed from the
     /// original one, starting from the given index.
     /// </summary>
     /// <param name="index"></param>

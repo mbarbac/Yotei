@@ -6,8 +6,8 @@ namespace Yotei.ORM;
 
 // ========================================================
 /// <summary>
-/// Represents the immutable ordered collection of not-duplicated metadata tags that describes
-/// the maximal structure of the identifiers associated with an underlying engine.
+/// Represents an immutable ordered collection of not-duplicated metadata tags that describes the
+/// maximal structure of the identifiers associated with an underlying engine.
 /// </summary>
 [Cloneable]
 public partial interface IIdentifierTags : IEnumerable<TItem>
@@ -152,7 +152,7 @@ public partial interface IIdentifierTags : IEnumerable<TItem>
     THost RemoveAt(int index);
 
     /// <summary>
-    /// Obtains a new instance where the given number of elements have been inserted into the
+    /// Obtains a new instance where the given number of elements have been removed from the
     /// original one, starting from the given index.
     /// </summary>
     /// <param name="index"></param>

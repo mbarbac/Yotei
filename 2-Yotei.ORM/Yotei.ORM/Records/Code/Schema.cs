@@ -1,5 +1,5 @@
-﻿using THost = Yotei.ORM.Records.IParameterList;
-using TItem = Yotei.ORM.Records.IParameter;
+﻿using THost = Yotei.ORM.Records.ISchema;
+using TItem = Yotei.ORM.Records.ISchemaEntry;
 using TKey = string;
 
 namespace Yotei.ORM.Records.Code;
@@ -10,15 +10,15 @@ namespace Yotei.ORM.Records.Code;
 /// </summary>
 [DebuggerDisplay("{ToDebugString()}")]
 [Cloneable(Specs = "(source)-*")]
-public partial class ParameterList : THost
+public partial class Schema : THost
 {
     /// <summary>
     /// Represents the collection of contents in this instance.
     /// </summary>
     protected class InnerList : CoreList<TKey, TItem>
     {
-        ParameterList Master { get; }
-        public InnerList(ParameterList master) => Master = master.ThrowWhenNull();
+        Schema Master { get; }
+        public InnerList(Schema master) => Master = master.ThrowWhenNull();
         protected InnerList(InnerList source)
         {
             source.ThrowWhenNull();
@@ -29,12 +29,35 @@ public partial class ParameterList : THost
 
         // ------------------------------------------------
 
-        public override TItem ValidateItem(TItem item) => item.ThrowWhenNull();
-        public override TKey GetKey(TItem item) => item.Name;
+        public override TItem ValidateItem(TItem item)
+        {
+            item.ThrowWhenNull();
+
+            if (!ReferenceEquals(Master.Engine, item.Engine)) throw new ArgumentException(
+                "The engine of the given entry is not the same as the engine of this collection.")
+                .WithData(item)
+                .WithData(Master, "this");
+
+            if (item.Identifier.Value == null) throw new ArgumentException(
+                "Value of the given identifier is null.")
+                .WithData(item)
+                .WithData(Master, "this");
+
+            if (item.Identifier is IIdentifierMultiPart multi && multi[^1].Value == null)
+                throw new ArgumentException(
+                    "Value of the last part of the given identifier is null.")
+                    .WithData(item)
+                    .WithData(Master, "this");
+
+            return item;
+        }
+        public override TKey GetKey(TItem item) => item.Identifier.Value!;
         public override TKey ValidateKey(TKey key) => key.NotNullNotEmpty();
         public override bool CompareKeys(TKey inner, TKey other)
         {
-            return string.Compare(inner, other, !Master.Engine.CaseSensitiveNames) == 0;
+            var xinner = new IdentifierMultiPart(Master.Engine, inner);
+            var xother = new IdentifierMultiPart(Master.Engine, other);
+            return xinner.Match(xother);
         }
         public override bool AcceptDuplicated(TItem item)
         {
@@ -42,6 +65,15 @@ public partial class ParameterList : THost
             throw new DuplicateException("Duplicated element.").WithData(item);
         }
         public override bool ExpandNexted(TItem _) => false;
+        protected override int FindElement(TItem other)
+        {
+            for (int i = 0; i < Count; i++)
+            {
+                var inner = this[i];
+                if (inner.Identifier.Match(other.Identifier)) return i;
+            }
+            return -1;
+        }
     }
 
     /// <summary>
@@ -55,7 +87,7 @@ public partial class ParameterList : THost
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="engine"></param>
-    public ParameterList(IEngine engine)
+    public Schema(IEngine engine)
     {
         Items = new(this);
         Engine = engine.ThrowWhenNull();
@@ -66,20 +98,20 @@ public partial class ParameterList : THost
     /// </summary>
     /// <param name="engine"></param>
     /// <param name="item"></param>
-    public ParameterList(IEngine engine, TItem item) : this(engine) => Items.Add(item);
+    public Schema(IEngine engine, TItem item) : this(engine) => Items.Add(item);
 
     /// <summary>
     /// Initializes a new instance with the elements from the given range.
     /// </summary>
     /// <param name="engine"></param>
     /// <param name="range"></param>
-    public ParameterList(IEngine engine, IEnumerable<TItem> range) : this(engine) => Items.AddRange(range);
+    public Schema(IEngine engine, IEnumerable<TItem> range) : this(engine) => Items.AddRange(range);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected ParameterList(ParameterList source)
+    protected Schema(Schema source)
     {
         source.ThrowWhenNull();
 
@@ -100,12 +132,6 @@ public partial class ParameterList : THost
     /// </summary>
     /// <returns></returns>
     public override string ToString() => $"Count: {Count}";
-
-    /// <summary>
-    /// Invoked to obtain a string representation of this instance for DEBUG purposes.
-    /// </summary>
-    /// <returns></returns>
-    string ToDebugString() => Items.ToDebugString();
 
     // ----------------------------------------------------
 
@@ -136,21 +162,21 @@ public partial class ParameterList : THost
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public bool Contains(TKey key) => Items.Contains(key);
+    public bool Contains(TKey key) => Items.Contains(key!);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public int IndexOf(TKey key) => Items.IndexOf(key);
+    public int IndexOf(TKey key) => Items.IndexOf(key!);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public int LastIndexOf(TKey key) => Items.LastIndexOf(key);
+    public int LastIndexOf(TKey key) => Items.LastIndexOf(key!);
 
     /// <summary>
     /// <inheritdoc/>
@@ -202,16 +228,15 @@ public partial class ParameterList : THost
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    /// <param name="key"></param>
     /// <returns></returns>
-    public string NextName()
+    public List<TItem> Match(TKey key, out TItem? unique)
     {
-        for (int i = Items.Count; i < int.MaxValue; i++)
-        {
-            var name = $"{Engine.ParameterPrefix}{i}";
-            var index = IndexOf(name);
-            if (index < 0) return name;
-        }
-        throw new UnExpectedException("Range of indexes exhausted.");
+        var temps = IndexesOf(key);
+        var items = temps.Select(x => this[x]).ToList();
+
+        unique = items.Count == 1 ? items[0] : null;
+        return items;
     }
 
     // ----------------------------------------------------

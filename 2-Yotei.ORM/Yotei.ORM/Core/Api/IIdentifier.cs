@@ -25,8 +25,8 @@ public interface IIdentifier
     IIdentifier Reduce();
 
     /// <summary>
-    /// Determines if this instance matches the filters expressed by the given target one, where
-    /// matching is performed from right to left using the non-terminated values, and any null,
+    /// Determines if this instance matches the filters expressed by the given target one.
+    /// Matching is performed from right to left using the non-terminated values. Any null,
     /// empty, or missed filter is considered as an implicit match.
     /// </summary>
     /// <param name="target"></param>

@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using THost = Yotei.ORM.IIdentifierMultiPart;
+﻿using THost = Yotei.ORM.IIdentifierMultiPart;
 using TItem = Yotei.ORM.IIdentifierSinglePart;
 using TKey = string;
 
@@ -122,37 +121,42 @@ public partial class IdentifierMultiPart : Identifier, THost
         // Removing empty head elements...
         get
         {
-            var sb = new StringBuilder();
-            var num = 0;
-
-            foreach (var item in Items)
+            if (_Value == null)
             {
-                var value = item.Value; if (num > 0 || value != null)
-                {
-                    if (num > 0) sb.Append('.');
-                    sb.Append(value);
-                    num++;
-                }
-            }
+                var sb = new StringBuilder();
+                var num = 0;
 
-            return num == 0 ? null : sb.ToString();
+                foreach (var item in Items)
+                {
+                    var value = item.Value; if (num > 0 || value != null)
+                    {
+                        if (num > 0) sb.Append('.');
+                        sb.Append(value);
+                        num++;
+                    }
+                }
+
+                _Value = num == 0 ? null : sb.ToString();
+            }
+            return _Value;
         }
 
         // Clearing and adding the obtained parts, if any...
         init
         {
-            value = value.NullWhenEmpty();
+            _Value = value.NullWhenEmpty();            
 
-            if (value == null) Items.Clear();
+            if (_Value == null) Items.Clear();
             else
             {
-                var parts = ValueToParts(value);
+                var parts = ValueToParts(_Value);
 
                 Items.Clear();
                 Items.AddRange(parts);
             }
         }
     }
+    string? _Value = null;
 
     /// <summary>
     /// <inheritdoc/>
