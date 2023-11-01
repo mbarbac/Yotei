@@ -2,10 +2,11 @@
 
 // ========================================================
 /// <summary>
-/// Provides the ability of parsing dynamic lambda expressions into the chain of names the
-/// expression resolves into.
+/// Represents the ability of parsing dynamic lambda expressions, defined as lambda expressions
+/// whose sole argument is a dynamic one, returning an instance that contains that argument and
+/// the chain of dynamic operations binded to it.
 /// </summary>
-public static class LambdaNameParser
+public partial class LambdaParser
 {
     /// <summary>
     /// Parses the given dynamic lambda expression returning a string with the dot separated
@@ -15,9 +16,9 @@ public static class LambdaNameParser
     /// </summary>
     /// <param name="expression"></param>
     /// <returns></returns>
-    public static string Parse(Func<dynamic, object> expression)
+    public static string ParseName(Func<dynamic, object> expression)
     {
-        return Parse(expression, out _, out _);
+        return ParseName(expression, out _, out _);
     }
 
     /// <summary>
@@ -29,9 +30,9 @@ public static class LambdaNameParser
     /// <param name="expression"></param>
     /// <param name="parts"></param>
     /// <returns></returns>
-    public static string Parse(Func<dynamic, object> expression, out string?[] parts)
+    public static string ParseName(Func<dynamic, object> expression, out string?[] parts)
     {
-        return Parse(expression, out parts, out _);
+        return ParseName(expression, out parts, out _);
     }
 
     /// <summary>
@@ -43,9 +44,9 @@ public static class LambdaNameParser
     /// <param name="expression"></param>
     /// <param name="arg"></param>
     /// <returns></returns>
-    public static string Parse(Func<dynamic, object> expression, out LambdaNodeArgument arg)
+    public static string ParseName(Func<dynamic, object> expression, out LambdaNodeArgument arg)
     {
-        return Parse(expression, out _, out arg);
+        return ParseName(expression, out _, out arg);
     }
 
     /// <summary>
@@ -58,12 +59,12 @@ public static class LambdaNameParser
     /// <param name="parts"></param>
     /// <param name="arg"></param>
     /// <returns></returns>
-    public static string Parse(
+    public static string ParseName(
         Func<dynamic, object> expression, out string?[] parts, out LambdaNodeArgument arg)
     {
         expression = expression.ThrowWhenNull();
 
-        var parser = LambdaParser.Parse(expression);
+        var parser = Parse(expression);
         var xarg = parser.Argument;
         arg = xarg;
 

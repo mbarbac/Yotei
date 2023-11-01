@@ -11,7 +11,7 @@ public static class Test_NameParser
     [Fact]
     public static void Test_Standard_Empty()
     {
-        var name = LambdaNameParser.Parse(x => x, out string?[] parts);
+        var name = LambdaParser.ParseName(x => x, out string?[] parts);
 
         WriteLine(true, name);
         Assert.Empty(name);
@@ -22,7 +22,7 @@ public static class Test_NameParser
     [Fact]
     public static void Test_Standard_Empty_MultiPart()
     {
-        var name = LambdaNameParser.Parse(x => x.x.x, out string?[] parts);
+        var name = LambdaParser.ParseName(x => x.x.x, out string?[] parts);
 
         WriteLine(true, name);
         Assert.Empty(name);
@@ -34,7 +34,7 @@ public static class Test_NameParser
     [Fact]
     public static void Test_Standard_SinglePart()
     {
-        var name = LambdaNameParser.Parse(x => x.Alpha, out string?[] parts);
+        var name = LambdaParser.ParseName(x => x.Alpha, out string?[] parts);
 
         WriteLine(true, name);
         Assert.Equal("Alpha", name);
@@ -46,7 +46,7 @@ public static class Test_NameParser
     [Fact]
     public static void Test_Standard_MultiPart()
     {
-        var name = LambdaNameParser.Parse(x => x.Alpha.Beta.Delta, out string?[] parts);
+        var name = LambdaParser.ParseName(x => x.Alpha.Beta.Delta, out string?[] parts);
 
         WriteLine(true, name);
         Assert.Equal("Alpha.Beta.Delta", name);
@@ -60,7 +60,7 @@ public static class Test_NameParser
     [Fact]
     public static void Test_Complex_Multipart()
     {
-        var name = LambdaNameParser.Parse(x => x.x.Alpha.Beta, out string?[] parts);
+        var name = LambdaParser.ParseName(x => x.x.Alpha.Beta, out string?[] parts);
 
         WriteLine(true, name);
         Assert.Equal(".Alpha.Beta", name);
@@ -69,7 +69,7 @@ public static class Test_NameParser
         Assert.Equal("Alpha", parts[1]);
         Assert.Equal("Beta", parts[2]);
 
-        name = LambdaNameParser.Parse(x => x.Alpha.x.Beta, out parts);
+        name = LambdaParser.ParseName(x => x.Alpha.x.Beta, out parts);
 
         WriteLine(true, name);
         Assert.Equal("Alpha..Beta", name);
@@ -78,7 +78,7 @@ public static class Test_NameParser
         Assert.Null(parts[1]);
         Assert.Equal("Beta", parts[2]);
 
-        name = LambdaNameParser.Parse(x => x.Alpha.Beta.x, out parts);
+        name = LambdaParser.ParseName(x => x.Alpha.Beta.x, out parts);
 
         WriteLine(true, name);
         Assert.Equal("Alpha.Beta.", name);
@@ -92,7 +92,7 @@ public static class Test_NameParser
     [Fact]
     public static void Test_Constant_Null()
     {
-        var name = LambdaNameParser.Parse(x => null!, out string?[] parts);
+        var name = LambdaParser.ParseName(x => null!, out string?[] parts);
 
         WriteLine(true, name);
         Assert.Empty(name);
@@ -104,21 +104,21 @@ public static class Test_NameParser
     [Fact]
     public static void Test_Constant_SinglePart()
     {
-        var name = LambdaNameParser.Parse(x => string.Empty, out string?[] parts);
+        var name = LambdaParser.ParseName(x => string.Empty, out string?[] parts);
 
         WriteLine(true, name);
         Assert.Empty(name);
         Assert.Single(parts);
         Assert.True(parts.All(x => x == null));
 
-        name = LambdaNameParser.Parse(x => "  ", out parts);
+        name = LambdaParser.ParseName(x => "  ", out parts);
 
         WriteLine(true, name);
         Assert.Empty(name);
         Assert.Single(parts);
         Assert.True(parts.All(x => x == null));
 
-        name = LambdaNameParser.Parse(x => " Alpha ", out parts);
+        name = LambdaParser.ParseName(x => " Alpha ", out parts);
 
         WriteLine(true, name);
         Assert.Equal("Alpha", name);
@@ -130,14 +130,14 @@ public static class Test_NameParser
     [Fact]
     public static void Test_Constant_MultiPart()
     {
-        var name = LambdaNameParser.Parse(x => " . . ", out string?[] parts);
+        var name = LambdaParser.ParseName(x => " . . ", out string?[] parts);
 
         WriteLine(true, name);
         Assert.Empty(name);
         Assert.Equal(3, parts.Length);
         Assert.True(parts.All(x => x == null));
 
-        name = LambdaNameParser.Parse(x => " Alpha . Beta . Delta ", out parts);
+        name = LambdaParser.ParseName(x => " Alpha . Beta . Delta ", out parts);
 
         WriteLine(true, name);
         Assert.Equal("Alpha.Beta.Delta", name);
@@ -146,7 +146,7 @@ public static class Test_NameParser
         Assert.Equal("Beta", parts[1]);
         Assert.Equal("Delta", parts[2]);
 
-        name = LambdaNameParser.Parse(x => " . Beta . Delta ", out parts);
+        name = LambdaParser.ParseName(x => " . Beta . Delta ", out parts);
 
         WriteLine(true, name);
         Assert.Equal(".Beta.Delta", name);
@@ -155,7 +155,7 @@ public static class Test_NameParser
         Assert.Equal("Beta", parts[1]);
         Assert.Equal("Delta", parts[2]);
 
-        name = LambdaNameParser.Parse(x => " Alpha . . Delta ", out parts);
+        name = LambdaParser.ParseName(x => " Alpha . . Delta ", out parts);
 
         WriteLine(true, name);
         Assert.Equal("Alpha..Delta", name);
@@ -164,7 +164,7 @@ public static class Test_NameParser
         Assert.Null(parts[1]);
         Assert.Equal("Delta", parts[2]);
 
-        name = LambdaNameParser.Parse(x => " Alpha . Beta . ", out parts);
+        name = LambdaParser.ParseName(x => " Alpha . Beta . ", out parts);
 
         WriteLine(true, name);
         Assert.Equal("Alpha.Beta.", name);

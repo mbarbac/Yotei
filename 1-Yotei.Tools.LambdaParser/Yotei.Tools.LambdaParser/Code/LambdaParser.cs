@@ -6,7 +6,7 @@
 /// whose sole argument is a dynamic one, returning an instance that contains that argument and
 /// the chain of dynamic operations binded to it.
 /// </summary>
-public class LambdaParser
+public partial class LambdaParser
 {
     /// <summary>
     /// Private constructor.

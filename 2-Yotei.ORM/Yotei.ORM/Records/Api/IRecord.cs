@@ -42,7 +42,7 @@ public partial interface IRecord : IEnumerable<TPair>
     /// </summary>
     /// <param name="specs"></param>
     /// <returns></returns>
-    List<TPair> this[string specs] { get; }
+    IEnumerable<TPair> this[string specs] { get; }
 
     /// <summary>
     /// Gets a list with the value-metadata pairs whose identifiers match the one obtained from
@@ -50,7 +50,7 @@ public partial interface IRecord : IEnumerable<TPair>
     /// </summary>
     /// <param name="specs"></param>
     /// <returns></returns>
-    List<TPair> this[Func<dynamic, object> specs] { get; }
+    IEnumerable<TPair> this[Func<dynamic, object> specs] { get; }
 
     // ----------------------------------------------------
 
