@@ -17,7 +17,7 @@ public partial class Record : THost
     public Record(IEngine engine)
     {
         Schema = new Schema(engine.ThrowWhenNull());
-        Values = [];        
+        Values = [];
     }
 
     /// <summary>
@@ -28,7 +28,7 @@ public partial class Record : THost
     public Record(ISchema schema)
     {
         Schema = schema.ThrowWhenNull();
-        Values = new(schema.Count);
+        Values = new object?[schema.Count];
     }
 
     /// <summary>
@@ -43,10 +43,10 @@ public partial class Record : THost
         engine.ThrowWhenNull();
         values.ThrowWhenNull();
 
-        Values = values.ToList();
+        Values = values.ToArray();
 
         var items = new List<SchemaEntry>();
-        for (int i = 0; i < Values.Count; i++) items.Add(new(engine, $"#{i}"));
+        for (int i = 0; i < Values.Length; i++) items.Add(new(engine, $"#{i}"));
         Schema = new Schema(engine, items);
     }
 
@@ -61,9 +61,9 @@ public partial class Record : THost
         schema.ThrowWhenNull();
         values.ThrowWhenNull();
 
-        Values = values.ToList();
+        Values = values.ToArray();
 
-        if (schema.Count != Values.Count) throw new ArgumentException(
+        if (schema.Count != Values.Length) throw new ArgumentException(
             "Size of the given schema is not the same as the size of the given values.")
             .WithData(schema)
             .WithData(this);
@@ -79,7 +79,7 @@ public partial class Record : THost
     {
         source.ThrowWhenNull();
 
-        Values = new(source.Values);
+        Values = new object?[source.Count]; Array.Copy(source.Values, Values, source.Count);
         Schema = source.Schema;
     }
 
@@ -122,7 +122,7 @@ public partial class Record : THost
     /// <summary>
     /// The actual collection of values.
     /// </summary>
-    protected List<object?> Values { get; private set; }
+    protected object?[] Values { get; private set; }
 
     /// <summary>
     /// <inheritdoc/>
@@ -140,7 +140,7 @@ public partial class Record : THost
 
         if (ReferenceEquals(this, schema)) return this;
 
-        if (schema.Count != Values.Count) throw new ArgumentException(
+        if (schema.Count != Values.Length) throw new ArgumentException(
             "Size of the given schema is not the same as the size of this instance.")
             .WithData(schema)
             .WithData(this);
@@ -153,7 +153,7 @@ public partial class Record : THost
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public int Count => Values.Count;
+    public int Count => Values.Length;
 
     /// <summary>
     /// <inheritdoc/>
@@ -161,6 +161,8 @@ public partial class Record : THost
     /// <param name="index"></param>
     /// <returns></returns>
     public object? this[int index] => Values[index];
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// <inheritdoc/>
@@ -195,6 +197,40 @@ public partial class Record : THost
             return this[name];
         }
     }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="specs"></param>
+    /// <param name="value"></param>
+    /// <param name="entry"></param>
+    /// <returns></returns>
+    public bool Unique(
+        string specs,
+        out object? value, [NotNullWhen(true)] out ISchemaEntry? entry)
+    {
+        var items = Schema.IndexesOf(specs);
+
+        value = items.Count == 1 ? Values[items[0]] : null;
+        entry = items.Count == 1 ? Schema[items[0]] : null;
+        return items.Count == 1;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="specs"></param>
+    /// <param name="value"></param>
+    /// <param name="entry"></param>
+    /// <returns></returns>
+    public bool Unique(
+        Func<dynamic, object> specs,
+        out object? value, [NotNullWhen(true)] out ISchemaEntry? entry)
+    {
+        var name = LambdaParser.ParseName(specs);
+        return Unique(name, out value, out entry);
+    }
+
     // ----------------------------------------------------
 
     /// <summary>
@@ -232,7 +268,7 @@ public partial class Record : THost
     /// <param name="index"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public virtual THost Replace(int index, object? value)
+    public virtual THost ReplaceValue(int index, object? value)
     {
         var temp = Clone();
         var done = temp.ReplaceInternal(index, value);
@@ -245,30 +281,6 @@ public partial class Record : THost
 
         Values[index] = value;
         return 1;
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="value"></param>
-    /// <returns></returns>
-    public virtual THost Replace(int index, object? value, ISchemaEntry entry)
-    {
-        var temp = Clone();
-        var done = temp.ReplaceInternal(index, value, entry);
-        return done > 0 ? temp : this;
-    }
-    int ReplaceInternal(int index, object? value, ISchemaEntry entry)
-    {
-        var count = ReplaceInternal(index, value);
-        var temp = Schema.Replace(index, entry);
-        if (!ReferenceEquals(temp, Schema))
-        {
-            Schema = temp;
-            count++;
-        }
-        return count;
     }
 
     /// <summary>
@@ -294,6 +306,50 @@ public partial class Record : THost
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    /// <param name="index"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public virtual THost Replace(int index, object? value, ISchemaEntry entry)
+    {
+        var temp = Clone();
+        var done = temp.ReplaceInternal(index, value, entry);
+        return done > 0 ? temp : this;
+    }
+    int ReplaceInternal(int index, object? value, ISchemaEntry entry)
+    {
+        var count = ReplaceInternal(index, value);
+
+        var temp = Schema.Replace(index, entry);
+        if (!ReferenceEquals(temp, Schema))
+        {
+            Schema = temp;
+            count++;
+        }
+        return count;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="entry"></param>
+    /// <returns></returns>
+    public virtual THost Add(object? value, ISchemaEntry entry)
+    {
+        var temp = Clone();
+        var done = temp.AddInternal(value, entry);
+        return done > 0 ? temp : this;
+    }
+    int AddInternal(object? value, ISchemaEntry entry)
+    {
+        Values = Values.Add(value);
+        Schema = Schema.Add(entry.ThrowWhenNull());
+        return 1;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     /// <param name="pair"></param>
     /// <returns></returns>
     public virtual THost Add(TPair pair)
@@ -302,12 +358,7 @@ public partial class Record : THost
         var done = temp.AddInternal(pair);
         return done > 0 ? temp : this;
     }
-    int AddInternal(TPair pair)
-    {
-        Values.Add(pair.Key);
-        Schema = Schema.Add(pair.Value);
-        return 1;
-    }
+    int AddInternal(TPair pair) => AddInternal(pair.Key, pair.Value);
 
     /// <summary>
     /// <inheritdoc/>
@@ -332,6 +383,26 @@ public partial class Record : THost
     /// <inheritdoc/>
     /// </summary>
     /// <param name="index"></param>
+    /// <param name="value"></param>
+    /// <param name="entry"></param>
+    /// <returns></returns>
+    public virtual THost Insert(int index, object? value, ISchemaEntry entry)
+    {
+        var temp = Clone();
+        var done = temp.InsertInternal(index, value, entry);
+        return done > 0 ? temp : this;
+    }
+    int InsertInternal(int index, object? value, ISchemaEntry entry)
+    {
+        Values = Values.Insert(index, value);
+        Schema = Schema.Insert(index, entry.ThrowWhenNull());
+        return 1;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="index"></param>
     /// <param name="pair"></param>
     /// <returns></returns>
     public virtual THost Insert(int index, TPair pair)
@@ -340,12 +411,7 @@ public partial class Record : THost
         var done = temp.InsertInternal(index, pair);
         return done > 0 ? temp : this;
     }
-    int InsertInternal(int index, TPair pair)
-    {
-        Values.Insert(index, pair.Key);
-        Schema = Schema.Insert(index, pair.Value);
-        return 1;
-    }
+    int InsertInternal(int index, TPair pair) => InsertInternal(index, pair.Key, pair.Value);
 
     /// <summary>
     /// <inheritdoc/>
@@ -385,7 +451,7 @@ public partial class Record : THost
     }
     int RemoveAtInternal(int index)
     {
-        Values.RemoveAt(index);
+        Values = Values.RemoveAt(index);
         Schema = Schema.RemoveAt(index);
         return 1;
     }
@@ -406,7 +472,7 @@ public partial class Record : THost
     {
         if (count == 0) return 0;
 
-        Values.RemoveRange(index, count);
+        Values = Values.RemoveRange(index, count);
         Schema = Schema.RemoveRange(index, count);
         return count;
     }
@@ -497,7 +563,7 @@ public partial class Record : THost
         specs = specs.NotNullNotEmpty();
 
         var indexes = Schema.IndexesOf(specs);
-        for (int i = 0; i < indexes.Count; i++)
+        for (int i = indexes.Count - 1; i >= 0; i--)
         {
             var index = indexes[i];
             RemoveAtInternal(index);
@@ -617,7 +683,7 @@ public partial class Record : THost
     {
         var count = Count; if (count > 0)
         {
-            Values.Clear();
+            Values = Values.Clear();
             Schema = Schema.Clear();
         }
         return count;

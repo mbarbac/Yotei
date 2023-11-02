@@ -37,6 +37,8 @@ public partial interface IRecord : IEnumerable<TPair>
     /// <returns></returns>
     object? this[int index] { get; }
 
+    // ----------------------------------------------------
+
     /// <summary>
     /// Gets a list with the value-metadata pairs whose identifiers match the given one.
     /// </summary>
@@ -51,6 +53,30 @@ public partial interface IRecord : IEnumerable<TPair>
     /// <param name="specs"></param>
     /// <returns></returns>
     IEnumerable<TPair> this[Func<dynamic, object> specs] { get; }
+
+    /// <summary>
+    /// Determines if this instance carries one and only one entry whose identifier matches the
+    /// given specs, and if so, sets the out argument to its associated value.
+    /// </summary>
+    /// <param name="specs"></param>
+    /// <param name="value"></param>
+    /// <param name="entry"></param>
+    /// <returns></returns>
+    bool Unique(
+        string specs,
+        out object? value, [NotNullWhen(true)] out ISchemaEntry? entry);
+
+    /// <summary>
+    /// Determines if this instance carries one and only one entry whose identifier matches the
+    /// given specs, and if so, sets the out argument to its associated value.
+    /// </summary>
+    /// <param name="specs"></param>
+    /// <param name="value"></param>
+    /// <param name="entry"></param>
+    /// <returns></returns>
+    bool Unique(
+        Func<dynamic, object> specs,
+        out object? value, [NotNullWhen(true)] out ISchemaEntry? entry);
 
     // ----------------------------------------------------
 
@@ -70,7 +96,16 @@ public partial interface IRecord : IEnumerable<TPair>
     /// <param name="index"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    THost Replace(int index, object? value);
+    THost ReplaceValue(int index, object? value);
+
+    /// <summary>
+    /// Obtains a new instance where the metadata at the given index has been replaced with the
+    /// new given one.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="entry"></param>
+    /// <returns></returns>
+    THost ReplaceMetadata(int index, ISchemaEntry entry);
 
     /// <summary>
     /// Obtains a new instance where the value and metadata at the given index have been replaced
@@ -82,13 +117,13 @@ public partial interface IRecord : IEnumerable<TPair>
     THost Replace(int index, object? value, ISchemaEntry entry);
 
     /// <summary>
-    /// Obtains a new instance where the metadata at the given index has been replaced with the
-    /// new given one.
+    /// Obtains a new instance where the given value-metadata pair has been added to the original
+    /// record.
     /// </summary>
-    /// <param name="index"></param>
+    /// <param name="value"></param>
     /// <param name="entry"></param>
     /// <returns></returns>
-    THost ReplaceMetadata(int index, ISchemaEntry entry);
+    THost Add(object? value, ISchemaEntry entry);
 
     /// <summary>
     /// Obtains a new instance where the given value-metadata pair has been added to the original
@@ -105,6 +140,16 @@ public partial interface IRecord : IEnumerable<TPair>
     /// <param name="range"></param>
     /// <returns></returns>
     THost AddRange(IEnumerable<TPair> range);
+
+    /// <summary>
+    /// Obtains a new instance where the given value-metadata pair has been inserted into the
+    /// original record.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="value"></param>
+    /// <param name="entry"></param>
+    /// <returns></returns>
+    THost Insert(int index, object? value, ISchemaEntry entry);
 
     /// <summary>
     /// Obtains a new instance where the given value-metadata pair has been inserted into the
