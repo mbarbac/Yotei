@@ -1,3 +1,6 @@
+using static Yotei.Tools.Diagnostics.ConsoleWrapper;
+using static System.ConsoleColor;
+
 namespace Yotei.Tools.Tests;
 
 // ========================================================

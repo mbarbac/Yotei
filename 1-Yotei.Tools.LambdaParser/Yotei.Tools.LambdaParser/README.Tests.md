@@ -2,7 +2,7 @@
 
 # Testing Yotei Lambda Parser
 
-For unknown reasons, when running the Yotei Lambda Parser sone test cases fail, but only when using XUnit.
+For unknown reasons, when testing LambdaParser some test cases fail, but only when using xUnit.
 
 In addition, this doesn't happen in a consistent way: if the any test is
 executed individually, it passes, but when executing them all as a whole,
