@@ -1,3 +1,24 @@
 ----------------------------------
 WHERE I AM?
 
+----------------------------------
+CLONE GENERATOR:
+- Objective: simplify.
+- Depend on a copy constructor, if not found => error.
+- Generated file: reverse FQN path + ".g.cs"
+- Specs:
+    - PreventVirtual
+    - IncludeUnderscores.
+
+----------------------------------
+WITH GENERATOR:
+- Objective: simplify.
+- Specs:
+    - Flags:
+        - Copy: default, use copy constructor. If not found => error.
+        - This: do not clone. Use this SETTER/INIT.
+        - Base: use base method. If not found => error.
+    - PreventVirtual.
+    - IncludeUnderscores.
+- Generated file: reverse FQN path + ".g.cs"
+    - Need to keep track on what members are decorated to include them all in the same file.

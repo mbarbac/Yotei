@@ -75,8 +75,25 @@ internal class XPropertyNode : PropertyNode
         // Abstract...
         if (Parent.Symbol.IsAbstract)
         {
-            cb.AppendLine($"{modifiers}{parentType}");
-            cb.AppendLine($"{MethodName}({memberType} {valueName});");
+            var specs = ObtainSpecs(out var stemp, out _) ? stemp : null;
+            if (specs == "this")
+            {
+                cb.AppendLine($"{modifiers}{parentType}");
+                cb.AppendLine($"{MethodName}({memberType} {valueName})");
+                cb.AppendLine("{");
+                cb.IndentLevel++;
+
+                cb.AppendLine($"{Symbol.Name} = {valueName};");
+                cb.AppendLine($"return this;");
+
+                cb.IndentLevel--;
+                cb.AppendLine("}");
+            }
+            else
+            {
+                cb.AppendLine($"public abstract {parentType}");
+                cb.AppendLine($"{MethodName}({memberType} {valueName});");
+            }
         }
 
         // Regular...
@@ -165,8 +182,6 @@ internal class XPropertyNode : PropertyNode
         // Implementation...
         else
         {
-            if (Parent.Symbol.IsAbstract) return "public abstract";
-
             var prevent = ObtainPreventVirtual(out var temp, out _) && temp;
             var times = GetChainTimes(Parent.Symbol, true);
             if (times)

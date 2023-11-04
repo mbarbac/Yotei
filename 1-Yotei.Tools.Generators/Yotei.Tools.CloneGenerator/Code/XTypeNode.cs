@@ -50,7 +50,7 @@ internal class XTypeNode : TypeNode
         // Abstract...
         if (Symbol.IsAbstract)
         {
-            cb.AppendLine($"{modifiers}{Symbol.Name} Clone();");
+            cb.AppendLine($"public abstract {Symbol.Name} Clone();");
         }
 
         // Regular...
@@ -125,8 +125,6 @@ internal class XTypeNode : TypeNode
         // Implementation...
         else
         {
-            if (Symbol.IsAbstract) return "public abstract";
-
             var prevent = ObtainPreventVirtual(out var temp, out _) && temp;
             var times = GetChainTimes(Symbol, true);
             if (times)

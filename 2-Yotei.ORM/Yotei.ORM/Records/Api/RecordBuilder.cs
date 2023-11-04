@@ -222,7 +222,6 @@ public class RecordBuilder
     /// <param name="isUniqueValued"></param>
     /// <param name="isReadOnly"></param>
     /// <param name="metadata"></param>
-    /// <exception cref="System.NullReferenceException"></exception>
     public void Insert(int index, object? value, string identifier,
         bool? isPrimaryKey = null,
         bool? isUniqueValued = null,
