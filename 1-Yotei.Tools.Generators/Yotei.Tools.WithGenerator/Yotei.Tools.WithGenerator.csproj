@@ -32,8 +32,6 @@
 	  <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 	  <!--<DefineConstants>$(DefineConstants);DEBUG_WITHGENERATOR</DefineConstants>-->
    </PropertyGroup>
-
-   <Import Project="..\Yotei.Tools.Generators\Yotei.Tools.Generators.projitems" Label="Shared" />
    <ItemGroup>
 	  <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.7.0" PrivateAssets="all" />
    </ItemGroup>

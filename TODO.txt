@@ -2,6 +2,10 @@
 WHERE I AM?
 
 ----------------------------------
+CORELIST:
+- Simplify
+
+----------------------------------
 CLONE GENERATOR:
 - Objective: simplify.
 - Depend on a copy constructor, if not found => error.

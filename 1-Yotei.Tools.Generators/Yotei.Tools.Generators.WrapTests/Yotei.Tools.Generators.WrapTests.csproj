@@ -26,7 +26,6 @@
    <!-- COMMON configuration -->
    <Import Project="..\Yotei.Tools.Generators\Yotei.Tools.Generators.projitems" Label="Shared" />
    <ItemGroup>
-	  <ProjectReference Include="..\Yotei.Tools.Generators.Wrap\Yotei.Tools.Generators.Wrap.csproj" />
 	  <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.7.0" PrivateAssets="all" />
    </ItemGroup>
 

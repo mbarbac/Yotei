@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
    <PropertyGroup>
 	  <TargetFramework>netstandard2.0</TargetFramework>
@@ -32,8 +32,6 @@
 	  <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 	  <!--<DefineConstants>$(DefineConstants);DEBUG_CLONEGENERATOR</DefineConstants>-->
    </PropertyGroup>
-
-   <Import Project="..\Yotei.Tools.Generators\Yotei.Tools.Generators.projitems" Label="Shared" />
    <ItemGroup>
 	  <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.7.0" PrivateAssets="all" />
    </ItemGroup>
