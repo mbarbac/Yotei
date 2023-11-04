@@ -2,21 +2,13 @@
 
 // ========================================================
 /// <summary>
-/// Represents a list-alike collection of elements identified by their respective keys.
+/// Represents an ordered list-alike collection of elements identified by their respective keys.
 /// </summary>
 /// <typeparam name="TKey"></typeparam>
 /// <typeparam name="TItem"></typeparam>
 public interface ICoreList<TKey, TItem>
-    : IList<TItem>, IList, ICollection<TItem>, ICollection, IEnumerable<TItem>, ICloneable
+    : IList<TItem>, IList, ICollection<TItem>, ICollection, IEnumerable<TItem>
 {
-    /// <summary>
-    /// <inheritdoc cref="ICloneable.Clone"/>
-    /// </summary>
-    /// <returns></returns>
-    new ICoreList<TKey, TItem> Clone();
-
-    // ----------------------------------------------------
-
     /// <summary>
     /// Invoked to validate the given element. This method must throw an appropriate exception
     /// if the given element is not valid for this collection.
@@ -51,10 +43,9 @@ public interface ICoreList<TKey, TItem>
 
     /// <summary>
     /// Invoked to determine if the given duplicate item can be added or inserted into this
-    /// collection, or not. Returns 'true' if the duplicated item shall be added or inserted,
-    /// of 'false' if it just ignored. This method shall throw an appropriate exception if
+    /// collection, or not. Returns 'true' if the duplicated item shall be added or inserted, or
+    /// 'false' if it shall just be ignored. This method shall throw an appropriate exception if
     /// duplicates are not accepted in this collection.
-    /// <br/> By default this method returns 'true', meaning that duplicates are accepted.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>

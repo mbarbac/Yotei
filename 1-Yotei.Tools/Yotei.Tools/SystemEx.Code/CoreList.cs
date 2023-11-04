@@ -29,14 +29,6 @@ public abstract class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     public CoreList(IEnumerable<TItem> range) => AddRange(range);
 
     /// <summary>
-    /// <inheritdoc cref="ICoreList{TKey, TItem}.Clone"/>
-    /// </summary>
-    /// <returns></returns>
-    public abstract CoreList<TKey, TItem> Clone();
-    ICoreList<TKey, TItem> ICoreList<TKey, TItem>.Clone() => Clone();
-    object ICloneable.Clone() => Clone();
-
-    /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
@@ -97,7 +89,7 @@ public abstract class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual bool AcceptDuplicate(TItem item) => true;
+    public abstract bool AcceptDuplicate(TItem item);
 
     /// <summary>
     /// <inheritdoc/>
