@@ -1,46 +1,31 @@
-﻿using THost = Experimental.Lists.IInvariantList;
-using TItem = Experimental.Lists.IElement;
+﻿using THost = Yotei.ORM.IParameterList;
+using TItem = Yotei.ORM.IParameter;
 using TKey = string;
 
-namespace Experimental.Lists;
-
-// ========================================================
-/// <summary>
-/// ...
-/// </summary>
-public class NameElement(string name) : TItem
-{
-    /// <summary>
-    /// ...
-    /// </summary>
-    public string Name { get; set; } = name.ThrowWhenNull();
-}
+namespace Yotei.ORM.Code;
 
 // ========================================================
 /// <summary>
 /// <inheritdoc cref="THost"/>
 /// </summary>
 [DebuggerDisplay("{ToDebugString()}")]
-public class InvariantList : THost, TItem // To test nested...
+[Cloneable]
+public partial class ParameterList : THost
 {
-    /// <summary>Represents the collection of elements in its host instance.</summary>
+    /// <summary>Represents the collection of elements in this instance.</summary>
     protected class InnerList : CoreList<TKey, TItem>
     {
-        InvariantList Master;
-        public InnerList(InvariantList master) => Master = master.ThrowWhenNull();
+        ParameterList Master;
+        public InnerList(ParameterList master) => Master = master.ThrowWhenNull();
         protected InnerList(InnerList source) : this(source.Master) => AddRange(source);
         public override InnerList Clone() => new(this);
 
         public override TItem ValidateItem(TItem item) => item.ThrowWhenNull();
-        public override TKey GetKey(TItem item)
-        {
-            if (item is NameElement named) return named.Name;
-            throw new ArgumentException("Cannot obtain key from the given item.").WithData(item);
-        }
+        public override TKey GetKey(TItem item) => item.Name;
         public override TKey ValidateKey(TKey key) => key.NotNullNotEmpty();
         public override bool CompareKeys(TKey source, TKey target)
         {
-            return string.Compare(source, target, !Master.CaseSensitive) == 0;
+            return string.Compare(source, target, !Master.Engine.CaseSensitiveNames) == 0;
         }
         public override bool AcceptDuplicate(TItem item)
         {
@@ -61,48 +46,40 @@ public class InvariantList : THost, TItem // To test nested...
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    /// <param name="sensitive"></param>
-    public InvariantList(bool sensitive)
+    /// <param name="engine"></param>
+    public ParameterList(IEngine engine)
     {
         Items = CreateInnerList();
-        CaseSensitive = sensitive;
+        Engine = engine.ThrowWhenNull();
     }
 
     /// <summary>
     /// Initializes a new instance with the given element.
     /// </summary>
-    /// <param name="sensitive"></param>
+    /// <param name="engine"></param>
     /// <param name="item"></param>
-    public InvariantList(bool sensitive, TItem item) : this(sensitive) => Items.Add(item);
+    public ParameterList(IEngine engine, TItem item) : this(engine) => Items.Add(item);
 
     /// <summary>
     /// Initializes a new instance with the elements from the given range.
     /// </summary>
-    /// <param name="sensitive"></param>
+    /// <param name="engine"></param>
     /// <param name="range"></param>
-    public InvariantList(
-        bool sensitive, IEnumerable<TItem> range) : this(sensitive) => Items.AddRange(range);
+    public ParameterList(
+        IEngine engine, IEnumerable<TItem> range) : this(engine) => Items.AddRange(range);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected InvariantList(InvariantList source)
+    protected ParameterList(ParameterList source)
     {
         source.ThrowWhenNull();
 
         Items = CreateInnerList();
-        CaseSensitive = source.CaseSensitive;
+        Engine = source.Engine;
         Items.AddRange(source);
     }
-
-    /// <summary>
-    /// <inheritdoc cref="THost.Clone"/>
-    /// </summary>
-    /// <returns></returns>
-    public virtual InvariantList Clone() => new(this);
-    THost THost.Clone() => Clone();
-    object ICloneable.Clone() => Clone();
 
     /// <summary>
     /// <inheritdoc/>
@@ -122,48 +99,12 @@ public class InvariantList : THost, TItem // To test nested...
     /// </summary>
     string ToDebugString() => Items.ToDebugString();
 
-    /// <summary>
-    /// Invoked to reload the contents of this instance after a change in its behavior.
-    /// </summary>
-    void ReLoad()
-    {
-        if (Count == 0) return;
-
-        var range = Items.ToArray();
-        Items.Clear();
-        Items.AddRange(range);
-    }
-
     // ----------------------------------------------------
-
-    /// <summary>
-    /// ...
-    /// </summary>
-    public bool CaseSensitive
-    {
-        get => _CaseSensitive;
-        init
-        {
-            if (_CaseSensitive == value) return;
-            _CaseSensitive = value;
-
-            ReLoad();
-        }
-    }
-    bool _CaseSensitive;
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="value"></param>
-    /// <returns></returns>
-    public virtual THost WithCaseSensitive(bool value)
-    {
-        if (CaseSensitive == value) return this;
-
-        var temp = new InvariantList(this) { CaseSensitive = value };
-        return temp;
-    }
+    public IEngine Engine { get; }
 
     /// <summary>
     /// <inheritdoc/>
@@ -249,6 +190,21 @@ public class InvariantList : THost, TItem // To test nested...
     /// </summary>
     /// <returns></returns>
     public List<TItem> ToList() => Items.ToList();
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public string NextName()
+    {
+        for (int i = Items.Count; i < int.MaxValue; i++)
+        {
+            var name = $"{Engine.ParameterPrefix}{i}";
+            var index = IndexOf(name);
+            if (index < 0) return name;
+        }
+        throw new UnExpectedException("Range of indexes exhausted.");
+    }
 
     // ----------------------------------------------------
 

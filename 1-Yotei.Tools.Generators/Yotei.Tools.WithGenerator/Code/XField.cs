@@ -130,8 +130,8 @@ internal class XField : FieldNode
                 file.AppendLine($"if (v_comparer.Equals({Symbol.Name}, {vname})) return this;");
                 file.AppendLine();
 
-                file.AppendLine($"{chain}.{MethodName}({vname});");
-                file.AppendLine("return this;");
+                file.AppendLine($"var v_temp = {chain}.{MethodName}({vname});");
+                file.AppendLine($"return ({HostType.Name})v_temp;");
             }
 
             file.IndentLevel--;

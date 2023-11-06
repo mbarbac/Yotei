@@ -9,7 +9,7 @@
    </PropertyGroup>
 
    <PropertyGroup>
-	  <Description>Yotei Tools, Clone Generator</Description>
+	  <Description>Yotei Tools, With Generator</Description>
 	  <Version>0.5.17-v0001</Version>
 	  <Authors>mbarbac@hotmail.com</Authors>
 	  <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>

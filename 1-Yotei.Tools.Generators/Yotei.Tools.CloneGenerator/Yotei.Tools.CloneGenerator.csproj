@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
    <PropertyGroup>
-	  <TargetFramework>net8.0</TargetFramework>
+	  <TargetFramework>netstandard2.0</TargetFramework>
 	  <ImplicitUsings>disable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
 	  <LangVersion>latest</LangVersion>
@@ -9,8 +9,8 @@
    </PropertyGroup>
 
    <PropertyGroup>
-	  <Description>Yotei Tools Dynamic Lambda Expression Parser</Description>
-	  <Version>0.5.23-v0001</Version>
+	  <Description>Yotei Tools, Clone Generator</Description>
+	  <Version>0.5.17-v0001</Version>
 	  <Authors>mbarbac@hotmail.com</Authors>
 	  <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
 	  <IsPackable>true</IsPackable>
@@ -23,27 +23,19 @@
 
    <ItemGroup>
 	  <None Include="README.md" Pack="true" PackagePath="" />
-	  <None Include="README.Tests.md" Pack="true" PackagePath="" />
 	  <None Include="LICENSE" Pack="true" PackagePath="" />
+	  <None Remove="bin\Release\netstandard2.0\\Yotei.Tools.WithGenerator.dll" />
+	  <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
    </ItemGroup>
-   
+
    <PropertyGroup>
-	  <!--<DefineConstants>$(DefineConstants);DEBUG_LAMBDAPARSER</DefineConstants>-->
+	  <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+	  <!--<DefineConstants>$(DefineConstants);DEBUG_CLONEGENERATOR</DefineConstants>-->
    </PropertyGroup>
 
-   <!-- DEBUG configuration -->
-   <ItemGroup Condition="'$(Configuration)'=='Debug'">
-	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
-   </ItemGroup>
-
-   <!-- LOCAL configuration -->
-   <ItemGroup Condition="'$(Configuration)'=='Local'">
-	  <PackageReference Include="Yotei.Tools" Version="0.5.27-v0001" />
-   </ItemGroup>
-
-   <!-- RELEASE configuration -->
-   <ItemGroup Condition="'$(Configuration)'=='Release'">
-	  <PackageReference Include="Yotei.Tools" Version="0.5.26" />
+   <Import Project="..\Yotei.Tools.Generators.Shared\Yotei.Tools.Generators.Shared.projitems" Label="Shared" />
+   <ItemGroup>
+	  <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.7.0" PrivateAssets="all" />
    </ItemGroup>
 
 </Project>

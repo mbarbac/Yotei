@@ -5,11 +5,11 @@ using System;
 namespace Yotei.Tools.WithGenerator.Tests
 {
     // Namespace-level elements...
-    using ICopyBuilder;
-    using CopyBuilder;
+    using IBaseBuilder;
+    using BaseBuilder;
 
     // ====================================================
-    namespace ICopyBuilder
+    namespace IBaseBuilder
     {
         public partial interface IOther
         {
@@ -30,7 +30,7 @@ namespace Yotei.Tools.WithGenerator.Tests
     }
 
     // ====================================================
-    namespace CopyBuilder
+    namespace BaseBuilder
     {
         public partial class Other
         {
@@ -43,7 +43,16 @@ namespace Yotei.Tools.WithGenerator.Tests
                 [WithGenerator]
                 public int Age = 0;
                 public string FirstName { get; set; } = default!;
-                public string LastName { get; set; } = default!;
+                public virtual string LastName
+                {
+                    get => _LastName;
+                    set
+                    {
+                        _LastName = value;
+                        _Info = "Persona.LastName";
+                    }
+                }
+                string _LastName = default!;
 
                 public Persona(string first, string last, int age)
                 {
@@ -63,10 +72,10 @@ namespace Yotei.Tools.WithGenerator.Tests
             }
 
             // --------------------------------------------
-            [WithGenerator]
+            [WithGenerator("base")] // <== To use base methods by default!
             public partial class Manager : Persona, IOther.IManager
             {
-                [WithGenerator]
+                [WithGenerator("copy")] // <== No base method for 'Branch'...
                 public string Branch { get; set; } = default!;
 
                 public Manager(string first, string last, int age, string branch)
@@ -81,13 +90,23 @@ namespace Yotei.Tools.WithGenerator.Tests
                     _Info = "Manager.Copy";
                     Branch = source.Branch;
                 }
+
+                public override string LastName
+                {
+                    get => base.LastName;
+                    set
+                    {
+                        base.LastName = value;
+                        _Info = "Manager.LastName";
+                    }
+                }
             }
         }
     }
 
     // ====================================================
     //[Enforced]
-    public static class Test_CopyBuilder
+    public static class Test_BaseBuilder
     {
         //[Enforced]
         [Fact]
@@ -98,14 +117,8 @@ namespace Yotei.Tools.WithGenerator.Tests
             var target = source.WithLastName(source.LastName);
             Assert.Same(source, target);
 
-            target = source.WithLastName("Other");
-            Assert.NotSame(source, target);
-            Assert.IsAssignableFrom<IOther.IManager>(target);
-            Assert.Equal(source.FirstName, target.FirstName);
-            Assert.Equal("Other", target.LastName);
-            Assert.Equal(((Other.Manager)source).Age, ((Other.Manager)target).Age);
-            Assert.Equal(source.Branch, target.Branch);
-            Assert.Equal("Manager.Copy", ((Other.Manager)target)._Info);
+            try { source.WithLastName("Other"); Assert.Fail(); }
+            catch (InvalidCastException) { }
         }
 
         //[Enforced]
@@ -117,26 +130,14 @@ namespace Yotei.Tools.WithGenerator.Tests
             var target = source.WithLastName(source.LastName);
             Assert.Same(source, target);
 
-            target = source.WithLastName("Other");
-            Assert.NotSame(source, target);
-            Assert.IsType<Other.Manager>(target);
-            Assert.Equal(source.FirstName, target.FirstName);
-            Assert.Equal("Other", target.LastName);
-            Assert.Equal(source.Age, target.Age);
-            Assert.Equal(source.Branch, target.Branch);
-            Assert.Equal("Manager.Copy", target._Info);
+            try { source.WithLastName("Other"); Assert.Fail(); }
+            catch (InvalidCastException) { }
 
             target = source.WithAge(source.Age);
             Assert.Same(source, target);
 
-            target = source.WithAge(60);
-            Assert.NotSame(source, target);
-            Assert.IsType<Other.Manager>(target);
-            Assert.Equal(source.FirstName, target.FirstName);
-            Assert.Equal(source.LastName, target.LastName);
-            Assert.Equal(60, target.Age);
-            Assert.Equal(source.Branch, target.Branch);
-            Assert.Equal("Manager.Copy", target._Info);
+            try { source.WithAge(60); Assert.Fail(); }
+            catch (InvalidCastException) { }
         }
     }
 }

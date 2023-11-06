@@ -5,11 +5,11 @@ using System;
 namespace Yotei.Tools.WithGenerator.Tests
 {
     // Namespace-level elements...
-    using ICopyBuilder;
-    using CopyBuilder;
+    using IThisBuilder;
+    using ThisBuilder;
 
     // ====================================================
-    namespace ICopyBuilder
+    namespace IThisBuilder
     {
         public partial interface IOther
         {
@@ -30,12 +30,12 @@ namespace Yotei.Tools.WithGenerator.Tests
     }
 
     // ====================================================
-    namespace CopyBuilder
+    namespace ThisBuilder
     {
         public partial class Other
         {
             // --------------------------------------------
-            [WithGenerator]
+            [WithGenerator("this")] // <== At the root of the class hierarchy...
             public partial class Persona : IOther.IPersona
             {
                 public string _Info = string.Empty;
@@ -87,7 +87,7 @@ namespace Yotei.Tools.WithGenerator.Tests
 
     // ====================================================
     //[Enforced]
-    public static class Test_CopyBuilder
+    public static class Test_ThisBuilder
     {
         //[Enforced]
         [Fact]
@@ -99,13 +99,14 @@ namespace Yotei.Tools.WithGenerator.Tests
             Assert.Same(source, target);
 
             target = source.WithLastName("Other");
-            Assert.NotSame(source, target);
+            Assert.Same(source, target);
+
             Assert.IsAssignableFrom<IOther.IManager>(target);
             Assert.Equal(source.FirstName, target.FirstName);
             Assert.Equal("Other", target.LastName);
             Assert.Equal(((Other.Manager)source).Age, ((Other.Manager)target).Age);
             Assert.Equal(source.Branch, target.Branch);
-            Assert.Equal("Manager.Copy", ((Other.Manager)target)._Info);
+            Assert.Equal("Manager.Regular", ((Other.Manager)target)._Info);
         }
 
         //[Enforced]
@@ -118,25 +119,27 @@ namespace Yotei.Tools.WithGenerator.Tests
             Assert.Same(source, target);
 
             target = source.WithLastName("Other");
-            Assert.NotSame(source, target);
+            Assert.Same(source, target);
+
             Assert.IsType<Other.Manager>(target);
             Assert.Equal(source.FirstName, target.FirstName);
             Assert.Equal("Other", target.LastName);
             Assert.Equal(source.Age, target.Age);
             Assert.Equal(source.Branch, target.Branch);
-            Assert.Equal("Manager.Copy", target._Info);
+            Assert.Equal("Manager.Regular", target._Info);
 
             target = source.WithAge(source.Age);
             Assert.Same(source, target);
 
             target = source.WithAge(60);
-            Assert.NotSame(source, target);
+            Assert.Same(source, target);
+
             Assert.IsType<Other.Manager>(target);
             Assert.Equal(source.FirstName, target.FirstName);
             Assert.Equal(source.LastName, target.LastName);
             Assert.Equal(60, target.Age);
             Assert.Equal(source.Branch, target.Branch);
-            Assert.Equal("Manager.Copy", target._Info);
+            Assert.Equal("Manager.Regular", target._Info);
         }
     }
 }

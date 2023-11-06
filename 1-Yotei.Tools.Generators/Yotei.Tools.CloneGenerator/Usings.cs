@@ -1,4 +1,4 @@
-global using System;
+﻿global using System;
 global using System.Collections;
 global using System.Collections.Generic;
 global using System.Collections.Immutable;
@@ -15,13 +15,8 @@ global using System.Text;
 global using System.Threading;
 global using System.Threading.Tasks;
 
-global using Xunit;
-global using Yotei.Tools;
-global using Yotei.Tools.Diagnostics;
-global using Yotei.Tools.WithGenerator;
-global using Yotei.Tools.CloneGenerator;
+global using Microsoft.CodeAnalysis;
+global using Microsoft.CodeAnalysis.CSharp;
+global using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-global using Yotei.ORM;
-global using Yotei.ORM.Code;
-//global using Yotei.ORM.Records;
-//global using Yotei.ORM.Records.Code;
+global using Yotei.Tools.Generators.Shared;

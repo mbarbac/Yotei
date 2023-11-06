@@ -30,12 +30,12 @@
 
    <!-- LOCAL configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Local'">
-	  <PackageReference Include="Yotei.Tools" Version="0.5.26-v0001" />
+	  <PackageReference Include="Yotei.Tools" Version="0.5.27-v0001" />
    </ItemGroup>
 
    <!-- RELEASE configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Release'">
-	  <PackageReference Include="Yotei.Tools" Version="0.5.25" />
+	  <PackageReference Include="Yotei.Tools" Version="0.5.26" />
    </ItemGroup>
 
 </Project>

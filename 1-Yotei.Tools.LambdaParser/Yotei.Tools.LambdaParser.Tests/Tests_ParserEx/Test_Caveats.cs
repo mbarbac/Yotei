@@ -34,7 +34,7 @@ public static class Test_Caveats
 
     // ----------------------------------------------------
 
-    [Enforced]
+    //[Enforced]
     [Fact]
     public static void Test_Standard_Unary_PostDecrement_Does_Not_Work()
     {
