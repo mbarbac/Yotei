@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
    <PropertyGroup>
 	  <TargetFramework>net8.0</TargetFramework>
@@ -8,6 +8,9 @@
 	  <IsPackable>false</IsPackable>
 	  <IsTestProject>true</IsTestProject>
 	  <Configurations>Debug;Release;Local</Configurations>
+
+	  <!-- Testing an arbitrary pragma -->
+	  <NoWarn>CS1633</NoWarn>
    </PropertyGroup>
 
    <ItemGroup>
@@ -25,17 +28,41 @@
 
    <!-- DEBUG configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Debug'">
-     <ProjectReference Include="..\Yotei.Tools\Yotei.Tools.csproj" />
+	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
+	  <ProjectReference Include="..\Yotei.Tools.WithGenerator\Yotei.Tools.WithGenerator.csproj">
+		 <OutputItemType>Analyzer</OutputItemType>
+		 <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+	  </ProjectReference>
    </ItemGroup>
 
    <!-- LOCAL configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Local'">
 	  <PackageReference Include="Yotei.Tools" Version="0.5.26-v0001" />
+	  <PackageReference Include="Yotei.Tools.WithGenerator" Version="0.5.17-v0001" />
    </ItemGroup>
 
    <!-- RELEASE configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Release'">
 	  <PackageReference Include="Yotei.Tools" Version="0.5.25" />
+	  <PackageReference Include="Yotei.Tools.WithGenerator" Version="0.5.16" />
    </ItemGroup>
+
+   <!-- Emit generated files -->
+   <ItemGroup>
+	  <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
+   </ItemGroup>
+   <PropertyGroup>
+	  <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+	  <CompilerGeneratedFilesOutputPath>Generated\$(TargetFramework)</CompilerGeneratedFilesOutputPath>
+   </PropertyGroup>
+
+   <!-- Clear generated files each compile or build -->
+   <!-- Need to appear at the end of the file -->
+   <Target Name="CustomBeforeCompile" BeforeTargets="BeforeCompile">
+	  <RemoveDir Directories="$(ProjectDir)\Generated\" />
+   </Target>
+   <Target Name="CustomBeforeBuild" BeforeTargets="BeforeBuild">
+	  <RemoveDir Directories="$(ProjectDir)\Generated\" />
+   </Target>
 
 </Project>

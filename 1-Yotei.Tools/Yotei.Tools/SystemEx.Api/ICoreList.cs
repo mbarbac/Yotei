@@ -7,8 +7,14 @@
 /// <typeparam name="TKey"></typeparam>
 /// <typeparam name="TItem"></typeparam>
 public interface ICoreList<TKey, TItem>
-    : IList<TItem>, IList, ICollection<TItem>, ICollection, IEnumerable<TItem>
+    : IList<TItem>, IList, ICollection<TItem>, ICollection, IEnumerable<TItem>, ICloneable
 {
+    /// <summary>
+    /// <inheritdoc cref="ICloneable.Clone"/>
+    /// </summary>
+    /// <returns></returns>
+    new ICoreList<TKey, TItem> Clone();
+
     /// <summary>
     /// Invoked to validate the given element. This method must throw an appropriate exception
     /// if the given element is not valid for this collection.

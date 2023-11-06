@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>f25c94c9-433a-472e-b0b4-b335b3e602f6</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Yotei.Tools.Generators.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\AttributeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\NameSyntaxExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\SymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\SintaxListExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\SyntaxNodeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\ToStringExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\TypeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\ExceptionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\DebugExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\StringExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\ChainExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CoreList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Base\CodeBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Base\FileBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Base\Diagnostics.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\Candidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\TypeCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\PropertyCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\FieldCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\MethodCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\MethodNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Node.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Base\BaseGenerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\FieldNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\PropertyNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\TypeNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
+  </ItemGroup>
+</Project>

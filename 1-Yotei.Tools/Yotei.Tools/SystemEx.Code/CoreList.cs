@@ -9,7 +9,7 @@
 [DebuggerDisplay("{ToDebugString()}")]
 public abstract class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
 {
-    readonly List<TItem> Items = new();
+    readonly List<TItem> Items = [];
 
     /// <summary>
     /// Initializes a new empty instance.
@@ -27,6 +27,24 @@ public abstract class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     /// </summary>
     /// <param name="range"></param>
     public CoreList(IEnumerable<TItem> range) => AddRange(range);
+
+    /// <summary>
+    /// Copy constructor.
+    /// </summary>
+    /// <param name="source"></param>
+    protected CoreList(CoreList<TKey, TItem> source)
+    {
+        source.ThrowWhenNull();
+        Items.AddRange(source.Items);
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="ICloneable.Clone"/>
+    /// </summary>
+    /// <returns></returns>
+    public abstract CoreList<TKey, TItem> Clone();
+    ICoreList<TKey, TItem> ICoreList<TKey, TItem>.Clone() => Clone();
+    object ICloneable.Clone() => Clone();
 
     /// <summary>
     /// <inheritdoc/>

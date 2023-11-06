@@ -30,6 +30,9 @@ public class InvariantList : THost, TItem // To test nested...
     {
         InvariantList Master;
         public InnerList(InvariantList master) => Master = master.ThrowWhenNull();
+        protected InnerList(InnerList source) : this(source.Master) => AddRange(source);
+        public override InnerList Clone() => new(this);
+
         public override TItem ValidateItem(TItem item) => item.ThrowWhenNull();
         public override TKey GetKey(TItem item)
         {
