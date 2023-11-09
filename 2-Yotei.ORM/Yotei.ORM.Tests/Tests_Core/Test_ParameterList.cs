@@ -4,7 +4,6 @@ using TItem = Yotei.ORM.Code.Parameter;
 namespace Yotei.ORM.Tests;
 
 // ========================================================
-//[Enforced]
 public static class Test_ParameterList
 {
     readonly static TItem x007 = new("Id", "007");

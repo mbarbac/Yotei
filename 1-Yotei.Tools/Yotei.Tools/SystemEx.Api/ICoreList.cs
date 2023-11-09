@@ -16,61 +16,6 @@ public interface ICoreList<TKey, TItem>
     new ICoreList<TKey, TItem> Clone();
 
     /// <summary>
-    /// Invoked to validate the given element. This method must throw an appropriate exception
-    /// if the given element is not valid for this collection.
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    TItem ValidateItem(TItem item);
-
-    /// <summary>
-    /// Invoked to obtain the key associated with the given item. This method must throw an
-    /// appropriate exception if the key cannot be obtained.
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    TKey GetKey(TItem item);
-
-    /// <summary>
-    /// Invoked to return a validated key. This method must throw an appropriate exception if
-    /// the key is an invalid one.
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    TKey ValidateKey(TKey key);
-
-    /// <summary>
-    /// Invoked to determine if the two given keys shall be considered as equivalent, or not.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="target"></param>
-    /// <returns></returns>
-    bool CompareKeys(TKey source, TKey target);
-
-    /// <summary>
-    /// Invoked to determine if the given duplicate item can be added or inserted into this
-    /// collection, or not. Returns 'true' if the duplicated item shall be added or inserted, or
-    /// 'false' if it shall just be ignored. This method shall throw an appropriate exception if
-    /// duplicates are not accepted in this collection.
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    bool AcceptDuplicate(TItem item);
-
-    /// <summary>
-    /// Invoked to determine if the given item, which is an enumeration of the items in this
-    /// collection, shall be expanded and its child elements used instead of the original one,
-    /// or not.
-    /// <br/> By default this method returns 'false' meaning that nested elements are not
-    /// expanded.
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    bool ExpandNested(TItem item);
-
-    // ----------------------------------------------------
-
-    /// <summary>
     /// Gets the number of elements in this instance.
     /// </summary>
     new int Count { get; }
@@ -171,6 +116,8 @@ public interface ICoreList<TKey, TItem>
 
     /// <summary>
     /// Sets the element at the given index with the new given one.
+    /// <br/> If the given element is strictly the same as the existing one at the given index,
+    /// then no replacement is done.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>

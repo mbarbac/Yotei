@@ -1,42 +1,16 @@
-﻿using THost = Experimental.Lists.IInvariantList;
-using TItem = Experimental.Lists.IElement;
-using TKey = string;
+﻿using THost = Experimental.Yotei.ITemplateList;
+using TItem = Experimental.Yotei.ITemplateElement;
+using TKey = Experimental.Yotei.ITemplateKey;
 
-namespace Experimental.Lists;
-
-// ========================================================
-/// <summary>
-/// ...
-/// </summary>
-public interface IElement { }
+namespace Experimental.Yotei;
 
 // ========================================================
 /// <summary>
-/// ...
+/// An immutable object that ...
 /// </summary>
-public interface IInvariantList : IEnumerable<TItem>, ICloneable
+[Cloneable]
+public partial interface ITemplateList : IEnumerable<TItem>
 {
-    /// <summary>
-    /// <inheritdoc cref="ICloneable.Clone"/>
-    /// </summary>
-    /// <returns></returns>
-    new THost Clone();
-
-    /// <summary>
-    /// ...
-    /// </summary>
-    bool CaseSensitive { get; }
-
-    /// <summary>
-    /// Obtains an instance where the value of the <see cref="CaseSensitive"/> property has
-    /// been replaced by the new given one.
-    /// </summary>
-    /// <param name="value"></param>
-    /// <returns></returns>
-    THost WithCaseSensitive(bool value);
-
-    // ----------------------------------------------------
-
     /// <summary>
     /// Gets the number of elements in this instance.
     /// </summary>
@@ -246,3 +220,7 @@ public interface IInvariantList : IEnumerable<TItem>, ICloneable
     /// <returns></returns>
     THost Clear();
 }
+
+// ========================================================
+public interface ITemplateKey { }
+public interface ITemplateElement { TKey Key { get; } }

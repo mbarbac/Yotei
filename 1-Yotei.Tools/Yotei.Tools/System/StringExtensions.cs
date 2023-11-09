@@ -874,8 +874,8 @@ public static class StringExtensions
 
     /// <summary>
     /// Wraps the given string with the given head and tail characters, provided that it is not
-    /// a null one after trimming, if such is requested, and that the source string was not already
-    /// wrapped.
+    /// a null one after trimming, if such is requested, and that the source string was not
+    /// already wrapped.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="head"></param>

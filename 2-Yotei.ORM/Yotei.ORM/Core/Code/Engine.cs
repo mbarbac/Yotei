@@ -5,7 +5,7 @@
 /// <inheritdoc cref="IEngine"/>
 /// </summary>
 [WithGenerator]
-public abstract partial class Engine : IEngine
+public partial class Engine : IEngine
 {
     public const bool CASESENSITIVENAMES = false;
     public const string NULLVALUELITERAL = "NULL";
@@ -20,12 +20,12 @@ public abstract partial class Engine : IEngine
     // ----------------------------------------------------
 
     /// <summary>
-    /// Initializes a new default instance.
+    /// Initializes a new empty instance.
     /// </summary>
     public Engine() { }
 
     /// <summary>
-    /// Copy constructor.
+    /// Copy constructor
     /// </summary>
     /// <param name="source"></param>
     protected Engine(Engine source)
@@ -51,12 +51,12 @@ public abstract partial class Engine : IEngine
     // ----------------------------------------------------
 
     /// <summary>
-    /// <inheritdoc/>
+    /// <<inheritdoc/>
     /// </summary>
     public bool CaseSensitiveNames { get; init; } = CASESENSITIVENAMES;
 
     /// <summary>
-    /// <inheritdoc/>
+    /// <<inheritdoc/>
     /// </summary>
     public string NullValueLiteral
     {
@@ -66,12 +66,12 @@ public abstract partial class Engine : IEngine
     string _NullValueLiteral = NULLVALUELITERAL;
 
     /// <summary>
-    /// <inheritdoc/>
+    /// <<inheritdoc/>
     /// </summary>
     public bool NativePaging { get; init; } = NATIVEPAGING;
 
     /// <summary>
-    /// <inheritdoc/>
+    /// <<inheritdoc/>
     /// </summary>
     public string ParameterPrefix
     {
@@ -81,12 +81,12 @@ public abstract partial class Engine : IEngine
     string _ParameterPrefix = PARAMETERPREFIX;
 
     /// <summary>
-    /// <inheritdoc/>
+    /// <<inheritdoc/>
     /// </summary>
     public bool PositionalParameters { get; init; } = POSITIONALPARAMETERS;
 
     /// <summary>
-    /// <inheritdoc/>
+    /// <<inheritdoc/>
     /// </summary>
     public bool UseTerminators { get; init; } = USETERMINATORS;
 
@@ -99,7 +99,7 @@ public abstract partial class Engine : IEngine
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// <<inheritdoc/>
     /// </summary>
     public char LeftTerminator
     {
@@ -109,7 +109,7 @@ public abstract partial class Engine : IEngine
     char _LeftTerminator = LEFTERMINATOR;
 
     /// <summary>
-    /// <inheritdoc/>
+    /// <<inheritdoc/>
     /// </summary>
     public char RightTerminator
     {
@@ -117,4 +117,15 @@ public abstract partial class Engine : IEngine
         init => _RightTerminator = ValidateTerminator(value);
     }
     char _RightTerminator = RIGHTTERMINATOR;
+
+    /// <summary>
+    /// The collection of the well-known metadata tags for this engine, for the purposes of the
+    /// framework.
+    /// </summary>
+    public IKnownTags KnownTags
+    {
+        get => _KnownTags;
+        init => _KnownTags = value.ThrowWhenNull();
+    }
+    IKnownTags _KnownTags = new KnownTags(CASESENSITIVETAGS);
 }

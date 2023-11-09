@@ -4,7 +4,7 @@
 /// <summary>
 /// <inheritdoc cref="IParameter"/>
 /// </summary>
-[WithGenerator]
+[WithGenerator(PreventVirtual = true)]
 public partial class Parameter : IParameter
 {
     /// <summary>
@@ -36,10 +36,8 @@ public partial class Parameter : IParameter
     /// <returns><inheritdoc/></returns>
     public override string ToString() => $"{Name}='{Value.Sketch()}'";
 
-    // ----------------------------------------------------
-
     /// <summary>
-    /// <inheritdoc/>
+    /// The name of this parameter.
     /// </summary>
     public string Name
     {
@@ -49,7 +47,7 @@ public partial class Parameter : IParameter
     string _Name = default!;
 
     /// <summary>
-    /// <inheritdoc/>
+    /// The value carried by this parameter.
     /// </summary>
     public object? Value { get; init; }
 }

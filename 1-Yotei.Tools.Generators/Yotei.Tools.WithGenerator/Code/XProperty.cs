@@ -33,7 +33,7 @@ internal class XProperty : PropertyNode
 
         if (!context.PropertyHasGetter(Symbol)) return false;
 
-        if (!HostType.IsInterface() &&
+        if (!Symbol.ContainingType.IsInterface() &&
             !context.PropertyHasSetter(Symbol)) return false;
 
         return true;

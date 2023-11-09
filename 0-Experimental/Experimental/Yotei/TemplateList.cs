@@ -1,108 +1,48 @@
-﻿using THost = Experimental.Lists.IInvariantList;
-using TItem = Experimental.Lists.IElement;
-using TKey = string;
+﻿using THost = Experimental.Yotei.ITemplateList;
+using TItem = Experimental.Yotei.ITemplateElement;
+using TKey = Experimental.Yotei.ITemplateKey;
 
-namespace Experimental.Lists;
-
-// ========================================================
-/// <summary>
-/// ...
-/// </summary>
-public class NameElement(string name) : TItem
-{
-    /// <summary>
-    /// ...
-    /// </summary>
-    public string Name { get; set; } = name.ThrowWhenNull();
-}
+namespace Experimental.Yotei;
 
 // ========================================================
 /// <summary>
 /// <inheritdoc cref="THost"/>
 /// </summary>
 [DebuggerDisplay("{ToDebugString()}")]
-public class InvariantList : THost, TItem // To test nested...
+[Cloneable]
+public partial class TemplateList : THost
 {
-    /// <summary>Represents the collection of elements in its host instance.</summary>
-    protected class InnerList : CoreList<TKey, TItem>
-    {
-        InvariantList Master;
-        public InnerList(InvariantList master) => Master = master.ThrowWhenNull();
-        protected InnerList(InnerList source) : this(source.Master) => AddRange(source);
-        public override InnerList Clone() => new(this);
-
-        public override TItem ValidateItem(TItem item) => item.ThrowWhenNull();
-        public override TKey GetKey(TItem item)
-        {
-            if (item is NameElement named) return named.Name;
-            throw new ArgumentException("Cannot obtain key from the given item.").WithData(item);
-        }
-        public override TKey ValidateKey(TKey key) => key.NotNullNotEmpty();
-        public override bool CompareKeys(TKey source, TKey target)
-        {
-            return string.Compare(source, target, !Master.CaseSensitive) == 0;
-        }
-        public override bool AcceptDuplicate(TItem item)
-        {
-            if (this.Any(x => ReferenceEquals(x, item))) return true;
-            throw new DuplicateException("Element is duplicated.").WithData(item);
-        }
-        public override bool ExpandNested(TItem item) => true;
-    }
-
-    /// <summary>Obtains a new inner list to hold the elements of this collection.</summary>
-    protected virtual InnerList CreateInnerList() => new(this);
-
-    /// <summary>The actual collection of elements of this instance.</summary>
-    protected InnerList Items { get; }
-
-    // ----------------------------------------------------
-
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    /// <param name="sensitive"></param>
-    public InvariantList(bool sensitive)
+    public TemplateList()
     {
         Items = CreateInnerList();
-        CaseSensitive = sensitive;
     }
 
     /// <summary>
     /// Initializes a new instance with the given element.
     /// </summary>
-    /// <param name="sensitive"></param>
     /// <param name="item"></param>
-    public InvariantList(bool sensitive, TItem item) : this(sensitive) => Items.Add(item);
+    public TemplateList(TItem item) : this() => Items.Add(item);
 
     /// <summary>
     /// Initializes a new instance with the elements from the given range.
     /// </summary>
-    /// <param name="sensitive"></param>
     /// <param name="range"></param>
-    public InvariantList(
-        bool sensitive, IEnumerable<TItem> range) : this(sensitive) => Items.AddRange(range);
+    public TemplateList(IEnumerable<TItem> range) : this() => Items.AddRange(range);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected InvariantList(InvariantList source)
+    protected TemplateList(TemplateList source)
     {
         source.ThrowWhenNull();
 
         Items = CreateInnerList();
-        CaseSensitive = source.CaseSensitive;
-        Items.AddRange(source);
+        Items.AddRange(source.Items);
     }
-
-    /// <summary>
-    /// <inheritdoc cref="THost.Clone"/>
-    /// </summary>
-    /// <returns></returns>
-    public virtual InvariantList Clone() => new(this);
-    THost THost.Clone() => Clone();
-    object ICloneable.Clone() => Clone();
 
     /// <summary>
     /// <inheritdoc/>
@@ -115,55 +55,45 @@ public class InvariantList : THost, TItem // To test nested...
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => Items.ToString();
+    public override string ToString() => $"Count: {Count}";
 
     /// <summary>
-    /// Obtains a string representation of this instance for DEBUG purposes.
+    /// Invoked to obtain a string representation of this instance for DEBUG purposes.
     /// </summary>
-    string ToDebugString() => Items.ToDebugString();
-
-    /// <summary>
-    /// Invoked to reload the contents of this instance after a change in its behavior.
-    /// </summary>
-    void ReLoad()
-    {
-        if (Count == 0) return;
-
-        var range = Items.ToArray();
-        Items.Clear();
-        Items.AddRange(range);
-    }
+    /// <returns></returns>
+    protected string ToDebugString() => Items.ToDebugString();
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// ...
+    /// Represents the internal collection of elements in this instance.
     /// </summary>
-    public bool CaseSensitive
+    protected class InnerList : CoreList<TKey, TItem>
     {
-        get => _CaseSensitive;
-        init
-        {
-            if (_CaseSensitive == value) return;
-            _CaseSensitive = value;
+        readonly THost Master;
+        public InnerList(THost master) => Master = master.ThrowWhenNull();
+        public new string ToDebugString() => base.ToDebugString();
 
-            ReLoad();
-        }
+        public override TItem ValidateItem(TItem item) => base.ValidateItem(item);
+        public override TKey GetKey(TItem item) => base.GetKey(item);
+        public override TKey ValidateKey(TKey key) => base.ValidateKey(key);
+        public override bool CompareKeys(TKey source, TKey target) => base.CompareKeys(source, target);
+        public override bool AcceptDuplicate(TItem item) => base.AcceptDuplicate(item);
+        public override bool ExpandNested(TItem item) => base.ExpandNested(item);
     }
-    bool _CaseSensitive;
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Obtains an inner list to be used by this instance.
     /// </summary>
-    /// <param name="value"></param>
     /// <returns></returns>
-    public virtual THost WithCaseSensitive(bool value)
-    {
-        if (CaseSensitive == value) return this;
+    protected virtual InnerList CreateInnerList() => new(this);
 
-        var temp = new InvariantList(this) { CaseSensitive = value };
-        return temp;
-    }
+    /// <summary>
+    /// The internal collection of elements in this instance.
+    /// </summary>
+    protected InnerList Items { get; }
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// <inheritdoc/>
@@ -258,7 +188,7 @@ public class InvariantList : THost, TItem // To test nested...
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual THost GetRange(int index, int count)
+    public THost GetRange(int index, int count)
     {
         if (count == Count && index == 0) return this;
         if (count == 0)
@@ -268,8 +198,8 @@ public class InvariantList : THost, TItem // To test nested...
         }
 
         var range = Items.GetRange(index, count);
-        var temp = Clone();
 
+        var temp = Clone();
         temp.Items.Clear();
         temp.Items.AddRange(range);
         return temp;
@@ -281,7 +211,7 @@ public class InvariantList : THost, TItem // To test nested...
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual THost Replace(int index, TItem item)
+    public THost Replace(int index, TItem item)
     {
         var temp = Clone();
         var num = temp.Items.Replace(index, item);
@@ -293,7 +223,7 @@ public class InvariantList : THost, TItem // To test nested...
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual THost Add(TItem item)
+    public THost Add(TItem item)
     {
         var temp = Clone();
         var num = temp.Items.Add(item);
@@ -305,7 +235,7 @@ public class InvariantList : THost, TItem // To test nested...
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual THost AddRange(IEnumerable<TItem> range)
+    public THost AddRange(IEnumerable<TItem> range)
     {
         var temp = Clone();
         var num = temp.Items.AddRange(range);
@@ -318,7 +248,7 @@ public class InvariantList : THost, TItem // To test nested...
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual THost Insert(int index, TItem item)
+    public THost Insert(int index, TItem item)
     {
         var temp = Clone();
         var num = temp.Items.Insert(index, item);
@@ -331,7 +261,7 @@ public class InvariantList : THost, TItem // To test nested...
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual THost InsertRange(int index, IEnumerable<TItem> range)
+    public THost InsertRange(int index, IEnumerable<TItem> range)
     {
         var temp = Clone();
         var num = temp.Items.InsertRange(index, range);
@@ -343,7 +273,7 @@ public class InvariantList : THost, TItem // To test nested...
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public virtual THost RemoveAt(int index)
+    public THost RemoveAt(int index)
     {
         var temp = Clone();
         var num = temp.Items.RemoveAt(index);
@@ -356,7 +286,7 @@ public class InvariantList : THost, TItem // To test nested...
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual THost RemoveRange(int index, int count)
+    public THost RemoveRange(int index, int count)
     {
         var temp = Clone();
         var num = temp.Items.RemoveRange(index, count);
@@ -368,7 +298,7 @@ public class InvariantList : THost, TItem // To test nested...
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public virtual THost Remove(TKey key)
+    public THost Remove(TKey key)
     {
         var temp = Clone();
         var num = temp.Items.Remove(key);
@@ -380,7 +310,7 @@ public class InvariantList : THost, TItem // To test nested...
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public virtual THost RemoveLast(TKey key)
+    public THost RemoveLast(TKey key)
     {
         var temp = Clone();
         var num = temp.Items.RemoveLast(key);
@@ -392,7 +322,7 @@ public class InvariantList : THost, TItem // To test nested...
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public virtual THost RemoveAll(TKey key)
+    public THost RemoveAll(TKey key)
     {
         var temp = Clone();
         var num = temp.Items.RemoveAll(key);
@@ -404,7 +334,7 @@ public class InvariantList : THost, TItem // To test nested...
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual THost Remove(Predicate<TItem> predicate)
+    public THost Remove(Predicate<TItem> predicate)
     {
         var temp = Clone();
         var num = temp.Items.Remove(predicate);
@@ -416,7 +346,7 @@ public class InvariantList : THost, TItem // To test nested...
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual THost RemoveLast(Predicate<TItem> predicate)
+    public THost RemoveLast(Predicate<TItem> predicate)
     {
         var temp = Clone();
         var num = temp.Items.RemoveLast(predicate);
@@ -428,7 +358,7 @@ public class InvariantList : THost, TItem // To test nested...
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual THost RemoveAll(Predicate<TItem> predicate)
+    public THost RemoveAll(Predicate<TItem> predicate)
     {
         var temp = Clone();
         var num = temp.Items.RemoveAll(predicate);
@@ -439,7 +369,7 @@ public class InvariantList : THost, TItem // To test nested...
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual THost Clear()
+    public THost Clear()
     {
         var temp = Clone();
         var num = temp.Items.Clear();

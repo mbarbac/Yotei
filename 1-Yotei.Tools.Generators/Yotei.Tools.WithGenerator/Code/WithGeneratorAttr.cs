@@ -50,7 +50,7 @@ internal static class WithGeneratorAttr
                 /// default value of this property is 'false' meaning that the generated methods
                 /// are either 'virtual' or 'override' ones.
                 /// </summary>
-                public string? {{PreventVirtual}} { get; set; }
+                public bool {{PreventVirtual}} { get; set; }
             }
         }
         """;

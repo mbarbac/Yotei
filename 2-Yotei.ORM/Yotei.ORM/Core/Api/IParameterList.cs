@@ -6,8 +6,8 @@ namespace Yotei.ORM;
 
 // ========================================================
 /// <summary>
-/// An immutable object that represents the collection of parameter in a command.
-/// Elements with duplicate names are allowed as far as they are exactly the same instance.
+/// An immutable object that represents the ordered collection of parameters in a command.
+/// <br/> Elements with duplicate names are allowed as far as they are the same instance.
 /// </summary>
 [Cloneable]
 public partial interface IParameterList : IEnumerable<TItem>

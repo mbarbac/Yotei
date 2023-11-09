@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// An immutable object that represents parameter in a command.
+/// An immutable object that represents a parameter in a command.
 /// </summary>
 public partial interface IParameter
 {
