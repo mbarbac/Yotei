@@ -1,0 +1,401 @@
+using NuGet.Frameworks;
+
+namespace Yotei.ORM.Tests;
+
+// ========================================================
+//[Enforced]
+public static class Test_SchemaEntry
+{
+    //[Enforced]
+    [Fact]
+    public static void Test_Create_Empty()
+    {
+        var engine = new FakeEngine();
+        var entry = new SchemaEntry(engine);
+
+        Assert.Equal(6, entry.Count);
+        Assert.True(entry.Contains(engine.KnownTags.IdentifierTags[0]));
+        Assert.True(entry.Contains(engine.KnownTags.IdentifierTags[1]));
+        Assert.True(entry.Contains(engine.KnownTags.IdentifierTags[2]));
+        Assert.True(entry.Contains(engine.KnownTags.PrimaryKeyTag!));
+        Assert.True(entry.Contains(engine.KnownTags.UniqueValuedTag!));
+        Assert.True(entry.Contains(engine.KnownTags.ReadOnlyTag!));
+
+        Assert.Null(entry.Identifier.Value);
+        Assert.False(entry.IsPrimaryKey);
+        Assert.False(entry.IsUniqueValued);
+        Assert.False(entry.IsReadOnly);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Create_Populated()
+    {
+        var engine = new FakeEngine();
+        var entry = new SchemaEntry(
+            engine,
+            "one.two",
+            isUniqueValued: true,
+            metadata: [new MetadataPair("age", 50)]);
+
+        Assert.Equal(7, entry.Count);
+        Assert.True(entry.Contains(engine.KnownTags.IdentifierTags[0]));
+        Assert.True(entry.Contains(engine.KnownTags.IdentifierTags[1]));
+        Assert.True(entry.Contains(engine.KnownTags.IdentifierTags[2]));
+        Assert.True(entry.Contains(engine.KnownTags.PrimaryKeyTag!));
+        Assert.True(entry.Contains(engine.KnownTags.UniqueValuedTag!));
+        Assert.True(entry.Contains(engine.KnownTags.ReadOnlyTag!));
+        Assert.True(entry.Contains("age"));
+
+        Assert.Equal("[one].[two]", entry.Identifier.Value);
+        Assert.False(entry.IsPrimaryKey);
+        Assert.True(entry.IsUniqueValued);
+        Assert.False(entry.IsReadOnly);
+        Assert.True(entry.ContainsItem("age", 50));
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Create_Only_Metadata()
+    {
+        var engine = new FakeEngine();
+        var entry = new SchemaEntry(
+            engine,
+            metadata: [
+                new MetadataPair(engine.KnownTags.IdentifierTags[0], "one"),
+                new MetadataPair(engine.KnownTags.IdentifierTags[2], "three"),
+                new MetadataPair(engine.KnownTags.UniqueValuedTag!, true),
+                new MetadataPair("age", 50)
+            ]);
+
+        Assert.Equal(7, entry.Count);
+        Assert.True(entry.Contains(engine.KnownTags.IdentifierTags[0]));
+        Assert.True(entry.Contains(engine.KnownTags.IdentifierTags[1]));
+        Assert.True(entry.Contains(engine.KnownTags.IdentifierTags[2]));
+        Assert.True(entry.Contains(engine.KnownTags.PrimaryKeyTag!));
+        Assert.True(entry.Contains(engine.KnownTags.UniqueValuedTag!));
+        Assert.True(entry.Contains(engine.KnownTags.ReadOnlyTag!));
+        Assert.True(entry.Contains("age"));
+
+        Assert.Equal("[one]..[three]", entry.Identifier.Value);
+        Assert.False(entry.IsPrimaryKey);
+        Assert.True(entry.IsUniqueValued);
+        Assert.False(entry.IsReadOnly);
+        Assert.True(entry.ContainsItem("age", 50));
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Clone()
+    {
+        var engine = new FakeEngine();
+        var source = new SchemaEntry(
+            engine, "one.two", isUniqueValued: true,
+            metadata: [new MetadataPair("age", 50)]);
+
+        var target = source.Clone();
+        Assert.NotSame(source, target);
+
+        Assert.Equal(7, target.Count);
+        Assert.True(target.Contains(engine.KnownTags.IdentifierTags[0]));
+        Assert.True(target.Contains(engine.KnownTags.IdentifierTags[1]));
+        Assert.True(target.Contains(engine.KnownTags.IdentifierTags[2]));
+        Assert.True(target.Contains(engine.KnownTags.PrimaryKeyTag!));
+        Assert.True(target.Contains(engine.KnownTags.UniqueValuedTag!));
+        Assert.True(target.Contains(engine.KnownTags.ReadOnlyTag!));
+        Assert.True(target.Contains("age"));
+
+        Assert.Equal("[one].[two]", target.Identifier.Value);
+        Assert.False(target.IsPrimaryKey);
+        Assert.True(target.IsUniqueValued);
+        Assert.False(target.IsReadOnly);
+        Assert.True(target.ContainsItem("age", 50));
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Equality()
+    {
+        var engine = new FakeEngine();
+        var source = new SchemaEntry(
+            engine, "one.two", isUniqueValued: true,
+            metadata: [new MetadataPair("age", 50)]);
+
+        var target = source.Clone();
+        Assert.Equal(source, target);
+
+        target = new SchemaEntry(
+            engine, "one.two", isUniqueValued: true,
+            metadata: [new MetadataPair("age", 50)]);
+        Assert.Equal(source, target);
+
+        target = new SchemaEntry(
+            engine, "one.two", isUniqueValued: true,
+            metadata: [new MetadataPair("age", 51)]);
+        Assert.NotEqual(source, target);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_WithIdentifier()
+    {
+        var engine = new FakeEngine();
+        var source = new SchemaEntry(
+            engine, "one.two.three", isUniqueValued: true,
+            metadata: [new MetadataPair("age", 50)]);
+
+        var target = source.WithIdentifier(new Identifier(engine, "x"));
+        Assert.NotSame(source, target);
+        Assert.Equal(7, target.Count);
+        Assert.Equal("[x]", target.Identifier.Value);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_WithPrimaryKey()
+    {
+        var engine = new FakeEngine();
+        var source = new SchemaEntry(
+            engine, "one.two.three",
+            metadata: [new MetadataPair("age", 50)]);
+
+        var target = source.WithIsPrimaryKey(true);
+        Assert.NotSame(source, target);
+        Assert.Equal(7, target.Count);
+        Assert.True(target.IsPrimaryKey);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_WithUniqueValued()
+    {
+        var engine = new FakeEngine();
+        var source = new SchemaEntry(
+            engine, "one.two.three",
+            metadata: [new MetadataPair("age", 50)]);
+
+        var target = source.WithIsUniqueValued(true);
+        Assert.NotSame(source, target);
+        Assert.Equal(7, target.Count);
+        Assert.True(target.IsUniqueValued);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_WithReadOnly()
+    {
+        var engine = new FakeEngine();
+        var source = new SchemaEntry(
+            engine, "one.two.three",
+            metadata: [new MetadataPair("age", 50)]);
+
+        var target = source.WithIsReadOnly(true);
+        Assert.NotSame(source, target);
+        Assert.Equal(7, target.Count);
+        Assert.True(target.IsReadOnly);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Replace_Identifier()
+    {
+        var engine = new FakeEngine();
+        var source = new SchemaEntry(
+            engine, "one.two.three", isUniqueValued: true,
+            metadata: [new MetadataPair("age", 50)]);
+
+        var target = source.Replace(engine.KnownTags.IdentifierTags[0], "ONE");
+        Assert.NotSame(source, target);
+        Assert.Equal(7, target.Count);
+        Assert.Equal("[ONE].[two].[three]", target.Identifier.Value);
+
+        target = source.Replace(engine.KnownTags.IdentifierTags[1], null);
+        Assert.NotSame(source, target);
+        Assert.Equal(7, target.Count);
+        Assert.Equal("[one]..[three]", target.Identifier.Value);
+
+        target = source.Replace(engine.KnownTags.IdentifierTags[2], null);
+        Assert.NotSame(source, target);
+        Assert.Equal(7, target.Count);
+        Assert.Equal("[one].[two].", target.Identifier.Value);
+
+        try { _ = source.Replace(engine.KnownTags.IdentifierTags[0], 1); Assert.Fail(); }
+        catch (ArgumentException) { }
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Replace_WellKnown()
+    {
+        var engine = new FakeEngine();
+        var source = new SchemaEntry(
+            engine, "one.two.three",
+            metadata: [new MetadataPair("age", 50)]);
+
+        var target = source.Replace(engine.KnownTags.PrimaryKeyTag!, true);
+        Assert.NotSame(source, target);
+        Assert.Equal(7, target.Count);
+        Assert.True(target.IsPrimaryKey);
+
+        target = source.Replace(engine.KnownTags.UniqueValuedTag!, true);
+        Assert.NotSame(source, target);
+        Assert.Equal(7, target.Count);
+        Assert.True(target.IsUniqueValued);
+
+        target = source.Replace(engine.KnownTags.ReadOnlyTag!, true);
+        Assert.NotSame(source, target);
+        Assert.Equal(7, target.Count);
+        Assert.True(target.IsReadOnly);
+
+        try { _ = source.Replace(engine.KnownTags.PrimaryKeyTag!, 1); Assert.Fail(); }
+        catch (ArgumentException) { }
+
+        try { _ = source.Replace(engine.KnownTags.UniqueValuedTag!, 1); Assert.Fail(); }
+        catch (ArgumentException) { }
+
+        try { _ = source.Replace(engine.KnownTags.ReadOnlyTag!, 1); Assert.Fail(); }
+        catch (ArgumentException) { }
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Replace_Other()
+    {
+        var engine = new FakeEngine();
+        var source = new SchemaEntry(
+            engine, "one.two.three",
+            metadata: [new MetadataPair("age", 50)]);
+
+        var target = source.Replace("AGE", 60);
+        Assert.NotSame(source, target);
+        Assert.Equal(7, target.Count);
+        Assert.True(target.ContainsItem("AGE", 60));
+
+        target = source.Replace("any", "other");
+        Assert.NotSame(source, target);
+        Assert.Equal(8, target.Count);
+        Assert.True(target.ContainsItem("ANY", "other"));
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Add_WellKnow()
+    {
+        var engine = new FakeEngine();
+        var source = new SchemaEntry(
+            engine, "one.two.three",
+            metadata: [new MetadataPair("age", 50)]);
+
+        var tag = engine.KnownTags.IdentifierTags[0];
+        var target = source.Add(new(tag, "ONE"));
+        Assert.NotSame(source, target);
+        Assert.Equal(7, target.Count);
+        Assert.Equal("[ONE].[two].[three]", target.Identifier.Value);
+
+        try { source.Add(new(tag, 1)); Assert.Fail(); }
+        catch (ArgumentException) { }
+
+        tag = engine.KnownTags.PrimaryKeyTag;
+        target = source.Add(new(tag!, true));
+        Assert.NotSame(source, target);
+        Assert.Equal(7, target.Count);
+        Assert.True(target.IsPrimaryKey);
+
+        try { source.Add(new(tag!, 1)); Assert.Fail(); }
+        catch (ArgumentException) { }
+
+        tag = engine.KnownTags.UniqueValuedTag;
+        target = source.Add(new(tag!, true));
+        Assert.NotSame(source, target);
+        Assert.Equal(7, target.Count);
+        Assert.True(target.IsUniqueValued);
+
+        try { source.Add(new(tag!, 1)); Assert.Fail(); }
+        catch (ArgumentException) { }
+
+        tag = engine.KnownTags.ReadOnlyTag;
+        target = source.Add(new(tag!, true));
+        Assert.NotSame(source, target);
+        Assert.Equal(7, target.Count);
+        Assert.True(target.IsReadOnly);
+
+        try { source.Add(new(tag!, 1)); Assert.Fail(); }
+        catch (ArgumentException) { }
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Add_Other()
+    {
+        var engine = new FakeEngine();
+        var source = new SchemaEntry(
+            engine, "one.two.three",
+            metadata: [new MetadataPair("age", 50)]);
+
+        var target = source.Add(new("any", "other"));
+        Assert.NotSame(source, target);
+        Assert.Equal(8, target.Count);
+        Assert.True(target.ContainsItem("ANY", "other"));
+
+        try { target.Add(new("any", "another")); Assert.Fail(); }
+        catch (DuplicateException) { }
+
+        try { source.Add(new()); Assert.Fail(); }
+        catch (ArgumentNullException) { }
+
+        try { source.Add(new("", 1)); Assert.Fail(); }
+        catch (EmptyException) { }
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Remove()
+    {
+        var engine = new FakeEngine();
+        var source = new SchemaEntry(
+            engine, "one.two.three", isUniqueValued: true,
+            metadata: [new MetadataPair("age", 50)]);
+
+        var tag = engine.KnownTags.IdentifierTags[0];
+        var target = source.Remove(tag);
+        Assert.NotSame(source, target);
+        Assert.Equal(7, target.Count);
+        Assert.Equal("[two].[three]", target.Identifier.Value);
+
+        tag = engine.KnownTags.IdentifierTags[1];
+        target = source.Remove(tag);
+        Assert.NotSame(source, target);
+        Assert.Equal(7, target.Count);
+        Assert.Equal("[one]..[three]", target.Identifier.Value);
+
+        tag = engine.KnownTags.IdentifierTags[2];
+        target = source.Remove(tag);
+        Assert.NotSame(source, target);
+        Assert.Equal(7, target.Count);
+        Assert.Equal("[one].[two].", target.Identifier.Value);
+
+        tag = engine.KnownTags.UniqueValuedTag!;
+        target = source.Remove(tag!);
+        Assert.NotSame(source, target);
+        Assert.Equal(7, target.Count);
+        Assert.False(target.IsUniqueValued);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Clear()
+    {
+        var engine = new FakeEngine();
+        var source = new SchemaEntry(
+            engine, "one.two.three", isUniqueValued: true,
+            metadata: [new MetadataPair("age", 50)]);
+
+        var target = source.Clear();
+        Assert.NotSame(source, target);
+        Assert.Equal(6, target.Count);
+        Assert.Null(target.Identifier.Value);
+        Assert.False(target.IsPrimaryKey);
+        Assert.False(target.IsUniqueValued);
+        Assert.False(target.IsReadOnly);
+    }
+}

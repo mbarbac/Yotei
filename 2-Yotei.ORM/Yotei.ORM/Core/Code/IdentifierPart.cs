@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Yotei.ORM.Code;
+﻿namespace Yotei.ORM.Code;
 
 // ========================================================
 /// <summary>
@@ -27,8 +25,36 @@ public class IdentifierPart : IIdentifierPart
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    public override bool Equals(object? obj)
+    {
+        if (obj is not IIdentifierPart other) return false;
+
+        if (!Engine.Equals(other.Engine)) return false;
+        if (string.Compare(Value, other.Value, !Engine.CaseSensitiveNames) != 0) return false;
+
+        return true;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public override int GetHashCode()
+    {
+        var code = HashCode.Combine(Engine.GetHashCode());
+        code = HashCode.Combine(code, Value);
+        return code;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     /// <returns></returns>
     public override string ToString() => Value ?? string.Empty;
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// <inheritdoc/>

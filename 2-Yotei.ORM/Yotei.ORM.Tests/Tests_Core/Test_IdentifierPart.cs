@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Yotei.ORM.Tests;
 
 // ========================================================
@@ -91,5 +93,20 @@ public static class Test_IdentifierPart
 
         try { _ = new IdentifierPart(engine, "one.two"); Assert.Fail(); }
         catch (ArgumentException) { }
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Equality()
+    {
+        var engine = new FakeEngine();
+        var source = new IdentifierPart(engine, "one");
+        var target = new IdentifierPart(engine, "ONE");
+        Assert.Equal(source, target);
+
+        engine = new FakeEngine() { CaseSensitiveNames = true };
+        source = new IdentifierPart(engine, "one");
+        target = new IdentifierPart(engine, "ONE");
+        Assert.NotEqual(source, target);
     }
 }

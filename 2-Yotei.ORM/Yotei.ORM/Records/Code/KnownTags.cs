@@ -73,6 +73,38 @@ public partial class KnownTags : IKnownTags
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    public override bool Equals(object? obj)
+    {
+        if (obj is not IKnownTags other) return false;
+
+        if (CaseSensitiveTags != other.CaseSensitiveTags) return false;
+        if (!IdentifierTags.Equals(other.IdentifierTags)) return false;
+        if (!Compare(PrimaryKeyTag!, other.PrimaryKeyTag!)) return false;
+        if (!Compare(UniqueValuedTag!, other.UniqueValuedTag!)) return false;
+        if (!Compare(PrimaryKeyTag!, other.PrimaryKeyTag!)) return false;
+
+        return true;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public override int GetHashCode()
+    {
+        var code = HashCode.Combine(CaseSensitiveTags);
+        code = HashCode.Combine(code, IdentifierTags.GetHashCode());
+        if (PrimaryKeyTag != null) code = HashCode.Combine(code, PrimaryKeyTag);
+        if (UniqueValuedTag != null) code = HashCode.Combine(code, UniqueValuedTag);
+        if (ReadOnlyTag != null) code = HashCode.Combine(code, ReadOnlyTag);
+        return code;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     /// <returns></returns>
     public override string ToString()
     {

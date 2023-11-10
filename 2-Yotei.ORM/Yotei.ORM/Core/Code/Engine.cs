@@ -1,4 +1,5 @@
-﻿namespace Yotei.ORM.Code;
+﻿
+namespace Yotei.ORM.Code;
 
 // ========================================================
 /// <summary>
@@ -40,6 +41,7 @@ public partial class Engine : IEngine
         UseTerminators = source.UseTerminators;
         LeftTerminator = source.LeftTerminator;
         RightTerminator = source.RightTerminator;
+        KnownTags = source.KnownTags;
     }
 
     /// <summary>
@@ -47,6 +49,46 @@ public partial class Engine : IEngine
     /// </summary>
     /// <returns></returns>
     public override string ToString() => "ORM.Engine";
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    public override bool Equals(object? obj)
+    {
+        if (obj is not IEngine other) return false;
+
+        if (CaseSensitiveNames != other.CaseSensitiveNames) return false;
+        if (!NullValueLiteral.Equals(other.NullValueLiteral)) return false;
+        if (NativePaging != other.NativePaging) return false;
+        if (!ParameterPrefix.Equals(other.ParameterPrefix)) return false;
+        if (PositionalParameters != other.PositionalParameters) return false;
+        if (UseTerminators != other.UseTerminators) return false;
+        if (LeftTerminator != other.LeftTerminator) return false;
+        if (RightTerminator != other.RightTerminator) return false;
+        if (!KnownTags.Equals(other.KnownTags)) return false;
+
+        return true;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public override int GetHashCode()
+    {
+        var code = HashCode.Combine(CaseSensitiveNames);
+        code = HashCode.Combine(code, NullValueLiteral);
+        code = HashCode.Combine(code, NativePaging);
+        code = HashCode.Combine(code, ParameterPrefix);
+        code = HashCode.Combine(code, PositionalParameters);
+        code = HashCode.Combine(code, UseTerminators);
+        code = HashCode.Combine(code, LeftTerminator);
+        code = HashCode.Combine(code, RightTerminator);
+        code = HashCode.Combine(code, KnownTags.GetHashCode());
+        return code;
+    }
 
     // ----------------------------------------------------
 

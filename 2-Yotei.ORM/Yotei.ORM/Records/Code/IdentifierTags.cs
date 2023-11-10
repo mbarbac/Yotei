@@ -60,6 +60,34 @@ public partial class IdentifierTags : THost
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    public override bool Equals(object? obj)
+    {
+        if (obj is not THost other) return false;
+
+        if (CaseSensitiveTags != other.CaseSensitiveTags) return false;
+        if (Count != other.Count) return false;
+        for (int i = 0; i < Count; i++)
+            if (string.Compare(this[i], other[i], !CaseSensitiveTags) != 0) return false;
+
+        return true;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public override int GetHashCode()
+    {
+        var code = HashCode.Combine(CaseSensitiveTags);
+        for (int i = 0; i < Count; i++) code = HashCode.Combine(code, this[i]);
+        return code;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     /// <returns></returns>
     public override string ToString() => string.Join('.', Items);
 

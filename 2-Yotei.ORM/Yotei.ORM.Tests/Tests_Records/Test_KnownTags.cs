@@ -31,6 +31,18 @@ public static class Test_KnownTags
 
     //[Enforced]
     [Fact]
+    public static void Test_Equality()
+    {
+        var source = new FakeKnownTags();
+        var target = new FakeKnownTags();
+        Assert.Equal(source, target);
+
+        target = target.WithPrimaryKeyTag("other");
+        Assert.NotEqual(source, target);
+    }
+
+    //[Enforced]
+    [Fact]
     public static void Test_With_Methods()
     {
         var source = new FakeKnownTags();

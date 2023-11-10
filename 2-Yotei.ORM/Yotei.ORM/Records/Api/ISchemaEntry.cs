@@ -63,6 +63,14 @@ public partial interface ISchemaEntry : IEnumerable<TItem>
     bool Contains(string tag);
 
     /// <summary>
+    /// Determines if this instance contains a metadata pair with the given tag and value.
+    /// </summary>
+    /// <param name="tag"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    bool ContainsItem(string tag, object? value);
+
+    /// <summary>
     /// Tries to obtain the value of the metadata pair with the given tag name.
     /// </summary>
     /// <param name="tag"></param>
@@ -106,30 +114,6 @@ public partial interface ISchemaEntry : IEnumerable<TItem>
     /// <param name="tag"></param>
     /// <returns></returns>
     THost Remove(string tag);
-
-    /// <summary>
-    /// Obtains an instance where the first metadata pair that matches the given predicate has
-    /// been removed from the original collection.
-    /// </summary>
-    /// <param name="predicate"></param>
-    /// <returns></returns>
-    THost Remove(Predicate<TItem> predicate);
-
-    /// <summary>
-    /// Obtains an instance where the last metadata pair that matches the given predicate has
-    /// been removed from the original collection.
-    /// </summary>
-    /// <param name="predicate"></param>
-    /// <returns></returns>
-    THost RemoveLast(Predicate<TItem> predicate);
-
-    /// <summary>
-    /// Obtains an instance where all the metadata pairs that match the given predicate have
-    /// been removed from the original collection.
-    /// </summary>
-    /// <param name="predicate"></param>
-    /// <returns></returns>
-    THost RemoveAll(Predicate<TItem> predicate);
 
     /// <summary>
     /// Obtains an instance where all the original elements have been removed.

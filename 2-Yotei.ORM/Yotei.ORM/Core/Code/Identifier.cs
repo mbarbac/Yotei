@@ -25,6 +25,14 @@ public partial class Identifier : IIdentifier
     public Identifier(IEngine engine, string? value) : this(engine) => Value = value;
 
     /// <summary>
+    /// Initializes a new instance with the elements obtained from the given range of values.
+    /// </summary>
+    /// <param name="engine"></param>
+    /// <param name="range"></param>
+    public Identifier(
+        IEngine engine, IEnumerable<string?> range) : this(engine) => AddRangeInternal(range);
+
+    /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
@@ -43,6 +51,32 @@ public partial class Identifier : IIdentifier
     /// <returns></returns>
     public IEnumerator<IIdentifierPart> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    public override bool Equals(object? obj)
+    {
+        if (obj is not IIdentifier other) return false;
+
+        if (!Engine.Equals(other.Engine)) return false;
+        if (string.Compare(Value, other.Value, !Engine.CaseSensitiveNames) != 0) return false;
+
+        return true;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public override int GetHashCode()
+    {
+        var code = HashCode.Combine(Engine.GetHashCode());
+        code = HashCode.Combine(code, Value);
+        return code;
+    }
 
     /// <summary>
     /// <inheritdoc/>

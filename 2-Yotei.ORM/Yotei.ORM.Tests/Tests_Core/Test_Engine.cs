@@ -73,4 +73,16 @@ public static class Test_Engine
         Assert.Null(target.KnownTags.UniqueValuedTag);
         Assert.Null(target.KnownTags.ReadOnlyTag);
     }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Equality()
+    {
+        var source = new FakeEngine();
+        var target = new FakeEngine();
+        Assert.Equal(source, target);
+
+        target = new FakeEngine() { UseTerminators = false };
+        Assert.NotEqual(source, target);
+    }
 }

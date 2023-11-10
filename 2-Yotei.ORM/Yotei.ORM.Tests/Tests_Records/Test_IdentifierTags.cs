@@ -65,6 +65,24 @@ public static class Test_IdentifierTags
 
     //[Enforced]
     [Fact]
+    public static void Test_Equality()
+    {
+        var source = new THost(false, "one.two.three");
+        var target = source.Clone();
+        Assert.True(source.Equals(target));
+
+        target = new THost(false, "one.two.three");
+        Assert.True(source.Equals(target));
+
+        target = new THost(false, "one.TWO.three");
+        Assert.True(source.Equals(target));
+
+        target = new THost(false, "one.x.three");
+        Assert.False(source.Equals(target));
+    }
+
+    //[Enforced]
+    [Fact]
     public static void Test_Find()
     {
         var items = new THost(false, "one.two.three");

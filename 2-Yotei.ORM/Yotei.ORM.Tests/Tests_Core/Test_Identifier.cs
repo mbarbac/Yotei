@@ -19,7 +19,7 @@ public static class Test_Identifier
     public static void Test_Create_Single()
     {
         var engine = new FakeEngine();
-        var items = new Identifier(engine, null);
+        var items = new Identifier(engine, (string?)null);
         Assert.Empty(items);
         Assert.Null(items.Value);
 
@@ -72,6 +72,10 @@ public static class Test_Identifier
         items = new Identifier(engine, "..three");
         Assert.Single(items);
         Assert.Equal("[three]", items.Value);
+
+        items = new Identifier(engine, ["one", "two.three"]);
+        Assert.Equal(3, items.Count);
+        Assert.Equal("[one].[two].[three]", items.Value);
     }
 
     //[Enforced]
@@ -186,6 +190,25 @@ public static class Test_Identifier
         Assert.NotSame(source, target);
         Assert.Equal(source.Count, target.Count);
         Assert.Equal(source.Value, target.Value);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Equality()
+    {
+        var engine = new FakeEngine();
+        var source = new Identifier(engine, "one.two.three");
+        var target = source.Clone();
+        Assert.Equal(source, target);
+
+        target = new Identifier(engine, "one.two.three");
+        Assert.Equal(source, target);
+
+        target = new Identifier(engine, "one.TWO.three");
+        Assert.Equal(source, target);
+
+        target = new Identifier(engine, "one..three");
+        Assert.NotEqual(source, target);
     }
 
     //[Enforced]
