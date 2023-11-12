@@ -8,29 +8,33 @@ namespace Experimental.Yotei;
 /// <summary>
 /// <inheritdoc cref="THost"/>
 /// </summary>
-[DebuggerDisplay("{ToDebugString()}")]
+[DebuggerDisplay("Items.{ToString(6)}")]
 [Cloneable]
 public partial class TemplateList : THost
 {
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    public TemplateList()
+    /// <param name="sensitive"></param>
+    public TemplateList(bool sensitive)
     {
         Items = CreateInnerList();
+        CaseSensitive = sensitive;
     }
 
     /// <summary>
     /// Initializes a new instance with the given element.
     /// </summary>
+    /// <param name="sensitive"></param>
     /// <param name="item"></param>
-    public TemplateList(TItem item) : this() => Items.Add(item);
+    public TemplateList(bool sensitive, TItem item) : this(sensitive) => Items.Add(item);
 
     /// <summary>
     /// Initializes a new instance with the elements from the given range.
     /// </summary>
     /// <param name="range"></param>
-    public TemplateList(IEnumerable<TItem> range) : this() => Items.AddRange(range);
+    public TemplateList(
+        bool sensitive, IEnumerable<TItem> range) : this(sensitive) => Items.AddRange(range);
 
     /// <summary>
     /// Copy constructor.
@@ -41,7 +45,43 @@ public partial class TemplateList : THost
         source.ThrowWhenNull();
 
         Items = CreateInnerList();
+        CaseSensitive = source.CaseSensitive;
         Items.AddRange(source.Items);
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    public virtual bool Equals(THost? other)
+    {
+        if (other is null) return false;
+
+        if (CaseSensitive != other.CaseSensitive) return false;
+        if (Count != other.Count) return false;
+        //for (int i = 0; i < Count; i++)
+        //    if (string.Compare(this[i], other[i], !CaseSensitive) != 0) return false;
+
+        return true;
+    }
+
+    /// <summary>
+    /// Determines if this object is the same as the other given one.
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    public override bool Equals(object? obj) => Equals(obj as THost);
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public override int GetHashCode()
+    {
+        var code = HashCode.Combine(CaseSensitive);
+        for (int i = 0; i < Count; i++) code = HashCode.Combine(code, this[i]);
+        return code;
     }
 
     /// <summary>
@@ -57,43 +97,60 @@ public partial class TemplateList : THost
     /// <returns></returns>
     public override string ToString() => $"Count: {Count}";
 
-    /// <summary>
-    /// Invoked to obtain a string representation of this instance for DEBUG purposes.
-    /// </summary>
-    /// <returns></returns>
-    protected string ToDebugString() => Items.ToDebugString();
-
     // ----------------------------------------------------
 
     /// <summary>
-    /// Represents the internal collection of elements in this instance.
+    /// Represents the container of elements in this instance.
     /// </summary>
-    protected class InnerList : CoreList<TKey, TItem>
+    [DebuggerDisplay("{ToString(6)}")]
+    protected class InnerList(TemplateList master) : CoreList<TKey, TItem>
     {
-        readonly THost Master;
-        public InnerList(THost master) => Master = master.ThrowWhenNull();
-        public new string ToDebugString() => base.ToDebugString();
-
-        public override TItem ValidateItem(TItem item) => base.ValidateItem(item);
-        public override TKey GetKey(TItem item) => base.GetKey(item);
-        public override TKey ValidateKey(TKey key) => base.ValidateKey(key);
-        public override bool CompareKeys(TKey source, TKey target) => base.CompareKeys(source, target);
-        public override bool AcceptDuplicate(TItem item) => base.AcceptDuplicate(item);
-        public override bool ExpandNested(TItem item) => base.ExpandNested(item);
+        TemplateList Master { get; } = master.ThrowWhenNull();
+        public override TItem ValidateItem(TItem item) => item.ThrowWhenNull();
+        public override bool AcceptDuplicate(int index, TItem item)
+        {
+            return this[index].Equals(item)
+                ? true
+                : throw new DuplicateException("Element is duplicated.").WithData(item);
+        }
+        public override TKey GetKey(TItem item) => item.Key;
+        public override TKey ValidateKey(TKey key) => key;
+        public override bool CompareKeys(TKey source, TKey target)
+            => string.Compare(source.Value, target.Value, !Master.CaseSensitive) == 0;
     }
 
     /// <summary>
-    /// Obtains an inner list to be used by this instance.
+    /// Invoked to create the container of elements of this instance.
     /// </summary>
     /// <returns></returns>
     protected virtual InnerList CreateInnerList() => new(this);
 
     /// <summary>
-    /// The internal collection of elements in this instance.
+    /// The actual collection of elements in this instance.
     /// </summary>
     protected InnerList Items { get; }
 
     // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public bool CaseSensitive
+    {
+        get => _CaseSensitive;
+        init
+        {
+            if (_CaseSensitive == value) return;
+            _CaseSensitive = value;
+
+            if (Count == 0) return;
+
+            var range = Items.ToArray();
+            Items.Clear();
+            Items.AddRange(range);
+        }
+    }
+    bool _CaseSensitive;
 
     /// <summary>
     /// <inheritdoc/>
@@ -188,7 +245,7 @@ public partial class TemplateList : THost
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public THost GetRange(int index, int count)
+    public virtual THost GetRange(int index, int count)
     {
         if (count == Count && index == 0) return this;
         if (count == 0)
@@ -198,7 +255,6 @@ public partial class TemplateList : THost
         }
 
         var range = Items.GetRange(index, count);
-
         var temp = Clone();
         temp.Items.Clear();
         temp.Items.AddRange(range);
@@ -211,7 +267,7 @@ public partial class TemplateList : THost
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public THost Replace(int index, TItem item)
+    public virtual THost Replace(int index, TItem item)
     {
         var temp = Clone();
         var num = temp.Items.Replace(index, item);
@@ -223,7 +279,7 @@ public partial class TemplateList : THost
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public THost Add(TItem item)
+    public virtual THost Add(TItem item)
     {
         var temp = Clone();
         var num = temp.Items.Add(item);
@@ -235,7 +291,7 @@ public partial class TemplateList : THost
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public THost AddRange(IEnumerable<TItem> range)
+    public virtual THost AddRange(IEnumerable<TItem> range)
     {
         var temp = Clone();
         var num = temp.Items.AddRange(range);
@@ -248,7 +304,7 @@ public partial class TemplateList : THost
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public THost Insert(int index, TItem item)
+    public virtual THost Insert(int index, TItem item)
     {
         var temp = Clone();
         var num = temp.Items.Insert(index, item);
@@ -261,7 +317,7 @@ public partial class TemplateList : THost
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    public THost InsertRange(int index, IEnumerable<TItem> range)
+    public virtual THost InsertRange(int index, IEnumerable<TItem> range)
     {
         var temp = Clone();
         var num = temp.Items.InsertRange(index, range);
@@ -273,7 +329,7 @@ public partial class TemplateList : THost
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public THost RemoveAt(int index)
+    public virtual THost RemoveAt(int index)
     {
         var temp = Clone();
         var num = temp.Items.RemoveAt(index);
@@ -286,8 +342,10 @@ public partial class TemplateList : THost
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public THost RemoveRange(int index, int count)
+    public virtual THost RemoveRange(int index, int count)
     {
+        if (count == 0) return this;
+
         var temp = Clone();
         var num = temp.Items.RemoveRange(index, count);
         return num > 0 ? temp : this;
@@ -298,7 +356,7 @@ public partial class TemplateList : THost
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public THost Remove(TKey key)
+    public virtual THost Remove(TKey key)
     {
         var temp = Clone();
         var num = temp.Items.Remove(key);
@@ -310,7 +368,7 @@ public partial class TemplateList : THost
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public THost RemoveLast(TKey key)
+    public virtual THost RemoveLast(TKey key)
     {
         var temp = Clone();
         var num = temp.Items.RemoveLast(key);
@@ -322,7 +380,7 @@ public partial class TemplateList : THost
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public THost RemoveAll(TKey key)
+    public virtual THost RemoveAll(TKey key)
     {
         var temp = Clone();
         var num = temp.Items.RemoveAll(key);
@@ -334,7 +392,7 @@ public partial class TemplateList : THost
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public THost Remove(Predicate<TItem> predicate)
+    public virtual THost Remove(Predicate<TItem> predicate)
     {
         var temp = Clone();
         var num = temp.Items.Remove(predicate);
@@ -346,7 +404,7 @@ public partial class TemplateList : THost
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public THost RemoveLast(Predicate<TItem> predicate)
+    public virtual THost RemoveLast(Predicate<TItem> predicate)
     {
         var temp = Clone();
         var num = temp.Items.RemoveLast(predicate);
@@ -358,7 +416,7 @@ public partial class TemplateList : THost
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public THost RemoveAll(Predicate<TItem> predicate)
+    public virtual THost RemoveAll(Predicate<TItem> predicate)
     {
         var temp = Clone();
         var num = temp.Items.RemoveAll(predicate);
@@ -369,7 +427,7 @@ public partial class TemplateList : THost
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public THost Clear()
+    public virtual THost Clear()
     {
         var temp = Clone();
         var num = temp.Items.Clear();

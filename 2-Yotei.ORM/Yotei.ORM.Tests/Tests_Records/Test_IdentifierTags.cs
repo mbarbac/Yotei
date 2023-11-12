@@ -163,11 +163,7 @@ public static class Test_IdentifierTags
         Assert.Same(source, target);
 
         target = source.Replace(0, "ONE");
-        Assert.NotSame(source, target);
-        Assert.Equal(3, target.Count);
-        Assert.Equal("ONE", target[0]);
-        Assert.Equal("two", target[1]);
-        Assert.Equal("three", target[2]);
+        Assert.Same(source, target);
 
         target = source.Replace(0, "x.y");
         Assert.NotSame(source, target);

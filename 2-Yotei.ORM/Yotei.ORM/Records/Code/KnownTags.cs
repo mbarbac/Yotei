@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices.Marshalling;
-
-namespace Yotei.ORM.Records.Code;
+﻿namespace Yotei.ORM.Records.Code;
 
 // ========================================================
 /// <summary>
@@ -8,7 +6,7 @@ namespace Yotei.ORM.Records.Code;
 /// </summary>
 [Cloneable]
 [WithGenerator]
-public partial class KnownTags : IKnownTags
+public sealed partial class KnownTags : IKnownTags
 {
     /// <summary>
     /// Initializes a new default instance.
@@ -46,7 +44,7 @@ public partial class KnownTags : IKnownTags
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected KnownTags(KnownTags source)
+    KnownTags(KnownTags source)
     {
         source.ThrowWhenNull();
 
@@ -148,7 +146,7 @@ public partial class KnownTags : IKnownTags
             _ReadOnlyTag = old.ReadOnlyTag;
         }
     }
-    bool _CaseSensitiveTags = Engine.CASESENSITIVETAGS;
+    bool _CaseSensitiveTags;
 
     /// <summary>
     /// <inheritdoc/>
@@ -308,7 +306,7 @@ public partial class KnownTags : IKnownTags
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual IKnownTags Clear()
+    public IKnownTags Clear()
     {
         if (IsEmpty) return this;
 

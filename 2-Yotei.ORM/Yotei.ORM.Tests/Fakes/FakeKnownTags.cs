@@ -1,16 +1,13 @@
 namespace Yotei.ORM.Tests;
 
 // ========================================================
-[Cloneable]
-[WithGenerator]
-public partial class FakeKnownTags : KnownTags
+public static class FakeKnownTags
 {
-    public FakeKnownTags(bool sensitive = false) : base(sensitive)
+    public static KnownTags Create(bool sensitive) => new(sensitive)
     {
-        IdentifierTags = new IdentifierTags(sensitive, "SchemaTag.TableTag.ColumnTag");
-        PrimaryKeyTag = "PrimaryTag";
-        UniqueValuedTag = "UniqueTag";
-        ReadOnlyTag = "ReadOnlyTag";
-    }
-    protected FakeKnownTags(FakeKnownTags source) : base(source) { }
+        IdentifierTags = new IdentifierTags(sensitive, "SchemaTag.TableTag.ColumnTag"),
+        PrimaryKeyTag = "PrimaryTag",
+        UniqueValuedTag = "UniqueTag",
+        ReadOnlyTag = "ReadOnlyTag",
+    };
 }

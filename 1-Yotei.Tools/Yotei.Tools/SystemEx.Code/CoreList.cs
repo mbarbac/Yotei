@@ -2,14 +2,64 @@
 
 // ========================================================
 /// <summary>
-/// <inheritdoc cref="ICoreList{TKey, TItem}"/>
+/// Represents a list-alike collection of elements identified by their respective keys.
 /// </summary>
 /// <typeparam name="TKey"></typeparam>
 /// <typeparam name="TItem"></typeparam>
-[DebuggerDisplay("{ToDebugString()}")]
-public class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
+[DebuggerDisplay("{ToString(6)}")]
+public abstract class CoreList<TKey, TItem>
+    : IList<TItem>, IList, ICollection<TItem>, ICollection, IEnumerable<TItem>
 {
-    readonly List<TItem> Items = [];
+    /// <summary>
+    /// Determines if the given element is an appropriate one for this collection, or throws an
+    /// appropriate exception otherwise.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    public abstract TItem ValidateItem(TItem item);
+
+    /// <summary>
+    /// Determines if the given item, which can be considered as a duplicate of the existing
+    /// one at the given index, can be added or inserted into this collection, or not. It is
+    /// expected that this method throws an appropriate exception if duplicated are not allowed
+    /// in this collection.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    public abstract bool AcceptDuplicate(int index, TItem item);
+
+    /// <summary>
+    /// Returns the key associated with the given element. It is expected that this method throws
+    /// an appropriate exception if the key cannot be obtained.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    public abstract TKey GetKey(TItem item);
+
+    /// <summary>
+    /// Returns a validated key that can be used for comparison purposes. It is expected this
+    /// method throws an appropriate exception if the key is not a valid one, but only for that
+    /// purposes.
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    public abstract TKey ValidateKey(TKey key);
+
+    /// <summary>
+    /// Determines if the given target key matches any of the source ones, or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="target"></param>
+    /// <returns></returns>
+    public abstract bool CompareKeys(TKey source, TKey target);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// The actual list of elements carried by this instance.
+    /// </summary>
+    protected List<TItem> Items { get; } = [];
 
     /// <summary>
     /// Initializes a new empty instance.
@@ -23,28 +73,10 @@ public class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     public CoreList(TItem item) => Add(item);
 
     /// <summary>
-    /// Initializes a new instance with the element from the given range.
+    /// Initializes a new instance with the elements from the given range.
     /// </summary>
     /// <param name="range"></param>
     public CoreList(IEnumerable<TItem> range) => AddRange(range);
-
-    /// <summary>
-    /// Copy constructor.
-    /// </summary>
-    /// <param name="source"></param>
-    protected CoreList(CoreList<TKey, TItem> source)
-    {
-        source.ThrowWhenNull();
-        AddRange(source.Items);
-    }
-
-    /// <summary>
-    /// <inheritdoc cref="ICoreList{TKey, TItem}.Clone"/>
-    /// </summary>
-    /// <returns></returns>
-    public virtual CoreList<TKey, TItem> Clone() => new(this);
-    ICoreList<TKey, TItem> ICoreList<TKey, TItem>.Clone() => Clone();
-    object ICloneable.Clone() => Clone();
 
     /// <summary>
     /// <inheritdoc/>
@@ -60,92 +92,31 @@ public class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     public override string ToString() => $"Count: {Count}";
 
     /// <summary>
-    /// Invoked to obtain a string representation of this instance for DEBUG purposes.
+    /// Returns a string representation of this instance with at most the given number of
+    /// elements.
     /// </summary>
+    /// <param name="count"></param>
     /// <returns></returns>
-    protected string ToDebugString()
+    public string ToString(int count)
     {
-        var items = Items.Count < DEBUGCOUNT ? Items : Items.Take(DEBUGCOUNT);
+        var items = Items.Count <= count ? Items : Items.Take(count);
         return $"({Count}):[{string.Join(", ", items)}]";
     }
-    static int DEBUGCOUNT = 8;
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Validates and returns the given element.
-    /// <br/> This method must throw an appropriate exception if the element is not valid for
-    /// this instance.
-    /// <br/> The default implementation of this method just returns the given element.
+    /// Gets the number of elements in this collection.
     /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    public virtual TItem ValidateItem(TItem item) => item;
+    public int Count => Items.Count;
 
     /// <summary>
-    /// Extracts the appropriate key for the given element.
-    /// <br/> This method must throw an appropriate exception if the key cannot be extracted
-    /// from the given element as, for instance, when it is a container element.
-    /// <br/> The default implementation of this method just throws an exception.
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    public virtual TKey GetKey(TItem item) => throw new NotImplementedException();
-
-    /// <summary>
-    /// Validates and return the given key.
-    /// <br/> The default implementation of this method just returns the given key.
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    public virtual TKey ValidateKey(TKey key) => key;
-
-    /// <summary>
-    /// Compares the two given keys to determine if they can be considered as the same one for
-    /// the purposes of this instance, or not.
-    /// <br/> The default implementation of this method just invokes the default comparer of the
-    /// type of the keys.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="target"></param>
-    /// <returns></returns>
-    public virtual bool CompareKeys(TKey source, TKey target) => EqualityComparer<TKey>.Default.Equals(source, target);
-
-    /// <summary>
-    /// Determines if the given element, which is considered a duplicated one, can be added or
-    /// or inserted into this instance, or not.
-    /// <br/> The default implementation of this method just returns <c>true</c>.
-    /// <br/> It is expected that this method will throw an appropriate exception if duplicates
-    /// are not allowed in this instance.
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    public virtual bool AcceptDuplicate(TItem item) => true;
-
-    /// <summary>
-    /// Determines if the given element, which is an enumeration of the base elements of this
-    /// instance, shall be expanded and its own child elements used, or rather to use the given
-    /// element instead.
-    /// <br/> The default implementation of this method just returns <c>false</c>.
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    public virtual bool ExpandNested(TItem item) => false;
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    public virtual int Count => Items.Count;
-
-    /// <summary>
-    /// <inheritdoc/>
+    /// Minimizes the memory consumption of this instance.
     /// </summary>
     public void Trim() => Items.TrimExcess();
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Gets or sets the element stored at the given index.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
@@ -161,7 +132,7 @@ public class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Determines if this collection contains any elements that match the given key.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
@@ -170,7 +141,8 @@ public class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     bool IList.Contains(object? value) => Contains(GetKey((TItem)value!));
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Returns the index of the first element in this collection with a key that matches the
+    /// given one, or -1 if any can be found.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
@@ -189,7 +161,8 @@ public class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     int IList.IndexOf(object? value) => IndexOf(GetKey((TItem)value!));
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Returns the index of the last element in this collection with a key that matches the
+    /// given one, or -1 if any can be found.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
@@ -206,7 +179,7 @@ public class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Returns the indexes of all the elements in this collection keys that match the given one.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
@@ -224,14 +197,15 @@ public class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Determines if this collection contains any elements that match the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
     public bool Contains(Predicate<TItem> predicate) => IndexOf(predicate) >= 0;
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Returns the index of the first element in this collection that match the given predicate,
+    /// or -1 if any can be found.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
@@ -248,7 +222,8 @@ public class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Returns the index of the last element in this collection that match the given predicate,
+    /// or -1 if any can be found.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
@@ -265,7 +240,7 @@ public class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Returns the indexes of the elements in this collection that match the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
@@ -283,78 +258,63 @@ public class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Returns an array with the elements in this collection.
     /// </summary>
     /// <returns></returns>
     public TItem[] ToArray() => Items.ToArray();
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Returns a list with the elements in this collection.
     /// </summary>
     /// <returns></returns>
     public List<TItem> ToList() => new(Items);
 
+    // ----------------------------------------------------
+
     /// <summary>
-    /// <inheritdoc/>
+    /// Returns a list with the given number of elements starting from the given index.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
     public List<TItem> GetRange(int index, int count) => Items.GetRange(index, count);
 
-    // ----------------------------------------------------
-
     /// <summary>
-    /// Returns the index of the first element that can be considered as a duplicate of the
-    /// given item, or -1 if any.
-    /// </summary>
-    protected virtual int FindDuplicate(TItem item)
-    {
-        var key = GetKey(item);
-        var num = IndexOf(key);
-        return num;
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
+    /// Sets the element at the given index with the new given one. If the given element can
+    /// be considered as equal to the existing one at that index, then no replacement is made.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
-    /// <returns><inheriteddoc/></returns>
+    /// <returns></returns>
     public virtual int Replace(int index, TItem item)
     {
         item = ValidateItem(item);
 
         var source = Items[index];
-        var same = EqualityComparer<TItem>.Default.Equals(source, item);
-        if (same) return 0;
+        if (CompareKeys(GetKey(source), GetKey(item))) return 0;
 
         var range = ToArray();
         RemoveAt(index);
 
-        var count = Insert(index, item); if (count == 0)
+        var num = Insert(index, item); if (num == 0)
         {
             Items.Clear();
             Items.AddRange(range);
         }
-        return count;
+        return num;
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Adds to this collection the given element.
     /// </summary>
     /// <param name="item"></param>
-    /// <returns><inheriteddoc/></returns>
+    /// <returns></returns>
     public virtual int Add(TItem item)
     {
-        if (item is IEnumerable<TItem> range && ExpandNested(item))
-        {
-            return AddRange(range);
-        }
-
         item = ValidateItem(item);
-        var num = FindDuplicate(item);
-        if (num >= 0 && !AcceptDuplicate(item)) return 0;
+
+        var num = IndexOf(GetKey(item));
+        if (num >= 0 && !AcceptDuplicate(num, item)) return 0;
 
         Items.Add(item);
         return 1;
@@ -367,38 +327,34 @@ public class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Adds to this collection the elements from the given range.
     /// </summary>
     /// <param name="range"></param>
-    /// <returns><inheriteddoc/></returns>
+    /// <returns></returns>
     public virtual int AddRange(IEnumerable<TItem> range)
     {
         range.ThrowWhenNull();
 
-        var count = 0; foreach (var item in range)
+        var num = 0; foreach (var item in range)
         {
-            var num = Add(item);
-            count += num;
+            var r = Add(item);
+            num += r;
         }
-        return count;
+        return num;
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Inserts into this collection the given element.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
-    /// <returns><inheriteddoc/></returns>
+    /// <returns></returns>
     public virtual int Insert(int index, TItem item)
     {
-        if (item is IEnumerable<TItem> range && ExpandNested(item))
-        {
-            return InsertRange(index, range);
-        }
-
         item = ValidateItem(item);
-        var num = FindDuplicate(item);
-        if (num >= 0 && !AcceptDuplicate(item)) return 0;
+
+        var num = IndexOf(GetKey(item));
+        if (num >= 0 && !AcceptDuplicate(num, item)) return 0;
 
         Items.Insert(index, item);
         return 1;
@@ -407,29 +363,30 @@ public class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     void IList.Insert(int index, object? value) => Insert(index, (TItem)value!);
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Inserts into this collection the elements from the given range, starting at the given
+    /// index.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="range"></param>
-    /// <returns><inheritdoc/></returns>
+    /// <returns></returns>
     public virtual int InsertRange(int index, IEnumerable<TItem> range)
     {
         range.ThrowWhenNull();
 
-        var count = 0; foreach (var item in range)
+        var num = 0; foreach (var item in range)
         {
-            var num = Insert(index, item);
-            count += num;
-            index += num;
+            var r = Insert(index, item);
+            num += r;
+            index += r;
         }
-        return count;
+        return num;
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Removes from this collection the element at the given index.
     /// </summary>
     /// <param name="index"></param>
-    /// <returns><inheriteddoc/></returns>
+    /// <returns></returns>
     public virtual int RemoveAt(int index)
     {
         Items.RemoveAt(index);
@@ -439,11 +396,11 @@ public class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     void IList.RemoveAt(int index) => RemoveAt(index);
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Removes from this collection the given number of elements, starting from the given index.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
-    /// <returns><inheriteddoc/></returns>
+    /// <returns></returns>
     public virtual int RemoveRange(int index, int count)
     {
         if (count > 0) Items.RemoveRange(index, count);
@@ -451,10 +408,10 @@ public class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Removes from this collection the first element that matches the given key.
     /// </summary>
     /// <param name="key"></param>
-    /// <returns><inheriteddoc/></returns>
+    /// <returns></returns>
     public virtual int Remove(TKey key)
     {
         var index = IndexOf(key);
@@ -464,10 +421,10 @@ public class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     void IList.Remove(object? value) => Remove(GetKey((TItem)value!));
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Removes from this collection the last element that matches the given key.
     /// </summary>
     /// <param name="key"></param>
-    /// <returns><inheriteddoc/></returns>
+    /// <returns></returns>
     public virtual int RemoveLast(TKey key)
     {
         var index = LastIndexOf(key);
@@ -475,27 +432,28 @@ public class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Removes from this collection all the elements that match the given key.
     /// </summary>
     /// <param name="key"></param>
-    /// <returns><inheriteddoc/></returns>
+    /// <returns></returns>
     public virtual int RemoveAll(TKey key)
     {
-        var count = 0; while (true)
+        var num = 0; while (true)
         {
             var index = IndexOf(key);
 
-            if (index >= 0) count += RemoveAt(index);
+            if (index >= 0) num += RemoveAt(index);
             else break;
         }
-        return count;
+        return num;
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Removes from this collection the first ocurrence of an element that matches the given
+    /// predicate.
     /// </summary>
     /// <param name="predicate"></param>
-    /// <returns><inheriteddoc/></returns>
+    /// <returns></returns>
     public virtual int Remove(Predicate<TItem> predicate)
     {
         predicate.ThrowWhenNull();
@@ -505,10 +463,11 @@ public class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Removes from this collection the last ocurrence of an element that matches the given
+    /// predicate.
     /// </summary>
     /// <param name="predicate"></param>
-    /// <returns><inheriteddoc/></returns>
+    /// <returns></returns>
     public virtual int RemoveLast(Predicate<TItem> predicate)
     {
         predicate.ThrowWhenNull();
@@ -518,32 +477,33 @@ public class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Removes from this collection all the ocurrences of elements that match the given
+    /// predicate.
     /// </summary>
     /// <param name="predicate"></param>
-    /// <returns><inheriteddoc/></returns>
+    /// <returns></returns>
     public virtual int RemoveAll(Predicate<TItem> predicate)
     {
         predicate.ThrowWhenNull();
 
-        var count = 0; while (true)
+        var num = 0; while (true)
         {
             var index = IndexOf(predicate);
 
-            if (index >= 0) count += RemoveAt(index);
+            if (index >= 0) num += RemoveAt(index);
             else break;
         }
-        return count;
+        return num;
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Clears this collection.
     /// </summary>
-    /// <returns><inheritdoc/></returns>
+    /// <returns></returns>
     public virtual int Clear()
     {
-        var count = Items.Count; if (count > 0) Items.Clear();
-        return count;
+        var num = Items.Count; if (num > 0) Items.Clear();
+        return num;
     }
     void ICollection<TItem>.Clear() => Clear();
     void IList.Clear() => Clear();

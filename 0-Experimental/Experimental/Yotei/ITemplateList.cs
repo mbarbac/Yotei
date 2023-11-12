@@ -6,13 +6,18 @@ namespace Experimental.Yotei;
 
 // ========================================================
 /// <summary>
-/// An immutable object that ...
+/// An immutable object that represents ...
 /// </summary>
 [Cloneable]
-public partial interface ITemplateList : IEnumerable<TItem>
+public partial interface ITemplateList : IEnumerable<TItem>, IEquatable<THost>
 {
     /// <summary>
-    /// Gets the number of elements in this instance.
+    /// Determines if the keys of the elements in this instance are case sensitive, or not.
+    /// </summary>
+    bool CaseSensitive { get; }
+
+    /// <summary>
+    /// Gets the number of elements in this collection.
     /// </summary>
     int Count { get; }
 
@@ -29,30 +34,30 @@ public partial interface ITemplateList : IEnumerable<TItem>
     TItem this[int index] { get; }
 
     /// <summary>
-    /// Determines if this collection contains any elements with the given key.
+    /// Determines if this collection contains any elements that match the given key.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
     bool Contains(TKey key);
 
     /// <summary>
-    /// Returns the index of the first element in this collection with the given key, or -1 if
-    /// any can be found.
+    /// Returns the index of the first element in this collection with a key that matches the
+    /// given one, or -1 if any can be found.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
     int IndexOf(TKey key);
 
     /// <summary>
-    /// Returns the index of the last element in this collection with the given key, or -1 if
-    /// any can be found.
+    /// Returns the index of the last element in this collection with a key that matches the
+    /// given one, or -1 if any can be found.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
     int LastIndexOf(TKey key);
 
     /// <summary>
-    /// Returns the indexes of all the elements in this collection with the given key.
+    /// Returns the indexes of all the elements in this collection keys that match the given one.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
@@ -103,8 +108,9 @@ public partial interface ITemplateList : IEnumerable<TItem>
     // ----------------------------------------------------
 
     /// <summary>
-    /// Obtains an instance that contains the given number of elements starting from the given
-    /// index.
+    /// Returns a new instance with the given number of elements starting from the given index.
+    /// <br/> If the index is zero and the requested number of elements is the same as the size
+    /// of the original collection, then it is returned instead.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
@@ -112,8 +118,10 @@ public partial interface ITemplateList : IEnumerable<TItem>
     THost GetRange(int index, int count);
 
     /// <summary>
-    /// Obtains an instance where the element at the given index has been replaced with the new
+    /// Returns a new instance where the element at the given index has been replaced by the new
     /// given one.
+    /// <br/> If the given element can be considered as equal to the existing one at that index,
+    /// then the original collection is returned instead.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
@@ -121,23 +129,24 @@ public partial interface ITemplateList : IEnumerable<TItem>
     THost Replace(int index, TItem item);
 
     /// <summary>
-    /// Obtains an instance where the given element has been added to the original one.
+    /// Returns a new instance where the given element has been added to the original collection.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
     THost Add(TItem item);
 
     /// <summary>
-    /// Obtains an instance where the elements from the given range have been added to the
-    /// original one.
+    /// Returns a new instance where the elements from the given range have been added to the
+    /// original collection.
+    /// <br/> If the range was an empty one, then the original collection is returned instead.
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
     THost AddRange(IEnumerable<TItem> range);
 
     /// <summary>
-    /// Obtains an instance where the given element has been inserted into the original one, at
-    /// the given index.
+    /// Returns a new instance where the given element has been inserted into the original
+    /// collection, at the given index.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
@@ -145,8 +154,9 @@ public partial interface ITemplateList : IEnumerable<TItem>
     THost Insert(int index, TItem item);
 
     /// <summary>
-    /// Obtains an instance where the elements from the given range have been inserted into the
-    /// original one, starting at the given index.
+    /// Returns a new instance where the given element has been inserted into the original
+    /// collection, at the given index.
+    /// <br/> If the range was an empty one, then the original collection is returned instead.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="range"></param>
@@ -154,15 +164,18 @@ public partial interface ITemplateList : IEnumerable<TItem>
     THost InsertRange(int index, IEnumerable<TItem> range);
 
     /// <summary>
-    /// Obtains an instance where the element at the given index has been removed.
+    /// Returns a new instance where the element at the given index has been removed from the
+    /// original collection.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
     THost RemoveAt(int index);
 
     /// <summary>
-    /// Obtains an instance where the given number of elements have been removed from the
-    /// original one, starting from the given index.
+    /// Returns a new instance where the given number of elements, starting from the given index,
+    /// have been removed from the original collection.
+    /// <br/> If the number of elements to remove is zero, then the original collection is
+    /// returned instead.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
@@ -170,57 +183,63 @@ public partial interface ITemplateList : IEnumerable<TItem>
     THost RemoveRange(int index, int count);
 
     /// <summary>
-    /// Obtains an instance where the first element with the given key has been removed.
+    /// Returns a new instance where the first element that matches the given key has been removed
+    /// from the original collection.
+    /// <br/> If no matching element was found, the original collection is returned instead.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
     THost Remove(TKey key);
 
     /// <summary>
-    /// Obtains an instance where the last element with the given key has been removed.
+    /// Returns a new instance where the last element that matches the given key has been removed
+    /// from the original collection.
+    /// <br/> If no matching element was found, the original collection is returned instead.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
     THost RemoveLast(TKey key);
 
     /// <summary>
-    /// Obtains an instance where all the elements with the given key have been removed.
+    /// Returns a new instance where all the elements that match the given key has been removed
+    /// from the original collection.
+    /// <br/> If no matching element was found, the original collection is returned instead.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
     THost RemoveAll(TKey key);
 
     /// <summary>
-    /// Obtains an instance where the first ocurrence of an element that matches the given
-    /// predicate has been removed.
+    /// Returns a new instance where the first ocurrence of an element that matches the given
+    /// predicate has been removed from the original collection.
+    /// <br/> If no matching element was found, the original collection is returned instead.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
     THost Remove(Predicate<TItem> predicate);
 
     /// <summary>
-    /// Obtains an instance where the last ocurrence of an element that matches the given
-    /// predicate has been removed.
+    /// Returns a new instance where the last ocurrence of an element that matches the given
+    /// predicate has been removed from the original collection.
+    /// <br/> If no matching element was found, the original collection is returned instead.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
     THost RemoveLast(Predicate<TItem> predicate);
 
     /// <summary>
-    /// Obtains an instance where all the ocurrences of elements that match the given predicate
-    /// have been removed.
+    /// Returns a new instance where all the ocurrences of elements that match the given predicate
+    /// have been removed from the original collection.
+    /// <br/> If no matching element was found, the original collection is returned instead.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
     THost RemoveAll(Predicate<TItem> predicate);
 
     /// <summary>
-    /// Obtains an instance where all the original elements have been removed.
+    /// Returns a new instance where all the original elements have been removed.
+    /// <br/> If the original collection was an empty one, it is returned instead.
     /// </summary>
     /// <returns></returns>
     THost Clear();
 }
-
-// ========================================================
-public interface ITemplateKey { }
-public interface ITemplateElement { TKey Key { get; } }

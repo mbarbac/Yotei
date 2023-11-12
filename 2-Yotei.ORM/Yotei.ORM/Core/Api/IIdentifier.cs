@@ -1,11 +1,14 @@
-﻿namespace Yotei.ORM;
+﻿using THost = Yotei.ORM.IIdentifier;
+using TItem = Yotei.ORM.IIdentifierPart;
+
+namespace Yotei.ORM;
 
 // ========================================================
 /// <summary>
 /// An immutable object that represents a database identifier.
 /// </summary>
 [Cloneable]
-public partial interface IIdentifier : IEnumerable<IIdentifierPart>, IEquatable<IIdentifier>
+public partial interface IIdentifier : IEnumerable<TItem>, IEquatable<THost>
 {
     /// <summary>
     /// The engine this instance is associated with.
@@ -17,13 +20,6 @@ public partial interface IIdentifier : IEnumerable<IIdentifierPart>, IEquatable<
     /// not, each part is wrapped with the engine terminators, if they are used.
     /// </summary>
     string? Value { get; }
-
-    /// <summary>
-    /// Returns a literal with the unwrapped values carried by this instance separated by dots,
-    /// or null if this instance represents an empty or missed identifier.
-    /// </summary>
-    /// <returns></returns>
-    string? ToUnwrappedValue();
 
     /// <summary>
     /// Returns an array with the unwrapped values carried by this instance separated by dots,
@@ -40,7 +36,7 @@ public partial interface IIdentifier : IEnumerable<IIdentifierPart>, IEquatable<
     /// </summary>
     /// <param name="target"></param>
     /// <returns></returns>
-    bool Match(IIdentifier target);
+    bool Match(THost target);
 
     // ----------------------------------------------------
 
@@ -54,7 +50,7 @@ public partial interface IIdentifier : IEnumerable<IIdentifierPart>, IEquatable<
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    IIdentifierPart this[int index] { get; }
+    TItem this[int index] { get; }
 
     /// <summary>
     /// Determines if this collection contains any elements with the given single part value.
@@ -92,7 +88,7 @@ public partial interface IIdentifier : IEnumerable<IIdentifierPart>, IEquatable<
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    bool Contains(Predicate<IIdentifierPart> predicate);
+    bool Contains(Predicate<TItem> predicate);
 
     /// <summary>
     /// Returns the index of the first element in this collection that match the given predicate,
@@ -100,7 +96,7 @@ public partial interface IIdentifier : IEnumerable<IIdentifierPart>, IEquatable<
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int IndexOf(Predicate<IIdentifierPart> predicate);
+    int IndexOf(Predicate<TItem> predicate);
 
     /// <summary>
     /// Returns the index of the last element in this collection that match the given predicate,
@@ -108,148 +104,167 @@ public partial interface IIdentifier : IEnumerable<IIdentifierPart>, IEquatable<
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int LastIndexOf(Predicate<IIdentifierPart> predicate);
+    int LastIndexOf(Predicate<TItem> predicate);
 
     /// <summary>
     /// Returns the indexes of the elements in this collection that match the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    List<int> IndexesOf(Predicate<IIdentifierPart> predicate);
+    List<int> IndexesOf(Predicate<TItem> predicate);
 
     /// <summary>
     /// Returns an array with the elements in this collection.
     /// </summary>
     /// <returns></returns>
-    IIdentifierPart[] ToArray();
+    TItem[] ToArray();
 
     /// <summary>
     /// Returns a list with the elements in this collection.
     /// </summary>
     /// <returns></returns>
-    List<IIdentifierPart> ToList();
+    List<TItem> ToList();
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Obtains an instance that contains the given number of elements starting from the given
+    /// Obtains a new instance that contains the given number of elements starting from the given
     /// index.
+    /// <br/> If the index is zero and the requested number of elements is the same as the size
+    /// of the original collection, then it is returned instead.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    IIdentifier GetRange(int index, int count);
+    THost GetRange(int index, int count);
 
     /// <summary>
-    /// Obtains an instance where the element at the given index has been replaced with the ones
-    /// obtained from the given value.
+    /// Obtains a new instance where the element at the given index has been replaced with the
+    /// ones obtained from the given value.
+    /// <br/> If the given element can be considered as equal to the existing one at that index,
+    /// then the original collection is returned instead.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    IIdentifier Replace(int index, string? value);
+    THost Replace(int index, string? value);
 
     /// <summary>
-    /// Obtains an instance where the elements obtained from the given value have been added to
-    /// the original one.
+    /// Obtains a new instance where the elements obtained from the given value have been added
+    /// to the original one.
+    /// <br/> If the range of values was an empty one, then the original collection is returned
+    /// instead.
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    IIdentifier Add(string? value);
+    THost Add(string? value);
 
     /// <summary>
-    /// Obtains an instance where the elements obtained from the given range of values have been
-    /// added to the original one.
+    /// Obtains a new instance where the elements obtained from the given range of values have
+    /// been added to the original one.
+    /// <br/> If the range was an empty one, then the original collection is returned instead.
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    IIdentifier AddRange(IEnumerable<string?> range);
+    THost AddRange(IEnumerable<string?> range);
 
     /// <summary>
-    /// Obtains an instance where the elements obtained from the given value have been inserted
-    /// into the original one, starting at the given index.
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="value"></param>
-    /// <returns></returns>
-    IIdentifier Insert(int index, string? value);
-
-    /// <summary>
-    /// Obtains an instance where the elements obtained from the given range of values have been
+    /// Obtains a new instance where the elements obtained from the given value have been
     /// inserted into the original one, starting at the given index.
+    /// <br/> If the range of values was an empty one, then the original collection is returned
+    /// instead.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    THost Insert(int index, string? value);
+
+    /// <summary>
+    /// Obtains a new instance where the elements obtained from the given range of values have
+    /// been inserted into the original one, starting at the given index.
+    /// <br/> If the range was an empty one, then the original collection is returned instead.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    IIdentifier InsertRange(int index, IEnumerable<string?> range);
+    THost InsertRange(int index, IEnumerable<string?> range);
 
     /// <summary>
-    /// Obtains an instance where the element at the given index has been removed.
+    /// Obtains a new instance where the element at the given index has been removed.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    IIdentifier RemoveAt(int index);
+    THost RemoveAt(int index);
 
     /// <summary>
-    /// Obtains an instance where the given number of elements have been removed from the
+    /// Obtains a new instance where the given number of elements have been removed from the
     /// original one, starting from the given index.
+    /// <br/> If the number of elements to remove is zero, then the original collection is
+    /// returned instead.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    IIdentifier RemoveRange(int index, int count);
+    THost RemoveRange(int index, int count);
 
     /// <summary>
-    /// Obtains an instance where the first element with the given single part value has been
+    /// Obtains a new instance where the first element with the given single part value has been
     /// removed.
+    /// <br/> If no matching element was found, the original collection is returned instead.
     /// </summary>
     /// <param name="part"></param>
     /// <returns></returns>
-    IIdentifier Remove(string? part);
+    THost Remove(string? part);
 
     /// <summary>
-    /// Obtains an instance where the last element with the given single part value has been
+    /// Obtains a new instance where the last element with the given single part value has been
     /// removed.
+    /// <br/> If no matching element was found, the original collection is returned instead.
     /// </summary>
     /// <param name="part"></param>
     /// <returns></returns>
-    IIdentifier RemoveLast(string? part);
+    THost RemoveLast(string? part);
 
     /// <summary>
-    /// Obtains an instance where all the elements with the given single part value have been
+    /// Obtains a new instance where all the elements with the given single part value have been
     /// removed.
+    /// <br/> If no matching element was found, the original collection is returned instead.
     /// </summary>
     /// <param name="part"></param>
     /// <returns></returns>
-    IIdentifier RemoveAll(string? part);
+    THost RemoveAll(string? part);
 
     /// <summary>
-    /// Obtains an instance where the first ocurrence of an element that matches the given
+    /// Obtains a new instance where the first ocurrence of an element that matches the given
     /// predicate has been removed.
+    /// <br/> If no matching element was found, the original collection is returned instead.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IIdentifier Remove(Predicate<IIdentifierPart> predicate);
+    THost Remove(Predicate<TItem> predicate);
 
     /// <summary>
-    /// Obtains an instance where the last ocurrence of an element that matches the given
+    /// Obtains a new instance where the last ocurrence of an element that matches the given
     /// predicate has been removed.
+    /// <br/> If no matching element was found, the original collection is returned instead.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IIdentifier RemoveLast(Predicate<IIdentifierPart> predicate);
+    THost RemoveLast(Predicate<TItem> predicate);
 
     /// <summary>
-    /// Obtains an instance where all the ocurrences of elements that match the given predicate
-    /// have been removed.
+    /// Obtains a new instance where all the ocurrences of elements that match the given
+    /// predicate have been removed.
+    /// <br/> If no matching element was found, the original collection is returned instead.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IIdentifier RemoveAll(Predicate<IIdentifierPart> predicate);
+    THost RemoveAll(Predicate<TItem> predicate);
 
     /// <summary>
-    /// Obtains an instance where all the original elements have been removed.
+    /// Obtains a new instance where all the original elements have been removed.
+    /// <br/> If the original collection was an empty one, it is returned instead.
     /// </summary>
     /// <returns></returns>
-    IIdentifier Clear();
+    THost Clear();
 }

@@ -8,15 +8,15 @@ namespace Yotei.ORM.Records;
 /// the maximal structure of the identifiers allowed by an underlying database.
 /// </summary>
 [Cloneable]
-public partial interface IIdentifierTags : IEnumerable<string>, IEquatable<IIdentifierTags>
+public partial interface IIdentifierTags : IEnumerable<string>, IEquatable<THost>
 {
     /// <summary>
-    /// Determines if the metadata tags in this collection are case sensitive, or not.
+    /// Determines if the keys of the elements in this instance are case sensitive, or not.
     /// </summary>
     [WithGenerator] bool CaseSensitiveTags { get; }
 
     /// <summary>
-    /// Gets the number of elements in this instance.
+    /// Gets the number of tags in this collection.
     /// </summary>
     int Count { get; }
 
@@ -26,7 +26,7 @@ public partial interface IIdentifierTags : IEnumerable<string>, IEquatable<IIden
     void Trim();
 
     /// <summary>
-    /// Gets the tag stored at the given index.
+    /// Gets the element stored at the given index.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
@@ -37,14 +37,14 @@ public partial interface IIdentifierTags : IEnumerable<string>, IEquatable<IIden
     /// </summary>
     /// <param name="tag"></param>
     /// <returns></returns>
-    bool Contains(string tag);
+    bool Contains(string value);
 
     /// <summary>
-    /// Returns the index of the the given tag in this collection, or -1 if it cannot be found.
+    /// Returns the index of the given tag, or -1 if any can be found.
     /// </summary>
     /// <param name="tag"></param>
     /// <returns></returns>
-    int IndexOf(string tag);
+    int IndexOf(string value);
 
     /// <summary>
     /// Determines if this collection contains any tags that match the given predicate.
@@ -70,7 +70,7 @@ public partial interface IIdentifierTags : IEnumerable<string>, IEquatable<IIden
     int LastIndexOf(Predicate<string> predicate);
 
     /// <summary>
-    /// Returns the indexes of the elements in this collection that match the given predicate.
+    /// Returns the indexes of the tags in this collection that match the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
@@ -91,8 +91,9 @@ public partial interface IIdentifierTags : IEnumerable<string>, IEquatable<IIden
     // ----------------------------------------------------
 
     /// <summary>
-    /// Obtains an instance that contains the given number of tags starting from the given
-    /// index.
+    /// Returns a new instance with the given number of tags starting from the given index.
+    /// <br/> If the index is zero and the requested number of elements is the same as the size
+    /// of the original collection, then it is returned instead.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
@@ -100,8 +101,10 @@ public partial interface IIdentifierTags : IEnumerable<string>, IEquatable<IIden
     THost GetRange(int index, int count);
 
     /// <summary>
-    /// Obtains an instance where the tag at the given index has been replaced with the new
-    /// ones obtained from the given value.
+    /// Returns a new instance where the tag at the given index has been replaced by the ones
+    /// obtained from the given value.
+    /// <br/> If the given value can be considered as equal to the existing tag at that index,
+    /// then the original collection is returned instead.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="value"></param>
@@ -109,33 +112,35 @@ public partial interface IIdentifierTags : IEnumerable<string>, IEquatable<IIden
     THost Replace(int index, string value);
 
     /// <summary>
-    /// Obtains an instance where the tags obtained from the given value have been added to the
-    /// original one.
+    /// Returns a new instance where the tags obtained from the given value have been added to
+    /// the original collection.
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
     THost Add(string value);
 
     /// <summary>
-    /// Obtains an instance where the tags obtained from the given range of values have been
-    /// added to the original one.
+    /// Returns a new instance where the tags obtained from the given range of values have been
+    /// added to the original collection.
+    /// <br/> If the range was an empty one, then the original collection is returned instead.
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
     THost AddRange(IEnumerable<string> range);
 
     /// <summary>
-    /// Obtains an instance where the tags obtained from the given value have been inserted into
-    /// the original one, starting at the given index.
+    /// Returns a new instance where the tags obtained from the given value have been inserted
+    /// into the original collection, starting at the given index.
     /// </summary>
     /// <param name="index"></param>
-    /// <param name="value"></param>
+    /// <param name="tag"></param>
     /// <returns></returns>
     THost Insert(int index, string value);
 
     /// <summary>
-    /// Obtains an instance where the tags obtained from the given range of values have been
-    /// inserted into the original one, starting at the given index.
+    /// Returns a new instance where the tags obtained from the given value have been inserted
+    /// into the original collection, at the given index.
+    /// <br/> If the range was an empty one, then the original collection is returned instead.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="range"></param>
@@ -143,15 +148,18 @@ public partial interface IIdentifierTags : IEnumerable<string>, IEquatable<IIden
     THost InsertRange(int index, IEnumerable<string> range);
 
     /// <summary>
-    /// Obtains an instance where the tag at the given index has been removed.
+    /// Returns a new instance where the tag at the given index has been removed from the
+    /// original collection.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
     THost RemoveAt(int index);
 
     /// <summary>
-    /// Obtains an instance where the given number of tags have been removed from the original
-    /// one, starting from the given index.
+    /// Returns a new instance where the given number of tags, starting from the given index,
+    /// have been removed from the original collection.
+    /// <br/> If the number of tags to remove is zero, then the original collection is returned
+    /// instead.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
@@ -159,38 +167,43 @@ public partial interface IIdentifierTags : IEnumerable<string>, IEquatable<IIden
     THost RemoveRange(int index, int count);
 
     /// <summary>
-    /// Obtains an instance where the given tag has been removed.
+    /// Returns a new instance where the given tag has been removed from the original collection.
+    /// <br/> If no matching tag was found, the original collection is returned instead.
     /// </summary>
     /// <param name="tag"></param>
     /// <returns></returns>
     THost Remove(string tag);
 
     /// <summary>
-    /// Obtains an instance where the first ocurrence of a tag that matches the given predicate
-    /// has been removed.
+    /// Returns a new instance where the first ocurrence of a tag that matches the given
+    /// predicate has been removed from the original collection.
+    /// <br/> If no matching tag was found, the original collection is returned instead.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
     THost Remove(Predicate<string> predicate);
 
     /// <summary>
-    /// Obtains an instance where the last ocurrence of a tag that matches the given predicate
-    /// has been removed.
+    /// Returns a new instance where the last ocurrence of a tag that matches the given
+    /// predicate has been removed from the original collection.
+    /// <br/> If no matching tag was found, the original collection is returned instead.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
     THost RemoveLast(Predicate<string> predicate);
 
     /// <summary>
-    /// Obtains an instance where all the ocurrences of tags that match the given predicate
-    /// have been removed.
+    /// Returns a new instance where all the ocurrences of tags that match the given predicate
+    /// have been removed from the original collection.
+    /// <br/> If no matching tag was found, the original collection is returned instead.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
     THost RemoveAll(Predicate<string> predicate);
 
     /// <summary>
-    /// Obtains an instance where all the original tags have been removed.
+    /// Returns a new instance where all the original tags have been removed.
+    /// <br/> If the original collection was an empty one, it is returned instead.
     /// </summary>
     /// <returns></returns>
     THost Clear();

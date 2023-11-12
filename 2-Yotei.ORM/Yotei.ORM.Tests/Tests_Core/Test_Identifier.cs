@@ -4,6 +4,15 @@ namespace Yotei.ORM.Tests;
 //[Enforced]
 public static class Test_Identifier
 {
+    public static string? ToUnwrappedValue(this IIdentifier item)
+    {
+        return item.Count == 0
+            ? null
+            : string.Join('.', item.Select(x => x.UnwrappedValue));
+    }
+
+    // ----------------------------------------------------
+
     //[Enforced]
     [Fact]
     public static void Test_Create_Empty()
@@ -225,8 +234,8 @@ public static class Test_Identifier
 
         Assert.Equal(0, items.IndexOf("ONE"));
         Assert.Equal(2, items.LastIndexOf("ONE"));
-        var list = items.IndexesOf("ONE");
 
+        var list = items.IndexesOf("ONE");
         Assert.Equal(2, list.Count);
         Assert.Equal(0, list[0]);
         Assert.Equal(2, list[1]);
@@ -263,9 +272,7 @@ public static class Test_Identifier
         Assert.Same(source, target);
 
         target = source.Replace(1, "TWO");
-        Assert.NotSame(source, target);
-        Assert.Equal(4, target.Count);
-        Assert.Equal("[one].[TWO].[one].[four]", target.Value);
+        Assert.Same(source, target);
 
         target = source.Replace(0, "x.y");
         Assert.NotSame(source, target);

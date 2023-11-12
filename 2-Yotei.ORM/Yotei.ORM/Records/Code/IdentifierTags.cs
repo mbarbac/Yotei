@@ -1,4 +1,6 @@
 ﻿using THost = Yotei.ORM.Records.IIdentifierTags;
+using TItem = string;
+using TKey = string;
 
 namespace Yotei.ORM.Records.Code;
 
@@ -8,7 +10,7 @@ namespace Yotei.ORM.Records.Code;
 /// </summary>
 [Cloneable]
 [WithGenerator]
-public partial class IdentifierTags : THost
+public sealed partial class IdentifierTags : THost
 {
     /// <summary>
     /// Initializes a new empty instance.
@@ -21,27 +23,26 @@ public partial class IdentifierTags : THost
     }
 
     /// <summary>
-    /// Initializes a new instance with the given element.
+    /// Initializes a new instance with elements obtained from the given value.
     /// </summary>
     /// <param name="caseSensitiveTags"></param>
-    /// <param name="tag"></param>
+    /// <param name="value"></param>
     public IdentifierTags(
-        bool caseSensitiveTags, string tag) : this(caseSensitiveTags) => Items.Add(tag);
+        bool caseSensitiveTags, string value) : this(caseSensitiveTags) => Items.Add(value);
 
     /// <summary>
-    /// Initializes a new instance with the elements from the given range.
+    /// Initializes a new instance with the tags obtained from the given range of values.
     /// </summary>
-    /// <param name="caseSensitiveTags"></param>
     /// <param name="range"></param>
-    public IdentifierTags(
-        bool caseSensitiveTags, IEnumerable<string> range) : this(caseSensitiveTags)
+    public IdentifierTags(bool caseSensitiveTags, IEnumerable<TItem> range)
+        : this(caseSensitiveTags)
         => Items.AddRange(range);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected IdentifierTags(IdentifierTags source)
+    IdentifierTags(IdentifierTags source)
     {
         source.ThrowWhenNull();
 
@@ -49,13 +50,6 @@ public partial class IdentifierTags : THost
         CaseSensitiveTags = source.CaseSensitiveTags;
         Items.AddRange(source.Items);
     }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
-    public IEnumerator<string> GetEnumerator() => Items.GetEnumerator();
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /// <summary>
     /// <inheritdoc/>
@@ -75,11 +69,11 @@ public partial class IdentifierTags : THost
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Determines if this object is the same as the other given one.
     /// </summary>
     /// <param name="obj"></param>
     /// <returns></returns>
-    public override bool Equals(object? obj) => Equals(obj as IIdentifierTags);
+    public override bool Equals(object? obj) => Equals(obj as THost);
 
     /// <summary>
     /// <inheritdoc/>
@@ -96,83 +90,95 @@ public partial class IdentifierTags : THost
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
+    public IEnumerator<TItem> GetEnumerator() => Items.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public override string ToString() => string.Join('.', Items);
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Represents the internal collection of elements in this instance.
+    /// Represents the container of elements in this instance.
     /// </summary>
-    protected class InnerList : CoreList<string, string>
+    [DebuggerDisplay("{ToString(6)}")]
+    class InnerList(IdentifierTags master) : CoreList<TKey, TItem>
     {
-        readonly THost Master;
-        public InnerList(THost master) => Master = master.ThrowWhenNull();
-        public new string ToDebugString() => base.ToDebugString();
-
-        public override string ValidateItem(string item) => item.NotNullNotEmpty();
-        public override string GetKey(string item) => item;
-        public override string ValidateKey(string key)
+        IdentifierTags Master { get; } = master.ThrowWhenNull();
+        public override TItem ValidateItem(TItem item) => item.NotNullNotEmpty();
+        public override bool AcceptDuplicate(int index, TItem item)
+            => throw new DuplicateException("Element is duplicated.").WithData(item);
+        public override TKey GetKey(TItem item) => item;
+        public override TKey ValidateKey(TKey key)
         {
-            key.NotNullNotEmpty();
-            if (key.Contains('.')) throw new ArgumentException(
-                "Identifier tags cannot contain embedded dots.").WithData(key);
+            if ((key = key.NotNullNotEmpty()).Contains('.')) throw new ArgumentException(
+                "Identifier tag cannot contain dots.")
+                .WithData(key);
             return key;
         }
-        public override bool CompareKeys(string source, string target)
+        public override bool CompareKeys(TKey source, TKey target)
             => string.Compare(source, target, !Master.CaseSensitiveTags) == 0;
-        public override bool AcceptDuplicate(string item)
-            => throw new DuplicateException("Duplicated element.").WithData(item);
 
         public override int Replace(int index, string item)
         {
-            item = item.NotNullNotEmpty();
-            if (item == this[index]) return 0;
+            item = ValidateItem(item);
 
+            var source = Items[index];
+            if (CompareKeys(source, item)) return 0;
+
+            var range = ToArray();
             RemoveAt(index);
-            var num = 0;
-            var parts = item.Split('.'); foreach (var part in parts)
+
+            var values = ValidateItem(item).Split('.');
+            var num = 0; foreach (var value in values)
             {
-                var temp = base.Insert(index, ValidateKey(part));
-                num += temp;
-                index += temp;
+                var r = base.Insert(index, value);
+                num += r;
+                index += r;
+            }
+            if (num == 0)
+            {
+                Items.Clear();
+                Items.AddRange(range);
             }
             return num;
         }
         public override int Add(string item)
         {
-            item = item.NotNullNotEmpty();
-            var num = 0;
-            var parts = item.Split('.'); foreach (var part in parts)
+            var values = ValidateItem(item).Split('.');
+            var num = 0; foreach (var value in values)
             {
-                var temp = base.Add(ValidateKey(part));
-                num += temp;
+                var r = base.Add(value);
+                num += r;
             }
             return num;
         }
         public override int Insert(int index, string item)
         {
-            item = item.NotNullNotEmpty();
-            var num = 0;
-            var parts = item.Split('.'); foreach (var part in parts)
+            var values = ValidateItem(item).Split('.');
+            var num = 0; foreach (var value in values)
             {
-                var temp = base.Insert(index, ValidateKey(part));
-                num += temp;
-                index += temp;
+                var r = base.Insert(index, value);
+                num += r;
+                index += r;
             }
             return num;
         }
     }
 
     /// <summary>
-    /// Obtains an inner list to be used by this instance.
+    /// Invoked to create the container of elements of this instance.
     /// </summary>
     /// <returns></returns>
-    protected virtual InnerList CreateInnerList() => new(this);
+    InnerList CreateInnerList() => new(this);
 
     /// <summary>
-    /// The internal collection of elements in this instance.
+    /// The actual collection of elements in this instance.
     /// </summary>
-    protected InnerList Items { get; }
+    InnerList Items { get; }
 
     // ----------------------------------------------------
 
@@ -188,12 +194,13 @@ public partial class IdentifierTags : THost
             _CaseSensitiveTags = value;
 
             if (Count == 0) return;
+
             var range = Items.ToArray();
             Items.Clear();
             Items.AddRange(range);
         }
     }
-    bool _CaseSensitiveTags = Engine.CASESENSITIVETAGS;
+    bool _CaseSensitiveTags;
 
     /// <summary>
     /// <inheritdoc/>
@@ -210,7 +217,7 @@ public partial class IdentifierTags : THost
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public string this[int index] => Items[index];
+    public TItem this[int index] => Items[index];
 
     /// <summary>
     /// <inheritdoc/>
@@ -274,7 +281,7 @@ public partial class IdentifierTags : THost
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual THost GetRange(int index, int count)
+    public THost GetRange(int index, int count)
     {
         if (count == Count && index == 0) return this;
         if (count == 0)
@@ -284,7 +291,6 @@ public partial class IdentifierTags : THost
         }
 
         var range = Items.GetRange(index, count);
-
         var temp = Clone();
         temp.Items.Clear();
         temp.Items.AddRange(range);
@@ -297,7 +303,7 @@ public partial class IdentifierTags : THost
     /// <param name="index"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public virtual THost Replace(int index, string value)
+    public THost Replace(int index, string value)
     {
         var temp = Clone();
         var num = temp.Items.Replace(index, value);
@@ -309,7 +315,7 @@ public partial class IdentifierTags : THost
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public virtual THost Add(string value)
+    public THost Add(string value)
     {
         var temp = Clone();
         var num = temp.Items.Add(value);
@@ -321,7 +327,7 @@ public partial class IdentifierTags : THost
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual THost AddRange(IEnumerable<string> range)
+    public THost AddRange(IEnumerable<string> range)
     {
         var temp = Clone();
         var num = temp.Items.AddRange(range);
@@ -334,7 +340,7 @@ public partial class IdentifierTags : THost
     /// <param name="index"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public virtual THost Insert(int index, string value)
+    public THost Insert(int index, string value)
     {
         var temp = Clone();
         var num = temp.Items.Insert(index, value);
@@ -347,7 +353,7 @@ public partial class IdentifierTags : THost
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual THost InsertRange(int index, IEnumerable<string> range)
+    public THost InsertRange(int index, IEnumerable<string> range)
     {
         var temp = Clone();
         var num = temp.Items.InsertRange(index, range);
@@ -359,7 +365,7 @@ public partial class IdentifierTags : THost
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public virtual THost RemoveAt(int index)
+    public THost RemoveAt(int index)
     {
         var temp = Clone();
         var num = temp.Items.RemoveAt(index);
@@ -372,8 +378,10 @@ public partial class IdentifierTags : THost
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual THost RemoveRange(int index, int count)
+    public THost RemoveRange(int index, int count)
     {
+        if (count == 0) return this;
+
         var temp = Clone();
         var num = temp.Items.RemoveRange(index, count);
         return num > 0 ? temp : this;
@@ -382,9 +390,9 @@ public partial class IdentifierTags : THost
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="tag"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    public virtual THost Remove(string tag)
+    public THost Remove(string tag)
     {
         var temp = Clone();
         var num = temp.Items.Remove(tag);
@@ -396,7 +404,7 @@ public partial class IdentifierTags : THost
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual THost Remove(Predicate<string> predicate)
+    public THost Remove(Predicate<string> predicate)
     {
         var temp = Clone();
         var num = temp.Items.Remove(predicate);
@@ -408,7 +416,7 @@ public partial class IdentifierTags : THost
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual THost RemoveLast(Predicate<string> predicate)
+    public THost RemoveLast(Predicate<string> predicate)
     {
         var temp = Clone();
         var num = temp.Items.RemoveLast(predicate);
@@ -420,7 +428,7 @@ public partial class IdentifierTags : THost
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual THost RemoveAll(Predicate<string> predicate)
+    public THost RemoveAll(Predicate<string> predicate)
     {
         var temp = Clone();
         var num = temp.Items.RemoveAll(predicate);
@@ -431,7 +439,7 @@ public partial class IdentifierTags : THost
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual THost Clear()
+    public THost Clear()
     {
         var temp = Clone();
         var num = temp.Items.Clear();

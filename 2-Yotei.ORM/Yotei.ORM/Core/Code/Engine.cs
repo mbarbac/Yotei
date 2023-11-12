@@ -1,5 +1,4 @@
-﻿
-namespace Yotei.ORM.Code;
+﻿namespace Yotei.ORM.Code;
 
 // ========================================================
 /// <summary>

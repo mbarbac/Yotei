@@ -4,6 +4,7 @@
 /// <summary>
 /// An immutable object that represents the well-known metadata tags of a given engine, for
 /// the purposes of the framework.
+/// <br/> Tags are just not null and not empty strings.
 /// </summary>
 [Cloneable]
 public partial interface IKnownTags : IEnumerable<string>, IEquatable<IKnownTags>

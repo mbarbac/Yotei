@@ -19,7 +19,7 @@ public static class Test_KnownTags
     [Fact]
     public static void Test_Create_Populated()
     {
-        var items = new FakeKnownTags();
+        var items = FakeKnownTags.Create(false);
         Assert.Equal(3, items.IdentifierTags.Count);
         Assert.Equal("SchemaTag", items.IdentifierTags[0]);
         Assert.Equal("TableTag", items.IdentifierTags[1]);
@@ -33,8 +33,8 @@ public static class Test_KnownTags
     [Fact]
     public static void Test_Equality()
     {
-        var source = new FakeKnownTags();
-        var target = new FakeKnownTags();
+        var source = FakeKnownTags.Create(false);
+        var target = FakeKnownTags.Create(false);
         Assert.Equal(source, target);
 
         target = target.WithPrimaryKeyTag("other");
@@ -45,7 +45,7 @@ public static class Test_KnownTags
     [Fact]
     public static void Test_With_Methods()
     {
-        var source = new FakeKnownTags();
+        var source = FakeKnownTags.Create(false);
 
         var ids = new IdentifierTags(false, "x.y.z");
         var target = source.WithIdentifierTags(ids);
@@ -81,7 +81,7 @@ public static class Test_KnownTags
     [Fact]
     public static void Test_With_Methods_Errors()
     {
-        var source = new FakeKnownTags();
+        var source = FakeKnownTags.Create(false);
 
         try { _ = source.WithPrimaryKeyTag("SchemaTag"); Assert.Fail(); }
         catch (DuplicateException) { }
@@ -105,7 +105,7 @@ public static class Test_KnownTags
     [Fact]
     public static void Test_Change_CaseSensitive()
     {
-        var source = new FakeKnownTags();
+        var source = FakeKnownTags.Create(false);
         var target = source.WithCaseSensitiveTags(true);
         Assert.NotSame(source, target);
         Assert.Equal(3, target.IdentifierTags.Count);

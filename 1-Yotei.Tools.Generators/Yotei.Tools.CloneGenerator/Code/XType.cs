@@ -147,7 +147,11 @@ internal class XType : TypeNode
             {
                 return !prevent ? "public override" : "public new";
             }
-            return !prevent ? "public virtual" : "public";
+            else
+            {
+                if (Symbol.IsSealed) return "public";
+                return !prevent ? "public virtual" : "public";
+            }
         }
 
         // Determines if appears in the chain...

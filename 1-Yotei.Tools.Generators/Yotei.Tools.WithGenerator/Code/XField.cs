@@ -245,7 +245,11 @@ internal class XField : FieldNode
             {
                 return !prevent ? "public override" : "public new";
             }
-            return !prevent ? "public virtual" : "public";
+            else
+            {
+                if (HostType.IsSealed) return "public";
+                return !prevent ? "public virtual" : "public";
+            }
         }
 
         // Determines if appears in the chain...
