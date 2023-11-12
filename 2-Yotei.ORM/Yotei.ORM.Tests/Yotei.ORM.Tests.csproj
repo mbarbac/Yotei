@@ -58,6 +58,26 @@
    <ItemGroup>
 	  <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
    </ItemGroup>
+   <ItemGroup>
+     <Compile Remove="Fakes\FakeEngine.cs" />
+     <Compile Remove="Fakes\FakeKnownTags.cs" />
+     <Compile Remove="Tests_Core\Test_Engine.cs" />
+     <Compile Remove="Tests_Core\Test_Identifier.cs" />
+     <Compile Remove="Tests_Core\Test_IdentifierMatch.cs" />
+     <Compile Remove="Tests_Core\Test_IdentifierPart.cs" />
+     <Compile Remove="Tests_Core\Test_Parameter.cs" />
+     <Compile Remove="Tests_Core\Test_ParameterList.cs" />
+     <Compile Remove="Tests_Records\Test_IdentifierTags.cs" />
+     <Compile Remove="Tests_Records\Test_KnownTags.cs" />
+     <Compile Remove="Tests_Records\Test_Schema.cs" />
+     <Compile Remove="Tests_Records\Test_SchemaEntry.cs" />
+     <Compile Remove="Tests_Records\Test_SchemaEntryNoTags.cs" />
+   </ItemGroup>
+   <ItemGroup>
+     <Folder Include="Fakes\" />
+     <Folder Include="Tests_Core\" />
+     <Folder Include="Tests_Records\" />
+   </ItemGroup>
    <PropertyGroup>
 	  <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 	  <CompilerGeneratedFilesOutputPath>Generated\$(TargetFramework)</CompilerGeneratedFilesOutputPath>

@@ -6,8 +6,8 @@ namespace Yotei.ORM.Records.Code;
 /// <summary>
 /// <inheritdoc cref="IKnownTags"/>
 /// </summary>
-[Cloneable(PreventVirtual = true)]
-[WithGenerator(PreventVirtual = true)]
+[Cloneable]
+[WithGenerator]
 public partial class KnownTags : IKnownTags
 {
     /// <summary>
@@ -73,11 +73,11 @@ public partial class KnownTags : IKnownTags
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="obj"></param>
+    /// <param name="other"></param>
     /// <returns></returns>
-    public override bool Equals(object? obj)
+    public bool Equals(IKnownTags? other)
     {
-        if (obj is not IKnownTags other) return false;
+        if (other is null) return false;
 
         if (CaseSensitiveTags != other.CaseSensitiveTags) return false;
         if (!IdentifierTags.Equals(other.IdentifierTags)) return false;
@@ -87,6 +87,13 @@ public partial class KnownTags : IKnownTags
 
         return true;
     }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    public override bool Equals(object? obj) => Equals(obj as IKnownTags);
 
     /// <summary>
     /// <inheritdoc/>
@@ -301,7 +308,7 @@ public partial class KnownTags : IKnownTags
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public IKnownTags Clear()
+    public virtual IKnownTags Clear()
     {
         if (IsEmpty) return this;
 
@@ -309,7 +316,7 @@ public partial class KnownTags : IKnownTags
         temp.ClearInternal();
         return temp;
     }
-    protected virtual void ClearInternal()
+    void ClearInternal()
     {
         _IdentifierTags = new IdentifierTags(CaseSensitiveTags);
         _PrimaryKeyTag = null;

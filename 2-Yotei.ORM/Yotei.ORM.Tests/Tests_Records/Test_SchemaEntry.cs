@@ -1,5 +1,3 @@
-using NuGet.Frameworks;
-
 namespace Yotei.ORM.Tests;
 
 // ========================================================

@@ -5,7 +5,7 @@
 /// An immutable object that represents a database identifier.
 /// </summary>
 [Cloneable]
-public partial interface IIdentifier : IEnumerable<IIdentifierPart>
+public partial interface IIdentifier : IEnumerable<IIdentifierPart>, IEquatable<IIdentifier>
 {
     /// <summary>
     /// The engine this instance is associated with.

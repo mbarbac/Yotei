@@ -4,7 +4,7 @@
 /// <summary>
 /// <inheritdoc cref="IIdentifierPart"/>
 /// </summary>
-public class IdentifierPart : IIdentifierPart
+public sealed class IdentifierPart : IIdentifierPart
 {
     string? _Value;
     string? _UnwrappedValue;
@@ -25,17 +25,24 @@ public class IdentifierPart : IIdentifierPart
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="obj"></param>
+    /// <param name="other"></param>
     /// <returns></returns>
-    public override bool Equals(object? obj)
+    public bool Equals(IIdentifierPart? other)
     {
-        if (obj is not IIdentifierPart other) return false;
+        if (other is null) return false;
 
         if (!Engine.Equals(other.Engine)) return false;
         if (string.Compare(Value, other.Value, !Engine.CaseSensitiveNames) != 0) return false;
 
         return true;
     }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    public override bool Equals(object? obj) => Equals(obj as IdentifierPart);
 
     /// <summary>
     /// <inheritdoc/>

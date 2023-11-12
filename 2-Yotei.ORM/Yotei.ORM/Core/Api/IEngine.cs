@@ -4,7 +4,7 @@
 /// <summary>
 /// An immutable object that represents an underlying database engine.
 /// </summary>
-public partial interface IEngine
+public partial interface IEngine : IEquatable<IEngine>
 {
     /// <summary>
     /// Determines if the identifier-alike elements in the database are case sensitive, or not.

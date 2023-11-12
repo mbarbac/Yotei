@@ -4,7 +4,7 @@ namespace Yotei.ORM.Tests;
 
 // ========================================================
 //[Enforced]
-public static class Test_SchemaEntry_NoTags
+public static class Test_SchemaEntryNoTags
 {
     //[Enforced]
     [Fact]

@@ -4,7 +4,7 @@
 /// <summary>
 /// An immutable object that represents a part in a database identifier.
 /// </summary>
-public interface IIdentifierPart
+public interface IIdentifierPart : IEquatable<IIdentifierPart>
 {
     /// <summary>
     /// The engine this instance is associated with.

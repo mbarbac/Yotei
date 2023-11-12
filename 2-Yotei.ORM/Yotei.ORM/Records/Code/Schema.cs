@@ -1,22 +1,23 @@
-﻿using THost = Yotei.ORM.IParameterList;
-using TItem = Yotei.ORM.IParameter;
-using TKey = string;
+﻿using System.Runtime.InteropServices.Marshalling;
+using THost = Yotei.ORM.Records.ISchema;
+using TItem = Yotei.ORM.Records.ISchemaEntry;
+using TKey = Yotei.ORM.IIdentifier;
 
-namespace Yotei.ORM.Code;
+namespace Yotei.ORM.Records.Code;
 
 // ========================================================
 /// <summary>
 /// <inheritdoc cref="THost"/>
 /// </summary>
 [DebuggerDisplay("{ToDebugString()}")]
-[Cloneable(PreventVirtual = true)]
-public sealed partial class ParameterList : THost
+[Cloneable]
+public partial class Schema : THost
 {
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="engine"></param>
-    public ParameterList(IEngine engine)
+    public Schema(IEngine engine)
     {
         Items = CreateInnerList();
         Engine = engine.ThrowWhenNull();
@@ -27,21 +28,21 @@ public sealed partial class ParameterList : THost
     /// </summary>
     /// <param name="engine"></param>
     /// <param name="item"></param>
-    public ParameterList(IEngine engine, TItem item) : this(engine) => Items.Add(item);
+    public Schema(IEngine engine, TItem item) : this(engine) => Items.Add(item);
 
     /// <summary>
     /// Initializes a new instance with the elements from the given range.
     /// </summary>
     /// <param name="engine"></param>
     /// <param name="range"></param>
-    public ParameterList(
+    public Schema(
         IEngine engine, IEnumerable<TItem> range) : this(engine) => Items.AddRange(range);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    ParameterList(ParameterList source)
+    protected Schema(Schema source)
     {
         source.ThrowWhenNull();
 
@@ -61,13 +62,21 @@ public sealed partial class ParameterList : THost
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"Count: {Count}";
+    public override string ToString() => string.Join('.', Items.Select(x => ToString(x)));
 
-    /// <summary>
-    /// Invoked to obtain a string representation of this instance for DEBUG purposes.
-    /// </summary>
-    /// <returns></returns>
-    string ToDebugString() => Items.ToDebugString();
+    string ToString(ISchemaEntry entry)
+    {
+        var str = entry.Identifier.Value ?? string.Empty;
+        if (entry.IsPrimaryKey) str += "(PK)";
+        return str;
+    }
+
+    protected string ToDebugString()
+    {
+        var items = Items.Count < DEBUGCOUNT ? Items : Items.Take(DEBUGCOUNT);
+        return $"({Count}):[{string.Join(", ", items)}]";
+    }
+    static int DEBUGCOUNT = 8;
 
     // ----------------------------------------------------
 
@@ -81,16 +90,49 @@ public sealed partial class ParameterList : THost
         public new string ToDebugString() => base.ToDebugString();
 
         public override TItem ValidateItem(TItem item) => item.ThrowWhenNull();
-        public override TKey GetKey(TItem item) => item.Name;
-        public override TKey ValidateKey(TKey key) => key.NotNullNotEmpty();
+        public override TKey GetKey(TItem item) => item.Identifier;
+        public override TKey ValidateKey(TKey key)
+        {
+            key.ThrowWhenNull();
+
+            if (!Master.Engine.Equals(key.Engine)) throw new ArgumentException(
+                "Engine of identifier is not the same as the engine of this schema.")
+                .WithData(key, "identifier")
+                .WithData(Master, "schema");
+
+            if (key.Count == 0) throw new ArgumentException(
+                "Identifier cannot be empty.")
+                .WithData(key, "identifier");
+
+            if (key.Value == null) throw new ArgumentException(
+                "Identifier cannot carry a null value.")
+                .WithData(key, "identifier");
+
+            if (key[^1].Value == null) throw new ArgumentException(
+                "Last part of the given identifier cannot carry a null value.")
+                .WithData(key, "identifier");
+
+            return key;
+        }
         public override bool CompareKeys(TKey source, TKey target)
         {
-            return string.Compare(source, target, !Master.Engine.CaseSensitiveNames) == 0;
+            return source.Match(target);
         }
         public override bool AcceptDuplicate(TItem item)
         {
             if (this.Any(x => ReferenceEquals(x, item))) return true;
             throw new DuplicateException("Duplicated element.").WithData(item);
+        }
+
+        protected override int FindDuplicate(TItem item)
+        {
+            var index = base.FindDuplicate(item);
+            if (index < 0)
+            {
+                if (this.Any(x => x.Identifier.Match(item.Identifier))) index = 1000;
+                if (this.Any(x => x.Identifier.Match(item.Identifier))) index = 1000;
+            }
+            return index;
         }
     }
 
@@ -132,30 +174,46 @@ public sealed partial class ParameterList : THost
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="identifier"></param>
     /// <returns></returns>
-    public bool Contains(TKey key) => Items.Contains(key);
+    public bool Contains(string identifier)
+    {
+        var item = new Identifier(Engine, identifier);
+        return Items.Contains(item);
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="identifier"></param>
     /// <returns></returns>
-    public int IndexOf(TKey key) => Items.IndexOf(key);
+    public int IndexOf(string identifier)
+    {
+        var item = new Identifier(Engine, identifier);
+        return Items.IndexOf(item);
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="identifier"></param>
     /// <returns></returns>
-    public int LastIndexOf(TKey key) => Items.LastIndexOf(key);
+    public int LastIndexOf(string identifier)
+    {
+        var item = new Identifier(Engine, identifier);
+        return Items.LastIndexOf(item);
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="identifier"></param>
     /// <returns></returns>
-    public List<int> IndexesOf(TKey key) => Items.IndexesOf(key);
+    public List<int> IndexesOf(string identifier)
+    {
+        var item = new Identifier(Engine, identifier);
+        return Items.IndexesOf(item);
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -200,16 +258,20 @@ public sealed partial class ParameterList : THost
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    /// <param name="identifier"></param>
+    /// <param name="unique"></param>
     /// <returns></returns>
-    public string NextName()
+    public List<TItem> Match(string identifier, out TItem? unique)
     {
-        for (int i = Items.Count; i < int.MaxValue; i++)
-        {
-            var name = $"{Engine.ParameterPrefix}{i}";
-            var index = IndexOf(name);
-            if (index < 0) return name;
-        }
-        throw new UnExpectedException("Range of indexes exhausted.");
+        var item = new Identifier(Engine, identifier);
+
+        identifier.ThrowWhenNull();
+
+        var nums = Items.IndexesOf(x => x.Identifier.Match(item));
+        var items = nums.Select(x => Items[x]).ToList();
+
+        unique = items.Count == 1 ? items[0] : null;
+        return items;
     }
 
     // ----------------------------------------------------
@@ -220,7 +282,7 @@ public sealed partial class ParameterList : THost
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public THost GetRange(int index, int count)
+    public virtual THost GetRange(int index, int count)
     {
         if (count == Count && index == 0) return this;
         if (count == 0)
@@ -243,7 +305,7 @@ public sealed partial class ParameterList : THost
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public THost Replace(int index, TItem item)
+    public virtual THost Replace(int index, TItem item)
     {
         var temp = Clone();
         var num = temp.Items.Replace(index, item);
@@ -255,7 +317,7 @@ public sealed partial class ParameterList : THost
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public THost Add(TItem item)
+    public virtual THost Add(TItem item)
     {
         var temp = Clone();
         var num = temp.Items.Add(item);
@@ -267,7 +329,7 @@ public sealed partial class ParameterList : THost
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public THost AddRange(IEnumerable<TItem> range)
+    public virtual THost AddRange(IEnumerable<TItem> range)
     {
         var temp = Clone();
         var num = temp.Items.AddRange(range);
@@ -280,7 +342,7 @@ public sealed partial class ParameterList : THost
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public THost Insert(int index, TItem item)
+    public virtual THost Insert(int index, TItem item)
     {
         var temp = Clone();
         var num = temp.Items.Insert(index, item);
@@ -293,7 +355,7 @@ public sealed partial class ParameterList : THost
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    public THost InsertRange(int index, IEnumerable<TItem> range)
+    public virtual THost InsertRange(int index, IEnumerable<TItem> range)
     {
         var temp = Clone();
         var num = temp.Items.InsertRange(index, range);
@@ -305,7 +367,7 @@ public sealed partial class ParameterList : THost
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public THost RemoveAt(int index)
+    public virtual THost RemoveAt(int index)
     {
         var temp = Clone();
         var num = temp.Items.RemoveAt(index);
@@ -318,7 +380,7 @@ public sealed partial class ParameterList : THost
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public THost RemoveRange(int index, int count)
+    public virtual THost RemoveRange(int index, int count)
     {
         var temp = Clone();
         var num = temp.Items.RemoveRange(index, count);
@@ -328,36 +390,42 @@ public sealed partial class ParameterList : THost
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="identifier"></param>
     /// <returns></returns>
-    public THost Remove(TKey key)
+    public virtual THost Remove(string identifier)
     {
         var temp = Clone();
-        var num = temp.Items.Remove(key);
+
+        var item = new Identifier(Engine, identifier);
+        var num = temp.Items.Remove(item);
         return num > 0 ? temp : this;
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="identifier"></param>
     /// <returns></returns>
-    public THost RemoveLast(TKey key)
+    public virtual THost RemoveLast(string identifier)
     {
         var temp = Clone();
-        var num = temp.Items.RemoveLast(key);
+
+        var item = new Identifier(Engine, identifier);
+        var num = temp.Items.RemoveLast(item);
         return num > 0 ? temp : this;
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="identifier"></param>
     /// <returns></returns>
-    public THost RemoveAll(TKey key)
+    public virtual THost RemoveAll(string identifier)
     {
         var temp = Clone();
-        var num = temp.Items.RemoveAll(key);
+
+        var item = new Identifier(Engine, identifier);
+        var num = temp.Items.RemoveAll(item);
         return num > 0 ? temp : this;
     }
 
@@ -366,7 +434,7 @@ public sealed partial class ParameterList : THost
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public THost Remove(Predicate<TItem> predicate)
+    public virtual THost Remove(Predicate<TItem> predicate)
     {
         var temp = Clone();
         var num = temp.Items.Remove(predicate);
@@ -378,7 +446,7 @@ public sealed partial class ParameterList : THost
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public THost RemoveLast(Predicate<TItem> predicate)
+    public virtual THost RemoveLast(Predicate<TItem> predicate)
     {
         var temp = Clone();
         var num = temp.Items.RemoveLast(predicate);
@@ -390,7 +458,7 @@ public sealed partial class ParameterList : THost
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public THost RemoveAll(Predicate<TItem> predicate)
+    public virtual THost RemoveAll(Predicate<TItem> predicate)
     {
         var temp = Clone();
         var num = temp.Items.RemoveAll(predicate);
@@ -401,7 +469,7 @@ public sealed partial class ParameterList : THost
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public THost Clear()
+    public virtual THost Clear()
     {
         var temp = Clone();
         var num = temp.Items.Clear();

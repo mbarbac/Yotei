@@ -65,9 +65,8 @@ public class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     /// <returns></returns>
     protected string ToDebugString()
     {
-        return Items.Count < DEBUGCOUNT
-            ? $"({Count}):[{string.Join(", ", Items)}]"
-            : $"({Count}):[{string.Join(", ", Items.Take(DEBUGCOUNT))}, ...]";
+        var items = Items.Count < DEBUGCOUNT ? Items : Items.Take(DEBUGCOUNT);
+        return $"({Count}):[{string.Join(", ", items)}]";
     }
     static int DEBUGCOUNT = 8;
 
@@ -306,6 +305,17 @@ public class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     // ----------------------------------------------------
 
     /// <summary>
+    /// Returns the index of the first element that can be considered as a duplicate of the
+    /// given item, or -1 if any.
+    /// </summary>
+    protected virtual int FindDuplicate(TItem item)
+    {
+        var key = GetKey(item);
+        var num = IndexOf(key);
+        return num;
+    }
+
+    /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="index"></param>
@@ -343,9 +353,7 @@ public class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
         }
 
         item = ValidateItem(item);
-
-        var key = GetKey(item);
-        var num = IndexOf(key);
+        var num = FindDuplicate(item);
         if (num >= 0 && !AcceptDuplicate(item)) return 0;
 
         Items.Add(item);
@@ -389,9 +397,7 @@ public class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
         }
 
         item = ValidateItem(item);
-
-        var key = GetKey(item);
-        var num = IndexOf(key);
+        var num = FindDuplicate(item);
         if (num >= 0 && !AcceptDuplicate(item)) return 0;
 
         Items.Insert(index, item);

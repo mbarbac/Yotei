@@ -5,7 +5,7 @@
 /// <inheritdoc cref="IIdentifier"/>
 /// </summary>
 [Cloneable(PreventVirtual = true)]
-public partial class Identifier : IIdentifier
+public sealed partial class Identifier : IIdentifier
 {
     /// <summary>
     /// Initializes a new empty instance.
@@ -36,7 +36,7 @@ public partial class Identifier : IIdentifier
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected Identifier(Identifier source)
+    Identifier(Identifier source)
     {
         source.ThrowWhenNull();
 
@@ -55,17 +55,24 @@ public partial class Identifier : IIdentifier
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="obj"></param>
+    /// <param name="other"></param>
     /// <returns></returns>
-    public override bool Equals(object? obj)
+    public bool Equals(IIdentifier? other)
     {
-        if (obj is not IIdentifier other) return false;
+        if (other is null) return false;
 
         if (!Engine.Equals(other.Engine)) return false;
         if (string.Compare(Value, other.Value, !Engine.CaseSensitiveNames) != 0) return false;
 
         return true;
     }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    public override bool Equals(object? obj) => Equals(obj as IIdentifier);
 
     /// <summary>
     /// <inheritdoc/>
@@ -89,7 +96,7 @@ public partial class Identifier : IIdentifier
     /// <summary>
     /// Represents the internal collection of elements in this instance.
     /// </summary>
-    protected class InnerList : CoreList<string?, IIdentifierPart>
+    class InnerList : CoreList<string?, IIdentifierPart>
     {
         readonly IIdentifier Master;
         public InnerList(IIdentifier master) => Master = master.ThrowWhenNull();
@@ -120,12 +127,12 @@ public partial class Identifier : IIdentifier
     /// Obtains an inner list to be used by this instance.
     /// </summary>
     /// <returns></returns>
-    protected virtual InnerList CreateInnerList() => new(this);
+    InnerList CreateInnerList() => new(this);
 
     /// <summary>
     /// The internal collection of elements in this instance.
     /// </summary>
-    protected InnerList Items { get; }
+    InnerList Items { get; }
 
     // ----------------------------------------------------
 

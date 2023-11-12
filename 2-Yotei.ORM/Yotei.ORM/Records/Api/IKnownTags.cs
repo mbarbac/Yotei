@@ -6,7 +6,7 @@
 /// the purposes of the framework.
 /// </summary>
 [Cloneable]
-public partial interface IKnownTags : IEnumerable<string>
+public partial interface IKnownTags : IEnumerable<string>, IEquatable<IKnownTags>
 {
     /// <summary>
     /// Determines if the metadata tags in this collection are case sensitive, or not.

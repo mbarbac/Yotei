@@ -116,55 +116,6 @@ public partial class SchemaEntry : THost
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="obj"></param>
-    /// <returns></returns>
-    public override bool Equals(object? obj)
-    {
-        if (obj is not ISchemaEntry other) return false;
-
-        if (!Engine.Equals(other.Engine)) return false;
-        if (!Identifier.Equals(other.Identifier)) return false;
-        if (IsPrimaryKey != other.IsPrimaryKey) return false;
-        if (IsUniqueValued != other.IsUniqueValued) return false;
-        if (IsReadOnly != other.IsReadOnly) return false;
-
-        if (Count !=  other.Count) return false;
-        for (int i = 0; i < Count; i++)
-        {
-            var item = Items[i];
-            if (!other.TryGetValue(item.Tag, out var value)) return false;
-
-            if (item.Value is null) { if (value is not null) return false; }
-            else if (!item.Value.Equals(value)) return false;
-        }
-
-        return true;
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
-    public override int GetHashCode()
-    {
-        var code = HashCode.Combine(Engine.GetHashCode());
-        code = HashCode.Combine(code, Identifier.GetHashCode());
-        code = HashCode.Combine(code, IsPrimaryKey);
-        code = HashCode.Combine(code, IsUniqueValued);
-        code = HashCode.Combine(code, IsReadOnly);
-
-        for (int i = 0; i < Count; i++)
-        {
-            var item = Items[i];
-            code = HashCode.Combine(item.Tag);
-            if (item.Value is not null) code = HashCode.Combine(item.Value);
-        }
-        return code;
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
     /// <returns></returns>
     public override string ToString()
     {
@@ -293,7 +244,7 @@ public partial class SchemaEntry : THost
     {
         value = value.ThrowWhenNull();
 
-        if (!ReferenceEquals(Engine, value.Engine)) throw new ArgumentException(
+        if (!Engine.Equals(value.Engine)) throw new ArgumentException(
             "Engine of the identifier is not the engine of this instance.")
             .WithData(value)
             .WithData(this);

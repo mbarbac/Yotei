@@ -5,7 +5,7 @@
 /// <inheritdoc cref="IParameter"/>
 /// </summary>
 [WithGenerator(PreventVirtual = true)]
-public partial class Parameter : IParameter
+public sealed partial class Parameter : IParameter
 {
     /// <summary>
     /// Initializes a new instance.
@@ -22,7 +22,7 @@ public partial class Parameter : IParameter
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected Parameter(Parameter source)
+    Parameter(Parameter source)
     {
         ArgumentNullException.ThrowIfNull(source);
 

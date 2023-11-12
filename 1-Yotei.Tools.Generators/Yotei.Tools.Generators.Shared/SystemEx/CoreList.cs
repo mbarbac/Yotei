@@ -65,9 +65,8 @@ internal class CoreList<T> : IEnumerable<T>, ICloneable
     /// </summary>
     string ToDebugString()
     {
-        return Items.Count < DEBUGCOUNT
-            ? $"({Count}):[{string.Join(", ", Items)}]"
-            : $"({Count}):[{string.Join(", ", Items.Take(DEBUGCOUNT))}, ...]";
+        var items = Items.Count < DEBUGCOUNT ? Items : Items.Take(DEBUGCOUNT);
+        return $"({Count}):[{string.Join(", ", items)}]";
     }
     static int DEBUGCOUNT = 8;
 

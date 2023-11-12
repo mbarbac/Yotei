@@ -8,7 +8,7 @@ namespace Yotei.ORM.Records;
 /// the maximal structure of the identifiers allowed by an underlying database.
 /// </summary>
 [Cloneable]
-public partial interface IIdentifierTags : IEnumerable<string>
+public partial interface IIdentifierTags : IEnumerable<string>, IEquatable<IIdentifierTags>
 {
     /// <summary>
     /// Determines if the metadata tags in this collection are case sensitive, or not.

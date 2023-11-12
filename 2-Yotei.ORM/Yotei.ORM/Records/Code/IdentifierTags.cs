@@ -6,8 +6,8 @@ namespace Yotei.ORM.Records.Code;
 /// <summary>
 /// <inheritdoc cref="THost"/>
 /// </summary>
-[Cloneable(PreventVirtual = true)]
-[WithGenerator(PreventVirtual = true)]
+[Cloneable]
+[WithGenerator]
 public partial class IdentifierTags : THost
 {
     /// <summary>
@@ -60,11 +60,11 @@ public partial class IdentifierTags : THost
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="obj"></param>
+    /// <param name="other"></param>
     /// <returns></returns>
-    public override bool Equals(object? obj)
+    public bool Equals(THost? other)
     {
-        if (obj is not THost other) return false;
+        if (other is null) return false;
 
         if (CaseSensitiveTags != other.CaseSensitiveTags) return false;
         if (Count != other.Count) return false;
@@ -73,6 +73,13 @@ public partial class IdentifierTags : THost
 
         return true;
     }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    public override bool Equals(object? obj) => Equals(obj as IIdentifierTags);
 
     /// <summary>
     /// <inheritdoc/>
@@ -267,7 +274,7 @@ public partial class IdentifierTags : THost
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public THost GetRange(int index, int count)
+    public virtual THost GetRange(int index, int count)
     {
         if (count == Count && index == 0) return this;
         if (count == 0)
@@ -290,7 +297,7 @@ public partial class IdentifierTags : THost
     /// <param name="index"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public THost Replace(int index, string value)
+    public virtual THost Replace(int index, string value)
     {
         var temp = Clone();
         var num = temp.Items.Replace(index, value);
@@ -302,7 +309,7 @@ public partial class IdentifierTags : THost
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public THost Add(string value)
+    public virtual THost Add(string value)
     {
         var temp = Clone();
         var num = temp.Items.Add(value);
@@ -314,7 +321,7 @@ public partial class IdentifierTags : THost
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public THost AddRange(IEnumerable<string> range)
+    public virtual THost AddRange(IEnumerable<string> range)
     {
         var temp = Clone();
         var num = temp.Items.AddRange(range);
@@ -327,7 +334,7 @@ public partial class IdentifierTags : THost
     /// <param name="index"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public THost Insert(int index, string value)
+    public virtual THost Insert(int index, string value)
     {
         var temp = Clone();
         var num = temp.Items.Insert(index, value);
@@ -340,7 +347,7 @@ public partial class IdentifierTags : THost
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    public THost InsertRange(int index, IEnumerable<string> range)
+    public virtual THost InsertRange(int index, IEnumerable<string> range)
     {
         var temp = Clone();
         var num = temp.Items.InsertRange(index, range);
@@ -352,7 +359,7 @@ public partial class IdentifierTags : THost
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public THost RemoveAt(int index)
+    public virtual THost RemoveAt(int index)
     {
         var temp = Clone();
         var num = temp.Items.RemoveAt(index);
@@ -365,7 +372,7 @@ public partial class IdentifierTags : THost
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public THost RemoveRange(int index, int count)
+    public virtual THost RemoveRange(int index, int count)
     {
         var temp = Clone();
         var num = temp.Items.RemoveRange(index, count);
@@ -377,7 +384,7 @@ public partial class IdentifierTags : THost
     /// </summary>
     /// <param name="tag"></param>
     /// <returns></returns>
-    public THost Remove(string tag)
+    public virtual THost Remove(string tag)
     {
         var temp = Clone();
         var num = temp.Items.Remove(tag);
@@ -389,7 +396,7 @@ public partial class IdentifierTags : THost
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public THost Remove(Predicate<string> predicate)
+    public virtual THost Remove(Predicate<string> predicate)
     {
         var temp = Clone();
         var num = temp.Items.Remove(predicate);
@@ -401,7 +408,7 @@ public partial class IdentifierTags : THost
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public THost RemoveLast(Predicate<string> predicate)
+    public virtual THost RemoveLast(Predicate<string> predicate)
     {
         var temp = Clone();
         var num = temp.Items.RemoveLast(predicate);
@@ -413,7 +420,7 @@ public partial class IdentifierTags : THost
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public THost RemoveAll(Predicate<string> predicate)
+    public virtual THost RemoveAll(Predicate<string> predicate)
     {
         var temp = Clone();
         var num = temp.Items.RemoveAll(predicate);
@@ -424,7 +431,7 @@ public partial class IdentifierTags : THost
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public THost Clear()
+    public virtual THost Clear()
     {
         var temp = Clone();
         var num = temp.Items.Clear();

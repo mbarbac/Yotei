@@ -1,0 +1,3 @@
+CoreList:
+- ValidateItem: needs and 'add' argument to be used when adding or inserting.
+- ValidateKey: the same, they are 2 different needs.

@@ -61,6 +61,27 @@
    <ItemGroup>
 	  <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
    </ItemGroup>
+   <ItemGroup>
+     <Compile Remove="Core\Api\IEngine.cs" />
+     <Compile Remove="Core\Api\IIdentifier.cs" />
+     <Compile Remove="Core\Api\IIdentifierPart.cs" />
+     <Compile Remove="Core\Api\IParameter.cs" />
+     <Compile Remove="Core\Api\IParameterList.cs" />
+     <Compile Remove="Core\Code\Engine.cs" />
+     <Compile Remove="Core\Code\Identifier.cs" />
+     <Compile Remove="Core\Code\IdentifierPart.cs" />
+     <Compile Remove="Core\Code\Parameter.cs" />
+     <Compile Remove="Core\Code\ParameterList.cs" />
+     <Compile Remove="Records\Api\IIdentifierTags.cs" />
+     <Compile Remove="Records\Api\IKnownTags.cs" />
+     <Compile Remove="Records\Api\ISchema.cs" />
+     <Compile Remove="Records\Api\ISchemaEntry.cs" />
+     <Compile Remove="Records\Api\MetadataPair.cs" />
+     <Compile Remove="Records\Code\IdentifierTags.cs" />
+     <Compile Remove="Records\Code\KnownTags.cs" />
+     <Compile Remove="Records\Code\Schema.cs" />
+     <Compile Remove="Records\Code\SchemaEntry.cs" />
+   </ItemGroup>
    <PropertyGroup>
 	  <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 	  <CompilerGeneratedFilesOutputPath>Generated\$(TargetFramework)</CompilerGeneratedFilesOutputPath>

@@ -53,11 +53,11 @@ public partial class Engine : IEngine
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="obj"></param>
+    /// <param name="other"></param>
     /// <returns></returns>
-    public override bool Equals(object? obj)
+    public bool Equals(IEngine? other)
     {
-        if (obj is not IEngine other) return false;
+        if (other is null) return false;
 
         if (CaseSensitiveNames != other.CaseSensitiveNames) return false;
         if (!NullValueLiteral.Equals(other.NullValueLiteral)) return false;
@@ -71,6 +71,13 @@ public partial class Engine : IEngine
 
         return true;
     }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    public override bool Equals(object? obj) => Equals(obj as IEngine);
 
     /// <summary>
     /// <inheritdoc/>

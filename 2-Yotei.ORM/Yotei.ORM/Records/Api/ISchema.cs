@@ -1,0 +1,242 @@
+﻿using THost = Yotei.ORM.Records.ISchema;
+using TItem = Yotei.ORM.Records.ISchemaEntry;
+using TKey = Yotei.ORM.IIdentifier;
+
+namespace Yotei.ORM.Records;
+
+// ========================================================
+/// <summary>
+/// An immutable object that contains the metadata that describes the contents and structure
+/// of a given record.
+/// <br/> Elements with duplicate identifiers are allowed as far as they are the same instance.
+/// </summary>
+[Cloneable]
+public partial interface ISchema : IEnumerable<TItem>
+{
+    /// <summary>
+    /// The engine this instance is associated with.
+    /// </summary>
+    IEngine Engine { get; }
+
+    /// <summary>
+    /// Gets the number of elements in this instance.
+    /// </summary>
+    int Count { get; }
+
+    /// <summary>
+    /// Minimizes the memory consumption of this instance.
+    /// </summary>
+    void Trim();
+
+    /// <summary>
+    /// Gets the element stored at the given index.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <returns></returns>
+    TItem this[int index] { get; }
+
+    /// <summary>
+    /// Determines if this collection contains any elements with the given identifier.
+    /// </summary>
+    /// <param name="identifier"></param>
+    /// <returns></returns>
+    bool Contains(string identifier);
+
+    /// <summary>
+    /// Returns the index of the first element in this collection with the given identifier,
+    /// or -1 if any can be found.
+    /// </summary>
+    /// <param name="identifier"></param>
+    /// <returns></returns>
+    int IndexOf(string identifier);
+
+    /// <summary>
+    /// Returns the index of the last element in this collection with the given identifier,
+    /// or -1 if any can be found.
+    /// </summary>
+    /// <param name="identifier"></param>
+    /// <returns></returns>
+    int LastIndexOf(string identifier);
+
+    /// <summary>
+    /// Returns the indexes of all the elements in this collection with the given identifier.
+    /// </summary>
+    /// <param name="identifier"></param>
+    /// <returns></returns>
+    List<int> IndexesOf(string identifier);
+
+    /// <summary>
+    /// Determines if this collection contains any elements that match the given predicate.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    bool Contains(Predicate<TItem> predicate);
+
+    /// <summary>
+    /// Returns the index of the first element in this collection that match the given predicate,
+    /// or -1 if any can be found.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    int IndexOf(Predicate<TItem> predicate);
+
+    /// <summary>
+    /// Returns the index of the last element in this collection that match the given predicate,
+    /// or -1 if any can be found.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    int LastIndexOf(Predicate<TItem> predicate);
+
+    /// <summary>
+    /// Returns the indexes of the elements in this collection that match the given predicate.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    List<int> IndexesOf(Predicate<TItem> predicate);
+
+    /// <summary>
+    /// Returns an array with the elements in this collection.
+    /// </summary>
+    /// <returns></returns>
+    TItem[] ToArray();
+
+    /// <summary>
+    /// Returns a list with the elements in this collection.
+    /// </summary>
+    /// <returns></returns>
+    List<TItem> ToList();
+
+    /// <summary>
+    /// Returns the collection of entries in this instance that match the given identifier. If
+    /// just one element is found, then it is placed in the out argument. Otherwise it is set
+    /// to null.
+    /// <br/> Matching is determined by comparing the unwrapped parts of this identifiers of the
+    /// entries in this  instance against the given one, from right to left. Any null, empty, or
+    /// missed target part is excluded from the comparison and considered an implicit match.
+    /// </summary>
+    /// <param name="identifier"></param>
+    /// <param name="unique"></param>
+    /// <returns></returns>
+    List<TItem> Match(string identifier, out TItem? unique);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Obtains an instance that contains the given number of elements starting from the given
+    /// index.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="count"></param>
+    /// <returns></returns>
+    THost GetRange(int index, int count);
+
+    /// <summary>
+    /// Obtains an instance where the element at the given index has been replaced with the new
+    /// given one.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    THost Replace(int index, TItem item);
+
+    /// <summary>
+    /// Obtains an instance where the given element has been added to the original one.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    THost Add(TItem item);
+
+    /// <summary>
+    /// Obtains an instance where the elements from the given range have been added to the
+    /// original one.
+    /// </summary>
+    /// <param name="range"></param>
+    /// <returns></returns>
+    THost AddRange(IEnumerable<TItem> range);
+
+    /// <summary>
+    /// Obtains an instance where the given element has been inserted into the original one, at
+    /// the given index.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    THost Insert(int index, TItem item);
+
+    /// <summary>
+    /// Obtains an instance where the elements from the given range have been inserted into the
+    /// original one, starting at the given index.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="range"></param>
+    /// <returns></returns>
+    THost InsertRange(int index, IEnumerable<TItem> range);
+
+    /// <summary>
+    /// Obtains an instance where the element at the given index has been removed.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <returns></returns>
+    THost RemoveAt(int index);
+
+    /// <summary>
+    /// Obtains an instance where the given number of elements have been removed from the
+    /// original one, starting from the given index.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="count"></param>
+    /// <returns></returns>
+    THost RemoveRange(int index, int count);
+
+    /// <summary>
+    /// Obtains an instance where the first element with the given identifier has been removed.
+    /// </summary>
+    /// <param name="identifier"></param>
+    /// <returns></returns>
+    THost Remove(string identifier);
+
+    /// <summary>
+    /// Obtains an instance where the last element with the given identifier has been removed.
+    /// </summary>
+    /// <param name="identifier"></param>
+    /// <returns></returns>
+    THost RemoveLast(string identifier);
+
+    /// <summary>
+    /// Obtains an instance where all the elements with the given identifier have been removed.
+    /// </summary>
+    /// <param name="identifier"></param>
+    /// <returns></returns>
+    THost RemoveAll(string identifier);
+
+    /// <summary>
+    /// Obtains an instance where the first ocurrence of an element that matches the given
+    /// predicate has been removed.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    THost Remove(Predicate<TItem> predicate);
+
+    /// <summary>
+    /// Obtains an instance where the last ocurrence of an element that matches the given
+    /// predicate has been removed.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    THost RemoveLast(Predicate<TItem> predicate);
+
+    /// <summary>
+    /// Obtains an instance where all the ocurrences of elements that match the given predicate
+    /// have been removed.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    THost RemoveAll(Predicate<TItem> predicate);
+
+    /// <summary>
+    /// Obtains an instance where all the original elements have been removed.
+    /// </summary>
+    /// <returns></returns>
+    THost Clear();
+}
