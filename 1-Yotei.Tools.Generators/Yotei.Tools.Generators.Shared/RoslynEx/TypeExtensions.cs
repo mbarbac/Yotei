@@ -80,6 +80,45 @@ internal static class TypeExtensions
     // ----------------------------------------------------
 
     /// <summary>
+    /// Returns the C#-alike name of the given type, including its generic parameters if any.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <param name="addNullable"></param>
+    /// <returns></returns>
+    public static string GivenName(this ITypeSymbol symbol, bool addNullable)
+    {
+        bool add = addNullable && symbol.NullableAnnotation == NullableAnnotation.Annotated;
+
+        if (symbol is INamedTypeSymbol type && type.IsGenericType && !type.IsNamespace)
+        {
+            var sb = new StringBuilder();
+            sb.Append($"{type.Name}<");
+
+            for (int i = 0; i < type.TypeArguments.Length; i++)
+            {
+                if (i != 0) sb.Append(", ");
+
+                var temp = type.TypeArguments[i];
+                var name = temp.GivenName(addNullable: true); // inner nullables = true!
+                sb.Append(name);
+            }
+
+            sb.Append(">");
+            if (add) sb.Append("?");
+            return sb.ToString();
+        }
+        
+        else
+        {
+            var name = symbol.Name;
+            if (add) name += "?";
+            return name;
+        }
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Returns the C#-alike fully qualified name of the given type
     /// </summary>
     /// <param name="symbol"></param>
@@ -87,58 +126,31 @@ internal static class TypeExtensions
     /// <returns></returns>
     public static string FullyQualifiedName(this ITypeSymbol symbol, bool addNullable)
     {
-        List<string> names = new();
-        ISymbol? node = symbol;
+        List<string> names = [];
+        bool add = addNullable && symbol.NullableAnnotation == NullableAnnotation.Annotated;
 
-        while (node != null)
+        ISymbol? node = symbol; while (node != null)
         {
             switch (node)
             {
-                case INamespaceSymbol item: AddToList(item); break;
-                case INamedTypeSymbol item: AddToList(item); break;
+                case INamespaceSymbol item: AddToList(item.Name); break;
+                case INamedTypeSymbol item: AddToList(item.GivenName(addNullable)); break;
+                case ITypeParameterSymbol item: AddToList(item.Name); break;
             }
             node = node.ContainingSymbol;
         }
 
         names.Reverse();
         var name = string.Join(".", names);
+        if (add) name += "?";
+        
+        return name;
 
-        return (addNullable && symbol.NullableAnnotation == NullableAnnotation.Annotated)
-            ? (name + "?")
-            : name;
-
-        /// <summary>
-        /// Adds the name of the given symbol to the list, provided it is not null.
-        /// </summary>
-        void AddToList(ISymbol symbol)
+        // Adds the name of the symbol to the list...
+        void AddToList(string? name)
         {
-            var name = GetShortName(symbol).NullWhenEmpty();
+            name = name.NullWhenEmpty();
             if (name != null) names.Add(name);
-        }
-
-        /// <summary>
-        /// Gets the short name of the given type or namespace symbol.
-        /// </summary>
-        string? GetShortName(ISymbol symbol)
-        {
-            if (symbol is INamedTypeSymbol type && type.IsGenericType && !type.IsNamespace)
-            {
-                var sb = new StringBuilder();
-                sb.Append($"{type.Name}<");
-
-                for (int i = 0; i < type.TypeArguments.Length; i++)
-                {
-                    if (i != 0) sb.Append(", ");
-
-                    var temp = type.TypeArguments[i];
-                    var name = temp.FullyQualifiedName(addNullable);
-                    sb.Append(name);
-                }
-
-                sb.Append(">");
-                return sb.ToString();
-            }
-            return symbol.Name;
         }
     }
 }

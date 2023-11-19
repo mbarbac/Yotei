@@ -59,16 +59,15 @@ internal class XProperty : PropertyNode
         var memberType = Symbol.Type.FullyQualifiedName(addNullable: true);
         var vname = $"v_{Symbol.Name}";
         PrintDocumentation(file, vname);
-        
-        var modifiers = GetModifiers();
-        if (modifiers != null) modifiers += " ";
 
+        // Host type is an interface...
         if (HostType.IsInterface())
         {
             PrintInterface();
             return;
         }
 
+        // Specs determine how to emit non-interface code...
         var specs = TryGetSpecs(out var temp) ? temp : null;
         var comparison = StringComparison.OrdinalIgnoreCase;
 
@@ -93,10 +92,13 @@ internal class XProperty : PropertyNode
         }
 
         /// <summary>
-        /// Invoked to emit code when the host is an interface...
+        /// Invoked when the host type is an interface.
         /// </summary>
         void PrintInterface()
         {
+            var modifiers = GetModifiers();
+            if (modifiers != null) modifiers += " ";
+
             file.AppendLine($"{modifiers}{parentType}");
             file.AppendLine($"{MethodName}({memberType} {vname});");
         }
@@ -106,6 +108,9 @@ internal class XProperty : PropertyNode
         /// </summary>
         void PrintThis()
         {
+            var modifiers = GetModifiers();
+            if (modifiers != null) modifiers += " ";
+
             file.AppendLine($"{modifiers}{parentType}");
             file.AppendLine($"{MethodName}({memberType} {vname})");
             file.AppendLine("{");
@@ -127,6 +132,9 @@ internal class XProperty : PropertyNode
         /// </summary>
         void PrintBase()
         {
+            var modifiers = GetModifiers();
+            if (modifiers != null) modifiers += " ";
+
             file.AppendLine($"{modifiers}{parentType}");
             file.AppendLine($"{MethodName}({memberType} {vname})");
             file.AppendLine("{");
@@ -182,6 +190,9 @@ internal class XProperty : PropertyNode
             }
             else
             {
+                var modifiers = GetModifiers();
+                if (modifiers != null) modifiers += " ";
+
                 file.AppendLine($"{modifiers}{parentType}");
                 file.AppendLine($"{MethodName}({memberType} {vname})");
                 file.AppendLine("{");

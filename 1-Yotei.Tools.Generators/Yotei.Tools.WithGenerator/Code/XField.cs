@@ -58,15 +58,14 @@ internal class XField : FieldNode
         var vname = $"v_{Symbol.Name}";
         PrintDocumentation(file, vname);
 
-        var modifiers = GetModifiers();
-        if (modifiers != null) modifiers += " ";
-
+        // Host type is an interface...
         if (HostType.IsInterface())
         {
             PrintInterface();
             return;
         }
 
+        // Specs determine how to emit non-interface code...
         var specs = TryGetSpecs(out var temp) ? temp : null;
         var comparison = StringComparison.OrdinalIgnoreCase;
 
@@ -80,10 +79,13 @@ internal class XField : FieldNode
         }
 
         /// <summary>
-        /// Invoked to emit code when the host is an interface...
+        /// Invoked when the host type is an interface.
         /// </summary>
         void PrintInterface()
         {
+            var modifiers = GetModifiers();
+            if (modifiers != null) modifiers += " ";
+
             file.AppendLine($"{modifiers}{parentType}");
             file.AppendLine($"{MethodName}({memberType} {vname});");
         }
@@ -93,6 +95,9 @@ internal class XField : FieldNode
         /// </summary>
         void PrintThis()
         {
+            var modifiers = GetModifiers();
+            if (modifiers != null) modifiers += " ";
+
             file.AppendLine($"{modifiers}{parentType}");
             file.AppendLine($"{MethodName}({memberType} {vname})");
             file.AppendLine("{");
@@ -114,6 +119,9 @@ internal class XField : FieldNode
         /// </summary>
         void PrintBase()
         {
+            var modifiers = GetModifiers();
+            if (modifiers != null) modifiers += " ";
+
             file.AppendLine($"{modifiers}{parentType}");
             file.AppendLine($"{MethodName}({memberType} {vname})");
             file.AppendLine("{");
@@ -169,6 +177,9 @@ internal class XField : FieldNode
             }
             else
             {
+                var modifiers = GetModifiers();
+                if (modifiers != null) modifiers += " ";
+
                 file.AppendLine($"{modifiers}{parentType}");
                 file.AppendLine($"{MethodName}({memberType} {vname})");
                 file.AppendLine("{");
@@ -264,48 +275,6 @@ internal class XField : FieldNode
             var parent = type.BaseType;
             return parent == null ? false : AppearsInChain(parent, false);
         }
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Returns the interfaces that need implementation.
-    /// </summary>
-    ITypeSymbol[] GetInterfacesToImplement()
-    {
-        var list = new CoreList<ITypeSymbol>()
-        {
-            AcceptDuplicate = (item) => false,
-            Compare = SymbolEqualityComparer.Default.Equals,
-        };
-
-        foreach (var iface in HostType.Interfaces) Populate(iface);
-        return list.ToArray();
-
-        // Needs to capture all suitable interfaces in the chain...
-        bool Populate(ITypeSymbol iface)
-        {
-            var done = false;
-
-            if (HasDecoratedMember(iface) != null) done = true;
-            if (HasMethod(iface) != null) done = true;
-
-            foreach (var child in iface.Interfaces) if (Populate(child)) done = true;
-
-            if (done) list.Add(iface);
-            return done;
-        }
-    }
-
-    /// <summary>
-    /// Returns the member type as defined in the given interface, if such is possible.
-    /// </summary>
-    string GetMemberTypeOn(ITypeSymbol iface)
-    {
-        var member = HasMember(iface);
-        return member != null
-            ? member.Type.FullyQualifiedName(addNullable: true)
-            : Symbol.Type.FullyQualifiedName(addNullable: true);
     }
 
     // ----------------------------------------------------

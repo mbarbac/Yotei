@@ -313,21 +313,22 @@ internal abstract class BaseGenerator : IIncrementalGenerator
         {
             var rec = tp.IsRecord ? "record " : string.Empty;
             var kind = rec + GetTypeKind(tp);
+            var name = tp.GivenName(addNullable: false);
 
-            file.AppendLine($"partial {kind} {tp.Name}");
+            file.AppendLine($"partial {kind} {name}");
             file.AppendLine("{");
             file.IndentLevel++;
         }
 
         node.Print(context, file);
 
-        foreach (var tp in candidate.TypeSymbolChain)
+        for (int i = 0; i < candidate.TypeSymbolChain.Length; i++)
         {
             file.IndentLevel--;
             file.AppendLine("}");
         }
 
-        foreach (var ns in candidate.NamespaceSyntaxChain)
+        for (int i = 0; i < candidate.NamespaceSyntaxChain.Length; i++)
         {
             file.IndentLevel--;
             file.AppendLine("}");

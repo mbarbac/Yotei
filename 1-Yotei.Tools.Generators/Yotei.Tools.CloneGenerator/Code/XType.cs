@@ -44,19 +44,56 @@ internal class XType : TypeNode
     public override void Print(SourceProductionContext context, FileBuilder file)
     {
         if (HasMethod(Symbol) != null) return; // Intercepting explicit implementation...
+        PrintDocumentation(file);       
 
-        PrintDocumentation(file);
-        var modifiers = GetModifiers();
-        if (modifiers != null) modifiers += " ";
-
+        // Type is interface...
         if (Symbol.IsInterface())
         {
-            PrintInterface();
+            var name = Symbol.GivenName(addNullable: false);
+            var modifiers = GetModifiers();
+            if (modifiers != null) modifiers += " ";
+
+            file.AppendLine($"{modifiers}{name} Clone();");
             return;
         }
 
-        PrintRegular();
+        // Type is abstract...
+        if (Symbol.IsAbstract)
+        {
+            var name = Symbol.GivenName(addNullable: false);
+            file.AppendLine($"public abstract {name} Clone();");
+        }
 
+        // Type is a regular one...
+        else
+        {
+            var name = Symbol.GivenName(addNullable: false);
+            var modifiers = GetModifiers();
+            if (modifiers != null) modifiers += " ";
+
+            file.AppendLine($"{modifiers}{name} Clone()");
+            file.AppendLine("{");
+            file.IndentLevel++;
+
+            var method =
+                Symbol.GetCopyConstructor(true) ?? Symbol.GetCopyConstructor(false);
+            
+            if (method == null)
+            {
+                file.AppendLine("throw new NotImplementedException();");
+                context.NoCopyConstructor(Symbol);
+            }
+            else
+            {
+                file.AppendLine($"var v_temp = new {name}(this);");
+                file.AppendLine("return v_temp;");
+            }
+
+            file.IndentLevel--;
+            file.AppendLine("}");
+        }
+
+        // Interfaces to implement...
         var ifaces = GetInterfacesToImplement();
         foreach (var iface in ifaces)
         {
@@ -66,46 +103,6 @@ internal class XType : TypeNode
             file.AppendLine();
             file.AppendLine(type);
             file.AppendLine($"{name}.Clone() => Clone();");
-        }
-
-        /// <summary>
-        /// Invoked to emit code when the host is an interface...
-        /// </summary>
-        void PrintInterface()
-        {
-            file.AppendLine($"{modifiers}{Symbol.Name} Clone();");
-        }
-
-        /// <summary>
-        /// Invoked to emit code when the specs are the default ones...
-        /// </summary>
-        void PrintRegular()
-        {
-            if (Symbol.IsAbstract)
-            {
-                file.AppendLine($"public abstract {Symbol.Name} Clone();");
-            }
-            else
-            {
-                file.AppendLine($"{modifiers}{Symbol.Name} Clone()");
-                file.AppendLine("{");
-                file.IndentLevel++;
-
-                var method = Symbol.GetCopyConstructor(true) ?? Symbol.GetCopyConstructor(false);
-                if (method == null)
-                {
-                    file.AppendLine("throw new NotImplementedException();");
-                    context.NoCopyConstructor(Symbol);
-                }
-                else
-                {
-                    file.AppendLine($"var v_temp = new {Symbol.Name}(this);");
-                    file.AppendLine("return v_temp;");
-                }
-
-                file.IndentLevel--;
-                file.AppendLine("}");
-            }
         }
     }
 
