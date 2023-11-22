@@ -1,23 +1,21 @@
-﻿using THost = Yotei.ORM.Tools.IInvariantListKT;
-using TItem = Yotei.ORM.Tools.IInvariantFake;
+﻿using THost = Yotei.ORM.IParameterList;
+using TItem = Yotei.ORM.IParameter;
 using TKey = string;
 
-namespace Yotei.ORM.Tools;
+namespace Yotei.ORM;
 
 // ========================================================
 /// <summary>
-/// Represents an immutable list-alike collection of elements identified by their respective keys
-/// that provides custom item validation and duplicates acceptance or denial capabilities.
+/// An immutable object that represents the ordered collection of parameters in a command.
+/// <br/> Duplicated elements are allowed as far as they are strictly the same instance.
 /// </summary>
 [Cloneable]
-public partial interface IInvariantListKT : IEnumerable<TItem>, IEquatable<THost>
+public partial interface IParameterList : IEnumerable<TItem>, IEquatable<THost>
 {
     /// <summary>
-    /// Determines if the names of the elements in this instance are case sensitive, or not.
+    /// The engine this instance is associated with.
     /// </summary>
-    [WithGenerator] bool CaseSensitive { get; }
-
-    // ----------------------------------------------------
+    IEngine Engine { get; }
 
     /// <summary>
     /// Minimizes the memory consumption of this instance.
@@ -37,34 +35,34 @@ public partial interface IInvariantListKT : IEnumerable<TItem>, IEquatable<THost
     TItem this[int index] { get; }
 
     /// <summary>
-    /// Determines if this instance has at least one element whose key matches the given one.
+    /// Determines if this instance has at least one element whose name matches the given one.
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="name"></param>
     /// <returns></returns>
-    bool Contains(TKey key);
+    bool Contains(TKey name);
 
     /// <summary>
-    /// Returns the index of the first element in this instance whose key matches the given one,
+    /// Returns the index of the first element in this instance whose name matches the given one,
     /// or -1 if any is found.
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="name"></param>
     /// <returns></returns>
-    int IndexOf(TKey key);
+    int IndexOf(TKey name);
 
     /// <summary>
-    /// Returns the index of the last element in this instance whose key matches the given one,
+    /// Returns the index of the last element in this instance whose name matches the given one,
     /// or -1 if any is found.
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="name"></param>
     /// <returns></returns>
-    int LastIndexOf(TKey key);
+    int LastIndexOf(TKey name);
 
     /// <summary>
-    /// Returns the indexes of the elements in this instance whose keys match the given one.
+    /// Returns the indexes of the elements in this instance whose names match the given one.
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="name"></param>
     /// <returns></returns>
-    List<int> IndexesOf(TKey key);
+    List<int> IndexesOf(TKey name);
 
     /// <summary>
     /// Determines if this instance has at least one element that matches the given predicate.
@@ -107,6 +105,12 @@ public partial interface IInvariantListKT : IEnumerable<TItem>, IEquatable<THost
     /// </summary>
     /// <returns></returns>
     List<TItem> ToList();
+
+    /// <summary>
+    /// Returns the next suitable parameter name based upon the contents in this instance.
+    /// </summary>
+    /// <returns></returns>
+    string NextName();
 
     // ----------------------------------------------------
 
@@ -183,28 +187,28 @@ public partial interface IInvariantListKT : IEnumerable<TItem>, IEquatable<THost
     THost RemoveRange(int index, int count);
 
     /// <summary>
-    /// Returns a new instance where the first element whose key matches the given one has been
+    /// Returns a new instance where the first element whose name matches the given one has been
     /// removed. If no changes are detected, returns the original instance instead.
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="name"></param>
     /// <returns></returns>
-    THost Remove(TKey key);
+    THost Remove(TKey name);
 
     /// <summary>
-    /// Returns a new instance where the last element whose key matches the given one has been
+    /// Returns a new instance where the last element whose name matches the given one has been
     /// removed. If no changes are detected, returns the original instance instead.
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="name"></param>
     /// <returns></returns>
-    THost RemoveLast(TKey key);
+    THost RemoveLast(TKey name);
 
     /// <summary>
-    /// Returns a new instance where all the elements whose keys match the given one have been
+    /// Returns a new instance where all the elements whose names match the given one have been
     /// removed. If no changes are detected, returns the original instance instead.
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="name"></param>
     /// <returns></returns>
-    THost RemoveAll(TKey key);
+    THost RemoveAll(TKey name);
 
     /// <summary>
     /// Returns a new instance where the first element that matches the given predicate has been

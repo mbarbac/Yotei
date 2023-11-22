@@ -1,86 +1,41 @@
-namespace Yotei.ORM.Tests;
+using THost = Yotei.ORM.Tools.Code.InvariantListKT;
+using TItem = Yotei.ORM.Tools.Code.InvariantFake;
+
+namespace Yotei.ORM.Tests.Tools;
 
 // ========================================================
 //[Enforced]
-public static partial class Test_InvariantList_KT
+public static class Test_InvariantList_KT
 {
-    public class Element(string name)
-    {
-        public string Name { get; set; } = name;
-        public override string ToString() => Name ?? string.Empty;
-    }
-
-    [Cloneable]
-    public partial class Chain : InvariantList<string, Element>
-    {
-        public Chain(bool sensitive) : base() => CaseSensitive = sensitive;
-        public Chain(bool sensitive, Element item) : this(sensitive) => Items.Add(item);
-        public Chain(bool sensitive, IEnumerable<Element> range) : this(sensitive) => Items.AddRange(range);
-        protected Chain(Chain source) : this(source.CaseSensitive) => Items.AddRange(source.Items);
-
-        public override Element ValidateItem(Element item)
-        {
-            item.ThrowWhenNull();
-            item.Name.NotNullNotEmpty();
-            return item;
-        }
-        public override bool CanDuplicate(Element source, Element target)
-        {
-            if (ReferenceEquals(source, target)) return true;
-            throw new DuplicateException("Duplicated element.").WithData(target);
-        }
-        public override string GetKey(Element item) => item.Name;
-        public override string ValidateKey(string key) => key.NotNullNotEmpty();
-        public override bool Compare(string source, string target)
-            => string.Compare(source, target, !CaseSensitive) == 0;
-
-        [WithGenerator]
-        public bool CaseSensitive
-        {
-            get => _CaseSensitive;
-            init
-            {
-                if (_CaseSensitive == value) return;
-                _CaseSensitive = value;
-
-                if (Count == 0) return;
-                var range = ToArray();
-                Clear();
-                AddRange(range);
-            }
-        }
-        bool _CaseSensitive;
-    }
+    static readonly TItem xone = new("one");
+    static readonly TItem xtwo = new("two");
+    static readonly TItem xthree = new("three");
+    static readonly TItem xfour = new("four");
+    static readonly TItem xfive = new("five");
+    static readonly TItem xsix = new("six");
 
     // ----------------------------------------------------
-
-    static readonly Element xone = new("one");
-    static readonly Element xtwo = new("two");
-    static readonly Element xthree = new("three");
-    static readonly Element xfour = new("four");
-    static readonly Element xfive = new("five");
-    static readonly Element xsix = new("six");
 
     //[Enforced]
     [Fact]
     public static void Test_Create_Empty()
     {
-        var chain = new Chain(false);
-        Assert.Empty(chain);
+        var items = new THost(false);
+        Assert.Empty(items);
     }
 
     //[Enforced]
     [Fact]
     public static void Test_Create_Single()
     {
-        var chain = new Chain(false, xone);
-        Assert.Single(chain);
-        Assert.Same(xone, chain[0]);
+        var items = new THost(false, xone);
+        Assert.Single(items);
+        Assert.Same(xone, items[0]);
 
-        try { _ = new Chain(false, (Element)null!); Assert.Fail(); }
+        try { _ = new THost(false, (TItem)null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
 
-        try { _ = new Chain(false, (Element)new("")); Assert.Fail(); }
+        try { _ = new THost(false, new TItem("")); Assert.Fail(); }
         catch (EmptyException) { }
     }
 
@@ -88,43 +43,71 @@ public static partial class Test_InvariantList_KT
     [Fact]
     public static void Test_Create_Many()
     {
-        var chain = new Chain(false, []);
-        Assert.Empty(chain);
+        var items = new THost(false, []);
+        Assert.Empty(items);
 
-        chain = new Chain(false, [xone, xtwo, xthree]);
-        Assert.Equal(3, chain.Count);
-        Assert.Same(xone, chain[0]);
-        Assert.Same(xtwo, chain[1]);
-        Assert.Same(xthree, chain[2]);
+        items = new THost(false, [xone, xtwo, xthree]);
+        Assert.Equal(3, items.Count);
+        Assert.Same(xone, items[0]);
+        Assert.Same(xtwo, items[1]);
+        Assert.Same(xthree, items[2]);
 
-        try { _ = new Chain(false, (IEnumerable<Element>)null!); Assert.Fail(); }
+        try { _ = new THost(false, (IEnumerable<TItem>)null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
 
-        try { _ = new Chain(false, [xone, null!]); Assert.Fail(); }
+        try { _ = new THost(false, [xone, null!]); Assert.Fail(); }
         catch (ArgumentNullException) { }
 
-        try { _ = new Chain(false, [xone, new("one")]); Assert.Fail(); }
+        try { _ = new THost(false, [xone, new TItem("one")]); Assert.Fail(); }
         catch (DuplicateException) { }
+
+        items = new THost(false, [xone, xtwo, xone]);
+        Assert.Equal(3, items.Count);
+        Assert.Same(xone, items[0]);
+        Assert.Same(xtwo, items[1]);
+        Assert.Same(xone, items[2]);
+
+        items = new THost(true, [xone, new TItem("ONE")]);
+        Assert.Equal(2, items.Count);
+        Assert.Same(xone, items[0]);
+        Assert.Equal("ONE", items[1].Name);
     }
 
     //[Enforced]
     [Fact]
-    public static void Test_Create_Many_With_Duplicates()
+    public static void Test_Clone()
     {
-        var chain = new Chain(false, [xone, xtwo, xthree, xone]);
-        Assert.Equal(4, chain.Count);
-        Assert.Same(xone, chain[0]);
-        Assert.Same(xtwo, chain[1]);
-        Assert.Same(xthree, chain[2]);
-        Assert.Same(xone, chain[3]);
+        var source = new THost(false, [xone, xtwo, xthree]);
+        var target = source.Clone();
+
+        Assert.NotSame(source, target);
+        Assert.Equal(3, target.Count);
+        Assert.Same(xone, target[0]);
+        Assert.Same(xtwo, target[1]);
+        Assert.Same(xthree, target[2]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Equality()
+    {
+        var source = new THost(false, [xone, xtwo]);
+        var target = source.Clone();
+        Assert.NotSame(source, target);
+        Assert.Equal(source, target);
+
+        target = new THost(false, [new TItem("one"), new TItem("two")]);
+        Assert.Equal(source, target);
+
+        target = new THost(false, [new TItem("one"), new TItem("TWO")]);
+        Assert.NotEqual(source, target);
     }
 
     //[Enforced]
     [Fact]
     public static void Test_Change_Settings()
     {
-        var source = new Chain(true, [xone, new("ONE")]);
-        Assert.Equal(2, source.Count);
+        var source = new THost(true, [xone, new TItem("ONE")]);
 
         try { _ = source.WithCaseSensitive(false); Assert.Fail(); }
         catch (DuplicateException) { }
@@ -134,14 +117,14 @@ public static partial class Test_InvariantList_KT
     [Fact]
     public static void Test_Find_Key()
     {
-        var chain = new Chain(false, [xone, xtwo, xthree, xone]);
+        var items = new THost(false, [xone, xtwo, xthree, xone]);
 
-        Assert.Equal(-1, chain.IndexOf("any"));
+        Assert.Equal(-1, items.IndexOf("any"));
 
-        Assert.Equal(0, chain.IndexOf("one"));
-        Assert.Equal(3, chain.LastIndexOf("one"));
+        Assert.Equal(0, items.IndexOf("ONE"));
+        Assert.Equal(3, items.LastIndexOf("ONE"));
 
-        var list = chain.IndexesOf("one");
+        var list = items.IndexesOf("ONE");
         Assert.Equal(2, list.Count);
         Assert.Equal(0, list[0]);
         Assert.Equal(3, list[1]);
@@ -151,14 +134,14 @@ public static partial class Test_InvariantList_KT
     [Fact]
     public static void Test_Find_Predicate()
     {
-        var chain = new Chain(false, [xone, xtwo, xthree, xone]);
+        var items = new THost(false, [xone, xtwo, xthree, xone]);
 
-        Assert.Equal(-1, chain.IndexOf(x => x.Name.Contains('z')));
+        Assert.Equal(-1, items.IndexOf(x => x.Name.Contains('z')));
 
-        Assert.Equal(0, chain.IndexOf(x => x.Name.Contains('e')));
-        Assert.Equal(3, chain.LastIndexOf(x => x.Name.Contains('e')));
+        Assert.Equal(0, items.IndexOf(x => x.Name.Contains('e')));
+        Assert.Equal(3, items.LastIndexOf(x => x.Name.Contains('e')));
 
-        var list = chain.IndexesOf(x => x.Name.Contains('e'));
+        var list = items.IndexesOf(x => x.Name.Contains('e'));
         Assert.Equal(3, list.Count);
         Assert.Equal(0, list[0]);
         Assert.Equal(2, list[1]);
@@ -169,7 +152,7 @@ public static partial class Test_InvariantList_KT
     [Fact]
     public static void Test_GetRange()
     {
-        var source = new Chain(false, [xone, xtwo, xthree, xone]);
+        var source = new THost(false, [xone, xtwo, xthree, xone]);
 
         var target = source.GetRange(0, 0);
         Assert.Empty(target);
@@ -182,26 +165,34 @@ public static partial class Test_InvariantList_KT
 
     //[Enforced]
     [Fact]
-    public static void Test_Replace_Method()
+    public static void Test_Replace()
     {
-        var source = new Chain(false, [xone, xtwo, xthree]);
+        var source = new THost(false, [xone, xtwo, xthree]);
+        
         var target = source.Replace(0, xone);
         Assert.Same(source, target);
 
-        target = source.Replace(0, new("one"));
+        target = source.Replace(1, xone);
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
-        Assert.NotSame(xone, target[0]); Assert.Equal("one", target[0].Name);
+        Assert.Same(xone, target[0]);
+        Assert.Same(xone, target[1]);
+        Assert.Same(xthree, target[2]);
+
+        target = source.Replace(0, new TItem("ONE"));
+        Assert.NotSame(source, target);
+        Assert.Equal(3, target.Count);
+        Assert.Equal("ONE", target[0].Name);
         Assert.Same(xtwo, target[1]);
         Assert.Same(xthree, target[2]);
 
-        try { source.Replace(0, new("two")); Assert.Fail(); }
+        try { source.Replace(1, new TItem("ONE")); Assert.Fail(); }
         catch (DuplicateException) { }
 
         try { source.Replace(0, null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
 
-        try { source.Replace(0, new("")); Assert.Fail(); }
+        try { source.Replace(0, new TItem("")); Assert.Fail(); }
         catch (EmptyException) { }
     }
 
@@ -209,7 +200,7 @@ public static partial class Test_InvariantList_KT
     [Fact]
     public static void Test_Add()
     {
-        var source = new Chain(false, [xone, xtwo, xthree]);
+        var source = new THost(false, [xone, xtwo, xthree]);
         var target = source.Add(xfour);
         Assert.NotSame(source, target);
         Assert.Equal(4, target.Count);
@@ -226,13 +217,13 @@ public static partial class Test_InvariantList_KT
         Assert.Same(xthree, target[2]);
         Assert.Same(xone, target[3]);
 
-        try { source.Add(new("one")); Assert.Fail(); }
+        try { source.Add(new TItem("one")); Assert.Fail(); }
         catch (DuplicateException) { }
 
         try { source.Add(null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
 
-        try { source.Add(new("")); Assert.Fail(); }
+        try { source.Add(new TItem("")); Assert.Fail(); }
         catch (EmptyException) { }
     }
 
@@ -240,7 +231,7 @@ public static partial class Test_InvariantList_KT
     [Fact]
     public static void Test_AddRange()
     {
-        var source = new Chain(false, [xone, xtwo, xthree]);
+        var source = new THost(false, [xone, xtwo, xthree]);
         var target = source.AddRange([]);
         Assert.Same(source, target);
 
@@ -258,7 +249,7 @@ public static partial class Test_InvariantList_KT
     [Fact]
     public static void Test_Insert()
     {
-        var source = new Chain(false, [xone, xtwo, xthree]);
+        var source = new THost(false, [xone, xtwo, xthree]);
         var target = source.Insert(3, xfour);
         Assert.NotSame(source, target);
         Assert.Equal(4, target.Count);
@@ -275,13 +266,13 @@ public static partial class Test_InvariantList_KT
         Assert.Same(xthree, target[2]);
         Assert.Same(xone, target[3]);
 
-        try { source.Insert(3, new("one")); Assert.Fail(); }
+        try { source.Insert(3, new TItem("one")); Assert.Fail(); }
         catch (DuplicateException) { }
 
         try { source.Insert(3, null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
 
-        try { source.Insert(3, new("")); Assert.Fail(); }
+        try { source.Insert(3, new TItem("")); Assert.Fail(); }
         catch (EmptyException) { }
     }
 
@@ -289,7 +280,7 @@ public static partial class Test_InvariantList_KT
     [Fact]
     public static void Test_InsertRange()
     {
-        var source = new Chain(false, [xone, xtwo, xthree]);
+        var source = new THost(false, [xone, xtwo, xthree]);
         var target = source.InsertRange(3, []);
         Assert.Same(source, target);
 
@@ -307,7 +298,7 @@ public static partial class Test_InvariantList_KT
     [Fact]
     public static void Test_RemoveAt()
     {
-        var source = new Chain(false, [xone, xtwo, xthree]);
+        var source = new THost(false, [xone, xtwo, xthree]);
         var target = source.RemoveAt(0);
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
@@ -319,7 +310,7 @@ public static partial class Test_InvariantList_KT
     [Fact]
     public static void Test_RemoveRange()
     {
-        var source = new Chain(false, [xone, xtwo, xthree]);
+        var source = new THost(false, [xone, xtwo, xthree]);
         var target = source.RemoveRange(0, 0);
         Assert.Same(source, target);
 
@@ -336,25 +327,25 @@ public static partial class Test_InvariantList_KT
     [Fact]
     public static void Test_Remove_Item()
     {
-        var source = new Chain(false, [xone, xtwo, xthree, xone]);
+        var source = new THost(false, [xone, xtwo, xthree, xone]);
         var target = source.Remove("any");
         Assert.Same(source, target);
 
-        target = source.Remove("one");
+        target = source.Remove("ONE");
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.Same(xtwo, target[0]);
         Assert.Same(xthree, target[1]);
         Assert.Same(xone, target[2]);
 
-        target = source.RemoveLast("one");
+        target = source.RemoveLast("ONE");
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
         Assert.Same(xthree, target[2]);
 
-        target = source.RemoveAll("one");
+        target = source.RemoveAll("ONE");
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
         Assert.Same(xtwo, target[0]);
@@ -365,7 +356,7 @@ public static partial class Test_InvariantList_KT
     [Fact]
     public static void Test_Remove_Predicate()
     {
-        var source = new Chain(false, [xone, xtwo, xthree, xone]);
+        var source = new THost(false, [xone, xtwo, xthree, xone]);
         var target = source.Remove(x => x.Name.Contains('z'));
         Assert.Same(source, target);
 
@@ -393,11 +384,11 @@ public static partial class Test_InvariantList_KT
     [Fact]
     public static void Test_Clear()
     {
-        var source = new Chain(false);
+        var source = new THost(false);
         var target = source.Clear();
         Assert.Same(source, target);
 
-        source = new Chain(false, [xone, xtwo, xthree, xone]);
+        source = new THost(false, [xone, xtwo, xthree, xone]);
         target = source.Clear();
         Assert.NotSame(source, target);
         Assert.Empty(target);

@@ -134,7 +134,7 @@ internal static class TypeExtensions
             switch (node)
             {
                 case INamespaceSymbol item: AddToList(item.Name); break;
-                case INamedTypeSymbol item: AddToList(item.GivenName(addNullable)); break;
+                case INamedTypeSymbol item: AddToList(item.GivenName(addNullable: false)); break;
                 case ITypeParameterSymbol item: AddToList(item.Name); break;
             }
             node = node.ContainingSymbol;

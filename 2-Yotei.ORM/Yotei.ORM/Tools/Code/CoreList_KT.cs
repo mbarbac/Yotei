@@ -2,17 +2,17 @@
 
 // ========================================================
 /// <summary>
-/// <inheritdoc cref="ICoreList{TKey, TItem}"/>
+/// <inheritdoc cref="ICoreList{K, T}"/>
 /// </summary>
-/// <typeparam name="TKey"></typeparam>
-/// <typeparam name="TItem"></typeparam>
-[DebuggerDisplay("{ToString(7)}")]
-public abstract class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
+/// <typeparam name="K"></typeparam>
+/// <typeparam name="T"></typeparam>
+[DebuggerDisplay("{ToStringEx(7)}")]
+public class CoreList<K, T> : ICoreList<K, T>
 {
-    readonly List<TItem> Items = [];
+    readonly List<T> Items = [];
 
     /// <summary>
-    /// Initializes a new empty list.
+    /// Initializes a new empty instance.
     /// </summary>
     public CoreList() { }
 
@@ -20,19 +20,19 @@ public abstract class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     /// Initializes a new instance with the given element.
     /// </summary>
     /// <param name="item"></param>
-    public CoreList(TItem item) : this() => Items.Add(item);
+    public CoreList(T item) => Add(item);
 
     /// <summary>
     /// Initializes a new instance with the elements from the given range.
     /// </summary>
     /// <param name="range"></param>
-    public CoreList(IEnumerable<TItem> range) : this() => Items.AddRange(range);
+    public CoreList(IEnumerable<T> range) => AddRange(range);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual IEnumerator<TItem> GetEnumerator() => Items.GetEnumerator();
+    public virtual IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /// <summary>
@@ -41,64 +41,137 @@ public abstract class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     /// <returns></returns>
     public override string ToString() => $"Count: {Count}";
 
-    /// <summary>
-    /// Returns a string representation of this collection containing at most the given number
-    /// of elements.
-    /// </summary>
-    /// <param name="count"></param>
-    /// <returns></returns>
-    protected string ToString(int count)
+    public virtual string ToStringEx(int count)
     {
         var items = count <= Items.Count ? Items : Items.Take(count);
-        var temp = string.Join(", ", items);
+        var temp = string.Join(", ", items.Select(x => ItemToString(x)));
+
         return $"({Count})[{temp}]";
     }
 
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    public abstract TItem ValidateItem(TItem item);
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="target"></param>
-    /// <returns></returns>
-    public abstract bool CanDuplicate(TItem source, TItem target);
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    public abstract TKey GetKey(TItem item);
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    public abstract TKey ValidateKey(TKey key);
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="target"></param>
-    /// <returns></returns>
-    public abstract bool Compare(TKey source, TKey target);
+    public virtual string ItemToString(T item) => item?.ToString() ?? string.Empty;
 
     // ----------------------------------------------------
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public int Count => Items.Count;
+    public Func<T, bool, T> ValidateItem
+    {
+        get => _ValidateItem;
+        set
+        {
+            if (ReferenceEquals(_ValidateItem, value)) return;
+            _ValidateItem = value.ThrowWhenNull();
+
+            if (Count == 0) return;
+            var range = ToArray();
+            Clear();
+            AddRange(range);
+        }
+    }
+    Func<T, bool, T> _ValidateItem = (item, add) => item;
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public Func<T, K> GetKey
+    {
+        get => _GetKey;
+        set
+        {
+            if (ReferenceEquals(_GetKey, value)) return;
+            _GetKey = value.ThrowWhenNull();
+
+            if (Count == 0) return;
+            var range = ToArray();
+            Clear();
+            AddRange(range);
+        }
+    }
+    Func<T, K> _GetKey = (item) => item.ConvertTo<K>()!;
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public Func<K, K> ValidateKey
+    {
+        get => _ValidateKey;
+        set
+        {
+            if (ReferenceEquals(_ValidateKey, value)) return;
+            _ValidateKey = value.ThrowWhenNull();
+
+            if (Count == 0) return;
+            var range = ToArray();
+            Clear();
+            AddRange(range);
+        }
+    }
+    Func<K, K> _ValidateKey = (item) => item;
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public Func<K, K, bool> Compare
+    {
+        get => _Compare;
+        set
+        {
+            if (ReferenceEquals(_Compare, value)) return;
+            _Compare = value.ThrowWhenNull();
+
+            if (Count == 0) return;
+            var range = ToArray();
+            Clear();
+            AddRange(range);
+        }
+    }
+    Func<K, K, bool> _Compare = (source, target)
+        => (source is null && target is null)
+        || (typeof(K).IsValueType ? source!.Equals(target) : ReferenceEquals(source, target));
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public Func<T, T, bool> IsSame
+    {
+        get => _IsSame;
+        set
+        {
+            if (ReferenceEquals(_IsSame, value)) return;
+            _IsSame = value.ThrowWhenNull();
+
+            if (Count == 0) return;
+            var range = ToArray();
+            Clear();
+            AddRange(range);
+        }
+    }
+    Func<T, T, bool> _IsSame = (source, target)
+        => (source is null && target is null)
+        || (typeof(T).IsValueType ? source!.Equals(target) : ReferenceEquals(source, target));
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public Func<T, T, bool> ValidDuplicate
+    {
+        get => _ValidDuplicate;
+        set
+        {
+            if (ReferenceEquals(_ValidDuplicate, value)) return;
+            _ValidDuplicate = value.ThrowWhenNull();
+
+            if (Count == 0) return;
+            var range = ToArray();
+            Clear();
+            AddRange(range);
+        }
+    }
+    Func<T, T, bool> _ValidDuplicate = (source, target) => true;
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// <inheritdoc/>
@@ -108,9 +181,14 @@ public abstract class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    public int Count => Items.Count;
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public TItem this[int index]
+    public T this[int index]
     {
         get => Items[index];
         set => Replace(index, value);
@@ -118,7 +196,40 @@ public abstract class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     object? IList.this[int index]
     {
         get => this[index];
-        set => this[index] = (TItem)value!;
+        set => this[index] = (T)value!;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    public bool Contains(K key) => IndexOf(key) >= 0;
+    bool ICollection<T>.Contains(T item) => Contains(GetKey(item));
+    bool IList.Contains(object? value) => Contains(GetKey((T)value!));
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    public int IndexOf(K key)
+    {
+        key = ValidateKey(key);
+        return IndexOf(x => Compare(GetKey(x), key));
+    }
+    int IList<T>.IndexOf(T item) => IndexOf(GetKey(item));
+    int IList.IndexOf(object? value) => IndexOf(GetKey((T)value!));
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    public int LastIndexOf(K key)
+    {
+        key = ValidateKey(key);
+        return LastIndexOf(x => Compare(GetKey(x), key));
     }
 
     /// <summary>
@@ -126,46 +237,25 @@ public abstract class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public bool Contains(TKey key) => IndexOf(ValidateKey(key)) >= 0;
-    bool ICollection<TItem>.Contains(TItem item) => Contains(GetKey(item));
-    bool IList.Contains(object? value) => Contains(GetKey((TItem)value!));
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    public int IndexOf(TKey key) => IndexOf(x => Compare(GetKey(x), ValidateKey(key)));
-    int IList<TItem>.IndexOf(TItem item) => IndexOf(GetKey(item));
-    int IList.IndexOf(object? value) => IndexOf(GetKey((TItem)value!));
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    public int LastIndexOf(TKey key) => LastIndexOf(x => Compare(GetKey(x), ValidateKey(key)));
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    public List<int> IndexesOf(TKey key) => IndexesOf(x => Compare(GetKey(x), ValidateKey(key)));
+    public List<int> IndexesOf(K key)
+    {
+        key = ValidateKey(key);
+        return IndexesOf(x => Compare(GetKey(x), key));
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public bool Contains(Predicate<TItem> predicate) => IndexOf(predicate) >= 0;
+    public bool Contains(Predicate<T> predicate) => IndexOf(predicate) >= 0;
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public int IndexOf(Predicate<TItem> predicate)
+    public int IndexOf(Predicate<T> predicate)
     {
         predicate.ThrowWhenNull();
 
@@ -178,7 +268,7 @@ public abstract class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public int LastIndexOf(Predicate<TItem> predicate)
+    public int LastIndexOf(Predicate<T> predicate)
     {
         predicate.ThrowWhenNull();
 
@@ -191,7 +281,7 @@ public abstract class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public List<int> IndexesOf(Predicate<TItem> predicate)
+    public List<int> IndexesOf(Predicate<T> predicate)
     {
         predicate.ThrowWhenNull();
 
@@ -204,15 +294,13 @@ public abstract class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public TItem[] ToArray() => Items.ToArray();
+    public T[] ToArray() => Items.ToArray();
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public List<TItem> ToList() => new(Items);
-
-    // ----------------------------------------------------
+    public List<T> ToList() => Items.ToList();
 
     /// <summary>
     /// <inheritdoc/>
@@ -220,7 +308,9 @@ public abstract class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public List<TItem> GetRange(int index, int count) => Items.GetRange(index, count);
+    public virtual List<T> GetRange(int index, int count) => Items.GetRange(index, count);
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// <inheritdoc/>
@@ -228,18 +318,19 @@ public abstract class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual int Replace(int index, TItem item)
+    public virtual int Replace(int index, T item)
     {
-        item = ValidateItem(item);
+        item = ValidateItem(item, true);
 
         var source = Items[index];
-        if ((source is null && item is null) ||
-            (source is not null && source.Equals(item))) return 0;
+        if (IsSame(source, item)) return 0;
 
-        var nums = IndexesOf(GetKey(item)); foreach (var num in nums)
+        var key = GetKey(item);
+        var nums = IndexesOf(key);
+        foreach (var num in nums)
         {
             if (num == index) continue;
-            if (!CanDuplicate(Items[num], item)) return 0;
+            if (!ValidDuplicate(Items[num], item)) return 0;
         }
 
         Items[index] = item;
@@ -251,20 +342,21 @@ public abstract class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual int Add(TItem item)
+    public virtual int Add(T item)
     {
-        item = ValidateItem(item);
+        item = ValidateItem(item, true);
 
-        var nums = IndexesOf(GetKey(item));
-        foreach (var num in nums) if (!CanDuplicate(Items[num], item)) return 0;
+        var key = GetKey(item);
+        var nums = IndexesOf(key);
+        foreach (var num in nums) if (!ValidDuplicate(Items[num], item)) return 0;
 
         Items.Add(item);
         return 1;
     }
-    void ICollection<TItem>.Add(TItem item) => Add(item);
+    void ICollection<T>.Add(T item) => Add(item);
     int IList.Add(object? value)
     {
-        var num = Add((TItem)value!);
+        var num = Add((T)value!);
         return num > 0 ? Count : -1;
     }
 
@@ -273,7 +365,7 @@ public abstract class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual int AddRange(IEnumerable<TItem> range)
+    public virtual int AddRange(IEnumerable<T> range)
     {
         range.ThrowWhenNull();
 
@@ -291,18 +383,19 @@ public abstract class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual int Insert(int index, TItem item)
+    public virtual int Insert(int index, T item)
     {
-        item = ValidateItem(item);
+        item = ValidateItem(item, true);
 
-        var nums = IndexesOf(GetKey(item));
-        foreach (var num in nums) if (!CanDuplicate(Items[num], item)) return 0;
+        var key = GetKey(item);
+        var nums = IndexesOf(key);
+        foreach (var num in nums) if (!ValidDuplicate(Items[num], item)) return 0;
 
         Items.Insert(index, item);
         return 1;
     }
-    void IList<TItem>.Insert(int index, TItem item) => Insert(index, item);
-    void IList.Insert(int index, object? value) => Insert(index, (TItem)value!);
+    void IList<T>.Insert(int index, T item) => Insert(index, item);
+    void IList.Insert(int index, object? value) => Insert(index, (T)value!);
 
     /// <summary>
     /// <inheritdoc/>
@@ -310,7 +403,7 @@ public abstract class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual int InsertRange(int index, IEnumerable<TItem> range)
+    public virtual int InsertRange(int index, IEnumerable<T> range)
     {
         range.ThrowWhenNull();
 
@@ -333,7 +426,7 @@ public abstract class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
         Items.RemoveAt(index);
         return 1;
     }
-    void IList<TItem>.RemoveAt(int index) => RemoveAt(index);
+    void IList<T>.RemoveAt(int index) => RemoveAt(index);
     void IList.RemoveAt(int index) => RemoveAt(index);
 
     /// <summary>
@@ -353,20 +446,20 @@ public abstract class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public virtual int Remove(TKey key)
+    public virtual int Remove(K key)
     {
         var index = IndexOf(key);
         return index >= 0 ? RemoveAt(index) : 0;
     }
-    bool ICollection<TItem>.Remove(TItem item) => Remove(GetKey(item)) >= 0;
-    void IList.Remove(object? value) => Remove(GetKey((TItem)value!));
+    bool ICollection<T>.Remove(T item) => Remove(GetKey(item)) >= 0;
+    void IList.Remove(object? value) => Remove(GetKey((T)value!));
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public virtual int RemoveLast(TKey key)
+    public virtual int RemoveLast(K key)
     {
         var index = LastIndexOf(key);
         return index >= 0 ? RemoveAt(index) : 0;
@@ -377,7 +470,7 @@ public abstract class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public virtual int RemoveAll(TKey key)
+    public virtual int RemoveAll(K key)
     {
         var num = 0; while (true)
         {
@@ -394,10 +487,8 @@ public abstract class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual int Remove(Predicate<TItem> predicate)
+    public virtual int Remove(Predicate<T> predicate)
     {
-        predicate.ThrowWhenNull();
-
         var index = IndexOf(predicate);
         return index >= 0 ? RemoveAt(index) : 0;
     }
@@ -407,10 +498,8 @@ public abstract class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual int RemoveLast(Predicate<TItem> predicate)
+    public virtual int RemoveLast(Predicate<T> predicate)
     {
-        predicate.ThrowWhenNull();
-
         var index = LastIndexOf(predicate);
         return index >= 0 ? RemoveAt(index) : 0;
     }
@@ -420,10 +509,8 @@ public abstract class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual int RemoveAll(Predicate<TItem> predicate)
+    public virtual int RemoveAll(Predicate<T> predicate)
     {
-        predicate.ThrowWhenNull();
-
         var num = 0; while (true)
         {
             var index = IndexOf(predicate);
@@ -443,19 +530,20 @@ public abstract class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
         var num = Items.Count; if (num > 0) Items.Clear();
         return num;
     }
-    void ICollection<TItem>.Clear() => Clear();
+    void ICollection<T>.Clear() => Clear();
     void IList.Clear() => Clear();
 
     // ----------------------------------------------------
 
-    bool ICollection<TItem>.IsReadOnly => false;
-    void ICollection<TItem>.CopyTo(
-        TItem[] array, int arrayIndex) => ((ICollection<TItem>)Items).CopyTo(array, arrayIndex);
+    bool ICollection<T>.IsReadOnly => false;
+    void ICollection<T>.CopyTo(
+        T[] array, int arrayIndex) => ((ICollection<T>)Items).CopyTo(array, arrayIndex);
 
     bool IList.IsFixedSize => false;
     bool IList.IsReadOnly => false;
 
     bool ICollection.IsSynchronized => false;
     object ICollection.SyncRoot => ((ICollection)Items).SyncRoot;
-    void ICollection.CopyTo(Array array, int index) => ((ICollection)Items).CopyTo(array, index);
+    void ICollection.CopyTo(
+        Array array, int index) => ((ICollection)Items).CopyTo(array, index);
 }

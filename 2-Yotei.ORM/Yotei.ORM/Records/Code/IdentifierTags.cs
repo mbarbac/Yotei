@@ -1,44 +1,41 @@
-﻿using TMaster = Yotei.ORM.Tools.Code.InvariantListKT;
-using THost = Yotei.ORM.Tools.IInvariantListKT;
-using TItem = Yotei.ORM.Tools.IInvariantFake;
-using TKey = string;
+﻿using TMaster = Yotei.ORM.Code.IdentifierTags;
+using THost = Yotei.ORM.IIdentifierTags;
+using TItem = string;
 
-namespace Yotei.ORM.Tools.Code;
+namespace Yotei.ORM.Code;
 
 // ========================================================
 /// <summary>
 /// <inheritdoc cref="THost"/>
 /// </summary>
-[DebuggerDisplay("{ToStringEx(7)}")]
 [Cloneable]
 [WithGenerator]
-public partial class InvariantListKT : THost
+public sealed partial class IdentifierTags : THost
 {
-    protected class InnerList : CoreList<TKey, TItem>
+    class InnerList : CoreList<TItem>
     {
         public InnerList(TMaster master)
         {
             Master = master.ThrowWhenNull();
-            ValidateItem = (item, add) =>
+            ValidateItem = (item, _) =>
             {
-                item.ThrowWhenNull();
-                if (add) ValidateKey(GetKey(item));
+                item = item.NotNullNotEmpty();
+                if (item.Contains('.')) throw new ArgumentException(
+                    "Identifier tags cannot contain dots.")
+                    .WithData(item);
                 return item;
             };
-            GetKey = (item) => item.Name;
-            ValidateKey = (key) => key.NotNullNotEmpty();
             Compare = (source, target)
-                => string.Compare(source, target, !Master.CaseSensitive) == 0;
-            IsSame = ReferenceEquals;
+                => string.Compare(source, target, !Master.CaseSensitiveTags) == 0;
+            IsSame = (source, target) => source == target;
             ValidDuplicate = (source, target) => IsSame(source, target)
                 ? true
                 : throw new DuplicateException("Duplicated element.").WithData(target);
         }
         public TMaster Master { get; }
     }
-    protected virtual InnerList CreateItems(TMaster master) => new(this);
-    protected InnerList Items { get; }
-    protected string ToStringEx(int count) => Items.ToStringEx(count);
+    static InnerList CreateItems(TMaster master) => new(master);
+    InnerList Items { get; }
 
     // ----------------------------------------------------
 
@@ -46,47 +43,47 @@ public partial class InvariantListKT : THost
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="sensitive"></param>
-    public InvariantListKT(bool sensitive)
+    public IdentifierTags(bool sensitive)
     {
         Items = CreateItems(this);
-        CaseSensitive = sensitive;
+        CaseSensitiveTags = sensitive;
     }
 
     /// <summary>
-    /// Initializes a new instance with the given element.
+    /// Initializes a new instance with the tags obtained from the given dotted values.
     /// </summary>
     /// <param name="sensitive"></param>
-    /// <param name="item"></param>
-    public InvariantListKT(bool sensitive, TItem item) : this(sensitive) => AddInternal(item);
+    /// <param name="dotted"></param>
+    public IdentifierTags(bool sensitive, TItem dotted) : this(sensitive) => AddInternal(dotted);
 
     /// <summary>
-    /// Initializes a new instance with the elements from the given range.
+    /// Initializes a new instance with the tags obtained from the dotted values of the given range.
     /// </summary>
     /// <param name="sensitive"></param>
-    /// <param name="range"></param>
-    public InvariantListKT(
-        bool sensitive, IEnumerable<TItem> range) : this(sensitive) => AddRangeInternal(range);
+    /// <param name="dottedrange"></param>
+    public IdentifierTags(
+        bool sensitive, IEnumerable<TItem> dottedrange) : this(sensitive) => AddRangeInternal(dottedrange);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected InvariantListKT(
-        TMaster source) : this(source.CaseSensitive) => AddRangeInternal(source.Items);
+    IdentifierTags(
+        TMaster source) : this(source.CaseSensitiveTags) => AddRangeInternal(source.Items);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
-    public virtual bool Equals(THost? other)
+    public bool Equals(THost? other)
     {
         if (other is null) return false;
 
-        if (CaseSensitive != other.CaseSensitive) return false;
-        if (Count !=  other.Count) return false;
-        for (int i = 0; i < Count;i++)
-            if (!Items.Compare(Items.GetKey(this[i]), Items.GetKey(other[i]))) return false;
+        if (CaseSensitiveTags != other.CaseSensitiveTags) return false;
+        if (Count != other.Count) return false;
+        for (int i = 0; i < Count; i++)
+            if (!Items.Compare(this[i], other[i])) return false;
 
         return true;
     }
@@ -104,7 +101,7 @@ public partial class InvariantListKT : THost
     /// <returns></returns>
     public override int GetHashCode()
     {
-        var code = CaseSensitive.GetHashCode();
+        var code = CaseSensitiveTags.GetHashCode();
         for (int i = 0; i < Count; i++) code = HashCode.Combine(code, this[i]);
         return code;
     }
@@ -113,27 +110,27 @@ public partial class InvariantListKT : THost
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual IEnumerator<TItem> GetEnumerator() => Items.GetEnumerator();
+    public IEnumerator<TItem> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"Count: {Count}";
+    public override string ToString() => string.Join('.', Items);
 
     // ----------------------------------------------------
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public bool CaseSensitive
+    public bool CaseSensitiveTags
     {
-        get => _CaseSensitive;
+        get => _CaseSensitiveTags;
         init
         {
-            if (_CaseSensitive == value) return;
-            _CaseSensitive = value;
+            if (_CaseSensitiveTags == value) return;
+            _CaseSensitiveTags = value;
 
             if (Count == 0) return;
             var range = ToArray();
@@ -141,9 +138,7 @@ public partial class InvariantListKT : THost
             AddRangeInternal(range);
         }
     }
-    bool _CaseSensitive;
-
-    // ----------------------------------------------------
+    bool _CaseSensitiveTags = Engine.CASESENSITIVETAGS;
 
     /// <summary>
     /// <inheritdoc/>
@@ -165,30 +160,16 @@ public partial class InvariantListKT : THost
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="tag"></param>
     /// <returns></returns>
-    public bool Contains(TKey key) => Items.Contains(key);
+    public bool Contains(TItem tag) => Items.Contains(tag);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="tag"></param>
     /// <returns></returns>
-    public int IndexOf(TKey key) => Items.IndexOf(key);
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    public int LastIndexOf(TKey key) => Items.LastIndexOf(key);
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    public List<int> IndexesOf(TKey key) => Items.IndexesOf(key);
+    public int IndexOf(TItem tag) => Items.IndexOf(tag);
 
     /// <summary>
     /// <inheritdoc/>
@@ -238,13 +219,13 @@ public partial class InvariantListKT : THost
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual THost GetRange(int index, int count)
+    public THost GetRange(int index, int count)
     {
         var clone = Clone();
         var done = clone.GetRangeInternal(index, count);
         return done > 0 ? clone : this;
     }
-    protected virtual int GetRangeInternal(int index, int count)
+    int GetRangeInternal(int index, int count)
     {
         if (count == 0 && index >= 0) return ClearInternal();
         if (index == 0 && count == Count) return 0;
@@ -259,83 +240,142 @@ public partial class InvariantListKT : THost
     /// <inheritdoc/>
     /// </summary>
     /// <param name="index"></param>
-    /// <param name="item"></param>
+    /// <param name="dotted"></param>
     /// <returns></returns>
-    public virtual THost Replace(int index, TItem item)
+    public THost Replace(int index, TItem dotted)
     {
         var clone = Clone();
-        var done = clone.ReplaceInternal(index, item);
+        var done = clone.ReplaceInternal(index, dotted);
         return done > 0 ? clone : this;
     }
-    protected virtual int ReplaceInternal(int index, TItem item) => Items.Replace(index, item);
+    int ReplaceInternal(int index, TItem dotted)
+    {
+        dotted = dotted.NotNullNotEmpty();
+
+        var source = Items[index];
+        if (Items.IsSame(source, dotted)) return 0;
+
+        RemoveAtInternal(index);
+        var num = 0;
+        var tags = dotted.Split('.'); foreach (var tag in tags)
+        {
+            var r = Items.Insert(index, tag);
+            num += r;
+            index += r;
+        }
+        return num;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="dotted"></param>
     /// <returns></returns>
-    public virtual THost Add(TItem item)
+    public THost Add(TItem dotted)
     {
         var clone = Clone();
-        var done = clone.AddInternal(item);
+        var done = clone.AddInternal(dotted);
         return done > 0 ? clone : this;
     }
-    protected virtual int AddInternal(TItem item) => Items.Add(item);
+    int AddInternal(TItem dotted)
+    {
+        dotted = dotted.NotNullNotEmpty();
+
+        var num = 0;
+        var tags = dotted.Split('.'); foreach (var tag in tags)
+        {
+            var r = Items.Add(tag);
+            num += r;
+        }
+        return num;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="range"></param>
+    /// <param name="dottedrange"></param>
     /// <returns></returns>
-    public virtual THost AddRange(IEnumerable<TItem> range)
+    public THost AddRange(IEnumerable<TItem> dottedrange)
     {
         var clone = Clone();
-        var done = clone.AddRangeInternal(range);
+        var done = clone.AddRangeInternal(dottedrange);
         return done > 0 ? clone : this;
     }
-    protected virtual int AddRangeInternal(IEnumerable<TItem> range) => Items.AddRange(range);
+    int AddRangeInternal(IEnumerable<TItem> dottedrange)
+    {
+        dottedrange.ThrowWhenNull();
+
+        var num = 0; foreach (var item in dottedrange)
+        {
+            var r = AddInternal(item);
+            num += r;
+        }
+        return num;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="index"></param>
-    /// <param name="item"></param>
+    /// <param name="dotted"></param>
     /// <returns></returns>
-    public virtual THost Insert(int index, TItem item)
+    public THost Insert(int index, TItem dotted)
     {
         var clone = Clone();
-        var done = clone.InsertInternal(index, item);
+        var done = clone.InsertInternal(index, dotted);
         return done > 0 ? clone : this;
     }
-    protected virtual int InsertInternal(int index, TItem item) => Items.Insert(index, item);
+    int InsertInternal(int index, TItem dotted)
+    {
+        dotted = dotted.NotNullNotEmpty();
+
+        var num = 0;
+        var tags = dotted.Split('.'); foreach (var tag in tags)
+        {
+            var r = Items.Insert(index, tag);
+            num += r;
+            index += r;
+        }
+        return num;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="index"></param>
-    /// <param name="range"></param>
+    /// <param name="dottedrange"></param>
     /// <returns></returns>
-    public virtual THost InsertRange(int index, IEnumerable<TItem> range)
+    public THost InsertRange(int index, IEnumerable<TItem> dottedrange)
     {
         var clone = Clone();
-        var done = clone.InsertRangeInternal(index, range);
+        var done = clone.InsertRangeInternal(index, dottedrange);
         return done > 0 ? clone : this;
     }
-    protected virtual int InsertRangeInternal(
-        int index, IEnumerable<TItem> range) => Items.InsertRange(index, range);
+    int InsertRangeInternal(int index, IEnumerable<TItem> dottedrange)
+    {
+        dottedrange.ThrowWhenNull();
+
+        var num = 0; foreach (var item in dottedrange)
+        {
+            var r = InsertInternal(index, item);
+            num += r;
+            index += r;
+        }
+        return num;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public virtual THost RemoveAt(int index)
+    public THost RemoveAt(int index)
     {
         var clone = Clone();
         var done = clone.RemoveAtInternal(index);
         return done > 0 ? clone : this;
     }
-    protected virtual int RemoveAtInternal(int index) => Items.RemoveAt(index);
+    int RemoveAtInternal(int index) => Items.RemoveAt(index);
 
     /// <summary>
     /// <inheritdoc/>
@@ -343,104 +383,75 @@ public partial class InvariantListKT : THost
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual THost RemoveRange(int index, int count)
+    public THost RemoveRange(int index, int count)
     {
         var clone = Clone();
         var done = clone.RemoveRangeInternal(index, count);
         return done > 0 ? clone : this;
     }
-    protected virtual int RemoveRangeInternal(
-        int index, int count) => Items.RemoveRange(index, count);
+    int RemoveRangeInternal(int index, int count) => Items.RemoveRange(index, count);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="tag"></param>
     /// <returns></returns>
-    public virtual THost Remove(TKey key)
+    public THost Remove(TItem tag)
     {
         var clone = Clone();
-        var done = clone.RemoveInternal(key);
+        var done = clone.RemoveInternal(tag);
         return done > 0 ? clone : this;
     }
-    protected virtual int RemoveInternal(TKey key) => Items.Remove(key);
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    public virtual THost RemoveLast(TKey key)
-    {
-        var clone = Clone();
-        var done = clone.RemoveLastInternal(key);
-        return done > 0 ? clone : this;
-    }
-    protected virtual int RemoveLastInternal(TKey key) => Items.RemoveLast(key);
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    public virtual THost RemoveAll(TKey key)
-    {
-        var clone = Clone();
-        var done = clone.RemoveAllInternal(key);
-        return done > 0 ? clone : this;
-    }
-    protected virtual int RemoveAllInternal(TKey key) => Items.RemoveAll(key);
+    int RemoveInternal(TItem tag) => Items.Remove(tag);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual THost Remove(Predicate<TItem> predicate)
+    public THost Remove(Predicate<TItem> predicate)
     {
         var clone = Clone();
         var done = clone.RemoveInternal(predicate);
         return done > 0 ? clone : this;
     }
-    protected virtual int RemoveInternal(Predicate<TItem> predicate) => Items.Remove(predicate);
+    int RemoveInternal(Predicate<TItem> predicate) => Items.Remove(predicate);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual THost RemoveLast(Predicate<TItem> predicate)
+    public THost RemoveLast(Predicate<TItem> predicate)
     {
         var clone = Clone();
         var done = clone.RemoveLastInternal(predicate);
         return done > 0 ? clone : this;
     }
-    protected virtual int RemoveLastInternal(
-        Predicate<TItem> predicate) => Items.RemoveLast(predicate);
+    int RemoveLastInternal(Predicate<TItem> predicate) => Items.RemoveLast(predicate);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual THost RemoveAll(Predicate<TItem> predicate)
+    public THost RemoveAll(Predicate<TItem> predicate)
     {
         var clone = Clone();
         var done = clone.RemoveAllInternal(predicate);
         return done > 0 ? clone : this;
     }
-    protected virtual int RemoveAllInternal(
-        Predicate<TItem> predicate) => Items.RemoveAll(predicate);
+    int RemoveAllInternal(Predicate<TItem> predicate) => Items.RemoveAll(predicate);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual THost Clear()
+    public THost Clear()
     {
         var clone = Clone();
         var done = clone.ClearInternal();
         return done > 0 ? clone : this;
     }
-    protected virtual int ClearInternal() => Items.Clear();
+    int ClearInternal() => Items.Clear();
 }

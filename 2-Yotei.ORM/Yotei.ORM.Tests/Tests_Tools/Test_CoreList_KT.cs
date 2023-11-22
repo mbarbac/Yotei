@@ -4,20 +4,22 @@ namespace Yotei.ORM.Tests.Tools;
 
 // ========================================================
 //[Enforced]
-public static class Test_CoreList_T
+public static class Test_CoreList_KT
 {
     public class Element(string name)
     {
         public string Name { get; set; } = name;
         public override string ToString() => Name ?? string.Empty;
     }
-    public class Chain : CoreList<Element>
+    public class Chain : CoreList<string, Element>
     {
         public Chain(bool sensitive)
         {
             CaseSensitive = sensitive;
-            ValidateItem = (item, add) => { item.ThrowWhenNull(); if (add) item.Name.NotNullNotEmpty(); return item; };
-            Compare = (source, target) => string.Compare(source.Name, target.Name, !CaseSensitive) == 0;
+            ValidateItem = (item, add) => { item.ThrowWhenNull(); if (add) ValidateKey(GetKey(item)); return item; };
+            GetKey = (item) => item.Name;
+            ValidateKey = (key) => key.NotNullNotEmpty();
+            Compare = (source, target) => string.Compare(source, target, !CaseSensitive) == 0;
             IsSame = (source, target) => ReferenceEquals(source, target);
             ValidDuplicate = (source, target) => IsSame(source, target)
                 ? true
@@ -126,12 +128,12 @@ public static class Test_CoreList_T
     {
         var items = new Chain(false, [xone, xtwo, xthree, xone]);
 
-        Assert.Equal(-1, items.IndexOf(new Element("any")));
+        Assert.Equal(-1, items.IndexOf("any"));
 
-        Assert.Equal(0, items.IndexOf(new Element("ONE")));
-        Assert.Equal(3, items.LastIndexOf(new Element("ONE")));
+        Assert.Equal(0, items.IndexOf("ONE"));
+        Assert.Equal(3, items.LastIndexOf("ONE"));
 
-        var list = items.IndexesOf(new Element("ONE"));
+        var list = items.IndexesOf("ONE");
         Assert.Equal(2, list.Count);
         Assert.Equal(0, list[0]);
         Assert.Equal(3, list[1]);
@@ -372,12 +374,12 @@ public static class Test_CoreList_T
     public static void Test_Remove_Item()
     {
         var items = new Chain(false, [xone, xtwo, xthree, xone]);
-        var done = items.Remove(new Element("any"));
+        var done = items.Remove("any");
         Assert.Equal(0, done);
         Assert.Equal(4, items.Count);
 
         items = new Chain(false, [xone, xtwo, xthree, xone]);
-        done = items.Remove(new Element("ONE"));
+        done = items.Remove("one");
         Assert.Equal(1, done);
         Assert.Equal(3, items.Count);
         Assert.Same(xtwo, items[0]);
@@ -385,7 +387,7 @@ public static class Test_CoreList_T
         Assert.Same(xone, items[2]);
 
         items = new Chain(false, [xone, xtwo, xthree, xone]);
-        done = items.RemoveLast(new Element("ONE"));
+        done = items.RemoveLast("one");
         Assert.Equal(1, done);
         Assert.Equal(3, items.Count);
         Assert.Same(xone, items[0]);
@@ -393,7 +395,7 @@ public static class Test_CoreList_T
         Assert.Same(xthree, items[2]);
 
         items = new Chain(false, [xone, xtwo, xthree, xone]);
-        done = items.RemoveAll(new Element("ONE"));
+        done = items.RemoveAll("one");
         Assert.Equal(2, done);
         Assert.Equal(2, items.Count);
         Assert.Same(xtwo, items[0]);

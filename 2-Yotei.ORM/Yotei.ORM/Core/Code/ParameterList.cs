@@ -1,9 +1,9 @@
-﻿using TMaster = Yotei.ORM.Tools.Code.InvariantListKT;
-using THost = Yotei.ORM.Tools.IInvariantListKT;
-using TItem = Yotei.ORM.Tools.IInvariantFake;
+﻿using TMaster = Yotei.ORM.Code.ParameterList;
+using THost = Yotei.ORM.IParameterList;
+using TItem = Yotei.ORM.IParameter;
 using TKey = string;
 
-namespace Yotei.ORM.Tools.Code;
+namespace Yotei.ORM.Code;
 
 // ========================================================
 /// <summary>
@@ -12,7 +12,7 @@ namespace Yotei.ORM.Tools.Code;
 [DebuggerDisplay("{ToStringEx(7)}")]
 [Cloneable]
 [WithGenerator]
-public partial class InvariantListKT : THost
+public partial class ParameterList : THost
 {
     protected class InnerList : CoreList<TKey, TItem>
     {
@@ -27,8 +27,8 @@ public partial class InvariantListKT : THost
             };
             GetKey = (item) => item.Name;
             ValidateKey = (key) => key.NotNullNotEmpty();
-            Compare = (source, target)
-                => string.Compare(source, target, !Master.CaseSensitive) == 0;
+            Compare = (source, target) 
+                => string.Compare(source, target, !Master.Engine.CaseSensitiveNames) == 0;
             IsSame = ReferenceEquals;
             ValidDuplicate = (source, target) => IsSame(source, target)
                 ? true
@@ -45,34 +45,34 @@ public partial class InvariantListKT : THost
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    /// <param name="sensitive"></param>
-    public InvariantListKT(bool sensitive)
+    /// <param name="engine"></param>
+    public ParameterList(IEngine engine)
     {
         Items = CreateItems(this);
-        CaseSensitive = sensitive;
+        Engine = engine.ThrowWhenNull();
     }
 
     /// <summary>
     /// Initializes a new instance with the given element.
     /// </summary>
-    /// <param name="sensitive"></param>
+    /// <param name="engine"></param>
     /// <param name="item"></param>
-    public InvariantListKT(bool sensitive, TItem item) : this(sensitive) => AddInternal(item);
+    public ParameterList(IEngine engine, TItem item) : this(engine) => AddInternal(item);
 
     /// <summary>
     /// Initializes a new instance with the elements from the given range.
     /// </summary>
-    /// <param name="sensitive"></param>
+    /// <param name="engine"></param>
     /// <param name="range"></param>
-    public InvariantListKT(
-        bool sensitive, IEnumerable<TItem> range) : this(sensitive) => AddRangeInternal(range);
+    public ParameterList(
+        IEngine engine, IEnumerable<TItem> range) : this(engine) => AddRangeInternal(range);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected InvariantListKT(
-        TMaster source) : this(source.CaseSensitive) => AddRangeInternal(source.Items);
+    protected ParameterList(
+        TMaster source) : this(source.Engine) => AddRangeInternal(source.Items);
 
     /// <summary>
     /// <inheritdoc/>
@@ -83,10 +83,9 @@ public partial class InvariantListKT : THost
     {
         if (other is null) return false;
 
-        if (CaseSensitive != other.CaseSensitive) return false;
-        if (Count !=  other.Count) return false;
-        for (int i = 0; i < Count;i++)
-            if (!Items.Compare(Items.GetKey(this[i]), Items.GetKey(other[i]))) return false;
+        if (!Engine.Equals(other.Engine)) return false;
+        if (Count != other.Count) return false;
+        for (int i = 0; i < Count; i++) if (!this[i].Equals(other[i])) return false;
 
         return true;
     }
@@ -104,7 +103,7 @@ public partial class InvariantListKT : THost
     /// <returns></returns>
     public override int GetHashCode()
     {
-        var code = CaseSensitive.GetHashCode();
+        var code = Engine.GetHashCode();
         for (int i = 0; i < Count; i++) code = HashCode.Combine(code, this[i]);
         return code;
     }
@@ -127,23 +126,7 @@ public partial class InvariantListKT : THost
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public bool CaseSensitive
-    {
-        get => _CaseSensitive;
-        init
-        {
-            if (_CaseSensitive == value) return;
-            _CaseSensitive = value;
-
-            if (Count == 0) return;
-            var range = ToArray();
-            ClearInternal();
-            AddRangeInternal(range);
-        }
-    }
-    bool _CaseSensitive;
-
-    // ----------------------------------------------------
+    public IEngine Engine { get; }
 
     /// <summary>
     /// <inheritdoc/>
@@ -229,6 +212,21 @@ public partial class InvariantListKT : THost
     /// </summary>
     /// <returns></returns>
     public List<TItem> ToList() => Items.ToList();
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public string NextName()
+    {
+        for (int i = Count; i < int.MaxValue; i++)
+        {
+            var name = $"{Engine.ParameterPrefix}{i}";
+            var index = IndexOf(name);
+            if (index < 0) return name;
+        }
+        throw new UnExpectedException("Range of integers exhausted.");
+    }
 
     // ----------------------------------------------------
 

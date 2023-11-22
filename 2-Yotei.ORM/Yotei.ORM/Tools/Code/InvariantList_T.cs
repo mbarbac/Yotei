@@ -1,42 +1,111 @@
-﻿namespace Yotei.ORM.Tools.Code;
+﻿using TMaster = Yotei.ORM.Tools.Code.InvariantListT;
+using THost = Yotei.ORM.Tools.IInvariantListT;
+using TItem = Yotei.ORM.Tools.IInvariantFake;
+
+namespace Yotei.ORM.Tools.Code;
 
 // ========================================================
 /// <summary>
-/// <inheritdoc cref="IInvariantList{TItem}"/>
+/// <inheritdoc cref="THost"/>
 /// </summary>
-/// <typeparam name="TItem"></typeparam>
-[DebuggerDisplay("{ToString(7)}")]
+[DebuggerDisplay("{ToStringEx(7)}")]
 [Cloneable]
-public abstract partial class InvariantList<TItem> : IInvariantList<TItem>
+[WithGenerator]
+public partial class InvariantListT : THost
 {
-    protected class InnerList(InvariantList<TItem> master) : CoreList<TItem>
+    protected class InnerList : CoreList<TItem>
     {
-        public InvariantList<TItem> Master { get; } = master.ThrowWhenNull();
-        public override TItem Validate(TItem item) => Master.Validate(item);
-        public override bool CanDuplicate(TItem source, TItem target) => Master.CanDuplicate(source, target);
-        public override bool Compare(TItem source, TItem target) => Master.Compare(source, target);
+        public InnerList(TMaster master)
+        {
+            Master = master.ThrowWhenNull();
+            ValidateItem = (item, add) =>
+            {
+                item.ThrowWhenNull();
+                if (add) item.Name.NotNullNotEmpty();
+                return item;
+            };
+            Compare = (source, target) => CompareKeys(source.Name, target.Name);
+            IsSame = ReferenceEquals;
+            ValidDuplicate = (source, target) => IsSame(source, target)
+                ? true
+                : throw new DuplicateException("Duplicated element.").WithData(target);
+        }
+        public TMaster Master { get; }
+        public bool CompareKeys(string source, string target)
+            => string.Compare(source, target, !Master.CaseSensitive) == 0;
     }
-    protected virtual InnerList CreateItems(InvariantList<TItem> master) => new(master);
+    protected virtual InnerList CreateItems(TMaster master) => new(master);
     protected InnerList Items { get; }
+    protected string ToStringEx(int count) => Items.ToStringEx(count);
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Initializes a new empty list.
+    /// Initializes a new empty instance.
     /// </summary>
-    public InvariantList() => Items = CreateItems(this);
+    /// <param name="sensitive"></param>
+    public InvariantListT(bool sensitive)
+    {
+        Items = CreateItems(this);
+        CaseSensitive = sensitive;
+    }
 
     /// <summary>
     /// Initializes a new instance with the given element.
     /// </summary>
+    /// <param name="sensitive"></param>
     /// <param name="item"></param>
-    public InvariantList(TItem item) : this() => Items.Add(item);
+    public InvariantListT(bool sensitive, TItem item) : this(sensitive) => AddInternal(item);
 
     /// <summary>
     /// Initializes a new instance with the elements from the given range.
     /// </summary>
+    /// <param name="sensitive"></param>
     /// <param name="range"></param>
-    public InvariantList(IEnumerable<TItem> range) : this() => Items.AddRange(range);
+    public InvariantListT(
+        bool sensitive, IEnumerable<TItem> range) : this(sensitive) => AddRangeInternal(range);
+
+    /// <summary>
+    /// Copy constructor.
+    /// </summary>
+    /// <param name="source"></param>
+    protected InvariantListT(
+        TMaster source) : this(source.CaseSensitive) => AddRangeInternal(source.Items);
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    public virtual bool Equals(THost? other)
+    {
+        if (other is null) return false;
+
+        if (CaseSensitive != other.CaseSensitive) return false;
+        if (Count != other.Count) return false;
+        for (int i = 0; i < Count; i++)
+            if (!Items.Compare(this[i], other[i])) return false;
+
+        return true;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    public override bool Equals(object? obj) => Equals(obj as InvariantFake);
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public override int GetHashCode()
+    {
+        var code = CaseSensitive.GetHashCode();
+        for (int i = 0; i < Count; i++) code = HashCode.Combine(code, this[i]);
+        return code;
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -51,54 +120,38 @@ public abstract partial class InvariantList<TItem> : IInvariantList<TItem>
     /// <returns></returns>
     public override string ToString() => $"Count: {Count}";
 
+    // ----------------------------------------------------
+
     /// <summary>
-    /// Returns a string representation of this collection containing at most the given number
-    /// of elements.
+    /// <inheritdoc/>
     /// </summary>
-    /// <param name="count"></param>
-    /// <returns></returns>
-    protected string ToString(int count)
+    public bool CaseSensitive
     {
-        var items = count <= Items.Count ? Items : Items.Take(count);
-        var temp = string.Join(", ", items);
-        return $"({Count})[{temp}]";
+        get => _CaseSensitive;
+        init
+        {
+            if (_CaseSensitive == value) return;
+            _CaseSensitive = value;
+
+            if (Count == 0) return;
+            var range = ToArray();
+            ClearInternal();
+            AddRangeInternal(range);
+        }
     }
+    bool _CaseSensitive;
 
     // ----------------------------------------------------
-
-    /// <summary>
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    public abstract TItem Validate(TItem item);
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="target"></param>
-    /// <returns></returns>
-    public abstract bool CanDuplicate(TItem source, TItem target);
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="target"></param>
-    /// <returns></returns>
-    public abstract bool Compare(TItem source, TItem target);
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    public int Count => Items.Count;
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     public void Trim() => Items.Trim();
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public int Count => Items.Count;
 
     /// <summary>
     /// <inheritdoc/>
@@ -112,7 +165,7 @@ public abstract partial class InvariantList<TItem> : IInvariantList<TItem>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public bool Contains(TItem item) => Items.IndexOf(item) >= 0;
+    public bool Contains(TItem item) => Items.Contains(item);
 
     /// <summary>
     /// <inheritdoc/>
@@ -140,7 +193,7 @@ public abstract partial class InvariantList<TItem> : IInvariantList<TItem>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public bool Contains(Predicate<TItem> predicate) => Items.IndexOf(predicate) >= 0;
+    public bool Contains(Predicate<TItem> predicate) => Items.Contains(predicate);
 
     /// <summary>
     /// <inheritdoc/>
@@ -183,17 +236,21 @@ public abstract partial class InvariantList<TItem> : IInvariantList<TItem>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual IInvariantList<TItem> GetRange(int index, int count)
+    public virtual THost GetRange(int index, int count)
     {
-        if (count == 0 && index >= 0) return Clear();
-        if (index == 0 && count == Count) return this;
+        var clone = Clone();
+        var done = clone.GetRangeInternal(index, count);
+        return done > 0 ? clone : this;
+    }
+    protected virtual int GetRangeInternal(int index, int count)
+    {
+        if (count == 0 && index >= 0) return ClearInternal();
+        if (index == 0 && count == Count) return 0;
 
         var range = Items.GetRange(index, count);
-
-        var temp = Clone();
-        temp.Items.Clear();
-        temp.Items.AddRange(range);
-        return temp;
+        Items.Clear();
+        Items.AddRange(range);
+        return count;
     }
 
     /// <summary>
@@ -202,39 +259,39 @@ public abstract partial class InvariantList<TItem> : IInvariantList<TItem>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IInvariantList<TItem> Replace(int index, TItem item)
+    public virtual THost Replace(int index, TItem item)
     {
-        var temp = Clone();
-        var done = temp.ReplaceInternal(index, item);
-        return done > 0 ? temp : this;
+        var clone = Clone();
+        var done = clone.ReplaceInternal(index, item);
+        return done > 0 ? clone : this;
     }
-    protected int ReplaceInternal(int index, TItem item) => Items.Replace(index, item);
+    protected virtual int ReplaceInternal(int index, TItem item) => Items.Replace(index, item);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IInvariantList<TItem> Add(TItem item)
+    public virtual THost Add(TItem item)
     {
-        var temp = Clone();
-        var done = temp.AddInternal(item);
-        return done > 0 ? temp : this;
+        var clone = Clone();
+        var done = clone.AddInternal(item);
+        return done > 0 ? clone : this;
     }
-    protected int AddInternal(TItem item) => Items.Add(item);
+    protected virtual int AddInternal(TItem item) => Items.Add(item);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual IInvariantList<TItem> AddRange(IEnumerable<TItem> range)
+    public virtual THost AddRange(IEnumerable<TItem> range)
     {
-        var temp = Clone();
-        var done = temp.AddRangeInternal(range);
-        return done > 0 ? temp : this;
+        var clone = Clone();
+        var done = clone.AddRangeInternal(range);
+        return done > 0 ? clone : this;
     }
-    protected int AddRangeInternal(IEnumerable<TItem> range) => Items.AddRange(range);
+    protected virtual int AddRangeInternal(IEnumerable<TItem> range) => Items.AddRange(range);
 
     /// <summary>
     /// <inheritdoc/>
@@ -242,13 +299,13 @@ public abstract partial class InvariantList<TItem> : IInvariantList<TItem>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IInvariantList<TItem> Insert(int index, TItem item)
+    public virtual THost Insert(int index, TItem item)
     {
-        var temp = Clone();
-        var done = temp.InsertInternal(index, item);
-        return done > 0 ? temp : this;
+        var clone = Clone();
+        var done = clone.InsertInternal(index, item);
+        return done > 0 ? clone : this;
     }
-    protected int InsertInternal(int index, TItem item) => Items.Insert(index, item);
+    protected virtual int InsertInternal(int index, TItem item) => Items.Insert(index, item);
 
     /// <summary>
     /// <inheritdoc/>
@@ -256,13 +313,13 @@ public abstract partial class InvariantList<TItem> : IInvariantList<TItem>
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual IInvariantList<TItem> InsertRange(int index, IEnumerable<TItem> range)
+    public virtual THost InsertRange(int index, IEnumerable<TItem> range)
     {
-        var temp = Clone();
-        var done = temp.InsertRangeInternal(index, range);
-        return done > 0 ? temp : this;
+        var clone = Clone();
+        var done = clone.InsertRangeInternal(index, range);
+        return done > 0 ? clone : this;
     }
-    protected int InsertRangeInternal(
+    protected virtual int InsertRangeInternal(
         int index, IEnumerable<TItem> range) => Items.InsertRange(index, range);
 
     /// <summary>
@@ -270,13 +327,13 @@ public abstract partial class InvariantList<TItem> : IInvariantList<TItem>
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public virtual IInvariantList<TItem> RemoveAt(int index)
+    public virtual THost RemoveAt(int index)
     {
-        var temp = Clone();
-        var done = temp.RemoveAtInternal(index);
-        return done > 0 ? temp : this;
+        var clone = Clone();
+        var done = clone.RemoveAtInternal(index);
+        return done > 0 ? clone : this;
     }
-    protected int RemoveAtInternal(int index) => Items.RemoveAt(index);
+    protected virtual int RemoveAtInternal(int index) => Items.RemoveAt(index);
 
     /// <summary>
     /// <inheritdoc/>
@@ -284,101 +341,104 @@ public abstract partial class InvariantList<TItem> : IInvariantList<TItem>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual IInvariantList<TItem> RemoveRange(int index, int count)
+    public virtual THost RemoveRange(int index, int count)
     {
-        var temp = Clone();
-        var done = temp.RemoveRangeInternal(index, count);
-        return done > 0 ? temp : this;
+        var clone = Clone();
+        var done = clone.RemoveRangeInternal(index, count);
+        return done > 0 ? clone : this;
     }
-    protected int RemoveRangeInternal(int index, int count) => Items.RemoveRange(index, count);
+    protected virtual int RemoveRangeInternal(
+        int index, int count) => Items.RemoveRange(index, count);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IInvariantList<TItem> Remove(TItem item)
+    public virtual THost Remove(TItem item)
     {
-        var temp = Clone();
-        var done = temp.RemoveInternal(item);
-        return done > 0 ? temp : this;
+        var clone = Clone();
+        var done = clone.RemoveInternal(item);
+        return done > 0 ? clone : this;
     }
-    protected int RemoveInternal(TItem item) => Items.Remove(item);
+    protected virtual int RemoveInternal(TItem item) => Items.Remove(item);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IInvariantList<TItem> RemoveLast(TItem item)
+    public virtual THost RemoveLast(TItem item)
     {
-        var temp = Clone();
-        var done = temp.RemoveLastInternal(item);
-        return done > 0 ? temp : this;
+        var clone = Clone();
+        var done = clone.RemoveLastInternal(item);
+        return done > 0 ? clone : this;
     }
-    protected int RemoveLastInternal(TItem item) => Items.RemoveLast(item);
+    protected virtual int RemoveLastInternal(TItem item) => Items.RemoveLast(item);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IInvariantList<TItem> RemoveAll(TItem item)
+    public virtual THost RemoveAll(TItem item)
     {
-        var temp = Clone();
-        var done = temp.RemoveAllInternal(item);
-        return done > 0 ? temp : this;
+        var clone = Clone();
+        var done = clone.RemoveAllInternal(item);
+        return done > 0 ? clone : this;
     }
-    protected int RemoveAllInternal(TItem item) => Items.RemoveAll(item);
+    protected virtual int RemoveAllInternal(TItem item) => Items.RemoveAll(item);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IInvariantList<TItem> Remove(Predicate<TItem> predicate)
+    public virtual THost Remove(Predicate<TItem> predicate)
     {
-        var temp = Clone();
-        var done = temp.RemoveInternal(predicate);
-        return done > 0 ? temp : this;
+        var clone = Clone();
+        var done = clone.RemoveInternal(predicate);
+        return done > 0 ? clone : this;
     }
-    protected int RemoveInternal(Predicate<TItem> predicate) => Items.Remove(predicate);
+    protected virtual int RemoveInternal(Predicate<TItem> predicate) => Items.Remove(predicate);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IInvariantList<TItem> RemoveLast(Predicate<TItem> predicate)
+    public virtual THost RemoveLast(Predicate<TItem> predicate)
     {
-        var temp = Clone();
-        var done = temp.RemoveLastInternal(predicate);
-        return done > 0 ? temp : this;
+        var clone = Clone();
+        var done = clone.RemoveLastInternal(predicate);
+        return done > 0 ? clone : this;
     }
-    protected int RemoveLastInternal(Predicate<TItem> predicate) => Items.RemoveLast(predicate);
+    protected virtual int RemoveLastInternal(
+        Predicate<TItem> predicate) => Items.RemoveLast(predicate);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IInvariantList<TItem> RemoveAll(Predicate<TItem> predicate)
+    public virtual THost RemoveAll(Predicate<TItem> predicate)
     {
-        var temp = Clone();
-        var done = temp.RemoveAllInternal(predicate);
-        return done > 0 ? temp : this;
+        var clone = Clone();
+        var done = clone.RemoveAllInternal(predicate);
+        return done > 0 ? clone : this;
     }
-    protected int RemoveAllInternal(Predicate<TItem> predicate) => Items.RemoveAll(predicate);
+    protected virtual int RemoveAllInternal(
+        Predicate<TItem> predicate) => Items.RemoveAll(predicate);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual IInvariantList<TItem> Clear()
+    public virtual THost Clear()
     {
-        var temp = Clone();
-        var done = temp.ClearInternal();
-        return done > 0 ? temp : this;
+        var clone = Clone();
+        var done = clone.ClearInternal();
+        return done > 0 ? clone : this;
     }
-    protected int ClearInternal() => Items.Clear();
+    protected virtual int ClearInternal() => Items.Clear();
 }

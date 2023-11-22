@@ -322,7 +322,7 @@ public static partial class ConvertToExtensions
             {
                 try
                 {
-                    target = (TTarget)method.Invoke(source, new object?[] { provider })!;
+                    target = (TTarget)method.Invoke(source, [provider])!;
                     return true;
                 }
                 catch { }
@@ -446,7 +446,7 @@ public static partial class ConvertToExtensions
             {
                 try
                 {
-                    target = (TTarget)method.Invoke(source, new object?[] { provider })!;
+                    target = (TTarget)method.Invoke(source, [provider])!;
                     return true;
                 }
                 catch { }
@@ -572,7 +572,7 @@ public static partial class ConvertToExtensions
             {
                 try
                 {
-                    target = method.Invoke(source, new object?[] { provider })!;
+                    target = method.Invoke(source, [provider])!;
                     return true;
                 }
                 catch { }

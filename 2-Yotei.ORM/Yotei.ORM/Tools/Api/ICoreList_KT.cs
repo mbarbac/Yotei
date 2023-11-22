@@ -3,63 +3,51 @@
 // ========================================================
 /// <summary>
 /// Represents a list-alike collection of elements identified by their respective keys that
-/// provides customizable item validation and duplicates acceptance or denial capabilities.
+/// provides custom item validation and duplicates acceptance or denial capabilities.
 /// </summary>
-/// <typeparam name="TKey"></typeparam>
-/// <typeparam name="TItem"></typeparam>
-public interface ICoreList<TKey, TItem>
-    : IList<TItem>, IList, ICollection<TItem>, ICollection, IEnumerable<TItem>
+/// <typeparam name="K"></typeparam>
+/// <typeparam name="T"></typeparam>
+public interface ICoreList<K, T> : IList<T>, IList, ICollection<T>, ICollection, IEnumerable<T>
 {
     /// <summary>
-    /// Determines if the given element is valid for this collection, or throws an appropriate
-    /// exception otherwise.
+    /// The (item, scenario) delegate invoked to return a validated element for this instance and
+    /// scenario, it being 'true' if the element is to be added or inserted, or 'false' otherwise.
+    /// Throws an exception if the element is not a valid one.
     /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    TItem ValidateItem(TItem item);
+    Func<T, bool, T> ValidateItem { get; set; }
 
     /// <summary>
-    /// Determines if the given target element, being a duplicate of the given source one, can be
-    /// added or inserted. Returns '<c>true</c>' if it can be added or inserted, '<c>false</c>' if
-    /// it shall just be ignored, or throws an appropriate exception if this instance does not
-    /// accept that duplicate.
+    /// The (item) delegate invoked to obtain the key associated with the given element.
+    /// Throws an exception if the key cannot be obtained.
     /// </summary>
-    /// <param name="source"></param>
-    /// <param name="target"></param>
-    /// <returns></returns>
-    bool CanDuplicate(TItem source, TItem target);
+    Func<T, K> GetKey { get; set; }
 
     /// <summary>
-    /// Returns the key associated with the given element, or throws an exception if that key
-    /// cannot be obtained.
+    /// The (key) delegate invoked to return a validated key for this instance.
+    /// Throws an exception if the key is not a valid one.
     /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    TKey GetKey(TItem key);
+    Func<K, K> ValidateKey { get; set; }
 
     /// <summary>
-    /// Determines if the given key is valid for this collection, or throws an appropriate
-    /// exception otherwise.
+    /// The (source, target) delegate invoked to compare the key of a source element in this
+    /// instance against the given target one.
     /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    TKey ValidateKey(TKey key);
+    Func<K, K, bool> Compare { get; set; }
 
     /// <summary>
-    /// Determines if the given target key can be considered equal to the given source one,
-    /// or not.
+    /// The (source, target) delegate invoked to determine if the given source element is the
+    /// same as the given target one, to prevent replacing it.
     /// </summary>
-    /// <param name="source"></param>
-    /// <param name="target"></param>
-    /// <returns></returns>
-    bool Compare(TKey source, TKey target);
+    Func<T, T, bool> IsSame { get; set; }
+
+    /// <summary>
+    /// The (source, target) delegate invoked to determine if the given duplicated target element
+    /// can be added or inserted into this instance. If not, then the element is just ignored. It
+    /// is expected that an exception is thrown if duplicates are not allowed.
+    /// </summary>
+    Func<T, T, bool> ValidDuplicate { get; set; }
 
     // ----------------------------------------------------
-
-    /// <summary>
-    /// Gets the number of elements in this collection.
-    /// </summary>
-    new int Count { get; }
 
     /// <summary>
     /// Minimizes the memory consumption of this instance.
@@ -67,19 +55,24 @@ public interface ICoreList<TKey, TItem>
     void Trim();
 
     /// <summary>
-    /// Gets or sets the element at the given index. The setter may throw an exception if the
-    /// new item is a duplicate of an existing one.
+    /// Gets the number of elements in this instance.
+    /// </summary>
+    new int Count { get; }
+
+    /// <summary>
+    /// Gets or sets the element at the given index. An exception may be thrown if the new one
+    /// is a duplicate of an existing element.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    new TItem this[int index] { get; set; }
+    new T this[int index] { get; set; }
 
     /// <summary>
-    /// Determines if this instance contains an element whose key matches the given one.
+    /// Determines if this instance has at least one element whose key matches the given one.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    bool Contains(TKey key);
+    bool Contains(K key);
 
     /// <summary>
     /// Returns the index of the first element in this instance whose key matches the given one,
@@ -87,7 +80,7 @@ public interface ICoreList<TKey, TItem>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    int IndexOf(TKey key);
+    int IndexOf(K key);
 
     /// <summary>
     /// Returns the index of the last element in this instance whose key matches the given one,
@@ -95,21 +88,21 @@ public interface ICoreList<TKey, TItem>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    int LastIndexOf(TKey key);
+    int LastIndexOf(K key);
 
     /// <summary>
-    /// Returns the indexes of all elements in this instance whose keys matches the given one.
+    /// Returns the indexes of the elements in this instance whose keys match the given one.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    List<int> IndexesOf(TKey key);
+    List<int> IndexesOf(K key);
 
     /// <summary>
-    /// Determines if this instance contains an element that matches the the given predicate.
+    /// Determines if this instance has at least one element that matches the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    bool Contains(Predicate<TItem> predicate);
+    bool Contains(Predicate<T> predicate);
 
     /// <summary>
     /// Returns the index of the first element in this instance that matches the given predicate,
@@ -117,7 +110,7 @@ public interface ICoreList<TKey, TItem>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int IndexOf(Predicate<TItem> predicate);
+    int IndexOf(Predicate<T> predicate);
 
     /// <summary>
     /// Returns the index of the last element in this instance that matches the given predicate,
@@ -125,28 +118,26 @@ public interface ICoreList<TKey, TItem>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int LastIndexOf(Predicate<TItem> predicate);
+    int LastIndexOf(Predicate<T> predicate);
 
     /// <summary>
-    /// Returns the index of all the element in this instance that matches the given predicate.
+    /// Returns the index of all the elements in this instance that match the given predicate..
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    List<int> IndexesOf(Predicate<TItem> predicate);
+    List<int> IndexesOf(Predicate<T> predicate);
 
     /// <summary>
-    /// Returns an array with the elements in this instace.
+    /// Returns an array with the elements in this instance.
     /// </summary>
     /// <returns></returns>
-    TItem[] ToArray();
+    T[] ToArray();
 
     /// <summary>
-    /// Returns a list with the elements in this instace.
+    /// Returns a list with the elements in this instance.
     /// </summary>
     /// <returns></returns>
-    List<TItem> ToList();
-
-    // ----------------------------------------------------
+    List<T> ToList();
 
     /// <summary>
     /// Returns a list with the given number of elements, starting at the given index.
@@ -154,55 +145,62 @@ public interface ICoreList<TKey, TItem>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    List<TItem> GetRange(int index, int count);
+    List<T> GetRange(int index, int count);
+
+    // ----------------------------------------------------
 
     /// <summary>
-    /// Replaces the element at the given index with the new given one.
+    /// Replaces the element at the given index with the new given one, unless both are the
+    /// same instance. Returns how many changes have been made.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    int Replace(int index, TItem item);
+    int Replace(int index, T item);
 
     /// <summary>
-    /// Adds the given element to this instance.
+    /// Adds the given element to this collection. Returns how many changes have been made.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    new int Add(TItem item);
+    new int Add(T item);
 
     /// <summary>
-    /// Adds the elements of the given range to this instance.
+    /// Adds the elements of the given range to this collection. Returns how many changes have
+    /// been made.
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    int AddRange(IEnumerable<TItem> range);
+    int AddRange(IEnumerable<T> range);
 
     /// <summary>
-    /// Inserts the given element into this instance at the given index.
+    /// Inserts the given element into this collection at the given index. Returns how many
+    /// changes have been made.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    new int Insert(int index, TItem item);
+    new int Insert(int index, T item);
 
     /// <summary>
-    /// Inserts the elements of the given range into this instance, starting at the given index.
+    /// Inserts the elements of the given range into this collection, starting at the given index.
+    /// Returns how many changes have been made.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    int InsertRange(int index, IEnumerable<TItem> range);
+    int InsertRange(int index, IEnumerable<T> range);
 
     /// <summary>
-    /// Removes from this instance the element at the given index.
+    /// Removes the element at the given index. Returns how many changes have been made.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
     new int RemoveAt(int index);
 
     /// <summary>
-    /// Removes from this instance the given number of elements, starting at the given index.
+    /// Removes the given number of elements, starting at the given index. Returns how many
+    /// changes have been made.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
@@ -210,49 +208,56 @@ public interface ICoreList<TKey, TItem>
     int RemoveRange(int index, int count);
 
     /// <summary>
-    /// Removes from this instance the first element whose key matches the given one.
+    /// Removes the first element whose key matches the given one. Returns how many changes have
+    /// been made.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    int Remove(TKey key);
+    int Remove(K key);
 
     /// <summary>
-    /// Removes from this instance the last element whose key matches the given one.
+    /// Removes the last element whose key matches the given one. Returns how many changes have
+    /// been made.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    int RemoveLast(TKey key);
+    int RemoveLast(K key);
 
     /// <summary>
-    /// Removes from this instance all the elements whose keys match the given one.
+    /// Removes all the elements whose keys match the given one. Returns how many changes have
+    /// been made.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    int RemoveAll(TKey key);
+    int RemoveAll(K key);
 
     /// <summary>
-    /// Removes from this instance the first element that matches the given predicate.
+    /// Removes the first element that matches the given predicate. Returns how many changes have
+    /// been made.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int Remove(Predicate<TItem> predicate);
+    int Remove(Predicate<T> predicate);
 
     /// <summary>
-    /// Removes from this instance the last element that matches the given predicate.
+    /// Removes the last element that matches the given predicate. Returns how many changes have
+    /// been made.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int RemoveLast(Predicate<TItem> predicate);
+    int RemoveLast(Predicate<T> predicate);
 
     /// <summary>
-    /// Removes from this instance all the elements that match the given predicate.
+    /// Removes all the elements that match the given predicate. Returns how many changes have
+    /// been made.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int RemoveAll(Predicate<TItem> predicate);
+    int RemoveAll(Predicate<T> predicate);
 
     /// <summary>
-    /// Clears this instance.
+    /// Clears this instance by removing all its elements. Returns how many changes have been
+    /// made.
     /// </summary>
     /// <returns></returns>
     new int Clear();
