@@ -32,7 +32,7 @@ public interface ICoreList<K, T> : IList<T>, IList, ICollection<T>, ICollection,
     /// The (source, target) delegate invoked to compare the key of a source element in this
     /// instance against the given target one.
     /// </summary>
-    Func<K, K, bool> Compare { get; set; }
+    Func<K, K, bool> CompareKeys { get; set; }
 
     /// <summary>
     /// The (source, target) delegate invoked to determine if the given source element is the

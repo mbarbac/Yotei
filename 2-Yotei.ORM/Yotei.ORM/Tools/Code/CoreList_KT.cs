@@ -113,7 +113,7 @@ public class CoreList<K, T> : ICoreList<K, T>
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public Func<K, K, bool> Compare
+    public Func<K, K, bool> CompareKeys
     {
         get => _Compare;
         set
@@ -216,7 +216,7 @@ public class CoreList<K, T> : ICoreList<K, T>
     public int IndexOf(K key)
     {
         key = ValidateKey(key);
-        return IndexOf(x => Compare(GetKey(x), key));
+        return IndexOf(x => CompareKeys(GetKey(x), key));
     }
     int IList<T>.IndexOf(T item) => IndexOf(GetKey(item));
     int IList.IndexOf(object? value) => IndexOf(GetKey((T)value!));
@@ -229,7 +229,7 @@ public class CoreList<K, T> : ICoreList<K, T>
     public int LastIndexOf(K key)
     {
         key = ValidateKey(key);
-        return LastIndexOf(x => Compare(GetKey(x), key));
+        return LastIndexOf(x => CompareKeys(GetKey(x), key));
     }
 
     /// <summary>
@@ -240,7 +240,7 @@ public class CoreList<K, T> : ICoreList<K, T>
     public List<int> IndexesOf(K key)
     {
         key = ValidateKey(key);
-        return IndexesOf(x => Compare(GetKey(x), key));
+        return IndexesOf(x => CompareKeys(GetKey(x), key));
     }
 
     /// <summary>

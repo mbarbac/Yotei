@@ -40,30 +40,8 @@ public partial class Engine : IEngine
         UseTerminators = source.UseTerminators;
         LeftTerminator = source.LeftTerminator;
         RightTerminator = source.RightTerminator;
+        KnownTags = source.KnownTags;
     }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
-    public override int GetHashCode()
-    {
-        var code = CaseSensitiveNames.GetHashCode();
-        code = HashCode.Combine(code, NullValueLiteral);
-        code = HashCode.Combine(code, NativePaging);
-        code = HashCode.Combine(code, ParameterPrefix);
-        code = HashCode.Combine(code, PositionalParameters);
-        code = HashCode.Combine(code, UseTerminators);
-        code = HashCode.Combine(code, LeftTerminator);
-        code = HashCode.Combine(code, RightTerminator);
-        return code;
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
-    public override string ToString() => "ORM.Engine";
 
     /// <summary>
     /// <inheritdoc/>
@@ -82,6 +60,7 @@ public partial class Engine : IEngine
         if (UseTerminators != other.UseTerminators) return false;
         if (LeftTerminator != other.LeftTerminator) return false;
         if (RightTerminator != other.RightTerminator) return false;
+        if (!KnownTags.Equals(other.KnownTags)) return false;
 
         return true;
     }
@@ -92,6 +71,30 @@ public partial class Engine : IEngine
     /// <param name="obj"></param>
     /// <returns></returns>
     public override bool Equals(object? obj) => Equals(obj as IEngine);
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public override int GetHashCode()
+    {
+        var code = CaseSensitiveNames.GetHashCode();
+        code = HashCode.Combine(code, NullValueLiteral);
+        code = HashCode.Combine(code, NativePaging);
+        code = HashCode.Combine(code, ParameterPrefix);
+        code = HashCode.Combine(code, PositionalParameters);
+        code = HashCode.Combine(code, UseTerminators);
+        code = HashCode.Combine(code, LeftTerminator);
+        code = HashCode.Combine(code, RightTerminator);
+        code = HashCode.Combine(code, KnownTags);
+        return code;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public override string ToString() => "ORM.Engine";
 
     // ----------------------------------------------------
 
@@ -162,4 +165,14 @@ public partial class Engine : IEngine
         init => _RightTerminator = ValidateTerminator(value);
     }
     char _RightTerminator = RIGHTTERMINATOR;
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public IKnownTags KnownTags
+    {
+        get => _KnownTags;
+        init => _KnownTags = value.ThrowWhenNull();
+    }
+    IKnownTags _KnownTags = new KnownTags(CASESENSITIVETAGS);
 }

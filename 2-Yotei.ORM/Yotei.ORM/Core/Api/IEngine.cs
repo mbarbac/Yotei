@@ -50,4 +50,10 @@ public partial interface IEngine : IEquatable<IEngine>
     /// are used.
     /// </summary>
     [WithGenerator] char RightTerminator { get; }
+
+    /// <summary>
+    /// The collection of the well-known metadata tags for this engine, for the purposes of the
+    /// framework.
+    /// </summary>
+    [WithGenerator] IKnownTags KnownTags { get; }
 }

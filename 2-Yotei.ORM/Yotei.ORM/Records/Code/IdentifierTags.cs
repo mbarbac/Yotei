@@ -25,12 +25,12 @@ public sealed partial class IdentifierTags : THost
                     .WithData(item);
                 return item;
             };
-            Compare = (source, target)
-                => string.Compare(source, target, !Master.CaseSensitiveTags) == 0;
             IsSame = (source, target) => source == target;
             ValidDuplicate = (source, target) => IsSame(source, target)
                 ? true
                 : throw new DuplicateException("Duplicated element.").WithData(target);
+            Compare = (source, target)
+                => string.Compare(source, target, !Master.CaseSensitiveTags) == 0;
         }
         public TMaster Master { get; }
     }
@@ -93,7 +93,7 @@ public sealed partial class IdentifierTags : THost
     /// </summary>
     /// <param name="obj"></param>
     /// <returns></returns>
-    public override bool Equals(object? obj) => Equals(obj as InvariantFake);
+    public override bool Equals(object? obj) => Equals(obj as THost);
 
     /// <summary>
     /// <inheritdoc/>

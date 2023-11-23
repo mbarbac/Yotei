@@ -25,14 +25,15 @@ public partial class ParameterList : THost
                 if (add) ValidateKey(GetKey(item));
                 return item;
             };
-            GetKey = (item) => item.Name;
-            ValidateKey = (key) => key.NotNullNotEmpty();
-            Compare = (source, target) 
-                => string.Compare(source, target, !Master.Engine.CaseSensitiveNames) == 0;
             IsSame = ReferenceEquals;
             ValidDuplicate = (source, target) => IsSame(source, target)
                 ? true
                 : throw new DuplicateException("Duplicated element.").WithData(target);
+
+            GetKey = (item) => item.Name;
+            ValidateKey = (key) => key.NotNullNotEmpty();
+            CompareKeys = (source, target) 
+                => string.Compare(source, target, !Master.Engine.CaseSensitiveNames) == 0;
         }
         public TMaster Master { get; }
     }
@@ -95,7 +96,7 @@ public partial class ParameterList : THost
     /// </summary>
     /// <param name="obj"></param>
     /// <returns></returns>
-    public override bool Equals(object? obj) => Equals(obj as InvariantFake);
+    public override bool Equals(object? obj) => Equals(obj as THost);
 
     /// <summary>
     /// <inheritdoc/>

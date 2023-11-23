@@ -19,7 +19,7 @@ public static class Test_CoreList_KT
             ValidateItem = (item, add) => { item.ThrowWhenNull(); if (add) ValidateKey(GetKey(item)); return item; };
             GetKey = (item) => item.Name;
             ValidateKey = (key) => key.NotNullNotEmpty();
-            Compare = (source, target) => string.Compare(source, target, !CaseSensitive) == 0;
+            CompareKeys = (source, target) => string.Compare(source, target, !CaseSensitive) == 0;
             IsSame = (source, target) => ReferenceEquals(source, target);
             ValidDuplicate = (source, target) => IsSame(source, target)
                 ? true

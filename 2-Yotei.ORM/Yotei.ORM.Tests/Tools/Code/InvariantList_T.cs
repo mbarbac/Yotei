@@ -24,11 +24,12 @@ public partial class InvariantListT : THost
                 if (add) item.Name.NotNullNotEmpty();
                 return item;
             };
-            Compare = (source, target) => CompareKeys(source.Name, target.Name);
             IsSame = ReferenceEquals;
             ValidDuplicate = (source, target) => IsSame(source, target)
                 ? true
                 : throw new DuplicateException("Duplicated element.").WithData(target);
+
+            Compare = (source, target) => CompareKeys(source.Name, target.Name);
         }
         public TMaster Master { get; }
         public bool CompareKeys(string source, string target)
@@ -94,7 +95,7 @@ public partial class InvariantListT : THost
     /// </summary>
     /// <param name="obj"></param>
     /// <returns></returns>
-    public override bool Equals(object? obj) => Equals(obj as InvariantFake);
+    public override bool Equals(object? obj) => Equals(obj as THost);
 
     /// <summary>
     /// <inheritdoc/>

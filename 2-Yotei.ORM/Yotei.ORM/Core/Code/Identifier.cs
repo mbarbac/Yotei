@@ -21,15 +21,16 @@ public sealed partial class Identifier : THost
                 item.ThrowWhenNull();
                 return item;
             };
-            IsSame = ReferenceEquals;
-            GetKey = (item) => item.UnwrappedValue;
+            IsSame = (source, target) => source.Value == target.Value;
             ValidDuplicate = (source, target) => true;
+
+            GetKey = (item) => item.Value;
             ValidateKey = (key) =>
             {
                 var item = new IdentifierPart(Master.Engine, key);
-                return item.UnwrappedValue;
+                return item.Value;
             };
-            Compare = (source, target)
+            CompareKeys = (source, target)
                 => (source is null && target is null)
                 || string.Compare(source, target, !Master.Engine.CaseSensitiveNames) == 0;
         }
@@ -94,7 +95,7 @@ public sealed partial class Identifier : THost
     /// </summary>
     /// <param name="obj"></param>
     /// <returns></returns>
-    public override bool Equals(object? obj) => Equals(obj as InvariantFake);
+    public override bool Equals(object? obj) => Equals(obj as THost);
 
     /// <summary>
     /// <inheritdoc/>
@@ -206,7 +207,7 @@ public sealed partial class Identifier : THost
     /// <summary>
     /// Reduces the given collection of parts, if such is needed.
     /// </summary>
-    void Reduce(List<IdentifierPart> parts)
+    static void Reduce(List<IdentifierPart> parts)
     {
         while (parts.Count > 0)
         {
@@ -295,7 +296,7 @@ public sealed partial class Identifier : THost
 
             var tvalue = target[^(i + 1)].UnwrappedValue; if (tvalue == null) continue;
             var svalue = source[^(i + 1)].UnwrappedValue;
-            if (!Items.Compare(svalue, tvalue)) return false;
+            if (!Items.CompareKeys(svalue, tvalue)) return false;
         }
         return true;
     }

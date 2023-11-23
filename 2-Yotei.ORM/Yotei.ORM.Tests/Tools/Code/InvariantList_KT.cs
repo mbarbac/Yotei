@@ -25,14 +25,15 @@ public partial class InvariantListKT : THost
                 if (add) ValidateKey(GetKey(item));
                 return item;
             };
-            GetKey = (item) => item.Name;
-            ValidateKey = (key) => key.NotNullNotEmpty();
-            Compare = (source, target)
-                => string.Compare(source, target, !Master.CaseSensitive) == 0;
             IsSame = ReferenceEquals;
             ValidDuplicate = (source, target) => IsSame(source, target)
                 ? true
                 : throw new DuplicateException("Duplicated element.").WithData(target);
+
+            GetKey = (item) => item.Name;
+            ValidateKey = (key) => key.NotNullNotEmpty();
+            CompareKeys = (source, target)
+                => string.Compare(source, target, !Master.CaseSensitive) == 0;
         }
         public TMaster Master { get; }
     }
@@ -86,7 +87,7 @@ public partial class InvariantListKT : THost
         if (CaseSensitive != other.CaseSensitive) return false;
         if (Count !=  other.Count) return false;
         for (int i = 0; i < Count;i++)
-            if (!Items.Compare(Items.GetKey(this[i]), Items.GetKey(other[i]))) return false;
+            if (!Items.CompareKeys(Items.GetKey(this[i]), Items.GetKey(other[i]))) return false;
 
         return true;
     }
@@ -96,7 +97,7 @@ public partial class InvariantListKT : THost
     /// </summary>
     /// <param name="obj"></param>
     /// <returns></returns>
-    public override bool Equals(object? obj) => Equals(obj as InvariantFake);
+    public override bool Equals(object? obj) => Equals(obj as THost);
 
     /// <summary>
     /// <inheritdoc/>
