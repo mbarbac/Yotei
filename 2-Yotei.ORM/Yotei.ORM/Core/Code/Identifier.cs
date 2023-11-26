@@ -12,11 +12,11 @@ namespace Yotei.ORM.Code;
 public sealed partial class Identifier : THost
 {
     readonly List<TItem> Items = [];
-    TItem ValidateItem(TItem item) => item.ThrowWhenNull();
-    bool SameItem(TItem source, TItem target) => source.Value == target.Value;
-    bool AllowDuplicate(TItem source, TItem target) => true;
+    static TItem ValidateItem(TItem item) => item.ThrowWhenNull();
+    static bool SameItem(TItem source, TItem target) => source.Value == target.Value;
+    static bool AllowDuplicate(TItem _, TItem __) => true;
     List<int> GetDuplicates(string? key) => IndexesOf(key);
-    string? GetKey(TItem item) => item.Value;
+    static string? GetKey(TItem item) => item.Value;
     string? ValidateKey(string? key) => new IdentifierPart(Engine, key).Value;
     bool CompareKeys(string? source, string? target)
         => string.Compare(source, target, !Engine.CaseSensitiveNames) == 0;
