@@ -1,23 +1,19 @@
-﻿namespace Yotei.ORM.Tools.Code;
+namespace Yotei.ORM.Tests.Templates;
 
 // ========================================================
+/// <summary>
+/// <inheritdoc cref="IInvariantFake"/>
+/// </summary>
 public class InvariantFake(string name) : IInvariantFake
 {
-    public override string ToString() => Name ?? string.Empty;
-    public string Name { get; set; } = name;
-
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
     public virtual bool Equals(IInvariantFake? other)
-    {
-        if (other is null) return false;
-
-        if (Name != other.Name) return false;
-        return true;
-    }
+        => other is not null
+        && Name == other.Name;
 
     /// <summary>
     /// <inheritdoc/>
@@ -31,4 +27,15 @@ public class InvariantFake(string name) : IInvariantFake
     /// </summary>
     /// <returns></returns>
     public override int GetHashCode() => Name.GetHashCode();
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public override string ToString() => Name ?? string.Empty;
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public string Name { get; } = name;
 }

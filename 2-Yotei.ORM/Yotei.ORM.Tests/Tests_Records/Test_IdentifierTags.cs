@@ -1,6 +1,6 @@
-using THost = Yotei.ORM.Code.IdentifierTags;
+using THost = Yotei.ORM.Records.Code.IdentifierTags;
 
-namespace Yotei.ORM.Tests.Records;
+namespace Yotei.ORM.Tests;
 
 // ========================================================
 //[Enforced]
@@ -56,14 +56,19 @@ public static class Test_IdentifierTags
 
         try { _ = new THost(false, "one..three"); Assert.Fail(); }
         catch (EmptyException) { }
+    }
 
-        try { _ = new THost(false, "one.ONE"); Assert.Fail(); }
-        catch (DuplicateException) { }
-
-        items = new THost(true, "one.ONE");
+    //[Enforced]
+    [Fact]
+    public static void Test_Create_Many_With_Duplicates()
+    {
+        var items = new THost(true, "one.ONE");
         Assert.Equal(2, items.Count);
         Assert.Equal("one", items[0]);
         Assert.Equal("ONE", items[1]);
+
+        try { _ = new THost(false, "one.ONE"); Assert.Fail(); }
+        catch (DuplicateException) { }
     }
 
     //[Enforced]

@@ -19,8 +19,8 @@ internal class Program
     public static string LocalRepoSource = "Local";
     public static string LocalRepoPath = @"C:\Dev\Packages";
 
-    public static Tester.RequestList Includes = new();
-    public static Tester.RequestList Excludes = new();
+    public static Tester.RequestList Includes = [];
+    public static Tester.RequestList Excludes = [];
 
     // ----------------------------------------------------
 

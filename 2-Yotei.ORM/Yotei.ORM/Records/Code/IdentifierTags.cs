@@ -1,8 +1,6 @@
-﻿using TMaster = Yotei.ORM.Code.IdentifierTags;
-using THost = Yotei.ORM.IIdentifierTags;
-using TItem = string;
+﻿using THost = Yotei.ORM.Records.IIdentifierTags;
 
-namespace Yotei.ORM.Code;
+namespace Yotei.ORM.Records.Code;
 
 // ========================================================
 /// <summary>
@@ -12,78 +10,68 @@ namespace Yotei.ORM.Code;
 [WithGenerator]
 public sealed partial class IdentifierTags : THost
 {
-    class InnerList : CoreList<TItem>
+    readonly List<string> Items = [];
+    static string ValidateItem(string item, bool _)
     {
-        public InnerList(TMaster master)
-        {
-            Master = master.ThrowWhenNull();
-            ValidateItem = (item, _) =>
-            {
-                item = item.NotNullNotEmpty();
-                if (item.Contains('.')) throw new ArgumentException(
-                    "Identifier tags cannot contain dots.")
-                    .WithData(item);
-                return item;
-            };
-            IsSame = (source, target) => source == target;
-            ValidDuplicate = (source, target) => IsSame(source, target)
-                ? true
-                : throw new DuplicateException("Duplicated element.").WithData(target);
-            Compare = (source, target)
-                => string.Compare(source, target, !Master.CaseSensitiveTags) == 0;
-        }
-        public TMaster Master { get; }
+        item = item.NotNullNotEmpty();
+        if (item.Contains('.')) throw new ArgumentException(
+            "Identifier tags cannot contain dots.")
+            .WithData(item);
+        return item;
     }
-    static InnerList CreateItems(TMaster master) => new(master);
-    InnerList Items { get; }
+    bool SameItem(string source, string target) => source == target;
+    bool AllowDuplicate(string source, string target)
+        => SameItem(source, target)
+        ? true
+        : throw new DuplicateException("Duplicated element.").WithData(target);
+    List<int> GetDuplicates(string item) => IndexesOf(x => CompareItems(x, item));
+    bool CompareItems(string source, string target)
+        => string.Compare(source, target, !CaseSensitiveTags) == 0;
 
     // ----------------------------------------------------
 
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    /// <param name="sensitive"></param>
-    public IdentifierTags(bool sensitive)
-    {
-        Items = CreateItems(this);
-        CaseSensitiveTags = sensitive;
-    }
+    /// <param name="caseSensitive"></param>
+    public IdentifierTags(bool caseSensitive) => CaseSensitiveTags = caseSensitive;
 
     /// <summary>
-    /// Initializes a new instance with the tags obtained from the given dotted values.
+    /// Initializes a new instance with the given element.
     /// </summary>
-    /// <param name="sensitive"></param>
-    /// <param name="dotted"></param>
-    public IdentifierTags(bool sensitive, TItem dotted) : this(sensitive) => AddInternal(dotted);
-
-    /// <summary>
-    /// Initializes a new instance with the tags obtained from the dotted values of the given range.
-    /// </summary>
-    /// <param name="sensitive"></param>
-    /// <param name="dottedrange"></param>
+    /// <param name="caseSensitive"></param>
+    /// <param name="item"></param>
     public IdentifierTags(
-        bool sensitive, IEnumerable<TItem> dottedrange) : this(sensitive) => AddRangeInternal(dottedrange);
+        bool caseSensitive, string item) : this(caseSensitive) => AddInternal(item);
+
+    /// <summary>
+    /// Initializes a new instance with the elements from the given range.
+    /// </summary>
+    /// <param name="caseSensitive"></param>
+    /// <param name="range"></param>
+    public IdentifierTags(bool caseSensitive, IEnumerable<string> range)
+        : this(caseSensitive)
+        => AddRangeInternal(range);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
     IdentifierTags(
-        TMaster source) : this(source.CaseSensitiveTags) => AddRangeInternal(source.Items);
+        IdentifierTags source) : this(source.CaseSensitiveTags) => AddRangeInternal(source);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
-    public bool Equals(THost? other)
+    public bool Equals(IIdentifierTags? other)
     {
         if (other is null) return false;
 
         if (CaseSensitiveTags != other.CaseSensitiveTags) return false;
         if (Count != other.Count) return false;
-        for (int i = 0; i < Count; i++)
-            if (!Items.Compare(this[i], other[i])) return false;
+        for (int i = 0; i < Count; i++) if (!CompareItems(this[i], other[i])) return false;
 
         return true;
     }
@@ -110,7 +98,7 @@ public sealed partial class IdentifierTags : THost
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public IEnumerator<TItem> GetEnumerator() => Items.GetEnumerator();
+    public IEnumerator<string> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /// <summary>
@@ -133,7 +121,7 @@ public sealed partial class IdentifierTags : THost
             _CaseSensitiveTags = value;
 
             if (Count == 0) return;
-            var range = ToArray();
+            var range = Items.ToArray();
             ClearInternal();
             AddRangeInternal(range);
         }
@@ -141,9 +129,9 @@ public sealed partial class IdentifierTags : THost
     bool _CaseSensitiveTags = Engine.CASESENSITIVETAGS;
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Minimizes memory consumption.
     /// </summary>
-    public void Trim() => Items.Trim();
+    public void Trim() => Items.TrimExcess();
 
     /// <summary>
     /// <inheritdoc/>
@@ -155,61 +143,84 @@ public sealed partial class IdentifierTags : THost
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public TItem this[int index] => Items[index];
+    public string this[int index] => Items[index];
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="tag"></param>
     /// <returns></returns>
-    public bool Contains(TItem tag) => Items.Contains(tag);
+    public bool Contains(string tag) => IndexOf(tag) >= 0;
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="tag"></param>
     /// <returns></returns>
-    public int IndexOf(TItem tag) => Items.IndexOf(tag);
+    public int IndexOf(string tag)
+    {
+        tag = ValidateItem(tag, false);
+        return IndexOf(x => CompareItems(x, tag));
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public bool Contains(Predicate<TItem> predicate) => Items.Contains(predicate);
+    public bool Contains(Predicate<string> predicate) => IndexOf(predicate) >= 0;
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public int IndexOf(Predicate<TItem> predicate) => Items.IndexOf(predicate);
+    public int IndexOf(Predicate<string> predicate)
+    {
+        predicate.ThrowWhenNull();
+
+        for (int i = 0; i < Items.Count; i++) if (predicate(Items[i])) return i;
+        return -1;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public int LastIndexOf(Predicate<TItem> predicate) => Items.LastIndexOf(predicate);
+    public int LastIndexOf(Predicate<string> predicate)
+    {
+        predicate.ThrowWhenNull();
+
+        for (int i = Items.Count - 1; i >= 0; i--) if (predicate(Items[i])) return i;
+        return -1;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public List<int> IndexesOf(Predicate<TItem> predicate) => Items.IndexesOf(predicate);
+    public List<int> IndexesOf(Predicate<string> predicate)
+    {
+        predicate.ThrowWhenNull();
+
+        var list = new List<int>();
+        for (int i = 0; i < Items.Count; i++) if (predicate(Items[i])) list.Add(i);
+        return list;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public TItem[] ToArray() => Items.ToArray();
+    public string[] ToArray() => Items.ToArray();
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public List<TItem> ToList() => Items.ToList();
+    public List<string> ToList() => Items.ToList();
 
     // ----------------------------------------------------
 
@@ -242,28 +253,21 @@ public sealed partial class IdentifierTags : THost
     /// <param name="index"></param>
     /// <param name="dotted"></param>
     /// <returns></returns>
-    public THost Replace(int index, TItem dotted)
+    public THost Replace(int index, string dotted)
     {
         var clone = Clone();
         var done = clone.ReplaceInternal(index, dotted);
         return done > 0 ? clone : this;
     }
-    int ReplaceInternal(int index, TItem dotted)
+    int ReplaceInternal(int index, string dotted)
     {
         dotted = dotted.NotNullNotEmpty();
 
         var source = Items[index];
-        if (Items.IsSame(source, dotted)) return 0;
+        if (SameItem(source, dotted)) return 0;
 
         RemoveAtInternal(index);
-        var num = 0;
-        var tags = dotted.Split('.'); foreach (var tag in tags)
-        {
-            var r = Items.Insert(index, tag);
-            num += r;
-            index += r;
-        }
-        return num;
+        return InsertInternal(index, dotted);
     }
 
     /// <summary>
@@ -271,23 +275,34 @@ public sealed partial class IdentifierTags : THost
     /// </summary>
     /// <param name="dotted"></param>
     /// <returns></returns>
-    public THost Add(TItem dotted)
+    public THost Add(string dotted)
     {
         var clone = Clone();
         var done = clone.AddInternal(dotted);
         return done > 0 ? clone : this;
     }
-    int AddInternal(TItem dotted)
+    int AddInternal(string dotted)
     {
         dotted = dotted.NotNullNotEmpty();
 
         var num = 0;
-        var tags = dotted.Split('.'); foreach (var tag in tags)
+        var tags = dotted.Split('.');
+        foreach (var tag in tags)
         {
-            var r = Items.Add(tag);
+            var r = AddInternalSingle(tag);
             num += r;
         }
         return num;
+    }
+    int AddInternalSingle(string item)
+    {
+        item = ValidateItem(item, true);
+
+        var nums = GetDuplicates(item);
+        foreach (var num in nums) if (!AllowDuplicate(Items[num], item)) return 0;
+
+        Items.Add(item);
+        return 1;
     }
 
     /// <summary>
@@ -295,17 +310,17 @@ public sealed partial class IdentifierTags : THost
     /// </summary>
     /// <param name="dottedrange"></param>
     /// <returns></returns>
-    public THost AddRange(IEnumerable<TItem> dottedrange)
+    public THost AddRange(IEnumerable<string> dottedrange)
     {
         var clone = Clone();
         var done = clone.AddRangeInternal(dottedrange);
         return done > 0 ? clone : this;
     }
-    int AddRangeInternal(IEnumerable<TItem> dottedrange)
+    int AddRangeInternal(IEnumerable<string> range)
     {
-        dottedrange.ThrowWhenNull();
+        range.ThrowWhenNull();
 
-        var num = 0; foreach (var item in dottedrange)
+        var num = 0; foreach (var item in range)
         {
             var r = AddInternal(item);
             num += r;
@@ -319,43 +334,54 @@ public sealed partial class IdentifierTags : THost
     /// <param name="index"></param>
     /// <param name="dotted"></param>
     /// <returns></returns>
-    public THost Insert(int index, TItem dotted)
+    public THost Insert(int index, string dotted)
     {
         var clone = Clone();
         var done = clone.InsertInternal(index, dotted);
         return done > 0 ? clone : this;
     }
-    int InsertInternal(int index, TItem dotted)
+    int InsertInternal(int index, string dotted)
     {
         dotted = dotted.NotNullNotEmpty();
 
         var num = 0;
-        var tags = dotted.Split('.'); foreach (var tag in tags)
+        var tags = dotted.Split('.');
+        foreach (var tag in tags)
         {
-            var r = Items.Insert(index, tag);
+            var r = InsertInternalSingle(index, tag);
             num += r;
             index += r;
         }
         return num;
+    }
+    int InsertInternalSingle(int index, string item)
+    {
+        item = ValidateItem(item, true);
+
+        var nums = GetDuplicates(item);
+        foreach (var num in nums) if (!AllowDuplicate(Items[num], item)) return 0;
+
+        Items.Insert(index, item);
+        return 1;
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="index"></param>
-    /// <param name="dottedrange"></param>
+    /// <param name="range"></param>
     /// <returns></returns>
-    public THost InsertRange(int index, IEnumerable<TItem> dottedrange)
+    public THost InsertRange(int index, IEnumerable<string> dottedrange)
     {
         var clone = Clone();
         var done = clone.InsertRangeInternal(index, dottedrange);
         return done > 0 ? clone : this;
     }
-    int InsertRangeInternal(int index, IEnumerable<TItem> dottedrange)
+    int InsertRangeInternal(int index, IEnumerable<string> range)
     {
-        dottedrange.ThrowWhenNull();
+        range.ThrowWhenNull();
 
-        var num = 0; foreach (var item in dottedrange)
+        var num = 0; foreach (var item in range)
         {
             var r = InsertInternal(index, item);
             num += r;
@@ -366,7 +392,6 @@ public sealed partial class IdentifierTags : THost
 
     /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
     public THost RemoveAt(int index)
@@ -375,7 +400,11 @@ public sealed partial class IdentifierTags : THost
         var done = clone.RemoveAtInternal(index);
         return done > 0 ? clone : this;
     }
-    int RemoveAtInternal(int index) => Items.RemoveAt(index);
+    int RemoveAtInternal(int index)
+    {
+        Items.RemoveAt(index);
+        return 1;
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -389,59 +418,85 @@ public sealed partial class IdentifierTags : THost
         var done = clone.RemoveRangeInternal(index, count);
         return done > 0 ? clone : this;
     }
-    int RemoveRangeInternal(int index, int count) => Items.RemoveRange(index, count);
+    int RemoveRangeInternal(int index, int count)
+    {
+        if (count > 0) Items.RemoveRange(index, count);
+        return count;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="tag"></param>
     /// <returns></returns>
-    public THost Remove(TItem tag)
+    public THost Remove(string tag)
     {
         var clone = Clone();
         var done = clone.RemoveInternal(tag);
         return done > 0 ? clone : this;
     }
-    int RemoveInternal(TItem tag) => Items.Remove(tag);
+    int RemoveInternal(string tag)
+    {
+        var index = IndexOf(tag);
+        return index >= 0 ? RemoveAtInternal(index) : 0;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public THost Remove(Predicate<TItem> predicate)
+    public THost Remove(Predicate<string> predicate)
     {
         var clone = Clone();
         var done = clone.RemoveInternal(predicate);
         return done > 0 ? clone : this;
     }
-    int RemoveInternal(Predicate<TItem> predicate) => Items.Remove(predicate);
+    int RemoveInternal(Predicate<string> predicate)
+    {
+        var index = IndexOf(predicate);
+        return index >= 0 ? RemoveAtInternal(index) : 0;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public THost RemoveLast(Predicate<TItem> predicate)
+    public THost RemoveLast(Predicate<string> predicate)
     {
         var clone = Clone();
         var done = clone.RemoveLastInternal(predicate);
         return done > 0 ? clone : this;
     }
-    int RemoveLastInternal(Predicate<TItem> predicate) => Items.RemoveLast(predicate);
+    int RemoveLastInternal(Predicate<string> predicate)
+    {
+        var index = LastIndexOf(predicate);
+        return index >= 0 ? RemoveAtInternal(index) : 0;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public THost RemoveAll(Predicate<TItem> predicate)
+    public THost RemoveAll(Predicate<string> predicate)
     {
         var clone = Clone();
         var done = clone.RemoveAllInternal(predicate);
         return done > 0 ? clone : this;
     }
-    int RemoveAllInternal(Predicate<TItem> predicate) => Items.RemoveAll(predicate);
+    int RemoveAllInternal(Predicate<string> predicate)
+    {
+        var num = 0; while (true)
+        {
+            var index = IndexOf(predicate);
+
+            if (index >= 0) num += RemoveAtInternal(index);
+            else break;
+        }
+        return num;
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -453,5 +508,9 @@ public sealed partial class IdentifierTags : THost
         var done = clone.ClearInternal();
         return done > 0 ? clone : this;
     }
-    int ClearInternal() => Items.Clear();
+    int ClearInternal()
+    {
+        var num = Items.Count; if (num > 0) Items.Clear();
+        return num;
+    }
 }

@@ -48,7 +48,7 @@ public partial class Engine : IEngine
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
-    public bool Equals(IEngine? other)
+    public virtual bool Equals(IEngine? other)
     {
         if (other is null) return false;
 
@@ -99,12 +99,12 @@ public partial class Engine : IEngine
     // ----------------------------------------------------
 
     /// <summary>
-    /// <<inheritdoc/>
+    /// <inheritdoc/>
     /// </summary>
     public bool CaseSensitiveNames { get; init; } = CASESENSITIVENAMES;
 
     /// <summary>
-    /// <<inheritdoc/>
+    /// <inheritdoc/>
     /// </summary>
     public string NullValueLiteral
     {
@@ -114,12 +114,12 @@ public partial class Engine : IEngine
     string _NullValueLiteral = NULLVALUELITERAL;
 
     /// <summary>
-    /// <<inheritdoc/>
+    /// <inheritdoc/>
     /// </summary>
     public bool NativePaging { get; init; } = NATIVEPAGING;
 
     /// <summary>
-    /// <<inheritdoc/>
+    /// <inheritdoc/>
     /// </summary>
     public string ParameterPrefix
     {
@@ -129,12 +129,12 @@ public partial class Engine : IEngine
     string _ParameterPrefix = PARAMETERPREFIX;
 
     /// <summary>
-    /// <<inheritdoc/>
+    /// <inheritdoc/>
     /// </summary>
     public bool PositionalParameters { get; init; } = POSITIONALPARAMETERS;
 
     /// <summary>
-    /// <<inheritdoc/>
+    /// <inheritdoc/>
     /// </summary>
     public bool UseTerminators { get; init; } = USETERMINATORS;
 
@@ -147,7 +147,7 @@ public partial class Engine : IEngine
     }
 
     /// <summary>
-    /// <<inheritdoc/>
+    /// <inheritdoc/>
     /// </summary>
     public char LeftTerminator
     {
@@ -157,7 +157,7 @@ public partial class Engine : IEngine
     char _LeftTerminator = LEFTERMINATOR;
 
     /// <summary>
-    /// <<inheritdoc/>
+    /// <inheritdoc/>
     /// </summary>
     public char RightTerminator
     {

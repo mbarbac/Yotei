@@ -1,23 +1,19 @@
-﻿using THost = Yotei.ORM.Tools.IInvariantListKT;
-using TItem = Yotei.ORM.Tools.IInvariantFake;
-using TKey = string;
+using THost = Yotei.ORM.Tests.Templates.IInvariantListT;
+using TItem = Yotei.ORM.Tests.Templates.IInvariantFake;
 
-namespace Yotei.ORM.Tools;
+namespace Yotei.ORM.Tests.Templates;
 
 // ========================================================
 /// <summary>
-/// Represents an immutable list-alike collection of elements identified by their respective keys
-/// that provides custom item validation and duplicates acceptance or denial capabilities.
+/// An immutable object that represents a list-alike collection of elements that provides custom
+/// item validation and duplicates acceptance or denial capabilities.
 /// </summary>
-[Cloneable]
-public partial interface IInvariantListKT : IEnumerable<TItem>, IEquatable<THost>
+public partial interface IInvariantListT : IEnumerable<TItem>, IEquatable<THost>
 {
     /// <summary>
-    /// Determines if the names of the elements in this instance are case sensitive, or not.
+    /// Whether the names of the elements in this instance are case sensitive or not.
     /// </summary>
-    [WithGenerator] bool CaseSensitive { get; }
-
-    // ----------------------------------------------------
+    [WithGenerator] IEngine Engine { get; }
 
     /// <summary>
     /// Minimizes the memory consumption of this instance.
@@ -37,37 +33,37 @@ public partial interface IInvariantListKT : IEnumerable<TItem>, IEquatable<THost
     TItem this[int index] { get; }
 
     /// <summary>
-    /// Determines if this instance has at least one element whose key matches the given one.
+    /// Determines if this instance has the given element.
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    bool Contains(TKey key);
+    bool Contains(TItem item);
 
     /// <summary>
-    /// Returns the index of the first element in this instance whose key matches the given one,
-    /// or -1 if any is found.
+    /// Returns the index of the first ocurrence of the given element in this instance, or -1 if
+    /// it cannot be found.
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    int IndexOf(TKey key);
+    int IndexOf(TItem item);
 
     /// <summary>
-    /// Returns the index of the last element in this instance whose key matches the given one,
-    /// or -1 if any is found.
+    /// Returns the index of the last ocurrence of the given element in this instance, or -1 if
+    /// it cannot be found.
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    int LastIndexOf(TKey key);
+    int LastIndexOf(TItem item);
 
     /// <summary>
-    /// Returns the indexes of the elements in this instance whose keys match the given one.
+    /// Returns the indexes of all the ocurrences of the given element in this instance.
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    List<int> IndexesOf(TKey key);
+    List<int> IndexesOf(TItem item);
 
     /// <summary>
-    /// Determines if this instance has at least one element that matches the given predicate.
+    /// Determines if this instance has an element that matches the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
@@ -75,7 +71,7 @@ public partial interface IInvariantListKT : IEnumerable<TItem>, IEquatable<THost
 
     /// <summary>
     /// Returns the index of the first element in this instance that matches the given predicate,
-    /// or -1 if any is found.
+    /// or -1 if any if found.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
@@ -83,14 +79,14 @@ public partial interface IInvariantListKT : IEnumerable<TItem>, IEquatable<THost
 
     /// <summary>
     /// Returns the index of the last element in this instance that matches the given predicate,
-    /// or -1 if any is found.
+    /// or -1 if any if found.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
     int LastIndexOf(Predicate<TItem> predicate);
 
     /// <summary>
-    /// Returns the index of all the elements in this instance that match the given predicate.
+    /// Returns the indexes of the elements in this instance that match the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
@@ -111,8 +107,8 @@ public partial interface IInvariantListKT : IEnumerable<TItem>, IEquatable<THost
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a new instance with the given number of elements, starting at the given index.
-    /// If no changes are detected, returns the original instance instead.
+    /// Returns a new instance with the given number of elements from the given index. If no
+    /// changes are detected, returns the original instance.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
@@ -121,8 +117,7 @@ public partial interface IInvariantListKT : IEnumerable<TItem>, IEquatable<THost
 
     /// <summary>
     /// Returns a new instance where the element at the given index has been replaced by the new
-    /// given one, unless both are the same instance. If no changes are detected, returns the
-    /// original instance instead.
+    /// given one. If no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
@@ -130,25 +125,24 @@ public partial interface IInvariantListKT : IEnumerable<TItem>, IEquatable<THost
     THost Replace(int index, TItem item);
 
     /// <summary>
-    /// Returns a new instance where the given element has been added to the original collection.
-    /// If no changes are detected, returns the original instance instead.
+    /// Returns a new instance where the given element has been added. If no changes are detected,
+    /// returns the original instance.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
     THost Add(TItem item);
 
     /// <summary>
-    /// Returns a new instance where the elements of the given range have been added to the
-    /// original collection. If no changes are detected, returns the original instance instead.
+    /// Returns a new instance where the elements from the given range have been added. If no
+    /// changes are detected, returns the original instance.
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
     THost AddRange(IEnumerable<TItem> range);
 
     /// <summary>
-    /// Returns a new instance where the given element has been inserted at the given index
-    /// into the original collection. If no changes are detected, returns the original instance
-    /// instead.
+    /// Returns a new instance where the given element has been inserted at the given index. If no
+    /// changes are detected, returns the original instance.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
@@ -156,9 +150,8 @@ public partial interface IInvariantListKT : IEnumerable<TItem>, IEquatable<THost
     THost Insert(int index, TItem item);
 
     /// <summary>
-    /// Returns a new instance where the elements from the given range have been inserted into
-    /// the original collection, starting at the given index. If no changes are detected, returns
-    /// the original instance instead.
+    /// Returns a new instance where the elements from the given range have been inserted starting
+    /// at the given index. If no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="range"></param>
@@ -166,16 +159,16 @@ public partial interface IInvariantListKT : IEnumerable<TItem>, IEquatable<THost
     THost InsertRange(int index, IEnumerable<TItem> range);
 
     /// <summary>
-    /// Returns a new instance where the element at the given index has been removed. If no
-    /// changes are detected, returns the original instance instead.
+    /// Returns a new instance where the element at the given index has been removed. If no changes
+    /// are detected, returns the original instance.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
     THost RemoveAt(int index);
 
     /// <summary>
-    /// Returns a new instance where the given number of elements, starting at the given index,
-    /// have been removed. If no changes are detected, returns the original instance instead.
+    /// Returns a new instance where the given number of elements, from the given index, have been
+    /// removed. If no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
@@ -183,32 +176,32 @@ public partial interface IInvariantListKT : IEnumerable<TItem>, IEquatable<THost
     THost RemoveRange(int index, int count);
 
     /// <summary>
-    /// Returns a new instance where the first element whose key matches the given one has been
-    /// removed. If no changes are detected, returns the original instance instead.
+    /// Returns a new instance where the first ocurrence of the given element has been removed.
+    /// If no changes are detected, returns the original instance.
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    THost Remove(TKey key);
+    THost Remove(TItem item);
 
     /// <summary>
-    /// Returns a new instance where the last element whose key matches the given one has been
-    /// removed. If no changes are detected, returns the original instance instead.
+    /// Returns a new instance where the last ocurrence of the given element has been removed.
+    /// If no changes are detected, returns the original instance.
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    THost RemoveLast(TKey key);
+    THost RemoveLast(TItem item);
 
     /// <summary>
-    /// Returns a new instance where all the elements whose keys match the given one have been
-    /// removed. If no changes are detected, returns the original instance instead.
+    /// Returns a new instance where all the ocurrences of the given element have been removed.
+    /// If no changes are detected, returns the original instance.
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    THost RemoveAll(TKey key);
+    THost RemoveAll(TItem item);
 
     /// <summary>
     /// Returns a new instance where the first element that matches the given predicate has been
-    /// removed. If no changes are detected, returns the original instance instead.
+    /// removed. If no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
@@ -216,23 +209,23 @@ public partial interface IInvariantListKT : IEnumerable<TItem>, IEquatable<THost
 
     /// <summary>
     /// Returns a new instance where the last element that matches the given predicate has been
-    /// removed. If no changes are detected, returns the original instance instead.
+    /// removed. If no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
     THost RemoveLast(Predicate<TItem> predicate);
 
     /// <summary>
-    /// Returns a new instance where all the elements that match the given predicate. If no
-    /// changes are detected, returns the original instance instead.
+    /// Returns a new instance where all the elements that match the given predicate have been
+    /// removed. If no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
     THost RemoveAll(Predicate<TItem> predicate);
 
     /// <summary>
-    /// Returns a new instance where all the original element have been removed. If no changes
-    /// are detected, returns the original instance instead.
+    /// Returns a new instance where all the elements have been removed.
+    /// If no changes are detected, returns the original instance.
     /// </summary>
     /// <returns></returns>
     THost Clear();

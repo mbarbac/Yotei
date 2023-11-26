@@ -1,4 +1,4 @@
-﻿namespace Yotei.ORM;
+﻿namespace Yotei.ORM.Records;
 
 // ========================================================
 /// <summary>
@@ -7,7 +7,6 @@
 /// <br/> Tags cannot be null or empty. Identifier tags cannot contain dots.
 /// <br/> Duplicate tags are not allowed.
 /// </summary>
-[Cloneable]
 public partial interface IKnownTags : IEnumerable<string>, IEquatable<IKnownTags>
 {
     /// <summary>

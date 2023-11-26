@@ -1,4 +1,4 @@
-namespace Yotei.ORM.Tests.Core;
+namespace Yotei.ORM.Tests;
 
 // ========================================================
 //[Enforced]
@@ -6,7 +6,7 @@ public static class Test_Identifier
 {
     public static string? ToUnwrappedValue(this IIdentifier item) => item.Count == 0
         ? null
-        : string.Join('.', item.UnwrappedValues);
+        : string.Join('.', item.Select(x => x.UnwrappedValue));
 
     // ----------------------------------------------------
 
@@ -278,17 +278,17 @@ public static class Test_Identifier
         Assert.Equal(5, target.Count);
         Assert.Equal("[x].[y].[two].[one].[four]", target.Value);
 
-        target = source.Replace(0, null);
+        target = source.Replace(0, (string?)null);
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.Equal("[two].[one].[four]", target.Value);
 
-        target = source.Replace(3, null);
+        target = source.Replace(3, (string?)null);
         Assert.NotSame(source, target);
         Assert.Equal(4, target.Count);
         Assert.Equal("[one].[two].[one].", target.Value);
 
-        target = source.Replace(1, null);
+        target = source.Replace(1, (string?)null);
         Assert.NotSame(source, target);
         Assert.Equal(4, target.Count);
         Assert.Equal("[one]..[one].[four]", target.Value);
@@ -316,7 +316,7 @@ public static class Test_Identifier
         Assert.Equal(5, target.Count);
         Assert.Equal("[one].[two].[one]..[five]", target.Value);
 
-        target = source.Add(null);
+        target = source.Add((string?)null);
         Assert.NotSame(source, target);
         Assert.Equal(4, target.Count);
         Assert.Equal("[one].[two].[one].", target.Value);
@@ -352,12 +352,10 @@ public static class Test_Identifier
         Assert.Equal(4, target.Count);
         Assert.Equal("[zero].[one].[two].[three]", target.Value);
 
-        target = source.Insert(0, null);
-        Assert.NotSame(source, target);
-        Assert.Equal(3, target.Count);
-        Assert.Equal("[one].[two].[three]", target.Value);
+        target = source.Insert(0, (string?)null);
+        Assert.Same(source, target);
 
-        target = source.Insert(1, null);
+        target = source.Insert(1, (string?)null);
         Assert.NotSame(source, target);
         Assert.Equal(4, target.Count);
         Assert.Equal("[one]..[two].[three]", target.Value);

@@ -1,7 +1,7 @@
-using THost = Yotei.ORM.Tools.Code.InvariantListKT;
-using TItem = Yotei.ORM.Tools.Code.InvariantFake;
+using THost = Yotei.ORM.Tests.Templates.InvariantListKT;
+using TItem = Yotei.ORM.Tests.Templates.InvariantFake;
 
-namespace Yotei.ORM.Tests.Tools;
+namespace Yotei.ORM.Tests.Templates;
 
 // ========================================================
 //[Enforced]
@@ -12,7 +12,6 @@ public static class Test_InvariantList_KT
     static readonly TItem xthree = new("three");
     static readonly TItem xfour = new("four");
     static readonly TItem xfive = new("five");
-    static readonly TItem xsix = new("six");
 
     // ----------------------------------------------------
 
@@ -20,7 +19,8 @@ public static class Test_InvariantList_KT
     [Fact]
     public static void Test_Create_Empty()
     {
-        var items = new THost(false);
+        var engine = new FakeEngine();
+        var items = new THost(engine);
         Assert.Empty(items);
     }
 
@@ -28,14 +28,15 @@ public static class Test_InvariantList_KT
     [Fact]
     public static void Test_Create_Single()
     {
-        var items = new THost(false, xone);
+        var engine = new FakeEngine();
+        var items = new THost(engine, xone);
         Assert.Single(items);
         Assert.Same(xone, items[0]);
 
-        try { _ = new THost(false, (TItem)null!); Assert.Fail(); }
+        try { _ = new THost(engine, (TItem)null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
 
-        try { _ = new THost(false, new TItem("")); Assert.Fail(); }
+        try { _ = new THost(engine, new TItem("")); Assert.Fail(); }
         catch (EmptyException) { }
     }
 
@@ -43,32 +44,41 @@ public static class Test_InvariantList_KT
     [Fact]
     public static void Test_Create_Many()
     {
-        var items = new THost(false, []);
+        var engine = new FakeEngine();
+        var items = new THost(engine, []);
         Assert.Empty(items);
 
-        items = new THost(false, [xone, xtwo, xthree]);
+        items = new THost(engine, [xone, xtwo, xthree]);
         Assert.Equal(3, items.Count);
         Assert.Same(xone, items[0]);
         Assert.Same(xtwo, items[1]);
         Assert.Same(xthree, items[2]);
 
-        try { _ = new THost(false, (IEnumerable<TItem>)null!); Assert.Fail(); }
+        try { _ = new THost(engine, (IEnumerable<TItem>)null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
 
-        try { _ = new THost(false, [xone, null!]); Assert.Fail(); }
+        try { _ = new THost(engine, [xone, null!]); Assert.Fail(); }
         catch (ArgumentNullException) { }
+    }
 
-        try { _ = new THost(false, [xone, new TItem("one")]); Assert.Fail(); }
+    //[Enforced]
+    [Fact]
+    public static void Test_Create_Many_With_Duplicates()
+    {
+        var engine = new FakeEngine();
+        var items = new THost(engine, [xone, xone]);
+        Assert.Equal(2, items.Count);
+        Assert.Same(xone, items[0]);
+        Assert.Same(xone, items[1]);
+
+        try { _ = new THost(engine, [xone, new TItem("one")]); Assert.Fail(); }
         catch (DuplicateException) { }
 
-        items = new THost(false, [xone, xtwo, xone]);
-        Assert.Equal(3, items.Count);
-        Assert.Same(xone, items[0]);
-        Assert.Same(xtwo, items[1]);
-        Assert.Same(xone, items[2]);
+        try { _ = new THost(engine, [xone, new TItem("ONE")]); Assert.Fail(); }
+        catch (DuplicateException) { }
 
-        items = new THost(true, [xone, new TItem("ONE")]);
-        Assert.Equal(2, items.Count);
+        engine = new FakeEngine() { CaseSensitiveNames = true };
+        items = new THost(engine, [xone, new TItem("ONE")]);
         Assert.Same(xone, items[0]);
         Assert.Equal("ONE", items[1].Name);
     }
@@ -77,7 +87,8 @@ public static class Test_InvariantList_KT
     [Fact]
     public static void Test_Clone()
     {
-        var source = new THost(false, [xone, xtwo, xthree]);
+        var engine = new FakeEngine();
+        var source = new THost(engine, [xone, xtwo, xthree]);
         var target = source.Clone();
 
         Assert.NotSame(source, target);
@@ -91,25 +102,32 @@ public static class Test_InvariantList_KT
     [Fact]
     public static void Test_Equality()
     {
-        var source = new THost(false, [xone, xtwo]);
+        var engine = new FakeEngine();
+        var source = new THost(engine, [xone, xtwo]);
         var target = source.Clone();
         Assert.NotSame(source, target);
-        Assert.Equal(source, target);
+        Assert.True(source.Equals(target));
 
-        target = new THost(false, [new TItem("one"), new TItem("two")]);
-        Assert.Equal(source, target);
+        target = new THost(engine, [new TItem("one"), new TItem("two")]);
+        Assert.True(source.Equals(target));
 
-        target = new THost(false, [new TItem("one"), new TItem("TWO")]);
-        Assert.NotEqual(source, target);
+        target = new THost(engine, [new TItem("one"), new TItem("TWO")]);
+        Assert.True(source.Equals(target));
+
+        engine = new FakeEngine() { CaseSensitiveNames = true };
+        source = new THost(engine, [xone, xtwo]);
+        target = new THost(engine, [new TItem("one"), new TItem("TWO")]);
+        Assert.False(source.Equals(target));
     }
 
     //[Enforced]
     [Fact]
     public static void Test_Change_Settings()
     {
-        var source = new THost(true, [xone, new TItem("ONE")]);
+        var engine = new FakeEngine() { CaseSensitiveNames = true };
+        var source = new THost(engine, [xone, new TItem("ONE")]);
 
-        try { _ = source.WithCaseSensitive(false); Assert.Fail(); }
+        try { _ = source.WithEngine(new FakeEngine()); Assert.Fail(); }
         catch (DuplicateException) { }
     }
 
@@ -117,7 +135,8 @@ public static class Test_InvariantList_KT
     [Fact]
     public static void Test_Find_Key()
     {
-        var items = new THost(false, [xone, xtwo, xthree, xone]);
+        var engine = new FakeEngine();
+        var items = new THost(engine, [xone, xtwo, xthree, xone]);
 
         Assert.Equal(-1, items.IndexOf("any"));
 
@@ -134,7 +153,8 @@ public static class Test_InvariantList_KT
     [Fact]
     public static void Test_Find_Predicate()
     {
-        var items = new THost(false, [xone, xtwo, xthree, xone]);
+        var engine = new FakeEngine();
+        var items = new THost(engine, [xone, xtwo, xthree, xone]);
 
         Assert.Equal(-1, items.IndexOf(x => x.Name.Contains('z')));
 
@@ -152,7 +172,8 @@ public static class Test_InvariantList_KT
     [Fact]
     public static void Test_GetRange()
     {
-        var source = new THost(false, [xone, xtwo, xthree, xone]);
+        var engine = new FakeEngine();
+        var source = new THost(engine, [xone, xtwo, xthree, xone]);
 
         var target = source.GetRange(0, 0);
         Assert.Empty(target);
@@ -167,8 +188,9 @@ public static class Test_InvariantList_KT
     [Fact]
     public static void Test_Replace()
     {
-        var source = new THost(false, [xone, xtwo, xthree]);
-        
+        var engine = new FakeEngine();
+        var source = new THost(engine, [xone, xtwo, xthree]);
+
         var target = source.Replace(0, xone);
         Assert.Same(source, target);
 
@@ -200,7 +222,8 @@ public static class Test_InvariantList_KT
     [Fact]
     public static void Test_Add()
     {
-        var source = new THost(false, [xone, xtwo, xthree]);
+        var engine = new FakeEngine();
+        var source = new THost(engine, [xone, xtwo, xthree]);
         var target = source.Add(xfour);
         Assert.NotSame(source, target);
         Assert.Equal(4, target.Count);
@@ -231,7 +254,8 @@ public static class Test_InvariantList_KT
     [Fact]
     public static void Test_AddRange()
     {
-        var source = new THost(false, [xone, xtwo, xthree]);
+        var engine = new FakeEngine();
+        var source = new THost(engine, [xone, xtwo, xthree]);
         var target = source.AddRange([]);
         Assert.Same(source, target);
 
@@ -249,7 +273,8 @@ public static class Test_InvariantList_KT
     [Fact]
     public static void Test_Insert()
     {
-        var source = new THost(false, [xone, xtwo, xthree]);
+        var engine = new FakeEngine();
+        var source = new THost(engine, [xone, xtwo, xthree]);
         var target = source.Insert(3, xfour);
         Assert.NotSame(source, target);
         Assert.Equal(4, target.Count);
@@ -280,7 +305,8 @@ public static class Test_InvariantList_KT
     [Fact]
     public static void Test_InsertRange()
     {
-        var source = new THost(false, [xone, xtwo, xthree]);
+        var engine = new FakeEngine();
+        var source = new THost(engine, [xone, xtwo, xthree]);
         var target = source.InsertRange(3, []);
         Assert.Same(source, target);
 
@@ -298,7 +324,8 @@ public static class Test_InvariantList_KT
     [Fact]
     public static void Test_RemoveAt()
     {
-        var source = new THost(false, [xone, xtwo, xthree]);
+        var engine = new FakeEngine();
+        var source = new THost(engine, [xone, xtwo, xthree]);
         var target = source.RemoveAt(0);
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
@@ -310,7 +337,8 @@ public static class Test_InvariantList_KT
     [Fact]
     public static void Test_RemoveRange()
     {
-        var source = new THost(false, [xone, xtwo, xthree]);
+        var engine = new FakeEngine();
+        var source = new THost(engine, [xone, xtwo, xthree]);
         var target = source.RemoveRange(0, 0);
         Assert.Same(source, target);
 
@@ -327,7 +355,8 @@ public static class Test_InvariantList_KT
     [Fact]
     public static void Test_Remove_Item()
     {
-        var source = new THost(false, [xone, xtwo, xthree, xone]);
+        var engine = new FakeEngine();
+        var source = new THost(engine, [xone, xtwo, xthree, xone]);
         var target = source.Remove("any");
         Assert.Same(source, target);
 
@@ -356,7 +385,8 @@ public static class Test_InvariantList_KT
     [Fact]
     public static void Test_Remove_Predicate()
     {
-        var source = new THost(false, [xone, xtwo, xthree, xone]);
+        var engine = new FakeEngine();
+        var source = new THost(engine, [xone, xtwo, xthree, xone]);
         var target = source.Remove(x => x.Name.Contains('z'));
         Assert.Same(source, target);
 
@@ -384,11 +414,12 @@ public static class Test_InvariantList_KT
     [Fact]
     public static void Test_Clear()
     {
-        var source = new THost(false);
+        var engine = new FakeEngine();
+        var source = new THost(engine);
         var target = source.Clear();
         Assert.Same(source, target);
 
-        source = new THost(false, [xone, xtwo, xthree, xone]);
+        source = new THost(engine, [xone, xtwo, xthree, xone]);
         target = source.Clear();
         Assert.NotSame(source, target);
         Assert.Empty(target);

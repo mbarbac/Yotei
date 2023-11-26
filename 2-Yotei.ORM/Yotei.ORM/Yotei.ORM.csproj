@@ -6,7 +6,11 @@
 	  <Nullable>enable</Nullable>
 	  <LangVersion>latest</LangVersion>
 	  <Configurations>Debug;Release;Local</Configurations>
-	  <NoWarn>CS0436</NoWarn>
+	  <NoWarn>CS0436;CS8034</NoWarn>
+	  <!--
+	  CS0436: Confliting imported types.
+	  CS8034: Unable to load analyzers.
+	  -->
    </PropertyGroup>
 
    <PropertyGroup>
@@ -62,6 +66,7 @@
 	  <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
    </ItemGroup>
    <PropertyGroup>
+	  <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 	  <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 	  <CompilerGeneratedFilesOutputPath>Generated\$(TargetFramework)</CompilerGeneratedFilesOutputPath>
    </PropertyGroup>
