@@ -29,7 +29,6 @@
 	  <ProjectReference Include="..\..\1-Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser.Tests\Yotei.Tools.LambdaParser.Tests.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.Generators.Tests\Yotei.Tools.Generators.Tests.csproj" />
 	  <ProjectReference Include="..\..\2-Yotei.ORM\Yotei.ORM.Tests\Yotei.ORM.Tests.csproj" />
-	  <ProjectReference Include="..\..\2-Yotei.ORM.Entities\Yotei.ORM.Entitites.Tests\Yotei.ORM.Entitites.Tests.csproj" />
    </ItemGroup>
 
 </Project>
