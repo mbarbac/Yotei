@@ -1,5 +1,5 @@
-using THost = Yotei.ORM.IIdentifier;
-using TItem = Yotei.ORM.IIdentifierPart;
+using THost = Yotei.ORM.IParameterList;
+using TItem = Yotei.ORM.IParameter;
 
 namespace Yotei.ORM.Code;
 
@@ -7,96 +7,40 @@ namespace Yotei.ORM.Code;
 /// <summary>
 /// <inheritdoc cref="THost"/>
 /// </summary>
+[DebuggerDisplay("{ToStringEx(7)}")]
 [Cloneable]
-public sealed partial class Identifier : THost
+public sealed partial class ParameterList : THost
 {
     readonly List<TItem> Items = [];
     TItem ValidateItem(TItem item)
     {
         item.ThrowWhenNull();
-        if (!ReferenceEquals(Engine, item.Engine)) throw new ArgumentException(
-            "Engine of the given part is not the engine of this instance.")
-            .WithData(item);
+        ValidateKey(GetKey(item));
         return item;
     }
-    static bool SameItem(TItem source, TItem target)
-        => ReferenceEquals(source.Engine, target.Engine)
-        && source.Value == target.Value;
-    static List<int> FindDuplicates(string? key) => [];
-    static bool AllowDuplicate(TItem _, TItem __) => true;
-    static string? GetKey(TItem item) => item.Value;
-    string? ValidateKey(string? key) => new IdentifierPart(Engine, key).Value;
+    static bool SameItem(TItem source, TItem target) => ReferenceEquals(source, target);
+    List<int> FindDuplicates(string key) => IndexesOf(key);
+    static bool AllowDuplicate(TItem source, TItem target) => SameItem(source, target)
+        ? true
+        : throw new DuplicateException("Duplicated element.").WithData(target);
+    static string GetKey(TItem item) => item.Name;
+    string ValidateKey(string key) => key.NotNullNotEmpty();
     bool CompareKeys(string? source, string? target)
         => (source is null && target is null)
         || string.Compare(source, target, !Engine.CaseSensitiveNames) == 0;
 
     /// <summary>
-    /// Gets a list with the parts of the given dotted value.
+    /// Returns the next available parameter name.
     /// </summary>
-    List<IdentifierPart> ToParts(string? dotted, bool reduce)
+    string NextName()
     {
-        dotted = dotted.NullWhenEmpty();
-
-        // We may need a not-empty collection...
-        if (dotted == null) return reduce ? [] : [new IdentifierPart(Engine)];
-
-        // Terminators not used...
-        if (!Engine.UseTerminators)
+        for (int i = Count; i < int.MaxValue; i++)
         {
-            var items = dotted.Split('.');
-            var parts = items.Select(x => new IdentifierPart(Engine, x)).ToList();
-            if (reduce) Reduce(parts);
-            return parts;
+            var name = $"{Engine.ParameterPrefix}{i}";
+            var index = IndexOf(name);
+            if (index < 0) return name;
         }
-
-        // Terminators used...
-        else
-        {
-            var dots = Engine.GetUnwrappedIndexes(dotted, '.');
-
-            // No unwrapped dots...
-            if (dots.Count == 0)
-            {
-                var temp = new IdentifierPart(Engine, dotted);
-                return reduce ? (temp.Value == null ? [] : [temp]) : [temp];
-            }
-
-            // With unwrapped dots...
-            else
-            {
-                string? str;
-                int len;
-                var head = 0;
-                var parts = new List<IdentifierPart>();
-
-                for (int i = 0; i < dots.Count; i++)
-                {
-                    str = dotted[head..dots[i]];
-                    parts.Add(new IdentifierPart(Engine, str));
-                    head = dots[i] + 1;
-                }
-
-                len = dotted.Length - head;
-                str = len == 0 ? string.Empty : dotted.Substring(dots[^1] + 1, len);
-                parts.Add(new IdentifierPart(Engine, str));
-
-                if (reduce) Reduce(parts);
-                return parts;
-            }
-        }
-    }
-
-    /// <summary>
-    /// Reduces the given list of parts.
-    /// </summary>
-    /// <param name="parts"></param>
-    static void Reduce(List<IdentifierPart> parts)
-    {
-        while (parts.Count > 0)
-        {
-            if (parts[0].Value == null) parts.RemoveAt(0);
-            else break;
-        }
+        throw new UnExpectedException("Range of integers exhausted.");
     }
 
     // ----------------------------------------------------
@@ -105,45 +49,29 @@ public sealed partial class Identifier : THost
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="engine"></param>
-    public Identifier(IEngine engine) => Engine = engine.ThrowWhenNull();
+    public ParameterList(IEngine engine) => Engine = engine.ThrowWhenNull();
 
     /// <summary>
     /// Initializes a new instance with the given element.
     /// </summary>
     /// <param name="engine"></param>
     /// <param name="item"></param>
-    public Identifier(IEngine engine, TItem item) : this(engine) => AddInternal(item);
-
-    /// <summary>
-    /// Initializes a new instance with the elements obtained from the given dotted value.
-    /// </summary>
-    /// <param name="engine"></param>
-    /// <param name="dotted"></param>
-    public Identifier(IEngine engine, string? dotted) : this(engine) => AddInternal(dotted);
+    public ParameterList(IEngine engine, TItem item) : this(engine) => AddInternal(item);
 
     /// <summary>
     /// Initializes a new instance with the element of the given range.
     /// </summary>
     /// <param name="engine"></param>
     /// <param name="range"></param>
-    public Identifier(
+    public ParameterList(
         IEngine engine, IEnumerable<TItem> range) : this(engine) => AddRangeInternal(range);
-
-    /// <summary>
-    /// Initializes a new instance with the elements obtained from the given range of dotted
-    /// values.
-    /// </summary>
-    /// <param name="engine"></param>
-    /// <param name="range"></param>
-    public Identifier(
-        IEngine engine, IEnumerable<string?> range) : this(engine) => AddRangeInternal(range);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    Identifier(
-        Identifier source) : this(source.Engine) => AddRangeInternal(source);
+    ParameterList(
+        ParameterList source) : this(source.Engine) => AddRangeInternal(source);
 
     /// <summary>
     /// <inheritdoc/>
@@ -156,7 +84,13 @@ public sealed partial class Identifier : THost
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => Value ?? string.Empty;
+    public override string ToString() => $"Count: {Count}";
+
+    string ToStringEx(int count) => Count <= count
+        ? $"({Count})[{string.Join(", ", Items.Select(ToStringEx))}]"
+        : $"({Count})[{string.Join(", ", Items.Take(count).Select(ToStringEx))}]...";
+
+    string ToStringEx(TItem item) => item?.ToString() ?? string.Empty;
 
     // ----------------------------------------------------
 
@@ -164,83 +98,6 @@ public sealed partial class Identifier : THost
     /// <inheritdoc/>
     /// </summary>
     public IEngine Engine { get; }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    public string? Value
-    {
-        get
-        {
-            if (!_Initialized)
-            {
-                _Initialized = true;
-                _Value = Items.Count == 0 ? null : string.Join('.', Items.Select(x => x.Value));
-            }
-            return _Value;
-        }
-        init
-        {
-            var parts = ToParts(value, reduce: true);
-
-            Items.Clear();
-            Items.AddRange(parts);
-            ResetValue();
-        }
-    }
-    string? _Value;
-    bool _Initialized;
-
-    // Resets the cached value so it must be computed again...
-    void ResetValue()
-    {
-        _Initialized = false;
-        _Value = null;
-
-        while (Items.Count > 0)
-        {
-            if (Items[0].Value == null) Items.RemoveAt(0);
-            else break;
-        }
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    public string?[] UnwrappedValues => Items.Select(x => x.UnwrappedValue).ToArray();
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="specifications"></param>
-    /// <returns></returns>
-    public bool Match(THost specifications)
-    {
-        var target = specifications.ThrowWhenNull();
-        var source = this;
-
-        for (int i = 0; ; i++)
-        {
-            if (i >= target.Count) break;
-            if (i >= source.Count)
-            {
-                while (i < target.Count)
-                {
-                    var value = target[^(i + 1)].UnwrappedValue;
-                    if (value != null) return false;
-                    i++;
-                }
-            }
-
-            var tvalue = target[^(i + 1)].UnwrappedValue; if (tvalue == null) continue;
-            var svalue = source[^(i + 1)].UnwrappedValue;
-            if (!CompareKeys(svalue, tvalue)) return false;
-        }
-
-        return true;
-    }
-
-    // ----------------------------------------------------
 
     /// <summary>
     /// Minimizes memory consumption.
@@ -262,41 +119,41 @@ public sealed partial class Identifier : THost
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="name"></param>
     /// <returns></returns>
-    public bool Contains(string? value) => IndexOf(value) >= 0;
+    public bool Contains(string name) => IndexOf(name) >= 0;
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="name"></param>
     /// <returns></returns>
-    public int IndexOf(string? value)
+    public int IndexOf(string name)
     {
-        value = ValidateKey(value);
-        return IndexOf(x => CompareKeys(GetKey(x), value));
+        name = ValidateKey(name);
+        return IndexOf(x => CompareKeys(GetKey(x), name));
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="name"></param>
     /// <returns></returns>
-    public int LastIndexOf(string? value)
+    public int LastIndexOf(string name)
     {
-        value = ValidateKey(value);
-        return LastIndexOf(x => CompareKeys(GetKey(x), value));
+        name = ValidateKey(name);
+        return LastIndexOf(x => CompareKeys(GetKey(x), name));
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="name"></param>
     /// <returns></returns>
-    public List<int> IndexesOf(string? value)
+    public List<int> IndexesOf(string name)
     {
-        value = ValidateKey(value);
-        return IndexesOf(x => CompareKeys(GetKey(x), value));
+        name = ValidateKey(name);
+        return IndexesOf(x => CompareKeys(GetKey(x), name));
     }
 
     /// <summary>
@@ -403,45 +260,7 @@ public sealed partial class Identifier : THost
         if (SameItem(source, item)) return 0;
 
         RemoveAtInternal(index);
-
-        return index == 0 && item.Value == null // Special replace case...
-            ? 1
-            : InsertInternal(index, item);
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="dotted"></param>
-    /// <returns></returns>
-    public THost Replace(int index, string? dotted)
-    {
-        var clone = Clone();
-        var done = clone.ReplaceInternal(index, dotted);
-        return done > 0 ? clone : this;
-    }
-    int ReplaceInternal(int index, string? dotted)
-    {
-        var parts = ToParts(dotted, reduce: false);
-
-        if (parts.Count == 0) return 0;
-        if (parts.Count == 1 && SameItem(Items[index], parts[0])) return 0;
-
-        RemoveAtInternal(index);
-        var num = 0;
-        foreach (var part in parts)
-        {
-            var r = index == 0 && part.Value == null // Special replace case...
-                ? 1
-                : InsertInternal(index, part);
-
-            num += r;
-            index += r;
-        }
-
-        ResetValue();
-        return num;
+        return InsertInternal(index, item);
     }
 
     /// <summary>
@@ -463,35 +282,20 @@ public sealed partial class Identifier : THost
         var nums = FindDuplicates(key);
         foreach (var num in nums) if (!AllowDuplicate(Items[num], item)) return 0;
 
-        if (item.Value == null && Count == 0) return 0;
-
         Items.Add(item);
-        ResetValue();
         return 1;
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="dotted"></param>
+    /// <param name="value"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    public THost Add(string? dotted)
+    public THost AddNew(object? value, out TItem item)
     {
-        var clone = Clone();
-        var done = clone.AddInternal(dotted);
-        return done > 0 ? clone : this;
-    }
-    int AddInternal(string? dotted)
-    {
-        var parts = ToParts(dotted, reduce: false);
-
-        var num = 0; foreach (var part in parts)
-        {
-            var r = AddInternal(part);
-            num += r;
-        }
-        ResetValue();
-        return num;
+        item = new Parameter(NextName(), value);
+        return Add(item);
     }
 
     /// <summary>
@@ -514,35 +318,6 @@ public sealed partial class Identifier : THost
             var r = AddInternal(item);
             num += r;
         }
-        ResetValue();
-        return num;
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="range"></param>
-    /// <returns></returns>
-    public THost AddRange(IEnumerable<string?> range)
-    {
-        var clone = Clone();
-        var done = clone.AddRangeInternal(range);
-        return done > 0 ? clone : this;
-    }
-    int AddRangeInternal(IEnumerable<string?> range)
-    {
-        range.ThrowWhenNull();
-
-        var num = 0; foreach (var item in range)
-        {
-            var parts = ToParts(item, reduce: false);
-            foreach (var part in parts)
-            {
-                var r = AddInternal(part);
-                num += r;
-            }
-        }
-        ResetValue();
         return num;
     }
 
@@ -566,10 +341,7 @@ public sealed partial class Identifier : THost
         var nums = FindDuplicates(key);
         foreach (var num in nums) if (!AllowDuplicate(Items[num], item)) return 0;
 
-        if (item.Value == null && index == 0) return 0;
-
         Items.Insert(index, item);
-        ResetValue();
         return 1;
     }
 
@@ -577,26 +349,13 @@ public sealed partial class Identifier : THost
     /// <inheritdoc/>
     /// </summary>
     /// <param name="index"></param>
-    /// <param name="dotted"></param>
+    /// <param name="value"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    public THost Insert(int index, string? dotted)
+    public THost InsertNew(int index, object? value, out TItem item)
     {
-        var clone = Clone();
-        var done = clone.InsertInternal(index, dotted);
-        return done > 0 ? clone : this;
-    }
-    int InsertInternal(int index, string? dotted)
-    {
-        var parts = ToParts(dotted, reduce: false);
-
-        var num = 0; foreach (var part in parts)
-        {
-            var r = InsertInternal(index, part);
-            num += r;
-            index += r;
-        }
-        ResetValue();
-        return num;
+        item = new Parameter(NextName(), value);
+        return Insert(index, item);
     }
 
     /// <summary>
@@ -621,37 +380,6 @@ public sealed partial class Identifier : THost
             num += r;
             index += r;
         }
-        ResetValue();
-        return num;
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="range"></param>
-    /// <returns></returns>
-    public THost InsertRange(int index, IEnumerable<string?> range)
-    {
-        var clone = Clone();
-        var done = clone.InsertRangeInternal(index, range);
-        return done > 0 ? clone : this;
-    }
-    int InsertRangeInternal(int index, IEnumerable<string?> range)
-    {
-        range.ThrowWhenNull();
-
-        var num = 0; foreach (var item in range)
-        {
-            var parts = ToParts(item, reduce: false);
-            foreach (var part in parts)
-            {
-                var r = InsertInternal(index, part);
-                num += r;
-                index += r;
-            }
-        }
-        ResetValue();
         return num;
     }
 
@@ -669,7 +397,6 @@ public sealed partial class Identifier : THost
     int RemoveAtInternal(int index)
     {
         Items.RemoveAt(index);
-        ResetValue();
         return 1;
     }
 
@@ -687,64 +414,60 @@ public sealed partial class Identifier : THost
     }
     int RemoveRangeInternal(int index, int count)
     {
-        if (count > 0)
-        {
-            Items.RemoveRange(index, count);
-            ResetValue();
-        }
+        if (count > 0) Items.RemoveRange(index, count);
         return count;
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="name"></param>
     /// <returns></returns>
-    public THost Remove(string? value)
+    public THost Remove(string name)
     {
         var clone = Clone();
-        var done = clone.RemoveInternal(value);
+        var done = clone.RemoveInternal(name);
         return done > 0 ? clone : this;
     }
-    int RemoveInternal(string? value)
+    int RemoveInternal(string name)
     {
-        var index = IndexOf(value);
+        var index = IndexOf(name);
         return index >= 0 ? RemoveAtInternal(index) : 0;
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="name"></param>
     /// <returns></returns>
-    public THost RemoveLast(string? value)
+    public THost RemoveLast(string name)
     {
         var clone = Clone();
-        var done = clone.RemoveLastInternal(value);
+        var done = clone.RemoveLastInternal(name);
         return done > 0 ? clone : this;
     }
-    int RemoveLastInternal(string? value)
+    int RemoveLastInternal(string name)
     {
-        var index = LastIndexOf(value);
+        var index = LastIndexOf(name);
         return index >= 0 ? RemoveAtInternal(index) : 0;
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="name"></param>
     /// <returns></returns>
-    public THost RemoveAll(string? value)
+    public THost RemoveAll(string name)
     {
         var clone = Clone();
-        var done = clone.RemoveAllInternal(value);
+        var done = clone.RemoveAllInternal(name);
         return done > 0 ? clone : this;
     }
-    int RemoveAllInternal(string? value)
+    int RemoveAllInternal(string name)
     {
         var num = 0; while (true)
         {
-            var index = IndexOf(value);
+            var index = IndexOf(name);
 
             if (index >= 0) num += RemoveAtInternal(index);
             else break;
@@ -821,11 +544,7 @@ public sealed partial class Identifier : THost
     }
     int ClearInternal()
     {
-        var num = Items.Count; if (num > 0)
-        {
-            Items.Clear();
-            ResetValue();
-        }
+        var num = Items.Count; if (num > 0) Items.Clear();
         return num;
     }
 }
