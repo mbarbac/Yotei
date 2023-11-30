@@ -1,42 +1,19 @@
-using THost = Yotei.ORM.IIdentifier;
-using TItem = Yotei.ORM.IIdentifierPart;
+﻿using THost = Experimental.Templates.IInvariantListT;
+using TItem = Experimental.Templates.IInvariantElement;
 
-namespace Yotei.ORM;
+namespace Experimental.Templates;
 
 // ========================================================
 /// <summary>
-/// An immutable object that represents a database identifier.
-/// <br/> Duplicate values are allowed.
+/// An immutable list-alike collection of elements, identified by their keys, that provides custom
+/// validation and duplicates detection capabilities.
 /// </summary>
-public interface IIdentifier : IEnumerable<TItem>
+public partial interface IInvariantListT : IEnumerable<TItem>, IEquatable<THost>
 {
     /// <summary>
-    /// The engine this instance is associated with.
+    /// Determines if the keys of the elements in this collection are case sensitive.
     /// </summary>
-    IEngine Engine { get; }
-
-    /// <summary>
-    /// The value carried by this instance, or null if it represents an empty or missed one. If
-    /// not, that value of each part is wrapped with the engine terminators, if they are used.
-    /// </summary>
-    string? Value { get; }
-
-    /// <summary>
-    /// The unwrapped values carried by this instance, or an empty array if it represents an
-    /// empty or missed one. Each part can also be null if it represents an empty or missed one.
-    /// </summary>
-    string?[] UnwrappedValues { get; }
-
-    /// <summary>
-    /// Determines if the value of this instance matches the given specifications, or not.
-    /// <br/> Matching is determined by comparing the unwrapped values of the parts in this
-    /// instance with the target ones, from right to left. Any null or empty target part is
-    /// excluded from the comparison and considered and implicit match.
-    /// <br/> Matching is not commutative.
-    /// </summary>
-    /// <param name="specifications"></param>
-    /// <returns></returns>
-    bool Match(THost specifications);
+    [WithGenerator] bool CaseSensitive { get; }
 
     // ----------------------------------------------------
 
@@ -53,34 +30,34 @@ public interface IIdentifier : IEnumerable<TItem>
     TItem this[int index] { get; }
 
     /// <summary>
-    /// Determines if this collection contains an element with the given value.
+    /// Determines if this collection contains the given element.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    bool Contains(string? value);
+    bool Contains(TItem item);
 
     /// <summary>
-    /// Returns the index of the first element in this collection with the given value, or -1
-    /// if no one can be found.
+    /// Returns the index of the first ocurrence of the given element in this collection, or -1
+    /// if it cannot be found.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    int IndexOf(string? value);
+    int IndexOf(TItem item);
 
     /// <summary>
-    /// Returns the index of the last element in this collection with the given value, or -1
-    /// if no one can be found.
+    /// Returns the index of the last ocurrence of the given element in this collection, or -1
+    /// if it cannot be found.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    int LastIndexOf(string? value);
+    int LastIndexOf(TItem item);
 
     /// <summary>
-    /// Returns the indexes of the elements in this collection with the given value.
+    /// Returns the indexes of all the ocurrences of the given element in this collection.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    List<int> IndexesOf(string? value);
+    List<int> IndexesOf(TItem item);
 
     /// <summary>
     /// Determines if this collection contains an element that matches the given predicate.
@@ -145,16 +122,6 @@ public interface IIdentifier : IEnumerable<TItem>
     THost Replace(int index, TItem item);
 
     /// <summary>
-    /// Returns a new instance where the original element at the given index has been replaced by 
-    /// the new ones obtained from the given dotted value. If no changes were detected, returns
-    /// the original instance.
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="dotted"></param>
-    /// <returns></returns>
-    THost Replace(int index, string? dotted);
-
-    /// <summary>
     /// Returns a new instance where the given element has been added to the original one. If no
     /// changes were detected, returns the original instance.
     /// </summary>
@@ -163,29 +130,12 @@ public interface IIdentifier : IEnumerable<TItem>
     THost Add(TItem item);
 
     /// <summary>
-    /// Returns a new instance where the elements obtained from the given dotted value have been
-    /// added to the original one. If no changes were detected, returns the original instance.
-    /// </summary>
-    /// <param name="dotted"></param>
-    /// <returns></returns>
-    THost Add(string? dotted);
-
-    /// <summary>
     /// Returns a new instance where the given range of elements have been added to the original
     /// one. If no changes were detected, returns the original instance.
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
     THost AddRange(IEnumerable<TItem> range);
-
-    /// <summary>
-    /// Returns a new instance where the elements obtained from the given range of dotted values
-    /// have been added to the original one. If no changes were detected, returns the original
-    /// instance.
-    /// </summary>
-    /// <param name="range"></param>
-    /// <returns></returns>
-    THost AddRange(IEnumerable<string?> range);
 
     /// <summary>
     /// Returns a new instance where the given element has been inserted, at the given index, into
@@ -197,16 +147,6 @@ public interface IIdentifier : IEnumerable<TItem>
     THost Insert(int index, TItem item);
 
     /// <summary>
-    /// Returns a new instance where the elements obtained from the given dotted value have been
-    /// inserted into the original one, starting at the given index. If no changes were detected,
-    /// returns the original instance.
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="dotted"></param>
-    /// <returns></returns>
-    THost Insert(int index, string? dotted);
-
-    /// <summary>
     /// Returns a new instance where the given range of elements have been inserted, starting at
     /// the given index, into the original one. If no changes were detected, returns the original
     /// instance.
@@ -215,16 +155,6 @@ public interface IIdentifier : IEnumerable<TItem>
     /// <param name="range"></param>
     /// <returns></returns>
     THost InsertRange(int index, IEnumerable<TItem> range);
-
-    /// <summary>
-    /// Returns a new instance where the elements obtained from the given range of dotted values
-    /// have been inserted into the original one, starting at the given index. If no changes were
-    /// detected, returns the original instance.
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="range"></param>
-    /// <returns></returns>
-    THost InsertRange(int index, IEnumerable<string?> range);
 
     /// <summary>
     /// Returns a new instance where the original element at the given index has been removed from
@@ -245,28 +175,28 @@ public interface IIdentifier : IEnumerable<TItem>
     THost RemoveRange(int index, int count);
 
     /// <summary>
-    /// Returns a new instance where the first element with the given value has been removed from
-    /// the original one. If no changes were detected, returns the original instance.
+    /// Returns a new instance where the first ocurrence of the given element has been removed
+    /// from the original one. If no changes were detected, returns the original instance.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    THost Remove(string? value);
+    THost Remove(TItem item);
 
     /// <summary>
-    /// Returns a new instance where the last element with the given value has been removed from
-    /// the original one. If no changes were detected, returns the original instance.
+    /// Returns a new instance where the last ocurrence of the given element has been removed
+    /// from the original one. If no changes were detected, returns the original instance.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    THost RemoveLast(string? value);
+    THost RemoveLast(TItem item);
 
     /// <summary>
-    /// Returns a new instance where all the elements with the given value have been removed from
-    /// the original one. If no changes were detected, returns the original instance.
+    /// Returns a new instance where all first ocurrences of the given element have been removed
+    /// from the original one. If no changes were detected, returns the original instance.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    THost RemoveAll(string? value);
+    THost RemoveAll(TItem item);
 
     /// <summary>
     /// Returns a new instance where the first element that matches the given predicate has been

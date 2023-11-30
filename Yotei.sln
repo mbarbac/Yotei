@@ -53,6 +53,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yotei.Tools.Generators.Test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yotei.Tools.CloneGenerator", "1-Yotei.Tools.Generators\Yotei.Tools.CloneGenerator\Yotei.Tools.CloneGenerator.csproj", "{D832B05D-F418-43E4-968F-928C7F38807E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3-Yotei.ORM.Relational", "3-Yotei.ORM.Relational", "{85668A97-AEFE-418C-9468-AD9E83B7309E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yotei.ORM.Relational", "3-Yotei.ORM.Relational\Yotei.ORM.Relational\Yotei.ORM.Relational.csproj", "{F016C1DF-A9FF-4233-94F5-82AB87ACE8E2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yotei.ORM.Relational.Tests", "3-Yotei.ORM.Relational\Yotei.ORM.Relational.Tests\Yotei.ORM.Relational.Tests.csproj", "{2323F850-922E-4646-9AA4-69436CBC4914}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -132,6 +138,18 @@ Global
 		{D832B05D-F418-43E4-968F-928C7F38807E}.Local|Any CPU.Build.0 = Local|Any CPU
 		{D832B05D-F418-43E4-968F-928C7F38807E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D832B05D-F418-43E4-968F-928C7F38807E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F016C1DF-A9FF-4233-94F5-82AB87ACE8E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F016C1DF-A9FF-4233-94F5-82AB87ACE8E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F016C1DF-A9FF-4233-94F5-82AB87ACE8E2}.Local|Any CPU.ActiveCfg = Debug|Any CPU
+		{F016C1DF-A9FF-4233-94F5-82AB87ACE8E2}.Local|Any CPU.Build.0 = Debug|Any CPU
+		{F016C1DF-A9FF-4233-94F5-82AB87ACE8E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F016C1DF-A9FF-4233-94F5-82AB87ACE8E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2323F850-922E-4646-9AA4-69436CBC4914}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2323F850-922E-4646-9AA4-69436CBC4914}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2323F850-922E-4646-9AA4-69436CBC4914}.Local|Any CPU.ActiveCfg = Debug|Any CPU
+		{2323F850-922E-4646-9AA4-69436CBC4914}.Local|Any CPU.Build.0 = Debug|Any CPU
+		{2323F850-922E-4646-9AA4-69436CBC4914}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2323F850-922E-4646-9AA4-69436CBC4914}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -152,6 +170,8 @@ Global
 		{57AC326E-BE72-4233-B638-57410D0668BF} = {57C4D261-733B-47F2-AA8C-F84E1758AF85}
 		{D17F0F28-46F7-4B33-ADDA-3E9ACD12D367} = {9D6637D0-D35D-4069-BE21-AF194DD22BBD}
 		{D832B05D-F418-43E4-968F-928C7F38807E} = {57C4D261-733B-47F2-AA8C-F84E1758AF85}
+		{F016C1DF-A9FF-4233-94F5-82AB87ACE8E2} = {85668A97-AEFE-418C-9468-AD9E83B7309E}
+		{2323F850-922E-4646-9AA4-69436CBC4914} = {85668A97-AEFE-418C-9468-AD9E83B7309E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0821CEE0-4168-45F2-B34E-41BD1B7B942E}

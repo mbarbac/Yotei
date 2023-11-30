@@ -1,10 +1,10 @@
-﻿namespace Yotei.ORM;
+namespace Yotei.ORM;
 
 // ========================================================
 /// <summary>
 /// An immutable object that represents a single-part database identifier.
 /// </summary>
-public interface IIdentifierPart : IEquatable<IIdentifierPart>
+public interface IIdentifierPart
 {
     /// <summary>
     /// The engine this instance is associated with.

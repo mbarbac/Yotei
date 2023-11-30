@@ -1,6 +1,3 @@
-﻿namespace Yotei.ORM.Records;
+﻿namespace Experimental.Templates.Code;
 
 // ========================================================
-public interface IRecord
-{
-}
