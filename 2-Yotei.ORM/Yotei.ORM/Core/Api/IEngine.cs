@@ -51,6 +51,12 @@ public partial interface IEngine
     [WithGenerator] char RightTerminator { get; }
 
     /// <summary>
+    /// The collection of metadata tags that are well-known to this engine, for the purposes
+    /// of the framework.
+    /// </summary>
+    [WithGenerator] IKnownTags KnownTags { get; }
+
+    /// <summary>
     /// Returns a list with the indexes of the unwrapped ocurrences of the given character in
     /// the given source value. Unwrapped ocurrences are those not protected by the terminators
     /// in this engine, if any.

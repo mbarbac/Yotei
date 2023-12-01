@@ -1,7 +1,7 @@
-using THost = Yotei.ORM.IParameterList;
-using TItem = Yotei.ORM.IParameter;
+using THost = Yotei.ORM.Records.IParameterList;
+using TItem = Yotei.ORM.Records.IParameter;
 
-namespace Yotei.ORM;
+namespace Yotei.ORM.Records;
 
 // ========================================================
 /// <summary>

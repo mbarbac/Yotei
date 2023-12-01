@@ -1,3 +1,3 @@
-namespace Yotei.ORM.Code;
+namespace Yotei.ORM.Records.Code;
 
 // ========================================================

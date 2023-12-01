@@ -1,11 +1,10 @@
-namespace Yotei.ORM.Code;
+namespace Yotei.ORM.Records.Code;
 
 // ========================================================
 /// <summary>
 /// <inheritdoc cref="ICommand"/>
 /// </summary>
-[Cloneable]
-public abstract partial class Command : ICommand
+public abstract class Command
 {
     /// <summary>
     /// Initializes a new instance.
@@ -23,8 +22,6 @@ public abstract partial class Command : ICommand
         if (pars != null && pars.Count > 0) str += $"; [{string.Join(", ", pars)}]";
         return str;
     }
-
-    // ----------------------------------------------------
 
     /// <summary>
     /// <inheritdoc/>

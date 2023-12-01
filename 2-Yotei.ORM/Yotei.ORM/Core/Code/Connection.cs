@@ -258,4 +258,9 @@ public abstract partial class Connection : DisposableClass, IConnection
     /// </summary>
     /// <returns></returns>
     protected abstract ITransaction CreateTransaction();
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public abstract IRecordOperations Records { get; }
 }

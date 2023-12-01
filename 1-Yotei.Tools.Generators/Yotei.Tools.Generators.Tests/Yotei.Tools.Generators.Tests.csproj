@@ -8,9 +8,11 @@
 	  <IsPackable>false</IsPackable>
 	  <IsTestProject>true</IsTestProject>
 	  <Configurations>Debug;Release;Local</Configurations>
-
-	  <!-- Testing an arbitrary pragma -->
-	  <NoWarn>CS1633</NoWarn>
+	  <NoWarn>CS1633;IDE0065</NoWarn>
+	  <!--
+	  CS1633: testing arbitrary pragma
+	  IDE0065: directives placed outside namespace
+	  -->
    </PropertyGroup>
 
    <ItemGroup>

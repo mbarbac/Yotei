@@ -15,6 +15,7 @@ public partial class Engine : IEngine
     public const bool USETERMINATORS = true;
     public const char LEFTERMINATOR = '[';
     public const char RIGHTTERMINATOR = ']';
+    public const bool CASESENSITIVETAGS = false;
 
     // ----------------------------------------------------
 
@@ -37,6 +38,7 @@ public partial class Engine : IEngine
         UseTerminators = source.UseTerminators;
         LeftTerminator = source.LeftTerminator;
         RightTerminator = source.RightTerminator;
+        KnownTags = source.KnownTags;
     }
 
     /// <summary>
@@ -114,6 +116,19 @@ public partial class Engine : IEngine
         init => _RightTerminator = ValidateTerminator(value);
     }
     char _RightTerminator = RIGHTTERMINATOR;
+
+
+
+    /// <summary>
+    /// The collection of metadata tags that are well-known to this engine, for the purposes
+    /// of the framework.
+    /// </summary>
+    public IKnownTags KnownTags
+    {
+        get => _KnownTags;
+        set => _KnownTags = value.ThrowWhenNull();
+    }
+    IKnownTags _KnownTags = new KnownTags(CASESENSITIVETAGS);
 
     // ----------------------------------------------------
 

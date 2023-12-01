@@ -57,4 +57,9 @@ public partial interface IConnection : IBaseDisposable
     /// The default transaction used by this instance.
     /// </summary>
     ITransaction Transaction { get; }
+
+    /// <summary>
+    /// Provides access to the record-oriented capabilities of this connection.
+    /// </summary>
+    IRecordOperations Records { get; }
 }

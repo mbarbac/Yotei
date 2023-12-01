@@ -1,11 +1,10 @@
-namespace Yotei.ORM;
+namespace Yotei.ORM.Records;
 
 // ========================================================
 /// <summary>
-/// Represents a command that can be executed against an underlying database.
+/// A record-oriented command that can be executed against an underlying database.
 /// </summary>
-[Cloneable]
-public partial interface ICommand
+public interface ICommand
 {
     /// <summary>
     /// The connection this instance is associated with.

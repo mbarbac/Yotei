@@ -1,8 +1,9 @@
-namespace Yotei.ORM;
+namespace Yotei.ORM.Records;
 
 // ========================================================
 /// <summary>
-/// Represents a command that when executed returns an integer as the result of that execution.
+/// Represents a record-oriented command that, when executed against an underlying database,
+/// produces an integer as the result of that execution.
 /// </summary>
 public interface IExecutableCommand : ICommand
 {
@@ -12,16 +13,23 @@ public interface IExecutableCommand : ICommand
     /// <returns></returns>
     ICommandExecutor GetExecutor();
 
+    /// <summary>
+    /// Returns an object that can execute this command.
+    /// </summary>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    ICommandExecutor GetAsyncExecutor(CancellationToken token = default);
+
     // ----------------------------------------------------
 
     /// <summary>
-    /// Executes this command and returns the integer produced as the result of that execution.
+    /// Executes this command and returns the integer produced by that execution.
     /// </summary>
     /// <returns></returns>
     int Execute();
 
     /// <summary>
-    /// Executes this command and returns the integer produced as the result of that execution.
+    /// Executes this command and returns the integer produced by that execution.
     /// </summary>
     /// <param name="token"></param>
     /// <returns></returns>

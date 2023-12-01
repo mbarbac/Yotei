@@ -6,7 +6,11 @@
 	  <Nullable>enable</Nullable>
 	  <LangVersion>latest</LangVersion>
 	  <Configurations>Debug;Release;Local</Configurations>
-	  <NoWarn>CS0436</NoWarn>
+	  <NoWarn>CS0436;IDE0290</NoWarn>
+	  <!--
+	  CS0436: Conflicting imported types.
+	  CS0290: Use primary constructor.
+	  -->
    </PropertyGroup>
 
    <!-- DEBUG configuration -->

@@ -17,4 +17,5 @@ public partial class FakeConnection : Connection
     protected override ValueTask OnCloseAsync() { OnClose(); return ValueTask.CompletedTask; }
 
     protected override ITransaction CreateTransaction() => new FakeTransaction(this);
+    public override IRecordOperations Records => throw new NotImplementedException();
 }
