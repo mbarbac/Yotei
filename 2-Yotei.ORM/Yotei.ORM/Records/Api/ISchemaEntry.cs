@@ -1,3 +1,6 @@
+using THost = Yotei.ORM.Records.ISchemaEntry;
+using TItem = Yotei.ORM.Records.IMetadataPair;
+
 namespace Yotei.ORM.Records;
 
 // ========================================================
@@ -6,7 +9,7 @@ namespace Yotei.ORM.Records;
 /// given entry in an associated record.
 /// <br/> Elements with duplicated tag names are not allowed.
 /// </summary>
-public partial interface ISchemaEntry : IEnumerable<IMetadataPair>
+public partial interface ISchemaEntry : IEnumerable<TItem>
 {
     /// <summary>
     /// The engine this instance is associated with.
@@ -88,13 +91,13 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataPair>
     /// Returns an array with the elements in this instance.
     /// </summary>
     /// <returns></returns>
-    IMetadataPair[] ToArray();
+    TItem[] ToArray();
 
     /// <summary>
     /// Returns a list with the elements in this instance.
     /// </summary>
     /// <returns></returns>
-    List<IMetadataPair> ToList();
+    List<TItem> ToList();
 
     // ----------------------------------------------------
 
@@ -108,7 +111,7 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataPair>
     /// <param name="value"></param>
     /// <param name="add"></param>
     /// <returns></returns>
-    ISchemaEntry Replace(string tag, object? value, bool add = true);
+    THost Replace(string tag, object? value, bool add = true);
 
     /// <summary>
     /// Returns a new instance where the given element has been added to the original one. If a
@@ -117,7 +120,7 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataPair>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    ISchemaEntry Add(IMetadataPair item);
+    THost Add(TItem item);
 
     /// <summary>
     /// Returns a new instance where the elements from the given range have been added to the
@@ -126,15 +129,15 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataPair>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    ISchemaEntry AddRange(IEnumerable<IMetadataPair> range);
+    THost AddRange(IEnumerable<TItem> range);
 
     /// <summary>
     /// Returns a new instance where the element with the given tag has been removed from the
     /// original one. If no changes were needed, returns the original instance instead.
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="tag"></param>
     /// <returns></returns>
-    ISchemaEntry Remove(string name);
+    THost Remove(string tag);
 
     /// <summary>
     /// Returns a new instance where the first element that matches the given predicate has been
@@ -143,7 +146,7 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataPair>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    ISchemaEntry Remove(Predicate<IMetadataPair> predicate);
+    THost Remove(Predicate<TItem> predicate);
 
     /// <summary>
     /// Returns a new instance where the last element that matches the given predicate has been
@@ -152,7 +155,7 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataPair>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    ISchemaEntry RemoveLast(Predicate<IMetadataPair> predicate);
+    THost RemoveLast(Predicate<TItem> predicate);
 
     /// <summary>
     /// Returns a new instance where all last elements that match the given predicate have been
@@ -161,12 +164,12 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataPair>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    ISchemaEntry RemoveAll(Predicate<IMetadataPair> predicate);
+    THost RemoveAll(Predicate<TItem> predicate);
 
     /// <summary>
     /// Returns a new instance where all the original elements have been removed. If no changes
     /// were needed, returns the original instance instead.
     /// </summary>
     /// <returns></returns>
-    ISchemaEntry Clear();
+    THost Clear();
 }
