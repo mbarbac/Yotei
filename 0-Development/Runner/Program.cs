@@ -1,8 +1,15 @@
 ﻿namespace Runner;
 
+// ========================================================
+/// <summary>
+/// Represents this program.
+/// </summary>
 internal class Program
 {
-    static void Main(string[] args)
+    /// <summary>
+    /// The entry point of this program.
+    /// </summary>
+    static void Main()
     {
         Console.WriteLine("Hello, World!");
         Console.ReadLine();
