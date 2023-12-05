@@ -1,0 +1,217 @@
+﻿========================================
+Schema:
+
+Row: 0
+- ColumnName: Id
+- ColumnOrdinal: 0                                  -- ColumnOrdinal
+- ColumnSize: 8
+- NumericPrecision: 255
+- NumericScale: 255
+- IsUnique: False                                   -- IsUnique
+- IsKey: True                                       -- IsKey
+- BaseServerName: NULL
+- BaseCatalogName: NULL
+- BaseColumnName: Id                                -- BaseColumnName
+- BaseSchemaName: dbo                               -- BaseSchemaName
+- BaseTableName: Regions                            -- BaseTableName
+- DataType: String
+- AllowDBNull: False
+- ProviderType: 12
+- IsAliased: False                                  -- ??
+- IsExpression: False
+- IsIdentity: False                                 -- ??
+- IsAutoIncrement: False
+- IsRowVersion: False                               -- IsRowVersion
+- IsHidden: False                                   -- IsHidden
+- IsLong: False
+- IsReadOnly: False                                 -- IsReadOnly
+- ProviderSpecificDataType: SqlString
+- DataTypeName: nvarchar
+- XmlSchemaCollectionDatabase: NULL
+- XmlSchemaCollectionOwningSchema: NULL
+- XmlSchemaCollectionName: NULL
+- UdtAssemblyQualifiedName: NULL
+- NonVersionedProviderType: 12
+- IsColumnSet: False
+
+Row: 1
+- ColumnName: Name
+- ColumnOrdinal: 1
+- ColumnSize: 50
+- NumericPrecision: 255
+- NumericScale: 255
+- IsUnique: False
+- IsKey: False
+- BaseServerName: NULL
+- BaseCatalogName: NULL
+- BaseColumnName: Name
+- BaseSchemaName: dbo
+- BaseTableName: Regions
+- DataType: String
+- AllowDBNull: True
+- ProviderType: 12
+- IsAliased: False
+- IsExpression: False
+- IsIdentity: False
+- IsAutoIncrement: False
+- IsRowVersion: False
+- IsHidden: False
+- IsLong: False
+- IsReadOnly: False
+- ProviderSpecificDataType: SqlString
+- DataTypeName: nvarchar
+- XmlSchemaCollectionDatabase: NULL
+- XmlSchemaCollectionOwningSchema: NULL
+- XmlSchemaCollectionName: NULL
+- UdtAssemblyQualifiedName: NULL
+- NonVersionedProviderType: 12
+- IsColumnSet: False
+
+Row: 2
+- ColumnName: Id
+- ColumnOrdinal: 2
+- ColumnSize: 8
+- NumericPrecision: 255
+- NumericScale: 255
+- IsUnique: False
+- IsKey: True
+- BaseServerName: NULL
+- BaseCatalogName: NULL
+- BaseColumnName: Id
+- BaseSchemaName: dbo
+- BaseTableName: Countries
+- DataType: String
+- AllowDBNull: False
+- ProviderType: 12
+- IsAliased: False
+- IsExpression: False
+- IsIdentity: False
+- IsAutoIncrement: False
+- IsRowVersion: False
+- IsHidden: False
+- IsLong: False
+- IsReadOnly: False
+- ProviderSpecificDataType: SqlString
+- DataTypeName: nvarchar
+- XmlSchemaCollectionDatabase: NULL
+- XmlSchemaCollectionOwningSchema: NULL
+- XmlSchemaCollectionName: NULL
+- UdtAssemblyQualifiedName: NULL
+- NonVersionedProviderType: 12
+- IsColumnSet: False
+
+Row: 3
+- ColumnName: Name
+- ColumnOrdinal: 3
+- ColumnSize: 50
+- NumericPrecision: 255
+- NumericScale: 255
+- IsUnique: False
+- IsKey: False
+- BaseServerName: NULL
+- BaseCatalogName: NULL
+- BaseColumnName: Name
+- BaseSchemaName: dbo
+- BaseTableName: Countries
+- DataType: String
+- AllowDBNull: True
+- ProviderType: 12
+- IsAliased: False
+- IsExpression: False
+- IsIdentity: False
+- IsAutoIncrement: False
+- IsRowVersion: False
+- IsHidden: False
+- IsLong: False
+- IsReadOnly: False
+- ProviderSpecificDataType: SqlString
+- DataTypeName: nvarchar
+- XmlSchemaCollectionDatabase: NULL
+- XmlSchemaCollectionOwningSchema: NULL
+- XmlSchemaCollectionName: NULL
+- UdtAssemblyQualifiedName: NULL
+- NonVersionedProviderType: 12
+- IsColumnSet: False
+
+Row: 4
+- ColumnName: RowVersion
+- ColumnOrdinal: 4
+- ColumnSize: 8
+- NumericPrecision: 255
+- NumericScale: 255
+- IsUnique: True
+- IsKey: False
+- BaseServerName: NULL
+- BaseCatalogName: NULL
+- BaseColumnName: RowVersion
+- BaseSchemaName: dbo
+- BaseTableName: Regions
+- DataType: Byte[]
+- AllowDBNull: False
+- ProviderType: 19
+- IsAliased: False
+- IsExpression: False
+- IsIdentity: False
+- IsAutoIncrement: False
+- IsRowVersion: True
+- IsHidden: True
+- IsLong: False
+- IsReadOnly: True
+- ProviderSpecificDataType: SqlBinary
+- DataTypeName: timestamp
+- XmlSchemaCollectionDatabase: NULL
+- XmlSchemaCollectionOwningSchema: NULL
+- XmlSchemaCollectionName: NULL
+- UdtAssemblyQualifiedName: NULL
+- NonVersionedProviderType: 19
+- IsColumnSet: False
+
+Row: 5
+- ColumnName: RowVersion
+- ColumnOrdinal: 5
+- ColumnSize: 8
+- NumericPrecision: 255
+- NumericScale: 255
+- IsUnique: True
+- IsKey: False
+- BaseServerName: NULL
+- BaseCatalogName: NULL
+- BaseColumnName: RowVersion
+- BaseSchemaName: dbo
+- BaseTableName: Countries
+- DataType: Byte[]
+- AllowDBNull: False
+- ProviderType: 19
+- IsAliased: False
+- IsExpression: False
+- IsIdentity: False
+- IsAutoIncrement: False
+- IsRowVersion: True
+- IsHidden: True
+- IsLong: False
+- IsReadOnly: True
+- ProviderSpecificDataType: SqlBinary
+- DataTypeName: timestamp
+- XmlSchemaCollectionDatabase: NULL
+- XmlSchemaCollectionOwningSchema: NULL
+- XmlSchemaCollectionName: NULL
+- UdtAssemblyQualifiedName: NULL
+- NonVersionedProviderType: 19
+- IsColumnSet: False
+
+========================================
+Contents:
+
+00: 000
+01: World
+02: ae
+03: United Arab Emirates
+04: [0, 0, 0, 0, 0, 0, 8, 4]
+05: [0, 0, 0, 0, 0, 0, 8, 30]
+
+00: 100
+01: Americas
+02: ae
+03: United Arab Emirates
+04: [0, 0, 0, 0, 0, 0, 8, 5]
+05: [0, 0, 0, 0, 0, 0, 8, 30]

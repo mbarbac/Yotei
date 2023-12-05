@@ -1,3 +1,5 @@
-namespace Yotei.ORM.Records.Code;
+namespace Yotei.ORM;
 
 // ========================================================
+
+public interface IFake { }

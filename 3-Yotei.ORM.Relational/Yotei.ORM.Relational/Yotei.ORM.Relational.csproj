@@ -27,15 +27,15 @@
 	  <None Include="LICENSE" Pack="true" PackagePath="" />
    </ItemGroup>
 
-   <!-- LOCAL configuration -->
-   <ItemGroup Condition="'$(Configuration)'=='Local'">
+   <!-- DEBUG configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Debug'">
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser.csproj" />
-	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.CloneGenerator\Yotei.Tools.CloneGenerator.csproj" >
+	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.CloneGenerator\Yotei.Tools.CloneGenerator.csproj">
 		 <OutputItemType>Analyzer</OutputItemType>
 		 <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
 	  </ProjectReference>
-	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.WithGenerator\Yotei.Tools.WithGenerator.csproj" >
+	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.WithGenerator\Yotei.Tools.WithGenerator.csproj">
 		 <OutputItemType>Analyzer</OutputItemType>
 		 <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
 	  </ProjectReference>
@@ -48,7 +48,7 @@
 	  <PackageReference Include="Yotei.Tools.LambdaParser" Version="0.5.26-v0001" />
 	  <PackageReference Include="Yotei.Tools.WithGenerator" Version="0.5.20-v0001" />
 	  <PackageReference Include="Yotei.Tools.CloneGenerator" Version="0.5.20-v0001" />
-	  <PackageReference Include="Yotei.ORM" Version="0.2.4-v0001" />
+	  <PackageReference Include="Yotei.ORM" Version="0.2.4" />
    </ItemGroup>
 
    <!-- RELEASE configuration -->
@@ -57,7 +57,7 @@
 	  <PackageReference Include="Yotei.Tools.LambdaParser" Version="0.5.25" />
 	  <PackageReference Include="Yotei.Tools.WithGenerator" Version="0.5.19" />
 	  <PackageReference Include="Yotei.Tools.CloneGenerator" Version="0.5.19" />
-	  <PackageReference Include="Yotei.ORM" Version="0.2.3" />
+	  <PackageReference Include="Yotei.ORM" Version="0.2.4-v0001" />
    </ItemGroup>
 
    <!-- Emit generated files -->
