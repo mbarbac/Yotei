@@ -1,1 +1,0 @@
-﻿[assembly: InternalsVisibleTo("Yotei.Tools.LambdaParser.Tests")]

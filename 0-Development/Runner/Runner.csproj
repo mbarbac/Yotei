@@ -1,35 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
    <PropertyGroup>
-	  <StartupObject>Runner.Program</StartupObject>
 	  <OutputType>Exe</OutputType>
 	  <TargetFramework>net8.0</TargetFramework>
+	  <LangVersion>latest</LangVersion>
 	  <ImplicitUsings>disable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
-	  <LangVersion>latest</LangVersion>
 	  <Configurations>Debug;Release;Local</Configurations>
    </PropertyGroup>
-
-   <ItemGroup>
-	  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-	  <PackageReference Include="xunit" Version="2.6.2" />
-	  <PackageReference Include="xunit.runner.visualstudio" Version="2.5.4">
-		 <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		 <PrivateAssets>all</PrivateAssets>
-	  </PackageReference>
-	  <PackageReference Include="coverlet.collector" Version="6.0.0">
-		 <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		 <PrivateAssets>all</PrivateAssets>
-	  </PackageReference>
-   </ItemGroup>
-
-   <ItemGroup>
-	  <ProjectReference Include="..\..\0-Experimental\Experimental.Tests\Experimental.Tests.csproj"/>
-	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Tests\Yotei.Tools.Tests.csproj" />
-	  <ProjectReference Include="..\..\1-Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser.Tests\Yotei.Tools.LambdaParser.Tests.csproj" />
-	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.Generators.Tests\Yotei.Tools.Generators.Tests.csproj" />
-	  <ProjectReference Include="..\..\2-Yotei.ORM\Yotei.ORM.Tests\Yotei.ORM.Tests.csproj" />
-	  <ProjectReference Include="..\..\3-Yotei.ORM.Relational\Yotei.ORM.Relational.Tests\Yotei.ORM.Relational.Tests.csproj" />
-   </ItemGroup>
 
 </Project>

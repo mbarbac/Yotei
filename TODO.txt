@@ -1,3 +1,0 @@
-WithGenerator:
-- Substitute the default comparer with a check to see if there is a custom one, for the type
-  or for THE FIRST base interface, and use it.
