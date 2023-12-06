@@ -124,7 +124,7 @@ public static class ArrayExtensions
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    [SuppressMessage("Style", "IDE0305:Simplify collection initialization")]
+    [SuppressMessage("", "IDE0305")]
     public static T[] Insert<T>(this T[] source, int index, T item)
     {
         source = source.ThrowWhenNull();
@@ -152,7 +152,7 @@ public static class ArrayExtensions
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    [SuppressMessage("Style", "IDE0305:Simplify collection initialization")]
+    [SuppressMessage("", "IDE0305")]
     public static T[] InsertRange<T>(this T[] source, int index, IEnumerable<T> range)
     {
         source = source.ThrowWhenNull();
@@ -180,7 +180,7 @@ public static class ArrayExtensions
     /// <param name="source"></param>
     /// <param name="index"></param>
     /// <returns></returns>
-    [SuppressMessage("Style", "IDE0305:Simplify collection initialization")]
+    [SuppressMessage("", "IDE0305")]
     public static T[] RemoveAt<T>(this T[] source, int index)
     {
         source = source.ThrowWhenNull();
@@ -199,7 +199,7 @@ public static class ArrayExtensions
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    [SuppressMessage("Style", "IDE0305:Simplify collection initialization")]
+    [SuppressMessage("", "IDE0305")]
     public static T[] RemoveRange<T>(this T[] source, int index, int count)
     {
         source = source.ThrowWhenNull();

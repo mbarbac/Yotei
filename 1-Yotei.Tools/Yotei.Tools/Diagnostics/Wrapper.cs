@@ -20,7 +20,7 @@ internal static class Wrappers
     /// <param name="value"></param>
     /// <param name="addNL"></param>
     /// <returns></returns>
-    [SuppressMessage("Style", "IDE0305:Simplify collection initialization")]
+    [SuppressMessage("", "IDE0305")]
     internal static string[] TokenizeNL(string? value, bool addNL = true)
     {
         if (value == null) return [];

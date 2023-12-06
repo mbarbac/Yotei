@@ -1,4 +1,5 @@
 using static System.ConsoleColor;
+using Console = Yotei.Tools.Diagnostics.ConsoleWrapper;
 
 namespace Yotei.Tools.Tests;
 
@@ -17,12 +18,20 @@ public static class Test_Locker
 #endif
     static readonly int TIMEOUT = WAIT * (DEEP + NUM / 2);
 
+    static void Print(object? _, string message) => Console.WriteLine(true, White, message);
+    static void Print(ConsoleColor color, string message)
+        => Console.WriteLine(true, color, Locker.Format(message));
+
+    // ----------------------------------------------------
+
     public class Info : IDisposable, IAsyncDisposable
     {
         public Locker Locker = new();
         public Random Random = new();
         public int Value = 0;
         public bool TimeoutCaptured = false;
+
+        public Info() => Locker.OnDebug += Print;
 
         public void Dispose()
         {
@@ -64,11 +73,11 @@ public static class Test_Locker
 
     static void Create_Sync(Info info, string id, int level, int timeout = -1)
     {
-        Locker.Print(White, $"Entering  : {info.Locker}, Id: {id}");
+        Print(Blue, $"Entering: {info.Locker}, Id: {id}");
         try
         {
             var span = TimeSpan.FromMilliseconds(timeout);
-            using var disp = info.Locker.Lock(id, span);
+            using var disp = info.Locker.Lock(span, id);
 
             var old = info.Value;
             var temp = info.Value = info.NewValue();
@@ -85,14 +94,14 @@ public static class Test_Locker
 
             Thread.Sleep(WAIT);
             info.Value = old;
-            Locker.Print(Gray, $"Exiting   : {disp}");
+            Print(Green, $"Exiting: {disp}");
         }
         catch (TimeoutException)
         {
             if (timeout >= 0)
             {
                 info.TimeoutCaptured = true;
-                Locker.Print(Red, $"** Timeout Exception: {info.Locker}, Id: {id}");
+                Print(Red, $"** Timeout Exception: {info.Locker}, Id: {id}");
             }
             else throw;
         }
@@ -100,7 +109,7 @@ public static class Test_Locker
 
     //[Enforced]
     [Fact]
-    [SuppressMessage("Style", "IDE0305:Simplify collection initialization")]
+    [SuppressMessage("", "IDE0305")]
     public static void Test_Sync()
     {
         using var info = new Info();
@@ -117,11 +126,11 @@ public static class Test_Locker
 
     static async Task Create_Async(Info info, string id, int level, int timeout = -1)
     {
-        Locker.Print(White, $"Entering  : {info.Locker}, Id: {id}");
+        Print(Blue, $"Entering: {info.Locker}, Id: {id}");
         try
         {
             var span = TimeSpan.FromMilliseconds(timeout);
-            await using var disp = await info.Locker.LockAsync(id, span).ConfigureAwait(false);
+            await using var disp = await info.Locker.LockAsync(span, id).ConfigureAwait(false);
 
             var old = info.Value;
             var temp = info.Value = info.NewValue();
@@ -130,7 +139,7 @@ public static class Test_Locker
             {
                 level++;
                 var str = $"{id}.{level}";
-                await Create_Async(info, str, level).ConfigureAwait(false);
+                await Create_Async(info, str, level, timeout).ConfigureAwait(false);
 
                 if (info.Value != temp)
                     throw new Exception($"Value:{info.Value}, Old:{old}, Temp:{temp}");
@@ -138,14 +147,14 @@ public static class Test_Locker
 
             await Task.Delay(WAIT).ConfigureAwait(false);
             info.Value = old;
-            Locker.Print(Gray, $"Exiting   : {disp}");
+            Print(Green, $"Exiting: {disp}");
         }
         catch (TimeoutException)
         {
             if (timeout >= 0)
             {
                 info.TimeoutCaptured = true;
-                Locker.Print(Red, $"** Timeout Exception: {info.Locker}, Id: {id}");
+                Print(Red, $"** Timeout Exception: {info.Locker}, Id: {id}");
             }
             else throw;
         }
@@ -153,7 +162,7 @@ public static class Test_Locker
 
     //[Enforced]
     [Fact]
-    [SuppressMessage("Style", "IDE0305:Simplify collection initialization")]
+    [SuppressMessage("", "IDE0305")]
     public static void Test_Async()
     {
         using var info = new Info();
@@ -170,11 +179,11 @@ public static class Test_Locker
 
     static void Create_Sync_Async(Info info, string id, int level, int timeout = -1)
     {
-        Locker.Print(White, $"Entering  : {info.Locker}, Id: {id}");
+        Print(Blue, $"Entering: {info.Locker}, Id: {id}");
         try
         {
             var span = TimeSpan.FromMilliseconds(timeout);
-            using var disp = info.Locker.Lock(id, span);
+            using var disp = info.Locker.Lock(span, id);
 
             var old = info.Value;
             var temp = info.Value = info.NewValue();
@@ -182,7 +191,7 @@ public static class Test_Locker
             if (level < DEEP)
             {
                 level++;
-                var str = $"{id}.{level}";
+                var str = $"{id}.{level}"; 
                 var task = Create_Async_Sync(info, str, level, timeout);
                 task.GetAwaiter().GetResult();
 
@@ -192,14 +201,14 @@ public static class Test_Locker
 
             Thread.Sleep(WAIT);
             info.Value = old;
-            Locker.Print(Gray, $"Exiting   : {disp}");
+            Print(Green, $"Exiting: {disp}");
         }
         catch (TimeoutException)
         {
             if (timeout >= 0)
             {
                 info.TimeoutCaptured = true;
-                Locker.Print(Red, $"** Timeout Exception: {info.Locker}, Id: {id}");
+                Print(Red, $"** Timeout Exception: {info.Locker}, Id: {id}");
             }
             else throw;
         }
@@ -207,11 +216,11 @@ public static class Test_Locker
 
     static async Task Create_Async_Sync(Info info, string id, int level, int timeout = -1)
     {
-        Locker.Print(White, $"Entering  : {info.Locker}, Id: {id}");
+        Print(Blue, $"Entering: {info.Locker}, Id: {id}");
         try
         {
             var span = TimeSpan.FromMilliseconds(timeout);
-            await using var disp = await info.Locker.LockAsync(id, span).ConfigureAwait(false);
+            await using var disp = await info.Locker.LockAsync(span, id).ConfigureAwait(false);
 
             var old = info.Value;
             var temp = info.Value = info.NewValue();
@@ -228,14 +237,14 @@ public static class Test_Locker
 
             await Task.Delay(WAIT).ConfigureAwait(false);
             info.Value = old;
-            Locker.Print(Gray, $"Exiting   : {disp}");
+            Print(Green, $"Exiting: {disp}");
         }
         catch (TimeoutException)
         {
             if (timeout >= 0)
             {
                 info.TimeoutCaptured = true;
-                Locker.Print(Red, $"** Timeout Exception: {info.Locker}, Id: {id}");
+                Print(Red, $"** Timeout Exception: {info.Locker}, Id: {id}");
             }
             else throw;
         }
@@ -243,7 +252,7 @@ public static class Test_Locker
 
     //[Enforced]
     [Fact]
-    [SuppressMessage("Style", "IDE0305:Simplify collection initialization")]
+    [SuppressMessage("", "IDE0305")]
     public static void Test_Sync_Async()
     {
         using var info = new Info();
@@ -260,7 +269,7 @@ public static class Test_Locker
 
     //[Enforced]
     [Fact]
-    [SuppressMessage("Style", "IDE0305:Simplify collection initialization")]
+    [SuppressMessage("", "IDE0305")]
     public static void Test_Async_Sync()
     {
         using var info = new Info();
@@ -277,7 +286,7 @@ public static class Test_Locker
 
     //[Enforced]
     [Fact]
-    [SuppressMessage("Style", "IDE0305:Simplify collection initialization")]
+    [SuppressMessage("", "IDE0305")]
     public static void Test_Mixing()
     {
         using var info = new Info();
@@ -300,7 +309,7 @@ public static class Test_Locker
 
     //[Enforced]
     [Fact]
-    [SuppressMessage("Style", "IDE0305:Simplify collection initialization")]
+    [SuppressMessage("", "IDE0305")]
     public static void Test_Sync_Timeout()
     {
         using var info = new Info();
@@ -320,7 +329,7 @@ public static class Test_Locker
 
     //[Enforced]
     [Fact]
-    [SuppressMessage("Style", "IDE0305:Simplify collection initialization")]
+    [SuppressMessage("", "IDE0305")]
     public static void Test_Async_Timeout()
     {
         using var info = new Info();
@@ -340,7 +349,7 @@ public static class Test_Locker
 
     //[Enforced]
     [Fact]
-    [SuppressMessage("Style", "IDE0305:Simplify collection initialization")]
+    [SuppressMessage("", "IDE0305")]
     public static void Test_Mixing_Timeout()
     {
         using var info = new Info();

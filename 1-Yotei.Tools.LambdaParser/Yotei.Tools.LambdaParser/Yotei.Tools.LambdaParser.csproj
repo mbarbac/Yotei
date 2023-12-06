@@ -9,8 +9,8 @@
    </PropertyGroup>
 
    <PropertyGroup>
-	  <Description>Yotei Framework Common Tools</Description>
-	  <Version>0.5.30-v0001</Version>
+	  <Description>Yotei Tools Dynamic Lambda Expression Parser</Description>
+	  <Version>0.5.26-v0001</Version>
 	  <Authors>mbarbac@hotmail.com</Authors>
 	  <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
 	  <IsPackable>true</IsPackable>
@@ -21,13 +21,29 @@
 	  <PackageLicenseFile>LICENSE</PackageLicenseFile>
    </PropertyGroup>
 
-   <PropertyGroup>
-	  <!--<DefineConstants>$(DefineConstants);DEBUG_LOCKER</DefineConstants>-->
-   </PropertyGroup>
-
    <ItemGroup>
 	  <None Include="README.md" Pack="true" PackagePath="" />
+	  <None Include="README.Tests.md" Pack="true" PackagePath="" />
 	  <None Include="LICENSE" Pack="true" PackagePath="" />
+   </ItemGroup>
+
+   <PropertyGroup>
+	  <!--<DefineConstants>$(DefineConstants);DEBUG_LAMBDAPARSER</DefineConstants>-->
+   </PropertyGroup>
+
+   <!-- DEBUG configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Debug'">
+	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
+   </ItemGroup>
+
+   <!-- LOCAL configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Local'">
+	  <PackageReference Include="Yotei.Tools" Version="0.5.30-v0001" />
+   </ItemGroup>
+
+   <!-- RELEASE configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Release'">
+	  <PackageReference Include="Yotei.Tools" Version="0.5.29" />
    </ItemGroup>
 
 </Project>

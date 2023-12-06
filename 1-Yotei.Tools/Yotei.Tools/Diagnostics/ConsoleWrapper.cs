@@ -22,7 +22,7 @@ public static class ConsoleWrapper
     /// requested.
     /// </summary>
     /// <param name="debug"></param>
-    [SuppressMessage("Style", "IDE0060:Remove unused parameter")]
+    [SuppressMessage("", "IDE0060")]
     public static void Write(bool debug) { }
 
     /// <summary>
