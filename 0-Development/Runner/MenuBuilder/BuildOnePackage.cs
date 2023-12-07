@@ -14,6 +14,7 @@ public class BuildOnePackage : MenuEntry
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    [SuppressMessage("", "IDE0305")]
     public override void Execute()
     {
         string? root = null;
@@ -38,7 +39,7 @@ public class BuildOnePackage : MenuEntry
             var projects = root!.FindProjects();
             var packables = projects.SelectPackableProjects();
 
-            var items = new List<MenuEntry> { new MenuEntry("Previous") };
+            var items = new List<MenuEntry> { new("Previous") };
             items.AddRange(packables.Select(x => new Surrogate(x)));
 
             WriteLine(true);
@@ -48,18 +49,12 @@ public class BuildOnePackage : MenuEntry
     }
 
     // ====================================================
-    public class Surrogate : MenuEntry
+    public class Surrogate(Project project) : MenuEntry
     {
-        /// <summary>
-        /// Initializes a new instance.
-        /// </summary>
-        /// <param name="project"></param>
-        public Surrogate(Project project) => Project = project;
-
         /// <summary>
         /// The project this surrogate refers to.
         /// </summary>
-        public Project Project { get; }
+        public Project Project { get; } = project;
 
         /// <summary>
         /// <inheritdoc/>

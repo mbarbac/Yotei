@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
    <PropertyGroup>
 	  <TargetFramework>net8.0</TargetFramework>
@@ -23,9 +23,11 @@
 	  </PackageReference>
    </ItemGroup>
 
+   
+
    <!-- DEBUG configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Debug'">
-	  <ProjectReference Include="..\Yotei.Tools\Yotei.Tools.csproj" />
+	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
    </ItemGroup>
 
    <!-- LOCAL configuration -->
@@ -37,5 +39,24 @@
    <ItemGroup Condition="'$(Configuration)'=='Release'">
 	  <PackageReference Include="Yotei.Tools" Version="0.5.30" />
    </ItemGroup>
+
+   <!-- Emit generated files -->
+   <ItemGroup>
+	  <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
+   </ItemGroup>
+   <PropertyGroup>
+	  <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+	  <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+	  <CompilerGeneratedFilesOutputPath>Generated\$(TargetFramework)</CompilerGeneratedFilesOutputPath>
+   </PropertyGroup>
+
+   <!-- Clear generated files each compile or build -->
+   <!-- Need to appear at the end of the file -->
+   <Target Name="CustomBeforeCompile" BeforeTargets="BeforeCompile">
+	  <RemoveDir Directories="$(ProjectDir)\Generated\" />
+   </Target>
+   <Target Name="CustomBeforeBuild" BeforeTargets="BeforeBuild">
+	  <RemoveDir Directories="$(ProjectDir)\Generated\" />
+   </Target>
 
 </Project>
