@@ -220,7 +220,7 @@ public static class Test_CoreList
     [Fact]
     public static void Test_Add()
     {
-        var items = new Chain(false, [xone, xtwo, xthree]);        
+        var items = new Chain(false, [xone, xtwo, xthree]);
         var done = items.Add(xfour);
         Assert.Equal(1, done);
         Assert.Equal(4, items.Count);

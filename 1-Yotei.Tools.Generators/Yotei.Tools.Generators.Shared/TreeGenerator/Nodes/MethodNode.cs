@@ -65,9 +65,8 @@ internal class MethodNode : Node
     }
 
     /// <summary>
-    /// The host type for which the source code of this instance will be emitted. If it is
-    /// not explicitly set, then its value is taken from the actual containing type of this
-    /// instance.
+    /// The host type for which the source code of this instance will be emitted. If it is not
+    /// explicitly set, then its value is taken from the actual containing type of this instance.
     /// </summary>
     public INamedTypeSymbol HostType
     {

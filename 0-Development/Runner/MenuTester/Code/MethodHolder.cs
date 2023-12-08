@@ -44,8 +44,9 @@ public class MethodHolder
     /// <summary>
     /// Determines if the underlying type is decorated with an enforced attribute, or not.
     /// </summary>
-    public bool HasEnforcedAttribute
-        => Method.GetCustomAttributes(typeof(EnforcedAttribute), true).Any();
+    public bool HasEnforcedAttribute => Method
+        .GetCustomAttributes(true)
+        .Any(x => x.GetType().Name == nameof(EnforcedAttribute));
 
     // ----------------------------------------------------
 

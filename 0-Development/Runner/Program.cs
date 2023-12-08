@@ -1,5 +1,4 @@
-﻿using Xunit.Sdk;
-using static System.ConsoleColor;
+﻿using static System.ConsoleColor;
 using static Yotei.Tools.Diagnostics.ConsoleWrapper;
 using Debug = Yotei.Tools.Diagnostics.DebugWrapper;
 

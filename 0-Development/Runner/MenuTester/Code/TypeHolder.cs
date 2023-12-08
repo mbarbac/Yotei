@@ -49,13 +49,14 @@ public class TypeHolder
     /// <summary>
     /// Determines if the underlying type is decorated with an enforced attribute, or not.
     /// </summary>
-    public bool HasEnforcedAttribute
-        => Type.GetCustomAttributes(typeof(EnforcedAttribute), true).Any();
+    public bool HasEnforcedAttribute => Type
+        .GetCustomAttributes(true)
+        .Any(x => x.GetType().Name == nameof(EnforcedAttribute));
 
     /// <summary>
     /// The collection of method holders in this instance.
     /// </summary>
-    public MethodHolderList MethodHolders { get; } = new();
+    public MethodHolderList MethodHolders { get; } = [];
 
     // ----------------------------------------------------
 
