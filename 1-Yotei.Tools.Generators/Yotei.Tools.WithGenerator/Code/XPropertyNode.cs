@@ -271,6 +271,7 @@ internal class XPropertyNode : PropertyNode
         /// replaced by the new given one.
         /// </summary>
         /// <param name ="{{vname}}"></param>
+        /// <returns></returns>
         """);
 
     // ----------------------------------------------------
@@ -313,9 +314,9 @@ internal class XPropertyNode : PropertyNode
                 if (!top)
                 {
                     if (HasMethod(type) != null) return true;
-                    if (HasDecoratedMember(type) != null) return true;
+                    else if (HasDecoratedMember(type) != null) return true;
                     
-                    if (type.HasAttributes(WithGeneratorAttr.LongName) &&
+                    else if (type.HasAttributes(WithGeneratorAttr.LongName) &&
                         HasMember(type) != null)
                         return true;
                 }
@@ -334,7 +335,7 @@ internal class XPropertyNode : PropertyNode
     [SuppressMessage("", "IDE0305")]
     ITypeSymbol[] GetInterfacesToImplement()
     {
-        var list = new CoreList<ITypeSymbol>
+        var list = new CustomList<ITypeSymbol>
         {
             AllowDuplicate = (x, y) => false,
             Compare = SymbolEqualityComparer.Default.Equals,
@@ -349,7 +350,7 @@ internal class XPropertyNode : PropertyNode
             var done = false;
 
             if (HasDecoratedMember(iface) != null) done = true;
-            if (HasMethod(iface) != null) done = true;
+            else if (HasMethod(iface) != null) done = true;
 
             foreach (var child in iface.Interfaces) if (Populate(child)) done = true;
 

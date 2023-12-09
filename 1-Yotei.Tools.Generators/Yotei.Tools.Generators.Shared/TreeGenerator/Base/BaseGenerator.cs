@@ -306,7 +306,7 @@ internal abstract class BaseGenerator : IIncrementalGenerator
     /// <param name="file"></param>
     void PrintPragmas(FileBuilder file)
     {
-        var list = new CoreList<string>()
+        var list = new CustomList<string>()
         {
             AllowDuplicate = (x, y) => false,
             Compare = (source, target) => source == target,
@@ -340,7 +340,7 @@ internal abstract class BaseGenerator : IIncrementalGenerator
     /// <param name="file"></param>
     void PrintUsings(FileBuilder file)
     {
-        var list = new CoreList<string>()
+        var list = new CustomList<string>()
         {
             AllowDuplicate = (x, y) => false,
             Compare = (source, target) => source == target,
@@ -417,7 +417,7 @@ internal abstract class BaseGenerator : IIncrementalGenerator
     /// </summary>
     void PrintUsings(FileBuilder file, BaseNamespaceDeclarationSyntax ns)
     {
-        var list = new CoreList<string>()
+        var list = new CustomList<string>()
         {
             AllowDuplicate = (x, y) => false,
             Compare = (source, target) => source == target,

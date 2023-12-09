@@ -9,7 +9,7 @@ public static class Test_CoreList
         public string Name { get; set; } = name;
         public override string ToString() => Name ?? string.Empty;
     }
-    internal class Chain : CoreList<Element>
+    internal class Chain : CustomList<Element>
     {
         public Chain(bool sensitive)
         {

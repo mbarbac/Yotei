@@ -256,6 +256,7 @@ internal class XFieldNode : FieldNode
         /// replaced by the new given one.
         /// </summary>
         /// <param name ="{{vname}}"></param>
+        /// <returns></returns>
         """);
 
     // ----------------------------------------------------
@@ -298,9 +299,9 @@ internal class XFieldNode : FieldNode
                 if (!top)
                 {
                     if (HasMethod(type) != null) return true;
-                    if (HasDecoratedMember(type) != null) return true;
+                    else if (HasDecoratedMember(type) != null) return true;
 
-                    if (type.HasAttributes(WithGeneratorAttr.LongName) &&
+                    else if (type.HasAttributes(WithGeneratorAttr.LongName) &&
                         HasMember(type) != null)
                         return true;
                 }

@@ -2,7 +2,7 @@
 #pragma whatever
 using System;
 
-namespace Yotei.Tools.Generators.Tests
+namespace Yotei.Tools.Generators.WithGenerator.Tests
 {
     // Namespace-level elements...
     using IThisBuilder;

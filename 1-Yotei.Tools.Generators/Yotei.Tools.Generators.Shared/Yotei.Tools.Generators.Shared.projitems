@@ -17,7 +17,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\NameSyntaxExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\ChainExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\AttributeExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CoreList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CustomList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\Debugextensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\ExceptionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\StringExtensions.cs" />

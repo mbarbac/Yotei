@@ -7,7 +7,7 @@ namespace Yotei.Tools.Generators.Shared;
 /// </summary>
 /// <typeparam name="T"></typeparam>
 [DebuggerDisplay("{ToDebugString(7)}")]
-internal class CoreList<T> : IEnumerable<T>
+internal class CustomList<T> : IEnumerable<T>
 {
     readonly List<T> Items = [];
 
@@ -79,19 +79,19 @@ internal class CoreList<T> : IEnumerable<T>
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    public CoreList() { }
+    public CustomList() { }
 
     /// <summary>
     /// Initializes a new instance with the given element.
     /// </summary>
     /// <param name="item"></param>
-    public CoreList(T item) => Add(item);
+    public CustomList(T item) => Add(item);
 
     /// <summary>
     /// Initializes a new instance with the elements from the given range..
     /// </summary>
     /// <param name="range"></param>
-    public CoreList(IEnumerable<T> range) => AddRange(range);
+    public CustomList(IEnumerable<T> range) => AddRange(range);
 
     /// <summary>
     /// <inheritdoc/>

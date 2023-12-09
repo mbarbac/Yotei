@@ -21,6 +21,8 @@ internal static class WithGeneratorAttr
             /// When used to decorate host types, generates 'With' methods for the members inherited
             /// that were decorated in any parent type (including interfaces), withoud the need of
             /// decorating them again.
+            /// <br/>
+            /// Types cannot be records.
             /// </summary>
             [AttributeUsage(
                 AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface |

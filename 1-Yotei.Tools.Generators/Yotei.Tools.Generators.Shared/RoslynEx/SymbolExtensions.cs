@@ -40,7 +40,7 @@ internal static class SymbolExtensions
     {
         symbol.ThrowWhenNull(nameof(symbol));
 
-        var list = new CoreList<BaseTypeDeclarationSyntax>()
+        var list = new CustomList<BaseTypeDeclarationSyntax>()
         {
             Compare = (x, y) => x.IsEquivalentTo(y),
             AllowDuplicate = (x, y) => false,
@@ -66,7 +66,7 @@ internal static class SymbolExtensions
     {
         symbol.ThrowWhenNull(nameof(symbol));
 
-        var list = new CoreList<PropertyDeclarationSyntax>
+        var list = new CustomList<PropertyDeclarationSyntax>
         {
             Compare = (x, y) => x.IsEquivalentTo(y),
             AllowDuplicate = (x, y) => false,
@@ -92,7 +92,7 @@ internal static class SymbolExtensions
     {
         symbol.ThrowWhenNull(nameof(symbol));
 
-        var list = new CoreList<FieldDeclarationSyntax>
+        var list = new CustomList<FieldDeclarationSyntax>
         {
             Compare = (x, y) => x.IsEquivalentTo(y),
             AllowDuplicate = (x, y) => false,
@@ -120,7 +120,7 @@ internal static class SymbolExtensions
     {
         symbol.ThrowWhenNull(nameof(symbol));
 
-        var list = new CoreList<MethodDeclarationSyntax>
+        var list = new CustomList<MethodDeclarationSyntax>
         {
             Compare = (x, y) => x.IsEquivalentTo(y),
             AllowDuplicate = (x, y) => false,
