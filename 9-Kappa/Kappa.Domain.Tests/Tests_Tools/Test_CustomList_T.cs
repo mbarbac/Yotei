@@ -1,8 +1,7 @@
-namespace Yotei.Tools.Generators.Shared.Tests;
+namespace Kappa.Domain.Tests;
 
 // ========================================================
-//[Enforced]
-public static class Test_CoreList
+public static class Test_CustomList_T
 {
     internal class Element(string name)
     {
@@ -16,7 +15,7 @@ public static class Test_CoreList
             Validate = (item, add) =>
             {
                 item.ThrowWhenNull(nameof(item));
-                if (add) item.Name.NotNullNotEmpty(nameof(item));
+                if (add) item.Name.NotNullNotEmpty();
                 return item;
             };
             Compare = (source, target) =>
@@ -24,7 +23,7 @@ public static class Test_CoreList
                 return ReferenceEquals(source, target)
                 || string.Compare(source.Name, target.Name, !CaseSensitive) == 0;
             };
-            AllowDuplicate = (source, target) =>
+            AcceptDuplicate = (source, target) =>
             {
                 return ReferenceEquals(source, target)
                 ? true
@@ -41,7 +40,10 @@ public static class Test_CoreList
             {
                 if (_CaseSensitive == value) return;
                 _CaseSensitive = value;
-                ReLoad();
+
+                var range = ToArray();
+                Clear();
+                AddRange(range);
             }
         }
         bool _CaseSensitive;
@@ -130,7 +132,7 @@ public static class Test_CoreList
 
     //[Enforced]
     [Fact]
-    public static void Test_Find_Key()
+    public static void Test_Find()
     {
         var items = new Chain(false, [xone, xtwo, xthree, xone]);
 

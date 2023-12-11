@@ -8,6 +8,7 @@
 	  <IsPackable>false</IsPackable>
 	  <IsTestProject>true</IsTestProject>
 	  <NoWarn>NU1701</NoWarn>
+	  <Configurations>Debug;Release;Local</Configurations>
    </PropertyGroup>
    <!--
    NU1701: Package (xunit.runner.visualstudio.2.5.4) restored using a later framework.
