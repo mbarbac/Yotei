@@ -28,7 +28,6 @@
 	  <ProjectReference Include="..\..\1-Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser.Tests\Yotei.Tools.LambdaParser.Tests.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.Generators.Shared.Tests\Yotei.Tools.Generators.Shared.Tests.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.Generators.Tests\Yotei.Tools.Generators.Tests.csproj" />
-	  <ProjectReference Include="..\..\9-Kappa\Kappa.Domain.Tests\Kappa.Domain.Tests.csproj" />
    </ItemGroup>
 
    <!-- DEBUG configuration -->

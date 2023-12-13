@@ -1,3 +1,3 @@
-﻿namespace Kappa.Domain;
+﻿namespace Experimental.Collections;
 
 // ========================================================

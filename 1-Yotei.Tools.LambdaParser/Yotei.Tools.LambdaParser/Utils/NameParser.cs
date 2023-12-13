@@ -58,7 +58,7 @@ public partial class LambdaParser
         expression = expression.ThrowWhenNull();
 
         var parser = Parse(expression);
-        var xarg = parser.Argument;
+        var xarg = parser.DynamicArguments[0]; // we have control on how many dynamics are...
         arg = xarg;
 
         var list = new List<string?>();

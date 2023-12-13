@@ -1,4 +1,4 @@
-namespace Kappa.Domain.Tests;
+﻿namespace Experimental;
 
 // ========================================================
 //[Enforced]

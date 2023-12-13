@@ -2,64 +2,133 @@
 #define DEBUGPRINT
 #endif
 
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
+
 namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>
 /// Represents the ability of parsing dynamic lambda expressions, defined as lambda expressions
-/// whose sole argument is a dynamic one.
+/// having dynamic arguments.
 /// </summary>
 public partial class LambdaParser
 {
     /// <summary>
     /// Parses the given dynamic lambda expression and returns a new instance that contains the
-    /// dynamic argument used to invoke it, and the chain of dynamic operations found while it
+    /// dynamic arguments used to invoke it, and the chain of dynamic operations found while it
     /// was executed.
+    /// <br/> The values of the optional collection of concrete arguments are used to replace
+    /// the ones in the lambda expression that are not dynamic ones.
     /// </summary>
     /// <param name="expression"></param>
+    /// <param name="concretes"></param>
     /// <returns></returns>
-    /// <exception cref="System.NullReferenceException"></exception>
-    public static LambdaParser Parse(Func<dynamic, object> expression)
+    public static LambdaParser Parse(Delegate expression, params object?[] concretes)
     {
         expression = expression.ThrowWhenNull();
+        concretes ??= [null!];
 
+        var parser = new LambdaParser();
+        var items = new List<object?>();
+
+        // Obtaining the delegate's method...
         var method = expression.GetMethodInfo() ??
            throw new ArgumentException(
-               "Cannot obtain the method of the given dynamic lambda expression.");
+               "Cannot obtain the method of the given lambda expression.");
 
+        if (method.ReturnType == typeof(void)) throw new NotSupportedException(
+            "Action-alike delegates, with no return type, are not supported.");
+
+        // Parsing the expression arguments...
         var pars = method.GetParameters();
-        if (pars.Length != 1) throw new ArgumentException(
-            "The given dynamic expression must have just one argument.");
+        var index = 0;
+        for (int i = 0; i < pars.Length; i++)
+        {
+            var par = pars[i];
 
-        var name = pars[0].Name ??
-            throw new ArgumentException(
-                "The dynamic argument of the dynamic lambda expression has no name.");
+            if (IsDynamic(par)) // Capturing dynamic arguments...
+            {
+                var name = par.Name ?? throw new ArgumentException(
+                    "A dynamic argument in the lambda expression has no name.")
+                    .WithData(par);
 
-        var parser = new LambdaParser() { Argument = new LambdaNodeArgument(name) };
-        parser.Argument.LambdaParser = parser;
+                var dyn = new LambdaNodeArgument(name) { LambdaParser = parser };
+                parser._DynamicArguments.Add(dyn);
+                items.Add(dyn);
+            }
+            else // Capturing regular arguments...
+            {
+                if (index >= concretes.Length) throw new NotFoundException(
+                    "Not enough concrete arguments provided.")
+                    .WithData(concretes);
 
+                items.Add(concretes[index]);
+                index++;
+            }
+        }
+
+        if (concretes.Length > index) throw new InvalidOperationException(
+            "Too many concrete arguments provided.")
+            .WithData(concretes);
+
+        // Executing the delegate...
         lock (SyncRoot)
         {
-            var obj = expression(parser.Argument);
+            var obj = expression.DynamicInvoke([.. items]);
             parser.Result = parser.LastNode ?? ToLambdaNode(obj, parser);
+            return parser;
         }
-        return parser;
+    }
+
+    /// <summary>
+    /// Determines if the given parameter is a dynamic one, or not.
+    /// </summary>
+    static bool IsDynamic(ParameterInfo par)
+    {
+        var ats = par.GetCustomAttributes(typeof(DynamicAttribute), false);
+        if (ats.Length > 0) return true;
+
+        // This hack comes from NET 4.6, where finding 'DynamicAttribute' didn't work. It is not
+        // 100% robust as an argument can be be decorated with 'ClassInterfaceAttribute' by the
+        // calling code, although I've never seen it...
+
+        var type = typeof(ClassInterfaceAttribute);
+        var at = par.ParameterType.CustomAttributes.FirstOrDefault(x => x.AttributeType == type);
+        if (at != null)
+        {
+            type = typeof(ClassInterfaceType);
+            var arg = at.ConstructorArguments.FirstOrDefault(x => x.ArgumentType == type);
+            if (arg != default)
+            {
+                var cit = (ClassInterfaceType)arg.Value!;
+                if (cit is ClassInterfaceType.AutoDispatch or ClassInterfaceType.AutoDual)
+                    return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"({Argument}) => {Result}";
+    public override string ToString()
+    {
+        var args = DynamicArguments.Select(x => x.Sketch()).Sketch();
+        return $"({args}) => {Result}";
+    }
 
     /// <summary>
-    /// The argument of the dynamic lambda expression that has been parsed.
+    /// The collection of dynamic arguments used to invoke the dynamic lambda expression.
     /// </summary>
-    public LambdaNodeArgument Argument { get; private set; } = default!;
+    public ImmutableArray<LambdaNodeArgument> DynamicArguments => _DynamicArguments.ToImmutableArray();
+    readonly List<LambdaNodeArgument> _DynamicArguments = [];
 
     /// <summary>
-    /// The chain of dynamic operations binded to the argument of the dynamic lambda expression
-    /// that has been parsed. This property contains the last binded operation on that argument,
+    /// The chain of dynamic operations binded to the arguments of the dynamic lambda expression
+    /// that has been parsed. This property contains the last binded operation on the arguments,
     /// from which the full chain can be obtained.
     /// </summary>
     public LambdaNode Result { get; private set; } = default!;
@@ -72,9 +141,8 @@ public partial class LambdaParser
     private LambdaParser() { }
 
     /// <summary>
-    /// The DLR is a unique shared resource that, for the purposes of <see cref="LambdaParser"/>,
-    /// cannot be used in parallel, because state its state must be managed in isolation by each
-    /// run of the parser.
+    /// For the purposes of <see cref="LambdaParser"/> the DLR acts as a unique shared resource
+    /// whose state must be managed in isolation by each run of the parser.
     /// </summary>
     public static object SyncRoot { get; } = new();
 

@@ -1,32 +1,33 @@
-﻿namespace Kappa.Tools;
+﻿namespace Experimental.Collections;
 
 // ========================================================
 /// <summary>
-/// <inheritdoc cref="ICustomList{K, T}"/>
+/// <inheritdoc cref="IInvariantList{K, T}"/>
 /// </summary>
 /// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>
-[DebuggerDisplay("{ToStringEx(7)}")]
-public class CustomList<K, T> : ICustomList<K, T>
+[DebuggerDisplay("{ToDebugString(7)}")]
+[Cloneable]
+public partial class InvariantList<K, T> : IInvariantList<K, T>
 {
     readonly List<T> Items = [];
 
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    public CustomList() { }
+    public InvariantList() { }
 
     /// <summary>
     /// Initializes a new instance with the given element.
     /// </summary>
     /// <param name="item"></param>
-    public CustomList(T item) => Add(item);
+    public InvariantList(T item) => AddInternal(item);
 
     /// <summary>
     /// Initializes a new instance with the elements from the given range.
     /// </summary>
     /// <param name="range"></param>
-    public CustomList(IEnumerable<T> range) => AddRange(range);
+    public InvariantList(IEnumerable<T> range) => AddRangeInternal(range);
 
     /// <summary>
     /// <inheritdoc/>
@@ -41,26 +42,27 @@ public class CustomList<K, T> : ICustomList<K, T>
     /// <returns></returns>
     public override string ToString() => $"Count: {Count}";
 
-    protected virtual string ToStringEx(int count) => Count <= count
-        ? $"({Count})[{string.Join(", ", Items.Select(Item2String))}]"
-        : $"({Count})[{string.Join(", ", Items.Take(count).Select(Item2String))}]...";
+    protected virtual string ToDebugString(int count) => Count <= count
+        ? $"({Count})[{string.Join(", ", Items.Select(ItemToString))}]"
+        : $"({Count})[{string.Join(", ", Items.Take(count).Select(ItemToString))}]...";
 
-    protected virtual string Item2String(T item) => item?.ToString() ?? string.Empty;
+    protected virtual string ItemToString(T item) => item?.ToString() ?? string.Empty;
 
     // ----------------------------------------------------
 
     /// <summary>
     /// The delegate to invoke to validate the given element before using it in this collection
-    /// for adding or inserting purposes.
+    /// for adding or inserting the purposes.
     /// </summary>
     public Func<T, T> ValidateItem
     {
         get => _ValidateItem;
-        set
+        init
         {
             if (_ValidateItem == value) return;
             _ValidateItem = value;
 
+            if (Count == 0) return;
             var range = ToArray();
             Clear();
             AddRange(range);
@@ -75,11 +77,12 @@ public class CustomList<K, T> : ICustomList<K, T>
     public Func<T, K> GetKey
     {
         get => _GetKey;
-        set
+        init
         {
             if (_GetKey == value) return;
             _GetKey = value;
 
+            if (Count == 0) return;
             var range = ToArray();
             Clear();
             AddRange(range);
@@ -88,17 +91,18 @@ public class CustomList<K, T> : ICustomList<K, T>
     Func<T, K> _GetKey = (item) => throw new NotImplementedException();
 
     /// <summary>
-    /// The delegate to invoke to validate the given key before using it in this collection for
+    /// The delegate to invoke to validate the given key before using it in this collection, for
     /// comparison purposes.
     /// </summary>
     public Func<K, K> ValidateKey
     {
         get => _ValidateKey;
-        set
+        init
         {
             if (_ValidateKey == value) return;
             _ValidateKey = value;
 
+            if (Count == 0) return;
             var range = ToArray();
             Clear();
             AddRange(range);
@@ -107,17 +111,18 @@ public class CustomList<K, T> : ICustomList<K, T>
     Func<K, K> _ValidateKey = (item) => item;
 
     /// <summary>
-    /// The delegate to invoke to determine if the two given keys shall be considered equal or
-    /// not.
+    /// The delegate to invoke to determine if the two given keys shall be considered equal
+    /// or not.
     /// </summary>
     public Func<K, K, bool> Compare
     {
         get => _Compare;
-        set
+        init
         {
             if (_Compare == value) return;
             _Compare = value;
 
+            if (Count == 0) return;
             var range = ToArray();
             Clear();
             AddRange(range);
@@ -132,18 +137,19 @@ public class CustomList<K, T> : ICustomList<K, T>
     };
 
     /// <summary>
-    /// The delegate to invoke to determine if this collection will accepts the given duplicated
+    /// The delegate to invoke to determine if this collection will accept the given duplicated
     /// element, or not. Returns <c>true</c> if so, <c>false</c> if the duplicated element shall
     /// just be ignored, or throws an exception if duplicates are not allowed.
     /// </summary>
     public Func<T, T, bool> AcceptDuplicate
     {
         get => _AcceptDuplicate;
-        set
+        init
         {
             if (_AcceptDuplicate == value) return;
             _AcceptDuplicate = value;
 
+            if (Count == 0) return;
             var range = ToArray();
             Clear();
             AddRange(range);
@@ -163,16 +169,7 @@ public class CustomList<K, T> : ICustomList<K, T>
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public T this[int index]
-    {
-        get => Items[index];
-        set => Replace(index, value);
-    }
-    object? IList.this[int index]
-    {
-        get => this[index];
-        set => this[index] = (T)value!;
-    }
+    public T this[int index] => Items[index];
 
     /// <summary>
     /// <inheritdoc/>
@@ -180,8 +177,6 @@ public class CustomList<K, T> : ICustomList<K, T>
     /// <param name="key"></param>
     /// <returns></returns>
     public bool Contains(K key) => IndexOf(key) >= 0;
-    bool ICollection<T>.Contains(T item) => Contains(GetKey(item));
-    bool IList.Contains(object? value) => Contains(GetKey((T)value!));
 
     /// <summary>
     /// <inheritdoc/>
@@ -193,8 +188,6 @@ public class CustomList<K, T> : ICustomList<K, T>
         key = ValidateKey(key);
         return IndexOf(x => Compare(GetKey(x), key));
     }
-    int IList<T>.IndexOf(T item) => IndexOf(GetKey(item));
-    int IList.IndexOf(object? value) => IndexOf(GetKey((T)value!));
 
     /// <summary>
     /// <inheritdoc/>
@@ -277,23 +270,6 @@ public class CustomList<K, T> : ICustomList<K, T>
     /// <returns></returns>
     public List<T> ToList() => new(Items);
 
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    public void Trim() => Items.TrimExcess();
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="comparer"></param>
-    public void Sort(IComparer<T> comparer)
-        => Items.Sort(comparer ?? throw new ArgumentNullException(nameof(comparer)));
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    public void Reverse() => Items.Reverse();
-
     // ----------------------------------------------------
 
     /// <summary>
@@ -302,7 +278,22 @@ public class CustomList<K, T> : ICustomList<K, T>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public List<T> GetRange(int index, int count) => Items.GetRange(index, count);
+    public virtual IInvariantList<K, T> GetRange(int index, int count)
+    {
+        var clone = Clone();
+        var done = clone.GetRangeInternal(index, count);
+        return done > 0 ? clone : this;
+    }
+    protected virtual int GetRangeInternal(int index, int count)
+    {
+        if (count == 0 && index >= 0) return ClearInternal();
+        if (index == 0 && count == Count) return 0;
+
+        var range = Items.GetRange(index, count);
+        Items.Clear();
+        Items.AddRange(range);
+        return count;
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -310,18 +301,24 @@ public class CustomList<K, T> : ICustomList<K, T>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual int Replace(int index, T item)
+    public virtual IInvariantList<K, T> Replace(int index, T item)
+    {
+        var clone = Clone();
+        var done = clone.ReplaceInternal(index, item);
+        return done > 0 ? clone : this;
+    }
+    protected virtual int ReplaceInternal(int index, T item)
     {
         item = ValidateItem(item);
 
         var source = Items[index];
         if (SameElement(source, item)) return 0;
 
-        RemoveAt(index);
-        return Insert(index, item);
+        RemoveAtInternal(index);
+        return InsertInternal(index, item);
     }
 
-    static bool SameElement(T source, T target) =>
+    protected virtual bool SameElement(T source, T target) =>
         (source is null && target is null) ||
         (source is not null && source.Equals(target));
 
@@ -330,7 +327,13 @@ public class CustomList<K, T> : ICustomList<K, T>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual int Add(T item)
+    public virtual IInvariantList<K, T> Add(T item)
+    {
+        var clone = Clone();
+        var done = clone.AddInternal(item);
+        return done > 0 ? clone : this;
+    }
+    protected virtual int AddInternal(T item)
     {
         item = ValidateItem(item);
 
@@ -343,21 +346,25 @@ public class CustomList<K, T> : ICustomList<K, T>
         Items.Add(item);
         return 1;
     }
-    void ICollection<T>.Add(T item) => Items.Add(item);
-    int IList.Add(object? value) => Add((T)value!) > 0 ? Count : -1;
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual int AddRange(IEnumerable<T> range)
+    public virtual IInvariantList<K, T> AddRange(IEnumerable<T> range)
+    {
+        var clone = Clone();
+        var done = clone.AddRangeInternal(range);
+        return done > 0 ? clone : this;
+    }
+    protected virtual int AddRangeInternal(IEnumerable<T> range)
     {
         range.ThrowWhenNull();
 
         var num = 0; foreach (var item in range)
         {
-            var r = Add(item);
+            var r = AddInternal(item);
             num += r;
         }
         return num;
@@ -369,7 +376,13 @@ public class CustomList<K, T> : ICustomList<K, T>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual int Insert(int index, T item)
+    public virtual IInvariantList<K, T> Insert(int index, T item)
+    {
+        var clone = Clone();
+        var done = clone.InsertInternal(index, item);
+        return done > 0 ? clone : this;
+    }
+    protected virtual int InsertInternal(int index, T item)
     {
         item = ValidateItem(item);
 
@@ -382,8 +395,6 @@ public class CustomList<K, T> : ICustomList<K, T>
         Items.Insert(index, item);
         return 1;
     }
-    void IList<T>.Insert(int index, T item) => Insert(index, item);
-    void IList.Insert(int index, object? value) => Insert(index, (T)value!);
 
     /// <summary>
     /// <inheritdoc/>
@@ -391,13 +402,19 @@ public class CustomList<K, T> : ICustomList<K, T>
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual int InsertRange(int index, IEnumerable<T> range)
+    public virtual IInvariantList<K, T> InsertRange(int index, IEnumerable<T> range)
+    {
+        var clone = Clone();
+        var done = clone.InsertRangeInternal(index, range);
+        return done > 0 ? clone : this;
+    }
+    protected virtual int InsertRangeInternal(int index, IEnumerable<T> range)
     {
         range.ThrowWhenNull();
 
         var num = 0; foreach (var item in range)
         {
-            var r = Insert(index, item);
+            var r = InsertInternal(index, item);
             num += r;
             index += r;
         }
@@ -409,13 +426,17 @@ public class CustomList<K, T> : ICustomList<K, T>
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public virtual int RemoveAt(int index)
+    public virtual IInvariantList<K, T> RemoveAt(int index)
+    {
+        var clone = Clone();
+        var done = clone.RemoveAtInternal(index);
+        return done > 0 ? clone : this;
+    }
+    protected virtual int RemoveAtInternal(int index)
     {
         Items.RemoveAt(index);
         return 1;
     }
-    void IList<T>.RemoveAt(int index) => RemoveAt(index);
-    void IList.RemoveAt(int index) => RemoveAt(index);
 
     /// <summary>
     /// <inheritdoc/>
@@ -423,7 +444,13 @@ public class CustomList<K, T> : ICustomList<K, T>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual int RemoveRange(int index, int count)
+    public virtual IInvariantList<K, T> RemoveRange(int index, int count)
+    {
+        var clone = Clone();
+        var done = clone.RemoveRangeInternal(index, count);
+        return done > 0 ? clone : this;
+    }
+    protected virtual int RemoveRangeInternal(int index, int count)
     {
         if (count > 0) Items.RemoveRange(index, count);
         return count;
@@ -434,23 +461,33 @@ public class CustomList<K, T> : ICustomList<K, T>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public virtual int Remove(K key)
+    public virtual IInvariantList<K, T> Remove(K key)
+    {
+        var clone = Clone();
+        var done = clone.RemoveInternal(key);
+        return done > 0 ? clone : this;
+    }
+    protected virtual int RemoveInternal(K key)
     {
         var index = IndexOf(key);
-        return index >= 0 ? RemoveAt(index) : 0;
+        return index >= 0 ? RemoveAtInternal(index) : 0;
     }
-    bool ICollection<T>.Remove(T item) => Remove(GetKey(item)) > 0;
-    void IList.Remove(object? value) => Remove(GetKey((T)value!));
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public virtual int RemoveLast(K key)
+    public virtual IInvariantList<K, T> RemoveLast(K key)
+    {
+        var clone = Clone();
+        var done = clone.RemoveLastInternal(key);
+        return done > 0 ? clone : this;
+    }
+    protected virtual int RemoveLastInternal(K key)
     {
         var index = LastIndexOf(key);
-        return index >= 0 ? RemoveAt(index) : 0;
+        return index >= 0 ? RemoveAtInternal(index) : 0;
     }
 
     /// <summary>
@@ -458,13 +495,19 @@ public class CustomList<K, T> : ICustomList<K, T>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public virtual int RemoveAll(K key)
+    public virtual IInvariantList<K, T> RemoveAll(K key)
+    {
+        var clone = Clone();
+        var done = clone.RemoveAllInternal(key);
+        return done > 0 ? clone : this;
+    }
+    protected virtual int RemoveAllInternal(K key)
     {
         var num = 0; while (true)
         {
             var index = IndexOf(key);
 
-            if (index >= 0) num += RemoveAt(index);
+            if (index >= 0) num += RemoveAtInternal(index);
             else break;
         }
         return num;
@@ -475,10 +518,16 @@ public class CustomList<K, T> : ICustomList<K, T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual int Remove(Predicate<T> predicate)
+    public virtual IInvariantList<K, T> Remove(Predicate<T> predicate)
+    {
+        var clone = Clone();
+        var done = clone.RemoveInternal(predicate);
+        return done > 0 ? clone : this;
+    }
+    protected virtual int RemoveInternal(Predicate<T> predicate)
     {
         var index = IndexOf(predicate);
-        return index >= 0 ? RemoveAt(index) : 0;
+        return index >= 0 ? RemoveAtInternal(index) : 0;
     }
 
     /// <summary>
@@ -486,10 +535,16 @@ public class CustomList<K, T> : ICustomList<K, T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual int RemoveLast(Predicate<T> predicate)
+    public virtual IInvariantList<K, T> RemoveLast(Predicate<T> predicate)
+    {
+        var clone = Clone();
+        var done = clone.RemoveLastInternal(predicate);
+        return done > 0 ? clone : this;
+    }
+    protected virtual int RemoveLastInternal(Predicate<T> predicate)
     {
         var index = LastIndexOf(predicate);
-        return index >= 0 ? RemoveAt(index) : 0;
+        return index >= 0 ? RemoveAtInternal(index) : 0;
     }
 
     /// <summary>
@@ -497,13 +552,19 @@ public class CustomList<K, T> : ICustomList<K, T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual int RemoveAll(Predicate<T> predicate)
+    public virtual IInvariantList<K, T> RemoveAll(Predicate<T> predicate)
+    {
+        var clone = Clone();
+        var done = clone.RemoveAllInternal(predicate);
+        return done > 0 ? clone : this;
+    }
+    protected virtual int RemoveAllInternal(Predicate<T> predicate)
     {
         var num = 0; while (true)
         {
             var index = IndexOf(predicate);
 
-            if (index >= 0) num += RemoveAt(index);
+            if (index >= 0) num += RemoveAtInternal(index);
             else break;
         }
         return num;
@@ -513,21 +574,21 @@ public class CustomList<K, T> : ICustomList<K, T>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual int Clear()
+    public virtual IInvariantList<K, T> Clear()
+    {
+        var clone = Clone();
+        var done = clone.ClearInternal();
+        return done > 0 ? clone : this;
+    }
+    protected virtual int ClearInternal()
     {
         var num = Items.Count; if (num > 0) Items.Clear();
         return num;
     }
-    void ICollection<T>.Clear() => Clear();
-    void IList.Clear() => Clear();
 
     // ----------------------------------------------------
 
-    object ICollection.SyncRoot => ((ICollection)Items).SyncRoot;
+    object ICollection.SyncRoot => Items;
     bool ICollection.IsSynchronized => false;
-    bool IList.IsFixedSize => false;
-    bool IList.IsReadOnly => false;
-    bool ICollection<T>.IsReadOnly => false;
-    void ICollection<T>.CopyTo(T[] array, int index) => Items.CopyTo(array, index);
     void ICollection.CopyTo(Array array, int index) => Items.CopyTo((T[])array, index);
 }

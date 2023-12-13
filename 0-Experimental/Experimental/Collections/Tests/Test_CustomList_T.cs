@@ -1,4 +1,4 @@
-namespace Kappa.Domain.Tests;
+﻿namespace Experimental.Collections;
 
 // ========================================================
 public static class Test_CustomList_T
@@ -8,6 +8,7 @@ public static class Test_CustomList_T
         public string Name { get; set; } = name;
         public override string ToString() => Name ?? string.Empty;
     }
+
     internal class Chain : CustomList<Element>
     {
         public Chain(bool sensitive)
@@ -33,6 +34,7 @@ public static class Test_CustomList_T
         }
         public Chain(bool sensitive, Element item) : this(sensitive) => Add(item);
         public Chain(bool sensitive, IEnumerable<Element> range) : this(sensitive) => AddRange(range);
+        
         public bool CaseSensitive
         {
             get => _CaseSensitive;
@@ -41,6 +43,7 @@ public static class Test_CustomList_T
                 if (_CaseSensitive == value) return;
                 _CaseSensitive = value;
 
+                if (Count == 0) return;
                 var range = ToArray();
                 Clear();
                 AddRange(range);
