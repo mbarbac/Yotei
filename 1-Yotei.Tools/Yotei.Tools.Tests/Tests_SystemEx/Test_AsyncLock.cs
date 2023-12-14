@@ -5,7 +5,7 @@ namespace Yotei.Tools.Tests;
 
 // ========================================================
 //[Enforced]
-public static class Test_Locker
+public static class Test_AsyncLock
 {
 #if DEBUG
     static readonly int NUM = 5;
@@ -20,13 +20,13 @@ public static class Test_Locker
 
     static void Print(object? _, string message) => Console.WriteLine(true, White, message);
     static void Print(ConsoleColor color, string message)
-        => Console.WriteLine(true, color, Locker.Format(message));
+        => Console.WriteLine(true, color, AsyncLock.Format(message));
 
     // ----------------------------------------------------
 
     public class Info : IDisposable, IAsyncDisposable
     {
-        public Locker Locker = new();
+        public AsyncLock Locker = new();
         public Random Random = new();
         public int Value = 0;
         public bool TimeoutCaptured = false;

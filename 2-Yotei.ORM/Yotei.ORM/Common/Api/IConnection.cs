@@ -1,4 +1,5 @@
-﻿using Yotei.ORM.Records;
+﻿using Yotei.ORM.Entities;
+using Yotei.ORM.Records;
 
 namespace Yotei.ORM;
 
@@ -6,12 +7,21 @@ namespace Yotei.ORM;
 /// <summary>
 /// Represents a connection with an underlying database.
 /// </summary>
-public interface IConnection : IBaseDisposable
+[Cloneable]
+public partial interface IConnection : IBaseDisposable
 {
     /// <summary>
-    /// The object that describes the underlying database engine.
+    /// The number of times this instance will retry to recover from transient network errors.
     /// </summary>
-    IEngine Engine { get; }
+    int Retries { get; set; }
+
+    /// <summary>
+    /// The amount of time this instance waits before a new attempt to recover from a transient
+    /// network error.
+    /// </summary>
+    TimeSpan RetryInterval { get; set; }
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// Determines if this connection is open or not.
@@ -44,13 +54,18 @@ public interface IConnection : IBaseDisposable
     // ----------------------------------------------------
 
     /// <summary>
-    /// Obtains a transaction associated with this instance.
+    /// Gets the default transaction associated with this connection.
     /// </summary>
     /// <returns></returns>
-    ITransaction GetTransaction();
+    ITransaction Transaction { get; }
 
     /// <summary>
     /// Provides access to the record-oriented capabilities of this connection.
     /// </summary>
     IRecordsGate Records { get; }
+
+    /// <summary>
+    /// The collection of entity maps known to this connection.
+    /// </summary>
+    IEntityMapCollection Maps { get; }
 }

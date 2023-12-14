@@ -3,10 +3,12 @@
 // ========================================================
 public class Persona
 {
+    [SuppressMessage("", "IDE0290")]
     public Persona(string name, int age) { Name = name; _Age = age; }
     public override string ToString() => $"Name:{Name}, Age:{_Age}";
     public int AgeGetter() => _Age;
 
+    [SuppressMessage("", "IDE0051")]
     private const int _Level = 9;
     private readonly int _Age;
     public string Name { get; init; }

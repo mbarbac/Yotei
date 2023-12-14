@@ -2,8 +2,8 @@
 
 // ========================================================
 /// <summary>
-/// An immutable object that represents an underlying database engine.
+/// An immutable object that describes a given database engine.
 /// </summary>
-public interface IEngine
-{
-}
+//public interface IEngine
+//{
+//}

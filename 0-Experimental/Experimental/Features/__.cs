@@ -1,3 +1,3 @@
-﻿namespace Experimental.Collections;
+﻿namespace Experimental.Features;
 
 // ========================================================

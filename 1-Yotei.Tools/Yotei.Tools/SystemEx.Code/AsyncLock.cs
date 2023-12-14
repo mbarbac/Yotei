@@ -1,4 +1,4 @@
-﻿#if DEBUG_LOCKER && DEBUG
+﻿#if DEBUG_ASYNC_LOCK && DEBUG
 #define DEBUGPRINT
 # endif
 
@@ -11,7 +11,7 @@ namespace Yotei.Tools;
 /// the operation that, when disposed, either releases the parent lock or decreases its reentrancy
 /// count.
 /// </summary>
-public class Locker : DisposableClass
+public class AsyncLock : DisposableClass
 {
     static int EnvironmentId => Environment.CurrentManagedThreadId;
 
@@ -24,7 +24,7 @@ public class Locker : DisposableClass
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
-    public Locker() { }
+    public AsyncLock() { }
 
     /// <summary>
     /// <inheritdoc/>
@@ -169,7 +169,7 @@ public class Locker : DisposableClass
         /// </summary>
         /// <param name="parent"></param>
         /// <param name="data"></param>
-        internal Surrogate(Locker parent, object? data)
+        internal Surrogate(AsyncLock parent, object? data)
         {
             Parent = parent;
             Data = data;
@@ -187,7 +187,7 @@ public class Locker : DisposableClass
         /// <summary>
         /// The parent lock this instance was created for.
         /// </summary>
-        public Locker Parent { get; private set; }
+        public AsyncLock Parent { get; private set; }
 
         /// <summary>
         /// The state date passed to this object when trying to obtain a lock.
@@ -364,7 +364,7 @@ public class Locker : DisposableClass
             {
                 if ((DateTime.Now - ini) > timeout)
                     throw new TimeoutException("Timeout has expired.")
-                    .WithData(Parent, nameof(Locker));
+                    .WithData(Parent, nameof(AsyncLock));
             }
         }
 
