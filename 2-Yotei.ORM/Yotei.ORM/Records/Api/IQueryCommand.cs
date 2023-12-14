@@ -2,8 +2,8 @@
 
 // ========================================================
 /// <summary>
-/// Provides access to the record-oriented capabilities of a given connection.
+/// Represents a records-oriented query command.
 /// </summary>
-public interface IRecordCommands
+public interface IQueryCommand : ICommand
 {
 }

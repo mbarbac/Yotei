@@ -32,14 +32,14 @@ public interface ICommand
     /// Executes this command and returns an enumeration of the results that execution produces.
     /// </summary>
     /// <returns></returns>
-    IReader ExecuteReader();
+    ICommandReader ExecuteReader();
 
     /// <summary>
     /// Executes this command and returns an enumeration of the results that execution produces.
     /// </summary>
     /// <param name="token"></param>
     /// <returns></returns>
-    ValueTask<IReader> ExecuteReaderAsync(CancellationToken token = default);
+    ValueTask<ICommandReader> ExecuteReaderAsync(CancellationToken token = default);
 
     /// <summary>
     /// Executes this command and returns an integer as the result of that operation.

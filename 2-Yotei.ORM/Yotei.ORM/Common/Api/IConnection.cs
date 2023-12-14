@@ -47,5 +47,5 @@ public interface IConnection : IBaseDisposable
     /// <summary>
     /// Provides access to the record-oriented capabilities of this connection.
     /// </summary>
-    IRecordCommands Records { get; }
+    IRecordsGate Records { get; }
 }
