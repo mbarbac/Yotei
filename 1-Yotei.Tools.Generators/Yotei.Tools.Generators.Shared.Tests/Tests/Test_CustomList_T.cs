@@ -2,13 +2,14 @@ namespace Yotei.Tools.Generators.Shared.Tests;
 
 // ========================================================
 //[Enforced]
-public static class Test_CustomList
+public static class Test_CustomList_T
 {
     internal class Element(string name)
     {
         public string Name { get; set; } = name;
         public override string ToString() => Name ?? string.Empty;
     }
+
     internal class Chain : CustomList<Element>
     {
         public Chain(bool sensitive)
@@ -24,7 +25,7 @@ public static class Test_CustomList
                 return ReferenceEquals(source, target)
                 || string.Compare(source.Name, target.Name, !CaseSensitive) == 0;
             };
-            AllowDuplicate = (source, target) =>
+            AcceptDuplicate = (source, target) =>
             {
                 return ReferenceEquals(source, target)
                 ? true
@@ -34,6 +35,7 @@ public static class Test_CustomList
         }
         public Chain(bool sensitive, Element item) : this(sensitive) => Add(item);
         public Chain(bool sensitive, IEnumerable<Element> range) : this(sensitive) => AddRange(range);
+
         public bool CaseSensitive
         {
             get => _CaseSensitive;
@@ -41,7 +43,11 @@ public static class Test_CustomList
             {
                 if (_CaseSensitive == value) return;
                 _CaseSensitive = value;
-                ReLoad();
+
+                if (Count == 0) return;
+                var range = ToArray();
+                Clear();
+                AddRange(range);
             }
         }
         bool _CaseSensitive;
@@ -130,7 +136,7 @@ public static class Test_CustomList
 
     //[Enforced]
     [Fact]
-    public static void Test_Find_Key()
+    public static void Test_Find()
     {
         var items = new Chain(false, [xone, xtwo, xthree, xone]);
 

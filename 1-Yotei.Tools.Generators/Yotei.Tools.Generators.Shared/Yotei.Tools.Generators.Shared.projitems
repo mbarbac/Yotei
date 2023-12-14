@@ -17,10 +17,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\NameSyntaxExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\ChainExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\AttributeExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CustomList.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\Debugextensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\ExceptionExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\StringExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx.Api\ICustomList_T.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx.Code\CustomList_T.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx.Code\Debugextensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx.Code\ExceptionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx.Code\StringExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Base\CodeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Base\FileBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Base\BaseDiagnostics.cs" />

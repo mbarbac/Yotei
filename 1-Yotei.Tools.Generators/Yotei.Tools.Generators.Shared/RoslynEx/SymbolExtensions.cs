@@ -43,7 +43,7 @@ internal static class SymbolExtensions
         var list = new CustomList<BaseTypeDeclarationSyntax>()
         {
             Compare = (x, y) => x.IsEquivalentTo(y),
-            AllowDuplicate = (x, y) => false,
+            AcceptDuplicate = (x, y) => false,
         };
 
         foreach (var dec in symbol.DeclaringSyntaxReferences)
@@ -69,7 +69,7 @@ internal static class SymbolExtensions
         var list = new CustomList<PropertyDeclarationSyntax>
         {
             Compare = (x, y) => x.IsEquivalentTo(y),
-            AllowDuplicate = (x, y) => false,
+            AcceptDuplicate = (x, y) => false,
         };
 
         foreach (var dec in symbol.DeclaringSyntaxReferences)
@@ -95,7 +95,7 @@ internal static class SymbolExtensions
         var list = new CustomList<FieldDeclarationSyntax>
         {
             Compare = (x, y) => x.IsEquivalentTo(y),
-            AllowDuplicate = (x, y) => false,
+            AcceptDuplicate = (x, y) => false,
         };
 
         foreach (var dec in symbol.DeclaringSyntaxReferences)
@@ -123,7 +123,7 @@ internal static class SymbolExtensions
         var list = new CustomList<MethodDeclarationSyntax>
         {
             Compare = (x, y) => x.IsEquivalentTo(y),
-            AllowDuplicate = (x, y) => false,
+            AcceptDuplicate = (x, y) => false,
         };
 
         foreach (var dec in symbol.DeclaringSyntaxReferences)

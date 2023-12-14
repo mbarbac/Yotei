@@ -337,7 +337,7 @@ internal class XPropertyNode : PropertyNode
     {
         var list = new CustomList<ITypeSymbol>
         {
-            AllowDuplicate = (x, y) => false,
+            AcceptDuplicate = (x, y) => false,
             Compare = SymbolEqualityComparer.Default.Equals,
         };
 
