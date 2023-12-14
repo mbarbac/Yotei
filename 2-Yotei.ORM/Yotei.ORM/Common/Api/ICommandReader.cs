@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents a forward-only reader of the data produced by an enumerable command.
 /// </summary>
-public interface ICommandReader : IEnumerable, IAsyncEnumerable<object>, IBaseDisposable
+public interface ICommandReader : IEnumerable<object>, IAsyncEnumerable<object>, IBaseDisposable
 {
     /// <summary>
     /// The connection this instance is associated with.
@@ -25,4 +25,58 @@ public interface ICommandReader : IEnumerable, IAsyncEnumerable<object>, IBaseDi
     /// The ordered collection of parameters used by the command when executed.
     /// </summary>
     IParameterList Parameters { get; }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns a list with the results produced by the execution of the command.
+    /// </summary>
+    /// <returns></returns>
+    List<object> ToList();
+
+    /// <summary>
+    /// Returns a list with the results produced by the execution of the command.
+    /// </summary>
+    /// <returns></returns>
+    ValueTask<List<object>> ToListAsync();
+
+    /// <summary>
+    /// Returns an array with the results produced by the execution of the command.
+    /// </summary>
+    /// <returns></returns>
+    object[] ToArray();
+
+    /// <summary>
+    /// Returns an array with the results produced by the execution of the command.
+    /// </summary>
+    /// <returns></returns>
+    ValueTask<object[]> ToArrayAsync();
+
+    /// <summary>
+    /// Returns the first result produced by the execution of the command, or null if any.
+    /// </summary>
+    /// <returns></returns>
+    object? First();
+
+    /// <summary>
+    /// Returns the first result produced by the execution of the command, or null if any.
+    /// </summary>
+    /// <returns></returns>
+    ValueTask<object?> FirstAsync();
+
+    /// <summary>
+    /// Returns the last result produced by the execution of the command, or null if any.
+    /// <br/> This method is provided as a fallback mechanism, as it iterates through all the
+    /// results produced, discarding them until the last one is found.
+    /// </summary>
+    /// <returns></returns>
+    object? Last();
+
+    /// <summary>
+    /// Returns the last result produced by the execution of the command, or null if any.
+    /// <br/> This method is provided as a fallback mechanism, as it iterates through all the
+    /// results produced, discarding them until the last one is found.
+    /// </summary>
+    /// <returns></returns>
+    ValueTask<object?> LastAsync();
 }

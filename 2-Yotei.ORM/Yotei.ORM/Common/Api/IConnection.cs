@@ -9,6 +9,11 @@ namespace Yotei.ORM;
 public interface IConnection : IBaseDisposable
 {
     /// <summary>
+    /// The object that describes the underlying database engine.
+    /// </summary>
+    IEngine Engine { get; }
+
+    /// <summary>
     /// Determines if this connection is open or not.
     /// </summary>
     bool IsOpen { get; }
