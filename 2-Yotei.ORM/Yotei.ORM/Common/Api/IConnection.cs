@@ -1,7 +1,4 @@
-﻿using Yotei.ORM.Entities;
-using Yotei.ORM.Records;
-
-namespace Yotei.ORM;
+﻿namespace Yotei.ORM;
 
 // ========================================================
 /// <summary>
@@ -10,6 +7,11 @@ namespace Yotei.ORM;
 [Cloneable]
 public partial interface IConnection : IBaseDisposable
 {
+    /// <summary>
+    /// The object that describes the underlying database engine used by this instance.
+    /// </summary>
+    IEngine Engine { get; }
+
     /// <summary>
     /// The number of times this instance will retry to recover from transient network errors.
     /// </summary>

@@ -8,19 +8,6 @@
 public interface ICommandReader : ORM.ICommandReader, IEnumerable<IRecord>, IAsyncEnumerable<IRecord>
 {
     /// <summary>
-    /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
-    /// </summary>
-    /// <returns></returns>
-    new IEnumerator<IRecord> GetEnumerator();
-
-    /// <summary>
-    /// <inheritdoc cref="IAsyncEnumerable{T}.GetAsyncEnumerator(CancellationToken)"/>
-    /// </summary>
-    /// <param name="token"></param>
-    /// <returns></returns>
-    IAsyncEnumerator<IRecord> GetEnumeratorAsync(CancellationToken token = default);
-
-    /// <summary>
     /// The schema that describes the structure and contents of the records produced by the
     /// execution of the associated command.
     /// </summary>
@@ -37,8 +24,9 @@ public interface ICommandReader : ORM.ICommandReader, IEnumerable<IRecord>, IAsy
     /// <summary>
     /// Returns a list with the records produced by the execution of the command.
     /// </summary>
+    /// <param name="token"></param>
     /// <returns></returns>
-    new ValueTask<List<IRecord>> ToListAsync();
+    new ValueTask<List<IRecord>> ToListAsync(CancellationToken token = default);
 
     /// <summary>
     /// Returns an array with the records produced by the execution of the command.
@@ -49,8 +37,9 @@ public interface ICommandReader : ORM.ICommandReader, IEnumerable<IRecord>, IAsy
     /// <summary>
     /// Returns an array with the records produced by the execution of the command.
     /// </summary>
+    /// <param name="token"></param>
     /// <returns></returns>
-    new ValueTask<IRecord[]> ToArrayAsync();
+    new ValueTask<IRecord[]> ToArrayAsync(CancellationToken token = default);
 
     /// <summary>
     /// Returns the first result produced by the execution of the command, or null if any.
@@ -61,8 +50,9 @@ public interface ICommandReader : ORM.ICommandReader, IEnumerable<IRecord>, IAsy
     /// <summary>
     /// Returns the first result produced by the execution of the command, or null if any.
     /// </summary>
+    /// <param name="token"></param>
     /// <returns></returns>
-    new ValueTask<IRecord?> FirstAsync();
+    new ValueTask<IRecord?> FirstAsync(CancellationToken token = default);
 
     /// <summary>
     /// Returns the last record produced by the execution of the command, or null if any.
@@ -77,6 +67,7 @@ public interface ICommandReader : ORM.ICommandReader, IEnumerable<IRecord>, IAsy
     /// <br/> This method is provided as a fallback mechanism, as it iterates through all the
     /// records produced, discarding them until the last one is found.
     /// </summary>
+    /// <param name="token"></param>
     /// <returns></returns>
-    new ValueTask<IRecord?> LastAsync();
+    new ValueTask<IRecord?> LastAsync(CancellationToken token = default);
 }

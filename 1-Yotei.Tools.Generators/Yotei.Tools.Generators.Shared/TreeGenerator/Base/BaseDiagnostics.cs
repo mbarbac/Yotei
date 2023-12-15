@@ -198,8 +198,8 @@ internal static class BaseDiagnostics
         DiagnosticSeverity severity = DiagnosticSeverity.Error)
     {
         var id = "BaseGen07";
-        var head = "Type is not partial.";
-        var desc = $"The type '{symbol.Name}' is not a partial one.";
+        var head = "Type has no copy constructor.";
+        var desc = $"The type '{symbol.Name}' has not a copy constructor.";
 
         context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor(
             id, head, desc,

@@ -1,16 +1,12 @@
-﻿namespace Yotei.ORM;
+﻿namespace Experimental.Templates;
 
 // ========================================================
 /// <summary>
-/// An immutable object that represents the ordered collection of parameters in a command.
+/// Represents an immutable list-alike collection of elements.
 /// </summary>
-public interface IParameterList : IEnumerable<IParameter>, ICollection
+/// <typeparam name="T"></typeparam>
+public interface IInvariantList<T> : ICollection, IEnumerable<T>
 {
-    /// <summary>
-    /// The engine this instance is associated with.
-    /// </summary>
-    IEngine Engine { get; }
-
     /// <summary>
     /// Gets the number of elements in this collection.
     /// </summary>
@@ -21,44 +17,44 @@ public interface IParameterList : IEnumerable<IParameter>, ICollection
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    IParameter this[int index] { get; }
+    T this[int index] { get; }
 
     /// <summary>
-    /// Determines if this collection contains an element with the given name.
+    /// Determines if this collection contains the given element.
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    bool Contains(string name);
+    bool Contains(T item);
 
     /// <summary>
-    /// Returns the index of the first element in this collection with the given name, or -1 if
-    /// it cannot be found.
+    /// Returns the index of the first ocurrence of the given element in this collection, or -1
+    /// if it cannot be found.
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    int IndexOf(string name);
+    int IndexOf(T item);
 
     /// <summary>
-    /// Returns the index of the last element in this collection with the given name, or -1 if
-    /// it cannot be found.
+    /// Returns the index of the last ocurrence of the given element in this collection, or -1
+    /// if it cannot be found.
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    int LastIndexOf(string name);
+    int LastIndexOf(T item);
 
     /// <summary>
-    /// Returns the indexes of elements in this collection with the given name.
+    /// Returns the indexes of the ocurrences of the given element in this collection.
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    List<int> IndexesOf(string name);
+    List<int> IndexesOf(T item);
 
     /// <summary>
     /// Determines if this collection contains an element that matches the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    bool Contains(Predicate<IParameter> predicate);
+    bool Contains(Predicate<T> predicate);
 
     /// <summary>
     /// Returns the index of the first ocurrence of an element in this collection that matches
@@ -66,7 +62,7 @@ public interface IParameterList : IEnumerable<IParameter>, ICollection
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int IndexOf(Predicate<IParameter> predicate);
+    int IndexOf(Predicate<T> predicate);
 
     /// <summary>
     /// Returns the index of the last ocurrence of an element in this collection that matches
@@ -74,26 +70,26 @@ public interface IParameterList : IEnumerable<IParameter>, ICollection
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int LastIndexOf(Predicate<IParameter> predicate);
+    int LastIndexOf(Predicate<T> predicate);
 
     /// <summary>
     /// Returns the indexes of the elements in this collection that match the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    List<int> IndexesOf(Predicate<IParameter> predicate);
+    List<int> IndexesOf(Predicate<T> predicate);
 
     /// <summary>
     /// Returns an array with the elements in this collection.
     /// </summary>
     /// <returns></returns>
-    IParameter[] ToArray();
+    T[] ToArray();
 
     /// <summary>
     /// Returns a list with the elements in this collection.
     /// </summary>
     /// <returns></returns>
-    List<IParameter> ToList();
+    List<T> ToList();
 
     // ----------------------------------------------------
 
@@ -104,7 +100,7 @@ public interface IParameterList : IEnumerable<IParameter>, ICollection
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    IParameterList GetRange(int index, int count);
+    IInvariantList<T> GetRange(int index, int count);
 
     /// <summary>
     /// Returns a new instance where the element at the given index has been replaced by the new
@@ -114,7 +110,7 @@ public interface IParameterList : IEnumerable<IParameter>, ICollection
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    IParameterList Replace(int index, IParameter item);
+    IInvariantList<T> Replace(int index, T item);
 
     /// <summary>
     /// Returns a new instance where the given element has been added to the collection. If no
@@ -122,16 +118,7 @@ public interface IParameterList : IEnumerable<IParameter>, ICollection
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    IParameterList Add(IParameter item);
-
-    /// <summary>
-    /// Returns a new instance where a new element, built using the given value and a name that
-    /// is automatically generated, has been added to the collection.
-    /// </summary>
-    /// <param name="value"></param>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    IParameterList AddNew(object? value, out IParameter item);
+    IInvariantList<T> Add(T item);
 
     /// <summary>
     /// Returns a new instance where the elements from the given range have been added to the
@@ -139,7 +126,7 @@ public interface IParameterList : IEnumerable<IParameter>, ICollection
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    IParameterList AddRange(IEnumerable<IParameter> range);
+    IInvariantList<T> AddRange(IEnumerable<T> range);
 
     /// <summary>
     /// Returns a new instance where the given element has been inserted into the collection at
@@ -148,16 +135,7 @@ public interface IParameterList : IEnumerable<IParameter>, ICollection
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    IParameterList Insert(int index, IParameter item);
-
-    /// <summary>
-    /// Returns a new instance where a new element, built using the given value and a name that
-    /// is automatically generated, has been inserted into the collection at the given index.
-    /// </summary>
-    /// <param name="value"></param>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    IParameterList InsertNew(int index, object? value, out IParameter item);
+    IInvariantList<T> Insert(int index, T item);
 
     /// <summary>
     /// Returns a new instance the elements from the given range have been inserted into the
@@ -167,7 +145,7 @@ public interface IParameterList : IEnumerable<IParameter>, ICollection
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    IParameterList InsertRange(int index, IEnumerable<IParameter> range);
+    IInvariantList<T> InsertRange(int index, IEnumerable<T> range);
 
     /// <summary>
     /// Returns a new instance where the element at the given index has been removed from the
@@ -175,7 +153,7 @@ public interface IParameterList : IEnumerable<IParameter>, ICollection
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    IParameterList RemoveAt(int index);
+    IInvariantList<T> RemoveAt(int index);
 
     /// <summary>
     /// Returns a new instance where the given number of elements, starting from the given index,
@@ -185,31 +163,31 @@ public interface IParameterList : IEnumerable<IParameter>, ICollection
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    IParameterList RemoveRange(int index, int count);
+    IInvariantList<T> RemoveRange(int index, int count);
 
     /// <summary>
-    /// Returns a new instance where the first element with the given name has been removed. If
-    /// no changes are detected, returns the original instance.
+    /// Returns a new instance where the first ocurrence of the given element has been removed.
+    /// If no changes are detected, returns the original instance.
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    IParameterList Remove(string name);
+    IInvariantList<T> Remove(T item);
 
     /// <summary>
-    /// Returns a new instance where the last element with the given name has been removed. If
-    /// no changes are detected, returns the original instance.
+    /// Returns a new instance where the last ocurrence of the given element has been removed.
+    /// If no changes are detected, returns the original instance.
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    IParameterList RemoveLast(string name);
+    IInvariantList<T> RemoveLast(T item);
 
     /// <summary>
-    /// Returns a new instance where all the elements with the given name have been removed. If
-    /// no changes are detected, returns the original instance.
+    /// Returns a new instance where all the ocurrences of the given element have been removed.
+    /// If no changes are detected, returns the original instance.
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    IParameterList RemoveAll(string name);
+    IInvariantList<T> RemoveAll(T item);
 
     /// <summary>
     /// Returns a new instance where the first element that matches the given predicate has been
@@ -217,7 +195,7 @@ public interface IParameterList : IEnumerable<IParameter>, ICollection
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IParameterList Remove(Predicate<IParameter> predicate);
+    IInvariantList<T> Remove(Predicate<T> predicate);
 
     /// <summary>
     /// Returns a new instance where the last element that matches the given predicate has been
@@ -225,7 +203,7 @@ public interface IParameterList : IEnumerable<IParameter>, ICollection
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IParameterList RemoveLast(Predicate<IParameter> predicate);
+    IInvariantList<T> RemoveLast(Predicate<T> predicate);
 
     /// <summary>
     /// Returns a new instance where all elements that match the given predicate has been removed.
@@ -233,12 +211,12 @@ public interface IParameterList : IEnumerable<IParameter>, ICollection
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IParameterList RemoveAll(Predicate<IParameter> predicate);
+    IInvariantList<T> RemoveAll(Predicate<T> predicate);
 
     /// <summary>
     /// Returns a new instance where all the elements have been removed. If no changes are
     /// detected, returns the original instance.
     /// </summary>
     /// <returns></returns>
-    IParameterList Clear();
+    IInvariantList<T> Clear();
 }

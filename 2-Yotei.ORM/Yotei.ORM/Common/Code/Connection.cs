@@ -1,12 +1,10 @@
-﻿using Yotei.ORM.Entities;
-using Yotei.ORM.Records;
-
-namespace Yotei.ORM.Code;
+﻿namespace Yotei.ORM.Code;
 
 // ========================================================
 /// <summary>
 /// <inheritdoc cref="IConnection"/>
 /// </summary>
+[SuppressMessage("", "IDE0290")]
 [Cloneable]
 public abstract partial class Connection : DisposableClass, IConnection
 {
@@ -18,13 +16,14 @@ public abstract partial class Connection : DisposableClass, IConnection
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
-    public Connection() { }
+    /// <param name="engine"></param>
+    public Connection(IEngine engine) => Engine = engine.ThrowWhenNull();
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected Connection(Connection source)
+    protected Connection(Connection source) : this(source.Engine)
     {
         Retries = source.Retries;
         RetryInterval = source.RetryInterval;
@@ -69,6 +68,11 @@ public abstract partial class Connection : DisposableClass, IConnection
     protected AsyncLock AsyncLock { get; } = new();
 
     // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public IEngine Engine { get; }
 
     /// <summary>
     /// <inheritdoc/>
@@ -220,15 +224,58 @@ public abstract partial class Connection : DisposableClass, IConnection
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public ITransaction Transaction => throw null;
+    public ITransaction Transaction
+    {
+        get
+        {
+            if (IsDisposed || OnDisposing) // Special case...
+            {
+                if (_Transaction == null)
+                {
+                    _Transaction = CreateTransaction();
+                    _Transaction.Dispose();
+                }
+            }
+            else // Regular case...
+            {
+                if (_Transaction == null || _Transaction.IsDisposed)
+                    _Transaction = CreateTransaction();
+            }
+            return _Transaction;
+        }
+        protected set // Need a setter for when the derived classes change their defaults...
+        {
+            if (value != null && this != value.Connection)
+                throw new ArgumentException(
+                    "The connection of the given transaction is not this instance.")
+                    .WithData(value)
+                    .WithData(this);
+
+            _Transaction = value;
+        }
+    }
+    ITransaction? _Transaction = null;
+
+    /// <summary>
+    /// Invoked to create a default transaction for this instance.
+    /// </summary>
+    protected abstract ITransaction CreateTransaction();
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public IRecordsGate Records => throw null;
+    public IRecordsGate Records => _Records ??= CreateRecordsGate();
+    IRecordsGate _Records = default!;
+
+    /// <summary>
+    /// Invoked to create a records gate for this instance.
+    /// </summary>
+    protected abstract IRecordsGate CreateRecordsGate();
 
     /// <summary>
     /// <<inheritdoc/>
     /// </summary>
-    public IEntityMapCollection Maps => throw null;
+    public IEntityMapCollection Maps { get; } = new EntityMapCollection();
 }

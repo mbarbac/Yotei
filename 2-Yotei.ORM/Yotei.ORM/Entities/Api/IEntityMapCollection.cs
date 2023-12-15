@@ -42,7 +42,7 @@ public interface IEntityMapCollection : IEnumerable<IEntityMap>
 
     /// <summary>
     /// Registers the given map into this collection, if it was not registered yet. By default,
-    /// the last one added becomes the default map for its entity type.
+    /// the map being added becomes the default map for its entity type.
     /// </summary>
     /// <param name="map"></param>
     /// <param name="asDefault"></param>
@@ -51,7 +51,7 @@ public interface IEntityMapCollection : IEnumerable<IEntityMap>
 
     /// <summary>
     /// Removes the given map from this collection. Removed maps are still functional, but are
-    /// not discoverable for the associated connection.
+    /// not discoverable by the associated connection.
     /// </summary>
     /// <param name="map"></param>
     /// <returns></returns>

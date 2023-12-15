@@ -28,6 +28,8 @@ public interface ICommand
     /// <returns></returns>
     string GetText(bool iterable, out IParameterList parameters);
 
+    // ----------------------------------------------------
+
     /// <summary>
     /// Executes this command and returns an enumeration of the results that execution produces.
     /// </summary>

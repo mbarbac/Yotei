@@ -12,11 +12,6 @@ public interface ICommandReader : IEnumerable<object>, IAsyncEnumerable<object>,
     IConnection Connection { get; }
 
     /// <summary>
-    /// The cancellation token to used with async operations.
-    /// </summary>
-    CancellationToken CancellationToken { get; }
-
-    /// <summary>
     /// The text of the command executed against the underlying database.
     /// </summary>
     string CommandText { get; }
@@ -37,8 +32,9 @@ public interface ICommandReader : IEnumerable<object>, IAsyncEnumerable<object>,
     /// <summary>
     /// Returns a list with the results produced by the execution of the command.
     /// </summary>
+    /// <param name="token"></param>
     /// <returns></returns>
-    ValueTask<List<object>> ToListAsync();
+    ValueTask<List<object>> ToListAsync(CancellationToken token = default);
 
     /// <summary>
     /// Returns an array with the results produced by the execution of the command.
@@ -49,8 +45,9 @@ public interface ICommandReader : IEnumerable<object>, IAsyncEnumerable<object>,
     /// <summary>
     /// Returns an array with the results produced by the execution of the command.
     /// </summary>
+    /// <param name="token"></param>
     /// <returns></returns>
-    ValueTask<object[]> ToArrayAsync();
+    ValueTask<object[]> ToArrayAsync(CancellationToken token = default);
 
     /// <summary>
     /// Returns the first result produced by the execution of the command, or null if any.
@@ -61,8 +58,9 @@ public interface ICommandReader : IEnumerable<object>, IAsyncEnumerable<object>,
     /// <summary>
     /// Returns the first result produced by the execution of the command, or null if any.
     /// </summary>
+    /// <param name="token"></param>
     /// <returns></returns>
-    ValueTask<object?> FirstAsync();
+    ValueTask<object?> FirstAsync(CancellationToken token = default);
 
     /// <summary>
     /// Returns the last result produced by the execution of the command, or null if any.
@@ -77,6 +75,7 @@ public interface ICommandReader : IEnumerable<object>, IAsyncEnumerable<object>,
     /// <br/> This method is provided as a fallback mechanism, as it iterates through all the
     /// results produced, discarding them until the last one is found.
     /// </summary>
+    /// <param name="token"></param>
     /// <returns></returns>
-    ValueTask<object?> LastAsync();
+    ValueTask<object?> LastAsync(CancellationToken token = default);
 }
