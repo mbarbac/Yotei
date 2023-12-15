@@ -4,7 +4,6 @@
 /// <summary>
 /// <inheritdoc cref="IParameter"/>
 /// </summary>
-[SuppressMessage("", "IDE0290")]
 public class Parameter : IParameter
 {
     /// <summary>

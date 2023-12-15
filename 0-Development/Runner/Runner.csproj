@@ -12,8 +12,8 @@
 
    <ItemGroup>
 	  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-	  <PackageReference Include="xunit" Version="2.6.2" />
-	  <PackageReference Include="xunit.runner.visualstudio" Version="2.5.4">
+	  <PackageReference Include="xunit" Version="2.6.3" />
+	  <PackageReference Include="xunit.runner.visualstudio" Version="2.5.5">
 		 <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		 <PrivateAssets>all</PrivateAssets>
 	  </PackageReference>
@@ -29,6 +29,7 @@
 	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.Generators.Shared.Tests\Yotei.Tools.Generators.Shared.Tests.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.Generators.Tests\Yotei.Tools.Generators.Tests.csproj" />
 	  <ProjectReference Include="..\..\2-Yotei.ORM\Yotei.ORM.Tests\Yotei.ORM.Tests.csproj" />
+	  <ProjectReference Include="..\..\3-Yotei.ORM.Relational\Yotei.ORM.Relational.FakeDB\Yotei.ORM.Relational.FakeDB.csproj" />
    </ItemGroup>
 
    <!-- DEBUG configuration -->

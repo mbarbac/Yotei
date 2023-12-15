@@ -50,8 +50,7 @@ public partial interface IConnection : IBaseDisposable
     /// <summary>
     /// Closes the connection with the underlying database.
     /// </summary>
-    /// <param name="token"></param>
-    ValueTask CloseAsync(CancellationToken token = default);
+    ValueTask CloseAsync();
 
     // ----------------------------------------------------
 

@@ -44,6 +44,8 @@ public abstract class Transaction : DisposableClass, ITransaction
     /// <returns></returns>
     public override string ToString() => $"ORM.Transaction({Connection})";
 
+    // ----------------------------------------------------
+
     /// <summary>
     /// The object used to synchronize operations on this instance.
     /// </summary>
@@ -58,7 +60,7 @@ public abstract class Transaction : DisposableClass, ITransaction
     /// The nesting level of this instance. A value of cero means this transaction has not been
     /// started yet.
     /// </summary>
-    public int Level { get; protected set; }
+    public int Level { get; private set; }
 
     // ----------------------------------------------------
 
@@ -196,7 +198,7 @@ public abstract class Transaction : DisposableClass, ITransaction
 
                 if (OpenedByThis)
                 {
-                    await Connection.CloseAsync(token).ConfigureAwait(false);
+                    await Connection.CloseAsync().ConfigureAwait(false);
                     OpenedByThis = false;
                 }
             }

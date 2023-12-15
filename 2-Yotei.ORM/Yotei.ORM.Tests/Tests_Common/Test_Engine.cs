@@ -1,3 +1,4 @@
+using Yotei.ORM.Code;
 namespace Yotei.ORM.Tests;
 
 // ========================================================

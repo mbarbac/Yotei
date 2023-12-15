@@ -26,6 +26,17 @@ public abstract class CommandReader : DisposableClass, ICommandReader
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    /// <returns></returns>
+    public override string ToString()
+    {
+        var str = CommandText;
+        if (Parameters.Count != 0) str += $"; -- [{string.Join(", ", Parameters)}]";
+        return str;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public IConnection Connection { get; }
 
     /// <summary>

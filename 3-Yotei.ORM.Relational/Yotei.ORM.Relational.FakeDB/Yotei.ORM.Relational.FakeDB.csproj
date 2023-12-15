@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
    <PropertyGroup>
 	  <TargetFramework>net8.0</TargetFramework>
@@ -8,11 +8,10 @@
 	  <IsPackable>false</IsPackable>
 	  <IsTestProject>true</IsTestProject>
 	  <Configurations>Debug;Release;Local</Configurations>
-	  <NoWarn>CS1633;IDE0065</NoWarn>
+	  <NoWarn>CS0436</NoWarn>
    </PropertyGroup>
    <!--
-   CS1633: testing arbitrary pragma
-   IDE0065: directives placed outside namespace
+   CS0436: Conflicting imported types (generator attributes)
    -->
 
    <ItemGroup>
@@ -27,18 +26,23 @@
 		 <PrivateAssets>all</PrivateAssets>
 	  </PackageReference>
    </ItemGroup>
+   <ItemGroup>
+	  <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.2" />
+   </ItemGroup>
 
    <!-- DEBUG configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Debug'">
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
-	  <ProjectReference Include="..\Yotei.Tools.WithGenerator\Yotei.Tools.WithGenerator.csproj">
+	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.CloneGenerator\Yotei.Tools.CloneGenerator.csproj">
 		 <OutputItemType>Analyzer</OutputItemType>
 		 <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
 	  </ProjectReference>
-	  <ProjectReference Include="..\Yotei.Tools.CloneGenerator\Yotei.Tools.CloneGenerator.csproj">
+	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.WithGenerator\Yotei.Tools.WithGenerator.csproj">
 		 <OutputItemType>Analyzer</OutputItemType>
 		 <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
 	  </ProjectReference>
+	  <ProjectReference Include="..\..\2-Yotei.ORM\Yotei.ORM\Yotei.ORM.csproj" />
+	  <ProjectReference Include="..\Yotei.ORM.Relational\Yotei.ORM.Relational.csproj" />
    </ItemGroup>
 
    <!-- LOCAL configuration -->
@@ -46,6 +50,8 @@
 	  <PackageReference Include="Yotei.Tools" Version="0.5.31-v0001" />
 	  <PackageReference Include="Yotei.Tools.WithGenerator" Version="0.5.21-v0001" />
 	  <PackageReference Include="Yotei.Tools.CloneGenerator" Version="0.5.21-v0001" />
+	  <PackageReference Include="Yotei.ORM" Version="0.2.4-v0001" />
+	  <PackageReference Include="Yotei.ORM.Relational" Version="0.2.2-v0001" />
    </ItemGroup>
 
    <!-- RELEASE configuration -->
@@ -53,11 +59,16 @@
 	  <PackageReference Include="Yotei.Tools" Version="0.5.30" />
 	  <PackageReference Include="Yotei.Tools.WithGenerator" Version="0.5.20" />
 	  <PackageReference Include="Yotei.Tools.CloneGenerator" Version="0.5.20" />
+	  <PackageReference Include="Yotei.ORM" Version="0.2.3" />
+	  <PackageReference Include="Yotei.ORM.Relational" Version="0.2.1" />
    </ItemGroup>
 
    <!-- Emit generated files -->
    <ItemGroup>
 	  <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
+   </ItemGroup>
+   <ItemGroup>
+	  <Folder Include="SQL\" />
    </ItemGroup>
 
    <PropertyGroup>

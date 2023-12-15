@@ -4,7 +4,6 @@
 /// <summary>
 /// <inheritdoc cref="IConnection"/>
 /// </summary>
-[SuppressMessage("", "IDE0290")]
 [Cloneable]
 public abstract partial class Connection : DisposableClass, IConnection
 {
@@ -17,6 +16,7 @@ public abstract partial class Connection : DisposableClass, IConnection
     /// Initializes a new instance.
     /// </summary>
     /// <param name="engine"></param>
+    [SuppressMessage("", "IDE0290")]
     public Connection(IEngine engine) => Engine = engine.ThrowWhenNull();
 
     /// <summary>
@@ -60,7 +60,7 @@ public abstract partial class Connection : DisposableClass, IConnection
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"ORM.Connection";
+    public override string ToString() => $"ORM.Connection({Engine})";
 
     /// <summary>
     /// The object used to synchronize operations on this instance.
@@ -201,22 +201,20 @@ public abstract partial class Connection : DisposableClass, IConnection
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="token"></param>
-    public async ValueTask CloseAsync(CancellationToken token = default)
+    public async ValueTask CloseAsync()
     {
         if (IsDisposed) return;
         if (!IsOpen) return;
 
-        await using var disp = await AsyncLock.LockAsync(token).ConfigureAwait(false);
-        await OnCloseAsync(token).ConfigureAwait(false);
+        await using var disp = await AsyncLock.LockAsync().ConfigureAwait(false);
+        await OnCloseAsync().ConfigureAwait(false);
     }
 
     /// <summary>
     /// Invoked to close the connection with the underlying database.
     /// </summary>
-    /// <param name="token"></param>
     /// <returns></returns>
-    protected abstract ValueTask OnCloseAsync(CancellationToken token);
+    protected abstract ValueTask OnCloseAsync();
 
     // ----------------------------------------------------
 
@@ -272,7 +270,7 @@ public abstract partial class Connection : DisposableClass, IConnection
     /// <summary>
     /// Invoked to create a records gate for this instance.
     /// </summary>
-    protected abstract IRecordsGate CreateRecordsGate();
+    protected virtual IRecordsGate CreateRecordsGate() => new RecordsGate(this);
 
     /// <summary>
     /// <<inheritdoc/>

@@ -20,7 +20,7 @@ public abstract class Command : ICommand
     public override string ToString()
     {
         var str = GetText(out var pars);
-        if (pars != null && pars.Count > 0) str += $"; [{string.Join(", ", pars)}]";
+        if (pars != null && pars.Count > 0) str += $"; -- [{string.Join(", ", pars)}]";
         return str;
     }
 
