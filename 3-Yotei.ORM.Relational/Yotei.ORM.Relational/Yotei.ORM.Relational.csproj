@@ -68,6 +68,9 @@
    <ItemGroup>
 	  <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
    </ItemGroup>
+   <ItemGroup>
+     <None Update="LICENSE" Pack="true" />
+   </ItemGroup>
 
    <PropertyGroup>
 	  <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
