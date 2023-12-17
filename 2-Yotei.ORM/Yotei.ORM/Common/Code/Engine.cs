@@ -114,4 +114,51 @@ public abstract partial class Engine : IEngine
         init => _RightTerminator = ValidateTerminator(value);
     }
     char _RightTerminator = RIGHTTERMINATOR;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="ch"></param>
+    /// <returns></returns>
+    public List<int> UnwrappedIndexes(string? value, char ch)
+    {
+        var nums = new List<int>();
+        var deep = 0;
+
+        // Obvious case...
+        if (value is null) return nums;
+
+        // No terminators...
+        if (!UseTerminators)
+        {
+            for (int i = 0; i < value.Length; i++) if (value[i] == ch) nums.Add(i);
+            return nums;
+        }
+
+        // Left and Right terminators are the same...
+        if (LeftTerminator == RightTerminator)
+        {
+            for (int i = 0; i < value.Length; i++)
+            {
+                if (value[i] == LeftTerminator) { deep = deep == 0 ? 1 : 0; continue; }
+                if (value[i] == ch && deep == 0) nums.Add(i);
+            }
+            return nums;
+        }
+
+        // Different terminators...
+        else
+        {
+            for (int i = 0; i < value.Length; i++)
+            {
+                if (value[i] == LeftTerminator) { deep++; continue; }
+                if (value[i] == RightTerminator) { deep--; if (deep < 0) deep = 0; continue; }
+                if (value[i] == ch && deep == 0) nums.Add(i);
+            }
+            return nums;
+        }
+    }
 }

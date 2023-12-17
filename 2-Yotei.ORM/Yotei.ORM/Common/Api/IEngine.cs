@@ -49,4 +49,16 @@ public partial interface IEngine
     /// The right terminator uses to wrap the identifier-alike names, if terminators are used.
     /// </summary>
     [WithGenerator] char RightTerminator { get; }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns a list with the indexes of the unwrapped ocurrences of the given character in
+    /// the given source value. Unwrapped ocurrences are those not protected by the terminators
+    /// of the engine, if any are used.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="ch"></param>
+    /// <returns></returns>
+    List<int> UnwrappedIndexes(string? value, char ch);
 }
