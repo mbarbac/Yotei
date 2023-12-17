@@ -6,9 +6,10 @@
 	  <ImplicitUsings>disable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
 	  <Configurations>Debug;Release;Local</Configurations>
-	  <NoWarn>CS0436</NoWarn>
+	  <NoWarn>IDE0290;CS0436</NoWarn>
    </PropertyGroup>
    <!--
+   IDE0290: Use primary constructor.
    CS0436: Conflicting imported types (generator attributes)
    -->
 

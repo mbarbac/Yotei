@@ -1,4 +1,4 @@
-namespace Yotei.ORM.Relational.FakeDB;
+namespace Yotei.ORM.Relational.FakeDB.DTO;
 
 // ========================================================
 public class EmployeeTalentDTO

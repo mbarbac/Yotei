@@ -26,8 +26,10 @@
 		 <PrivateAssets>all</PrivateAssets>
 	  </PackageReference>
    </ItemGroup>
+   
    <ItemGroup>
 	  <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.2" />
+	  <Folder Include="SQL\" />
    </ItemGroup>
 
    <!-- DEBUG configuration -->
@@ -66,9 +68,6 @@
    <!-- Emit generated files -->
    <ItemGroup>
 	  <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
-   </ItemGroup>
-   <ItemGroup>
-	  <Folder Include="SQL\" />
    </ItemGroup>
 
    <PropertyGroup>
