@@ -4,18 +4,18 @@ namespace Yotei.ORM.Tests;
 //[Enforced]
 public static class Test_ParameterList
 {
-    readonly static Parameter x007 = new("Id", "007");
-    readonly static Parameter x008 = new("Id", "008");
-    readonly static Parameter xJames = new("FirstName", "James");
-    readonly static Parameter xBond = new("LastName", "Bond");
-    readonly static Parameter xMi6 = new("Organization", "Mi6");
+    readonly static Code.Parameter x007 = new("Id", "007");
+    readonly static Code.Parameter x008 = new("Id", "008");
+    readonly static Code.Parameter xJames = new("FirstName", "James");
+    readonly static Code.Parameter xBond = new("LastName", "Bond");
+    readonly static Code.Parameter xMi6 = new("Organization", "Mi6");
 
     //[Enforced]
     [Fact]
     public static void Test_Create_Empty()
     {
         var engine = new FakeEngine();
-        var items = new ParameterList(engine);
+        var items = new Code.ParameterList(engine);
         Assert.Empty(items);
     }
 
@@ -24,14 +24,14 @@ public static class Test_ParameterList
     public static void Test_Create_Single()
     {
         var engine = new FakeEngine();
-        var items = new ParameterList(engine, x007);
+        var items = new Code.ParameterList(engine, x007);
         Assert.Single(items);
         Assert.Same(x007, items[0]);
 
-        try { _ = new ParameterList(engine, (Parameter)null!); Assert.Fail(); }
+        try { _ = new Code.ParameterList(engine, (Code.Parameter)null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
 
-        try { _ = new ParameterList(engine, (Parameter)new("", null)); Assert.Fail(); }
+        try { _ = new Code.ParameterList(engine, (Code.Parameter)new("", null)); Assert.Fail(); }
         catch (ArgumentException) { }
     }
 
@@ -40,25 +40,25 @@ public static class Test_ParameterList
     public static void Test_Create_Many()
     {
         var engine = new FakeEngine();
-        var items = new ParameterList(engine, []);
+        var items = new Code.ParameterList(engine, []);
         Assert.Empty(items);
 
-        items = new ParameterList(engine, [x007, xJames, xBond]);
+        items = new Code.ParameterList(engine, [x007, xJames, xBond]);
         Assert.Equal(3, items.Count);
         Assert.Same(x007, items[0]);
         Assert.Same(xJames, items[1]);
         Assert.Same(xBond, items[2]);
 
-        try { _ = new ParameterList(engine, (IEnumerable<Parameter>)null!); Assert.Fail(); }
+        try { _ = new Code.ParameterList(engine, (IEnumerable<Code.Parameter>)null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
 
-        try { _ = new ParameterList(engine, [x007, null!]); Assert.Fail(); }
+        try { _ = new Code.ParameterList(engine, [x007, null!]); Assert.Fail(); }
         catch (ArgumentNullException) { }
 
-        try { _ = new ParameterList(engine, [x007, new Parameter("", null)]); Assert.Fail(); }
+        try { _ = new Code.ParameterList(engine, [x007, new Code.Parameter("", null)]); Assert.Fail(); }
         catch (ArgumentException) { }
 
-        try { _ = new ParameterList(engine, [x007, new Parameter("Id", null)]); Assert.Fail(); }
+        try { _ = new Code.ParameterList(engine, [x007, new Code.Parameter("Id", null)]); Assert.Fail(); }
         catch (DuplicateException) { }
     }
 
@@ -67,7 +67,7 @@ public static class Test_ParameterList
     public static void Test_Clone()
     {
         var engine = new FakeEngine();
-        var source = new ParameterList(engine, [x007, xJames, xBond]);
+        var source = new Code.ParameterList(engine, [x007, xJames, xBond]);
 
         var target = source.Clone();
         Assert.NotSame(source, target);
@@ -82,7 +82,7 @@ public static class Test_ParameterList
     public static void Test_Find_Key()
     {
         var engine = new FakeEngine();
-        var items = new ParameterList(engine, [x007, xJames, xBond]);
+        var items = new Code.ParameterList(engine, [x007, xJames, xBond]);
 
         Assert.Equal(-1, items.IndexOf("any"));
         Assert.Equal(0, items.IndexOf("ID"));
@@ -93,7 +93,7 @@ public static class Test_ParameterList
     public static void Test_Find_Predicate()
     {
         var engine = new FakeEngine();
-        var items = new ParameterList(engine, [x007, xJames, xBond]);
+        var items = new Code.ParameterList(engine, [x007, xJames, xBond]);
 
         Assert.Equal(-1, items.IndexOf(x => x.Name.Contains('z')));
 
@@ -110,7 +110,7 @@ public static class Test_ParameterList
     public static void Test_GetRange()
     {
         var engine = new FakeEngine();
-        var source = new ParameterList(engine, [x007, xJames, xBond]);
+        var source = new Code.ParameterList(engine, [x007, xJames, xBond]);
 
         var target = source.GetRange(0, 0);
         Assert.Empty(target);
@@ -126,26 +126,26 @@ public static class Test_ParameterList
     public static void Test_Replace()
     {
         var engine = new FakeEngine();
-        var source = new ParameterList(engine, [x007, xJames, xBond]);
+        var source = new Code.ParameterList(engine, [x007, xJames, xBond]);
 
         var target = source.Replace(0, x007);
         Assert.Same(source, target);
 
-        target = source.Replace(0, new Parameter("Id", "007"));
+        target = source.Replace(0, new Code.Parameter("Id", "007"));
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.NotSame(x007, target[0]); Assert.Equal("Id", target[0].Name);
         Assert.Same(xJames, target[1]);
         Assert.Same(xBond, target[2]);
 
-        target = source.Replace(0, new Parameter("Id", "008"));
+        target = source.Replace(0, new Code.Parameter("Id", "008"));
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.NotSame(x007, target[0]); Assert.Equal("Id", target[0].Name);
         Assert.Same(xJames, target[1]);
         Assert.Same(xBond, target[2]);
 
-        try { source.Replace(0, new Parameter("FirstName", "James")); Assert.Fail(); }
+        try { source.Replace(0, new Code.Parameter("FirstName", "James")); Assert.Fail(); }
         catch (DuplicateException) { }
 
         try { source.Replace(0, null!); Assert.Fail(); }
@@ -157,7 +157,7 @@ public static class Test_ParameterList
     public static void Test_Add()
     {
         var engine = new FakeEngine();
-        var source = new ParameterList(engine, [x007, xJames, xBond]);
+        var source = new Code.ParameterList(engine, [x007, xJames, xBond]);
 
         var target = source.Add(xMi6);
         Assert.NotSame(source, target);
@@ -167,7 +167,7 @@ public static class Test_ParameterList
         Assert.Same(xBond, target[2]);
         Assert.Same(xMi6, target[3]);
 
-        try { source.Add(new Parameter("Id", "008")); Assert.Fail(); }
+        try { source.Add(new Code.Parameter("Id", "008")); Assert.Fail(); }
         catch (DuplicateException) { }
 
         try { source.Add(null!); Assert.Fail(); }
@@ -179,7 +179,7 @@ public static class Test_ParameterList
     public static void Test_AddNew()
     {
         var engine = new FakeEngine();
-        var source = new ParameterList(engine, [x007, xJames, xBond]);
+        var source = new Code.ParameterList(engine, [x007, xJames, xBond]);
 
         var target = source.AddNew("UK", out var item);
         Assert.NotSame(source, target);
@@ -193,7 +193,7 @@ public static class Test_ParameterList
     public static void Test_AddRange()
     {
         var engine = new FakeEngine();
-        var source = new ParameterList(engine, [x007, xJames]);
+        var source = new Code.ParameterList(engine, [x007, xJames]);
 
         var target = source.AddRange([]);
         Assert.Same(source, target);
@@ -212,7 +212,7 @@ public static class Test_ParameterList
     public static void Test_Insert()
     {
         var engine = new FakeEngine();
-        var source = new ParameterList(engine, [x007, xJames, xBond]);
+        var source = new Code.ParameterList(engine, [x007, xJames, xBond]);
 
         var target = source.Insert(3, xMi6);
         Assert.NotSame(source, target);
@@ -222,7 +222,7 @@ public static class Test_ParameterList
         Assert.Same(xBond, target[2]);
         Assert.Same(xMi6, target[3]);
 
-        try { source.Insert(3, new Parameter("Id", "008")); Assert.Fail(); }
+        try { source.Insert(3, new Code.Parameter("Id", "008")); Assert.Fail(); }
         catch (DuplicateException) { }
 
         try { source.Insert(3, null!); Assert.Fail(); }
@@ -234,7 +234,7 @@ public static class Test_ParameterList
     public static void Test_InsertNew()
     {
         var engine = new FakeEngine();
-        var source = new ParameterList(engine, [x007, xJames, xBond]);
+        var source = new Code.ParameterList(engine, [x007, xJames, xBond]);
 
         var target = source.InsertNew(3, "UK", out var item);
         Assert.NotSame(source, target);
@@ -248,7 +248,7 @@ public static class Test_ParameterList
     public static void Test_InsertRange()
     {
         var engine = new FakeEngine();
-        var source = new ParameterList(engine, [x007, xJames]);
+        var source = new Code.ParameterList(engine, [x007, xJames]);
 
         var target = source.InsertRange(2, []);
         Assert.Same(source, target);
@@ -267,7 +267,7 @@ public static class Test_ParameterList
     public static void Test_RemoveAt()
     {
         var engine = new FakeEngine();
-        var source = new ParameterList(engine, [x007, xJames, xBond]);
+        var source = new Code.ParameterList(engine, [x007, xJames, xBond]);
 
         var target = source.RemoveAt(0);
         Assert.NotSame(source, target);
@@ -281,7 +281,7 @@ public static class Test_ParameterList
     public static void Test_RemoveRange()
     {
         var engine = new FakeEngine();
-        var source = new ParameterList(engine, [x007, xJames, xBond]);
+        var source = new Code.ParameterList(engine, [x007, xJames, xBond]);
 
         var target = source.RemoveRange(0, 0);
         Assert.Same(source, target);
@@ -300,7 +300,7 @@ public static class Test_ParameterList
     public static void Test_Remove_Item()
     {
         var engine = new FakeEngine();
-        var source = new ParameterList(engine, [x007, xJames, xBond]);
+        var source = new Code.ParameterList(engine, [x007, xJames, xBond]);
 
         var target = source.Remove("any");
         Assert.Same(source, target);
@@ -317,7 +317,7 @@ public static class Test_ParameterList
     public static void Test_Remove_Predicate()
     {
         var engine = new FakeEngine();
-        var source = new ParameterList(engine, [x007, xJames, xBond]);
+        var source = new Code.ParameterList(engine, [x007, xJames, xBond]);
 
         var target = source.Remove(x => x.Name == "any");
         Assert.Same(source, target);
@@ -346,11 +346,11 @@ public static class Test_ParameterList
     public static void Test_Clear()
     {
         var engine = new FakeEngine();
-        var source = new ParameterList(engine);
+        var source = new Code.ParameterList(engine);
         var target = source.Clear();
         Assert.Same(source, target);
 
-        source = new ParameterList(engine, [x007, xJames, xBond]);
+        source = new Code.ParameterList(engine, [x007, xJames, xBond]);
         target = source.Clear();
         Assert.NotSame(source, target);
         Assert.Empty(target);

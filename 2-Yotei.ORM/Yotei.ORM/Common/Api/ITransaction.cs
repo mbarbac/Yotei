@@ -2,8 +2,8 @@
 
 // ========================================================
 /// <summary>
-/// Represents a transaction under which a set of commands are executed against an underlying
-/// database.
+/// Represents a nestable transaction under which a set of commands are executed against an
+/// underlying database.
 /// </summary>
 public interface ITransaction : IBaseDisposable
 {
@@ -18,23 +18,31 @@ public interface ITransaction : IBaseDisposable
     bool IsActive { get; }
 
     /// <summary>
-    /// Starts the underlying physical transaction.
+    /// The nesting level of this instance. A value of cero means this transaction has not been
+    /// started yet.
+    /// </summary>
+    int Level { get; }
+
+    /// <summary>
+    /// Starts the underlying physical transaction, if it has not been started yet, and increases
+    /// its nesting level.
     /// </summary>
     void Start();
 
     /// <summary>
-    /// Starts the underlying physical transaction.
+    /// Starts the underlying physical transaction, if it has not been started yet, and increases
+    /// its nesting level.
     /// </summary>
     /// <param name="token"></param>
     ValueTask StartAsync(CancellationToken token = default);
 
     /// <summary>
-    /// Commits the underlying physical transaction.
+    /// Commits the underlying physical transaction, or decreases its nesting level.
     /// </summary>
     void Commit();
 
     /// <summary>
-    /// Commits the underlying physical transaction.
+    /// Commits the underlying physical transaction, or decreases its nesting level.
     /// </summary>
     /// <param name="token"></param>
     ValueTask CommitAsync(CancellationToken token = default);

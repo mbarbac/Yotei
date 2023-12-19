@@ -61,4 +61,6 @@ public partial interface IEngine
     /// <param name="ch"></param>
     /// <returns></returns>
     List<int> UnwrappedIndexes(string? value, char ch);
+
+
 }

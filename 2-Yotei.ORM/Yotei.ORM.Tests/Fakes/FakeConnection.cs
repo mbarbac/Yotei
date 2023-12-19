@@ -2,7 +2,7 @@ namespace Yotei.ORM.Tests;
 
 // ========================================================
 [Cloneable]
-public partial class FakeConnection : Connection
+public partial class FakeConnection : Code.Connection
 {
     public FakeConnection(IEngine engine) : base(engine) { }
     protected FakeConnection(FakeConnection source) : base(source) { }

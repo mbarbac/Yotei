@@ -10,14 +10,14 @@ public static class Test_Engine
     {
         var engine = new FakeEngine();
 
-        Assert.Equal(Engine.CASESENSITIVENAMES, engine.CaseSensitiveNames);
-        Assert.Equal(Engine.NULLVALUELITERAL, engine.NullValueLiteral);
-        Assert.Equal(Engine.NATIVEPAGING, engine.NativePaging);
-        Assert.Equal(Engine.PARAMETERPREFIX, engine.ParameterPrefix);
-        Assert.Equal(Engine.POSITIONALPARAMETERS, engine.PositionalParameters);
-        Assert.Equal(Engine.USETERMINATORS, engine.UseTerminators);
-        Assert.Equal(Engine.LEFTERMINATOR, engine.LeftTerminator);
-        Assert.Equal(Engine.RIGHTTERMINATOR, engine.RightTerminator);
+        Assert.Equal(Code.Engine.CASESENSITIVENAMES, engine.CaseSensitiveNames);
+        Assert.Equal(Code.Engine.NULLVALUELITERAL, engine.NullValueLiteral);
+        Assert.Equal(Code.Engine.NATIVEPAGING, engine.NativePaging);
+        Assert.Equal(Code.Engine.PARAMETERPREFIX, engine.ParameterPrefix);
+        Assert.Equal(Code.Engine.POSITIONALPARAMETERS, engine.PositionalParameters);
+        Assert.Equal(Code.Engine.USETERMINATORS, engine.UseTerminators);
+        Assert.Equal(Code.Engine.LEFTERMINATOR, engine.LeftTerminator);
+        Assert.Equal(Code.Engine.RIGHTTERMINATOR, engine.RightTerminator);
     }
 
     //[Enforced]
@@ -26,29 +26,29 @@ public static class Test_Engine
     {
         var source = new FakeEngine();
 
-        var target = source.WithCaseSensitiveNames(!Engine.CASESENSITIVENAMES);
+        var target = source.WithCaseSensitiveNames(!Code.Engine.CASESENSITIVENAMES);
         Assert.NotSame(source, target);
-        Assert.Equal(!Engine.CASESENSITIVENAMES, target.CaseSensitiveNames);
+        Assert.Equal(!Code.Engine.CASESENSITIVENAMES, target.CaseSensitiveNames);
 
         target = source.WithNullValueLiteral("x");
         Assert.NotSame(source, target);
         Assert.Equal("x", target.NullValueLiteral);
 
-        target = source.WithNativePaging(!Engine.NATIVEPAGING);
+        target = source.WithNativePaging(!Code.Engine.NATIVEPAGING);
         Assert.NotSame(source, target);
-        Assert.Equal(!Engine.NATIVEPAGING, target.NativePaging);
+        Assert.Equal(!Code.Engine.NATIVEPAGING, target.NativePaging);
 
         target = source.WithParameterPrefix("x");
         Assert.NotSame(source, target);
         Assert.Equal("x", target.ParameterPrefix);
 
-        target = source.WithPositionalParameters(!Engine.POSITIONALPARAMETERS);
+        target = source.WithPositionalParameters(!Code.Engine.POSITIONALPARAMETERS);
         Assert.NotSame(source, target);
-        Assert.Equal(!Engine.POSITIONALPARAMETERS, target.PositionalParameters);
+        Assert.Equal(!Code.Engine.POSITIONALPARAMETERS, target.PositionalParameters);
 
-        target = source.WithUseTerminators(!Engine.USETERMINATORS);
+        target = source.WithUseTerminators(!Code.Engine.USETERMINATORS);
         Assert.NotSame(source, target);
-        Assert.Equal(!Engine.USETERMINATORS, target.UseTerminators);
+        Assert.Equal(!Code.Engine.USETERMINATORS, target.UseTerminators);
 
         target = source.WithLeftTerminator('x');
         Assert.NotSame(source, target);

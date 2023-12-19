@@ -41,7 +41,7 @@ public abstract class Transaction : DisposableClass, ITransaction
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"ORM.Transaction({Connection})";
+    public override string ToString() => $"ORM.Transaction({Connection}, {Level})";
 
     // ----------------------------------------------------
 
@@ -55,12 +55,6 @@ public abstract class Transaction : DisposableClass, ITransaction
     /// </summary>
     protected bool OpenedByThis { get; private set; }
 
-    /// <summary>
-    /// The nesting level of this instance. A value of cero means this transaction has not been
-    /// started yet.
-    /// </summary>
-    public int Level { get; private set; }
-
     // ----------------------------------------------------
 
     /// <summary>
@@ -72,6 +66,11 @@ public abstract class Transaction : DisposableClass, ITransaction
     /// <inheritdoc/>
     /// </summary>
     public bool IsActive => Level > 0;
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public int Level { get; private set; }
 
     /// <summary>
     /// <inheritdoc/>
