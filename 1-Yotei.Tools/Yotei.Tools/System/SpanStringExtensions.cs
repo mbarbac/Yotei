@@ -506,8 +506,11 @@ public static class SpanStringExtensions
         if (index == 0 && source.Length == value.Length) return Span.Empty;
 
         var array = new char[source.Length - value.Length];
-        source.Slice(0, index).CopyTo(array);
-        source.Slice(index + value.Length).CopyTo(array.AsSpan(value.Length));
+        source[..index].CopyTo(array);        
+        var dest = array.AsSpan(index);
+        var ini = index + value.Length;
+        source[ini..].CopyTo(dest);
+
         return array.AsSpan();
     }
 
@@ -539,8 +542,11 @@ public static class SpanStringExtensions
         if (index == 0 && source.Length == value.Length) return Span.Empty;
 
         var array = new char[source.Length - value.Length];
-        source.Slice(0, index).CopyTo(array);
-        source.Slice(index + value.Length).CopyTo(array.AsSpan(value.Length));
+        source[..index].CopyTo(array);
+        var dest = array.AsSpan(index);
+        var ini = index + value.Length;
+        source[ini..].CopyTo(dest);
+
         return array.AsSpan();
     }
 
@@ -573,8 +579,11 @@ public static class SpanStringExtensions
         if (index == 0 && source.Length == value.Length) return Span.Empty;
 
         var array = new char[source.Length - value.Length];
-        source.Slice(0, index).CopyTo(array);
-        source.Slice(index + value.Length).CopyTo(array.AsSpan(value.Length));
+        source[..index].CopyTo(array);
+        var dest = array.AsSpan(index);
+        var ini = index + value.Length;
+        source[ini..].CopyTo(dest);
+
         return array.AsSpan();
     }
 
@@ -607,8 +616,11 @@ public static class SpanStringExtensions
         if (index == 0 && source.Length == value.Length) return Span.Empty;
 
         var array = new char[source.Length - value.Length];
-        source.Slice(0, index).CopyTo(array);
-        source.Slice(index + value.Length).CopyTo(array.AsSpan(value.Length));
+        source[..index].CopyTo(array);
+        var dest = array.AsSpan(index);
+        var ini = index + value.Length;
+        source[ini..].CopyTo(dest);
+
         return array.AsSpan();
     }
 
@@ -641,8 +653,11 @@ public static class SpanStringExtensions
         if (index == 0 && source.Length == value.Length) return Span.Empty;
 
         var array = new char[source.Length - value.Length];
-        source.Slice(0, index).CopyTo(array);
-        source.Slice(index + value.Length).CopyTo(array.AsSpan(value.Length));
+        source[..index].CopyTo(array);
+        var dest = array.AsSpan(index);
+        var ini = index + value.Length;
+        source[ini..].CopyTo(dest);
+
         return array.AsSpan();
     }
 
@@ -676,8 +691,11 @@ public static class SpanStringExtensions
         if (index == 0 && source.Length == value.Length) return Span.Empty;
 
         var array = new char[source.Length - value.Length];
-        source.Slice(0, index).CopyTo(array);
-        source.Slice(index + value.Length).CopyTo(array.AsSpan(value.Length));
+        source[..index].CopyTo(array);
+        var dest = array.AsSpan(index);
+        var ini = index + value.Length;
+        source[ini..].CopyTo(dest);
+
         return array.AsSpan();
     }
 
@@ -709,8 +727,11 @@ public static class SpanStringExtensions
         if (index == 0 && source.Length == value.Length) return Span.Empty;
 
         var array = new char[source.Length - value.Length];
-        source.Slice(0, index).CopyTo(array);
-        source.Slice(index + value.Length).CopyTo(array.AsSpan(value.Length));
+        source[..index].CopyTo(array);
+        var dest = array.AsSpan(index);
+        var ini = index + value.Length;
+        source[ini..].CopyTo(dest);
+
         return array.AsSpan();
     }
 
@@ -743,8 +764,11 @@ public static class SpanStringExtensions
         if (index == 0 && source.Length == value.Length) return Span.Empty;
 
         var array = new char[source.Length - value.Length];
-        source.Slice(0, index).CopyTo(array);
-        source.Slice(index + value.Length).CopyTo(array.AsSpan(value.Length));
+        source[..index].CopyTo(array);
+        var dest = array.AsSpan(index);
+        var ini = index + value.Length;
+        source[ini..].CopyTo(dest);
+
         return array.AsSpan();
     }
 
@@ -777,8 +801,11 @@ public static class SpanStringExtensions
         if (index == 0 && source.Length == value.Length) return Span.Empty;
 
         var array = new char[source.Length - value.Length];
-        source.Slice(0, index).CopyTo(array);
-        source.Slice(index + value.Length).CopyTo(array.AsSpan(value.Length));
+        source[..index].CopyTo(array);
+        var dest = array.AsSpan(index);
+        var ini = index + value.Length;
+        source[ini..].CopyTo(dest);
+
         return array.AsSpan();
     }
 
@@ -811,8 +838,11 @@ public static class SpanStringExtensions
         if (index == 0 && source.Length == value.Length) return Span.Empty;
 
         var array = new char[source.Length - value.Length];
-        source.Slice(0, index).CopyTo(array);
-        source.Slice(index + value.Length).CopyTo(array.AsSpan(value.Length));
+        source[..index].CopyTo(array);
+        var dest = array.AsSpan(index);
+        var ini = index + value.Length;
+        source[ini..].CopyTo(dest);
+
         return array.AsSpan();
     }
 

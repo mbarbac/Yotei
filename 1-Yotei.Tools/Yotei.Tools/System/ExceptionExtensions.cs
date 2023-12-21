@@ -13,7 +13,7 @@ public static class ExceptionExtensions
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T ThrowWhenNull<T>(
-        this T value,
+        [AllowNull] this T value,
         [CallerArgumentExpression(nameof(value))] string? description = null)
     {
         description = description.NullWhenEmpty() ?? nameof(description);

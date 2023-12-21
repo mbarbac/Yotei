@@ -110,6 +110,31 @@ public static class Test_SpanStringExtenssion
 
     //[Enforced]
     [Fact]
+    public static void Test_ContainsAny()
+    {
+        var source = "abc".AsSpan();
+
+        Assert.False(source.ContainsAny([]));
+        Assert.False(source.ContainsAny("".ToCharArray()));
+        Assert.False(source.ContainsAny("xyz".ToCharArray()));
+
+        Assert.False(source.ContainsAny("xyzC".ToCharArray(), true));
+        Assert.True(source.ContainsAny("xyzC".ToCharArray(), false));
+
+        Assert.False(source.ContainsAny("xyzC".ToCharArray(), new CharComparer((x, y) => x.Equals(y, true))));
+        Assert.True(source.ContainsAny("xyzC".ToCharArray(), new CharComparer((x, y) => x.Equals(y, false))));
+
+        Assert.False(source.ContainsAny("xyzC".ToCharArray(), StringComparer.Ordinal));
+        Assert.True(source.ContainsAny("xyzC".ToCharArray(), StringComparer.OrdinalIgnoreCase));
+
+        Assert.False(source.ContainsAny("xyzC".ToCharArray(), StringComparison.Ordinal));
+        Assert.True(source.ContainsAny("xyzC".ToCharArray(), StringComparison.OrdinalIgnoreCase));
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
     public static void Test_Remove()
     {
         var source = "xxabyyab".AsSpan();

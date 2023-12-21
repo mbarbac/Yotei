@@ -13,6 +13,7 @@ namespace System.Runtime.CompilerServices
         /// Initializes a new instance.
         /// </summary>
         /// <param name="parameterName"></param>
+        [SuppressMessage("", "IDE0290")]
         public CallerArgumentExpressionAttribute(string parameterName)
         {
             ParameterName = parameterName;
