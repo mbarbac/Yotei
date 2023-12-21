@@ -12,36 +12,35 @@ public static class ExceptionExtensions
     /// <param name="description"></param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    [return: NotNull]
     public static T ThrowWhenNull<T>(
-        [AllowNull] this T value,
+        this T value,
         [CallerArgumentExpression(nameof(value))] string? description = null)
     {
-        description = description.NullWhenEmpty() ?? nameof(value);
+        description = description.NullWhenEmpty() ?? nameof(description);
 
-        if (value == null)
-            throw new ArgumentNullException($"'{description}' is null.");
+        if (value is null)
+            throw new ArgumentNullException(description);
 
         return value;
     }
 
     /// <summary>
-    /// Adds to the data dictionary of the given exception an entry with the given name and value.
-    /// An existing entry with that name gets its value updated. Returns the given exception.
+    /// Adds to or replaces in the data dictionary the entry with the given name and value.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="exception"></param>
     /// <param name="value"></param>
     /// <param name="name"></param>
     /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T WithData<T>(
         this T exception,
         object? value,
         [CallerArgumentExpression(nameof(value))] string? name = null) where T : Exception
     {
-        exception = exception.ThrowWhenNull();
+        exception.ThrowWhenNull();
 
-        name = name.NullWhenEmpty() ?? nameof(value);
+        name = name.NotNullNotEmpty();
         exception.Data[name] = value;
         return exception;
     }
