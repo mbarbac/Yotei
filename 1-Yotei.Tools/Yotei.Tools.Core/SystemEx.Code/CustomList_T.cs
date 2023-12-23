@@ -32,13 +32,17 @@ public class CustomList<T> : ICustomList<T>
     public IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public override string ToString() => $"Count: {Count}";
 
-    protected virtual string ToDebugString(int count) => Count <= count
+    public virtual string ToDebugString(int count) => Count <= count
         ? $"({Count})[{string.Join(", ", Items.Select(ItemToString))}]"
         : $"({Count})[{string.Join(", ", Items.Take(count).Select(ItemToString))}]...";
 
-    protected virtual string ItemToString(T item) => item?.ToString() ?? string.Empty;
+    public virtual string ItemToString(T item) => item?.ToString() ?? string.Empty;
 
     // ----------------------------------------------------
 
@@ -165,7 +169,7 @@ public class CustomList<T> : ICustomList<T>
     /// <summary>
     /// Invoked to reload the contents of this instance.
     /// </summary>
-    protected void ReLoad()
+    public void ReLoad()
     {
         var range = ToArray();
         Clear();

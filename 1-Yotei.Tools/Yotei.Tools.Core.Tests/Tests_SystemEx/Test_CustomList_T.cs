@@ -10,6 +10,8 @@ public static class Test_CustomList_T
         public override string ToString() => Name ?? string.Empty;
     }
 
+    // ----------------------------------------------------
+
     internal class Chain : CustomList<Element>
     {
         public Chain(bool sensitive)
