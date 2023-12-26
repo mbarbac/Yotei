@@ -24,27 +24,16 @@
    </ItemGroup>
 
    <ItemGroup>
-	  <ProjectReference Include="..\..\0-Experimental\Experiments\Experiments.csproj" />	  
-	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Tests\Yotei.Tools.Tests.csproj" />
-	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Core.Tests\Yotei.Tools.Core.Tests.csproj" />
-   </ItemGroup>
-
-   <!-- DEBUG configuration -->
-   <ItemGroup Condition="'$(Configuration)'=='Debug'">
-	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Core\Yotei.Tools.Core.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
    </ItemGroup>
 
-   <!-- LOCAL configuration -->
-   <ItemGroup Condition="'$(Configuration)'=='Local'">
-	  <PackageReference Include="Yotei.Tools.Core" Version="0.5.31-v0001" />
-	  <PackageReference Include="Yotei.Tools" Version="0.5.31-v0001" />
-   </ItemGroup>
+   <PropertyGroup>
+	  <DoTests>DOTESTS</DoTests>
+   </PropertyGroup>
 
-   <!-- RELEASE configuration -->
-   <ItemGroup Condition="'$(Configuration)'=='Release'">
-	  <PackageReference Include="Yotei.Tools.Core" Version="0.5.30" />
-	  <PackageReference Include="Yotei.Tools" Version="0.5.30" />
+   <ItemGroup Condition="'$(DoTests)'=='DOTESTS'">
+	  <ProjectReference Include="..\..\0-Experimental\Experiments\Experiments.csproj" />	  
+	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Tests\Yotei.Tools.Tests.csproj" />
    </ItemGroup>
 
 </Project>

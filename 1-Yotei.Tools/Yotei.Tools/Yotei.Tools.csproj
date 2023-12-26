@@ -21,28 +21,13 @@
 	  <PackageLicenseFile>LICENSE</PackageLicenseFile>
    </PropertyGroup>
 
-   <PropertyGroup>
-	  <!--<DefineConstants>$(DefineConstants);DEBUG_ASYNC_LOCK</DefineConstants>-->
-   </PropertyGroup>
-
    <ItemGroup>
 	  <None Include="README.md" Pack="true" PackagePath="" />
 	  <None Include="LICENSE" Pack="true" PackagePath="" />
    </ItemGroup>
 
-   <!-- DEBUG configuration -->
-   <ItemGroup Condition="'$(Configuration)'=='Debug'">
-     <ProjectReference Include="..\Yotei.Tools.Core\Yotei.Tools.Core.csproj" />
-   </ItemGroup>
-
-   <!-- LOCAL configuration -->
-   <ItemGroup Condition="'$(Configuration)'=='Local'">
-	  <PackageReference Include="Yotei.Tools.Core" Version="0.5.31-v0001" />
-   </ItemGroup>
-
-   <!-- RELEASE configuration -->
-   <ItemGroup Condition="'$(Configuration)'=='Release'">
-	  <PackageReference Include="Yotei.Tools.Core" Version="0.5.30" />
-   </ItemGroup>
+   <PropertyGroup>
+	  <!--<DefineConstants>$(DefineConstants);DEBUG_ASYNC_LOCK</DefineConstants>-->
+   </PropertyGroup>
    
 </Project>
