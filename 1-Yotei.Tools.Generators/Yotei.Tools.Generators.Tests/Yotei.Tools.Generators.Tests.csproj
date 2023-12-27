@@ -35,13 +35,16 @@
 		 <OutputItemType>Analyzer</OutputItemType>
 		 <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
 	  </ProjectReference>
+	  <ProjectReference Include="..\Yotei.Tools.CloneGenerator\Yotei.Tools.CloneGenerator.csproj">
+		 <OutputItemType>Analyzer</OutputItemType>
+		 <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+	  </ProjectReference>
    </ItemGroup>
 
    <!-- Generator settings -->
    <ItemGroup>
 	  <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
    </ItemGroup>
-
    <PropertyGroup>
 	  <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 	  <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>

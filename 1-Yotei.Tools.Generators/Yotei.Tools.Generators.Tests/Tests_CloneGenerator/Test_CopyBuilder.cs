@@ -2,7 +2,7 @@
 #pragma whatever
 using System;
 
-namespace Yotei.Tools.Generators.Tests.WithGenerator
+namespace Yotei.Tools.Generators.Tests.CloneGenerator
 {
     // Namespace-level elements...
     using ICopyBuilder;
@@ -18,14 +18,11 @@ namespace Yotei.Tools.Generators.Tests.WithGenerator
         {
             IOther.IManager source = new Other.Manager("James", "Bond", 50, "UK");
 
-            var target = source.WithLastName(source.LastName);
-            Assert.Same(source, target);
-
-            target = source.WithLastName("Other");
+            var target = source.Clone();
             Assert.NotSame(source, target);
             Assert.IsAssignableFrom<IOther.IManager>(target);
             Assert.Equal(source.FirstName, target.FirstName);
-            Assert.Equal("Other", target.LastName);
+            Assert.Equal(source.LastName, target.LastName);
             Assert.Equal(((Other.Manager)source).Age, ((Other.Manager)target).Age);
             Assert.Equal(source.Branch, target.Branch);
             Assert.Equal("Manager.Copy", ((Other.Manager)target)._Info);
@@ -37,27 +34,12 @@ namespace Yotei.Tools.Generators.Tests.WithGenerator
         {
             var source = new Other.Manager("James", "Bond", 50, "UK");
 
-            var target = source.WithLastName(source.LastName);
-            Assert.Same(source, target);
-
-            target = source.WithLastName("Other");
-            Assert.NotSame(source, target);
-            Assert.IsType<Other.Manager>(target);
-            Assert.Equal(source.FirstName, target.FirstName);
-            Assert.Equal("Other", target.LastName);
-            Assert.Equal(source.Age, target.Age);
-            Assert.Equal(source.Branch, target.Branch);
-            Assert.Equal("Manager.Copy", target._Info);
-
-            target = source.WithAge(source.Age);
-            Assert.Same(source, target);
-
-            target = source.WithAge(60);
+            var target = source.Clone();
             Assert.NotSame(source, target);
             Assert.IsType<Other.Manager>(target);
             Assert.Equal(source.FirstName, target.FirstName);
             Assert.Equal(source.LastName, target.LastName);
-            Assert.Equal(60, target.Age);
+            Assert.Equal(source.Age, target.Age);
             Assert.Equal(source.Branch, target.Branch);
             Assert.Equal("Manager.Copy", target._Info);
         }
@@ -69,17 +51,18 @@ namespace Yotei.Tools.Generators.Tests.WithGenerator
         public partial interface IOther
         {
             // --------------------------------------------
-            public partial interface IPersona
+            [Cloneable]
+            public partial interface IPersona : ICloneable
             {
-                [WithGenerator] string FirstName { get; }
-                [WithGenerator] string LastName { get; }
+                string FirstName { get; }
+                string LastName { get; }
             }
 
             // --------------------------------------------
-            [WithGenerator]
+            [Cloneable]
             public partial interface IManager : IPersona
             {
-                [WithGenerator] string Branch { get; }
+                string Branch { get; }
             }
         }
     }
@@ -90,12 +73,11 @@ namespace Yotei.Tools.Generators.Tests.WithGenerator
         public partial class Other
         {
             // --------------------------------------------
-            [WithGenerator]
+            [Cloneable]
             public partial class Persona : IOther.IPersona
             {
                 public string _Info = string.Empty;
 
-                [WithGenerator]
                 public int Age = 0;
                 public string FirstName { get; set; } = default!;
                 public string LastName { get; set; } = default!;
@@ -118,10 +100,9 @@ namespace Yotei.Tools.Generators.Tests.WithGenerator
             }
 
             // --------------------------------------------
-            [WithGenerator]
+            [Cloneable]
             public partial class Manager : Persona, IOther.IManager
             {
-                [WithGenerator]
                 public string Branch { get; set; } = default!;
 
                 public Manager(string first, string last, int age, string branch)

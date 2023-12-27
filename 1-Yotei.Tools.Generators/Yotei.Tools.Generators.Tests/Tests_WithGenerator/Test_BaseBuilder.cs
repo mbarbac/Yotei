@@ -5,12 +5,12 @@ using System;
 namespace Yotei.Tools.Generators.Tests.WithGenerator
 {
     // Namespace-level elements...
-    using ICopyBuilder;
-    using CopyBuilder;
+    using IBaseBuilder;
+    using BaseBuilder;
 
     // ====================================================
     //[Enforced]
-    public static class Test_CopyBuilder
+    public static class Test_BaseBuilder
     {
         //[Enforced]
         [Fact]
@@ -18,17 +18,12 @@ namespace Yotei.Tools.Generators.Tests.WithGenerator
         {
             IOther.IManager source = new Other.Manager("James", "Bond", 50, "UK");
 
-            var target = source.WithLastName(source.LastName);
+            var target = source.WithLastName(source.LastName); // Because no changes...
             Assert.Same(source, target);
 
-            target = source.WithLastName("Other");
-            Assert.NotSame(source, target);
-            Assert.IsAssignableFrom<IOther.IManager>(target);
-            Assert.Equal(source.FirstName, target.FirstName);
-            Assert.Equal("Other", target.LastName);
-            Assert.Equal(((Other.Manager)source).Age, ((Other.Manager)target).Age);
-            Assert.Equal(source.Branch, target.Branch);
-            Assert.Equal("Manager.Copy", ((Other.Manager)target)._Info);
+            // Should not cast Persona to Manager...
+            try { source.WithLastName("Other"); Assert.Fail(); }
+            catch (InvalidCastException) { }
         }
 
         //[Enforced]
@@ -37,34 +32,33 @@ namespace Yotei.Tools.Generators.Tests.WithGenerator
         {
             var source = new Other.Manager("James", "Bond", 50, "UK");
 
-            var target = source.WithLastName(source.LastName);
+            var target = source.WithLastName(source.LastName); // Because no changes...
             Assert.Same(source, target);
 
-            target = source.WithLastName("Other");
-            Assert.NotSame(source, target);
-            Assert.IsType<Other.Manager>(target);
-            Assert.Equal(source.FirstName, target.FirstName);
-            Assert.Equal("Other", target.LastName);
-            Assert.Equal(source.Age, target.Age);
-            Assert.Equal(source.Branch, target.Branch);
-            Assert.Equal("Manager.Copy", target._Info);
-
-            target = source.WithAge(source.Age);
+            target = source.WithAge(source.Age); // Because no changes...
             Assert.Same(source, target);
 
-            target = source.WithAge(60);
+            target = source.WithBranch("Other");
             Assert.NotSame(source, target);
             Assert.IsType<Other.Manager>(target);
             Assert.Equal(source.FirstName, target.FirstName);
             Assert.Equal(source.LastName, target.LastName);
-            Assert.Equal(60, target.Age);
-            Assert.Equal(source.Branch, target.Branch);
+            Assert.Equal(source.Age, target.Age);
+            Assert.Equal("Other", target.Branch);
             Assert.Equal("Manager.Copy", target._Info);
+
+            // Should not cast Persona to Manager...
+            try { source.WithLastName("Other"); Assert.Fail(); }
+            catch (InvalidCastException) { }
+
+            // Should not cast Persona to Manager...
+            try { source.WithAge(60); Assert.Fail(); }
+            catch (InvalidCastException) { }
         }
     }
 
     // ====================================================
-    namespace ICopyBuilder
+    namespace IBaseBuilder
     {
         public partial interface IOther
         {
@@ -85,7 +79,7 @@ namespace Yotei.Tools.Generators.Tests.WithGenerator
     }
 
     // ====================================================
-    namespace CopyBuilder
+    namespace BaseBuilder
     {
         public partial class Other
         {
@@ -118,10 +112,12 @@ namespace Yotei.Tools.Generators.Tests.WithGenerator
             }
 
             // --------------------------------------------
-            [WithGenerator]
+            // Using 'base' with all methods by default...
+            [WithGenerator("base")]
             public partial class Manager : Persona, IOther.IManager
             {
-                [WithGenerator]
+                // Not using 'base' method for 'Branch'...
+                [WithGenerator("copy")]
                 public string Branch { get; set; } = default!;
 
                 public Manager(string first, string last, int age, string branch)

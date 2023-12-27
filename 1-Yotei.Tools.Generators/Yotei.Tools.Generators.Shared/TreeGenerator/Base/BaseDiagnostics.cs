@@ -180,7 +180,68 @@ internal static class BaseDiagnostics
 
     // ----------------------------------------------------
 
-    // InvalidSpecs
-    // NoCopyConstructor
-    // NoBaseMethod
+    /// <summary>
+    /// Reports a diagnostic when the specifications for the given symbol are invalid.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="symbol"></param>
+    /// <param name="specs"></param>
+    /// <param name="severity"></param>
+    public static void InvalidSpecs(
+        this SourceProductionContext context,
+        ISymbol symbol,
+        string? specs,
+        DiagnosticSeverity severity = DiagnosticSeverity.Error)
+    {
+        var id = "TreeGen07";
+        var head = "Invalid specifications.";
+        var desc = $"Specifications '{specs}' are invalid for '{symbol.Name}'.";
+
+        context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor(
+            id, head, desc,
+            "Yotei", severity, isEnabledByDefault: true),
+            symbol.Locations.FirstOrDefault()));
+    }
+
+    /// <summary>
+    /// Reports a diagnostic when there is not a copy constructor for the given type.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="symbol"></param>
+    /// <param name="severity"></param>
+    public static void NoCopyConstructor(
+        this SourceProductionContext context,
+        ITypeSymbol symbol,
+        DiagnosticSeverity severity = DiagnosticSeverity.Error)
+    {
+        var id = "TreeGen08";
+        var head = "Type has no copy constructor.";
+        var desc = $"The type '{symbol.Name}' has not a copy constructor.";
+
+        context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor(
+            id, head, desc,
+            "Yotei", severity, isEnabledByDefault: true),
+            symbol.Locations.FirstOrDefault()));
+    }
+
+    /// <summary>
+    /// Reports a diagnostic when there is not a base method for the given symbol.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="symbol"></param>
+    /// <param name="severity"></param>
+    public static void NoBaseMethod(
+        this SourceProductionContext context,
+        ISymbol symbol,
+        DiagnosticSeverity severity = DiagnosticSeverity.Error)
+    {
+        var id = "TreeGen09";
+        var head = "No base method.";
+        var desc = $"No base method found for symbol '{symbol.Name}'.";
+
+        context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor(
+            id, head, desc,
+            "Yotei", severity, isEnabledByDefault: true),
+            symbol.Locations.FirstOrDefault()));
+    }
 }
