@@ -26,16 +26,19 @@
    <!-- DEBUG configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Debug'">
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
+	  <ProjectReference Include="..\Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser.csproj" />
    </ItemGroup>
 
    <!-- LOCAL configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Local'">
 	  <PackageReference Include="Yotei.Tools" Version="0.5.31-v0001" />
+	  <PackageReference Include="Yotei.Tools.LambdaParser" Version="0.5.27-v0001" />
    </ItemGroup>
 
    <!-- RELEASE configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Release'">
 	  <PackageReference Include="Yotei.Tools" Version="0.5.30" />
+	  <PackageReference Include="Yotei.Tools.LambdaParser" Version="0.5.27" />
    </ItemGroup>
 
 </Project>

@@ -29,11 +29,13 @@
    </ItemGroup>
 
    <!-- LOCAL configuration -->
-   <!--<ItemGroup Condition="'$(Configuration)'=='Local'">
-   </ItemGroup>-->
+   <ItemGroup Condition="'$(Configuration)'=='Local'">
+	  <PackageReference Include="Yotei.Tools" Version="0.5.31-v0001" />
+   </ItemGroup>
 
    <!-- RELEASE configuration -->
-   <!--<ItemGroup Condition="'$(Configuration)'=='Release'">
-   </ItemGroup>-->
+   <ItemGroup Condition="'$(Configuration)'=='Release'">
+	  <PackageReference Include="Yotei.Tools" Version="0.5.30" />
+   </ItemGroup>
 
 </Project>
