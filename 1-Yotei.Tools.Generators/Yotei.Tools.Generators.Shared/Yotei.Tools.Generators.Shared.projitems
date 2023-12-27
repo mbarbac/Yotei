@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>00b93080-b99d-48e7-97e7-62eca2cf17da</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Yotei.Tools.Generators.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Platform\Index.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Platform\NotNullWhenAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Platform\DoesNotReturnAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Platform\CallerArgumentExpressionAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Platform\NotNullAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Platform\MaybeNullAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Platform\Range.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Platform\AllowNullAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\AttributeExtension.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\ChainExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\NameSyntaxExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\SymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\SyntaxNodeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\ToStringExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\SyntaxListExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\TypeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CodeBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CustomList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\DebugExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\ExceptionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\StringExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\CharSpanExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Base\BaseGenerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Base\FileBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Base\BaseDiagnostics.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\Candidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\MethodCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\FieldCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\PropertyCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\TypeCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Api\INode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Api\ChildrenList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Code\NamespaceNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Code\TypeNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Code\PropertyNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Code\FieldNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Code\MethodNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
+  </ItemGroup>
+</Project>
