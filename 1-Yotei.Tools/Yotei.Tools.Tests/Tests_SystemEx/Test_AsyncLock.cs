@@ -4,7 +4,7 @@ using Console = Yotei.Tools.Diagnostics.ConsoleWrapper;
 namespace Yotei.Tools.Tests;
 
 // ========================================================
-[Enforced]
+//[Enforced]
 public static class Test_AsyncLock
 {
 #if DEBUG

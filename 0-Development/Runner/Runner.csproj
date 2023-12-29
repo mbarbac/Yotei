@@ -35,6 +35,9 @@
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Tests\Yotei.Tools.Tests.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser.Tests\Yotei.Tools.LambdaParser.Tests.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.Generators.Tests\Yotei.Tools.Generators.Tests.csproj" />
+	  <ProjectReference Include="..\..\2-Yotei.ORM\Yotei.ORM.Tests\Yotei.ORM.Tests.csproj" />
+	  <ProjectReference Include="..\..\3-Yotei.ORM.Relational\Yotei.ORM.Relational.FakeDB\Yotei.ORM.Relational.FakeDB.csproj" />
+	  <ProjectReference Include="..\..\3-Yotei.ORM.Relational\Yotei.ORM.Relational.Tests\Yotei.ORM.Relational.Tests.csproj" />
    </ItemGroup>
 
 </Project>
