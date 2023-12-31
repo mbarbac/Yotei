@@ -49,6 +49,11 @@ public partial interface IEngine
     /// </summary>
     [WithGenerator] char RightTerminator { get; }
 
+    /// <summary>
+    /// Determines if this engine treats its metadata tag names as case sensitive, or not.
+    /// </summary>
+    [WithGenerator] bool CaseSensitiveTags { get; }
+
     // ----------------------------------------------------
 
     /// <summary>

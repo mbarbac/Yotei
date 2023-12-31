@@ -1,3 +1,5 @@
+using IdentifierPart = Yotei.ORM.Code.IdentifierPart;
+
 namespace Yotei.ORM.Tests;
 
 // ========================================================
@@ -9,11 +11,11 @@ public static class Test_IdentifierPart
     public static void Test_Create_Empty()
     {
         var engine = new FakeEngine();
-        var item = new Code.IdentifierPart(engine);
+        var item = new IdentifierPart(engine);
         Assert.Null(item.UnwrappedValue);
         Assert.Null(item.Value);
 
-        item = new Code.IdentifierPart(engine, null);
+        item = new IdentifierPart(engine, null);
         Assert.Null(item.UnwrappedValue);
         Assert.Null(item.Value);
     }
@@ -23,31 +25,31 @@ public static class Test_IdentifierPart
     public static void Test_Create_With_Terminators()
     {
         var engine = new FakeEngine();
-        var item = new Code.IdentifierPart(engine, " ");
+        var item = new IdentifierPart(engine, " ");
         Assert.Null(item.UnwrappedValue);
         Assert.Null(item.Value);
 
-        item = new Code.IdentifierPart(engine, " one ");
+        item = new IdentifierPart(engine, " one ");
         Assert.Equal("one", item.UnwrappedValue);
         Assert.Equal("[one]", item.Value);
 
-        item = new Code.IdentifierPart(engine, " [ ] ");
+        item = new IdentifierPart(engine, " [ ] ");
         Assert.Null(item.UnwrappedValue);
         Assert.Null(item.Value);
 
-        item = new Code.IdentifierPart(engine, " [ [ ] ] ");
+        item = new IdentifierPart(engine, " [ [ ] ] ");
         Assert.Null(item.UnwrappedValue);
         Assert.Null(item.Value);
 
-        item = new Code.IdentifierPart(engine, " [ one two ] ");
+        item = new IdentifierPart(engine, " [ one two ] ");
         Assert.Equal("one two", item.UnwrappedValue);
         Assert.Equal("[one two]", item.Value);
 
-        item = new Code.IdentifierPart(engine, " [ one.two ] ");
+        item = new IdentifierPart(engine, " [ one.two ] ");
         Assert.Equal("one.two", item.UnwrappedValue);
         Assert.Equal("[one.two]", item.Value);
 
-        item = new Code.IdentifierPart(engine, " [ one [ two three ] ] ");
+        item = new IdentifierPart(engine, " [ one [ two three ] ] ");
         Assert.Equal("one [ two three ]", item.UnwrappedValue);
         Assert.Equal("[one [ two three ]]", item.Value);
     }
@@ -58,11 +60,11 @@ public static class Test_IdentifierPart
     {
         var engine = new FakeEngine() { LeftTerminator = '\'', RightTerminator = '\'' };
 
-        var item = new Code.IdentifierPart(engine, "'one'");
+        var item = new IdentifierPart(engine, "'one'");
         Assert.Equal("one", item.UnwrappedValue);
         Assert.Equal("'one'", item.Value);
 
-        item = new Code.IdentifierPart(engine, "'one.two'");
+        item = new IdentifierPart(engine, "'one.two'");
         Assert.Equal("one.two", item.UnwrappedValue);
         Assert.Equal("'one.two'", item.Value);
     }
@@ -72,24 +74,24 @@ public static class Test_IdentifierPart
     public static void Test_Create_With_No_Terminators()
     {
         var engine = new FakeEngine() { UseTerminators = false };
-        var item = new Code.IdentifierPart(engine, " ");
+        var item = new IdentifierPart(engine, " ");
         Assert.Null(item.UnwrappedValue);
         Assert.Null(item.Value);
 
-        item = new Code.IdentifierPart(engine, " one ");
+        item = new IdentifierPart(engine, " one ");
         Assert.Equal("one", item.UnwrappedValue);
         Assert.Equal("one", item.Value);
 
-        try { _ = new Code.IdentifierPart(engine, " [ ] "); Assert.Fail(); }
+        try { _ = new IdentifierPart(engine, " [ ] "); Assert.Fail(); }
         catch (ArgumentException) { }
 
-        try { _ = new Code.IdentifierPart(engine, " one two "); Assert.Fail(); }
+        try { _ = new IdentifierPart(engine, " one two "); Assert.Fail(); }
         catch (ArgumentException) { }
 
-        try { _ = new Code.IdentifierPart(engine, " [ one two ] "); Assert.Fail(); }
+        try { _ = new IdentifierPart(engine, " [ one two ] "); Assert.Fail(); }
         catch (ArgumentException) { }
 
-        try { _ = new Code.IdentifierPart(engine, "one.two"); Assert.Fail(); }
+        try { _ = new IdentifierPart(engine, "one.two"); Assert.Fail(); }
         catch (ArgumentException) { }
     }
 }

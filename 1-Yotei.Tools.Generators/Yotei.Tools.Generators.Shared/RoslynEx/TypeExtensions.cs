@@ -142,7 +142,10 @@ internal static class TypeExtensions
 
         names.Reverse();
         var name = string.Join(".", names);
-        if (add) name += "?";
+
+        // If the type itself is a nullable one (ie: ending with '?') we must not add a redundant
+        // '?' symbol...
+        if (add && symbol.Name != "Nullable") name += "?";
 
         return name;
 

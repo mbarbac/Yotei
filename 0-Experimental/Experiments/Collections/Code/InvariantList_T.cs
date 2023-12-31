@@ -99,11 +99,7 @@ public partial class InvariantList<T> : IInvariantList<T>
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public T this[int index]
-    {
-        get => Items[index];
-        set => Replace(index, value);
-    }
+    public T this[int index] => Items[index];
 
     /// <summary>
     /// <inheritdoc/>

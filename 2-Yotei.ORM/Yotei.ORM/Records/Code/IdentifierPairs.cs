@@ -1,165 +1,132 @@
-namespace Experiments;
+﻿using TPair = System.Collections.Generic.KeyValuePair<string, string?>;
+
+namespace Yotei.ORM.Records.Code;
 
 // ========================================================
 /// <summary>
-/// <inheritdoc cref="IInvariantList{K, T}"/>
+/// An immutable object that contains the ordered collection of metadata pairs that describes
+/// the maximal structure of the identifiers in an underlyins database. Each pair contains its
+/// tag name, and its default value.
+/// <br/> Pairs with duplicated tag names are not allowed.
+/// <br/> Tags names cannot contain embedded dots.
 /// </summary>
-/// <typeparam name="K"></typeparam>
-/// <typeparam name="T"></typeparam>
-[DebuggerDisplay("{ToDebugString(6)}")]
 [Cloneable]
-public partial class InvariantList<K, T> : IInvariantList<K, T>
+public sealed partial class IdentifierPairs : IEnumerable<TPair>
 {
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    public InvariantList() { }
+    /// <param name="engine"></param>
+    [SuppressMessage("", "IDE0290")]
+    public IdentifierPairs(IEngine engine) => Engine = engine.ThrowWhenNull();
 
     /// <summary>
     /// Initializes a new instance with the given element.
     /// </summary>
+    /// <param name="engine"></param>
     /// <param name="item"></param>
-    public InvariantList(T item) => AddInternal(item);
+    public IdentifierPairs(IEngine engine, TPair item) : this(engine) => AddInternal(item);
 
     /// <summary>
-    /// Initializes a new instance with the elements of the given range.
+    /// Initializes a new instance with the elements from the given range.
     /// </summary>
+    /// <param name="engine"></param>
     /// <param name="range"></param>
-    public InvariantList(IEnumerable<T> range) => AddRangeInternal(range);
+    public IdentifierPairs(IEngine engine, IEnumerable<TPair> range) : this(engine) => AddRangeInternal(range);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected InvariantList(InvariantList<T> source) => AddRangeInternal(source);
+    IdentifierPairs(IdentifierPairs source) : this(source.Engine) => AddRangeInternal(source);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
+    public IEnumerator<TPair> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"Count: {Count}";
-
-    protected virtual string ToDebugString(int count) => Count <= count
-        ? $"({Count})[{string.Join(", ", Items.Select(ItemToString))}]"
-        : $"({Count})[{string.Join(", ", Items.Take(count).Select(ItemToString))}]...";
-
-    protected virtual string ItemToString(T item) => item?.ToString() ?? string.Empty;
+    public override string ToString() => string.Join('.', Items.Select(x => $"{x.Key}:{x.Value}"));
 
     // ----------------------------------------------------
 
-    readonly List<T> Items = [];
+    readonly List<TPair> Items = [];
 
-    /// <summary>
-    /// Invoked to validate the given element before using it.
-    /// </summary>
-    protected virtual T ValidateItem(T item) => item;
-
-    /// <summary>
-    /// Invoked to obtain the key associated with the given element.
-    /// </summary>
-    protected virtual K GetKey(T item) => default!;
-
-    /// <summary>
-    /// Invoked to validate the given key before using it.
-    /// </summary>
-    protected virtual K ValidateKey(K key) => key;
-
-    /// <summary>
-    /// Invoked to determine if the two given elements shall be considered equal, or not, for
-    /// comparison purposes.
-    /// </summary>
-    protected virtual bool Compare(K source, K other) =>
-        (source is null && other is null) ||
-        (source is not null && source.Equals(other));
-
-    /// <summary>
-    /// Invoked to determine if the two given elements shall be considered the same element,
-    /// or not, for adding, inserting or replacing purposes.
-    /// </summary>
-    protected virtual bool IsSameElement(T item, T other) =>
-        (item is null && other is null) ||
-        (item is not null && item.Equals(other));
-
-    /// <summary>
-    /// Determines if the given duplicated item can be added or inserted to this collection, or
-    /// not. This method shall throw an exception if duplicates are not allowed.
-    /// </summary>
-    protected virtual bool AcceptDuplicates(T source, T item) => true;
+    static TPair ValidateItem(TPair pair) { ValidateKey(pair.Key); return pair; }
+    static string GetKey(TPair pair) => pair.Key;
+    static string ValidateKey(string tag)
+    {
+        tag = tag.NotNullNotEmpty();
+        if (tag.Contains('.')) throw new ArgumentException(
+            "Identifier tag names cannot contain dots.").WithData(tag);
+        return tag;
+    }
+    bool Compare(string x, string y) => string.Compare(x, y, !Engine.CaseSensitiveTags) == 0;
+    bool IsSameElement(TPair x, TPair y) => Compare(x.Key, y.Key) && x.Value == y.Value;
+    static bool AcceptDuplicates(TPair _, TPair y) => throw new DuplicateException("Duplicated element.").WithData(y);
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// <inheritdoc/>
+    /// The engine this instance is associated with.
+    /// </summary>
+    public IEngine Engine { get; }
+
+    /// <summary>
+    /// Gets the number of elements in this collection.
     /// </summary>
     public int Count => Items.Count;
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Gets the element stored at the given index.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public T this[int index] => Items[index];
+    public TPair this[int index] => Items[index];
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Determines if this collection contains an element with the given tag name.
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="tag"></param>
     /// <returns></returns>
-    public bool Contains(K key) => IndexOf(key) >= 0;
+    public bool Contains(string tag) => IndexOf(tag) >= 0;
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Returns the index of the element with the given tag name, or -1 if not found.
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="tag"></param>
     /// <returns></returns>
-    public int IndexOf(K key)
+    public int IndexOf(string tag)
     {
-        key = ValidateKey(key);
-        return IndexOf(x => Compare(GetKey(x), key));
+        tag = ValidateKey(tag);
+        return IndexOf(x => Compare(GetKey(x), tag));
+    }
+
+    List<int> IndexesOf(string tag)
+    {
+        tag = ValidateKey(tag);
+        return IndexesOf(x => Compare(GetKey(x), tag));
     }
 
     /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    public int LastIndexOf(K key)
-    {
-        key = ValidateKey(key);
-        return LastIndexOf(x => Compare(GetKey(x), key));
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    public List<int> IndexesOf(K key)
-    {
-        key = ValidateKey(key);
-        return IndexesOf(x => Compare(GetKey(x), key));
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
+    /// Determines if this collection contains an element that matches the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public bool Contains(Predicate<T> predicate) => IndexOf(predicate) >= 0;
+    public bool Contains(Predicate<TPair> predicate) => IndexOf(predicate) >= 0;
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Returns the index of the first ocurrence of an element that matches the given predicate,
+    /// or -1 if such cannot be found.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public int IndexOf(Predicate<T> predicate)
+    public int IndexOf(Predicate<TPair> predicate)
     {
         predicate.ThrowWhenNull(nameof(predicate));
 
@@ -168,11 +135,12 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Returns the index of the last ocurrence of an element that matches the given predicate,
+    /// or -1 if such cannot be found.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public int LastIndexOf(Predicate<T> predicate)
+    public int LastIndexOf(Predicate<TPair> predicate)
     {
         predicate.ThrowWhenNull(nameof(predicate));
 
@@ -181,11 +149,11 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Returns the indexes of the elements in this collection that match the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public List<int> IndexesOf(Predicate<T> predicate)
+    public List<int> IndexesOf(Predicate<TPair> predicate)
     {
         predicate.ThrowWhenNull(nameof(predicate));
 
@@ -195,16 +163,16 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Returns an array with the elements in this collection.
     /// </summary>
     /// <returns></returns>
-    public T[] ToArray() => Items.ToArray();
+    public TPair[] ToArray() => Items.ToArray();
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public List<T> ToList() => new(Items);
+    public List<TPair> ToList() => new(Items);
 
     /// <summary>
     /// Minimizes the memory consumption of this collection.
@@ -214,18 +182,19 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     // ----------------------------------------------------
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Returns a new instance with the given number of elements starting from the given index.
+    /// If no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> GetRange(int index, int count)
+    public IdentifierPairs GetRange(int index, int count)
     {
         var clone = Clone();
         var num = clone.GetRangeInternal(index, count);
         return num > 0 ? clone : this;
     }
-    protected virtual int GetRangeInternal(int index, int count)
+    int GetRangeInternal(int index, int count)
     {
         if (count == 0 && index >= 0) return ClearInternal();
         if (index == 0 && count == Count) return 0;
@@ -237,18 +206,20 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Returns a new instance where the element at the given index has been replaced by the new
+    /// given one, if not equal to the existing one. If no changes are detected, returns the
+    /// original instance.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> Replace(int index, T item)
+    public IdentifierPairs Replace(int index, TPair item)
     {
         var clone = Clone();
         var num = clone.ReplaceInternal(index, item);
         return num > 0 ? clone : this;
     }
-    protected virtual int ReplaceInternal(int index, T item)
+    int ReplaceInternal(int index, TPair item)
     {
         item = ValidateItem(item);
 
@@ -260,17 +231,17 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Returns a new instance where the given element has been added to the collection.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> Add(T item)
+    public IdentifierPairs Add(TPair item)
     {
         var clone = Clone();
         var num = clone.AddInternal(item);
         return num > 0 ? clone : this;
     }
-    protected virtual int AddInternal(T item)
+    int AddInternal(TPair item)
     {
         item = ValidateItem(item);
 
@@ -285,17 +256,18 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Returns a new instance where the elements from the given range have been added to the
+    /// collection. If no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> AddRange(IEnumerable<T> range)
+    public IdentifierPairs AddRange(IEnumerable<TPair> range)
     {
         var clone = Clone();
         var num = clone.AddRangeInternal(range);
         return num > 0 ? clone : this;
     }
-    protected virtual int AddRangeInternal(IEnumerable<T> range)
+    int AddRangeInternal(IEnumerable<TPair> range)
     {
         range.ThrowWhenNull();
 
@@ -308,18 +280,19 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Returns a new instance where the given element has been inserted into the collection at
+    /// the given index. If no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> Insert(int index, T item)
+    public IdentifierPairs Insert(int index, TPair item)
     {
         var clone = Clone();
         var num = clone.InsertInternal(index, item);
         return num > 0 ? clone : this;
     }
-    protected virtual int InsertInternal(int index, T item)
+    int InsertInternal(int index, TPair item)
     {
         item = ValidateItem(item);
 
@@ -334,18 +307,20 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Returns a new instance the elements from the given range have been inserted into the
+    /// collection, starting at the given index. If no changes are detected, returns the original
+    /// instance.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> InsertRange(int index, IEnumerable<T> range)
+    public IdentifierPairs InsertRange(int index, IEnumerable<TPair> range)
     {
         var clone = Clone();
         var num = clone.InsertRangeInternal(index, range);
         return num > 0 ? clone : this;
     }
-    protected virtual int InsertRangeInternal(int index, IEnumerable<T> range)
+    int InsertRangeInternal(int index, IEnumerable<TPair> range)
     {
         range.ThrowWhenNull();
 
@@ -359,143 +334,111 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Returns a new instance where the element at the given index has been removed from the
+    /// original collection. If no changes are detected, returns the original
+    /// instance.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> RemoveAt(int index)
+    public IdentifierPairs RemoveAt(int index)
     {
         var clone = Clone();
         var num = clone.RemoveAtInternal(index);
         return num > 0 ? clone : this;
     }
-    protected virtual int RemoveAtInternal(int index)
+    int RemoveAtInternal(int index)
     {
         Items.RemoveAt(index);
         return 1;
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Returns a new instance where the given number of elements, starting from the given index,
+    /// have been removed from the collection. If no changes are detected, returns the original
+    /// instance.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> RemoveRange(int index, int count)
+    public IdentifierPairs RemoveRange(int index, int count)
     {
         var clone = Clone();
         var num = clone.RemoveRangeInternal(index, count);
         return num > 0 ? clone : this;
     }
-    protected virtual int RemoveRangeInternal(int index, int count)
+    int RemoveRangeInternal(int index, int count)
     {
         if (count > 0) Items.RemoveRange(index, count);
         return count;
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Returns a new instance where the element with the given tag name has been removed. If no
+    /// changes are detected, returns the original instance.
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="tag"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> Remove(K key)
+    public IdentifierPairs Remove(string tag)
     {
         var clone = Clone();
-        var num = clone.RemoveInternal(key);
+        var num = clone.RemoveInternal(tag);
         return num > 0 ? clone : this;
     }
-    protected virtual int RemoveInternal(K key)
+    int RemoveInternal(string tag)
     {
-        var index = IndexOf(key);
+        var index = IndexOf(tag);
         return index >= 0 ? RemoveAtInternal(index) : 0;
     }
 
     /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    public virtual IInvariantList<K, T> RemoveLast(K key)
-    {
-        var clone = Clone();
-        var num = clone.RemoveLastInternal(key);
-        return num > 0 ? clone : this;
-    }
-    protected virtual int RemoveLastInternal(K key)
-    {
-        var index = LastIndexOf(key);
-        return index >= 0 ? RemoveAtInternal(index) : 0;
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    public virtual IInvariantList<K, T> RemoveAll(K key)
-    {
-        var clone = Clone();
-        var num = clone.RemoveAllInternal(key);
-        return num > 0 ? clone : this;
-    }
-    protected virtual int RemoveAllInternal(K key)
-    {
-        var num = 0; while (true)
-        {
-            var index = IndexOf(key);
-
-            if (index >= 0) num += RemoveAtInternal(index);
-            else break;
-        }
-        return num;
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
+    /// Returns a new instance where the first element that matches the given predicate has been
+    /// removed. If no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> Remove(Predicate<T> predicate)
+    public IdentifierPairs Remove(Predicate<TPair> predicate)
     {
         var clone = Clone();
         var num = clone.RemoveInternal(predicate);
         return num > 0 ? clone : this;
     }
-    protected virtual int RemoveInternal(Predicate<T> predicate)
+    int RemoveInternal(Predicate<TPair> predicate)
     {
         var index = IndexOf(predicate);
         return index >= 0 ? RemoveAtInternal(index) : 0;
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Returns a new instance where the last element that matches the given predicate has been
+    /// removed. If no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> RemoveLast(Predicate<T> predicate)
+    public IdentifierPairs RemoveLast(Predicate<TPair> predicate)
     {
         var clone = Clone();
         var num = clone.RemoveLastInternal(predicate);
         return num > 0 ? clone : this;
     }
-    protected virtual int RemoveLastInternal(Predicate<T> predicate)
+    int RemoveLastInternal(Predicate<TPair> predicate)
     {
         var index = LastIndexOf(predicate);
         return index >= 0 ? RemoveAtInternal(index) : 0;
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Returns a new instance where all elements that match the given predicate has been removed.
+    /// If no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> RemoveAll(Predicate<T> predicate)
+    public IdentifierPairs RemoveAll(Predicate<TPair> predicate)
     {
         var clone = Clone();
         var num = clone.RemoveAllInternal(predicate);
         return num > 0 ? clone : this;
     }
-    protected virtual int RemoveAllInternal(Predicate<T> predicate)
+    int RemoveAllInternal(Predicate<TPair> predicate)
     {
         var num = 0; while (true)
         {
@@ -508,16 +451,17 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Returns a new instance where all the elements have been removed. If no changes are
+    /// detected, returns the original instance.
     /// </summary>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> Clear()
+    public IdentifierPairs Clear()
     {
         var clone = Clone();
         var num = clone.ClearInternal();
         return num > 0 ? clone : this;
     }
-    protected virtual int ClearInternal()
+    int ClearInternal()
     {
         var num = Items.Count; if (num > 0) Items.Clear();
         return num;

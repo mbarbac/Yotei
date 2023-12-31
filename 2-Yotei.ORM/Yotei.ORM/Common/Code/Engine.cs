@@ -15,6 +15,7 @@ public abstract partial class Engine : IEngine
     public const bool USETERMINATORS = true;
     public const char LEFTERMINATOR = '[';
     public const char RIGHTTERMINATOR = ']';
+    public const bool CASESENSITIVETAGS = false;
 
     // ----------------------------------------------------
 
@@ -37,6 +38,7 @@ public abstract partial class Engine : IEngine
         UseTerminators = source.UseTerminators;
         LeftTerminator = source.LeftTerminator;
         RightTerminator = source.RightTerminator;
+        CaseSensitiveTags = source.CaseSensitiveTags;
     }
 
     /// <summary>
@@ -114,6 +116,11 @@ public abstract partial class Engine : IEngine
         init => _RightTerminator = ValidateTerminator(value);
     }
     char _RightTerminator = RIGHTTERMINATOR;
+
+    /// <summary>
+    /// Determines if this engine treats its metadata tag names as case sensitive, or not.
+    /// </summary>
+    public bool CaseSensitiveTags { get; init; } = CASESENSITIVETAGS;
 
     // ----------------------------------------------------
 

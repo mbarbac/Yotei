@@ -1,3 +1,5 @@
+using Identifier = Yotei.ORM.Code.Identifier;
+
 namespace Yotei.ORM.Tests;
 
 // ========================================================
@@ -15,7 +17,7 @@ public static class Test_Identifier
     public static void Test_Create_Empty()
     {
         var engine = new FakeEngine();
-        var items = new Code.Identifier(engine);
+        var items = new Identifier(engine);
         Assert.Empty(items);
         Assert.Null(items.Value);
     }
@@ -25,27 +27,27 @@ public static class Test_Identifier
     public static void Test_Create_Single()
     {
         var engine = new FakeEngine();
-        var items = new Code.Identifier(engine, (string?)null);
+        var items = new Identifier(engine, (string?)null);
         Assert.Empty(items);
         Assert.Null(items.Value);
 
-        items = new Code.Identifier(engine, " ");
+        items = new Identifier(engine, " ");
         Assert.Empty(items);
         Assert.Null(items.Value);
 
-        items = new Code.Identifier(engine, " [ ] ");
+        items = new Identifier(engine, " [ ] ");
         Assert.Empty(items);
         Assert.Null(items.Value);
 
-        items = new Code.Identifier(engine, " [ [ ] ] ");
+        items = new Identifier(engine, " [ [ ] ] ");
         Assert.Empty(items);
         Assert.Null(items.Value);
 
-        items = new Code.Identifier(engine, "one");
+        items = new Identifier(engine, "one");
         Assert.Single(items);
         Assert.Equal("[one]", items.Value);
 
-        items = new Code.Identifier(engine, " [ [ one ] ]");
+        items = new Identifier(engine, " [ [ one ] ]");
         Assert.Single(items);
         Assert.Equal("[one]", items.Value);
     }
@@ -55,31 +57,31 @@ public static class Test_Identifier
     public static void Test_Create_Many()
     {
         var engine = new FakeEngine();
-        var items = new Code.Identifier(engine, "one.two.three");
+        var items = new Identifier(engine, "one.two.three");
         Assert.Equal(3, items.Count);
         Assert.Equal("[one].[two].[three]", items.Value);
 
-        items = new Code.Identifier(engine, "one.two.");
+        items = new Identifier(engine, "one.two.");
         Assert.Equal(3, items.Count);
         Assert.Equal("[one].[two].", items.Value);
 
-        items = new Code.Identifier(engine, "one..");
+        items = new Identifier(engine, "one..");
         Assert.Equal(3, items.Count);
         Assert.Equal("[one]..", items.Value);
 
-        items = new Code.Identifier(engine, "..");
+        items = new Identifier(engine, "..");
         Assert.Empty(items);
         Assert.Null(items.Value);
 
-        items = new Code.Identifier(engine, ".two.three");
+        items = new Identifier(engine, ".two.three");
         Assert.Equal(2, items.Count);
         Assert.Equal("[two].[three]", items.Value);
 
-        items = new Code.Identifier(engine, "..three");
+        items = new Identifier(engine, "..three");
         Assert.Single(items);
         Assert.Equal("[three]", items.Value);
 
-        items = new Code.Identifier(engine, ["one", "two.three"]);
+        items = new Identifier(engine, ["one", "two.three"]);
         Assert.Equal(3, items.Count);
         Assert.Equal("[one].[two].[three]", items.Value);
     }
@@ -89,15 +91,15 @@ public static class Test_Identifier
     public static void Test_Create_Embedded()
     {
         var engine = new FakeEngine();
-        var items = new Code.Identifier(engine, " [ one.two ] ");
+        var items = new Identifier(engine, " [ one.two ] ");
         Assert.Single(items);
         Assert.Equal("[one.two]", items.Value);
 
-        items = new Code.Identifier(engine, " [ one two ] ");
+        items = new Identifier(engine, " [ one two ] ");
         Assert.Single(items);
         Assert.Equal("[one two]", items.Value);
 
-        items = new Code.Identifier(engine, " [ one [ two.three ] ] ");
+        items = new Identifier(engine, " [ one [ two.three ] ] ");
         Assert.Single(items);
         Assert.Equal("[one [ two.three ]]", items.Value);
     }
@@ -108,15 +110,15 @@ public static class Test_Identifier
     {
         var engine = new FakeEngine() { UseTerminators = false };
 
-        var items = new Code.Identifier(engine, " one . two ");
+        var items = new Identifier(engine, " one . two ");
         Assert.Equal(2, items.Count);
         Assert.Equal("one.two", items.Value);
 
-        items = new Code.Identifier(engine, "[one].two");
+        items = new Identifier(engine, "[one].two");
         Assert.Equal(2, items.Count);
         Assert.Equal("[one].two", items.Value);
 
-        try { _ = new Code.Identifier(engine, "one two"); Assert.Fail(); }
+        try { _ = new Identifier(engine, "one two"); Assert.Fail(); }
         catch (ArgumentException) { }
     }
 
@@ -126,32 +128,32 @@ public static class Test_Identifier
     {
         var engine = new FakeEngine() { LeftTerminator = '\'', RightTerminator = '\'' };
 
-        var items = new Code.Identifier(engine, "'one'");
+        var items = new Identifier(engine, "'one'");
         Assert.Equal(1, items.Count);
         Assert.Equal("one", items.ToUnwrappedValue());
         Assert.Equal("'one'", items.Value);
 
-        items = new Code.Identifier(engine, "'one.two.three'");
+        items = new Identifier(engine, "'one.two.three'");
         Assert.Equal(1, items.Count);
         Assert.Equal("one.two.three", items.ToUnwrappedValue());
         Assert.Equal("'one.two.three'", items.Value);
 
-        items = new Code.Identifier(engine, "'one'.'two'.'three'");
+        items = new Identifier(engine, "'one'.'two'.'three'");
         Assert.Equal(3, items.Count);
         Assert.Equal("one.two.three", items.ToUnwrappedValue());
         Assert.Equal("'one'.'two'.'three'", items.Value);
 
-        items = new Code.Identifier(engine, ".'two'.'three'");
+        items = new Identifier(engine, ".'two'.'three'");
         Assert.Equal(2, items.Count);
         Assert.Equal("two.three", items.ToUnwrappedValue());
         Assert.Equal("'two'.'three'", items.Value);
 
-        items = new Code.Identifier(engine, "'one'..'three'");
+        items = new Identifier(engine, "'one'..'three'");
         Assert.Equal(3, items.Count);
         Assert.Equal("one..three", items.ToUnwrappedValue());
         Assert.Equal("'one'..'three'", items.Value);
 
-        items = new Code.Identifier(engine, "'one'.'two'.");
+        items = new Identifier(engine, "'one'.'two'.");
         Assert.Equal(3, items.Count);
         Assert.Equal("one.two.", items.ToUnwrappedValue());
         Assert.Equal("'one'.'two'.", items.Value);
@@ -162,7 +164,7 @@ public static class Test_Identifier
     public static void Test_Create_With_Duplicates()
     {
         var engine = new FakeEngine();
-        var items = new Code.Identifier(engine, "one.two.one.four");
+        var items = new Identifier(engine, "one.two.one.four");
         Assert.Equal(4, items.Count);
         Assert.Equal("[one].[two].[one].[four]", items.Value);
     }
@@ -173,25 +175,25 @@ public static class Test_Identifier
     {
         var engine = new FakeEngine();
 
-        var source = new Code.Identifier(engine);
+        var source = new Identifier(engine);
         var target = source.Clone();
         Assert.NotSame(source, target);
         Assert.Equal(source.Count, target.Count);
         Assert.Equal(source.Value, target.Value);
 
-        source = new Code.Identifier(engine, "one.two.three");
+        source = new Identifier(engine, "one.two.three");
         target = source.Clone();
         Assert.NotSame(source, target);
         Assert.Equal(source.Count, target.Count);
         Assert.Equal(source.Value, target.Value);
 
-        source = new Code.Identifier(engine, "one.two.");
+        source = new Identifier(engine, "one.two.");
         target = source.Clone();
         Assert.NotSame(source, target);
         Assert.Equal(source.Count, target.Count);
         Assert.Equal(source.Value, target.Value);
 
-        source = new Code.Identifier(engine, ".two.three");
+        source = new Identifier(engine, ".two.three");
         target = source.Clone();
         Assert.NotSame(source, target);
         Assert.Equal(source.Count, target.Count);
@@ -203,7 +205,7 @@ public static class Test_Identifier
     public static void Test_Find()
     {
         var engine = new FakeEngine();
-        var items = new Code.Identifier(engine, "one.two.one.four");
+        var items = new Identifier(engine, "one.two.one.four");
 
         Assert.Equal(-1, items.IndexOf("any"));
 
@@ -224,7 +226,7 @@ public static class Test_Identifier
     public static void Test_GetRange()
     {
         var engine = new FakeEngine();
-        var source = new Code.Identifier(engine, "one.two.one.four");
+        var source = new Identifier(engine, "one.two.one.four");
 
         var target = source.GetRange(0, source.Count);
         Assert.Same(source, target);
@@ -244,7 +246,7 @@ public static class Test_Identifier
     public static void Test_Replace()
     {
         var engine = new FakeEngine();
-        var source = new Code.Identifier(engine, "one.two.one.four");
+        var source = new Identifier(engine, "one.two.one.four");
 
         var target = source.Replace(1, "two");
         Assert.Same(source, target);
@@ -285,11 +287,11 @@ public static class Test_Identifier
     public static void Test_Add()
     {
         var engine = new FakeEngine();
-        var source = new Code.Identifier(engine);
+        var source = new Identifier(engine);
         var target = source.Add((string?)null);
         Assert.Same(source, target);
 
-        source = new Code.Identifier(engine, "one.two.one");
+        source = new Identifier(engine, "one.two.one");
 
         target = source.Add("four");
         Assert.NotSame(source, target);
@@ -317,7 +319,7 @@ public static class Test_Identifier
     public static void Test_AddRange()
     {
         var engine = new FakeEngine();
-        var source = new Code.Identifier(engine, "one.two.three");
+        var source = new Identifier(engine, "one.two.three");
         var target = source.AddRange((IEnumerable<IIdentifierPart>)[]);
         Assert.Same(source, target);
 
@@ -337,7 +339,7 @@ public static class Test_Identifier
     public static void Test_Insert()
     {
         var engine = new FakeEngine();
-        var source = new Code.Identifier(engine, "one.two.three");
+        var source = new Identifier(engine, "one.two.three");
 
         var target = source.Insert(0, "zero");
         Assert.NotSame(source, target);
@@ -363,7 +365,7 @@ public static class Test_Identifier
     public static void Test_InsertRange()
     {
         var engine = new FakeEngine();
-        var source = new Code.Identifier(engine, "one.two.three");
+        var source = new Identifier(engine, "one.two.three");
         var target = source.InsertRange(0, (IEnumerable<IIdentifierPart>)[]);
         Assert.Same(source, target);
 
@@ -383,7 +385,7 @@ public static class Test_Identifier
     public static void Test_RemoveAt()
     {
         var engine = new FakeEngine();
-        var source = new Code.Identifier(engine, "one.two.three");
+        var source = new Identifier(engine, "one.two.three");
 
         var target = source.RemoveAt(2);
         Assert.NotSame(source, target);
@@ -395,7 +397,7 @@ public static class Test_Identifier
         Assert.Equal(2, target.Count);
         Assert.Equal("[two].[three]", target.Value);
 
-        source = new Code.Identifier(engine, "one..three");
+        source = new Identifier(engine, "one..three");
         target = source.RemoveAt(0);
         Assert.NotSame(source, target);
         Assert.Equal(1, target.Count);
@@ -407,7 +409,7 @@ public static class Test_Identifier
     public static void Test_Remove_Predicate()
     {
         var engine = new FakeEngine();
-        var source = new Code.Identifier(engine, "one.two.three");
+        var source = new Identifier(engine, "one.two.three");
 
         var target = source.Remove(x => x.UnwrappedValue!.Contains('e'));
         Assert.NotSame(source, target);
@@ -430,7 +432,7 @@ public static class Test_Identifier
     public static void Test_Clear()
     {
         var engine = new FakeEngine();
-        var source = new Code.Identifier(engine, "one.two.three");
+        var source = new Identifier(engine, "one.two.three");
 
         var target = source.Clear();
         Assert.NotSame(source, target);
@@ -449,7 +451,7 @@ public static class Test_Identifier_Match
     {
         var engine = new FakeEngine();
 
-        var source = new Code.Identifier(engine);
+        var source = new Identifier(engine);
         Assert.True(source.Match(null));
         Assert.True(source.Match(""));
         Assert.True(source.Match("  "));
@@ -461,22 +463,22 @@ public static class Test_Identifier_Match
     {
         var engine = new FakeEngine();
 
-        var source = new Code.Identifier(engine, "one");
+        var source = new Identifier(engine, "one");
         Assert.True(source.Match("ONE"));
 
-        source = new Code.Identifier(engine, "one.two");
+        source = new Identifier(engine, "one.two");
         Assert.False(source.Match("one"));
 
-        source = new Code.Identifier(engine, "one.two");
+        source = new Identifier(engine, "one.two");
         Assert.False(source.Match("one.x"));
 
-        source = new Code.Identifier(engine, "one.two.three");
+        source = new Identifier(engine, "one.two.three");
         Assert.True(source.Match("..three"));
 
-        source = new Code.Identifier(engine, "one.two.three");
+        source = new Identifier(engine, "one.two.three");
         Assert.True(source.Match("one.."));
 
-        source = new Code.Identifier(engine, "one.two.three");
+        source = new Identifier(engine, "one.two.three");
         Assert.True(source.Match("two."));
     }
 
@@ -486,13 +488,13 @@ public static class Test_Identifier_Match
     {
         var engine = new FakeEngine();
 
-        var source = new Code.Identifier(engine);
+        var source = new Identifier(engine);
         Assert.False(source.Match("any"));
 
-        source = new Code.Identifier(engine, "one");
+        source = new Identifier(engine, "one");
         Assert.False(source.Match("two.one"));
 
-        source = new Code.Identifier(engine, "two.one");
+        source = new Identifier(engine, "two.one");
         Assert.False(source.Match("four...one"));
     }
 
@@ -502,16 +504,16 @@ public static class Test_Identifier_Match
     {
         var engine = new FakeEngine() { CaseSensitiveNames = true };
 
-        var source = new Code.Identifier(engine, "one");
+        var source = new Identifier(engine, "one");
         Assert.False(source.Match("ONE"));
 
-        source = new Code.Identifier(engine, "one.two.three");
+        source = new Identifier(engine, "one.two.three");
         Assert.False(source.Match("..THREE"));
 
-        source = new Code.Identifier(engine, "one.two.three");
+        source = new Identifier(engine, "one.two.three");
         Assert.False(source.Match("ONE.."));
 
-        source = new Code.Identifier(engine, "one.two.three");
+        source = new Identifier(engine, "one.two.three");
         Assert.False(source.Match("TWO."));
     }
 }

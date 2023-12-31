@@ -11,6 +11,7 @@ public sealed partial class Identifier : IIdentifier
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="engine"></param>
+    [SuppressMessage("", "IDE0290")]
     public Identifier(IEngine engine) => Engine = engine.ThrowWhenNull();
 
     /// <summary>
@@ -66,21 +67,10 @@ public sealed partial class Identifier : IIdentifier
 
     readonly List<IIdentifierPart> Items = [];
 
-    /// <summary>
-    /// Invoked to validate the given element before using it.
-    /// </summary>
     static IIdentifierPart ValidateItem(IIdentifierPart item) => item.ThrowWhenNull();
-
-    /// <summary>
-    /// Invoked to obtain the key associated with the given element.
-    /// </summary>
     static string? GetKey(IIdentifierPart item, bool wrapped) => wrapped
         ? item.Value
         : item.UnwrappedValue;
-
-    /// <summary>
-    /// Invoked to validate the given key before using it.
-    /// </summary>
     string? ValidateKey(string? key, bool wrapped)
     {
         if ((key = key.NullWhenEmpty()) == null) return null;
@@ -97,26 +87,11 @@ public sealed partial class Identifier : IIdentifier
             return key;
         }
     }
-
-    /// <summary>
-    /// Invoked to determine if the two given elements shall be considered equal, or not, for
-    /// comparison purposes.
-    /// </summary>
-    bool Compare(string? source, string? other)
-        => string.Compare(source, other, !Engine.CaseSensitiveNames) == 0;
-
-    /// <summary>
-    /// Invoked to determine if the two given elements shall be considered the same element,
-    /// or not, for adding, inserting or replacing purposes.
-    /// </summary>
+    bool Compare(string? source, string? other) =>
+        string.Compare(source, other, !Engine.CaseSensitiveNames) == 0;
     static bool IsSameElement(IIdentifierPart item, IIdentifierPart other) =>
         item.Value == other.Value &&
         item.UnwrappedValue == other.UnwrappedValue;
-
-    /// <summary>
-    /// Determines if the given duplicated item can be added or inserted to this collection, or
-    /// not. This method shall throw an exception if duplicates are not allowed.
-    /// </summary>
     static bool AcceptDuplicates(IIdentifierPart _, IIdentifierPart __) => true;
 
     // ----------------------------------------------------
