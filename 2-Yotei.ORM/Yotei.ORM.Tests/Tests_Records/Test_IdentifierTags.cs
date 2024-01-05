@@ -112,36 +112,36 @@ public static class Test_IdentifierTags
     }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_GetRange() { }
+    [Fact]
+    public static void Test_GetRange() { /*TODO*/ }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_Replace() { }
+    [Fact]
+    public static void Test_Replace() { /*TODO*/ }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_Add() { }
+    [Fact]
+    public static void Test_Add() { /*TODO*/ }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_AddRange() { }
+    [Fact]
+    public static void Test_AddRange() { /*TODO*/ }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_Insert() { }
+    [Fact]
+    public static void Test_Insert() { /*TODO*/ }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_InsertRange() { }
+    [Fact]
+    public static void Test_InsertRange() { /*TODO*/ }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_RemoveAt() { }
+    [Fact]
+    public static void Test_RemoveAt() { /*TODO*/ }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_RemoveRange() { }
+    [Fact]
+    public static void Test_RemoveRange() { /*TODO*/ }
 
     //[Enforced]
     [Fact]
@@ -176,10 +176,10 @@ public static class Test_IdentifierTags
     }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_Remove_Predicate() { }
+    [Fact]
+    public static void Test_Remove_Predicate() { /*TODO*/ }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_Clear() { }
+    [Fact]
+    public static void Test_Clear() { /*TODO*/ }
 }

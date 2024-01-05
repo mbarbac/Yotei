@@ -1,86 +1,86 @@
 namespace Experiments;
 
 // ========================================================
-//[Enforced]
+////[Enforced]
 public static partial class Test_Template
 {
     //[Enforced]
-    //[Fact]
-    //public static void Test_Create_Empty() { }
+    [Fact]
+    public static void Test_Create_Empty() { /*TODO*/ }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_Create_Single() { }
+    [Fact]
+    public static void Test_Create_Single() { /*TODO*/ }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_Create_Multiple() { }
+    [Fact]
+    public static void Test_Create_Multiple() { /*TODO*/ }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_Create_Multiple_With_Duplicates() { }
+    [Fact]
+    public static void Test_Create_Multiple_With_Duplicates() { /*TODO*/ }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_Change_Settings() { }
+    [Fact]
+    public static void Test_Change_Settings() { /*TODO*/ }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_Contains() { }
+    [Fact]
+    public static void Test_Contains() { /*TODO*/ }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_Find_Key() { }
+    [Fact]
+    public static void Test_Find_Key() { /*TODO*/ }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_Find_Predicate() { }
+    [Fact]
+    public static void Test_Find_Predicate() { /*TODO*/ }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_Clone() { }
+    [Fact]
+    public static void Test_Clone() { /*TODO*/ }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_GetRange() { }
+    [Fact]
+    public static void Test_GetRange() { /*TODO*/ }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_Replace() { }
+    [Fact]
+    public static void Test_Replace() { /*TODO*/ }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_Add() { }
+    [Fact]
+    public static void Test_Add() { /*TODO*/ }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_AddRange() { }
+    [Fact]
+    public static void Test_AddRange() { /*TODO*/ }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_Insert() { }
+    [Fact]
+    public static void Test_Insert() { /*TODO*/ }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_InsertRange() { }
+    [Fact]
+    public static void Test_InsertRange() { /*TODO*/ }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_RemoveAt() { }
+    [Fact]
+    public static void Test_RemoveAt() { /*TODO*/ }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_RemoveRange() { }
+    [Fact]
+    public static void Test_RemoveRange() { /*TODO*/ }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_Remove_Item() { }
+    [Fact]
+    public static void Test_Remove_Item() { /*TODO*/ }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_Remove_Predicate() { }
+    [Fact]
+    public static void Test_Remove_Predicate() { /*TODO*/ }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_Clear() { }
+    [Fact]
+    public static void Test_Clear() { /*TODO*/ }
 }

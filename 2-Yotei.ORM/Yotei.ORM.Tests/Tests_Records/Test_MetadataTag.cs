@@ -328,8 +328,8 @@ public static class Test_MetadataTag
     }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_Remove_Predicate() { }
+    [Fact]
+    public static void Test_Remove_Predicate() { /*TODO*/ }
 
     //[Enforced]
     [Fact]

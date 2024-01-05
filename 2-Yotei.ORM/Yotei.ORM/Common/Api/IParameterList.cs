@@ -3,7 +3,7 @@
 // ========================================================
 /// <summary>
 /// An immutable object that represents the ordered collection of parameters given to a command.
-/// <br/> Elements with duplicated names are not allowed.
+/// <br/> Elements with duplicated names are not allowed unless they are the same instance.
 /// </summary>
 public interface IParameterList : IEnumerable<IParameter>
 {
@@ -32,11 +32,25 @@ public interface IParameterList : IEnumerable<IParameter>
     bool Contains(string name);
 
     /// <summary>
-    /// Returns the index of the element with the given name, or -1 if not found.
+    /// Returns the index of the first element with the given name, or -1 if not found.
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
     int IndexOf(string name);
+
+    /// <summary>
+    /// Returns the index of the last element with the given name, or -1 if not found.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    int LastIndexOf(string name);
+
+    /// <summary>
+    /// Returns the indexes of the elements with the given key.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    List<int> IndexesOf(string name);
 
     /// <summary>
     /// Determines if this collection contains an element that matches the given predicate.
@@ -109,8 +123,8 @@ public interface IParameterList : IEnumerable<IParameter>
     IParameterList Add(IParameter item);
 
     /// <summary>
-    /// Returns a new instance where a new element based upon the given value and a name that is
-    /// generated automatically has been added to the collection.
+    /// Returns a new instance where a new element, built using the given value and a name that
+    /// is generated automatically, has been added to the collection.
     /// </summary>
     /// <param name="value"></param>
     /// <param name="item"></param>
@@ -135,8 +149,8 @@ public interface IParameterList : IEnumerable<IParameter>
     IParameterList Insert(int index, IParameter item);
 
     /// <summary>
-    /// Returns a new instance where a new element based upon the given value and a name that is
-    /// generated automatically has been inserted into the collection at the given index.
+    /// Returns a new instance where a new element, built using the given value and a name that
+    /// is generated automatically has been inserted into the collection at the given index.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="value"></param>
@@ -172,12 +186,28 @@ public interface IParameterList : IEnumerable<IParameter>
     IParameterList RemoveRange(int index, int count);
 
     /// <summary>
-    /// Returns a new instance where the element with the given name has been removed. If no
-    /// changes are detected, returns the original instance.
+    /// Returns a new instance where the first element with the given name has been removed. If
+    /// no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
     IParameterList Remove(string name);
+
+    /// <summary>
+    /// Returns a new instance where the last element with the given name has been removed. If
+    /// no changes are detected, returns the original instance.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    IParameterList RemoveLast(string name);
+
+    /// <summary>
+    /// Returns a new instance where all the elements with the given name have been removed. If
+    /// no changes are detected, returns the original instance.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    IParameterList RemoveAll(string name);
 
     /// <summary>
     /// Returns a new instance where the first element that matches the given predicate has been
