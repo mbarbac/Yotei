@@ -26,6 +26,12 @@ public partial interface ISchemaEntry : IEnumerable<TPair>
     [WithGenerator] bool IsPrimaryKey { get; }
 
     /// <summary>
+    /// Determines if this instance describes an entry that is a unique valued one, or is part of
+    /// the unique valued group, if any, or not.
+    /// </summary>
+    [WithGenerator] bool IsUniqueValued { get; }
+
+    /// <summary>
     /// Determines if this instance describes a read only entry in a record, or not.
     /// </summary>
     [WithGenerator] bool IsReadOnly { get; }
@@ -38,39 +44,54 @@ public partial interface ISchemaEntry : IEnumerable<TPair>
     int Count { get; }
 
     /// <summary>
-    /// Returns the value of the metadata entry whose tag is given. If such tag does not exist,
-    /// an exception is thrown.
+    /// Gets the metadata tag names in this collection.
     /// </summary>
-    /// <param name="tag"></param>
-    /// <returns></returns>
-    object? this[string tag] { get; }
+    IEnumerable<string> Names { get; }
 
     /// <summary>
-    /// Determines if this instance contains a metadata entry with the given tag, or not.
+    /// Returns the value of the metadata entry whose tag name is given. If such tag does not
+    /// exist, an exception is thrown.
     /// </summary>
-    /// <param name="tag"></param>
+    /// <param name="name"></param>
     /// <returns></returns>
-    bool Contains(string tag);
+    object? this[string name] { get; }
 
     /// <summary>
-    /// Tries to obtain the value of the metadata entry with the given tag.
+    /// Determines if this instance contains a metadata entry with the given tag name, or not.
     /// </summary>
-    /// <param name="tag"></param>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    bool Contains(string name);
+
+    /// <summary>
+    /// Tries to obtain the value of the metadata entry with the given tag name.
+    /// </summary>
+    /// <param name="name"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    bool TryGetValue(string tag, out object? value);
+    bool TryGetValue(string name, out object? value);
+
+    /// <summary>
+    /// Tries to obtain the value of the metadata entry with the given tag name, provided that
+    /// value is of the requested type.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="name"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    bool TryGetValue<T>(string name, out T value);
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a new instance where the value of the metadata entry with the given tag has been
-    /// replaced with the given one. If such entry did not exist, a new metadata entry is added
-    /// to the returned instance.
+    /// Returns a new instance where the value of the metadata entry with the given tag name has
+    /// been replaced with the given one. If such entry did not exist, a new metadata entry is
+    /// added to the returned instance.
     /// </summary>
     /// <param name="tag"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    ISchemaEntry Replace(string tag, object? value);
+    ISchemaEntry Replace(string name, object? value);
 
     /// <summary>
     /// Returns a new instance where a new metadata pair with the given tag name and value has been
@@ -79,7 +100,15 @@ public partial interface ISchemaEntry : IEnumerable<TPair>
     /// <param name="tag"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    ISchemaEntry Add(string tag, object? value);
+    ISchemaEntry Add(string name, object? value);
+
+    /// <summary>
+    /// Returns a new instance where the given metadata pair has been added. If a pair with the
+    /// given tag already exists, and exception is thrown.
+    /// </summary>
+    /// <param name="pair"></param>
+    /// <returns></returns>
+    ISchemaEntry Add(TPair pair);
 
     /// <summary>
     /// Returns a new instance where the metadata pairs from the given range have been added to the
@@ -95,7 +124,7 @@ public partial interface ISchemaEntry : IEnumerable<TPair>
     /// </summary>
     /// <param name="tag"></param>
     /// <returns></returns>
-    ISchemaEntry Remove(string tag);
+    ISchemaEntry Remove(string name);
 
     /// <summary>
     /// Returns a new instance where all the original metadata entries have been removed.
