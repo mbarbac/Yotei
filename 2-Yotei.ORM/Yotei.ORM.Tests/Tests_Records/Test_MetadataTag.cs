@@ -278,7 +278,7 @@ public static class Test_MetadataTag
         Assert.True(target.HasValue);
         Assert.Equal(50, target.Value);
 
-        source = new MetadataTag(engine, "one");
+        source = new MetadataTag(engine, "one"); // Cannot remove default
         try { source.RemoveAt(0); Assert.Fail(); }
         catch (InvalidOperationException) { }
     }
@@ -300,7 +300,7 @@ public static class Test_MetadataTag
         Assert.True(target.HasValue);
         Assert.Equal(50, target.Value);
 
-        try { source.RemoveRange(0, source.Count); Assert.Fail(); }
+        try { source.RemoveRange(0, source.Count); Assert.Fail(); } // Cannot remove default
         catch (InvalidOperationException) { }
     }
 
@@ -323,13 +323,40 @@ public static class Test_MetadataTag
         Assert.Equal(50, target.Value);
 
         source = new MetadataTag(engine, "one");
-        try { source.Remove("one"); Assert.Fail(); }
+        try { source.Remove("one"); Assert.Fail(); } // Cannot remove default
         catch (InvalidOperationException) { }
     }
 
     //[Enforced]
     [Fact]
-    public static void Test_Remove_Predicate() { /*TODO*/ }
+    public static void Test_Remove_Predicate()
+    {
+        var engine = new FakeEngine();
+        var source = new MetadataTag(engine, ["one", "two", "three"]) { Value = 50 };
+
+        var target = source.Remove(x => x.Contains('z'));
+        Assert.Same(source, target);
+
+        target = source.Remove(x => x.Contains('e'));
+        Assert.NotSame(source, target);
+        Assert.Equal(2, target.Count);
+        Assert.Equal("two", target[0]);
+        Assert.Equal("three", target[1]);
+
+        target = source.RemoveLast(x => x.Contains('e'));
+        Assert.NotSame(source, target);
+        Assert.Equal(2, target.Count);
+        Assert.Equal("one", target[0]);
+        Assert.Equal("two", target[1]);
+
+        target = source.RemoveAll(x => x.Contains('e'));
+        Assert.NotSame(source, target);
+        Assert.Single(target);
+        Assert.Equal("two", target[0]);
+
+        try { source.RemoveAll(x => true); Assert.Fail(); } // Cannot remove default
+        catch (InvalidOperationException) { }
+    }
 
     //[Enforced]
     [Fact]
@@ -339,6 +366,7 @@ public static class Test_MetadataTag
         var source = new MetadataTag(engine, "one");
         var target = source.Clear();
         Assert.Same(source, target);
+        Assert.Single(target);
 
         source = new MetadataTag(engine, ["one", "two"]) { Value = 50 };
         target = source.Clear();
