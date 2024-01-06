@@ -1,4 +1,4 @@
-namespace Experiments;
+namespace Experiments.Collections;
 
 // ========================================================
 /// <summary>
