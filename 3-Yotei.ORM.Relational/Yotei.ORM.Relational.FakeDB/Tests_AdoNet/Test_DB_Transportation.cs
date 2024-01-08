@@ -47,7 +47,7 @@ public static class Test_DB_Transportation
 
     // ----------------------------------------------------
 
-    [Enforced]
+    //[Enforced]
     [Fact]
     public static void Test_Query_Plates()
     {

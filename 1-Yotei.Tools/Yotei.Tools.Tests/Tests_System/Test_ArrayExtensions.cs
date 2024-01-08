@@ -17,6 +17,7 @@ public static class Test_ArrayExtensions
 
         source = [];
         target = source.Duplicate();
+        Assert.Same(source, target);
         Assert.Empty(target);
     }
 
@@ -43,21 +44,21 @@ public static class Test_ArrayExtensions
     public static void Test_GetRange()
     {
         var source = new[] { "1", "2", "3" };
-        var target = source.GetRange(1, 2);
+        var target = source.GetRange(0, 0);
+        Assert.Empty(target);
+
+        target = source.GetRange(1, 2);
+        Assert.NotSame(source, target);
         Assert.Equal(2, target.Length);
         Assert.Same(source[1], target[0]);
         Assert.Same(source[2], target[1]);
-
-        target = source.GetRange(1, 0);
-        Assert.Empty(target);
     }
-
     //[Enforced]
     [Fact]
-    public static void Test_ReplaceItem()
+    public static void Test_Replace()
     {
         var source = new[] { "1", "2", "3" };
-        var target = source.ReplaceItem(1, "4");
+        var target = source.Replace(1, "4");
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Length);
         Assert.Same(source[0], target[0]);
@@ -71,6 +72,7 @@ public static class Test_ArrayExtensions
     {
         var source = new[] { "1", "2", "3" };
         var target = source.Add("4");
+        Assert.NotSame(source, target);
         Assert.Equal(4, target.Length);
         Assert.Same(source[0], target[0]);
         Assert.Same(source[1], target[1]);
@@ -79,6 +81,7 @@ public static class Test_ArrayExtensions
 
         source = [];
         target = source.Add("4");
+        Assert.NotSame(source, target);
         Assert.Single(target);
         Assert.Same("4", target[0]);
     }
@@ -89,6 +92,7 @@ public static class Test_ArrayExtensions
     {
         var source = new[] { "1", "2", "3" };
         var target = source.AddRange(["4", "5"]);
+        Assert.NotSame(source, target);
         Assert.Equal(5, target.Length);
         Assert.Same(source[0], target[0]);
         Assert.Same(source[1], target[1]);
@@ -96,7 +100,8 @@ public static class Test_ArrayExtensions
         Assert.Same("4", target[3]);
         Assert.Same("5", target[4]);
 
-        target = source.AddRange(Array.Empty<string>());
+        target = source.AddRange([]);
+        Assert.NotSame(source, target);
         Assert.Equal(3, target.Length);
         Assert.Same(source[0], target[0]);
         Assert.Same(source[1], target[1]);
@@ -105,12 +110,14 @@ public static class Test_ArrayExtensions
         source = [];
         target = source.AddRange(["4", "5"]);
         Assert.NotSame(source, target);
+        Assert.NotSame(source, target);
         Assert.Equal(2, target.Length);
         Assert.Same("4", target[0]);
         Assert.Same("5", target[1]);
 
         source = [];
-        target = source.AddRange(Array.Empty<string>());
+        target = source.AddRange([]);
+        Assert.Same(source, target);
         Assert.Empty(target);
     }
 
@@ -119,12 +126,22 @@ public static class Test_ArrayExtensions
     public static void Test_Insert()
     {
         var source = new[] { "1", "2", "3" };
+
         var target = source.Insert(0, "4");
+        Assert.NotSame(source, target);
         Assert.Equal(4, target.Length);
         Assert.Same("4", target[0]);
         Assert.Same(source[0], target[1]);
         Assert.Same(source[1], target[2]);
         Assert.Same(source[2], target[3]);
+
+        target = source.Insert(3, "4");
+        Assert.NotSame(source, target);
+        Assert.Equal(4, target.Length);        
+        Assert.Same(source[0], target[0]);
+        Assert.Same(source[1], target[1]);
+        Assert.Same(source[2], target[2]);
+        Assert.Same("4", target[3]);
 
         source = [];
         target = source.Insert(0, "4");
@@ -132,10 +149,7 @@ public static class Test_ArrayExtensions
         Assert.Single(target);
         Assert.Same("4", target[0]);
 
-        try { target = source.Insert(1, "4"); Assert.Fail(); }
-        catch (ArgumentException) { }
-
-        try { target = source.Insert(4, "4"); Assert.Fail(); }
+        try { source = []; target = source.Insert(1, "4"); Assert.Fail(); }
         catch (ArgumentException) { }
     }
 
@@ -145,6 +159,7 @@ public static class Test_ArrayExtensions
     {
         var source = new[] { "1", "2", "3" };
         var target = source.InsertRange(3, ["4", "5"]);
+        Assert.NotSame(source, target);
         Assert.Equal(5, target.Length);
         Assert.Same(source[0], target[0]);
         Assert.Same(source[1], target[1]);
@@ -152,7 +167,7 @@ public static class Test_ArrayExtensions
         Assert.Same("4", target[3]);
         Assert.Same("5", target[4]);
 
-        target = source.InsertRange(0, Array.Empty<string>());
+        target = source.InsertRange(0, []);
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Length);
         Assert.Same(source[0], target[0]);
@@ -167,10 +182,11 @@ public static class Test_ArrayExtensions
         Assert.Same("5", target[1]);
 
         source = [];
-        target = source.InsertRange(0, Array.Empty<string>());
+        target = source.InsertRange(0, []);
+        Assert.Same(source, target);
         Assert.Empty(target);
 
-        try { target = source.InsertRange(1, Array.Empty<string>()); Assert.Fail(); }
+        try { source = []; target = source.InsertRange(1, []); Assert.Fail(); }
         catch (ArgumentException) { }
     }
 
@@ -180,9 +196,18 @@ public static class Test_ArrayExtensions
     {
         var source = new[] { "1", "2", "3" };
         var target = source.RemoveAt(1);
+        Assert.NotSame(source, target);
         Assert.Equal(2, target.Length);
         Assert.Same(source[0], target[0]);
         Assert.Same(source[2], target[1]);
+
+        source = ["1"];
+        target = source.RemoveAt(0);
+        Assert.NotSame(source, target);
+        Assert.Empty(target);
+
+        try { source = []; target = source.RemoveAt(0); Assert.Fail(); }
+        catch (InvalidOperationException) { }
     }
 
     //[Enforced]
@@ -191,11 +216,20 @@ public static class Test_ArrayExtensions
     {
         var source = new[] { "1", "2", "3" };
         var target = source.RemoveRange(1, 2);
+        Assert.NotSame(source, target);
         Assert.Single(target);
         Assert.Same(source[0], target[0]);
 
         target = source.RemoveRange(0, 3);
+        Assert.NotSame(source, target);
         Assert.Empty(target);
+
+        target = source.RemoveRange(0, 0);
+        Assert.NotSame(source, target);
+        Assert.Equal(3, target.Length);
+        Assert.Same(source[0], target[0]);
+        Assert.Same(source[1], target[1]);
+        Assert.Same(source[2], target[2]);
     }
 
     //[Enforced]

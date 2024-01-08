@@ -2,7 +2,7 @@ namespace Experiments.Collections;
 
 // ========================================================
 //[Enforced]
-public static partial class Test_InvariantList_KT
+public static partial class Test_FrozenArray
 {
     internal class Element(string name)
     {
@@ -13,22 +13,33 @@ public static partial class Test_InvariantList_KT
     // ----------------------------------------------------
 
     [Cloneable]
-    internal partial class Chain : InvariantList<string, Element>
+    internal partial class Chain : FrozenArray<Element>
     {
         public Chain(bool sensitive) => CaseSensitive = sensitive;
         public Chain(bool sensitive, Element item) : this(sensitive) => AddInternal(item);
         public Chain(bool sensitive, IEnumerable<Element> range) : this(sensitive) => AddRangeInternal(range);
-        protected Chain(Chain source) : this(source.CaseSensitive) => AddRangeInternal(source);
-        
-        protected override Element ValidateItem(Element item) => item.ThrowWhenNull();
-        protected override string GetKey(Element item) => item.Name;
-        protected override string ValidateKey(string key) => key.NotNullNotEmpty();
-        protected override bool Compare(string source, string other) => string.Compare(source, other, !CaseSensitive) == 0;
-        protected override bool IsSameElement(Element source, Element item) => ReferenceEquals(source, item);
-        protected override bool AcceptDuplicates(Element source, Element item)
-            => ReferenceEquals(source, item)
-            ? true
-            : throw new DuplicateException().WithData(item);
+        protected Chain(Chain source) : base(source) => CaseSensitive = source.CaseSensitive;
+
+        protected override Element ValidateItem(Element item, bool add)
+        {
+            item.ThrowWhenNull();
+            if (add) item.Name.NotNullNotEmpty();
+            return item;
+        }
+        protected override bool CompareItems(Element resident, Element item)
+        {
+            return string.Compare(resident.Name, item.Name, !CaseSensitive) == 0;
+        }
+        protected override List<int> GetDuplicates(Element item)
+        {
+            return base.GetDuplicates(item);
+        }
+        protected override bool AcceptDuplicate(Element resident, Element item)
+        {
+            return ReferenceEquals(resident, item)
+                ? true
+                : throw new DuplicateException("Duplicated element.").WithData(item);
+        }
 
         [WithGenerator]
         public bool CaseSensitive
@@ -151,12 +162,12 @@ public static partial class Test_InvariantList_KT
     {
         var items = new Chain(false, [xone, xtwo, xthree, xone]);
 
-        Assert.Equal(-1, items.IndexOf("any"));
+        Assert.Equal(-1, items.IndexOf(new Element("any")));
 
-        Assert.Equal(0, items.IndexOf("ONE"));
-        Assert.Equal(3, items.LastIndexOf("ONE"));
+        Assert.Equal(0, items.IndexOf(new Element("ONE")));
+        Assert.Equal(3, items.LastIndexOf(new Element("ONE")));
 
-        var list = items.IndexesOf("ONE");
+        var list = items.IndexesOf(new Element("ONE"));
         Assert.Equal(2, list.Count);
         Assert.Equal(0, list[0]);
         Assert.Equal(3, list[1]);
@@ -211,12 +222,8 @@ public static partial class Test_InvariantList_KT
         Assert.Same(xone, target[1]);
         Assert.Same(xthree, target[2]);
 
-        target = source.Replace(0, new Element("ONE"));
-        Assert.NotSame(source, target);
-        Assert.Equal(3, target.Count);
-        Assert.Equal("ONE", target[0].Name);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
+        try { source.Replace(0, new Element("ONE")); Assert.Fail(); }
+        catch (DuplicateException) { }
 
         try { source.Replace(1, new Element("ONE")); Assert.Fail(); }
         catch (DuplicateException) { }
@@ -360,24 +367,24 @@ public static partial class Test_InvariantList_KT
     public static void Test_Remove_Item()
     {
         var source = new Chain(false, [xone, xtwo, xthree, xone]);
-        var target = source.Remove("any");
+        var target = source.Remove(new Element("any"));
         Assert.Same(source, target);
 
-        target = source.Remove("ONE");
+        target = source.Remove(new Element("ONE"));
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.Same(xtwo, target[0]);
         Assert.Same(xthree, target[1]);
         Assert.Same(xone, target[2]);
 
-        target = source.RemoveLast("ONE");
+        target = source.RemoveLast(new Element("ONE"));
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
         Assert.Same(xthree, target[2]);
 
-        target = source.RemoveAll("ONE");
+        target = source.RemoveAll(new Element("ONE"));
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
         Assert.Same(xtwo, target[0]);

@@ -1,43 +1,44 @@
-namespace Experiments.Collections;
+using Experiments.Collections;
+
+namespace Experiments;
 
 // ========================================================
 /// <summary>
-/// <inheritdoc cref="IInvariantList{K, T}"/>
+/// <inheritdoc cref="IFrozenArray{T}"/>
 /// </summary>
-/// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>
 [DebuggerDisplay("{ToDebugString(6)}")]
 [Cloneable]
-public partial class InvariantList<K, T> : IInvariantList<K, T>
+public partial class FrozenArray<T> : IFrozenArray<T>
 {
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    public InvariantList() { }
+    public FrozenArray() { }
 
     /// <summary>
     /// Initializes a new instance with the given element.
     /// </summary>
     /// <param name="item"></param>
-    public InvariantList(T item) => AddInternal(item);
+    public FrozenArray(T item) => AddInternal(item);
 
     /// <summary>
-    /// Initializes a new instance with the elements of the given range.
+    /// Initializes a new instance with the elements from the given range.
     /// </summary>
     /// <param name="range"></param>
-    public InvariantList(IEnumerable<T> range) => AddRangeInternal(range);
+    public FrozenArray(IEnumerable<T> range) => AddRangeInternal(range);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected InvariantList(InvariantList<T> source) => AddRangeInternal(source);
+    protected FrozenArray(FrozenArray<T> source) => Items = source.Items;
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
+    public IEnumerator<T> GetEnumerator() => Items.AsEnumerable<T>().GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /// <summary>
@@ -54,51 +55,47 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
 
     // ----------------------------------------------------
 
-    readonly List<T> Items = [];
+    T[] Items = [];
 
     /// <summary>
-    /// Invoked to validate the given element before using it.
+    /// Validates the given item before using it in this collection for the given purposes:
+    /// 'true' for adding or inserting, 'false' otherise.
     /// </summary>
-    protected virtual T ValidateItem(T item) => item;
+    /// <param name="item"></param>
+    /// <returns></returns>
+    protected virtual T ValidateItem(T item, bool add) => item;
 
     /// <summary>
-    /// Invoked to obtain the key associated with the given element.
+    /// Compares the given item with the given resident one.
     /// </summary>
-    protected virtual K GetKey(T item) => default!;
+    /// <param name="resident"></param>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    protected virtual bool CompareItems(T resident, T item) =>
+        (resident is null && item is null) ||
+        (resident is not null && resident.Equals(item));
 
     /// <summary>
-    /// Invoked to validate the given key before using it.
+    /// Returns the indexes of the elements that are duplicates of the given one.
     /// </summary>
-    protected virtual K ValidateKey(K key) => key;
+    /// <param name="item"></param>
+    /// <returns></returns>
+    protected virtual List<int> GetDuplicates(T item) => IndexesOf(item);
 
     /// <summary>
-    /// Invoked to determine if the two given elements shall be considered equal, or not, for
-    /// comparison purposes.
+    /// Determines if the given duplicated item can be added or inserted, or not.
     /// </summary>
-    protected virtual bool Compare(K source, K other) =>
-        (source is null && other is null) ||
-        (source is not null && source.Equals(other));
-
-    /// <summary>
-    /// Invoked to determine if the two given elements shall be considered the same element,
-    /// or not, for adding, inserting or replacing purposes.
-    /// </summary>
-    protected virtual bool IsSameElement(T item, T other) =>
-        (item is null && other is null) ||
-        (item is not null && item.Equals(other));
-
-    /// <summary>
-    /// Determines if the given duplicated item can be added or inserted to this collection, or
-    /// not. This method shall throw an exception if duplicates are not allowed.
-    /// </summary>
-    protected virtual bool AcceptDuplicates(T source, T item) => true;
+    /// <param name="resident"></param>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    protected virtual bool AcceptDuplicate(T resident, T item) => true;
 
     // ----------------------------------------------------
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public int Count => Items.Count;
+    public int Count => Items.Length;
 
     /// <summary>
     /// <inheritdoc/>
@@ -110,41 +107,41 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    public bool Contains(K key) => IndexOf(key) >= 0;
+    public bool Contains(T item) => IndexOf(item) >= 0;
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    public int IndexOf(K key)
+    public int IndexOf(T item)
     {
-        key = ValidateKey(key);
-        return IndexOf(x => Compare(GetKey(x), key));
+        item = ValidateItem(item, false);
+        return IndexOf(x => CompareItems(x, item));
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    public int LastIndexOf(K key)
+    public int LastIndexOf(T item)
     {
-        key = ValidateKey(key);
-        return LastIndexOf(x => Compare(GetKey(x), key));
+        item = ValidateItem(item, false);
+        return LastIndexOf(x => CompareItems(x, item));
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    public List<int> IndexesOf(K key)
+    public List<int> IndexesOf(T item)
     {
-        key = ValidateKey(key);
-        return IndexesOf(x => Compare(GetKey(x), key));
+        item = ValidateItem(item, false);
+        return IndexesOf(x => CompareItems(x, item));
     }
 
     /// <summary>
@@ -163,7 +160,7 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     {
         predicate.ThrowWhenNull(nameof(predicate));
 
-        for (int i = 0; i < Items.Count; i++) if (predicate(Items[i])) return i;
+        for (int i = 0; i < Items.Length; i++) if (predicate(Items[i])) return i;
         return -1;
     }
 
@@ -176,7 +173,7 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     {
         predicate.ThrowWhenNull(nameof(predicate));
 
-        for (int i = Items.Count - 1; i >= 0; i--) if (predicate(Items[i])) return i;
+        for (int i = Items.Length - 1; i >= 0; i--) if (predicate(Items[i])) return i;
         return -1;
     }
 
@@ -190,7 +187,7 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
         predicate.ThrowWhenNull(nameof(predicate));
 
         var nums = new List<int>();
-        for (int i = 0; i < Items.Count; i++) if (predicate(Items[i])) nums.Add(i);
+        for (int i = 0; i < Items.Length; i++) if (predicate(Items[i])) nums.Add(i);
         return nums;
     }
 
@@ -198,7 +195,12 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public T[] ToArray() => Items.ToArray();
+    public T[] ToArray()
+    {
+        var target = new T[Items.Length];
+        Array.Copy(Items, target, Items.Length);
+        return target;
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -206,12 +208,17 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <returns></returns>
     public List<T> ToList() => new(Items);
 
-    /// <summary>
-    /// Minimizes the memory consumption of this collection.
-    /// </summary>
-    public void Trim() => Items.TrimExcess();
-
     // ----------------------------------------------------
+
+    static T[] RangeToArray(IEnumerable<T> range)
+    {
+        return range switch
+        {
+            T[] items => items,
+            FrozenArray<T> items => items.Items,
+            _ => range.ToArray()
+        };
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -219,7 +226,7 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> GetRange(int index, int count)
+    public virtual IFrozenArray<T> GetRange(int index, int count)
     {
         var clone = Clone();
         var num = clone.GetRangeInternal(index, count);
@@ -227,12 +234,10 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     }
     protected virtual int GetRangeInternal(int index, int count)
     {
-        if (count == 0 && index >= 0) return ClearInternal();
+        if (count == 0) { if (index >= 0) return ClearInternal(); }
         if (index == 0 && count == Count) return 0;
 
-        var range = Items.GetRange(index, count);
-        Items.Clear();
-        Items.AddRange(range);
+        Items = Items.GetRange(index, count);
         return count;
     }
 
@@ -242,7 +247,7 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> Replace(int index, T item)
+    public virtual IFrozenArray<T> Replace(int index, T item)
     {
         var clone = Clone();
         var num = clone.ReplaceInternal(index, item);
@@ -250,13 +255,19 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     }
     protected virtual int ReplaceInternal(int index, T item)
     {
-        item = ValidateItem(item);
+        item = ValidateItem(item, true);
 
         var temp = Items[index];
-        if (IsSameElement(temp, item)) return 0;
+        if ((temp is null && item is null) ||
+            (temp is not null && temp.Equals(item))) return 0;
 
-        RemoveAtInternal(index);
-        return InsertInternal(index, item);
+        var nums = GetDuplicates(item);
+        var valid = true;
+        foreach (var num in nums) if (!AcceptDuplicate(Items[num], item)) valid = false;
+        if (!valid) return 0;
+
+        Items = Items.Replace(index, item);
+        return 1;
     }
 
     /// <summary>
@@ -264,7 +275,7 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> Add(T item)
+    public virtual IFrozenArray<T> Add(T item)
     {
         var clone = Clone();
         var num = clone.AddInternal(item);
@@ -272,15 +283,14 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     }
     protected virtual int AddInternal(T item)
     {
-        item = ValidateItem(item);
+        item = ValidateItem(item, true);
 
-        var key = GetKey(item);
-        var nums = IndexesOf(key);
+        var nums = GetDuplicates(item);
         var valid = true;
-        foreach (var num in nums) if (!AcceptDuplicates(Items[num], item)) valid = false;
+        foreach (var num in nums) if (!AcceptDuplicate(Items[num], item)) valid = false;
         if (!valid) return 0;
 
-        Items.Add(item);
+        Items = Items.Add(item);
         return 1;
     }
 
@@ -289,7 +299,7 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> AddRange(IEnumerable<T> range)
+    public virtual IFrozenArray<T> AddRange(IEnumerable<T> range)
     {
         var clone = Clone();
         var num = clone.AddRangeInternal(range);
@@ -299,12 +309,20 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     {
         range.ThrowWhenNull();
 
-        var num = 0; foreach (var item in range)
+        var array = RangeToArray(range);
+        if (array.Length == 0) return 0;
+        for (int i = 0; i < array.Length; i++) array[i] = ValidateItem(array[i], true);
+
+        Items = Items.AddRange(array);
+        foreach (var item in array)
         {
-            var r = AddInternal(item);
-            num += r;
+            var nums = GetDuplicates(item);
+            var valid = true;
+            if (nums.Count > 1)
+                nums.ForEach(x => { if (!AcceptDuplicate(Items[x], item)) valid = false; });
+            if (!valid) return 0;
         }
-        return num;
+        return array.Length;
     }
 
     /// <summary>
@@ -313,7 +331,7 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> Insert(int index, T item)
+    public virtual IFrozenArray<T> Insert(int index, T item)
     {
         var clone = Clone();
         var num = clone.InsertInternal(index, item);
@@ -321,15 +339,14 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     }
     protected virtual int InsertInternal(int index, T item)
     {
-        item = ValidateItem(item);
+        item = ValidateItem(item, true);
 
-        var key = GetKey(item);
-        var nums = IndexesOf(key);
+        var nums = GetDuplicates(item);
         var valid = true;
-        foreach (var num in nums) if (!AcceptDuplicates(Items[num], item)) valid = false;
+        foreach (var num in nums) if (!AcceptDuplicate(Items[num], item)) valid = false;
         if (!valid) return 0;
 
-        Items.Insert(index, item);
+        Items = Items.Insert(index, item);
         return 1;
     }
 
@@ -339,7 +356,7 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> InsertRange(int index, IEnumerable<T> range)
+    public virtual IFrozenArray<T> InsertRange(int index, IEnumerable<T> range)
     {
         var clone = Clone();
         var num = clone.InsertRangeInternal(index, range);
@@ -349,13 +366,20 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     {
         range.ThrowWhenNull();
 
-        var num = 0; foreach (var item in range)
+        var array = RangeToArray(range);
+        if (array.Length == 0) return 0;
+        for (int i = 0; i < array.Length; i++) array[i] = ValidateItem(array[i], true);
+
+        Items = Items.InsertRange(index, array);
+        foreach (var item in array)
         {
-            var r = InsertInternal(index, item);
-            index += r;
-            num += r;
+            var nums = GetDuplicates(item);
+            var valid = true;
+            if (nums.Count > 1)
+                nums.ForEach(x => { if (!AcceptDuplicate(Items[x], item)) valid = false; });
+            if (!valid) return 0;
         }
-        return num;
+        return array.Length;
     }
 
     /// <summary>
@@ -363,7 +387,7 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> RemoveAt(int index)
+    public virtual IFrozenArray<T> RemoveAt(int index)
     {
         var clone = Clone();
         var num = clone.RemoveAtInternal(index);
@@ -371,7 +395,7 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     }
     protected virtual int RemoveAtInternal(int index)
     {
-        Items.RemoveAt(index);
+        Items = Items.RemoveAt(index);
         return 1;
     }
 
@@ -381,7 +405,7 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> RemoveRange(int index, int count)
+    public virtual IFrozenArray<T> RemoveRange(int index, int count)
     {
         var clone = Clone();
         var num = clone.RemoveRangeInternal(index, count);
@@ -389,65 +413,65 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     }
     protected virtual int RemoveRangeInternal(int index, int count)
     {
-        if (count > 0) Items.RemoveRange(index, count);
+        if (count > 0) Items = Items.RemoveRange(index, count);
         return count;
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> Remove(K key)
+    public virtual IFrozenArray<T> Remove(T item)
     {
         var clone = Clone();
-        var num = clone.RemoveInternal(key);
+        var num = clone.RemoveInternal(item);
         return num > 0 ? clone : this;
     }
-    protected virtual int RemoveInternal(K key)
+    protected virtual int RemoveInternal(T item)
     {
-        var index = IndexOf(key);
+        var index = IndexOf(item);
         return index >= 0 ? RemoveAtInternal(index) : 0;
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> RemoveLast(K key)
+    public virtual IFrozenArray<T> RemoveLast(T item)
     {
         var clone = Clone();
-        var num = clone.RemoveLastInternal(key);
+        var num = clone.RemoveLastInternal(item);
         return num > 0 ? clone : this;
     }
-    protected virtual int RemoveLastInternal(K key)
+    protected virtual int RemoveLastInternal(T item)
     {
-        var index = LastIndexOf(key);
+        var index = LastIndexOf(item);
         return index >= 0 ? RemoveAtInternal(index) : 0;
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> RemoveAll(K key)
+    public virtual IFrozenArray<T> RemoveAll(T item)
     {
         var clone = Clone();
-        var num = clone.RemoveAllInternal(key);
+        var num = clone.RemoveAllInternal(item);
         return num > 0 ? clone : this;
     }
-    protected virtual int RemoveAllInternal(K key)
+    [SuppressMessage("", "IDE0305")]
+    protected virtual int RemoveAllInternal(T item)
     {
-        var num = 0; while (true)
-        {
-            var index = IndexOf(key);
+        item = ValidateItem(item, false);
 
-            if (index >= 0) num += RemoveAtInternal(index);
-            else break;
-        }
-        return num;
+        var list = new List<T>(Items.Length);
+        foreach (var temp in Items) if (!CompareItems(temp, item)) list.Add(temp);
+
+        Items = list.ToArray();
+        return list.Count;
     }
 
     /// <summary>
@@ -455,7 +479,7 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> Remove(Predicate<T> predicate)
+    public virtual IFrozenArray<T> Remove(Predicate<T> predicate)
     {
         var clone = Clone();
         var num = clone.RemoveInternal(predicate);
@@ -463,6 +487,8 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     }
     protected virtual int RemoveInternal(Predicate<T> predicate)
     {
+        predicate.ThrowWhenNull();
+
         var index = IndexOf(predicate);
         return index >= 0 ? RemoveAtInternal(index) : 0;
     }
@@ -472,7 +498,7 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> RemoveLast(Predicate<T> predicate)
+    public virtual IFrozenArray<T> RemoveLast(Predicate<T> predicate)
     {
         var clone = Clone();
         var num = clone.RemoveLastInternal(predicate);
@@ -480,6 +506,8 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     }
     protected virtual int RemoveLastInternal(Predicate<T> predicate)
     {
+        predicate.ThrowWhenNull();
+
         var index = LastIndexOf(predicate);
         return index >= 0 ? RemoveAtInternal(index) : 0;
     }
@@ -489,29 +517,29 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> RemoveAll(Predicate<T> predicate)
+    public virtual IFrozenArray<T> RemoveAll(Predicate<T> predicate)
     {
         var clone = Clone();
         var num = clone.RemoveAllInternal(predicate);
         return num > 0 ? clone : this;
     }
+    [SuppressMessage("", "IDE0305")]
     protected virtual int RemoveAllInternal(Predicate<T> predicate)
     {
-        var num = 0; while (true)
-        {
-            var index = IndexOf(predicate);
+        predicate.ThrowWhenNull();
 
-            if (index >= 0) num += RemoveAtInternal(index);
-            else break;
-        }
-        return num;
+        var list = new List<T>(Items.Length);
+        foreach (var temp in Items) if (!predicate(temp)) list.Add(temp);
+
+        Items = list.ToArray();
+        return list.Count;
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> Clear()
+    public virtual IFrozenArray<T> Clear()
     {
         var clone = Clone();
         var num = clone.ClearInternal();
@@ -519,7 +547,7 @@ public partial class InvariantList<K, T> : IInvariantList<K, T>
     }
     protected virtual int ClearInternal()
     {
-        var num = Items.Count; if (num > 0) Items.Clear();
+        var num = Count; if (num > 0) Items = [];
         return num;
     }
 }

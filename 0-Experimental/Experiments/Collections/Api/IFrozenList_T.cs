@@ -5,7 +5,7 @@ namespace Experiments.Collections;
 /// Represents an immutable list-alike collection of elements.
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public interface IInvariantList<T> : IEnumerable<T>
+public interface IFrozen<T> : IEnumerable<T>
 {
     /// <summary>
     /// Gets the number of elements in this collection.
@@ -98,7 +98,7 @@ public interface IInvariantList<T> : IEnumerable<T>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    IInvariantList<T> GetRange(int index, int count);
+    IFrozen<T> GetRange(int index, int count);
 
     /// <summary>
     /// Returns a new instance where the element at the given index has been replaced by the new
@@ -108,7 +108,7 @@ public interface IInvariantList<T> : IEnumerable<T>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    IInvariantList<T> Replace(int index, T item);
+    IFrozen<T> Replace(int index, T item);
 
     /// <summary>
     /// Returns a new instance where the given element has been added to the collection, unless
@@ -117,7 +117,7 @@ public interface IInvariantList<T> : IEnumerable<T>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    IInvariantList<T> Add(T item);
+    IFrozen<T> Add(T item);
 
     /// <summary>
     /// Returns a new instance where the elements from the given range have been added to the
@@ -126,7 +126,7 @@ public interface IInvariantList<T> : IEnumerable<T>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    IInvariantList<T> AddRange(IEnumerable<T> range);
+    IFrozen<T> AddRange(IEnumerable<T> range);
 
     /// <summary>
     /// Returns a new instance where the given element has been inserted into the collection at
@@ -136,7 +136,7 @@ public interface IInvariantList<T> : IEnumerable<T>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    IInvariantList<T> Insert(int index, T item);
+    IFrozen<T> Insert(int index, T item);
 
     /// <summary>
     /// Returns a new instance the elements from the given range have been inserted into the
@@ -146,7 +146,7 @@ public interface IInvariantList<T> : IEnumerable<T>
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    IInvariantList<T> InsertRange(int index, IEnumerable<T> range);
+    IFrozen<T> InsertRange(int index, IEnumerable<T> range);
 
     /// <summary>
     /// Returns a new instance where the element at the given index has been removed from the
@@ -155,7 +155,7 @@ public interface IInvariantList<T> : IEnumerable<T>
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveAt(int index);
+    IFrozen<T> RemoveAt(int index);
 
     /// <summary>
     /// Returns a new instance where the given number of elements, starting from the given index,
@@ -165,7 +165,7 @@ public interface IInvariantList<T> : IEnumerable<T>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveRange(int index, int count);
+    IFrozen<T> RemoveRange(int index, int count);
 
     /// <summary>
     /// Returns a new instance where the first ocurrence of the given element has been removed.
@@ -173,7 +173,7 @@ public interface IInvariantList<T> : IEnumerable<T>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    IInvariantList<T> Remove(T item);
+    IFrozen<T> Remove(T item);
 
     /// <summary>
     /// Returns a new instance where the last ocurrence of the given element has been removed.
@@ -181,7 +181,7 @@ public interface IInvariantList<T> : IEnumerable<T>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveLast(T item);
+    IFrozen<T> RemoveLast(T item);
 
     /// <summary>
     /// Returns a new instance where the ocurrences of the given element have been removed. If no
@@ -189,7 +189,7 @@ public interface IInvariantList<T> : IEnumerable<T>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveAll(T item);
+    IFrozen<T> RemoveAll(T item);
 
     /// <summary>
     /// Returns a new instance where the first element that matches the given predicate has been
@@ -197,7 +197,7 @@ public interface IInvariantList<T> : IEnumerable<T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IInvariantList<T> Remove(Predicate<T> predicate);
+    IFrozen<T> Remove(Predicate<T> predicate);
 
     /// <summary>
     /// Returns a new instance where the last element that matches the given predicate has been
@@ -205,7 +205,7 @@ public interface IInvariantList<T> : IEnumerable<T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveLast(Predicate<T> predicate);
+    IFrozen<T> RemoveLast(Predicate<T> predicate);
 
     /// <summary>
     /// Returns a new instance where all elements that match the given predicate has been removed.
@@ -213,12 +213,12 @@ public interface IInvariantList<T> : IEnumerable<T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveAll(Predicate<T> predicate);
+    IFrozen<T> RemoveAll(Predicate<T> predicate);
 
     /// <summary>
     /// Returns a new instance where all the elements have been removed. If no changes are
     /// detected, returns the original instance.
     /// </summary>
     /// <returns></returns>
-    IInvariantList<T> Clear();
+    IFrozen<T> Clear();
 }

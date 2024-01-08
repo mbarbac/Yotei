@@ -65,13 +65,14 @@ public static class ArrayExtensions
     /// <param name="item"></param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static T[] ReplaceItem<T>(this T[] source, int index, T item)
+    public static T[] Replace<T>(this T[] source, int index, T item)
     {
         source.ThrowWhenNull();
 
-        source = source.Duplicate();
-        source[index] = item;
-        return source;
+        var target = new T[source.Length];
+        Array.Copy(source, target, source.Length);
+        target[index] = item;
+        return target;
     }
 
     /// <summary>
@@ -108,13 +109,12 @@ public static class ArrayExtensions
         source.ThrowWhenNull();
         range.ThrowWhenNull();
 
-        var temps = range is T[] others ? others : range.ToArray();
+        var array = range is T[] others ? others : range.ToArray();
+        if (array.Length == 0) return source.Duplicate();
 
-        if (temps.Length == 0) return source.Duplicate();
-
-        var target = new T[source.Length + temps.Length];
+        var target = new T[source.Length + array.Length];
         Array.Copy(source, target, source.Length);
-        Array.Copy(temps, 0, target, source.Length, temps.Length);
+        Array.Copy(array, 0, target, source.Length, array.Length);
         return target;
     }
 
@@ -127,24 +127,16 @@ public static class ArrayExtensions
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    [SuppressMessage("", "IDE0305")]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T[] Insert<T>(this T[] source, int index, T item)
     {
         source.ThrowWhenNull();
 
-        if (source.Length == 0)
-        {
-            if (index > 0) throw new ArgumentException(
-                $"Index '{index}' must be cero when inserting into empty arrays.");
-
-            return [item];
-        }
-
-        var span1 = new ArraySegment<T>(source, 0, index);
-        var span2 = new ArraySegment<T>([item]);
-        var span3 = new ArraySegment<T>(source, index, source.Length - index);
-        return span1.Concat(span2).Concat(span3).ToArray();
+        var target = new T[source.Length + 1];
+        Array.Copy(source, target, index);
+        target[index] = item;
+        Array.Copy(source, index, target, index + 1, source.Length - index);
+        return target;
     }
 
     /// <summary>
@@ -156,26 +148,23 @@ public static class ArrayExtensions
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    [SuppressMessage("", "IDE0305")]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T[] InsertRange<T>(this T[] source, int index, IEnumerable<T> range)
     {
         source.ThrowWhenNull();
         range.ThrowWhenNull();
 
-        var temps = range is T[] others ? others : range.ToArray();
-
         if (source.Length == 0 && index > 0)
-            throw new ArgumentException(
-                $"Index '{index}' must be cero when inserting into empty arrays.");
+            throw new ArgumentException("Index must be cero when inserting in empty arrays").WithData(index);
 
-        if (temps.Length == 0) return source.Duplicate();
-        if (source.Length == 0) return temps.Duplicate();
+        var array = range is T[] others ? others : range.ToArray();
+        if (array.Length == 0) return source.Duplicate();
 
-        var span1 = new ArraySegment<T>(source, 0, index);
-        var span2 = new ArraySegment<T>(temps);
-        var span3 = new ArraySegment<T>(source, index, source.Length - index);
-        return span1.Concat(span2).Concat(span3).ToArray();
+        var target = new T[source.Length + array.Length];
+        Array.Copy(source, target, index);
+        Array.Copy(array, 0, target, index, array.Length);
+        Array.Copy(source, index, target, index + array.Length, source.Length - index);
+        return target;
     }
 
     /// <summary>
@@ -185,15 +174,18 @@ public static class ArrayExtensions
     /// <param name="source"></param>
     /// <param name="index"></param>
     /// <returns></returns>
-    [SuppressMessage("", "IDE0305")]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T[] RemoveAt<T>(this T[] source, int index)
     {
         source.ThrowWhenNull();
 
-        var span1 = new ArraySegment<T>(source, 0, index);
-        var span2 = new ArraySegment<T>(source, index + 1, source.Length - index - 1);
-        return span1.Concat(span2).ToArray();
+        if (source.Length == 0) throw new InvalidOperationException(
+            "Cannot remove elements from empty arrays.");
+
+        var target = new T[source.Length - 1];
+        Array.Copy(source, target, index);
+        Array.Copy(source, index + 1, target, index, source.Length - index - 1);
+        return target;
     }
 
     /// <summary>
@@ -205,7 +197,6 @@ public static class ArrayExtensions
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    [SuppressMessage("", "IDE0305")]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T[] RemoveRange<T>(this T[] source, int index, int count)
     {
@@ -213,9 +204,10 @@ public static class ArrayExtensions
 
         if (count == 0) return source.Duplicate();
 
-        var span1 = new ArraySegment<T>(source, 0, index);
-        var span2 = new ArraySegment<T>(source, index + count, source.Length - index - count);
-        return span1.Concat(span2).ToArray();
+        var target = new T[source.Length - count];
+        Array.Copy(source, target, index);
+        Array.Copy(source, index + count, target, index, source.Length - index - count);
+        return target;
     }
 
     /// <summary>
