@@ -267,4 +267,11 @@ public abstract partial class Connection : DisposableClass, IConnection
     /// </summary>
     /// <returns></returns>
     protected abstract ITransaction CreateTransaction();
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Provides access to the records-oriented capabilities of a given connection.
+    /// </summary>
+    public abstract Records.IRecordsGate Records { get; }
 }
