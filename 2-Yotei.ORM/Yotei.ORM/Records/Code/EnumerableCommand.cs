@@ -18,7 +18,7 @@ public abstract partial class EnumerableCommand : ORM.Code.Command, IEnumerableC
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public abstract ICommandEnumerator GetEnumerator();
+    public virtual ICommandEnumerator GetEnumerator() => Connection.Records.CommandEnumerator(this);
     IEnumerator<IRecord?> IEnumerable<IRecord?>.GetEnumerator() => GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -27,7 +27,7 @@ public abstract partial class EnumerableCommand : ORM.Code.Command, IEnumerableC
     /// </summary>
     /// <param name="token"></param>
     /// <returns></returns>
-    public abstract ICommandEnumerator GetAsyncEnumerator(CancellationToken token = default);
+    public virtual ICommandEnumerator GetAsyncEnumerator(CancellationToken token = default) => Connection.Records.CommandEnumerator(this, token);
     IAsyncEnumerator<IRecord?> IAsyncEnumerable<IRecord?>.GetAsyncEnumerator(
         CancellationToken token)
         => GetAsyncEnumerator(token);
