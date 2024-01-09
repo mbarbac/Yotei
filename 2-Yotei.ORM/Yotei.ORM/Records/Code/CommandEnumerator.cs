@@ -160,17 +160,20 @@ public abstract class CommandEnumerator : DisposableClass, ICommandEnumerator
                 "Cannot obtain a schema while initializing the command execution.")
                 .WithData(this);
 
-            if (!Command.NativePaging) // Emulating paging...
+            if (Command is IPagedCommand paged) // We may need to emulate paging...
             {
-                var skip = Command.Skip; for (int i = 0; i < skip; i++)
+                if (!paged.NativePaging)
                 {
-                    var r = OnNextResult();
-                    if (r == null) return false;
-                }
-                var take = Command.Take; if (take > 0)
-                {
-                    _TakeEmulated = true;
-                    _TakeRemaining = take;
+                    var skip = paged.Skip; for (int i = 0; i < skip; i++)
+                    {
+                        var r = OnNextResult();
+                        if (r == null) return false;
+                    }
+                    var take = paged.Take; if (take > 0)
+                    {
+                        _TakeEmulated = true;
+                        _TakeRemaining = take;
+                    }
                 }
             }
 
@@ -290,17 +293,20 @@ public abstract class CommandEnumerator : DisposableClass, ICommandEnumerator
                 "Cannot obtain a schema while initializing the command execution.")
                 .WithData(this);
 
-            if (!Command.NativePaging) // Emulating paging...
+            if (Command is IPagedCommand paged) // We may need to emulate paging...
             {
-                var skip = Command.Skip; for (int i = 0; i < skip; i++)
+                if (!paged.NativePaging)
                 {
-                    var r = await OnNextResultAsync().ConfigureAwait(false);
-                    if (r == null) return false;
-                }
-                var take = Command.Take; if (take > 0)
-                {
-                    _TakeEmulated = true;
-                    _TakeRemaining = take;
+                    var skip = paged.Skip; for (int i = 0; i < skip; i++)
+                    {
+                        var r = await OnNextResultAsync().ConfigureAwait(false);
+                        if (r == null) return false;
+                    }
+                    var take = paged.Take; if (take > 0)
+                    {
+                        _TakeEmulated = true;
+                        _TakeRemaining = take;
+                    }
                 }
             }
 

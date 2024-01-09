@@ -66,7 +66,9 @@ public static class TypeExtensions
 
         return
             type.IsCompilerGenerated() &&
+            type.IsGenericType &&
+            type.Namespace is null &&
             type.Name.Contains("Anonymous") &&
-            type.Name.Contains("<>");
+            type.Name.StartsWith("<>");
     }
 }

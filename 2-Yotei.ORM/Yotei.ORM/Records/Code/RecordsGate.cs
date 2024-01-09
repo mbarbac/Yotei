@@ -18,12 +18,20 @@ public abstract class RecordsGate(IConnection connection) : IRecordsGate
     /// <param name="command"></param>
     /// <param name="token"></param>
     /// <returns></returns>
-    public abstract ICommandEnumerator CommandEnumerator(IEnumerableCommand command, CancellationToken token = default);
+    public abstract ICommandEnumerator CreateCommandEnumerator(IEnumerableCommand command, CancellationToken token = default);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
-    public abstract ICommandExecutor CommandExecutor(IExecutableCommand command);
+    public abstract ICommandExecutor CreateCommandExecutor(IExecutableCommand command);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Creates a new RAW command.
+    /// </summary>
+    /// <returns></returns>
+    public virtual IRawCommand Raw() => new RawCommand(Connection);
 }

@@ -17,12 +17,20 @@ public interface IRecordsGate
     /// <param name="command"></param>
     /// <param name="token"></param>
     /// <returns></returns>
-    ICommandEnumerator CommandEnumerator(IEnumerableCommand command, CancellationToken token = default);
+    ICommandEnumerator CreateCommandEnumerator(IEnumerableCommand command, CancellationToken token = default);
 
     /// <summary>
     /// Returns an object that can execute the given command.
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
-    ICommandExecutor CommandExecutor(IExecutableCommand command);
+    ICommandExecutor CreateCommandExecutor(IExecutableCommand command);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Creates a new RAW command.
+    /// </summary>
+    /// <returns></returns>
+    IRawCommand Raw();
 }
