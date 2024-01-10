@@ -27,13 +27,13 @@ public static class Test_SetArgument
     {
         Func<dynamic, object> func;
         LambdaNode node;
-        LambdaNodeConstant item;
+        LambdaNodeValue item;
 
         WriteLine();
         func = x => x = 7;
         node = LambdaParser.Parse(func).Result;
         WriteLine($"> Result: {node}");
-        item = Assert.IsType<LambdaNodeConstant>(node);
+        item = Assert.IsType<LambdaNodeValue>(node);
         Assert.Equal("'7'", node.ToString());
     });
 

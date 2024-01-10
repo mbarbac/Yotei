@@ -17,6 +17,24 @@ public sealed class IdentifierPart : IIdentifierPart
     public IdentifierPart() { }
 
     /// <summary>
+    /// Returns a new instance using the given value, which does not suppport embedded dots or
+    /// spaces, or special characters.
+    /// </summary>
+    /// <param name="value"></param>
+    public IdentifierPart(string? value)
+    {
+        value = value.NullWhenEmpty(); if (value is not null)
+        {
+            if (value.ContainsAny(INVALID_CHARS)) throw new ArgumentException(
+                "Value contains invalid chararcters.")
+                .WithData(value);
+        }
+        Value = value;
+        UnwrappedValue = value;
+    }
+    static readonly string INVALID_CHARS = @" .+-/*[]{}'`´()^=?%&!\";
+
+    /// <summary>
     /// Initializes a new instance using the given value and the terminator rules of the given
     /// engine.
     /// </summary>

@@ -39,12 +39,12 @@ public static class Test_ManyArguments
     {
         Func<int, int> func = (x) => x + 1;
         LambdaNode node;
-        LambdaNodeConstant item;
+        LambdaNodeValue item;
 
         WriteLine();
         node = LambdaParser.Parse(func, 1).Result;
         WriteLine($"> Result: {node}");
-        item = Assert.IsType<LambdaNodeConstant>(node);
+        item = Assert.IsType<LambdaNodeValue>(node);
         Assert.Equal(2, item.LambdaValue);
 
         try { node = LambdaParser.Parse(func).Result; Assert.Fail(); }

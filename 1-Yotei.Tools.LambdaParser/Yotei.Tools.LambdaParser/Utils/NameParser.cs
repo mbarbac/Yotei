@@ -76,7 +76,7 @@ public partial class LambdaParser
             {
                 case LambdaNodeArgument: return;
                 case LambdaNodeMember item: OnParseNameMember(item); return;
-                case LambdaNodeConstant item: OnParseNameConstant(item); return;
+                case LambdaNodeValue item: OnParseNameConstant(item); return;
 
                 default:
                     throw new ArgumentException(
@@ -103,7 +103,7 @@ public partial class LambdaParser
         /// <summary>
         /// ParseNames a constant node.
         /// </summary>
-        void OnParseNameConstant(LambdaNodeConstant node)
+        void OnParseNameConstant(LambdaNodeValue node)
         {
             if (node.LambdaValue is null)
             {

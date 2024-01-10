@@ -27,13 +27,13 @@ public static class Test_ToResults
     {
         Func<dynamic, object> func;
         LambdaNode node;
-        LambdaNodeConstant item;
+        LambdaNodeValue item;
 
         WriteLine();
         func = x => new { x.Name, x.Age, Id = 50 };
         node = LambdaParser.Parse(func).Result;
         WriteLine($"> Result: {node}");
-        item = Assert.IsType<LambdaNodeConstant>(node);
+        item = Assert.IsType<LambdaNodeValue>(node);
         Assert.Equal("'{ Name = x.Name, Age = x.Age, Id = 50 }'", node.ToString());
 
         Assert.True(item.LambdaValue!.GetType().IsAnonymous());
@@ -49,13 +49,13 @@ public static class Test_ToResults
     {
         Func<dynamic, object> func;
         LambdaNode node;
-        LambdaNodeConstant item;
+        LambdaNodeValue item;
 
         WriteLine();
         func = x => new[] { x.Name, 7, null };
         node = LambdaParser.Parse(func).Result;
         WriteLine($"> Result: {node}");
-        item = Assert.IsType<LambdaNodeConstant>(node);
+        item = Assert.IsType<LambdaNodeValue>(node);
         Assert.Equal("'[x.Name, 7, NULL]'", node.ToString());
 
         var items = (object[])item.LambdaValue!;

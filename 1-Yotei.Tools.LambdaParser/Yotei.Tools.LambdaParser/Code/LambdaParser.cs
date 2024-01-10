@@ -176,7 +176,7 @@ public partial class LambdaParser
             LambdaMetaNode meta => meta.LambdaNode,
             DynamicMetaObject meta => ToLambdaNode(meta.Value, parser),
 
-            _ => new LambdaNodeConstant(value)
+            _ => new LambdaNodeValue(value)
         };
     }
 

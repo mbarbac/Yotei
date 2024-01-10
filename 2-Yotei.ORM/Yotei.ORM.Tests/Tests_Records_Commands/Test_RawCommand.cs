@@ -146,7 +146,6 @@ public static class Test_RawCommand
         command.Append("WHERE [Id] = {id} AND [ManagerId] = {1}",
             new { id = "007" },
             null);
-
         text = command.GetText(out parameters);
         Assert.Equal("WHERE [Id] = {id} AND [ManagerId] = #1", text);
         Assert.Equal(2, parameters.Count);

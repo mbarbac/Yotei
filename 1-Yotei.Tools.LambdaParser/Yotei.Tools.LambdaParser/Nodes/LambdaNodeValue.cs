@@ -5,13 +5,13 @@
 /// Represents a constant value in a chain of dynamic operations.
 /// </summary>
 [DebuggerDisplay("{ToDebugString()}")]
-public class LambdaNodeConstant : LambdaNode
+public class LambdaNodeValue : LambdaNode
 {
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
     /// <param name="value"></param>
-    public LambdaNodeConstant(object? value) : base()
+    public LambdaNodeValue(object? value) : base()
     {
         if (value is LambdaNode)
             throw new ArgumentException(
@@ -34,7 +34,7 @@ public class LambdaNodeConstant : LambdaNode
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override LambdaNodeConstant Clone() => new(LambdaValue.TryClone());
+    public override LambdaNodeValue Clone() => new(LambdaValue.TryClone());
 
     /// <summary>
     /// Returns the dynamic argument ultimately associated with this instance, or null if any.

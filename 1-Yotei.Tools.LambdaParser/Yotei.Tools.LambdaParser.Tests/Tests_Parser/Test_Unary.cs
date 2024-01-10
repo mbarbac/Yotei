@@ -27,14 +27,14 @@ public static class Test_Unary
     {
         Func<dynamic, object> func;
         LambdaNode node;
-        LambdaNodeConstant item;
+        LambdaNodeValue item;
 
         WriteLine();
         var value = true;
         func = x => !value;
         node = LambdaParser.Parse(func).Result;
         WriteLine($"> Result: {node}");
-        item = Assert.IsType<LambdaNodeConstant>(node);
+        item = Assert.IsType<LambdaNodeValue>(node);
         Assert.Equal("'False'", node.ToString());
     });
 
@@ -78,14 +78,14 @@ public static class Test_Unary
     {
         Func<dynamic, object> func;
         LambdaNode node;
-        LambdaNodeConstant item;
+        LambdaNodeValue item;
 
         WriteLine();
         var value = 7;
         func = x => -value;
         node = LambdaParser.Parse(func).Result;
         WriteLine($"> Result: {node}");
-        item = Assert.IsType<LambdaNodeConstant>(node);
+        item = Assert.IsType<LambdaNodeValue>(node);
         Assert.Equal("'-7'", node.ToString());
     });
 
