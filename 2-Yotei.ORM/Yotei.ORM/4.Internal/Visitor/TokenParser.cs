@@ -7,14 +7,20 @@ namespace Yotei.ORM.Internal;
 /// Represents the ability of parsing dynamic lambda expressions and nodes and returning a token
 /// that represents their contents as database tokens.
 /// </summary>
-public static class TokenParser
+/// <param name="engine"></param>
+public class TokenParser(IEngine engine)
 {
+    /// <summary>
+    /// The engine this instance is associated with.
+    /// </summary>
+    public IEngine Engine { get; } = engine.ThrowWhenNull();
+
     /// <summary>
     /// Parses the given dynamic lambda expression returning a token that represents its contents.
     /// </summary>
     /// <param name="expression"></param>
     /// <returns></returns>
-    public static Token Parse(Func<dynamic, object> expression)
+    public Token Parse(Func<dynamic, object> expression)
     {
         var parser = LambdaParser.Parse(expression);
         var token = Parse(parser.Result);
@@ -27,24 +33,24 @@ public static class TokenParser
     /// <param name="node"></param>
     /// <param name="darg"></param>
     /// <returns></returns>
-    public static Token Parse(LambdaNode node)
+    public Token Parse(LambdaNode node)
     {
         node.ThrowWhenNull();
 
         return node switch
         {
-            LambdaNodeArgument item => Parse(item),
-            LambdaNodeBinary item => Parse(item),
-            LambdaNodeConvert item => Parse(item),
-            LambdaNodeIndexed item => Parse(item),
-            LambdaNodeInvoke item => Parse(item),
-            LambdaNodeMember item => Parse(item),
-            LambdaNodeMethod item => Parse(item),
-            LambdaNodeSetter item => Parse(item),
-            LambdaNodeUnary item => Parse(item),
-            LambdaNodeValue item => Parse(item),
-            LambdaNodeCoalesce item => Parse(item),
-            LambdaNodeTernary item => Parse(item),
+            LambdaNodeArgument item => ParseArgument(item),
+            LambdaNodeBinary item => ParseBinary(item),
+            LambdaNodeConvert item => ParseConvert(item),
+            LambdaNodeIndexed item => ParseIndexed(item),
+            LambdaNodeInvoke item => ParseInvoke(item),
+            LambdaNodeMember item => ParseMember(item),
+            LambdaNodeMethod item => ParseMethod(item),
+            LambdaNodeSetter item => ParseSetter(item),
+            LambdaNodeUnary item => ParseUnary(item),
+            LambdaNodeValue item => ParseValue(item),
+            LambdaNodeCoalesce item => ParseCoalesce(item),
+            LambdaNodeTernary item => ParseTernary(item),
 
             _ => throw new UnExpectedException("Unknown node.").WithData(node)
         };
@@ -55,7 +61,7 @@ public static class TokenParser
     /// <summary>
     /// Parses the given node.
     /// </summary>
-    static TokenArgument Parse(LambdaNodeArgument node)
+    static TokenArgument ParseArgument(LambdaNodeArgument node)
     {
         return new TokenArgument(node.LambdaName);
     }
@@ -63,7 +69,7 @@ public static class TokenParser
     /// <summary>
     /// Parses the given node.
     /// </summary>
-    static TokenBinary Parse(LambdaNodeBinary node)
+    TokenBinary ParseBinary(LambdaNodeBinary node)
     {
         var left = Parse(node.LambdaLeft);
         var right = Parse(node.LambdaRight);
@@ -74,7 +80,7 @@ public static class TokenParser
     /// <summary>
     /// Parses the given node.
     /// </summary>
-    static TokenConvertToType Parse(LambdaNodeConvert node)
+    TokenConvertToType ParseConvert(LambdaNodeConvert node)
     {
         var target = Parse(node.LambdaTarget);
         return new TokenConvertToType(node.LambdaType, target);
@@ -83,7 +89,7 @@ public static class TokenParser
     /// <summary>
     /// Parses the given node.
     /// </summary>
-    static TokenIndexed Parse(LambdaNodeIndexed node)
+    TokenIndexed ParseIndexed(LambdaNodeIndexed node)
     {
         var host = Parse(node.LambdaHost);
         var items = node.LambdaIndexes.Select(x => Parse(x));
@@ -94,7 +100,7 @@ public static class TokenParser
     /// <summary>
     /// Parses the given node.
     /// </summary>
-    static TokenInvoke Parse(LambdaNodeInvoke node)
+    TokenInvoke ParseInvoke(LambdaNodeInvoke node)
     {
         var host = Parse(node.LambdaHost);
         var items = node.LambdaArguments.Select(x => Parse(x)).ToList();
@@ -111,19 +117,19 @@ public static class TokenParser
     /// <summary>
     /// Parses the given node.
     /// </summary>
-    static TokenIdentifier Parse(LambdaNodeMember node)
+    TokenIdentifier ParseMember(LambdaNodeMember node)
     {
         var host = Parse(node.LambdaHost);
         var darg = node.GetArgument();
-        var name = node.LambdaName.NullWhenDynamicName(darg, false);
+        var name = node.LambdaName.NullWhenDynamicName(darg, Engine.CaseSensitiveNames);
 
-        return new TokenIdentifier(host, new Code.IdentifierPart(name));
+        return new TokenIdentifier(host, new Code.IdentifierPart(Engine, name));
     }
 
     /// <summary>
     /// Parses the given node.
     /// </summary>
-    static Token Parse(LambdaNodeMethod node)
+    Token ParseMethod(LambdaNodeMethod node)
     {
         var darg = node.GetArgument();
         var name = node.LambdaName.NullWhenDynamicName(darg, false);
@@ -135,7 +141,7 @@ public static class TokenParser
                 .WithData(node);
 
             var temp = new LambdaNodeInvoke(node.LambdaHost, node.LambdaArguments);
-            return Parse(temp);
+            return ParseInvoke(temp);
         }
         else // Other cases...
         {
@@ -189,7 +195,7 @@ public static class TokenParser
     /// <summary>
     /// Parses the given node.
     /// </summary>
-    static TokenSetter Parse(LambdaNodeSetter node)
+    private TokenSetter ParseSetter(LambdaNodeSetter node)
     {
         var target = Parse(node.LambdaTarget);
         var value = Parse(node.LambdaValue);
@@ -200,7 +206,7 @@ public static class TokenParser
     /// <summary>
     /// Parses the given node.
     /// </summary>
-    static TokenUnary Parse(LambdaNodeUnary node)
+    TokenUnary ParseUnary(LambdaNodeUnary node)
     {
         var target = Parse(node.LambdaTarget);
         return new TokenUnary(node.LambdaOperation, target);
@@ -209,7 +215,7 @@ public static class TokenParser
     /// <summary>
     /// Parses the given node.
     /// </summary>
-    static Token Parse(LambdaNodeValue node)
+    Token ParseValue(LambdaNodeValue node)
     {
         return node.LambdaValue switch
         {
@@ -227,7 +233,7 @@ public static class TokenParser
     /// <summary>
     /// Parses the given node.
     /// </summary>
-    static TokenCoalesce Parse(LambdaNodeCoalesce node)
+    TokenCoalesce ParseCoalesce(LambdaNodeCoalesce node)
     {
         var left = Parse(node.LambdaLeft);
         var right = Parse(node.LambdaRight);
@@ -238,7 +244,7 @@ public static class TokenParser
     /// <summary>
     /// Parses the given node.
     /// </summary>
-    static TokenTernary Parse(LambdaNodeTernary node)
+    TokenTernary ParseTernary(LambdaNodeTernary node)
     {
         var left = Parse(node.LambdaLeft);
         var middle = Parse(node.LambdaMiddle);
