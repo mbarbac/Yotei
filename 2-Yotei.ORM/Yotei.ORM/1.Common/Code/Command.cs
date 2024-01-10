@@ -5,7 +5,8 @@
 /// <inheritdoc cref="ICommand"/>
 /// </summary>
 /// <param name="connection"></param>
-public abstract class Command(IConnection connection) : ICommand
+[Cloneable]
+public abstract partial class Command(IConnection connection) : ICommand
 {
     /// <summary>
     /// <inheritdoc/>

@@ -4,7 +4,8 @@
 /// <summary>
 /// Represents a command that returns an integer as the result of its execution.
 /// </summary>
-public interface IExecutableCommand : ICommand
+[Cloneable]
+public partial interface IExecutableCommand : ICommand
 {
     /// <summary>
     /// Returns an object that can execute this command and return the integer produced by that

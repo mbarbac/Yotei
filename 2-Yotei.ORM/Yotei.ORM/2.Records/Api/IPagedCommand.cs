@@ -4,6 +4,7 @@
 /// <summary>
 /// Represents a command that suppports paging functionality.
 /// </summary>
+[Cloneable]
 public partial interface IPagedCommand : ICommand
 {
     /// <summary>

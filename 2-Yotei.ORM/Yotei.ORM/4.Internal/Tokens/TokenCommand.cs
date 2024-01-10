@@ -17,7 +17,11 @@ public sealed class TokenCommand : Token
     /// <inheritdoc/>
     /// </summary>
     /// <returns><inheritdoc/></returns>
-    public override string ToString() => Command.GetText(out _);
+    public override string ToString()
+    {
+        var str = Command.GetText(out _).UnWrap('(', ')', trim: true, recursive: true);
+        return $"({str})";
+    }
 
     /// <summary>
     /// The actual embedded command carried by this instance.

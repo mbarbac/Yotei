@@ -4,7 +4,8 @@
 /// <summary>
 /// Represents a command that can enumerate the records produced by its execution.
 /// </summary>
-public interface IEnumerableCommand
+[Cloneable]
+public partial interface IEnumerableCommand
     : ICommand
     , IEnumerable<IRecord?>
     , IAsyncEnumerable<IRecord?>

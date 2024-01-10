@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents a records-oriented command whose contents are explicitly set.
 /// </summary>
-[WithGenerator]
+[Cloneable]
 public partial interface IRawCommand : ICommand, IEnumerableCommand, IExecutableCommand
 {
     /// <summary>

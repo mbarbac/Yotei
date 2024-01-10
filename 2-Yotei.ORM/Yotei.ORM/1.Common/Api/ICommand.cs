@@ -4,7 +4,8 @@
 /// <summary>
 /// Represents an arbitrary command that can be executed against an underlying database.
 /// </summary>
-public interface ICommand
+[Cloneable]
+public partial interface ICommand
 {
     /// <summary>
     /// The connection this instance is associated with.
