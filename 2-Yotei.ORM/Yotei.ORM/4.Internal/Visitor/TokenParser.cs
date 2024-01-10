@@ -7,7 +7,7 @@ namespace Yotei.ORM.Internal;
 /// Represents the ability of parsing dynamic lambda expressions and nodes and returning a token
 /// that represents their contents as database tokens.
 /// </summary>
-public static class ExpressionParser
+public static class TokenParser
 {
     /// <summary>
     /// Parses the given dynamic lambda expression returning a token that represents its contents.
@@ -215,7 +215,6 @@ public static class ExpressionParser
         {
             Token item => item,
             LambdaNode item => Parse(item),
-            ICommand item => new TokenCommand(item),
 
             Delegate item => throw new ArgumentException(
                 $"Cannot use a delegate as the value of a '{nameof(TokenValue)}' token.")
