@@ -13,6 +13,7 @@ public sealed partial class ParameterList : IParameterList
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="engine"></param>
+    [SuppressMessage("", "IDE0290")]
     public ParameterList(IEngine engine) => Engine = engine.ThrowWhenNull();
 
     /// <summary>
@@ -74,17 +75,6 @@ public sealed partial class ParameterList : IParameterList
         => ReferenceEquals(source, item)
         ? true
         : throw new DuplicateException("Duplicated element.").WithData(item);
-
-    string NextName()
-    {
-        for (int i = Count; i < int.MaxValue; i++)
-        {
-            var name = $"{Engine.ParameterPrefix}{i}";
-            var index = IndexOf(name);
-            if (index < 0) return name;
-        }
-        throw new UnExpectedException("Range of integers exhausted.");
-    }
 
     // ----------------------------------------------------
 
@@ -208,6 +198,21 @@ public sealed partial class ParameterList : IParameterList
     /// Minimizes the memory consumption of this collection.
     /// </summary>
     public void Trim() => Items.TrimExcess();
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public string NextName()
+    {
+        for (int i = Count; i < int.MaxValue; i++)
+        {
+            var name = $"{Engine.ParameterPrefix}{i}";
+            var index = IndexOf(name);
+            if (index < 0) return name;
+        }
+        throw new UnExpectedException("Range of integers exhausted.");
+    }
 
     // ----------------------------------------------------
 

@@ -11,6 +11,7 @@ public sealed class TokenCoalesce : Token
     /// </summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
+    [SuppressMessage("", "IDE0290")]
     public TokenCoalesce(Token left, Token right)
     {
         Left = left.ThrowWhenNull();

@@ -94,6 +94,12 @@ public interface IParameterList : IEnumerable<IParameter>
     /// <returns></returns>
     List<IParameter> ToList();
 
+    /// <summary>
+    /// Returns a name literal that can be used to add a new parameter to this collection.
+    /// </summary>
+    /// <returns></returns>
+    string NextName();
+
     // ----------------------------------------------------
 
     /// <summary>

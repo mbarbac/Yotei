@@ -100,16 +100,22 @@ public class TokenParser(IEngine engine)
     /// <summary>
     /// Parses the given node.
     /// </summary>
-    TokenInvoke ParseInvoke(LambdaNodeInvoke node)
+    Token ParseInvoke(LambdaNodeInvoke node)
     {
         var host = Parse(node.LambdaHost);
         var items = node.LambdaArguments.Select(x => Parse(x)).ToList();
 
-        // Single string argument is considered a literal...
-        if (items.Count == 1 &&
-            items[0] is TokenValue value &&
-            value.Value is string str)
-            items[0] = new TokenLiteral(str);
+        // Special cases...
+        if (items.Count == 1)
+        {
+            // Single string is considered a literal...
+            if (items[0] is TokenValue value &&
+                value.Value is string str)
+                items[0] = new TokenLiteral(str);
+
+            // Single command argument...
+            if (items[0] is TokenCommand command) return command;
+        }
 
         return new TokenInvoke(host, items);
     }
@@ -132,64 +138,76 @@ public class TokenParser(IEngine engine)
     Token ParseMethod(LambdaNodeMethod node)
     {
         var darg = node.GetArgument();
-        var name = node.LambdaName.NullWhenDynamicName(darg, false);
+        var name = node.LambdaName.NullWhenDynamicName(darg, engine.CaseSensitiveNames);
 
-        if (name == null) // Translate to invoke...
+        // Translate to invoke...
+        if (name == null)
         {
             if (node.LambdaTypeArguments.Count != 0) throw new ArgumentException(
                 "Invoke tokens do not support generic type arguments.")
                 .WithData(node);
 
-            var temp = new LambdaNodeInvoke(node.LambdaHost, node.LambdaArguments);
-            return ParseInvoke(temp);
+            var invoke = new LambdaNodeInvoke(node.LambdaHost, node.LambdaArguments);
+            return ParseInvoke(invoke);
         }
-        else // Other cases...
+
+        // x => x.Coalesce(left, right)...
+        if (node.LambdaHost is LambdaNodeArgument &&
+            node.LambdaArguments.Count == 2 &&
+            string.Compare(name, "Coalesce", !engine.CaseSensitiveNames) == 0)
         {
-            // x => x.Convert(type, target)...
-            if (node.LambdaHost is LambdaNodeArgument &&
-                node.LambdaArguments.Count == 2 &&
-                node.LambdaArguments[0] is LambdaNodeValue one &&
-                string.Compare(node.LambdaName, "Convert", ignoreCase: true) == 0)
+            var left = Parse(node.LambdaArguments[0]);
+            var right = Parse(node.LambdaArguments[1]);
+
+            return new TokenCoalesce(left, right);
+        }
+
+        // c => x.Ternary(left, middle, right)...
+        if (node.LambdaHost is LambdaNodeArgument &&
+            node.LambdaArguments.Count == 3 &&
+            string.Compare(name, "Ternary", !engine.CaseSensitiveNames) == 0)
+        {
+            var left = Parse(node.LambdaArguments[0]);
+            var middle = Parse(node.LambdaArguments[1]);
+            var right = Parse(node.LambdaArguments[2]);
+
+            return new TokenTernary(left, middle, right);
+        }
+
+        // x => x.Convert...
+        if (node.LambdaHost is LambdaNodeArgument && (
+            string.Compare(name, "Convert", !engine.CaseSensitiveNames) == 0 ||
+            string.Compare(name, "Cast", !Engine.CaseSensitiveNames) == 0))
+        {
+            // x => x.Convert<T>(target...)...
+            if (node.LambdaTypeArguments.Count == 1 &&
+                node.LambdaArguments.Count == 1)
+            {
+                var type = node.LambdaTypeArguments[0];
+                var target = Parse(node.LambdaArguments[0]);
+                return new TokenConvertToType(type, target);
+            }
+
+            // x => x.Convert(type|spec, target)...
+            if (node.LambdaArguments.Count == 2 &&
+                node.LambdaArguments[0] is LambdaNodeValue value)
             {
                 var target = Parse(node.LambdaArguments[1]);
-                switch (one.LambdaValue)
+                switch (value.LambdaValue)
                 {
-                    case Type oneType: return new TokenConvertToType(oneType, target);
-                    case string oneSpec: return new TokenConvertToSpecification(oneSpec, target);
+                    case Type vtype: return new TokenConvertToType(vtype, target);
+                    case string vspec: return new TokenConvertToSpecification(vspec, target);
                 }
             }
-
-            // x => x.Coalesce(left, right)
-            if (node.LambdaHost is LambdaNodeArgument &&
-                node.LambdaArguments.Count == 2 &&
-                string.Compare(node.LambdaName, "Coalesce", ignoreCase: true) == 0)
-            {
-                var left = Parse(node.LambdaArguments[0]);
-                var right = Parse(node.LambdaArguments[1]);
-
-                return new TokenCoalesce(left, right);
-            }
-
-            // x => x.Ternary(left, middle, right)
-            if (node.LambdaHost is LambdaNodeArgument &&
-                node.LambdaArguments.Count == 3 &&
-                string.Compare(node.LambdaName, "Ternary", ignoreCase: true) == 0)
-            {
-                var left = Parse(node.LambdaArguments[0]);
-                var middle = Parse(node.LambdaArguments[1]);
-                var right = Parse(node.LambdaArguments[2]);
-
-                return new TokenTernary(left, middle, right);
-            }
-
-            // Standard case...
-            var host = Parse(node.LambdaHost);
-            var items = node.LambdaArguments.Select(x => Parse(x));
-
-            return node.LambdaTypeArguments.Count == 0
-                ? new TokenMethod(host, name, items)
-                : new TokenMethod(host, name, node.LambdaTypeArguments, items);
         }
+
+        // Standar case...
+        var host = Parse(node.LambdaHost);
+        var items = node.LambdaArguments.Select(x => Parse(x));
+
+        return node.LambdaTypeArguments.Count == 0
+            ? new TokenMethod(host, name, items)
+            : new TokenMethod(host, name, node.LambdaTypeArguments, items);
     }
 
     /// <summary>
@@ -221,6 +239,7 @@ public class TokenParser(IEngine engine)
         {
             Token item => item,
             LambdaNode item => Parse(item),
+            ICommand item => new TokenCommand(item),
 
             Delegate item => throw new ArgumentException(
                 $"Cannot use a delegate as the value of a '{nameof(TokenValue)}' token.")

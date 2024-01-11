@@ -26,9 +26,11 @@ public class LambdaNodeValue : LambdaNode
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => LambdaValue == null
-        ? "'NULL'"
-        : $"'{LambdaValue.Sketch()}'";
+    public override string ToString() => LambdaValue switch
+    {
+        null => "'NULL'",
+        _ => $"'{LambdaValue.Sketch()}'"
+    };
 
     /// <summary>
     /// <inheritdoc/>

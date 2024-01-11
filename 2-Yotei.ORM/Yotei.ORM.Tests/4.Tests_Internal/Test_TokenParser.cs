@@ -1,4 +1,6 @@
 #pragma warning disable CS1717
+
+using Xunit.Sdk;
 using Yotei.ORM.Internal;
 
 namespace Yotei.ORM.Tests;
@@ -90,6 +92,29 @@ public static class Test_TokenParser
         Assert.Equal(ExpressionType.GreaterThanOrEqual, item.Operation);
         Assert.IsType<TokenIdentifier>(item.Left);
         Assert.IsType<TokenIdentifier>(item.Right);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Parse_Coalesce()
+    {
+        var engine = new FakeEngine();
+        var parser = new TokenParser(engine);
+        Token token;
+
+        try
+        {
+            token = parser.Parse(x => x.Alpha ?? x.Beta);
+            Assert.IsType<TokenCoalesce>(token);
+            Assert.Fail();
+        }
+        catch (IsTypeException) { }
+
+        token = parser.Parse(x => x.Coalesce(x.Alpha, x.Beta));
+        Assert.Equal("(x.[Alpha] ?? x.[Beta])", token.ToString());
+        Assert.IsType<TokenCoalesce>(token);
     }
 
     // ----------------------------------------------------
@@ -380,93 +405,155 @@ public static class Test_TokenParser
         Token token;
         TokenMethod item;
 
-        // TODO: Conversion using CAST and GENERICS...
-
-        token = parser.Parse(x => x.Cast<string>(x.Alpha));
-        Assert.Equal("x.Cast<String>(x.[Alpha])", token.ToString());
+        token = parser.Parse(x => x.Whatever<string>(x.Alpha));
+        Assert.Equal("x.Whatever<String>(x.[Alpha])", token.ToString());
         item = Assert.IsType<TokenMethod>(token);
         Assert.Single(item.Arguments);
         Assert.IsType<TokenIdentifier>(item.Arguments[0]);
         Assert.Single(item.TypeArguments);
         Assert.IsAssignableFrom<Type>(item.TypeArguments[0]);
+
+        token = parser.Parse(x => x.Whatever<string, int>(x.Alpha));
+        Assert.Equal("x.Whatever<String, Int32>(x.[Alpha])", token.ToString());
+        item = Assert.IsType<TokenMethod>(token);
+        Assert.Single(item.Arguments);
+        Assert.IsType<TokenIdentifier>(item.Arguments[0]);
+        Assert.Equal(2, item.TypeArguments.Length);
+        Assert.True(item.TypeArguments[0] == typeof(string));
+        Assert.True(item.TypeArguments[1] == typeof(int));
     }
 
     // ----------------------------------------------------
 
     //[Enforced]
-    //[Fact]
-    //public static void Parse_Method_As_Invoke()
-    //{
-    //    var engine = new FakeEngine();
-    //    var parser = new TokenParser(engine);
-    //    Token token;
-    //    TokenMethod item;
-    //
-    //    token = parser.Parse(x => );
-    //    Assert.Equal("", token.ToString());
-    //    item = Assert.IsType<>(token);
-    //    TODO...
-    //}
+    [Fact]
+    public static void Parse_Method_As_Invoke()
+    {
+        var engine = new FakeEngine();
+        var parser = new TokenParser(engine);
+        Token token;
+        TokenInvoke item;
+
+        token = parser.Parse(x => x.Alpha.x());
+        Assert.Equal("x.[Alpha]()", token.ToString());
+        item = Assert.IsType<TokenInvoke>(token);
+        Assert.Empty(item.Arguments);
+
+        token = parser.Parse(x => x(x.Alpha).x(x.Beta));
+        Assert.Equal("x(x.[Alpha])(x.[Beta])", token.ToString());
+        item = Assert.IsType<TokenInvoke>(token);
+        item = Assert.IsType<TokenInvoke>(item.Host);
+        Assert.IsType<TokenArgument>(item.Host);
+    }
 
     //[Enforced]
-    //[Fact]
-    //public static void Parse_Method_As_Convert_To_Type()
-    //{
-    //    var engine = new FakeEngine();
-    //    var parser = new TokenParser(engine);
-    //    Token token;
-    //    TokenMethod item;
-    //
-    //    token = parser.Parse(x => );
-    //    Assert.Equal("", token.ToString());
-    //    item = Assert.IsType<>(token);
-    //    TODO...
-    //}
+    [Fact]
+    public static void Parse_Method_As_Invoke_ToLiteral()
+    {
+        var engine = new FakeEngine();
+        var parser = new TokenParser(engine);
+        Token token;
+        TokenInvoke item;
+
+        token = parser.Parse(x => x("any"));
+        Assert.Equal("x(any)", token.ToString());
+        item = Assert.IsType<TokenInvoke>(token);
+        Assert.Single(item.Arguments);
+        Assert.IsType<TokenLiteral>(item.Arguments[0]);
+
+        token = parser.Parse(x => x.Alpha.x("any"));
+        Assert.Equal("x.[Alpha](any)", token.ToString());
+        item = Assert.IsType<TokenInvoke>(token);
+        Assert.Single(item.Arguments);
+        Assert.IsType<TokenLiteral>(item.Arguments[0]);
+    }
 
     //[Enforced]
-    //[Fact]
-    //public static void Parse_Method_As_Convert_To_Specifications()
-    //{
-    //    var engine = new FakeEngine();
-    //    var parser = new TokenParser(engine);
-    //    Token token;
-    //    TokenMethod item;
-    //
-    //    token = parser.Parse(x => );
-    //    Assert.Equal("", token.ToString());
-    //    item = Assert.IsType<>(token);
-    //    TODO...
-    //}
+    [Fact]
+    public static void Parse_Method_Embedded_Literal_As_Invoke_Argument()
+    {
+        var engine = new FakeEngine();
+        var parser = new TokenParser(engine);
+        Token token;
+        TokenMethod item;
+        TokenInvoke invoke;
+
+        token = parser.Parse(x => x.Alpha.Beta(x.Delta, null, x("any")));
+        Assert.Equal("x.[Alpha].Beta(x.[Delta], NULL, x(any))", token.ToString());
+        item = Assert.IsType<TokenMethod>(token);
+        Assert.Equal(3, item.Arguments.Count);
+
+        invoke = Assert.IsType<TokenInvoke>(item.Arguments[2]);
+        Assert.Single(invoke.Arguments);
+        Assert.IsType<TokenLiteral>(invoke.Arguments[0]);
+    }
+
+    // ----------------------------------------------------
 
     //[Enforced]
-    //[Fact]
-    //public static void Parse_Method_As_Coalesce()
-    //{
-    //    var engine = new FakeEngine();
-    //    var parser = new TokenParser(engine);
-    //    Token token;
-    //    TokenMethod item;
-    //
-    //    token = parser.Parse(x => );
-    //    Assert.Equal("", token.ToString());
-    //    item = Assert.IsType<>(token);
-    //    TODO...
-    //}
+    [Fact]
+    public static void Parse_Method_As_Convert_To_Type()
+    {
+        var engine = new FakeEngine();
+        var parser = new TokenParser(engine);
+        Token token;
+        TokenConvertToType toType;
+
+        token = parser.Parse(x => x.Cast(typeof(string), x.Alpha));
+        Assert.Equal("((String) x.[Alpha])", token.ToString());
+        toType = Assert.IsType<TokenConvertToType>(token);
+        Assert.True(toType.Type == typeof(string));
+
+        token = parser.Parse(x => x.Cast<int>(x.Alpha));
+        Assert.Equal("((Int32) x.[Alpha])", token.ToString());
+        toType = Assert.IsType<TokenConvertToType>(token);
+        Assert.Equal(typeof(int), toType.Type);
+    }
 
     //[Enforced]
-    //[Fact]
-    //public static void Parse_Method_As_Ternary()
-    //{
-    //    var engine = new FakeEngine();
-    //    var parser = new TokenParser(engine);
-    //    Token token;
-    //    TokenMethod item;
-    //
-    //    token = parser.Parse(x => );
-    //    Assert.Equal("", token.ToString());
-    //    item = Assert.IsType<>(token);
-    //    TODO...
-    //}
+    [Fact]
+    public static void Parse_Method_As_Convert_To_Specification()
+    {
+        var engine = new FakeEngine();
+        var parser = new TokenParser(engine);
+        Token token;
+        TokenConvertToSpecification toSpec;
+
+        token = parser.Parse(x => x.Cast("varchar", x.Alpha));
+        Assert.Equal("((varchar) x.[Alpha])", token.ToString());
+        toSpec = Assert.IsType<TokenConvertToSpecification>(token);
+        Assert.Equal("varchar", toSpec.Type);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Parse_Method_As_Coalesce()
+    {
+        var engine = new FakeEngine();
+        var parser = new TokenParser(engine);
+        Token token;
+        TokenCoalesce item;
+
+        token = parser.Parse(x => x.Coalesce(x.Alpha, x.Beta));
+        Assert.Equal("(x.[Alpha] ?? x.[Beta])", token.ToString());
+        item = Assert.IsType<TokenCoalesce>(token);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Parse_Method_As_Ternary()
+    {
+        var engine = new FakeEngine();
+        var parser = new TokenParser(engine);
+        Token token;
+        TokenTernary item;
+
+        token = parser.Parse(x => x.Ternary(x.Alpha, x.Beta, x.Delta));
+        Assert.Equal("(x.[Alpha] ? x.[Beta] : x.[Delta])", token.ToString());
+        item = Assert.IsType<TokenTernary>(token);
+    }
 
     // ----------------------------------------------------
 
@@ -528,6 +615,29 @@ public static class Test_TokenParser
         item = Assert.IsType<TokenSetter>(token);
         Assert.IsType<TokenIdentifier>(item.Target);
         Assert.IsType<TokenIdentifier>(item.Value);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Parse_Ternary()
+    {
+        var engine = new FakeEngine();
+        var parser = new TokenParser(engine);
+        Token token;
+
+        try
+        {
+            token = parser.Parse(x => x.Alpha ? x.Beta : x.Delta);
+            Assert.IsType<TokenTernary>(token);
+            Assert.Fail();
+        }
+        catch (IsTypeException) { }
+
+        token = parser.Parse(x => x.Ternary(x.Alpha, x.Beta, x.Delta));
+        Assert.Equal("(x.[Alpha] ? x.[Beta] : x.[Delta])", token.ToString());
+        Assert.IsType<TokenTernary>(token);
     }
 
     // ----------------------------------------------------
@@ -605,51 +715,27 @@ public static class Test_TokenParser
     }
 
     //[Enforced]
-    //[Fact]
-    //public static void Parse_Value_Command()
-    //{
-    //    var engine = new FakeEngine();
-    //    var parser = new TokenParser(engine);
-    //    Token token;
-    //    TokenCommand item;
-    //
-    //    token = parser.Parse(x => );
-    //    Assert.Equal("", token.ToString());
-    //    item = Assert.IsType<>(token);
-    //    TODO...
-    //}
+    [Fact]
+    public static void Parse_Value_Command()
+    {
+        var engine = new FakeEngine();
+        var connection = new FakeConnection(engine);
+        var parser = new TokenParser(engine);
+        Token token;
+        TokenCommand item;
 
-    // ----------------------------------------------------
+        var command = new Records.Code.CoreCommand(connection,
+            "WHERE [LastName] = {0}",
+            "Bond");
 
-    //[Enforced]
-    //[Fact]
-    //public static void Parse_Coalesce()
-    //{
-    //    var engine = new FakeEngine();
-    //    var parser = new TokenParser(engine);
-    //    Token token;
-    //    TokenCoalesce item;
-    //
-    //    token = parser.Parse(x => );
-    //    Assert.Equal("", token.ToString());
-    //    item = Assert.IsType<>(token);
-    //    TODO...
-    //}
+        token = parser.Parse(x => command);
+        Assert.Equal("(WHERE [LastName] = #0)", token.ToString());
+        item = Assert.IsType<TokenCommand>(token);
+        Assert.NotSame(command, item.Command);
 
-    // ----------------------------------------------------
-
-    //[Enforced]
-    //[Fact]
-    //public static void Parse_Ternary()
-    //{
-    //    var engine = new FakeEngine();
-    //    var parser = new TokenParser(engine);
-    //    Token token;
-    //    TokenTernary item;
-    //
-    //    token = parser.Parse(x => );
-    //    Assert.Equal("", token.ToString());
-    //    item = Assert.IsType<>(token);
-    //    TODO...
-    //}
+        token = parser.Parse(x => x(command));
+        Assert.Equal("(WHERE [LastName] = #0)", token.ToString());
+        item = Assert.IsType<TokenCommand>(token);
+        Assert.NotSame(command, item.Command);
+    }
 }

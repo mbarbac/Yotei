@@ -54,11 +54,14 @@ public static class SketchExtensions
 
         if (type.IsPrimitive) return RoundedTypeName(InvokeToString()!);
         if (source is Enum) return GetEnum();
-        if (source is IDictionary dict) return GetDictionary(dict);
-        if (source is IEnumerable items) return GetEnumerable(items);
 
+        // This need to come before IDictionary or IEnumerable, as those will actually enumerate
+        // which means it may have side effects...
         str = InvokeToString();
         if (str is not null) return RoundedTypeName(str);
+
+        if (source is IDictionary dict) return GetDictionary(dict);
+        if (source is IEnumerable items) return GetEnumerable(items);
 
         str = GetShape();
         if (str is not null) return RoundedTypeName(str);
