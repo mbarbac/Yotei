@@ -16,6 +16,8 @@ public static class Test_CommandInfo
         Assert.Empty(info.Parameters);
     }
 
+    // ----------------------------------------------------
+
     //[Enforced]
     [Fact]
     public static void Test_Add_Text()
@@ -125,4 +127,6 @@ public static class Test_CommandInfo
         Assert.Equal("#1", info.Parameters[1].Name); Assert.Null(info.Parameters[1].Value);
         Assert.Equal("#2", info.Parameters[2].Name); Assert.Equal(50, info.Parameters[2].Value);
     }
+
+    // ----------------------------------------------------
 }

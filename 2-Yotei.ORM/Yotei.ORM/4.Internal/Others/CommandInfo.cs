@@ -180,4 +180,42 @@ public sealed partial class CommandInfo
         // Adding the text if needed...
         if (text != null) CommandText += text;
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Adds to this instance the contents of the given one, potentially changing the names
+    /// of the embedded arguments.
+    /// </summary>
+    /// <param name="source"></param>
+    public void Add(CommandInfo source)
+    {
+        var text = source.CommandText;
+
+        // Iterating through the parameters...
+        for (int i = 0; i < source.Parameters.Count; i++)
+        {
+            var old = source.Parameters[i];
+            Parameters = Parameters.AddNew(old.Value, out var par);
+
+            if (text != null) // We may need to adjust the original text...
+            {
+                var start = 0;
+                while (start < text.Length)
+                {
+                    var name = old.Name;
+                    var pos = text.IndexOf(name, start);
+                    if (pos >= 0)
+                    {
+                        text = text.Remove(pos, name.Length);
+                        text = text.Insert(pos, par.Name);
+                        start = pos + par.Name.Length;
+                    }
+                }
+            }
+        }
+
+        // Adding the text...
+        if (text != null) CommandText += text;
+    }
 }
