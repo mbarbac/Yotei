@@ -22,10 +22,19 @@ public sealed partial class CommandInfo
     /// </summary>
     /// <param name="engine"></param>
     /// <param name="text"></param>
-    public CommandInfo(IEngine engine, string text)
+    public CommandInfo(IEngine engine, string text) : this(engine)
     {
-        CommandText = text.ThrowWhenNull();
-        Parameters = new Code.ParameterList(engine);
+        Add(text);
+    }
+
+    /// <summary>
+    /// Initializes a new instance with the given text and parameters.
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="parameters"></param>
+    public CommandInfo(IEngine engine, string text, params object?[] parameters) : this(engine)
+    {
+        Add(text, parameters);
     }
 
     /// <summary>
@@ -134,7 +143,10 @@ public sealed partial class CommandInfo
                 var arg = args[i];
 
                 // Case: arg is already a parameter...
-                if (arg is IParameter par) Parameters = Parameters.Add(par);
+                if (arg is IParameter par)
+                {
+                    Parameters = Parameters.Add(par);
+                }
                 else
                 {
                     // Case: arg is an anonyous type...
@@ -147,8 +159,9 @@ public sealed partial class CommandInfo
 
                         var member = members[0];
                         var value = member.GetValue(arg);
-                        par = new Code.Parameter(member.Name, value);
+                        var name = "{" + member.Name + "}";
 
+                        par = new Code.Parameter(name, value);
                         Parameters = Parameters.Add(par);
                     }
 
@@ -196,20 +209,31 @@ public sealed partial class CommandInfo
         for (int i = 0; i < source.Parameters.Count; i++)
         {
             var old = source.Parameters[i];
-            Parameters = Parameters.AddNew(old.Value, out var par);
 
-            if (text != null) // We may need to adjust the original text...
+            // Case: wrapped with brackets...
+            if (old.Name[0] == '{' && old.Name[^1] == '}')
             {
-                var start = 0;
-                while (start < text.Length)
+                Parameters = Parameters.Add(old);
+            }
+
+            // Case: other names...
+            else
+            {
+                Parameters = Parameters.AddNew(old.Value, out var par);
+
+                if (text != null) // Adjusting old text...
                 {
-                    var name = old.Name;
-                    var pos = text.IndexOf(name, start);
-                    if (pos >= 0)
+                    var start = 0;
+                    while (start < text.Length)
                     {
-                        text = text.Remove(pos, name.Length);
-                        text = text.Insert(pos, par.Name);
-                        start = pos + par.Name.Length;
+                        var name = old.Name;
+                        var pos = text.IndexOf(name, start);
+                        if (pos >= 0)
+                        {
+                            text = text.Remove(pos, name.Length);
+                            text = text.Insert(pos, par.Name);
+                            start = pos + par.Name.Length;
+                        }
                     }
                 }
             }

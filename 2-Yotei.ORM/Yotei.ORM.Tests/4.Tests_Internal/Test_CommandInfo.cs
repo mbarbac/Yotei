@@ -84,7 +84,7 @@ public static class Test_CommandInfo
         Assert.Single(info.Parameters);
         Assert.Equal("#0", info.Parameters[0].Name); Assert.Equal("007", info.Parameters[0].Value);
 
-        info.Add(" AND [ManagerID] IS {0}", null!);;
+        info.Add(" AND [ManagerID] IS {0}", null!); ;
         Assert.Equal("WHERE [Id] = #0 AND [ManagerID] IS #1", info.CommandText);
         Assert.Equal(2, info.Parameters.Count);
         Assert.Equal("#0", info.Parameters[0].Name); Assert.Equal("007", info.Parameters[0].Value);
@@ -114,19 +114,34 @@ public static class Test_CommandInfo
         info.Add("WHERE [Id] = {id} AND [ManagerId] = {1}",
             new { id = "007" },
             null);
-        
+
         Assert.Equal("WHERE [Id] = {id} AND [ManagerId] = #1", info.CommandText);
         Assert.Equal(2, info.Parameters.Count);
-        Assert.Equal("id", info.Parameters[0].Name); Assert.Equal("007", info.Parameters[0].Value);
+        Assert.Equal("{id}", info.Parameters[0].Name); Assert.Equal("007", info.Parameters[0].Value);
         Assert.Equal("#1", info.Parameters[1].Name); Assert.Null(info.Parameters[1].Value);
 
         info.Add(" AND [Age] = {0}", 50);
         Assert.Equal("WHERE [Id] = {id} AND [ManagerId] = #1 AND [Age] = #2", info.CommandText);
         Assert.Equal(3, info.Parameters.Count);
-        Assert.Equal("id", info.Parameters[0].Name); Assert.Equal("007", info.Parameters[0].Value);
+        Assert.Equal("{id}", info.Parameters[0].Name); Assert.Equal("007", info.Parameters[0].Value);
         Assert.Equal("#1", info.Parameters[1].Name); Assert.Null(info.Parameters[1].Value);
         Assert.Equal("#2", info.Parameters[2].Name); Assert.Equal(50, info.Parameters[2].Value);
     }
 
     // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Add_Info()
+    {
+        var engine = new FakeEngine();
+        var source = new CommandInfo(engine, "WHERE [Id] = {0}", "007");
+        var target = new CommandInfo(engine, " AND [ManagerId] = {id}", new { id = "M" });
+
+        source.Add(target);
+        Assert.Equal("WHERE [Id] = #0 AND [ManagerId] = {id}", source.CommandText);
+        Assert.Equal(2, source.Parameters.Count);
+        Assert.Equal("{id}", source.Parameters[0].Name); Assert.Equal("007", source.Parameters[0].Value);
+        Assert.Equal("#1", source.Parameters[1].Name); Assert.Null(source.Parameters[1].Value);
+    }
 }
