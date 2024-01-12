@@ -2,25 +2,24 @@
 
 // ========================================================
 /// <summary>
-/// Represents a list-alike collection of elements, identified by their respective keys, with
-/// customizable behavior.
+/// Represents an immutable list-alike collection of elements, identified by their respective
+/// keys, with customizable behavior.
 /// </summary>
 /// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>
-[Cloneable]
-public partial interface ICoreList<K, T> : IList<T>, IList, ICollection<T>, ICollection
+public interface IFrozenList<K, T> : IEnumerable<T>
 {
     /// <summary>
     /// Gets the number of elements in this collection.
     /// </summary>
-    new int Count { get; }
+    int Count { get; }
 
     /// <summary>
-    /// Gets or sets the element stored at the given index.
+    /// Gets the element stored at the given index.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    new T this[int index] { get; set; }
+    T this[int index] { get; }
 
     /// <summary>
     /// Determines if this collection contains an element with the given key.
@@ -46,7 +45,7 @@ public partial interface ICoreList<K, T> : IList<T>, IList, ICollection<T>, ICol
     int LastIndexOf(K key);
 
     /// <summary>
-    /// Returns the indexes of the ocurrences of elements with the given key.
+    /// Returns the indexes of the elements with the given key.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
@@ -94,126 +93,135 @@ public partial interface ICoreList<K, T> : IList<T>, IList, ICollection<T>, ICol
     /// <returns></returns>
     List<T> ToList();
 
+    /// <summary>
+    /// Returns a builder of an appropriate type with the elements of this instance.
+    /// </summary>
+    /// <returns></returns>
+    ICoreList<K, T> ToCoreList();
+
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns the given number of elements starting from the given index.
+    /// Returns a new instance that contains the given number of elements starting from the given
+    /// index. If no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    List<T> GetRange(int index, int count);
+    IFrozenList<K, T> GetRange(int index, int count);
 
     /// <summary>
-    /// Replaces the element at the given index with the new given one. Returns the number of
-    /// changes made.
+    /// Returns a new instance with the element at the given index replaced by the new given one.
+    /// If no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    int Replace(int index, T item);
+    IFrozenList<K, T> Replace(int index, T item);
 
     /// <summary>
-    /// Adds to this collection the given element. Returns the number of changes made.
+    /// Returns a new instance with the given element added to it. If no changes are detected,
+    /// returns the original instance.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    new int Add(T item);
+    IFrozenList<K, T> Add(T item);
 
     /// <summary>
-    /// Adds to this collection the elements from the given range. Returns the number of changes
-    /// made.
+    /// Returns a new instance with the elements from the given range add to it. If no changes
+    /// are detected, returns the original instance.
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    int AddRange(IEnumerable<T> range);
+    IFrozenList<K, T> AddRange(IEnumerable<T> range);
 
     /// <summary>
-    /// Inserts into this collection the given element at the given index. Returns the number of
-    /// changes made.
+    /// Returns a new instance with the given element inserted into it at the given index. If no
+    /// changes are detected, returns the original instance.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    new int Insert(int index, T item);
+    IFrozenList<K, T> Insert(int index, T item);
 
     /// <summary>
-    /// Inserts into this collection the elements from the given range, starting at the given
-    /// index. Returns the number of changes made.
+    /// Returns a new instance with the elements from the given range inserted into it, starting
+    /// at the given index. If no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    int InsertRange(int index, IEnumerable<T> range);
+    IFrozenList<K, T> InsertRange(int index, IEnumerable<T> range);
 
     /// <summary>
-    /// Removes from this collection the element at the given index. Returns the number of
-    /// changes made.
+    /// Returns a new instance with the element at the given index removed from it. If no changes
+    /// are detected, returns the original instance.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    new int RemoveAt(int index);
+    IFrozenList<K, T> RemoveAt(int index);
 
     /// <summary>
-    /// Removes from this collection the given number of elements, starting from the given index.
-    /// Returns the number of changes made.
+    /// Returns a new instance with the given number of elements, starting from the given index,
+    /// removed from it. If no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    int RemoveRange(int index, int count);
+    IFrozenList<K, T> RemoveRange(int index, int count);
 
     /// <summary>
-    /// Removes from this collection the first ocurrence of an element with the given key.
-    /// Returns the number of changes made.
+    /// Returns a new instance with the first ocurrence of an element with the given key removed
+    /// from it. If no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    int Remove(K key);
+    IFrozenList<K, T> Remove(K key);
 
     /// <summary>
-    /// Removes from this collection the last ocurrence of an element with the given key.
-    /// Returns the number of changes made.
+    /// Returns a new instance with the last ocurrence of an element with the given key removed
+    /// from it. If no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    int RemoveLast(K key);
+    IFrozenList<K, T> RemoveLast(K key);
 
     /// <summary>
-    /// Removes from this collection all the ocurrences of elements with the given key. Returns
-    /// the number of changes made.
+    /// Returns a new instance with all ocurrences of elements with the given key removed from it.
+    /// If no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    int RemoveAll(K key);
+    IFrozenList<K, T> RemoveAll(K key);
 
     /// <summary>
-    /// Removes from this collection the first ocurrence of an element that matches the given
-    /// predicate. Returns the number of changes made.
+    /// Returns a new instance with the first ocurrence of an element that matches the given
+    /// predicate removed from it. If no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int Remove(Predicate<T> predicate);
+    IFrozenList<K, T> Remove(Predicate<T> predicate);
 
     /// <summary>
-    /// Removes from this collection the last ocurrence of an element that matches the given
-    /// predicate. Returns the number of changes made.
+    /// Returns a new instance with the last ocurrence of an element that matches the given
+    /// predicate removed from it. If no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int RemoveLast(Predicate<T> predicate);
+    IFrozenList<K, T> RemoveLast(Predicate<T> predicate);
 
     /// <summary>
-    /// Removes from this collection all the ocurrences of elements that match the given
-    /// predicate. Returns the number of changes made.
+    /// Returns a new instance with all the ocurrences of elements that match the given predicate
+    /// removed from it. If no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int RemoveAll(Predicate<T> predicate);
+    IFrozenList<K, T> RemoveAll(Predicate<T> predicate);
 
     /// <summary>
-    /// Clears all the elements in this collection. Returns the number of changes made.
+    /// Returns a new instance with all the original elements removed. If no changes are detected,
+    /// returns the original instance.
     /// </summary>
     /// <returns></returns>
-    new int Clear();
+    IFrozenList<K, T> Clear();
 }

@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Tools.Code;
+﻿using System.Text.RegularExpressions;
+
+namespace Yotei.ORM.Tools.Code;
 
 // ========================================================
 /// <summary>
@@ -32,13 +34,19 @@ public partial class CoreList<T> : ICoreList<T>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected CoreList(CoreList<T> source) => AddRange(source);
+    protected CoreList(CoreList<T> source)
+    {
+        if (source.Count == 0) return;
+
+        Items.Capacity = source.Count;
+        AddRange(source, false);
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
+    public IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /// <summary>
@@ -210,6 +218,32 @@ public partial class CoreList<T> : ICoreList<T>
 
     // ----------------------------------------------------
 
+    void TryIncrease()
+    {
+        if (Items.Count < Items.Capacity) return;
+        else if (Items.Count < 8) Items.Capacity += 4;
+        else if (Items.Count < 24) Items.Capacity += 8;
+        else Items.Capacity += Items.Capacity / 2;
+    }
+
+    void TryIncrease(IEnumerable<T> range)
+    {
+        var size = TentativeCount(range);
+        if (size == 0) return;
+        else if ((Items.Capacity - Items.Count) < size) Items.Capacity += size;
+    }
+
+    static int TentativeCount(IEnumerable<T> range) =>
+        range is ICollection<T> rt ? rt.Count :
+        range is ICollection rg ? rg.Count :
+        0;
+
+    void TryDecrease()
+    {
+        if (Items.Count < 2 && Items.Capacity > 2) Items.Capacity = 2;
+        else if (Items.Count < Items.Capacity / 2) Items.Capacity /= 2;
+    }
+
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
@@ -231,8 +265,8 @@ public partial class CoreList<T> : ICoreList<T>
         var source = Items[index];
         if (SameItem(source, item)) return 0;
 
-        RemoveAt(index);
-        return Insert(index, item);
+        RemoveAt(index, false);
+        return Insert(index, item, false);
     }
 
     /// <summary>
@@ -240,7 +274,8 @@ public partial class CoreList<T> : ICoreList<T>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual int Add(T item)
+    public virtual int Add(T item) => Add(item, true);
+    int Add(T item, bool increase)
     {
         item = ValidateItem(item, true);
 
@@ -249,6 +284,7 @@ public partial class CoreList<T> : ICoreList<T>
         foreach (var num in nums) if (!AcceptDuplicate(Items[num], item)) valid = false;
         if (!valid) return 0;
 
+        if (increase) TryIncrease();
         Items.Add(item);
         return 1;
     }
@@ -260,13 +296,15 @@ public partial class CoreList<T> : ICoreList<T>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual int AddRange(IEnumerable<T> range)
+    public virtual int AddRange(IEnumerable<T> range) => AddRange(range, true);
+    int AddRange(IEnumerable<T> range, bool increase)
     {
         range.ThrowWhenNull();
 
+        if (increase) TryIncrease(range);
         var num = 0; foreach (var item in range)
         {
-            var r = Add(item);
+            var r = Add(item, !increase);
             num += r;
         }
         return num;
@@ -278,7 +316,8 @@ public partial class CoreList<T> : ICoreList<T>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual int Insert(int index, T item)
+    public virtual int Insert(int index, T item) => Insert(index, item, true);
+    int Insert(int index, T item, bool increase)
     {
         item = ValidateItem(item, true);
 
@@ -287,6 +326,7 @@ public partial class CoreList<T> : ICoreList<T>
         foreach (var num in nums) if (!AcceptDuplicate(Items[num], item)) valid = false;
         if (!valid) return 0;
 
+        if (increase) TryIncrease();
         Items.Insert(index, item);
         return 1;
     }
@@ -299,13 +339,15 @@ public partial class CoreList<T> : ICoreList<T>
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual int InsertRange(int index, IEnumerable<T> range)
+    public virtual int InsertRange(int index, IEnumerable<T> range) => InsertRange(index, range, true);
+    int InsertRange(int index, IEnumerable<T> range, bool increase)
     {
         range.ThrowWhenNull();
 
+        if (increase) TryIncrease(range);
         var num = 0; foreach (var item in range)
         {
-            var r = Insert(index, item);
+            var r = Insert(index, item, !increase);
             index += r;
             num += r;
         }
@@ -317,9 +359,11 @@ public partial class CoreList<T> : ICoreList<T>
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public virtual int RemoveAt(int index)
+    public virtual int RemoveAt(int index) => RemoveAt(index, true);
+    int RemoveAt(int index, bool decrease)
     {
         Items.RemoveAt(index);
+        if (decrease) TryDecrease();
         return 1;
     }
     void IList<T>.RemoveAt(int index) => RemoveAt(index);
@@ -334,6 +378,7 @@ public partial class CoreList<T> : ICoreList<T>
     public virtual int RemoveRange(int index, int count)
     {
         if (count > 0) Items.RemoveRange(index, count);
+        TryDecrease();
         return count;
     }
 
@@ -423,7 +468,11 @@ public partial class CoreList<T> : ICoreList<T>
     /// <returns></returns>
     public virtual int Clear()
     {
-        var num = Items.Count; if (num > 0) Items.Clear();
+        var num = Items.Count; if (num > 0)
+        {
+            Items.Clear();
+            TryDecrease();
+        }
         return num;
     }
     void IList.Clear() => Clear();
