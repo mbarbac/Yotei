@@ -1,60 +1,60 @@
-namespace Experiments.Collections;
+using Yotei.ORM.Tools;
+using Yotei.ORM.Tools.Code;
+
+namespace Yotei.ORM.Tests;
 
 // ========================================================
 //[Enforced]
-public static partial class Test_FrozenList_KT
+public static partial class Test_CoreList_KT
 {
     internal class Element(string name)
     {
         public string Name { get; set; } = name;
         public override string ToString() => Name ?? string.Empty;
     }
+    static readonly Element xone = new("one");
+    static readonly Element xtwo = new("two");
+    static readonly Element xthree = new("three");
+    static readonly Element xfour = new("four");
+    static readonly Element xfive = new("five");
 
     // ----------------------------------------------------
 
     [Cloneable]
-    internal partial class Chain : FrozenList<string, Element>
+    internal partial class Chain : CoreList<string, Element>
     {
         public Chain(bool sensitive) => CaseSensitive = sensitive;
-        public Chain(bool sensitive, Element item) : this(sensitive) => AddInternal(item);
-        public Chain(bool sensitive, IEnumerable<Element> range) : this(sensitive) => AddRangeInternal(range);
-        protected Chain(Chain source) : this(source.CaseSensitive) => AddRangeInternal(source);
-        
+        public Chain(bool sensitive, Element item) : this(sensitive) => Add(item);
+        public Chain(bool sensitive, IEnumerable<Element> range) : this(sensitive) => AddRange(range);
+        protected Chain(Chain source) : this(source.CaseSensitive) => AddRange(source);
+
         protected override Element ValidateItem(Element item) => item.ThrowWhenNull();
-        protected override string GetKey(Element item) => item.Name;
+        protected override string GetKey(Element item) => item.ThrowWhenNull().Name;
         protected override string ValidateKey(string key) => key.NotNullNotEmpty();
-        protected override bool Compare(string source, string other) => string.Compare(source, other, !CaseSensitive) == 0;
-        protected override bool IsSameElement(Element source, Element item) => ReferenceEquals(source, item);
-        protected override bool AcceptDuplicates(Element source, Element item)
-            => ReferenceEquals(source, item)
+        protected override bool CompareKeys(string source, string item) => string.Compare(source, item, !CaseSensitive) == 0;
+        protected override bool SameItem(Element source, Element item) => ReferenceEquals(source, item);
+        protected override bool AcceptDuplicate(Element source, Element item)
+            => SameItem(source, item)
             ? true
-            : throw new DuplicateException().WithData(item);
+            : throw new DuplicateException("Duplicated item.").WithData(item);
 
         [WithGenerator]
         public bool CaseSensitive
         {
             get => _CaseSensitive;
-            init
+            set
             {
                 if (_CaseSensitive == value) return;
                 _CaseSensitive = value;
 
                 if (Count == 0) return;
                 var range = ToArray();
-                ClearInternal();
-                AddRangeInternal(range);
+                Clear();
+                AddRange(range);
             }
         }
         bool _CaseSensitive;
     }
-
-    // ----------------------------------------------------
-
-    static readonly Element xone = new("one");
-    static readonly Element xtwo = new("two");
-    static readonly Element xthree = new("three");
-    static readonly Element xfour = new("four");
-    static readonly Element xfive = new("five");
 
     // ----------------------------------------------------
 
@@ -186,13 +186,13 @@ public static partial class Test_FrozenList_KT
     {
         var source = new Chain(false, [xone, xtwo, xthree, xone]);
 
-        var target = source.GetRange(0, 0);
-        Assert.Empty(target);
+        var list = source.GetRange(0, 0);
+        Assert.Empty(list);
 
-        target = source.GetRange(1, 2);
-        Assert.Equal(2, target.Count);
-        Assert.Same(xtwo, target[0]);
-        Assert.Same(xthree, target[1]);
+        list = source.GetRange(1, 2);
+        Assert.Equal(2, list.Count);
+        Assert.Same(xtwo, list[0]);
+        Assert.Same(xthree, list[1]);
     }
 
     //[Enforced]
@@ -200,25 +200,17 @@ public static partial class Test_FrozenList_KT
     public static void Test_Replace()
     {
         var source = new Chain(false, [xone, xtwo, xthree]);
+        var num = source.Replace(0, xone);
+        Assert.Equal(0, num);
 
-        var target = source.Replace(0, xone);
-        Assert.Same(source, target);
+        source = new Chain(false, [xone, xtwo, xthree]);
+        num = source.Replace(0, new Element("one"));
+        Assert.Equal(1, num);
+        Assert.NotSame(xone, source[0]);
+        Assert.Equal("one", source[0].Name);
 
-        target = source.Replace(1, xone);
-        Assert.NotSame(source, target);
-        Assert.Equal(3, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xone, target[1]);
-        Assert.Same(xthree, target[2]);
-
-        target = source.Replace(0, new Element("ONE"));
-        Assert.NotSame(source, target);
-        Assert.Equal(3, target.Count);
-        Assert.Equal("ONE", target[0].Name);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
-
-        try { source.Replace(1, new Element("ONE")); Assert.Fail(); }
+        source = new Chain(false, [xone, xtwo, xthree]);
+        try { source.Replace(1, new Element("one")); Assert.Fail(); }
         catch (DuplicateException) { }
 
         try { source.Replace(0, null!); Assert.Fail(); }
@@ -233,21 +225,22 @@ public static partial class Test_FrozenList_KT
     public static void Test_Add()
     {
         var source = new Chain(false, [xone, xtwo, xthree]);
-        var target = source.Add(xfour);
-        Assert.NotSame(source, target);
-        Assert.Equal(4, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
-        Assert.Same(xfour, target[3]);
+        var num = source.Add(xfour);
+        Assert.Equal(1, num);
+        Assert.Equal(4, source.Count);
+        Assert.Same(xone, source[0]);
+        Assert.Same(xtwo, source[1]);
+        Assert.Same(xthree, source[2]);
+        Assert.Same(xfour, source[3]);
 
-        target = source.Add(xone);
-        Assert.NotSame(source, target);
-        Assert.Equal(4, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
-        Assert.Same(xone, target[3]);
+        source = new Chain(false, [xone, xtwo, xthree]);
+        num = source.Add(xone);
+        Assert.Equal(1, num);
+        Assert.Equal(4, source.Count);
+        Assert.Same(xone, source[0]);
+        Assert.Same(xtwo, source[1]);
+        Assert.Same(xthree, source[2]);
+        Assert.Same(xone, source[3]);
 
         try { source.Add(new Element("one")); Assert.Fail(); }
         catch (DuplicateException) { }
@@ -264,17 +257,27 @@ public static partial class Test_FrozenList_KT
     public static void Test_AddRange()
     {
         var source = new Chain(false, [xone, xtwo, xthree]);
-        var target = source.AddRange([]);
-        Assert.Same(source, target);
+        var num = source.AddRange([]);
+        Assert.Equal(0, num);
 
-        target = source.AddRange([xfour, xfive]);
-        Assert.NotSame(source, target);
-        Assert.Equal(5, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
-        Assert.Same(xfour, target[3]);
-        Assert.Same(xfive, target[4]);
+        source = new Chain(false, [xone, xtwo, xthree]);
+        num = source.AddRange([xfour, xfive]);
+        Assert.Equal(2, num);
+        Assert.Equal(5, source.Count);
+        Assert.Same(xone, source[0]);
+        Assert.Same(xtwo, source[1]);
+        Assert.Same(xthree, source[2]);
+        Assert.Same(xfour, source[3]);
+        Assert.Same(xfive, source[4]);
+
+        try { source.AddRange(null!); Assert.Fail(); }
+        catch (ArgumentNullException) { }
+
+        try { source.AddRange([null!]); Assert.Fail(); }
+        catch (ArgumentException) { }
+
+        try { source.AddRange([new Element("")]); Assert.Fail(); }
+        catch (ArgumentException) { }
     }
 
     //[Enforced]
@@ -282,21 +285,22 @@ public static partial class Test_FrozenList_KT
     public static void Test_Insert()
     {
         var source = new Chain(false, [xone, xtwo, xthree]);
-        var target = source.Insert(3, xfour);
-        Assert.NotSame(source, target);
-        Assert.Equal(4, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
-        Assert.Same(xfour, target[3]);
+        var num = source.Insert(3, xfour);
+        Assert.Equal(1, num);
+        Assert.Equal(4, source.Count);
+        Assert.Same(xone, source[0]);
+        Assert.Same(xtwo, source[1]);
+        Assert.Same(xthree, source[2]);
+        Assert.Same(xfour, source[3]);
 
-        target = source.Insert(3, xone);
-        Assert.NotSame(source, target);
-        Assert.Equal(4, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
-        Assert.Same(xone, target[3]);
+        source = new Chain(false, [xone, xtwo, xthree]);
+        num = source.Insert(3, xone);
+        Assert.Equal(1, num);
+        Assert.Equal(4, source.Count);
+        Assert.Same(xone, source[0]);
+        Assert.Same(xtwo, source[1]);
+        Assert.Same(xthree, source[2]);
+        Assert.Same(xone, source[3]);
 
         try { source.Insert(3, new Element("one")); Assert.Fail(); }
         catch (DuplicateException) { }
@@ -313,17 +317,27 @@ public static partial class Test_FrozenList_KT
     public static void Test_InsertRange()
     {
         var source = new Chain(false, [xone, xtwo, xthree]);
-        var target = source.InsertRange(3, []);
-        Assert.Same(source, target);
+        var num = source.InsertRange(3, []);
+        Assert.Equal(0, num);
 
-        target = source.InsertRange(3, [xfour, xfive]);
-        Assert.NotSame(source, target);
-        Assert.Equal(5, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
-        Assert.Same(xfour, target[3]);
-        Assert.Same(xfive, target[4]);
+        source = new Chain(false, [xone, xtwo, xthree]);
+        num = source.InsertRange(3, [xfour, xfive]);
+        Assert.Equal(2, num);
+        Assert.Equal(5, source.Count);
+        Assert.Same(xone, source[0]);
+        Assert.Same(xtwo, source[1]);
+        Assert.Same(xthree, source[2]);
+        Assert.Same(xfour, source[3]);
+        Assert.Same(xfive, source[4]);
+
+        try { source.InsertRange(3, null!); Assert.Fail(); }
+        catch (ArgumentNullException) { }
+
+        try { source.InsertRange(3, [null!]); Assert.Fail(); }
+        catch (ArgumentException) { }
+
+        try { source.InsertRange(3, [new Element("")]); Assert.Fail(); }
+        catch (ArgumentException) { }
     }
 
     //[Enforced]
@@ -331,11 +345,11 @@ public static partial class Test_FrozenList_KT
     public static void Test_RemoveAt()
     {
         var source = new Chain(false, [xone, xtwo, xthree]);
-        var target = source.RemoveAt(0);
-        Assert.NotSame(source, target);
-        Assert.Equal(2, target.Count);
-        Assert.Same(xtwo, target[0]);
-        Assert.Same(xthree, target[1]);
+        var num = source.RemoveAt(0);
+        Assert.Equal(1, num);
+        Assert.Equal(2, source.Count);
+        Assert.Same(xtwo, source[0]);
+        Assert.Same(xthree, source[1]);
     }
 
     //[Enforced]
@@ -343,16 +357,16 @@ public static partial class Test_FrozenList_KT
     public static void Test_RemoveRange()
     {
         var source = new Chain(false, [xone, xtwo, xthree]);
-        var target = source.RemoveRange(0, 0);
-        Assert.Same(source, target);
+        var num = source.RemoveRange(0, 0);
+        Assert.Equal(0, num);
 
-        target = source.RemoveRange(1, 0);
-        Assert.Same(source, target);
+        num = source.RemoveRange(1, 0);
+        Assert.Equal(0, num);
 
-        target = source.RemoveRange(1, 2);
-        Assert.NotSame(source, target);
-        Assert.Single(target);
-        Assert.Same(xone, target[0]);
+        num = source.RemoveRange(1, 2);
+        Assert.Equal(2, num);
+        Assert.Single(source);
+        Assert.Same(xone, source[0]);
     }
 
     //[Enforced]
@@ -360,28 +374,30 @@ public static partial class Test_FrozenList_KT
     public static void Test_Remove_Item()
     {
         var source = new Chain(false, [xone, xtwo, xthree, xone]);
-        var target = source.Remove("any");
-        Assert.Same(source, target);
+        var num = source.Remove("any");
+        Assert.Equal(0, num);
 
-        target = source.Remove("ONE");
-        Assert.NotSame(source, target);
-        Assert.Equal(3, target.Count);
-        Assert.Same(xtwo, target[0]);
-        Assert.Same(xthree, target[1]);
-        Assert.Same(xone, target[2]);
+        num = source.Remove("ONE");
+        Assert.Equal(1, num);
+        Assert.Equal(3, source.Count);
+        Assert.Same(xtwo, source[0]);
+        Assert.Same(xthree, source[1]);
+        Assert.Same(xone, source[2]);
 
-        target = source.RemoveLast("ONE");
-        Assert.NotSame(source, target);
-        Assert.Equal(3, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
+        source = new Chain(false, [xone, xtwo, xthree, xone]);
+        num = source.RemoveLast("ONE");
+        Assert.Equal(1, num);
+        Assert.Equal(3, source.Count);
+        Assert.Same(xone, source[0]);
+        Assert.Same(xtwo, source[1]);
+        Assert.Same(xthree, source[2]);
 
-        target = source.RemoveAll("ONE");
-        Assert.NotSame(source, target);
-        Assert.Equal(2, target.Count);
-        Assert.Same(xtwo, target[0]);
-        Assert.Same(xthree, target[1]);
+        source = new Chain(false, [xone, xtwo, xthree, xone]);
+        num = source.RemoveAll("ONE");
+        Assert.Equal(2, num);
+        Assert.Equal(2, source.Count);
+        Assert.Same(xtwo, source[0]);
+        Assert.Same(xthree, source[1]);
     }
 
     //[Enforced]
@@ -389,27 +405,29 @@ public static partial class Test_FrozenList_KT
     public static void Test_Remove_Predicate()
     {
         var source = new Chain(false, [xone, xtwo, xthree, xone]);
-        var target = source.Remove(x => x.Name.Contains('z'));
-        Assert.Same(source, target);
+        var num = source.Remove(x => x.Name.Contains('z'));
+        Assert.Equal(0, num);
 
-        target = source.Remove(x => x.Name.Contains('e'));
-        Assert.NotSame(source, target);
-        Assert.Equal(3, target.Count);
-        Assert.Same(xtwo, target[0]);
-        Assert.Same(xthree, target[1]);
-        Assert.Same(xone, target[2]);
+        num = source.Remove(x => x.Name.Contains('e'));
+        Assert.Equal(1, num);
+        Assert.Equal(3, source.Count);
+        Assert.Same(xtwo, source[0]);
+        Assert.Same(xthree, source[1]);
+        Assert.Same(xone, source[2]);
 
-        target = source.RemoveLast(x => x.Name.Contains('e'));
-        Assert.NotSame(source, target);
-        Assert.Equal(3, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
+        source = new Chain(false, [xone, xtwo, xthree, xone]);
+        num = source.RemoveLast(x => x.Name.Contains('e'));
+        Assert.Equal(1, num);
+        Assert.Equal(3, source.Count);
+        Assert.Same(xone, source[0]);
+        Assert.Same(xtwo, source[1]);
+        Assert.Same(xthree, source[2]);
 
-        target = source.RemoveAll(x => x.Name.Contains('e'));
-        Assert.NotSame(source, target);
-        Assert.Single(target);
-        Assert.Same(xtwo, target[0]);
+        source = new Chain(false, [xone, xtwo, xthree, xone]);
+        num = source.RemoveAll(x => x.Name.Contains('e'));
+        Assert.Equal(3, num);
+        Assert.Single(source);
+        Assert.Same(xtwo, source[0]);
     }
 
     //[Enforced]
@@ -417,12 +435,12 @@ public static partial class Test_FrozenList_KT
     public static void Test_Clear()
     {
         var source = new Chain(false);
-        var target = source.Clear();
-        Assert.Same(source, target);
+        var num = source.Clear();
+        Assert.Equal(0, num);
 
         source = new Chain(false, [xone, xtwo, xthree, xone]);
-        target = source.Clear();
-        Assert.NotSame(source, target);
-        Assert.Empty(target);
+        num = source.Clear();
+        Assert.Equal(4, num);
+        Assert.Empty(source);
     }
 }

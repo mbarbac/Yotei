@@ -1,43 +1,44 @@
-namespace Experiments.Collections;
+﻿namespace Yotei.ORM.Tools.Code;
 
 // ========================================================
 /// <summary>
-/// <inheritdoc cref="IFrozenList{K, T}"/>
+/// <inheritdoc cref="ICoreList{K, T}"/>
 /// </summary>
 /// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>
-[DebuggerDisplay("{ToDebugString(6)}")]
 [Cloneable]
-public partial class FrozenList<K, T> : IFrozenList<K, T>
+public partial class CoreList<K, T> : ICoreList<K, T>
 {
+    readonly List<T> Items = [];
+
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    public FrozenList() { }
+    public CoreList() { }
 
     /// <summary>
     /// Initializes a new instance with the given element.
     /// </summary>
     /// <param name="item"></param>
-    public FrozenList(T item) => AddInternal(item);
+    public CoreList(T item) => Add(item);
 
     /// <summary>
-    /// Initializes a new instance with the elements of the given range.
+    /// Initializes a new instance with the elements from the given range.
     /// </summary>
     /// <param name="range"></param>
-    public FrozenList(IEnumerable<T> range) => AddRangeInternal(range);
+    public CoreList(IEnumerable<T> range) => AddRange(range);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected FrozenList(FrozenList<T> source) => AddRangeInternal(source);
+    protected CoreList(CoreList<T> source) => AddRange(source);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
+    public virtual IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /// <summary>
@@ -46,52 +47,53 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     /// <returns></returns>
     public override string ToString() => $"Count: {Count}";
 
-    protected virtual string ToDebugString(int count) => Count <= count
-        ? $"({Count})[{string.Join(", ", Items.Select(ItemToString))}]"
-        : $"({Count})[{string.Join(", ", Items.Take(count).Select(ItemToString))}]...";
+    protected virtual string ToDebugString(int num) => Count == 0 ? "0:[]" : (Count <= num
+        ? $"[{string.Join(", ", Items.Select(ItemToString))}]"
+        : $"[{string.Join(", ", Items.Take(num).Select(ItemToString))}, ...]");
 
     protected virtual string ItemToString(T item) => item?.ToString() ?? string.Empty;
+    protected virtual int DebugCount => 6;
 
     // ----------------------------------------------------
 
-    readonly List<T> Items = [];
-
     /// <summary>
-    /// Invoked to validate the given element before using it.
+    /// Validates the given element before using it in this collection.
     /// </summary>
     protected virtual T ValidateItem(T item) => item;
 
     /// <summary>
-    /// Invoked to obtain the key associated with the given element.
+    /// Obtains the key associated with the given element.
     /// </summary>
-    protected virtual K GetKey(T item) => default!;
+    protected virtual K GetKey(T item) => throw new NotImplementedException();
 
     /// <summary>
-    /// Invoked to validate the given key before using it.
+    /// Validates the given key before using it in this collection.
     /// </summary>
     protected virtual K ValidateKey(K key) => key;
 
     /// <summary>
-    /// Invoked to determine if the two given elements shall be considered equal, or not, for
-    /// comparison purposes.
+    /// Invoked to compare the given source key with the other given one.
     /// </summary>
-    protected virtual bool Compare(K source, K other) =>
-        (source is null && other is null) ||
-        (source is not null && source.Equals(other));
+    protected virtual bool CompareKeys(K source, K item) =>
+        (source is null && item is null) ||
+        (source is not null && source.Equals(item));
 
     /// <summary>
-    /// Invoked to determine if the two given elements shall be considered the same element,
-    /// or not, for adding, inserting or replacing purposes.
+    /// Determines if the given source element is the same as the other given one.
     /// </summary>
-    protected virtual bool IsSameElement(T item, T other) =>
-        (item is null && other is null) ||
-        (item is not null && item.Equals(other));
+    protected virtual bool SameItem(T source, T item) =>
+        (source is null && item is null) ||
+        (source is not null && source.Equals(item));
 
     /// <summary>
-    /// Determines if the given duplicated item can be added or inserted to this collection, or
-    /// not. This method shall throw an exception if duplicates are not allowed.
+    /// Obtains the indexes of the source elements whose key is duplicated of the given one.
     /// </summary>
-    protected virtual bool AcceptDuplicates(T source, T item) => true;
+    protected virtual List<int> GetDuplicates(K key) => IndexesOf(key);
+
+    /// <summary>
+    /// Determines if the given duplicated item is added, or ignored, or throws an exception.
+    /// </summary>
+    protected virtual bool AcceptDuplicate(T source, T item) => true;
 
     // ----------------------------------------------------
 
@@ -105,7 +107,16 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public T this[int index] => Items[index];
+    public T this[int index]
+    {
+        get => Items[index];
+        set => Replace(index, value);
+    }
+    object? IList.this[int index]
+    {
+        get => this[index];
+        set => this[index] = (T)value!;
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -113,6 +124,8 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     /// <param name="key"></param>
     /// <returns></returns>
     public bool Contains(K key) => IndexOf(key) >= 0;
+    bool IList.Contains(object? value) => Contains(GetKey((T)value!));
+    bool ICollection<T>.Contains(T item) => Contains(GetKey(item));
 
     /// <summary>
     /// <inheritdoc/>
@@ -122,8 +135,10 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     public int IndexOf(K key)
     {
         key = ValidateKey(key);
-        return IndexOf(x => Compare(GetKey(x), key));
+        return IndexOf(x => CompareKeys(GetKey(x), key));
     }
+    int IList<T>.IndexOf(T item) => IndexOf(GetKey(item));
+    int IList.IndexOf(object? value) => IndexOf(GetKey((T)value!));
 
     /// <summary>
     /// <inheritdoc/>
@@ -133,7 +148,7 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     public int LastIndexOf(K key)
     {
         key = ValidateKey(key);
-        return LastIndexOf(x => Compare(GetKey(x), key));
+        return LastIndexOf(x => CompareKeys(GetKey(x), key));
     }
 
     /// <summary>
@@ -144,7 +159,7 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     public List<int> IndexesOf(K key)
     {
         key = ValidateKey(key);
-        return IndexesOf(x => Compare(GetKey(x), key));
+        return IndexesOf(x => CompareKeys(GetKey(x), key));
     }
 
     /// <summary>
@@ -161,7 +176,7 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     /// <returns></returns>
     public int IndexOf(Predicate<T> predicate)
     {
-        predicate.ThrowWhenNull(nameof(predicate));
+        predicate.ThrowWhenNull();
 
         for (int i = 0; i < Items.Count; i++) if (predicate(Items[i])) return i;
         return -1;
@@ -174,7 +189,7 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     /// <returns></returns>
     public int LastIndexOf(Predicate<T> predicate)
     {
-        predicate.ThrowWhenNull(nameof(predicate));
+        predicate.ThrowWhenNull();
 
         for (int i = Items.Count - 1; i >= 0; i--) if (predicate(Items[i])) return i;
         return -1;
@@ -187,7 +202,7 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     /// <returns></returns>
     public List<int> IndexesOf(Predicate<T> predicate)
     {
-        predicate.ThrowWhenNull(nameof(predicate));
+        predicate.ThrowWhenNull();
 
         var nums = new List<int>();
         for (int i = 0; i < Items.Count; i++) if (predicate(Items[i])) nums.Add(i);
@@ -206,11 +221,6 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     /// <returns></returns>
     public List<T> ToList() => new(Items);
 
-    /// <summary>
-    /// Minimizes the memory consumption of this collection.
-    /// </summary>
-    public void Trim() => Items.TrimExcess();
-
     // ----------------------------------------------------
 
     /// <summary>
@@ -219,22 +229,7 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual IFrozenList<K, T> GetRange(int index, int count)
-    {
-        var clone = Clone();
-        var num = clone.GetRangeInternal(index, count);
-        return num > 0 ? clone : this;
-    }
-    protected virtual int GetRangeInternal(int index, int count)
-    {
-        if (count == 0 && index >= 0) return ClearInternal();
-        if (index == 0 && count == Count) return 0;
-
-        var range = Items.GetRange(index, count);
-        Items.Clear();
-        Items.AddRange(range);
-        return count;
-    }
+    public List<T> GetRange(int index, int count) => Items.GetRange(index, count);
 
     /// <summary>
     /// <inheritdoc/>
@@ -242,21 +237,15 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IFrozenList<K, T> Replace(int index, T item)
-    {
-        var clone = Clone();
-        var num = clone.ReplaceInternal(index, item);
-        return num > 0 ? clone : this;
-    }
-    protected virtual int ReplaceInternal(int index, T item)
+    public virtual int Replace(int index, T item)
     {
         item = ValidateItem(item);
 
-        var temp = Items[index];
-        if (IsSameElement(temp, item)) return 0;
+        var source = Items[index];
+        if (SameItem(source, item)) return 0;
 
-        RemoveAtInternal(index);
-        return InsertInternal(index, item);
+        RemoveAt(index);
+        return Insert(index, item);
     }
 
     /// <summary>
@@ -264,44 +253,34 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IFrozenList<K, T> Add(T item)
-    {
-        var clone = Clone();
-        var num = clone.AddInternal(item);
-        return num > 0 ? clone : this;
-    }
-    protected virtual int AddInternal(T item)
+    public virtual int Add(T item)
     {
         item = ValidateItem(item);
 
         var key = GetKey(item);
-        var nums = IndexesOf(key);
+        var nums = GetDuplicates(key);
         var valid = true;
-        foreach (var num in nums) if (!AcceptDuplicates(Items[num], item)) valid = false;
+        foreach (var num in nums) if (!AcceptDuplicate(Items[num], item)) valid = false;
         if (!valid) return 0;
 
         Items.Add(item);
         return 1;
     }
+    int IList.Add(object? value) { var num = Add((T)value!); return num >= 0 ? Count : -1; }
+    void ICollection<T>.Add(T item) => Add(item);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual IFrozenList<K, T> AddRange(IEnumerable<T> range)
-    {
-        var clone = Clone();
-        var num = clone.AddRangeInternal(range);
-        return num > 0 ? clone : this;
-    }
-    protected virtual int AddRangeInternal(IEnumerable<T> range)
+    public virtual int AddRange(IEnumerable<T> range)
     {
         range.ThrowWhenNull();
 
         var num = 0; foreach (var item in range)
         {
-            var r = AddInternal(item);
+            var r = Add(item);
             num += r;
         }
         return num;
@@ -313,25 +292,21 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IFrozenList<K, T> Insert(int index, T item)
-    {
-        var clone = Clone();
-        var num = clone.InsertInternal(index, item);
-        return num > 0 ? clone : this;
-    }
-    protected virtual int InsertInternal(int index, T item)
+    public virtual int Insert(int index, T item)
     {
         item = ValidateItem(item);
 
         var key = GetKey(item);
-        var nums = IndexesOf(key);
+        var nums = GetDuplicates(key);
         var valid = true;
-        foreach (var num in nums) if (!AcceptDuplicates(Items[num], item)) valid = false;
+        foreach (var num in nums) if (!AcceptDuplicate(Items[num], item)) valid = false;
         if (!valid) return 0;
 
         Items.Insert(index, item);
         return 1;
     }
+    void IList<T>.Insert(int index, T value) => Insert(index, value);
+    void IList.Insert(int index, object? value) => Insert(index, (T)value!);
 
     /// <summary>
     /// <inheritdoc/>
@@ -339,19 +314,13 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual IFrozenList<K, T> InsertRange(int index, IEnumerable<T> range)
-    {
-        var clone = Clone();
-        var num = clone.InsertRangeInternal(index, range);
-        return num > 0 ? clone : this;
-    }
-    protected virtual int InsertRangeInternal(int index, IEnumerable<T> range)
+    public virtual int InsertRange(int index, IEnumerable<T> range)
     {
         range.ThrowWhenNull();
 
         var num = 0; foreach (var item in range)
         {
-            var r = InsertInternal(index, item);
+            var r = Insert(index, item);
             index += r;
             num += r;
         }
@@ -363,17 +332,13 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public virtual IFrozenList<K, T> RemoveAt(int index)
-    {
-        var clone = Clone();
-        var num = clone.RemoveAtInternal(index);
-        return num > 0 ? clone : this;
-    }
-    protected virtual int RemoveAtInternal(int index)
+    public virtual int RemoveAt(int index)
     {
         Items.RemoveAt(index);
         return 1;
     }
+    void IList<T>.RemoveAt(int index) => RemoveAt(index);
+    void IList.RemoveAt(int index) => RemoveAt(index);
 
     /// <summary>
     /// <inheritdoc/>
@@ -381,13 +346,7 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual IFrozenList<K, T> RemoveRange(int index, int count)
-    {
-        var clone = Clone();
-        var num = clone.RemoveRangeInternal(index, count);
-        return num > 0 ? clone : this;
-    }
-    protected virtual int RemoveRangeInternal(int index, int count)
+    public virtual int RemoveRange(int index, int count)
     {
         if (count > 0) Items.RemoveRange(index, count);
         return count;
@@ -398,33 +357,23 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public virtual IFrozenList<K, T> Remove(K key)
-    {
-        var clone = Clone();
-        var num = clone.RemoveInternal(key);
-        return num > 0 ? clone : this;
-    }
-    protected virtual int RemoveInternal(K key)
+    public virtual int Remove(K key)
     {
         var index = IndexOf(key);
-        return index >= 0 ? RemoveAtInternal(index) : 0;
+        return index >= 0 ? RemoveAt(index) : 0;
     }
+    void IList.Remove(object? value) => Remove(GetKey((T)value!));
+    bool ICollection<T>.Remove(T item) => Remove(GetKey(item)) > 0;
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public virtual IFrozenList<K, T> RemoveLast(K key)
-    {
-        var clone = Clone();
-        var num = clone.RemoveLastInternal(key);
-        return num > 0 ? clone : this;
-    }
-    protected virtual int RemoveLastInternal(K key)
+    public virtual int RemoveLast(K key)
     {
         var index = LastIndexOf(key);
-        return index >= 0 ? RemoveAtInternal(index) : 0;
+        return index >= 0 ? RemoveAt(index) : 0;
     }
 
     /// <summary>
@@ -432,19 +381,13 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public virtual IFrozenList<K, T> RemoveAll(K key)
-    {
-        var clone = Clone();
-        var num = clone.RemoveAllInternal(key);
-        return num > 0 ? clone : this;
-    }
-    protected virtual int RemoveAllInternal(K key)
+    public virtual int RemoveAll(K key)
     {
         var num = 0; while (true)
         {
             var index = IndexOf(key);
 
-            if (index >= 0) num += RemoveAtInternal(index);
+            if (index >= 0) num += RemoveAt(index);
             else break;
         }
         return num;
@@ -455,16 +398,10 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IFrozenList<K, T> Remove(Predicate<T> predicate)
-    {
-        var clone = Clone();
-        var num = clone.RemoveInternal(predicate);
-        return num > 0 ? clone : this;
-    }
-    protected virtual int RemoveInternal(Predicate<T> predicate)
+    public virtual int Remove(Predicate<T> predicate)
     {
         var index = IndexOf(predicate);
-        return index >= 0 ? RemoveAtInternal(index) : 0;
+        return index >= 0 ? RemoveAt(index) : 0;
     }
 
     /// <summary>
@@ -472,16 +409,10 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IFrozenList<K, T> RemoveLast(Predicate<T> predicate)
-    {
-        var clone = Clone();
-        var num = clone.RemoveLastInternal(predicate);
-        return num > 0 ? clone : this;
-    }
-    protected virtual int RemoveLastInternal(Predicate<T> predicate)
+    public virtual int RemoveLast(Predicate<T> predicate)
     {
         var index = LastIndexOf(predicate);
-        return index >= 0 ? RemoveAtInternal(index) : 0;
+        return index >= 0 ? RemoveAt(index) : 0;
     }
 
     /// <summary>
@@ -489,19 +420,13 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IFrozenList<K, T> RemoveAll(Predicate<T> predicate)
-    {
-        var clone = Clone();
-        var num = clone.RemoveAllInternal(predicate);
-        return num > 0 ? clone : this;
-    }
-    protected virtual int RemoveAllInternal(Predicate<T> predicate)
+    public virtual int RemoveAll(Predicate<T> predicate)
     {
         var num = 0; while (true)
         {
             var index = IndexOf(predicate);
 
-            if (index >= 0) num += RemoveAtInternal(index);
+            if (index >= 0) num += RemoveAt(index);
             else break;
         }
         return num;
@@ -511,15 +436,21 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual IFrozenList<K, T> Clear()
-    {
-        var clone = Clone();
-        var num = clone.ClearInternal();
-        return num > 0 ? clone : this;
-    }
-    protected virtual int ClearInternal()
+    public virtual int Clear()
     {
         var num = Items.Count; if (num > 0) Items.Clear();
         return num;
     }
+    void IList.Clear() => Clear();
+    void ICollection<T>.Clear() => Clear();
+
+    // ----------------------------------------------------
+
+    object ICollection.SyncRoot => Items;
+    bool ICollection.IsSynchronized => false;
+    bool IList.IsFixedSize => false;
+    bool IList.IsReadOnly => false;
+    bool ICollection<T>.IsReadOnly => false;
+    void ICollection<T>.CopyTo(T[] array, int index) => Items.CopyTo(array, index);
+    void ICollection.CopyTo(Array array, int index) => Items.CopyTo((T[])array, index);
 }

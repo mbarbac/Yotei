@@ -1,37 +1,38 @@
-namespace Experiments.Collections;
+﻿namespace Yotei.ORM.Tools;
 
 // ========================================================
 /// <summary>
-/// Represents an immutable list-alike collection of elements.
+/// Represents a list-alike collection of elements, with customizable behavior.
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public interface IFrozen<T> : IEnumerable<T>
+[Cloneable]
+public partial interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollection
 {
     /// <summary>
     /// Gets the number of elements in this collection.
     /// </summary>
-    int Count { get; }
+    new int Count { get; }
 
     /// <summary>
     /// Gets the element stored at the given index.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    T this[int index] { get; }
+    new T this[int index] { get; set; }
 
     /// <summary>
     /// Determines if this collection contains the given element.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    bool Contains(T item);
+    new bool Contains(T item);
 
     /// <summary>
     /// Returns the index of the first ocurrence of the given element, or -1 if not found.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    int IndexOf(T item);
+    new int IndexOf(T item);
 
     /// <summary>
     /// Returns the index of the last ocurrence of the given element, or -1 if not found.
@@ -92,133 +93,123 @@ public interface IFrozen<T> : IEnumerable<T>
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a new instance with the given number of elements starting from the given index.
-    /// If no changes are detected, returns the original instance.
+    /// Returns the given number of elements starting from the given index.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    IFrozen<T> GetRange(int index, int count);
+    List<T> GetRange(int index, int count);
 
     /// <summary>
-    /// Returns a new instance where the element at the given index has been replaced by the new
-    /// given one, if not equal to the existing one, or if duplicates are rejected or not allowed.
-    /// If no changes are detected, returns the original instance.
+    /// Replaces the element at the given index with the new given one. Returns the number of
+    /// changes made.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    IFrozen<T> Replace(int index, T item);
+    int Replace(int index, T item);
 
     /// <summary>
-    /// Returns a new instance where the given element has been added to the collection, unless
-    /// duplicates are rejected or not allowed. If no changes are detected, returns the original
-    /// instance.
+    /// Adds to this collection the given element. Returns the number of changes made.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    IFrozen<T> Add(T item);
+    new int Add(T item);
 
     /// <summary>
-    /// Returns a new instance where the elements from the given range have been added to the
-    /// collection, unless duplicates are rejected or not allowed. If no changes are detected,
-    /// returns the original instance.
+    /// Adds to this collection the elements from the given range. Returns the number of changes
+    /// made.
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    IFrozen<T> AddRange(IEnumerable<T> range);
+    int AddRange(IEnumerable<T> range);
 
     /// <summary>
-    /// Returns a new instance where the given element has been inserted into the collection at
-    /// the given index, unless duplicates are rejected or not allowed. If no changes are detected,
-    /// returns the original instance.
+    /// Inserts into this collection the given element at the given index. Returns the number of
+    /// changes made.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    IFrozen<T> Insert(int index, T item);
+    new int Insert(int index, T item);
 
     /// <summary>
-    /// Returns a new instance the elements from the given range have been inserted into the
-    /// collection, starting at the given index, unless duplicates are rejected or not allowed. If
-    /// no changes are detected, returns the original instance.
+    /// Inserts into this collection the elements from the given range, starting at the given
+    /// index. Returns the number of changes made.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    IFrozen<T> InsertRange(int index, IEnumerable<T> range);
+    int InsertRange(int index, IEnumerable<T> range);
 
     /// <summary>
-    /// Returns a new instance where the element at the given index has been removed from the
-    /// original collection, if such is allowed. If no changes are detected, returns the original
-    /// instance.
+    /// Removes from this collection the element at the given index. Returns the number of
+    /// changes made.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    IFrozen<T> RemoveAt(int index);
+    new int RemoveAt(int index);
 
     /// <summary>
-    /// Returns a new instance where the given number of elements, starting from the given index,
-    /// have been removed from the collection, if such is allowed. If no changes are detected,
-    /// returns the original instance.
+    /// Removes from this collection the given number of elements, starting from the given index.
+    /// Returns the number of changes made.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    IFrozen<T> RemoveRange(int index, int count);
+    int RemoveRange(int index, int count);
 
     /// <summary>
-    /// Returns a new instance where the first ocurrence of the given element has been removed.
-    /// If no changes are detected, returns the original instance.
+    /// Removes from this collection the first ocurrence of the given element. Returns the number
+    /// of changes made.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    IFrozen<T> Remove(T item);
+    new int Remove(T item);
 
     /// <summary>
-    /// Returns a new instance where the last ocurrence of the given element has been removed.
-    /// If no changes are detected, returns the original instance.
+    /// Removes from this collection the last ocurrence of the given element. Returns the number
+    /// of changes made.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    IFrozen<T> RemoveLast(T item);
+    int RemoveLast(T item);
 
     /// <summary>
-    /// Returns a new instance where the ocurrences of the given element have been removed. If no
-    /// changes are detected, returns the original instance.
+    /// Removes from this collection all the ocurrences of the given element. Returns the number
+    /// of changes made.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    IFrozen<T> RemoveAll(T item);
+    int RemoveAll(T item);
 
     /// <summary>
-    /// Returns a new instance where the first element that matches the given predicate has been
-    /// removed. If no changes are detected, returns the original instance.
+    /// Removes from this collection the first ocurrence of an element that matches the given
+    /// predicate. Returns the number of changes made.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IFrozen<T> Remove(Predicate<T> predicate);
+    int Remove(Predicate<T> predicate);
 
     /// <summary>
-    /// Returns a new instance where the last element that matches the given predicate has been
-    /// removed. If no changes are detected, returns the original instance.
+    /// Removes from this collection the last ocurrence of an element that matches the given
+    /// predicate. Returns the number of changes made.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IFrozen<T> RemoveLast(Predicate<T> predicate);
+    int RemoveLast(Predicate<T> predicate);
 
     /// <summary>
-    /// Returns a new instance where all elements that match the given predicate has been removed.
-    /// If no changes are detected, returns the original instance.
+    /// Removes from this collection all the ocurrences of elements that match the given
+    /// predicate. Returns the number of changes made.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IFrozen<T> RemoveAll(Predicate<T> predicate);
+    int RemoveAll(Predicate<T> predicate);
 
     /// <summary>
-    /// Returns a new instance where all the elements have been removed. If no changes are
-    /// detected, returns the original instance.
+    /// Clears all the elements in this collection. Returns the number of changes made.
     /// </summary>
     /// <returns></returns>
-    IFrozen<T> Clear();
+    new int Clear();
 }
