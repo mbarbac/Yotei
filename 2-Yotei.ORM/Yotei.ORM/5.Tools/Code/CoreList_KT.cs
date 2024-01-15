@@ -2,14 +2,14 @@
 
 // ========================================================
 /// <summary>
-/// <inheritdoc cref="ICoreList{K, T}"/>
+/// <inheritdoc cref="ICoreList{TKey, TItem}"/>
 /// </summary>
-/// <typeparam name="K"></typeparam>
-/// <typeparam name="T"></typeparam>
+/// <typeparam name="TKey"></typeparam>
+/// <typeparam name="TItem"></typeparam>
 [Cloneable]
-public partial class CoreList<K, T> : ICoreList<K, T>
+public partial class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
 {
-    readonly List<T> Items = [];
+    readonly List<TItem> Items = [];
 
     /// <summary>
     /// Initializes a new empty instance.
@@ -20,19 +20,19 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// Initializes a new instance with the given element.
     /// </summary>
     /// <param name="item"></param>
-    public CoreList(T item) => Add(item);
+    public CoreList(TItem item) => Add(item);
 
     /// <summary>
     /// Initializes a new instance with the elements from the given range.
     /// </summary>
     /// <param name="range"></param>
-    public CoreList(IEnumerable<T> range) => AddRange(range);
+    public CoreList(IEnumerable<TItem> range) => AddRange(range);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected CoreList(CoreList<K, T> source)
+    protected CoreList(CoreList<TKey, TItem> source)
     {
         if (source.Count == 0) return;
 
@@ -44,7 +44,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
+    public IEnumerator<TItem> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /// <summary>
@@ -57,7 +57,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
         ? $"[{string.Join(", ", Items.Select(ItemToString))}]"
         : $"[{string.Join(", ", Items.Take(num).Select(ItemToString))}, ...]");
 
-    protected virtual string ItemToString(T item) => item?.ToString() ?? string.Empty;
+    protected virtual string ItemToString(TItem item) => item?.ToString() ?? string.Empty;
     protected virtual int DebugCount => 6;
 
     // ----------------------------------------------------
@@ -65,41 +65,41 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// <summary>
     /// Validates the given element before using it in this collection.
     /// </summary>
-    protected virtual T ValidateItem(T item) => item;
+    protected virtual TItem ValidateItem(TItem item) => item;
 
     /// <summary>
     /// Obtains the key associated with the given element.
     /// </summary>
-    protected virtual K GetKey(T item) => throw new NotImplementedException();
+    protected virtual TKey GetKey(TItem item) => throw new NotImplementedException();
 
     /// <summary>
     /// Validates the given key before using it in this collection.
     /// </summary>
-    protected virtual K ValidateKey(K key) => key;
+    protected virtual TKey ValidateKey(TKey key) => key;
 
     /// <summary>
     /// Invoked to compare the given source key with the other given one.
     /// </summary>
-    protected virtual bool CompareKeys(K source, K item) =>
+    protected virtual bool CompareKeys(TKey source, TKey item) =>
         (source is null && item is null) ||
         (source is not null && source.Equals(item));
 
     /// <summary>
     /// Determines if the given source element is the same as the other given one.
     /// </summary>
-    protected virtual bool SameItem(T source, T item) =>
+    protected virtual bool SameItem(TItem source, TItem item) =>
         (source is null && item is null) ||
         (source is not null && source.Equals(item));
 
     /// <summary>
     /// Obtains the indexes of the source elements whose key is duplicated of the given one.
     /// </summary>
-    protected virtual List<int> GetDuplicates(K key) => IndexesOf(key);
+    protected virtual List<int> GetDuplicates(TKey key) => IndexesOf(key);
 
     /// <summary>
     /// Determines if the given duplicated item is added, or ignored, or throws an exception.
     /// </summary>
-    protected virtual bool AcceptDuplicate(T source, T item) => true;
+    protected virtual bool AcceptDuplicate(TItem source, TItem item) => true;
 
     // ----------------------------------------------------
 
@@ -113,7 +113,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public T this[int index]
+    public TItem this[int index]
     {
         get => Items[index];
         set => Replace(index, value);
@@ -121,7 +121,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     object? IList.this[int index]
     {
         get => this[index];
-        set => this[index] = (T)value!;
+        set => this[index] = (TItem)value!;
     }
 
     /// <summary>
@@ -129,29 +129,29 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public bool Contains(K key) => IndexOf(key) >= 0;
-    bool IList.Contains(object? value) => Contains(GetKey((T)value!));
-    bool ICollection<T>.Contains(T item) => Contains(GetKey(item));
+    public bool Contains(TKey key) => IndexOf(key) >= 0;
+    bool IList.Contains(object? value) => Contains(GetKey((TItem)value!));
+    bool ICollection<TItem>.Contains(TItem item) => Contains(GetKey(item));
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public int IndexOf(K key)
+    public int IndexOf(TKey key)
     {
         key = ValidateKey(key);
         return IndexOf(x => CompareKeys(GetKey(x), key));
     }
-    int IList<T>.IndexOf(T item) => IndexOf(GetKey(item));
-    int IList.IndexOf(object? value) => IndexOf(GetKey((T)value!));
+    int IList<TItem>.IndexOf(TItem item) => IndexOf(GetKey(item));
+    int IList.IndexOf(object? value) => IndexOf(GetKey((TItem)value!));
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public int LastIndexOf(K key)
+    public int LastIndexOf(TKey key)
     {
         key = ValidateKey(key);
         return LastIndexOf(x => CompareKeys(GetKey(x), key));
@@ -162,7 +162,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public List<int> IndexesOf(K key)
+    public List<int> IndexesOf(TKey key)
     {
         key = ValidateKey(key);
         return IndexesOf(x => CompareKeys(GetKey(x), key));
@@ -173,14 +173,14 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public bool Contains(Predicate<T> predicate) => IndexOf(predicate) >= 0;
+    public bool Contains(Predicate<TItem> predicate) => IndexOf(predicate) >= 0;
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public int IndexOf(Predicate<T> predicate)
+    public int IndexOf(Predicate<TItem> predicate)
     {
         predicate.ThrowWhenNull();
 
@@ -193,7 +193,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public int LastIndexOf(Predicate<T> predicate)
+    public int LastIndexOf(Predicate<TItem> predicate)
     {
         predicate.ThrowWhenNull();
 
@@ -206,7 +206,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public List<int> IndexesOf(Predicate<T> predicate)
+    public List<int> IndexesOf(Predicate<TItem> predicate)
     {
         predicate.ThrowWhenNull();
 
@@ -219,13 +219,13 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public T[] ToArray() => Items.ToArray();
+    public TItem[] ToArray() => Items.ToArray();
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public List<T> ToList() => new(Items);
+    public List<TItem> ToList() => new(Items);
 
     // ----------------------------------------------------
 
@@ -237,15 +237,15 @@ public partial class CoreList<K, T> : ICoreList<K, T>
         else Items.Capacity += Items.Capacity / 2;
     }
 
-    void TryIncrease(IEnumerable<T> range)
+    void TryIncrease(IEnumerable<TItem> range)
     {
         var size = TentativeCount(range);
         if (size == 0) return;
         else if ((Items.Capacity - Items.Count) < size) Items.Capacity += size;
     }
 
-    static int TentativeCount(IEnumerable<T> range) =>
-        range is ICollection<T> rt ? rt.Count :
+    static int TentativeCount(IEnumerable<TItem> range) =>
+        range is ICollection<TItem> rt ? rt.Count :
         range is ICollection rg ? rg.Count :
         0;
 
@@ -261,7 +261,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public List<T> GetRange(int index, int count) => Items.GetRange(index, count);
+    public List<TItem> GetRange(int index, int count) => Items.GetRange(index, count);
 
     /// <summary>
     /// <inheritdoc/>
@@ -269,7 +269,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual int Replace(int index, T item)
+    public virtual int Replace(int index, TItem item)
     {
         item = ValidateItem(item);
 
@@ -285,8 +285,8 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual int Add(T item) => Add(item, true);
-    int Add(T item, bool increase)
+    public virtual int Add(TItem item) => Add(item, true);
+    int Add(TItem item, bool increase)
     {
         item = ValidateItem(item);
 
@@ -300,16 +300,16 @@ public partial class CoreList<K, T> : ICoreList<K, T>
         Items.Add(item);
         return 1;
     }
-    int IList.Add(object? value) { var num = Add((T)value!); return num >= 0 ? Count : -1; }
-    void ICollection<T>.Add(T item) => Add(item);
+    int IList.Add(object? value) { var num = Add((TItem)value!); return num >= 0 ? Count : -1; }
+    void ICollection<TItem>.Add(TItem item) => Add(item);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual int AddRange(IEnumerable<T> range) => AddRange(range, true);
-    int AddRange(IEnumerable<T> range, bool increase)
+    public virtual int AddRange(IEnumerable<TItem> range) => AddRange(range, true);
+    int AddRange(IEnumerable<TItem> range, bool increase)
     {
         range.ThrowWhenNull();
 
@@ -328,8 +328,8 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual int Insert(int index, T item) => Insert(index, item, true);
-    int Insert(int index, T item, bool increase)
+    public virtual int Insert(int index, TItem item) => Insert(index, item, true);
+    int Insert(int index, TItem item, bool increase)
     {
         item = ValidateItem(item);
 
@@ -343,8 +343,8 @@ public partial class CoreList<K, T> : ICoreList<K, T>
         Items.Insert(index, item);
         return 1;
     }
-    void IList<T>.Insert(int index, T value) => Insert(index, value);
-    void IList.Insert(int index, object? value) => Insert(index, (T)value!);
+    void IList<TItem>.Insert(int index, TItem value) => Insert(index, value);
+    void IList.Insert(int index, object? value) => Insert(index, (TItem)value!);
 
     /// <summary>
     /// <inheritdoc/>
@@ -352,8 +352,8 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual int InsertRange(int index, IEnumerable<T> range) => InsertRange(index, range, true);
-    int InsertRange(int index, IEnumerable<T> range, bool increase)
+    public virtual int InsertRange(int index, IEnumerable<TItem> range) => InsertRange(index, range, true);
+    int InsertRange(int index, IEnumerable<TItem> range, bool increase)
     {
         range.ThrowWhenNull();
 
@@ -379,7 +379,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
         if (decrease) TryDecrease();
         return 1;
     }
-    void IList<T>.RemoveAt(int index) => RemoveAt(index);
+    void IList<TItem>.RemoveAt(int index) => RemoveAt(index);
     void IList.RemoveAt(int index) => RemoveAt(index);
 
     /// <summary>
@@ -400,20 +400,20 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public virtual int Remove(K key)
+    public virtual int Remove(TKey key)
     {
         var index = IndexOf(key);
         return index >= 0 ? RemoveAt(index) : 0;
     }
-    void IList.Remove(object? value) => Remove(GetKey((T)value!));
-    bool ICollection<T>.Remove(T item) => Remove(GetKey(item)) > 0;
+    void IList.Remove(object? value) => Remove(GetKey((TItem)value!));
+    bool ICollection<TItem>.Remove(TItem item) => Remove(GetKey(item)) > 0;
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public virtual int RemoveLast(K key)
+    public virtual int RemoveLast(TKey key)
     {
         var index = LastIndexOf(key);
         return index >= 0 ? RemoveAt(index) : 0;
@@ -424,7 +424,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public virtual int RemoveAll(K key)
+    public virtual int RemoveAll(TKey key)
     {
         var num = 0; while (true)
         {
@@ -442,7 +442,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual int Remove(Predicate<T> predicate)
+    public virtual int Remove(Predicate<TItem> predicate)
     {
         var index = IndexOf(predicate);
         return index >= 0 ? RemoveAt(index) : 0;
@@ -453,7 +453,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual int RemoveLast(Predicate<T> predicate)
+    public virtual int RemoveLast(Predicate<TItem> predicate)
     {
         var index = LastIndexOf(predicate);
         return index >= 0 ? RemoveAt(index) : 0;
@@ -464,7 +464,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual int RemoveAll(Predicate<T> predicate)
+    public virtual int RemoveAll(Predicate<TItem> predicate)
     {
         var num = 0; while (true)
         {
@@ -492,7 +492,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
         return num;
     }
     void IList.Clear() => Clear();
-    void ICollection<T>.Clear() => Clear();
+    void ICollection<TItem>.Clear() => Clear();
 
     // ----------------------------------------------------
 
@@ -500,7 +500,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     bool ICollection.IsSynchronized => false;
     bool IList.IsFixedSize => false;
     bool IList.IsReadOnly => false;
-    bool ICollection<T>.IsReadOnly => false;
-    void ICollection<T>.CopyTo(T[] array, int index) => Items.CopyTo(array, index);
-    void ICollection.CopyTo(Array array, int index) => Items.CopyTo((T[])array, index);
+    bool ICollection<TItem>.IsReadOnly => false;
+    void ICollection<TItem>.CopyTo(TItem[] array, int index) => Items.CopyTo(array, index);
+    void ICollection.CopyTo(Array array, int index) => Items.CopyTo((TItem[])array, index);
 }

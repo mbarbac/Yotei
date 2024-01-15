@@ -4,9 +4,9 @@
 /// <summary>
 /// Represents a list-alike collection of elements, with customizable behavior.
 /// </summary>
-/// <typeparam name="T"></typeparam>
+/// <typeparam name="TItem"></typeparam>
 [Cloneable]
-public partial interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollection
+public partial interface ICoreList<TItem> : IList<TItem>, IList, ICollection<TItem>, ICollection
 {
     /// <summary>
     /// Gets the number of elements in this collection.
@@ -18,42 +18,42 @@ public partial interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollec
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    new T this[int index] { get; set; }
+    new TItem this[int index] { get; set; }
 
     /// <summary>
     /// Determines if this collection contains the given element.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    new bool Contains(T item);
+    new bool Contains(TItem item);
 
     /// <summary>
     /// Returns the index of the first ocurrence of the given element, or -1 if not found.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    new int IndexOf(T item);
+    new int IndexOf(TItem item);
 
     /// <summary>
     /// Returns the index of the last ocurrence of the given element, or -1 if not found.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    int LastIndexOf(T item);
+    int LastIndexOf(TItem item);
 
     /// <summary>
     /// Returns the indexes of the ocurrences of the given element.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    List<int> IndexesOf(T item);
+    List<int> IndexesOf(TItem item);
 
     /// <summary>
     /// Determines if this collection contains an element that matches the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    bool Contains(Predicate<T> predicate);
+    bool Contains(Predicate<TItem> predicate);
 
     /// <summary>
     /// Returns the index of the first ocurrence of an element that matches the given predicate,
@@ -61,7 +61,7 @@ public partial interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollec
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int IndexOf(Predicate<T> predicate);
+    int IndexOf(Predicate<TItem> predicate);
 
     /// <summary>
     /// Returns the index of the last ocurrence of an element that matches the given predicate,
@@ -69,26 +69,26 @@ public partial interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollec
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int LastIndexOf(Predicate<T> predicate);
+    int LastIndexOf(Predicate<TItem> predicate);
 
     /// <summary>
     /// Returns the indexes of the elements in this collection that match the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    List<int> IndexesOf(Predicate<T> predicate);
+    List<int> IndexesOf(Predicate<TItem> predicate);
 
     /// <summary>
     /// Returns an array with the elements in this collection.
     /// </summary>
     /// <returns></returns>
-    T[] ToArray();
+    TItem[] ToArray();
 
     /// <summary>
     /// Returns a list with the elements in this collection.
     /// </summary>
     /// <returns></returns>
-    List<T> ToList();
+    List<TItem> ToList();
 
     // ----------------------------------------------------
 
@@ -98,7 +98,7 @@ public partial interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollec
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    List<T> GetRange(int index, int count);
+    List<TItem> GetRange(int index, int count);
 
     /// <summary>
     /// Replaces the element at the given index with the new given one. Returns the number of
@@ -107,14 +107,14 @@ public partial interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollec
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    int Replace(int index, T item);
+    int Replace(int index, TItem item);
 
     /// <summary>
     /// Adds to this collection the given element. Returns the number of changes made.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    new int Add(T item);
+    new int Add(TItem item);
 
     /// <summary>
     /// Adds to this collection the elements from the given range. Returns the number of changes
@@ -122,7 +122,7 @@ public partial interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollec
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    int AddRange(IEnumerable<T> range);
+    int AddRange(IEnumerable<TItem> range);
 
     /// <summary>
     /// Inserts into this collection the given element at the given index. Returns the number of
@@ -131,7 +131,7 @@ public partial interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollec
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    new int Insert(int index, T item);
+    new int Insert(int index, TItem item);
 
     /// <summary>
     /// Inserts into this collection the elements from the given range, starting at the given
@@ -140,7 +140,7 @@ public partial interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollec
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    int InsertRange(int index, IEnumerable<T> range);
+    int InsertRange(int index, IEnumerable<TItem> range);
 
     /// <summary>
     /// Removes from this collection the element at the given index. Returns the number of
@@ -165,7 +165,7 @@ public partial interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollec
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    new int Remove(T item);
+    new int Remove(TItem item);
 
     /// <summary>
     /// Removes from this collection the last ocurrence of the given element. Returns the number
@@ -173,7 +173,7 @@ public partial interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollec
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    int RemoveLast(T item);
+    int RemoveLast(TItem item);
 
     /// <summary>
     /// Removes from this collection all the ocurrences of the given element. Returns the number
@@ -181,7 +181,7 @@ public partial interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollec
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    int RemoveAll(T item);
+    int RemoveAll(TItem item);
 
     /// <summary>
     /// Removes from this collection the first ocurrence of an element that matches the given
@@ -189,7 +189,7 @@ public partial interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollec
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int Remove(Predicate<T> predicate);
+    int Remove(Predicate<TItem> predicate);
 
     /// <summary>
     /// Removes from this collection the last ocurrence of an element that matches the given
@@ -197,7 +197,7 @@ public partial interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollec
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int RemoveLast(Predicate<T> predicate);
+    int RemoveLast(Predicate<TItem> predicate);
 
     /// <summary>
     /// Removes from this collection all the ocurrences of elements that match the given
@@ -205,7 +205,7 @@ public partial interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollec
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int RemoveAll(Predicate<T> predicate);
+    int RemoveAll(Predicate<TItem> predicate);
 
     /// <summary>
     /// Clears all the elements in this collection. Returns the number of changes made.

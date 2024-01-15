@@ -1,64 +1,89 @@
-﻿//using TItem = ...;
+﻿using TItem = Yotei.ORM.IParameter;
+using TKey = string;
 
-namespace Yotei.ORM.Tools.Code;
+namespace Yotei.ORM.Code;
 
 // ========================================================
 /// <summary>
-/// <inheritdoc cref="IFrozenList{TItem}"/>
+/// <inheritdoc cref="IParameterList"/>
 /// </summary>
-/// <typeparam name="TItem"></typeparam>
 [DebuggerDisplay("{ToDebugString(DebugCount)}")]
 [Cloneable]
-public partial class FrozenList<TItem> : IFrozenList<TItem>
+public sealed partial class ParameterList : IParameterList
 {
     /// <summary>
     /// The builder type for instances of the host one.
     /// </summary>
+    /// <param name="engine"></param>
     [Cloneable]
-    partial class Builder() : CoreList<TItem>
+    sealed partial class Builder(IEngine engine) : Tools.Code.CoreList<TKey, TItem>
     {
-        protected Builder(Builder source) : this() => AddRange(source);
+        readonly IEngine Engine = engine.ThrowWhenNull();
+        Builder(Builder source) : this(source.Engine) => AddRange(source);
 
-        protected override TItem ValidateItem(TItem item, bool add) => base.ValidateItem(item, add);
-        protected override bool CompareItems(TItem source, TItem item) => base.CompareItems(source, item);
-        protected override bool SameItem(TItem source, TItem item) => base.SameItem(source, item);
-        protected override List<int> GetDuplicates(TItem item) => base.GetDuplicates(item);
-        protected override bool AcceptDuplicate(TItem source, TItem item) => base.AcceptDuplicate(source, item);
+        protected override TItem ValidateItem(TItem item) => item.ThrowWhenNull();
+        protected override TKey GetKey(TItem item) => item.ThrowWhenNull().Name;
+        protected override TKey ValidateKey(TKey key) => key.NotNullNotEmpty();
+        protected override bool CompareKeys(TKey source, TKey item)
+            => string.Compare(source, item, !Engine.CaseSensitiveNames) == 0;
+        protected override bool SameItem(TItem source, TItem item)
+            => ReferenceEquals(source, item);
+        protected override List<int> GetDuplicates(TKey key) => base.GetDuplicates(key);
+        protected override bool AcceptDuplicate(TItem source, TItem item)
+            => ReferenceEquals(source, item)
+            ? true
+            : throw new DuplicateException("Duplicated element.").WithData(item);
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    /// <param name="engine"></param>
     /// <returns></returns>
-    public static Tools.ICoreList<TItem> CreateBuilder() => new Builder();
+    public static Tools.ICoreList<TKey, TItem> CreateBuilder(IEngine engine) => new Builder(engine);
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public IEngine Engine { get; }
 
     // ----------------------------------------------------
 
-    readonly Tools.ICoreList<TItem> Items;
+    readonly Tools.ICoreList<TKey, TItem> Items;
 
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    public FrozenList() => Items = CreateBuilder()
-        ?? throw new UnExpectedException("Cannot create a builder.");
+    /// <param name="engine"></param>
+    [SuppressMessage("", "IDE0290")]
+    public ParameterList(IEngine engine)
+    {
+        Engine = engine.ThrowWhenNull();
+        Items = CreateBuilder(engine)
+            ?? throw new UnExpectedException("Cannot create a builder for this type.");
+    }
 
     /// <summary>
     /// Initializes a new instance with the given element.
     /// </summary>
+    /// <param name="engine"></param>
     /// <param name="item"></param>
-    public FrozenList(TItem item) : this() => AddInternal(item);
+    public ParameterList(IEngine engine, TItem item) : this(engine) => AddInternal(item);
 
     /// <summary>
     /// Initializes a new instance with the elements from the given range.
     /// </summary>
+    /// <param name="engine"></param>
     /// <param name="range"></param>
-    public FrozenList(IEnumerable<TItem> range) : this() => AddRangeInternal(range);
+    public ParameterList(IEngine engine, IEnumerable<TItem> range)
+        : this(engine)
+        => AddRangeInternal(range);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected FrozenList(FrozenList<TItem> source) => Items = source.Items.Clone();
+    ParameterList(ParameterList source) : this(source.Engine) => AddRangeInternal(source);
 
     /// <summary>
     /// <inheritdoc/>
@@ -73,12 +98,12 @@ public partial class FrozenList<TItem> : IFrozenList<TItem>
     /// <returns></returns>
     public override string ToString() => $"Count: {Count}";
 
-    protected virtual string ToDebugString(int num) => Count == 0 ? "0:[]" : (Count <= num
+    string ToDebugString(int num) => Count == 0 ? "0:[]" : (Count <= num
         ? $"[{string.Join(", ", Items.Select(ItemToString))}]"
         : $"[{string.Join(", ", Items.Take(num).Select(ItemToString))}, ...]");
 
-    protected virtual string ItemToString(TItem item) => item?.ToString() ?? string.Empty;
-    protected virtual int DebugCount => 6;
+    string ItemToString(TItem item) => item?.ToString() ?? string.Empty;
+    static int DebugCount => 6;
 
     // ----------------------------------------------------
 
@@ -97,30 +122,30 @@ public partial class FrozenList<TItem> : IFrozenList<TItem>
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    public bool Contains(TItem item) => Items.Contains(item);
+    public bool Contains(TKey key) => Items.Contains(key);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    public int IndexOf(TItem item) => Items.IndexOf(item);
+    public int IndexOf(TKey key) => Items.IndexOf(key);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    public int LastIndexOf(TItem item) => Items.LastIndexOf(item);
+    public int LastIndexOf(TKey key) => Items.LastIndexOf(key);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    public List<int> IndexesOf(TItem item) => Items.IndexesOf(item);
+    public List<int> IndexesOf(TKey key) => Items.IndexesOf(key);
 
     /// <summary>
     /// <inheritdoc/>
@@ -166,7 +191,7 @@ public partial class FrozenList<TItem> : IFrozenList<TItem>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public Tools.ICoreList<TItem> ToBuilder() => Items.Clone();
+    public Tools.ICoreList<TKey, TItem> ToBuilder() => Items.Clone();
 
     // ----------------------------------------------------
 
@@ -176,13 +201,13 @@ public partial class FrozenList<TItem> : IFrozenList<TItem>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual IFrozenList<TItem> GetRange(int index, int count)
+    public IParameterList GetRange(int index, int count)
     {
         var clone = Clone();
         var num = clone.GetRangeInternal(index, count);
         return num > 0 ? clone : this;
     }
-    protected int GetRangeInternal(int index, int count)
+    int GetRangeInternal(int index, int count)
     {
         if (count == 0 && index >= 0) return ClearInternal();
         if (index == 0 && count == Count) return 0;
@@ -199,39 +224,39 @@ public partial class FrozenList<TItem> : IFrozenList<TItem>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IFrozenList<TItem> Replace(int index, TItem item)
+    public IParameterList Replace(int index, TItem item)
     {
         var clone = Clone();
         var num = clone.ReplaceInternal(index, item);
         return num > 0 ? clone : this;
     }
-    protected int ReplaceInternal(int index, TItem item) => Items.Replace(index, item);
+    int ReplaceInternal(int index, TItem item) => Items.Replace(index, item);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IFrozenList<TItem> Add(TItem item)
+    public IParameterList Add(TItem item)
     {
         var clone = Clone();
         var num = clone.AddInternal(item);
         return num > 0 ? clone : this;
     }
-    protected int AddInternal(TItem item) => Items.Add(item);
+    int AddInternal(TItem item) => Items.Add(item);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual IFrozenList<TItem> AddRange(IEnumerable<TItem> range)
+    public IParameterList AddRange(IEnumerable<TItem> range)
     {
         var clone = Clone();
         var num = clone.AddRangeInternal(range);
         return num > 0 ? clone : this;
     }
-    protected int AddRangeInternal(IEnumerable<TItem> range) => Items.AddRange(range);
+    int AddRangeInternal(IEnumerable<TItem> range) => Items.AddRange(range);
 
     /// <summary>
     /// <inheritdoc/>
@@ -239,13 +264,13 @@ public partial class FrozenList<TItem> : IFrozenList<TItem>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IFrozenList<TItem> Insert(int index, TItem item)
+    public IParameterList Insert(int index, TItem item)
     {
         var clone = Clone();
         var num = clone.InsertInternal(index, item);
         return num > 0 ? clone : this;
     }
-    protected int InsertInternal(int index, TItem item) => Items.Insert(index, item);
+    int InsertInternal(int index, TItem item) => Items.Insert(index, item);
 
     /// <summary>
     /// <inheritdoc/>
@@ -253,27 +278,26 @@ public partial class FrozenList<TItem> : IFrozenList<TItem>
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual IFrozenList<TItem> InsertRange(int index, IEnumerable<TItem> range)
+    public IParameterList InsertRange(int index, IEnumerable<TItem> range)
     {
         var clone = Clone();
         var num = clone.InsertRangeInternal(index, range);
         return num > 0 ? clone : this;
     }
-    protected int InsertRangeInternal(
-        int index, IEnumerable<TItem> range) => Items.InsertRange(index, range);
+    int InsertRangeInternal(int index, IEnumerable<TItem> range) => Items.InsertRange(index, range);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public virtual IFrozenList<TItem> RemoveAt(int index)
+    public IParameterList RemoveAt(int index)
     {
         var clone = Clone();
         var num = clone.RemoveAtInternal(index);
         return num > 0 ? clone : this;
     }
-    protected int RemoveAtInternal(int index) => Items.RemoveAt(index);
+    int RemoveAtInternal(int index) => Items.RemoveAt(index);
 
     /// <summary>
     /// <inheritdoc/>
@@ -281,101 +305,101 @@ public partial class FrozenList<TItem> : IFrozenList<TItem>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual IFrozenList<TItem> RemoveRange(int index, int count)
+    public IParameterList RemoveRange(int index, int count)
     {
         var clone = Clone();
         var num = clone.RemoveRangeInternal(index, count);
         return num > 0 ? clone : this;
     }
-    protected int RemoveRangeInternal(int index, int count) => Items.RemoveRange(index, count);
+    int RemoveRangeInternal(int index, int count) => Items.RemoveRange(index, count);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    public virtual IFrozenList<TItem> Remove(TItem item)
+    public IParameterList Remove(TKey key)
     {
         var clone = Clone();
-        var num = clone.RemoveInternal(item);
+        var num = clone.RemoveInternal(key);
         return num > 0 ? clone : this;
     }
-    protected int RemoveInternal(TItem item) => Items.Remove(item);
+    int RemoveInternal(TKey key) => Items.Remove(key);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    public virtual IFrozenList<TItem> RemoveLast(TItem item)
+    public IParameterList RemoveLast(TKey key)
     {
         var clone = Clone();
-        var num = clone.RemoveLastInternal(item);
+        var num = clone.RemoveLastInternal(key);
         return num > 0 ? clone : this;
     }
-    protected int RemoveLastInternal(TItem item) => Items.RemoveLast(item);
+    int RemoveLastInternal(TKey key) => Items.RemoveLast(key);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    public virtual IFrozenList<TItem> RemoveAll(TItem item)
+    public IParameterList RemoveAll(TKey key)
     {
         var clone = Clone();
-        var num = clone.RemoveAllInternal(item);
+        var num = clone.RemoveAllInternal(key);
         return num > 0 ? clone : this;
     }
-    protected int RemoveAllInternal(TItem item) => Items.RemoveAll(item);
+    int RemoveAllInternal(TKey key) => Items.RemoveAll(key);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IFrozenList<TItem> Remove(Predicate<TItem> predicate)
+    public IParameterList Remove(Predicate<TItem> predicate)
     {
         var clone = Clone();
         var num = clone.RemoveInternal(predicate);
         return num > 0 ? clone : this;
     }
-    protected int RemoveInternal(Predicate<TItem> predicate) => Items.Remove(predicate);
+    int RemoveInternal(Predicate<TItem> predicate) => Items.Remove(predicate);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IFrozenList<TItem> RemoveLast(Predicate<TItem> predicate)
+    public IParameterList RemoveLast(Predicate<TItem> predicate)
     {
         var clone = Clone();
         var num = clone.RemoveLastInternal(predicate);
         return num > 0 ? clone : this;
     }
-    protected int RemoveLastInternal(Predicate<TItem> predicate) => Items.RemoveLast(predicate);
+    int RemoveLastInternal(Predicate<TItem> predicate) => Items.RemoveLast(predicate);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IFrozenList<TItem> RemoveAll(Predicate<TItem> predicate)
+    public IParameterList RemoveAll(Predicate<TItem> predicate)
     {
         var clone = Clone();
         var num = clone.RemoveAllInternal(predicate);
         return num > 0 ? clone : this;
     }
-    protected int RemoveAllInternal(Predicate<TItem> predicate) => Items.RemoveAll(predicate);
+    int RemoveAllInternal(Predicate<TItem> predicate) => Items.RemoveAll(predicate);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual IFrozenList<TItem> Clear()
+    public IParameterList Clear()
     {
         var clone = Clone();
         var num = clone.ClearInternal();
         return num > 0 ? clone : this;
     }
-    protected int ClearInternal() => Items.Clear();
+    int ClearInternal() => Items.Clear();
 }

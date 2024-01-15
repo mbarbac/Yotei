@@ -1,6 +1,3 @@
-using Yotei.ORM.Tools;
-using Yotei.ORM.Tools.Code;
-
 namespace Yotei.ORM.Tests;
 
 // ========================================================

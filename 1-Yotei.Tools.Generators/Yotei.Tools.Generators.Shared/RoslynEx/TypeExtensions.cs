@@ -89,12 +89,12 @@ internal static class TypeExtensions
     {
         bool add = addNullable && symbol.NullableAnnotation == NullableAnnotation.Annotated;
 
-        if (symbol is INamedTypeSymbol type && type.IsGenericType && !type.IsNamespace)
+        if (symbol is INamedTypeSymbol type && type.TypeParameters.Length != 0 && !type.IsNamespace)
         {
             var sb = new StringBuilder();
             sb.Append($"{type.Name}<");
 
-            for (int i = 0; i < type.TypeArguments.Length; i++)
+            for (int i = 0; i < type.TypeParameters.Length; i++)
             {
                 if (i != 0) sb.Append(", ");
 

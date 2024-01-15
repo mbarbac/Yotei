@@ -1,28 +1,31 @@
 ﻿//using TItem = ...;
+//using TKey = ...;
 
 namespace Yotei.ORM.Tools.Code;
 
 // ========================================================
 /// <summary>
-/// <inheritdoc cref="IFrozenList{TItem}"/>
+/// <inheritdoc cref="IFrozenList{TKey, TItem}"/>
 /// </summary>
 /// <typeparam name="TItem"></typeparam>
 [DebuggerDisplay("{ToDebugString(DebugCount)}")]
 [Cloneable]
-public partial class FrozenList<TItem> : IFrozenList<TItem>
+public partial class FrozenList<TKey, TItem> : IFrozenList<TKey, TItem>
 {
     /// <summary>
     /// The builder type for instances of the host one.
     /// </summary>
     [Cloneable]
-    partial class Builder() : CoreList<TItem>
+    partial class Builder() : CoreList<TKey, TItem>
     {
         protected Builder(Builder source) : this() => AddRange(source);
 
-        protected override TItem ValidateItem(TItem item, bool add) => base.ValidateItem(item, add);
-        protected override bool CompareItems(TItem source, TItem item) => base.CompareItems(source, item);
+        protected override TItem ValidateItem(TItem item) => base.ValidateItem(item);
+        protected override TKey GetKey(TItem item) => base.GetKey(item);
+        protected override TKey ValidateKey(TKey key) => base.ValidateKey(key);
+        protected override bool CompareKeys(TKey source, TKey item) => base.CompareKeys(source, item);
         protected override bool SameItem(TItem source, TItem item) => base.SameItem(source, item);
-        protected override List<int> GetDuplicates(TItem item) => base.GetDuplicates(item);
+        protected override List<int> GetDuplicates(TKey key) => base.GetDuplicates(key);
         protected override bool AcceptDuplicate(TItem source, TItem item) => base.AcceptDuplicate(source, item);
     }
 
@@ -30,11 +33,11 @@ public partial class FrozenList<TItem> : IFrozenList<TItem>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public static Tools.ICoreList<TItem> CreateBuilder() => new Builder();
+    public static Tools.ICoreList<TKey, TItem> CreateBuilder() => new Builder();
 
     // ----------------------------------------------------
 
-    readonly Tools.ICoreList<TItem> Items;
+    readonly Tools.ICoreList<TKey, TItem> Items;
 
     /// <summary>
     /// Initializes a new empty instance.
@@ -58,7 +61,7 @@ public partial class FrozenList<TItem> : IFrozenList<TItem>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected FrozenList(FrozenList<TItem> source) => Items = source.Items.Clone();
+    protected FrozenList(FrozenList<TKey, TItem> source) => Items = source.Items.Clone();
 
     /// <summary>
     /// <inheritdoc/>
@@ -97,30 +100,30 @@ public partial class FrozenList<TItem> : IFrozenList<TItem>
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    public bool Contains(TItem item) => Items.Contains(item);
+    public bool Contains(TKey key) => Items.Contains(key);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    public int IndexOf(TItem item) => Items.IndexOf(item);
+    public int IndexOf(TKey key) => Items.IndexOf(key);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    public int LastIndexOf(TItem item) => Items.LastIndexOf(item);
+    public int LastIndexOf(TKey key) => Items.LastIndexOf(key);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    public List<int> IndexesOf(TItem item) => Items.IndexesOf(item);
+    public List<int> IndexesOf(TKey key) => Items.IndexesOf(key);
 
     /// <summary>
     /// <inheritdoc/>
@@ -166,7 +169,7 @@ public partial class FrozenList<TItem> : IFrozenList<TItem>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public Tools.ICoreList<TItem> ToBuilder() => Items.Clone();
+    public Tools.ICoreList<TKey, TItem> ToBuilder() => Items.Clone();
 
     // ----------------------------------------------------
 
@@ -176,7 +179,7 @@ public partial class FrozenList<TItem> : IFrozenList<TItem>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual IFrozenList<TItem> GetRange(int index, int count)
+    public virtual IFrozenList<TKey, TItem> GetRange(int index, int count)
     {
         var clone = Clone();
         var num = clone.GetRangeInternal(index, count);
@@ -199,7 +202,7 @@ public partial class FrozenList<TItem> : IFrozenList<TItem>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IFrozenList<TItem> Replace(int index, TItem item)
+    public virtual IFrozenList<TKey, TItem> Replace(int index, TItem item)
     {
         var clone = Clone();
         var num = clone.ReplaceInternal(index, item);
@@ -212,7 +215,7 @@ public partial class FrozenList<TItem> : IFrozenList<TItem>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IFrozenList<TItem> Add(TItem item)
+    public virtual IFrozenList<TKey, TItem> Add(TItem item)
     {
         var clone = Clone();
         var num = clone.AddInternal(item);
@@ -225,7 +228,7 @@ public partial class FrozenList<TItem> : IFrozenList<TItem>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual IFrozenList<TItem> AddRange(IEnumerable<TItem> range)
+    public virtual IFrozenList<TKey, TItem> AddRange(IEnumerable<TItem> range)
     {
         var clone = Clone();
         var num = clone.AddRangeInternal(range);
@@ -239,7 +242,7 @@ public partial class FrozenList<TItem> : IFrozenList<TItem>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IFrozenList<TItem> Insert(int index, TItem item)
+    public virtual IFrozenList<TKey, TItem> Insert(int index, TItem item)
     {
         var clone = Clone();
         var num = clone.InsertInternal(index, item);
@@ -253,7 +256,7 @@ public partial class FrozenList<TItem> : IFrozenList<TItem>
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual IFrozenList<TItem> InsertRange(int index, IEnumerable<TItem> range)
+    public virtual IFrozenList<TKey, TItem> InsertRange(int index, IEnumerable<TItem> range)
     {
         var clone = Clone();
         var num = clone.InsertRangeInternal(index, range);
@@ -267,7 +270,7 @@ public partial class FrozenList<TItem> : IFrozenList<TItem>
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public virtual IFrozenList<TItem> RemoveAt(int index)
+    public virtual IFrozenList<TKey, TItem> RemoveAt(int index)
     {
         var clone = Clone();
         var num = clone.RemoveAtInternal(index);
@@ -281,7 +284,7 @@ public partial class FrozenList<TItem> : IFrozenList<TItem>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual IFrozenList<TItem> RemoveRange(int index, int count)
+    public virtual IFrozenList<TKey, TItem> RemoveRange(int index, int count)
     {
         var clone = Clone();
         var num = clone.RemoveRangeInternal(index, count);
@@ -292,48 +295,48 @@ public partial class FrozenList<TItem> : IFrozenList<TItem>
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    public virtual IFrozenList<TItem> Remove(TItem item)
+    public virtual IFrozenList<TKey, TItem> Remove(TKey key)
     {
         var clone = Clone();
-        var num = clone.RemoveInternal(item);
+        var num = clone.RemoveInternal(key);
         return num > 0 ? clone : this;
     }
-    protected int RemoveInternal(TItem item) => Items.Remove(item);
+    protected int RemoveInternal(TKey key) => Items.Remove(key);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    public virtual IFrozenList<TItem> RemoveLast(TItem item)
+    public virtual IFrozenList<TKey, TItem> RemoveLast(TKey key)
     {
         var clone = Clone();
-        var num = clone.RemoveLastInternal(item);
+        var num = clone.RemoveLastInternal(key);
         return num > 0 ? clone : this;
     }
-    protected int RemoveLastInternal(TItem item) => Items.RemoveLast(item);
+    protected int RemoveLastInternal(TKey key) => Items.RemoveLast(key);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    public virtual IFrozenList<TItem> RemoveAll(TItem item)
+    public virtual IFrozenList<TKey, TItem> RemoveAll(TKey key)
     {
         var clone = Clone();
-        var num = clone.RemoveAllInternal(item);
+        var num = clone.RemoveAllInternal(key);
         return num > 0 ? clone : this;
     }
-    protected int RemoveAllInternal(TItem item) => Items.RemoveAll(item);
+    protected int RemoveAllInternal(TKey key) => Items.RemoveAll(key);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IFrozenList<TItem> Remove(Predicate<TItem> predicate)
+    public virtual IFrozenList<TKey, TItem> Remove(Predicate<TItem> predicate)
     {
         var clone = Clone();
         var num = clone.RemoveInternal(predicate);
@@ -346,7 +349,7 @@ public partial class FrozenList<TItem> : IFrozenList<TItem>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IFrozenList<TItem> RemoveLast(Predicate<TItem> predicate)
+    public virtual IFrozenList<TKey, TItem> RemoveLast(Predicate<TItem> predicate)
     {
         var clone = Clone();
         var num = clone.RemoveLastInternal(predicate);
@@ -359,7 +362,7 @@ public partial class FrozenList<TItem> : IFrozenList<TItem>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IFrozenList<TItem> RemoveAll(Predicate<TItem> predicate)
+    public virtual IFrozenList<TKey, TItem> RemoveAll(Predicate<TItem> predicate)
     {
         var clone = Clone();
         var num = clone.RemoveAllInternal(predicate);
@@ -371,7 +374,7 @@ public partial class FrozenList<TItem> : IFrozenList<TItem>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual IFrozenList<TItem> Clear()
+    public virtual IFrozenList<TKey, TItem> Clear()
     {
         var clone = Clone();
         var num = clone.ClearInternal();

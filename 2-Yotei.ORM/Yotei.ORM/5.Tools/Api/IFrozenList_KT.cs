@@ -5,10 +5,17 @@
 /// Represents an immutable list-alike collection of elements, identified by their respective
 /// keys, with customizable behavior.
 /// </summary>
-/// <typeparam name="K"></typeparam>
-/// <typeparam name="T"></typeparam>
-public interface IFrozenList<K, T> : IEnumerable<T>
+/// <typeparam name="TKey"></typeparam>
+/// <typeparam name="TItem"></typeparam>
+[Cloneable]
+public partial interface IFrozenList<TKey, TItem> : IEnumerable<TItem>
 {
+    /// <summary>
+    /// Obtains an appropriate builder for this type.
+    /// </summary>
+    /// <returns></returns>
+    static abstract Tools.ICoreList<TKey, TItem> CreateBuilder();
+
     /// <summary>
     /// Gets the number of elements in this collection.
     /// </summary>
@@ -19,14 +26,14 @@ public interface IFrozenList<K, T> : IEnumerable<T>
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    T this[int index] { get; }
+    TItem this[int index] { get; }
 
     /// <summary>
     /// Determines if this collection contains an element with the given key.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    bool Contains(K key);
+    bool Contains(TKey key);
 
     /// <summary>
     /// Returns the index of the first ocurrence of an element with the given key, or -1 if not
@@ -34,7 +41,7 @@ public interface IFrozenList<K, T> : IEnumerable<T>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    int IndexOf(K key);
+    int IndexOf(TKey key);
 
     /// <summary>
     /// Returns the index of the last ocurrence of an element with the given key, or -1 if not
@@ -42,21 +49,21 @@ public interface IFrozenList<K, T> : IEnumerable<T>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    int LastIndexOf(K key);
+    int LastIndexOf(TKey key);
 
     /// <summary>
-    /// Returns the indexes of the elements with the given key.
+    /// Returns the indexes of the ocurrences of elements with the given key.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    List<int> IndexesOf(K key);
+    List<int> IndexesOf(TKey key);
 
     /// <summary>
     /// Determines if this collection contains an element that matches the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    bool Contains(Predicate<T> predicate);
+    bool Contains(Predicate<TItem> predicate);
 
     /// <summary>
     /// Returns the index of the first ocurrence of an element that matches the given predicate,
@@ -64,7 +71,7 @@ public interface IFrozenList<K, T> : IEnumerable<T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int IndexOf(Predicate<T> predicate);
+    int IndexOf(Predicate<TItem> predicate);
 
     /// <summary>
     /// Returns the index of the last ocurrence of an element that matches the given predicate,
@@ -72,32 +79,32 @@ public interface IFrozenList<K, T> : IEnumerable<T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int LastIndexOf(Predicate<T> predicate);
+    int LastIndexOf(Predicate<TItem> predicate);
 
     /// <summary>
     /// Returns the indexes of the elements in this collection that match the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    List<int> IndexesOf(Predicate<T> predicate);
+    List<int> IndexesOf(Predicate<TItem> predicate);
 
     /// <summary>
     /// Returns an array with the elements in this collection.
     /// </summary>
     /// <returns></returns>
-    T[] ToArray();
+    TItem[] ToArray();
 
     /// <summary>
     /// Returns a list with the elements in this collection.
     /// </summary>
     /// <returns></returns>
-    List<T> ToList();
+    List<TItem> ToList();
 
     /// <summary>
-    /// Returns a builder of an appropriate type with the elements of this instance.
+    /// Returns a builder of the appropriate type with the elements of this instance.
     /// </summary>
     /// <returns></returns>
-    ICoreList<K, T> ToCoreList();
+    Tools.ICoreList<TKey, TItem> ToBuilder();
 
     // ----------------------------------------------------
 
@@ -108,7 +115,7 @@ public interface IFrozenList<K, T> : IEnumerable<T>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    IFrozenList<K, T> GetRange(int index, int count);
+    IFrozenList<TKey, TItem> GetRange(int index, int count);
 
     /// <summary>
     /// Returns a new instance with the element at the given index replaced by the new given one.
@@ -117,7 +124,7 @@ public interface IFrozenList<K, T> : IEnumerable<T>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    IFrozenList<K, T> Replace(int index, T item);
+    IFrozenList<TKey, TItem> Replace(int index, TItem item);
 
     /// <summary>
     /// Returns a new instance with the given element added to it. If no changes are detected,
@@ -125,7 +132,7 @@ public interface IFrozenList<K, T> : IEnumerable<T>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    IFrozenList<K, T> Add(T item);
+    IFrozenList<TKey, TItem> Add(TItem item);
 
     /// <summary>
     /// Returns a new instance with the elements from the given range add to it. If no changes
@@ -133,7 +140,7 @@ public interface IFrozenList<K, T> : IEnumerable<T>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    IFrozenList<K, T> AddRange(IEnumerable<T> range);
+    IFrozenList<TKey, TItem> AddRange(IEnumerable<TItem> range);
 
     /// <summary>
     /// Returns a new instance with the given element inserted into it at the given index. If no
@@ -142,7 +149,7 @@ public interface IFrozenList<K, T> : IEnumerable<T>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    IFrozenList<K, T> Insert(int index, T item);
+    IFrozenList<TKey, TItem> Insert(int index, TItem item);
 
     /// <summary>
     /// Returns a new instance with the elements from the given range inserted into it, starting
@@ -151,7 +158,7 @@ public interface IFrozenList<K, T> : IEnumerable<T>
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    IFrozenList<K, T> InsertRange(int index, IEnumerable<T> range);
+    IFrozenList<TKey, TItem> InsertRange(int index, IEnumerable<TItem> range);
 
     /// <summary>
     /// Returns a new instance with the element at the given index removed from it. If no changes
@@ -159,7 +166,7 @@ public interface IFrozenList<K, T> : IEnumerable<T>
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    IFrozenList<K, T> RemoveAt(int index);
+    IFrozenList<TKey, TItem> RemoveAt(int index);
 
     /// <summary>
     /// Returns a new instance with the given number of elements, starting from the given index,
@@ -168,7 +175,7 @@ public interface IFrozenList<K, T> : IEnumerable<T>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    IFrozenList<K, T> RemoveRange(int index, int count);
+    IFrozenList<TKey, TItem> RemoveRange(int index, int count);
 
     /// <summary>
     /// Returns a new instance with the first ocurrence of an element with the given key removed
@@ -176,7 +183,7 @@ public interface IFrozenList<K, T> : IEnumerable<T>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    IFrozenList<K, T> Remove(K key);
+    IFrozenList<TKey, TItem> Remove(TKey key);
 
     /// <summary>
     /// Returns a new instance with the last ocurrence of an element with the given key removed
@@ -184,15 +191,15 @@ public interface IFrozenList<K, T> : IEnumerable<T>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    IFrozenList<K, T> RemoveLast(K key);
+    IFrozenList<TKey, TItem> RemoveLast(TKey key);
 
     /// <summary>
-    /// Returns a new instance with all ocurrences of elements with the given key removed from it.
-    /// If no changes are detected, returns the original instance.
+    /// Returns a new instance with all ocurrences of elements with the givne key removed from
+    /// it. If no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    IFrozenList<K, T> RemoveAll(K key);
+    IFrozenList<TKey, TItem> RemoveAll(TKey key);
 
     /// <summary>
     /// Returns a new instance with the first ocurrence of an element that matches the given
@@ -200,7 +207,7 @@ public interface IFrozenList<K, T> : IEnumerable<T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IFrozenList<K, T> Remove(Predicate<T> predicate);
+    IFrozenList<TKey, TItem> Remove(Predicate<TItem> predicate);
 
     /// <summary>
     /// Returns a new instance with the last ocurrence of an element that matches the given
@@ -208,7 +215,7 @@ public interface IFrozenList<K, T> : IEnumerable<T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IFrozenList<K, T> RemoveLast(Predicate<T> predicate);
+    IFrozenList<TKey, TItem> RemoveLast(Predicate<TItem> predicate);
 
     /// <summary>
     /// Returns a new instance with all the ocurrences of elements that match the given predicate
@@ -216,12 +223,12 @@ public interface IFrozenList<K, T> : IEnumerable<T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IFrozenList<K, T> RemoveAll(Predicate<T> predicate);
+    IFrozenList<TKey, TItem> RemoveAll(Predicate<TItem> predicate);
 
     /// <summary>
     /// Returns a new instance with all the original elements removed. If no changes are detected,
     /// returns the original instance.
     /// </summary>
     /// <returns></returns>
-    IFrozenList<K, T> Clear();
+    IFrozenList<TKey, TItem> Clear();
 }
