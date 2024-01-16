@@ -16,10 +16,7 @@ public record SketchOptions
     /// </summary>
     public SketchOptions() { }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override string ToString()
     {
         var sb = new StringBuilder();

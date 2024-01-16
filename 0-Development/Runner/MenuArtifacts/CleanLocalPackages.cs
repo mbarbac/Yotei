@@ -6,14 +6,10 @@ namespace Runner.Artifacts;
 // ========================================================
 public class CleanLocalPackages : MenuEntry
 {
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public override string Header() => "Clean Local Packages";
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public override void Execute()
     {
         WriteLine(true);

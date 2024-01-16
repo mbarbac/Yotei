@@ -19,16 +19,10 @@ public class LambdaNodeConvert : LambdaNode
         LambdaParser.Print(this, $"- New: {ToDebugString()}");
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override string ToString() => $"(({LambdaType.EasyName()}) {LambdaTarget})";
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override LambdaNodeConvert Clone() => new(
         LambdaTarget.Clone(),
         LambdaType);

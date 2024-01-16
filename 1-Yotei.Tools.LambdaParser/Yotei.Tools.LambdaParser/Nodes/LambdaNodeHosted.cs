@@ -15,10 +15,7 @@ public abstract class LambdaNodeHosted : LambdaNode
     [SuppressMessage("", "IDE0290")]
     public LambdaNodeHosted(LambdaNode host) : base() => LambdaHost = host.ThrowWhenNull();
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override LambdaNodeArgument? GetArgument() => LambdaHost.GetArgument();
 
     /// <summary>

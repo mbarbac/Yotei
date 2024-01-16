@@ -36,10 +36,7 @@ public record class Locale : IComparer<string>, IEqualityComparer<char>
         CompareOptions = options;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns><inheritdoc/></returns>
     public override string ToString()
     {
         var sb = new StringBuilder();
@@ -125,62 +122,33 @@ public record class Locale : IComparer<string>, IEqualityComparer<char>
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
-    /// <returns></returns>
     public bool Equals(char x, char y) => Compare(x, y) == 0;
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="obj"></param>
-    /// <returns></returns>
     public int GetHashCode(char obj) => obj.GetHashCode();
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc cref="CompareInfo.IsPrefix(string, string)"/>
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="prefix"></param>
-    /// <returns><inheritdoc/></returns>
     public bool HasPrefix(string source, string prefix)
     {
         return CultureInfo.CompareInfo.IsPrefix(source, prefix, CompareOptions);
     }
 
-    /// <summary>
     /// <inheritdoc cref="HasPrefix(string, string)"/>
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="prefix"></param>
-    /// <returns></returns>
     public bool HasPrefix(ReadOnlySpan<char> source, ReadOnlySpan<char> prefix)
     {
         return CultureInfo.CompareInfo.IsPrefix(source, prefix, CompareOptions);
     }
 
-    /// <summary>
     /// <inheritdoc cref="CompareInfo.IsSuffix(string, string)"/>
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="suffix"></param>
-    /// <returns><inheritdoc/></returns>
     public bool HasSuffix(string source, string suffix)
     {
         return CultureInfo.CompareInfo.IsSuffix(source, suffix, CompareOptions);
     }
 
-    /// <summary>
     /// <inheritdoc cref="HasSuffix(string, string)"/>
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="suffix"></param>
-    /// <returns></returns>
     public bool HasSuffix(ReadOnlySpan<char> source, ReadOnlySpan<char> suffix)
     {
         return CultureInfo.CompareInfo.IsSuffix(source, suffix, CompareOptions);
@@ -188,45 +156,25 @@ public record class Locale : IComparer<string>, IEqualityComparer<char>
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc cref="CompareInfo.IndexOf(string, string)"/>
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="value"></param>
-    /// <returns><inheritdoc/></returns>
     public int IndexOf(string source, string value)
     {
         return CultureInfo.CompareInfo.IndexOf(source, value, CompareOptions);
     }
 
-    /// <summary>
     /// <inheritdoc cref="CompareInfo.IndexOf(string, char)"/>
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="value"></param>
-    /// <returns><inheritdoc/></returns>
     public int IndexOf(string source, char value)
     {
         return CultureInfo.CompareInfo.IndexOf(source, value, CompareOptions);
     }
 
-    /// <summary>
     /// <inheritdoc cref="IndexOf(string, string)"/>
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="value"></param>
-    /// <returns><inheritdoc/></returns>
     public int IndexOf(ReadOnlySpan<char> source, ReadOnlySpan<char> value)
     {
         return CultureInfo.CompareInfo.IndexOf(source, value, CompareOptions);
     }
 
-    /// <summary>
     /// <inheritdoc cref="IndexOf(string, char)"/>
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="value"></param>
-    /// <returns><inheritdoc/></returns>
     public int IndexOf(ReadOnlySpan<char> source, char value)
     {
         return CultureInfo.CompareInfo.IndexOf(source, value.ToString(), CompareOptions);
@@ -234,45 +182,25 @@ public record class Locale : IComparer<string>, IEqualityComparer<char>
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc cref="CompareInfo.LastIndexOf(string, string)"/>
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="value"></param>
-    /// <returns><inheritdoc/></returns>
     public int LastIndexOf(string source, string value)
     {
         return CultureInfo.CompareInfo.LastIndexOf(source, value, CompareOptions);
     }
 
-    /// <summary>
     /// <inheritdoc cref="CompareInfo.LastIndexOf(string, char)"/>
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="value"></param>
-    /// <returns><inheritdoc/></returns>
     public int LastIndexOf(string source, char value)
     {
         return CultureInfo.CompareInfo.LastIndexOf(source, value, CompareOptions);
     }
 
-    /// <summary>
     /// <inheritdoc cref="LastIndexOf(string, string)"/>
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="value"></param>
-    /// <returns><inheritdoc/></returns>
     public int LastIndexOf(ReadOnlySpan<char> source, ReadOnlySpan<char> value)
     {
         return CultureInfo.CompareInfo.LastIndexOf(source, value, CompareOptions);
     }
 
-    /// <summary>
     /// <inheritdoc cref="LastIndexOf(string, char)"/>
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="value"></param>
-    /// <returns><inheritdoc/></returns>
     public int LastIndexOf(ReadOnlySpan<char> source, char value)
     {
         return CultureInfo.CompareInfo.LastIndexOf(source, value.ToString(), CompareOptions);
@@ -280,21 +208,13 @@ public record class Locale : IComparer<string>, IEqualityComparer<char>
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc cref="TextInfo.ToUpper(string)"/>
-    /// </summary>
-    /// <param name="value"></param>
-    /// <returns><inheritdoc/></returns>
     public string ToUpper(string value)
     {
         return CultureInfo.TextInfo.ToUpper(value);
     }
 
-    /// <summary>
     /// <inheritdoc cref="TextInfo.ToUpper(char)"/>
-    /// </summary>
-    /// <param name="value"></param>
-    /// <returns><inheritdoc/></returns>
     public char ToUpper(char value)
     {
         return CultureInfo.TextInfo.ToUpper(value);
@@ -302,21 +222,13 @@ public record class Locale : IComparer<string>, IEqualityComparer<char>
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc cref="TextInfo.ToLower(string)"/>
-    /// </summary>
-    /// <param name="value"></param>
-    /// <returns><inheritdoc/></returns>
     public string ToLower(string value)
     {
         return CultureInfo.TextInfo.ToLower(value);
     }
 
-    /// <summary>
     /// <inheritdoc cref="TextInfo.ToLower(char)"/>
-    /// </summary>
-    /// <param name="value"></param>
-    /// <returns><inheritdoc/></returns>
     public char ToLower(char value)
     {
         return CultureInfo.TextInfo.ToLower(value);
@@ -324,11 +236,7 @@ public record class Locale : IComparer<string>, IEqualityComparer<char>
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc cref="TextInfo.ToTitleCase(string)"/>
-    /// </summary>
-    /// <param name="value"></param>
-    /// <returns><inheritdoc/></returns>
     public string ToTitleCase(string value)
     {
         return CultureInfo.TextInfo.ToTitleCase(value);

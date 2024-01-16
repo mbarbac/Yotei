@@ -13,16 +13,10 @@ public class TypeHolderList : IEnumerable<TypeHolder>
     /// </summary>
     public TypeHolderList() { }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override string ToString() => $"Count: {Count}";
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public IEnumerator<TypeHolder> GetEnumerator() => _Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 

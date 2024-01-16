@@ -1,9 +1,7 @@
 ﻿namespace Yotei.Tools;
 
 // ========================================================
-/// <summary>
 /// <inheritdoc cref="DynamicMetaObject"/>
-/// </summary>
 internal class LambdaMetaNode : DynamicMetaObject
 {
     /// <summary>
@@ -24,10 +22,7 @@ internal class LambdaMetaNode : DynamicMetaObject
         LambdaParser.Print(this, $"- New: {this}");
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override string ToString() => $"Meta#{LambdaId}({LambdaNode.ToDebugString()})";
 
     /// <summary>
@@ -52,12 +47,7 @@ internal class LambdaMetaNode : DynamicMetaObject
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="binder"></param>
-    /// <param name="value"></param>
-    /// <returns></returns>
     public override DynamicMetaObject BindSetMember(
         SetMemberBinder binder, DynamicMetaObject value)
     {
@@ -91,13 +81,7 @@ internal class LambdaMetaNode : DynamicMetaObject
         return meta;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="binder"></param>
-    /// <param name="indexes"></param>
-    /// <param name="value"></param>
-    /// <returns></returns>
     public override DynamicMetaObject BindSetIndex(
         SetIndexBinder binder, DynamicMetaObject[] indexes, DynamicMetaObject value)
     {
@@ -132,12 +116,7 @@ internal class LambdaMetaNode : DynamicMetaObject
         return meta;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="binder"></param>
-    /// <param name="arg"></param>
-    /// <returns></returns>
     public override DynamicMetaObject BindBinaryOperation(
         BinaryOperationBinder binder, DynamicMetaObject arg)
     {
@@ -168,11 +147,7 @@ internal class LambdaMetaNode : DynamicMetaObject
         return meta;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="binder"></param>
-    /// <returns></returns>
     public override DynamicMetaObject BindUnaryOperation(UnaryOperationBinder binder)
     {
         var parser = LambdaNode.GetArgument()?.LambdaParser;
@@ -220,11 +195,7 @@ internal class LambdaMetaNode : DynamicMetaObject
         return meta;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="binder"></param>
-    /// <returns></returns>
     public override DynamicMetaObject BindConvert(ConvertBinder binder)
     {
         var parser = LambdaNode.GetArgument()?.LambdaParser;
@@ -298,11 +269,7 @@ internal class LambdaMetaNode : DynamicMetaObject
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc/> DELEGATES OPERATION TO THE MASTER INSTANCE.
-    /// </summary>
-    /// <param name="binder"></param>
-    /// <returns></returns>
     public override DynamicMetaObject BindGetMember(
         GetMemberBinder binder)
     {
@@ -313,12 +280,7 @@ internal class LambdaMetaNode : DynamicMetaObject
         return meta;
     }
 
-    /// <summary>
     /// <inheritdoc/> DELEGATES OPERATION TO THE MASTER INSTANCE.
-    /// </summary>
-    /// <param name="binder"></param>
-    /// <param name="indexes"></param>
-    /// <returns></returns>
     public override DynamicMetaObject BindGetIndex(
         GetIndexBinder binder,
         DynamicMetaObject[] indexes)
@@ -330,12 +292,7 @@ internal class LambdaMetaNode : DynamicMetaObject
         return meta;
     }
 
-    /// <summary>
     /// <inheritdoc/> DELEGATES OPERATION TO THE MASTER INSTANCE.
-    /// </summary>
-    /// <param name="binder"></param>
-    /// <param name="args"></param>
-    /// <returns></returns>
     public override DynamicMetaObject BindInvoke(
         InvokeBinder binder,
         DynamicMetaObject[] args)
@@ -347,12 +304,7 @@ internal class LambdaMetaNode : DynamicMetaObject
         return meta;
     }
 
-    /// <summary>
     /// <inheritdoc/> DELEGATES OPERATION TO THE MASTER INSTANCE.
-    /// </summary>
-    /// <param name="binder"></param>
-    /// <param name="args"></param>
-    /// <returns></returns>
     public override DynamicMetaObject BindInvokeMember(
         InvokeMemberBinder binder,
         DynamicMetaObject[] args)
@@ -366,12 +318,7 @@ internal class LambdaMetaNode : DynamicMetaObject
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc/> OPERATION NOT SUPPORTED.
-    /// </summary>
-    /// <param name="binder"></param>
-    /// <param name="args"></param>
-    /// <returns></returns>
     public override DynamicMetaObject BindCreateInstance(
         CreateInstanceBinder binder,
         DynamicMetaObject[] args)
@@ -384,12 +331,7 @@ internal class LambdaMetaNode : DynamicMetaObject
             .WithData(this);
     }
 
-    /// <summary>
     /// <inheritdoc/> OPERATION NOT SUPPORTED.
-    /// </summary>
-    /// <param name="binder"></param>
-    /// <param name="indexes"></param>
-    /// <returns></returns>
     public override DynamicMetaObject BindDeleteIndex(
         DeleteIndexBinder binder,
         DynamicMetaObject[] indexes)
@@ -402,11 +344,7 @@ internal class LambdaMetaNode : DynamicMetaObject
             .WithData(this);
     }
 
-    /// <summary>
     /// <inheritdoc/> OPERATION NOT SUPPORTED.
-    /// </summary>
-    /// <param name="binder"></param>
-    /// <returns></returns>
     public override DynamicMetaObject BindDeleteMember(
         DeleteMemberBinder binder)
     {

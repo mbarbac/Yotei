@@ -18,16 +18,10 @@ public class LambdaNodeMember : LambdaNodeHosted
         LambdaParser.Print(this, $"- New: {ToDebugString()}");
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns><inheritdoc/></returns>
     public override string ToString() => $"{LambdaHost}.{LambdaName}";
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override LambdaNodeMember Clone() => new(
         LambdaHost.Clone(),
         LambdaName);

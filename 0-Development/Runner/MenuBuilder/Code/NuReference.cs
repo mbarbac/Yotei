@@ -19,10 +19,7 @@ public class NuReference
             .WithData(line);
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns><inheritdoc/></returns>
     public override string ToString() => Line.Value;
 
     /// <summary>

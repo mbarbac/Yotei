@@ -18,17 +18,11 @@ public class LambdaNodeInvoke : LambdaNodeHosted
         LambdaParser.Print(this, $"- New: {ToDebugString()}");
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns><inheritdoc/></returns>
     public override string ToString()
         => $"{LambdaHost}({string.Join(", ", LambdaArguments.Select(x => x.ToString()))})";
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override LambdaNodeInvoke Clone() => new(
         LambdaHost.Clone(),
         LambdaArguments.Select(x => x.Clone()).ToImmutableList());

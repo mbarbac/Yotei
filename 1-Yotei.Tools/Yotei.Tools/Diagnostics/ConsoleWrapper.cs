@@ -54,7 +54,7 @@ public static class ConsoleWrapper
         {
             Debug.Write(message);
 
-            if (message.EndsWith("\n") ||
+            if (message.EndsWith('\n') ||
                 message.EndsWith(Environment.NewLine))
                 DiagnosticsWrapper.DebugAtOrigin = true;
 
@@ -131,7 +131,7 @@ public static class ConsoleWrapper
         {
             Debug.WriteLine(message);
 
-            if (message.EndsWith("\n") ||
+            if (message.EndsWith('\n') ||
                 message.EndsWith(Environment.NewLine))
                 DiagnosticsWrapper.DebugAtOrigin = true;
 

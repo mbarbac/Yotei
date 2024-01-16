@@ -107,10 +107,7 @@ public partial class LambdaParser
         return false;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override string ToString()
     {
         var args = DynamicArguments.Select(x => x.Sketch()).Sketch();

@@ -16,17 +16,11 @@ public abstract class LambdaNode : DynamicObject, ICloneable
         LambdaVersion = Interlocked.Increment(ref _LastLambdaVersion);
     }
 
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
+    /// <inheritdoc cref="ICloneable.Clone"/>
     public abstract LambdaNode Clone();
     object ICloneable.Clone() => Clone();
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override string ToString() => nameof(LambdaNode);
 
     /// <summary>
@@ -139,11 +133,7 @@ public abstract class LambdaNode : DynamicObject, ICloneable
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="expression"></param>
-    /// <returns></returns>
     public override DynamicMetaObject GetMetaObject(Expression expression)
     {
         var master = base.GetMetaObject(expression);
@@ -224,12 +214,7 @@ public abstract class LambdaNode : DynamicObject, ICloneable
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="binder"></param>
-    /// <param name="result"></param>
-    /// <returns></returns>
     public override bool TryGetMember(GetMemberBinder binder, out object? result)
     {
         var parser = GetArgument()?.LambdaParser;
@@ -247,13 +232,7 @@ public abstract class LambdaNode : DynamicObject, ICloneable
         return true;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="binder"></param>
-    /// <param name="indexes"></param>
-    /// <param name="result"></param>
-    /// <returns></returns>
     public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object? result)
     {
         var parser = GetArgument()?.LambdaParser;
@@ -272,13 +251,7 @@ public abstract class LambdaNode : DynamicObject, ICloneable
         return true;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="binder"></param>
-    /// <param name="args"></param>
-    /// <param name="result"></param>
-    /// <returns></returns>
     public override bool TryInvoke(InvokeBinder binder, object?[]? args, out object? result)
     {
         var parser = GetArgument()?.LambdaParser;
@@ -297,13 +270,7 @@ public abstract class LambdaNode : DynamicObject, ICloneable
         return true;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="binder"></param>
-    /// <param name="args"></param>
-    /// <param name="result"></param>
-    /// <returns></returns>
     public override bool TryInvokeMember(
         InvokeMemberBinder binder, object?[]? args, out object? result)
     {

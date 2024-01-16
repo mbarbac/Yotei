@@ -24,10 +24,7 @@ public class Request
             throw new ArgumentException("Cannot initialize an empty instance.");
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns><inheritdoc/></returns>
     public override string ToString()
         => $"({AssemblyName ?? "-"}, {TypeName ?? "-"}, {MethodName ?? "-"})";
 

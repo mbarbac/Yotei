@@ -49,10 +49,7 @@ public readonly struct Either<L, R> : IComparable<Either<L, R>>, IEquatable<Eith
         _IsLeft = false;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override string ToString() => Match(onLeft: x => $"{x}", onRight: x => $"{x}");
 
     /// <summary>
@@ -122,11 +119,7 @@ public readonly struct Either<L, R> : IComparable<Either<L, R>>, IEquatable<Eith
             : Comparer<V>.Default.Compare(x, y);
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="other"></param>
-    /// <returns></returns>
     public int CompareTo(Either<L, R> other) => Compare(this, other);
 
     public static bool operator ==(Either<L, R> x, Either<L, R> y) => Compare(x, y) == 0;
@@ -138,13 +131,10 @@ public readonly struct Either<L, R> : IComparable<Either<L, R>>, IEquatable<Eith
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="other"></param>
-    /// <returns></returns>
     public bool Equals(Either<L, R> other) => Compare(this, other) == 0;
 
+    /// <inheritdoc/>
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
         if (obj is null) return false;
@@ -153,6 +143,7 @@ public readonly struct Either<L, R> : IComparable<Either<L, R>>, IEquatable<Eith
         return Equals(other);
     }
 
+    /// <inheritdoc/>
     public override int GetHashCode() => Match(
         onLeft: z => z is null ? HashCode.Combine(z) : z.GetHashCode(),
         onRight: z => z is null ? HashCode.Combine(z) : z.GetHashCode());

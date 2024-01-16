@@ -6,14 +6,10 @@ namespace Runner.Builder;
 // ========================================================
 public class BuildOnePackage : MenuEntry
 {
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public override string Header() => "Build One Package";
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public override void Execute()
     {
         string? root = null;

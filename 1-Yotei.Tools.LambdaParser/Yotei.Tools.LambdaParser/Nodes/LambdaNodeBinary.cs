@@ -21,16 +21,10 @@ public class LambdaNodeBinary : LambdaNode
         LambdaParser.Print(this, $"- New: {ToDebugString()}");
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override string ToString() => $"({LambdaLeft} {LambdaOperation} {LambdaRight})";
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override LambdaNodeBinary Clone() => new(
         LambdaLeft.Clone(),
         LambdaOperation,

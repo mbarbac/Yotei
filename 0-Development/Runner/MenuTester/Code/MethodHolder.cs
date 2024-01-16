@@ -20,10 +20,7 @@ public class MethodHolder
         IsEnforced = HasEnforcedAttribute;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns><inheritdoc/></returns>
     public override string ToString() => Name;
 
     /// <summary>

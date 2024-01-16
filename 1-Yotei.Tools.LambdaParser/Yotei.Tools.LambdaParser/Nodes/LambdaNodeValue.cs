@@ -22,26 +22,17 @@ public class LambdaNodeValue : LambdaNode
         LambdaParser.Print(this, $"- New: {ToDebugString()}");
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override string ToString() => LambdaValue switch
     {
         null => "'NULL'",
         _ => $"'{LambdaValue.Sketch()}'"
     };
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override LambdaNodeValue Clone() => new(LambdaValue.TryClone());
 
-    /// <summary>
-    /// Returns the dynamic argument ultimately associated with this instance, or null if any.
-    /// </summary>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public override LambdaNodeArgument? GetArgument() => null;
 
     /// <summary>

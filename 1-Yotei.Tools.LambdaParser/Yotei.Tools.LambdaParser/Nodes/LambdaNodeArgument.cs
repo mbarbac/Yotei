@@ -17,22 +17,13 @@ public class LambdaNodeArgument : LambdaNode
         LambdaParser.Print(this, $"- New: {ToDebugString()}");
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override string ToString() => LambdaName;
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override LambdaNodeArgument Clone() => new(LambdaName);
 
-    /// <summary>
-    /// Returns the dynamic argument ultimately associated with this instance, or null if any.
-    /// </summary>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public override LambdaNodeArgument? GetArgument() => this;
 
     /// <summary>

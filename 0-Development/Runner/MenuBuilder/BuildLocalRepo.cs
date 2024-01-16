@@ -6,14 +6,10 @@ namespace Runner.Builder;
 // ========================================================
 public class BuildLocalRepo : MenuEntry
 {
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public override string Header() => "ReBuild Local Repo";
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public override void Execute()
     {
         WriteLine(true);
@@ -54,7 +50,7 @@ public class BuildLocalRepo : MenuEntry
     /// </summary>
     /// <param name="projects"></param>
     /// <returns></returns>
-    List<Project> ReOrder(IEnumerable<Project> packables)
+    static List<Project> ReOrder(IEnumerable<Project> packables)
     {
         var list = new List<Project>(); foreach (var packable in packables)
         {

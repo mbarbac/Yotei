@@ -19,24 +19,15 @@ public class LambdaNodeUnary : LambdaNode
         LambdaParser.Print(this, $"- New: {ToDebugString()}");
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override string ToString() => $"({LambdaOperation} {LambdaTarget})";
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override LambdaNodeUnary Clone() => new(
         LambdaOperation,
         LambdaTarget.Clone());
 
-    /// <summary>
-    /// Returns the dynamic argument ultimately associated with this instance, or null if any.
-    /// </summary>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public override LambdaNodeArgument? GetArgument() => LambdaTarget.GetArgument();
 
     /// <summary>

@@ -138,11 +138,7 @@ public record SemanticVersion : IComparable<SemanticVersion>, IEquatable<Semanti
             .WithData(value);
     }
 
-    /// <summary>
-    /// <inheritdoc/> This emthod always emit the major and minor versions, even if they are
-    /// cero.
-    /// </summary>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public override string ToString()
     {
         var str = $"{Major}.{Minor}.{Patch}";
@@ -278,11 +274,7 @@ public record SemanticVersion : IComparable<SemanticVersion>, IEquatable<Semanti
         return x.PreRelease.CompareTo(y.PreRelease);
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="other"></param>
-    /// <returns></returns>
     public int CompareTo(SemanticVersion? other) => Compare(this, other);
 
     public static bool operator >(SemanticVersion? x, SemanticVersion? y) => Compare(x, y) > 0;
@@ -290,17 +282,9 @@ public record SemanticVersion : IComparable<SemanticVersion>, IEquatable<Semanti
     public static bool operator >=(SemanticVersion? x, SemanticVersion? y) => Compare(x, y) >= 0;
     public static bool operator <=(SemanticVersion? x, SemanticVersion? y) => Compare(x, y) <= 0;
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="other"></param>
-    /// <returns></returns>
     public virtual bool Equals(SemanticVersion? other) => Compare(this, other) == 0;
 
-    /// <summary>
-    /// <inheritdoc/> This method only takes into consideration the version value carried by
-    /// this instance, and not its metadata one.
-    /// </summary>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public override int GetHashCode() => HashCode.Combine(Major, Minor, Patch, PreRelease);
 }
