@@ -6,7 +6,7 @@ namespace Yotei.ORM.Tools.Code;
 /// <inheritdoc cref="ICoreList{TItem}"/>
 /// </summary>
 /// <typeparam name="TItem"></typeparam>
-[DebuggerDisplay("{ToDebugString(DebugCount)}")]
+[DebuggerDisplay("{ToDebugString(6)}")]
 [Cloneable]
 public partial class CoreList<TItem> : ICoreList<TItem>
 {
@@ -33,13 +33,7 @@ public partial class CoreList<TItem> : ICoreList<TItem>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected CoreList(CoreList<TItem> source)
-    {
-        if (source.Count == 0) return;
-
-        Items.Capacity = source.Count;
-        AddRange(source, false);
-    }
+    protected CoreList(CoreList<TItem> source) => AddRange(source, false);
 
     /// <summary>
     /// <inheritdoc/>
@@ -54,12 +48,17 @@ public partial class CoreList<TItem> : ICoreList<TItem>
     /// <returns></returns>
     public override string ToString() => $"Count: {Count}";
 
-    protected virtual string ToDebugString(int num) => Count == 0 ? "0:[]" : (Count <= num
+    /// <summary>
+    /// Returns a string with a debug representation of this instance.
+    /// </summary>
+    /// <param name="num"></param>
+    /// <returns></returns>
+    public virtual string ToDebugString(int num)
+        => Count == 0 ? "0:[]" : (Count <= num
         ? $"[{string.Join(", ", Items.Select(ItemToString))}]"
         : $"[{string.Join(", ", Items.Take(num).Select(ItemToString))}, ...]");
 
     protected virtual string ItemToString(TItem item) => item?.ToString() ?? string.Empty;
-    protected virtual int DebugCount => 6;
 
     // ----------------------------------------------------
 

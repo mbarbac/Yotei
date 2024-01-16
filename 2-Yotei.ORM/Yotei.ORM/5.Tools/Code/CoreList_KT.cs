@@ -6,6 +6,7 @@
 /// </summary>
 /// <typeparam name="TKey"></typeparam>
 /// <typeparam name="TItem"></typeparam>
+[DebuggerDisplay("{ToDebugString(6)}")]
 [Cloneable]
 public partial class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
 {
@@ -32,13 +33,7 @@ public partial class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected CoreList(CoreList<TKey, TItem> source)
-    {
-        if (source.Count == 0) return;
-
-        Items.Capacity = source.Count;
-        AddRange(source, false);
-    }
+    protected CoreList(CoreList<TKey, TItem> source) => AddRange(source, false);
 
     /// <summary>
     /// <inheritdoc/>
@@ -53,12 +48,17 @@ public partial class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     /// <returns></returns>
     public override string ToString() => $"Count: {Count}";
 
-    protected virtual string ToDebugString(int num) => Count == 0 ? "0:[]" : (Count <= num
+    /// <summary>
+    /// Returns a string with a debug representation of this instance.
+    /// </summary>
+    /// <param name="num"></param>
+    /// <returns></returns>
+    public virtual string ToDebugString(int num)
+        => Count == 0 ? "0:[]" : (Count <= num
         ? $"[{string.Join(", ", Items.Select(ItemToString))}]"
         : $"[{string.Join(", ", Items.Take(num).Select(ItemToString))}, ...]");
 
     protected virtual string ItemToString(TItem item) => item?.ToString() ?? string.Empty;
-    protected virtual int DebugCount => 6;
 
     // ----------------------------------------------------
 
