@@ -97,14 +97,6 @@ public partial interface ICoreList<TKey, TItem> : IList<TItem>, IList, ICollecti
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns the given number of elements starting from the given index.
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="count"></param>
-    /// <returns></returns>
-    List<TItem> GetRange(int index, int count);
-
-    /// <summary>
     /// Replaces the element at the given index with the new given one. Returns the number of
     /// changes made.
     /// </summary>

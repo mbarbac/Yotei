@@ -179,21 +179,6 @@ public static partial class Test_CoreList_KT
 
     //[Enforced]
     [Fact]
-    public static void Test_GetRange()
-    {
-        var source = new Chain(false, [xone, xtwo, xthree, xone]);
-
-        var list = source.GetRange(0, 0);
-        Assert.Empty(list);
-
-        list = source.GetRange(1, 2);
-        Assert.Equal(2, list.Count);
-        Assert.Same(xtwo, list[0]);
-        Assert.Same(xthree, list[1]);
-    }
-
-    //[Enforced]
-    [Fact]
     public static void Test_Replace()
     {
         var source = new Chain(false, [xone, xtwo, xthree]);

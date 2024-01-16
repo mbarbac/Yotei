@@ -31,7 +31,7 @@ public partial class CoreList<TItem> : ICoreList<TItem>
     protected CoreList(CoreList<TItem> source) => AddRange(source, false);
 
     /// <inheritdoc/>
-    public IEnumerator<TItem> GetEnumerator() => Items.GetEnumerator();
+    public virtual IEnumerator<TItem> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /// <inheritdoc/>
@@ -149,6 +149,7 @@ public partial class CoreList<TItem> : ICoreList<TItem>
 
     // ----------------------------------------------------
 
+    [Conditional("MEMORY")]
     void TryIncrease()
     {
         if (Items.Count < Items.Capacity) return;
@@ -157,6 +158,7 @@ public partial class CoreList<TItem> : ICoreList<TItem>
         else Items.Capacity += Items.Capacity / 2;
     }
 
+    [Conditional("MEMORY")]
     void TryIncrease(IEnumerable<TItem> range)
     {
         var size = TentativeCount(range);
@@ -169,14 +171,14 @@ public partial class CoreList<TItem> : ICoreList<TItem>
         range is ICollection rg ? rg.Count :
         0;
 
+    [Conditional("MEMORY")]
     void TryDecrease()
     {
         if (Items.Count < 2 && Items.Capacity > 2) Items.Capacity = 2;
         else if (Items.Count < Items.Capacity / 2) Items.Capacity /= 2;
     }
 
-    /// <inheritdoc/>
-    public virtual List<TItem> GetRange(int index, int count) => Items.GetRange(index, count);
+    // ----------------------------------------------------
 
     /// <inheritdoc/>
     public virtual int Replace(int index, TItem item)

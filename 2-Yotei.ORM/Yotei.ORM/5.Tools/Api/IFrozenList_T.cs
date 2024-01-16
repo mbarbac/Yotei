@@ -2,37 +2,50 @@
 
 // ========================================================
 /// <summary>
-/// Represents a list-alike collection of elements, with customizable behavior.
+/// Represents an immutable list-alike collection of elements, with customizable behavior.
 /// </summary>
 /// <typeparam name="TItem"></typeparam>
-[Cloneable]
-public partial interface ICoreList<TItem> : IList<TItem>, IList, ICollection<TItem>, ICollection
+/// <remarks>
+/// This type shall be used as a template and not for inheritance purposes.
+/// </remarks>
+public interface IFrozenList<TItem> : IEnumerable<TItem>
 {
+    /// <summary>
+    /// Returns a builder of the appropriate type, with the elements of this instance.
+    /// </summary>
+    /// <returns></returns>
+    ICoreList<TItem> ToBuilder();
+
+    /// <summary>
+    /// The engine this instance is associated with.
+    /// </summary>
+    IEngine Engine { get; }
+
     /// <summary>
     /// Gets the number of elements in this collection.
     /// </summary>
-    new int Count { get; }
+    int Count { get; }
 
     /// <summary>
-    /// Gets or sets the element stored at the given index.
+    /// Gets the element stored at the given index.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    new TItem this[int index] { get; set; }
+    TItem this[int index] { get; }
 
     /// <summary>
     /// Determines if this collection contains the given element.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    new bool Contains(TItem item);
+    bool Contains(TItem item);
 
     /// <summary>
     /// Returns the index of the first ocurrence of the given element, or -1 if not found.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    new int IndexOf(TItem item);
+    int IndexOf(TItem item);
 
     /// <summary>
     /// Returns the index of the last ocurrence of the given element, or -1 if not found.
@@ -93,115 +106,126 @@ public partial interface ICoreList<TItem> : IList<TItem>, IList, ICollection<TIt
     // ----------------------------------------------------
 
     /// <summary>
-    /// Replaces the element at the given index with the new given one. Returns the number of
-    /// changes made.
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    int Replace(int index, TItem item);
-
-    /// <summary>
-    /// Adds to this collection the given element. Returns the number of changes made.
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    new int Add(TItem item);
-
-    /// <summary>
-    /// Adds to this collection the elements from the given range. Returns the number of changes
-    /// made.
-    /// </summary>
-    /// <param name="range"></param>
-    /// <returns></returns>
-    int AddRange(IEnumerable<TItem> range);
-
-    /// <summary>
-    /// Inserts into this collection the given element at the given index. Returns the number of
-    /// changes made.
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    new int Insert(int index, TItem item);
-
-    /// <summary>
-    /// Inserts into this collection the elements from the given range, starting at the given
-    /// index. Returns the number of changes made.
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="range"></param>
-    /// <returns></returns>
-    int InsertRange(int index, IEnumerable<TItem> range);
-
-    /// <summary>
-    /// Removes from this collection the element at the given index. Returns the number of
-    /// changes made.
-    /// </summary>
-    /// <param name="index"></param>
-    /// <returns></returns>
-    new int RemoveAt(int index);
-
-    /// <summary>
-    /// Removes from this collection the given number of elements, starting from the given index.
-    /// Returns the number of changes made.
+    /// Returns a new instance that contains the given number of elements starting from the given
+    /// index. If no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    int RemoveRange(int index, int count);
+    IFrozenList<TItem> GetRange(int index, int count);
 
     /// <summary>
-    /// Removes from this collection the first ocurrence of the given element. Returns the number
-    /// of changes made.
+    /// Returns a new instance with the element at the given index replaced by the new given one.
+    /// If no changes are detected, returns the original instance.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    IFrozenList<TItem> Replace(int index, TItem item);
+
+    /// <summary>
+    /// Returns a new instance with the given element added to it. If no changes are detected,
+    /// returns the original instance.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    new int Remove(TItem item);
+    IFrozenList<TItem> Add(TItem item);
 
     /// <summary>
-    /// Removes from this collection the last ocurrence of the given element. Returns the number
-    /// of changes made.
+    /// Returns a new instance with the elements from the given range add to it. If no changes
+    /// are detected, returns the original instance.
+    /// </summary>
+    /// <param name="range"></param>
+    /// <returns></returns>
+    IFrozenList<TItem> AddRange(IEnumerable<TItem> range);
+
+    /// <summary>
+    /// Returns a new instance with the given element inserted into it at the given index. If no
+    /// changes are detected, returns the original instance.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    IFrozenList<TItem> Insert(int index, TItem item);
+
+    /// <summary>
+    /// Returns a new instance with the elements from the given range inserted into it, starting
+    /// at the given index. If no changes are detected, returns the original instance.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="range"></param>
+    /// <returns></returns>
+    IFrozenList<TItem> InsertRange(int index, IEnumerable<TItem> range);
+
+    /// <summary>
+    /// Returns a new instance with the element at the given index removed from it. If no changes
+    /// are detected, returns the original instance.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <returns></returns>
+    IFrozenList<TItem> RemoveAt(int index);
+
+    /// <summary>
+    /// Returns a new instance with the given number of elements, starting from the given index,
+    /// removed from it. If no changes are detected, returns the original instance.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="count"></param>
+    /// <returns></returns>
+    IFrozenList<TItem> RemoveRange(int index, int count);
+
+    /// <summary>
+    /// Returns a new instance with the first ocurrence of the given element removed from it. If
+    /// no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    int RemoveLast(TItem item);
+    IFrozenList<TItem> Remove(TItem item);
 
     /// <summary>
-    /// Removes from this collection all the ocurrences of the given element. Returns the number
-    /// of changes made.
+    /// Returns a new instance with the last ocurrence of the given element removed from it. If
+    /// no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    int RemoveAll(TItem item);
+    IFrozenList<TItem> RemoveLast(TItem item);
 
     /// <summary>
-    /// Removes from this collection the first ocurrence of an element that matches the given
-    /// predicate. Returns the number of changes made.
+    /// Returns a new instance with all ocurrences of the given element removed from it. If
+    /// no changes are detected, returns the original instance.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    IFrozenList<TItem> RemoveAll(TItem item);
+
+    /// <summary>
+    /// Returns a new instance with the first ocurrence of an element that matches the given
+    /// predicate removed from it. If no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int Remove(Predicate<TItem> predicate);
+    IFrozenList<TItem> Remove(Predicate<TItem> predicate);
 
     /// <summary>
-    /// Removes from this collection the last ocurrence of an element that matches the given
-    /// predicate. Returns the number of changes made.
+    /// Returns a new instance with the last ocurrence of an element that matches the given
+    /// predicate removed from it. If no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int RemoveLast(Predicate<TItem> predicate);
+    IFrozenList<TItem> RemoveLast(Predicate<TItem> predicate);
 
     /// <summary>
-    /// Removes from this collection all the ocurrences of elements that match the given
-    /// predicate. Returns the number of changes made.
+    /// Returns a new instance with all the ocurrences of elements that match the given predicate
+    /// removed from it. If no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    int RemoveAll(Predicate<TItem> predicate);
+    IFrozenList<TItem> RemoveAll(Predicate<TItem> predicate);
 
     /// <summary>
-    /// Clears all the elements in this collection. Returns the number of changes made.
+    /// Returns a new instance with all the original elements removed. If no changes are detected,
+    /// returns the original instance.
     /// </summary>
     /// <returns></returns>
-    new int Clear();
+    IFrozenList<TItem> Clear();
 }
