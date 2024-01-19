@@ -25,16 +25,25 @@ public class LambdaNodeTernary : LambdaNode
         LambdaParser.Print(this, $"- New: {ToDebugString()}");
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public override string ToString() => $"({LambdaLeft} ? {LambdaMiddle} : {LambdaRight})";
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public override LambdaNodeTernary Clone() => new(
         LambdaLeft.Clone(),
         LambdaMiddle.Clone(),
         LambdaRight.Clone());
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public override LambdaNodeArgument? GetArgument() =>
         LambdaLeft.GetArgument() ??
         LambdaMiddle.GetArgument() ??

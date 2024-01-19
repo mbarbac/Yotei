@@ -20,7 +20,10 @@ public class TypeHolder
         IsEnforced = HasEnforcedAttribute;
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public override string ToString() => Type.Name;
 
     /// <summary>

@@ -248,7 +248,7 @@ public static class Test_ParameterList
         Assert.Same(xJames, target[1]);
         Assert.Same(xBond, target[2]);
         Assert.Same(item, target[3]);
-        Assert.Equal("#3", item.Name);
+        Assert.Equal("#3", item!.Name);
         Assert.Equal(99, item.Value);
         Assert.Equal(3, source.Count);
     }

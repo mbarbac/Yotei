@@ -42,27 +42,20 @@ public partial class ParameterListBuilder : CoreList<TKey, TItem>
 
     // ----------------------------------------------------
 
-    /// <inheritdoc/>
     protected override TItem ValidateItem(TItem item) => item.ThrowWhenNull();
 
-    /// <inheritdoc/>
     protected override TKey GetKey(TItem item) => item.ThrowWhenNull().Name;
 
-    /// <inheritdoc/>
     protected override TKey ValidateKey(TKey key) => key.NotNullNotEmpty();
 
-    /// <inheritdoc/>
     protected override bool CompareKeys(TKey source, TKey item)
         => string.Compare(source, item, !Engine.CaseSensitiveNames) == 0;
 
-    /// <inheritdoc/>
     protected override bool SameItem(TItem source, TItem item)
         => ReferenceEquals(source, item);
 
-    /// <inheritdoc/>
     protected override List<int> GetDuplicates(TKey key) => base.GetDuplicates(key);
 
-    /// <inheritdoc/>
     protected override bool AcceptDuplicate(TItem source, TItem item)
         => ReferenceEquals(source, item)
         ? true

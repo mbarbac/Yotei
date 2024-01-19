@@ -4,7 +4,9 @@ using TKey = string;
 namespace Yotei.ORM.Code;
 
 // ========================================================
+/// <summary>
 /// <inheritdoc cref="IIdentifier"/>
+/// </summary>
 [Cloneable]
 public sealed partial class Identifier : FrozenList<TKey?, TItem>, IIdentifier
 {
@@ -46,22 +48,33 @@ public sealed partial class Identifier : FrozenList<TKey?, TItem>, IIdentifier
     /// <param name="source"></param>
     Identifier(Identifier source) : this(source.Engine) => Items.AddRange(source);
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public override string ToString() => Value ?? string.Empty;
 
     // ----------------------------------------------------
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
     public IEngine Engine { get; }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
     public string? Value
     {
         get => Items.Value;
         init => Items.Value = value;
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <param name="specs"></param>
+    /// <returns></returns>
     public bool Match(string? specs)
     {
         if ((specs = specs.NullWhenEmpty()) == null) return true;
@@ -95,13 +108,28 @@ public sealed partial class Identifier : FrozenList<TKey?, TItem>, IIdentifier
 
     // ----------------------------------------------------
 
-    /// <inheritdoc/>
     public override IIdentifier GetRange(int index, int count) => (IIdentifier)base.GetRange(index, count);
-
-    /// <inheritdoc/>
     public override IIdentifier Replace(int index, TItem item) => (IIdentifier)base.Replace(index, item);
+    public override IIdentifier Add(TItem item) => (IIdentifier)base.Add(item);
+    public override IIdentifier AddRange(IEnumerable<TItem> range) => (IIdentifier)base.AddRange(range);
+    public override IIdentifier Insert(int index, TItem item) => (IIdentifier)base.Insert(index, item);
+    public override IIdentifier InsertRange(int index, IEnumerable<TItem> range) => (IIdentifier)base.InsertRange(index, range);
+    public override IIdentifier RemoveAt(int index) => (IIdentifier)base.RemoveAt(index);
+    public override IIdentifier RemoveRange(int index, int count) => (IIdentifier)base.RemoveRange(index, count);
+    public override IIdentifier Remove(TKey? key) => (IIdentifier)base.Remove(key);
+    public override IIdentifier RemoveLast(TKey? key) => (IIdentifier)base.RemoveLast(key);
+    public override IIdentifier RemoveAll(TKey? key) => (IIdentifier)base.RemoveAll(key);
+    public override IIdentifier Remove(Predicate<TItem> predicate) => (IIdentifier)base.Remove(predicate);
+    public override IIdentifier RemoveLast(Predicate<TItem> predicate) => (IIdentifier)base.RemoveLast(predicate);
+    public override IIdentifier RemoveAll(Predicate<TItem> predicate) => (IIdentifier)base.RemoveAll(predicate);
+    public override IIdentifier Clear() => (IIdentifier)base.Clear();
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
     public IIdentifier Replace(int index, string? value)
     {
         var clone = Clone();
@@ -109,10 +137,11 @@ public sealed partial class Identifier : FrozenList<TKey?, TItem>, IIdentifier
         return num > 0 ? clone : this;
     }
 
+    /// <summary>
     /// <inheritdoc/>
-    public override IIdentifier Add(TItem item) => (IIdentifier)base.Add(item);
-
-    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
     public IIdentifier Add(string? value)
     {
         var clone = Clone();
@@ -120,10 +149,11 @@ public sealed partial class Identifier : FrozenList<TKey?, TItem>, IIdentifier
         return num > 0 ? clone : this;
     }
 
+    /// <summary>
     /// <inheritdoc/>
-    public override IIdentifier AddRange(IEnumerable<TItem> range) => (IIdentifier)base.AddRange(range);
-
-    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="range"></param>
+    /// <returns></returns>
     public IIdentifier AddRange(IEnumerable<string?> range)
     {
         var clone = Clone();
@@ -131,10 +161,12 @@ public sealed partial class Identifier : FrozenList<TKey?, TItem>, IIdentifier
         return num > 0 ? clone : this;
     }
 
+    /// <summary>
     /// <inheritdoc/>
-    public override IIdentifier Insert(int index, TItem item) => (IIdentifier)base.Insert(index, item);
-
-    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
     public IIdentifier Insert(int index, string? value)
     {
         var clone = Clone();
@@ -142,41 +174,16 @@ public sealed partial class Identifier : FrozenList<TKey?, TItem>, IIdentifier
         return num > 0 ? clone : this;
     }
 
+    /// <summary>
     /// <inheritdoc/>
-    public override IIdentifier InsertRange(int index, IEnumerable<TItem> range) => (IIdentifier)base.InsertRange(index, range);
-
-    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="range"></param>
+    /// <returns></returns>
     public IIdentifier InsertRange(int index, IEnumerable<string?> range)
     {
         var clone = Clone();
         var num = clone.Items.InsertRange(index, range);
         return num > 0 ? clone : this;
     }
-
-    /// <inheritdoc/>
-    public override IIdentifier RemoveAt(int index) => (IIdentifier)base.RemoveAt(index);
-
-    /// <inheritdoc/>
-    public override IIdentifier RemoveRange(int index, int count) => (IIdentifier)base.RemoveRange(index, count);
-
-    /// <inheritdoc/>
-    public override IIdentifier Remove(TKey? key) => (IIdentifier)base.Remove(key);
-
-    /// <inheritdoc/>
-    public override IIdentifier RemoveLast(TKey? key) => (IIdentifier)base.RemoveLast(key);
-
-    /// <inheritdoc/>
-    public override IIdentifier RemoveAll(TKey? key) => (IIdentifier)base.RemoveAll(key);
-
-    /// <inheritdoc/>
-    public override IIdentifier Remove(Predicate<TItem> predicate) => (IIdentifier)base.Remove(predicate);
-
-    /// <inheritdoc/>
-    public override IIdentifier RemoveLast(Predicate<TItem> predicate) => (IIdentifier)base.RemoveLast(predicate);
-
-    /// <inheritdoc/>
-    public override IIdentifier RemoveAll(Predicate<TItem> predicate) => (IIdentifier)base.RemoveAll(predicate);
-
-    /// <inheritdoc/>
-    public override IIdentifier Clear() => (IIdentifier)base.Clear();
 }

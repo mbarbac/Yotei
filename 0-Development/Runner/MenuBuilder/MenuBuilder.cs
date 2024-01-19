@@ -6,10 +6,15 @@ namespace Runner.Builder;
 // ========================================================
 public class MenuBuilder : MenuEntry
 {
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public override string Header() => "Build Packages";
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
     public override void Execute()
     {
         var done = -1; do

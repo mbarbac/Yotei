@@ -1,7 +1,9 @@
 ﻿namespace Yotei.ORM.Code;
 
 // ========================================================
+/// <summary>
 /// <inheritdoc cref="IParameter"/>
+/// </summary>
 public sealed class Parameter : IParameter
 {
     /// <summary>
@@ -15,12 +17,19 @@ public sealed class Parameter : IParameter
         Value = value;
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public override string ToString() => $"{Name}='{Value.Sketch()}'";
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
     public string Name { get; private set; }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
     public object? Value { get; private set; }
 }

@@ -12,7 +12,10 @@ public class ProjectLine
     /// <param name="value"></param>
     public ProjectLine(string value) => Value = value;
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public override string ToString() => Value.Trim();
 
     /// <summary>

@@ -38,7 +38,10 @@ public class LambdaNodeMethod : LambdaNodeHosted
         LambdaParser.Print(this, $"- New: {ToDebugString()}");
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public override string ToString()
     {
         var sb = new StringBuilder();
@@ -57,7 +60,10 @@ public class LambdaNodeMethod : LambdaNodeHosted
         return sb.ToString();
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public override LambdaNodeMethod Clone()
     {
         if (LambdaTypeArguments.Count == 0)

@@ -13,10 +13,16 @@ public class AssemblyHolderList : IEnumerable<AssemblyHolder>
     /// </summary>
     public AssemblyHolderList() { }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public override string ToString() => $"Count: {Count}";
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public IEnumerator<AssemblyHolder> GetEnumerator() => _Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 

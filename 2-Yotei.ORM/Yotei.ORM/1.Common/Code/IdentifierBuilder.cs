@@ -40,12 +40,14 @@ public partial class IdentifierBuilder : CoreList<TKey?, TItem>
         : this(source.Engine)
         => AddRange(source);
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public override string ToString() => string.Join('.', this.Select(x => x.Value));
 
     // ----------------------------------------------------
 
-    /// <inheritdoc/>
     protected override TItem ValidateItem(TItem item)
     {
         item.ThrowWhenNull();
@@ -56,25 +58,19 @@ public partial class IdentifierBuilder : CoreList<TKey?, TItem>
         return item;
     }
 
-    /// <inheritdoc/>
     protected override TKey? GetKey(TItem item) => item.ThrowWhenNull().UnwrappedValue;
 
-    /// <inheritdoc/>
     protected override TKey? ValidateKey(
         TKey? key) => new IdentifierPart(Engine, key).UnwrappedValue;
 
-    /// <inheritdoc/>
     protected override bool CompareKeys(TKey? source, TKey? item)
         => string.Compare(source, item, !Engine.CaseSensitiveNames) == 0;
 
-    /// <inheritdoc/>
     protected override bool SameItem(TItem source, TItem item)
         => ReferenceEquals(source, item);
 
-    /// <inheritdoc/>
     protected override List<int> GetDuplicates(TKey? key) => [];
 
-    /// <inheritdoc/>
     protected override bool AcceptDuplicate(TItem source, TItem item) => true;
 
     /// <summary>
@@ -186,18 +182,23 @@ public partial class IdentifierBuilder : CoreList<TKey?, TItem>
 
     // ----------------------------------------------------
 
-    /// <inheritdoc/>
+    /// <inheritdoc cref="CoreList{TItem}.Contains(TItem)"/>
     public new bool Contains(TKey? key) => base.Contains(key);
 
-    /// <inheritdoc/>
+    /// <inheritdoc cref="CoreList{TItem}.IndexOf(TItem)"/>
     public new int IndexOf(TKey key) => base.IndexOf(key);
 
-    /// <inheritdoc/>
+    /// <inheritdoc cref="CoreList{TItem}.LastIndexOf(TItem)"/>
     public new int LastIndexOf(TKey key) => base.LastIndexOf(key);
 
     // ----------------------------------------------------
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="item"></param>
+    /// <returns></returns>
     public override int Replace(int index, TItem item)
     {
         var num = base.Replace(index, item);
@@ -234,7 +235,11 @@ public partial class IdentifierBuilder : CoreList<TKey?, TItem>
         return num + 1;
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
     public override int Add(TItem item)
     {
         if (Count == 0 && item.Value == null) return 0;
@@ -260,7 +265,11 @@ public partial class IdentifierBuilder : CoreList<TKey?, TItem>
         return Add(parts[0]);
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <param name="range"></param>
+    /// <returns></returns>
     public override int AddRange(IEnumerable<TItem> range)
     {
         var num = base.AddRange(range);
@@ -289,7 +298,12 @@ public partial class IdentifierBuilder : CoreList<TKey?, TItem>
         return num;
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="item"></param>
+    /// <returns></returns>
     public override int Insert(int index, TItem item)
     {
         if (index == 0 && item.Value == null) return 0;
@@ -316,7 +330,12 @@ public partial class IdentifierBuilder : CoreList<TKey?, TItem>
         return Insert(index, parts[0]);
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="range"></param>
+    /// <returns></returns>
     public override int InsertRange(int index, IEnumerable<TItem> range)
     {
         var num = base.InsertRange(index, range);
@@ -347,7 +366,11 @@ public partial class IdentifierBuilder : CoreList<TKey?, TItem>
         return num;
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <param name="index"></param>
+    /// <returns></returns>
     public override int RemoveAt(int index)
     {
         var num = base.RemoveAt(index);
@@ -355,7 +378,12 @@ public partial class IdentifierBuilder : CoreList<TKey?, TItem>
         return num;
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="count"></param>
+    /// <returns></returns>
     public override int RemoveRange(int index, int count)
     {
         var num = base.RemoveRange(index, count);
@@ -363,7 +391,11 @@ public partial class IdentifierBuilder : CoreList<TKey?, TItem>
         return num;
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
     public override int Remove(TKey? key)
     {
         var num = base.Remove(key);
@@ -371,7 +403,11 @@ public partial class IdentifierBuilder : CoreList<TKey?, TItem>
         return num;
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
     public override int RemoveLast(TKey? key)
     {
         var num = base.RemoveLast(key);
@@ -379,7 +415,11 @@ public partial class IdentifierBuilder : CoreList<TKey?, TItem>
         return num;
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
     public override int RemoveAll(TKey? key)
     {
         var num = base.RemoveAll(key);
@@ -387,7 +427,11 @@ public partial class IdentifierBuilder : CoreList<TKey?, TItem>
         return num;
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
     public override int Remove(Predicate<TItem> predicate)
     {
         var num = base.Remove(predicate);
@@ -395,14 +439,23 @@ public partial class IdentifierBuilder : CoreList<TKey?, TItem>
         return num;
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
     public override int RemoveLast(Predicate<TItem> predicate)
     {
         var num = base.RemoveLast(predicate);
         Reduce();
         return num;
     }
+    
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
     public override int RemoveAll(Predicate<TItem> predicate)
     {
         var num = base.RemoveAll(predicate);
@@ -410,7 +463,10 @@ public partial class IdentifierBuilder : CoreList<TKey?, TItem>
         return num;
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public override int Clear()
     {
         var num = base.Clear();

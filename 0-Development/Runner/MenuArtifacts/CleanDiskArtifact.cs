@@ -6,10 +6,15 @@ namespace Runner.Artifacts;
 // ========================================================
 public class CleanDiskArtifacts : MenuEntry
 {
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public override string Header() => "Clean Disk Artifacts";
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
     public override void Execute()
     {
         WriteLine(true);

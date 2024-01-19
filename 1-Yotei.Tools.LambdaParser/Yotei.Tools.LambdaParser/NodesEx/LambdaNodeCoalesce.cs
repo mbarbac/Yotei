@@ -23,15 +23,24 @@ public class LambdaNodeCoalesce : LambdaNode
         LambdaParser.Print(this, $"- New: {ToDebugString()}");
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public override string ToString() => $"({LambdaLeft} ?? {LambdaRight})";
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public override LambdaNodeCoalesce Clone() => new(
         LambdaLeft.Clone(),
         LambdaRight.Clone());
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public override LambdaNodeArgument? GetArgument() =>
         LambdaLeft.GetArgument() ??
         LambdaRight.GetArgument();

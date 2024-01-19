@@ -28,7 +28,10 @@ public record SemanticRelease : IComparable<SemanticRelease>, IEquatable<Semanti
         if (source.Length > 0) Value = source;
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public override string ToString()
     {
         var value = Value.Length == 0 ? string.Empty : $"{Value}";
@@ -265,7 +268,11 @@ public record SemanticRelease : IComparable<SemanticRelease>, IEquatable<Semanti
         return string.Compare(xpart, ypart);
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
     public int CompareTo(SemanticRelease? other) => Compare(this, other);
 
     public static bool operator >(SemanticRelease? x, SemanticRelease? y) => Compare(x, y) > 0;
@@ -273,9 +280,16 @@ public record SemanticRelease : IComparable<SemanticRelease>, IEquatable<Semanti
     public static bool operator >=(SemanticRelease? x, SemanticRelease? y) => Compare(x, y) >= 0;
     public static bool operator <=(SemanticRelease? x, SemanticRelease? y) => Compare(x, y) <= 0;
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
     public virtual bool Equals(SemanticRelease? other) => Compare(this, other) == 0;
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public override int GetHashCode() => Value.GetHashCode();
 }

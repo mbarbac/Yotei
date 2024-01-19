@@ -19,15 +19,24 @@ public class LambdaNodeSetter : LambdaNode
         LambdaParser.Print(this, $"- New: {ToDebugString()}");
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public override string ToString() => $"({LambdaTarget} = {LambdaValue})";
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public override LambdaNodeSetter Clone() => new(
         LambdaTarget.Clone(),
         LambdaValue.Clone());
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public override LambdaNodeArgument? GetArgument() =>
         LambdaTarget.GetArgument() ??
         LambdaValue.GetArgument();

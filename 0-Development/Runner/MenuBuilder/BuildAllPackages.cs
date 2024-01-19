@@ -6,10 +6,15 @@ namespace Runner.Builder;
 // ========================================================
 public class BuildAllPackages : MenuEntry
 {
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public override string Header() => "Build All Packages";
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
     public override void Execute()
     {
         WriteLine(true);

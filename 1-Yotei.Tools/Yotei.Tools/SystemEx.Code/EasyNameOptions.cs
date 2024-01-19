@@ -16,7 +16,10 @@ public record EasyNameOptions
     /// </summary>
     public EasyNameOptions() { }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public override string ToString()
     {
         var sb = new StringBuilder();

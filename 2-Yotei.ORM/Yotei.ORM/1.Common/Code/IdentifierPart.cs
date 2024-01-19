@@ -1,7 +1,9 @@
 ﻿namespace Yotei.ORM.Code;
 
 // ========================================================
+/// <summary>
 /// <inheritdoc cref="IIdentifierPart"/>
+/// </summary>
 public sealed class IdentifierPart : IIdentifierPart
 {
     /// <summary>
@@ -42,17 +44,26 @@ public sealed class IdentifierPart : IIdentifierPart
             : UnwrappedValue;
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public override string ToString() => Value ?? string.Empty;
 
     // ----------------------------------------------------
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
     public IEngine Engine { get; }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
     public string? Value { get; private set; }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
     public string? UnwrappedValue { get; private set; }
 }

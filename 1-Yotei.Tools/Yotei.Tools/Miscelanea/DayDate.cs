@@ -93,7 +93,10 @@ public sealed record class DayDate : IComparable<DayDate>, IEquatable<DayDate>
 
     // ----------------------------------------------------
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public override string ToString() => $"{Year:0000}-{Month:00}-{Day:00}";
 
     /// <summary>
@@ -348,7 +351,11 @@ public sealed record class DayDate : IComparable<DayDate>, IEquatable<DayDate>
         return 0;
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
     public int CompareTo(DayDate? other) => Compare(this, other);
 
     public static bool operator >(DayDate? x, DayDate? y) => Compare(x, y) > 0;
@@ -356,9 +363,16 @@ public sealed record class DayDate : IComparable<DayDate>, IEquatable<DayDate>
     public static bool operator >=(DayDate? x, DayDate? y) => Compare(x, y) >= 0;
     public static bool operator <=(DayDate? x, DayDate? y) => Compare(x, y) <= 0;
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
     public bool Equals(DayDate? other) => Compare(this, other) == 0;
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
     public override int GetHashCode() => HashCode.Combine(Year, Month, Day);
 }
