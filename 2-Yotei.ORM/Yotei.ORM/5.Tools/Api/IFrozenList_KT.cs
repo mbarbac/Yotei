@@ -3,25 +3,17 @@
 // ========================================================
 /// <summary>
 /// Represents an immutable list-alike collection of elements, identified by their respective
-/// keys, with customizable behavior.
+/// keys, with customizable behvior.
 /// </summary>
 /// <typeparam name="TKey"></typeparam>
 /// <typeparam name="TItem"></typeparam>
-/// <remarks>
-/// This type shall be used as a template and not for inheritance purposes.
-/// </remarks>
 public interface IFrozenList<TKey, TItem> : IEnumerable<TItem>
 {
     /// <summary>
-    /// Returns a builder of the appropriate type, with the elements of this instance.
+    /// Returns a builder collection of the appropriate type with the elements of this instance.
     /// </summary>
     /// <returns></returns>
     ICoreList<TKey, TItem> ToBuilder();
-
-    /// <summary>
-    /// The engine this instance is associated with.
-    /// </summary>
-    IEngine Engine { get; }
 
     /// <summary>
     /// Gets the number of elements in this collection.

@@ -22,17 +22,6 @@ public static class Test_Identifier
 
     //[Enforced]
     [Fact]
-    public static void Test_Create_Single()
-    {
-        var engine = new FakeEngine();
-        var items = new Identifier(engine, new IdentifierPart(engine, "one"));
-
-        Assert.Single(items);
-        Assert.Equal("[one]", items.Value);
-    }
-
-    //[Enforced]
-    [Fact]
     public static void Test_Create_Single_Value()
     {
         var engine = new FakeEngine();
@@ -221,6 +210,28 @@ public static class Test_Identifier
         Assert.NotSame(source, target);
         Assert.Equal(source.Count, target.Count);
         Assert.Equal(source.Value, target.Value);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Builder()
+    {
+        var engine = new FakeEngine();
+        var items = new Identifier(engine, "one.two.three");
+
+        var builder = items.ToBuilder();
+        Assert.Equal(3, builder.Count);
+        Assert.Equal("one", builder[0].UnwrappedValue);
+        Assert.Equal("two", builder[1].UnwrappedValue);
+        Assert.Equal("three", builder[2].UnwrappedValue);
+
+        var num = builder.RemoveAll(x => x.Value!.Contains('e'));
+        Assert.Equal(2, num);
+        Assert.Equal("two", builder[0].UnwrappedValue);
+
+        items = new Identifier(engine, builder);
+        Assert.Equal(1, items.Count);
+        Assert.Equal("two", items[0].UnwrappedValue);
     }
 
     //[Enforced]

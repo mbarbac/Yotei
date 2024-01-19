@@ -2,59 +2,37 @@
 
 // ========================================================
 /// <inheritdoc cref="IFrozenList{TItem}"/>
+[DebuggerDisplay("{Items.ToDebugString(6)}")]
 [Cloneable]
-public partial class FrozenList<TItem> : IFrozenList<TItem>
+public abstract partial class FrozenList<TItem> : IFrozenList<TItem>
 {
     /// <summary>
-    /// The builder that maintains the items of this instance.
+    /// The repository of elements of this instance.
     /// </summary>
-    protected CoreList<TItem> Items { get; }
-
-    /// <summary>
-    /// Invoked to create a new builder of the appropriate type.
-    /// </summary>
-    /// <param name="engine"></param>
-    /// <returns></returns>
-    protected virtual CoreList<TItem> CreateBuilder(IEngine engine) => new();
-
-    /// <inheritdoc/>
-    public virtual CoreList<TItem> ToBuilder() => Items.Clone();
-    ICoreList<TItem> IFrozenList<TItem>.ToBuilder() => ToBuilder();
-
-    // ----------------------------------------------------
+    protected abstract ICoreList<TItem> Items { get; }
 
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    /// <param name="engine"></param>
-    public FrozenList(IEngine engine)
-    {
-        Engine = engine.ThrowWhenNull();
-        Items = CreateBuilder(engine);
-    }
+    public FrozenList() { }
 
     /// <summary>
     /// Initializes a new instance with the given element.
     /// </summary>
-    /// <param name="engine"></param>
     /// <param name="item"></param>
-    public FrozenList(IEngine engine, TItem item) : this(engine) => Items.Add(item);
+    public FrozenList(TItem item) => Items.Add(item);
 
     /// <summary>
-    /// Initializes a new instance with the elements of the given range.
+    /// Initializes a new instance with the elements from the given range.
     /// </summary>
-    /// <param name="engine"></param>
     /// <param name="range"></param>
-    public FrozenList(
-        IEngine engine, IEnumerable<TItem> range) : this(engine) => Items.AddRange(range);
+    public FrozenList(IEnumerable<TItem> range) => Items.AddRange(range);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected FrozenList(FrozenList<TItem> source)
-        : this(source.Engine)
-        => Items.AddRange(source);
+    protected FrozenList(FrozenList<TItem> source) => Items.AddRange(source);
 
     /// <inheritdoc/>
     public IEnumerator<TItem> GetEnumerator() => Items.GetEnumerator();
@@ -66,7 +44,7 @@ public partial class FrozenList<TItem> : IFrozenList<TItem>
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public IEngine Engine { get; }
+    public ICoreList<TItem> ToBuilder() => Items.Clone();
 
     /// <inheritdoc/>
     public int Count => Items.Count;

@@ -2,6 +2,7 @@
 
 // ========================================================
 /// <inheritdoc cref="ICoreList{TKey, TItem}"/>
+[DebuggerDisplay("{ToDebugString(6)}")]
 [Cloneable]
 public partial class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
 {
@@ -28,7 +29,7 @@ public partial class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected CoreList(CoreList<TKey, TItem> source) => AddRange(source, false);
+    protected CoreList(CoreList<TKey, TItem> source) => AddRange(source);
 
     /// <inheritdoc/>
     public IEnumerator<TItem> GetEnumerator() => Items.GetEnumerator();
@@ -36,6 +37,13 @@ public partial class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
 
     /// <inheritdoc/>
     public override string ToString() => $"Count: {Count}";
+
+    public string ToDebugString(int count) => Count == 0 ? "0:[]" : (
+        Count < count
+        ? $"{Count}:[{string.Join(", ", this.Select(ItemToString))}]"
+        : $"{Count}:[{string.Join(", ", this.Take(count).Select(ItemToString))}, ...]");
+
+    protected virtual string ItemToString(TItem item) => item?.ToString() ?? "-";
 
     // ----------------------------------------------------
 
@@ -162,37 +170,6 @@ public partial class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
 
     // ----------------------------------------------------
 
-    [Conditional("MEMORY")]
-    void TryIncrease()
-    {
-        if (Items.Count < Items.Capacity) return;
-        else if (Items.Count < 8) Items.Capacity += 4;
-        else if (Items.Count < 24) Items.Capacity += 8;
-        else Items.Capacity += Items.Capacity / 2;
-    }
-
-    [Conditional("MEMORY")]
-    void TryIncrease(IEnumerable<TItem> range)
-    {
-        var size = TentativeCount(range);
-        if (size == 0) return;
-        else if ((Items.Capacity - Items.Count) < size) Items.Capacity += size;
-    }
-
-    static int TentativeCount(IEnumerable<TItem> range) =>
-        range is ICollection<TItem> rt ? rt.Count :
-        range is ICollection rg ? rg.Count :
-        0;
-
-    [Conditional("MEMORY")]
-    void TryDecrease()
-    {
-        if (Items.Count < 2 && Items.Capacity > 2) Items.Capacity = 2;
-        else if (Items.Count < Items.Capacity / 2) Items.Capacity /= 2;
-    }
-
-    // ----------------------------------------------------
-
     /// <inheritdoc/>
     public virtual int Replace(int index, TItem item)
     {
@@ -201,13 +178,12 @@ public partial class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
         var source = Items[index];
         if (SameItem(source, item)) return 0;
 
-        RemoveAt(index, false);
-        return Insert(index, item, false);
+        RemoveAt(index);
+        return Insert(index, item);
     }
 
     /// <inheritdoc/>
-    public virtual int Add(TItem item) => Add(item, true);
-    int Add(TItem item, bool increase)
+    public virtual int Add(TItem item)
     {
         item = ValidateItem(item);
 
@@ -217,7 +193,6 @@ public partial class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
         foreach (var num in nums) if (!AcceptDuplicate(Items[num], item)) valid = false;
         if (!valid) return 0;
 
-        if (increase) TryIncrease();
         Items.Add(item);
         return 1;
     }
@@ -225,23 +200,23 @@ public partial class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     void ICollection<TItem>.Add(TItem item) => Add(item);
 
     /// <inheritdoc/>
-    public virtual int AddRange(IEnumerable<TItem> range) => AddRange(range, true);
-    int AddRange(IEnumerable<TItem> range, bool increase)
+    public virtual int AddRange(IEnumerable<TItem> range)
     {
         range.ThrowWhenNull();
 
-        if (increase) TryIncrease(range);
+        if (range is ICollection irange && irange.Count == 0) return 0;
+        if (range is ICollection<TItem> trange && trange.Count == 0) return 0;
+
         var num = 0; foreach (var item in range)
         {
-            var r = Add(item, !increase);
+            var r = Add(item);
             num += r;
         }
         return num;
     }
 
     /// <inheritdoc/>
-    public virtual int Insert(int index, TItem item) => Insert(index, item, true);
-    int Insert(int index, TItem item, bool increase)
+    public virtual int Insert(int index, TItem item)
     {
         item = ValidateItem(item);
 
@@ -251,7 +226,6 @@ public partial class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
         foreach (var num in nums) if (!AcceptDuplicate(Items[num], item)) valid = false;
         if (!valid) return 0;
 
-        if (increase) TryIncrease();
         Items.Insert(index, item);
         return 1;
     }
@@ -259,15 +233,16 @@ public partial class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     void IList.Insert(int index, object? value) => Insert(index, (TItem)value!);
 
     /// <inheritdoc/>
-    public virtual int InsertRange(int index, IEnumerable<TItem> range) => InsertRange(index, range, true);
-    int InsertRange(int index, IEnumerable<TItem> range, bool increase)
+    public virtual int InsertRange(int index, IEnumerable<TItem> range)
     {
         range.ThrowWhenNull();
 
-        if (increase) TryIncrease(range);
+        if (range is ICollection irange && irange.Count == 0) return 0;
+        if (range is ICollection<TItem> trange && trange.Count == 0) return 0;
+
         var num = 0; foreach (var item in range)
         {
-            var r = Insert(index, item, !increase);
+            var r = Insert(index, item);
             index += r;
             num += r;
         }
@@ -275,11 +250,9 @@ public partial class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     }
 
     /// <inheritdoc/>
-    public virtual int RemoveAt(int index) => RemoveAt(index, true);
-    int RemoveAt(int index, bool decrease)
+    public virtual int RemoveAt(int index)
     {
         Items.RemoveAt(index);
-        if (decrease) TryDecrease();
         return 1;
     }
     void IList<TItem>.RemoveAt(int index) => RemoveAt(index);
@@ -289,7 +262,6 @@ public partial class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
     public virtual int RemoveRange(int index, int count)
     {
         if (count > 0) Items.RemoveRange(index, count);
-        TryDecrease();
         return count;
     }
 
@@ -316,10 +288,9 @@ public partial class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
         {
             var index = IndexOf(key);
 
-            if (index >= 0) num += RemoveAt(index, false);
+            if (index >= 0) num += RemoveAt(index);
             else break;
         }
-        TryDecrease();
         return num;
     }
 
@@ -344,22 +315,16 @@ public partial class CoreList<TKey, TItem> : ICoreList<TKey, TItem>
         {
             var index = IndexOf(predicate);
 
-            if (index >= 0) num += RemoveAt(index, false);
+            if (index >= 0) num += RemoveAt(index);
             else break;
         }
-        TryDecrease();
         return num;
     }
 
     /// <inheritdoc/>
-    public virtual int Clear() => Clear(true);
-    int Clear(bool decrease)
+    public virtual int Clear()
     {
-        var num = Items.Count; if (num > 0)
-        {
-            Items.Clear();
-            if (decrease) TryDecrease();
-        }
+        var num = Items.Count; if (num > 0) Items.Clear();
         return num;
     }
     void IList.Clear() => Clear();

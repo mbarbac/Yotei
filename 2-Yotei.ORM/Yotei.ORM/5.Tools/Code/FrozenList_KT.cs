@@ -2,59 +2,37 @@
 
 // ========================================================
 /// <inheritdoc cref="IFrozenList{TKey, TItem}"/>
+[DebuggerDisplay("{Items.ToDebugString(6)}")]
 [Cloneable]
-public partial class FrozenList<TKey, TItem> : IFrozenList<TKey, TItem>
+public abstract partial class FrozenList<TKey, TItem> : IFrozenList<TKey, TItem>
 {
     /// <summary>
-    /// The builder that maintains the items of this instance.
+    /// The repository of elements of this instance.
     /// </summary>
-    protected CoreList<TKey, TItem> Items { get; }
-
-    /// <summary>
-    /// Invoked to create a new builder of the appropriate type.
-    /// </summary>
-    /// <param name="engine"></param>
-    /// <returns></returns>
-    protected virtual CoreList<TKey, TItem> CreateBuilder(IEngine engine) => new();
-
-    /// <inheritdoc/>
-    public virtual CoreList<TKey, TItem> ToBuilder() => Items.Clone();
-    ICoreList<TKey, TItem> IFrozenList<TKey, TItem>.ToBuilder() => ToBuilder();
-
-    // ----------------------------------------------------
+    protected abstract ICoreList<TKey, TItem> Items { get; }
 
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    /// <param name="engine"></param>
-    public FrozenList(IEngine engine)
-    {
-        Engine = engine.ThrowWhenNull();
-        Items = CreateBuilder(engine);
-    }
+    public FrozenList() { }
 
     /// <summary>
     /// Initializes a new instance with the given element.
     /// </summary>
-    /// <param name="engine"></param>
     /// <param name="item"></param>
-    public FrozenList(IEngine engine, TItem item) : this(engine) => Items.Add(item);
+    public FrozenList(TItem item) => Items.Add(item);
 
     /// <summary>
-    /// Initializes a new instance with the elements of the given range.
+    /// Initializes a new instance with the elements from the given range.
     /// </summary>
-    /// <param name="engine"></param>
     /// <param name="range"></param>
-    public FrozenList(
-        IEngine engine, IEnumerable<TItem> range) : this(engine) => Items.AddRange(range);
+    public FrozenList(IEnumerable<TItem> range) => Items.AddRange(range);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected FrozenList(FrozenList<TKey, TItem> source)
-        : this(source.Engine)
-        => Items.AddRange(source);
+    protected FrozenList(FrozenList<TKey, TItem> source) => Items.AddRange(source);
 
     /// <inheritdoc/>
     public IEnumerator<TItem> GetEnumerator() => Items.GetEnumerator();
@@ -66,7 +44,7 @@ public partial class FrozenList<TKey, TItem> : IFrozenList<TKey, TItem>
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public IEngine Engine { get; }
+    public virtual ICoreList<TKey, TItem> ToBuilder() => Items.Clone();
 
     /// <inheritdoc/>
     public int Count => Items.Count;
@@ -120,7 +98,7 @@ public partial class FrozenList<TKey, TItem> : IFrozenList<TKey, TItem>
     }
 
     /// <inheritdoc/>
-    public virtual IFrozenList<TKey, TItem> Replace(int index, TItem item)
+    public virtual IFrozenList<TKey, TItem>  Replace(int index, TItem item)
     {
         var clone = Clone();
         var num = clone.Items.Replace(index, item);
@@ -128,7 +106,7 @@ public partial class FrozenList<TKey, TItem> : IFrozenList<TKey, TItem>
     }
 
     /// <inheritdoc/>
-    public virtual IFrozenList<TKey, TItem> Add(TItem item)
+    public virtual IFrozenList<TKey, TItem>  Add(TItem item)
     {
         var clone = Clone();
         var num = clone.Items.Add(item);
@@ -136,7 +114,7 @@ public partial class FrozenList<TKey, TItem> : IFrozenList<TKey, TItem>
     }
 
     /// <inheritdoc/>
-    public virtual IFrozenList<TKey, TItem> AddRange(IEnumerable<TItem> range)
+    public virtual IFrozenList<TKey, TItem>  AddRange(IEnumerable<TItem> range)
     {
         if (range is ICollection irange && irange.Count == 0) return this;
         if (range is ICollection<TItem> trange && trange.Count == 0) return this;
@@ -147,7 +125,7 @@ public partial class FrozenList<TKey, TItem> : IFrozenList<TKey, TItem>
     }
 
     /// <inheritdoc/>
-    public virtual IFrozenList<TKey, TItem> Insert(int index, TItem item)
+    public virtual IFrozenList<TKey, TItem>  Insert(int index, TItem item)
     {
         var clone = Clone();
         var num = clone.Items.Insert(index, item);
@@ -155,7 +133,7 @@ public partial class FrozenList<TKey, TItem> : IFrozenList<TKey, TItem>
     }
 
     /// <inheritdoc/>
-    public virtual IFrozenList<TKey, TItem> InsertRange(int index, IEnumerable<TItem> range)
+    public virtual IFrozenList<TKey, TItem>  InsertRange(int index, IEnumerable<TItem> range)
     {
         if (range is ICollection irange && irange.Count == 0) return this;
         if (range is ICollection<TItem> trange && trange.Count == 0) return this;
@@ -166,7 +144,7 @@ public partial class FrozenList<TKey, TItem> : IFrozenList<TKey, TItem>
     }
 
     /// <inheritdoc/>
-    public virtual IFrozenList<TKey, TItem> RemoveAt(int index)
+    public virtual IFrozenList<TKey, TItem>  RemoveAt(int index)
     {
         var clone = Clone();
         var num = clone.Items.RemoveAt(index);
@@ -174,7 +152,7 @@ public partial class FrozenList<TKey, TItem> : IFrozenList<TKey, TItem>
     }
 
     /// <inheritdoc/>
-    public virtual IFrozenList<TKey, TItem> RemoveRange(int index, int count)
+    public virtual IFrozenList<TKey, TItem>  RemoveRange(int index, int count)
     {
         if (count == 0 && index >= 0) return this;
 
@@ -184,7 +162,7 @@ public partial class FrozenList<TKey, TItem> : IFrozenList<TKey, TItem>
     }
 
     /// <inheritdoc/>
-    public virtual IFrozenList<TKey, TItem> Remove(TKey key)
+    public virtual IFrozenList<TKey, TItem>  Remove(TKey key)
     {
         if (Count == 0) return this;
 
@@ -194,7 +172,7 @@ public partial class FrozenList<TKey, TItem> : IFrozenList<TKey, TItem>
     }
 
     /// <inheritdoc/>
-    public virtual IFrozenList<TKey, TItem> RemoveLast(TKey key)
+    public virtual IFrozenList<TKey, TItem>  RemoveLast(TKey key)
     {
         if (Count == 0) return this;
 
@@ -204,7 +182,7 @@ public partial class FrozenList<TKey, TItem> : IFrozenList<TKey, TItem>
     }
 
     /// <inheritdoc/>
-    public virtual IFrozenList<TKey, TItem> RemoveAll(TKey key)
+    public virtual IFrozenList<TKey, TItem>  RemoveAll(TKey key)
     {
         if (Count == 0) return this;
 
@@ -214,7 +192,7 @@ public partial class FrozenList<TKey, TItem> : IFrozenList<TKey, TItem>
     }
 
     /// <inheritdoc/>
-    public virtual IFrozenList<TKey, TItem> Remove(Predicate<TItem> predicate)
+    public virtual IFrozenList<TKey, TItem>  Remove(Predicate<TItem> predicate)
     {
         if (Count == 0) return this;
 
@@ -224,7 +202,7 @@ public partial class FrozenList<TKey, TItem> : IFrozenList<TKey, TItem>
     }
 
     /// <inheritdoc/>
-    public virtual IFrozenList<TKey, TItem> RemoveLast(Predicate<TItem> predicate)
+    public virtual IFrozenList<TKey, TItem>  RemoveLast(Predicate<TItem> predicate)
     {
         if (Count == 0) return this;
 
@@ -234,7 +212,7 @@ public partial class FrozenList<TKey, TItem> : IFrozenList<TKey, TItem>
     }
 
     /// <inheritdoc/>
-    public virtual IFrozenList<TKey, TItem> RemoveAll(Predicate<TItem> predicate)
+    public virtual IFrozenList<TKey, TItem>  RemoveAll(Predicate<TItem> predicate)
     {
         if (Count == 0) return this;
 
@@ -244,7 +222,7 @@ public partial class FrozenList<TKey, TItem> : IFrozenList<TKey, TItem>
     }
 
     /// <inheritdoc/>
-    public virtual IFrozenList<TKey, TItem> Clear()
+    public virtual IFrozenList<TKey, TItem>  Clear()
     {
         if (Count == 0) return this;
 

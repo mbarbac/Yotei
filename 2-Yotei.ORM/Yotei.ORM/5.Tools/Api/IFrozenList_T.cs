@@ -2,24 +2,17 @@
 
 // ========================================================
 /// <summary>
-/// Represents an immutable list-alike collection of elements, with customizable behavior.
+/// Represents an immutable list-alike collection of elements, identified by their respective
+/// keys, with customizable behvior.
 /// </summary>
 /// <typeparam name="TItem"></typeparam>
-/// <remarks>
-/// This type shall be used as a template and not for inheritance purposes.
-/// </remarks>
 public interface IFrozenList<TItem> : IEnumerable<TItem>
 {
     /// <summary>
-    /// Returns a builder of the appropriate type, with the elements of this instance.
+    /// Returns a builder collection of the appropriate type with the elements of this instance.
     /// </summary>
     /// <returns></returns>
     ICoreList<TItem> ToBuilder();
-
-    /// <summary>
-    /// The engine this instance is associated with.
-    /// </summary>
-    IEngine Engine { get; }
 
     /// <summary>
     /// Gets the number of elements in this collection.
@@ -191,8 +184,8 @@ public interface IFrozenList<TItem> : IEnumerable<TItem>
     IFrozenList<TItem> RemoveLast(TItem item);
 
     /// <summary>
-    /// Returns a new instance with all ocurrences of the given element removed from it. If
-    /// no changes are detected, returns the original instance.
+    /// Returns a new instance with all ocurrences of the given element removed from it. If no
+    /// changes are detected, returns the original instance.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
