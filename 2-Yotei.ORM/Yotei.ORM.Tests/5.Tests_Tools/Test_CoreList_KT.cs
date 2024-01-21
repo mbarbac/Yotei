@@ -44,7 +44,7 @@ public static partial class Test_CoreList_KT
                 if (_CaseSensitive == value) return;
                 _CaseSensitive = value;
 
-                if (Count == 0) return;
+                if (Count <= 1) return;
                 var range = ToArray();
                 Clear();
                 AddRange(range);

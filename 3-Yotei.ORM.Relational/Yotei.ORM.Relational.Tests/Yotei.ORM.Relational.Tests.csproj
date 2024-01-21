@@ -12,8 +12,8 @@
 
    <ItemGroup>
 	  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-	  <PackageReference Include="xunit" Version="2.6.3" />
-	  <PackageReference Include="xunit.runner.visualstudio" Version="2.5.5">
+	  <PackageReference Include="xunit" Version="2.6.6" />
+	  <PackageReference Include="xunit.runner.visualstudio" Version="2.5.6">
 		 <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		 <PrivateAssets>all</PrivateAssets>
 	  </PackageReference>
@@ -25,7 +25,7 @@
 
    <!-- Common Elements  -->
    <ItemGroup>
-	  <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.2" />
+	  <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.4" />
 	  <ProjectReference Include="..\Yotei.ORM.Relational.FakeDB\Yotei.ORM.Relational.FakeDB.csproj" />
    </ItemGroup>
 
@@ -33,11 +33,11 @@
    <ItemGroup Condition="'$(Configuration)'=='Debug'">
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser.csproj" />
-	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.CloneGenerator\Yotei.Tools.CloneGenerator.csproj" >
+	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.CloneGenerator\Yotei.Tools.CloneGenerator.csproj">
 		 <OutputItemType>Analyzer</OutputItemType>
 		 <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
 	  </ProjectReference>
-	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.WithGenerator\Yotei.Tools.WithGenerator.csproj" >
+	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.WithGenerator\Yotei.Tools.WithGenerator.csproj">
 		 <OutputItemType>Analyzer</OutputItemType>
 		 <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
 	  </ProjectReference>
