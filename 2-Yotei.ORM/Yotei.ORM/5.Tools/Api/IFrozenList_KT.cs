@@ -9,6 +9,13 @@
 /// <typeparam name="TItem"></typeparam>
 public interface IFrozenList<TKey, TItem> : IEnumerable<TItem>
 {
+    [SuppressMessage("", "IDE0051")]
+    private string ToDebugString(int count) => Count == 0
+        ? "0:[]"
+        : (Count < count
+        ? $"{Count}:[{string.Join(", ", this.Select(x => x?.ToString() ?? "-"))}]"
+        : $"{Count}:[{string.Join(", ", this.Take(count).Select(x => x?.ToString() ?? "-"))}, ...]");
+
     /// <summary>
     /// Returns a builder collection of the appropriate type with the elements of this instance.
     /// </summary>

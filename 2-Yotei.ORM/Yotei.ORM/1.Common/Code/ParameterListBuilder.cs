@@ -10,6 +10,19 @@ namespace Yotei.ORM.Code;
 [Cloneable]
 public partial class ParameterListBuilder : CoreList<TKey, TItem>
 {
+    protected override TItem ValidateItem(TItem item) => item.ThrowWhenNull();
+    protected override TKey GetKey(TItem item) => item.ThrowWhenNull().Name;
+    protected override TKey ValidateKey(TKey key) => key.NotNullNotEmpty();
+    protected override bool CompareKeys(TKey source, TKey item) => string.Compare(source, item, !Engine.CaseSensitiveNames) == 0;
+    protected override bool SameItem(TItem source, TItem item) => ReferenceEquals(source, item);
+    protected override List<int> GetDuplicates(TKey key) => base.GetDuplicates(key);
+    protected override bool AcceptDuplicate(TItem source, TItem item)
+        => ReferenceEquals(source, item)
+        ? true
+        : throw new DuplicateException("Duplicated element.").WithData(item);
+
+    // ----------------------------------------------------
+
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
@@ -39,29 +52,6 @@ public partial class ParameterListBuilder : CoreList<TKey, TItem>
     protected ParameterListBuilder(ParameterListBuilder source)
         : this(source.Engine)
         => AddRange(source);
-
-    // ----------------------------------------------------
-
-    protected override TItem ValidateItem(TItem item) => item.ThrowWhenNull();
-
-    protected override TKey GetKey(TItem item) => item.ThrowWhenNull().Name;
-
-    protected override TKey ValidateKey(TKey key) => key.NotNullNotEmpty();
-
-    protected override bool CompareKeys(TKey source, TKey item)
-        => string.Compare(source, item, !Engine.CaseSensitiveNames) == 0;
-
-    protected override bool SameItem(TItem source, TItem item)
-        => ReferenceEquals(source, item);
-
-    protected override List<int> GetDuplicates(TKey key) => base.GetDuplicates(key);
-
-    protected override bool AcceptDuplicate(TItem source, TItem item)
-        => ReferenceEquals(source, item)
-        ? true
-        : throw new DuplicateException("Duplicated element.").WithData(item);
-
-    // ----------------------------------------------------
 
     /// <summary>
     /// The identifier this instance is associated with.

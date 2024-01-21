@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// Represents a nestable transaction under which a set of commands are executed against an
+/// Represents a nestable transaction under which a set of commands can be executed against an
 /// underlying database.
 /// </summary>
 public interface ITransaction : IBaseDisposable

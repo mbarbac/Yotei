@@ -5,7 +5,7 @@ namespace Yotei.ORM;
 
 // ========================================================
 /// <summary>
-/// Represents an arbitrary database identifier.
+/// Represents a database identifier.
 /// </summary>
 public interface IIdentifier : IFrozenList<TKey?, TItem>
 {

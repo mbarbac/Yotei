@@ -8,6 +8,13 @@
 [Cloneable]
 public partial interface ICoreList<TItem> : IList<TItem>, IList, ICollection<TItem>, ICollection
 {
+    [SuppressMessage("", "IDE0051")]
+    private string ToDebugString(int count) => Count == 0
+        ? "0:[]"
+        : (Count < count
+        ? $"{Count}:[{string.Join(", ", this.Select(x => x?.ToString() ?? "-"))}]"
+        : $"{Count}:[{string.Join(", ", this.Take(count).Select(x => x?.ToString() ?? "-"))}, ...]");
+
     /// <summary>
     /// Gets the number of elements in this collection.
     /// </summary>

@@ -84,6 +84,4 @@ public sealed partial class ParameterList : FrozenList<TKey, TItem>, IParameterL
         var num = clone.Items.AddNew(value, out item);
         return num > 0 ? clone : this;
     }
-
-    
 }

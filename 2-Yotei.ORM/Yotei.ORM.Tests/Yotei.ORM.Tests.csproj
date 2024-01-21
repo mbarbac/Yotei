@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
    <PropertyGroup>
 	  <TargetFramework>net8.0</TargetFramework>
@@ -8,9 +8,11 @@
 	  <IsPackable>false</IsPackable>
 	  <IsTestProject>true</IsTestProject>
 	  <Configurations>Debug;Release;Local</Configurations>
-	  <NoWarn>CS0436</NoWarn>
+	  <NoWarn>IDE0290;CA1859;CS0436</NoWarn>
    </PropertyGroup>
    <!--
+   IDE0290: Use primary constructor.
+   CA1859: Use concrete types for improved performance.
    CS0436: Conflicting imported names (generators.
    -->
 
