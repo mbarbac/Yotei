@@ -1,3 +1,5 @@
-﻿namespace Yotei.Tools.CloneGenerator;
+﻿namespace Yotei.ORM;
 
 // ========================================================
+
+public interface IFake { }

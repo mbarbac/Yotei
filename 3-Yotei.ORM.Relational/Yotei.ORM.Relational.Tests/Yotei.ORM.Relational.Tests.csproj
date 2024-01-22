@@ -33,14 +33,6 @@
    <ItemGroup Condition="'$(Configuration)'=='Debug'">
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser.csproj" />
-	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.CloneGenerator\Yotei.Tools.CloneGenerator.csproj">
-		 <OutputItemType>Analyzer</OutputItemType>
-		 <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-	  </ProjectReference>
-	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.WithGenerator\Yotei.Tools.WithGenerator.csproj">
-		 <OutputItemType>Analyzer</OutputItemType>
-		 <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-	  </ProjectReference>
 	  <ProjectReference Include="..\..\2-Yotei.ORM\Yotei.ORM\Yotei.ORM.csproj" />
 	  <ProjectReference Include="..\Yotei.ORM.Relational\Yotei.ORM.Relational.csproj" />
    </ItemGroup>
