@@ -62,7 +62,7 @@ public class CustomList<T> : IEnumerable<T>
     /// <summary>
     /// The comparer used by this instance to determine equality of elements.
     /// </summary>
-    public IEqualityComparer<T> Comparer
+    public Func<T, T, bool> Comparer
     {
         get => _Comparer;
         set
@@ -72,7 +72,7 @@ public class CustomList<T> : IEnumerable<T>
             Reload();
         }
     }
-    IEqualityComparer<T> _Comparer = EqualityComparer<T>.Default;
+    Func<T, T, bool> _Comparer = EqualityComparer<T>.Default.Equals;
 
     /// <summary>
     /// Invoked to determine if the given element can be included into this collection. Returns
@@ -80,7 +80,7 @@ public class CustomList<T> : IEnumerable<T>
     /// addition, this delegate may find any duplicates and throw an appropriate exception if
     /// duplicates are not allowed.
     /// </summary>
-    public Func<T, bool> CanInclude
+    public Func<CustomList<T>, T, bool> CanInclude
     {
         get => _CanInclude;
         set
@@ -90,7 +90,7 @@ public class CustomList<T> : IEnumerable<T>
             Reload();
         }
     }
-    Func<T, bool> _CanInclude = (item) => true;
+    Func<CustomList<T>, T, bool> _CanInclude = (_, _) => true;
 
     // ----------------------------------------------------
 
@@ -126,7 +126,7 @@ public class CustomList<T> : IEnumerable<T>
     public int IndexOf(T item)
     {
         item = Validate(item);
-        return IndexOf(x => Comparer.Equals(x, item));
+        return IndexOf(x => Comparer(x, item));
     }
 
     /// <summary>
@@ -138,7 +138,7 @@ public class CustomList<T> : IEnumerable<T>
     public int LastIndexOf(T item)
     {
         item = Validate(item);
-        return LastIndexOf(x => Comparer.Equals(x, item));
+        return LastIndexOf(x => Comparer(x, item));
     }
 
     /// <summary>
@@ -149,7 +149,7 @@ public class CustomList<T> : IEnumerable<T>
     public List<int> IndexesOf(T item)
     {
         item = Validate(item);
-        return IndexesOf(x => Comparer.Equals(x, item));
+        return IndexesOf(x => Comparer(x, item));
     }
 
     /// <summary>
@@ -246,7 +246,7 @@ public class CustomList<T> : IEnumerable<T>
     {
         item = Validate(item);
 
-        if (!CanInclude(item)) return 0;
+        if (!CanInclude(this, item)) return 0;
         Items.Add(item);
         return 1;
     }
@@ -283,7 +283,7 @@ public class CustomList<T> : IEnumerable<T>
     {
         item = Validate(item);
 
-        if (!CanInclude(item)) return 0;
+        if (!CanInclude(this, item)) return 0;
         Items.Insert(index, item);
         return 1;
     }

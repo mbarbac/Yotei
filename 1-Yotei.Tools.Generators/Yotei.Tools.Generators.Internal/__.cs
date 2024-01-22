@@ -1,3 +1,3 @@
-﻿namespace Yotei.Tools.WithGenerator;
+﻿namespace Yotei.Tools.Generators.Internal;
 
 // ========================================================
