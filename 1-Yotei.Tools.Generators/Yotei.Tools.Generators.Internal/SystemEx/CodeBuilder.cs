@@ -91,6 +91,12 @@ internal class CodeBuilder
         Append("\n");
     }
 
+    /// <summary>
+    /// Invoked to obtain the code associated with this builder.
+    /// </summary>
+    /// <returns></returns>
+    public string GetTextCode() => Builder.ToString();
+
     // ----------------------------------------------------
 
     /// <summary>

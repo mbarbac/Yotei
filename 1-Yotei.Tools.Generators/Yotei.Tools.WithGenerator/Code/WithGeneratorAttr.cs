@@ -30,7 +30,7 @@ internal static class WithGeneratorAttr
                 Inherited = false,
                 AllowMultiple = false
             )]
-            public class {{LongName}} : Attribute
+            internal class {{LongName}} : Attribute
             {
                 /// <summary>
                 /// Initializes a new instance.

@@ -111,6 +111,7 @@ public class CustomList<K, T> : IEnumerable<T>
     /// <see langword="true"/> if so, of <see langword="false"/> if the operation shall be
     /// ignored. In addition, this delegate may find any duplicates and throw an appropriate
     /// exception if duplicates are not allowed.
+    /// <br/> Common True/False usage: '(@this, item) =&gt; @this.IndexOf(item) &lt; 0;'
     /// </summary>
     public Func<CustomList<K, T>, T, bool> CanInclude
     {

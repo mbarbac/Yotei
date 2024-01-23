@@ -5,6 +5,7 @@
 /// Represents a list-alike collection of elements with customizable behavior.
 /// </summary>
 /// <typeparam name="T"></typeparam>
+[DebuggerDisplay("{ToDebugString(6)}")]
 internal class CustomList<T> : IEnumerable<T>
 {
     readonly List<T> Items = [];
@@ -32,6 +33,24 @@ internal class CustomList<T> : IEnumerable<T>
     /// <returns></returns>
     public IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public override string ToString() => $"Count: {Count}";
+
+    public string ToDebugString(int count) => Count == 0 ? "0:[]" : (
+        Count < count
+        ? $"{Count}:[{string.Join(", ", this.Select(x => ItemToDebug(x)))}]"
+        : $"{Count}:[{string.Join(", ", this.Take(count).Select(x => ItemToDebug(x)))}, ...]");
+
+    public Func<T, string> ItemToDebug
+    {
+        get => _ItemToDebug;
+        set => _ItemToDebug = value.ThrowWhenNull();
+    }
+    Func<T, string> _ItemToDebug = (item) => item?.ToString() ?? string.Empty;
 
     // ----------------------------------------------------
 
@@ -79,6 +98,7 @@ internal class CustomList<T> : IEnumerable<T>
     /// '<c>true</c>' if so (by default), or '<c>false</c>' if the operation shall be ignored. In
     /// addition, this delegate may find any duplicates and throw an appropriate exception if
     /// duplicates are not allowed.
+    /// <br/> Common True/False usage: '(@this, item) =&gt; @this.IndexOf(item) &lt; 0;'
     /// </summary>
     public Func<CustomList<T>, T, bool> CanInclude
     {

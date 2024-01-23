@@ -17,8 +17,8 @@ internal static class GetSyntaxNodesExtensions
         var list = new CustomList<BaseTypeDeclarationSyntax>()
         {
             Comparer = (x, y) => x.IsEquivalentTo(y),
-            CanInclude = (@this, item) => @this.IndexesOf(item).Count <= 0
-        };
+            CanInclude = (@this, item) => @this.IndexOf(item) < 0,
+    };
 
         foreach (var dec in symbol.DeclaringSyntaxReferences)
             if (dec.GetSyntax() is BaseTypeDeclarationSyntax temp) list.Add(temp);
@@ -40,7 +40,7 @@ internal static class GetSyntaxNodesExtensions
         var list = new CustomList<PropertyDeclarationSyntax>()
         {
             Comparer = (x, y) => x.IsEquivalentTo(y),
-            CanInclude = (@this, item) => @this.IndexesOf(item).Count <= 0
+            CanInclude = (@this, item) => @this.IndexOf(item) < 0,
         };
 
         foreach (var dec in symbol.DeclaringSyntaxReferences)
@@ -63,7 +63,7 @@ internal static class GetSyntaxNodesExtensions
         var list = new CustomList<FieldDeclarationSyntax>()
         {
             Comparer = (x, y) => x.IsEquivalentTo(y),
-            CanInclude = (@this, item) => @this.IndexesOf(item).Count <= 0
+            CanInclude = (@this, item) => @this.IndexOf(item) < 0,
         };
 
         foreach (var dec in symbol.DeclaringSyntaxReferences)
@@ -90,7 +90,7 @@ internal static class GetSyntaxNodesExtensions
         var list = new CustomList<MethodDeclarationSyntax>()
         {
             Comparer = (x, y) => x.IsEquivalentTo(y),
-            CanInclude = (@this, item) => @this.IndexesOf(item).Count <= 0
+            CanInclude = (@this, item) => @this.IndexOf(item) < 0,
         };
 
         foreach (var dec in symbol.DeclaringSyntaxReferences)

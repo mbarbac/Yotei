@@ -79,6 +79,7 @@ public class CustomList<T> : IEnumerable<T>
     /// '<c>true</c>' if so (by default), or '<c>false</c>' if the operation shall be ignored. In
     /// addition, this delegate may find any duplicates and throw an appropriate exception if
     /// duplicates are not allowed.
+    /// <br/> Common True/False usage: '(@this, item) =&gt; @this.IndexOf(item) &lt; 0;'
     /// </summary>
     public Func<CustomList<T>, T, bool> CanInclude
     {

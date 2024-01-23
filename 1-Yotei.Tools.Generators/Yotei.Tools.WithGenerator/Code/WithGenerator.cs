@@ -32,4 +32,21 @@ internal class WithGenerator : TreeGenerator
         var name = WithGeneratorAttr.LongName + ".g.cs";
         context.AddSource(name, code);
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public override string[] TypeAttributes => [WithGeneratorAttr.LongName];
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public override string[] PropertyAttributes => [WithGeneratorAttr.LongName];
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public override string[] FieldAttributes => [WithGeneratorAttr.LongName];
 }
