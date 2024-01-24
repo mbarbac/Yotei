@@ -32,11 +32,12 @@
    </PropertyGroup>
 
    <PropertyGroup>
-	  <DefineConstants>$(DefineConstants);DEBUG_WITH_GENERATOR</DefineConstants>
+	  <!--<DefineConstants>$(DefineConstants);DEBUG_WITH_GENERATOR</DefineConstants>-->
    </PropertyGroup>
+
+   <Import Project="..\Yotei.Tools.Generators.Internal\Yotei.Tools.Generators.Internal.projitems" Label="Shared" />
    <ItemGroup>
 	  <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.8.0" PrivateAssets="all" />
    </ItemGroup>
-   <Import Project="..\Yotei.Tools.Generators.Internal\Yotei.Tools.Generators.Internal.projitems" Label="Shared" />
 
 </Project>

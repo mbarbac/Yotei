@@ -70,16 +70,15 @@ internal abstract class Candidate(SemanticModel model, SyntaxNode syntax, ISymbo
             var temps = name.Split('.');
             parts.AddRange(temps);
         }
-        
+
+        var options = new EasyNameOptions(
+            fullTypeName: false,
+            typeParameters: true,
+            nullableAnnotation: false);
+
         foreach (var tp in TypeSymbolChain)
         {
-            var options = new EasyNameOptions()
-            {
-                UseFullTypeName = false,
-                UseTypeParameters = true,
-                UseNullableAnnotation = false,
-            };
-            var name = tp.EasyName();
+            var name = tp.EasyName(options);
             name = name.Replace('<', '[');
             name = name.Replace('>', ']');
             name = name.RemoveAll(' ');

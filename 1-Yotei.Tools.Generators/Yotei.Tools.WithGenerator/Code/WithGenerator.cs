@@ -49,4 +49,36 @@ internal class WithGenerator : TreeGenerator
     /// <inheritdoc/>
     /// </summary>
     public override string[] FieldAttributes => [WithGeneratorAttr.LongName];
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="parent"></param>
+    /// <param name="candidate"></param>
+    /// <returns></returns>
+    public override TypeNode CreateNode(
+        INode parent,
+        TypeCandidate candidate) => new XTypeNode(parent, candidate);
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="parent"></param>
+    /// <param name="candidate"></param>
+    /// <returns></returns>
+    public override PropertyNode CreateNode(
+        TypeNode parent,
+        PropertyCandidate candidate) => new XPropertyNode(parent, candidate);
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="parent"></param>
+    /// <param name="candidate"></param>
+    /// <returns></returns>
+    public override FieldNode CreateNode(
+        TypeNode parent,
+        FieldCandidate candidate) => new XFieldNode(parent, candidate);
 }

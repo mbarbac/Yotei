@@ -221,16 +221,10 @@ internal class TypeNode : INode
     /// <br/> Inheritors may add to it any inheritance chain that would be needed.
     /// </summary>
     /// <returns></returns>
-    protected virtual string GetTypeName()
-    {
-        var options = EasyNameOptions.Default with
-        {
-            UseFullTypeName = false,
-            UseTypeParameters = true,
-            UseNullableAnnotation = false,
-        };
-        return Symbol.EasyName(options);
-    }
+    protected virtual string GetTypeName() => Symbol.EasyName(new EasyNameOptions(
+        fullTypeName: false,
+        typeParameters: true,
+        nullableAnnotation: false));
 
     /// <summary>
     /// Obtains the kind of this type.

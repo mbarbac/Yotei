@@ -26,23 +26,30 @@ internal static class EasyNameExtensions
         if (symbol.IsNamespace) throw new ArgumentException("Symbol is namespace.").WithData(symbol);
 
         var sb = new StringBuilder();
+        var named = symbol as INamedTypeSymbol;
 
-        if (options.UseFullTypeName)
+        if (options.FullTypeName && symbol is not ITypeParameterSymbol)
         {
             List<string> names = [];
-            ISymbol? node = symbol;
+            string? name;
 
+            ISymbol? node = symbol.ContainingSymbol;
             while (node != null)
             {
                 switch (node)
                 {
-                    case INamespaceSymbol item: names.Add(item.Name); break;
+                    case INamespaceSymbol item:
+                        name = item.Name.NullWhenEmpty();
+                        if (name != null) names.Add(name);
+                        break;
+
                     case ITypeSymbol item:
-                        names.Add(item.EasyName(options with
+                        name = item.EasyName(options with
                         {
-                            UseNullableAnnotation = false,
-                            UseFullTypeName = false,
-                        }));
+                            FullTypeName = false,
+                            NullableAnnotation = false
+                        });
+                        names.Add(name);
                         break;
                 }
                 node = node.ContainingSymbol;
@@ -54,9 +61,7 @@ internal static class EasyNameExtensions
 
         sb.Append(symbol.Name);
 
-        if (options.UseTypeParameters &&
-            symbol is INamedTypeSymbol named &&
-            named.TypeParameters.Length > 0)
+        if (options.TypeParameters && named != null && named.TypeParameters.Length > 0)
         {
             sb.Append('<'); for (int i = 0; i < named.TypeParameters.Length; i++)
             {
@@ -70,7 +75,7 @@ internal static class EasyNameExtensions
         }
 
         var add =
-            options.UseNullableAnnotation &&
+            options.NullableAnnotation &&
             symbol.NullableAnnotation == NullableAnnotation.Annotated &&
             symbol.Name != "Nullable";
 
@@ -99,7 +104,7 @@ internal static class EasyNameExtensions
     {
         var sb = new StringBuilder();
 
-        if (options.UseMemberType)
+        if (options.MemberType)
         {
             var type = symbol.Type;
             var name = type.EasyName(options);
@@ -107,17 +112,17 @@ internal static class EasyNameExtensions
             sb.Append(' ');
         }
 
-        if (options.UseHostType)
+        if (options.HostType)
         {
             var type = symbol.ContainingType;
-            var name = type.EasyName(options with { UseNullableAnnotation = false });
+            var name = type.EasyName(options with { NullableAnnotation = false });
             sb.Append(name);
             sb.Append('.');
         }
 
         sb.Append(symbol.Name);
 
-        if (options.UseArguments && symbol.IsIndexer)
+        if (options.WithArguments && symbol.IsIndexer)
         {
             sb.Append('['); for (int i = 0; i < symbol.Parameters.Length; i++)
             {
@@ -155,7 +160,7 @@ internal static class EasyNameExtensions
     {
         var sb = new StringBuilder();
 
-        if (options.UseMemberType)
+        if (options.MemberType)
         {
             var type = symbol.Type;
             var name = type.EasyName(options);
@@ -163,10 +168,10 @@ internal static class EasyNameExtensions
             sb.Append(' ');
         }
 
-        if (options.UseHostType)
+        if (options.HostType)
         {
             var type = symbol.ContainingType;
-            var name = type.EasyName(options with { UseNullableAnnotation = false });
+            var name = type.EasyName(options with { NullableAnnotation = false });
             sb.Append(name);
             sb.Append('.');
         }
@@ -196,7 +201,7 @@ internal static class EasyNameExtensions
     {
         var sb = new StringBuilder();
 
-        if (options.UseMemberType)
+        if (options.MemberType)
         {
             var type = symbol.ReturnType;
             var name = type.EasyName(options);
@@ -204,17 +209,17 @@ internal static class EasyNameExtensions
             sb.Append(' ');
         }
 
-        if (options.UseHostType)
+        if (options.HostType)
         {
             var type = symbol.ContainingType;
-            var name = type.EasyName(options with { UseNullableAnnotation = false });
+            var name = type.EasyName(options with { NullableAnnotation = false });
             sb.Append(name);
             sb.Append('.');
         }
 
         sb.Append(symbol.Name);
 
-        if (options.UseTypeParameters && symbol.TypeParameters.Length > 0)
+        if (options.TypeParameters && symbol.TypeParameters.Length > 0)
         {
             sb.Append('<'); for (int i = 0; i < symbol.TypeArguments.Length; i++)
             {
@@ -227,7 +232,7 @@ internal static class EasyNameExtensions
             sb.Append('>');
         }
 
-        if (options.UseArguments)
+        if (options.WithArguments)
         {
             sb.Append('('); for (int i = 0; i < symbol.Parameters.Length; i++)
             {
