@@ -164,7 +164,7 @@ internal class TypeNode : INode
     /// </summary>
     /// <param name="context"></param>
     /// <param name="cb"></param>
-    public void Print(SourceProductionContext context, CodeBuilder cb)
+    public virtual void Print(SourceProductionContext context, CodeBuilder cb)
     {
         var rec = Symbol.IsRecord ? "record " : string.Empty;
         var kind = rec + GetTypeKind();

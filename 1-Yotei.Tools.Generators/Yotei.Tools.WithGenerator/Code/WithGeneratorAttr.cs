@@ -57,4 +57,79 @@ internal static class WithGeneratorAttr
             }
         }
         """;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Tries to obtain the 'specs' value associated with the given symbol.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static bool GetSpecs(ISymbol symbol, out string? value)
+    {
+        var ats = symbol.GetAttributes(LongName);
+        foreach (var at in ats)
+        {
+            if (at is AttributeData data)
+            {
+                if (data.ConstructorArguments.Length > 0)
+                {
+                    var item = data.ConstructorArguments[0];
+                    if (item.Value is string temp)
+                    {
+                        value = temp.NullWhenEmpty();
+                        return true;
+                    }
+                    if (item.IsNull)
+                    {
+                        // We don't use this because 'null' is the default value and, if we
+                        // intercept it here, that will stop further downstream searches...
+                    }
+                }
+            }
+
+            var arg = at.GetNamedArgument(Specs);
+            if (arg != null)
+            {
+                if (arg.Value.IsNull)
+                {
+                    value = null;
+                    return true;
+                }
+                if (arg.Value.Value is string temp)
+                {
+                    value = temp.NullWhenEmpty();
+                    return true;
+                }
+            }
+        }
+
+        value = null;
+        return false;
+    }
+
+    /// <summary>
+    /// Tries to obtain the 'prevent virtual' value associated with the given symbol.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static bool GetPreventVirtual(ISymbol symbol, out bool value)
+    {
+        var ats = symbol.GetAttributes(LongName);
+        foreach (var at in ats)
+        {
+            var arg = at.GetNamedArgument(PreventVirtual);
+            if (arg != null &&
+                arg.Value.Value is bool temp)
+            {
+                value = temp;
+                return true;
+            }
+        }
+
+        value = false;
+        return false;
+    }
 }
