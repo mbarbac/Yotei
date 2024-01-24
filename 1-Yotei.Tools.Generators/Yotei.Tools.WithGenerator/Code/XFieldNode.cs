@@ -222,7 +222,7 @@ internal class XFieldNode : FieldNode
     /// <summary>
     /// Prints documentation.
     /// </summary>
-    /// <param name="file"></param>
+    /// <param name="cb"></param>
     /// <param name="vname"></param>
     void PrintDocumentation(CodeBuilder cb, string vname) => cb.AppendLine($$"""
     /// <summary>

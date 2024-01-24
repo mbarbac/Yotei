@@ -1,6 +1,6 @@
 using TPair = System.Collections.Generic.KeyValuePair<string, int>;
 
-namespace Yotei.Tools.Generators.Tests_WithGenerator
+namespace Yotei.Tools.Generators.Tests_CloneGenerator
 {
     using IMiscelanea;
     using TMiscelanea;
@@ -16,10 +16,10 @@ namespace Yotei.Tools.Generators.Tests_WithGenerator
             var source = new TOther.Foo("James");
             Assert.Equal("James", source.Name);
 
-            var target = source.WithName("Bond");
+            var target = source.Clone();
             Assert.NotSame(source, target);
             Assert.IsType<TOther.Foo>(target);
-            Assert.Equal("Bond", target.Name);
+            Assert.Equal(source.Name, target.Name);
         }
 
         //[Enforced]
@@ -29,11 +29,11 @@ namespace Yotei.Tools.Generators.Tests_WithGenerator
             IOther.IFoo<string> source = new TOther.Foo("James");
             Assert.Equal("James", source.Name);
 
-            var target = source.WithName("Bond");
+            var target = source.Clone();
             Assert.IsAssignableFrom<IOther.IFoo<string>>(target);
             Assert.NotSame(source, target);
             Assert.IsType<TOther.Foo>(target);
-            Assert.Equal("Bond", target.Name);
+            Assert.Equal(source.Name, target.Name);
         }
 
         //[Enforced]
@@ -45,15 +45,11 @@ namespace Yotei.Tools.Generators.Tests_WithGenerator
             Assert.Equal("Age", source.MyPair!.Value.Key);
             Assert.Equal(50, source.MyPair!.Value.Value);
 
-            var target = source.WithName("James");
+            var target = source.Clone();
             Assert.NotSame(source, target);
             Assert.IsType<TOther.Bar<int>>(target);
-            Assert.Equal("James", target.Name);
-
-            target = source.WithMyPair(null);
-            Assert.NotSame(source, target);
-            Assert.IsType<TOther.Bar<int>>(target);
-            Assert.Null(target.MyPair);
+            Assert.Equal(source.Name, target.Name);
+            Assert.Equal(source.MyPair, target.MyPair);
         }
 
         //[Enforced]
@@ -65,15 +61,11 @@ namespace Yotei.Tools.Generators.Tests_WithGenerator
             Assert.Equal("Age", source.MyPair!.Value.Key);
             Assert.Equal(50, source.MyPair!.Value.Value);
 
-            var target = source.WithName("James");
+            var target = source.Clone();
             Assert.NotSame(source, target);
             Assert.IsAssignableFrom<IOther.IBar<int, string>>(target);
-            Assert.Equal("James", target.Name);
-
-            target = source.WithMyPair(null);
-            Assert.NotSame(source, target);
-            Assert.IsAssignableFrom<IOther.IBar<int, string>>(target);
-            Assert.Null(target.MyPair);
+            Assert.Equal(source.Name, target.Name);
+            Assert.Equal(source.MyPair, target.MyPair);
         }
 
         //[Enforced]
@@ -86,10 +78,10 @@ namespace Yotei.Tools.Generators.Tests_WithGenerator
             Assert.Equal("Age", bar.MyPair!.Value.Key);
             Assert.Equal(50, bar.MyPair!.Value.Value);
 
-            var target = source.WithName("James");
+            var target = source.Clone();
             Assert.NotSame(source, target);
             Assert.IsAssignableFrom<IOther.IFoo<string>>(target);
-            Assert.Equal("James", target.Name);
+            Assert.Equal(source.Name, target.Name);
             bar = (IOther.IBar<int, string>)target;
             Assert.Equal("Age", bar.MyPair!.Value.Key);
             Assert.Equal(50, bar.MyPair!.Value.Value);
@@ -102,17 +94,16 @@ namespace Yotei.Tools.Generators.Tests_WithGenerator
         public partial interface IOther
         {
             // --------------------------------------------
+            [Cloneable]
             public partial interface IFoo<T>
             {
-                [WithGenerator]
                 string Name { get; }
             }
 
             // --------------------------------------------
-            [WithGenerator]
+            [Cloneable]
             public partial interface IBar<K, T> : IFoo<string>
             {
-                [WithGenerator]
                 TPair? MyPair { get; }
             }
         }
@@ -124,7 +115,7 @@ namespace Yotei.Tools.Generators.Tests_WithGenerator
         public partial class TOther
         {
             // --------------------------------------------
-            [WithGenerator]
+            [Cloneable]
             public partial class Foo : IOther.IFoo<string>
             {
                 public Foo(string name) => Name = name;
@@ -135,7 +126,7 @@ namespace Yotei.Tools.Generators.Tests_WithGenerator
             }
 
             // --------------------------------------------
-            [WithGenerator]
+            [Cloneable]
             public partial class Bar<K> : Foo, IOther.IBar<K, string>
             {
                 public Bar(string name, TPair? myPair) : base(name) => MyPair = myPair;

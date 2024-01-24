@@ -235,7 +235,7 @@ internal class XPropertyNode : PropertyNode
     /// <summary>
     /// Prints documentation.
     /// </summary>
-    /// <param name="file"></param>
+    /// <param name="cb"></param>
     /// <param name="vname"></param>
     void PrintDocumentation(CodeBuilder cb, string vname) => cb.AppendLine($$"""
     /// <summary>
@@ -304,6 +304,7 @@ internal class XPropertyNode : PropertyNode
     /// Returns the collection of interfaces that need implementation.
     /// </summary>
     /// <returns></returns>
+    [SuppressMessage("", "IDE0305")]
     ITypeSymbol[] GetInterfacesToImplement()
     {
         var list = new CustomList<ITypeSymbol>()

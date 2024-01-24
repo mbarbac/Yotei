@@ -20,9 +20,8 @@ internal static class WithGeneratorAttr
             /// <br/>
             /// When used to decorate host types, generates 'With' methods for the inherited members
             /// that were decorated in any parent type (including interfaces), withoud the need of
-            /// decorating them again.
-            /// <br/>
-            /// Types cannot be records.
+            /// decorating them again. If the type is not an interface, it must contain a copy
+            /// constructor. Decorated types cannot be records.
             /// </summary>
             [AttributeUsage(
                 AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface |
@@ -53,7 +52,7 @@ internal static class WithGeneratorAttr
                 /// default value is 'false', meaning that the generated methods are either virtual
                 /// or override ones.
                 /// </summary>
-                bool {{PreventVirtual}} { get; set; }
+                public bool {{PreventVirtual}} { get; set; }
             }
         }
         """;
