@@ -10,7 +10,7 @@
 
    <PropertyGroup>
 	  <Description>Yotei Dynamic Lambda Parser</Description>
-	  <Version>0.5.27-v0001</Version>
+	  <Version>0.5.28-v0001</Version>
 	  <Authors>mbarbac@hotmail.com</Authors>
 	  <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
 	  <IsPackable>true</IsPackable>

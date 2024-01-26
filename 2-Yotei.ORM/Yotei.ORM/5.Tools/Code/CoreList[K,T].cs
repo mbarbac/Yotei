@@ -1,32 +1,39 @@
-namespace Experiments;
+﻿namespace Yotei.ORM.Tools.Code;
 
 // ========================================================
 /// <summary>
-/// Represents a list-alike collection of elements identifed by their respective keys, with
-/// customizable behavior.
+/// <inheritdoc cref="ICoreList{K, T}"/>
 /// </summary>
 /// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>
-public class CustomList<K, T> : IEnumerable<T>
+[DebuggerDisplay("{ToDebugString(6)}")]
+[Cloneable]
+public partial class CoreList<K, T> : ICoreList<K, T>
 {
     readonly List<T> Items = [];
 
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    public CustomList() { }
+    public CoreList() { }
 
     /// <summary>
     /// Initializes a new instance with the given element.
     /// </summary>
     /// <param name="item"></param>
-    public CustomList(T item) => Add(item);
+    public CoreList(T item) => Add(item);
 
     /// <summary>
     /// Initializes a new instance with the elements of the given range.
     /// </summary>
     /// <param name="range"></param>
-    public CustomList(IEnumerable<T> range) => AddRange(range);
+    public CoreList(IEnumerable<T> range) => AddRange(range);
+
+    /// <summary>
+    /// Copy constructor.
+    /// </summary>
+    /// <param name="source"></param>
+    protected CoreList(CoreList<K, T> source) => AddRange(source);
 
     /// <summary>
     /// <inheritdoc/>
@@ -34,6 +41,19 @@ public class CustomList<K, T> : IEnumerable<T>
     /// <returns></returns>
     public IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public override string ToString() => $"Count: {Count}";
+
+    public string ToDebugString(int count) => Count == 0 ? "0:[]" : (
+        Count < count
+        ? $"{Count}:[{string.Join(", ", this.Select(ItemToString))}]"
+        : $"{Count}:[{string.Join(", ", this.Take(count).Select(ItemToString))}, ...]");
+
+    protected virtual string ItemToString(T item) => item?.ToString() ?? "-";
 
     // ----------------------------------------------------
 
@@ -47,7 +67,7 @@ public class CustomList<K, T> : IEnumerable<T>
     }
 
     /// <summary>
-    /// Invoked to validate the given element before using it in this collection.
+    /// <inheritdoc/>
     /// </summary>
     public Func<T, T> ValidateItem
     {
@@ -62,7 +82,7 @@ public class CustomList<K, T> : IEnumerable<T>
     Func<T, T> _ValidateItem = (item) => item;
 
     /// <summary>
-    /// Invoked to extract the key associated with the given element.
+    /// <inheritdoc/>
     /// </summary>
     public Func<T, K> GetKey
     {
@@ -77,7 +97,7 @@ public class CustomList<K, T> : IEnumerable<T>
     Func<T, K> _GetKey = (item) => throw new NotImplementedException();
 
     /// <summary>
-    /// Invoked to validate the given key.
+    /// <inheritdoc/>
     /// </summary>
     public Func<K, K> ValidateKey
     {
@@ -92,28 +112,39 @@ public class CustomList<K, T> : IEnumerable<T>
     Func<K, K> _ValidateKey = (key) => key;
 
     /// <summary>
-    /// The comparer used by this instance to determine equality of keys.
+    /// <inheritdoc/>
     /// </summary>
-    public Func<K, K, bool> Comparer
+    public Func<K, K, bool> CompareKeys
     {
-        get => _Comparer;
+        get => _CompareKeys;
         set
         {
-            if (ReferenceEquals(_Comparer, value.ThrowWhenNull())) return;
-            _Comparer = value;
+            if (ReferenceEquals(_CompareKeys, value.ThrowWhenNull())) return;
+            _CompareKeys = value;
             Reload();
         }
     }
-    Func<K, K, bool> _Comparer = EqualityComparer<K>.Default.Equals;
+    Func<K, K, bool> _CompareKeys = EqualityComparer<K>.Default.Equals;
 
     /// <summary>
-    /// Invoked to determine if the given element can be included into this collection. Returns
-    /// <see langword="true"/> if so, of <see langword="false"/> if the operation shall be
-    /// ignored. In addition, this delegate may find any duplicates and throw an appropriate
-    /// exception if duplicates are not allowed.
-    /// <br/> Common True/False usage: '(@this, item) =&gt; @this.IndexOf(item) &lt; 0;'
+    /// <inheritdoc/>
     /// </summary>
-    public Func<CustomList<K, T>, T, bool> CanInclude
+    public Func<ICoreList<K, T>, K, List<int>> Duplicates
+    {
+        get => _Duplicates;
+        set
+        {
+            if (ReferenceEquals(_Duplicates, value.ThrowWhenNull())) return;
+            _Duplicates = value;
+            Reload();
+        }
+    }
+    Func<ICoreList<K, T>, K, List<int>> _Duplicates = (@this, key) => @this.IndexesOf(key);
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public Func<T, T, bool> CanInclude
     {
         get => _CanInclude;
         set
@@ -123,17 +154,17 @@ public class CustomList<K, T> : IEnumerable<T>
             Reload();
         }
     }
-    Func<CustomList<K, T>, T, bool> _CanInclude = (_, _) => true;
+    Func<T, T, bool> _CanInclude = (_, _) => true;
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Gets the number of elements in this collection.
+    /// <inheritdoc/>
     /// </summary>
     public int Count => Items.Count;
 
     /// <summary>
-    /// Gets or sets the element at the given index.
+    /// <inheritdoc/>
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
@@ -142,59 +173,65 @@ public class CustomList<K, T> : IEnumerable<T>
         get => Items[index];
         set => Replace(index, value);
     }
+    object? IList.this[int index]
+    {
+        get => this[index];
+        set => this[index] = (T)value!;
+    }
 
     /// <summary>
-    /// Determines if this collection contains an element with the given key.
+    /// <inheritdoc/>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
     public bool Contains(K key) => IndexOf(key) >= 0;
+    bool ICollection<T>.Contains(T item) => Contains(GetKey(ValidateItem(item)));
+    bool IList.Contains(object? value) => Contains(GetKey(ValidateItem((T)value!)));
 
     /// <summary>
-    /// Gets the index of the first element in this collection with the given key, or -1 if
-    /// it is not found.
+    /// <inheritdoc/>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
     public int IndexOf(K key)
     {
         key = ValidateKey(key);
-        return IndexOf(x => Comparer(GetKey(x), key));
+        return IndexOf(x => CompareKeys(GetKey(x), key));
     }
+    int IList<T>.IndexOf(T item) => IndexOf(GetKey(ValidateItem(item)));
+    int IList.IndexOf(object? value) => IndexOf(GetKey(ValidateItem((T)value!)));
 
     /// <summary>
-    /// Gets the index of the last element in this collection with the given key, or -1 if
-    /// it is not found.
+    /// <inheritdoc/>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
     public int LastIndexOf(K key)
     {
         key = ValidateKey(key);
-        return LastIndexOf(x => Comparer(GetKey(x), key));
+        return LastIndexOf(x => CompareKeys(GetKey(x), key));
     }
 
     /// <summary>
-    /// Gets the indexes of the elements in this collection with the given key.
+    /// <inheritdoc/>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
     public List<int> IndexesOf(K key)
     {
         key = ValidateKey(key);
-        return IndexesOf(x => Comparer(GetKey(x), key));
+        return IndexesOf(x => CompareKeys(GetKey(x), key));
     }
 
     /// <summary>
-    /// Determines if this collection contains an element that matches the given predicate.
+    /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
     public bool Contains(Predicate<T> predicate) => IndexOf(predicate) >= 0;
 
     /// <summary>
-    /// Gets the index of the first element in this collection that matches the given predicate,
-    /// or -1 if any is found.
+    /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
@@ -207,8 +244,7 @@ public class CustomList<K, T> : IEnumerable<T>
     }
 
     /// <summary>
-    /// Gets the index of the last element in this collection that matches the given predicate,
-    /// or -1 if any is found.
+    /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
@@ -221,7 +257,7 @@ public class CustomList<K, T> : IEnumerable<T>
     }
 
     /// <summary>
-    /// Gets the indexes of the elements in this collection that match the given predicate.
+    /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
@@ -235,13 +271,13 @@ public class CustomList<K, T> : IEnumerable<T>
     }
 
     /// <summary>
-    /// Gets an array with the elements in this collection.
+    /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
     public T[] ToArray() => Items.ToArray();
 
     /// <summary>
-    /// Gets a list with the elements in this collection.
+    /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
     public List<T> ToList() => new(Items);
@@ -253,8 +289,7 @@ public class CustomList<K, T> : IEnumerable<T>
         : ReferenceEquals(source, item);
 
     /// <summary>
-    /// Replaces the element at the given index with the new given one. Returns the number of
-    /// changes made.
+    /// <inheritdoc/>
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
@@ -271,7 +306,7 @@ public class CustomList<K, T> : IEnumerable<T>
     }
 
     /// <summary>
-    /// Adds to this collection the given element. Returns the number of changes made.
+    /// <inheritdoc/>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
@@ -279,14 +314,20 @@ public class CustomList<K, T> : IEnumerable<T>
     {
         item = ValidateItem(item);
 
-        if (!CanInclude(this, item)) return 0;
+        var key = GetKey(item);
+        var prevent = false;
+        var range = Duplicates(this, key);
+        foreach (var i in range) if (!CanInclude(Items[i], item)) prevent = true;
+        if (prevent) return 0;
+
         Items.Add(item);
         return 1;
     }
+    void ICollection<T>.Add(T item) => Add(item);
+    int IList.Add(object? value) => Add((T)value!) > 0 ? (Count - 1) : -1;
 
     /// <summary>
-    /// Adds to this collection the elements from the given range. Returns the number of changes
-    /// made.
+    /// <inheritdoc/>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
@@ -306,8 +347,7 @@ public class CustomList<K, T> : IEnumerable<T>
     }
 
     /// <summary>
-    /// Inserts into this collection the given element at the given index. Returns the number of
-    /// changes made.
+    /// <inheritdoc/>
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
@@ -316,14 +356,20 @@ public class CustomList<K, T> : IEnumerable<T>
     {
         item = ValidateItem(item);
 
-        if (!CanInclude(this, item)) return 0;
+        var key = GetKey(item);
+        var prevent = false;
+        var range = Duplicates(this, key);
+        foreach (var i in range) if (!CanInclude(Items[i], item)) prevent = true;
+        if (prevent) return 0;
+
         Items.Insert(index, item);
         return 1;
     }
+    void IList<T>.Insert(int index, T item) => Insert(index, item);
+    void IList.Insert(int index, object? value) => Insert(index, (T)value!);
 
     /// <summary>
-    /// Inserts into this collection the elements from the given range, starting at the given
-    /// index. Returns the number of changes made.
+    /// <inheritdoc/>
     /// </summary>
     /// <param name="index"></param>
     /// <param name="range"></param>
@@ -345,65 +391,74 @@ public class CustomList<K, T> : IEnumerable<T>
     }
 
     /// <summary>
-    /// Removes from this collection the element at the given index. Returns the number of
-    /// changes made.
+    /// <inheritdoc/>
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
     public virtual int RemoveAt(int index)
     {
+        if (index < 0 || index >= Items.Count) throw new IndexOutOfRangeException("Index out of range.").WithData(index);
+
         Items.RemoveAt(index);
         return 1;
     }
+    void IList<T>.RemoveAt(int index) => RemoveAt(index);
+    void IList.RemoveAt(int index) => RemoveAt(index);
 
     /// <summary>
-    /// Removes from this collection the given number of elements, starting at the given index.
-    /// Returns the number of changes made.
+    /// <inheritdoc/>
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
     public virtual int RemoveRange(int index, int count)
     {
-        if (count > 0) Items.RemoveRange(index, count);
-        else if (index < 0 || index >= Items.Count)
-            throw new IndexOutOfRangeException("Index out of range.").WithData(index);
+        if (count < 0) throw new ArgumentException("Count is less than cero.").WithData(count);
+        if (index < 0 || index >= Count)
+            throw new IndexOutOfRangeException("Index less than cero or bigger then count.")
+            .WithData(index);
 
+        if (count > 0) Items.RemoveRange(index, count);
         return count;
     }
 
     /// <summary>
-    /// Removes from this collection the first element with the given key. Returns the number
-    /// of changes made.
+    /// <inheritdoc/>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
     public virtual int Remove(K key)
     {
+        if (Count == 0) return 0;
+
         var index = IndexOf(key);
         return index >= 0 ? RemoveAt(index) : 0;
     }
+    bool ICollection<T>.Remove(T item) => Remove(GetKey(ValidateItem(item))) >= 0;
+    void IList.Remove(object? value) => Remove(GetKey(ValidateItem((T)value!)));
 
     /// <summary>
-    /// Removes from this collection the last element with the given key. Returns the number
-    /// of changes made.
+    /// <inheritdoc/>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
     public virtual int RemoveLast(K key)
     {
+        if (Count == 0) return 0;
+
         var index = LastIndexOf(key);
         return index >= 0 ? RemoveAt(index) : 0;
     }
 
     /// <summary>
-    /// Removes from this collection all the elements with the given key. Returns the number
-    /// of changes made.
+    /// <inheritdoc/>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
     public virtual int RemoveAll(K key)
     {
+        if (Count == 0) return 0;
+
         var num = 0; while (true)
         {
             var index = IndexOf(key);
@@ -415,37 +470,40 @@ public class CustomList<K, T> : IEnumerable<T>
     }
 
     /// <summary>
-    /// Removes from this collection the first ocurrence of an element that matches the given
-    /// predicate. Returns the number of changes made.
+    /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
     public virtual int Remove(Predicate<T> predicate)
     {
+        if (Count == 0) return 0;
+
         var index = IndexOf(predicate);
         return index >= 0 ? RemoveAt(index) : 0;
     }
 
     /// <summary>
-    /// Removes from this collection the last ocurrence of an element that matches the given
-    /// predicate. Returns the number of changes made.
+    /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
     public virtual int RemoveLast(Predicate<T> predicate)
     {
+        if (Count == 0) return 0;
+
         var index = LastIndexOf(predicate);
         return index >= 0 ? RemoveAt(index) : 0;
     }
 
     /// <summary>
-    /// Removes from this collection all the ocurrences of elements that match the given
-    /// predicate. Returns the number of changes made.
+    /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
     public virtual int RemoveAll(Predicate<T> predicate)
     {
+        if (Count == 0) return 0;
+
         var num = 0; while (true)
         {
             var index = IndexOf(predicate);
@@ -457,7 +515,7 @@ public class CustomList<K, T> : IEnumerable<T>
     }
 
     /// <summary>
-    /// Clears all the elements in this collection. Returns the number of changes made.
+    /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
     public virtual int Clear()
@@ -465,4 +523,17 @@ public class CustomList<K, T> : IEnumerable<T>
         var num = Items.Count; if (num > 0) Items.Clear();
         return num;
     }
+    void ICollection<T>.Clear() => Clear();
+    void IList.Clear() => Clear();
+
+    // ----------------------------------------------------
+
+    bool ICollection<T>.IsReadOnly => false;
+    bool IList.IsReadOnly => false;
+    bool IList.IsFixedSize => false;
+    bool ICollection.IsSynchronized => false;
+    object ICollection.SyncRoot => ((ICollection)Items).SyncRoot;
+
+    void ICollection<T>.CopyTo(T[] array, int index) => Items.CopyTo(array, index);
+    void ICollection.CopyTo(Array array, int index) => Items.CopyTo((T[])array, index);
 }

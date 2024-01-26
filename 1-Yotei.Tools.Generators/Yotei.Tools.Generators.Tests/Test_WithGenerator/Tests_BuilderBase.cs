@@ -86,7 +86,7 @@ namespace Yotei.Tools.Generators.Tests_WithGenerator
                 [WithGenerator("this")]
                 public string Name { get; set; }
 
-                public string Branch { get; set; }
+                public string Branch { get; set; } = default!;
             }
 
             // --------------------------------------------
