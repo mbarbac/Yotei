@@ -33,7 +33,16 @@ internal class FieldNode : INode
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"Field: {Symbol.EasyName()}";
+    public override string ToString()
+    {
+        var same = SymbolEqualityComparer.Default.Equals(
+            Symbol.ContainingType,
+            ParentNode.Symbol);
+
+        return same
+            ? $"Field: {Symbol.EasyName()}"
+            : $"Field({ParentNode.Symbol.Name}): {Symbol.EasyName()}";
+    }
 
     /// <summary>
     /// <inheritdoc/>

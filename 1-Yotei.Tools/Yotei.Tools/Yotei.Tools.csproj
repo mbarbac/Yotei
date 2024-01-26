@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
    <PropertyGroup>
 	  <TargetFramework>net8.0</TargetFramework>
@@ -10,7 +10,7 @@
 
    <PropertyGroup>
 	  <Description>Yotei Framework Common Tools</Description>
-	  <Version>0.5.31-v0001</Version>
+	  <Version>0.5.32-v0001</Version>
 	  <Authors>mbarbac@hotmail.com</Authors>
 	  <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
 	  <IsPackable>true</IsPackable>

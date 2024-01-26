@@ -14,7 +14,7 @@ internal static class CloneableAttr
         {
             /// <summary>
             /// Decorates types for which a 'Clone()' method will be declared or implemented. If
-            /// the type is not an interface, it must implemen a copy constructor. Decorated types
+            /// the type is not an interface, it must implement a copy constructor. Decorated types
             /// cannot be records.
             /// </summary>
             [AttributeUsage(

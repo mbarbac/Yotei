@@ -34,63 +34,103 @@ internal class XTypeNode : TypeNode
     protected override void OnPrint(SourceProductionContext context, CodeBuilder cb)
     {
         // Intercepting explicit implementation...
-        if (HasMethod(Symbol) != null) return;
+        if (HasMethod(Symbol, recursive: false)) return;
 
         // Emitting code...
         PrintDocumentation(cb);
+        if (Symbol.IsInterface()) PrintInterface(context, cb);
+        else if (Symbol.IsAbstract) PrintAbstract(context, cb);
+        else PrintRegular(context, cb);
+    }
 
-        var options = new EasyNameOptions(
-            fullTypeName: true,
-            typeParameters: true,
-            nullableAnnotation: false);
-        var typeName = Symbol.EasyName(options);
+    /// <summary>
+    /// Case: type is an interface...
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="cb"></param>
+    void PrintInterface(SourceProductionContext _, CodeBuilder cb)
+    {
         var modifiers = GetModifiers();
+        var typeName = Symbol.EasyName(new EasyNameOptions(
+            fullTypeName: false,
+            typeParameters:true,
+            nullableAnnotation: false));
 
-        // Type is an interface...
-        if (Symbol.IsInterface())
+        cb.AppendLine("[Yotei.Tools.CloneGenerator.YoteiGenerated]");
+        cb.AppendLine($"{modifiers}{typeName} Clone();");
+    }
+
+    /// <summary>
+    /// Case: type is abstract...
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="cb"></param>
+    void PrintAbstract(SourceProductionContext context, CodeBuilder cb)
+    {
+        var typeName = Symbol.EasyName(new EasyNameOptions(
+            fullTypeName: false,
+            typeParameters: true,
+            nullableAnnotation: false));
+
+        cb.AppendLine("[Yotei.Tools.CloneGenerator.YoteiGenerated]");
+        cb.AppendLine($"public abstract {typeName} Clone();");
+        PrintNeededInterfaces(context, cb);
+    }
+
+    /// <summary>
+    /// Case: standard case...
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="cb"></param>
+    void PrintRegular(SourceProductionContext context, CodeBuilder cb)
+    {
+        var modifiers = GetModifiers();
+        var typeName = Symbol.EasyName(new EasyNameOptions(
+            fullTypeName: false,
+            typeParameters: true,
+            nullableAnnotation: false));
+
+        cb.AppendLine("[Yotei.Tools.CloneGenerator.YoteiGenerated]");
+        cb.AppendLine($"{modifiers}{typeName} Clone()");
+        cb.AppendLine("{");
+        cb.IndentLevel++;
+
+        var method = Symbol.GetCopyConstructor(true) ?? Symbol.GetCopyConstructor(false);
+        if (method == null)
         {
-            cb.AppendLine($"{modifiers}{typeName} Clone();");
-            return;
+            cb.AppendLine("throw new NotImplementedException();");
+            context.NoCopyConstructor(Symbol);
         }
-
-        // Type is abstract...
-        if (Symbol.IsAbstract)
-        {
-            cb.AppendLine($"public abstract {typeName} Clone();");
-        }
-
-        // Regular...
         else
         {
-            cb.AppendLine($"{modifiers}{typeName} Clone()");
-            cb.AppendLine("{");
-            cb.IndentLevel++;
-
-            var method = Symbol.GetCopyConstructor(true) ?? Symbol.GetCopyConstructor(false);
-            if (method == null)
-            {
-                cb.AppendLine("throw new NotImplementedException();");
-                context.NoCopyConstructor(Symbol);
-            }
-            else
-            {
-                cb.AppendLine($"var v_temp = new {typeName}(this);");
-                cb.AppendLine("return v_temp;");
-            }
-
-            cb.IndentLevel--;
-            cb.AppendLine("}");
+            cb.AppendLine($"var v_temp = new {typeName}(this);"); // Copy constructor...
+            cb.AppendLine("return v_temp;");
         }
 
-        // Interfaces to implement...
+        cb.IndentLevel--;
+        cb.AppendLine("}");
+        PrintNeededInterfaces(context, cb);
+    }
+
+    /// <summary>
+    /// Emits interfaces that need implementation...
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="cb"></param>
+    void PrintNeededInterfaces(SourceProductionContext _, CodeBuilder cb)
+    {
         var ifaces = GetInterfacesToImplement();
         foreach (var iface in ifaces)
         {
-            typeName = iface.EasyName(options);
-            var type = iface.Name == "ICloneable" ? "object" : typeName;
+            var typeName = iface.EasyName(new EasyNameOptions(
+                fullTypeName: true,
+                typeParameters: true,
+                nullableAnnotation: false));
+
+            var valueName = iface.Name == "ICloneable" ? "object" : typeName;
 
             cb.AppendLine();
-            cb.AppendLine(type);
+            cb.AppendLine(valueName);
             cb.AppendLine($"{typeName}.Clone() => Clone();");
         }
     }
@@ -129,7 +169,7 @@ internal class XTypeNode : TypeNode
         // Implementation...
         else
         {
-            var prevent = GetPreventVirtual(out var temp) && temp;
+            var prevent = GetPreventVirtual(Symbol, out var temp) && temp;
             var appears = AppearsInChain(Symbol, true);
             if (appears)
             {
@@ -147,7 +187,7 @@ internal class XTypeNode : TypeNode
             {
                 if (!top)
                 {
-                    if (HasMethod(type) != null) return true;
+                    if (HasMethod(type, recursive: false)) return true;
                     if (type.HasAttributes(CloneableAttr.LongName)) return true;
                 }
                 var parent = type.BaseType;
@@ -181,7 +221,7 @@ internal class XTypeNode : TypeNode
 
             if (iface.HasAttributes(CloneableAttr.LongName)) done = true;
             else if (iface.Name == "ICloneable") done = true;
-            else if (HasMethod(iface) != null) done = true;
+            else if (HasMethod(iface, recursive: false)) done = true;
 
             foreach (var child in iface.Interfaces) if (Populate(child)) done = true;
 
@@ -197,28 +237,41 @@ internal class XTypeNode : TypeNode
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
-    IMethodSymbol? HasMethod(ITypeSymbol type) => type
+    IMethodSymbol? GetTypeMethod(ITypeSymbol type) => type
         .GetMembers()
         .OfType<IMethodSymbol>()
         .FirstOrDefault(x =>
             x.Name == "Clone" &&
             x.Parameters.Length == 0);
 
+    bool HasMethod(ITypeSymbol type, bool recursive)
+    {
+        if (GetTypeMethod(type) != null) return true;
+        if (recursive)
+        {
+            var parent = type.BaseType;
+            if (parent != null) return HasMethod(parent, recursive);
+        }
+        return false;
+    }
+
     // ----------------------------------------------------
 
     /// <summary>
-    /// Tries to get the effective value of the <see cref="WithGeneratorAttr.PreventVirtual"/> setting.
+    /// Tries to get the effective value of the <see cref="WithGeneratorAttr.PreventVirtual"/>
+    /// setting, starting at the given type and up through its inheritance chain.
     /// </summary>
+    /// <param name="type"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    bool GetPreventVirtual(out bool value)
+    bool GetPreventVirtual(ITypeSymbol type, out bool value)
     {
-        if (CloneableAttr.GetPreventVirtual(Symbol, out value)) return true;
+        if (CloneableAttr.GetPreventVirtual(type, out value)) return true;
 
-        foreach (var parent in Symbol.AllBaseTypes())
+        foreach (var parent in type.AllBaseTypes())
             if (CloneableAttr.GetPreventVirtual(parent, out value)) return true;
 
-        foreach (var parent in Symbol.AllInterfaces)
+        foreach (var parent in type.AllInterfaces)
             if (CloneableAttr.GetPreventVirtual(parent, out value)) return true;
 
         return false;

@@ -33,7 +33,16 @@ internal class PropertyNode : INode
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"Property: {Symbol.EasyName()}";
+    public override string ToString()
+    {
+        var same = SymbolEqualityComparer.Default.Equals(
+            Symbol.ContainingType,
+            ParentNode.Symbol);
+
+        return same
+            ? $"Property: {Symbol.EasyName()}"
+            : $"Property({ParentNode.Symbol.Name}): {Symbol.EasyName()}";
+    }
 
     /// <summary>
     /// <inheritdoc/>

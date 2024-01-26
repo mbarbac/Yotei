@@ -9,10 +9,8 @@ internal class XFieldNode : FieldNode
     public XFieldNode(TypeNode parent, IFieldSymbol symbol) : base(parent, symbol) { }
     public XFieldNode(TypeNode parent, FieldCandidate candidate) : base(parent, candidate) { }
 
-    /// <summary>
-    /// The name of the method to generate.
-    /// </summary>
     string MethodName => $"With{Symbol.Name}";
+    string ArgumentName => $"v_{Symbol.Name}";
 
     // ----------------------------------------------------
 
@@ -26,6 +24,7 @@ internal class XFieldNode : FieldNode
         if (!base.Validate(context)) return false;
 
         if (!context.TypeIsNotRecord(ParentNode.Symbol)) return false;
+
         if (!ParentNode.Symbol.IsInterface() &&
             !context.FieldIsWrittable(Symbol)) return false;
 
@@ -42,178 +41,257 @@ internal class XFieldNode : FieldNode
     public override void Print(SourceProductionContext context, CodeBuilder cb)
     {
         // Intercepting explicit implementation...
-        if (HasMethod(ParentNode.Symbol) != null) return;
-
-        // Documentation...
-        var vname = $"v_{Symbol.Name}";
-        PrintDocumentation(cb, vname);
+        if (HasMethod(ParentNode.Symbol, recursive: false)) return;
 
         // Emitting code...
-        var options = new EasyNameOptions(
+        PrintDocumentation(cb);
+        if (ParentNode.Symbol.IsInterface()) PrintInterface(context, cb);
+        else if (ParentNode.Symbol.IsAbstract) PrintAbstract(context, cb);
+        else
+        {
+            var specs = GetSpecs(ParentNode.Symbol, out var temp) ? temp.NullWhenEmpty() : null;
+            var comp = StringComparison.OrdinalIgnoreCase;
+
+            if (string.Compare(specs, "this", comp) == 0) PrintThisBuilder(context, cb);
+            else if (string.Compare(specs, "base", comp) == 0) PrintBaseBuilder(context, cb);
+            else if (specs == null || string.Compare(specs, "copy", comp) == 0) PrintCopyBuilder(context, cb);
+            else context.InvalidSpecs(Symbol, specs);
+        }
+    }
+
+    /// <summary>
+    /// Case: host type is an interface...
+    /// </summary>
+    /// <param name="_"></param>
+    /// <param name="cb"></param>
+    void PrintInterface(SourceProductionContext _, CodeBuilder cb)
+    {
+        var modifiers = GetModifiers();
+
+        var parentType = ParentNode.Symbol.EasyName(new EasyNameOptions(
+            fullTypeName: false,
+            typeParameters: true,
+            nullableAnnotation: false));
+        var memberType = Symbol.Type.EasyName(new EasyNameOptions(
             fullTypeName: true,
             typeParameters: true,
-            nullableAnnotation: false);
-        var parentType = ParentNode.Symbol.EasyName(options);
-        var memberType = Symbol.Type.EasyName(options with { NullableAnnotation = true });
+            nullableAnnotation: true));
 
+        cb.AppendLine("[Yotei.Tools.WithGenerator.YoteiGenerated]");
+        cb.AppendLine($"{modifiers}{parentType}");
+        cb.AppendLine($"{MethodName}({memberType} {ArgumentName});");
+    }
+
+    /// <summary>
+    /// Case: host type is abstract...
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="cb"></param>
+    void PrintAbstract(SourceProductionContext context, CodeBuilder cb)
+    {
+        var parentType = ParentNode.Symbol.EasyName(new EasyNameOptions(
+            fullTypeName: false,
+            typeParameters: true,
+            nullableAnnotation: false));
+        var memberType = Symbol.Type.EasyName(new EasyNameOptions(
+            fullTypeName: true,
+            typeParameters: true,
+            nullableAnnotation: true));
+
+        cb.AppendLine("[Yotei.Tools.WithGenerator.YoteiGenerated]");
+        cb.AppendLine($"public abstract {parentType}");
+        cb.AppendLine($"{MethodName}({memberType} {ArgumentName});");
+        PrintNeededInterfaces(context, cb);
+    }
+
+    /// <summary>
+    /// Case: "copy" specs...
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="cb"></param>
+    void PrintCopyBuilder(SourceProductionContext context, CodeBuilder cb)
+    {
         var modifiers = GetModifiers();
-        var specs = GetSpecs(out var temp) ? temp.NullWhenEmpty() : null;
-        var comp = StringComparison.OrdinalIgnoreCase;
 
-        if (ParentNode.Symbol.IsInterface()) { PrintInterface(); return; }
+        var parentType = ParentNode.Symbol.EasyName(new EasyNameOptions(
+            fullTypeName: false,
+            typeParameters: true,
+            nullableAnnotation: false));
+        var memberType = Symbol.Type.EasyName(new EasyNameOptions(
+            fullTypeName: true,
+            typeParameters: true,
+            nullableAnnotation: true));
 
-        if (string.Compare(specs, "this", comp) == 0) PrintThis();
-        else if (string.Compare(specs, "base", comp) == 0) PrintBase();
-        else if (specs is null || string.Compare(specs, "copy", comp) == 0) PrintCopy();
-        else { context.InvalidSpecs(Symbol, specs); return; }
+        cb.AppendLine("[Yotei.Tools.WithGenerator.YoteiGenerated]");
+        cb.AppendLine($"{modifiers}{parentType}");
+        cb.AppendLine($"{MethodName}({memberType} {ArgumentName})");
+        cb.AppendLine("{");
+        cb.IndentLevel++;
 
-        /// <summary>
-        /// Emits code when the host instance is an interface...
-        /// </summary>
-        void PrintInterface()
+        var parent = ParentNode.Symbol;
+        var method = parent.GetCopyConstructor(true) ?? parent.GetCopyConstructor(false);
+        if (method == null)
         {
-            cb.AppendLine($"{modifiers}{parentType}");
-            cb.AppendLine($"{MethodName}({memberType} {vname});");
+            cb.AppendLine("throw new NotImplementedException();");
+            context.NoCopyConstructor(parent);
         }
-
-        /// <summary>
-        /// Emits code when modifying the member of the calling instance...
-        /// </summary>
-        void PrintThis()
+        else
         {
-            cb.AppendLine($"{modifiers}{parentType}");
-            cb.AppendLine($"{MethodName}({memberType} {vname})");
-            cb.AppendLine("{");
-            cb.IndentLevel++;
+            var vtemp = "v_temp";
 
             cb.AppendLine($"var v_comparer = EqualityComparer<{memberType}>.Default;");
-            cb.AppendLine($"if (v_comparer.Equals({Symbol.Name}, {vname})) return this;");
+            cb.AppendLine($"if (v_comparer.Equals({Symbol.Name}, {ArgumentName})) return this;");
             cb.AppendLine();
 
-            cb.AppendLine($"{Symbol.Name} = {vname};");
-            cb.AppendLine("return this;");
-
-            cb.IndentLevel--;
-            cb.AppendLine("}");
-        }
-
-        /// <summary>
-        /// Emits code when we shall invoke a base method...
-        /// </summary>
-        void PrintBase()
-        {
-            cb.AppendLine($"{modifiers}{parentType}");
-            cb.AppendLine($"{MethodName}({memberType} {vname})");
+            cb.AppendLine($"var {vtemp} = new {parentType}(this)"); // Copy constructor...
             cb.AppendLine("{");
+
             cb.IndentLevel++;
-
-            var chain = FindBaseChain(); if (chain == null)
-            {
-                cb.AppendLine("throw new NotImplementedException();");
-                context.NoBaseMethod(Symbol);
-            }
-            else
-            {
-                cb.AppendLine($"var v_comparer = EqualityComparer<{memberType}>.Default;");
-                cb.AppendLine($"if (v_comparer.Equals({Symbol.Name}, {vname})) return this;");
-                cb.AppendLine();
-
-                cb.AppendLine($"var v_temp = {chain}.{MethodName}({vname});");
-                cb.AppendLine($"return ({ParentNode.Symbol.Name})v_temp;");
-            }
-
+            cb.AppendLine($"{Symbol.Name} = {ArgumentName}");
             cb.IndentLevel--;
-            cb.AppendLine("}");
 
-            string? FindBaseChain()
-            {
-                var parent = ParentNode.Symbol.BaseType;
-                var num = parent == null ? 0 : FindBaseNum(parent);
-                if (num > 0)
-                {
-                    var sb = new StringBuilder();
-                    for (int i = 0; i < num; i++)
-                    {
-                        if (i > 0) sb.Append('.');
-                        sb.Append("base");
-                    }
-                    return sb.ToString();
-                }
-                return null;
-            }
-
-            int FindBaseNum(ITypeSymbol type)
-            {
-                var parent = type.BaseType;
-                var num = parent == null ? 0 : FindBaseNum(parent);
-
-                if (HasDecoratedMember(type) != null ||
-                    HasMethod(type) != null ||
-                    (HasMember(type) != null && type.HasAttributes(WithGeneratorAttr.LongName)))
-                {
-                    num++;
-                }
-                return num;
-            }
+            cb.AppendLine("};");
+            cb.AppendLine($"return {vtemp};");
         }
 
-        /// <summary>
-        /// Emits code when the host instance is an abstract type...
-        /// </summary>
-        void PrintAbstract()
+        cb.IndentLevel--;
+        cb.AppendLine("}");
+        PrintNeededInterfaces(context, cb);
+    }
+
+    /// <summary>
+    /// Case: "this" specs...
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="cb"></param>
+    void PrintThisBuilder(SourceProductionContext context, CodeBuilder cb)
+    {
+        var modifiers = GetModifiers();
+
+        var parentType = ParentNode.Symbol.EasyName(new EasyNameOptions(
+            fullTypeName: false,
+            typeParameters: true,
+            nullableAnnotation: false));
+        var memberType = Symbol.Type.EasyName(new EasyNameOptions(
+            fullTypeName: true,
+            typeParameters: true,
+            nullableAnnotation: true));
+
+        cb.AppendLine("[Yotei.Tools.WithGenerator.YoteiGenerated]");
+        cb.AppendLine($"{modifiers}{parentType}");
+        cb.AppendLine($"{MethodName}({memberType} {ArgumentName})");
+        cb.AppendLine("{");
+        cb.IndentLevel++;
+
+        cb.AppendLine($"{Symbol.Name} = {ArgumentName};"); // This instance...
+        cb.AppendLine("return this;");
+
+        cb.IndentLevel--;
+        cb.AppendLine("}");
+        PrintNeededInterfaces(context, cb);
+    }
+
+    /// <summary>
+    /// Case: "base" specs...
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="cb"></param>
+    void PrintBaseBuilder(SourceProductionContext context, CodeBuilder cb)
+    {
+        var modifiers = GetModifiers();
+
+        var parentType = ParentNode.Symbol.EasyName(new EasyNameOptions(
+            fullTypeName: false,
+            typeParameters: true,
+            nullableAnnotation: false));
+        var memberType = Symbol.Type.EasyName(new EasyNameOptions(
+            fullTypeName: true,
+            typeParameters: true,
+            nullableAnnotation: true));
+
+        cb.AppendLine("[Yotei.Tools.WithGenerator.YoteiGenerated]");
+        cb.AppendLine($"{modifiers}{parentType}");
+        cb.AppendLine($"{MethodName}({memberType} {ArgumentName})");
+        cb.AppendLine("{");
+        cb.IndentLevel++;
+
+        var parent = ParentNode.Symbol.BaseType;
+        if (parent == null || !HasBaseMethod(out var chain))
         {
-            cb.AppendLine($"public abstract {parentType}");
-            cb.AppendLine($"{MethodName}({memberType} {vname});");
+            cb.AppendLine("throw new NotImplementedException();");
+            context.NoBaseMethod(Symbol, parentType);
+        }
+        else
+        {
+            var vtemp = "v_temp";
+            cb.AppendLine($"var {vtemp} = {chain}.{MethodName}({ArgumentName});"); // Base...
+            cb.AppendLine($"return ({parentType}){vtemp};");
         }
 
-        /// <summary>
-        /// Emits code when we shall use a copy constructor (the default)...
-        /// </summary>
-        void PrintCopy()
+        cb.IndentLevel--;
+        cb.AppendLine("}");
+        PrintNeededInterfaces(context, cb);
+    }
+
+    bool HasBaseMethod(out string? chain)
+    {
+        var num = 0;
+        var temp = ParentNode.Symbol.BaseType; while (temp != null)
         {
-            if (ParentNode.Symbol.IsAbstract) { PrintAbstract(); return; }
-
-            cb.AppendLine($"{modifiers}{parentType}");
-            cb.AppendLine($"{MethodName}({memberType} {vname})");
-            cb.AppendLine("{");
-            cb.IndentLevel++;
-
-            var method =
-                ParentNode.Symbol.GetCopyConstructor(true) ??
-                ParentNode.Symbol.GetCopyConstructor(false);
-
-            if (method == null)
+            if (HasDecoratedMember(temp, recursive: false) ||
+                HasMethod(temp, recursive: false) ||
+                (HasMember(temp, recursive: false) && temp.HasAttributes(WithGeneratorAttr.LongName)))
             {
-                cb.AppendLine("throw new NotImplementedException();");
-                context.NoCopyConstructor(ParentNode.Symbol);
-            }
-            else
-            {
-                var vtemp = "v_temp";
-
-                cb.AppendLine($"var v_comparer = EqualityComparer<{memberType}>.Default;");
-                cb.AppendLine($"if (v_comparer.Equals({Symbol.Name}, {vname})) return this;");
-                cb.AppendLine();
-
-                var options = new EasyNameOptions(
-                    fullTypeName: false,
-                    typeParameters: true,
-                    nullableAnnotation: false);
-                var name = ParentNode.Symbol.EasyName(options);
-
-                cb.AppendLine($"var {vtemp} = new {name}(this)");
-                cb.AppendLine("{");
-
-                cb.IndentLevel++;
-                cb.AppendLine($"{Symbol.Name} = {vname}");
-                cb.IndentLevel--;
-
-                cb.AppendLine("};");
-                cb.AppendLine($"return {vtemp};");
+                num++;
+                chain = string.Join(".", Enumerable.Repeat("base", num));
+                return true;
             }
 
-            cb.IndentLevel--;
-            cb.AppendLine("}");
+            temp = temp.BaseType;
+        }
+
+        chain = null;
+        return false;
+    }
+
+    /// <summary>
+    /// Emits interfaces that need implementation...
+    /// </summary>
+    /// <param name="_"></param>
+    /// <param name="cb"></param>
+    void PrintNeededInterfaces(SourceProductionContext _, CodeBuilder cb)
+    {
+        var ifaces = GetInterfacesToImplement();
+        foreach (var iface in ifaces)
+        {
+            var parentType = iface.EasyName(new EasyNameOptions(
+                fullTypeName: true,
+                typeParameters: true,
+                nullableAnnotation: false));
+
+            var member = GetTypeMember(iface);
+            if (member == null)
+            {
+                foreach (var parent in iface.AllInterfaces)
+                {
+                    member = GetTypeMember(parent);
+                    if (member != null) break;
+                }
+
+                if (member == null) throw new InvalidOperationException(
+                    "Cannot find member in interface.")
+                    .WithData(Symbol.Name)
+                    .WithData(iface.Name);
+            }
+
+            var memberType = member.Type.EasyName(new EasyNameOptions(
+                fullTypeName: true,
+                typeParameters: true,
+                nullableAnnotation: true));
+
+            cb.AppendLine();
+            cb.AppendLine($"{parentType}");
+            cb.AppendLine($"{parentType}.{MethodName}({memberType} value) => {MethodName}(value);");
         }
     }
 
@@ -223,13 +301,12 @@ internal class XFieldNode : FieldNode
     /// Prints documentation.
     /// </summary>
     /// <param name="cb"></param>
-    /// <param name="vname"></param>
-    void PrintDocumentation(CodeBuilder cb, string vname) => cb.AppendLine($$"""
+    void PrintDocumentation(CodeBuilder cb) => cb.AppendLine($$"""
     /// <summary>
     /// Returns an instance of the host type where the value of the decorated member has been
     /// replaced by the new given one.
     /// </summary>
-    /// <param name ="{{vname}}"></param>
+    /// <param name ="{{ArgumentName}}"></param>
     /// <returns></returns>
     """);
 
@@ -245,8 +322,8 @@ internal class XFieldNode : FieldNode
         if (ParentNode.Symbol.IsInterface())
         {
             return ParentNode.Symbol.AllInterfaces.Any(x =>
-                HasDecoratedMember(x) != null ||
-                HasMethod(x) != null)
+                HasDecoratedMember(x, recursive: false) ||
+                HasMethod(x, recursive: false))
                 ? "new "
                 : null;
         }
@@ -254,7 +331,7 @@ internal class XFieldNode : FieldNode
         // Implementation...
         else
         {
-            var prevent = GetPreventVirtual(out var temp) && temp;
+            var prevent = GetPreventVirtual(ParentNode.Symbol, out var temp) && temp;
             var appears = AppearsInChain(ParentNode.Symbol, true);
             if (appears)
             {
@@ -272,11 +349,11 @@ internal class XFieldNode : FieldNode
             {
                 if (!top)
                 {
-                    if (HasMethod(type) != null) return true;
-                    else if (HasDecoratedMember(type) != null) return true;
+                    if (HasMethod(type, recursive: false)) return true;
+                    else if (HasDecoratedMember(type, recursive: false)) return true;
 
                     else if (type.HasAttributes(WithGeneratorAttr.LongName) &&
-                        HasMember(type) != null)
+                        HasMember(type, recursive: false))
                         return true;
                 }
                 var parent = type.BaseType;
@@ -288,33 +365,88 @@ internal class XFieldNode : FieldNode
     // ----------------------------------------------------
 
     /// <summary>
+    /// Returns the collection of interfaces that need implementation.
+    /// </summary>
+    /// <returns></returns>
+    [SuppressMessage("", "IDE0305")]
+    ITypeSymbol[] GetInterfacesToImplement()
+    {
+        var list = new CustomList<ITypeSymbol>()
+        {
+            Comparer = SymbolEqualityComparer.Default.Equals,
+            CanInclude = (@this, item) => @this.IndexOf(item) < 0,
+        };
+
+        foreach (var iface in ParentNode.Symbol.Interfaces) Populate(iface);
+        return list.ToArray();
+
+        // Captures all suitable interfaces in the inheritance chain...
+        bool Populate(ITypeSymbol iface)
+        {
+            var done = false;
+
+            if (HasDecoratedMember(iface, recursive: false)) done = true;
+            else if (HasMethod(iface, recursive: false)) done = true;
+
+            foreach (var child in iface.Interfaces) if (Populate(child)) done = true;
+
+            if (done) list.Add(iface);
+            return done;
+        }
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Determines if the type has a member with the appropriate name, or not.
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
-    IFieldSymbol? HasMember(ITypeSymbol type) => type
+    IFieldSymbol? GetTypeMember(ITypeSymbol type) => type
         .GetMembers()
         .OfType<IFieldSymbol>()
         .FirstOrDefault(x => x.Name == Symbol.Name);
+
+    bool HasMember(ITypeSymbol type, bool recursive)
+    {
+        if (GetTypeMember(type) != null) return true;
+        if (recursive)
+        {
+            var parent = type.BaseType;
+            if (parent != null) return HasMember(parent, recursive);
+        }
+        return false;
+    }
 
     /// <summary>
     /// Determines if the type has a DECORATED member with the appropriate name, or not.
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
-    IFieldSymbol? HasDecoratedMember(ITypeSymbol type) => type
+    IFieldSymbol? GetTypeDecoratedMember(ITypeSymbol type) => type
         .GetMembers()
         .OfType<IFieldSymbol>()
         .FirstOrDefault(x =>
             x.Name == Symbol.Name &&
             x.HasAttributes(WithGeneratorAttr.LongName));
 
+    bool HasDecoratedMember(ITypeSymbol type, bool recursive)
+    {
+        if (GetTypeDecoratedMember(type) != null) return true;
+        if (recursive)
+        {
+            var parent = type.BaseType;
+            if (parent != null) return HasDecoratedMember(parent, recursive);
+        }
+        return false;
+    }
+
     /// <summary>
     /// Determines if the type implements a compatible method, or not.
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
-    IMethodSymbol? HasMethod(ITypeSymbol type) => type
+    IMethodSymbol? GetTypeMethod(ITypeSymbol type) => type
         .GetMembers()
         .OfType<IMethodSymbol>()
         .FirstOrDefault(x =>
@@ -322,65 +454,86 @@ internal class XFieldNode : FieldNode
             x.Parameters.Length == 1 &&
             Symbol.Type.IsAssignableTo(x.Parameters[0].Type));
 
+    bool HasMethod(ITypeSymbol type, bool recursive)
+    {
+        if (GetTypeMethod(type) != null) return true;
+        if (recursive)
+        {
+            var parent = type.BaseType;
+            if (parent != null) return HasMethod(parent, recursive);
+        }
+        return false;
+    }
+
     // ----------------------------------------------------
 
     /// <summary>
-    /// Tries to get the effective value of the <see cref="WithGeneratorAttr.Specs"/> setting.
+    /// Tries to get the effective value of the <see cref="WithGeneratorAttr.PreventVirtual"/>
+    /// setting, starting at the given type and up through its inheritance chain.
     /// </summary>
+    /// <param name="type"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    bool GetSpecs(out string? value)
+    bool GetPreventVirtual(ITypeSymbol type, out bool value)
     {
-        if (WithGeneratorAttr.GetSpecs(Symbol, out value)) return true;
-        if (WithGeneratorAttr.GetSpecs(ParentNode.Symbol, out value)) return true;
+        var member = GetTypeDecoratedMember(type);
+        if (member != null &&
+            WithGeneratorAttr.GetPreventVirtual(member, out value)) return true;
 
-        foreach (var parent in ParentNode.Symbol.AllBaseTypes())
+        if (WithGeneratorAttr.GetPreventVirtual(type, out value)) return true;
+
+        foreach (var parent in type.AllBaseTypes())
         {
-            var member = HasDecoratedMember(parent);
+            member = GetTypeDecoratedMember(parent);
             if (member != null &&
-                WithGeneratorAttr.GetSpecs(member, out value)) return true;
+                WithGeneratorAttr.GetPreventVirtual(member, out value)) return true;
 
-            if (WithGeneratorAttr.GetSpecs(parent, out value)) return true;
+            if (WithGeneratorAttr.GetPreventVirtual(parent, out value)) return true;
         }
 
-        foreach (var parent in ParentNode.Symbol.AllInterfaces)
+        foreach (var parent in type.AllInterfaces)
         {
-            var member = HasDecoratedMember(parent);
+            member = GetTypeDecoratedMember(parent);
             if (member != null &&
-                WithGeneratorAttr.GetSpecs(member, out value)) return true;
+                WithGeneratorAttr.GetPreventVirtual(member, out value)) return true;
 
-            if (WithGeneratorAttr.GetSpecs(parent, out value)) return true;
+            if (WithGeneratorAttr.GetPreventVirtual(parent, out value)) return true;
         }
 
         return false;
     }
 
     /// <summary>
-    /// Tries to get the effective value of the <see cref="WithGeneratorAttr.PreventVirtual"/> setting.
+    /// Tries to get the effective value of the <see cref="WithGeneratorAttr.Specs"/>
+    /// setting, starting at the given type and up through its inheritance chain.
     /// </summary>
+    /// <param name="type"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    bool GetPreventVirtual(out bool value)
+    bool GetSpecs(ITypeSymbol type, out string? value)
     {
-        if (WithGeneratorAttr.GetPreventVirtual(Symbol, out value)) return true;
-        if (WithGeneratorAttr.GetPreventVirtual(ParentNode.Symbol, out value)) return true;
+        var member = GetTypeDecoratedMember(type);
+        if (member != null &&
+            WithGeneratorAttr.GetSpecs(member, out value)) return true;
 
-        foreach (var parent in ParentNode.Symbol.AllBaseTypes())
+        if (WithGeneratorAttr.GetSpecs(type, out value)) return true;
+
+        foreach (var parent in type.AllBaseTypes())
         {
-            var member = HasDecoratedMember(parent);
+            member = GetTypeDecoratedMember(parent);
             if (member != null &&
-                WithGeneratorAttr.GetPreventVirtual(member, out value)) return true;
+                WithGeneratorAttr.GetSpecs(member, out value)) return true;
 
-            if (WithGeneratorAttr.GetPreventVirtual(parent, out value)) return true;
+            if (WithGeneratorAttr.GetSpecs(parent, out value)) return true;
         }
 
-        foreach (var parent in ParentNode.Symbol.AllInterfaces)
+        foreach (var parent in type.AllInterfaces)
         {
-            var member = HasDecoratedMember(parent);
+            member = GetTypeDecoratedMember(parent);
             if (member != null &&
-                WithGeneratorAttr.GetPreventVirtual(member, out value)) return true;
+                WithGeneratorAttr.GetSpecs(member, out value)) return true;
 
-            if (WithGeneratorAttr.GetPreventVirtual(parent, out value)) return true;
+            if (WithGeneratorAttr.GetSpecs(parent, out value)) return true;
         }
 
         return false;

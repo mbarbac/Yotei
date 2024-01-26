@@ -17,11 +17,12 @@ internal static class WithGeneratorAttr
             /// When used to decorate type members, generates a 'With[name](value)' method that 
             /// returns an instance of the host type where the value of the decorated member has
             /// been replaced with the new given one.
-            /// <br/>
+            /// <br/><br/>
             /// When used to decorate host types, generates 'With' methods for the inherited members
             /// that were decorated in any parent type (including interfaces), withoud the need of
-            /// decorating them again. If the type is not an interface, it must contain a copy
-            /// constructor. Decorated types cannot be records.
+            /// decorating them again.
+            /// <br/> Members not inherited need their own decoration.
+            /// <br/> Decorated types cannot be records.
             /// </summary>
             [AttributeUsage(
                 AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface |
@@ -43,7 +44,8 @@ internal static class WithGeneratorAttr
                 /// <summary>
                 /// If not null, determines the method used to generate the 'With' methods: 'copy'
                 /// to use a copy constructor of the host type, 'this' to just modify the current
-                /// instance, or 'base' to use a base method. If null, then 'copy' is used.
+                /// instance, or 'base' to use a base method. If null or empty, then 'copy' is used
+                /// by default.
                 /// </summary>
                 public string? {{Specs}} { get; set; }
 
@@ -80,11 +82,10 @@ internal static class WithGeneratorAttr
                         value = temp.NullWhenEmpty();
                         return true;
                     }
-                    if (item.IsNull)
-                    {
-                        // We don't use this because 'null' is the default value and, if we
-                        // intercept it here, that will stop further downstream searches...
-                    }
+
+                    // We don't intercept this case: if so, it will end any further downstream
+                    // search, preventing using settings from the inheritance chain...
+                    if (item.IsNull) { }
                 }
             }
 

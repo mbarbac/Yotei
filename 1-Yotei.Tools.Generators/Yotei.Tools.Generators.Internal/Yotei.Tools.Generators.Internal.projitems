@@ -52,6 +52,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\ChildrenList[T].cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\TreeDiagnostics.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\TreeGenerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\YoteiGeneratedAttr.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
   </ItemGroup>
 </Project>

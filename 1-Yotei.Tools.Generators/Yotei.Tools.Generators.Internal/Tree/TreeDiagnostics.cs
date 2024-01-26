@@ -260,15 +260,17 @@ internal static class TreeDiagnostics
     /// </summary>
     /// <param name="context"></param>
     /// <param name="symbol"></param>
+    /// <param name="source"></param>
     /// <param name="severity"></param>
     public static void NoBaseMethod(
         this SourceProductionContext context,
         ISymbol symbol,
+        string source,
         DiagnosticSeverity severity = DiagnosticSeverity.Error)
     {
         var id = "TreeGen09";
         var head = "No base method found.";
-        var desc = $"No base method found for symbol '{symbol.Name}'.";
+        var desc = $"No base method found for symbol '{symbol.Name}' on source '{source}'.";
 
         context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor(
             id, head, desc,

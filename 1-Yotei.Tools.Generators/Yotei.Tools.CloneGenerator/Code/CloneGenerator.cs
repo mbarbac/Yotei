@@ -28,6 +28,9 @@ internal class CloneGenerator : TreeGenerator
         cb.AppendLine();
         cb.AppendLine(CloneableAttr.Code(nsName));
 
+        cb.AppendLine();
+        cb.AppendLine(YoteiGeneratedAttr.Code(nsName));
+
         var code = cb.ToString();
         var name = CloneableAttr.LongName + ".g.cs";
         context.AddSource(name, code);

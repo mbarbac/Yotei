@@ -28,6 +28,9 @@ internal class WithGenerator : TreeGenerator
         cb.AppendLine();
         cb.AppendLine(WithGeneratorAttr.Code(nsName));
 
+        cb.AppendLine();
+        cb.AppendLine(YoteiGeneratedAttr.Code(nsName));
+
         var code = cb.ToString();
         var name = WithGeneratorAttr.LongName + ".g.cs";
         context.AddSource(name, code);

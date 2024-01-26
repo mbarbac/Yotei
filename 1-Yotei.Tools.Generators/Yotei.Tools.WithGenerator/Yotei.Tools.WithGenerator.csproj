@@ -32,7 +32,7 @@
    </PropertyGroup>
 
    <PropertyGroup>
-	  <!--<DefineConstants>$(DefineConstants);DEBUG_WITH_GENERATOR</DefineConstants>-->
+	  <DefineConstants>$(DefineConstants);DEBUG_WITH_GENERATOR</DefineConstants>
    </PropertyGroup>
 
    <Import Project="..\Yotei.Tools.Generators.Internal\Yotei.Tools.Generators.Internal.projitems" Label="Shared" />

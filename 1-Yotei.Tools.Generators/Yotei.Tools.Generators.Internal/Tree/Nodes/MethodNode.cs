@@ -33,7 +33,16 @@ internal class MethodNode : INode
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"Method: {Symbol.EasyName()}";
+    public override string ToString()
+    {
+        var same = SymbolEqualityComparer.Default.Equals(
+            Symbol.ContainingType,
+            ParentNode.Symbol);
+
+        return same
+            ? $"Method: {Symbol.EasyName()}"
+            : $"Method({ParentNode.Symbol.Name}): {Symbol.EasyName()}";
+    }
 
     /// <summary>
     /// <inheritdoc/>
