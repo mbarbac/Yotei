@@ -32,7 +32,7 @@ public static partial class Test_FrozenList_KT
                 item.ThrowWhenNull(); ValidateKey(item.Name);
                 return item;
             };
-            GetKey = (item) => item?.Name ?? throw new ArgumentNullException();
+            GetKey = (item) => item?.Name ?? throw new ArgumentNullException(nameof(item));
             ValidateKey = (key) => key.NotNullNotEmpty();
             CompareKeys = (x, y) => string.Compare(x, y, !Engine.CaseSensitiveNames) == 0;
             Duplicates = (@this, key) => @this.IndexesOf(key);
@@ -42,7 +42,7 @@ public static partial class Test_FrozenList_KT
         }
         public ChainBuilder(IEngine engine, T item) : this(engine) => Add(item);
         public ChainBuilder(IEngine engine, IEnumerable<T> range) : this(engine) => AddRange(range);
-        public ChainBuilder(ChainBuilder source) : this(source.Engine) => AddRange(source);        
+        protected ChainBuilder(ChainBuilder source) : this(source.Engine) => AddRange(source);        
     }
 
     // ====================================================

@@ -39,7 +39,7 @@ public static partial class Test_FrozenList_T
         }
         public ChainBuilder(IEngine engine, T item) : this(engine) => Add(item);
         public ChainBuilder(IEngine engine, IEnumerable<T> range) : this(engine) => AddRange(range);
-        public ChainBuilder(ChainBuilder source) : this(source.Engine) => AddRange(source);        
+        protected ChainBuilder(ChainBuilder source) : this(source.Engine) => AddRange(source);        
     }
 
     // ====================================================
