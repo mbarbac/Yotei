@@ -6,15 +6,10 @@ namespace Runner.Artifacts;
 // ========================================================
 public class CleanDiskArtifacts : MenuEntry
 {
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override string Header() => "Clean Disk Artifacts";
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public override void Execute()
     {
         WriteLine(true);
@@ -29,9 +24,6 @@ public class CleanDiskArtifacts : MenuEntry
     /// <summary>
     /// Executes on the given path.
     /// </summary>
-    /// <param name="root"></param>
-    /// <param name="path"></param>
-    /// <param name="delete"></param>
     static void Execute(string root, string path, bool delete)
     {
         var directory = new DirectoryInfo(path);

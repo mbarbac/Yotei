@@ -1,32 +1,22 @@
 ﻿namespace Yotei.Tools;
 
 // ========================================================
-/// <summary>
 /// <inheritdoc cref="IBaseDisposable"/>
-/// </summary>
 public abstract record class DisposableRecord : IBaseDisposable
 {
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public bool IsDisposed { get; private set; } = false;
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public void ThrowWhenDisposed()
     {
         ObjectDisposedException.ThrowIf(IsDisposed, this);
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public bool OnDisposing { get; private set; } = false;
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public void ThrowWhenDisposing()
     {
         if (OnDisposing)
@@ -37,9 +27,7 @@ public abstract record class DisposableRecord : IBaseDisposable
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public void Dispose()
     {
         if (!IsDisposed)
@@ -58,10 +46,7 @@ public abstract record class DisposableRecord : IBaseDisposable
     /// <param name="disposing"></param>
     protected abstract void OnDispose(bool disposing);
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public async ValueTask DisposeAsync()
     {
         if (!IsDisposed)

@@ -1,9 +1,7 @@
 ﻿namespace Yotei.Tools.CloneGenerator;
 
 // ========================================================
-/// <summary>
 /// <inheritdoc/>
-/// </summary>
 internal class XTypeNode : TypeNode
 {
     public XTypeNode(INode parent, INamedTypeSymbol symbol) : base(parent, symbol) { }
@@ -11,11 +9,7 @@ internal class XTypeNode : TypeNode
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="context"></param>
-    /// <returns></returns>
     protected override bool OnValidate(SourceProductionContext context)
     {
         if (!base.OnValidate(context)) return false;
@@ -26,11 +20,7 @@ internal class XTypeNode : TypeNode
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="context"></param>
-    /// <param name="cb"></param>
     protected override void OnPrint(SourceProductionContext context, CodeBuilder cb)
     {
         // Intercepting explicit implementation...

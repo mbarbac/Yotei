@@ -50,15 +50,10 @@ internal class TypeNode : INode
         MethodChildren = new(this);
     }
 
-    // <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override string ToString() => $"Type: {Symbol.EasyName()}";
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public Hierarchy Hierarchy => ParentNode.Hierarchy;
 
     /// <summary>
@@ -130,11 +125,7 @@ internal class TypeNode : INode
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="context"></param>
-    /// <returns></returns>
     public bool Validate(SourceProductionContext context)
     {
         foreach (var node in TypeChildren) if (!node.Validate(context)) return false;
@@ -159,11 +150,7 @@ internal class TypeNode : INode
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="context"></param>
-    /// <param name="cb"></param>
     public virtual void Print(SourceProductionContext context, CodeBuilder cb)
     {
         var rec = Symbol.IsRecord ? "record " : string.Empty;

@@ -6,10 +6,7 @@
 /// </summary>
 public class AssemblyHolder(Assembly assembly)
 {
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override string ToString() => Name;
 
     /// <summary>

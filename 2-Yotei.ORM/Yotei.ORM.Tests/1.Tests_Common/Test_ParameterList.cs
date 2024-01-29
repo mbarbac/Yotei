@@ -96,29 +96,6 @@ public static class Test_ParameterList
 
     //[Enforced]
     [Fact]
-    public static void Test_Builder()
-    {
-        var engine = new FakeEngine();
-        var items = new ParameterList(engine, [x007, xJames, xBond, x007]);
-
-        var builder = items.ToBuilder();
-        Assert.Equal(4, builder.Count);
-        Assert.Same(x007, builder[0]);
-        Assert.Same(xJames, builder[1]);
-        Assert.Same(xBond, builder[2]);
-        Assert.Same(x007, builder[3]);
-
-        var num = builder.RemoveAll("ID");
-        Assert.Equal(2, num);
-
-        items = new ParameterList(engine, builder);
-        Assert.Equal(2, items.Count);
-        Assert.Same(xJames, items[0]);
-        Assert.Same(xBond, items[1]);
-    }
-
-    //[Enforced]
-    [Fact]
     public static void Test_Find_Item()
     {
         var engine = new FakeEngine();

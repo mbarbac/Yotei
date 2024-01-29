@@ -55,6 +55,7 @@ internal static class StringExtensions
     /// <param name="source"></param>
     /// <param name="ch"></param>
     /// <returns></returns>
+    [SuppressMessage("", "IDE0305")]
     public static string RemoveAll(this string source, char ch)
     {
         source.ThrowWhenNull();

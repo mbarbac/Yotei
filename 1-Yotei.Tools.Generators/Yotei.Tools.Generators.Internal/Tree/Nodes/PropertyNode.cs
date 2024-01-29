@@ -29,10 +29,7 @@ internal class PropertyNode : INode
         Symbol = candidate.Symbol;
     }
 
-    // <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override string ToString()
     {
         var same = SymbolEqualityComparer.Default.Equals(
@@ -44,9 +41,7 @@ internal class PropertyNode : INode
             : $"Property({ParentNode.Symbol.Name}): {Symbol.EasyName()}";
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public Hierarchy Hierarchy => ParentNode.Hierarchy;
 
     /// <summary>
@@ -67,20 +62,12 @@ internal class PropertyNode : INode
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="context"></param>
-    /// <returns></returns>
     public virtual bool Validate(SourceProductionContext context) => true;
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="context"></param>
-    /// <param name="cb"></param>
     public virtual void Print(SourceProductionContext context, CodeBuilder cb)
     {
         cb.AppendLine($"// {this}");

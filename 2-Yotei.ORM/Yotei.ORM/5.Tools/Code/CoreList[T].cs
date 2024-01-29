@@ -1,10 +1,7 @@
 ﻿namespace Yotei.ORM.Tools.Code;
 
 // ========================================================
-/// <summary>
 /// <inheritdoc cref="ICoreList{T}"/>
-/// </summary>
-/// <typeparam name="T"></typeparam>
 [DebuggerDisplay("{ToDebugString(6)}")]
 [Cloneable]
 public partial class CoreList<T> : ICoreList<T>
@@ -34,17 +31,11 @@ public partial class CoreList<T> : ICoreList<T>
     /// <param name="source"></param>
     protected CoreList(CoreList<T> source) => AddRange(source);
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override string ToString() => $"Count: {Count}";
 
     public string ToDebugString(int count) => Count == 0 ? "0:[]" : (
@@ -65,9 +56,7 @@ public partial class CoreList<T> : ICoreList<T>
         AddRange(range);
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public Func<T, T> Validate
     {
         get => _Validate;
@@ -80,9 +69,7 @@ public partial class CoreList<T> : ICoreList<T>
     }
     Func<T, T> _Validate = (item) => item;
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public Func<T, T, bool> Compare
     {
         get => _Comparer;
@@ -95,9 +82,7 @@ public partial class CoreList<T> : ICoreList<T>
     }
     Func<T, T, bool> _Comparer = EqualityComparer<T>.Default.Equals;
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public Func<ICoreList<T>, T, List<int>> Duplicates
     {
         get => _Duplicates;
@@ -110,9 +95,7 @@ public partial class CoreList<T> : ICoreList<T>
     }
     Func<ICoreList<T>, T, List<int>> _Duplicates = (@this, item) => @this.IndexesOf(item);
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public Func<T, T, bool> CanInclude
     {
         get => _CanInclude;
@@ -127,16 +110,10 @@ public partial class CoreList<T> : ICoreList<T>
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public int Count => Items.Count;
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="index"></param>
-    /// <returns></returns>
     public T this[int index]
     {
         get => Items[index];
@@ -148,19 +125,11 @@ public partial class CoreList<T> : ICoreList<T>
         set => this[index] = (T)value!;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
     public bool Contains(T item) => IndexOf(item) >= 0;
     bool IList.Contains(object? value) => Contains(Validate((T)value!));
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
     public int IndexOf(T item)
     {
         item = Validate(item);
@@ -168,40 +137,24 @@ public partial class CoreList<T> : ICoreList<T>
     }
     int IList.IndexOf(object? value) => IndexOf(Validate((T)value!));
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
     public int LastIndexOf(T item)
     {
         item = Validate(item);
         return LastIndexOf(x => Compare(x, item));
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
     public List<int> IndexesOf(T item)
     {
         item = Validate(item);
         return IndexesOf(x => Compare(x, item));
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="predicate"></param>
-    /// <returns></returns>
     public bool Contains(Predicate<T> predicate) => IndexOf(predicate) >= 0;
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="predicate"></param>
-    /// <returns></returns>
     public int IndexOf(Predicate<T> predicate)
     {
         predicate.ThrowWhenNull();
@@ -210,11 +163,7 @@ public partial class CoreList<T> : ICoreList<T>
         return -1;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="predicate"></param>
-    /// <returns></returns>
     public int LastIndexOf(Predicate<T> predicate)
     {
         predicate.ThrowWhenNull();
@@ -223,11 +172,7 @@ public partial class CoreList<T> : ICoreList<T>
         return -1;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="predicate"></param>
-    /// <returns></returns>
     public List<int> IndexesOf(Predicate<T> predicate)
     {
         predicate.ThrowWhenNull();
@@ -237,16 +182,10 @@ public partial class CoreList<T> : ICoreList<T>
         return list;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public T[] ToArray() => Items.ToArray();
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public List<T> ToList() => new(Items);
 
     // ----------------------------------------------------
@@ -255,12 +194,7 @@ public partial class CoreList<T> : ICoreList<T>
         ? source!.Equals(item)
         : ReferenceEquals(source, item);
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="item"></param>
-    /// <returns></returns>
     public virtual int Replace(int index, T item)
     {
         item = Validate(item);
@@ -272,11 +206,7 @@ public partial class CoreList<T> : ICoreList<T>
         return Insert(index, item);
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
     public virtual int Add(T item)
     {
         Console.WriteLine($"Entering add...count: {Count}, item: {item}");
@@ -294,11 +224,7 @@ public partial class CoreList<T> : ICoreList<T>
     void ICollection<T>.Add(T item) => Add(item);
     int IList.Add(object? value) => Add((T)value!) > 0 ? (Count - 1) : -1;
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="range"></param>
-    /// <returns></returns>
     public virtual int AddRange(IEnumerable<T> range)
     {
         Console.WriteLine($"Entering addrange...count: {Count}");
@@ -316,12 +242,7 @@ public partial class CoreList<T> : ICoreList<T>
         return num;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="item"></param>
-    /// <returns></returns>
     public virtual int Insert(int index, T item)
     {
         item = Validate(item);
@@ -337,12 +258,7 @@ public partial class CoreList<T> : ICoreList<T>
     void IList<T>.Insert(int index, T item) => Insert(index, item);
     void IList.Insert(int index, object? value) => Insert(index, (T)value!);
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="range"></param>
-    /// <returns></returns>
     public virtual int InsertRange(int index, IEnumerable<T> range)
     {
         range.ThrowWhenNull();
@@ -359,11 +275,7 @@ public partial class CoreList<T> : ICoreList<T>
         return num;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="index"></param>
-    /// <returns></returns>
     public virtual int RemoveAt(int index)
     {
         if (index < 0 || index >= Items.Count) throw new IndexOutOfRangeException("Index out of range.").WithData(index);
@@ -374,12 +286,7 @@ public partial class CoreList<T> : ICoreList<T>
     void IList<T>.RemoveAt(int index) => RemoveAt(index);
     void IList.RemoveAt(int index) => RemoveAt(index);
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="count"></param>
-    /// <returns></returns>
     public virtual int RemoveRange(int index, int count)
     {
         if (count < 0) throw new ArgumentException("Count is less than cero.").WithData(count);
@@ -391,11 +298,7 @@ public partial class CoreList<T> : ICoreList<T>
         return count;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
     public virtual int Remove(T item)
     {
         if (Count == 0) return 0;
@@ -406,11 +309,7 @@ public partial class CoreList<T> : ICoreList<T>
     bool ICollection<T>.Remove(T item) => Remove(Validate(item)) >= 0;
     void IList.Remove(object? value) => Remove(Validate((T)value!));
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
     public virtual int RemoveLast(T item)
     {
         if (Count == 0) return 0;
@@ -419,11 +318,7 @@ public partial class CoreList<T> : ICoreList<T>
         return index >= 0 ? RemoveAt(index) : 0;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
     public virtual int RemoveAll(T item)
     {
         if (Count == 0) return 0;
@@ -438,11 +333,7 @@ public partial class CoreList<T> : ICoreList<T>
         return num;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="predicate"></param>
-    /// <returns></returns>
     public virtual int Remove(Predicate<T> predicate)
     {
         if (Count == 0) return 0;
@@ -451,11 +342,7 @@ public partial class CoreList<T> : ICoreList<T>
         return index >= 0 ? RemoveAt(index) : 0;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="predicate"></param>
-    /// <returns></returns>
     public virtual int RemoveLast(Predicate<T> predicate)
     {
         if (Count == 0) return 0;
@@ -464,11 +351,7 @@ public partial class CoreList<T> : ICoreList<T>
         return index >= 0 ? RemoveAt(index) : 0;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="predicate"></param>
-    /// <returns></returns>
     public virtual int RemoveAll(Predicate<T> predicate)
     {
         if (Count == 0) return 0;
@@ -483,10 +366,7 @@ public partial class CoreList<T> : ICoreList<T>
         return num;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public virtual int Clear()
     {
         var num = Items.Count; if (num > 0) Items.Clear();

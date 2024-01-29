@@ -15,12 +15,6 @@ public partial interface IFrozenList<K, T> : IEnumerable<T>
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a builder of the appropriate type for this instance.
-    /// </summary>
-    /// <returns></returns>
-    ICoreList<K, T> ToBuilder();
-
-    /// <summary>
     /// Gets the number of elements in this collection.
     /// </summary>
     int Count { get; }

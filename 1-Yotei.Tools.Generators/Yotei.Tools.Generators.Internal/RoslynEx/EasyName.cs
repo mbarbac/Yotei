@@ -19,6 +19,7 @@ internal static class EasyNameExtensions
     /// <param name="symbol"></param>
     /// <param name="options"></param>
     /// <returns></returns>
+    [SuppressMessage("", "IDE0019")]
     public static string EasyName(this ITypeSymbol symbol, EasyNameOptions options)
     {
         symbol.ThrowWhenNull();

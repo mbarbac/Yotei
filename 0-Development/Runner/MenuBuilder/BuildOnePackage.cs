@@ -6,15 +6,10 @@ namespace Runner.Builder;
 // ========================================================
 public class BuildOnePackage : MenuEntry
 {
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override string Header() => "Build One Package";
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public override void Execute()
     {
         string? root = null;
@@ -56,19 +51,14 @@ public class BuildOnePackage : MenuEntry
         /// </summary>
         public Project Project { get; } = project;
 
-        /// <summary>
         /// <inheritdoc/>
-        /// </summary>
-        /// <returns></returns>
         public override string Header()
         {
             var version = Project.GetVersion(out var temp) ? temp.ToString() : "Invalid";
             return $"{Project.Name} v:{version}";
         }
 
-        /// <summary>
         /// <inheritdoc/>
-        /// </summary>
         public override void Execute()
         {
             if (!PackageBuilder.AskForMode(out var mode)) return;

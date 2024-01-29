@@ -36,10 +36,7 @@ public record class Locale : IComparer<string>, IEqualityComparer<char>
         CompareOptions = options;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override string ToString()
     {
         var sb = new StringBuilder();

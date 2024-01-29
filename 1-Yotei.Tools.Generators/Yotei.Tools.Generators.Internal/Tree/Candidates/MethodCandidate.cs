@@ -11,19 +11,12 @@ internal class MethodCandidate(
     SemanticModel model, MethodDeclarationSyntax syntax, IMethodSymbol symbol)
     : Candidate(model, syntax, symbol)
 {
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override string ToString() => $"Method: {Symbol.EasyName()}";
 
-    /// <summary>
     /// <inheritdoc cref="Candidate.Syntax"/>
-    /// </summary>
     public new MethodDeclarationSyntax Syntax => (MethodDeclarationSyntax)base.Syntax;
 
-    /// <summary>
     /// <inheritdoc cref="Candidate.Symbol"/>
-    /// </summary>
     public new IMethodSymbol Symbol => (IMethodSymbol)base.Symbol;
 }

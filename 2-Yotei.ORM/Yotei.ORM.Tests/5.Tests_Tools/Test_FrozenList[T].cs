@@ -20,43 +20,38 @@ public static partial class Test_FrozenList_T
     // ====================================================
 
     [Cloneable]
-    internal partial class ChainBuilder : CoreList<T>
-    {
-        public IEngine Engine { get; }
-        public ChainBuilder(IEngine engine)
-        {
-            Engine = engine.ThrowWhenNull();
-            Validate = (item) =>
-            {
-                item.ThrowWhenNull(); item.Name.NotNullNotEmpty();
-                return item;
-            };
-            Compare = (x, y) => string.Compare(x.Name, y.Name, !Engine.CaseSensitiveNames) == 0;
-            Duplicates = (@this, item) => @this.IndexesOf(item);
-            CanInclude = (x, item) => ReferenceEquals(x, item)
-                ? true
-                : throw new DuplicateException("Duplicated element.").WithData(item);
-        }
-        public ChainBuilder(IEngine engine, T item) : this(engine) => Add(item);
-        public ChainBuilder(IEngine engine, IEnumerable<T> range) : this(engine) => AddRange(range);
-        protected ChainBuilder(ChainBuilder source) : this(source.Engine) => AddRange(source);        
-    }
-
-    // ====================================================
-
-    [Cloneable]
     internal partial class Chain : FrozenList<T>
     {
-        public IEngine Engine { get; }
-        protected override ChainBuilder Items => _Items ??= new(Engine);
-        ChainBuilder? _Items = null;
+        [Cloneable]
+        protected partial class InnerItems : CoreList<T>
+        {
+            readonly Chain Master;
+            public InnerItems(Chain master)
+            {
+                Master = master.ThrowWhenNull();
+                Validate = (item) =>
+                {
+                    item.ThrowWhenNull(); item.Name.NotNullNotEmpty();
+                    return item;
+                };
+                Compare = (x, y) => string.Compare(x.Name, y.Name, !Master.Engine.CaseSensitiveNames) == 0;
+                Duplicates = (@this, item) => @this.IndexesOf(item);
+                CanInclude = (x, item) => ReferenceEquals(x, item)
+                    ? true
+                    : throw new DuplicateException("Duplicated element.").WithData(item);
+            }
+            public InnerItems(InnerItems source) : this(source.Master) => AddRange(source);
+        }
+        protected override InnerItems Items => _Items ??= new(this);
+        InnerItems? _Items = null;
 
         public Chain(IEngine engine) => Engine = engine.ThrowWhenNull();
         public Chain(IEngine engine, T item) : this(engine) => Items.Add(item);
         public Chain(IEngine engine, IEnumerable<T> range) : this(engine) => Items.AddRange(range);
         public Chain(Chain source) : this(source.Engine) => Items.AddRange(source);
 
-        public override ChainBuilder ToBuilder() => (ChainBuilder)base.ToBuilder();
+        public IEngine Engine { get; }
+
         public override Chain GetRange(int index, int count) => (Chain)base.GetRange(index, count);
         public override Chain Replace(int index, T item) => (Chain)base.Replace(index, item);
         public override Chain Add(T item) => (Chain)base.Add(item);

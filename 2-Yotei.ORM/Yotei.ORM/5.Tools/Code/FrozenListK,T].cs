@@ -1,16 +1,12 @@
 ﻿namespace Yotei.ORM.Tools.Code;
 
 // ========================================================
-/// <summary>
 /// <inheritdoc cref="IFrozenList{K, T}"/>
-/// </summary>
-/// <typeparam name="K"></typeparam>
-/// <typeparam name="T"></typeparam>
 [DebuggerDisplay("{ToDebugString(6)}")]
 [Cloneable]
-public abstract partial class FrozenList<K, T> : IFrozenList<K, T>
+public partial class FrozenList<K, T> : IFrozenList<K, T>
 {
-    protected abstract ICoreList<K, T> Items { get; }
+    protected virtual ICoreList<K, T> Items { get; } = new CoreList<K, T>();
 
     /// <summary>
     /// Initializes a new empty instance.
@@ -35,117 +31,56 @@ public abstract partial class FrozenList<K, T> : IFrozenList<K, T>
     /// <param name="source"></param>
     protected FrozenList(CoreList<K, T> source) => Items.AddRange(source);
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override string ToString() => $"Count: {Count}";
 
     public string ToDebugString(int count) => Items.ToDebugString(count);
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
-    public virtual ICoreList<K, T> ToBuilder() => Items.Clone();
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
     public int Count => Items.Count;
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="index"></param>
-    /// <returns></returns>
     public T this[int index] => Items[index];
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
     public bool Contains(K key) => Items.Contains(key);
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
     public int IndexOf(K key) => Items.IndexOf(key);
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
     public int LastIndexOf(K key) => Items.LastIndexOf(key);
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
     public List<int> IndexesOf(K key) => Items.IndexesOf(key);
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="predicate"></param>
-    /// <returns></returns>
     public bool Contains(Predicate<T> predicate) => Items.Contains(predicate);
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="predicate"></param>
-    /// <returns></returns>
     public int IndexOf(Predicate<T> predicate) => Items.IndexOf(predicate);
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="predicate"></param>
-    /// <returns></returns>
     public int LastIndexOf(Predicate<T> predicate) => Items.LastIndexOf(predicate);
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="predicate"></param>
-    /// <returns></returns>
     public List<int> IndexesOf(Predicate<T> predicate) => Items.IndexesOf(predicate);
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public T[] ToArray() => Items.ToArray();
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public List<T> ToList() => Items.ToList();
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="count"></param>
-    /// <returns></returns>
     public virtual IFrozenList<K, T> GetRange(int index, int count)
     {
         if (index == 0 && count == Count) return this;
@@ -158,12 +93,7 @@ public abstract partial class FrozenList<K, T> : IFrozenList<K, T>
         return clone;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="item"></param>
-    /// <returns></returns>
     public virtual IFrozenList<K, T> Replace(int index, T item)
     {
         var clone = Clone();
@@ -171,11 +101,7 @@ public abstract partial class FrozenList<K, T> : IFrozenList<K, T>
         return num > 0 ? clone : this;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
     public virtual IFrozenList<K, T> Add(T item)
     {
         var clone = Clone();
@@ -183,11 +109,7 @@ public abstract partial class FrozenList<K, T> : IFrozenList<K, T>
         return num > 0 ? clone : this;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="range"></param>
-    /// <returns></returns>
     public virtual IFrozenList<K, T> AddRange(IEnumerable<T> range)
     {
         if (range is ICollection<T> trange && trange.Count == 0) return this;
@@ -198,12 +120,7 @@ public abstract partial class FrozenList<K, T> : IFrozenList<K, T>
         return num > 0 ? clone : this;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="item"></param>
-    /// <returns></returns>
     public virtual IFrozenList<K, T> Insert(int index, T item)
     {
         var clone = Clone();
@@ -211,12 +128,7 @@ public abstract partial class FrozenList<K, T> : IFrozenList<K, T>
         return num > 0 ? clone : this;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="range"></param>
-    /// <returns></returns>
     public virtual IFrozenList<K, T> InsertRange(int index, IEnumerable<T> range)
     {
         if (range is ICollection<T> trange && trange.Count == 0) return this;
@@ -227,11 +139,7 @@ public abstract partial class FrozenList<K, T> : IFrozenList<K, T>
         return num > 0 ? clone : this;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="index"></param>
-    /// <returns></returns>
     public virtual IFrozenList<K, T> RemoveAt(int index)
     {
         if (index < 0 || index >= Items.Count) throw new IndexOutOfRangeException("Index out of range.").WithData(index);
@@ -241,12 +149,7 @@ public abstract partial class FrozenList<K, T> : IFrozenList<K, T>
         return num > 0 ? clone : this;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="count"></param>
-    /// <returns></returns>
     public virtual IFrozenList<K, T> RemoveRange(int index, int count)
     {
         if (count < 0) throw new ArgumentException("Count is less than cero.").WithData(count);
@@ -261,11 +164,7 @@ public abstract partial class FrozenList<K, T> : IFrozenList<K, T>
         return this;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
     public virtual IFrozenList<K, T> Remove(K key)
     {
         if (Count == 0) return this;
@@ -275,11 +174,7 @@ public abstract partial class FrozenList<K, T> : IFrozenList<K, T>
         return num > 0 ? clone : this;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
     public virtual IFrozenList<K, T> RemoveLast(K key)
     {
         if (Count == 0) return this;
@@ -289,11 +184,7 @@ public abstract partial class FrozenList<K, T> : IFrozenList<K, T>
         return num > 0 ? clone : this;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
     public virtual IFrozenList<K, T> RemoveAll(K key)
     {
         if (Count == 0) return this;
@@ -303,11 +194,7 @@ public abstract partial class FrozenList<K, T> : IFrozenList<K, T>
         return num > 0 ? clone : this;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="predicate"></param>
-    /// <returns></returns>
     public virtual IFrozenList<K, T> Remove(Predicate<T> predicate)
     {
         if (Count == 0) return this;
@@ -317,11 +204,7 @@ public abstract partial class FrozenList<K, T> : IFrozenList<K, T>
         return num > 0 ? clone : this;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="predicate"></param>
-    /// <returns></returns>
     public virtual IFrozenList<K, T> RemoveLast(Predicate<T> predicate)
     {
         if (Count == 0) return this;
@@ -331,11 +214,7 @@ public abstract partial class FrozenList<K, T> : IFrozenList<K, T>
         return num > 0 ? clone : this;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="predicate"></param>
-    /// <returns></returns>
     public virtual IFrozenList<K, T> RemoveAll(Predicate<T> predicate)
     {
         if (Count == 0) return this;
@@ -345,10 +224,7 @@ public abstract partial class FrozenList<K, T> : IFrozenList<K, T>
         return num > 0 ? clone : this;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public virtual IFrozenList<K, T> Clear()
     {
         if (Count == 0) return this;

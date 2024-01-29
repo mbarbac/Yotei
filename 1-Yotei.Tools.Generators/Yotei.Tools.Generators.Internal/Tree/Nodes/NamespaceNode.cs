@@ -46,15 +46,10 @@ internal class NamespaceNode : INode
         TypeChildren = new(this);
     }
 
-    // <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override string ToString() => $"Namespace: {Name}";
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public Hierarchy Hierarchy => ParentNode.Hierarchy;
 
     /// <summary>
@@ -100,11 +95,7 @@ internal class NamespaceNode : INode
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="context"></param>
-    /// <returns></returns>
     public bool Validate(SourceProductionContext context)
     {
         foreach (var node in NamespaceChildren) if (!node.Validate(context)) return false;
@@ -114,11 +105,7 @@ internal class NamespaceNode : INode
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="context"></param>
-    /// <param name="cb"></param>
     public void Print(SourceProductionContext context, CodeBuilder cb)
     {
         cb.AppendLine($"namespace {Name}");

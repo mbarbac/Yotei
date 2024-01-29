@@ -6,15 +6,10 @@ namespace Runner.Builder;
 // ========================================================
 public class BuildLocalRepo : MenuEntry
 {
-    /// <summary>
-    /// <inheritdoc></inheritdoc>/>
-    /// </summary>
-    /// <returns></returns>
+    /// <inheritdoc>
     public override string Header() => "ReBuild Local Repo";
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public override void Execute()
     {
         WriteLine(true);

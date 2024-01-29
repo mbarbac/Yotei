@@ -1,9 +1,7 @@
 ﻿namespace Yotei.ORM.Code;
 
 // ========================================================
-/// <summary>
 /// <inheritdoc cref="IEngine"/>
-/// </summary>
 [WithGenerator]
 public abstract partial class Engine : IEngine
 {
@@ -39,22 +37,15 @@ public abstract partial class Engine : IEngine
         RightTerminator = source.RightTerminator;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override string ToString() => "ORM.Engine";
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public bool CaseSensitiveNames { get; init; } = CASESENSITIVENAMES;
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public string NullValueLiteral
     {
         get => _NullValueLiteral;
@@ -62,14 +53,10 @@ public abstract partial class Engine : IEngine
     }
     string _NullValueLiteral = NULLVALUELITERAL;
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public bool NativePaging { get; init; } = NATIVEPAGING;
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public string ParameterPrefix
     {
         get => _ParameterPrefix;
@@ -77,14 +64,10 @@ public abstract partial class Engine : IEngine
     }
     string _ParameterPrefix = PARAMETERPREFIX;
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public bool PositionalParameters { get; init; } = POSITIONALPARAMETERS;
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public bool UseTerminators { get; init; } = USETERMINATORS;
 
     static char ValidateTerminator(char value)
@@ -95,9 +78,7 @@ public abstract partial class Engine : IEngine
         return value;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public char LeftTerminator
     {
         get => _LeftTerminator;
@@ -105,9 +86,7 @@ public abstract partial class Engine : IEngine
     }
     char _LeftTerminator = LEFTERMINATOR;
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public char RightTerminator
     {
         get => _RightTerminator;
@@ -117,12 +96,7 @@ public abstract partial class Engine : IEngine
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="value"></param>
-    /// <param name="ch"></param>
-    /// <returns></returns>
     public List<int> UnwrappedIndexes(string? value, char ch)
     {
         var nums = new List<int>();

@@ -26,31 +26,21 @@ public class AsyncLock : DisposableClass
     /// </summary>
     public AsyncLock() { }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="disposing"></param>
     protected override void OnDispose(bool disposing)
     {
         if (IsDisposed || !disposing) return;
         Semaphore.Dispose();
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="disposing"></param>
-    /// <returns></returns>
     protected override ValueTask OnDisposeAsync(bool disposing)
     {
         OnDispose(disposing);
         return ValueTask.CompletedTask;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override string ToString() => $"({ThreadId}/{AsyncId}, #:{Count})";
 
     /// <summary>
@@ -296,10 +286,7 @@ public class AsyncLock : DisposableClass
 
         // ------------------------------------------------
 
-        /// <summary>
         /// <inheritdoc/>
-        /// </summary>
-        /// <param name="disposing"></param>
         protected override void OnDispose(bool disposing)
         {
             if (IsDisposed || !disposing) return;
@@ -323,11 +310,7 @@ public class AsyncLock : DisposableClass
             }
         }
 
-        /// <summary>
         /// <inheritdoc/>
-        /// </summary>
-        /// <param name="disposing"></param>
-        /// <returns></returns>
         protected override async ValueTask OnDisposeAsync(bool disposing)
         {
             if (IsDisposed || !disposing) return;

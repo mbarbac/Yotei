@@ -14,10 +14,7 @@ internal class CodeBuilder
     /// </summary>
     public CodeBuilder() { }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override string ToString() => Builder.ToString();
 
     /// <summary>

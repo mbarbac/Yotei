@@ -11,19 +11,12 @@ internal class PropertyCandidate(
     SemanticModel model, PropertyDeclarationSyntax syntax, IPropertySymbol symbol)
     : Candidate(model, syntax, symbol)
 {
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override string ToString() => $"Property: {Symbol.EasyName()}";
 
-    /// <summary>
     /// <inheritdoc cref="Candidate.Syntax"/>
-    /// </summary>
     public new PropertyDeclarationSyntax Syntax => (PropertyDeclarationSyntax)base.Syntax;
 
-    /// <summary>
     /// <inheritdoc cref="Candidate.Symbol"/>
-    /// </summary>
     public new IPropertySymbol Symbol => (IPropertySymbol)base.Symbol;
 }

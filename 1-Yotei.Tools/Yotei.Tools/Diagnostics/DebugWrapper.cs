@@ -116,7 +116,7 @@ public static class DebugWrapper
                 };
                 Console.Write(item);
 
-                if (part.EndsWith("\n") ||
+                if (part.EndsWith('\n') ||
                     part.EndsWith(Environment.NewLine))
                     DiagnosticsWrapper.DebugAtOrigin = true;
             }
@@ -217,7 +217,7 @@ public static class DebugWrapper
                 };
                 Console.WriteLine(item);
 
-                if (part.EndsWith("\n") ||
+                if (part.EndsWith('\n') ||
                     part.EndsWith(Environment.NewLine))
                     DiagnosticsWrapper.DebugAtOrigin = true;
             }

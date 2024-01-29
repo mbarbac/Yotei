@@ -6,15 +6,10 @@ namespace Runner.Artifacts;
 // ========================================================
 public class MenuArtifacts : MenuEntry
 {
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override string Header() => "Manage Artifacts";
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public override void Execute()
     {
         var done = -1; do

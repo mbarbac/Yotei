@@ -114,10 +114,7 @@ public sealed record class ClockTime : IComparable<ClockTime>, IEquatable<ClockT
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override string ToString() => ToStringSeparated(":");
 
     string ToStringSeparated(string separator)
@@ -336,11 +333,7 @@ public sealed record class ClockTime : IComparable<ClockTime>, IEquatable<ClockT
         return 0;
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="other"></param>
-    /// <returns></returns>
     public int CompareTo(ClockTime? other) => Compare(this, other);
 
     public static bool operator >(ClockTime? x, ClockTime? y) => Compare(x, y) > 0;
@@ -348,16 +341,9 @@ public sealed record class ClockTime : IComparable<ClockTime>, IEquatable<ClockT
     public static bool operator >=(ClockTime? x, ClockTime? y) => Compare(x, y) >= 0;
     public static bool operator <=(ClockTime? x, ClockTime? y) => Compare(x, y) <= 0;
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="other"></param>
-    /// <returns></returns>
     public bool Equals(ClockTime? other) => Compare(this, other) == 0;
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override int GetHashCode() => HashCode.Combine(Hour, Minute, Second, Millisecond);
 }

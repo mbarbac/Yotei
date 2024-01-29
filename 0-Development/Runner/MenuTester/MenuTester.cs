@@ -12,15 +12,10 @@ public class MenuTester(bool breakOnError) : MenuEntry
     /// </summary>
     public bool BreakOnError { get; } = breakOnError;
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override string Header() => "Execute Tests";
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public override void Execute()
     {
         WriteLine(true);

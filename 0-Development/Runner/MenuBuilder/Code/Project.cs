@@ -35,10 +35,7 @@ public class Project
         LoadFile();
     }
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override string ToString() => $"{Name}.{Extension}";
 
     /// <summary>

@@ -1,9 +1,7 @@
 ﻿namespace Yotei.Tools.WithGenerator;
 
 // ========================================================
-/// <summary>
 /// <inheritdoc/>
-/// </summary>
 internal class XPropertyNode : PropertyNode
 {
     public XPropertyNode(TypeNode parent, IPropertySymbol symbol) : base(parent, symbol) { }
@@ -14,11 +12,7 @@ internal class XPropertyNode : PropertyNode
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="context"></param>
-    /// <returns></returns>
     public override bool Validate(SourceProductionContext context)
     {
         if (!base.Validate(context)) return false;
@@ -33,11 +27,7 @@ internal class XPropertyNode : PropertyNode
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="context"></param>
-    /// <param name="cb"></param>
     public override void Print(SourceProductionContext context, CodeBuilder cb)
     {
         // Intercepting explicit implementation...

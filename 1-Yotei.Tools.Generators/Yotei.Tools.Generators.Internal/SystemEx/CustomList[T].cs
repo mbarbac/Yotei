@@ -27,17 +27,11 @@ internal class CustomList<T> : IEnumerable<T>
     /// <param name="range"></param>
     public CustomList(IEnumerable<T> range) => AddRange(range);
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
     public override string ToString() => $"Count: {Count}";
 
     public string ToDebugString(int count) => Count == 0 ? "0:[]" : (

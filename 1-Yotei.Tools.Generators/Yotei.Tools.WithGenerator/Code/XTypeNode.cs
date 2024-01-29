@@ -1,9 +1,7 @@
 ﻿namespace Yotei.Tools.WithGenerator;
 
 // ========================================================
-/// <summary>
 /// <inheritdoc/>
-/// </summary>
 internal class XTypeNode : TypeNode
 {
     public XTypeNode(INode parent, INamedTypeSymbol symbol) : base(parent, symbol) { }
@@ -11,11 +9,7 @@ internal class XTypeNode : TypeNode
 
     // ----------------------------------------------------
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
-    /// <param name="context"></param>
-    /// <returns></returns>
     protected override bool OnValidate(SourceProductionContext context)
     {
         if (!base.OnValidate(context)) return false;
@@ -26,12 +20,11 @@ internal class XTypeNode : TypeNode
 
     // ----------------------------------------------------
 
-    /// <summary>
-    /// <inheritdoc/> Before calling the base implementation, this override tries to capture the
-    /// members that are decorated in the inheritance chain, but not in this type.
-    /// </summary>
-    /// <param name="context"></param>
-    /// <param name="cb"></param>
+    /// <inheritdoc/>
+    /// <remarks>
+    /// Before calling the base implementation, this override tries to capture the members that
+    /// are decorated in the inheritance chain, but not in this type.
+    /// </remarks>
     public override void Print(SourceProductionContext context, CodeBuilder cb)
     {
         CaptureProperties();
