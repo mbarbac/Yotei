@@ -35,7 +35,7 @@ public static class Test_CommandInfo
         var x007 = new Parameter("Id", "007");
         var xJames = new Parameter("FirstName", "James");
         var xBond = new Parameter("LastName", "Bond");
-        var pars = new ParameterList(engine, [x007, xJames, xBond]);
+        var pars = new Code.ParameterList(engine, [x007, xJames, xBond]);
 
         var info = new CommandInfo(pars);
         Assert.False(info.IsEmpty);
@@ -45,10 +45,10 @@ public static class Test_CommandInfo
         Assert.Same(xJames, info.Parameters[1]);
         Assert.Same(xBond, info.Parameters[2]);
 
-        try { _ = new CommandInfo((IParameterList)null!); Assert.Fail(); }
+        try { _ = new CommandInfo((ParameterList)null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
 
-        try { _ = new CommandInfo(new ParameterList(engine, [x007, null!])); Assert.Fail(); }
+        try { _ = new CommandInfo(new Code.ParameterList(engine, [x007, null!])); Assert.Fail(); }
         catch (ArgumentException) { }
     }
 
@@ -59,7 +59,7 @@ public static class Test_CommandInfo
         var engine = new FakeEngine();
         var x007 = new Parameter("#Id", "007");
         var xJames = new Parameter("#FirstName", "James");
-        var pars = new ParameterList(engine, [x007, xJames]);
+        var pars = new Code.ParameterList(engine, [x007, xJames]);
 
         var info = new CommandInfo("[Id]={0}, [Name]={1}", pars);
         Assert.False(info.IsEmpty);
@@ -71,7 +71,7 @@ public static class Test_CommandInfo
         try { _ = new CommandInfo((string)null!, pars); Assert.Fail(); }
         catch (ArgumentException) { }
 
-        try { _ = new CommandInfo("any", (IParameterList)null!); Assert.Fail(); }
+        try { _ = new CommandInfo("any", (ParameterList)null!); Assert.Fail(); }
         catch (ArgumentException) { }
     }
 
@@ -111,7 +111,7 @@ public static class Test_CommandInfo
         var engine = new FakeEngine();
         var source = new CommandInfo(engine, "any");
 
-        var pars = new ParameterList(engine, [new Parameter("Id", "007"), new Parameter("Age", 50)]);
+        var pars = new Code.ParameterList(engine, [new Parameter("Id", "007"), new Parameter("Age", 50)]);
         var target = source.Add(pars);
         Assert.NotSame(source, target);
         Assert.Equal("any", target.Text);
@@ -155,7 +155,7 @@ public static class Test_CommandInfo
 
         var xJames = new Parameter("#FirstName", "James");
         var xBond = new Parameter("#LastName", "Bond");
-        var pars = new ParameterList(engine, [xJames, xBond]);
+        var pars = new Code.ParameterList(engine, [xJames, xBond]);
 
         var target = source.Add(", [First]={0}, [Last]={1}", pars);
         Assert.NotSame(source, target);
@@ -165,7 +165,7 @@ public static class Test_CommandInfo
         Assert.Equal("#FirstName", target.Parameters[1].Name); Assert.Equal("James", target.Parameters[1].Value);
         Assert.Equal("#LastName", target.Parameters[2].Name); Assert.Equal("Bond", target.Parameters[2].Value);
 
-        try { source.Add("{0}", new ParameterList(engine, [new Parameter("#0", "any")])); Assert.Fail(); }
+        try { source.Add("{0}", new Code.ParameterList(engine, [new Parameter("#0", "any")])); Assert.Fail(); }
         catch (DuplicateException) { }
     }
 

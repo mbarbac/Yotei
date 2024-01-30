@@ -8,6 +8,60 @@ namespace Yotei.Tools.Generators.Tests_CloneGenerator
     using TMiscelanea;
 
     // ====================================================
+    namespace IMiscelanea
+    {
+        public partial interface IOther
+        {
+            // --------------------------------------------
+            [Cloneable]
+            public partial interface IFoo<T>
+            {
+                string Name { get; }
+            }
+
+            // --------------------------------------------
+            [Cloneable]
+            public partial interface IBar<T, K> : IFoo<T>
+            {
+                TPair? MyPair { get; }
+            }
+        }
+    }
+
+    // ====================================================
+    namespace TMiscelanea
+    {
+        public partial class TOther
+        {
+            // --------------------------------------------
+            [Cloneable]
+            public partial class Foo : IOther.IFoo<string?>
+            {
+                public Foo(string name, int level) { Name = name; Level = level; }
+                protected Foo(Foo source) { Name = source.Name; Level = source.Level; }
+                public override string ToString() => $"{Name}({Level})";
+
+                public string Name { get; set; }
+                public int Level;
+            }
+
+            // --------------------------------------------
+            [Cloneable]
+            public partial class Bar<K> : Foo, IOther.IBar<K, string?>
+            {
+                public Bar(string name, int level, TPair? myPair) : base(name, level) => MyPair = myPair;
+                protected Bar(Bar<K> source) : base(source) => MyPair = source.MyPair;
+                public override string ToString() =>
+                    (base.ToString()) + (MyPair.HasValue
+                    ? ($", {MyPair.Value.Key} = {MyPair.Value.Value}")
+                    : string.Empty);
+
+                public TPair? MyPair { get; set; }
+            }
+        }
+    }
+
+    // ====================================================
     //[Enforced]
     public static partial class Test_Miscelanea
     {
@@ -30,7 +84,7 @@ namespace Yotei.Tools.Generators.Tests_CloneGenerator
         [Fact]
         public static void Test_Interface_IFoo()
         {
-            IOther.IFoo<string> source = new TOther.Foo("James", 1);
+            IOther.IFoo<string?> source = new TOther.Foo("James", 1);
             Assert.Equal("James", source.Name);
             Assert.Equal(1, ((TOther.Foo)source).Level);
 
@@ -64,7 +118,7 @@ namespace Yotei.Tools.Generators.Tests_CloneGenerator
         [Fact]
         public static void Test_Interface_IBar_On_Bar()
         {
-            IOther.IBar<int, string> source = new TOther.Bar<int>("Bond", 2, new("Age", 50));
+            IOther.IBar<int, string?> source = new TOther.Bar<int>("Bond", 2, new("Age", 50));
             Assert.Equal("Bond", source.Name);
             Assert.Equal(2, ((TOther.Bar<int>)source).Level);
             Assert.Equal("Age", source.MyPair!.Value.Key);
@@ -82,7 +136,7 @@ namespace Yotei.Tools.Generators.Tests_CloneGenerator
         [Fact]
         public static void Test_Interface_IFoo_On_Bar()
         {
-            IOther.IFoo<string> source = new TOther.Bar<int>("Bond", 2,new("Age", 50));
+            IOther.IFoo<string?> source = new TOther.Bar<int>("Bond", 2, new("Age", 50));
             Assert.Equal("Bond", source.Name);
             Assert.Equal(2, ((TOther.Bar<int>)source).Level);
             var bar = (IOther.IBar<int, string>)source;
@@ -97,60 +151,6 @@ namespace Yotei.Tools.Generators.Tests_CloneGenerator
             bar = (IOther.IBar<int, string>)target;
             Assert.Equal("Age", bar.MyPair!.Value.Key);
             Assert.Equal(50, bar.MyPair!.Value.Value);
-        }
-    }
-
-    // ====================================================
-    namespace IMiscelanea
-    {
-        public partial interface IOther
-        {
-            // --------------------------------------------
-            [Cloneable]
-            public partial interface IFoo<T>
-            {
-                string Name { get; }
-            }
-
-            // --------------------------------------------
-            [Cloneable]
-            public partial interface IBar<K, T> : IFoo<string>
-            {
-                TPair? MyPair { get; }
-            }
-        }
-    }
-
-    // ====================================================
-    namespace TMiscelanea
-    {
-        public partial class TOther
-        {
-            // --------------------------------------------
-            [Cloneable]
-            public partial class Foo : IOther.IFoo<string>
-            {
-                public Foo(string name, int level) { Name = name; Level = level; }
-                protected Foo(Foo source) { Name = source.Name; Level = source.Level; }
-                public override string ToString() => $"{Name}({Level})";
-
-                public string Name { get; set; }
-                public int Level;
-            }
-
-            // --------------------------------------------
-            [Cloneable]
-            public partial class Bar<K> : Foo, IOther.IBar<K, string>
-            {
-                public Bar(string name, int level, TPair? myPair) : base(name, level) => MyPair = myPair;
-                protected Bar(Bar<K> source) : base(source) => MyPair = source.MyPair;
-                public override string ToString() =>
-                    (base.ToString()) + (MyPair.HasValue
-                    ? ($", {MyPair.Value.Key} = {MyPair.Value.Value}")
-                    : string.Empty);
-
-                public TPair? MyPair { get; set; }
-            }
         }
     }
 }

@@ -218,7 +218,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
 
     // ----------------------------------------------------
 
-    static bool SameItem(T source, T item) => typeof(T).IsValueType
+    protected virtual bool SameItem(T source, T item) => typeof(T).IsValueType
         ? source!.Equals(item)
         : ReferenceEquals(source, item);
 

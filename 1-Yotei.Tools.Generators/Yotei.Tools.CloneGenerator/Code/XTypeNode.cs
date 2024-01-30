@@ -42,9 +42,9 @@ internal class XTypeNode : TypeNode
     {
         var modifiers = GetModifiers();
         var typeName = Symbol.EasyName(new EasyNameOptions(
-            fullTypeName: false,
-            typeParameters:true,
-            nullableAnnotation: false));
+            typeFullName: false,
+            typeGenerics:true,
+            typeNullable: false));
 
         cb.AppendLine("[Yotei.Tools.CloneGenerator.YoteiGenerated]");
         cb.AppendLine($"{modifiers}{typeName} Clone();");
@@ -58,9 +58,9 @@ internal class XTypeNode : TypeNode
     void PrintAbstract(SourceProductionContext context, CodeBuilder cb)
     {
         var typeName = Symbol.EasyName(new EasyNameOptions(
-            fullTypeName: false,
-            typeParameters: true,
-            nullableAnnotation: false));
+            typeFullName: false,
+            typeGenerics: true,
+            typeNullable: false));
 
         cb.AppendLine("[Yotei.Tools.CloneGenerator.YoteiGenerated]");
         cb.AppendLine($"public abstract {typeName} Clone();");
@@ -76,9 +76,9 @@ internal class XTypeNode : TypeNode
     {
         var modifiers = GetModifiers();
         var typeName = Symbol.EasyName(new EasyNameOptions(
-            fullTypeName: false,
-            typeParameters: true,
-            nullableAnnotation: false));
+            typeFullName: false,
+            typeGenerics: true,
+            typeNullable: false));
 
         cb.AppendLine("[Yotei.Tools.CloneGenerator.YoteiGenerated]");
         cb.AppendLine($"{modifiers}{typeName} Clone()");
@@ -113,9 +113,9 @@ internal class XTypeNode : TypeNode
         foreach (var iface in ifaces)
         {
             var typeName = iface.EasyName(new EasyNameOptions(
-                fullTypeName: true,
-                typeParameters: true,
-                nullableAnnotation: false));
+                typeFullName: true,
+                typeGenerics: true,
+                typeNullable: false));
 
             var valueName = iface.Name == "ICloneable" ? "object" : typeName;
 

@@ -25,7 +25,7 @@
 
    <!-- Common Elements  -->
    <ItemGroup>
-	  <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.4" />
+	  <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.5" />
 	  <ProjectReference Include="..\Yotei.ORM.Relational.FakeDB\Yotei.ORM.Relational.FakeDB.csproj" />
    </ItemGroup>
 

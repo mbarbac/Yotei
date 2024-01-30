@@ -59,13 +59,13 @@ internal class XPropertyNode : PropertyNode
         var modifiers = GetModifiers();
 
         var parentType = ParentNode.Symbol.EasyName(new EasyNameOptions(
-            fullTypeName: false,
-            typeParameters: true,
-            nullableAnnotation: false));
+            typeFullName: false,
+            typeGenerics: true,
+            typeNullable: false));
         var memberType = Symbol.Type.EasyName(new EasyNameOptions(
-            fullTypeName: true,
-            typeParameters: true,
-            nullableAnnotation: true));
+            typeFullName: true,
+            typeGenerics: true,
+            typeNullable: true));
 
         cb.AppendLine("[Yotei.Tools.WithGenerator.YoteiGenerated]");
         cb.AppendLine($"{modifiers}{parentType}");
@@ -80,13 +80,13 @@ internal class XPropertyNode : PropertyNode
     void PrintAbstract(SourceProductionContext context, CodeBuilder cb)
     {
         var parentType = ParentNode.Symbol.EasyName(new EasyNameOptions(
-            fullTypeName: false,
-            typeParameters: true,
-            nullableAnnotation: false));
+            typeFullName: false,
+            typeGenerics: true,
+            typeNullable: false));
         var memberType = Symbol.Type.EasyName(new EasyNameOptions(
-            fullTypeName: true,
-            typeParameters: true,
-            nullableAnnotation: true));
+            typeFullName: true,
+            typeGenerics: true,
+            typeNullable: true));
 
         cb.AppendLine("[Yotei.Tools.WithGenerator.YoteiGenerated]");
         cb.AppendLine($"public abstract {parentType}");
@@ -104,13 +104,13 @@ internal class XPropertyNode : PropertyNode
         var modifiers = GetModifiers();
 
         var parentType = ParentNode.Symbol.EasyName(new EasyNameOptions(
-            fullTypeName: false,
-            typeParameters: true,
-            nullableAnnotation: false));
+            typeFullName: false,
+            typeGenerics: true,
+            typeNullable: false));
         var memberType = Symbol.Type.EasyName(new EasyNameOptions(
-            fullTypeName: true,
-            typeParameters: true,
-            nullableAnnotation: true));
+            typeFullName: true,
+            typeGenerics: true,
+            typeNullable: true));
 
         cb.AppendLine("[Yotei.Tools.WithGenerator.YoteiGenerated]");
         cb.AppendLine($"{modifiers}{parentType}");
@@ -159,13 +159,13 @@ internal class XPropertyNode : PropertyNode
         var modifiers = GetModifiers();
 
         var parentType = ParentNode.Symbol.EasyName(new EasyNameOptions(
-            fullTypeName: false,
-            typeParameters: true,
-            nullableAnnotation: false));
+            typeFullName: false,
+            typeGenerics: true,
+            typeNullable: false));
         var memberType = Symbol.Type.EasyName(new EasyNameOptions(
-            fullTypeName: true,
-            typeParameters: true,
-            nullableAnnotation: true));
+            typeFullName: true,
+            typeGenerics: true,
+            typeNullable: true));
 
         cb.AppendLine("[Yotei.Tools.WithGenerator.YoteiGenerated]");
         cb.AppendLine($"{modifiers}{parentType}");
@@ -191,13 +191,13 @@ internal class XPropertyNode : PropertyNode
         var modifiers = GetModifiers();
 
         var parentType = ParentNode.Symbol.EasyName(new EasyNameOptions(
-            fullTypeName: false,
-            typeParameters: true,
-            nullableAnnotation: false));
+            typeFullName: false,
+            typeGenerics: true,
+            typeNullable: false));
         var memberType = Symbol.Type.EasyName(new EasyNameOptions(
-            fullTypeName: true,
-            typeParameters: true,
-            nullableAnnotation: true));
+            typeFullName: true,
+            typeGenerics: true,
+            typeNullable: true));
 
         cb.AppendLine("[Yotei.Tools.WithGenerator.YoteiGenerated]");
         cb.AppendLine($"{modifiers}{parentType}");
@@ -255,9 +255,9 @@ internal class XPropertyNode : PropertyNode
         foreach (var iface in ifaces)
         {
             var parentType = iface.EasyName(new EasyNameOptions(
-                fullTypeName: true,
-                typeParameters: true,
-                nullableAnnotation: false));
+                typeFullName: true,
+                typeGenerics: true,
+                typeNullable: false));
 
             var member = GetTypeMember(iface);
             if (member == null)
@@ -275,9 +275,9 @@ internal class XPropertyNode : PropertyNode
             }
 
             var memberType = member.Type.EasyName(new EasyNameOptions(
-                fullTypeName: true,
-                typeParameters: true,
-                nullableAnnotation: true));
+                typeFullName: true,
+                typeGenerics: true,
+                typeNullable: true));
 
             cb.AppendLine();
             cb.AppendLine($"{parentType}");

@@ -8,30 +8,8 @@ namespace Yotei.ORM.Code;
 [Cloneable]
 public sealed partial class ParameterList : FrozenList<K, T>, IParameterList
 {
-    [Cloneable]
-    public partial class Builder : CoreList<K, T>
-    {
-        readonly IEngine Engine;
-        public Builder(IEngine engine)
-        {
-            Engine = engine.ThrowWhenNull();
-            ValidateItem = (item) =>
-            {
-                item.ThrowWhenNull(); ValidateKey(item.Name);
-                return item;
-            };
-            GetKey = (item) => item?.Name ?? throw new ArgumentNullException(nameof(item));
-            ValidateKey = (key) => key.NotNullNotEmpty();
-            CompareKeys = (x, y) => string.Compare(x, y, !Engine.CaseSensitiveNames) == 0;
-            Duplicates = (@this, key) => @this.IndexesOf(key);
-            CanInclude = (x, item) => ReferenceEquals(x, item)
-                ? true
-                : throw new DuplicateException("Duplicated element.").WithData(item);
-        }
-        Builder(Builder source) : this(source.Engine) => AddRange(source);
-    }
-    protected override Builder Items => _Items ??= new(Engine);
-    Builder? _Items = null;
+    protected override ParameterListBuilder Items => _Items ??= new(Engine);
+    ParameterListBuilder? _Items = null;
 
     /// <summary>
     /// Initializes a new empty instance.
@@ -65,16 +43,25 @@ public sealed partial class ParameterList : FrozenList<K, T>, IParameterList
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public string NextName()
+    public string NextName() => Items.NextName();
+
+    /// <inheritdoc/>
+    public IParameterList AddNew(object? value, out T item)
     {
-        for (int i = Count; i < int.MaxValue; i++)
-        {
-            var name = $"{Engine.ParameterPrefix}{i}";
-            var index = IndexOf(name);
-            if (index < 0) return name;
-        }
-        throw new UnExpectedException("Range of integers exhausted.");
+        var clone = Clone();
+        var num = clone.Items.AddNew(value, out item);
+        return num > 0 ? clone : this;
     }
+
+    /// <inheritdoc/>
+    public IParameterList InsertNew(int index, object? value, out T item)
+    {
+        var clone = Clone();
+        var num = clone.Items.InsertNew(index, value, out item);
+        return num > 0 ? clone : this;
+    }
+
+    // ----------------------------------------------------
 
     /// <inheritdoc/>
     public override IParameterList GetRange(int index, int count) => (IParameterList)base.GetRange(index, count);
@@ -86,24 +73,10 @@ public sealed partial class ParameterList : FrozenList<K, T>, IParameterList
     public override IParameterList Add(T item) => (IParameterList)base.Add(item);
 
     /// <inheritdoc/>
-    public IParameterList AddNew(object? value, out T item)
-    {
-        item = new Parameter(NextName(), value);
-        return Add(item);
-    }
-
-    /// <inheritdoc/>
     public override IParameterList AddRange(IEnumerable<T> range) => (IParameterList)base.AddRange(range);
 
     /// <inheritdoc/>
     public override IParameterList Insert(int index, T item) => (IParameterList)base.Insert(index, item);
-
-    /// <inheritdoc/>
-    public IParameterList InsertNew(int index, object? value, out T item)
-    {
-        item = new Parameter(NextName(), value);
-        return Insert(index, item);
-    }
 
     /// <inheritdoc/>
     public override IParameterList InsertRange(int index, IEnumerable<T> range) => (IParameterList)base.InsertRange(index, range);

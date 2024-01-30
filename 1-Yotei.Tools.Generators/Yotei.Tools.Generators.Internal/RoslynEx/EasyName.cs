@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis.Diagnostics;
+using System.Data;
 
 namespace Yotei.Tools.Generators.Internal;
 
@@ -29,7 +30,7 @@ internal static class EasyNameExtensions
         var sb = new StringBuilder();
         var named = symbol as INamedTypeSymbol;
 
-        if (options.FullTypeName && symbol is not ITypeParameterSymbol)
+        if (options.TypeFullName && symbol is not ITypeParameterSymbol)
         {
             List<string> names = [];
             string? name;
@@ -47,8 +48,8 @@ internal static class EasyNameExtensions
                     case ITypeSymbol item:
                         name = item.EasyName(options with
                         {
-                            FullTypeName = false,
-                            NullableAnnotation = false
+                            TypeFullName = false,
+                            TypeNullable = false
                         });
                         names.Add(name);
                         break;
@@ -62,21 +63,24 @@ internal static class EasyNameExtensions
 
         sb.Append(symbol.Name);
 
-        if (options.TypeParameters && named != null && named.TypeParameters.Length > 0)
+        if (options.TypeGenerics && named != null && named.TypeParameters.Length > 0)
         {
-            sb.Append('<'); for (int i = 0; i < named.TypeParameters.Length; i++)
+            sb.Append('<');
+            var temp = options with { TypeNullable = options.TypeNullableGenerics };
+            
+            for (int i = 0; i < named.TypeParameters.Length; i++)
             {
                 if (i != 0) sb.Append(", ");
 
                 var item = named.TypeArguments[i];
-                var name = item.EasyName(options);
+                var name = item.EasyName(temp);
                 sb.Append(name);
             }
             sb.Append('>');
         }
 
         var add =
-            options.NullableAnnotation &&
+            options.TypeNullable &&
             symbol.NullableAnnotation == NullableAnnotation.Annotated &&
             symbol.Name != "Nullable";
 
@@ -113,17 +117,17 @@ internal static class EasyNameExtensions
             sb.Append(' ');
         }
 
-        if (options.HostType)
+        if (options.MemberHostType)
         {
             var type = symbol.ContainingType;
-            var name = type.EasyName(options with { NullableAnnotation = false });
+            var name = type.EasyName(options with { TypeNullable = false });
             sb.Append(name);
             sb.Append('.');
         }
 
         sb.Append(symbol.Name);
 
-        if (options.WithArguments && symbol.IsIndexer)
+        if (options.MemberArguments && symbol.IsIndexer)
         {
             sb.Append('['); for (int i = 0; i < symbol.Parameters.Length; i++)
             {
@@ -169,10 +173,10 @@ internal static class EasyNameExtensions
             sb.Append(' ');
         }
 
-        if (options.HostType)
+        if (options.MemberHostType)
         {
             var type = symbol.ContainingType;
-            var name = type.EasyName(options with { NullableAnnotation = false });
+            var name = type.EasyName(options with { TypeNullable = false });
             sb.Append(name);
             sb.Append('.');
         }
@@ -210,17 +214,17 @@ internal static class EasyNameExtensions
             sb.Append(' ');
         }
 
-        if (options.HostType)
+        if (options.MemberHostType)
         {
             var type = symbol.ContainingType;
-            var name = type.EasyName(options with { NullableAnnotation = false });
+            var name = type.EasyName(options with { TypeNullable = false });
             sb.Append(name);
             sb.Append('.');
         }
 
         sb.Append(symbol.Name);
 
-        if (options.TypeParameters && symbol.TypeParameters.Length > 0)
+        if (options.TypeGenerics && symbol.TypeParameters.Length > 0)
         {
             sb.Append('<'); for (int i = 0; i < symbol.TypeArguments.Length; i++)
             {
@@ -233,7 +237,7 @@ internal static class EasyNameExtensions
             sb.Append('>');
         }
 
-        if (options.WithArguments)
+        if (options.MemberArguments)
         {
             sb.Append('('); for (int i = 0; i < symbol.Parameters.Length; i++)
             {

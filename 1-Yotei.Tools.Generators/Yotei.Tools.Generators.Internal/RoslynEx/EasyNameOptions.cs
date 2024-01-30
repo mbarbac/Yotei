@@ -14,61 +14,63 @@ internal record EasyNameOptions
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
-    /// <param name="fullTypeName"></param>
-    /// <param name="typeParameters"></param>
-    /// <param name="nullableAnnotation"></param>
+    /// <param name="typeFullName"></param>
+    /// <param name="typeGenerics"></param>
+    /// <param name="typeNullable"></param>
     /// <param name="memberType"></param>
-    /// <param name="hostType"></param>
-    /// <param name="withArguments"></param>
+    /// <param name="memberHostType"></param>
+    /// <param name="memberArguments"></param>
     public EasyNameOptions(
-        bool fullTypeName = false,
-        bool typeParameters = true,
-        bool nullableAnnotation = true,
+        bool typeFullName = false,
+        bool typeGenerics = true,
+        bool typeNullable = true,
+        bool typeNullableGenerics = true,
         bool memberType = true,
-        bool hostType = true,
-        bool withArguments = true)
+        bool memberHostType = true,
+        bool memberArguments = true)
     {
-        FullTypeName = fullTypeName;
-        TypeParameters = typeParameters;
-        NullableAnnotation = nullableAnnotation;
+        TypeFullName = typeFullName;
+        TypeGenerics = typeGenerics;
+        TypeNullable = typeNullable;
+        TypeNullableGenerics = typeNullableGenerics;
+
         MemberType = memberType;
-        HostType = hostType;
-        WithArguments = withArguments;
+        MemberHostType = memberHostType;
+        MemberArguments = memberArguments;
     }
 
     /// <summary>
     /// Whether to obtain the fully qualified name of the type, instead of its short one.
-    /// <br/> The default value of this property is: <see langword="false"/>
     /// </summary>
-    public bool FullTypeName { get; init; }
+    public bool TypeFullName { get; init; }
 
     /// <summary>
     /// Whether to include the generic type arguments found in the element, ot not.
-    /// <br/> The default value of this property is: <see langword="true"/>
     /// </summary>
-    public bool TypeParameters { get; init; }
+    public bool TypeGenerics { get; init; }
 
     /// <summary>
-    /// Whether to include a question mark for nullable elements, or not.
-    /// <br/> The default value of this property is: <see langword="true"/>
+    /// Whether to include a question mark for nullable types, or not.
     /// </summary>
-    public bool NullableAnnotation { get; init; }
+    public bool TypeNullable { get; init; }
+
+    /// <summary>
+    /// Whether to include a question mark for the nullable generic parameters, or not.
+    /// </summary>
+    public bool TypeNullableGenerics { get; init; }
 
     /// <summary>
     /// Whether to use the member type (or return type), or not.
-    /// <br/> The default value of this property is: <see langword="true"/>
     /// </summary>
     public bool MemberType { get; init; }
 
     /// <summary>
     /// Whether to use the host type for the member easy name, with a dot after, or not.
-    /// <br/> The default value of this property is: <see langword="true"/>
     /// </summary>
-    public bool HostType { get; init; }
+    public bool MemberHostType { get; init; }
 
     /// <summary>
     /// Whether to use the indexer specification for indexed properties, or method arguments.
-    /// <br/> The default value of this property is: <see langword="true"/>
     /// </summary>
-    public bool WithArguments { get; init; }
+    public bool MemberArguments { get; init; }
 }

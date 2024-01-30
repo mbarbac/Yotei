@@ -214,6 +214,8 @@ public sealed partial class CommandInfo : ICommandInfo
         var done = clone.AddInternal(text, args);
         return done ? clone : this;
     }
+
+    [SuppressMessage("", "CA2249")]
     bool AddInternal(string text, params object?[] args)
     {
         text.ThrowWhenNull();

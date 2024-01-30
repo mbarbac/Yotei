@@ -2,7 +2,8 @@
 
 // ========================================================
 /// <inheritdoc cref="IParameter"/>
-public sealed class Parameter : IParameter
+[WithGenerator]
+public sealed partial class Parameter : IParameter
 {
     /// <summary>
     /// Initializes a new instance.
@@ -13,6 +14,16 @@ public sealed class Parameter : IParameter
     {
         Name = name.NotNullNotEmpty();
         Value = value;
+    }
+
+    /// <summary>
+    /// Copy constructor.
+    /// </summary>
+    /// <param name="source"></param>
+    Parameter(Parameter source)
+    {
+        Name = source.Name;
+        Value = source.Value;
     }
 
     /// <inheritdoc/>

@@ -209,9 +209,9 @@ internal class TypeNode : INode
     /// </summary>
     /// <returns></returns>
     protected virtual string GetTypeName() => Symbol.EasyName(new EasyNameOptions(
-        fullTypeName: false,
-        typeParameters: true,
-        nullableAnnotation: false));
+        typeFullName: false,
+        typeGenerics: true,
+        typeNullable: false));
 
     /// <summary>
     /// Obtains the kind of this type.

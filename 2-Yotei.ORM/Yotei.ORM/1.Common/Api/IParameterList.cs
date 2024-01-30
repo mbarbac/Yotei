@@ -23,15 +23,6 @@ public partial interface IParameterList : IFrozenList<K, T>
     /// <returns></returns>
     string NextName();
 
-    /// <inheritdoc cref="IFrozenList{K, T}.GetRange(int, int)"/>
-    new IParameterList GetRange(int index, int count);
-
-    /// <inheritdoc cref="IFrozenList{K, T}.Replace(int, T)"/>
-    new IParameterList Replace(int index, T item);
-
-    /// <inheritdoc cref="IFrozenList{K, T}.Add(T)"/>
-    new IParameterList Add(T item);
-
     /// <summary>
     /// Returns a new instance with a new element, built using the given value and the next
     /// available name, is added to it.
@@ -40,12 +31,6 @@ public partial interface IParameterList : IFrozenList<K, T>
     /// <param name="item"></param>
     /// <returns></returns>
     IParameterList AddNew(object? value, out T item);
-
-    /// <inheritdoc cref="IFrozenList{K, T}.AddRange(IEnumerable{T})"/>
-    new IParameterList AddRange(IEnumerable<T> range);
-
-    /// <inheritdoc cref="IFrozenList{K, T}.Insert(int, T)"/>
-    new IParameterList Insert(int index, T item);
 
     /// <summary>
     /// Returns a new instance with a new element, built using the given value and the next
@@ -56,6 +41,23 @@ public partial interface IParameterList : IFrozenList<K, T>
     /// <param name="item"></param>
     /// <returns></returns>
     IParameterList InsertNew(int index, object? value, out T item);
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc cref="IFrozenList{K, T}.GetRange(int, int)"/>
+    new IParameterList GetRange(int index, int count);
+
+    /// <inheritdoc cref="IFrozenList{K, T}.Replace(int, T)"/>
+    new IParameterList Replace(int index, T item);
+
+    /// <inheritdoc cref="IFrozenList{K, T}.Add(T)"/>
+    new IParameterList Add(T item);
+
+    /// <inheritdoc cref="IFrozenList{K, T}.AddRange(IEnumerable{T})"/>
+    new IParameterList AddRange(IEnumerable<T> range);
+
+    /// <inheritdoc cref="IFrozenList{K, T}.Insert(int, T)"/>
+    new IParameterList Insert(int index, T item);
 
     /// <inheritdoc cref="IFrozenList{K, T}.InsertRange(int, IEnumerable{T})"/>
     new IParameterList InsertRange(int index, IEnumerable<T> range);

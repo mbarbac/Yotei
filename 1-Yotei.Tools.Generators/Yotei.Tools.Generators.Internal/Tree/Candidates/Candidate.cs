@@ -72,9 +72,9 @@ internal abstract class Candidate(SemanticModel model, SyntaxNode syntax, ISymbo
         }
 
         var options = new EasyNameOptions(
-            fullTypeName: false,
-            typeParameters: true,
-            nullableAnnotation: false);
+            typeFullName: false,
+            typeGenerics: true,
+            typeNullable: false);
 
         foreach (var tp in TypeSymbolChain)
         {
