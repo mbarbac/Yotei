@@ -39,7 +39,7 @@ public partial interface IParameterList : IFrozenList<K, T>
     /// <param name="value"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    IParameterList AddNew(object? value, out T? item);
+    IParameterList AddNew(object? value, out T item);
 
     /// <inheritdoc cref="IFrozenList{K, T}.AddRange(IEnumerable{T})"/>
     new IParameterList AddRange(IEnumerable<T> range);
@@ -55,7 +55,7 @@ public partial interface IParameterList : IFrozenList<K, T>
     /// <param name="value"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    IParameterList InsertNew(int index, object? value, out T? item);
+    IParameterList InsertNew(int index, object? value, out T item);
 
     /// <inheritdoc cref="IFrozenList{K, T}.InsertRange(int, IEnumerable{T})"/>
     new IParameterList InsertRange(int index, IEnumerable<T> range);

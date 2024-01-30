@@ -4,7 +4,7 @@ using K = string;
 namespace Yotei.ORM.Code;
 
 // ========================================================
-/// <inheritdoc/>
+/// <inheritdoc cref="IParameterList"/>
 [Cloneable]
 public sealed partial class ParameterList : FrozenList<K, T>, IParameterList
 {
@@ -86,7 +86,7 @@ public sealed partial class ParameterList : FrozenList<K, T>, IParameterList
     public override IParameterList Add(T item) => (IParameterList)base.Add(item);
 
     /// <inheritdoc/>
-    public IParameterList AddNew(object? value, out T? item)
+    public IParameterList AddNew(object? value, out T item)
     {
         item = new Parameter(NextName(), value);
         return Add(item);
@@ -99,7 +99,7 @@ public sealed partial class ParameterList : FrozenList<K, T>, IParameterList
     public override IParameterList Insert(int index, T item) => (IParameterList)base.Insert(index, item);
 
     /// <inheritdoc/>
-    public IParameterList InsertNew(int index, object? value, out T? item)
+    public IParameterList InsertNew(int index, object? value, out T item)
     {
         item = new Parameter(NextName(), value);
         return Insert(index, item);
