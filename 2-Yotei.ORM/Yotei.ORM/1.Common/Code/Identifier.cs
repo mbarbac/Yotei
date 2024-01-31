@@ -60,6 +60,38 @@ public sealed partial class Identifier : FrozenList<K?, T>, IIdentifier
     /// <inheritdoc/>
     public string? Value => Items.Value;
 
+    /// <inheritdoc/>
+    public bool Match(string? specs)
+    {
+        if ((specs = specs.NullWhenEmpty()) == null) return true;
+
+        var target = new Identifier(Engine, specs);
+        var source = this;
+
+        for (int i = 0; ; i++)
+        {
+            if (i >= target.Count) break;
+            if (i >= source.Count)
+            {
+                while (i < target.Count)
+                {
+                    var value = target[^(i + 1)].UnwrappedValue;
+                    if (value != null) return false;
+                    i++;
+                }
+            }
+
+            var tvalue = target[^(i + 1)].UnwrappedValue; if (tvalue == null) continue;
+            var svalue = source[^(i + 1)].UnwrappedValue;
+            if (!Compare(svalue, tvalue)) return false;
+        }
+
+        return true;
+
+        bool Compare(string? source, string? target)
+        => string.Compare(source, target, !Engine.CaseSensitiveNames) == 0;
+    }
+
     // ----------------------------------------------------
 
     /// <inheritdoc/>

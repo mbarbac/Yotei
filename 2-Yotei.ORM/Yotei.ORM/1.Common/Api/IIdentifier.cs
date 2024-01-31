@@ -21,6 +21,15 @@ public partial interface IIdentifier : IFrozenList<K?, T>
     /// </summary>
     string? Value { get; }
 
+    /// <summary>
+    /// Determines if this instance matches the given specifications. Matching is performed by
+    /// comparing parts from right to left, where any null or empty part in the specifications
+    /// is considered an implicit match.
+    /// </summary>
+    /// <param name="specs"></param>
+    /// <returns></returns>
+    bool Match(string? specs);
+
     // ----------------------------------------------------
 
     /// <inheritdoc cref="IFrozenList{K, T}.Contains(K)"/>
