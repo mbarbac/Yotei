@@ -8,9 +8,9 @@
 public interface IMetadataTag : IEnumerable<string>
 {
     /// <summary>
-    /// Whether the names in this collection are case sensitive, or not.
+    /// The engine this instance is associated with.
     /// </summary>
-    bool CaseSensitiveTags { get; }
+    IEngine Engine { get; }
 
     /// <summary>
     /// The default optional value carry by this instance, or an undefined value otherwise.

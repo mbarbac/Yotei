@@ -11,22 +11,22 @@ public sealed partial class MetadataTag<T> : IMetadataTag<T>
     /// <summary>
     /// Initializes a new instance with the given name.
     /// </summary>
-    /// <param name="caseSensitiveTags"></param>
+    /// <param name="engine"></param>
     /// <param name="name"></param>
-    public MetadataTag(bool caseSensitiveTags, string name)
+    public MetadataTag(IEngine engine, string name)
     {
-        CaseSensitiveTags = caseSensitiveTags;
+        Engine = engine.ThrowWhenNull();
         AddInternal(name);
     }
 
     /// <summary>
     /// Initializes a new instance with the names from the given range.
     /// </summary>
-    /// <param name="caseSensitiveTags"></param>
+    /// <param name="engine"></param>
     /// <param name="range"></param>
-    public MetadataTag(bool caseSensitiveTags, IEnumerable<string> range)
+    public MetadataTag(IEngine engine, IEnumerable<string> range)
     {
-        CaseSensitiveTags = caseSensitiveTags;
+        Engine = engine.ThrowWhenNull();
         AddRangeInternal(range);
 
         if (Count == 0) throw new ArgumentException(
@@ -41,7 +41,7 @@ public sealed partial class MetadataTag<T> : IMetadataTag<T>
     {
         if (source.HasValue) DefaultValue = source.DefaultValue;
 
-        CaseSensitiveTags = source.CaseSensitiveTags;
+        Engine = source.Engine;
         AddRangeInternal(source);
     }
 
@@ -67,9 +67,9 @@ public sealed partial class MetadataTag<T> : IMetadataTag<T>
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public bool CaseSensitiveTags { get; }
+    public IEngine Engine { get; }
 
-    bool Compare(string x, string y) => string.Compare(x, y, !CaseSensitiveTags) == 0;
+    bool Compare(string x, string y) => string.Compare(x, y, !Engine.CaseSensitiveTags) == 0;
 
     /// <inheritdoc/>
     public T DefaultValue

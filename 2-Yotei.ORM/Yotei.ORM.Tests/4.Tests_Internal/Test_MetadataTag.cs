@@ -8,26 +8,27 @@ public static class Test_MetadataTag
     [Fact]
     public static void Test_Create_Single()
     {
-        var tag1 = new MetadataTag<object?>(false, "one");
+        var engine = new FakeEngine();
+        var tag1 = new MetadataTag<object?>(engine, "one");
         Assert.Single(tag1);
         Assert.True(tag1.Contains("one"));
         Assert.True(tag1.Contains("ONE"));
         Assert.False(tag1.HasValue);
 
-        var tag2 = new MetadataTag<int>(false, "one") { DefaultValue = 1 };
+        var tag2 = new MetadataTag<int>(engine, "one") { DefaultValue = 1 };
         Assert.Single(tag2);
         Assert.True(tag1.Contains("one"));
         Assert.True(tag1.Contains("ONE"));
         Assert.True(tag2.HasValue);
         Assert.Equal(1, tag2.DefaultValue);
 
-        try { _ = new MetadataTag<int>(false, (string)null!); Assert.Fail(); }
+        try { _ = new MetadataTag<int>(engine, (string)null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
 
-        try { _ = new MetadataTag<int>(false, string.Empty); Assert.Fail(); }
+        try { _ = new MetadataTag<int>(engine, string.Empty); Assert.Fail(); }
         catch (ArgumentException) { }
 
-        try { _ = new MetadataTag<int>(false, " "); Assert.Fail(); }
+        try { _ = new MetadataTag<int>(engine, " "); Assert.Fail(); }
         catch (ArgumentException) { }
     }
 
@@ -35,23 +36,24 @@ public static class Test_MetadataTag
     [Fact]
     public static void Test_Create_Many()
     {
-        var tag = new MetadataTag<int>(false, ["one", "two"]);
+        var engine = new FakeEngine();
+        var tag = new MetadataTag<int>(engine, ["one", "two"]);
         Assert.Equal(2, tag.Count);
         Assert.True(tag.Contains("one")); Assert.True(tag.Contains("ONE"));
         Assert.True(tag.Contains("two")); Assert.True(tag.Contains("TWO"));
         Assert.Equal("one", tag.DefaultName);
         Assert.False(tag.HasValue);
 
-        try { _ = new MetadataTag<int>(false, (IEnumerable<string>)null!); Assert.Fail(); }
+        try { _ = new MetadataTag<int>(engine, (IEnumerable<string>)null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
 
-        try { _ = new MetadataTag<int>(false, Array.Empty<string>()); Assert.Fail(); }
+        try { _ = new MetadataTag<int>(engine, Array.Empty<string>()); Assert.Fail(); }
         catch (ArgumentException) { }
 
-        try { _ = new MetadataTag<int>(false, [string.Empty]); Assert.Fail(); }
+        try { _ = new MetadataTag<int>(engine, [string.Empty]); Assert.Fail(); }
         catch (ArgumentException) { }
 
-        try { _ = new MetadataTag<int>(false, [" "]); Assert.Fail(); }
+        try { _ = new MetadataTag<int>(engine, [" "]); Assert.Fail(); }
         catch (ArgumentException) { }
     }
 
@@ -59,7 +61,8 @@ public static class Test_MetadataTag
     [Fact]
     public static void Test_Create_Many_CaseSensitive()
     {
-        var tag = new MetadataTag<int>(true, ["one", "ONE"]);
+        var engine = new FakeEngine() { CaseSensitiveTags = true };
+        var tag = new MetadataTag<int>(engine, ["one", "ONE"]);
         Assert.Equal(2, tag.Count);
         Assert.True(tag.Contains("one"));
         Assert.True(tag.Contains("ONE"));      
@@ -71,7 +74,8 @@ public static class Test_MetadataTag
     [Fact]
     public static void Test_Find()
     {
-        var tag = new MetadataTag<int>(false, ["one", "two", "three"]);
+        var engine = new FakeEngine();
+        var tag = new MetadataTag<int>(engine, ["one", "two", "three"]);
         Assert.False(tag.Contains("four"));
         Assert.True(tag.ContainsAny(["x", "y", "THREE"]));
     }
@@ -80,7 +84,8 @@ public static class Test_MetadataTag
     [Fact]
     public static void Test_Clone()
     {
-        var source = new MetadataTag<int>(false, ["one", "two", "three"]) { DefaultValue = 1 };
+        var engine = new FakeEngine();
+        var source = new MetadataTag<int>(engine, ["one", "two", "three"]) { DefaultValue = 1 };
         var target = source.Clone();
 
         Assert.NotSame(source, target);
@@ -97,7 +102,8 @@ public static class Test_MetadataTag
     [Fact]
     public static void Test_Replace()
     {
-        var source = new MetadataTag<int>(false, ["one", "two", "three"]) { DefaultValue = 1 };
+        var engine = new FakeEngine();
+        var source = new MetadataTag<int>(engine, ["one", "two", "three"]) { DefaultValue = 1 };
         var target = source.Replace("any", "other");
         Assert.Same(source, target);
 
@@ -129,7 +135,8 @@ public static class Test_MetadataTag
     [Fact]
     public static void Test_Add()
     {
-        var source = new MetadataTag<int>(false, ["one", "two"]) { DefaultValue = 1 };
+        var engine = new FakeEngine();
+        var source = new MetadataTag<int>(engine, ["one", "two"]) { DefaultValue = 1 };
         var target = source.Add("three");
 
         Assert.NotSame(source, target);
@@ -158,7 +165,8 @@ public static class Test_MetadataTag
     [Fact]
     public static void Test_AddRange()
     {
-        var source = new MetadataTag<int>(false, ["one", "two"]) { DefaultValue = 1 };
+        var engine = new FakeEngine();
+        var source = new MetadataTag<int>(engine, ["one", "two"]) { DefaultValue = 1 };
         var target = source.AddRange(["three", "four"]);
 
         Assert.NotSame(source, target);
@@ -188,7 +196,8 @@ public static class Test_MetadataTag
     [Fact]
     public static void Test_Remove()
     {
-        var source = new MetadataTag<int>(false, ["one", "two", "three"]) { DefaultValue = 1 };
+        var engine = new FakeEngine();
+        var source = new MetadataTag<int>(engine, ["one", "two", "three"]) { DefaultValue = 1 };
         var target = source.Remove("ONE");
 
         Assert.NotSame(source, target);
@@ -199,7 +208,7 @@ public static class Test_MetadataTag
         Assert.True(target.HasValue);
         Assert.Equal(1, target.DefaultValue);
 
-        source = new MetadataTag<int>(false, "one") { DefaultValue = 1 };
+        source = new MetadataTag<int>(engine, "one") { DefaultValue = 1 };
         try { source.Remove("ONE"); Assert.Fail(); }
         catch (InvalidOperationException) { }
     }
@@ -208,11 +217,12 @@ public static class Test_MetadataTag
     [Fact]
     public static void Test_Clear()
     {
-        var source = new MetadataTag<int>(false, "one") { DefaultValue = 1 };
+        var engine = new FakeEngine();
+        var source = new MetadataTag<int>(engine, "one") { DefaultValue = 1 };
         var target = source.Clear();
         Assert.Same(source, target);
 
-        source = new MetadataTag<int>(false, ["one", "two"]) { DefaultValue = 1 };
+        source = new MetadataTag<int>(engine, ["one", "two"]) { DefaultValue = 1 };
         target = source.Clear();
         Assert.Single(target);
         Assert.True(target.Contains("ONE"));
