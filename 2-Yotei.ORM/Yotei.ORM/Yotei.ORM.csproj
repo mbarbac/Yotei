@@ -65,6 +65,14 @@
    <ItemGroup>
 	  <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
    </ItemGroup>
+   <ItemGroup>
+     <Compile Remove="1.Common\Api\_IIdentifierMultiPart_.cs" />
+     <Compile Remove="1.Common\Api\_IIdentifierSinglePart_.cs" />
+     <Compile Remove="1.Common\Api\_IIdentifier_.cs" />
+     <Compile Remove="1.Common\Code\_IdentifierMultiPartBuilder_.cs" />
+     <Compile Remove="1.Common\Code\_IdentifierMultiPart_.cs" />
+     <Compile Remove="1.Common\Code\_IdentifierSinglePart_.cs" />
+   </ItemGroup>
    <PropertyGroup>
 	  <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 	  <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>

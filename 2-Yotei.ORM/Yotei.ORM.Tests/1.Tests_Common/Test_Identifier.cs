@@ -2,9 +2,9 @@ namespace Yotei.ORM.Tests;
 
 // ========================================================
 //[Enforced]
-public static class Test_IdentifierMultiPart
+public static class Test_Identifier
 {
-    public static string? ToUnwrappedValue(this IIdentifierMultiPart item) => item.Count == 0
+    public static string? ToUnwrappedValue(this IIdentifier item) => item.Count == 0
         ? null
         : string.Join('.', item.Select(x => x.UnwrappedValue));
 
@@ -15,7 +15,7 @@ public static class Test_IdentifierMultiPart
     public static void Test_Create_Empty()
     {
         var engine = new FakeEngine();
-        var items = new IdentifierMultiPart(engine);
+        var items = new Identifier(engine);
         Assert.Empty(items);
         Assert.Null(items.Value);
     }
@@ -25,27 +25,27 @@ public static class Test_IdentifierMultiPart
     public static void Test_Create_Single_Value()
     {
         var engine = new FakeEngine();
-        var items = new IdentifierMultiPart(engine, (string?)null);
+        var items = new Identifier(engine, (string?)null);
         Assert.Empty(items);
         Assert.Null(items.Value);
 
-        items = new IdentifierMultiPart(engine, " ");
+        items = new Identifier(engine, " ");
         Assert.Empty(items);
         Assert.Null(items.Value);
 
-        items = new IdentifierMultiPart(engine, " [ ] ");
+        items = new Identifier(engine, " [ ] ");
         Assert.Empty(items);
         Assert.Null(items.Value);
 
-        items = new IdentifierMultiPart(engine, " [ [ ] ] ");
+        items = new Identifier(engine, " [ [ ] ] ");
         Assert.Empty(items);
         Assert.Null(items.Value);
 
-        items = new IdentifierMultiPart(engine, "one");
+        items = new Identifier(engine, "one");
         Assert.Single(items);
         Assert.Equal("[one]", items.Value);
 
-        items = new IdentifierMultiPart(engine, " [ [ one ] ]");
+        items = new Identifier(engine, " [ [ one ] ]");
         Assert.Single(items);
         Assert.Equal("[one]", items.Value);
     }
@@ -55,15 +55,15 @@ public static class Test_IdentifierMultiPart
     public static void Test_Create_Range()
     {
         var engine = new FakeEngine();
-        var items = new IdentifierMultiPart(engine, Array.Empty<IIdentifierSinglePart>());
+        var items = new Identifier(engine, Array.Empty<IdentifierPart>());
         Assert.Empty(items);
         Assert.Null(items.Value);
 
-        var one = new IdentifierSinglePart(engine, "one");
-        var two = new IdentifierSinglePart(engine, "two");
-        var three = new IdentifierSinglePart(engine, "three");
+        var one = new IdentifierPart(engine, "one");
+        var two = new IdentifierPart(engine, "two");
+        var three = new IdentifierPart(engine, "three");
 
-        items = new IdentifierMultiPart(engine, [one, two, three]);
+        items = new Identifier(engine, [one, two, three]);
         Assert.Equal(3, items.Count);
         Assert.Equal("[one].[two].[three]", items.Value);
     }
@@ -73,27 +73,27 @@ public static class Test_IdentifierMultiPart
     public static void Test_Create_Many_Values()
     {
         var engine = new FakeEngine();
-        var items = new IdentifierMultiPart(engine, "one.two.three");
+        var items = new Identifier(engine, "one.two.three");
         Assert.Equal(3, items.Count);
         Assert.Equal("[one].[two].[three]", items.Value);
 
-        items = new IdentifierMultiPart(engine, "one.two.");
+        items = new Identifier(engine, "one.two.");
         Assert.Equal(3, items.Count);
         Assert.Equal("[one].[two].", items.Value);
 
-        items = new IdentifierMultiPart(engine, "one..");
+        items = new Identifier(engine, "one..");
         Assert.Equal(3, items.Count);
         Assert.Equal("[one]..", items.Value);
 
-        items = new IdentifierMultiPart(engine, "..");
+        items = new Identifier(engine, "..");
         Assert.Empty(items);
         Assert.Null(items.Value);
 
-        items = new IdentifierMultiPart(engine, ".two.three");
+        items = new Identifier(engine, ".two.three");
         Assert.Equal(2, items.Count);
         Assert.Equal("[two].[three]", items.Value);
 
-        items = new IdentifierMultiPart(engine, "..three");
+        items = new Identifier(engine, "..three");
         Assert.Single(items);
         Assert.Equal("[three]", items.Value);
     }
@@ -103,15 +103,15 @@ public static class Test_IdentifierMultiPart
     public static void Test_Create_Embedded()
     {
         var engine = new FakeEngine();
-        var items = new IdentifierMultiPart(engine, " [ one.two ] ");
+        var items = new Identifier(engine, " [ one.two ] ");
         Assert.Single(items);
         Assert.Equal("[one.two]", items.Value);
 
-        items = new IdentifierMultiPart(engine, " [ one two ] ");
+        items = new Identifier(engine, " [ one two ] ");
         Assert.Single(items);
         Assert.Equal("[one two]", items.Value);
 
-        items = new IdentifierMultiPart(engine, " [ one [ two.three ] ] ");
+        items = new Identifier(engine, " [ one [ two.three ] ] ");
         Assert.Single(items);
         Assert.Equal("[one [ two.three ]]", items.Value);
     }
@@ -122,61 +122,61 @@ public static class Test_IdentifierMultiPart
     {
         var engine = new FakeEngine() { UseTerminators = false };
 
-        var items = new IdentifierMultiPart(engine, " one . two ");
+        var items = new Identifier(engine, " one . two ");
         Assert.Equal(2, items.Count);
         Assert.Equal("one.two", items.Value);
 
-        items = new IdentifierMultiPart(engine, "[one].two");
+        items = new Identifier(engine, "[one].two");
         Assert.Equal(2, items.Count);
         Assert.Equal("[one].two", items.Value);
 
-        try { _ = new IdentifierMultiPart(engine, "one two"); Assert.Fail(); }
+        try { _ = new Identifier(engine, "one two"); Assert.Fail(); }
         catch (ArgumentException) { }
     }
-    
+
     //[Enforced]
     [Fact]
     public static void Test_Create_With_Same_Terminators()
     {
         var engine = new FakeEngine() { LeftTerminator = '\'', RightTerminator = '\'' };
 
-        var items = new IdentifierMultiPart(engine, "'one'");
+        var items = new Identifier(engine, "'one'");
         Assert.Equal(1, items.Count);
         Assert.Equal("one", items.ToUnwrappedValue());
         Assert.Equal("'one'", items.Value);
 
-        items = new IdentifierMultiPart(engine, "'one.two.three'");
+        items = new Identifier(engine, "'one.two.three'");
         Assert.Equal(1, items.Count);
         Assert.Equal("one.two.three", items.ToUnwrappedValue());
         Assert.Equal("'one.two.three'", items.Value);
 
-        items = new IdentifierMultiPart(engine, "'one'.'two'.'three'");
+        items = new Identifier(engine, "'one'.'two'.'three'");
         Assert.Equal(3, items.Count);
         Assert.Equal("one.two.three", items.ToUnwrappedValue());
         Assert.Equal("'one'.'two'.'three'", items.Value);
 
-        items = new IdentifierMultiPart(engine, ".'two'.'three'");
+        items = new Identifier(engine, ".'two'.'three'");
         Assert.Equal(2, items.Count);
         Assert.Equal("two.three", items.ToUnwrappedValue());
         Assert.Equal("'two'.'three'", items.Value);
 
-        items = new IdentifierMultiPart(engine, "'one'..'three'");
+        items = new Identifier(engine, "'one'..'three'");
         Assert.Equal(3, items.Count);
         Assert.Equal("one..three", items.ToUnwrappedValue());
         Assert.Equal("'one'..'three'", items.Value);
 
-        items = new IdentifierMultiPart(engine, "'one'.'two'.");
+        items = new Identifier(engine, "'one'.'two'.");
         Assert.Equal(3, items.Count);
         Assert.Equal("one.two.", items.ToUnwrappedValue());
         Assert.Equal("'one'.'two'.", items.Value);
     }
-    
+
     //[Enforced]
     [Fact]
     public static void Test_Create_With_Duplicates()
     {
         var engine = new FakeEngine();
-        var items = new IdentifierMultiPart(engine, "one.two.one.four");
+        var items = new Identifier(engine, "one.two.one.four");
         Assert.Equal(4, items.Count);
         Assert.Equal("[one].[two].[one].[four]", items.Value);
     }
@@ -187,37 +187,37 @@ public static class Test_IdentifierMultiPart
     {
         var engine = new FakeEngine();
 
-        var source = new IdentifierMultiPart(engine);
+        var source = new Identifier(engine);
         var target = source.Clone();
         Assert.NotSame(source, target);
         Assert.Equal(source.Count, target.Count);
         Assert.Equal(source.Value, target.Value);
 
-        source = new IdentifierMultiPart(engine, "one.two.three");
+        source = new Identifier(engine, "one.two.three");
         target = source.Clone();
         Assert.NotSame(source, target);
         Assert.Equal(source.Count, target.Count);
         Assert.Equal(source.Value, target.Value);
 
-        source = new IdentifierMultiPart(engine, "one.two.");
+        source = new Identifier(engine, "one.two.");
         target = source.Clone();
         Assert.NotSame(source, target);
         Assert.Equal(source.Count, target.Count);
         Assert.Equal(source.Value, target.Value);
 
-        source = new IdentifierMultiPart(engine, ".two.three");
+        source = new Identifier(engine, ".two.three");
         target = source.Clone();
         Assert.NotSame(source, target);
         Assert.Equal(source.Count, target.Count);
         Assert.Equal(source.Value, target.Value);
     }
-    
+
     //[Enforced]
     [Fact]
     public static void Test_Find()
     {
         var engine = new FakeEngine();
-        var items = new IdentifierMultiPart(engine, "one.two.one.four");
+        var items = new Identifier(engine, "one.two.one.four");
 
         Assert.Equal(-1, items.IndexOf("any"));
 
@@ -238,7 +238,7 @@ public static class Test_IdentifierMultiPart
     public static void Test_GetRange()
     {
         var engine = new FakeEngine();
-        var source = new IdentifierMultiPart(engine, "one.two.one.four");
+        var source = new Identifier(engine, "one.two.one.four");
 
         var target = source.GetRange(0, source.Count);
         Assert.Same(source, target);
@@ -252,13 +252,13 @@ public static class Test_IdentifierMultiPart
         Assert.Equal(2, target.Count);
         Assert.Equal("[two].[one]", target.Value);
     }
-    
+
     //[Enforced]
     [Fact]
     public static void Test_Replace()
     {
         var engine = new FakeEngine();
-        var source = new IdentifierMultiPart(engine, "one.two.one.four");
+        var source = new Identifier(engine, "one.two.one.four");
 
         var target = source.Replace(1, "two");
         Assert.Same(source, target);
@@ -293,18 +293,18 @@ public static class Test_IdentifierMultiPart
         Assert.Equal(4, target.Count);
         Assert.Equal("[one]..[one].[four]", target.Value);
     }
-    
+
     //[Enforced]
     [Fact]
     public static void Test_Add()
     {
         var engine = new FakeEngine();
-        var source = new IdentifierMultiPart(engine);
-        
+        var source = new Identifier(engine);
+
         var target = source.Add(null);
         Assert.Same(source, target);
 
-        source = new IdentifierMultiPart(engine, "one.two.one");
+        source = new Identifier(engine, "one.two.one");
 
         target = source.Add("four");
         Assert.NotSame(source, target);
@@ -326,13 +326,13 @@ public static class Test_IdentifierMultiPart
         Assert.Equal(4, target.Count);
         Assert.Equal("[one].[two].[one].", target.Value);
     }
-    
+
     //[Enforced]
     [Fact]
     public static void Test_AddRange()
     {
         var engine = new FakeEngine();
-        var source = new IdentifierMultiPart(engine);
+        var source = new Identifier(engine);
 
         var target = source.AddRange([]);
         Assert.Same(source, target);
@@ -340,7 +340,7 @@ public static class Test_IdentifierMultiPart
         target = source.AddRange([null, ".", null]);
         Assert.Same(source, target);
 
-        source = new IdentifierMultiPart(engine, "one.two.three");
+        source = new Identifier(engine, "one.two.three");
 
         target = source.AddRange([]);
         Assert.Same(source, target);
@@ -361,7 +361,7 @@ public static class Test_IdentifierMultiPart
     public static void Test_Insert()
     {
         var engine = new FakeEngine();
-        var source = new IdentifierMultiPart(engine, "one.two.three");
+        var source = new Identifier(engine, "one.two.three");
 
         var target = source.Insert(0, "zero");
         Assert.NotSame(source, target);
@@ -387,8 +387,8 @@ public static class Test_IdentifierMultiPart
     public static void Test_InsertRange()
     {
         var engine = new FakeEngine();
-        var source = new IdentifierMultiPart(engine, "one.two.three");
-        var target = source.InsertRange(0, (IEnumerable<IIdentifierSinglePart>)[]);
+        var source = new Identifier(engine, "one.two.three");
+        var target = source.InsertRange(0, Array.Empty<IIdentifierPart>());
         Assert.Same(source, target);
 
         target = source.InsertRange(0, ["x", "y.z"]);
@@ -407,7 +407,7 @@ public static class Test_IdentifierMultiPart
     public static void Test_RemoveAt()
     {
         var engine = new FakeEngine();
-        var source = new IdentifierMultiPart(engine, "one.two.three");
+        var source = new Identifier(engine, "one.two.three");
 
         var target = source.RemoveAt(2);
         Assert.NotSame(source, target);
@@ -419,7 +419,7 @@ public static class Test_IdentifierMultiPart
         Assert.Equal(2, target.Count);
         Assert.Equal("[two].[three]", target.Value);
 
-        source = new IdentifierMultiPart(engine, "one..three");
+        source = new Identifier(engine, "one..three");
         target = source.RemoveAt(0);
         Assert.NotSame(source, target);
         Assert.Equal(1, target.Count);
@@ -431,7 +431,7 @@ public static class Test_IdentifierMultiPart
     public static void Test_Remove_Predicate()
     {
         var engine = new FakeEngine();
-        var source = new IdentifierMultiPart(engine, "one.two.three");
+        var source = new Identifier(engine, "one.two.three");
 
         var target = source.Remove(x => x.UnwrappedValue!.Contains('e'));
         Assert.NotSame(source, target);
@@ -454,7 +454,7 @@ public static class Test_IdentifierMultiPart
     public static void Test_Clear()
     {
         var engine = new FakeEngine();
-        var source = new IdentifierMultiPart(engine, "one.two.three");
+        var source = new Identifier(engine, "one.two.three");
 
         var target = source.Clear();
         Assert.NotSame(source, target);

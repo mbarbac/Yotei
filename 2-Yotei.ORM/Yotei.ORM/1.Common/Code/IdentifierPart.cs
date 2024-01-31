@@ -1,25 +1,25 @@
 ﻿namespace Yotei.ORM.Code;
 
 // ========================================================
-/// <inheritdoc cref="IIdentifierSinglePart"/>
-public sealed class IdentifierSinglePart : IIdentifierSinglePart
+/// <inheritdoc cref="IIdentifierPart"/>
+public sealed class IdentifierPart : IIdentifierPart
 {
     /// <summary>
-    /// A shared empty instance.
+    /// A common shared empty instance.
     /// </summary>
-    public static IdentifierSinglePart Empty { get; } = new();
+    public static IdentifierPart Empty { get; } = new();
 
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    public IdentifierSinglePart() { }
+    public IdentifierPart() { }
 
     /// <summary>
-    /// Initializes a new instance using the given value.
+    /// Initializes a new instance with the given value.
     /// </summary>
     /// <param name="engine"></param>
     /// <param name="value"></param>
-    public IdentifierSinglePart(IEngine engine, string? value)
+    public IdentifierPart(IEngine engine, string? value)
     {
         engine.ThrowWhenNull();
 

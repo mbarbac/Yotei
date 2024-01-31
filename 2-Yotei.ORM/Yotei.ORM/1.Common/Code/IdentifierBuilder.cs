@@ -1,26 +1,25 @@
-﻿using T = Yotei.ORM.IIdentifierSinglePart;
+﻿using T = Yotei.ORM.IIdentifierPart;
 using K = string;
-using System.Runtime.InteropServices.Marshalling;
 
 namespace Yotei.ORM.Code;
 
 // ========================================================
 [Cloneable]
-public sealed partial class IdentifierMultiPartBuilder : CoreList<K?, T>
+public sealed partial class IdentifierBuilder : CoreList<K?, T>
 {
-    public IdentifierMultiPartBuilder(IEngine engine)
+    public IdentifierBuilder(IEngine engine)
     {
         Engine = engine.ThrowWhenNull();
         ValidateItem = (item) => item.ThrowWhenNull();
         GetKey = (item) => item.UnwrappedValue;
-        ValidateKey = (key) => new IdentifierSinglePart(Engine, key).UnwrappedValue;
+        ValidateKey = (key) => new IdentifierPart(Engine, key).UnwrappedValue;
         CompareKeys = (x, y) => string.Compare(x, y, !Engine.CaseSensitiveNames) == 0;
         Duplicates = (@this, key) => [];
         CanInclude = (x, item) => true;
     }
-    public IdentifierMultiPartBuilder(IEngine engine, T item) : this(engine) => Add(item);
-    public IdentifierMultiPartBuilder(IEngine engine, IEnumerable<T> range) : this(engine) => AddRange(range);
-    IdentifierMultiPartBuilder(IdentifierMultiPartBuilder source) : this(source.Engine) => AddRange(source);
+    public IdentifierBuilder(IEngine engine, T item) : this(engine) => Add(item);
+    public IdentifierBuilder(IEngine engine, IEnumerable<T> range) : this(engine) => AddRange(range);
+    IdentifierBuilder(IdentifierBuilder source) : this(source.Engine) => AddRange(source);
 
     public IEngine Engine { get; }
 
@@ -46,7 +45,7 @@ public sealed partial class IdentifierMultiPartBuilder : CoreList<K?, T>
         value = value.NullWhenEmpty();
 
         // We may need an empty collection...
-        if (value == null) return reduce ? [] : [IdentifierSinglePart.Empty];
+        if (value == null) return reduce ? [] : [IdentifierPart.Empty];
 
         // Terminators not used...
         if (!Engine.UseTerminators)
@@ -54,7 +53,7 @@ public sealed partial class IdentifierMultiPartBuilder : CoreList<K?, T>
             var items = value.Split('.');
             var parts = new List<T>();
 
-            parts.AddRange(items.Select(x => new IdentifierSinglePart(Engine, x)));
+            parts.AddRange(items.Select(x => new IdentifierPart(Engine, x)));
             if (reduce) Reduce(parts);
             return parts;
         }
@@ -66,7 +65,7 @@ public sealed partial class IdentifierMultiPartBuilder : CoreList<K?, T>
 
             if (dots.Count == 0) // No unwrapped dots...
             {
-                var temp = new IdentifierSinglePart(Engine, value);
+                var temp = new IdentifierPart(Engine, value);
                 return reduce ? (temp.Value == null ? [] : [temp]) : [temp];
             }
             else // With unwrapped dots...
@@ -79,13 +78,13 @@ public sealed partial class IdentifierMultiPartBuilder : CoreList<K?, T>
                 for (int i = 0; i < dots.Count; i++)
                 {
                     str = value[head..dots[i]];
-                    parts.Add(new IdentifierSinglePart(Engine, str));
+                    parts.Add(new IdentifierPart(Engine, str));
                     head = dots[i] + 1;
                 }
 
                 len = value.Length - head;
                 str = len == 0 ? string.Empty : value.Substring(dots[^1] + 1, len);
-                parts.Add(new IdentifierSinglePart(Engine, str));
+                parts.Add(new IdentifierPart(Engine, str));
 
                 if (reduce) Reduce(parts);
                 return parts;
@@ -213,7 +212,7 @@ public sealed partial class IdentifierMultiPartBuilder : CoreList<K?, T>
         var num = parts.Count == 1
             ? Add(parts[0], false)
             : AddRange(parts, false);
-        
+
         if (reduce) Reduce();
         return num;
     }
@@ -246,7 +245,7 @@ public sealed partial class IdentifierMultiPartBuilder : CoreList<K?, T>
         var num = parts.Count == 1
             ? Insert(index, parts[0], false)
             : InsertRange(index, parts, false);
-        
+
         if (reduce) Reduce();
         return num;
     }

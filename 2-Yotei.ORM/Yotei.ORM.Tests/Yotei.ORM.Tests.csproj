@@ -66,6 +66,10 @@
    <ItemGroup>
 	  <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
    </ItemGroup>
+   <ItemGroup>
+     <Compile Remove="1.Tests_Common\_Test_IdentifierMultiPart_.cs" />
+     <Compile Remove="1.Tests_Common\_Test_IdentifierSinglePart_.cs" />
+   </ItemGroup>
    <PropertyGroup>
 	  <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 	  <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
