@@ -41,6 +41,16 @@ public sealed partial class IdentifierTags : FrozenList<T>, IIdentifierTags
     /// <inheritdoc/>
     public IEngine Engine { get; }
 
+    /// <inheritdoc/>
+    public IEnumerable<string> Names
+    {
+        get
+        {
+            foreach (var item in this)
+                foreach (var name in item) yield return name;
+        }
+    }
+
     // ----------------------------------------------------
 
     /// <inheritdoc/>

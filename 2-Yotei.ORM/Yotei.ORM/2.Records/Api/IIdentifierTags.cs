@@ -15,6 +15,11 @@ public partial interface IIdentifierTags : IFrozenList<T>
     /// </summary>
     IEngine Engine { get; }
 
+    /// <summary>
+    /// Gets the collection of names carried by this instance.
+    /// </summary>
+    IEnumerable<string> Names { get; }
+
     // ----------------------------------------------------
 
     /// <summary>
