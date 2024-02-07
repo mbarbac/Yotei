@@ -36,7 +36,7 @@ public abstract partial class Engine : IEngine
         UseTerminators = source.UseTerminators;
         LeftTerminator = source.LeftTerminator;
         RightTerminator = source.RightTerminator;
-        CaseSensitiveTags = source.CaseSensitiveTags;
+        KnownTags = source.KnownTags;
     }
 
     /// <inheritdoc/>
@@ -97,7 +97,12 @@ public abstract partial class Engine : IEngine
     char _RightTerminator = RIGHTTERMINATOR;
 
     /// <inheritdoc/>
-    public bool CaseSensitiveTags { get; init; } = CASESENSITIVETAGS;
+    public IKnownTags KnownTags
+    {
+        get => _KnownTags;
+        init => _KnownTags = value.ThrowWhenNull();
+    }
+    IKnownTags _KnownTags = new KnownTags(CASESENSITIVETAGS);
 
     // ----------------------------------------------------
 
