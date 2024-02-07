@@ -1,9 +1,8 @@
-﻿namespace Yotei.ORM.Internal;
+﻿namespace Yotei.ORM.Records;
 
 // ========================================================
 /// <summary>
-/// Represents the collection of names by which a given metadata entry can be located, along
-/// with an optional default value.
+/// Represents the collection of names by which a given metadata entry can be located.
 /// </summary>
 public interface IMetadataTag : IEnumerable<string>
 {
@@ -11,16 +10,6 @@ public interface IMetadataTag : IEnumerable<string>
     /// The engine this instance is associated with.
     /// </summary>
     IEngine Engine { get; }
-
-    /// <summary>
-    /// The default optional value carry by this instance, or an undefined value otherwise.
-    /// </summary>
-    object? DefaultValue { get; }
-
-    /// <summary>
-    /// Determines if this instance carries a default optional value, or not.
-    /// </summary>
-    bool HasValue { get; }
 
     // ----------------------------------------------------
 

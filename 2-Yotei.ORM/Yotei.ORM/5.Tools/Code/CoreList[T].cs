@@ -209,8 +209,6 @@ public partial class CoreList<T> : ICoreList<T>
     /// <inheritdoc/>
     public virtual int Add(T item)
     {
-        Console.WriteLine($"Entering add...count: {Count}, item: {item}");
-
         item = Validate(item);
 
         var prevent = false;
@@ -227,8 +225,6 @@ public partial class CoreList<T> : ICoreList<T>
     /// <inheritdoc/>
     public virtual int AddRange(IEnumerable<T> range)
     {
-        Console.WriteLine($"Entering addrange...count: {Count}");
-
         range.ThrowWhenNull();
 
         if (range is ICollection<T> trange && trange.Count == 0) return 0;

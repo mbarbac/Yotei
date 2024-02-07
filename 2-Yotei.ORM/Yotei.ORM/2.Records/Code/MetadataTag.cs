@@ -1,10 +1,9 @@
-﻿namespace Yotei.ORM.Internal.Code;
+﻿namespace Yotei.ORM.Records.Code;
 
 // ========================================================
 /// <inheritdoc cref="IMetadataTag"/>
-/// <typeparam name="T"></typeparam>
 [Cloneable]
-public sealed partial class MetadataTag<T> : IMetadataTag<T>
+public sealed partial class MetadataTag : IMetadataTag
 {
     readonly List<string> Items = [];
 
@@ -37,10 +36,8 @@ public sealed partial class MetadataTag<T> : IMetadataTag<T>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    MetadataTag(MetadataTag<T> source)
+    MetadataTag(MetadataTag source)
     {
-        if (source.HasValue) DefaultValue = source.DefaultValue;
-
         Engine = source.Engine;
         AddRangeInternal(source);
     }
@@ -50,39 +47,17 @@ public sealed partial class MetadataTag<T> : IMetadataTag<T>
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /// <inheritdoc/>
-    public override string ToString()
-    {
-        var sb = new StringBuilder();
-        if (Count == 1) sb.Append(DefaultName);
-        else
-        {
-            sb.Append('(');
-            sb.Append(string.Join(", ", Items));
-            sb.Append(')');
-        }
-        if (HasValue) sb.Append($" = {DefaultValue.Sketch()}");
-        return sb.ToString();
-    }
+    public override string ToString() => Count == 1
+        ? DefaultName
+        : $"({string.Join(", ", Items)})";
 
     // ----------------------------------------------------
 
     /// <inheritdoc/>
     public IEngine Engine { get; }
 
-    bool Compare(string x, string y) => string.Compare(x, y, !Engine.CaseSensitiveTags) == 0;
-
-    /// <inheritdoc/>
-    public T DefaultValue
-    {
-        get => _DefaultValue;
-        init { _DefaultValue = value; HasValue = true; }
-    }
-    T _DefaultValue = default!;
-
-    object? IMetadataTag.DefaultValue => DefaultValue;
-
-    /// <inheritdoc/>
-    public bool HasValue { get; private set; }
+    bool Compare(string x, string y)
+        => string.Compare(x, y, !Engine.CaseSensitiveTags) == 0;
 
     // ----------------------------------------------------
 
@@ -110,7 +85,7 @@ public sealed partial class MetadataTag<T> : IMetadataTag<T>
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public IMetadataTag<T> Replace(string oldname, string newname)
+    public IMetadataTag Replace(string oldname, string newname)
     {
         var clone = Clone();
         var num = clone.ReplaceInternal(oldname, newname);
@@ -134,7 +109,7 @@ public sealed partial class MetadataTag<T> : IMetadataTag<T>
     }
 
     /// <inheritdoc/>
-    public IMetadataTag<T> Add(string name)
+    public IMetadataTag Add(string name)
     {
         var clone = Clone();
         var num = clone.AddInternal(name);
@@ -150,7 +125,7 @@ public sealed partial class MetadataTag<T> : IMetadataTag<T>
     }
 
     /// <inheritdoc/>
-    public IMetadataTag<T> AddRange(IEnumerable<string> range)
+    public IMetadataTag AddRange(IEnumerable<string> range)
     {
         var clone = Clone();
         var num = clone.AddRangeInternal(range);
@@ -172,7 +147,7 @@ public sealed partial class MetadataTag<T> : IMetadataTag<T>
     }
 
     /// <inheritdoc/>
-    public IMetadataTag<T> Remove(string name)
+    public IMetadataTag Remove(string name)
     {
         var clone = Clone();
         var num = clone.RemoveInternal(name);
@@ -194,7 +169,7 @@ public sealed partial class MetadataTag<T> : IMetadataTag<T>
     }
 
     /// <inheritdoc/>
-    public IMetadataTag<T> Clear()
+    public IMetadataTag Clear()
     {
         var clone = Clone();
         var num = clone.ClearInternal();
@@ -213,12 +188,4 @@ public sealed partial class MetadataTag<T> : IMetadataTag<T>
         }
         return 0;
     }
-
-    // ----------------------------------------------------
-
-    IMetadataTag IMetadataTag.Replace(string oldname, string newname) => Replace(oldname, newname);
-    IMetadataTag IMetadataTag.Add(string name) => Add(name);
-    IMetadataTag IMetadataTag.AddRange(IEnumerable<string> range) => AddRange(range);
-    IMetadataTag IMetadataTag.Remove(string name) => Remove(name);
-    IMetadataTag IMetadataTag.Clear() => Clear();
 }

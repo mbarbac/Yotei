@@ -70,6 +70,9 @@
      <Compile Remove="1.Tests_Common\_Test_IdentifierMultiPart_.cs" />
      <Compile Remove="1.Tests_Common\_Test_IdentifierSinglePart_.cs" />
    </ItemGroup>
+   <ItemGroup>
+     <Folder Include="4.Tests_Internal\" />
+   </ItemGroup>
    <PropertyGroup>
 	  <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 	  <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
