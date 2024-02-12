@@ -33,14 +33,14 @@
    <ItemGroup Condition="'$(Configuration)'=='Debug'">
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser.csproj" />
-	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.CloneGenerator\Yotei.Tools.CloneGenerator.csproj">
+	  <!--<ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.CloneGenerator\Yotei.Tools.CloneGenerator.csproj">
 		 <OutputItemType>Analyzer</OutputItemType>
 		 <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-	  </ProjectReference>
-	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.WithGenerator\Yotei.Tools.WithGenerator.csproj">
+	  </ProjectReference>-->
+	  <!--<ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.WithGenerator\Yotei.Tools.WithGenerator.csproj">
 		 <OutputItemType>Analyzer</OutputItemType>
 		 <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-	  </ProjectReference>
+	  </ProjectReference>-->
 	  <ProjectReference Include="..\Yotei.ORM\Yotei.ORM.csproj" />
    </ItemGroup>
 
@@ -48,8 +48,8 @@
    <ItemGroup Condition="'$(Configuration)'=='Local'">
 	  <PackageReference Include="Yotei.Tools" Version="0.5.32-v0001" />
 	  <PackageReference Include="Yotei.Tools.LambdaParser" Version="0.5.28-v0001" />
-	  <PackageReference Include="Yotei.Tools.WithGenerator" Version="0.5.22-v0001" />
-	  <PackageReference Include="Yotei.Tools.CloneGenerator" Version="0.5.22-v0001" />
+	  <!--<PackageReference Include="Yotei.Tools.WithGenerator" Version="0.5.22-v0001" />-->
+	  <!--<PackageReference Include="Yotei.Tools.CloneGenerator" Version="0.5.22-v0001" />-->
 	  <PackageReference Include="Yotei.ORM" Version="0.2.4-v0001" />
    </ItemGroup>
 
@@ -57,32 +57,28 @@
    <ItemGroup Condition="'$(Configuration)'=='Release'">
 	  <PackageReference Include="Yotei.Tools" Version="0.5.31" />
 	  <PackageReference Include="Yotei.Tools.LambdaParser" Version="0.5.27" />
-	  <PackageReference Include="Yotei.Tools.WithGenerator" Version="0.5.21" />
-	  <PackageReference Include="Yotei.Tools.CloneGenerator" Version="0.5.21" />
+	  <!--<PackageReference Include="Yotei.Tools.WithGenerator" Version="0.5.21" />-->
+	  <!--<PackageReference Include="Yotei.Tools.CloneGenerator" Version="0.5.21" />-->
 	  <PackageReference Include="Yotei.ORM" Version="0.2.4" />
    </ItemGroup>
 
    <!-- Generator settings -->
-   <ItemGroup>
+   <!--<ItemGroup>
 	  <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
-   </ItemGroup>
-   <ItemGroup>
-     <Compile Remove="1.Tests_Common\_Test_IdentifierMultiPart_.cs" />
-     <Compile Remove="1.Tests_Common\_Test_IdentifierSinglePart_.cs" />
    </ItemGroup>
    <PropertyGroup>
 	  <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 	  <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 	  <CompilerGeneratedFilesOutputPath>Generated\$(TargetFramework)</CompilerGeneratedFilesOutputPath>
-   </PropertyGroup>
+   </PropertyGroup>-->
 
    <!-- Clear generated files each compile or build -->
    <!-- Need to appear at the end of the file -->
-   <Target Name="CustomBeforeCompile" BeforeTargets="BeforeCompile">
+   <!--<Target Name="CustomBeforeCompile" BeforeTargets="BeforeCompile">
 	  <RemoveDir Directories="$(ProjectDir)\Generated\" />
    </Target>
    <Target Name="CustomBeforeBuild" BeforeTargets="BeforeBuild">
 	  <RemoveDir Directories="$(ProjectDir)\Generated\" />
-   </Target>
+   </Target>-->
 
 </Project>
