@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
    <PropertyGroup>
-	  <StartupObject>Runner.Program</StartupObject>
-	  <OutputType>Exe</OutputType>
 	  <TargetFramework>net8.0</TargetFramework>
 	  <LangVersion>latest</LangVersion>
 	  <ImplicitUsings>disable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
+	  <IsPackable>false</IsPackable>
+	  <IsTestProject>true</IsTestProject>
 	  <Configurations>Debug;Release;Local</Configurations>
    </PropertyGroup>
 
@@ -23,21 +23,22 @@
 	  </PackageReference>
    </ItemGroup>
 
-   <ItemGroup>
+   <!-- DEBUG configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Debug'">
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
+	  <ProjectReference Include="..\Yotei.Tools.Collections\Yotei.Tools.Collections.csproj" />
    </ItemGroup>
 
-   <PropertyGroup>
-	  <DoTests>DOTESTS</DoTests>
-   </PropertyGroup>
-   <ItemGroup Condition="'$(DoTests)'=='DOTESTS'">
-	  <ProjectReference Include="..\..\0-Experimental\Experiments\Experiments.csproj" />	  
-	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Tests\Yotei.Tools.Tests.csproj" />
-	  <ProjectReference Include="..\..\1-Yotei.Tools.Collections\Yotei.Tools.Collections.Tests\Yotei.Tools.Collections.Tests.csproj" />
-	  <ProjectReference Include="..\..\1-Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser.Tests\Yotei.Tools.LambdaParser.Tests.csproj" />
-	  <ProjectReference Include="..\..\2-Yotei.ORM\Yotei.ORM.Tests\Yotei.ORM.Tests.csproj" />
-	  <ProjectReference Include="..\..\3-Yotei.ORM.Relational\Yotei.ORM.Relational.FakeDB\Yotei.ORM.Relational.FakeDB.csproj" />
-	  <ProjectReference Include="..\..\3-Yotei.ORM.Relational\Yotei.ORM.Relational.Tests\Yotei.ORM.Relational.Tests.csproj" />
+   <!-- LOCAL configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Local'">
+	  <PackageReference Include="Yotei.Tools" Version="0.5.32-v0001" />
+	  <PackageReference Include="Yotei.Tools.Collections" Version="0.5.1-v0001" />
+   </ItemGroup>
+
+   <!-- RELEASE configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Release'">
+	  <PackageReference Include="Yotei.Tools" Version="0.5.31" />
+	  <PackageReference Include="Yotei.Tools.Collections" Version="0.5.1-v0001" />
    </ItemGroup>
 
 </Project>
