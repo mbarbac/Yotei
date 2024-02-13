@@ -7,7 +7,8 @@
 /// </summary>
 /// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>
-public interface ICoreList<K, T> : ICloneable, IList<T>, IList, ICollection<T>, ICollection
+[Cloneable]
+public partial interface ICoreList<K, T> : ICloneable, IList<T>, IList, ICollection<T>, ICollection
 {
     string ToDebugString(int count);
 

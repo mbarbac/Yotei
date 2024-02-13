@@ -16,6 +16,8 @@ global using System.Text;
 global using System.Threading;
 global using System.Threading.Tasks;
 
-global using Yotei.Tools;
-global using Yotei.Tools.Diagnostics;
-global using Yotei.Tools.CloneGenerator;
+global using Yotei.Tools.Generators.Internal;
+global using Microsoft.CodeAnalysis;
+global using Microsoft.CodeAnalysis.CSharp;
+global using Microsoft.CodeAnalysis.CSharp.Syntax;
+global using Microsoft.CodeAnalysis.Text;

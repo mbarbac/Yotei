@@ -5,7 +5,7 @@ namespace Yotei.Tools.Tests;
 
 // ========================================================
 //[Enforced]
-public static class Test_CoreList_KT
+public static partial class Test_CoreList_KT
 {
     internal class Element(string name)
     {
@@ -20,7 +20,8 @@ public static class Test_CoreList_KT
 
     // ====================================================
 
-    internal class Chain : CoreList<K, T>
+    [Cloneable]
+    internal partial class Chain : CoreList<K, T>
     {
         public Chain(bool caseSensitive) : base()
         {
@@ -41,7 +42,6 @@ public static class Test_CoreList_KT
         public Chain(bool caseSensitive, T item) : this(caseSensitive) => Add(item);
         public Chain(bool caseSensitive, IEnumerable<T> range) : this(caseSensitive) => AddRange(range);
         protected Chain(Chain source) : this(source.CaseSensitive) => AddRange(source);
-        public override Chain Clone() => new(this);
 
         public bool CaseSensitive
         {

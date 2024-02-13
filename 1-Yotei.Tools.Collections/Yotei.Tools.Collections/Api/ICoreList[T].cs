@@ -5,7 +5,8 @@
 /// Represents a list-alike collection of elements with customizable behavior.
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public interface ICoreList<T> : ICloneable, IList<T>, IList, ICollection<T>, ICollection
+[Cloneable]
+public partial interface ICoreList<T> : ICloneable, IList<T>, IList, ICollection<T>, ICollection
 {
     string ToDebugString(int count);
 

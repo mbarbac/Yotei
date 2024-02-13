@@ -2,8 +2,9 @@
 
 // ========================================================
 /// <inheritdoc cref="ICoreList{K, T}"/>
+[Cloneable]
 [DebuggerDisplay("{ToDebugString(6)}")]
-public class CoreList<K, T> : ICoreList<K, T>
+public partial class CoreList<K, T> : ICoreList<K, T>
 {
     readonly List<T> Items = [];
 
@@ -39,10 +40,6 @@ public class CoreList<K, T> : ICoreList<K, T>
     /// </summary>
     /// <param name="source"></param>
     protected CoreList(CoreList<K, T> source) : this() => AddRange(source);
-
-    /// <inheritdoc cref="ICloneable.Clone"/>
-    public virtual CoreList<K, T> Clone() => new(this);
-    object ICloneable.Clone() => Clone();
 
     /// <inheritdoc/>
     public IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
