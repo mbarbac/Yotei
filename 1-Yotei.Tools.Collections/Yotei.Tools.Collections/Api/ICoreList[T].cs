@@ -2,12 +2,10 @@
 
 // ========================================================
 /// <summary>
-/// Represents a list-alike collection of elements identified by their respective keys, with
-/// customizable behavior.
+/// Represents a list-alike collection of elements with customizable behavior.
 /// </summary>
-/// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>
-public interface ICoreList<K, T> : ICloneable, IList<T>, IList, ICollection<T>, ICollection
+public interface ICoreList<T> : ICloneable, IList<T>, IList, ICollection<T>, ICollection
 {
     string ToDebugString(int count);
 
@@ -16,28 +14,18 @@ public interface ICoreList<K, T> : ICloneable, IList<T>, IList, ICollection<T>, 
     /// <summary>
     /// Invoked to validate the given element before using it in this collection.
     /// </summary>
-    Func<T, T> ValidateItem { get; set; }
+    Func<T, T> Validate { get; set; }
 
     /// <summary>
-    /// Invoked to extract the key associated with the given element.
+    /// Invoked to determine equality of elements.
     /// </summary>
-    Func<T, K> GetKey { get; set; }
-
-    /// <summary>
-    /// Invoked to validate the given key.
-    /// </summary>
-    Func<K, K> ValidateKey { get; set; }
-
-    /// <summary>
-    /// Invoked to determine equality of keys.
-    /// </summary>
-    Func<K, K, bool> CompareKeys { get; set; }
+    Func<T, T, bool> Compare { get; set; }
 
     /// <summary>
     /// Invoked to get the indexes of the elements in this collection that can be considered as
-    /// duplicates of the given key.
+    /// duplicates of the given one.
     /// </summary>
-    Func<K, List<int>> GetDuplicates { get; set; }
+    Func<T, List<int>> GetDuplicates { get; set; }
 
     /// <summary>
     /// Invoked to determine if the first given element can be included in this collection when
@@ -62,34 +50,34 @@ public interface ICoreList<K, T> : ICloneable, IList<T>, IList, ICollection<T>, 
     new T this[int index] { get; set; }
 
     /// <summary>
-    /// Determines if this collection contains an element with the given key.
+    /// Determines if this collection contains the given element.
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    bool Contains(K key);
+    new bool Contains(T item);
 
     /// <summary>
-    /// Gets the index of the first element in this collection with the given key, or -1 if
+    /// Gets the index of the first ocurrence of the given element in this collection, or -1 if
     /// it is not found.
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    int IndexOf(K key);
+    new int IndexOf(T item);
 
     /// <summary>
-    /// Gets the index of the last element in this collection with the given key, or -1 if
+    /// Gets the index of the last ocurrence of the given element in this collection, or -1 if
     /// it is not found.
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    int LastIndexOf(K key);
+    int LastIndexOf(T item);
 
     /// <summary>
-    /// Gets the indexes of the elements in this collection with the given key.
+    /// Gets the indexes of the ocurrences of the given element in this collection.
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    List<int> IndexesOf(K key);
+    List<int> IndexesOf(T item);
 
     /// <summary>
     /// Determines if this collection contains an element that matches the given predicate.
@@ -195,28 +183,28 @@ public interface ICoreList<K, T> : ICloneable, IList<T>, IList, ICollection<T>, 
     int RemoveRange(int index, int count);
 
     /// <summary>
-    /// Removes from this collection the first element with the given key. Returns the number
+    /// Removes from this collection the first ocurrence of the given element. Returns the number
     /// of changes made.
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    int Remove(K key);
+    new int Remove(T item);
 
     /// <summary>
-    /// Removes from this collection the last element with the given key. Returns the number
+    /// Removes from this collection the last ocurrence of the given element. Returns the number
     /// of changes made.
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    int RemoveLast(K key);
+    int RemoveLast(T item);
 
     /// <summary>
-    /// Removes from this collection all the elements with the given key. Returns the number
+    /// Removes from this collection all the ocurrences of the given element. Returns the number
     /// of changes made.
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    int RemoveAll(K key);
+    int RemoveAll(T item);
 
     /// <summary>
     /// Removes from this collection the first ocurrence of an element that matches the given

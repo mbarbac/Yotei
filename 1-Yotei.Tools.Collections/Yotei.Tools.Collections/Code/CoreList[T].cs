@@ -1,9 +1,9 @@
 ﻿namespace Yotei.Tools.Code;
 
 // ========================================================
-/// <inheritdoc cref="ICoreList{K, T}"/>
+/// <inheritdoc cref="ICoreList{T}"/>
 [DebuggerDisplay("{ToDebugString(6)}")]
-public class CoreList<K, T> : ICoreList<K, T>
+public class CoreList<T> : ICoreList<T>
 {
     readonly List<T> Items = [];
 
@@ -12,10 +12,8 @@ public class CoreList<K, T> : ICoreList<K, T>
     /// </summary>
     public CoreList()
     {
-        _ValidateItem = (item) => item;
-        _GetKey = (item) => throw new NotImplementedException();
-        _ValidateKey = (key) => key;
-        _CompareKeys = EqualityComparer<K>.Default.Equals;
+        _Validate = (item) => item;
+        _Compare = EqualityComparer<T>.Default.Equals;
         _GetDuplicates = IndexesOf;
         _CanInclude = (item, x) => true;
     }
@@ -38,17 +36,15 @@ public class CoreList<K, T> : ICoreList<K, T>
     /// constructor must be overriden.
     /// </summary>
     /// <param name="source"></param>
-    protected CoreList(CoreList<K, T> source) : this() => AddRange(source);
+    protected CoreList(CoreList<T> source) : this() => AddRange(source);
 
     /// <inheritdoc cref="ICloneable.Clone"/>
-    public virtual CoreList<K, T> Clone() => new(this);
+    public virtual CoreList<T> Clone() => new(this);
     object ICloneable.Clone() => Clone();
 
     /// <inheritdoc/>
     public IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-    /// <inheritdoc/>
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();/// <inheritdoc/>
     public override string ToString() => $"Count: {Count}";
 
     public virtual string ToDebugString(int count) => Count == 0 ? "0:[]" : (
@@ -70,59 +66,33 @@ public class CoreList<K, T> : ICoreList<K, T>
     }
 
     /// <inheritdoc/>
-    public Func<T, T> ValidateItem
+    public Func<T, T> Validate
     {
-        get => _ValidateItem;
+        get => _Validate;
         set
         {
-            if (ReferenceEquals(_ValidateItem, value.ThrowWhenNull())) return;
-            _ValidateItem = value;
+            if (ReferenceEquals(_Validate, value.ThrowWhenNull())) return;
+            _Validate = value;
             Reload();
         }
     }
-    Func<T, T> _ValidateItem;
+    Func<T, T> _Validate;
 
     /// <inheritdoc/>
-    public Func<T, K> GetKey
+    public Func<T, T, bool> Compare
     {
-        get => _GetKey;
+        get => _Compare;
         set
         {
-            if (ReferenceEquals(_GetKey, value.ThrowWhenNull())) return;
-            _GetKey = value;
+            if (ReferenceEquals(_Compare, value.ThrowWhenNull())) return;
+            _Compare = value;
             Reload();
         }
     }
-    Func<T, K> _GetKey;
+    Func<T, T, bool> _Compare;
 
     /// <inheritdoc/>
-    public Func<K, K> ValidateKey
-    {
-        get => _ValidateKey;
-        set
-        {
-            if (ReferenceEquals(_ValidateKey, value.ThrowWhenNull())) return;
-            _ValidateKey = value;
-            Reload();
-        }
-    }
-    Func<K, K> _ValidateKey;
-
-    /// <inheritdoc/>
-    public Func<K, K, bool> CompareKeys
-    {
-        get => _CompareKeys;
-        set
-        {
-            if (ReferenceEquals(_CompareKeys, value.ThrowWhenNull())) return;
-            _CompareKeys = value;
-            Reload();
-        }
-    }
-    Func<K, K, bool> _CompareKeys;
-
-    /// <inheritdoc/>
-    public Func<K, List<int>> GetDuplicates
+    public Func<T, List<int>> GetDuplicates
     {
         get => _GetDuplicates;
         set
@@ -132,7 +102,7 @@ public class CoreList<K, T> : ICoreList<K, T>
             Reload();
         }
     }
-    Func<K, List<int>> _GetDuplicates;
+    Func<T, List<int>> _GetDuplicates;
 
     /// <inheritdoc/>
     public Func<T, T, bool> CanInclude
@@ -165,31 +135,29 @@ public class CoreList<K, T> : ICoreList<K, T>
     }
 
     /// <inheritdoc/>
-    public bool Contains(K key) => IndexOf(key) >= 0;
-    bool ICollection<T>.Contains(T item) => Contains(GetKey(ValidateItem(item)));
-    bool IList.Contains(object? value) => Contains(GetKey(ValidateItem((T)value!)));
+    public bool Contains(T item) => IndexOf(item) >= 0;
+    bool IList.Contains(object? value) => Contains(Validate((T)value!));
 
     /// <inheritdoc/>
-    public int IndexOf(K key)
+    public int IndexOf(T item)
     {
-        key = ValidateKey(key);
-        return IndexOf(x => CompareKeys(GetKey(x), key));
+        item = Validate(item);
+        return IndexOf(x => Compare(x, item));
     }
-    int IList<T>.IndexOf(T item) => IndexOf(GetKey(ValidateItem(item)));
-    int IList.IndexOf(object? value) => IndexOf(GetKey(ValidateItem((T)value!)));
+    int IList.IndexOf(object? value) => IndexOf(Validate((T)value!));
 
     /// <inheritdoc/>
-    public int LastIndexOf(K key)
+    public int LastIndexOf(T item)
     {
-        key = ValidateKey(key);
-        return LastIndexOf(x => CompareKeys(GetKey(x), key));
+        item = Validate(item);
+        return LastIndexOf(x => Compare(x, item));
     }
 
     /// <inheritdoc/>
-    public List<int> IndexesOf(K key)
+    public List<int> IndexesOf(T item)
     {
-        key = ValidateKey(key);
-        return IndexesOf(x => CompareKeys(GetKey(x), key));
+        item = Validate(item);
+        return IndexesOf(x => Compare(x, item));
     }
 
     /// <inheritdoc/>
@@ -234,7 +202,7 @@ public class CoreList<K, T> : ICoreList<K, T>
     /// <inheritdoc/>
     public virtual int Replace(int index, T item)
     {
-        item = ValidateItem(item);
+        item = Validate(item);
 
         var source = Items[index];
         if (SameItem(source, item)) return 0;
@@ -250,11 +218,10 @@ public class CoreList<K, T> : ICoreList<K, T>
     /// <inheritdoc/>
     public virtual int Add(T item)
     {
-        item = ValidateItem(item);
+        item = Validate(item);
 
         var prevent = false;
-        var key = GetKey(item);
-        var range = GetDuplicates(key);
+        var range = GetDuplicates(item);
         foreach (var x in range) if (!CanInclude(item, Items[x])) prevent = true;
         if (prevent) return 0;
 
@@ -283,11 +250,10 @@ public class CoreList<K, T> : ICoreList<K, T>
     /// <inheritdoc/>
     public virtual int Insert(int index, T item)
     {
-        item = ValidateItem(item);
+        item = Validate(item);
 
         var prevent = false;
-        var key = GetKey(item);
-        var range = GetDuplicates(key);
+        var range = GetDuplicates(item);
         foreach (var x in range) if (!CanInclude(item, Items[x])) prevent = true;
         if (prevent) return 0;
 
@@ -339,33 +305,33 @@ public class CoreList<K, T> : ICoreList<K, T>
     }
 
     /// <inheritdoc/>
-    public virtual int Remove(K key)
+    public virtual int Remove(T item)
     {
         if (Count == 0) return 0;
 
-        var index = IndexOf(key);
+        var index = IndexOf(item);
         return index >= 0 ? RemoveAt(index) : 0;
     }
-    bool ICollection<T>.Remove(T item) => Remove(GetKey(ValidateItem(item))) >= 0;
-    void IList.Remove(object? value) => Remove(GetKey(ValidateItem((T)value!)));
+    bool ICollection<T>.Remove(T item) => Remove(Validate(item)) >= 0;
+    void IList.Remove(object? value) => Remove(Validate((T)value!));
 
     /// <inheritdoc/>
-    public virtual int RemoveLast(K key)
+    public virtual int RemoveLast(T item)
     {
         if (Count == 0) return 0;
 
-        var index = LastIndexOf(key);
+        var index = LastIndexOf(item);
         return index >= 0 ? RemoveAt(index) : 0;
     }
 
     /// <inheritdoc/>
-    public virtual int RemoveAll(K key)
+    public virtual int RemoveAll(T item)
     {
         if (Count == 0) return 0;
 
         var num = 0; while (true)
         {
-            var index = IndexOf(key);
+            var index = IndexOf(item);
 
             if (index >= 0) num += RemoveAt(index);
             else break;
