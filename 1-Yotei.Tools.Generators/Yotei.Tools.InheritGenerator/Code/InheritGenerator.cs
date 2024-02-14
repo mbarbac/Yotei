@@ -1,11 +1,12 @@
-﻿namespace Yotei.Tools.CloneGenerator;
+﻿
+namespace Yotei.Tools.InheritGenerator;
 
 // ========================================================
 /// <inheritdoc cref="TreeGenerator"/>
 [Generator(LanguageNames.CSharp)]
-internal class CloneGenerator : TreeGenerator
+internal class InheritGenerator : TreeGenerator
 {
-#if DEBUG && DEBUG_CLONE_GENERATOR
+#if DEBUG && DEBUG_INHERIT_GENERATOR
     /// <inheritdoc/>
     protected override bool LaunchDebugger => true;
 #endif
@@ -17,22 +18,24 @@ internal class CloneGenerator : TreeGenerator
         cb.AppendLine("#nullable enable");
         cb.AppendLine("using System;");
 
-        var nsName = typeof(CloneableAttr).Namespace;
+        var nsName = typeof(InheritAttr).Namespace;
+
         cb.AppendLine();
-        cb.AppendLine(CloneableAttr.Code(nsName));
+        cb.AppendLine(InheritAttr.Code(nsName));
+
+        cb.AppendLine();
+        cb.AppendLine(IGenericIFace.Code(nsName));
 
         cb.AppendLine();
         cb.AppendLine(YoteiGeneratedAttr.Code(nsName));
 
         var code = cb.ToString();
-        var name = CloneableAttr.LongName + ".g.cs";
+        var name = InheritAttr.LongName + ".g.cs";
         context.AddSource(name, code);
     }
 
-    // ----------------------------------------------------
-
     /// <inheritdoc/>
-    public override string[] TypeAttributes => [CloneableAttr.LongName];
+    public override string[] TypeAttributes => [InheritAttr.LongName];
 
     /// <inheritdoc/>
     public override TypeNode CreateNode(

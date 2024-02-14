@@ -1,2 +1,0 @@
-Añadir [Cloneable] a las Tools.Collection
-Pero despues de haber reestablecido los Generators
