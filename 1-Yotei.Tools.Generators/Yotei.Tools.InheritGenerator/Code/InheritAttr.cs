@@ -81,10 +81,10 @@ internal class InheritElement
     /// <param name="attr"></param>
     public InheritElement(AttributeData attr)
     {
-        Provider = attr.AttributeClass!.TypeArguments[0];
+        Symbol = attr.AttributeClass!.TypeArguments[0];
 
         var arguments = new List<InheritTypeArgument>();
-        if (Provider is INamedTypeSymbol named && named.Arity > 0)
+        if (Symbol is INamedTypeSymbol named && named.Arity > 0)
         {
             for (int i = 0; i < named.TypeArguments.Length; i++)
             {
@@ -104,10 +104,33 @@ internal class InheritElement
         TypeArguments = arguments.ToImmutableArray();
     }
 
+    public override string ToString() => ToString(expanded: false);
+    public string ToString(bool expanded)
+    {
+        var sb = new StringBuilder();
+        sb.Append(Symbol.EasyName(new EasyNameOptions(
+            typeFullName: expanded,
+            typeGenerics: false,
+            typeNullable: false,
+            typeNullableGenerics: true)));
+
+        if (TypeArguments.Length > 0)
+        {
+            sb.Append('<'); for (int i = 0; i < TypeArguments.Length; i++)
+            {
+                if (i != 0) sb.Append(", ");
+                sb.Append(TypeArguments[i].ToString(expanded));
+            }
+            sb.Append('>');
+        }
+
+        return sb.ToString();
+    }
+
     /// <summary>
     /// The type the attribute refers to, aka: the type whose elements will be inherited.
     /// </summary>
-    public ITypeSymbol Provider { get; }
+    public ITypeSymbol Symbol { get; }
 
     /// <summary>
     /// The type arguments carried by the provider type, if any.
@@ -119,8 +142,17 @@ internal class InheritElement
 /// <summary>
 /// Describes a type argument of a given inherit provider.
 /// </summary>
-public class InheritTypeArgument(ITypeSymbol symbol, bool isGeneric, string genericName)
+internal class InheritTypeArgument(ITypeSymbol symbol, bool isGeneric, string genericName)
 {
+    public override string ToString() => ToString(expanded: false);
+    public string ToString(bool expanded) => IsGeneric
+        ? GenericName
+        : Symbol.EasyName(new EasyNameOptions(
+            typeFullName: expanded,
+            typeGenerics: true,
+            typeNullable: false,
+            typeNullableGenerics: true));
+
     /// <summary>
     /// The type the argument refers to.
     /// </summary>
