@@ -7,6 +7,8 @@ internal class XTypeNode : TypeNode
     public XTypeNode(INode parent, INamedTypeSymbol symbol) : base(parent, symbol) { }
     public XTypeNode(INode parent, TypeCandidate candidate) : base(parent, candidate) { }
 
+    string YOTEIGENERATED => "[Yotei.Tools.CloneGenerator.YoteiGenerated]";
+
     // ----------------------------------------------------
 
     /// <inheritdoc/>
@@ -46,7 +48,7 @@ internal class XTypeNode : TypeNode
             typeGenerics: true,
             typeNullable: false));
 
-        cb.AppendLine("[Yotei.Tools.CloneGenerator.YoteiGenerated]");
+        cb.AppendLine(YOTEIGENERATED);
         cb.AppendLine($"{modifiers}{typeName} Clone();");
     }
 
@@ -62,7 +64,7 @@ internal class XTypeNode : TypeNode
             typeGenerics: true,
             typeNullable: false));
 
-        cb.AppendLine("[Yotei.Tools.CloneGenerator.YoteiGenerated]");
+        cb.AppendLine(YOTEIGENERATED);
         cb.AppendLine($"public abstract {typeName} Clone();");
         PrintNeededInterfaces(context, cb);
     }
@@ -80,7 +82,7 @@ internal class XTypeNode : TypeNode
             typeGenerics: true,
             typeNullable: false));
 
-        cb.AppendLine("[Yotei.Tools.CloneGenerator.YoteiGenerated]");
+        cb.AppendLine(YOTEIGENERATED);
         cb.AppendLine($"{modifiers}{typeName} Clone()");
         cb.AppendLine("{");
         cb.IndentLevel++;
