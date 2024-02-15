@@ -56,9 +56,12 @@ internal static class EasyNameExtensions
                 }
                 node = node.ContainingSymbol;
             }
-            names.Reverse();
-            sb.Append(string.Join(".", names));
-            sb.Append('.');
+            if (names.Count > 0)
+            {
+                names.Reverse();
+                sb.Append(string.Join(".", names));
+                sb.Append('.');
+            }
         }
 
         sb.Append(symbol.Name);

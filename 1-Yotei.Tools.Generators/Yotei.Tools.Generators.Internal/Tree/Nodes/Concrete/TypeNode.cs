@@ -129,6 +129,8 @@ internal class TypeNode : INode
     public bool Validate(SourceProductionContext context)
     {
         foreach (var node in TypeChildren) if (!node.Validate(context)) return false;
+
+        if (!OnValidate(context)) return false;
         foreach (var node in PropertyChildren) if (!node.Validate(context)) return false;
         foreach (var node in FieldChildren) if (!node.Validate(context)) return false;
         foreach (var node in MethodChildren) if (!node.Validate(context)) return false;
