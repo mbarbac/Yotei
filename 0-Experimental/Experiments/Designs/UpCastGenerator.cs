@@ -1,12 +1,12 @@
 namespace Experiments.Designs.UpCastGenerator;
 
 // UpCast generator is designed to facilitate inheritance of base interfaces and classes when
-// the real need is just to upcast, or reimplement, elements whose original types are the base
+// the real need is just to upcast (or reimplement) elements whose original types are the base
 // one, and upcast them to the implementing one.
 
 // The base types can be interfaces, classes and records. They can be written the way you want
-// and tested they way you need. They require no modification, no attribute - indeed it may
-// happen you have not access to the source code.
+// and tested they way you need. They require no modifications and no attributes applied to them.
+// Indeed, it may even happen you have no access to the source code.
 
 public interface IFoo<T>
 {
@@ -36,9 +36,25 @@ public class Foo<T> : IFoo<T>
     IFoo<T> IFoo<T>.Add(T item) => Add(item);
 }
 
-// Now, when you want to reimplement these types upcasting their elements to the derived type,
-// those derived types need to be decorated with the UpCast attribute. We can try a generic
-// attribute:
+// Now, when you want to reimplement these types upcasting their elements to a given derived
+// type, you typically have to write a lot of boiler plate code just for upcasting purposes.
+// Instead, the idea is to apply to those derived types the UpCast attribute, and let the code
+// generator take care of all of that repetitive code in our behalf.
+
+// Starting from C# 11 We could have used a generic attribute, ie: UpCast<T>, where T specifies
+// the base type to inherit from. But now suppose that T itself is a generic one (as IFoo<T> in
+// our previous example). If this happens, the compiler will complain because it expects, for
+// generic attributes, that their types are fully constructed.
+
+//[UpCast<IFoo<B>] // CS8968: an attribute type argument cannot use type parameters.
+//public class Any<A, B> { }
+
+// A possible solution is to use a market type that the compiler considers fully constructed,
+// for instance an interface whose only purpose in live is to serve as a placeholder. But then
+// we have the problem of identifying what is the right name to use with it (or names in the
+// case where we have several one).
+
+// With all of these we would have ended with something like the following:
 
 [AttributeUsage(
     AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface,
@@ -51,18 +67,6 @@ public class UpCastAttribute<T> : Attribute
     public string[] GenericNames { get; set; } = [];
 }
 
-// But there is a problem: when the attribute is used, its generic argument must be fully
-// constructed (aka: it cannot be itself a generic one). So we cannot use it, as such, to upcast
-// from a generic base type to a generic derived one:
-
-//[UpCast<IFoo<B>] // CS8968: an attribute type argument cannot use type parameters.
-//public class Any<A, B> { }
-
-// A possible solution is to use a market type that the compiler considers fully constructed,
-// for instance an interface whose only purpose in live is to serve as a placeholder. But then
-// we have the problem of identifying what is the right name to use with it (or names in the
-// case where we have several one). 
-
 public interface IGeneric { }
 
 [UpCast<IFoo<IGeneric>>(GenericNames = ["B"])]
@@ -70,9 +74,10 @@ public class Other<A, B, C> { }
 
 // Now, this requires introducing another type, the marker one, which opens the door of naming
 // problems (potential colisions) and, in any case, the syntax feels not natural. Indeed, it is
-// an ugly one, and even more if 'IFoo' itself uses several generic ones. So we discard the
-// generic attribute option, and instead we are going to specify the type to inherit (upcast)
-// as the first mandatory argument of the attribute:
+// an ugly one, and even more if 'IFoo' itself uses several generic ones.
+
+// So we discard the generic attribute option, and instead we are going to specify the type to
+// inherit (upcast) as the first mandatory argument of the attribute:
 
 [AttributeUsage(
     AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface,
@@ -83,7 +88,7 @@ public class UpCastAttribute(Type type) : Attribute
 {
     public Type Type { get; } = type;
     public string[] GenericNames { get; set; } = [];
-    public bool ExplicitProperties { get; set; }
+    public bool ChangeProperties { get; set; }
 }
 
 [UpCast(typeof(IFoo<>), GenericNames = ["B"])]
@@ -101,7 +106,7 @@ public class Another<A, B, C> { }
 
 // UpCast will then reimplement the matching elements. Let's start by using it with an interface:
 
-[UpCast(typeof(IFoo<>), GenericNames = ["T"])]
+[UpCast(typeof(IFoo<>), GenericNames = ["T"], ChangeProperties = true)]
 public partial interface IBar<T> { }
 
 // then the following code is generated:
@@ -116,12 +121,16 @@ partial interface IBar<T> : IFoo<T>
 // derived type, and if not, adds it in the code generated. If it was already specified, then
 // this step is skipped.
 
+// The 'ChangeProperties' argument governs if the code generator will upcast properties or not.
+// Reasons are better understood when discussing the next case (applyin the attribute to classes
+// or records), so we postpone the discussion for a while.
+
 // Now we have the case of using the UpCast attribute with a class (or a record). UpCast can be
 // applied several times to a given derived class, each specifying a different base type to
 // upcast from (at most one base class, but as many interfaces as needed).
 
-[UpCast(typeof(IBar<>), GenericNames = ["T"])]
-[UpCast(typeof(Foo<>), GenericNames = ["T"], ExplicitProperties = true)]
+[UpCast(typeof(IBar<>), GenericNames = ["T"], ChangeProperties = true)]
+[UpCast(typeof(Foo<>), GenericNames = ["T"], ChangeProperties = true)]
 public partial class Bar<T> { }
 
 // and then the following code is generated:
@@ -157,3 +166,15 @@ partial class Bar<T> : Foo<T>, IBar<T>
 // In addition, if a method or property has been generated by another Yotei generator, UpCast
 // will not mess with it. It is assumed the original generator provides the mechanisms to use
 // in inheritance or implementing scenarios.
+
+// BACKLOG:
+//
+// - Include an exclusion mechanism for methods. Ie: a string list of those to exclude. If
+//   any element contains rounded brackets, then what is inside the brackets govern the possible
+//   method override to exclude: name() only parameterless method, name(int) only the method
+//   with one parameter that is an int, name(int, string) ..., and so forth.
+//
+// - Include an exclusion mechanism for properties. Ie: a string list of those to exclude. If
+//   any element contains square brackets, then what is inside the brackets govern the possible
+//   property override to exclude: name[] is an error as there are not empty indexers, name[int]
+//   only the indexer with one parameter that is an int, name[int, string] ..., and so forth.

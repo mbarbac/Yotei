@@ -27,7 +27,7 @@
    </ItemGroup>
 
    <PropertyGroup>
-	  <DefineConstants>$(DefineConstants);DEBUG_WITH_GENERATOR</DefineConstants>
+	  <!--<DefineConstants>$(DefineConstants);DEBUG_WITH_GENERATOR</DefineConstants>-->
 	  <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
    </PropertyGroup>
    <ItemGroup>
