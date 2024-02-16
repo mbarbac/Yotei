@@ -28,18 +28,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)System\CodeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\ExceptionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\StringExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Base\TreeGenerator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Base\YoteiGeneratedAttr.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Base\TreeDiagnostics.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\MethodCandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\FieldCandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\PropertyCandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\TypeCandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\Candidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concrete\__.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)Tree\Nodes\Api\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Tree\" />
   </ItemGroup>
 </Project>
