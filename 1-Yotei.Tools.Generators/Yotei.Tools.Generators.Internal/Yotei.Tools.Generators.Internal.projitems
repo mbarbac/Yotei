@@ -22,10 +22,24 @@
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\Range.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\RequiredMemberAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\SkipLocalsInitAttribute.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CodeBuilder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CustomList[T].cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\TypeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\NameSyntaxExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\AttributeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\CodeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\ExceptionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\StringExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Base\TreeGenerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Base\YoteiGeneratedAttr.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Base\TreeDiagnostics.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\MethodCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\FieldCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\PropertyCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\TypeCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\Candidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concrete\__.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Tree\Nodes\Api\" />
   </ItemGroup>
 </Project>

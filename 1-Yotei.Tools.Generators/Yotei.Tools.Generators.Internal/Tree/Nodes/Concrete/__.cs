@@ -1,3 +1,3 @@
-﻿namespace Yotei.Tools.CloneGenerator;
+﻿namespace Yotei.Tools.Generators.Internal;
 
 // ========================================================
