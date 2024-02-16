@@ -46,4 +46,25 @@ internal static class StringExtensions
         source = source.ThrowWhenNull(description);
         return source!;
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns a new string with all the ocurrences of the given char removed.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="ch"></param>
+    /// <returns></returns>
+    [SuppressMessage("", "IDE0305")]
+    public static string RemoveAll(this string source, char ch)
+    {
+        source.ThrowWhenNull();
+
+        if (source.Length == 0) return source;
+        if (!source.Contains(ch)) return source;
+
+        var cs = new List<char>();
+        foreach (var c in source) if (c != ch) cs.Add(c);
+        return new string(cs.ToArray());
+    }
 }

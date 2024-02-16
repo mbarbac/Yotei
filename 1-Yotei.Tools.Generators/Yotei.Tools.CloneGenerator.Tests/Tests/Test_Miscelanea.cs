@@ -1,3 +1,5 @@
+#pragma warning disable IDE0065
+
 using TPair = System.Collections.Generic.KeyValuePair<string, int>;
 
 namespace Yotei.Tools.CloneGenerator.Tests
