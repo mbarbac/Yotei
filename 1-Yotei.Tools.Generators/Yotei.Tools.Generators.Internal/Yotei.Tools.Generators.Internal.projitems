@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>d5a70fb4-8d1f-4754-9115-93c061e4b563</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Yotei.Tools.Generators.Internal</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\AllowNullAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\BitOperations.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\CallerArgumentExpressionAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\DoesNotReturnAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\HashCode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\Index.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\IsExternalInit.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\MaybeNullAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\NotNullAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\NotNullWhenAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\Range.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\RequiredMemberAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\SkipLocalsInitAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CodeBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CustomList[T].cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\ExceptionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\StringExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
+  </ItemGroup>
+</Project>

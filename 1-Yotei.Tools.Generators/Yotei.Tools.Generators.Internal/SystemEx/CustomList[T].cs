@@ -1,17 +1,19 @@
-﻿/*namespace Yotei.Tools.Code;
+﻿namespace Yotei.Tools.Generators.Internal;
 
 // ========================================================
-/// <inheritdoc cref="ICoreList{T}"/>
-[Cloneable]
+/// <summary>
+/// Represents a list-alike collection of elements with customizable behavior.
+/// </summary>
+/// <typeparam name="T"></typeparam>
 [DebuggerDisplay("{ToDebugString(6)}")]
-public partial class CoreList<T> : ICoreList<T>
+internal class CustomList<T> : IEnumerable<T>
 {
     readonly List<T> Items = [];
 
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    public CoreList()
+    public CustomList()
     {
         _Validate = (item) => item;
         _Compare = EqualityComparer<T>.Default.Equals;
@@ -23,26 +25,18 @@ public partial class CoreList<T> : ICoreList<T>
     /// Initializes a new instance with the given element.
     /// </summary>
     /// <param name="item"></param>
-    public CoreList(T item) : this() => Add(item);
+    public CustomList(T item) : this() => Add(item);
 
     /// <summary>
     /// Initializes a new instance with the elements of the given range.
     /// </summary>
     /// <param name="range"></param>
-    public CoreList(IEnumerable<T> range) : this() => AddRange(range);
-
-    /// <summary>
-    /// Copy constructor.
-    /// <br/> If there is the need of copying the delegates from the given source, then this
-    /// constructor must be overriden.
-    /// </summary>
-    /// <param name="source"></param>
-    protected CoreList(CoreList<T> source) : this() => AddRange(source);
+    public CustomList(IEnumerable<T> range) : this() => AddRange(range);
 
     /// <inheritdoc/>
     public IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-    
+
     /// <inheritdoc/>
     public override string ToString() => $"Count: {Count}";
 
@@ -64,7 +58,9 @@ public partial class CoreList<T> : ICoreList<T>
         AddRange(range);
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Invoked to validate the given element before using it in this collection.
+    /// </summary>
     public Func<T, T> Validate
     {
         get => _Validate;
@@ -77,7 +73,9 @@ public partial class CoreList<T> : ICoreList<T>
     }
     Func<T, T> _Validate;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Invoked to determine equality of elements.
+    /// </summary>
     public Func<T, T, bool> Compare
     {
         get => _Compare;
@@ -90,7 +88,10 @@ public partial class CoreList<T> : ICoreList<T>
     }
     Func<T, T, bool> _Compare;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Invoked to get the indexes of the elements in this collection that can be considered as
+    /// duplicates of the given one.
+    /// </summary>
     public Func<T, List<int>> GetDuplicates
     {
         get => _GetDuplicates;
@@ -103,7 +104,12 @@ public partial class CoreList<T> : ICoreList<T>
     }
     Func<T, List<int>> _GetDuplicates;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Invoked to determine if the first given element can be included in this collection when
+    /// compared with the second one. Returns 'true' if so, or 'false' if the inclusion operation
+    /// shall be just ignored. In addition, it can throw an appropriate exception if duplicates
+    /// are not allowed.
+    /// </summary>
     public Func<T, T, bool> CanInclude
     {
         get => _CanInclude;
@@ -118,51 +124,77 @@ public partial class CoreList<T> : ICoreList<T>
 
     // ----------------------------------------------------
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the number of elements in this collection.
+    /// </summary>
     public int Count => Items.Count;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets or sets the element at the given index.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <returns></returns>
     public T this[int index]
     {
         get => Items[index];
         set => Replace(index, value);
     }
-    object? IList.this[int index]
-    {
-        get => this[index];
-        set => this[index] = (T)value!;
-    }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Determines if this collection contains the given element.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
     public bool Contains(T item) => IndexOf(item) >= 0;
-    bool IList.Contains(object? value) => Contains(Validate((T)value!));
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the index of the first ocurrence of the given element in this collection, or -1 if
+    /// it is not found.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
     public int IndexOf(T item)
     {
         item = Validate(item);
         return IndexOf(x => Compare(x, item));
     }
-    int IList.IndexOf(object? value) => IndexOf(Validate((T)value!));
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the index of the last ocurrence of the given element in this collection, or -1 if
+    /// it is not found.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
     public int LastIndexOf(T item)
     {
         item = Validate(item);
         return LastIndexOf(x => Compare(x, item));
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the indexes of the ocurrences of the given element in this collection.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
     public List<int> IndexesOf(T item)
     {
         item = Validate(item);
         return IndexesOf(x => Compare(x, item));
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Determines if this collection contains an element that matches the given predicate.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
     public bool Contains(Predicate<T> predicate) => IndexOf(predicate) >= 0;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the index of the first element in this collection that matches the given predicate,
+    /// or -1 if any is found.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
     public int IndexOf(Predicate<T> predicate)
     {
         predicate.ThrowWhenNull();
@@ -171,7 +203,12 @@ public partial class CoreList<T> : ICoreList<T>
         return -1;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the index of the last element in this collection that matches the given predicate,
+    /// or -1 if any is found.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
     public int LastIndexOf(Predicate<T> predicate)
     {
         predicate.ThrowWhenNull();
@@ -180,7 +217,11 @@ public partial class CoreList<T> : ICoreList<T>
         return -1;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the indexes of the elements in this collection that match the given predicate.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
     public List<int> IndexesOf(Predicate<T> predicate)
     {
         predicate.ThrowWhenNull();
@@ -190,15 +231,27 @@ public partial class CoreList<T> : ICoreList<T>
         return list;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets an array with the elements in this collection.
+    /// </summary>
+    /// <returns></returns>
     public T[] ToArray() => Items.ToArray();
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets a list with the elements in this collection.
+    /// </summary>
+    /// <returns></returns>
     public List<T> ToList() => new(Items);
 
     // ----------------------------------------------------
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Replaces the element at the given index with the new given one. Returns the number of
+    /// changes made.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="item"></param>
+    /// <returns></returns>
     public virtual int Replace(int index, T item)
     {
         item = Validate(item);
@@ -214,7 +267,11 @@ public partial class CoreList<T> : ICoreList<T>
         ? source!.Equals(item)
         : ReferenceEquals(source, item);
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Adds to this collection the given element. Returns the number of changes made.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
     public virtual int Add(T item)
     {
         item = Validate(item);
@@ -227,10 +284,13 @@ public partial class CoreList<T> : ICoreList<T>
         Items.Add(item);
         return 1;
     }
-    void ICollection<T>.Add(T item) => Add(item);
-    int IList.Add(object? value) => Add((T)value!) > 0 ? (Count - 1) : -1;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Adds to this collection the elements from the given range. Returns the number of changes
+    /// made.
+    /// </summary>
+    /// <param name="range"></param>
+    /// <returns></returns>
     public virtual int AddRange(IEnumerable<T> range)
     {
         range.ThrowWhenNull();
@@ -246,7 +306,13 @@ public partial class CoreList<T> : ICoreList<T>
         return num;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Inserts into this collection the given element at the given index. Returns the number of
+    /// changes made.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="item"></param>
+    /// <returns></returns>
     public virtual int Insert(int index, T item)
     {
         item = Validate(item);
@@ -259,10 +325,14 @@ public partial class CoreList<T> : ICoreList<T>
         Items.Insert(index, item);
         return 1;
     }
-    void IList<T>.Insert(int index, T item) => Insert(index, item);
-    void IList.Insert(int index, object? value) => Insert(index, (T)value!);
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Inserts into this collection the elements from the given range, starting at the given
+    /// index. Returns the number of changes made.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="range"></param>
+    /// <returns></returns>
     public virtual int InsertRange(int index, IEnumerable<T> range)
     {
         range.ThrowWhenNull();
@@ -279,7 +349,12 @@ public partial class CoreList<T> : ICoreList<T>
         return num;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Removes from this collection the element at the given index. Returns the number of
+    /// changes made.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <returns></returns>
     public virtual int RemoveAt(int index)
     {
         if (index < 0 || index >= Items.Count)
@@ -288,10 +363,14 @@ public partial class CoreList<T> : ICoreList<T>
         Items.RemoveAt(index);
         return 1;
     }
-    void IList<T>.RemoveAt(int index) => RemoveAt(index);
-    void IList.RemoveAt(int index) => RemoveAt(index);
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Removes from this collection the given number of elements, starting at the given index.
+    /// Returns the number of changes made.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="count"></param>
+    /// <returns></returns>
     public virtual int RemoveRange(int index, int count)
     {
         if (count < 0) throw new ArgumentException("Count is less than cero.").WithData(count);
@@ -303,7 +382,12 @@ public partial class CoreList<T> : ICoreList<T>
         return count;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Removes from this collection the first ocurrence of the given element. Returns the number
+    /// of changes made.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
     public virtual int Remove(T item)
     {
         if (Count == 0) return 0;
@@ -311,10 +395,13 @@ public partial class CoreList<T> : ICoreList<T>
         var index = IndexOf(item);
         return index >= 0 ? RemoveAt(index) : 0;
     }
-    bool ICollection<T>.Remove(T item) => Remove(Validate(item)) >= 0;
-    void IList.Remove(object? value) => Remove(Validate((T)value!));
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Removes from this collection the last ocurrence of the given element. Returns the number
+    /// of changes made.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
     public virtual int RemoveLast(T item)
     {
         if (Count == 0) return 0;
@@ -323,7 +410,12 @@ public partial class CoreList<T> : ICoreList<T>
         return index >= 0 ? RemoveAt(index) : 0;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Removes from this collection all the ocurrences of the given element. Returns the number
+    /// of changes made.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
     public virtual int RemoveAll(T item)
     {
         if (Count == 0) return 0;
@@ -338,7 +430,12 @@ public partial class CoreList<T> : ICoreList<T>
         return num;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Removes from this collection the first ocurrence of an element that matches the given
+    /// predicate. Returns the number of changes made.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
     public virtual int Remove(Predicate<T> predicate)
     {
         if (Count == 0) return 0;
@@ -347,7 +444,12 @@ public partial class CoreList<T> : ICoreList<T>
         return index >= 0 ? RemoveAt(index) : 0;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Removes from this collection the last ocurrence of an element that matches the given
+    /// predicate. Returns the number of changes made.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
     public virtual int RemoveLast(Predicate<T> predicate)
     {
         if (Count == 0) return 0;
@@ -356,7 +458,12 @@ public partial class CoreList<T> : ICoreList<T>
         return index >= 0 ? RemoveAt(index) : 0;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Removes from this collection all the ocurrences of elements that match the given
+    /// predicate. Returns the number of changes made.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
     public virtual int RemoveAll(Predicate<T> predicate)
     {
         if (Count == 0) return 0;
@@ -371,23 +478,13 @@ public partial class CoreList<T> : ICoreList<T>
         return num;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Clears all the elements in this collection. Returns the number of changes made.
+    /// </summary>
+    /// <returns></returns>
     public virtual int Clear()
     {
         var num = Items.Count; if (num > 0) Items.Clear();
         return num;
     }
-    void ICollection<T>.Clear() => Clear();
-    void IList.Clear() => Clear();
-
-    // ----------------------------------------------------
-
-    bool ICollection<T>.IsReadOnly => false;
-    bool IList.IsReadOnly => false;
-    bool IList.IsFixedSize => false;
-    bool ICollection.IsSynchronized => false;
-    object ICollection.SyncRoot => ((ICollection)Items).SyncRoot;
-
-    void ICollection<T>.CopyTo(T[] array, int index) => Items.CopyTo(array, index);
-    void ICollection.CopyTo(Array array, int index) => Items.CopyTo((T[])array, index);
-}*/
+}

@@ -1,4 +1,4 @@
-namespace Yotei.Tools.Tests;
+namespace Yotei.Tools.CloneGenerator.Tests;
 
 // ========================================================
 //[Enforced]

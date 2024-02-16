@@ -1,4 +1,4 @@
-﻿namespace Yotei.Tools.Code;
+﻿/*namespace Yotei.Tools.Code;
 
 // ========================================================
 /// <inheritdoc cref="ICoreList{K, T}"/>
@@ -422,4 +422,4 @@ public partial class CoreList<K, T> : ICoreList<K, T>
 
     void ICollection<T>.CopyTo(T[] array, int index) => Items.CopyTo(array, index);
     void ICollection.CopyTo(Array array, int index) => Items.CopyTo((T[])array, index);
-}
+}*/
