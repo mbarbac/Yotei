@@ -26,10 +26,6 @@
    <!-- DEBUG configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Debug'">
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
-	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.CloneGenerator\Yotei.Tools.CloneGenerator.csproj" >
-		 <OutputItemType>Analyzer</OutputItemType>
-		 <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-	  </ProjectReference>
 	  <ProjectReference Include="..\Yotei.Tools.Collections\Yotei.Tools.Collections.csproj" />
    </ItemGroup>
 
