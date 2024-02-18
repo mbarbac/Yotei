@@ -33,26 +33,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)System\CodeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\ExceptionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\StringExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Base\YoteiGeneratedAttr.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Base\Diagnostics.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Base\TreeGenerator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\IMethodCandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\IFieldCandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\IPropertyCandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\ITypeCandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\ICandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Core\MethodNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Core\Candidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Others\NamespaceNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Others\Api\INode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Core\FieldNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Core\PropertyNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Core\TypeNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Others\Hierarchy.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Others\FileNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)Tree\Nodes\Others\Api\" />
   </ItemGroup>
 </Project>
