@@ -33,6 +33,20 @@
     <Compile Include="$(MSBuildThisFileDirectory)System\CodeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\ExceptionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\StringExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\Api\ICandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\Concrete\MethodCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\Concrete\FieldCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\Concrete\PropertyCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\Concrete\TypeCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Api\INodeEx.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Api\INode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concrete\MethodNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concrete\FieldNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concrete\PropertyNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concrete\TypeNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Hierarchy\NamespaceNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Hierarchy\FileNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Hierarchy\Hierarchy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
   </ItemGroup>
 </Project>
