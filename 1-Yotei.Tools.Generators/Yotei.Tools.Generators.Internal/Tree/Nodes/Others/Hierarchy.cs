@@ -39,8 +39,6 @@ internal sealed class Hierarchy
     /// <param name="candidate"></param>
     void RegisterCandidate(ICandidate candidate)
     {
-        var comparer = SymbolEqualityComparer.Default;
-
         // File...
         var fname = candidate.GetFileName();
         var fnode = ChildFiles.Find(x => x.FileName == fname);
@@ -56,9 +54,8 @@ internal sealed class Hierarchy
         for (int nsindex = 0; nsindex < candidate.NamespaceSyntaxChain.Length; nsindex++)
         {
             var syntax = candidate.NamespaceSyntaxChain[nsindex];
-            var name = syntax.Name.ToString();
 
-            nsnode = nsList.Find(x => x.Name == name);
+            nsnode = nsList.Find(x => ReferenceEquals(x.Syntax, syntax));
             if (nsnode == null)
             {
                 nsnode = new NamespaceNode(syntax);
@@ -76,10 +73,11 @@ internal sealed class Hierarchy
             var syntax = candidate.TypeSyntaxChain[tpindex];
             var symbol = candidate.TypeSymbolChain[tpindex];
 
-            tpnode = tpList.Find(x => comparer.Equals(symbol, x.Symbol));
+            tpnode = tpList.Find(x => ReferenceEquals(syntax, x.Syntax));
             if (tpnode == null)
             {
-                if (candidate is TypeNode temp && tpindex == (candidate.TypeSymbolChain.Length - 1))
+                if (candidate is TypeNode temp &&
+                    tpindex == (candidate.TypeSymbolChain.Length - 1))
                 {
                     tpList.Add(temp);
                     return;
@@ -97,7 +95,7 @@ internal sealed class Hierarchy
         // Properties...
         if (candidate is PropertyNode propertyNode)
         {
-            var temp = tpnode.ChildProperties.Find(x => comparer.Equals(x.Symbol, candidate.Symbol));
+            var temp = tpnode.ChildProperties.Find(x => ReferenceEquals(x.Syntax, candidate.Syntax));
             if (temp == null) tpnode.ChildProperties.Add(propertyNode);
             return;
         }
@@ -105,7 +103,7 @@ internal sealed class Hierarchy
         // Fields...
         if (candidate is FieldNode fieldNode)
         {
-            var temp = tpnode.ChildFields.Find(x => comparer.Equals(x.Symbol, candidate.Symbol));
+            var temp = tpnode.ChildFields.Find(x => ReferenceEquals(x.Syntax, candidate.Syntax));
             if (temp == null) tpnode.ChildFields.Add(fieldNode);
             return;
         }
@@ -113,7 +111,7 @@ internal sealed class Hierarchy
         // Methods...
         if (candidate is MethodNode methodNode)
         {
-            var temp = tpnode.ChildMethods.Find(x => comparer.Equals(x.Symbol, candidate.Symbol));
+            var temp = tpnode.ChildMethods.Find(x => ReferenceEquals(x.Syntax, candidate.Syntax));
             if (temp == null) tpnode.ChildMethods.Add(methodNode);
             return;
         }

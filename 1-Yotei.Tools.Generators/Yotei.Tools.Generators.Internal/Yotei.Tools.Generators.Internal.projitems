@@ -28,6 +28,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\ChainExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\EasyNameOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\EasyNameExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\CompilationExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\SyntaxNodeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\CodeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\ExceptionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\StringExtensions.cs" />

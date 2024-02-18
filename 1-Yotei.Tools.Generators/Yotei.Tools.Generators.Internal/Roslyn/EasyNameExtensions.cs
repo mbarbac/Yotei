@@ -10,7 +10,8 @@ internal static class EasyNameExtensions
     /// </summary>
     /// <param name="symbol"></param>
     /// <returns></returns>
-    public static string EasyName(this ITypeSymbol symbol) => symbol.EasyName(EasyNameOptions.Default);
+    public static string EasyName(
+        this ITypeSymbol symbol) => symbol.EasyName(EasyNameOptions.Default);
 
     /// <summary>
     /// Returns the C#-alike name of the given symbol, using the given options.
@@ -18,6 +19,7 @@ internal static class EasyNameExtensions
     /// <param name="symbol"></param>
     /// <param name="options"></param>
     /// <returns></returns>
+    [SuppressMessage("", "IDE0019")]
     public static string EasyName(this ITypeSymbol symbol, EasyNameOptions options)
     {
         symbol.ThrowWhenNull();
@@ -29,7 +31,7 @@ internal static class EasyNameExtensions
 
         if (options.UseFullName && symbol is not ITypeParameterSymbol and not IErrorTypeSymbol)
         {
-            List<string> names = new List<string>();
+            List<string> names = [];
             string? name;
 
             ISymbol? node = symbol.ContainingSymbol;
@@ -43,7 +45,7 @@ internal static class EasyNameExtensions
                         break;
 
                     case ITypeSymbol item:
-                        name = item.EasyName(options with { AddNullable = true });
+                        name = item.EasyName(options with { UseFullName = false, AddNullable = true });
                         names.Add(name);
                         break;
                 }
@@ -91,7 +93,8 @@ internal static class EasyNameExtensions
     /// </summary>
     /// <param name="symbol"></param>
     /// <returns></returns>
-    public static string EasyName(this IPropertySymbol symbol) => symbol.EasyName(EasyNameOptions.Default);
+    public static string EasyName(
+        this IPropertySymbol symbol) => symbol.EasyName(EasyNameOptions.Default);
 
     /// <summary>
     /// Returns the C#-alike name of the given property, using the given options.
@@ -149,7 +152,8 @@ internal static class EasyNameExtensions
     /// </summary>
     /// <param name="symbol"></param>
     /// <returns></returns>
-    public static string EasyName(this IFieldSymbol symbol) => symbol.EasyName(EasyNameOptions.Default);
+    public static string EasyName(
+        this IFieldSymbol symbol) => symbol.EasyName(EasyNameOptions.Default);
 
     /// <summary>
     /// Returns the C#-alike name of the given field, using the given options.
@@ -192,7 +196,8 @@ internal static class EasyNameExtensions
     /// </summary>
     /// <param name="symbol"></param>
     /// <returns></returns>
-    public static string EasyName(this IMethodSymbol symbol) => symbol.EasyName(EasyNameOptions.Default);
+    public static string EasyName(
+        this IMethodSymbol symbol) => symbol.EasyName(EasyNameOptions.Default);
 
     /// <summary>
     /// Returns the C#-alike name of the given method, using the given options.

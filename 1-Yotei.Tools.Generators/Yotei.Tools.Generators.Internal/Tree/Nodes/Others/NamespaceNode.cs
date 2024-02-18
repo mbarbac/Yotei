@@ -35,10 +35,47 @@ internal sealed class NamespaceNode(BaseNamespaceDeclarationSyntax node) : INode
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public bool Validate(SourceProductionContext context) => throw null;
+    public bool Validate(SourceProductionContext context)
+    {
+        foreach (var node in ChildNamespaces) if (!node.Validate(context)) return false;
+        foreach (var node in ChildTypes) if (!node.Validate(context)) return false;
+        return true;
+    }
 
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public void Emit(SourceProductionContext context, CodeBuilder cb) => throw null;
+    public void Emit(SourceProductionContext context, CodeBuilder cb)
+    {
+        cb.AppendLine($"namespace {Name}");
+        cb.AppendLine("{");
+        cb.IndentLevel++;
+
+        PrintUsings(cb);
+
+        foreach (var node in ChildNamespaces) node.Emit(context, cb);
+        foreach (var node in ChildTypes) node.Emit(context, cb);
+
+        cb.IndentLevel--;
+        cb.AppendLine("}");
+    }
+
+    /// <summary>
+    /// Emits the namespace-level usings.
+    /// </summary>
+    void PrintUsings(CodeBuilder cb)
+    {
+        var items = new List<string>();
+
+        foreach (var item in Syntax.Usings)
+        {
+            var str = item.ToString();
+            if (!string.IsNullOrWhiteSpace(str) && !items.Contains(str)) items.Add(str);
+        }
+        if (items.Count > 0)
+        {
+            foreach (var item in items) cb.AppendLine(item);
+            cb.AppendLine();
+        }
+    }
 }

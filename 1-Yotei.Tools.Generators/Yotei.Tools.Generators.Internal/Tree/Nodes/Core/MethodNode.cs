@@ -12,7 +12,16 @@ internal class MethodNode(
     : Candidate(model, syntax, symbol), INode, IMethodCandidate
 {
     /// <inheritdoc/>
-    public override string ToString() => $"Method: {Symbol.ContainingSymbol.Name}.{Symbol.Name}";
+    public override string ToString()
+    {
+        var options = new EasyNameOptions(
+            useGenerics: true,
+            useHostType: true,
+            useMemberType: true,
+            useMemberArguments: true);
+
+        return $"Method: {Symbol.EasyName(options)}";
+    }
 
     /// <inheritdoc/>
     public new MethodDeclarationSyntax Syntax { get; } = syntax.ThrowWhenNull();

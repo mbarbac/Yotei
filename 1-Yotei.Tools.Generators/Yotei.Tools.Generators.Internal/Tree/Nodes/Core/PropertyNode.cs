@@ -12,7 +12,16 @@ internal class PropertyNode(
     : Candidate(model, syntax, symbol), INode, IPropertyCandidate
 {
     /// <inheritdoc/>
-    public override string ToString() => $"Property: {Symbol.ContainingSymbol.Name}.{Symbol.Name}";
+    public override string ToString()
+    {
+        var options = new EasyNameOptions(
+            useGenerics: true,
+            useHostType: true,
+            useMemberType: true,
+            useMemberArguments: true);
+
+        return $"Property: {Symbol.EasyName(options)}";
+    }
 
     /// <inheritdoc/>
     public new PropertyDeclarationSyntax Syntax { get; } = syntax.ThrowWhenNull();

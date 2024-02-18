@@ -38,4 +38,31 @@ internal static class CloneableAttr
             }
         }
         """;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Tries to get the value of the <see cref="PreventVirtual"/> property from the attributes
+    /// applied to the given symbol.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static bool GetPreventVirtual(ISymbol symbol, out bool value)
+    {
+        var ats = symbol.GetAttributes(LongName);
+        foreach (var at in ats)
+        {
+            var arg = at.GetNamedArgument(PreventVirtual);
+            if (arg != null &&
+                arg.Value.Value is bool temp)
+            {
+                value = temp;
+                return true;
+            }
+        }
+
+        value = false;
+        return false;
+    }
 }

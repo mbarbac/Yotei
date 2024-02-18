@@ -1,4 +1,5 @@
-﻿namespace Yotei.Tools.CloneGenerator;
+﻿
+namespace Yotei.Tools.CloneGenerator;
 
 // ========================================================
 /// <inheritdoc cref="TreeGenerator"/>
@@ -33,4 +34,9 @@ internal class XCloneGenerator : TreeGenerator
 
     /// <inheritdoc/>
     public override string[] TypeAttributes => [CloneableAttr.LongName];
+
+    /// <inheritdoc/>
+    public override TypeNode CreateNode(
+        SemanticModel model, TypeDeclarationSyntax syntax, INamedTypeSymbol symbol)
+        => new XTypeNode(model, syntax, symbol);
 }

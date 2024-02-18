@@ -52,4 +52,27 @@ internal static class TypeExtensions
         // Not found...
         return false;
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns a copy constructor found for the given type, or null if any. In strict mode,
+    /// the type of the sole argument of the constructor must be the type itself. In not strict
+    /// mode, is enough if the type can be assigned to that argument.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <param name="strict"></param>
+    /// <returns></returns>
+    public static IMethodSymbol? GetCopyConstructor(this ITypeSymbol symbol, bool strict)
+    {
+        var methods = symbol.GetMembers().OfType<IMethodSymbol>().Where(x =>
+            x.MethodKind == MethodKind.Constructor &&
+            x.IsStatic == false &&
+            x.Parameters.Length == 1);
+
+        var comparer = SymbolEqualityComparer.Default;
+        return strict
+            ? methods.FirstOrDefault(x => comparer.Equals(symbol, x.Parameters[0].Type))
+            : methods.FirstOrDefault(x => symbol.IsAssignableTo(x.Parameters[0].Type));
+    }
 }

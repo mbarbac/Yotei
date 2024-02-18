@@ -21,4 +21,20 @@ internal static class YoteiGeneratedAttr
             internal sealed class {{LongName}} : Attribute { }
         }
         """;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Gets the decoration to use with any element for the given namespace.
+    /// </summary>
+    /// <param name="nsName"></param>
+    /// <returns></returns>
+    public static string GetDecorator(string nsName) => $"[{nsName}.{ShortName}]";
+
+    /// <summary>
+    /// Gets the decoration to use with any element for the namespace the given type belongs to.
+    /// </summary>
+    /// <param name="nsName"></param>
+    /// <returns></returns>
+    public static string GetDecorator(Type template) => $"[{template.Namespace}.{ShortName}]";
 }

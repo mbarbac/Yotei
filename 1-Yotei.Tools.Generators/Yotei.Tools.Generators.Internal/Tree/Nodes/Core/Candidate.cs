@@ -20,7 +20,34 @@ internal abstract class Candidate(SemanticModel model, SyntaxNode node, ISymbol 
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public virtual string GetFileName()
+    public virtual string GetFileName() => GetFileNameByNamespace();
+
+    /// <summary>
+    /// Gets the name of the file where this candidate will emit its source code using its
+    /// tail-most namespace.
+    /// </summary>
+    /// <returns></returns>
+    public string GetFileNameByNamespace()
+    {
+        List<string> parts = [];
+
+        foreach (var ns in NamespaceSyntaxChain)
+        {
+            var name = ns.Name.LongName();
+            var temps = name.Split('.');
+            parts.AddRange(temps);
+        }
+
+        parts.Reverse();
+        return string.Join(".", parts);
+    }
+
+    /// <summary>
+    /// Gets the name of the file where this candidate will emit its source code using its
+    /// top-most type.
+    /// </summary>
+    /// <returns></returns>
+    public string GetFileNameByType()
     {
         List<string> parts = [];
 

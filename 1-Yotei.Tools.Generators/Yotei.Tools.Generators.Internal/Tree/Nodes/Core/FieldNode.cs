@@ -12,7 +12,15 @@ internal class FieldNode(
     : Candidate(model, syntax, symbol), INode, IFieldCandidate
 {
     /// <inheritdoc/>
-    public override string ToString() => $"Field: {Symbol.ContainingSymbol.Name}.{Symbol.Name}";
+    public override string ToString()
+    {
+        var options = new EasyNameOptions(
+            useGenerics: true,
+            useHostType: true,
+            useMemberType: true);
+
+        return $"Field: {Symbol.EasyName(options)}";
+    }
 
     /// <inheritdoc/>
     public new FieldDeclarationSyntax Syntax { get; } = syntax.ThrowWhenNull();
