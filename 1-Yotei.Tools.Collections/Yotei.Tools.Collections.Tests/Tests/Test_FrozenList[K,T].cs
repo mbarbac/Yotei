@@ -1,7 +1,7 @@
-/*using T = Yotei.Tools.Tests.Test_FrozenList_KT.Element;
+using T = Yotei.Tools.Tests.FrozenList_KT.Test_FrozenList_KT.Element;
 using K = string;
 
-namespace Yotei.Tools.Tests;
+namespace Yotei.Tools.Tests.FrozenList_KT;
 
 // ========================================================
 //[Enforced]
@@ -484,4 +484,4 @@ public static partial class Test_FrozenList_KT
         Assert.NotSame(source, target);
         Assert.Empty(target);
     }
-}*/
+}

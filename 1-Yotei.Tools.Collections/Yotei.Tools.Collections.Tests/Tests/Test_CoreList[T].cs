@@ -1,6 +1,6 @@
-/*using T = Yotei.Tools.Tests.Test_CoreList_T.Element;
+using T = Yotei.Tools.Tests.CoreList_T.Test_CoreList_T.Element;
 
-namespace Yotei.Tools.Tests;
+namespace Yotei.Tools.Tests.CoreList_T;
 
 // ========================================================
 //[Enforced]
@@ -500,4 +500,4 @@ public static partial class Test_CoreList_T
         Assert.Equal(4, done);
         Assert.Empty(source);
     }
-}*/
+}
