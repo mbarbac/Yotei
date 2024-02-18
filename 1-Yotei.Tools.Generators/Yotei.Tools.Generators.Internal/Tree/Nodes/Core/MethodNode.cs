@@ -4,12 +4,14 @@
 /// <summary>
 /// Represents a method in the source code generation hierarchy.
 /// </summary>
+/// <param name="parentNode"></param>
 /// <param name="model"></param>
-/// <param name="syntax"></param>
+/// <param name="syntaxNode"></param>
 /// <param name="symbol"></param>
 internal class MethodNode(
-    SemanticModel model, MethodDeclarationSyntax syntax, IMethodSymbol symbol)
-    : Candidate(model, syntax, symbol), INode, IMethodCandidate
+    TypeNode parentNode,
+    SemanticModel model, MethodDeclarationSyntax syntaxNode, IMethodSymbol symbol)
+    : Candidate(model, syntaxNode, symbol), INode, IMethodCandidate
 {
     /// <inheritdoc/>
     public override string ToString()
@@ -24,7 +26,11 @@ internal class MethodNode(
     }
 
     /// <inheritdoc/>
-    public new MethodDeclarationSyntax Syntax { get; } = syntax.ThrowWhenNull();
+    public TypeNode ParentNode { get; } = parentNode.ThrowWhenNull();
+    INode INode.ParentNode => ParentNode;
+
+    /// <inheritdoc/>
+    public new MethodDeclarationSyntax Syntax { get; } = syntaxNode.ThrowWhenNull();
 
     /// <inheritdoc/>
     public new IMethodSymbol Symbol { get; } = symbol.ThrowWhenNull();

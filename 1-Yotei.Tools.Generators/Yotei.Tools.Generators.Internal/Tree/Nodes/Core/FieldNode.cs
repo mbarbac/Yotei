@@ -4,12 +4,14 @@
 /// <summary>
 /// Represents a field in the source code generation hierarchy.
 /// </summary>
+/// <param name="parentNode"></param>
 /// <param name="model"></param>
-/// <param name="syntax"></param>
+/// <param name="syntaxNode"></param>
 /// <param name="symbol"></param>
 internal class FieldNode(
-    SemanticModel model, FieldDeclarationSyntax syntax, IFieldSymbol symbol)
-    : Candidate(model, syntax, symbol), INode, IFieldCandidate
+    TypeNode parentNode,
+    SemanticModel model, FieldDeclarationSyntax syntaxNode, IFieldSymbol symbol)
+    : Candidate(model, syntaxNode, symbol), INode, IFieldCandidate
 {
     /// <inheritdoc/>
     public override string ToString()
@@ -23,7 +25,11 @@ internal class FieldNode(
     }
 
     /// <inheritdoc/>
-    public new FieldDeclarationSyntax Syntax { get; } = syntax.ThrowWhenNull();
+    public TypeNode ParentNode { get; } = parentNode.ThrowWhenNull();
+    INode INode.ParentNode => ParentNode;
+
+    /// <inheritdoc/>
+    public new FieldDeclarationSyntax Syntax { get; } = syntaxNode.ThrowWhenNull();
 
     /// <inheritdoc/>
     public new IFieldSymbol Symbol { get; } = symbol.ThrowWhenNull();

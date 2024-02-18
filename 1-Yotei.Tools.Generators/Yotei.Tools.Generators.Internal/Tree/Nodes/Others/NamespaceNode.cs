@@ -4,16 +4,35 @@
 /// <summary>
 /// Represents a namespace in the source code generation hierarchy.
 /// </summary>
-/// <param name="node"></param>
-internal sealed class NamespaceNode(BaseNamespaceDeclarationSyntax node) : INode
+/// 
+internal sealed class NamespaceNode : INode
 {
+    /// <summary>
+    /// Initializes a new instance.
+    /// </summary>
+    /// <param name="parentNode"></param>
+    /// <param name="syntaxNode"></param>
+    public NamespaceNode(INode parentNode, BaseNamespaceDeclarationSyntax syntaxNode)
+    {
+        ParentNode = parentNode.ThrowWhenNull();
+        Syntax = syntaxNode.ThrowWhenNull();
+
+        if (ParentNode is not FileNode and not NamespaceNode)
+            throw new ArgumentException(
+                "Parent node is not a file nor a namespace.")
+                .WithData(parentNode);
+    }
+
+    /// <inheritdoc/>
+    public INode ParentNode { get; }
+
     /// <inheritdoc/>
     public override string ToString() => $"Namespace: {Name}";
 
     /// <summary>
     /// The syntax this instance represents.
     /// </summary>
-    public BaseNamespaceDeclarationSyntax Syntax { get; } = node.ThrowWhenNull();
+    public BaseNamespaceDeclarationSyntax Syntax { get; }
 
     /// <summary>
     /// The name of this namespace, including dot separated parts if they are explicitly used.

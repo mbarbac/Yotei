@@ -225,4 +225,141 @@ internal static class Diagnostics
             "Yotei", severity, isEnabledByDefault: true),
             type.Locations.FirstOrDefault()));
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Reports a diagnostic when no base method is found for the given element.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="symbol"></param>
+    /// <param name="source"></param>
+    /// <param name="severity"></param>
+    public static void NoBaseMethod(
+        this SourceProductionContext context,
+        ISymbol symbol,
+        string source,
+        DiagnosticSeverity severity = DiagnosticSeverity.Error)
+    {
+        var id = "TreeGen05";
+        var head = "No base method found.";
+        var desc = $"No base method found for symbol '{symbol.Name}' on source '{source}'.";
+
+        context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor(
+            id, head, desc,
+            "Yotei", severity, isEnabledByDefault: true),
+            symbol.Locations.FirstOrDefault()));
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Reports a diagnostic when the specifications for the given symbol are invalid.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="symbol"></param>
+    /// <param name="specs"></param>
+    /// <param name="severity"></param>
+    public static void InvalidSpecs(
+        this SourceProductionContext context,
+        ISymbol symbol,
+        string? specs,
+        DiagnosticSeverity severity = DiagnosticSeverity.Error)
+    {
+        var id = "TreeGen06";
+        var head = "Invalid specifications.";
+        var desc = $"Specifications '{specs}' are invalid for symbol '{symbol.Name}'.";
+
+        context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor(
+            id, head, desc,
+            "Yotei", severity, isEnabledByDefault: true),
+            symbol.Locations.FirstOrDefault()));
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Validates that the given property has a getter.
+    /// <br/> If not, reports a diagnostic.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="property"></param>
+    /// <param name="severity"></param>
+    /// <returns></returns>
+    public static bool PropertyHasGetter(
+        this SourceProductionContext context,
+        IPropertySymbol property,
+        DiagnosticSeverity severity = DiagnosticSeverity.Error)
+    {
+        if (property.GetMethod != null) return true;
+
+        var id = "TreeGen07";
+        var head = "Property has no getter.";
+        var desc = $"Property '{property.Name}' has no getter.";
+
+        context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor(
+            id, head, desc,
+            "Yotei", severity, isEnabledByDefault: true),
+            property.Locations.FirstOrDefault()));
+
+        return false;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Validates that the given property has a setter.
+    /// <br/> If not, reports a diagnostic.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="property"></param>
+    /// <param name="severity"></param>
+    /// <returns></returns>
+    public static bool PropertyHasSetter(
+        this SourceProductionContext context,
+        IPropertySymbol property,
+        DiagnosticSeverity severity = DiagnosticSeverity.Error)
+    {
+        if (property.SetMethod != null) return true;
+
+        var id = "TreeGen08";
+        var head = "Property has no setter.";
+        var desc = $"Property '{property.Name}' has no setter.";
+
+        context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor(
+            id, head, desc,
+            "Yotei", severity, isEnabledByDefault: true),
+            property.Locations.FirstOrDefault()));
+
+        return false;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Validates that the given field is a writtable one.
+    /// <br/> If not, reports a diagnostic.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="field"></param>
+    /// <param name="severity"></param>
+    /// <returns></returns>
+    public static bool FieldIsWrittable(
+        this SourceProductionContext context,
+        IFieldSymbol field,
+        DiagnosticSeverity severity = DiagnosticSeverity.Error)
+    {
+        if (!field.IsConst && !field.IsReadOnly && !field.HasConstantValue) return true;
+
+        var id = "TreeGen09";
+        var head = "Field is not writtable.";
+        var desc = $"Field '{field.Name}' is not writtable.";
+
+        context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor(
+            id, head, desc,
+            "Yotei", severity, isEnabledByDefault: true),
+            field.Locations.FirstOrDefault()));
+
+        return false;
+    }
 }

@@ -95,7 +95,7 @@ internal class XTypeNode(
     // ----------------------------------------------------
 
     /// <summary>
-    /// Case: interfaces to implement.
+    /// Emits the interfaces that need to be implemented.
     /// </summary>
     void PrintInterfacesToImplement(CodeBuilder cb)
     {
@@ -149,7 +149,6 @@ internal class XTypeNode(
     /// Returns the appropriate modifiers, or null if any.
     /// <br/> If so, an space is added to the returned string.
     /// </summary>
-    /// <returns></returns>
     string? GetModifiers()
     {
         // Interfaces...
@@ -197,15 +196,13 @@ internal class XTypeNode(
     /// <summary>
     /// Returns the method implemented by the type, or null if any.
     /// </summary>
-    /// <param name="type"></param>
-    /// <returns></returns>
     IMethodSymbol? GetNodeMethod(ITypeSymbol type, bool recursive = false)
     {
-        var method = type.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(x =>
+        var item = type.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(x =>
             x.Name == "Clone" &&
             x.Parameters.Length == 0);
 
-        if (method != null) return method;
+        if (item != null) return item;
 
         if (recursive)
         {
@@ -221,20 +218,17 @@ internal class XTypeNode(
     /// <summary>
     /// Gets the effective value of the <see cref="CloneableAttr.PreventVirtual"/> setting.
     /// </summary>
-    /// <param name="type"></param>
-    /// <param name="value"></param>
-    /// <returns></returns>
     bool GetPreventVirtual(ITypeSymbol type, out bool value)
     {
         // The symbol itself...
-        if (CloneableAttr.GetPreventVirtual(type, out value)) return value;
+        if (CloneableAttr.GetPreventVirtual(type, out value)) return true;
 
         // It might be defined in the inheritance hierarchy...
         foreach(var parent in type.AllBaseTypes())
-            if (CloneableAttr.GetPreventVirtual(parent, out value)) return value;
+            if (CloneableAttr.GetPreventVirtual(parent, out value)) return true;
 
-        foreach (var parent in type.Interfaces)
-            if (CloneableAttr.GetPreventVirtual(parent, out value)) return value;
+        foreach (var parent in type.AllInterfaces)
+            if (CloneableAttr.GetPreventVirtual(parent, out value)) return true;
 
         // Not defined...
         return false;

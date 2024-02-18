@@ -4,12 +4,14 @@
 /// <summary>
 /// Represents a property in the source code generation hierarchy.
 /// </summary>
+/// <param name="parentNode"></param>
 /// <param name="model"></param>
-/// <param name="syntax"></param>
+/// <param name="syntaxNode"></param>
 /// <param name="symbol"></param>
 internal class PropertyNode(
-    SemanticModel model, PropertyDeclarationSyntax syntax, IPropertySymbol symbol)
-    : Candidate(model, syntax, symbol), INode, IPropertyCandidate
+    TypeNode parentNode,
+    SemanticModel model, PropertyDeclarationSyntax syntaxNode, IPropertySymbol symbol)
+    : Candidate(model, syntaxNode, symbol), INode, IPropertyCandidate
 {
     /// <inheritdoc/>
     public override string ToString()
@@ -24,7 +26,11 @@ internal class PropertyNode(
     }
 
     /// <inheritdoc/>
-    public new PropertyDeclarationSyntax Syntax { get; } = syntax.ThrowWhenNull();
+    public TypeNode ParentNode { get; } = parentNode.ThrowWhenNull();
+    INode INode.ParentNode => ParentNode;
+
+    /// <inheritdoc/>
+    public new PropertyDeclarationSyntax Syntax { get; } = syntaxNode.ThrowWhenNull();
 
     /// <inheritdoc/>
     public new IPropertySymbol Symbol { get; } = symbol.ThrowWhenNull();

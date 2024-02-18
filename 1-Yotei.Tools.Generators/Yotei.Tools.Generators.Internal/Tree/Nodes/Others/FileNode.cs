@@ -8,6 +8,9 @@
 internal sealed class FileNode(string fileName) : INode
 {
     /// <inheritdoc/>
+    INode INode.ParentNode => null!;
+
+    /// <inheritdoc/>
     public override string ToString() => $"File: {FileName}";
 
     /// <summary>

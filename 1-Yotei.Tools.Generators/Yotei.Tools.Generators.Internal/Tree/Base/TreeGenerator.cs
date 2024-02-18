@@ -200,46 +200,54 @@ internal abstract class TreeGenerator : IIncrementalGenerator
     /// <summary>
     /// Creates a node of the appropriate type.
     /// </summary>
+    /// <param name="parentNode"></param>
     /// <param name="model"></param>
-    /// <param name="syntax"></param>
+    /// <param name="syntaxNode"></param>
     /// <param name="symbol"></param>
     /// <returns></returns>
     public virtual TypeNode CreateNode(
-        SemanticModel model, TypeDeclarationSyntax syntax, INamedTypeSymbol symbol)
-        => new(model, syntax, symbol);
+        INode parentNode,
+        SemanticModel model, TypeDeclarationSyntax syntaxNode, INamedTypeSymbol symbol)
+        => new(parentNode, model, syntaxNode, symbol);
 
     /// <summary>
     /// Creates a node of the appropriate type.
     /// </summary>
+    /// <param name="parentNode"></param>
     /// <param name="model"></param>
-    /// <param name="syntax"></param>
+    /// <param name="syntaxNode"></param>
     /// <param name="symbol"></param>
     /// <returns></returns>
     public virtual PropertyNode CreateNode(
-        SemanticModel model, PropertyDeclarationSyntax syntax, IPropertySymbol symbol)
-        => new(model, syntax, symbol);
+        TypeNode parentNode,
+        SemanticModel model, PropertyDeclarationSyntax syntaxNode, IPropertySymbol symbol)
+        => new(parentNode, model, syntaxNode, symbol);
 
     /// <summary>
     /// Creates a node of the appropriate type.
     /// </summary>
+    /// <param name="parentNode"></param>
     /// <param name="model"></param>
-    /// <param name="syntax"></param>
+    /// <param name="syntaxNode"></param>
     /// <param name="symbol"></param>
     /// <returns></returns>
     public virtual FieldNode CreateNode(
-        SemanticModel model, FieldDeclarationSyntax syntax, IFieldSymbol symbol)
-        => new(model, syntax, symbol);
+        TypeNode parentNode,
+        SemanticModel model, FieldDeclarationSyntax syntaxNode, IFieldSymbol symbol)
+        => new(parentNode, model, syntaxNode, symbol);
 
     /// <summary>
     /// Creates a node of the appropriate type.
     /// </summary>
+    /// <param name="parentNode"></param>
     /// <param name="model"></param>
     /// <param name="syntax"></param>
     /// <param name="symbol"></param>
     /// <returns></returns>
     public virtual MethodNode CreateNode(
+        TypeNode parentNode,
         SemanticModel model, MethodDeclarationSyntax syntax, IMethodSymbol symbol)
-        => new(model, syntax, symbol);
+        => new(parentNode, model, syntax, symbol);
 
     // ----------------------------------------------------
 

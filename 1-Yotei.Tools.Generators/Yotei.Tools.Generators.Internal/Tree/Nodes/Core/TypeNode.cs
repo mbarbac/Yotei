@@ -6,13 +6,33 @@ namespace Yotei.Tools.Generators.Internal;
 /// <summary>
 /// Represents a type in the source code generation hierarchy.
 /// </summary>
-/// <param name="model"></param>
-/// <param name="syntax"></param>
-/// <param name="symbol"></param>
-internal class TypeNode(
-    SemanticModel model, TypeDeclarationSyntax syntax, INamedTypeSymbol symbol)
-    : Candidate(model, syntax, symbol), INode, ITypeCandidate
+internal class TypeNode : Candidate, INode, ITypeCandidate
 {
+    /// <summary>
+    /// Initializes a new instance.
+    /// </summary>
+    /// <param name="parentNode"></param>
+    /// <param name="model"></param>
+    /// <param name="syntaxNode"></param>
+    /// <param name="symbol"></param>
+    public TypeNode(
+        INode parentNode,
+        SemanticModel model, TypeDeclarationSyntax syntaxNode, INamedTypeSymbol symbol)
+        : base(model, syntaxNode, symbol)
+    {
+        ParentNode = parentNode.ThrowWhenNull();
+        Syntax = syntaxNode.ThrowWhenNull();
+        Symbol = symbol.ThrowWhenNull();
+
+        if (ParentNode is not NamespaceNode and not TypeNode)
+            throw new ArgumentException(
+                "Parent node is not a namespace nor a type.")
+                .WithData(parentNode);
+    }
+
+    /// <inheritdoc/>
+    public INode ParentNode { get; }
+
     /// <inheritdoc/>
     public override string ToString()
     {
@@ -21,10 +41,10 @@ internal class TypeNode(
     }
 
     /// <inheritdoc/>
-    public new TypeDeclarationSyntax Syntax { get; } = syntax.ThrowWhenNull();
+    public new TypeDeclarationSyntax Syntax { get; }
 
     /// <inheritdoc/>
-    public new INamedTypeSymbol Symbol { get; } = symbol.ThrowWhenNull();
+    public new INamedTypeSymbol Symbol { get; }
 
     /// <summary>
     /// The list of child types.

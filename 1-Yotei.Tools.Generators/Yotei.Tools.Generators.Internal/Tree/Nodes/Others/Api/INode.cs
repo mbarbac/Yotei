@@ -7,6 +7,11 @@
 internal interface INode
 {
     /// <summary>
+    /// The node that is the hierarchical parent of this one, or null if this is a top-most one.
+    /// </summary>
+    INode ParentNode { get; }
+
+    /// <summary>
     /// Invoked to validate this node, and its child ones, before source code generation.
     /// </summary>
     /// <param name="context"></param>
