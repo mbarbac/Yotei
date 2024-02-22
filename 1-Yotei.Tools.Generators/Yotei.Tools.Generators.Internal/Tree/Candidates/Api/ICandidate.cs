@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// Represents a wrapper over a syntax node identified for source generation.
+/// Represents a wrapper over a syntax node.
 /// </summary>
 internal interface ICandidate
 {
@@ -20,4 +20,22 @@ internal interface ICandidate
     /// The symbol this instance is associated with.
     /// </summary>
     ISymbol Symbol { get; }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// The chain of namespaces to this instance.
+    /// </summary>
+    ImmutableArray<BaseNamespaceDeclarationSyntax> NamespaceSyntaxChain { get; }
+
+    /// <summary>
+    /// The chain of type declaration syntaxes to this instance, including itself if it is a
+    /// type-alike one.
+    /// </summary>
+    ImmutableArray<TypeDeclarationSyntax> TypeSyntaxChain { get; }
+
+    /// <summary>
+    /// The chain of type symbols to this instance, including itself if it is a type-alike one.
+    /// </summary>
+    ImmutableArray<INamedTypeSymbol> TypeSymbolChain { get; }
 }

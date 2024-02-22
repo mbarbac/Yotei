@@ -2,23 +2,21 @@
 
 // ========================================================
 /// <summary>
-/// Represents a wrapper over a field-alike syntax node identified for source generation.
+/// Represents a wrapper over a field-alike syntax node.
 /// </summary>
 /// <param name="model"></param>
-/// <param name="syntaxNode"></param>
+/// <param name="syntax"></param>
 /// <param name="symbol"></param>
 internal class FieldCandidate(
-    SemanticModel model, FieldDeclarationSyntax syntaxNode, IFieldSymbol symbol)
-    : ICandidate
+    SemanticModel model, FieldDeclarationSyntax syntax, IFieldSymbol symbol)
+    : Candidate(model, syntax, symbol)
 {
-    /// <inheritdoc cref="ICandidate.SemanticModel"/>
-    public SemanticModel SemanticModel { get; } = model.ThrowWhenNull();
+    /// <inheritdoc/>
+    public override string ToString() => $"Field: {Symbol.Name}";
 
     /// <inheritdoc cref="ICandidate.SyntaxNode"/>
-    public FieldDeclarationSyntax SyntaxNode { get; } = syntaxNode.ThrowWhenNull();
-    SyntaxNode ICandidate.SyntaxNode => SyntaxNode;
+    public new FieldDeclarationSyntax SyntaxNode => (FieldDeclarationSyntax)base.SyntaxNode;
 
-    /// <inheritdoc cref="ICandidate.SyntaxNode"/>
-    public IFieldSymbol Symbol { get; } = symbol.ThrowWhenNull();
-    ISymbol ICandidate.Symbol => Symbol;
+    /// <inheritdoc cref="ICandidate.Symbol"/>
+    public new IFieldSymbol Symbol => (IFieldSymbol)base.Symbol;
 }

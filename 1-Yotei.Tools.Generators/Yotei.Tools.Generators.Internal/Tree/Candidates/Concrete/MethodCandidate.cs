@@ -2,23 +2,21 @@
 
 // ========================================================
 /// <summary>
-/// Represents a wrapper over a method-alike syntax node identified for source generation.
+/// Represents a wrapper over a method-alike syntax node.
 /// </summary>
 /// <param name="model"></param>
-/// <param name="syntaxNode"></param>
+/// <param name="syntax"></param>
 /// <param name="symbol"></param>
 internal class MethodCandidate(
-    SemanticModel model, MethodDeclarationSyntax syntaxNode, IMethodSymbol symbol)
-    : ICandidate
+    SemanticModel model, MethodDeclarationSyntax syntax, IMethodSymbol symbol)
+    : Candidate(model, syntax, symbol)
 {
-    /// <inheritdoc cref="ICandidate.SemanticModel"/>
-    public SemanticModel SemanticModel { get; } = model.ThrowWhenNull();
+    /// <inheritdoc/>
+    public override string ToString() => $"Method: {Symbol.Name}";
 
     /// <inheritdoc cref="ICandidate.SyntaxNode"/>
-    public MethodDeclarationSyntax SyntaxNode { get; } = syntaxNode.ThrowWhenNull();
-    SyntaxNode ICandidate.SyntaxNode => SyntaxNode;
+    public new MethodDeclarationSyntax SyntaxNode => (MethodDeclarationSyntax)base.SyntaxNode;
 
-    /// <inheritdoc cref="ICandidate.SyntaxNode"/>
-    public IMethodSymbol Symbol { get; } = symbol.ThrowWhenNull();
-    ISymbol ICandidate.Symbol => Symbol;
+    /// <inheritdoc cref="ICandidate.Symbol"/>
+    public new IMethodSymbol Symbol => (IMethodSymbol)base.Symbol;
 }

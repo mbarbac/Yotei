@@ -2,23 +2,21 @@
 
 // ========================================================
 /// <summary>
-/// Represents a wrapper over a property-alike syntax node identified for source generation.
+/// Represents a wrapper over a property-alike syntax node.
 /// </summary>
 /// <param name="model"></param>
-/// <param name="syntaxNode"></param>
+/// <param name="syntax"></param>
 /// <param name="symbol"></param>
 internal class PropertyCandidate(
-    SemanticModel model, PropertyDeclarationSyntax syntaxNode, IPropertySymbol symbol)
-    : ICandidate
+    SemanticModel model, PropertyDeclarationSyntax syntax, IPropertySymbol symbol)
+    : Candidate(model, syntax, symbol)
 {
-    /// <inheritdoc cref="ICandidate.SemanticModel"/>
-    public SemanticModel SemanticModel { get; } = model.ThrowWhenNull();
+    /// <inheritdoc/>
+    public override string ToString() => $"Property: {Symbol.Name}";
 
     /// <inheritdoc cref="ICandidate.SyntaxNode"/>
-    public PropertyDeclarationSyntax SyntaxNode { get; } = syntaxNode.ThrowWhenNull();
-    SyntaxNode ICandidate.SyntaxNode => SyntaxNode;
+    public new PropertyDeclarationSyntax SyntaxNode => (PropertyDeclarationSyntax)base.SyntaxNode;
 
-    /// <inheritdoc cref="ICandidate.SyntaxNode"/>
-    public IPropertySymbol Symbol { get; } = symbol.ThrowWhenNull();
-    ISymbol ICandidate.Symbol => Symbol;
+    /// <inheritdoc cref="ICandidate.Symbol"/>
+    public new IPropertySymbol Symbol => (IPropertySymbol)base.Symbol;
 }
