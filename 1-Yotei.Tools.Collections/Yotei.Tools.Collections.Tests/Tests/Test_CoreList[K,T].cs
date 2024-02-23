@@ -1,4 +1,4 @@
-/*using T = Yotei.Tools.Tests.CoreList_KT.Test_CoreList_KT.Element;
+using T = Yotei.Tools.Tests.CoreList_KT.Test_CoreList_KT.Element;
 using K = string;
 
 namespace Yotei.Tools.Tests.CoreList_KT;
@@ -503,4 +503,4 @@ public static partial class Test_CoreList_KT
         Assert.Equal(4, done);
         Assert.Empty(source);
     }
-}*/
+}
