@@ -259,14 +259,11 @@ internal abstract class TreeGenerator : IIncrementalGenerator
 
     // ----------------------------------------------------
 
-    /// <summary>
-    /// Invoked to create a new node of the appropriate type for this instance.
-    /// </summary>
-    /// <param name="parent"></param>
-    /// <param name="candidate"></param>
-    /// <returns></returns>
-    public virtual TypeNodeEx CreateNode(
-        INode parent, TypeCandidate candidate) => new(parent, candidate);
+    // Note: the signature of the following methods is to return instances of regular nodes,
+    // not extended ones, even if their implementation do so. The reason is that there are
+    // scenarios where the generators need to create dependent nodes on the fly, without any
+    // syntax or model information, only their symbols. Any case, nothing impede you to use
+    // the extended varieties, as these base implementations do.
 
     /// <summary>
     /// Invoked to create a new node of the appropriate type for this instance.
@@ -274,8 +271,8 @@ internal abstract class TreeGenerator : IIncrementalGenerator
     /// <param name="parent"></param>
     /// <param name="candidate"></param>
     /// <returns></returns>
-    public virtual PropertyNodeEx CreateNode(
-        TypeNode parent, PropertyCandidate candidate) => new(parent, candidate);
+    public virtual TypeNode CreateNode(
+        INode parent, TypeCandidate candidate) => new TypeNodeEx(parent, candidate);
 
     /// <summary>
     /// Invoked to create a new node of the appropriate type for this instance.
@@ -283,8 +280,8 @@ internal abstract class TreeGenerator : IIncrementalGenerator
     /// <param name="parent"></param>
     /// <param name="candidate"></param>
     /// <returns></returns>
-    public virtual FieldNodeEx CreateNode(
-        TypeNode parent, FieldCandidate candidate) => new(parent, candidate);
+    public virtual PropertyNode CreateNode(
+        TypeNode parent, PropertyCandidate candidate) => new PropertyNodeEx(parent, candidate);
 
     /// <summary>
     /// Invoked to create a new node of the appropriate type for this instance.
@@ -292,8 +289,17 @@ internal abstract class TreeGenerator : IIncrementalGenerator
     /// <param name="parent"></param>
     /// <param name="candidate"></param>
     /// <returns></returns>
-    public virtual MethodNodeEx CreateNode(
-        TypeNode parent, MethodCandidate candidate) => new(parent, candidate);
+    public virtual FieldNode CreateNode(
+        TypeNode parent, FieldCandidate candidate) => new FieldNodeEx(parent, candidate);
+
+    /// <summary>
+    /// Invoked to create a new node of the appropriate type for this instance.
+    /// </summary>
+    /// <param name="parent"></param>
+    /// <param name="candidate"></param>
+    /// <returns></returns>
+    public virtual MethodNode CreateNode(
+        TypeNode parent, MethodCandidate candidate) => new MethodNodeEx(parent, candidate);
 
     // ----------------------------------------------------
 

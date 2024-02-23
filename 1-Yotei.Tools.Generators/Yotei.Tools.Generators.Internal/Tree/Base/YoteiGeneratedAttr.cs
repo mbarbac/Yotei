@@ -25,17 +25,10 @@ internal static class YoteiGeneratedAttr
     // ----------------------------------------------------
 
     /// <summary>
-    /// Gets the decoration to use with an arbitrary element, for the given namespace.
+    /// Gets the decoration to use with an arbitrary element, for the given namespace related
+    /// to the concrete code being generated.
     /// </summary>
     /// <param name="nsName"></param>
     /// <returns></returns>
     public static string GetDecorator(string nsName) => $"[{nsName}.{ShortName}]";
-
-    /// <summary>
-    /// Gets the decoration to use with an arbitrary element, for the namespace that the given
-    /// type belongs to.
-    /// </summary>
-    /// <param name="nsName"></param>
-    /// <returns></returns>
-    public static string GetDecorator(Type template) => $"[{template.Namespace}.{ShortName}]";
 }
