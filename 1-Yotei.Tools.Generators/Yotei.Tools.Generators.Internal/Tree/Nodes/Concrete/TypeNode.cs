@@ -57,6 +57,8 @@ internal class TypeNode : IChildNode
     /// <inheritdoc/>
     public virtual bool Validate(SourceProductionContext context)
     {
+        if (!OnValidate(context)) return false;
+
         foreach (var node in ChildTypes) if (!node.Validate(context)) return false;
         foreach (var node in ChildProperties) if (!node.Validate(context)) return false;
         foreach (var node in ChildFields) if (!node.Validate(context)) return false;

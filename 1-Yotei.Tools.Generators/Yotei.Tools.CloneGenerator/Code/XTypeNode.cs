@@ -6,11 +6,11 @@ internal class XTypeNode(
     INode parent, INamedTypeSymbol symbol) : TypeNode(parent, symbol)
 {
     /// <inheritdoc/>
-    public override bool Validate(SourceProductionContext context)
+    protected override bool OnValidate(SourceProductionContext context)
     {
         if (!context.TypeIsNotRecord(Symbol)) return false;
 
-        if (!base.Validate(context)) return false;
+        if (!base.OnValidate(context)) return false;
         return true;
     }
 
@@ -31,7 +31,7 @@ internal class XTypeNode(
     /// <inheritdoc/>
     protected override void OnEmit(SourceProductionContext context, CodeBuilder cb)
     {
-        if (GetTypeMethod(Symbol) != null) return; // Already implemented!
+        if (HasMethod(Symbol) != null) return; // Already implemented!
 
         if (Symbol.IsInterface()) EmitInterface(context, cb);
         else if (Symbol.IsAbstract) EmitAbstract(context, cb);
@@ -43,7 +43,7 @@ internal class XTypeNode(
     /// <summary>
     /// Case: type is interface.
     /// </summary>
-    void EmitInterface(SourceProductionContext context, CodeBuilder cb)
+    void EmitInterface(SourceProductionContext _, CodeBuilder cb)
     {
         var modifiers = GetModifiers();
         var typeName = Symbol.EasyName(new EasyNameOptions(useGenerics: true));
@@ -55,7 +55,7 @@ internal class XTypeNode(
     /// <summary>
     /// Case: type is abstract.
     /// </summary>
-    void EmitAbstract(SourceProductionContext context, CodeBuilder cb)
+    void EmitAbstract(SourceProductionContext _, CodeBuilder cb)
     {
         var typeName = Symbol.EasyName(new EasyNameOptions(useGenerics: true));
 
@@ -133,7 +133,7 @@ internal class XTypeNode(
 
             if (iface.HasAttributes(CloneableAttr.LongName)) done = true;
             else if (iface.Name == "ICloneable") done = true;
-            else if (GetTypeMethod(iface) != null) done = true;
+            else if (HasMethod(iface) != null) done = true;
 
             foreach (var child in iface.Interfaces) if (Populate(child)) done = true;
 
@@ -186,7 +186,7 @@ internal class XTypeNode(
             {
                 if (type is null) return false;
 
-                if (GetTypeMethod(type) != null) return true;
+                if (HasMethod(type) != null) return true;
                 if (type.HasAttributes(CloneableAttr.LongName)) return true;
 
                 return AppearsInChain(type.BaseType);
@@ -202,7 +202,7 @@ internal class XTypeNode(
     /// <param name="type"></param>
     /// <param name="recursive"></param>
     /// <returns></returns>
-    IMethodSymbol? GetTypeMethod(ITypeSymbol type, bool recursive = false)
+    IMethodSymbol? HasMethod(ITypeSymbol type, bool recursive = false)
     {
         var item = type.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(x =>
             x.Name == "Clone" &&
@@ -213,7 +213,7 @@ internal class XTypeNode(
         if (recursive)
         {
             var parent = type.BaseType;
-            if (parent != null) return GetTypeMethod(parent, recursive);
+            if (parent != null) return HasMethod(parent, recursive);
         }
 
         return null;
