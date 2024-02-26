@@ -14,8 +14,8 @@ internal class PropertyCandidate(
     /// <inheritdoc/>
     public override string ToString() => $"Property: {Symbol.Name}";
 
-    /// <inheritdoc cref="ICandidate.SyntaxNode"/>
-    public new PropertyDeclarationSyntax SyntaxNode => (PropertyDeclarationSyntax)base.SyntaxNode;
+    /// <inheritdoc cref="ICandidate.Syntax"/>
+    public new PropertyDeclarationSyntax Syntax => (PropertyDeclarationSyntax)base.Syntax;
 
     /// <inheritdoc cref="ICandidate.Symbol"/>
     public new IPropertySymbol Symbol => (IPropertySymbol)base.Symbol;

@@ -14,8 +14,8 @@ internal class MethodCandidate(
     /// <inheritdoc/>
     public override string ToString() => $"Method: {Symbol.Name}";
 
-    /// <inheritdoc cref="ICandidate.SyntaxNode"/>
-    public new MethodDeclarationSyntax SyntaxNode => (MethodDeclarationSyntax)base.SyntaxNode;
+    /// <inheritdoc cref="ICandidate.Syntax"/>
+    public new MethodDeclarationSyntax Syntax => (MethodDeclarationSyntax)base.Syntax;
 
     /// <inheritdoc cref="ICandidate.Symbol"/>
     public new IMethodSymbol Symbol => (IMethodSymbol)base.Symbol;

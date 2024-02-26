@@ -14,7 +14,7 @@ internal interface ICandidate
     /// <summary>
     /// The syntax node this instance wraps over.
     /// </summary>
-    SyntaxNode SyntaxNode { get; }
+    SyntaxNode Syntax { get; }
 
     /// <summary>
     /// The symbol this instance is associated with.

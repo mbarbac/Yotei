@@ -14,8 +14,8 @@ internal class FieldCandidate(
     /// <inheritdoc/>
     public override string ToString() => $"Field: {Symbol.Name}";
 
-    /// <inheritdoc cref="ICandidate.SyntaxNode"/>
-    public new FieldDeclarationSyntax SyntaxNode => (FieldDeclarationSyntax)base.SyntaxNode;
+    /// <inheritdoc cref="ICandidate.Syntax"/>
+    public new FieldDeclarationSyntax Syntax => (FieldDeclarationSyntax)base.Syntax;
 
     /// <inheritdoc cref="ICandidate.Symbol"/>
     public new IFieldSymbol Symbol => (IFieldSymbol)base.Symbol;

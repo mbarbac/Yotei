@@ -14,8 +14,8 @@ internal class TypeCandidate(
     /// <inheritdoc/>
     public override string ToString() => $"Type: {Symbol.Name}";
 
-    /// <inheritdoc cref="ICandidate.SyntaxNode"/>
-    public new TypeDeclarationSyntax SyntaxNode => (TypeDeclarationSyntax)base.SyntaxNode;
+    /// <inheritdoc cref="ICandidate.Syntax"/>
+    public new TypeDeclarationSyntax Syntax => (TypeDeclarationSyntax)base.Syntax;
 
     /// <inheritdoc cref="ICandidate.Symbol"/>
     public new INamedTypeSymbol Symbol => (INamedTypeSymbol)base.Symbol;
