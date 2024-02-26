@@ -41,7 +41,12 @@ internal class FileNode(string fileName) : INode
         EmitPragmas(cb);
         EmitUsings(cb);
 
-        foreach (var node in ChildNamespaces) node.Emit(context, cb);
+        var done = false;
+        foreach (var node in ChildNamespaces)
+        {
+            if (done) cb.AppendLine(); done = true;
+            node.Emit(context, cb);
+        }
     }
 
     /// <summary>

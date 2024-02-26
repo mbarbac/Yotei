@@ -42,6 +42,11 @@ internal class CodeBuilder
     int _IndentSize = 4;
 
     /// <summary>
+    /// The actual size of this instance.
+    /// </summary>
+    public int Length => Builder.Length;
+
+    /// <summary>
     /// Appends the given contents to this instance, using the current indentation level and any
     /// new line separators embedded in the given message.
     /// </summary>

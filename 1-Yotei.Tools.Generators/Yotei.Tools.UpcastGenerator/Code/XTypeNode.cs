@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools.UpcastGenerator;
+﻿using System.ComponentModel;
+
+namespace Yotei.Tools.UpcastGenerator;
 
 // ========================================================
 /// <inheritdoc cref="TypeNode"/>
@@ -7,15 +9,15 @@
 internal class XTypeNode(
     INode parent, TypeCandidate candidate) : TypeNodeEx(parent, candidate)
 {
-    // The collection of inherited types from the attributes that decorates this syntax node.
-    readonly List<InheritedType> InheritedTypes = [];
+    // The collection of upcasted types from the attributes that decorates this syntax node.
+    readonly List<UpcastType> UpcastedTypes = [];
 
     // ----------------------------------------------------
 
     /// <inheritdoc/>
     protected override bool OnValidate(SourceProductionContext context)
     {
-        InheritedTypes.Clear();
+        UpcastedTypes.Clear();
 
         // We need an inheritance chain to implement...
         if (Syntax.BaseList != null)
@@ -84,7 +86,7 @@ internal class XTypeNode(
                     for (int i = 0; i < nodes.Count; i++)
                     {
                         var item = Create(nodes, i, change, prevent);
-                        Update(InheritedTypes, item);
+                        Update(UpcastedTypes, item);
                     }
                 }
 
@@ -94,14 +96,14 @@ internal class XTypeNode(
                     foreach (var index in indexes)
                     {
                         var item = Create(nodes, index, change, prevent);
-                        Update(InheritedTypes, item);
+                        Update(UpcastedTypes, item);
                     }
                 }
             }
         }
 
         // No inherited types found...
-        if (InheritedTypes.Count == 0)
+        if (UpcastedTypes.Count == 0)
         {
             context.NoInheritedElements(Syntax);
             return false;
@@ -110,15 +112,15 @@ internal class XTypeNode(
     }
 
     // Creates a new inherited type instance...
-    InheritedType Create(List<SyntaxNode> nodes, int index, bool change, bool prevent)
+    UpcastType Create(List<SyntaxNode> nodes, int index, bool change, bool prevent)
     {
         var syntax = (SimpleNameSyntax)((SimpleBaseTypeSyntax)nodes[index]).Type;
         var symbol = (INamedTypeSymbol)SemanticModel.GetSymbolInfo(syntax).Symbol!;
-        return new InheritedType(syntax, symbol, change, prevent);
+        return new UpcastType(syntax, symbol, change, prevent);
     }
 
     // Finds the index of the symbol in the captured inherited types...
-    static int IndexOf(List<InheritedType> items, INamedTypeSymbol symbol)
+    static int IndexOf(List<UpcastType> items, INamedTypeSymbol symbol)
     {
         for (int i = 0; i < items.Count; i++)
             if (SymbolEqualityComparer.Default.Equals(items[i].Symbol, symbol)) return i;
@@ -127,7 +129,7 @@ internal class XTypeNode(
     }
 
     // Updates the inherited type...
-    static void Update(List<InheritedType> items, InheritedType item)
+    static void Update(List<UpcastType> items, UpcastType item)
     {
         var index = IndexOf(items, item.Symbol);
 
@@ -140,26 +142,125 @@ internal class XTypeNode(
     /// <inheritdoc/>
     protected override void OnEmit(SourceProductionContext context, CodeBuilder cb)
     {
-        var comparer = SymbolEqualityComparer.Default;
         var hostType = Symbol.EasyName(new EasyNameOptions(useGenerics: true));
+        var comparer = SymbolEqualityComparer.Default;
         var prev = false;
 
-        foreach (var type in InheritedTypes)
+        foreach (var upcast in UpcastedTypes)
         {
-            if (!prev) cb.AppendLine();
-            prev = true;
+            var upcastType = upcast.Symbol.EasyName(new EasyNameOptions(useGenerics: true));
 
-            // Properties...
-            foreach (var property in type.Symbol.GetMembers().OfType<IPropertySymbol>())
+            if (upcast.ChangeProperties)
             {
-                if (!comparer.Equals(type.Symbol, property.Type)) continue; // Not same property type...
+                var upcastProperties = upcast.Symbol.GetMembers().OfType<IPropertySymbol>()
+                .Where(x => comparer.Equals(upcast.Symbol, x.Type))
+                .ToDebugArray();
+
+                foreach (var upcastProperty in upcastProperties) TryProperty(upcastProperty);
             }
 
-            // Methods...
-            foreach (var method in type.Symbol.GetMembers().OfType<IMethodSymbol>())
+            var upcastMethods = upcast.Symbol.GetMembers().OfType<IMethodSymbol>()
+                .Where(x => comparer.Equals(upcast.Symbol, x.ReturnType))
+                .ToDebugArray();
+
+            foreach (var upcastMethod in upcastMethods) TryMethod(upcastMethod);
+
+            // --------------------------------------------
+
+            // Invoked to emit the given upcasted property...
+            void TryProperty(IPropertySymbol upcastProperty)
             {
-                if (!comparer.Equals(type.Symbol, method.ReturnType)) continue; // Not same return type...
+                var props = Symbol.GetMembers().OfType<IPropertySymbol>()
+                    .Where(x => Same(upcastProperty, x))
+                    .ToDebugArray();
+
+                if (props.Any()) return; // Already implemented!
+
+                if (prev) cb.AppendLine();
+                prev = true;
+
+                var header = upcastProperty.EasyName(new EasyNameOptions(useMemberArguments: true));
+                var addnul = upcastProperty.NullableAnnotation == NullableAnnotation.Annotated ? "?" : "";
+                var isindexer = upcastProperty.IsIndexer;
+                var name = "";
+                if (isindexer)
+                {
+                    var sb = new StringBuilder();
+                    sb.Append('['); for (int i = 0; i < upcastProperty.Parameters.Length; i++)
+                    {
+                        if (i != 0) sb.Append(", ");
+                        sb.Append(upcastProperty.Parameters[i].Name);
+                    }
+                    sb.Append(']');
+                    name = sb.ToString();
+                }
+                else name = upcastProperty.Name;
+                var dot = isindexer ? "" : ".";
+
+                var getter = upcastProperty.GetMethod != null;
+                var setter = upcastProperty.SetMethod != null && !upcastProperty.SetMethod.IsInitOnly;
+                var initter = upcastProperty.SetMethod != null && upcastProperty.SetMethod.IsInitOnly;
+
+                if (upcast.Symbol.IsInterface()) // Inheriting from an interface...
+                {
+                    if (Symbol.IsInterface())
+                    {
+                        cb.Append($"new {hostType}{addnul} {header} {{");
+                        if (getter) cb.Append(" get;");
+                        if (setter) cb.Append(" set;");
+                        if (initter) cb.Append(" init;");
+                        cb.AppendLine(" }");
+                    }
+                    else
+                    {
+                        cb.AppendLine($"{upcastType}{addnul} {upcastType}{dot}{name}");
+                        cb.AppendLine("{");
+                        cb.IndentLevel++;
+
+                        if (getter) cb.AppendLine($"get => {(isindexer ? "this" : "")}{name};");
+                        if (setter) cb.AppendLine($"set => {(isindexer ? "this" : "")} = ({hostType}{addnul})value;");
+                        if (initter) cb.AppendLine($"init => {(isindexer ? "this" : "")} = ({hostType}{addnul})value;");
+
+                        cb.IndentLevel--;
+                        cb.AppendLine("}");
+                    }
+                }
+                else // Inheriting from a base type...
+                {
+                    cb.AppendLine($"public new {hostType}{addnul} {header}");
+                    cb.AppendLine("{");
+                    cb.IndentLevel++;
+
+                    if (getter) cb.AppendLine($"get => ({hostType}{addnul})base{dot}{name};");
+                    if (setter) cb.AppendLine($"set => base{dot}{name} = value;");
+                    if (initter) cb.AppendLine($"init => base{dot}{name} = value;");
+
+                    cb.IndentLevel--;
+                    cb.AppendLine("}");
+                }
+            }
+
+            // --------------------------------------------
+
+            // Invoked to emit the given upcasted property...
+            void TryMethod(IMethodSymbol upcastMethod)
+            {
             }
         }
+    }
+
+    // Determines if the property in the upcasted type is the same as the one in the host one.
+    bool Same(IPropertySymbol upcastProp, IPropertySymbol hostProp)
+    {
+        if (upcastProp.Name != hostProp.Name) return false;
+        if (upcastProp.Parameters.Length != hostProp.Parameters.Length) return false;
+
+        for (int i = 0; i < upcastProp.Parameters.Length; i++)
+        {
+            var upcastType = upcastProp.Type;
+            var hostType = hostProp.Type;
+            if (!hostType.IsAssignableTo(upcastType)) return false;
+        }
+        return true;
     }
 }

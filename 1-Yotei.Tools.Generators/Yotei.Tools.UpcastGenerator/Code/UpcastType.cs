@@ -2,13 +2,13 @@
 
 // ========================================================
 /// <summary>
-/// Represents an inherited type.
+/// Represents a type to be upcasted.
 /// </summary>
 /// <param name="syntax"></param>
 /// <param name="symbol"></param>
 /// <param name="changeProperties"></param>
 /// <param name="preventVirtual"></param>
-internal class InheritedType(
+internal class UpcastType(
     SimpleNameSyntax syntax,
     INamedTypeSymbol symbol,
     bool changeProperties,
@@ -18,12 +18,12 @@ internal class InheritedType(
     public override string ToString() => Symbol.EasyName(new EasyNameOptions(useGenerics: true));
 
     /// <summary>
-    /// The syntax associated with this inherited type.
+    /// The syntax associated with this upcasted type.
     /// </summary>
     public SimpleNameSyntax Syntax { get; } = syntax.ThrowWhenNull();
 
     /// <summary>
-    /// The symbol associated with this inherited type.
+    /// The symbol associated with this upcasted type.
     /// </summary>
     public INamedTypeSymbol Symbol { get; } = symbol.ThrowWhenNull();
 

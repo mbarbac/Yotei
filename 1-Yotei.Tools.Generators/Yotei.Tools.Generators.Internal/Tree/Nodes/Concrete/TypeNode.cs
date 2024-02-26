@@ -92,8 +92,9 @@ internal class TypeNode : IChildNode
         cb.AppendLine("{");
         cb.IndentLevel++;
 
+        var len = cb.Length;
         OnEmit(context, cb);
-        var done = false;
+        var done = len != cb.Length;
 
         foreach (var node in ChildFields)
         {

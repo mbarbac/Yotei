@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools.Generators.Internal;
+﻿using System.Data;
+
+namespace Yotei.Tools.Generators.Internal;
 
 // ========================================================
 /// <summary>
@@ -68,8 +70,17 @@ internal class NamespaceNode : IChildNode
 
         EmitUsings(cb);
 
-        foreach (var node in ChildNamespaces) node.Emit(context, cb);
-        foreach (var node in ChildTypes) node.Emit(context, cb);
+        var done = false;
+        foreach (var node in ChildNamespaces)
+        {
+            if (done) cb.AppendLine(); done = true;
+            node.Emit(context, cb);
+        }
+        foreach (var node in ChildTypes)
+        {
+            if (done) cb.AppendLine(); done = true;
+            node.Emit(context, cb);
+        }
 
         cb.IndentLevel--;
         cb.AppendLine("}");

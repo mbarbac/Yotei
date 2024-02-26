@@ -125,7 +125,7 @@ internal static class EasyNameExtensions
             sb.Append('.');
         }
 
-        sb.Append(symbol.Name);
+        sb.Append(symbol.IsIndexer ? "this" : symbol.Name);
 
         if (options.UseMemberArguments && symbol.IsIndexer)
         {

@@ -33,6 +33,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)System\CodeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\ExceptionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\StringExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\DebugExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Base\TreeGenerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Base\Diagnostics.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Base\YoteiGeneratedAttr.cs" />
