@@ -1,4 +1,4 @@
-﻿namespace Yotei.Tools;
+﻿/*namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>
@@ -223,4 +223,4 @@ public partial interface IFrozenList<K, T> : IEnumerable<T>
     /// </summary>
     /// <returns></returns>
     IFrozenList<K, T> Clear();
-}
+}*/

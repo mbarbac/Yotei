@@ -1,4 +1,4 @@
-﻿namespace Yotei.Tools.Code;
+﻿/*namespace Yotei.Tools.Code;
 
 // ========================================================
 /// <inheritdoc cref="IFrozenList{K, T}"/>
@@ -233,4 +233,4 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
         var num = clone.Items.Clear();
         return num > 0 ? clone : this;
     }
-}
+}*/
