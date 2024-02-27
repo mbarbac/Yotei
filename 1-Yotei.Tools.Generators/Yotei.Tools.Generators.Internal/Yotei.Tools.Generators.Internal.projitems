@@ -34,6 +34,32 @@
     <Compile Include="$(MSBuildThisFileDirectory)System\ExceptionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\StringExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\DebugExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Base\Diagnostics.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Base\GeneratedCodeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\Concrete\MethodCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\Concrete\FieldCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\Concrete\PropertyCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\Concrete\TypeCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concrete\MethodNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concrete\FileNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concrete\NamespaceNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concrete\FieldNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concrete\PropertyNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concrete\TypeNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Extended\MethodNodeEx.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Extended\FieldNodeEx.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Extended\PropertyNodeEx.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Extended\TypeNodeEx.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Base\ChildList[T].cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Base\TreeGenerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\Api\ICandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Api\INode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Api\IChildNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concrete\Hierarchy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Base\MemberExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Tree\Candidates\Api\" />
   </ItemGroup>
 </Project>
