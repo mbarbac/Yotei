@@ -1,4 +1,4 @@
-namespace Yotei.Tools.UpcastGenerator.Tests;
+namespace Yotei.Tools.UpcastGenerator.Tests.Collections;
 
 // ========================================================
 //[Enforced]
@@ -10,3 +10,5 @@ namespace Yotei.Tools.UpcastGenerator.Tests;
 //    {
 //    }
 //}
+
+public interface IFake { }

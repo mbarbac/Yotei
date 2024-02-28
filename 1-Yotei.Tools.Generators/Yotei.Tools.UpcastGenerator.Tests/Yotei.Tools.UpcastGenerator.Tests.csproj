@@ -30,18 +30,27 @@
 		 <OutputItemType>Analyzer</OutputItemType>
 		 <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
 	  </ProjectReference>
+	  <ProjectReference Include="..\Yotei.Tools.CloneGenerator\Yotei.Tools.CloneGenerator.csproj">
+		 <OutputItemType>Analyzer</OutputItemType>
+		 <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+	  </ProjectReference>
+	  <ProjectReference Include="..\..\1-Yotei.Tools.Collections\Yotei.Tools.Collections\Yotei.Tools.Collections.csproj" />
    </ItemGroup>
 
    <!-- LOCAL configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Local'">
 	  <PackageReference Include="Yotei.Tools" Version="0.5.32-v0001" />
 	  <PackageReference Include="Yotei.Tools.UpcastGenerator" Version="0.2.1-v0001" />
+	  <PackageReference Include="Yotei.Tools.CloneGenerator" Version="0.5.22-v0001" />
+	  <PackageReference Include="Yotei.Tools.Collections" Version="0.5.1-v0001" />
    </ItemGroup>
 
    <!-- RELEASE configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Release'">
 	  <PackageReference Include="Yotei.Tools" Version="0.5.31" />
 	  <PackageReference Include="Yotei.Tools.UpcastGenerator" Version="0.2.1" />
+	  <PackageReference Include="Yotei.Tools.CloneGenerator" Version="0.5.22" />
+	  <PackageReference Include="Yotei.Tools.Collections" Version="0.5.1" />
    </ItemGroup>
 
    <!-- Emit generated files -->
