@@ -35,7 +35,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)System\StringExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\DebugExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Base\Diagnostics.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Base\GeneratedCodeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Base\GeneratedCodeAttr.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\Concrete\MethodCandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\Concrete\FieldCandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\Concrete\PropertyCandidate.cs" />

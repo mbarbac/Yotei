@@ -218,7 +218,7 @@ internal static class Diagnostics
     /// <param name="type"></param>
     /// <param name="raiseException"></param>
     /// <param name="severity"></param>
-    public static void NoBaseMethod(
+    public static void NoCopyConstructor(
         this SourceProductionContext context,
         TypeDeclarationSyntax type,
         bool raiseException = false,
@@ -243,7 +243,7 @@ internal static class Diagnostics
     /// <param name="type"></param>
     /// <param name="raiseException"></param>
     /// <param name="severity"></param>
-    public static void NoBaseMethod(
+    public static void NoCopyConstructor(
         this SourceProductionContext context,
         ITypeSymbol type,
         bool raiseException = false,

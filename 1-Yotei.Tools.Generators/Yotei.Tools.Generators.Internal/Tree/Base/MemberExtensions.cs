@@ -76,14 +76,46 @@ internal static class MemberExtensions
         return false;
     }
 
+    // ----------------------------------------------------
+
     /// <summary>
-    /// Determines if the given type is a record alike one.
+    /// Determines if the property has a suitable getter.
     /// </summary>
-    /// <param name="type"></param>
+    /// <param name="symbol"></param>
     /// <returns></returns>
-    public static bool IsRecord(this ITypeSymbol type)
+    public static bool HasGetter(this IPropertySymbol symbol)
     {
-        return type.IsRecord;
+        return symbol.GetMethod != null;
+    }
+
+    /// <summary>
+    /// Determines if the property has a suitable setter or initer.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <returns></returns>
+    public static bool HasSetterOrIniter(this IPropertySymbol symbol)
+    {
+        return symbol.SetMethod != null;
+    }
+
+    /// <summary>
+    /// Determines if the property has a suitable setter that is not an initer.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <returns></returns>
+    public static bool HasSetter(this IPropertySymbol symbol)
+    {
+        return symbol.SetMethod != null && !symbol.SetMethod.IsInitOnly;
+    }
+
+    /// <summary>
+    /// Determines if the property has a suitable initer.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <returns></returns>
+    public static bool HasIniter(this IPropertySymbol symbol)
+    {
+        return symbol.SetMethod != null && symbol.SetMethod.IsInitOnly;
     }
 
     // ----------------------------------------------------

@@ -1,4 +1,4 @@
-﻿/*namespace Yotei.Tools;
+﻿namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>
@@ -248,4 +248,4 @@ public partial interface ICoreList<K, T> : ICloneable, IList<T>, IList, ICollect
     /// </summary>
     /// <returns></returns>
     new int Clear();
-}*/
+}
