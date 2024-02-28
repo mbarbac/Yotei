@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools.Generators.Internal;
+﻿using System.Net.Http.Headers;
+
+namespace Yotei.Tools.Generators.Internal;
 
 // ========================================================
 /// <summary>
@@ -26,7 +28,23 @@ internal class ChildList<T> : IEnumerable<T>
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public T this[int index] => Items[index];
+    public T this[int index]
+    {
+        get => Items[index];
+        set
+        {
+            value.ThrowWhenNull();
+
+            var temp = IndexOf(value);
+            if (temp == index) return;
+
+            if (Items.Contains(value)) throw new ArgumentException(
+                "The given element is already in this collection.")
+                .WithData(value);
+
+            Items[index] = value;
+        }
+    }
 
     /// <summary>
     /// Returns the index of the given element in this collection, or -1 if it is not found.
@@ -75,19 +93,38 @@ internal class ChildList<T> : IEnumerable<T>
     }
 
     /// <summary>
-    /// Adds the given object to this collection. Throws an exception if the given element is
-    /// already present in this collection.
+    /// Adds the given object to this collection. If requested, throws an exception if the given
+    /// element is already present in this collection, otherwise the element is ignored.
     /// </summary>
     /// <param name="item"></param>
-    public void Add(T item)
+    /// <param name="raiseDuplicates"></param>
+    public void Add(T item, bool raiseDuplicates = true)
     {
         item.ThrowWhenNull();
 
-        if (Items.Contains(item)) throw new ArgumentException(
-            "The given element is already in this collection.")
-            .WithData(item);
+        if (Items.Contains(item))
+        {
+            if (raiseDuplicates) throw new ArgumentException(
+                "The given element is already in this collection.")
+                .WithData(item);
+
+            return;
+        }
 
         Items.Add(item);
+    }
+
+    /// <summary>
+    /// Adds the elements from the given range to this collection. If requested, throws an
+    /// exception if any is already present in this collection, otherwise the element is
+    /// ignored.
+    /// </summary>
+    /// <param name="range"></param>
+    public void AddRange(IEnumerable<T> range, bool raiseDuplicates = true)
+    {
+        range.ThrowWhenNull();
+
+        foreach (var item in range) Add(item, raiseDuplicates);
     }
 
     /// <summary>
@@ -105,4 +142,23 @@ internal class ChildList<T> : IEnumerable<T>
     /// Clears this collection.
     /// </summary>
     public void Clear() => Items.Clear();
+
+    /// <summary>
+    /// Returns the underlying storage of the elements in this collection, for performance
+    /// purposes. Any manipulation of this storage is at the caller's risk.
+    /// </summary>
+    /// <returns></returns>
+    public List<T> AsList() => Items;
+
+    /// <summary>
+    /// Returns a new list with the elements in this collection.
+    /// </summary>
+    /// <returns></returns>
+    public List<T> ToList() => new(Items);
+
+    /// <summary>
+    /// Returns a new array with the elements in this collection.
+    /// </summary>
+    /// <returns></returns>
+    public T[] ToArray() => Items.ToArray();
 }

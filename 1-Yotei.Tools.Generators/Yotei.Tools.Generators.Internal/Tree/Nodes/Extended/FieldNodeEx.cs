@@ -19,4 +19,9 @@ internal class FieldNodeEx(
     /// The syntax this instance is associated with.
     /// </summary>
     public FieldDeclarationSyntax Syntax => Candidate.Syntax;
+
+    /// <summary>
+    /// The semantic model this instance is associated with.
+    /// </summary>
+    public SemanticModel SemanticModel => Candidate.SemanticModel;
 }

@@ -40,6 +40,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\Concrete\FieldCandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\Concrete\PropertyCandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\Concrete\TypeCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Api\ChildNodeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concrete\MethodNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concrete\FileNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concrete\NamespaceNode.cs" />

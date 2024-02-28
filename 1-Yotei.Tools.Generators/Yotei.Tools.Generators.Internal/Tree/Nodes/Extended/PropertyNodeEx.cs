@@ -19,4 +19,9 @@ internal class PropertyNodeEx(
     /// The syntax this instance is associated with.
     /// </summary>
     public PropertyDeclarationSyntax Syntax => Candidate.Syntax;
+
+    /// <summary>
+    /// The semantic model this instance is associated with.
+    /// </summary>
+    public SemanticModel SemanticModel => Candidate.SemanticModel;
 }

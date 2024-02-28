@@ -24,7 +24,7 @@ internal static class GeneratedCodeAttr
                 /// </summary>
                 /// <param name="tool"></param>
                 /// <param name="version"></param>
-                public {{LongName}}(string tool, string version = null)
+                public {{LongName}}(string tool, string version)
                 {
                     Tool = tool == null ? "" : version;
                     Version = version == null ? "" : version;
@@ -66,7 +66,7 @@ internal static class GeneratedCodeAttr
     /// </summary>
     /// <param name="symbol"></param>
     /// <returns></returns>
-    public static bool IsGeneratedCode(ISymbol symbol)
+    public static bool IsGeneratedCode(this ISymbol symbol)
     {
         return symbol.HasAttributes(LongName);
     }
@@ -78,7 +78,7 @@ internal static class GeneratedCodeAttr
     /// <param name="tool"></param>
     /// <param name="version"></param>
     /// <returns></returns>
-    public static bool IsGeneratedCode(ISymbol symbol, out string tool, out string version)
+    public static bool IsGeneratedCode(this ISymbol symbol, out string tool, out string version)
     {
         tool = "";
         version = "";

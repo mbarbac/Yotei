@@ -18,4 +18,9 @@ internal class TypeNodeEx(
     /// The syntax this instance is associated with.
     /// </summary>
     public TypeDeclarationSyntax Syntax => Candidate.Syntax;
+
+    /// <summary>
+    /// The semantic model this instance is associated with.
+    /// </summary>
+    public SemanticModel SemanticModel => Candidate.SemanticModel;
 }

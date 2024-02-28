@@ -10,5 +10,3 @@ namespace Yotei.Tools.UpcastGenerator.Tests;
 //    {
 //    }
 //}
-
-public interface IFake { }
