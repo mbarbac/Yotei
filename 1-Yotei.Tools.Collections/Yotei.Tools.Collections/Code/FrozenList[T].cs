@@ -1,4 +1,4 @@
-﻿namespace Yotei.Tools.Code;
+﻿namespace Yotei.Tools;
 
 // ========================================================
 /// <inheritdoc cref="IFrozenList{T}"/>

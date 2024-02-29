@@ -1,4 +1,4 @@
-#define GENERATE_
+#define GENERATE
 
 namespace Yotei.Tools.UpcastGenerator.Tests.Core_FromCore;
 
@@ -34,11 +34,17 @@ public partial class Bar<K> : Foo<K, string>
 
 // ========================================================
 //[Enforced]
-//public static class Test
-//{
-//    //[Enforced]
-//    [Fact]
-//    public static void Execute()
-//    {
-//    }
-//}
+public static class Test
+{
+    //[Enforced]
+    [Fact]
+    public static void Execute()
+    {
+        Bar<int> item = new Bar<int>();
+
+        Assert.Equal(0, item.Count);
+        Assert.Same(item, item.Legend);
+        Assert.Same(item, item[0]);
+        Assert.Same(item, item.Add(""));
+    }
+}

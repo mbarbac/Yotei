@@ -345,6 +345,8 @@ internal class XTypeNode(INode parent, TypeCandidate candidate) : TypeNodeEx(par
     /// </summary>
     void DoMethods(UpcastType utype, CodeBuilder cb, ref bool num)
     {
+        if (Symbol.Name == "TagList") { } // DEBUG
+
         var hname = Symbol.EasyName(new EasyNameOptions(useGenerics: true));
         var items = GetMethods(utype);
         foreach (var item in items)
@@ -435,8 +437,22 @@ internal class XTypeNode(INode parent, TypeCandidate candidate) : TypeNodeEx(par
     /// </summary>
     List<IMethodSymbol> GetMethods(UpcastType utype)
     {
+        // PROBLEM:
+        // Suppose we have a base interface ITagList
+        // An implementing class, TagList, with methods with ITagList as return type
+        // An finally, a derived class, 'MyList : IUpcast<TagList>, IUpcast<ITagList>'.
+        // Then, the logic below will NOT find them, because the return type of the methods is
+        // ITagList, which is not the same as the upcasted one, TagList.
+
         var items = utype.Symbol.GetMembers().OfType<IMethodSymbol>()
-            .Where(x => Comparer.Equals(x.ReturnType, utype.Symbol))
+            .Where(x =>
+            {
+                var rtype = x.ReturnType;
+                var ntype = utype.Symbol;
+                var same = Comparer.Equals(rtype, ntype);
+                return same;
+            })
+            //.Where(x => Comparer.Equals(x.ReturnType, utype.Symbol))
             .ToList();
 
         var hierarchy = this.GetHierarchy();

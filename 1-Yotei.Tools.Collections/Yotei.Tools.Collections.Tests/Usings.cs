@@ -17,7 +17,6 @@ global using System.Threading.Tasks;
 
 global using Xunit;
 global using Yotei.Tools;
-global using Yotei.Tools.Code;
 global using Yotei.Tools.Diagnostics;
 global using Yotei.Tools.Miscelanea;
 global using Yotei.Tools.CloneGenerator;

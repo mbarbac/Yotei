@@ -1,3 +1,3 @@
-﻿namespace Yotei.Tools.Code;
+﻿namespace Yotei.Tools;
 
 // ========================================================
