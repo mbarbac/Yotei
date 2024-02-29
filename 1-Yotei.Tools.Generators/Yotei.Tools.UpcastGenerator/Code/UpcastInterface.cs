@@ -3,6 +3,12 @@
 // ========================================================
 public static class UpcastInterface
 {
+    public static string IUpcast { get; } = nameof(IUpcast);
+    public static string IUpcastEx { get; } = nameof(IUpcastEx);
+
+    // Remarks: these interfaces must be public to prevent they being less accessible than the
+    // actual types they may wrap over.
+
     public static string Code(string nsName) => $$"""
         namespace {{nsName}}
         {
@@ -14,7 +20,7 @@ public static class UpcastInterface
             /// that interfaces must come after the base types, apply.
             /// </summary>
             /// <typeparam name="T"></typeparam>
-            internal interface IUpcast<T> { }
+            public interface {{IUpcast}}<T> { }
 
             /// <summary>
             /// Used to wrap the types that appears in the inheritance list of a given host type
@@ -24,7 +30,7 @@ public static class UpcastInterface
             /// that interfaces must come after the base types, apply.
             /// </summary>
             /// <typeparam name="T"></typeparam>
-            internal interface IUpcastEx<T> { }
+            public interface {{IUpcastEx}}<T> { }
         }
         """;
 }

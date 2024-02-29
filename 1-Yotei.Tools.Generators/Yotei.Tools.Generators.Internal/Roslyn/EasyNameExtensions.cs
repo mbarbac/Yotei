@@ -127,17 +127,29 @@ internal static class EasyNameExtensions
 
         sb.Append(symbol.IsIndexer ? "this" : symbol.Name);
 
-        if (options.UseMemberArguments && symbol.IsIndexer)
+        if ((options.UseMemberArguments || options.UseArgumentsType || options.UseArgumentsName)
+            && symbol.IsIndexer)
         {
             sb.Append('['); for (int i = 0; i < symbol.Parameters.Length; i++)
             {
                 if (i != 0) sb.Append(", ");
 
                 var item = symbol.Parameters[i];
-                var itemType = item.Type.EasyName(options with { AddNullable = true });
-                var itemName = item.Name;
 
-                sb.Append($"{itemType} {itemName}");
+                var itemType = options.UseMemberArguments || options.UseArgumentsType
+                    ? item.Type.EasyName(options with { AddNullable = true })
+                    : null;
+
+                var itemName = options.UseMemberArguments || options.UseArgumentsName
+                    ? item.Name
+                    : null;
+
+                if (itemType != null && itemName != null) sb.Append($"{itemType} {itemName}");
+                else
+                {
+                    if (itemType != null) sb.Append(itemType);
+                    if (itemName != null) sb.Append(itemName);
+                }
             }
             sb.Append(']');
         }
@@ -245,17 +257,28 @@ internal static class EasyNameExtensions
             sb.Append('>');
         }
 
-        if (options.UseMemberArguments && symbol.Parameters.Length > 0)
+        if (options.UseMemberArguments || options.UseArgumentsType || options.UseArgumentsName)
         {
             sb.Append('('); for (int i = 0; i < symbol.Parameters.Length; i++)
             {
                 if (i != 0) sb.Append(", ");
 
                 var item = symbol.Parameters[i];
-                var itemType = item.Type.EasyName(options with { AddNullable = true });
-                var itemName = item.Name;
 
-                sb.Append($"{itemType} {itemName}");
+                var itemType = options.UseMemberArguments || options.UseArgumentsType
+                    ? item.Type.EasyName(options with { AddNullable = true })
+                    : null;
+
+                var itemName = options.UseMemberArguments || options.UseArgumentsName
+                    ? item.Name
+                    : null;
+
+                if (itemType != null && itemName != null) sb.Append($"{itemType} {itemName}");
+                else
+                {
+                    if (itemType != null) sb.Append(itemType);
+                    if (itemName != null) sb.Append(itemName);
+                }
             }
             sb.Append(')');
         }

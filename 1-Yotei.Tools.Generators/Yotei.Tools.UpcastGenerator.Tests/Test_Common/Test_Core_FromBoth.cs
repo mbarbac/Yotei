@@ -1,6 +1,4 @@
-#define GENERATE_
-
-using System.ComponentModel.DataAnnotations;
+#define GENERATE
 
 namespace Yotei.Tools.UpcastGenerator.Tests.Core_FromBoth;
 
@@ -50,10 +48,10 @@ public class Foo<K, T> : IFoo<K, T>
 
 // ========================================================
 #if GENERATE
-public class Bar<K> : IUpcastEx<Foo<K, string>>, IUpcastEx<IBar<K>>
+public partial class Bar<K> : IUpcastEx<Foo<K, string>>, IUpcastEx<IBar<K>>
 { }
 #else
-public class Bar<K> : Foo<K, string>, IBar<K>
+public partial class Bar<K> : Foo<K, string>, IBar<K>
 {
     public new Bar<K>? Legend
     {

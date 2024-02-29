@@ -4,10 +4,18 @@
 /// <summary>
 /// Represents a type to be upcasted.
 /// </summary>
-public class UpcastType(INamedTypeSymbol symbol, bool withProperties)
+internal class UpcastType(TypeSyntax syntax, INamedTypeSymbol symbol, bool withProperties)
 {
+    /// <inheritdoc/>
+    public override string ToString() => Symbol.ToDisplayString();
+
     /// <summary>
-    /// The symbol whose members are to be upcasted.
+    /// The syntax of the type whose members are to be upcasted.
+    /// </summary>
+    public TypeSyntax Syntax { get; } = syntax.ThrowWhenNull();
+
+    /// <summary>
+    /// The symbol of the type whose members are to be upcasted.
     /// </summary>
     public INamedTypeSymbol Symbol { get; } = symbol.ThrowWhenNull();
 
