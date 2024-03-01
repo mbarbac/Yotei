@@ -9,8 +9,8 @@
    </PropertyGroup>
 
    <PropertyGroup>
-	  <Description>Yotei Framework Clone Generator</Description>
-	  <Version>0.5.22-v0001</Version>
+	  <Description>Yotei Framework Upcast Generator</Description>
+	  <Version>0.2.1-v0001</Version>
 	  <Authors>mbarbac@hotmail.com</Authors>
 	  <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
 	  <IsPackable>true</IsPackable>
@@ -27,7 +27,7 @@
    </ItemGroup>
 
    <PropertyGroup>
-	  <!--<DefineConstants>$(DefineConstants);DEBUG_CLONE_GENERATOR</DefineConstants>-->
+	  <!--<DefineConstants>$(DefineConstants);DEBUG_UPCAST_GENERATOR</DefineConstants>-->
 	  <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
    </PropertyGroup>
    <ItemGroup>
@@ -35,7 +35,7 @@
 	  <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
    </ItemGroup>
 
-   <Import Project="..\Yotei.Tools.Generators.Internal\Yotei.Tools.Generators.Internal.projitems" Label="Shared" />
+   <Import Project="..\..\1-Yotei.Tools.Generators\Yotei.Tools.Generators.Internal\Yotei.Tools.Generators.Internal.projitems" Label="Shared" />
    <ItemGroup>
 	  <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.8.0" PrivateAssets="all" />
    </ItemGroup>
