@@ -63,7 +63,7 @@ internal class XFieldNode(TypeNode parent, IFieldSymbol symbol) : FieldNode(pare
     /// </summary>
     /// <param name="context"></param>
     /// <param name="cb"></param>
-    void EmitInterface(SourceProductionContext context, CodeBuilder cb)
+    void EmitInterface(SourceProductionContext _, CodeBuilder cb)
     {
         var modifiers = GetModifiers();
         var parentType = ParentNode.Symbol.EasyName(new EasyNameOptions(useGenerics: true));
@@ -82,7 +82,7 @@ internal class XFieldNode(TypeNode parent, IFieldSymbol symbol) : FieldNode(pare
     /// </summary>
     /// <param name="context"></param>
     /// <param name="cb"></param>
-    void EmitAbstract(SourceProductionContext context, CodeBuilder cb)
+    void EmitAbstract(SourceProductionContext _, CodeBuilder cb)
     {
         var parentType = ParentNode.Symbol.EasyName(new EasyNameOptions(useGenerics: true));
         var memberType = Symbol.Type.EasyName(new EasyNameOptions(
@@ -148,7 +148,7 @@ internal class XFieldNode(TypeNode parent, IFieldSymbol symbol) : FieldNode(pare
     /// </summary>
     /// <param name="context"></param>
     /// <param name="cb"></param>
-    void EmitThisBuilder(SourceProductionContext context, CodeBuilder cb)
+    void EmitThisBuilder(SourceProductionContext _, CodeBuilder cb)
     {
         var modifiers = GetModifiers();
         var parentType = ParentNode.Symbol.EasyName(new EasyNameOptions(useGenerics: true));
@@ -258,7 +258,7 @@ internal class XFieldNode(TypeNode parent, IFieldSymbol symbol) : FieldNode(pare
             }
             else
             {
-                return Symbol.IsSealed || prevent
+                return ParentNode.Symbol.IsSealed || prevent
                     ? "public "
                     : "public virtual ";
             }

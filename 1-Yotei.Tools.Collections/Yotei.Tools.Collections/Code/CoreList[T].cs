@@ -210,6 +210,9 @@ public partial class CoreList<T> : ICoreList<T>
         return Insert(index, item);
     }
 
+    /// <summary>
+    /// Determines equality between the two given elements, for replacement purposes.
+    /// </summary>
     protected virtual bool SameItem(T source, T item) => typeof(T).IsValueType
         ? source!.Equals(item)
         : ReferenceEquals(source, item);
