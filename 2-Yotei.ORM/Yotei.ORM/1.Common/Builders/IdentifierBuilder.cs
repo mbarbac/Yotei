@@ -16,7 +16,11 @@ public sealed partial class IdentifierBuilder : CoreList<K?, T>
         Engine = engine.ThrowWhenNull();
 
         ValidateItem = (item) => item.ThrowWhenNull();
-        GetKey = (item) => item.UnwrappedValue;
+        GetKey = (item) =>
+        {
+            item.ThrowWhenNull();
+            return item.UnwrappedValue;
+        };
         ValidateKey = (key) => new IdentifierPart(Engine, key).UnwrappedValue;
         CompareKeys = (x, y) => string.Compare(x, y, !Engine.CaseSensitiveNames) == 0;
         GetDuplicates = (_) => [];
