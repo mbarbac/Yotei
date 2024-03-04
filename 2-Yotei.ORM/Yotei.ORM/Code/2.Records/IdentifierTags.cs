@@ -14,6 +14,7 @@ public partial class IdentifierTags : FrozenList<T>, IIdentifierTags
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="caseSensitiveTags"></param>
+    [SuppressMessage("", "IDE0290")]
     public IdentifierTags(bool caseSensitiveTags) => CaseSensitiveTags = caseSensitiveTags;
 
     /// <summary>
