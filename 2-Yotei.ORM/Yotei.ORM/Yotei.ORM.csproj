@@ -63,6 +63,9 @@
    <ItemGroup>
 	  <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
    </ItemGroup>
+   <ItemGroup>
+     <Folder Include="Api\1.Common\" />
+   </ItemGroup>
    <PropertyGroup>
 	  <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 	  <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>

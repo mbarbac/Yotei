@@ -48,6 +48,11 @@ public partial interface IEngine
     /// </summary>
     [WithGenerator] char RightTerminator { get; }
 
+    /// <summary>
+    /// The collection of metadata tags that are well-known to this engine.
+    /// </summary>
+    [WithGenerator] IKnownTags KnownTags { get; }
+
     // ----------------------------------------------------
 
     /// <summary>

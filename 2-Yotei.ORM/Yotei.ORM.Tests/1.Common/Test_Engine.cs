@@ -18,6 +18,15 @@ public static class Test_Engine
         Assert.Equal(Engine.USETERMINATORS, engine.UseTerminators);
         Assert.Equal(Engine.LEFTERMINATOR, engine.LeftTerminator);
         Assert.Equal(Engine.RIGHTTERMINATOR, engine.RightTerminator);
+
+        Assert.Equal(Engine.CASESENSITIVETAGS, engine.KnownTags.CaseSensitiveTags);
+        Assert.Equal(3, engine.KnownTags.IdentifierTags.Count);
+        Assert.Equal("SchemaTag", engine.KnownTags.IdentifierTags[0].DefaultName);
+        Assert.Equal("TableTag", engine.KnownTags.IdentifierTags[1].DefaultName);
+        Assert.Equal("ColumnTag", engine.KnownTags.IdentifierTags[2].DefaultName);
+        Assert.NotNull(engine.KnownTags.PrimaryKeyTag); Assert.Equal("PrimaryTag", engine.KnownTags.PrimaryKeyTag.DefaultName);
+        Assert.NotNull(engine.KnownTags.UniqueValuedTag); Assert.Equal("UniqueTag", engine.KnownTags.UniqueValuedTag.DefaultName);
+        Assert.NotNull(engine.KnownTags.ReadOnlyTag); Assert.Equal("ReadonlyTag", engine.KnownTags.ReadOnlyTag.DefaultName);
     }
 
     //[Enforced]
@@ -57,6 +66,10 @@ public static class Test_Engine
         target = source.WithRightTerminator('x');
         Assert.NotSame(source, target);
         Assert.Equal('x', target.RightTerminator);
+
+        target = source.WithKnownTags(new KnownTags(true));
+        Assert.NotSame(source, target);
+        Assert.True(target.KnownTags.CaseSensitiveTags);
     }
 
     // ----------------------------------------------------
