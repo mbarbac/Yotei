@@ -12,6 +12,11 @@ public interface IMetadataTag : IEnumerable<string>
     bool CaseSensitiveTags { get; }
 
     /// <summary>
+    /// The number of tag names carried by this instance.
+    /// </summary>
+    int Count { get; }
+
+    /// <summary>
     /// Determines if this instance contains the given name, or not.
     /// </summary>
     /// <param name="name"></param>

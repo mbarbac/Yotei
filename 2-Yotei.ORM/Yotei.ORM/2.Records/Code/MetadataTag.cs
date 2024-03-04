@@ -74,6 +74,8 @@ public partial class MetadataTag : IMetadataTag
         return string.Compare(x, y, !CaseSensitiveTags) == 0;
     }
 
+    /// <inheritdoc/>
+    public int Count => Items.Count;
 
     /// <inheritdoc/>
     public bool Contains(string name)
