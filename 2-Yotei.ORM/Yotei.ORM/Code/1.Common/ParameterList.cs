@@ -15,6 +15,7 @@ public sealed partial class ParameterList : FrozenList<K?, T>, IParameterList
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="engine"></param>
+    [SuppressMessage("", "IDE0290")]
     public ParameterList(IEngine engine) => Engine = engine.ThrowWhenNull();
 
     /// <summary>
