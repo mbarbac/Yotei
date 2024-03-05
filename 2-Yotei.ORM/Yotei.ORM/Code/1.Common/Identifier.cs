@@ -15,6 +15,7 @@ public sealed partial class Identifier : FrozenList<K?, T>, IIdentifier
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="engine"></param>
+    [SuppressMessage("", "IDE0290")]
     public Identifier(IEngine engine) => Engine = engine.ThrowWhenNull();
 
     /// <summary>

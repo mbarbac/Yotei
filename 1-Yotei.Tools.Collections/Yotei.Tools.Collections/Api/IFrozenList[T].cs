@@ -18,7 +18,7 @@ public partial interface IFrozenList<T> : IEnumerable<T>
     int Count { get; }
 
     /// <summary>
-    /// Gets or sets the element at the given index.
+    /// Gets the element at the given index.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
