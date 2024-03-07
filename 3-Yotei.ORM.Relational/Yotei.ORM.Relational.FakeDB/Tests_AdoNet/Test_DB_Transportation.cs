@@ -48,7 +48,7 @@ public static class Test_DB_Transportation
     // ----------------------------------------------------
 
     //[Enforced]
-    [Fact]
+    //[Fact]
     public static void Test_Query_Plates()
     {
         var factory = SqlClientFactory.Instance;

@@ -51,5 +51,8 @@
 	  <PackageReference Include="Yotei.ORM" Version="0.2.4" />
 	  <PackageReference Include="Yotei.ORM.Relational" Version="0.2.2" />
    </ItemGroup>
+   <ItemGroup>
+     <Folder Include="SQLDatabase\" />
+   </ItemGroup>
 
 </Project>
