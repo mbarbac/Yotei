@@ -6,6 +6,7 @@
 /// <br/> Instances of this type are essentially key/value pairs, where the key itself is a
 /// collection of names.
 /// </summary>
+[Cloneable]
 public partial interface IMetadataEntry
 {
     /// <summary>

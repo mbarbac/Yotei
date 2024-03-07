@@ -2,6 +2,7 @@
 
 // ========================================================
 /// <inheritdoc cref="IMetadataEntry"/>
+[Cloneable]
 [WithGenerator]
 public sealed partial class MetadataEntry : IMetadataEntry
 {
