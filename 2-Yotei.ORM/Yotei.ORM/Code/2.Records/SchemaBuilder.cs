@@ -56,9 +56,8 @@ public sealed partial class SchemaBuilder : CoreList<K, T>
     /// <summary>
     /// Initializes a new instance with the given element.
     /// </summary>
-    /// <param name="engine"></param>
     /// <param name="item"></param>
-    public SchemaBuilder(IEngine engine, T item) : this(engine) => Add(item);
+    public SchemaBuilder(T item) : this(item.ThrowWhenNull().Engine) => Add(item);
 
     /// <summary>
     /// Initializes a new instance with the elements from the given range.
