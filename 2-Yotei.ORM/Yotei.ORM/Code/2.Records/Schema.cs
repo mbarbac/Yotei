@@ -38,6 +38,12 @@ public sealed partial class Schema : FrozenList<K, T>, ISchema
     /// <param name="source"></param>
     Schema(Schema source) : this(source.Engine) => Items.AddRange(source);
 
+    /// <summary>
+    /// Returns a new builder based upon the contents of this instance.
+    /// </summary>
+    /// <returns></returns>
+    public SchemaBuilder ToBuilder() => new(Engine, this);
+
     /// <inheritdoc/>
     public IEngine Engine { get; }
 

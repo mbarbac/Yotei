@@ -54,6 +54,12 @@ public sealed partial class ParameterListBuilder : CoreList<K?, T>
     ParameterListBuilder(ParameterListBuilder source) : this(source.Engine) => AddRange(source);
 
     /// <summary>
+    /// Returns a new instance based upon the contents of this builder.
+    /// </summary>
+    /// <returns></returns>
+    public IParameterList ToInstance() => new ParameterList(Engine, this);
+
+    /// <summary>
     /// The engine this instance is associated with.
     /// </summary>
     public IEngine Engine { get; }

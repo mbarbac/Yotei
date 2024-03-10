@@ -51,6 +51,14 @@ public sealed partial class IdentifierBuilder : CoreList<K?, T>
     public override string ToString() => Value ?? string.Empty;
 
     /// <summary>
+    /// Returns a new instance based upon the contents of this builder.
+    /// </summary>
+    /// <returns></returns>
+    public IIdentifier ToInstance() => new Identifier(Engine, this);
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// The engine this instance is associated with.
     /// </summary>
     public IEngine Engine { get; }

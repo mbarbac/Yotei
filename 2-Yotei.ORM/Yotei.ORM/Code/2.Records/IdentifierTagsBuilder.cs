@@ -54,6 +54,14 @@ public sealed partial class IdentifierTagsBuilder : CoreList<T>
         IdentifierTagsBuilder source) : this(source.CaseSensitiveTags) => AddRange(source);
 
     /// <summary>
+    /// Returns a new instance based upon the contents of this builder.
+    /// </summary>
+    /// <returns></returns>
+    public IIdentifierTags ToInstance() => new IdentifierTags(CaseSensitiveTags, this);
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Determines if the names in this instance are considered case sensitive or not.
     /// </summary>
     public bool CaseSensitiveTags { get; }

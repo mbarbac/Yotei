@@ -62,6 +62,12 @@ public sealed partial class SchemaEntryBuilder : IEnumerable<T>
 
     string ItemToString(T item) => item?.ToString() ?? "-";
 
+    /// <summary>
+    /// Returns a new instance based upon the contents of this builder.
+    /// </summary>
+    /// <returns></returns>
+    public ISchemaEntry ToInstance() => new SchemaEntry(Engine, this);
+
     // ----------------------------------------------------
 
     /// <summary>

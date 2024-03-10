@@ -39,6 +39,14 @@ public partial class IdentifierTags : FrozenList<T>, IIdentifierTags
     /// <param name="source"></param>
     IdentifierTags(IdentifierTags source) : this(source.CaseSensitiveTags) => Items.AddRange(source);
 
+    /// <summary>
+    /// Returns a new builder based upon the contents of this instance.
+    /// </summary>
+    /// <returns></returns>
+    public IdentifierTagsBuilder ToBuilder() => new(CaseSensitiveTags, this);
+
+    // ----------------------------------------------------
+
     /// <inheritdoc/>
     public bool CaseSensitiveTags { get; }
 

@@ -38,6 +38,12 @@ public sealed partial class ParameterList : FrozenList<K?, T>, IParameterList
     /// <param name="source"></param>
     ParameterList(ParameterList source) : this(source.Engine) => Items.AddRange(source);
 
+    /// <summary>
+    /// Returns a new builder based upon the contents of this instance.
+    /// </summary>
+    /// <returns></returns>
+    public ParameterListBuilder ToBuilder() => new(Engine, this);
+
     /// <inheritdoc/>
     public IEngine Engine { get; }
 

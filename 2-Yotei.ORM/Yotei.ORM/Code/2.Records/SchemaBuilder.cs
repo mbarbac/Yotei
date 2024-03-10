@@ -73,6 +73,12 @@ public sealed partial class SchemaBuilder : CoreList<K, T>
     SchemaBuilder(SchemaBuilder source) : this(source.Engine) => AddRange(source);
 
     /// <summary>
+    /// Returns a new instance based upon the contents of this builder.
+    /// </summary>
+    /// <returns></returns>
+    public ISchema ToInstance() => new Schema(Engine, this);
+
+    /// <summary>
     /// The engine this instance is associated with.
     /// </summary>
     public IEngine Engine { get; }

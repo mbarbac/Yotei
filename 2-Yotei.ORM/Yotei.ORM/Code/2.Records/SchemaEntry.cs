@@ -87,6 +87,12 @@ public sealed partial class SchemaEntry : ISchemaEntry
     /// <inheritdoc/>
     public override string ToString() => Items.ToString();
 
+    /// <summary>
+    /// Returns a new builder based upon the contents of this instance.
+    /// </summary>
+    /// <returns></returns>
+    public SchemaEntryBuilder ToBuilder() => new(Engine, this);
+
     // ----------------------------------------------------
 
     /// <inheritdoc/>
