@@ -50,9 +50,9 @@ public partial interface IRecord : IEnumerable<object?>
     /// If no changes are detected, returns the original instance.
     /// </summary>
     /// <param name="index"></param>
-    /// <param name="value"></param>
+    /// <param name="entry"></param>
     /// <returns></returns>
-    IRecord ReplaceEntry(int index, object? value);
+    IRecord ReplaceEntry(int index, ISchemaEntry entry);
 
     /// <summary>
     /// Returns a new instance with the value and entry at the given index replaced by the new
@@ -85,10 +85,11 @@ public partial interface IRecord : IEnumerable<object?>
     /// Returns a new instance with the given value and entry pair inserted into the original
     /// one at the given index.
     /// </summary>
+    /// <param name="index"></param>
     /// <param name="value"></param>
     /// <param name="entry"></param>
     /// <returns></returns>
-    IRecord Insert(object? value, ISchemaEntry entry);
+    IRecord Insert(int index, object? value, ISchemaEntry entry);
 
     /// <summary>
     /// Returns a new instance with the value and entry pairs from the given ranges inserted into
