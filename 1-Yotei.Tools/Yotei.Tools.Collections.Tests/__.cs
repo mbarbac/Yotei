@@ -10,5 +10,3 @@ namespace Yotei.Tools.Collections.Tests;
 //    {
 //    }
 //}
-
-public interface IFake { }

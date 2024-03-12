@@ -1,8 +1,11 @@
-﻿namespace Yotei.Tools.Collections;
+﻿using System.Collections.Specialized;
+
+namespace Yotei.Tools.Collections;
 
 // ========================================================
 /// <inheritdoc cref="ICoreList{K, T}"/>
 [Cloneable]
+[DebuggerDisplay("{ToDebugString(6)}")]
 public partial class CoreList<K, T> : ICoreList<K, T>
 {
     readonly List<T> Items = [];
@@ -44,6 +47,18 @@ public partial class CoreList<K, T> : ICoreList<K, T>
 
     /// <inheritdoc/>
     public override string ToString() => $"Count: {Count}";
+
+    public string ToDebugString(int count)
+    {
+        if (Count == 0) return "0:[]";
+        if (count == 0) return ToString();
+
+        return Count < count
+            ? $"{Count}:[{string.Join(", ", this.Select(ItemToDebugString))}]"
+            : $"{Count}:[{string.Join(", ", this.Take(count).Select(ItemToDebugString))}, ...]";
+    }
+
+    protected virtual string ItemToDebugString(T item) => item?.ToString() ?? "-";
 
     // ----------------------------------------------------
 
@@ -238,10 +253,32 @@ public partial class CoreList<K, T> : ICoreList<K, T>
 
     // ----------------------------------------------------
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    void Validate(int index, bool insert = false)
+    {
+        if (index < 0) throw new IndexOutOfRangeException("Index is negative.").WithData(index);
+
+        var value = Items.Count + (insert ? 1 : 0);
+        if (index >= value) throw new IndexOutOfRangeException("Index greater than or equal the number of elements.").WithData(index);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    void Validate(int index, int count, bool insert = false)
+    {
+        Validate(index, insert);
+        ArgumentOutOfRangeException.ThrowIfNegative(count);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(count, Items.Count - index);
+    }
+
+    // ----------------------------------------------------
+
     /// <inheritdoc/>
     public virtual int GetRange(int index, int count)
     {
+        Validate(index, count);
+        
         if (count == 0) return 0;
+        if (index == 0 && count == Count) return 0;
 
         var range = Items.GetRange(index, count);
         Items.Clear();
@@ -252,6 +289,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// <inheritdoc/>
     public virtual int Replace(int index, T item)
     {
+        Validate(index);
         item = ValidateItem(item);
 
         var source = Items[index];
@@ -305,6 +343,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// <inheritdoc/>
     public virtual int Insert(int index, T item)
     {
+        Validate(index, true);
         item = ValidateItem(item);
 
         var prevent = false;
@@ -322,6 +361,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// <inheritdoc/>
     public virtual int InsertRange(int index, IEnumerable<T> range)
     {
+        Validate(index, true);
         range.ThrowWhenNull();
 
         if (range is ICollection<T> trange && trange.Count == 0) return 0;
@@ -339,6 +379,8 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// <inheritdoc/>
     public virtual int RemoveAt(int index)
     {
+        Validate(index);
+
         Items.RemoveAt(index);
         return 1;
     }
@@ -348,7 +390,10 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// <inheritdoc/>
     public virtual int RemoveRange(int index, int count)
     {
-        if (count == Count && index == 0) return Clear();
+        Validate(index, count);
+
+        if (count == 0) return 0;
+        if (index == 0 && count == Count) return Clear();
 
         if (count > 0) Items.RemoveRange(index, count);
         return count;

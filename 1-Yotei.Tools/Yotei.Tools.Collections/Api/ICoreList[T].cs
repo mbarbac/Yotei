@@ -48,7 +48,7 @@ public partial interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollec
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    int IndexesOf(T item);
+    List<int> IndexesOf(T item);
 
     /// <summary>
     /// Determines if this collection contains an element that matches the given predicate.

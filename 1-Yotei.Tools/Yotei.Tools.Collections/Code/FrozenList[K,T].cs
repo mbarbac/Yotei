@@ -1,11 +1,11 @@
 ﻿namespace Yotei.Tools.Collections;
-/*
+
 // ========================================================
 /// <inheritdoc cref="IFrozenList{K, T}"/>
 [Cloneable]
 public partial class FrozenList<K, T> : IFrozenList<K, T>
 {
-    protected virtual ICoreList<K, T> Items { get; } = null;
+    protected virtual ICoreList<K, T> Items { get; } = new CoreList<K, T>();
 
     /// <summary>
     /// Initializes a new empty instance.
@@ -36,6 +36,18 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
 
     /// <inheritdoc/>
     public override string ToString() => $"Count: {Count}";
+
+    public string ToDebugString(int count)
+    {
+        if (Count == 0) return "0:[]";
+        if (count == 0) return ToString();
+
+        return Count < count
+            ? $"{Count}:[{string.Join(", ", this.Select(ItemToDebugString))}]"
+            : $"{Count}:[{string.Join(", ", this.Take(count).Select(ItemToDebugString))}, ...]";
+    }
+
+    protected virtual string ItemToDebugString(T item) => item?.ToString() ?? "-";
 
     // ----------------------------------------------------
 
@@ -77,23 +89,50 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
 
     // ----------------------------------------------------
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    void Validate(int index, bool insert = false)
+    {
+        if (index < 0) throw new IndexOutOfRangeException("Index is negative.").WithData(index);
+
+        var value = Items.Count + (insert ? 1 : 0);
+        if (index >= value) throw new IndexOutOfRangeException("Index greater than or equal the number of elements.").WithData(index);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    void Validate(int index, int count, bool insert = false)
+    {
+        Validate(index, insert);
+        ArgumentOutOfRangeException.ThrowIfNegative(count);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(count, Items.Count - index);
+    }
+
+    // ----------------------------------------------------
+
     /// <inheritdoc/>
     public virtual IFrozenList<K, T> GetRange(int index, int count)
     {
+        Validate(index, count);
+
         if (count == 0) return this;
         if (index == 0 && count == Count) return this;
 
         var clone = Clone();
         var done = clone.Items.GetRange(index, count);
-        return done ? clone : this;
+        return done > 0 ? clone : this;
     }
 
     /// <inheritdoc/>
     public virtual IFrozenList<K, T> Replace(int index, T item)
     {
+        Validate(index);
+
+        var source = Items[index];
+        var same = (source is null && item is null) || (source is not null && source.Equals(item));
+        if (same) return this;
+
         var clone = Clone();
         var done = clone.Items.Replace(index, item);
-        return done ? clone : this;
+        return done > 0 ? clone : this;
     }
 
     /// <inheritdoc/>
@@ -101,56 +140,67 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     {
         var clone = Clone();
         var done = clone.Items.Add(item);
-        return done ? clone : this;
+        return done > 0 ? clone : this;
     }
 
     /// <inheritdoc/>
     public virtual IFrozenList<K, T> AddRange(IEnumerable<T> range)
     {
+        range.ThrowWhenNull();
+
         if (range is ICollection<T> trange && trange.Count == 0) return this;
         if (range is ICollection irange && irange.Count == 0) return this;
 
         var clone = Clone();
         var done = clone.Items.AddRange(range);
-        return done ? clone : this;
+        return done > 0 ? clone : this;
     }
 
     /// <inheritdoc/>
     public virtual IFrozenList<K, T> Insert(int index, T item)
     {
+        Validate(index, true);
+
         var clone = Clone();
         var done = clone.Items.Insert(index, item);
-        return done ? clone : this;
+        return done > 0 ? clone : this;
     }
 
     /// <inheritdoc/>
     public virtual IFrozenList<K, T> InsertRange(int index, IEnumerable<T> range)
     {
+        Validate(index, true);
+        range.ThrowWhenNull();
+
         if (range is ICollection<T> trange && trange.Count == 0) return this;
         if (range is ICollection irange && irange.Count == 0) return this;
 
         var clone = Clone();
         var done = clone.Items.InsertRange(index, range);
-        return done ? clone : this;
+        return done > 0 ? clone : this;
     }
 
     /// <inheritdoc/>
     public virtual IFrozenList<K, T> RemoveAt(int index)
     {
+        Validate(index);
+
         var clone = Clone();
         var done = clone.Items.RemoveAt(index);
-        return done ? clone : this;
+        return done > 0 ? clone : this;
     }
 
     /// <inheritdoc/>
     public virtual IFrozenList<K, T> RemoveRange(int index, int count)
     {
+        Validate(index, count);
+
         if (count == 0) return this;
         if (index == 0 && count == Count) return Clear();
 
         var clone = Clone();
         var done = clone.Items.RemoveRange(index, count);
-        return done ? clone : this;
+        return done > 0 ? clone : this;
     }
 
     /// <inheritdoc/>
@@ -160,7 +210,7 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
 
         var clone = Clone();
         var done = clone.Items.Remove(key);
-        return done ? clone : this;
+        return done > 0 ? clone : this;
     }
 
     /// <inheritdoc/>
@@ -170,7 +220,7 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
 
         var clone = Clone();
         var done = clone.Items.RemoveLast(key);
-        return done ? clone : this;
+        return done > 0 ? clone : this;
     }
 
     /// <inheritdoc/>
@@ -180,7 +230,7 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
 
         var clone = Clone();
         var done = clone.Items.RemoveAll(key);
-        return done ? clone : this;
+        return done > 0 ? clone : this;
     }
 
     /// <inheritdoc/>
@@ -190,7 +240,7 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
 
         var clone = Clone();
         var done = clone.Items.Remove(predicate);
-        return done ? clone : this;
+        return done > 0 ? clone : this;
     }
 
     /// <inheritdoc/>
@@ -200,7 +250,7 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
 
         var clone = Clone();
         var done = clone.Items.RemoveLast(predicate);
-        return done ? clone : this;
+        return done > 0 ? clone : this;
     }
 
     /// <inheritdoc/>
@@ -210,7 +260,7 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
 
         var clone = Clone();
         var done = clone.Items.RemoveAll(predicate);
-        return done ? clone : this;
+        return done > 0 ? clone : this;
     }
 
     /// <inheritdoc/>
@@ -220,6 +270,6 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
 
         var clone = Clone();
         var done = clone.Items.Clear();
-        return done ? clone : this;
+        return done > 0 ? clone : this;
     }
-}*/
+}
