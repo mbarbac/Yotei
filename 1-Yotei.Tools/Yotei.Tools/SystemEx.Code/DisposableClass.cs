@@ -16,9 +16,7 @@ public abstract class DisposableClass : IBaseDisposable
     /// <inheritdoc/>
     public bool OnDisposing { get; private set; } = false;
 
-    /// <summary>
     /// <inheritdoc/>
-    /// </summary>
     public void ThrowWhenDisposing()
     {
         if (OnDisposing)
