@@ -48,7 +48,7 @@ public partial interface IFrozenList<T> : IEnumerable<T>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    int IndexesOf(T item);
+    List<int> IndexesOf(T item);
 
     /// <summary>
     /// Determines if this collection contains an element that matches the given predicate.
