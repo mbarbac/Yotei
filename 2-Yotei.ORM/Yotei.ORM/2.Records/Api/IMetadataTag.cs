@@ -7,7 +7,7 @@
 public interface IMetadataTag : IEnumerable<string>
 {
     /// <summary>
-    /// Determines if the names in this instance are considered case sensitive or not.
+    /// Determines if the tag names in this instance are considered case sensitive or not.
     /// </summary>
     bool CaseSensitiveTags { get; }
 
