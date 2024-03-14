@@ -268,6 +268,10 @@ public partial class CoreList<K, T> : ICoreList<K, T>
         ArgumentOutOfRangeException.ThrowIfGreaterThan(count, Items.Count - index);
     }
 
+    protected virtual bool SameItem(T source, T target) =>
+        (source is null && target is null) ||
+        (source is not null && source.Equals(target));
+
     // ----------------------------------------------------
 
     /// <inheritdoc/>
@@ -275,13 +279,15 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     {
         Validate(index, count);
         
-        if (count == 0) return 0;
+        if (count == 0 && Count == 0) return 0;
         if (index == 0 && count == Count) return 0;
 
         var range = Items.GetRange(index, count);
+        var num = Count - range.Count;
+
         Items.Clear();
         AddRange(range);
-        return count;
+        return num;
     }
 
     /// <inheritdoc/>
@@ -291,7 +297,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
         item = ValidateItem(item);
 
         var source = Items[index];
-        var same = (source is null && item is null) || (source is not null && source.Equals(item));
+        var same = SameItem(source, item);
         if (same) return 0;
 
         var done = RemoveAt(index);

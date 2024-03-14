@@ -113,7 +113,7 @@ public partial class FrozenList<T> : IFrozenList<T>
     {
         Validate(index, count);
 
-        if (count == 0) return this;
+        if (count == 0 && Count == 0) return this;
         if (index == 0 && count == Count) return this;
 
         var clone = Clone();

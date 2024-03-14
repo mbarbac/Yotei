@@ -3,7 +3,7 @@
 // ========================================================
 /// <inheritdoc cref="IEngine"/>
 [WithGenerator]
-public partial class Engine : IEngine
+public abstract partial class Engine : IEngine
 {
     public const bool CASESENSITIVENAMES = false;
     public const string NULLVALUELITERAL = "NULL";

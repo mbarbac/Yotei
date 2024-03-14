@@ -16,7 +16,11 @@ global using System.Text;
 global using System.Threading;
 global using System.Threading.Tasks;
 
+global using System.Data;
+global using System.Data.Common;
+
 global using Yotei.Tools;
+global using Yotei.Tools.Collections;
 global using Yotei.Tools.Diagnostics;
 global using Yotei.Tools.CloneGenerator;
 global using Yotei.Tools.WithGenerator;
