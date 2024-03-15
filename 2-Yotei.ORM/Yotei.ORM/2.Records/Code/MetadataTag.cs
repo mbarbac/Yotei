@@ -69,6 +69,32 @@ public sealed partial class MetadataTag : IMetadataTag
 
     // ----------------------------------------------------
 
+    /// <inheritdoc/>
+    public bool Equals(IMetadataTag? other)
+    {
+        if (other is null) return false;
+
+        if (CaseSensitiveTags != other.CaseSensitiveTags) return false;
+        if (Count != other.Count) return false;
+
+        List<string> sources = new(Items);
+        List<string> targets = new(other);
+
+        while (sources.Count > 0)
+        {
+            var source = sources[0];
+            var index = targets.FindIndex(x => Compare(x, source));
+            if (index < 0) return false;
+
+            sources.RemoveAt(0);
+            targets.RemoveAt(index);
+        }
+
+        return true;
+    }
+
+    // ----------------------------------------------------
+
     bool Compare(string x, string y) => string.Compare(x, y, !CaseSensitiveTags) == 0;
 
     /// <inheritdoc/>

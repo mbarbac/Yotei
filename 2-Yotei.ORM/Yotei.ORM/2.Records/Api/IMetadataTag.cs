@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents the collection of names by which a given metadata entry is known.
 /// </summary>
-public interface IMetadataTag : IEnumerable<string>
+public interface IMetadataTag : IEnumerable<string>, IEquatable<IMetadataTag>
 {
     /// <summary>
     /// Determines if the tag names in this instance are considered case sensitive or not.
