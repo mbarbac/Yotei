@@ -28,7 +28,7 @@ public static class Test_MetadataEntry
 
         var other = tag.Clone();
         target = source.WithTag(other);
-        Assert.NotSame(source, target);
+        Assert.Same(source, target);
     }
 
     //[Enforced]
