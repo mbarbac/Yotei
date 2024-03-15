@@ -236,14 +236,25 @@ internal class XFieldNode(TypeNode parent, IFieldSymbol symbol) : FieldNode(pare
     /// <returns></returns>
     string? GetModifiers()
     {
+        var comparer = SymbolEqualityComparer.Default;
+
         // Interfaces...
         if (ParentNode.Symbol.IsInterface())
         {
             return ParentNode.Symbol.AllInterfaces.Any(x =>
-                HasDecoratedMember(x) != null ||
-                HasMethod(x) != null)
-                ? "new "
-                : null;
+            {
+                var member = HasDecoratedMember(x);
+                if (member != null &&
+                    comparer.Equals(Symbol.Type, member.Type)) return true;
+
+                var method = HasMethod(x);
+                if (method != null &&
+                    comparer.Equals(Symbol.Type, method.Parameters[0].Type)) return true;
+
+                return false;
+            })
+            ? "new "
+            : null;
         }
 
         // Others...
@@ -268,10 +279,18 @@ internal class XFieldNode(TypeNode parent, IFieldSymbol symbol) : FieldNode(pare
             {
                 if (type is null) return false;
 
-                if (HasMethod(type) != null) return true;
-                if (HasDecoratedMember(type) != null) return true;
-                if (type.HasAttributes(WithGeneratorAttr.LongName) && HasMember(type) != null)
-                    return true;
+                var method = HasMethod(type);
+                if (method != null &&
+                    comparer.Equals(Symbol.Type, method.Parameters[0].Type)) return true;
+
+                var member = HasDecoratedMember(type);
+                if (member != null &&
+                    comparer.Equals(Symbol.Type, member.Type)) return true;
+
+                member = HasMember(type);
+                if (member != null &&
+                    type.HasAttributes(WithGeneratorAttr.LongName) &&
+                    comparer.Equals(Symbol.Type, member.Type)) return true;
 
                 return AppearsInChain(type.BaseType);
             }

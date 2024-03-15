@@ -15,6 +15,8 @@ global using System.Text;
 global using System.Threading;
 global using System.Threading.Tasks;
 
+global using Microsoft.Data.SqlClient;
+
 global using Xunit;
 global using Yotei.Tools;
 global using Yotei.Tools.Collections;

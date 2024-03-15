@@ -3,7 +3,7 @@
 // ========================================================
 /// <inheritdoc cref="IEngine"/>
 [WithGenerator]
-public abstract partial class Engine : IEngine
+public partial class Engine : IEngine
 {
     public const bool CASESENSITIVENAMES = false;
     public const string NULLVALUELITERAL = "NULL";
@@ -41,6 +41,8 @@ public abstract partial class Engine : IEngine
 
     /// <inheritdoc/>
     public override string ToString() => "ORM.Engine";
+
+    // ----------------------------------------------------
 
     public bool CaseSensitiveNames { get; init; } = CASESENSITIVENAMES;
 

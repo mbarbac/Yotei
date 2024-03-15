@@ -9,7 +9,11 @@ public partial class Engine : ORM.Code.Engine, IEngine
     /// Initializes a new instance.
     /// </summary>
     /// <param name="factory"></param>
-    public Engine(DbProviderFactory factory) : base() => Factory = factory.ThrowWhenNull();
+    public Engine(DbProviderFactory factory) : base()
+    {
+        Factory = factory.ThrowWhenNull();
+        KnownTags = new KnownTags(CASESENSITIVETAGS);
+    }
 
     /// <summary>
     /// Copy constructor.
@@ -18,5 +22,17 @@ public partial class Engine : ORM.Code.Engine, IEngine
     protected Engine(Engine source) : base(source) => Factory = source.Factory;
 
     /// <inheritdoc/>
+    public override string ToString() => "Relational.Engine";
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
     public DbProviderFactory Factory { get; }
+
+    /// <inheritdoc cref="ORM.IEngine.KnownTags"/>
+    public new IKnownTags KnownTags
+    {
+        get => (IKnownTags)base.KnownTags;
+        init => base.KnownTags = value;
+    }
 }

@@ -11,4 +11,7 @@ public partial interface IEngine : ORM.IEngine
     /// The underlying ADO.NET factory used by this instance.
     /// </summary>
     DbProviderFactory Factory { get; }
+
+    /// <inheritdoc cref="ORM.IEngine.KnownTags"/>
+    [WithGenerator] new IKnownTags KnownTags { get; }
 }
