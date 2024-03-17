@@ -89,6 +89,30 @@ public partial class KnownTags : IKnownTags
     // ----------------------------------------------------
 
     /// <inheritdoc/>
+    public bool Equals(IKnownTags? other)
+    {
+        if (other is null) return false;
+        if (!IdentifierTags.Equals(other.IdentifierTags)) return false;
+        if (!PrimaryKeyTag.EquivalentTo(other.PrimaryKeyTag)) return false;
+        if (!UniqueValuedTag.EquivalentTo(other.UniqueValuedTag)) return false;
+        if (!ReadOnlyTag.EquivalentTo(other.ReadOnlyTag)) return false;
+        return true;
+    }
+    public override bool Equals(object? obj) => Equals(obj as IKnownTags);
+    public static bool operator ==(KnownTags x, IKnownTags y) => x is not null && x.Equals(y);
+    public static bool operator !=(KnownTags x, IKnownTags y) => !(x == y);
+    public override int GetHashCode()
+    {
+        var code = HashCode.Combine(IdentifierTags);
+        code = HashCode.Combine(code, PrimaryKeyTag);
+        code = HashCode.Combine(code, UniqueValuedTag);
+        code = HashCode.Combine(code, ReadOnlyTag);
+        return code;
+    }
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
     public bool CaseSensitiveTags { get; }
 
     /// <inheritdoc/>

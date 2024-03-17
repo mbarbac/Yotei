@@ -234,9 +234,7 @@ public partial class CoreList<T> : ICoreList<T>
         ArgumentOutOfRangeException.ThrowIfGreaterThan(count, Items.Count - index);
     }
 
-    protected virtual bool SameItem(T source, T target) =>
-        (source is null && target is null) ||
-        (source is not null && source.Equals(target));
+    protected virtual bool SameItem(T source, T target) => source.EquivalentTo(target);
 
     // ----------------------------------------------------
 

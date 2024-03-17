@@ -79,7 +79,6 @@ public sealed partial class MetadataTag : IMetadataTag
 
         List<string> sources = new(Items);
         List<string> targets = new(other);
-
         while (sources.Count > 0)
         {
             var source = sources[0];
@@ -89,8 +88,16 @@ public sealed partial class MetadataTag : IMetadataTag
             sources.RemoveAt(0);
             targets.RemoveAt(index);
         }
-
         return true;
+    }
+    public override bool Equals(object? obj) => Equals(obj as IMetadataTag);
+    public static bool operator ==(MetadataTag x, IMetadataTag y) => x is not null && x.Equals(y);
+    public static bool operator !=(MetadataTag x, IMetadataTag y) => !(x == y);
+    public override int GetHashCode()
+    {
+        var code = HashCode.Combine(CaseSensitiveTags);
+        for (int i = 0; i < Items.Count; i++) code = HashCode.Combine(code, Items[i]);
+        return code;
     }
 
     // ----------------------------------------------------

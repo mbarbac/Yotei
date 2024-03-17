@@ -43,6 +43,29 @@ public sealed partial class IdentifierTags : FrozenList<T>, IIdentifierTags
     // ----------------------------------------------------
 
     /// <inheritdoc/>
+    public bool Equals(IIdentifierTags? other)
+    {
+        if (other is null) return false;
+
+        if (CaseSensitiveTags != other.CaseSensitiveTags) return false;
+        if (Count != other.Count) return false;
+        for (int i = 0; i < Count; i++) if (!this[i].Equals(other[i])) return false;
+        return true;
+    }
+    public override bool Equals(object? obj) => Equals(obj as IIdentifierTags);
+    public static bool operator ==(IdentifierTags x, IIdentifierTags y) => x is not null && x.Equals(y);
+    public static bool operator !=(IdentifierTags x, IIdentifierTags y) => !(x == y);
+    public override int GetHashCode()
+    {
+        var code = HashCode.Combine(CaseSensitiveTags);
+        for (int i = 0; i < Items.Count; i++) code = HashCode.Combine(code, Items[i]);
+
+        return code;
+    }
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
     public bool CaseSensitiveTags { get; }
 
     /// <inheritdoc/>

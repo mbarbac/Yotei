@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Code;
+﻿using System.Numerics;
+
+namespace Yotei.ORM.Code;
 
 // ========================================================
 /// <inheritdoc cref="IEngine"/>
@@ -41,6 +43,40 @@ public partial class Engine : IEngine
 
     /// <inheritdoc/>
     public override string ToString() => "ORM.Engine";
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public bool Equals(IEngine? other)
+    {
+        if (other is null) return false;
+        if (CaseSensitiveNames != other.CaseSensitiveNames) return false;
+        if (string.Compare(NullValueLiteral, other.NullValueLiteral, !CaseSensitiveNames) != 0) return false;
+        if (NativePaging != other.NativePaging) return false;
+        if (string.Compare(ParameterPrefix, other.ParameterPrefix, !CaseSensitiveNames) != 0) return false;
+        if (PositionalParameters != other.PositionalParameters) return false;
+        if (UseTerminators != other.UseTerminators) return false;
+        if (LeftTerminator != other.LeftTerminator) return false;
+        if (RightTerminator != other.RightTerminator) return false;
+        if (!KnownTags.Equals(other.KnownTags)) return false;
+        return true;
+    }
+    public override bool Equals(object? obj) => Equals(obj as IEngine);
+    public static bool operator ==(Engine x, IEngine y) => x is not null && x.Equals(y);
+    public static bool operator !=(Engine x, IEngine y) => !(x == y);
+    public override int GetHashCode()
+    {
+        var code = HashCode.Combine(CaseSensitiveNames);
+        code = HashCode.Combine(code, NullValueLiteral);
+        code = HashCode.Combine(code, NativePaging);
+        code = HashCode.Combine(code, ParameterPrefix);
+        code = HashCode.Combine(code, PositionalParameters);
+        code = HashCode.Combine(code, UseTerminators);
+        code = HashCode.Combine(code, LeftTerminator);
+        code = HashCode.Combine(code, RightTerminator);
+        code = HashCode.Combine(code, KnownTags);
+        return code;
+    }
 
     // ----------------------------------------------------
 

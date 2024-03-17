@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents a metadata entry, which is essentially a key/value pair.
 /// </summary>
-public partial interface IMetadataEntry
+public partial interface IMetadataEntry : IEquatable<IMetadataEntry>
 {
     /// <summary>
     /// The collection of tag names by which this instance is known.

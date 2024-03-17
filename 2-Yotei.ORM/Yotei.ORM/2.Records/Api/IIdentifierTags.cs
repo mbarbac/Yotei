@@ -8,7 +8,7 @@ namespace Yotei.ORM;
 /// in an underlying database.
 /// </summary>
 [Cloneable]
-public partial interface IIdentifierTags : IFrozenList<T>
+public partial interface IIdentifierTags : IFrozenList<T>, IEquatable<IIdentifierTags>
 {
     /// <summary>
     /// Determines if the tag names in this instance are considered case sensitive or not.

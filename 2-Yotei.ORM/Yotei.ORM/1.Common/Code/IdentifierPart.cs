@@ -49,6 +49,19 @@ public sealed class IdentifierPart : IIdentifierPart
     /// <inheritdoc/>
     public override string ToString() => Value ?? string.Empty;
 
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public bool Equals(IIdentifierPart? other, bool caseSensitive)
+    {
+        if (other == null) return false;
+        if (string.Compare(Value, other.Value, !caseSensitive) != 0) return false;
+        if (string.Compare(UnwrappedValue, other.UnwrappedValue, !caseSensitive) != 0) return false;
+        return true;
+    }
+
+    // ----------------------------------------------------
+
     /// <inheritdoc/>
     public string? Value { get; }
 

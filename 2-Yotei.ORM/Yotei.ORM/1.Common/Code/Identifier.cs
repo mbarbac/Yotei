@@ -59,6 +59,21 @@ public sealed partial class Identifier : FrozenList<K?, T>, IIdentifier
     // ----------------------------------------------------
 
     /// <inheritdoc/>
+    public bool Equals(IIdentifier? other)
+    {
+        if (other is null) return false;
+        if (!Engine.Equals(other.Engine)) return false;
+        if (string.Compare(Value, other.Value, !Engine.CaseSensitiveNames) != 0) return false;
+        return true;
+    }
+    public override bool Equals(object? obj) => Equals(obj as IIdentifier);
+    public static bool operator ==(Identifier x, IIdentifier y) => x is not null && x.Equals(y);
+    public static bool operator !=(Identifier x, IIdentifier y) => !(x == y);
+    public override int GetHashCode() => HashCode.Combine(Value);
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
     public IEngine Engine { get; }
 
     /// <inheritdoc/>

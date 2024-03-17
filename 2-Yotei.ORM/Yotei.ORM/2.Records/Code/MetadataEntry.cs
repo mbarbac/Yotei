@@ -1,6 +1,4 @@
-﻿#pragma warning disable IDE0290 // Use primary constructor
-
-namespace Yotei.ORM.Code;
+﻿namespace Yotei.ORM.Code;
 
 // ========================================================
 /// <inheritdoc cref="IMetadataEntry"/>
@@ -26,6 +24,29 @@ public sealed partial class MetadataEntry : IMetadataEntry
 
     /// <inheritdoc/>
     public override string ToString() => $"{Tag.DefaultName} = '{Value.Sketch()}'";
+    
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public bool Equals(IMetadataEntry? other)
+    {
+        if (other is null) return false;
+
+        if (!Tag.Equals(other.Tag)) return false;
+        if (!Value.EquivalentTo(other.Value)) return false;
+        return true;
+    }
+    public override bool Equals(object? obj) => Equals(obj as IMetadataEntry);
+    public static bool operator ==(MetadataEntry x, IMetadataEntry y) => x is not null && x.Equals(y);
+    public static bool operator !=(MetadataEntry x, IMetadataEntry y) => !(x == y);
+    public override int GetHashCode()
+    {
+        var code = HashCode.Combine(Tag);
+        code = HashCode.Combine(code, Value);
+        return code;
+    }
+
+    // ----------------------------------------------------
 
     /// <inheritdoc/>
     public IMetadataTag Tag

@@ -8,7 +8,7 @@ namespace Yotei.ORM;
 /// Represents an arbitrary database identifier.
 /// </summary>
 [Cloneable]
-public partial interface IIdentifier : IFrozenList<K?, T>
+public partial interface IIdentifier : IFrozenList<K?, T>, IEquatable<IIdentifier>
 {
     /// <summary>
     /// The engine this instance is associated with.

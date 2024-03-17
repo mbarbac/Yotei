@@ -106,6 +106,8 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
         ArgumentOutOfRangeException.ThrowIfGreaterThan(count, Items.Count - index);
     }
 
+    protected virtual bool SameItem(T source, T target) => source.EquivalentTo(target);
+
     // ----------------------------------------------------
 
     /// <inheritdoc/>
@@ -127,7 +129,7 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
         Validate(index);
 
         var source = Items[index];
-        var same = (source is null && item is null) || (source is not null && source.Equals(item));
+        var same = SameItem(source, item);
         if (same) return this;
 
         var clone = Clone();

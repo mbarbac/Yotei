@@ -5,7 +5,7 @@
 /// Represents the collection of tags that are well-known for an underlying engine.
 /// </summary>
 [Cloneable]
-public partial interface IKnownTags : IEnumerable<IMetadataTag>
+public partial interface IKnownTags : IEnumerable<IMetadataTag>, IEquatable<IKnownTags>
 {
     /// <summary>
     /// Determines if the names in this instance are considered case sensitive or not.
