@@ -41,7 +41,7 @@ public static class Test_KnownTags
 
         Assert.False(tags.Contains("any"));
         Assert.True(tags.Contains("SCHEMATAG"));
-        Assert.True(tags.ContainsAny(["any", "UNIQUETAG"]));
+        Assert.True(tags.Contains(["any", "UNIQUETAG"]));
     }
 
     //[Enforced]

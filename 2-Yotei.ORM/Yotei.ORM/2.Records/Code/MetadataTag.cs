@@ -118,7 +118,7 @@ public sealed partial class MetadataTag : IMetadataTag
     }
 
     /// <inheritdoc/>
-    public bool ContainsAny(IEnumerable<string> range)
+    public bool Contains(IEnumerable<string> range)
     {
         range.ThrowWhenNull();
 

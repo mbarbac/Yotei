@@ -67,10 +67,10 @@ public static class Test_IdentifierTags
         Assert.Equal(0, items.IndexOf("ONEA"));
         Assert.Equal(0, items.IndexOf("ONEB"));
 
-        Assert.Equal(0, items.IndexOfAny(["any", "TWOB", "ONEB"]));
-        Assert.Equal(1, items.LastIndexOfAny(["any", "TWOB", "ONEB"]));
+        Assert.Equal(0, items.IndexOf(["any", "TWOB", "ONEB"]));
+        Assert.Equal(1, items.LastIndexOf(["any", "TWOB", "ONEB"]));
 
-        var list = items.IndexesOfAny(["any", "TWOB", "ONEB"]);
+        var list = items.IndexesOf(["any", "TWOB", "ONEB"]);
         Assert.Equal(2, list.Count);
         Assert.Equal(0, list[0]);
         Assert.Equal(1, list[1]);
@@ -90,10 +90,10 @@ public static class Test_IdentifierTags
         Assert.Equal(0, items.IndexOf(x => x.Contains("ONEA")));
         Assert.Equal(0, items.IndexOf(x => x.Contains("ONEB")));
 
-        Assert.Equal(0, items.IndexOf(x => x.ContainsAny(["any", "TWOB", "ONEB"])));
-        Assert.Equal(1, items.LastIndexOf(x => x.ContainsAny(["any", "TWOB", "ONEB"])));
+        Assert.Equal(0, items.IndexOf(x => x.Contains(["any", "TWOB", "ONEB"])));
+        Assert.Equal(1, items.LastIndexOf(x => x.Contains(["any", "TWOB", "ONEB"])));
 
-        var list = items.IndexesOf(x => x.ContainsAny(["any", "TWOB", "ONEB"]));
+        var list = items.IndexesOf(x => x.Contains(["any", "TWOB", "ONEB"]));
         Assert.Equal(2, list.Count);
         Assert.Equal(0, list[0]);
         Assert.Equal(1, list[1]);
@@ -331,22 +331,22 @@ public static class Test_IdentifierTags
         Assert.Same(xone, target[0]);
         Assert.Same(xthree, target[1]);
 
-        target = source.RemoveAny([]);
+        target = source.Remove((IEnumerable<string>)([]));
         Assert.Equal(source, target);
 
-        target = source.RemoveAny(["any", "twoB", "threeB"]);
+        target = source.Remove(["any", "twoB", "threeB"]);
         Assert.NotEqual(source, target);
         Assert.Equal(2, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Same(xthree, target[1]);
 
-        target = source.RemoveLastAny(["any", "twoB", "threeB"]);
+        target = source.RemoveLast(["any", "twoB", "threeB"]);
         Assert.NotEqual(source, target);
         Assert.Equal(2, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
 
-        target = source.RemoveAllAny(["any", "twoB", "threeB"]);
+        target = source.RemoveAll(["any", "twoB", "threeB"]);
         Assert.NotEqual(source, target);
         Assert.Single(target);
         Assert.Same(xone, target[0]);
@@ -391,19 +391,19 @@ public static class Test_IdentifierTags
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
 
-        target = source.Remove(x => x.ContainsAny(["any", "TWOB", "THREEB"]));
+        target = source.Remove(x => x.Contains(["any", "TWOB", "THREEB"]));
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Same(xthree, target[1]);
 
-        target = source.RemoveLast(x => x.ContainsAny(["any", "TWOB", "THREEB"]));
+        target = source.RemoveLast(x => x.Contains(["any", "TWOB", "THREEB"]));
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
 
-        target = source.RemoveAll(x => x.ContainsAny(["any", "TWOB", "THREEB"]));
+        target = source.RemoveAll(x => x.Contains(["any", "TWOB", "THREEB"]));
         Assert.NotSame(source, target);
         Assert.Single(target);
         Assert.Same(xone, target[0]);

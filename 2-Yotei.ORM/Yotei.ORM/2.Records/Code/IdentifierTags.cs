@@ -77,19 +77,19 @@ public sealed partial class IdentifierTags : FrozenList<T>, IIdentifierTags
     public bool Contains(string name) => Items.Contains(name);
 
     /// <inheritdoc/>
-    public bool ContainsAny(IEnumerable<string> range) => Items.ContainsAny(range);
+    public bool Contains(IEnumerable<string> range) => Items.Contains(range);
 
     /// <inheritdoc/>
     public int IndexOf(string name) => Items.IndexOf(name);
 
     /// <inheritdoc/>
-    public int IndexOfAny(IEnumerable<string> range) => Items.IndexOfAny(range);
+    public int IndexOf(IEnumerable<string> range) => Items.IndexOf(range);
 
     /// <inheritdoc/>
-    public int LastIndexOfAny(IEnumerable<string> range) => Items.LastIndexOfAny(range);
+    public int LastIndexOf(IEnumerable<string> range) => Items.LastIndexOf(range);
 
     /// <inheritdoc/>
-    public List<int> IndexesOfAny(IEnumerable<string> range) => Items.IndexesOfAny(range);
+    public List<int> IndexesOf(IEnumerable<string> range) => Items.IndexesOf(range);
 
     // ----------------------------------------------------
 
@@ -151,32 +151,32 @@ public sealed partial class IdentifierTags : FrozenList<T>, IIdentifierTags
     }
 
     /// <inheritdoc/>
-    public IIdentifierTags RemoveAny(IEnumerable<string> range)
+    public IIdentifierTags Remove(IEnumerable<string> range)
     {
         if (Count == 0) return this;
 
         var clone = Clone();
-        var num = clone.Items.RemoveAny(range);
+        var num = clone.Items.Remove(range);
         return num > 0 ? clone : this;
     }
 
     /// <inheritdoc/>
-    public IIdentifierTags RemoveLastAny(IEnumerable<string> range)
+    public IIdentifierTags RemoveLast(IEnumerable<string> range)
     {
         if (Count == 0) return this;
 
         var clone = Clone();
-        var num = clone.Items.RemoveLastAny(range);
+        var num = clone.Items.RemoveLast(range);
         return num > 0 ? clone : this;
     }
 
     /// <inheritdoc/>
-    public IIdentifierTags RemoveAllAny(IEnumerable<string> range)
+    public IIdentifierTags RemoveAll(IEnumerable<string> range)
     {
         if (Count == 0) return this;
 
         var clone = Clone();
-        var num = clone.Items.RemoveAllAny(range);
+        var num = clone.Items.RemoveAll(range);
         return num > 0 ? clone : this;
     }
 }

@@ -52,18 +52,18 @@ public partial interface ISchemaEntry : IEnumerable<T>, IEquatable<ISchemaEntry>
     /// Tries to obtain the metadata pair whose tag contains the given tag name.
     /// </summary>
     /// <param name="name"></param>
-    /// <param name="value"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    bool TryGet(string name, out T? value);
+    bool TryGet(string name, [NotNullWhen(true)] out T? item);
 
     /// <summary>
     /// Tries to obtains the metadata pair whose tag contains any of the tag names from the given
     /// range.
     /// </summary>
     /// <param name="range"></param>
-    /// <param name="value"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    bool TryGet(IEnumerable<string> range,  out T? value);
+    bool TryGet(IEnumerable<string> range,  [NotNullWhen(true)] out T? item);
 
     /// <summary>
     /// Determines if this instance contains a metadata pair whose tag contains the given name.
@@ -111,6 +111,24 @@ public partial interface ISchemaEntry : IEnumerable<T>, IEquatable<ISchemaEntry>
     /// <param name="item"></param>
     /// <returns></returns>
     ISchemaEntry Replace(IEnumerable<string> range, T item);
+
+    /// <summary>
+    /// Returns a new instance where the value of the metadata pair that contains the given tag
+    /// name has been replaced by the new given one.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    ISchemaEntry ReplaceValue(string name, object? value);
+
+    /// <summary>
+    /// Returns a new instance where the value of the metadata pair that contains any of the given
+    /// tag names has been replaced by the new given one.
+    /// </summary>
+    /// <param name="range"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    ISchemaEntry ReplaceValue(IEnumerable<string> range, object? value);
 
     /// <summary>
     /// Returns a new instance where the given metadata pair has been added to it.

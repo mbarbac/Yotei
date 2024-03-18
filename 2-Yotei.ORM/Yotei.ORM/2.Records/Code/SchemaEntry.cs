@@ -5,169 +5,247 @@ namespace Yotei.ORM.Code;
 // ========================================================
 /// <inheritdoc cref="ISchemaEntry"/>
 [WithGenerator]
+[Cloneable]
 public sealed partial class SchemaEntry : ISchemaEntry
 {
+    readonly SchemaEntryBuilder Items;
+
+    /// <summary>
+    /// Initializes a new empty instance.
+    /// </summary>
+    /// <param name="engine"></param>
+    public SchemaEntry(IEngine engine) => Items = new SchemaEntryBuilder(engine);
+
+    /// <summary>
+    /// Initializes a new instance with the given range of metadata pairs.
+    /// </summary>
+    /// <param name="engine"></param>
+    /// <param name="range"></param>
+    public SchemaEntry(
+        IEngine engine, IEnumerable<T> range) => Items = new SchemaEntryBuilder(engine, range);
+
+    /// <summary>
+    /// Initializes a new instance with the given identifier and optional metadata.
+    /// </summary>
+    /// <param name="identifier"></param>
+    /// <param name="isPrimaryKey"></param>
+    /// <param name="isUniqueValued"></param>
+    /// <param name="isReadOnly"></param>
+    /// <param name="range"></param>
+    public SchemaEntry(
+        IIdentifier identifier,
+        bool? isPrimaryKey = null,
+        bool? isUniqueValued = null,
+        bool? isReadOnly = null,
+        IEnumerable<T>? range = null) => Items = new SchemaEntryBuilder(
+            identifier,
+            isPrimaryKey,
+            isUniqueValued,
+            isReadOnly,
+            range);
+
+    /// <summary>
+    /// Initializes a new instance with the given identifier and optional metadata.
+    /// </summary>
+    /// <param name="engine"></param>
+    /// <param name="identifier"></param>
+    /// <param name="isPrimaryKey"></param>
+    /// <param name="isUniqueValued"></param>
+    /// <param name="isReadOnly"></param>
+    /// <param name="range"></param>
+    public SchemaEntry(
+        IEngine engine,
+        string? identifier,
+        bool? isPrimaryKey = null,
+        bool? isUniqueValued = null,
+        bool? isReadOnly = null,
+        IEnumerable<T>? range = null) => Items = new SchemaEntryBuilder(
+            engine, identifier,
+            isPrimaryKey,
+            isUniqueValued,
+            isReadOnly,
+            range);
+
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    SchemaEntry(SchemaEntry source) => throw null;
+    SchemaEntry(SchemaEntry source) => Items = new SchemaEntryBuilder(
+        source.Identifier.Engine,
+        source);
+
+    /// <inheritdoc/>
+    public IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    /// <inheritdoc/>
+    public override string ToString() => Items.ToString();
 
     // ----------------------------------------------------
 
-    /// <summary>
-    /// The identifier by which this instance is known. It cannot be null, and its last part
-    /// cannot be null either.
-    /// </summary>
+    /// <inheritdoc/>
+    public bool Equals(ISchemaEntry? other)
+    {
+        if (other is null) return false;
+
+        if (!Identifier.Equals(other.Identifier)) return false;
+        if (!IsPrimaryKey.EquivalentTo(other.IsPrimaryKey)) return false;
+        if (!IsUniqueValued.EquivalentTo(other.IsUniqueValued)) return false;
+        if (!IsReadOnly.EquivalentTo(other.IsReadOnly)) return false;
+
+        var sources = this.ToList();
+        var targets = other.ToList();
+        while (sources.Count > 0)
+        {
+            var index = targets.FindIndex(x => x.Tag.Contains(sources[0].Tag));
+            if (index < 0) return false;
+
+            if (!sources[0].Equals(targets[index])) return false;
+            sources.RemoveAt(0);
+            targets.RemoveAt(index);
+        }
+        return true;
+    }
+    public override bool Equals(object? obj) => Equals(obj as ISchemaEntry);
+    public static bool operator ==(SchemaEntry x, ISchemaEntry y) => x is not null && x.Equals(y);
+    public static bool operator !=(SchemaEntry x, ISchemaEntry y) => !(x == y);
+    public override int GetHashCode()
+    {
+        var code = HashCode.Combine(Identifier);
+        code = HashCode.Combine(code, IsPrimaryKey);
+        code = HashCode.Combine(code, IsUniqueValued);
+        code = HashCode.Combine(code, IsReadOnly);
+        foreach (var item in Items) code = HashCode.Combine(code, item);
+        return code;
+    }
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
     public IIdentifier Identifier
     {
-        get => throw null;
-        init => throw null;
+        get => Items.Identifier;
+        init => Items.Identifier = value;
     }
 
-    /// <summary>
-    /// Determines if this instance describes a primary key column, or one that it is part of the
-    /// primary key group, if any, or not. Only one primary key group is supported per schema.
-    /// </summary>
+    /// <inheritdoc/>
     public bool IsPrimaryKey
     {
-        get => throw null;
-        init => throw null;
+        get => Items.IsPrimaryKey;
+        init => Items.IsPrimaryKey = value;
     }
 
-    /// <summary>
-    /// Determines if this instance describes an unique valued column, or one that it is part of
-    /// the unique valued group, if any, or not. Only one unique valued group is supported per
-    /// schema.
-    /// </summary>
+    /// <inheritdoc/>
     public bool IsUniqueValued
     {
-        get => throw null;
-        init => throw null;
+        get => Items.IsUniqueValued;
+        init => Items.IsUniqueValued = value;
     }
 
-    /// <summary>
-    /// Determines if this instance describes a read only column, or not.
-    /// </summary>
+    /// <inheritdoc/>
     public bool IsReadOnly
     {
-        get => throw null;
-        init => throw null;
+        get => Items.IsReadOnly;
+        init => Items.IsReadOnly = value;
     }
 
     // ----------------------------------------------------
 
-    /// <summary>
-    /// Gets the number of metadata pairs in this collection.
-    /// </summary>
-    public int Count { get => throw null; }
+    /// <inheritdoc/>
+    public int Count => Items.Count;
 
-    /// <summary>
-    /// Gets the metadata pair whose tag contains the given tag name. If no pair is found, then
-    /// an exception will be thrown.
-    /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    public T this[string name] { get => throw null; }
+    /// <inheritdoc/>
+    public T this[string name] => Items[name];
 
-    /// <summary>
-    /// Tries to obtain the metadata pair whose tag contains the given tag name.
-    /// </summary>
-    /// <param name="name"></param>
-    /// <param name="value"></param>
-    /// <returns></returns>
-    public bool TryGet(string name, out T? value) => throw null;
+    /// <inheritdoc/>
+    public bool TryGet(string name, [NotNullWhen(true)] out T? item) => Items.TryGet(name, out item);
 
-    /// <summary>
-    /// Tries to obtains the metadata pair whose tag contains any of the tag names from the given
-    /// range.
-    /// </summary>
-    /// <param name="range"></param>
-    /// <param name="value"></param>
-    /// <returns></returns>
-    public bool TryGet(IEnumerable<string> range, out T? value) => throw null;
+    /// <inheritdoc/>
+    public bool TryGet(IEnumerable<string> range, [NotNullWhen(true)] out T? item) => Items.TryGet(range, out item);
 
-    /// <summary>
-    /// Determines if this instance contains a metadata pair whose tag contains the given name.
-    /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    public bool Contains(string name) => throw null;
+    /// <inheritdoc/>
+    public bool Contains(string name) => Items.Contains(name);
 
-    /// <summary>
-    /// Determines if this instance contains a metadata pair whose tag contains any of the names
-    /// from the given range.
-    /// </summary>
-    /// <param name="range"></param>
-    /// <returns></returns>
-    public bool Contains(IEnumerable<string> range) => throw null;
+    /// <inheritdoc/>
+    public bool Contains(IEnumerable<string> range) => Items.Contains(range);
 
-    /// <summary>
-    /// Gets an array with the metadata pairs in this collection.
-    /// </summary>
-    /// <returns></returns>
-    public T[] ToArray() => throw null;
+    /// <inheritdoc/>
+    public T[] ToArray() => Items.ToArray();
 
-    /// <summary>
-    /// Gets a list with the metadata pairs in this collection.
-    /// </summary>
-    /// <returns></returns>
-    public List<T> ToList() => throw null;
+    /// <inheritdoc/>
+    public List<T> ToList() => Items.ToList();
 
     // ----------------------------------------------------
 
-    /// <summary>
-    /// Returns a new instance where the metadata pair that contains the given tag name has been
-    /// replaced by the new given one.
-    /// </summary>
-    /// <param name="name"></param>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    public ISchemaEntry Replace(string name, T item) => throw null;
+    /// <inheritdoc/>
+    public ISchemaEntry Replace(string name, T item)
+    {
+        var clone = Clone();
+        var done = clone.Items.Replace(name, item);
+        return done > 0 ? clone : this;
+    }
 
-    /// <summary>
-    /// Returns a new instance where the metadata pair that contains any of the names from the
-    /// given range has been replaced by the new given one.
-    /// </summary>
-    /// <param name="range"></param>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    public ISchemaEntry Replace(IEnumerable<string> range, T item) => throw null;
+    /// <inheritdoc/>
+    public ISchemaEntry Replace(IEnumerable<string> range, T item)
+    {
+        var clone = Clone();
+        var done = clone.Items.Replace(range, item);
+        return done > 0 ? clone : this;
+    }
 
-    /// <summary>
-    /// Returns a new instance where the given metadata pair has been added to it.
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    public ISchemaEntry Add(T item) => throw null;
+    /// <inheritdoc/>
+    public ISchemaEntry ReplaceValue(string name, object? value)
+    {
+        var clone = Clone();
+        var done = clone.Items.ReplaceValue(name, value);
+        return done > 0 ? clone : this;
+    }
 
-    /// <summary>
-    /// Returns a new instance where the metadata pairs from the given range have been added
-    /// to it.
-    /// </summary>
-    /// <param name="range"></param>
-    /// <returns></returns>
-    public ISchemaEntry AddRange(IEnumerable<T> range) => throw null;
+    /// <inheritdoc/>
+    public ISchemaEntry ReplaceValue(IEnumerable<string> range, object? value)
+    {
+        var clone = Clone();
+        var done = clone.Items.ReplaceValue(range, value);
+        return done > 0 ? clone : this;
+    }
 
-    /// <summary>
-    /// Returns a new instance where the metadata pair that contains the given name has been
-    /// removed. If no pair can be found, returns the original instance.
-    /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    public ISchemaEntry Remove(string name) => throw null;
+    /// <inheritdoc/>
+    public ISchemaEntry Add(T item)
+    {
+        var clone = Clone();
+        var done = clone.Items.Add(item);
+        return done > 0 ? clone : this;
+    }
 
-    /// <summary>
-    /// Returns a new instance where the metadata pair that contains any of the names from the
-    /// given range has been removed. If no pair can be found, returns the original instance.
-    /// </summary>
-    /// <param name="range"></param>
-    /// <returns></returns>
-    public ISchemaEntry Remove(IEnumerable<string> range) => throw null;
+    /// <inheritdoc/>
+    public ISchemaEntry AddRange(IEnumerable<T> range)
+    {
+        var clone = Clone();
+        var done = clone.Items.AddRange(range);
+        return done > 0 ? clone : this;
+    }
 
-    /// <summary>
-    /// Returns a new instance where all the original metadata pairs have been removed.
-    /// </summary>
-    /// <returns></returns>
-    public ISchemaEntry Clear() => throw null;
+    /// <inheritdoc/>
+    public ISchemaEntry Remove(string name)
+    {
+        var clone = Clone();
+        var done = clone.Items.Remove(name);
+        return done > 0 ? clone : this;
+    }
+
+    /// <inheritdoc/>
+    public ISchemaEntry Remove(IEnumerable<string> range)
+    {
+        var clone = Clone();
+        var done = clone.Items.Remove(range);
+        return done > 0 ? clone : this;
+    }
+
+    /// <inheritdoc/>
+    public ISchemaEntry Clear()
+    {
+        var clone = Clone();
+        var done = clone.Items.Clear();
+        return done > 0 ? clone : this;
+    }
 }

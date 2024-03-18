@@ -26,7 +26,7 @@ public sealed partial class IdentifierTagsBuilder : CoreList<T>
             return item;
         };
         CompareItems = (x, y) => ReferenceEquals(x, y) || x.Equals(y);
-        GetDuplicates = (item) => IndexesOf(x => x.ContainsAny(item));
+        GetDuplicates = (item) => IndexesOf(x => x.Contains(item));
         CanInclude = (item, _) => throw new DuplicateException("Duplicated element.").WithData(item);
     }
 
@@ -72,8 +72,8 @@ public sealed partial class IdentifierTagsBuilder : CoreList<T>
     /// <inheritdoc cref="IIdentifierTags.Contains(string)"/>
     public bool Contains(string name) => IndexOf(name) >= 0;
 
-    /// <inheritdoc cref="IIdentifierTags.ContainsAny(IEnumerable{string})"/>
-    public bool ContainsAny(IEnumerable<string> range) => IndexOfAny(range) >= 0;
+    /// <inheritdoc cref="IIdentifierTags.Contains(IEnumerable{string})"/>
+    public bool Contains(IEnumerable<string> range) => IndexOf(range) >= 0;
 
     /// <inheritdoc cref="IIdentifierTags.IndexOf(string)"/>
     public int IndexOf(string name)
@@ -82,8 +82,8 @@ public sealed partial class IdentifierTagsBuilder : CoreList<T>
         return IndexOf(x => x.Contains(name));
     }
 
-    /// <<inheritdoc cref="IIdentifierTags.IndexOfAny(IEnumerable{string})"/>
-    public int IndexOfAny(IEnumerable<string> range)
+    /// <<inheritdoc cref="IIdentifierTags.IndexOf(IEnumerable{string})"/>
+    public int IndexOf(IEnumerable<string> range)
     {
         range.ThrowWhenNull();
 
@@ -97,8 +97,8 @@ public sealed partial class IdentifierTagsBuilder : CoreList<T>
         });
     }
 
-    /// <inheritdoc cref="IIdentifierTags.LastIndexOfAny(IEnumerable{string})"/>
-    public int LastIndexOfAny(IEnumerable<string> range)
+    /// <inheritdoc cref="IIdentifierTags.LastIndexOf(IEnumerable{string})"/>
+    public int LastIndexOf(IEnumerable<string> range)
     {
         range.ThrowWhenNull();
 
@@ -112,8 +112,8 @@ public sealed partial class IdentifierTagsBuilder : CoreList<T>
         });
     }
 
-    /// <inheritdoc cref="IIdentifierTags.IndexesOfAny(IEnumerable{string})"/>
-    public List<int> IndexesOfAny(IEnumerable<string> range)
+    /// <inheritdoc cref="IIdentifierTags.IndexesOf(IEnumerable{string})"/>
+    public List<int> IndexesOf(IEnumerable<string> range)
     {
         range.ThrowWhenNull();
 
@@ -146,9 +146,9 @@ public sealed partial class IdentifierTagsBuilder : CoreList<T>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public int RemoveAny(IEnumerable<string> range)
+    public int Remove(IEnumerable<string> range)
     {
-        var index = IndexOfAny(range);
+        var index = IndexOf(range);
         return index >= 0 ? RemoveAt(index) : 0;
     }
 
@@ -158,9 +158,9 @@ public sealed partial class IdentifierTagsBuilder : CoreList<T>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public int RemoveLastAny(IEnumerable<string> range)
+    public int RemoveLast(IEnumerable<string> range)
     {
-        var index = LastIndexOfAny(range);
+        var index = LastIndexOf(range);
         return index >= 0 ? RemoveAt(index) : 0;
     }
 
@@ -170,13 +170,13 @@ public sealed partial class IdentifierTagsBuilder : CoreList<T>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public int RemoveAllAny(IEnumerable<string> range)
+    public int RemoveAll(IEnumerable<string> range)
     {
         if (Count == 0) return 0;
 
         var num = 0; while (true)
         {
-            var index = IndexOfAny(range);
+            var index = IndexOf(range);
 
             if (index >= 0) num += RemoveAt(index);
             else break;

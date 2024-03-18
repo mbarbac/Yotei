@@ -49,6 +49,32 @@ public sealed partial class SchemaEntryBuilder : IEnumerable<T>
     }
 
     /// <summary>
+    /// Initializes a new instance with the given identifier and optional metadata.
+    /// </summary>
+    /// <param name="engine"></param>
+    /// <param name="identifier"></param>
+    /// <param name="isPrimaryKey"></param>
+    /// <param name="isUniqueValued"></param>
+    /// <param name="isReadOnly"></param>
+    /// <param name="range"></param>
+    public SchemaEntryBuilder(
+        IEngine engine,
+        string? identifier,
+        bool? isPrimaryKey = null,
+        bool? isUniqueValued = null,
+        bool? isReadOnly = null,
+        IEnumerable<T>? range = null)
+    {
+        Engine = engine.ThrowWhenNull();
+
+        Identifier = new Identifier(engine, identifier);
+        if (isPrimaryKey != null) IsPrimaryKey = isPrimaryKey.Value;
+        if (isUniqueValued != null) IsUniqueValued = isUniqueValued.Value;
+        if (isReadOnly != null) IsReadOnly = isReadOnly.Value;
+        if (range != null) AddRange(range);
+    }
+
+    /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
@@ -86,12 +112,12 @@ public sealed partial class SchemaEntryBuilder : IEnumerable<T>
     // The index of the pair that contains any of the given names, or -1.
     int IndexOf(IEnumerable<string> range)
     {
-        for (int i = 0; i < Items.Count; i++) if (Items[i].Tag.ContainsAny(range)) return i;
+        for (int i = 0; i < Items.Count; i++) if (Items[i].Tag.Contains(range)) return i;
         return -1;
     }
 
     // Clears the cache of the well known property that contains the given name.
-    void ClearCacheOf(string name)
+    void ClearCache(string name)
     {
         if (KnownTags.IdentifierTags.Contains(name)) _Identifier = null;
         else if (KnownTags.PrimaryKeyTag != null && KnownTags.PrimaryKeyTag.Contains(name)) _IsPrimaryKey = null;
@@ -100,9 +126,9 @@ public sealed partial class SchemaEntryBuilder : IEnumerable<T>
     }
 
     // Clears the cache of the well known property that contains any of the given names.
-    void ClearCacheOf(IEnumerable<string> range)
+    void ClearCache(IEnumerable<string> range)
     {
-        foreach (var name in range) ClearCacheOf(name);
+        foreach (var name in range) ClearCache(name);
     }
 
     // Validates the given pair before using it in this collection.
@@ -110,18 +136,24 @@ public sealed partial class SchemaEntryBuilder : IEnumerable<T>
     {
         item.ThrowWhenNull();
 
-        if (KnownTags.IdentifierTags.ContainsAny(item.Tag))
+        if (KnownTags.IdentifierTags.Contains(item.Tag))
         {
             if (item.Value is not null and not string) throw new InvalidCastException(
                 "Value for the given tag must be null or a string.")
                 .WithData(item);
 
+            var need = false;
+            var value = (string?)item.Value;
+            var temp = new IdentifierPart(Engine, value).UnwrappedValue;
+            if (string.Compare(value, temp) != 0) need = true;
+
             var index = KnownTags.IdentifierTags.IndexOf(item.Tag);
             var tag = KnownTags.IdentifierTags[index];
-            if (!tag.Equals(item.Tag))
-                item = new MetadataEntry(tag, item.Value);
+            if (!tag.Equals(item.Tag)) need = true;
+
+            if (need) item = new MetadataEntry(tag, temp);
         }
-        else if (KnownTags.PrimaryKeyTag != null && KnownTags.PrimaryKeyTag.ContainsAny(item.Tag))
+        else if (KnownTags.PrimaryKeyTag != null && KnownTags.PrimaryKeyTag.Contains(item.Tag))
         {
             if (item.Value is not bool) throw new InvalidCastException(
                 "Value for the given tag must be a boolean.")
@@ -131,7 +163,7 @@ public sealed partial class SchemaEntryBuilder : IEnumerable<T>
             if (!tag.Equals(item.Tag))
                 item = new MetadataEntry(tag, item.Value);
         }
-        else if (KnownTags.UniqueValuedTag != null && KnownTags.UniqueValuedTag.ContainsAny(item.Tag))
+        else if (KnownTags.UniqueValuedTag != null && KnownTags.UniqueValuedTag.Contains(item.Tag))
         {
             if (item.Value is not bool) throw new InvalidCastException(
                 "Value for the given tag must be a boolean.")
@@ -141,7 +173,7 @@ public sealed partial class SchemaEntryBuilder : IEnumerable<T>
             if (!tag.Equals(item.Tag))
                 item = new MetadataEntry(tag, item.Value);
         }
-        else if (KnownTags.ReadOnlyTag != null && KnownTags.ReadOnlyTag.ContainsAny(item.Tag))
+        else if (KnownTags.ReadOnlyTag != null && KnownTags.ReadOnlyTag.Contains(item.Tag))
         {
             if (item.Value is not bool) throw new InvalidCastException(
                 "Value for the given tag must be a boolean.")
@@ -387,20 +419,20 @@ public sealed partial class SchemaEntryBuilder : IEnumerable<T>
     /// Tries to obtain the metadata pair whose tag contains the given tag name.
     /// </summary>
     /// <param name="name"></param>
-    /// <param name="value"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    public bool TryGet(string name, [NotNullWhen(true)] out T? value)
+    public bool TryGet(string name, [NotNullWhen(true)] out T? item)
     {
         name = name.NotNullNotEmpty();
 
         var index = IndexOf(name);
         if (index >= 0)
         {
-            value = Items[index];
+            item = Items[index];
             return true;
         }
 
-        value = null;
+        item = null;
         return false;
     }
 
@@ -409,20 +441,20 @@ public sealed partial class SchemaEntryBuilder : IEnumerable<T>
     /// range.
     /// </summary>
     /// <param name="range"></param>
-    /// <param name="value"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    public bool TryGet(IEnumerable<string> range, [NotNullWhen(true)] out T? value)
+    public bool TryGet(IEnumerable<string> range, [NotNullWhen(true)] out T? item)
     {
         range.ThrowWhenNull();
 
         var index = IndexOf(range);
         if (index >= 0)
         {
-            value = Items[index];
+            item = Items[index];
             return true;
         }
 
-        value = null;
+        item = null;
         return false;
     }
 
@@ -469,7 +501,7 @@ public sealed partial class SchemaEntryBuilder : IEnumerable<T>
         var index = IndexOf(name);
         if (index < 0)
         {
-            if (KnownTags.ContainsAny(item.Tag)) // Might be a well-known tag...
+            if (KnownTags.Contains(item.Tag)) // Might be a well-known tag...
             {
                 return Add(item);
             }
@@ -496,7 +528,7 @@ public sealed partial class SchemaEntryBuilder : IEnumerable<T>
         var index = IndexOf(range);
         if (index < 0)
         {
-            if (KnownTags.ContainsAny(item.Tag)) // Might be a well-known tag...
+            if (KnownTags.Contains(item.Tag)) // Might be a well-known tag...
             {
                 return Add(item);
             }
@@ -506,6 +538,72 @@ public sealed partial class SchemaEntryBuilder : IEnumerable<T>
         {
             Items.RemoveAt(index);
             return Add(item);
+        }
+    }
+
+    /// <summary>
+    /// Replaces the value of the metadata pair that contains the given tag name with the new
+    /// given one. Returns the number of changes made.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public int ReplaceValue(string name, object? value)
+    {
+        name = name.NotNullNotEmpty();
+
+        var index = IndexOf(name);
+        if (index < 0)
+        {
+            var tag = KnownTags.Find(name); // Might be a well-known tag...
+            if (tag != null)
+            {
+                return Add(new MetadataEntry(tag, value));
+            }
+            return 0;
+        }
+        else
+        {
+            var item = Items[index];
+            if (!item.Value.EquivalentTo(value))
+            {
+                Items.RemoveAt(index);
+                return Add(new MetadataEntry(item.Tag, value));
+            }
+            else return 0;
+        }
+    }
+
+    /// <summary>
+    /// Replaces the value of the metadata pair that contains any of the given tag names with the
+    /// new given one. Returns the number of changes made.
+    /// </summary>
+    /// <param name="range"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public int  ReplaceValue(IEnumerable<string> range, object? value)
+    {
+        range.ThrowWhenNull();
+
+        var index = IndexOf(range);
+        if (index < 0)
+        {
+            var tag = KnownTags.Find(range); // Might be a well-known tag...
+            if (tag != null)
+            {
+                return Add(new MetadataEntry(tag, value));
+            }
+            return 0;
+        }
+        else
+        {
+            var item = Items[index];
+            if (!item.Value.EquivalentTo(value))
+            {
+                Items.RemoveAt(index);
+                return Add(new MetadataEntry(item.Tag, value));
+            }
+            else return 0;
         }
     }
 
@@ -520,12 +618,12 @@ public sealed partial class SchemaEntryBuilder : IEnumerable<T>
 
         var index = IndexOf(item.Tag);
         if (index >= 0) throw new DuplicateException(
-            "This collectio already carries a tag name from the given element.")
+            "This collection already carries a tag name from the given element.")
             .WithData(item)
             .WithData(this);
 
         Items.Add(item);
-        ClearCacheOf(item.Tag);
+        ClearCache(item.Tag);
         return 1;
     }
 
@@ -561,7 +659,7 @@ public sealed partial class SchemaEntryBuilder : IEnumerable<T>
         if (index >= 0)
         {
             Items.RemoveAt(index);
-            ClearCacheOf(name);
+            ClearCache(name);
             return 1;
         }
 
@@ -582,7 +680,7 @@ public sealed partial class SchemaEntryBuilder : IEnumerable<T>
         if (index >= 0)
         {
             Items.RemoveAt(index);
-            ClearCacheOf(range);
+            ClearCache(range);
             return 1;
         }
 

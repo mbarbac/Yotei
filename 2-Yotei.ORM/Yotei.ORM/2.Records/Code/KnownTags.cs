@@ -129,7 +129,7 @@ public partial class KnownTags : IKnownTags
                 .WithData(this);
 
             var clone = Clone(); clone._IdentifierTags = null;
-            if (clone.ContainsAny(value.Names)) throw new DuplicateException(
+            if (clone.Contains(value.Names)) throw new DuplicateException(
                 "This instance already carries a name from the given element.")
                 .WithData(value)
                 .WithData(this);
@@ -154,7 +154,7 @@ public partial class KnownTags : IKnownTags
                      .WithData(this);
 
                 var clone = Clone(); clone._PrimaryKeyTag = null;
-                if (clone.ContainsAny(value)) throw new DuplicateException(
+                if (clone.Contains(value)) throw new DuplicateException(
                     "This instance already carries a name from the given element.")
                     .WithData(value)
                     .WithData(this);
@@ -180,7 +180,7 @@ public partial class KnownTags : IKnownTags
                      .WithData(this);
 
                 var clone = Clone(); clone._UniqueValuedTag = null;
-                if (clone.ContainsAny(value)) throw new DuplicateException(
+                if (clone.Contains(value)) throw new DuplicateException(
                     "This instance already carries a name from the given element.")
                     .WithData(value)
                     .WithData(this);
@@ -206,7 +206,7 @@ public partial class KnownTags : IKnownTags
                      .WithData(this);
 
                 var clone = Clone(); clone._ReadOnlyTag = null;
-                if (clone.ContainsAny(value)) throw new DuplicateException(
+                if (clone.Contains(value)) throw new DuplicateException(
                     "This instance already carries a name from the given element.")
                     .WithData(value)
                     .WithData(this);
@@ -232,29 +232,39 @@ public partial class KnownTags : IKnownTags
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public bool Contains(string name)
+    public bool Contains(string name) => Find(name) != null;
+
+    /// <inheritdoc/>
+    public bool Contains(IEnumerable<string> range) => Find(range) != null;
+
+    /// <inheritdoc/>
+    public IMetadataTag? Find(string name)
     {
         name = name.NotNullNotEmpty();
 
-        if (IdentifierTags.Contains(name)) return true;
-        if (PrimaryKeyTag != null && PrimaryKeyTag.Contains(name)) return true;
-        if (UniqueValuedTag != null && UniqueValuedTag.Contains(name)) return true;
-        if (ReadOnlyTag != null && ReadOnlyTag.Contains(name)) return true;
+        var index = IdentifierTags.IndexOf(name);
+        if (index >= 0) return IdentifierTags[index];
 
-        return false;
+        if (PrimaryKeyTag != null && PrimaryKeyTag.Contains(name)) return PrimaryKeyTag;
+        if (UniqueValuedTag != null && UniqueValuedTag.Contains(name)) return UniqueValuedTag;
+        if (ReadOnlyTag != null && ReadOnlyTag.Contains(name)) return ReadOnlyTag;
+
+        return null;
     }
 
     /// <inheritdoc/>
-    public bool ContainsAny(IEnumerable<string> range)
+    public IMetadataTag? Find(IEnumerable<string> range)
     {
         range.ThrowWhenNull();
 
-        if (IdentifierTags.ContainsAny(range)) return true;
-        if (PrimaryKeyTag != null && PrimaryKeyTag.ContainsAny(range)) return true;
-        if (UniqueValuedTag != null && UniqueValuedTag.ContainsAny(range)) return true;
-        if (ReadOnlyTag != null && ReadOnlyTag.ContainsAny(range)) return true;
+        var index = IdentifierTags.IndexOf(range);
+        if (index >= 0) return IdentifierTags[index];
 
-        return false;
+        if (PrimaryKeyTag != null && PrimaryKeyTag.Contains(range)) return PrimaryKeyTag;
+        if (UniqueValuedTag != null && UniqueValuedTag.Contains(range)) return UniqueValuedTag;
+        if (ReadOnlyTag != null && ReadOnlyTag.Contains(range)) return ReadOnlyTag;
+
+        return null;
     }
 
     /// <inheritdoc/>

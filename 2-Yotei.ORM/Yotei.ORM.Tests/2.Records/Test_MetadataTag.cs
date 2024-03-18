@@ -68,7 +68,7 @@ public static class Test_MetadataTag
     {
         var tag = new MetadataTag(false, ["one", "two", "three"]);
         Assert.False(tag.Contains("four"));
-        Assert.True(tag.ContainsAny(["x", "y", "THREE"]));
+        Assert.True(tag.Contains(["x", "y", "THREE"]));
     }
 
     //[Enforced]

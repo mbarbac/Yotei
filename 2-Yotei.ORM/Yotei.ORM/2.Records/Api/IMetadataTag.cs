@@ -28,7 +28,7 @@ public interface IMetadataTag : IEnumerable<string>, IEquatable<IMetadataTag>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    bool ContainsAny(IEnumerable<string> range);
+    bool Contains(IEnumerable<string> range);
 
     /// <summary>
     /// Gets the default tag name of this instance.

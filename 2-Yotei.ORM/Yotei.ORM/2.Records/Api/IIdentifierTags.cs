@@ -34,7 +34,7 @@ public partial interface IIdentifierTags : IFrozenList<T>, IEquatable<IIdentifie
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    bool ContainsAny(IEnumerable<string> range);
+    bool Contains(IEnumerable<string> range);
 
     /// <summary>
     /// Gets the index of the element in this collection that contains the given tag name, of -1
@@ -50,7 +50,7 @@ public partial interface IIdentifierTags : IFrozenList<T>, IEquatable<IIdentifie
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    int IndexOfAny(IEnumerable<string> range);
+    int IndexOf(IEnumerable<string> range);
 
     /// <summary>
     /// Gets the index of the last element in this collection that contains any tag name from
@@ -58,7 +58,7 @@ public partial interface IIdentifierTags : IFrozenList<T>, IEquatable<IIdentifie
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    int LastIndexOfAny(IEnumerable<string> range);
+    int LastIndexOf(IEnumerable<string> range);
 
     /// <summary>
     /// Gets the indexes of all the elements in this collection that contains any tag name from
@@ -66,7 +66,7 @@ public partial interface IIdentifierTags : IFrozenList<T>, IEquatable<IIdentifie
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    List<int> IndexesOfAny(IEnumerable<string> range);
+    List<int> IndexesOf(IEnumerable<string> range);
 
     // ----------------------------------------------------
 
@@ -132,7 +132,7 @@ public partial interface IIdentifierTags : IFrozenList<T>, IEquatable<IIdentifie
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    IIdentifierTags RemoveAny(IEnumerable<string> range);
+    IIdentifierTags Remove(IEnumerable<string> range);
 
     /// <summary>
     /// Returns a new instance where the last element that carries any tag name from the given
@@ -141,7 +141,7 @@ public partial interface IIdentifierTags : IFrozenList<T>, IEquatable<IIdentifie
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    IIdentifierTags RemoveLastAny(IEnumerable<string> range);
+    IIdentifierTags RemoveLast(IEnumerable<string> range);
 
     /// <summary>
     /// Returns a new instance where all the elements that carry any tag name from the given range
@@ -150,5 +150,5 @@ public partial interface IIdentifierTags : IFrozenList<T>, IEquatable<IIdentifie
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    IIdentifierTags RemoveAllAny(IEnumerable<string> range);
+    IIdentifierTags RemoveAll(IEnumerable<string> range);
 }
