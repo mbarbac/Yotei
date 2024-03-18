@@ -1,3 +1,5 @@
+#pragma warning disable CA1859
+
 using Pair = Yotei.ORM.Code.MetadataEntry;
 using Tag = Yotei.ORM.Code.MetadataTag;
 

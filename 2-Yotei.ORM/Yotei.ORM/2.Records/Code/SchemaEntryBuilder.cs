@@ -477,6 +477,7 @@ public sealed partial class SchemaEntryBuilder : IEnumerable<T>
     /// Gets an array with the metadata pairs in this collection.
     /// </summary>
     /// <returns></returns>
+    [SuppressMessage("", "IDE0305")]
     public T[] ToArray() => Items.ToArray();
 
     /// <summary>

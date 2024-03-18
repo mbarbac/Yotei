@@ -165,7 +165,7 @@ public partial interface IFrozenList<K, T> : IEnumerable<T>
     IFrozenList<K, T> RemoveRange(int index, int count);
 
     /// <summary>
-    /// Returns a new instance where the first element with the given index has been removed from
+    /// Returns a new instance where the first element with the given key has been removed from
     /// the collection. If no changes have been made, returns the original instance.
     /// </summary>
     /// <param name="key"></param>
@@ -173,7 +173,7 @@ public partial interface IFrozenList<K, T> : IEnumerable<T>
     IFrozenList<K, T> Remove(K key);
 
     /// <summary>
-    /// Returns a new instance where the last element with the given index has been removed from
+    /// Returns a new instance where the last element with the given key has been removed from
     /// the collection. If no changes have been made, returns the original instance.
     /// </summary>
     /// <param name="key"></param>
@@ -181,7 +181,7 @@ public partial interface IFrozenList<K, T> : IEnumerable<T>
     IFrozenList<K, T> RemoveLast(K key);
 
     /// <summary>
-    /// Returns a new instance where all the elements with the given index have been removed from
+    /// Returns a new instance where all the elements with the given key have been removed from
     /// the collection. If no changes have been made, returns the original instance.
     /// </summary>
     /// <param name="key"></param>

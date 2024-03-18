@@ -79,7 +79,26 @@ public sealed partial class SchemaEntry : ISchemaEntry
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /// <inheritdoc/>
-    public override string ToString() => Items.ToString();
+    public override string ToString()
+    {
+        var sb = new StringBuilder();
+
+        sb.Append(Identifier.Value ?? "-");
+        if (IsPrimaryKey) sb.Append(", Primary");
+        if (IsUniqueValued) sb.Append(", Unique");
+        if (IsReadOnly) sb.Append(", Readonly");
+
+        foreach (var item in Items)
+        {
+            if (Identifier.Engine.KnownTags.Contains(item.Tag)) continue;
+
+            var name = item.Tag.DefaultName;
+            var value = item.Value.Sketch();
+            sb.Append($", {name}='{value}'");
+        }
+
+        return sb.ToString();
+    }
 
     // ----------------------------------------------------
 
