@@ -48,6 +48,14 @@ public sealed partial class IdentifierBuilder : CoreList<K?, T>
 
     protected override string ItemToDebugString(T item) => item.Value ?? string.Empty;
 
+    /// <summary>
+    /// Returns a new instance based on the current contents of this builder.
+    /// </summary>
+    /// <returns></returns>
+    public IIdentifier ToInstance() =>
+        Count == 0 ? new Identifier(Engine) :
+        Count == 1 ? new Identifier(Engine, this[0]) : new Identifier(Engine, this);
+
     // ----------------------------------------------------
 
     /// <inheritdoc cref="IIdentifier.Engine"/>

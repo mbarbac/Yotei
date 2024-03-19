@@ -75,6 +75,14 @@ public sealed partial class SchemaBuilder : CoreList<K, T>
 
     protected override string ItemToDebugString(T item) => item.ToString() ?? string.Empty;
 
+    /// <summary>
+    /// Returns a new instance based on the current contents of this builder.
+    /// </summary>
+    /// <returns></returns>
+    public ISchema ToInstance() =>
+        Count == 0 ? new Schema(Engine) :
+        Count == 1 ? new Schema(Engine, this[0]) : new Schema(Engine, this);
+
     // ----------------------------------------------------
 
     /// <summary>

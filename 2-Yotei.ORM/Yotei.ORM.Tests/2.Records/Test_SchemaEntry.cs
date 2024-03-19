@@ -207,6 +207,9 @@ public static class Test_SchemaEntry
         try { _ = source.Add(new Pair(new Tag(sensitive, "ReadONLYtag"), false)); Assert.Fail(); }
         catch (DuplicateException) { }
 
+        try { _ = source.Add(new Pair(new Tag(sensitive, ["any", "TABLETag"]), null)); Assert.Fail(); }
+        catch (DuplicateException) { }
+
         try { _ = source.Add(new Pair(new Tag(sensitive, "SchemaTag"), 0)); Assert.Fail(); }
         catch (InvalidCastException) { }
 
@@ -225,6 +228,10 @@ public static class Test_SchemaEntry
             range: [new Pair(new Tag(false, ["age", "years"]), 50)]);
 
         var target = source.Remove("tableTAG");
+        Assert.NotSame(source, target);
+        Assert.Equal("[two]", target.Identifier.Value);
+
+        target = source.Remove(["any", "TABLETag"]);
         Assert.NotSame(source, target);
         Assert.Equal("[two]", target.Identifier.Value);
 

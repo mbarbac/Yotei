@@ -97,6 +97,17 @@ public sealed partial class SchemaEntryBuilder : IEnumerable<T>
             : $"{Count}:[{string.Join(", ", this.Take(count).Select(x => x.ToString()))}, ...]";
     }
 
+    /// <summary>
+    /// Returns a new instance based on the current contents of this builder.
+    /// </summary>
+    /// <returns></returns>
+    public ISchemaEntry ToInstance() => new SchemaEntry(
+        Identifier,
+        IsPrimaryKey,
+        IsUniqueValued,
+        IsReadOnly,
+        this);
+
     // ----------------------------------------------------
 
     IEngine Engine { get; set; }
