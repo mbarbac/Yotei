@@ -7,6 +7,7 @@ namespace Yotei.ORM;
 /// <summary>
 /// Maintains the ordered collection of schema entries that describe the structure and contents 
 /// of a record.
+/// <br/> Duplicated elements are accepted as far as they are the same one.
 /// </summary>
 [Cloneable]
 public partial interface ISchema : IFrozenList<K, T>, IEquatable<ISchema>

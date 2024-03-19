@@ -31,6 +31,7 @@ public sealed partial class SchemaBuilder : CoreList<K, T>
         ValidateKey = (key) =>
         {
             key.ThrowWhenNull();
+            if (key.Count == 0) throw new ArgumentException("Identifier cannot be empty.").WithData(key);
             if (key.Value == null) throw new ArgumentException("Identifier cannot be empty.").WithData(key);
             if (key[^1].Value == null) throw new ArgumentException("Last part of identifier cannot be null.").WithData(key);
             return key;
