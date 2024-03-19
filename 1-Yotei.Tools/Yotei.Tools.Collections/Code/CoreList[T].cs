@@ -361,7 +361,7 @@ public partial class CoreList<T> : ICoreList<T>
         if (count == 0) return 0;
         if (index == 0 && count == Count) return Clear();
 
-        if (count > 0) Items.RemoveRange(index, count);
+        Items.RemoveRange(index, count);
         return count;
     }
 
