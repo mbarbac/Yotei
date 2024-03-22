@@ -1,6 +1,6 @@
-﻿using T = Yotei.ORM.IMetadataEntry;
+﻿using T = Yotei.ORM.Records.IMetadataEntry;
 
-namespace Yotei.ORM;
+namespace Yotei.ORM.Records;
 
 // ========================================================
 /// <summary>

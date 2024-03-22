@@ -1,6 +1,6 @@
-﻿using T = Yotei.ORM.IMetadataEntry;
+﻿using T = Yotei.ORM.Records.IMetadataEntry;
 
-namespace Yotei.ORM.Code;
+namespace Yotei.ORM.Records.Code;
 
 // ========================================================
 [Cloneable]
@@ -67,7 +67,7 @@ public sealed partial class SchemaEntryBuilder : IEnumerable<T>
     {
         Engine = engine.ThrowWhenNull();
 
-        Identifier = new Identifier(engine, identifier);
+        Identifier = new ORM.Code.Identifier(engine, identifier);
         if (isPrimaryKey != null) IsPrimaryKey = isPrimaryKey.Value;
         if (isUniqueValued != null) IsUniqueValued = isUniqueValued.Value;
         if (isReadOnly != null) IsReadOnly = isReadOnly.Value;
@@ -155,7 +155,7 @@ public sealed partial class SchemaEntryBuilder : IEnumerable<T>
 
             var need = false;
             var value = (string?)item.Value;
-            var temp = new IdentifierPart(Engine, value).UnwrappedValue;
+            var temp = new ORM.Code.IdentifierPart(Engine, value).UnwrappedValue;
             if (string.Compare(value, temp) != 0) need = true;
 
             var index = KnownTags.IdentifierTags.IndexOf(item.Tag);
@@ -217,7 +217,7 @@ public sealed partial class SchemaEntryBuilder : IEnumerable<T>
                 var tags = KnownTags.IdentifierTags;
                 var count = tags.Count;
 
-                if (count == 0) _Identifier = new Identifier(Engine);
+                if (count == 0) _Identifier = new ORM.Code.Identifier(Engine);
                 else
                 {
                     var values = new List<string?>(count);
@@ -229,8 +229,8 @@ public sealed partial class SchemaEntryBuilder : IEnumerable<T>
                     }
                     while (values.Count > 0 && values[0] == null) values.RemoveAt(0);
 
-                    if (values.Count > 0) _Identifier = new Identifier(Engine, values);
-                    else _Identifier = new Identifier(Engine);
+                    if (values.Count > 0) _Identifier = new ORM.Code.Identifier(Engine, values);
+                    else _Identifier = new ORM.Code.Identifier(Engine);
                 }
             }
 

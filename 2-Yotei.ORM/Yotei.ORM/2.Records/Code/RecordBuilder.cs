@@ -1,9 +1,10 @@
-﻿namespace Yotei.ORM.Code;
+﻿namespace Yotei.ORM.Records.Code;
 
 // ========================================================
 [DebuggerDisplay("{ToDebugString(6, true)}")]
 public class RecordBuilder
 {
+    [SuppressMessage("", "IDE0044")]
     SchemaBuilder _Schema;
     List<object?> _Values;
 

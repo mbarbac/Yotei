@@ -6,4 +6,4 @@
 /// </summary>
 [Cloneable]
 [WithGenerator]
-public partial interface IKnownTags : ORM.IKnownTags { }
+public partial interface IKnownTags : Records.IKnownTags { }

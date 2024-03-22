@@ -1,4 +1,4 @@
-using Record = Yotei.ORM.Code.Record;
+using Record = Yotei.ORM.Records.Code.Record;
 
 namespace Yotei.ORM.Tests;
 

@@ -1,7 +1,7 @@
-﻿using T = Yotei.ORM.ISchemaEntry;
+﻿using T = Yotei.ORM.Records.ISchemaEntry;
 using K = Yotei.ORM.IIdentifier;
 
-namespace Yotei.ORM.Code;
+namespace Yotei.ORM.Records.Code;
 
 // ========================================================
 [Cloneable]
@@ -139,7 +139,7 @@ public sealed partial class SchemaBuilder : CoreList<K, T>
     /// <returns></returns>
     public int IndexOf(string identifier)
     {
-        var key = new Identifier(Engine, identifier);
+        var key = new ORM.Code.Identifier(Engine, identifier);
         return IndexOf(key);
     }
 
@@ -151,7 +151,7 @@ public sealed partial class SchemaBuilder : CoreList<K, T>
     /// <returns></returns>
     public int LastIndexOf(string identifier)
     {
-        var key = new Identifier(Engine, identifier);
+        var key = new ORM.Code.Identifier(Engine, identifier);
         return LastIndexOf(key);
     }
 
@@ -162,7 +162,7 @@ public sealed partial class SchemaBuilder : CoreList<K, T>
     /// <returns></returns>
     public List<int> IndexesOf(string identifier)
     {
-        var key = new Identifier(Engine, identifier);
+        var key = new ORM.Code.Identifier(Engine, identifier);
         return IndexesOf(key);
     }
 

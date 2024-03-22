@@ -5,7 +5,6 @@ namespace Yotei.ORM.Tests;
 public static class Test_ParameterList
 {
     readonly static Parameter x007 = new("Id", "007");
-    readonly static Parameter x008 = new("Id", "008");
     readonly static Parameter xJames = new("FirstName", "James");
     readonly static Parameter xBond = new("LastName", "Bond");
     readonly static Parameter xMi6 = new("Organization", "Mi6");

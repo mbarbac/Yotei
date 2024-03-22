@@ -1,6 +1,6 @@
-﻿using T = Yotei.ORM.IMetadataEntry;
+﻿using T = Yotei.ORM.Records.IMetadataEntry;
 
-namespace Yotei.ORM.Code;
+namespace Yotei.ORM.Records.Code;
 
 // ========================================================
 /// <inheritdoc cref="ISchemaEntry"/>

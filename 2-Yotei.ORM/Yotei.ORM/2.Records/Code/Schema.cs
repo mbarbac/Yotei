@@ -1,7 +1,7 @@
-﻿using T = Yotei.ORM.ISchemaEntry;
+﻿using T = Yotei.ORM.Records.ISchemaEntry;
 using K = Yotei.ORM.IIdentifier;
 
-namespace Yotei.ORM.Code;
+namespace Yotei.ORM.Records.Code;
 
 // ========================================================
 /// <inheritdoc cref="ISchema"/>

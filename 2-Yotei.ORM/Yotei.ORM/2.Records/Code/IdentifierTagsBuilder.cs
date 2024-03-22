@@ -1,6 +1,6 @@
-﻿using T = Yotei.ORM.IMetadataTag;
+﻿using T = Yotei.ORM.Records.IMetadataTag;
 
-namespace Yotei.ORM.Code;
+namespace Yotei.ORM.Records.Code;
 
 // ========================================================
 [Cloneable]

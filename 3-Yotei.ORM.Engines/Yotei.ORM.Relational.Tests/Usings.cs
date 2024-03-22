@@ -24,7 +24,10 @@ global using Yotei.Tools.Diagnostics;
 global using Yotei.Tools.Miscelanea;
 global using Yotei.Tools.CloneGenerator;
 global using Yotei.Tools.WithGenerator;
+
 global using Yotei.ORM;
 global using Yotei.ORM.Code;
+global using Yotei.ORM.Records;
+global using Yotei.ORM.Records.Code;
 global using Yotei.ORM.Relational;
 global using Yotei.ORM.Relational.Code;

@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-
-namespace Yotei.ORM.Code;
+﻿namespace Yotei.ORM.Code;
 
 // ========================================================
 /// <inheritdoc cref="IEngine"/>
@@ -132,12 +130,12 @@ public partial class Engine : IEngine
     char _RightTerminator = RIGHTTERMINATOR;
 
     /// <inheritdoc/>
-    public IKnownTags KnownTags
+    public Records.IKnownTags KnownTags
     {
         get => _KnownTags;
         init => _KnownTags = value.ThrowWhenNull();
     }
-    IKnownTags _KnownTags = new KnownTags(CASESENSITIVETAGS);
+    Records.IKnownTags _KnownTags = new Records.Code.KnownTags(CASESENSITIVETAGS);
 
     // ----------------------------------------------------
 

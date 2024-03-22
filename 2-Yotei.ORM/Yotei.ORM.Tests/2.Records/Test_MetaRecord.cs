@@ -1,4 +1,4 @@
-using Meta = Yotei.ORM.Code.SchemaEntry;
+using Meta = Yotei.ORM.Records.Code.SchemaEntry;
 
 namespace Yotei.ORM.Tests;
 
