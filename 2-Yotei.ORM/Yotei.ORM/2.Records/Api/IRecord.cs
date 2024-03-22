@@ -5,7 +5,7 @@
 /// Represents a collection of related contents retrieved from, or to be persisted into, an
 /// underlying database.
 /// </summary>
-public interface IRecord : IEnumerable<object?>
+public interface IRecord : IEnumerable<object?>, IEquatable<IRecord>
 {
     /// <summary>
     /// Gets the number of entries in this instance.

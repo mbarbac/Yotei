@@ -77,15 +77,33 @@ public class RecordBuilder
         return sb.ToString();
     }
 
+    // ----------------------------------------------------
+
     /// <summary>
-    /// Returns a new instance based on the current contents of this builder.
+    /// Returns a new record based upon the contents of this builder.
+    /// </summary>
+    /// <returns></returns>
+    public IRecord ToRecord() => ToRecord(out _);
+
+    /// <summary>
+    /// Returns a new record based on the current contents of this builder.
     /// </summary>
     /// <param name="schema"></param>
     /// <returns></returns>
-    public IRecord ToInstance(out ISchema schema)
+    public IRecord ToRecord(out ISchema schema)
     {
         schema = _Schema.ToInstance();
         return new Record(_Values);
+    }
+
+    /// <summary>
+    /// Returns a new meta record based upon the current contents of this builder.
+    /// </summary>
+    /// <returns></returns>
+    public IMetaRecord ToMetaRecord()
+    {
+        var record = ToRecord(out var schema);
+        return new MetaRecord(record, schema);
     }
 
     // ----------------------------------------------------

@@ -4,7 +4,7 @@
 /// <inheritdoc cref="IRecord"/>
 public sealed class Record : IRecord
 {
-    object?[] Items;
+    readonly object?[] Items;
 
     /// <summary>
     /// Initializes a new empty instance.
@@ -23,18 +23,33 @@ public sealed class Record : IRecord
     /// <param name="range"></param>
     public Record(IEnumerable<object?> range) => Items = range.ThrowWhenNull().ToArray();
 
-    /// <summary>
-    /// Copy constructor.
-    /// </summary>
-    /// <param name="source"></param>
-    Record(Record source) => Items = source.Items;
-
     /// <inheritdoc/>
     public IEnumerator<object?> GetEnumerator() => Items.GetTypedEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /// <inheritdoc/>
     public override string ToString() => Items.Sketch();
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public bool Equals(IRecord? other)
+    {
+        if (other is null) return false;
+
+        if (Count != other.Count) return false;
+        for (int i = 0; i < Count; i++) if (!this[i].EquivalentTo(other[i])) return false;
+
+        return true;
+    }
+    public override bool Equals(object? obj) => Equals(obj as IRecord);
+    public static bool operator ==(Record x, IRecord y) => x is not null && x.Equals(y);
+    public static bool operator !=(Record x, IRecord y) => !(x == y);
+    public override int GetHashCode()
+    {
+        var code = 0; for (int i = 0; i < Count; i++) code = HashCode.Combine(code, Items[i]);
+        return code;
+    }
 
     // ----------------------------------------------------
 
@@ -155,5 +170,5 @@ public sealed class Record : IRecord
     }
 
     /// <inheritdoc/>
-    public IRecord Clear() => Count == 0 ? this : new Record();
+    public IRecord Clear() => Count == 0 ? this : [];
 }

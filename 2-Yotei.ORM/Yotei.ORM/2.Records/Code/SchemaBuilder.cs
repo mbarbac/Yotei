@@ -44,7 +44,7 @@ public sealed partial class SchemaBuilder : CoreList<K, T>
             foreach (var num in temp) if (!nums.Contains(num)) nums.Add(num);
             return nums;
         };
-        CanInclude = (item, x) => ReferenceEquals(item, x)
+        CanInclude = (item, x) => item.Equals(x)
             ? true
             : throw new DuplicateException("Duplicated element.").WithData(item);
     }

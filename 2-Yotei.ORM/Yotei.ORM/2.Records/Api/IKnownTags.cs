@@ -3,6 +3,7 @@
 // ========================================================
 /// <summary>
 /// Represents the collection of tags that are well-known for an underlying engine.
+/// <br/> Elements that contain any existing tag name are not allowed.
 /// </summary>
 [Cloneable]
 public partial interface IKnownTags : IEnumerable<IMetadataTag>, IEquatable<IKnownTags>

@@ -6,6 +6,7 @@ namespace Yotei.ORM;
 // ========================================================
 /// <summary>
 /// Represents an arbitrary database identifier.
+/// <br/> Duplicated elements are accepted.
 /// </summary>
 [Cloneable]
 public partial interface IIdentifier : IFrozenList<K?, T>, IEquatable<IIdentifier>

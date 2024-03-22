@@ -11,7 +11,7 @@ public static class Test_RecordBuilder
         var engine = new FakeEngine();
         var builder = new RecordBuilder(engine);
 
-        var record = builder.ToInstance(out var schema);
+        var record = builder.ToRecord(out var schema);
         Assert.Empty(record);
         Assert.Empty(schema);
     }
@@ -24,7 +24,7 @@ public static class Test_RecordBuilder
         var xid = new SchemaEntry(engine, "Emp.Id", isPrimaryKey: true);
 
         var builder = new RecordBuilder("007", xid);
-        var record = builder.ToInstance(out var schema);
+        var record = builder.ToRecord(out var schema);
         Assert.Single(record);
         Assert.Single(schema);
         Assert.Equal("007", record[0]); Assert.Equal("[Emp].[Id]", schema[0].Identifier.Value);
@@ -40,7 +40,7 @@ public static class Test_RecordBuilder
         var xlast = new SchemaEntry(engine, "Last");
 
         var builder = new RecordBuilder(["007", "James", "Bond"], [xid, xfirst, xlast]);
-        var record = builder.ToInstance(out var schema);
+        var record = builder.ToRecord(out var schema);
         Assert.Equal(3, record.Count);
         Assert.Equal(3, schema.Count);
         Assert.Equal("007", record[0]); Assert.Equal("[Emp].[Id]", schema[0].Identifier.Value);
@@ -259,7 +259,7 @@ public static class Test_RecordBuilder
         var builder = new RecordBuilder(["007", "James", "Bond"], [xid, xfirst, xlast]);
 
         builder.Clear();
-        var record = builder.ToInstance(out var schema);
+        var record = builder.ToRecord(out var schema);
         Assert.Empty(record);
         Assert.Empty(schema);
     }

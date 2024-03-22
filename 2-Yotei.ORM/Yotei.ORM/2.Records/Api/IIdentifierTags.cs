@@ -6,6 +6,7 @@ namespace Yotei.ORM;
 /// <summary>
 /// Represents the ordered collection of tags that describes the maximal structure of identifiers
 /// in an underlying database.
+/// <br/> Elements that contain any similar tag name are not allowed.
 /// </summary>
 [Cloneable]
 public partial interface IIdentifierTags : IFrozenList<T>, IEquatable<IIdentifierTags>
