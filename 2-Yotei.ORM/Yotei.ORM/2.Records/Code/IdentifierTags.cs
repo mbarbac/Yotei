@@ -9,14 +9,13 @@ namespace Yotei.ORM.Code;
 [Cloneable]
 public sealed partial class IdentifierTags : FrozenList<T>, IIdentifierTags
 {
-    protected override IdentifierTagsBuilder Items => _Items ??= new(CaseSensitiveTags);
-    IdentifierTagsBuilder? _Items;
+    protected override IdentifierTagsBuilder Items { get; }
 
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="caseSensitive"></param>
-    public IdentifierTags(bool caseSensitive) => CaseSensitiveTags = caseSensitive;
+    public IdentifierTags(bool caseSensitive) => Items = new(caseSensitive);
 
     /// <summary>
     /// Initializes a new instance with the given element
@@ -66,7 +65,7 @@ public sealed partial class IdentifierTags : FrozenList<T>, IIdentifierTags
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public bool CaseSensitiveTags { get; }
+    public bool CaseSensitiveTags => Items.CaseSensitiveTags;
 
     /// <inheritdoc/>
     public IEnumerable<string> Names => Items.Names;

@@ -10,14 +10,13 @@ namespace Yotei.ORM.Code;
 [Cloneable]
 public sealed partial class Identifier : FrozenList<K?, T>, IIdentifier
 {
-    protected override IdentifierBuilder Items => _Items ??= new(Engine);
-    IdentifierBuilder? _Items;
+    protected override IdentifierBuilder Items { get; }
 
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
     /// <param name="engine"></param>
-    public Identifier(IEngine engine) => Engine = engine.ThrowWhenNull();
+    public Identifier(IEngine engine) => Items = new(engine);
 
     /// <summary>
     /// Initializes a new instance with the given element.
@@ -74,7 +73,7 @@ public sealed partial class Identifier : FrozenList<K?, T>, IIdentifier
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public IEngine Engine { get; }
+    public IEngine Engine => Items.Engine;
 
     /// <inheritdoc/>
     public string? Value => Items.Value;

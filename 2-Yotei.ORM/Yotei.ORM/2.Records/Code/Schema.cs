@@ -8,15 +8,14 @@ namespace Yotei.ORM.Code;
 [Cloneable]
 public sealed partial class Schema : FrozenList<K, T>, ISchema
 {
-    protected override SchemaBuilder Items => _Items ??= new(Engine);
-    SchemaBuilder? _Items;
+    protected override SchemaBuilder Items { get; }
 
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
     /// <param name="engine"></param>
     [SuppressMessage("", "IDE0290")]
-    public Schema(IEngine engine) => Engine = engine.ThrowWhenNull();
+    public Schema(IEngine engine) => Items = new(engine);
 
     /// <summary>
     /// Initializes a new instance with the given element.
@@ -65,7 +64,7 @@ public sealed partial class Schema : FrozenList<K, T>, ISchema
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public IEngine Engine { get; }
+    public IEngine Engine => Items.Engine;
 
     /// <inheritdoc/>
     public List<int> Match(string? specs) => Items.Match(specs);
