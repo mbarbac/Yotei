@@ -1,4 +1,7 @@
-﻿namespace Yotei.ORM.Code;
+﻿using ParameterList = Yotei.ORM.Code.ParameterList;
+using Parameter = Yotei.ORM.Code.Parameter;
+
+namespace Yotei.ORM.Records.Code;
 
 // ========================================================
 /// <inheritdoc cref="ICommandInfo"/>
@@ -49,7 +52,7 @@ public sealed partial class CommandInfo : ICommandInfo
     /// <inheritdoc/>
     public override string ToString() => Parameters.Count == 0
         ? Text
-        : Text + $"; -- [{string.Join(", ", Parameters)}]";
+        : Text + $" -- [{string.Join(", ", Parameters)}]";
 
     // ----------------------------------------------------
 

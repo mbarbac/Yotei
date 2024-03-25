@@ -1,5 +1,7 @@
 ﻿#pragma warning disable IDE0290 // Use primary constructor
 
+using IRecordsGate = Yotei.ORM.Records.IRecordsGate;
+
 namespace Yotei.ORM.Code;
 
 // ========================================================
@@ -234,4 +236,9 @@ public abstract partial class Connection : DisposableClass, IConnection
     /// </summary>
     /// <returns></returns>
     protected abstract ITransaction CreateTransaction();
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public abstract IRecordsGate Records { get; }
 }

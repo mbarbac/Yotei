@@ -1,4 +1,7 @@
-﻿namespace Yotei.ORM.Code;
+﻿using IKnownTags = Yotei.ORM.Records.IKnownTags;
+using KnownTags = Yotei.ORM.Records.Code.KnownTags;
+
+namespace Yotei.ORM.Code;
 
 // ========================================================
 /// <inheritdoc cref="IEngine"/>
@@ -130,12 +133,12 @@ public partial class Engine : IEngine
     char _RightTerminator = RIGHTTERMINATOR;
 
     /// <inheritdoc/>
-    public Records.IKnownTags KnownTags
+    public IKnownTags KnownTags
     {
         get => _KnownTags;
         init => _KnownTags = value.ThrowWhenNull();
     }
-    Records.IKnownTags _KnownTags = new Records.Code.KnownTags(CASESENSITIVETAGS);
+    IKnownTags _KnownTags = new KnownTags(CASESENSITIVETAGS);
 
     // ----------------------------------------------------
 

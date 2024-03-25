@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM;
+﻿using IRecordsGate = Yotei.ORM.Records.IRecordsGate;
+
+namespace Yotei.ORM;
 
 // ========================================================
 /// <summary>
@@ -58,4 +60,11 @@ public partial interface IConnection : IBaseDisposable
     /// The default nestable transaction associated with this instance.
     /// </summary>
     ITransaction Transaction { get; }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Provides access to the records-oriented capabilities of this connection.
+    /// </summary>
+    IRecordsGate Records { get; }
 }

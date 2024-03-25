@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM;
+﻿using IKnownTags = Yotei.ORM.Records.IKnownTags;
+
+namespace Yotei.ORM;
 
 // ========================================================
 /// <summary>
@@ -51,7 +53,7 @@ public partial interface IEngine : IEquatable<IEngine>
     /// <summary>
     /// The collection of metadata tags that are well-known to this engine.
     /// </summary>
-    [WithGenerator] Records.IKnownTags KnownTags { get; }
+    [WithGenerator] IKnownTags KnownTags { get; }
 
     // ----------------------------------------------------
 
