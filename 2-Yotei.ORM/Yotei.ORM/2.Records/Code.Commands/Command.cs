@@ -3,8 +3,20 @@
 // ========================================================
 /// <inheritdoc cref="ICommand"/>
 [Cloneable]
-public abstract partial class Command(IConnection connection) : ICommand
+[WithGenerator]
+public abstract partial class Command : ICommand
 {
+    /// <summary>
+    /// Initializes a new instance.
+    /// </summary>
+    /// <param name="connection"></param>
+    public Command(IConnection connection)
+    {
+        Connection = connection.ThrowWhenNull();
+        Locale = new Locale();
+    }
+
+    /// <inheritdoc/>
     public override string ToString()
     {
         var info = GetCommandInfo(iterable: false);
@@ -15,7 +27,15 @@ public abstract partial class Command(IConnection connection) : ICommand
     }
 
     /// <inheritdoc/>
-    public IConnection Connection { get; } = connection.ThrowWhenNull();
+    public IConnection Connection { get; }
+
+    /// <inheritdoc/>
+    public Locale Locale
+    {
+        get => _Locale ??= new Locale();
+        set => _Locale = value.ThrowWhenNull();
+    }
+    Locale? _Locale;
 
     /// <inheritdoc/>
     public abstract ICommandInfo GetCommandInfo();

@@ -6,6 +6,7 @@
 /// produces an integer as the result of that execution.
 /// </summary>
 [Cloneable]
+[WithGenerator]
 public partial interface IExecutableCommand : ICommand
 {
     /// <summary>

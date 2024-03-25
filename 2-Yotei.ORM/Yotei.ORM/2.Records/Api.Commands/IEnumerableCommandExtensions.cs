@@ -158,4 +158,59 @@ public static class IEnumerableCommandExtensions
 
         return r;
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Executes the given action if an scalar can be obtained from the execution of the given
+    /// command, where the scalar is defined as the value of the first column of the first record
+    /// obtained, if any.
+    /// </summary>
+    /// <param name="command"></param>
+    /// <param name="action"></param>
+    public static void GetScalar(
+        this IEnumerableCommand command,
+        Action<object?> action)
+    {
+        command.ThrowWhenNull();
+        action.ThrowWhenNull();
+
+        var meta = command.First();
+        if (meta != null)
+        {
+            if (meta.Record.Count == 0) throw new NotFoundException(
+                "The first record is an empty one, no scalar can be obtained.");
+
+            var value = meta.Record[0];
+            action(value);
+        }
+    }
+
+    /// <summary>
+    /// Executes the given action if an scalar can be obtained from the execution of the given
+    /// command, where the scalar is defined as the value of the first column of the first record
+    /// obtained, if any.
+    /// </summary>
+    /// <param name="command"></param>
+    /// <param name="action"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    public static async ValueTask GetScalarAsync(
+        this IEnumerableCommand command,
+        Action<object?> action,
+        CancellationToken token = default)
+    {
+        command.ThrowWhenNull();
+        action.ThrowWhenNull();
+
+        var meta = await command.FirstAsync(token).ConfigureAwait(false);
+        if (meta != null)
+        {
+            if (meta.Record.Count == 0) throw new NotFoundException(
+                "The first record is an empty one, no scalar can be obtained.");
+
+            var value = meta.Record[0];
+            action(value);
+        }
+    }
 }

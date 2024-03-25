@@ -6,6 +6,7 @@
 /// enumerates the records produced by that execution, if any.
 /// </summary>
 [Cloneable]
+[WithGenerator]
 public partial interface IEnumerableCommand
     : ICommand
     , IEnumerable<IRecord?>, IAsyncEnumerable<IRecord?>

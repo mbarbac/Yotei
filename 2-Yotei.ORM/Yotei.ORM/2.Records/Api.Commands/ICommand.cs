@@ -13,6 +13,14 @@ public partial interface ICommand
     IConnection Connection { get; }
 
     /// <summary>
+    /// The locale used by this command with culture-sensitive elements in the database.
+    /// <br/> The default value of this property is obtained from the culture of the thread where
+    /// this instance was created.
+    /// </summary>
+    [WithGenerator]
+    Locale Locale { get; set; }
+
+    /// <summary>
     /// Gets the information needed to execute this command, using its default iterable mode.
     /// </summary>
     /// <returns></returns>
