@@ -1,7 +1,7 @@
-namespace Yotei.ORM.Records.Tests;
+using Pair = Yotei.ORM.Records.Code.MetadataEntry;
+using Tag = Yotei.ORM.Records.Code.MetadataTag;
 
-using Pair = MetadataEntry;
-using Tag = MetadataTag;
+namespace Yotei.ORM.Records.Tests;
 
 // ========================================================
 //[Enforced]
