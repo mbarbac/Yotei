@@ -43,6 +43,13 @@ public sealed partial class IdentifierChain : FrozenList<K?, T>, IIdentifierChai
     /// <param name="item"></param>
     public IdentifierChain(IEngine engine, string? value) : this(engine) => Items.Add(value);
 
+    /// <summary>
+    /// Initializes a new instance with the elements obtained from the given values.
+    /// </summary>
+    /// <param name="engine"></param>
+    /// <param name="values"></param>
+    public IdentifierChain(IEngine engine, IEnumerable<string?> values) : this(engine) => Items.AddRange(values);
+
     /// <inheritdoc/>
     public override string ToString() => Items.ToString();
 

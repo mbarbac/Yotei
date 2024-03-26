@@ -44,7 +44,7 @@ internal class XTypeNode(INode parent, INamedTypeSymbol symbol) : TypeNode(paren
     /// </summary>
     /// <param name="context"></param>
     /// <param name="cb"></param>
-    void EmitInterface(SourceProductionContext context, CodeBuilder cb)
+    void EmitInterface(SourceProductionContext _, CodeBuilder cb)
     {
         var modifiers = GetModifiers();
         var typeName = Symbol.EasyName(new EasyNameOptions(useGenerics: true));
@@ -58,12 +58,25 @@ internal class XTypeNode(INode parent, INamedTypeSymbol symbol) : TypeNode(paren
     /// </summary>
     /// <param name="context"></param>
     /// <param name="cb"></param>
-    void EmitAbstract(SourceProductionContext context, CodeBuilder cb)
+    void EmitAbstract(SourceProductionContext _, CodeBuilder cb)
     {
-        var typeName = Symbol.EasyName(new EasyNameOptions(useGenerics: true));
+        var done = false;
+        var parent = Symbol.BaseType;
+        if (parent != null)
+        {
+            var method = HasMethod(parent, recursive: true);
+            if (method != null)
+            {
+                if (method.IsAbstract) done = true;
+            }
+        }
+        if (!done)
+        {
+            var typeName = Symbol.EasyName(new EasyNameOptions(useGenerics: true));
 
-        EmitDocumentation(cb);
-        cb.AppendLine($"public abstract {typeName} Clone();");
+            EmitDocumentation(cb);
+            cb.AppendLine($"public abstract {typeName} Clone();");
+        }
         EmitInterfacesToImplement(cb);
     }
 
@@ -118,7 +131,7 @@ internal class XTypeNode(INode parent, INamedTypeSymbol symbol) : TypeNode(paren
 
             cb.AppendLine();
             cb.AppendLine(valueName);
-            cb.AppendLine($"{typeName}.Clone() => Clone();");
+            cb.AppendLine($"{typeName}.Clone() => ({typeName})Clone();");
         }
     }
 

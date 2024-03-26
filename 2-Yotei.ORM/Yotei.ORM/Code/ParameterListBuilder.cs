@@ -9,7 +9,7 @@ namespace Yotei.ORM.Code;
 /// </summary>
 [DebuggerDisplay("{ToDebugString(6)}")]
 [Cloneable]
-public sealed partial class ParameterListBuilder : CoreList<K?, T>
+public sealed partial class ParameterListBuilder : CoreList<K, T>
 {
     /// <summary>
     /// Initializes a new empty instance.

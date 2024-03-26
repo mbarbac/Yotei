@@ -81,8 +81,8 @@ public static class Test_MetadataTag
         tag.SetDefault("ONE");
         Assert.Equal("one", tag.DefaultName);
 
-        tag.SetDefault("TWO");
-        Assert.Equal("two", tag.DefaultName);
+        tag.SetDefault("THREE");
+        Assert.Equal("three", tag.DefaultName);
 
         try { tag.SetDefault("other"); Assert.Fail(); }
         catch (NotFoundException) { }

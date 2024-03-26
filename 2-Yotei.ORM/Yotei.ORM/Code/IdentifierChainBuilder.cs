@@ -51,8 +51,15 @@ public sealed partial class IdentifierChainBuilder : CoreList<K?, T>
     /// Initializes a new instance with the elements obtained from the given value.
     /// </summary>
     /// <param name="engine"></param>
-    /// <param name="item"></param>
+    /// <param name="value"></param>
     public IdentifierChainBuilder(IEngine engine, string? value) : this(engine) => Add(value);
+
+    /// <summary>
+    /// Initializes a new instance with the elements obtained from the given values.
+    /// </summary>
+    /// <param name="engine"></param>
+    /// <param name="values"></param>
+    public IdentifierChainBuilder(IEngine engine, IEnumerable<string?> values) : this(engine) => AddRange(values);
 
     /// <inheritdoc/>
     public override string ToString() => Value ?? string.Empty;

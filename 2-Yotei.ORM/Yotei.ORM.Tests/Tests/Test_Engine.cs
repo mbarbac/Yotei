@@ -24,6 +24,18 @@ public static class Test_Engine
 
     //[Enforced]
     [Fact]
+    public static void Test_Equals()
+    {
+        var source = new FakeEngine();
+        var target = new FakeEngine();
+        Assert.True(source.Equals(target));
+
+        target = target.WithUseTerminators(false);
+        Assert.False(source.Equals(target));
+    }
+
+    //[Enforced]
+    [Fact]
     public static void Test_With_Methods()
     {
         var source = new FakeEngine();
