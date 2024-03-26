@@ -21,4 +21,7 @@ public abstract partial class Connection : ORM.Code.Connection, IConnection
 
     /// <inheritdoc/>
     public new IEngine Engine => (IEngine)base.Engine;
+
+    /// <inheritdoc/>
+    public abstract IRecordMethods Records { get; }
 }

@@ -17,4 +17,6 @@ public partial class FakeConnection : Code.Connection, IConnection
     protected override ValueTask OnCloseAsync() { OnClose(); return ValueTask.CompletedTask; }
 
     protected override ITransaction CreateTransaction() => new FakeTransaction(this);
+
+    public override IRecordMethods Records => new FakeRecordMethods(this);
 }
