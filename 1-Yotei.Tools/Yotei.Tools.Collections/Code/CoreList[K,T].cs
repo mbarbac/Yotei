@@ -244,7 +244,6 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     }
 
     /// <inheritdoc/>
-    [SuppressMessage("", "IDE0305")]
     public T[] ToArray() => Items.ToArray();
 
     /// <inheritdoc/>

@@ -2,13 +2,13 @@
 
 // ========================================================
 /// <inheritdoc cref="IIdentifierPart"/>
-public class IdentifierPart : Identifier, IIdentifierPart
+public class IdentifierPart : IIdentifierPart
 {
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="engine"></param>
-    public IdentifierPart(IEngine engine) : base(engine) { }
+    public IdentifierPart(IEngine engine) => Engine = engine.ThrowWhenNull();
 
     /// <summary>
     /// Initializes a new instance with the given value.
@@ -51,15 +51,26 @@ public class IdentifierPart : Identifier, IIdentifierPart
 
     // ----------------------------------------------------
 
+    /// <inheritdoc/>
+    public virtual bool Equals(IIdentifier? other)
+    {
+        if (other is null) return false;
+        if (!Engine.Equals(other.Engine)) return false;
+
+        return string.Compare(Value, other.Value, !Engine.CaseSensitiveNames) == 0;
+    }
     public override bool Equals(object? obj) => Equals(obj as IIdentifier);
     public static bool operator ==(IdentifierPart x, IIdentifier y) => x is not null && x.Equals(y);
     public static bool operator !=(IdentifierPart x, IIdentifier y) => !(x == y);
-    public override int GetHashCode() => base.GetHashCode();
+    public override int GetHashCode() => HashCode.Combine(Value);
 
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public override string? Value { get; }
+    public IEngine Engine { get; }
+
+    /// <inheritdoc/>
+    public string? Value { get; }
 
     /// <inheritdoc/>
     public string? UnwrappedValue { get; }

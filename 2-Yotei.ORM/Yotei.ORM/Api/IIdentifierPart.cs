@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// Represents an arbitrary single part database identifier.
+/// Represents an arbitrary single-part database identifier.
 /// </summary>
 public interface IIdentifierPart : IIdentifier
 {
