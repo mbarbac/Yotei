@@ -142,7 +142,7 @@ public static class Test_IdentifierPart
 
     //[Enforced]
     [Fact]
-    public static void Test_Equality()
+    public static void Test_Equals()
     {
         var source = new IdentifierPart(new FakeEngine());
         var target = new IdentifierPart(new FakeEngine());

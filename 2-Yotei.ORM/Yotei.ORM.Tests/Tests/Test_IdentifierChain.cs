@@ -466,7 +466,7 @@ public static class Test_IdentifierChain
 
     //[Enforced]
     [Fact]
-    public static void Test_Equality()
+    public static void Test_Equals()
     {
         var source = new IdentifierChain(new FakeEngine());
         var target = new IdentifierChain(new FakeEngine());
