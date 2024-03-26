@@ -6,7 +6,9 @@
 	  <ImplicitUsings>disable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
 	  <Configurations>Debug;Release;Local</Configurations>
+	  <NoWarn>IDE0305</NoWarn>
    </PropertyGroup>
+   <!--IDE0305: Simplify collection initialization-->
 
    <PropertyGroup>
 	  <Description>Yotei Framework Collections</Description>

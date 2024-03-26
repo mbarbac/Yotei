@@ -37,6 +37,9 @@
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Collections.Tests\Yotei.Tools.Collections.Tests.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.CloneGenerator.Tests\Yotei.Tools.CloneGenerator.Tests.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.WithGenerator.Tests\Yotei.Tools.WithGenerator.Tests.csproj" />
+	  <ProjectReference Include="..\..\2-Yotei.ORM\Yotei.ORM.Tests\Yotei.ORM.Tests.csproj" />
+	  <ProjectReference Include="..\..\2-Yotei.ORM\Yotei.ORM.Records.Tests\Yotei.ORM.Records.Tests.csproj" />
+	  <ProjectReference Include="..\..\2-Yotei.ORM\Yotei.ORM.Entities.Tests\Yotei.ORM.Entities.Tests.csproj" />
    </ItemGroup>
 
 </Project>

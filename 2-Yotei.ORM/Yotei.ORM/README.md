@@ -1,2 +1,2 @@
-# Yotei Tools
-Yotei Framework
+# Yotei ORM
+Yotei ORM Framework
