@@ -10,5 +10,3 @@ namespace Yotei.ORM.Records.Tests;
 //    {
 //    }
 //}
-
-public interface IFake { }

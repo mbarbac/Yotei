@@ -6,7 +6,10 @@
 	  <ImplicitUsings>disable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
 	  <Configurations>Debug;Release;Local</Configurations>
+	  <NoWarn>IDE0290;IDE0305</NoWarn>
    </PropertyGroup>
+   <!--IDE0290: Use primary constructor-->
+   <!--IDE0305: Simplify collection initialization-->
 
    <PropertyGroup>
 	  <Description>Yotei ORM Entities</Description>
