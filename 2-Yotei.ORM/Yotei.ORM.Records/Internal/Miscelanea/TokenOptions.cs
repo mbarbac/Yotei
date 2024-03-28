@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Records.Internal;
+﻿using System.Diagnostics.Contracts;
+
+namespace Yotei.ORM.Records.Internal;
 
 // ========================================================
 /// <summary>
@@ -11,6 +13,28 @@ public record TokenOptions
     public const bool USETERMINATORS = true;
     public const bool CAPTUREVALUES = true;
     public const bool CONVERTVALUES = true;
+    public const string? SEPARATOR = null;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Gets an instance with the default options.
+    /// </summary>
+    public static TokenOptions Default() => new();
+
+    /// <summary>
+    /// Gets an instance with all options set to false or null.
+    /// <br/> Note that the locale is set to the culture from which this method is invoked.
+    /// </summary>
+    /// <returns></returns>
+    public static TokenOptions False() => new(
+        locale: null,
+        useNullString: false,
+        useQuotes: false,
+        useTerminators: false,
+        captureValues: false,
+        convertValues: false,
+        separator: null);
 
     // ----------------------------------------------------
 
@@ -23,13 +47,15 @@ public record TokenOptions
     /// <param name="useTerminators"></param>
     /// <param name="captureValues"></param>
     /// <param name="convertValues"></param>
+    /// <param name="separator"></param>
     public TokenOptions(
         Locale? locale = null,
         bool useNullString = USENULLSTRING,
         bool useQuotes = USEQUOTES,
         bool useTerminators = USETERMINATORS,
         bool captureValues = CAPTUREVALUES,
-        bool convertValues = CONVERTVALUES)
+        bool convertValues = CONVERTVALUES,
+        string? separator = SEPARATOR)
     {
         Locale = locale ?? new();
         UseNullString = useNullString;
@@ -37,6 +63,7 @@ public record TokenOptions
         UseTerminators = useTerminators;
         CaptureValues = captureValues;
         ConvertValues = convertValues;
+        Separator = separator;
     }
 
     /// <summary>
@@ -72,4 +99,9 @@ public record TokenOptions
     /// understood ones, or not.
     /// </summary>
     public bool ConvertValues { get; init; }
+
+    /// <summary>
+    /// The separator to use elements in a range, or null if it is not used.
+    /// </summary>
+    public string? Separator { get; init; }
 }

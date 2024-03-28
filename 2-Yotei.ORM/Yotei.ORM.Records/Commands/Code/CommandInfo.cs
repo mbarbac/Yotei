@@ -19,6 +19,17 @@ public sealed partial class CommandInfo : ICommandInfo
     }
 
     /// <summary>
+    /// Initializes a new instance with the given text and collection of parameters.
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="paameters"></param>
+    public CommandInfo(string? text, IParameterList paameters)
+    {
+        Text = text ?? string.Empty;
+        Parameters = paameters.ThrowWhenNull(); // Assuming it is an immutable one...
+    }
+
+    /// <summary>
     /// Initializes a new instance with the given text and optional arguments.
     /// <br/> If the text is null, then it is ignored.
     /// <br/> If the optional list of arguments is used, then their associated names or positions
@@ -175,7 +186,10 @@ public sealed partial class CommandInfo : ICommandInfo
 
                 if (value is IParameter par)
                 {
-                    Parameters = Parameters.Add(par);
+                    Parameters = Parameters.Contains(par.Name)
+                        ? Parameters.AddNew(par.Value, out par)
+                        : Parameters.Add(par);
+
                     used[index] = true;
                     text = ReplaceAll(text, terminated, par.Name);
                 }
