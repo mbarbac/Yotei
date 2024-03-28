@@ -2,9 +2,9 @@
 
 // ========================================================
 /// <summary>
-/// Represents the ability of translating values of a given source type to a given target one.
+/// Represents the ability of converting values of a given source type to a given target one.
 /// </summary>
-public interface IValueTranslator
+public interface IValueConverter
 {
     /// <summary>
     /// The source type of the values to convert.
@@ -17,27 +17,27 @@ public interface IValueTranslator
     Type TargetType { get; }
 
     /// <summary>
-    /// Translates the given source value to a target one, using the given locale if such is
+    /// Converts the given source value to a target one, using the given locale if such is
     /// needed.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="locale"></param>
     /// <returns></returns>
-    object? Translate(object? source, Locale locale);
+    object? Convert(object? source, Locale locale);
 }
 
 // ========================================================
-/// <inheritdoc cref="IValueTranslator"/>
+/// <inheritdoc cref="IValueConverter"/>
 /// <typeparam name="TSource"></typeparam>
 /// <typeparam name="TTarget"></typeparam>
-public interface IValueTranslator<TSource, TTarget> : IValueTranslator
+public interface IValueConverter<TSource, TTarget> : IValueConverter
 {
     /// <summary>
-    /// Translates the given source value to a target one, using the given locale if such is
+    /// Converts the given source value to a target one, using the given locale if such is
     /// needed.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="locale"></param>
     /// <returns></returns>
-    TTarget Translate(TSource source, Locale locale);
+    TTarget Convert(TSource source, Locale locale);
 }

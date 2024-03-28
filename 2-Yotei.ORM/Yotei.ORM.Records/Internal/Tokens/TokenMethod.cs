@@ -45,7 +45,7 @@ public sealed class TokenMethod : TokenHosted
         IEnumerable<Type> types,
         IEnumerable<Token> arguments) : base(host)
     {
-        Name = name.ValidateTokenName();
+        Name = ValidateTokenName(name);
         TypeArguments = GetTypeArguments(types);
         Arguments = new TokenChain(arguments);
     }

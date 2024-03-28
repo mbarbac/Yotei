@@ -34,7 +34,7 @@ public partial interface IConnection : IBaseDisposable
     /// The collection of value translators used by this instance to translate application-level
     /// values to the ones understood by the underlying database.
     /// </summary>
-    IValueTranslators ValueTranslators { get; }
+    IValueConverterList ValueConverters { get; }
 
     // ----------------------------------------------------
 

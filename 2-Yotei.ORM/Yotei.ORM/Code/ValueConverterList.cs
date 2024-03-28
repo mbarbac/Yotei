@@ -5,26 +5,26 @@ using Yotei.ORM.Code.Internal;
 namespace Yotei.ORM.Code;
 
 // ========================================================
-/// <inheritdoc cref="IValueTranslators"/>
+/// <inheritdoc cref="IValueConverterList"/>
 [Cloneable]
 [DebuggerDisplay("{ToDebugString(6)}")]
-public sealed partial class ValueTranslators : IValueTranslators
+public sealed partial class ValueConverterList : IValueConverterList
 {
-    readonly List<IValueTranslator> Items = [];
+    readonly List<IValueConverter> Items = [];
 
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    public ValueTranslators() { }
+    public ValueConverterList() { }
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    ValueTranslators(ValueTranslators source) => Items.AddRange(source.Items);
+    ValueConverterList(ValueConverterList source) => Items.AddRange(source.Items);
 
     /// <inheritdoc/>
-    public IEnumerator<IValueTranslator> GetEnumerator() => Items.GetEnumerator();
+    public IEnumerator<IValueConverter> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /// <inheritdoc/>
@@ -46,12 +46,7 @@ public sealed partial class ValueTranslators : IValueTranslators
     public int Count => Items.Count;
 
     /// <inheritdoc/>
-    public IEnumerable<Type> SourceTypes => Items.Select(x => x.SourceType);
-
-    // ----------------------------------------------------
-
-    /// <inheritdoc/>
-    public IValueTranslator? Find(Type type, bool inherit = false)
+    public IValueConverter? Find(Type type, bool inherit = false)
     {
         type.ThrowWhenNull();
 
@@ -70,7 +65,7 @@ public sealed partial class ValueTranslators : IValueTranslators
                     int parentDistance;
                     int ifaceDistance;
 
-                    List<(IValueTranslator, int, int)> temps = [];
+                    List<(IValueConverter, int, int)> temps = [];
                     for (int i = 0; i < list.Count; i++)
                     {
                         var temp = list[i];
@@ -103,56 +98,56 @@ public sealed partial class ValueTranslators : IValueTranslators
     }
 
     /// <inheritdoc/>
-    public IValueTranslator? Find<TSource>(bool inherit = false)
+    public IValueConverter? Find<TSource>(bool inherit = false)
     {
         return Find(typeof(TSource), inherit);
     }
 
     /// <inheritdoc/>
-    public void Add<TSource, TTarget>(IValueTranslator<TSource, TTarget> translator)
+    public void Add<TSource, TTarget>(IValueConverter<TSource, TTarget> func)
     {
-        translator.ThrowWhenNull();
+        func.ThrowWhenNull();
 
         lock (Items)
         {
-            var item = Items.Find(x => x.SourceType == translator.SourceType);
+            var item = Items.Find(x => x.SourceType == func.SourceType);
             if (item != null) throw new DuplicateException(
                 "The source type of the given translator is already registered into this collection.")
-                .WithData(translator);
+                .WithData(func);
 
-            Items.Add(translator);
+            Items.Add(func);
         }
     }
 
     /// <inheritdoc/>
-    public void Add<TSource, TTarget>(Func<TSource, Locale, TTarget> translator)
+    public void Add<TSource, TTarget>(Func<TSource, Locale, TTarget> func)
     {
-        var item = new ValueTranslator<TSource, TTarget>(translator);
+        var item = new ValueConverter<TSource, TTarget>(func);
         Add(item);
     }
 
     /// <inheritdoc/>
-    public void AddOrReplace<TSource, TTarget>(IValueTranslator<TSource, TTarget> translator)
+    public void AddOrReplace<TSource, TTarget>(IValueConverter<TSource, TTarget> func)
     {
-        translator.ThrowWhenNull();
+        func.ThrowWhenNull();
 
         lock (Items)
         {
-            var index = Items.FindIndex(x => x.SourceType == translator.SourceType);
-            if (index >= 0) Items[index] = translator;
-            else Items.Add(translator);
+            var index = Items.FindIndex(x => x.SourceType == func.SourceType);
+            if (index >= 0) Items[index] = func;
+            else Items.Add(func);
         }
     }
 
     /// <inheritdoc/>
-    public void AddOrReplace<TSource, TTarget>(Func<TSource, Locale, TTarget> translator)
+    public void AddOrReplace<TSource, TTarget>(Func<TSource, Locale, TTarget> func)
     {
-        var item = new ValueTranslator<TSource, TTarget>(translator);
+        var item = new ValueConverter<TSource, TTarget>(func);
         AddOrReplace(item);
     }
 
     /// <inheritdoc/>
-    public void AddRange(IEnumerable<IValueTranslator> range)
+    public void AddRange(IEnumerable<IValueConverter> range)
     {
         range.ThrowWhenNull();
 
@@ -199,20 +194,27 @@ public sealed partial class ValueTranslators : IValueTranslators
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public object? Translate(object? source, Locale locale, bool inherit = false)
+    public object? TryConvert(object? source, Locale locale, bool inherit = false)
     {
         if (source == null) return null;
 
         var type = source.GetType();
         var item = Find(type, inherit);
 
-        return item == null ? source : item.Translate(source, locale);
+        return item == null ? source : item.Convert(source, locale);
     }
 
     /// <inheritdoc/>
-    public object? Translate<TSource>(TSource source, Locale locale, bool inherit = false)
+    public object? TryConvert<TSource>(TSource source, Locale locale, bool inherit = false)
     {
         var item = Find<TSource>(inherit);
-        return item == null ? source : item.Translate(source, locale);
+        return item == null ? source : item.Convert(source, locale);
+    }
+
+    /// <inheritdoc/>
+    public TTarget TryConvert<TSource, TTarget>(TSource source, Locale locale, bool inherit = false)
+    {
+        var item = TryConvert<TSource>(source, locale, inherit);
+        return (TTarget)item!;
     }
 }

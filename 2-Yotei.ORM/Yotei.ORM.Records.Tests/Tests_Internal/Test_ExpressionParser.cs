@@ -4,7 +4,7 @@ namespace Yotei.ORM.Records.Tests;
 
 // ========================================================
 //[Enforced]
-public static class Test_TokenParser
+public static class Test_ExpressionParser
 {
     //[Enforced]
     [Fact]

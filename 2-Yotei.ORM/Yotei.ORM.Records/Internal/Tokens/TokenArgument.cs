@@ -12,7 +12,7 @@ public sealed class TokenArgument : Token
     /// Initializes a new instance.
     /// </summary>
     /// <param name="name"></param>
-    public TokenArgument(string name) => Name = name.ValidateTokenName();
+    public TokenArgument(string name) => Name = ValidateTokenName(name);
 
     /// <inheritdoc/>
     public override string ToString() => Name;

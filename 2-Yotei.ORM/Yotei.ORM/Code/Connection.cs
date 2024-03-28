@@ -25,7 +25,7 @@ public abstract partial class Connection : DisposableClass, IConnection
         Retries = source.Retries;
         RetryInterval = source.RetryInterval;
         Locale = source.Locale;
-        ValueTranslators.AddRange(source.ValueTranslators);
+        ValueConverters.AddRange(source.ValueConverters);
     }
 
     /// <inheritdoc/>
@@ -90,7 +90,7 @@ public abstract partial class Connection : DisposableClass, IConnection
     Locale _Locale = new();
 
     /// <inheritdoc/>
-    public IValueTranslators ValueTranslators { get; } = new ValueTranslators();
+    public IValueConverterList ValueConverters { get; } = new ValueConverterList();
 
     // ----------------------------------------------------
 
