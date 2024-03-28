@@ -3,6 +3,7 @@
 // ========================================================
 /// <inheritdoc cref="IFrozenList{T}"/>
 [Cloneable]
+[DebuggerDisplay("{ToDebugString(6)}")]
 public partial class FrozenList<T> : IFrozenList<T>
 {
     protected virtual ICoreList<T> Items { get; } = new CoreList<T>();
@@ -40,9 +41,9 @@ public partial class FrozenList<T> : IFrozenList<T>
     public string ToDebugString(int count)
     {
         if (Count == 0) return "0:[]";
-        if (count == 0) return ToString();
+        if (count == 0) return $"{Count}:[...]";
 
-        return Count < count
+        return Count <= count
             ? $"{Count}:[{string.Join(", ", this.Select(ItemToDebugString))}]"
             : $"{Count}:[{string.Join(", ", this.Take(count).Select(ItemToDebugString))}, ...]";
     }

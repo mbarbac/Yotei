@@ -40,9 +40,15 @@ public sealed partial class TokenChain : Token, IEnumerable<Token>
     /// <inheritdoc/>
     public override string ToString() => $"Count: {Count}";
 
-    string ToDebugString(int count) => Count <= count
-        ? $"({Count})[{string.Join(", ", Items)}]"
-        : $"({Count})[{string.Join(", ", Items.Take(count))}]...";
+    public string ToDebugString(int count)
+    {
+        if (Count == 0) return "0:[]";
+        if (count == 0) return $"{Count}:[...]";
+
+        return Count <= count
+            ? $"{Count}:[{string.Join(", ", Items)}]"
+            : $"{Count}:[{string.Join(", ", Items.Take(count))}, ...]";
+    }
 
     /// <summary>
     /// Returns a string representation of this instance using the given head, tail and separator

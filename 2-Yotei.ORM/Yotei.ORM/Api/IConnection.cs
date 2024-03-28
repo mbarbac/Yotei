@@ -23,6 +23,19 @@ public partial interface IConnection : IBaseDisposable
     /// </summary>
     TimeSpan RetryInterval { get; set; }
 
+    /// <summary>
+    /// The default locale to use with culture-sensitive elements in the underlying database.
+    /// <br/> The default value of this property is obtained from the thread from which it was
+    /// created, or from the instance from which this one was cloned.
+    /// </summary>
+    Locale Locale { get; set; }
+
+    /// <summary>
+    /// The collection of value translators used by this instance to translate application-level
+    /// values to the ones understood by the underlying database.
+    /// </summary>
+    IValueTranslators ValueTranslators { get; }
+
     // ----------------------------------------------------
 
     /// <summary>

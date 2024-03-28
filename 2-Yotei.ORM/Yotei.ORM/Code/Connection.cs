@@ -24,6 +24,8 @@ public abstract partial class Connection : DisposableClass, IConnection
     {
         Retries = source.Retries;
         RetryInterval = source.RetryInterval;
+        Locale = source.Locale;
+        ValueTranslators.AddRange(source.ValueTranslators);
     }
 
     /// <inheritdoc/>
@@ -78,6 +80,17 @@ public abstract partial class Connection : DisposableClass, IConnection
             : throw new ArgumentException($"Retry interval '{value}' must be cero or greater.");
     }
     TimeSpan _RetryInterval = TimeSpan.FromMilliseconds(RETRYINTERVAL);
+
+    /// <inheritdoc/>
+    public Locale Locale
+    {
+        get => _Locale;
+        set => _Locale = value.ThrowWhenNull();
+    }
+    Locale _Locale = new();
+
+    /// <inheritdoc/>
+    public IValueTranslators ValueTranslators { get; } = new ValueTranslators();
 
     // ----------------------------------------------------
 

@@ -85,14 +85,14 @@ public sealed partial class SchemaEntryBuilder : IEnumerable<T>
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /// <inheritdoc/>
-    public override string ToString() => ToDebugString(Count);
+    public override string ToString() => $"Count: {Count}";
 
     string ToDebugString(int count)
     {
         if (Count == 0) return "0:[]";
-        if (count == 0) return ToString();
+        if (count == 0) return $"{Count}:[...]";
 
-        return Count < count
+        return Count <= count
             ? $"{Count}:[{string.Join(", ", this.Select(x => x.ToString()))}]"
             : $"{Count}:[{string.Join(", ", this.Take(count).Select(x => x.ToString()))}, ...]";
     }

@@ -49,9 +49,9 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     public string ToDebugString(int count)
     {
         if (Count == 0) return "0:[]";
-        if (count == 0) return ToString();
+        if (count == 0) return $"{Count}:[...]";
 
-        return Count < count
+        return Count <= count
             ? $"{Count}:[{string.Join(", ", this.Select(ItemToDebugString))}]"
             : $"{Count}:[{string.Join(", ", this.Take(count).Select(ItemToDebugString))}, ...]";
     }

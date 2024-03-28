@@ -49,6 +49,9 @@ public class IdentifierPart : IIdentifierPart
             : UnwrappedValue;
     }
 
+    /// <inheritdoc/>
+    public override string ToString() => Value ?? string.Empty;
+
     // ----------------------------------------------------
 
     /// <inheritdoc/>

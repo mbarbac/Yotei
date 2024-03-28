@@ -28,6 +28,14 @@ public partial interface IRawCommand : ICommand, IEnumerableCommand, IExecutable
     IRawCommand Append(string? specs, params object?[] args);
 
     /// <summary>
+    /// Appends to this command the text and optional arguments obtained from parsing the given
+    /// dynamic lambda expression.
+    /// </summary>
+    /// <param name="spec"></param>
+    /// <returns></returns>
+    //IRawCommand Append(Func<dynamic, object> spec);
+
+    /// <summary>
     /// Clears this command.
     /// </summary>
     /// <returns></returns>

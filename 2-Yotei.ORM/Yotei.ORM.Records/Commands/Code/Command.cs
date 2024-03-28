@@ -13,7 +13,6 @@ public abstract partial class Command : ICommand
     public Command(IConnection connection)
     {
         Connection = connection.ThrowWhenNull();
-        Locale = new Locale();
     }
 
     /// <inheritdoc/>
@@ -30,12 +29,10 @@ public abstract partial class Command : ICommand
     public IConnection Connection { get; }
 
     /// <inheritdoc/>
-    public Locale Locale
-    {
-        get => _Locale ??= new Locale();
-        set => _Locale = value.ThrowWhenNull();
-    }
-    Locale? _Locale;
+    public Locale? Locale { get; set; }
+
+    /// <inheritdoc/>
+    public Locale GetLocale() => Locale ?? Connection.Locale;
 
     /// <inheritdoc/>
     public abstract ICommandInfo GetCommandInfo();

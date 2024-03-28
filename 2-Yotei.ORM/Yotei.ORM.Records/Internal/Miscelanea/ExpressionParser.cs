@@ -8,13 +8,13 @@ namespace Yotei.ORM.Records.Internal;
 /// Represents the ability of parsing dynamic lambda expressions and nodes and returning a token
 /// that represents their contents as database tokens.
 /// </summary>
-public class TokenParser
+public class ExpressionParser
 {
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
     /// <param name="engine"></param>
-    public TokenParser(IEngine engine) => Engine = engine.ThrowWhenNull();
+    public ExpressionParser(IEngine engine) => Engine = engine.ThrowWhenNull();
 
     /// <summary>
     /// The engine this instance is associated with.
@@ -90,6 +90,7 @@ public class TokenParser
     /// </summary>
     /// <param name="node"></param>
     /// <returns></returns>
+    [SuppressMessage("","CA1859")]
     TokenConvert ParseConvert(LambdaNodeConvert node)
     {
         var target = Parse(node.LambdaTarget);

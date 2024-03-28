@@ -8,10 +8,11 @@
 	  <IsPackable>false</IsPackable>
 	  <IsTestProject>true</IsTestProject>
 	  <Configurations>Debug;Release;Local</Configurations>
-	  <NoWarn>IDE0290;IDE0305;CA1859</NoWarn>
+	  <NoWarn>IDE0290;IDE0305;IDE0300;CA1859</NoWarn>
    </PropertyGroup>
    <!--IDE0290: Use primary constructor-->
    <!--IDE0305: Simplify collection initialization-->
+   <!--IDE0300: Simplify collection initialization-->
    <!--CA1859: Change type for improved performance-->
 
    <ItemGroup>
