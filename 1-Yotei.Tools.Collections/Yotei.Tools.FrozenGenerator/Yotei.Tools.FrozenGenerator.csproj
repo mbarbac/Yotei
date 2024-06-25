@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+   <PropertyGroup>
+	  <TargetFramework>netstandard2.0</TargetFramework>
+	  <LangVersion>latest</LangVersion>
+	  <ImplicitUsings>disable</ImplicitUsings>
+	  <Nullable>enable</Nullable>
+	  <Configurations>Debug;Release;Local</Configurations>
+	  <NoWarn>IDE0290;IDE0305</NoWarn>
+   </PropertyGroup>
+   <!--IDE0290: Use primary constructor-->
+   <!--IDE0305: Simplify collection initialization-->
+
+   <PropertyGroup>
+	  <Description>Yotei Framework Frozen Generator</Description>
+	  <Version>0.5.22-v0001</Version>
+	  <Authors>mbarbac@hotmail.com</Authors>
+	  <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
+	  <IsPackable>true</IsPackable>
+	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	  <IncludeSymbols>true</IncludeSymbols>
+	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	  <PackageReadmeFile>README.md</PackageReadmeFile>
+	  <PackageLicenseFile>LICENSE</PackageLicenseFile>
+   </PropertyGroup>
+
+   <ItemGroup>
+	  <None Include="README.md" Pack="true" PackagePath="" />
+	  <None Include="LICENSE" Pack="true" PackagePath="" />
+   </ItemGroup>
+
+   <ItemGroup>
+	  <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.8.0" PrivateAssets="all" />
+   </ItemGroup>
+   <Import Project="..\..\1-Yotei.Tools.Generators\Yotei.Tools.Generators\Yotei.Tools.Generators.projitems" Label="Shared" />
+
+   <PropertyGroup>
+	  <!--<DefineConstants>$(DefineConstants);DEBUG_FROZEN_GENERATOR</DefineConstants>-->
+	  <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+   </PropertyGroup>
+
+   <ItemGroup>
+	  <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+   </ItemGroup>
+   
+</Project>

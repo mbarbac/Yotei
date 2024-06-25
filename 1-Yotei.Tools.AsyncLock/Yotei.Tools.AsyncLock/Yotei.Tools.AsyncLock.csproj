@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+   <PropertyGroup>
+	  <TargetFramework>net8.0</TargetFramework>
+	  <LangVersion>latest</LangVersion>
+	  <ImplicitUsings>disable</ImplicitUsings>
+	  <Nullable>enable</Nullable>
+	  <Configurations>Debug;Release;Local</Configurations>
+	  <NoWarn>IDE0290</NoWarn>
+   </PropertyGroup>
+   <!--IDE0290: Use primary constructor-->
+
+   <PropertyGroup>
+	  <Description>Yotei Framework Async Lock</Description>
+	  <Version>0.5.32-v0001</Version>
+	  <Authors>mbarbac@hotmail.com</Authors>
+	  <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
+	  <IsPackable>true</IsPackable>
+	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	  <IncludeSymbols>true</IncludeSymbols>
+	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	  <PackageReadmeFile>README.md</PackageReadmeFile>
+	  <PackageLicenseFile>LICENSE</PackageLicenseFile>
+   </PropertyGroup>
+
+   <ItemGroup>
+	  <None Include="README.md" Pack="true" PackagePath="" />
+	  <None Include="LICENSE" Pack="true" PackagePath="" />
+   </ItemGroup>
+
+   <PropertyGroup>
+	  <!--<DefineConstants>$(DefineConstants);DEBUG_ASYNC_LOCK</DefineConstants>-->
+   </PropertyGroup>
+
+   <!-- DEBUG configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Debug'">
+	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
+   </ItemGroup>
+
+   <!-- LOCAL configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Local'">
+	  <PackageReference Include="Yotei.Tools" Version="0.5.32-v0001" />
+   </ItemGroup>
+
+   <!-- RELEASE configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Release'">
+	  <PackageReference Include="Yotei.Tools" Version="0.5.32" />
+   </ItemGroup>
+   
+</Project>
