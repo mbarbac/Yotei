@@ -8,7 +8,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		LICENSE = LICENSE
 		README.md = README.md
-		TODO.txt = TODO.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0-Development", "0-Development", "{41E47AF2-1CA9-4664-A60A-8B5DFED49827}"
@@ -51,11 +50,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yotei.Tools.CloneGenerator.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1-Yotei.Tools.Collections", "1-Yotei.Tools.Collections", "{FA9019F8-5916-4FBD-97EA-16DC4D78F322}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yotei.Tools.Collections", "1-Yotei.Tools.Collections\Yotei.Tools.Collections\Yotei.Tools.Collections.csproj", "{09AAF10A-E5D3-4497-B577-F1286601656B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yotei.Tools.Collections", "1-Yotei.Tools.Collections\Yotei.Tools.Collections\Yotei.Tools.Collections.csproj", "{09AAF10A-E5D3-4497-B577-F1286601656B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yotei.Tools.Collections.Tests", "1-Yotei.Tools.Collections\Yotei.Tools.Collections.Tests\Yotei.Tools.Collections.Tests.csproj", "{3534AE40-F401-43F6-8734-17E579B77116}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yotei.Tools.Collections.Tests", "1-Yotei.Tools.Collections\Yotei.Tools.Collections.Tests\Yotei.Tools.Collections.Tests.csproj", "{3534AE40-F401-43F6-8734-17E579B77116}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yotei.Tools.FrozenGenerator", "1-Yotei.Tools.Collections\Yotei.Tools.FrozenGenerator\Yotei.Tools.FrozenGenerator.csproj", "{0C047AED-2614-4409-A300-54E3D6F8A2DF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yotei.Tools.FrozenGenerator", "1-Yotei.Tools.Collections\Yotei.Tools.FrozenGenerator\Yotei.Tools.FrozenGenerator.csproj", "{0C047AED-2614-4409-A300-54E3D6F8A2DF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
