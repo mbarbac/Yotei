@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+   <PropertyGroup>
+	  <TargetFramework>net8.0</TargetFramework>
+	  <LangVersion>latest</LangVersion>
+	  <ImplicitUsings>disable</ImplicitUsings>
+	  <Nullable>enable</Nullable>
+	  <IsPackable>false</IsPackable>
+	  <IsTestProject>true</IsTestProject>
+	  <Configurations>Debug;Release;Local</Configurations>
+	  <NoWarn>IDE0290;CA1859</NoWarn>
+   </PropertyGroup>
+   <!--IDE0290: Use primary constructor-->
+   <!--CA1859: Change type for improved performance-->
+
+   <ItemGroup>
+	  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+	  <PackageReference Include="xunit" Version="2.6.6" />
+	  <PackageReference Include="xunit.runner.visualstudio" Version="2.5.6">
+		 <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		 <PrivateAssets>all</PrivateAssets>
+	  </PackageReference>
+	  <PackageReference Include="coverlet.collector" Version="6.0.0">
+		 <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		 <PrivateAssets>all</PrivateAssets>
+	  </PackageReference>
+   </ItemGroup>
+
+   <!-- DEBUG configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Debug'">
+     <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
+     <ProjectReference Include="..\Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser.csproj" />
+   </ItemGroup>
+
+<!-- LOCAL configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Local'">
+	  <PackageReference Include="Yotei.Tools" Version="0.5.32-v0001" />
+	  <PackageReference Include="Yotei.Tools.LambdaParser" Version="0.5.32-v0001" />
+   </ItemGroup>
+
+   <!-- RELEASE configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Release'">
+	  <PackageReference Include="Yotei.Tools" Version="0.5.31" />
+	  <PackageReference Include="Yotei.Tools.LambdaParser" Version="0.5.32" />
+   </ItemGroup>
+
+</Project>
