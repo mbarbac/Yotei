@@ -21,63 +21,73 @@ public static class EasyNameExtensions
         item.ThrowWhenNull();
         options.ThrowWhenNull();
 
-        var tpargs = item.GetGenericArguments();
+        var tpargs = item.GetGenericArguments().AsSpan();
         var tpused = 0;
         return item.EasyName(options, tpargs, ref tpused);
     }
-    static string EasyName(this Type item, EasyTypeOptions options, Type[] tpargs, ref int tpused)
+    static string EasyName(this Type item, EasyTypeOptions options, Span<Type> tpargs, ref int tpused)
     {
         item.ThrowWhenNull();
         options.ThrowWhenNull();
 
         var sb = new StringBuilder();
-        var isgen = item.FullName == null; // || item.IsGenericTypeParameter || item.IsGenericMethodParameter
+        var isgen = item.FullName == null;
+        var ns = item.Namespace;
+        var host = item.DeclaringType;
 
-        // Namespace requested...
-        if (!isgen && options.UseNamespace)
+        // Namespace...
+        if (ns != null && ns.Length > 0 && host == null)
         {
-            var s = item.Namespace;
-            if (s != null && s.Length > 0) sb.Append($"{s}.");
+            // Namespace requested...
+            if (!isgen && options.UseNamespace) sb.Append($"{ns}.");
         }
 
-        // Declaring host requested...
-        var host = item.DeclaringType;
-        if (!isgen && host != null && options.UseHostType)
+        // Host type...
+        if (!isgen && host != null)
         {
-            var xoptions = options with { UseNamespace = false };
-
-            var s = host.EasyName(xoptions, tpargs, ref tpused);
-            if (s != null && s.Length > 0) sb.Append($"{s}.");
+            // Consuming type arguments as needed...
+            var s = host.EasyName(options, tpargs, ref tpused);            
+            if (s.Length > 0 && !isgen)
+            {
+                // Declaring host requested...
+                if (options.UseTypeHost || options.UseNamespace) sb.Append($"{s}.");
+            }
         }
 
         // Type name...
         var name = item.Name;
-        if (!options.UseTypeName) name = string.Empty;
-
         var index = name.IndexOf('`');
         if (index >= 0) name = name.Remove(index, name.Length - index);
-        sb.Append(name);
+
+        if (options.UseTypeName) sb.Append(name);
 
         // Type arguments...
-        if (tpargs.Length > 0)
+        tpargs = tpargs[tpused..]; if (tpargs.Length > 0)
         {
-            var hargs = host == null ? [] : host.GetGenericArguments();
-            var args = item.GetGenericArguments().AsSpan(0, hargs.Length);
-            if (args.Length > 0)
+            var hold = host == null ? [] : host.GetGenericArguments();
+            var args = item.GetGenericArguments();
+            var num = args.Length - hold.Length;
+            if (num > 0)
             {
-                var temps = tpargs.AsSpan(tpused, args.Length);
-                if (temps.Length > 0)
+                tpused += num;
+
+                if (options.UseArguments || options.UseArgumentNames ||
+                    options.UseArgumentsHosts || options.UseArgumentsNamespaces)
                 {
-                    var xoptions = options with // Order of assignation matters!
+                    if (!options.UseTypeName && !isgen) sb.Append(name);
+
+                    var xoptions = options with // Order matters!
                     {
-                        UseNamespace = isgen && options.UseTypeArgumentNamespaces,
-                        UseHostType = isgen && options.UseTypeArgumentHostTypes,
-                        UseTypeName = options.UseTypeName
+                        UseNamespace = options.UseArgumentsNamespaces,
+                        UseTypeHost = options.UseArgumentsHosts,
+                        UseTypeName = options.UseArgumentNames,
                     };
 
-                    sb.Append('<'); for (int i = 0; i < temps.Length; i++)
+                    tpargs = tpargs[..num];
+                    sb.Append('<');
+                    for (int i = 0; i < num; i++)
                     {
-                        var temp = temps[i];
+                        var temp = tpargs[i];
                         var s = temp.EasyName(xoptions);
 
                         if (i > 0) sb.Append(s.Length > 0 ? ", " : ",");
@@ -86,9 +96,6 @@ public static class EasyNameExtensions
                     sb.Append('>');
                 }
             }
-
-            // Consuming this level type arguments...
-            tpused += args.Length;
         }
 
         // Finishing...
