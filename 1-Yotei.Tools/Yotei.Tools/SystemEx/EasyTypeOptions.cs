@@ -2,26 +2,27 @@
 
 // ========================================================
 /// <summary>
-/// Provides options for the <see cref="EasyNameExtensions"/> methods.
+/// Provides options for the <see cref="EasyTypeExtensions"/> methods.
 /// </summary>
 public record EasyTypeOptions
 {
     /// <summary>
-    /// Use the namespace of the given type, or <c>false</c> to ignore it.
-    /// <br/> This option implies <see cref="UseTypeHost"/>
+    /// Use the namespace of the type, or <c>false</c> to ignore it.
+    /// <br/> This option implies <see cref="UseHost"/>
     /// </summary>
     public bool UseNamespace { get; init; }
 
     /// <summary>
-    /// Use the declaring type of the given one, or <c>false</c> to ignore it.
+    /// Use the declaring type, or <c>false</c> to ignore it.
     /// </summary>
-    public bool UseTypeHost { get; init; }
+    public bool UseHost { get; init; }
 
     /// <summary>
-    /// Use the type short name, or <c>false</c> to leave it blank.
+    /// Use the type short name, or <c>false</c> to leave it blank. The later is useful when the
+    /// type is an unbounded generic one, and the desired result is not to use its slot.
     /// <br/> The default value of this property is <c>true</c>.
     /// </summary>
-    public bool UseTypeName { get; init; } = true; // As an exception
+    public bool UseName { get; init; } = true; // By default
 
     /// <summary>
     /// Use the type's generic arguments, or <c>false</c> to ignore them.
@@ -30,7 +31,7 @@ public record EasyTypeOptions
 
     /// <summary>
     /// Use the namespaces of the type's generic arguments, or <c>false</c> to ignore them.
-    /// <br/> This option implies <see cref="UseArguments"/>
+    /// <br/> This option implies <see cref="UseArguments"/> and <see cref="UseArgumentsHosts"/>.
     /// </summary>
     public bool UseArgumentsNamespaces { get; init; }
 
@@ -49,6 +50,11 @@ public record EasyTypeOptions
     // ----------------------------------------------------
 
     /// <summary>
+    /// Initializes a new default instance.
+    /// </summary>
+    public EasyTypeOptions() { }
+
+    /// <summary>
     /// A common shared default instance.
     /// </summary>
     public static EasyTypeOptions Default { get; } = new();
@@ -59,8 +65,8 @@ public record EasyTypeOptions
     public static EasyTypeOptions True { get; } = new EasyTypeOptions() with
     {
         UseNamespace = true,
-        UseTypeHost = true,
-        UseTypeName = true,
+        UseHost = true,
+        UseName = true,
         UseArguments = true,
         UseArgumentsNamespaces = true,
         UseArgumentsHosts = true,
@@ -68,7 +74,16 @@ public record EasyTypeOptions
     };
 
     /// <summary>
-    /// Initializes a new default instance.
+    /// A common shared instance with all options set except namespaces.
     /// </summary>
-    public EasyTypeOptions() { }
+    public static EasyTypeOptions TrueNoNamespaces { get; } = new EasyTypeOptions() with
+    {
+        UseNamespace = false,
+        UseHost = true,
+        UseName = true,
+        UseArguments = true,
+        UseArgumentsNamespaces = false,
+        UseArgumentsHosts = true,
+        UseArgumentNames = true,
+    };
 }

@@ -1,7 +1,7 @@
 ﻿namespace Yotei.Tools;
 
 // ========================================================
-public static class EasyNameExtensions
+public static class EasyTypeExtensions
 {
     /// <summary>
     /// Returns the C#-alike name of the given type, using the default settings.
@@ -11,7 +11,7 @@ public static class EasyNameExtensions
     public static string EasyName(this Type type) => type.EasyName(EasyTypeOptions.Default);
 
     /// <summary>
-    /// Returns the C#-alike name of the given type, using the given arguments.
+    /// Returns the C#-alike name of the given type, using the given settings.
     /// </summary>
     /// <param name="item"></param>
     /// <param name="options"></param>
@@ -20,6 +20,10 @@ public static class EasyNameExtensions
     {
         item.ThrowWhenNull();
         options.ThrowWhenNull();
+
+        // If we use 'GetGenericArguments' with a declaring host, it doesn't retain information
+        // about the concrete type arguments used, but only the generic declaring ones. So we need
+        // to grab this information now!
 
         var tpargs = item.GetGenericArguments().AsSpan();
         var tpused = 0;
@@ -50,7 +54,7 @@ public static class EasyNameExtensions
             if (s.Length > 0 && !isgen)
             {
                 // Declaring host requested...
-                if (options.UseTypeHost || options.UseNamespace) sb.Append($"{s}.");
+                if (options.UseHost || options.UseNamespace) sb.Append($"{s}.");
             }
         }
 
@@ -59,7 +63,7 @@ public static class EasyNameExtensions
         var index = name.IndexOf('`');
         if (index >= 0) name = name.Remove(index, name.Length - index);
 
-        if (options.UseTypeName) sb.Append(name);
+        if (options.UseName) sb.Append(name);
 
         // Type arguments...
         tpargs = tpargs[tpused..]; if (tpargs.Length > 0)
@@ -74,13 +78,13 @@ public static class EasyNameExtensions
                 if (options.UseArguments || options.UseArgumentNames ||
                     options.UseArgumentsHosts || options.UseArgumentsNamespaces)
                 {
-                    if (!options.UseTypeName && !isgen) sb.Append(name);
+                    if (!options.UseName && !isgen) sb.Append(name);
 
                     var xoptions = options with // Order matters!
                     {
                         UseNamespace = options.UseArgumentsNamespaces,
-                        UseTypeHost = options.UseArgumentsHosts,
-                        UseTypeName = options.UseArgumentNames,
+                        UseHost = options.UseArgumentsHosts,
+                        UseName = options.UseArgumentNames,
                     };
 
                     tpargs = tpargs[..num];
