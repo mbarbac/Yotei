@@ -63,7 +63,7 @@ public record EasyMemberOptions
     /// <summary>
     /// A common shared instance with all options set.
     /// </summary>
-    public static EasyMemberOptions True { get; } = new EasyMemberOptions() with
+    public static EasyMemberOptions True { get; } = new EasyMemberOptions
     {
         UseReturnType = EasyTypeOptions.True,
         UseHostType = EasyTypeOptions.True,
@@ -77,14 +77,14 @@ public record EasyMemberOptions
     /// <summary>
     /// A common shared instance with all options set except namespaces.
     /// </summary>
-    public static EasyMemberOptions TrueNoNamespaces { get; } = new EasyMemberOptions() with
+    public static EasyMemberOptions NoNamespaces { get; } = new EasyMemberOptions
     {
-        UseReturnType = EasyTypeOptions.TrueNoNamespaces,
-        UseHostType = EasyTypeOptions.TrueNoNamespaces,
+        UseReturnType = EasyTypeOptions.NoNamespaces,
+        UseHostType = EasyTypeOptions.NoNamespaces,
         UseName = true,
-        UseGenericArguments = EasyTypeOptions.TrueNoNamespaces,
+        UseGenericArguments = EasyTypeOptions.NoNamespaces,
         UseArguments = true,
-        UseArgumentsTypes = EasyTypeOptions.TrueNoNamespaces,
+        UseArgumentsTypes = EasyTypeOptions.NoNamespaces,
         UseArgumentsNames = true,
     };
 }

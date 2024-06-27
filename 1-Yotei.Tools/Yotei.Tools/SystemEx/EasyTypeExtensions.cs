@@ -75,7 +75,7 @@ public static class EasyTypeExtensions
             {
                 tpused += num;
 
-                if (options.UseArguments || options.UseArgumentNames ||
+                if (options.UseArguments || options.UseArgumentsNames ||
                     options.UseArgumentsHosts || options.UseArgumentsNamespaces)
                 {
                     if (!options.UseName && !isgen) sb.Append(name);
@@ -84,7 +84,7 @@ public static class EasyTypeExtensions
                     {
                         UseNamespace = options.UseArgumentsNamespaces,
                         UseHost = options.UseArgumentsHosts,
-                        UseName = options.UseArgumentNames,
+                        UseName = options.UseArgumentsNames,
                     };
 
                     tpargs = tpargs[..num];

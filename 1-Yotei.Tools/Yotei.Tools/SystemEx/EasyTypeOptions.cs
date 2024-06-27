@@ -45,7 +45,7 @@ public record EasyTypeOptions
     /// Use the type names of the type's generic arguments, or <c>false</c> to ignore them.
     /// <br/> This option implies <see cref="UseArguments"/>
     /// </summary>
-    public bool UseArgumentNames { get; init; }
+    public bool UseArgumentsNames { get; init; }
 
     // ----------------------------------------------------
 
@@ -62,7 +62,7 @@ public record EasyTypeOptions
     /// <summary>
     /// A common shared instance with all options set.
     /// </summary>
-    public static EasyTypeOptions True { get; } = new EasyTypeOptions() with
+    public static EasyTypeOptions True { get; } = new EasyTypeOptions
     {
         UseNamespace = true,
         UseHost = true,
@@ -70,13 +70,13 @@ public record EasyTypeOptions
         UseArguments = true,
         UseArgumentsNamespaces = true,
         UseArgumentsHosts = true,
-        UseArgumentNames = true,
+        UseArgumentsNames = true,
     };
 
     /// <summary>
     /// A common shared instance with all options set except namespaces.
     /// </summary>
-    public static EasyTypeOptions TrueNoNamespaces { get; } = new EasyTypeOptions() with
+    public static EasyTypeOptions NoNamespaces { get; } = new EasyTypeOptions
     {
         UseNamespace = false,
         UseHost = true,
@@ -84,6 +84,6 @@ public record EasyTypeOptions
         UseArguments = true,
         UseArgumentsNamespaces = false,
         UseArgumentsHosts = true,
-        UseArgumentNames = true,
+        UseArgumentsNames = true,
     };
 }

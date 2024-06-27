@@ -45,7 +45,7 @@ public static class Test_EasyMemberNames
         options = new EasyMemberOptions { UseArgumentsTypes = EasyTypeOptions.Default };
         name = item.EasyName(options); Assert.Equal("MTKS(K, S)", name);
 
-        options = EasyMemberOptions.TrueNoNamespaces;
+        options = EasyMemberOptions.NoNamespaces;
         name = item.EasyName(options); Assert.Equal($"T {CLASSNAME}.TA<T, K>.MTKS<S>(K one, S two)", name);
     }
 
@@ -79,7 +79,7 @@ public static class Test_EasyMemberNames
         options = new EasyMemberOptions { UseArgumentsTypes = EasyTypeOptions.Default };
         name = item.EasyName(options); Assert.Equal("MTKS(Int32, Int64)", name);
 
-        options = EasyMemberOptions.TrueNoNamespaces;
+        options = EasyMemberOptions.NoNamespaces;
         name = item.EasyName(options); Assert.Equal($"Byte {CLASSNAME}.TA<Byte, Int32>.MTKS<Int64>(Int32 one, Int64 two)", name);
     }
 
@@ -104,13 +104,13 @@ public static class Test_EasyMemberNames
         options = options with { UseArguments = true };
         name = item.EasyName(options); Assert.Equal("()", name);
 
-        options = new EasyMemberOptions { UseHostType = new EasyTypeOptions { UseArgumentNames = true } };
+        options = new EasyMemberOptions { UseHostType = new EasyTypeOptions { UseArgumentsNames = true } };
         name = item.EasyName(options); Assert.Equal("TB<T>..ctor", name);
 
         options = options with { UseArguments = true };
         name = item.EasyName(options); Assert.Equal("TB<T>..ctor()", name);
 
-        options = EasyMemberOptions.TrueNoNamespaces;
+        options = EasyMemberOptions.NoNamespaces;
         name = item.EasyName(options); Assert.Equal($"{CLASSNAME}.TB<T> {CLASSNAME}.TB<T>..ctor()", name);
     }
 
@@ -131,13 +131,13 @@ public static class Test_EasyMemberNames
         options = options with { UseArguments = true };
         name = item.EasyName(options); Assert.Equal("()", name);
 
-        options = new EasyMemberOptions { UseHostType = new EasyTypeOptions { UseArgumentNames = true } };
+        options = new EasyMemberOptions { UseHostType = new EasyTypeOptions { UseArgumentsNames = true } };
         name = item.EasyName(options); Assert.Equal("TB<Byte>..ctor", name);
 
         options = options with { UseArguments = true };
         name = item.EasyName(options); Assert.Equal("TB<Byte>..ctor()", name);
 
-        options = EasyMemberOptions.TrueNoNamespaces;
+        options = EasyMemberOptions.NoNamespaces;
         name = item.EasyName(options); Assert.Equal($"{CLASSNAME}.TB<Byte> {CLASSNAME}.TB<Byte>..ctor()", name);
     }
 
@@ -168,10 +168,10 @@ public static class Test_EasyMemberNames
         options = new EasyMemberOptions { UseArgumentsTypes = EasyTypeOptions.Default };
         name = item.EasyName(options); Assert.Equal(".ctor(T, K)", name);
 
-        options = new EasyMemberOptions { UseHostType = new EasyTypeOptions { UseArgumentNames = true } };
+        options = new EasyMemberOptions { UseHostType = new EasyTypeOptions { UseArgumentsNames = true } };
         name = item.EasyName(options); Assert.Equal("TC<T, K>..ctor", name);
 
-        options = EasyMemberOptions.TrueNoNamespaces;
+        options = EasyMemberOptions.NoNamespaces;
         name = item.EasyName(options); Assert.Equal($"{CLASSNAME}.TC<T, K> {CLASSNAME}.TC<T, K>..ctor(T one, K two)", name);
     }
 
@@ -198,10 +198,10 @@ public static class Test_EasyMemberNames
         options = new EasyMemberOptions { UseArgumentsTypes = EasyTypeOptions.Default };
         name = item.EasyName(options); Assert.Equal(".ctor(Byte, Int32)", name);
 
-        options = new EasyMemberOptions { UseHostType = new EasyTypeOptions { UseArgumentNames = true } };
+        options = new EasyMemberOptions { UseHostType = new EasyTypeOptions { UseArgumentsNames = true } };
         name = item.EasyName(options); Assert.Equal("TC<Byte, Int32>..ctor", name);
 
-        options = EasyMemberOptions.TrueNoNamespaces;
+        options = EasyMemberOptions.NoNamespaces;
         name = item.EasyName(options); Assert.Equal($"{CLASSNAME}.TC<Byte, Int32> {CLASSNAME}.TC<Byte, Int32>..ctor(Byte one, Int32 two)", name);
     }
 
@@ -239,7 +239,7 @@ public static class Test_EasyMemberNames
         options = new EasyMemberOptions { UseArgumentsNames = true, UseArgumentsTypes = EasyTypeOptions.Default };
         name = item.EasyName(options); Assert.Equal("this[K one]", name);
 
-        options = EasyMemberOptions.TrueNoNamespaces;
+        options = EasyMemberOptions.NoNamespaces;
         name = item.EasyName(options); Assert.Equal($"T {CLASSNAME}.TD<T, K>.this[K one]", name);
     }
 
@@ -269,7 +269,7 @@ public static class Test_EasyMemberNames
         options = new EasyMemberOptions { UseArgumentsNames = true, UseArgumentsTypes = EasyTypeOptions.Default };
         name = item.EasyName(options); Assert.Equal("this[Int32 one]", name);
 
-        options = EasyMemberOptions.TrueNoNamespaces;
+        options = EasyMemberOptions.NoNamespaces;
         name = item.EasyName(options); Assert.Equal($"Byte {CLASSNAME}.TD<Byte, Int32>.this[Int32 one]", name);
     }
 
@@ -298,7 +298,7 @@ public static class Test_EasyMemberNames
         options = new EasyMemberOptions { UseArgumentsTypes = EasyTypeOptions.Default };
         name = item.EasyName(options); Assert.Equal("PT", name);
 
-        options = EasyMemberOptions.TrueNoNamespaces;
+        options = EasyMemberOptions.NoNamespaces;
         name = item.EasyName(options); Assert.Equal($"T {CLASSNAME}.TD<T, K>.PT", name);
     }
 
@@ -325,7 +325,7 @@ public static class Test_EasyMemberNames
         options = new EasyMemberOptions { UseArgumentsTypes = EasyTypeOptions.Default };
         name = item.EasyName(options); Assert.Equal("PT", name);
 
-        options = EasyMemberOptions.TrueNoNamespaces;
+        options = EasyMemberOptions.NoNamespaces;
         name = item.EasyName(options); Assert.Equal($"Byte {CLASSNAME}.TD<Byte, Int32>.PT", name);
     }
 
@@ -363,7 +363,7 @@ public static class Test_EasyMemberNames
         options = new EasyMemberOptions { UseArgumentsNames = true, UseArgumentsTypes = EasyTypeOptions.Default };
         name = item.EasyName(options); Assert.Equal("this[K one]", name);
 
-        options = EasyMemberOptions.TrueNoNamespaces;
+        options = EasyMemberOptions.NoNamespaces;
         name = item.EasyName(options); Assert.Equal($"T {CLASSNAME}.TE<T, K>.this[K one]", name);
     }
 
@@ -393,7 +393,7 @@ public static class Test_EasyMemberNames
         options = new EasyMemberOptions { UseArgumentsNames = true, UseArgumentsTypes = EasyTypeOptions.Default };
         name = item.EasyName(options); Assert.Equal("this[Int32 one]", name);
 
-        options = EasyMemberOptions.TrueNoNamespaces;
+        options = EasyMemberOptions.NoNamespaces;
         name = item.EasyName(options); Assert.Equal($"Byte {CLASSNAME}.TE<Byte, Int32>.this[Int32 one]", name);
     }
 
@@ -421,7 +421,7 @@ public static class Test_EasyMemberNames
         options = new EasyMemberOptions { UseArguments = true };
         name = item.EasyName(options); Assert.Equal("Age", name);
 
-        options = EasyMemberOptions.TrueNoNamespaces;
+        options = EasyMemberOptions.NoNamespaces;
         name = item.EasyName(options); Assert.Equal($"T {CLASSNAME}.TF<T, K>.Age", name);
     }
 
@@ -442,7 +442,7 @@ public static class Test_EasyMemberNames
         options = new EasyMemberOptions { UseArguments = true };
         name = item.EasyName(options); Assert.Equal("Age", name);
 
-        options = EasyMemberOptions.TrueNoNamespaces;
+        options = EasyMemberOptions.NoNamespaces;
         name = item.EasyName(options); Assert.Equal($"Byte {CLASSNAME}.TF<Byte, Int32>.Age", name);
     }
 }
