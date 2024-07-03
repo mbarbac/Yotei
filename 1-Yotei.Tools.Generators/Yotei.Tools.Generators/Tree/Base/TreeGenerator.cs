@@ -22,6 +22,50 @@ internal class TreeGenerator : IIncrementalGenerator
     /// <param name="context"></param>
     protected virtual void OnInitialize(IncrementalGeneratorPostInitializationContext context) { }
 
+    /// <summary>
+    /// Invoked to create a node of the appropriate type.
+    /// </summary>
+    /// <param name="parent"></param>
+    /// <param name="candidate"></param>
+    /// <returns></returns>
+    protected virtual TypeNode CreateNode(
+        INode parent, TypeCandidate candidate) => new(parent, candidate);
+
+    /// <summary>
+    /// Invoked to create a node of the appropriate type.
+    /// </summary>
+    /// <param name="parent"></param>
+    /// <param name="candidate"></param>
+    /// <returns></returns>
+    protected virtual PropertyNode CreateNode(
+        TypeNode parent, PropertyCandidate candidate) => new(parent, candidate);
+
+    /// <summary>
+    /// Invoked to create a node of the appropriate type.
+    /// </summary>
+    /// <param name="parent"></param>
+    /// <param name="candidate"></param>
+    /// <returns></returns>
+    protected virtual FieldNode CreateNode(
+        TypeNode parent, FieldCandidate candidate) => new(parent, candidate);
+
+    /// <summary>
+    /// Invoked to create a node of the appropriate type.
+    /// </summary>
+    /// <param name="parent"></param>
+    /// <param name="candidate"></param>
+    /// <returns></returns>
+    protected virtual MethodNode CreateNode(
+        TypeNode parent, MethodCandidate candidate) => new(parent, candidate);
+
+    /// <summary>
+    /// Gets the name of the file where the given candidate will emit its source code.
+    /// </summary>
+    /// <param name="candidate"></param>
+    /// <returns></returns>
+    public virtual string GetFileName(
+        INodeCandidate candidate) => candidate.FileNameByTailType();
+
     // ----------------------------------------------------
 
     /// <summary>
@@ -253,5 +297,179 @@ internal class TreeGenerator : IIncrementalGenerator
     /// </summary>
     void Execute(SourceProductionContext context, ImmutableArray<ICandidate> candidates)
     {
+        var files = new ChildFiles();
+        var nschain = ImmutableArray<BaseNamespaceDeclarationSyntax>.Empty;
+        var tpchain = ImmutableArray<INamedTypeSymbol>.Empty;
+        var comparer = SymbolEqualityComparer.Default;
+        INode parent = default!;
+
+        // Reporting errors...
+        candidates.OfType<IErrorCandidate>().ForEach(x => context.ReportDiagnostic(x.Diagnostic));
+
+        // Creatinh hierarchy...
+        candidates.OfType<TypeCandidate>().ForEach(CaptureHierarchy);
+        candidates.OfType<INodeCandidate>().ForEach(x => x is not TypeCandidate, CaptureHierarchy);
+
+        // Emitting source code...
+        foreach (var file in files)
+        {
+            context.CancellationToken.ThrowIfCancellationRequested();
+
+            if (!file.Validate(context)) continue;
+
+            var cb = new CodeBuilder(); file.Emit(context, cb);
+            var code = cb.ToString();
+            var name = file.FileName + ".g.cs";
+            context.AddSource(name, code);
+        }
+
+        /// <summary>
+        /// Invoked to emit the hierarchy for the given candidate.
+        /// </summary>
+        void CaptureHierarchy(INodeCandidate candidate)
+        {
+            context.CancellationToken.ThrowIfCancellationRequested();
+
+            nschain = candidate.Syntax.GetNamespaceSyntaxChain();
+            tpchain = candidate.Symbol.GetTypeSymbolChain();
+
+            if (!CaptureFileLevel(candidate)) return;
+            if (!CaptureNamespaceLevel(candidate)) return;
+            if (!CaptureTypeLevel(candidate)) return;
+            if (!CapturePropertyLevel(candidate)) return;
+            if (!EmitFieldLevel(candidate)) return;
+            if (!CaptureMethodLevel(candidate)) return;
+        }
+
+        /// <summary>
+        /// Invoked to create the hierarchy at file level.
+        /// <br/> Returns false if any error happened that prevent further execution.
+        /// </summary>
+        bool CaptureFileLevel(INodeCandidate candidate)
+        {
+            var name = GetFileName(candidate);
+            var node = files.Find(x => string.Compare(x.FileName, name, ignoreCase: true) == 0);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Invoked to create the hierarchy at namespace level.
+        /// <br/> Returns false if any error happened that prevent further execution.
+        /// </summary>
+        bool CaptureNamespaceLevel(INodeCandidate candidate)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Invoked to create the hierarchy at type level.
+        /// <br/> Returns false if any error happened that prevent further execution.
+        /// </summary>
+        bool CaptureTypeLevel(INodeCandidate candidate)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Invoked to create the hierarchy at property level.
+        /// <br/> Returns false if any error happened that prevent further execution.
+        /// </summary>
+        bool CapturePropertyLevel(INodeCandidate candidate)
+        {
+            if (candidate is PropertyCandidate item)
+            {
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Invoked to create the hierarchy at field level.
+        /// <br/> Returns false if any error happened that prevent further execution.
+        /// </summary>
+        bool EmitFieldLevel(INodeCandidate candidate)
+        {
+            if (candidate is FieldCandidate item)
+            {
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Invoked to create the hierarchy at method level.
+        /// <br/> Returns false if any error happened that prevent further execution.
+        /// </summary>
+        bool CaptureMethodLevel(INodeCandidate candidate)
+        {
+            if (candidate is MethodCandidate item)
+            {
+            }
+            return true;
+        }
     }
+
+    // ----------------------------------------------------
+
+
 }
+/*
+    /// <summary>
+    /// Returns a suitable file name, without extensions, based on the tail-most namespace.
+    /// </summary>
+    /// <param name="candidate"></param>
+    /// <returns></returns>
+    public static string FileNameByTailNamespace(this INodeCandidate candidate)
+    {
+        candidate.ThrowWhenNull();
+
+        var nschain = candidate.Syntax.GetNamespaceSyntaxChain();
+        var tpchain = candidate.Symbol.GetTypeSymbolChain();
+        List<string> parts = [];
+
+        foreach (var ns in nschain)
+        {
+            var name = ns.Name.LongName();
+            var temps = name.Split('.');
+            parts.AddRange(temps);
+        }
+
+        parts.Reverse();
+        return string.Join(".", parts);
+    }
+
+    /// <summary>
+    /// Returns a suitable file name, without extensions, based on the tail-most type.
+    /// </summary>
+    /// <param name="candidate"></param>
+    /// <returns></returns>
+    public static string FileNameByTailType(this INodeCandidate candidate)
+    {
+        candidate.ThrowWhenNull();
+
+        var nschain = candidate.Syntax.GetNamespaceSyntaxChain();
+        var tpchain = candidate.Symbol.GetTypeSymbolChain();
+        List<string> parts = [];
+
+        foreach (var ns in nschain)
+        {
+            var name = ns.Name.LongName();
+            var temps = name.Split('.');
+            parts.AddRange(temps);
+        }
+
+        foreach (var tp in tpchain)
+        {
+            var name = tp.Name;
+            
+            if (name.Length == 0) name = "$";
+            else
+            {
+                var index = name.IndexOf('`');
+                if (index > 0) name = name[..index];
+            }
+            parts.Add(name);
+        }
+
+        parts.Reverse();
+        return string.Join(".", parts);
+    }*/

@@ -27,9 +27,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\AttributeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\NameSyntaxExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\MatchExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\__.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\ChainExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\ExceptionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\StringExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\CustomList[T].cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\CodeBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\IEnumerableExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Base\TreeGenerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Base\TreeDiagnostics.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\Code\Candidate.cs" />
@@ -42,6 +45,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\CandidateComparer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\ICandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\IErrorCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\CandidateExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Code\FileNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Code\FieldNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Code\MethodNode.cs" />
@@ -50,6 +54,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Code\NamespaceNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\INode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\IChildNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Lists\ChildNamespaces.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Lists\ChildFiles.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Lists\ChildFields.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Lists\ChildMethods.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Lists\ChildProperties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Lists\ChildTypes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
   </ItemGroup>
 </Project>
