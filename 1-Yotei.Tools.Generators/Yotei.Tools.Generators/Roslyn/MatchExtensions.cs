@@ -1,4 +1,6 @@
-﻿using SystemTypeInfo = System.Reflection.TypeInfo;
+﻿#pragma warning disable IDE0019
+
+using SystemTypeInfo = System.Reflection.TypeInfo;
 
 namespace Yotei.Tools.Generators.Internal;
 

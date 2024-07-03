@@ -1,4 +1,4 @@
-﻿using System.CodeDom.Compiler;
+﻿#pragma warning disable IDE0019
 
 namespace Yotei.Tools.Generators.Internal;
 
@@ -88,7 +88,7 @@ internal class TreeGenerator : IIncrementalGenerator
         MethodAttributeNames = Capture(MethodAttributes);
 
         // Returns the array of names corresponding to the given array of types.
-        string[] Capture(Type[] types)
+        static string[] Capture(Type[] types)
         {
             var attribute = "Attribute";
             var array = new string[types.Length];
@@ -176,46 +176,58 @@ internal class TreeGenerator : IIncrementalGenerator
         if (syntax is TypeDeclarationSyntax typeSyntax)
         {
             var symbol = model.GetDeclaredSymbol(typeSyntax, token);
-            if (symbol == null) throw null;
+            if (symbol == null)
+                return new ErrorCandidate(TreeDiagnostics.SymbolNotFound(typeSyntax));
 
             var atts = Matches(symbol.GetAttributes(), TypeAttributes);
-            if (atts.Length != 0) return new TypeCandidate(atts, model, typeSyntax, symbol);
+            if (atts.Length != 0)
+                return new TypeCandidate(atts, model, typeSyntax, symbol);
         }
 
         // Properties...
         else if (syntax is PropertyDeclarationSyntax propertySyntax)
         {
             var symbol = model.GetDeclaredSymbol(propertySyntax, token);
-            if (symbol == null) throw null;
+            if (symbol == null)
+                return new ErrorCandidate(TreeDiagnostics.SymbolNotFound(propertySyntax));
 
             var atts = Matches(symbol.GetAttributes(), PropertyAttributes);
-            if (atts.Length != 0) return new PropertyCandidate(atts, model, propertySyntax, symbol);
+            if (atts.Length != 0)
+                return new PropertyCandidate(atts, model, propertySyntax, symbol);
         }
 
         // Fields...
         else if (syntax is FieldDeclarationSyntax fieldSyntax)
         {
+            var found = false;
             var items = fieldSyntax.Declaration.Variables;
             foreach (var item in items)
             {
                 var symbol = model.GetDeclaredSymbol(item, token) as IFieldSymbol;
-                if (symbol == null) continue;
-
-                var atts = Matches(symbol.GetAttributes(), FieldAttributes);
-                if (atts.Length != 0) return new FieldCandidate(atts, model, fieldSyntax, symbol);
+                if (symbol != null)
+                {
+                    found = true;
+                    var atts = Matches(symbol.GetAttributes(), FieldAttributes);
+                    if (atts.Length != 0)
+                        return new FieldCandidate(atts, model, fieldSyntax, symbol);
+                }
             }
+            if (!found) return new ErrorCandidate(TreeDiagnostics.SymbolNotFound(fieldSyntax));
         }
 
         // Methods...
         else if (syntax is MethodDeclarationSyntax methodSyntax)
         {
             var symbol = model.GetDeclaredSymbol(methodSyntax, token);
-            if (symbol == null) throw null;
+            if (symbol == null)
+                return new ErrorCandidate(TreeDiagnostics.SymbolNotFound(methodSyntax));
 
             var atts = Matches(symbol.GetAttributes(), MethodAttributes);
-            if (atts.Length != 0) return new MethodCandidate(atts, model, methodSyntax, symbol);
+            if (atts.Length != 0)
+                return new MethodCandidate(atts, model, methodSyntax, symbol);
         }
 
+        // Represents a valid kind with no attribute matches...
         return null!;
     }
 

@@ -1,4 +1,5 @@
 ﻿#pragma warning disable RS1024
+#pragma warning disable IDE0019
 
 namespace Yotei.Tools.Generators.Internal;
 

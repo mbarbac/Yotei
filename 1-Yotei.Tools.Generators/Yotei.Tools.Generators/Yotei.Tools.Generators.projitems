@@ -31,6 +31,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)System\ExceptionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\StringExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Base\TreeGenerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Base\TreeDiagnostics.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\Code\Candidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\Code\FieldCandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\Code\MethodCandidate.cs" />
@@ -41,7 +42,14 @@
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\CandidateComparer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\ICandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\IErrorCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Code\FileNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Code\FieldNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Code\MethodNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Code\PropertyNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Code\TypeNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Code\NamespaceNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\INode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\IChildNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
   </ItemGroup>
 </Project>
