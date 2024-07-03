@@ -52,7 +52,16 @@ internal class PropertyNode : IChildNode
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
-    public virtual bool Validate(SourceProductionContext context) => true;
+    public virtual bool Validate(SourceProductionContext context)
+    {
+        if (!ParentNode.Symbol.IsPartial())
+        {
+            context.ReportDiagnostic(TreeDiagnostics.TypeIsNotPartial(ParentNode.Symbol));
+            return false;
+        }
+
+        return true;
+    }
 
     // -----------------------------------------------------
 
@@ -61,5 +70,8 @@ internal class PropertyNode : IChildNode
     /// </summary>
     /// <param name="context"></param>
     /// <param name="cb"></param>
-    public virtual void Emit(SourceProductionContext context, CodeBuilder cb) { }
+    public virtual void Emit(SourceProductionContext context, CodeBuilder cb)
+    {
+        cb.AppendLine($"// {this}");
+    }
 }
