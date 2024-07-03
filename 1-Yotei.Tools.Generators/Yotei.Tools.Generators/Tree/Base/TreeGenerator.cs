@@ -64,7 +64,9 @@ internal class TreeGenerator : IIncrementalGenerator
     /// <param name="candidate"></param>
     /// <returns></returns>
     public virtual string GetFileName(
-        INodeCandidate candidate) => candidate.FileNameByTailType();
+        ImmutableArray<BaseNamespaceDeclarationSyntax> nschain,
+        ImmutableArray<INamedTypeSymbol> tpchain)
+        => GetFileNameByTailType(nschain, tpchain);
 
     // ----------------------------------------------------
 
@@ -347,9 +349,16 @@ internal class TreeGenerator : IIncrementalGenerator
         /// </summary>
         bool CaptureFileLevel(INodeCandidate candidate)
         {
-            var name = GetFileName(candidate);
+            var name = GetFileName(nschain, tpchain);
             var node = files.Find(x => string.Compare(x.FileName, name, ignoreCase: true) == 0);
 
+            if (node == null)
+            {
+                node = new FileNode(name);
+                files.Add(node);
+            }
+
+            parent = node;
             return true;
         }
 
@@ -359,6 +368,25 @@ internal class TreeGenerator : IIncrementalGenerator
         /// </summary>
         bool CaptureNamespaceLevel(INodeCandidate candidate)
         {
+            var list = ((FileNode)parent).ChildNamespaces;
+            var len = nschain.Length;
+
+            for (int index = 0; index < len; index++)
+            {
+                var syntax = nschain[index];
+                var name = syntax.Name.ToString();
+                var node = list.Find(x => string.Compare(x.Name, name) == 0);
+
+                if (node == null)
+                {
+                    node = new(parent, syntax);
+                    list.Add(node);
+                }
+
+                parent = node;
+                list = node.ChildNamespaces;
+            }
+
             return true;
         }
 
@@ -368,6 +396,62 @@ internal class TreeGenerator : IIncrementalGenerator
         /// </summary>
         bool CaptureTypeLevel(INodeCandidate candidate)
         {
+            var list = ((NamespaceNode)parent).ChildTypes;
+            var len = tpchain.Length;
+
+            for (int index = 0; index < len; index++)
+            {
+                var symbol = tpchain[index];
+                var node = list.Find(x => x.Symbol.Name == symbol.Name);
+
+                // Need to create a new node...
+                if (node == null)
+                {
+                    // Creatig custom node...
+                    if (candidate is TypeCandidate element && index == (len - 1))
+                    {
+                        node = CreateNode(parent, element);
+                        list.Add(node);
+                    }
+
+                    // Creating structural...
+                    else
+                    {
+                        node = new(parent, symbol);
+                        list.Add(node);
+                    }
+                }
+
+                // Validating consistency...
+                else if (candidate is TypeCandidate element && index == (len - 1))
+                {
+                    if (node.GetType() == typeof(TypeNode)) // Substitute structural...
+                    {
+                        var temp = CreateNode(parent, element);
+                        foreach (var child in node.ChildTypes) temp.ChildTypes.Add(child);
+                        foreach (var child in node.ChildProperties) temp.ChildProperties.Add(child);
+                        foreach (var child in node.ChildFields) temp.ChildFields.Add(child);
+                        foreach (var child in node.ChildMethods) temp.ChildMethods.Add(child);
+
+                        list.Remove(node);
+                        list.Add(temp);
+                    }
+                    else // Validating existing custom node...
+                    {
+                        if (!comparer.Equals(node.Symbol, symbol))
+                        {
+                            context.ReportDiagnostic(
+                                TreeDiagnostics.InconsistentHierarchy(node, candidate));
+
+                            return false;
+                        }
+                    }
+                }
+
+                parent = node;
+                list = node.ChildTypes;
+            }
+
             return true;
         }
 
@@ -379,7 +463,40 @@ internal class TreeGenerator : IIncrementalGenerator
         {
             if (candidate is PropertyCandidate item)
             {
+                var tpnode = (TypeNode)parent;
+                var list = tpnode.ChildProperties;
+                var symbol = item.Symbol;
+                var node = list.Find(x => x.Symbol.Name == symbol.Name);
+
+                // Creating a new custom node...
+                if (node == null)
+                {
+                    node = CreateNode(tpnode, item);
+                    list.Add(node);
+                }
+
+                // Validating consistency...
+                else
+                {
+                    if (node.GetType() == typeof(PropertyNode)) // Substitute structural...
+                    {
+                        var temp = CreateNode(tpnode, item);
+                        list.Remove(node);
+                        list.Add(temp);
+                    }
+                    else // Validating existing custom node...
+                    {
+                        if (!comparer.Equals(node.Symbol, symbol))
+                        {
+                            context.ReportDiagnostic(
+                                TreeDiagnostics.InconsistentHierarchy(node, candidate));
+
+                            return false;
+                        }
+                    }
+                }
             }
+
             return true;
         }
 
@@ -391,7 +508,40 @@ internal class TreeGenerator : IIncrementalGenerator
         {
             if (candidate is FieldCandidate item)
             {
+                var tpnode = (TypeNode)parent;
+                var list = tpnode.ChildFields;
+                var symbol = item.Symbol;
+                var node = list.Find(x => x.Symbol.Name == symbol.Name);
+
+                // Creating a new custom node...
+                if (node == null)
+                {
+                    node = CreateNode(tpnode, item);
+                    list.Add(node);
+                }
+
+                // Validating consistency...
+                else
+                {
+                    if (node.GetType() == typeof(FieldNode)) // Substitute structural...
+                    {
+                        var temp = CreateNode(tpnode, item);
+                        list.Remove(node);
+                        list.Add(temp);
+                    }
+                    else // Validating existing custom node...
+                    {
+                        if (!comparer.Equals(node.Symbol, symbol))
+                        {
+                            context.ReportDiagnostic(
+                                TreeDiagnostics.InconsistentHierarchy(node, candidate));
+
+                            return false;
+                        }
+                    }
+                }
             }
+
             return true;
         }
 
@@ -403,27 +553,57 @@ internal class TreeGenerator : IIncrementalGenerator
         {
             if (candidate is MethodCandidate item)
             {
+                var tpnode = (TypeNode)parent;
+                var list = tpnode.ChildMethods;
+                var symbol = item.Symbol;
+                var node = list.Find(x => x.Symbol.Name == symbol.Name);
+
+                // Creating a new custom node...
+                if (node == null)
+                {
+                    node = CreateNode(tpnode, item);
+                    list.Add(node);
+                }
+
+                // Validating consistency...
+                else
+                {
+                    if (node.GetType() == typeof(MethodNode)) // Substitute structural...
+                    {
+                        var temp = CreateNode(tpnode, item);
+                        list.Remove(node);
+                        list.Add(temp);
+                    }
+                    else // Validating existing custom node...
+                    {
+                        if (!comparer.Equals(node.Symbol, symbol))
+                        {
+                            context.ReportDiagnostic(
+                                TreeDiagnostics.InconsistentHierarchy(node, candidate));
+
+                            return false;
+                        }
+                    }
+                }
             }
+
             return true;
         }
     }
 
     // ----------------------------------------------------
 
-
-}
-/*
     /// <summary>
     /// Returns a suitable file name, without extensions, based on the tail-most namespace.
     /// </summary>
-    /// <param name="candidate"></param>
+    /// <param name="nschain"></param>
+    /// <param name="tpchain"></param>
     /// <returns></returns>
-    public static string FileNameByTailNamespace(this INodeCandidate candidate)
+    protected virtual string GetFileNameByTailNamespace(
+        ImmutableArray<BaseNamespaceDeclarationSyntax> nschain)
     {
-        candidate.ThrowWhenNull();
+        nschain.ThrowWhenNull();
 
-        var nschain = candidate.Syntax.GetNamespaceSyntaxChain();
-        var tpchain = candidate.Symbol.GetTypeSymbolChain();
         List<string> parts = [];
 
         foreach (var ns in nschain)
@@ -440,14 +620,16 @@ internal class TreeGenerator : IIncrementalGenerator
     /// <summary>
     /// Returns a suitable file name, without extensions, based on the tail-most type.
     /// </summary>
-    /// <param name="candidate"></param>
+    /// <param name="nschain"></param>
+    /// <param name="tpchain"></param>
     /// <returns></returns>
-    public static string FileNameByTailType(this INodeCandidate candidate)
+    protected virtual string GetFileNameByTailType(
+        ImmutableArray<BaseNamespaceDeclarationSyntax> nschain,
+        ImmutableArray<INamedTypeSymbol> tpchain)
     {
-        candidate.ThrowWhenNull();
+        nschain.ThrowWhenNull();
+        tpchain.ThrowWhenNull();
 
-        var nschain = candidate.Syntax.GetNamespaceSyntaxChain();
-        var tpchain = candidate.Symbol.GetTypeSymbolChain();
         List<string> parts = [];
 
         foreach (var ns in nschain)
@@ -460,7 +642,7 @@ internal class TreeGenerator : IIncrementalGenerator
         foreach (var tp in tpchain)
         {
             var name = tp.Name;
-            
+
             if (name.Length == 0) name = "$";
             else
             {
@@ -470,6 +652,20 @@ internal class TreeGenerator : IIncrementalGenerator
             parts.Add(name);
         }
 
+        /*
+        var options = new EasyNameOptions(useGenericNames: true);
+        foreach (var tp in tpchain)
+        {
+            var name = tp.EasyName(options);
+            name = name.Replace('<', '[');
+            name = name.Replace('>', ']');
+            name = name.RemoveAll('?');
+            name = name.RemoveAll(' ');
+            parts.Add(name);
+        }
+         */
+
         parts.Reverse();
         return string.Join(".", parts);
-    }*/
+    }
+}

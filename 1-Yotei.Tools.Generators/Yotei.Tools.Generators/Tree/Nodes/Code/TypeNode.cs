@@ -78,7 +78,7 @@ internal class TypeNode : IChildNode
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
-    public bool Validate(SourceProductionContext context) => throw null;
+    public virtual bool Validate(SourceProductionContext context) => true;
 
     // -----------------------------------------------------
 
@@ -87,5 +87,5 @@ internal class TypeNode : IChildNode
     /// </summary>
     /// <param name="context"></param>
     /// <param name="cb"></param>
-    public void Emit(SourceProductionContext context, CodeBuilder cb) => throw null;
+    public virtual void Emit(SourceProductionContext context, CodeBuilder cb) { }
 }

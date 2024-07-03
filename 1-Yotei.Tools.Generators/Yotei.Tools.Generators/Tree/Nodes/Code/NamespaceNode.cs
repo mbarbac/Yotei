@@ -59,7 +59,7 @@ internal sealed class NamespaceNode : IChildNode
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
-    public bool Validate(SourceProductionContext context) => throw null;
+    public bool Validate(SourceProductionContext context) => true;
 
     // -----------------------------------------------------
 
@@ -68,5 +68,5 @@ internal sealed class NamespaceNode : IChildNode
     /// </summary>
     /// <param name="context"></param>
     /// <param name="cb"></param>
-    public void Emit(SourceProductionContext context, CodeBuilder cb) => throw null;
+    public void Emit(SourceProductionContext context, CodeBuilder cb) { }
 }

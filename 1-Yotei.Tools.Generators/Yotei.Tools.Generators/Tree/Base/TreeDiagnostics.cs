@@ -90,4 +90,29 @@ internal static class TreeDiagnostics
             severity, isEnabledByDefault: true),
             location);
     }
+
+    // -----------------------------------------------------
+
+    /// <summary>
+    /// A candidate is not consistent with an existing node in the hierarchy.
+    /// </summary>
+    /// <param name="node"></param>
+    /// <param name="candidate"></param>
+    /// <param name="severity"></param>
+    /// <returns></returns>
+    public static Diagnostic InconsistentHierarchy(
+        INode node,
+        INodeCandidate candidate,
+        DiagnosticSeverity severity = DiagnosticSeverity.Error)
+    {
+        var id = "TreeGen02";
+        var head = "A candidate is not consistent with an existing node in the hierarchy.";
+        var desc = $"Candidate '{candidate}' is not consistent with an existing node: '{node}'.";
+        var location = candidate.Syntax.GetLocation();
+
+        return Diagnostic.Create(new DiagnosticDescriptor(
+            id, head, desc, "Yotei",
+            severity, isEnabledByDefault: true),
+            location);
+    }
 }

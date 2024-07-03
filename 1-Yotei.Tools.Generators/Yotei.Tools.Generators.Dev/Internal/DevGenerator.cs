@@ -11,7 +11,7 @@ internal class DevGenerator : TreeGenerator
 #endif
 
     /// <inheritdoc/>
-    protected override Type[] TypeAttributes { get; } = [typeof(FakeAttribute<>)];
+    protected override Type[] TypeAttributes { get; } = [
+        typeof(FakeAttribute),
+        typeof(FakeAttribute<>)];
 }
-
-public class GenA<T> { }

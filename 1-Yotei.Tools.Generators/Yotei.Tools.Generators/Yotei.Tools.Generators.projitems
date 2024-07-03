@@ -45,7 +45,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\CandidateComparer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\ICandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\IErrorCandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\CandidateExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Code\FileNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Code\FieldNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Code\MethodNode.cs" />
