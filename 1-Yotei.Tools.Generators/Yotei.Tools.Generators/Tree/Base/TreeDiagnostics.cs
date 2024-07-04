@@ -129,8 +129,7 @@ internal static class TreeDiagnostics
     {
         var item = syntax.GetText();
         var text = item.ToString().Replace('\r', ' ').Replace('\n', ' ').Trim();
-        int index;
-        while ((index = text.IndexOf("  ")) > 0) text = text.Replace("  ", " ");
+        while (text.IndexOf("  ") > 0) text = text.Replace("  ", " ");
 
         var id = "TreeGen03";
         var head = "The syntax node kind is not supported.";

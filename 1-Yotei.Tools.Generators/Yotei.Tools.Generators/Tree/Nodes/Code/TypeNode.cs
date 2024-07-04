@@ -87,5 +87,90 @@ internal class TypeNode : IChildNode
     /// </summary>
     /// <param name="context"></param>
     /// <param name="cb"></param>
-    public virtual void Emit(SourceProductionContext context, CodeBuilder cb) { }
+    public virtual void Emit(SourceProductionContext context, CodeBuilder cb)
+    {
+        var head = GetHeader(context);
+        if (head == null) return;
+
+        cb.AppendLine(head);
+        cb.AppendLine("{");
+        cb.IndentLevel++;
+        {
+            EmitElements(context, cb);
+            EmitCore(context, cb);
+        }
+        cb.IndentLevel--;
+        cb.AppendLine("}");
+    }
+
+    /// <summary>
+    /// Invoked to obtain the header of this type that, by default, it is just its kind followed
+    /// by its name. Derived classes may add a colon (':') and an optional list of elements that
+    /// the type inherits from or implements.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    protected virtual string? GetHeader(SourceProductionContext context)
+    {
+        var rec = Symbol.IsRecord ? "record " : string.Empty;
+        var kind = Symbol.TypeKind switch
+        {
+            TypeKind.Class => "class",
+            TypeKind.Struct => "struct",
+            TypeKind.Interface => "interface",
+            _ => throw new ArgumentException("Invalid type kind.").WithData(Symbol)
+        };
+
+        /*
+        var options = new EasyNameOptions(useGenerics: true);
+        var name = Symbol.EasyName(options);
+        return $"partial {rec}{kind} {name}";*/
+
+        return $"partial {rec}{kind} {Symbol.Name}";
+    }
+
+    /// <summary>
+    /// Invoked to emit the source code of the registered child elements, if any.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="cb"></param>
+    protected virtual void EmitElements(SourceProductionContext context, CodeBuilder cb)
+    {
+        var done = false;
+
+        foreach (var node in ChildFields)
+        {
+            if (done) cb.AppendLine(); done = true;
+            node.Emit(context, cb);
+        }
+        foreach (var node in ChildProperties)
+        {
+            if (done) cb.AppendLine(); done = true;
+            node.Emit(context, cb);
+        }
+        foreach (var node in ChildMethods)
+        {
+            if (done) cb.AppendLine(); done = true;
+            node.Emit(context, cb);
+        }
+        foreach (var node in ChildTypes)
+        {
+            if (done) cb.AppendLine(); done = true;
+            node.Emit(context, cb);
+        }
+    }
+
+    /// <summary>
+    /// Gets the total number of child elements registered into this instance.
+    /// </summary>
+    protected int SumChilds
+        => ChildFields.Count + ChildProperties.Count + ChildMethods.Count + ChildTypes.Count;
+
+    /// <summary>
+    /// Invoked to emit the source code of this type, without taking into consideration its
+    /// registered child elements.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="cb"></param>
+    protected virtual void EmitCore(SourceProductionContext context, CodeBuilder cb) { }
 }

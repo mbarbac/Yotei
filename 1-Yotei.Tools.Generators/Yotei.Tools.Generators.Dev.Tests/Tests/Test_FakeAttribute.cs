@@ -2,13 +2,15 @@ namespace Yotei.Tools.Generators.Dev.Tests;
 
 // ========================================================
 //[Enforced]
-public static class Test_FakeAttribute
+public static partial class Test_FakeAttribute
 {
-    public class GenA<T> { }
+    public class Target<T> { }
 
-    [Fake<GenA<int>>]
-    public class TypeA
+    [Fake]
+    public partial class TypeA<T>
     {
+        public Target<T> MethodT() => throw new NotImplementedException();
+        public Target<int> MethodInt() => throw new NotImplementedException();
     }
 
     //[Enforced]

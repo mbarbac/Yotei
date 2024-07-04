@@ -11,7 +11,9 @@ internal class DevGenerator : TreeGenerator
 #endif
 
     /// <inheritdoc/>
-    protected override Type[] TypeAttributes { get; } = [
-        typeof(FakeAttribute),
-        typeof(FakeAttribute<>)];
+    protected override Type[] TypeAttributes { get; } = [typeof(FakeAttribute)];
+
+    /// <inheritdoc/>
+    protected override TypeNode CreateNode(
+        INode parent, TypeCandidate candidate) => new XTypeNode(parent, candidate);
 }

@@ -652,19 +652,6 @@ internal class TreeGenerator : IIncrementalGenerator
             parts.Add(name);
         }
 
-        /*
-        var options = new EasyNameOptions(useGenericNames: true);
-        foreach (var tp in tpchain)
-        {
-            var name = tp.EasyName(options);
-            name = name.Replace('<', '[');
-            name = name.Replace('>', ']');
-            name = name.RemoveAll('?');
-            name = name.RemoveAll(' ');
-            parts.Add(name);
-        }
-         */
-
         parts.Reverse();
         return string.Join(".", parts);
     }
