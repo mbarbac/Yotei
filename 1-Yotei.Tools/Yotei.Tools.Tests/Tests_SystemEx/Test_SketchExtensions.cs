@@ -64,7 +64,7 @@ public static class Test_SketchExtensions
         target = source.Sketch(options);
         Assert.Equal("(Nullable) NULL", target);
 
-        options = options with { TypeOptions = options.TypeOptions with { UseName = true, UseArgumentsNames = true } };
+        options = options with { TypeOptions = options.TypeOptions with { UseName = true, UseTypeArgumentsNames = true } };
         target = source.Sketch(options);
         Assert.Equal("(Nullable<Int32>) NULL", target);
 
@@ -300,7 +300,7 @@ public static class Test_SketchExtensions
         target = source.Sketch(options);
         Assert.Equal("(Dictionary) {James = 50, Maria = 25}", target);
 
-        options = new SketchOptions { TypeOptions = options.TypeOptions with { UseArgumentsNames = true } };
+        options = new SketchOptions { TypeOptions = options.TypeOptions with { UseTypeArgumentsNames = true } };
         target = source.Sketch(options);
         Assert.Equal("(Dictionary<String, Int32>) {James = 50, Maria = 25}", target);
 
@@ -324,7 +324,7 @@ public static class Test_SketchExtensions
         target = source.Sketch(options);
         Assert.Equal("(List) [James, Maria]", target);
 
-        options = new SketchOptions { TypeOptions = options.TypeOptions with { UseArgumentsNames = true } };
+        options = new SketchOptions { TypeOptions = options.TypeOptions with { UseTypeArgumentsNames = true } };
         target = source.Sketch(options);
         Assert.Equal("(List<String>) [James, Maria]", target);
 

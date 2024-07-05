@@ -13,46 +13,56 @@ public record EasyTypeOptions
     public bool UseNamespace { get; init; }
 
     /// <summary>
-    /// Use the declaring type, or <c>false</c> to ignore it.
+    /// Use the declaring host type, or <c>false</c> to ignore it.
     /// </summary>
     public bool UseHost { get; init; }
 
     /// <summary>
-    /// Use the type short name, or <c>false</c> to leave it blank. The later is useful when the
-    /// type is an unbounded generic one, and the desired result is not to use its slot.
-    /// <br/> The default value of this property is <c>true</c>.
+    /// Use the type short name, or <c>false</c> to leave it blank (useful when the type is an
+    /// unbounded generic one, and the desired result is not to use its slot).
     /// </summary>
-    public bool UseName { get; init; } = true; // By default
+    public bool UseName { get; init; }
 
     /// <summary>
     /// Use the type's generic arguments, or <c>false</c> to ignore them.
     /// </summary>
-    public bool UseArguments { get; init; }
+    public bool UseTypeArguments { get; init; }
 
     /// <summary>
     /// Use the namespaces of the type's generic arguments, or <c>false</c> to ignore them.
-    /// <br/> This option implies <see cref="UseArguments"/> and <see cref="UseArgumentsHosts"/>.
+    /// <br/> This option implies <see cref="UseTypeArguments"/> and
+    /// <see cref="UseTypeArgumentsHosts"/>.
     /// </summary>
-    public bool UseArgumentsNamespaces { get; init; }
+    public bool UseTypeArgumentsNamespaces { get; init; }
 
     /// <summary>
     /// Use the host types of the type's generic arguments, or <c>false</c> to ignore them.
-    /// <br/> This option implies <see cref="UseArguments"/>
+    /// <br/> This option implies <see cref="UseTypeArguments"/>
     /// </summary>
-    public bool UseArgumentsHosts { get; init; }
+    public bool UseTypeArgumentsHosts { get; init; }
 
     /// <summary>
     /// Use the type names of the type's generic arguments, or <c>false</c> to ignore them.
-    /// <br/> This option implies <see cref="UseArguments"/>
+    /// <br/> This option implies <see cref="UseTypeArguments"/>
     /// </summary>
-    public bool UseArgumentsNames { get; init; }
+    public bool UseTypeArgumentsNames { get; init; }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Initializes a new default instance.
+    /// Initializes a new default instance, that uses the name of the type and the names of its
+    /// type arguments, if any.
     /// </summary>
-    public EasyTypeOptions() { }
+    public EasyTypeOptions()
+    {
+        UseNamespace = false;
+        UseHost = false;
+        UseName = true;
+        UseTypeArguments = false;
+        UseTypeArgumentsNamespaces = false;
+        UseTypeArgumentsHosts = false;
+        UseTypeArgumentsNames = true;
+    }
 
     /// <summary>
     /// A common shared default instance.
@@ -60,30 +70,30 @@ public record EasyTypeOptions
     public static EasyTypeOptions Default { get; } = new();
 
     /// <summary>
-    /// A common shared instance with all options set.
+    /// A common shared instance with all its options set to <c>false</c>.
     /// </summary>
-    public static EasyTypeOptions True { get; } = new EasyTypeOptions
+    public static EasyTypeOptions Empty { get; } = new()
+    {
+        UseNamespace = false,
+        UseHost = false,
+        UseName = false,
+        UseTypeArguments = false,
+        UseTypeArgumentsNamespaces = false,
+        UseTypeArgumentsHosts = false,
+        UseTypeArgumentsNames = false,
+    };
+
+    /// <summary>
+    /// A common shared instance with all its options set to <c>true</c>.
+    /// </summary>
+    public static EasyTypeOptions Full { get; } = new()
     {
         UseNamespace = true,
         UseHost = true,
         UseName = true,
-        UseArguments = true,
-        UseArgumentsNamespaces = true,
-        UseArgumentsHosts = true,
-        UseArgumentsNames = true,
-    };
-
-    /// <summary>
-    /// A common shared instance with all options set except namespaces.
-    /// </summary>
-    public static EasyTypeOptions NoNamespaces { get; } = new EasyTypeOptions
-    {
-        UseNamespace = false,
-        UseHost = true,
-        UseName = true,
-        UseArguments = true,
-        UseArgumentsNamespaces = false,
-        UseArgumentsHosts = true,
-        UseArgumentsNames = true,
+        UseTypeArguments = true,
+        UseTypeArgumentsNamespaces = true,
+        UseTypeArgumentsHosts = true,
+        UseTypeArgumentsNames = true,
     };
 }

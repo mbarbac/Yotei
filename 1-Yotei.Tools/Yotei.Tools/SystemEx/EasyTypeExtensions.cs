@@ -75,16 +75,16 @@ public static class EasyTypeExtensions
             {
                 tpused += num;
 
-                if (options.UseArguments || options.UseArgumentsNames ||
-                    options.UseArgumentsHosts || options.UseArgumentsNamespaces)
+                if (options.UseTypeArguments || options.UseTypeArgumentsNames ||
+                    options.UseTypeArgumentsHosts || options.UseTypeArgumentsNamespaces)
                 {
                     if (!options.UseName && !isgen) sb.Append(name);
 
                     var xoptions = options with // Order matters!
                     {
-                        UseNamespace = options.UseArgumentsNamespaces,
-                        UseHost = options.UseArgumentsHosts,
-                        UseName = options.UseArgumentsNames,
+                        UseNamespace = options.UseTypeArgumentsNamespaces,
+                        UseHost = options.UseTypeArgumentsHosts,
+                        UseName = options.UseTypeArgumentsNames,
                     };
 
                     tpargs = tpargs[..num];

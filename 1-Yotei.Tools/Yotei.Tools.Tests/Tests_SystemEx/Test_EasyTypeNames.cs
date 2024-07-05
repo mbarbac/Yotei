@@ -13,9 +13,13 @@ public static class Test_EasyTypeNames
     [Fact]
     public static void Test_System_Types()
     {
-        EasyTypeOptions options;
         Type type = typeof(string);
-        string name = type.EasyName(); Assert.Equal("String", name);
+
+        EasyTypeOptions options = EasyTypeOptions.Empty;
+        string name = type.EasyName(options); Assert.Equal("", name);
+
+        options = options with { UseName = true };
+        name = type.EasyName(options); Assert.Equal("String", name);
 
         options = new EasyTypeOptions { UseHost = true };
         name = type.EasyName(options); Assert.Equal("String", name);
@@ -28,13 +32,17 @@ public static class Test_EasyTypeNames
 
     public class TA { public class TB { } }
 
-    [Enforced]
+    //[Enforced]
     [Fact]
     public static void Test_Simple_Type()
     {
-        EasyTypeOptions options;
         Type type = typeof(TA);
-        string name = type.EasyName(); Assert.Equal("TA", name);
+        
+        EasyTypeOptions options = EasyTypeOptions.Empty;
+        string name = type.EasyName(options); Assert.Equal("", name);
+
+        options = options with { UseName = true };
+        name = type.EasyName(options); Assert.Equal("TA", name);
 
         options = new EasyTypeOptions { UseHost = true };
         name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TA", name);
@@ -66,26 +74,30 @@ public static class Test_EasyTypeNames
     [Fact]
     public static void Test_Type_Unbound_Generics()
     {
-        EasyTypeOptions options;
         Type type = typeof(TC<,>);
-        string name = type.EasyName(); Assert.Equal("TC", name);
+        
+        EasyTypeOptions options = EasyTypeOptions.Empty;
+        string name = type.EasyName(options); Assert.Equal("", name);
 
-        options = new EasyTypeOptions { UseHost = true };
+        options = options with { UseName = true };
+        name = type.EasyName(options); Assert.Equal("TC", name);
+
+        options = options with { UseHost = true };
         name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TC", name);
 
-        options = new EasyTypeOptions { UseNamespace = true };
+        options = options with { UseNamespace = true };
         name = type.EasyName(options); Assert.Equal($"{NAMESPACE}.{CLASSNAME}.TC", name);
 
-        options = new EasyTypeOptions { UseArguments = true };
+        options = EasyTypeOptions.Empty with { UseName = true, UseTypeArguments = true };
         name = type.EasyName(options); Assert.Equal("TC<,>", name);
 
-        options = new EasyTypeOptions { UseArgumentsNames = true };
+        options = options with { UseTypeArgumentsNames = true };
         name = type.EasyName(options); Assert.Equal("TC<K, T>", name);
 
-        options = options with { UseArgumentsHosts = true };
+        options = options with { UseTypeArgumentsHosts = true };
         name = type.EasyName(options); Assert.Equal("TC<K, T>", name);
 
-        options = options with { UseArgumentsNamespaces = true };
+        options = options with { UseTypeArgumentsNamespaces = true };
         name = type.EasyName(options); Assert.Equal("TC<K, T>", name);
     }
 
@@ -93,26 +105,30 @@ public static class Test_EasyTypeNames
     [Fact]
     public static void Test_Type_Bound_Generics()
     {
-        EasyTypeOptions options;
         Type type = typeof(TC<int, string>);
-        string name = type.EasyName(); Assert.Equal("TC", name);
+        
+        EasyTypeOptions options = EasyTypeOptions.Empty;
+        string name = type.EasyName(options); Assert.Equal("", name);
 
-        options = new EasyTypeOptions { UseHost = true };
+        options = options with { UseName = true };
+        name = type.EasyName(options); Assert.Equal("TC", name);
+
+        options = options with { UseHost = true };
         name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TC", name);
 
-        options = new EasyTypeOptions { UseNamespace = true };
+        options = options with { UseNamespace = true };
         name = type.EasyName(options); Assert.Equal($"{NAMESPACE}.{CLASSNAME}.TC", name);
 
-        options = new EasyTypeOptions { UseArguments = true };
+        options = EasyTypeOptions.Empty with { UseName = true, UseTypeArguments = true };
         name = type.EasyName(options); Assert.Equal("TC<,>", name);
 
-        options = new EasyTypeOptions { UseArgumentsNames = true };
+        options = options with { UseTypeArgumentsNames = true };
         name = type.EasyName(options); Assert.Equal("TC<Int32, String>", name);
 
-        options = options with { UseArgumentsHosts = true };
+        options = options with { UseTypeArgumentsHosts = true };
         name = type.EasyName(options); Assert.Equal("TC<Int32, String>", name);
 
-        options = options with { UseArgumentsNamespaces = true };
+        options = options with { UseTypeArgumentsNamespaces = true };
         name = type.EasyName(options); Assert.Equal("TC<System.Int32, System.String>", name);
     }
 
@@ -122,80 +138,64 @@ public static class Test_EasyTypeNames
 
     //[Enforced]
     [Fact]
-    public static void Test_Type_Unbound_Nested_Generics_No_Names()
+    public static void Test_Type_Unbound_Nested_Generics()
     {
-        EasyTypeOptions options;
         Type type = typeof(TD<,>.TE<>);
-        string name = type.EasyName(); Assert.Equal("TE", name);
+        
+        EasyTypeOptions options = EasyTypeOptions.Empty;
+        string name = type.EasyName(options); Assert.Equal("", name);
 
-        options = new EasyTypeOptions { UseHost = true };
+        options = options with { UseName = true };
+        name = type.EasyName(options); Assert.Equal("TE", name);
+
+        options = options with { UseHost = true };
         name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TD.TE", name);
 
-        options = new EasyTypeOptions { UseNamespace = true };
+        options = options with { UseNamespace = true };
         name = type.EasyName(options); Assert.Equal($"{NAMESPACE}.{CLASSNAME}.TD.TE", name);
 
-        options = new EasyTypeOptions { UseArguments = true };
+        options = EasyTypeOptions.Empty with { UseName = true, UseTypeArguments = true };
         name = type.EasyName(options); Assert.Equal("TE<>", name);
 
-        options = options with { UseHost = true, UseArgumentsHosts = true };
-        name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TD<,>.TE<>", name);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_Type_Unbound_Nested_Generics_With_Names()
-    {
-        EasyTypeOptions options;
-        Type type = typeof(TD<,>.TE<>);
-        string name = type.EasyName(); Assert.Equal("TE", name);
-
-        options = new EasyTypeOptions { UseNamespace = true };
-        name = type.EasyName(options); Assert.Equal($"{NAMESPACE}.{CLASSNAME}.TD.TE", name);
-
-        options = new EasyTypeOptions { UseArgumentsNames = true };
+        options = options with { UseTypeArgumentsNames = true };
         name = type.EasyName(options); Assert.Equal("TE<S>", name);
 
         options = options with { UseHost = true };
+        name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TD<K, T>.TE<S>", name);
+
+        options = options with { UseTypeArgumentsNamespaces = true };
         name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TD<K, T>.TE<S>", name);
     }
 
     //[Enforced]
     [Fact]
-    public static void Test_Type_Bound_Nested_Generics_No_Names()
+    public static void Test_Type_Bound_Nested_Generics()
     {
-        EasyTypeOptions options;
         Type type = typeof(TD<int, long>.TE<byte>);
-        string name = type.EasyName(); Assert.Equal("TE", name);
+        
+        EasyTypeOptions options = EasyTypeOptions.Empty;
+        string name = type.EasyName(options); Assert.Equal("", name);
 
-        options = new EasyTypeOptions { UseHost = true };
+        options = options with { UseName = true };
+        name = type.EasyName(options); Assert.Equal("TE", name);
+
+        options = options with { UseHost = true };
         name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TD.TE", name);
 
-        options = new EasyTypeOptions { UseNamespace = true };
+        options = options with { UseNamespace = true };
         name = type.EasyName(options); Assert.Equal($"{NAMESPACE}.{CLASSNAME}.TD.TE", name);
 
-        options = new EasyTypeOptions { UseArguments = true };
+        options = EasyTypeOptions.Empty with { UseName = true, UseTypeArguments = true };
         name = type.EasyName(options); Assert.Equal("TE<>", name);
 
-        options = options with { UseHost = true, UseArgumentsHosts = true };
-        name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TD<,>.TE<>", name);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_Type_Bound_Nested_Generics_With_Names()
-    {
-        EasyTypeOptions options;
-        Type type = typeof(TD<int, long>.TE<byte>);
-        string name = type.EasyName(); Assert.Equal("TE", name);
-
-        options = new EasyTypeOptions { UseNamespace = true };
-        name = type.EasyName(options); Assert.Equal($"{NAMESPACE}.{CLASSNAME}.TD.TE", name);
-
-        options = new EasyTypeOptions { UseArgumentsNames = true };
+        options = options with { UseTypeArgumentsNames = true };
         name = type.EasyName(options); Assert.Equal("TE<Byte>", name);
 
         options = options with { UseHost = true };
         name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TD<Int32, Int64>.TE<Byte>", name);
+
+        options = options with { UseTypeArgumentsNamespaces = true };
+        name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TD<System.Int32, System.Int64>.TE<System.Byte>", name);
     }
 
     // -----------------------------------------------------
@@ -204,82 +204,63 @@ public static class Test_EasyTypeNames
 
     //[Enforced]
     [Fact]
-    public static void Test_Type_Unbound_TwoNested_Generics_No_Names()
+    public static void Test_Type_Unbound_TwoNested_Generics()
     {
-        EasyTypeOptions options;
         Type type = typeof(TF<,>.TG.TH<>);
-        string name = type.EasyName(); Assert.Equal("TH", name);
+        
+        EasyTypeOptions options = EasyTypeOptions.Empty;
+        string name = type.EasyName(options); Assert.Equal("", name);
 
-        options = new EasyTypeOptions { UseHost = true };
+        options = options with { UseName = true };
+        name = type.EasyName(options); Assert.Equal("TH", name);
+
+        options = options with { UseHost = true };
         name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TF.TG.TH", name);
 
-        options = new EasyTypeOptions { UseNamespace = true };
+        options = options with { UseNamespace = true };
         name = type.EasyName(options); Assert.Equal($"{NAMESPACE}.{CLASSNAME}.TF.TG.TH", name);
 
-        options = new EasyTypeOptions { UseArguments = true };
+        options = EasyTypeOptions.Empty with { UseName = true, UseTypeArguments = true };
         name = type.EasyName(options); Assert.Equal("TH<>", name);
 
-        options = new EasyTypeOptions { UseArguments = true, UseHost = true };
-        name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TF<,>.TG.TH<>", name);
-
-        options = new EasyTypeOptions { UseArguments = true, UseNamespace = true };
-        name = type.EasyName(options); Assert.Equal($"{NAMESPACE}.{CLASSNAME}.TF<,>.TG.TH<>", name);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_Type_Unbound_TwoNested_Generics_With_Names()
-    {
-        EasyTypeOptions options;
-        Type type = typeof(TF<,>.TG.TH<>);
-        string name = type.EasyName(); Assert.Equal("TH", name);
-
-        options = new EasyTypeOptions { UseArgumentsNames = true };
+        options = options with { UseTypeArgumentsNames = true };
         name = type.EasyName(options); Assert.Equal("TH<S>", name);
 
         options = options with { UseHost = true };
         name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TF<K, T>.TG.TH<S>", name);
 
-        options = options with { UseNamespace = true };
-        name = type.EasyName(options); Assert.Equal($"{NAMESPACE}.{CLASSNAME}.TF<K, T>.TG.TH<S>", name);
+        options = options with { UseTypeArgumentsNamespaces = true };
+        name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TF<K, T>.TG.TH<S>", name);
     }
 
     //[Enforced]
     [Fact]
-    public static void Test_Type_Bound_TwoNested_Generics_No_Names()
+    public static void Test_Type_Bound_TwoNested_Generics()
     {
-        EasyTypeOptions options;
-        Type type = typeof(TF<,>.TG.TH<>);
-        string name = type.EasyName(); Assert.Equal("TH", name);
+        Type type = typeof(TF<int, long>.TG.TH<byte>);
+        
+        EasyTypeOptions options = EasyTypeOptions.Empty;
+        string name = type.EasyName(options); Assert.Equal("", name);
 
-        options = new EasyTypeOptions() { UseHost = true };
+        options = options with { UseName = true };
+        name = type.EasyName(options); Assert.Equal("TH", name);
+
+        options = options with { UseHost = true };
         name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TF.TG.TH", name);
 
-        options = new EasyTypeOptions { UseNamespace = true };
+        options = options with { UseNamespace = true };
         name = type.EasyName(options); Assert.Equal($"{NAMESPACE}.{CLASSNAME}.TF.TG.TH", name);
 
-        options = new EasyTypeOptions { UseArguments = true };
+        options = EasyTypeOptions.Empty with { UseName = true, UseTypeArguments = true };
         name = type.EasyName(options); Assert.Equal("TH<>", name);
 
-        options = options with { UseHost = true, UseArgumentsHosts = true };
-        name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TF<,>.TG.TH<>", name);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_Type_Bound_TwoNested_Generics_With_Names()
-    {
-        EasyTypeOptions options;
-        Type type = typeof(TF<int, long>.TG.TH<byte>);
-        string name = type.EasyName(); Assert.Equal("TH", name);
-
-        options = new EasyTypeOptions { UseNamespace = true };
-        name = type.EasyName(options); Assert.Equal($"{NAMESPACE}.{CLASSNAME}.TF.TG.TH", name);
-
-        options = new EasyTypeOptions { UseArgumentsNames = true };
+        options = options with { UseTypeArgumentsNames = true };
         name = type.EasyName(options); Assert.Equal("TH<Byte>", name);
 
-        options = options with { UseHost = true, UseArgumentsHosts = true };
+        options = options with { UseHost = true };
         name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TF<Int32, Int64>.TG.TH<Byte>", name);
+
+        options = options with { UseTypeArgumentsNamespaces = true };
+        name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TF<System.Int32, System.Int64>.TG.TH<System.Byte>", name);
     }
 }

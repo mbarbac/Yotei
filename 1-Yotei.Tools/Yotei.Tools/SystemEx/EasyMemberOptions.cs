@@ -19,8 +19,8 @@ public record EasyMemberOptions
     public EasyTypeOptions? UseHostType { get; init; }
 
     /// <summary>
-    /// Use the member name, or <c>false</c> to leave it blank. The later is useful when the
-    /// member is an special one, and the desired result is not to use its slot.
+    /// Use the member name, or <c>false</c> to leave it blank (useful when the member is an
+    /// special one, and the desired result is not to use its slot).
     /// </summary>
     public bool UseName { get; init; } = true; // By default
 
@@ -28,7 +28,7 @@ public record EasyMemberOptions
     /// Not <c>null</c> to use the generic type arguments of the member, if any, with the given
     /// options, or <c>null</c> to ignore them.
     /// </summary>
-    public EasyTypeOptions? UseGenericArguments { get; init; }
+    public EasyTypeOptions? UseTypeArguments { get; init; }
 
     /// <summary>
     /// Use the indexed property or method arguments, or or <c>false</c> to ignore them.
@@ -51,9 +51,19 @@ public record EasyMemberOptions
     // ----------------------------------------------------
 
     /// <summary>
-    /// Initializes a new default instance.
+    /// Initializes a new default instance that uses the member name, its generic arguments, and
+    /// the type of its regular ones, if any.
     /// </summary>
-    public EasyMemberOptions() { }
+    public EasyMemberOptions()
+    {
+        UseReturnType = null;
+        UseHostType = null;
+        UseName = true;
+        UseTypeArguments = EasyTypeOptions.Default;
+        UseArguments = true;
+        UseArgumentsTypes = EasyTypeOptions.Default;
+        UseArgumentsNames = false;
+    }
 
     /// <summary>
     /// A common shared default instance.
@@ -61,30 +71,30 @@ public record EasyMemberOptions
     public static EasyMemberOptions Default { get; } = new();
 
     /// <summary>
-    /// A common shared instance with all options set.
+    /// A common shared instance with all its options set to <c>false</c> or <c>null</c>.
     /// </summary>
-    public static EasyMemberOptions True { get; } = new EasyMemberOptions
+    public static EasyMemberOptions Empty { get; } = new()
     {
-        UseReturnType = EasyTypeOptions.True,
-        UseHostType = EasyTypeOptions.True,
-        UseName = true,
-        UseGenericArguments = EasyTypeOptions.True,
-        UseArguments = true,
-        UseArgumentsTypes = EasyTypeOptions.True,
-        UseArgumentsNames = true,
+        UseReturnType = null,
+        UseHostType = null,
+        UseName = false,
+        UseTypeArguments = null,
+        UseArguments = false,
+        UseArgumentsTypes = null,
+        UseArgumentsNames = false,
     };
 
     /// <summary>
-    /// A common shared instance with all options set except namespaces.
+    /// A common shared instance with all its options set to <c>true</c> or full.
     /// </summary>
-    public static EasyMemberOptions NoNamespaces { get; } = new EasyMemberOptions
+    public static EasyMemberOptions Full { get; } = new()
     {
-        UseReturnType = EasyTypeOptions.NoNamespaces,
-        UseHostType = EasyTypeOptions.NoNamespaces,
+        UseReturnType = EasyTypeOptions.Full,
+        UseHostType = EasyTypeOptions.Full,
         UseName = true,
-        UseGenericArguments = EasyTypeOptions.NoNamespaces,
+        UseTypeArguments = EasyTypeOptions.Full,
         UseArguments = true,
-        UseArgumentsTypes = EasyTypeOptions.NoNamespaces,
+        UseArgumentsTypes = EasyTypeOptions.Full,
         UseArgumentsNames = true,
     };
 }

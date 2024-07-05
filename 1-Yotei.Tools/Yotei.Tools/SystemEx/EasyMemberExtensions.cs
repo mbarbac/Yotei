@@ -43,7 +43,7 @@ public static class EasyMemberExtensions
         if (options.UseName) sb.Append(item.Name);
 
         // Member generic type arguments...
-        if (options.UseGenericArguments != null)
+        if (options.UseTypeArguments != null)
         {
             var gens = item.GetGenericArguments();
             if (gens.Length > 0)
@@ -51,7 +51,7 @@ public static class EasyMemberExtensions
                 sb.Append('<'); for (int i = 0; i < gens.Length; i++)
                 {
                     var gen = gens[i];
-                    var s = gen.EasyName(options.UseGenericArguments);
+                    var s = gen.EasyName(options.UseTypeArguments);
 
                     if (i > 0) sb.Append(s.Length > 0 ? ", " : ",");
                     sb.Append(s);
