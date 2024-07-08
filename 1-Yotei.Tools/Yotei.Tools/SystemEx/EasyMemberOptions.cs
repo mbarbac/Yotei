@@ -22,7 +22,7 @@ public record EasyMemberOptions
     /// Use the member name, or <c>false</c> to leave it blank (useful when the member is an
     /// special one, and the desired result is not to use its slot).
     /// </summary>
-    public bool UseName { get; init; } = true; // By default
+    public bool UseName { get; init; }
 
     /// <summary>
     /// Not <c>null</c> to use the generic type arguments of the member, if any, with the given

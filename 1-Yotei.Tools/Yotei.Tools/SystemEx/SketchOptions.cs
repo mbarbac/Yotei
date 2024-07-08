@@ -14,7 +14,7 @@ public record SketchOptions
         get => _TypeOptions;
         init => _TypeOptions = value.ThrowWhenNull();
     }
-    EasyTypeOptions _TypeOptions = new EasyTypeOptions { UseName = false };
+    EasyTypeOptions _TypeOptions = default!;
 
     /// <summary>
     /// The string used to represent null values.
@@ -22,9 +22,9 @@ public record SketchOptions
     public string NullStr
     {
         get => _NullStr;
-        init => _NullStr = value.NotNullNotEmpty();
+        init => _NullStr = value.ThrowWhenNull();
     }
-    string _NullStr = "NULL";
+    string _NullStr = default!;
 
     /// <summary>
     /// If not null, the format specification to use.
@@ -37,9 +37,9 @@ public record SketchOptions
     public IFormatProvider? Provider { get; init; }
 
     /// <summary>
-    /// If true prevents the usage of the source's shape, if such would be needed.
+    /// If true uses the source's shape, if such would be needed.
     /// </summary>
-    public bool PreventShape { get; init; }
+    public bool UseShape { get; init; }
 
     /// <summary>
     /// If true enforces including private members for objects' shapes.
@@ -54,12 +54,50 @@ public record SketchOptions
     // ----------------------------------------------------
 
     /// <summary>
-    /// Initializes a new default instance.
+    /// Initializes a new default instance, with 'NULL' and empty type options.
     /// </summary>
-    public SketchOptions() { }
+    public SketchOptions()
+    {
+        TypeOptions = EasyTypeOptions.Empty;
+        NullStr = "NULL";
+        Format = null;
+        Provider = null;
+        UseShape = false;
+        UsePrivateMembers = false;
+        UseStaticMembers = false;
+    }
 
     /// <summary>
     /// A common shared default instance.
     /// </summary>
     public static SketchOptions Default { get; } = new();
+
+    /// <summary>
+    /// A common shared instance with an empty <see cref="NullStr"/> and empty type options.
+    /// </summary>
+    public static SketchOptions Empty { get; } = new()
+    {
+        TypeOptions = EasyTypeOptions.Empty,
+        NullStr = "",
+        Format = null,
+        Provider = null,
+        UseShape = false,
+        UsePrivateMembers = false,
+        UseStaticMembers = false,
+    };
+
+    /// <summary>
+    /// A common shared instance with all its options set to <c>true</c> or <c>full</c>, except
+    /// the <see cref="Format"/> and <see cref="Provider"/> ones.
+    /// </summary>
+    public static SketchOptions Full { get; } = new()
+    {
+        TypeOptions = EasyTypeOptions.Full,
+        NullStr = "NULL",
+        Format = null,
+        Provider = null,
+        UseShape = true,
+        UsePrivateMembers = true,
+        UseStaticMembers = true,
+    };
 }

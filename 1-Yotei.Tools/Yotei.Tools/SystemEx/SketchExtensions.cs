@@ -100,7 +100,7 @@ public static class SketchExtensions
             var end = isdynamic ? '}' : ']';
             var first = true;
 
-            var xoptions = options with { TypeOptions = EasyTypeOptions.Default with { UseName = false } };
+            var xoptions = options with { TypeOptions = EasyTypeOptions.Empty };
             sb.Append(ini);
             var iter = source.GetEnumerator(); while (iter.MoveNext())
             {
@@ -127,7 +127,7 @@ public static class SketchExtensions
             var sb = new StringBuilder();
             if (typename.Length > 0) sb.Append(RoundedTypeName(string.Empty));
 
-            var xoptions = options with { TypeOptions = EasyTypeOptions.Default with { UseName = false } };
+            var xoptions = options with { TypeOptions = EasyTypeOptions.Empty };
             var ini = '{';
             var end = '}';
             var first = true;
@@ -153,8 +153,8 @@ public static class SketchExtensions
         /// </summary>
         string? GetShape()
         {
-            if (options.PreventShape) return null;
-            var xoptions = options with { TypeOptions = EasyTypeOptions.Default with { UseName = false } };
+            if (!options.UseShape) return null;
+            var xoptions = options with { TypeOptions = EasyTypeOptions.Empty };
 
             var list = new List<string>();
             var flags = BindingFlags.Public | BindingFlags.Instance;
