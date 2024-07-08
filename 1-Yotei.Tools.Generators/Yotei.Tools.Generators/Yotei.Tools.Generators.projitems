@@ -31,13 +31,14 @@
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\SyntaxNodeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\TypeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\CompilationExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\CoreNameExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\ExceptionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\StringExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\CustomList[T].cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\CodeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\IEnumerableExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\EasyNameOptions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)System\EasyNameExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\EasySymbolExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Base\TreeGenerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Base\TreeDiagnostics.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\Code\Candidate.cs" />

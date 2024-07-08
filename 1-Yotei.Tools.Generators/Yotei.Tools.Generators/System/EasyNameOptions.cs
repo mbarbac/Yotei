@@ -66,6 +66,18 @@ internal record EasyNameOptions
     // ----------------------------------------------------
 
     /// <summary>
+    /// Adds to the symbol its nullable annotation, if any.
+    /// </summary>
+    public bool AddNullable { get; init; }
+
+    /// <summary>
+    /// Use the values of the symbol arguments, if any.
+    /// </summary>
+    public bool UseMemberArgumentsValues { get; init; }
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Initializes a new instance with default <c>false</c> values for its properties, except
     /// the following ones that are set to <c>true</c>:
     /// <br/> <see cref="UseTypeName"/>
@@ -85,6 +97,8 @@ internal record EasyNameOptions
     /// <param name="useMemberArguments"></param>
     /// <param name="useMemberArgumentsTypes"></param>
     /// <param name="useMemberArgumentsNames"></param>
+    /// <param name="addNullable"></param>
+    /// <param name="useMemberArgumentsValues"></param>
     public EasyNameOptions(
         bool useTypeNamespace = false,
         bool useTypeHost = false,
@@ -96,7 +110,9 @@ internal record EasyNameOptions
         bool useMemberTypeArguments = true,     // True by default
         bool useMemberArguments = true,         // True by default
         bool useMemberArgumentsTypes = true,    // True by default
-        bool useMemberArgumentsNames = false)
+        bool useMemberArgumentsNames = false,
+        bool addNullable = false,
+        bool useMemberArgumentsValues = false)
     {
         UseTypeNamespace = useTypeNamespace;
         UseTypeHost = useTypeHost;
@@ -108,6 +124,8 @@ internal record EasyNameOptions
         UseMemberArguments = useMemberArguments;
         UseMemberArgumentsTypes = useMemberArgumentsTypes;
         UseMemberArgumentsNames = useMemberArgumentsNames;
+        AddNullable = addNullable;
+        UseMemberArgumentsValues = useMemberArgumentsValues;
     }
 
     /// <summary>
@@ -129,7 +147,9 @@ internal record EasyNameOptions
         useMemberTypeArguments: false,
         useMemberArguments: false,
         useMemberArgumentsTypes: false,
-        useMemberArgumentsNames: false);
+        useMemberArgumentsNames: false,
+        addNullable: false,
+        useMemberArgumentsValues: false);
 
     /// <summary>
     /// A shared instance with all options set to <c>true</c>.
@@ -145,5 +165,7 @@ internal record EasyNameOptions
         useMemberTypeArguments: true,
         useMemberArguments: true,
         useMemberArgumentsTypes: true,
-        useMemberArgumentsNames: true);
+        useMemberArgumentsNames: true,
+        addNullable: true,
+        useMemberArgumentsValues: true);
 }
