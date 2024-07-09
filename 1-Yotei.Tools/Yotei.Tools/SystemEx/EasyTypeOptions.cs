@@ -8,25 +8,21 @@ public record EasyTypeOptions
 {
     /// <summary>
     /// Use the namespace of the given type.
-    /// <br/> The default value of this property is <c>false</c>.
     /// </summary>
     public bool UseNamespace { get; init; }
 
     /// <summary>
     /// Use the declaring host of the given type.
-    /// <br/> The default value of this property is <c>false</c>.
     /// </summary>
     public bool UseHost { get; init; }
 
     /// <summary>
     /// When the type is a type argument, whether to use its name or not.
-    /// <br/> The default value of this property is <c>true</c>.
     /// </summary>
     public bool UseName { get; init; }
 
     /// <summary>
     /// If not null, the options to use with the type arguments of the given type.
-    /// <br/> The default value of this property is <c><see cref="Default"/></c>.
     /// </summary>
     public EasyTypeOptions? UseTypeArguments { get; init; }
 
@@ -35,6 +31,10 @@ public record EasyTypeOptions
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
+    /// <param name="useNamespace"></param>
+    /// <param name="useHost"></param>
+    /// <param name="useName"></param>
+    /// <param name="useTypeArguments"></param>
     public EasyTypeOptions(
         bool useNamespace = false,
         bool useHost = false,
