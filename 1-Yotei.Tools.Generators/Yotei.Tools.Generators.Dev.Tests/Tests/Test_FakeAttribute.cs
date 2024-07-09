@@ -7,13 +7,8 @@ public static partial class Test_FakeAttribute
     public class Target<T> { }
 
     [Fake]
-    public partial class TypeA<T>
+    public partial class TypeA<T> : Target<T?>
     {
-        public Target<T> MethodT() => throw new NotImplementedException();
-        public Target<int> MethodInt() => throw new NotImplementedException();
+        public T this[T one, int two] => throw new NotImplementedException();
     }
-
-    //[Enforced]
-    //[Fact]
-    //public static void Test() { }
 }
