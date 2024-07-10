@@ -1,6 +1,4 @@
-﻿using System.Transactions;
-
-namespace Yotei.Tools;
+﻿namespace Yotei.Tools;
 
 // ========================================================
 public static class EasyNameExtensions
@@ -59,7 +57,8 @@ public static class EasyNameExtensions
         var index = name.IndexOf('`');
         if (index >= 0) name = name.Remove(index, name.Length - index);
 
-        sb.Append(gen && !options.UseName ? "" : name);
+        var used = options.UseName || options.UseHost || options.UseNamespace;
+        if (used) sb.Append(name);
 
         // Type arguments...
         tpargs = tpargs[tpused..]; if (tpargs.Length > 0)
@@ -76,7 +75,7 @@ public static class EasyNameExtensions
                 // Using arguments, if requested...
                 if (options.UseTypeArguments != null)
                 {
-                    if (name.Length == 0) sb.Append(name); // To make sense...
+                    if (!used) sb.Append(name.Length > 0 ? name : "$"); // To make sense...
 
                     var xoptions = options with
                     {

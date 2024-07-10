@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools;
+﻿#pragma warning disable IDE0017
+
+namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>
@@ -25,6 +27,13 @@ public record EasyTypeOptions
     /// If not null, the options to use with the type arguments of the given type.
     /// </summary>
     public EasyTypeOptions? UseTypeArguments { get; init; }
+
+    // ----------------------------------------------------
+
+    public override string ToString() => _Debug;
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    string _Debug = nameof(EasyTypeOptions);
 
     // ----------------------------------------------------
 
@@ -61,7 +70,12 @@ public record EasyTypeOptions
         {
             if (_Default == null)
             {
-                _Default = new();
+                _Default = new(
+                    useNamespace: false,
+                    useHost: false,
+                    useName: true);
+
+                _Default._Debug = $"{nameof(EasyTypeOptions)}.{nameof(Default)}";
 
                 var prop = typeof(EasyTypeOptions).GetProperty(nameof(UseTypeArguments));
                 prop!.SetValue(_Default, _Default);
@@ -84,6 +98,8 @@ public record EasyTypeOptions
                     useNamespace: true,
                     useHost: true,
                     useName: true);
+
+                _Full._Debug = $"{nameof(EasyTypeOptions)}.{nameof(Full)}";
 
                 var prop = typeof(EasyTypeOptions).GetProperty(nameof(UseTypeArguments));
                 prop!.SetValue(_Full, _Full);

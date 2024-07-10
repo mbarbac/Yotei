@@ -1,4 +1,5 @@
-﻿namespace Yotei.Tools;
+﻿#pragma warning disable IDE0017
+namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>
@@ -38,6 +39,13 @@ public record EasyMemberOptions
 
     // ----------------------------------------------------
 
+    public override string ToString() => _Debug;
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    string _Debug = nameof(EasyTypeOptions);
+
+    // ----------------------------------------------------
+
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
@@ -65,22 +73,48 @@ public record EasyMemberOptions
     /// <summary>
     /// A shared default instance.
     /// </summary>
-    public static EasyMemberOptions Default { get; } = new(
-        useType: null,
-        useHost: null,
-        useTypeArguments: EasyTypeOptions.Default,
-        useArguments: true,
-        useArgumentsTypes: EasyTypeOptions.Default,
-        useArgumentsNames: false);
+    public static EasyMemberOptions Default
+    {
+        get
+        {
+            if (_Default == null)
+            {
+                _Default = new(
+                    useType: null,
+                    useHost: null,
+                    useTypeArguments: EasyTypeOptions.Default,
+                    useArguments: true,
+                    useArgumentsTypes: EasyTypeOptions.Default,
+                    useArgumentsNames: false);
+
+                _Default._Debug = $"{nameof(EasyMemberOptions)}.{nameof(Default)}";
+            }
+            return _Default;
+        }
+    }
+    static EasyMemberOptions _Default = null!;
 
     /// <summary>
     /// A shared full instance.
     /// </summary>
-    public static EasyMemberOptions Full { get; } = new(
-        useType: EasyTypeOptions.Full,
-        useHost: EasyTypeOptions.Full,
-        useTypeArguments: EasyTypeOptions.Full,
-        useArguments: true,
-        useArgumentsTypes: EasyTypeOptions.Full,
-        useArgumentsNames: true);
+    public static EasyMemberOptions Full
+    {
+        get
+        {
+            if (_Full == null)
+            {
+                _Full = new(
+                    useType: EasyTypeOptions.Full,
+                    useHost: EasyTypeOptions.Full,
+                    useTypeArguments: EasyTypeOptions.Full,
+                    useArguments: true,
+                    useArgumentsTypes: EasyTypeOptions.Full,
+                    useArgumentsNames: true);
+
+                _Full._Debug = $"{nameof(EasyMemberOptions)}.{nameof(Full)}";
+            }
+            return _Full;
+        }
+    }
+    static EasyMemberOptions _Full = null!;
 }
