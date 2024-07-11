@@ -1,7 +1,7 @@
-﻿namespace Yotei.Tools;
+﻿namespace Yotei.Tools.Generators.Internal;
 
 // ========================================================
-public static class EasyNameExtensions
+internal static class EasyNameExtensions
 {
     /// <summary>
     /// Returns a C#-alike name of the given type, using default options.

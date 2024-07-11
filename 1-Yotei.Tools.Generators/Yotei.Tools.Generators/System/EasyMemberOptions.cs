@@ -1,11 +1,12 @@
 ﻿#pragma warning disable IDE0017
-namespace Yotei.Tools;
+
+namespace Yotei.Tools.Generators.Internal;
 
 // ========================================================
 /// <summary>
 /// Provides options for the <see cref="EasyNameExtensions"/> methods.
 /// </summary>
-public record EasyMemberOptions
+internal record EasyMemberOptions
 {
     /// <summary>
     /// If not null, the options to use with the return type of the given member.
