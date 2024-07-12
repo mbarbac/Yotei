@@ -1,3 +1,4 @@
+/*
 namespace Yotei.Tools.Tests;
 
 // ========================================================
@@ -17,10 +18,10 @@ public static class Test_EasyName_Types
         var options = EasyTypeOptions.Empty;
         var name = type.EasyName(options); Assert.Equal("", name);
 
-        options = options with { UseName = true };
+        options = options with { UseTypeName = true };
         name = type.EasyName(options); Assert.Equal("String", name);
 
-        options = options with { UseNamespace = true };
+        options = options with { UseTypeNamespace = true };
         name = type.EasyName(options); Assert.Equal("System.String", name);
 
         // Default...
@@ -40,13 +41,13 @@ public static class Test_EasyName_Types
         var options = EasyTypeOptions.Empty;
         var name = type.EasyName(options); Assert.Equal("", name);
 
-        options = options with { UseName = true };
+        options = options with { UseTypeName = true };
         name = type.EasyName(options); Assert.Equal("TA", name);
 
-        options = options with { UseHost = true };
+        options = options with { UseTypeHost = true };
         name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TA", name);
 
-        options = options with { UseNamespace = true };
+        options = options with { UseTypeNamespace = true };
         name = type.EasyName(options); Assert.Equal($"{NAMESPACE}.{CLASSNAME}.TA", name);
 
         // Default...
@@ -62,13 +63,13 @@ public static class Test_EasyName_Types
         var options = EasyTypeOptions.Empty;
         var name = type.EasyName(options); Assert.Equal("", name);
 
-        options = options with { UseName = true };
+        options = options with { UseTypeName = true };
         name = type.EasyName(options); Assert.Equal("TB", name);
 
-        options = options with { UseHost = true };
+        options = options with { UseTypeHost = true };
         name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TA.TB", name);
 
-        options = options with { UseNamespace = true };
+        options = options with { UseTypeNamespace = true };
         name = type.EasyName(options); Assert.Equal($"{NAMESPACE}.{CLASSNAME}.TA.TB", name);
 
         // Default...
@@ -88,21 +89,21 @@ public static class Test_EasyName_Types
         var options = EasyTypeOptions.Empty;
         var name = type.EasyName(options); Assert.Equal("", name);
 
-        options = options with { UseName = true };
+        options = options with { UseTypeName = true };
         name = type.EasyName(options); Assert.Equal("TC", name);
 
-        options = options with { UseHost = true };
+        options = options with { UseTypeHost = true };
         name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TC", name);
 
-        options = options with { UseNamespace = true };
+        options = options with { UseTypeNamespace = true };
         name = type.EasyName(options); Assert.Equal($"{NAMESPACE}.{CLASSNAME}.TC", name);
 
         // Name implicit...
-        options = EasyTypeOptions.Empty with { UseName = false };
+        options = EasyTypeOptions.Empty with { UseTypeName = false };
         options = options with { UseTypeArguments = EasyTypeOptions.Empty };
         name = type.EasyName(options); Assert.Equal("TC<,>", name);
 
-        options = options with { UseHost = true };
+        options = options with { UseTypeHost = true };
         name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TC<,>", name);
 
         options = options with { UseTypeArguments = EasyTypeOptions.Full };
@@ -121,21 +122,21 @@ public static class Test_EasyName_Types
         var options = EasyTypeOptions.Empty;
         var name = type.EasyName(options); Assert.Equal("", name);
 
-        options = options with { UseName = true };
+        options = options with { UseTypeName = true };
         name = type.EasyName(options); Assert.Equal("TC", name);
 
-        options = options with { UseHost = true };
+        options = options with { UseTypeHost = true };
         name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TC", name);
 
-        options = options with { UseNamespace = true };
+        options = options with { UseTypeNamespace = true };
         name = type.EasyName(options); Assert.Equal($"{NAMESPACE}.{CLASSNAME}.TC", name);
 
         // Name implicit...
-        options = EasyTypeOptions.Empty with { UseName = false };
+        options = EasyTypeOptions.Empty with { UseTypeName = false };
         options = options with { UseTypeArguments = EasyTypeOptions.Empty };
         name = type.EasyName(options); Assert.Equal("TC<,>", name);
 
-        options = options with { UseHost = true };
+        options = options with { UseTypeHost = true };
         name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TC<,>", name);
 
         options = options with { UseTypeArguments = EasyTypeOptions.Full };
@@ -158,21 +159,21 @@ public static class Test_EasyName_Types
         var options = EasyTypeOptions.Empty;
         var name = type.EasyName(options); Assert.Equal("", name);
 
-        options = options with { UseName = true };
+        options = options with { UseTypeName = true };
         name = type.EasyName(options); Assert.Equal("TE", name);
 
-        options = options with { UseHost = true };
+        options = options with { UseTypeHost = true };
         name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TD.TE", name);
 
-        options = options with { UseNamespace = true };
+        options = options with { UseTypeNamespace = true };
         name = type.EasyName(options); Assert.Equal($"{NAMESPACE}.{CLASSNAME}.TD.TE", name);
 
         // Name implicit...
-        options = EasyTypeOptions.Empty with { UseName = false };
+        options = EasyTypeOptions.Empty with { UseTypeName = false };
         options = options with { UseTypeArguments = EasyTypeOptions.Empty };
         name = type.EasyName(options); Assert.Equal("TE<>", name);
 
-        options = options with { UseHost = true };
+        options = options with { UseTypeHost = true };
         name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TD<,>.TE<>", name);
 
         options = options with { UseTypeArguments = EasyTypeOptions.Full };
@@ -191,21 +192,21 @@ public static class Test_EasyName_Types
         var options = EasyTypeOptions.Empty;
         var name = type.EasyName(options); Assert.Equal("", name);
 
-        options = options with { UseName = true };
+        options = options with { UseTypeName = true };
         name = type.EasyName(options); Assert.Equal("TE", name);
 
-        options = options with { UseHost = true };
+        options = options with { UseTypeHost = true };
         name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TD.TE", name);
 
-        options = options with { UseNamespace = true };
+        options = options with { UseTypeNamespace = true };
         name = type.EasyName(options); Assert.Equal($"{NAMESPACE}.{CLASSNAME}.TD.TE", name);
 
         // Name implicit...
-        options = EasyTypeOptions.Empty with { UseName = false };
+        options = EasyTypeOptions.Empty with { UseTypeName = false };
         options = options with { UseTypeArguments = EasyTypeOptions.Empty };
         name = type.EasyName(options); Assert.Equal("TE<>", name);
 
-        options = options with { UseHost = true };
+        options = options with { UseTypeHost = true };
         name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TD<,>.TE<>", name);
 
         options = options with { UseTypeArguments = EasyTypeOptions.Default };
@@ -231,21 +232,21 @@ public static class Test_EasyName_Types
         var options = EasyTypeOptions.Empty;
         var name = type.EasyName(options); Assert.Equal("", name);
 
-        options = options with { UseName = true };
+        options = options with { UseTypeName = true };
         name = type.EasyName(options); Assert.Equal("TH", name);
 
-        options = options with { UseHost = true };
+        options = options with { UseTypeHost = true };
         name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TF.TG.TH", name);
 
-        options = options with { UseNamespace = true };
+        options = options with { UseTypeNamespace = true };
         name = type.EasyName(options); Assert.Equal($"{NAMESPACE}.{CLASSNAME}.TF.TG.TH", name);
 
         // Name implicit...
-        options = EasyTypeOptions.Empty with { UseName = false };
+        options = EasyTypeOptions.Empty with { UseTypeName = false };
         options = options with { UseTypeArguments = EasyTypeOptions.Empty };
         name = type.EasyName(options); Assert.Equal("TH<>", name);
 
-        options = options with { UseHost = true };
+        options = options with { UseTypeHost = true };
         name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TF<,>.TG.TH<>", name);
 
         options = options with { UseTypeArguments = EasyTypeOptions.Full };
@@ -264,21 +265,21 @@ public static class Test_EasyName_Types
         var options = EasyTypeOptions.Empty;
         var name = type.EasyName(options); Assert.Equal("", name);
 
-        options = options with { UseName = true };
+        options = options with { UseTypeName = true };
         name = type.EasyName(options); Assert.Equal("TH", name);
 
-        options = options with { UseHost = true };
+        options = options with { UseTypeHost = true };
         name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TF.TG.TH", name);
 
-        options = options with { UseNamespace = true };
+        options = options with { UseTypeNamespace = true };
         name = type.EasyName(options); Assert.Equal($"{NAMESPACE}.{CLASSNAME}.TF.TG.TH", name);
 
         // Name implicit...
-        options = EasyTypeOptions.Empty with { UseName = false };
+        options = EasyTypeOptions.Empty with { UseTypeName = false };
         options = options with { UseTypeArguments = EasyTypeOptions.Empty };
         name = type.EasyName(options); Assert.Equal("TH<>", name);
 
-        options = options with { UseHost = true };
+        options = options with { UseTypeHost = true };
         name = type.EasyName(options); Assert.Equal($"{CLASSNAME}.TF<,>.TG.TH<>", name);
 
         options = options with { UseTypeArguments = EasyTypeOptions.Default };
@@ -291,4 +292,4 @@ public static class Test_EasyName_Types
         options = EasyTypeOptions.Default;
         name = type.EasyName(options); Assert.Equal("TH<Int32>", name);
     }
-}
+}*/

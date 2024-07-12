@@ -1,4 +1,5 @@
-﻿namespace Yotei.Tools;
+﻿/*
+namespace Yotei.Tools;
 
 // ========================================================
 public static class SketchExtensions
@@ -289,4 +290,4 @@ public static class SketchExtensions
             if (type.BaseType != null) CaptureToStringMethods(type.BaseType);
         }
     }
-}
+}*/

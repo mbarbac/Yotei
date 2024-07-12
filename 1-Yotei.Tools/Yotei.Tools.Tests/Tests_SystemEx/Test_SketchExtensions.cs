@@ -1,3 +1,4 @@
+/*
 namespace Yotei.Tools.Tests;
 
 // ========================================================
@@ -24,7 +25,7 @@ public static class Test_SketchExtensions
         options = options with { UseSourceType = EasyTypeOptions.Default };
         name = source.Sketch(options); Assert.Equal("(Object) NULL", name);
 
-        options = options with { UseSourceType = options.UseSourceType with { UseNamespace = true } };
+        options = options with { UseSourceType = options.UseSourceType with { UseTypeNamespace = true } };
         name = source.Sketch(options); Assert.Equal("(System.Object) NULL", name);
 
         // Default...
@@ -47,7 +48,7 @@ public static class Test_SketchExtensions
         options = options with { UseSourceType = EasyTypeOptions.Default };
         name = source.Sketch(options); Assert.Equal("(String) NULL", name);
 
-        options = options with { UseSourceType = options.UseSourceType with { UseNamespace = true } };
+        options = options with { UseSourceType = options.UseSourceType with { UseTypeNamespace = true } };
         name = source.Sketch(options); Assert.Equal("(System.String) NULL", name);
 
         // Default...
@@ -70,7 +71,7 @@ public static class Test_SketchExtensions
         options = options with { UseSourceType = EasyTypeOptions.Default };
         name = source.Sketch(options); Assert.Equal("(Nullable<Int32>) NULL", name);
 
-        options = options with { UseSourceType = options.UseSourceType with { UseNamespace = true } };
+        options = options with { UseSourceType = options.UseSourceType with { UseTypeNamespace = true } };
         name = source.Sketch(options); Assert.Equal("(System.Nullable<Int32>) NULL", name);
 
         // Default...
@@ -95,7 +96,7 @@ public static class Test_SketchExtensions
         options = options with { UseSourceType = EasyTypeOptions.Default };
         name = source.Sketch(options); Assert.Equal("(String) Hello", name);
 
-        options = options with { UseSourceType = options.UseSourceType with { UseNamespace = true } };
+        options = options with { UseSourceType = options.UseSourceType with { UseTypeNamespace = true } };
         name = source.Sketch(options); Assert.Equal("(System.String) Hello", name);
 
         // Default...
@@ -118,7 +119,7 @@ public static class Test_SketchExtensions
         options = options with { UseSourceType = EasyTypeOptions.Default };
         name = source.Sketch(options); Assert.Equal("(Guid) 00000001-0002-0003-0405-060708090a0b", name);
 
-        options = options with { UseSourceType = options.UseSourceType with { UseNamespace = true } };
+        options = options with { UseSourceType = options.UseSourceType with { UseTypeNamespace = true } };
         name = source.Sketch(options); Assert.Equal("(System.Guid) 00000001-0002-0003-0405-060708090a0b", name);
 
         // Default...
@@ -141,7 +142,7 @@ public static class Test_SketchExtensions
         options = options with { UseSourceType = EasyTypeOptions.Default };
         name = source.Sketch(options); Assert.Equal("(Int32) 5", name);
 
-        options = options with { UseSourceType = options.UseSourceType with { UseNamespace = true } };
+        options = options with { UseSourceType = options.UseSourceType with { UseTypeNamespace = true } };
         name = source.Sketch(options); Assert.Equal("(System.Int32) 5", name);
 
         // Default...
@@ -166,7 +167,7 @@ public static class Test_SketchExtensions
         options = options with { UseSourceType = EasyTypeOptions.Default };
         name = source.Sketch(options); Assert.Equal("(Double) 1234.567", name);
 
-        options = options with { UseSourceType = options.UseSourceType with { UseNamespace = true } };
+        options = options with { UseSourceType = options.UseSourceType with { UseTypeNamespace = true } };
         name = source.Sketch(options); Assert.Equal("(System.Double) 1234.567", name);
 
         // Default...
@@ -193,7 +194,7 @@ public static class Test_SketchExtensions
         options = options with { UseSourceType = EasyTypeOptions.Default };
         name = source.Sketch(options); Assert.Equal("(Decimal) 7.5", name);
 
-        options = options with { UseSourceType = options.UseSourceType with { UseNamespace = true } };
+        options = options with { UseSourceType = options.UseSourceType with { UseTypeNamespace = true } };
         name = source.Sketch(options); Assert.Equal("(System.Decimal) 7.5", name);
 
         // Default...
@@ -224,7 +225,7 @@ public static class Test_SketchExtensions
         options = options with { UseSourceType = EasyTypeOptions.Default };
         name = source.Sketch(options); Assert.Equal("MyEnum.One", name);
 
-        options = options with { UseSourceType = options.UseSourceType with { UseNamespace = true } };
+        options = options with { UseSourceType = options.UseSourceType with { UseTypeNamespace = true } };
         name = source.Sketch(options); Assert.Equal($"{NAMESPACE}.{CLASSNAME}.MyEnum.One", name);
 
         // Default...
@@ -247,7 +248,7 @@ public static class Test_SketchExtensions
         options = options with { UseSourceType = EasyTypeOptions.Default };
         name = source.Sketch(options); Assert.Equal("MyEnum.One | MyEnum.Two | MyEnum.Three", name);
 
-        options = options with { UseSourceType = options.UseSourceType with { UseNamespace = true } };
+        options = options with { UseSourceType = options.UseSourceType with { UseTypeNamespace = true } };
         name = source.Sketch(options); Assert.Equal($"{NAMESPACE}.{CLASSNAME}.MyEnum.One | {NAMESPACE}.{CLASSNAME}.MyEnum.Two | {NAMESPACE}.{CLASSNAME}.MyEnum.Three", name);
 
         // Default...
@@ -272,7 +273,7 @@ public static class Test_SketchExtensions
         options = options with { UseSourceType = EasyTypeOptions.Default };
         name = source.Sketch(options); Assert.Equal("(Char[]) []", name);
 
-        options = options with { UseSourceType = options.UseSourceType with { UseNamespace = true } };
+        options = options with { UseSourceType = options.UseSourceType with { UseTypeNamespace = true } };
         name = source.Sketch(options); Assert.Equal("(System.Char[]) []", name);
 
         // Default...
@@ -295,7 +296,7 @@ public static class Test_SketchExtensions
         options = options with { UseSourceType = EasyTypeOptions.Default };
         name = source.Sketch(options); Assert.Equal("(Int32[]) [1, 2, 3]", name);
 
-        options = options with { UseSourceType = options.UseSourceType with { UseNamespace = true } };
+        options = options with { UseSourceType = options.UseSourceType with { UseTypeNamespace = true } };
         name = source.Sketch(options); Assert.Equal("(System.Int32[]) [1, 2, 3]", name);
 
         // Default...
@@ -318,7 +319,7 @@ public static class Test_SketchExtensions
         options = options with { UseSourceType = EasyTypeOptions.Default };
         name = source.Sketch(options); Assert.Equal("(Dictionary<String, Int32>) {James = 50, Maria = 25}", name);
 
-        options = options with { UseSourceType = options.UseSourceType with { UseNamespace = true } };
+        options = options with { UseSourceType = options.UseSourceType with { UseTypeNamespace = true } };
         name = source.Sketch(options); Assert.Equal("(System.Collections.Generic.Dictionary<String, Int32>) {James = 50, Maria = 25}", name);
 
         // Default...
@@ -341,7 +342,7 @@ public static class Test_SketchExtensions
         options = options with { UseSourceType = EasyTypeOptions.Default };
         name = source.Sketch(options); Assert.Equal("(List<String>) [James, Maria]", name);
 
-        options = options with { UseSourceType = options.UseSourceType with { UseNamespace = true } };
+        options = options with { UseSourceType = options.UseSourceType with { UseTypeNamespace = true } };
         name = source.Sketch(options); Assert.Equal("(System.Collections.Generic.List<String>) [James, Maria]", name);
 
         // Default...
@@ -463,4 +464,4 @@ public static class Test_SketchExtensions
         options = SketchOptions.Default;
         name = source.Sketch(options); Assert.Equal("{ Name = James, Age = 50 }", name);
     }
-}
+}*/

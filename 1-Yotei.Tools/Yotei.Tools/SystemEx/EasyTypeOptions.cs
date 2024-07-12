@@ -1,4 +1,5 @@
-﻿#pragma warning disable IDE0017
+﻿/*
+#pragma warning disable IDE0017
 
 namespace Yotei.Tools;
 
@@ -11,17 +12,17 @@ public record EasyTypeOptions
     /// <summary>
     /// Use the namespace of the given type.
     /// </summary>
-    public bool UseNamespace { get; init; }
+    public bool UseTypeNamespace { get; init; }
 
     /// <summary>
     /// Use the declaring host of the given type.
     /// </summary>
-    public bool UseHost { get; init; }
+    public bool UseTypeHost { get; init; }
 
     /// <summary>
     /// When the type is a type argument, whether to use its name or not.
     /// </summary>
-    public bool UseName { get; init; }
+    public bool UseTypeName { get; init; }
 
     /// <summary>
     /// If not null, the options to use with the type arguments of the given type.
@@ -40,19 +41,19 @@ public record EasyTypeOptions
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    /// <param name="useNamespace"></param>
-    /// <param name="useHost"></param>
-    /// <param name="useName"></param>
+    /// <param name="useTypeNamespace"></param>
+    /// <param name="useTypeHost"></param>
+    /// <param name="useTypeName"></param>
     /// <param name="useTypeArguments"></param>
     public EasyTypeOptions(
-        bool useNamespace = false,
-        bool useHost = false,
-        bool useName = false,
+        bool useTypeNamespace = false,
+        bool useTypeHost = false,
+        bool useTypeName = false,
         EasyTypeOptions? useTypeArguments = null)
     {
-        UseNamespace = useNamespace;
-        UseHost = useHost;
-        UseName = useName;
+        UseTypeNamespace = useTypeNamespace;
+        UseTypeHost = useTypeHost;
+        UseTypeName = useTypeName;
         UseTypeArguments = useTypeArguments;
     }
 
@@ -71,9 +72,9 @@ public record EasyTypeOptions
             if (_Default == null)
             {
                 _Default = new(
-                    useNamespace: false,
-                    useHost: false,
-                    useName: true);
+                    useTypeNamespace: false,
+                    useTypeHost: false,
+                    useTypeName: true);
 
                 _Default._Debug = $"{nameof(EasyTypeOptions)}.{nameof(Default)}";
 
@@ -95,9 +96,9 @@ public record EasyTypeOptions
             if (_Full == null)
             {
                 _Full = new(
-                    useNamespace: true,
-                    useHost: true,
-                    useName: true);
+                    useTypeNamespace: true,
+                    useTypeHost: true,
+                    useTypeName: true);
 
                 _Full._Debug = $"{nameof(EasyTypeOptions)}.{nameof(Full)}";
 
@@ -108,4 +109,4 @@ public record EasyTypeOptions
         }
     }
     static EasyTypeOptions _Full = null!;
-}
+}*/

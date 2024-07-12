@@ -23,25 +23,25 @@ internal record EasyMemberOptions
     /// If not null, the options to use with the type arguments of the given member, if any.
     /// <br/> This property is only used when the member is a method.
     /// </summary>
-    public EasyTypeOptions? UseTypeArguments { get; init; }
+    public EasyTypeOptions? UseMemberTypeArguments { get; init; }
 
     /// <summary>
     /// Use the arguments of the given member, if any.
     /// <br/> This property is only used when the member is a method or an indexer.
     /// </summary>
-    public bool UseArguments { get; init; }
+    public bool UseMemberArguments { get; init; }
 
     /// <summary>
     /// If not null, the options to use with the types of the arguments of the given member, if any.
     /// <br/> This property is only used when the member is a method or an indexer.
     /// </summary>
-    public EasyTypeOptions? UseArgumentsTypes { get; init; }
+    public EasyTypeOptions? UseMemberArgumentsTypes { get; init; }
 
     /// <summary>
     /// Use the names of the arguments of the given member, if any.
     /// <br/> This property is only used when the member is a method or an indexer.
     /// </summary>
-    public bool UseArgumentsNames { get; init; }
+    public bool UseMemberArgumentsNames { get; init; }
 
     // ----------------------------------------------------
 
@@ -57,24 +57,24 @@ internal record EasyMemberOptions
     /// </summary>
     /// <param name="useMemberType"></param>
     /// <param name="useMemberHost"></param>
-    /// <param name="useTypeArguments"></param>
-    /// <param name="useArguments"></param>
-    /// <param name="useArgumentsTypes"></param>
-    /// <param name="useArgumentsNames"></param>
+    /// <param name="useMemberTypeArguments"></param>
+    /// <param name="useMemberArguments"></param>
+    /// <param name="useMemberArgumentsTypes"></param>
+    /// <param name="useMemberArgumentsNames"></param>
     public EasyMemberOptions(
         EasyTypeOptions? useMemberType = null,
         EasyTypeOptions? useMemberHost = null,
-        EasyTypeOptions? useTypeArguments = null,
-        bool useArguments = false,
-        EasyTypeOptions? useArgumentsTypes = null,
-        bool useArgumentsNames = false)
+        EasyTypeOptions? useMemberTypeArguments = null,
+        bool useMemberArguments = false,
+        EasyTypeOptions? useMemberArgumentsTypes = null,
+        bool useMemberArgumentsNames = false)
     {
         UseMemberType = useMemberType;
         UseMemberHost = useMemberHost;
-        UseTypeArguments = useTypeArguments;
-        UseArguments = useArguments;
-        UseArgumentsTypes = useArgumentsTypes;
-        UseArgumentsNames = useArgumentsNames;
+        UseMemberTypeArguments = useMemberTypeArguments;
+        UseMemberArguments = useMemberArguments;
+        UseMemberArgumentsTypes = useMemberArgumentsTypes;
+        UseMemberArgumentsNames = useMemberArgumentsNames;
     }
 
     /// <summary>
@@ -94,10 +94,10 @@ internal record EasyMemberOptions
                 _Default = new(
                     useMemberType: null,
                     useMemberHost: null,
-                    useTypeArguments: EasyTypeOptions.Default,
-                    useArguments: true,
-                    useArgumentsTypes: EasyTypeOptions.Default,
-                    useArgumentsNames: false);
+                    useMemberTypeArguments: EasyTypeOptions.Default,
+                    useMemberArguments: true,
+                    useMemberArgumentsTypes: EasyTypeOptions.Default,
+                    useMemberArgumentsNames: false);
 
                 _Default._Debug = $"{nameof(EasyMemberOptions)}.{nameof(Default)}";
             }
@@ -118,10 +118,10 @@ internal record EasyMemberOptions
                 _Full = new(
                     useMemberType: EasyTypeOptions.Full,
                     useMemberHost: EasyTypeOptions.Full,
-                    useTypeArguments: EasyTypeOptions.Full,
-                    useArguments: true,
-                    useArgumentsTypes: EasyTypeOptions.Full,
-                    useArgumentsNames: true);
+                    useMemberTypeArguments: EasyTypeOptions.Full,
+                    useMemberArguments: true,
+                    useMemberArgumentsTypes: EasyTypeOptions.Full,
+                    useMemberArgumentsNames: true);
 
                 _Full._Debug = $"{nameof(EasyMemberOptions)}.{nameof(Full)}";
             }

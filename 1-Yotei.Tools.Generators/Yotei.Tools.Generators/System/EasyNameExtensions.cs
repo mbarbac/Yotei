@@ -1,7 +1,7 @@
 ﻿namespace Yotei.Tools.Generators.Internal;
 
 // ========================================================
-internal static class EasyNameExtensions
+internal static partial class EasyNameExtensions
 {
     /// <summary>
     /// Returns a C#-alike name of the given type, using default options.
@@ -36,7 +36,7 @@ internal static class EasyNameExtensions
         var host = item.DeclaringType;
 
         // Namespace...
-        if (options.UseNamespace && !gen && host == null)
+        if (options.UseTypeNamespace && !gen && host == null)
         {
             var ns = item.Namespace;
             if (ns != null && ns.Length > 0) sb.Append($"{ns}.");
@@ -49,7 +49,7 @@ internal static class EasyNameExtensions
             var str = host.EasyName(options, tpargs, ref tpused);
 
             // Using host if requested...
-            if ((options.UseHost || options.UseNamespace) && str.Length > 0) sb.Append($"{str}.");
+            if ((options.UseTypeHost || options.UseTypeNamespace) && str.Length > 0) sb.Append($"{str}.");
         }
 
         // Name...
@@ -57,7 +57,7 @@ internal static class EasyNameExtensions
         var index = name.IndexOf('`');
         if (index >= 0) name = name.Remove(index, name.Length - index);
 
-        var used = options.UseName || options.UseHost || options.UseNamespace;
+        var used = options.UseTypeName || options.UseTypeHost || options.UseTypeNamespace;
         if (used) sb.Append(name);
 
         // Type arguments...
@@ -79,9 +79,9 @@ internal static class EasyNameExtensions
 
                     var xoptions = options with
                     {
-                        UseNamespace = options.UseTypeArguments.UseNamespace,
-                        UseHost = options.UseTypeArguments.UseHost,
-                        UseName = options.UseTypeArguments.UseName,
+                        UseTypeNamespace = options.UseTypeArguments.UseTypeNamespace,
+                        UseTypeHost = options.UseTypeArguments.UseTypeHost,
+                        UseTypeName = options.UseTypeArguments.UseTypeName,
                     };
 
                     tpargs = tpargs[..num];
@@ -145,7 +145,7 @@ internal static class EasyNameExtensions
         sb.Append(item.Name);
 
         // Type arguments...
-        if (options.UseTypeArguments != null)
+        if (options.UseMemberTypeArguments != null)
         {
             var args = item.GetGenericArguments();
             if (args.Length > 0)
@@ -153,7 +153,7 @@ internal static class EasyNameExtensions
                 sb.Append('<');
                 for (int i = 0; i < args.Length; i++)
                 {
-                    var xoptions = options.UseTypeArguments;
+                    var xoptions = options.UseMemberTypeArguments;
 
                     var arg = args[i];
                     var str = arg.EasyName(xoptions);
@@ -166,14 +166,14 @@ internal static class EasyNameExtensions
         }
 
         // Member arguments...
-        if (options.UseArguments || options.UseArgumentsTypes != null || options.UseArgumentsNames)
+        if (options.UseMemberArguments || options.UseMemberArgumentsTypes != null || options.UseMemberArgumentsNames)
         {
             sb.Append('(');
             var pars = item.GetParameters(); for (int i = 0; i < pars.Length; i++)
             {
                 var par = pars[i];
-                var ptype = options.UseArgumentsTypes != null ? par.ParameterType.EasyName(options.UseArgumentsTypes) : "";
-                var pname = options.UseArgumentsNames ? (par.Name ?? "") : "";
+                var ptype = options.UseMemberArgumentsTypes != null ? par.ParameterType.EasyName(options.UseMemberArgumentsTypes) : "";
+                var pname = options.UseMemberArgumentsNames ? (par.Name ?? "") : "";
 
                 var len = ptype.Length + pname.Length;
                 if (i > 0) sb.Append(len > 0 ? ", " : ",");
@@ -227,14 +227,14 @@ internal static class EasyNameExtensions
         sb.Append(name);
 
         // Member arguments...
-        if (options.UseArguments || options.UseArgumentsTypes != null || options.UseArgumentsNames)
+        if (options.UseMemberArguments || options.UseMemberArgumentsTypes != null || options.UseMemberArgumentsNames)
         {
             sb.Append('(');
             var pars = item.GetParameters(); for (int i = 0; i < pars.Length; i++)
             {
                 var par = pars[i];
-                var ptype = options.UseArgumentsTypes != null ? par.ParameterType.EasyName(options.UseArgumentsTypes) : "";
-                var pname = options.UseArgumentsNames ? (par.Name ?? "") : "";
+                var ptype = options.UseMemberArgumentsTypes != null ? par.ParameterType.EasyName(options.UseMemberArgumentsTypes) : "";
+                var pname = options.UseMemberArgumentsNames ? (par.Name ?? "") : "";
 
                 var len = ptype.Length + pname.Length;
                 if (i > 0) sb.Append(len > 0 ? ", " : ",");
@@ -296,15 +296,15 @@ internal static class EasyNameExtensions
         sb.Append(name);
 
         // Member arguments...
-        if ((options.UseArguments || options.UseArgumentsTypes != null || options.UseArgumentsNames)
+        if ((options.UseMemberArguments || options.UseMemberArgumentsTypes != null || options.UseMemberArgumentsNames)
            && pars.Length > 0)
         {
             sb.Append('[');
             for (int i = 0; i < pars.Length; i++)
             {
                 var par = pars[i];
-                var ptype = options.UseArgumentsTypes != null ? par.ParameterType.EasyName(options.UseArgumentsTypes) : "";
-                var pname = options.UseArgumentsNames ? (par.Name ?? "") : "";
+                var ptype = options.UseMemberArgumentsTypes != null ? par.ParameterType.EasyName(options.UseMemberArgumentsTypes) : "";
+                var pname = options.UseMemberArgumentsNames ? (par.Name ?? "") : "";
 
                 var len = ptype.Length + pname.Length;
                 if (i > 0) sb.Append(len > 0 ? ", " : ",");

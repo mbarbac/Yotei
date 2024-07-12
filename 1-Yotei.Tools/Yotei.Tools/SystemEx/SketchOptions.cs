@@ -1,4 +1,5 @@
-﻿namespace Yotei.Tools;
+﻿/*
+namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>
@@ -116,4 +117,4 @@ public record SketchOptions
         UsePrivateMembers = true,
         UseStaticMembers = true,
     };
-}
+}*/
