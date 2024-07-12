@@ -94,8 +94,14 @@ public record EasyNameOptions
             {
                 _Default = new EasyNameOptions
                 {
+                    UseTypeNamespace = false,
+                    UseTypeHost = false,
                     UseTypeName = true,
+
+                    UseMemberType = null,
+                    UseMemberHost = null,
                     UseMemberArguments = true,
+                    UseMemberArgumentsNames = false,
                 };
 
                 var prop = typeof(EasyNameOptions).GetProperty(nameof(UseTypeArguments));
