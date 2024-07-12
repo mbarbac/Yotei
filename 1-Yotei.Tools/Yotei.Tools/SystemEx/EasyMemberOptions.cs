@@ -1,4 +1,5 @@
 ﻿#pragma warning disable IDE0017
+
 namespace Yotei.Tools;
 
 // ========================================================
