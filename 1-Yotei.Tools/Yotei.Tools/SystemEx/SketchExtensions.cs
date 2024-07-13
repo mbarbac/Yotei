@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools;
+﻿#pragma warning disable IDE0300
+
+namespace Yotei.Tools;
 
 // ========================================================
 public static class SketchExtensions
