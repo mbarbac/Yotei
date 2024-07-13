@@ -2,7 +2,7 @@
 
 // =========================================================
 /// <inheritdoc/>
-//[Generator(LanguageNames.CSharp)]
+[Generator(LanguageNames.CSharp)]
 internal class DevGenerator : TreeGenerator
 {
 #if DEBUG_DEV_GENERATOR && DEBUG

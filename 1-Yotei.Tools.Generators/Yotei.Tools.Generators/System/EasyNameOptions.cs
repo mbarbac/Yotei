@@ -22,6 +22,11 @@ internal record EasyNameOptions
     public bool UseTypeName { get; init; }
 
     /// <summary>
+    /// Add the nullable annotation to the type name, if any.
+    /// </summary>
+    public bool UseTypeNullable { get; init; }
+
+    /// <summary>
     /// If not null, the options to use with the type arguments of the given type.
     /// </summary>
     public EasyNameOptions? UseTypeArguments { get; init; }
@@ -60,11 +65,6 @@ internal record EasyNameOptions
 
     // -----------------------------------------------------
 
-    public override string ToString() => _ToString;
-    string _ToString = nameof(EasyNameOptions);
-
-    // -----------------------------------------------------
-
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
@@ -73,6 +73,7 @@ internal record EasyNameOptions
         UseTypeNamespace = false;
         UseTypeHost = false;
         UseTypeName = false;
+        UseTypeNullable = false;
         UseTypeArguments = null;
 
         UseMemberType = null;
@@ -102,13 +103,13 @@ internal record EasyNameOptions
                     UseTypeNamespace = false,
                     UseTypeHost = false,
                     UseTypeName = true,
+                    UseTypeNullable = true,
 
                     UseMemberType = null,
                     UseMemberHost = null,
                     UseMemberArguments = true,
                     UseMemberArgumentsNames = false,
                 };
-                _Default._ToString = $"{nameof(EasyNameOptions)}.{nameof(Default)}";
 
                 var prop = typeof(EasyNameOptions).GetProperty(nameof(UseTypeArguments));
                 prop!.SetValue(_Default, _Default);
@@ -138,11 +139,11 @@ internal record EasyNameOptions
                     UseTypeNamespace = true,
                     UseTypeHost = true,
                     UseTypeName = true,
+                    UseTypeNullable = true,
 
                     UseMemberArguments = true,
                     UseMemberArgumentsNames = true,
                 };
-                _Full._ToString = $"{nameof(EasyNameOptions)}.{nameof(Full)}";
 
                 var prop = typeof(EasyNameOptions).GetProperty(nameof(UseTypeArguments));
                 prop!.SetValue(_Full, _Full);

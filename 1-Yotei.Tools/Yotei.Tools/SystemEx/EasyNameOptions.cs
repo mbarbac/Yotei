@@ -60,11 +60,6 @@ public record EasyNameOptions
 
     // -----------------------------------------------------
 
-    public override string ToString() => _ToString;
-    string _ToString = nameof(EasyNameOptions);
-
-    // -----------------------------------------------------
-
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
@@ -108,7 +103,6 @@ public record EasyNameOptions
                     UseMemberArguments = true,
                     UseMemberArgumentsNames = false,
                 };
-                _Default._ToString = $"{nameof(EasyNameOptions)}.{nameof(Default)}";
 
                 var prop = typeof(EasyNameOptions).GetProperty(nameof(UseTypeArguments));
                 prop!.SetValue(_Default, _Default);
@@ -142,7 +136,6 @@ public record EasyNameOptions
                     UseMemberArguments = true,
                     UseMemberArgumentsNames = true,
                 };
-                _Full._ToString = $"{nameof(EasyNameOptions)}.{nameof(Full)}";
 
                 var prop = typeof(EasyNameOptions).GetProperty(nameof(UseTypeArguments));
                 prop!.SetValue(_Full, _Full);

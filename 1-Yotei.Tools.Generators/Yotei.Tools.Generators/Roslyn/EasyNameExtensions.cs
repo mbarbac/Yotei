@@ -1,4 +1,4 @@
-﻿/*namespace Yotei.Tools.Generators.Internal;
+﻿namespace Yotei.Tools.Generators.Internal;
 
 // ========================================================
 internal static partial class EasyNameExtensions
@@ -8,7 +8,7 @@ internal static partial class EasyNameExtensions
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static string EasyName(this ITypeSymbol item) => item.EasyName(EasyTypeOptions.Default);
+    public static string EasyName(this ITypeSymbol item) => item.EasyName(EasyNameOptions.Default);
 
     /// <summary>
     /// Returns a C#-alike name of the given type, using the given options.
@@ -16,7 +16,7 @@ internal static partial class EasyNameExtensions
     /// <param name="item"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this ITypeSymbol item, EasyTypeOptions options)
+    public static string EasyName(this ITypeSymbol item, EasyNameOptions options)
     {
         item.ThrowWhenNull();
         options.ThrowWhenNull();
@@ -27,7 +27,7 @@ internal static partial class EasyNameExtensions
     /// <summary>
     /// Invoked when the type symbol IS a namespace.
     /// </summary>
-    static string EasyNamespace(this ITypeSymbol item, EasyTypeOptions options)
+    static string EasyNamespace(this ITypeSymbol item, EasyNameOptions options)
     {
         List<string> names = [];
         ISymbol? node = item;
@@ -53,20 +53,24 @@ internal static partial class EasyNameExtensions
     /// <summary>
     /// Invoked when the type symbol IS NOT a namespace.
     /// </summary>
-    static string EasyType(this ITypeSymbol item, EasyTypeOptions options)
+    static string EasyType(this ITypeSymbol item, EasyNameOptions options)
     {
         var sb = new StringBuilder();
         var gen = item.TypeKind == TypeKind.TypeParameter;
         var named = item as INamedTypeSymbol;
 
-        // Namespace...
+        // Namespace and Host...
         if ((options.UseTypeNamespace || options.UseTypeHost) && !gen)
         {
             List<string> names = [];
             ISymbol? node = item;
 
-            // Prevents re-entrancy when obtaining the host...
-            var xoptions = options with { UseTypeNamespace = false, UseTypeHost = false };
+            var xoptions = options with // Prevents re-entrance and not using nullable...
+            {
+                UseTypeNamespace = false,
+                UseTypeHost = false,
+                UseTypeNullable = false,
+            };
 
             while ((node = node.ContainingSymbol) != null)
             {
@@ -91,7 +95,9 @@ internal static partial class EasyNameExtensions
 
         // Name...
         var name = item.Name;
-        var used = options.UseTypeName || options.UseTypeHost || options.UseTypeNamespace;
+        var used =
+            options.UseTypeName || options.UseTypeNullable ||
+            options.UseTypeHost || options.UseTypeNamespace;
 
         if (used) sb.Append(name);
 
@@ -106,7 +112,7 @@ internal static partial class EasyNameExtensions
                 UseTypeNamespace = options.UseTypeArguments.UseTypeNamespace,
                 UseTypeHost = options.UseTypeArguments.UseTypeHost,
                 UseTypeName = options.UseTypeArguments.UseTypeName,
-                AddNullable = options.UseTypeArguments.AddNullable,
+                UseTypeNullable = options.UseTypeArguments.UseTypeNullable,
             };
 
             sb.Append('<');
@@ -123,7 +129,7 @@ internal static partial class EasyNameExtensions
 
         // Nullable requested...
         bool nullable =
-            options.AddNullable &&
+            options.UseTypeNullable &&
             item.NullableAnnotation == NullableAnnotation.Annotated &&
             item.Name != "Nullable";
 
@@ -144,7 +150,7 @@ internal static partial class EasyNameExtensions
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static string EasyName(this IMethodSymbol item) => item.EasyName(EasyMemberOptions.Default);
+    public static string EasyName(this IMethodSymbol item) => item.EasyName(EasyNameOptions.Default);
 
     /// <summary>
     /// Returns a C#-alike name of the given method, using the given options.
@@ -152,7 +158,7 @@ internal static partial class EasyNameExtensions
     /// <param name="item"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this IMethodSymbol item, EasyMemberOptions options)
+    public static string EasyName(this IMethodSymbol item, EasyNameOptions options)
     {
         item.ThrowWhenNull();
         options.ThrowWhenNull();
@@ -162,16 +168,12 @@ internal static partial class EasyNameExtensions
         // Return type...
         if (options.UseMemberType != null)
         {
-            bool valid = item.MethodKind switch
-            {
-                MethodKind.Constructor => false,
-                _ => true
-            };
-            if (valid)
-            {
-                var str = item.ReturnType.EasyName(options.UseMemberType);
-                if (str.Length > 0) sb.Append($"{str} ");
-            }
+            var type = item.MethodKind == MethodKind.Constructor
+                ? item.ContainingType
+                : item.ReturnType;
+
+            var str = type.EasyName(options.UseMemberType);
+            if (str.Length > 0) sb.Append($"{str} ");
         }
 
         // Member host...
@@ -198,11 +200,14 @@ internal static partial class EasyNameExtensions
         {
             if (name.Length == 0) { name = "$"; sb.Append(name); };
 
+            var xoptions = options.UseMemberTypeArguments with
+            {
+                UseTypeNullable = false,
+            };
+
             sb.Append('<');
             for (int i = 0; i < item.TypeArguments.Length; i++)
             {
-                var xoptions = options.UseMemberTypeArguments with { AddNullable = false };
-
                 var arg = item.TypeArguments[i];
                 var str = arg.EasyName(xoptions);
 
@@ -249,7 +254,7 @@ internal static partial class EasyNameExtensions
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static string EasyName(this IPropertySymbol item) => item.EasyName(EasyMemberOptions.Default);
+    public static string EasyName(this IPropertySymbol item) => item.EasyName(EasyNameOptions.Default);
 
     /// <summary>
     /// Returns a C#-alike name of the given property, using the given options.
@@ -257,7 +262,7 @@ internal static partial class EasyNameExtensions
     /// <param name="item"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this IPropertySymbol item, EasyMemberOptions options)
+    public static string EasyName(this IPropertySymbol item, EasyNameOptions options)
     {
         item.ThrowWhenNull();
         options.ThrowWhenNull();
@@ -287,8 +292,9 @@ internal static partial class EasyNameExtensions
         sb.Append(name);
 
         // Member arguments...
-        if (item.Parameters.Length > 0 &&
-            (options.UseMemberArguments || options.UseMemberArgumentsTypes != null || options.UseMemberArgumentsNames))
+        if (item.Parameters.Length > 0 && (
+            options.UseMemberArguments || options.UseMemberArgumentsTypes != null ||
+            options.UseMemberArgumentsNames))
         {
             if (name.Length == 0) { name = "$"; sb.Append(name); };
 
@@ -323,7 +329,7 @@ internal static partial class EasyNameExtensions
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static string EasyName(this IFieldSymbol item) => item.EasyName(EasyMemberOptions.Default);
+    public static string EasyName(this IFieldSymbol item) => item.EasyName(EasyNameOptions.Default);
 
     /// <summary>
     /// Returns a C#-alike name of the given field, using the given options.
@@ -331,7 +337,7 @@ internal static partial class EasyNameExtensions
     /// <param name="item"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this IFieldSymbol item, EasyMemberOptions options)
+    public static string EasyName(this IFieldSymbol item, EasyNameOptions options)
     {
         item.ThrowWhenNull();
         options.ThrowWhenNull();
@@ -362,4 +368,4 @@ internal static partial class EasyNameExtensions
         // Finishing...
         return sb.ToString();
     }
-}*/
+}
