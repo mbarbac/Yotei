@@ -1,4 +1,4 @@
-﻿namespace Yotei.Tools.Generators.Internal;
+﻿/*namespace Yotei.Tools.Generators.Internal;
 
 // ========================================================
 internal static partial class EasyNameExtensions
@@ -362,4 +362,4 @@ internal static partial class EasyNameExtensions
         // Finishing...
         return sb.ToString();
     }
-}
+}*/

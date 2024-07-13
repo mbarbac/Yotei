@@ -1,5 +1,4 @@
-﻿/*
-namespace Yotei.Tools;
+﻿namespace Yotei.Tools;
 
 // ========================================================
 public static class SketchExtensions
@@ -19,13 +18,14 @@ public static class SketchExtensions
     /// <returns></returns>
     public static string Sketch<T>(this T? source, SketchOptions options)
     {
-        // Reflection cases using 'EasyNameExtensions'...
+        // Reflection-related cases...
         switch (source)
         {
-            case Type item: return item.EasyName(options.TypeOptions);
-            case ConstructorInfo item: return item.EasyName(options.MemberOptions);
-            case PropertyInfo item: return item.EasyName(options.MemberOptions);
-            case FieldInfo item: return item.EasyName(options.MemberOptions);
+            case Type item: return item.EasyName(options.EasyNameOptions);
+            case MethodInfo item: return item.EasyName(options.EasyNameOptions);
+            case ConstructorInfo item: return item.EasyName(options.EasyNameOptions);
+            case PropertyInfo item: return item.EasyName(options.EasyNameOptions);
+            case FieldInfo item: return item.EasyName(options.EasyNameOptions);
         }
 
         // Capturing type...
@@ -290,4 +290,4 @@ public static class SketchExtensions
             if (type.BaseType != null) CaptureToStringMethods(type.BaseType);
         }
     }
-}*/
+}

@@ -8,7 +8,7 @@ internal static partial class EasyNameExtensions
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static string EasyName(this Type item) => item.EasyName(EasyTypeOptions.Default);
+    public static string EasyName(this Type item) => item.EasyName(EasyNameOptions.Default);
 
     /// <summary>
     /// Returns a C#-alike name of the given type, using the given options.
@@ -16,7 +16,7 @@ internal static partial class EasyNameExtensions
     /// <param name="item"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this Type item, EasyTypeOptions options)
+    public static string EasyName(this Type item, EasyNameOptions options)
     {
         item.ThrowWhenNull();
         options.ThrowWhenNull();
@@ -29,7 +29,7 @@ internal static partial class EasyNameExtensions
     /// <summary>
     /// Invoked after having captured the whole set of generic arguments.
     /// </summary>
-    static string EasyName(this Type item, EasyTypeOptions options, Span<Type> tpargs, ref int tpused)
+    static string EasyName(this Type item, EasyNameOptions options, Span<Type> tpargs, ref int tpused)
     {
         var sb = new StringBuilder();
         var gen = item.FullName == null;
@@ -100,6 +100,7 @@ internal static partial class EasyNameExtensions
             }
         }
 
+
         // Finishing...
         return sb.ToString();
     }
@@ -111,7 +112,7 @@ internal static partial class EasyNameExtensions
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static string EasyName(this MethodInfo item) => item.EasyName(EasyMemberOptions.Default);
+    public static string EasyName(this MethodInfo item) => item.EasyName(EasyNameOptions.Default);
 
     /// <summary>
     /// Returns a C#-alike name of the given method, using the given options.
@@ -119,7 +120,7 @@ internal static partial class EasyNameExtensions
     /// <param name="item"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this MethodInfo item, EasyMemberOptions options)
+    public static string EasyName(this MethodInfo item, EasyNameOptions options)
     {
         item.ThrowWhenNull();
         options.ThrowWhenNull();
@@ -153,10 +154,8 @@ internal static partial class EasyNameExtensions
                 sb.Append('<');
                 for (int i = 0; i < args.Length; i++)
                 {
-                    var xoptions = options.UseMemberTypeArguments;
-
                     var arg = args[i];
-                    var str = arg.EasyName(xoptions);
+                    var str = arg.EasyName(options.UseMemberTypeArguments);
 
                     if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
                     sb.Append(str);
@@ -166,7 +165,8 @@ internal static partial class EasyNameExtensions
         }
 
         // Member arguments...
-        if (options.UseMemberArguments || options.UseMemberArgumentsTypes != null || options.UseMemberArgumentsNames)
+        if (options.UseMemberArguments || options.UseMemberArgumentsTypes != null ||
+            options.UseMemberArgumentsNames)
         {
             sb.Append('(');
             var pars = item.GetParameters(); for (int i = 0; i < pars.Length; i++)
@@ -199,7 +199,7 @@ internal static partial class EasyNameExtensions
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static string EasyName(this ConstructorInfo item) => item.EasyName(EasyMemberOptions.Default);
+    public static string EasyName(this ConstructorInfo item) => item.EasyName(EasyNameOptions.Default);
 
     /// <summary>
     /// Returns a C#-alike name of the given constructor, using the given options.
@@ -207,7 +207,7 @@ internal static partial class EasyNameExtensions
     /// <param name="item"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this ConstructorInfo item, EasyMemberOptions options)
+    public static string EasyName(this ConstructorInfo item, EasyNameOptions options)
     {
         item.ThrowWhenNull();
         options.ThrowWhenNull();
@@ -260,7 +260,7 @@ internal static partial class EasyNameExtensions
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static string EasyName(this PropertyInfo item) => item.EasyName(EasyMemberOptions.Default);
+    public static string EasyName(this PropertyInfo item) => item.EasyName(EasyNameOptions.Default);
 
     /// <summary>
     /// Returns a C#-alike name of the given property, using the given options.
@@ -268,7 +268,7 @@ internal static partial class EasyNameExtensions
     /// <param name="item"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this PropertyInfo item, EasyMemberOptions options)
+    public static string EasyName(this PropertyInfo item, EasyNameOptions options)
     {
         item.ThrowWhenNull();
         options.ThrowWhenNull();
@@ -330,7 +330,7 @@ internal static partial class EasyNameExtensions
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static string EasyName(this FieldInfo item) => item.EasyName(EasyMemberOptions.Default);
+    public static string EasyName(this FieldInfo item) => item.EasyName(EasyNameOptions.Default);
 
     /// <summary>
     /// Returns a C#-alike name of the given field, using the given options.
@@ -338,7 +338,7 @@ internal static partial class EasyNameExtensions
     /// <param name="item"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this FieldInfo item, EasyMemberOptions options)
+    public static string EasyName(this FieldInfo item, EasyNameOptions options)
     {
         item.ThrowWhenNull();
         options.ThrowWhenNull();

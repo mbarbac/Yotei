@@ -1,10 +1,10 @@
-﻿namespace Yotei.Tools;
+﻿namespace Yotei.Tools.Generators.Internal;
 
 // ========================================================
 /// <summary>
 /// Provides options for the <see cref="EasyNameExtensions"/> methods.
 /// </summary>
-public record EasyNameOptions
+internal record EasyNameOptions
 {
     /// <summary>
     /// Use the namespace of the given type.

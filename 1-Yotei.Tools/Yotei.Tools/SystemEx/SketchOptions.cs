@@ -1,5 +1,4 @@
-﻿/*
-namespace Yotei.Tools;
+﻿namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>
@@ -8,26 +7,14 @@ namespace Yotei.Tools;
 public record SketchOptions
 {
     /// <summary>
-    /// The options to use when the element is a <see cref="Type"/>.
+    /// The options to use with not-null reflection elements.
     /// </summary>
-    public EasyTypeOptions TypeOptions
+    public EasyNameOptions EasyNameOptions
     {
-        get => _TypeOptions;
-        init => _TypeOptions = value.ThrowWhenNull();
+        get => _EasyNameOptions;
+        init => _EasyNameOptions = value.ThrowWhenNull();
     }
-    EasyTypeOptions _TypeOptions = default!;
-
-    /// <summary>
-    /// The options to use when the element is a reflection one.
-    /// </summary>
-    public EasyMemberOptions MemberOptions
-    {
-        get => _MemberOptions;
-        init => _MemberOptions = value.ThrowWhenNull();
-    }
-    EasyMemberOptions _MemberOptions = default!;
-
-    // ----------------------------------------------------
+    EasyNameOptions _EasyNameOptions = null!;
 
     /// <summary>
     /// The string used to represent null values.
@@ -40,10 +27,9 @@ public record SketchOptions
     string _NullStr = default!;
 
     /// <summary>
-    /// If not null, the options to use to preceed values with their types between rounded
-    /// brackets.
+    /// If not null, the options to use to preceed values with their types.
     /// </summary>
-    public EasyTypeOptions? UseSourceType { get; init; }
+    public EasyNameOptions? UseSourceType { get; init; }
 
     /// <summary>
     /// If not null, the format specification to use.
@@ -70,15 +56,14 @@ public record SketchOptions
     /// </summary>
     public bool UseStaticMembers { get; init; }
 
-    // ----------------------------------------------------
+    // -----------------------------------------------------
 
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
     public SketchOptions()
     {
-        TypeOptions = EasyTypeOptions.Empty;
-        MemberOptions = EasyMemberOptions.Empty;
+        EasyNameOptions = EasyNameOptions.Empty;
         NullStr = string.Empty;
         UseSourceType = null;
         Format = null;
@@ -94,27 +79,28 @@ public record SketchOptions
     public static SketchOptions Empty { get; } = new();
 
     /// <summary>
-    /// A shared default instance.
+    /// A shared instance with default settings.
     /// </summary>
-    public static SketchOptions Default { get; } = new()
+    public static SketchOptions Default => _Default ??= new SketchOptions
     {
-        TypeOptions = EasyTypeOptions.Default,
-        MemberOptions = EasyMemberOptions.Default,
+        EasyNameOptions = EasyNameOptions.Default,
         NullStr = "NULL",
         UseShape = true,
     };
+    static SketchOptions _Default = null!;
 
     /// <summary>
-    /// A shared default instance.
+    /// A shared instance with full settings (except the <see cref="Format"/> and
+    /// <see cref="Provider"/> ones).
     /// </summary>
-    public static SketchOptions Full { get; } = new()
+    public static SketchOptions Full => _Full ??= new SketchOptions
     {
-        TypeOptions = EasyTypeOptions.Full,
-        MemberOptions = EasyMemberOptions.Full,
+        EasyNameOptions = EasyNameOptions.Full,
         NullStr = "NULL",
-        UseSourceType = EasyTypeOptions.Full,
+        UseSourceType = EasyNameOptions.Full,
         UseShape = true,
         UsePrivateMembers = true,
         UseStaticMembers = true,
     };
-}*/
+    static SketchOptions _Full = null!;
+}
