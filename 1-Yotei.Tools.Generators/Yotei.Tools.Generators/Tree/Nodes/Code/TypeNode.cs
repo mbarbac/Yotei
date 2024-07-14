@@ -86,7 +86,7 @@ internal class TypeNode : IChildNode
             return false;
         }
 
-        if (IsSupportedKind())
+        if (!IsSupportedKind())
         {
             context.ReportDiagnostic(TreeDiagnostics.KindNotSupported(Symbol));
             return false;

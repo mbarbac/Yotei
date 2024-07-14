@@ -87,4 +87,21 @@ internal static class MatchExtensions
         // Finishing...
         return true;
     }
+
+    // -----------------------------------------------------
+
+    /// <summary>
+    /// Extract from the given collection of attributes those whose attribute class match the
+    /// given type.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    public static List<AttributeData> Match(this IEnumerable<AttributeData> source, Type type)
+    {
+        source.ThrowWhenNull();
+        type.ThrowWhenNull();
+
+        return source.Where(x => x.Match(type)).ToList();
+    }
 }

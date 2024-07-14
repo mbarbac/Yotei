@@ -280,7 +280,8 @@ internal class TreeGenerator : IIncrementalGenerator
     /// <summary>
     /// Extracts the attributes that match any of the given types.
     /// </summary>
-    static ImmutableArray<AttributeData> Matches(IEnumerable<AttributeData> attributes, Type[] types)
+    static ImmutableArray<AttributeData> Matches(
+        IEnumerable<AttributeData> attributes, Type[] types)
     {
         List<AttributeData> items = [];
 
