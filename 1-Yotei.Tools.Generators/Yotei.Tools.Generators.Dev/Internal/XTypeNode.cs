@@ -9,8 +9,12 @@ internal class XTypeNode : TypeNode
 
     protected override void EmitCore(SourceProductionContext context, CodeBuilder cb)
     {
-        var item = Symbol.GetMembers().OfType<IFieldSymbol>().First();
+        var item = Candidate!.Attributes[0];
         var options = EasyNameOptions.Full;
         var name = item!.EasyName(options);
+
+        //var item = Symbol.GetMembers().OfType<IFieldSymbol>().First();
+        //var options = EasyNameOptions.Full;
+        //var name = item!.EasyName(options);
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools.Generators.Internal;
+﻿#pragma warning disable IDE0019
+
+namespace Yotei.Tools.Generators.Internal;
 
 // ========================================================
 internal static partial class EasyNameExtensions
@@ -21,13 +23,13 @@ internal static partial class EasyNameExtensions
         item.ThrowWhenNull();
         options.ThrowWhenNull();
 
-        return item.IsNamespace ? item.EasyNamespace(options) : item.EasyType(options);
+        return item.IsNamespace ? item.EasyNamespace() : item.EasyType(options);
     }
 
     /// <summary>
     /// Invoked when the type symbol IS a namespace.
     /// </summary>
-    static string EasyNamespace(this ITypeSymbol item, EasyNameOptions options)
+    static string EasyNamespace(this ITypeSymbol item)
     {
         List<string> names = [];
         ISymbol? node = item;
@@ -367,5 +369,154 @@ internal static partial class EasyNameExtensions
 
         // Finishing...
         return sb.ToString();
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns a C#-alike representation of the given attribute instance, using default options.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    public static string EasyName(this AttributeData item) => item.EasyName(EasyNameOptions.Default);
+
+    /// <summary>
+    /// Returns a C#-alike representation of the given attribute instance, using the given options.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="options"></param>
+    /// <returns></returns>
+    public static string EasyName(this AttributeData item, EasyNameOptions options)
+    {
+        item.ThrowWhenNull();
+        options.ThrowWhenNull();
+
+        var sb = new StringBuilder();
+
+        // Attribute class name (including its type attributes, if any)...
+        if (options.UseMemberHost != null)
+        {
+            var xoptions = options.UseMemberHost with { UseTypeName = true, UseTypeNullable = false };
+            var name = item.AttributeClass == null ? "" : item.AttributeClass.EasyName(xoptions);
+            sb.Append(name);
+        }
+
+        // Attribute arguments...
+        if (options.UseMemberTypeArguments != null && (
+            item.ConstructorArguments.Length != 0 || item.NamedArguments.Length != 0))
+        {
+            var done = false;
+            sb.Append('(');
+
+            foreach (var arg in item.ConstructorArguments)
+            {
+                if (done) sb.Append(", ");
+                done = true;
+
+                var temp = arg.EasyName(options, null);
+                sb.Append(temp);
+            }
+
+            foreach (var named in item.NamedArguments)
+            {
+                if (done) sb.Append(", ");
+                done = true;
+
+                var temp = named.Value.EasyName(options, named.Key);
+                sb.Append(temp);
+            }
+
+            sb.Append(')');
+        }
+
+        // Finishing...
+        return sb.ToString();
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns a C#-alike name of the constant, using default options, and the optional name.
+    /// <br/> Constants typically are constructor arguments or named ones.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    public static string EasyName(
+        this TypedConstant item, string? name = null) => item.EasyName(EasyNameOptions.Default, name);
+
+    /// <summary>
+    /// Returns a C#-alike name of the constant, using given options, and the optional name.
+    /// <br/> Constants typically are constructor arguments or named ones.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="options"></param>
+    /// <returns></returns>
+    public static string EasyName(
+        this TypedConstant item, EasyNameOptions options, string? name = null)
+    {
+        item.ThrowWhenNull();
+        options.ThrowWhenNull();
+
+        var sb = new StringBuilder();
+        string str;
+
+        if (options.UseMemberType != null && item.Type != null)
+        {
+            if (item.Type != null)
+            {
+                sb.Append('(');
+                str = item.Type.EasyName(options); sb.Append(str);
+                if (item.Kind == TypedConstantKind.Array) sb.Append("[]");
+                sb.Append(')');
+                sb.Append(' ');
+            }
+        }
+
+        if (name != null)
+        {
+            sb.Append(name);
+            sb.Append(": ");
+        }
+
+        if (item.IsNull) sb.Append("null");
+        else
+        {
+            if (item.Kind == TypedConstantKind.Array)
+            {
+                sb.Append('['); for (int i = 0; i < item.Values.Length; i++)
+                {
+                    if (i > 0) sb.Append(", ");
+
+                    var value = item.Values[i];
+                    str = value.EasyName(options, null);
+                    sb.Append(str);
+                }
+                sb.Append(']');
+            }
+            else
+            {
+                str = ObjectValue(item.Value, options);
+                sb.Append(str);
+            }
+        }
+
+        // Finishing...
+        return sb.ToString();
+
+        /// <summary>
+        /// Invoked to obtain the value representation.
+        /// </summary>
+        static string ObjectValue(object? value, EasyNameOptions options) => value switch
+        {
+            ITypeSymbol item => item.EasyName(options),
+            IMethodSymbol item => item.EasyName(options),
+            IPropertySymbol item => item.EasyName(options),
+            IFieldSymbol item => item.EasyName(options),
+
+            Type type => type.EasyName(options),
+
+            null => "null",
+            _ => $"{value}"
+        };
     }
 }

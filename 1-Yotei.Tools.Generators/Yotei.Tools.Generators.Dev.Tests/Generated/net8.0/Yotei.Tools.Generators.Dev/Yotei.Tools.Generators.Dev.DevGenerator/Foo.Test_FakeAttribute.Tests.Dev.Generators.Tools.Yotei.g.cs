@@ -5,7 +5,7 @@ namespace Yotei.Tools.Generators.Dev.Tests
 {
     partial class Test_FakeAttribute
     {
-        partial class TypeA
+        partial class Foo
         {
         }
     }
