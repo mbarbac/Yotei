@@ -27,7 +27,8 @@ internal class PropertyNode : IChildNode
         => Candidate = candidate;
 
     /// <inheritdoc/>
-    public override string ToString() => $"Property: {Symbol.Name}";
+    public override string ToString()
+        => $"Property: {Symbol.EasyName(EasyNameOptions.Default with { UseMemberHost = EasyNameOptions.Default })}";
 
     /// <summary>
     /// The type-alike node this instance belongs to in the source code generation hierarchy.

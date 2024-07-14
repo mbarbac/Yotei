@@ -20,6 +20,8 @@ internal static class MatchExtensions
         return false;
     }
 
+    // -----------------------------------------------------
+
     /// <summary>
     /// Determines if the given symbol matches the given type.
     /// </summary>

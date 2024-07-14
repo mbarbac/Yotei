@@ -31,7 +31,7 @@ internal class TypeNode : IChildNode
         => Candidate = candidate;
 
     /// <inheritdoc/>
-    public override string ToString() => $"Type: {Symbol.Name}";
+    public override string ToString() => $"Type: {Symbol.EasyName()}";
 
     /// <summary>
     /// The parent node this instance belongs to in the source code generation hierarchy, which
@@ -78,7 +78,36 @@ internal class TypeNode : IChildNode
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
-    public virtual bool Validate(SourceProductionContext context) => true;
+    public virtual bool Validate(SourceProductionContext context)
+    {
+        if (!Symbol.IsPartial())
+        {
+            context.ReportDiagnostic(TreeDiagnostics.TypeIsNotPartial(Symbol));
+            return false;
+        }
+
+        if (IsSupportedKind())
+        {
+            context.ReportDiagnostic(TreeDiagnostics.KindNotSupported(Symbol));
+            return false;
+        }
+
+        foreach (var node in ChildTypes) if (!node.Validate(context)) return false;
+        foreach (var node in ChildProperties) if (!node.Validate(context)) return false;
+        foreach (var node in ChildFields) if (!node.Validate(context)) return false;
+        foreach (var node in ChildMethods) if (!node.Validate(context)) return false;
+
+        return true;
+    }
+
+    /// <summary>
+    /// Determines if the kind of the type symbol of this instance is a supported one or not.
+    /// </summary>
+    /// <returns></returns>
+    protected virtual bool IsSupportedKind() => Symbol.TypeKind is
+        TypeKind.Class or
+        TypeKind.Struct or
+        TypeKind.Interface;
 
     // -----------------------------------------------------
 
@@ -120,13 +149,9 @@ internal class TypeNode : IChildNode
             TypeKind.Interface => "interface",
             _ => throw new ArgumentException("Invalid type kind.").WithData(Symbol)
         };
-
-        /*
-        var options = new EasyNameOptions(useGenerics: true);
+        var options = EasyNameOptions.Default;
         var name = Symbol.EasyName(options);
-        return $"partial {rec}{kind} {name}";*/
-
-        return $"partial {rec}{kind} {Symbol.Name}";
+        return $"partial {rec}{kind} {name}";
     }
 
     /// <summary>
