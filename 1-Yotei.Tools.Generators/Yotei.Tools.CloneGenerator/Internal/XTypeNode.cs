@@ -23,7 +23,13 @@ internal class XTypeNode : TypeNode
     /// <inheritdoc/>
     protected override void EmitCore(SourceProductionContext context, CodeBuilder cb)
     {
-        throw null;
+        // Implemented explicitly...
+        if (FindMethod(Symbol) != null) return;
+
+        // Dispatching...
+        if (Symbol.IsInterface()) EmitHostInterface(context, cb);
+        else if (Symbol.IsAbstract) EmitHostAbstract(context, cb);
+        else EmitHostConcrete(context, cb);
     }
 
     // -----------------------------------------------------
@@ -31,9 +37,23 @@ internal class XTypeNode : TypeNode
     /// <summary>
     /// Invoked when the symbol is an interface.
     /// </summary>
-    void EmitHostInterface(SourceProductionContext context, CodeBuilder cb)
+    void EmitHostInterface(SourceProductionContext _, CodeBuilder cb)
     {
-        throw null;
+        var modifiers = GetModifiers();
+        var typename = Symbol.EasyName(EasyNameOptions.Default);
+
+        EmitDocumentation(cb);
+        cb.AppendLine($"{modifiers}{typename} Clone();");
+
+        // Gets the appropriate method modifiers, or null if any...
+        string? GetModifiers()
+        {
+            var found = Symbol.AllInterfaces.Any(x =>
+                FindMethod(x) != null ||
+                FindAttribute(x) != null);
+
+            return found ? "new " : null;
+        }
     }
 
     // -----------------------------------------------------
@@ -43,7 +63,31 @@ internal class XTypeNode : TypeNode
     /// </summary>
     void EmitHostAbstract(SourceProductionContext context, CodeBuilder cb)
     {
-        throw null;
+        var modifiers = GetModifiers();
+        var typename = Symbol.EasyName(EasyNameOptions.Default);
+
+        EmitDocumentation(cb);
+        cb.AppendLine($"{modifiers}{typename} Clone();");
+
+        EmitNeededInterfaces(context, cb);
+
+        // Gets the appropriate method modifiers, or null if any...
+        string? GetModifiers()
+        {
+            var parent = Symbol.BaseType;
+            var method = parent == null ? null : FindMethod(parent, chain: true, ifaces: true);
+            var attr = parent == null ? null : FindAttribute(parent, chain: true, ifaces: true);
+
+            if (method == null)
+            {
+                return attr != null ? "public abstract override " : "public abstract ";
+            }
+            else
+            {
+                var isvirtual = method.IsVirtual || method.IsOverride || method.IsAbstract;
+                return isvirtual ? "public abstract override " : "public abstract ";
+            }
+        }
     }
 
     // -----------------------------------------------------
@@ -53,7 +97,51 @@ internal class XTypeNode : TypeNode
     /// </summary>
     void EmitHostConcrete(SourceProductionContext context, CodeBuilder cb)
     {
-        throw null;
+        var ctor = Symbol.GetCopyConstructor();
+        if (ctor == null)
+        {
+            context.ReportDiagnostic(TreeDiagnostics.NoCopyConstructor(Symbol));
+            return;
+        }
+
+        var modifiers = GetModifiers();
+        var typename = Symbol.EasyName(EasyNameOptions.Default);
+
+        EmitDocumentation(cb);
+        cb.AppendLine($"{modifiers}{typename} Clone()");
+        cb.AppendLine("{");
+        cb.IndentLevel++;
+        {
+            cb.AppendLine($"var v_temp = new {typename}(this);");
+            cb.AppendLine("return v_temp;");
+        }
+        cb.IndentLevel--;
+        cb.AppendLine("}");
+
+        EmitNeededInterfaces(context, cb);
+
+        // Gets the appropriate method modifiers, or null if any...
+        string? GetModifiers()
+        {
+            var parent = Symbol.BaseType;
+            var method = parent == null ? null : FindMethod(parent, chain: true, ifaces: true);
+            var attr = parent == null ? null : FindAttribute(parent, chain: true, ifaces: true);
+
+            if (method == null)
+            {
+                if (attr != null) return "public override ";
+                return Symbol.IsSealed ? "public " : "public virtual ";
+            }
+            else
+            {
+                var isvirtual = method.IsVirtual || method.IsOverride || method.IsAbstract;
+                return Symbol.IsSealed switch
+                {
+                    true => isvirtual ? "public protected override " : "public override ",
+                    false => isvirtual ? "public override " : "public new "
+                };
+            }
+        }
     }
 
     // -----------------------------------------------------
@@ -61,7 +149,7 @@ internal class XTypeNode : TypeNode
     /// <summary>
     /// Emits the interfaces that need explicit implementation.
     /// </summary>
-    void EmitNeededInterfaces(SourceProductionContext context, CodeBuilder cb)
+    void EmitNeededInterfaces(SourceProductionContext _, CodeBuilder cb)
     {
         var ifaces = GetNeededInterfaces();
         foreach (var iface in ifaces)

@@ -36,7 +36,7 @@
    <Import Project="..\Yotei.Tools.Generators\Yotei.Tools.Generators.projitems" Label="Shared" />
 
    <PropertyGroup>
-	  <!--<DefineConstants>$(DefineConstants);DEBUG_CLONE_GENERATOR</DefineConstants>-->
+	  <DefineConstants>$(DefineConstants);DEBUG_CLONE_GENERATOR</DefineConstants>
 	  <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
    </PropertyGroup>
 
