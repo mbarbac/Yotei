@@ -254,7 +254,7 @@ internal class XTypeNode : TypeNode
     /// </summary>
     AttributeData? FindAttribute(ITypeSymbol type, bool chain = false, bool ifaces = false)
     {
-        var temps = type.GetAttributes().Match(typeof(CloneableAttribute));
+        var temps = type.GetAttributes(typeof(CloneableAttribute));
         var temp = temps.Count == 1 ? temps[0] : null;
 
         if (temps == null && chain)

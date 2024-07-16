@@ -36,16 +36,12 @@
    <Import Project="..\..\1-Yotei.Tools.Generators\Yotei.Tools.Generators\Yotei.Tools.Generators.projitems" Label="Shared" />
 
    <PropertyGroup>
-	  <!--<DefineConstants>$(DefineConstants);DEBUG_FROZEN_GENERATOR</DefineConstants>-->
+	  <DefineConstants>$(DefineConstants);DEBUG_FROZEN_GENERATOR</DefineConstants>
 	  <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
    </PropertyGroup>
 
    <ItemGroup>
 	  <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-   </ItemGroup>
-
-   <ItemGroup>
-     <Folder Include="Code\" />
    </ItemGroup>
    
 </Project>

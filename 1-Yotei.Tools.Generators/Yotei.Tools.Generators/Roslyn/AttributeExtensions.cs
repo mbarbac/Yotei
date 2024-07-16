@@ -44,4 +44,31 @@ internal static class AttributeExtensions
     {
         return sources.SelectMany(x => x.Attributes).ToList();
     }
+
+    // -----------------------------------------------------
+
+    /// <summary>
+    /// Returns a list with the attributes applied to the given symbol that match the given type.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    public static List<AttributeData> GetAttributes(this ISymbol symbol, Type type)
+    {
+        symbol.ThrowWhenNull();
+        type.ThrowWhenNull();
+
+        return symbol.GetAttributes().Match(type);
+    }
+
+    /// <summary>
+    /// Determines if the given symbol carries any attributes whose type is the given one.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    public static bool HasAttributes(this ISymbol symbol, Type type)
+    {
+        return symbol.GetAttributes(type).Any();
+    }
 }
