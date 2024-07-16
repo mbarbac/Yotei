@@ -193,6 +193,7 @@ internal static partial class EasyNameExtensions
         var name = item.Name switch
         {
             ".ctor" => "new",
+            ".cctor" => "new",
             _ => item.Name
         };
         sb.Append(name);

@@ -21,7 +21,7 @@ internal class MethodCandidate : Candidate
         : base(attributes, model, syntax, symbol) { }
 
     /// <inheritdoc/>
-    public override string ToString() => $"Method: {Symbol.Name}";
+    public override string ToString() => $"Method: {Symbol.EasyName()}";
 
     /// <inheritdoc cref="INodeCandidate.Syntax"/>
     public new MethodDeclarationSyntax Syntax => (MethodDeclarationSyntax)base.Syntax;

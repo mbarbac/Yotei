@@ -23,7 +23,7 @@ internal class ChildProperties : CustomList<PropertyNode>
     {
         public bool Equals(PropertyNode x, PropertyNode y)
         {
-            return SymbolEqualityComparer.Default.Equals(x.Symbol, y.Symbol);
+            return SymbolComparer.Default.Equals(x.Symbol, y.Symbol);
         }
         public int GetHashCode(PropertyNode obj) => throw new NotSupportedException();
     }

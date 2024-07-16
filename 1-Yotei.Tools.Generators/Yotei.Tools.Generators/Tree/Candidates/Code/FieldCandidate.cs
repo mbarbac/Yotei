@@ -21,7 +21,7 @@ internal class FieldCandidate : Candidate
         : base(attributes, model, syntax, symbol) { }
 
     /// <inheritdoc/>
-    public override string ToString() => $"Field: {Symbol.Name}";
+    public override string ToString() => $"Field: {Symbol.EasyName()}";
 
     /// <inheritdoc cref="INodeCandidate.Syntax"/>
     public new FieldDeclarationSyntax Syntax => (FieldDeclarationSyntax)base.Syntax;

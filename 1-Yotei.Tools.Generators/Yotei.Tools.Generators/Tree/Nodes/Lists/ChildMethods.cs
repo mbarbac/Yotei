@@ -23,7 +23,7 @@ internal class ChildMethods : CustomList<MethodNode>
     {
         public bool Equals(MethodNode x, MethodNode y)
         {
-            return SymbolEqualityComparer.Default.Equals(x.Symbol, y.Symbol);
+            return SymbolComparer.Default.Equals(x.Symbol, y.Symbol);
         }
         public int GetHashCode(MethodNode obj) => throw new NotSupportedException();
     }

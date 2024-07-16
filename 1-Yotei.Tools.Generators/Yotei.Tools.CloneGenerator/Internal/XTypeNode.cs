@@ -169,7 +169,7 @@ internal class XTypeNode : TypeNode
     /// <returns></returns>
     List<ITypeSymbol> GetNeededInterfaces()
     {
-        var comparer = SymbolEqualityComparer.Default;
+        var comparer = SymbolComparer.Default;
         var list = new List<ITypeSymbol>();
 
         foreach (var iface in Symbol.Interfaces) Populate(iface);

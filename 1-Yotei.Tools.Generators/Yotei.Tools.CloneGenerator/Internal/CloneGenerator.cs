@@ -5,7 +5,7 @@
 [Generator(LanguageNames.CSharp)]
 internal class CloneGenerator : TreeGenerator
 {
-#if DEBUG_CLONE_GENERATOR && DEBUG__
+#if DEBUG_CLONE_GENERATOR && DEBUG
     /// <inheritdoc/>
     protected override bool LaunchDebugger => true;
 #endif

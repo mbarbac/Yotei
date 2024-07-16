@@ -1,10 +1,25 @@
-﻿using SystemTypeInfo = System.Reflection.TypeInfo;
-
-namespace Yotei.Tools.Generators.Internal;
+﻿namespace Yotei.Tools.Generators.Internal;
 
 // ========================================================
 internal static class MatchExtensions
 {
+    /// <summary>
+    /// Extract from the given collection of attributes those whose attribute class match the
+    /// given type.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    public static List<AttributeData> Match(this IEnumerable<AttributeData> source, Type type)
+    {
+        source.ThrowWhenNull();
+        type.ThrowWhenNull();
+
+        return source.Where(x => x.Match(type)).ToList();
+    }
+
+    // -----------------------------------------------------
+
     /// <summary>
     /// Determines if the given attribute matches the given type.
     /// </summary>
@@ -49,7 +64,7 @@ internal static class MatchExtensions
         
         var targs = type.GenericTypeArguments.Length != 0
             ? type.GenericTypeArguments
-            : type is SystemTypeInfo info ? info.GenericTypeParameters : [];
+            : type is System.Reflection.TypeInfo info ? info.GenericTypeParameters : [];
 
         if (sargs.Length != targs.Length) return false; // Shortcut...
 
@@ -86,22 +101,5 @@ internal static class MatchExtensions
 
         // Finishing...
         return true;
-    }
-
-    // -----------------------------------------------------
-
-    /// <summary>
-    /// Extract from the given collection of attributes those whose attribute class match the
-    /// given type.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="type"></param>
-    /// <returns></returns>
-    public static List<AttributeData> Match(this IEnumerable<AttributeData> source, Type type)
-    {
-        source.ThrowWhenNull();
-        type.ThrowWhenNull();
-
-        return source.Where(x => x.Match(type)).ToList();
     }
 }

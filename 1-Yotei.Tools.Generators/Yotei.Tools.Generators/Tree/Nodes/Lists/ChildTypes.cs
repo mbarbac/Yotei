@@ -23,7 +23,7 @@ internal class ChildTypes : CustomList<TypeNode>
     {
         public bool Equals(TypeNode x, TypeNode y)
         {
-            return SymbolEqualityComparer.Default.Equals(x.Symbol, y.Symbol);
+            return SymbolComparer.Default.Equals(x.Symbol, y.Symbol);
         }
         public int GetHashCode(TypeNode obj) => throw new NotSupportedException();
     }

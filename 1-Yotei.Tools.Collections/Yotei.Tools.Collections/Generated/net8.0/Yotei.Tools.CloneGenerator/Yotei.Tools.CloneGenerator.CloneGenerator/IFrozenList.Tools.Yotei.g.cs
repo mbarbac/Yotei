@@ -11,4 +11,13 @@ namespace Yotei.Tools
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("CloneGenerator", "0.5.22.0")]
         IFrozenList<K, T> Clone();
     }
+    
+    partial interface IFrozenList<T>
+    {
+        /// <summary>
+        /// <inheritdoc cref="ICloneable.Clone"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("CloneGenerator", "0.5.22.0")]
+        IFrozenList<T> Clone();
+    }
 }

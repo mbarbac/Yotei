@@ -303,7 +303,7 @@ internal class TreeGenerator : IIncrementalGenerator
         var files = new ChildFiles();
         var nschain = ImmutableArray<BaseNamespaceDeclarationSyntax>.Empty;
         var tpchain = ImmutableArray<INamedTypeSymbol>.Empty;
-        var comparer = SymbolEqualityComparer.Default;
+        var comparer = SymbolComparer.Default;
         INode parent = default!;
 
         // Reporting errors...
@@ -403,7 +403,9 @@ internal class TreeGenerator : IIncrementalGenerator
             for (int index = 0; index < len; index++)
             {
                 var symbol = tpchain[index];
-                var node = list.Find(x => x.Symbol.Name == symbol.Name);
+
+                // Find using symbol comparer, as may have same name but different type arguments...
+                var node = list.Find(x => comparer.Equals(x.Symbol, symbol));
 
                 // Need to create a new node...
                 if (node == null)

@@ -21,7 +21,7 @@ internal class TypeCandidate : Candidate
         : base(attributes, model, syntax, symbol) { }
 
     /// <inheritdoc/>
-    public override string ToString() => $"Type: {Symbol.Name}";
+    public override string ToString() => $"Type: {Symbol.EasyName()}";
 
     /// <inheritdoc cref="INodeCandidate.Syntax"/>
     public new TypeDeclarationSyntax Syntax => (TypeDeclarationSyntax)base.Syntax;

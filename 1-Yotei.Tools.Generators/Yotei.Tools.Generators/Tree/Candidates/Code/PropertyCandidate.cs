@@ -21,7 +21,7 @@ internal class PropertyCandidate : Candidate
         : base(attributes, model, syntax, symbol) { }
 
     /// <inheritdoc/>
-    public override string ToString() => $"Property: {Symbol.Name}";
+    public override string ToString() => $"Property: {Symbol.EasyName()}";
 
     /// <inheritdoc cref="INodeCandidate.Syntax"/>
     public new PropertyDeclarationSyntax Syntax => (PropertyDeclarationSyntax)base.Syntax;

@@ -84,7 +84,7 @@ internal static class TypeExtensions
     public static bool IsAssignableTo(this ITypeSymbol source, ITypeSymbol target)
     {
         // Same type...
-        var comparer = SymbolEqualityComparer.Default;
+        var comparer = SymbolComparer.Default;
         if (comparer.Equals(source, target)) return true;
 
         // Parent elements...
@@ -124,9 +124,10 @@ internal static class TypeExtensions
         var methods = type.GetMembers().OfType<IMethodSymbol>().Where(x =>
             x.MethodKind == MethodKind.Constructor &&
             x.IsStatic == false &&
-            x.Parameters.Length == 1);
+            x.Parameters.Length == 1)
+            .ToDebugArray();
 
-        var comparer = SymbolEqualityComparer.Default;
+        var comparer = SymbolComparer.Default;
         return strict
             ? methods.FirstOrDefault(x => comparer.Equals(type, x.Parameters[0].Type))
             : methods.FirstOrDefault(x => type.IsAssignableTo(x.Parameters[0].Type));

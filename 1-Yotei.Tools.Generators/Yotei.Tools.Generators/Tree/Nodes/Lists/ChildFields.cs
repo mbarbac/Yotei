@@ -23,7 +23,7 @@ internal class ChildFields : CustomList<FieldNode>
     {
         public bool Equals(FieldNode x, FieldNode y)
         {
-            return SymbolEqualityComparer.Default.Equals(x.Symbol, y.Symbol);
+            return SymbolComparer.Default.Equals(x.Symbol, y.Symbol);
         }
         public int GetHashCode(FieldNode obj) => throw new NotSupportedException();
     }

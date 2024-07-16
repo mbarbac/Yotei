@@ -20,7 +20,7 @@ internal class CandidateComparer : IEqualityComparer<ICandidate>
         var yy = y as INodeCandidate;
         if (xx is null || yy is null) return false;
 
-        if (!SymbolEqualityComparer.Default.Equals(xx.Symbol, yy.Symbol)) return false;
+        if (!SymbolComparer.Default.Equals(xx.Symbol, yy.Symbol)) return false;
         return true;
     }
 

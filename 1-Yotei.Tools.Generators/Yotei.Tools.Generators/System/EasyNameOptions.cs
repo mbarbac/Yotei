@@ -1,4 +1,4 @@
-﻿namespace Yotei.Tools.Generators.Internal;
+﻿    namespace Yotei.Tools.Generators.Internal;
 
 // ========================================================
 /// <summary>
