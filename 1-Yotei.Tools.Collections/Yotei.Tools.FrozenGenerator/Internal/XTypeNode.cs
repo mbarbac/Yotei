@@ -12,7 +12,6 @@ internal class XTypeNode : TypeNode
     Type Template = null!;
     INamedTypeSymbol KType = null!;
     INamedTypeSymbol TType = null!;
-    INamedTypeSymbol? OverrideType = null;
 
     // -----------------------------------------------------
 
@@ -31,6 +30,12 @@ internal class XTypeNode : TypeNode
     static bool InvalidAttribute(SourceProductionContext context, INamedTypeSymbol symbol)
     {
         context.ReportDiagnostic(FrozenDiagnostics.InvalidAttribute(symbol));
+        return false;
+    }
+
+    static bool NoCopyConstructor(SourceProductionContext context, INamedTypeSymbol symbol)
+    {
+        context.ReportDiagnostic(TreeDiagnostics.NoCopyConstructor(symbol));
         return false;
     }
 
@@ -73,28 +78,26 @@ internal class XTypeNode : TypeNode
         };
         if (Template is null) return InvalidAttribute(context, Symbol);
 
-        OverrideType = GetOverrideType();
+        if (!Symbol.IsInterface())
+        {
+            var ctor = Symbol.GetCopyConstructor();
+            if (ctor == null) return NoCopyConstructor(context, Symbol);
+        }
 
         return base.Validate(context);
 
+        // Gets the 'K' type, if any...
         INamedTypeSymbol? GetKType()
         {
             if (AttributeClass.Arity == 2) return AttributeClass.TypeArguments[0] as INamedTypeSymbol;
             return null;
         }
 
+        // Gets the 'T' type, if any...
         INamedTypeSymbol? GetTType()
         {
             if (AttributeClass.Arity == 1) return AttributeClass.TypeArguments[0] as INamedTypeSymbol;
             if (AttributeClass.Arity == 2) return AttributeClass.TypeArguments[1] as INamedTypeSymbol;
-            return null;
-        }
-
-        INamedTypeSymbol? GetOverrideType()
-        {
-            if (Attribute.GetNamedArgument("OverrideType", out var item))
-            {
-            }
             return null;
         }
     }
@@ -107,10 +110,10 @@ internal class XTypeNode : TypeNode
         var kname = KType?.EasyName(EasyNameOptions.Full) ?? "";
         var tname = TType?.EasyName(EasyNameOptions.Full) ?? "";
 
-        var name = Template.EasyName(EasyNameOptions.Full);
-        name = name.Replace(".FrozenGenerator.Templates", "");
-        name = name.Replace("<T>", $"<{tname}>");
-        name = name.Replace("<K, T>", $"<{kname}, {tname}>");
+        var arity = Template.GetGenericArguments().Length;
+        var bracket = arity == 1 ? $"<{tname}>" : $"<{kname}, {tname}>";
+        var name = Template.EasyName(EasyNameOptions.Empty with { UseTypeName = true });
+        name = $"Yotei.Tools.{name}{bracket}";
 
         var head = base.GetHeader(context);
         head += $" : {name}";
@@ -122,41 +125,75 @@ internal class XTypeNode : TypeNode
     /// <inheritdoc/>
     protected override void EmitCore(SourceProductionContext context, CodeBuilder cb)
     {
+        var iface = Symbol.Interfaces.Length > 0 ? Symbol.Interfaces[0] : null;
+        var iname = iface?.EasyName(EasyNameOptions.Full);
+
         var hname = Symbol.EasyName(EasyNameOptions.Default);
         var kname = KType?.EasyName(EasyNameOptions.Full) ?? "";
         var tname = TType?.EasyName(EasyNameOptions.Full) ?? "";
 
-        var pname = Template.EasyName(EasyNameOptions.Full);
-        pname = pname.Replace(".FrozenGenerator.Templates", "");
-        pname = pname.Replace("<T>", $"<{tname}>");
-        pname = pname.Replace("<K, T>", $"<{kname}, {tname}>");
+        var arity = Template.GetGenericArguments().Length;
+        var bracket = arity == 1 ? $"<{tname}>" : $"<{kname}, {tname}>";
+        var pname = Template.EasyName(EasyNameOptions.Empty with { UseTypeName = true });
+        pname = $"Yotei.Tools.{pname}{bracket}";
 
-        var options = EasyNameOptions.Default with
+        cb.AppendLine("/// <inheritdoc cref=\"ICloneable.Clone\"/>");
+        cb.AppendLine(GeneratedAttribute);
+        cb.AppendLine(Symbol.IsInterface()
+            ? $"new {hname} Clone();"
+            : $"public override {hname} Clone() => new {hname}(this);");
+
+        if (!Symbol.IsInterface() && iface != null)
+        {
+            cb.AppendLine();
+            cb.AppendLine($"{iname}");
+            cb.AppendLine($"{iname}.Clone() => Clone();");
+        }
+
+        var ioptions = EasyNameOptions.Default with
         {
             UseMemberArgumentsTypes = EasyNameOptions.Full,
             UseMemberArgumentsNames = true,
         };
-        var methods = Template.GetMembers().OfType<MethodInfo>();
-        var done = false;
+        var toptions = ioptions with { UseMemberArgumentsTypes = null };
+
+        var methods = Template.GetMembers()
+            .OfType<MethodInfo>().Where(x => x.DeclaringType == Template);
+
         foreach (var method in methods)
         {
-            var name = method.EasyName(options);
+            var name = method.EasyName(ioptions);
             name = name.Replace("T ", $"{tname} ");
             name = name.Replace("T> ", $"{tname}>");
             name = name.Replace("T> ", $"{tname}>");
             name = name.Replace("K ", $"{kname} ");
 
-            if (done) cb.AppendLine();
-            done = true;
+            if (Symbol.IsInterface())
+            {
+                var head = $"{pname}.{name}".Replace('<', '{').Replace('>', '}');
+                head = $"/// <inheritdoc cref=\"{head}\"/>";
+                cb.AppendLine();
+                cb.AppendLine(head);
+                cb.AppendLine(GeneratedAttribute);
 
-            var head = $"{pname}.{name}".Replace('<', '{').Replace('>', '}');
-            head = $"/// <inheritdoc cref=\"{head}\"/>";
-            cb.AppendLine(head);
-            cb.AppendLine(GeneratedAttribute);
-
-            if (Symbol.IsInterface()) cb.AppendLine($"new {hname} {name};");
+                cb.AppendLine($"new {hname} {name};");
+            }
             else
             {
+                var args = method.EasyName(toptions);
+
+                cb.AppendLine();
+                cb.AppendLine("/// <inheritdoc/>");
+                cb.AppendLine(GeneratedAttribute);
+
+                cb.AppendLine($"public override {hname} {name} => ({hname})base.{args}; ");
+
+                if (iface != null)
+                {
+                    cb.AppendLine();
+                    cb.AppendLine($"{iname}");
+                    cb.AppendLine($"{iname}.{name} => {args};");
+                }
             }
         }
     }
