@@ -54,7 +54,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yotei.Tools.Collections", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yotei.Tools.Collections.Tests", "1-Yotei.Tools.Collections\Yotei.Tools.Collections.Tests\Yotei.Tools.Collections.Tests.csproj", "{3534AE40-F401-43F6-8734-17E579B77116}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yotei.Tools.FrozenGenerator", "1-Yotei.Tools.Collections\Yotei.Tools.FrozenGenerator\Yotei.Tools.FrozenGenerator.csproj", "{0C047AED-2614-4409-A300-54E3D6F8A2DF}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WithGenerator", "WithGenerator", "{17608CDC-EA21-4900-9E2B-B1A4A3E33957}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FrozenGenerator", "FrozenGenerator", "{5B3909D9-3A68-409F-906F-5239D0151BC1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yotei.Tools.FrozenGenerator", "1-Yotei.Tools.Generators\Yotei.Tools.FrozenGenerator\Yotei.Tools.FrozenGenerator.csproj", "{ED146613-0592-4FB7-827E-6B92518D3294}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yotei.Tools.FrozenGenerator.Tests", "1-Yotei.Tools.Generators\Yotei.Tools.FrozenGenerator.Tests\Yotei.Tools.FrozenGenerator.Tests.csproj", "{B8315696-08BE-4476-AF27-B9B173070C23}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -135,12 +141,18 @@ Global
 		{3534AE40-F401-43F6-8734-17E579B77116}.Local|Any CPU.Build.0 = Debug|Any CPU
 		{3534AE40-F401-43F6-8734-17E579B77116}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3534AE40-F401-43F6-8734-17E579B77116}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0C047AED-2614-4409-A300-54E3D6F8A2DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0C047AED-2614-4409-A300-54E3D6F8A2DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0C047AED-2614-4409-A300-54E3D6F8A2DF}.Local|Any CPU.ActiveCfg = Debug|Any CPU
-		{0C047AED-2614-4409-A300-54E3D6F8A2DF}.Local|Any CPU.Build.0 = Debug|Any CPU
-		{0C047AED-2614-4409-A300-54E3D6F8A2DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0C047AED-2614-4409-A300-54E3D6F8A2DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED146613-0592-4FB7-827E-6B92518D3294}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED146613-0592-4FB7-827E-6B92518D3294}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED146613-0592-4FB7-827E-6B92518D3294}.Local|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED146613-0592-4FB7-827E-6B92518D3294}.Local|Any CPU.Build.0 = Debug|Any CPU
+		{ED146613-0592-4FB7-827E-6B92518D3294}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED146613-0592-4FB7-827E-6B92518D3294}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8315696-08BE-4476-AF27-B9B173070C23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8315696-08BE-4476-AF27-B9B173070C23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8315696-08BE-4476-AF27-B9B173070C23}.Local|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8315696-08BE-4476-AF27-B9B173070C23}.Local|Any CPU.Build.0 = Debug|Any CPU
+		{B8315696-08BE-4476-AF27-B9B173070C23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8315696-08BE-4476-AF27-B9B173070C23}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -161,14 +173,17 @@ Global
 		{18672361-50ED-4496-BF23-5AABF3F59D7C} = {869A0583-00A5-4F0E-AB62-0DAA83542529}
 		{09AAF10A-E5D3-4497-B577-F1286601656B} = {FA9019F8-5916-4FBD-97EA-16DC4D78F322}
 		{3534AE40-F401-43F6-8734-17E579B77116} = {FA9019F8-5916-4FBD-97EA-16DC4D78F322}
-		{0C047AED-2614-4409-A300-54E3D6F8A2DF} = {FA9019F8-5916-4FBD-97EA-16DC4D78F322}
+		{17608CDC-EA21-4900-9E2B-B1A4A3E33957} = {805C5648-8FF1-43C4-B528-67AA1C3652C6}
+		{5B3909D9-3A68-409F-906F-5239D0151BC1} = {805C5648-8FF1-43C4-B528-67AA1C3652C6}
+		{ED146613-0592-4FB7-827E-6B92518D3294} = {5B3909D9-3A68-409F-906F-5239D0151BC1}
+		{B8315696-08BE-4476-AF27-B9B173070C23} = {5B3909D9-3A68-409F-906F-5239D0151BC1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0821CEE0-4168-45F2-B34E-41BD1B7B942E}
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		1-Yotei.Tools.Generators\Yotei.Tools.Generators\Yotei.Tools.Generators.projitems*{0c047aed-2614-4409-a300-54e3d6f8a2df}*SharedItemsImports = 5
 		1-Yotei.Tools.Generators\Yotei.Tools.Generators\Yotei.Tools.Generators.projitems*{6091dd23-451a-46ec-9d96-51ff55b02e5a}*SharedItemsImports = 13
 		1-Yotei.Tools.Generators\Yotei.Tools.Generators\Yotei.Tools.Generators.projitems*{87bd0129-4374-4091-b338-c06b86c1c9c0}*SharedItemsImports = 5
+		1-Yotei.Tools.Generators\Yotei.Tools.Generators\Yotei.Tools.Generators.projitems*{ed146613-0592-4fb7-827e-6b92518d3294}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal
