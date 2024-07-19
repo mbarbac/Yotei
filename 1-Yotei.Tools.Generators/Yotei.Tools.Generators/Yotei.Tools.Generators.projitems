@@ -35,6 +35,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\FieldExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\PropertyExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\SymbolComparer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\AccesibilityExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\EasyNameExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\ExceptionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\StringExtensions.cs" />

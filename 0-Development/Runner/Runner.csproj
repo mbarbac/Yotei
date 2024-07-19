@@ -36,6 +36,7 @@
 	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.CloneGenerator.Tests\Yotei.Tools.CloneGenerator.Tests.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools.Collections\Yotei.Tools.Collections.Tests\Yotei.Tools.Collections.Tests.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.FrozenGenerator.Tests\Yotei.Tools.FrozenGenerator.Tests.csproj" />
+	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.WithGenerator.Tests\Yotei.Tools.WithGenerator.Tests.csproj" />
    </ItemGroup>
 
 </Project>

@@ -13,7 +13,7 @@
 public class CloneableAttribute : Attribute
 {
     /// <summary>
-    /// Initializes a new instance.
+    /// If <c>true</c> instructs the generator to not produce virtual-alike methods.
     /// </summary>
-    public CloneableAttribute() { }
+    public bool PreventVirtual { get; set; }
 }
