@@ -3,7 +3,7 @@
 // =========================================================
 /// <summary>
 /// Decorates host types for which a 'Clone()' method will be declared or implemented.
-/// <br/> Types that are not interfaces must implement a copy constructor.
+/// <br/> Non-interface host types must implement a copy constructor.
 /// <br/> Records are not supported.
 /// </summary>
 [AttributeUsage(

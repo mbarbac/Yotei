@@ -122,6 +122,7 @@ internal static class TreeDiagnostics
     /// The syntax node's kind is not supported.
     /// </summary>
     /// <param name="syntax"></param>
+    /// <param name="severity"></param>
     /// <returns></returns>
     public static Diagnostic KindNotSupported(
         SyntaxNode syntax,
@@ -145,7 +146,7 @@ internal static class TreeDiagnostics
     /// <summary>
     /// Type kind not supported.
     /// </summary>
-    /// <param name="syntax"></param>
+    /// <param name="type"></param>
     /// <param name="severity"></param>
     /// <returns></returns>
     public static Diagnostic KindNotSupported(
@@ -170,7 +171,7 @@ internal static class TreeDiagnostics
     /// <summary>
     /// Type is not a partial.
     /// </summary>
-    /// <param name="syntax"></param>
+    /// <param name="type"></param>
     /// <param name="severity"></param>
     /// <returns></returns>
     public static Diagnostic TypeIsNotPartial(
@@ -195,7 +196,7 @@ internal static class TreeDiagnostics
     /// <summary>
     /// Type has not a copy constructor.
     /// </summary>
-    /// <param name="syntax"></param>
+    /// <param name="type"></param>
     /// <param name="severity"></param>
     /// <returns></returns>
     public static Diagnostic NoCopyConstructor(
@@ -220,7 +221,7 @@ internal static class TreeDiagnostics
     /// <summary>
     /// Property has no getter.
     /// </summary>
-    /// <param name="syntax"></param>
+    /// <param name="item"></param>
     /// <param name="severity"></param>
     /// <returns></returns>
     public static Diagnostic NoGetter(
@@ -245,7 +246,7 @@ internal static class TreeDiagnostics
     /// <summary>
     /// Property has no setter.
     /// </summary>
-    /// <param name="syntax"></param>
+    /// <param name="item"></param>
     /// <param name="severity"></param>
     /// <returns></returns>
     public static Diagnostic NoSetter(
@@ -270,7 +271,7 @@ internal static class TreeDiagnostics
     /// <summary>
     /// Field is not writtable.
     /// </summary>
-    /// <param name="syntax"></param>
+    /// <param name="item"></param>
     /// <param name="severity"></param>
     /// <returns></returns>
     public static Diagnostic NotWrittable(

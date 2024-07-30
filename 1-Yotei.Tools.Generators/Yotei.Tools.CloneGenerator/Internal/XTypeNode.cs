@@ -191,39 +191,34 @@ internal class XTypeNode : TypeNode
         // Tries to populate the list with the given interface...
         bool Populate(ITypeSymbol iface)
         {
-            // If any child, this iface also needs implementation...
-            var found = false; foreach (var child in iface.Interfaces)
+            var found = false;
+
+            foreach (var child in iface.Interfaces) // If any child,  iface needs implementation...
             {
                 var temp = Populate(child);
                 if (temp) found = true;
             }
 
             // This iface...
-            if (!found) found = FindAt(iface);
+            found = found ||
+                iface.Name == "ICloneable" ||
+                FindMethod(iface) != null ||
+                FindAttribute(iface) != null;
 
-            // Adding if needed...
-            if (found)
+            if (found) // Adding if needed...
             {
                 var temp = list.Find(x => comparer.Equals(x, iface));
                 if (temp == null) list.Add(iface);
             }
-
-            // Informs if found at this iface level...
-            return found;
+            return found; // Informs if found at this iface level...
         }
-
-        // Determines if the given interface needs implementation, at its level only...
-        bool FindAt(ITypeSymbol iface) =>
-            iface.Name == "ICloneable" ||
-            FindMethod(iface) != null ||
-            FindAttribute(iface) != null;
     }
 
     // -----------------------------------------------------
 
     string GeneratedVersion => Assembly.GetExecutingAssembly().GetName().Version.ToString();
     string GeneratedAttribute => $$"""
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("{{nameof(Tools.CloneGenerator)}}", "{{GeneratedVersion}}")]
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("{{nameof(CloneGenerator)}}", "{{GeneratedVersion}}")]
         """;
 
     /// <summary>

@@ -1,11 +1,9 @@
 namespace Yotei.Tools.CloneGenerator.Tests.Inherited
 {
     // ====================================================
-    public class PrivateClone
+    public class PrivateClone(string name)
     {
-        public PrivateClone(string name) => Name = name;
-        public string Name { get; }
-
+        public string Name { get; set; } = name;
 
         [SuppressMessage("", "IDE0051")]
         PrivateClone Clone() => new(Name);
