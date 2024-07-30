@@ -178,14 +178,22 @@ internal class XPropertyNode : PropertyNode
                 var method = FindMethod(host, chain: true);
                 if (method != null)
                 {
-                    var access = method.DeclaredAccessibility.ToCSharpString(addspace: true);
-                    var isvirtual = method.IsVirtual || method.IsOverride || method.IsAbstract;
-
-                    return isvirtual switch
+                    var access = method.DeclaredAccessibility;
+                    if (access == Accessibility.Private)
                     {
-                        true => $"{access}override ",
-                        false => $"{access}new ",
-                    };
+                        return null;
+                    }
+                    else
+                    {
+                        var accstr = access.ToCSharpString(addspace: true);
+                        var isvirtual = method.IsVirtual || method.IsOverride || method.IsAbstract;
+
+                        return isvirtual switch
+                        {
+                            true => $"{accstr}override ",
+                            false => $"{accstr}new ",
+                        };
+                    }
                 }
 
                 while (host != null)
@@ -205,7 +213,8 @@ internal class XPropertyNode : PropertyNode
                 }
             }
 
-            return prevent ? "public " : "public virtual ";
+            var issealed = Symbol.IsSealed;
+            return prevent || issealed ? "public " : "public virtual ";
         }
     }
 

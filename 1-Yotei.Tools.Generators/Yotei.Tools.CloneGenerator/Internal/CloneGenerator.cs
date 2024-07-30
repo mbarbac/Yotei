@@ -1,4 +1,5 @@
-﻿namespace Yotei.Tools.CloneGenerator;
+﻿
+namespace Yotei.Tools.CloneGenerator;
 
 // =========================================================
 /// <inheritdoc cref="TreeGenerator"/>

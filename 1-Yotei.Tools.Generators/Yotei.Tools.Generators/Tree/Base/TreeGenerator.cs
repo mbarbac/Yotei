@@ -170,6 +170,9 @@ internal class TreeGenerator : IIncrementalGenerator
     /// source code generation, or not. This method just tries to quickly compare the attributes
     /// applied to the node with any of the requested ones for that node kind.
     /// </summary>
+    /// <param name="node"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
     bool Predicate(SyntaxNode node, CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
@@ -210,7 +213,11 @@ internal class TreeGenerator : IIncrementalGenerator
     /// <summary>
     /// Invoked to transform the syntax node carried by the given context into a candidate for
     /// source code generation.
+    /// <br/> If this method returns null then such candidate is not taken into consideration.
     /// </summary>
+    /// <param name="context"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
     ICandidate Transform(GeneratorSyntaxContext context, CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
@@ -298,6 +305,8 @@ internal class TreeGenerator : IIncrementalGenerator
     /// Invoked to emit the source code for the given captured nodes by creating the appropriate
     /// hierarchy and then invoking the nodes created out of the candidates.
     /// </summary>
+    /// <param name="context"></param>
+    /// <param name="candidates"></param>
     void Execute(SourceProductionContext context, ImmutableArray<ICandidate> candidates)
     {
         var files = new ChildFiles();

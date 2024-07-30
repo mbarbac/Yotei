@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools.CloneGenerator;
+﻿#pragma warning disable IDE0075
+
+namespace Yotei.Tools.CloneGenerator;
 
 // =========================================================
 /// <inheritdoc cref="TypeNode"/>
@@ -10,12 +12,13 @@ internal class XTypeNode : TypeNode
     // -----------------------------------------------------
 
     /// <inheritdoc/>
-    protected override bool IsSupportedKind()
+    public override bool Validate(SourceProductionContext context)
     {
-        if (!base.IsSupportedKind()) return false;
-
-        if (Symbol.IsRecord) return false;
-        return true;
+        if (Symbol.IsRecord)
+        {
+            context.ReportDiagnostic(TreeDiagnostics.KindNotSupported(Symbol));
+        }
+        return base.Validate(context);
     }
 
     // -----------------------------------------------------
@@ -46,7 +49,7 @@ internal class XTypeNode : TypeNode
         cb.AppendLine($"{modifiers}{typename} Clone();");
 
         /// <summary>
-        /// Gets the appropriate method modifiers, or null if any...
+        /// Gets the method modifiers, or null if any...
         /// </summary>
         string? GetModifiers()
         {
@@ -74,23 +77,28 @@ internal class XTypeNode : TypeNode
         EmitNeededInterfaces(context, cb);
 
         /// <summary>
-        /// Gets the appropriate method modifiers, or null if any...
+        /// Gets the method modifiers, or null if any...
         /// </summary>
         string? GetModifiers()
         {
-            var parent = Symbol.BaseType;
-            var method = parent == null ? null : FindMethod(parent, chain: true, ifaces: true);
-            var attr = parent == null ? null : FindAttribute(parent, chain: true, ifaces: true);
+            if (Symbol.BaseType == null) return "public abstract ";
 
-            if (method == null)
+            var method = FindMethod(Symbol.BaseType, chain: true);
+            if (method != null)
             {
-                return attr != null ? "public abstract override " : "public abstract ";
-            }
-            else
-            {
+                var access = method.DeclaredAccessibility.ToCSharpString(addspace: true);
                 var isvirtual = method.IsVirtual || method.IsOverride || method.IsAbstract;
-                return isvirtual ? "public abstract override " : "public abstract ";
+
+                return isvirtual ? $"{access}abstract override " : $"{access}abstract ";
             }
+
+            var atr = FindAttribute(Symbol.BaseType, chain: true);
+            if (atr != null)
+            {
+                return "public abstract override ";
+            }
+
+            return "public abstract ";
         }
     }
 
@@ -125,35 +133,46 @@ internal class XTypeNode : TypeNode
         EmitNeededInterfaces(context, cb);
 
         /// <summary>
-        /// Gets the appropriate method modifiers, or null if any...
+        /// Gets the method modifiers, or null if any...
         /// </summary>
         string? GetModifiers()
         {
+            var prevent = GetPreventVirtual(Symbol, out var value, true, true) && value;
             var host = Symbol.BaseType;
-            if (host == null) return "public ";
 
-            var method = FindMethod(host, chain: true);
-            if (method == null)
+            if (host != null)
             {
-                var attr = FindAttribute(host, chain: true, ifaces: true);
-                if (attr != null) return "public override ";
-
-                var prevent = GetPreventVirtual(Symbol, out var temp) && temp;
-                return prevent || Symbol.IsSealed ? "public " : "public virtual ";
-            }
-
-            else
-            {
-                var access = method.DeclaredAccessibility;
-                var accstr = access.ToCSharpString(addspace: true);
-                var isvirtual = method.IsVirtual || method.IsOverride || method.IsAbstract;
-
-                return isvirtual switch
+                var method = FindMethod(host, chain: true);
+                if (method != null)
                 {
-                    true => $"{accstr}override ",
-                    false => $"{accstr}new ",
-                };
+                    var access = method.DeclaredAccessibility;
+                    if (access == Accessibility.Private)
+                    {
+                        return null;
+                    }
+                    else
+                    {
+                        var str = access.ToCSharpString(addspace: true);
+                        var isvirtual = method.IsVirtual || method.IsOverride || method.IsAbstract;
+
+                        return isvirtual switch
+                        {
+                            true => $"{str}override ",
+                            false => $"{str}new ",
+                        };
+                    }
+                }
+
+                var atr = FindAttribute(host, chain: true, ifaces: true);
+                if (atr != null)
+                {
+                    prevent = GetPreventVirtual(atr, out value) && value;
+                    return prevent ? "public new " : "public override ";
+                }
             }
+
+            var issealed = Symbol.IsSealed;
+            return prevent || issealed ? "public " : "public virtual ";
         }
     }
 
@@ -185,32 +204,32 @@ internal class XTypeNode : TypeNode
         var comparer = SymbolComparer.Default;
         var list = new List<ITypeSymbol>();
 
-        foreach (var iface in Symbol.Interfaces) Populate(iface);
+        foreach (var iface in Symbol.Interfaces) Capture(iface);
         return list;
 
-        // Tries to populate the list with the given interface...
-        bool Populate(ITypeSymbol iface)
+        // Tries to capture the given interface...
+        bool Capture(ITypeSymbol iface)
         {
             var found = false;
 
-            foreach (var child in iface.Interfaces) // If any child,  iface needs implementation...
+            foreach (var child in iface.Interfaces)
             {
-                var temp = Populate(child);
+                var temp = Capture(child);
                 if (temp) found = true;
             }
 
-            // This iface...
             found = found ||
                 iface.Name == "ICloneable" ||
                 FindMethod(iface) != null ||
                 FindAttribute(iface) != null;
 
-            if (found) // Adding if needed...
+            if (found)
             {
                 var temp = list.Find(x => comparer.Equals(x, iface));
                 if (temp == null) list.Add(iface);
             }
-            return found; // Informs if found at this iface level...
+
+            return found;
         }
     }
 
@@ -234,82 +253,102 @@ internal class XTypeNode : TypeNode
     // -----------------------------------------------------
 
     /// <summary>
-    /// Finds a compatible method on the given type, or in its inheritance and interface chains
-    /// if such is requested.
+    /// Finds a compatible method.
     /// </summary>
     IMethodSymbol? FindMethod(ITypeSymbol type, bool chain = false, bool ifaces = false)
     {
-        var member = type.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(x =>
+        var item = type.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(x =>
             x.Name == "Clone" &&
             x.Parameters.Length == 0);
 
-        if (member == null && chain)
-            foreach (var item in type.AllBaseTypes())
-                if ((member = FindMethod(item, false, false)) != null) break;
-
-        if (member == null && ifaces)
-            foreach (var item in type.AllInterfaces)
-                if ((member = FindMethod(item, false, false)) != null) break;
-
-        return member;
-    }
-
-    // -----------------------------------------------------
-
-    /// <summary>
-    /// Finds the <see cref="CloneableAttribute"/> attribute on the given type, or in its
-    /// inheritance and interface chains if requested.
-    /// </summary>
-    AttributeData? FindAttribute(ITypeSymbol type, bool chain = false, bool ifaces = false)
-    {
-        var attrs = type.GetAttributes(typeof(CloneableAttribute));
-        var attr = attrs.Count == 1 ? attrs[0] : null;
-
-        if (attr == null && chain)
-            foreach (var item in type.AllBaseTypes())
-                if ((attr = FindAttribute(item, false, false)) != null) break;
-
-        if (attr == null && ifaces)
-            foreach (var item in type.AllInterfaces)
-                if ((attr = FindAttribute(item, false, false)) != null) break;
-
-        return attr;
-    }
-
-    // -----------------------------------------------------
-
-    /// <summary>
-    /// Determines if the <see cref="CloneableAttribute.PreventVirtual"/> setting is enabled,
-    /// in the given instance or in its inheritance and interface chains if requested.
-    /// </summary>
-    /// <param name="type"></param>
-    /// <param name="value"></param>
-    /// <param name="chain"></param>
-    /// <param name="ifaces"></param>
-    /// <returns></returns>
-    bool GetPreventVirtual(ITypeSymbol type, out bool value, bool chain = false, bool ifaces = false)
-    {
-        var attrs = type.GetAttributes(typeof(CloneableAttribute));
-        foreach (var attr in attrs)
+        if (item == null && chain)
         {
-            if (attr.GetNamedArgument(nameof(CloneableAttribute.PreventVirtual), out var arg) &&
-                !arg.Value.IsNull &&
-                arg.Value.Value is bool temp)
+            foreach (var temp in type.AllBaseTypes())
+                if ((item = FindMethod(temp)) != null) break;
+        }
+
+        if (item == null && ifaces)
+        {
+            foreach (var temp in type.AllInterfaces)
+                if ((item = FindMethod(temp)) != null) break;
+        }
+
+        return item;
+    }
+
+    // -----------------------------------------------------
+
+    /// <summary>
+    /// Finds the value of <see cref="CloneableAttribute.PreventVirtual"/>.
+    /// </summary>
+    bool GetPreventVirtual(AttributeData attr, out bool value)
+    {
+        if (attr.GetNamedArgument(nameof(CloneableAttribute.PreventVirtual), out var arg))
+        {
+            if (!arg.Value.IsNull && arg.Value.Value is bool temp)
             {
                 value = temp;
                 return true;
             }
         }
 
-        if (chain)
-            foreach (var item in type.AllBaseTypes())
-                if (GetPreventVirtual(item, out value, false, false)) return true;
-
-        if (ifaces)
-            foreach (var item in type.AllInterfaces)
-                if (GetPreventVirtual(item, out value, false, false)) return true;
-
         value = false;
         return false;
+    }
+
+    /// <summary>
+    /// Finds the effective value of <see cref="CloneableAttribute.PreventVirtual"/>.
+    /// </summary>
+    bool GetPreventVirtual(ITypeSymbol type, out bool value, bool chain = false, bool ifaces = false)
+    {
+        value = false;
+
+        var attr = FindAttribute(type);
+        var found = attr != null ? GetPreventVirtual(attr, out value) : false;
+        if (found) return true;
+
+        if (chain)
+        {
+            foreach (var temp in type.AllBaseTypes())
+            {
+                found = GetPreventVirtual(temp, out value);
+                if (found) return true;
+            }
+        }
+
+        if (ifaces)
+        {
+            foreach (var temp in type.AllInterfaces)
+            {
+                found = GetPreventVirtual(temp, out value);
+                if (found) return true;
+            }
+        }
+
+        return false;
+    }
+
+    // -----------------------------------------------------
+
+    /// <summary>
+    /// Finds the effective <see cref="CloneableAttribute"/>.
+    /// </summary>
+    AttributeData? FindAttribute(ITypeSymbol type, bool chain = false, bool ifaces = false)
+    {
+        var atr = type.GetAttributes(typeof(CloneableAttribute)).FirstOrDefault();
+
+        if (atr == null && chain)
+        {
+            foreach (var temp in type.AllBaseTypes())
+                if ((atr = FindAttribute(temp)) != null) break;
+        }
+
+        if (atr == null && ifaces)
+        {
+            foreach (var temp in type.AllInterfaces)
+                if ((atr = FindAttribute(temp)) != null) break;
+        }
+
+        return atr;
     }
 }
