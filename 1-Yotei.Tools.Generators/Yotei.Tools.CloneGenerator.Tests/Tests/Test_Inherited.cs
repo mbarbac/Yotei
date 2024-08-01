@@ -37,4 +37,29 @@ namespace Yotei.Tools.CloneGenerator.Tests.Inherited
             Assert.True(method.IsPrivate);
         }
     }
+
+    // ====================================================
+
+    [Cloneable] public partial interface IA { }
+
+    [Cloneable]
+    public partial class TA : IA
+    {
+        public TA() { }
+        public TA(TA _) { }
+    }
+
+    [Cloneable]
+    public partial class TB : TA
+    {
+        public TB() { }
+        public TB(TB source) : base(source) { }
+    }
+
+    [Cloneable]
+    public partial class TC : TB
+    {
+        public TC() { }
+        public TC(TC source) : base(source) { }
+    }
 }
