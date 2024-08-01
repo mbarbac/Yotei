@@ -19,6 +19,7 @@ public partial class CoreList<T> : ICoreList<T>
         _CompareItems = EqualityComparer<T>.Default.Equals;
         _GetDuplicates = IndexesOf;
         _CanInclude = (x, y) => true;
+        _ExpandItems = false;
     }
 
     /// <summary>
@@ -130,6 +131,22 @@ public partial class CoreList<T> : ICoreList<T>
         }
     }
     Func<T, T, bool> _CanInclude;
+
+    /// <summary>
+    /// Determines if, when adding, inserting, or removing a given element, if it is itself a
+    /// collection of the elements of this instance, then its own elements shall be used instead
+    /// of that given one.
+    /// </summary>
+    public bool ExpandItems
+    {
+        get => _ExpandItems;
+        set
+        {
+            if (_ExpandItems == value) return;
+            if (_ExpandItems = value) Reload();
+        }
+    }
+    bool _ExpandItems;
 
     /// <summary>
     /// Reloads the contents of this instance using the rules of this instance.
@@ -286,21 +303,28 @@ public partial class CoreList<T> : ICoreList<T>
         var same = CompareItems(source, item);
         if (same) return 0;
 
-        var num = RemoveAt(index);
-        var count = Insert(index, item);
-        return count == 0 ? num : count;
+        var removed = RemoveAt(index);
+        var inserted = Insert(index, item);
+        return inserted == 0 ? removed : inserted;
     }
 
     /// <inheritdoc/>
     public virtual int Add(T item)
     {
-        item = ValidateItem(item);
+        if (ExpandItems && item is IEnumerable<T> items)
+        {
+            return AddRange(items);
+        }
+        else
+        {
+            item = ValidateItem(item);
 
-        var dups = GetDuplicates(item);
-        foreach (var dup in dups) if (!CanInclude(item, Items[dup])) return 0;
+            var dups = GetDuplicates(item);
+            foreach (var dup in dups) if (!CanInclude(item, Items[dup])) return 0;
 
-        Items.Add(item);
-        return 1;
+            Items.Add(item);
+            return 1;
+        }
     }
     void ICollection<T>.Add(T item) => Add(item);
     int IList.Add(object? value) => Add((T)value!) > 0 ? (Count - 1) : -1;
@@ -321,14 +345,21 @@ public partial class CoreList<T> : ICoreList<T>
     /// <inheritdoc/>
     public virtual int Insert(int index, T item)
     {
-        ValidateIndex(index, insert: true);
-        item = ValidateItem(item);
+        if (ExpandItems && item is IEnumerable<T> items)
+        {
+            return InsertRange(index, items);
+        }
+        else
+        {
+            ValidateIndex(index, insert: true);
+            item = ValidateItem(item);
 
-        var dups = GetDuplicates(item);
-        foreach (var dup in dups) if (!CanInclude(item, Items[dup])) return 0;
+            var dups = GetDuplicates(item);
+            foreach (var dup in dups) if (!CanInclude(item, Items[dup])) return 0;
 
-        Items.Insert(index, item);
-        return 1;
+            Items.Insert(index, item);
+            return 1;
+        }
     }
     void IList<T>.Insert(int index, T item) => Insert(index, item);
     void IList.Insert(int index, object? value) => Insert(index, (T)value!);
@@ -377,8 +408,17 @@ public partial class CoreList<T> : ICoreList<T>
     {
         if (Count == 0) return 0;
 
-        var index = IndexOf(item, validate: false);
-        return index >= 0 ? RemoveAt(index) : 0;
+        if (ExpandItems && item is IEnumerable<T> items)
+        {
+            var r = 0;
+            foreach (var temp in items) r += Remove(temp);
+            return r;
+        }
+        else
+        {
+            var index = IndexOf(item, validate: false);
+            return index >= 0 ? RemoveAt(index) : 0;
+        }
     }
     bool ICollection<T>.Remove(T item) => Remove(item) > 0;
     void IList.Remove(object? value) => Remove((T)value!);
@@ -388,8 +428,17 @@ public partial class CoreList<T> : ICoreList<T>
     {
         if (Count == 0) return 0;
 
-        var index = LastIndexOf(item, validate: false);
-        return index >= 0 ? RemoveAt(index) : 0;
+        if (ExpandItems && item is IEnumerable<T> items)
+        {
+            var r = 0;
+            foreach (var temp in items) r += RemoveLast(temp);
+            return r;
+        }
+        else
+        {
+            var index = LastIndexOf(item, validate: false);
+            return index >= 0 ? RemoveAt(index) : 0;
+        }
     }
 
     /// <inheritdoc/>
@@ -397,14 +446,23 @@ public partial class CoreList<T> : ICoreList<T>
     {
         if (Count == 0) return 0;
 
-        var num = 0; while (true)
+        if (ExpandItems && item is IEnumerable<T> items)
         {
-            var index = IndexOf(item, validate: false);
-
-            if (index >= 0) num += RemoveAt(index);
-            else break;
+            var r = 0;
+            foreach (var temp in items) r += RemoveAll(temp);
+            return r;
         }
-        return num;
+        else
+        {
+            var num = 0; while (true)
+            {
+                var index = IndexOf(item, validate: false);
+
+                if (index >= 0) num += RemoveAt(index);
+                else break;
+            }
+            return num;
+        }
     }
 
     /// <inheritdoc/>

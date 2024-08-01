@@ -199,7 +199,7 @@ internal class XFieldNode : FieldNode
                 }
             }
 
-            var issealed = Symbol.IsSealed;
+            var issealed = ParentNode.Symbol.IsSealed;
             return prevent || issealed ? "public " : "public virtual ";
         }
     }

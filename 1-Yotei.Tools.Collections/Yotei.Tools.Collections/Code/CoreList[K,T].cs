@@ -21,6 +21,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
         _CompareKeys = EqualityComparer<K>.Default.Equals;
         _GetDuplicates = IndexesOf;
         _CanInclude = (item, x) => true;
+        _ExpandItems = false;
     }
 
     /// <summary>
@@ -164,6 +165,22 @@ public partial class CoreList<K, T> : ICoreList<K, T>
         }
     }
     Func<T, T, bool> _CanInclude;
+
+    /// <summary>
+    /// Determines if, when adding, inserting, or removing a given element, if it is itself a
+    /// collection of the elements of this instance, then its own elements shall be used instead
+    /// of that given one.
+    /// </summary>
+    public bool ExpandItems
+    {
+        get => _ExpandItems;
+        set
+        {
+            if (_ExpandItems == value) return;
+            if (_ExpandItems = value) Reload();
+        }
+    }
+    bool _ExpandItems;
 
     /// <summary>
     /// Reloads the contents of this instance using the rules of this instance.
@@ -322,22 +339,29 @@ public partial class CoreList<K, T> : ICoreList<K, T>
         var same = CompareKeys(GetKey(source), ValidateKey(GetKey(item)));
         if (same) return 0;
 
-        var num = RemoveAt(index);
-        var count = Insert(index, item);
-        return count == 0 ? num : count;
+        var removed = RemoveAt(index);
+        var inserted = Insert(index, item);
+        return inserted == 0 ? removed : inserted;
     }
 
     /// <inheritdoc/>
     public virtual int Add(T item)
     {
-        item = ValidateItem(item);
+        if (ExpandItems && item is IEnumerable<T> items)
+        {
+            return AddRange(items);
+        }
+        else
+        {
+            item = ValidateItem(item);
 
-        var key = ValidateKey(GetKey(item));
-        var dups = GetDuplicates(key);
-        foreach (var dup in dups) if (!CanInclude(item, Items[dup])) return 0;
+            var key = ValidateKey(GetKey(item));
+            var dups = GetDuplicates(key);
+            foreach (var dup in dups) if (!CanInclude(item, Items[dup])) return 0;
 
-        Items.Add(item);
-        return 1;
+            Items.Add(item);
+            return 1;
+        }
     }
     void ICollection<T>.Add(T item) => Add(item);
     int IList.Add(object? value) => Add((T)value!) > 0 ? (Count - 1) : -1;
@@ -358,15 +382,22 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// <inheritdoc/>
     public virtual int Insert(int index, T item)
     {
-        ValidateIndex(index, insert: true);
-        item = ValidateItem(item);
+        if (ExpandItems && item is IEnumerable<T> items)
+        {
+            return InsertRange(index, items);
+        }
+        else
+        {
+            ValidateIndex(index, insert: true);
+            item = ValidateItem(item);
 
-        var key = ValidateKey(GetKey(item));
-        var dups = GetDuplicates(key);
-        foreach (var dup in dups) if (!CanInclude(item, Items[dup])) return 0;
+            var key = ValidateKey(GetKey(item));
+            var dups = GetDuplicates(key);
+            foreach (var dup in dups) if (!CanInclude(item, Items[dup])) return 0;
 
-        Items.Insert(index, item);
-        return 1;
+            Items.Insert(index, item);
+            return 1;
+        }
     }
     void IList<T>.Insert(int index, T item) => Insert(index, item);
     void IList.Insert(int index, object? value) => Insert(index, (T)value!);
