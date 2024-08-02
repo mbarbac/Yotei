@@ -1,4 +1,4 @@
-﻿namespace Yotei.ORM.Code.Internal;
+﻿namespace Yotei.ORM.Internal;
 
 // ========================================================
 /// <inheritdoc cref="IStrTokenText"/>
@@ -14,7 +14,7 @@ public class StrTokenText : IStrTokenText
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    public StrTokenText() { }
+    public StrTokenText() => Payload = string.Empty;
 
     /// <summary>
     /// Initializes a new instance with the given value.
@@ -31,7 +31,7 @@ public class StrTokenText : IStrTokenText
         get => _Payload;
         init => _Payload = value.ThrowWhenNull();
     }
-    string _Payload = string.Empty;
+    string _Payload = default!;
 
     object? IStrToken.Payload => Payload;
 
