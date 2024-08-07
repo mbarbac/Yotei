@@ -12,6 +12,17 @@ public abstract partial class StrTokenizer
     public StrTokenizer() { }
 
     /// <summary>
+    /// Copy constructor.
+    /// </summary>
+    /// <param name="source"></param>
+    protected StrTokenizer(StrTokenizer source)
+    {
+        Comparison = source.Comparison;
+        ReduceSource = source.ReduceSource;
+        ReduceResult = source.ReduceResult;
+    }
+
+    /// <summary>
     /// The comparison used to compare string sequences.
     /// <br/> Its default value is <see cref="StringComparison.CurrentCulture"/>.
     /// </summary>

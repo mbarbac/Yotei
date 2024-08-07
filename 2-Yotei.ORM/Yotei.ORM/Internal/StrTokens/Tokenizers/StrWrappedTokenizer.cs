@@ -34,13 +34,32 @@ public partial class StrWrappedTokenizer : StrTokenizer
         : throw new ArgumentException("Invalid character.").WithData(c);
 
     /// <summary>
+    /// Initializes a new instance when the head and tail sequences are the same one.
+    /// </summary>
+    /// <param name="wrapper"></param>
+    public StrWrappedTokenizer(string wrapper) : this(wrapper, wrapper) { }
+
+    /// <summary>
+    /// Initializes a new instance when the head and tail sequences are the same one.
+    /// </summary>
+    /// <param name="wrapper"></param>
+    public StrWrappedTokenizer(char wrapper) : this(wrapper, wrapper) { }
+
+    /// <summary>
     /// Copy constructor
     /// </summary>
     /// <param name="source"></param>
     protected StrWrappedTokenizer(StrWrappedTokenizer source)
     {
+        Comparison = source.Comparison;
+        ReduceSource = source.ReduceSource;
+        ReduceResult = source.ReduceResult;
+
         Head = source.Head;
         Tail = source.Tail;
+        UseSourceWrappers = source.UseSourceWrappers;
+        Escape = source.Escape;
+        RemoveEscape = source.RemoveEscape;
     }
 
     /// <inheritdoc/>
@@ -69,12 +88,12 @@ public partial class StrWrappedTokenizer : StrTokenizer
     string _Tail = default!;
 
     /// <summary>
-    /// If <c>true</c> then the head or tail found in the source sequence is substituted by the
-    /// given ones in the returned token. The default <c>false</c> one keeps the original head or
-    /// tail sequence.
+    /// If <c>true</c> then the head and tail values found in the source sequence are kept in
+    /// the returned token. The default <c>false</c> one replaces them with the ones specified
+    /// in this instance.
     /// </summary>
     [With]
-    public bool ForceWrappers { get; set; }
+    public bool UseSourceWrappers { get; set; }
 
     /// <summary>
     /// If not null, the sequence that if appears right after the head or tails ones, prevents
@@ -89,11 +108,11 @@ public partial class StrWrappedTokenizer : StrTokenizer
     string? _Escape = null;
 
     /// <summary>
-    /// If <c>true</c> then the escape sequence is kept in the returned token. The default
-    /// <c>false</c> one removes it.
+    /// If <c>true</c> then the escape sequence is removed from the tokenized result. The default
+    /// <c>false</c> one keeps it.
     /// </summary>
     [With]
-    public bool KeepEscape { get; set; }
+    public bool RemoveEscape { get; set; }
 
     // ----------------------------------------------------
 
@@ -125,9 +144,9 @@ public partial class StrWrappedTokenizer : StrTokenizer
             ReduceSource = master.ReduceSource;
             ReduceResult = master.ReduceResult;
 
-            ForceValue = master.ForceWrappers;
+            UseSourceValue = true; // To keep the source...
             Escape = master.Escape;
-            KeepEscape = master.KeepEscape;
+            RemoveEscape = master.RemoveEscape;
         }
         protected override IStrToken Generator(string value) => new XHead(value);
     }
@@ -164,7 +183,10 @@ public partial class StrWrappedTokenizer : StrTokenizer
                             0 => StrTokenText.Empty,
                             _ => new StrTokenChain(chain.GetRange(ini + 1, len))
                         };
-                        item = Generator(xhead.Payload, item, xhead.Payload);
+
+                        var head = UseSourceWrappers ? Head : xhead.Payload;
+                        var tail = UseSourceWrappers ? Head : xhead.Payload;
+                        item = Generator(head, item, tail);
 
                         chain.RemoveRange(ini, len + 2);
                         chain.Insert(ini, item);
@@ -177,6 +199,7 @@ public partial class StrWrappedTokenizer : StrTokenizer
             for (int i = 0; i < chain.Count; i++)
             {
                 var item = chain[i];
+
                 if (item is XHead xhead) chain[i] = new StrTokenText(xhead.Payload);
             }
 
@@ -205,9 +228,9 @@ public partial class StrWrappedTokenizer : StrTokenizer
             ReduceSource = master.ReduceSource;
             ReduceResult = master.ReduceResult;
 
-            ForceValue = master.ForceWrappers;
+            UseSourceValue = true; // To keep the source...
             Escape = master.Escape;
-            KeepEscape = master.KeepEscape;
+            RemoveEscape = master.RemoveEscape;
         }
         protected override IStrToken Generator(string value) => new XHead(value);
     }
@@ -250,7 +273,9 @@ public partial class StrWrappedTokenizer : StrTokenizer
                         0 => StrTokenText.Empty,
                         _ => new StrTokenChain(chain.GetRange(ini + 1, len))
                     };
-                    item = Generator(xhead.Payload, item, xtail.Payload);
+                    var head = UseSourceWrappers ? Head : xhead.Payload;
+                    var tail = UseSourceWrappers ? Head : xtail.Payload;
+                    item = Generator(head, item, tail);
 
                     chain.RemoveRange(ini, len + 2);
                     chain.Insert(ini, item);

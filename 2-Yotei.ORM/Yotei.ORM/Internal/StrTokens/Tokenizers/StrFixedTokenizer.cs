@@ -19,8 +19,14 @@ public partial class StrFixedTokenizer : StrTokenizer
     /// <param name="source"></param>
     protected StrFixedTokenizer(StrFixedTokenizer source)
     {
+        Comparison = source.Comparison;
+        ReduceSource = source.ReduceSource;
+        ReduceResult = source.ReduceResult;
+
         Value = source.Value;
+        UseSourceValue = source.UseSourceValue;
         Escape = source.Escape;
+        RemoveEscape = source.RemoveEscape;
     }
 
     /// <inheritdoc/>
@@ -38,11 +44,11 @@ public partial class StrFixedTokenizer : StrTokenizer
     string _Value = default!;
 
     /// <summary>
-    /// If <c>true</c> then the value found in the source sequence is substituted by the given
-    /// one in the returned token. The default <c>false</c> one keeps the original sequence.
+    /// If <c>true</c> then the value found in the source sequence is kept in the returned token.
+    /// The default <c>false</c> one replaces it with the one specified in this instance.
     /// </summary>
     [With]
-    public bool ForceValue { get; set; }
+    public bool UseSourceValue { get; set; }
 
     /// <summary>
     /// If not null, the sequence that if appears right after the value one, prevents it from
@@ -57,11 +63,11 @@ public partial class StrFixedTokenizer : StrTokenizer
     string? _Escape = null;
 
     /// <summary>
-    /// If <c>true</c> then the escape sequence is kept in the returned token. The default
-    /// <c>false</c> one removes it.
+    /// If <c>true</c> then the escape sequence is removed from the tokenized result. The default
+    /// <c>false</c> one keeps it.
     /// </summary>
     [With]
-    public bool KeepEscape { get; set; }
+    public bool RemoveEscape { get; set; }
 
     // ----------------------------------------------------
 
@@ -96,7 +102,7 @@ public partial class StrFixedTokenizer : StrTokenizer
             // Escape sequence...
             if (xcape is not null && span.StartsWith(xcape, Comparison))
             {
-                if (!KeepEscape) // We need to remove the escape sequence...
+                if (RemoveEscape) // We need to remove the escape sequence...
                 {
                     len = i - last;
                     str = len > 0 ? source.Substring(last, len) : string.Empty;
@@ -111,7 +117,14 @@ public partial class StrFixedTokenizer : StrTokenizer
                 }
                 else // Otherwise...
                 {
-                    str = ForceValue ? xcape : source.Substring(last, xcape.Length);
+                    len = i - last; if (len > 0)
+                    {
+                        str = source.Substring(last, len);
+                        token = new StrTokenText(str);
+                        chain.Add(token);
+                    }
+
+                    str = source.Substring(i, xcape.Length);
                     token = new StrTokenText(str);
                     chain.Add(token);
 
@@ -131,7 +144,7 @@ public partial class StrFixedTokenizer : StrTokenizer
                     chain.Add(token);
                 }
 
-                str = ForceValue ? Value : source.Substring(i, Value.Length);
+                str = UseSourceValue ? source.Substring(i, Value.Length) : Value;
                 token = Generator(str);
                 chain.Add(token);
 
