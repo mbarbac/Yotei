@@ -1,5 +1,5 @@
 ﻿namespace Yotei.ORM.Internal;
-
+/*
 // ========================================================
 /// <summary>
 /// Extracts <see cref="IStrTokenWrapped"/> tokens from a given source.
@@ -306,4 +306,4 @@ public partial class StrWrappedTokenizer : StrTokenizer
         // Finishing...
         return token;
     }
-}
+}*/

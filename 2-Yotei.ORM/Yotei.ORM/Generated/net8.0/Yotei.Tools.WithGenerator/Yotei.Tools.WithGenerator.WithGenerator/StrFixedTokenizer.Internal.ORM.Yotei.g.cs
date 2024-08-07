@@ -25,14 +25,14 @@ namespace Yotei.ORM.Internal
         /// Returns an instance of the host type where the value of the decorated member has been
         /// replaced by the new given one.
         /// </summary>
-        /// <param name ="v_UseSourceValue"></param>
+        /// <param name ="v_UseTokenizerValue"></param>
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("WithGenerator", "0.5.22.0")]
         public virtual StrFixedTokenizer
-        WithUseSourceValue(System.Boolean v_UseSourceValue)
+        WithUseTokenizerValue(System.Boolean v_UseTokenizerValue)
         {
             var x_temp = new StrFixedTokenizer(this)
             {
-                UseSourceValue = v_UseSourceValue
+                UseTokenizerValue = v_UseTokenizerValue
             };
             return x_temp;
         }
@@ -57,14 +57,14 @@ namespace Yotei.ORM.Internal
         /// Returns an instance of the host type where the value of the decorated member has been
         /// replaced by the new given one.
         /// </summary>
-        /// <param name ="v_RemoveEscape"></param>
+        /// <param name ="v_KeepEscape"></param>
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("WithGenerator", "0.5.22.0")]
         public virtual StrFixedTokenizer
-        WithRemoveEscape(System.Boolean v_RemoveEscape)
+        WithKeepEscape(System.Boolean v_KeepEscape)
         {
             var x_temp = new StrFixedTokenizer(this)
             {
-                RemoveEscape = v_RemoveEscape
+                KeepEscape = v_KeepEscape
             };
             return x_temp;
         }

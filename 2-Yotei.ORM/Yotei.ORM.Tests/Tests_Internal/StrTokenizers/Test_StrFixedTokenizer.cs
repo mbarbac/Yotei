@@ -11,7 +11,7 @@ public static class Test_StrFixedTokenizer
         string source;
         IStrToken target;
         var comparison = StringComparison.OrdinalIgnoreCase;
-        var tokenizer = new StrFixedTokenizer("--") { Comparison = comparison };
+        var tokenizer = new StrFixedTokenizer("XX") { Comparison = comparison };
         StrTokenText text;
 
         source = null!;
@@ -44,33 +44,14 @@ public static class Test_StrFixedTokenizer
         chain = Assert.IsType<StrTokenChain>(target); Assert.Equal(3, chain.Count);
         text = Assert.IsType<StrTokenText>(chain[0]); Assert.Equal("aaa", text.Payload);
         fix = Assert.IsType<StrTokenFixed>(chain[1]); Assert.Equal("xx", fix.Payload);
-        text = Assert.IsType<StrTokenText>(chain[2]); Assert.Equal(".xxbbb", text.Payload);
-    }
+        text = Assert.IsType<StrTokenText>(chain[2]); Assert.Equal("xxbbb", text.Payload);
 
-    //[Enforced]
-    [Fact]
-    public static void Test_String_Source_UseSourceValue_RemoveEscape()
-    {
-        string source;
-        IStrToken target;
-        var comparison = StringComparison.OrdinalIgnoreCase;
-        var tokenizer = new StrFixedTokenizer("XX")
-        {
-            Escape = ".",
-            Comparison = comparison,
-            UseSourceValue = true,
-            RemoveEscape = true
-        };
-        StrTokenText text;
-        StrTokenFixed fix;
-        StrTokenChain chain;
-
-        source = "aaaxx.xxbbb";
+        tokenizer = tokenizer.WithUseTokenizerValue(true).WithKeepEscape(true);
         target = tokenizer.Tokenize(source);
         chain = Assert.IsType<StrTokenChain>(target); Assert.Equal(3, chain.Count);
         text = Assert.IsType<StrTokenText>(chain[0]); Assert.Equal("aaa", text.Payload);
         fix = Assert.IsType<StrTokenFixed>(chain[1]); Assert.Equal("XX", fix.Payload);
-        text = Assert.IsType<StrTokenText>(chain[2]); Assert.Equal("xxbbb", text.Payload);
+        text = Assert.IsType<StrTokenText>(chain[2]); Assert.Equal(".xxbbb", text.Payload);
     }
 
     //[Enforced]
@@ -80,7 +61,7 @@ public static class Test_StrFixedTokenizer
         StrTokenChain source;
         IStrToken target;
         var comparison = StringComparison.OrdinalIgnoreCase;
-        var tokenizer = new StrFixedTokenizer("xx") { Escape = ".", Comparison = comparison };
+        var tokenizer = new StrFixedTokenizer("XX") { Escape = ".", Comparison = comparison };
         StrTokenText text;
         StrTokenFixed fix;
         StrTokenChain chain;
@@ -93,10 +74,18 @@ public static class Test_StrFixedTokenizer
             new StrTokenText("xx"),
             new StrTokenText("bbb"),
             ]);
+
         target = tokenizer.Tokenize(source);
         chain = Assert.IsType<StrTokenChain>(target); Assert.Equal(3, chain.Count);
         text = Assert.IsType<StrTokenText>(chain[0]); Assert.Equal("aaa", text.Payload);
         fix = Assert.IsType<StrTokenFixed>(chain[1]); Assert.Equal("xx", fix.Payload);
+        text = Assert.IsType<StrTokenText>(chain[2]); Assert.Equal("xxbbb", text.Payload);
+
+        var xtokenizer = tokenizer.WithUseTokenizerValue(true).WithKeepEscape(true);
+        target = xtokenizer.Tokenize(source);
+        chain = Assert.IsType<StrTokenChain>(target); Assert.Equal(3, chain.Count);
+        text = Assert.IsType<StrTokenText>(chain[0]); Assert.Equal("aaa", text.Payload);
+        fix = Assert.IsType<StrTokenFixed>(chain[1]); Assert.Equal("XX", fix.Payload);
         text = Assert.IsType<StrTokenText>(chain[2]); Assert.Equal(".xxbbb", text.Payload);
     }
 }

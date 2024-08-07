@@ -1,5 +1,5 @@
 namespace Yotei.ORM.Tests;
-
+/*
 // ========================================================
 //[Enforced]
 public static class Test_StrWrappedSameTokenizer
@@ -91,4 +91,4 @@ public static class Test_StrWrappedSameTokenizer
         target = xtokenizer.Tokenize(source);
         text = Assert.IsType<StrTokenText>(target); Assert.Equal("aaxbbx", text.Payload);
     }
-}
+}*/
