@@ -1,7 +1,6 @@
 using Chain = Yotei.ORM.Internal.StrTokenChain;
 using Text = Yotei.ORM.Internal.StrTokenText;
 using Fixed = Yotei.ORM.Internal.StrTokenFixed;
-using System.ComponentModel.DataAnnotations;
 
 namespace Yotei.ORM.Tests;
 

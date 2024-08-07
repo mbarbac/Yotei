@@ -20,7 +20,7 @@ public class StrTokenText : IStrTokenText
     /// Initializes a new instance with the given value.
     /// </summary>
     /// <param name="value"></param>
-    public StrTokenText(string value) => Payload = value;
+    public StrTokenText(string value) => Payload = value ?? string.Empty;
 
     /// <inheritdoc/>
     public override string ToString() => Payload;
@@ -39,4 +39,11 @@ public class StrTokenText : IStrTokenText
 
     /// <inheritdoc/>
     public IStrToken Reduce(StringComparison comparison) => this;
+
+    /// <inheritdoc/>
+    public IStrToken Tokenize(Func<string, IStrToken> tokenizer)
+    {
+        tokenizer.ThrowWhenNull();
+        return tokenizer(Payload);
+    }
 }

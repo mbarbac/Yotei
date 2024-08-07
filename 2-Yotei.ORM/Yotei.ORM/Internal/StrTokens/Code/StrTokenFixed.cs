@@ -27,4 +27,7 @@ public class StrTokenFixed : IStrTokenFixed
 
     /// <inheritdoc/>
     public IStrToken Reduce(StringComparison comparison) => this;
+
+    /// <inheritdoc/>
+    public IStrToken Tokenize(Func<string, IStrToken> tokenizer) => this;
 }

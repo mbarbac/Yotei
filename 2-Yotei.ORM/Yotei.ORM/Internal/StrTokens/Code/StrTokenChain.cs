@@ -75,6 +75,8 @@ public partial class StrTokenChain : IStrTokenChain
     public IEnumerable<IStrToken> Payload => this;
     object? IStrToken.Payload => Payload;
 
+    // ----------------------------------------------------
+
     /// <inheritdoc/>
     public IStrToken Reduce(StringComparison comparison)
     {
@@ -115,5 +117,30 @@ public partial class StrTokenChain : IStrTokenChain
             builder.Count == 1 ? builder[0] :
             changed ? builder.ToInstance() :
             this;
+    }
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public IStrToken Tokenize(Func<string, IStrToken> tokenizer)
+    {
+        tokenizer.ThrowWhenNull();
+
+        var builder = ToBuilder();
+        var changed = false;
+
+        for (int i = 0; i < builder.Count; i++)
+        {
+            var item = builder[i];
+            var temp = item.Tokenize(tokenizer);
+
+            if (!ReferenceEquals(item, temp))
+            {
+                builder[i] = temp;
+                changed = true;
+            }
+        }
+
+        return changed ? builder.ToInstance() : this;
     }
 }
