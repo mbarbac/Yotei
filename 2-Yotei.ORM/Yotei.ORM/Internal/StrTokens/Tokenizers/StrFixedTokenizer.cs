@@ -63,7 +63,7 @@ public partial class StrFixedTokenizer : StrTokenizer
     string? _Escape = null;
 
     /// <summary>
-    /// If <c>true</c> then the escape sequence is removed from the tokenized result. The default
+    /// If <c>true</c> then the escape sequence is kept in the tokenized result. The default
     /// <c>false</c> one removes it.
     /// </summary>
     [With]

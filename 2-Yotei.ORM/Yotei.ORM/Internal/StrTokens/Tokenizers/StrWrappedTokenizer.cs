@@ -1,5 +1,5 @@
 ﻿namespace Yotei.ORM.Internal;
-/*
+
 // ========================================================
 /// <summary>
 /// Extracts <see cref="IStrTokenWrapped"/> tokens from a given source.
@@ -57,9 +57,9 @@ public partial class StrWrappedTokenizer : StrTokenizer
 
         Head = source.Head;
         Tail = source.Tail;
-        UseSourceWrappers = source.UseSourceWrappers;
+        UseTokenizerWrappers = source.UseTokenizerWrappers;
         Escape = source.Escape;
-        RemoveEscape = source.RemoveEscape;
+        KeepEscape = source.KeepEscape;
     }
 
     /// <inheritdoc/>
@@ -88,15 +88,15 @@ public partial class StrWrappedTokenizer : StrTokenizer
     string _Tail = default!;
 
     /// <summary>
-    /// If <c>true</c> then the head and tail values found in the source sequence are kept in
-    /// the returned token. The default <c>false</c> one replaces them with the ones specified
-    /// in this instance.
+    /// If <c>true</c> then the head and value found in the source sequence are replaced by the
+    /// ones defined by this instance. The default <c>false</c> keeps the source sequence head
+    /// and tail values.
     /// </summary>
     [With]
-    public bool UseSourceWrappers { get; set; }
+    public bool UseTokenizerWrappers { get; set; }
 
     /// <summary>
-    /// If not null, the sequence that if appears right after the head or tails ones, prevents
+    /// If not null, the sequence that if appears right after the head or tail ones, prevents
     /// them from being tokenized.
     /// </summary>
     [With]
@@ -108,11 +108,11 @@ public partial class StrWrappedTokenizer : StrTokenizer
     string? _Escape = null;
 
     /// <summary>
-    /// If <c>true</c> then the escape sequence is removed from the tokenized result. The default
-    /// <c>false</c> one keeps it.
+    /// If <c>true</c> then the escape sequence is kept in the tokenized result. The default
+    /// <c>false</c> one removes it.
     /// </summary>
     [With]
-    public bool RemoveEscape { get; set; }
+    public bool KeepEscape { get; set; }
 
     // ----------------------------------------------------
 
@@ -144,13 +144,14 @@ public partial class StrWrappedTokenizer : StrTokenizer
             ReduceSource = master.ReduceSource;
             ReduceResult = master.ReduceResult;
 
-            UseSourceValue = true; // To keep the source...
+            UseTokenizerValue = false; // Enforced, later we'll treat it...
             Escape = master.Escape;
-            RemoveEscape = master.RemoveEscape;
+            KeepEscape = master.KeepEscape;
         }
         protected override IStrToken Generator(string value) => new XHead(value);
     }
 
+    /// <inheritdoc/>
     IStrToken ExtractSame(string source)
     {
         // Trivial case...
@@ -177,16 +178,14 @@ public partial class StrWrappedTokenizer : StrTokenizer
                     else
                     {
                         var len = i - ini - 1;
+                        var head = UseTokenizerWrappers ? Head : xhead.Payload;
 
                         item = len switch
                         {
                             0 => StrTokenText.Empty,
                             _ => new StrTokenChain(chain.GetRange(ini + 1, len))
                         };
-
-                        var head = UseSourceWrappers ? Head : xhead.Payload;
-                        var tail = UseSourceWrappers ? Head : xhead.Payload;
-                        item = Generator(head, item, tail);
+                        item = Generator(head, item, head);
 
                         chain.RemoveRange(ini, len + 2);
                         chain.Insert(ini, item);
@@ -199,8 +198,21 @@ public partial class StrWrappedTokenizer : StrTokenizer
             for (int i = 0; i < chain.Count; i++)
             {
                 var item = chain[i];
-
                 if (item is XHead xhead) chain[i] = new StrTokenText(xhead.Payload);
+            }
+
+            // Removing not needed escape elements...
+            if (!KeepEscape && Escape is not null)
+            {
+                for (int i = 0; i < chain.Count; i++)
+                {
+                    var item = chain[i];
+                    if (item is StrTokenText temp && string.Compare(Escape, temp.Payload, Comparison) == 0)
+                    {
+                        chain.RemoveAt(i);
+                        i--;
+                    }
+                }
             }
 
             // Restoring...
@@ -228,13 +240,14 @@ public partial class StrWrappedTokenizer : StrTokenizer
             ReduceSource = master.ReduceSource;
             ReduceResult = master.ReduceResult;
 
-            UseSourceValue = true; // To keep the source...
+            UseTokenizerValue = false; // Enforced, later we'll treat it...
             Escape = master.Escape;
-            RemoveEscape = master.RemoveEscape;
+            KeepEscape = master.KeepEscape;
         }
-        protected override IStrToken Generator(string value) => new XHead(value);
+        protected override IStrToken Generator(string value) => new XTail(value);
     }
 
+    /// <inheritdoc/>
     IStrToken ExtractDifferent(string source)
     {
         // Trivial case...
@@ -265,16 +278,16 @@ public partial class StrWrappedTokenizer : StrTokenizer
                 }
                 if (item is XTail xtail && ini >= 0)
                 {
-                    var xhead = (XHead)chain[i];
                     var len = i - ini - 1;
+                    var xhead = (XHead)chain[ini];
+                    var head = UseTokenizerWrappers ? Head : xhead.Payload;
+                    var tail = UseTokenizerWrappers ? Tail : xtail.Payload;
 
                     item = len switch
                     {
                         0 => StrTokenText.Empty,
                         _ => new StrTokenChain(chain.GetRange(ini + 1, len))
                     };
-                    var head = UseSourceWrappers ? Head : xhead.Payload;
-                    var tail = UseSourceWrappers ? Head : xtail.Payload;
                     item = Generator(head, item, tail);
 
                     chain.RemoveRange(ini, len + 2);
@@ -283,13 +296,27 @@ public partial class StrWrappedTokenizer : StrTokenizer
                 }
             }
 
-            // Removing orphan ones...
+            //  Removing orphan ones...
             for (int i = 0; i < chain.Count; i++)
             {
                 var item = chain[i];
 
                 if (item is XHead xhead) chain[i] = new StrTokenText(xhead.Payload);
                 if (item is XTail xtail) chain[i] = new StrTokenText(xtail.Payload);
+            }
+
+            // Removing not needed escape elements...
+            if (!KeepEscape && Escape is not null)
+            {
+                for (int i = 0; i < chain.Count; i++)
+                {
+                    var item = chain[i];
+                    if (item is StrTokenText temp && string.Compare(Escape, temp.Payload, Comparison) == 0)
+                    {
+                        chain.RemoveAt(i);
+                        i--;
+                    }
+                }
             }
 
             // Restoring...
@@ -306,4 +333,4 @@ public partial class StrWrappedTokenizer : StrTokenizer
         // Finishing...
         return token;
     }
-}*/
+}

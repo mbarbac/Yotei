@@ -68,14 +68,16 @@ public class StrTokenWrapped : IStrTokenWrapped
     /// <inheritdoc/>
     public IStrToken Reduce(StringComparison comparison)
     {
-        var item = Payload;
-        while (item is IStrTokenWrapped temp &&
-            string.Compare(Head, temp.Head, comparison) == 0 &&
-            string.Compare(Tail, temp.Tail, comparison) == 0)
-            item = temp;
+        var item = Payload.Reduce(comparison);
 
-        item = item.Reduce(comparison);
-        return ReferenceEquals(Payload, item) ? this : new StrTokenWrapped(Head, item, Tail);
+        if (item is IStrTokenWrapped temp &&
+            string.Compare(temp.Head, Head, comparison) == 0 &&
+            string.Compare(temp.Tail, Tail, comparison) == 0)
+            return item;
+
+        return ReferenceEquals(Payload, item)
+            ? this
+            : new StrTokenWrapped(Head, item, Tail);
     }
 
     // ----------------------------------------------------
