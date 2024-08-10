@@ -25,14 +25,14 @@ namespace Yotei.ORM.Internal
         /// Returns an instance of the host type where the value of the decorated member has been
         /// replaced by the new given one.
         /// </summary>
-        /// <param name ="v_UseTokenizerValue"></param>
+        /// <param name ="v_PreventSourceValue"></param>
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("WithGenerator", "0.5.22.0")]
         public virtual StrFixedTokenizer
-        WithUseTokenizerValue(System.Boolean v_UseTokenizerValue)
+        WithPreventSourceValue(System.Boolean v_PreventSourceValue)
         {
             var x_temp = new StrFixedTokenizer(this)
             {
-                UseTokenizerValue = v_UseTokenizerValue
+                PreventSourceValue = v_PreventSourceValue
             };
             return x_temp;
         }

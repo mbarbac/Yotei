@@ -3,7 +3,7 @@ using Chain = Yotei.ORM.Internal.StrTokenChain;
 using Wrapped = Yotei.ORM.Internal.StrTokenWrapped;
 using Xunit.Sdk;
 
-namespace Yotei.ORM.Tests;
+namespace Yotei.ORM.Tests.Internal;
 
 // ========================================================
 //[Enforced]
@@ -51,7 +51,7 @@ public static class Test_StrWrappedDifferentTokenizer
         IStrToken target;
         var comparison = StringComparison.OrdinalIgnoreCase;
         var tokenizer = new StrWrappedTokenizer('(', ')') { Escape = ".", Comparison = comparison };
-        var xtokenizer = tokenizer.WithUseTokenizerWrappers(true).WithKeepEscape(true);
+        var xtokenizer = tokenizer.WithPreventSourceWrappers(true).WithKeepEscape(true);
         Text text;
 
         source = "(";
@@ -85,7 +85,7 @@ public static class Test_StrWrappedDifferentTokenizer
         IStrToken target;
         var comparison = StringComparison.OrdinalIgnoreCase;
         var tokenizer = new StrWrappedTokenizer('(', ')') { Escape = ".", Comparison = comparison };
-        var xtokenizer = tokenizer.WithUseTokenizerWrappers(true).WithKeepEscape(true);
+        var xtokenizer = tokenizer.WithPreventSourceWrappers(true).WithKeepEscape(true);
         Text text;
 
         source = ")(";
@@ -106,7 +106,7 @@ public static class Test_StrWrappedDifferentTokenizer
         IStrToken target;
         var comparison = StringComparison.OrdinalIgnoreCase;
         var tokenizer = new StrWrappedTokenizer('(', ')') { Escape = ".", Comparison = comparison };
-        var xtokenizer = tokenizer.WithUseTokenizerWrappers(true).WithKeepEscape(true);
+        var xtokenizer = tokenizer.WithPreventSourceWrappers(true).WithKeepEscape(true);
         Text text;
         Chain chain;
         Wrapped wrapped;
@@ -174,7 +174,7 @@ public static class Test_StrWrappedDifferentTokenizer
         IStrToken target;
         var comparison = StringComparison.OrdinalIgnoreCase;
         var tokenizer = new StrWrappedTokenizer('(', ')') { Escape = ".", Comparison = comparison };
-        var xtokenizer = tokenizer.WithUseTokenizerWrappers(true).WithKeepEscape(true);
+        var xtokenizer = tokenizer.WithPreventSourceWrappers(true).WithKeepEscape(true);
         Text text;
         Chain chain;
         Wrapped wrapped;
@@ -223,7 +223,7 @@ public static class Test_StrWrappedDifferentTokenizer
         IStrToken target;
         var comparison = StringComparison.OrdinalIgnoreCase;
         var tokenizer = new StrWrappedTokenizer('(', ')') { Escape = ".", Comparison = comparison };
-        var xtokenizer = tokenizer.WithUseTokenizerWrappers(true).WithKeepEscape(true);
+        var xtokenizer = tokenizer.WithPreventSourceWrappers(true).WithKeepEscape(true);
         Text text;
         Chain chain;
         Wrapped wrapped;

@@ -24,7 +24,7 @@ public partial class StrFixedTokenizer : StrTokenizer
         ReduceResult = source.ReduceResult;
 
         Value = source.Value;
-        UseTokenizerValue = source.UseTokenizerValue;
+        PreventSourceValue = source.PreventSourceValue;
         Escape = source.Escape;
         KeepEscape = source.KeepEscape;
     }
@@ -48,7 +48,7 @@ public partial class StrFixedTokenizer : StrTokenizer
     /// by this instance. The default <c>false</c> keeps the source sequence value.
     /// </summary>
     [With]
-    public bool UseTokenizerValue { get; set; }
+    public bool PreventSourceValue { get; set; }
 
     /// <summary>
     /// If not null, the sequence that if appears right after the value one, prevents it from
@@ -78,6 +78,14 @@ public partial class StrFixedTokenizer : StrTokenizer
     {
         return new StrTokenFixed(value);
     }
+
+    /// <summary>
+    /// Provides an additional validation about if the given source, at the given index, contains
+    /// a valid value sequence or not, in addition of the standard lexicografical comparison.
+    /// </summary>
+    protected virtual bool IsValueAtIndex(int index, string source) => true;
+
+    // ----------------------------------------------------
 
     /// <inheritdoc/>
     protected override IStrToken Extract(string source)
@@ -135,7 +143,7 @@ public partial class StrFixedTokenizer : StrTokenizer
             }
 
             // Value sequence...
-            if (span.StartsWith(Value, Comparison))
+            if (span.StartsWith(Value, Comparison) && IsValueAtIndex(i, source))
             {
                 len = i - last; if (len > 0)
                 {
@@ -144,7 +152,7 @@ public partial class StrFixedTokenizer : StrTokenizer
                     chain.Add(token);
                 }
 
-                str = UseTokenizerValue ? Value : source.Substring(i, Value.Length);
+                str = PreventSourceValue ? Value : source.Substring(i, Value.Length);
                 token = Generator(str);
                 chain.Add(token);
 

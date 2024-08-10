@@ -2,7 +2,7 @@ using Chain = Yotei.ORM.Internal.StrTokenChain;
 using Text = Yotei.ORM.Internal.StrTokenText;
 using Fixed = Yotei.ORM.Internal.StrTokenFixed;
 
-namespace Yotei.ORM.Tests;
+namespace Yotei.ORM.Tests.Internal;
 
 // ========================================================
 //[Enforced]

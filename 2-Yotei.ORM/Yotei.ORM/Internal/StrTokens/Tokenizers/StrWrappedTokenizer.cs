@@ -57,7 +57,7 @@ public partial class StrWrappedTokenizer : StrTokenizer
 
         Head = source.Head;
         Tail = source.Tail;
-        UseTokenizerWrappers = source.UseTokenizerWrappers;
+        PreventSourceWrappers = source.PreventSourceWrappers;
         Escape = source.Escape;
         KeepEscape = source.KeepEscape;
     }
@@ -93,7 +93,7 @@ public partial class StrWrappedTokenizer : StrTokenizer
     /// and tail values.
     /// </summary>
     [With]
-    public bool UseTokenizerWrappers { get; set; }
+    public bool PreventSourceWrappers { get; set; }
 
     /// <summary>
     /// If not null, the sequence that if appears right after the head or tail ones, prevents
@@ -144,7 +144,7 @@ public partial class StrWrappedTokenizer : StrTokenizer
             ReduceSource = master.ReduceSource;
             ReduceResult = master.ReduceResult;
 
-            UseTokenizerValue = false; // Enforced, later we'll treat it...
+            PreventSourceValue = false; // Enforced, later we'll treat it...
             Escape = master.Escape;
             KeepEscape = master.KeepEscape;
         }
@@ -178,7 +178,7 @@ public partial class StrWrappedTokenizer : StrTokenizer
                     else
                     {
                         var len = i - ini - 1;
-                        var head = UseTokenizerWrappers ? Head : xhead.Payload;
+                        var head = PreventSourceWrappers ? Head : xhead.Payload;
 
                         item = len switch
                         {
@@ -240,7 +240,7 @@ public partial class StrWrappedTokenizer : StrTokenizer
             ReduceSource = master.ReduceSource;
             ReduceResult = master.ReduceResult;
 
-            UseTokenizerValue = false; // Enforced, later we'll treat it...
+            PreventSourceValue = false; // Enforced, later we'll treat it...
             Escape = master.Escape;
             KeepEscape = master.KeepEscape;
         }
@@ -280,8 +280,8 @@ public partial class StrWrappedTokenizer : StrTokenizer
                 {
                     var len = i - ini - 1;
                     var xhead = (XHead)chain[ini];
-                    var head = UseTokenizerWrappers ? Head : xhead.Payload;
-                    var tail = UseTokenizerWrappers ? Tail : xtail.Payload;
+                    var head = PreventSourceWrappers ? Head : xhead.Payload;
+                    var tail = PreventSourceWrappers ? Tail : xtail.Payload;
 
                     item = len switch
                     {

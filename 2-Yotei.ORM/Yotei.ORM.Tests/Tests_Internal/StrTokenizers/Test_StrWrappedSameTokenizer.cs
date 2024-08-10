@@ -2,7 +2,7 @@ using Text = Yotei.ORM.Internal.StrTokenText;
 using Chain = Yotei.ORM.Internal.StrTokenChain;
 using Wrapped = Yotei.ORM.Internal.StrTokenWrapped;
 
-namespace Yotei.ORM.Tests;
+namespace Yotei.ORM.Tests.Internal;
 
 // ========================================================
 //[Enforced]
@@ -50,7 +50,7 @@ public static class Test_StrWrappedSameTokenizer
         IStrToken target;
         var comparison = StringComparison.OrdinalIgnoreCase;
         var tokenizer = new StrWrappedTokenizer("X") { Escape = ".", Comparison = comparison };
-        var xtokenizer = tokenizer.WithUseTokenizerWrappers(true).WithKeepEscape(true);
+        var xtokenizer = tokenizer.WithPreventSourceWrappers(true).WithKeepEscape(true);
         Text text;
 
         source = "x";
@@ -78,7 +78,7 @@ public static class Test_StrWrappedSameTokenizer
         IStrToken target;
         var comparison = StringComparison.OrdinalIgnoreCase;
         var tokenizer = new StrWrappedTokenizer("X") { Escape = ".", Comparison = comparison };
-        var xtokenizer = tokenizer.WithUseTokenizerWrappers(true).WithKeepEscape(true);
+        var xtokenizer = tokenizer.WithPreventSourceWrappers(true).WithKeepEscape(true);
         Text text;
 
         source = "aax";
@@ -122,7 +122,7 @@ public static class Test_StrWrappedSameTokenizer
         IStrToken target;
         var comparison = StringComparison.OrdinalIgnoreCase;
         var tokenizer = new StrWrappedTokenizer("X") { Escape = ".", Comparison = comparison };
-        var xtokenizer = tokenizer.WithUseTokenizerWrappers(true).WithKeepEscape(true);
+        var xtokenizer = tokenizer.WithPreventSourceWrappers(true).WithKeepEscape(true);
         Text text;
         Chain chain;
         Wrapped wrapped;
@@ -226,7 +226,7 @@ public static class Test_StrWrappedSameTokenizer
         IStrToken target;
         var comparison = StringComparison.OrdinalIgnoreCase;
         var tokenizer = new StrWrappedTokenizer("X") { Escape = ".", Comparison = comparison };
-        var xtokenizer = tokenizer.WithUseTokenizerWrappers(true).WithKeepEscape(true);
+        var xtokenizer = tokenizer.WithPreventSourceWrappers(true).WithKeepEscape(true);
         Text text;
         Chain chain;
         Wrapped wrapped;
