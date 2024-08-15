@@ -34,7 +34,6 @@ public static class Test_StrKeywordTokenizer
         var xtokenizer = tokenizer.WithPreventSourceKeyword(true).WithKeepEscape(true);
         StrTokenText text;
         StrTokenFixed key;
-        StrTokenChain chain;
 
         source = "xx";
         target = tokenizer.Tokenize(source);
@@ -50,78 +49,48 @@ public static class Test_StrKeywordTokenizer
         target = xtokenizer.Tokenize(source);
         text = Assert.IsType<StrTokenText>(target); Assert.Equal(".xx", text.Payload);
     }
-}
-/*
-    
-    {
-        
-
-        
-    }
 
     //[Enforced]
     [Fact]
-    public static void Test_String_Source()
+    public static void Test_Start()
     {
         string source;
         IStrToken target;
         var comparison = StringComparison.OrdinalIgnoreCase;
         var tokenizer = new StrKeywordTokenizer("XX") { Escape = ".", Comparison = comparison };
+        var xtokenizer = tokenizer.WithPreventSourceKeyword(true).WithKeepEscape(true);
         StrTokenText text;
-        StrTokenFixed fix;
+        StrTokenFixed key;
         StrTokenChain chain;
 
-        source = " ";
+        source = "xx (xx other";
         target = tokenizer.Tokenize(source);
-        text = Assert.IsType<StrTokenText>(target); Assert.Equal(" ", text.Payload);
-
-        source = "aaaxx.xxbbb";
-        target = tokenizer.Tokenize(source);
-        chain = Assert.IsType<StrTokenChain>(target); Assert.Equal(3, chain.Count);
-        text = Assert.IsType<StrTokenText>(chain[0]); Assert.Equal("aaa", text.Payload);
-        fix = Assert.IsType<StrTokenFixed>(chain[1]); Assert.Equal("xx", fix.Payload);
-        text = Assert.IsType<StrTokenText>(chain[2]); Assert.Equal("xxbbb", text.Payload);
-
-        tokenizer = tokenizer.WithPreventSourceValue(true).WithKeepEscape(true);
-        target = tokenizer.Tokenize(source);
-        chain = Assert.IsType<StrTokenChain>(target); Assert.Equal(3, chain.Count);
-        text = Assert.IsType<StrTokenText>(chain[0]); Assert.Equal("aaa", text.Payload);
-        fix = Assert.IsType<StrTokenFixed>(chain[1]); Assert.Equal("XX", fix.Payload);
-        text = Assert.IsType<StrTokenText>(chain[2]); Assert.Equal(".xxbbb", text.Payload);
+        chain = Assert.IsType<StrTokenChain>(target); Assert.Equal(4, chain.Count);
+        key = Assert.IsType<StrTokenFixed>(chain[0]); Assert.Equal("xx", key.Payload);
+        text = Assert.IsType<StrTokenText>(chain[1]); Assert.Equal(" (", text.Payload);
+        key = Assert.IsType<StrTokenFixed>(chain[2]); Assert.Equal("xx", key.Payload);
+        text = Assert.IsType<StrTokenText>(chain[3]); Assert.Equal(" other", text.Payload);
     }
 
     //[Enforced]
     [Fact]
-    public static void Test_Chain_Source()
+    public static void Test_End()
     {
-        StrTokenChain source;
+        string source;
         IStrToken target;
         var comparison = StringComparison.OrdinalIgnoreCase;
         var tokenizer = new StrKeywordTokenizer("XX") { Escape = ".", Comparison = comparison };
+        var xtokenizer = tokenizer.WithPreventSourceKeyword(true).WithKeepEscape(true);
         StrTokenText text;
-        StrTokenFixed fix;
+        StrTokenFixed key;
         StrTokenChain chain;
 
-        source = new([
-            new StrTokenText("aaa"),
-            StrTokenText.Empty,
-            new StrTokenText("xx"),
-            new StrTokenText("."),
-            new StrTokenText("xx"),
-            new StrTokenText("bbb"),
-            ]);
-
+        source = "other xx) xx";
         target = tokenizer.Tokenize(source);
-        chain = Assert.IsType<StrTokenChain>(target); Assert.Equal(3, chain.Count);
-        text = Assert.IsType<StrTokenText>(chain[0]); Assert.Equal("aaa", text.Payload);
-        fix = Assert.IsType<StrTokenFixed>(chain[1]); Assert.Equal("xx", fix.Payload);
-        text = Assert.IsType<StrTokenText>(chain[2]); Assert.Equal("xxbbb", text.Payload);
-
-        var xtokenizer = tokenizer.WithPreventSourceValue(true).WithKeepEscape(true);
-        target = xtokenizer.Tokenize(source);
-        chain = Assert.IsType<StrTokenChain>(target); Assert.Equal(3, chain.Count);
-        text = Assert.IsType<StrTokenText>(chain[0]); Assert.Equal("aaa", text.Payload);
-        fix = Assert.IsType<StrTokenFixed>(chain[1]); Assert.Equal("XX", fix.Payload);
-        text = Assert.IsType<StrTokenText>(chain[2]); Assert.Equal(".xxbbb", text.Payload);
+        chain = Assert.IsType<StrTokenChain>(target); Assert.Equal(4, chain.Count);
+        text = Assert.IsType<StrTokenText>(chain[0]); Assert.Equal("other ", text.Payload);
+        key = Assert.IsType<StrTokenFixed>(chain[1]); Assert.Equal("xx", key.Payload);
+        text = Assert.IsType<StrTokenText>(chain[2]); Assert.Equal(") ", text.Payload);
+        key = Assert.IsType<StrTokenFixed>(chain[3]); Assert.Equal("xx", key.Payload);
     }
-}*/
+}
