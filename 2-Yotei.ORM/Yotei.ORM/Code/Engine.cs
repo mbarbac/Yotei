@@ -24,7 +24,7 @@ public partial class Engine : IEngine
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    Engine(IEngine source)
+    protected Engine(IEngine source)
     {
         CaseSensitiveNames = source.CaseSensitiveNames;
         NullValueLiteral = source.NullValueLiteral;

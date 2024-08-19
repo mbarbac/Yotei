@@ -14,6 +14,16 @@ public partial class StrFixedTokenizer : StrTokenizer
     public StrFixedTokenizer(string value) => Value = value;
 
     /// <summary>
+    /// Initializes a new instance.
+    /// </summary>
+    /// <param name="value"></param>
+    public StrFixedTokenizer(char value) => Value = Validate(value).ToString();
+
+    static char Validate(char c) => c >= 32
+        ? c
+        : throw new ArgumentException("Invalid character.").WithData(c);
+
+    /// <summary>
     /// Copy constructor
     /// </summary>
     /// <param name="source"></param>
