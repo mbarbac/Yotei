@@ -98,7 +98,7 @@ public partial interface IFrozenList<T> : IEnumerable<T>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    List<T> GetRange(int index, int count);
+    List<T> ToList(int index, int count);
 
     /// <summary>
     /// Trims the internal structures of this collection.
@@ -114,7 +114,7 @@ public partial interface IFrozenList<T> : IEnumerable<T>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns>If no changes were detected, returns the original instance instead.</returns>
-    IFrozenList<T> Reduce(int index, int count);
+    IFrozenList<T> GetRange(int index, int count);
 
     /// <summary>
     /// Returns a new copy of this instance where the original element at the given index has

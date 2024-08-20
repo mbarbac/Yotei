@@ -6,7 +6,7 @@
 /// </summary>
 internal class FrozenList<T>
 {
-    public FrozenList<T> Reduce(int index, int count) => throw new NotImplementedException();
+    public FrozenList<T> GetRange(int index, int count) => throw new NotImplementedException();
     public FrozenList<T> Replace(int index, T item) => throw new NotImplementedException();
     public FrozenList<T> Add(T item) => throw new NotImplementedException();
     public FrozenList<T> AddRange(IEnumerable<T> range) => throw new NotImplementedException();

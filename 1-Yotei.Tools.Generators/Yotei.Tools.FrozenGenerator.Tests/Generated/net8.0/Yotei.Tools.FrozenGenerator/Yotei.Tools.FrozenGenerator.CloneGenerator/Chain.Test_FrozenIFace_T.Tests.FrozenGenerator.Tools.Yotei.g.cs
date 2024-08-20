@@ -16,10 +16,10 @@ namespace Yotei.Tools.FrozenGenerator.Tests
             
             /// <inheritdoc/>
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("FrozenGenerator", "0.5.22.0")]
-            public override Chain Reduce(System.Int32 index, System.Int32 count) => (Chain)base.Reduce(index, count); 
+            public override Chain GetRange(System.Int32 index, System.Int32 count) => (Chain)base.GetRange(index, count); 
             
             Yotei.Tools.FrozenGenerator.Tests.Test_FrozenIFace_T.IChain
-            Yotei.Tools.FrozenGenerator.Tests.Test_FrozenIFace_T.IChain.Reduce(System.Int32 index, System.Int32 count) => Reduce(index, count);
+            Yotei.Tools.FrozenGenerator.Tests.Test_FrozenIFace_T.IChain.GetRange(System.Int32 index, System.Int32 count) => GetRange(index, count);
             
             /// <inheritdoc/>
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("FrozenGenerator", "0.5.22.0")]

@@ -11,9 +11,9 @@ namespace Yotei.Tools.FrozenGenerator.Tests
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("FrozenGenerator", "0.5.22.0")]
             new IChain Clone();
             
-            /// <inheritdoc cref="Yotei.Tools.IFrozenList{System.String, Yotei.Tools.FrozenGenerator.Tests.Test_Frozen_KT.Element}.Reduce(System.Int32 index, System.Int32 count)"/>
+            /// <inheritdoc cref="Yotei.Tools.IFrozenList{System.String, Yotei.Tools.FrozenGenerator.Tests.Test_Frozen_KT.Element}.GetRange(System.Int32 index, System.Int32 count)"/>
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("FrozenGenerator", "0.5.22.0")]
-            new IChain Reduce(System.Int32 index, System.Int32 count);
+            new IChain GetRange(System.Int32 index, System.Int32 count);
             
             /// <inheritdoc cref="Yotei.Tools.IFrozenList{System.String, Yotei.Tools.FrozenGenerator.Tests.Test_Frozen_KT.Element}.Replace(System.Int32 index, Yotei.Tools.FrozenGenerator.Tests.Test_Frozen_KT.Element item)"/>
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("FrozenGenerator", "0.5.22.0")]

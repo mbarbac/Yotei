@@ -183,7 +183,7 @@ public partial class StrWrappedTokenizer : StrTokenizer
                         item = len switch
                         {
                             0 => StrTokenText.Empty,
-                            _ => new StrTokenChain(chain.GetRange(ini + 1, len))
+                            _ => new StrTokenChain(chain.ToList(ini + 1, len))
                         };
                         item = Generator(head, item, head);
 
@@ -286,7 +286,7 @@ public partial class StrWrappedTokenizer : StrTokenizer
                     item = len switch
                     {
                         0 => StrTokenText.Empty,
-                        _ => new StrTokenChain(chain.GetRange(ini + 1, len))
+                        _ => new StrTokenChain(chain.ToList(ini + 1, len))
                     };
                     item = Generator(head, item, tail);
 

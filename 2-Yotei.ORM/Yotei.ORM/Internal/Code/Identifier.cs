@@ -1,19 +1,65 @@
-﻿using Yotei.ORM.Internal;
+﻿#pragma warning disable IDE0305
 
-namespace Yotei.ORM;
+namespace Yotei.ORM.Internal;
 
 // ========================================================
 public static class Identifier
 {
     /// <summary>
+    /// Determines if the given identifier matches the given specifications.
+    /// <br/> Comparison is performed by comparing parts from right to left, where any empty or
+    /// null one is taken as an implicit match.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="specs"></param>
+    /// <returns></returns>
+    public static bool Match(this IIdentifier item, string? specs)
+    {
+        item.ThrowWhenNull();
+
+        if ((specs = specs.NullWhenEmpty()) == null) return true;
+
+        var engine = item.Engine;
+        var target = new IdentifierChain(engine, specs);
+        var source = item is IIdentifierChain chain
+            ? chain
+            : new IdentifierChain(engine, (IIdentifierPart)item);
+
+        for (int i = 0; ; i++)
+        {
+            if (i >= target.Count) break;
+            if (i >= source.Count)
+            {
+                while (i < target.Count)
+                {
+                    var value = target[^(i + 1)].UnwrappedValue;
+                    if (value != null) return false;
+                    i++;
+                }
+                break;
+            }
+
+            var tvalue = target[^(i + 1)].UnwrappedValue; if (tvalue == null) continue;
+            var svalue = source[^(i + 1)].UnwrappedValue;
+            if (string.Compare(svalue, tvalue, !engine.CaseSensitiveNames) != 0) return false;
+        }
+
+        return true;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Extracts the dotted-separated parts from the given value, unwrapped from the engine's
-    /// terminators, if any, and where any empty part is transformed into a null string. Finally,
-    /// all all heading null parts are removed, which may produce an empty list.
+    /// terminators, if any, and where any empty part is transformed into a null string.
+    /// <br/> By default, the resulting list is reduced by removing all heading parts whose value
+    /// is null, may producing an empty list. Null source values always produce an empty list.
     /// </summary>
     /// <param name="engine"></param>
     /// <param name="value"></param>
+    /// <param name="reduce"></param>
     /// <returns></returns>
-    public static List<string?> GetParts(this IEngine engine, string? value)
+    public static List<string?> GetParts(this IEngine engine, string? value, bool reduce = true)
     {
         engine.ThrowWhenNull();
 
@@ -21,7 +67,14 @@ public static class Identifier
             ? GetPartsWithTerminators(engine, value)
             : GetPartsNoTerminators(value);
 
-        while (parts.Count > 0) { if (parts[0] == null) parts.RemoveAt(0); else break; }
+        if (reduce)
+        {
+            while (parts.Count > 0)
+            {
+                if (parts[0] == null) parts.RemoveAt(0);
+                else break;
+            }
+        }
         return parts;
     }
 
@@ -66,7 +119,9 @@ public static class Identifier
         // No wrapped parts detected...
         if (token is IStrTokenText)
         {
-            return GetPartsNoTerminators(value);
+            var parts = GetPartsNoTerminators(value);
+            for (int i = 0; i < parts.Count; i++) parts[i] = Validate(parts[i]);
+            return parts;
         }
 
         // Single wrapped part detected...

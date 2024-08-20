@@ -93,7 +93,7 @@ public partial class FrozenList<T> : IFrozenList<T>
     public List<T> ToList() => Items.ToList();
 
     /// <inheritdoc/>
-    public List<T> GetRange(int index, int count) => Items.GetRange(index, count);
+    public List<T> ToList(int index, int count) => Items.ToList(index, count);
 
     /// <inheritdoc/>
     public void Trim() => Items.Trim();
@@ -101,10 +101,10 @@ public partial class FrozenList<T> : IFrozenList<T>
     // -----------------------------------------------------
 
     /// <inheritdoc/>
-    public virtual IFrozenList<T> Reduce(int index, int count)
+    public virtual IFrozenList<T> GetRange(int index, int count)
     {
         var clone = Clone();
-        var done = clone.Items.Reduce(index, count);
+        var done = clone.Items.GetRange(index, count);
         return done > 0 ? clone : this;
     }
 

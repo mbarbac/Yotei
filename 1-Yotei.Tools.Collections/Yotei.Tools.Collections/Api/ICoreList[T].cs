@@ -98,7 +98,7 @@ public partial interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollec
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    List<T> GetRange(int index, int count);
+    List<T> ToList(int index, int count);
 
     /// <summary>
     /// Trims the internal structures of this collection.
@@ -113,7 +113,7 @@ public partial interface ICoreList<T> : IList<T>, IList, ICollection<T>, ICollec
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns>The number of changes made.</returns>
-    int Reduce(int index, int count);
+    int GetRange(int index, int count);
 
     /// <summary>
     /// Replaces the element at the given index with the new given one.

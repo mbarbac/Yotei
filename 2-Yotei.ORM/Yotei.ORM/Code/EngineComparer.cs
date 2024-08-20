@@ -1,4 +1,4 @@
-﻿namespace Yotei.ORM;
+﻿namespace Yotei.ORM.Code;
 
 // ========================================================
 /// <inheritdoc cref="IEngineComparer"/>

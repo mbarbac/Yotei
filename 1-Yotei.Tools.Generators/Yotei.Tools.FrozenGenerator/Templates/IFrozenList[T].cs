@@ -6,7 +6,7 @@
 /// </summary>
 internal partial interface IFrozenList<T>
 {
-    IFrozenList<T> Reduce(int index, int count);
+    IFrozenList<T> GetRange(int index, int count);
     IFrozenList<T> Replace(int index, T item);
     IFrozenList<T> Add(T item);
     IFrozenList<T> AddRange(IEnumerable<T> range);

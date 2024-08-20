@@ -284,7 +284,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     public List<T> ToList() => new(Items);
 
     /// <inheritdoc/>
-    public List<T> GetRange(int index, int count) => Items.GetRange(index, count);
+    public List<T> ToList(int index, int count) => Items.GetRange(index, count);
 
     /// <inheritdoc/>
     public void Trim() => Items.TrimExcess();
@@ -309,10 +309,22 @@ public partial class CoreList<K, T> : ICoreList<K, T>
             throw new ArgumentOutOfRangeException(nameof(count)).WithData(count);
     }
 
+    /// <summary>
+    /// Invoked to determine if the given item is the same as the given source one, in the
+    /// context of replacing the source element with the given item.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    protected virtual bool SameKeys(K source, K item)
+    {
+        return CompareKeys(source, item);
+    }
+
     // -----------------------------------------------------
 
     /// <inheritdoc/>
-    public virtual int Reduce(int index, int count)
+    public virtual int GetRange(int index, int count)
     {
         ValidateIndex(index, insert: false);
         ValidateCount(index, count);
@@ -336,7 +348,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
         item = ValidateItem(item);
 
         var source = Items[index];
-        var same = CompareKeys(GetKey(source), ValidateKey(GetKey(item)));
+        var same = SameKeys(GetKey(source), ValidateKey(GetKey(item)));
         if (same) return 0;
 
         var removed = RemoveAt(index);

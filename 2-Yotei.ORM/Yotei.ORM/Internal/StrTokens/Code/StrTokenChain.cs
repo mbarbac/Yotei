@@ -6,47 +6,14 @@
 public partial class StrTokenChain : IStrTokenChain
 {
     /// <summary>
-    /// Represents a builder of <see cref="IStrTokenChain"/> instances.
-    /// </summary>
-    [Cloneable]
-    public partial class Builder : CoreList<IStrToken>
-    {
-        /// <inheritdoc/>
-        public Builder() : base()
-        {
-            ValidateItem = (x) => x.ThrowWhenNull();
-            GetDuplicates = (x) => [];
-            ExpandItems = true;
-        }
-
-        /// <inheritdoc/>
-        public Builder(IStrToken item) : this() => Add(item);
-
-        /// <inheritdoc/>
-        public Builder(IEnumerable<IStrToken> range) : this() => AddRange(range);
-
-        /// <summary>
-        /// Copy constructor
-        /// </summary>
-        /// <param name="source"></param>
-        protected Builder(Builder source) : this() => AddRange(source);
-
-        /// <summary>
-        /// Returns a new instance based upon the captured contents.
-        /// </summary>
-        /// <returns></returns>
-        public virtual IStrTokenChain ToInstance() => new StrTokenChain(this);
-    }
-
-    /// <summary>
     /// Returns a new builder based upon the contents of this instance.
     /// </summary>
     /// <returns></returns>
     public virtual Builder ToBuilder() => Items.Clone();
 
-    // ====================================================
-
     protected override Builder Items { get; }
+
+    // -----------------------------------------------------
 
     /// <inheritdoc/>
     public StrTokenChain() : base() => Items = [];
@@ -142,5 +109,40 @@ public partial class StrTokenChain : IStrTokenChain
         }
 
         return changed ? builder.ToInstance() : this;
+    }
+
+    // ====================================================
+
+    /// <summary>
+    /// Represents a builder of <see cref="IStrTokenChain"/> instances.
+    /// </summary>
+    [Cloneable]
+    public partial class Builder : CoreList<IStrToken>
+    {
+        /// <inheritdoc/>
+        public Builder() : base()
+        {
+            ValidateItem = (item) => item.ThrowWhenNull();
+            GetDuplicates = (item) => [];
+            ExpandItems = true;
+        }
+
+        /// <inheritdoc/>
+        public Builder(IStrToken item) : this() => Add(item);
+
+        /// <inheritdoc/>
+        public Builder(IEnumerable<IStrToken> range) : this() => AddRange(range);
+
+        /// <summary>
+        /// Copy constructor
+        /// </summary>
+        /// <param name="source"></param>
+        protected Builder(Builder source) : this() => AddRange(source);
+
+        /// <summary>
+        /// Returns a new instance based upon the captured contents.
+        /// </summary>
+        /// <returns></returns>
+        public virtual IStrTokenChain ToInstance() => new StrTokenChain(this);
     }
 }

@@ -106,10 +106,10 @@ public static class Test_StrTokenChain
         var xthree = new Text("three");
         var chain = new Chain([xone, xtwo, xthree]);
 
-        var range = chain.GetRange(0, 0);
+        var range = chain.ToList(0, 0);
         Assert.Empty(range);
 
-        range = chain.GetRange(1, 1);
+        range = chain.ToList(1, 1);
         Assert.Single(range);
         Assert.Same(xtwo, range[0]);
     }
@@ -142,13 +142,13 @@ public static class Test_StrTokenChain
         var xthree = new Text("three");
         var source = new Chain([xone, xtwo, xthree]);
 
-        var target = source.Reduce(0, 3);
+        var target = source.GetRange(0, 3);
         Assert.Same(source, target);
 
-        target = source.Reduce(1, 0);
+        target = source.GetRange(1, 0);
         Assert.Empty(target);
 
-        target = source.Reduce(1, 2);
+        target = source.GetRange(1, 2);
         Assert.Equal(2, target.Count);
         Assert.Same(xtwo, target[0]);
         Assert.Same(xthree, target[1]);

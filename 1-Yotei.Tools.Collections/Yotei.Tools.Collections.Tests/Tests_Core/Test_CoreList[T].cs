@@ -175,34 +175,34 @@ public static partial class Test_CoreList_T
 
     //[Enforced]
     [Fact]
-    public static void Test_Reduce()
+    public static void Test_GetRange()
     {
         var source = new Chain(false, [xone, xtwo, xthree, xone]);
 
-        var done = source.Reduce(0, 4);
+        var done = source.GetRange(0, 4);
         Assert.Equal(0, done);
 
-        done = source.Reduce(0, 0);
+        done = source.GetRange(0, 0);
         Assert.Equal(4, done);
         Assert.Empty(source);
 
         source = new Chain(false, [xone, xtwo, xthree, xone]);
-        done = source.Reduce(1, 2);
+        done = source.GetRange(1, 2);
         Assert.Equal(2, done);
         Assert.Equal(2, source.Count);
         Assert.Same(xtwo, source[0]);
         Assert.Same(xthree, source[1]);
 
-        try { source.Reduce(-1, 0); Assert.Fail(); }
+        try { source.GetRange(-1, 0); Assert.Fail(); }
         catch (IndexOutOfRangeException) { }
 
-        try { source.Reduce(5, 0); Assert.Fail(); }
+        try { source.GetRange(5, 0); Assert.Fail(); }
         catch (IndexOutOfRangeException) { }
 
-        try { source.Reduce(0, -1); Assert.Fail(); }
+        try { source.GetRange(0, -1); Assert.Fail(); }
         catch (ArgumentOutOfRangeException) { }
 
-        try { source.Reduce(0, 5); Assert.Fail(); }
+        try { source.GetRange(0, 5); Assert.Fail(); }
         catch (ArgumentOutOfRangeException) { }
     }
 

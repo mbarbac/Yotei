@@ -246,33 +246,33 @@ public static partial class Test_Frozen_KT
 
     //[Enforced]
     [Fact]
-    public static void Test_Reduce()
+    public static void GetRange()
     {
         var source = new Chain(false, [xone, xtwo, xthree, xone]);
 
-        var target = source.Reduce(0, 4);
+        var target = source.GetRange(0, 4);
         Assert.Same(source, target);
 
-        target = source.Reduce(0, 0);
+        target = source.GetRange(0, 0);
         Assert.NotSame(source, target);
         Assert.Empty(target);
 
-        target = source.Reduce(1, 2);
+        target = source.GetRange(1, 2);
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
         Assert.Same(xtwo, target[0]);
         Assert.Same(xthree, target[1]);
 
-        try { source.Reduce(-1, 0); Assert.Fail(); }
+        try { source.GetRange(-1, 0); Assert.Fail(); }
         catch (IndexOutOfRangeException) { }
 
-        try { source.Reduce(5, 0); Assert.Fail(); }
+        try { source.GetRange(5, 0); Assert.Fail(); }
         catch (IndexOutOfRangeException) { }
 
-        try { source.Reduce(0, -1); Assert.Fail(); }
+        try { source.GetRange(0, -1); Assert.Fail(); }
         catch (ArgumentOutOfRangeException) { }
 
-        try { source.Reduce(0, 5); Assert.Fail(); }
+        try { source.GetRange(0, 5); Assert.Fail(); }
         catch (ArgumentOutOfRangeException) { }
     }
 

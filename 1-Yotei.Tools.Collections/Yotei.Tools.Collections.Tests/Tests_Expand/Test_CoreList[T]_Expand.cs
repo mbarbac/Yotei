@@ -182,10 +182,4 @@ public static partial class Test_CoreList_T_Expand
         Assert.Same(xone, items[0]);
         Assert.Same(xthree, items[1]);
     }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_()
-    {
-    }
 }
