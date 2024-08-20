@@ -85,6 +85,25 @@ namespace Yotei.ORM.Code
         /// Returns an instance of the host type where the value of the decorated member has been
         /// replaced by the new given one.
         /// </summary>
+        /// <param name ="v_NativePaging"></param>
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("WithGenerator", "0.5.22.0")]
+        public virtual Engine
+        WithNativePaging(System.Boolean v_NativePaging)
+        {
+            var x_temp = new Engine(this)
+            {
+                NativePaging = v_NativePaging
+            };
+            return x_temp;
+        }
+        
+        Yotei.ORM.IEngine
+        Yotei.ORM.IEngine.WithNativePaging(System.Boolean value) => WithNativePaging(value);
+        
+        /// <summary>
+        /// Returns an instance of the host type where the value of the decorated member has been
+        /// replaced by the new given one.
+        /// </summary>
         /// <param name ="v_UseTerminators"></param>
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("WithGenerator", "0.5.22.0")]
         public virtual Engine

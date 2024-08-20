@@ -24,6 +24,7 @@ public class EngineComparer : IEqualityComparer<T>
         if (string.Compare(x.NullValueLiteral, y.NullValueLiteral, !x.CaseSensitiveNames) != 0) return false;
         if (x.PositionalParameters != y.PositionalParameters) return false;
         if (string.Compare(x.ParametersPrefix, y.ParametersPrefix, !x.CaseSensitiveNames) != 0) return false;
+        if (x.NativePaging != y.NativePaging) return false;
         if (x.UseTerminators != y.UseTerminators) return false;
         if (x.LeftTerminator != y.LeftTerminator) return false;
         if (x.RightTerminator != y.RightTerminator) return false;
@@ -40,6 +41,7 @@ public class EngineComparer : IEqualityComparer<T>
             code = HashCode.Combine(code, obj.NullValueLiteral);
             code = HashCode.Combine(code, obj.PositionalParameters);
             code = HashCode.Combine(code, obj.ParametersPrefix);
+            code = HashCode.Combine(code, obj.NativePaging);
             code = HashCode.Combine(code, obj.UseTerminators);
             code = HashCode.Combine(code, obj.LeftTerminator);
             code = HashCode.Combine(code, obj.RightTerminator);

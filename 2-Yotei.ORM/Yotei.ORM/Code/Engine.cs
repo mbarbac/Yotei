@@ -9,6 +9,7 @@ public partial class Engine : IEngine
     public const string NULLVALUELITERAL = "NULL";
     public const bool POSITIONALPARAMETERS = false;
     public const string PARAMETERSPREFIX = "#";
+    public const bool NATIVEPAGING = false;
     public const bool USETERMINATORS = true;
     public const char LEFTTERMINATOR = '[';
     public const char RIGHTTERMINATOR = ']';
@@ -30,6 +31,7 @@ public partial class Engine : IEngine
         NullValueLiteral = source.NullValueLiteral;
         PositionalParameters = source.PositionalParameters;
         ParametersPrefix = source.ParametersPrefix;
+        NativePaging = source.NativePaging;
         UseTerminators = source.UseTerminators;
         LeftTerminator = source.LeftTerminator;
         RightTerminator = source.RightTerminator;
@@ -61,6 +63,9 @@ public partial class Engine : IEngine
         init => _ParametersPrefix = value.NotNullNotEmpty();
     }
     string _ParametersPrefix = PARAMETERSPREFIX;
+
+    /// <inheritdoc/>
+    public bool NativePaging { get; init; } = NATIVEPAGING;
 
     /// <inheritdoc/>
     public bool UseTerminators { get; init; } = USETERMINATORS;

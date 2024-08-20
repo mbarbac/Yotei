@@ -73,6 +73,22 @@ namespace Yotei.ORM.Tests
         /// Returns an instance of the host type where the value of the decorated member has been
         /// replaced by the new given one.
         /// </summary>
+        /// <param name ="v_NativePaging"></param>
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("WithGenerator", "0.5.22.0")]
+        public override FakeEngine
+        WithNativePaging(System.Boolean v_NativePaging)
+        {
+            var x_temp = new FakeEngine(this)
+            {
+                NativePaging = v_NativePaging
+            };
+            return x_temp;
+        }
+        
+        /// <summary>
+        /// Returns an instance of the host type where the value of the decorated member has been
+        /// replaced by the new given one.
+        /// </summary>
         /// <param name ="v_UseTerminators"></param>
         [global::System.CodeDom.Compiler.GeneratedCodeAttribute("WithGenerator", "0.5.22.0")]
         public override FakeEngine

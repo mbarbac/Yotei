@@ -28,6 +28,12 @@ public partial interface IEngine
     [With] string ParametersPrefix { get; }
 
     /// <summary>
+    /// Determines if this engine provides native paging capabilities, or rather they have to
+    /// be emulated by the framework.
+    /// </summary>
+    [With] bool NativePaging { get; }
+
+    /// <summary>
     /// Determines if the engine wraps the identifier-alike elements of a command with specific
     /// terminators, or not.
     /// </summary>
