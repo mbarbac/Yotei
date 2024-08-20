@@ -1,8 +1,12 @@
-﻿namespace Yotei.ORM.Code;
+﻿using T = Yotei.ORM.IEngine;
+
+namespace Yotei.ORM.Code;
 
 // ========================================================
-/// <inheritdoc cref="IEngineComparer"/>
-public class EngineComparer : IEngineComparer
+/// <summary>
+/// Defines methods that support comparison of <see cref="T"/> instances.
+/// </summary>
+public class EngineComparer : IEqualityComparer<T>
 {
     /// <summary>
     /// A common shared instance.
@@ -10,7 +14,7 @@ public class EngineComparer : IEngineComparer
     public static EngineComparer Instance { get; } = new();
 
     /// <inheritdoc/>
-    public virtual bool Equals(IEngine? x, IEngine? y)
+    public virtual bool Equals(T? x, T? y)
     {
         if (x is null && y is null) return true;
         if (x is null) return false;
@@ -28,17 +32,17 @@ public class EngineComparer : IEngineComparer
     }
 
     /// <inheritdoc/>
-    public virtual int GetHashCode(IEngine obj)
+    public virtual int GetHashCode(T obj)
     {
         var code = 0; if (obj is not null)
         {
-            code = HashCode.Combine(obj.CaseSensitiveNames);
-            code = HashCode.Combine(obj.NullValueLiteral);
-            code = HashCode.Combine(obj.PositionalParameters);
-            code = HashCode.Combine(obj.ParametersPrefix);
-            code = HashCode.Combine(obj.UseTerminators);
-            code = HashCode.Combine(obj.LeftTerminator);
-            code = HashCode.Combine(obj.RightTerminator);
+            code = HashCode.Combine(code, obj.CaseSensitiveNames);
+            code = HashCode.Combine(code, obj.NullValueLiteral);
+            code = HashCode.Combine(code, obj.PositionalParameters);
+            code = HashCode.Combine(code, obj.ParametersPrefix);
+            code = HashCode.Combine(code, obj.UseTerminators);
+            code = HashCode.Combine(code, obj.LeftTerminator);
+            code = HashCode.Combine(code, obj.RightTerminator);
         }
         return code;
     }

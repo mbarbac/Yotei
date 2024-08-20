@@ -6,234 +6,83 @@ public static class Test_Identifier
 {
     //[Enforced]
     [Fact]
-    public static void Test_GetParts_NoTerminators()
+    public static void Test_Create()
     {
-        string? value;
-        List<string?> parts;
-        var engine = new FakeEngine() { UseTerminators = false };
+        IIdentifier item;
+        IIdentifierPart part;
+        IIdentifierChain chain;
+        var engine = new FakeEngine();
 
-        value = null;
-        parts = engine.GetParts(value);
-        Assert.Empty(parts);
+        item = Identifier.Create(engine);
+        part = Assert.IsType<IdentifierPart>(item);
+        Assert.Null(part.Value);
 
-        value = string.Empty;
-        parts = engine.GetParts(value);
-        Assert.Empty(parts);
+        item = Identifier.Create(engine, "");
+        part = Assert.IsType<IdentifierPart>(item);
+        Assert.Null(part.Value);
 
-        value = ".";
-        parts = engine.GetParts(value);
-        Assert.Empty(parts);
+        item = Identifier.Create(engine, "aa");
+        part = Assert.IsType<IdentifierPart>(item);
+        Assert.Equal("[aa]", part.Value);
 
-        value = ".two";
-        parts = engine.GetParts(value);
-        Assert.Single(parts);
-        Assert.Equal("two", parts[0]);
+        item = Identifier.Create(engine, "aa.bb");
+        chain = Assert.IsType<IdentifierChain>(item);
+        Assert.Equal("[aa]", chain[0].Value);
+        Assert.Equal("[bb]", chain[1].Value);
+    }
 
-        value = "one..three.";
-        parts = engine.GetParts(value);
-        Assert.Equal(4, parts.Count);
-        Assert.Equal("one", parts[0]);
-        Assert.Null(parts[1]);
-        Assert.Equal("three", parts[2]);
-        Assert.Null(parts[3]);
+    // ----------------------------------------------------
 
-        value = " ";
-        try { parts = engine.GetParts(value); Assert.Fail(); }
-        catch (ArgumentException) { }
+    //[Enforced]
+    [Fact]
+    public static void Test_Match_Empty()
+    {
+        var engine = new FakeEngine();
+        var item = new IdentifierChain(engine);
 
-        value = "one. ";
-        try { parts = engine.GetParts(value); Assert.Fail(); }
-        catch (ArgumentException) { }
+        Assert.True(item.Match(null));
+        Assert.True(item.Match(""));
+        Assert.True(item.Match(" "));
 
-        value = " .two";
-        try { parts = engine.GetParts(value); Assert.Fail(); }
-        catch (ArgumentException) { }
+        Assert.False(item.Match("two"));
+        Assert.False(item.Match("two."));
     }
 
     //[Enforced]
     [Fact]
-    public static void Test_GetParts_WithTerminators_NotUsed()
+    public static void Test_Match_Populated_Smaller()
     {
-        string? value;
-        List<string?> parts;
         var engine = new FakeEngine();
+        var item = new IdentifierChain(engine, "one");
 
-        value = null;
-        parts = engine.GetParts(value);
-        Assert.Empty(parts);
+        Assert.True(item.Match(null));
+        Assert.True(item.Match(""));
+        Assert.True(item.Match(" "));
 
-        value = string.Empty;
-        parts = engine.GetParts(value);
-        Assert.Empty(parts);
+        Assert.True(item.Match("one"));
+        Assert.True(item.Match(".one"));
 
-        value = ".";
-        parts = engine.GetParts(value);
-        Assert.Empty(parts);
-
-        value = ".two";
-        parts = engine.GetParts(value);
-        Assert.Single(parts);
-        Assert.Equal("two", parts[0]);
-
-        value = "one..three.";
-        parts = engine.GetParts(value);
-        Assert.Equal(4, parts.Count);
-        Assert.Equal("one", parts[0]);
-        Assert.Null(parts[1]);
-        Assert.Equal("three", parts[2]);
-        Assert.Null(parts[3]);
-
-        value = " ";
-        try { parts = engine.GetParts(value); Assert.Fail(); }
-        catch (ArgumentException) { }
-
-        value = "one. ";
-        try { parts = engine.GetParts(value); Assert.Fail(); }
-        catch (ArgumentException) { }
-
-        value = " .two";
-        try { parts = engine.GetParts(value); Assert.Fail(); }
-        catch (ArgumentException) { }
+        Assert.False(item.Match("two"));
+        Assert.False(item.Match("two."));
     }
 
     //[Enforced]
     [Fact]
-    public static void Test_GetParts_WithTerminators_SingleWrapped()
+    public static void Test_Match_Populated_Bigger()
     {
-        string? value;
-        List<string?> parts;
         var engine = new FakeEngine();
+        var item = new IdentifierChain(engine, "two.one");
 
-        value = "[]";
-        parts = engine.GetParts(value);
-        Assert.Empty(parts);
+        Assert.True(item.Match(null));
+        Assert.True(item.Match(""));
+        Assert.True(item.Match(" "));
 
-        value = "[[]]";
-        parts = engine.GetParts(value);
-        Assert.Empty(parts);
+        Assert.True(item.Match("one"));
+        Assert.True(item.Match(".one"));
+        Assert.True(item.Match("two.one"));
+        Assert.True(item.Match("two."));
 
-        value = "[one]";
-        parts = engine.GetParts(value);
-        Assert.Single(parts);
-        Assert.Equal("one", parts[0]);
-
-        value = "[[one]]";
-        parts = engine.GetParts(value);
-        Assert.Single(parts);
-        Assert.Equal("one", parts[0]);
-
-        value = "[one xtra]";
-        parts = engine.GetParts(value);
-        Assert.Single(parts);
-        Assert.Equal("one xtra", parts[0]);
-
-        value = "[one.xtra]";
-        parts = engine.GetParts(value);
-        Assert.Single(parts);
-        Assert.Equal("one.xtra", parts[0]);
-
-        value = "[ one ]";
-        try { parts = engine.GetParts(value); Assert.Fail(); }
-        catch (ArgumentException) { }
-
-        value = "[.one.]";
-        try { parts = engine.GetParts(value); Assert.Fail(); }
-        catch (ArgumentException) { }
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_GetParts_WithTerminators_Chained()
-    {
-        string? value;
-        List<string?> parts;
-        var engine = new FakeEngine();
-
-        value = ".";
-        parts = engine.GetParts(value);
-        Assert.Empty(parts);
-
-        value = "[].[]";
-        parts = engine.GetParts(value);
-        Assert.Empty(parts);
-
-        value = ".[two]";
-        parts = engine.GetParts(value);
-        Assert.Single(parts);
-        Assert.Equal("two", parts[0]);
-
-        value = "..[three]";
-        parts = engine.GetParts(value);
-        Assert.Single(parts);
-        Assert.Equal("three", parts[0]);
-
-        value = "...[four]";
-        parts = engine.GetParts(value);
-        Assert.Single(parts);
-        Assert.Equal("four", parts[0]);
-
-        value = "one.[two]";
-        parts = engine.GetParts(value);
-        Assert.Equal(2, parts.Count);
-        Assert.Equal("one", parts[0]);
-        Assert.Equal("two", parts[1]);
-
-        value = "[one].[two]";
-        parts = engine.GetParts(value);
-        Assert.Equal(2, parts.Count);
-        Assert.Equal("one", parts[0]);
-        Assert.Equal("two", parts[1]);
-
-        value = "[one].";
-        parts = engine.GetParts(value);
-        Assert.Equal(2, parts.Count);
-        Assert.Equal("one", parts[0]);
-        Assert.Null(parts[1]);
-
-        value = "[one]....";
-        parts = engine.GetParts(value);
-        Assert.Equal(5, parts.Count);
-        Assert.Equal("one", parts[0]);
-        Assert.Null(parts[1]);
-        Assert.Null(parts[2]);
-        Assert.Null(parts[3]);
-        Assert.Null(parts[4]);
-
-        value = "[one]..three..";
-        parts = engine.GetParts(value);
-        Assert.Equal(5, parts.Count);
-        Assert.Equal("one", parts[0]);
-        Assert.Null(parts[1]);
-        Assert.Equal("three", parts[2]);
-        Assert.Null(parts[3]);
-        Assert.Null(parts[4]);
-
-        value = "one.two..[four]";
-        parts = engine.GetParts(value);
-        Assert.Equal(4, parts.Count);
-        Assert.Equal("one", parts[0]);
-        Assert.Equal("two", parts[1]);
-        Assert.Null(parts[2]);
-        Assert.Equal("four", parts[3]);
-
-        value = "one.[two other]";
-        parts = engine.GetParts(value);
-        Assert.Equal(2, parts.Count);
-        Assert.Equal("one", parts[0]);
-        Assert.Equal("two other", parts[1]);
-
-        value = "one.[two.other]";
-        parts = engine.GetParts(value);
-        Assert.Equal(2, parts.Count);
-        Assert.Equal("one", parts[0]);
-        Assert.Equal("two.other", parts[1]);
-
-        value = "[][]";
-        try { parts = engine.GetParts(value); Assert.Fail(); }
-        catch (ArgumentException) { }
-
-        value = "[one.[two]]";
-        try { parts = engine.GetParts(value); Assert.Fail(); }
-        catch (ArgumentException) { }
+        Assert.False(item.Match("two"));
+        Assert.False(item.Match("one."));
     }
 }

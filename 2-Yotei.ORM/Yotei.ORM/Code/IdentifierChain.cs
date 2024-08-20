@@ -57,7 +57,7 @@ public partial class IdentifierChain : IIdentifierChain
     string? _Value = null;
 
     /// <inheritdoc/>
-    public bool Match(string? specs) => Identifier.Match(this, specs);
+    public bool Match(string? specs) => IdentifierCode.Match(this, specs);
 
     // -----------------------------------------------------
 
@@ -446,7 +446,7 @@ public partial class IdentifierChain : IIdentifierChain
         /// </summary>
         List<IdentifierPart> GetParts(string? value)
         {
-            var items = Identifier.GetParts(Engine, value, false);
+            var items = IdentifierCode.GetParts(Engine, value, false);
             var parts = items.Select(x => new IdentifierPart(Engine, PartToString(x))).ToList();
 
             if (parts.Count == 0) parts.Add(new IdentifierPart(Engine));

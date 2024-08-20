@@ -3,7 +3,7 @@
 namespace Yotei.ORM.Internal;
 
 // ========================================================
-public static class Identifier
+public static class IdentifierCode
 {
     /// <summary>
     /// Determines if the given identifier matches the given specifications.

@@ -19,7 +19,7 @@ public class IdentifierPart : IIdentifierPart
     {
         Engine = engine.ThrowWhenNull();
 
-        var parts = Identifier.GetParts(Engine, value);
+        var parts = IdentifierCode.GetParts(Engine, value);
         switch (parts.Count)
         {
             case 0: return;
@@ -51,5 +51,5 @@ public class IdentifierPart : IIdentifierPart
     public string? UnwrappedValue { get; }
 
     /// <inheritdoc/>
-    public bool Match(string? specs) => Identifier.Match(this, specs);
+    public bool Match(string? specs) => IdentifierCode.Match(this, specs);
 }
