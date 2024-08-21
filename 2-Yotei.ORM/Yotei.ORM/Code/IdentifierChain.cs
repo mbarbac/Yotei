@@ -199,13 +199,13 @@ public partial class IdentifierChain : IIdentifierChain
         /// <inheritdoc/>
         public override string ToString() => Value ?? string.Empty;
 
-        // -------------------------------------------------
-
         /// <summary>
         /// Returns a new instance based upon the captured contents.
         /// </summary>
         /// <returns></returns>
-        public virtual IIdentifierChain ToInstance() => new IdentifierChain(Engine, this);
+        public virtual IdentifierChain ToInstance() => new (Engine, this);
+
+        // -------------------------------------------------
 
         /// <inheritdoc cref="IIdentifier.Engine"/>
         public IEngine Engine { get; }

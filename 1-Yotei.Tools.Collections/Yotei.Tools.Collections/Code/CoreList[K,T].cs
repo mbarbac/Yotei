@@ -316,9 +316,9 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// <param name="source"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    protected virtual bool SameKeys(K source, K item)
+    protected virtual bool SameItem(T source, T item)
     {
-        return CompareKeys(source, item);
+        return CompareKeys(GetKey(source), ValidateKey(GetKey(item)));
     }
 
     // -----------------------------------------------------
@@ -348,7 +348,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
         item = ValidateItem(item);
 
         var source = Items[index];
-        var same = SameKeys(GetKey(source), ValidateKey(GetKey(item)));
+        var same = SameItem(source, item);
         if (same) return 0;
 
         var removed = RemoveAt(index);

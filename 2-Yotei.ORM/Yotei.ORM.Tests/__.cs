@@ -6,7 +6,7 @@ namespace Yotei.ORM.Tests;
 //{
 //    //[Enforced]
 //    [Fact]
-//    public static void Test__()
+//    public static void Test_()
 //    {
 //    }
 //}
