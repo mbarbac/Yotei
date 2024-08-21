@@ -1,12 +1,8 @@
-﻿using T = Yotei.ORM.IEngine;
-
-namespace Yotei.ORM.Code;
+﻿namespace Yotei.ORM.Code;
 
 // ========================================================
-/// <summary>
-/// Defines methods that support comparison of <see cref="T"/> instances.
-/// </summary>
-public class EngineComparer : IEqualityComparer<T>
+/// <inheritdoc cref="IEngine"/>
+public class EngineComparer : IEngineComparer
 {
     /// <summary>
     /// A common shared instance.
@@ -14,7 +10,7 @@ public class EngineComparer : IEqualityComparer<T>
     public static EngineComparer Instance { get; } = new();
 
     /// <inheritdoc/>
-    public virtual bool Equals(T? x, T? y)
+    public virtual bool Equals(IEngine? x, IEngine? y)
     {
         if (x is null && y is null) return true;
         if (x is null) return false;
@@ -33,7 +29,7 @@ public class EngineComparer : IEqualityComparer<T>
     }
 
     /// <inheritdoc/>
-    public virtual int GetHashCode(T obj)
+    public virtual int GetHashCode(IEngine obj)
     {
         var code = 0; if (obj is not null)
         {
