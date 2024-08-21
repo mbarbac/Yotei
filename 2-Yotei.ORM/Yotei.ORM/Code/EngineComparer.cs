@@ -1,7 +1,7 @@
 ﻿namespace Yotei.ORM.Code;
 
 // ========================================================
-/// <inheritdoc cref="IEngine"/>
+/// <inheritdoc cref="IEngineComparer"/>
 public class EngineComparer : IEngineComparer
 {
     /// <summary>

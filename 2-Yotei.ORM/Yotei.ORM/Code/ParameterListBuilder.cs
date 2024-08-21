@@ -6,7 +6,7 @@
 public partial class ParameterListBuilder : CoreList<string, IParameter>, IParameterListBuilder
 {
     /// <summary>
-    /// Initializes a new instance.
+    /// Initializes a new empty instance.
     /// </summary>
     /// <param name="engine"></param>
     public ParameterListBuilder(IEngine engine) : base()
