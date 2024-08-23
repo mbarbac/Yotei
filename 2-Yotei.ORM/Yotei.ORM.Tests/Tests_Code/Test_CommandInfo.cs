@@ -177,7 +177,7 @@ public static class Test_CommandInfo
 
     //[Enforced]
     [Fact]
-    public static void Test_Create_Duplicates()
+    public static void Test_Duplicates_Must_Fail()
     {
         var engine = new FakeEngine();
 
@@ -248,6 +248,33 @@ public static class Test_CommandInfo
         Assert.Null(target.Parameters[0].Value);
     }
 
+    //[Enforced]
+    [Fact]
+    public static void Test_Replace_Values()
+    {
+        var engine = new FakeEngine();
+        var source = new CommandInfo(engine);
+        var target = source.ReplaceValues();
+        Assert.Same(source, target);
+
+        target = source.ReplaceValues([]);
+        Assert.Same(source, target);
+
+        source = new CommandInfo(engine, "[First]={0}, [Last]={1}", "James", "Bond");
+        target = source.ReplaceValues();
+        Assert.NotSame(source, target);
+        Assert.Empty(target.Parameters);
+
+        target = source.ReplaceValues([]);
+        Assert.NotSame(source, target);
+        Assert.Empty(target.Parameters);
+
+        target = source.ReplaceValues(null!);
+        Assert.NotSame(source, target);
+        Assert.Single(target.Parameters);
+        Assert.Null(target.Parameters[0].Value);
+    }
+
     // ----------------------------------------------------
 
     //[Enforced]
@@ -303,40 +330,143 @@ public static class Test_CommandInfo
         Assert.Equal("[First]=#0, [Last]=#1, [Any]=#2", target.Text);
         Assert.Equal("James", target.Parameters[0].Value);
         Assert.Equal("Bond", target.Parameters[1].Value);
-        Assert.Null(target.Parameters[1].Value);
+        Assert.Null(target.Parameters[2].Value);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Add_Only_Values()
+    {
+        var engine = new FakeEngine();
+        var source = new CommandInfo(engine, "[First]={0}, [Last]={1}", "James", "Bond");
+
+        var target = source.Add((string?)null);
+        Assert.Same(source, target);
+
+        target = source.Add(null, null!);
+        Assert.NotSame(source, target);
+        Assert.Equal(source.Text, target.Text);
+        Assert.Equal(3, target.Parameters.Count);
+        Assert.Equal("#0", target.Parameters[0].Name); Assert.Equal("James", target.Parameters[0].Value);
+        Assert.Equal("#1", target.Parameters[1].Name); Assert.Equal("Bond", target.Parameters[1].Value);
+        Assert.Equal("#2", target.Parameters[2].Name); Assert.Null(target.Parameters[2].Value);
     }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_Add_CommandInfoBuilder() => Assert.Fail();
+    [Fact]
+    public static void Test_Add_Only_Anonymous()
+    {
+        var engine = new FakeEngine();
+        var source = new CommandInfo(engine, "[First]={0}, [Last]={1}", "James", "Bond");
+
+        var xany = new { Any = (string?)null };
+
+        var target = source.Add(null, xany);
+        Assert.NotSame(source, target);
+        Assert.Equal(source.Text, target.Text);
+        Assert.Equal(3, target.Parameters.Count);
+        Assert.Equal("#0", target.Parameters[0].Name); Assert.Equal("James", target.Parameters[0].Value);
+        Assert.Equal("#1", target.Parameters[1].Name); Assert.Equal("Bond", target.Parameters[1].Value);
+        Assert.Equal("#Any", target.Parameters[2].Name); Assert.Null(target.Parameters[2].Value);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Add_Only_Parameters()
+    {
+        var engine = new FakeEngine();
+        var source = new CommandInfo(engine, "[First]={0}, [Last]={1}", "James", "Bond");
+
+        var xany = new Parameter("#0", null);
+
+        var target = source.Add(null, xany);
+        Assert.NotSame(source, target);
+        Assert.Equal(source.Text, target.Text);
+        Assert.Equal(3, target.Parameters.Count);
+        Assert.Equal("#0", target.Parameters[0].Name); Assert.Equal("James", target.Parameters[0].Value);
+        Assert.Equal("#1", target.Parameters[1].Name); Assert.Equal("Bond", target.Parameters[1].Value);
+        Assert.Equal("#2", target.Parameters[2].Name); Assert.Null(target.Parameters[2].Value);
+    }
 
     // ----------------------------------------------------
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_Add_Only_Values() => Assert.Fail();
+    [Fact]
+    public static void Test_Add_Text_And_Values()
+    {
+        var engine = new FakeEngine();
+        var source = new CommandInfo(engine, "[First]={0}, [Last]={1}", "James", "Bond");
+
+        var target = source.Add(", [Any]={0}", null!);
+        Assert.NotSame(source, target);
+        Assert.Equal("[First]=#0, [Last]=#1, [Any]=#2", target.Text);
+        Assert.Equal(3, target.Parameters.Count);
+        Assert.Equal("#0", target.Parameters[0].Name); Assert.Equal("James", target.Parameters[0].Value);
+        Assert.Equal("#1", target.Parameters[1].Name); Assert.Equal("Bond", target.Parameters[1].Value);
+        Assert.Equal("#2", target.Parameters[2].Name); Assert.Null(target.Parameters[2].Value);
+    }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_Add_Only_Anonymous() => Assert.Fail();
+    [Fact]
+    public static void Test_Add_Text_And_Anonymous()
+    {
+        var engine = new FakeEngine();
+        var source = new CommandInfo(engine, "[First]={0}, [Last]={1}", "James", "Bond");
+
+        var xany = new { Any = (string?)null };
+
+        var target = source.Add(", [Any]={0}", xany);
+        Assert.NotSame(source, target);
+        Assert.Equal("[First]=#0, [Last]=#1, [Any]=#Any", target.Text);
+        Assert.Equal(3, target.Parameters.Count);
+        Assert.Equal("#0", target.Parameters[0].Name); Assert.Equal("James", target.Parameters[0].Value);
+        Assert.Equal("#1", target.Parameters[1].Name); Assert.Equal("Bond", target.Parameters[1].Value);
+        Assert.Equal("#Any", target.Parameters[2].Name); Assert.Null(target.Parameters[2].Value);
+
+        target = source.Add(", [Any]={Any}", xany);
+        Assert.NotSame(source, target);
+        Assert.Equal("[First]=#0, [Last]=#1, [Any]=#Any", target.Text);
+        Assert.Equal(3, target.Parameters.Count);
+        Assert.Equal("#0", target.Parameters[0].Name); Assert.Equal("James", target.Parameters[0].Value);
+        Assert.Equal("#1", target.Parameters[1].Name); Assert.Equal("Bond", target.Parameters[1].Value);
+        Assert.Equal("#Any", target.Parameters[2].Name); Assert.Null(target.Parameters[2].Value);
+
+        target = source.Add(", [Any]={#Any}", xany);
+        Assert.NotSame(source, target);
+        Assert.Equal("[First]=#0, [Last]=#1, [Any]=#Any", target.Text);
+        Assert.Equal(3, target.Parameters.Count);
+        Assert.Equal("#0", target.Parameters[0].Name); Assert.Equal("James", target.Parameters[0].Value);
+        Assert.Equal("#1", target.Parameters[1].Name); Assert.Equal("Bond", target.Parameters[1].Value);
+        Assert.Equal("#Any", target.Parameters[2].Name); Assert.Null(target.Parameters[2].Value);
+    }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_Add_Only_Parameters() => Assert.Fail();
+    [Fact]
+    public static void Test_Add_Text_And_Parameters()
+    {
+        var engine = new FakeEngine();
+        var source = new CommandInfo(engine, "[First]={0}, [Last]={1}", "James", "Bond");
 
-    // ----------------------------------------------------
+        var xany = new Parameter("#0", null);
 
-    //[Enforced]
-    //[Fact]
-    //public static void Test_Add_Text_And_Values() => Assert.Fail();
+        var target = source.Add(", [Any]={0}", xany);
+        Assert.NotSame(source, target);
+        Assert.Equal("[First]=#0, [Last]=#1, [Any]=#2", target.Text);
+        Assert.Equal(3, target.Parameters.Count);
+        Assert.Equal("#0", target.Parameters[0].Name); Assert.Equal("James", target.Parameters[0].Value);
+        Assert.Equal("#1", target.Parameters[1].Name); Assert.Equal("Bond", target.Parameters[1].Value);
+        Assert.Equal("#2", target.Parameters[2].Name); Assert.Null(target.Parameters[2].Value);
 
-    //[Enforced]
-    //[Fact]
-    //public static void Test_Add_Text_And_Anonymous() => Assert.Fail();
-
-    //[Enforced]
-    //[Fact]
-    //public static void Test_Add_Text_And_Parameters() => Assert.Fail();
+        target = source.Add(", [Any]={#0}", xany);
+        Assert.NotSame(source, target);
+        Assert.Equal("[First]=#0, [Last]=#1, [Any]=#2", target.Text);
+        Assert.Equal(3, target.Parameters.Count);
+        Assert.Equal("#0", target.Parameters[0].Name); Assert.Equal("James", target.Parameters[0].Value);
+        Assert.Equal("#1", target.Parameters[1].Name); Assert.Equal("Bond", target.Parameters[1].Value);
+        Assert.Equal("#2", target.Parameters[2].Name); Assert.Null(target.Parameters[2].Value);
+    }
 
     // ----------------------------------------------------
 

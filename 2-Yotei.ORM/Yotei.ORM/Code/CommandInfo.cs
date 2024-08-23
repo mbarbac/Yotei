@@ -66,6 +66,14 @@ public partial class CommandInfo : ICommandInfo
         return done ? clone : this;
     }
 
+    /// <inheritdoc/>
+    public ICommandInfo ReplaceValues(params object?[] range)
+    {
+        var clone = Clone();
+        var done = clone.Builder.ReplaceValues(range);
+        return done ? clone : this;
+    }
+
     // ----------------------------------------------------
 
     /// <inheritdoc/>

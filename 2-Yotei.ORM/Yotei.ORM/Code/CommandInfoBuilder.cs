@@ -1,6 +1,10 @@
-﻿namespace Yotei.ORM.Code;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
+
+namespace Yotei.ORM.Code;
 
 // ========================================================
+/// <inheritdoc cref="ICommandInfoBuilder"/>
 [Cloneable]
 public partial class CommandInfoBuilder : ICommandInfoBuilder
 {
@@ -26,8 +30,8 @@ public partial class CommandInfoBuilder : ICommandInfoBuilder
     /// <param name="range"></param>
     public CommandInfoBuilder(ICommandInfo source) : this(source.Parameters.Engine)
     {
-        var strict = false;
-        Add(strict, source.Text, source.Parameters);
+        var brackets = false;
+        Add(brackets, source.Text, source.Parameters);
     }
 
     /// <summary>
@@ -38,8 +42,8 @@ public partial class CommandInfoBuilder : ICommandInfoBuilder
     /// <param name="range"></param>
     public CommandInfoBuilder(IEngine engine, string? text, params object?[] range) : this(engine)
     {
-        var strict = !(text is null || (range is not null && range.Length == 0));
-        Add(strict, text, range!);
+        var brackets = true;
+        Add(brackets, text, range);
     }
 
     /// <summary>
@@ -104,6 +108,20 @@ public partial class CommandInfoBuilder : ICommandInfoBuilder
         return true;
     }
 
+    /// <inheritdoc/>
+    public bool ReplaceValues(params object?[] range)
+    {
+        range ??= [null];
+
+        if (_Parameters.Count == 0 && range.Length == 0) return false;
+
+        _Parameters.Clear();
+
+        var brackets = true;
+        Add(brackets, null, range);
+        return true;
+    }
+
     // ----------------------------------------------------
 
     /// <inheritdoc/>
@@ -111,8 +129,8 @@ public partial class CommandInfoBuilder : ICommandInfoBuilder
     {
         source.ThrowWhenNull();
 
-        var strict = false;
-        return Add(strict, source.Text, source.Parameters);
+        var brackets = false;
+        return Add(brackets, source.Text, source.Parameters);
     }
 
     /// <inheritdoc/>
@@ -120,15 +138,15 @@ public partial class CommandInfoBuilder : ICommandInfoBuilder
     {
         source.ThrowWhenNull();
 
-        var strict = false;
-        return Add(strict, source.Text.ToString(), source.Parameters);
+        var brackets = false;
+        return Add(brackets, source.Text, source.Parameters);
     }
 
     /// <inheritdoc/>
     public bool Add(string? text, params object?[] range)
     {
-        var strict = true;
-        return Add(strict, text, range);
+        var brackets = true;
+        return Add(brackets, text, range);
     }
 
     // ----------------------------------------------------
@@ -146,21 +164,24 @@ public partial class CommandInfoBuilder : ICommandInfoBuilder
     // ----------------------------------------------------
 
     /// <summary>
-    /// Factorizes code taking into consideration whether strict mode is requested or not.
-    /// When in strict mode, there are no validations for the match between the specifications
-    /// in the text, brackets, and element names.
+    /// Factorizes common add code.
+    /// <br/> If text is null, then just capture the elements without trying to match specs.
+    /// <br/> If not elements, then just capture the text without trying to match specs.
+    /// <br/> Specs can be '{n}' ordinal or '{name}' ones, name using or not engine prefix.
+    /// <br/> brackets: Find element names using brackets or ordinals, or just the raw name.
     /// </summary>
-    /// <param name="strict"></param>
+    /// <param name="brackets"></param>
     /// <param name="text"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    bool Add(bool strict, string? text, params object?[] range)
+    bool Add(bool brackets, string? text, params object?[] range)
     {
+        var match = !(text is null || (range != null && range.Length == 0));
+        var textnull = text is null;
         var comparison = Engine.CaseSensitiveNames
             ? StringComparison.Ordinal
             : StringComparison.OrdinalIgnoreCase;
 
-        var textnull = text is null;
         text ??= string.Empty;
         range ??= [null];
 
@@ -169,8 +190,7 @@ public partial class CommandInfoBuilder : ICommandInfoBuilder
 
         // Intercepting single-valued elements...
         if (range.Length == 1 &&
-            range[0] is IEnumerable<IParameter> xrange)
-            return Add(strict, text, xrange.ToArray());
+            range[0] is IEnumerable<IParameter> xrange) return Add(brackets, text, xrange.ToArray());
 
         // Capturing and validating elements...
         var items = RangeElement.Capture(range);
@@ -181,101 +201,80 @@ public partial class CommandInfoBuilder : ICommandInfoBuilder
             if (item.Value is ICommandInfo) throw new ArgumentException("Element in the range of values cannot be a command info instance.").WithData(item);
         }
 
-        // If text is null, inconditionally capturing the elements...
-        if (textnull)
+        // Iterating the given elements...
+        for (int i = 0; i < items.Length; i++)
         {
-            for (int i = 0; i < items.Length; i++)
+            string name = null!;
+            var item = items[i];
+
+            if (item.Value is IParameter par) // Element is a parameter...
             {
-                var item = items[i];
+                name = par.Name;
+                par = Capture(par);
+            }
+            else if (item.Value is AnonymousItem anon) // Element is an anonymous type...
+            {
+                name = anon.Name;
+                par = new Parameter(anon.Name, anon.Value);
+                par = Capture(par);
+            }
+            else // Element is an arbitrary value...
+            {
+                _Parameters.AddNew(item.Value, out par);
 
-                if (item.Value is IParameter par) // Parameter specified...
-                {
-                    par = Capture(par);
-                }
-                else if (item.Value is AnonymousItem anon) // Anonymous specified...
-                {
-                    par = new Parameter(anon.Name, anon.Value);
-                    par = Capture(par);
-                }
-                else // Value specified...
-                {
-                    _Parameters.AddNew(item.Value, out par);
-                    novels.Add(par);
-                }
+                novels.Add(par);
+                name = par.Name;
+            }
 
+            if (textnull) // We don't need to modify the given text...
+            {
                 item.Used = true;
                 done = true;
+                continue;
             }
-        }
 
-        // Otherwise, iterating through the elements...
-        else
-        {
-            for (int i = 0; i < items.Length; i++)
+            if (brackets) // Finding named or ordinal specs...
             {
-                string name = null!;
-                var item = items[i];
-
-                // Capturing the element, just once...
-                if (item.Parameter == null)
-                {
-                    if (item.Value is IParameter par) // Parameter specified...
-                    {
-                        name = par.Name;
-                        par = Capture(par);
-                    }
-                    else if (item.Value is AnonymousItem anon) // Anonymous specified...
-                    {
-                        name = anon.Name;
-                        par = new Parameter(anon.Name, anon.Value);
-                        par = Capture(par);
-                    }
-                    else // Value specified...
-                    {
-                        _Parameters.AddNew(item.Value, out par);
-                        novels.Add(par);
-                        name = par.Name;
-                    }
-
-                    item.Parameter = par;
-                }
-
-                throw NotImplementedException();
-                // Problem: when the element comes from an alredy validated collection, its
-                // name may alredy be in the correct form, so we need to find for that form
-                // and not for a bracket!
-                // Idea:
-                // En FindNamedBracket, cuando NO strict, intentar como fall-back encontrar
-                // el name, pero siempre que haya un separador tras el !!!
-
-                // Named specifications...
                 var pos = 0;
                 while ((pos = FindNamedBracket(name, pos, out var bracket)) >= 0)
                 {
                     text = text.Remove(pos, bracket!.Length);
-                    text = text.Insert(pos, item.Parameter.Name);
-                    pos += bracket.Length;
+                    text = text.Insert(pos, par.Name);
 
+                    pos += par.Name.Length;
                     item.Used = true;
                     done = true;
                 }
 
-                // Ordinal specifications...
                 pos = 0;
                 while ((pos = FindOrdinalBracket(i, pos, out var bracket)) >= 0)
                 {
                     text = text.Remove(pos, bracket!.Length);
-                    text = text.Insert(pos, item.Parameter.Name);
-                    pos += bracket.Length;
+                    text = text.Insert(pos, par.Name);
 
+                    pos += par.Name.Length;
+                    item.Used = true;
+                    done = true;
+                }
+            }
+
+            else // Finding raw element names...
+            {
+                var pos = 0;
+                while ((pos = FindRawName(name, pos)) >= 0)
+                {
+                    text = text.Remove(pos, name.Length);
+                    text = text.Insert(pos, par.Name);
+
+                    pos += par.Name.Length;
                     item.Used = true;
                     done = true;
                 }
             }
         }
 
-        // Validations in strict mode...
-        if (strict)
+        // Validations...
+        if (match)
         {
             // No remaining unused elements...
             if (items.Length > 0 && items.Any(x => !x.Used)) throw new ArgumentException(
@@ -301,14 +300,18 @@ public partial class CommandInfoBuilder : ICommandInfoBuilder
         return done;
 
         /// <summary>
-        /// Captures the given parameter, eventually creating a new one if its name does not
-        /// begin with the parameter prefix, or if it name already exist, provided its not a
-        /// duplicate coming from duplicated element names.
+        /// Captures the given parameter, eventually creating a new one if:
+        /// - Its name does not belong with the engine's prefix.
+        /// - Its name collides with an original one.
+        /// In addition, this method validates that the name of the captured parameter is not a
+        /// duplicate of any of the new parameters.
         /// </summary>
         IParameter Capture(IParameter par)
         {
-            if (!par.Name.StartsWith(Engine.ParametersPrefix, comparison))
-                par = new Parameter(Engine.ParametersPrefix + par.Name, par.Value);
+            var prefix = Engine.ParametersPrefix;
+
+            if (!par.Name.StartsWith(prefix, comparison))
+                par = new Parameter(prefix + par.Name, par.Value);
 
             if (novels.Contains(par.Name)) throw new DuplicateException(
                 "Duplicated element name detected.")
@@ -319,6 +322,33 @@ public partial class CommandInfoBuilder : ICommandInfoBuilder
 
             novels.Add(par);
             return par;
+        }
+
+        /// <summary>
+        /// Gets the index of the first ocurrence or the given name, starting from the given
+        /// index, provided there are suitable heading and trailing separators.
+        /// </summary>
+        int FindRawName(string name, int ini)
+        {
+            var pos = text.IndexOf(name, ini, comparison);
+            
+            if (pos >= 0)
+            {
+                if (pos > 0)
+                {
+                    var c = text[pos - 1];
+                    if (!Separators.Contains(c)) return -1;
+                }
+
+                var len = pos + name.Length;
+                if (len < (text.Length - 1))
+                {
+                    var c = text[pos - 1];
+                    if (!Separators.Contains(c)) return -1;
+                }
+            }
+
+            return pos;
         }
 
         /// <summary>
@@ -377,20 +407,23 @@ public partial class CommandInfoBuilder : ICommandInfoBuilder
     }
 
     /// <summary>
+    /// Used to identify raw element names.
+    /// </summary>
+    static char[] Separators = " ()[]{}.,:;-+*/^!?=&%´'\"".ToCharArray();
+
+    /// <summary>
     /// Represents an element in the given collecion of parameters.
     /// </summary>
     class RangeElement
     {
         public object? Value;
-        public IParameter? Parameter;
         public bool Used;
 
         public RangeElement() { }
         public override string ToString()
         {
             string str;
-            if (Parameter is not null) str = $"Par:{Parameter}";
-            else if (Value is IParameter par) str = $"Par:{par}";
+            if (Value is IParameter par) str = $"Par:{par}";
             else if (Value is AnonymousItem item) str = $"Anon:{item}";
             else str = $"'{Value.Sketch()}'";
 

@@ -13,19 +13,13 @@ public partial interface ICommandInfoBuilder
     /// <returns></returns>
     ICommandInfo ToInstance();
 
-    // <summary>
-    /// Obtains the current text captured by this instance.
-    /// </summary>
+    /// <inheritdoc cref="ICommandInfo.Text"/>
     string Text { get; }
 
-    /// <summary>
-    /// Obtains the current list of parameters captured by this instance.
-    /// </summary>
+    /// <inheritdoc cref="ICommandInfo.Parameters"/>
     IParameterList Parameters { get; }
 
-    /// <summary>
-    /// Determines if this instance is currently an empty one, or not.
-    /// </summary>
+    /// <inheritdoc cref="ICommandInfo.IsEmpty"/>
     bool IsEmpty { get; }
 
     // ----------------------------------------------------
@@ -40,11 +34,19 @@ public partial interface ICommandInfoBuilder
 
     /// <summary>
     /// Inconditionally replaces the collection of parameters in this instance with the new given
-    /// ones, without trying to match it with the existing text.
+    /// one, without trying to match it with the existing text.
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
     bool ReplaceParameters(IEnumerable<IParameter> range);
+
+    /// <summary>
+    /// Inconditionally replaces the collection of parameters in this instance with the new given
+    /// range of values, without trying to match them with the existing text.
+    /// </summary>
+    /// <param name="range"></param>
+    /// <returns></returns>
+    bool ReplaceValues(params object?[] range);
 
     // ----------------------------------------------------
 
@@ -65,21 +67,16 @@ public partial interface ICommandInfoBuilder
     bool Add(ICommandInfoBuilder source);
 
     /// <summary>
-    /// Returns a new instance where the given text and parameters have been added to the original
-    /// ones.
-    /// <br/>- If the text is null, then the parameters are just captured without trying to match
-    /// them with any specifications in the text.
-    /// <br/>- Similarly, if no parameters are given, the text is captured without validating any
-    /// specifications.
-    /// <br/>- Otherwise, if there are parameters with no corresponding specifications in the
-    /// given text, of if the text contains specifications with no matching parameters, then an
-    /// exception is thrown.
-    /// <br/>- Specifications can either be positional '{n}' ones, where 'n' is the ordinal in the
-    /// parameters' collection, or named '{name}' ones, where 'name' can begin or not with the
-    /// engines' parameter prefix, matching either the name of a parameter in that collection, or
-    /// with the name of the unique property of an anonymous type in that range.
-    /// <br/>- They names of the added parameters may change if the collide with any existing
-    /// ones.
+    /// Adds to the contents of this instance the given text and elements. If the text is null
+    /// then the elements are just captured without trying to match their names with any text
+    /// specifications. Similarly, if no elements were given, the text is just captured without
+    /// intercepting dangling specifications. Otherwise, the names or the ordinal positions of
+    /// the given elements must match, and be used, as specifications in the given text.
+    /// <br/> Specifications can either be positional '{n}' ones, where 'n' is the ordinal in the
+    /// collection of elements, or named '{name}' ones, where 'name' can begin or not with the
+    /// engines' parameter prefix. Named specifications must match with the name of any of the
+    /// given elements, even if afterwards these names may change to prevent duplicates with the
+    /// original captured parameters.
     /// </summary>
     /// <param name="text"></param>
     /// <param name="range"></param>

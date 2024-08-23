@@ -99,7 +99,7 @@ public partial class StrKeywordTokenizer : StrTokenizer
     /// he default set of characters that act as head and tail separators for the keyword, in
     /// addition to it appearing at the start or end of a sequence.
     /// </summary>
-    public static readonly char[] Separators = " ()[]{}=".ToCharArray();
+    public static readonly char[] Separators = " ()[]{}.,:;-+*/^!?=&%´'\"".ToCharArray();
 
     static char[] Validate(char[] array)
     {
