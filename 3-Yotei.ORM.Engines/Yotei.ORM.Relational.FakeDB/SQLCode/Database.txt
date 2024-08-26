@@ -1,0 +1,25 @@
+﻿LOCAL DB INSTRUCTIONS
+=================================================
+From a command prompt:
+	SQLLocalDB -?					: help
+	SQLLocalDB info					: lists existing LocalDB instances
+	SQLLocalDB create "name" [-s]	: creates a new instance with the given name, and optionally starts it
+	SQLLocalDB start "name"			: starts the instance with the given name
+	SQLLocalDB stop "name"			: stops the instance with the given name
+	SQLLocalDB delete "name"		: deletes the instance with the given name
+
+CONNECT
+=================================================
+Use: SQL Server Object Explorer
+
+CONNECTION STRING
+=================================================
+Use:
+	Data Source=(LocalDB)\KeroseneDB;
+	Initial Catalog=KeroseneDB;
+	Integrated Security=True;
+	Persist Security Info=False;
+	Pooling=False;
+	MultipleActiveResultSets=True;
+	Encrypt=False;
+	TrustServerCertificate=False
