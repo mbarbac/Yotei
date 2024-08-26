@@ -31,7 +31,7 @@
    </ItemGroup>
 
    <ItemGroup>
-	  <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.8.0" PrivateAssets="all" />
+	  <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.11.0" PrivateAssets="all" />
    </ItemGroup>
    <Import Project="..\Yotei.Tools.Generators\Yotei.Tools.Generators.projitems" Label="Shared" />
 
