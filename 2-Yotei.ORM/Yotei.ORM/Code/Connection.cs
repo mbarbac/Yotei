@@ -31,6 +31,7 @@ public abstract partial class Connection : DisposableClass, IConnection
     {
         if (IsDisposed || !disposing) return;
 
+        try { _Transaction?.Dispose(); } catch { }
         try { if (IsOpen) Close(); } catch { }
         try { AsyncLock.Dispose(); } catch { }
     }
@@ -40,6 +41,7 @@ public abstract partial class Connection : DisposableClass, IConnection
     {
         if (IsDisposed || !disposing) return;
 
+        try { if (_Transaction != null) await _Transaction.DisposeAsync().ConfigureAwait(false); } catch { }
         try { if (IsOpen) await CloseAsync().ConfigureAwait(false); } catch { }
         try { await AsyncLock.DisposeAsync().ConfigureAwait(false); } catch { }
     }
@@ -78,6 +80,43 @@ public abstract partial class Connection : DisposableClass, IConnection
     TimeSpan _RetryInterval = TimeSpan.FromMilliseconds(RETRYINTERVAL);
 
     // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to create a new transaction appropriate for this instance.
+    /// </summary>
+    /// <returns></returns>
+    protected abstract ITransaction CreateTransaction();
+
+    /// <inheritdoc/>
+    public ITransaction Transaction
+    {
+        // Always obtains an instance, even if we are disposing/disposed...
+        get
+        {
+            if (IsDisposed || OnDisposing)
+            {
+                if (_Transaction == null)
+                {
+                    _Transaction = CreateTransaction();
+                    _Transaction.Dispose();
+                }
+            }
+            else
+            {
+                if (_Transaction == null || _Transaction.IsDisposed)
+                {
+                    _Transaction = CreateTransaction();
+                }
+            }
+            return _Transaction;
+        }
+    }
+    ITransaction? _Transaction;
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public abstract void Enlist(IDbCommand command);
 
     /// <inheritdoc/>
     public abstract bool IsOpen { get; }
@@ -162,6 +201,10 @@ public abstract partial class Connection : DisposableClass, IConnection
 
         using (var disp = AsyncLock.Lock())
         {
+            if (_Transaction != null && _Transaction.IsActive)
+            {
+                _Transaction.Abort();
+            }
             OnClose();
         }
     }
@@ -174,6 +217,10 @@ public abstract partial class Connection : DisposableClass, IConnection
 
         await using (var disp = await AsyncLock.LockAsync().ConfigureAwait(false))
         {
+            if (_Transaction != null && _Transaction.IsActive)
+            {
+                await _Transaction.AbortAsync().ConfigureAwait(false);
+            }
             await OnCloseAsync();
         }
     }

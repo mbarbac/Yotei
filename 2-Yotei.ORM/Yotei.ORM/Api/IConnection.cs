@@ -24,7 +24,19 @@ public partial interface IConnection : IBaseDisposable
     /// </summary>
     TimeSpan RetryInterval { get; }
 
+    /// <summary>
+    /// Gets the transaction associated with this instance.
+    /// </summary>
+    ITransaction Transaction { get; }
+
     // ----------------------------------------------------
+
+    /// <summary>
+    /// Sets the connectoin associated with the given physical command the the one associated
+    /// with this instance.
+    /// </summary>
+    /// <param name="command"></param>
+    void Enlist(IDbCommand command);
 
     /// <summary>
     /// Determines if this instance is opened or not.
