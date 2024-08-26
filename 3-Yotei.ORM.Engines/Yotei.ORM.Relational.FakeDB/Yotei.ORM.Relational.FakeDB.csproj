@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+   <PropertyGroup>
+	  <TargetFramework>net8.0</TargetFramework>
+	  <LangVersion>latest</LangVersion>
+	  <ImplicitUsings>disable</ImplicitUsings>
+	  <Nullable>enable</Nullable>
+	  <Configurations>Debug;Release;Local</Configurations>
+	  <NoWarn>IDE0130;IDE0290</NoWarn>
+   </PropertyGroup>
+   <!--IDE0130: Namespace doesn't match folder structure-->
+   <!--IDE0290: Use primary constructor-->
+
+   <!-- DEBUG configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Debug'">
+	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
+	  <ProjectReference Include="..\Yotei.ORM.Relational\Yotei.ORM.Relational.csproj" />
+   </ItemGroup>
+
+   <!-- LOCAL configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Local'">
+	  <PackageReference Include="Yotei.Tools" Version="0.5.32-v0001" />
+	  <PackageReference Include="Yotei.ORM.Relational" Version="0.2.4-v0001" />
+   </ItemGroup>
+
+   <!-- RELEASE configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Release'">
+	  <PackageReference Include="Yotei.Tools" Version="0.5.32" />
+	  <PackageReference Include="Yotei.ORM.Relational" Version="0.2.4" />
+   </ItemGroup>
+
+</Project>
