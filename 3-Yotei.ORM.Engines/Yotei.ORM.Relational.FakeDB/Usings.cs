@@ -3,6 +3,7 @@ global using System.Collections;
 global using System.Collections.Generic;
 global using System.Collections.Immutable;
 global using System.Data;
+global using System.Data.Common;
 global using System.Diagnostics;
 global using System.Diagnostics.CodeAnalysis;
 global using System.Dynamic;
@@ -16,6 +17,9 @@ global using System.Text;
 global using System.Threading;
 global using System.Threading.Tasks;
 
+global using Xunit;
 global using Yotei.Tools;
+global using Yotei.Tools.Diagnostics;
+
 global using Yotei.ORM;
 global using Yotei.ORM.Relational;

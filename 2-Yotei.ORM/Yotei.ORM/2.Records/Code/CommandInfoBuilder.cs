@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
-namespace Yotei.ORM.Code;
+namespace Yotei.ORM.Records.Code;
 
 // ========================================================
 /// <inheritdoc cref="ICommandInfoBuilder"/>

@@ -3,6 +3,7 @@ global using System.Collections;
 global using System.Collections.Generic;
 global using System.Collections.Immutable;
 global using System.Data;
+global using System.Data.Common;
 global using System.Diagnostics;
 global using System.Diagnostics.CodeAnalysis;
 global using System.Dynamic;
@@ -27,4 +28,6 @@ global using Yotei.Tools.WithGenerator;
 
 global using Yotei.ORM;
 global using Yotei.ORM.Code;
+global using Yotei.ORM.Records;
+global using Yotei.ORM.Records.Code;
 global using Yotei.ORM.Internal;

@@ -1,6 +1,4 @@
-#pragma warning disable IDE0130
-
-namespace Yotei.ORM.Tests;
+namespace Yotei.ORM.Tests.Records;
 
 // ========================================================
 //[Enforced]
