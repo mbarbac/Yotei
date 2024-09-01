@@ -6,7 +6,7 @@
 /// <br/> Duplicated elements are allowed as far as they are exactly the same instance.
 /// </summary>
 [IFrozenList<string, IParameter>]
-public partial interface IParameterList
+public partial interface IParameterList : IEquatable<IParameterList>
 {
     /// <summary>
     /// Returns a new builder based upon the contents of this instance.

@@ -43,6 +43,43 @@ public partial class Engine : IEngine
     // ----------------------------------------------------
 
     /// <inheritdoc/>
+    public bool Equals(IEngine? other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+
+        if (CaseSensitiveNames != other.CaseSensitiveNames) return false;
+        if (string.Compare(NullValueLiteral, other.NullValueLiteral, !CaseSensitiveNames) != 0) return false;
+        if (PositionalParameters != other.PositionalParameters) return false;
+        if (string.Compare(ParametersPrefix, other.ParametersPrefix, !CaseSensitiveNames) != 0) return false;
+        if (NativePaging != other.NativePaging) return false;
+        if (UseTerminators != other.UseTerminators) return false;
+        if (LeftTerminator != other.LeftTerminator) return false;
+        if (RightTerminator != other.RightTerminator) return false;
+
+        return true;
+    }
+    public override bool Equals(object? obj) => Equals(obj as IEngine);
+    public static bool operator ==(Engine x, IEngine y) => x is not null && x.Equals(y);
+    public static bool operator !=(Engine x, IEngine y) => !(x == y);
+    public override int GetHashCode()
+    {
+        var code = 0;
+        code = HashCode.Combine(code, CaseSensitiveNames);
+        code = HashCode.Combine(code, NullValueLiteral);
+        code = HashCode.Combine(code, PositionalParameters);
+        code = HashCode.Combine(code, ParametersPrefix);
+        code = HashCode.Combine(code, NativePaging);
+        code = HashCode.Combine(code, UseTerminators);
+        code = HashCode.Combine(code, LeftTerminator);
+        code = HashCode.Combine(code, RightTerminator);
+            
+        return code;
+    }
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
     public bool CaseSensitiveNames { get; init; } = CASESENSITIVENAMES;
 
     /// <inheritdoc/>

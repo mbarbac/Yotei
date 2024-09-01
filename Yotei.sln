@@ -8,6 +8,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		LICENSE = LICENSE
 		README.md = README.md
+		TODO.md = TODO.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0-Development", "0-Development", "{41E47AF2-1CA9-4664-A60A-8B5DFED49827}"
@@ -74,11 +75,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yotei.ORM.Tests", "2-Yotei.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3-Yotei.ORM.Engines", "3-Yotei.ORM.Engines", "{80F6A441-21F5-493D-AB00-1DBFFEFC7312}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yotei.ORM.Relational", "3-Yotei.ORM.Engines\Yotei.ORM.Relational\Yotei.ORM.Relational.csproj", "{D488CBAD-A395-483A-A83F-8AB4E2872E3B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yotei.ORM.Relational", "3-Yotei.ORM.Engines\Yotei.ORM.Relational\Yotei.ORM.Relational.csproj", "{D488CBAD-A395-483A-A83F-8AB4E2872E3B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yotei.ORM.Relational.Tests", "3-Yotei.ORM.Engines\Yotei.ORM.Relational.Tests\Yotei.ORM.Relational.Tests.csproj", "{C35B7C20-4A72-4892-B80D-85AFB018164A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yotei.ORM.Relational.Tests", "3-Yotei.ORM.Engines\Yotei.ORM.Relational.Tests\Yotei.ORM.Relational.Tests.csproj", "{C35B7C20-4A72-4892-B80D-85AFB018164A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yotei.ORM.Relational.FakeDB", "3-Yotei.ORM.Engines\Yotei.ORM.Relational.FakeDB\Yotei.ORM.Relational.FakeDB.csproj", "{047FD062-9A90-4E0D-BFD2-9A303F535A7B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yotei.ORM.Relational.FakeDB", "3-Yotei.ORM.Engines\Yotei.ORM.Relational.FakeDB\Yotei.ORM.Relational.FakeDB.csproj", "{047FD062-9A90-4E0D-BFD2-9A303F535A7B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -42,6 +42,31 @@ public class IdentifierPart : IIdentifierPart
     /// <inheritdoc/>
     public override string ToString() => Value ?? string.Empty;
 
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public bool Equals(IIdentifier? other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+
+        if (!Engine.Equals(other.Engine)) return false;
+        return string.Compare(Value, other.Value, !Engine.CaseSensitiveNames) == 0;
+    }
+    public override bool Equals(object? obj) => Equals(obj as IIdentifier);
+    public static bool operator ==(IdentifierPart x, IIdentifier y) => x is not null && x.Equals(y);
+    public static bool operator !=(IdentifierPart x, IIdentifier y) => !(x == y);
+    public override int GetHashCode()
+    {
+        var code = 0;
+        code = HashCode.Combine(code, Engine);
+        code = HashCode.Combine(code, Value);
+
+        return code;
+    }
+
+    // ----------------------------------------------------
+
     /// <inheritdoc/>
     public IEngine Engine { get; }
 

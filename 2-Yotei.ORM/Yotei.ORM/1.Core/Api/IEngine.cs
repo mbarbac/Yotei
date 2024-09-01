@@ -4,7 +4,7 @@
 /// <summary>
 /// Describes an underlying database engine.
 /// </summary>
-public partial interface IEngine
+public partial interface IEngine : IEquatable<IEngine>
 {
     /// <summary>
     /// Determines if the engine treats the identifier-alike names as case sensitive, or not.

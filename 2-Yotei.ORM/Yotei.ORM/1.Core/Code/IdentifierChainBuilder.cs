@@ -18,7 +18,7 @@ public partial class IdentifierChainBuilder
         {
             item.ThrowWhenNull();
 
-            if (!EngineComparer.Instance.Equals(Engine, item.Engine))
+            if (!Engine.Equals(item.Engine))
                 throw new ArgumentException(
                     "The engine of the given element is not equivalent to the one of this instance.")
                     .WithData(item)

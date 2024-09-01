@@ -61,6 +61,29 @@ public partial class IdentifierChain : IIdentifierChain
     // ----------------------------------------------------
 
     /// <inheritdoc/>
+    public bool Equals(IIdentifier? other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+
+        if (!Engine.Equals(other.Engine)) return false;
+        return string.Compare(Value, other.Value, !Engine.CaseSensitiveNames) == 0;
+    }
+    public override bool Equals(object? obj) => Equals(obj as IIdentifier);
+    public static bool operator ==(IdentifierChain x, IIdentifier y) => x is not null && x.Equals(y);
+    public static bool operator !=(IdentifierChain x, IIdentifier y) => !(x == y);
+    public override int GetHashCode()
+    {
+        var code = 0;
+        code = HashCode.Combine(code, Engine);
+        for (int i = 0; i < Count; i++) code = HashCode.Combine(code, this[i]);
+
+        return code;
+    }
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
     public IEngine Engine => Items.Engine;
 
     /// <inheritdoc/>

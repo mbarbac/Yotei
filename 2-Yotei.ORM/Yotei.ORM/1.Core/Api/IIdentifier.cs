@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents an arbitrary database identifier.
 /// </summary>
-public interface IIdentifier
+public interface IIdentifier : IEquatable<IIdentifier>
 {
     /// <summary>
     /// The engine this instance is associated with.

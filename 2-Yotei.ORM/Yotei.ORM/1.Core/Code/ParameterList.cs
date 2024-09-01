@@ -46,6 +46,39 @@ public partial class ParameterList : IParameterList
     // ----------------------------------------------------
 
     /// <inheritdoc/>
+    public bool Equals(IParameterList? other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+
+        if (!Engine.Equals(other.Engine)) return false;
+        if (Count != other.Count) return false;
+        for (int i = 0; i < Count; ++i)
+        {
+            var source = this[i];
+            var target = other[i];
+
+            if (string.Compare(source.Name, target.Name, !Engine.CaseSensitiveNames) != 0) return false;
+            if (!source.Value.EqualsEx(target.Value)) return false;
+        }
+
+        return true;
+    }
+    public override bool Equals(object? obj) => Equals(obj as IParameterList);
+    public static bool operator ==(ParameterList x, IParameterList y) => x is not null && x.Equals(y);
+    public static bool operator !=(ParameterList x, IParameterList y) => !(x == y);
+    public override int GetHashCode()
+    {
+        var code = 0;
+        code = HashCode.Combine(code, Engine);
+        for (int i = 0; i < Count; i++) code = HashCode.Combine(code, this[i]);
+
+        return code;
+    }
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
     public IEngine Engine => Items.Engine;
 
     /// <inheritdoc/>

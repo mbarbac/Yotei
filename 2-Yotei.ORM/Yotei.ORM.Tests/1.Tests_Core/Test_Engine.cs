@@ -26,14 +26,15 @@ public static class Test_Engine
     {
         var source = new FakeEngine();
         var target = new FakeEngine();
-        Assert.True(EngineComparer.Instance.Equals(source, target));
+        Assert.True(source.Equals(target));
+        Assert.True(target.Equals(source));
 
         target = source.WithCaseSensitiveNames(false);
         target = target.WithNullValueLiteral("null");
-        Assert.True(EngineComparer.Instance.Equals(source, target));
+        Assert.True(source.Equals( target));
 
         target = source.WithCaseSensitiveNames(true);
-        Assert.False(EngineComparer.Instance.Equals(source, target));
+        Assert.False(source.Equals(target));
     }
 
     //[Enforced]
