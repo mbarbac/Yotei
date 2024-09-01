@@ -1,11 +1,6 @@
 ﻿namespace Yotei.Tools;
 
 // ========================================================
-/// <summary>
-/// ParseNames dynamic lambda expressions returning a string with the dot-separated parts of the
-/// name that expression resolves into. Parts whose value is the same as the dynamic argument
-/// are parsed as null literals.
-/// </summary>
 public partial class LambdaParser
 {
     /// <summary>
