@@ -7,7 +7,9 @@ namespace Yotei.Tools;
 // ========================================================
 /// <summary>
 /// Represents the ability of parsing dynamic lambda expressions, defined as lambda expressions
-/// having dynamic arguments.
+/// having dynamic arguments, returning the chain of dynamic operations bounded to them.
+/// <br/> In addition, provides especialed methods to get the dot-separated name an expression
+/// resolves into, if possible.
 /// </summary>
 public partial class LambdaParser
 {
