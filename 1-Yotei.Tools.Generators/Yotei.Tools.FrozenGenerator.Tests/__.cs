@@ -10,3 +10,5 @@ namespace Yotei.Tools.FrozenGenerator.Tests;
 //    {
 //    }
 //}
+
+public interface IFake { }
