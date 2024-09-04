@@ -140,11 +140,6 @@ public partial interface ICoreList<T>
     void Reverse();
 
     /// <summary>
-    /// Sorts the elements of this collection using the comparison funtion of this instance.
-    /// </summary>
-    void Sort();
-
-    /// <summary>
     /// Sorts the elements of this collection using the given comparer.
     /// </summary>
     /// <param name="comparer"></param>

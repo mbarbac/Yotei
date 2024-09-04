@@ -189,21 +189,6 @@ public partial class CoreList<T> : ICoreList<T>
     public void Reverse() => Items.Reverse();
 
     /// <inheritdoc/>
-    public void Sort() => Sort(new KeysComparer(this));
-    struct KeysComparer(CoreList<T> Master) : IComparer<T>
-    {
-        public readonly int Compare(T? x, T? y)
-        {
-            if (x is null && y is null) return 0;
-            if (x is not null) return -1;
-            if (y is not null) return +1;
-
-            if (ReferenceEquals(x, y)) return 0;
-            return Master.CompareItems(x!, y!) ? 0 : -1;
-        }
-    }
-
-    /// <inheritdoc/>
     public void Sort(IComparer<T> comparer) => Items.Sort(comparer);
 
     /// <inheritdoc/>
@@ -236,15 +221,9 @@ public partial class CoreList<T> : ICoreList<T>
     }
     bool Same(T source, T item)
     {
-        if (!typeof(T).IsValueType)
-        {
-            if (source is null && item is null) return true;
-            if (source is not null) return false;
-            if (item is not null) return false;
-
-            if (ReferenceEquals(source, item)) return true;
-        }
-        return CompareItems(source, item);
+        return typeof(T).IsValueType
+            ? CompareItems(source, item)
+            : ReferenceEquals(source, item);
     }
 
     /// <inheritdoc/>

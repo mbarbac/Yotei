@@ -210,22 +210,32 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     public void Reverse() => Items.Reverse();
 
     /// <inheritdoc/>
-    public void Sort() => Sort(new KeysComparer(this));
-    struct KeysComparer(CoreList<K, T> Master) : IComparer<T>
+    public void Sort(IComparer<K> comparer)
     {
-        public readonly int Compare(T? x, T? y)
+        var icomparer = new ItemsComparer(this, comparer);
+        Items.Sort(icomparer);
+    }
+    readonly struct ItemsComparer : IComparer<T>
+    {
+        public ItemsComparer(ICoreList<K, T> master, IComparer<K> comparer)
+        {
+            Master = master.ThrowWhenNull();
+            Comparer = comparer.ThrowWhenNull();
+        }
+        readonly ICoreList<K, T> Master;
+        readonly IComparer<K> Comparer;
+
+        public int Compare(T? x, T? y)
         {
             if (x is null && y is null) return 0;
-            if (x is not null) return -1;
-            if (y is not null) return +1;
+            if (x is null) return +1;
+            if (y is null) return -1;
 
-            if (ReferenceEquals(x, y)) return 0;
-            return Master.CompareKeys(Master.GetKey(x!), Master.GetKey(y!)) ? 0 : -1;
+            var xkey = Master.GetKey(x);
+            var ykey = Master.GetKey(y);
+            return Comparer.Compare(xkey, ykey);
         }
     }
-
-    /// <inheritdoc/>
-    public void Sort(IComparer<T> comparer) => Items.Sort(comparer);
 
     /// <inheritdoc/>
     public int Capacity
@@ -257,15 +267,9 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     }
     bool Same(T source, T item)
     {
-        if (!typeof(T).IsValueType)
-        {
-            if (source is null && item is null) return true;
-            if (source is not null) return false;
-            if (item is not null) return false;
-
-            if (ReferenceEquals(source, item)) return true;
-        }
-        return CompareKeys(GetKey(source), GetKey(item));
+        return typeof(T).IsValueType
+            ? CompareKeys(GetKey(source), GetKey(item))
+            : ReferenceEquals(source, item);
     }
 
     /// <inheritdoc/>

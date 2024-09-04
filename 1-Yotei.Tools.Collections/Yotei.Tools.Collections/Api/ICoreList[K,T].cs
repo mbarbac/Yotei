@@ -156,15 +156,10 @@ public partial interface ICoreList<K, T>
     void Reverse();
 
     /// <summary>
-    /// Sorts the elements of this collection using the comparison funtion of this instance.
-    /// </summary>
-    void Sort();
-
-    /// <summary>
-    /// Sorts the elements of this collection using the given comparer.
+    /// Sorts the elements of this collection, by their respective keys, using the given comparer.
     /// </summary>
     /// <param name="comparer"></param>
-    void Sort(IComparer<T> comparer);
+    void Sort(IComparer<K> comparer);
 
     /// <summary>
     /// Gets or sets the total number of elements the internal data structures can hold without
