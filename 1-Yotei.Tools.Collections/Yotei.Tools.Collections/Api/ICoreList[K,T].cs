@@ -2,8 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// Represents a list-alike collecion of elements identified by their respective keys, with
-/// customizable behavior.
+/// Represents a list-alike collecion of elements identified by their respective keys.
 /// </summary>
 /// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>
@@ -11,66 +10,6 @@
 public partial interface ICoreList<K, T>
     : IList<T>, IList, ICollection<T>, ICollection, IReadOnlyList<T>, IReadOnlyCollection<T>
 {
-    /// <summary>
-    /// Invoked to validate the given item before using it in this collection.
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    T ValidateItem(T item);
-
-    /// <summary>
-    /// Invoked to obtain the key associated with the given element.
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    K GetKey(T item);
-
-    /// <summary>
-    /// Invoked to validate the given key before using it in this collection.
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    K ValidateKey(K key);
-
-    /// <summary>
-    /// Invoke to determine if the two given keys shall be considered the same, or not.
-    /// </summary>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
-    /// <returns></returns>
-    bool CompareKeys(K x, K y);
-
-    /// <summary>
-    /// Invoked to obtain the indexes of the existing elements whose keys shall be considered
-    /// duplicates of the given one.
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    List<int> GetDuplicates(K key);
-
-    /// <summary>
-    /// Invoked to determine if the given element (item) can be added or inserted into this
-    /// collection, even if its key has been considered a duplicate of the key of the given
-    /// existing element. This method returns:
-    /// <br/>- <c>true</c> if the item can be added or inserted.
-    /// <br/>- <c>false</c> if the add or insert operation shall be ignored.
-    /// <br/>- Or throws an appropriate exception if duplicated keys are not allowed.
-    /// </summary>
-    /// <param name="item"></param>
-    /// <param name="source"></param>
-    /// <returns></returns>
-    bool CanInclude(T item, T source);
-
-    /// <summary>
-    /// Invoked to determine if, when a given element is itself a collection of elements of the
-    /// type this instance is built for, that element shall be expanded before using it in this
-    /// collection, and then its own ones used instead, or not.
-    /// </summary>
-    /// <returns></returns>
-    bool ExpandItems();
-
-    // ----------------------------------------------------
-
     /// <summary>
     /// Gets the current number of elements in this collection.
     /// </summary>

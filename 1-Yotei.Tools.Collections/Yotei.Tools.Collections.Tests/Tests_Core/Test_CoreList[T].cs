@@ -1,10 +1,13 @@
+using System.Xml;
+
 namespace Yotei.Tools.Tests;
 
 // ========================================================
 //[Enforced]
-public static partial class Test_CoreList_KT
+public static partial class Test_CoreList_T
 {
     interface IElement { }
+
 
     // ----------------------------------------------------
 
@@ -22,7 +25,7 @@ public static partial class Test_CoreList_KT
     // ----------------------------------------------------
 
     [Cloneable]
-    partial class Chain : CoreList<string, IElement>, IElement
+    partial class Chain : CoreList<IElement>, IElement
     {
         public Chain(bool sensitive) : base() => Sensitive = sensitive;
         public Chain(bool sensitive, int capacity) : this(sensitive) => Capacity = capacity;
@@ -30,12 +33,16 @@ public static partial class Test_CoreList_KT
         protected Chain(Chain items) : this(items.Sensitive) => AddRange(items);
 
         public bool Sensitive { get; }
-        public override IElement ValidateItem(IElement item) => item.ThrowWhenNull();
-        public override string GetKey(IElement item) => item is Element named
-            ? named.Name
-            : throw new ArgumentException("Element is not a named instance.").WithData(item);
-        public override string ValidateKey(string key) => key.NotNullNotEmpty();
-        public override bool CompareKeys(string x, string y) => string.Compare(x, y, !Sensitive) == 0;
+        public override IElement ValidateItem(IElement item)
+        {
+            item.ThrowWhenNull();
+            if (item is Element named) named.Name.NotNullNotEmpty();
+            return item;
+        }
+        public override bool CompareItems(IElement x, IElement y)
+            => x is Element xnamed && y is Element ynamed
+            ? string.Compare(xnamed.Name, ynamed.Name, !Sensitive) == 0
+            : ReferenceEquals(x, y);
         public override bool CanInclude(IElement item, IElement items) => ReferenceEquals(item, items)
             ? true
             : throw new DuplicateException("Duplicated element.").WithData(item);
@@ -125,27 +132,27 @@ public static partial class Test_CoreList_KT
         Assert.Same(xthree, target[2]);
         Assert.Same(xone, target[3]);
     }
-
+    
     //[Enforced]
     [Fact]
     public static void Test_Find()
     {
         var items = new Chain(false, [xone, xtwo, xthree, xone]);
 
-        Assert.Equal(-1, items.IndexOf("xfive"));
+        Assert.Equal(-1, items.IndexOf(xfive));
 
-        Assert.Equal(0, items.IndexOf("one"));
-        Assert.Equal(0, items.IndexOf("ONE"));
+        Assert.Equal(0, items.IndexOf(xone));
+        Assert.Equal(0, items.IndexOf(new Element("ONE")));
 
-        Assert.Equal(3, items.LastIndexOf("one"));
-        Assert.Equal(3, items.LastIndexOf("ONE"));
+        Assert.Equal(3, items.LastIndexOf(xone));
+        Assert.Equal(3, items.LastIndexOf(new Element("ONE")));
 
-        var list = items.IndexesOf("one");
+        var list = items.IndexesOf(xone);
         Assert.Equal(2, list.Count);
         Assert.Equal(0, list[0]);
         Assert.Equal(3, list[1]);
 
-        list = items.IndexesOf("ONE");
+        list = items.IndexesOf(new Element("ONE"));
         Assert.Equal(2, list.Count);
         Assert.Equal(0, list[0]);
         Assert.Equal(3, list[1]);
@@ -186,12 +193,45 @@ public static partial class Test_CoreList_KT
     public static void Test_Sort()
     {
         var items = new Chain(false, [xone, xtwo, xthree, xfour]);
-        items.Sort(StringComparer.Ordinal);
+        items.Sort(new MyComparer());
 
         Assert.Same(xfour, items[0]);
         Assert.Same(xone, items[1]);
         Assert.Same(xthree, items[2]);
         Assert.Same(xtwo, items[3]);
+    }
+    struct MyComparer : IComparer<IElement>
+    {
+        public int Compare(IElement? x, IElement? y)
+        {
+            if (x is null && y is null) return 0;
+            if (x is null) return -1;
+            if (y is null) return +1;
+
+            if (x is Chain xchain && y is Chain ychain)
+            {
+                if (xchain.Count != ychain.Count) return xchain.Count > ychain.Count ? -1 : +1;
+                for (int i = 0; i < xchain.Count; i++)
+                {
+                    var xitem = xchain[i];
+                    var yitem = ychain[i];
+                    var r = Compare(xitem, yitem);
+                    if (r != 0) return r;
+                }
+                return 0;
+            }
+            if (x is Chain) return -1;
+            if (y is Chain) return +1;
+
+            if (x is Element xnamed && y is Element ynamed)
+            {
+                return string.Compare(xnamed.Name, ynamed.Name);
+            }
+            if (x is Element) return -1;
+            if (y is Element) return +1;
+
+            throw new NotSupportedException("Unknown element.");
+        }
     }
 
     //[Enforced]
@@ -542,11 +582,11 @@ public static partial class Test_CoreList_KT
     public static void Test_Remove_Item()
     {
         var items = new Chain(false, [xone, xtwo, xthree, xone]);
-        var num = items.Remove("four");
+        var num = items.Remove(xfour);
         Assert.Equal(0, num);
         Assert.Equal(4, items.Count);
 
-        num = items.Remove("one");
+        num = items.Remove(xone);
         Assert.Equal(1, num);
         Assert.Equal(3, items.Count);
         Assert.Same(xtwo, items[0]);
@@ -554,7 +594,7 @@ public static partial class Test_CoreList_KT
         Assert.Same(xone, items[2]);
 
         items = new Chain(false, [xone, xtwo, xthree, xone]);
-        num = items.Remove("ONE");
+        num = items.Remove(new Element("ONE"));
         Assert.Equal(1, num);
         Assert.Equal(3, items.Count);
         Assert.Same(xtwo, items[0]);
@@ -562,7 +602,7 @@ public static partial class Test_CoreList_KT
         Assert.Same(xone, items[2]);
 
         items = new Chain(false, [xone, xtwo, xthree, xone]);
-        num = items.RemoveLast("one");
+        num = items.RemoveLast(xone);
         Assert.Equal(1, num);
         Assert.Equal(3, items.Count);
         Assert.Same(xone, items[0]);
@@ -570,7 +610,7 @@ public static partial class Test_CoreList_KT
         Assert.Same(xthree, items[2]);
 
         items = new Chain(false, [xone, xtwo, xthree, xone]);
-        num = items.RemoveLast("ONE");
+        num = items.RemoveLast(new Element("ONE"));
         Assert.Equal(1, num);
         Assert.Equal(3, items.Count);
         Assert.Same(xone, items[0]);
@@ -578,14 +618,14 @@ public static partial class Test_CoreList_KT
         Assert.Same(xthree, items[2]);
 
         items = new Chain(false, [xone, xtwo, xthree, xone]);
-        num = items.RemoveAll("one");
+        num = items.RemoveAll(xone);
         Assert.Equal(2, num);
         Assert.Equal(2, items.Count);
         Assert.Same(xtwo, items[0]);
         Assert.Same(xthree, items[1]);
 
         items = new Chain(false, [xone, xtwo, xthree, xone]);
-        num = items.RemoveAll("ONE");
+        num = items.RemoveAll(new Element("ONE"));
         Assert.Equal(2, num);
         Assert.Equal(2, items.Count);
         Assert.Same(xtwo, items[0]);

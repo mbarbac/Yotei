@@ -58,7 +58,7 @@ public partial class CoreList<T> : ICoreList<T>
     // ----------------------------------------------------
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Invoked to validate the given item before using it in this collection.
     /// <br/> The default implementation of this method just returns the given element.
     /// </summary>
     /// <param name="item"></param>
@@ -66,7 +66,7 @@ public partial class CoreList<T> : ICoreList<T>
     public virtual T ValidateItem(T item) => item;
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Invoked to determine if the two given elements shall be considered the same, or not.
     /// <br/> The default implementation of this method just uses the default comparer for the
     /// type of the elements.
     /// </summary>
@@ -76,7 +76,8 @@ public partial class CoreList<T> : ICoreList<T>
     public virtual bool CompareItems(T x, T y) => EqualityComparer<T>.Default.Equals(x, y);
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Invoked to obtain the indexes of the existing elements that shall be considered duplicates
+    /// of the given one.
     /// <br/> The default implementation of this method just uses the <see cref="IndexesOf(T)"/>
     /// method.
     /// </summary>
@@ -85,7 +86,12 @@ public partial class CoreList<T> : ICoreList<T>
     public virtual List<int> GetDuplicates(T item) => IndexesOf(item);
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Invoked to determine if the given element (item) can be added or inserted into this
+    /// collection, even if its key has been considered a duplicate of the key of the given
+    /// existing element. This method returns:
+    /// <br/>- <c>true</c> if the item can be added or inserted.
+    /// <br/>- <c>false</c> if the add or insert operation shall be ignored.
+    /// <br/>- Or throws an appropriate exception if duplicated keys are not allowed.
     /// <br/> The default implementation of this method just returns <c>true</c>.
     /// </summary>
     /// <param name="item"></param>
@@ -94,7 +100,9 @@ public partial class CoreList<T> : ICoreList<T>
     public virtual bool CanInclude(T item, T source) => true;
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Invoked to determine if, when a given element is itself a collection of elements of the
+    /// type this instance is built for, that element shall be expanded before using it in this
+    /// collection, and then its own ones used instead, or not.
     /// <br/> The default implementation of this method just returns <c>true</c>.
     /// </summary>
     /// <returns></returns>

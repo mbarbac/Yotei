@@ -1,6 +1,4 @@
-﻿using System.Xml.Linq;
-
-namespace Yotei.Tools;
+﻿namespace Yotei.Tools;
 
 // ========================================================
 /// <inheritdoc cref="ICoreList{K, T}"/>
@@ -60,7 +58,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     // ----------------------------------------------------
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Invoked to validate the given item before using it in this collection.
     /// <br/> The default implementation of this method just returns the given element.
     /// </summary>
     /// <param name="item"></param>
@@ -68,7 +66,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     public virtual T ValidateItem(T item) => item;
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Invoked to obtain the key associated with the given element.
     /// <br/> The default implementation of this method thrown an exception. Derived classes must
     /// override it.
     /// </summary>
@@ -77,7 +75,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     public virtual K GetKey(T item) => throw new NotImplementedException("Please override this method.");
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Invoked to validate the given key before using it in this collection.
     /// <br/> The default implementation of this method just returns the given key.
     /// </summary>
     /// <param name="key"></param>
@@ -85,7 +83,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     public virtual K ValidateKey(K key) => key;
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Invoke to determine if the two given keys shall be considered the same, or not.
     /// <br/> The default implementation of this method just uses the default comparer for the
     /// type of the keys.
     /// </summary>
@@ -95,7 +93,8 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     public virtual bool CompareKeys(K x, K y) => EqualityComparer<K>.Default.Equals(x, y);
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Invoked to obtain the indexes of the existing elements whose keys shall be considered
+    /// duplicates of the given one.
     /// <br/> The default implementation of this method just the <see cref="IndexesOf(K)"/>
     /// method.
     /// </summary>
@@ -104,7 +103,12 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     public virtual List<int> GetDuplicates(K key) => IndexesOf(key);
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Invoked to determine if the given element (item) can be added or inserted into this
+    /// collection, even if its key has been considered a duplicate of the key of the given
+    /// existing element. This method returns:
+    /// <br/>- <c>true</c> if the item can be added or inserted.
+    /// <br/>- <c>false</c> if the add or insert operation shall be ignored.
+    /// <br/>- Or throws an appropriate exception if duplicated keys are not allowed.
     /// <br/> The default implementation of this method just returns <c>true</c>.
     /// </summary>
     /// <param name="item"></param>
@@ -113,7 +117,9 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     public virtual bool CanInclude(T item, T source) => true;
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Invoked to determine if, when a given element is itself a collection of elements of the
+    /// type this instance is built for, that element shall be expanded before using it in this
+    /// collection, and then its own ones used instead, or not.
     /// <br/> The default implementation of this method just returns <c>true</c>.
     /// </summary>
     /// <returns></returns>
@@ -217,12 +223,12 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     }
     readonly struct ItemsComparer : IComparer<T>
     {
-        public ItemsComparer(ICoreList<K, T> master, IComparer<K> comparer)
+        public ItemsComparer(CoreList<K, T> master, IComparer<K> comparer)
         {
             Master = master.ThrowWhenNull();
             Comparer = comparer.ThrowWhenNull();
         }
-        readonly ICoreList<K, T> Master;
+        readonly CoreList<K, T> Master;
         readonly IComparer<K> Comparer;
 
         public int Compare(T? x, T? y)
