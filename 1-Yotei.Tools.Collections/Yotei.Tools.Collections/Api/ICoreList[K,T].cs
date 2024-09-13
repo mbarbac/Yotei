@@ -53,6 +53,13 @@ public partial interface ICoreList<K, T>
     List<int> IndexesOf(K key);
 
     /// <summary>
+    /// Determines if this collection contains an element that matches the given predicate.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    bool Contains(Predicate<T> predicate);
+
+    /// <summary>
     /// Gets the index of the first element in this collection that matches the given predicate,
     /// or -1 if any is found.
     /// </summary>
@@ -205,7 +212,7 @@ public partial interface ICoreList<K, T>
     int Remove(Predicate<T> predicate);
 
     /// <summary>
-    /// Removes from this collection the first element that matches the given predicate.
+    /// Removes from this collection the last element that matches the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns>The number of changes made.</returns>

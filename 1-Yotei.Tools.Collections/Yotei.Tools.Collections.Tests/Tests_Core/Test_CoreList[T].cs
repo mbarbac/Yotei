@@ -27,10 +27,10 @@ public static partial class Test_CoreList_T
     [Cloneable]
     partial class Chain : CoreList<IElement>, IElement
     {
-        public Chain(bool sensitive) : base() => Sensitive = sensitive;
+        public Chain(bool sensitive) => Sensitive = sensitive;
         public Chain(bool sensitive, int capacity) : this(sensitive) => Capacity = capacity;
         public Chain(bool sensitive, IEnumerable<IElement> range) : this(sensitive) => AddRange(range);
-        protected Chain(Chain items) : this(items.Sensitive) => AddRange(items);
+        protected Chain(Chain source) : this(source.Sensitive) => AddRange(source);
 
         public bool Sensitive { get; }
         public override IElement ValidateItem(IElement item)

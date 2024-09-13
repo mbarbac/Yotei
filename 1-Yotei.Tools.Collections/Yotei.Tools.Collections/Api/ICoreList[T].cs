@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// Represents a list-alike collecion of elements, with customizable behavior.
+/// Represents a list-alike collecion of elements.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 [Cloneable]
@@ -50,6 +50,13 @@ public partial interface ICoreList<T>
     /// <param name="item"></param>
     /// <returns></returns>
     List<int> IndexesOf(T item);
+
+    /// <summary>
+    /// Determines if this collection contains an element that matches the given predicate.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    bool Contains(Predicate<T> predicate);
 
     /// <summary>
     /// Gets the index of the first element in this collection that matches the given predicate,
@@ -204,7 +211,7 @@ public partial interface ICoreList<T>
     int Remove(Predicate<T> predicate);
 
     /// <summary>
-    /// Removes from this collection the first element that matches the given predicate.
+    /// Removes from this collection the last element that matches the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns>The number of changes made.</returns>

@@ -2,6 +2,7 @@
 
 // ========================================================
 /// <inheritdoc cref="ICoreList{T}"/>
+[DebuggerDisplay("{ToDebugString(6)}")]
 [Cloneable]
 public partial class CoreList<T> : ICoreList<T>
 {
@@ -40,10 +41,7 @@ public partial class CoreList<T> : ICoreList<T>
     /// <summary>
     /// Invoked to produce a debug string.
     /// </summary>
-    /// <param name="count"></param>
-    /// <param name="item2debug"></param>
-    /// <returns></returns>
-    protected virtual string ToDebugString(int count, Func<T, string>? item2debug)
+    protected virtual string ToDebugString(int count, Func<T, string>? item2debug = null)
     {
         if (Count == 0) return "0:[]";
         if (count == 0) return $"{Count}:[]";
@@ -59,7 +57,6 @@ public partial class CoreList<T> : ICoreList<T>
 
     /// <summary>
     /// Invoked to validate the given item before using it in this collection.
-    /// <br/> The default implementation of this method just returns the given element.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
@@ -67,8 +64,6 @@ public partial class CoreList<T> : ICoreList<T>
 
     /// <summary>
     /// Invoked to determine if the two given elements shall be considered the same, or not.
-    /// <br/> The default implementation of this method just uses the default comparer for the
-    /// type of the elements.
     /// </summary>
     /// <param name="x"></param>
     /// <param name="y"></param>
@@ -78,8 +73,6 @@ public partial class CoreList<T> : ICoreList<T>
     /// <summary>
     /// Invoked to obtain the indexes of the existing elements that shall be considered duplicates
     /// of the given one.
-    /// <br/> The default implementation of this method just uses the <see cref="IndexesOf(T)"/>
-    /// method.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
@@ -92,7 +85,6 @@ public partial class CoreList<T> : ICoreList<T>
     /// <br/>- <c>true</c> if the item can be added or inserted.
     /// <br/>- <c>false</c> if the add or insert operation shall be ignored.
     /// <br/>- Or throws an appropriate exception if duplicated keys are not allowed.
-    /// <br/> The default implementation of this method just returns <c>true</c>.
     /// </summary>
     /// <param name="item"></param>
     /// <param name="source"></param>
@@ -103,7 +95,6 @@ public partial class CoreList<T> : ICoreList<T>
     /// Invoked to determine if, when a given element is itself a collection of elements of the
     /// type this instance is built for, that element shall be expanded before using it in this
     /// collection, and then its own ones used instead, or not.
-    /// <br/> The default implementation of this method just returns <c>true</c>.
     /// </summary>
     /// <returns></returns>
     public virtual bool ExpandItems() => true;
@@ -156,6 +147,9 @@ public partial class CoreList<T> : ICoreList<T>
         if (validate) item = ValidateItem(item);
         return IndexesOf(x => CompareItems(x, item));
     }
+
+    /// <inheritdoc/>
+    public bool Contains(Predicate<T> predicate) => IndexOf(predicate) >= 0;
 
     /// <inheritdoc/>
     public int IndexOf(Predicate<T> predicate)
@@ -305,6 +299,9 @@ public partial class CoreList<T> : ICoreList<T>
     /// <inheritdoc/>
     public virtual int RemoveRange(int index, int count)
     {
+        if (index < 0 || index >= Count)
+            throw new ArgumentOutOfRangeException("Invalid index.").WithData(index);
+
         Items.RemoveRange(index, count);
         return count;
     }

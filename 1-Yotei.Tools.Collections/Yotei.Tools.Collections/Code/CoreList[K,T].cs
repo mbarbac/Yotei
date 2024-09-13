@@ -2,6 +2,7 @@
 
 // ========================================================
 /// <inheritdoc cref="ICoreList{K, T}"/>
+[DebuggerDisplay("{ToDebugString(6)}")]
 [Cloneable]
 public partial class CoreList<K, T> : ICoreList<K, T>
 {
@@ -40,10 +41,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// <summary>
     /// Invoked to produce a debug string.
     /// </summary>
-    /// <param name="count"></param>
-    /// <param name="item2debug"></param>
-    /// <returns></returns>
-    protected virtual string ToDebugString(int count, Func<T, string>? item2debug)
+    protected virtual string ToDebugString(int count, Func<T, string>? item2debug = null)
     {
         if (Count == 0) return "0:[]";
         if (count == 0) return $"{Count}:[]";
@@ -59,7 +57,6 @@ public partial class CoreList<K, T> : ICoreList<K, T>
 
     /// <summary>
     /// Invoked to validate the given item before using it in this collection.
-    /// <br/> The default implementation of this method just returns the given element.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
@@ -67,16 +64,14 @@ public partial class CoreList<K, T> : ICoreList<K, T>
 
     /// <summary>
     /// Invoked to obtain the key associated with the given element.
-    /// <br/> The default implementation of this method thrown an exception. Derived classes must
-    /// override it.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual K GetKey(T item) => throw new NotImplementedException("Please override this method.");
+    public virtual K GetKey(
+        T item) => throw new NotImplementedException("Please override this method.");
 
     /// <summary>
     /// Invoked to validate the given key before using it in this collection.
-    /// <br/> The default implementation of this method just returns the given key.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
@@ -84,8 +79,6 @@ public partial class CoreList<K, T> : ICoreList<K, T>
 
     /// <summary>
     /// Invoke to determine if the two given keys shall be considered the same, or not.
-    /// <br/> The default implementation of this method just uses the default comparer for the
-    /// type of the keys.
     /// </summary>
     /// <param name="x"></param>
     /// <param name="y"></param>
@@ -95,8 +88,6 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// <summary>
     /// Invoked to obtain the indexes of the existing elements whose keys shall be considered
     /// duplicates of the given one.
-    /// <br/> The default implementation of this method just the <see cref="IndexesOf(K)"/>
-    /// method.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
@@ -109,7 +100,6 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// <br/>- <c>true</c> if the item can be added or inserted.
     /// <br/>- <c>false</c> if the add or insert operation shall be ignored.
     /// <br/>- Or throws an appropriate exception if duplicated keys are not allowed.
-    /// <br/> The default implementation of this method just returns <c>true</c>.
     /// </summary>
     /// <param name="item"></param>
     /// <param name="source"></param>
@@ -120,7 +110,6 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// Invoked to determine if, when a given element is itself a collection of elements of the
     /// type this instance is built for, that element shall be expanded before using it in this
     /// collection, and then its own ones used instead, or not.
-    /// <br/> The default implementation of this method just returns <c>true</c>.
     /// </summary>
     /// <returns></returns>
     public virtual bool ExpandItems() => true;
@@ -175,6 +164,9 @@ public partial class CoreList<K, T> : ICoreList<K, T>
         if (validate) key = ValidateKey(key);
         return IndexesOf(x => CompareKeys(GetKey(x), key));
     }
+
+    /// <inheritdoc/>
+    public bool Contains(Predicate<T> predicate) => IndexOf(predicate) >= 0;
 
     /// <inheritdoc/>
     public int IndexOf(Predicate<T> predicate)
@@ -351,6 +343,9 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// <inheritdoc/>
     public virtual int RemoveRange(int index, int count)
     {
+        if (index < 0 || index >= Count)
+            throw new ArgumentOutOfRangeException("Invalid index.").WithData(index);
+
         Items.RemoveRange(index, count);
         return count;
     }
