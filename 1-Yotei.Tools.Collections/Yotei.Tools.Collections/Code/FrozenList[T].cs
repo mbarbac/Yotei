@@ -194,6 +194,8 @@ public partial class FrozenList<T> : IFrozenList<T>
     /// <inheritdoc/>
     public virtual IFrozenList<T> Remove(T item)
     {
+        if (Count == 0) return this;
+
         var clone = Clone();
         var done = clone.Items.Remove(item);
         return done > 0 ? clone : this;
@@ -202,6 +204,8 @@ public partial class FrozenList<T> : IFrozenList<T>
     /// <inheritdoc/>
     public virtual IFrozenList<T> RemoveLast(T item)
     {
+        if (Count == 0) return this;
+
         var clone = Clone();
         var done = clone.Items.RemoveLast(item);
         return done > 0 ? clone : this;
@@ -210,6 +214,8 @@ public partial class FrozenList<T> : IFrozenList<T>
     /// <inheritdoc/>
     public virtual IFrozenList<T> RemoveAll(T item)
     {
+        if (Count == 0) return this;
+
         var clone = Clone();
         var done = clone.Items.RemoveAll(item);
         return done > 0 ? clone : this;
@@ -218,6 +224,8 @@ public partial class FrozenList<T> : IFrozenList<T>
     /// <inheritdoc/>
     public virtual IFrozenList<T> Remove(Predicate<T> predicate)
     {
+        if (Count == 0) return this;
+
         var clone = Clone();
         var done = clone.Items.Remove(predicate);
         return done > 0 ? clone : this;
@@ -226,6 +234,8 @@ public partial class FrozenList<T> : IFrozenList<T>
     /// <inheritdoc/>
     public virtual IFrozenList<T> RemoveLast(Predicate<T> predicate)
     {
+        if (Count == 0) return this;
+
         var clone = Clone();
         var done = clone.Items.RemoveLast(predicate);
         return done > 0 ? clone : this;
@@ -234,6 +244,8 @@ public partial class FrozenList<T> : IFrozenList<T>
     /// <inheritdoc/>
     public virtual IFrozenList<T> RemoveAll(Predicate<T> predicate)
     {
+        if (Count == 0) return this;
+
         var clone = Clone();
         var done = clone.Items.RemoveAll(predicate);
         return done > 0 ? clone : this;

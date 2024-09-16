@@ -124,7 +124,7 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     /// <inheritdoc/>
     public virtual IFrozenList<K, T> GetRange(int index, int count)
     {
-        if (count == 0 && index >= 0 && index < Count) return this;
+        if (index == 0 && count == Count) return this;
 
         var items = Items.GetRange(index, count);
         var clone = Clone();
@@ -194,6 +194,8 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     /// <inheritdoc/>
     public virtual IFrozenList<K, T> Remove(K key)
     {
+        if (Count == 0) return this;
+
         var clone = Clone();
         var done = clone.Items.Remove(key);
         return done > 0 ? clone : this;
@@ -202,6 +204,8 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     /// <inheritdoc/>
     public virtual IFrozenList<K, T> RemoveLast(K key)
     {
+        if (Count == 0) return this;
+
         var clone = Clone();
         var done = clone.Items.RemoveLast(key);
         return done > 0 ? clone : this;
@@ -210,6 +214,8 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     /// <inheritdoc/>
     public virtual IFrozenList<K, T> RemoveAll(K key)
     {
+        if (Count == 0) return this;
+
         var clone = Clone();
         var done = clone.Items.RemoveAll(key);
         return done > 0 ? clone : this;
@@ -218,6 +224,8 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     /// <inheritdoc/>
     public virtual IFrozenList<K, T> Remove(Predicate<T> predicate)
     {
+        if (Count == 0) return this;
+
         var clone = Clone();
         var done = clone.Items.Remove(predicate);
         return done > 0 ? clone : this;
@@ -226,6 +234,8 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     /// <inheritdoc/>
     public virtual IFrozenList<K, T> RemoveLast(Predicate<T> predicate)
     {
+        if (Count == 0) return this;
+
         var clone = Clone();
         var done = clone.Items.RemoveLast(predicate);
         return done > 0 ? clone : this;
@@ -234,6 +244,8 @@ public partial class FrozenList<K, T> : IFrozenList<K, T>
     /// <inheritdoc/>
     public virtual IFrozenList<K, T> RemoveAll(Predicate<T> predicate)
     {
+        if (Count == 0) return this;
+
         var clone = Clone();
         var done = clone.Items.RemoveAll(predicate);
         return done > 0 ? clone : this;

@@ -1,8 +1,10 @@
-﻿namespace Yotei.Tools.Tests;
+﻿using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+
+namespace Yotei.Tools.Tests;
 
 // ========================================================
 //[Enforced]
-public static partial class Test_FrozenList_KT
+public static partial class Test_FrozenList_T
 {
     public interface IElement { }
 
@@ -22,7 +24,7 @@ public static partial class Test_FrozenList_KT
     // ----------------------------------------------------
 
     [Cloneable]
-    public partial class Builder : CoreList<string, IElement>
+    public partial class Builder : CoreList<IElement>
     {
         public Builder(bool sensitive) => Sensitive = sensitive;
         public Builder(bool sensitive, int capacity) : this(sensitive) => Capacity = capacity;
@@ -30,12 +32,16 @@ public static partial class Test_FrozenList_KT
         protected Builder(Builder source) : this(source.Sensitive) => AddRange(source);
 
         public bool Sensitive { get; }
-        public override IElement ValidateItem(IElement item) => item.ThrowWhenNull();
-        public override string GetKey(IElement item) => item is Element named
-            ? named.Name
-            : throw new ArgumentException("Element is not a named instance.").WithData(item);
-        public override string ValidateKey(string key) => key.NotNullNotEmpty();
-        public override bool CompareKeys(string x, string y) => string.Compare(x, y, !Sensitive) == 0;
+        public override IElement ValidateItem(IElement item)
+        {
+            item.ThrowWhenNull();
+            if (item is Element named) named.Name.NotNullNotEmpty();
+            return item;
+        }
+        public override bool CompareItems(IElement x, IElement y)
+            => x is Element xnamed && y is Element ynamed
+            ? string.Compare(xnamed.Name, ynamed.Name, !Sensitive) == 0
+            : ReferenceEquals(x, y);
         public override bool CanInclude(IElement item, IElement source)
             => ReferenceEquals(item, source)
             ? true
@@ -45,7 +51,7 @@ public static partial class Test_FrozenList_KT
     // ----------------------------------------------------
 
     [Cloneable]
-    public partial class Chain : FrozenList<string, IElement>, IElement
+    public partial class Chain : FrozenList<IElement>, IElement
     {
         protected override Builder Items => _Items ??= new Builder(Sensitive);
         Builder? _Items = null;
@@ -149,20 +155,20 @@ public static partial class Test_FrozenList_KT
     {
         var items = new Chain(false, [xone, xtwo, xthree, xone]);
 
-        Assert.Equal(-1, items.IndexOf("xfive"));
+        Assert.Equal(-1, items.IndexOf(xfive));
 
-        Assert.Equal(0, items.IndexOf("one"));
-        Assert.Equal(0, items.IndexOf("ONE"));
+        Assert.Equal(0, items.IndexOf(xone));
+        Assert.Equal(0, items.IndexOf(new Element("ONE")));
 
-        Assert.Equal(3, items.LastIndexOf("one"));
-        Assert.Equal(3, items.LastIndexOf("ONE"));
+        Assert.Equal(3, items.LastIndexOf(xone));
+        Assert.Equal(3, items.LastIndexOf(new Element("ONE")));
 
-        var list = items.IndexesOf("one");
+        var list = items.IndexesOf(xone);
         Assert.Equal(2, list.Count);
         Assert.Equal(0, list[0]);
         Assert.Equal(3, list[1]);
 
-        list = items.IndexesOf("ONE");
+        list = items.IndexesOf(new Element("ONE"));
         Assert.Equal(2, list.Count);
         Assert.Equal(0, list[0]);
         Assert.Equal(3, list[1]);
@@ -206,13 +212,47 @@ public static partial class Test_FrozenList_KT
     public static void Test_Sort()
     {
         var source = new Chain(false, [xone, xtwo, xthree, xfour]);
-        var target = source.Sort(StringComparer.Ordinal);
+        var target = source.Sort(new MyComparer());
 
         Assert.NotSame(source, target);
         Assert.Same(xfour, target[0]);
         Assert.Same(xone, target[1]);
         Assert.Same(xthree, target[2]);
         Assert.Same(xtwo, target[3]);
+    }
+
+    struct MyComparer : IComparer<IElement>
+    {
+        public int Compare(IElement? x, IElement? y)
+        {
+            if (x is null && y is null) return 0;
+            if (x is null) return -1;
+            if (y is null) return +1;
+
+            if (x is Chain xchain && y is Chain ychain)
+            {
+                if (xchain.Count != ychain.Count) return xchain.Count > ychain.Count ? -1 : +1;
+                for (int i = 0; i < xchain.Count; i++)
+                {
+                    var xitem = xchain[i];
+                    var yitem = ychain[i];
+                    var r = Compare(xitem, yitem);
+                    if (r != 0) return r;
+                }
+                return 0;
+            }
+            if (x is Chain) return -1;
+            if (y is Chain) return +1;
+
+            if (x is Element xnamed && y is Element ynamed)
+            {
+                return string.Compare(xnamed.Name, ynamed.Name);
+            }
+            if (x is Element) return -1;
+            if (y is Element) return +1;
+
+            throw new NotSupportedException("Unknown element.");
+        }
     }
 
     //[Enforced]
@@ -559,44 +599,44 @@ public static partial class Test_FrozenList_KT
     public static void Test_Remove_Item()
     {
         var source = new Chain(false, [xone, xtwo, xthree, xone]);
-        var target = source.Remove("four");
+        var target = source.Remove(xfour);
         Assert.Same(source, target);
 
-        target = source.Remove("one");
+        target = source.Remove(xone);
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.Same(xtwo, target[0]);
         Assert.Same(xthree, target[1]);
         Assert.Same(xone, target[2]);
 
-        target = source.Remove("ONE");
+        target = source.Remove(new Element("ONE"));
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.Same(xtwo, target[0]);
         Assert.Same(xthree, target[1]);
         Assert.Same(xone, target[2]);
 
-        target = source.RemoveLast("one");
+        target = source.RemoveLast(xone);
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
         Assert.Same(xthree, target[2]);
 
-        target = source.RemoveLast("ONE");
+        target = source.RemoveLast(new Element("ONE"));
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
         Assert.Same(xthree, target[2]);
 
-        target = source.RemoveAll("one");
+        target = source.RemoveAll(xone);
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
         Assert.Same(xtwo, target[0]);
         Assert.Same(xthree, target[1]);
 
-        target = source.RemoveAll("ONE");
+        target = source.RemoveAll(new Element("ONE"));
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
         Assert.Same(xtwo, target[0]);
