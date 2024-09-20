@@ -6,6 +6,7 @@
 /// </summary>
 /// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>
+// Note: Changes must be kept in sync with the 'FrozenGenerator' package.
 [Cloneable]
 public partial interface IFrozenList<K, T> : IReadOnlyList<T>
 {

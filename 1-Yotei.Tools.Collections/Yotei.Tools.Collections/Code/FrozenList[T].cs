@@ -2,6 +2,7 @@
 
 // ========================================================
 /// <inheritdoc cref="IFrozenList{T}"/>
+// Note: Changes must be kept in sync with the 'FrozenGenerator' package.
 [DebuggerDisplay("{ToDebugString(6)}")]
 [Cloneable]
 public partial class FrozenList<T> : IFrozenList<T>

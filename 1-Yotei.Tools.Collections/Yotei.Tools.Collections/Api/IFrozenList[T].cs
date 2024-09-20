@@ -5,6 +5,7 @@
 /// Represents an immutable list-alike collecion of elements identified by their respective keys.
 /// </summary>
 /// <typeparam name="T"></typeparam>
+// Note: Changes must be kept in sync with the 'FrozenGenerator' package.
 [Cloneable]
 public partial interface IFrozenList<T> : IReadOnlyList<T>
 {
