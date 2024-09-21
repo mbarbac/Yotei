@@ -3,7 +3,7 @@
 // =========================================================
 /// <summary>
 /// Implements the 'IFrozenList{K,T}' on the decorated interface.
-/// The inherited members are upcasted so that their new return type is the decorated interface.
+/// <br/> The inherited members are upcasted so that their new return type is the decorated interface.
 /// </summary>
 /// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>

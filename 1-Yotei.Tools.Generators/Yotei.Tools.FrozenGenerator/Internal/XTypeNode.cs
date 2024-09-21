@@ -16,10 +16,14 @@ internal class XTypeNode : TypeNode
     const string CNameAttr = nameof(FrozenListAttribute);
     const string FrozenNamespace = "Yotei.Tools";
 
-    string BName = null!;
+    readonly string IFrozenListName = INameAttr.RemoveEnd("Attribute");
+    readonly string FrozenListName = CNameAttr.RemoveEnd("Attribute");
+
+    string AttributeClassName = null!;
     string KTypeName = null!;
     string TTypeName = null!;
     string SymbolName = null!;
+    string BaseName = null!;
 
     // -----------------------------------------------------
 
@@ -82,14 +86,14 @@ internal class XTypeNode : TypeNode
         else return context.InvalidAttribute(Symbol);
 
         // Capturing the template to use...
-        BName = attr.AttributeClass.Name;
+        AttributeClassName = attr.AttributeClass.Name;
 
-        if (BName == INameAttr)
+        if (AttributeClassName == INameAttr)
             Template = Arity == 1
                 ? typeof(IFrozenListTemplate<>)
                 : typeof(IFrozenListTemplate<,>);
 
-        if (BName == CNameAttr)
+        if (AttributeClassName == CNameAttr)
             Template = Arity == 1
                 ? typeof(FrozenListTemplate<>)
                 : typeof(FrozenListTemplate<,>);
@@ -123,11 +127,11 @@ internal class XTypeNode : TypeNode
         KTypeName = KType?.EasyName(EasyNameOptions.Full) ?? string.Empty;
         TTypeName = TType?.EasyName(EasyNameOptions.Full) ?? string.Empty;
 
-        var tname = BName.RemoveEnd("Attribute");
+        var atrname = AttributeClassName.RemoveEnd("Attribute");
         var bracket = Arity == 1 ? $"<{TTypeName}>" : $"<{KTypeName}, {TTypeName}>";
-        var name = $"{FrozenNamespace}.{tname}{bracket}";
 
-        var head = base.GetHeader(context) + $" : {name}";
+        BaseName = $"{FrozenNamespace}.{atrname}{bracket}";
+        var head = base.GetHeader(context) + $" : {BaseName}";
         return head;
     }
 
@@ -137,6 +141,8 @@ internal class XTypeNode : TypeNode
     protected override void EmitCore(SourceProductionContext context, CodeBuilder cb)
     {
         SymbolName = Symbol.EasyName();
+        var iface = FindFrozenInterface();
+        var iname = iface?.EasyName(EasyNameOptions.Full) ?? "";
 
         // Emitting 'Clone' if needed...
         if (GetCloneMethod(Symbol) == null)
@@ -146,6 +152,13 @@ internal class XTypeNode : TypeNode
             cb.AppendLine(Symbol.IsInterface()
                 ? $"new {SymbolName} Clone();"
                 : $"public override {SymbolName} Clone() => new {SymbolName}(this);");
+
+            if (!Symbol.IsInterface() && iface != null)
+            {
+                cb.AppendLine();
+                cb.AppendLine($"{iname}");
+                cb.AppendLine($"{iname}.Clone() => Clone();");
+            }
         }
 
         // Using the methods defined by the template...
@@ -154,27 +167,114 @@ internal class XTypeNode : TypeNode
             .OfType<MethodInfo>()
             .Where(x => x.DeclaringType == Template);
 
-        var methodOptions = EasyNameOptions.Default with
+        var ixoptions = EasyNameOptions.Default with // Used for iface method names...
         {
             UseMemberArgumentsTypes = EasyNameOptions.Full,
             UseMemberArgumentsNames = true,
         };
+        var cxoptions = ixoptions with // Used for base method invocations...
+        {
+            UseMemberArgumentsTypes = null
+        };
+        var head = Template.EasyName().Replace("Template", "");
+        if (!head.StartsWith("I")) head = 'I' + head;
 
         foreach (var method in methods)
         {
-            var name = method.EasyName(methodOptions);
-            name = name.Replace("<K,", $"<{KTypeName},");
-            name = name.Replace("T>", $"{TTypeName}>");
+            var name = method.EasyName(ixoptions);
+            name = name.Replace("K ", $"{KTypeName} ");     // K key...
+            name = name.Replace("<K", $"<{KTypeName}");     // IComparer<K> comparer...
+            name = name.Replace("T ", $"{TTypeName} ");     // T item...
+            name = name.Replace("T>", $"{TTypeName}>");     // IEnumerable<T> range...            
 
+            if (Symbol.IsInterface())
+            {
+                var core = method.EasyName(EasyNameOptions.Default);
+                core = $"{head}.{core}";
+                core = core.Replace('<', '{').Replace('>', '}');
+                core = $"/// <inheritdoc cref=\"{core}\"/>";
+
+                cb.AppendLine();
+                cb.AppendLine(core);
+                cb.AppendLine(GeneratedAttribute);
+
+                cb.AppendLine($"new {SymbolName} {name};");
+            }
+
+            else
+            {
+                var core = method.EasyName(EasyNameOptions.Default);
+                var temp = iface?.EasyName() ?? head;
+                core = $"{temp}.{core}";
+                core = core.Replace('<', '{').Replace('>', '}');
+                core = $"/// <inheritdoc cref=\"{core}\"/>";
+                cb.AppendLine();
+                cb.AppendLine(core);
+                cb.AppendLine(GeneratedAttribute);
+
+                var args = method.EasyName(cxoptions);                
+                cb.AppendLine($"public override {SymbolName} {name}");
+                cb.AppendLine($"=> ({SymbolName})base.{args};");
+
+                if (iface != null)
+                {
+                    cb.AppendLine();
+                    cb.AppendLine($"{iname}");
+                    cb.AppendLine($"{iname}.{name}");
+                    cb.AppendLine($"=> {args};");
+                }
+            }
         }
     }
 
     // -----------------------------------------------------
 
-    string GeneratedVersion => Assembly.GetExecutingAssembly().GetName().Version.ToString();
-    string GeneratedAttribute => $$"""
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("{{nameof(FrozenGenerator)}}", "{{GeneratedVersion}}")]
-        """;
+    /// <summary>
+    /// Finds the 'IFrozenList' interface to reimplement.
+    /// </summary>
+    INamedTypeSymbol? FindFrozenInterface()
+    {
+        if (!Symbol.IsInterface()) // This method only makes sense for classes, not interfaces.
+        {
+            INamedTypeSymbol? item = null;
+            foreach (var iface in Symbol.Interfaces)
+            {
+                if (IsFrozen(iface, out var temp)) return iface;
+                if (temp != null && item == null) item = temp;
+            }
+            if (item != null) return item;
+        }
+        return null;
+
+        bool IsFrozen(INamedTypeSymbol iface, out INamedTypeSymbol? type)
+        {
+            // Might be decorated with any 'Frozen' attribute...
+            var ats = iface.GetAttributes();
+            foreach (var at in ats)
+            {
+                if (at.AttributeClass != null && at.AttributeClass.Name.Contains(CNameAttr))
+                {
+                    type = iface;
+                    return true;
+                }
+            }
+
+            // Or might implement 'IFrozenList'...
+            if (iface.Name.StartsWith(IFrozenListName))
+            {
+                type = iface;
+                return true;
+            }
+
+            // Childs...
+            foreach (var child in iface.Interfaces)
+                if (IsFrozen(child, out type)) return true;
+
+            // Not found...
+            type = null;
+            return false;
+        }
+    }
 
     // -----------------------------------------------------
 
@@ -228,4 +328,11 @@ internal class XTypeNode : TypeNode
         core= null;
         return null;
     }
+
+    // -----------------------------------------------------
+
+    string GeneratedVersion => Assembly.GetExecutingAssembly().GetName().Version.ToString();
+    string GeneratedAttribute => $$"""
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("{{nameof(FrozenGenerator)}}", "{{GeneratedVersion}}")]
+        """;
 }
