@@ -6,9 +6,10 @@
 	  <ImplicitUsings>disable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
 	  <Configurations>Debug;Release;Local</Configurations>
-	  <NoWarn>IDE0290;IDE0305</NoWarn>
+	  <NoWarn>IDE0130;IDE0290;IDE0305</NoWarn>
 	  <WarningsAsErrors>CS8785</WarningsAsErrors>
    </PropertyGroup>
+   <!--IDE0130: Namespace doesn't match folder structure-->
    <!--IDE0290: Use primary constructor-->
    <!--IDE0305: Simplify collection initialization-->
 
@@ -36,7 +37,7 @@
    <Import Project="..\Yotei.Tools.Generators\Yotei.Tools.Generators.projitems" Label="Shared" />
 
    <PropertyGroup>
-	  <!--<DefineConstants>$(DefineConstants);DEBUG_FROZEN_GENERATOR</DefineConstants>-->
+	  <DefineConstants>$(DefineConstants);DEBUG_FROZEN_GENERATOR</DefineConstants>
 	  <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
    </PropertyGroup>
 

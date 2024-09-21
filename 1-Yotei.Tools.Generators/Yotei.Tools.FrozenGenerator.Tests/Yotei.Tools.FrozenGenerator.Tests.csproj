@@ -8,9 +8,10 @@
 	  <IsPackable>false</IsPackable>
 	  <IsTestProject>true</IsTestProject>
 	  <Configurations>Debug;Release;Local</Configurations>
-	  <NoWarn>IDE0290;CA1859</NoWarn>
+	  <NoWarn>IDE0130;IDE0290;CA1859</NoWarn>
 	  <WarningsAsErrors>CS8785</WarningsAsErrors>
    </PropertyGroup>
+   <!--IDE0130: Namespace doesn't match folder structure-->
    <!--IDE0290: Use primary constructor-->
    <!--CA1859: Change type for improved performance-->
 

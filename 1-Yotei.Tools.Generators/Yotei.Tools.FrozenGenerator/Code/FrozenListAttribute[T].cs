@@ -1,4 +1,4 @@
-﻿/*namespace Yotei.Tools.FrozenGenerator;
+﻿namespace Yotei.Tools.FrozenGenerator;
 
 // =========================================================
 /// <summary>
@@ -9,4 +9,4 @@
 [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
 public class FrozenListAttribute<T> : Attribute
 {
-}*/
+}

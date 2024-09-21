@@ -1,4 +1,4 @@
-﻿/*namespace Yotei.Tools.FrozenGenerator.Internal;
+﻿namespace Yotei.Tools.FrozenGenerator.Internal;
 
 // =========================================================
 internal abstract class FrozenListTemplate<K, T>
@@ -20,4 +20,4 @@ internal abstract class FrozenListTemplate<K, T>
     public abstract FrozenListTemplate<K, T> RemoveLast(Predicate<T> predicate);
     public abstract FrozenListTemplate<K, T> RemoveAll(Predicate<T> predicate);
     public abstract FrozenListTemplate<K, T> Clear();
-}*/
+}

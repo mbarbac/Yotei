@@ -22,3 +22,4 @@ global using Microsoft.CodeAnalysis.CSharp.Syntax;
 global using Microsoft.CodeAnalysis.Text;
 
 global using Yotei.Tools.Generators.Internal;
+global using Yotei.Tools.FrozenGenerator.Internal;
