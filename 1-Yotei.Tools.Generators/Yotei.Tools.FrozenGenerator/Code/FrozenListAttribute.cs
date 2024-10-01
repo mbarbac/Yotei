@@ -3,7 +3,12 @@
 // =========================================================
 /// <summary>
 /// Uses the 'FrozenList{T}' class as the base one of the decorated class.
-/// 
+/// <br/> The inherited members are upcasted so that their new return type is the decorated class.
+/// <br/> In addition, if the class definition contains an interface this 'FrozenList' inherits,
+/// then that interface is explicitly implemented as well.
+/// <br/>
+/// <br/> This not-generic attribute is used when the key type (if used) and the element one are
+/// generic ones themselves, which is not allowed.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
 public class FrozenListAttribute : Attribute

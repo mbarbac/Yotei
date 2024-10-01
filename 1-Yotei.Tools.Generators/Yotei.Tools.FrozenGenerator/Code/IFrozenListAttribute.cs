@@ -4,6 +4,9 @@
 /// <summary>
 /// Implements the 'IFrozenList{T}' on the decorated interface.
 /// <br/> The inherited members are upcasted so that their new return type is the decorated interface.
+/// <br/>
+/// <br/> This not-generic attribute is used when the key type (if used) and the element one are
+/// generic ones themselves, which is not allowed.
 /// </summary>
 [AttributeUsage(AttributeTargets.Interface, Inherited = false, AllowMultiple = false)]
 public class IFrozenListAttribute : Attribute

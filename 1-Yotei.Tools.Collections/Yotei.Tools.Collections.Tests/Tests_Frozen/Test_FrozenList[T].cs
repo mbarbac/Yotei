@@ -285,6 +285,8 @@ public static partial class Test_FrozenList_T
         catch (ArgumentException) { }
     }
 
+    // ----------------------------------------------------
+
     //[Enforced]
     [Fact]
     public static void Test_Replace()
