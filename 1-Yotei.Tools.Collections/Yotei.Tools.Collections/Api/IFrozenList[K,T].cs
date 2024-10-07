@@ -161,7 +161,7 @@ public partial interface IFrozenList<K, T> : IReadOnlyList<T>
     IFrozenList<K, T> Insert(int index, T item);
 
     /// <summary>
-    /// Returns a new instance where where the elements from the given rane have been inserted
+    /// Returns a new instance where where the elements from the given range have been inserted
     /// starting at the given index into the original ones.
     /// </summary>
     /// <param name="index"></param>

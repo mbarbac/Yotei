@@ -21,7 +21,10 @@ public static partial class Test_Frozen_KT
     // ----------------------------------------------------
 
     [IFrozenList(typeof(string), typeof(IElement<byte>))]
-    public partial interface IChain<R> : IElement<R> { }
+    public partial interface IChain<R> : IElement<R>
+    {
+        new IChain<R> Remove(string? key);
+    }
 
     // ----------------------------------------------------
 
@@ -60,6 +63,10 @@ public static partial class Test_Frozen_KT
         protected Chain(Chain<R> source) : this(source.Sensitive) => Items.AddRange(source);
 
         public bool Sensitive { get; }
+
+
+        public override Chain<R> Remove(string? key) => (Chain<R>)base.Remove(key!);
+        IChain<R> IChain<R>.Remove(string? key) => Remove(key);
     }
 
     // -----------------------------------------------------

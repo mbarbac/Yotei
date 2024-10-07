@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools.FrozenGenerator;
+﻿using System.Diagnostics.Contracts;
+
+namespace Yotei.Tools.FrozenGenerator;
 
 // =========================================================
 /// <inheritdoc cref="TypeNode"/>
@@ -7,111 +9,115 @@ internal class XTypeNode : TypeNode
     public XTypeNode(INode parent, INamedTypeSymbol symbol) : base(parent, symbol) { }
     public XTypeNode(INode parent, TypeCandidate candidate) : base(parent, candidate) { }
 
+    const string FrozenNamespace = "Yotei.Tools";
+    const string IFrozenListName = "IFrozenList";
+    const string FrozenListName = "FrozenList";
+    const string IFrozenAttributeName = IFrozenListName + "Attribute";
+    const string FrozenAttributeName = FrozenListName + "Attribute";
+
+    AttributeData AttributeData = null!;
+    INamedTypeSymbol AttributeClass = null!;
     int Arity = 0;
     INamedTypeSymbol KType = null!;
     INamedTypeSymbol TType = null!;
-
+    
     Type Template = null!;
-    const string INameAttr = nameof(IFrozenListAttribute);
-    const string CNameAttr = nameof(FrozenListAttribute);
-    const string FrozenNamespace = "Yotei.Tools";
-
-    readonly string IFrozenListName = INameAttr.RemoveEnd("Attribute");
-    readonly string FrozenListName = CNameAttr.RemoveEnd("Attribute");
-
-    string AttributeClassName = null!;
+    IMethodSymbol? CloneMethod = null;
     string KTypeName = null!;
     string TTypeName = null!;
-    string SymbolName = null!;
     string BaseName = null!;
+    string SymbolName = null!;
 
     // -----------------------------------------------------
 
     /// <inheritdoc/>
     public override bool Validate(SourceProductionContext context)
     {
-        AttributeData attr;
-
-        // Capturing the unique attribute...
+        // Capturing the unique allowed attribute...
         if (Candidate != null)
         {
             if (Candidate.Attributes.Length == 0) return context.NoAttributes(Symbol);
             if (Candidate.Attributes.Length > 1) return context.ManyAttributes(Symbol);
-            attr = Candidate.Attributes[0];
+            AttributeData = Candidate.Attributes[0];
         }
         else
         {
-            var attrs = Symbol.GetAttributes(typeof(IFrozenListAttribute<>));
-            attrs.AddRange(Symbol.GetAttributes(typeof(IFrozenListAttribute<,>)));
+            var ats = Symbol.GetAttributes().Where(x =>
+                x.AttributeClass != null &&
+                x.AttributeClass.Name.Contains(FrozenAttributeName))
+                .ToArray();
 
-            if (attrs.Count == 0) return context.NoAttributes(Symbol);
-            if (attrs.Count > 1) return context.ManyAttributes(Symbol);
-            attr = attrs[0];
+            if (ats.Length == 0) return context.NoAttributes(Symbol);
+            if (ats.Length > 1) return context.ManyAttributes(Symbol);
+            AttributeData = ats[0];
         }
 
-        // Capturing arity...
-        if (attr.AttributeClass == null) return context.InvalidAttribute(Symbol);
-        Arity = attr.AttributeClass.Arity;
+        // Capturing attribute class...
+        if ((AttributeClass = AttributeData.AttributeClass!) == null) return context.InvalidAttribute(Symbol);
 
-        // Capturing KType (if any) and TType...
+        // Capturing element's TType and KType (if any), along with the effective arity...
+        Arity = AttributeClass.Arity;
         if (Arity == 0)
         {
-            if (attr.ConstructorArguments.Length == 1)
+            var args = AttributeData.ConstructorArguments;
+
+            if (args.Length == 1)
             {
-                if ((TType = GetType(attr.ConstructorArguments[0])) == null) return context.InvalidAttribute(Symbol);
+                if ((TType = GetType(args[0])) == null) return context.InvalidAttribute(Symbol);
                 Arity = 1;
             }
-            else if (attr.ConstructorArguments.Length == 2)
+            else if (args.Length == 2)
             {
-                if ((KType = GetType(attr.ConstructorArguments[0])) == null) return context.InvalidAttribute(Symbol);
-                if ((TType = GetType(attr.ConstructorArguments[1])) == null) return context.InvalidAttribute(Symbol);
+                if ((KType = GetType(args[0])) == null) return context.InvalidAttribute(Symbol);
+                if ((TType = GetType(args[1])) == null) return context.InvalidAttribute(Symbol);
                 Arity = 2;
             }
             else return context.InvalidAttribute(Symbol);
 
             static INamedTypeSymbol GetType(TypedConstant item)
-                => !item.IsNull && item.Kind == TypedConstantKind.Type
-                ? (INamedTypeSymbol)item.Value!
-                : null!;
+            {
+                return !item.IsNull && item.Kind == TypedConstantKind.Type
+                    ? (INamedTypeSymbol)item.Value!
+                    : null!;
+            }
         }
         else if (Arity == 1)
         {
-            TType = (attr.AttributeClass.TypeArguments[0] as INamedTypeSymbol)!;
+            TType = (AttributeClass.TypeArguments[0] as INamedTypeSymbol)!;
         }
         else if (Arity == 2)
         {
-            KType = (attr.AttributeClass.TypeArguments[0] as INamedTypeSymbol)!;
-            TType = (attr.AttributeClass.TypeArguments[1] as INamedTypeSymbol)!;
+            KType = (AttributeClass.TypeArguments[0] as INamedTypeSymbol)!;
+            TType = (AttributeClass.TypeArguments[1] as INamedTypeSymbol)!;
         }
         else return context.InvalidAttribute(Symbol);
 
         // Capturing the template to use...
-        AttributeClassName = attr.AttributeClass.Name;
+        var name = AttributeClass.Name;
 
-        if (AttributeClassName == INameAttr)
+        if (name == IFrozenAttributeName)
             Template = Arity == 1
                 ? typeof(IFrozenListTemplate<>)
                 : typeof(IFrozenListTemplate<,>);
 
-        if (AttributeClassName == CNameAttr)
+        if (name == FrozenAttributeName)
             Template = Arity == 1
                 ? typeof(FrozenListTemplate<>)
                 : typeof(FrozenListTemplate<,>);
 
         if (Template == null) return context.InvalidAttribute(Symbol);
 
-        // Validating copy constructor, if needed...
-        if (!Symbol.IsInterface())
-        {
-            var method = GetCloneMethod(Symbol);
-            if (method == null)
+        // Validating copy constructor to emit 'Clone', if needed...
+        CloneMethod = GetCloneMethod(Symbol);
+
+        // Validating copy constructor in case we need to emit...
+        if (CloneMethod == null && !Symbol.IsInterface())
+        {            
+            var cons = Symbol.GetCopyConstructor();
+            if (cons == null)
             {
-                var cons = Symbol.GetCopyConstructor();
-                if (cons == null)
-                {
-                    context.ReportDiagnostic(TreeDiagnostics.NoCopyConstructor(Symbol));
-                    return false;
-                }
+                context.ReportDiagnostic(TreeDiagnostics.NoCopyConstructor(Symbol));
+                return false;
             }
         }
 
@@ -127,7 +133,7 @@ internal class XTypeNode : TypeNode
         KTypeName = KType?.EasyName(EasyNameOptions.Full) ?? string.Empty;
         TTypeName = TType?.EasyName(EasyNameOptions.Full) ?? string.Empty;
 
-        var atrname = AttributeClassName.RemoveEnd("Attribute");
+        var atrname = AttributeClass.Name.RemoveEnd("Attribute");
         var bracket = Arity == 1 ? $"<{TTypeName}>" : $"<{KTypeName}, {TTypeName}>";
 
         BaseName = $"{FrozenNamespace}.{atrname}{bracket}";
@@ -141,14 +147,15 @@ internal class XTypeNode : TypeNode
     protected override void EmitCore(SourceProductionContext context, CodeBuilder cb)
     {
         SymbolName = Symbol.EasyName();
-        var iface = FindFrozenInterface();
-        var iname = iface?.EasyName(EasyNameOptions.Full) ?? "";
+        var iface = Symbol.IsInterface() ? null : FindImplementable();
+        var iname = iface?.EasyName(EasyNameOptions.Full);
 
-        // Emitting 'Clone' if needed...
-        if (GetCloneMethod(Symbol) == null)
+        // Emitting 'Clone' method is needed...
+        if (CloneMethod == null)
         {
             cb.AppendLine("/// <inheritdoc cref=\"ICloneable.Clone\"/>");
             cb.AppendLine(GeneratedAttribute);
+
             cb.AppendLine(Symbol.IsInterface()
                 ? $"new {SymbolName} Clone();"
                 : $"public override {SymbolName} Clone() => new {SymbolName}(this);");
@@ -161,35 +168,38 @@ internal class XTypeNode : TypeNode
             }
         }
 
-        // Using the methods defined by the template...
-        var methods = Template
-            .GetMembers()
-            .OfType<MethodInfo>()
-            .Where(x => x.DeclaringType == Template);
-
-        var ixoptions = EasyNameOptions.Default with // Used for iface method names...
+        // Options for iface methods' names...
+        var ixoptions = EasyNameOptions.Default with
         {
             UseMemberArgumentsTypes = EasyNameOptions.Full,
             UseMemberArgumentsNames = true,
         };
-        var cxoptions = ixoptions with // Used for base method invocations...
-        {
-            UseMemberArgumentsTypes = null
-        };
+
+        // Options for base method invocation...
+        var cxoptions = ixoptions with { UseMemberArgumentsTypes = null };
+
+        // Head variable for documenting iface...
         var head = Template.EasyName().Replace("Template", "");
         if (!head.StartsWith("I")) head = 'I' + head;
 
-        foreach (var method in methods)
+        // Used to prevent emitting already defined ones...
+        var methods = Symbol.GetMembers().OfType<IMethodSymbol>().ToArray();
+
+        // Iterating through the captured template methods, declared in the template...
+        var templates = Template.GetMembers().OfType<MethodInfo>().Where(x => x.DeclaringType == Template);
+        foreach (var template in templates)
         {
-            var name = method.EasyName(ixoptions);
+            if (!CanEmit(template, methods)) continue;
+
+            var name = template.EasyName(ixoptions);
             name = name.Replace("K ", $"{KTypeName} ");     // K key...
             name = name.Replace("<K", $"<{KTypeName}");     // IComparer<K> comparer...
             name = name.Replace("T ", $"{TTypeName} ");     // T item...
-            name = name.Replace("T>", $"{TTypeName}>");     // IEnumerable<T> range...            
+            name = name.Replace("T>", $"{TTypeName}>");     // IEnumerable<T> range...
 
             if (Symbol.IsInterface())
             {
-                var core = method.EasyName(EasyNameOptions.Default);
+                var core = template.EasyName(EasyNameOptions.Default);
                 core = $"{head}.{core}";
                 core = core.Replace('<', '{').Replace('>', '}');
                 core = $"/// <inheritdoc cref=\"{core}\"/>";
@@ -203,7 +213,7 @@ internal class XTypeNode : TypeNode
 
             else
             {
-                var core = method.EasyName(EasyNameOptions.Default);
+                var core = template.EasyName(EasyNameOptions.Default);
                 var temp = iface?.EasyName() ?? head;
                 core = $"{temp}.{core}";
                 core = core.Replace('<', '{').Replace('>', '}');
@@ -212,7 +222,7 @@ internal class XTypeNode : TypeNode
                 cb.AppendLine(core);
                 cb.AppendLine(GeneratedAttribute);
 
-                var args = method.EasyName(cxoptions);                
+                var args = template.EasyName(cxoptions);
                 cb.AppendLine($"public override {SymbolName} {name}");
                 cb.AppendLine($"=> ({SymbolName})base.{args};");
 
@@ -227,32 +237,82 @@ internal class XTypeNode : TypeNode
         }
     }
 
+    /// <summary>
+    /// Determines if the given template method can be emitted, based upon the list of declared
+    /// ones.
+    /// </summary>
+    bool CanEmit(MethodInfo template, IMethodSymbol[] declaredmethods)
+    {
+        foreach (var declared in declaredmethods)
+        {
+            var tname = template.Name;
+            var dname = declared.Name;
+            if (tname != dname) continue; // Name differ...
+
+            var tpars = template.GetParameters();
+            var dpars = declared.Parameters;
+            if (tpars.Length != dpars.Length) continue; // Number of parameters not the same...
+
+            var count = tpars.Length;
+            for (int i = 0; i < tpars.Length; i++)
+            {
+                var tpar = tpars[i];
+                var dpar = dpars[i];
+
+                // Template parameter not being a generic one...
+                if (!tpar.ParameterType.IsGenericParameter)
+                {
+                    var ttype = tpar.ParameterType;
+                    var dtype = dpar.Type;
+
+                    if (dtype.Match(ttype)) count--;
+                }
+
+                // Template parameter being a generic one... that corresponds to a declared one that
+                // may not be so. Also, we we know that KType and TType, if not null, are concrete ones
+                // due to C# syntax rules.
+                else
+                {
+                    var match = false;
+                    var dtype = dpar.Type;
+
+                    if (KType != null && SymbolComparer.Default.Equals(dtype, KType)) match = true;
+                    if (TType != null && SymbolComparer.Default.Equals(dtype, TType)) match = true;
+
+                    if (match) count--;
+                }
+            }
+
+            if (count == 0) return false; // All parameters the same...
+        }
+
+        return true;
+    }
+
     // -----------------------------------------------------
 
     /// <summary>
-    /// Finds the 'IFrozenList' interface to reimplement.
+    /// Finds the 'IFrozenList' interface to reimplement. To be invoked for non-interfaces only.
     /// </summary>
-    INamedTypeSymbol? FindFrozenInterface()
+    /// <returns></returns>
+    INamedTypeSymbol? FindImplementable()
     {
-        if (!Symbol.IsInterface()) // This method only makes sense for classes, not interfaces.
+        INamedTypeSymbol? item = null;
+        foreach (var iface in Symbol.Interfaces)
         {
-            INamedTypeSymbol? item = null;
-            foreach (var iface in Symbol.Interfaces)
-            {
-                if (IsFrozen(iface, out var temp)) return iface;
-                if (temp != null && item == null) item = temp;
-            }
-            if (item != null) return item;
+            if (IsFrozenAlike(iface, out var temp)) return iface;
+            if (temp != null && item == null) item = temp;
         }
-        return null;
+        return item;
 
-        bool IsFrozen(INamedTypeSymbol iface, out INamedTypeSymbol? type)
+        // Determines if iface is a frozen-alike one...
+        static bool IsFrozenAlike(INamedTypeSymbol iface, out INamedTypeSymbol? type)
         {
             // Might be decorated with any 'Frozen' attribute...
             var ats = iface.GetAttributes();
             foreach (var at in ats)
             {
-                if (at.AttributeClass != null && at.AttributeClass.Name.Contains(CNameAttr))
+                if (at.AttributeClass != null && at.AttributeClass.Name.Contains(FrozenAttributeName))
                 {
                     type = iface;
                     return true;
@@ -268,7 +328,7 @@ internal class XTypeNode : TypeNode
 
             // Childs...
             foreach (var child in iface.Interfaces)
-                if (IsFrozen(child, out type)) return true;
+                if (IsFrozenAlike(child, out type)) return true;
 
             // Not found...
             type = null;
@@ -325,7 +385,7 @@ internal class XTypeNode : TypeNode
             }
         }
 
-        core= null;
+        core = null;
         return null;
     }
 

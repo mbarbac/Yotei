@@ -35,13 +35,13 @@
 	  <ProjectReference Include="..\..\1-Yotei.Tools.AsyncLock\Yotei.Tools.AsyncLock\Yotei.Tools.AsyncLock.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools.Collections\Yotei.Tools.Collections\Yotei.Tools.Collections.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser.csproj" />
-	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.CloneGenerator\Yotei.Tools.CloneGenerator.csproj" >
+	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.CloneGenerator\Yotei.Tools.CloneGenerator.csproj">
 		 <OutputItemType>Analyzer</OutputItemType>
 	  </ProjectReference>
-	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.FrozenGenerator\Yotei.Tools.FrozenGenerator.csproj" >
+	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.FrozenGenerator\Yotei.Tools.FrozenGenerator.csproj">
 		 <OutputItemType>Analyzer</OutputItemType>
 	  </ProjectReference>
-	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.WithGenerator\Yotei.Tools.WithGenerator.csproj" >
+	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.WithGenerator\Yotei.Tools.WithGenerator.csproj">
 		 <OutputItemType>Analyzer</OutputItemType>
 	  </ProjectReference>
 	  <ProjectReference Include="..\..\2-Yotei.ORM\Yotei.ORM\Yotei.ORM.csproj" />	  
