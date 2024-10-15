@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// Represents an ordered collection of elements.
+/// Represents a list-alike collection of elements.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 [Cloneable]
@@ -94,8 +94,6 @@ public partial interface ICoreList<T>
     /// <returns></returns>
     List<T> ToList();
 
-    // ----------------------------------------------------
-
     /// <summary>
     /// Gets or sets the total number of elements the internal data structures can hold without
     /// resizing.
@@ -106,19 +104,6 @@ public partial interface ICoreList<T>
     /// Trims the internal structures of this collection.
     /// </summary>
     void Trim();
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Reverses the order of the elements in this collection.
-    /// </summary>
-    void Reverse();
-
-    /// <summary>
-    /// Sorts the elements of this collection using the given comparer for its elements.
-    /// </summary>
-    /// <param name="comparer"></param>
-    void Sort(IComparer<T> comparer);
 
     /// <summary>
     /// Returns a list with a shallow copy of the given number of elements, starting from the

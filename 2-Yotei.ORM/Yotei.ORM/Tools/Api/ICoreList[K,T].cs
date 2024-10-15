@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// Represents an ordered collection of elements identified by their respective keys.
+/// Represents a list-alike collection of elements identified by their respective keys.
 /// </summary>
 /// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>
@@ -11,6 +11,9 @@ public partial interface ICoreList<K, T>
     : IList<T>, IList, IReadOnlyList<T>
     , ICollection<T>, ICollection, IReadOnlyCollection<T>
 {
+
+    // ----------------------------------------------------
+
     /// <summary>
     /// Gets the current number of elements in this collection.
     /// </summary>
@@ -95,8 +98,6 @@ public partial interface ICoreList<K, T>
     /// <returns></returns>
     List<T> ToList();
 
-    // ----------------------------------------------------
-
     /// <summary>
     /// Gets or sets the total number of elements the internal data structures can hold without
     /// resizing.
@@ -107,20 +108,6 @@ public partial interface ICoreList<K, T>
     /// Trims the internal structures of this collection.
     /// </summary>
     void Trim();
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Reverses the order of the elements in this collection.
-    /// </summary>
-    void Reverse();
-
-    /// <summary>
-    /// Sorts the elements of this collection using the given comparer for the keys of its
-    /// elements.
-    /// </summary>
-    /// <param name="comparer"></param>
-    void Sort(IComparer<K> comparer);
 
     /// <summary>
     /// Returns a list with a shallow copy of the given number of elements, starting from the

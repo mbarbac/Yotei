@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// Represents an immutable and read-only ordered collection of elements identified by their
+/// Represents an immutable read-only list-alike collection of elements identified by their
 /// respective keys.
 /// </summary>
 /// <typeparam name="K"></typeparam>

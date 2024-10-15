@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// Represents an immutable and read-only ordered collection of elements.
+/// Represents an immutable read-only list-alike collection of elements.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 [Cloneable]
