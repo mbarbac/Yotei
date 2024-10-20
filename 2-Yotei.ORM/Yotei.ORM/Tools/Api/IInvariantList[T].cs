@@ -106,20 +106,6 @@ public partial interface IInvariantList<T> : IReadOnlyList<T>
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a new instance where the order of the elements of the original collection has
-    /// been reversed.
-    /// </summary>
-    /// <returns></returns>
-    IInvariantList<T> Reverse();
-
-    /// <summary>
-    /// Returns a new instance where the elements of the original collection have been sorted
-    /// using the given comparer for its elements.
-    /// </summary>
-    /// <param name="comparer"></param>
-    IInvariantList<T> Sort(IComparer<T> comparer);
-
-    /// <summary>
     /// Returns a new instance with the given number of elements from the original collection,
     /// starting at the given index.
     /// </summary>
@@ -127,8 +113,6 @@ public partial interface IInvariantList<T> : IReadOnlyList<T>
     /// <param name="count"></param>
     /// <returns></returns>
     IInvariantList<T> GetRange(int index, int count);
-
-    // ----------------------------------------------------
 
     /// <summary>
     /// Returns a new instance where the original element at the given index has been replaced

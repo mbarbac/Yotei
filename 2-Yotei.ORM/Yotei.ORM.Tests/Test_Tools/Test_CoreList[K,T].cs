@@ -4,11 +4,11 @@ namespace Yotei.ORM.Tests;
 //[Enforced]
 public static partial class Test_CoreList_KT
 {
-    interface IElement { }
+    public interface IElement { }
 
     // ----------------------------------------------------
 
-    class Element(string name) : IElement
+    public class Element(string name) : IElement
     {
         public string Name { get; set; } = name;
         public override string ToString() => Name ?? string.Empty;
@@ -22,7 +22,7 @@ public static partial class Test_CoreList_KT
     // ----------------------------------------------------
 
     [Cloneable]
-    partial class Chain : CoreList<string, IElement>, IElement
+    public partial class Chain : CoreList<string, IElement>, IElement
     {
         public Chain(bool sensitive) => Sensitive = sensitive;
         public Chain(bool sensitive, int capacity) : this(sensitive) => Capacity = capacity;

@@ -40,7 +40,7 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     /// <inheritdoc/>
     public override string ToString() => $"Count: {Count}";
 
-    // <summary>
+    /// <summary>
     /// Invoked to produce a debug string.
     /// </summary>
     protected virtual string ToDebugString(int count)
