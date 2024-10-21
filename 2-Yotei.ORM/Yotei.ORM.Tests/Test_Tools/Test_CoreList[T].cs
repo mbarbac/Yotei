@@ -1,5 +1,4 @@
-
-namespace Yotei.ORM.Tests;
+namespace Yotei.ORM.Tests.Tools;
 
 // ========================================================
 //[Enforced]
