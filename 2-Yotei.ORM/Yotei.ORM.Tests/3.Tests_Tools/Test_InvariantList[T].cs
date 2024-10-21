@@ -49,13 +49,13 @@ public static partial class Test_InvariantList_T
 
         public struct BuilderComparer(bool Sensitive) : IEqualityComparer<IElement>
         {
-            public bool Equals(IElement? x, IElement? y)
+            public readonly bool Equals(IElement? x, IElement? y)
             {
                 return x is Element xnamed && y is Element ynamed
                     ? string.Compare(xnamed.Name, ynamed.Name, !Sensitive) == 0
                     : ReferenceEquals(x, y);
             }
-            int IEqualityComparer<IElement>.GetHashCode(IElement obj) => throw new NotImplementedException();
+            readonly int IEqualityComparer<IElement>.GetHashCode(IElement obj) => throw new NotImplementedException();
         }
 
         public bool Sensitive { get; }
