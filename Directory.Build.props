@@ -1,0 +1,7 @@
+<Project>
+    <PropertyGroup>
+        <NoWarn>IDE0130;IDE0290</NoWarn>
+    </PropertyGroup>
+    <!--IDE0130: namespace doesn't match folder structure.-->
+    <!--IDE0290: use primary constructor.-->
+</Project>
