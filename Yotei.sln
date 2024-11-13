@@ -15,6 +15,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0-Development", "0-Development", "{3C81E441-CA1B-4DC6-99C8-7BE088A760B4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Runner", "0-Development\Runner\Runner.csproj", "{C64E4E76-1D7E-41F9-9127-2A092AE62FFB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yotei.Tools.Tests", "1-Yotei.Tools\Yotei.Tools.Tests\Yotei.Tools.Tests.csproj", "{3891115F-E9F1-46A5-9AA8-2E9159C5E7FC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,11 +31,21 @@ Global
 		{A54CA263-C434-44D2-A2EE-1DC657593688}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A54CA263-C434-44D2-A2EE-1DC657593688}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A54CA263-C434-44D2-A2EE-1DC657593688}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C64E4E76-1D7E-41F9-9127-2A092AE62FFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C64E4E76-1D7E-41F9-9127-2A092AE62FFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C64E4E76-1D7E-41F9-9127-2A092AE62FFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C64E4E76-1D7E-41F9-9127-2A092AE62FFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3891115F-E9F1-46A5-9AA8-2E9159C5E7FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3891115F-E9F1-46A5-9AA8-2E9159C5E7FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3891115F-E9F1-46A5-9AA8-2E9159C5E7FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3891115F-E9F1-46A5-9AA8-2E9159C5E7FC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{A54CA263-C434-44D2-A2EE-1DC657593688} = {D1D7E300-62F1-43E7-9653-DBBD8C613AD5}
+		{C64E4E76-1D7E-41F9-9127-2A092AE62FFB} = {3C81E441-CA1B-4DC6-99C8-7BE088A760B4}
+		{3891115F-E9F1-46A5-9AA8-2E9159C5E7FC} = {D1D7E300-62F1-43E7-9653-DBBD8C613AD5}
 	EndGlobalSection
 EndGlobal
