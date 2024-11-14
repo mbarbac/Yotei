@@ -16,6 +16,10 @@ internal class Program
     /// </summary>
     static void Main()
     {
+        var value = "Hello world";
+        var comp = StringComparison.OrdinalIgnoreCase;
+        var iter = value.SplitEx(comp, true, "hello", "world");
+        foreach (var item in iter) WriteLine($"- {item}");
 
         WriteLine("Hello world!");
         ReadLine();

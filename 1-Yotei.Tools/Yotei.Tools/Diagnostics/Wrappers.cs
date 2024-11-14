@@ -1,7 +1,7 @@
 ﻿namespace Yotei.Tools.Diagnostics;
 
 // ========================================================
-internal static class Internal
+internal static class Wrappers
 {
     // ----------------------------------------------------
 
