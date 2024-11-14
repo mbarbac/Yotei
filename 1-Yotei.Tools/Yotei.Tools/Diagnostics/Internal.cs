@@ -1,8 +1,7 @@
-﻿/*
-namespace Runner;
+﻿namespace Yotei.Tools.Diagnostics;
 
 // ========================================================
-internal static class Wrappers
+internal static class Internal
 {
     // ----------------------------------------------------
 
@@ -39,4 +38,4 @@ internal static class Wrappers
     readonly static string Header8 = new(' ', 8);
     readonly static string Header9 = new(' ', 9);
     readonly static Dictionary<int, string> Headers = [];
-}*/
+}

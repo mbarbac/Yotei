@@ -16,6 +16,7 @@ internal class Program
     /// </summary>
     static void Main()
     {
+
         WriteLine("Hello world!");
         ReadLine();
     }
