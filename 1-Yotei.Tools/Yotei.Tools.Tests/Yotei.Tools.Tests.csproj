@@ -15,4 +15,8 @@
 	  <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
    </ItemGroup>
 
+   <ItemGroup>
+	  <ProjectReference Include="..\Yotei.Tools\Yotei.Tools.csproj" />
+   </ItemGroup>
+
 </Project>

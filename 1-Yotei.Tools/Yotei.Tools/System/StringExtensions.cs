@@ -4,8 +4,9 @@
 public static class StringExtensions
 {
     /// <summary>
-    /// Returns null if the given source string is null, or empty after trimmed if such has been
-    /// requested (by default). Otherwise, returns either the original string or the trimmed one.
+    /// Returns null if the given source string is null or empty after being trimmed, if such
+    /// has been requested (by default). Otherwise, returns either the original string or the
+    /// trimmed one.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="trim"></param>
@@ -29,9 +30,9 @@ public static class StringExtensions
 
     /// <summary>
     /// Throws an <see cref="EmptyException"/> is the given source string is null or empty after
-    /// has been trimmed if such is requested (by default). Otherwise, returns either the original
+    /// being trimmed if such is requested (by default). Otherwise, returns either the original
     /// or the trimmed string.
-    /// <br/> Note that if no trim is requested, string with only spaces are considered valid ones.
+    /// <br/> If no trim is requested, spaces-only strings are considered valid ones.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="trim"></param>

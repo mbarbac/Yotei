@@ -1,56 +1,9 @@
-﻿namespace Runner;
+﻿/*
+namespace Runner;
 
 // ========================================================
 internal static class Wrappers
 {
-    /// <summary>
-    /// Splits the given value into its regular and NL parts, which are also returned by default.
-    /// <br/> If the source value is null or empty, then an empty list is returned.
-    /// </summary>
-    /// <param name="value"></param>
-    /// <param name="addNL"></param>
-    /// <returns></returns>
-    internal static List<string> TokenizeNL(string? value, bool addNL = true)
-    {
-        if (value is null) return [];
-        if (value.Length == 0) return [];
-
-        var list = new List<string>();
-        var span = value.AsSpan();
-
-        while (true)
-        {
-            var token = "\r\n";
-            var index = span.IndexOf(token.AsSpan());
-            var found = index >= 0;
-
-            if (!found)
-            {
-                token = "\n";
-                index = span.IndexOf(token.AsSpan());
-                found = index >= 0;
-            }
-
-            if (found)
-            {
-                if (addNL)
-                {
-                    list.Add(span[..index].ToString());
-                    list.Add(token);
-                }
-                span = span[(index + token.Length)..];
-            }
-
-            else
-            {
-                list.Add(span.ToString());
-                break;
-            }
-        }
-
-        return list;
-    }
-
     // ----------------------------------------------------
 
     /// <summary>
@@ -86,4 +39,4 @@ internal static class Wrappers
     readonly static string Header8 = new(' ', 8);
     readonly static string Header9 = new(' ', 9);
     readonly static Dictionary<int, string> Headers = [];
-}
+}*/

@@ -17,3 +17,5 @@ global using System.Threading;
 global using System.Threading.Tasks;
 
 global using Xunit;
+global using Yotei.Tools;
+global using Yotei.Tools.Diagnostics;

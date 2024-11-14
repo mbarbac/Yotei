@@ -1,4 +1,4 @@
-﻿namespace Runner;
+﻿namespace Yotei.Tools.Diagnostics;
 
 // ========================================================
 public static class ExceptionExtensions

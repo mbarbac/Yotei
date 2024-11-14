@@ -1,4 +1,5 @@
-﻿namespace Runner;
+﻿/*
+namespace Runner;
 
 // ========================================================
 /// <summary>
@@ -131,3 +132,4 @@ public static class DebugEx
         throw null;
     }
 }
+*/
