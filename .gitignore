@@ -396,3 +396,4 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/1-Yotei.Tools/Yotei.Tools/SystemEx/SpanCharSplitter.cs
