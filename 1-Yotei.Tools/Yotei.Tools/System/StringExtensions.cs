@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualBasic;
-
-namespace Yotei.Tools;
+﻿namespace Yotei.Tools;
 
 // ========================================================
 public static class StringExtensions
@@ -57,6 +55,4 @@ public static class StringExtensions
         if (source is null || source.Length == 0) throw new EmptyException(description);
         return source;
     }
-
-    // ----------------------------------------------------
 }

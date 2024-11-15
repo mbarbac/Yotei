@@ -16,12 +16,19 @@ internal class Program
     /// </summary>
     static void Main()
     {
-        var value = "Hello world";
-        var comp = StringComparison.OrdinalIgnoreCase;
-        var iter = value.SplitEx(comp, true, "hello", "world");
-        foreach (var item in iter) WriteLine($"- {item}");
+        var source = """
+            World
 
-        WriteLine("Hello world!");
+            """;
+
+        var iter = new SpanCharSplitter(source, Environment.NewLine) { KeepSeparators = true };
+        foreach (var item in iter)
+        {
+            var temp = item.SequenceEqual(Environment.NewLine) ? "NL" : item;
+            WriteLine($"- '{temp}'");
+        }
+
+        //WriteLine("Hello world!");
         ReadLine();
     }
 }
