@@ -1,5 +1,4 @@
-﻿using static System.Console;
-using static System.ConsoleColor;
+﻿using static System.ConsoleColor;
 
 namespace Runner;
 
@@ -16,7 +15,12 @@ internal class Program
     /// </summary>
     static void Main()
     {
-        WriteLine("Hello world!");
-        ReadLine();
+        // Debug environment...
+        DebugEx.IndentSize = 2;
+        DebugEx.AutoFlush = true;
+        Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
+
+        DebugEx.WriteLine(Green, "Hi\nDear");
+        Console.ReadLine();
     }
 }

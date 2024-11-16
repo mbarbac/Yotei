@@ -18,11 +18,20 @@ public static class Ambient
     /// <returns></returns>
     public static bool IsConsoleListener([NotNullWhen(true)] out TraceListener? listener)
     {
+        if (_Computed)
+        {
+            listener = _Listener;
+            return _Listener is not null;
+        }
+
+        _Computed = true;
+        _Listener = null;
+
         foreach (var item in Trace.Listeners)
         {
             if (item is TextWriterTraceListener temp && ReferenceEquals(Console.Out, temp.Writer))
             {
-                listener = temp;
+                _Listener = listener = temp;
                 return true;
             }
         }
@@ -30,4 +39,12 @@ public static class Ambient
         listener = null;
         return false;
     }
+
+    /// <summary>
+    /// Enforces to recompute the console listeners.
+    /// </summary>
+    public static void RecomputeConsoleListener() => _Computed = false;
+
+    static TraceListener? _Listener = null;
+    static bool _Computed = false;
 }
