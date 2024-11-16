@@ -16,19 +16,7 @@ internal class Program
     /// </summary>
     static void Main()
     {
-        var source = """
-            World
-
-            """;
-
-        var iter = new SpanCharSplitter(source, Environment.NewLine) { KeepSeparators = true };
-        foreach (var item in iter)
-        {
-            var temp = item.SequenceEqual(Environment.NewLine) ? "NL" : item;
-            WriteLine($"- '{temp}'");
-        }
-
-        //WriteLine("Hello world!");
+        WriteLine("Hello world!");
         ReadLine();
     }
 }
