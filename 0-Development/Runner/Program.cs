@@ -16,11 +16,11 @@ internal class Program
     static void Main()
     {
         // Debug environment...
-        DebugEx.IndentSize = 2;
-        DebugEx.AutoFlush = true;
+        //DebugEx.IndentSize = 2;
+        //DebugEx.AutoFlush = true;
         Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
 
-        DebugEx.WriteLine(Green, "Hi\nDear");
+        Console.WriteLine("Hi\nDear");
         Console.ReadLine();
     }
 }
