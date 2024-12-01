@@ -1,4 +1,5 @@
-﻿using static System.ConsoleColor;
+﻿using static Yotei.Tools.Diagnostics.ConsoleEx;
+using static System.ConsoleColor;
 
 namespace Runner;
 
@@ -16,11 +17,13 @@ internal class Program
     static void Main()
     {
         // Debug environment...
-        //DebugEx.IndentSize = 2;
-        //DebugEx.AutoFlush = true;
         Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
+        DebugEx.IndentSize = 2;
+        DebugEx.AutoFlush = true;
 
-        Console.WriteLine("Hi\nDear");
-        Console.ReadLine();
+        ReadLine(true);
+
+        WriteLine(true, "Hi\nDear");
+        ReadLine(true);
     }
 }

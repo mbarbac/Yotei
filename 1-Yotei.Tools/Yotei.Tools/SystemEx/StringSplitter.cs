@@ -100,6 +100,7 @@ public class StringSplitter : IEnumerable<ReadOnlyMemory<char>>, IEnumerator<Rea
             {
                 var span = _Source[_Index..];
 
+                // First found separator wins...
                 foreach (var separator in _Separators)
                 {
                     if (span.StartsWith(separator, Comparison))
@@ -115,6 +116,7 @@ public class StringSplitter : IEnumerable<ReadOnlyMemory<char>>, IEnumerator<Rea
                     }
                 }
 
+                // Otherwise, try from next character...
                 _Index++;
             }
         }
