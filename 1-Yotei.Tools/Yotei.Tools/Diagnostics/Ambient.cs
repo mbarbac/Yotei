@@ -72,7 +72,8 @@ public static class Ambient
     /// Unregisters and returns the collection of console listeners.
     /// </summary>
     /// <returns></returns>
-    public static TraceListener[] UnregisterConsoleListeners()
+    [SuppressMessage("", "IDE0305")]
+    public static ImmutableArray<TraceListener> UnregisterConsoleListeners()
     {
         List<TraceListener> items = [];
         
@@ -90,14 +91,14 @@ public static class Ambient
         _Listener = null;
         _Computed = false;
 
-        return items.ToArray();
+        return items.ToImmutableArray();
     }
 
     /// <summary>
     /// Re-registers the given collection of console listerners.
     /// </summary>
     /// <param name="items"></param>
-    public static void RegisterConsoleListeners(TraceListener[] items)
+    public static void RegisterConsoleListeners(IEnumerable<TraceListener> items)
     {
         items.ThrowWhenNull();
 

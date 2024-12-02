@@ -21,7 +21,8 @@ internal class Program
         DebugEx.IndentSize = 2;
         DebugEx.AutoFlush = true;
 
-        ReadLine(true);
+        var r = EditLine(true, White, Green, TimeSpan.FromSeconds(10), null, out var result);
+        WriteLine($"[{r}]: {result}");
 
         WriteLine(true, "Hi\nDear");
         ReadLine(true);

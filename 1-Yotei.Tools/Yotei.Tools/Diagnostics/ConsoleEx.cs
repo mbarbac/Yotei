@@ -1,7 +1,4 @@
-﻿using System.Data;
-using System.Net.Http.Headers;
-
-namespace Yotei.Tools.Diagnostics;
+﻿namespace Yotei.Tools.Diagnostics;
 
 // ========================================================
 /// <summary>
@@ -385,7 +382,177 @@ public static class ConsoleEx
         bool debug, TimeSpan timeout,
         string? source, [NotNullWhen(true)] out string? result)
     {
-        throw null;
+        var sb = new StringBuilder(source ?? string.Empty);
+        var pos = sb.Length;
+        var left = Console.CursorLeft;
+        var size = Console.CursorSize;
+        var insert = false;
+        int len;
+
+        // Main loop...
+        while (true)
+        {
+            // This resets the timeout period for each new key...
+            var info = ReadKey(timeout, false);
+            info ??= new ConsoleKeyInfo('\0', ConsoleKey.Escape, false, false, false);
+
+            // Special keys...
+            switch (info.Value.Key)
+            {
+                case ConsoleKey.Enter:
+                    SetInsert(false);
+                    Console.WriteLine();
+                    result = sb.ToString();
+
+                    if (debug)
+                    {
+                        var found = Trace.Listeners.Any(x =>
+                            x is TextWriterTraceListener temp &&
+                            ReferenceEquals(Console.Out, temp.Writer));
+
+                        var items = !found ? [] : Ambient.UnregisterConsoleListeners();
+                        Debug.WriteLine(result);
+                        Ambient.RegisterConsoleListeners(items);
+                    }
+
+                    return true;
+
+                case ConsoleKey.Escape:
+                    SetInsert(false);
+                    len = sb.Length; sb.Clear();
+                    ShowLine(0, len);
+                    Console.WriteLine();
+                    result = null;
+                    return false;
+
+                case ConsoleKey.Insert:
+                    SetInsert(!insert);
+                    break;
+
+                case ConsoleKey.Home:
+                    pos = 0;
+                    Console.CursorLeft = left;
+                    break;
+
+                case ConsoleKey.End:
+                    pos = sb.Length;
+                    Console.CursorLeft = left + pos;
+                    break;
+
+                case ConsoleKey.Delete:
+                    if (pos < sb.Length)
+                    {
+                        len = sb.Length; sb.Remove(pos, 1);
+                        ShowLine(pos, len);
+                    }
+                    break;
+
+                case ConsoleKey.Backspace:
+                    if (pos > 0)
+                    {
+                        len = sb.Length; sb.Remove(--pos, 1);
+                        ShowLine(pos, len);
+                    }
+                    break;
+
+                case ConsoleKey.LeftArrow:
+                    if (pos > 0)
+                    {
+                        if (!info.Value.Modifiers.HasFlag(ConsoleModifiers.Control))
+                        {
+                            pos--;
+                            Console.CursorLeft--;
+                            break;
+                        }
+                        else
+                        {
+                            var ascii = char.IsLetterOrDigit(sb[pos - 1]);
+                            while (pos > 0)
+                            {
+                                var temp = char.IsLetterOrDigit(sb[pos - 1]);
+                                if (temp == ascii)
+                                {
+                                    pos--;
+                                    Console.CursorLeft--;
+                                }
+                                else break;
+                            }
+                        }
+                    }
+                    break;
+
+                case ConsoleKey.RightArrow:
+                    if (pos < sb.Length)
+                    {
+                        if (!info.Value.Modifiers.HasFlag(ConsoleModifiers.Control))
+                        {
+                            pos++;
+                            Console.CursorLeft++;
+                            break;
+                        }
+                        else
+                        {
+                            var ascii = char.IsLetterOrDigit(sb[pos]);
+                            while (pos < sb.Length)
+                            {
+                                var temp = char.IsLetterOrDigit(sb[pos]);
+                                if (temp == ascii)
+                                {
+                                    pos++;
+                                    Console.CursorLeft++;
+                                }
+                                else break;
+                            }
+                        }
+                    }
+                    break;
+            }
+
+            // Regular keys...
+            if (info.Value.KeyChar >= 32)
+            {
+                if (insert)
+                {
+                    sb.Insert(pos, info.Value.KeyChar);
+                    ShowLine(++pos);
+                }
+                else
+                {
+                    if (pos < sb.Length)
+                    {
+                        sb[pos] = info.Value.KeyChar;
+                        ShowLine(++pos);
+                    }
+                    else
+                    {
+                        sb.Append(info.Value.KeyChar);
+                        Console.Write(info.Value.KeyChar);
+                        pos++;
+                    }
+                }
+            }
+        }
+
+        // Sets the cursor to insert mode, or not...
+        void SetInsert(bool value)
+        {
+            if (value == insert) return;
+
+            var temp = value ? 25 : size;
+            var iswindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            if (iswindows) Console.CursorSize = temp;
+            insert = value;
+        }
+
+        // Shows the current value, sets cursor position, and clear remaining len...
+        void ShowLine(int pos, int len = 0)
+        {
+            Console.CursorLeft = left;
+            Console.Write(sb);
+            len -= sb.Length;
+            if (len > 0) Console.Write(DebugEx.Header(len));
+            Console.CursorLeft = left + pos;
+        }
     }
 
     /// <summary>
@@ -487,48 +654,86 @@ public static class ConsoleEx
     // ----------------------------------------------------
 
     /// <summary>
+    /// Reads the next available pressed key from the console and displays it in the console.
+    /// </summary>
+    /// <returns></returns>
+    public static ConsoleKeyInfo? ReadKey() => ReadKey(true);
+
+    /// <summary>
     /// Reads the next available pressed key from the console. The key is also displayed in the
-    /// console if requested (by default).
+    /// console if requested.
     /// </summary>
     /// <param name="display"></param>
     /// <returns></returns>
     public static ConsoleKeyInfo? ReadKey(
-        bool display = true) => ReadKey(false, Timeout.InfiniteTimeSpan, display);
+        bool display) => ReadKey(false, Timeout.InfiniteTimeSpan, display);
 
     /// <summary>
     /// Reads the next available pressed key from the console, waiting for at most the given
     /// amount of time. Returns either the pressed key or null if the timeout period expired.
-    /// The key is also displayed in the console if requested (by default).
+    /// The key is also displayed in the console if requested.
     /// </summary>
     /// <param name="timeout"></param>
     /// <param name="display"></param>
     /// <returns></returns>
     public static ConsoleKeyInfo? ReadKey(
-        TimeSpan timeout, bool display = true) => ReadKey(false, timeout, display);
+        TimeSpan timeout, bool display) => ReadKey(false, timeout, display);
 
     /// <summary>
     /// Reads the next available pressed key from the console. The key is also displayed in the
-    /// console (by default), and replicated in the debug environment, if such things are requested.
+    /// console, and replicated in the debug environment, if such things are requested.
     /// </summary>
     /// <param name="debug"></param>
     /// <param name="display"></param>
     /// <returns></returns>
     public static ConsoleKeyInfo? ReadKey(
-        bool debug, bool display = true) => ReadKey(debug, Timeout.InfiniteTimeSpan, display);
+        bool debug, bool display) => ReadKey(debug, Timeout.InfiniteTimeSpan, display);
 
     /// <summary>
     /// Reads the next available pressed key from the console, waiting for at most the given
     /// amount of time. Returns either the pressed key or null if the timeout period expired.
-    /// The key is also displayed in the console (by default), and replicated in the debug
-    /// environment, if such things are requested.
+    /// The key is also displayed in the console, and replicated in the debug environment, if
+    /// such things are requested.
     /// </summary>
     /// <param name="debug"></param>
     /// <param name="timeout"></param>
     /// <param name="display"></param>
     /// <returns></returns>
-    public static ConsoleKeyInfo? ReadKey(bool debug, TimeSpan timeout, bool display = true)
+    public static ConsoleKeyInfo? ReadKey(bool debug, TimeSpan timeout, bool display)
     {
-        throw null;
+        var ms = timeout.ValidateTimeout();
+        var ini = DateTime.UtcNow;
+
+        while (true)
+        {
+            if (Console.KeyAvailable)
+            {
+                var info = Console.ReadKey(intercept: true);
+                var ch = info.KeyChar < 32 ? $"[{info.Key}]" : $"{info.KeyChar}";
+                if (display) Console.Write(ch);
+
+                if (debug)
+                {
+                    var found = Trace.Listeners.Any(x =>
+                        x is TextWriterTraceListener temp &&
+                        ReferenceEquals(Console.Out, temp.Writer));
+
+                    var items = !found ? [] : Ambient.UnregisterConsoleListeners();
+                    Debug.Write(ch);
+                    Ambient.RegisterConsoleListeners(items);
+                }
+
+                return info;
+            }
+
+            if (ms != -1)
+            {
+                var now = DateTime.UtcNow;
+                if ((now - ini) > timeout) return null;
+            }
+
+            Thread.Sleep(10);
+        }
     }
 
     // ----------------------------------------------------

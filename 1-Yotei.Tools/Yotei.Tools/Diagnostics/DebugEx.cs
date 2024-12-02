@@ -321,7 +321,7 @@ public static class DebugEx
     }
 
     readonly static string Header0 = string.Empty;
-    readonly static char Space = '·';
+    readonly static char Space = ' ';
 
     readonly static string Header1 = new(Space, 1);
     readonly static string Header2 = new(Space, 2);
