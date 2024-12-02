@@ -1,5 +1,4 @@
-﻿/*
-using static System.Console;
+﻿using static Yotei.Tools.Diagnostics.ConsoleEx;
 using static System.ConsoleColor;
 
 namespace Runner;
@@ -11,6 +10,7 @@ namespace Runner;
 /// </summary>
 public static class Menu
 {
+    /*
     /// <summary>
     /// Runs a console menu for the given set of menu entries, that the user can select using
     /// the [Up] and [Down] keys, and the [Enter] one to execute its associated action.
@@ -56,7 +56,7 @@ public static class Menu
     public static int Run(ConsoleColor color, params MenuEntry[] entries)
     {
         return Run(color, Timeout.InfiniteTimeSpan, entries);
-    }
+    }*/
 
     /// <summary>
     /// Runs a console menu for the given set of menu entries, that the user can select using
@@ -78,8 +78,8 @@ public static class Menu
         if (Console.CursorTop >= (Console.BufferHeight - entries.Length - 1))
         {
             WriteLine();
-            WriteLine(ConsoleColor.Red, "Screen buffer exhausted!");
-            Write(ConsoleColor.Red, "Press [Enter] to clear the buffer... ");
+            WriteLine(Red, "Screen buffer exhausted!");
+            Write(Red, "Press [Enter] to clear the buffer... ");
             ReadLine();
             Clear();
         }
@@ -137,4 +137,4 @@ public static class Menu
             }
         }
     }
-}*/
+}

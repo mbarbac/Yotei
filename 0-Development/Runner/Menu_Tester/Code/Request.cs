@@ -1,0 +1,40 @@
+﻿namespace Runner.Tester;
+
+// ========================================================
+/// <summary>
+/// Represents a explicit inclusion or exclusion request.
+/// </summary>
+public class Request
+{
+    public Request(string? assemblyName, string? typeName, string? methodName)
+    {
+        AssemblyName = assemblyName?.NotNullNotEmpty();
+        TypeName = typeName?.NotNullNotEmpty();
+        MethodName = methodName?.NotNullNotEmpty();
+
+        if (assemblyName is null &&
+            typeName is null &&
+            methodName is null)
+            throw new ArgumentException("Cannot initialize an empty instance.");
+    }
+
+    /// <inheritdoc/>
+    public override string ToString()
+        => $"({AssemblyName ?? "-"}, {TypeName ?? "-"}, {MethodName ?? "-"})";
+
+    /// <summary>
+    /// The assembly name, or <c>null</c> if this filter is not used.
+    /// </summary>
+    public string? AssemblyName { get; }
+
+    /// <summary>
+    /// The type name, or <c>null</c> if this filter is not used.
+    /// <br/> Type names that ends with the value of this property are considered a match.
+    /// </summary>
+    public string? TypeName { get; }
+
+    /// <summary>
+    /// The method name, or <c>null</c> if this filter is not used.
+    /// </summary>
+    public string? MethodName { get; }
+}

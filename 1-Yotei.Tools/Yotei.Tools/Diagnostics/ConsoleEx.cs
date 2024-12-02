@@ -21,7 +21,7 @@ public static class ConsoleEx
     /// <param name="args"></param>
     public static void Write(
         ConsoleColor forecolor, string? message, params object?[] args)
-        => Write(forecolor, message, args);
+        => Write(false, forecolor, message, args);
 
     /// <summary>
     /// Writes the given message, using the given foreground and background colors.
@@ -382,12 +382,14 @@ public static class ConsoleEx
         bool debug, TimeSpan timeout,
         string? source, [NotNullWhen(true)] out string? result)
     {
-        var sb = new StringBuilder(source ?? string.Empty);
-        var pos = sb.Length;
-        var left = Console.CursorLeft;
         var size = Console.CursorSize;
+        var left = Console.CursorLeft;
         var insert = false;
         int len;
+
+        var sb = new StringBuilder(source ?? string.Empty);
+        var pos = sb.Length;
+        ShowLine(pos);
 
         // Main loop...
         while (true)
