@@ -1,4 +1,6 @@
-﻿namespace Runner.Tester;
+﻿using Xunit.Abstractions;
+
+namespace Runner.Tester;
 
 // ========================================================
 /// <summary>
@@ -29,25 +31,4 @@ public class AssemblyHolder
     /// The list of type holders in this instance.
     /// </summary>
     public TypeHolderList TypeHolders { get; } = [];
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Invoked to populate this instance with its test classes and method.
-    /// </summary>
-    public void Populate()
-    {
-        foreach (var type in Assembly.DefinedTypes)
-        {
-            if (!TypeHolder.IsValidTestClass(type)) continue;
-
-            if (TypeHolders.Find(type) != null)
-            {
-                var holder = new TypeHolder(type);
-                holder.Populate();
-
-                if (holder.MethodHolders.Count > 0) TypeHolders.Add(holder);
-            }
-        }
-    }
 }

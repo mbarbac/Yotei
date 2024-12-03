@@ -71,27 +71,4 @@ public class TypeHolder
         type.ThrowWhenNull();
         return type.IsClass;
     }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Invoked to populate this instance with its test methods.
-    /// </summary>
-    public void Populate()
-    {
-        var flags =
-            BindingFlags.Instance | BindingFlags.Static |
-            BindingFlags.Public | BindingFlags.NonPublic;
-
-        foreach (var method in Type.GetMethods(flags))
-        {
-            if (!MethodHolder.IsValidTestMethod(method)) continue;
-
-            if (MethodHolders.Find(method) == null)
-            {
-                var holder = new MethodHolder(method);
-                MethodHolders.Add(holder);
-            }
-        }
-    }
 }

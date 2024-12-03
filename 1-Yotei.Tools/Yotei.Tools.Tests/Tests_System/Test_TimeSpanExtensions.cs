@@ -1,9 +1,13 @@
-﻿namespace Yotei.Tools.Tests;
+﻿using static Yotei.Tools.Diagnostics.ConsoleEx;
+using static System.ConsoleColor;
+
+namespace Yotei.Tools.Tests;
 
 // ========================================================
+//[Enforced]
 public class Test_TimeSpanExtensions
 {
-    // [Enforced]
+    //[Enforced]
     [Fact]
     public void Test_ValidateTimeout_Cero()
     {

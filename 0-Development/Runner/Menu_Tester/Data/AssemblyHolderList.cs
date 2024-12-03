@@ -92,4 +92,3 @@ public class AssemblyHolderList : IEnumerable<AssemblyHolder>
     /// </summary>
     public void Clear() => _Items.Clear();
 }
-}

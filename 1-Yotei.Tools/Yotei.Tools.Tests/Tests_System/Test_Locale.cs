@@ -1,11 +1,16 @@
-﻿namespace Yotei.Tools.Tests;
+﻿using static Yotei.Tools.Diagnostics.ConsoleEx;
+using static System.ConsoleColor;
+
+namespace Yotei.Tools.Tests;
 
 // ========================================================
-//public class Test_
-//{
-//    // [Enforced]
-//    [Fact]
-//    public void Test()
-//    {
-//    }
-//}
+//[Enforced]
+public class Test_Locale
+{
+    //[Enforced]
+    [Fact]
+    public Task Test1()
+    {
+        return Task.CompletedTask;
+    }
+}

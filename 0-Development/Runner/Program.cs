@@ -1,5 +1,7 @@
 ﻿using static Yotei.Tools.Diagnostics.ConsoleEx;
 using static System.ConsoleColor;
+using Runner.Tester;
+using Runner.Artifacts;
 
 namespace Runner;
 
@@ -13,6 +15,11 @@ internal class Program
     public static readonly string SlimSeparator = "-------------------------";
     public static TimeSpan Timeout = TimeSpan.FromMinutes(2);
 
+    public static RequestList Includes = [];
+    public static RequestList Excludes = [];
+
+    public static string LocalRepoPath = @"C:\Dev\Packages";
+
     // ----------------------------------------------------
 
     /// <summary>
@@ -25,9 +32,8 @@ internal class Program
         DebugEx.IndentSize = 2;
         DebugEx.AutoFlush = true;
 
-        var path = $"C\\bin";
-        var result = EditDirectory(path);
-        WriteLine($"- Result: {result}");
+        // Explicit includes and excludes, in order...
+        //Includes.Add(new("Yotei.Tools.Tests", "Test_StringExtensions", "Test_NullWhenEmpty_With_Trim"));
 
         // Main menu...
         var done = -1; do
@@ -40,8 +46,8 @@ internal class Program
             done = Menu.Run(
                 Green, Timeout,
                 new MenuEntry("Exit"),
-                new MenuEntry("Execute Tests"),
-                new MenuEntry("Manage Local Artifacts"),
+                new MenuTester(breakOnError: true),
+                new MenuArtifacts(),
                 new MenuEntry("Build NuGet Packages"));
         }
         while (done > 0);

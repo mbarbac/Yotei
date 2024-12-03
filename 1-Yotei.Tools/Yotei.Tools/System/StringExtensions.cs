@@ -55,4 +55,42 @@ public static class StringExtensions
         if (source is null || source.Length == 0) throw new EmptyException(description);
         return source;
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Removes from the source string the first ocurrence of the given value.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static string Remove(this string source, string value)
+    {
+        source.ThrowWhenNull();
+        value.ThrowWhenNull();
+
+        var index = source.IndexOf(value);
+        if (index >= 0) source = source.Substring(index, value.Length);
+
+        return source;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Removes from the source string the last ocurrence of the given value.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static string RemoveLast(this string source, string value)
+    {
+        source.ThrowWhenNull();
+        value.ThrowWhenNull();
+
+        var index = source.LastIndexOf(value);
+        if (index >= 0) source = source.Substring(index, value.Length);
+
+        return source;
+    }
 }
