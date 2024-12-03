@@ -6,6 +6,13 @@
 /// </summary>
 public class Request
 {
+    /// <summary>
+    /// Initializes a new instance.
+    /// <br/> The three arguments, used as filters, must not be null simultaneously.
+    /// </summary>
+    /// <param name="assemblyName"></param>
+    /// <param name="typeName"></param>
+    /// <param name="methodName"></param>
     public Request(string? assemblyName, string? typeName, string? methodName)
     {
         AssemblyName = assemblyName?.NotNullNotEmpty();

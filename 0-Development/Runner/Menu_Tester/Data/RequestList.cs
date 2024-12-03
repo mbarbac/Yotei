@@ -34,41 +34,13 @@ public class RequestList : IEnumerable<Request>
 
     // ----------------------------------------------------
 
-    /*
     /// <summary>
-    /// Returns the holder whose name is given, or null if any can be found.
-    /// </summary>
-    /// <param name="methodName"></param>
-    /// <returns></returns>
-    public Request? Find(string methodName)
-    {
-        methodName = methodName.NotNullNotEmpty();
-        return _Items.Find(x => string.Compare(methodName, x.Name) == 0);
-    }
-
-    /// <summary>
-    /// Returns the holder whose method is given, or null if any can be found.
-    /// </summary>
-    /// <param name="assembly"></param>
-    /// <returns></returns>
-    public Request? Find(MethodInfo method)
-    {
-        method.ThrowWhenNull();
-        return Find(method.Name);
-    }
-
-    /// <summary>
-    /// Adds the given holder to this collection, or throws a duplicate exception.
+    /// Adds the given request to this collection, even if it is a duplicated one.
     /// </summary>
     /// <param name="holder"></param>
     public void Add(Request holder)
     {
         holder.ThrowWhenNull();
-
-        if (Find(holder.Name) != null) throw new DuplicateException(
-            "This collection already contains a duplicated element.")
-            .WithData(holder);
-
         _Items.Add(holder);
     }
 
@@ -82,7 +54,6 @@ public class RequestList : IEnumerable<Request>
         holder.ThrowWhenNull();
         return _Items.Remove(holder);
     }
-    */
 
     /// <summary>
     /// Clears this collection.
