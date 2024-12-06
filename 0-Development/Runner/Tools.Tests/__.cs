@@ -1,13 +1,13 @@
 ﻿using static Yotei.Tools.Diagnostics.ConsoleEx;
 using static System.ConsoleColor;
 
-namespace Yotei.Tools.Tests;
+namespace Runner;
 
 // ========================================================
 //[Enforced]
 //public class Test_
 //{
-//    //[Enforced]
+//    // [Enforced]
 //    [Fact]
 //    public void Test_()
 //    {
