@@ -1,11 +1,20 @@
-﻿using System.Runtime.InteropServices.Marshalling;
-
-namespace Runner;
+﻿namespace Runner;
 
 // ========================================================
 /// <summary>
-/// Represents the optional pre-release portion of a semantic version specification, which is
-/// composed by its value and its metadata.
+/// Represents the pre-release portion of a semantic specification, as defined at
+/// 'https://semver.org'.
+/// <br/> A pre-release version is denoted by appending a hypen and a series of dot separated
+/// identifiers, that use ASCII alphanumeric characters [0 - 9, A - Z, a - z] only, and that MUST
+/// NOT be empty. Hyphens are only allowed once as the separator. Numeric identifiers MUST not
+/// include leading zeroes.
+/// <br/> Metadata is denoted by appending a plus sign and a series of dot-separated identifiers
+/// immediately following the patch or pre-release version. Identifiers must comprise ASCII
+/// alphanumerics [0 - 9, A - Z, a - z] characters only, and MUST NOT be empty.
+/// <br/> Precedence is calculated by comparing each dot-separated identifier from left to right
+/// until a difference is found either numerically or is ASCII sort order. Numeric identifiers
+/// always have lower precendence than alphanumeric ones. When comparing precedence build metadata
+/// is ignored, but used for equality purposes.
 /// </summary>
 public record SemanticRelease : IComparable<SemanticRelease>, IEquatable<SemanticRelease>
 {
@@ -24,18 +33,11 @@ public record SemanticRelease : IComparable<SemanticRelease>, IEquatable<Semanti
     /// character.
     /// </summary>
     /// <param name="source"></param>
-    public SemanticRelease(string source)
-    {
-        source = source.ThrowWhenNull();
-        if (source.Length > 0) Value = source;
-    }
-
-    /// <inheritdoc/>
-    public override string ToString() => ToString(false);
+    public SemanticRelease(string source) => Value = source;
 
     /// <summary>
     /// Returns a string representation of this instance, with or without a leading hypen as
-    /// requested.
+    /// requested if needed.
     /// </summary>
     /// <param name="hypen"></param>
     /// <returns></returns>
@@ -45,7 +47,7 @@ public record SemanticRelease : IComparable<SemanticRelease>, IEquatable<Semanti
         else
         {
             var sb = new StringBuilder();
-            
+
             if (Value.Length > 0)
             {
                 if (hypen) sb.Append('-');
@@ -55,6 +57,9 @@ public record SemanticRelease : IComparable<SemanticRelease>, IEquatable<Semanti
             return sb.ToString();
         }
     }
+
+    /// <inheritdoc/>
+    public override string ToString() => ToString(false);
 
     /// <summary>
     /// Implicit conversion operator.
@@ -71,53 +76,69 @@ public record SemanticRelease : IComparable<SemanticRelease>, IEquatable<Semanti
     // ----------------------------------------------------
 
     /// <summary>
-    /// The value of the pre-release version, without its preceding hypen, or an empty string.
-    /// The init setter removes the leading hypen characters, if any, and accepts optional
-    /// metadata separated by the first plus character.
+    /// Represents the actual value of the pre-release part of a semantic version specification,
+    /// which is separated from the normal one by a hyphen (not included in this property), or an
+    /// empty string. The value contains a series of dot-separated identifiers that use ASCII
+    /// alphanumeric characters [0 - 9, A - Z, a - z] only, that MUST NOT be empty (or consisting
+    /// in hyphens only), and must not contain leading zeroes.
     /// </summary>
     public string Value
     {
         get => _Value;
         init
         {
-            _Value = Validate(value, out _, out var metadata);
-            if (metadata.Length > 0) Metadata = metadata;
+            value.ThrowWhenNull();
+
+            if (value.Length > 0)
+            {
+                value.NotNullNotEmpty();
+
+                var index = value.IndexOf('+');
+                if (index >= 0)
+                {
+                    var meta = value[index..];
+                    Metadata = meta;
+
+                    value = value[..index];
+                    if (value.Length == 0)
+                    {
+                        _Value = string.Empty;
+                        return;
+                    }
+                }
+
+                if (value[0] == '-') value = value[1..];
+
+                var parts = value.Split('.');
+                foreach (var part in parts) ValidatePart(part, noLeadingZeroes: true);
+            }
+
+            _Value = value;
         }
     }
     string _Value = string.Empty;
 
     /// <summary>
-    /// The build metadata value, without its preceding plus character, or an empty string. The
-    /// init setter removes the leading plus characters, if any.
+    /// Represents the build metadata portion of a semantic specification, which is separated the
+    /// other ones by a plus sign (not included in this property), or an empty string. It contains
+    /// a series of dot separated identifiers using ASCII alphanumeric characters [0 - 9, A - Z,
+    /// a - z] only, that MUST NOT be empty.
     /// </summary>
     public string Metadata
     {
         get => _Metadata;
         init
         {
-            value = value.ThrowWhenNull();
-
-            var plus = false; while (value.Length > 0)
-            {
-                if (value[0] == '+')
-                {
-                    plus = true;
-                    value = value[1..];
-                }
-                else
-                {
-                    plus = false;
-                    break;
-                }
-            }
-            if (plus) throw new ArgumentException(
-                "Metadata cannot consist on just plus character(s).")
-                .WithData(value);
+            value.ThrowWhenNull();
 
             if (value.Length > 0)
             {
+                value.NotNullNotEmpty();
+
+                if (value[0] == '+') value = value[1..];
+
                 var parts = value.Split('.');
-                foreach (var part in parts) Validate(part);
+                foreach (var part in parts) ValidatePart(part);
             }
 
             _Metadata = value;
@@ -130,179 +151,36 @@ public record SemanticRelease : IComparable<SemanticRelease>, IEquatable<Semanti
     /// </summary>
     public bool IsEmpty => Value.Length == 0 && Metadata.Length == 0;
 
-    // ----------------------------------------------------
-
     /// <summary>
-    /// Invoked to obtain the pre-release parts and metadata from the given value.
+    /// Invoked to validate a given identifier or part, which must use ASCII alphanumeric characters
+    /// [0 - 9, A - Z, a - z] only, and must not be empty.
     /// </summary>
-    static string Validate(string value, out string[] parts, out string metadata)
-    {
-        value = value.ThrowWhenNull();
-
-        parts = [];
-        metadata = string.Empty;
-
-        var hypen = false; while (value.Length > 0)
-        {
-            if (value[0] == '-')
-            {
-                hypen = true;
-                value = value[1..];
-            }
-            else
-            {
-                hypen = false;
-                break;
-            }
-        }
-        if (hypen) throw new ArgumentException(
-            "Parts cannot consist on just hypen character(s).")
-            .WithData(value);
-
-        if (value.Length > 0)
-        {
-            var index = value.IndexOf('+');
-            if (index >= 0)
-            {
-                metadata = value[index..];
-                value = value[..index];
-            }
-        }
-
-        if (value.Length > 0)
-        {
-            parts = value.Split('.');
-            foreach (var part in parts)
-            {
-                Validate(part);
-                NoLeadingZeroes(part);
-            }
-        }
-
-        return value;
-    }
-
-    /// <summary>
-    /// Invoked to validate the given part has no leasing zeroes.
-    /// </summary>
-    static void NoLeadingZeroes(string part)
-    {
-        if (part.Length > 1 &&
-            part[0] == '0' &&
-            part.All(char.IsDigit))
-            throw new ArgumentException(
-                "Leading zeroes are not allowed in pre-release parts.")
-                .WithData(part);
-    }
-
-    /// <summary>
-    /// Invoked to validate the given part.
-    /// </summary>
-    static void Validate(string part)
+    /// <param name="part"></param>
+    /// <param name="noLeadingZeroes"></param>
+    static void ValidatePart(string part, bool noLeadingZeroes = false)
     {
         part.NotNullNotEmpty();
 
-        if (part[0] == '-') throw new ArgumentException(
-            "Leading '-' character is not allowed in pre-release parts.")
-            .WithData(part);
-
-        if (part[0] == '+') throw new ArgumentException(
-            "Leading '+' character is not allowed in pre-release parts.")
-            .WithData(part);
-
         foreach (var c in part)
-            if (!Validate(c)) throw new ArgumentException(
-                "Pre-release part carries invalid characters.")
-                .WithData(c)
-                .WithData(part);
-    }
+            if (!char.IsAsciiLetter(c) && !char.IsAsciiDigit(c))
+                throw new ArgumentException(
+                    "Identifier part carries invalid characters.")
+                    .WithData(part);
 
-    /// <summary>
-    /// Invoked to validate that the given char belongs to an acceptable range.
-    /// </summary>
-    static bool Validate(char c) =>
-        c is '-' or '+' or
-        >= '0' and <= '9' or
-        >= 'A' and <= 'Z' or
-        >= 'a' and <= 'z';
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Returns a new instance with the original value increased, and the original metadata
-    /// cleared. Note that the new value might be the same as the original one if it was an empty
-    /// one, or not a trailing numeric one. In any case, the build metadata has been cleared.
-    /// </summary>
-    /// <returns></returns>
-    public SemanticRelease Increase() => Increase(out _);
-
-    /// <summary>
-    /// Returns a new instance with the original value increased, and the original metadata
-    /// cleared. The out argument determines whether the value has been increased, or not, for
-    /// instance because it was an empty one or not a trailing numeric one.
-    /// </summary>
-    /// <param name="done"></param>
-    /// <returns></returns>
-    public SemanticRelease Increase(out bool done)
-    {
-        // Returning a new version with the metadata cleared...
-        if (Value.Length == 0)
-        {
-            done = false;
-            return new(Value);
-        }
-
-        // Preparing...
-        var parts = Value.Split('.');
-        var temp = parts[^1];
-
-        // We may have a last numeric chunk to increase
-        var index = FirstDigit(temp);
-        if (index >= 0)
-        {
-            var num = temp[index..];
-            temp = temp[..index];
-
-            var item = int.TryParse(num, out var r) ? r : 0;
-            item++;
-
-            var len = num.Length;
-            num = item.ToString($"D{len}");
-            temp += num;
-
-            parts[^1] = temp;
-            done = true;
-            return string.Join('.', parts);
-        }
-
-        // Or there is not a trailing numeric part...
-        else
-        {
-            done = false;
-            return new(Value);
-        }
-    }
-
-    /// <summary>
-    /// Gets the index of the first digit in the last numeric part, or -1 if any.
-    /// </summary>
-    static int FirstDigit(string value)
-    {
-        var r = -1;
-
-        for (int i = value.Length - 1; i >= 0; i--)
-        {
-            if (char.IsDigit(value[i])) r = i;
-            else break;
-        }
-        return r;
+        if (noLeadingZeroes &&
+            part[0] == '0')
+            throw new ArgumentException(
+                "Identifier carries leading zeroes.")
+                    .WithData(part);
     }
 
     // ----------------------------------------------------
 
     /// <summary>
     /// Compares the two given instances and returns an integer that indicates whether the first
-    /// one precedes, follows, or occurs in the same sort order position as the second one.
+    /// one precedes, follows, or occurs in the same position as the second one. Comparison is
+    /// performed by comparing the parts in the regular value, but does not take into consideration
+    /// the build metadata.
     /// </summary>
     /// <param name="x"></param>
     /// <param name="y"></param>
@@ -327,9 +205,7 @@ public record SemanticRelease : IComparable<SemanticRelease>, IEquatable<Semanti
             i++;
         }
 
-        /// <summary>
-        /// Invoked to compare the two given parts.
-        /// </summary>
+        // Compares the two given parts using the precedence rules...
         static int CompareParts(string xpart, string ypart)
         {
             var nx = xpart.All(char.IsDigit);
@@ -349,7 +225,12 @@ public record SemanticRelease : IComparable<SemanticRelease>, IEquatable<Semanti
         }
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// <inheritdoc/> Comparison is performed by comparing the parts in the regular value, but
+    /// does not take into consideration the build metadata.
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
     public int CompareTo(SemanticRelease? other) => Compare(this, other);
 
     public static bool operator >(SemanticRelease? x, SemanticRelease? y) => Compare(x, y) > 0;
@@ -357,9 +238,90 @@ public record SemanticRelease : IComparable<SemanticRelease>, IEquatable<Semanti
     public static bool operator >=(SemanticRelease? x, SemanticRelease? y) => Compare(x, y) >= 0;
     public static bool operator <=(SemanticRelease? x, SemanticRelease? y) => Compare(x, y) <= 0;
 
-    /// <inheritdoc/>
-    public virtual bool Equals(SemanticRelease? other) => Compare(this, other) == 0;
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/> Comparison is performed by comparing the parts in the regular value, and
+    /// by comparing the build metadata as well.
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    public virtual bool Equals(SemanticRelease? other)
+    {
+        return
+            Compare(this, other) == 0 &&
+            other is not null &&
+            string.Compare(Metadata, other.Metadata) == 0;
+    }
 
     /// <inheritdoc/>
     public override int GetHashCode() => Value.GetHashCode();
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns a new instance with the original value increased, provided such is not empty and
+    /// can be treated as a trailing numeric one. In any case, the build metadata part is always
+    /// cleared.
+    /// </summary>
+    /// <returns></returns>
+    public SemanticRelease Increase() => Increase(out _);
+
+    /// <summary>
+    /// Returns a new instance with the original value increased, provided such is not empty and
+    /// can be treated as a trailing numeric one. If so, the out argument is set to <c>true</c>,
+    /// or otherwise set to false. In any case, the build metadata part is always cleared.
+    /// </summary>
+    /// <param name="increased"></param>
+    /// <returns></returns>
+    public SemanticRelease Increase(out bool increased)
+    {
+        // No value to increase...
+        if (Value.Length == 0)
+        {
+            increased = false;
+            return new(Value);
+        }
+
+        // Preparing...
+        var parts = Value.Split('.');
+        var temp = parts[^1];
+
+        // We need a trailing numeric chunk to increase...
+        var index = FirstDigit(temp);
+        if (index < 0)
+        {
+            increased = false;
+            return new(Value);
+        }
+        else
+        {
+            var num = temp[index..];
+            var item = int.TryParse(num, out var r) ? r : 0;
+            item++;
+
+            var len = num.Length;
+            num = item.ToString($"D{len}");
+
+            temp = temp[..index];
+            temp += num;
+            parts[^1] = temp;
+
+            increased = true;
+            return string.Join('.', parts);
+        }
+
+        // The index of the first digit, or -1 if any...
+        static int FirstDigit(string value)
+        {
+            var r = -1;
+
+            for (int i = value.Length - 1; i >= 0; i--)
+            {
+                if (char.IsDigit(value[i])) r = i;
+                else break;
+            }
+            return r;
+        }
+    }
 }

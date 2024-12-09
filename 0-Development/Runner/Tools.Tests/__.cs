@@ -7,7 +7,7 @@ namespace Runner;
 //[Enforced]
 //public class Test_
 //{
-//    // [Enforced]
+//    //[Enforced]
 //    [Fact]
 //    public void Test_()
 //    {

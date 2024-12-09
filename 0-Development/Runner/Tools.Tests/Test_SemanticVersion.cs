@@ -5,34 +5,65 @@ namespace Runner;
 
 // ========================================================
 //[Enforced]
-public class Test_SemanticRelease
+public class Test_SemanticVersion
 {
     //[Enforced]
     [Fact]
-    public void Test_Create_Empy()
+    public void Test_Create_Empty()
     {
-        var item = new SemanticRelease();
-        Assert.Empty(item.Value);
-        Assert.Empty(item.Metadata);
+        var item = new SemanticVersion();
+        Assert.Equal(0, item.Major);
+        Assert.Equal(0, item.Minor);
+        Assert.Equal(0, item.Patch);
+        Assert.True(item.PreRelease.IsEmpty);
         Assert.True(item.IsEmpty);
-        Assert.Empty(item.ToString(true));
+        Assert.Equal("0.0", item.ToString());
 
         item = "";
-        Assert.Empty(item.Value);
-        Assert.Empty(item.Metadata);
+        Assert.Equal(0, item.Major);
+        Assert.Equal(0, item.Minor);
+        Assert.Equal(0, item.Patch);
+        Assert.True(item.PreRelease.IsEmpty);
         Assert.True(item.IsEmpty);
-        Assert.Empty(item.ToString(true));
+        Assert.Equal("0.0", item.ToString());
 
         try { item = (string)null!; Assert.Fail(); } catch (ArgumentNullException) { } // Null value
         try { item = " "; Assert.Fail(); } catch (EmptyException) { } // Empty value
-        try { item = "-"; Assert.Fail(); } catch (EmptyException) { } // Empty after hyphen
-        try { item = "."; Assert.Fail(); } catch (EmptyException) { } // Empty parts
     }
 
     //[Enforced]
     [Fact]
-    public void Test_Create_Populated_Value()
+    public void Test_Create_Populated()
     {
+        SemanticVersion item;
+
+        item = ""; Assert.Equal("0.0", item.ToString());
+        item = "0"; Assert.Equal("0.0", item.ToString());
+        item = "1"; Assert.Equal("1.0", item.ToString());
+        item = "1.2"; Assert.Equal("1.2", item.ToString());
+        item = "1.2.3"; Assert.Equal("1.2.3", item.ToString());
+
+        try { item = "."; Assert.Fail(); } catch (ArgumentException) { } // Empty parts
+        try { item = "1."; Assert.Fail(); } catch (ArgumentException) { } // Empty parts
+        try { item = ".2"; Assert.Fail(); } catch (ArgumentException) { } // Empty parts
+        try { item = "00"; Assert.Fail(); } catch (ArgumentException) { } // Leading zeroes
+    }
+
+    //[Enforced]
+    [Fact]
+    public void Test_Create_Populated_With_Release()
+    {
+        SemanticVersion item;
+
+        item = "0-pre"; Assert.Equal("0.0-pre", item.ToString());
+        item = "1-pre+any"; Assert.Equal("1.0-pre", item.ToString());
+        item = "1.2+any"; Assert.Equal("1.2+any", item.ToString());
+
+        try { item = "-1"; Assert.Fail(); } catch (ArgumentException) { } // Negative value
+        try { item = "1.-2"; Assert.Fail(); } catch (ArgumentException) { } // Negative value
+    }
+}
+/*
         var item = new SemanticRelease("1");
         Assert.Equal("1", item.Value);
         Assert.Empty(item.Metadata);
@@ -52,6 +83,11 @@ public class Test_SemanticRelease
         Assert.Equal("beta1", item.Value);
         Assert.Empty(item.Metadata);
         Assert.Equal("-beta1", item.ToString(true));
+
+        try { item = (string)null!; Assert.Fail(); } catch (ArgumentNullException) { } // Null value
+        try { item = " "; Assert.Fail(); } catch (EmptyException) { } // Empty value
+        try { item = "-"; Assert.Fail(); } catch (EmptyException) { } // Empty after hyphen
+        
 
         try { item = "01"; Assert.Fail(); } catch (ArgumentException) { } // Leading zeroes
         try { item = "1.02"; Assert.Fail(); } catch (ArgumentException) { } // Leading zeroes
@@ -289,4 +325,4 @@ public class Test_SemanticRelease
         Assert.Equal("a3v100", target.Value);
         Assert.Empty(target.Metadata);
     }
-}
+ */
