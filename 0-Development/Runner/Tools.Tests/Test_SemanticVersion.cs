@@ -1,5 +1,6 @@
 ﻿using static Yotei.Tools.Diagnostics.ConsoleEx;
 using static System.ConsoleColor;
+using System.Numerics;
 
 namespace Runner;
 
@@ -43,9 +44,10 @@ public class Test_SemanticVersion
         item = "1.2"; Assert.Equal("1.2", item.ToString());
         item = "1.2.3"; Assert.Equal("1.2.3", item.ToString());
 
-        try { item = "."; Assert.Fail(); } catch (ArgumentException) { } // Empty parts
-        try { item = "1."; Assert.Fail(); } catch (ArgumentException) { } // Empty parts
-        try { item = ".2"; Assert.Fail(); } catch (ArgumentException) { } // Empty parts
+        try { item = "-"; Assert.Fail(); } catch (EmptyException) { } // Empty parts
+        try { item = "."; Assert.Fail(); } catch (EmptyException) { } // Empty parts
+        try { item = "1."; Assert.Fail(); } catch (EmptyException) { } // Empty parts
+        try { item = ".2"; Assert.Fail(); } catch (EmptyException) { } // Empty parts
         try { item = "00"; Assert.Fail(); } catch (ArgumentException) { } // Leading zeroes
     }
 
@@ -56,138 +58,16 @@ public class Test_SemanticVersion
         SemanticVersion item;
 
         item = "0-pre"; Assert.Equal("0.0-pre", item.ToString());
-        item = "1-pre+any"; Assert.Equal("1.0-pre", item.ToString());
+        item = "1-pre+any"; Assert.Equal("1.0-pre+any", item.ToString());
         item = "1.2+any"; Assert.Equal("1.2+any", item.ToString());
+        item = "1.0.3-pre+any"; Assert.Equal("1.0.3-pre+any", item.ToString());
+        item = "1.0.3-00+00"; Assert.Equal("1.0.3-00+00", item.ToString());
 
-        try { item = "-1"; Assert.Fail(); } catch (ArgumentException) { } // Negative value
-        try { item = "1.-2"; Assert.Fail(); } catch (ArgumentException) { } // Negative value
-    }
-}
-/*
-        var item = new SemanticRelease("1");
-        Assert.Equal("1", item.Value);
-        Assert.Empty(item.Metadata);
-        Assert.Equal("-1", item.ToString(true));
-
-        item = "-1";
-        Assert.Equal("1", item.Value);
-        Assert.Empty(item.Metadata);
-        Assert.Equal("-1", item.ToString(true));
-
-        item = "beta1";
-        Assert.Equal("beta1", item.Value);
-        Assert.Empty(item.Metadata);
-        Assert.Equal("-beta1", item.ToString(true));
-
-        item = "-beta1";
-        Assert.Equal("beta1", item.Value);
-        Assert.Empty(item.Metadata);
-        Assert.Equal("-beta1", item.ToString(true));
-
-        try { item = (string)null!; Assert.Fail(); } catch (ArgumentNullException) { } // Null value
-        try { item = " "; Assert.Fail(); } catch (EmptyException) { } // Empty value
-        try { item = "-"; Assert.Fail(); } catch (EmptyException) { } // Empty after hyphen
-        
-
-        try { item = "01"; Assert.Fail(); } catch (ArgumentException) { } // Leading zeroes
-        try { item = "1.02"; Assert.Fail(); } catch (ArgumentException) { } // Leading zeroes
-        try { item = ".1"; Assert.Fail(); } catch (EmptyException) { } // Empty parts
-        try { item = "1."; Assert.Fail(); } catch (EmptyException) { } // Empty parts
-        try { item = "1..2"; Assert.Fail(); } catch (EmptyException) { } // Empty parts
-        try { item = "1.-2"; Assert.Fail(); } catch (ArgumentException) { } // Invalid character
-    }
-
-    //[Enforced]
-    [Fact]
-    public void Test_Create_Empty_Value_And_Metadata()
-    {
-        var item = new SemanticRelease("+1");
-        Assert.Empty(item.Value);
-        Assert.Equal("1", item.Metadata);
-        Assert.Equal("+1", item.ToString(true));
-
-        item = "+x1.y2";
-        Assert.Empty(item.Value);
-        Assert.Equal("x1.y2", item.Metadata);
-        Assert.Equal("+x1.y2", item.ToString(true));
-
-        item = "+001";
-        Assert.Empty(item.Value);
-        Assert.Equal("001", item.Metadata);
-        Assert.Equal("+001", item.ToString(true));
-    }
-
-    //[Enforced]
-    [Fact]
-    public void Test_Create_Populated_Value_And_Metadata()
-    {
-        var item = new SemanticRelease("beta1+1");
-        Assert.Equal("beta1", item.Value);
-        Assert.Equal("1", item.Metadata);
-        Assert.Equal("-beta1+1", item.ToString(true));
-
-        item = "-beta1+1";
-        Assert.Equal("beta1", item.Value);
-        Assert.Equal("1", item.Metadata);
-        Assert.Equal("-beta1+1", item.ToString(true));
-
-        item = "-beta1+01";
-        Assert.Equal("beta1", item.Value);
-        Assert.Equal("01", item.Metadata);
-        Assert.Equal("-beta1+01", item.ToString(true));
-
-        try { item = "+"; Assert.Fail(); } catch (EmptyException) { } // Empty metadata
-        try { item = "+."; Assert.Fail(); } catch (EmptyException) { } // Empty parts
-        try { item = "+1."; Assert.Fail(); } catch (EmptyException) { } // Empty parts
-    }
-
-    // ----------------------------------------------------
-
-    //[Enforced]
-    [Fact]
-    public void Test_With_From_Empty()
-    {
-        var source = new SemanticRelease();
-        var target = source with { Value = "beta1" };
-        Assert.Equal("beta1", target.Value);
-        Assert.Empty(target.Metadata);
-        Assert.Equal("-beta1", target.ToString(true));
-
-        target = source with { Metadata = "any" };
-        Assert.Empty(target.Value);
-        Assert.Equal("any", target.Metadata);
-        Assert.Equal("+any", target.ToString(true));
-    }
-
-    //[Enforced]
-    [Fact]
-    public void Test_With_From_Populated()
-    {
-        var source = new SemanticRelease("beta+any");
-        var target = source with { Value = "other" };
-        Assert.Equal("other", target.Value);
-        Assert.Equal("any", target.Metadata);
-        Assert.Equal("-other+any", target.ToString(true));
-
-        target = source with { Value = "other+whatever" };
-        Assert.Equal("other", target.Value);
-        Assert.Equal("whatever", target.Metadata);
-        Assert.Equal("-other+whatever", target.ToString(true));
-
-        target = source with { Value = "+whatever" };
-        Assert.Empty(target.Value);
-        Assert.Equal("whatever", target.Metadata);
-        Assert.Equal("+whatever", target.ToString(true));
-
-        target = source with { Value = "" };
-        Assert.Empty(target.Value);
-        Assert.Equal("any", target.Metadata);
-        Assert.Equal("+any", target.ToString(true));
-
-        target = source with { Metadata = "" };
-        Assert.Equal("beta", target.Value);
-        Assert.Empty(target.Metadata);
-        Assert.Equal("-beta", target.ToString(true));
+        try { item = "-1"; Assert.Fail(); } catch (EmptyException) { } // Negative value
+        try { item = "1.-2"; Assert.Fail(); } catch (EmptyException) { } // Negative value
+        try { item = "+1"; Assert.Fail(); } catch (EmptyException) { } // Empty part
+        try { item = "1.+2"; Assert.Fail(); } catch (EmptyException) { } // Empty part
+        try { item = "1.00"; Assert.Fail(); } catch (ArgumentException) { } // Leading zeroes
     }
 
     // ----------------------------------------------------
@@ -196,13 +76,23 @@ public class Test_SemanticVersion
     [Fact]
     public void Test_Compare_Numeric()
     {
-        var source = new SemanticRelease("beta.9+xyz");
-        var target = new SemanticRelease("beta.9+abc");
+        var source = new SemanticVersion();
+        var target = new SemanticVersion();
         Assert.NotSame(source, target);
         Assert.Equal(0, source.CompareTo(target));
 
-        source = "beta.9+xyz";
-        target = "beta.10+abc";
+        source = "0+other";
+        target = "0+any";
+        Assert.Equal(0, source.CompareTo(target));
+        Assert.Equal(0, target.CompareTo(source));
+
+        source = "0";
+        target = "1";
+        Assert.True(source < target);
+        Assert.True(target > source);
+
+        source = "0";
+        target = "0.0.1";
         Assert.True(source < target);
         Assert.True(target > source);
     }
@@ -211,36 +101,33 @@ public class Test_SemanticVersion
     [Fact]
     public void Test_Compare_Alphanumeric()
     {
-        var source = new SemanticRelease("alpha");
-        var target = new SemanticRelease("alpha");
+        var source = new SemanticVersion("0-pre");
+        var target = new SemanticVersion("0-pre");
+        Assert.NotSame(source, target);
         Assert.Equal(0, source.CompareTo(target));
 
-        source = "alpha+abc";
-        target = "alpha+xyz";
+        source = "0-pre+other";
+        target = "0-pre+any";
         Assert.Equal(0, source.CompareTo(target));
+        Assert.Equal(0, target.CompareTo(source));
 
-        source = "alpha";
-        target = "beta";
+        source = "0-alpha";
+        target = "0-beta";
         Assert.Equal(-1, source.CompareTo(target));
         Assert.Equal(+1, target.CompareTo(source));
 
-        source = "alpha.beta";
-        target = "alpha.beta.delta";
+        source = "0.1-alpha.beta.9";
+        target = "0.1-alpha.beta.10";
         Assert.Equal(-1, source.CompareTo(target));
         Assert.Equal(+1, target.CompareTo(source));
 
-        source = "alpha.9";
-        target = "alpha.10";
-        Assert.Equal(-1, source.CompareTo(target));
-        Assert.Equal(+1, target.CompareTo(source));
-
-        source = "alpha.x9";
-        target = "alpha.x10";
+        source = "0.1.2-alpha.x9";
+        target = "0.1.2-alpha.x10";
         Assert.Equal(+1, source.CompareTo(target));
         Assert.Equal(-1, target.CompareTo(source));
 
-        source = "9999";
-        target = "a";
+        source = "1.2.3-9999";
+        target = "1.2.3-a";
         Assert.Equal(-1, source.CompareTo(target));
         Assert.Equal(+1, target.CompareTo(source));
     }
@@ -251,18 +138,18 @@ public class Test_SemanticVersion
     [Fact]
     public void Test_Equals()
     {
-        var source = new SemanticRelease();
-        var target = new SemanticRelease();
+        var source = new SemanticVersion();
+        var target = new SemanticVersion();
         Assert.NotSame(source, target);
         Assert.True(source == target);
 
-        source = new SemanticRelease("beta");
-        target = new SemanticRelease("beta");
+        source = new SemanticVersion("1.2-beta");
+        target = new SemanticVersion("1.2-beta");
         Assert.NotSame(source, target);
         Assert.True(source == target);
 
-        source = new SemanticRelease("beta.9+xyz");
-        target = new SemanticRelease("beta.9+abc");
+        source = new SemanticVersion("1.2.3-beta.9+xyz");
+        target = new SemanticVersion("1.2.3-beta.9+abc");
         Assert.NotSame(source, target);
         Assert.False(source == target);
     }
@@ -271,58 +158,108 @@ public class Test_SemanticVersion
 
     //[Enforced]
     [Fact]
-    public void Test_Increase_Empty()
+    public void Test_Increase_Major()
     {
-        var source = new SemanticRelease();
-        var target = source.Increase(out var increased);
-        Assert.False(increased);
-        Assert.Equal(source, target);
-        Assert.Empty(target.ToString(hypen: true));
+        var source = new SemanticVersion();
+        var target = source.IncreaseMajor();
+        Assert.Equal(1, target.Major);
+        Assert.Equal(0, target.Minor);
+        Assert.Equal(0, target.Patch);
+        Assert.True(target.PreRelease.IsEmpty);
+
+        source = "1.2.3-pre+any";
+        target = source.IncreaseMajor();
+        Assert.Equal(2, target.Major);
+        Assert.Equal(0, target.Minor);
+        Assert.Equal(0, target.Patch);
+        Assert.True(target.PreRelease.IsEmpty);
     }
 
     //[Enforced]
     [Fact]
-    public void Test_Increase_Not_Numeric()
+    public void Test_Increase_Minor()
     {
-        var source = new SemanticRelease("alpha");
-        var target = source.Increase(out var increased);
-        Assert.False(increased);
-        Assert.Equal(source, target);
-        Assert.Equal("-alpha", target.ToString(hypen: true));
+        var source = new SemanticVersion();
+        var target = source.IncreaseMinor();
+        Assert.Equal(0, target.Major);
+        Assert.Equal(1, target.Minor);
+        Assert.Equal(0, target.Patch);
+        Assert.True(target.PreRelease.IsEmpty);
+
+        source = "1.2.3-pre+any";
+        target = source.IncreaseMinor();
+        Assert.Equal(1, target.Major);
+        Assert.Equal(3, target.Minor);
+        Assert.Equal(0, target.Patch);
+        Assert.True(target.PreRelease.IsEmpty);
     }
 
     //[Enforced]
     [Fact]
-    public void Test_Increase_Others()
+    public void Test_Increase_Patch()
     {
-        var source = new SemanticRelease("9+any");
-        var target = source.Increase(out var increased);
-        Assert.True(increased);
-        Assert.Equal("10", target.Value);
-        Assert.Empty(target.Metadata);
+        var source = new SemanticVersion();
+        var target = source.IncreasePatch();
+        Assert.Equal(0, target.Major);
+        Assert.Equal(0, target.Minor);
+        Assert.Equal(1, target.Patch);
+        Assert.True(target.PreRelease.IsEmpty);
 
-        source = new SemanticRelease("v001+any");
-        target = source.Increase(out increased);
-        Assert.True(increased);
-        Assert.Equal("v002", target.Value);
-        Assert.Empty(target.Metadata);
-
-        source = new SemanticRelease("v99+any");
-        target = source.Increase(out increased);
-        Assert.True(increased);
-        Assert.Equal("v100", target.Value);
-        Assert.Empty(target.Metadata);
-
-        source = new SemanticRelease("a3v001+any");
-        target = source.Increase(out increased);
-        Assert.True(increased);
-        Assert.Equal("a3v002", target.Value);
-        Assert.Empty(target.Metadata);
-
-        source = new SemanticRelease("a3v99+any");
-        target = source.Increase(out increased);
-        Assert.True(increased);
-        Assert.Equal("a3v100", target.Value);
-        Assert.Empty(target.Metadata);
+        source = "1.2.3-pre+any";
+        target = source.IncreasePatch();
+        Assert.Equal(1, target.Major);
+        Assert.Equal(2, target.Minor);
+        Assert.Equal(4, target.Patch);
+        Assert.True(target.PreRelease.IsEmpty);
     }
- */
+
+    //[Enforced]
+    [Fact]
+    public void Test_Increase_PreRelease_Not_Numeric()
+    {
+        var source = new SemanticVersion();
+        var target = source.IncreasePreRelease(out var increased);
+        Assert.Equal(0, target.Major);
+        Assert.Equal(0, target.Minor);
+        Assert.Equal(0, target.Patch);
+        Assert.False(increased);
+        Assert.True(target.PreRelease.IsEmpty);
+
+        source = "1.2.3-pre+any";
+        target = source.IncreasePreRelease(out increased);
+        Assert.Equal(1, target.Major);
+        Assert.Equal(2, target.Minor);
+        Assert.Equal(3, target.Patch);
+        Assert.False(increased);
+        Assert.Equal("-pre", target.PreRelease.ToString(hyphen: true));
+    }
+
+    //[Enforced]
+    [Fact]
+    public void Test_Increase_PreRelease_Numeric()
+    {
+        var source = new SemanticVersion("0-9+any");
+        var target = source.IncreasePreRelease(out var increased);
+        Assert.Equal(0, target.Major);
+        Assert.Equal(0, target.Minor);
+        Assert.Equal(0, target.Patch);
+        Assert.True(increased);
+        Assert.Equal("-10", target.PreRelease.ToString(hyphen: true));
+
+        source = "1.2.3-x5v001+any";
+        target = source.IncreasePreRelease(out increased);
+        Assert.Equal(1, target.Major);
+        Assert.Equal(2, target.Minor);
+        Assert.Equal(3, target.Patch);
+        Assert.True(increased);
+        Assert.Equal("-x5v002", target.PreRelease.ToString(hyphen: true));
+
+        source = "1.2.3-x5v99+any";
+        target = source.IncreasePreRelease(out increased);
+        Assert.Equal(1, target.Major);
+        Assert.Equal(2, target.Minor);
+        Assert.Equal(3, target.Patch);
+        Assert.True(increased);
+        Assert.Equal("-x5v100", target.PreRelease.ToString(hyphen: true));
+    }
+}

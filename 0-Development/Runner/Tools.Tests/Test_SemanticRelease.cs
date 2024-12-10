@@ -53,8 +53,16 @@ public class Test_SemanticRelease
         Assert.Empty(item.Metadata);
         Assert.Equal("-beta1", item.ToString(true));
 
-        try { item = "01"; Assert.Fail(); } catch (ArgumentException) { } // Leading zeroes
-        try { item = "1.02"; Assert.Fail(); } catch (ArgumentException) { } // Leading zeroes
+        item = "01";
+        Assert.Equal("01", item.Value);
+        Assert.Empty(item.Metadata);
+        Assert.Equal("-01", item.ToString(true));
+
+        item = "1.02";
+        Assert.Equal("1.02", item.Value);
+        Assert.Empty(item.Metadata);
+        Assert.Equal("-1.02", item.ToString(true));
+
         try { item = ".1"; Assert.Fail(); } catch (EmptyException) { } // Empty parts
         try { item = "1."; Assert.Fail(); } catch (EmptyException) { } // Empty parts
         try { item = "1..2"; Assert.Fail(); } catch (EmptyException) { } // Empty parts
@@ -241,7 +249,7 @@ public class Test_SemanticRelease
         var target = source.Increase(out var increased);
         Assert.False(increased);
         Assert.Equal(source, target);
-        Assert.Empty(target.ToString(hypen: true));
+        Assert.Empty(target.ToString(hyphen: true));
     }
 
     //[Enforced]
@@ -252,7 +260,7 @@ public class Test_SemanticRelease
         var target = source.Increase(out var increased);
         Assert.False(increased);
         Assert.Equal(source, target);
-        Assert.Equal("-alpha", target.ToString(hypen: true));
+        Assert.Equal("-alpha", target.ToString(hyphen: true));
     }
 
     //[Enforced]

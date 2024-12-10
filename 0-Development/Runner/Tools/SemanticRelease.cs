@@ -39,9 +39,9 @@ public record SemanticRelease : IComparable<SemanticRelease>, IEquatable<Semanti
     /// Returns a string representation of this instance, with or without a leading hypen as
     /// requested if needed.
     /// </summary>
-    /// <param name="hypen"></param>
+    /// <param name="hyphen"></param>
     /// <returns></returns>
-    public string ToString(bool hypen)
+    public string ToString(bool hyphen)
     {
         if (Value.Length == 0 && Metadata.Length == 0) return string.Empty;
         else
@@ -50,7 +50,7 @@ public record SemanticRelease : IComparable<SemanticRelease>, IEquatable<Semanti
 
             if (Value.Length > 0)
             {
-                if (hypen) sb.Append('-');
+                if (hyphen) sb.Append('-');
                 sb.Append(Value);
             }
             if (Metadata.Length > 0) sb.Append($"+{Metadata}");
@@ -110,7 +110,7 @@ public record SemanticRelease : IComparable<SemanticRelease>, IEquatable<Semanti
                 if (value[0] == '-') value = value[1..];
 
                 var parts = value.Split('.');
-                foreach (var part in parts) ValidatePart(part, noLeadingZeroes: true);
+                foreach (var part in parts) ValidatePart(part);
             }
 
             _Value = value;
@@ -260,17 +260,18 @@ public record SemanticRelease : IComparable<SemanticRelease>, IEquatable<Semanti
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a new instance with the original value increased, provided such is not empty and
-    /// can be treated as a trailing numeric one. In any case, the build metadata part is always
-    /// cleared.
+    /// Returns a new instance with the original value increased, provided that such is not empty
+    /// and that it can be treated as a trailing numeric one. In any case, the build metadata part
+    /// is always cleared.
     /// </summary>
     /// <returns></returns>
     public SemanticRelease Increase() => Increase(out _);
 
     /// <summary>
-    /// Returns a new instance with the original value increased, provided such is not empty and
-    /// can be treated as a trailing numeric one. If so, the out argument is set to <c>true</c>,
-    /// or otherwise set to false. In any case, the build metadata part is always cleared.
+    /// Returns a new instance with the original value increased, provided that such is not empty
+    /// and that it can be treated as a trailing numeric one. If so, the out argument is set to
+    /// <c>true</c>, or otherwise set to false. In any case, the build metadata part is always
+    /// cleared.
     /// </summary>
     /// <param name="increased"></param>
     /// <returns></returns>

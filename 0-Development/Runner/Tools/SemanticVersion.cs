@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices.Marshalling;
+﻿using System.Reflection.Metadata.Ecma335;
+using System.Runtime.InteropServices.Marshalling;
 
 namespace Runner;
 
@@ -22,7 +23,7 @@ namespace Runner;
 /// have lower precendence than alphanumeric ones. When comparing precedence build metadata is
 /// ignored, but used for equality purposes.
 /// </summary>
-public partial record SemanticVersion
+public partial record SemanticVersion : IComparable<SemanticVersion>, IEquatable<SemanticVersion>
 {
     public static SemanticVersion Empty { get; } = new();
 
@@ -70,7 +71,43 @@ public partial record SemanticVersion
         value.ThrowWhenNull(); if (value.Length == 0) return;
         value.NotNullNotEmpty();
 
-        throw null;
+        string? metadata = null;
+
+        if (value is not null) Major = GetValue(value, out value);
+        if (value is not null) Minor = GetValue(value, out value);
+        if (value is not null) Patch = GetValue(value, out value);
+        if (metadata is not null) PreRelease = metadata;
+
+        // Gets the value of the given major, minor or patch part...
+        int GetValue(string value, out string newvalue)
+        {
+            newvalue = null!;
+
+            var index = value.IndexOf('-'); if (index >= 0)
+            {
+                metadata = value[index..];
+                value = value[..index];
+            }
+
+            index = value.IndexOf('+'); if (index >= 0)
+            {
+                metadata = value[index..];
+                value = value[..index];
+            }
+
+            index = value.IndexOf('.');
+            if (index >= 0)
+            {
+                newvalue = value[(index + 1)..];
+                value = value[..index];
+            }
+
+            if (value.Length == 0) throw new EmptyException("Part cannot be empty.").WithData(value);
+            if (!value.All(char.IsAsciiDigit)) throw new ArgumentException("Part must contain digits only.").WithData(value);
+            if (value.Length > 1 && value[0] == '0') throw new ArgumentException("Part must not have leading zeroes.").WithData(value);
+
+            return int.TryParse(value, out var r) ? r : 0;
+        }
     }
 
     /// <inheritdoc/>
@@ -78,7 +115,7 @@ public partial record SemanticVersion
     {
         var str = $"{Major}.{Minor}";
         if (Patch > 0) str += $".{Patch}";
-        if (!PreRelease.IsEmpty) str += PreRelease.ToString(hypen: true);
+        if (!PreRelease.IsEmpty) str += PreRelease.ToString(hyphen: true);
         return str;
     }
 
@@ -156,4 +193,109 @@ public partial record SemanticVersion
     /// Determines if this instance is an empty one, or not.
     /// </summary>
     public bool IsEmpty => Major == 0 && Minor == 0 && Patch == 0 && PreRelease.IsEmpty;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Compares the two given instances and returns an integer that indicates whether the first
+    /// one precedes, follows, or occurs in the same position as the second one. Comparison is
+    /// performed by comparing in order the values of the major, minor and patch parts, and then,
+    /// the prerelease one, but not taking into consideration its build metadata.
+    /// 
+    /// the parts in the regular value, but does not take into consideration
+    /// the build metadata.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <returns></returns>
+    public static int Compare(SemanticVersion? x, SemanticVersion? y)
+    {
+        if (x is null && y is null) return 0;
+        if (x is null) return -1;
+        if (y is null) return +1;
+
+        if (x.Major != y.Major) return x.Major.CompareTo(y.Major);
+        if (x.Minor != y.Minor) return x.Minor.CompareTo(y.Minor);
+        if (x.Patch != y.Patch) return x.Patch.CompareTo(y.Patch);
+
+        return x.PreRelease.CompareTo(y.PreRelease);
+    }
+
+    /// <summary>
+    /// <inheritdoc/> Comparison is performed by comparing in order the values of the major,
+    /// minor and patch parts, and then, the prerelease one, but not taking into consideration
+    /// its build metadata.
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    public int CompareTo(SemanticVersion? other) => Compare(this, other);
+
+    public static bool operator >(SemanticVersion? x, SemanticVersion? y) => Compare(x, y) > 0;
+    public static bool operator <(SemanticVersion? x, SemanticVersion? y) => Compare(x, y) < 0;
+    public static bool operator >=(SemanticVersion? x, SemanticVersion? y) => Compare(x, y) >= 0;
+    public static bool operator <=(SemanticVersion? x, SemanticVersion? y) => Compare(x, y) <= 0;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/> Comparison is performed by comparing the parts in the regular value, and
+    /// by comparing the build metadata as well.
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    public virtual bool Equals(SemanticVersion? other)
+    {
+        return
+            Compare(this, other) == 0 &&
+            other is not null &&
+            PreRelease.Equals(other.PreRelease);
+    }
+
+    /// <inheritdoc/>
+    public override int GetHashCode() => HashCode.Combine(Major, Minor, Patch, PreRelease);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns a new instance where the original major version has been increased by one unit.
+    /// The minor and patch values, and the build metadata have been cleared.
+    /// </summary>
+    /// <returns></returns>
+    public SemanticVersion IncreaseMajor() => new(Major + 1, 0, 0, "");
+
+    /// <summary>
+    /// Returns a new instance where the original minor version has been increased by one unit.
+    /// The patch value, and the build metadata have been cleared.
+    /// </summary>
+    /// <returns></returns>
+    public SemanticVersion IncreaseMinor() => new(Major, Minor + 1, 0, "");
+
+    /// <summary>
+    /// Returns a new instance where the original patch version has been increased by one unit.
+    /// The build metadata has been cleared.
+    /// </summary>
+    /// <returns></returns>
+    public SemanticVersion IncreasePatch() => new(Major, Minor, Patch + 1, "");
+
+    /// <summary>
+    /// Returns a new instance where the original value of the prerelease part has been increased,
+    /// provided that such is not empty and that it can be treated as a trailing numeric one. In
+    /// any case, the build metadata part is always cleared.
+    /// </summary>
+    /// <returns></returns>
+    public SemanticVersion IncreasePreRelease() => IncreasePreRelease(out _);
+
+    /// <summary>
+    /// Returns a new instance where the original value of the prerelease part has been increased,
+    /// provided that such is not empty and that it can be treated as a trailing numeric one. If
+    /// so, the out argument is set to <c>true</c>, or otherwise set to false. In any case, the
+    /// build metadata part is always cleared.
+    /// </summary>
+    /// <param name="increased"></param>
+    /// <returns></returns>
+    public SemanticVersion IncreasePreRelease(out bool increased)
+    {
+        var temp = PreRelease.Increase(out increased);
+        return new(Major, Minor, Patch, temp);
+    }
 }
