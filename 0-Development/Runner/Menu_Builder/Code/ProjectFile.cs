@@ -12,7 +12,28 @@ public class ProjectFile
     /// <param name="path"></param>
     public ProjectFile(string path)
     {
-        throw null;
+        path.ThrowWhenNull();
+
+        Directory = Path.GetDirectoryName(path) ?? string.Empty;
+        if (Directory.Length > 0 && Directory.EndsWith('\\')) Directory = Directory[..^1];
+
+        Name = Path.GetFileNameWithoutExtension(path);
+
+        Extension = Path.GetExtension(path) ?? string.Empty;
+        if (Extension.Length > 0 && Extension.StartsWith('.')) Extension = Extension[1..];
+
+        if (string.Compare(Extension, "csproj", ignoreCase: true) != 0)
+            throw new ArgumentException(
+                "File has not a project file valid extension.")
+                .WithData(path);
+
+        var file = new FileInfo(FullName);
+        if (!file.Exists)
+            throw new ArgumentException(
+                "Cannot find the given project file.")
+                .WithData(path);
+
+        LoadContents();
     }
 
     /// <inheritdoc/>
@@ -97,23 +118,46 @@ public class ProjectFile
 
     // ----------------------------------------------------
 
+    const string ISPACKABLE = "IsPackable";
+    const string TRUE = "true";
+    const string VERSION = "Version";
+
     /// <summary>
-    /// Determines if this project file represents a packable one, or not.
+    /// Determines if this project file represents a packable one, or not, using the current
+    /// collection of lines.
     /// </summary>
     /// <returns></returns>
     public bool IsPackable()
     {
-        throw null;
+        foreach (var line in Lines)
+        {
+            if (line.GetXMLValue(ISPACKABLE, out var value) &&
+                string.Compare(TRUE, value, ignoreCase: true) == 0)
+                return true;
+        }
+
+        return false;
     }
 
     /// <summary>
-    /// Tries to obtain the semantic version value specified in this project file.
+    /// Tries to obtain the semantic version value specified in this project file, using the
+    /// current collection of lines.
     /// </summary>
     /// <param name="version"></param>
     /// <returns></returns>
-    public bool GetVersion([NotNullWhen(true)] out SemanticVersion version)
+    public bool GetVersion([NotNullWhen(true)] out SemanticVersion? version)
     {
-        throw null;
+        foreach (var line in Lines)
+        {
+            if (line.GetXMLValue(VERSION, out var value))
+            {
+                version = new(value);
+                return true;
+            }
+        }
+
+        version = null;
+        return false;
     }
 
     /// <summary>
@@ -126,6 +170,38 @@ public class ProjectFile
     /// <returns></returns>
     public bool SetVersion(SemanticVersion version, [NotNullWhen(true)] out SemanticVersion? old)
     {
-        throw null;
+        version.ThrowWhenNull();
+
+        foreach (var line in Lines)
+        {
+            if (!line.GetXMLValue(VERSION, out var temp)) continue;
+
+            if (line.SetXMLValue(VERSION, version))
+            {
+                old = temp;
+                return true;
+            }
+        }
+
+        old = null;
+        return false;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Gets the list of NuGet package references contained in the project file.
+    /// </summary>
+    /// <returns></returns>
+    public List<NuPackageReference> GetNuPackageReferences()
+    {
+        var list = new List<NuPackageReference>();
+
+        foreach (var line in Lines)
+        {
+            if (NuPackageReference.Validate(line, out _, out _)) list.Add(new(line));
+        }
+
+        return list;
     }
 }

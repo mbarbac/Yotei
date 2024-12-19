@@ -10,7 +10,6 @@ namespace Runner;
 /// </summary>
 public static class Menu
 {
-    /*
     /// <summary>
     /// Runs a console menu for the given set of menu entries, that the user can select using
     /// the [Up] and [Down] keys, and the [Enter] one to execute its associated action.
@@ -56,7 +55,7 @@ public static class Menu
     public static int Run(ConsoleColor color, params MenuEntry[] entries)
     {
         return Run(color, Timeout.InfiniteTimeSpan, entries);
-    }*/
+    }
 
     /// <summary>
     /// Runs a console menu for the given set of menu entries, that the user can select using

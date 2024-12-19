@@ -147,8 +147,6 @@ public class ProjectLine
         return GetWrappedValue(head, tail, out value, comparison);
     }
 
-
-
     /// <summary>
     /// Tries to set the value of the not-null sequence wrapped by the given not-null and not-empty
     /// XML delimiter, if any. The delimiter must be a literal one without any termination characters.
@@ -157,7 +155,7 @@ public class ProjectLine
     /// <param name="value"></param>
     /// <param name="comparison"></param>
     /// <returns></returns>
-    public bool SetWrappedValue(
+    public bool SetXMLValue(
         string delimiter,
         string value,
         StringComparison comparison = StringComparison.OrdinalIgnoreCase)
