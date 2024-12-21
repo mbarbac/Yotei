@@ -5,11 +5,11 @@ namespace Runner;
 
 // ========================================================
 //[Enforced]
-//public class Test_
+//public static class Test_
 //{
 //    //[Enforced]
 //    [Fact]
-//    public void Test_()
+//    public static void Test_()
 //    {
 //    }
 //}

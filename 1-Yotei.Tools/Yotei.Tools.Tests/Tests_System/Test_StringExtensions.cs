@@ -5,11 +5,11 @@ namespace Yotei.Tools.Tests;
 
 // ========================================================
 //[Enforced]
-public class Test_StringExtensions
+public static class Test_StringExtensions
 {
     // [Enforced]
     [Fact]
-    public void Test_NullWhenEmpty_With_Trim()
+    public static void Test_NullWhenEmpty_With_Trim()
     {
         string? source = null;
         string? result = source.NullWhenEmpty();
@@ -26,7 +26,7 @@ public class Test_StringExtensions
 
     // [Enforced]
     [Fact]
-    public void Test_NullWhenEmpty_No_Trim()
+    public static void Test_NullWhenEmpty_No_Trim()
     {
         string? source = null;
         string? result = source.NullWhenEmpty(trim: false);
@@ -46,7 +46,7 @@ public class Test_StringExtensions
 
     // [Enforced]
     [Fact]
-    public void Test_NotNullNotEmpty_With_Trim()
+    public static void Test_NotNullNotEmpty_With_Trim()
     {
         string? source = null;
         Assert.Throws<ArgumentNullException>(() => source.NotNullNotEmpty());
@@ -60,7 +60,7 @@ public class Test_StringExtensions
 
     // [Enforced]
     [Fact]
-    public void Test_NotNullNotEmpty_No_Trim()
+    public static void Test_NotNullNotEmpty_No_Trim()
     {
         string? source = null;
         Assert.Throws<ArgumentNullException>(() => source.NotNullNotEmpty(trim: false));
@@ -71,6 +71,4 @@ public class Test_StringExtensions
         source = " ";
         Assert.Equal(" ", source.NotNullNotEmpty(trim: false));
     }
-
-
 }

@@ -5,11 +5,11 @@ namespace Yotei.Tools.Tests;
 
 // ========================================================
 //[Enforced]
-public class Test_StringSplitter
+public static class Test_StringSplitter
 {
     // [Enforced]
     [Fact]
-    public void Test_Null()
+    public static void Test_Null()
     {
         var iter = new StringSplitter(null, Environment.NewLine);
         var items = iter.Select(x => x.ToString());
@@ -19,7 +19,7 @@ public class Test_StringSplitter
 
     // [Enforced]
     [Fact]
-    public void Test_Empty()
+    public static void Test_Empty()
     {
         var iter = new StringSplitter(string.Empty, Environment.NewLine);
         var items = iter.Select(x => x.ToString()).ToList();
@@ -30,7 +30,7 @@ public class Test_StringSplitter
 
     // [Enforced]
     [Fact]
-    public void Test_Empty_PlusNL()
+    public static void Test_Empty_PlusNL()
     {
         var source = """
 
@@ -48,7 +48,7 @@ public class Test_StringSplitter
 
     // [Enforced]
     [Fact]
-    public void Test_Empty_OneElement()
+    public static void Test_Empty_OneElement()
     {
         var iter = new StringSplitter("Hi", Environment.NewLine);
         var items = iter.Select(x => x.ToString()).ToList();
@@ -59,7 +59,7 @@ public class Test_StringSplitter
 
     // [Enforced]
     [Fact]
-    public void Test_Empty_OneElement_PlusNL()
+    public static void Test_Empty_OneElement_PlusNL()
     {
         var source = """
             Hi
@@ -77,7 +77,7 @@ public class Test_StringSplitter
 
     // [Enforced]
     [Fact]
-    public void Test_Empty_OneElement_PreNL()
+    public static void Test_Empty_OneElement_PreNL()
     {
         var source = """
 
@@ -95,7 +95,7 @@ public class Test_StringSplitter
 
     // [Enforced]
     [Fact]
-    public void Test_Empty_TwoElements()
+    public static void Test_Empty_TwoElements()
     {
         var source = """
             Hi
@@ -113,7 +113,7 @@ public class Test_StringSplitter
 
     // [Enforced]
     [Fact]
-    public void Test_Empty_TwoElements_PreNL_PostNL()
+    public static void Test_Empty_TwoElements_PreNL_PostNL()
     {
         var source = """
 
@@ -139,7 +139,7 @@ public class Test_StringSplitter
 
     // [Enforced]
     [Fact]
-    public void Test_Where_Predicate()
+    public static void Test_Where_Predicate()
     {
         var source = """
 
@@ -161,7 +161,7 @@ public class Test_StringSplitter
 
     // [Enforced]
     [Fact]
-    public void Test_Where_Predicate_With_BoolAsCurrentIsSeparator()
+    public static void Test_Where_Predicate_With_BoolAsCurrentIsSeparator()
     {
         var source = """
 

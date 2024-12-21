@@ -9,7 +9,7 @@
    </PropertyGroup>
 
    <PropertyGroup>
-	  <Description>Yotei Common Tools</Description>
+	  <Description>Yotei Async Lock</Description>
 	  <Version>0.6.0-v001</Version>
 	  <Authors>mbarbac@hotmail.com</Authors>
 	  <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
@@ -24,6 +24,25 @@
    <ItemGroup>
 	  <None Include="README.md" Pack="true" PackagePath="" />
 	  <None Include="LICENSE" Pack="true" PackagePath="" />
+   </ItemGroup>
+
+   <PropertyGroup>
+	  <DefineConstants>$(DefineConstants);DEBUG_ASYNC_LOCK</DefineConstants>
+   </PropertyGroup>
+
+   <!-- DEBUG configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Debug'">
+	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
+   </ItemGroup>
+
+   <!-- LOCAL configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Local'">
+	  <PackageReference Include="Yotei.Tools" Version="0.6.0-v001" />
+   </ItemGroup>
+
+   <!-- RELEASE configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Release'">
+	  <PackageReference Include="Yotei.Tools" Version="0.6.0" />
    </ItemGroup>
 
 </Project>

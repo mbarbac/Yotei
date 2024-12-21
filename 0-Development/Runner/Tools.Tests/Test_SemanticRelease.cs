@@ -5,11 +5,11 @@ namespace Runner;
 
 // ========================================================
 //[Enforced]
-public class Test_SemanticRelease
+public static class Test_SemanticRelease
 {
     //[Enforced]
     [Fact]
-    public void Test_Create_Empy()
+    public static void Test_Create_Empy()
     {
         var item = new SemanticRelease();
         Assert.Empty(item.Value);
@@ -31,7 +31,7 @@ public class Test_SemanticRelease
 
     //[Enforced]
     [Fact]
-    public void Test_Create_Populated_Value()
+    public static void Test_Create_Populated_Value()
     {
         var item = new SemanticRelease("1");
         Assert.Equal("1", item.Value);
@@ -71,7 +71,7 @@ public class Test_SemanticRelease
 
     //[Enforced]
     [Fact]
-    public void Test_Create_Empty_Value_And_Metadata()
+    public static void Test_Create_Empty_Value_And_Metadata()
     {
         var item = new SemanticRelease("+1");
         Assert.Empty(item.Value);
@@ -91,7 +91,7 @@ public class Test_SemanticRelease
 
     //[Enforced]
     [Fact]
-    public void Test_Create_Populated_Value_And_Metadata()
+    public static void Test_Create_Populated_Value_And_Metadata()
     {
         var item = new SemanticRelease("beta1+1");
         Assert.Equal("beta1", item.Value);
@@ -117,7 +117,7 @@ public class Test_SemanticRelease
 
     //[Enforced]
     [Fact]
-    public void Test_With_From_Empty()
+    public static void Test_With_From_Empty()
     {
         var source = new SemanticRelease();
         var target = source with { Value = "beta1" };
@@ -133,7 +133,7 @@ public class Test_SemanticRelease
 
     //[Enforced]
     [Fact]
-    public void Test_With_From_Populated()
+    public static void Test_With_From_Populated()
     {
         var source = new SemanticRelease("beta+any");
         var target = source with { Value = "other" };
@@ -166,7 +166,7 @@ public class Test_SemanticRelease
 
     //[Enforced]
     [Fact]
-    public void Test_Compare_Numeric()
+    public static void Test_Compare_Numeric()
     {
         var source = new SemanticRelease("beta.9+xyz");
         var target = new SemanticRelease("beta.9+abc");
@@ -181,7 +181,7 @@ public class Test_SemanticRelease
 
     //[Enforced]
     [Fact]
-    public void Test_Compare_Alphanumeric()
+    public static void Test_Compare_Alphanumeric()
     {
         var source = new SemanticRelease("alpha");
         var target = new SemanticRelease("alpha");
@@ -221,7 +221,7 @@ public class Test_SemanticRelease
 
     //[Enforced]
     [Fact]
-    public void Test_Equals()
+    public static void Test_Equals()
     {
         var source = new SemanticRelease();
         var target = new SemanticRelease();
@@ -243,7 +243,7 @@ public class Test_SemanticRelease
 
     //[Enforced]
     [Fact]
-    public void Test_Increase_Empty()
+    public static void Test_Increase_Empty()
     {
         var source = new SemanticRelease();
         var target = source.Increase(out var increased);
@@ -254,7 +254,7 @@ public class Test_SemanticRelease
 
     //[Enforced]
     [Fact]
-    public void Test_Increase_Not_Numeric()
+    public static void Test_Increase_Not_Numeric()
     {
         var source = new SemanticRelease("alpha");
         var target = source.Increase(out var increased);
@@ -265,7 +265,7 @@ public class Test_SemanticRelease
 
     //[Enforced]
     [Fact]
-    public void Test_Increase_Others()
+    public static void Test_Increase_Others()
     {
         var source = new SemanticRelease("9+any");
         var target = source.Increase(out var increased);

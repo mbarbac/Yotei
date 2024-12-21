@@ -5,12 +5,11 @@ namespace Yotei.Tools.Tests;
 
 // ========================================================
 //[Enforced]
-public class Test_Locale
-{
-    //[Enforced]
-    [Fact]
-    public Task Test1()
-    {
-        return Task.CompletedTask;
-    }
-}
+//public static class Test_
+//{
+//    //[Enforced]
+//    [Fact]
+//    public static void Test_()
+//    {
+//    }
+//}

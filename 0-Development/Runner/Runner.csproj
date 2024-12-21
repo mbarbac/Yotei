@@ -7,6 +7,7 @@
 	  <LangVersion>latest</LangVersion>
 	  <ImplicitUsings>disable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
+	  <Configurations>Debug;Release;Local</Configurations>
    </PropertyGroup>
 
    <ItemGroup>
@@ -19,6 +20,7 @@
    <ItemGroup>
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Tests\Yotei.Tools.Tests.csproj" />
+	  <ProjectReference Include="..\..\1-Yotei.Tools.AsyncLock\Yotei.Tools.AsyncLock.Tests\Yotei.Tools.AsyncLock.Tests.csproj" />
    </ItemGroup>
 
 </Project>

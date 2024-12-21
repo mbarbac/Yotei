@@ -5,11 +5,11 @@ namespace Yotei.Tools.Tests;
 
 // ========================================================
 //[Enforced]
-public class Test_TimeSpanExtensions
+public static class Test_TimeSpanExtensions
 {
     //[Enforced]
     [Fact]
-    public void Test_ValidateTimeout_Cero()
+    public static void Test_ValidateTimeout_Cero()
     {
         var span = TimeSpan.FromMilliseconds(0);
         var ms = span.ValidateTimeout();
@@ -18,7 +18,7 @@ public class Test_TimeSpanExtensions
 
     // [Enforced]
     [Fact]
-    public void Test_ValidateTimeout_Positive()
+    public static void Test_ValidateTimeout_Positive()
     {
         var span = TimeSpan.FromMilliseconds(5);
         var ms = span.ValidateTimeout();
@@ -27,7 +27,7 @@ public class Test_TimeSpanExtensions
 
     // [Enforced]
     [Fact]
-    public void Test_ValidateTimeout_Infinite()
+    public static void Test_ValidateTimeout_Infinite()
     {
         var span = TimeSpan.FromMilliseconds(-1);
         var ms = span.ValidateTimeout();
@@ -40,7 +40,7 @@ public class Test_TimeSpanExtensions
 
     // [Enforced]
     [Fact]
-    public void Test_ValidateTimeout_Negative_Must_Fail()
+    public static void Test_ValidateTimeout_Negative_Must_Fail()
     {
         var span = TimeSpan.FromMilliseconds(-2);
         Assert.Throws<ArgumentOutOfRangeException>(() => span.ValidateTimeout());

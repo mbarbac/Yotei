@@ -5,11 +5,11 @@ namespace Runner;
 
 // ========================================================
 //[Enforced]
-public class Test_SemanticVersion
+public static class Test_SemanticVersion
 {
     //[Enforced]
     [Fact]
-    public void Test_Create_Empty()
+    public static void Test_Create_Empty()
     {
         var item = new SemanticVersion();
         Assert.Equal(0, item.Major);
@@ -33,7 +33,7 @@ public class Test_SemanticVersion
 
     //[Enforced]
     [Fact]
-    public void Test_Create_Populated()
+    public static void Test_Create_Populated()
     {
         SemanticVersion item;
 
@@ -52,7 +52,7 @@ public class Test_SemanticVersion
 
     //[Enforced]
     [Fact]
-    public void Test_Create_Populated_With_Release()
+    public static void Test_Create_Populated_With_Release()
     {
         SemanticVersion item;
 
@@ -73,7 +73,7 @@ public class Test_SemanticVersion
 
     //[Enforced]
     [Fact]
-    public void Test_Compare_Numeric()
+    public static void Test_Compare_Numeric()
     {
         var source = new SemanticVersion();
         var target = new SemanticVersion();
@@ -98,7 +98,7 @@ public class Test_SemanticVersion
 
     //[Enforced]
     [Fact]
-    public void Test_Compare_Alphanumeric()
+    public static void Test_Compare_Alphanumeric()
     {
         var source = new SemanticVersion("0-pre");
         var target = new SemanticVersion("0-pre");
@@ -135,7 +135,7 @@ public class Test_SemanticVersion
 
     //[Enforced]
     [Fact]
-    public void Test_Equals()
+    public static void Test_Equals()
     {
         var source = new SemanticVersion();
         var target = new SemanticVersion();
@@ -157,7 +157,7 @@ public class Test_SemanticVersion
 
     //[Enforced]
     [Fact]
-    public void Test_Increase_Major()
+    public static void Test_Increase_Major()
     {
         var source = new SemanticVersion();
         var target = source.IncreaseMajor();
@@ -176,7 +176,7 @@ public class Test_SemanticVersion
 
     //[Enforced]
     [Fact]
-    public void Test_Increase_Minor()
+    public static void Test_Increase_Minor()
     {
         var source = new SemanticVersion();
         var target = source.IncreaseMinor();
@@ -195,7 +195,7 @@ public class Test_SemanticVersion
 
     //[Enforced]
     [Fact]
-    public void Test_Increase_Patch()
+    public static void Test_Increase_Patch()
     {
         var source = new SemanticVersion();
         var target = source.IncreasePatch();
@@ -214,7 +214,7 @@ public class Test_SemanticVersion
 
     //[Enforced]
     [Fact]
-    public void Test_Increase_PreRelease_Not_Numeric()
+    public static void Test_Increase_PreRelease_Not_Numeric()
     {
         var source = new SemanticVersion();
         var target = source.IncreasePreRelease(out var increased);
@@ -235,7 +235,7 @@ public class Test_SemanticVersion
 
     //[Enforced]
     [Fact]
-    public void Test_Increase_PreRelease_Numeric()
+    public static void Test_Increase_PreRelease_Numeric()
     {
         var source = new SemanticVersion("0-9+any");
         var target = source.IncreasePreRelease(out var increased);

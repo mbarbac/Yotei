@@ -5,11 +5,11 @@ namespace Yotei.Tools.Tests;
 
 // ========================================================
 //[Enforced]
-public class Test_ObjectExtensions
+public static class Test_ObjectExtensions
 {
     // [Enforced]
     [Fact]
-    public void Test_ThrowWhenNull()
+    public static void Test_ThrowWhenNull()
     {
         object? obj = null;
         Assert.Throws<ArgumentNullException>(() => { obj.ThrowWhenNull(); });
