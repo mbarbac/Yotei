@@ -1,4 +1,8 @@
-﻿namespace Yotei.Tools;
+﻿#if DEBUG && DEBUG_LAMBDA_PARSER
+#define DEBUGPRINT
+#endif
+
+namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>
@@ -21,4 +25,19 @@ public class LambdaParser
     /// objects.
     /// </summary>
     internal Dictionary<object, LambdaNode> Surrogates { get; } = [];
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to print the given debug message.
+    /// </summary>
+    [Conditional("DEBUGPRINT")]
+    internal static void Print(string message) => DebugEx.WriteLine(message);
+
+    /// <summary>
+    /// Invoked to print the given debug message.
+    /// </summary>
+    /// [Conditional("DEBUGPRINT")]
+    internal static void Print(ConsoleColor color, string message) => DebugEx.WriteLine(color, message);
+
 }
