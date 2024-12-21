@@ -27,6 +27,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yotei.Tools.AsyncLock", "1-
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yotei.Tools.AsyncLock.Tests", "1-Yotei.Tools.AsyncLock\Yotei.Tools.AsyncLock.Tests\Yotei.Tools.AsyncLock.Tests.csproj", "{F4BE277F-E447-49B1-9278-CFADA3185B01}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1-Yotei.Tools.LambdaParser", "1-Yotei.Tools.LambdaParser", "{36BF625E-8EA3-49A3-B722-1D454939973B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yotei.Tools.LambdaParser", "1-Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser.csproj", "{017218DD-BDC6-4BD5-B120-EB3848E7D68E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yotei.Tools.LambdaParser.Tests", "1-Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser.Tests\Yotei.Tools.LambdaParser.Tests.csproj", "{88AFF06C-FE63-47B7-BF33-0CE11345E83C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,6 +70,18 @@ Global
 		{F4BE277F-E447-49B1-9278-CFADA3185B01}.Local|Any CPU.Build.0 = Local|Any CPU
 		{F4BE277F-E447-49B1-9278-CFADA3185B01}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F4BE277F-E447-49B1-9278-CFADA3185B01}.Release|Any CPU.Build.0 = Release|Any CPU
+		{017218DD-BDC6-4BD5-B120-EB3848E7D68E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{017218DD-BDC6-4BD5-B120-EB3848E7D68E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{017218DD-BDC6-4BD5-B120-EB3848E7D68E}.Local|Any CPU.ActiveCfg = Local|Any CPU
+		{017218DD-BDC6-4BD5-B120-EB3848E7D68E}.Local|Any CPU.Build.0 = Local|Any CPU
+		{017218DD-BDC6-4BD5-B120-EB3848E7D68E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{017218DD-BDC6-4BD5-B120-EB3848E7D68E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88AFF06C-FE63-47B7-BF33-0CE11345E83C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88AFF06C-FE63-47B7-BF33-0CE11345E83C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88AFF06C-FE63-47B7-BF33-0CE11345E83C}.Local|Any CPU.ActiveCfg = Local|Any CPU
+		{88AFF06C-FE63-47B7-BF33-0CE11345E83C}.Local|Any CPU.Build.0 = Local|Any CPU
+		{88AFF06C-FE63-47B7-BF33-0CE11345E83C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88AFF06C-FE63-47B7-BF33-0CE11345E83C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -74,5 +92,7 @@ Global
 		{3891115F-E9F1-46A5-9AA8-2E9159C5E7FC} = {D1D7E300-62F1-43E7-9653-DBBD8C613AD5}
 		{6FC9C39C-0E2F-4244-BD36-7576E0D4EDF8} = {1D5D19BF-4AC7-4890-BDF0-E5806ED35367}
 		{F4BE277F-E447-49B1-9278-CFADA3185B01} = {1D5D19BF-4AC7-4890-BDF0-E5806ED35367}
+		{017218DD-BDC6-4BD5-B120-EB3848E7D68E} = {36BF625E-8EA3-49A3-B722-1D454939973B}
+		{88AFF06C-FE63-47B7-BF33-0CE11345E83C} = {36BF625E-8EA3-49A3-B722-1D454939973B}
 	EndGlobalSection
 EndGlobal
