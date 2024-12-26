@@ -220,7 +220,8 @@ public partial class LambdaParser
     /// <summary>
     /// Invoked to print the given debug message.
     /// </summary>
-    /// [Conditional("DEBUGPRINT")]
-    internal static void Print(ConsoleColor color, string message) => DebugEx.WriteLine(color, message);
+    [Conditional("DEBUGPRINT")]
+    internal static void Print(
+        ConsoleColor color, string message) => DebugEx.WriteLine(color, message);
 
 }

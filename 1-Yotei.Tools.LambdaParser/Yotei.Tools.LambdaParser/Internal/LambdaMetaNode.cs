@@ -286,6 +286,7 @@ internal class LambdaMetaNode : DynamicMetaObject
     {
         LambdaParser.Print(LambdaParser.MetaBindedColor, $"* BindGetMember:");
         LambdaParser.Print(LambdaParser.MetaBindedColor, $"- This: {this}");
+        LambdaParser.Print(LambdaParser.MetaBindedColor, $"- Member: {binder.Name}");
 
         var meta = LambdaMetaMaster.BindGetMember(binder);
         return meta;
@@ -301,6 +302,8 @@ internal class LambdaMetaNode : DynamicMetaObject
     {
         LambdaParser.Print(LambdaParser.MetaBindedColor, $"* BindGetIndex:");
         LambdaParser.Print(LambdaParser.MetaBindedColor, $"- This: {this}");
+        foreach (var index in indexes)
+            LambdaParser.Print(LambdaParser.MetaBindedColor, $"- Index: {index}");
 
         var meta = LambdaMetaMaster.BindGetIndex(binder, indexes);
         return meta;
@@ -316,6 +319,8 @@ internal class LambdaMetaNode : DynamicMetaObject
     {
         LambdaParser.Print(LambdaParser.MetaBindedColor, $"* BindInvoke:");
         LambdaParser.Print(LambdaParser.MetaBindedColor, $"- This: {this}");
+        foreach (var arg in args)
+            LambdaParser.Print(LambdaParser.MetaBindedColor, $"- Argument: {arg}");
 
         var meta = LambdaMetaMaster.BindInvoke(binder, args);
         return meta;
@@ -331,6 +336,8 @@ internal class LambdaMetaNode : DynamicMetaObject
     {
         LambdaParser.Print(LambdaParser.MetaBindedColor, $"* BindMethod:");
         LambdaParser.Print(LambdaParser.MetaBindedColor, $"- This: {this}");
+        foreach (var arg in args)
+            LambdaParser.Print(LambdaParser.MetaBindedColor, $"- Argument: {arg}");
 
         var meta = LambdaMetaMaster.BindInvokeMember(binder, args);
         return meta;
@@ -348,6 +355,8 @@ internal class LambdaMetaNode : DynamicMetaObject
     {
         LambdaParser.Print(LambdaParser.MetaBindedColor, $"* BindCreateInstance:");
         LambdaParser.Print(LambdaParser.MetaBindedColor, $"- This: {this}");
+        foreach (var arg in args)
+            LambdaParser.Print(LambdaParser.MetaBindedColor, $"- Argument: {arg}");
 
         throw new NotSupportedException(
             "'BindCreateInstance' operations are not supported.")
@@ -364,6 +373,8 @@ internal class LambdaMetaNode : DynamicMetaObject
     {
         LambdaParser.Print(LambdaParser.MetaBindedColor, $"* BindDeleteIndex:");
         LambdaParser.Print(LambdaParser.MetaBindedColor, $"- This: {this}");
+        foreach (var index in indexes)
+            LambdaParser.Print(LambdaParser.MetaBindedColor, $"- Index: {index}");
 
         throw new NotSupportedException(
             "'BindDeleteIndex' operations are not supported.")
@@ -379,6 +390,7 @@ internal class LambdaMetaNode : DynamicMetaObject
     {
         LambdaParser.Print(LambdaParser.MetaBindedColor, $"* BindDeleteMember:");
         LambdaParser.Print(LambdaParser.MetaBindedColor, $"- This: {this}");
+        LambdaParser.Print(LambdaParser.MetaBindedColor, $"- Member: {binder.Name}");
 
         throw new NotSupportedException(
             "'BindDeleteMember' operations are not supported.")

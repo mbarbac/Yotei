@@ -6,12 +6,12 @@ using static System.ConsoleColor;
 namespace Yotei.Tools.Tests;
 
 // ========================================================
-[Enforced]
+//[Enforced]
 public static class Test_Binary
 {
     //[Enforced]
     [Fact]
-    public static void Equal_Argument_Argument()
+    public static void Parse_Equal_Argument_Argument()
     {
         Func<dynamic, object> func;
         LambdaNode node;
@@ -27,7 +27,7 @@ public static class Test_Binary
 
     //[Enforced]
     [Fact]
-    public static void Equal_Argument_Constant()
+    public static void Parse_Equal_Argument_Constant()
     {
         Func<dynamic, object> func;
         LambdaNode node;
@@ -50,7 +50,7 @@ public static class Test_Binary
 
     //[Enforced]
     [Fact]
-    public static void Equal_Argument_Dynamic()
+    public static void Parse_Equal_Argument_Dynamic()
     {
         Func<dynamic, object> func;
         LambdaNode node;
@@ -68,7 +68,7 @@ public static class Test_Binary
 
     //[Enforced]
     [Fact]
-    public static void Equal_Dynamic_Argument()
+    public static void Parse_Equal_Dynamic_Argument()
     {
         Func<dynamic, object> func;
         LambdaNode node;
@@ -84,7 +84,7 @@ public static class Test_Binary
 
     //[Enforced]
     [Fact]
-    public static void Equal_Dynamic_Dynamic()
+    public static void Parse_Equal_Dynamic_Dynamic()
     {
         Func<dynamic, object> func;
         LambdaNode node;
@@ -100,7 +100,7 @@ public static class Test_Binary
 
     //[Enforced]
     [Fact]
-    public static void Equal_Dynamic_Same_Dynamic()
+    public static void Parse_Equal_Dynamic_Same_Dynamic()
     {
         Func<dynamic, object> func;
         LambdaNode node;
@@ -116,7 +116,7 @@ public static class Test_Binary
 
     //[Enforced]
     [Fact]
-    public static void Equal_Dynamic_Setter()
+    public static void Parse_Equal_Dynamic_Setter()
     {
         Func<dynamic, object> func;
         LambdaNode node;
@@ -141,7 +141,7 @@ public static class Test_Binary
 
     //[Enforced]
     [Fact]
-    public static void SingleAnd_Argument_Constant()
+    public static void Parse_SingleAnd_Argument_Constant()
     {
         Func<dynamic, object> func;
         LambdaNode node;
@@ -157,7 +157,7 @@ public static class Test_Binary
 
     //[Enforced]
     [Fact]
-    public static void SingleAnd_Argument_Argument()
+    public static void Parse_SingleAnd_Argument_Argument()
     {
         Func<dynamic, object> func;
         LambdaNode node;
@@ -173,7 +173,7 @@ public static class Test_Binary
 
     //[Enforced]
     [Fact]
-    public static void SingleAnd_Argument_Dynamic()
+    public static void Parse_SingleAnd_Argument_Dynamic()
     {
         Func<dynamic, object> func;
         LambdaNode node;
@@ -196,7 +196,7 @@ public static class Test_Binary
 
     //[Enforced]
     [Fact]
-    public static void SingleAnd_Dynamic_Dynamic()
+    public static void Parse_SingleAnd_Dynamic_Dynamic()
     {
         Func<dynamic, object> func;
         LambdaNode node;
@@ -214,7 +214,7 @@ public static class Test_Binary
 
     //[Enforced]
     [Fact]
-    public static void RegularAnd_Argument_Constant()
+    public static void Parse_RegularAnd_Argument_Constant()
     {
         Func<dynamic, object> func;
         LambdaNode node;
@@ -230,7 +230,7 @@ public static class Test_Binary
 
     //[Enforced]
     [Fact]
-    public static void RegularAnd_Argument_Argument()
+    public static void Parse_RegularAnd_Argument_Argument()
     {
         Func<dynamic, object> func;
         LambdaNode node;
@@ -246,7 +246,7 @@ public static class Test_Binary
 
     //[Enforced]
     [Fact]
-    public static void RegularAnd_Argument_Dynamic()
+    public static void Parse_RegularAnd_Argument_Dynamic()
     {
         Func<dynamic, object> func;
         LambdaNode node;
@@ -269,7 +269,7 @@ public static class Test_Binary
 
     //[Enforced]
     [Fact]
-    public static void RegularAnd_Dynamic_Dynamic()
+    public static void Parse_RegularAnd_Dynamic_Dynamic()
     {
         Func<dynamic, object> func;
         LambdaNode node;
@@ -287,7 +287,7 @@ public static class Test_Binary
 
     //[Enforced]
     [Fact]
-    public static void Binary_AddAssign_Resolves_To_Setter()
+    public static void Parse_Binary_AddAssign_Resolves_To_Setter()
     {
         Func<dynamic, object> func;
         LambdaNode node;

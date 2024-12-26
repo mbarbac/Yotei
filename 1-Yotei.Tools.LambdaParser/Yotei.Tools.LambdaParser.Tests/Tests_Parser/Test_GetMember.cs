@@ -4,7 +4,7 @@ using static System.ConsoleColor;
 namespace Yotei.Tools.Tests;
 
 // ========================================================
-[Enforced]
+//[Enforced]
 public static class Test_GetMember
 {
     //[Enforced]

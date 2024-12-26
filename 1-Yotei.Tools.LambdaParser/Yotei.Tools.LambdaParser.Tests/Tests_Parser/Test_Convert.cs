@@ -4,7 +4,7 @@ using static System.ConsoleColor;
 namespace Yotei.Tools.Tests;
 
 // ========================================================
-[Enforced]
+//[Enforced]
 public static class Test_Convert
 {
     // Used to have a type with no parameterless constructor.
@@ -18,7 +18,7 @@ public static class Test_Convert
 
     //[Enforced]
     [Fact]
-    public static void Convert_Argument()
+    public static void Parse_Convert_Argument()
     {
         Func<dynamic, object> func;
         LambdaNode node;
@@ -50,7 +50,7 @@ public static class Test_Convert
 
     //[Enforced]
     [Fact]
-    public static void Convert_IndexedArgument()
+    public static void Parse_Convert_IndexedArgument()
     {
         Func<dynamic, object> func;
         LambdaNode node;
@@ -68,7 +68,7 @@ public static class Test_Convert
 
     //[Enforced]
     [Fact]
-    public static void Convert_Member()
+    public static void Parse_Convert_Member()
     {
         Func<dynamic, object> func;
         LambdaNode node;
@@ -91,7 +91,7 @@ public static class Test_Convert
 
     //[Enforced]
     [Fact]
-    public static void Convert_Member_And_Assign()
+    public static void Parse_Convert_Member_And_Assign()
     {
         Func<dynamic, object> func;
         LambdaNode node;
@@ -116,7 +116,7 @@ public static class Test_Convert
 
     //[Enforced]
     [Fact]
-    public static void Conversions_As_Indexes()
+    public static void Parse_Conversions_As_Indexes()
     {
         Func<dynamic, object> func;
         LambdaNode node;
@@ -139,7 +139,7 @@ public static class Test_Convert
 
     //[Enforced]
     [Fact]
-    public static void Conversions_As_Arguments()
+    public static void Parse_Conversions_As_Arguments()
     {
         Func<dynamic, object> func;
         LambdaNode node;

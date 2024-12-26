@@ -33,7 +33,7 @@ internal class Program
         DebugEx.AutoFlush = true;
 
         // Explicit includes and excludes, in order...
-        //Includes.Add(new("Yotei.Tools.Tests", "Test_StringExtensions", "Test_NullWhenEmpty_With_Trim"));
+        Includes.Add(new("Yotei.Tools.LambdaParser.Tests", null, null));
 
         // Main menu...
         var done = -1; do
