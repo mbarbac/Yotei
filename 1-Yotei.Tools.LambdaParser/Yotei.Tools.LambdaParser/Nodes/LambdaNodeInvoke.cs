@@ -15,7 +15,7 @@ public class LambdaNodeInvoke : LambdaNodeHosted
     public LambdaNodeInvoke(LambdaNode host, IEnumerable<LambdaNode> indexes) : base(host)
     {
         LambdaArguments = ValidateLambdaArguments(indexes, canBeEmpty: true);
-        LambdaParser.Print($"- New: {ToDebugString()}");
+        LambdaParser.Print(LambdaParser.NewNodeColor, $"- New Node: {ToDebugString()}");
     }
 
     /// <inheritdoc/>

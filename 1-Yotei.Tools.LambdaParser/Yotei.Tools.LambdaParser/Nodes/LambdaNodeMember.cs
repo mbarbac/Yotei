@@ -15,7 +15,7 @@ public class LambdaNodeMember : LambdaNodeHosted
     public LambdaNodeMember(LambdaNode host, string name) : base(host)
     {
         LambdaName = ValidateName(name);
-        LambdaParser.Print($"- New: {ToDebugString()}");
+        LambdaParser.Print(LambdaParser.NewNodeColor, $"- New Node: {ToDebugString()}");
     }
 
     /// <inheritdoc/>

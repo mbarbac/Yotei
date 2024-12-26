@@ -21,7 +21,7 @@ public class LambdaNodeMethod : LambdaNodeHosted
         LambdaName = ValidateName(name);
         LambdaArguments = ValidateLambdaArguments(arguments, canBeEmpty: true);
         LambdaGenericArguments = ImmutableList<Type>.Empty;
-        LambdaParser.Print($"- New: {ToDebugString()}");
+        LambdaParser.Print(LambdaParser.NewNodeColor, $"- New Node: {ToDebugString()}");
     }
 
     /// <summary>

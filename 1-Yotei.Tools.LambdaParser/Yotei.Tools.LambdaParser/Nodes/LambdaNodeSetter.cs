@@ -16,7 +16,7 @@ public class LambdaNodeSetter : LambdaNode
     {
         LambdaTarget = target.ThrowWhenNull();
         LambdaValue = value.ThrowWhenNull();
-        LambdaParser.Print($"- New: {ToDebugString()}");
+        LambdaParser.Print(LambdaParser.NewNodeColor, $"- New Node: {ToDebugString()}");
     }
 
     /// <inheritdoc/>

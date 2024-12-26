@@ -19,7 +19,7 @@ public class LambdaNodeValue : LambdaNode
                 .WithData(value);
 
         LambdaValue = value;
-        LambdaParser.Print($"- New: {ToDebugString()}");
+        LambdaParser.Print(LambdaParser.NewNodeColor, $"- New Node: {ToDebugString()}");
     }
 
     /// <inheritdoc/>

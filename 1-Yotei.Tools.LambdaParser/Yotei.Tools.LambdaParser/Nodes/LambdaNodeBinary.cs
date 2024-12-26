@@ -18,7 +18,7 @@ public class LambdaNodeBinary : LambdaNode
         LambdaLeft = left.ThrowWhenNull();
         LambdaOperation = operation;
         LambdaRight = right.ThrowWhenNull();
-        LambdaParser.Print($"- New: {ToDebugString()}");
+        LambdaParser.Print(LambdaParser.NewNodeColor, $"- New Node: {ToDebugString()}");
     }
 
     /// <inheritdoc/>

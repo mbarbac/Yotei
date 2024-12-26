@@ -16,7 +16,7 @@ public class LambdaNodeConvert : LambdaNode
     {
         LambdaTarget = target.ThrowWhenNull();
         LambdaType = type.ThrowWhenNull();
-        LambdaParser.Print($"- New: {ToDebugString()}");
+        LambdaParser.Print(LambdaParser.NewNodeColor, $"- New Node: {ToDebugString()}");
     }
 
     /// <inheritdoc/>

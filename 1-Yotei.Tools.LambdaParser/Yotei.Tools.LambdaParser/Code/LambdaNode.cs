@@ -120,4 +120,218 @@ public abstract class LambdaNode : DynamicObject, ICloneable
 
         return list;
     }
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public override DynamicMetaObject GetMetaObject(Expression expression)
+    {
+        var master = base.GetMetaObject(expression);
+        var rest = BindingRestrictions.GetInstanceRestriction(expression, this);
+        var meta = new LambdaMetaNode(master, expression, rest, this);
+
+        return meta;
+    }
+
+    /// <summary>
+    /// Flags to find the method info of the version-related methods.
+    /// </summary>
+    static readonly BindingFlags LAMBDA_FLAGS
+        = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+
+    /// <summary>
+    /// Determines if the version of this instance is the same as the latest one, or not.
+    /// </summary>
+    internal bool ValidateLambdaVersion()
+    {
+        var result = LambdaVersion == LastLambdaVersion;
+
+        LambdaParser.Print(
+            LambdaParser.ValidateLambdaColor,
+            $"- Version: {(result ? "Valid" : "Invalid")}, {ToDebugString()}");
+
+        return result;
+    }
+
+    static MethodInfo ValidateLambdaVersionInfo
+        => typeof(LambdaNode).GetMethod(nameof(ValidateLambdaVersion), LAMBDA_FLAGS)!;
+
+    /// <summary>
+    /// Updates the version of this instance to the lates one, which is also incremented.
+    /// </summary>
+    internal void UpdateLambdaVersion()
+    {
+        var old = ToDebugString();
+        LambdaVersion = Interlocked.Increment(ref LastLambdaVersion);
+
+        LambdaParser.Print(
+            LambdaParser.UpdateLambdaColor,
+            $"- Updating: {old} ==> {ToDebugString()}");
+    }
+
+    static MethodInfo UpdateLambdaVersionInfo
+        => typeof(LambdaNode).GetMethod(nameof(UpdateLambdaVersion), LAMBDA_FLAGS)!;
+
+    /// <summary>
+    /// Obtains binding restrictions that validate that the version of this instance is equal to
+    /// the latest one and, if not, update it.
+    /// <br/> The DLR caches the results it obtains using both the type of the call site and its
+    /// arguments. For the purposes of <see cref="LambdaParser"/> this mechanism may render the
+    /// same node over and over again, instead of a new binded one. So this method is a hack that
+    /// intercepts the original mechanism by using a custom binding restriction that forces the
+    /// cache to discard previous nodes and use the new binded one when needed.
+    /// </summary>
+    /// <param name="updateExpr"></param>
+    /// <returns></returns>
+    [SuppressMessage("", "IDE0300")]
+    internal BindingRestrictions GetBindingRestrictions(Expression updateExpr)
+    {
+        var nodeExpr = Expression.Constant(this);
+        var argExpr = Expression.Parameter(typeof(object));
+
+        var condition = Expression.Block(
+            new[] { argExpr },
+            Expression.Assign(argExpr, nodeExpr),
+            Expression.Condition(
+                Expression.IsFalse(
+                    Expression.Call(
+                        Expression.Convert(argExpr, typeof(LambdaNode)),
+                        ValidateLambdaVersionInfo)),
+                Expression.Block(
+                    Expression.Call(
+                        Expression.Convert(argExpr, typeof(LambdaNode)),
+                        UpdateLambdaVersionInfo),
+                    updateExpr),
+                Expression.Constant(true)));
+
+        var rest = BindingRestrictions.GetExpressionRestriction(condition);
+        return rest;
+    }
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public override bool TryGetMember(GetMemberBinder binder, out object? result)
+    {
+        var parser = GetArgument()?.LambdaParser;
+        if (parser != null) parser.LastNode = null;
+
+        LambdaParser.Print(LambdaParser.NodeBindedColor, $"* GetMember:");
+        LambdaParser.Print(LambdaParser.NodeBindedColor, $"- This: {ToDebugString()}");
+        LambdaParser.Print(LambdaParser.NodeBindedColor, $"- Name: {binder.Name}");
+
+        var node = new LambdaNodeMember(this, binder.Name);
+        result = node;
+
+        // Finishing...
+        LambdaParser.Print(LambdaParser.NodeBindedColor, $"- Result: {node.ToDebugString()}");
+        return true;
+    }
+
+    /// <inheritdoc/>
+    public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object? result)
+    {
+        var parser = GetArgument()?.LambdaParser;
+        if (parser != null) parser.LastNode = null;
+
+        LambdaParser.Print(LambdaParser.NodeBindedColor, $"* GetIndex:");
+        LambdaParser.Print(LambdaParser.NodeBindedColor, $"- This: {ToDebugString()}");
+        var list = LambdaParser.ToLambdaNodes(indexes, parser);
+        foreach (var temp in list) LambdaParser.Print(LambdaParser.NodeBindedColor, $"- Index: {temp.ToDebugString()}");
+
+        var node = new LambdaNodeIndexed(this, list);
+        result = node;
+
+        // Finishing...
+        LambdaParser.Print(LambdaParser.NodeBindedColor, $"- Result: {node.ToDebugString()}");
+        return true;
+    }
+
+    /// <inheritdoc/>
+    public override bool TryInvoke(InvokeBinder binder, object?[]? args, out object? result)
+    {
+        var parser = GetArgument()?.LambdaParser;
+        if (parser != null) parser.LastNode = null;
+
+        LambdaParser.Print(LambdaParser.NodeBindedColor, $"* Invoke:");
+        LambdaParser.Print(LambdaParser.NodeBindedColor, $"- This: {ToDebugString()}");
+        var list = LambdaParser.ToLambdaNodes(args, parser);
+        foreach (var temp in list) LambdaParser.Print(LambdaParser.NodeBindedColor, $"- Argument: {temp.ToDebugString()}");
+
+        var node = new LambdaNodeInvoke(this, list);
+        result = node;
+
+        // Finishing...
+        LambdaParser.Print(LambdaParser.NodeBindedColor, $"- Result: {node.ToDebugString()}");
+        return true;
+    }
+
+    /// <inheritdoc/>
+    public override bool TryInvokeMember(
+        InvokeMemberBinder binder, object?[]? args, out object? result)
+    {
+        var parser = GetArgument()?.LambdaParser;
+        if (parser != null) parser.LastNode = null;
+
+        LambdaParser.Print(LambdaParser.NodeBindedColor, $"* Method:");
+        LambdaParser.Print(LambdaParser.NodeBindedColor, $"- This: {ToDebugString()}");
+        LambdaParser.Print(LambdaParser.NodeBindedColor, $"- Name: {binder.Name}");
+        var list = LambdaParser.ToLambdaNodes(args, parser);
+        foreach (var temp in list) LambdaParser.Print(LambdaParser.NodeBindedColor, $"- Argument: {temp.ToDebugString()}");
+
+        LambdaNode node;
+
+        // Intercepting 'Coalesce' methods...
+        if (this is LambdaNodeArgument && binder.Name == "Coalesce" && list.Length == 2)
+        {
+            LambdaParser.Print(LambdaParser.NodeBindedColor, $"* Intercepting 'Coalesce' method...");
+
+            node = new LambdaNodeCoalesce(list[0], list[1]);
+            result = node;
+        }
+
+        // Intercepting 'Ternary' methods...
+        else if (this is LambdaNodeArgument && binder.Name == "Ternary" && list.Length == 3)
+        {
+            LambdaParser.Print(LambdaParser.NodeBindedColor, $"* Intercepting 'Ternary' method...");
+
+            node = new LambdaNodeTernary(list[0], list[1], list[2]);
+            result = node;
+        }
+
+        // Regular methods...
+        else
+        {
+            var types = Array.Empty<Type>();
+
+            if (binder.GetType().Name == "CSharpInvokeMemberBinder") // Not public!
+            {
+                var flags = BindingFlags.Instance | BindingFlags.Public;
+                var info = binder.GetType().GetProperty("TypeArguments", flags);
+                types = (Type[])info!.GetValue(binder)!;
+            }
+
+            node = types.Length == 0
+                ? new LambdaNodeMethod(this, binder.Name, list)
+                : new LambdaNodeMethod(this, binder.Name, types, list);
+
+            result = node;
+        }
+
+        // Finishing
+        LambdaParser.Print(LambdaParser.NodeBindedColor, $"- Result: {node.ToDebugString()}");
+        return true;
+    }
+
+    // ----------------------------------------------------
+
+    /* bool TryBinaryOperation(BinaryOperationBinder binder, object arg, out object? result) */
+    /* bool TryUnaryOperation(UnaryOperationBinder binder, out object? result) */
+    /* bool TrySetMember(SetMemberBinder binder, object? value) */
+    /* bool TrySetIndex(SetIndexBinder binder, object[] indexes, object? value) */
+    /* bool TryConvert(ConvertBinder binder, out object? result) */
+
+    /* bool TryCreateInstance(CreateInstanceBinder binder, object?[]? args, [NotNullWhen(true)] out object? result) */
+    /* bool TryDeleteIndex(DeleteIndexBinder binder, object[] indexes) */
+    /* bool TryDeleteMember(DeleteMemberBinder binder) */
 }

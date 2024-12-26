@@ -16,7 +16,7 @@ public class LambdaNodeUnary : LambdaNode
     {
         LambdaOperation = operation;
         LambdaTarget = target.ThrowWhenNull();
-        LambdaParser.Print($"- New: {ToDebugString()}");
+        LambdaParser.Print(LambdaParser.NewNodeColor, $"- New Node: {ToDebugString()}");
     }
 
     /// <inheritdoc/>
