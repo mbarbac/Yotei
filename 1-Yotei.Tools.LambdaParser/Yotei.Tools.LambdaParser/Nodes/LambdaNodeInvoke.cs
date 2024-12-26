@@ -20,7 +20,7 @@ public class LambdaNodeInvoke : LambdaNodeHosted
 
     /// <inheritdoc/>
     public override string ToString()
-         => $"{LambdaHost}[{string.Join(", ", LambdaArguments.Select(x => x.ToString()))}]";
+         => $"{LambdaHost}({string.Join(", ", LambdaArguments.Select(x => x.ToString()))})";
 
     /// <inheritdoc/>
     public override LambdaNodeInvoke Clone() => new(

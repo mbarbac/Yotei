@@ -20,7 +20,10 @@ public class LambdaNodeIndexed : LambdaNodeHosted
 
     /// <inheritdoc/>
     public override string ToString()
-         => $"{LambdaHost}[{string.Join(", ", LambdaIndexes.Select(x => x.ToString()))}]";
+    {
+        var str = $"{LambdaHost}[{string.Join(", ", LambdaIndexes.Select(x => x.ToString()))}]";
+        return str;
+    }
 
     /// <inheritdoc/>
     public override LambdaNodeIndexed Clone() => new(
