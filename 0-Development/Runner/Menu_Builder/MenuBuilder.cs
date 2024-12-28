@@ -20,29 +20,32 @@ public class MenuBuilder : MenuEntry
         WriteLine(true, Green, Program.FatSeparator);
         WriteLine(true, Green, $"{Header()}:");
         WriteLine(true);
-        WriteLine("Please select the build mode (or [Escape] to finish)...");
-        if (!Builder.CaptureBuildMode(out mode)) return;
+        WriteLine(true, "Please select the desired build mode...");
+        WriteLine(true);
 
-        var root = Program.GetSolutionDirectory();
-        var projects = root.FindProjects();
-        var packables = projects.SelectPackables();
-        packables = packables.OrderByDependencies();
-        if (packables.Count == 0) return;
+        if (!Builder.CaptureBuildMode(out mode)) return;
 
         var done = -1; do
         {
+            var root = Program.GetSolutionDirectory();
+            var projects = root.FindProjects();
+            var packables = projects.SelectPackables();
+            packables = packables.OrderByDependencies();
+            if (packables.Count == 0) return;
+
             WriteLine(true);
             WriteLine(true, Green, Program.SlimSeparator);
             WriteLine(true, Green, $"{mode}:");
             WriteLine(true);
 
             var entries = new List<MenuEntry> {
+                new MenuEntry("Previous"),
                 new MenuEntry("All projects"),
             };
-            foreach (var packable in packables) entries.Add(new(packable.Name));
+            foreach (var packable in packables) entries.Add(new PackageBuilder(packable, mode));
 
             done = Menu.Run(Green, Program.Timeout, entries.ToArray());
         }
-        while (done >= 0);
+        while (done > 0);
     }
 }

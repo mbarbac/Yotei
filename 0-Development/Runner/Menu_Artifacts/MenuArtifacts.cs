@@ -24,9 +24,12 @@ public class MenuArtifacts : MenuEntry
 
             done = Menu.Run(
                 Green, Program.Timeout,
+                new MenuEntry("Previous"),
                 new CleanLocalPackages(),
                 new CleanDiskArtifacts());
+
+            WriteLine(true);
         }
-        while (done >= 0);
+        while (done > 0);
     }
 }

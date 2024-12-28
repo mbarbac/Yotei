@@ -15,15 +15,16 @@ public static class Builder
     {
         var done = Menu.Run(
             Green, Program.Timeout,
+            new MenuEntry("Previous"),
             new MenuEntry(nameof(BuildMode.Debug)),
             new MenuEntry(nameof(BuildMode.Local)),
             new MenuEntry(nameof(BuildMode.Release)));
 
         switch (done)
         {
-            case 0: mode = BuildMode.Debug; return true;
-            case 1: mode = BuildMode.Local; return true;
-            case 2: mode = BuildMode.Release; return true;
+            case 1: mode = BuildMode.Debug; return true;
+            case 2: mode = BuildMode.Local; return true;
+            case 3: mode = BuildMode.Release; return true;
         }
 
         mode = default;

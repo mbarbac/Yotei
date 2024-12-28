@@ -52,11 +52,12 @@ internal class Program
 
             done = Menu.Run(
                 Green, Timeout,
+                new MenuEntry("Exit"),
                 new MenuTester(breakOnError: true),
                 new MenuArtifacts(),
                 new MenuBuilder());
         }
-        while (done >= 0);
+        while (done > 0);
     }
 
     // ----------------------------------------------------
