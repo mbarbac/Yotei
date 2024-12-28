@@ -137,4 +137,21 @@ public partial class AsyncLock : DisposableClass
         AsyncHolder.Value = Interlocked.Increment(ref LastAsyncHolder);
         return item.EnterAsync(timeout, token);
     }
+
+    // ------------------------------------------------
+
+    /// <summary>
+    /// Invoked to print the given message on the debug environment.
+    /// </summary>
+    /// <param name="message"></param>
+    [Conditional("DEBUG_ASYNC_LOCK")]
+    public static void Print(string message) => DebugEx.WriteLine(message);
+
+    /// <summary>
+    /// Invoked to print the given message on the debug environment.
+    /// </summary>
+    /// <param name="color"></param>
+    /// <param name="message"></param>
+    [Conditional("DEBUG_ASYNC_LOCK")]
+    public static void Print(ConsoleColor color, string message) => DebugEx.WriteLine(color, message);
 }

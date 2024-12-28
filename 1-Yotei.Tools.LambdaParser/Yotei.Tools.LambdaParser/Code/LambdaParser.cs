@@ -1,9 +1,5 @@
 ﻿#pragma warning disable IDE0305
 
-#if DEBUG && DEBUG_LAMBDA_PARSER
-#define DEBUGPRINT
-#endif
-
 namespace Yotei.Tools;
 
 // ========================================================
@@ -214,13 +210,13 @@ public partial class LambdaParser
     /// <summary>
     /// Invoked to print the given debug message.
     /// </summary>
-    [Conditional("DEBUGPRINT")]
+    [Conditional("DEBUG_LAMBDA_PARSER")]
     internal static void Print(string message) => DebugEx.WriteLine(message);
 
     /// <summary>
     /// Invoked to print the given debug message.
     /// </summary>
-    [Conditional("DEBUGPRINT")]
+    [Conditional("DEBUG_LAMBDA_PARSER")]
     internal static void Print(
         ConsoleColor color, string message) => DebugEx.WriteLine(color, message);
 

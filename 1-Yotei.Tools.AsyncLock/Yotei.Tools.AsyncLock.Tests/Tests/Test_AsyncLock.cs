@@ -93,7 +93,7 @@ public static class Test_AsyncLock
         try
         {
             using var disposable = info.Locker.Lock(span, id);
-            WriteLine(Magenta, $"Entered : {info.Locker}, Id: {id}");
+            AsyncLock.Print(Magenta, $"Entered : {info.Locker}, Id: {id}");
 
             var old = info.Value;
             var temp = info.Value = info.NewValue();
@@ -110,14 +110,14 @@ public static class Test_AsyncLock
 
             Thread.Sleep(WAIT);
             info.Value = old;
-            WriteLine(Green, $"Exiting: {disposable}");
+            AsyncLock.Print(Green, $"Exiting: {disposable}");
         }
         catch (TimeoutException)
         {
             if (timeout >= 0)
             {
                 info.Captured = true;
-                WriteLine(Red, $"** Timeout exception: {info.Locker}, Id: {id}");
+                AsyncLock.Print(Red, $"** Timeout exception: {info.Locker}, Id: {id}");
             }
             else throw;
         }
@@ -165,7 +165,7 @@ public static class Test_AsyncLock
         try
         {
             await using var disposable = await info.Locker.LockAsync(span, id).ConfigureAwait(false);
-            WriteLine(Magenta, $"Entered : {info.Locker}, Id: {id}");
+            AsyncLock.Print(Magenta, $"Entered : {info.Locker}, Id: {id}");
 
             var old = info.Value;
             var temp = info.Value = info.NewValue();
@@ -182,14 +182,14 @@ public static class Test_AsyncLock
 
             await Task.Delay(WAIT).ConfigureAwait(false);
             info.Value = old;
-            WriteLine(Green, $"Exiting: {disposable}");
+            AsyncLock.Print(Green, $"Exiting: {disposable}");
         }
         catch (TimeoutException)
         {
             if (timeout >= 0)
             {
                 info.Captured = true;
-                WriteLine(Red, $"** Timeout exception: {info.Locker}, Id: {id}");
+                AsyncLock.Print(Red, $"** Timeout exception: {info.Locker}, Id: {id}");
             }
             else throw;
         }
@@ -237,7 +237,7 @@ public static class Test_AsyncLock
         try
         {
             using var disposable = info.Locker.Lock(span, id);
-            WriteLine(Magenta, $"Entered : {info.Locker}, Id: {id}");
+            AsyncLock.Print(Magenta, $"Entered : {info.Locker}, Id: {id}");
 
             var old = info.Value;
             var temp = info.Value = info.NewValue();
@@ -255,14 +255,14 @@ public static class Test_AsyncLock
 
             Thread.Sleep(WAIT);
             info.Value = old;
-            WriteLine(Green, $"Exiting: {disposable}");
+            AsyncLock.Print(Green, $"Exiting: {disposable}");
         }
         catch (TimeoutException)
         {
             if (timeout >= 0)
             {
                 info.Captured = true;
-                WriteLine(Red, $"** Timeout exception: {info.Locker}, Id: {id}");
+                AsyncLock.Print(Red, $"** Timeout exception: {info.Locker}, Id: {id}");
             }
             else throw;
         }
@@ -310,7 +310,7 @@ public static class Test_AsyncLock
         try
         {
             await using var disposable = await info.Locker.LockAsync(span, id).ConfigureAwait(false);
-            WriteLine(Magenta, $"Entered : {info.Locker}, Id: {id}");
+            AsyncLock.Print(Magenta, $"Entered : {info.Locker}, Id: {id}");
 
             var old = info.Value;
             var temp = info.Value = info.NewValue();
@@ -327,14 +327,14 @@ public static class Test_AsyncLock
 
             await Task.Delay(WAIT).ConfigureAwait(false);
             info.Value = old;
-            WriteLine(Green, $"Exiting: {disposable}");
+            AsyncLock.Print(Green, $"Exiting: {disposable}");
         }
         catch (TimeoutException)
         {
             if (timeout >= 0)
             {
                 info.Captured = true;
-                WriteLine(Red, $"** Timeout exception: {info.Locker}, Id: {id}");
+                AsyncLock.Print(Red, $"** Timeout exception: {info.Locker}, Id: {id}");
             }
             else throw;
         }

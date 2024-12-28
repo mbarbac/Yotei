@@ -1,8 +1,4 @@
-﻿//#if DEBUG_ASYNC_LOCK && DEBUG
-//#define DEBUGPRINT
-//#endif
-
-using static System.ConsoleColor;
+﻿using static System.ConsoleColor;
 
 namespace Yotei.Tools;
 
@@ -235,22 +231,5 @@ public partial class AsyncLock
         public object? Data { get; }
 
         string GetData() => Data is null ? string.Empty : $"Data:{Data}";
-
-        // ------------------------------------------------
-
-        /// <summary>
-        /// Invoked to print the given message on the debug environment.
-        /// </summary>
-        /// <param name="message"></param>
-        [Conditional("DEBUGPRINT")]
-        static void Print(string message) => DebugEx.WriteLine(message);
-
-        /// <summary>
-        /// Invoked to print the given message on the debug environment.
-        /// </summary>
-        /// <param name="color"></param>
-        /// <param name="message"></param>
-        [Conditional("DEBUGPRINT")]
-        static void Print(ConsoleColor color, string message) => DebugEx.WriteLine(color, message);
     }
 }
