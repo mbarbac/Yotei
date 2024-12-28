@@ -4,13 +4,13 @@
 /// <summary>
 /// Represents a project file.
 /// </summary>
-public class ProjectFile
+public class Project
 {
     /// <summary>
     /// Initializes a new instance using the one found at the given path.
     /// </summary>
     /// <param name="path"></param>
-    public ProjectFile(string path)
+    public Project(string path)
     {
         path.ThrowWhenNull();
 

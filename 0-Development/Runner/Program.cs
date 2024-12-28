@@ -2,6 +2,7 @@
 using static System.ConsoleColor;
 using Runner.Tester;
 using Runner.Artifacts;
+using Runner.Builder;
 
 namespace Runner;
 
@@ -18,7 +19,13 @@ internal class Program
     public static RequestList Includes = [];
     public static RequestList Excludes = [];
 
+    public static string NuGetRepoSource = @"https://api.nuget.org/v3/index.json";
+    public static string LocalRepoSource = "Local";
     public static string LocalRepoPath = @"C:\Dev\Packages";
+
+    // Note that "Local" is a label that through configuration maps to a concrete location or
+    // path on disk. The later is used when deleting artifacts, the former when building nuget
+    // packages.
 
     // ----------------------------------------------------
 
@@ -45,12 +52,11 @@ internal class Program
 
             done = Menu.Run(
                 Green, Timeout,
-                new MenuEntry("Exit"),
                 new MenuTester(breakOnError: true),
                 new MenuArtifacts(),
-                new MenuEntry("Build NuGet Packages"));
+                new MenuBuilder());
         }
-        while (done > 0);
+        while (done >= 0);
     }
 
     // ----------------------------------------------------
