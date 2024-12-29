@@ -13,6 +13,17 @@ internal class Program
     public static readonly string SlimSeparator = "-------------------------";
     public static TimeSpan Timeout = TimeSpan.FromMinutes(2);
 
+    public static RequestList Includes = [];
+    public static RequestList Excludes = [];
+
+    // Note that "Local" is a label that through configuration maps to a concrete location or
+    // path on disk. The later is used when deleting artifacts, the former when building nuget
+    // packages.
+
+    public static string NuGetRepoSource = @"https://api.nuget.org/v3/index.json";
+    public static string LocalRepoSource = "Local";
+    public static string LocalRepoPath = @"C:\Dev\Packages";
+
     // ----------------------------------------------------
 
     /// <summary>
@@ -39,8 +50,8 @@ internal class Program
             done = new MenuConsole
             {
                 new MenuEntry("Exit"),
-                new MenuEntry("Execute Tests"),
-                new MenuEntry("Manage Artifacts"),
+                new MenuTester(breakOnError: true),
+                new MenuArtifacts(),
                 new MenuEntry("Build Packages"),
             }
             .Run(Green, Timeout, done);
