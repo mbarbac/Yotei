@@ -7,7 +7,7 @@ namespace Runner.Builder;
 /// <summary>
 /// Represents a builder for a given package.
 /// </summary>
-public class PackageBuilder : MenuEntry
+public class PackageBuilderEntry : MenuEntry
 {
     public Project Project { get; }
     public SemanticVersion Version { get; }
@@ -18,7 +18,7 @@ public class PackageBuilder : MenuEntry
     /// </summary>
     /// <param name="project"></param>
     /// <param name="mode"></param>
-    public PackageBuilder(Project project, BuildMode mode)
+    public PackageBuilderEntry(Project project, BuildMode mode)
     {
         if (!project.ThrowWhenNull().IsPackable()) throw new ArgumentException(
             "Project is not a packable one.")
@@ -40,10 +40,10 @@ public class PackageBuilder : MenuEntry
     /// <inheritdoc/>
     public override void Execute()
     {
-        WriteLine(true);
-        WriteLine(true, Green, Program.SlimSeparator);
-        Write(true, Green, "Compiling: "); Write(Header());
-        Write(true, Green, " for mode: "); WriteLine(BuildMode.ToString());
-        WriteLine(true);
+        var backup = Project.SaveBackup();
+        var done = Project.Build(BuildMode, fatSeparator: false);
+
+        if (!done) Project.RestoreBackup(backup);
+        return;
     }
 }

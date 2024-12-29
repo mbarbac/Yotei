@@ -1,5 +1,6 @@
 ﻿using static Yotei.Tools.Diagnostics.ConsoleEx;
 using static System.ConsoleColor;
+using System.Runtime.InteropServices.Marshalling;
 
 namespace Runner.Builder;
 
@@ -7,180 +8,170 @@ namespace Runner.Builder;
 public static class Builder
 {
     /// <summary>
-    /// Tries to interactively capture the build mode preferred by the user.
+    /// Invoked to build the given project for the given build mode. Returns whether the build
+    /// process has succeeded or not. This method does not save nor restore a backup in case of
+    /// errors.
     /// </summary>
+    /// <param name="project"></param>
     /// <param name="mode"></param>
+    /// <param name="fatSeparator"></param>
     /// <returns></returns>
-    public static bool CaptureBuildMode(out BuildMode mode)
+    public static bool Build(this Project project, BuildMode mode, bool fatSeparator)
     {
-        var done = Menu.Run(
-            Green, Program.Timeout,
-            new MenuEntry("Previous"),
-            new MenuEntry(nameof(BuildMode.Debug)),
-            new MenuEntry(nameof(BuildMode.Local)),
-            new MenuEntry(nameof(BuildMode.Release)));
+        project.ThrowWhenNull();
 
-        switch (done)
-        {
-            case 1: mode = BuildMode.Debug; return true;
-            case 2: mode = BuildMode.Local; return true;
-            case 3: mode = BuildMode.Release; return true;
-        }
+        if (!project.IsPackable()) throw new ArgumentException(
+            "Project is not a packable one.")
+            .WithData(project);
 
-        mode = default;
-        return false;
+        if (!project.GetVersion(out var oldversion)) throw new InvalidOperationException(
+            "Cannot obtain current version of packable project.")
+            .WithData(project);
+
+        var separator = fatSeparator ? Program.FatSeparator : Program.SlimSeparator;
+        WriteLine(true);
+        WriteLine(true, Green, separator);
+        Write(true, Green, "Compiling: "); Write(true, $"{project.Name} v:{oldversion}");
+        Write(true, Green, " for mode: "); WriteLine(mode.ToString());
+
+        WriteLine(true);
+        WriteLine(true, Green, "Clearing files...");
+        if (!DeleteFiles(project, mode)) return false;
+
+        var newversion = IncreaseVersion(oldversion, mode);
+
+        return true;
     }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a list with the projects found starting at the given directory, and in its own
-    /// sub-directories, provided they are not in the exclusion branch.
+    /// Invoked to clear the appropriate repository.
     /// </summary>
-    /// <param name="directory"></param>
-    /// <param name="exclusion"></param>
-    /// <param name="comparison"></param>
-    /// <returns></returns>
-    public static List<Project> FindProjects(
-        this string directory,
-        string? exclusion = null,
-        StringComparison comparison = StringComparison.OrdinalIgnoreCase)
+    static bool DeleteFiles(Project project, BuildMode mode)
     {
-        directory = directory.NotNullNotEmpty();
-        exclusion = exclusion.NullWhenEmpty();
-
-        var list = new List<Project>();
-        Populate(directory);
-        return list;
-
-        // Recursively populates the given path.
-        void Populate(string path)
+        GetNuGetPackageFiles(project, out var regulars, out var symbols);
+        if (!DeleteList(regulars)) return false;
+        if (!DeleteList(symbols)) return false;
+        
+        bool DeleteList(List<FileInfo> files)
         {
-            if (path.Contains(".git", comparison)) return;
-            if (path.Contains(".vs", comparison)) return;
-            if (path.Contains("\\bin\\", comparison)) return;
-            if (path.Contains("\\obj\\", comparison)) return;
-
-            if (exclusion != null &&
-                exclusion.Length > 0 &&
-                path.StartsWith(exclusion, comparison)) return;
-
-            var dir = new DirectoryInfo(path);
-            if (!dir.Exists) return;
-
-            var files = dir.GetFiles("*.csproj");
-            foreach (var file in files) list.Add(new(file.FullName));
-
-            var dirs = dir.GetDirectories();
-            foreach (var temp in dirs) Populate(temp.FullName);
-        }
-    }
-
-    /// <summary>
-    /// Returns the packable projects found in the given projects' collection.
-    /// </summary>
-    /// <param name="projects"></param>
-    /// <returns></returns>
-    public static List<Project> SelectPackables(this IEnumerable<Project> projects)
-    {
-        projects.ThrowWhenNull();
-
-        return projects.Where(x => x.IsPackable()).ToList();
-    }
-
-    /// <summary>
-    /// Orders the given collection of packable project by their respective dependencies, so
-    /// that the last ones may depend on the early ones, but not the opposite.
-    /// </summary>
-    /// <param name="packables"></param>
-    /// <returns></returns>
-    public static List<Project> OrderByDependencies(this IEnumerable<Project> packables)
-    {
-        packables.ThrowWhenNull();
-
-        var list = new List<Project>();
-
-        foreach (var packable in packables)
-        {
-            var pname = packable.Name;
-            var found = false;
-
-            for (int i = 0; i < list.Count; i++)
+            foreach (var file in files)
             {
-                if (found) break;
-
-                var item = list[i];
-                var nrefs = item.GetNuPackageReferences();
-
-                foreach (var nref in nrefs)
+                try { file.Delete(); }
+                catch (Exception e)
                 {
-                    if (string.Compare(pname, nref.Name, ignoreCase: true) == 0)
-                    {
-                        list.Insert(i, packable);
-                        found = true;
-                        break;
-                    }
+                    Write(Red, "Cannot delete file: "); WriteLine(true, file.FullName);
+                    WriteLine(Red, $"- {e.Message}");
+                    return false;
                 }
             }
-
-            if (!found) list.Add(packable);
+            return true;
         }
 
-        return list;
+        if (mode == BuildMode.Local)
+        {
+            var dir = new DirectoryInfo(Program.LocalRepoPath);
+            var files = dir.GetFiles($"{project.Name}*.*");
+            foreach (var file in files)
+            {
+                try { file.Delete(); }
+                catch (Exception e)
+                {
+                    Write(Red, "Cannot delete file: "); WriteLine(true, file.FullName);
+                    WriteLine(Red, $"- {e.Message}");
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Gets the NuGet package files starting from the project directory.
+    /// </summary>
+    static void GetNuGetPackageFiles(
+        Project project,
+        out List<FileInfo> regulars,
+        out List<FileInfo> symbols)
+    {
+        var dir = new DirectoryInfo(project.Directory);
+        if (dir.Exists)
+        {
+            regulars = dir.GetFiles("*.nupkg", SearchOption.AllDirectories).ToList();
+            symbols = dir.GetFiles("*.snupkg", SearchOption.AllDirectories).ToList();
+        }
+        else
+        {
+            regulars = [];
+            symbols = [];
+        }
     }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Invoked to build the given packable project, using the given build mode. Returns whether
-    /// the build process succeeded, or not.
+    /// Returns an increased semantic version using the given mode.
     /// </summary>
-    /// <param name="packable"></param>
+    /// <param name="oldversion"></param>
     /// <param name="mode"></param>
     /// <returns></returns>
-    public static bool BuildPackage(Project packable, BuildMode mode)
+    public static SemanticVersion IncreaseVersion(SemanticVersion oldversion, BuildMode mode)
     {
-        packable.ThrowWhenNull();
+        oldversion.ThrowWhenNull();
 
-        switch (mode)
+        if (mode == BuildMode.Debug)
         {
-            case BuildMode.Debug: return BuildDebug(packable);
-            case BuildMode.Local: return BuildLocal(packable);
-            case BuildMode.Release: return BuildRelease(packable);
+            var increased = false;
+            var newversion = oldversion.PreRelease.IsEmpty
+                ? oldversion.IncreasePatch()
+                : oldversion.IncreasePreRelease(out increased);
+
+            if (!increased) newversion = newversion with { PreRelease = "v001" };
+            return newversion;
         }
+        else if (mode == BuildMode.Local)
+        {
+            var newversion = oldversion.PreRelease.IsEmpty
+                ? oldversion with { PreRelease = "v001" }
+                : oldversion;
 
-        return false;
-    }
+            return newversion;
+        }
+        else if (mode == BuildMode.Release)
+        {
+            var newversion = oldversion.PreRelease.IsEmpty
+                ? oldversion.IncreasePatch()
+                : oldversion with { PreRelease = "" };
 
-    /// <summary>
-    /// Invoked to build the given project in debug mode.
-    /// </summary>
-    /// <param name="packable"></param>
-    /// <returns></returns>
-    static bool BuildDebug(Project packable)
-    {
-        throw null;
-    }
-
-    /// <summary>
-    /// Invoked to build the given project in local mode.
-    /// </summary>
-    /// <param name="packable"></param>
-    /// <returns></returns>
-    static bool BuildLocal(Project packable)
-    {
-        throw null;
-    }
-
-    /// <summary>
-    /// Invoked to build the given project in release mode.
-    /// </summary>
-    /// <param name="packable"></param>
-    /// <returns></returns>
-    static bool BuildRelease(Project packable)
-    {
-        throw null;
+            return newversion;
+        }
+        else throw new UnExpectedException("Unknown build mode.").WithData(mode);
     }
 
     // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to save a backup of the current project file contents.
+    /// </summary>
+    /// <param name="project"></param>
+    /// <returns></returns>
+    public static List<ProjectLine> SaveBackup(this Project project)
+    {
+        return project.ThrowWhenNull().SaveLines();
+    }
+
+    /// <summary>
+    /// Invoked to restore the backup.
+    /// </summary>
+    public static void RestoreBackup(this Project project, List<ProjectLine> backup)
+    {
+        project.ThrowWhenNull();
+        backup.ThrowWhenNull();
+
+        Write(true, Green, "Recovering backup for project: "); WriteLine(project.Name);
+        project.RestoreLines(backup);
+        project.SaveContents();
+    }
 }
