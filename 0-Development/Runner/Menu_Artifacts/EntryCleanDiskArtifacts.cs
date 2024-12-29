@@ -4,7 +4,7 @@ using static System.ConsoleColor;
 namespace Runner.Artifacts;
 
 // ========================================================
-public class CleanDiskArtifactsEntry : MenuEntry
+public class EntryCleanDiskArtifacts : MenuEntry
 {
     /// <inheritdoc/>
     public override string Header() => "Clean Disk Artifacts";

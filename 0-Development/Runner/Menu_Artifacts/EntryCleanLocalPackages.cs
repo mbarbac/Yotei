@@ -4,7 +4,7 @@ using static System.ConsoleColor;
 namespace Runner.Artifacts;
 
 // ========================================================
-public class CleanLocalPackagesEntry : MenuEntry
+public class EntryCleanLocalPackages : MenuEntry
 {
     /// <inheritdoc/>
     public override string Header() => "Clean Local Packages";

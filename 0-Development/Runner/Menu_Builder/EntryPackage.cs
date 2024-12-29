@@ -7,7 +7,7 @@ namespace Runner.Builder;
 /// <summary>
 /// Represents a builder for a given package.
 /// </summary>
-public class PackageBuilderEntry : MenuEntry
+public class EntryPackage : MenuEntry
 {
     public Project Project { get; }
     public SemanticVersion Version { get; }
@@ -18,7 +18,7 @@ public class PackageBuilderEntry : MenuEntry
     /// </summary>
     /// <param name="project"></param>
     /// <param name="mode"></param>
-    public PackageBuilderEntry(Project project, BuildMode mode)
+    public EntryPackage(Project project, BuildMode mode)
     {
         if (!project.ThrowWhenNull().IsPackable()) throw new ArgumentException(
             "Project is not a packable one.")
@@ -43,7 +43,14 @@ public class PackageBuilderEntry : MenuEntry
         var backup = Project.SaveBackup();
         var done = Project.Build(BuildMode, fatSeparator: false);
 
-        if (!done) Project.RestoreBackup(backup);
+        if (!done)
+        {
+            WriteLine(true);
+            Write(Red, "Cannot compile project: ");
+            WriteLine(Project.FullName);
+
+            Project.RestoreBackup(backup);
+        }
         return;
     }
 }

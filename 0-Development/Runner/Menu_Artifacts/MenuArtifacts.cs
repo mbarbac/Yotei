@@ -25,8 +25,8 @@ public class MenuArtifacts : MenuEntry
             done = Menu.Run(
                 Green, Program.Timeout,
                 new MenuEntry("Previous"),
-                new CleanLocalPackagesEntry(),
-                new CleanDiskArtifactsEntry());
+                new EntryCleanLocalPackages(),
+                new EntryCleanDiskArtifacts());
 
             WriteLine(true);
         }

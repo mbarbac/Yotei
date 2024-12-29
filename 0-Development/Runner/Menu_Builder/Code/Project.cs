@@ -37,7 +37,12 @@ public class Project
     }
 
     /// <inheritdoc/>
-    public override string ToString() => NameAndExtension;
+    public override string ToString()
+    {
+        var sb = new StringBuilder(NameAndExtension);
+        if (GetVersion(out var version)) sb.Append($" v:{version}");
+        return sb.ToString(); ;
+    }
 
     /// <summary>
     /// The directory this project file belongs to, without any tailing separator character.
@@ -81,7 +86,11 @@ public class Project
     /// Saves the current contents of this project file in a new collection of lines.
     /// </summary>
     /// <returns></returns>
-    public List<ProjectLine> SaveLines() => new(Lines);
+    public List<ProjectLine> SaveLines()
+    {
+        var list = Lines.Select(x => new ProjectLine(x)).ToList();
+        return list;
+    }
 
     /// <summary>
     /// Restores the contents of this project file from the given collection of lines.

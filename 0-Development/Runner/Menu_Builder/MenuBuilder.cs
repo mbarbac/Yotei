@@ -41,9 +41,9 @@ public class MenuBuilder : MenuEntry
 
             var entries = new List<MenuEntry> {
                 new MenuEntry("Previous"),
-                new MenuEntry("All projects"),
+                new EntryAllPackages(packables, mode),
             };
-            foreach (var packable in packables) entries.Add(new PackageBuilderEntry(packable, mode));
+            foreach (var packable in packables) entries.Add(new EntryPackage(packable, mode));
 
             done = Menu.Run(Green, Program.Timeout, entries.ToArray());
         }

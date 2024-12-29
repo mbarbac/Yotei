@@ -1,11 +1,10 @@
 ﻿using static Yotei.Tools.Diagnostics.ConsoleEx;
 using static System.ConsoleColor;
-using System.Runtime.InteropServices.Marshalling;
 
 namespace Runner.Builder;
 
 // ========================================================
-public static class Builder
+public static class NuBuilder
 {
     /// <summary>
     /// Invoked to build the given project for the given build mode. Returns whether the build
@@ -20,18 +19,28 @@ public static class Builder
     {
         project.ThrowWhenNull();
 
-        if (!project.IsPackable()) throw new ArgumentException(
-            "Project is not a packable one.")
-            .WithData(project);
-
-        if (!project.GetVersion(out var oldversion)) throw new InvalidOperationException(
-            "Cannot obtain current version of packable project.")
-            .WithData(project);
-
         var separator = fatSeparator ? Program.FatSeparator : Program.SlimSeparator;
         WriteLine(true);
         WriteLine(true, Green, separator);
-        Write(true, Green, "Compiling: "); Write(true, $"{project.Name} v:{oldversion}");
+        Write(true, Green, "Compiling: "); Write(true, $"{project.Name}");
+
+        if (!project.IsPackable())
+        {
+            WriteLine(true);
+            Write(true, Red, "Project is not a packable one: ");
+            WriteLine(project.FullName);
+            return false;
+        }
+
+        if (!project.GetVersion(out var oldversion))
+        {
+            WriteLine(true);
+            Write(true, Red, "Cannot obtain current version of project: ");
+            WriteLine(project.FullName);
+            return false;
+        }
+                
+        Write(true, $" v:{oldversion}");
         Write(true, Green, " for mode: "); WriteLine(mode.ToString());
 
         WriteLine(true);
@@ -39,6 +48,99 @@ public static class Builder
         if (!DeleteFiles(project, mode)) return false;
 
         var newversion = IncreaseVersion(oldversion, mode);
+        WriteLine(true);
+        Write(true, Green, "Increasing version to: "); WriteLine(newversion);
+        if (!SetVersion(project, newversion)) return false;
+
+        WriteLine(true);
+        WriteLine(true, Green, "Compiling project...");
+        if (!CompileProject(project, mode)) return false;
+
+        WriteLine(true);
+        WriteLine(true, Green, "Pushing package files...");
+        if (!PushPackage(project, mode)) return false;
+
+        return false;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to push the package files.
+    /// </summary>
+    static bool PushPackage(Project project, BuildMode mode)
+    {
+        GetNuGetPackageFiles(project, out var files, out _);
+        if (files.Count == 0)
+        {
+            WriteLine(true, Red, "No package files found!");
+            return false;
+        }
+        if (files.Count > 1)
+        {
+            WriteLine(true, Red, "Too many package files found!");
+            return false;
+        }
+
+        //var file = files[0];
+        //var cmd = mode switch
+        //{
+        //    BuildMode.Debug => $"nuget push {file} -s {Program.NuGetRepoSource}",
+        //    BuildMode.Local => $"nuget push {file} -s {Program.LocalRepoSource}",
+        //    BuildMode.Release => $"nuget push {file} -s {Program.NuGetRepoSource}",
+        //    _ => throw new ArgumentException("Unknown build mode.").WithData(mode)
+        //};
+
+        //var done = Command.Execute(
+        //    "dotnet",
+        //    cmd,
+        //    file.DirectoryName);
+
+        //if (done != 0) WriteLine(true, Red, "Cannot push package files!");
+        //return done == 0;
+
+        return true;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to compile the given project for the given mode.
+    /// </summary>
+    static bool CompileProject(Project project, BuildMode mode)
+    {
+        var code = Command.Execute(
+            "dotnet",
+            $"build -c {mode} {Path.GetFileName(project.FullName)}",
+            Path.GetDirectoryName(project.FullName));
+
+        return code == 0;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to set the project version to the given value, and save the file.
+    /// </summary>
+    /// <param name="project"></param>
+    /// <param name="newversion"></param>
+    /// <returns></returns>
+    static bool SetVersion(Project project, SemanticVersion newversion)
+    {
+        if (!project.SetVersion(newversion, out _))
+        {
+            Write(true, Red, "Cannot set the new version to: ");
+            WriteLine(newversion);
+            return false;
+        }
+
+        try { project.SaveContents(); }
+        catch (Exception e)
+        {
+            Write(true, Red, "Cannot save the projet with a new version because: ");
+            WriteLine(true, Red, $"- {e.Message}");
+            return false;
+        }
 
         return true;
     }
