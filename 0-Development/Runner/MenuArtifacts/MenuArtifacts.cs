@@ -21,11 +21,11 @@ public class MenuArtifacts : MenuEntry
 
             done = new MenuConsole
             {
-                new MenuEntry("Exit"),
+                new MenuEntry("Previous"),
                 new EntryClearLocalPackages(),
                 new EntryClearDiskArtifacts(),
             }
-            .Run(Green, Program.Timeout, done);
+            .Run(Green, Program.Timeout);
         }
         while (done > 0);
     }

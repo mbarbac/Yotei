@@ -52,9 +52,9 @@ internal class Program
                 new MenuEntry("Exit"),
                 new MenuTester(breakOnError: true),
                 new MenuArtifacts(),
-                new MenuEntry("Build Packages"),
+                new MenuBuilder(),
             }
-            .Run(Green, Timeout, done);
+            .Run(Green, Timeout);
         }
         while (done > 0);
     }

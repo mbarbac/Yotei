@@ -33,6 +33,11 @@ public class MenuConsole : IEnumerable<MenuEntry>
     // ----------------------------------------------------
 
     /// <summary>
+    /// Gets the number of entries in this instance.
+    /// </summary>
+    public int Count => Entries.Count;
+
+    /// <summary>
     /// Gets the entry stored at the given index.
     /// </summary>
     /// <param name="index"></param>

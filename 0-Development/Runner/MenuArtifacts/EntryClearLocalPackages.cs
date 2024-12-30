@@ -28,7 +28,6 @@ public class EntryClearLocalPackages : MenuEntry
     /// </summary>
     static void CleanNuGet()
     {
-        WriteLine(true);
         WriteLine(true, Green, Program.SlimSeparator);
         WriteLine(true, Green, "Cleaning NuGet Caches...");
         WriteLine(true);

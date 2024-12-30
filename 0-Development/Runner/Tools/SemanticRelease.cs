@@ -260,41 +260,51 @@ public record SemanticRelease : IComparable<SemanticRelease>, IEquatable<Semanti
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a new instance with the original value increased, provided that such is not empty
-    /// and that it can be treated as a trailing numeric one. In any case, the build metadata part
-    /// is always cleared.
+    /// Returns a new instance with the original value increased, provided that such is not
+    /// empty, and can be treated as a trailing numeric one. If not, and the template value
+    /// is not null, then it is used as the returned value.
+    /// <br/> By default, the existing build metadata is discarded, although it may happen
+    /// that the template value contains it.
     /// </summary>
+    /// <param name="template"></param>
     /// <returns></returns>
-    public SemanticRelease Increase() => Increase(out _);
+    public SemanticRelease Increase(string? template = null) => Increase(out _, template);
 
     /// <summary>
-    /// Returns a new instance with the original value increased, provided that such is not empty
-    /// and that it can be treated as a trailing numeric one. If so, the out argument is set to
-    /// <c>true</c>, or otherwise set to false. In any case, the build metadata part is always
-    /// cleared.
+    /// Returns a new instance with the original value increased, provided that such is not
+    /// empty, and can be treated as a trailing numeric one. If so, or if the template value
+    /// is not null, the out argument is set to <c>true</c>, and that template value used as
+    /// the returned one if not. Otherwise, the out argument is set to false.
+    /// <br/> By default, the existing build metadata is discarded, although it may happen
+    /// that the template value contains it.
     /// </summary>
     /// <param name="increased"></param>
+    /// <param name="template"></param>
     /// <returns></returns>
-    public SemanticRelease Increase(out bool increased)
+    public SemanticRelease Increase(out bool increased, string? template = null)
     {
+        template = template?.NotNullNotEmpty();
+
         // No value to increase...
         if (Value.Length == 0)
         {
-            increased = false;
-            return new(Value);
+            increased = template is not null;
+            return new(template is null ? Value : template);
         }
 
         // Preparing...
         var parts = Value.Split('.');
         var temp = parts[^1];
 
-        // We need a trailing numeric chunk to increase...
+        // We may have not a trailing numeric chunk to increase...
         var index = FirstDigit(temp);
         if (index < 0)
         {
-            increased = false;
-            return new(Value);
+            increased = template is not null;
+            return new(template is null ? Value : template);
         }
+
+        // Or increasing that numeric trailing chunk...
         else
         {
             var num = temp[index..];

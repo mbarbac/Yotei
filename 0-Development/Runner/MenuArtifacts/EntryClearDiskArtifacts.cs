@@ -17,7 +17,6 @@ public class EntryClearDiskArtifacts : MenuEntry
     /// <inheritdoc/>
     public override void Execute()
     {
-        WriteLine(true);
         WriteLine(true, Green, Program.FatSeparator);
         WriteLine(true, Green, Header());
         WriteLine(true);

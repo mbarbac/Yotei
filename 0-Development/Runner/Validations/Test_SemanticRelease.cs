@@ -248,24 +248,37 @@ public static class Test_SemanticRelease
         var source = new SemanticRelease();
         var target = source.Increase(out var increased);
         Assert.False(increased);
-        Assert.Equal(source, target);
         Assert.Empty(target.ToString(hyphen: true));
+
+        source = new SemanticRelease();
+        target = source.Increase(out increased, template: "v001");
+        Assert.True(increased);
+        Assert.Equal("-v001", target.ToString(hyphen: true));
     }
 
     //[Enforced]
     [Fact]
     public static void Test_Increase_Not_Numeric()
     {
-        var source = new SemanticRelease("alpha");
+        var source = new SemanticRelease("alpha+xyz");
         var target = source.Increase(out var increased);
         Assert.False(increased);
-        Assert.Equal(source, target);
         Assert.Equal("-alpha", target.ToString(hyphen: true));
+
+        source = new SemanticRelease("alpha+xyz");
+        target = source.Increase(out increased, template: "v001");
+        Assert.True(increased);
+        Assert.Equal("-v001", target.ToString(hyphen: true));
+
+        source = new SemanticRelease("alpha+xyz");
+        target = source.Increase(out increased, template: "v001+abc");
+        Assert.True(increased);
+        Assert.Equal("-v001+abc", target.ToString(hyphen: true));
     }
 
     //[Enforced]
     [Fact]
-    public static void Test_Increase_Others()
+    public static void Test_Increase_Numeric_Alike()
     {
         var source = new SemanticRelease("9+any");
         var target = source.Increase(out var increased);
