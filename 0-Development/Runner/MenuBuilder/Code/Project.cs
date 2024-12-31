@@ -102,29 +102,6 @@ public class Project
     /// </summary>
     public List<ProjectLine> Lines { get; } = [];
 
-    /// <summary>
-    /// Saves the current contents of this project file into a new collection of lines.
-    /// </summary>
-    /// <returns></returns>
-    public List<ProjectLine> SaveLines()
-    {
-        var list = Lines.Select(x => new ProjectLine(x)).ToList();
-        return list;
-    }
-
-    /// <summary>
-    /// Restores the contents of this project file from the given collection of lines.
-    /// <br/> This method does not save the contents of the file to disk.
-    /// </summary>
-    /// <param name="lines"></param>
-    public void RestoreLines(IEnumerable<ProjectLine> lines)
-    {
-        lines.ThrowWhenNull();
-
-        Lines.Clear();
-        Lines.AddRange(lines);
-    }
-
     // ----------------------------------------------------
 
     /// <summary>
@@ -161,19 +138,18 @@ public class Project
 
     /// <summary>
     /// Determines if this project represents a packable one, or not, using its current collection
-    /// of lines. If so, this method also tries to return in the out argument its current version,
-    /// which may be null if not found.
+    /// of lines. If so, this method also returns in the out argument its current version.
     /// </summary>
     /// <param name="version"></param>
     /// <returns></returns>
-    public bool IsPackable(out SemanticVersion? version)
+    public bool IsPackable([NotNullWhen(true)] out SemanticVersion? version)
     {
         foreach (var line in Lines)
         {
             if (line.GetXMLValue(ISPACKABLE, out var value) &&
                 string.Compare(TRUE, value, ignoreCase: true) == 0)
             {
-                GetVersion(out version);
+                if (!GetVersion(out version)) break;
                 return true;
             }
         }
@@ -240,7 +216,32 @@ public class Project
     {
         var list = new List<NuReference>();
 
-        foreach (var line in Lines) if (line.IsNuReference()) list.Add(new(line));
+        foreach (var line in Lines) if (NuReference.IsReference(line)) list.Add(new(line));
         return list;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Saves the current contents of this project file into a new collection of lines.
+    /// </summary>
+    /// <returns></returns>
+    public List<ProjectLine> CopyLines()
+    {
+        var list = Lines.Select(x => new ProjectLine(x)).ToList();
+        return list;
+    }
+
+    /// <summary>
+    /// Restores the contents of this project file from the given collection of lines.
+    /// <br/> This method does not save the contents of the file to disk.
+    /// </summary>
+    /// <param name="lines"></param>
+    public void RestoreLines(IEnumerable<ProjectLine> lines)
+    {
+        lines.ThrowWhenNull();
+
+        Lines.Clear();
+        Lines.AddRange(lines);
     }
 }

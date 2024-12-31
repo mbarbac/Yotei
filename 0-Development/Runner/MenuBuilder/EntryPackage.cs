@@ -1,5 +1,6 @@
 ﻿using static Yotei.Tools.Diagnostics.ConsoleEx;
 using static System.ConsoleColor;
+using System.Runtime.InteropServices.Marshalling;
 
 namespace Runner;
 
@@ -20,11 +21,14 @@ public class EntryPackage : MenuEntry
     /// <inheritdoc/>
     public override string Header() => Project.NameExtensionVersion;
 
+    // ----------------------------------------------------
+
     /// <inheritdoc/>
     public override void Execute()
     {
-        BuildMode mode = default;
-        SemanticVersion newversion = default!;
+        WriteLine(true);
+        WriteLine(Green, Program.SlimSeparator);
+        Write(true, Green, "Building package: "); WriteLine(Header());
 
         if (!Project.IsPackable(out var oldversion))
         {
@@ -32,9 +36,10 @@ public class EntryPackage : MenuEntry
             WriteLine(true, Red, "Project is not a packable one.");
             return;
         }
-        var debugversion = oldversion!.IncreasePreRelease("v001");
-        var localversion = oldversion!.PreRelease.IsEmpty ? oldversion with { PreRelease = "v001" } : oldversion;
-        var releaseversion = oldversion!.IncreasePatch();
+
+        var debugversion = MenuBuilder.IncreaseVersion(oldversion, BuildMode.Debug);
+        var localversion = MenuBuilder.IncreaseVersion(oldversion, BuildMode.Local);
+        var releaseversion = MenuBuilder.IncreaseVersion(oldversion, BuildMode.Release);
 
         var menu = new MenuConsole() {
             new MenuEntry("Previous"),
@@ -45,13 +50,12 @@ public class EntryPackage : MenuEntry
         };
 
         WriteLine(true);
-        WriteLine(Green, Program.SlimSeparator);
-        Write(true, Green, "Building package: "); WriteLine(Header());
-        WriteLine(true);
         WriteLine(true, Green, "Please select the desired mode:");
         WriteLine(true);
-
         var result = menu.Run(Green, Program.Timeout);
+
+        BuildMode mode = default;
+        SemanticVersion newversion = default!;
         switch (result)
         {
             case 1: mode = BuildMode.Debug; newversion = debugversion; break;
@@ -65,58 +69,53 @@ public class EntryPackage : MenuEntry
             default: return;
         }
 
-        var backups = new BuildBackups();
-        var done = Execute(backups, Project, mode, newversion);
-        if (!done)
+        var backups = new ProjectBackups();
+        var done = false;
+        try { done = Execute(backups, true, mode, newversion); }
+        catch (Exception e)
         {
             WriteLine(true);
-            WriteLine(true, Red, Program.FatSeparator);
-            WriteLine(true, Red, "Errors have been detected...");
+            WriteLine(true, Red, "Exception intercepted: ");
+            WriteLine(true, e.ToDisplayString());
+        }
+        finally
+        {
+            if (!done)
+            {
+                WriteLine(true);
+                WriteLine(true, Red, Program.FatSeparator);
+                WriteLine(true, Red, "Errors have been detected...");
 
-            backups.Restore();
+                backups.Restore();
+            }
         }
     }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Builds the given project using the given build mode, provided it is a packable one.
+    /// Invoked to build this project for the given build mode and new semantic version.
     /// </summary>
     /// <param name="backups"></param>
-    /// <param name="project"></param>
+    /// <param name="saveBackup"></param>
     /// <param name="mode"></param>
     /// <param name="newversion"></param>
-    /// <returns></returns>
-    public static bool Execute(
-        BuildBackups backups,
-        Project project, BuildMode mode, SemanticVersion newversion)
+    public bool Execute(
+        ProjectBackups backups,
+        bool saveBackup,
+        BuildMode mode, SemanticVersion newversion)
     {
         backups.ThrowWhenNull();
-        project.ThrowWhenNull();
-        newversion.ThrowWhenNull();
-
-        backups.Add(project);
-        return ExecuteInternal(backups, project, mode, newversion);
-    }
-
-    /// <summary>
-    /// Invoked to build the given project.
-    /// </summary>
-    static bool ExecuteInternal(
-        BuildBackups backups,
-        Project project, BuildMode mode, SemanticVersion newversion)
-    {
-        project.ThrowWhenNull();
         newversion.ThrowWhenNull();
 
         // Initializing...
         WriteLine(true);
         WriteLine(true, Green, Program.FatSeparator);
-        Write(true, Green, "Compiling project: "); Write(project.NameVersion);
-        Write(true, Green, " for mode: "); WriteLine(mode.ToString());
+        Write(true, Green, "Compiling project: "); Write(true, Project.NameVersion);
+        Write(true, Green, " for mode: "); WriteLine(true, mode.ToString());
         Write(true, Green, "New version: "); WriteLine(newversion);
 
-        if (!project.IsPackable(out var oldversion))
+        if (!Project.IsPackable(out var oldversion))
         {
             WriteLine(true);
             WriteLine(true, Red, "Project is not a packable one.");
@@ -132,26 +131,37 @@ public class EntryPackage : MenuEntry
         }
 
         // Processing...
+        if (saveBackup)
+        {
+            WriteLine(true);
+            WriteLine(true, Green, "Saving project backup...");
+            backups.Update(Project);
+        }
+
         WriteLine(true);
         WriteLine(true, Green, "Deleting old files...");
-        if (!DeleteFiles(project, mode)) return false;
+        if (!DeleteFiles(mode)) return false;
 
         WriteLine(true);
         WriteLine(true, Green, "Compiling project...");
-        if (!CompileProject(project, mode)) return false;
+        if (!CompileProject(mode)) return false;
 
         WriteLine(true);
         WriteLine(true, Green, "Pushing package files...");
-        if (!PushPackage(project, mode)) return false;
+        if (!PushPackage(mode)) return false;
 
         WriteLine(true);
         WriteLine(true, Green, "Updating references...");
-        if (!UpdateReferences(project, mode, backups, oldversion!, newversion)) return false;
+        if (!UpdateReferences(mode, backups, oldversion!, newversion)) return false;
 
+        // Special case when building for release mode...
         if (mode == BuildMode.Release)
         {
             newversion = newversion.IncreasePatch() with { PreRelease = "v001" };
-            var done = ExecuteInternal(backups, project, BuildMode.Debug, newversion);
+            mode = BuildMode.Debug;
+
+            // We must not save again the backup...
+            var done = Execute(backups, false, mode, newversion);
             if (!done) return false;
         }
 
@@ -162,22 +172,24 @@ public class EntryPackage : MenuEntry
     // ----------------------------------------------------
 
     /// <summary>
-    /// Invoked to clear previous build files and repository.
+    /// Invoked to delete previous files.
     /// </summary>
-    static bool DeleteFiles(Project project, BuildMode mode)
+    bool DeleteFiles(BuildMode mode)
     {
-        GetNuGetPackageFiles(project, out var regulars, out var symbols);
+        // Delete build files...
+        GetNuPackageFiles(out var regulars, out var symbols);
         if (!DeleteList(regulars)) return false;
         if (!DeleteList(symbols)) return false;
 
-        bool DeleteList(List<FileInfo> files)
+        // Invoked to delete the given list of files...
+        static bool DeleteList(List<FileInfo> files)
         {
             foreach (var file in files)
             {
                 try { file.Delete(); }
                 catch (Exception e)
                 {
-                    Write(Red, "Cannot delete file: "); WriteLine(true, file.FullName);
+                    Write(true, Red, "Cannot delete file: "); WriteLine(file.FullName);
                     WriteLine(Red, $"- {e.Message}");
                     return false;
                 }
@@ -185,34 +197,33 @@ public class EntryPackage : MenuEntry
             return true;
         }
 
+        // Deletes the local repository...
         if (mode == BuildMode.Local)
         {
             var dir = new DirectoryInfo(Program.LocalRepoPath);
-            var files = dir.GetFiles($"{project.Name}*.*");
+            var files = dir.GetFiles($"{Project.Name}*.*");
             foreach (var file in files)
             {
                 try { file.Delete(); }
                 catch (Exception e)
                 {
-                    Write(Red, "Cannot delete file: "); WriteLine(true, file.FullName);
+                    Write(true, Red, "Cannot delete file: "); WriteLine(file.FullName);
                     WriteLine(Red, $"- {e.Message}");
                     return false;
                 }
             }
         }
 
+        // Finishing...
         return true;
     }
 
     /// <summary>
-    /// Gets the NuGet package files starting from the project directory.
+    /// Invoked to obtain the build NuGet package files in the project directory branch.
     /// </summary>
-    static void GetNuGetPackageFiles(
-        Project project,
-        out List<FileInfo> regulars,
-        out List<FileInfo> symbols)
+    void GetNuPackageFiles(out List<FileInfo> regulars, out List<FileInfo> symbols)
     {
-        var dir = new DirectoryInfo(project.Directory);
+        var dir = new DirectoryInfo(Project.Directory);
         if (dir.Exists)
         {
             regulars = dir.GetFiles("*.nupkg", SearchOption.AllDirectories).ToList();
@@ -230,12 +241,12 @@ public class EntryPackage : MenuEntry
     /// <summary>
     /// Invoked to compile the given project.
     /// </summary>
-    static bool CompileProject(Project project, BuildMode mode)
+    bool CompileProject(BuildMode mode)
     {
         var code = Command.Execute(
             "dotnet",
-            $"build -c {mode} {Path.GetFileName(project.FullName)}",
-            Path.GetDirectoryName(project.FullName));
+            $"build -c {mode} {Path.GetFileName(Project.FullName)}",
+            Path.GetDirectoryName(Project.FullName));
 
         return code == 0;
     }
@@ -245,7 +256,7 @@ public class EntryPackage : MenuEntry
     /// <summary>
     /// Invoked to push the package files.
     /// </summary>
-    static bool PushPackage(Project project, BuildMode mode)
+    bool PushPackage(BuildMode mode)
     {
         /*
         GetNuGetPackageFiles(project, out var files, out _);
@@ -283,24 +294,48 @@ public class EntryPackage : MenuEntry
     // ----------------------------------------------------
 
     /// <summary>
-    /// Invoked to update the references to the given project in all projects in the current
-    /// solution.
+    /// Invoked to update the references to this project in all projects in the solution.
     /// </summary>
-    /// <returns></returns>
-    static bool UpdateReferences(
-        Project project,
+    bool UpdateReferences(
         BuildMode mode,
-        BuildBackups backups,
+        ProjectBackups backups,
         SemanticVersion oldversion, SemanticVersion newversion)
     {
+        var pname = Project.Name;
+
         var root = Program.GetSolutionDirectory();
-        var projects = MenuBuilder.FindProjects(root);
+        var items = MenuBuilder.FindProjects(root);
 
+        foreach (var item in items)
+        {
+            var captured = false;
 
+            var nrefs = item.GetNuReferences();
+            foreach (var nref in nrefs)
+            {
+                var nname = nref.Name;
+                if (string.Compare(nname, pname, ignoreCase: true) != 0) continue;
 
+                var nversion = nref.Version;
 
+                Black-Black-BLA....
 
+                if (nversion.CompareTo(oldversion) != 0) continue;
 
-        return false;
+                Write(true, Green, "Updating package on project: ");
+                WriteLine(true, item.Name);
+
+                if (!captured)
+                {
+                    backups.Update(item);
+                    captured = true;
+                }
+                nref.Version = newversion;
+            }
+
+            if (captured) item.SaveContents();
+        }
+
+        return true;
     }
 }

@@ -207,4 +207,31 @@ public class MenuBuilder : MenuEntry
 
         return true;
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Increases the given semantic version value using the given build mode.
+    /// </summary>
+    /// <param name="version"></param>
+    /// <param name="mode"></param>
+    /// <returns></returns>
+    public static SemanticVersion IncreaseVersion(SemanticVersion version, BuildMode mode)
+    {
+        version.ThrowWhenNull();
+
+        switch (mode)
+        {
+            case BuildMode.Debug:
+                return version.IncreasePreRelease("v001");
+
+            case BuildMode.Local:
+                return version.PreRelease.IsEmpty ? version with { PreRelease = "v001" } : version;
+
+            case BuildMode.Release:
+                return version.IncreasePatch();
+        }
+
+        throw new UnExpectedException("Unknown build mode.").WithData(mode);
+    }
 }

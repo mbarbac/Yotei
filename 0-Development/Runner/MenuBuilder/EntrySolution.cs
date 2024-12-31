@@ -29,35 +29,39 @@ public class EntrySolution : MenuEntry
 
         if (!MenuBuilder.CaptureMode(out var mode)) return;
 
-        var backups = new BuildBackups();
-        var done = true;
+        var backups = new ProjectBackups();
+        bool done = false;
 
-        foreach (var project in Projects)
+        try
         {
-            done = project.IsPackable(out var oldversion);
-            if (!done) break;
-
-            SemanticVersion newversion = default!;
-            switch (mode)
+            foreach (var project in Projects)
             {
-                case BuildMode.Debug: newversion = oldversion!.IncreasePreRelease("v001"); break;
-                case BuildMode.Local: newversion = oldversion!.PreRelease.IsEmpty ? oldversion with { PreRelease = "v001" } : oldversion; break;
-                case BuildMode.Release: newversion = oldversion!.IncreasePatch(); break;
-                default: goto FINISHING;
+                done = project.IsPackable(out var oldversion);
+                if (!done) break;
+
+                var newversion = MenuBuilder.IncreaseVersion(oldversion!, mode);
+                var entry = new EntryPackage(project);
+
+                done = entry.Execute(backups, true, mode, newversion);
+                if (!done) break;
             }
-
-            done = EntryPackage.Execute(backups, project, mode, newversion);
-            if (!done) break;
         }
-
-        FINISHING:
-        if (!done)
+        catch (Exception e)
         {
             WriteLine(true);
-            WriteLine(true, Red, Program.FatSeparator);
-            WriteLine(true, Red, "Errors have been detected...");
+            WriteLine(true, Red, "Exception intercepted: ");
+            WriteLine(true, e.ToDisplayString());
+        }
+        finally
+        {
+            if (!done)
+            {
+                WriteLine(true);
+                WriteLine(true, Red, Program.FatSeparator);
+                WriteLine(true, Red, "Errors have been detected...");
 
-            backups.Restore();
+                backups.Restore();
+            }
         }
     }
 }

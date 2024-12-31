@@ -7,14 +7,14 @@ namespace Runner;
 /// <summary>
 /// Represents a collection of project backups.
 /// </summary>
-public class BuildBackups
+public class ProjectBackups
 {
     readonly Dictionary<Project, List<ProjectLine>> Items = [];
 
     /// <summary>
-    /// Initializes a new empty instance.
+    /// Initializes a new instance.
     /// </summary>
-    public BuildBackups() { }
+    public ProjectBackups() { }
 
     /// <inheritdoc/>
     public override string ToString() => $"Count: {Items.Count}";
@@ -53,7 +53,7 @@ public class BuildBackups
             "This collection already contains an entry for the given project.")
             .WithData(project);
 
-        var lines = project.SaveLines();
+        var lines = project.CopyLines();
         Items.Add(project, lines);
     }
 
@@ -66,7 +66,7 @@ public class BuildBackups
     {
         project.ThrowWhenNull();
 
-        var lines = project.SaveLines();
+        var lines = project.CopyLines();
         Items[project] = lines;
     }
 
