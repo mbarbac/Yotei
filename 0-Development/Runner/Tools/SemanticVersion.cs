@@ -113,8 +113,7 @@ public partial record SemanticVersion : IComparable<SemanticVersion>, IEquatable
     /// <inheritdoc/>
     public override string ToString()
     {
-        var str = $"{Major}.{Minor}";
-        if (Patch > 0) str += $".{Patch}";
+        var str = $"{Major}.{Minor}.{Patch}";
         if (!PreRelease.IsEmpty) str += PreRelease.ToString(hyphen: true);
         return str;
     }
@@ -258,44 +257,54 @@ public partial record SemanticVersion : IComparable<SemanticVersion>, IEquatable
 
     /// <summary>
     /// Returns a new instance where the original major version has been increased by one unit.
-    /// The minor and patch values, and the build metadata have been cleared.
+    /// The minor and patch values, and the prerelease part has been cleared.
     /// </summary>
     /// <returns></returns>
     public SemanticVersion IncreaseMajor() => new(Major + 1, 0, 0, "");
 
     /// <summary>
     /// Returns a new instance where the original minor version has been increased by one unit.
-    /// The patch value, and the build metadata have been cleared.
+    /// The patch value, and the the prerelease part has been cleared.
     /// </summary>
     /// <returns></returns>
     public SemanticVersion IncreaseMinor() => new(Major, Minor + 1, 0, "");
 
     /// <summary>
-    /// Returns a new instance where the original patch version has been increased by one unit.
-    /// The build metadata has been cleared.
+    /// Returns a new instance where the original patch version has been increased by one unit,
+    /// and the prerelease part has been cleared.
     /// </summary>
     /// <returns></returns>
     public SemanticVersion IncreasePatch() => new(Major, Minor, Patch + 1, "");
 
     /// <summary>
-    /// Returns a new instance where the original value of the prerelease part has been increased,
-    /// provided that such is not empty and that it can be treated as a trailing numeric one. In
-    /// any case, the build metadata part is always cleared.
+    /// Returns a new instance where the value of the prerelease part has been increased, provided
+    /// it is not empty and can be treated as a trailing numeric one. If not, the given template
+    /// value is used, provided it is not a null one. Otherwise, the value is not modified.
+    /// <br/> By default, the existing build metadata is discarded, although it may happen
+    /// that the template value contains it.
     /// </summary>
+    /// <param name="template"></param>
     /// <returns></returns>
-    public SemanticVersion IncreasePreRelease() => IncreasePreRelease(out _);
+    public SemanticVersion IncreasePreRelease(string? template = null)
+    {
+        var temp = PreRelease.Increase(template);
+        return new(Major, Minor, Patch, temp);
+    }
 
     /// <summary>
-    /// Returns a new instance where the original value of the prerelease part has been increased,
-    /// provided that such is not empty and that it can be treated as a trailing numeric one. If
-    /// so, the out argument is set to <c>true</c>, or otherwise set to false. In any case, the
-    /// build metadata part is always cleared.
+    /// Returns a new instance where the value of the prerelease part has been increased, provided
+    /// it is not empty and can be treated as a trailing numeric one. If not, the given template
+    /// value is used, provided it is not a null one. In both cases the value of the out argument
+    /// is set to <c>true</c>. Otherwise, the value is not modified and the value of argument is
+    /// set to <c>false</c>.
+    /// <br/> By default, the existing build metadata is discarded, although it may happen
+    /// that the template value contains it.
     /// </summary>
-    /// <param name="increased"></param>
+    /// <param name="template"></param>
     /// <returns></returns>
-    public SemanticVersion IncreasePreRelease(out bool increased)
+    public SemanticVersion IncreasePreRelease(out bool increased, string? template = null)
     {
-        var temp = PreRelease.Increase(out increased);
+        var temp = PreRelease.Increase(out increased, template);
         return new(Major, Minor, Patch, temp);
     }
 }

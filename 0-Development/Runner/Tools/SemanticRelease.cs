@@ -261,10 +261,9 @@ public record SemanticRelease : IComparable<SemanticRelease>, IEquatable<Semanti
 
     /// <summary>
     /// Returns a new instance with the original value increased, provided that such is not
-    /// empty, and can be treated as a trailing numeric one. If not, and the template value
-    /// is not null, then it is used as the returned value.
-    /// <br/> By default, the existing build metadata is discarded, although it may happen
-    /// that the template value contains it.
+    /// empty, and can be treated as a trailing numeric one. If not, the given template is
+    /// used as the new value provided it is not null. Otherswise, the value of the new
+    /// instance is not modified.
     /// </summary>
     /// <param name="template"></param>
     /// <returns></returns>
@@ -272,9 +271,9 @@ public record SemanticRelease : IComparable<SemanticRelease>, IEquatable<Semanti
 
     /// <summary>
     /// Returns a new instance with the original value increased, provided that such is not
-    /// empty, and can be treated as a trailing numeric one. If so, or if the template value
-    /// is not null, the out argument is set to <c>true</c>, and that template value used as
-    /// the returned one if not. Otherwise, the out argument is set to false.
+    /// empty, and can be treated as a trailing numeric one. If so, or if the given template
+    /// is not null and so used as the new value, the out argument is set to <c>true</c>.
+    /// Otherwise, is set to false.
     /// <br/> By default, the existing build metadata is discarded, although it may happen
     /// that the template value contains it.
     /// </summary>

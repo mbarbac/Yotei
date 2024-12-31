@@ -33,9 +33,9 @@ public class MenuBuilder : MenuEntry
 
             var menu = new MenuConsole {
                 new MenuEntry("Previous"),
-                new EntryBuildAll(projects),
+                new EntrySolution(projects),
             };
-            foreach (var project in projects) menu.Add(new EntryBuildPackage(project));
+            foreach (var project in projects) menu.Add(new EntryPackage(project));
 
             done = menu.Run(Green, Program.Timeout);
         }
@@ -128,5 +128,83 @@ public class MenuBuilder : MenuEntry
         }
 
         return list;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to capture a build mode.
+    /// </summary>
+    /// <param name="mode"></param>
+    /// <returns></returns>
+    public static bool CaptureMode(out BuildMode mode)
+    {
+        WriteLine(true);
+        WriteLine(true, Green, "Please select the desired build mode:");
+        WriteLine(true);
+
+        var done = new MenuConsole {
+            new MenuEntry("Previous"),
+            new MenuEntry("Debug"),
+            new MenuEntry("Local"),
+            new MenuEntry("Release"),
+        }
+        .Run(Green, Program.Timeout);
+
+        switch (done)
+        {
+            case 1: mode = BuildMode.Debug; return true;
+            case 2: mode = BuildMode.Local; return true;
+            case 3: mode = BuildMode.Release; return true;
+        }
+
+        mode = default;
+        return false;
+    }
+
+    /// <summary>
+    /// Invoked to capture a new value of the semantic version.
+    /// </summary>
+    /// <param name="mode"></param>
+    /// <param name="oldversion"></param>
+    /// <param name="newversion"></param>
+    /// <returns></returns>
+    public static bool CaptureVersion(
+        BuildMode mode,
+        SemanticVersion oldversion, out SemanticVersion newversion)
+    {
+        newversion = default!;
+
+        WriteLine(true);
+        Write(true, Green, "Please enter the desired version: ");
+
+        if (!EditLine(oldversion, out var result)) return false;
+        newversion = new SemanticVersion(result);
+
+        if ((mode == BuildMode.Debug || mode == BuildMode.Local) &&
+            newversion.PreRelease.IsEmpty)
+        {
+            newversion = newversion with { PreRelease = "v001" };
+            Write(true, Magenta, "Modified value: ");
+            WriteLine(newversion);
+        }
+
+        if (mode == BuildMode.Release && !newversion.PreRelease.IsEmpty)
+        {
+            newversion = newversion with { PreRelease = "" };
+            Write(true, Magenta, "Modified value: ");
+            WriteLine(newversion);
+        }
+
+        if (newversion.CompareTo(oldversion) < 0 ||
+            (newversion.CompareTo(oldversion) == 0 && mode != BuildMode.Local))
+        {
+            WriteLine(true);
+            Write(true, Red, "New version value must be greater than the old one.");
+            WriteLine(true);
+            return false;
+        }
+
+        return true;
     }
 }

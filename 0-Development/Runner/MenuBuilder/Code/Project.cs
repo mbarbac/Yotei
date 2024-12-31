@@ -114,6 +114,7 @@ public class Project
 
     /// <summary>
     /// Restores the contents of this project file from the given collection of lines.
+    /// <br/> This method does not save the contents of the file to disk.
     /// </summary>
     /// <param name="lines"></param>
     public void RestoreLines(IEnumerable<ProjectLine> lines)
