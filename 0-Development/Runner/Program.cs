@@ -11,7 +11,7 @@ internal class Program
 {
     public static readonly string FatSeparator = "****************************************";
     public static readonly string SlimSeparator = "-------------------------";
-    public static TimeSpan Timeout = TimeSpan.FromMinutes(2);
+    public static TimeSpan Timeout = TimeSpan.FromSeconds(30);
 
     public static RequestList Includes = [];
     public static RequestList Excludes = [];

@@ -10,7 +10,7 @@
 
    <PropertyGroup>
 	  <Description>Yotei Lambda Parser</Description>
-	  <Version>0.6.0-v001</Version>
+	  <Version>0.6.0-v002</Version>
 	  <Authors>mbarbac@hotmail.com</Authors>
 	  <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
 	  <IsPackable>true</IsPackable>
@@ -37,7 +37,7 @@
 
    <!-- LOCAL configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Local'">
-	  <PackageReference Include="Yotei.Tools" Version="0.6.0-v001" />
+	  <PackageReference Include="Yotei.Tools" Version="0.6.0-v004" />
    </ItemGroup>
 
    <!-- RELEASE configuration -->

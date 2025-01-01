@@ -17,7 +17,7 @@ public static class Test_SemanticVersion
         Assert.Equal(0, item.Patch);
         Assert.True(item.PreRelease.IsEmpty);
         Assert.True(item.IsEmpty);
-        Assert.Equal("0.0", item.ToString());
+        Assert.Equal("0.0.0", item.ToString());
 
         item = "";
         Assert.Equal(0, item.Major);
@@ -25,7 +25,7 @@ public static class Test_SemanticVersion
         Assert.Equal(0, item.Patch);
         Assert.True(item.PreRelease.IsEmpty);
         Assert.True(item.IsEmpty);
-        Assert.Equal("0.0", item.ToString());
+        Assert.Equal("0.0.0", item.ToString());
 
         try { item = (string)null!; Assert.Fail(); } catch (ArgumentNullException) { } // Null value
         try { item = " "; Assert.Fail(); } catch (EmptyException) { } // Empty value
@@ -37,10 +37,10 @@ public static class Test_SemanticVersion
     {
         SemanticVersion item;
 
-        item = ""; Assert.Equal("0.0", item.ToString());
-        item = "0"; Assert.Equal("0.0", item.ToString());
-        item = "1"; Assert.Equal("1.0", item.ToString());
-        item = "1.2"; Assert.Equal("1.2", item.ToString());
+        item = ""; Assert.Equal("0.0.0", item.ToString());
+        item = "0"; Assert.Equal("0.0.0", item.ToString());
+        item = "1"; Assert.Equal("1.0.0", item.ToString());
+        item = "1.2"; Assert.Equal("1.2.0", item.ToString());
         item = "1.2.3"; Assert.Equal("1.2.3", item.ToString());
 
         try { item = "-"; Assert.Fail(); } catch (EmptyException) { } // Empty parts
@@ -56,9 +56,9 @@ public static class Test_SemanticVersion
     {
         SemanticVersion item;
 
-        item = "0-pre"; Assert.Equal("0.0-pre", item.ToString());
-        item = "1-pre+any"; Assert.Equal("1.0-pre+any", item.ToString());
-        item = "1.2+any"; Assert.Equal("1.2+any", item.ToString());
+        item = "0-pre"; Assert.Equal("0.0.0-pre", item.ToString());
+        item = "1-pre+any"; Assert.Equal("1.0.0-pre+any", item.ToString());
+        item = "1.2+any"; Assert.Equal("1.2.0+any", item.ToString());
         item = "1.0.3-pre+any"; Assert.Equal("1.0.3-pre+any", item.ToString());
         item = "1.0.3-00+00"; Assert.Equal("1.0.3-00+00", item.ToString());
 

@@ -5,16 +5,16 @@ namespace Runner;
 
 // ========================================================
 /// <summary>
-/// Represents a collection of project backups.
+/// Represents a collection of build backups.
 /// </summary>
-public class ProjectBackups
+public class BuildBackups
 {
     readonly Dictionary<Project, List<ProjectLine>> Items = [];
 
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
-    public ProjectBackups() { }
+    public BuildBackups() { }
 
     /// <inheritdoc/>
     public override string ToString() => $"Count: {Items.Count}";
@@ -58,16 +58,30 @@ public class ProjectBackups
     }
 
     /// <summary>
-    /// Updates the stored backup of the given project with a new one, or adds that backup if
-    /// the project was not in the collection.
+    /// Adds a backup of the given project to this collection, or updates the existing one.
     /// </summary>
     /// <param name="project"></param>
-    public void Update(Project project)
+    public void AddOrUpdate(Project project)
     {
         project.ThrowWhenNull();
 
         var lines = project.CopyLines();
         Items[project] = lines;
+    }
+
+    /// <summary>
+    /// Adds a backup of the given project to this collection, but only if no previous backup
+    /// exist. Otherwise, this method is ignored.
+    /// </summary>
+    /// <param name="project"></param>
+    public void AddOrIgnore(Project project)
+    {
+        project.ThrowWhenNull();
+
+        if (Items.ContainsKey(project)) return;
+
+        var lines = project.CopyLines();
+        Items.Add(project, lines);
     }
 
     /// <summary>

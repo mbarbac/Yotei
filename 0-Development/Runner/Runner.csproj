@@ -24,9 +24,4 @@
 	  <ProjectReference Include="..\..\1-Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser.Tests\Yotei.Tools.LambdaParser.Tests.csproj" />
    </ItemGroup>
 
-   <ItemGroup>
-     <Folder Include="MenuTester\Code\" />
-     <Folder Include="Validations\" />
-   </ItemGroup>
-
 </Project>
