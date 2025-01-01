@@ -5,93 +5,8 @@ namespace Yotei.Tools.Tests;
 
 // ========================================================
 //[Enforced]
-public static class Test_StringExtensions
+public static class Test_StrCharSpanExtensions
 {
-    // [Enforced]
-    [Fact]
-    public static void Test_NullWhenEmpty_With_Trim()
-    {
-        string? source = null;
-        string? result = source.NullWhenEmpty();
-        Assert.Null(result);
-
-        source = "";
-        result = source.NullWhenEmpty();
-        Assert.Null(result);
-
-        source = " ";
-        result = source.NullWhenEmpty();
-        Assert.Null(result);
-    }
-
-    // [Enforced]
-    [Fact]
-    public static void Test_NullWhenEmpty_No_Trim()
-    {
-        string? source = null;
-        string? result = source.NullWhenEmpty(trim: false);
-        Assert.Null(result);
-
-        source = "";
-        result = source.NullWhenEmpty(trim: false);
-        Assert.Null(result);
-
-        source = " ";
-        result = source.NullWhenEmpty(trim: false); // spaces not removed!
-        Assert.NotNull(result);
-        Assert.Equal(" ", result);
-    }
-
-    // ----------------------------------------------------
-
-    // [Enforced]
-    [Fact]
-    public static void Test_NotNullNotEmpty_With_Trim()
-    {
-        string? source = null;
-        Assert.Throws<ArgumentNullException>(() => source.NotNullNotEmpty());
-
-        source = string.Empty;
-        Assert.Throws<EmptyException>(() => source.NotNullNotEmpty());
-
-        source = " ";
-        Assert.Throws<EmptyException>(() => source.NotNullNotEmpty());
-    }
-
-    // [Enforced]
-    [Fact]
-    public static void Test_NotNullNotEmpty_No_Trim()
-    {
-        string? source = null;
-        Assert.Throws<ArgumentNullException>(() => source.NotNullNotEmpty(trim: false));
-
-        source = string.Empty;
-        Assert.Throws<EmptyException>(() => source.NotNullNotEmpty(trim: false));
-
-        source = " ";
-        Assert.Equal(" ", source.NotNullNotEmpty(trim: false));
-    }
-
-    // --------------------------------------------------
-
-    //[Enforced]
-    [Fact]
-    public static void Test_RemoveDiacritics()
-    {
-        string value, temp;
-
-        value = "é"; temp = value.RemoveDiacritics(); Assert.Equal("e", temp);
-        value = "É"; temp = value.RemoveDiacritics(); Assert.Equal("E", temp);
-        value = "ñ"; temp = value.RemoveDiacritics(); Assert.Equal("n", temp);
-        value = "Ñ"; temp = value.RemoveDiacritics(); Assert.Equal("N", temp);
-        value = "ç"; temp = value.RemoveDiacritics(); Assert.Equal("c", temp);
-        value = "Ç"; temp = value.RemoveDiacritics(); Assert.Equal("C", temp);
-        value = "ü"; temp = value.RemoveDiacritics(); Assert.Equal("u", temp);
-        value = "Ü"; temp = value.RemoveDiacritics(); Assert.Equal("U", temp);
-    }
-
-    // ----------------------------------------------------
-
     class CharComparer(Func<char, char, bool> comparer) : IEqualityComparer<char>
     {
         public Func<char, char, bool> Comparer { get; } = comparer;
@@ -105,7 +20,7 @@ public static class Test_StringExtensions
     [Fact]
     public static void Test_IndexOf()
     {
-        var source = "xxabyyab";
+        var source = "xxabyyab".AsSpan();
 
         Assert.Equal(2, source.IndexOf("ab"));
         Assert.Equal(-1, source.IndexOf("AB"));
@@ -118,7 +33,7 @@ public static class Test_StringExtensions
     [Fact]
     public static void Test_IndexOf_CaseSensitive()
     {
-        var source = "xxabyyab";
+        var source = "xxabyyab".AsSpan();
 
         Assert.Equal(-1, source.IndexOf("AB", caseSensitive: true));
         Assert.Equal(2, source.IndexOf("AB", caseSensitive: false));
@@ -156,7 +71,7 @@ public static class Test_StringExtensions
     [Fact]
     public static void Test_IndexOf_CharComparer()
     {
-        var source = "xxabyyab";
+        var source = "xxabyyab".AsSpan();
 
         Assert.Equal(-1, source.IndexOf("AB", new CharComparer((x, y) => x.Equals(y, true))));
         Assert.Equal(2, source.IndexOf("AB", new CharComparer((x, y) => x.Equals(y, false))));
@@ -171,7 +86,7 @@ public static class Test_StringExtensions
     [Fact]
     public static void Test_IndexOf_StringComparison()
     {
-        var source = "xxabyyab";
+        var source = "xxabyyab".AsSpan();
 
         Assert.Equal(-1, source.IndexOf("AB", StringComparison.Ordinal));
         Assert.Equal(2, source.IndexOf("AB", StringComparison.OrdinalIgnoreCase));
@@ -184,7 +99,7 @@ public static class Test_StringExtensions
     [Fact]
     public static void Test_IndexOf_StringComparer()
     {
-        var source = "xxabyyab";
+        var source = "xxabyyab".AsSpan();
 
         Assert.Equal(-1, source.IndexOf("AB", StringComparer.Ordinal));
         Assert.Equal(2, source.IndexOf("AB", StringComparer.OrdinalIgnoreCase));
@@ -199,7 +114,7 @@ public static class Test_StringExtensions
     [Fact]
     public static void Test_ContainsAny()
     {
-        var source = "abc";
+        var source = "abc".AsSpan();
 
         Assert.False(source.ContainsAny([]));
         Assert.False(source.ContainsAny("".ToCharArray()));
@@ -224,7 +139,7 @@ public static class Test_StringExtensions
     [Fact]
     public static void Test_Remove()
     {
-        var source = "xxabyyab";
+        var source = "xxabyyab".AsSpan();
         var target = source.Remove("zz");
         Assert.Equal(source, target);
 
@@ -242,7 +157,7 @@ public static class Test_StringExtensions
     [Fact]
     public static void Test_Remove_CaseSensitive()
     {
-        var source = "xxabyyab";
+        var source = "xxabyyab".AsSpan();
         var target = source.Remove("AB", true);
         Assert.Equal(source, target);
 
@@ -266,7 +181,7 @@ public static class Test_StringExtensions
     [Fact]
     public static void Test_Remove_CharComparer()
     {
-        var source = "xxabyyab";
+        var source = "xxabyyab".AsSpan();
         var target = source.Remove("AB", new CharComparer((x, y) => x.Equals(y, true)));
         Assert.Equal(source, target);
 
@@ -290,7 +205,7 @@ public static class Test_StringExtensions
     [Fact]
     public static void Test_Remove_StringComparer()
     {
-        var source = "xxabyyab";
+        var source = "xxabyyab".AsSpan();
         var target = source.Remove("AB", StringComparer.Ordinal);
         Assert.Equal(source, target);
 
@@ -314,7 +229,7 @@ public static class Test_StringExtensions
     [Fact]
     public static void Test_Remove_StringComparison()
     {
-        var source = "xxabyyab";
+        var source = "xxabyyab".AsSpan();
         var target = source.Remove("AB", StringComparison.Ordinal);
         Assert.Equal(source, target);
 
