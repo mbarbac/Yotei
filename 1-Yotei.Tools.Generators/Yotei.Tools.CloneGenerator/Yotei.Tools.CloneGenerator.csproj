@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
    <PropertyGroup>
-	  <TargetFramework>net9.0</TargetFramework>
+	  <TargetFramework>netstandard2.0</TargetFramework>
 	  <LangVersion>latest</LangVersion>
 	  <ImplicitUsings>disable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
@@ -9,8 +9,8 @@
    </PropertyGroup>
 
    <PropertyGroup>
-	  <Description>Yotei Lambda Parser</Description>
-	  <Version>0.6.1-v001</Version>
+	  <Description>Yotei Clone Generator</Description>
+	  <Version>0.6.0-v001</Version>
 	  <Authors>mbarbac@hotmail.com</Authors>
 	  <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
 	  <IsPackable>true</IsPackable>
@@ -26,23 +26,18 @@
 	  <None Include="LICENSE" Pack="true" PackagePath="" />
    </ItemGroup>
 
-   <!--<PropertyGroup Condition="'$(Configuration)'=='Debug'">
-	  <DefineConstants>$(DefineConstants);DEBUG_LAMBDA_PARSER</DefineConstants>
-   </PropertyGroup>-->
-
-   <!-- DEBUG configuration -->
-   <ItemGroup Condition="'$(Configuration)'=='Debug'">
-	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
+   <ItemGroup>
+	  <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.12.0" PrivateAssets="all" />
    </ItemGroup>
+   <Import Project="..\Yotei.Tools.BaseGenerator\Yotei.Tools.BaseGenerator.projitems" Label="Shared" />
 
-   <!-- LOCAL configuration -->
-   <ItemGroup Condition="'$(Configuration)'=='Local'">
-	  <PackageReference Include="Yotei.Tools" Version="0.6.0-v005" />
-   </ItemGroup>
+   <PropertyGroup>
+	  <DefineConstants>$(DefineConstants);DEBUG_CLONE_GENERATOR</DefineConstants>
+	  <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+   </PropertyGroup>
 
-   <!-- RELEASE configuration -->
-   <ItemGroup Condition="'$(Configuration)'=='Release'">
-	  <PackageReference Include="Yotei.Tools" Version="0.6.1" />
+   <ItemGroup>
+	  <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
    </ItemGroup>
 
 </Project>

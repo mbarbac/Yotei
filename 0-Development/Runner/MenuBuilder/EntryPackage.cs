@@ -76,6 +76,7 @@ public class EntryPackage : MenuEntry
     public bool Execute(BuildBackups backups, BuildMode mode)
     {
         backups.ThrowWhenNull();
+        backups.AddOrIgnore(Project);
 
         WriteLine(true);
         WriteLine(true, Green, Program.FatSeparator);
@@ -93,15 +94,20 @@ public class EntryPackage : MenuEntry
         // Adjusting current version...
         if ((mode == BuildMode.Debug || mode == BuildMode.Local) &&
             version.PreRelease.IsEmpty)
+        {
             version = version with { PreRelease = "v001" };
+            Project.SetVersion(version, out _);
+            Project.SaveContents();
+        }
 
         if (mode == BuildMode.Release && !version.PreRelease.IsEmpty)
+        {
             version = version with { PreRelease = "" };
+            Project.SetVersion(version, out _);
+            Project.SaveContents();
+        }
 
         Write(true, Green, "Building version: "); WriteLine(version);
-
-        // Saving backup, only if not already saved...
-        backups.AddOrIgnore(Project);
 
         // Processing...
         WriteLine(true);
@@ -155,7 +161,7 @@ public class EntryPackage : MenuEntry
     /// <summary>
     /// Invoked to delete previous files.
     /// </summary>
-    bool DeleteFiles() //BuildMode mode)
+    bool DeleteFiles()
     {
         // Delete build files...
         GetNuPackageFiles(out var regulars, out var symbols);
@@ -177,23 +183,6 @@ public class EntryPackage : MenuEntry
             }
             return true;
         }
-
-        // Deletes the local repository...
-        //if (mode == BuildMode.Local)
-        //{
-        //    var dir = new DirectoryInfo(Program.LocalRepoPath);
-        //    var files = dir.GetFiles($"{Project.Name}*.*");
-        //    foreach (var file in files)
-        //    {
-        //        try { file.Delete(); }
-        //        catch (Exception e)
-        //        {
-        //            Write(true, Red, "Cannot delete file: "); WriteLine(file.FullName);
-        //            WriteLine(Red, $"- {e.Message}");
-        //            return false;
-        //        }
-        //    }
-        //}
 
         // Finishing...
         return true;
@@ -295,6 +284,11 @@ public class EntryPackage : MenuEntry
                 if (mode == BuildMode.Debug && nversion.PreRelease.IsEmpty) continue;
                 if (mode == BuildMode.Local && nversion.PreRelease.IsEmpty) continue;
                 if (mode == BuildMode.Release && !nversion.PreRelease.IsEmpty) continue;
+
+                Write(true, Green, "On project: "); Write(true, item.Name);
+                Write(true, Green, " From: "); Write(true, nversion);
+                Write(true, Green, " To: "); Write(true, version);
+                WriteLine(true);
 
                 backups.AddOrIgnore(item);
                 nref.Version = version;

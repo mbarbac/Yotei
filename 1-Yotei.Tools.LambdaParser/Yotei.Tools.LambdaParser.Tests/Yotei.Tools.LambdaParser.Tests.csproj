@@ -10,10 +10,16 @@
    </PropertyGroup>
 
    <ItemGroup>
-	  <PackageReference Include="coverlet.collector" Version="6.0.2" />
+	  <PackageReference Include="coverlet.collector" Version="6.0.3">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
 	  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
 	  <PackageReference Include="xunit" Version="2.9.2" />
-	  <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+	  <PackageReference Include="xunit.runner.visualstudio" Version="3.0.0">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
    </ItemGroup>
 
    <!-- DEBUG configuration -->
@@ -24,13 +30,13 @@
 
    <!-- LOCAL configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Local'">
-	  <PackageReference Include="Yotei.Tools" Version="0.6.0-v004" />
-	  <PackageReference Include="Yotei.Tools.LambdaParser" Version="0.6.0-v001" />
+	  <PackageReference Include="Yotei.Tools" Version="0.6.0-v005" />
+	  <PackageReference Include="Yotei.Tools.LambdaParser" Version="0.6.0-v002" />
    </ItemGroup>
 
    <!-- RELEASE configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Release'">
-	  <PackageReference Include="Yotei.Tools" Version="0.6.0" />
+	  <PackageReference Include="Yotei.Tools" Version="0.6.1" />
 	  <PackageReference Include="Yotei.Tools.LambdaParser" Version="0.6.0" />
    </ItemGroup>
 

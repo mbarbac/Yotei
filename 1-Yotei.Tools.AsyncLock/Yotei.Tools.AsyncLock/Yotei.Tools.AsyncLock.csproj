@@ -10,7 +10,7 @@
 
    <PropertyGroup>
 	  <Description>Yotei Async Lock</Description>
-	  <Version>0.6.0-v002</Version>
+	  <Version>0.6.1-v001</Version>
 	  <Authors>mbarbac@hotmail.com</Authors>
 	  <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
 	  <IsPackable>true</IsPackable>
@@ -37,12 +37,12 @@
 
    <!-- LOCAL configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Local'">
-	  <PackageReference Include="Yotei.Tools" Version="0.6.0-v004" />
+	  <PackageReference Include="Yotei.Tools" Version="0.6.0-v005" />
    </ItemGroup>
 
    <!-- RELEASE configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Release'">
-	  <PackageReference Include="Yotei.Tools" Version="0.6.0" />
+	  <PackageReference Include="Yotei.Tools" Version="0.6.1" />
    </ItemGroup>
 
 </Project>

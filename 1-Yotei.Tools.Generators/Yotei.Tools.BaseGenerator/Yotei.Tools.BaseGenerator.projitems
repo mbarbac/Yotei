@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>87a24c2c-3aba-43a2-b65d-a22fe52e25b0</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Yotei.Tools.BaseGenerator</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\AllowNullAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\BitOperations.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\CallerArgumentExpressionAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\CompilerFeatureRequiredAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\DoesNotReturnAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\HashCode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\Index.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\IsExternalInit.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\MaybeNullAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\NotNullAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\NotNullWhenAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\Range.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\RequiredMemberAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\SetsRequiredMembersAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\SkipLocalsInitAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CustomList[T].cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\DebugExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\StringExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\ObjectExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\ExceptionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Base\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Roslyn\" />
+  </ItemGroup>
+</Project>
