@@ -72,7 +72,6 @@ public static class Ambient
     /// Unregisters and returns the collection of console listeners.
     /// </summary>
     /// <returns></returns>
-    [SuppressMessage("", "IDE0305")]
     public static ImmutableArray<TraceListener> UnregisterConsoleListeners()
     {
         List<TraceListener> items = [];

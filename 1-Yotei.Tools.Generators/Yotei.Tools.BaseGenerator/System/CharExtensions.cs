@@ -1,24 +1,10 @@
-﻿
-namespace Yotei.Tools;
+﻿namespace Yotei.Tools.BaseGenerator;
 
 // ========================================================
-public static class CharExtensions
+internal static class CharExtensions
 {
     /// <summary>
-    /// Returns a new char where its diacritics, if any, have been removed.
-    /// </summary>
-    /// <param name="value"></param>
-    /// <returns></returns>
-    public static char RemoveDiacritics(this char value)
-    {
-        string temp = value.ToString().RemoveDiacritics();
-        return temp.Length > 0 ? temp[0] : (char)0;
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Determines if the two given chars are equal or not.
+    /// Determines if the value of this char is the same as the value of the other given one.
     /// </summary>
     /// <param name="value"></param>
     /// <param name="other"></param>
@@ -33,7 +19,7 @@ public static class CharExtensions
     }
 
     /// <summary>
-    /// Determines if the two given chars are equal or not.
+    /// Determines if the value of this char is the same as the value of the other given one.
     /// </summary>
     /// <param name="value"></param>
     /// <param name="other"></param>
@@ -47,7 +33,7 @@ public static class CharExtensions
 
     // ----------------------------------------------------
 
-    static readonly Lock Locker = new();
+    static readonly object Locker = new();
     static readonly char[] ValueArray = new char[1];
     static readonly char[] OtherArray = new char[1];
 

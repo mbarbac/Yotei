@@ -1,6 +1,4 @@
-﻿#pragma warning disable IDE0305
-
-namespace Yotei.Tools;
+﻿namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>

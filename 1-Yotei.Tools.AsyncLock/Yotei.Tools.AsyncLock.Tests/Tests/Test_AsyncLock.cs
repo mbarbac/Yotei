@@ -1,8 +1,4 @@
-﻿#pragma warning disable IDE0079
-#pragma warning disable IDE0305
-#pragma warning disable CA2208
-
-using static Yotei.Tools.Diagnostics.ConsoleEx;
+﻿using static Yotei.Tools.Diagnostics.ConsoleEx;
 using static System.ConsoleColor;
 
 namespace Yotei.Tools.Tests;
