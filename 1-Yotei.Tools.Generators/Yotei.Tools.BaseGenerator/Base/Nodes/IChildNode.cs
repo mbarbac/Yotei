@@ -7,7 +7,7 @@
 internal interface IChildNode : INode
 {
     /// <summary>
-    /// The parent node this instance belongs to, in the source code generation hierarchy.
+    /// The parent node this one belongs to, in the source code generation hierarchy.
     /// </summary>
     INode ParentNode { get; }
 }

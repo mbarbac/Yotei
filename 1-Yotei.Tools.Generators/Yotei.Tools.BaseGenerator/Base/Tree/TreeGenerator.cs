@@ -132,7 +132,17 @@ internal class TreeGenerator : IIncrementalGenerator
     /// <returns></returns>
     public virtual bool Predicate(SyntaxNode node, CancellationToken token)
     {
-        throw null;
+        token.ThrowIfCancellationRequested();
+
+        return node switch
+        {
+            TypeDeclarationSyntax item => Match(item, TypeAttributeNames),
+            PropertyDeclarationSyntax item => Match(item, PropertyAttributeNames),
+            FieldDeclarationSyntax item => Match(item, FieldAttributeNames),
+            MethodDeclarationSyntax item => Match(item, MethodAttributeNames),
+
+            _ => false
+        };
 
         /// <summary>
         /// Determines if the given syntax node has at least one attribute that matches with any
@@ -141,20 +151,133 @@ internal class TreeGenerator : IIncrementalGenerator
         /// </summary>
         static bool Match(MemberDeclarationSyntax syntax, string[] types)
         {
-            throw null;
+            var ats = syntax.AttributeLists.GetAttributes();
+            var attribute = "Attribute";
+
+            foreach (var at in ats)
+            {
+                var name = at.Name.ShortName();
+                if (!name.EndsWith(attribute)) name += attribute;
+
+                var arity = at.Name.Arity;
+                if (arity > 0) name += $"`{arity}";
+
+                foreach (var type in types) if (name == type) return true;
+            }
+
+            return false;
         }
     }
 
     // ----------------------------------------------------
 
-    INode Transform(GeneratorSyntaxContext context, CancellationToken token)
+    /// <summary>
+    /// Invoked to transform the syntax node carried by the given context into a valid candidate
+    /// for source code generation purposes.
+    /// <br/> Note that if this method returns a null instance, then it will simply be ignored
+    /// and not be not taken into consideration for that purposes.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    public virtual ICandidate Transform(GeneratorSyntaxContext context, CancellationToken token)
     {
-        throw null;
+        token.ThrowIfCancellationRequested();
+
+        var syntax = context.Node;
+        var model = context.SemanticModel;
+
+        // Types...
+        if (syntax is TypeDeclarationSyntax typeSyntax)
+        {
+            var symbol = model.GetDeclaredSymbol(typeSyntax, token)
+                ?? throw new ArgumentException(
+                    "Cannot find symbol of the given type syntax.")
+                    .WithData(typeSyntax);
+
+            var atts = Matches(symbol.GetAttributes(), TypeAttributes).ToImmutableArray();
+            if (atts.Length != 0)
+                return new TypeCandidate(atts, model, typeSyntax, symbol);
+        }
+
+        // Properties...
+        else if (syntax is PropertyDeclarationSyntax propertySyntax)
+        {
+            var symbol = model.GetDeclaredSymbol(propertySyntax, token)
+                ?? throw new ArgumentException(
+                    "Cannot find symbol of the given property syntax.")
+                    .WithData(propertySyntax);
+
+            var atts = Matches(symbol.GetAttributes(), PropertyAttributes).ToImmutableArray();
+            if (atts.Length != 0)
+                return new PropertyCandidate(atts, model, propertySyntax, symbol);
+        }
+
+        // Fields...
+        else if (syntax is FieldDeclarationSyntax fieldSyntax)
+        {
+            var found = false;
+            var items = fieldSyntax.Declaration.Variables;
+
+            foreach (var item in items)
+            {
+                var symbol = model.GetDeclaredSymbol(item, token) as IFieldSymbol;
+                if (symbol != null)
+                {
+                    found = true;
+                    var atts = Matches(symbol.GetAttributes(), FieldAttributes).ToImmutableArray();
+                    if (atts.Length != 0)
+                        return new FieldCandidate(atts, model, fieldSyntax, symbol);
+                }
+            }
+
+            if (!found) throw new ArgumentException(
+                "Cannot find symbol of the given field syntax.").WithData(fieldSyntax);
+        }
+
+        // Methods...
+        else if (syntax is MethodDeclarationSyntax methodSyntax)
+        {
+            var symbol = model.GetDeclaredSymbol(methodSyntax, token)
+                ?? throw new ArgumentException(
+                    "Cannot find symbol of the given method syntax.")
+                    .WithData(methodSyntax);
+
+            var atts = Matches(symbol.GetAttributes(), PropertyAttributes).ToImmutableArray();
+            if (atts.Length != 0)
+                return new MethodCandidate(atts, model, methodSyntax, symbol);
+        }
+
+        // Finishing with no transformation...
+        throw null!;
+    }
+
+    /// <summary>
+    /// Extracts the attributes that match any of the given types.
+    /// </summary>
+    static List<AttributeData> Matches(
+        IEnumerable<AttributeData> attributes,
+        Type[] types)
+    {
+        List<AttributeData> items = [];
+
+        foreach (var attribute in attributes)
+            foreach (var type in types)
+                if (attribute.Match(type)) items.Add(attribute);
+
+        return items;
     }
 
     // ----------------------------------------------------
 
-    void Execute(SourceProductionContext context, ImmutableArray<INode> candidates)
+    /// <summary>
+    /// Invoked to emit the source code of the given collection of captured candidates, by
+    /// creating the appropriate hierarchy and then invoking the appropriate methods on the
+    /// created nodes.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="candidates"></param>
+    void Execute(SourceProductionContext context, ImmutableArray<ICandidate> candidates)
     {
         throw null;
     }

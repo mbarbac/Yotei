@@ -7,16 +7,14 @@
 internal interface INode
 {
     /// <summary>
-    /// Invoked *before* source code generation to validate this node and its child ones, if it
-    /// has any.
+    /// Invoked before generation to validate this node, and its child ones if any.
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
     bool Validate(SourceProductionContext context);
 
     /// <summary>
-    /// Invoked to emit the source code of this node, and its child ones, if any, on the given
-    /// code builder instance.
+    /// Invoked to emit the source code for this node, and its child ones if any.
     /// </summary>
     /// <param name="context"></param>
     /// <param name="cb"></param>

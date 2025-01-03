@@ -9,12 +9,28 @@
     <Import_RootNamespace>Yotei.Tools.BaseGenerator</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Base\Elements\Api\INode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Base\Elements\Api\IChildNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Base\Elements\Api\IMemberNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Base\Elements\__.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\Candidates\Code\MethodCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\Candidates\Code\FieldCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\Candidates\Code\PropertyCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\Candidates\Code\TypeCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\Candidates\ICandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\Nodes\Code\MethodNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\Nodes\Code\FieldNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\Nodes\Code\PropertyNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\Nodes\Code\TypeNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\Nodes\Code\NamespaceNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\Nodes\Code\FileNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\Nodes\Collections\ChildFields.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\Nodes\Collections\ChildMethods.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\Nodes\Collections\ChildProperties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\Nodes\Collections\ChildFiles.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\Nodes\Collections\ChildTypes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\Nodes\Collections\ChildNamespaces.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\Nodes\IChildNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\Nodes\INode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Tree\TreeGenerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Tree\TreeDiagnostics.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\__.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\AllowNullAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\BitOperations.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\CallerArgumentExpressionAttribute.cs" />
@@ -30,9 +46,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\RequiredMemberAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\SetsRequiredMembersAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\SkipLocalsInitAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\RoslynNameExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\RoslynNameOptions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\SymbolComparer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\AttributeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\NameSyntaxExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\MatchExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\MatchExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CustomList[T].cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\EasyNameExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\EasyNameOptions.cs" />
