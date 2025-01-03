@@ -1,4 +1,10 @@
 ﻿namespace Yotei.Tools.BaseGenerator;
 
 // ========================================================
-internal interface ICandidate { }
+/// <summary>
+/// Represents
+/// </summary>
+internal interface IMemberNode : IChildNode
+{
+
+}

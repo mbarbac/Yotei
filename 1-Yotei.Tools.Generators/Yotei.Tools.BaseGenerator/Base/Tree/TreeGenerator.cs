@@ -147,9 +147,15 @@ internal class TreeGenerator : IIncrementalGenerator
 
     // ----------------------------------------------------
 
-    ICandidate Transform(GeneratorSyntaxContext context, CancellationToken token) => throw null;
+    INode Transform(GeneratorSyntaxContext context, CancellationToken token)
+    {
+        throw null;
+    }
 
     // ----------------------------------------------------
 
-    void Execute(SourceProductionContext context, ImmutableArray<ICandidate> candidates) => throw null;
+    void Execute(SourceProductionContext context, ImmutableArray<INode> candidates)
+    {
+        throw null;
+    }
 }
