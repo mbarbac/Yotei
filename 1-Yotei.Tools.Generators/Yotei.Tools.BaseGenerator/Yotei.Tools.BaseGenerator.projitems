@@ -52,6 +52,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\AttributeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\NameSyntaxExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\MatchExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\ChainExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CustomList[T].cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\EasyNameExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\EasyNameOptions.cs" />

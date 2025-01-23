@@ -43,10 +43,10 @@ internal sealed class NamespaceNode : IChildNode
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public bool Validate(SourceProductionContext context) => throw null;
+    public bool Validate(SourceProductionContext context) => true;
 
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public void Emit(SourceProductionContext context, CodeBuilder cb) => throw null;
+    public void Emit(SourceProductionContext context, CodeBuilder cb) { }
 }

@@ -54,9 +54,126 @@ internal class TreeGenerator : IIncrementalGenerator
     // ----------------------------------------------------
 
     /// <summary>
+    /// Invoked to create an appropriate node using the given candidate.
+    /// </summary>
+    /// <param name="parent"></param>
+    /// <param name="candidate"></param>
+    /// <returns></returns>
+    protected virtual TypeNode CreateNode(
+        INode parent, TypeCandidate candidate) => new(parent, candidate);
+
+    /// <summary>
+    /// Invoked to create an appropriate node using the given candidate.
+    /// </summary>
+    /// <param name="parent"></param>
+    /// <param name="candidate"></param>
+    /// <returns></returns>
+    protected virtual PropertyNode CreateNode(
+        TypeNode parent, PropertyCandidate candidate) => new(parent, candidate);
+
+    /// <summary>
+    /// Invoked to create an appropriate node using the given candidate.
+    /// </summary>
+    /// <param name="parent"></param>
+    /// <param name="candidate"></param>
+    /// <returns></returns>
+    protected virtual FieldNode CreateNode(
+        TypeNode parent, FieldCandidate candidate) => new(parent, candidate);
+
+    /// <summary>
+    /// Invoked to create an appropriate node using the given candidate.
+    /// </summary>
+    /// <param name="parent"></param>
+    /// <param name="candidate"></param>
+    /// <returns></returns>
+    protected virtual MethodNode CreateNode(
+        TypeNode parent, MethodCandidate candidate) => new(parent, candidate);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Gets the name of the file where the code of the tail type in the chain of types will be
+    /// emitted into.
+    /// </summary>
+    /// <param name="nschain"></param>
+    /// <param name="tpchain"></param>
+    /// <returns></returns>
+    protected virtual string GetFileName(
+        ImmutableArray<BaseNamespaceDeclarationSyntax> nschain,
+        ImmutableArray<INamedTypeSymbol> tpchain)
+    {
+        return GetFileNameByTailType(nschain, tpchain);
+    }
+
+    /// <summary>
+    /// Returns a suitable file name using the given chain of namespaces.
+    /// </summary>
+    /// <param name="nschain"></param>
+    /// <returns></returns>
+    protected string GetFileNameByTailNamespace(
+        ImmutableArray<BaseNamespaceDeclarationSyntax> nschain)
+    {
+        nschain.ThrowWhenNull();
+
+        List<string> parts = [];
+
+        foreach (var ns in nschain)
+        {
+            var name = ns.Name.LongName();
+            var temps = name.Split('.');
+            parts.AddRange(temps);
+        }
+
+        parts.Reverse();
+        return string.Join(".", parts);
+    }
+
+    /// <summary>
+    /// Returns a suitable file name using the given namespace and type chains.
+    /// </summary>
+    /// <param name="nschain"></param>
+    /// <param name="tpchain"></param>
+    /// <returns></returns>
+    protected virtual string GetFileNameByTailType(
+        ImmutableArray<BaseNamespaceDeclarationSyntax> nschain,
+        ImmutableArray<INamedTypeSymbol> tpchain)
+    {
+        nschain.ThrowWhenNull();
+        tpchain.ThrowWhenNull();
+
+        List<string> parts = [];
+
+        foreach (var ns in nschain)
+        {
+            var name = ns.Name.LongName();
+            var temps = name.Split('.');
+            parts.AddRange(temps);
+        }
+
+        foreach (var tp in tpchain)
+        {
+            var name = tp.Name;
+
+            if (name.Length == 0) name = "$";
+            else
+            {
+                var index = name.IndexOf('`');
+                if (index > 0) name = name[..index];
+            }
+            parts.Add(name);
+        }
+
+        parts.Reverse();
+        return string.Join(".", parts);
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Invoked automatically by the compiler to initialize the generator and to register source
-    /// code generation steps via callbacks on the context. Although this method is public, it is
-    /// just infrastructure and shall not be called from user code.
+    /// code generation steps via callbacks on the context.
+    /// <br/> Although this method is public, it is just infrastructure and shall not be called
+    /// from user code.
     /// </summary>
     /// <param name="context"></param>
     public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -124,7 +241,7 @@ internal class TreeGenerator : IIncrementalGenerator
     /// <summary>
     /// Invoked to quickly determine if the given syntax node shall be considered as a potential
     /// candidate for source code generation or not. By default, this method just compares if any
-    /// of the attributes applied to the given node match with any of the specified ones, for the
+    /// of the attributes applied to the given node match with any of the specified ones for the
     /// kind of that node.
     /// </summary>
     /// <param name="node"></param>
@@ -174,12 +291,13 @@ internal class TreeGenerator : IIncrementalGenerator
     /// <summary>
     /// Invoked to transform the syntax node carried by the given context into a valid candidate
     /// for source code generation purposes.
-    /// <br/> Note that if this method returns a null instance, then it will simply be ignored
-    /// and not be not taken into consideration for that purposes.
+    /// <br/> Note that if this method returns null, then it will simply be ignored and not be not
+    /// taken into consideration for those purposes.
     /// </summary>
     /// <param name="context"></param>
     /// <param name="token"></param>
     /// <returns></returns>
+    [SuppressMessage("", "IDE0019")]
     public virtual ICandidate Transform(GeneratorSyntaxContext context, CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
@@ -249,7 +367,7 @@ internal class TreeGenerator : IIncrementalGenerator
         }
 
         // Finishing with no transformation...
-        throw null!;
+        return null!;
     }
 
     /// <summary>
@@ -279,6 +397,86 @@ internal class TreeGenerator : IIncrementalGenerator
     /// <param name="candidates"></param>
     void Execute(SourceProductionContext context, ImmutableArray<ICandidate> candidates)
     {
-        throw null;
+        var files = new ChildFiles();
+        var nschain = ImmutableArray<BaseNamespaceDeclarationSyntax>.Empty;
+        var tpchain = ImmutableArray<INamedTypeSymbol>.Empty;
+        var comparer = SymbolComparer.Default;
+        INode parent = default!;
+
+        candidates.OfType<TypeCandidate>().ForEach(CaptureHierarchy);
+        candidates.ForEach(x => x is not null and not TypeCandidate, CaptureHierarchy);
+
+        foreach (var file in files)
+        {
+            context.CancellationToken.ThrowIfCancellationRequested();
+
+            if (!file.Validate(context)) continue;
+
+            var cb = new CodeBuilder(); file.Emit(context, cb);
+            var code = cb.ToString();
+            var name = file.FileName + ".g.cs";
+            context.AddSource(name, code);
+        }
+
+        /// <summary>
+        /// Invoked to emit the hierarchy of the given candidate.
+        /// </summary>
+        void CaptureHierarchy(ICandidate candidate)
+        {
+        }
+
+        /// <summary>
+        /// Invoked to emit the hierarchy of the given file-level candidate.
+        /// Returns <c>false</c> if errors are detected that prevents further execution.
+        /// </summary>
+        bool CaptureFile(ICandidate candidate)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Invoked to emit the hierarchy of the given namespace-level candidate.
+        /// Returns <c>false</c> if errors are detected that prevents further execution.
+        /// </summary>
+        bool CaptureNamespace(ICandidate candidate)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Invoked to emit the hierarchy of the given type-level candidate.
+        /// Returns <c>false</c> if errors are detected that prevents further execution.
+        /// </summary>
+        bool CaptureType(ICandidate candidate)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Invoked to emit the hierarchy of the given property-level candidate.
+        /// Returns <c>false</c> if errors are detected that prevents further execution.
+        /// </summary>
+        bool CaptureProperty(ICandidate candidate)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Invoked to emit the hierarchy of the given field-level candidate.
+        /// Returns <c>false</c> if errors are detected that prevents further execution.
+        /// </summary>
+        bool CaptureField(ICandidate candidate)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Invoked to emit the hierarchy of the given method-level candidate.
+        /// Returns <c>false</c> if errors are detected that prevents further execution.
+        /// </summary>
+        bool CaptureMethod(ICandidate candidate)
+        {
+            return true;
+        }
     }
 }

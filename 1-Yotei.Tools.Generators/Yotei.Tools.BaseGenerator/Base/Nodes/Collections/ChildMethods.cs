@@ -27,7 +27,7 @@ internal class ChildMethods : CustomList<MethodNode>
         /// <inheritdoc/>
         public bool Equals(MethodNode x, MethodNode y)
         {
-            return string.Compare(x.FileName, y.FileName, ignoreCase: true) == 0;
+            return SymbolComparer.Default.Equals(x.Symbol, y.Symbol);
         }
 
         /// <inheritdoc/>

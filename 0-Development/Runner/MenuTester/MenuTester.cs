@@ -443,8 +443,7 @@ public class MenuTester : MenuEntry
     /// <returns></returns>
     static TimeSpan Execute(object? instance, MethodInfo method, bool breakOnError)
     {
-        var watch = new Stopwatch();
-        watch.Start();
+        var ini = Stopwatch.GetTimestamp();
 
         // xUnit only supports Task and void as return types...
         try
@@ -480,12 +479,9 @@ public class MenuTester : MenuEntry
                 Environment.FailFast(null);
             }
         }
-        finally
-        {
-            watch.Stop();
-        }
 
-        return watch.Elapsed;
+        var end = Stopwatch.GetElapsedTime(ini);
+        return end;
     }
 
     /// <summary>
