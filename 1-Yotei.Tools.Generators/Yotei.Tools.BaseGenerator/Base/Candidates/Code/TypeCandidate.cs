@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents a type-alike candidate for source code generation purposes.
 /// </summary>
-internal sealed class TypeCandidate : ICandidate
+internal sealed class TypeCandidate : IValidCandidate
 {
     /// <summary>
     /// Initializes a new instance.
@@ -36,9 +36,9 @@ internal sealed class TypeCandidate : ICandidate
 
     /// <inheritdoc/>
     public TypeDeclarationSyntax Syntax { get; }
-    SyntaxNode ICandidate.Syntax => Syntax;
+    SyntaxNode IValidCandidate.Syntax => Syntax;
 
     /// <inheritdoc/>
     public INamedTypeSymbol Symbol { get; }
-    ISymbol ICandidate.Symbol => Symbol;
+    ISymbol IValidCandidate.Symbol => Symbol;
 }

@@ -13,7 +13,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Base\Candidates\Code\FieldCandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Candidates\Code\PropertyCandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Candidates\Code\TypeCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\Candidates\Code\ErrorCandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Candidates\ICandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\Candidates\IValidCandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Nodes\Code\MethodNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Nodes\Code\FieldNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Nodes\Code\PropertyNode.cs" />

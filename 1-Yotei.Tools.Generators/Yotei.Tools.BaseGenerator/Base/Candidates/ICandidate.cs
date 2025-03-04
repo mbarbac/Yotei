@@ -2,27 +2,6 @@
 
 // ========================================================
 /// <summary>
-/// Represents a source code element that is a candidate for source code generation.
+/// Represents either a candidate for source code generation, or an error situation.
 /// </summary>
-internal interface ICandidate
-{
-    /// <summary>
-    /// The list of recognized attributes that decorates the candidate.
-    /// </summary>
-    ImmutableArray<AttributeData> Attributes { get; }
-
-    /// <summary>
-    /// The semantic model the source element is associated with.
-    /// </summary>
-    SemanticModel SemanticModel { get; }
-
-    /// <summary>
-    /// The syntax of the associated source element.
-    /// </summary>
-    SyntaxNode Syntax { get; }
-
-    /// <summary>
-    /// The symbol of the associated source element.
-    /// </summary>
-    ISymbol Symbol { get; }
-}
+internal interface ICandidate { }

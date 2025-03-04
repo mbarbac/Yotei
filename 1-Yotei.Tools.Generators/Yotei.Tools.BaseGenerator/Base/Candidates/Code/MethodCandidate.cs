@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents a method-alike candidate for source code generation purposes.
 /// </summary>
-internal sealed class MethodCandidate : ICandidate
+internal sealed class MethodCandidate : IValidCandidate
 {
     /// <summary>
     /// Initializes a new instance.
@@ -36,9 +36,9 @@ internal sealed class MethodCandidate : ICandidate
 
     /// <inheritdoc/>
     public MethodDeclarationSyntax Syntax { get; }
-    SyntaxNode ICandidate.Syntax => Syntax;
+    SyntaxNode IValidCandidate.Syntax => Syntax;
 
     /// <inheritdoc/>
     public IMethodSymbol Symbol { get; }
-    ISymbol ICandidate.Symbol => Symbol;
+    ISymbol IValidCandidate.Symbol => Symbol;
 }

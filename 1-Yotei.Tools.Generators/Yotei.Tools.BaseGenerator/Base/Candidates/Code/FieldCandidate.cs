@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents a field-alike candidate for source code generation purposes.
 /// </summary>
-internal sealed class FieldCandidate : ICandidate
+internal sealed class FieldCandidate : IValidCandidate
 {
     /// <summary>
     /// Initializes a new instance.
@@ -36,9 +36,9 @@ internal sealed class FieldCandidate : ICandidate
 
     /// <inheritdoc/>
     public FieldDeclarationSyntax Syntax { get; }
-    SyntaxNode ICandidate.Syntax => Syntax;
+    SyntaxNode IValidCandidate.Syntax => Syntax;
 
     /// <inheritdoc/>
     public IFieldSymbol Symbol { get; }
-    ISymbol ICandidate.Symbol => Symbol;
+    ISymbol IValidCandidate.Symbol => Symbol;
 }

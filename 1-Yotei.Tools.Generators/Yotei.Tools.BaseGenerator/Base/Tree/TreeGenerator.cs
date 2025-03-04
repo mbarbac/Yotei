@@ -308,10 +308,9 @@ internal class TreeGenerator : IIncrementalGenerator
         // Types...
         if (syntax is TypeDeclarationSyntax typeSyntax)
         {
-            var symbol = model.GetDeclaredSymbol(typeSyntax, token)
-                ?? throw new ArgumentException(
-                    "Cannot find symbol of the given type syntax.")
-                    .WithData(typeSyntax);
+            var symbol = model.GetDeclaredSymbol(typeSyntax, token);
+            if (symbol == null)
+                return new ErrorCandidate(TreeDiagnostics.SymbolNotFound(typeSyntax));
 
             var atts = Matches(symbol.GetAttributes(), TypeAttributes).ToImmutableArray();
             if (atts.Length != 0)
@@ -321,10 +320,9 @@ internal class TreeGenerator : IIncrementalGenerator
         // Properties...
         else if (syntax is PropertyDeclarationSyntax propertySyntax)
         {
-            var symbol = model.GetDeclaredSymbol(propertySyntax, token)
-                ?? throw new ArgumentException(
-                    "Cannot find symbol of the given property syntax.")
-                    .WithData(propertySyntax);
+            var symbol = model.GetDeclaredSymbol(propertySyntax, token);
+            if (symbol == null)
+                return new ErrorCandidate(TreeDiagnostics.SymbolNotFound(propertySyntax));
 
             var atts = Matches(symbol.GetAttributes(), PropertyAttributes).ToImmutableArray();
             if (atts.Length != 0)
@@ -334,7 +332,6 @@ internal class TreeGenerator : IIncrementalGenerator
         // Fields...
         else if (syntax is FieldDeclarationSyntax fieldSyntax)
         {
-            var found = false;
             var items = fieldSyntax.Declaration.Variables;
 
             foreach (var item in items)
@@ -342,24 +339,21 @@ internal class TreeGenerator : IIncrementalGenerator
                 var symbol = model.GetDeclaredSymbol(item, token) as IFieldSymbol;
                 if (symbol != null)
                 {
-                    found = true;
                     var atts = Matches(symbol.GetAttributes(), FieldAttributes).ToImmutableArray();
                     if (atts.Length != 0)
                         return new FieldCandidate(atts, model, fieldSyntax, symbol);
                 }
             }
 
-            if (!found) throw new ArgumentException(
-                "Cannot find symbol of the given field syntax.").WithData(fieldSyntax);
+            return new ErrorCandidate(TreeDiagnostics.SymbolNotFound(fieldSyntax));
         }
 
         // Methods...
         else if (syntax is MethodDeclarationSyntax methodSyntax)
         {
-            var symbol = model.GetDeclaredSymbol(methodSyntax, token)
-                ?? throw new ArgumentException(
-                    "Cannot find symbol of the given method syntax.")
-                    .WithData(methodSyntax);
+            var symbol = model.GetDeclaredSymbol(methodSyntax, token);
+            if (symbol == null)
+                return new ErrorCandidate(TreeDiagnostics.SymbolNotFound(methodSyntax));
 
             var atts = Matches(symbol.GetAttributes(), PropertyAttributes).ToImmutableArray();
             if (atts.Length != 0)
@@ -367,7 +361,7 @@ internal class TreeGenerator : IIncrementalGenerator
         }
 
         // Finishing with no transformation...
-        return null!;
+        return new ErrorCandidate(TreeDiagnostics.UnknownSyntax(syntax));
     }
 
     /// <summary>
@@ -403,8 +397,9 @@ internal class TreeGenerator : IIncrementalGenerator
         var comparer = SymbolComparer.Default;
         INode parent = default!;
 
+        candidates.OfType<ErrorCandidate>().ForEach(x => x.Diagnostic.Report(context));
         candidates.OfType<TypeCandidate>().ForEach(CaptureHierarchy);
-        candidates.ForEach(x => x is not null and not TypeCandidate, CaptureHierarchy);
+        candidates.OfType<IValidCandidate>().ForEach(x => x is not TypeCandidate, CaptureHierarchy);
 
         foreach (var file in files)
         {
@@ -418,64 +413,270 @@ internal class TreeGenerator : IIncrementalGenerator
             context.AddSource(name, code);
         }
 
+        // ------------------------------------------------
         /// <summary>
         /// Invoked to emit the hierarchy of the given candidate.
         /// </summary>
-        void CaptureHierarchy(ICandidate candidate)
+        void CaptureHierarchy(IValidCandidate candidate)
         {
+            context.CancellationToken.ThrowIfCancellationRequested();
+
+            nschain = candidate.Syntax.GetNamespaceSyntaxChain();
+            tpchain = candidate.Symbol.GetTypeSymbolChain();
+
+            if (!CaptureFile(candidate)) return;
+            if (!CaptureNamespace(candidate)) return;
+            if (!CaptureType(candidate)) return;
+            if (!CaptureProperty(candidate)) return;
+            if (!CaptureField(candidate)) return;
+            if (!CaptureMethod(candidate)) return;
         }
 
+        // ------------------------------------------------
         /// <summary>
         /// Invoked to emit the hierarchy of the given file-level candidate.
         /// Returns <c>false</c> if errors are detected that prevents further execution.
         /// </summary>
-        bool CaptureFile(ICandidate candidate)
+        bool CaptureFile(IValidCandidate candidate)
         {
+            var name = GetFileName(nschain, tpchain);
+            var node = files.Find(x => string.Compare(x.FileName, name, ignoreCase: true) == 0);
+
+            if (node == null) // No node, let's create a new one...
+            {
+                node = new FileNode(name);
+                files.Add(node);
+            }
+
+            parent = node;
             return true;
         }
 
+        // ------------------------------------------------
         /// <summary>
         /// Invoked to emit the hierarchy of the given namespace-level candidate.
         /// Returns <c>false</c> if errors are detected that prevents further execution.
         /// </summary>
-        bool CaptureNamespace(ICandidate candidate)
+        bool CaptureNamespace(IValidCandidate candidate)
         {
+            var list = ((FileNode)parent).ChildNamespaces;
+            var len = nschain.Length;
+
+            for (int index = 0; index < len; index++)
+            {
+                var syntax = nschain[index];
+                var name = syntax.Name.ToString();
+                var node = list.Find(x => string.Compare(x.Name, name) == 0);
+
+                if (node == null) // No node, let's create a new one...
+                {
+                    node = new(parent, syntax);
+                    list.Add(node);
+                }
+
+                parent = node;
+                list = node.ChildNamespaces;
+            }
+
             return true;
         }
 
+        // ------------------------------------------------
         /// <summary>
         /// Invoked to emit the hierarchy of the given type-level candidate.
         /// Returns <c>false</c> if errors are detected that prevents further execution.
         /// </summary>
-        bool CaptureType(ICandidate candidate)
+        bool CaptureType(IValidCandidate candidate)
         {
+            var list = ((NamespaceNode)parent).ChildTypes;
+            var len = tpchain.Length;
+
+            // Main loop...
+            for (int index = 0; index < len; index++)
+            {
+                // Find using symbol comparer, as we may have same name but different type args...
+                var symbol = tpchain[index];
+                var node = list.Find(x => comparer.Equals(x.Symbol, symbol));
+
+                // If no type node, let's create a new one...
+                if (node == null)
+                {
+                    // Create custom node...
+                    if (candidate is TypeCandidate element && index == (len - 1))
+                    {
+                        node = CreateNode(parent, element);
+                        list.Add(node);
+                    }
+
+                    // Create a structural one...
+                    else
+                    {
+                        node = new(parent, symbol);
+                        list.Add(node);
+                    }
+                }
+
+                // Otherwise, validate consistency...
+                else if (candidate is TypeCandidate element && index == (len - 1))
+                {
+                    // Substitute structural node if needed...
+                    if (node.GetType() == typeof(TypeNode))
+                    {
+                        var temp = CreateNode(parent, element);
+                        foreach (var child in node.ChildTypes) temp.ChildTypes.Add(child);
+                        foreach (var child in node.ChildProperties) temp.ChildProperties.Add(child);
+                        foreach (var child in node.ChildFields) temp.ChildFields.Add(child);
+                        foreach (var child in node.ChildMethods) temp.ChildMethods.Add(child);
+
+                        list.Remove(node);
+                        list.Add(temp);
+                    }
+
+                    // Otherwise, validate custom node...
+                    else
+                    {
+                        if (!comparer.Equals(node.Symbol, symbol))
+                        {
+                            TreeDiagnostics.InconsistentHierarchy(node, candidate).Report(context);
+                            return false;
+                        }
+                    }
+                }
+
+                parent = node;
+                list = node.ChildTypes;
+            }
+
             return true;
         }
 
+        // ------------------------------------------------
         /// <summary>
         /// Invoked to emit the hierarchy of the given property-level candidate.
         /// Returns <c>false</c> if errors are detected that prevents further execution.
         /// </summary>
-        bool CaptureProperty(ICandidate candidate)
+        bool CaptureProperty(IValidCandidate candidate)
         {
+            if (candidate is PropertyCandidate item)
+            {
+                var tpnode = (TypeNode)parent;
+                var list = tpnode.ChildProperties;
+                var symbol = item.Symbol;
+                var node = list.Find(x => x.Symbol.Name == symbol.Name);
+
+                if (node == null) // No node, let's create a new one...
+                {
+                    node = CreateNode(tpnode, item);
+                    list.Add(node);
+                }
+
+                else // Validating consistency...
+                {
+                    if (node.GetType() == typeof(PropertyNode)) // Substitute structural...
+                    {
+                        var temp = CreateNode(tpnode, item);
+                        list.Remove(node);
+                        list.Add(temp);
+                    }
+
+                    else // Validating existing custom node...
+                    {
+                        if (!comparer.Equals(node.Symbol, symbol))
+                        {
+                            TreeDiagnostics.InconsistentHierarchy(node, candidate).Report(context);
+                            return false;
+                        }
+                    }
+                }
+            }
+
             return true;
         }
 
+        // ------------------------------------------------
         /// <summary>
         /// Invoked to emit the hierarchy of the given field-level candidate.
         /// Returns <c>false</c> if errors are detected that prevents further execution.
         /// </summary>
-        bool CaptureField(ICandidate candidate)
+        bool CaptureField(IValidCandidate candidate)
         {
+            if (candidate is FieldCandidate item)
+            {
+                var tpnode = (TypeNode)parent;
+                var list = tpnode.ChildFields;
+                var symbol = item.Symbol;
+                var node = list.Find(x => x.Symbol.Name == symbol.Name);
+
+                if (node == null) // No node, let's create a new one...
+                {
+                    node = CreateNode(tpnode, item);
+                    list.Add(node);
+                }
+
+                else // Validating consistency...
+                {
+                    if (node.GetType() == typeof(FieldNode)) // Substitute structural...
+                    {
+                        var temp = CreateNode(tpnode, item);
+                        list.Remove(node);
+                        list.Add(temp);
+                    }
+
+                    else // Validating existing custom node...
+                    {
+                        if (!comparer.Equals(node.Symbol, symbol))
+                        {
+                            TreeDiagnostics.InconsistentHierarchy(node, candidate).Report(context);
+                            return false;
+                        }
+                    }
+                }
+            }
+
             return true;
         }
 
+        // ------------------------------------------------
         /// <summary>
         /// Invoked to emit the hierarchy of the given method-level candidate.
         /// Returns <c>false</c> if errors are detected that prevents further execution.
         /// </summary>
-        bool CaptureMethod(ICandidate candidate)
+        bool CaptureMethod(IValidCandidate candidate)
         {
+            if (candidate is MethodCandidate item)
+            {
+                var tpnode = (TypeNode)parent;
+                var list = tpnode.ChildMethods;
+                var symbol = item.Symbol;
+                var xcomparer = SymbolComparer.Full with { UseNullability = false };
+                var node = list.Find(x => xcomparer.Equals(x.Symbol, symbol));
+
+                if (node == null) // No node, let's create a new one...
+                {
+                    node = CreateNode(tpnode, item);
+                    list.Add(node);
+                }
+
+                else // Validating consistency...
+                {
+                    if (node.GetType() == typeof(FieldNode)) // Substitute structural...
+                    {
+                        var temp = CreateNode(tpnode, item);
+                        list.Remove(node);
+                        list.Add(temp);
+                    }
+
+                    else // Validating existing custom node...
+                    {
+                        if (!xcomparer.Equals(node.Symbol, symbol))
+                        {
+                            TreeDiagnostics.InconsistentHierarchy(node, candidate).Report(context);
+                            return false;
+                        }
+                    }
+                }
+            }
+
             return true;
         }
     }

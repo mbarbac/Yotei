@@ -22,6 +22,13 @@ internal sealed class FileNode : INode
 
     // ----------------------------------------------------
 
+    /// <summary>
+    /// The collection of child namespaces registered in this file node.
+    /// </summary>
+    public ChildNamespaces ChildNamespaces { get; } = [];
+
+    // ----------------------------------------------------
+
     /// <inheritdoc/>
     public bool Validate(SourceProductionContext context) => true;
 

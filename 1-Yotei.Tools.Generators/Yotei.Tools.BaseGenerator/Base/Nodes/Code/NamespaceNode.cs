@@ -42,6 +42,18 @@ internal sealed class NamespaceNode : IChildNode
 
     // ----------------------------------------------------
 
+    /// <summary>
+    /// The collection of child namespaces registered in this namespace node.
+    /// </summary>
+    public ChildNamespaces ChildNamespaces { get; } = [];
+
+    /// <summary>
+    /// The collection of child types registered in this namespace node.
+    /// </summary>
+    public ChildTypes ChildTypes { get; } = [];
+
+    // ----------------------------------------------------
+
     /// <inheritdoc/>
     public bool Validate(SourceProductionContext context) => true;
 

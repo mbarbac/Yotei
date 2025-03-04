@@ -50,6 +50,28 @@ internal class TypeNode : IChildNode
 
     // ----------------------------------------------------
 
+    /// <summary>
+    /// The collection of child types registered in this type node.
+    /// </summary>
+    public ChildTypes ChildTypes { get; } = [];
+
+    /// <summary>
+    /// The collection of child properties registered in this type node.
+    /// </summary>
+    public ChildProperties ChildProperties { get; } = [];
+
+    /// <summary>
+    /// The collection of child fields registered in this type node.
+    /// </summary>
+    public ChildFields ChildFields { get; } = [];
+
+    /// <summary>
+    /// The collection of child methods registered in this type node.
+    /// </summary>
+    public ChildMethods ChildMethods { get; } = [];
+
+    // ----------------------------------------------------
+
     /// <inheritdoc/>
     public bool Validate(SourceProductionContext context) => true;
 

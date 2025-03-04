@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents a property-alike candidate for source code generation purposes.
 /// </summary>
-internal sealed class PropertyCandidate : ICandidate
+internal sealed class PropertyCandidate : IValidCandidate
 {
     /// <summary>
     /// Initializes a new instance.
@@ -36,9 +36,9 @@ internal sealed class PropertyCandidate : ICandidate
 
     /// <inheritdoc/>
     public PropertyDeclarationSyntax Syntax { get; }
-    SyntaxNode ICandidate.Syntax => Syntax;
+    SyntaxNode IValidCandidate.Syntax => Syntax;
 
     /// <inheritdoc/>
     public IPropertySymbol Symbol { get; }
-    ISymbol ICandidate.Symbol => Symbol;
+    ISymbol IValidCandidate.Symbol => Symbol;
 }
