@@ -30,6 +30,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Base\Nodes\Collections\ChildNamespaces.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Nodes\IChildNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Nodes\INode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Base\Nodes\NodeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Tree\TreeGenerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Tree\TreeDiagnostics.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\AllowNullAttribute.cs" />
@@ -50,7 +51,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\RoslynNameExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\RoslynNameOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\SymbolComparer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\CompilationExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\CompilationExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\AttributeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\NameSyntaxExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\MatchExtensions.cs" />
@@ -59,6 +60,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\SyntaxNodeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\PropertyExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\FieldExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\AccessibilityExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CustomList[T].cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\EasyNameExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\EasyNameOptions.cs" />
