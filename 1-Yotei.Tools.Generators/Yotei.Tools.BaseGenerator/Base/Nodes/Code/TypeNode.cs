@@ -73,10 +73,115 @@ internal class TypeNode : IChildNode
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public bool Validate(SourceProductionContext context) => true;
+    public virtual bool Validate(SourceProductionContext context)
+    {
+        if (!Symbol.IsPartial())
+        {
+            TreeDiagnostics.TypeIsNotPartial(Symbol).Report(context);
+            return false;
+        }
+
+        if (!IsSupportedKind())
+        {
+            TreeDiagnostics.KindNotSupported(Symbol).Report(context);
+            return false;
+        }
+
+        foreach (var node in ChildTypes) if (!node.Validate(context)) return false;
+        foreach (var node in ChildProperties) if (!node.Validate(context)) return false;
+        foreach (var node in ChildFields) if (!node.Validate(context)) return false;
+        foreach (var node in ChildMethods) if (!node.Validate(context)) return false;
+
+        return true;
+    }
+
+    /// <summary>
+    /// Used to validate that the type's kind is supported for code generation.
+    /// </summary>
+    /// <returns></returns>
+    protected virtual bool IsSupportedKind() => Symbol.TypeKind is
+        TypeKind.Class or
+        TypeKind.Struct or
+        TypeKind.Interface;
 
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public void Emit(SourceProductionContext context, CodeBuilder cb) { }
+    public virtual void Emit(SourceProductionContext context, CodeBuilder cb)
+    {
+        var head = GetHeader(context);
+        if (head == null) return;
+
+        cb.AppendLine(head);
+        cb.AppendLine("{");
+        cb.IndentLevel++;
+        {
+            EmitChildElements(context, cb);
+            EmitCore(context, cb);
+        }
+        cb.IndentLevel--;
+        cb.AppendLine("}");
+    }
+
+    /// <summary>
+    /// Invoked to emit the source code of this type node, without taking into consideration the
+    /// source code of its registered child elements.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="cb"></param>
+    protected virtual void EmitCore(SourceProductionContext context, CodeBuilder cb) { }
+
+    /// <summary>
+    /// Invoked to obtain the header of this type that, by default, it is just its kind followed
+    /// by its name (as in 'class MyType'). Derived classes can override this method to addd a
+    /// colon (':') and an optional list of elements that the type inherits from or implements.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    protected virtual string? GetHeader(SourceProductionContext context)
+    {
+        var rec = Symbol.IsRecord ? "record " : string.Empty;
+        var kind = Symbol.TypeKind switch
+        {
+            TypeKind.Class => "class",
+            TypeKind.Struct => "struct",
+            TypeKind.Interface => "interface",
+            _ => throw new ArgumentException("Invalid type kind.").WithData(Symbol)
+        };
+
+        var options = RoslynNameOptions.Default;
+        var name = Symbol.EasyName(options);
+        return $"partial {rec}{kind} {name}";
+    }
+
+    /// <summary>
+    /// Invoked to emit the actual source code of the child elements registered in this type node.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="cb"></param>
+    protected virtual void EmitChildElements(SourceProductionContext context, CodeBuilder cb)
+    {
+        var done = false;
+
+        foreach (var node in ChildTypes)
+        {
+            if (done) cb.AppendLine(); done = true;
+            node.Emit(context, cb);
+        }
+        foreach (var node in ChildProperties)
+        {
+            if (done) cb.AppendLine(); done = true;
+            node.Emit(context, cb);
+        }
+        foreach (var node in ChildFields)
+        {
+            if (done) cb.AppendLine(); done = true;
+            node.Emit(context, cb);
+        }
+        foreach (var node in ChildMethods)
+        {
+            if (done) cb.AppendLine(); done = true;
+            node.Emit(context, cb);
+        }
+    }
 }

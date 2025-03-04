@@ -51,10 +51,22 @@ internal class PropertyNode : IChildNode
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public bool Validate(SourceProductionContext context) => true;
+    public virtual bool Validate(SourceProductionContext context)
+    {
+        if (!ParentNode.Symbol.IsPartial())
+        {
+            TreeDiagnostics.TypeIsNotPartial(ParentNode.Symbol).Report(context);
+            return false;
+        }
+
+        return true;
+    }
 
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public void Emit(SourceProductionContext context, CodeBuilder cb) { }
+    public virtual void Emit(SourceProductionContext context, CodeBuilder cb)
+    {
+        cb.AppendLine($"// {this}");
+    }
 }

@@ -42,6 +42,25 @@ internal static class TreeDiagnostics
     // ----------------------------------------------------
 
     /// <summary>
+    /// Factorizes common code.
+    /// </summary>
+    private static Diagnostic CreateSymbolNotFoundDiagnostic(
+        SyntaxNode syntax,
+        string type,
+        DiagnosticSeverity severity)
+    {
+        var id = "TreeGen02";
+        var head = $"Cannot find a symbol associated to the given {type} syntax.";
+        var desc = $"Cannot find a symbol associated to the given {type} syntax: '{syntax}'.";
+        var location = syntax.GetLocation();
+
+        return Diagnostic.Create(new DiagnosticDescriptor(
+            id, head, desc, "Yotei",
+            severity, isEnabledByDefault: true),
+            location);
+    }
+
+    /// <summary>
     /// Cannot find a symbol associated to the given syntax.
     /// </summary>
     /// <param name="syntax"></param>
@@ -50,17 +69,7 @@ internal static class TreeDiagnostics
     public static Diagnostic SymbolNotFound(
         TypeDeclarationSyntax syntax,
         DiagnosticSeverity severity = DiagnosticSeverity.Error)
-    {
-        var id = "TreeGen02";
-        var head = "Cannot find a symbol associated to the given type syntax.";
-        var desc = $"Cannot find a symbol associated to the given type syntax: '{syntax}'.";
-        var location = syntax.GetLocation();
-
-        return Diagnostic.Create(new DiagnosticDescriptor(
-            id, head, desc, "Yotei",
-            severity, isEnabledByDefault: true),
-            location);
-    }
+        => CreateSymbolNotFoundDiagnostic(syntax, "type", severity);
 
     /// <summary>
     /// Cannot find a symbol associated to the given syntax.
@@ -71,17 +80,7 @@ internal static class TreeDiagnostics
     public static Diagnostic SymbolNotFound(
         PropertyDeclarationSyntax syntax,
         DiagnosticSeverity severity = DiagnosticSeverity.Error)
-    {
-        var id = "TreeGen02";
-        var head = "Cannot find a symbol associated to the given property syntax.";
-        var desc = $"Cannot find a symbol associated to the given property syntax: '{syntax}'.";
-        var location = syntax.GetLocation();
-
-        return Diagnostic.Create(new DiagnosticDescriptor(
-            id, head, desc, "Yotei",
-            severity, isEnabledByDefault: true),
-            location);
-    }
+        => CreateSymbolNotFoundDiagnostic(syntax, "property", severity);
 
     /// <summary>
     /// Cannot find a symbol associated to the given syntax.
@@ -92,17 +91,7 @@ internal static class TreeDiagnostics
     public static Diagnostic SymbolNotFound(
         FieldDeclarationSyntax syntax,
         DiagnosticSeverity severity = DiagnosticSeverity.Error)
-    {
-        var id = "TreeGen02";
-        var head = "Cannot find a symbol associated to the given field syntax.";
-        var desc = $"Cannot find a symbol associated to the given field syntax: '{syntax}'.";
-        var location = syntax.GetLocation();
-
-        return Diagnostic.Create(new DiagnosticDescriptor(
-            id, head, desc, "Yotei",
-            severity, isEnabledByDefault: true),
-            location);
-    }
+        => CreateSymbolNotFoundDiagnostic(syntax, "field", severity);
 
     /// <summary>
     /// Cannot find a symbol associated to the given syntax.
@@ -113,17 +102,7 @@ internal static class TreeDiagnostics
     public static Diagnostic SymbolNotFound(
         MethodDeclarationSyntax syntax,
         DiagnosticSeverity severity = DiagnosticSeverity.Error)
-    {
-        var id = "TreeGen02";
-        var head = "Cannot find a symbol associated to the given method syntax.";
-        var desc = $"Cannot find a symbol associated to the given method syntax: '{syntax}'.";
-        var location = syntax.GetLocation();
-
-        return Diagnostic.Create(new DiagnosticDescriptor(
-            id, head, desc, "Yotei",
-            severity, isEnabledByDefault: true),
-            location);
-    }
+        => CreateSymbolNotFoundDiagnostic(syntax, "method", severity);
 
     // ----------------------------------------------------
 

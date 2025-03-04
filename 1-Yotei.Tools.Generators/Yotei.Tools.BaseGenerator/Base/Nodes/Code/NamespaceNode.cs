@@ -55,10 +55,62 @@ internal sealed class NamespaceNode : IChildNode
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public bool Validate(SourceProductionContext context) => true;
+    public bool Validate(SourceProductionContext context)
+    {
+        foreach (var node in ChildNamespaces) if (!node.Validate(context)) return false;
+        foreach (var node in ChildTypes) if (!node.Validate(context)) return false;
+        return true;
+    }
 
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public void Emit(SourceProductionContext context, CodeBuilder cb) { }
+    public void Emit(SourceProductionContext context, CodeBuilder cb)
+    {
+        cb.AppendLine($"namespace {Name}");
+        cb.AppendLine("{");
+        cb.IndentLevel++;
+        {
+            GenerateUsings(cb);
+
+            var done = false;
+
+            foreach (var node in ChildNamespaces)
+            {
+                if (done) cb.AppendLine(); done = true;
+                node.Emit(context, cb);
+            }
+            
+            foreach (var node in ChildTypes)
+            {
+                if (done) cb.AppendLine(); done = true;
+                node.Emit(context, cb);
+            }
+        }
+        cb.IndentLevel--;
+        cb.AppendLine("}");
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Generates namespace-level usings, if any.
+    /// </summary>
+    /// <param name="cb"></param>
+    void GenerateUsings(CodeBuilder cb)
+    {
+        var items = new List<string>();
+
+        foreach (var item in Syntax.Usings)
+        {
+            var str = item.ToString().Trim();
+            if (!string.IsNullOrWhiteSpace(str) && !items.Contains(str)) items.Add(str);
+        }
+
+        if (items.Count > 0)
+        {
+            foreach (var item in items) cb.AppendLine(item);
+            cb.AppendLine();
+        }
+    }
 }

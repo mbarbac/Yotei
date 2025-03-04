@@ -50,6 +50,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\RoslynNameExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\RoslynNameOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\SymbolComparer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\CompilationExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\AttributeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\NameSyntaxExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\MatchExtensions.cs" />
