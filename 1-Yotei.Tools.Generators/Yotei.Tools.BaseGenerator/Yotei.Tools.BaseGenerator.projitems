@@ -32,7 +32,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Base\Nodes\INode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Tree\TreeGenerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Tree\TreeDiagnostics.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Base\__.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\AllowNullAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\BitOperations.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\CallerArgumentExpressionAttribute.cs" />
@@ -55,6 +54,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\NameSyntaxExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\MatchExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\ChainExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\TypeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\SyntaxNodeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\PropertyExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\FieldExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CustomList[T].cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\EasyNameExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\EasyNameOptions.cs" />

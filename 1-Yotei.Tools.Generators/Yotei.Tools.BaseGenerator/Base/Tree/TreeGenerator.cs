@@ -648,6 +648,8 @@ internal class TreeGenerator : IIncrementalGenerator
                 var tpnode = (TypeNode)parent;
                 var list = tpnode.ChildMethods;
                 var symbol = item.Symbol;
+
+                // Special comparer for method elements...
                 var xcomparer = SymbolComparer.Full with { UseNullability = false };
                 var node = list.Find(x => xcomparer.Equals(x.Symbol, symbol));
 
@@ -668,7 +670,7 @@ internal class TreeGenerator : IIncrementalGenerator
 
                     else // Validating existing custom node...
                     {
-                        if (!xcomparer.Equals(node.Symbol, symbol))
+                        if (!xcomparer.Equals(node.Symbol, symbol)) // Use special comparer...
                         {
                             TreeDiagnostics.InconsistentHierarchy(node, candidate).Report(context);
                             return false;
