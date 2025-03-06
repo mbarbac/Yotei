@@ -4,8 +4,9 @@
 internal static class AccessibilityExtensions
 {
     /// <summary>
-    /// Returns the C# string representation of the specified accessibility. May return null
-    /// if no accessibility is applicable.
+    /// Returns the C# string representation of the specified accessibility, or null if no
+    /// accessibility is applicable. If returning a not-null string, an space can optionally
+    /// be added if requested.
     /// </summary>
     /// <param name="value"></param>
     /// <param name="addspace"></param>
