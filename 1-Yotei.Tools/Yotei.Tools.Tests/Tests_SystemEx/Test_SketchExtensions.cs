@@ -173,7 +173,7 @@ public static class Test_SketchExtensions
         name = source.Sketch(options); Assert.Equal("(System.Double) 1234.567", name);
 
         // Default...
-        options = SketchOptions.Default;
+        options = SketchOptions.Default with { Provider = CultureInfo.InvariantCulture };
         name = source.Sketch(options); Assert.Equal("1234.567", name);
 
         // Explicit culture...
@@ -200,7 +200,7 @@ public static class Test_SketchExtensions
         name = source.Sketch(options); Assert.Equal("(System.Decimal) 7.5", name);
 
         // Default...
-        options = SketchOptions.Default;
+        options = SketchOptions.Default with { Provider = CultureInfo.InvariantCulture };
         name = source.Sketch(options); Assert.Equal("7.5", name);
 
         // Explicit culture...

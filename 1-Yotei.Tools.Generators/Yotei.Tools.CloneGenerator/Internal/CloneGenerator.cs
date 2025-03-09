@@ -13,4 +13,8 @@ internal class CloneGenerator : TreeGenerator
 
     /// <inheritdoc/>
     protected override Type[] TypeAttributes { get; } = [typeof(CloneableAttribute)];
+
+    /// <inheritdoc/>
+    protected override TypeNode CreateNode(
+        INode parent, TypeCandidate candidate) => new XTypeNode(parent, candidate);
 }

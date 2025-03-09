@@ -173,11 +173,62 @@ internal class XTypeNode : TypeNode
 
     /// <summary>
     /// Emits the elements of the interfaces of the type need explicit implementation. This
-    /// method only applies to abstract or concrete types, but not to interfaces themselves.
+    /// method shall not be used with interface types, because they do not need explicit
+    /// implementation.
     /// </summary>
     void EmitInterfaceItems(SourceProductionContext context, CodeBuilder cb)
     {
-        throw null;
+        var ifaces = GetInterfaceItems();
+
+        foreach (var iface in ifaces)
+        {
+            var typename = iface.EasyName(RoslynNameOptions.Full with { UseTypeNullable = false });
+            var valuename = iface.Name == "ICloneable" ? "object" : typename;
+
+            cb.AppendLine();
+            cb.AppendLine(valuename);
+            cb.AppendLine($"{typename}.Clone() => ({typename})Clone();");
+        }
+    }
+
+    /// <summary>
+    /// Returns a list with the interfaces that the type needs to implement explicitly. This
+    /// method shall not be used with interface types, because they do not need explicit
+    /// implementation.
+    /// </summary>
+    /// <returns></returns>
+    List<ITypeSymbol> GetInterfaceItems()
+    {
+        var comparer = SymbolComparer.Default;
+        var list = new List<ITypeSymbol>();
+
+        foreach (var iface in Symbol.Interfaces) Capture(iface);
+        return list;
+
+        // Tries to capture the given interface...
+        bool Capture(ITypeSymbol iface)
+        {
+            var found = false;
+
+            foreach (var child in iface.Interfaces)
+            {
+                var temp = Capture(child);
+                if (temp) found = true;
+            }
+
+            found = found ||
+                iface.Name == "ICloneable" ||
+                FindMethod(iface) != null ||
+                FindCloneableAttribute(iface) != null;
+
+            if (found)
+            {
+                var temp = list.Find(x => comparer.Equals(x, iface));
+                if (temp == null) list.Add(iface);
+            }
+
+            return found;
+        }
     }
 
     // ----------------------------------------------------
