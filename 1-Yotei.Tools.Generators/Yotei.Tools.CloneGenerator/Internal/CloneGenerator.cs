@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// ....
+/// Generates 'Clone()' methods for types decorated with the <see cref="CloneableAttribute"/>.
 /// </summary>
 internal class CloneGenerator : TreeGenerator
 {

@@ -32,8 +32,10 @@ internal sealed class FileNode : INode
     /// <inheritdoc/>
     public bool Validate(SourceProductionContext context)
     {
-        foreach (var node in ChildNamespaces) if (!node.Validate(context)) return false;
-        return true;
+        var r = true;
+
+        foreach (var node in ChildNamespaces) if (!node.Validate(context)) r = false;
+        return r;
     }
 
     // ----------------------------------------------------

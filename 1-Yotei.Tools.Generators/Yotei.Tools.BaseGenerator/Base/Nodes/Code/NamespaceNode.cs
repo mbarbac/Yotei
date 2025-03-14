@@ -57,9 +57,12 @@ internal sealed class NamespaceNode : IChildNode
     /// <inheritdoc/>
     public bool Validate(SourceProductionContext context)
     {
-        foreach (var node in ChildNamespaces) if (!node.Validate(context)) return false;
-        foreach (var node in ChildTypes) if (!node.Validate(context)) return false;
-        return true;
+        var r = true;
+
+        foreach (var node in ChildNamespaces) if (!node.Validate(context)) r = false;
+        foreach (var node in ChildTypes) if (!node.Validate(context)) r = false;
+
+        return r;
     }
 
     // ----------------------------------------------------

@@ -53,13 +53,15 @@ internal class FieldNode : IChildNode
     /// <inheritdoc/>
     public virtual bool Validate(SourceProductionContext context)
     {
+        var r = true;
+
         if (!ParentNode.Symbol.IsPartial())
         {
             TreeDiagnostics.TypeIsNotPartial(ParentNode.Symbol).Report(context);
-            return false;
+            r = false;
         }
 
-        return true;
+        return r;
     }
 
     // ----------------------------------------------------

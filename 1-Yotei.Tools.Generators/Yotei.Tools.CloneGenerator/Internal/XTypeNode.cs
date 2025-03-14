@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools.CloneGenerator;
+﻿#pragma warning disable IDE0075
+
+namespace Yotei.Tools.CloneGenerator;
 
 // ========================================================
 /// <inheritdoc cref="TypeNode"/>
@@ -12,13 +14,17 @@ internal class XTypeNode : TypeNode
     /// <inheritdoc/>
     public override bool Validate(SourceProductionContext context)
     {
+        var r = true;
+
         if (Symbol.IsRecord)
         {
             TreeDiagnostics.KindNotSupported(Symbol).Report(context);
-            return false;
+            r = false;
         }
 
-        return base.Validate(context);
+        if (!base.Validate(context)) r = false;
+
+        return r;
     }
 
     // ----------------------------------------------------
@@ -26,13 +32,13 @@ internal class XTypeNode : TypeNode
     /// <inheritdoc/>
     protected override void EmitCore(SourceProductionContext context, CodeBuilder cb)
     {
-        // Declared or implemented explicitly...
+        // Declared or implemented exlicitly...
         if (FindMethod(Symbol) != null) return;
 
         // Dispatching...
-        if (Symbol.IsInterface()) EmitAsInterface(context, cb);
-        else if (Symbol.IsAbstract) EmitAsAbstract(context, cb);
-        else EmitAsConcrete(context, cb);
+        if (Symbol.IsInterface()) EmitCoreAsInterface(context, cb);
+        else if (Symbol.IsAbstract) EmitCoreAsAbstract(context, cb);
+        else EmitCoreAsConcrete(context, cb);
     }
 
     // ----------------------------------------------------
@@ -40,7 +46,9 @@ internal class XTypeNode : TypeNode
     /// <summary>
     /// Invoked when the type is an interface.
     /// </summary>
-    void EmitAsInterface(SourceProductionContext context, CodeBuilder cb)
+    /// <param name="context"></param>
+    /// <param name="cb"></param>
+    protected void EmitCoreAsInterface(SourceProductionContext context, CodeBuilder cb)
     {
         var modifiers = GetModifiers();
         var typename = Symbol.EasyName(RoslynNameOptions.Default);
@@ -48,7 +56,10 @@ internal class XTypeNode : TypeNode
         EmitDocumentation(cb);
         cb.AppendLine($"{modifiers}{typename} Clone();");
 
-        // Gets the method modifiers, or null if any...
+        // Gets the method modifiers, or null if any.
+        // If we find the method in any interface (which covers the 'IClonable' attribute), or the
+        // CloneableAttribute (as its generation should have emitted a method), we use 'new' as we
+        // re-declare the method to return the new host type.
         string? GetModifiers()
         {
             var found = Symbol.AllInterfaces.Any(x =>
@@ -62,9 +73,11 @@ internal class XTypeNode : TypeNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// Invoked when the type is an abstract type.
+    /// Invoked when the type is an abstract one.
     /// </summary>
-    void EmitAsAbstract(SourceProductionContext context, CodeBuilder cb)
+    /// <param name="context"></param>
+    /// <param name="cb"></param>
+    protected void EmitCoreAsAbstract(SourceProductionContext context, CodeBuilder cb)
     {
         var modifiers = GetModifiers();
         var typename = Symbol.EasyName(RoslynNameOptions.Default);
@@ -72,29 +85,31 @@ internal class XTypeNode : TypeNode
         EmitDocumentation(cb);
         cb.AppendLine($"{modifiers}{typename} Clone();");
 
-        EmitInterfaceItems(context, cb);
+        EmitCoreExplicitInterfaces(context, cb);
 
-        // Gets the method modifiers, or null if any...
+        // Gets the method modifiers, or null if any.
+        // The implemented method will always be an 'abstract' one, and might add 'override' in
+        // some scenarios.
         string? GetModifiers()
         {
-            if (Symbol.BaseType != null)
+            if (Symbol.BaseType != null) 
             {
-                var method = FindMethod(Symbol.BaseType, chain: true); // Only chain...
+                // There might be a base method...
+                var method = FindMethod(Symbol.BaseType, chain: true);
                 if (method != null)
                 {
                     var access = method.DeclaredAccessibility.ToCSharpString(addspace: true);
-                    var isvirtual = method.IsVirtual || method.IsOverride || method.IsAbstract;
+                    var isvirtual = method.IsVirtual || method.IsOverride | method.IsAbstract;
 
                     return isvirtual ? $"{access}abstract override " : $"{access}abstract ";
                 }
 
-                var at = FindCloneableAttribute(Symbol.BaseType, chain: true); // Only chain...
-                if (at != null)
-                {
-                    return "public abstract override ";
-                }
+                // Might already be implemented because the attribute applied to base items...
+                var at = FindCloneableAttribute(Symbol.BaseType, chain: true);
+                if (at != null) return "public abstract override ";
             }
 
+            // The default for abstract types...
             return "public abstract ";
         }
     }
@@ -102,10 +117,13 @@ internal class XTypeNode : TypeNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// Invoked when the type is a concrete type.
+    /// Invoked when the type is a concrete one.
     /// </summary>
-    void EmitAsConcrete(SourceProductionContext context, CodeBuilder cb)
+    /// <param name="context"></param>
+    /// <param name="cb"></param>
+    protected void EmitCoreAsConcrete(SourceProductionContext context, CodeBuilder cb)
     {
+        // We need a copy constructor...
         var ctor = Symbol.GetCopyConstructor(strict: true);
         if (ctor == null)
         {
@@ -113,6 +131,7 @@ internal class XTypeNode : TypeNode
             return;
         }
 
+        // Emitting...
         var modifiers = GetModifiers();
         var typename = Symbol.EasyName(RoslynNameOptions.Default);
 
@@ -127,58 +146,26 @@ internal class XTypeNode : TypeNode
         cb.IndentLevel--;
         cb.AppendLine("}");
 
-        EmitInterfaceItems(context, cb);
+        EmitCoreExplicitInterfaces(context, cb);
 
-        // Gets the method modifiers, or null if any...
+        // Gets the method modifiers, or null if any.
         string? GetModifiers()
         {
-            var prevent = GetPreventVirtualValue(Symbol, out var value, true, true) && value;
-
-            var host = Symbol.BaseType;
-            if (host != null)
-            {
-                var method = FindMethod(host, chain: true); // Only chain...
-                if (method != null)
-                {
-                    var access = method.DeclaredAccessibility;
-                    if (access == Accessibility.Private)
-                    {
-                        return null;
-                    }
-
-                    var str = access.ToCSharpString(addspace: true);
-                    var isvirtual = method.IsVirtual || method.IsOverride || method.IsAbstract;
-
-                    return isvirtual switch
-                    {
-                        true => $"{str}override ",
-                        false => $"{str}new ",
-                    };
-                }
-
-                var at = FindCloneableAttribute(host, true, true); // Chain and ifaces...
-                if (at != null)
-                {
-                    prevent = GetPreventVirtualValue(at, out value) && value;
-                    return prevent ? "public new " : "public override ";
-                }
-            }
-
-            var issealed = Symbol.IsSealed;
-            return prevent || issealed ? "public " : "public virtual ";
+            throw null;
         }
     }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Emits the elements of the interfaces of the type need explicit implementation. This
-    /// method shall not be used with interface types, because they do not need explicit
-    /// implementation.
+    /// Invoked to emit the explicit method implementations for the inherited methods. Note that
+    /// this method only makes sense for abstract and concrete types, but not for interface ones.
     /// </summary>
-    void EmitInterfaceItems(SourceProductionContext context, CodeBuilder cb)
+    /// <param name="context"></param>
+    /// <param name="cb"></param>
+    protected void EmitCoreExplicitInterfaces(SourceProductionContext context, CodeBuilder cb)
     {
-        var ifaces = GetInterfaceItems();
+        var ifaces = GetExplicitInterfaces();
 
         foreach (var iface in ifaces)
         {
@@ -192,12 +179,10 @@ internal class XTypeNode : TypeNode
     }
 
     /// <summary>
-    /// Returns a list with the interfaces that the type needs to implement explicitly. This
-    /// method shall not be used with interface types, because they do not need explicit
-    /// implementation.
+    /// Returns a list with the interface types that need explicit implementation.
     /// </summary>
     /// <returns></returns>
-    List<ITypeSymbol> GetInterfaceItems()
+    List<ITypeSymbol> GetExplicitInterfaces()
     {
         var comparer = SymbolComparer.Default;
         var list = new List<ITypeSymbol>();
@@ -251,8 +236,9 @@ internal class XTypeNode : TypeNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// Tries to find an appropriate method in the given type, including its inheritance and
-    /// interfaces chains if requested. Returns null if no method is found.
+    /// Tries to find the generator's method in the given type, including its base types and
+    /// interfaces if requested.
+    /// <br/> Returns <c>null</c> if not found.
     /// </summary>
     IMethodSymbol? FindMethod(ITypeSymbol type, bool chain = false, bool ifaces = false)
     {
@@ -260,13 +246,13 @@ internal class XTypeNode : TypeNode
             x.Name == "Clone" &&
             x.Parameters.Length == 0);
 
-        if (item == null && chain)
+        if (item == null && chain) // Inheritance chain requested...
         {
             foreach (var temp in type.AllBaseTypes())
                 if ((item = FindMethod(temp)) != null) break;
         }
 
-        if (item == null && ifaces)
+        if (item == null && ifaces) // Interfaces requested...
         {
             foreach (var temp in type.AllInterfaces)
                 if ((item = FindMethod(temp)) != null) break;
@@ -279,10 +265,10 @@ internal class XTypeNode : TypeNode
 
     /// <summary>
     /// Tries to find the <see cref="CloneableAttribute"/> in the given type, including its
-    /// inheritance and interfaces chains if requested. Returns null if no attribute is found.
+    /// inheritance and interfaces chains if requested.
+    /// <br/> Returns <c>null</c> if not found.
     /// </summary>
-    AttributeData? FindCloneableAttribute(
-        ITypeSymbol type, bool chain = false, bool ifaces = false)
+    AttributeData? FindCloneableAttribute(ITypeSymbol type, bool chain = false, bool ifaces = false)
     {
         var at = type.GetAttributes(typeof(CloneableAttribute)).FirstOrDefault();
 
@@ -302,13 +288,16 @@ internal class XTypeNode : TypeNode
     }
 
     /// <summary>
-    /// Tries to get the value of the <see cref="CloneableAttribute.PreventVirtual"/> setting
-    /// from the given attribute data. Returns false if the setting is not found, or otherwise
-    /// true and the actual value in the out argument.
+    /// Tries to get the value of the 'AddVirtual' property in the given attribute. Returns
+    /// <c>false</c> if the setting is not found, or otherwise <c>true</c> and the setting's
+    /// value in the out argument.
     /// </summary>
-    bool GetPreventVirtualValue(AttributeData at, out bool value)
+    /// <param name="at"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    bool GetAddVirtualValue(AttributeData at, out bool value)
     {
-        if (at.GetNamedArgument(nameof(CloneableAttribute.PreventVirtual), out var arg))
+        if (at.GetNamedArgument(nameof(CloneableAttribute.AddVirtual), out var arg))
         {
             if (!arg.Value.IsNull && arg.Value.Value is bool temp)
             {
@@ -317,91 +306,43 @@ internal class XTypeNode : TypeNode
             }
         }
 
-        value = false;
+        value = default;
         return false;
     }
 
     /// <summary>
-    /// Tries to get the value of the <see cref="CloneableAttribute.PreventVirtual"/> setting
-    /// from the attributes applied to the given type, including its inheritance and interfaces
-    /// chains if requested. Returns false if the setting is not found, or otherwise true and
-    /// the actual value in the out argument.
+    /// Tries to get the value of the 'AddVirtual' property from the attributes applied to the
+    /// given type, including its inheritance and interfaces chains if requested. Returns
+    /// <c>false</c> if the setting is not found, or otherwise <c>true</c> and the setting's
+    /// value in the out argument.
     /// </summary>
-    bool GetPreventVirtualValue(
+    /// <param name="type"></param>
+    /// <param name="value"></param>
+    /// <param name="chain"></param>
+    /// <param name="ifaces"></param>
+    /// <returns></returns>
+    bool GetAddVirtualValue(
         ITypeSymbol type, out bool value, bool chain = false, bool ifaces = false)
     {
-        value = false;
-
         var at = FindCloneableAttribute(type);
-        if (at is not null)
+        if (at != null)
         {
-            if (GetPreventVirtualValue(at, out value)) return value;
+            if (GetAddVirtualValue(at, out value)) return true;
         }
 
         if (chain)
         {
             foreach (var temp in type.AllBaseTypes())
-                if (GetPreventVirtualValue(temp, out value)) return value;
+                if (GetAddVirtualValue(temp, out value)) return true;
         }
 
         if (ifaces)
         {
             foreach (var temp in type.AllInterfaces)
-                if (GetPreventVirtualValue(temp, out value)) return value;
+                if (GetAddVirtualValue(temp, out value)) return true;
         }
 
-        return false;
-    }
-
-    /// <summary>
-    /// Tries to get the value of the <see cref="CloneableAttribute.AddICloneable"/> setting
-    /// from the given attribute data. Returns false if the setting is not found, or otherwise
-    /// true and the actual value in the out argument.
-    /// </summary>
-    bool GetAddICloneableValue(AttributeData at, out bool value)
-    {
-        if (at.GetNamedArgument(nameof(CloneableAttribute.AddICloneable), out var arg))
-        {
-            if (!arg.Value.IsNull && arg.Value.Value is bool temp)
-            {
-                value = temp;
-                return true;
-            }
-        }
-
-        value = false;
-        return false;
-    }
-
-    /// <summary>
-    /// Tries to get the value of the <see cref="CloneableAttribute.AddICloneable"/> setting
-    /// from the attributes applied to the given type, including its inheritance and interfaces
-    /// chains if requested. Returns false if the setting is not found, or otherwise true and
-    /// the actual value in the out argument.
-    /// </summary>
-    bool GetAddICloneableValue(
-        ITypeSymbol type, out bool value, bool chain = false, bool ifaces = false)
-    {
-        value = false;
-
-        var at = FindCloneableAttribute(type);
-        if (at is not null)
-        {
-            if (GetAddICloneableValue(at, out value)) return value;
-        }
-
-        if (chain)
-        {
-            foreach (var temp in type.AllBaseTypes())
-                if (GetAddICloneableValue(temp, out value)) return value;
-        }
-
-        if (ifaces)
-        {
-            foreach (var temp in type.AllInterfaces)
-                if (GetAddICloneableValue(temp, out value)) return value;
-        }
-
+        value = default;
         return false;
     }
 }
