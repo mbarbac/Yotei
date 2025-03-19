@@ -1,4 +1,4 @@
-﻿namespace Yotei.Tools.TimeExtensions;
+﻿namespace Yotei.Tools.Miscelanea;
 
 // ========================================================
 /// <summary>

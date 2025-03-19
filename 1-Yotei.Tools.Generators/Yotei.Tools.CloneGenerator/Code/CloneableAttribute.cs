@@ -15,9 +15,16 @@
 public class CloneableAttribute : Attribute
 {
     /// <summary>
-    /// If <c>true</c>, instructs the generator to add a 'virtual', 'abstract' or 'override'
-    /// modifier to the generated 'Clone()' method, unless the host type is sealed.
-    /// <br/> The default value of this setting is <c>true</c>.
+    /// If <c>true</c>, instructs the generator not to add a 'virtual', 'abstract' or 'override'
+    /// modifier to the generated 'Clone()' method. Otherwise, such modifiers are used unless the
+    /// the host type is sealed.
     /// </summary>
-    public bool AddVirtual { get; set; } = true;
+    public bool PreventVirtual { get; set; }
+
+    /// <summary>
+    /// If <c>true</c> instructs the generator to add a <see cref="ICloneable"/> interface to the
+    /// type, in case it was not already added to it, or any of its base elements.
+    /// <br/> The default value of this property is <c>false</c>.
+    /// </summary>
+    public bool AddICloneable { get; set; }
 }

@@ -1,4 +1,4 @@
-﻿#pragma warning disable IDE0075
+﻿using Microsoft.CodeAnalysis.Host;
 
 namespace Yotei.Tools.CloneGenerator;
 
@@ -46,9 +46,9 @@ internal class XTypeNode : TypeNode
     /// <summary>
     /// Invoked when the type is an interface.
     /// </summary>
-    /// <param name="context"></param>
+    /// <param name="_"></param>
     /// <param name="cb"></param>
-    protected void EmitCoreAsInterface(SourceProductionContext context, CodeBuilder cb)
+    protected void EmitCoreAsInterface(SourceProductionContext _, CodeBuilder cb)
     {
         var modifiers = GetModifiers();
         var typename = Symbol.EasyName(RoslynNameOptions.Default);
@@ -92,6 +92,7 @@ internal class XTypeNode : TypeNode
         // some scenarios.
         string? GetModifiers()
         {
+            // When the type is a derived one...
             if (Symbol.BaseType != null) 
             {
                 // There might be a base method...
@@ -151,7 +152,39 @@ internal class XTypeNode : TypeNode
         // Gets the method modifiers, or null if any.
         string? GetModifiers()
         {
-            throw null;
+            var issealed = Symbol.IsSealed;
+            var prevent = GetPreventVirtualValue(Symbol, out var value, true, true) && value;
+
+            // When the type is a derived one...
+            if (Symbol.BaseType != null)
+            {
+                // There might be a base method...
+                var method = FindMethod(Symbol.BaseType, chain: true);
+                if (method != null)
+                {
+                    var access = method.DeclaredAccessibility;
+                    if (access != Accessibility.Private) return null; // Ufff!!!
+
+                    var str = access.ToCSharpString(addspace: true);
+                    var isvirtual = method.IsVirtual || method.IsOverride || method.IsAbstract;
+
+                    return isvirtual switch
+                    {
+                        true => $"{str}override ",
+                        false => $"{str}new ",
+                    };
+                }
+
+                // Might already be implemented because the attribute applied to base items...
+                var at = FindCloneableAttribute(Symbol.BaseType, chain: true);
+                if (at != null)
+                {
+                    return prevent ? "public new " : "public override ";
+                }
+            }
+
+            // The defaults for concrete types...
+            return prevent || issealed ? "public " : "public virtual ";
         }
     }
 
@@ -161,9 +194,9 @@ internal class XTypeNode : TypeNode
     /// Invoked to emit the explicit method implementations for the inherited methods. Note that
     /// this method only makes sense for abstract and concrete types, but not for interface ones.
     /// </summary>
-    /// <param name="context"></param>
+    /// <param name="_"></param>
     /// <param name="cb"></param>
-    protected void EmitCoreExplicitInterfaces(SourceProductionContext context, CodeBuilder cb)
+    protected void EmitCoreExplicitInterfaces(SourceProductionContext _, CodeBuilder cb)
     {
         var ifaces = GetExplicitInterfaces();
 
@@ -287,17 +320,19 @@ internal class XTypeNode : TypeNode
         return at;
     }
 
+    // ----------------------------------------------------
+
     /// <summary>
-    /// Tries to get the value of the 'AddVirtual' property in the given attribute. Returns
-    /// <c>false</c> if the setting is not found, or otherwise <c>true</c> and the setting's
-    /// value in the out argument.
+    /// Tries to get the value of the <see cref="CloneableAttribute.PreventVirtual"/> property
+    /// from the given attribute. Returns <c>false</c> if the setting is not found, or otherwise
+    /// <c>true</c> and the setting's value in the out argument.
     /// </summary>
     /// <param name="at"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    bool GetAddVirtualValue(AttributeData at, out bool value)
+    bool GetPreventVirtualValue(AttributeData at, out bool value)
     {
-        if (at.GetNamedArgument(nameof(CloneableAttribute.AddVirtual), out var arg))
+        if (at.GetNamedArgument(nameof(CloneableAttribute.PreventVirtual), out var arg))
         {
             if (!arg.Value.IsNull && arg.Value.Value is bool temp)
             {
@@ -311,35 +346,96 @@ internal class XTypeNode : TypeNode
     }
 
     /// <summary>
-    /// Tries to get the value of the 'AddVirtual' property from the attributes applied to the
-    /// given type, including its inheritance and interfaces chains if requested. Returns
-    /// <c>false</c> if the setting is not found, or otherwise <c>true</c> and the setting's
-    /// value in the out argument.
+    /// Tries to get the value of the <see cref="CloneableAttribute.PreventVirtual"/> property
+    /// from the given type, including its inheritance and interfaces chains if requested. Returns
+    /// <c>false</c> if the setting is not found, or otherwise <c>true</c> and the setting's value
+    /// in the out argument.
     /// </summary>
     /// <param name="type"></param>
     /// <param name="value"></param>
     /// <param name="chain"></param>
     /// <param name="ifaces"></param>
     /// <returns></returns>
-    bool GetAddVirtualValue(
+    bool GetPreventVirtualValue(
         ITypeSymbol type, out bool value, bool chain = false, bool ifaces = false)
     {
         var at = FindCloneableAttribute(type);
         if (at != null)
         {
-            if (GetAddVirtualValue(at, out value)) return true;
+            if (GetPreventVirtualValue(at, out value)) return true;
         }
 
         if (chain)
         {
             foreach (var temp in type.AllBaseTypes())
-                if (GetAddVirtualValue(temp, out value)) return true;
+                if (GetPreventVirtualValue(temp, out value)) return true;
         }
 
         if (ifaces)
         {
             foreach (var temp in type.AllInterfaces)
-                if (GetAddVirtualValue(temp, out value)) return true;
+                if (GetPreventVirtualValue(temp, out value)) return true;
+        }
+
+        value = default;
+        return false;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Tries to get the value of the <see cref="CloneableAttribute.AddICloneable"/> property
+    /// from the given attribute. Returns <c>false</c> if the setting is not found, or otherwise
+    /// <c>true</c> and the setting's value in the out argument.
+    /// </summary>
+    /// <param name="at"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    bool GetAddICloneableValue(AttributeData at, out bool value)
+    {
+        if (at.GetNamedArgument(nameof(CloneableAttribute.AddICloneable), out var arg))
+        {
+            if (!arg.Value.IsNull && arg.Value.Value is bool temp)
+            {
+                value = temp;
+                return true;
+            }
+        }
+
+        value = default;
+        return false;
+    }
+
+    /// <summary>
+    /// Tries to get the value of the <see cref="CloneableAttribute.AddICloneable"/> property
+    /// from the given type, including its inheritance and interfaces chains if requested. Returns
+    /// <c>false</c> if the setting is not found, or otherwise <c>true</c> and the setting's value
+    /// in the out argument.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="value"></param>
+    /// <param name="chain"></param>
+    /// <param name="ifaces"></param>
+    /// <returns></returns>
+    bool GetAddICloneableValue(
+        ITypeSymbol type, out bool value, bool chain = false, bool ifaces = false)
+    {
+        var at = FindCloneableAttribute(type);
+        if (at != null)
+        {
+            if (GetAddICloneableValue(at, out value)) return true;
+        }
+
+        if (chain)
+        {
+            foreach (var temp in type.AllBaseTypes())
+                if (GetAddICloneableValue(temp, out value)) return true;
+        }
+
+        if (ifaces)
+        {
+            foreach (var temp in type.AllInterfaces)
+                if (GetAddICloneableValue(temp, out value)) return true;
         }
 
         value = default;
