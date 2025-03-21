@@ -25,8 +25,6 @@ internal class XTypeNode : TypeNode
         return r;
     }
 
-    // ----------------------------------------------------
-
     /// <inheritdoc/>
     protected override string? GetHeader(SourceProductionContext context)
     {
@@ -66,15 +64,16 @@ internal class XTypeNode : TypeNode
         EmitDocumentation(cb);
         cb.AppendLine($"{modifiers}{typename} Clone();");
 
-        // Gets the method modifiers, or null if any.
-        // If we find the method in any interface (which covers the 'IClonable' attribute), or the
-        // CloneableAttribute (as its generation should have emitted a method), we use 'new' as we
-        // re-declare the method to return the new host type.
+        /// <summary>
+        /// Gets the method modifiers or null if any.
+        /// </summary>
         string? GetModifiers()
         {
-            if (Symbol.Name == "IBar") { } // DEBUG
+            var found =
+                FindMethod(Symbol, top: false, ifaces: true) != null ||
+                FindCloneableAttribute(Symbol, top: false, ifaces: true) != null ||
+                Symbol.AllInterfaces.Any(x => x.Name == "ICloneable");
 
-            var found = HasCloneable(Symbol, ifaces: true); // Only ifaces needed here
             return found ? "new " : null;
         }
     }
@@ -96,16 +95,16 @@ internal class XTypeNode : TypeNode
 
         EmitCoreExplicitInterfaces(context, cb);
 
-        // Gets the method modifiers, or null if any.
-        // The implemented method will always be an 'abstract' one, and might add 'override' in
-        // some scenarios.
+        /// <summary>
+        /// Gets the method modifiers or null if any.
+        /// </summary>
         string? GetModifiers()
         {
-            // When the type is a derived one...
-            if (Symbol.BaseType != null) 
+            // Case when symbol is a derived one...
+            if (Symbol.BaseType != null)
             {
-                // There might be a base method...
-                var method = FindMethod(Symbol.BaseType, chain: true);
+                // There might be already a base method...
+                var method = FindMethod(Symbol, top: false, chain: true);
                 if (method != null)
                 {
                     var access = method.DeclaredAccessibility.ToCSharpString(addspace: true);
@@ -114,12 +113,15 @@ internal class XTypeNode : TypeNode
                     return isvirtual ? $"{access}abstract override " : $"{access}abstract ";
                 }
 
-                // Might already be implemented because the attribute applied to base items...
-                var at = FindCloneableAttribute(Symbol.BaseType, chain: true);
-                if (at != null) return "public abstract override ";
+                // Or being implemented...
+                var at = FindCloneableAttribute(Symbol, top: false, chain: true, ifaces: true);
+                if (at != null)
+                {
+                    return "public abstract override ";
+                }
             }
 
-            // The default for abstract types...
+            // Default for abstract types...
             return "public abstract ";
         }
     }
@@ -158,24 +160,26 @@ internal class XTypeNode : TypeNode
 
         EmitCoreExplicitInterfaces(context, cb);
 
-        // Gets the method modifiers, or null if any.
+        /// <summary>
+        /// Gets the method modifiers or null if any.
+        /// </summary>
         string? GetModifiers()
         {
             var issealed = Symbol.IsSealed;
-            var prevent = GetPreventVirtualValue(Symbol, out var value, true, true) && value;
+            var prevent = GetPreventVirtualValue(Symbol, out var temp, true, true, true) && temp;
 
-            // When the type is a derived one...
+            // Case when symbol is a derived one...
             if (Symbol.BaseType != null)
             {
-                // There might be a base method...
-                var method = FindMethod(Symbol.BaseType, chain: true);
+                // There might be already a base method...
+                var method = FindMethod(Symbol, top: false, chain: true);
                 if (method != null)
                 {
                     var access = method.DeclaredAccessibility;
-                    if (access != Accessibility.Private) return null; // Ufff!!!
+                    if (access == Accessibility.Private) return null;
 
                     var str = access.ToCSharpString(addspace: true);
-                    var isvirtual = method.IsVirtual || method.IsOverride || method.IsAbstract;
+                    var isvirtual = method.IsVirtual || method.IsOverride | method.IsAbstract;
 
                     return isvirtual switch
                     {
@@ -184,15 +188,15 @@ internal class XTypeNode : TypeNode
                     };
                 }
 
-                // Might already be implemented because the attribute applied to base items...
-                var at = FindCloneableAttribute(Symbol.BaseType, chain: true);
+                // Or being implemented...
+                var at = FindCloneableAttribute(Symbol, top: false, chain: true, ifaces: true);
                 if (at != null)
                 {
                     return prevent ? "public new " : "public override ";
                 }
             }
 
-            // The defaults for concrete types...
+            // Default for concrete types...
             return prevent || issealed ? "public " : "public virtual ";
         }
     }
@@ -279,14 +283,21 @@ internal class XTypeNode : TypeNode
 
     /// <summary>
     /// Tries to find the generator's method in the given type, including its base types and
-    /// interfaces if requested.
+    /// interfaces if requested. By default, the search starts from the given type, but if the
+    /// <paramref name="top"/> flag is set to <c>false</c>, then only its base types and interfaces
+    /// are considered.
     /// <br/> Returns <c>null</c> if not found.
     /// </summary>
-    IMethodSymbol? FindMethod(ITypeSymbol type, bool chain = false, bool ifaces = false)
+    IMethodSymbol? FindMethod(
+        ITypeSymbol type,
+        bool top = true,
+        bool chain = false, bool ifaces = false)
     {
-        var item = type.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(x =>
-            x.Name == "Clone" &&
-            x.Parameters.Length == 0);
+        var item = !top
+            ? null
+            : type.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(x =>
+                x.Name == "Clone" &&
+                x.Parameters.Length == 0);
 
         if (item == null && chain) // Inheritance chain requested...
         {
@@ -303,33 +314,27 @@ internal class XTypeNode : TypeNode
         return item;
     }
 
-    /// <summary>
-    /// Determines if the given type either has a 'Clone()' method, or its has been requested
-    /// via its decoration, including its base types and interfaces if requested.
-    /// </summary>
-    /// <param name="type"></param>
-    /// <param name="chain"></param>
-    /// <param name="ifaces"></param>
-    /// <returns></returns>
-    bool HasCloneable(ITypeSymbol type, bool chain = false, bool ifaces = false)
-    {
-        if (type.AllInterfaces.Any(x => x.Name == "ICloneable")) return true;
-        if (FindMethod(type, chain, ifaces) != null) return true;
-        if (FindCloneableAttribute(type, chain, ifaces) != null) return true;
-
-        return false;
-    }
-
     // ----------------------------------------------------
 
     /// <summary>
     /// Tries to find the <see cref="CloneableAttribute"/> in the given type, including its
-    /// inheritance and interfaces chains if requested.
-    /// <br/> Returns <c>null</c> if not found.
+    /// inheritance and interfaces chains, if requested. By default, the search starts from the
+    /// given type, but if the <paramref name="top"/> flag is set to <c>false</c>, then only its
+    /// base types and interfaces are considered.
     /// </summary>
-    AttributeData? FindCloneableAttribute(ITypeSymbol type, bool chain = false, bool ifaces = false)
+    /// <param name="type"></param>
+    /// <param name="top"></param>
+    /// <param name="chain"></param>
+    /// <param name="ifaces"></param>
+    /// <returns></returns>
+    AttributeData? FindCloneableAttribute(
+        ITypeSymbol type,
+        bool top = true,
+        bool chain = false, bool ifaces = false)
     {
-        var at = type.GetAttributes(typeof(CloneableAttribute)).FirstOrDefault();
+        var at = top
+            ? type.GetAttributes(typeof(CloneableAttribute)).FirstOrDefault()
+            : null;
 
         if (at == null && chain)
         {
@@ -372,20 +377,25 @@ internal class XTypeNode : TypeNode
     }
 
     /// <summary>
-    /// Tries to get the value of the <see cref="CloneableAttribute.PreventVirtual"/> property
-    /// from the given type, including its inheritance and interfaces chains if requested. Returns
-    /// <c>false</c> if the setting is not found, or otherwise <c>true</c> and the setting's value
-    /// in the out argument.
+    /// Tries to find the value of the <see cref="CloneableAttribute.PreventVirtual"/> property
+    /// in the given type, including  inheritance and interfaces chains, if requested. By default,
+    /// the search starts from the given type, but if the <paramref name="top"/> flag is set to
+    /// <c>false</c>, then only its base types and interfaces are considered.
     /// </summary>
     /// <param name="type"></param>
+    /// <param name="top"></param>
     /// <param name="value"></param>
     /// <param name="chain"></param>
     /// <param name="ifaces"></param>
     /// <returns></returns>
     bool GetPreventVirtualValue(
-        ITypeSymbol type, out bool value, bool chain = false, bool ifaces = false)
+        ITypeSymbol type,
+        out bool value,
+        bool top = true,
+        bool chain = false, bool ifaces = false)
     {
-        var at = FindCloneableAttribute(type);
+        var at = FindCloneableAttribute(type, top);
+
         if (at != null)
         {
             if (GetPreventVirtualValue(at, out value)) return true;
@@ -433,20 +443,25 @@ internal class XTypeNode : TypeNode
     }
 
     /// <summary>
-    /// Tries to get the value of the <see cref="CloneableAttribute.AddICloneable"/> property
-    /// from the given type, including its inheritance and interfaces chains if requested. Returns
-    /// <c>false</c> if the setting is not found, or otherwise <c>true</c> and the setting's value
-    /// in the out argument.
+    /// Tries to find the value of the <see cref="CloneableAttribute.AddICloneable"/> property
+    /// in the given type, including  inheritance and interfaces chains, if requested. By default,
+    /// the search starts from the given type, but if the <paramref name="top"/> flag is set to
+    /// <c>false</c>, then only its base types and interfaces are considered.
     /// </summary>
     /// <param name="type"></param>
+    /// <param name="top"></param>
     /// <param name="value"></param>
     /// <param name="chain"></param>
     /// <param name="ifaces"></param>
     /// <returns></returns>
     bool GetAddICloneableValue(
-        ITypeSymbol type, out bool value, bool chain = false, bool ifaces = false)
+        ITypeSymbol type,
+        out bool value,
+        bool top = true,
+        bool chain = false, bool ifaces = false)
     {
-        var at = FindCloneableAttribute(type);
+        var at = FindCloneableAttribute(type, top);
+
         if (at != null)
         {
             if (GetAddICloneableValue(at, out value)) return true;
