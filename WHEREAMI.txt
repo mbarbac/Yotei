@@ -1,4 +1,2 @@
 Estoy en el generador CloneGenerator
-- Acabo de añadir el setting AddICloneable, hay que ver como añador el interface al type if needed
-- Ojo al caso de que elementos en las cadenas de herencia lo hayan hecho por el attributo
-- Luego: todos los casos de prueba
+Luego: todos los casos de prueba

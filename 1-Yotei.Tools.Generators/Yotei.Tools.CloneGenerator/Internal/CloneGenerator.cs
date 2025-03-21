@@ -4,6 +4,7 @@
 /// <summary>
 /// Generates 'Clone()' methods for types decorated with the <see cref="CloneableAttribute"/>.
 /// </summary>
+[Generator(LanguageNames.CSharp)]
 internal class CloneGenerator : TreeGenerator
 {
 #if DEBUG_CLONE_GENERATOR

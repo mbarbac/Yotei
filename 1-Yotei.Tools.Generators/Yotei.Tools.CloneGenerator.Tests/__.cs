@@ -13,5 +13,3 @@ namespace Yotei.Tools.CloneGenerator.Tests;
 //    {
 //    }
 //}
-
-public interface IFake { }

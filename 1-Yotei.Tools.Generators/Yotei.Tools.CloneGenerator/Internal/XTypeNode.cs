@@ -1,6 +1,4 @@
-﻿using Microsoft.CodeAnalysis.Host;
-
-namespace Yotei.Tools.CloneGenerator;
+﻿namespace Yotei.Tools.CloneGenerator;
 
 // ========================================================
 /// <inheritdoc cref="TypeNode"/>
@@ -25,6 +23,18 @@ internal class XTypeNode : TypeNode
         if (!base.Validate(context)) r = false;
 
         return r;
+    }
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    protected override string? GetHeader(SourceProductionContext context)
+    {
+        var head = base.GetHeader(context);
+        var add = GetAddICloneableValue(Symbol, out var temp, chain: true, ifaces: true) && temp;
+
+        if (add) head += " : ICloneable";
+        return head;
     }
 
     // ----------------------------------------------------
@@ -62,10 +72,9 @@ internal class XTypeNode : TypeNode
         // re-declare the method to return the new host type.
         string? GetModifiers()
         {
-            var found = Symbol.AllInterfaces.Any(x =>
-                FindMethod(x) != null ||
-                FindCloneableAttribute(x) != null);
+            if (Symbol.Name == "IBar") { } // DEBUG
 
+            var found = HasCloneable(Symbol, ifaces: true); // Only ifaces needed here
             return found ? "new " : null;
         }
     }
@@ -292,6 +301,23 @@ internal class XTypeNode : TypeNode
         }
 
         return item;
+    }
+
+    /// <summary>
+    /// Determines if the given type either has a 'Clone()' method, or its has been requested
+    /// via its decoration, including its base types and interfaces if requested.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="chain"></param>
+    /// <param name="ifaces"></param>
+    /// <returns></returns>
+    bool HasCloneable(ITypeSymbol type, bool chain = false, bool ifaces = false)
+    {
+        if (type.AllInterfaces.Any(x => x.Name == "ICloneable")) return true;
+        if (FindMethod(type, chain, ifaces) != null) return true;
+        if (FindCloneableAttribute(type, chain, ifaces) != null) return true;
+
+        return false;
     }
 
     // ----------------------------------------------------
