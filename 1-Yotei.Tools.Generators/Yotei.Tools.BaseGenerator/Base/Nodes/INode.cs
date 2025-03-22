@@ -7,14 +7,14 @@
 internal interface INode
 {
     /// <summary>
-    /// Gets the compilation stored by the file node at the top of this hierarchy.
+    /// Gets the compilation stored by the file node at the top of this branch hierarchy.
     /// <br/> The value of this property is obtained from the first candidate used to create this
-    /// hierarchy branch. Other candidates attached to the same branch are not used for this.
+    /// branch. Other candidates captured by the same branch are not used for this.
     /// <br/> In addition, some nodes may have a <see cref="IValidCandidate"/> property that, if
     /// not <c>null</c>, can be used to get the node's compilation from its semantic model.
     /// </summary>
     /// <returns></returns>
-    Compilation GetHierarchyCompilation();
+    Compilation GetBranchCompilation();
 
     // ----------------------------------------------------
 

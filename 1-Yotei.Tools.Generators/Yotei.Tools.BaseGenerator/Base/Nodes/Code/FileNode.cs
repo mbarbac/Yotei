@@ -31,7 +31,7 @@ internal sealed class FileNode : INode
     public Compilation Compilation { get; }
 
     /// <inheritdoc/>
-    public Compilation GetHierarchyCompilation() => Compilation;
+    public Compilation GetBranchCompilation() => Compilation;
 
     // ----------------------------------------------------
 

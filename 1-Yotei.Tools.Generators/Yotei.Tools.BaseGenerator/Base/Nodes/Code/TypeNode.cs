@@ -51,7 +51,7 @@ internal class TypeNode : IChildNode
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public Compilation GetHierarchyCompilation() => ParentNode.GetHierarchyCompilation();
+    public Compilation GetBranchCompilation() => ParentNode.GetBranchCompilation();
 
     // ----------------------------------------------------
 

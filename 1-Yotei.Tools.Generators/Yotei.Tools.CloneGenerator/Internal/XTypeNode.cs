@@ -272,7 +272,7 @@ internal class XTypeNode : TypeNode
             var add = GetAddICloneableValue(Symbol, out var value, chain: true, ifaces: true) && value;
             if (add)
             {
-                var comp = GetHierarchyCompilation();
+                var comp = GetBranchCompilation();
                 var item = comp.GetTypeByMetadataName("System.ICloneable");
                 if (item != null) list.Add(item);
             }

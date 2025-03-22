@@ -1,4 +1,4 @@
-﻿/*#pragma warning disable IDE0065
+﻿#pragma warning disable IDE0065
 
 using static Yotei.Tools.Diagnostics.ConsoleEx;
 using static System.ConsoleColor;
@@ -24,7 +24,7 @@ namespace Yotei.Tools.CloneGenerator.Tests.Interfaces
 
     // ====================================================
     //[Enforced]
-    public static class Test_Interface
+    public static class Test
     {
         //[Enforced]
         [Fact]
@@ -49,7 +49,7 @@ namespace Yotei.Tools.CloneGenerator.Tests.Interfaces
                 x.GetParameters().Length == 0);
 
             Assert.NotNull(method);
-            Assert.False(method.IsVirtual);
+            Assert.True(method.IsVirtual); // PreventVirtual has no effect on interfaces
         }
     }
-}*/
+}
