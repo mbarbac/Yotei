@@ -42,6 +42,11 @@ internal sealed class NamespaceNode : IChildNode
 
     // ----------------------------------------------------
 
+    /// <inheritdoc/>
+    public Compilation GetHierarchyCompilation() => ParentNode.GetHierarchyCompilation();
+
+    // ----------------------------------------------------
+
     /// <summary>
     /// The collection of child namespaces registered in this namespace node.
     /// </summary>

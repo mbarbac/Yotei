@@ -28,7 +28,7 @@ namespace Yotei.Tools.CloneGenerator.Tests.Interfaces
     {
         //[Enforced]
         [Fact]
-        public static void Test_Ifaces_Have_Method_Declared()
+        public static void Test_IA_Methods()
         {
             var type = typeof(IOther.IA);
             var method = type.GetMethods().FirstOrDefault(x =>
@@ -37,6 +37,19 @@ namespace Yotei.Tools.CloneGenerator.Tests.Interfaces
 
             Assert.NotNull(method);
             Assert.True(method.IsVirtual);
+        }
+
+        //[Enforced]
+        [Fact]
+        public static void Test_IB_Methods()
+        {
+            var type = typeof(IOther.IB);
+            var method = type.GetMethods().FirstOrDefault(x =>
+                x.Name == "Clone" &&
+                x.GetParameters().Length == 0);
+
+            Assert.NotNull(method);
+            Assert.False(method.IsVirtual);
         }
     }
 }*/

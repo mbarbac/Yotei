@@ -15,7 +15,7 @@ namespace Yotei.Tools.CloneGenerator.Tests.Abstracts
     {
         partial interface IOther
         {
-            partial interface IBar<K, T>
+            partial interface IBar<K, T> : ICloneable
             {
                 /// <summary>
                 /// <inheritdoc cref="ICloneable.Clone"/>

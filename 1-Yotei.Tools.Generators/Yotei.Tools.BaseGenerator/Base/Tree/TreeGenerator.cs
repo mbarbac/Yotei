@@ -444,7 +444,9 @@ internal class TreeGenerator : IIncrementalGenerator
 
             if (node == null) // No node, let's create a new one...
             {
-                node = new FileNode(name);
+                var comp = candidate.SemanticModel.Compilation;
+
+                node = new FileNode(name, comp);
                 files.Add(node);
             }
 

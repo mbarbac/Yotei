@@ -50,6 +50,11 @@ internal class TypeNode : IChildNode
 
     // ----------------------------------------------------
 
+    /// <inheritdoc/>
+    public Compilation GetHierarchyCompilation() => ParentNode.GetHierarchyCompilation();
+
+    // ----------------------------------------------------
+
     /// <summary>
     /// The collection of child types registered in this type node.
     /// </summary>

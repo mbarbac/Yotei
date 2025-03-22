@@ -10,7 +10,12 @@ internal sealed class FileNode : INode
     /// Initializes a new instance.
     /// </summary>
     /// <param name="fileName"></param>
-    public FileNode(string fileName) => FileName = fileName.NotNullNotEmpty();
+    /// <param name="compilation"></param>
+    public FileNode(string fileName, Compilation compilation)
+    {
+        FileName = fileName.NotNullNotEmpty();
+        Compilation = compilation.ThrowWhenNull();
+    }
 
     /// <inheritdoc/>
     public override string ToString() => $"File: {FileName}";
@@ -19,6 +24,14 @@ internal sealed class FileNode : INode
     /// The name of this file, without extension parts.
     /// </summary>
     public string FileName { get; }
+
+    /// <summary>
+    /// The compilation for which this node is obtained.
+    /// </summary>
+    public Compilation Compilation { get; }
+
+    /// <inheritdoc/>
+    public Compilation GetHierarchyCompilation() => Compilation;
 
     // ----------------------------------------------------
 

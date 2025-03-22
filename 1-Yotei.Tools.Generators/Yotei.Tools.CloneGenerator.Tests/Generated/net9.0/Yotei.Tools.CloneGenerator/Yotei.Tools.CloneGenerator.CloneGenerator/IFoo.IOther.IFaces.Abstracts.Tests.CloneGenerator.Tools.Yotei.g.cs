@@ -21,7 +21,7 @@ namespace Yotei.Tools.CloneGenerator.Tests.Abstracts
                 /// <inheritdoc cref="ICloneable.Clone"/>
                 /// </summary>
                 [global::System.CodeDom.Compiler.GeneratedCodeAttribute("CloneGenerator", "0.6.0.0")]
-                new IFoo<T> Clone();
+                IFoo<T> Clone();
             }
         }
     }

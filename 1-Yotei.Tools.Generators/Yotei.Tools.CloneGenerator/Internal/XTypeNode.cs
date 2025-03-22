@@ -69,10 +69,12 @@ internal class XTypeNode : TypeNode
         /// </summary>
         string? GetModifiers()
         {
-            var found =
-                FindMethod(Symbol, top: false, ifaces: true) != null ||
-                FindCloneableAttribute(Symbol, top: false, ifaces: true) != null ||
-                Symbol.AllInterfaces.Any(x => x.Name == "ICloneable");
+            var found = false;
+
+            if (!found) found = Symbol.AllInterfaces.Any(x => x.Name == "ICloneable");
+            if (!found) found = GetAddICloneableValue(Symbol, out var value, ifaces: true) && value;
+            if (!found) found = FindMethod(Symbol, top: false, ifaces: true) != null;
+            if (!found) found = FindCloneableAttribute(Symbol, top: false, ifaces: true) != null;
 
             return found ? "new " : null;
         }
@@ -101,7 +103,7 @@ internal class XTypeNode : TypeNode
         string? GetModifiers()
         {
             // Case when symbol is a derived one...
-            if (Symbol.BaseType != null)
+            if (Symbol.BaseType != null && Symbol.BaseType.Name != "Object")
             {
                 // There might be already a base method...
                 var method = FindMethod(Symbol, top: false, chain: true);
@@ -169,7 +171,7 @@ internal class XTypeNode : TypeNode
             var prevent = GetPreventVirtualValue(Symbol, out var temp, true, true, true) && temp;
 
             // Case when symbol is a derived one...
-            if (Symbol.BaseType != null)
+            if (Symbol.BaseType != null && Symbol.BaseType.Name != "Object")
             {
                 // There might be already a base method...
                 var method = FindMethod(Symbol, top: false, chain: true);
@@ -234,6 +236,7 @@ internal class XTypeNode : TypeNode
         var list = new List<ITypeSymbol>();
 
         foreach (var iface in Symbol.Interfaces) Capture(iface);
+        TryICloneable();
         return list;
 
         // Tries to capture the given interface...
@@ -241,12 +244,14 @@ internal class XTypeNode : TypeNode
         {
             var found = false;
 
+            // First, its child interfaces...
             foreach (var child in iface.Interfaces)
             {
                 var temp = Capture(child);
                 if (temp) found = true;
             }
 
+            // And then, this one...
             found = found ||
                 iface.Name == "ICloneable" ||
                 FindMethod(iface) != null ||
@@ -259,6 +264,18 @@ internal class XTypeNode : TypeNode
             }
 
             return found;
+        }
+
+        // ICloneable requested as a special case...
+        void TryICloneable()
+        {
+            var add = GetAddICloneableValue(Symbol, out var value, chain: true, ifaces: true) && value;
+            if (add)
+            {
+                var comp = GetHierarchyCompilation();
+                var item = comp.GetTypeByMetadataName("System.ICloneable");
+                if (item != null) list.Add(item);
+            }
         }
     }
 

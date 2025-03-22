@@ -51,6 +51,11 @@ internal class MethodNode : IChildNode
     // ----------------------------------------------------
 
     /// <inheritdoc/>
+    public Compilation GetHierarchyCompilation() => ParentNode.GetHierarchyCompilation();
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
     public virtual bool Validate(SourceProductionContext context)
     {
         var r = true;
