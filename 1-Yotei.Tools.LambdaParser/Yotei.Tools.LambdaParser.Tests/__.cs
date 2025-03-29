@@ -1,4 +1,4 @@
-﻿using static Yotei.Tools.Diagnostics.ConsoleEx;
+﻿using static Yotei.Tools.Diagnostics.DebugEx;
 using static System.ConsoleColor;
 
 namespace Yotei.Tools.Tests;
