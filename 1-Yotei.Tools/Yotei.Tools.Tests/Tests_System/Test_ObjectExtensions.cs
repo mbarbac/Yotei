@@ -12,6 +12,7 @@ public static class Test_ObjectExtensions
     public static void Test_ThrowWhenNull()
     {
         object? obj = null;
-        Assert.Throws<ArgumentNullException>(() => { obj.ThrowWhenNull(); });
+        try { obj.ThrowWhenNull(); Assert.Fail(); }
+        catch (ArgumentNullException) { }
     }
 }

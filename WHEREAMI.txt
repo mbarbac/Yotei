@@ -1,2 +1,2 @@
-Estoy en el generador CloneGenerator
-Luego: todos los casos de prueba
+Toy: lambda parser inconsistente en second run
+Toy: empezar con WithGenerator

@@ -49,13 +49,16 @@ public static class Test_StringExtensions
     public static void Test_NotNullNotEmpty_With_Trim()
     {
         string? source = null;
-        Assert.Throws<ArgumentNullException>(() => source.NotNullNotEmpty());
+        try { source.NotNullNotEmpty(); Assert.Fail(); }
+        catch (ArgumentNullException) { }
 
         source = string.Empty;
-        Assert.Throws<EmptyException>(() => source.NotNullNotEmpty());
+        try { source.NotNullNotEmpty(); Assert.Fail(); }
+        catch (EmptyException) { }
 
         source = " ";
-        Assert.Throws<EmptyException>(() => source.NotNullNotEmpty());
+        try { source.NotNullNotEmpty(); Assert.Fail(); }
+        catch (EmptyException) { }
     }
 
     // [Enforced]
@@ -63,10 +66,12 @@ public static class Test_StringExtensions
     public static void Test_NotNullNotEmpty_No_Trim()
     {
         string? source = null;
-        Assert.Throws<ArgumentNullException>(() => source.NotNullNotEmpty(trim: false));
+        try { source.NotNullNotEmpty(trim: false); Assert.Fail(); }
+        catch (ArgumentNullException) { }
 
         source = string.Empty;
-        Assert.Throws<EmptyException>(() => source.NotNullNotEmpty(trim: false));
+        try { source.NotNullNotEmpty(trim: false); Assert.Fail(); }
+        catch (EmptyException) { }
 
         source = " ";
         Assert.Equal(" ", source.NotNullNotEmpty(trim: false));
