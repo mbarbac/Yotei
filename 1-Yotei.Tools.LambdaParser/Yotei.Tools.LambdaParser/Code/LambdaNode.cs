@@ -10,7 +10,11 @@ public abstract class LambdaNode : DynamicObject, ICloneable
     /// Initializes a new instance.
     /// </summary>
     /// <param name="parser"></param>
-    public LambdaNode(LambdaParser parser) => LambdaParser = parser.ThrowWhenNull();
+    public LambdaNode(LambdaParser parser)
+    {
+        LambdaParser = parser.ThrowWhenNull();
+        LambdaId = NextLambdaId();
+    }
 
     /// <inheritdoc cref="ICloneable.Clone"/>
     public abstract LambdaNode Clone();
@@ -127,5 +131,83 @@ public abstract class LambdaNode : DynamicObject, ICloneable
         var meta = new LambdaMetaNode(master, expression, rest, this);
 
         return meta;
+    }
+
+    /// <summary>
+    /// Obtains binding restrictions that validate that the version of this instance is equal to
+    /// the latest one and, if not, update it.
+    /// <br/> The DLR caches the results it obtains using both the type of the call site and its
+    /// arguments. For the purposes of <see cref="LambdaParser"/> this mechanism may render the
+    /// same node over and over again, instead of a new binded one. So this method is a hack that
+    /// intercepts the original mechanism by using a custom binding restriction that forces the
+    /// cache to discard previous nodes and use the new binded one when needed.
+    /// </summary>
+    /// <param name="updateExpr"></param>
+    /// <returns></returns>
+    internal BindingRestrictions GetBindingRestrictions(Expression updateExpr)
+    {
+        var nodeExpr = Expression.Constant(this);
+        var argExpr = Expression.Parameter(typeof(object));
+
+        var condition = Expression.Block(
+            new[] { argExpr },
+            Expression.Assign(argExpr, nodeExpr),
+            Expression.Condition(
+                Expression.IsFalse(
+                    Expression.Call(
+                        Expression.Convert(argExpr, typeof(LambdaNode)),
+                        ValidateLambdaVersionInfo)),
+                Expression.Block(
+                    Expression.Call(
+                        Expression.Convert(argExpr, typeof(LambdaNode)),
+                        UpdateLambdaVersionInfo),
+                    updateExpr),
+                Expression.Constant(true)));
+
+        var rest = BindingRestrictions.GetExpressionRestriction(condition);
+        return rest;
+    }
+
+    /// <summary>
+    /// Flags to find the method info of the version-related methods.
+    /// </summary>
+    static readonly BindingFlags LAMBDA_FLAGS =
+        BindingFlags.Instance | BindingFlags.Static |
+        BindingFlags.Public | BindingFlags.NonPublic;
+
+    /// <summary>
+    /// Determines if the version of this instance is the same as the latest one, or not.
+    /// </summary>
+    internal static bool ValidateLambdaVersion() => true;
+
+    static MethodInfo ValidateLambdaVersionInfo
+        => typeof(LambdaNode).GetMethod(nameof(ValidateLambdaVersion), LAMBDA_FLAGS)!;
+
+    /// <summary>
+    /// Updates the version of this instance to the lates one, which is also incremented.
+    /// </summary>
+    internal static void UpdateLambdaVersion() { }
+
+    static MethodInfo UpdateLambdaVersionInfo
+        => typeof(LambdaNode).GetMethod(nameof(UpdateLambdaVersion), LAMBDA_FLAGS)!;
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public override bool TryGetMember(GetMemberBinder binder, out object? result)
+    {
+        var parser = LambdaParser.Current
+            ?? throw new InvalidOperationException("Current parser is null.");
+
+        LambdaDebug.Print(LambdaDebug.NodeBindedColor, $"* GetMember:");
+        LambdaDebug.Print(LambdaDebug.NodeBindedColor, $"- This: {ToDebugString()}");
+        LambdaDebug.Print(LambdaDebug.NodeBindedColor, $"- Name: {binder.Name}");
+
+        var node = new LambdaNodeMember(parser, this, binder.Name);
+        parser.LastNode = node;
+        result = node;
+
+        LambdaDebug.Print(LambdaDebug.NodeBindedColor, $"- Result: {node.ToDebugString()}");
+        return true;
     }
 }

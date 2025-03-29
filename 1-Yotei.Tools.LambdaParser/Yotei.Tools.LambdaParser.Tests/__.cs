@@ -9,7 +9,7 @@ namespace Yotei.Tools.Tests;
 //{
 //    //[Enforced]
 //    [Fact]
-//    public static void Test_()
+//    public static void Parse_() => Repeater.Repeat(() =>
 //    {
-//    }
+//    });
 //}
