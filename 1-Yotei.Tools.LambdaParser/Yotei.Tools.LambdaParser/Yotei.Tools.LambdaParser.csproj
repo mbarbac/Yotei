@@ -26,9 +26,9 @@
 	  <None Include="LICENSE" Pack="true" PackagePath="" />
    </ItemGroup>
 
-   <!--<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
 	  <DefineConstants>$(DefineConstants);DEBUG_LAMBDA_PARSER</DefineConstants>
-   </PropertyGroup>-->
+   </PropertyGroup>
 
    <!-- DEBUG configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Debug'">
