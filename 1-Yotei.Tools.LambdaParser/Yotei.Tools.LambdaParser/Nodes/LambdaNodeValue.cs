@@ -24,7 +24,7 @@ public class LambdaNodeValue : LambdaNode
 
         LambdaValue = value;
 
-        LambdaDebug.Print(LambdaDebug.NewNodeColor, $"- New Node: {ToDebugString()}");
+        LambdaHelpers.Print(LambdaHelpers.NewNodeColor, $"- New Node: {ToDebugString()}");
     }
 
     /// <inheritdoc/>

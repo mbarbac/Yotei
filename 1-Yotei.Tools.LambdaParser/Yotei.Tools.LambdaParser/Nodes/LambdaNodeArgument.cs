@@ -15,9 +15,9 @@ public class LambdaNodeArgument : LambdaNode
     public LambdaNodeArgument(
         LambdaParser parser, string name) : base(parser)
     {
-        LambdaName = ValidateName(name);
+        LambdaName = LambdaHelpers.ValidateName(name);
 
-        LambdaDebug.Print(LambdaDebug.NewNodeColor, $"- New Node: {ToDebugString()}");
+        LambdaHelpers.Print(LambdaHelpers.NewNodeColor, $"- New Node: {ToDebugString()}");
     }
 
     /// <inheritdoc/>

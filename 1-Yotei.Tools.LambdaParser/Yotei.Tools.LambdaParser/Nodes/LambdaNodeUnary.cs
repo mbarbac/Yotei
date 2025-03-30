@@ -20,7 +20,7 @@ public class LambdaNodeUnary : LambdaNode
         LambdaOperation = operation;
         LambdaTarget = target.ThrowWhenNull();
 
-        LambdaDebug.Print(LambdaDebug.NewNodeColor, $"- New Node: {ToDebugString()}");
+        LambdaHelpers.Print(LambdaHelpers.NewNodeColor, $"- New Node: {ToDebugString()}");
     }
 
     /// <inheritdoc/>

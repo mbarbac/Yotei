@@ -22,7 +22,7 @@ public class LambdaNodeTernary : LambdaNode
         LambdaMiddle = middle.ThrowWhenNull();
         LambdaRight = right.ThrowWhenNull();
 
-        LambdaDebug.Print(LambdaDebug.NewNodeColor, $"- New Node: {ToDebugString()}");
+        LambdaHelpers.Print(LambdaHelpers.NewNodeColor, $"- New Node: {ToDebugString()}");
     }
 
     /// <inheritdoc/>

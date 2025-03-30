@@ -20,11 +20,11 @@ public class LambdaNodeMethod : LambdaNodeHosted
         string name,
         IEnumerable<LambdaNode> arguments) : base(parser, host)
     {
-        LambdaName = ValidateName(name);
-        LambdaArguments = ValidateLambdaArguments(arguments, canBeEmpty: true);
+        LambdaName = LambdaHelpers.ValidateName(name);
+        LambdaArguments = LambdaHelpers.ValidateLambdaArguments(arguments, canBeEmpty: true);
         LambdaGenericArguments = ImmutableList<Type>.Empty;
 
-        LambdaDebug.Print(LambdaDebug.NewNodeColor, $"- New Node: {ToDebugString()}");
+        LambdaHelpers.Print(LambdaHelpers.NewNodeColor, $"- New Node: {ToDebugString()}");
     }
 
     /// <summary>
@@ -41,11 +41,11 @@ public class LambdaNodeMethod : LambdaNodeHosted
         IEnumerable<Type> types,
         IEnumerable<LambdaNode> arguments) : base(parser, host)
     {
-        LambdaName = ValidateName(name);
-        LambdaArguments = ValidateLambdaArguments(arguments, canBeEmpty: true);
-        LambdaGenericArguments = ValidateLambdaTypes(types);
+        LambdaName = LambdaHelpers.ValidateName(name);
+        LambdaArguments = LambdaHelpers.ValidateLambdaArguments(arguments, canBeEmpty: true);
+        LambdaGenericArguments = LambdaHelpers.ValidateLambdaTypes(types);
 
-        LambdaDebug.Print(LambdaDebug.NewNodeColor, $"- New: {ToDebugString()}");
+        LambdaHelpers.Print(LambdaHelpers.NewNodeColor, $"- New: {ToDebugString()}");
     }
 
     /// <inheritdoc/>

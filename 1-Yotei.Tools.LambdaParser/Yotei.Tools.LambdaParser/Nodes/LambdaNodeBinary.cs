@@ -22,7 +22,7 @@ public class LambdaNodeBinary : LambdaNode
         LambdaOperation = operation;
         LambdaRight = right.ThrowWhenNull();
 
-        LambdaDebug.Print(LambdaDebug.NewNodeColor, $"- New Node: {ToDebugString()}");
+        LambdaHelpers.Print(LambdaHelpers.NewNodeColor, $"- New Node: {ToDebugString()}");
     }
 
     /// <inheritdoc/>
