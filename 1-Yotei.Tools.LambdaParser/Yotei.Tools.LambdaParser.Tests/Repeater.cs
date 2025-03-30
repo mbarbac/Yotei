@@ -13,14 +13,18 @@ public static class Repeater
         if (count < 1) count = 1;
         for (int i = 1; i <= count; i++)
         {
+            WriteHeader(count, i);
+            action();
+        }
+
+        static void WriteHeader(int count, int i)
+        {
             if (count > 1)
             {
                 WriteLine();
                 WriteLine(DarkYellow, "----------------------------------------");
                 WriteLine(DarkYellow, $"Repetition #: {i}");
             }
-
-            action();
         }
     }
 }
