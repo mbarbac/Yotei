@@ -195,6 +195,11 @@ public class LambdaParser
     // ----------------------------------------------------
 
     /// <summary>
+    /// Maintains the surrogates associated with the given objects.
+    /// </summary>
+    internal Dictionary<object, LambdaNode> Surrogates = [];
+
+    /// <summary>
     /// Returns a dynamic lambda node associated with the given value, which can either be an
     /// existing surrogate or an ad-hoc instance created for that value.
     /// </summary>
@@ -202,14 +207,22 @@ public class LambdaParser
     /// <returns></returns>
     internal LambdaNode ToLambdaNode(object? value)
     {
-        return value switch
+        if (value == null) return new LambdaNodeValue(null);
+        else
         {
-            LambdaNode item => item,
-            LambdaMetaNode item => item.ValueNode,
-            DynamicMetaObject item => ToLambdaNode(item.Value),
+            if (Surrogates.TryGetValue(value, out var node)) return node;
 
-            _ => new LambdaNodeValue(value)
-        };
+            node = value switch
+            {
+                LambdaNode item => item,
+                LambdaMetaNode item => item.ValueNode,
+                DynamicMetaObject item => ToLambdaNode(item.Value),
+
+                _ => Surrogates[value] = new LambdaNodeValue(value)
+            };
+
+            return node;
+        }
     }
 
     /// <summary>

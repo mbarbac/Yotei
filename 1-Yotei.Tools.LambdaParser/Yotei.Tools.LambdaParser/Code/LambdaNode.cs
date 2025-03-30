@@ -143,6 +143,8 @@ public abstract class LambdaNode : DynamicObject, ICloneable
             LambdaHelpers.ValidateLambdaColor,
             $"- VERSION Updating: {old} to {neo}, {ToDebugString()}");
 
+        // Hack that permits to grab this instance even when the dynamic binding is not invoked.
+        // This happens, for instance, the 2nd time a conversion is invoked.
         LambdaParser.Instance.LastNode = this;
     }
 
@@ -154,26 +156,108 @@ public abstract class LambdaNode : DynamicObject, ICloneable
     /// <inheritdoc/> -----------------
     public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object? result)
     {
-        throw null;
+        LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"* GetIndex:");
+        LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"- This: {ToDebugString()}");
+
+        var list = LambdaParser.Instance.ToLambdaNodes(indexes);
+        foreach (var temp in list) LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"- Index: {temp.ToDebugString()}");
+
+        var node = new LambdaNodeIndexed(this, list);
+        LambdaParser.Instance.LastNode = node;
+        result = node;
+
+        LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"- Result: {node.ToDebugString()}");
+        return true;
     }
 
     /// <inheritdoc/> -----------------
     public override bool TryGetMember(GetMemberBinder binder, out object? result)
     {
-        throw null;
+        LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"* GetMember:");
+        LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"- This: {ToDebugString()}");
+        LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"- Name: {binder.Name}");
+
+        var node = new LambdaNodeMember(this, binder.Name);
+        LambdaParser.Instance.LastNode = node;
+        result = node;
+
+        LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"- Result: {node.ToDebugString()}");
+        return true;
     }
 
     /// <inheritdoc/> -----------------
     public override bool TryInvoke(InvokeBinder binder, object?[]? args, out object? result)
     {
-        throw null;
+        LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"* Invoke:");
+        LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"- This: {ToDebugString()}");
+
+        var list = LambdaParser.Instance.ToLambdaNodes(args);
+        foreach (var temp in list) LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"- Argument: {temp.ToDebugString()}");
+
+        var node = new LambdaNodeIndexed(this, list);
+        LambdaParser.Instance.LastNode = node;
+        result = node;
+
+        LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"- Result: {node.ToDebugString()}");
+        return true;
     }
 
     /// <inheritdoc/> -----------------
     public override bool TryInvokeMember(
         InvokeMemberBinder binder, object?[]? args, out object? result)
     {
-        throw null;
+        LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"* Method:");
+        LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"- This: {ToDebugString()}");
+        LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"- Name: {binder.Name}");
+
+        var list = LambdaParser.Instance.ToLambdaNodes(args);
+        foreach (var temp in list) LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"- Argument: {temp.ToDebugString()}");
+
+        LambdaNode node;
+
+        // Intercepting 'Coalesce' methods...
+        if (this is LambdaNodeArgument && binder.Name == "Coalesce" && list.Length == 2)
+        {
+            LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"* Intercepting 'Coalesce' method...");
+
+            node = new LambdaNodeCoalesce(list[0], list[1]);
+            LambdaParser.Instance.LastNode = node;
+            result = node;
+        }
+
+        // Intercepting 'Ternary' methods...
+        else if (this is LambdaNodeArgument && binder.Name == "Ternary" && list.Length == 3)
+        {
+            LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"* Intercepting 'Ternary' method...");
+
+            node = new LambdaNodeTernary(list[0], list[1], list[2]);
+            LambdaParser.Instance.LastNode = node;
+            result = node;
+        }
+
+        // Regular methods...
+        else
+        {
+            var types = Array.Empty<Type>();
+
+            if (binder.GetType().Name == "CSharpInvokeMemberBinder") // Not public!
+            {
+                var flags = BindingFlags.Instance | BindingFlags.Public;
+                var info = binder.GetType().GetProperty("TypeArguments", flags);
+                types = (Type[])info!.GetValue(binder)!;
+            }
+
+            node = types.Length == 0
+                ? new LambdaNodeMethod(this, binder.Name, list)
+                : new LambdaNodeMethod(this, binder.Name, types, list);
+
+            LambdaParser.Instance.LastNode = node;
+            result = node;
+        }
+
+        // Finishing...
+        LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"- Result: {node.ToDebugString()}");
+        return true;
     }
 
     // ---------------------------------------------------- Intercepted by meta node...

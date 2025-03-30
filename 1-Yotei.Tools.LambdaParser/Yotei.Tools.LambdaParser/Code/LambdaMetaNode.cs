@@ -62,7 +62,29 @@ internal class LambdaMetaNode : DynamicMetaObject
         BinaryOperationBinder binder,
         DynamicMetaObject arg)
     {
-        throw null;
+        LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"* META BindBinary:");
+        LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- This: {this}");
+        LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- Operation: {binder.Operation}");
+
+        var item = LambdaParser.Instance.ToLambdaNode(arg);
+        LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- Target: {item.ToDebugString()}");
+
+        var node = new LambdaNodeBinary(ValueNode, binder.Operation, item);
+        LambdaParser.Instance.LastNode = node;
+
+        binder.FallbackBinaryOperation(this, arg);
+        var updateExpr = binder.GetUpdateExpression(typeof(bool));
+
+        var nodeExpr = Expression.Constant(node);
+        var rest = node.GetBindingRestrictions(updateExpr);
+        var meta = new LambdaMetaNode(
+            new DynamicMetaObject(nodeExpr, rest, node),
+            nodeExpr, rest, node);
+
+        binder.FallbackBinaryOperation(this, arg, meta);
+
+        LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- Result: {meta}");
+        return meta;
     }
 
     /// <inheritdoc/> -----------------
@@ -117,19 +139,106 @@ internal class LambdaMetaNode : DynamicMetaObject
     public override DynamicMetaObject BindSetIndex(
         SetIndexBinder binder, DynamicMetaObject[] indexes, DynamicMetaObject value)
     {
-        throw null;
+        LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"* META BindSetIndex:");
+        LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- This: {this}");
+
+        var list = LambdaParser.Instance.ToLambdaNodes(indexes);
+        foreach (var temp in list) LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- Index: {temp.ToDebugString()}");
+
+        var item = LambdaParser.Instance.ToLambdaNode(value);
+        LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- Value: {item.ToDebugString()}");
+
+        var member = new LambdaNodeIndexed(ValueNode, list);
+        var node = new LambdaNodeSetter(member, item);
+        LambdaParser.Instance.LastNode = node;
+
+        binder.FallbackSetIndex(this, indexes, value);
+        var updateExpr = binder.GetUpdateExpression(typeof(bool));
+
+        var nodeExpr = Expression.Constant(node);
+        var rest = node.GetBindingRestrictions(updateExpr);
+        var meta = new LambdaMetaNode(
+            new DynamicMetaObject(nodeExpr, rest, node),
+            nodeExpr, rest, node);
+
+        binder.FallbackSetIndex(this, indexes, value, meta);
+
+        LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- Result: {meta}");
+        return meta;
     }
 
     /// <inheritdoc/> -----------------
     public override DynamicMetaObject BindSetMember(SetMemberBinder binder, DynamicMetaObject value)
     {
-        throw null;
+        LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"* META BindSetMember:");
+        LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- This: {this}");
+        LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- Name: {binder.Name}");
+
+        var item = LambdaParser.Instance.ToLambdaNode(value);
+        LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- Value: {item.ToDebugString()}");
+
+        var member = new LambdaNodeMember(ValueNode, binder.Name);
+        var node = new LambdaNodeSetter(member, item);
+        LambdaParser.Instance.LastNode = node;
+
+        binder.FallbackSetMember(this, value);
+        var updateExpr = binder.GetUpdateExpression(typeof(bool));
+
+        var nodeExpr = Expression.Constant(node);
+        var rest = node.GetBindingRestrictions(updateExpr);
+        var meta = new LambdaMetaNode(
+            new DynamicMetaObject(nodeExpr, rest, node),
+            nodeExpr, rest, node);
+
+        binder.FallbackSetMember(this, value, meta);
+
+        LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- Result: {meta}");
+        return meta;
     }
 
     /// <inheritdoc/> -----------------
     public override DynamicMetaObject BindUnaryOperation(UnaryOperationBinder binder)
     {
-        throw null;
+        LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"* META BindUnary:");
+        LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- This: {this}");
+        LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- Operation: {binder.Operation}");
+
+        var node = new LambdaNodeUnary(binder.Operation, ValueNode);
+        LambdaParser.Instance.LastNode = node;
+
+        binder.FallbackUnaryOperation(this);
+        var updateExpr = binder.GetUpdateExpression(typeof(bool));
+
+        var nodeExpr = Expression.Constant(node);
+        var rest = node.GetBindingRestrictions(updateExpr);
+
+        LambdaMetaNode meta;
+
+        // Binding artifacts...
+        if (binder.Operation is ExpressionType.IsTrue or ExpressionType.IsFalse)
+        {
+            var obj = false;
+            var objExpr = Expression.Constant(obj);
+
+            meta = new LambdaMetaNode(
+                new DynamicMetaObject(nodeExpr, rest, node),
+                objExpr, rest, node);
+
+            binder.FallbackUnaryOperation(this, meta);
+        }
+
+        // Standard case...
+        else
+        {
+            meta = new LambdaMetaNode(
+                new DynamicMetaObject(nodeExpr, rest, node),
+                nodeExpr, rest, node);
+
+            binder.FallbackUnaryOperation(this, meta);
+        }
+
+        LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- Result: {meta}");
+        return meta;
     }
 
     // ---------------------------------------------------- Delegated to underlying node...
