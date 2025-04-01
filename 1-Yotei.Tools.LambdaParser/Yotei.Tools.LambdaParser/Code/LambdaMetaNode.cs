@@ -101,7 +101,9 @@ internal class LambdaMetaNode : DynamicMetaObject
         var updateExpr = binder.GetUpdateExpression(typeof(bool));
 
         // Creating a compatible object to keep the ball rolling, and adding it to the surrogates
-        // so that from that value we'll find later the original node...
+        // so that from that value we'll find later the original node. Otherwise, the indexes and
+        // arguments received by other methods will just be the plain values, and not the convert
+        // nodes...
         var ret = CreateCompatible(binder.ReturnType);
         if (ret != null) LambdaParser.Instance.Surrogates[ret] = node;
 
@@ -221,6 +223,8 @@ internal class LambdaMetaNode : DynamicMetaObject
         // Binding artifacts...
         if (binder.Operation is ExpressionType.IsTrue or ExpressionType.IsFalse)
         {
+            // This is a choice, by which we understand that dynamic nodes are logically false
+            // when used as a boolean value, being 'false' the default boolean value itself...
             var obj = false;
             var objExpr = Expression.Constant(obj);
 

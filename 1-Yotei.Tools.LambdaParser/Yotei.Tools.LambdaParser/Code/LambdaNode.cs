@@ -263,7 +263,7 @@ public abstract class LambdaNode : DynamicObject, ICloneable
         return true;
     }
 
-    // ---------------------------------------------------- Intercepted by meta node...
+    // ---------------------------------------------------- Intercepted by the meta node...
 
     /*public override bool TryBinaryOperation(BinaryOperationBinder binder, object arg, out object? result)*/
     /*public override bool TryConvert(ConvertBinder binder, out object? result)*/

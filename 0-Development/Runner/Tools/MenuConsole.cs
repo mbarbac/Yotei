@@ -164,6 +164,8 @@ public class MenuConsole : IEnumerable<MenuEntry>
                 ConsoleEx.Clear();
                 WriteLine(Red, "Screen buffer exhausted and cleared!");
                 WriteLine();
+
+                top = Console.CursorTop;
             }
 
             foreach (var entry in Entries)

@@ -76,8 +76,43 @@ public class LambdaParser
             foreach (var arg in args) Instance._DynamicArguments.Add(arg);
 
             var obj = expression.DynamicInvoke([.. items]);
+
+            // Hacks for special return types...
+            if (obj != null)
+            {
+                var type = obj.GetType();
+
+                if (type.IsAnonymous()) // Anonymous types...
+                {
+                    Instance.Result = new LambdaNodeValue(obj);
+                    goto FINISH;
+                }
+                if (type.IsArray) // Arrays...
+                {
+                    var array = (Array)obj;
+                    var nodes = new LambdaNode[array.Length];
+                    for (int i = 0; i < array.Length; i++)
+                    {
+                        nodes[i] = Instance.ToLambdaNode(array.GetValue(i));
+                    }
+
+                    Instance.Result = new LambdaNodeValue(nodes);
+                    goto FINISH;
+                }
+                if (obj is ICollection list) // Lists and alike...
+                {
+                    var ret = new List<LambdaNode>();
+                    foreach (var item in list) ret.Add(Instance.ToLambdaNode(item));
+
+                    Instance.Result = new LambdaNodeValue(ret);
+                    goto FINISH;
+                }
+            }
+
+            // Standar case...
             Instance.Result = Instance.LastNode ?? Instance.ToLambdaNode(obj);
 
+            FINISH:
             var parser = NewParserFrom(Instance);
             Clear(Instance);
             return parser;

@@ -5,8 +5,8 @@ internal static class LambdaHelpers
 {
     internal const ConsoleColor NewNodeColor = ConsoleColor.White;
     internal const ConsoleColor NewMetaColor = ConsoleColor.Gray;
-    internal const ConsoleColor NodeBindedColor = ConsoleColor.Blue;
-    internal const ConsoleColor MetaBindedColor = ConsoleColor.Yellow;
+    internal const ConsoleColor NodeBindedColor = ConsoleColor.Yellow;
+    internal const ConsoleColor MetaBindedColor = ConsoleColor.Blue;
 
     internal const ConsoleColor ValidateLambdaColor = ConsoleColor.Cyan;
     internal const ConsoleColor UpdateLambdaColor = ConsoleColor.Magenta;
