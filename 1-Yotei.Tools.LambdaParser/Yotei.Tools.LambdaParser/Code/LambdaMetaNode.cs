@@ -100,7 +100,10 @@ internal class LambdaMetaNode : DynamicMetaObject
         binder.FallbackConvert(this);
         var updateExpr = binder.GetUpdateExpression(typeof(bool));
 
+        // Creating a compatible object to keep the ball rolling, and adding it to the surrogates
+        // so that from that value we'll find later the original node...
         var ret = CreateCompatible(binder.ReturnType);
+        if (ret != null) LambdaParser.Instance.Surrogates[ret] = node;
 
         var par = Expression.Variable(binder.ReturnType, "ret");
         var exp = Expression.Block(
@@ -143,7 +146,8 @@ internal class LambdaMetaNode : DynamicMetaObject
         LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- This: {this}");
 
         var list = LambdaParser.Instance.ToLambdaNodes(indexes);
-        foreach (var temp in list) LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- Index: {temp.ToDebugString()}");
+        foreach (var temp in list)
+            LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- Index: {temp.ToDebugString()}");
 
         var item = LambdaParser.Instance.ToLambdaNode(value);
         LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- Value: {item.ToDebugString()}");
@@ -248,8 +252,12 @@ internal class LambdaMetaNode : DynamicMetaObject
     {
         LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"* META BindGetIndex:");
         LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- This: {this}");
+
         foreach (var index in indexes)
-            LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- Index: {index}");
+        {
+            var item = LambdaParser.Instance.ToLambdaNode(index);
+            LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- Index: {item.ToDebugString()}");
+        }
 
         LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- Delegated...");
         var meta = LambdaMetaMaster.BindGetIndex(binder, indexes);
@@ -273,8 +281,12 @@ internal class LambdaMetaNode : DynamicMetaObject
     {
         LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"* META BindInvoke:");
         LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- This: {this}");
+
         foreach (var arg in args)
-            LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- Argument: {arg}");
+        {
+            var item = LambdaParser.Instance.ToLambdaNode(arg);
+            LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- Argument: {item.ToDebugString()}");
+        }
 
         LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- Delegated...");
         var meta = LambdaMetaMaster.BindInvoke(binder, args);
@@ -288,8 +300,12 @@ internal class LambdaMetaNode : DynamicMetaObject
     {
         LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"* META BindMethod:");
         LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- This: {this}");
+
         foreach (var arg in args)
-            LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- Argument: {arg}");
+        {
+            var item = LambdaParser.Instance.ToLambdaNode(arg);
+            LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- Argument: {item.ToDebugString()}");
+        }
 
         LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- Delegated...");
         var meta = LambdaMetaMaster.BindInvokeMember(binder, args);
@@ -306,7 +322,7 @@ internal class LambdaMetaNode : DynamicMetaObject
         LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"* META BindCreateInstance:");
         LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- This: {this}");
         foreach (var arg in args)
-            LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- Argument: {arg}");
+            LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"- Argument: {arg?.Value}");
 
         throw new NotSupportedException(
             "'BindCreateInstance' operations are not supported.")

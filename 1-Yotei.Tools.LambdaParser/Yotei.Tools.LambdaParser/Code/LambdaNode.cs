@@ -29,7 +29,7 @@ public abstract class LambdaNode : DynamicObject, ICloneable
     public string ToDebugString()
     {
         var type = GetType().EasyName();
-        return $"[{type}](Id:{LambdaId}, {ToString()}) [Vs:{LambdaVersion}]";
+        return $"[{type}#{LambdaId}]({ToString()}) [Vs:{LambdaVersion}]";
     }
 
     // ----------------------------------------------------
@@ -160,7 +160,8 @@ public abstract class LambdaNode : DynamicObject, ICloneable
         LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"- This: {ToDebugString()}");
 
         var list = LambdaParser.Instance.ToLambdaNodes(indexes);
-        foreach (var temp in list) LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"- Index: {temp.ToDebugString()}");
+        foreach (var temp in list)
+            LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"- Index: {temp.ToDebugString()}");
 
         var node = new LambdaNodeIndexed(this, list);
         LambdaParser.Instance.LastNode = node;
@@ -192,7 +193,8 @@ public abstract class LambdaNode : DynamicObject, ICloneable
         LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"- This: {ToDebugString()}");
 
         var list = LambdaParser.Instance.ToLambdaNodes(args);
-        foreach (var temp in list) LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"- Argument: {temp.ToDebugString()}");
+        foreach (var temp in list)
+            LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"- Argument: {temp.ToDebugString()}");
 
         var node = new LambdaNodeInvoke(this, list);
         LambdaParser.Instance.LastNode = node;
@@ -211,7 +213,8 @@ public abstract class LambdaNode : DynamicObject, ICloneable
         LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"- Name: {binder.Name}");
 
         var list = LambdaParser.Instance.ToLambdaNodes(args);
-        foreach (var temp in list) LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"- Argument: {temp.ToDebugString()}");
+        foreach (var temp in list)
+            LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"- Argument: {temp.ToDebugString()}");
 
         LambdaNode node;
 

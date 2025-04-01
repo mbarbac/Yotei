@@ -208,21 +208,19 @@ public class LambdaParser
     internal LambdaNode ToLambdaNode(object? value)
     {
         if (value == null) return new LambdaNodeValue(null);
-        else
+
+        if (Surrogates.TryGetValue(value, out var node)) return node;
+
+        node = value switch
         {
-            if (Surrogates.TryGetValue(value, out var node)) return node;
+            LambdaNode item => item,
+            LambdaMetaNode item => item.ValueNode,
+            DynamicMetaObject item => ToLambdaNode(item.Value),
 
-            node = value switch
-            {
-                LambdaNode item => item,
-                LambdaMetaNode item => item.ValueNode,
-                DynamicMetaObject item => ToLambdaNode(item.Value),
+            _ => Surrogates[value] = new LambdaNodeValue(value)
+        };
 
-                _ => Surrogates[value] = new LambdaNodeValue(value)
-            };
-
-            return node;
-        }
+        return node;
     }
 
     /// <summary>

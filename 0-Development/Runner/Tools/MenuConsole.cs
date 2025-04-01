@@ -144,6 +144,7 @@ public class MenuConsole : IEnumerable<MenuEntry>
     /// <param name="timeout"></param>
     /// <param name="position"></param>
     /// <returns></returns>
+    [SuppressMessage("Interoperability", "CA1416")] // MoveBufferArea
     public int Run(ConsoleColor color, TimeSpan timeout, int position = 0)
     {
         if (position < 0) throw new ArgumentException("Negative position").WithData(position);
@@ -154,6 +155,9 @@ public class MenuConsole : IEnumerable<MenuEntry>
         {
             if (Entries.Count == 0) return -1;
 
+            // Initializing...
+            var top = Console.CursorTop;
+
             // It happens from time to time...
             if (Console.CursorTop >= (Console.BufferHeight - Entries.Count - 1))
             {
@@ -161,9 +165,6 @@ public class MenuConsole : IEnumerable<MenuEntry>
                 WriteLine(Red, "Screen buffer exhausted and cleared!");
                 WriteLine();
             }
-
-            // Initializing...
-            var top = Console.CursorTop;
 
             foreach (var entry in Entries)
             {
@@ -203,7 +204,7 @@ public class MenuConsole : IEnumerable<MenuEntry>
                         break;
 
                     case ConsoleKey.DownArrow:
-                        if (position < (Entries.Count- 1)) position++;
+                        if (position < (Entries.Count - 1)) position++;
                         break;
 
                     case ConsoleKey.Home:

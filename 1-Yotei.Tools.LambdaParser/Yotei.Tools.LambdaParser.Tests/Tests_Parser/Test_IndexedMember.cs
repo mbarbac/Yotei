@@ -170,7 +170,7 @@ public static class Test_IndexedMember
         Assert.Equal("x.Alpha[x.Beta[x.Alpha]]", node.ToString());
     });
 
-    [Enforced]
+    //[Enforced]
     [Fact]
     public static void Parse_Nested_Assign() => Repeater.Repeat(() =>
     {
