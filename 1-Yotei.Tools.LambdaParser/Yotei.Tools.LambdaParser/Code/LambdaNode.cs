@@ -194,7 +194,7 @@ public abstract class LambdaNode : DynamicObject, ICloneable
         var list = LambdaParser.Instance.ToLambdaNodes(args);
         foreach (var temp in list) LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"- Argument: {temp.ToDebugString()}");
 
-        var node = new LambdaNodeIndexed(this, list);
+        var node = new LambdaNodeInvoke(this, list);
         LambdaParser.Instance.LastNode = node;
         result = node;
 

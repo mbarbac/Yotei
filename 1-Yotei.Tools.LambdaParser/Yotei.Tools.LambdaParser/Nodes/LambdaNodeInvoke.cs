@@ -11,12 +11,11 @@ public class LambdaNodeInvoke : LambdaNodeHosted
     /// Initializes a new instance.
     /// </summary>
     /// <param name="host"></param>
-    /// <param name="indexes"></param>
+    /// <param name="arguments"></param>
     public LambdaNodeInvoke(
-        LambdaNode host, IEnumerable<LambdaNode> indexes) : base(host)
+        LambdaNode host, IEnumerable<LambdaNode> arguments) : base(host)
     {
-        LambdaArguments = LambdaHelpers.ValidateLambdaArguments(indexes, canBeEmpty: true);
-
+        LambdaArguments = LambdaHelpers.ValidateLambdaArguments(arguments, canBeEmpty: true);
         LambdaHelpers.PrintNode(this);
     }
 
