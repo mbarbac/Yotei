@@ -60,37 +60,129 @@ public class LambdaNameParser
             "Dynamic lambda name parser requires one and only one dynamic argument.")
             .WithData(parser, nameof(expression));
 
-        var named = new LambdaNameParser();
-        named.Parser = parser;
-        named.Argument = arg = parser.DynamicArguments[0];
+        var items = new List<string>();
+        OnParse(parser.Result, items, parser);
 
-        named.OnParse(parser.Result, true);
+        parts = items.ToArray();
+        arg = parser.DynamicArguments[0];
 
-        parts = named.List.ToArray();
-        return parts.All(x => x.Length == 0) ? string.Empty : string.Join('.', parts);
+        return parts.Length == 0 || parts.All(x => x.Length == 0)
+            ? string.Empty
+            : string.Join(".", parts);
     }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Private constructor.
+    /// Invoked to recursively parse the given node.
     /// </summary>
-    private LambdaNameParser() { }
+    static void OnParse(LambdaNode node, List<string> items, LambdaParser parser)
+    {
+        switch (node)
+        {
+            case LambdaNodeArgument: break;
+
+            case LambdaNodeMember item: OnParseMember(item, items, parser); break;
+            case LambdaNodeIndexed item: OnParseIndexed(item, items, parser); break;
+            case LambdaNodeInvoke item: OnParseInvoke(item, items, parser); break;
+            case LambdaNodeValue item: OnParseValue(item, items, parser); break;
+
+            default:
+                throw new ArgumentException(
+                    "Expression carries a not-supported node.")
+                    .WithData(node)
+                    .WithData(parser, "expression");
+        }
+    }
 
     /// <summary>
-    /// The parser used by this instance.
+    /// Invoked to parse the given member node.
     /// </summary>
-    LambdaParser Parser { get; set; } = default!;
+    static void OnParseMember(LambdaNodeMember node, List<string> items, LambdaParser parser)
+    {
+        OnParse(node.LambdaHost, items, parser);
+
+        var arg = parser.DynamicArguments[0];
+        var name = node.LambdaName == arg.LambdaName
+            ? string.Empty
+            : node.LambdaName;
+
+        items.Add(name);
+    }
 
     /// <summary>
-    /// The dynamic argument used to invoked the expression parsed.
+    /// Invoked to parse the given indexed node.
     /// </summary>
-    LambdaNodeArgument Argument { get; set; } = default!;
+    static void OnParseIndexed(LambdaNodeIndexed node, List<string> items, LambdaParser parser)
+    {
+        if (node.LambdaIndexes.Count != 1)
+            throw new ArgumentException(
+                "Indexed parts require one and only one index.")
+                .WithData(node)
+                .WithData(parser, "expression");
+
+        OnParse(node.LambdaHost, items, parser);
+
+        var temps = new List<string>();
+        OnParse(node.LambdaIndexes[0], temps, parser);
+
+        if (items.Count > 0) items[^1] += temps[0];
+        else items.Add(temps[0]);
+
+        for (int i = 1; i < temps.Count; i++) items.Add(temps[i]);
+    }
 
     /// <summary>
-    /// The list of parsed parts.
+    /// Invoked to parse the given indexed node.
     /// </summary>
-    List<string> List { get; } = [];
+    static void OnParseInvoke(LambdaNodeInvoke node, List<string> items, LambdaParser parser)
+    {
+        if (node.LambdaArguments.Count != 1)
+            throw new ArgumentException(
+                "Invoke parts require one and only one argument.")
+                .WithData(node)
+                .WithData(parser, "expression");
 
-    // ----------------------------------------------------l
+        OnParse(node.LambdaHost, items, parser);
+
+        var temps = new List<string>();
+        OnParse(node.LambdaArguments[0], temps, parser);
+
+        if (items.Count > 0) items[^1] += temps[0];
+        else items.Add(temps[0]);
+
+        for (int i = 1; i < temps.Count; i++) items.Add(temps[i]);
+    }
+
+    /// <summary>
+    /// Invoked to parse the constant value node.
+    /// </summary>
+    static void OnParseValue(LambdaNodeValue node, List<string> items, LambdaParser parser)
+    {
+        if (node.LambdaValue == null)
+        {
+            items.Add(string.Empty);
+        }
+        else if (node.LambdaValue is string str)
+        {
+            var names = str.Split('.');
+            for (int i = 0; i < names.Length; i++)
+            {
+                var name = names[i].NullWhenEmpty(trim: true) ?? string.Empty;
+                items.Add(name);
+            }
+        }
+        else if (node.LambdaValue.GetType().IsPrimitive)
+        {
+            var name = node.LambdaValue.ToString() ?? string.Empty;
+            items.Add(name);
+        }
+        else
+        {
+            throw new ArgumentException(
+                "Expression carries a not supported constant.")
+                .WithData(node)
+                .WithData(parser, "expression");
+        }
+    }
 }

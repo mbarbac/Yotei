@@ -177,15 +177,23 @@ public static class Test_LambdaNameParser
         Assert.Empty(parts[2]);
     });
 
-    [Enforced]
+    //[Enforced]
     [Fact]
     public static void Parse_Constant_String_And_Numeric() => Repeater.Repeat(() =>
     {
-        var name = LambdaNameParser.Parse(x => x("James")("00")(7), out string[] parts);
+        var name = LambdaNameParser.Parse(x => x["James"]["00"][7], out string[] parts);
         WriteLine($"Name: '{name}'");
 
-        Assert.Empty(name);
-        Assert.Equal(4, parts.Length);
-        Assert.True(parts.All(x => x.Length == 0));
+        Assert.Equal("James007", name);
+        Assert.Single(parts);
+        Assert.Equal("James007", parts[0]);
+
+        name = LambdaNameParser.Parse(x => x("James")("007")(".Bond"), out parts);
+        WriteLine($"Name: '{name}'");
+
+        Assert.Equal("James007.Bond", name);
+        Assert.Equal(2, parts.Length);
+        Assert.Equal("James007", parts[0]);
+        Assert.Equal("Bond", parts[1]);
     });
 }
