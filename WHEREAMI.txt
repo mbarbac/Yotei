@@ -1,4 +1,1 @@
-- Toy: rehacer AsyncLock, parece que entra en la task de 1er nivel.
-  Habrá que diferenciar entre "scheduled" y "entered" y "running"...
-
 - Toy: empezar con WithGenerator

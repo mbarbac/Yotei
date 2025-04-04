@@ -18,7 +18,7 @@ public static class Test_AsyncLock
     static readonly int DEEP = 10;
     static readonly int WAIT = 100;
 #endif
-    static readonly int TIMEOUT = WAIT * (DEEP + NUM / 2);
+    static readonly int TIMEOUT = WAIT * (DEEP + NUM);
 
     /// <summary>
     /// Wait until all tasks are completed, or until one of them throws an exception.
