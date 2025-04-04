@@ -125,6 +125,8 @@ public static class DebugEx
                 iter.CurrentIsSeparator ||
                 (iter.Current.Length == 0 && DebugAtOrigin);
         }
+
+        Flush();
     }
 
     /// <summary>
@@ -255,6 +257,8 @@ public static class DebugEx
         Debug.WriteLine(string.Empty);
         if (console) Console.WriteLine();
         DebugAtOrigin = true;
+
+        Flush();
     }
 
     /// <summary>

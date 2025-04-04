@@ -84,7 +84,7 @@ public partial class AsyncLock
                             break;
                         }
 
-                        else if (Parent.AsyncId == OldAsyncId) // Increasing the lock...
+                        if (Parent.AsyncId == OldAsyncId) // Increasing the lock...
                         {
                             Print($"Increasing Async: {this}");
                             Parent.AsyncId = AsyncHolder.Value;
@@ -93,13 +93,6 @@ public partial class AsyncLock
                             Print($"Increased Async: {this}");
                             Captured = true;
                             break;
-                        }
-
-                        else // Cannot handle any other situation...
-                        {
-                            throw new UnExpectedException(
-                                "Unknown situation.")
-                                .WithData(Parent, nameof(AsyncLock));
                         }
                     }
 
@@ -212,10 +205,12 @@ public partial class AsyncLock
                     Parent.Count--;
                     Parent.ThreadId = Parent.Count == 0 ? 0 : OldThreadId;
                     Parent.AsyncId = Parent.Count == 0 ? 0 : OldAsyncId;
+
                     return;
                 }
                 finally
                 {
+                    Parent.Semaphore.Release();
                 }
             }
         }
@@ -240,10 +235,12 @@ public partial class AsyncLock
                     Parent.Count--;
                     Parent.ThreadId = Parent.Count == 0 ? 0 : OldThreadId;
                     Parent.AsyncId = Parent.Count == 0 ? 0 : OldAsyncId;
+
                     return;
                 }
                 finally
                 {
+                    Parent.Semaphore.Release();
                 }
             }
         }

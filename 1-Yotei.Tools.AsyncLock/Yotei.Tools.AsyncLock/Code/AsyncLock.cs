@@ -53,6 +53,7 @@ public partial class AsyncLock : DisposableClass
     /// <inheritdoc/>
     protected override ValueTask OnDisposeAsync(bool disposing)
     {
+        // Remember to validate that 'OnDispose()' can be used...
         OnDispose(disposing);
         return ValueTask.CompletedTask;
     }
