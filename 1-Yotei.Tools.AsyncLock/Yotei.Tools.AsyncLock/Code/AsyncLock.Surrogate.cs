@@ -158,7 +158,7 @@ public partial class AsyncLock
                         }
                     }
 
-                    if (ms >= 0) // Let's wait the requested timeout, if needed...
+                    if (ms >= 0) // Reached here, let's wait the requested timeout, if needed...
                     {
                         var now = DateTime.UtcNow;
 
