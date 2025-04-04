@@ -6,14 +6,14 @@ public partial class AsyncLock
 {
     // ====================================================
     /// <summary>
-    /// Represents the result of a lock operation. If the lock was captured, when instances of
-    /// this class are disposed, then they either release their parent lock, or decrease their
-    /// reentrancy count.
+    /// Represents the result of an <see cref="AsyncLock"/>'s lock operation. If the lock was
+    /// acquired, then disposing this object will release the lock or decrease its reentrancy
+    /// count. Otherwise, the dispose operation will do nothing.
     /// </summary>
     public class Surrogate : DisposableClass
     {
         /// <summary>
-        /// Initializes a new not-entered instance.
+        /// Initializes a new not-captured instance.
         /// </summary>
         /// <param name="parent"></param>
         /// <param name="data"></param>
@@ -29,6 +29,166 @@ public partial class AsyncLock
         /// <inheritdoc/>
         public override string ToString()
             => $"Old:({OldThreadId}/{OldAsyncId}), Lock:{Parent}, {GetData()}";
+
+        /// <summary>
+        /// The lock this instance refers to.
+        /// </summary>
+        public AsyncLock Parent { get; }
+
+        /// <summary>
+        /// Determines if this instance represents a captured lock, or not.
+        /// </summary>
+        public bool Captured { get; private set; }
+
+        /// <summary>
+        /// Represents context data passed to this instance when trying to capture the lock, or
+        /// null if any is given.
+        /// </summary>
+        public object? Data { get; }
+
+        string GetData() => Data is null ? string.Empty : $"Data:{Data}";
+
+        readonly int OldThreadId;
+        readonly ulong OldAsyncId;
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Invoked when trying to enter the lock, capturing it or increasing its reentrancy count.
+        /// </summary>
+        /// <param name="timeout"></param>
+        /// <returns></returns>
+        internal Surrogate Enter(TimeSpan timeout)
+        {
+            var ms = timeout.ValidateTimeout();
+            var ini = DateTime.UtcNow;
+
+            while (true)
+            {
+                var taken = false; // Initializing status...
+
+                try // Trying to capture the semaphore...
+                {
+                    taken = Parent.Semaphore.Wait(timeout);
+                    if (taken)
+                    {
+                        if (Parent.AsyncId == 0) // Capturing the lock...
+                        {
+                            Print($"Capturing Async: {this}");
+                            Parent.ThreadId = EnvironmentId;
+                            Parent.AsyncId = AsyncHolder.Value;
+                            Parent.Count++;
+
+                            Print($"Captured Async: {this}");
+                            Captured = true;
+                            break;
+                        }
+
+                        else if (Parent.AsyncId == OldAsyncId) // Increasing the lock...
+                        {
+                            Print($"Increasing Async: {this}");
+                            Parent.AsyncId = AsyncHolder.Value;
+                            Parent.Count++;
+
+                            Print($"Increased Async: {this}");
+                            Captured = true;
+                            break;
+                        }
+
+                        else // Cannot handle any other situation...
+                        {
+                            throw new UnExpectedException(
+                                "Unknown situation.")
+                                .WithData(Parent, nameof(AsyncLock));
+                        }
+                    }
+
+                    if (ms >= 0) // Let's wait the requested timeout, if needed...
+                    {
+                        var now = DateTime.UtcNow;
+
+                        if ((now - ini) > timeout) throw new TimeoutException(
+                            "Timeout has expired.")
+                            .WithData(Parent, nameof(AsyncLock));
+                    }
+                }
+                finally // Always releasing the semaphore if taken....
+                {
+                    if (taken) Parent.Semaphore.Release();
+                }
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Invoked when trying to enter the lock, capturing it or increasing its reentrancy count.
+        /// </summary>
+        /// <param name="timeout"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        internal async ValueTask<Surrogate> EnterAsync(TimeSpan timeout, CancellationToken token)
+        {
+            var ms = timeout.ValidateTimeout();
+            var ini = DateTime.UtcNow;
+
+            while (true)
+            {
+                var taken = false; // Initializing status...
+
+                try // Trying to capture the semaphore...
+                {
+                    taken = await Parent.Semaphore.WaitAsync(timeout, token).ConfigureAwait(false);
+                    if (taken)
+                    {
+                        if (Parent.AsyncId == 0) // Capturing the lock...
+                        {
+                            Print($"Capturing Async: {this}");
+                            Parent.ThreadId = EnvironmentId;
+                            Parent.AsyncId = AsyncHolder.Value;
+                            Parent.Count++;
+
+                            Print($"Captured Async: {this}");
+                            Captured = true;
+                            break;
+                        }
+
+                        else if (Parent.AsyncId == OldAsyncId) // Increasing the lock...
+                        {
+                            Print($"Increasing Async: {this}");
+                            Parent.AsyncId = AsyncHolder.Value;
+                            Parent.Count++;
+
+                            Print($"Increased Async: {this}");
+                            Captured = true;
+                            break;
+                        }
+
+                        else // Cannot handle any other situation...
+                        {
+                            throw new UnExpectedException(
+                                "Unknown situation.")
+                                .WithData(Parent, nameof(AsyncLock));
+                        }
+                    }
+
+                    if (ms >= 0) // Let's wait the requested timeout, if needed...
+                    {
+                        var now = DateTime.UtcNow;
+
+                        if ((now-ini) > timeout) throw new TimeoutException(
+                            "Timeout has expired.")
+                            .WithData(Parent, nameof(AsyncLock));
+                    }
+                }
+                finally // Always releasing the semaphore if taken....
+                {
+                    if (taken) Parent.Semaphore.Release();
+                }
+            }
+
+            return this;
+        }
 
         // ------------------------------------------------
 
@@ -47,7 +207,7 @@ public partial class AsyncLock
                 Parent.Semaphore.Wait();
                 try
                 {
-                    Print(Gray, $"Sync disposing: {this}");
+                    Print(Gray, $"Disposing Async: {this}");
 
                     Parent.Count--;
                     Parent.ThreadId = Parent.Count == 0 ? 0 : OldThreadId;
@@ -56,7 +216,6 @@ public partial class AsyncLock
                 }
                 finally
                 {
-                    Parent.Semaphore.Release();
                 }
             }
         }
@@ -76,7 +235,7 @@ public partial class AsyncLock
                 await Parent.Semaphore.WaitAsync().ConfigureAwait(false);
                 try
                 {
-                    Print(Gray, $"Async disposing: {this}");
+                    Print(Gray, $"Disposing Async: {this}");
 
                     Parent.Count--;
                     Parent.ThreadId = Parent.Count == 0 ? 0 : OldThreadId;
@@ -85,151 +244,8 @@ public partial class AsyncLock
                 }
                 finally
                 {
-                    Parent.Semaphore.Release();
                 }
             }
         }
-
-        // ------------------------------------------------
-
-        /// <summary>
-        /// Invoked when trying to enter the lock.
-        /// </summary>
-        /// <param name="timeout"></param>
-        /// <returns></returns>
-        internal Surrogate Enter(TimeSpan timeout)
-        {
-            var ms = timeout.ValidateTimeout();
-            var ini = DateTime.UtcNow;
-
-            while (true)
-            {
-                var taken = false;
-                try
-                {
-                    taken = Parent.Semaphore.Wait(timeout);
-                    if (taken)
-                    {
-                        if (Parent.AsyncId == 0)
-                        {
-                            Print($"Sync capturing : {this}");
-                            Parent.ThreadId = EnvironmentId;
-                            Parent.AsyncId = AsyncHolder.Value;
-                            Parent.Count++;
-
-                            Print($"Sync captured  : {this}");
-                            Captured = true;
-                            break;
-                        }
-                        if (Parent.AsyncId == OldAsyncId)
-                        {
-                            Print($"Sync increasing : {this}");
-                            Parent.AsyncId = AsyncHolder.Value;
-                            Parent.Count++;
-
-                            Print($"Sync increased  : {this}");
-                            Captured = true;
-                            break;
-                        }
-                    }
-
-                    if (ms >= 0)
-                    {
-                        var now = DateTime.UtcNow;
-                        if ((now - ini) > timeout) throw new TimeoutException(
-                            "Timeout has expired.")
-                            .WithData(Parent, nameof(AsyncLock));
-                    }
-                }
-                finally
-                {
-                    if (taken) Parent.Semaphore.Release();
-                }
-            }
-
-            return this;
-        }
-
-        /// <summary>
-        /// Invoked when trying to enter the lock.
-        /// </summary>
-        /// <param name="timeout"></param>
-        /// <param name="token"></param>
-        /// <returns></returns>
-        internal async ValueTask<Surrogate> EnterAsync(TimeSpan timeout, CancellationToken token)
-        {
-            var ms = timeout.ValidateTimeout();
-            var ini = DateTime.UtcNow;
-
-            while (true)
-            {
-                var taken = false;
-                try
-                {
-                    taken = await Parent.Semaphore.WaitAsync(timeout, token).ConfigureAwait(false);
-                    if (taken)
-                    {
-                        if (Parent.AsyncId == 0)
-                        {
-                            Print($"Async capturing: {this}");
-                            Parent.ThreadId = EnvironmentId;
-                            Parent.AsyncId = AsyncHolder.Value;
-                            Parent.Count++;
-
-                            Print($"Async captured : {this}");
-                            Captured = true;
-                            break;
-                        }
-                        if (Parent.AsyncId == OldAsyncId)
-                        {
-                            Print($"Async increasing: {this}");
-                            Parent.AsyncId = AsyncHolder.Value;
-                            Parent.Count++;
-
-                            Print($"Async increased : {this}");
-                            Captured = true;
-                            break;
-                        }
-                    }
-
-                    if (ms >= 0)
-                    {
-                        var now = DateTime.UtcNow;
-                        if ((now - ini) > timeout) throw new TimeoutException(
-                            "Timeout has expired.")
-                            .WithData(Parent, nameof(AsyncLock));
-                    }
-                }
-                finally
-                {
-                    if (taken) Parent.Semaphore.Release();
-                }
-            }
-
-            return this;
-        }
-
-        // ------------------------------------------------
-
-        readonly int OldThreadId;
-        readonly long OldAsyncId;
-
-        /// <summary>
-        /// The parent lock this instance refers to.
-        /// </summary>
-        public AsyncLock Parent { get; }
-
-        /// <summary>
-        /// Determines if this instance has captured its parent lock, or increased its reentrancy
-        /// count, or not.
-        /// </summary>
-        public bool Captured { get; private set; }
-
-        /// <summary>
-        /// The state data passed to this instance when capturing a lock, or null if any.
-        /// </summary>
-        public object? Data { get; }
-
-        string GetData() => Data is null ? string.Empty : $"Data:{Data}";
     }
 }

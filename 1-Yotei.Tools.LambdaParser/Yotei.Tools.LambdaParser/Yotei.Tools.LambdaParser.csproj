@@ -27,7 +27,7 @@
    </ItemGroup>
 
    <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-	  <DefineConstants>$(DefineConstants);DEBUG_LAMBDA_PARSER</DefineConstants>
+	  <!--<DefineConstants>$(DefineConstants);DEBUG_LAMBDA_PARSER</DefineConstants>-->
    </PropertyGroup>
 
    <!-- DEBUG configuration -->
