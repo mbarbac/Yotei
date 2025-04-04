@@ -6,6 +6,8 @@
 /// </summary>
 public static class DebugEx
 {
+    static object ColorSync = new();
+
     /// <summary>
     /// Determines if the debug environment shall be considered at the origin of a line, or not.
     /// </summary>
@@ -140,9 +142,12 @@ public static class DebugEx
     [Conditional("DEBUG")]
     public static void Write(bool console, ConsoleColor forecolor, string? message, params object?[] args)
     {
-        var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
-        Write(console, message, args);
-        Console.ForegroundColor = oldfore;
+        lock (ColorSync)
+        {
+            var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
+            Write(console, message, args);
+            Console.ForegroundColor = oldfore;
+        }
     }
 
     /// <summary>
@@ -157,11 +162,14 @@ public static class DebugEx
     [Conditional("DEBUG")]
     public static void Write(bool console, ConsoleColor forecolor, ConsoleColor backcolor, string? message, params object?[] args)
     {
-        var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
-        var oldback = Console.BackgroundColor; Console.BackgroundColor = backcolor;
-        Write(console, message, args);
-        Console.ForegroundColor = oldfore;
-        Console.BackgroundColor = oldback;
+        lock (ColorSync)
+        {
+            var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
+            var oldback = Console.BackgroundColor; Console.BackgroundColor = backcolor;
+            Write(console, message, args);
+            Console.ForegroundColor = oldfore;
+            Console.BackgroundColor = oldback;
+        }
     }
 
     // ----------------------------------------------------
@@ -272,9 +280,12 @@ public static class DebugEx
     [Conditional("DEBUG")]
     public static void WriteLine(bool console, ConsoleColor forecolor, string? message, params object?[] args)
     {
-        var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
-        WriteLine(console, message, args);
-        Console.ForegroundColor = oldfore;
+        lock (ColorSync)
+        {
+            var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
+            WriteLine(console, message, args);
+            Console.ForegroundColor = oldfore;
+        }
     }
 
     /// <summary>
@@ -290,11 +301,14 @@ public static class DebugEx
     [Conditional("DEBUG")]
     public static void WriteLine(bool console, ConsoleColor forecolor, ConsoleColor backcolor, string? message, params object?[] args)
     {
-        var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
-        var oldback = Console.BackgroundColor; Console.BackgroundColor = backcolor;
-        WriteLine(console, message, args);
-        Console.ForegroundColor = oldfore;
-        Console.BackgroundColor = oldback;
+        lock (ColorSync)
+        {
+            var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
+            var oldback = Console.BackgroundColor; Console.BackgroundColor = backcolor;
+            WriteLine(console, message, args);
+            Console.ForegroundColor = oldfore;
+            Console.BackgroundColor = oldback;
+        }
     }
 
     // ----------------------------------------------------

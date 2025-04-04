@@ -41,7 +41,7 @@ public partial class AsyncLock : DisposableClass
     public AsyncLock() { }
 
     /// <inheritdoc/>
-    public override string ToString() => $"({ThreadId}/{AsyncId}, #:{Count})";
+    public override string ToString() => $"(Thread:{ThreadId}/Async:{AsyncId}, #Count:{Count})";
 
     /// <inheritdoc/>
     protected override void OnDispose(bool disposing)
@@ -69,7 +69,10 @@ public partial class AsyncLock : DisposableClass
     /// <param name="timeout"></param>
     /// <param name="data"></param>
     /// <returns></returns>
-    public Surrogate Lock(object? data = null) => Lock(Timeout.InfiniteTimeSpan, data);
+    public Surrogate Lock(object? data = null)
+    {
+        return Lock(Timeout.InfiniteTimeSpan, data);
+    }
 
     /// <summary>
     /// Tries to capture this lock waiting at most for the given amount of time. Returns a
@@ -100,9 +103,10 @@ public partial class AsyncLock : DisposableClass
     /// <param name="token"></param>
     /// <param name="data"></param>
     /// <returns></returns>
-    public ValueTask<Surrogate> LockAsync(
-        object? data = null)
-        => LockAsync(data, CancellationToken.None);
+    public ValueTask<Surrogate> LockAsync(object? data = null)
+    {
+        return LockAsync(data, CancellationToken.None);
+    }
 
     /// <summary>
     /// Tries to capture this lock while observing the given cancellation token, if any. Returns
@@ -114,9 +118,10 @@ public partial class AsyncLock : DisposableClass
     /// <param name="data"></param>
     /// <param name="token"></param>
     /// <returns></returns>
-    public ValueTask<Surrogate> LockAsync(
-        object? data = null, CancellationToken token = default)
-        => LockAsync(Timeout.InfiniteTimeSpan, data, token);
+    public ValueTask<Surrogate> LockAsync(object? data = null, CancellationToken token = default)
+    {
+        return LockAsync(Timeout.InfiniteTimeSpan, data, token);
+    }
 
     /// <summary>
     /// Tries to capture this lock waiting at most for the given amount of time. Returns a
@@ -129,9 +134,10 @@ public partial class AsyncLock : DisposableClass
     /// <param name="token"></param>
     /// <param name="data"></param>
     /// <returns></returns>
-    public ValueTask<Surrogate> LockAsync(
-        TimeSpan timeout, object? data = null)
-        => LockAsync(timeout, data, CancellationToken.None);
+    public ValueTask<Surrogate> LockAsync(TimeSpan timeout, object? data = null)
+    {
+        return LockAsync(timeout, data, CancellationToken.None);
+    }
 
     /// <summary>
     /// Tries to capture this lock waiting at most for the given amount of time, while observing

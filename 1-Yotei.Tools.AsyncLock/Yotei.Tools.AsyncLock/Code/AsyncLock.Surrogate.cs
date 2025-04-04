@@ -28,7 +28,7 @@ public partial class AsyncLock
 
         /// <inheritdoc/>
         public override string ToString()
-            => $"Old:({OldThreadId}/{OldAsyncId}), Lock:{Parent}, {GetData()}";
+            => $"Old:(Thread:{OldThreadId}/Async:{OldAsyncId}), Lock:{Parent}, {GetData()}";
 
         /// <summary>
         /// The lock this instance refers to.
@@ -46,7 +46,7 @@ public partial class AsyncLock
         /// </summary>
         public object? Data { get; }
 
-        string GetData() => Data is null ? string.Empty : $"Data:{Data}";
+        string GetData() => Data is null ? string.Empty : $"Data: {Data}";
 
         readonly int OldThreadId;
         readonly ulong OldAsyncId;
@@ -146,7 +146,7 @@ public partial class AsyncLock
                             break;
                         }
 
-                        else if (Parent.AsyncId == OldAsyncId) // Increasing the lock...
+                        if (Parent.AsyncId == OldAsyncId) // Increasing the lock...
                         {
                             Print($"Increasing Async: {this}");
                             Parent.AsyncId = AsyncHolder.Value;
@@ -155,13 +155,6 @@ public partial class AsyncLock
                             Print($"Increased Async: {this}");
                             Captured = true;
                             break;
-                        }
-
-                        else // Cannot handle any other situation...
-                        {
-                            throw new UnExpectedException(
-                                "Unknown situation.")
-                                .WithData(Parent, nameof(AsyncLock));
                         }
                     }
 

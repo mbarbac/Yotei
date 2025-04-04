@@ -150,8 +150,11 @@ public static class Test_AsyncLock
         }
         ThrowOrWaitAll(tasks.ToArray());
 
-        if (!info.Captured) throw new Exception(
-            "Timeout exceptions expected but not captured!");
+        if (!info.Captured)
+        {
+            WriteLine(true, Red, $"**** Timeout exceptions expected but not captured!");
+            throw new InvalidOperationException();
+        }
     }
 
     // ----------------------------------------------------
@@ -195,12 +198,9 @@ public static class Test_AsyncLock
             }
             else throw;
         }
-
-        if (!info.Captured) throw new Exception(
-            "Timeout exceptions expected but not captured!");
     }
 
-    [Enforced]
+    //[Enforced]
     [Fact]
     public static void Test_Async_Async()
     {
@@ -214,20 +214,180 @@ public static class Test_AsyncLock
         ThrowOrWaitAll(tasks.ToArray());
     }
 
-    /*
     //[Enforced]
     [Fact]
-    public static void Test_Sync_Sync_Timeout()
+    public static void Test_Async_Async_Timeout()
     {
         using var info = new Info();
         var tasks = new List<Task>(); for (int i = 0; i < NUM; i++)
         {
             var str = $"{i + 1}";
-            var task = Task.Run(() => Create_Sync_Sync(info, str, 0, TIMEOUT));
+            var task = Task.Run(() => Create_Async_Async(info, str, 0, TIMEOUT));
             tasks.Add(task);
         }
         ThrowOrWaitAll(tasks.ToArray());
 
-        
-    }*/
+        if (!info.Captured)
+        {
+            WriteLine(true, Red, $"**** Timeout exceptions expected but not captured!");
+            throw new InvalidOperationException();
+        }
+    }
+
+    // ----------------------------------------------------
+
+    static void Create_Sync_Async(Info info, string id, int level, int timeout)
+    {
+        WriteLine(true, Blue, $"Locking: {info.Locker}, Id: {id}");
+
+        var span = TimeSpan.FromMilliseconds(timeout);
+        try
+        {
+            using var disposable = info.Locker.Lock(span, id);
+
+            WriteLine(true, Magenta, $"Locked: {info.Locker}, Id: {id}");
+
+            var old = info.Value;
+            var temp = info.Value = info.NewValue();
+
+            if (level < DEEP)
+            {
+                level++;
+                var str = $"{id}.{level}";
+
+                var task = Create_Async_Sync(info, str, level, timeout);
+                task.GetAwaiter().GetResult();
+
+                if (info.Value != temp)
+                    throw new Exception($"Value:{info.Value}, Old:{old}, Temp:{temp}");
+            }
+
+            Thread.Sleep(WAIT);
+            info.Value = old;
+
+            WriteLine(Green, $"Unlocking: {disposable}");
+        }
+        catch (TimeoutException)
+        {
+            if (timeout >= 0)
+            {
+                info.Captured = true;
+                WriteLine(true, Red, $"** Timeout exception: {info.Locker}, Id: {id}");
+            }
+            else throw;
+        }
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Sync_Async()
+    {
+        using var info = new Info();
+        var tasks = new List<Task>(); for (int i = 0; i < NUM; i++)
+        {
+            var str = $"{i + 1}";
+            var task = Task.Run(() => Create_Sync_Async(info, str, 0, -1));
+            tasks.Add(task);
+        }
+        ThrowOrWaitAll(tasks.ToArray());
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Sync_Async_Timeout()
+    {
+        using var info = new Info();
+        var tasks = new List<Task>(); for (int i = 0; i < NUM; i++)
+        {
+            var str = $"{i + 1}";
+            var task = Task.Run(() => Create_Sync_Async(info, str, 0, TIMEOUT));
+            tasks.Add(task);
+        }
+        ThrowOrWaitAll(tasks.ToArray());
+
+        if (!info.Captured)
+        {
+            WriteLine(true, Red, $"**** Timeout exceptions expected but not captured!");
+            throw new InvalidOperationException();
+        }
+    }
+
+    // ----------------------------------------------------
+
+    static async Task Create_Async_Sync(Info info, string id, int level, int timeout)
+    {
+        WriteLine(true, Blue, $"Locking: {info.Locker}, Id: {id}");
+
+        var span = TimeSpan.FromMilliseconds(timeout);
+        try
+        {
+            await using var disposable =
+                await info.Locker.LockAsync(span, id).ConfigureAwait(false);
+
+            WriteLine(true, Magenta, $"Locked: {info.Locker}, Id: {id}");
+
+            var old = info.Value;
+            var temp = info.Value = info.NewValue();
+
+            if (level < DEEP)
+            {
+                level++;
+                var str = $"{id}.{level}";
+
+                await Task.Run(()
+                    => Create_Sync_Async(info, str, level, timeout)).ConfigureAwait(false);
+
+                if (info.Value != temp)
+                    throw new Exception($"Value:{info.Value}, Old:{old}, Temp:{temp}");
+            }
+
+            await Task.Delay(WAIT).ConfigureAwait(false);
+            info.Value = old;
+
+            WriteLine(Green, $"Unlocking: {disposable}");
+        }
+        catch (TimeoutException)
+        {
+            if (timeout >= 0)
+            {
+                info.Captured = true;
+                WriteLine(true, Red, $"** Timeout exception: {info.Locker}, Id: {id}");
+            }
+            else throw;
+        }
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Async_Sync()
+    {
+        using var info = new Info();
+        var tasks = new List<Task>(); for (int i = 0; i < NUM; i++)
+        {
+            var str = $"{i + 1}";
+            var task = Create_Async_Sync(info, str, 0, -1);
+            tasks.Add(task);
+        }
+        ThrowOrWaitAll(tasks.ToArray());
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Async_Sync_Timeout()
+    {
+        using var info = new Info();
+        var tasks = new List<Task>(); for (int i = 0; i < NUM; i++)
+        {
+            var str = $"{i + 1}";
+            var task = Create_Async_Sync(info, str, 0, TIMEOUT);
+            tasks.Add(task);
+        }
+        ThrowOrWaitAll(tasks.ToArray());
+
+        if (!info.Captured)
+        {
+            WriteLine(true, Red, $"**** Timeout exceptions expected but not captured!");
+            throw new InvalidOperationException();
+        }
+    }
 }

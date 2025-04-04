@@ -27,7 +27,7 @@
    </ItemGroup>
 
    <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-	  <!--<DefineConstants>$(DefineConstants);DEBUG_ASYNC_LOCK</DefineConstants>-->
+	  <DefineConstants>$(DefineConstants);DEBUG_ASYNC_LOCK</DefineConstants>
    </PropertyGroup>
 
    <!-- DEBUG configuration -->
