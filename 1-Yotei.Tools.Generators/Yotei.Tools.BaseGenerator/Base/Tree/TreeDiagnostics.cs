@@ -180,6 +180,57 @@ internal static class TreeDiagnostics
             location);
     }
 
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Records are not supported.
+    /// </summary>
+    /// <param name="syntax"></param>
+    /// <param name="severity"></param>
+    /// <returns></returns>
+    public static Diagnostic RecordsNotSupported(
+        SyntaxNode syntax,
+        DiagnosticSeverity severity = DiagnosticSeverity.Error)
+    {
+        var text = syntax.GetText().ToString()
+            .Replace('\r', ' ').Replace('\n', ' ')
+            .Replace("  ", " ")
+            .Trim();
+
+        var id = "TreeGen05";
+        var head = "Records are not supported.";
+        var desc = $"Records are not supported: '{syntax.Kind()}', '{text}'.";
+        var location = syntax.GetLocation();
+
+        return Diagnostic.Create(new DiagnosticDescriptor(
+            id, head, desc, "Yotei",
+            severity, isEnabledByDefault: true),
+            location);
+    }
+
+    /// <summary>
+    /// Records are not supported.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="severity"></param>
+    /// <returns></returns>
+    public static Diagnostic RecordsNotSupported(
+        ITypeSymbol type,
+        DiagnosticSeverity severity = DiagnosticSeverity.Error)
+    {
+        var id = "TreeGen05";
+        var head = "Records are not supported.";
+        var desc = $"Records not supported: '{type.Name}'.";
+        var location =
+            type.Locations.FirstOrDefault() ??
+            type.GetSyntaxNodes().FirstOrDefault()?.GetLocation();
+
+        return Diagnostic.Create(new DiagnosticDescriptor(
+            id, head, desc, "Yotei",
+            severity, isEnabledByDefault: true),
+            location);
+    }
+
     // -----------------------------------------------------
 
     /// <summary>
@@ -192,7 +243,7 @@ internal static class TreeDiagnostics
         ITypeSymbol type,
         DiagnosticSeverity severity = DiagnosticSeverity.Error)
     {
-        var id = "TreeGen05";
+        var id = "TreeGen06";
         var head = "Type is not partial.";
         var desc = $"Type '{type.Name}' is not partial.";
         var location =
@@ -217,7 +268,7 @@ internal static class TreeDiagnostics
         ITypeSymbol type,
         DiagnosticSeverity severity = DiagnosticSeverity.Error)
     {
-        var id = "TreeGen06";
+        var id = "TreeGen07";
         var head = "Type has not a copy constructor.";
         var desc = $"Type '{type.Name}' has not a suitable copy constructor.";
         var location =
@@ -242,7 +293,7 @@ internal static class TreeDiagnostics
         IPropertySymbol item,
         DiagnosticSeverity severity = DiagnosticSeverity.Error)
     {
-        var id = "TreeGen07";
+        var id = "TreeGen08";
         var head = "Property has no getter.";
         var desc = $"Property '{item.Name}' has no getter.";
         var location =
@@ -267,7 +318,7 @@ internal static class TreeDiagnostics
         IPropertySymbol item,
         DiagnosticSeverity severity = DiagnosticSeverity.Error)
     {
-        var id = "TreeGen08";
+        var id = "TreeGen09";
         var head = "Property has no setter.";
         var desc = $"Property '{item.Name}' has no setter.";
         var location =
@@ -292,9 +343,34 @@ internal static class TreeDiagnostics
         IFieldSymbol item,
         DiagnosticSeverity severity = DiagnosticSeverity.Error)
     {
-        var id = "TreeGen09";
+        var id = "TreeGen10";
         var head = "Field is not writtable.";
         var desc = $"Field '{item.Name}' is not writtable.";
+        var location =
+            item.Locations.FirstOrDefault() ??
+            item.GetSyntaxNodes().FirstOrDefault()?.GetLocation();
+
+        return Diagnostic.Create(new DiagnosticDescriptor(
+            id, head, desc, "Yotei",
+            severity, isEnabledByDefault: true),
+            location);
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Indexed properties are not supported.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="severity"></param>
+    /// <returns></returns>
+    public static Diagnostic IndexerNotSupported(
+        IPropertySymbol item,
+        DiagnosticSeverity severity = DiagnosticSeverity.Error)
+    {
+        var id = "TreeGen11";
+        var head = "Indexed properties are not supported.";
+        var desc = $"Indexed properties are not supported: '{item.Name}'.";
         var location =
             item.Locations.FirstOrDefault() ??
             item.GetSyntaxNodes().FirstOrDefault()?.GetLocation();

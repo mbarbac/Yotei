@@ -16,7 +16,7 @@ internal class XTypeNode : TypeNode
 
         if (Symbol.IsRecord)
         {
-            TreeDiagnostics.KindNotSupported(Symbol).Report(context);
+            TreeDiagnostics.RecordsNotSupported(Symbol).Report(context);
             r = false;
         }
 
@@ -305,7 +305,7 @@ internal class XTypeNode : TypeNode
     /// are considered.
     /// <br/> Returns <c>null</c> if not found.
     /// </summary>
-    IMethodSymbol? FindMethod(
+    public static IMethodSymbol? FindMethod(
         ITypeSymbol type,
         bool top = true,
         bool chain = false, bool ifaces = false)
@@ -344,7 +344,7 @@ internal class XTypeNode : TypeNode
     /// <param name="chain"></param>
     /// <param name="ifaces"></param>
     /// <returns></returns>
-    AttributeData? FindCloneableAttribute(
+    public static AttributeData? FindCloneableAttribute(
         ITypeSymbol type,
         bool top = true,
         bool chain = false, bool ifaces = false)
@@ -378,7 +378,7 @@ internal class XTypeNode : TypeNode
     /// <param name="at"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    bool GetPreventVirtualValue(AttributeData at, out bool value)
+    public static bool GetPreventVirtualValue(AttributeData at, out bool value)
     {
         if (at.GetNamedArgument(nameof(CloneableAttribute.PreventVirtual), out var arg))
         {
@@ -405,7 +405,7 @@ internal class XTypeNode : TypeNode
     /// <param name="chain"></param>
     /// <param name="ifaces"></param>
     /// <returns></returns>
-    bool GetPreventVirtualValue(
+    public static bool GetPreventVirtualValue(
         ITypeSymbol type,
         out bool value,
         bool top = true,
@@ -444,7 +444,7 @@ internal class XTypeNode : TypeNode
     /// <param name="at"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    bool GetAddICloneableValue(AttributeData at, out bool value)
+    public static bool GetAddICloneableValue(AttributeData at, out bool value)
     {
         if (at.GetNamedArgument(nameof(CloneableAttribute.AddICloneable), out var arg))
         {
@@ -471,7 +471,7 @@ internal class XTypeNode : TypeNode
     /// <param name="chain"></param>
     /// <param name="ifaces"></param>
     /// <returns></returns>
-    bool GetAddICloneableValue(
+    public static bool GetAddICloneableValue(
         ITypeSymbol type,
         out bool value,
         bool top = true,
