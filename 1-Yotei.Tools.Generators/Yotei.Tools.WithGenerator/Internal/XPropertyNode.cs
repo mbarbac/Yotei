@@ -46,65 +46,124 @@ internal class XPropertyNode : PropertyNode
 
     // ----------------------------------------------------
 
-    public static AttributeData? FindWithAttribute(
-        IPropertySymbol symbol)
-    {
-        throw null;
-    }
-}
-/*
-
-
-    
-
     /// <summary>
-    /// Tries to find the <see cref="CloneableAttribute"/> in the given type, including its
-    /// inheritance and interfaces chains, if requested. By default, the search starts from the
-    /// given type, but if the <paramref name="top"/> flag is set to <c>false</c>, then only its
-    /// base types and interfaces are considered.
+    /// Finds a compatible member starting by default at the the given type, or otherwise, using
+    /// the type's base ones and interfaces, if requested. Returns null if no member can be found.
     /// </summary>
     /// <param name="type"></param>
     /// <param name="top"></param>
     /// <param name="chain"></param>
     /// <param name="ifaces"></param>
     /// <returns></returns>
-    public static AttributeData? FindWithAttribute(
+    public IPropertySymbol? FindMember(
         ITypeSymbol type,
         bool top = true,
         bool chain = false, bool ifaces = false)
     {
-        var at = top
-            ? type.GetAttributes(typeof(WithAttribute)).FirstOrDefault()
+        var member = top
+            ? type.GetMembers().OfType<IPropertySymbol>().FirstOrDefault(x =>
+                x.Name == Symbol.Name &&
+                x.Parameters.Length == 0 &&
+                Symbol.Type.IsAssignableTo(x.Type))
             : null;
 
-        if (at == null && chain)
+        if (member == null && chain)
         {
             foreach (var temp in type.AllBaseTypes())
-                if ((at = FindWithAttribute(temp)) != null) break;
+            {
+                member = FindMember(temp);
+                if (member != null) break;
+            }
         }
 
-        if (at == null && ifaces)
+        if (member == null && ifaces)
         {
             foreach (var temp in type.AllInterfaces)
-                if ((at = FindWithAttribute(temp)) != null) break;
+            {
+                member = FindMember(temp);
+                if (member != null) break;
+            }
         }
 
-        return at;
+        return member;
+    }
+
+    /// <summary>
+    /// Finds a decorated compatible member starting by default at the the given type, or
+    /// otherwise, using the type's base ones and interfaces, if requested. Returns null if
+    /// no member can be found.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="top"></param>
+    /// <param name="chain"></param>
+    /// <param name="ifaces"></param>
+    /// <returns></returns>
+    public IPropertySymbol? FindDecoratedMember(
+        ITypeSymbol type,
+        bool top = true,
+        bool chain = false, bool ifaces = false)
+    {
+        var member = top
+            ? type.GetMembers().OfType<IPropertySymbol>().FirstOrDefault(x =>
+                x.Name == Symbol.Name &&
+                x.Parameters.Length == 0 &&
+                Symbol.Type.IsAssignableTo(x.Type) &&
+                x.HasAttributes(typeof(WithAttribute)))
+            : null;
+
+        if (member == null && chain)
+        {
+            foreach (var temp in type.AllBaseTypes())
+            {
+                member = FindMember(temp);
+                if (member != null) break;
+            }
+        }
+
+        if (member == null && ifaces)
+        {
+            foreach (var temp in type.AllInterfaces)
+            {
+                member = FindMember(temp);
+                if (member != null) break;
+            }
+        }
+
+        return member;
     }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Tries to get the value of the <see cref="WithAttribute.InheritMembers"/> property
+    /// Finds the <see cref="WithAttribute"/> in the given type, including its inheritance and
+    /// interfaces chains, if requested, or null if not found.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="chain"></param>
+    /// <param name="ifaces"></param>
+    /// <returns></returns>
+    public AttributeData? FindWithAttribute(
+        ITypeSymbol type,
+        bool chain = false, bool ifaces = false)
+    {
+        var member = FindDecoratedMember(type, true, chain, ifaces);
+        var item = member?.GetAttributes(typeof(WithAttribute)).FirstOrDefault();
+        return item;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Tries to get the value of the <see cref="WithAttribute.PreventVirtual"/> property
     /// from the given attribute. Returns <c>false</c> if the setting is not found, or otherwise
     /// <c>true</c> and the setting's value in the out argument.
     /// </summary>
     /// <param name="at"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static bool GetInheritMembersValue(AttributeData at, out bool value)
+    public bool GetPreventVirtualValue(AttributeData at, out bool value)
     {
-        if (at.GetNamedArgument(nameof(WithAttribute.InheritMembers), out var arg))
+        if (at.GetNamedArgument(nameof(WithAttribute.PreventVirtual), out var arg))
         {
             if (!arg.Value.IsNull && arg.Value.Value is bool temp)
             {
@@ -117,8 +176,8 @@ internal class XPropertyNode : PropertyNode
     }
 
     /// <summary>
-    /// Tries to find the value of the <see cref="WithAttribute.InheritMembers"/> property
-    /// in the given type, including  inheritance and interfaces chains, if requested. By default,
+    /// Tries to find the value of the <see cref="WithAttribute.PreventVirtual"/> property
+    /// in this member, or in its base type's ones and interfaces , if requested. By default,
     /// the search starts from the given type, but if the <paramref name="top"/> flag is set to
     /// <c>false</c>, then only its base types and interfaces are considered.
     /// </summary>
@@ -128,12 +187,26 @@ internal class XPropertyNode : PropertyNode
     /// <param name="chain"></param>
     /// <param name="ifaces"></param>
     /// <returns></returns>
-    public static bool GetInheritMembersValue(
+    public bool GetPreventVirtualValue(
         ITypeSymbol type,
         out bool value,
         bool top = true,
         bool chain = false, bool ifaces = false)
     {
+        AttributeData? at = null;
+
+        if (top) at = FindWithAttribute(type, chain, false);
+        else
+        {
+            var host = type.BaseType;
+            if (host != null) at = FindWithAttribute(host, chain, ifaces);
+        }
+
+        value = at != null && (GetPreventVirtualValue(at, out var temp) && temp);
+        return at != null;
+    }
+}
+/*
         var at = FindWithAttribute(type, top, chain, ifaces);
 
         if (at != null)
@@ -156,4 +229,4 @@ internal class XPropertyNode : PropertyNode
         value = default;
         return false;
     }
-*/
+ */

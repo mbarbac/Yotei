@@ -319,13 +319,19 @@ internal class XTypeNode : TypeNode
         if (item == null && chain) // Inheritance chain requested...
         {
             foreach (var temp in type.AllBaseTypes())
-                if ((item = FindMethod(temp)) != null) break;
+            {
+                item = FindMethod(temp);
+                if (item != null) break;
+            }
         }
 
         if (item == null && ifaces) // Interfaces requested...
         {
             foreach (var temp in type.AllInterfaces)
-                if ((item = FindMethod(temp)) != null) break;
+            {
+                item = FindMethod(temp);
+                if (item != null) break;
+            }
         }
 
         return item;
@@ -356,13 +362,19 @@ internal class XTypeNode : TypeNode
         if (at == null && chain)
         {
             foreach (var temp in type.AllBaseTypes())
-                if ((at = FindCloneableAttribute(temp)) != null) break;
+            {
+                at = FindCloneableAttribute(temp);
+                if (at != null) break;
+            }
         }
 
         if (at == null && ifaces)
         {
             foreach (var temp in type.AllInterfaces)
-                if ((at = FindCloneableAttribute(temp)) != null) break;
+            {
+                at = FindCloneableAttribute(temp);
+                if (at != null) break;
+            }
         }
 
         return at;

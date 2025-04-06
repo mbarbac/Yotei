@@ -125,13 +125,19 @@ internal class XTypeNode : TypeNode
         if (at == null && chain)
         {
             foreach (var temp in type.AllBaseTypes())
-                if ((at = FindWithAttribute(temp)) != null) break;
+            {
+                at = FindWithAttribute(temp);
+                if (at != null) break;
+            }
         }
 
         if (at == null && ifaces)
         {
             foreach (var temp in type.AllInterfaces)
-                if ((at = FindWithAttribute(temp)) != null) break;
+            {
+                at = FindWithAttribute(temp);
+                if (at != null) break;
+            }
         }
 
         return at;
