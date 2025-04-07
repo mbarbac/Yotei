@@ -4,12 +4,12 @@
 /// <summary>
 /// Generates 'With()' methods for types or member decorated with the <see cref="WithAttribute"/>.
 /// </summary>
-[Generator(LanguageNames.CSharp)]
+//[Generator(LanguageNames.CSharp)]
 internal class WithGenerator : TreeGenerator
 {
 #if DEBUG_WITH_GENERATOR
     /// <inheritdoc/>
-    protected override bool LaunchDebugger => true;
+    //protected override bool LaunchDebugger => true;
 #endif
 
     // ----------------------------------------------------

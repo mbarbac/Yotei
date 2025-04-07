@@ -122,7 +122,7 @@ internal class XTypeNode : TypeNode
                 }
 
                 // Or that method is being implemented...
-                var at = FindCloneableAttribute(host, chain: true, ifaces: true);
+                var at = FindCloneableAttribute(host, chain: true);
                 if (at != null)
                 {
                     return "public abstract override ";
@@ -198,7 +198,7 @@ internal class XTypeNode : TypeNode
                 }
 
                 // Or that method is being implemented...
-                var at = FindCloneableAttribute(host, chain: true, ifaces: true);
+                var at = FindCloneableAttribute(host, chain: true);
                 if (at != null)
                 {
                     return prevent ? "public new " : "public override ";
