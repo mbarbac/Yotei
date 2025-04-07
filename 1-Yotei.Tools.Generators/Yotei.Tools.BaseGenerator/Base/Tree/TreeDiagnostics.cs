@@ -41,10 +41,8 @@ internal static class TreeDiagnostics
 
     // ----------------------------------------------------
 
-    /// <summary>
-    /// Factorizes common code.
-    /// </summary>
-    private static Diagnostic CreateSymbolNotFoundDiagnostic(
+    // Factorizes common code.
+    private static Diagnostic CreateSymbolNotFoundForSyntax(
         SyntaxNode syntax,
         string type,
         DiagnosticSeverity severity)
@@ -66,10 +64,10 @@ internal static class TreeDiagnostics
     /// <param name="syntax"></param>
     /// <param name="severity"></param>
     /// <returns></returns>
-    public static Diagnostic SymbolNotFound(
+    public static Diagnostic SymbolNotFoundForSyntax(
         TypeDeclarationSyntax syntax,
         DiagnosticSeverity severity = DiagnosticSeverity.Error)
-        => CreateSymbolNotFoundDiagnostic(syntax, "type", severity);
+        => CreateSymbolNotFoundForSyntax(syntax, "type", severity);
 
     /// <summary>
     /// Cannot find a symbol associated to the given syntax.
@@ -77,10 +75,10 @@ internal static class TreeDiagnostics
     /// <param name="syntax"></param>
     /// <param name="severity"></param>
     /// <returns></returns>
-    public static Diagnostic SymbolNotFound(
+    public static Diagnostic SymbolNotFoundForSyntax(
         PropertyDeclarationSyntax syntax,
         DiagnosticSeverity severity = DiagnosticSeverity.Error)
-        => CreateSymbolNotFoundDiagnostic(syntax, "property", severity);
+        => CreateSymbolNotFoundForSyntax(syntax, "property", severity);
 
     /// <summary>
     /// Cannot find a symbol associated to the given syntax.
@@ -88,10 +86,10 @@ internal static class TreeDiagnostics
     /// <param name="syntax"></param>
     /// <param name="severity"></param>
     /// <returns></returns>
-    public static Diagnostic SymbolNotFound(
+    public static Diagnostic SymbolNotFoundForSyntax(
         FieldDeclarationSyntax syntax,
         DiagnosticSeverity severity = DiagnosticSeverity.Error)
-        => CreateSymbolNotFoundDiagnostic(syntax, "field", severity);
+        => CreateSymbolNotFoundForSyntax(syntax, "field", severity);
 
     /// <summary>
     /// Cannot find a symbol associated to the given syntax.
@@ -99,10 +97,76 @@ internal static class TreeDiagnostics
     /// <param name="syntax"></param>
     /// <param name="severity"></param>
     /// <returns></returns>
-    public static Diagnostic SymbolNotFound(
+    public static Diagnostic SymbolNotFoundForSyntax(
         MethodDeclarationSyntax syntax,
         DiagnosticSeverity severity = DiagnosticSeverity.Error)
-        => CreateSymbolNotFoundDiagnostic(syntax, "method", severity);
+        => CreateSymbolNotFoundForSyntax(syntax, "method", severity);
+
+    // ----------------------------------------------------
+
+    // Factorizes common code.
+    private static Diagnostic CreateSymbolNotFound(
+        ISymbol symbol,
+        string type,
+        DiagnosticSeverity severity)
+    {
+        var id = "TreeGen02";
+        var head = $"{type} symbol not found.";
+        var desc = $"{type} symbol not found: '{symbol.Name}'.";
+
+        var location =
+            symbol.Locations.FirstOrDefault() ??
+            symbol.GetSyntaxNodes().FirstOrDefault()?.GetLocation();
+
+        return Diagnostic.Create(new DiagnosticDescriptor(
+            id, head, desc, "Yotei",
+            severity, isEnabledByDefault: true),
+            location);
+    }
+
+    /// <summary>
+    /// Cannot find the given symbol.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <param name="severity"></param>
+    /// <returns></returns>
+    public static Diagnostic SymbolNotFound(
+        ITypeSymbol symbol,
+        DiagnosticSeverity severity = DiagnosticSeverity.Error)
+        => CreateSymbolNotFound(symbol, "Type", severity);
+
+    /// <summary>
+    /// Cannot find the given symbol.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <param name="severity"></param>
+    /// <returns></returns>
+    public static Diagnostic SymbolNotFound(
+        IPropertySymbol symbol,
+        DiagnosticSeverity severity = DiagnosticSeverity.Error)
+        => CreateSymbolNotFound(symbol, "Property", severity);
+
+    /// <summary>
+    /// Cannot find the given symbol.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <param name="severity"></param>
+    /// <returns></returns>
+    public static Diagnostic SymbolNotFound(
+        IFieldSymbol symbol,
+        DiagnosticSeverity severity = DiagnosticSeverity.Error)
+        => CreateSymbolNotFound(symbol, "Field", severity);
+
+    /// <summary>
+    /// Cannot find the given symbol.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <param name="severity"></param>
+    /// <returns></returns>
+    public static Diagnostic SymbolNotFound(
+        IMethodSymbol symbol,
+        DiagnosticSeverity severity = DiagnosticSeverity.Error)
+        => CreateSymbolNotFound(symbol, "Method", severity);
 
     // ----------------------------------------------------
 

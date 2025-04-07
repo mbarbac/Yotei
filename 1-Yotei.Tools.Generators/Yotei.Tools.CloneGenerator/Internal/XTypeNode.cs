@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools.CloneGenerator;
+﻿using Microsoft.CodeAnalysis.Diagnostics;
+
+namespace Yotei.Tools.CloneGenerator;
 
 // ========================================================
 /// <inheritdoc cref="TypeNode"/>
@@ -58,16 +60,28 @@ internal class XTypeNode : TypeNode
     /// </summary>
     /// <param name="context"></param>
     /// <param name="cb"></param>
-    protected void EmitAsInterface(SourceProductionContext context, CodeBuilder cb)
+    protected void EmitAsInterface(SourceProductionContext _, CodeBuilder cb)
     {
-        throw null;
+        var modifiers = GetModifiers();
+        var typename = Symbol.EasyName(RoslynNameOptions.Default);
+
+        EmitDocumentation(cb);
+        cb.AppendLine($"{modifiers}{typename} Clone();");
 
         /// <summary>
         /// Gets the method modifiers, with a space separator, or null if no modifiers.
         /// </summary>
         string? GetModifiers()
         {
-            throw null;
+            var found = false;
+            var host = Symbol.BaseType;
+
+            if (!found) found = Symbol.AllInterfaces.Any(x => x.Name == "ICloneable");
+            if (!found) found = GetAddICloneableValue(Symbol, out var value, ifaces: true) && value;
+            if (!found && host != null) found = FindCloneMethod(host, ifaces: true) != null;
+            if (!found && host != null) found = FindCloneableAttribute(host, ifaces: true) != null;
+
+            return found ? "new " : null;
         }
     }
 
@@ -80,14 +94,43 @@ internal class XTypeNode : TypeNode
     /// <param name="cb"></param>
     protected void EmitAsAbstract(SourceProductionContext context, CodeBuilder cb)
     {
-        throw null;
+        var modifiers = GetModifiers();
+        var typename = Symbol.EasyName(RoslynNameOptions.Default);
+
+        EmitDocumentation(cb);
+        cb.AppendLine($"{modifiers}{typename} Clone();");
+
+        EmitExplicitInterfaces(context, cb);
 
         /// <summary>
         /// Gets the method modifiers, with a space separator, or null if no modifiers.
         /// </summary>
         string? GetModifiers()
         {
-            throw null;
+            // When symbol is a derived one...
+            var host = Symbol.BaseType;
+            if (host != null && host.Name != "Object")
+            {
+                // There might already be a base method...
+                var method = FindCloneMethod(host, chain: true);
+                if (method != null)
+                {
+                    var access = method.DeclaredAccessibility.ToCSharpString(addspace: true);
+                    var isvirtual = method.IsVirtual || method.IsOverride | method.IsAbstract;
+
+                    return isvirtual ? $"{access}abstract override " : $"{access}abstract ";
+                }
+
+                // Or that method is being implemented...
+                var at = FindCloneableAttribute(host, chain: true, ifaces: true);
+                if (at != null)
+                {
+                    return "public abstract override ";
+                }
+            }
+
+            // Default for abstract types...
+            return "public abstract ";
         }
     }
 
@@ -100,14 +143,70 @@ internal class XTypeNode : TypeNode
     /// <param name="cb"></param>
     protected void EmitAsConcrete(SourceProductionContext context, CodeBuilder cb)
     {
-        throw null;
+        // We need a copy constructor...
+        var ctor = Symbol.GetCopyConstructor(strict: true);
+        if (ctor == null)
+        {
+            TreeDiagnostics.NoCopyConstructor(Symbol).Report(context);
+            return;
+        }
+
+        // Emitting...
+        var modifiers = GetModifiers();
+        var typename = Symbol.EasyName(RoslynNameOptions.Default);
+
+        EmitDocumentation(cb);
+        cb.AppendLine($"{modifiers}{typename} Clone()");
+        cb.AppendLine("{");
+        cb.IndentLevel++;
+        {
+            cb.AppendLine($"var v_temp = new {typename}(this);");
+            cb.AppendLine("return v_temp;");
+        }
+        cb.IndentLevel--;
+        cb.AppendLine("}");
+
+        EmitExplicitInterfaces(context, cb);
 
         /// <summary>
         /// Gets the method modifiers, with a space separator, or null if no modifiers.
         /// </summary>
         string? GetModifiers()
         {
-            throw null;
+            var issealed = Symbol.IsSealed;
+            var prevent = GetPreventVirtualValue(Symbol, out var temp, chain: true, ifaces: true) && temp;
+
+            // When symbol is a derived one...
+            var host = Symbol.BaseType;
+            if (host != null && host.Name != "Object")
+            {
+                // There might already be a base method...
+                var method = FindCloneMethod(host, chain: true);
+                if (method != null)
+                {
+                    var access = method.DeclaredAccessibility;
+                    if (access == Accessibility.Private) return null;
+
+                    var str = access.ToCSharpString(addspace: true);
+                    var isvirtual = method.IsVirtual || method.IsOverride | method.IsAbstract;
+
+                    return isvirtual switch
+                    {
+                        true => $"{str}override ",
+                        false => $"{str}new ",
+                    };
+                }
+
+                // Or that method is being implemented...
+                var at = FindCloneableAttribute(host, chain: true, ifaces: true);
+                if (at != null)
+                {
+                    return prevent ? "public new " : "public override ";
+                }
+            }
+
+            // Default for concrete types...
+            return prevent || issealed ? "public " : "public virtual ";
         }
     }
 
@@ -118,10 +217,19 @@ internal class XTypeNode : TypeNode
     /// </summary>
     /// <param name="_"></param>
     /// <param name="cb"></param>
-    /// <exception cref="System.NullReferenceException"></exception>
     protected void EmitExplicitInterfaces(SourceProductionContext _, CodeBuilder cb)
     {
-        throw null;
+        var ifaces = GetExplicitInterfaces();
+
+        foreach (var iface in ifaces)
+        {
+            var typename = iface.EasyName(RoslynNameOptions.Full with { UseTypeNullable = false });
+            var valuename = iface.Name == "ICloneable" ? "object" : typename;
+
+            cb.AppendLine();
+            cb.AppendLine(valuename);
+            cb.AppendLine($"{typename}.Clone() => ({typename})Clone();");
+        }
     }
 
     /// <summary>
@@ -130,10 +238,61 @@ internal class XTypeNode : TypeNode
     /// <returns></returns>
     List<ITypeSymbol> GetExplicitInterfaces()
     {
-        throw null;
-    }
+        var comparer = SymbolEqualityComparer.Default;
+        var list = new List<ITypeSymbol>();
 
-    // ----------------------------------------------------
+        foreach (var iface in Symbol.Interfaces) Capture(iface);
+        TryICloneable();
+        return list;
+
+        /// <summary>
+        /// Tries to capture the given interface type.
+        /// </summary>
+        bool Capture(ITypeSymbol iface)
+        {
+            var found = false;
+
+            // First, its child interfaces...
+            foreach (var child in iface.Interfaces)
+            {
+                var temp = Capture(child);
+                if (temp) found = true;
+            }
+
+            // An them the given interface itself....
+            found = found ||
+                iface.Name == "ICloneable" ||
+                FindCloneMethod(iface) != null ||
+                FindCloneableAttribute(iface) != null;
+
+            // Adding if needed, and finishing...
+            if (found)
+            {
+                var temp = list.Find(x => comparer.Equals(x, iface));
+                if (temp == null) list.Add(iface);
+            }
+
+            return found;
+        }
+
+        /// <summary>
+        /// Treat <see cref="CloneableAttribute.AddICloneable"/> as a special case.
+        /// </summary>
+        void TryICloneable()
+        {
+            var add = GetAddICloneableValue(Symbol, out var value, chain: true, ifaces: true) && value;
+            if (add)
+            {
+                var comp = GetBranchCompilation();
+                var item = comp.GetTypeByMetadataName("System.ICloneable");
+                if (item != null)
+                {
+                    var temp = list.Find(x => comparer.Equals(x, item));
+                    if (temp == null) list.Add(item);
+                }
+            }
+        }
+    }
 
     // ----------------------------------------------------
 
@@ -162,7 +321,6 @@ internal class XTypeNode : TypeNode
     /// <param name="chain"></param>
     /// <param name="ifaces"></param>
     /// <returns></returns>
-    /// <exception cref="System.NullReferenceException"></exception>
     public IMethodSymbol? FindCloneMethod(ITypeSymbol type, bool chain = false, bool ifaces = false)
     {
         var item = type.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(x =>
@@ -194,8 +352,8 @@ internal class XTypeNode : TypeNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// Tries to find a '<c>CloneableAttribute</c>' attribute in the given type, including also
-    /// its base types and interfaces if requested. Returns null if not found.
+    /// Tries to find a '<see cref="CloneableAttribute"/>' attribute in the given type,
+    /// including also its base types and interfaces if requested. Returns null if not found.
     /// </summary>
     /// <param name="type"></param>
     /// <param name="chain"></param>

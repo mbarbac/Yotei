@@ -37,7 +37,7 @@ internal class Program
         DebugEx.AutoFlush = true;
 
         // Explicit includes and excludes, in order...
-        //Includes.Add(new("Yotei.Tools.AsyncLock.Tests", null, null));
+        //Includes.Add(new("Yotei.Tools.CloneGenerator.Tests", null, null));
 
         // Main menu...
         var done = 0; do

@@ -150,7 +150,7 @@ namespace Yotei.Tools.CloneGenerator.Tests.Abstracts
         {
             var type = typeof(TOther.AbstractFromAbstract<int, int>);
             var iface = typeof(ICloneable);
-            
+
             type.GetInterfaceMap(iface);
         }
 

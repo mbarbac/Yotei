@@ -310,7 +310,7 @@ internal class TreeGenerator : IIncrementalGenerator
         {
             var symbol = model.GetDeclaredSymbol(typeSyntax, token);
             if (symbol == null)
-                return new ErrorCandidate(TreeDiagnostics.SymbolNotFound(typeSyntax));
+                return new ErrorCandidate(TreeDiagnostics.SymbolNotFoundForSyntax(typeSyntax));
 
             var atts = Matches(symbol.GetAttributes(), TypeAttributes).ToImmutableArray();
             if (atts.Length != 0)
@@ -322,7 +322,7 @@ internal class TreeGenerator : IIncrementalGenerator
         {
             var symbol = model.GetDeclaredSymbol(propertySyntax, token);
             if (symbol == null)
-                return new ErrorCandidate(TreeDiagnostics.SymbolNotFound(propertySyntax));
+                return new ErrorCandidate(TreeDiagnostics.SymbolNotFoundForSyntax(propertySyntax));
 
             var atts = Matches(symbol.GetAttributes(), PropertyAttributes).ToImmutableArray();
             if (atts.Length != 0)
@@ -345,7 +345,7 @@ internal class TreeGenerator : IIncrementalGenerator
                 }
             }
 
-            return new ErrorCandidate(TreeDiagnostics.SymbolNotFound(fieldSyntax));
+            return new ErrorCandidate(TreeDiagnostics.SymbolNotFoundForSyntax(fieldSyntax));
         }
 
         // Methods...
@@ -353,7 +353,7 @@ internal class TreeGenerator : IIncrementalGenerator
         {
             var symbol = model.GetDeclaredSymbol(methodSyntax, token);
             if (symbol == null)
-                return new ErrorCandidate(TreeDiagnostics.SymbolNotFound(methodSyntax));
+                return new ErrorCandidate(TreeDiagnostics.SymbolNotFoundForSyntax(methodSyntax));
 
             var atts = Matches(symbol.GetAttributes(), PropertyAttributes).ToImmutableArray();
             if (atts.Length != 0)
