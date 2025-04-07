@@ -1,6 +1,4 @@
-﻿using Yotei.Tools.WithGenerator;
-
-namespace Yotei.Tools.BaseGenerator;
+﻿namespace Yotei.Tools.BaseGenerator;
 
 // ========================================================
 /// <summary>
@@ -77,40 +75,5 @@ internal class PropertyNode : IChildNode
     public virtual void Emit(SourceProductionContext context, CodeBuilder cb)
     {
         cb.AppendLine($"// {this}");
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Invoked when the type is an interface.
-    /// </summary>
-    /// <param name="context"></param>
-    /// <param name="cb"></param>
-    protected void EmitAsInterface(SourceProductionContext _, CodeBuilder cb)
-    {
-        var modifiers = GetModifiers();
-        var parentType = Host.EasyName(RoslynNameOptions.Default);
-        var memberType = Symbol.Type.EasyName(RoslynNameOptions.Full);
-
-        EmitDocumentation(cb);
-        cb.AppendLine($"{modifiers}{parentType}");
-        cb.AppendLine($"{MethodName}({memberType} {ArgumentName});");
-
-        /// <summary>
-        /// Gets the method modifiers, with a space separator, or null if no modifiers.
-        /// </summary>
-        string? GetModifiers()
-        {
-            foreach (var iface in Host.AllInterfaces)
-            {
-                var member = FindDecoratedMember(iface);
-                if (member != null) return "new ";
-
-                var method = FindWithMethod(iface);
-                if (member != null) return "new ";
-            }
-
-            return null;
-        }
     }
 }
