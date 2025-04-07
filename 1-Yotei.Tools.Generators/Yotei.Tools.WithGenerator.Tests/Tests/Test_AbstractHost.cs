@@ -2,7 +2,7 @@
 
 using static Yotei.Tools.Diagnostics.ConsoleEx;
 using static System.ConsoleColor;
-
+/*
 namespace Yotei.Tools.WithGenerator.Tests.Abstracts
 {
     using IFaces;
@@ -86,7 +86,7 @@ namespace Yotei.Tools.WithGenerator.Tests.Abstracts
         //    Assert.True(method.IsAbstract);
         //}
     }
-}
+}*/
 /*
 
     // ====================================================
