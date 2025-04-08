@@ -1,4 +1,4 @@
-﻿namespace Yotei.ORM.Tools;
+﻿namespace Yotei.ORM.Tools.Code;
 
 // ========================================================
 /// <inheritdoc/>
@@ -209,29 +209,49 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     /// <inheritdoc/>
     public virtual int Replace(int index, T item)
     {
-        if (item is IEnumerable<T> range && ExpandItems)
-        {
-            var num = 0; foreach (var temp in range)
-            {
-                var r = Replace(index, temp);
-                num += r;
-                index += r;
-            }
-            return num;
-        }
-
-        item = ValidateItem(item);
-
-        var source = Items[index];
-        var same = Same(item, source);
-        if (same) return 0;
-
-        var removed = RemoveAt(index);
-        var inserted = removed == 0 ? 0 : Insert(index, item);
+        Replace(index, item, remove1st: true, out var removed, out var inserted);
         return inserted == 0 ? removed : inserted;
     }
 
-    // Invoked to determine if the given items are the same or not.
+    void Replace(int index, T item, bool remove1st, out int removed, out int inserted)
+    {
+        removed = 0;
+        inserted = 0;
+
+        if (item is IEnumerable<T> range && ExpandItems) // Enumerable expansion...
+        {
+            removed = RemoveAt(index);
+            if (removed == 0) return;
+
+            foreach (var temp in range)
+            {
+                Replace(index, temp, remove1st: false, out var xremoved, out var xinserted);
+                inserted += xinserted;
+                index += xinserted;
+            }
+        }
+
+        else // Standard case...
+        {
+            item = ValidateItem(item);
+
+            var source = Items[index];
+            var same = Same(item, source);
+            if (same) return;
+
+            removed = remove1st ? RemoveAt(index) : 0;
+            if (removed == 0 && remove1st) return;
+
+            inserted = Insert(index, item);
+        }
+    }
+
+    /// <summary>
+    /// Invoked to determine if the given items are the same or not.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="source"></param>
+    /// <returns></returns>
     protected bool Same(T item, T source)
     {
         return typeof(T).IsValueType
@@ -242,7 +262,16 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     /// <inheritdoc/>
     public virtual int Add(T item)
     {
-        throw null;
+        if (item is IEnumerable<T> range && ExpandItems) return AddRange(range);
+
+        item = ValidateItem(item);
+
+        var key = GetKey(item);
+        var dups = IndexesOf(key);
+        foreach (var dup in dups) if (!IncludeDuplicate(item, Items[dup])) return 0;
+
+        Items.Add(item);
+        return 1;
     }
     void ICollection<T>.Add(T item) => Add(item);
     int IList.Add(object? value) => Add((T)value!) > 0 ? (Count - 1) : -1;
@@ -250,13 +279,29 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     /// <inheritdoc/>
     public virtual int AddRange(IEnumerable<T> range)
     {
-        throw null;
+        range.ThrowWhenNull();
+
+        var num = 0; foreach (var item in range)
+        {
+            var r = Add(item);
+            num += r;
+        }
+        return num;
     }
 
     /// <inheritdoc/>
     public virtual int Insert(int index, T item)
     {
-        throw null;
+        if (item is IEnumerable<T> range && ExpandItems) return InsertRange(index, range);
+
+        item = ValidateItem(item);
+
+        var key = GetKey(item);
+        var dups = IndexesOf(key);
+        foreach (var dup in dups) if (!IncludeDuplicate(item, Items[dup])) return 0;
+
+        Items.Insert(index, item);
+        return 1;
     }
     void IList<T>.Insert(int index, T item) => Insert(index, item);
     void IList.Insert(int index, object? value) => Insert(index, (T)value!);
@@ -264,13 +309,22 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     /// <inheritdoc/>
     public virtual int InsertRange(int index, IEnumerable<T> range)
     {
-        throw null;
+        range.ThrowWhenNull();
+
+        var num = 0; foreach (var item in range)
+        {
+            var r = Insert(index, item);
+            num += r;
+            index += r;
+        }
+        return num;
     }
 
     /// <inheritdoc/>
     public virtual int RemoveAt(int index)
     {
-        throw null;
+        Items.RemoveAt(index);
+        return 1;
     }
     void IList<T>.RemoveAt(int index) => RemoveAt(index);
     void IList.RemoveAt(int index) => RemoveAt(index);
@@ -278,13 +332,15 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     /// <inheritdoc/>
     public virtual int RemoveRange(int index, int count)
     {
-        throw null;
+        Items.RemoveRange(index, count);
+        return count;
     }
 
     /// <inheritdoc/>
     public virtual int Remove(K key)
     {
-        throw null;
+        var index = IndexOf(key);
+        return index >= 0 ? RemoveAt(index) : 0;
     }
     bool ICollection<T>.Remove(T item) => Remove(GetKey(ValidateItem(item))) > 0;
     void IList.Remove(object? value) => Remove(GetKey(ValidateItem((T)value!)));
@@ -292,37 +348,57 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     /// <inheritdoc/>
     public virtual int RemoveLast(K key)
     {
-        throw null;
+        var index = LastIndexOf(key);
+        return index >= 0 ? RemoveAt(index) : 0;
     }
 
     /// <inheritdoc/>
     public virtual int RemoveAll(K key)
     {
-        throw null;
+        key = ValidateKey(key);
+
+        var num = 0; while (true)
+        {
+            var index = IndexOf(key, validate: false);
+
+            if (index >= 0) num += RemoveAt(index);
+            else break;
+        }
+        return num;
     }
 
     /// <inheritdoc/>
     public virtual int Remove(Predicate<T> predicate)
     {
-        throw null;
+        var index = IndexOf(predicate);
+        return index >= 0 ? RemoveAt(index) : 0;
     }
 
     /// <inheritdoc/>
     public virtual int RemoveLast(Predicate<T> predicate)
     {
-        throw null;
+        var index = LastIndexOf(predicate);
+        return index >= 0 ? RemoveAt(index) : 0;
     }
 
     /// <inheritdoc/>
     public virtual int RemoveAll(Predicate<T> predicate)
     {
-        throw null;
+        var num = 0; while (true)
+        {
+            var index = IndexOf(predicate);
+
+            if (index >= 0) num += RemoveAt(index);
+            else break;
+        }
+        return num;
     }
 
     /// <inheritdoc/>
     public virtual int Clear()
     {
-        throw null;
+        var num = Count; if (num > 0) Items.Clear();
+        return num;
     }
     void ICollection<T>.Clear() => Clear();
     void IList.Clear() => Clear();

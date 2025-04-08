@@ -1,9 +1,11 @@
 <Project>
    <PropertyGroup>
-	  <NoWarn>IDE0300;IDE0305;IDE0130;IDE0290</NoWarn>
+	  <NoWarn>IDE0028;IDE0300;IDE0306;IDE0305;IDE0130;IDE0290</NoWarn>
    </PropertyGroup>
+   <!--IDE0028: Simplify collection initialization-->
    <!--IDE0300: Simplify collection initialization-->
    <!--IDE0305: Simplify collection initialization-->
+   <!--IDE0306: Simplify collection initialization-->
    <!--IDE0130: Namespace doesn't match folder structure-->
    <!--IDE0290: Use primary constructor-->
 </Project>
