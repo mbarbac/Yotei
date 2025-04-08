@@ -30,7 +30,7 @@ internal class XTypeNode : TypeNode
     /// <inheritdoc/>
     public override void Emit(SourceProductionContext context, CodeBuilder cb)
     {
-        if (GetInheritMembersValue(Symbol, out var value) && value)
+        if (GetTypeInheritMembersValue(Symbol, out var value) && value)
         {
             CaptureProperties();
             CaptureFields();
@@ -110,7 +110,7 @@ internal class XTypeNode : TypeNode
     /// <param name="chain"></param>
     /// <param name="ifaces"></param>
     /// <returns></returns>
-    public static AttributeData? FindWithAttribute(
+    public static AttributeData? FindTypeWithAttribute(
         ITypeSymbol type,
         bool chain = false, bool ifaces = false)
     {
@@ -120,7 +120,7 @@ internal class XTypeNode : TypeNode
         {
             foreach (var temp in type.AllBaseTypes())
             {
-                at = FindWithAttribute(temp);
+                at = FindTypeWithAttribute(temp);
                 if (at != null) break;
             }
         }
@@ -129,7 +129,7 @@ internal class XTypeNode : TypeNode
         {
             foreach (var temp in type.AllInterfaces)
             {
-                at = FindWithAttribute(temp);
+                at = FindTypeWithAttribute(temp);
                 if (at != null) break;
             }
         }
@@ -173,25 +173,25 @@ internal class XTypeNode : TypeNode
     /// <param name="chain"></param>
     /// <param name="ifaces"></param>
     /// <returns></returns>
-    public static bool GetInheritMembersValue(
+    public static bool GetTypeInheritMembersValue(
         ITypeSymbol type,
         out bool value,
         bool chain = false, bool ifaces = false)
     {
-        var at = FindWithAttribute(type, chain, ifaces);
+        var at = FindTypeWithAttribute(type, chain, ifaces);
         if (at != null)
             if (GetInheritMembersValue(at, out value)) return true;
 
         if (chain)
         {
             foreach (var temp in type.AllBaseTypes())
-                if (GetInheritMembersValue(temp, out value)) return true;
+                if (GetTypeInheritMembersValue(temp, out value)) return true;
         }
 
         if (ifaces)
         {
             foreach (var temp in type.AllInterfaces)
-                if (GetInheritMembersValue(temp, out value)) return true;
+                if (GetTypeInheritMembersValue(temp, out value)) return true;
         }
 
         value = default;

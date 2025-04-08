@@ -2,7 +2,7 @@
 
 using static Yotei.Tools.Diagnostics.ConsoleEx;
 using static System.ConsoleColor;
-/*
+
 namespace Yotei.Tools.WithGenerator.Tests.Interfaces
 {
     using IFaces;
@@ -64,4 +64,4 @@ namespace Yotei.Tools.WithGenerator.Tests.Interfaces
             Assert.True(method.IsVirtual); // PreventVirtual has no effect on interfaces
         }
     }
-}*/
+}
