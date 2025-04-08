@@ -1,4 +1,0 @@
-- Toy: refactorizar CloneGenerator.
-  Eliminar 'top' de los métodos, es confuso.
-
-- Toy: empezar con WithGenerator
