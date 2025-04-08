@@ -55,7 +55,7 @@ public static partial class Test_CoreList_KT
                     : StringComparer.OrdinalIgnoreCase;
             }
         }
-        public override bool IncludeDuplicate(IElement item, IElement source)
+        public override bool IncludeDuplicated(IElement item, IElement source)
         {
             return ReferenceEquals(item, source)
                 ? true
