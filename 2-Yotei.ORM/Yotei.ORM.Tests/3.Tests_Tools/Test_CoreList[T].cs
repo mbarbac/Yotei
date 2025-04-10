@@ -37,7 +37,6 @@ public static partial class Test_CoreList_T
             if (item.ThrowWhenNull() is Element named) named.Name.NotNullNotEmpty();
             return item;
         }
-
         public override bool IncludeDuplicated(IElement item, IElement source)
         {
             return ReferenceEquals(item, source)
