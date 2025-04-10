@@ -185,7 +185,7 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
     }
     IInvariantList<T> IInvariantList<T>.RemoveRange(int index, int count) => RemoveRange(index, count);
 
-    /// <inheritdoc cref="IInvariantList{T}.Remove(K)"/>
+    /// <inheritdoc cref="IInvariantList{T}.Remove(T)"/>
     public virtual InvariantList<T> Remove(T item)
     {
         var clone = Clone();
@@ -194,7 +194,7 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
     }
     IInvariantList<T> IInvariantList<T>.Remove(T item) => Remove(item);
 
-    /// <inheritdoc cref="IInvariantList{T}.RemoveLast(K)"/>
+    /// <inheritdoc cref="IInvariantList{T}.RemoveLast(T)"/>
     public virtual InvariantList<T> RemoveLast(T item)
     {
         var clone = Clone();
@@ -203,7 +203,7 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
     }
     IInvariantList<T> IInvariantList<T>.RemoveLast(T item) => RemoveLast(item);
 
-    /// <inheritdoc cref="IInvariantList{T}.RemoveAll(K)"/>
+    /// <inheritdoc cref="IInvariantList{T}.RemoveAll(T)"/>
     public virtual InvariantList<T> RemoveAll(T item)
     {
         var clone = Clone();
