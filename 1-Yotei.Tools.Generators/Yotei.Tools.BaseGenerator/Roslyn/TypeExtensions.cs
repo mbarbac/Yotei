@@ -93,26 +93,14 @@ internal static class TypeExtensions
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a copy constructor for the given type, or null if any, trying first strict mode
-    /// and then the non-strict one.
-    /// </summary>
-    /// <returns></returns>
-    public static IMethodSymbol? GetCopyConstructor(this ITypeSymbol type)
-    {
-        return
-            type.GetCopyConstructor(true) ??
-            type.GetCopyConstructor(false);
-    }
-
-    /// <summary>
-    /// Returns a copy constructor for the given type, or null if any. In strict mode, the type
-    /// of the unique argument of the constructor must be the type itself. In non-strict mode, a
-    /// match is considered when that type can be assigned to the type.
+    /// Returns a copy constructor for the given type, or null if any. In the default strict mode,
+    /// the type of the unique argument of the constructor must be the type itself. In the optional
+    /// non-strict mode, a match is considered when that type can be assigned to the type.
     /// </summary>
     /// <param name="type"></param>
     /// <param name="strict"></param>
     /// <returns></returns>
-    public static IMethodSymbol? GetCopyConstructor(this ITypeSymbol type, bool strict)
+    public static IMethodSymbol? GetCopyConstructor(this ITypeSymbol type, bool strict = true)
     {
         type.ThrowWhenNull();
 
@@ -123,8 +111,11 @@ internal static class TypeExtensions
             .ToDebugArray();
 
         var comparer = SymbolComparer.Default;
-        return strict
-            ? methods.FirstOrDefault(x => comparer.Equals(type, x.Parameters[0].Type))
-            : methods.FirstOrDefault(x => type.IsAssignableTo(x.Parameters[0].Type));
+
+        var method = methods.FirstOrDefault(x => comparer.Equals(type, x.Parameters[0].Type));
+        if (method == null && !strict)
+            method = methods.FirstOrDefault(x => type.IsAssignableTo(x.Parameters[0].Type));
+
+        return method;
     }
 }

@@ -144,7 +144,7 @@ internal class XTypeNode : TypeNode
     protected void EmitAsConcrete(SourceProductionContext context, CodeBuilder cb)
     {
         // We need a copy constructor...
-        var ctor = Symbol.GetCopyConstructor(strict: true);
+        var ctor = Symbol.GetCopyConstructor(strict: false);
         if (ctor == null)
         {
             TreeDiagnostics.NoCopyConstructor(Symbol).Report(context);

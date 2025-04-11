@@ -152,7 +152,7 @@ internal class XPropertyNode : PropertyNode
     /// <param name="cb"></param>
     protected void EmitAsConcrete(SourceProductionContext context, CodeBuilder cb)
     {
-        var ctor = Host.GetCopyConstructor(strict: true);
+        var ctor = Host.GetCopyConstructor(strict: false);
         if (ctor == null)
         {
             TreeDiagnostics.NoCopyConstructor(Host).Report(context);

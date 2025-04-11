@@ -8,7 +8,7 @@ namespace Yotei.ORM.Tools.Templates;
 /// ...
 /// </summary>
 [Cloneable]
-public partial class ChainT : InvariantList<IItem>, IItem
+public partial class ChainT : InvariantList<IItem>, IChain<IItem>, IItem
 {
     /// <summary>
     /// The builder associated with this type.
@@ -87,46 +87,61 @@ public partial class ChainT : InvariantList<IItem>, IItem
 
     /// <inheritdoc/>
     public override ChainT GetRange(int index, int count) => (ChainT)base.GetRange(index, count);
+    IChain<IItem> IChain<IItem>.GetRange(int index, int count) => GetRange(index, count);
 
     /// <inheritdoc/>
     public override ChainT Replace(int index, IItem item) => (ChainT)base.Replace(index, item);
+    IChain<IItem> IChain<IItem>.Replace(int index, IItem item) => Replace(index, item);
 
     /// <inheritdoc/>
     public override ChainT Add(IItem item) => (ChainT)base.Add(item);
+    IChain<IItem> IChain<IItem>.Add(IItem item) => Add(item);
 
     /// <inheritdoc/>
     public override ChainT AddRange(IEnumerable<IItem> range) => (ChainT)base.AddRange(range);
+    IChain<IItem> IChain<IItem>.AddRange(IEnumerable<IItem> range) => AddRange(range);
 
     /// <inheritdoc/>
     public override ChainT Insert(int index, IItem item) => (ChainT)base.Insert(index, item);
+    IChain<IItem> IChain<IItem>.Insert(int index, IItem item) => Insert(index, item);
 
     /// <inheritdoc/>
     public override ChainT InsertRange(int index, IEnumerable<IItem> range) => (ChainT)base.InsertRange(index, range);
+    IChain<IItem> IChain<IItem>.InsertRange(int index, IEnumerable<IItem> range) => InsertRange(index, range);
 
     /// <inheritdoc/>
     public override ChainT RemoveAt(int index) => (ChainT)base.RemoveAt(index);
+    IChain<IItem> IChain<IItem>.RemoveAt(int index) => RemoveAt(index);
 
     /// <inheritdoc/>
     public override ChainT RemoveRange(int index, int count) => (ChainT)base.RemoveRange(index, count);
+    IChain<IItem> IChain<IItem>.RemoveRange(int index, int count) => RemoveRange(index, count);
 
     /// <inheritdoc/>
     public override ChainT Remove(IItem item) => (ChainT)base.Remove(item);
+    IChain<IItem> IChain<IItem>.Remove(IItem item) => Remove(item);
 
     /// <inheritdoc/>
     public override ChainT RemoveLast(IItem item) => (ChainT)base.RemoveLast(item);
+    IChain<IItem> IChain<IItem>.RemoveLast(IItem item) => RemoveLast(item);
 
     /// <inheritdoc/>
     public override ChainT RemoveAll(IItem item) => (ChainT)base.RemoveAll(item);
+    IChain<IItem> IChain<IItem>.RemoveAll(IItem item) => RemoveAll(item);
 
     /// <inheritdoc/>
     public override ChainT Remove(Predicate<IItem> predicate) => (ChainT)base.Remove(predicate);
+    IChain<IItem> IChain<IItem>.Remove(Predicate<IItem> predicate) => Remove(predicate);
 
     /// <inheritdoc/>
     public override ChainT RemoveLast(Predicate<IItem> predicate) => (ChainT)base.RemoveLast(predicate);
+    IChain<IItem> IChain<IItem>.RemoveLast(Predicate<IItem> predicate) => RemoveLast(predicate);
 
     /// <inheritdoc/>
     public override ChainT RemoveAll(Predicate<IItem> predicate) => (ChainT)base.RemoveAll(predicate);
+    IChain<IItem> IChain<IItem>.RemoveAll(Predicate<IItem> predicate) => RemoveAll(predicate);
 
     /// <inheritdoc/>
     public override ChainT Clear() => (ChainT)base.Clear();
+    IChain<IItem> IChain<IItem>.Clear() => Clear();
 }
