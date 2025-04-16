@@ -1,4 +1,4 @@
-﻿namespace Yotei.Tools.Generators;
+﻿namespace Yotei.ORM.Generators;
 
 // ========================================================
 /// <inheritdoc cref="TypeNode"/>
@@ -27,7 +27,7 @@ internal class XTypeNode : TypeNode
     string TTypeName = null!;
     string AttributeName = null!;
     string BracketName = null!;
-    string InvariantNamespace = null!;    
+    string InvariantNamespace = null!;
 
     // ----------------------------------------------------
 
@@ -63,18 +63,37 @@ internal class XTypeNode : TypeNode
         }
 
         // Capturing arity and types...
-        var args = AttributeData.ConstructorArguments;
+        Arity = AttributeClass.Arity;
 
-        if (args.Length == 1)
+        if (Arity == 0) // No generic parameters...
         {
-            if ((TType = GetType(args[0], out TTypeNullable)!) == null) return false;
-            Arity = 1;
+            var args = AttributeData.ConstructorArguments;
+
+            if (args.Length == 1)
+            {
+                if ((TType = GetType(args[0], out TTypeNullable)!) == null) return false;
+                Arity = 1;
+            }
+            else if (args.Length == 2)
+            {
+                if ((KType = GetType(args[0], out KTypeNullable)!) == null) return false;
+                if ((TType = GetType(args[1], out TTypeNullable)!) == null) return false;
+                Arity = 2;
+            }
+            else
+            {
+                InvariantListDiagnostics.InvalidAttribute(Symbol).Report(context);
+                return false;
+            }
         }
-        else if (args.Length == 2)
+        else if (Arity == 1) // One generic <T> parameter...
         {
-            if ((KType = GetType(args[0], out KTypeNullable)!) == null) return false;
-            if ((TType = GetType(args[1], out TTypeNullable)!) == null) return false;
-            Arity = 2;
+            TType = (AttributeClass.TypeArguments[0] as INamedTypeSymbol)!;
+        }
+        else if (Arity == 2) // Two generic <K,T> parameters...
+        {
+            KType = (AttributeClass.TypeArguments[0] as INamedTypeSymbol)!;
+            TType = (AttributeClass.TypeArguments[1] as INamedTypeSymbol)!;
         }
         else
         {
@@ -103,7 +122,7 @@ internal class XTypeNode : TypeNode
         // Finishing...
         KTypeName = KType?.EasyName(RoslynNameOptions.Full)!; if (KTypeNullable) KTypeName += "?";
         TTypeName = TType?.EasyName(RoslynNameOptions.Full)!; if (TTypeNullable) TTypeName += "?";
-        
+
         AttributeName = AttributeClass.Name.RemoveEnd("Attribute");
         BracketName = Arity == 1 ? $"<{TTypeName}>" : $"<{KTypeName}, {TTypeName}>";
 
@@ -123,7 +142,7 @@ internal class XTypeNode : TypeNode
 
             var type = (INamedTypeSymbol)source.Value!;
 
-            if (type.Name == "Nullable")
+            if (type.Name is "Nullable" or "AsNullable")
             {
                 if (type.TypeArguments.Length != 1)
                 {
@@ -131,6 +150,7 @@ internal class XTypeNode : TypeNode
                     isNullable = false;
                     return null;
                 }
+
                 type = (INamedTypeSymbol)type.TypeArguments[0];
                 isNullable = true;
                 return type;

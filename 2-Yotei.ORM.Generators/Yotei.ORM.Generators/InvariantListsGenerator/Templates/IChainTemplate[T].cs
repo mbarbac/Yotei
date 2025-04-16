@@ -1,4 +1,4 @@
-﻿namespace Yotei.Tools.Generators;
+﻿namespace Yotei.ORM.Generators;
 
 // ========================================================
 internal abstract class IChainTemplate<T>
