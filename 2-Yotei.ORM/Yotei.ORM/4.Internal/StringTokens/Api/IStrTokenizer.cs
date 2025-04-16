@@ -23,8 +23,8 @@ public partial interface IStrTokenizer
     /// Tokenizes the payload of the given token, by default reducing the resulting token if
     /// possible.
     /// </summary>
-    /// <param name="source"></param>
+    /// <param name="token"></param>
     /// <param name="reduce"></param>
     /// <returns></returns>
-    IStrToken Tokenize(IStrToken source, bool reduce = true);
+    IStrToken Tokenize(IStrToken token, bool reduce = true);
 }

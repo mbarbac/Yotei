@@ -24,13 +24,20 @@ public abstract partial class StrTokenizer : IStrTokenizer
     /// <inheritdoc/>
     public IStrToken Tokenize(string source, bool reduce = true)
     {
-        throw null;
+        var token = new StrTokenText(source);
+        return Tokenize(token, reduce);
     }
 
     /// <inheritdoc/>
-    public IStrToken Tokenize(IStrToken source, bool reduce = true)
+    public IStrToken Tokenize(IStrToken token, bool reduce = true)
     {
-        throw null;
+        token.ThrowWhenNull();
+
+        token = ReduceTextTokens(token);
+        token = token.TokenizeWith(Extract);
+        if (reduce) token = token.Reduce(Comparison);
+
+        return token;
     }
 
     /// <summary>
@@ -48,8 +55,47 @@ public abstract partial class StrTokenizer : IStrTokenizer
     /// </summary>
     /// <param name="token"></param>
     /// <returns></returns>
-    public virtual IStrToken Reduce(IStrToken token)
+    public abstract IStrToken Reduce(IStrToken token);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Provides basic reduce capabilities by combining text element and returning a simpler
+    /// form, if possible.
+    /// </summary>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    public static IStrToken ReduceTextTokens(IStrToken token)
     {
-        throw null;
+        // Chain sources...
+        if (token is StrTokenChain chain)
+        {
+            var builder = chain.GetBuilder();
+            var changed = false;
+
+            // Combining text elements starting from [1], not from [0]...
+            for (int i = 1; i < builder.Count; i++)
+            {
+                var prev = builder[i - 1];
+                var item = builder[i];
+
+                if (prev is StrTokenText xprev && item is StrTokenText xitem)
+                {
+                    builder[i - 1] = new StrTokenText($"{xprev.Payload}{xitem.Payload}");
+                    builder.RemoveAt(i);
+                    i--;
+                    changed = true;
+                }
+            }
+
+            // Simplifying...
+            token =
+                builder.Count == 0 ? StrTokenText.Empty :
+                builder.Count == 1 ? builder[0] :
+                changed ? builder.ToInstance() : chain;
+        }
+
+        // Finishing...
+        return token;
     }
 }
