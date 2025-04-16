@@ -71,13 +71,13 @@ internal class XTypeNode : TypeNode
 
             if (args.Length == 1)
             {
-                if ((TType = GetType(args[0], out TTypeNullable)!) == null) return false;
+                if ((TType = GetType(args[0], out TTypeNullable, context)!) == null) return false;
                 Arity = 1;
             }
             else if (args.Length == 2)
             {
-                if ((KType = GetType(args[0], out KTypeNullable)!) == null) return false;
-                if ((TType = GetType(args[1], out TTypeNullable)!) == null) return false;
+                if ((KType = GetType(args[0], out KTypeNullable, context)!) == null) return false;
+                if ((TType = GetType(args[1], out TTypeNullable, context)!) == null) return false;
                 Arity = 2;
             }
             else
@@ -88,12 +88,12 @@ internal class XTypeNode : TypeNode
         }
         else if (Arity == 1) // One generic <T> parameter...
         {
-            TType = (AttributeClass.TypeArguments[0] as INamedTypeSymbol)!;
+            if ((TType = GetType((INamedTypeSymbol)AttributeClass.TypeArguments[0], out TTypeNullable, context)!) == null) return false;
         }
         else if (Arity == 2) // Two generic <K,T> parameters...
         {
-            KType = (AttributeClass.TypeArguments[0] as INamedTypeSymbol)!;
-            TType = (AttributeClass.TypeArguments[1] as INamedTypeSymbol)!;
+            if ((KType = GetType((INamedTypeSymbol)AttributeClass.TypeArguments[0], out KTypeNullable, context)!) == null) return false;
+            if ((TType = GetType((INamedTypeSymbol)AttributeClass.TypeArguments[1], out TTypeNullable, context)!) == null) return false;
         }
         else
         {
@@ -129,37 +129,72 @@ internal class XTypeNode : TypeNode
         InvariantNamespace = Symbol.IsInterface() ? IInvariantListNamespace : InvariantListNamespace;
 
         return true;
+    }
 
-        // Invoked to get the actual type and if it is a nullable one...
-        INamedTypeSymbol? GetType(TypedConstant source, out bool isNullable)
+    /// <summary>
+    /// Invoked to get the actual type and if it is a nullable one.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="isNullable"></param>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    INamedTypeSymbol? GetType(TypedConstant source, out bool isNullable, SourceProductionContext context)
+    {
+        if (source.IsNull || source.Kind != TypedConstantKind.Type)
         {
-            if (source.IsNull || source.Kind != TypedConstantKind.Type)
+            InvariantListDiagnostics.InvalidAttribute(Symbol).Report(context);
+            isNullable = false;
+            return null;
+        }
+
+        var type = (INamedTypeSymbol)source.Value!;
+
+        if (type.Name is "Nullable" or "AsNullable")
+        {
+            if (type.TypeArguments.Length != 1)
             {
                 InvariantListDiagnostics.InvalidAttribute(Symbol).Report(context);
                 isNullable = false;
                 return null;
             }
 
-            var type = (INamedTypeSymbol)source.Value!;
+            type = (INamedTypeSymbol)type.TypeArguments[0];
+            isNullable = true;
+            return type;
+        }
+        else
+        {
+            isNullable = false;
+            return type;
+        }
+    }
 
-            if (type.Name is "Nullable" or "AsNullable")
+    /// <summary>
+    /// Invoked to get the actual type and if it is a nullable one.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="isNullable"></param>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    INamedTypeSymbol? GetType(INamedTypeSymbol source, out bool isNullable, SourceProductionContext context)
+    {
+        if (source.Name is "Nullable" or "AsNullable")
+        {
+            if (source.TypeArguments.Length != 1)
             {
-                if (type.TypeArguments.Length != 1)
-                {
-                    InvariantListDiagnostics.InvalidAttribute(Symbol).Report(context);
-                    isNullable = false;
-                    return null;
-                }
-
-                type = (INamedTypeSymbol)type.TypeArguments[0];
-                isNullable = true;
-                return type;
-            }
-            else
-            {
+                InvariantListDiagnostics.InvalidAttribute(Symbol).Report(context);
                 isNullable = false;
-                return type;
+                return null;
             }
+
+            source = (INamedTypeSymbol)source.TypeArguments[0];
+            isNullable = true;
+            return source;
+        }
+        else
+        {
+            isNullable = false;
+            return (INamedTypeSymbol)source;
         }
     }
 
@@ -271,6 +306,8 @@ internal class XTypeNode : TypeNode
         }
     }
 
+    // ----------------------------------------------------
+
     /// <summary>
     /// Determines if the given method can be emitted or not.
     /// </summary>
@@ -320,6 +357,8 @@ internal class XTypeNode : TypeNode
         // No impediments, we can emit code for the given method...
         return true;
     }
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// Finds the interfaces where 'Clone()' is declared, if any.
