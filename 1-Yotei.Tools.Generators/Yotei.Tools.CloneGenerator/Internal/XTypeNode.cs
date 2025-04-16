@@ -1,6 +1,4 @@
-﻿using Microsoft.CodeAnalysis.Diagnostics;
-
-namespace Yotei.Tools.CloneGenerator;
+﻿namespace Yotei.Tools.CloneGenerator;
 
 // ========================================================
 /// <inheritdoc cref="TypeNode"/>
