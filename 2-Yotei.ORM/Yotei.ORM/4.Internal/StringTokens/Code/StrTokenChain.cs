@@ -65,12 +65,16 @@ public partial class StrTokenChain : IStrToken
 
     /// <inheritdoc/>
     public override bool Equals(object? obj) => Equals(obj as IEngine);
+
+    // Equality operator.
     public static bool operator ==(StrTokenChain? x, IStrToken? y)
     {
         if (x is null && y is null) return true;
         if (x is null || y is null) return false;
         return x.Equals(y);
     }
+
+    // Inequality operator.
     public static bool operator !=(StrTokenChain? x, IStrToken? y) => !(x == y);
 
     /// <inheritdoc/>

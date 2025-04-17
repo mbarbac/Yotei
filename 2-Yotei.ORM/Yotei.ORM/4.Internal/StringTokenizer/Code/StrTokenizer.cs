@@ -51,15 +51,6 @@ public abstract partial class StrTokenizer : IStrTokenizer
     // ----------------------------------------------------
 
     /// <summary>
-    /// Provides the ability of reducing the given token to a simpler form, if possible.
-    /// </summary>
-    /// <param name="token"></param>
-    /// <returns></returns>
-    public abstract IStrToken Reduce(IStrToken token);
-
-    // ----------------------------------------------------
-
-    /// <summary>
     /// Provides basic reduce capabilities by combining text element and returning a simpler
     /// form, if possible.
     /// </summary>
@@ -70,29 +61,33 @@ public abstract partial class StrTokenizer : IStrTokenizer
         // Chain sources...
         if (token is StrTokenChain chain)
         {
-            var builder = chain.GetBuilder();
-            var changed = false;
-
-            // Combining text elements starting from [1], not from [0]...
-            for (int i = 1; i < builder.Count; i++)
+            if (chain.Any(x => x is StrTokenText)) // We'll only combine if there are any...
             {
-                var prev = builder[i - 1];
-                var item = builder[i];
+                var builder = chain.GetBuilder();
+                var changed = false;
 
-                if (prev is StrTokenText xprev && item is StrTokenText xitem)
+                // Combining text elements starting from [1], not from [0]...
+                for (int i = 1; i < builder.Count; i++)
                 {
-                    builder[i - 1] = new StrTokenText($"{xprev.Payload}{xitem.Payload}");
-                    builder.RemoveAt(i);
-                    i--;
-                    changed = true;
+                    var prev = builder[i - 1];
+                    var item = builder[i];
+
+                    if (prev is StrTokenText xprev && item is StrTokenText xitem)
+                    {
+                        builder[i - 1] = new StrTokenText($"{xprev.Payload}{xitem.Payload}");
+                        builder.RemoveAt(i);
+                        i--;
+                        changed = true;
+                    }
                 }
+
+                if (changed) chain = builder.ToInstance();
             }
 
-            // Simplifying...
             token =
-                builder.Count == 0 ? StrTokenText.Empty :
-                builder.Count == 1 ? builder[0] :
-                changed ? builder.ToInstance() : chain;
+                chain.Count == 0 ? StrTokenText.Empty :
+                chain.Count == 1 ? chain[0] :
+                chain;
         }
 
         // Finishing...

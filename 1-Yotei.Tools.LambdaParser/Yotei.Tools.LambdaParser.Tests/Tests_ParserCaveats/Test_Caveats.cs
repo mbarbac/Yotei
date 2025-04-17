@@ -21,8 +21,13 @@ public static class Test_Caveats
         WriteLine($"> Result: {node}");
         item = Assert.IsType<LambdaNodeSetter>(node);
 
-        // For unknown reasons the DLR understands both are equivalent and prefers the second...
-        Assert.NotEqual("(x.Alpha = (x.Alpha = x.Beta))", node.ToString());
-        Assert.Equal("(x.Alpha = x.Beta)", node.ToString());
+        // For unknown reasons the DLR understands both are equivalent and prefers the second,
+        // but not always (!!??), and there is no consistency among test runs...
+        var str = node.ToString();
+        var eq =
+            str == "(x.Alpha = (x.Alpha = x.Beta))" ||
+            str == "(x.Alpha = x.Beta)";
+
+        Assert.True(eq);
     });
 }

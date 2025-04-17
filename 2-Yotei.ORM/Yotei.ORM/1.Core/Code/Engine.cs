@@ -45,8 +45,8 @@ public partial class Engine : IEngine
     /// <inheritdoc/>
     public bool Equals(IEngine? other)
     {
-        if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
+        if (other is null) return false;        
 
         return
             CaseSensitiveNames == other.CaseSensitiveNames &&
@@ -61,12 +61,16 @@ public partial class Engine : IEngine
 
     /// <inheritdoc/>
     public override bool Equals(object? obj) => Equals(obj as IEngine);
+
+    // Equality operator.
     public static bool operator ==(Engine? x, Engine? y)
     {
         if (x is null && y is null) return true;
         if (x is null || y is null) return false;
         return x.Equals(y);
     }
+
+    // Inequality operator.
     public static bool operator !=(Engine? x, Engine? y) => !(x == y);
 
     /// <inheritdoc/>

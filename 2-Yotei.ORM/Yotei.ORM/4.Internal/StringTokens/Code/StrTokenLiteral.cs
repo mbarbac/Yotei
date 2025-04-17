@@ -52,6 +52,24 @@ public class StrTokenLiteral : IStrToken
         return true;
     }
 
+    /// <inheritdoc/>
+    public override bool Equals(object? obj) => Equals(obj as IStrToken);
+
+    // Equality operator.
+    public static bool operator ==(StrTokenLiteral? x, IStrToken? y)
+    {
+        if (x is null && y is null) return true;
+        if (x is null || y is null) return false;
+
+        return x.Equals(y);
+    }
+
+    // Inequality operator.
+    public static bool operator !=(StrTokenLiteral? x, IStrToken? y) => !(x == y);
+
+    /// <inheritdoc/>
+    public override int GetHashCode() => Payload.GetHashCode();
+
     // ----------------------------------------------------
 
     /// <inheritdoc/>
