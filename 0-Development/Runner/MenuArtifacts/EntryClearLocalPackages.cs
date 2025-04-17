@@ -53,11 +53,19 @@ public class EntryClearLocalPackages : MenuEntry
         WriteLine(true);
 
         var dir = new DirectoryInfo(Program.LocalRepoPath);
-        var files = dir.GetFiles();
-        foreach (var file in files)
+        try
         {
-            try { file.Delete(); }
-            catch { }
+            var files = dir.GetFiles();
+            foreach (var file in files)
+            {
+                try { file.Delete(); }
+                catch { }
+            }
+        }
+        catch (DirectoryNotFoundException)
+        {
+            WriteLine(true);
+            Write(true, Red, "Cannot find packages' folder: "); WriteLine(true, Program.LocalRepoPath);
         }
     }
 }
