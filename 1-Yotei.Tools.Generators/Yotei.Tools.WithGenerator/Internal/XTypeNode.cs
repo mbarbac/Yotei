@@ -30,11 +30,9 @@ internal class XTypeNode : TypeNode
     /// <inheritdoc/>
     public override void Emit(SourceProductionContext context, CodeBuilder cb)
     {
-        if (GetTypeInheritMembersValue(Symbol, out var value) && value)
-        {
-            CaptureProperties();
-            CaptureFields();
-        }
+        CaptureProperties();
+        CaptureFields();
+
         base.Emit(context, cb);
     }
 
@@ -50,7 +48,7 @@ internal class XTypeNode : TypeNode
         foreach (var type in Symbol.AllBaseTypes()) Capture(type);
         foreach (var type in Symbol.AllInterfaces) Capture(type);
 
-        // Captures members are the type's level...
+        // Captures members at the type's level...
         void Capture(ITypeSymbol type)
         {
             var members = type.GetMembers().OfType<IPropertySymbol>()
@@ -81,7 +79,7 @@ internal class XTypeNode : TypeNode
         foreach (var type in Symbol.AllBaseTypes()) Capture(type);
         foreach (var type in Symbol.AllInterfaces) Capture(type);
 
-        // Captures members are the type's level...
+        // Captures members at the type's level...
         void Capture(ITypeSymbol type)
         {
             var members = type.GetMembers().OfType<IFieldSymbol>()
@@ -103,24 +101,24 @@ internal class XTypeNode : TypeNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// Tries to find a '<see cref="WithAttribute"/>' attribute in the given type,
+    /// Tries to find the <see cref="InheritWithsAttribute"/> attribute in the given type,
     /// including also its base types and interfaces if requested. Returns null if not found.
     /// </summary>
     /// <param name="type"></param>
     /// <param name="chain"></param>
     /// <param name="ifaces"></param>
     /// <returns></returns>
-    public static AttributeData? FindTypeWithAttribute(
+    public static AttributeData? FindInheritWithsAttribute(
         ITypeSymbol type,
         bool chain = false, bool ifaces = false)
     {
-        var at = type.GetAttributes(typeof(WithAttribute)).FirstOrDefault();
+        var at = type.GetAttributes(typeof(InheritWithsAttribute)).FirstOrDefault();
 
         if (at == null && chain)
         {
             foreach (var temp in type.AllBaseTypes())
             {
-                at = FindTypeWithAttribute(temp);
+                at = FindInheritWithsAttribute(temp);
                 if (at != null) break;
             }
         }
@@ -129,7 +127,7 @@ internal class XTypeNode : TypeNode
         {
             foreach (var temp in type.AllInterfaces)
             {
-                at = FindTypeWithAttribute(temp);
+                at = FindInheritWithsAttribute(temp);
                 if (at != null) break;
             }
         }
@@ -139,6 +137,7 @@ internal class XTypeNode : TypeNode
 
     // ----------------------------------------------------
 
+    /*
     /// <summary>
     /// Tries to get the value of the '<see cref="WithAttribute.InheritMembers"/>'
     /// named argument from the given attribute data. Returns <c>true</c> if the value is found,
@@ -160,8 +159,9 @@ internal class XTypeNode : TypeNode
 
         value = default;
         return false;
-    }
+    }*/
 
+    /*
     /// <summary>
     /// Tries to get the value of the '<see cref="WithAttribute.InheritMembers"/>'
     /// named argument from that attribute applied to the given type, if any. Returns <c>true</c>
@@ -196,5 +196,5 @@ internal class XTypeNode : TypeNode
 
         value = default;
         return false;
-    }
+    }*/
 }

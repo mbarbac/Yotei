@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents the ability of extracting <see cref="StrTokenLiteral"/> tokens.
 /// </summary>
-[With(InheritMembers = true)]
+[InheritWiths]
 public partial class StrLiteralTokenizer : StrTokenizer
 {
     /// <summary>

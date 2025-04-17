@@ -18,7 +18,7 @@ namespace Yotei.Tools.WithGenerator.Tests.Abstracts
         }
 
         // --------------------------------------------
-        [With(InheritMembers = true)]
+        [InheritWiths]
         public partial interface IBar<K, T> : IFoo<T>
         {
             [With(PreventVirtual = true)] string Branch { get; }
@@ -31,7 +31,7 @@ namespace Yotei.Tools.WithGenerator.Tests.Abstracts
         public partial class TOther
         {
             // --------------------------------------------
-            [With(InheritMembers = true)]
+            [InheritWiths]
             public abstract partial class AbstractFoo<T> : IFoo<T>
             {
                 public AbstractFoo(string name) => Name = name;
@@ -42,7 +42,7 @@ namespace Yotei.Tools.WithGenerator.Tests.Abstracts
 
             // --------------------------------------------
 
-            [With(InheritMembers = true)]
+            [InheritWiths]
             public abstract partial class AbstractFromAbstract<K, T> : AbstractFoo<T>, IBar<K, T>
             {
                 public AbstractFromAbstract(string name, string branch) : base(name) => Branch = branch;
@@ -52,7 +52,7 @@ namespace Yotei.Tools.WithGenerator.Tests.Abstracts
             }
 
             // --------------------------------------------
-            [With(InheritMembers = true)]
+            [InheritWiths]
             public partial class ConcreteFoo<T> : IFoo<T>
             {
                 public ConcreteFoo(string name) => Name = name;
@@ -62,7 +62,7 @@ namespace Yotei.Tools.WithGenerator.Tests.Abstracts
             }
 
             // --------------------------------------------
-            [With(InheritMembers = true)]
+            [InheritWiths]
             public abstract partial class AbstractFromConcrete<K, T> : ConcreteFoo<T>, IBar<K, T>
             {
                 public AbstractFromConcrete(string name, string branch) : base(name) => Branch = branch;

@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents the ability of extracting <see cref="StrTokenKeyword"/> tokens.
 /// </summary>
-[With(InheritMembers = true)]
+[InheritWiths]
 public partial class StrKeywordTokenizer : StrTokenizer
 {
     /// <summary>

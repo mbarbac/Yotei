@@ -2,18 +2,17 @@
 
 // ========================================================
 /// <summary>
-/// When used to decorate members of a type, properties and fields, to emulate the 'with' keyword
-/// for non-record types, by generating a 'With[name](bvalue)' method for each member decorated
-/// with this attribute.
+/// Used to decorate types whose previously decorated members (properties and fields) shall be
+/// redeclared or reimplemented.
 /// <br/> Records are not supported.
 /// <br/> The '<see cref="PreventVirtual"/>' setting is used to prevent the generation of virtual
 /// alike methods.
 /// </summary>
 [AttributeUsage(
-    AttributeTargets.Property | AttributeTargets.Field,
+    AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface,
     Inherited = false,
     AllowMultiple = false)]
-public class WithAttribute : Attribute
+public class InheritWithsAttribute : Attribute
 {
     /// <summary>
     /// If <c>true</c>, instructs the generator not to add a 'virtual', 'abstract' or 'override'

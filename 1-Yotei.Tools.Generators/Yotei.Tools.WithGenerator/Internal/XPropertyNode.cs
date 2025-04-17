@@ -131,8 +131,9 @@ internal class XPropertyNode : PropertyNode
 
                 // Or if it is being implemented...
                 var at = FindMemberWithAttribute(Host.BaseType, chain: true, ifaces: true);
-                var inherit = XTypeNode.GetTypeInheritMembersValue(Host, out var value) && value;
-                if (at != null && inherit)
+                var inherit = XTypeNode.FindInheritWithsAttribute(Host, chain: true, ifaces: true);
+
+                if (at != null && inherit != null)
                 {
                     return "public abstract override ";
                 }
@@ -192,7 +193,7 @@ internal class XPropertyNode : PropertyNode
         {
             var at =
                 FindMemberWithAttribute(Host, chain: true, ifaces: true) ??
-                XTypeNode.FindTypeWithAttribute(Host, chain: true, ifaces: true);
+                XTypeNode.FindInheritWithsAttribute(Host, chain: true, ifaces: true);
 
             var prevent = at != null && GetPreventVirtualValue(at, out var temp) && temp;
             var issealed = Host.IsSealed;
@@ -218,8 +219,8 @@ internal class XPropertyNode : PropertyNode
                 }
 
                 // Or if it is being implemented...
-                var inherit = XTypeNode.GetTypeInheritMembersValue(Host, out var value) && value;
-                if (inherit)
+                var inherit = XTypeNode.FindInheritWithsAttribute(Host);
+                if (inherit != null)
                 {
                     var host = Host.BaseType;
                     while (host != null)
@@ -474,9 +475,11 @@ internal class XPropertyNode : PropertyNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// Tries to get the value of the '<see cref="WithAttribute.PreventVirtual"/>'
-    /// named argument from the given attribute data. Returns <c>true</c> if the value is found,
-    /// and the value itself in the <paramref name="value"/> parameter, or false otherwise.
+    /// Tries to get the value of the '<see cref="WithAttribute.PreventVirtual"/>' or the
+    /// <see cref="InheritWithsAttribute.PreventVirtual"/> named argument from the given
+    /// attribute data, using the fact that both are named the same.  Returns <c>true</c> if
+    /// the value is found, and the value itself in the <paramref name="value"/> parameter, or
+    /// false otherwise.
     /// </summary>
     /// <param name="at"></param>
     /// <param name="value"></param>
@@ -484,31 +487,6 @@ internal class XPropertyNode : PropertyNode
     public static bool GetPreventVirtualValue(AttributeData at, out bool value)
     {
         if (at.GetNamedArgument(nameof(WithAttribute.PreventVirtual), out var arg))
-        {
-            if (!arg.Value.IsNull && arg.Value.Value is bool temp)
-            {
-                value = temp;
-                return true;
-            }
-        }
-
-        value = default;
-        return false;
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Tries to get the value of the '<see cref="WithAttribute.InheritMembers"/>'
-    /// named argument from the given attribute data. Returns <c>true</c> if the value is found,
-    /// and the value itself in the <paramref name="value"/> parameter, or false otherwise.
-    /// </summary>
-    /// <param name="at"></param>
-    /// <param name="value"></param>
-    /// <returns></returns>
-    public static bool GetInheritMembersValue(AttributeData at, out bool value)
-    {
-        if (at.GetNamedArgument(nameof(WithAttribute.InheritMembers), out var arg))
         {
             if (!arg.Value.IsNull && arg.Value.Value is bool temp)
             {

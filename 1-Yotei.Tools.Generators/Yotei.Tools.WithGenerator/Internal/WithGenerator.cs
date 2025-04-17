@@ -15,7 +15,7 @@ internal class WithGenerator : TreeGenerator
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    protected override Type[] TypeAttributes { get; } = [typeof(WithAttribute)];
+    protected override Type[] TypeAttributes { get; } = [typeof(InheritWithsAttribute)];
 
     /// <inheritdoc/>
     protected override Type[] PropertyAttributes { get; } = [typeof(WithAttribute)];

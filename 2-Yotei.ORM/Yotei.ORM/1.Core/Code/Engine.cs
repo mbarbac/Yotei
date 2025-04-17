@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <inheritdoc cref="IEngine"/>
-[With(InheritMembers = true)]
+[InheritWiths]
 public partial class Engine : IEngine
 {
     public const bool CASESENSITIVENAMES = false;

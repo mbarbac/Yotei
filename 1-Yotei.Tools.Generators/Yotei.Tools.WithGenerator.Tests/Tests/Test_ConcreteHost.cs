@@ -18,7 +18,7 @@ namespace Yotei.Tools.WithGenerator.Tests.Concretes
         }
 
         // --------------------------------------------
-        [With(InheritMembers = true)]
+        [InheritWiths]
         public partial interface IBar<K, T> : IFoo<T>
         {
             [With(PreventVirtual = true)] string Branch { get; }
@@ -31,7 +31,7 @@ namespace Yotei.Tools.WithGenerator.Tests.Concretes
         public partial class TOther
         {
             // --------------------------------------------
-            [With(InheritMembers = true)]
+            [InheritWiths]
             public partial class Foo<T> : IFoo<T>
             {
                 public Foo(string name) => Name = name;
@@ -41,7 +41,7 @@ namespace Yotei.Tools.WithGenerator.Tests.Concretes
             }
 
             // --------------------------------------------
-            [With(InheritMembers = true)]
+            [InheritWiths]
             public partial class Bar<K, T> : Foo<T>, IBar<K, T>
             {
                 public Bar(string name, string branch) : base(name) => Branch = branch;

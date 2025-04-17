@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <inheritdoc cref="IStrTokenizer"/>
-[With(InheritMembers = true)]
+[InheritWiths]
 public abstract partial class StrTokenizer : IStrTokenizer
 {
     /// <summary>

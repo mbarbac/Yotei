@@ -17,7 +17,7 @@ namespace Yotei.Tools.WithGenerator.Tests.Interfaces
         }
 
         // --------------------------------------------
-        [With(InheritMembers = true)]
+        [InheritWiths]
         public partial interface IBar<K, T> : IFoo<T>
         {
             [With(PreventVirtual = true)] string Branch { get; }
