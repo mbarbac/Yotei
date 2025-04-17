@@ -40,7 +40,7 @@ public partial class StrLiteralTokenizer : StrTokenizer
     }
 
     /// <inheritdoc/>
-    public override string ToString() => $"[{Value}]";
+    public override string ToString() => $"{Value}";
 
     /// <summary>
     /// The not-null and not-empty value to extract as literal tokens. Note that values that

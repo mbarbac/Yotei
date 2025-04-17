@@ -33,10 +33,12 @@ public abstract partial class StrTokenizer : IStrTokenizer
     {
         token.ThrowWhenNull();
 
+        // We reduce text tokens up-front as the things to search for might be a combination
+        // of two consecutive text elements...
         token = ReduceTextTokens(token);
         token = token.TokenizeWith(Extract);
-        token = ReduceTextTokens(token);
 
+        // But we only reduce after finishing if such is requested...
         if (reduce) token = token.Reduce(Comparison);
         return token;
     }

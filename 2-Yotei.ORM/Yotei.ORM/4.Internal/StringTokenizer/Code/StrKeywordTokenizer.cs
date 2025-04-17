@@ -42,7 +42,7 @@ public partial class StrKeywordTokenizer : StrTokenizer
     }
 
     /// <inheritdoc/>
-    public override string ToString() => $"[{Keyword}]";
+    public override string ToString() => $"{Keyword}";
 
     /// <summary>
     /// The not-null and not-empty keyword to extract. Keywords are trimmed before used.

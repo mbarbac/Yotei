@@ -89,6 +89,7 @@ public class StrTokenText : IStrToken
     /// <inheritdoc/>
     public IStrToken TokenizeWith(Func<string, IStrToken> tokenizer)
     {
-        return tokenizer.ThrowWhenNull()(_Payload);
+        tokenizer.ThrowWhenNull();
+        return tokenizer(_Payload);
     }
 }
