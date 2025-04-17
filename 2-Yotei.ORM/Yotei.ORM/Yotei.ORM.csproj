@@ -34,10 +34,7 @@
 	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.CloneGenerator\Yotei.Tools.CloneGenerator.csproj">
 		 <OutputItemType>Analyzer</OutputItemType>
 	  </ProjectReference>
-	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.WithGenerator\Yotei.Tools.WithGenerator.csproj">
-		 <OutputItemType>Analyzer</OutputItemType>
-	  </ProjectReference>
-	  <ProjectReference Include="..\..\2-Yotei.ORM.Generators\Yotei.ORM.Generators\Yotei.ORM.Generators.csproj">
+	  <ProjectReference Include="..\Yotei.ORM.Generators\Yotei.ORM.Generators.csproj">
 		 <OutputItemType>Analyzer</OutputItemType>
 	  </ProjectReference>
    </ItemGroup>
