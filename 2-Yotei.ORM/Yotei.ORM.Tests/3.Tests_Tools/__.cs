@@ -1,7 +1,7 @@
 ﻿using static Yotei.Tools.Diagnostics.ConsoleEx;
 using static System.ConsoleColor;
 
-namespace Yotei.ORM.Tests;
+namespace Yotei.ORM.Tests.Tools;
 
 // ========================================================
 //[Enforced]
@@ -13,5 +13,3 @@ namespace Yotei.ORM.Tests;
 //    {
 //    }
 //}
-
-public interface IFake { }
