@@ -35,8 +35,9 @@ public abstract partial class StrTokenizer : IStrTokenizer
 
         token = ReduceTextTokens(token);
         token = token.TokenizeWith(Extract);
-        if (reduce) token = token.Reduce(Comparison);
+        token = ReduceTextTokens(token);
 
+        if (reduce) token = token.Reduce(Comparison);
         return token;
     }
 
@@ -61,7 +62,8 @@ public abstract partial class StrTokenizer : IStrTokenizer
         // Chain sources...
         if (token is StrTokenChain chain)
         {
-            if (chain.Any(x => x is StrTokenText)) // We'll only combine if there are any...
+            // We'll only combine if needed to decrease GC allocations...
+            if (chain.Count(x => x is StrTokenText) > 1)
             {
                 var builder = chain.GetBuilder();
                 var changed = false;
@@ -84,6 +86,7 @@ public abstract partial class StrTokenizer : IStrTokenizer
                 if (changed) chain = builder.ToInstance();
             }
 
+            // Simplifying...
             token =
                 chain.Count == 0 ? StrTokenText.Empty :
                 chain.Count == 1 ? chain[0] :
