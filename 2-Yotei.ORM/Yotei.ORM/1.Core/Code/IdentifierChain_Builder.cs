@@ -153,6 +153,8 @@ public partial class IdentifierChain
         public int AddRange(IEnumerable<IIdentifierPart> range, bool reduce)
         {
             range.ThrowWhenNull();
+            if (range.Any(x => x == null)) throw new ArgumentException("Range contains null elements.").WithData(range);
+
             if (Count == 0 && range.All(x => x.Value == null) && reduce) return 0;
 
             var r = base.AddRange(range);
@@ -176,6 +178,8 @@ public partial class IdentifierChain
         public int InsertRange(int index, IEnumerable<IIdentifierPart> range, bool reduce)
         {
             range.ThrowWhenNull();
+            if (range.Any(x => x == null)) throw new ArgumentException("Range contains null elements.").WithData(range);
+
             if (Count == 0 && range.All(x => x.Value == null) && reduce) return 0;
             if (index == 0 && range.All(x => x.Value == null) && reduce) return 0;
 
@@ -292,18 +296,22 @@ public partial class IdentifierChain
         public int Replace(int index, string? value) => Replace(index, value, true);
         int Replace(int index, string? value, bool reduce)
         {
-            var parts = GetParts(value, reduce);
+            var parts = GetParts(value, reduce: false);
+            if (parts.Count == 0) return 0;
+
+            var temp = this[index];
+            var removed = base.RemoveAt(index);
+            if (removed == 0) { base.Insert(index, temp); return 0; }
 
             var r = 0; foreach (var part in parts)
             {
-                var temp = Replace(index, part, reduce: false);
-                r += temp;
-                index += temp;
+                var num = Insert(index, part, reduce: false);
+                r += num;
+                index += num;
             }
 
             return Reduce(r, reduce);
         }
-
 
         /// <inheritdoc cref="ICoreList{K, T}.Add(T)"/>
         public int Add(string? value) => Add(value, true);

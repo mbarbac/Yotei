@@ -79,8 +79,17 @@ public static class Identifier
     /// </summary>
     static List<string?> GetPartsWithTerminators(IEngine engine, string? value)
     {
+        // Trivial cases....
         if (value == null) return [];
+        if (!value.Contains('.'))
+        {
+            value = value.UnWrap(engine.LeftTerminator, engine.RightTerminator, trim: false);
+            value = ValidateWithTerminators(engine, value, preventTerminators: true);
 
+            return [value];
+        }
+
+        // Finding wrapped parts...
         var tokenizer = new StrWrappedTokenizer(engine.LeftTerminator, engine.RightTerminator);
         var token = tokenizer.Tokenize(value);
 
@@ -156,7 +165,7 @@ public static class Identifier
 
         // Unknown token...
         throw new ArgumentException(
-            "Cannot obtain a known token while finding wrapped parts.")
+            "Unknown token while finding wrapped parts.")
             .WithData(value)
             .WithData(engine);
     }
