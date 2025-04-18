@@ -10,5 +10,5 @@ public interface IIdentifierPart : IIdentifier
     /// The unwrapped value carried by this identifier, without any terminators, or null if it
     /// represents an empty or missed one.
     /// </summary>
-    string? UnWrappedValue { get; }
+    string? UnwrappedValue { get; }
 }

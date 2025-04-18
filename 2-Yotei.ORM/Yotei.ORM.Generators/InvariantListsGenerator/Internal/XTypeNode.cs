@@ -194,7 +194,7 @@ internal class XTypeNode : TypeNode
         else
         {
             isNullable = false;
-            return (INamedTypeSymbol)source;
+            return source;
         }
     }
 
@@ -229,7 +229,7 @@ internal class XTypeNode : TypeNode
 
             if (!Symbol.IsInterface())
             {
-                foreach (var iface in FindCloneInterfaces())
+                foreach (var iface in FindCloneInterfaces(Symbol))
                 {
                     var name = iface.EasyName(RoslynNameOptions.Full);
 
@@ -288,8 +288,10 @@ internal class XTypeNode : TypeNode
             // Classes...
             else
             {
+                if (Symbol.Name == "IdentifierChain") { } // DEBUG-ONLY
+
                 var core = method.EasyName();
-                var temp = invface?.EasyName() ?? headdoc;
+                var temp = invfaceShort ?? headdoc;
                 core = $"{temp}.{core}";
                 core = core.Replace('<', '{').Replace('>', '}');
                 core = $"/// <inheritdoc cref=\"{core}\"/>";
@@ -298,10 +300,17 @@ internal class XTypeNode : TypeNode
                 cb.AppendLine(core);
                 cb.AppendLine(AttributeDoc);
 
-                var xname = invface == null ? symbolname : invfaceShort;
+                var xname = symbolname;
                 var args = method.EasyName(coptions);
                 cb.AppendLine($"public override {xname} {mname}");
                 cb.AppendLine($"=> ({xname})base.{args};");
+
+                if (invface != null)
+                {
+                    cb.AppendLine();
+                    cb.AppendLine($"{invfaceShort}");
+                    cb.AppendLine($"{invfaceShort}.{mname} => {args};");
+                }
             }
         }
     }
@@ -361,14 +370,40 @@ internal class XTypeNode : TypeNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// Finds the interfaces where 'Clone()' is declared, if any.
+    /// Finds the interfaces where 'Clone()' is declared, if any, staring from the interfaces
+    /// of the given host.
     /// </summary>
-    IEnumerable<INamedTypeSymbol> FindCloneInterfaces()
+    IEnumerable<INamedTypeSymbol> FindCloneInterfaces(INamedTypeSymbol host)
     {
-        foreach (var iface in Symbol.Interfaces)
+        var comparer = SymbolComparer.Default;
+        List<INamedTypeSymbol> items = [];
+
+        foreach (var iface in host.Interfaces) Capture(iface);
+        return items;
+
+        // Tries to capture the given interface...
+        void Capture(INamedTypeSymbol iface)
         {
+            var found = false;
+
             var method = FindCloneMethod(iface);
-            if (method != null) yield return iface;
+            if (method != null) found = true;
+            else
+            {
+                var ats = iface.GetAttributes().FirstOrDefault(x =>
+                    x.AttributeClass != null &&
+                    x.AttributeClass.Name.Contains(InvariantListName));
+
+                if (ats != null) found = true;
+            }
+
+            if (found)
+            {
+                var temp = items.Find(x => comparer.Equals(iface, x));
+                if (temp == null) items.Add(iface);
+            }
+
+            foreach (var child in iface.Interfaces) Capture(child);
         }
     }
 
