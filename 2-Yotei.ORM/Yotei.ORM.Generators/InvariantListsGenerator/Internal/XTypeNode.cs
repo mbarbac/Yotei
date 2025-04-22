@@ -22,7 +22,6 @@ internal class XTypeNode : TypeNode
     INamedTypeSymbol TType = null!; bool TTypeNullable = false; // Arity == 1 or 2
 
     Type Template = null!;
-    //IMethodSymbol? CloneMethod = null;
     string KTypeName = null!;
     string TTypeName = null!;
     string AttributeName = null!;
@@ -371,39 +370,39 @@ internal class XTypeNode : TypeNode
     /// Finds the interfaces where 'Clone()' is declared, if any, staring from the interfaces
     /// of the given host.
     /// </summary>
-    IEnumerable<INamedTypeSymbol> FindCloneInterfaces(INamedTypeSymbol host)
-    {
-        var comparer = SymbolComparer.Default;
-        List<INamedTypeSymbol> items = [];
+    //IEnumerable<INamedTypeSymbol> FindCloneInterfaces(INamedTypeSymbol host)
+    //{
+    //    var comparer = SymbolComparer.Default;
+    //    List<INamedTypeSymbol> items = [];
 
-        foreach (var iface in host.Interfaces) Capture(iface);
-        return items;
+    //    foreach (var iface in host.Interfaces) Capture(iface);
+    //    return items;
 
-        // Tries to capture the given interface...
-        void Capture(INamedTypeSymbol iface)
-        {
-            var found = false;
+    //    // Tries to capture the given interface...
+    //    void Capture(INamedTypeSymbol iface)
+    //    {
+    //        var found = false;
 
-            var method = FindCloneMethod(iface);
-            if (method != null) found = true;
-            else
-            {
-                var ats = iface.GetAttributes().FirstOrDefault(x =>
-                    x.AttributeClass != null &&
-                    x.AttributeClass.Name.Contains(InvariantListName));
+    //        var method = FindCloneMethod(iface);
+    //        if (method != null) found = true;
+    //        else
+    //        {
+    //            var ats = iface.GetAttributes().FirstOrDefault(x =>
+    //                x.AttributeClass != null &&
+    //                x.AttributeClass.Name.Contains(InvariantListName));
 
-                if (ats != null) found = true;
-            }
+    //            if (ats != null) found = true;
+    //        }
 
-            if (found)
-            {
-                var temp = items.Find(x => comparer.Equals(iface, x));
-                if (temp == null) items.Add(iface);
-            }
+    //        if (found)
+    //        {
+    //            var temp = items.Find(x => comparer.Equals(iface, x));
+    //            if (temp == null) items.Add(iface);
+    //        }
 
-            foreach (var child in iface.Interfaces) Capture(child);
-        }
-    }
+    //        foreach (var child in iface.Interfaces) Capture(child);
+    //    }
+    //}
 
     /// <summary>
     /// Returns the 'IInvariantList' -alike interface to reimplement, if any is used explicitly
@@ -461,31 +460,31 @@ internal class XTypeNode : TypeNode
     /// <param name="chain"></param>
     /// <param name="ifaces"></param>
     /// <returns></returns>
-    static IMethodSymbol? FindCloneMethod(ITypeSymbol type, bool chain = false, bool ifaces = false)
-    {
-        var item = type.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(x =>
-            x.Name == "Clone" &&
-            x.Parameters.Length == 0 &&
-            x.ReturnsVoid == false);
+    //static IMethodSymbol? FindCloneMethod(ITypeSymbol type, bool chain = false, bool ifaces = false)
+    //{
+    //    var item = type.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(x =>
+    //        x.Name == "Clone" &&
+    //        x.Parameters.Length == 0 &&
+    //        x.ReturnsVoid == false);
 
-        if (item == null && chain)
-        {
-            foreach (var temp in type.AllBaseTypes())
-            {
-                item = FindCloneMethod(temp);
-                if (item != null) break;
-            }
-        }
+    //    if (item == null && chain)
+    //    {
+    //        foreach (var temp in type.AllBaseTypes())
+    //        {
+    //            item = FindCloneMethod(temp);
+    //            if (item != null) break;
+    //        }
+    //    }
 
-        if (item == null && ifaces)
-        {
-            foreach (var temp in type.AllInterfaces)
-            {
-                item = FindCloneMethod(temp);
-                if (item != null) break;
-            }
-        }
+    //    if (item == null && ifaces)
+    //    {
+    //        foreach (var temp in type.AllInterfaces)
+    //        {
+    //            item = FindCloneMethod(temp);
+    //            if (item != null) break;
+    //        }
+    //    }
 
-        return item;
-    }
+    //    return item;
+    //}
 }

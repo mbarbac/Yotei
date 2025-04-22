@@ -3,6 +3,7 @@
 // ========================================================
 /// <summary>
 /// Decorates interfaces for which the 'IInvariantList{T}' one is reimplemented.
+/// <br/> Note that the decorated host must have a 'Clone()' method.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 [AttributeUsage(AttributeTargets.Interface, Inherited = false, AllowMultiple = false)]

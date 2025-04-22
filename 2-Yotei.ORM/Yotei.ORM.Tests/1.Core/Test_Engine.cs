@@ -25,6 +25,16 @@ public static class Test_Engine
 
     //[Enforced]
     [Fact]
+    public static void Test_Clone()
+    {
+        var source = new FakeEngine();
+        var target = source.Clone();
+        Assert.NotSame(source, target);
+        Assert.True(source.Equals(target));
+    }
+
+    //[Enforced]
+    [Fact]
     public static void Test_Compare()
     {
         var source = new FakeEngine();

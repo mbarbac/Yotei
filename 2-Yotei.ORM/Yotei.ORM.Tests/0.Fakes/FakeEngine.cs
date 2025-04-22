@@ -1,6 +1,7 @@
 ﻿namespace Yotei.ORM.Tests;
 
 // ========================================================
+[Cloneable]
 [InheritWiths]
 public partial class FakeEngine : Code.Engine
 {
