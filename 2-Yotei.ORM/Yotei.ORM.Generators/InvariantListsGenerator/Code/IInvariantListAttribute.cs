@@ -4,7 +4,6 @@
 /// <summary>
 /// Decorates interfaces for which the 'IInvariantList{T}' or the 'IInvariantList{K,T}' one
 /// is reimplemented.
-/// <br/> Note that the decorated host must have a 'Clone()' method.
 /// </summary>
 [AttributeUsage(AttributeTargets.Interface, Inherited = false, AllowMultiple = false)]
 public class IInvariantListAttribute : Attribute

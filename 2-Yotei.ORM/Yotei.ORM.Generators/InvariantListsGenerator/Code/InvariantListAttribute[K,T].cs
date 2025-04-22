@@ -3,7 +3,6 @@
 // ========================================================
 /// <summary>
 /// Decorates classes for which the 'InvariantList{K,T}' one is used as its base one.
-/// <br/> Note that the decorated host must have a 'Clone()' method.
 /// </summary>
 /// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>

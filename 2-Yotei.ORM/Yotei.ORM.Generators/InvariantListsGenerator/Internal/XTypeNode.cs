@@ -105,18 +105,16 @@ internal class XTypeNode : TypeNode
             ? typeof(IChainTemplate<>)
             : typeof(IChainTemplate<,>);
 
-        // Determining if a clone method already exists in this type...
-        //CloneMethod = FindCloneMethod(Symbol);
-
-        //if (CloneMethod == null && !Symbol.IsInterface()) // We need a copy constructor...
-        //{
-        //    var cons = Symbol.GetCopyConstructor();
-        //    if (cons == null)
-        //    {
-        //        TreeDiagnostics.NoCopyConstructor(Symbol).Report(context);
-        //        return false;
-        //    }
-        //}
+        // We'll always need a copy constructor if host is a class...
+        if (!Symbol.IsInterface())
+        {
+            var cons = Symbol.GetCopyConstructor();
+            if (cons == null)
+            {
+                TreeDiagnostics.NoCopyConstructor(Symbol).Report(context);
+                return false;
+            }
+        }
 
         // Finishing...
         KTypeName = KType?.EasyName(RoslynNameOptions.Full)!; if (KTypeNullable) KTypeName += "?";
@@ -216,33 +214,13 @@ internal class XTypeNode : TypeNode
         var symbolname = Symbol.EasyName();
         var headdoc = Symbol.IsInterface() ? IInvariantListName : InvariantListName;
 
-        // Emitting 'Clone()' if needed...
-        //if (CloneMethod == null)
-        //{
-        //    cb.AppendLine("/// <inheritdoc cref=\"ICloneable.Clone\"/>");
-        //    cb.AppendLine(AttributeDoc);
-
-        //    cb.AppendLine(Symbol.IsInterface()
-        //        ? $"new {symbolname} Clone();"
-        //        : $"public override {symbolname} Clone() => new {symbolname}(this);");
-
-        //    if (!Symbol.IsInterface())
-        //    {
-        //        foreach (var iface in FindCloneInterfaces(Symbol))
-        //        {
-        //            var name = iface.EasyName(RoslynNameOptions.Full);
-
-        //            cb.AppendLine();
-        //            cb.AppendLine($"{name}");
-        //            cb.AppendLine($"{name}.Clone() => Clone();");
-        //        }
-        //    }
-        //}
-
         // The interface to use for base methods' reimplementation...
         var invface = FindInvariantListIface();
         var invfaceFull = invface?.EasyName(RoslynNameOptions.Full);
         var invfaceShort = invface?.EasyName();
+
+        // Emitting 'Clone()' method is needed...
+        TryEmitCloneMethod(context, cb);
 
         // Name options...
         var ioptions = EasyNameOptions.Default with // For iface method names...
@@ -367,44 +345,6 @@ internal class XTypeNode : TypeNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// Finds the interfaces where 'Clone()' is declared, if any, staring from the interfaces
-    /// of the given host.
-    /// </summary>
-    //IEnumerable<INamedTypeSymbol> FindCloneInterfaces(INamedTypeSymbol host)
-    //{
-    //    var comparer = SymbolComparer.Default;
-    //    List<INamedTypeSymbol> items = [];
-
-    //    foreach (var iface in host.Interfaces) Capture(iface);
-    //    return items;
-
-    //    // Tries to capture the given interface...
-    //    void Capture(INamedTypeSymbol iface)
-    //    {
-    //        var found = false;
-
-    //        var method = FindCloneMethod(iface);
-    //        if (method != null) found = true;
-    //        else
-    //        {
-    //            var ats = iface.GetAttributes().FirstOrDefault(x =>
-    //                x.AttributeClass != null &&
-    //                x.AttributeClass.Name.Contains(InvariantListName));
-
-    //            if (ats != null) found = true;
-    //        }
-
-    //        if (found)
-    //        {
-    //            var temp = items.Find(x => comparer.Equals(iface, x));
-    //            if (temp == null) items.Add(iface);
-    //        }
-
-    //        foreach (var child in iface.Interfaces) Capture(child);
-    //    }
-    //}
-
-    /// <summary>
     /// Returns the 'IInvariantList' -alike interface to reimplement, if any is used explicitly
     /// in the class declaration, or null if any is found. This method should only be called for
     /// class' hosts.
@@ -445,46 +385,120 @@ internal class XTypeNode : TypeNode
 
     // ----------------------------------------------------
 
-    string VersionDoc => Assembly.GetExecutingAssembly().GetName().Version.ToString();
-    string AttributeDoc => $$"""
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("{{nameof(InvariantListGenerator)}}", "{{VersionDoc}}")]
-        """;
+    /// <summary>
+    /// Tries to emit a suitable 'Clone()' method, if such is needed.
+    /// </summary>
+    void TryEmitCloneMethod(SourceProductionContext context, CodeBuilder cb)
+    {
+        var symbolname = Symbol.EasyName();
 
-    // ----------------------------------------------------
+        // If already declared or implemented we are done...
+        var method = FindCloneMethod(Symbol);
+        if (method != null) return;
+
+        // Documenting...
+        cb.AppendLine("/// <inheritdoc cref=\"ICloneable.Clone\"/>");
+        cb.AppendLine(AttributeDoc);
+
+        // Host is an interface...
+        if (Symbol.IsInterface()) cb.AppendLine($"new {symbolname} Clone();");
+
+        // Otherwise we are inheriting from an abstract class...
+        else
+        {
+            cb.AppendLine($"public override {symbolname} Clone() => new {symbolname}(this);");
+
+            foreach (var iface in FindCloneInterfaces(Symbol))
+            {
+                var name = iface.EasyName(RoslynNameOptions.Full);
+
+                cb.AppendLine();
+                cb.AppendLine($"{name}");
+                cb.AppendLine($"{name}.Clone() => Clone();");
+            }
+        }
+    }
 
     /// <summary>
-    /// Tries to find a '<c>Clone()</c>' method in the given type, including also its base types
-    /// and interfaces if requested. Returns null if not found.
+    /// Finds the interfaces where 'Clone()' is declared, starting from the interfaces of the
+    /// given host.
+    /// </summary>
+    /// <param name="host"></param>
+    /// <returns></returns>
+    IEnumerable<INamedTypeSymbol> FindCloneInterfaces(INamedTypeSymbol host)
+    {
+        var comparer = SymbolComparer.Default;
+        List<INamedTypeSymbol> items = [];
+
+        foreach (var iface in host.Interfaces) Capture(iface);
+        return items;
+
+        // Tries to capture the given interface...
+        void Capture(INamedTypeSymbol iface)
+        {
+            var found = false;
+
+            var method = FindCloneMethod(iface);
+            if (method != null) found = true;
+            else
+            {
+                var ats = iface.GetAttributes().FirstOrDefault(x =>
+                    x.AttributeClass != null &&
+                    x.AttributeClass.Name.Contains(InvariantListName));
+
+                if (ats != null) found = true;
+            }
+
+            if (found)
+            {
+                var temp = items.Find(x => comparer.Equals(iface, x));
+                if (temp == null) items.Add(iface);
+            }
+
+            foreach (var child in iface.Interfaces) Capture(child);
+        }
+    }
+
+    /// <summary>
+    /// Tries to find a 'Clone()' method in the given type, also including its base types and
+    /// interfaces if requested. Returns null if not found.
     /// </summary>
     /// <param name="type"></param>
     /// <param name="chain"></param>
     /// <param name="ifaces"></param>
     /// <returns></returns>
-    //static IMethodSymbol? FindCloneMethod(ITypeSymbol type, bool chain = false, bool ifaces = false)
-    //{
-    //    var item = type.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(x =>
-    //        x.Name == "Clone" &&
-    //        x.Parameters.Length == 0 &&
-    //        x.ReturnsVoid == false);
+    static IMethodSymbol? FindCloneMethod(ITypeSymbol type, bool chain = false, bool ifaces = false)
+    {
+        var item = type.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(x =>
+            x.Name == "Clone" &&
+            x.Parameters.Length == 0 &&
+            x.ReturnsVoid == false);
 
-    //    if (item == null && chain)
-    //    {
-    //        foreach (var temp in type.AllBaseTypes())
-    //        {
-    //            item = FindCloneMethod(temp);
-    //            if (item != null) break;
-    //        }
-    //    }
+        if (item == null && chain)
+        {
+            foreach (var temp in type.AllBaseTypes())
+            {
+                item = FindCloneMethod(temp);
+                if (item != null) break;
+            }
+        }
 
-    //    if (item == null && ifaces)
-    //    {
-    //        foreach (var temp in type.AllInterfaces)
-    //        {
-    //            item = FindCloneMethod(temp);
-    //            if (item != null) break;
-    //        }
-    //    }
+        if (item == null && ifaces)
+        {
+            foreach (var temp in type.AllInterfaces)
+            {
+                item = FindCloneMethod(temp);
+                if (item != null) break;
+            }
+        }
 
-    //    return item;
-    //}
+        return item;
+    }
+
+    // ----------------------------------------------------
+
+    string VersionDoc => Assembly.GetExecutingAssembly().GetName().Version.ToString();
+    string AttributeDoc => $$"""
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("{{nameof(InvariantListGenerator)}}", "{{VersionDoc}}")]
+        """;
 }

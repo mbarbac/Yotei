@@ -3,7 +3,6 @@
 // ========================================================
 /// <summary>
 /// Decorates interfaces for which the 'IInvariantList{K,T}' one is reimplemented.
-/// <br/> Note that the decorated host must have a 'Clone()' method.
 /// </summary>
 /// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>
