@@ -22,7 +22,7 @@ internal class XTypeNode : TypeNode
     INamedTypeSymbol TType = null!; bool TTypeNullable = false; // Arity == 1 or 2
 
     Type Template = null!;
-    IMethodSymbol? CloneMethod = null;
+    //IMethodSymbol? CloneMethod = null;
     string KTypeName = null!;
     string TTypeName = null!;
     string AttributeName = null!;
@@ -107,17 +107,17 @@ internal class XTypeNode : TypeNode
             : typeof(IChainTemplate<,>);
 
         // Determining if a clone method already exists in this type...
-        CloneMethod = FindCloneMethod(Symbol);
+        //CloneMethod = FindCloneMethod(Symbol);
 
-        if (CloneMethod == null && !Symbol.IsInterface()) // We need a copy constructor...
-        {
-            var cons = Symbol.GetCopyConstructor();
-            if (cons == null)
-            {
-                TreeDiagnostics.NoCopyConstructor(Symbol).Report(context);
-                return false;
-            }
-        }
+        //if (CloneMethod == null && !Symbol.IsInterface()) // We need a copy constructor...
+        //{
+        //    var cons = Symbol.GetCopyConstructor();
+        //    if (cons == null)
+        //    {
+        //        TreeDiagnostics.NoCopyConstructor(Symbol).Report(context);
+        //        return false;
+        //    }
+        //}
 
         // Finishing...
         KTypeName = KType?.EasyName(RoslynNameOptions.Full)!; if (KTypeNullable) KTypeName += "?";
@@ -218,27 +218,27 @@ internal class XTypeNode : TypeNode
         var headdoc = Symbol.IsInterface() ? IInvariantListName : InvariantListName;
 
         // Emitting 'Clone()' if needed...
-        if (CloneMethod == null)
-        {
-            cb.AppendLine("/// <inheritdoc cref=\"ICloneable.Clone\"/>");
-            cb.AppendLine(AttributeDoc);
+        //if (CloneMethod == null)
+        //{
+        //    cb.AppendLine("/// <inheritdoc cref=\"ICloneable.Clone\"/>");
+        //    cb.AppendLine(AttributeDoc);
 
-            cb.AppendLine(Symbol.IsInterface()
-                ? $"new {symbolname} Clone();"
-                : $"public override {symbolname} Clone() => new {symbolname}(this);");
+        //    cb.AppendLine(Symbol.IsInterface()
+        //        ? $"new {symbolname} Clone();"
+        //        : $"public override {symbolname} Clone() => new {symbolname}(this);");
 
-            if (!Symbol.IsInterface())
-            {
-                foreach (var iface in FindCloneInterfaces(Symbol))
-                {
-                    var name = iface.EasyName(RoslynNameOptions.Full);
+        //    if (!Symbol.IsInterface())
+        //    {
+        //        foreach (var iface in FindCloneInterfaces(Symbol))
+        //        {
+        //            var name = iface.EasyName(RoslynNameOptions.Full);
 
-                    cb.AppendLine();
-                    cb.AppendLine($"{name}");
-                    cb.AppendLine($"{name}.Clone() => Clone();");
-                }
-            }
-        }
+        //            cb.AppendLine();
+        //            cb.AppendLine($"{name}");
+        //            cb.AppendLine($"{name}.Clone() => Clone();");
+        //        }
+        //    }
+        //}
 
         // The interface to use for base methods' reimplementation...
         var invface = FindInvariantListIface();
@@ -288,8 +288,6 @@ internal class XTypeNode : TypeNode
             // Classes...
             else
             {
-                if (Symbol.Name == "IdentifierChain") { } // DEBUG-ONLY
-
                 var core = method.EasyName();
                 var temp = invfaceShort ?? headdoc;
                 core = $"{temp}.{core}";

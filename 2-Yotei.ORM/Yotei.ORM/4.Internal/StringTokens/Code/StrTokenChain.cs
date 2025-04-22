@@ -5,6 +5,7 @@
 /// Represents a token that carries a flat collection of string tokens.
 /// </summary>
 [DebuggerDisplay("{ToDebugString(5)}")]
+[Cloneable]
 [InvariantList<IStrToken>]
 public partial class StrTokenChain : IStrToken
 {

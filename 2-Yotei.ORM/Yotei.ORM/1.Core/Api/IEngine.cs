@@ -4,6 +4,7 @@
 /// <summary>
 /// Describes an underlying database engine.
 /// </summary>
+[Cloneable]
 public partial interface IEngine : IEquatable<IEngine>
 {
     /// <summary>

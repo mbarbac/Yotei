@@ -2,6 +2,7 @@
 
 // ========================================================
 /// <inheritdoc cref="IEngine"/>
+[Cloneable]
 [InheritWiths]
 public partial class Engine : IEngine
 {
