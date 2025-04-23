@@ -60,6 +60,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yotei.ORM", "2-Yotei.ORM\Yo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yotei.ORM.Tests", "2-Yotei.ORM\Yotei.ORM.Tests\Yotei.ORM.Tests.csproj", "{6FF5900F-FD67-4749-B83E-A4326B2D0A23}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Experimental", "0-Development\Experimental\Experimental.csproj", "{3AC9267C-EC44-4B8D-8CF3-68E9E3772197}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -151,6 +153,12 @@ Global
 		{6FF5900F-FD67-4749-B83E-A4326B2D0A23}.Local|Any CPU.Build.0 = Debug|Any CPU
 		{6FF5900F-FD67-4749-B83E-A4326B2D0A23}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6FF5900F-FD67-4749-B83E-A4326B2D0A23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3AC9267C-EC44-4B8D-8CF3-68E9E3772197}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AC9267C-EC44-4B8D-8CF3-68E9E3772197}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AC9267C-EC44-4B8D-8CF3-68E9E3772197}.Local|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AC9267C-EC44-4B8D-8CF3-68E9E3772197}.Local|Any CPU.Build.0 = Debug|Any CPU
+		{3AC9267C-EC44-4B8D-8CF3-68E9E3772197}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AC9267C-EC44-4B8D-8CF3-68E9E3772197}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -174,6 +182,7 @@ Global
 		{1B33009B-FE95-168C-2235-85928A71DEBC} = {E9F1463C-205C-4379-A73A-30D341742DE0}
 		{B978C141-9276-4975-AA0E-17CE9E92D155} = {E9F1463C-205C-4379-A73A-30D341742DE0}
 		{6FF5900F-FD67-4749-B83E-A4326B2D0A23} = {E9F1463C-205C-4379-A73A-30D341742DE0}
+		{3AC9267C-EC44-4B8D-8CF3-68E9E3772197} = {3C81E441-CA1B-4DC6-99C8-7BE088A760B4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BAE8432F-D282-481D-9635-D482FFACD5AA}
