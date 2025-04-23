@@ -1,25 +1,14 @@
 ﻿namespace Yotei.ORM.Internal;
 
 // ========================================================
-/// <inheritdoc cref="IStrTokenText"/>
-public class StrTokenText : IStrTokenText
+/// <inheritdoc cref="IStrTokenKeyword"/>
+public class StrTokenKeyword : IStrTokenKeyword
 {
-    /// <inheritdoc/>
-    public static StrTokenText Empty { get; } = new();
-    static IStrTokenText IStrTokenText.Empty => Empty;
-
-    // ----------------------------------------------------
-
     /// <summary>
-    /// Initializes a new empty instance.
+    /// Initializes a new instance with the given keyword value
     /// </summary>
-    public StrTokenText() : this(string.Empty) { }
-
-    /// <summary>
-    /// Initializes a new instance with the given payload value
-    /// </summary>
-    /// <param name="payload"></param>
-    public StrTokenText(string payload) => Payload = payload;
+    /// <param name="keyword"></param>
+    public StrTokenKeyword(string keyword) => Payload = keyword;
 
     /// <inheritdoc/>
     public override string ToString() => Payload;
@@ -28,7 +17,7 @@ public class StrTokenText : IStrTokenText
     public string Payload
     {
         get => _Payload;
-        init => _Payload = value.ThrowWhenNull();
+        init => _Payload = value.NotNullNotEmpty(trim: true); // Keywords must be trimmed before used!
     }
     string _Payload = default!;
     object? IStrToken.Payload => _Payload;
@@ -39,7 +28,7 @@ public class StrTokenText : IStrTokenText
     public bool Equals(IStrToken? other)
     {
         if (ReferenceEquals(this, other)) return true;
-        if (other is null || other is not IStrTokenText valid) return false;
+        if (other is null || other is not IStrTokenKeyword valid) return false;
 
         if (Payload != valid.Payload) return false;
         return true;
@@ -54,7 +43,7 @@ public class StrTokenText : IStrTokenText
     public bool Equals(IStrToken? other, StringComparison comparison)
     {
         if (ReferenceEquals(this, other)) return true;
-        if (other is null || other is not IStrTokenText valid) return false;
+        if (other is null || other is not IStrTokenKeyword valid) return false;
 
         if (string.Compare(Payload, valid.Payload, comparison) != 0) return false;
         return true;
@@ -64,7 +53,7 @@ public class StrTokenText : IStrTokenText
     public override bool Equals(object? obj) => Equals(obj as IStrToken);
 
     // Equality operator.
-    public static bool operator ==(StrTokenText? x, IStrToken? y)
+    public static bool operator ==(StrTokenKeyword? x, IStrToken? y)
     {
         if (x is null && y is null) return true;
         if (x is null || y is null) return false;
@@ -73,7 +62,7 @@ public class StrTokenText : IStrTokenText
     }
 
     // Inequality operator.
-    public static bool operator !=(StrTokenText? x, IStrToken? y) => !(x == y);
+    public static bool operator !=(StrTokenKeyword? x, IStrToken? y) => !(x == y);
 
     /// <inheritdoc/>
     public override int GetHashCode() => Payload.GetHashCode();
@@ -86,9 +75,5 @@ public class StrTokenText : IStrTokenText
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public IStrToken TokenizeWith(Func<string, IStrToken> tokenizer)
-    {
-        tokenizer.ThrowWhenNull();
-        return tokenizer(_Payload);
-    }
+    public IStrToken TokenizeWith(Func<string, IStrToken> tokenizer) => this;
 }

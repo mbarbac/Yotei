@@ -388,13 +388,12 @@ internal class XTypeNode : TypeNode
     /// <summary>
     /// Tries to emit a suitable 'Clone()' method, if such is needed.
     /// </summary>
-    void TryEmitCloneMethod(SourceProductionContext context, CodeBuilder cb)
+    void TryEmitCloneMethod(SourceProductionContext _, CodeBuilder cb)
     {
         var symbolname = Symbol.EasyName();
 
         // If already declared or implemented we are done...
-        var method = FindCloneMethod(Symbol);
-        if (method != null) return;
+        if (HasCloneMethod(Symbol)) return;
 
         // Documenting...
         cb.AppendLine("/// <inheritdoc cref=\"ICloneable.Clone\"/>");
@@ -410,7 +409,7 @@ internal class XTypeNode : TypeNode
 
             foreach (var iface in FindCloneInterfaces(Symbol))
             {
-                var name = iface.EasyName(RoslynNameOptions.Full);
+                var name = iface.EasyName(); // RoslynNameOptions.Full);
 
                 cb.AppendLine();
                 cb.AppendLine($"{name}");
@@ -493,6 +492,35 @@ internal class XTypeNode : TypeNode
         }
 
         return item;
+    }
+
+    /// <summary>
+    /// Determines if the given type has a suitable 'Clone()' method, including also its base
+    /// types and interfaces if requested.
+    /// </summary>
+    static bool HasCloneMethod(ITypeSymbol type, bool chain = false, bool ifaces = false)
+    {
+        var method = FindCloneMethod(type);
+        if (method != null) return true;
+
+        var ats = type.GetAttributes();
+        foreach (var at in ats)
+            if (at.AttributeClass != null &&
+                at.AttributeClass.Name.Contains("Cloneable")) return true;
+
+        foreach (var iface in type.Interfaces)
+            if (iface.Name == "ICloneable") return true;
+
+        if (chain && type.BaseType != null)
+            if (HasCloneMethod(type.BaseType, true, false)) return true;
+
+        if (ifaces)
+        {
+            foreach (var child in type.Interfaces)
+                if (HasCloneMethod(child, false, true)) return true;
+        }
+
+        return false;
     }
 
     // ----------------------------------------------------

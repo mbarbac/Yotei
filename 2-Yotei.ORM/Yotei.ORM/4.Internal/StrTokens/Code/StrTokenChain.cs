@@ -58,7 +58,7 @@ public partial class StrTokenChain : IStrTokenChain
     public bool Equals(IStrToken? other)
     {
         if (ReferenceEquals(this, other)) return true;
-        if (other is null || other is not StrTokenChain valid) return false;
+        if (other is null || other is not IStrTokenChain valid) return false;
 
         if (Count != valid.Count) return false;
         for (int i = 0; i < Count; i++) if (!this[i].Equals(valid[i])) return false;
@@ -66,7 +66,7 @@ public partial class StrTokenChain : IStrTokenChain
     }
 
     /// <inheritdoc/>
-    public override bool Equals(object? obj) => Equals(obj as StrTokenChain);
+    public override bool Equals(object? obj) => Equals(obj as IStrToken);
 
     // Equality operator.
     public static bool operator ==(StrTokenChain? x, IStrToken? y)

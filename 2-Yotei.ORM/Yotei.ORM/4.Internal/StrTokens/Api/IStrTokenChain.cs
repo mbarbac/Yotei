@@ -4,8 +4,8 @@
 /// <summary>
 /// Represents a token that carries a flat collection of arbitrary tokens.
 /// </summary>
-[Cloneable]
 [IInvariantList<IStrToken>]
+[Cloneable]
 public partial interface IStrTokenChain : IStrToken
 {
     /// <inheritdoc cref="IInvariantList{T}.GetBuilder"/>
