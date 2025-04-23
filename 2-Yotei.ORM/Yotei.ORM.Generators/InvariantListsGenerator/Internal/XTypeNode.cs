@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Generators;
+﻿using System.Data;
+
+namespace Yotei.ORM.Generators;
 
 // ========================================================
 /// <inheritdoc cref="TypeNode"/>
@@ -234,12 +236,12 @@ internal class XTypeNode : TypeNode
         };
 
         // Iterating through the methods that may need implementation...
-        var implemented = Symbol.GetMembers().OfType<IMethodSymbol>().ToArray();
+        var implementedes = Symbol.GetMembers().OfType<IMethodSymbol>().ToArray();
         var methods = Template.GetMembers().OfType<MethodInfo>().Where(x => x.DeclaringType == Template);
 
         foreach (var method in methods)
         {
-            if (!CanEmit(method, implemented)) continue;
+            if (!CanEmit(method, implementedes)) continue;
 
             var mname = method.EasyName(ioptions);
             mname = mname.Replace("K ", $"{KTypeName} "); // K key...
@@ -295,47 +297,84 @@ internal class XTypeNode : TypeNode
     /// <summary>
     /// Determines if the given method can be emitted or not.
     /// </summary>
-    bool CanEmit(MethodInfo method, IMethodSymbol[] implemented)
+    bool CanEmit(MethodInfo method, IMethodSymbol[] implementedes)
     {
-        foreach (var declared in implemented)
+        // Let's see if the method is already implemented or not...
+        foreach (var implemented in implementedes)
         {
             var mname = method.Name;
-            var dname = declared.Name;
-            if (mname != dname) continue; // Names differ...
+            var iname = implemented.Name;
+            if (mname != iname) continue; // Names differ...
 
             var mpars = method.GetParameters();
-            var dpars = declared.Parameters;
-            if (mpars.Length != dpars.Length) continue; // Number of parameters differ...
+            var ipars = implemented.Parameters;
+            if (mpars.Length != ipars.Length) continue; // Number of parameters differ...
 
+            if (Symbol.Name.Contains("IdentifierChain")) { } // DEBUG-ONLY
+
+            // Trying to match all parameters...
             var count = mpars.Length;
+
             for (int i = 0; i < mpars.Length; i++)
             {
-                var mpar = mpars[i];
-                var dpar = dpars[i];
+                var mpar = mpars[i]; var mtype = mpar.ParameterType;
+                var ipar = ipars[i]; var itype = (INamedTypeSymbol)ipar.Type;
 
-                if (!mpar.ParameterType.IsGenericParameter) // Template parameter not generic...
+                // Ej: Add(T item), Remove(K key)...
+                if (mtype.IsGenericParameter)
                 {
-                    var mtype = mpar.ParameterType;
-                    var dtype = dpar.Type;
-
-                    if (dtype.Match(mtype)) count--; // Found...
-                }
-
-                else // Template parameter being a generic one...
-                {
-                    var match = false;
-                    var dtype = dpar.Type;
                     var comparer = SymbolComparer.Default;
 
-                    if (KType != null && comparer.Equals(dtype, KType)) match = true;
-                    if (TType != null && comparer.Equals(dtype, TType)) match = true;
+                    if (mtype.Name == "T")
+                    {
+                        if (comparer.Equals(itype, TType)) count--; // Found...
+                    }
+                    if (mtype.Name == "K")
+                    {
+                        if (comparer.Equals(itype, KType)) count--; // Found...
+                    }
+                }
 
-                    if (match) count--; // Found...
+                // Ej: AddRange(IEnumerable<T> range)...
+                else if (mtype.Name == "IEnumerable`1" &&
+                    mtype.FullName == null &&
+                    mtype.GenericTypeArguments[0].IsGenericParameter)
+                {
+                    if (itype.Name == "IEnumerable" &&
+                        itype.TypeArguments.Length == 1)
+                    {
+                        var mtemp = mtype.GenericTypeArguments[0];
+                        var itemp = itype.TypeArguments[0];
+
+                        if (itemp.Match(mtemp)) count--; // Found...
+                    }
+                    else return false;
+                }
+
+                // Ej: Remove(Predicate<T> predicate)...
+                else if (mtype.Name == "Predicate`1" &&
+                    mtype.FullName == null &&
+                    mtype.GenericTypeArguments[0].IsGenericParameter)
+                {
+                    if (itype.Name == "Predicate" &&
+                        itype.TypeArguments.Length == 1)
+                    {
+                        var mtemp = mtype.GenericTypeArguments[0];
+                        var itemp = itype.TypeArguments[0];
+
+                        if (itemp.Match(mtemp)) count--; // Found...
+                    }
+                    else return false;
+                }
+
+                // Ej: RemoveAt(int index)...
+                else
+                {
+                    if (itype.Match(mtype)) count--; // Found...
                 }
             }
 
-            // All parameters matched, it is implemented...
-            if (count == 0) return false;
+            if (count == 0) return false; // All have matched...
         }
 
         // No impediments, we can emit code for the given method...

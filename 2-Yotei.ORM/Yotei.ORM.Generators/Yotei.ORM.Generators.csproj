@@ -32,7 +32,7 @@
    <Import Project="..\..\1-Yotei.Tools.Generators\Yotei.Tools.BaseGenerator\Yotei.Tools.BaseGenerator.projitems" Label="Shared" />
    
    <PropertyGroup>
-	  <!--<DefineConstants>$(DefineConstants);DEBUG_INVARIANT_GENERATOR</DefineConstants>-->
+	  <DefineConstants>$(DefineConstants);DEBUG_INVARIANT_GENERATOR</DefineConstants>
 	  <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
    </PropertyGroup>
 

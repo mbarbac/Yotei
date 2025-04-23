@@ -122,8 +122,7 @@ public partial interface ICoreList<K, T>
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
-    /// <returns>The number of changes made, it being either the number of actual inserts
-    /// performed or, if none, the number of actual removals.</returns>
+    /// <returns>The number of changes made.</returns>
     int Replace(int index, T item);
 
     /// <summary>

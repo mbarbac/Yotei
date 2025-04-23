@@ -3,6 +3,7 @@
 // ========================================================
 /// <summary>
 /// Decorates interfaces for which the 'IInvariantList{K,T}' one is reimplemented.
+/// <br/> 'Clone()' capability is added automatically if needed.
 /// </summary>
 /// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>
