@@ -310,10 +310,9 @@ internal class XTypeNode : TypeNode
             var ipars = implemented.Parameters;
             if (mpars.Length != ipars.Length) continue; // Number of parameters differ...
 
-            if (Symbol.Name.Contains("IdentifierChain")) { } // DEBUG-ONLY
-
             // Trying to match all parameters...
             var count = mpars.Length;
+            var comparer = SymbolComparer.Default;
 
             for (int i = 0; i < mpars.Length; i++)
             {
@@ -323,16 +322,11 @@ internal class XTypeNode : TypeNode
                 // Ej: Add(T item), Remove(K key)...
                 if (mtype.IsGenericParameter)
                 {
-                    var comparer = SymbolComparer.Default;
+                    if (mtype.Name == "T" &&
+                        comparer.Equals(itype, TType)) count--; // Found...
 
-                    if (mtype.Name == "T")
-                    {
-                        if (comparer.Equals(itype, TType)) count--; // Found...
-                    }
-                    if (mtype.Name == "K")
-                    {
-                        if (comparer.Equals(itype, KType)) count--; // Found...
-                    }
+                    if (mtype.Name == "K" &&
+                        comparer.Equals(itype, KType)) count--; // Found...
                 }
 
                 // Ej: AddRange(IEnumerable<T> range)...
@@ -346,7 +340,11 @@ internal class XTypeNode : TypeNode
                         var mtemp = mtype.GenericTypeArguments[0];
                         var itemp = itype.TypeArguments[0];
 
-                        if (itemp.Match(mtemp)) count--; // Found...
+                        if (mtemp.Name == "T" &&
+                            comparer.Equals(itemp, TType)) count--; // Found...
+
+                        if (mtemp.Name == "K" &&
+                            comparer.Equals(itype, KType)) count--; // Found...
                     }
                     else return false;
                 }
@@ -362,7 +360,11 @@ internal class XTypeNode : TypeNode
                         var mtemp = mtype.GenericTypeArguments[0];
                         var itemp = itype.TypeArguments[0];
 
-                        if (itemp.Match(mtemp)) count--; // Found...
+                        if (mtemp.Name == "T" &&
+                            comparer.Equals(itype, TType)) count--; // Found...
+
+                        if (mtemp.Name == "K" &&
+                            comparer.Equals(itype, KType)) count--; // Found...
                     }
                     else return false;
                 }

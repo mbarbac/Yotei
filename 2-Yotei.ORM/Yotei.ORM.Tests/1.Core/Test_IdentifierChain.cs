@@ -3,7 +3,6 @@
 
 using static Yotei.Tools.Diagnostics.ConsoleEx;
 using static System.ConsoleColor;
-using System.ComponentModel.Design;
 
 namespace Yotei.ORM.Tests.Core;
 
@@ -423,7 +422,8 @@ public static class Test_IdentifierChain
         Assert.Same(source, target);
 
         target = source.Add(string.Empty);
-        Assert.Same(source, target);
+        Assert.NotSame(source, target);
+        Assert.Empty(target);
     }
 
     //[Enforced]
@@ -479,7 +479,12 @@ public static class Test_IdentifierChain
 
         var source = new IdentifierChain(engine, [xone, xtwo, xthree]);
         var target = source.Add("");
-        Assert.Same(source, target);
+        Assert.NotSame(source, target);
+        Assert.Equal(4, target.Count);
+        Assert.Same(xone, target[0]);
+        Assert.Equal(xtwo, target[1]);
+        Assert.Same(xthree, target[2]);
+        Assert.Null(target[3].UnwrappedValue);
 
         target = source.Add("four.five");
         Assert.NotSame(source, target);
@@ -506,12 +511,6 @@ public static class Test_IdentifierChain
         var xthree = new IdentifierPart(engine, "three");
         var xfour = new IdentifierPart(engine, "four");
         target = source.AddRange([xthree, xfour]);
-    }
-
-    /*
-        
-
-        
         Assert.NotSame(source, target);
         Assert.Equal(4, target.Count);
         Assert.Same(xone, target[0]);
@@ -519,14 +518,8 @@ public static class Test_IdentifierChain
         Assert.Same(xthree, target[2]);
         Assert.Same(xfour, target[3]);
 
-        try { _ = source.AddRange([new Element("one")]); Assert.Fail(); }
-        catch (DuplicateException) { }
-
-        try { _ = source.AddRange([xfive, null!]); Assert.Fail(); }
-        catch (ArgumentNullException) { }
-
-        try { _ = source.AddRange([xfive, new Element("")]); Assert.Fail(); }
-        catch (EmptyException) { }
+        try { _ = source.AddRange([xone, null!]); Assert.Fail(); }
+        catch (ArgumentException) { }
     }
 
     //[Enforced]
@@ -536,24 +529,23 @@ public static class Test_IdentifierChain
         var engine = new FakeEngine();
         var xone = new IdentifierPart(engine, "one");
         var xtwo = new IdentifierPart(engine, "two");
-        var xthree = new IdentifierPart(engine, "three");
-        var xfour = new IdentifierPart(engine, "four");
 
         var source = new IdentifierChain(engine, [xone, xtwo]);
-        var other = new IdentifierChain(engine, []);
+        var target = source.AddRange([""]);
+        Assert.NotSame(source, target);
+        Assert.Equal(3, target.Count);
+        Assert.Same(xone, target[0]);
+        Assert.Equal(xtwo, target[1]);
+        Assert.Null(target[2].UnwrappedValue);
 
-        var target = source.AddRange([other]);
-        Assert.Same(source, target);
-
-        other = new IdentifierChain(engine, [xfour, xfive]);
-        target = source.AddRange([xthree, other]);
+        target = source.AddRange(["three", "four.five"]);
         Assert.NotSame(source, target);
         Assert.Equal(5, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Equal(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
-        Assert.Same(xfour, target[3]);
-        Assert.Same(xfive, target[4]);
+        Assert.Equal("three", target[2].UnwrappedValue);
+        Assert.Equal("four", target[3].UnwrappedValue);
+        Assert.Equal("five", target[4].UnwrappedValue);
     }
 
     // ----------------------------------------------------
@@ -566,7 +558,6 @@ public static class Test_IdentifierChain
         var xone = new IdentifierPart(engine, "one");
         var xtwo = new IdentifierPart(engine, "two");
         var xthree = new IdentifierPart(engine, "three");
-        var xfour = new IdentifierPart(engine, "four");
 
         var source = new IdentifierChain(engine, [xone, xtwo]);
         var target = source.Insert(2, xthree);
@@ -576,34 +567,8 @@ public static class Test_IdentifierChain
         Assert.Same(xtwo, target[1]);
         Assert.Same(xthree, target[2]);
 
-        try { _ = source.Insert(0, null!); Assert.Fail(); }
-        catch (ArgumentNullException) { }
-
-        try { _ = source.Insert(0, new Element("")); Assert.Fail(); }
-        catch (EmptyException) { }
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_Insert_Duplicates()
-    {
-        var engine = new FakeEngine();
-        var xone = new IdentifierPart(engine, "one");
-        var xtwo = new IdentifierPart(engine, "two");
-        var xthree = new IdentifierPart(engine, "three");
-        var xfour = new IdentifierPart(engine, "four");
-
-        var source = new IdentifierChain(engine, [xone, xtwo]);
-        var target = source.Insert(2, xone);
-        Assert.NotSame(source, target);
-        Assert.Equal(3, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xone, target[2]);
-
-        source = new IdentifierChain(engine, [xone, xtwo]);
-        try { _ = source.Insert(0, new Element("one")); Assert.Fail(); }
-        catch (DuplicateException) { }
+        target = source.Insert(0, null!);
+        Assert.Same(source, target);
     }
 
     //[Enforced]
@@ -617,20 +582,21 @@ public static class Test_IdentifierChain
         var xfour = new IdentifierPart(engine, "four");
 
         var source = new IdentifierChain(engine, [xone, xtwo, xthree]);
-        var other = new IdentifierChain(engine, []);
-
-        var target = source.Insert(3, other);
-        Assert.Same(source, target);
-
-        other = new IdentifierChain(engine, [xfour, xfive]);
-        target = source.Insert(3, other);
+        var target = source.Insert(3, "");
         Assert.NotSame(source, target);
+        Assert.Equal(4, target.Count);
+        Assert.Same(xone, target[0]);
+        Assert.Same(xtwo, target[1]);
+        Assert.Same(xthree, target[2]);
+        Assert.Null(target[3].UnwrappedValue);
+
+        target = source.Insert(3, "four.five");
         Assert.Equal(5, target.Count);
         Assert.Same(xone, target[0]);
-        Assert.Equal(xtwo, target[1]);
+        Assert.Same(xtwo, target[1]);
         Assert.Same(xthree, target[2]);
-        Assert.Same(xfour, target[3]);
-        Assert.Same(xfive, target[4]);
+        Assert.Equal("four", target[3].UnwrappedValue);
+        Assert.Equal("five", target[4].UnwrappedValue);
     }
 
     //[Enforced]
@@ -655,14 +621,8 @@ public static class Test_IdentifierChain
         Assert.Same(xthree, target[2]);
         Assert.Same(xfour, target[3]);
 
-        try { _ = source.InsertRange(0, [new Element("one")]); Assert.Fail(); }
-        catch (DuplicateException) { }
-
-        try { _ = source.InsertRange(0, [xfive, null!]); Assert.Fail(); }
-        catch (ArgumentNullException) { }
-
-        try { _ = source.InsertRange(0, [xfive, new Element("")]); Assert.Fail(); }
-        catch (EmptyException) { }
+        try { _ = source.InsertRange(0, [xone, null!]); Assert.Fail(); }
+        catch (ArgumentException) { }
     }
 
     //[Enforced]
@@ -672,24 +632,26 @@ public static class Test_IdentifierChain
         var engine = new FakeEngine();
         var xone = new IdentifierPart(engine, "one");
         var xtwo = new IdentifierPart(engine, "two");
+
+        // Target will actually insert an empty head element, later removed when reduced, but
+        // it means that there are a number of changes, namely one, that make the target a
+        // different instance...
+        var source = new IdentifierChain(engine, [xone, xtwo]);
+        var target = source.InsertRange(0, [""]);
+        Assert.NotSame(source, target);
+        Assert.Equal(source.Count, target.Count);
+        Assert.Same(source[0], target[0]);
+        Assert.Same(source[1], target[1]);
+
         var xthree = new IdentifierPart(engine, "three");
         var xfour = new IdentifierPart(engine, "four");
-
-        var source = new IdentifierChain(engine, [xone, xtwo]);
-        var other = new IdentifierChain(engine, []);
-
-        var target = source.InsertRange(2, [other]);
-        Assert.Same(source, target);
-
-        other = new IdentifierChain(engine, [xfour, xfive]);
-        target = source.InsertRange(2, [xthree, other]);
+        target = source.InsertRange(2, [xthree, xfour]);
         Assert.NotSame(source, target);
-        Assert.Equal(5, target.Count);
+        Assert.Equal(4, target.Count);
         Assert.Same(xone, target[0]);
-        Assert.Equal(xtwo, target[1]);
+        Assert.Same(xtwo, target[1]);
         Assert.Same(xthree, target[2]);
         Assert.Same(xfour, target[3]);
-        Assert.Same(xfive, target[4]);
     }
 
     // ----------------------------------------------------
@@ -702,8 +664,6 @@ public static class Test_IdentifierChain
         var xone = new IdentifierPart(engine, "one");
         var xtwo = new IdentifierPart(engine, "two");
         var xthree = new IdentifierPart(engine, "three");
-        var xfour = new IdentifierPart(engine, "four");
-
         var source = new IdentifierChain(engine, [xone, xtwo, xthree, xone]);
 
         var target = source.RemoveAt(0);
@@ -821,24 +781,24 @@ public static class Test_IdentifierChain
         var xfour = new IdentifierPart(engine, "four");
 
         var source = new IdentifierChain(engine, [xone, xtwo, xthree, xone]);
-        var target = source.Remove(x => ((Element)x).Name.Contains('z'));
+        var target = source.Remove(x => x.Value != null && x.Value.Contains('z'));
         Assert.Same(source, target);
 
-        target = source.Remove(x => ((Element)x).Name.Contains('n'));
+        target = source.Remove(x => x.Value != null && x.Value.Contains('n'));
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.Same(xtwo, target[0]);
         Assert.Same(xthree, target[1]);
         Assert.Same(xone, target[2]);
 
-        target = source.RemoveLast(x => ((Element)x).Name.Contains('n'));
+        target = source.RemoveLast(x => x.Value != null && x.Value.Contains('n'));
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
         Assert.Same(xthree, target[2]);
 
-        target = source.RemoveAll(x => ((Element)x).Name.Contains('n'));
+        target = source.RemoveAll(x => x.Value != null && x.Value.Contains('n'));
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
         Assert.Same(xtwo, target[0]);
@@ -863,5 +823,5 @@ public static class Test_IdentifierChain
         target = source.Clear();
         Assert.NotSame(source, target);
         Assert.Empty(target);
-    }*/
+    }
 }

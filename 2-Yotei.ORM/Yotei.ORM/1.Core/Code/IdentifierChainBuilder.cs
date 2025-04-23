@@ -347,7 +347,7 @@ public partial class IdentifierChainBuilder : CoreList<TKey?, IItem>, IBuilder
     public virtual int Add(string? value) => Add(value, true);
     int Add(string? value, bool reduce)
     {
-        var parts = GetParts(value, reduce);
+        var parts = GetParts(value, reduce: false);
 
         var r = 0; foreach (var part in parts)
         {
@@ -377,7 +377,7 @@ public partial class IdentifierChainBuilder : CoreList<TKey?, IItem>, IBuilder
     public virtual int Insert(int index, string? value) => Insert(index, value, true);
     int Insert(int index, string? value, bool reduce)
     {
-        var parts = GetParts(value, reduce);
+        var parts = GetParts(value, reduce: false);
 
         var r = 0; foreach (var part in parts)
         {
