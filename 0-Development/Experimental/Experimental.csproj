@@ -23,10 +23,6 @@
    </ItemGroup>
 
    <ItemGroup>
-     <Folder Include="Monads\Tests\" />
-   </ItemGroup>
-
-   <ItemGroup>
      <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
    </ItemGroup>
    
