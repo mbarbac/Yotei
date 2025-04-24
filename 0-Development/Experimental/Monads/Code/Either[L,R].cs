@@ -48,7 +48,7 @@ public readonly struct Either<L, R> : IComparable<Either<L, R>>, IEquatable<Eith
 
         _Left = default!;
         _Right = value;
-        _IsLeft = true;
+        _IsLeft = false;
     }
 
     /// <inheritdoc/>
@@ -108,7 +108,7 @@ public readonly struct Either<L, R> : IComparable<Either<L, R>>, IEquatable<Eith
     public static int Compare(Either<L, R> x, Either<L, R> y)
     {
         if (x.IsLeft == y.IsLeft) return x.Match(
-            onLeft: z => CompareValues(z, x._Left),
+            onLeft: z => CompareValues(z, y._Left),
             onRight: z => CompareValues(z, y._Right));
 
         return x.IsLeft ? -1 : +1;
@@ -136,8 +136,7 @@ public readonly struct Either<L, R> : IComparable<Either<L, R>>, IEquatable<Eith
 
     // ----------------------------------------------------
 
-    /*
-     /// <inheritdoc/>
+    /// <inheritdoc/>
     public bool Equals(Either<L, R> other) => Compare(this, other) == 0;
 
     /// <inheritdoc/>
@@ -151,9 +150,6 @@ public readonly struct Either<L, R> : IComparable<Either<L, R>>, IEquatable<Eith
 
     /// <inheritdoc/>
     public override int GetHashCode() => Match(
-        valid: x => HashCode.Combine(x),
-        invalid: () => Maybe.None.GetHashCode());
-     */
-
-    // ----------------------------------------------------
+        onLeft: z => z is null ? HashCode.Combine(z) : z.GetHashCode(),
+        onRight: z => z is null ? HashCode.Combine(z) : z.GetHashCode());
 }
