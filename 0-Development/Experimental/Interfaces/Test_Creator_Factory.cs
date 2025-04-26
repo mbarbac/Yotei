@@ -1,5 +1,8 @@
 ﻿namespace Experimental.Interfaces;
 
+using static Yotei.Tools.Diagnostics.ConsoleEx;
+using static System.ConsoleColor;
+
 // ========================================================
 //[Enforced]
 public static class Test_Creator_Factory

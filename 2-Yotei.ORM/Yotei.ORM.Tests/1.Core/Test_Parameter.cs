@@ -28,4 +28,17 @@ public static class Test_Parameter
         try { _ = new Parameter(" ", "whatever"); Assert.Fail(); }
         catch (EmptyException) { }
     }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Equality()
+    {
+        var one = new Parameter("one", 7);
+        var two = new Parameter("one", 7);
+
+        Assert.True(one.Equals(two));
+        Assert.True(one == two);
+        Assert.Equal(one, two);
+        Assert.False(ReferenceEquals(one, two));
+    }
 }

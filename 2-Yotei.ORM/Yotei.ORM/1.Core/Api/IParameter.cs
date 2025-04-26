@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents a parameter in a command.
 /// </summary>
-public interface IParameter
+public interface IParameter : IEquatable<IParameter>
 {
     /// <summary>
     /// The name of this parameter.

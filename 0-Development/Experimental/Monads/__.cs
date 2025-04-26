@@ -1,4 +1,7 @@
-﻿namespace Experimental.Monads;
+﻿using static Yotei.Tools.Diagnostics.ConsoleEx;
+using static System.ConsoleColor;
+
+namespace Experimental.Monads;
 
 // ========================================================
 //[Enforced]

@@ -237,7 +237,7 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
             item = ValidateItem(item);
 
             var source = Items[index];
-            var same = Same(item, source);
+            var same = SameItem(item, source);
             if (same) return;
 
             removed = remove1st ? RemoveAt(index) : 0;
@@ -250,7 +250,7 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     /// <summary>
     /// Invoked to determine if the given items are the same or not.
     /// </summary>
-    protected bool Same(T item, T source)
+    protected virtual bool SameItem(T item, T source)
     {
         return typeof(T).IsValueType
             ? Comparer.Equals(GetKey(item), GetKey(source))

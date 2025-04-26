@@ -1,5 +1,8 @@
 ﻿#pragma warning disable IDE0079
 
+using static Yotei.Tools.Diagnostics.ConsoleEx;
+using static System.ConsoleColor;
+
 namespace Experimental.Interfaces;
 
 // ========================================================

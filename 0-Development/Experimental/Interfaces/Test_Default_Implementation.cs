@@ -1,6 +1,9 @@
 ﻿#pragma warning disable IDE0079
 #pragma warning disable CA1859
 
+using static Yotei.Tools.Diagnostics.ConsoleEx;
+using static System.ConsoleColor;
+
 namespace Experimental.Interfaces;
 
 // ========================================================

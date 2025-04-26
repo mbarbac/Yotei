@@ -1,4 +1,7 @@
-﻿namespace Experimental.SystemEx;
+﻿using static Yotei.Tools.Diagnostics.ConsoleEx;
+using static System.ConsoleColor;
+
+namespace Experimental.SystemEx;
 
 // ========================================================
 //[Enforced]

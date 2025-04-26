@@ -1,4 +1,7 @@
-﻿namespace Experimental.Net8Reflection;
+﻿using static Yotei.Tools.Diagnostics.ConsoleEx;
+using static System.ConsoleColor;
+
+namespace Experimental.Net8Reflection;
 
 // ========================================================
 //[Enforced]
