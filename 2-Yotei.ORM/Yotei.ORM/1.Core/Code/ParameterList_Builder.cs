@@ -46,10 +46,10 @@ public partial class ParameterList
         public override IItem ValidateItem(IItem item) => item.ThrowWhenNull();
 
         /// <inheritdoc/>
-        public override string GetKey(IItem item) => item.ThrowWhenNull().Name;
+        public override TKey GetKey(IItem item) => item.ThrowWhenNull().Name;
 
         /// <inheritdoc/>
-        public override string ValidateKey(TKey key) => key.NotNullNotEmpty();
+        public override TKey ValidateKey(TKey key) => key.NotNullNotEmpty();
 
         /// <inheritdoc/>
         public override IEqualityComparer<TKey> Comparer => Engine.CaseSensitiveNames

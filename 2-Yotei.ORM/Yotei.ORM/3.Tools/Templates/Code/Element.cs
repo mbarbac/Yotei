@@ -1,31 +1,20 @@
-﻿using THost = Yotei.ORM.Code.Parameter;
-using IHost = Yotei.ORM.IParameter;
+﻿using IHost = Yotei.ORM.Tools.Code.Templates.IElement;
+using THost = Yotei.ORM.Tools.Code.Templates.Element;
 
-namespace Yotei.ORM.Code;
+namespace Yotei.ORM.Tools.Code.Templates;
 
 // ========================================================
-/// <inheritdoc cref="IParameter"/>
-public class Parameter : IParameter
+/// <inheritdoc cref="IHost"/>
+public class Element : IHost
 {
     /// <summary>
-    /// Initializes a new instance.
+    /// Initializes a new instance with the given name.
     /// </summary>
     /// <param name="name"></param>
-    /// <param name="value"></param>
-    public Parameter(string name, object? value)
-    {
-        Name = name.NotNullNotEmpty();
-        Value = value;
-    }
-
-    /// <inheritdoc/>
-    public override string ToString() => $"{Name}='{Value.Sketch()}'";
+    public Element(string name) => Name = name.NotNullNotEmpty();
 
     /// <inheritdoc/>
     public string Name { get; }
-
-    /// <inheritdoc/>
-    public object? Value { get; }
 
     // ----------------------------------------------------
 
@@ -46,17 +35,7 @@ public class Parameter : IParameter
         if (other is not IHost valid) return false;
 
         if (string.Compare(Name, valid.Name, !caseSensitiveNames) != 0) return false;
-        if (!CompareValues()) return false;
-
         return true;
-
-        bool CompareValues() // Use 'is' instead of '=='...
-        {
-            if (Value is null && valid.Value is null) return true;
-            if (Value is null || valid.Value is null) return false;
-
-            return Value.Equals(valid.Value);
-        }
     }
 
     /// <inheritdoc/>
@@ -77,7 +56,6 @@ public class Parameter : IParameter
     {
         var code = 0;
         code = HashCode.Combine(code, Name);
-        code = HashCode.Combine(code, Value);
         return code;
     }
 }
