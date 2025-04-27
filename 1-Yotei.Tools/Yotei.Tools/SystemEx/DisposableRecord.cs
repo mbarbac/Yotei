@@ -10,6 +10,26 @@ public abstract record class DisposableRecord : IDisposableEx
     /// <inheritdoc/>
     public bool OnDisposing { get; private set; }
 
+    /// <summary>
+    /// Throws an exception if this instance has been disposed.
+    /// </summary>
+    public void ThrowIfDisposed()
+    {
+        if (IsDisposed) throw new ObjectDisposedException(
+            "This object has been disposed.")
+            .WithData(this);
+    }
+
+    /// <summary>
+    /// Throws an exception if this instance is being disposed.
+    /// </summary>
+    public void ThrowIfDisposing()
+    {
+        if (IsDisposed) throw new InvalidOperationException(
+            "This object is being disposed.")
+            .WithData(this);
+    }
+
     // ----------------------------------------------------
 
     /// <inheritdoc/>

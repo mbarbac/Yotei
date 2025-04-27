@@ -118,7 +118,7 @@ public partial class AsyncLock : DisposableClass
     /// <param name="data"></param>
     /// <param name="token"></param>
     /// <returns></returns>
-    public ValueTask<Surrogate> LockAsync(object? data = null, CancellationToken token = default)
+    public ValueTask<Surrogate> LockAsync(object? data, CancellationToken token = default)
     {
         return LockAsync(Timeout.InfiniteTimeSpan, data, token);
     }
@@ -134,7 +134,7 @@ public partial class AsyncLock : DisposableClass
     /// <param name="token"></param>
     /// <param name="data"></param>
     /// <returns></returns>
-    public ValueTask<Surrogate> LockAsync(TimeSpan timeout, object? data = null)
+    public ValueTask<Surrogate> LockAsync(TimeSpan timeout, object? data)
     {
         return LockAsync(timeout, data, CancellationToken.None);
     }
