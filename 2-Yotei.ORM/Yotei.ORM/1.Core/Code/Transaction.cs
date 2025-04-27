@@ -37,7 +37,7 @@ public abstract class Transaction : DisposableClass, ITransaction
     public IConnection Connection { get; }
 
     /// <inheritdoc/>
-    public bool IsActive { get; }
+    public bool IsActive => Level > 0;
 
     /// <inheritdoc/>
     public int Level { get; private set; }

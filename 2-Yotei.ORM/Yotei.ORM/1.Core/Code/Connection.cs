@@ -31,7 +31,7 @@ public abstract partial class Connection : DisposableClass, IConnection
     {
         if (IsDisposed || !disposing) return;
 
-        try { _Transaction?.Dispose(); } catch { }
+        try { if (_Transaction != null) _Transaction.Dispose(); } catch { }
         try { if (IsOpen) Close(); } catch { }
         try { AsyncLock.Dispose(); } catch { }
     }
@@ -97,6 +97,7 @@ public abstract partial class Connection : DisposableClass, IConnection
             if (IsDisposed || OnDisposing) // Even here we always need a valid instance...
             {
                 _Transaction ??= CreateTransaction();
+                _Transaction.Dispose();
             }
             else
             {
