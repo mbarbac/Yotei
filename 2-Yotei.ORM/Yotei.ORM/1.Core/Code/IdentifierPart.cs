@@ -23,27 +23,21 @@ public class IdentifierPart : IIdentifierPart
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public bool Equals(IIdentifier? other)
-    {
-        if (ReferenceEquals(this, other)) return true;
-        if (other is null || other is not IIdentifierPart valid) return false;
-
-        return string.Compare(Value, valid.Value) == 0;
-    }
+    public bool Equals(IIdentifier? other) => Equals(other, caseSensitiveNames: true);
 
     /// <summary>
     /// Determines whether the current object is equal to the other given one, using the given
     /// comparison method.
     /// </summary>
     /// <param name="other"></param>
-    /// <param name="comparison"></param>
+    /// <param name="caseSensitiveNames"></param>
     /// <returns></returns>
-    public bool Equals(IIdentifier? other, StringComparison comparison)
+    public bool Equals(IIdentifier? other, bool caseSensitiveNames)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null || other is not IIdentifierPart valid) return false;
 
-        return string.Compare(Value, valid.Value, comparison) == 0;
+        return string.Compare(Value, valid.Value, !caseSensitiveNames) == 0;
     }
 
     /// <inheritdoc/>
