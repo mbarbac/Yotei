@@ -128,7 +128,7 @@ partial class CommandInfo
             if (_Parameters.Count == 0 && count == 0) return false;
 
             _Parameters.Clear();
-            _Parameters.AddRange(range);
+            if (count > 0) AddCore(null, range.ToArray());
             return true;
         }
 
@@ -140,7 +140,7 @@ partial class CommandInfo
             if (_Parameters.Count == 0 && range.Length == 0) return false;
 
             _Parameters.Clear();
-            AddCore(null, range);
+            if (range.Length > 0) AddCore(null, range);
             return true;
         }
 
@@ -155,7 +155,7 @@ partial class CommandInfo
                 ? StringComparison.Ordinal
                 : StringComparison.OrdinalIgnoreCase;
 
-            var pars = source.Parameters;
+            var pars = source.Parameters.ToArray();
             var text = TextToBrackets(source.Text, pars, comparison);
             return AddCore(text, pars);
         }
@@ -169,7 +169,7 @@ partial class CommandInfo
                 ? StringComparison.Ordinal
                 : StringComparison.OrdinalIgnoreCase;
 
-            var pars = source.Parameters;
+            var pars = source.Parameters.ToArray();
             var text = TextToBrackets(source.Text, pars, comparison);
             return AddCore(text, pars);
         }
@@ -316,11 +316,13 @@ partial class CommandInfo
             string text, IEnumerable<IParameter> pars, StringComparison comparison)
         {
             var i = 0;
-            var pos = 0;
+            int pos;
             
             foreach (var par in pars)
             {
                 var bracket = $"{{{i}}}";
+                pos = 0;
+                i++;
 
                 while ((pos = text.IndexOf(par.Name, pos, comparison)) >= 0)
                 {

@@ -249,4 +249,190 @@ public static class Test_CommandInfoBuilder
         Assert.Equal("#One", info.Parameters[0].Name); Assert.Equal(1, info.Parameters[0].Value);
         Assert.Equal("#Two", info.Parameters[1].Name); Assert.Equal(2, info.Parameters[1].Value);
     }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Clone()
+    {
+        var engine = new FakeEngine();
+        var source = new Builder(engine, "[Any]={0}, [Name]={1}", null, "Bond");
+        var target = source.Clone();
+        
+        Assert.NotSame(source, target);
+        Assert.Equal(source.Text, target.Text);
+        Assert.Equal(source.Parameters.Count, target.Parameters.Count);
+        for (int i = 0; i < target.Parameters.Count; i++)
+        {
+            Assert.Equal(target.Parameters[i].Name, source.Parameters[i].Name);
+            Assert.True(target.Parameters[i].Value.EqualsEx(source.Parameters[i].Value));
+        }
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_ReplaceText()
+    {
+        var engine = new FakeEngine();
+        var info = new Builder(engine);
+        Assert.False(info.ReplaceText(null));
+
+        info = new Builder(engine, "[Any]={0}, [Name]={1}", null, "Bond");
+        Assert.True(info.ReplaceText(null));
+        Assert.Empty(info.Text);
+        Assert.Equal(2, info.Parameters.Count);
+
+        info = new Builder(engine, "[Any]={0}, [Name]={1}", null, "Bond");
+        Assert.True(info.ReplaceText("[Other]=#whatever"));
+        Assert.Equal("[Other]=#whatever", info.Text);
+        Assert.Equal(2, info.Parameters.Count);
+
+        try { info.ReplaceText("[Other]={0}"); Assert.Fail(); }
+        catch (ArgumentException) { }
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_ReplaceParameters()
+    {
+        var engine = new FakeEngine();
+        var info = new Builder(engine);
+        Assert.False(info.ReplaceParameters([]));
+
+        info = new Builder(engine, "[Any]={0}, [Name]={1}", null, "Bond");
+        Assert.True(info.ReplaceParameters([new Parameter("Other", 1)]));
+        Assert.Equal("[Any]=#0, [Name]=#1", info.Text);
+        Assert.Single(info.Parameters);
+        Assert.Equal("#Other", info.Parameters[0].Name); Assert.Equal(1, info.Parameters[0].Value);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_ReplaceValues()
+    {
+        var engine = new FakeEngine();
+        var info = new Builder(engine);
+        Assert.False(info.ReplaceValues());
+        Assert.False(info.ReplaceValues([]));
+
+        info = new Builder(engine, "[Any]={0}, [Name]={1}", null, "Bond");
+        Assert.True(info.ReplaceValues("MI5", 50));
+        Assert.Equal("[Any]=#0, [Name]=#1", info.Text);
+        Assert.Equal(2, info.Parameters.Count);
+        Assert.Equal("#0", info.Parameters[0].Name); Assert.Equal("MI5", info.Parameters[0].Value);
+        Assert.Equal("#1", info.Parameters[1].Name); Assert.Equal(50, info.Parameters[1].Value);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Add_Only_Text()
+    {
+        var engine = new FakeEngine();
+        var info = new Builder(engine, "[Any]={0}, [Name]={1}", null, "Bond");
+
+        Assert.False(info.Add((string?)null));
+        Assert.False(info.Add(string.Empty));
+
+        Assert.True(info.Add(" Other"));
+        Assert.Equal("[Any]=#0, [Name]=#1 Other", info.Text);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Add_Only_Values()
+    {
+        var engine = new FakeEngine();
+        var info = new Builder(engine, "[Any]={0}, [Name]={1}", null, "Bond");
+
+        Assert.False(info.Add(null, []));
+
+        Assert.True(info.Add(null, "James"));
+        Assert.Equal("[Any]=#0, [Name]=#1", info.Text);
+        Assert.Equal(3, info.Parameters.Count);
+        Assert.Equal("#0", info.Parameters[0].Name); Assert.Null(info.Parameters[0].Value);
+        Assert.Equal("#1", info.Parameters[1].Name); Assert.Equal("Bond", info.Parameters[1].Value);
+        Assert.Equal("#2", info.Parameters[2].Name); Assert.Equal("James", info.Parameters[2].Value);
+    }
+
+    //[Enforced]
+    //[Fact]
+    //public static void Test_Add_Only_Parameters()
+    //{
+    //}
+
+    //[Enforced]
+    //[Fact]
+    //public static void Test_Add_Only_Anonymous()
+    //{
+    //}
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Add_Text_And_Values()
+    {
+        var engine = new FakeEngine();
+        var info = new Builder(engine, "[Any]={0}, [Name]={1}", null, "Bond");
+
+        Assert.True(info.Add(" [Other]={0}", 50));
+        Assert.Equal("[Any]=#0, [Name]=#1 [Other]=#2", info.Text);
+        Assert.Equal(3, info.Parameters.Count);
+        Assert.Equal("#0", info.Parameters[0].Name); Assert.Null(info.Parameters[0].Value);
+        Assert.Equal("#1", info.Parameters[1].Name); Assert.Equal("Bond", info.Parameters[1].Value);
+        Assert.Equal("#2", info.Parameters[2].Name); Assert.Equal(50, info.Parameters[2].Value);
+    }
+
+    //[Enforced]
+    //[Fact]
+    //public static void Test_Add_Text_And_Parameters()
+    //{
+    //}
+
+    //[Enforced]
+    //[Fact]
+    //public static void Test_Add_Text_And_Anonymous()
+    //{
+    //}
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Add_Info()
+    {
+        var engine = new FakeEngine();
+        var info = new Builder(engine, "[Any]={0}, [Name]={1}", null, "Bond");
+        var other = new Builder(engine);
+        Assert.False(info.Add(other));
+
+        other = new Builder(engine, " [One]={0}, [Two]={1}", 1, 2);
+        Assert.True(info.Add(other));
+        Assert.Equal("[Any]=#0, [Name]=#1 [One]=#2, [Two]=#3", info.Text);
+        Assert.Equal(4, info.Parameters.Count);
+        Assert.Equal("#0", info.Parameters[0].Name); Assert.Null(info.Parameters[0].Value);
+        Assert.Equal("#1", info.Parameters[1].Name); Assert.Equal("Bond", info.Parameters[1].Value);
+        Assert.Equal("#2", info.Parameters[2].Name); Assert.Equal(1, info.Parameters[2].Value);
+        Assert.Equal("#3", info.Parameters[3].Name); Assert.Equal(2, info.Parameters[3].Value);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Clear()
+    {
+        var engine = new FakeEngine();
+        var info = new Builder(engine);
+        Assert.False(info.Clear());
+
+        info = new Builder(engine, "[Any]={0}, [Name]={1}", null, "Bond");
+        Assert.True(info.Clear());
+        Assert.True(info.IsEmpty);
+    }
 }
