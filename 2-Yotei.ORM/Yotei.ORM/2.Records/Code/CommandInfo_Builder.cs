@@ -1,7 +1,5 @@
 ﻿#pragma warning disable IDE0057
 
-using System.ComponentModel.DataAnnotations;
-
 namespace Yotei.ORM.Records.Code;
 
 partial class CommandInfo
@@ -214,25 +212,17 @@ partial class CommandInfo
             range ??= [null];
 
             // Capturing and validating...
-            if (range.Length == 1)
-            {
-                var item = range[0];
-                if (item is IEnumerable<IParameter> xrange) return AddCore(text, xrange.ToArray());
-            }
-
             var items = RangeElement.Capture(range);
+
             for (int i = 0; i < items.Length; i++)
             {
                 var item = items[i];
-                switch (item.Value)
-                {
-                    case IEnumerable<IParameter>: throw new ArgumentException("Element in range cannot be a parameters' collection.").WithData(item);
-                    case ICommandInfo.IBuilder: throw new ArgumentException("Element in range cannot be a command info builder.").WithData(item);
-                    case ICommandInfo: throw new ArgumentException("Element in range cannot be a command info.").WithData(item);
-                    case ICommand: throw new ArgumentException("Element in range cannot be a command.").WithData(item);
-                }
-            }
 
+                if (item.Value is ICommand) throw new ArgumentException("Element cannot be a command itself.").WithData(item);
+                if (item.Value is ICommandInfo) throw new ArgumentException("Element cannot be a command info itself.").WithData(item);
+                if (item.Value is ICommandInfo.IBuilder) throw new ArgumentException("Element cannot be a command info builder itself.").WithData(item);
+            }
+            
             // Iterating through the given range of elements...
             var ret = !textnull;
             var captured = new ParameterList.Builder(Engine);
@@ -322,9 +312,6 @@ partial class CommandInfo
         /// Finds in the given text the raw parameter names of the given collection, and transform
         /// them into bracket ordinal ones.
         /// </summary>
-        /// <param name="text"></param>
-        /// <param name="pars"></param>
-        /// <returns></returns>
         static string TextToBrackets(
             string text, IEnumerable<IParameter> pars, StringComparison comparison)
         {
