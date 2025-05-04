@@ -93,7 +93,7 @@ partial class MetadataTag
                 else if (index > 0)
                 {
                     Items.RemoveAt(index);
-                    Items.Insert(index, value);
+                    Items.Insert(0, value);
                 }
                 else throw new NotFoundException("Tag name not found.").WithData(value);
             }
