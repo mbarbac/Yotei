@@ -1,5 +1,7 @@
 ﻿#pragma warning disable IDE0057
 
+using System.Runtime.InteropServices.Marshalling;
+
 namespace Yotei.ORM.Records.Code;
 
 partial class CommandInfo
@@ -121,14 +123,25 @@ partial class CommandInfo
             {
                 IParameterList items => items.Count,
                 IParameterList.IBuilder items => items.Count,
-                List<IParameter> items => items.Count,
+                IParameter[] items => items.Length,
+                IList<IParameter> items => items.Count,
                 _ => range.Count(),
             };
 
             if (_Parameters.Count == 0 && count == 0) return false;
 
-            _Parameters.Clear();
-            if (count > 0) AddCore(null, range.ToArray());
+            _Parameters.Clear(); if (count > 0)
+            {
+                var comparison = Engine.CaseSensitiveNames
+                    ? StringComparison.Ordinal
+                    : StringComparison.OrdinalIgnoreCase;
+
+                var captured = new ParameterList.Builder(Engine);
+                foreach (var par in range)
+                {
+                    Capture(par, captured, comparison);
+                }
+            }
             return true;
         }
 
@@ -139,8 +152,36 @@ partial class CommandInfo
 
             if (_Parameters.Count == 0 && range.Length == 0) return false;
 
-            _Parameters.Clear();
-            if (range.Length > 0) AddCore(null, range);
+            _Parameters.Clear(); if (range.Length > 0)
+            {
+                var comparison = Engine.CaseSensitiveNames
+                    ? StringComparison.Ordinal
+                    : StringComparison.OrdinalIgnoreCase;
+
+                var items = RangeElement.Capture(range);
+                var captured = new ParameterList.Builder(Engine);
+                IParameter par;
+
+                for (int i = 0; i < items.Length; i++)
+                {
+                    var item = items[i];
+                    switch (item.Value)
+                    {
+                        case IParameter xpar:
+                            Capture(xpar, captured, comparison);
+                            break;
+
+                        case AnonymousElement anon:
+                            par = new Parameter(anon.Name, anon.Value);
+                            Capture(par, captured, comparison);
+                            break;
+
+                        default:
+                            _Parameters.AddNew(item.Value, out _);
+                            break;
+                    }
+                }
+            }
             return true;
         }
 
@@ -157,6 +198,8 @@ partial class CommandInfo
 
             var pars = source.Parameters.ToArray();
             var text = TextToBrackets(source.Text, pars, comparison);
+
+            if (text.Length == 0) text = null;
             return AddCore(text, pars);
         }
 
@@ -171,6 +214,8 @@ partial class CommandInfo
 
             var pars = source.Parameters.ToArray();
             var text = TextToBrackets(source.Text, pars, comparison);
+
+            if (text.Length == 0) text = null;
             return AddCore(text, pars);
         }
 
@@ -312,12 +357,11 @@ partial class CommandInfo
         /// Finds in the given text the raw parameter names of the given collection, and transform
         /// them into bracket ordinal ones.
         /// </summary>
-        static string TextToBrackets(
-            string text, IEnumerable<IParameter> pars, StringComparison comparison)
+        static string TextToBrackets(string text, IEnumerable<IParameter> pars, StringComparison comparison)
         {
             var i = 0;
             int pos;
-            
+
             foreach (var par in pars)
             {
                 var bracket = $"{{{i}}}";
