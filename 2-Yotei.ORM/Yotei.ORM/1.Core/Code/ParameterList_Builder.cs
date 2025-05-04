@@ -85,7 +85,7 @@ public partial class ParameterList
         /// <inheritdoc/>
         public string NextName()
         {
-            for (int i = 0; i < int.MaxValue; i++)
+            for (int i = Count; i < int.MaxValue; i++)
             {
                 var name = $"{Engine.ParameterPrefix}{i}";
                 var index = IndexOf(name);

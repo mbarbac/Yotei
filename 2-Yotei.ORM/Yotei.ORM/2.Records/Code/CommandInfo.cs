@@ -155,4 +155,12 @@ public partial class CommandInfo : ICommandInfo
         var done = builder.Add(text, range);
         return done ? builder.ToInstance() : this;
     }
+
+    /// <inheritdoc/>
+    public ICommandInfo Add(bool space, string? text, params object?[]? range)
+    {
+        var builder = GetBuilder();
+        var done = builder.Add(space, text, range);
+        return done ? builder.ToInstance() : this;
+    }
 }

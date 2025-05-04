@@ -71,7 +71,8 @@ partial class CommandInfo
         {
             var noRemainingSpecs = true;
             var noUnusedValues = true;
-            Add(noRemainingSpecs, noUnusedValues, text, range);
+            var space = true;
+            Add(noRemainingSpecs, noUnusedValues, space, text, range);
         }
 
         /// <summary>
@@ -143,8 +144,7 @@ partial class CommandInfo
 
             if (_Parameters.Count == 0 && range.Length == 0) return false;
 
-            _Parameters.Clear();
-            if (range.Length > 0)
+            _Parameters.Clear(); if (range.Length > 0)
             {
                 var items = RangeElement.Capture(range);
                 var captured = new ParameterList.Builder(Engine);
@@ -200,7 +200,8 @@ partial class CommandInfo
 
             var noRemainingSpecs = text is not null;
             var noUnusedValues = true;
-            return Add(noRemainingSpecs, noUnusedValues, text, pars);
+            var space = true;
+            return Add(noRemainingSpecs, noUnusedValues, space, text, pars);
         }
 
         /// <inheritdoc/>
@@ -218,7 +219,8 @@ partial class CommandInfo
 
             var noRemainingSpecs = text is not null;
             var noUnusedValues = true;
-            return Add(noRemainingSpecs, noUnusedValues, text, pars);
+            var space = true;
+            return Add(noRemainingSpecs, noUnusedValues, space, text, pars);
         }
 
         /// <inheritdoc/>
@@ -226,7 +228,16 @@ partial class CommandInfo
         {
             var noRemainingSpecs = true;
             var noUnusedValues = true;
-            return Add(noRemainingSpecs, noUnusedValues, text, range);
+            var space = true;
+            return Add(noRemainingSpecs, noUnusedValues, space, text, range);
+        }
+
+        /// <inheritdoc/>
+        public bool Add(bool space, string? text, params object?[]? range)
+        {
+            var noRemainingSpecs = true;
+            var noUnusedValues = true;
+            return Add(noRemainingSpecs, noUnusedValues, space, text, range);
         }
 
         // ------------------------------------------------
@@ -237,6 +248,7 @@ partial class CommandInfo
         bool Add(
             bool noRemainingSpecs,
             bool noUnusedValues,
+            bool space,
             string? text, params object?[]? range)
         {
             var textnull = text is null;
@@ -337,7 +349,14 @@ partial class CommandInfo
                     .WithData(text);
 
             // Finishing...
-            if (ret && !textnull) _Text.Append(text);
+            if (ret && !textnull)
+            {
+                if (space && _Text.Length > 0)
+                {
+                    if (text.Length > 0 && text[0] != ' ') _Text.Append(' ');
+                }
+                _Text.Append(text);
+            }
             return ret;
         }
 
@@ -496,7 +515,6 @@ partial class CommandInfo
                     case AnonymousElement item: sb.Append($"Anon: {item}"); break;
                     default: sb.Append($"'{Value.Sketch()}'"); break;
                 }
-                ;
                 if (Used) sb.Append($" (Used)");
                 return sb.ToString();
             }
