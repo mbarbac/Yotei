@@ -22,6 +22,20 @@ partial class IdentifierTags
         public Builder(bool sensitive) => CaseSensitiveTags = sensitive;
 
         /// <summary>
+        /// Initializes a new empty instance with the given initial capacity.
+        /// </summary>
+        /// <param name="sensitive"></param>
+        /// <param name="capacity"></param>
+        public Builder(bool sensitive, int capacity) : this(sensitive) => Capacity = capacity;
+
+        /// <summary>
+        /// Initializes a new instance with the given element.
+        /// </summary>
+        /// <param name="engine"></param>
+        /// <param name="item"></param>
+        public Builder(bool sensitive, IItem item) : this(sensitive) => Add(item);
+
+        /// <summary>
         /// Initializes a new instance with the tags in the given range.
         /// </summary>
         /// <param name="sensitive"></param>

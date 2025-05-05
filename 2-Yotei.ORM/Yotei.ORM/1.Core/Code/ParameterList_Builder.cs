@@ -27,6 +27,13 @@ public partial class ParameterList
         public Builder(IEngine engine, int capacity) : this(engine) => Capacity = capacity;
 
         /// <summary>
+        /// Initializes a new instance with the given element.
+        /// </summary>
+        /// <param name="engine"></param>
+        /// <param name="item"></param>
+        public Builder(IEngine engine, IItem item) : this(engine) => Add(item);
+
+        /// <summary>
         /// Initializes a new instance with the elements of the given range.
         /// </summary>
         /// <param name="engine"></param>

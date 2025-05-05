@@ -26,6 +26,13 @@ public partial class IdentifierChain : IHost
     public IdentifierChain(IEngine engine, int capacity) => Items = new(engine, capacity);
 
     /// <summary>
+    /// Initializes a new instance with the given element.
+    /// </summary>
+    /// <param name="engine"></param>
+    /// <param name="item"></param>
+    public IdentifierChain(IEngine engine, IItem item) : this(engine) => Items.Add(item);
+
+    /// <summary>
     /// Initializes a new instance with the elements of the given range.
     /// </summary>
     /// <param name="engine"></param>

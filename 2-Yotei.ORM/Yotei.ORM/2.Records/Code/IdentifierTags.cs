@@ -18,6 +18,20 @@ public partial class IdentifierTags : IHost
     public IdentifierTags(bool sensitive) => Items = new(sensitive);
 
     /// <summary>
+    /// Initializes a new empty instance with the given initial capacity.
+    /// </summary>
+    /// <param name="sensitive"></param>
+    /// <param name="capacity"></param>
+    public IdentifierTags(bool sensitive, int capacity) => Items = new(sensitive, capacity);
+
+    /// <summary>
+    /// Initializes a new instance with the given element.
+    /// </summary>
+    /// <param name="engine"></param>
+    /// <param name="item"></param>
+    public IdentifierTags(bool sensitive, IItem item) : this(sensitive) => Items.Add(item);
+
+    /// <summary>
     /// Initializes a new instance with the tags in the given range.
     /// </summary>
     /// <param name="sensitive"></param>
