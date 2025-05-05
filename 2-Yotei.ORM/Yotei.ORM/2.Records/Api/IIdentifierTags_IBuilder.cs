@@ -90,6 +90,6 @@ partial interface IIdentifierTags
         /// </summary>
         /// <param name="range"></param>
         /// <returns>The number of changes made.</returns>
-        int RemoveAll(IEnumerable<string> range);
+        int RemoveAny(IEnumerable<string> range);
     }
 }

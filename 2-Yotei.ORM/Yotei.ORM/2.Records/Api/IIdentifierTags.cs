@@ -88,5 +88,5 @@ public partial interface IIdentifierTags : IEquatable<IHost>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    IHost RemoveAll(IEnumerable<string> range);
+    IHost RemoveAny(IEnumerable<string> range);
 }

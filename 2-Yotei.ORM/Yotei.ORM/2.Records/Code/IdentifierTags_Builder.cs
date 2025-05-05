@@ -176,7 +176,7 @@ partial class IdentifierTags
         }
 
         /// <inheritdoc/>
-        public int RemoveAll(IEnumerable<string> range)
+        public int RemoveAny(IEnumerable<string> range)
         {
             var num = 0; while (true)
             {

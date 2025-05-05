@@ -67,7 +67,7 @@ public static class Test_IdentifierTags
 
         var tone = new MetadataTag(false, ["oneA", "oneB"]);
         var ttwo = new MetadataTag(false, ["twoA", "twoB"]);
-        var target = new Tags(false, [sone, stwo]);
+        var target = new Tags(false, [tone, ttwo]);
         Assert.True(source.Equals(target));
 
         target = new Tags(false, [stwo, sone]);
@@ -97,39 +97,6 @@ public static class Test_IdentifierTags
         Assert.Equal(1, list[1]);
     }
 
-    // ----------------------------------------------------
-
-    //[Enforced]
-    //[Fact]
-    //public static void Test_()
-    //{
-    //}
-
-    // ----------------------------------------------------
-    /*
-     //[Enforced]
-    [Fact]
-    public static void Test_Find_Predicate()
-    {
-        var xone = new MetadataTag(false, ["oneA", "oneB"]);
-        var xtwo = new MetadataTag(false, ["twoA", "twoB"]);
-        var xthree = new MetadataTag(false, ["threeA", "threeB"]);
-        var items = new IdentifierTags(false, [xone, xtwo, xthree]);
-
-        Assert.Equal(-1, items.IndexOf(x => x.Contains("any")));
-
-        Assert.Equal(0, items.IndexOf(x => x.Contains("ONEA")));
-        Assert.Equal(0, items.IndexOf(x => x.Contains("ONEB")));
-
-        Assert.Equal(0, items.IndexOf(x => x.Contains(["any", "TWOB", "ONEB"])));
-        Assert.Equal(1, items.LastIndexOf(x => x.Contains(["any", "TWOB", "ONEB"])));
-
-        var list = items.IndexesOf(x => x.Contains(["any", "TWOB", "ONEB"]));
-        Assert.Equal(2, list.Count);
-        Assert.Equal(0, list[0]);
-        Assert.Equal(1, list[1]);
-    }
-
     //[Enforced]
     [Fact]
     public static void Test_Clone()
@@ -137,7 +104,7 @@ public static class Test_IdentifierTags
         var xone = new MetadataTag(false, ["oneA", "oneB"]);
         var xtwo = new MetadataTag(false, ["twoA", "twoB"]);
         var xthree = new MetadataTag(false, ["threeA", "threeB"]);
-        var source = new IdentifierTags(false, [xone, xtwo, xthree]);
+        var source = new Tags(false, [xone, xtwo, xthree]);
 
         var target = source.Clone();
         Assert.NotSame(source, target);
@@ -147,6 +114,8 @@ public static class Test_IdentifierTags
         Assert.Same(xthree, target[2]);
     }
 
+    // ----------------------------------------------------
+
     //[Enforced]
     [Fact]
     public static void Test_Replace()
@@ -154,23 +123,23 @@ public static class Test_IdentifierTags
         var xone = new MetadataTag(false, ["oneA", "oneB"]);
         var xtwo = new MetadataTag(false, ["twoA", "twoB"]);
         var xthree = new MetadataTag(false, ["threeA", "threeB"]);
-        var source = new IdentifierTags(false, [xone, xtwo, xthree]);
+        var source = new Tags(false, [xone, xtwo, xthree]);
 
         var target = source.Replace(0, xone);
         Assert.Same(source, target);
 
-        var xtra = new MetadataTag(false, "four");
-        target = source.Replace(2, xtra);
-        Assert.NotSame(source, target);
+        var xfour = new MetadataTag(false, ["fourA", "fourB"]);
+        target = source.Replace(2, xfour);
+        Assert.NotSame(xone, target);
+        Assert.Equal(3, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
-        Assert.Same(xtra, target[2]);
+        Assert.Same(xfour, target[2]);
 
-        xtra = new MetadataTag(false, ["any", "oneB"]);
-        try { _ = source.Replace(2, xtra); Assert.Fail(); }
+        try { source.Replace(0, new MetadataTag(false, ["fourA", "THREEB"])); Assert.Fail(); }
         catch (DuplicateException) { }
 
-        try { _ = source.Replace(1, null!); Assert.Fail(); }
+        try { source.Replace(0, null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
     }
 
@@ -180,25 +149,23 @@ public static class Test_IdentifierTags
     {
         var xone = new MetadataTag(false, ["oneA", "oneB"]);
         var xtwo = new MetadataTag(false, ["twoA", "twoB"]);
-        var source = new IdentifierTags(false, [xone, xtwo]);
+        var source = new Tags(false, [xone, xtwo]);
 
-        var xtra = new MetadataTag(false, ["threeA", "threeB"]);
-        var target = source.Add(xtra);
+        var xthree = new MetadataTag(false, ["threeA", "threeB"]);
+        var target = source.Add(xthree);
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
-        Assert.Same(xtra, target[2]);
+        Assert.Same(xthree, target[2]);
 
-        try { _ = source.Add(null!); Assert.Fail(); }
+        try { source.Add(null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
 
-        xtra = new MetadataTag(true, "any");
-        try { _ = source.Add(xtra); Assert.Fail(); }
+        try { source.Add(new MetadataTag(true, "any")); Assert.Fail(); }
         catch (ArgumentException) { }
 
-        xtra = new MetadataTag(false, ["any", "TWOB"]);
-        try { _ = source.Add(xtra); Assert.Fail(); }
+        try { source.Add(new MetadataTag(false, ["any", "ONEB"])); Assert.Fail(); }
         catch (DuplicateException) { }
     }
 
@@ -207,31 +174,26 @@ public static class Test_IdentifierTags
     public static void Test_AddRange()
     {
         var xone = new MetadataTag(false, ["oneA", "oneB"]);
-        var xtwo = new MetadataTag(false, ["twoA", "twoB"]);
-        var source = new IdentifierTags(false, [xone, xtwo]);
-
+        var source = new Tags(false, xone);
         var target = source.AddRange([]);
         Assert.Same(source, target);
 
+        var xtwo = new MetadataTag(false, ["twoA", "twoB"]);
         var xthree = new MetadataTag(false, ["threeA", "threeB"]);
-        var xfour = new MetadataTag(false, ["fourA", "fourB"]);
-        target = source.AddRange([xthree, xfour]);
+        target = source.AddRange([xtwo, xthree]);
         Assert.NotSame(source, target);
-        Assert.Equal(4, target.Count);
+        Assert.Equal(3, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
         Assert.Same(xthree, target[2]);
-        Assert.Same(xfour, target[3]);
 
-        try { _ = source.AddRange(null!); Assert.Fail(); }
+        try { source.AddRange(null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
 
-        xthree = new MetadataTag(true, "any");
-        try { _ = source.AddRange([xthree, xfour]); Assert.Fail(); }
+        try { source.AddRange([new MetadataTag(true, "any")]); Assert.Fail(); }
         catch (ArgumentException) { }
 
-        xthree = new MetadataTag(false, ["any", "TWOB"]);
-        try { _ = source.AddRange([xthree, xfour]); Assert.Fail(); }
+        try { source.AddRange([new MetadataTag(false, ["any", "ONEB"])]); Assert.Fail(); }
         catch (DuplicateException) { }
     }
 
@@ -241,25 +203,30 @@ public static class Test_IdentifierTags
     {
         var xone = new MetadataTag(false, ["oneA", "oneB"]);
         var xtwo = new MetadataTag(false, ["twoA", "twoB"]);
-        var source = new IdentifierTags(false, [xone, xtwo]);
+        var source = new Tags(false, [xone, xtwo]);
 
-        var xtra = new MetadataTag(false, ["threeA", "threeB"]);
-        var target = source.Insert(2, xtra);
+        var xthree = new MetadataTag(false, ["threeA", "threeB"]);
+        var target = source.Insert(2, xthree);
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
-        Assert.Same(xtra, target[2]);
+        Assert.Same(xthree, target[2]);
 
-        try { _ = source.Insert(2, null!); Assert.Fail(); }
+        target = source.Insert(0, xthree);
+        Assert.NotSame(source, target);
+        Assert.Equal(3, target.Count);
+        Assert.Same(xthree, target[0]);
+        Assert.Same(xone, target[1]);
+        Assert.Same(xtwo, target[2]);        
+
+        try { source.Insert(0, null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
 
-        xtra = new MetadataTag(true, "any");
-        try { _ = source.Insert(2, xtra); Assert.Fail(); }
+        try { source.Insert(0, new MetadataTag(true, "any")); Assert.Fail(); }
         catch (ArgumentException) { }
 
-        xtra = new MetadataTag(false, ["any", "TWOB"]);
-        try { _ = source.Insert(2, xtra); Assert.Fail(); }
+        try { source.Insert(0, new MetadataTag(false, ["any", "ONEB"])); Assert.Fail(); }
         catch (DuplicateException) { }
     }
 
@@ -268,31 +235,33 @@ public static class Test_IdentifierTags
     public static void Test_InsertRange()
     {
         var xone = new MetadataTag(false, ["oneA", "oneB"]);
-        var xtwo = new MetadataTag(false, ["twoA", "twoB"]);
-        var source = new IdentifierTags(false, [xone, xtwo]);
-
-        var target = source.InsertRange(2, []);
+        var source = new Tags(false, xone);
+        var target = source.InsertRange(0, []);
         Assert.Same(source, target);
 
+        var xtwo = new MetadataTag(false, ["twoA", "twoB"]);
         var xthree = new MetadataTag(false, ["threeA", "threeB"]);
-        var xfour = new MetadataTag(false, ["fourA", "fourB"]);
-        target = source.InsertRange(2, [xthree, xfour]);
+        target = source.InsertRange(1, [xtwo, xthree]);
         Assert.NotSame(source, target);
-        Assert.Equal(4, target.Count);
+        Assert.Equal(3, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
         Assert.Same(xthree, target[2]);
-        Assert.Same(xfour, target[3]);
 
-        try { _ = source.InsertRange(2, null!); Assert.Fail(); }
+        target = source.InsertRange(0, [xtwo, xthree]);
+        Assert.NotSame(source, target);
+        Assert.Equal(3, target.Count);
+        Assert.Same(xtwo, target[0]);
+        Assert.Same(xthree, target[1]);
+        Assert.Same(xone, target[2]);
+
+        try { source.InsertRange(0, null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
 
-        xthree = new MetadataTag(true, "any");
-        try { _ = source.InsertRange(2, [xthree, xfour]); Assert.Fail(); }
+        try { source.InsertRange(0, [new MetadataTag(true, "any")]); Assert.Fail(); }
         catch (ArgumentException) { }
 
-        xthree = new MetadataTag(false, ["any", "TWOB"]);
-        try { _ = source.InsertRange(2, [xthree, xfour]); Assert.Fail(); }
+        try { source.InsertRange(0, [new MetadataTag(false, ["any", "ONEB"])]); Assert.Fail(); }
         catch (DuplicateException) { }
     }
 
@@ -303,7 +272,7 @@ public static class Test_IdentifierTags
         var xone = new MetadataTag(false, ["oneA", "oneB"]);
         var xtwo = new MetadataTag(false, ["twoA", "twoB"]);
         var xthree = new MetadataTag(false, ["threeA", "threeB"]);
-        var source = new IdentifierTags(false, [xone, xtwo, xthree]);
+        var source = new Tags(false, [xone, xtwo, xthree]);
 
         var target = source.RemoveAt(0);
         Assert.NotSame(source, target);
@@ -319,68 +288,29 @@ public static class Test_IdentifierTags
         var xone = new MetadataTag(false, ["oneA", "oneB"]);
         var xtwo = new MetadataTag(false, ["twoA", "twoB"]);
         var xthree = new MetadataTag(false, ["threeA", "threeB"]);
-        var source = new IdentifierTags(false, [xone, xtwo, xthree]);
+        var source = new Tags(false, [xone, xtwo, xthree]);
 
         var target = source.RemoveRange(0, 0);
         Assert.Same(source, target);
 
-        target = source.RemoveRange(0, 1);
+        target = source.RemoveRange(1, 1);
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
-        Assert.Same(xtwo, target[0]);
+        Assert.Same(xone, target[0]);
         Assert.Same(xthree, target[1]);
 
         target = source.RemoveRange(0, 3);
         Assert.NotSame(source, target);
         Assert.Empty(target);
 
-        try { _ = source.RemoveRange(0, -1); Assert.Fail(); }
+        try { source.RemoveRange(0, -1); Assert.Fail(); }
         catch (ArgumentException) { }
 
-        try { _ = source.RemoveRange(-1, 0); Assert.Fail(); }
-        catch (IndexOutOfRangeException) { }
+        try { source.RemoveRange(-1, 0); Assert.Fail(); }
+        catch (ArgumentOutOfRangeException) { }
 
-        try { _ = source.RemoveRange(4, 0); Assert.Fail(); }
-        catch (IndexOutOfRangeException) { }
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_Remove_Name()
-    {
-        var xone = new MetadataTag(false, ["oneA", "oneB"]);
-        var xtwo = new MetadataTag(false, ["twoA", "twoB"]);
-        var xthree = new MetadataTag(false, ["threeA", "threeB"]);
-        var source = new IdentifierTags(false, [xone, xtwo, xthree]);
-
-        var target = source.Remove("any");
-        Assert.Same(source, target);
-
-        target = source.Remove("twoB");
-        Assert.NotSame(source, target);
-        Assert.Equal(2, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xthree, target[1]);
-
-        target = source.Remove((IEnumerable<string>)([]));
-        Assert.Equal(source, target);
-
-        target = source.Remove(["any", "twoB", "threeB"]);
-        Assert.NotEqual(source, target);
-        Assert.Equal(2, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xthree, target[1]);
-
-        target = source.RemoveLast(["any", "twoB", "threeB"]);
-        Assert.NotEqual(source, target);
-        Assert.Equal(2, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-
-        target = source.RemoveAll(["any", "twoB", "threeB"]);
-        Assert.NotEqual(source, target);
-        Assert.Single(target);
-        Assert.Same(xone, target[0]);
+        try { source.RemoveRange(4, 0); Assert.Fail(); }
+        catch (ArgumentException) { }
     }
 
     //[Enforced]
@@ -390,18 +320,43 @@ public static class Test_IdentifierTags
         var xone = new MetadataTag(false, ["oneA", "oneB"]);
         var xtwo = new MetadataTag(false, ["twoA", "twoB"]);
         var xthree = new MetadataTag(false, ["threeA", "threeB"]);
-        var source = new IdentifierTags(false, [xone, xtwo, xthree]);
+        var source = new Tags(false, [xone, xtwo, xthree]);
 
-        var xitem = new MetadataTag(false, "any");
-        var target = source.Remove(xitem);
+        var target = source.Remove(new MetadataTag(false, "any"));
         Assert.Same(source, target);
 
-        xitem = xthree;
-        target = source.Remove(xitem);
+        target = source.Remove(xtwo);
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
         Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
+        Assert.Same(xthree, target[1]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Remove_Name()
+    {
+        var xone = new MetadataTag(false, ["oneA", "oneB"]);
+        var xtwo = new MetadataTag(false, ["twoA", "twoB"]);
+        var xthree = new MetadataTag(false, ["threeA", "threeB"]);
+        var source = new Tags(false, [xone, xtwo, xthree]);
+
+        var target = source.Remove("any");
+        Assert.Same(source, target);
+
+        target = source.Remove("TWOB");
+        Assert.NotSame(source, target);
+        Assert.Equal(2, target.Count);
+        Assert.Same(xone, target[0]);
+        Assert.Same(xthree, target[1]);
+
+        target = source.RemoveAny([]);
+        Assert.Same(source, target);
+
+        target = source.RemoveAny(["ONEB", "THREEB"]);
+        Assert.NotSame(source, target);
+        Assert.Single(target);
+        Assert.Same(xtwo, target[0]);
     }
 
     //[Enforced]
@@ -411,7 +366,7 @@ public static class Test_IdentifierTags
         var xone = new MetadataTag(false, ["oneA", "oneB"]);
         var xtwo = new MetadataTag(false, ["twoA", "twoB"]);
         var xthree = new MetadataTag(false, ["threeA", "threeB"]);
-        var source = new IdentifierTags(false, [xone, xtwo, xthree]);
+        var source = new Tags(false, [xone, xtwo, xthree]);
 
         var target = source.Remove(x => x.Contains("ANY"));
         Assert.Same(source, target);
@@ -422,19 +377,19 @@ public static class Test_IdentifierTags
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
 
-        target = source.Remove(x => x.Contains(["any", "TWOB", "THREEB"]));
+        target = source.Remove(x => x.ContainsAny(["any", "TWOB", "THREEB"]));
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Same(xthree, target[1]);
 
-        target = source.RemoveLast(x => x.Contains(["any", "TWOB", "THREEB"]));
+        target = source.RemoveLast(x => x.ContainsAny(["any", "TWOB", "THREEB"]));
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
 
-        target = source.RemoveAll(x => x.Contains(["any", "TWOB", "THREEB"]));
+        target = source.RemoveAll(x => x.ContainsAny(["any", "TWOB", "THREEB"]));
         Assert.NotSame(source, target);
         Assert.Single(target);
         Assert.Same(xone, target[0]);
@@ -444,17 +399,17 @@ public static class Test_IdentifierTags
     [Fact]
     public static void Test_Clear()
     {
-        var source = new IdentifierTags(false);
+        var source = new Tags(false);
         var target = source.Clear();
         Assert.Same(source, target);
 
         var xone = new MetadataTag(false, ["oneA", "oneB"]);
         var xtwo = new MetadataTag(false, ["twoA", "twoB"]);
         var xthree = new MetadataTag(false, ["threeA", "threeB"]);
-        source = new IdentifierTags(false, [xone, xtwo, xthree]);
+        
+        source = new Tags(false, [xone, xtwo, xthree]);
         target = source.Clear();
         Assert.NotSame(source, target);
         Assert.Empty(target);
     }
-     */
 }

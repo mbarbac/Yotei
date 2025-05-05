@@ -134,10 +134,10 @@ public partial class IdentifierTags : IHost
     }
 
     /// <inheritdoc/>
-    public IHost RemoveAll(IEnumerable<string> range)
+    public IHost RemoveAny(IEnumerable<string> range)
     {
         var builder = GetBuilder();
-        var done = builder.RemoveAll(range);
+        var done = builder.RemoveAny(range);
         return done > 0 ? builder.ToInstance() : this;
     }
 }
