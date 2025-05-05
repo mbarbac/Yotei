@@ -61,7 +61,7 @@ public partial interface IMetadataTag : IEnumerable<string>, IEquatable<IMetadat
 
     /// <summary>
     /// Returns a new instance where the given existing tag name has been replaced by the new
-    /// given one.
+    /// given one. If the original tag name was not found, returns the original instance.
     /// </summary>
     /// <param name="oldname"></param>
     /// <param name="newname"></param>
@@ -82,24 +82,6 @@ public partial interface IMetadataTag : IEnumerable<string>, IEquatable<IMetadat
     /// <param name="range"></param>
     /// <returns></returns>
     IMetadataTag AddRange(IEnumerable<string> range);
-
-    /// <summary>
-    /// Returns a new instance where the given tag name has been inserted into the original
-    /// collection, at the given index.
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    IMetadataTag Insert(int index, string name);
-
-    /// <summary>
-    /// Returns a new instance where the tag names in the given range have been inserted into the
-    /// original collection, starting at the given index.
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="range"></param>
-    /// <returns></returns>
-    IMetadataTag InsertRange(int index, IEnumerable<string> range);
 
     /// <summary>
     /// Returns a new instance where the given tag name has been removed from the original

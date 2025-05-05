@@ -144,22 +144,6 @@ public partial class MetadataTag : IMetadataTag
     }
 
     /// <inheritdoc/>
-    public IMetadataTag Insert(int index, string name)
-    {
-        var builder = GetBuilder();
-        var done = builder.Insert(index, name);
-        return done ? builder.ToInstance() : this;
-    }
-
-    /// <inheritdoc/>
-    public IMetadataTag InsertRange(int index, IEnumerable<string> range)
-    {
-        var builder = GetBuilder();
-        var done = builder.InsertRange(index, range);
-        return done ? builder.ToInstance() : this;
-    }
-
-    /// <inheritdoc/>
     public IMetadataTag Remove(string name)
     {
         var builder = GetBuilder();

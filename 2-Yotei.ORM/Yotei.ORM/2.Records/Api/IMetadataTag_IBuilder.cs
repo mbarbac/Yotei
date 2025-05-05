@@ -63,7 +63,8 @@ partial interface IMetadataTag
         // ------------------------------------------------
 
         /// <summary>
-        /// Replaces the given existing tag name with the new given one.
+        /// Replaces the given existing tag name with the new given one. If the original tag
+        /// name was not found, returns <c>false</c>.
         /// <br/> Returns whether changes have been made or not.
         /// </summary>
         /// <param name="oldname"></param>
@@ -86,24 +87,6 @@ partial interface IMetadataTag
         /// <param name="range"></param>
         /// <returns></returns>
         bool AddRange(IEnumerable<string> range);
-
-        /// <summary>
-        /// Inserts the given name into this collection at the given index.
-        /// <br/> Returns whether changes have been made or not.
-        /// </summary>
-        /// <param name="index"></param>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        bool Insert(int index, string name);
-
-        /// <summary>
-        /// Inserts the names of the given range into this collection, starting at the given index.
-        /// <br/> Returns whether changes have been made or not.
-        /// </summary>
-        /// <param name="index"></param>
-        /// <param name="range"></param>
-        /// <returns></returns>
-        bool InsertRange(int index, IEnumerable<string> range);
 
         /// <summary>
         /// Removes the given name from this collection.

@@ -101,44 +101,127 @@ public static class Test_MetadataTag
     // ----------------------------------------------------
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_Replace()
-    //{
-    //}
+    [Fact]
+    public static void Test_Replace()
+    {
+        var source = new Tag(false, ["one", "two", "three"]);
+        var target = source.Replace("any", "other");
+        Assert.Same(source, target);
+
+        target = source.Replace("one", "one");
+        Assert.Same(source, target);
+
+        target = source.Replace("one", "ONE");
+        Assert.Same(source, target);
+
+        target = source.Replace("one", "other");
+        Assert.NotSame(source, target);
+        Assert.Equal(3, target.Count);
+        Assert.False(target.Contains("one"));
+        Assert.True(target.Contains("other"));
+        Assert.True(target.Contains("two"));
+        Assert.True(target.Contains("three"));
+        Assert.Equal("other", target.Default);
+
+        try { source.Replace("one", "two"); Assert.Fail(); }
+        catch (DuplicateException) { }
+
+        try { source.Replace("one", null!); Assert.Fail(); }
+        catch (ArgumentNullException) { }
+
+        try { source.Replace("one", string.Empty); Assert.Fail(); }
+        catch (EmptyException) { }
+
+        try { source.Replace("one", " "); Assert.Fail(); }
+        catch (EmptyException) { }
+    }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_Add()
-    //{
-    //}
+    [Fact]
+    public static void Test_Add()
+    {
+        var source = new Tag(false, ["one", "two"]);
+        var target = source.Add("three");
+
+        Assert.NotSame(source, target);
+        Assert.Equal(3, target.Count);
+        Assert.True(target.Contains("one"));
+        Assert.True(target.Contains("two"));
+        Assert.True(target.Contains("three"));
+        Assert.Equal("one", target.Default);
+
+        try { source.Add("two"); Assert.Fail(); }
+        catch (DuplicateException) { }
+
+        try { source.Add(null!); Assert.Fail(); }
+        catch (ArgumentNullException) { }
+
+        try { source.Add(string.Empty); Assert.Fail(); }
+        catch (EmptyException) { }
+
+        try { source.Add(" "); Assert.Fail(); }
+        catch (EmptyException) { }
+    }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_AddRange()
-    //{
-    //}
+    [Fact]
+    public static void Test_AddRange()
+    {
+        var source = new Tag(false, ["one"]);
+        var target = source.AddRange([]);
+        Assert.Same(source, target);       
+        
+        target = source.AddRange(["two", "three"]);
+        Assert.NotSame(source, target);
+        Assert.Equal(3, target.Count);
+        Assert.True(target.Contains("one"));
+        Assert.True(target.Contains("two"));
+        Assert.True(target.Contains("three"));
+        Assert.Equal("one", target.Default);
+
+        try { source.AddRange(null!); Assert.Fail(); }
+        catch (ArgumentNullException) { }
+
+        try { source.Add(string.Empty); Assert.Fail(); }
+        catch (EmptyException) { }
+
+        try { source.Add(" "); Assert.Fail(); }
+        catch (EmptyException) { }
+    }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_Insert()
-    //{
-    //}
+    [Fact]
+    public static void Test_Remove()
+    {
+        var source = new Tag(false, ["one", "two", "three"]);
+        var target = source.Remove("four");
+        Assert.Same(source, target);
+
+        target = source.Remove("one");
+        Assert.NotSame(source, target);
+        Assert.Equal(2, target.Count);
+        Assert.False(target.Contains("one"));
+        Assert.True(target.Contains("two"));
+        Assert.True(target.Contains("three"));
+        Assert.Equal("two", target.Default);
+
+        source = new Tag(false, ["one"]);
+        try { source.Remove("one"); Assert.Fail(); }
+        catch (InvalidOperationException) { }
+    }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_InsertRange()
-    //{
-    //}
+    [Fact]
+    public static void Test_Clear()
+    {
+        var source = new Tag(false, ["one", "two", "three"]);
+        var target = source.Clear();
+        Assert.NotSame(source, target);
+        Assert.Single(target);
+        Assert.True(target.Contains("one"));
 
-    //[Enforced]
-    //[Fact]
-    //public static void Test_Remove()
-    //{
-    //}
-
-    //[Enforced]
-    //[Fact]
-    //public static void Test_Clear()
-    //{
-    //}
+        source = new Tag(false, ["one"]);
+        target = source.Clear();
+        Assert.Same(source, target);
+    }
 }

@@ -158,6 +158,13 @@ partial class MetadataTag
                 if (index >= 0)
                 {
                     Items.RemoveAt(index);
+
+                    var temp = IndexOf(xnew);
+                    if (temp >= 0) throw new DuplicateException(
+                        "Tag name is already in this collection.")
+                        .WithData(xnew)
+                        .WithData(this);
+
                     Items.Insert(index, xnew);
                     return true;
                 }
@@ -187,39 +194,6 @@ partial class MetadataTag
 
             var done = false;
             foreach (var name in range) if (Add(name)) done = true;
-
-            return done;
-        }
-
-        /// <inheritdoc/>
-        public bool Insert(int index, string name)
-        {
-            name = Validate(name);
-
-            var temp = IndexOf(name);
-            if (temp >= 0) throw new DuplicateException(
-                "Tag name is already in this collection.")
-                .WithData(name)
-                .WithData(this);
-
-            Items.Insert(index, name);
-            return true;
-        }
-
-        /// <inheritdoc/>
-        public bool InsertRange(int index, IEnumerable<string> range)
-        {
-            range.ThrowWhenNull();
-
-            var done = false;
-            foreach (var name in range)
-            {
-                if (Insert(index, name))
-                {
-                    done = true;
-                    index++;
-                }
-            }
 
             return done;
         }
