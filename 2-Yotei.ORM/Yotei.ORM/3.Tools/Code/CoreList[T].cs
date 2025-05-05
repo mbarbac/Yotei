@@ -191,6 +191,26 @@ public partial class CoreList<T> : ICoreList<T>
 
     // ----------------------------------------------------
 
+    /// <summary>
+    /// Invoked to determine if the given items are the same or not.
+    /// </summary>
+    protected virtual bool SameItem(T item, T source)
+    {
+        return typeof(T).IsValueType
+            ? Comparer.Equals(item, source)
+            : ReferenceEquals(item, source);
+    }
+
+    /// <summary>
+    /// Invoked to find the indexes of the elements in this collection that can be considered
+    /// as duplicates of the given one.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    protected virtual List<int> FindDuplicates(T item) => IndexesOf(item);
+
+    // ----------------------------------------------------
+
     /// <inheritdoc/>
     public virtual int Replace(int index, T item)
     {
@@ -231,16 +251,6 @@ public partial class CoreList<T> : ICoreList<T>
         }
     }
 
-    /// <summary>
-    /// Invoked to determine if the given items are the same or not.
-    /// </summary>
-    protected virtual bool SameItem(T item, T source)
-    {
-        return typeof(T).IsValueType
-            ? Comparer.Equals(item, source)
-            : ReferenceEquals(item, source);
-    }
-
     /// <inheritdoc/>
     public virtual int Add(T item)
     {
@@ -248,7 +258,7 @@ public partial class CoreList<T> : ICoreList<T>
 
         item = ValidateItem(item);
 
-        var dups = IndexesOf(item);
+        var dups = FindDuplicates(item);
         foreach (var dup in dups) if (!IncludeDuplicated(item, Items[dup])) return 0;
 
         Items.Add(item);
@@ -277,7 +287,7 @@ public partial class CoreList<T> : ICoreList<T>
 
         item = ValidateItem(item);
 
-        var dups = IndexesOf(item);
+        var dups = FindDuplicates(item);
         foreach (var dup in dups) if (!IncludeDuplicated(item, Items[dup])) return 0;
 
         Items.Insert(index, item);

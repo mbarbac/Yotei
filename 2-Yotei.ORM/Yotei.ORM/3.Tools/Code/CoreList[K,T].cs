@@ -207,6 +207,26 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
 
     // ----------------------------------------------------
 
+    /// <summary>
+    /// Invoked to determine if the given items are the same or not.
+    /// </summary>
+    protected virtual bool SameItem(T item, T source)
+    {
+        return typeof(T).IsValueType
+            ? Comparer.Equals(GetKey(item), GetKey(source))
+            : ReferenceEquals(item, source);
+    }
+
+    /// <summary>
+    /// Invoked to find the indexes of the elements in this collection that can be considered
+    /// as duplicates of the given one.
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    protected virtual List<int> FindDuplicates(K key) => IndexesOf(key);
+
+    // ----------------------------------------------------
+
     /// <inheritdoc/>
     public virtual int Replace(int index, T item)
     {
@@ -247,16 +267,6 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
         }
     }
 
-    /// <summary>
-    /// Invoked to determine if the given items are the same or not.
-    /// </summary>
-    protected virtual bool SameItem(T item, T source)
-    {
-        return typeof(T).IsValueType
-            ? Comparer.Equals(GetKey(item), GetKey(source))
-            : ReferenceEquals(item, source);
-    }
-
     /// <inheritdoc/>
     public virtual int Add(T item)
     {
@@ -265,7 +275,7 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
         item = ValidateItem(item);
 
         var key = GetKey(item);
-        var dups = IndexesOf(key);
+        var dups = FindDuplicates(key);
         foreach (var dup in dups) if (!IncludeDuplicated(item, Items[dup])) return 0;
 
         Items.Add(item);
@@ -295,7 +305,7 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
         item = ValidateItem(item);
 
         var key = GetKey(item);
-        var dups = IndexesOf(key);
+        var dups = FindDuplicates(key);
         foreach (var dup in dups) if (!IncludeDuplicated(item, Items[dup])) return 0;
 
         Items.Insert(index, item);
