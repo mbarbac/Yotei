@@ -93,25 +93,73 @@ public static class Test_
     }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_With_PrimaryKeyTag()
-    //{
-    //    var source = new FakeKnownTags(false);
-    //}
+    [Fact]
+    public static void Test_With_PrimaryKeyTag()
+    {
+        var source = new FakeKnownTags(false);
+        var target = source.WithPrimaryKeyTag(null);
+        Assert.NotSame(source, target);
+        Assert.Null(target.PrimaryKeyTag);
+
+        target = source.WithPrimaryKeyTag(source.PrimaryKeyTag);
+        Assert.NotSame(source, target);
+        Assert.Same(source.PrimaryKeyTag, target.PrimaryKeyTag);
+
+        var xany = new MetadataTag(false, "any");
+        target = source.WithPrimaryKeyTag(xany);
+        Assert.NotSame(source, target);
+        Assert.Same(xany, target.PrimaryKeyTag);
+
+        xany = new MetadataTag(false, "SCHEMATAG");
+        try { source.WithPrimaryKeyTag(xany); Assert.Fail(); }
+        catch (DuplicateException) { }
+    }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_With_UniqueValuedTag()
-    //{
-    //    var source = new FakeKnownTags(false);
-    //}
+    [Fact]
+    public static void Test_With_UniqueValuedTag()
+    {
+        var source = new FakeKnownTags(false);
+        var target = source.WithUniqueValuedTag(null);
+        Assert.NotSame(source, target);
+        Assert.Null(target.UniqueValuedTag);
+
+        target = source.WithUniqueValuedTag(source.UniqueValuedTag);
+        Assert.NotSame(source, target);
+        Assert.Same(source.UniqueValuedTag, target.UniqueValuedTag);
+
+        var xany = new MetadataTag(false, "any");
+        target = source.WithUniqueValuedTag(xany);
+        Assert.NotSame(source, target);
+        Assert.Same(xany, target.UniqueValuedTag);
+
+        xany = new MetadataTag(false, "SCHEMATAG");
+        try { source.WithUniqueValuedTag(xany); Assert.Fail(); }
+        catch (DuplicateException) { }
+    }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_With_ReadOnlyTag()
-    //{
-    //    var source = new FakeKnownTags(false);
-    //}
+    [Fact]
+    public static void Test_With_ReadOnlyTag()
+    {
+        var source = new FakeKnownTags(false);
+        var target = source.WithReadOnlyTag(null);
+        Assert.NotSame(source, target);
+        Assert.Null(target.ReadOnlyTag);
+
+        target = source.WithReadOnlyTag(source.ReadOnlyTag);
+        Assert.NotSame(source, target);
+        Assert.Same(source.ReadOnlyTag, target.ReadOnlyTag);
+
+        var xany = new MetadataTag(false, "any");
+        target = source.WithReadOnlyTag(xany);
+        Assert.NotSame(source, target);
+        Assert.Same(xany, target.ReadOnlyTag);
+
+        xany = new MetadataTag(false, "SCHEMATAG");
+        try { source.WithReadOnlyTag(xany); Assert.Fail(); }
+        catch (DuplicateException) { }
+    }
 
     // ----------------------------------------------------
 
