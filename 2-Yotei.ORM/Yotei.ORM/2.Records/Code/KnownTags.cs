@@ -89,12 +89,12 @@ public partial class KnownTags : IKnownTags
         if (ReferenceEquals(this, other)) return true;
         if (other == null) return false;
 
-        if (!IdentifierTags.Equals(other.IdentifierTags)) return false;
-        if (!PrimaryKeyTag.EqualsEx(other.PrimaryKeyTag)) return false;
-        if (!UniqueValuedTag.EqualsEx(other.UniqueValuedTag)) return false;
-        if (!ReadOnlyTag.EqualsEx(other.ReadOnlyTag)) return false;
-
-        return true;
+        return
+            CaseSensitiveTags == other.CaseSensitiveTags &&
+            IdentifierTags.Equals(other.IdentifierTags) &&
+            PrimaryKeyTag.EqualsEx(other.PrimaryKeyTag) &&
+            UniqueValuedTag.EqualsEx(other.UniqueValuedTag) &&
+            ReadOnlyTag.EqualsEx(other.ReadOnlyTag);
     }
 
     /// <inheritdoc/>

@@ -14,6 +14,7 @@ public partial class Engine : IEngine
     public const bool USETERMINATORS = true;
     public const char LEFTTERMINATOR = '[';
     public const char RIGHTTERMINATOR = ']';
+    public const bool CASESENSITIVETAGS = false;
 
     // ----------------------------------------------------
 
@@ -36,6 +37,7 @@ public partial class Engine : IEngine
         UseTerminators = source.UseTerminators;
         LeftTerminator = source.LeftTerminator;
         RightTerminator = source.RightTerminator;
+        KnownTags = source.KnownTags;
     }
 
     /// <inheritdoc/>
@@ -47,7 +49,7 @@ public partial class Engine : IEngine
     public bool Equals(IEngine? other)
     {
         if (ReferenceEquals(this, other)) return true;
-        if (other is null) return false;        
+        if (other is null) return false;
 
         return
             CaseSensitiveNames == other.CaseSensitiveNames &&
@@ -57,7 +59,8 @@ public partial class Engine : IEngine
             NativePagination == other.NativePagination &&
             UseTerminators == other.UseTerminators &&
             LeftTerminator == other.LeftTerminator &&
-            RightTerminator == other.RightTerminator;
+            RightTerminator == other.RightTerminator &&
+            KnownTags.Equals(other.KnownTags);
     }
 
     /// <inheritdoc/>
@@ -143,4 +146,12 @@ public partial class Engine : IEngine
         init => _RightTerminator = ValidateTerminator(value);
     }
     char _RightTerminator = RIGHTTERMINATOR;
+
+    /// <inheritdoc/>
+    public IKnownTags KnownTags
+    {
+        get => _KnownTags;
+        init => _KnownTags = value.ThrowWhenNull();
+    }
+    IKnownTags _KnownTags = new KnownTags(CASESENSITIVETAGS);
 }
