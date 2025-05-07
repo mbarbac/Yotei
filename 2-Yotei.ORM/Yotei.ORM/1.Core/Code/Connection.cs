@@ -24,7 +24,8 @@ public abstract partial class Connection : DisposableClass, IConnection
     {
         Engine = source.Engine;
         Retries = source.Retries;
-        RetryInterval = source.RetryInterval;
+        RetryInterval = source.RetryInterval;        
+        foreach (var item in source.ToDatabase) ToDatabase.Add(item);
     }
     /// <inheritdoc/>
     protected override void OnDispose(bool disposing)
@@ -73,6 +74,9 @@ public abstract partial class Connection : DisposableClass, IConnection
             : throw new ArgumentException($"Retry interval '{value}' must be cero or greater.");
     }
     TimeSpan _RetryInterval = TimeSpan.FromMilliseconds(RETRYINTERVAL);
+
+    /// <inheritdoc/>
+    public IValueConverterList ToDatabase { get; } = new ValueConverterList();
 
     /// <summary>
     /// The object used to synchronize operations in this instance.

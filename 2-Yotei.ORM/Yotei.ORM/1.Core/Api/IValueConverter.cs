@@ -35,6 +35,5 @@ public interface IValueConverter
 public interface IValueConverter<TSource, TTarget> : IValueConverter
 {
     /// <inheritdoc cref="IValueConverter.Convert(object?, Locale)"/>
-    [return: MaybeNull]
-    TTarget Convert([MaybeNull] TSource source, Locale locale);
+    TTarget? Convert(TSource? value, Locale locale);
 }

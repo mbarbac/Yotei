@@ -15,7 +15,7 @@ public class ValueConverter<TSource, TTarget> : IValueConverter<TSource, TTarget
     /// </summary>
     /// <param name="converter"></param>
     public ValueConverter(
-        Func<TSource, Locale, TTarget> converter) => _Converter = converter.ThrowWhenNull();
+        Func<TSource?, Locale, TTarget?> converter) => _Converter = converter.ThrowWhenNull();
 
     /// <inheritdoc/>
     public override string ToString() => $"[{SourceType.EasyName()} => {TargetType.EasyName()}]";
@@ -29,13 +29,11 @@ public class ValueConverter<TSource, TTarget> : IValueConverter<TSource, TTarget
     public Type TargetType => typeof(TTarget);
 
     /// <inheritdoc/>
-    [return: MaybeNull]
-    public TTarget Convert(
-        [MaybeNull] TSource value, Locale locale) => _Converter(value, locale);
+    public TTarget? Convert(TSource? value, Locale locale) => _Converter(value, locale);
     
     object? IValueConverter.Convert(
         object? value, Locale locale) => Convert((TSource)value!, locale);
 
-    readonly Func<TSource, Locale, TTarget> _Converter =
+    readonly Func<TSource?, Locale, TTarget?> _Converter =
         (x, _) => x is null ? default! : x.ConvertTo<TTarget>()!;
 }
