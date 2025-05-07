@@ -111,19 +111,19 @@ public partial class IdentifierTags : IHost
     public bool Contains(string name) => Items.Contains(name);
 
     /// <inheritdoc/>
-    public bool ContainsAny(IEnumerable<string> range) => Items.ContainsAny(range);
+    public bool Contains(IEnumerable<string> range) => Items.Contains(range);
 
     /// <inheritdoc/>
     public int IndexOf(string name) => Items.IndexOf(name);
 
     /// <inheritdoc/>
-    public int IndexOfAny(IEnumerable<string> range) => Items.IndexOfAny(range);
+    public int IndexOf(IEnumerable<string> range) => Items.IndexOf(range);
 
     /// <inheritdoc/>
-    public int LastIndexOfAny(IEnumerable<string> range) => Items.LastIndexOfAny(range);
+    public int LastIndexOf(IEnumerable<string> range) => Items.LastIndexOf(range);
 
     /// <inheritdoc/>
-    public List<int> IndexesOfAny(IEnumerable<string> range) => Items.IndexesOfAny(range);
+    public List<int> IndexesOf(IEnumerable<string> range) => Items.IndexesOf(range);
 
     /// <inheritdoc/>
     public IHost Remove(string name)
@@ -134,10 +134,10 @@ public partial class IdentifierTags : IHost
     }
 
     /// <inheritdoc/>
-    public IHost RemoveAny(IEnumerable<string> range)
+    public IHost Remove(IEnumerable<string> range)
     {
         var builder = GetBuilder();
-        var done = builder.RemoveAny(range);
+        var done = builder.Remove(range);
         return done > 0 ? builder.ToInstance() : this;
     }
 }

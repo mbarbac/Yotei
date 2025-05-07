@@ -57,7 +57,7 @@ public partial interface IKnownTags : IEnumerable<IMetadataTag>, IEquatable<IKno
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    bool ContainsAny(IEnumerable<string> range);
+    bool Contains(IEnumerable<string> range);
 
     /// <summary>
     /// Returns the tag that contains the given name, or null if any.
@@ -71,7 +71,7 @@ public partial interface IKnownTags : IEnumerable<IMetadataTag>, IEquatable<IKno
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    List<IMetadataTag> FindAny(IEnumerable<string> range);
+    List<IMetadataTag> Find(IEnumerable<string> range);
 
     // ----------------------------------------------------
 

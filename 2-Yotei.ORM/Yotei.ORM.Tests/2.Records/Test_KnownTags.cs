@@ -47,7 +47,7 @@ public static class Test_
 
         Assert.False(tags.Contains("any"));
         Assert.True(tags.Contains("SCHEMATAG"));
-        Assert.True(tags.ContainsAny(["any", "SCHEMATAG"]));
+        Assert.True(tags.Contains(["any", "SCHEMATAG"]));
     }
 
     //[Enforced]

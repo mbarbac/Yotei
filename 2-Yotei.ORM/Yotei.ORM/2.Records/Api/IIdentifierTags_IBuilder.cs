@@ -43,7 +43,7 @@ partial interface IIdentifierTags
         /// </summary>
         /// <param name="range"></param>
         /// <returns></returns>
-        bool ContainsAny(IEnumerable<string> range);
+        bool Contains(IEnumerable<string> range);
 
         /// <summary>
         /// Gets the index of the element in this collection that carries the given name, or -1
@@ -59,7 +59,7 @@ partial interface IIdentifierTags
         /// </summary>
         /// <param name="range"></param>
         /// <returns></returns>
-        int IndexOfAny(IEnumerable<string> range);
+        int IndexOf(IEnumerable<string> range);
 
         /// <summary>
         /// Gets the index of the last element in this collection that carries any of the names
@@ -67,7 +67,7 @@ partial interface IIdentifierTags
         /// </summary>
         /// <param name="range"></param>
         /// <returns></returns>
-        int LastIndexOfAny(IEnumerable<string> range);
+        int LastIndexOf(IEnumerable<string> range);
 
         /// <summary>
         /// Gets the indexes of the elements in this collection that carries any of the names from
@@ -75,7 +75,7 @@ partial interface IIdentifierTags
         /// </summary>
         /// <param name="range"></param>
         /// <returns></returns>
-        List<int> IndexesOfAny(IEnumerable<string> range);
+        List<int> IndexesOf(IEnumerable<string> range);
 
         /// <summary>
         /// Removes from this collection the element that carries the given name, if any.
@@ -90,6 +90,6 @@ partial interface IIdentifierTags
         /// </summary>
         /// <param name="range"></param>
         /// <returns>The number of changes made.</returns>
-        int RemoveAny(IEnumerable<string> range);
+        int Remove(IEnumerable<string> range);
     }
 }

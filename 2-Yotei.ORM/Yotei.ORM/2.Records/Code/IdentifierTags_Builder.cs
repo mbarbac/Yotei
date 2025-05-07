@@ -126,7 +126,7 @@ partial class IdentifierTags
         public bool Contains(string name) => IndexOf(name) >= 0;
 
         /// <inheritdoc/>
-        public bool ContainsAny(IEnumerable<string> range) => IndexOfAny(range) >= 0;
+        public bool Contains(IEnumerable<string> range) => IndexOf(range) >= 0;
 
         /// <inheritdoc/>
         public int IndexOf(string name)
@@ -136,7 +136,7 @@ partial class IdentifierTags
         }
 
         /// <inheritdoc/>
-        public int IndexOfAny(IEnumerable<string> range)
+        public int IndexOf(IEnumerable<string> range)
         {
             range.ThrowWhenNull();
             return IndexOf(x =>
@@ -147,7 +147,7 @@ partial class IdentifierTags
         }
 
         /// <inheritdoc/>
-        public int LastIndexOfAny(IEnumerable<string> range)
+        public int LastIndexOf(IEnumerable<string> range)
         {
             range.ThrowWhenNull();
             return LastIndexOf(x =>
@@ -158,7 +158,7 @@ partial class IdentifierTags
         }
 
         /// <inheritdoc/>
-        public List<int> IndexesOfAny(IEnumerable<string> range)
+        public List<int> IndexesOf(IEnumerable<string> range)
         {
             range.ThrowWhenNull();
             return IndexesOf(x =>
@@ -176,11 +176,11 @@ partial class IdentifierTags
         }
 
         /// <inheritdoc/>
-        public int RemoveAny(IEnumerable<string> range)
+        public int Remove(IEnumerable<string> range)
         {
             var num = 0; while (true)
             {
-                var index = IndexOfAny(range);
+                var index = IndexOf(range);
 
                 if (index >= 0) { RemoveAt(index); num++; }
                 else break;

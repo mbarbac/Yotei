@@ -43,7 +43,7 @@ public partial interface IMetadataTag : IEnumerable<string>, IEquatable<IMetadat
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    bool ContainsAny(IEnumerable<string> range);
+    bool Contains(IEnumerable<string> range);
 
     /// <summary>
     /// Returns an array with the tag names in this instance.

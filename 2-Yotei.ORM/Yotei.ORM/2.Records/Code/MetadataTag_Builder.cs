@@ -106,7 +106,7 @@ partial class MetadataTag
         public bool Contains(string name) => IndexOf(Validate(name)) >= 0;
 
         /// <inheritdoc/>
-        public bool ContainsAny(IEnumerable<string> range)
+        public bool Contains(IEnumerable<string> range)
         {
             range.ThrowWhenNull();
 

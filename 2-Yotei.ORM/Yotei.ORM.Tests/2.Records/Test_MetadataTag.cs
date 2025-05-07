@@ -94,8 +94,8 @@ public static class Test_MetadataTag
         Assert.True(item.Contains("ONE"));
         Assert.False(item.Contains("four"));
 
-        Assert.True(item.ContainsAny(["alpha", "beta", "two"]));
-        Assert.False(item.ContainsAny(["alpha", "beta", "gamma"]));
+        Assert.True(item.Contains(["alpha", "beta", "two"]));
+        Assert.False(item.Contains(["alpha", "beta", "gamma"]));
     }
 
     // ----------------------------------------------------

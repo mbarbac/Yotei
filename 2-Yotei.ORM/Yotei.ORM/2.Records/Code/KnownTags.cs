@@ -142,7 +142,7 @@ public partial class KnownTags : IKnownTags
 
             var clone = Clone();
             clone._IdentifierTags = new IdentifierTags(CaseSensitiveTags);
-            if (clone.ContainsAny(value.Names)) throw new DuplicateException(
+            if (clone.Contains(value.Names)) throw new DuplicateException(
                 "This instance already carries a name from the given tag.")
                 .WithData(value)
                 .WithData(this);
@@ -168,7 +168,7 @@ public partial class KnownTags : IKnownTags
 
                 var clone = Clone();
                 clone._PrimaryKeyTag = null;
-                if (clone.ContainsAny(value)) throw new DuplicateException(
+                if (clone.Contains(value)) throw new DuplicateException(
                     "This instance already carries a name from the given tag.")
                     .WithData(value)
                     .WithData(this);
@@ -195,7 +195,7 @@ public partial class KnownTags : IKnownTags
 
                 var clone = Clone();
                 clone._UniqueValuedTag = null;
-                if (clone.ContainsAny(value)) throw new DuplicateException(
+                if (clone.Contains(value)) throw new DuplicateException(
                     "This instance already carries a name from the given tag.")
                     .WithData(value)
                     .WithData(this);
@@ -222,7 +222,7 @@ public partial class KnownTags : IKnownTags
 
                 var clone = Clone();
                 clone._ReadOnlyTag = null;
-                if (clone.ContainsAny(value)) throw new DuplicateException(
+                if (clone.Contains(value)) throw new DuplicateException(
                     "This instance already carries a name from the given tag.")
                     .WithData(value)
                     .WithData(this);
@@ -251,7 +251,7 @@ public partial class KnownTags : IKnownTags
     public bool Contains(string name) => Find(name) is not null;
 
     /// <inheritdoc/>
-    public bool ContainsAny(IEnumerable<string> range) => FindAny(range).Count > 0;
+    public bool Contains(IEnumerable<string> range) => Find(range).Count > 0;
 
     /// <inheritdoc/>
     public IMetadataTag? Find(string name)
@@ -269,18 +269,18 @@ public partial class KnownTags : IKnownTags
     }
 
     /// <inheritdoc/>
-    public List<IMetadataTag> FindAny(IEnumerable<string> range)
+    public List<IMetadataTag> Find(IEnumerable<string> range)
     {
         range.ThrowWhenNull();
 
         var list = new List<IMetadataTag>();
 
-        var temp = IdentifierTags.IndexesOfAny(range);
+        var temp = IdentifierTags.IndexesOf(range);
         list.AddRange(temp.Select(x => IdentifierTags[x]));
 
-        if (PrimaryKeyTag is not null && PrimaryKeyTag.ContainsAny(range)) list.Add(PrimaryKeyTag);
-        if (UniqueValuedTag is not null && UniqueValuedTag.ContainsAny(range)) list.Add(UniqueValuedTag);
-        if (ReadOnlyTag is not null && ReadOnlyTag.ContainsAny(range)) list.Add(ReadOnlyTag);
+        if (PrimaryKeyTag is not null && PrimaryKeyTag.Contains(range)) list.Add(PrimaryKeyTag);
+        if (UniqueValuedTag is not null && UniqueValuedTag.Contains(range)) list.Add(UniqueValuedTag);
+        if (ReadOnlyTag is not null && ReadOnlyTag.Contains(range)) list.Add(ReadOnlyTag);
 
         return list;
     }
@@ -297,7 +297,7 @@ public partial class KnownTags : IKnownTags
             return this;
 
         var clone = Clone();
-        clone._IdentifierTags = null;
+        clone._IdentifierTags = new IdentifierTags(CaseSensitiveTags);
         clone._PrimaryKeyTag = null;
         clone._UniqueValuedTag = null;
         clone._ReadOnlyTag = null;

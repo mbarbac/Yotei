@@ -40,7 +40,7 @@ public partial interface IIdentifierTags : IEquatable<IHost>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    bool ContainsAny(IEnumerable<string> range);
+    bool Contains(IEnumerable<string> range);
 
     /// <summary>
     /// Gets the index of the element in this collection that carries the given name, or -1
@@ -56,7 +56,7 @@ public partial interface IIdentifierTags : IEquatable<IHost>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    int IndexOfAny(IEnumerable<string> range);
+    int IndexOf(IEnumerable<string> range);
 
     /// <summary>
     /// Gets the index of the last element in this collection that carries any of the names
@@ -64,7 +64,7 @@ public partial interface IIdentifierTags : IEquatable<IHost>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    int LastIndexOfAny(IEnumerable<string> range);
+    int LastIndexOf(IEnumerable<string> range);
 
     /// <summary>
     /// Gets the indexes of the elements in this collection that carries any of the names from
@@ -72,7 +72,7 @@ public partial interface IIdentifierTags : IEquatable<IHost>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    List<int> IndexesOfAny(IEnumerable<string> range);
+    List<int> IndexesOf(IEnumerable<string> range);
 
     /// <summary>
     /// Returns a new instance where the element in the original collection that carried the
@@ -88,5 +88,5 @@ public partial interface IIdentifierTags : IEquatable<IHost>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    IHost RemoveAny(IEnumerable<string> range);
+    IHost Remove(IEnumerable<string> range);
 }

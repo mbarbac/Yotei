@@ -109,7 +109,7 @@ public partial class MetadataTag : IMetadataTag
     public bool Contains(string name) => Items.Contains(name);
 
     /// <inheritdoc/>
-    public bool ContainsAny(IEnumerable<string> range) => Items.ContainsAny(range);
+    public bool Contains(IEnumerable<string> range) => Items.Contains(range);
 
     /// <inheritdoc/>
     public string[] ToArray() => Items.ToArray();
