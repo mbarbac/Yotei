@@ -16,6 +16,11 @@ partial interface ISchemaEntry
         ISchemaEntry ToInstance();
 
         /// <summary>
+        /// The engine this instance is associated with.
+        /// </summary>
+        IEngine Engine { get; }
+
+        /// <summary>
         /// The identifier by which this instance is known.
         /// </summary>
         IIdentifier Identifier { get; set; }
@@ -23,7 +28,7 @@ partial interface ISchemaEntry
         /// <summary>
         /// Determines if this instance is a primary key, or is part of a primary key group, or not.
         /// </summary>
-        bool IsPrimary { get; set; }
+        bool IsPrimaryKey { get; set; }
 
         /// <summary>
         /// Determines if this instance is a unique valued one, or is part of a unique valued group,
@@ -47,18 +52,18 @@ partial interface ISchemaEntry
         /// Tries to obtain he metadata pair whose tag contains the given name.
         /// </summary>
         /// <param name="name"></param>
-        /// <param name="value"></param>
+        /// <param name="item"></param>
         /// <returns></returns>
-        bool TryGet(string name, [NotNullWhen(true)] out IMetadataEntry? value);
+        bool TryGet(string name, [NotNullWhen(true)] out IMetadataEntry? item);
 
         /// <summary>
         /// Tries to obtain he metadata pair whose tag contains the any of the names from the given
         /// range.
         /// </summary>
         /// <param name="range"></param>
-        /// <param name="value"></param>
+        /// <param name="item"></param>
         /// <returns></returns>
-        bool TryGet(IEnumerable<string> range, [NotNullWhen(true)] out IMetadataEntry? value);
+        bool TryGet(IEnumerable<string> range, [NotNullWhen(true)] out IMetadataEntry? item);
 
         /// <summary>
         /// Determines if this instance contains a metadata pair whose tag contains the given name.
@@ -112,6 +117,23 @@ partial interface ISchemaEntry
         /// <param name="item"></param>
         /// <returns></returns>
         bool Replace(IEnumerable<string> range, IMetadataEntry item);
+
+        /// <summary>
+        /// Replaces the value of the metadata pair whose tag contains the given name.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        bool ReplaceValue(string name, object? value);
+
+        /// <summary>
+        /// Replaces the value of the metadata pair whose tag contains any name from the given
+        /// range.
+        /// </summary>
+        /// <param name="range"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        bool ReplaceValue(IEnumerable<string> range, object? value);
 
         /// <summary>
         /// Adds the given element has been added to this collection.

@@ -14,6 +14,11 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataEntry>, IEquatable<
     IBuilder GetBuilder();
 
     /// <summary>
+    /// The engine this instance is associated with.
+    /// </summary>
+    IEngine Engine { get; }
+
+    /// <summary>
     /// The identifier by which this instance is known.
     /// </summary>
     [With] IIdentifier Identifier { get; }
@@ -21,7 +26,7 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataEntry>, IEquatable<
     /// <summary>
     /// Determines if this instance is a primary key, or is part of a primary key group, or not.
     /// </summary>
-    [With] bool IsPrimary { get; }
+    [With] bool IsPrimaryKey { get; }
 
     /// <summary>
     /// Determines if this instance is a unique valued one, or is part of a unique valued group,
@@ -53,18 +58,18 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataEntry>, IEquatable<
     /// Tries to obtain he metadata pair whose tag contains the given name.
     /// </summary>
     /// <param name="name"></param>
-    /// <param name="value"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    bool TryGet(string name, [NotNullWhen(true)] out IMetadataEntry? value);
+    bool TryGet(string name, [NotNullWhen(true)] out IMetadataEntry? item);
 
     /// <summary>
     /// Tries to obtain he metadata pair whose tag contains the any of the names from the given
     /// range.
     /// </summary>
     /// <param name="range"></param>
-    /// <param name="value"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    bool TryGet(IEnumerable<string> range, [NotNullWhen(true)] out IMetadataEntry? value);
+    bool TryGet(IEnumerable<string> range, [NotNullWhen(true)] out IMetadataEntry? item);
 
     /// <summary>
     /// Determines if this instance contains a metadata pair whose tag contains the given name.
@@ -117,6 +122,24 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataEntry>, IEquatable<
     /// <param name="item"></param>
     /// <returns></returns>
     ISchemaEntry Replace(IEnumerable<string> range, IMetadataEntry item);
+
+    /// <summary>
+    /// Returns a new instance where the the value of the metadata pair whose tag contains the
+    /// given name has been replaced by the new given one.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    ISchemaEntry ReplaceValue(string name, object? value);
+
+    /// <summary>
+    /// Returns a new instance where the the value of the metadata pair whose tag contains any of
+    /// the names from the given range has been replaced by the new given one.
+    /// </summary>
+    /// <param name="range"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    ISchemaEntry ReplaceValue(IEnumerable<string> range, object? value);
 
     /// <summary>
     /// Returns a new instance where the given element has been added to the collection.
