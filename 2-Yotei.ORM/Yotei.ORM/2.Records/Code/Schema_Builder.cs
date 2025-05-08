@@ -18,27 +18,28 @@ partial class Schema
         /// Initializes a new empty instance.
         /// </summary>
         /// <param name="engine"></param>
-        public Builder(IEngine engine) => throw null;
+        public Builder(IEngine engine) => Engine = engine.ThrowWhenNull();
 
         /// <summary>
         /// Initializes a new instance with the given element.
         /// </summary>
         /// <param name="engine"></param>
         /// <param name="item"></param>
-        public Builder(IEngine engine, IItem item) => throw null;
+        public Builder(IEngine engine, IItem item) : this(engine) => Add(item);
 
         /// <summary>
         /// Initializes a new instance with the elements of the given range.
         /// </summary>
         /// <param name="engine"></param>
-        /// <param name="item"></param>
-        public Builder(IEngine engine, IEnumerable<IItem> item) => throw null;
+        /// <param name="range"></param>
+        public Builder(
+            IEngine engine, IEnumerable<IItem> range) : this(engine) => AddRange(range);
 
         /// <summary>
         /// Copy constructor.
         /// </summary>
         /// <param name="source"></param>
-        protected Builder(Builder source) => throw null;
+        protected Builder(Builder source) : this(source.Engine) => AddRange(source);
 
         // ------------------------------------------------
 
@@ -52,6 +53,7 @@ partial class Schema
                 .WithData(item)
                 .WithData(this);
 
+            ValidateKey(item.Identifier); // Needed to prevent adding invalid ones...
             return item;
         }
 
@@ -105,9 +107,13 @@ partial class Schema
         protected override bool SameItem(IItem item, IItem source) => ReferenceEquals(item, source);
 
         /// <inheritdoc/>
-        protected virtual List<int> FindDuplicates(TKey key)
+        protected override List<int> FindDuplicates(TKey key)
         {
-            throw null;
+            var nums = IndexesOf(x => x.Identifier.Match(key.Value));
+            var temp = IndexesOf(x => key.Match(x.Identifier.Value));
+
+            foreach (var num in temp) if (!nums.Contains(num)) nums.Add(num);
+            return nums;
         }
 
         // ------------------------------------------------
@@ -116,40 +122,98 @@ partial class Schema
         public IEngine Engine { get; }
 
         /// <inheritdoc/>
-        public THost ToInstance() => throw null;
+        public THost ToInstance() => Count == 0 ? new THost(Engine) : new THost(Engine, this);
         IHost IHost.IBuilder.ToInstance() => ToInstance();
 
         // ------------------------------------------------
 
         /// <inheritdoc/>
-        public List<int> Match(string? specs) => throw null;
+        public List<int> Match(string? specs) => Match(specs, out _);
 
         /// <inheritdoc/>
-        public List<int> Match(string? specs, out IItem? unique) => throw null;
+        public List<int> Match(string? specs, out IItem? unique)
+        {
+            List<int> nums = [];
+
+            for (int i = 0; i < Count; i++)
+            {
+                var item = this[i];
+                if (item.Identifier.Match(specs)) nums.Add(i);
+            }
+
+            unique = nums.Count == 1 ? this[nums[0]] : null;
+            return nums;
+        }
 
         // ------------------------------------------------
 
         /// <inheritdoc/>
-        public bool Contains(string identifier) => throw null;
+        public bool Contains(string identifier) => IndexOf(identifier) >= 0;
 
         /// <inheritdoc/>
-        public int IndexOf(string identifier) => throw null;
+        public int IndexOf(string identifier)
+        {
+            var key = Identifier.Create(Engine, identifier);
+            return IndexOf(key);
+        }
 
         /// <inheritdoc/>
-        public int LastIndexOf(string identifier) => throw null;
+        public int LastIndexOf(string identifier)
+        {
+            var key = Identifier.Create(Engine, identifier);
+            return LastIndexOf(key);
+        }
 
         /// <inheritdoc/>
-        public List<int> IndexesOf(string identifier) => throw null;
+        public List<int> IndexesOf(string identifier)
+        {
+            var key = Identifier.Create(Engine, identifier);
+            return IndexesOf(key);
+        }
 
         // ------------------------------------------------
 
         /// <inheritdoc/>
-        public bool Remove(string identifier) => throw null;
+        public bool Remove(string identifier)
+        {
+            var index = IndexOf(identifier);
+            if (index >= 0)
+            {
+                RemoveAt(index);
+                return true;
+            }
+            return false;
+        }
 
         /// <inheritdoc/>
-        public bool RemoveLast(string identifier) => throw null;
+        public bool RemoveLast(string identifier)
+        {
+            var index = LastIndexOf(identifier);
+            if (index >= 0)
+            {
+                RemoveAt(index);
+                return true;
+            }
+            return false;
+        }
 
         /// <inheritdoc/>
-        public bool RemoveAll(string identifier) => throw null;
+        public bool RemoveAll(string identifier)
+        {
+            var done = false;
+
+            while (true)
+            {
+                var index = IndexOf(identifier);
+
+                if (index >= 0)
+                {
+                    RemoveAt(index);
+                    done = true;
+                }
+                else break;
+            }
+            return done;
+        }
     }
 }

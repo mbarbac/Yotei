@@ -45,7 +45,7 @@ public static class Identifier
     /// <param name="item"></param>
     /// <param name="specs"></param>
     /// <returns></returns>
-    public static bool Match(IIdentifier item, string? specs)
+    public static bool Match(this IIdentifier item, string? specs)
     {
         item.ThrowWhenNull();
 
