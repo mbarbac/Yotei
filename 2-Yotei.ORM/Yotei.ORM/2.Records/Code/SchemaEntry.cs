@@ -76,7 +76,7 @@ public partial class SchemaEntry : ISchemaEntry
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected SchemaEntry(SchemaEntry source) : this(source.Engine) => AddRange(source);
+    protected SchemaEntry(SchemaEntry source) : this(source.Engine) => Items.AddRange(source);
 
     /// <inheritdoc/>
     public IEnumerator<IMetadataEntry> GetEnumerator() => Items.GetEnumerator();
