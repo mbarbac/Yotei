@@ -92,7 +92,17 @@ partial class SchemaEntry
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         /// <inheritdoc/>
-        public override string ToString() => $"Count: {Count}";
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+
+            sb.Append(Identifier.Value ?? "-");
+            if (IsPrimaryKey) sb.Append(", Primary");
+            if (IsUniqueValued) sb.Append(", Unique");
+            if (IsReadOnly) sb.Append(", ReadOnly");
+
+            return sb.ToString();
+        }
 
         /// <summary>
         /// Invoked to produce a debug string.
