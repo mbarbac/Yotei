@@ -65,6 +65,8 @@ public partial class KnownTags : IKnownTags
     }
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+    // TODO: use [DebuggerDisplay("Items.{ToDebugString(5)}")]
+
     /// <inheritdoc/>
     public override string ToString()
     {

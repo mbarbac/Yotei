@@ -8,6 +8,7 @@ namespace Yotei.ORM.Records.Code;
 // ========================================================
 /// <inheritdoc cref="IHost"/>
 [InvariantList<TKey, IItem>]
+[DebuggerDisplay("Items.{ToDebugString(5)}")]
 public partial class Schema : IHost
 {
     /// <summary>

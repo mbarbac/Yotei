@@ -4,6 +4,7 @@
 /// <inheritdoc cref="ISchemaEntry"/>
 [Cloneable]
 [InheritWiths]
+[DebuggerDisplay("Items.{ToDebugString(5)}")]
 public partial class SchemaEntry : ISchemaEntry
 {
     readonly Builder Items;
