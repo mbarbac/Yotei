@@ -4,7 +4,7 @@
 /// <inheritdoc cref="IRecord"/>
 [Cloneable]
 [InheritWiths]
-[DebuggerDisplay("Items.{ToDebugString(5)}")]
+[DebuggerDisplay("{Items.ToDebugString(5)}")]
 public partial class Record : IRecord
 {
     /// <summary>
@@ -23,7 +23,10 @@ public partial class Record : IRecord
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public bool Equals(IRecord? other) => throw null;
+    public bool Equals(IRecord? other)
+    {
+        throw null;
+    }
 
     /*
      /// <inheritdoc/>
@@ -67,95 +70,5 @@ public partial class Record : IRecord
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public ISchema? Schema { get => throw null; init => throw null; }
-
-    /// <inheritdoc/>
-    public int Count { get => throw null; }
-
-    /// <inheritdoc/>
-    public object? this[int index] { get => throw null; }
-
-    /// <inheritdoc/>
-    public bool TryGet(string identifier, out object? value) => throw null;
-
-    /// <inheritdoc/>
-    [return: MaybeNull]
-    public T This<T>(int index) => throw null;
-
-    /// <inheritdoc/>
-    public bool TryGet<T>(string identifier, out T? value) => throw null;
-
-    /// <inheritdoc/>
-    public object?[] ToArray() => throw null;
-
-    /// <inheritdoc/>
-    public List<object?> ToList() => throw null;
-
-    /// <inheritdoc/>
-    public List<object?> ToList(int index, int count) => throw null;
-
-    // ----------------------------------------------------
-
-    /// <inheritdoc/>
-    public IRecord GetRange(int index, int count) => throw null;
-
-    /// <inheritdoc/>
-    public IRecord Replace(int index, object? value) => throw null;
-
-    /// <inheritdoc/>
-    public IRecord Replace(int index, object? value, ISchemaEntry entry) => throw null;
-
-    /// <inheritdoc/>
-    public IRecord Add(object? value) => throw null;
-
-    /// <inheritdoc/>
-    public IRecord Add(object? value, ISchemaEntry entry) => throw null;
-
-    /// <inheritdoc/>
-    public IRecord AddRange(IEnumerable<object?> range) => throw null;
-
-    /// <inheritdoc/>
-    public IRecord AddRange(IEnumerable<object?> range, IEnumerable<ISchemaEntry> entries) => throw null;
-
-    /// <inheritdoc/>
-    public IRecord Insert(int index, object? value) => throw null;
-
-    /// <inheritdoc/>
-    public IRecord Insert(int index, object? value, ISchemaEntry entry) => throw null;
-
-    /// <inheritdoc/>
-    public IRecord InsertRange(int index, IEnumerable<object?> range, IEnumerable<ISchemaEntry> entries) => throw null;
-
-    /// <inheritdoc/>
-    public IRecord RemoveAt(int index) => throw null;
-
-    /// <inheritdoc/>
-    public IRecord RemoveRange(int index, int count) => throw null;
-
-    /// <inheritdoc/>
-    public IRecord Remove(Predicate<object?> predicate) => throw null;
-
-    /// <inheritdoc/>
-    public IRecord RemoveLast(Predicate<object?> predicate) => throw null;
-
-    /// <inheritdoc/>
-    public IRecord RemoveAll(Predicate<object?> predicate) => throw null;
-
-    /// <inheritdoc/>
-    public IRecord Clear() => throw null;
-
-    // ----------------------------------------------------
-
-    /// <inheritdoc/>
-    public IRecord? GetChanges(
-        IRecord target,
-        bool useSchema = true,
-        bool orphanSources = false, bool orphanTargets = false) => throw null;
-
-    /// <inheritdoc/>
-    public IRecord? GetChanges(
-        IRecord target,
-        IEqualityComparer comparer,
-        bool useSchema = true,
-        bool orphanSources = false, bool orphanTargets = false) => throw null;
+    public IRecord.IBuilder GetBuilder() => throw null;
 }

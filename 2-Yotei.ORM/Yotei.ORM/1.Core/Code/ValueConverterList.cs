@@ -1,10 +1,9 @@
-﻿using System.Windows.Markup;
-
-namespace Yotei.ORM.Code;
+﻿namespace Yotei.ORM.Code;
 
 // ========================================================
 /// <inheritdoc cref="IValueConverterList"/>
 [Cloneable]
+[DebuggerDisplay("{Items.ToDebugString(5)}")]
 public partial class ValueConverterList : IValueConverterList
 {
     readonly List<IValueConverter> Items = [];
@@ -27,6 +26,21 @@ public partial class ValueConverterList : IValueConverterList
 
     /// <inheritdoc/>
     public override string ToString() => $"Count: {Count}";
+
+    /// <summary>
+    /// Invoked to produce a debug string.
+    /// </summary>
+    public virtual string ToDebugString(int count)
+    {
+        if (Count == 0) return $"0:[]";
+        if (count == 0) return $"{Count}:[...]";
+
+        return Count <= count
+            ? $"{Count}:[{string.Join(", ", this.Select(ToDebugItem))}]"
+            : $"{Count}:[{string.Join(", ", this.Take(count).Select(ToDebugItem))}, ...]";
+    }
+
+    string ToDebugItem(IValueConverter item) => item?.ToString() ?? "-";
 
     // ----------------------------------------------------
 

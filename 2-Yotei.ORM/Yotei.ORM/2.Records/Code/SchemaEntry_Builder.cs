@@ -107,20 +107,17 @@ partial class SchemaEntry
         /// <summary>
         /// Invoked to produce a debug string.
         /// </summary>
-        protected virtual string ToDebugString(int count)
+        public virtual string ToDebugString(int count)
         {
             if (Count == 0) return $"0:[]";
             if (count == 0) return $"{Count}:[...]";
 
             return Count <= count
-                ? $"{Count}:[{string.Join(", ", this.Select(ItemToDebug))}]"
-                : $"{Count}:[{string.Join(", ", this.Take(count).Select(ItemToDebug))}, ...]";
+                ? $"{Count}:[{string.Join(", ", this.Select(ToDebugItem))}]"
+                : $"{Count}:[{string.Join(", ", this.Take(count).Select(ToDebugItem))}, ...]";
         }
 
-        /// <summary>
-        /// Invoked to obtain a debug string of the given item.
-        /// </summary>
-        protected virtual string ItemToDebug(IMetadataEntry item) => item?.ToString() ?? "-";
+        string ToDebugItem(IMetadataEntry item) => item?.ToString() ?? "-";
 
         // ------------------------------------------------
 

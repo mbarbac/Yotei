@@ -9,7 +9,7 @@ namespace Yotei.ORM.Code;
 // ========================================================
 /// <inheritdoc cref="IHost"/>
 [InvariantList<AsNullable<TKey>, IItem>]
-[DebuggerDisplay("Items.{ToDebugString(5)}")]
+[DebuggerDisplay("{Items.ToDebugString(5)}")]
 public partial class IdentifierChain : IHost
 {
     /// <summary>

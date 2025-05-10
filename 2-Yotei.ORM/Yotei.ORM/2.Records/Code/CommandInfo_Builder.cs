@@ -1,8 +1,4 @@
-﻿#pragma warning disable IDE0057
-
-using System.Data;
-
-namespace Yotei.ORM.Records.Code;
+﻿namespace Yotei.ORM.Records.Code;
 
 partial class CommandInfo
 {

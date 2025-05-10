@@ -25,18 +25,18 @@ internal class CustomList<T> : IEnumerable<T>
     /// <inheritdoc/>
     public override string ToString() => $"Count: {Count}";
 
-    string ToDebugString(int count, Func<T, string>? itemToDebug = null)
+    public string ToDebugString(int count, Func<T, string>? toDebugItem = null)
     {
         if (Count == 0) return "0:[]";
         if (count == 0) return $"{Count}:[...]";
 
-        itemToDebug ??= ItemToDebug;
+        toDebugItem ??= ToDebugItem;
 
         return Count <= count
-            ? $"{Count}:[{string.Join(", ", this.Select(itemToDebug))}]"
-            : $"{Count}:[{string.Join(", ", this.Take(count).Select(itemToDebug))}]";
+            ? $"{Count}:[{string.Join(", ", this.Select(toDebugItem))}]"
+            : $"{Count}:[{string.Join(", ", this.Take(count).Select(toDebugItem))}]";
     }
-    static string ItemToDebug(T item) => item?.ToString() ?? "-";
+    static string ToDebugItem(T item) => item?.ToString() ?? "-";
 
     /// <inheritdoc/>
     public IEnumerator<T> GetEnumerator() => Items.GetEnumerator();

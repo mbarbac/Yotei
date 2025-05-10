@@ -5,7 +5,7 @@ namespace Yotei.ORM.Internal;
 
 // ========================================================
 /// <inheritdoc cref="IStrTokenchain"/>
-[DebuggerDisplay("{ToDebugString(5)}")]
+[DebuggerDisplay("{Items.ToDebugString(5)}")]
 [InvariantList<IStrToken>]
 public partial class StrTokenChain : IStrTokenChain
 {

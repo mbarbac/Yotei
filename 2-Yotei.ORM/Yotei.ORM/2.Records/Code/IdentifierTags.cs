@@ -8,7 +8,7 @@ namespace Yotei.ORM.Records.Code;
 // ========================================================
 /// <inheritdoc cref="IHost"/>
 [InvariantList<IItem>]
-[DebuggerDisplay("Items.{ToDebugString(5)}")]
+[DebuggerDisplay("{Items.ToDebugString(5)}")]
 public partial class IdentifierTags : IHost
 {
     /// <summary>
