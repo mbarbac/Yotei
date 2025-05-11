@@ -108,6 +108,7 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
     /// <inheritdoc cref="IInvariantList{T}.GetRange(int, int)"/>
     public virtual InvariantList<T> GetRange(int index, int count)
     {
+        if (Count == 0) return this;
         if (index == 0 && count == Count) return this;
 
         var range = Items.ToList(index, count);
