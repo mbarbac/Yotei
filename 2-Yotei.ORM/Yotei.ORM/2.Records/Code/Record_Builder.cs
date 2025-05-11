@@ -20,7 +20,7 @@ partial class Record
         /// Initializes a new schema-less instance with the values from the given range.
         /// </summary>
         /// <param name="range"></param>
-        public Builder(IEnumerable<object?> range) => Add(range);
+        public Builder(IEnumerable<object?> range) => AddRange(range);
 
         /// <summary>
         /// Initializes a new empty schema-full instance.
@@ -101,7 +101,12 @@ partial class Record
         // ------------------------------------------------
 
         /// <inheritdoc/>
-        public IRecord ToInstance() => throw null;
+        public IRecord ToInstance()
+        {
+            return _Schema is null
+                ? new Record(_Values)
+                : new Record(_Schema.Engine, _Values, _Schema);
+        }
 
         /// <inheritdoc/>
         public ISchema? Schema
@@ -219,6 +224,11 @@ partial class Record
         {
             ThrowIfSchemaLess();
 
+            if (!_Schema!.Engine.Equals(entry.Engine)) throw new ArgumentException(
+                "Engine of the given entry is not this instance's one.")
+                .WithData(entry)
+                .WithData(this);
+
             _Values.Add(value);
             _Schema!.Add(entry);
             return true;
@@ -274,6 +284,11 @@ partial class Record
         public bool Insert(int index, object? value, ISchemaEntry entry)
         {
             ThrowIfSchemaLess();
+
+            if (!_Schema!.Engine.Equals(entry.Engine)) throw new ArgumentException(
+                "Engine of the given entry is not this instance's one.")
+                .WithData(entry)
+                .WithData(this);
 
             _Values.Insert(index, value);
             _Schema!.Insert(index, entry);
