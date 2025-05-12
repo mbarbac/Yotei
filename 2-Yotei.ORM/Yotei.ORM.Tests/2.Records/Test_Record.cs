@@ -46,6 +46,22 @@ public static class Test_Record
         Assert.Equal("Bond", record[2]); Assert.Same(xlast, record.Schema[2]);
     }
 
+    //[Enforced]
+    [Fact]
+    public static void Test_Create_Duplicated()
+    {
+        var engine = new FakeEngine();
+        var xid = new SchemaEntry(engine, "Id", isPrimaryKey: true);
+        var xfirst = new SchemaEntry(engine, "FirstName");
+        var record = new Record(engine, ["007", "James", "008"], [xid, xfirst, xid]);
+
+        Assert.Equal(3, record.Count);
+        Assert.NotNull(record.Schema);
+        Assert.Equal("007", record[0]); Assert.Same(xid, record.Schema[0]);
+        Assert.Equal("James", record[1]); Assert.Same(xfirst, record.Schema[1]);
+        Assert.Equal("008", record[2]); Assert.Same(xid, record.Schema[2]);
+    }
+
     // ----------------------------------------------------
 
     //[Enforced]
@@ -80,6 +96,44 @@ public static class Test_Record
         Assert.False(source.Equals(target));
         Assert.False(target.Equals(source));
     }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Clone_SchemaLess()
+    {
+        var source = new Record([1, "any"]);
+        var target = source.Clone();
+
+        Assert.NotSame(source, target);
+        Assert.Equal(2, target.Count);
+        Assert.Equal(1, target[0]);
+        Assert.Equal("any", target[1]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Clone_SchemaFull()
+    {
+        var engine = new FakeEngine();
+        var xid = new SchemaEntry(engine, "dbo.Employees.Id", isPrimaryKey: true);
+        var xfirst = new SchemaEntry(engine, "Employees.FirstName");
+        var xlast = new SchemaEntry(engine, "LastName");
+        var source = new Record(engine, ["007", "James", "Bond"], [xid, xfirst, xlast]);
+    }
+
+    //[Enforced]
+    //[Fact]
+    //public static void Test_WithSchema_SchemaLess()
+    //{
+    //}
+
+    //[Enforced]
+    //[Fact]
+    //public static void Test_WithSchema_SchemaFull()
+    //{
+    //}
+
+    // ----------------------------------------------------
 
     //[Enforced]
     //[Fact]
