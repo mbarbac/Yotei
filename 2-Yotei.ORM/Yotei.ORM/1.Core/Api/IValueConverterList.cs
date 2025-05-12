@@ -36,6 +36,13 @@ public partial interface IValueConverterList : IEnumerable<IValueConverter>
     IValueConverter? Find<TSource>(bool chain = false, bool ifaces = false);
 
     /// <summary>
+    /// Trims the internal structures of this collection.
+    /// </summary>
+    void Trim();
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Adds to this collection the given converter, provided its source type is not already
     /// registered.
     /// </summary>

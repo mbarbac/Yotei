@@ -120,6 +120,9 @@ partial class MetadataTag
         /// <inheritdoc/>
         public List<string> ToList() => new(Items);
 
+        /// <inheritdoc/>
+        public void Trim() => Items.TrimExcess();
+
         // ------------------------------------------------
 
         /// <summary>

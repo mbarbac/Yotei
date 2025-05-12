@@ -57,6 +57,12 @@ public partial interface IMetadataTag : IEnumerable<string>, IEquatable<IMetadat
     /// <returns></returns>
     List<string> ToList();
 
+    /// <summary>
+    /// Trims the internal structures of this collection, without affecting to the immutability
+    /// of the collection.
+    /// </summary>
+    void Trim();
+
     // ------------------------------------------------
 
     /// <summary>

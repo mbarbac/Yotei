@@ -60,6 +60,11 @@ partial interface IMetadataTag
         /// <returns></returns>
         List<string> ToList();
 
+        /// <summary>
+        /// Trims the internal structures of this collection.
+        /// </summary>
+        void Trim();
+
         // ------------------------------------------------
 
         /// <summary>

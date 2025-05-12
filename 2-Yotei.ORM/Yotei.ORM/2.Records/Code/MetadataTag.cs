@@ -117,6 +117,9 @@ public partial class MetadataTag : IMetadataTag
     /// <inheritdoc/>
     public List<string> ToList() => Items.ToList();
 
+    /// <inheritdoc/>
+    public void Trim() => Items.Trim();
+
     // ------------------------------------------------
 
     /// <inheritdoc/>

@@ -6,19 +6,26 @@
 [DebuggerDisplay("{Items.ToDebugString(5)}")]
 public partial class ValueConverterList : IValueConverterList
 {
-    readonly List<IValueConverter> Items = [];
+    readonly List<IValueConverter> Items;
 
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    public ValueConverterList() { }
+    public ValueConverterList() => Items = [];
+
+    /// <summary>
+    /// Initializes a new empty instance with the given initial capacity.
+    /// </summary>
+    /// <param name="engine"></param>
+    /// <param name="capacity"></param>
+    public ValueConverterList(int capacity) => Items = new(capacity);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
     protected ValueConverterList(
-        ValueConverterList source) => Items.AddRange(source.ThrowWhenNull());
+        ValueConverterList source) : this() => Items.AddRange(source.ThrowWhenNull());
 
     /// <inheritdoc/>
     public IEnumerator<IValueConverter> GetEnumerator() => Items.GetEnumerator();
@@ -86,6 +93,11 @@ public partial class ValueConverterList : IValueConverterList
     /// <inheritdoc/>
     public IValueConverter? Find<TSource>(
         bool chain = false, bool ifaces = false) => Find(typeof(TSource), chain, ifaces);
+
+    /// <inheritdoc/>
+    public void Trim() => Items.TrimExcess();
+
+    // ----------------------------------------------------
 
     /// <inheritdoc/>
     public void Add(IValueConverter converter)

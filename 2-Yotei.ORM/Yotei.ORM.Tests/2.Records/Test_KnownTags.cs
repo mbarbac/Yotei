@@ -37,6 +37,26 @@ public static class Test_
         Assert.Equal("ReadOnlyTag", tags.ReadOnlyTag!.Default);
     }
 
+    //[Enforced]
+    [Fact]
+    public static void Test_Create_Duplicated()
+    {
+        var engine = new FakeEngine();
+        try
+        {
+            _ = new KnownTags(
+                false,
+                new IdentifierTags(
+                    false, [
+                        new MetadataTag(false, "TableTag"),
+                        new MetadataTag(false, "ColumnTag")]),
+                new MetadataTag(false, "TableTag"));
+
+            Assert.Fail();
+        }
+        catch (DuplicateException) { }
+    }
+
     // ----------------------------------------------------
 
     //[Enforced]
