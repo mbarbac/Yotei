@@ -33,12 +33,13 @@ public partial interface IRecord : IEnumerable<object?>, IEquatable<IRecord>
     object? this[int index] { get; }
 
     /// <summary>
-    /// Gets the value associated with the entry whose identifier is given.
-    /// <br/> This property throws an exception if this instance is a schema-less one.
+    /// Tries to get the value associated to the entry whose identifier is given.
+    /// <br/> This method throws an exception if this instance is a schema-less one.
     /// </summary>
     /// <param name="identifier"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    object? this[string identifier] { get; }
+    bool TryGet(string identifier, out object? value);
 
     /// <summary>
     /// Gets an array with the values in this instance.
@@ -81,12 +82,33 @@ public partial interface IRecord : IEnumerable<object?>, IEquatable<IRecord>
     IRecord Replace(int index, object? value);
 
     /// <summary>
+    /// Returns a new instance where the value and schema entry at the given index have been
+    /// replaced by the new given ones.
+    /// <br/> This method throws an exception if this instance is a schema-less one.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="value"></param>
+    /// <param name="entry"></param>
+    /// <returns></returns>
+    IRecord Replace(int index, object? value, ISchemaEntry entry);
+
+    /// <summary>
     /// Returns a new instance where the given value has been added to the original instance.
     /// <br/> This method throws an exception if this instance is a schema-full one.
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
     IRecord Add(object? value);
+
+    /// <summary>
+    /// Returns a new instance where the given value and schema entry have been added to the
+    /// original instance.
+    /// <br/> This method throws an exception if this instance is a schema-less one.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="entry"></param>
+    /// <returns></returns>
+    IRecord Add(object? value, ISchemaEntry entry);
 
     /// <summary>
     /// Returns a new instance where the values from the given range have been added to the
@@ -96,6 +118,16 @@ public partial interface IRecord : IEnumerable<object?>, IEquatable<IRecord>
     /// <param name="range"></param>
     /// <returns></returns>
     IRecord AddRange(IEnumerable<object?> range);
+
+    /// <summary>
+    /// Returns a new instance where the values and schema entries from the given ranges have
+    /// been added to the original instance.
+    /// <br/> This method throws an exception if this instance is a schema-less one.
+    /// </summary>
+    /// <param name="range"></param>
+    /// <param name="entries"></param>
+    /// <returns></returns>
+    IRecord AddRange(IEnumerable<object?> range, IEnumerable<ISchemaEntry> entries);
 
     /// <summary>
     /// Returns a new instance where the given value has been inserted into the original instance,
@@ -108,6 +140,17 @@ public partial interface IRecord : IEnumerable<object?>, IEquatable<IRecord>
     IRecord Insert(int index, object? value);
 
     /// <summary>
+    /// Returns a new instance where the given value and schema entry have been inserted into the
+    /// original instance, at the given index.
+    /// <br/> This method throws an exception if this instance is a schema-less one.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="value"></param>
+    /// <param name="entry"></param>
+    /// <returns></returns>
+    IRecord Insert(int index, object? value, ISchemaEntry entry);
+
+    /// <summary>
     /// Returns a new instance where the values from the given range have been inserted into
     /// the original instamce, starting at the given index.
     /// <br/> This method throws an exception if this instance is a schema-full one.
@@ -118,7 +161,16 @@ public partial interface IRecord : IEnumerable<object?>, IEquatable<IRecord>
     /// <returns></returns>
     IRecord InsertRange(int index, IEnumerable<object?> range);
 
-    // ----------------------------------------------------
+    /// <summary>
+    /// Returns a new instance where the values and schema entries from the given ranges have
+    /// been inserted into the original instance, starting at the given index.
+    /// <br/> This method throws an exception if this instance is a schema-less one.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="range"></param>
+    /// <param name="entries"></param>
+    /// <returns></returns>
+    IRecord InsertRange(int index, IEnumerable<object?> range, IEnumerable<ISchemaEntry> entries);
 
     /// <summary>
     /// Returns a new instance where the value and schema entry, if any, at the given index
@@ -146,55 +198,36 @@ public partial interface IRecord : IEnumerable<object?>, IEquatable<IRecord>
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a new instance where the value and schema entry at the given index have been
-    /// replaced by the new given ones.
-    /// <br/> This method throws an exception if this instance is a schema-less one.
+    /// Returns a new record with the changes detected at the given target one when it is compared
+    /// against this instance, using a default comparer to compare their respective values, or null
+    /// if no changes are detected.
+    /// <br/> Both instances must either be schema-less or schema-full ones simultaneously.
+    /// <br/> Schema-less instances compare their respective values, in order.
+    /// <br/> Schema-full ones compare the values associated to similar identifiers.
     /// </summary>
-    /// <param name="index"></param>
-    /// <param name="value"></param>
-    /// <param name="entry"></param>
+    /// <param name="target"></param>
+    /// <param name="orphanSources"></param>
+    /// <param name="orphanTargets"></param>
     /// <returns></returns>
-    IRecord Replace(int index, object? value, ISchemaEntry entry);
+    IRecord? GetChanges(
+        IRecord target,
+        bool orphanSources = false, bool orphanTargets = false);
 
     /// <summary>
-    /// Returns a new instance where the given value and schema entry have been added to the
-    /// original instance.
-    /// <br/> This method throws an exception if this instance is a schema-less one.
+    /// Returns a new record with the changes detected at the given target one when it is compared
+    /// against this instance, using the given comparer to compare their respective values, or null
+    /// if no changes are detected.
+    /// <br/> Both instances must either be schema-less or schema-full ones simultaneously.
+    /// <br/> Schema-less instances compare their respective values, in order.
+    /// <br/> Schema-full ones compare the values associated to similar identifiers.
     /// </summary>
-    /// <param name="value"></param>
-    /// <param name="entry"></param>
+    /// <param name="target"></param>
+    /// <param name="comparer"></param>
+    /// <param name="orphanSources"></param>
+    /// <param name="orphanTargets"></param>
     /// <returns></returns>
-    IRecord Add(object? value, ISchemaEntry entry);
-
-    /// <summary>
-    /// Returns a new instance where the values and schema entries from the given ranges have
-    /// been added to the original instance.
-    /// <br/> This method throws an exception if this instance is a schema-less one.
-    /// </summary>
-    /// <param name="range"></param>
-    /// <param name="entries"></param>
-    /// <returns></returns>
-    IRecord AddRange(IEnumerable<object?> range, IEnumerable<ISchemaEntry> entries);
-
-    /// <summary>
-    /// Returns a new instance where the given value and schema entry have been inserted into the
-    /// original instance, at the given index.
-    /// <br/> This method throws an exception if this instance is a schema-less one.
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="value"></param>
-    /// <param name="entry"></param>
-    /// <returns></returns>
-    IRecord Insert(int index, object? value, ISchemaEntry entry);
-
-    /// <summary>
-    /// Returns a new instance where the values and schema entries from the given ranges have
-    /// been inserted into the original instance, starting at the given index.
-    /// <br/> This method throws an exception if this instance is a schema-less one.
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="range"></param>
-    /// <param name="entries"></param>
-    /// <returns></returns>
-    IRecord InsertRange(int index, IEnumerable<object?> range, IEnumerable<ISchemaEntry> entries);
+    IRecord? GetChanges(
+        IRecord target,
+        IEqualityComparer comparer,
+        bool orphanSources = false, bool orphanTargets = false);
 }

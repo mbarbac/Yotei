@@ -34,12 +34,13 @@ partial interface IRecord
         object? this[int index] { get; set; }
 
         /// <summary>
-        /// Gets or sets the value associated with the entry whose identifier is given.
-        /// <br/> This property throws an exception if this instance is a schema-less one.
+        /// Tries to get the value associated to the entry whose identifier is given.
+        /// <br/> This method throws an exception if this instance is a schema-less one.
         /// </summary>
         /// <param name="identifier"></param>
+        /// <param name="value"></param>
         /// <returns></returns>
-        object? this[string identifier] { get; set; }
+        bool TryGet(string identifier, out object? value);
 
         /// <summary>
         /// Gets an array with the values in this instance.
@@ -80,6 +81,16 @@ partial interface IRecord
         bool Replace(int index, object? value);
 
         /// <summary>
+        /// Replaces the the value and schema entry at the given index by the new given ones.
+        /// <br/> This method throws an exception if this instance is a schema-less one.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="value"></param>
+        /// <param name="entry"></param>
+        /// <returns></returns>
+        bool Replace(int index, object? value, ISchemaEntry entry);
+
+        /// <summary>
         /// Adds the given value to this instance.
         /// <br/> This method throws an exception if this instance is a schema-full one.
         /// </summary>
@@ -88,12 +99,30 @@ partial interface IRecord
         bool Add(object? value);
 
         /// <summary>
+        /// Adds the given value and schema entry to this collection.
+        /// <br/> This method throws an exception if this instance is a schema-less one.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="entry"></param>
+        /// <returns></returns>
+        bool Add(object? value, ISchemaEntry entry);
+
+        /// <summary>
         /// Adds the values from the given range to this instance.
         /// <br/> This method throws an exception if this instance is a schema-full one.
         /// </summary>
         /// <param name="range"></param>
         /// <returns></returns>
         bool AddRange(IEnumerable<object?> range);
+
+        /// <summary>
+        /// Adds the values and schema entries from the given ranges to this collection.
+        /// <br/> This method throws an exception if this instance is a schema-less one.
+        /// </summary>
+        /// <param name="range"></param>
+        /// <param name="entries"></param>
+        /// <returns></returns>
+        bool AddRange(IEnumerable<object?> range, IEnumerable<ISchemaEntry> entries);
 
         /// <summary>
         /// Inserts the given value into this instance, at the given index.
@@ -105,6 +134,16 @@ partial interface IRecord
         bool Insert(int index, object? value);
 
         /// <summary>
+        /// Inserts the given value and schema entry into this collection, at the given index.
+        /// <br/> This method throws an exception if this instance is a schema-less one.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="value"></param>
+        /// <param name="entry"></param>
+        /// <returns></returns>
+        bool Insert(int index, object? value, ISchemaEntry entry);
+
+        /// <summary>
         /// Inserts the values from the given range into this instance, starting at the given index.
         /// <br/> This method throws an exception if this instance is a schema-full one.
         /// <br/> Returns whether changes have been made, or not.
@@ -114,7 +153,16 @@ partial interface IRecord
         /// <returns></returns>
         bool InsertRange(int index, IEnumerable<object?> range);
 
-        // ------------------------------------------------
+        /// <summary>
+        /// Inserts the values and schema entries from the given ranges into this collection,
+        /// starting at the given index.
+        /// <br/> This method throws an exception if this instance is a schema-less one.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="range"></param>
+        /// <param name="entries"></param>
+        /// <returns></returns>
+        bool InsertRange(int index, IEnumerable<object?> range, IEnumerable<ISchemaEntry> entries);
 
         /// <summary>
         /// Removes the value and schema entry, if any, at the given index.
@@ -139,54 +187,5 @@ partial interface IRecord
         bool Clear();
 
         // ----------------------------------------------------
-
-        /// <summary>
-        /// Replaces the the value and schema entry at the given index by the new given ones.
-        /// <br/> This method throws an exception if this instance is a schema-less one.
-        /// </summary>
-        /// <param name="index"></param>
-        /// <param name="value"></param>
-        /// <param name="entry"></param>
-        /// <returns></returns>
-        bool Replace(int index, object? value, ISchemaEntry entry);
-
-        /// <summary>
-        /// Adds the given value and schema entry to this collection.
-        /// <br/> This method throws an exception if this instance is a schema-less one.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="entry"></param>
-        /// <returns></returns>
-        bool Add(object? value, ISchemaEntry entry);
-
-        /// <summary>
-        /// Adds the values and schema entries from the given ranges to this collection.
-        /// <br/> This method throws an exception if this instance is a schema-less one.
-        /// </summary>
-        /// <param name="range"></param>
-        /// <param name="entries"></param>
-        /// <returns></returns>
-        bool AddRange(IEnumerable<object?> range, IEnumerable<ISchemaEntry> entries);
-
-        /// <summary>
-        /// Inserts the given value and schema entry into this collection, at the given index.
-        /// <br/> This method throws an exception if this instance is a schema-less one.
-        /// </summary>
-        /// <param name="index"></param>
-        /// <param name="value"></param>
-        /// <param name="entry"></param>
-        /// <returns></returns>
-        bool Insert(int index, object? value, ISchemaEntry entry);
-
-        /// <summary>
-        /// Inserts the values and schema entries from the given ranges into this collection,
-        /// starting at the given index.
-        /// <br/> This method throws an exception if this instance is a schema-less one.
-        /// </summary>
-        /// <param name="index"></param>
-        /// <param name="range"></param>
-        /// <param name="entries"></param>
-        /// <returns></returns>
-        bool InsertRange(int index, IEnumerable<object?> range, IEnumerable<ISchemaEntry> entries);
     }
 }
