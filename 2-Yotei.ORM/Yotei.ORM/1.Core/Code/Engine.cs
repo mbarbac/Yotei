@@ -10,7 +10,7 @@ public partial class Engine : IEngine
     public const string NULLVALUELITERAL = "NULL";
     public const bool POSITIONALPARAMETERS = false;
     public const string PARAMETERPREFIX = "#";
-    public const bool NATIVEPAGINATION = false;
+    public const bool SUPPORTSNATIVEPAGING = false;
     public const bool USETERMINATORS = true;
     public const char LEFTTERMINATOR = '[';
     public const char RIGHTTERMINATOR = ']';
@@ -33,7 +33,7 @@ public partial class Engine : IEngine
         NullValueLiteral = source.NullValueLiteral;
         PositionalParameters = source.PositionalParameters;
         ParameterPrefix = source.ParameterPrefix;
-        NativePagination = source.NativePagination;
+        SupportsNativePaging = source.SupportsNativePaging;
         UseTerminators = source.UseTerminators;
         LeftTerminator = source.LeftTerminator;
         RightTerminator = source.RightTerminator;
@@ -56,7 +56,7 @@ public partial class Engine : IEngine
             string.Compare(NullValueLiteral, other.NullValueLiteral, !CaseSensitiveNames) == 0 &&
             PositionalParameters == other.PositionalParameters &&
             string.Compare(ParameterPrefix, other.ParameterPrefix, !CaseSensitiveNames) == 0 &&
-            NativePagination == other.NativePagination &&
+            SupportsNativePaging == other.SupportsNativePaging &&
             UseTerminators == other.UseTerminators &&
             LeftTerminator == other.LeftTerminator &&
             RightTerminator == other.RightTerminator &&
@@ -85,7 +85,7 @@ public partial class Engine : IEngine
         code = HashCode.Combine(code, NullValueLiteral);
         code = HashCode.Combine(code, PositionalParameters);
         code = HashCode.Combine(code, ParameterPrefix);
-        code = HashCode.Combine(code, NativePagination);
+        code = HashCode.Combine(code, SupportsNativePaging);
         code = HashCode.Combine(code, UseTerminators);
         code = HashCode.Combine(code, LeftTerminator);
         code = HashCode.Combine(code, RightTerminator);
@@ -118,7 +118,7 @@ public partial class Engine : IEngine
     string _ParameterPrefix = PARAMETERPREFIX;
 
     /// <inheritdoc/>
-    public bool NativePagination { get; init; } = NATIVEPAGINATION;
+    public bool SupportsNativePaging { get; init; } = SUPPORTSNATIVEPAGING;
 
     /// <inheritdoc/>
     public bool UseTerminators { get; init; } = USETERMINATORS;

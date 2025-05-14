@@ -33,7 +33,7 @@ public partial interface IEngine : IEquatable<IEngine>
     /// Determines if this engine provides a native support for native pagination, or rather it
     /// has to be emulated by the framework.
     /// </summary>
-    [With] bool NativePagination { get; }
+    [With] bool SupportsNativePaging { get; }
 
     /// <summary>
     /// Determines if this engine wraps the SQL command identifier-alike identifiers between

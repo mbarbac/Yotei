@@ -17,7 +17,7 @@ public static class Test_Engine
         Assert.Equal(Engine.NULLVALUELITERAL, engine.NullValueLiteral);
         Assert.Equal(Engine.POSITIONALPARAMETERS, engine.PositionalParameters);
         Assert.Equal(Engine.PARAMETERPREFIX, engine.ParameterPrefix);
-        Assert.Equal(Engine.NATIVEPAGINATION, engine.NativePagination);
+        Assert.Equal(Engine.SUPPORTSNATIVEPAGING, engine.SupportsNativePaging);
         Assert.Equal(Engine.USETERMINATORS, engine.UseTerminators);
         Assert.Equal(Engine.LEFTTERMINATOR, engine.LeftTerminator);
         Assert.Equal(Engine.RIGHTTERMINATOR, engine.RightTerminator);
@@ -73,9 +73,9 @@ public static class Test_Engine
         Assert.NotSame(source, target);
         Assert.Equal("x", target.ParameterPrefix);
 
-        target = source.WithNativePagination(true);
+        target = source.WithSupportsNativePaging(true);
         Assert.NotSame(source, target);
-        Assert.True(target.NativePagination);
+        Assert.True(target.SupportsNativePaging);
 
         target = source.WithUseTerminators(false);
         Assert.NotSame(source, target);

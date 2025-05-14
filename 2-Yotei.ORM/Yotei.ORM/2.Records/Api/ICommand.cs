@@ -35,7 +35,8 @@ public partial interface ICommand
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a new instance with all the original contents cleared.
+    /// Clears all the contents of this instance.
+    /// <br/> Returns a reference to itself to enable a fluent syntax usage.
     /// </summary>
     /// <returns></returns>
     ICommand Clear();

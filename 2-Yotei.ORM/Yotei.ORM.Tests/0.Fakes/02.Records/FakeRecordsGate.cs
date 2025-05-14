@@ -7,9 +7,9 @@ public class FakeRecordsGate : RecordsGate
 
     public override ICommandEnumerator CreateCommandEnumerator(
         IEnumerableCommand command, CancellationToken token = default)
-        => throw null;
+        => new FakeCommandEnumerator(command, token);
 
     public override ICommandExecutor CreateCommandExecutor(
         IExecutableCommand command)
-        => throw null;
+        => new FakeCommandExecutor(command);
 }
