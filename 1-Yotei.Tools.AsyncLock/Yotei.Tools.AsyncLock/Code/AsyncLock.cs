@@ -1,4 +1,5 @@
-﻿using static System.ConsoleColor;
+﻿#pragma warning disable IDE0079
+#pragma warning disable CA1068
 
 namespace Yotei.Tools;
 
@@ -33,7 +34,7 @@ public partial class AsyncLock : DisposableClass
     /// </summary>
     public int Count { get; private set; }
 
-    // ------------------------------------------------
+    // ----------------------------------------------------
 
     /// <summary>
     /// Initializes a new instance.
@@ -58,15 +59,12 @@ public partial class AsyncLock : DisposableClass
         return ValueTask.CompletedTask;
     }
 
-    // ------------------------------------------------
+    // ----------------------------------------------------
 
     /// <summary>
-    /// Waits until this lock can be captured. Returns a disposable object that, when disposed,
-    /// either releases the lock or decreases its reentrancy count.
-    /// <br/> The <paramref name="data"/> argument is used to pass context data to the surrogate
-    /// object, typically for tracking purposes.
+    /// Waits untill this lock is captured. Returns a disposable object that, when disposed,
+    /// either releases this lock or decreases its re-entrancy count.
     /// </summary>
-    /// <param name="timeout"></param>
     /// <param name="data"></param>
     /// <returns></returns>
     public Surrogate Lock(object? data = null)
@@ -75,11 +73,11 @@ public partial class AsyncLock : DisposableClass
     }
 
     /// <summary>
-    /// Tries to capture this lock waiting at most for the given amount of time. Returns a
-    /// disposable object that, when disposed, it either releases the lock or decreases its
-    /// reentrancy count.
-    /// <br/> The <paramref name="data"/> argument is used to pass context data to the surrogate
-    /// object, typically for tracking purposes.
+    /// Tries to capture this lock waiting for at most the given amount of time. Returns a
+    /// disposable object that, when disposed, either releases this lock or decreases its
+    /// re-entrancy count.
+    /// <br/> The 'data' argument is used to pass context information (as for instance for debug
+    /// or tracking purposes).
     /// </summary>
     /// <param name="timeout"></param>
     /// <param name="data"></param>
@@ -92,66 +90,49 @@ public partial class AsyncLock : DisposableClass
         return item.Enter(timeout);
     }
 
-    // ------------------------------------------------
+    // ----------------------------------------------------
 
     /// <summary>
-    /// Waits until this lock can be captured. Returns a disposable object that, when disposed,
-    /// either releases the lock or decreases its reentrancy count.
-    /// <br/> The <paramref name="data"/> argument is used to pass context data to the surrogate
-    /// object, typically for tracking purposes.
+    /// Waits untill this lock is captured. Returns a disposable object that, when disposed,
+    /// either releases this lock or decreases its re-entrancy count.
+    /// <br/> The 'data' argument is used to pass context information (as for instance for debug
+    /// or tracking purposes).
     /// </summary>
-    /// <param name="token"></param>
     /// <param name="data"></param>
     /// <returns></returns>
     public ValueTask<Surrogate> LockAsync(object? data = null)
     {
-        return LockAsync(data, CancellationToken.None);
+        return LockAsync(CancellationToken.None, data);
     }
 
     /// <summary>
-    /// Tries to capture this lock while observing the given cancellation token, if any. Returns
-    /// a disposable object that, when disposed, it either releases the lock or decreases its
-    /// reentrancy count.
-    /// <br/> The <paramref name="data"/> argument is used to pass context data to the surrogate
-    /// object, typically for tracking purposes.
+    /// Waits untill this lock is captured while observing the given cancellation token, if any.
+    /// Returns a disposable object that, when disposed, either releases this lock or decreases
+    /// its re-entrancy count.
+    /// <br/> The 'data' argument is used to pass context information (as for instance for debug
+    /// or tracking purposes).
     /// </summary>
-    /// <param name="data"></param>
     /// <param name="token"></param>
+    /// <param name="data"></param>
     /// <returns></returns>
-    public ValueTask<Surrogate> LockAsync(object? data, CancellationToken token = default)
+    public ValueTask<Surrogate> LockAsync(CancellationToken token, object? data = null)
     {
-        return LockAsync(Timeout.InfiniteTimeSpan, data, token);
+        return LockAsync(Timeout.InfiniteTimeSpan ,token, data);
     }
 
     /// <summary>
-    /// Tries to capture this lock waiting at most for the given amount of time. Returns a
-    /// disposable object that, when disposed, it either releases the lock or decreases its
-    /// reentrancy count.
-    /// <br/> The <paramref name="data"/> argument is used to pass context data to the surrogate
-    /// object, typically for tracking purposes.
+    /// Tries to capture this lock waiting for at most the given amount of time, while observing
+    /// the given cancellation token, if any. Returns a disposable object that, when disposed,
+    /// either releases this lock or decreases its re-entrancy count.
+    /// <br/> The 'data' argument is used to pass context information (as for instance for debug
+    /// or tracking purposes).
     /// </summary>
     /// <param name="timeout"></param>
     /// <param name="token"></param>
     /// <param name="data"></param>
-    /// <returns></returns>
-    public ValueTask<Surrogate> LockAsync(TimeSpan timeout, object? data)
-    {
-        return LockAsync(timeout, data, CancellationToken.None);
-    }
-
-    /// <summary>
-    /// Tries to capture this lock waiting at most for the given amount of time, while observing
-    /// the given cancellation token, if any. Returns a disposable object that, when disposed, it
-    /// either releases the lock or decreases its reentrancy count.
-    /// <br/> The <paramref name="data"/> argument is used to pass context data to the surrogate
-    /// object, typically for tracking purposes.
-    /// </summary>
-    /// <param name="timeout"></param>
-    /// <param name="data"></param>
-    /// <param name="token"></param>
     /// <returns></returns>
     public ValueTask<Surrogate> LockAsync(
-        TimeSpan timeout, object? data = null, CancellationToken token = default)
+        TimeSpan timeout, CancellationToken token = default, object? data = null)
     {
         var item = new Surrogate(this, data);
 
@@ -159,7 +140,7 @@ public partial class AsyncLock : DisposableClass
         return item.EnterAsync(timeout, token);
     }
 
-    // ------------------------------------------------
+    // ----------------------------------------------------
 
     /// <summary>
     /// Prints the given message to the debug and console outputs.

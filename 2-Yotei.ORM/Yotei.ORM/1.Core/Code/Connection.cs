@@ -32,7 +32,7 @@ public abstract partial class Connection : DisposableClass, IConnection
     {
         if (IsDisposed || !disposing) return;
 
-        try { if (_Transaction != null) _Transaction.Dispose(); } catch { }
+        try { _Transaction?.Dispose(); } catch { }
         try { if (IsOpen) Close(); } catch { }
         try { AsyncLock.Dispose(); } catch { }
     }
@@ -245,4 +245,16 @@ public abstract partial class Connection : DisposableClass, IConnection
     /// Invoked to close the connection with the underlying database.
     /// </summary>
     protected abstract ValueTask OnCloseAsync();
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public IRecordsGate Records => _Records ??= CreateRecordsGate();
+    IRecordsGate? _Records;
+
+    /// <summary>
+    /// Invoked to create an appropriate instance.
+    /// </summary>
+    /// <returns></returns>
+    protected abstract IRecordsGate CreateRecordsGate();
 }

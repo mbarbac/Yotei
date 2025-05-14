@@ -1,4 +1,5 @@
-﻿#pragma warning disable CA2208
+﻿#pragma warning disable IDE0079
+#pragma warning disable CA2208
 
 using static Yotei.Tools.Diagnostics.DebugEx;
 using static System.ConsoleColor;
@@ -167,7 +168,7 @@ public static class Test_AsyncLock
         try
         {
             await using var disposable =
-                await info.Locker.LockAsync(span, id).ConfigureAwait(false);
+                await info.Locker.LockAsync(span, CancellationToken.None, id).ConfigureAwait(false);
 
             WriteLine(true, Magenta, $"Locked: {info.Locker}, Id: {id}");
 
@@ -322,7 +323,7 @@ public static class Test_AsyncLock
         try
         {
             await using var disposable =
-                await info.Locker.LockAsync(span, id).ConfigureAwait(false);
+                await info.Locker.LockAsync(span, CancellationToken.None, id).ConfigureAwait(false);
 
             WriteLine(true, Magenta, $"Locked: {info.Locker}, Id: {id}");
 

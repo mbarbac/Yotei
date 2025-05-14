@@ -203,7 +203,7 @@ public partial interface IRecord : IEnumerable<object?>, IEquatable<IRecord>
     /// if no changes are detected.
     /// <br/> Both instances must either be schema-less or schema-full ones simultaneously.
     /// <br/> Schema-less instances compare their respective values, in order.
-    /// <br/> Schema-full ones compare the values associated to similar identifiers.
+    /// <br/> Schema-full ones compare the values associated to similar identifiers, in source order.
     /// </summary>
     /// <param name="target"></param>
     /// <param name="orphanSources"></param>
@@ -219,7 +219,7 @@ public partial interface IRecord : IEnumerable<object?>, IEquatable<IRecord>
     /// if no changes are detected.
     /// <br/> Both instances must either be schema-less or schema-full ones simultaneously.
     /// <br/> Schema-less instances compare their respective values, in order.
-    /// <br/> Schema-full ones compare the values associated to similar identifiers.
+    /// <br/> Schema-full ones compare the values associated to similar identifiers, in source order.
     /// </summary>
     /// <param name="target"></param>
     /// <param name="comparer"></param>
