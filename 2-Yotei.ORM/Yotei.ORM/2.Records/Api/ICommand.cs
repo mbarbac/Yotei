@@ -31,4 +31,12 @@ public partial interface ICommand
     /// <param name="iterable"></param>
     /// <returns></returns>
     ICommandInfo GetCommandInfo(bool iterable);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns a new instance with all the original contents cleared.
+    /// </summary>
+    /// <returns></returns>
+    ICommand Clear();
 }

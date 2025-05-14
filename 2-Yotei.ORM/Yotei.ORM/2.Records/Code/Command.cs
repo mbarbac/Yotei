@@ -30,4 +30,9 @@ public abstract partial class Command : ICommand
 
     /// <inheritdoc/>
     public abstract ICommandInfo GetCommandInfo(bool iterable);
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public abstract ICommand Clear();
 }

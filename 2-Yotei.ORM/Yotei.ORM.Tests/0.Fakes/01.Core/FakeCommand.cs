@@ -29,4 +29,6 @@ public partial class FakeCommand : Command
     public override ICommandInfo GetCommandInfo() => _FakeInfo;
     
     public override ICommandInfo GetCommandInfo(bool _) => _FakeInfo;
+
+    public override FakeCommand Clear() => new(Connection);
 }
