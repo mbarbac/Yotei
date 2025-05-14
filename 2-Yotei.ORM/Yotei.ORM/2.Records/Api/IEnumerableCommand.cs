@@ -5,6 +5,8 @@
 /// Represents a records-oriented command that, when executed, enumerates the records produced
 /// by that execution, if any.
 /// </summary>
+[Cloneable]
+[InheritWiths]
 public partial interface IEnumerableCommand
     : ICommand
     , IEnumerable<IRecord?>, IAsyncEnumerable<IRecord?>

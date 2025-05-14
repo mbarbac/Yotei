@@ -44,13 +44,14 @@ public partial class RawCommand : Command, IRawCommand
     public RawCommand(
         IConnection connection,
         Func<dynamic, object?> spec) : this(connection) => Append(spec);
-
+    
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected RawCommand(
-        RawCommand source) : base(source.Connection) => _Info = source._Info.Clone();
+    protected RawCommand(RawCommand source)
+        : base(source)
+        => _Info = source._Info.Clone();
 
     /// <inheritdoc/>
     public override string ToString() => _Info.ToString()!;
@@ -119,7 +120,7 @@ public partial class RawCommand : Command, IRawCommand
     /// <inheritdoc/>
     public virtual IRawCommand Append(Func<dynamic, object?> spec)
     {
-        throw new NotImplementedException();
+        throw null;
     }
 
     // ----------------------------------------------------

@@ -12,6 +12,16 @@ public abstract partial class Command : ICommand
     /// <param name="connection"></param>
     public Command(IConnection connection) => Connection = connection.ThrowWhenNull();
 
+    /// <summary>
+    /// Copy constructor.
+    /// </summary>
+    /// <param name="source"></param>
+    protected Command(Command source)
+    {
+        Connection = source.ThrowWhenNull().Connection;
+        Locale = source.Locale;
+    }
+
     // ----------------------------------------------------
 
     /// <inheritdoc/>

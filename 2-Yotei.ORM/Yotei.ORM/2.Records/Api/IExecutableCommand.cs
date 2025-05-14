@@ -5,6 +5,8 @@
 /// Represents a records-oriented command that, when executed, produces an integer as the result
 /// of that execution.
 /// </summary>
+[Cloneable]
+[InheritWiths]
 public partial interface IExecutableCommand : ICommand
 {
     /// <summary>
