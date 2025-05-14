@@ -55,18 +55,26 @@ internal static class LambdaHelpers
     {
         name = name.NotNullNotEmpty();
 
-        if (name.Any(x => !ValidChar(x))) throw new ArgumentException(
+        if (!ValidFirstChar(name[0])) throw new ArgumentException(
+            "Name contains invalid first character.")
+            .WithData(name);
+
+        if (name.Any(x => !ValidOtherChar(x))) throw new ArgumentException(
             "Name contains invalid character(s).")
             .WithData(name);
 
         return name;
 
-        static bool ValidChar(char c) =>
-            c is '_' or
-            (>= '0' and <= '9') or
-            (>= 'A' and <= 'Z') or
-            (>= 'a' and <= 'z');
+        static bool ValidFirstChar(char c) =>
+            VALID_FIRST.Contains(c) ||
+            (c >= '0' && c <= '9') ||
+            (c >= 'A' && c <= 'Z') ||
+            (c >= 'a' && c <= 'z');
+
+        static bool ValidOtherChar(char c) => ValidFirstChar(c);
     }
+
+    static string VALID_FIRST = "_$@#";
 
     /// <summary>
     /// Invoked to validate the given collection of dynamic lambda nodes that can be used as the
