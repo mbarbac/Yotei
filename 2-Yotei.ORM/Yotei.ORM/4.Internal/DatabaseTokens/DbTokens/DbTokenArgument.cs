@@ -6,7 +6,7 @@
 /// <br/> Instances of this type are considered translation artifacts, with no representation
 /// in a database command.
 /// </summary>
-public sealed class DbTokenArgument : DbToken
+public class DbTokenArgument : DbToken
 {
     /// <summary>
     /// Initializes a new instance.

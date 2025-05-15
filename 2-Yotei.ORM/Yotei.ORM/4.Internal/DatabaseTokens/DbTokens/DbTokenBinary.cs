@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents a binary operation between two given tokens.
 /// </summary>
-public sealed class DbTokenBinary : DbToken
+public class DbTokenBinary : DbToken
 {
     /// <summary>
     /// Initializes a new instance.

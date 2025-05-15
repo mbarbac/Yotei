@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents a unary operation against a given token.
 /// </summary>
-public sealed class DbTokenUnary : DbToken
+public class DbTokenUnary : DbToken
 {
     /// <summary>
     /// Initializes a new instance.
