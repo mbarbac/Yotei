@@ -113,6 +113,8 @@ public class DbLambdaParser
 
     /// <summary>
     /// Parses the given node.
+    /// <br/> Single-command arguments '(cmd)' are tranlated into the command.
+    /// <br/> Stand-alone string '(str)' are translated into a single argument literal.
     /// </summary>
     DbToken ParseInvoke(LambdaNodeInvoke node)
     {
@@ -138,46 +140,146 @@ public class DbLambdaParser
     /// </summary>
     DbTokenIdentifier ParseMember(LambdaNodeMember node)
     {
-        throw null;
+        var host = Parse(node.LambdaHost);
+        var darg = node.GetArgument();
+        var name = node.LambdaName.NullWhenDynamicName(darg, Engine.CaseSensitiveNames);
+
+        var id = name == null ? new IdentifierPart(Engine) : new IdentifierPart(Engine, name);
+        return new(host, id);
+    }
+
+    /// <summary>
+    /// Parses the given node.
+    /// <br/> Translate 'x => x(...)' and 'x => x.Any.x(...)' to invoke.
+    /// <br/> Intercepts 'x => x.Coalesce(...)' virtual method.
+    /// <br/> Intercepts 'x => x.Ternary(...)' virtual method.
+    /// <br/> Intercepts 'x => x.Convert(...)' and 'x => x.Cast(...)' virtual methods.
+    /// </summary>
+    DbToken ParseMethod(LambdaNodeMethod node)
+    {
+        var darg = node.GetArgument();
+        var name = node.LambdaName.NullWhenDynamicName(darg, Engine.CaseSensitiveNames);
+
+        // 'x => x(...)' and 'x => x.Any.x(...)' to invoke...
+        if (name == null)
+        {
+            if (node.LambdaGenericArguments.Count != 0) throw new ArgumentException(
+                "Cannot use type arguments with invoke tokens.")
+                .WithData(node);
+
+            var invoke = new LambdaNodeInvoke(node.LambdaHost, node.LambdaArguments);
+            return ParseInvoke(invoke);
+        }
+
+        // Intercepts 'Coalesce' virtual method...
+        if (node.LambdaHost is LambdaNodeArgument &&
+            node.LambdaArguments.Count == 2 &&
+            string.Compare(name, "Coalesce", !Engine.CaseSensitiveNames) == 0)
+        {
+            var left = Parse(node.LambdaArguments[0]);
+            var right = Parse(node.LambdaArguments[1]);
+
+            return new DbTokenCoalesce(left, right);
+        }
+
+        // Intercepts 'Ternary' virtual method...
+        if (node.LambdaHost is LambdaNodeArgument &&
+            node.LambdaArguments.Count == 3 &&
+            string.Compare(name, "Ternary", !Engine.CaseSensitiveNames) == 0)
+        {
+            var left = Parse(node.LambdaArguments[0]);
+            var middle = Parse(node.LambdaArguments[1]);
+            var right = Parse(node.LambdaArguments[2]);
+
+            return new DbTokenTernary(left, middle, right);
+        }
+
+        // Intercepts 'Convert' and 'Cast' virtual methods...
+        if (node.LambdaHost is LambdaNodeArgument && (
+            string.Compare(name, "Convert", !Engine.CaseSensitiveNames) == 0 ||
+            string.Compare(name, "Cast", !Engine.CaseSensitiveNames) == 0))
+        {
+            // x => x.Convert<T>(target)...
+            if (node.LambdaGenericArguments.Count == 1 &&
+                node.LambdaArguments.Count == 1)
+            {
+                var type = node.LambdaGenericArguments[0];
+                var target = Parse(node.LambdaArguments[0]);
+                
+                return new DbTokenConvert.ToType(type, target);
+            }
+
+            // x => x.Convert(type|spec, target)...
+            if (node.LambdaArguments.Count == 2 &&
+                node.LambdaArguments[0] is LambdaNodeValue value)
+            {
+                var target = Parse(node.LambdaArguments[1]);
+                switch (value.LambdaValue)
+                {
+                    case Type vtype: return new DbTokenConvert.ToType(vtype, target);
+                    case string vspec: return new DbTokenConvert.ToSpec(vspec, target);
+                }
+            }
+        }
+
+        // Standard case...
+        var host = Parse(node.LambdaHost);
+        var items = node.LambdaArguments.Select(x => Parse(x));
+
+        return node.LambdaGenericArguments.Count == 0
+            ? new DbTokenMethod(host, name, items)
+            : new DbTokenMethod(host, name, node.LambdaGenericArguments, items);
     }
 
     /// <summary>
     /// Parses the given node.
     /// </summary>
-    DbTokenArgument ParseMethod(LambdaNodeMethod node)
+    DbTokenSetter ParseSetter(LambdaNodeSetter node)
     {
-        throw null;
+        var target = Parse(node.LambdaTarget);
+        var value = Parse(node.LambdaValue);
+
+        return new(target, value);
     }
 
     /// <summary>
     /// Parses the given node.
     /// </summary>
-    DbTokenArgument ParseSetter(LambdaNodeSetter node)
+    DbTokenTernary ParseTernary(LambdaNodeTernary node)
     {
-        throw null;
+        var left = Parse(node.LambdaLeft);
+        var middle = Parse(node.LambdaMiddle);
+        var right = Parse(node.LambdaRight);
+
+        return new(left, middle, right);
     }
 
     /// <summary>
     /// Parses the given node.
     /// </summary>
-    DbTokenArgument ParseTernary(LambdaNodeTernary node)
+    DbTokenUnary ParseUnary(LambdaNodeUnary node)
     {
-        throw null;
+        var target = Parse(node.LambdaTarget);
+        return new(node.LambdaOperation, target);
     }
 
     /// <summary>
     /// Parses the given node.
     /// </summary>
-    DbTokenArgument ParseUnary(LambdaNodeUnary node)
+    DbToken ParseValue(LambdaNodeValue node)
     {
-        throw null;
-    }
+        return node.LambdaValue switch
+        {
+            DbToken item => item,
+            LambdaNode item => Parse(item),
+            ICommand item => new DbTokenCommand(item),
+            ICommandInfo item => new DbTokenCommand(item),
 
-    /// <summary>
-    /// Parses the given node.
-    /// </summary>
-    DbTokenArgument ParseValue(LambdaNodeValue node)
-    {
-        throw null;
+            Delegate => throw new ArgumentException(
+                "Cannot use delegates as the value of tokens.")
+                .WithData(node),
+
+            _ => new DbTokenValue(node.LambdaValue)
+        };
     }
 }
