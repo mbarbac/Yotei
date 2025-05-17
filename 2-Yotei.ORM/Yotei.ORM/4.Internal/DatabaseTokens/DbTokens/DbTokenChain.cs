@@ -42,6 +42,34 @@ public partial class DbTokenChain : DbToken, IEnumerable<DbToken>
     /// <inheritdoc/>
     public override string ToString() => Items.ToString();
 
+    /// <summary>
+    /// Returns a collection-alike string representation of this instance.
+    /// </summary>
+    /// <param name="rounded"></param>
+    /// <param name="separator"></param>
+    /// <returns></returns>
+    public string ToString(bool rounded, string separator = ", ")
+    {
+        separator.ThrowWhenNull();
+
+        var head = rounded ? '(' : '[';
+        var tail = rounded ? ')' : ']';
+
+        var sb = new StringBuilder();
+        sb.Append(head);
+
+        for (int i = 0; i < Count; i++)
+        {
+            var item = Items[i].ToString();
+
+            if (i > 0) sb.Append(separator);
+            sb.Append(item);
+        }
+
+        sb.Append(tail);
+        return sb.ToString();
+    }
+
     /// <inheritdoc/>
     public IEnumerator<DbToken> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

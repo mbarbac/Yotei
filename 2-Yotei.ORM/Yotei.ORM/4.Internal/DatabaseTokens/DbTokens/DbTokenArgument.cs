@@ -38,10 +38,5 @@ public class DbTokenArgument : DbToken
     }
 
     /// <inheritdoc/>
-    public override int GetHashCode()
-    {
-        var code = 0;
-        code = HashCode.Combine(code, Name);
-        return code;
-    }
+    public override int GetHashCode() => Name.GetHashCode();
 }
