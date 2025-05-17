@@ -27,6 +27,12 @@ public class LambdaNodeTernary : LambdaNode
     public override string ToString() => $"({LambdaLeft} ? {LambdaMiddle} : {LambdaRight})";
 
     /// <inheritdoc/>
+    public override LambdaNodeArgument? GetArgument()
+        => LambdaLeft.GetArgument()
+        ?? LambdaMiddle.GetArgument()
+        ?? LambdaRight.GetArgument();
+
+    /// <inheritdoc/>
     public override LambdaNodeTernary Clone() => new(
         LambdaLeft.Clone(),
         LambdaMiddle.Clone(),

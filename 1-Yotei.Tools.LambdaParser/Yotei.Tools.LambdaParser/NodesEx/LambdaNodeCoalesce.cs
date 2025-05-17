@@ -24,6 +24,11 @@ public class LambdaNodeCoalesce : LambdaNode
     public override string ToString() => $"({LambdaLeft} ?? {LambdaRight})";
 
     /// <inheritdoc/>
+    public override LambdaNodeArgument? GetArgument()
+        => LambdaLeft.GetArgument()
+        ?? LambdaRight.GetArgument();
+
+    /// <inheritdoc/>
     public override LambdaNodeCoalesce Clone() => new(
         LambdaLeft.Clone(),
         LambdaRight.Clone());

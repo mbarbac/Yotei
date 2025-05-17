@@ -114,9 +114,23 @@ public class DbLambdaParser
     /// <summary>
     /// Parses the given node.
     /// </summary>
-    DbTokenInvoke ParseInvoke(LambdaNodeInvoke node)
+    DbToken ParseInvoke(LambdaNodeInvoke node)
     {
-        throw null;
+        var host = Parse(node.LambdaHost);
+        var items = node.LambdaArguments.Select(x => Parse(x)).ToList();
+
+        if (items.Count == 1)
+        {
+            // Single-command argument...
+            if (items[0] is DbTokenCommand command) return command;
+
+            // Intercepting stand-alone strings, but only modifying the token...
+            if (items[0] is DbTokenValue value &&
+                value.Value is string str) items[0] = new DbTokenLiteral(str);
+        }
+
+        // Standard case...
+        return new DbTokenInvoke(host, items);
     }
 
     /// <summary>
