@@ -45,7 +45,21 @@ partial class DbTokenChain
         public override DbToken ValidateItem(DbToken item) => item.ThrowWhenNull();
 
         /// <inheritdoc/>
-        public override IEqualityComparer<DbToken> Comparer { get; } = EqualityComparer<DbToken>.Default;
+        public override IEqualityComparer<DbToken> Comparer => _Comparer ??= new MyComparer();
+        MyComparer? _Comparer = null;
+
+        readonly struct MyComparer : IEqualityComparer<DbToken>
+        {
+            public bool Equals(DbToken? x, DbToken? y)
+            {
+                if (x is null && y is null) return true;
+                if (x is null || y is null) return false;
+
+                return x.Equals(y);
+            }
+
+            public int GetHashCode([DisallowNull] DbToken obj) => throw new NotImplementedException();
+        }
 
         /// <inheritdoc/>
         public override bool ExpandItems { get; } = true;
@@ -58,5 +72,13 @@ partial class DbTokenChain
         /// </summary>
         /// <returns></returns>
         public DbTokenChain ToInstance() => new(this);
+
+        /// <inheritdoc/>
+        protected override bool SameItem(DbToken item, DbToken source)
+        {
+            return
+                item is null && source is null ||
+                item is not null && item.Equals(source);
+        }
     }
 }

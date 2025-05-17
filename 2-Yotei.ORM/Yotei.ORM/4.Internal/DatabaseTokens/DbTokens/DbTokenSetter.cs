@@ -34,4 +34,27 @@ public class DbTokenSetter : DbToken
     /// The value operand of this assignation operation.
     /// </summary>
     public DbToken Value { get; }
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public override bool Equals(DbToken? other)
+    {
+        if (other is DbTokenSetter xother)
+        {
+            if (Target.Equals(xother.Target) &&
+                Value.Equals(xother.Value))
+                return true;
+        }
+        return ReferenceEquals(this, other);
+    }
+
+    /// <inheritdoc/>
+    public override int GetHashCode()
+    {
+        var code = 0;
+        code = HashCode.Combine(code, Target);
+        code = HashCode.Combine(code, Value);
+        return code;
+    }
 }

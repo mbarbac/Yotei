@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Internal;
+﻿using System.Runtime.InteropServices.Marshalling;
+
+namespace Yotei.ORM.Internal;
 
 // ========================================================
 /// <summary>
@@ -29,6 +31,21 @@ public class DbTokenValue : DbToken
     /// The actual value carried by this instance.
     /// </summary>
     public object? Value { get; }
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public override bool Equals(DbToken? other)
+    {
+        if (other is DbTokenValue xother)
+        {
+            if (Value.EqualsEx(xother.Value)) return true;
+        }
+        return ReferenceEquals(this, other);
+    }
+
+    /// <inheritdoc/>
+    public override int GetHashCode() => Value is null ? 0 : Value.GetHashCode();
 
     // ----------------------------------------------------
 

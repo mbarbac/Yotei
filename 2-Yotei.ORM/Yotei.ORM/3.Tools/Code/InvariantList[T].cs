@@ -109,6 +109,7 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
     public virtual InvariantList<T> GetRange(int index, int count)
     {
         if (index == 0 && count == Count) return this;
+        if (index == 0 && count == 0) return Clear();
 
         var range = Items.ToList(index, count);
         var clone = Clone();

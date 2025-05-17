@@ -164,8 +164,8 @@ partial class Record
         /// <inheritdoc/>
         public bool GetRange(int index, int count)
         {
-            if (Count == 0) return false;
             if (index == 0 && count == Count) return false;
+            if (index == 0 && count == 0) return Clear();
 
             if (count == 0)
             {

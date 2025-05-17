@@ -24,4 +24,24 @@ public class DbTokenArgument : DbToken
     /// The name of the dynamic argument.
     /// </summary>
     public string Name { get; }
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public override bool Equals(DbToken? other)
+    {
+        if (other is DbTokenArgument xother)
+        {
+            if (Name == xother.Name) return true;
+        }
+        return ReferenceEquals(this, other);
+    }
+
+    /// <inheritdoc/>
+    public override int GetHashCode()
+    {
+        var code = 0;
+        code = HashCode.Combine(code, Name);
+        return code;
+    }
 }

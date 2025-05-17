@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents an arbitrary token in a database expression.
 /// </summary>
-public abstract class DbToken
+public abstract class DbToken : IEquatable<DbToken>
 {
     /// <summary>
     /// Returns the dynamic argument associated with this instance, or <c>null</c> if it cannot
@@ -12,6 +12,27 @@ public abstract class DbToken
     /// </summary>
     /// <returns></returns>
     public abstract DbTokenArgument? GetArgument();
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public abstract bool Equals(DbToken? other);
+
+    /// <inheritdoc/>
+    public override bool Equals(object? obj) => Equals(obj as DbToken);
+
+    public static bool operator ==(DbToken? host, DbToken? item) // Use 'is' instead of '=='...
+    {
+        if (host is null && item is null) return true;
+        if (host is null || item is null) return false;
+
+        return host.Equals(item);
+    }
+
+    public static bool operator !=(DbToken? host, DbToken? item) => !(host == item);
+
+    /// <inheritdoc/>
+    public override int GetHashCode() => 0;
 
     // ----------------------------------------------------
 

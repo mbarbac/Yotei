@@ -40,6 +40,29 @@ public abstract class DbTokenConvert : DbToken
         /// The type to convert the target to.
         /// </summary>
         public Type Type { get; }
+
+        // ----------------------------------------------------
+
+        /// <inheritdoc/>
+        public override bool Equals(DbToken? other)
+        {
+            if (other is ToType xother)
+            {
+                if (Target.Equals(xother.Target) &&
+                    Type == xother.Type)
+                    return true;
+            }
+            return ReferenceEquals(this, other);
+        }
+
+        /// <inheritdoc/>
+        public override int GetHashCode()
+        {
+            var code = 0;
+            code = HashCode.Combine(code, Target);
+            code = HashCode.Combine(code, Type);
+            return code;
+        }
     }
 
     // ====================================================
@@ -62,5 +85,28 @@ public abstract class DbTokenConvert : DbToken
         /// The specification of the type to convert the target to.
         /// </summary>
         public string Type { get; }
+
+        // ----------------------------------------------------
+
+        /// <inheritdoc/>
+        public override bool Equals(DbToken? other)
+        {
+            if (other is ToSpec xother)
+            {
+                if (Target.Equals(xother.Target) &&
+                    Type == xother.Type)
+                    return true;
+            }
+            return ReferenceEquals(this, other);
+        }
+
+        /// <inheritdoc/>
+        public override int GetHashCode()
+        {
+            var code = 0;
+            code = HashCode.Combine(code, Target);
+            code = HashCode.Combine(code, Type);
+            return code;
+        }
     }
 }

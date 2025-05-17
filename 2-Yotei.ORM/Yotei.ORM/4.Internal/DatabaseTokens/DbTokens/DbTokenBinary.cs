@@ -44,6 +44,31 @@ public class DbTokenBinary : DbToken
 
     // ----------------------------------------------------
 
+    /// <inheritdoc/>
+    public override bool Equals(DbToken? other)
+    {
+        if (other is DbTokenBinary xother)
+        {
+            if (Operation == xother.Operation &&
+                Left.Equals(xother.Left) &&
+                Right.Equals(xother.Right))
+                return true;
+        }
+        return ReferenceEquals(this, other);
+    }
+
+    /// <inheritdoc/>
+    public override int GetHashCode()
+    {
+        var code = 0;
+        code = HashCode.Combine(code, Operation);
+        code = HashCode.Combine(code, Left);
+        code = HashCode.Combine(code, Right);
+        return code;
+    }
+
+    // ----------------------------------------------------
+
     /// <summary>
     /// Returns a validated operation.
     /// </summary>

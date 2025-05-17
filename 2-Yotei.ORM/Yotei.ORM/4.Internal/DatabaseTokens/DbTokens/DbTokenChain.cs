@@ -4,6 +4,8 @@
 /// <summary>
 /// Represents a flatten and ordered collection of tokens.
 /// </summary>
+[Cloneable]
+[DebuggerDisplay("{Items.ToDebugString(5)}")]
 public partial class DbTokenChain : DbToken, IEnumerable<DbToken>
 {
     readonly Builder Items = [];
@@ -53,6 +55,32 @@ public partial class DbTokenChain : DbToken, IEnumerable<DbToken>
             if (arg is not null) return arg;
         }
         return null;
+    }
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public override bool Equals(DbToken? other)
+    {
+        if (other is DbTokenChain xother)
+        {
+            if (Count != xother.Count) return false;
+            for (int i = 0; i < Count; i++)
+            {
+                var item = Items[i];
+                var temp = xother.Items[i];
+                if (!item.Equals(temp)) return false;
+            }
+        }
+        return ReferenceEquals(this, other);
+    }
+
+    /// <inheritdoc/>
+    public override int GetHashCode()
+    {
+        var code = 0;
+        for (int i = 0; i < Count; i++) code = HashCode.Combine(code, this[i]);
+        return code;
     }
 
     // ----------------------------------------------------
@@ -165,6 +193,14 @@ public partial class DbTokenChain : DbToken, IEnumerable<DbToken>
     // ----------------------------------------------------
 
     /// <summary>
+    /// Reduces this instance to a simpler form, if possible. Otherwise, returns the original one.
+    /// </summary>
+    /// <returns></returns>
+    public DbToken Reduce() => Count == 1 ? this[0] : this;
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Returns a new instance with the given number of elements, starting from the given index.
     /// </summary>
     /// <param name="index"></param>
@@ -173,7 +209,7 @@ public partial class DbTokenChain : DbToken, IEnumerable<DbToken>
     public DbTokenChain GetRange(int index, int count)
     {
         if (index == 0 && count == Count) return this;
-        if (count == 0) return Clear();
+        if (index == 0 && count == 0) return Clear();
 
         var temp = ToList(index, count);
         return new(temp);

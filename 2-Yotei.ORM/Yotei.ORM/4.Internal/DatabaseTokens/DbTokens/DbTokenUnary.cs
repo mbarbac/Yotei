@@ -35,6 +35,29 @@ public class DbTokenUnary : DbToken
 
     // ----------------------------------------------------
 
+    /// <inheritdoc/>
+    public override bool Equals(DbToken? other)
+    {
+        if (other is DbTokenUnary xother)
+        {
+            if (Operation == xother.Operation &&
+                Target.Equals(xother.Target))
+                return true;
+        }
+        return ReferenceEquals(this, other);
+    }
+
+    /// <inheritdoc/>
+    public override int GetHashCode()
+    {
+        var code = 0;
+        code = HashCode.Combine(code, Operation);
+        code = HashCode.Combine(code, Target);
+        return code;
+    }
+
+    // ----------------------------------------------------
+
     /// <summary>
     /// Returns a validated operation.
     /// </summary>

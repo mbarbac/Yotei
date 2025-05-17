@@ -90,101 +90,59 @@ public static class Test_DbTokenChain
     // ----------------------------------------------------
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_()
-    //{
-    //}
-}
-/*
-
-    //[Enforced]
-    [Fact]
-    public static void Test_Create_With_Duplicates()
-    {
-        var items = new Chain([xone, xone]);
-        Assert.Equal(2, items.Count);
-        Assert.Same(xone, items[0]);
-        Assert.Same(xone, items[1]);
-
-        items = new Chain([xone, xtwo, xone]);
-        Assert.Equal(3, items.Count);
-        Assert.Same(xone, items[0]);
-        Assert.Same(xtwo, items[1]);
-        Assert.Same(xone, items[2]);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_Create_Extended()
-    {
-        var other = new Chain([xtwo, xthree]);
-        var items = new Chain([xone, other]);
-
-        Assert.Equal(3, items.Count);
-        Assert.Same(xone, items[0]);
-        Assert.Same(xtwo, items[1]);
-        Assert.Same(xthree, items[2]);
-    }
-
-    // ----------------------------------------------------
-
-    //[Enforced]
     [Fact]
     public static void Test_Clone()
     {
-        var items = new Chain([xone, xtwo, xthree, xone]);
-        var target = items.Clone();
-
-        Assert.NotSame(items, target);
-        Assert.Equal(4, target.Count);
+        var source = new Chain([xone, xtwo, xthree]);
+        var target = source.Clone();
+        Assert.Equal(3, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
         Assert.Same(xthree, target[2]);
-        Assert.Same(xone, target[3]);
     }
 
     //[Enforced]
     [Fact]
     public static void Test_Find()
     {
-        var items = new Chain([xone, xtwo, xthree, xone]);
+        var chain = new Chain([xone, xtwo, xthree, xone]);
 
-        Assert.Equal(-1, items.IndexOf(xfive));
+        Assert.Equal(-1, chain.IndexOf(xfive));
 
-        Assert.Equal(0, items.IndexOf(xone));
-        Assert.Equal(-1, items.IndexOf(new Text("ONE"))); // Uppercase...
-        Assert.Equal(0, items.IndexOf(new Text("one")));
+        Assert.Equal(0, chain.IndexOf(xone));
+        Assert.Equal(0, chain.IndexOf(new Literal("One")));
+        Assert.Equal(-1, chain.IndexOf(new Literal("ONE")));
 
-        Assert.Equal(3, items.LastIndexOf(xone));
-        Assert.Equal(-1, items.LastIndexOf(new Text("ONE"))); // Uppercase...
-        Assert.Equal(3, items.LastIndexOf(new Text("one")));
+        Assert.Equal(3, chain.LastIndexOf(xone));
+        Assert.Equal(3, chain.LastIndexOf(new Literal("One")));
+        Assert.Equal(-1, chain.LastIndexOf(new Literal("ONE")));
 
-        var list = items.IndexesOf(xone);
+        var list = chain.IndexesOf(xone);
         Assert.Equal(2, list.Count);
         Assert.Equal(0, list[0]);
         Assert.Equal(3, list[1]);
 
-        list = items.IndexesOf(new Text("ONE")); // Uppercase...
+        list = chain.IndexesOf(new Literal("One"));
+        Assert.Equal(2, list.Count);
+        Assert.Equal(0, list[0]);
+        Assert.Equal(3, list[1]);
+
+        list = chain.IndexesOf(new Literal("ONE"));
         Assert.Empty(list);
-
-        list = items.IndexesOf(new Text("one"));
-        Assert.Equal(2, list.Count);
-        Assert.Equal(0, list[0]);
-        Assert.Equal(3, list[1]);
     }
 
     //[Enforced]
     [Fact]
     public static void Test_Find_Predicate()
     {
-        var items = new Chain([xone, xtwo, xthree, xone]);
+        var chain = new Chain([xone, xtwo, xthree, xone]);
 
-        Assert.Equal(-1, items.IndexOf(x => ((Text)x).Payload.Contains('z')));
+        Assert.Equal(-1, chain.IndexOf(x => ((Literal)x).Value.Contains('z')));
 
-        Assert.Equal(0, items.IndexOf(x => ((Text)x).Payload.Contains('n')));
-        Assert.Equal(3, items.LastIndexOf(x => ((Text)x).Payload.Contains('n')));
+        Assert.Equal(0, chain.IndexOf(x => ((Literal)x).Value.Contains('n')));
+        Assert.Equal(3, chain.LastIndexOf(x => ((Literal)x).Value.Contains('n')));
 
-        var list = items.IndexesOf(x => ((Text)x).Payload.Contains('n'));
+        var list = chain.IndexesOf(x => ((Literal)x).Value.Contains('n'));
         Assert.Equal(2, list.Count);
         Assert.Equal(0, list[0]);
         Assert.Equal(3, list[1]);
@@ -194,25 +152,25 @@ public static class Test_DbTokenChain
     [Fact]
     public static void Test_ToList()
     {
-        var items = new Chain([xone, xtwo, xthree, xfour]);
-        var list = items.ToList(0, 0);
+        var chain = new Chain([xone, xtwo, xthree, xfour]);
+        var list = chain.ToList(0, 0);
         Assert.Empty(list);
 
-        list = items.ToList(1, 2);
+        list = chain.ToList(1, 2);
         Assert.Equal(2, list.Count);
         Assert.Same(xtwo, list[0]);
         Assert.Same(xthree, list[1]);
 
-        try { items.ToList(-1, 0); Assert.Fail(); }
+        try { chain.ToList(-1, 0); Assert.Fail(); }
         catch (ArgumentOutOfRangeException) { }
 
-        try { items.ToList(0, -1); Assert.Fail(); }
+        try { chain.ToList(0, -1); Assert.Fail(); }
         catch (ArgumentOutOfRangeException) { }
 
-        try { items.ToList(5, 0); Assert.Fail(); }
+        try { chain.ToList(5, 0); Assert.Fail(); }
         catch (ArgumentException) { }
 
-        try { items.ToList(0, 5); Assert.Fail(); }
+        try { chain.ToList(0, 5); Assert.Fail(); }
         catch (ArgumentException) { }
     }
 
@@ -252,6 +210,9 @@ public static class Test_DbTokenChain
         var target = source.Replace(1, xtwo);
         Assert.Same(source, target);
 
+        target = source.Replace(1, new Literal("Two"));
+        Assert.Same(source, target);
+
         target = source.Replace(1, xone);
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
@@ -265,22 +226,6 @@ public static class Test_DbTokenChain
     public static void Test_Replace_Extended()
     {
         var source = new Chain([xone, xtwo, xthree]);
-        var other = new Chain([xfour, xfive]);
-
-        var target = source.Replace(1, other);
-        Assert.NotSame(source, target);
-        Assert.Equal(4, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Equal(xfour, target[1]);
-        Assert.Same(xfive, target[2]);
-        Assert.Same(xthree, target[3]);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_Replace_Extended_Empty()
-    {
-        var source = new Chain([xone, xtwo, xthree]);
         var other = new Chain();
 
         var target = source.Replace(1, other);
@@ -288,6 +233,16 @@ public static class Test_DbTokenChain
         Assert.Equal(2, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Equal(xthree, target[1]);
+
+        other = new Chain([xfour, xfive]);
+        target = source.Replace(1, other);
+
+        Assert.NotSame(source, target);
+        Assert.Equal(4, target.Count);
+        Assert.Same(xone, target[0]);
+        Assert.Equal(xfour, target[1]);
+        Assert.Same(xfive, target[2]);
+        Assert.Same(xthree, target[3]);
     }
 
     // ----------------------------------------------------
@@ -384,6 +339,8 @@ public static class Test_DbTokenChain
         Assert.Same(xfour, target[3]);
         Assert.Same(xfive, target[4]);
     }
+
+
 
     // ----------------------------------------------------
 
@@ -544,15 +501,15 @@ public static class Test_DbTokenChain
         Assert.Same(xthree, target[1]);
         Assert.Same(xone, target[2]);
 
-        target = source.Remove(new Text("ONE"));
-        Assert.Same(source, target);
-
-        target = source.Remove(new Text("one"));
+        target = source.Remove(new Literal("One"));
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.Same(xtwo, target[0]);
         Assert.Same(xthree, target[1]);
         Assert.Same(xone, target[2]);
+
+        target = source.Remove(new Literal("ONE"));
+        Assert.Same(source, target);
 
         target = source.RemoveLast(xone);
         Assert.NotSame(source, target);
@@ -561,15 +518,15 @@ public static class Test_DbTokenChain
         Assert.Same(xtwo, target[1]);
         Assert.Same(xthree, target[2]);
 
-        target = source.RemoveLast(new Text("ONE"));
-        Assert.Same(source, target);
-
-        target = source.RemoveLast(new Text("one"));
+        target = source.RemoveLast(new Literal("One"));
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
         Assert.Same(xthree, target[2]);
+
+        target = source.RemoveLast(new Literal("ONE"));
+        Assert.Same(source, target);
 
         target = source.RemoveAll(xone);
         Assert.NotSame(source, target);
@@ -577,14 +534,14 @@ public static class Test_DbTokenChain
         Assert.Same(xtwo, target[0]);
         Assert.Same(xthree, target[1]);
 
-        target = source.RemoveAll(new Text("ONE"));
-        Assert.Same(source, target);
-
-        target = source.RemoveAll(new Text("one"));
+        target = source.RemoveAll(new Literal("One"));
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
         Assert.Same(xtwo, target[0]);
         Assert.Same(xthree, target[1]);
+
+        target = source.RemoveAll(new Literal("ONE"));
+        Assert.Same(source, target);
     }
 
     //[Enforced]
@@ -617,24 +574,24 @@ public static class Test_DbTokenChain
     public static void Test_Remove_Predicate()
     {
         var source = new Chain([xone, xtwo, xthree, xone]);
-        var target = source.Remove(x => ((Text)x).Payload.Contains('z'));
+        var target = source.Remove(x => ((Literal)x).Value.Contains('z'));
         Assert.Same(source, target);
 
-        target = source.Remove(x => ((Text)x).Payload.Contains('n'));
+        target = source.Remove(x => ((Literal)x).Value.Contains('n'));
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.Same(xtwo, target[0]);
         Assert.Same(xthree, target[1]);
         Assert.Same(xone, target[2]);
 
-        target = source.RemoveLast(x => ((Text)x).Payload.Contains('n'));
+        target = source.RemoveLast(x => ((Literal)x).Value.Contains('n'));
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
         Assert.Same(xthree, target[2]);
 
-        target = source.RemoveAll(x => ((Text)x).Payload.Contains('n'));
+        target = source.RemoveAll(x => ((Literal)x).Value.Contains('n'));
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
         Assert.Same(xtwo, target[0]);
@@ -661,25 +618,17 @@ public static class Test_DbTokenChain
     [Fact]
     public static void Test_Reduce()
     {
-        var comparison = StringComparison.Ordinal;
         var source = new Chain();
-        var target = source.Reduce(comparison);
-        var text = Assert.IsType<Text>(target);
-        Assert.Empty(text.Payload);
+        var target = source.Reduce();
+        Assert.Same(source, target);
 
-        source = new Chain([xone, xtwo, xthree]);
-        target = source.Reduce(comparison);
-        text = Assert.IsType<Text>(target);
-        Assert.Equal("onetwothree", text.Payload);
+        source = new Chain(xone);
+        target = source.Reduce();
+        Assert.NotSame(source, target);
+        var text = Assert.IsType<DbTokenLiteral>(target); Assert.Same(xone, text);
 
-        var literal = new Literal("xx");
-        source = new Chain([literal]);
-        target = source.Reduce(comparison);
-        Assert.IsType<Literal>(target);
-
-        source = new Chain([xone, literal, xthree]);
-        target = source.Reduce(comparison);
+        source = new Chain([xone, xtwo, xthree, xone]);
+        target = source.Reduce();
         Assert.Same(source, target);
     }
 }
- */

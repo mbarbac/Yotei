@@ -28,4 +28,24 @@ public class DbTokenLiteral : DbToken
     /// The actual value carried by this instance.
     /// </summary>
     public string Value { get; }
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public override bool Equals(DbToken? other)
+    {
+        if (other is DbTokenLiteral xother)
+        {
+            if (Value == xother.Value) return true;
+        }
+        return ReferenceEquals(this, other);
+    }
+
+    /// <inheritdoc/>
+    public override int GetHashCode()
+    {
+        var code = 0;
+        code = HashCode.Combine(code, Value);
+        return code;
+    }
 }
