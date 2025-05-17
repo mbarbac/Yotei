@@ -32,6 +32,13 @@ public abstract class LambdaNode : DynamicObject, ICloneable
         return $"[{type}#{LambdaId}]({ToString()}) [Vs:{LambdaVersion}]";
     }
 
+    /// <summary>
+    /// Returns the dynamic argument this instance is ultimately associated with, or <c>null</c>
+    /// if this information cannot be obtained.
+    /// </summary>
+    /// <returns></returns>
+    public abstract LambdaNodeArgument? GetArgument();
+
     // ----------------------------------------------------
 
     /// <summary>
@@ -153,7 +160,7 @@ public abstract class LambdaNode : DynamicObject, ICloneable
 
     // ---------------------------------------------------- Overriden
 
-    /// <inheritdoc/> -----------------
+    /// <inheritdoc/>
     public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object? result)
     {
         LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"* GetIndex:");
@@ -171,7 +178,7 @@ public abstract class LambdaNode : DynamicObject, ICloneable
         return true;
     }
 
-    /// <inheritdoc/> -----------------
+    /// <inheritdoc/>
     public override bool TryGetMember(GetMemberBinder binder, out object? result)
     {
         LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"* GetMember:");
@@ -186,7 +193,7 @@ public abstract class LambdaNode : DynamicObject, ICloneable
         return true;
     }
 
-    /// <inheritdoc/> -----------------
+    /// <inheritdoc/>
     public override bool TryInvoke(InvokeBinder binder, object?[]? args, out object? result)
     {
         LambdaHelpers.Print(LambdaHelpers.NodeBindedColor, $"* Invoke:");
@@ -204,7 +211,7 @@ public abstract class LambdaNode : DynamicObject, ICloneable
         return true;
     }
 
-    /// <inheritdoc/> -----------------
+    /// <inheritdoc/>
     public override bool TryInvokeMember(
         InvokeMemberBinder binder, object?[]? args, out object? result)
     {

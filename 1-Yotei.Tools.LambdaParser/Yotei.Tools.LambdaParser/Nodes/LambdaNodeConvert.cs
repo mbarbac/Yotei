@@ -24,6 +24,9 @@ public class LambdaNodeConvert : LambdaNode
     public override string ToString() => $"(({LambdaType.EasyName()}) {LambdaTarget})";
 
     /// <inheritdoc/>
+    public override LambdaNodeArgument? GetArgument() => LambdaTarget.GetArgument();
+
+    /// <inheritdoc/>
     public override LambdaNodeConvert Clone() => new(
         LambdaType,
         LambdaTarget.Clone());

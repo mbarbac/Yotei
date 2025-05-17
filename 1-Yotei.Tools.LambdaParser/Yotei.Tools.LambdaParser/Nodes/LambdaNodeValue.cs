@@ -29,6 +29,11 @@ public class LambdaNodeValue : LambdaNode
     public override string ToString() => $"'{LambdaValue.Sketch()}'";
 
     /// <inheritdoc/>
+    public override LambdaNodeArgument? GetArgument() => LambdaValue is LambdaNode node
+        ? node.GetArgument()
+        : null;
+
+    /// <inheritdoc/>
     public override LambdaNodeValue Clone() => new(LambdaValue.TryClone());
 
     // ----------------------------------------------------

@@ -24,6 +24,11 @@ public class LambdaNodeSetter : LambdaNode
     public override string ToString() => $"({LambdaTarget} = {LambdaValue})";
 
     /// <inheritdoc/>
+    public override LambdaNodeArgument? GetArgument()
+        => LambdaTarget.GetArgument()
+        ?? LambdaValue.GetArgument();
+
+    /// <inheritdoc/>
     public override LambdaNodeSetter Clone() => new(
         LambdaTarget.Clone(),
         LambdaValue.Clone());

@@ -24,6 +24,9 @@ public class LambdaNodeUnary : LambdaNode
     public override string ToString() => $"({LambdaOperation} {LambdaTarget})";
 
     /// <inheritdoc/>
+    public override LambdaNodeArgument? GetArgument() => LambdaTarget.GetArgument();
+
+    /// <inheritdoc/>
     public override LambdaNodeUnary Clone() => new(
         LambdaOperation,
         LambdaTarget.Clone());

@@ -21,6 +21,9 @@ public class LambdaNodeArgument : LambdaNode
     public override string ToString() => LambdaName;
 
     /// <inheritdoc/>
+    public override LambdaNodeArgument? GetArgument() => this;
+
+    /// <inheritdoc/>
     public override LambdaNodeArgument Clone() => new(LambdaName);
 
     // ----------------------------------------------------

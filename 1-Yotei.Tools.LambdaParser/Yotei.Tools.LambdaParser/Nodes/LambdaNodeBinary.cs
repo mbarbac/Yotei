@@ -27,6 +27,11 @@ public class LambdaNodeBinary : LambdaNode
     public override string ToString() => $"({LambdaLeft} {LambdaOperation} {LambdaRight})";
 
     /// <inheritdoc/>
+    public override LambdaNodeArgument? GetArgument()
+        => LambdaLeft.GetArgument()
+        ?? LambdaRight.GetArgument();
+
+    /// <inheritdoc/>
     public override LambdaNodeBinary Clone() => new(
         LambdaLeft.Clone(),
         LambdaOperation,
