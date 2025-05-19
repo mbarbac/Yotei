@@ -33,7 +33,7 @@ public partial interface IConnection : IDisposableEx
     /// The collection of converters carried by this instance to convert from application level
     /// values to database supported ones.
     /// </summary>
-    IValueConverterList ToDatabase { get; }
+    IValueConverterList ToDatabaseConverters { get; }
 
     // ----------------------------------------------------
 

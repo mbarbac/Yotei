@@ -25,7 +25,7 @@ public abstract partial class Connection : DisposableClass, IConnection
         Engine = source.Engine;
         Retries = source.Retries;
         RetryInterval = source.RetryInterval;        
-        foreach (var item in source.ToDatabase) ToDatabase.Add(item);
+        foreach (var item in source.ToDatabaseConverters) ToDatabaseConverters.Add(item);
     }
     /// <inheritdoc/>
     protected override void OnDispose(bool disposing)
@@ -76,7 +76,7 @@ public abstract partial class Connection : DisposableClass, IConnection
     TimeSpan _RetryInterval = TimeSpan.FromMilliseconds(RETRYINTERVAL);
 
     /// <inheritdoc/>
-    public IValueConverterList ToDatabase { get; } = new ValueConverterList();
+    public IValueConverterList ToDatabaseConverters { get; } = new ValueConverterList();
 
     /// <summary>
     /// The object used to synchronize operations in this instance.

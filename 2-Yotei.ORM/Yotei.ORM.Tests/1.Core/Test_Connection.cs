@@ -20,7 +20,7 @@ public static class Test_Connection
         Assert.Equal(Connection.RETRIES, connection.Retries);
         Assert.Equal(Connection.RETRYINTERVAL, connection.RetryInterval.Milliseconds);
         Assert.NotNull(connection.Transaction);
-        Assert.Empty(connection.ToDatabase);
+        Assert.Empty(connection.ToDatabaseConverters);
     }
 
     //[Enforced]
@@ -35,7 +35,7 @@ public static class Test_Connection
         Assert.Equal(source.Retries, target.Retries);
         Assert.Equal(source.RetryInterval, target.RetryInterval);
         Assert.NotSame(source.Transaction, target.Transaction);
-        Assert.NotSame(source.ToDatabase, target.ToDatabase);
+        Assert.NotSame(source.ToDatabaseConverters, target.ToDatabaseConverters);
     }
 
     // ----------------------------------------------------

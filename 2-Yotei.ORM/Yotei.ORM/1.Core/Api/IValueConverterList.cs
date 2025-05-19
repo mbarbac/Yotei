@@ -82,5 +82,6 @@ public partial interface IValueConverterList : IEnumerable<IValueConverter>
     /// <param name="chain"></param>
     /// <param name="ifaces"></param>
     /// <returns></returns>
-    object? TryConvert<TSource>(TSource? value, Locale locale, bool chain = false, bool ifaces = false);
+    object? TryConvert<TSource>(
+        TSource? value, Locale locale, bool chain = false, bool ifaces = false);
 }
