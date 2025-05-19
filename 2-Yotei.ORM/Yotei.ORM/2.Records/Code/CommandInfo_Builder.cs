@@ -67,8 +67,7 @@ partial class CommandInfo
         {
             var noRemainingSpecs = true;
             var noUnusedValues = true;
-            var space = true;
-            Add(noRemainingSpecs, noUnusedValues, space, text, range);
+            Add(noRemainingSpecs, noUnusedValues, text, range);
         }
 
         /// <summary>
@@ -196,8 +195,7 @@ partial class CommandInfo
 
             var noRemainingSpecs = text is not null;
             var noUnusedValues = true;
-            var space = true;
-            return Add(noRemainingSpecs, noUnusedValues, space, text, pars);
+            return Add(noRemainingSpecs, noUnusedValues, text, pars);
         }
 
         /// <inheritdoc/>
@@ -215,8 +213,7 @@ partial class CommandInfo
 
             var noRemainingSpecs = text is not null;
             var noUnusedValues = true;
-            var space = true;
-            return Add(noRemainingSpecs, noUnusedValues, space, text, pars);
+            return Add(noRemainingSpecs, noUnusedValues, text, pars);
         }
 
         /// <inheritdoc/>
@@ -224,16 +221,7 @@ partial class CommandInfo
         {
             var noRemainingSpecs = true;
             var noUnusedValues = true;
-            var space = true;
-            return Add(noRemainingSpecs, noUnusedValues, space, text, range);
-        }
-
-        /// <inheritdoc/>
-        public bool Add(bool space, string? text, params object?[]? range)
-        {
-            var noRemainingSpecs = true;
-            var noUnusedValues = true;
-            return Add(noRemainingSpecs, noUnusedValues, space, text, range);
+            return Add(noRemainingSpecs, noUnusedValues, text, range);
         }
 
         // ------------------------------------------------
@@ -244,9 +232,14 @@ partial class CommandInfo
         bool Add(
             bool noRemainingSpecs,
             bool noUnusedValues,
-            bool space,
             string? text, params object?[]? range)
         {
+            if (range is not null &&
+                range.Length == 1 &&
+                range[0] is IParameterList prange) range = prange.ToArray();
+
+            //if (range is IParameterList prange) range = prange.ToArray();
+
             var textnull = text is null;
             var rangeempty = range is not null && range.Length == 0;
 
@@ -345,14 +338,7 @@ partial class CommandInfo
                     .WithData(text);
 
             // Finishing...
-            if (ret && !textnull)
-            {
-                if (space && _Text.Length > 0)
-                {
-                    if (text.Length > 0 && text[0] != ' ') _Text.Append(' ');
-                }
-                _Text.Append(text);
-            }
+            if (ret && !textnull) _Text.Append(text);
             return ret;
         }
 

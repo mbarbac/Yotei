@@ -353,12 +353,12 @@ public static class Test_CommandInfo
         Assert.Empty(target.Parameters);
 
         source = new CommandInfo(engine, "any");
-        target = source.Add("other");
+        target = source.Add(" other");
         Assert.NotSame(source, target);
         Assert.Equal("any other", target.Text);
         Assert.Empty(target.Parameters);
 
-        target = source.Add(false, "other");
+        target = source.Add("other");
         Assert.NotSame(source, target);
         Assert.Equal("anyother", target.Text);
         Assert.Empty(target.Parameters);
@@ -426,7 +426,7 @@ public static class Test_CommandInfo
         var engine = new FakeEngine();
         var source = new CommandInfo(engine, "[Any]={0} [Name]={1}", xany, xname);
 
-        var target = source.Add("[Other]={0}", 50);
+        var target = source.Add(" [Other]={0}", 50);
         Assert.NotSame(source, target);
         Assert.Equal("[Any]=#Any [Name]=#Name [Other]=#2", target.Text);
         Assert.Equal(3, target.Parameters.Count);
@@ -444,7 +444,7 @@ public static class Test_CommandInfo
         var engine = new FakeEngine();
         var source = new CommandInfo(engine, "[Any]={0} [Name]={1}", xany, xname);
 
-        var target = source.Add("[Other]={0}", new Parameter("Other", 50));
+        var target = source.Add(" [Other]={0}", new Parameter("Other", 50));
         Assert.NotSame(source, target);
         Assert.Equal("[Any]=#Any [Name]=#Name [Other]=#Other", target.Text);
         Assert.Equal(3, target.Parameters.Count);
@@ -453,7 +453,7 @@ public static class Test_CommandInfo
         Assert.Equal("#Other", target.Parameters[2].Name); Assert.Equal(50, target.Parameters[2].Value);
 
         // 'Any' is duplicated of an original one (not duplicated new one), so it can transformed...
-        target = source.Add("[Other]={0}", new Parameter("Any", 50));
+        target = source.Add(" [Other]={0}", new Parameter("Any", 50));
         Assert.NotSame(source, target);
         Assert.Equal("[Any]=#Any [Name]=#Name [Other]=#2", target.Text);
         Assert.Equal(3, target.Parameters.Count);
@@ -471,7 +471,7 @@ public static class Test_CommandInfo
         var engine = new FakeEngine();
         var source = new CommandInfo(engine, "[Any]={0} [Name]={1}", xany, xname);
 
-        var target = source.Add("[Other]={0}", new { Other = 50 });
+        var target = source.Add(" [Other]={0}", new { Other = 50 });
         Assert.NotSame(source, target);
         Assert.Equal("[Any]=#Any [Name]=#Name [Other]=#Other", target.Text);
         Assert.Equal(3, target.Parameters.Count);
