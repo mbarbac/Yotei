@@ -22,7 +22,7 @@ public abstract class RecordsGate : IRecordsGate
     public abstract ICommandExecutor CreateCommandExecutor(IExecutableCommand command);
 
     // ----------------------------------------------------
-
+    /*
     /// <inheritdoc/>
     public virtual IRawCommand Raw() => new RawCommand(Connection);
 
@@ -33,4 +33,5 @@ public abstract class RecordsGate : IRecordsGate
     /// <inheritdoc/>
     public virtual IRawCommand Raw(
         Func<dynamic, object?> spec) => new RawCommand(Connection, spec);
+    */
 }

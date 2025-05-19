@@ -1,5 +1,5 @@
 ﻿namespace Yotei.ORM.Records;
-
+/*
 // ========================================================
 /// <summary>
 /// Represents a records-oriented raw SQL command whose contents are explicitly set.
@@ -37,4 +37,4 @@ public partial interface IRawCommand : ICommand, IEnumerableCommand, IExecutable
 
     /// <inheritdoc cref="ICommand.Clear"/>
     new IRawCommand Clear();
-}
+}*/

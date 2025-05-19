@@ -1,5 +1,5 @@
 ﻿namespace Yotei.ORM.Records.Code;
-
+/*
 // ========================================================
 /// <inheritdoc cref="IRawCommand"/>
 [Cloneable]
@@ -131,4 +131,4 @@ public partial class RawCommand : Command, IRawCommand
         _Info.Clear();
         return this;
     }
-}
+}*/
