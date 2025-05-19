@@ -5,7 +5,7 @@
 /// Represents the ability of parsing db-token chains returns the <see cref="ICommandInfo"/>
 /// object that represents that chain for the underlying database engine.
 /// </summary>
-public partial record class TokenVisitor
+public partial record class DbTokenVisitor
 {
     public const bool USENULLSTRING = true;
     public const bool CAPTUREVALUES = true;
@@ -27,7 +27,7 @@ public partial record class TokenVisitor
     /// <param name="useQuotes"></param>
     /// <param name="useTerminators"></param>
     /// <param name="rangeSeparator"></param>
-    public TokenVisitor(
+    public DbTokenVisitor(
         IConnection connection,
         Locale? locale = null,
         bool useNullString = USENULLSTRING,
@@ -52,7 +52,7 @@ public partial record class TokenVisitor
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected TokenVisitor(TokenVisitor source)
+    protected DbTokenVisitor(DbTokenVisitor source)
     {
         source.ThrowWhenNull();
 
@@ -67,7 +67,7 @@ public partial record class TokenVisitor
     }
 
     /// <inheritdoc/>
-    public override string ToString() => nameof(TokenVisitor);
+    public override string ToString() => nameof(DbTokenVisitor);
 
     // ----------------------------------------------------
 

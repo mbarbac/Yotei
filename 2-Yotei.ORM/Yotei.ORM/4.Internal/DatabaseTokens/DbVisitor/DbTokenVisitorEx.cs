@@ -1,9 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Yotei.ORM.Internal;
+﻿namespace Yotei.ORM.Internal;
 
 // ========================================================
-partial record class TokenVisitor
+partial record class DbTokenVisitor
 {
     /// <summary>
     /// Visits the chain of tokens obtained from parsing the given dynamic lambda expression,
@@ -92,20 +90,20 @@ partial record class TokenVisitor
     /// Returns a clone of this instance with the appropriate separator for range elements.
     /// </summary>
     /// <returns></returns>
-    protected virtual TokenVisitor ToRangeVisitor() => this with { RangeSeparator = ", " };
+    protected virtual DbTokenVisitor ToRangeVisitor() => this with { RangeSeparator = ", " };
 
 
     /// <summary>
     /// Returns a clone of this instance that uses no separator between range elements.
     /// </summary>
     /// <returns></returns>
-    protected virtual TokenVisitor ToNullVisitor() => this with { RangeSeparator = null };
+    protected virtual DbTokenVisitor ToNullVisitor() => this with { RangeSeparator = null };
 
     /// <summary>
     /// Returns a clone of this instance with all its settings to <c>false</c> or <c>null</c>.
     /// </summary>
     /// <returns></returns>
-    protected virtual TokenVisitor ToRawVisitor() => this with
+    protected virtual DbTokenVisitor ToRawVisitor() => this with
     {
         UseNullString = false,
         CaptureValues = false,
