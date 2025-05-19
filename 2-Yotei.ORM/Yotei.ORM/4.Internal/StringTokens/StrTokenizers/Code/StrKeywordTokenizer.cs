@@ -84,8 +84,8 @@ public partial class StrKeywordTokenizer : StrTokenizer
     /// The default collection of chars that act as head and tail separators for keywords that
     /// are not isolated ones.
     /// </summary>
-    public static readonly ImmutableArray<char> Separators = " ()[]{}<>=!|&?^'`´/*\\\""
-        .ToImmutableArray();
+    //public static readonly ImmutableArray<char> Separators = " ()[]{}<>=!|&?^\"'`´/*\\\""
+    //    .ToImmutableArray();
 
     static ImmutableArray<char> Validate(ImmutableArray<char> array)
     {
@@ -106,7 +106,7 @@ public partial class StrKeywordTokenizer : StrTokenizer
         get => _Heads;
         init => _Heads = Validate(value);
     }
-    ImmutableArray<char> _Heads = Separators;
+    ImmutableArray<char> _Heads = StringIsolated.SEPARATORS;
 
     /// <summary>
     /// The set of characters that act as tail separators for non isolated keywords.
@@ -117,7 +117,7 @@ public partial class StrKeywordTokenizer : StrTokenizer
         get => _Tails;
         init => _Tails = Validate(value);
     }
-    ImmutableArray<char> _Tails = Separators;
+    ImmutableArray<char> _Tails = StringIsolated.SEPARATORS;
 
     // ----------------------------------------------------
 

@@ -4,8 +4,9 @@ using IHost = Yotei.ORM.IParameter;
 namespace Yotei.ORM.Code;
 
 // ========================================================
-/// <inheritdoc cref="IParameter"/>
-public class Parameter : IParameter
+/// <inheritdoc cref="IHost"/>
+[InheritWiths]
+public partial class Parameter : IHost
 {
     /// <summary>
     /// Initializes a new instance.
@@ -14,18 +15,35 @@ public class Parameter : IParameter
     /// <param name="value"></param>
     public Parameter(string name, object? value)
     {
-        Name = name.NotNullNotEmpty();
+        Name = name;
         Value = value;
+    }
+
+    /// <summary>
+    /// Copy constructor.
+    /// </summary>
+    /// <param name="source"></param>
+    protected Parameter(THost source)
+    {
+        source.ThrowWhenNull();
+
+        Name = source.Name;
+        Value = source.Value;
     }
 
     /// <inheritdoc/>
     public override string ToString() => $"{Name}='{Value.Sketch()}'";
 
     /// <inheritdoc/>
-    public string Name { get; }
+    public string Name
+    {
+        get => _Name;
+        init => _Name = value.NotNullNotEmpty();
+    }
+    string _Name = default!;
 
     /// <inheritdoc/>
-    public object? Value { get; }
+    public object? Value { get; init; }
 
     // ----------------------------------------------------
 

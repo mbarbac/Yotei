@@ -4,15 +4,15 @@
 /// <summary>
 /// Represents a parameter in a command.
 /// </summary>
-public interface IParameter : IEquatable<IParameter>
+public partial interface IParameter : IEquatable<IParameter>
 {
     /// <summary>
     /// The name of this parameter.
     /// </summary>
-    string Name { get; }
+    [With] string Name { get; }
 
     /// <summary>
     /// The value captured by this parameter.
     /// </summary>
-    object? Value { get; }
+    [With] object? Value { get; }
 }

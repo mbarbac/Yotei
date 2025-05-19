@@ -1,7 +1,7 @@
 ﻿namespace Yotei.ORM.Internal;
 
 // ========================================================
-public static partial class StringExtensions
+public static partial class StringIsolated
 {
     /// <summary>
     /// Returns <c>null</c> if the given value matches the given name of the dynamic argument,
