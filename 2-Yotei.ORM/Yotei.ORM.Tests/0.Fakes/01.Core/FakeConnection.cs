@@ -4,7 +4,14 @@
 [Cloneable]
 public partial class FakeConnection : Code.Connection
 {
-    public FakeConnection(IEngine engine) : base(engine) { }
+    public FakeConnection(IEngine engine) : base(engine)
+    {
+        ToDatabaseConverters.Add(
+            new ValueConverter<DateOnly, DateTime>((x, _) => x.ToDateTime(new TimeOnly())));
+
+        ToDatabaseConverters.Add(
+            new ValueConverter<DateTime, DateOnly>((x, _) => new DateOnly(x.Year, x.Month, x.Day)));
+    }
     protected FakeConnection(FakeConnection source) : base(source) { }
     public override string ToString() => $"FakeConnection({Engine})";
 
