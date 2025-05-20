@@ -2,7 +2,7 @@
 using static System.ConsoleColor;
 
 namespace Yotei.ORM.Tests.Records;
-/*
+
 // ========================================================
 //[Enforced]
 public static class Test_Command
@@ -33,4 +33,3 @@ public static class Test_Command
         Assert.Equal("#0", info.Parameters[0].Name); Assert.Equal("007", info.Parameters[0].Value);
     }
 }
-*/

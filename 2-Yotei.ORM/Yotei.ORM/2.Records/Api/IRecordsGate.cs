@@ -31,7 +31,7 @@ public interface IRecordsGate
     ICommandExecutor CreateCommandExecutor(IExecutableCommand command);
 
     // ----------------------------------------------------
-    /*
+
     /// <summary>
     /// Returns a new empty RAW command.
     /// </summary>
@@ -62,5 +62,4 @@ public interface IRecordsGate
     /// <param name="spec"></param>
     /// <returns></returns>
     IRawCommand Raw(Func<dynamic, object?> spec);
-    */
 }

@@ -118,8 +118,6 @@ partial class CommandInfo
             if (_Text.Length == 0 &&
                 (text is null || text.Length == 0)) return false;
 
-            if (string.Compare(text, _Text.ToString()) == 0) return false;
-
             if (text is not null &&
                 AreRemainingBrackets(text)) throw new ArgumentException(
                     "No '{...}' bracket specifications allowed.")
