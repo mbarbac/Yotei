@@ -111,16 +111,22 @@ public partial class RawCommand : Command, IRawCommand
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public virtual IRawCommand Append(string? text, params object?[] args)
+    public virtual IRawCommand Append(string? text, params object?[]? args)
     {
         _Info.Add(text, args);
         return this;
     }
 
     /// <inheritdoc/>
-    public virtual IRawCommand Append(Func<dynamic, object?> spec)
+    public virtual IRawCommand Append(Func<dynamic, object> spec)
     {
-        throw null;
+        spec.ThrowWhenNull();
+
+        var visitor = Connection.Records.CreateDbTokenVisitor();
+        var info = visitor.Visit(spec);
+
+        _Info.Add(info);
+        return this;
     }
 
     // ----------------------------------------------------

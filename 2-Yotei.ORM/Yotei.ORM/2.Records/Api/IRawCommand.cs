@@ -24,7 +24,7 @@ public partial interface IRawCommand : ICommand, IEnumerableCommand, IExecutable
     /// <param name="text"></param>
     /// <param name="args"></param>
     /// <returns></returns>
-    IRawCommand Append(string? text, params object?[] args);
+    IRawCommand Append(string? text, params object?[]? args);
 
     /// <summary>
     /// Adds to this instance the the text and arguments obtained from parsing the given dynamic
@@ -33,7 +33,7 @@ public partial interface IRawCommand : ICommand, IEnumerableCommand, IExecutable
     /// </summary>
     /// <param name="spec"></param>
     /// <returns></returns>
-    IRawCommand Append(Func<dynamic, object?> spec);
+    IRawCommand Append(Func<dynamic, object> spec);
 
     /// <inheritdoc cref="ICommand.Clear"/>
     new IRawCommand Clear();
