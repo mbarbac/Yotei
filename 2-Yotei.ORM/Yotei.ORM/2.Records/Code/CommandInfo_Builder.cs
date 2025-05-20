@@ -118,6 +118,8 @@ partial class CommandInfo
             if (_Text.Length == 0 &&
                 (text is null || text.Length == 0)) return false;
 
+            if (string.Compare(text, _Text.ToString()) == 0) return false;
+
             if (text is not null &&
                 AreRemainingBrackets(text)) throw new ArgumentException(
                     "No '{...}' bracket specifications allowed.")
@@ -136,8 +138,15 @@ partial class CommandInfo
             if (_Parameters.Count == 0 &&
                 range.Length == 0) return false;
 
-            _Parameters.Clear();  // If '[]' is given, then is the same as clearing the
-            if (range.Length > 0) // original collection...
+            var old = _Parameters.Clone();
+
+            if (range.Length == 1)
+            {
+                if (range[0] is IParameterList xlist) range = xlist.ToArray();
+                if (range[0] is IParameterList.IBuilder xbuilder) range = xbuilder.ToArray();
+            }
+
+            if (range.Length > 0)
             {
                 var items = RangeElement.Capture(range);
                 var captured = new ParameterList.Builder(Engine);
@@ -154,14 +163,17 @@ partial class CommandInfo
                             var par = new Parameter(anon.Name, anon.Value);
                             Capture(par, captured);
                             break;
-                        
+
                         default:
                             _Parameters.AddNew(item.Value, out _);
                             break;
                     }
                 }
-            }
 
+                if (old.Equals(captured)) return false;
+            }
+            
+            if (old.Count > 0) _Parameters.RemoveRange(0, old.Count);
             return true;
         }
 

@@ -41,6 +41,7 @@ public partial interface ICommandInfo
     /// Returns a new instance where the existing text has been inconditionally replaced by
     /// the new given one, without any attempt of matching any text specifications with the
     /// names of the existing parameters.
+    /// <br/> No bracket '{...}' specifications are allowed.
     /// </summary>
     /// <param name="text"></param>
     /// <returns></returns>

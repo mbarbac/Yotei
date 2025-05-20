@@ -42,6 +42,7 @@ partial interface ICommandInfo
         /// <summary>
         /// Inconditionally replaces the existing text by the new given one, without any attempt
         /// of matching any text specifications with the names of the existing parameters.
+        /// <br/> No bracket '{...}' specifications are allowed.
         /// <br/> Returns whether changes have been made or not.
         /// </summary>
         /// <param name="text"></param>
