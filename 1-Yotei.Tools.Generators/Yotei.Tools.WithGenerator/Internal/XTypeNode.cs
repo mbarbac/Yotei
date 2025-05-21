@@ -30,8 +30,8 @@ internal class XTypeNode : TypeNode
     /// <inheritdoc/>
     public override void Emit(SourceProductionContext context, CodeBuilder cb)
     {
-        CaptureProperties();
-        CaptureFields();
+        CaptureInheritedProperties();
+        CaptureInheritedFields();
 
         base.Emit(context, cb);
     }
@@ -39,16 +39,16 @@ internal class XTypeNode : TypeNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// Invoked to capture the inherited properties, if any.
+    /// Invoked to capture the inherited properties that have not been captured yet.
     /// </summary>
-    void CaptureProperties()
+    void CaptureInheritedProperties()
     {
         var comparer = SymbolComparer.Empty;
 
         foreach (var type in Symbol.AllBaseTypes()) Capture(type);
         foreach (var type in Symbol.AllInterfaces) Capture(type);
 
-        // Captures members at the type's level...
+        // Capture members at the type's level...
         void Capture(ITypeSymbol type)
         {
             var members = type.GetMembers().OfType<IPropertySymbol>()
@@ -58,7 +58,7 @@ internal class XTypeNode : TypeNode
             foreach (var member in members)
             {
                 var temp = ChildProperties.Find(x => comparer.Equals(x.Symbol, member));
-                if (temp == null)
+                if (temp is null)
                 {
                     var node = new XPropertyNode(this, member);
                     ChildProperties.Add(node);
@@ -70,16 +70,16 @@ internal class XTypeNode : TypeNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// Invoked to capture the inherited fields, if any.
+    /// Invoked to capture the inherited properties that have not been captured yet.
     /// </summary>
-    void CaptureFields()
+    void CaptureInheritedFields()
     {
         var comparer = SymbolComparer.Empty;
 
         foreach (var type in Symbol.AllBaseTypes()) Capture(type);
         foreach (var type in Symbol.AllInterfaces) Capture(type);
 
-        // Captures members at the type's level...
+        // Capture members at the type's level...
         void Capture(ITypeSymbol type)
         {
             var members = type.GetMembers().OfType<IFieldSymbol>()
@@ -89,49 +89,12 @@ internal class XTypeNode : TypeNode
             foreach (var member in members)
             {
                 var temp = ChildFields.Find(x => comparer.Equals(x.Symbol, member));
-                if (temp == null)
+                if (temp is null)
                 {
                     var node = new XFieldNode(this, member);
                     ChildFields.Add(node);
                 }
             }
         }
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Tries to find the <see cref="InheritWithsAttribute"/> attribute in the given type,
-    /// including also its base types and interfaces if requested. Returns null if not found.
-    /// </summary>
-    /// <param name="type"></param>
-    /// <param name="chain"></param>
-    /// <param name="ifaces"></param>
-    /// <returns></returns>
-    public static AttributeData? FindInheritWithsAttribute(
-        ITypeSymbol type,
-        bool chain = false, bool ifaces = false)
-    {
-        var at = type.GetAttributes(typeof(InheritWithsAttribute)).FirstOrDefault();
-
-        if (at == null && chain)
-        {
-            foreach (var temp in type.AllBaseTypes())
-            {
-                at = FindInheritWithsAttribute(temp);
-                if (at != null) break;
-            }
-        }
-
-        if (at == null && ifaces)
-        {
-            foreach (var temp in type.AllInterfaces)
-            {
-                at = FindInheritWithsAttribute(temp);
-                if (at != null) break;
-            }
-        }
-
-        return at;
     }
 }

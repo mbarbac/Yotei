@@ -1,16 +1,16 @@
 ﻿namespace Yotei.ORM.Relational.Code;
 
 // ========================================================
-/// <inheritdoc cref="IEngine"/>
+/// <inheritdoc cref="IXEngine"/>
 [Cloneable]
 [InheritWiths]
-public partial class Engine : ORM.Code.Engine, IEngine
+public partial class XEngine : ORM.Code.Engine, IXEngine
 {
     /// <summary>
     /// Initializes a new default instance.
     /// </summary>
     /// <param name="factory"></param>
-    public Engine(DbProviderFactory factory) : base()
+    public XEngine(DbProviderFactory factory) : base()
     {
         KnownTags = new KnownTags(CASESENSITIVETAGS);
         Factory = factory;
@@ -20,7 +20,7 @@ public partial class Engine : ORM.Code.Engine, IEngine
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected Engine(Engine source) : base(source) => Factory = source.Factory;
+    protected XEngine(XEngine source) : base(source) => Factory = source.Factory;
 
     /// <inheritdoc/>
     public override string ToString() => "Relational.Engine";
@@ -31,7 +31,7 @@ public partial class Engine : ORM.Code.Engine, IEngine
     public override bool Equals(ORM.IEngine? other)
     {
         if (ReferenceEquals(this, other)) return true;
-        if (other is null || other is not IEngine valid) return false;
+        if (other is null || other is not IXEngine valid) return false;
 
         return base.Equals(valid) && Factory == valid.Factory;
     }

@@ -6,8 +6,9 @@
 	  <ImplicitUsings>disable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
 	  <Configurations>Debug;Release;Local</Configurations>
-	  <NoWarn>RS1038</NoWarn>
+	  <NoWarn>IDE0130;RS1038</NoWarn>
    </PropertyGroup>
+   <!--IDE0130: Namespace doesn't match folder structure -->
    <!--RS1038: Generator implemented in assembly containing Microsoft.CodeAnalysis.Workspaces -->
 
    <PropertyGroup>
@@ -34,7 +35,7 @@
    <Import Project="..\Yotei.Tools.BaseGenerator\Yotei.Tools.BaseGenerator.projitems" Label="Shared" />
 
    <PropertyGroup>
-	  <!--<DefineConstants>$(DefineConstants);DEBUG_WITH_GENERATOR</DefineConstants>-->
+	  <DefineConstants>$(DefineConstants);DEBUG_WITH_GENERATOR</DefineConstants>
 	  <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
    </PropertyGroup>
 

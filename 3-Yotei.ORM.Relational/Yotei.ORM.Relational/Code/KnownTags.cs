@@ -6,7 +6,7 @@
 [InheritWiths]
 public partial class KnownTags : Records.Code.KnownTags, IKnownTags
 {
-    public const bool CASESENSITIVETAGS = Engine.CASESENSITIVETAGS;
+    public const bool CASESENSITIVETAGS = XEngine.CASESENSITIVETAGS;
     public const string PRIMARYKEYTAG = "IsKey";
     public const string UNIQUEVALUEDTAG = "IsUnique";
     public const string READONLYTAG = "IsReadOnly";
