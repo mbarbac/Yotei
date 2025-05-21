@@ -2,7 +2,7 @@
 PRINT 'DROPPING TABLES...'
 
 --- =============================================
-USE [KeroseneDB];
+USE [YoteiDB];
 
 --- Comment out the creation code if the tables do not exist yet...
 

@@ -2,7 +2,7 @@
 PRINT 'DELETING CONTENTS...'
 --- =============================================
 
-USE KeroseneDB;
+USE YoteiDB;
 
 PRINT 'Deleting contents from EmployeeTalents...'
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[EmployeeTalents]') AND type in (N'U'))

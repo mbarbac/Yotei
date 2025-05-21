@@ -4,7 +4,7 @@ PRINT 'CREATING A STORED PROCEDURE...'
 
 PRINT 'NOTE: It only works if the Employee ID can be converted to an INT field...'
 
-USE [KeroseneDB]
+USE [YoteiDB]
 GO
 
 IF EXISTS (
