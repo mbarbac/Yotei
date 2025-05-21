@@ -20,19 +20,19 @@ public static class Test_Connection
         Assert.Equal(Connection.RETRIES, connection.Retries);
         Assert.Equal(Connection.RETRYINTERVAL, connection.RetryInterval.Milliseconds);
         Assert.NotNull(connection.Transaction);
-        Assert.NotEmpty(connection.ToDatabaseConverters);
+        Assert.NotEmpty(connection.ToDatabase);
 
-        Assert.Equal(2, connection.ToDatabaseConverters.Count);
+        Assert.Equal(2, connection.ToDatabase.Count);
         Locale locale = new();
 
         DateOnly dateonly = new DateOnly(2001, 12, 31);
-        DateTime datetime = (DateTime)connection.ToDatabaseConverters.TryConvert(dateonly, locale)!;
+        DateTime datetime = (DateTime)connection.ToDatabase.TryConvert(dateonly, locale)!;
         Assert.Equal(2001, datetime.Year);
         Assert.Equal(12, datetime.Month);
         Assert.Equal(31, datetime.Day);
 
         datetime = new(2020, 11, 29);
-        dateonly = (DateOnly)connection.ToDatabaseConverters.TryConvert(datetime, locale)!;
+        dateonly = (DateOnly)connection.ToDatabase.TryConvert(datetime, locale)!;
         Assert.Equal(2020, dateonly.Year);
         Assert.Equal(11, dateonly.Month);
         Assert.Equal(29, dateonly.Day);
@@ -50,11 +50,11 @@ public static class Test_Connection
         Assert.Equal(source.Retries, target.Retries);
         Assert.Equal(source.RetryInterval, target.RetryInterval);
         Assert.NotSame(source.Transaction, target.Transaction);
-        Assert.NotSame(source.ToDatabaseConverters, target.ToDatabaseConverters);
+        Assert.NotSame(source.ToDatabase, target.ToDatabase);
 
-        Assert.Equal(2, target.ToDatabaseConverters.Count);
-        Assert.NotNull(target.ToDatabaseConverters.Find<DateTime>());
-        Assert.NotNull(target.ToDatabaseConverters.Find<DateOnly>());
+        Assert.Equal(2, target.ToDatabase.Count);
+        Assert.NotNull(target.ToDatabase.Find<DateTime>());
+        Assert.NotNull(target.ToDatabase.Find<DateOnly>());
     }
 
     // ----------------------------------------------------

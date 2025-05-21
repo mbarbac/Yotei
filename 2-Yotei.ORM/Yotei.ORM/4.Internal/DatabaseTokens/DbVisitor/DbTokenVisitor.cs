@@ -76,7 +76,7 @@ public partial record class DbTokenVisitor
     /// </summary>
     public IConnection Connection { get; }
     IEngine Engine => Connection.Engine;
-    IValueConverterList Converters => Connection.ToDatabaseConverters;
+    IValueConverterList Converters => Connection.ToDatabase;
 
     /// <summary>
     /// The locale to use with culture-sensitive elements.
