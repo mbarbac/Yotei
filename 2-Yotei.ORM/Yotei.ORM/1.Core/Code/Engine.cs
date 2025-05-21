@@ -67,7 +67,7 @@ public partial class Engine : IEngine
     public override bool Equals(object? obj) => Equals(obj as IEngine);
 
     // Equality operator.
-    public static bool operator ==(Engine? x, Engine? y)
+    public static bool operator ==(Engine? x, IEngine? y)
     {
         if (x is null && y is null) return true;
         if (x is null || y is null) return false;
@@ -75,7 +75,7 @@ public partial class Engine : IEngine
     }
 
     // Inequality operator.
-    public static bool operator !=(Engine? x, Engine? y) => !(x == y);
+    public static bool operator !=(Engine? x, IEngine? y) => !(x == y);
 
     /// <inheritdoc/>
     public override int GetHashCode()

@@ -27,6 +27,18 @@ public partial class Engine : ORM.Code.Engine, IEngine
 
     // ----------------------------------------------------
 
+    /// <inheritdoc/>
+    public override bool Equals(ORM.IEngine? other)
+    {
+        if (ReferenceEquals(this, other)) return true;
+        if (other is null || other is not IEngine valid) return false;
+
+        return base.Equals(valid) && Factory == valid.Factory;
+    }
+
+    /// <inheritdoc/>
+    public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), Factory);
+
     // ----------------------------------------------------
 
     /// <inheritdoc/>
