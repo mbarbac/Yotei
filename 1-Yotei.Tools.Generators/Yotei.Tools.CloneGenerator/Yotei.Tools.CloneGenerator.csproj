@@ -6,7 +6,9 @@
 	  <ImplicitUsings>disable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
 	  <Configurations>Debug;Release;Local</Configurations>
+	  <NoWarn>RS1038</NoWarn>
    </PropertyGroup>
+   <!--RS1038: Generator implemented in assembly containing Microsoft.CodeAnalysis.Workspaces -->
 
    <PropertyGroup>
 	  <Description>Yotei Clone Generator</Description>
@@ -27,7 +29,7 @@
    </ItemGroup>
 
    <ItemGroup>
-	  <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.12.0" PrivateAssets="all" />
+	  <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.14.0" PrivateAssets="all" />
    </ItemGroup>
    <Import Project="..\Yotei.Tools.BaseGenerator\Yotei.Tools.BaseGenerator.projitems" Label="Shared" />
 

@@ -43,7 +43,7 @@ public partial class RawCommand : Command, IRawCommand
     /// <param name="spec"></param>
     public RawCommand(
         IConnection connection,
-        Func<dynamic, object?> spec) : this(connection) => Append(spec);
+        Func<dynamic, object> spec) : this(connection) => Append(spec);
     
     /// <summary>
     /// Copy constructor.

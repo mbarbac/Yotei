@@ -298,6 +298,8 @@ internal struct HashCode
     private const uint Prime4 = 668265263U;
     private const uint Prime5 = 374761393U;
 
+#pragma warning disable IDE0079
+#pragma warning disable RS1035
     private static uint GenerateGlobalSeed()
     {
         int len = sizeof(uint);
@@ -305,12 +307,15 @@ internal struct HashCode
 
         unchecked
         {
+
             var rand = new Random((int)DateTime.Now.Ticks);
             rand.NextBytes(array);
 
             return BitConverter.ToUInt32(array, 0);
         }
     }
+#pragma warning restore RS1035
+#pragma warning restore IDE0079
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Initialize(out uint v1, out uint v2, out uint v3, out uint v4)

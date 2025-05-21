@@ -5,21 +5,25 @@
 	  <LangVersion>latest</LangVersion>
 	  <ImplicitUsings>disable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
-	  <IsPackable>false</IsPackable>
 	  <Configurations>Debug;Release;Local</Configurations>
    </PropertyGroup>
 
+   <PropertyGroup>
+	  <Description>Yotei ORM Relational Engines</Description>
+	  <Version>0.2.4-v001</Version>
+	  <Authors>mbarbac@hotmail.com</Authors>
+	  <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
+	  <IsPackable>true</IsPackable>
+	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	  <IncludeSymbols>true</IncludeSymbols>
+	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	  <PackageReadmeFile>README.md</PackageReadmeFile>
+	  <PackageLicenseFile>LICENSE</PackageLicenseFile>
+   </PropertyGroup>
+
    <ItemGroup>
-	  <PackageReference Include="coverlet.collector" Version="6.0.4">
-		 <PrivateAssets>all</PrivateAssets>
-		 <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-	  </PackageReference>
-	  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
-	  <PackageReference Include="xunit" Version="2.9.3" />
-	  <PackageReference Include="xunit.runner.visualstudio" Version="3.1.0">
-		 <PrivateAssets>all</PrivateAssets>
-		 <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-	  </PackageReference>
+	  <None Include="README.md" Pack="true" PackagePath="" />
+	  <None Include="LICENSE" Pack="true" PackagePath="" />
    </ItemGroup>
 
    <!-- DEBUG configuration -->
@@ -27,14 +31,14 @@
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools.AsyncLock\Yotei.Tools.AsyncLock\Yotei.Tools.AsyncLock.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser.csproj" />
-	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.CloneGenerator\Yotei.Tools.CloneGenerator.csproj">
+	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.CloneGenerator\Yotei.Tools.CloneGenerator.csproj" >
 		 <OutputItemType>Analyzer</OutputItemType>
 	  </ProjectReference>
-	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.WithGenerator\Yotei.Tools.WithGenerator.csproj">
+	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\Yotei.Tools.WithGenerator\Yotei.Tools.WithGenerator.csproj" >
 		 <OutputItemType>Analyzer</OutputItemType>
 	  </ProjectReference>
-	  <ProjectReference Include="..\Yotei.ORM\Yotei.ORM.csproj" />
-	  <ProjectReference Include="..\Yotei.ORM.Generators\Yotei.ORM.Generators.csproj">
+	  <ProjectReference Include="..\..\2-Yotei.ORM\Yotei.ORM\Yotei.ORM.csproj" />
+	  <ProjectReference Include="..\..\2-Yotei.ORM\Yotei.ORM.Generators\Yotei.ORM.Generators.csproj" >
 		 <OutputItemType>Analyzer</OutputItemType>
 	  </ProjectReference>
    </ItemGroup>
@@ -50,8 +54,8 @@
 	  <PackageReference Include="Yotei.ORM.Generators" Version="0.2.4-v001" />
    </ItemGroup>
 
-   <!-- RELEASE configuration -->
-   <ItemGroup Condition="'$(Configuration)'=='Release'">
+   <!-- LOCAL configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Local'">
 	  <PackageReference Include="Yotei.Tools" Version="0.6.2" />
 	  <PackageReference Include="Yotei.Tools.AsyncLock" Version="0.6.1" />
 	  <PackageReference Include="Yotei.Tools.LambdaParser" Version="0.6.1" />

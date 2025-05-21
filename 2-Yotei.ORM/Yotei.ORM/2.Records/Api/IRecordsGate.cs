@@ -85,5 +85,5 @@ public interface IRecordsGate
     /// </summary>
     /// <param name="spec"></param>
     /// <returns></returns>
-    IRawCommand Raw(Func<dynamic, object?> spec);
+    IRawCommand Raw(Func<dynamic, object> spec);
 }

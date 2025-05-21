@@ -55,5 +55,5 @@ public abstract class RecordsGate : IRecordsGate
 
     /// <inheritdoc/>
     public virtual IRawCommand Raw(
-        Func<dynamic, object?> spec) => new RawCommand(Connection, spec);
+        Func<dynamic, object> spec) => new RawCommand(Connection, spec);
 }

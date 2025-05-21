@@ -1,2 +1,2 @@
-# Yotei
+# Yotei ORM
 Yotei Framework
