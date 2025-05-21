@@ -25,7 +25,7 @@ public class StrTokenLiteral : IStrTokenLiteral
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public bool Equals(IStrToken? other)
+    public virtual bool Equals(IStrToken? other)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null || other is not IStrTokenLiteral valid) return false;
@@ -40,7 +40,7 @@ public class StrTokenLiteral : IStrTokenLiteral
     /// <param name="other"></param>
     /// <param name="comparison"></param>
     /// <returns></returns>
-    public bool Equals(IStrToken? other, StringComparison comparison)
+    public virtual bool Equals(IStrToken? other, StringComparison comparison)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null || other is not IStrTokenLiteral valid) return false;

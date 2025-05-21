@@ -83,7 +83,7 @@ public partial class IdentifierChain : IHost
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public bool Equals(IIdentifier? other) // Using 'IIdentifier' instead of 'IIdentierChain'...
+    public virtual bool Equals(IIdentifier? other) // Using 'IIdentifier' instead of 'IIdentierChain'...
     {
         if (ReferenceEquals(this, other)) return true;
         if (other == null) return false;

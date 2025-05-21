@@ -65,7 +65,7 @@ public class StrTokenWrapped : IStrTokenWrapped
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public bool Equals(IStrToken? other)
+    public virtual bool Equals(IStrToken? other)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null || other is not IStrTokenWrapped valid) return false;
@@ -83,7 +83,7 @@ public class StrTokenWrapped : IStrTokenWrapped
     /// <param name="other"></param>
     /// <param name="comparison"></param>
     /// <returns></returns>
-    public bool Equals(IStrToken? other, StringComparison comparison)
+    public virtual bool Equals(IStrToken? other, StringComparison comparison)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null || other is not IStrTokenWrapped valid) return false;

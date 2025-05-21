@@ -61,7 +61,7 @@ public partial class Record : IRecord
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public bool Equals(IRecord? other)
+    public virtual bool Equals(IRecord? other)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other == null) return false;

@@ -96,7 +96,7 @@ public partial class SchemaEntry : ISchemaEntry
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public bool Equals(ISchemaEntry? other)
+    public virtual bool Equals(ISchemaEntry? other)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other == null) return false;

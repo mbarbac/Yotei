@@ -36,7 +36,7 @@ public class StrTokenText : IStrTokenText
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public bool Equals(IStrToken? other)
+    public virtual bool Equals(IStrToken? other)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null || other is not IStrTokenText valid) return false;
@@ -51,7 +51,7 @@ public class StrTokenText : IStrTokenText
     /// <param name="other"></param>
     /// <param name="comparison"></param>
     /// <returns></returns>
-    public bool Equals(IStrToken? other, StringComparison comparison)
+    public virtual bool Equals(IStrToken? other, StringComparison comparison)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null || other is not IStrTokenText valid) return false;

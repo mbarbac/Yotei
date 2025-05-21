@@ -46,7 +46,7 @@ public partial class MetadataTag : IMetadataTag
     // ------------------------------------------------
 
     /// <inheritdoc/>
-    public bool Equals(IMetadataTag? other)
+    public virtual bool Equals(IMetadataTag? other)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other == null) return false;

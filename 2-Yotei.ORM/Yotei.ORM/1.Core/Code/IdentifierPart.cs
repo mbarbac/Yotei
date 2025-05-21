@@ -23,7 +23,7 @@ public class IdentifierPart : IIdentifierPart
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public bool Equals(IIdentifier? other) => Equals(other, caseSensitiveNames: true);
+    public virtual bool Equals(IIdentifier? other) => Equals(other, caseSensitiveNames: true);
 
     /// <summary>
     /// Determines whether the current object is equal to the other given one, using the given
@@ -32,7 +32,7 @@ public class IdentifierPart : IIdentifierPart
     /// <param name="other"></param>
     /// <param name="caseSensitiveNames"></param>
     /// <returns></returns>
-    public bool Equals(IIdentifier? other, bool caseSensitiveNames)
+    public virtual bool Equals(IIdentifier? other, bool caseSensitiveNames)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null || other is not IIdentifierPart valid) return false;

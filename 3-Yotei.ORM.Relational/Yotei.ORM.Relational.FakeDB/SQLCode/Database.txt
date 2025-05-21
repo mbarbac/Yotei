@@ -15,11 +15,12 @@ Use: SQL Server Object Explorer
 CONNECTION STRING
 =================================================
 Use:
-	Data Source=(LocalDB)\KeroseneDB;
-	Initial Catalog=KeroseneDB;
+	Data Source=(LocalDB)\MSSQLLocalDB;
+	Initial Catalog=YoteiDB;
 	Integrated Security=True;
 	Persist Security Info=False;
 	Pooling=False;
 	MultipleActiveResultSets=True;
 	Encrypt=False;
-	TrustServerCertificate=False
+	TrustServerCertificate=False;
+	Connect Timeout=10;

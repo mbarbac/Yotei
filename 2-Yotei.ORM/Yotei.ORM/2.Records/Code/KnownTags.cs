@@ -84,7 +84,7 @@ public partial class KnownTags : IKnownTags
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public bool Equals(IKnownTags? other)
+    public virtual bool Equals(IKnownTags? other)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other == null) return false;

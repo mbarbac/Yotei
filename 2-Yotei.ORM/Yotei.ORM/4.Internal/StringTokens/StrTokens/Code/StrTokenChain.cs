@@ -55,7 +55,7 @@ public partial class StrTokenChain : IStrTokenChain
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public bool Equals(IStrToken? other)
+    public virtual bool Equals(IStrToken? other)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null || other is not IStrTokenChain valid) return false;

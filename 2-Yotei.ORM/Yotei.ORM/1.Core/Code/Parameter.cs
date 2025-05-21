@@ -48,7 +48,7 @@ public partial class Parameter : IHost
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public bool Equals(IHost? other) => Equals(other, caseSensitiveNames: true);
+    public virtual bool Equals(IHost? other) => Equals(other, caseSensitiveNames: true);
 
     /// <summary>
     /// Indicates whether this object is equal to another object of the same type, using the
@@ -57,7 +57,7 @@ public partial class Parameter : IHost
     /// <param name="other"></param>
     /// <param name="caseSensitiveNames"></param>
     /// <returns></returns>
-    public bool Equals(IHost? other, bool caseSensitiveNames)
+    public virtual bool Equals(IHost? other, bool caseSensitiveNames)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other == null) return false;

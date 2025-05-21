@@ -51,7 +51,7 @@ public partial class IdentifierTags : IHost
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public bool Equals(IHost? other)
+    public virtual bool Equals(IHost? other)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other == null) return false;

@@ -34,7 +34,7 @@ public partial class MetadataEntry : IMetadataEntry
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public bool Equals(IMetadataEntry? other)
+    public virtual bool Equals(IMetadataEntry? other)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other == null) return false;

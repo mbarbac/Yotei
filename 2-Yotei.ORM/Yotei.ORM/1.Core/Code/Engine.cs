@@ -46,7 +46,7 @@ public partial class Engine : IEngine
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public bool Equals(IEngine? other)
+    public virtual bool Equals(IEngine? other)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null) return false;

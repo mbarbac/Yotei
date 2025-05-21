@@ -99,7 +99,7 @@ internal record SymbolComparer : IEqualityComparer<ISymbol>
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public bool Equals(ISymbol? x, ISymbol? y)
+    public virtual bool Equals(ISymbol? x, ISymbol? y)
     {
         if (x is null && y is null) return true;
         if (x is null) return false;
