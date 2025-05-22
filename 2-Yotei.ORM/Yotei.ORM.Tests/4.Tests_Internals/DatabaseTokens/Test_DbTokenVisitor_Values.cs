@@ -76,7 +76,7 @@ public static class Test_DbTokenVisitor_Values
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection) { ConvertValues = false };
         string str;
         var value = new DateTime(2001, 12, 31);
 
@@ -95,7 +95,7 @@ public static class Test_DbTokenVisitor_Values
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection) { ConvertValues = false };
         string str;
         var value = new DateOnly(2001, 12, 31);
 

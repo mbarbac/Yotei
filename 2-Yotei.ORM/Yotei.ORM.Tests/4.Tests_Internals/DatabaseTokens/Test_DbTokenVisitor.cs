@@ -971,7 +971,7 @@ public static class Test_DbTokenVisitor
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
         var locale = new Locale(CultureInfo.InvariantCulture);
-        var visitor = new DbTokenVisitor(connection) { Locale = locale };
+        var visitor = new DbTokenVisitor(connection) { Locale = locale, ConvertValues = false };
         ICommandInfo.IBuilder item;
         var value = new DateTime(2001, 12, 31);
 
@@ -998,7 +998,7 @@ public static class Test_DbTokenVisitor
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
         var locale = new Locale(CultureInfo.GetCultureInfo("es-ES"));
-        var visitor = new DbTokenVisitor(connection) { Locale = locale };
+        var visitor = new DbTokenVisitor(connection) { Locale = locale, ConvertValues = false };
         ICommandInfo.IBuilder item;
         var value = new DateTime(2001, 12, 31);
 
