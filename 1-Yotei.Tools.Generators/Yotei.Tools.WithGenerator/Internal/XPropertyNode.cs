@@ -13,8 +13,6 @@ internal class XPropertyNode : PropertyNode
     string MethodName => $"With{Symbol.Name}";
     string ArgumentName => $"v_{Symbol.Name}";
 
-    bool HasNewModifier = false;
-
     // ----------------------------------------------------
 
     /// <inheritdoc/>
@@ -53,7 +51,10 @@ internal class XPropertyNode : PropertyNode
     /// <inheritdoc/>
     public override void Emit(SourceProductionContext context, CodeBuilder cb)
     {
-        if (ParentNode.Symbol.Name == "ITypeB") { } // DEBUG-ONLY
+        // DEBUG-ONLY
+        if (ParentNode.Symbol.Name == "Bar" &&
+            Symbol.Name == "Name")
+        { }
 
         // Declared or implemented explicitly, no need for strict typing...
         if (FindMethod(Host) != null) return;
@@ -73,7 +74,13 @@ internal class XPropertyNode : PropertyNode
     /// <param name="cb"></param>
     protected void EmitAsInterface(SourceProductionContext _, CodeBuilder cb)
     {
-        throw null;
+        var modifiers = GetModifiers();
+        var parentType = Host.EasyName(RoslynNameOptions.Default);
+        var memberType = Symbol.Type.EasyName(RoslynNameOptions.Full);
+
+        EmitDocumentation(cb);
+        cb.AppendLine($"{modifiers}{parentType}");
+        cb.AppendLine($"{MethodName}({memberType} {ArgumentName});");
 
         /// <summary>
         /// Gets the method modifiers followed by a space separator, or null if any.
@@ -82,7 +89,7 @@ internal class XPropertyNode : PropertyNode
         {
             // A 'new' property means a brand new 'With'method...
             var hasnew = FindNewModifier();
-            if (!hasnew) goto BYDEFAULT;
+            if (hasnew) goto BYDEFAULT;
 
             // If implemented with strict typing, then 'new' is needed...
             foreach (var iface in Host.AllInterfaces)
@@ -108,7 +115,15 @@ internal class XPropertyNode : PropertyNode
     /// <param name="cb"></param>
     protected void EmitAsAbstract(SourceProductionContext context, CodeBuilder cb)
     {
-        throw null;
+        var modifiers = GetModifiers();
+        var parentType = Host.EasyName(RoslynNameOptions.Default);
+        var memberType = Symbol.Type.EasyName(RoslynNameOptions.Full);
+
+        EmitDocumentation(cb);
+        cb.AppendLine($"{modifiers}{parentType}");
+        cb.AppendLine($"{MethodName}({memberType} {ArgumentName});");
+
+        EmitExplicitInterfaces(context, cb);
 
         /// <summary>
         /// Gets the method modifiers followed by a space separator, or null if any.
@@ -117,13 +132,13 @@ internal class XPropertyNode : PropertyNode
         {
             // A 'new' property means a brand new 'With'method...
             var hasnew = FindNewModifier();
-            if (!hasnew) goto BYDEFAULT;
+            if (hasnew) goto BYDEFAULT;
 
             // If appears in a base type, then 'override' is needed...
             if (Host.BaseType != null)
             {
                 // If there is a base method implementation...
-                var method = FindMethod(Host.BaseType, strict: true, chain: true);
+                var method = FindMethod(Host.BaseType, chain: true);
                 if (method != null)
                 {
                     var access = method.DeclaredAccessibility.ToCSharpString(addspace: true);
@@ -131,8 +146,8 @@ internal class XPropertyNode : PropertyNode
                 }
 
                 // Or if it is being implemented...
-                var at = FindWithsAttribute(Host.BaseType, strict: true, chain: true);
-                var inherit = FindInheritWithsAttribute(Host.BaseType, chain: true);
+                var at = FindWithsAttribute(Host.BaseType, chain: true, ifaces: true);
+                var inherit = FindInheritWithsAttribute(Host.BaseType, chain: true, ifaces: true);
 
                 if (at != null && inherit != null)
                 {
@@ -154,7 +169,38 @@ internal class XPropertyNode : PropertyNode
     /// <param name="cb"></param>
     protected void EmitAsConcrete(SourceProductionContext context, CodeBuilder cb)
     {
-        throw null;
+        var ctor = Host.GetCopyConstructor(strict: false);
+        if (ctor == null)
+        {
+            TreeDiagnostics.NoCopyConstructor(Host).Report(context);
+            return;
+        }
+
+        var modifiers = GetModifiers();
+        var parentType = Host.EasyName(RoslynNameOptions.Default);
+        var memberType = Symbol.Type.EasyName(RoslynNameOptions.Full);
+
+        EmitDocumentation(cb);
+        cb.AppendLine($"{modifiers}{parentType}");
+        cb.AppendLine($"{MethodName}({memberType} {ArgumentName})");
+        cb.AppendLine("{");
+        cb.IndentLevel++;
+        {
+            var xtemp = "x_temp";
+            cb.AppendLine($"var {xtemp} = new {parentType}(this)");
+            cb.AppendLine("{");
+            cb.IndentLevel++;
+            {
+                cb.AppendLine($"{Symbol.Name} = {ArgumentName}");
+            }
+            cb.IndentLevel--;
+            cb.AppendLine("};");
+            cb.AppendLine($"return {xtemp};");
+        }
+        cb.IndentLevel--;
+        cb.AppendLine("}");
+
+        EmitExplicitInterfaces(context, cb);
 
         /// <summary>
         /// Gets the method modifiers followed by a space separator, or null if any.
@@ -166,7 +212,7 @@ internal class XPropertyNode : PropertyNode
 
             // A 'new' property means a brand new 'With'method...
             var hasnew = FindNewModifier();
-            if (!hasnew) goto BYDEFAULT;
+            if (hasnew) goto BYDEFAULT;
 
             // If appears in a base type, then 'override' or 'new' is needed...
             if (Host.BaseType != null)
@@ -189,8 +235,8 @@ internal class XPropertyNode : PropertyNode
                 }
 
                 // Or if it is being implemented...
-                var at = FindWithsAttribute(Host.BaseType, strict: true, chain: true);
-                var inherit = FindInheritWithsAttribute(Host.BaseType, chain: true);
+                var at = FindWithsAttribute(Host.BaseType, strict: true, chain: true, ifaces: true);
+                var inherit = FindInheritWithsAttribute(Host.BaseType, chain: true, ifaces: true);
 
                 if (at != null && inherit != null)
                 {
@@ -212,7 +258,33 @@ internal class XPropertyNode : PropertyNode
     /// <param name="cb"></param>
     protected void EmitExplicitInterfaces(SourceProductionContext context, CodeBuilder cb)
     {
-        throw null;
+        var ifaces = GetExplicitInterfaces();
+
+        foreach (var iface in ifaces)
+        {
+            var member = FindMember(iface);
+            if (member is null)
+            {
+                foreach (var temp in iface.AllInterfaces)
+                {
+                    member = FindMember(temp);
+                    if (member is not null) break;
+                }
+                if (member is null)
+                {
+                    TreeDiagnostics.SymbolNotFound(Symbol).Report(context);
+                    return;
+                }
+            }
+
+            var parentType = iface.EasyName(RoslynNameOptions.Full with { UseTypeNullable = false });
+            var memberType = member.Type.EasyName(RoslynNameOptions.Full);
+
+            cb.AppendLine();
+            cb.AppendLine($"{parentType}");
+            cb.Append($"{parentType}.{MethodName}({memberType} value)");
+            cb.AppendLine($" => {MethodName}(value);");
+        }
     }
 
     /// <summary>
@@ -221,7 +293,39 @@ internal class XPropertyNode : PropertyNode
     /// <returns></returns>
     List<ITypeSymbol> GetExplicitInterfaces()
     {
-        throw null;
+        var comparer = SymbolEqualityComparer.Default;
+        var list = new List<ITypeSymbol>();
+
+        foreach (var iface in Host.Interfaces) Capture(iface);
+        return list;
+
+        // Tries to capture the given interface...
+        bool Capture(ITypeSymbol iface)
+        {
+            var found = false;
+
+            // First, its child interfaces...
+            foreach (var child in iface.Interfaces)
+            {
+                var temp = Capture(child);
+                if (temp) found = true;
+            }
+
+            // And then, the given interface itself...
+            found =
+                found ||
+                FindMember(iface) != null ||
+                FindDecoratedMember(iface) != null;
+
+            // Adding if needed...
+            if (found)
+            {
+                var temp = list.Find(x => comparer.Equals(x, iface));
+                if (temp == null) list.Add(iface);
+            }
+
+            return found;
+        }
     }
 
     // ----------------------------------------------------
@@ -342,6 +446,11 @@ internal class XPropertyNode : PropertyNode
     /// </summary>
     bool FindNewModifier()
     {
+        // If not declared or implemented in the host, then is an inherit one...
+        var member = FindMember(Host);
+        if (member is null) return false;
+
+        // Otherwise, if found in the chain or interfaces, we asume 'new' is used...
         var comparer = SymbolEqualityComparer.Default;
 
         if (!ParentNode.Symbol.IsInterface())
@@ -422,7 +531,7 @@ internal class XPropertyNode : PropertyNode
         var member = FindDecoratedMember(type, strict: strict);
         var at = member?.GetAttributes(typeof(WithAttribute)).FirstOrDefault();
 
-        if (at != null && chain)
+        if (at == null && chain)
         {
             foreach (var temp in type.AllBaseTypes())
             {
@@ -431,7 +540,7 @@ internal class XPropertyNode : PropertyNode
             }
         }
 
-        if (at != null && ifaces)
+        if (at == null && ifaces)
         {
             foreach (var temp in type.AllInterfaces)
             {
@@ -452,7 +561,7 @@ internal class XPropertyNode : PropertyNode
     {
         var at = type.GetAttributes(typeof(InheritWithsAttribute)).FirstOrDefault();
 
-        if (at != null && chain)
+        if (at == null && chain)
         {
             foreach (var temp in type.AllBaseTypes())
             {
@@ -461,7 +570,7 @@ internal class XPropertyNode : PropertyNode
             }
         }
 
-        if (at != null && ifaces)
+        if (at == null && ifaces)
         {
             foreach (var temp in type.AllInterfaces)
             {
