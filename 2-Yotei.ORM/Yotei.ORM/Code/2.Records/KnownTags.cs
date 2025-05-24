@@ -254,7 +254,7 @@ public partial class KnownTags : IKnownTags
     public bool Contains(IEnumerable<string> range) => Find(range).Count > 0;
 
     /// <inheritdoc/>
-    public IMetadataTag? Find(string name)
+    public virtual IMetadataTag? Find(string name)
     {
         name = name.NotNullNotEmpty();
 
@@ -269,7 +269,7 @@ public partial class KnownTags : IKnownTags
     }
 
     /// <inheritdoc/>
-    public List<IMetadataTag> Find(IEnumerable<string> range)
+    public virtual List<IMetadataTag> Find(IEnumerable<string> range)
     {
         range.ThrowWhenNull();
 
@@ -288,7 +288,7 @@ public partial class KnownTags : IKnownTags
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public IKnownTags Clear()
+    public virtual IKnownTags Clear()
     {
         if (IdentifierTags.Count == 0 &&
             PrimaryKeyTag is null &&
