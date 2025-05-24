@@ -13,6 +13,7 @@ public partial interface IEngine : ORM.IEngine
 
     /// <summary>
     /// The underlying ADO.NET factory used by this instance.
+    /// <br/> This property is INFRASTRUCTURE and shall NOT be used by application code.
     /// </summary>
     [With] DbProviderFactory Factory { get; }
 }

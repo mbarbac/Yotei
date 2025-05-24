@@ -94,11 +94,15 @@ public abstract partial class Connection : DisposableClass, IConnection
     /// <summary>
     /// Gets the default transaction associated with this instance.
     /// </summary>
+    /// <remarks>We allow a protected setter that can only take <c>null</c> as its value, as a
+    /// flag to recreate the default transaction, but only when the existing one was not active.
+    /// </remarks>
     public ITransaction Transaction
     {
+        // We need to always return a valid instance even if disposed or disposing...
         get
         {
-            if (IsDisposed || OnDisposing) // Even here we always need a valid instance...
+            if (IsDisposed || OnDisposing)
             {
                 _Transaction ??= CreateTransaction();
                 _Transaction.Dispose();
@@ -111,6 +115,20 @@ public abstract partial class Connection : DisposableClass, IConnection
                 }
             }
             return _Transaction;
+        }
+
+        // We allow setting to null as a flag to recreate the default one, if not active!
+        protected set
+        {
+            if (value is not null) throw new ArgumentException("Only 'NULL' is allowed.");
+
+            if (_Transaction is not null &&
+                _Transaction.IsActive)
+                throw new InvalidOperationException(
+                    "Default transaction is active and so it cannot be nullified.")
+                    .WithData(this);
+
+            _Transaction = null;
         }
     }
     ITransaction? _Transaction;

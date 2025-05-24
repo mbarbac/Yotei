@@ -19,7 +19,7 @@ public interface ITransaction : ORM.ITransaction
 
     /// <summary>
     /// The underlying physical transaction, if any.
-    /// <br/> This property is INFRASTRUCTURE and shall not be used by application code.
+    /// <br/> This property is INFRASTRUCTURE and shall NOT be used by application code.
     /// </summary>
     DbTransaction? DbTransaction { get; }
 }
