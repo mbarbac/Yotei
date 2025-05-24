@@ -1,5 +1,5 @@
-﻿using IHost = Yotei.ORM.Records.ISchema;
-using IItem = Yotei.ORM.Records.ISchemaEntry;
+﻿using IHost = Yotei.ORM.ISchema;
+using IItem = Yotei.ORM.ISchemaEntry;
 using TKey = Yotei.ORM.IIdentifier;
 
 namespace Yotei.ORM;

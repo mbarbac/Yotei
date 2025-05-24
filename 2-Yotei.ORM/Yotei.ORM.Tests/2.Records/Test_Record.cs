@@ -1,7 +1,7 @@
 ﻿using static Yotei.Tools.Diagnostics.ConsoleEx;
 using static System.ConsoleColor;
 
-using Record = Yotei.ORM.Records.Code.Record;
+using Record = Yotei.ORM.Code.Record;
 
 namespace Yotei.ORM.Tests.Records;
 

@@ -1,5 +1,5 @@
-﻿using IHost = Yotei.ORM.Records.IIdentifierTags;
-using IItem = Yotei.ORM.Records.IMetadataTag;
+﻿using IHost = Yotei.ORM.IIdentifierTags;
+using IItem = Yotei.ORM.IMetadataTag;
 
 namespace Yotei.ORM;
 

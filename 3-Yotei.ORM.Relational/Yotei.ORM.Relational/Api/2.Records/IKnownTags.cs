@@ -6,4 +6,4 @@
 /// </summary>
 [Cloneable]
 [InheritWiths]
-public partial interface IKnownTags : Records.IKnownTags { }
+public partial interface IKnownTags : ORM.IKnownTags { }

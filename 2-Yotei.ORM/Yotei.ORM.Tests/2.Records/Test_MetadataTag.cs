@@ -1,8 +1,7 @@
 ﻿using static Yotei.Tools.Diagnostics.ConsoleEx;
 using static System.ConsoleColor;
 
-using Tag = Yotei.ORM.Records.Code.MetadataTag;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+using Tag = Yotei.ORM.Code.MetadataTag;
 
 namespace Yotei.ORM.Tests.Records;
 

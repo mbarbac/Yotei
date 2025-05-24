@@ -1,8 +1,8 @@
 ﻿using static Yotei.Tools.Diagnostics.ConsoleEx;
 using static System.ConsoleColor;
 
-using Pair = Yotei.ORM.Records.Code.MetadataEntry;
-using Tag = Yotei.ORM.Records.Code.MetadataTag;
+using Pair = Yotei.ORM.Code.MetadataEntry;
+using Tag = Yotei.ORM.Code.MetadataTag;
 
 namespace Yotei.ORM.Tests.Records;
 

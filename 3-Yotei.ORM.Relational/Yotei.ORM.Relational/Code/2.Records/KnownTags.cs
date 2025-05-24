@@ -4,7 +4,7 @@
 /// <inheritdoc cref="IKnownTags"/>
 [Cloneable]
 [InheritWiths]
-public partial class KnownTags : Records.Code.KnownTags, IKnownTags
+public partial class KnownTags : ORM.Code.KnownTags, IKnownTags
 {
     public const bool CASESENSITIVETAGS = Engine.CASESENSITIVETAGS;
     public const string PRIMARYKEYTAG = "IsKey";
