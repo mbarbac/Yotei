@@ -10,9 +10,7 @@ public abstract class DisposableClass : IDisposableEx
     /// <inheritdoc/>
     public bool OnDisposing { get; private set; }
 
-    /// <summary>
-    /// Throws an exception if this instance has been disposed.
-    /// </summary>
+    /// <inheritdoc/>
     public void ThrowIfDisposed()
     {
         if (IsDisposed) throw new ObjectDisposedException(
@@ -20,9 +18,7 @@ public abstract class DisposableClass : IDisposableEx
             .WithData(this);
     }
 
-    /// <summary>
-    /// Throws an exception if this instance is being disposed.
-    /// </summary>
+    /// <inheritdoc/>
     public void ThrowIfDisposing()
     {
         if (IsDisposed) throw new InvalidOperationException(

@@ -141,7 +141,7 @@ public abstract class LambdaNode : DynamicObject, ICloneable
     /// <summary>
     /// Updates the version of this instance to the lates one, which is also incremented.
     /// </summary>
-    internal void UpdateLambdaVersion()
+    void UpdateLambdaVersion()
     {
         var old = LambdaVersion;
         var neo = LambdaVersion = NextLambdaVersion();

@@ -111,7 +111,7 @@ public partial class ParameterList : IHost
     public string NextName() => Items.NextName();
 
     /// <inheritdoc cref="IHost.AddNew(object?, out IItem)"/>
-    public THost AddNew(object? value, out IItem item)
+    public virtual THost AddNew(object? value, out IItem item)
     {
         var builder = GetBuilder();
         var done = builder.AddNew(value, out item);
@@ -120,7 +120,7 @@ public partial class ParameterList : IHost
     IHost IHost.AddNew(object? value, out IItem item) => AddNew(value, out item);
 
     /// <inheritdoc cref="IHost.InsertNew(int, object?, out IItem)"/>
-    public THost InsertNew(int index, object? value, out IItem item)
+    public virtual THost InsertNew(int index, object? value, out IItem item)
     {
         var builder = GetBuilder();
         var done = builder.InsertNew(index, value, out item);

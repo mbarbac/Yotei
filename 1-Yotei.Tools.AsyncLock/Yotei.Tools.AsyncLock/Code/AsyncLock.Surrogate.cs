@@ -10,7 +10,7 @@ public partial class AsyncLock
     /// acquired, then disposing this object will release the lock or decrease its reentrancy
     /// count. Otherwise, the dispose operation will do nothing.
     /// </summary>
-    public class Surrogate : DisposableClass
+    public sealed class Surrogate : DisposableClass
     {
         /// <summary>
         /// Initializes a new not-captured instance.

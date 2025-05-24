@@ -9,7 +9,7 @@ namespace Yotei.Tools;
 /// re-entrant ones. Its lock methods return a disposable object as the result of that operation
 /// that, when disposed, either releases the parent lock or decreases its reentrancy count.
 /// </summary>
-public partial class AsyncLock : DisposableClass
+public sealed partial class AsyncLock : DisposableClass
 {
     static int EnvironmentId => Environment.CurrentManagedThreadId;
     static readonly AsyncLocal<ulong> AsyncHolder = new() { Value = 0 };

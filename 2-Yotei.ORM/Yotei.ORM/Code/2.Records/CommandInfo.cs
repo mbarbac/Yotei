@@ -3,7 +3,7 @@
 // ========================================================
 /// <inheritdoc cref="ICommandInfo"/>
 [Cloneable]
-public partial class CommandInfo : ICommandInfo
+public sealed partial class CommandInfo : ICommandInfo
 {
     /// <summary>
     /// Initializes a new empty instance.
@@ -67,7 +67,7 @@ public partial class CommandInfo : ICommandInfo
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected CommandInfo(CommandInfo source)
+    CommandInfo(CommandInfo source)
     {
         source.ThrowWhenNull();
 

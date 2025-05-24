@@ -129,7 +129,7 @@ partial class SchemaEntry
         // ------------------------------------------------
 
         /// <inheritdoc/>
-        public ISchemaEntry ToInstance() => new SchemaEntry(Engine, this);
+        public virtual ISchemaEntry ToInstance() => new SchemaEntry(Engine, this);
 
         /// <inheritdoc/>
         public IEngine Engine { get; }

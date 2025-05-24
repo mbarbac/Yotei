@@ -7,7 +7,7 @@ partial class CommandInfo
     // ====================================================
     /// <inheritdoc cref="ICommandInfo.IBuilder"/>
     [Cloneable]
-    public partial class Builder : ICommandInfo.IBuilder
+    public sealed partial class Builder : ICommandInfo.IBuilder
     {
         readonly StringBuilder _Text;
         readonly ParameterList.Builder _Parameters;
@@ -70,7 +70,7 @@ partial class CommandInfo
         /// Copy constructor.
         /// </summary>
         /// <param name="source"></param>
-        protected Builder(Builder source)
+        Builder(Builder source)
         {
             source.ThrowWhenNull();
 

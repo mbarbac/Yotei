@@ -57,7 +57,7 @@ internal class LambdaMetaNode : DynamicMetaObject
 
     // ---------------------------------------------------- Overriden
 
-    /// <inheritdoc/> -----------------
+    /// <inheritdoc/>
     public override DynamicMetaObject BindBinaryOperation(
         BinaryOperationBinder binder,
         DynamicMetaObject arg)
@@ -87,7 +87,7 @@ internal class LambdaMetaNode : DynamicMetaObject
         return meta;
     }
 
-    /// <inheritdoc/> -----------------
+    /// <inheritdoc/>
     public override DynamicMetaObject BindConvert(ConvertBinder binder)
     {
         LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"* META BindConvert:");
@@ -140,7 +140,7 @@ internal class LambdaMetaNode : DynamicMetaObject
         }
     }
 
-    /// <inheritdoc/> -----------------
+    /// <inheritdoc/>
     public override DynamicMetaObject BindSetIndex(
         SetIndexBinder binder, DynamicMetaObject[] indexes, DynamicMetaObject value)
     {
@@ -173,7 +173,7 @@ internal class LambdaMetaNode : DynamicMetaObject
         return meta;
     }
 
-    /// <inheritdoc/> -----------------
+    /// <inheritdoc/>
     public override DynamicMetaObject BindSetMember(SetMemberBinder binder, DynamicMetaObject value)
     {
         LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"* META BindSetMember:");
@@ -202,7 +202,7 @@ internal class LambdaMetaNode : DynamicMetaObject
         return meta;
     }
 
-    /// <inheritdoc/> -----------------
+    /// <inheritdoc/>
     public override DynamicMetaObject BindUnaryOperation(UnaryOperationBinder binder)
     {
         LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"* META BindUnary:");
@@ -251,7 +251,7 @@ internal class LambdaMetaNode : DynamicMetaObject
 
     // ---------------------------------------------------- Delegated to underlying node...
 
-    /// <inheritdoc/> -----------------
+    /// <inheritdoc/>
     public override DynamicMetaObject BindGetIndex(GetIndexBinder binder, DynamicMetaObject[] indexes)
     {
         LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"* META BindGetIndex:");
@@ -268,7 +268,7 @@ internal class LambdaMetaNode : DynamicMetaObject
         return meta;
     }
 
-    /// <inheritdoc/> -----------------
+    /// <inheritdoc/>
     public override DynamicMetaObject BindGetMember(GetMemberBinder binder)
     {
         LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"* META BindGetMember:");
@@ -280,7 +280,7 @@ internal class LambdaMetaNode : DynamicMetaObject
         return meta;
     }
 
-    /// <inheritdoc/> -----------------
+    /// <inheritdoc/>
     public override DynamicMetaObject BindInvoke(InvokeBinder binder, DynamicMetaObject[] args)
     {
         LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"* META BindInvoke:");
@@ -297,7 +297,7 @@ internal class LambdaMetaNode : DynamicMetaObject
         return meta;
     }
 
-    /// <inheritdoc/> -----------------
+    /// <inheritdoc/>
     public override DynamicMetaObject BindInvokeMember(
         InvokeMemberBinder binder,
         DynamicMetaObject[] args)
@@ -318,7 +318,7 @@ internal class LambdaMetaNode : DynamicMetaObject
 
     // ---------------------------------------------------- Not supported
 
-    /// <inheritdoc/> -----------------
+    /// <inheritdoc/>
     public override DynamicMetaObject BindCreateInstance(
         CreateInstanceBinder binder,
         DynamicMetaObject[] args)
@@ -333,7 +333,7 @@ internal class LambdaMetaNode : DynamicMetaObject
             .WithData(this);
     }
 
-    /// <inheritdoc/> -----------------
+    /// <inheritdoc/>
     public override DynamicMetaObject BindDeleteIndex(
         DeleteIndexBinder binder,
         DynamicMetaObject[] indexes)
@@ -348,7 +348,7 @@ internal class LambdaMetaNode : DynamicMetaObject
             .WithData(this);
     }
 
-    /// <inheritdoc/> -----------------
+    /// <inheritdoc/>
     public override DynamicMetaObject BindDeleteMember(DeleteMemberBinder binder)
     {
         LambdaHelpers.Print(LambdaHelpers.MetaBindedColor, $"* META BindDeleteMember:");

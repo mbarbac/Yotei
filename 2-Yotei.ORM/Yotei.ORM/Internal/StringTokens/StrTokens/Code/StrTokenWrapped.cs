@@ -124,7 +124,7 @@ public class StrTokenWrapped : IStrTokenWrapped
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public IStrToken Reduce(StringComparison comparison)
+    public virtual IStrToken Reduce(StringComparison comparison)
     {
         var item = Payload.Reduce(comparison);
 
@@ -147,7 +147,7 @@ public class StrTokenWrapped : IStrTokenWrapped
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public IStrToken TokenizeWith(Func<string, IStrToken> tokenizer)
+    public virtual IStrToken TokenizeWith(Func<string, IStrToken> tokenizer)
     {
         tokenizer.ThrowWhenNull();
 

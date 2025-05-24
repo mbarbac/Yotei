@@ -81,12 +81,12 @@ public class StrTokenText : IStrTokenText
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public IStrToken Reduce(StringComparison comparison) => this;
+    public virtual IStrToken Reduce(StringComparison comparison) => this;
 
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public IStrToken TokenizeWith(Func<string, IStrToken> tokenizer)
+    public virtual IStrToken TokenizeWith(Func<string, IStrToken> tokenizer)
     {
         tokenizer.ThrowWhenNull();
         return tokenizer(_Payload);

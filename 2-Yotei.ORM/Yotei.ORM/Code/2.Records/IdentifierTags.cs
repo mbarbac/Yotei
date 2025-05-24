@@ -9,7 +9,7 @@ namespace Yotei.ORM.Code;
 /// <inheritdoc cref="IHost"/>
 [InvariantList<IItem>]
 [DebuggerDisplay("{Items.ToDebugString(5)}")]
-public partial class IdentifierTags : IHost
+public sealed partial class IdentifierTags : IHost
 {
     /// <summary>
     /// Initializes a new empty instance.
@@ -43,7 +43,7 @@ public partial class IdentifierTags : IHost
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected IdentifierTags(THost source) : this(source.CaseSensitiveTags) => Items.AddRange(source);
+    IdentifierTags(THost source) : this(source.CaseSensitiveTags) => Items.AddRange(source);
 
     /// <inheritdoc/>
     public override string ToString() => Items.ToString();
@@ -51,7 +51,7 @@ public partial class IdentifierTags : IHost
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public virtual bool Equals(IHost? other)
+    public bool Equals(IHost? other)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other == null) return false;

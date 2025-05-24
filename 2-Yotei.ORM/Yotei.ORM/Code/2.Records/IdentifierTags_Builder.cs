@@ -13,7 +13,7 @@ partial class IdentifierTags
     /// </summary>
     [Cloneable]
     [DebuggerDisplay("{ToDebugString(5)}")]
-    public partial class Builder : CoreList<IItem>, IHost.IBuilder
+    public sealed partial class Builder : CoreList<IItem>, IHost.IBuilder
     {
         /// <summary>
         /// Initializes a new empty instance.
@@ -46,7 +46,7 @@ partial class IdentifierTags
         /// Copy constructor.
         /// </summary>
         /// <param name="source"></param>
-        protected Builder(Builder source) : this(source.CaseSensitiveTags) => AddRange(source);
+        Builder(Builder source) : this(source.CaseSensitiveTags) => AddRange(source);
 
         // ------------------------------------------------
 

@@ -3,7 +3,7 @@
 // ========================================================
 /// <inheritdoc cref="IMetadataEntry"/>
 [InheritWiths]
-public partial class MetadataEntry : IMetadataEntry
+public sealed partial class MetadataEntry : IMetadataEntry
 {
     /// <summary>
     /// Initializes a new instance.
@@ -20,7 +20,7 @@ public partial class MetadataEntry : IMetadataEntry
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected MetadataEntry(MetadataEntry source)
+    MetadataEntry(MetadataEntry source)
     {
         source.ThrowWhenNull();
 
@@ -34,7 +34,7 @@ public partial class MetadataEntry : IMetadataEntry
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public virtual bool Equals(IMetadataEntry? other)
+    public bool Equals(IMetadataEntry? other)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other == null) return false;

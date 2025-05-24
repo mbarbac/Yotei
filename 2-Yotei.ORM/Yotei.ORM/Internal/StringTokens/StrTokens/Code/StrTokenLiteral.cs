@@ -70,10 +70,12 @@ public class StrTokenLiteral : IStrTokenLiteral
     // ----------------------------------------------------
 
     /// <inheritdoc/>
+    /// <remarks>Not virtual.</remarks>
     public IStrToken Reduce(StringComparison comparison) => this;
 
     // ----------------------------------------------------
 
     /// <inheritdoc/>
+    /// <remarks>Not virtual.</remarks>
     public IStrToken TokenizeWith(Func<string, IStrToken> tokenizer) => this;
 }

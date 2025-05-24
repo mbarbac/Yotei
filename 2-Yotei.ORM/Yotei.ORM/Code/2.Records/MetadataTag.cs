@@ -3,7 +3,7 @@
 // ========================================================
 /// <inheritdoc cref="IMetadataTag"/>
 [Cloneable]
-public partial class MetadataTag : IMetadataTag
+public sealed partial class MetadataTag : IMetadataTag
 {
     readonly Builder Items;
 
@@ -27,7 +27,7 @@ public partial class MetadataTag : IMetadataTag
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected MetadataTag(MetadataTag source)
+    MetadataTag(MetadataTag source)
     {
         source.ThrowWhenNull();
         Items = new(source.CaseSensitiveTags, source);
@@ -46,7 +46,7 @@ public partial class MetadataTag : IMetadataTag
     // ------------------------------------------------
 
     /// <inheritdoc/>
-    public virtual bool Equals(IMetadataTag? other)
+    public bool Equals(IMetadataTag? other)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other == null) return false;

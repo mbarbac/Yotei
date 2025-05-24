@@ -4,7 +4,7 @@
 /// <summary>
 /// Splits source strings according to the rules in this instance.
 /// </summary>
-public class StringSplitter : IEnumerable<ReadOnlyMemory<char>>, IEnumerator<ReadOnlyMemory<char>>
+public sealed class StringSplitter : IEnumerable<ReadOnlyMemory<char>>, IEnumerator<ReadOnlyMemory<char>>
 {
     readonly string? _Source;
     readonly IEnumerable<string> _Separators;
@@ -82,7 +82,7 @@ public class StringSplitter : IEnumerable<ReadOnlyMemory<char>>, IEnumerator<Rea
     /// <inheritdoc cref="IEnumerator.MoveNext"/>
     public bool MoveNext()
     {
-        // Separator rom previous iteration...
+        // Separator from previous iteration...
         if (_SeparatorFound)
         {
             Current = _Separator.AsMemory();

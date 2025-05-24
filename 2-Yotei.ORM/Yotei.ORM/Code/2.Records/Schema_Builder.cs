@@ -126,7 +126,7 @@ partial class Schema
         public IEngine Engine { get; }
 
         /// <inheritdoc/>
-        public THost ToInstance() => Count == 0 ? new THost(Engine) : new THost(Engine, this);
+        public virtual THost ToInstance() => Count == 0 ? new THost(Engine) : new THost(Engine, this);
         IHost IHost.IBuilder.ToInstance() => ToInstance();
 
         // ------------------------------------------------

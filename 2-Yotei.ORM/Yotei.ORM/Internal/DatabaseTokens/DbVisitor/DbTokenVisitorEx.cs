@@ -9,7 +9,7 @@ partial record class DbTokenVisitor
     /// </summary>
     /// <param name="expression"></param>
     /// <returns></returns>
-    public ICommandInfo.IBuilder Visit(Func<dynamic, object> expression)
+    public virtual ICommandInfo.IBuilder Visit(Func<dynamic, object> expression)
     {
         expression.ThrowWhenNull();
 
@@ -25,7 +25,7 @@ partial record class DbTokenVisitor
     /// </summary>
     /// <param name="token"></param>
     /// <returns></returns>
-    public ICommandInfo.IBuilder Visit(DbToken token)
+    public virtual ICommandInfo.IBuilder Visit(DbToken token)
     {
         return token switch
         {
@@ -57,7 +57,7 @@ partial record class DbTokenVisitor
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public ICommandInfo.IBuilder VisitRange(IEnumerable<DbToken> range)
+    public virtual ICommandInfo.IBuilder VisitRange(IEnumerable<DbToken> range)
     {
         var builder = new CommandInfo.Builder(Engine);
         var num = false;
@@ -512,7 +512,7 @@ partial record class DbTokenVisitor
     /// Determines if the given chain is either an empty one, or consist in just one element whose
     /// value is an asterisk.
     /// </summary>
-    protected static bool IsEmptyOrSoleAsterisk(DbTokenChain chain)
+    static bool IsEmptyOrSoleAsterisk(DbTokenChain chain)
     {
         if (chain.Count == 0) return true;
 
@@ -528,7 +528,7 @@ partial record class DbTokenVisitor
     /// <summary>
     /// Returns an alias built from visiting the elements in the given chain.
     /// </summary>
-    protected string ParseAlias(DbTokenChain chain)
+    protected virtual string ParseAlias(DbTokenChain chain)
     {
         var visitor = ToRawVisitor();
         var temp = visitor.VisitRange(chain);
@@ -559,7 +559,7 @@ partial record class DbTokenVisitor
     /// Tries to expand the first element of the given chain, provided that it is an enumerable
     /// one, and it is the unique one in that chain.
     /// </summary>
-    protected DbTokenChain TryExpand(DbTokenChain chain)
+    DbTokenChain TryExpand(DbTokenChain chain)
     {
         if (chain.Count == 1)
         {

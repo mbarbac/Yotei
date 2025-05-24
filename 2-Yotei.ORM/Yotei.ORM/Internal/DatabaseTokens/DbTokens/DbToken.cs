@@ -32,7 +32,7 @@ public abstract class DbToken : IEquatable<DbToken>
     public static bool operator !=(DbToken? host, DbToken? item) => !(host == item);
 
     /// <inheritdoc/>
-    public override int GetHashCode() => 0;
+    public override abstract int GetHashCode();
 
     // ----------------------------------------------------
 

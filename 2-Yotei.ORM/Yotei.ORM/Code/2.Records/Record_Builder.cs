@@ -6,7 +6,7 @@ partial class Record
     /// <inheritdoc cref="IRecord.IBuilder"/>
     [Cloneable]
     [DebuggerDisplay("{ToDebugString(5)}")]
-    public partial class Builder : IRecord.IBuilder
+    public sealed partial class Builder : IRecord.IBuilder
     {
         Schema.Builder? _Schema = null;
         List<object?> _Values = [];
@@ -44,7 +44,7 @@ partial class Record
         /// Copy constructor.
         /// </summary>
         /// <param name="source"></param>
-        protected Builder(Builder source)
+        Builder(Builder source)
         {
             source.ThrowWhenNull();
 

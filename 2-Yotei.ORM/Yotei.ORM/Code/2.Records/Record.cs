@@ -5,7 +5,7 @@
 [Cloneable]
 [InheritWiths]
 [DebuggerDisplay("{Items.ToDebugString(5)}")]
-public partial class Record : IRecord
+public sealed partial class Record : IRecord
 {
     readonly Builder Items;
 
@@ -41,7 +41,7 @@ public partial class Record : IRecord
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected Record(Record source)
+    Record(Record source)
     {
         source.ThrowWhenNull();
 
@@ -61,7 +61,7 @@ public partial class Record : IRecord
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public virtual bool Equals(IRecord? other)
+    public bool Equals(IRecord? other)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other == null) return false;

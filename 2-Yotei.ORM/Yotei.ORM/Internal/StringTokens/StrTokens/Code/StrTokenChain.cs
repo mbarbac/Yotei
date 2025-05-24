@@ -92,7 +92,7 @@ public partial class StrTokenChain : IStrTokenChain
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public IStrToken Reduce(StringComparison comparison)
+    public virtual IStrToken Reduce(StringComparison comparison)
     {
         var builder = new Builder();
         var changed = false;
@@ -116,7 +116,7 @@ public partial class StrTokenChain : IStrTokenChain
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public IStrToken TokenizeWith(Func<string, IStrToken> tokenizer)
+    public virtual IStrToken TokenizeWith(Func<string, IStrToken> tokenizer)
     {
         tokenizer.ThrowWhenNull();
 

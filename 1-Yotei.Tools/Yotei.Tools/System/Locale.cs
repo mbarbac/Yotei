@@ -6,7 +6,7 @@ namespace Yotei.Tools;
 /// <summary>
 /// Represents an immutable collection of culture sensitive settings and related methods.
 /// </summary>
-public record class Locale
+public sealed record class Locale
     : IComparer<string?>, IComparer<char>, IComparer<SpanChar>
     , IEqualityComparer<string?>, IEqualityComparer<char>, IEqualityComparer<SpanChar>
 {

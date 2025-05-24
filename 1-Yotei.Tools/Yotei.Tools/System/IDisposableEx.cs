@@ -16,4 +16,16 @@ public interface IDisposableEx : IDisposable, IAsyncDisposable
     /// obtained, or not.
     /// </summary>
     bool OnDisposing { get; }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Throws an exception if this instance has been disposed.
+    /// </summary>
+    void ThrowIfDisposed();
+
+    /// <summary>
+    /// Throws an exception if this instance is being disposed.
+    /// </summary>
+    void ThrowIfDisposing();
 }

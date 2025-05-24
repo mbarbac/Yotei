@@ -4,7 +4,7 @@
 /// <inheritdoc cref="IValueConverterList"/>
 [Cloneable]
 [DebuggerDisplay("{Items.ToDebugString(5)}")]
-public partial class ValueConverterList : IValueConverterList
+public sealed partial class ValueConverterList : IValueConverterList
 {
     readonly List<IValueConverter> Items;
 
@@ -24,7 +24,7 @@ public partial class ValueConverterList : IValueConverterList
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected ValueConverterList(
+    ValueConverterList(
         ValueConverterList source) : this() => Items.AddRange(source.ThrowWhenNull());
 
     /// <inheritdoc/>
@@ -37,7 +37,7 @@ public partial class ValueConverterList : IValueConverterList
     /// <summary>
     /// Invoked to produce a debug string.
     /// </summary>
-    public virtual string ToDebugString(int count)
+    public string ToDebugString(int count)
     {
         if (Count == 0) return $"0:[]";
         if (count == 0) return $"{Count}:[...]";

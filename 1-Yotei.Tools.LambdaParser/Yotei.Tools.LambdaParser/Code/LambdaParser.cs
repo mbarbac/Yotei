@@ -2,7 +2,9 @@
 
 // ========================================================
 /// <summary>
-/// 
+/// Represents the ability of parsing dynamic lambda expressions, defined as lambda expresssions
+/// with at least one <c>dynamic</c> argument, and returns the chained result of parsing the
+/// dynamic methods and properties bound to those dynamic arguments.
 /// </summary>
 public class LambdaParser
 {
@@ -134,8 +136,6 @@ public class LambdaParser
     /// This method is invoked to produce the instance to return, so there is no real need to
     /// copy all properties.
     /// </summary>
-    /// <param name="source"></param>
-    /// <returns></returns>
     static LambdaParser NewParserFrom(LambdaParser source)
     {
         var target = new LambdaParser();
@@ -151,8 +151,6 @@ public class LambdaParser
     /// Determines if the given parameter correspond to a dynamic argument in the given dynamic
     /// lambda expression, or not.
     /// </summary>
-    /// <param name="par"></param>
-    /// <returns></returns>
     static bool IsDynamic(ParameterInfo par)
     {
         var ats = par.GetCustomAttributes(typeof(DynamicAttribute), false);

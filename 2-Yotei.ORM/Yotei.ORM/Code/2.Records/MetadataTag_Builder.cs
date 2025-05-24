@@ -5,7 +5,7 @@ partial class MetadataTag
     // ====================================================
     /// <inheritdoc cref="IMetadataTag.IBuilder"/>
     [Cloneable]
-    public partial class Builder : IMetadataTag.IBuilder
+    public sealed partial class Builder : IMetadataTag.IBuilder
     {
         readonly List<string> Items = [];
 
@@ -38,7 +38,7 @@ partial class MetadataTag
         /// Copy constructor.
         /// </summary>
         /// <param name="source"></param>
-        protected Builder(Builder source)
+        Builder(Builder source)
         {
             source.ThrowWhenNull();
 

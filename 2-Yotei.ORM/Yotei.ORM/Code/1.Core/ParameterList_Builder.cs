@@ -103,14 +103,14 @@ public partial class ParameterList
         }
 
         /// <inheritdoc/>
-        public int AddNew(object? value, out IItem item)
+        public virtual int AddNew(object? value, out IItem item)
         {
             item = new Parameter(NextName(), value);
             return Add(item);
         }
 
         /// <inheritdoc/>
-        public int InsertNew(int index, object? value, out IItem item)
+        public virtual int InsertNew(int index, object? value, out IItem item)
         {
             item = new Parameter(NextName(), value);
             return Insert(index, item);
