@@ -33,3 +33,4 @@ global using Yotei.ORM.Internal;
 global using Yotei.ORM.Generators;
 
 global using Yotei.ORM.Relational;
+global using Yotei.ORM.Relational.Code;

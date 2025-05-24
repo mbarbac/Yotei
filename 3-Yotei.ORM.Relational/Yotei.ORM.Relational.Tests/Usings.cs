@@ -4,6 +4,7 @@ global using System.Collections.Generic;
 global using System.Collections.Immutable;
 global using System.Data;
 global using System.Data.Common;
+global using Microsoft.Data.SqlClient;
 global using System.Diagnostics;
 global using System.Diagnostics.CodeAnalysis;
 global using System.Dynamic;
@@ -34,3 +35,4 @@ global using Yotei.ORM.Internal;
 global using Yotei.ORM.Generators;
 
 global using Yotei.ORM.Relational;
+global using Yotei.ORM.Relational.Code;

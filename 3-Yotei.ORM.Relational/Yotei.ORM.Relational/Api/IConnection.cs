@@ -8,7 +8,7 @@
 public partial interface IConnection : ORM.IConnection
 {
     /// <inheritdoc cref="ORM.IConnection.Engine"/>
-    new IXEngine Engine { get; }
+    new IEngine Engine { get; }
 
     /// <inheritdoc cref="ORM.IConnection.Transaction"/>
     new ITransaction Transaction { get; }

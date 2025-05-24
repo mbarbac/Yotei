@@ -6,7 +6,7 @@
 /// </summary>
 [Cloneable]
 [InheritWiths]
-public partial interface IXEngine : ORM.IEngine
+public partial interface IEngine : ORM.IEngine
 {
     /// <inheritdoc cref="ORM.IEngine.KnownTags"/>
     [With] new IKnownTags KnownTags { get; }
