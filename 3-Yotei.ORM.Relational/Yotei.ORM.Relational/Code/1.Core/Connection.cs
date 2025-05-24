@@ -236,5 +236,5 @@ public partial class Connection : ORM.Code.Connection, IConnection
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    protected override IRecordsGate CreateRecordsGate() => throw null;
+    protected override IRecordsGate CreateRecordsGate() => new RecordsGate(this);
 }
