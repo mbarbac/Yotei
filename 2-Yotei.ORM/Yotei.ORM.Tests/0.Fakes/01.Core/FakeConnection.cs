@@ -23,7 +23,7 @@ public partial class FakeConnection : Code.Connection
     protected override void OnClose() => _IsOpen = false;
     protected override ValueTask OnCloseAsync() { OnClose(); return ValueTask.CompletedTask; }
 
-    protected override ITransaction CreateTransaction() => new FakeTransaction(this);
+    public override ITransaction CreateTransaction() => new FakeTransaction(this);
 
     protected override IRecordsGate CreateRecordsGate() => new FakeRecordsGate(this);
 }

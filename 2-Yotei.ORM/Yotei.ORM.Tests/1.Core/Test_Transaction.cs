@@ -235,26 +235,29 @@ public static class Test_Transaction
             Assert.False(connection.IsOpen);
             Assert.False(connection.IsDisposed);
 
-            // Transaction disposal is only automatic via connection's one if it is the default...
-            transaction = connection.Transaction;
-            int count = 3;
-
-            for (int i = 0; i < count; i++)
+            using (transaction = connection.CreateTransaction())
             {
-                transaction.Start();
+                int count = 3;
+                for (int i = 0; i < count; i++)
+                {
+                    transaction.Start();
 
-                Assert.True(connection.IsOpen);
-                Assert.False(connection.IsDisposed);
+                    Assert.True(connection.IsOpen);
+                    Assert.False(connection.IsDisposed);
 
-                Assert.False(transaction.IsDisposed);
-                Assert.True(transaction.IsActive);
-                Assert.Equal(i + 1, transaction.Level);
+                    Assert.False(transaction.IsDisposed);
+                    Assert.True(transaction.IsActive);
+                    Assert.Equal(i + 1, transaction.Level);
+                }
             }
-        }
 
-        Assert.True(transaction.IsDisposed);
-        Assert.False(transaction.IsActive);
-        Assert.Equal(0, transaction.Level);
+            Assert.False(transaction.IsActive);
+            Assert.Equal(0, transaction.Level);
+            Assert.True(transaction.IsDisposed);
+
+            Assert.False(connection.IsOpen);
+            Assert.False(connection.IsDisposed);
+        }
 
         Assert.False(connection.IsOpen);
         Assert.True(connection.IsDisposed);

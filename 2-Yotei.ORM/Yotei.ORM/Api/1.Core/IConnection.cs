@@ -24,17 +24,6 @@ public partial interface IConnection : IDisposableEx
     /// </summary>
     TimeSpan RetryInterval { get; }
 
-    /// <summary>
-    /// Gets the default transaction associated with this instance.
-    /// </summary>
-    ITransaction Transaction { get; }
-
-    /// <summary>
-    /// The collection of converters carried by this instance to convert from application level
-    /// values to database supported ones.
-    /// </summary>
-    IValueConverterList ToDatabase { get; }
-
     // ----------------------------------------------------
 
     /// <summary>
@@ -66,6 +55,25 @@ public partial interface IConnection : IDisposableEx
     ValueTask CloseAsync();
 
     // ----------------------------------------------------
+
+    /*
+    /// <summary>
+    /// Gets the default transaction associated with this instance.
+    /// </summary>
+    ITransaction Transaction { get; }
+    */
+
+    /// <summary>
+    /// Invoked to create a new transaction of the appropriate type for this instance.
+    /// </summary>
+    /// <returns></returns>
+    ITransaction CreateTransaction();
+
+    /// <summary>
+    /// The collection of converters carried by this instance to convert from application level
+    /// values to database supported ones.
+    /// </summary>
+    IValueConverterList ToDatabase { get; }
 
     /// <summary>
     /// Provides access to the records-oriented capabilities of this instance.

@@ -5,7 +5,7 @@
 /// Represents a list-alike collection of child elements that prevents null or duplicated ones.
 /// </summary>
 /// <typeparam name="T"></typeparam>
-[DebuggerDisplay("{ToDebugString(6)}")]
+[DebuggerDisplay("{ToDebugString(5)}")]
 internal class CustomList<T> : IEnumerable<T>
 {
     readonly List<T> Items = [];

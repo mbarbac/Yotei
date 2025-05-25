@@ -13,11 +13,25 @@ public partial interface IConnection : ORM.IConnection
     /// <inheritdoc cref="ORM.IConnection.Records"/>
     new IRecordsGate Records { get; }
 
+    /*
+    /// <inheritdoc cref="ORM.IConnection.Transaction"/>
+    new ITransaction Transaction { get; }
+    */
+
+    /// <inheritdoc cref="ORM.IConnection.CreateTransaction"/>
+    new ITransaction CreateTransaction();
+
+    /// <summary>
+    /// <inheritdoc cref="ORM.IConnection.CreateTransaction"/>
+    /// </summary>
+    /// <param name="isolationLevel"></param>
+    /// <returns></returns>
+    ITransaction CreateTransaction(IsolationLevel isolationLevel);
+
     // ----------------------------------------------------
 
     /// <summary>
     /// The default isolation level of transactions associated with this instance.
-    /// <br/> The setter throws an exception if there is an active existing transaction.
     /// </summary>
     IsolationLevel IsolationLevel { get; set; }
 
@@ -37,9 +51,6 @@ public partial interface IConnection : ORM.IConnection
     /// is not available.
     /// </summary>
     string? Database { get; }
-
-    /// <inheritdoc cref="ORM.IConnection.Transaction"/>
-    new ITransaction Transaction { get; }
 
     /// <summary>
     /// The underlying physical connection, if any.

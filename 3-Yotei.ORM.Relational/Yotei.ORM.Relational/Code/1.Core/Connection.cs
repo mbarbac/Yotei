@@ -138,21 +138,27 @@ public partial class Connection : ORM.Code.Connection, IConnection
         get => _IsolationLevel;
         set
         {
-            Transaction = null!; // Throws if it was an active one.
+            //Transaction = null!; // Throws if it was an active one.
             _IsolationLevel = value;
         }
     }
     IsolationLevel _IsolationLevel = Code.Transaction.ISOLATIONLEVEL;
 
+    /*
     /// <inheritdoc/>
     public new ITransaction Transaction
     {
         get => (ITransaction)base.Transaction;
         protected set => base.Transaction = value;
     }
+    */
 
     /// <inheritdoc/>
-    protected override ITransaction CreateTransaction() => new Transaction(this, IsolationLevel);
+    public override ITransaction CreateTransaction() => CreateTransaction(IsolationLevel);
+
+    /// <inheritdoc/>
+    public virtual ITransaction CreateTransaction(
+        IsolationLevel isolationLevel) => new Transaction(this, isolationLevel);
 
     // ----------------------------------------------------
 

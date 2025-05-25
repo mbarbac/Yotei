@@ -198,7 +198,7 @@ public class RecordsGate : ORM.Code.RecordsGate, IRecordsGate
 
         if (!TryGetProperty(Connection.DbConnection, "InnerConnection", out var inner)) return;
         if (inner is null || !TryGetProperty(inner, "CurrentTransaction", out var current)) return;
-        if (current is null || !TryGetProperty(inner, "Parent", out var parent)) return;
+        if (current is null || !TryGetProperty(current, "Parent", out var parent)) return;
         if (parent is null) return;
 
         command.Transaction = (DbTransaction)parent;

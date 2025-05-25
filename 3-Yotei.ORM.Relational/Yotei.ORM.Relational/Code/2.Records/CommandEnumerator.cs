@@ -76,17 +76,30 @@ public class CommandEnumerator : ORM.Code.CommandEnumerator, ICommandEnumerator
 
             for (int c = 0; c < table.Columns.Count; c++)
             {
-                var meta = table.Columns[c].ColumnName;
+                var name = table.Columns[c].ColumnName;
                 var value = row[c] is DBNull ? null : row[c];
 
                 if (value is string str) value = str.NullWhenEmpty();
                 if (value is null) continue;
-
+                
                 var tag =
-                    engine.KnownTags.Find(meta) ??
-                    new MetadataTag(engine.KnownTags.CaseSensitiveTags, meta);
+                    engine.KnownTags.Find(name) ??
+                    new MetadataTag(engine.KnownTags.CaseSensitiveTags, name);
 
-                metas.Add(new MetadataEntry(tag, value));
+                var temp = metas.Find(x => x.Tag.Contains(tag));
+                if (temp != null)
+                {
+                    var other = temp.Value;
+                    if (!value.EqualsEx(other)) throw new InvalidOperationException(
+                        "New value for existing metadata entry does not match.")
+                        .WithData(temp, "Existing Entry")
+                        .WithData(value, "Existing Value")
+                        .WithData(other, "New Value");
+                }
+                else
+                {
+                    metas.Add(new MetadataEntry(tag, value));
+                }
             }
 
             // Creating a new schema entry...

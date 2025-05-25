@@ -3,7 +3,7 @@ using static System.ConsoleColor;
 
 using DB = Yotei.ORM.Relational.FakeDB.DB;
 
-namespace Yotei.ORM.Relational.Tests.Core;
+namespace Yotei.ORM.Relational.Tests.Records;
 
 // ========================================================
 //[Enforced]

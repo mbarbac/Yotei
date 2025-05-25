@@ -13,7 +13,7 @@ public class Transaction : ORM.Code.Transaction, ITransaction
     /// </summary>
     /// <param name="connection"></param>
     /// <param name="isolationLevel"></param>
-    public Transaction(IConnection connection, IsolationLevel isolationLevel)
+    public Transaction(IConnection connection, IsolationLevel isolationLevel = ISOLATIONLEVEL)
         : base(connection)
         => IsolationLevel = isolationLevel;
 

@@ -56,8 +56,10 @@ partial class Record
         public IEnumerator<object?> GetEnumerator() => _Values.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+        // ----------------------------------------------------
+
         /// <inheritdoc/>
-        public override string ToString() => $"Count: {Count}";
+        public override string ToString() => ToDebugString(Count);
 
         public string ToDebugString(int count)
         {
@@ -67,18 +69,30 @@ partial class Record
             var sb = new StringBuilder();
             sb.Append($"{Count}:[");
 
-            for (int i = 0; i < count; i++)
+            var n = false;
+            var i = 0;
+            
+            while ((i < count && i < Count))
             {
-                if (i > 0) sb.Append(", ");
+                if (_Values[i] != null)
+                {
+                    if (n) sb.Append(", ");
 
-                var value = _Values[i].Sketch();
-                var entry = _Schema is null ? $"({i})" : _Schema[i].ToString();
-                sb.Append($"{entry}='{value}'");
+                    var value = _Values[i].Sketch();
+                    var entry = _Schema is null ? $"({i})" : _Schema[i].Identifier.Value;
+                    sb.Append($"{entry}='{value}'");
+
+                    n = true;
+                }
+
+                i++;
             }
 
             sb.Append(count < Count ? ", ...]" : "]");
             return sb.ToString();
         }
+
+        // ----------------------------------------------------
 
         /// <summary>
         /// Throws an exception is this instance is a schema-less one.
