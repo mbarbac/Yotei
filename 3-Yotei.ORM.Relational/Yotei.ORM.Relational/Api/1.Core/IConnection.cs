@@ -13,11 +13,6 @@ public partial interface IConnection : ORM.IConnection
     /// <inheritdoc cref="ORM.IConnection.Records"/>
     new IRecordsGate Records { get; }
 
-    /*
-    /// <inheritdoc cref="ORM.IConnection.Transaction"/>
-    new ITransaction Transaction { get; }
-    */
-
     /// <inheritdoc cref="ORM.IConnection.CreateTransaction"/>
     new ITransaction CreateTransaction();
 

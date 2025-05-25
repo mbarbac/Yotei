@@ -56,13 +56,6 @@ public partial interface IConnection : IDisposableEx
 
     // ----------------------------------------------------
 
-    /*
-    /// <summary>
-    /// Gets the default transaction associated with this instance.
-    /// </summary>
-    ITransaction Transaction { get; }
-    */
-
     /// <summary>
     /// Invoked to create a new transaction of the appropriate type for this instance.
     /// </summary>

@@ -133,25 +133,7 @@ public partial class Connection : ORM.Code.Connection, IConnection
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public IsolationLevel IsolationLevel
-    {
-        get => _IsolationLevel;
-        set
-        {
-            //Transaction = null!; // Throws if it was an active one.
-            _IsolationLevel = value;
-        }
-    }
-    IsolationLevel _IsolationLevel = Code.Transaction.ISOLATIONLEVEL;
-
-    /*
-    /// <inheritdoc/>
-    public new ITransaction Transaction
-    {
-        get => (ITransaction)base.Transaction;
-        protected set => base.Transaction = value;
-    }
-    */
+    public IsolationLevel IsolationLevel { get; set; } = Transaction.ISOLATIONLEVEL;
 
     /// <inheritdoc/>
     public override ITransaction CreateTransaction() => CreateTransaction(IsolationLevel);

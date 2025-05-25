@@ -27,12 +27,12 @@ public abstract partial class Connection : DisposableClass, IConnection
         RetryInterval = source.RetryInterval;        
         foreach (var item in source.ToDatabase) ToDatabase.Add(item);
     }
+
     /// <inheritdoc/>
     protected override void OnDispose(bool disposing)
     {
         if (IsDisposed || !disposing) return;
 
-        //try { _Transaction?.Dispose(); } catch { }
         try { if (IsOpen) Close(); } catch { }
         try { AsyncLock.Dispose(); } catch { }
     }
@@ -42,7 +42,6 @@ public abstract partial class Connection : DisposableClass, IConnection
     {
         if (IsDisposed || !disposing) return;
 
-        //try { if (_Transaction != null) await _Transaction.DisposeAsync().ConfigureAwait(false); } catch { }
         try { if (IsOpen) await CloseAsync().ConfigureAwait(false); } catch { }
         try { await AsyncLock.DisposeAsync().ConfigureAwait(false); } catch { }
     }
@@ -165,10 +164,6 @@ public abstract partial class Connection : DisposableClass, IConnection
 
         using (var disp = AsyncLock.Lock())
         {
-            //if (_Transaction != null && _Transaction.IsActive)
-            //{
-            //    _Transaction.Abort();
-            //}
             OnClose();
         }
     }
@@ -181,10 +176,6 @@ public abstract partial class Connection : DisposableClass, IConnection
 
         await using (var disp = await AsyncLock.LockAsync().ConfigureAwait(false))
         {
-            //if (_Transaction != null && _Transaction.IsActive)
-            //{
-            //    await _Transaction.AbortAsync().ConfigureAwait(false);
-            //}
             await OnCloseAsync().ConfigureAwait(false);
         }
     }
@@ -215,52 +206,6 @@ public abstract partial class Connection : DisposableClass, IConnection
 
     /// <inheritdoc/>
     public abstract ITransaction CreateTransaction();
-
-    /*
-    /// <summary>
-    /// Gets the default transaction associated with this instance.
-    /// </summary>
-    /// <remarks>We allow a protected setter that can only take <c>null</c> as its value, as a
-    /// flag to recreate the default transaction, but only when the existing one was not active.
-    /// </remarks>
-    public ITransaction Transaction
-    {
-        // We need to always return a valid instance even if disposed or disposing...
-        get
-        {
-            if (IsDisposed || OnDisposing)
-            {
-                _Transaction ??= CreateTransaction();
-                _Transaction.Dispose();
-            }
-            else
-            {
-                if (_Transaction == null || _Transaction.IsDisposed)
-                {
-                    _Transaction = CreateTransaction();
-                }
-            }
-            return _Transaction;
-        }
-
-        // We allow setting to null as a flag to recreate the default one, if not active!
-        protected set
-        {
-            if (value is not null) throw new ArgumentException("Only 'NULL' is allowed.");
-
-            if (_Transaction is not null &&
-                _Transaction.IsActive)
-                throw new InvalidOperationException(
-                    "Default transaction is active and so it cannot be nullified.")
-                    .WithData(this);
-
-            _Transaction = null;
-        }
-    }
-    ITransaction? _Transaction;
-    */
-
-    // ----------------------------------------------------
 
     /// <inheritdoc/>
     public IValueConverterList ToDatabase { get; } = new ValueConverterList();
