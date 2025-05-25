@@ -7,7 +7,8 @@ namespace Yotei.ORM;
 // ========================================================
 /// <summary>
 /// Represents the ordered collection of schema entries that describe the structure and contents
-/// of given records. Elements with duplicated or ambiguous identifiers are not allowed.
+/// of given records.
+/// <br/> Elements with duplicated or ambiguous identifiers are not allowed.
 /// </summary>
 [IInvariantList<TKey, IItem>]
 public partial interface ISchema : IEquatable<IHost>

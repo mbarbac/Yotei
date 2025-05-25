@@ -31,6 +31,9 @@ public partial class Connection : ORM.Code.Connection, IConnection
     /// <inheritdoc/>
     public new IEngine Engine => (IEngine)base.Engine;
 
+    /// <inheritdoc/>
+    public new IRecordsGate Records => (IRecordsGate)base.Records;
+
     // ----------------------------------------------------
 
     DbConnectionStringBuilder? _Builder;

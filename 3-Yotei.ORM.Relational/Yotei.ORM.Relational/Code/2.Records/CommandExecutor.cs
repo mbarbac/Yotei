@@ -23,8 +23,60 @@ public class CommandExecutor : ORM.Code.CommandExecutor, ICommandExecutor
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    protected override int OnExecute() => throw null;
+    protected override int OnExecute()
+    {
+        var connection = (IConnection)Command.Connection;
+        var dbcmd = (DbCommand?)null;
+
+        try
+        {
+            dbcmd = connection.Records.CreateDbCommand(Command, iterable: false);
+
+            var r = dbcmd.ExecuteNonQuery();
+            return r;
+        }
+        catch
+        {
+            if (dbcmd != null)
+            {
+                try { dbcmd.Cancel(); }
+                catch { }
+            }
+
+            throw;
+        }
+        finally
+        {
+            if (dbcmd != null) dbcmd.Dispose();
+        }
+    }
 
     /// <inheritdoc/>
-    protected override ValueTask<int> OnExecuteAsync(CancellationToken token) => throw null;
+    protected override async ValueTask<int> OnExecuteAsync(CancellationToken token)
+    {
+        var connection = (IConnection)Command.Connection;
+        var dbcmd = (DbCommand?)null;
+
+        try
+        {
+            dbcmd = connection.Records.CreateDbCommand(Command, iterable: false);
+
+            var r = await dbcmd.ExecuteNonQueryAsync(token).ConfigureAwait(false);
+            return r;
+        }
+        catch
+        {
+            if (dbcmd != null)
+            {
+                try { dbcmd.Cancel(); }
+                catch { }
+            }
+
+            throw;
+        }
+        finally
+        {
+            if (dbcmd != null) await dbcmd.DisposeAsync().ConfigureAwait(false);
+        }
+    }
 }

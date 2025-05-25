@@ -10,6 +10,11 @@ public partial interface IConnection : ORM.IConnection
     /// <inheritdoc cref="ORM.IConnection.Engine"/>
     new IEngine Engine { get; }
 
+    /// <inheritdoc cref="ORM.IConnection.Records"/>
+    new IRecordsGate Records { get; }
+
+    // ----------------------------------------------------
+
     /// <summary>
     /// The default isolation level of transactions associated with this instance.
     /// <br/> The setter throws an exception if there is an active existing transaction.
