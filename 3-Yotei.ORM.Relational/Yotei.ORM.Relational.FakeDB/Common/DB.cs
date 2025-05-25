@@ -25,6 +25,16 @@ public static partial class DB
     public static object Syncroot { get; } = new();
 
     /// <summary>
+    /// Determines the default mode of the test environment.
+    /// </summary>
+    public static bool LongEnvironment =>
+#if DEBUG
+        false;
+#else
+        true;
+#endif
+
+    /// <summary>
     /// Determines if the test database is a long or short one.
     /// </summary>
     public static bool IsLongDatabase

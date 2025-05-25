@@ -25,7 +25,7 @@ public static class Test_Connection
         Assert.Equal(2, connection.ToDatabase.Count);
         Locale locale = new();
 
-        DateOnly dateonly = new DateOnly(2001, 12, 31);
+        DateOnly dateonly = new(2001, 12, 31);
         DateTime datetime = (DateTime)connection.ToDatabase.TryConvert(dateonly, locale)!;
         Assert.Equal(2001, datetime.Year);
         Assert.Equal(12, datetime.Month);
