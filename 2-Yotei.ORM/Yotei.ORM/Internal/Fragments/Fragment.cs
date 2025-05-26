@@ -12,28 +12,27 @@ public partial class Fragment
         /// <summary>
         /// Initializes a new instance.
         /// </summary>
-        /// <param name="info"></param>
-        public Entry(ICommandInfo info) => CommandInfo = info.ThrowWhenNull();
+        public Entry(ICommand command) => Command = command.ThrowWhenNull();
 
         /// <summary>
         /// Copy constructor.
         /// </summary>
         /// <param name="source"></param>
-        public Entry(Entry source) => CommandInfo = source.CommandInfo;
-
-        /// <summary>
-        /// The command info wrapped by this instance.
-        /// </summary>
-        public ICommandInfo CommandInfo { get; }
+        public Entry(Entry source) : this(source.Command) { }
 
         /// <inheritdoc/>
-        public override string ToString() => CommandInfo.ToString()!;
+        public override string ToString() => Visit().ToString()!;
 
         /// <summary>
-        /// Returns the database string appropriate for the contents of this element.
+        /// The command this instance is associated with.
+        /// </summary>
+        public ICommand Command { get; }
+
+        /// <summary>
+        /// Returns the command info object that represents the contents of this entry.
         /// </summary>
         /// <returns></returns>
-        public abstract string Visit();
+        public abstract ICommandInfo.IBuilder Visit();
     }
 
     // ====================================================
@@ -41,9 +40,10 @@ public partial class Fragment
     /// Represents a list-alike collection of fragments.
     /// </summary>
     [Cloneable]
-    [DebuggerDisplay("{ToDebugString(5)}")]
-    public abstract partial class Master : CoreList<Entry>
+    public abstract partial class Master : IEnumerable<Entry>
     {
+        readonly List<Entry> Items = [];
+
         /// <summary>
         /// Initializes a new instance.
         /// </summary>
@@ -54,10 +54,14 @@ public partial class Fragment
         /// Copy constructor.
         /// </summary>
         /// <param name="source"></param>
-        public Master(Master source) : this(source.Command) => AddRange(source);
+        public Master(Master source) : this(source.Command) => Items.AddRange(source.Items);
 
         /// <inheritdoc/>
-        public override string ToString() => $"Count: {Count}";
+        public override string ToString() => Visit().ToString()!;
+
+        /// <inheritdoc/>
+        public IEnumerator<Entry> GetEnumerator() => Items.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         /// <summary>
         /// The command this instance is associated with.
@@ -65,9 +69,34 @@ public partial class Fragment
         public ICommand Command { get; }
 
         /// <summary>
-        /// Returns the database string appropriate for the contents of this element.
+        /// Gets the number of elements in this collection.
+        /// </summary>
+        public int Count => Items.Count;
+
+        /// <summary>
+        /// Gets the entry stored at the given index.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public Entry this[int index] => Items[index];
+
+        /// <summary>
+        /// Clears all the contents captured by this instance.
+        /// </summary>
+        public void Clear() => Items.Clear();
+
+        /// <summary>
+        /// Captures into an entry in this instance the contents obtained from the given dynamic
+        /// lambda expression.
+        /// </summary>
+        /// <param name="expression"></param>
+        public abstract void Capture(Func<dynamic, object> expression);
+
+        /// <summary>
+        /// Returns the command info object that represents the contents of this collection of
+        /// fragments.
         /// </summary>
         /// <returns></returns>
-        public abstract string Visit();
+        public abstract ICommandInfo.IBuilder Visit();
     }
 }
