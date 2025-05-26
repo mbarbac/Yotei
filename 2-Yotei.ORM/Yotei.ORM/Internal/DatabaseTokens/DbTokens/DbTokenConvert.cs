@@ -4,7 +4,8 @@
 /// <summary>
 /// Represents a conversion or cast operation of a given token.
 /// </summary>
-public abstract class DbTokenConvert : DbToken
+[Cloneable]
+public abstract partial class DbTokenConvert : DbToken
 {
     /// <summary>
     /// Initializes a new instance.
@@ -24,7 +25,8 @@ public abstract class DbTokenConvert : DbToken
     /// <summary>
     /// Represents a conversion or cast operation of a given token to a given type.
     /// </summary>
-    public class ToType : DbTokenConvert
+    [Cloneable]
+    public partial class ToType : DbTokenConvert
     {
         /// <summary>
         /// Initializes a new instance.
@@ -32,6 +34,12 @@ public abstract class DbTokenConvert : DbToken
         /// <param name="type"></param>
         /// <param name="target"></param>
         public ToType(Type type, DbToken target) : base(target) => Type = type.ThrowWhenNull();
+
+        /// <summary>
+        /// Copy constructor.
+        /// </summary>
+        /// <param name="source"></param>
+        public ToType(ToType source) : this(source.Type, source.Target) { }
 
         /// <inheritdoc/>
         public override string ToString() => $"(({Type.EasyName()}) {Target})";
@@ -69,7 +77,8 @@ public abstract class DbTokenConvert : DbToken
     /// <summary>
     /// Represents a conversion or cast operation of a given token to a given type specification.
     /// </summary>
-    public class ToSpec : DbTokenConvert
+    [Cloneable]
+    public partial class ToSpec : DbTokenConvert
     {
         /// <summary>
         /// Initializes a new instance.
@@ -77,6 +86,12 @@ public abstract class DbTokenConvert : DbToken
         /// <param name="type"></param>
         /// <param name="target"></param>
         public ToSpec(string type, DbToken target) : base(target) => Type = type.NotNullNotEmpty();
+
+        /// <summary>
+        /// Copy constructor.
+        /// </summary>
+        /// <param name="source"></param>
+        public ToSpec(ToSpec source) : this(source.Type, source.Target) { }
 
         /// <inheritdoc/>
         public override string ToString() => $"(({Type}) {Target})";

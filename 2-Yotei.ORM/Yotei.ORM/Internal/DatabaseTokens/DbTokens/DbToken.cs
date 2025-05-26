@@ -4,7 +4,8 @@
 /// <summary>
 /// Represents an arbitrary token in a database expression.
 /// </summary>
-public abstract class DbToken : IEquatable<DbToken>
+[Cloneable]
+public abstract partial class DbToken : IEquatable<DbToken>
 {
     /// <summary>
     /// Returns the dynamic argument associated with this instance, or <c>null</c> if it cannot
@@ -64,5 +65,5 @@ public abstract class DbToken : IEquatable<DbToken>
         static bool ValidOtherChar(char c) => ValidFirstChar(c);
     }
 
-    static string VALID_FIRST = "_$@#";
+    static readonly string VALID_FIRST = "_$@#";
 }

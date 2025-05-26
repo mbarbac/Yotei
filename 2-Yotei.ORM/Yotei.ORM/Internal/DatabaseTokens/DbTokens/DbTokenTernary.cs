@@ -4,7 +4,8 @@
 /// <summary>
 /// Represents a ternary expression (left ? middle : right) in a database expression.
 /// </summary>
-public class DbTokenTernary : DbToken
+[Cloneable]
+public partial class DbTokenTernary : DbToken
 {
     /// <summary>
     /// Initializes a new instance.
@@ -18,6 +19,12 @@ public class DbTokenTernary : DbToken
         Middle = middle.ThrowWhenNull();
         Right = right.ThrowWhenNull();
     }
+
+    /// <summary>
+    /// Copy constructor.
+    /// </summary>
+    /// <param name="source"></param>
+    public DbTokenTernary(DbTokenTernary source) : this(source.Left, source.Middle, source.Right) { }
 
     /// <inheritdoc/>
     public override string ToString() => $"({Left} ? {Middle} : {Right})";

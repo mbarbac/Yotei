@@ -5,7 +5,8 @@
 /// Represents an arbitrary literal in a database expression that, by convention, will never be
 /// captured as an argument. Literal values can be empty ones, but not null ones.
 /// </summary>
-public class DbTokenLiteral : DbToken
+[Cloneable]
+public partial class DbTokenLiteral : DbToken
 {
     /// <summary>
     /// Represents an empty literal.
@@ -17,6 +18,12 @@ public class DbTokenLiteral : DbToken
     /// </summary>
     /// <param name="value"></param>
     public DbTokenLiteral(string value) => Value = value.ThrowWhenNull();
+
+    /// <summary>
+    /// Copy constructor.
+    /// </summary>
+    /// <param name="source"></param>
+    public DbTokenLiteral(DbTokenLiteral source) : this(source.Value) { }
 
     /// <inheritdoc/>
     public override string ToString() => Value;

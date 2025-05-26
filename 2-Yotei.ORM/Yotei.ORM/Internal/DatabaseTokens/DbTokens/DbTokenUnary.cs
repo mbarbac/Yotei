@@ -4,7 +4,8 @@
 /// <summary>
 /// Represents a unary operation against a given token.
 /// </summary>
-public class DbTokenUnary : DbToken
+[Cloneable]
+public partial class DbTokenUnary : DbToken
 {
     /// <summary>
     /// Initializes a new instance.
@@ -16,6 +17,12 @@ public class DbTokenUnary : DbToken
         Operation = ValidatedOperation(operation);
         Target = target.ThrowWhenNull();
     }
+
+    /// <summary>
+    /// Copy constructor.
+    /// </summary>
+    /// <param name="source"></param>
+    public DbTokenUnary(DbTokenUnary source) : this(source.Operation, source.Target) { }
 
     /// <inheritdoc/>
     public override string ToString() => $"({Operation} {Target})";

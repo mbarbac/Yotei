@@ -15,6 +15,10 @@ public partial interface IInsertCommand
     /// <br/>- Alternate syntax: 'x => x.Source.As(...) = Value'.
     /// </summary>
     /// <param name="specs"></param>
+    /// <remarks>
+    /// All syntaxes can be preceeded or followed by invoke tokens to represent head and tail
+    /// elements before and after the given spec, as in: 'x => x(...).yyy.x(...)'.
+    /// </remarks>
     /// <returns></returns>
     IInsertCommand Columns(params Func<dynamic, object>[] specs);
 }

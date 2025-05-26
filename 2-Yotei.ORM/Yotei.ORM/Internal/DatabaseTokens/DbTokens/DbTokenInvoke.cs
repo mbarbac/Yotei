@@ -3,7 +3,8 @@
 // ========================================================
 /// <summary>
 /// Represents a direct invocation on a given host token.
-public class DbTokenInvoke : DbTokenHosted
+[Cloneable]
+public partial class DbTokenInvoke : DbTokenHosted
 {
     /// <summary>
     /// Initializes a new parameter-less instance.
@@ -24,7 +25,11 @@ public class DbTokenInvoke : DbTokenHosted
         Arguments = new(args);
     }
 
-    // ----------------------------------------------------
+    /// <summary>
+    /// Copy constructor.
+    /// </summary>
+    /// <param name="source"></param>
+    public DbTokenInvoke(DbTokenInvoke source) : this(source.Host, source.Arguments) { }
 
     /// <inheritdoc/>
     public override string ToString()
@@ -32,6 +37,10 @@ public class DbTokenInvoke : DbTokenHosted
         var args = Arguments.ToString(true);
         return $"{Host}{args}";
     }
+
+    /// <inheritdoc/>
+    public override DbTokenInvoke ChangeHost(
+        DbToken host) => (DbTokenInvoke)base.ChangeHost(host);
 
     /// <summary>
     /// The arguments used by this instance, which may be an empty collection.

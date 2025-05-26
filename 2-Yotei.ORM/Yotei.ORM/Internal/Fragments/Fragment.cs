@@ -21,18 +21,20 @@ public partial class Fragment
         public Entry(Entry source) : this(source.Command) { }
 
         /// <inheritdoc/>
-        public override string ToString() => Visit().ToString()!;
+        public override string ToString() => throw null;
 
         /// <summary>
         /// The command this instance is associated with.
         /// </summary>
         public ICommand Command { get; }
 
+        /*
         /// <summary>
         /// Returns the command info object that represents the contents of this entry.
         /// </summary>
         /// <returns></returns>
         public abstract ICommandInfo.IBuilder Visit();
+        */
     }
 
     // ====================================================
@@ -57,7 +59,7 @@ public partial class Fragment
         public Master(Master source) : this(source.Command) => Items.AddRange(source.Items);
 
         /// <inheritdoc/>
-        public override string ToString() => Visit().ToString()!;
+        public override string ToString() => throw null;
 
         /// <inheritdoc/>
         public IEnumerator<Entry> GetEnumerator() => Items.GetEnumerator();
@@ -85,18 +87,22 @@ public partial class Fragment
         /// </summary>
         public void Clear() => Items.Clear();
 
+        /*
         /// <summary>
         /// Captures into an entry in this instance the contents obtained from the given dynamic
         /// lambda expression.
         /// </summary>
         /// <param name="expression"></param>
         public abstract void Capture(Func<dynamic, object> expression);
+        */
 
+        /*
         /// <summary>
         /// Returns the command info object that represents the contents of this collection of
         /// fragments.
         /// </summary>
         /// <returns></returns>
         public abstract ICommandInfo.IBuilder Visit();
+        */
     }
 }

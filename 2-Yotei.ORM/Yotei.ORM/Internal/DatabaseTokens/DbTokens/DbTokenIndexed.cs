@@ -4,7 +4,8 @@
 /// <summary>
 /// Represents an indexed getter on a given host token.
 /// </summary>
-public class DbTokenIndexed : DbTokenHosted
+[Cloneable]
+public partial class DbTokenIndexed : DbTokenHosted
 {
     /// <summary>
     /// Initialises a new instance.
@@ -19,8 +20,18 @@ public class DbTokenIndexed : DbTokenHosted
             "Collection of indexes cannot be an empty one.");
     }
 
+    /// <summary>
+    /// Copy constructor.
+    /// </summary>
+    /// <param name="source"></param>
+    public DbTokenIndexed(DbTokenIndexed source) : this(source.Host, source.Indexes) { }
+
     /// <inheritdoc/>
     public override string ToString() => $"{Host}{Indexes.ToString(false)}";
+
+    /// <inheritdoc/>
+    public override DbTokenIndexed ChangeHost(
+        DbToken host) => (DbTokenIndexed)base.ChangeHost(host);
 
     /// <summary>
     /// The indexes used by this instance.

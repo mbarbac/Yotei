@@ -6,13 +6,20 @@
 /// <br/> Instances of this type are considered translation artifacts, with no representation
 /// in a database command.
 /// </summary>
-public class DbTokenArgument : DbToken
+[Cloneable]
+public partial class DbTokenArgument : DbToken
 {
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
     /// <param name="name"></param>
     public DbTokenArgument(string name) => Name = ValidateTokenName(name);
+
+    /// <summary>
+    /// Copy constructor.
+    /// </summary>
+    /// <param name="source"></param>
+    public DbTokenArgument(DbTokenArgument source) : this(source.Name) { }
 
     /// <inheritdoc/>
     public override string ToString() => Name;

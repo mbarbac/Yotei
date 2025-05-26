@@ -5,13 +5,20 @@
 /// Represents an arbitrary value in a database expression that typically is intended to be
 /// captured as an argument.
 /// </summary>
-public class DbTokenValue : DbToken
+[Cloneable]
+public partial class DbTokenValue : DbToken
 {
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
     /// <param name="value"></param>
     public DbTokenValue(object? value) => Value = Value = ValidateValue(value);
+
+    /// <summary>
+    /// Copy constructor.
+    /// </summary>
+    /// <param name="source"></param>
+    public DbTokenValue(DbTokenValue source) : this(source.Value.TryClone()) { }
 
     /// <inheritdoc/>
     public override string ToString() => Value switch

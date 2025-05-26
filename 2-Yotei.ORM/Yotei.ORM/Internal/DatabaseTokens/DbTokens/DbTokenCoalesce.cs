@@ -4,7 +4,8 @@
 /// <summary>
 /// Represents a coalesce expression (left ?? right) in a database expression.
 /// </summary>
-public class DbTokenCoalesce : DbToken
+[Cloneable]
+public partial class DbTokenCoalesce : DbToken
 {
     /// <summary>
     /// Initializes a new instance.
@@ -16,6 +17,12 @@ public class DbTokenCoalesce : DbToken
         Left = left.ThrowWhenNull();
         Right = right.ThrowWhenNull();
     }
+
+    /// <summary>
+    /// Copy constructor.
+    /// </summary>
+    /// <param name="source"></param>
+    public DbTokenCoalesce(DbTokenCoalesce source) : this(source.Left, source.Right) { }
 
     /// <inheritdoc/>
     public override string ToString() => $"({Left} ?? {Right})";

@@ -3,7 +3,8 @@
 // ========================================================
 /// <summary>
 /// Represents a method invocation on a given host token.
-public class DbTokenMethod : DbTokenHosted
+[Cloneable]
+public partial class DbTokenMethod : DbTokenHosted
 {
     /// <summary>
     /// Initializes a new parameter-less instance.
@@ -45,7 +46,15 @@ public class DbTokenMethod : DbTokenHosted
         Arguments = new(args);
     }
 
-    // ----------------------------------------------------
+    /// <summary>
+    /// Copy constructor.
+    /// </summary>
+    /// <param name="source"></param>
+    public DbTokenMethod(DbTokenMethod source) : this(
+        source.Host,
+        source.Name,
+        source.TypeArguments,
+        source.Arguments) { }
 
     /// <summary>
     /// Returns an immutable array of types based upon the given collection.
@@ -65,8 +74,6 @@ public class DbTokenMethod : DbTokenHosted
         return list.ToImmutableArray();
     }
 
-    // ----------------------------------------------------
-
     /// <inheritdoc/>
     public override string ToString()
     {
@@ -78,6 +85,10 @@ public class DbTokenMethod : DbTokenHosted
 
         return $"{Host}.{Name}{types}{args}";
     }
+
+    /// <inheritdoc/>
+    public override DbTokenMethod ChangeHost(
+        DbToken host) => (DbTokenMethod)base.ChangeHost(host);
 
     /// <summary>
     /// The method's name.

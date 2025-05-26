@@ -4,7 +4,8 @@
 /// <summary>
 /// Represents a token that carries a single-part identifier.
 /// </summary>
-public class DbTokenIdentifier : DbTokenHosted
+[Cloneable]
+public partial class DbTokenIdentifier : DbTokenHosted
 {
     /// <summary>
     /// Initializes a new instance based upon the given identifier.
@@ -36,8 +37,18 @@ public class DbTokenIdentifier : DbTokenHosted
         }
     }
 
+    /// <summary>
+    /// Copy constructor.
+    /// </summary>
+    /// <param name="source"></param>
+    public DbTokenIdentifier(DbTokenIdentifier source) : this(source.Host, source.Identifier) { }
+
     /// <inheritdoc/>
     public override string ToString() => $"{Host}.{Identifier}";
+
+    /// <inheritdoc/>
+    public override DbTokenIdentifier ChangeHost(
+        DbToken host) => (DbTokenIdentifier)base.ChangeHost(host);
 
     /// <summary>
     /// The single-part identifier carried by this instance.

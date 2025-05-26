@@ -6,7 +6,8 @@
 /// <br/> The value carried by this instance is the immutable <see cref="CommandInfo"/> object
 /// that carries the command's information.
 /// </summary>
-public class DbTokenCommand : DbToken
+[Cloneable]
+public partial class DbTokenCommand : DbToken
 {
     /// <summary>
     /// Initializes a new instance.
@@ -20,6 +21,12 @@ public class DbTokenCommand : DbToken
     /// </summary>
     /// <param name="info"></param>
     public DbTokenCommand(ICommandInfo info) => CommandInfo = info.ThrowWhenNull();
+
+    /// <summary>
+    /// Copy constructor.
+    /// </summary>
+    /// <param name="source"></param>
+    public DbTokenCommand(DbTokenCommand source) : this(source.CommandInfo) { }
 
     /// <inheritdoc/>
     public override string ToString()

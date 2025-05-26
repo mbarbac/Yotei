@@ -21,9 +21,6 @@ public partial class FragmentWhere
         /// </summary>
         /// <param name="source"></param>
         public Entry(Entry source) : base(source) { }
-
-        /// <inheritdoc/>
-        public override ICommandInfo.IBuilder Visit() => throw null;
     }
 
     // ====================================================
@@ -44,11 +41,5 @@ public partial class FragmentWhere
         /// </summary>
         /// <param name="source"></param>
         public Master(Master source) : base(source) { }
-
-        /// <inheritdoc/>
-        public override void Capture(Func<dynamic, object> expression) => throw null;
-
-        /// <inheritdoc/>
-        public override ICommandInfo.IBuilder Visit() => throw null;
     }
 }

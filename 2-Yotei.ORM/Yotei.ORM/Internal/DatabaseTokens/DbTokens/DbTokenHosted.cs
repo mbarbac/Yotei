@@ -4,7 +4,8 @@
 /// <summary>
 /// Represents a hosted token.
 /// </summary>
-public abstract class DbTokenHosted : DbToken
+[Cloneable]
+public abstract partial class DbTokenHosted : DbToken
 {
     /// <summary>
     /// Initializes a new instance.
@@ -18,5 +19,23 @@ public abstract class DbTokenHosted : DbToken
     /// <summary>
     /// The host of this instance.
     /// </summary>
-    public DbToken Host { get; }
+    public DbToken Host { get; private set; }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns a clone of this instance where the original host has been replaced with the given
+    /// one.
+    /// </summary>
+    /// <param name="host"></param>
+    /// <returns></returns>
+    public virtual DbTokenHosted ChangeHost(DbToken host)
+    {
+        host.ThrowWhenNull();
+
+        if (ReferenceEquals(Host, host)) return this;
+
+        var temp = Clone(); temp.Host = host;
+        return temp;
+    }
 }

@@ -15,6 +15,10 @@ public partial interface IQueryCommand : ICommand, IEnumerableCommand
     /// <br/>- Alternate syntax: 'x => x.Source.As(...)'.
     /// </summary>
     /// <param name="specs"></param>
+    /// <remarks>
+    /// All syntaxes can be preceeded or followed by invoke tokens to represent head and tail
+    /// elements before and after the given spec, as in: 'x => x(...).yyy.x(...)'.
+    /// </remarks>
     /// <returns></returns>
     IQueryCommand From(params Func<dynamic, object>[] specs);
 
@@ -26,6 +30,10 @@ public partial interface IQueryCommand : ICommand, IEnumerableCommand
     /// <br/>- Alternate syntax: 'x => x.Or(...)'.
     /// </summary>
     /// <param name="specs"></param>
+    /// <remarks>
+    /// All syntaxes can be preceeded or followed by invoke tokens to represent head and tail
+    /// elements before and after the given spec, as in: 'x => x(...).yyy.x(...)'.
+    /// </remarks>
     /// <returns></returns>
     IQueryCommand Where(params Func<dynamic, object>[] specs);
 
@@ -37,6 +45,10 @@ public partial interface IQueryCommand : ICommand, IEnumerableCommand
     /// <br/>- Alternate syntax: 'x => x.All()'.
     /// </summary>
     /// <param name="specs"></param>
+    /// <remarks>
+    /// All syntaxes can be preceeded or followed by invoke tokens to represent head and tail
+    /// elements before and after the given spec, as in: 'x => x(...).yyy.x(...)'.
+    /// </remarks>
     /// <returns></returns>
     IQueryCommand Select(params Func<dynamic, object>[] specs);
 
@@ -47,18 +59,21 @@ public partial interface IQueryCommand : ICommand, IEnumerableCommand
     /// <br/>- Ordering: ASC, ASCENDING, DESC, DESCENDING.
     /// </summary>
     /// <param name="specs"></param>
+    /// <remarks>
+    /// All syntaxes can be preceeded or followed by invoke tokens to represent head and tail
+    /// elements before and after the given spec, as in: 'x => x(...).yyy.x(...)'.
+    /// </remarks>
     /// <returns></returns>
     IQueryCommand OrderBy(params Func<dynamic, object>[] specs);
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Gets or sets the value of the DISTINCT clause.
+    /// Sets the value of the DISTINCT clause to the given value.
     /// </summary>
-    /// <remarks>
-    /// The underlying database engine may not support DISTINCT operations.
-    /// </remarks>
-    [With] bool Distinct { get; set; }
+    /// <param name="value"></param>
+    /// <returns></returns>
+    IQueryCommand Distinct(bool value);
 
     /// <summary>
     /// Adds to the contents of the JOIN clause the ones obtained from parsing the given
@@ -66,10 +81,13 @@ public partial interface IQueryCommand : ICommand, IEnumerableCommand
     /// <br/>- Standard syntax: 'x => x.Source.As(...).On(...)'.
     /// <br/>- Alternate syntax: 'x => x.Join(join-type).Source.As(...).On(...)'.
     /// </summary>
+    /// <param name="specs"></param>
     /// <remarks>
     /// The underlying database engine may not support JOIN operations.
+    /// <br/>
+    /// All syntaxes can be preceeded or followed by invoke tokens to represent head and tail
+    /// elements before and after the given spec, as in: 'x => x(...).yyy.x(...)'.
     /// </remarks>
-    /// <param name="specs"></param>
     /// <returns></returns>
     IQueryCommand Join(params Func<dynamic, object>[] specs);
 
@@ -78,10 +96,13 @@ public partial interface IQueryCommand : ICommand, IEnumerableCommand
     /// dynamic lambda expression.
     /// <br/>- Standard syntax: 'x => x.Source'.
     /// </summary>
+    /// <param name="specs"></param>
     /// <remarks>
     /// The underlying database engine may not support GROUP BY operations.
+    /// <br/>
+    /// All syntaxes can be preceeded or followed by invoke tokens to represent head and tail
+    /// elements before and after the given spec, as in: 'x => x(...).yyy.x(...)'.
     /// </remarks>
-    /// <param name="specs"></param>
     /// <returns></returns>
     IQueryCommand GroupBy(params Func<dynamic, object>[] specs);
 
@@ -92,10 +113,13 @@ public partial interface IQueryCommand : ICommand, IEnumerableCommand
     /// <br/>- Alternate syntax: 'x => x.And(...)'.
     /// <br/>- Alternate syntax: 'x => x.Or(...)'.
     /// </summary>
+    /// <param name="specs"></param>
     /// <remarks>
     /// The underlying database engine may not support GROUP BY operations.
+    /// <br/>
+    /// All syntaxes can be preceeded or followed by invoke tokens to represent head and tail
+    /// elements before and after the given spec, as in: 'x => x(...).yyy.x(...)'.
     /// </remarks>
-    /// <param name="specs"></param>
     /// <returns></returns>
     IQueryCommand Having(params Func<dynamic, object>[] specs);
 }

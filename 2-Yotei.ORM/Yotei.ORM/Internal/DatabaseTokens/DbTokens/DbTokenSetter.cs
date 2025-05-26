@@ -4,7 +4,8 @@
 /// <summary>
 /// Represents the assignation of an arbitrary token to a target one.
 /// </summary>
-public class DbTokenSetter : DbToken
+[Cloneable]
+public partial class DbTokenSetter : DbToken
 {
     /// <summary>
     /// Initializes a new instance.
@@ -16,6 +17,12 @@ public class DbTokenSetter : DbToken
         Target = target.ThrowWhenNull();
         Value = value.ThrowWhenNull();
     }
+
+    /// <summary>
+    /// Copy constructor.
+    /// </summary>
+    /// <param name="source"></param>
+    public DbTokenSetter(DbTokenSetter source) : this(source.Target, source.Value) { }
 
     /// <inheritdoc/>
     public override string ToString() => $"({Target} = {Value})";

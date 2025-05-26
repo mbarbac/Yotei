@@ -4,7 +4,8 @@
 /// <summary>
 /// Represents a binary operation between two given tokens.
 /// </summary>
-public class DbTokenBinary : DbToken
+[Cloneable]
+public partial class DbTokenBinary : DbToken
 {
     /// <summary>
     /// Initializes a new instance.
@@ -21,6 +22,12 @@ public class DbTokenBinary : DbToken
 
     /// <inheritdoc/>
     public override string ToString() => $"({Left} {Operation} {Right})";
+
+    /// <summary>
+    /// Copy constructor.
+    /// </summary>
+    /// <param name="source"></param>
+    public DbTokenBinary(DbTokenBinary source) : this(source.Left, source.Operation, source.Right) { }
 
     /// <inheritdoc/>
     public override DbTokenArgument? GetArgument() => 
