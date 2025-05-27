@@ -29,10 +29,6 @@ public partial class DbTokenIndexed : DbTokenHosted
     /// <inheritdoc/>
     public override string ToString() => $"{Host}{Indexes.ToString(false)}";
 
-    /// <inheritdoc/>
-    public override DbTokenIndexed ChangeHost(
-        DbToken host) => (DbTokenIndexed)base.ChangeHost(host);
-
     /// <summary>
     /// The indexes used by this instance.
     /// </summary>

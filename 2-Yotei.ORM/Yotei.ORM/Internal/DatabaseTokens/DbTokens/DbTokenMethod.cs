@@ -86,10 +86,6 @@ public partial class DbTokenMethod : DbTokenHosted
         return $"{Host}.{Name}{types}{args}";
     }
 
-    /// <inheritdoc/>
-    public override DbTokenMethod ChangeHost(
-        DbToken host) => (DbTokenMethod)base.ChangeHost(host);
-
     /// <summary>
     /// The method's name.
     /// </summary>

@@ -46,10 +46,6 @@ public partial class DbTokenIdentifier : DbTokenHosted
     /// <inheritdoc/>
     public override string ToString() => $"{Host}.{Identifier}";
 
-    /// <inheritdoc/>
-    public override DbTokenIdentifier ChangeHost(
-        DbToken host) => (DbTokenIdentifier)base.ChangeHost(host);
-
     /// <summary>
     /// The single-part identifier carried by this instance.
     /// </summary>

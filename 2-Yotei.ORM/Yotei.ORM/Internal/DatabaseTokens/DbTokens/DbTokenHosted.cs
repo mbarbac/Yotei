@@ -24,18 +24,12 @@ public abstract partial class DbTokenHosted : DbToken
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a clone of this instance where the original host has been replaced with the given
-    /// one.
+    /// Changes the host of this instance with the given one.
+    /// <br/>
+    /// This method modifies this instance breaking its immutability, so caution is advised and,
+    /// in most circumstances, you should take a clone before using this method.
     /// </summary>
     /// <param name="host"></param>
     /// <returns></returns>
-    public virtual DbTokenHosted ChangeHost(DbToken host)
-    {
-        host.ThrowWhenNull();
-
-        if (ReferenceEquals(Host, host)) return this;
-
-        var temp = Clone(); temp.Host = host;
-        return temp;
-    }
+    public virtual void ChangeHost(DbToken host) => Host = host.ThrowWhenNull();
 }

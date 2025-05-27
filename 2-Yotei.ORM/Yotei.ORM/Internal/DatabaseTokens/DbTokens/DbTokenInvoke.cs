@@ -38,10 +38,6 @@ public partial class DbTokenInvoke : DbTokenHosted
         return $"{Host}{args}";
     }
 
-    /// <inheritdoc/>
-    public override DbTokenInvoke ChangeHost(
-        DbToken host) => (DbTokenInvoke)base.ChangeHost(host);
-
     /// <summary>
     /// The arguments used by this instance, which may be an empty collection.
     /// </summary>
