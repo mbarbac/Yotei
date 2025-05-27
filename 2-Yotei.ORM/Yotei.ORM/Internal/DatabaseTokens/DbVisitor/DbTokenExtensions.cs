@@ -1,4 +1,6 @@
-﻿#pragma warning disable IDE0038
+﻿#pragma warning disable IDE0008
+#pragma warning disable IDE0019
+#pragma warning disable IDE0038
 
 namespace Yotei.ORM.Internal;
 
@@ -6,75 +8,85 @@ namespace Yotei.ORM.Internal;
 public static class DbTokenExtensions
 {
     /// <summary>
-    /// Removes the last occurrence of a token that matches the given predicate, from the tree
-    /// represented by the given source token. If so, returns the new tree with that item
-    /// removed, and the item itself in the out parameter. Otherwise, returns the original
-    /// tree and the out parameter is set to <c>null</c>.
+    /// Extracts the head, body and tail parts from the given source tree of tokens, where the
+    /// head and tail ones are the combined chain of invoke operations at the head or tail of
+    /// that tree.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="item"></param>
-    /// <param name="predicate"></param>
     /// <returns></returns>
-    public static DbToken RemoveFirst(
-        this DbToken source, Predicate<DbToken> predicate, out DbToken? removed)
+    public static (DbTokenInvoke? Head, DbToken Body, DbTokenInvoke? Tail) GetPars(this DbToken source)
     {
         source.ThrowWhenNull();
-        predicate.ThrowWhenNull();
 
-        removed = null;
+        if (source is DbTokenArgument) return (null, source, null);
+        if (source is not DbTokenHosted) return (null, source, null);
 
-        if (source is DbTokenArgument) return source;
-        if (source is not DbTokenHosted) return source;
+        var arg = source.GetArgument()
+            ?? throw new InvalidOperationException(
+                "Cannot obtain dynamic argument of given source tree.").WithData(source);
 
-        var cloned = source.Clone();
-        var item = cloned;
-        var prev = (DbToken?)null;
-        var found = (DbToken?)null;
-        var first = true;
+        DbTokenInvoke? head = null;
+        DbTokenInvoke? tail = null;
+        DbToken body = source;
 
-        while (item is DbTokenHosted)
+        ExtractTail();
+        ExtractHead();
+        return (head, body, tail);
+
+        /// <summary>
+        /// Extracts the tail part, if possible.
+        /// </summary>
+        void ExtractTail()
         {
-            if (predicate(item))
+            while (true)
             {
-                found = item;
-                if (!first) prev = item;
-            }
+                body = body.RemoveLast(x => x is DbTokenInvoke, out var removed);
+                if (removed == null) break;
+                var invoke = (DbTokenInvoke)removed;
 
-            first = false;
-            item = ((DbTokenHosted)item).Host;
-        }
-
-        if (found != null)
-        {
-            if (prev == null) // Found the last one in the tree...
-            {
-                var host = ((DbTokenHosted)found).Host;
-
-                removed = found;
-                return host;
-            }
-            else // Found an intermediate one...
-            {
-                var host = ((DbTokenHosted)found).Host;
-
-                removed = found;
-                ((DbTokenHosted)prev).ChangeHost(host);
-                return cloned;
+                if (tail is null) tail = invoke;
+                else
+                {
+                    var args = invoke.Arguments.ToList();
+                    args.AddRange(tail.Arguments);
+                    tail = new DbTokenInvoke(arg, args);
+                }
             }
         }
 
-        return source;
+        /// <summary>
+        /// Extracts the head part, if possible.
+        /// </summary>
+        void ExtractHead()
+        {
+            while (true)
+            {
+                body = body.RemoveFirst(x => x is DbTokenInvoke, out var removed);
+                if (removed == null) break;
+                var invoke = (DbTokenInvoke)removed;
+
+                if (head is null) head = invoke;
+                else
+                {
+                    var args = head.Arguments.ToList();
+                    args.AddRange(invoke.Arguments);
+                    head = new DbTokenInvoke(arg, args);
+                }
+            }
+        }
     }
 
+    // ----------------------------------------------------
+
     /// <summary>
-    /// Removes the last occurrence of a token that matches the given predicate, from the tree
-    /// represented by the given source token. If so, returns the new tree with that item
-    /// removed, and the item itself in the out parameter. Otherwise, returns the original
-    /// tree and the out parameter is set to <c>null</c>.
+    /// Removes from the given source tree of tokens the last ocurrence of the ones that match
+    /// the given predicate. If found, returns the modified tree of tokens and the removed one
+    /// in the out parameter. Otherwise, returns the original tree and sets the out parameter
+    /// to <c>null</c>.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="item"></param>
     /// <param name="predicate"></param>
+    /// <param name="removed"></param>
     /// <returns></returns>
     public static DbToken RemoveLast(
         this DbToken source, Predicate<DbToken> predicate, out DbToken? removed)
@@ -83,50 +95,129 @@ public static class DbTokenExtensions
         predicate.ThrowWhenNull();
 
         removed = null;
-
         if (source is DbTokenArgument) return source;
         if (source is not DbTokenHosted) return source;
 
-        var cloned = source.Clone();
-        var item = cloned;
-        var prev = (DbToken?)null;
+        var arg = source.GetArgument()
+            ?? throw new InvalidOperationException(
+                "Cannot obtain dynamic argument of given source tree.").WithData(source);
 
-        while (item is DbTokenHosted)
+        DbToken cloned = source.Clone(); // To prevent source modifications...
+        DbToken item = cloned;
+        DbToken? prev = null;
+
+        while (item is DbTokenHosted hosted)
         {
             if (predicate(item))
             {
-                if (prev == null) // Found the last one in the tree...
+                if (prev is null) // Found last one in tree...
                 {
-                    var host = ((DbTokenHosted)item).Host;
+                    removed = item.Clone();
+                    if (removed is DbTokenHosted rtemp) rtemp.ChangeHost(arg);
 
-                    removed = item;
+                    var host = hosted.Host;
                     return host;
                 }
-                else // Found an intermediate one...
+                else // Found intermediate one...
                 {
-                    var host = ((DbTokenHosted)item).Host;
+                    removed = item.Clone();
+                    if (removed is DbTokenHosted rtemp) rtemp.ChangeHost(arg);
 
-                    removed = item;
+                    var host = hosted.Host;
                     ((DbTokenHosted)prev).ChangeHost(host);
                     return cloned;
                 }
             }
-
-            prev = item;
-            item = ((DbTokenHosted)item).Host;
+            else // Not found yet...
+            {
+                prev = item;
+                item = hosted.Host;
+            }
         }
 
+        // Not found...
         return source;
     }
 
+    // ----------------------------------------------------
+
     /// <summary>
-    /// Removes all the occurrences of tokens that match the given predicate, from the tree
-    /// represented by the given source token. If so, returns the new tree with that items
-    /// removed, and the items themselves in the out parameter. Otherwise, returns the original
-    /// tree and the out parameter is set to an empty one.
+    /// Removes from the given source tree of tokens the first ocurrence of the ones that match
+    /// the given predicate. If found, returns the modified tree of tokens and the removed one
+    /// in the out parameter. Otherwise, returns the original tree and sets the out parameter
+    /// to <c>null</c>.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="item"></param>
+    /// <param name="predicate"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static DbToken RemoveFirst(
+        this DbToken source, Predicate<DbToken> predicate, out DbToken? removed)
+    {
+        source.ThrowWhenNull();
+        predicate.ThrowWhenNull();
+
+        removed = null;
+        if (source is DbTokenArgument) return source;
+        if (source is not DbTokenHosted) return source;
+
+        var arg = source.GetArgument()
+            ?? throw new InvalidOperationException(
+                "Cannot obtain dynamic argument of given source tree.").WithData(source);
+
+        DbToken cloned = source.Clone(); // To prevent source modifications...
+        DbToken item = cloned;
+        DbToken? found = null;
+        DbToken? parent = null;
+        DbToken? prev = null;
+
+        while (item is DbTokenHosted hosted)
+        {
+            if (predicate(item)) // Found a candidate to remove...
+            {
+                found = item;
+                parent = prev;
+            }
+
+            prev = item;
+            item = hosted.Host;
+        }
+
+        if (found != null) // Found an item to remove...
+        {
+            if (parent is null) // Found last one in tree...
+            {
+                removed = found.Clone();
+                if (removed is DbTokenHosted rtemp) rtemp.ChangeHost(arg);
+
+                var host = ((DbTokenHosted)found).Host;
+                return host;
+            }
+            else // Found intermediate one...
+            {
+                removed = found.Clone();
+                if (removed is DbTokenHosted rtemp) rtemp.ChangeHost(arg);
+
+                var host = ((DbTokenHosted)found).Host;
+                ((DbTokenHosted)parent).ChangeHost(host);
+                return cloned;
+            }
+        }
+
+        // Not found...
+        return source;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Removes from the given source tree of tokens all the ocurrences of the ones that match
+    /// the given predicate. If found, returns the modified tree of tokens and the collection of
+    /// removed ones in the out parameter. Otherwise, returns the original tree and sets the out
+    /// parameter to an empty collection.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="predicate"></param>
     /// <param name="list"></param>
     /// <returns></returns>
     public static DbToken RemoveAll(
@@ -135,16 +226,22 @@ public static class DbTokenExtensions
         source.ThrowWhenNull();
         predicate.ThrowWhenNull();
 
-        list = new List<DbToken>();
+        DbToken temp = source;
+        list = [];
 
         while (true)
         {
-            source = source.RemoveLast(predicate, out var removed);
+            var hosted = temp as DbTokenHosted;
 
-            if (removed == null) break;
-            list.Insert(0, removed);
+            if (hosted is null) break;
+            else
+            {
+                temp = hosted.RemoveLast(predicate, out var removed);
+                if (removed == null) break;
+                list.Insert(0, removed);
+            }
         }
 
-        return source;
+        return temp;
     }
 }
