@@ -12,9 +12,13 @@ public static class DbTokenExtensions
     /// head and tail ones are the combined chain of invoke operations at the head or tail of
     /// that tree.
     /// </summary>
+    /// <remarks>
+    /// In case a part is an ambiguous head or tail, tail ones take precedence.
+    /// </remarks>
     /// <param name="source"></param>
     /// <returns></returns>
-    public static (DbTokenInvoke? Head, DbToken Body, DbTokenInvoke? Tail) GetPars(this DbToken source)
+    public static (DbTokenInvoke? Head, DbToken Body, DbTokenInvoke? Tail) ExtractParts(
+        this DbToken source)
     {
         source.ThrowWhenNull();
 
@@ -27,7 +31,7 @@ public static class DbTokenExtensions
 
         DbTokenInvoke? head = null;
         DbTokenInvoke? tail = null;
-        DbToken body = source;
+        DbToken body = source.Clone(); // To prevent source modifications...
 
         ExtractTail();
         ExtractHead();
@@ -38,19 +42,22 @@ public static class DbTokenExtensions
         /// </summary>
         void ExtractTail()
         {
-            while (true)
+            var item = body; while (item is DbTokenInvoke invoke)
             {
-                body = body.RemoveLast(x => x is DbTokenInvoke, out var removed);
-                if (removed == null) break;
-                var invoke = (DbTokenInvoke)removed;
-
-                if (tail is null) tail = invoke;
+                if (tail is null)
+                {
+                    tail = invoke.Clone();
+                    tail.ChangeHost(arg);
+                }
                 else
                 {
                     var args = invoke.Arguments.ToList();
                     args.AddRange(tail.Arguments);
                     tail = new DbTokenInvoke(arg, args);
                 }
+
+                body = invoke.Host;
+                item = body;
             }
         }
 
@@ -59,20 +66,7 @@ public static class DbTokenExtensions
         /// </summary>
         void ExtractHead()
         {
-            while (true)
-            {
-                body = body.RemoveFirst(x => x is DbTokenInvoke, out var removed);
-                if (removed == null) break;
-                var invoke = (DbTokenInvoke)removed;
 
-                if (head is null) head = invoke;
-                else
-                {
-                    var args = head.Arguments.ToList();
-                    args.AddRange(invoke.Arguments);
-                    head = new DbTokenInvoke(arg, args);
-                }
-            }
         }
     }
 
