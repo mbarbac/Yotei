@@ -32,10 +32,11 @@ public static class DbTokenExtensions
         DbTokenInvoke? head = null;
         DbTokenInvoke? tail = null;
         DbToken body = source.Clone(); // To prevent source modifications...
+        bool changed = false;
 
         ExtractTail();
         ExtractHead();
-        return (head, body, tail);
+        return (head, changed ? body : source, tail);
 
         /// <summary>
         /// Extracts the tail part, if possible.
@@ -55,9 +56,9 @@ public static class DbTokenExtensions
                     args.AddRange(tail.Arguments);
                     tail = new DbTokenInvoke(arg, args);
                 }
-
                 body = invoke.Host;
                 item = body;
+                changed = true;
             }
         }
 
@@ -66,7 +67,37 @@ public static class DbTokenExtensions
         /// </summary>
         void ExtractHead()
         {
+            DbToken item = body;
+            DbToken? prev = null;
 
+            while (item is DbTokenHosted hosted)
+            {
+                if (hosted.Host is DbTokenArgument) // First possible token...
+                {
+                    if (hosted is not DbTokenInvoke invoke) break;
+
+                    if (head is null)
+                    {
+                        head = invoke.Clone();
+                        head.ChangeHost(arg);
+                    }
+                    else
+                    {
+                        var args = head.Arguments.ToList();
+                        args.AddRange(invoke.Arguments);
+                        head = new DbTokenInvoke(arg, args);
+                    }
+
+                    if (prev is not null) ((DbTokenHosted)prev).ChangeHost(arg);
+                    changed = true;
+
+                    ExtractHead(); // Finding the next first one...
+                    break;
+                }
+
+                prev = item;
+                item = hosted.Host;
+            }
         }
     }
 
