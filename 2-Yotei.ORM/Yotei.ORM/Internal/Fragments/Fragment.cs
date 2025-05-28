@@ -83,18 +83,42 @@ public partial class Fragment
         public Entry this[int index] => Items[index];
 
         /// <summary>
+        /// Adds the given entry to this collection.
+        /// <br/> Inheritors can override this method to, for instance, intercept the type of
+        /// entries to add.
+        /// </summary>
+        /// <param name="item"></param>
+        public virtual void Add(Entry item) => Items.Add(item);
+
+        /// <summary>
+        /// Removes from this collection the given item.
+        /// </summary>
+        /// <param name="item"></param>
+        public bool Remove(Entry item) => Items.Remove(item);
+
+        /// <summary>
         /// Clears all the contents captured by this instance.
         /// </summary>
         public void Clear() => Items.Clear();
 
-        /*
         /// <summary>
-        /// Captures into an entry in this instance the contents obtained from the given dynamic
+        /// Creates a new entry using the contents obtained from parsing the given dynamic lambda
+        /// expression, and adds that entry to this collection.
+        /// </summary>
+        /// <param name="spec"></param>
+        public void Capture(Func<dynamic, object> spec)
+        {
+            var item = Create(spec);
+            Add(item);
+        }
+
+        /// <summary>
+        /// Returns a new entry based upon the contents obtained from parsing the given dynamic
         /// lambda expression.
         /// </summary>
-        /// <param name="expression"></param>
-        public abstract void Capture(Func<dynamic, object> expression);
-        */
+        /// <param name="spec"></param>
+        /// <returns></returns>
+        public abstract Entry Create(Func<dynamic, object> spec);
 
         /*
         /// <summary>

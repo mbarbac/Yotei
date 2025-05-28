@@ -13,7 +13,8 @@ public static class DbTokenExtensions
     /// that tree.
     /// </summary>
     /// <remarks>
-    /// In case a part is an ambiguous head or tail, tail ones take precedence.
+    /// If no head and tail are detected, then body is the same as the given source.
+    /// <br/> In case a part is an ambiguous head or tail, tail ones take precedence.
     /// </remarks>
     /// <param name="source"></param>
     /// <returns></returns>

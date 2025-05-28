@@ -1,5 +1,4 @@
-﻿
-namespace Yotei.ORM.Internal;
+﻿namespace Yotei.ORM.Internal;
 
 public partial class FragmentWhere
 {
@@ -21,6 +20,9 @@ public partial class FragmentWhere
         /// </summary>
         /// <param name="source"></param>
         public Entry(Entry source) : base(source) { }
+
+        /// <inheritdoc/>
+        public override string ToString() => throw null;
     }
 
     // ====================================================
@@ -41,5 +43,11 @@ public partial class FragmentWhere
         /// </summary>
         /// <param name="source"></param>
         public Master(Master source) : base(source) { }
+
+        /// <inheritdoc/>
+        public override void Add(Fragment.Entry item) => base.Add(item);
+
+        /// <inheritdoc/>
+        public override Entry Create(Func<dynamic, object> spec) => throw null;
     }
 }
