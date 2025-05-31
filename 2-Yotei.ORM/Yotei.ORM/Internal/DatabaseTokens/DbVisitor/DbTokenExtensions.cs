@@ -1,6 +1,5 @@
 ﻿#pragma warning disable IDE0008
 #pragma warning disable IDE0019
-#pragma warning disable IDE0038
 
 namespace Yotei.ORM.Internal;
 

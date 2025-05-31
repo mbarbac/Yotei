@@ -92,19 +92,19 @@ partial record class DbTokenVisitor
     /// Returns a clone of this instance with the appropriate separator for range elements.
     /// </summary>
     /// <returns></returns>
-    protected virtual DbTokenVisitor ToRangeVisitor() => this with { RangeSeparator = ", " };
+    public DbTokenVisitor ToCommaRangeVisitor() => this with { RangeSeparator = ", " };
 
     /// <summary>
     /// Returns a clone of this instance that uses no separator between range elements.
     /// </summary>
     /// <returns></returns>
-    protected virtual DbTokenVisitor ToNullVisitor() => this with { RangeSeparator = null };
+    public DbTokenVisitor ToNoSeparatorVisitor() => this with { RangeSeparator = null };
 
     /// <summary>
     /// Returns a clone of this instance with all its settings to <c>false</c> or <c>null</c>.
     /// </summary>
     /// <returns></returns>
-    protected virtual DbTokenVisitor ToRawVisitor() => this with
+    public DbTokenVisitor ToRawVisitor() => this with
     {
         UseNullString = false,
         CaptureValues = false,
@@ -309,7 +309,7 @@ partial record class DbTokenVisitor
     protected virtual ICommandInfo.IBuilder Parse(DbTokenIndexed token)
     {
         var host = Visit(token.Host);
-        var temp = ToRangeVisitor();
+        var temp = ToCommaRangeVisitor();
         var args = temp.VisitRange(token.Indexes);
 
         args.ReplaceText($"[{args.Text}]");
@@ -326,7 +326,7 @@ partial record class DbTokenVisitor
     protected virtual ICommandInfo.IBuilder Parse(DbTokenInvoke token)
     {
         var host = Visit(token.Host);
-        var temp = ToNullVisitor();
+        var temp = ToNoSeparatorVisitor();
         var args = temp.VisitRange(token.Arguments);
 
         host.Add(args);
@@ -393,7 +393,7 @@ partial record class DbTokenVisitor
                     if (IsEmptyOrSoleAsterisk(token.Arguments))
                         return new CommandInfo.Builder(Engine, "COUNT(*)");
 
-                    temp = ToRangeVisitor().VisitRange(token.Arguments);
+                    temp = ToCommaRangeVisitor().VisitRange(token.Arguments);
                     temp.ReplaceText($"COUNT({temp.Text})");
                     return temp;
 
@@ -446,7 +446,7 @@ partial record class DbTokenVisitor
                 case "IN":
                     if (token.Arguments.Count == 0) Throw($"IN(expr, ...) requires at least 1 argument.");
                     chain = TryExpand(token.Arguments);
-                    temp = ToRangeVisitor().VisitRange(chain);
+                    temp = ToCommaRangeVisitor().VisitRange(chain);
                     host.Add(" IN (");
                     host.Add(temp);
                     host.Add(")");
@@ -455,7 +455,7 @@ partial record class DbTokenVisitor
                 case "NOTIN":
                     if (token.Arguments.Count == 0) Throw($"IN(expr, ...) requires at least 1 argument.");
                     chain = TryExpand(token.Arguments);
-                    temp = ToRangeVisitor().VisitRange(chain);
+                    temp = ToCommaRangeVisitor().VisitRange(chain);
                     host.Add(" NOT IN (");
                     host.Add(temp);
                     host.Add(")");
@@ -496,7 +496,7 @@ partial record class DbTokenVisitor
             host.Add(">");
         }
 
-        temp = ToRangeVisitor().VisitRange(token.Arguments);
+        temp = ToCommaRangeVisitor().VisitRange(token.Arguments);
         host.Add("(");
         host.Add(temp);
         host.Add(")");
