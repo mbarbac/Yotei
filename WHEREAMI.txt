@@ -1,3 +1,0 @@
-Ademas de los Fragment Entry "normales"
-Considerar un Fragment.Entry.Terminal
-Que solo lleven head or tails, y solo puedan aparecer en primera o ultima position
