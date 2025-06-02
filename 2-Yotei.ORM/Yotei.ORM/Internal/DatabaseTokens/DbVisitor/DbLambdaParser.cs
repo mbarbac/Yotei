@@ -83,12 +83,22 @@ public class DbLambdaParser
     /// <summary>
     /// Parses the given node.
     /// </summary>
-    DbTokenCoalesce ParseCoalesce(LambdaNodeCoalesce node)
+    DbToken ParseCoalesce(LambdaNodeCoalesce node)
     {
-        var left = Parse(node.LambdaLeft);
-        var right = Parse(node.LambdaRight);
+        // Special case...
+        if (node.LambdaLeft is LambdaNodeValue value && value.LambdaValue is null)
+        {
+            return Parse(node.LambdaRight);
+        }
 
-        return new(left, right);
+        // Standard case...
+        else
+        {
+            var left = Parse(node.LambdaLeft);
+            var right = Parse(node.LambdaRight);
+
+            return new DbTokenCoalesce(left, right);
+        }
     }
 
     /// <summary>

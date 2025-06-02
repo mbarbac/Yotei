@@ -157,6 +157,20 @@ public static class Test_DbTokenVisitor
         Assert.Empty(item.Parameters);
     }
 
+    //[Enforced]
+    [Fact]
+    public static void Test_Coalesce_SpecialCase()
+    {
+        var engine = new FakeEngine();
+        var connection = new FakeConnection(engine);
+        var visitor = new DbTokenVisitor(connection);
+        ICommandInfo.IBuilder item;
+
+        item = visitor.Visit(x => x.Coalesce(null, x.Alpha));
+        Assert.Equal("[Alpha]", item.Text);
+        Assert.Empty(item.Parameters);
+    }
+
     // -----------------------------------------------------
 
     //[Enforced]

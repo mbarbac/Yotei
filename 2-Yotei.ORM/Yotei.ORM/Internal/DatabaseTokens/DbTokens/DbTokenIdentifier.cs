@@ -52,6 +52,11 @@ public partial class DbTokenIdentifier : DbTokenHosted
     public IIdentifierPart Identifier { get; }
 
     /// <summary>
+    /// The value carried by this identifier, or null if it represents an empty or missed one.
+    /// </summary>
+    public string? Value => Identifier.Value;
+
+    /// <summary>
     /// Determines if this instance, along with its chain of hosts, represents a pure identifier
     /// or not.
     /// </summary>
