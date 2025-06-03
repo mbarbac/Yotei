@@ -25,6 +25,83 @@ public static partial class DbTokenExtensions
     /// <returns></returns>
     public static DbTokenParts ExtractParts(this DbToken source)
     {
-        throw null;
+        source.ThrowWhenNull();
+
+        var arg = source.GetArgument()
+            ?? throw new InvalidOperationException(
+                "Cannot obtain dynamic argument from the given source-tree").WithData(source);
+
+        if (source is not DbTokenHosted) return new(null, source, null);
+
+        DbToken body = source.Clone(); // To prevent modifications in the original source...
+        DbTokenInvoke? head = null;
+        DbTokenInvoke? tail = null;
+
+        ExtractHead();
+        ExtractTail();
+        var same = head is null && tail is null;
+        return new(head, same ? source : body, tail);
+
+        /// <summary>
+        /// Extracts the head parts, if possible.
+        /// </summary>
+        void ExtractHead()
+        {
+            DbToken item = body;
+            DbToken? prev = null;
+
+            while (item is DbTokenHosted hosted)
+            {
+                if (hosted.Host is DbTokenArgument && hosted is DbTokenInvoke invoke) // Found...
+                {
+                    if (head is null)
+                    {
+                        head = invoke.Clone();
+                        head.ChangeHost(arg);
+                    }
+                    else
+                    {
+                        var args = head.Arguments.ToList();
+                        args.AddRange(invoke.Arguments);
+                        head = new DbTokenInvoke(arg, args);
+                    }
+
+                    if (prev is null) body = arg;
+                    else ((DbTokenHosted)prev).ChangeHost(arg);
+
+                    ExtractHead(); // Finding the next one...
+                    break;
+                }
+
+                prev = item;
+                item = hosted.Host;
+            }
+        }
+
+        /// <summary>
+        /// Extracts the tail parts, if possible.
+        /// </summary>
+        void ExtractTail()
+        {
+            DbToken item = body;
+
+            while (item is DbTokenInvoke invoke)
+            {
+                if (tail is null)
+                {
+                    tail = invoke.Clone();
+                    tail.ChangeHost(arg);
+                }
+                else
+                {
+                    var args = invoke.Arguments.ToList();
+                    args.AddRange(tail.Arguments);
+                    tail = new DbTokenInvoke(arg, args);
+                }
+
+                body = invoke.Host;
+                item = body;
+            }
+        }
     }
 }
