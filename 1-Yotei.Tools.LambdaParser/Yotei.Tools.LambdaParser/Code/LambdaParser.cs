@@ -89,7 +89,7 @@ public class LambdaParser
                     Instance.Result = new LambdaNodeValue(obj);
                     goto FINISH;
                 }
-                if (type.IsArray) // Arrays...
+                else if (type.IsArray) // Arrays...
                 {
                     var array = (Array)obj;
                     var nodes = new LambdaNode[array.Length];
@@ -101,7 +101,7 @@ public class LambdaParser
                     Instance.Result = new LambdaNodeValue(nodes);
                     goto FINISH;
                 }
-                if (obj is ICollection list) // Lists and alike...
+                else if (obj is ICollection list) // Lists and alike...
                 {
                     var ret = new List<LambdaNode>();
                     foreach (var item in list) ret.Add(Instance.ToLambdaNode(item));
@@ -111,7 +111,7 @@ public class LambdaParser
                 }
             }
 
-            // Standar case...
+            // Standard case...
             Instance.Result = Instance.LastNode ?? Instance.ToLambdaNode(obj);
 
             FINISH:

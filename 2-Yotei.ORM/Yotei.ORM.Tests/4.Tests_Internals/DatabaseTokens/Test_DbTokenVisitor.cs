@@ -475,6 +475,27 @@ public static class Test_DbTokenVisitor
         Assert.Empty(item.Parameters);
     }
 
+    //[Enforced]
+    [Fact]
+    public static void Test_Literal_From_String_Value()
+    {
+        var engine = new FakeEngine();
+        var connection = new FakeConnection(engine);
+        var visitor = new DbTokenVisitor(connection);
+        ICommandInfo.IBuilder item;
+
+        // This form does NOT scape the literal...
+        item = visitor.Visit(x => "any");
+        Assert.Equal("#0", item.Text);
+        Assert.Single(item.Parameters);
+        Assert.Equal("#0", item.Parameters[0].Name); Assert.Equal("any", item.Parameters[0].Value);
+
+        // We need to wrap the literal into an invoke...
+        item = visitor.Visit(x => x("any"));
+        Assert.Equal("any", item.Text);
+        Assert.Empty(item.Parameters);
+    }
+
     // -----------------------------------------------------
 
     //[Enforced]

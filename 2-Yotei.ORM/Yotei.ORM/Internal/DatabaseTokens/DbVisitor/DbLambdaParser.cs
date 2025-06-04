@@ -23,6 +23,7 @@ public class DbLambdaParser
     /// <summary>
     /// Parses the given dynamic lambda expression returning the last db-alike node in the chain
     /// that represents the dynamic operations in that expression.
+    /// <br/> Delegates must be of the 'Func&lt;dynamic, object&gt;' form.
     /// </summary>
     /// <param name="expression"></param>
     /// <returns></returns>
@@ -43,7 +44,7 @@ public class DbLambdaParser
     {
         node.ThrowWhenNull();
 
-        return node switch
+        var temp = node switch
         {
             LambdaNodeArgument item => ParseArgument(item),
             LambdaNodeBinary item => ParseBinary(item),
@@ -60,6 +61,9 @@ public class DbLambdaParser
 
             _ => throw new ArgumentException("Unknown node.").WithData(node)
         };
+
+        if (temp is DbTokenChain chain) temp = chain.Reduce();
+        return temp;
     }
 
     // ----------------------------------------------------
@@ -215,7 +219,7 @@ public class DbLambdaParser
             {
                 var type = node.LambdaGenericArguments[0];
                 var target = Parse(node.LambdaArguments[0]);
-                
+
                 return new DbTokenConvert.ToType(type, target);
             }
 

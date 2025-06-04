@@ -475,21 +475,24 @@ public static class Test_DbLambdaParser
         var engine = new FakeEngine();
         var parser = new DbLambdaParser(engine);
         DbToken token;
-        DbTokenInvoke item;
+        DbTokenIdentifier id;
+        DbTokenInvoke invoke;
         DbTokenLiteral text;
 
         token = parser.Parse(x => x("any"));
         Assert.Equal("x(any)", token.ToString());
-        item = Assert.IsType<DbTokenInvoke>(token);
-        Assert.Single(item.Arguments);
-        text = Assert.IsType<DbTokenLiteral>(item.Arguments[0]);
+        invoke = Assert.IsType<DbTokenInvoke>(token);
+        Assert.Single(invoke.Arguments);
+        text = Assert.IsType<DbTokenLiteral>(invoke.Arguments[0]);
         Assert.Equal("any", text.Value);
 
         token = parser.Parse(x => x.Alpha.x("any"));
         Assert.Equal("x.[Alpha](any)", token.ToString());
-        item = Assert.IsType<DbTokenInvoke>(token);
-        Assert.Single(item.Arguments);
-        text = Assert.IsType<DbTokenLiteral>(item.Arguments[0]);
+        invoke = Assert.IsType<DbTokenInvoke>(token);
+        id = Assert.IsType<DbTokenIdentifier>(invoke.Host);
+        Assert.Equal("[Alpha]", id.Value);
+        Assert.Single(invoke.Arguments);
+        text = Assert.IsType<DbTokenLiteral>(invoke.Arguments[0]);
         Assert.Equal("any", text.Value);
     }
 
@@ -558,7 +561,6 @@ public static class Test_DbLambdaParser
 
     //[Enforced]
     [Fact]
-#pragma warning disable CS1717
     public static void Parse_Setter_OnArgument()
     {
         var engine = new FakeEngine();
@@ -567,16 +569,17 @@ public static class Test_DbLambdaParser
         DbTokenArgument arg;
         DbTokenValue value;
 
+#pragma warning disable CS1717
         token = parser.Parse(x => x = x);
         Assert.Equal("x", token.ToString());
         arg = Assert.IsType<DbTokenArgument>(token);
+#pragma warning restore
 
         token = parser.Parse(x => x = "007");
         Assert.Equal("'007'", token.ToString());
         value = Assert.IsType<DbTokenValue>(token);
         Assert.Equal("007", value.Value);
     }
-#pragma warning restore
     
     //[Enforced]
     [Fact]
@@ -712,10 +715,31 @@ public static class Test_DbLambdaParser
         Assert.Equal("TRUE", token.ToString());
         item = Assert.IsType<DbTokenValue>(token);
         Assert.True((bool)item.Value!);
+    }
 
+    //[Enforced]
+    [Fact]
+    public static void Parse_Value_Literal_From_String()
+    {
+        var engine = new FakeEngine();
+        var parser = new DbLambdaParser(engine);
+        DbToken token;
+        DbTokenValue value;
+        DbTokenInvoke invoke;
+        DbTokenLiteral text;
+
+        // This form does NOT scape the literal...
         token = parser.Parse(x => "any");
         Assert.Equal("'any'", token.ToString());
-        item = Assert.IsType<DbTokenValue>(token);
-        Assert.Equal("any", item.Value);
+        value = Assert.IsType<DbTokenValue>(token);
+        Assert.Equal("any", value.Value);
+
+        // Literals shall be wrapped by an invoke...
+        token = parser.Parse(x => x("any"));
+        Assert.Equal("x(any)", token.ToString());
+        invoke = Assert.IsType<DbTokenInvoke>(token);
+        Assert.Single(invoke.Arguments);
+        text = Assert.IsType<DbTokenLiteral>(invoke.Arguments[0]);
+        Assert.Equal("any", text.Value);
     }
 }

@@ -63,6 +63,23 @@ public static class Test_RawCommand
         Assert.Equal("#0", info.Parameters[0].Name); Assert.Equal("007", info.Parameters[0].Value);
     }
 
+    //[Enforced]
+    [Fact]
+    public static void Test_Create_With_Lambda_To_Text()
+    {
+        var engine = new FakeEngine();
+        var connection = new FakeConnection(engine);
+        IRawCommand command;
+        ICommandInfo info;
+
+        // We need to scape the literal using a 'x => x(...)' form...
+        command = new RawCommand(connection);
+        command.Append(x => x("FROM [Emps] WHERE [Id] = '007'"));
+        info = command.GetCommandInfo();
+        Assert.Equal("FROM [Emps] WHERE [Id] = '007'", info.Text);
+        Assert.Empty(info.Parameters);
+    }
+
     // ----------------------------------------------------
 
     //[Enforced]

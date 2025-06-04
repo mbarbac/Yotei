@@ -11,22 +11,6 @@ public static class Test_SetArgument
 {
     //[Enforced]
     [Fact]
-    public static void Parse_ToConstant_Resolves_Into_Constant() => Repeater.Repeat(() =>
-    {
-        Func<dynamic, object> func;
-        LambdaNode node;
-        LambdaNodeValue item;
-
-        WriteLine();
-        func = x => x = 7;
-        node = LambdaParser.Parse(func).Result;
-        WriteLine($"> Result: {node}");
-        item = Assert.IsType<LambdaNodeValue>(node);
-        Assert.Equal("'7'", node.ToString());
-    });
-
-    //[Enforced]
-    [Fact]
     public static void Parse_ToArgument_Resolves_Into_Argument() => Repeater.Repeat(() =>
     {
         Func<dynamic, object> func;
@@ -62,5 +46,30 @@ public static class Test_SetArgument
         WriteLine($"> Result: {node}");
         item = Assert.IsType<LambdaNodeMember>(node);
         Assert.Equal("x.Alpha.Beta", node.ToString());
+    });
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Parse_ToConstant_Resolves_Into_Constant() => Repeater.Repeat(() =>
+    {
+        Func<dynamic, object> func;
+        LambdaNode node;
+        LambdaNodeValue item;
+
+        WriteLine();
+        func = x => x = 7;
+        node = LambdaParser.Parse(func).Result;
+        WriteLine($"> Result: {node}");
+        item = Assert.IsType<LambdaNodeValue>(node);
+        Assert.Equal("'7'", node.ToString());
+
+        WriteLine();
+        func = x => x = "any";
+        node = LambdaParser.Parse(func).Result;
+        WriteLine($"> Result: {node}");
+        item = Assert.IsType<LambdaNodeValue>(node);
+        Assert.Equal("'any'", node.ToString());
     });
 }
