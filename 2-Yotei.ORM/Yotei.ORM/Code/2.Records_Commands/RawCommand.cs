@@ -62,7 +62,8 @@ public partial class RawCommand : Command, IRawCommand
     /// <remarks>We cannot determine if the arbitrary contents are such that support native
     /// paging, even if the underlying engine does so. Hence, the default value of this property
     /// if <c>false</c>, but it can be set to <c>true</c> under the caller's responsability.
-    /// <br/> Note that the setter DOES NOT generate a new instance.</remarks>
+    /// <para>Note that the setter DOES NOT generate a new instance.</para>
+    /// </remarks>
     public virtual bool SupportsNativePaging
     {
         get => _SupportsNativePaging && Connection.Engine.SupportsNativePaging;

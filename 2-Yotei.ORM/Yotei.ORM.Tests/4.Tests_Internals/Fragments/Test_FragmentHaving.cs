@@ -5,14 +5,14 @@ namespace Yotei.ORM.Tests.Internals;
 
 // ========================================================
 //[Enforced]
-public static class Test_FragmentWhere
+public static class Test_FragmentHaving
 {
     //[Enforced]
     [Fact]
     public static void Test_Expression_Binary()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentWhere.Master master;
+        FragmentHaving.Master master;
         ICommandInfo.IBuilder builder;
 
         master = new(command);
@@ -39,7 +39,7 @@ public static class Test_FragmentWhere
     public static void Test_Expression_InvokeToLiteral()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentWhere.Master master;
+        FragmentHaving.Master master;
         ICommandInfo.IBuilder builder;
 
         master = new(command);
@@ -55,7 +55,7 @@ public static class Test_FragmentWhere
     public static void Test_Expression_Chained()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentWhere.Master master;
+        FragmentHaving.Master master;
         ICommandInfo.IBuilder builder;
 
         master = new(command);
