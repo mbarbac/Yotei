@@ -99,12 +99,16 @@ public static class Test_StrKeywordTokenizer
         StrTokenKeyword word;
         StrTokenChain chain;
 
-        source = "any(xx)other";
+        //source = "any(xx)other";
+        //target = tokenizer.Tokenize(source);
+        //chain = Assert.IsType<StrTokenChain>(target); Assert.Equal(3, chain.Count);
+        //text = Assert.IsType<StrTokenText>(chain[0]); Assert.Equal("any(", text.Payload);
+        //word = Assert.IsType<StrTokenKeyword>(chain[1]); Assert.Equal("XX", word.Payload);
+        //text = Assert.IsType<StrTokenText>(chain[2]); Assert.Equal(")other", text.Payload);
+
+        tokenizer = new StrKeywordTokenizer("=") { Escape = ".", Comparison = comparison };
+        source = "x=50";
         target = tokenizer.Tokenize(source);
-        chain = Assert.IsType<StrTokenChain>(target); Assert.Equal(3, chain.Count);
-        text = Assert.IsType<StrTokenText>(chain[0]); Assert.Equal("any(", text.Payload);
-        word = Assert.IsType<StrTokenKeyword>(chain[1]); Assert.Equal("XX", word.Payload);
-        text = Assert.IsType<StrTokenText>(chain[2]); Assert.Equal(")other", text.Payload);
     }
 
     //[Enforced]

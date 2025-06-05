@@ -1,7 +1,7 @@
 ﻿namespace Yotei.ORM.Internal;
 
 // ========================================================
-public static partial class StringIsolated
+public static class StringIsolated
 {
     /// <summary>
     /// The default set of characters that act as head or tail separators for isolated string

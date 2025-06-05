@@ -1,0 +1,3 @@
+String Tokenizers no estan funcionando.
+Por ejemplo: "x=50" con un keyword-tokenizer de "=" falla.
+El problema esta en encontrar el keyword isolated.
