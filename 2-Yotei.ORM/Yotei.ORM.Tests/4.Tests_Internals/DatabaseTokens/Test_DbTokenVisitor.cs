@@ -449,6 +449,10 @@ public static class Test_DbTokenVisitor
         Assert.Equal("[Alpha]#0", item.Text);
         Assert.Single(item.Parameters);
         Assert.Equal("#0", item.Parameters[0].Name); Assert.Equal("any", item.Parameters[0].Value);
+
+        item = visitor.Visit(x => x.Alpha.x(".").Id);
+        Assert.Equal("[Alpha].[Id]", item.Text);
+        Assert.Empty(item.Parameters);
     }
 
     // -----------------------------------------------------

@@ -1,14 +1,14 @@
 ﻿namespace Yotei.ORM.Internal;
 
 /// <summary>
-/// Represents the ability of parsing COLUMN clauses.
+/// Represents the ability of parsing SETTER clauses.
 /// <br/>- Standard syntax: 'x => Target = Value'.
 /// </summary>
-public static partial class FragmentColumn
+public static partial class FragmentSetter
 {
     // ====================================================
     /// <summary>
-    /// Represents an entry in a collection of fragments used to build COLUMN clauses.
+    /// Represents an entry in a collection of fragments used to build SETTER clauses.
     /// </summary>
     [Cloneable]
     public partial class Entry : Fragment.Entry
@@ -27,7 +27,7 @@ public static partial class FragmentColumn
         {
             if (body.Target is not DbTokenIdentifier)
                 throw new ArgumentException(
-                    $"Target of a COLUMN clause must be a valid identifier.")
+                    $"Target of a SETTER clause must be a valid identifier.")
                     .WithData(body);
         }
 
@@ -42,9 +42,20 @@ public static partial class FragmentColumn
         /// <inheritdoc/>
         public override ICommandInfo.IBuilder Visit(DbTokenVisitor visitor, string? separator)
         {
-            throw new InvalidOperationException(
-                "Please use 'VisitName()' or 'VisitValue()' instead.")
-                .WithData(this);
+            if (Body is DbTokenSetter setter)
+            {
+                var builder = visitor.Visit(setter);
+                var str = builder.Text.UnWrap('(', ')');
+                builder.ReplaceText(str);
+
+                if (ValidSeparator(separator)) builder.ReplaceText($"{separator}{builder.Text}");
+                return builder;
+            }
+            else
+            {
+                //var body = (DbTokenLiteral)Body;
+                throw null;
+            }
         }
 
         /// <summary>
@@ -57,7 +68,6 @@ public static partial class FragmentColumn
         /// <param name="visitor"></param>
         /// <param name="separator"></param>
         /// <returns></returns>
-        /// <exception cref="System.NullReferenceException"></exception>
         public ICommandInfo.IBuilder VisitName(DbTokenVisitor visitor, string? separator)
         {
             if (Body is DbTokenSetter setter)
@@ -84,7 +94,6 @@ public static partial class FragmentColumn
         /// <param name="visitor"></param>
         /// <param name="separator"></param>
         /// <returns></returns>
-        /// <exception cref="System.NullReferenceException"></exception>
         public ICommandInfo.IBuilder VisitValue(DbTokenVisitor visitor, string? separator)
         {
             if (Body is DbTokenSetter setter)
@@ -104,7 +113,7 @@ public static partial class FragmentColumn
 
     // ====================================================
     /// <summary>
-    /// Represents a collection of fragments used to build COLUMN clauses.
+    /// Represents a collection of fragments used to build SETTER clauses.
     /// </summary>
     [Cloneable]
     public partial class Master : Fragment.Master
@@ -127,7 +136,7 @@ public static partial class FragmentColumn
         protected override Entry Validate(Fragment.Entry entry)
         {
             if (entry is not Entry valid) throw new ArgumentException(
-                "Entry is not a valid COLUMN one.")
+                "Entry is not a valid SETTER one.")
                 .WithData(entry);
 
             return valid;
@@ -147,7 +156,7 @@ public static partial class FragmentColumn
                 DbTokenSetter temp => new(temp),
 
                 _ => throw new ArgumentException(
-                    "Specification does not resolve into a valid COLUMN clause.")
+                    "Specification does not resolve into a valid SETTER clause.")
                     .WithData(body)
             };
         }
@@ -160,9 +169,11 @@ public static partial class FragmentColumn
         /// <inheritdoc/>
         public override ICommandInfo.IBuilder Visit()
         {
-            throw new InvalidOperationException(
-                "Please use 'VisitName()' or 'VisitValue()' instead.")
-                .WithData(this);
+            var builder = base.Visit();
+            var str = builder.Text.UnWrap('(', ')').Wrap('(', ')');
+            
+            builder.ReplaceText(str);
+            return builder;
         }
 
         /// <summary>
@@ -213,7 +224,12 @@ public static partial class FragmentColumn
                 builder.Add(temp);
             }
 
-            builder.ReplaceText($"({builder.Text})");
+            if (Count == 1)
+            {
+                var str = builder.Text.UnWrap('(', ')').Wrap('(', ')');
+                builder.ReplaceText(str);
+            }
+            if (Count > 1) builder.ReplaceText($"({builder.Text})");
             return builder;
         }
     }

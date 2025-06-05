@@ -72,6 +72,47 @@ public static class Test_FragmentHaving
 
     //[Enforced]
     [Fact]
+    public static void Test_Clear()
+    {
+        var command = new FakeCommand(new FakeConnection(new FakeEngine()));
+
+        FragmentHaving.Master master = new(command);
+        master.Capture(x => x.Id == "007");
+        master.Capture(x => x.And(x.First == "James"));
+        master.Capture(x => x.Or().Last == "Bond");
+
+        master.Clear();
+        Assert.Empty(master);
+
+        ICommandInfo.IBuilder builder = master.Visit();
+        Assert.True(builder.IsEmpty);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Clone()
+    {
+        var command = new FakeCommand(new FakeConnection(new FakeEngine()));
+
+        FragmentHaving.Master master = new(command);
+        master.Capture(x => x.Id == "007");
+        master.Capture(x => x.And(x.First == "James"));
+        master.Capture(x => x.Or().Last == "Bond");
+
+        var other = master.Clone();
+        Assert.Equal(3, other.Count);
+        ICommandInfo.IBuilder builder = other.Visit();
+        Assert.Equal("([Id] = #0) AND ([First] = #1) OR ([Last] = #2)", builder.Text);
+        Assert.Equal(3, builder.Parameters.Count);
+        Assert.Equal("007", builder.Parameters[0].Value);
+        Assert.Equal("James", builder.Parameters[1].Value);
+        Assert.Equal("Bond", builder.Parameters[2].Value);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
     public static void Test_Literal()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
