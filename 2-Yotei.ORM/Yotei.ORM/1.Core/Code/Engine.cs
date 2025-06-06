@@ -68,6 +68,7 @@ public partial class Engine : IEngine
     {
         if (x is null && y is null) return true;
         if (x is null || y is null) return false;
+
         return x.Equals(y);
     }
 

@@ -1,4 +1,4 @@
-﻿namespace Yotei.ORM.Tools;
+﻿namespace Yotei.ORM.Tools.Code;
 
 // ========================================================
 /// <inheritdoc cref="IInvariantList{K, T}"/>
