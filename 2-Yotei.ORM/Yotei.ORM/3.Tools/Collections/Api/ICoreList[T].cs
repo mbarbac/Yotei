@@ -5,6 +5,7 @@
 /// Represents a customizable list-alike collection of elements.
 /// </summary>
 /// <typeparam name="T"></typeparam>
+[Cloneable]
 public partial interface ICoreList<T>
     : IList<T>, IList, IReadOnlyList<T>
     , ICollection<T>, ICollection, IReadOnlyCollection<T>
@@ -112,21 +113,21 @@ public partial interface ICoreList<T>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    bool Replace(int index, T item);
+    int Replace(int index, T item);
 
     /// <summary>
     /// Adds to this collection the given element.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    new bool Add(T item);
+    new int Add(T item);
 
     /// <summary>
     /// Adds to this collection the elements from the given range.
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    bool AddRange(IEnumerable<T> range);
+    int AddRange(IEnumerable<T> range);
 
     /// <summary>
     /// Inserts into this collection the given element at the given index.
@@ -134,7 +135,7 @@ public partial interface ICoreList<T>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    new bool Insert(int index, T item);
+    new int Insert(int index, T item);
 
     /// <summary>
     /// Inserts into this collection the elements from the given range, starting at the given
@@ -143,14 +144,14 @@ public partial interface ICoreList<T>
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    bool InsertRange(int index, IEnumerable<T> range);
+    int InsertRange(int index, IEnumerable<T> range);
 
     /// <summary>
     /// Removes from this collection the element at the given index.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    new bool RemoveAt(int index);
+    new int RemoveAt(int index);
 
     /// <summary>
     /// Removes from this collection the given number of elements, starting at the given index.
@@ -158,53 +159,53 @@ public partial interface ICoreList<T>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    bool RemoveRange(int index, int count);
+    int RemoveRange(int index, int count);
 
     /// <summary>
     /// Removes from this collection the first ocurrence of the given element.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    new bool Remove(T item);
+    new int Remove(T item);
 
     /// <summary>
     /// Removes from this collection the last ocurrence of the given element.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    bool RemoveLast(T item);
+    int RemoveLast(T item);
 
     /// <summary>
     /// Removes from this collection all the ocurrences of the given element.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    bool RemoveAll(T item);
+    int RemoveAll(T item);
 
     /// <summary>
     /// Removes from this collection the first element that matches the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    bool Remove(Predicate<T> predicate);
+    int Remove(Predicate<T> predicate);
 
     /// <summary>
     /// Removes from this collection the last element that matches the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    bool RemoveLast(Predicate<T> predicate);
+    int RemoveLast(Predicate<T> predicate);
 
     /// <summary>
     /// Removes from this collection all the elements that match the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    bool RemoveAll(Predicate<T> predicate);
+    int RemoveAll(Predicate<T> predicate);
 
     /// <summary>
     /// Clears this collection.
     /// </summary>
     /// <returns></returns>
-    new bool Clear();
+    new int Clear();
 }

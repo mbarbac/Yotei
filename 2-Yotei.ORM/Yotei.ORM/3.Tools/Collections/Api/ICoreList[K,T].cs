@@ -7,6 +7,7 @@
 /// </summary>
 /// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>
+[Cloneable]
 public partial interface ICoreList<K, T>
     : IList<T>, IList, IReadOnlyList<T>
     , ICollection<T>, ICollection, IReadOnlyCollection<T>
