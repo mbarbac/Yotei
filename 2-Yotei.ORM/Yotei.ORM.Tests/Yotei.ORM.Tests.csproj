@@ -7,7 +7,10 @@
 	  <Nullable>enable</Nullable>
 	  <IsPackable>false</IsPackable>
 	  <Configurations>Debug;Release;Local</Configurations>
+	  <NoWarn>CA1859;IDE0290</NoWarn>
    </PropertyGroup>
+   <!--CA1859: Change type to improve performance.-->
+   <!--IDE0290: Use primary constructor.-->
 
    <ItemGroup>
 	  <PackageReference Include="coverlet.collector" Version="6.0.4">
