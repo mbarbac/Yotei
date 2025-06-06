@@ -112,7 +112,7 @@ public partial interface ICoreList<K, T>
     /// <summary>
     /// Replaces the element at the given index with the given one.
     /// <br/> If an empty enumeration is given, then nothing is replaced (so this scenario cannot
-    /// be used to replace the '<see cref="RemoveAt(int)"/>' method).
+    /// be used instead of the '<see cref="RemoveAt(int)"/>' method).
     /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="index"></param>
