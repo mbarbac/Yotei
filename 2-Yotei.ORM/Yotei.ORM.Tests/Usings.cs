@@ -29,4 +29,5 @@ global using Yotei.ORM.Records.Code;
 global using Yotei.ORM.Tools;
 global using Yotei.ORM.Tools.Code;
 global using Yotei.ORM.Internal;
+global using Yotei.ORM.Internal.Code;
 global using Yotei.ORM.Generators;
