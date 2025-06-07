@@ -95,43 +95,43 @@ public static class DebugEx
     /// <param name="message"></param>
     /// <param name="args"></param>
     [Conditional("DEBUG")]
-    public static void Write(bool console, string? message, params object?[] args) => throw null;
-    //{
-    //    if (message is null) return;
-    //    if (message.Length == 0) return;
+    public static void Write(bool console, string? message, params object?[] args)
+    {
+        if (message is null) return;
+        if (message.Length == 0) return;
 
-    //    args ??= [null];
-    //    if (args.Length > 0) message = string.Format(message, args);
+        args ??= [null];
+        if (args.Length > 0) message = string.Format(message, args);
 
-    //    console = console && !Ambient.IsConsoleListener();
+        console = console && !Ambient.IsConsoleListener();
 
-    //    var size = Debug.IndentSize;
-    //    var level = Debug.IndentLevel;
-    //    var header = Header(size * level);
+        var size = Debug.IndentSize;
+        var level = Debug.IndentLevel;
+        var header = Header(size * level);
 
-    //    var iter = new StringSplitter(message, Environment.NewLine, "\n");
-    //    while (iter.MoveNext())
-    //    {
-    //        if (DebugAtOrigin && console) Console.Write(header);
+        var iter = new StringSplitter(message, Environment.NewLine, "\n");
+        while (iter.MoveNext())
+        {
+            if (DebugAtOrigin && console) Console.Write(header);
 
-    //        if (iter.CurrentIsSeparator)
-    //        {
-    //            Debug.WriteLine(string.Empty);
-    //            if (console) Console.WriteLine();
-    //            DebugAtOrigin = true;
-    //            continue;
-    //        }
+            if (iter.IsSeparator)
+            {
+                Debug.WriteLine(string.Empty);
+                if (console) Console.WriteLine();
+                DebugAtOrigin = true;
+                continue;
+            }
 
-    //        Debug.Write(iter.Current);
-    //        if (console) Console.Write(iter.Current);
+            Debug.Write(iter.Current);
+            if (console) Console.Write(iter.Current);
 
-    //        DebugAtOrigin =
-    //            iter.CurrentIsSeparator ||
-    //            (iter.Current.Length == 0 && DebugAtOrigin);
-    //    }
+            DebugAtOrigin =
+                iter.IsSeparator ||
+                (iter.Current.Length == 0 && DebugAtOrigin);
+        }
 
-    //    Flush();
-    //}
+        Flush();
+    }
 
     /// <summary>
     /// Writes the given message, replicated in the console if such is requested, using the given
@@ -231,45 +231,45 @@ public static class DebugEx
     /// <param name="message"></param>
     /// <param name="args"></param>
     [Conditional("DEBUG")]
-    public static void WriteLine(bool console, string? message, params object?[] args) => throw null;
-    //{
-    //    message ??= string.Empty;
-    //    args ??= [null];
-    //    if (args.Length > 0) message = string.Format(message, args);
+    public static void WriteLine(bool console, string? message, params object?[] args)
+    {
+        message ??= string.Empty;
+        args ??= [null];
+        if (args.Length > 0) message = string.Format(message, args);
 
-    //    console = console && !Ambient.IsConsoleListener();
+        console = console && !Ambient.IsConsoleListener();
 
-    //    var size = Debug.IndentSize;
-    //    var level = Debug.IndentLevel;
-    //    var header = Header(size * level);
+        var size = Debug.IndentSize;
+        var level = Debug.IndentLevel;
+        var header = Header(size * level);
 
-    //    var iter = new StringSplitter(message, Environment.NewLine, "\n");
-    //    while (iter.MoveNext())
-    //    {
-    //        if (DebugAtOrigin && console) Console.Write(header);
+        var iter = new StringSplitter(message, Environment.NewLine, "\n");
+        while (iter.MoveNext())
+        {
+            if (DebugAtOrigin && console) Console.Write(header);
 
-    //        if (iter.CurrentIsSeparator)
-    //        {
-    //            Debug.WriteLine(string.Empty);
-    //            if (console) Console.WriteLine();
-    //            DebugAtOrigin = true;
-    //            continue;
-    //        }
+            if (iter.IsSeparator)
+            {
+                Debug.WriteLine(string.Empty);
+                if (console) Console.WriteLine();
+                DebugAtOrigin = true;
+                continue;
+            }
 
-    //        Debug.Write(iter.Current);
-    //        if (console) Console.Write(iter.Current);
+            Debug.Write(iter.Current);
+            if (console) Console.Write(iter.Current);
 
-    //        DebugAtOrigin =
-    //            iter.CurrentIsSeparator ||
-    //            (iter.Current.Length == 0 && DebugAtOrigin);
-    //    }
+            DebugAtOrigin =
+                iter.IsSeparator ||
+                (iter.Current.Length == 0 && DebugAtOrigin);
+        }
 
-    //    Debug.WriteLine(string.Empty);
-    //    if (console) Console.WriteLine();
-    //    DebugAtOrigin = true;
+        Debug.WriteLine(string.Empty);
+        if (console) Console.WriteLine();
+        DebugAtOrigin = true;
 
-    //    Flush();
-    //}
+        Flush();
+    }
 
     /// <summary>
     /// Writes the given message, replicated in the console if such is requested, followed by a
