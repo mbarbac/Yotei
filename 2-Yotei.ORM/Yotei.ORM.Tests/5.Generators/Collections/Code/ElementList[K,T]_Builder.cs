@@ -62,7 +62,7 @@ partial class ElementList_KT
         /// Copy constructor.
         /// </summary>
         /// <param name="source"></param>
-        public Builder(Builder source) : this(source.Comparison) => AddRange(source);
+        protected Builder(Builder source) : this(source.Comparison) => AddRange(source);
 
         // ------------------------------------------------
 

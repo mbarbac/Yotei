@@ -6,6 +6,7 @@
 [InvariantList<string, IParameter>]
 public partial class ParameterList : IParameterList
 {
+    /// <inheritdoc/>
     protected override Builder Items { get; }
 
     /// <summary>
@@ -26,7 +27,7 @@ public partial class ParameterList : IParameterList
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    public ParameterList(ParameterList source) : this(source.Engine) => Items.AddRange(source);
+    protected ParameterList(ParameterList source) : this(source.Engine) => Items.AddRange(source);
 
     // ----------------------------------------------------
 

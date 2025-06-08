@@ -25,7 +25,7 @@ partial class ParameterList
         /// Copy constructor.
         /// </summary>
         /// <param name="source"></param>
-        public Builder(Builder source) : this(source.Engine) => AddRange(source);
+        protected Builder(Builder source) : this(source.Engine) => AddRange(source);
 
         // ------------------------------------------------
 
