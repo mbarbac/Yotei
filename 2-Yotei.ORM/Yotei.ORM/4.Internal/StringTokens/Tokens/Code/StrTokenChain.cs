@@ -1,5 +1,5 @@
 ﻿namespace Yotei.ORM.Internal.Code;
-
+/*
 // ========================================================
 /// <inheritdoc cref="IStrTokenChain"/>
 [DebuggerDisplay("{ToDebugString(5)}")]
@@ -154,3 +154,4 @@ public partial class StrTokenChain : IStrTokenChain
         return changed ? builder.ToInstance() : this;
     }
 }
+*/

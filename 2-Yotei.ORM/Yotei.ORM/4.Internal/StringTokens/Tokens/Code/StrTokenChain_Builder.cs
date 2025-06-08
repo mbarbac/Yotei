@@ -1,5 +1,5 @@
 ﻿namespace Yotei.ORM.Internal.Code;
-
+/*
 partial class StrTokenChain
 {
     // ====================================================
@@ -52,3 +52,4 @@ partial class StrTokenChain
         IStrTokenChain IStrTokenChain.IBuilder.ToInstance() => ToInstance();
     }
 }
+*/
