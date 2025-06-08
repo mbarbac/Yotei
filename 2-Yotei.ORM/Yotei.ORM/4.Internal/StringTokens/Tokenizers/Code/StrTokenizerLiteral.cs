@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// Represents the ability of extracting arbitrary text tokens as literal ones.
+/// Represents the ability of extracting text tokens as <see cref="IStrTokenLiteral"/> ones.
 /// </summary>
 [InheritWiths]
 public partial class StrTokenizerLiteral : StrTokenizerText

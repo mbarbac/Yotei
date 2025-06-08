@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// Represents the ability of extracting arbitrary text tokens.
+/// Represents the ability of extracting arbitrary <see cref="IStrTokenText"/> tokens.
 /// <br/> Note that if 'reduce' is requested while tokenizing, adjacent text elements may get
 /// combined in the final result.
 /// </summary>
@@ -90,6 +90,15 @@ public partial class StrTokenizerText : StrTokenizer
     /// <returns></returns>
     protected virtual IStrToken CreateToken(string value) => new StrTokenText(value);
 
+    /// <summary>
+    /// Determines if the value is found at the given index in the given source. This method is
+    /// invoked to validate that the value is found considering the context that sorrounds it.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    protected virtual bool IsValueAtIndex(int index, string source) => true;
+
     // ----------------------------------------------------
 
     /// <inheritdoc/>
@@ -130,7 +139,7 @@ public partial class StrTokenizerText : StrTokenizer
             }
 
             // Value found...
-            if (span.StartsWith(Value, Comparison))
+            if (span.StartsWith(Value, Comparison) && IsValueAtIndex(i, source))
             {
                 len = i - last; if (len > 0)
                 {
