@@ -45,10 +45,7 @@ partial class StrTokenChain
         public override bool ExpandItems => true;
 
         /// <inheritdoc/>
-        public override bool IsValidDuplicate(IItem source, IItem item)
-            => ReferenceEquals(source, item)
-            ? true
-            : throw new DuplicateException("Duplicated element.").WithData(item);
+        public override bool IsValidDuplicate(IItem source, IItem item) => true;
 
         /// <inheritdoc/>
         public override IEqualityComparer<IItem> Comparer { get; } = EqualityComparer<IStrToken>.Default;
