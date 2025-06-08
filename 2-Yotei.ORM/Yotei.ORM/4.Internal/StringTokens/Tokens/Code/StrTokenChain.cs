@@ -141,7 +141,7 @@ public partial class StrTokenChain : IHost
             if (changed) token = builder.ToInstance();
         }
 
-        // Finishing...
+        // Finishing reducing the resulting chain...
         return
             token.Count == 0 ? StrTokenText.Empty :
             token.Count == 1 ? token[0] :

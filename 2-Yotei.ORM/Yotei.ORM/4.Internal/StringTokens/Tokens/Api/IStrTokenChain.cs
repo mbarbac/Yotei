@@ -26,7 +26,7 @@ public partial interface IStrTokenChain : IItem
 
     /// <summary>
     /// Reduces this instance to a simpler form by combining adjacent text elements in this
-    /// collection, if possible.
+    /// collection, if possible, and then reducing the resulting chain.
     /// </summary>
     /// <returns></returns>
     IStrToken ReduceText();

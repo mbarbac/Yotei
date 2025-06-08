@@ -587,7 +587,7 @@ public static class Test_StrTokenChain
         var target = source.Reduce(comparison);
 
         Assert.NotSame(source, target);
-        var text = Assert.IsType<StrTokenText>(target);
+        var text = Assert.IsType<Text>(target);
         Assert.Equal("onetwothree", text.Payload);
     }
 
@@ -598,7 +598,16 @@ public static class Test_StrTokenChain
         var comparison = StringComparison.OrdinalIgnoreCase;
         var source = new Chain([xone, new Literal("two"), xthree]);
         var target = source.Reduce(comparison);
-
         Assert.Same(source, target);
+
+        source = new Chain([xone, xtwo, new Literal("three")]);
+        target = source.Reduce(comparison);
+        Assert.NotSame(source, target);
+        var chain = Assert.IsType<Chain>(target);
+        Assert.Equal(2, chain.Count);
+        var text = Assert.IsType<Text>(chain[0]);
+        Assert.Equal("onetwo", text.Payload);
+        var literal = Assert.IsType<Literal>(chain[1]);
+        Assert.Equal("three", literal.Payload);
     }
 }
