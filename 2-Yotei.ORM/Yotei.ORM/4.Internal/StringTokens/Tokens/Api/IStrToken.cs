@@ -22,8 +22,8 @@ public interface IStrToken : IEquatable<IStrToken>
     IStrToken Reduce(StringComparison comparison);
 
     /// <summary>
-    /// Invoked to tokenize the payload carried by this instance, provided that payload can
-    /// be transformed into a string one, or that this instance is not an invariant one.
+    /// Invoked to tokenize the payload carried by this instance.
+    /// <br/> This method shall NOT reduce the produced result.
     /// </summary>
     /// <param name="tokenizer"></param>
     /// <returns></returns>

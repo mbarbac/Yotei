@@ -25,7 +25,7 @@ partial class ElementList_KT
         /// <see cref="StringComparison.OrdinalIgnoreCase"/> comparison.
         /// </summary>
         /// <param name="capacity"></param>
-        public Builder(int capacity) : this() { }
+        public Builder(int capacity) : this() => Capacity = capacity;
 
         /// <summary>
         /// Initializes a new instance with the elements of the given range, and a default
