@@ -109,7 +109,7 @@ public static class DebugEx
         var level = Debug.IndentLevel;
         var header = Header(size * level);
 
-        var iter = new StringSplitter(message, Environment.NewLine, "\n");
+        var iter = message.Splitter(Environment.NewLine, "\n");
         while (iter.MoveNext())
         {
             if (DebugAtOrigin && console) Console.Write(header);
@@ -243,7 +243,7 @@ public static class DebugEx
         var level = Debug.IndentLevel;
         var header = Header(size * level);
 
-        var iter = new StringSplitter(message, Environment.NewLine, "\n");
+        var iter = message.Splitter(Environment.NewLine, "\n");
         while (iter.MoveNext())
         {
             if (DebugAtOrigin && console) Console.Write(header);

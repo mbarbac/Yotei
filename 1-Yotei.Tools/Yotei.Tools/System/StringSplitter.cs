@@ -1,12 +1,37 @@
-﻿CHANGE:
-No admito Source siendo null,
-Mimic what string.Split does.
+﻿namespace Yotei.Tools;
 
-namespace Yotei.Tools;
+// ========================================================
+public static class StringSplitterExtensions
+{
+    /// <summary>
+    /// Returns a new splitter for the given source string and separators.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="separators"></param>
+    /// <returns></returns>
+    public static StringSplitter Splitter(this string source, params IEnumerable<string> separators)
+    {
+        return new StringSplitter(source, separators);
+    }
+
+    /// <summary>
+    /// Returns a new splitter for the given source string and separators.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="separators"></param>
+    /// <returns></returns>
+    public static StringSplitter Splitter(this string source, params IEnumerable<char> separators)
+    {
+        return new StringSplitter(source, separators);
+    }
+}
 
 // ========================================================
 /// <summary>
 /// Represents a forward-only string splitter.
+/// <br/> The class aligns with the 'string.Split()' family of methods' behavior, but accepts a
+/// custom string comparison, produces span-alike results, and the separators are also produced
+/// as valid results by default.
 /// </summary>
 public record class StringSplitter : IEnumerable<ReadOnlyMemory<char>>, IEnumerator<ReadOnlyMemory<char>>
 {
@@ -32,9 +57,7 @@ public record class StringSplitter : IEnumerable<ReadOnlyMemory<char>>, IEnumera
     /// <inheritdoc/>
     void IDisposable.Dispose()
     {
-        Results?.Dispose();
-        Results = null;
-
+        Reset();
         GC.SuppressFinalize(this);
     }
 
@@ -104,79 +127,18 @@ public record class StringSplitter : IEnumerable<ReadOnlyMemory<char>>, IEnumera
 
     // ----------------------------------------------------
 
-    /// <inheritdoc/>
-    void IEnumerator.Reset() { }
-
-    // ----------------------------------------------------
-
     int Index = 0;
     int Last = 0;
     IEnumerator<ReadOnlyMemory<char>>? Results = null;
 
-    IEnumerator<ReadOnlyMemory<char>> GetResults()
+    /// <inheritdoc/>
+    public void Reset()
     {
-        // Iterating through source...
-        if (Source is not null)
-        {
-            Current = default;
-            IsSeparator = false;
+        Index = 0;
+        Last = 0;
 
-            // Looping through source...
-            while (Index < Source.Length)
-            {
-                var span = Source[Index..];
-
-                // First separator found wins...
-                foreach (var item in Separators)
-                {
-                    if (!span.StartsWith(item, Comparison)) continue;
-
-                    if (Index > 0) // Separators at position 0 has not a previous element...
-                    {
-                        Current = Source.AsMemory(Last, Index - Last);
-
-                        if (TrimEntries) Current = Current.Trim();
-                        if (!OmitEmptyEntries || (OmitEmptyEntries && Current.Length > 0))
-                        {
-                            yield return Current;
-                        }
-                    }
-
-                    if (!OmitSeparators) // Reporting the separator if such is allowed...
-                    {
-                        IsSeparator = true;
-                        Current = item.AsMemory();
-
-                        Index += item.Length; Last = Index;
-                        Index--;
-
-                        yield return Current;
-                    }
-
-                    break; // We've found a separator, we need not to try more...
-                }
-
-                // Advance to next character...
-                Index++;
-            }
-
-            // Remaining...
-            var len = Source.Length - Last;
-            if (len > 0)
-            {
-                Current = Source.AsMemory(Last, len);
-
-                if (TrimEntries) Current = Current.Trim();
-                if (!OmitEmptyEntries || (OmitEmptyEntries && Current.Length > 0))
-                {
-                    Last = int.MaxValue;
-                    yield return Current;
-                }
-            }
-        }
-
-        // Finishing...
-        yield break;
+        Results?.Dispose();
+        Results = null;
     }
 
     /// <inheritdoc/>
@@ -186,5 +148,70 @@ public record class StringSplitter : IEnumerable<ReadOnlyMemory<char>>, IEnumera
 
         while (Results.MoveNext()) return true;
         return false;
+    }
+
+    /// <summary>
+    /// Invoked to produce the actual results of this iterator.
+    /// </summary>
+    IEnumerator<ReadOnlyMemory<char>> GetResults()
+    {
+        Current = default;
+        IsSeparator = false;
+
+        // Looping through source...
+        while (Index < Source.Length)
+        {
+            var span = Source[Index..];
+
+            // First separator found wins...
+
+            foreach (var item in Separators)
+            {
+                if (!span.StartsWith(item, Comparison)) continue;
+
+                // Contents before the separator...
+                Current = Source.AsMemory(Last, Index - Last);
+
+                if (TrimEntries) Current = Current.Trim();
+                if (!OmitEmptyEntries || (OmitEmptyEntries && Current.Length > 0))
+                {
+                    yield return Current;
+                }
+
+                // Reporting the separator itself...
+                if (!OmitSeparators)
+                {
+                    Current = Source.AsMemory(Index, item.Length);
+                    IsSeparator = true;
+
+                    yield return Current;
+                }
+
+                Index += item.Length;
+                Last = Index;
+                Index--;
+                break;
+            }
+
+            // Advance to next character...
+            Index++;
+        }
+
+        // Remaining...
+        var len = Source.Length - Last;
+        if (len >= 0)
+        {
+            Current = Source.AsMemory(Last, len);
+            Last = int.MaxValue;
+
+            if (TrimEntries) Current = Current.Trim();
+            if (!OmitEmptyEntries || (OmitEmptyEntries && Current.Length > 0))
+            {
+                yield return Current;
+            }
+        }
+
+        // Finishing...
+        yield break;
     }
 }
