@@ -3,6 +3,7 @@
 // ========================================================
 /// <summary>
 /// Represents an arbitrary string token.
+/// <para>Instances of this class are intended to be immutable ones.</para>
 /// </summary>
 public interface IStrToken : IEquatable<IStrToken>
 {
