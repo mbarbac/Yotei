@@ -4,7 +4,7 @@
 /// <summary>
 /// Parses into dot-separated member names the given dynamic lambda expression.
 /// </summary>
-public class LambdaNameParser
+public static class LambdaNameParser
 {
     /// <summary>
     /// Parses the given dynamic lambda expression into the dot-separated names that expression

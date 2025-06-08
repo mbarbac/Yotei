@@ -3,6 +3,7 @@
 // ========================================================
 /// <summary>
 /// Represents a node in a chain of dynamic operations.
+/// <para>Instances of this class are intended to be immutable ones.</para>
 /// </summary>
 public abstract class LambdaNode : DynamicObject, ICloneable
 {

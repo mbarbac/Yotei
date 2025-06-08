@@ -5,6 +5,7 @@
 /// Represents a constant value in a chain of dynamic operations.
 /// <br/> Instances of this type are also captured containig the returned value of methods or
 /// functions invoked while parsing the dynamic expression.
+/// <para>Instances of this class are intended to be immutable ones.</para>
 /// </summary>
 [DebuggerDisplay("{ToDebugString()}")]
 public class LambdaNodeValue : LambdaNode

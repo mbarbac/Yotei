@@ -3,6 +3,7 @@
 // ========================================================
 /// <summary>
 /// Represents a single-part database identifier.
+/// <para>Instances of this class are intended to be immutable ones.</para>
 /// </summary>
 public interface IIdentifierPart : IIdentifier
 {

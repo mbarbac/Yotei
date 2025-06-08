@@ -3,6 +3,7 @@
 // ========================================================
 /// <summary>
 /// Represents a dynamic coalesce operation, as in 'x.Alpha ?? x.Beta'.
+/// <para>Instances of this class are intended to be immutable ones.</para>
 /// </summary>
 [DebuggerDisplay("{ToDebugString()}")]
 public class LambdaNodeCoalesce : LambdaNode

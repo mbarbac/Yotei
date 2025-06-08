@@ -3,6 +3,7 @@
 // ========================================================
 /// <summary>
 /// Represents a dynamic method invocation operation.
+/// <para>Instances of this class are intended to be immutable ones.</para>
 /// </summary>
 [DebuggerDisplay("{ToDebugString()}")]
 public class LambdaNodeMethod : LambdaNodeHosted

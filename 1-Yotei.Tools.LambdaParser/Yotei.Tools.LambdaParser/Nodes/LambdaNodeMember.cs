@@ -3,6 +3,7 @@
 // ========================================================
 /// <summary>
 /// Represents a dynamic get member operation.
+/// <para>Instances of this class are intended to be immutable ones.</para>
 /// </summary>
 [DebuggerDisplay("{ToDebugString()}")]
 public class LambdaNodeMember : LambdaNodeHosted

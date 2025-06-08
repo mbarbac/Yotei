@@ -3,6 +3,7 @@
 // ========================================================
 /// <summary>
 /// Represents a dynamic argument used in a dynamic lambda expression.
+/// <para>Instances of this class are intended to be immutable ones.</para>
 /// </summary>
 [DebuggerDisplay("{ToDebugString()}")]
 public class LambdaNodeArgument : LambdaNode

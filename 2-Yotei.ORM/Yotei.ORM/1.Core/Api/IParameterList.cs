@@ -4,6 +4,7 @@
 /// <summary>
 /// Represents the ordered collection of parameters in a command.
 /// <br/> Duplicated elements are allowed as far as they are exactly the same instance.
+/// <para>Instances of this class are intended to be immutable ones.</para>
 /// </summary>
 [IInvariantList<string, IParameter>]
 public partial interface IParameterList : IEquatable<IParameterList>

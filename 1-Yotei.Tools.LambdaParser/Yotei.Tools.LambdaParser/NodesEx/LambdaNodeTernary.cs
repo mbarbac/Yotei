@@ -3,6 +3,7 @@
 // ========================================================
 /// <summary>
 /// Represents a dynamic ternary operation, as in 'x.Alpha ? x.Beta : x.Delta'.
+/// <para>Instances of this class are intended to be immutable ones.</para>
 /// </summary>
 [DebuggerDisplay("{ToDebugString()}")]
 public class LambdaNodeTernary : LambdaNode

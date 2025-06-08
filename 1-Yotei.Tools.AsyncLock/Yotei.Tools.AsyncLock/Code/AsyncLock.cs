@@ -6,8 +6,8 @@ namespace Yotei.Tools;
 // ========================================================
 /// <summary>
 /// Provides lock-alike capabilities for synchronous, asynchronous and mixed scenarios, including
-/// re-entrant ones. Its lock methods return a disposable object as the result of that operation
-/// that, when disposed, either releases the parent lock or decreases its reentrancy count.
+/// re-entrant ones. The lock methods in this class return a disposable object that, when disposed,
+/// either releases the parent lock or decreases its reentrancy count.
 /// </summary>
 public sealed partial class AsyncLock : DisposableClass
 {

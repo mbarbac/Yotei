@@ -4,6 +4,7 @@
 /// <summary>
 /// Represents an immutable and customizable list-alike collection of elements that are identified
 /// by their respective keys.
+/// <para>Instances of this class are intended to be immutable ones.</para>
 /// </summary>
 /// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>

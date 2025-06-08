@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// Represents a connection with an underliying database.
+/// Represents a connection with an underlying database.
 /// </summary>
 [Cloneable]
 public partial interface IConnection : IDisposableEx

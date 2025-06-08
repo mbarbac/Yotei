@@ -5,6 +5,7 @@
 /// Represents the ability of parsing dynamic lambda expressions, defined as lambda expresssions
 /// with at least one <c>dynamic</c> argument, and returns the chained result of parsing the
 /// dynamic methods and properties bound to those dynamic arguments.
+/// <para>Instances of this class are intended to be immutable ones.</para>
 /// </summary>
 public class LambdaParser
 {

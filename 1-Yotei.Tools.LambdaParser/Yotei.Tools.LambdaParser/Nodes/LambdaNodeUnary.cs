@@ -2,7 +2,8 @@
 
 // ========================================================
 /// <summary>
-/// Represents a dynamic setter operation.
+/// Represents a dynamic unary operation.
+/// <para>Instances of this class are intended to be immutable ones.</para>
 /// </summary>
 [DebuggerDisplay("{ToDebugString()}")]
 public class LambdaNodeUnary : LambdaNode

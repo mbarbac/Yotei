@@ -3,6 +3,7 @@
 // ========================================================
 /// <summary>
 /// Represents an immutable and customizable list-alike collection of elements.
+/// <para>Instances of this class are intended to be immutable ones.</para>
 /// </summary>
 /// <typeparam name="T"></typeparam>
 [Cloneable]
