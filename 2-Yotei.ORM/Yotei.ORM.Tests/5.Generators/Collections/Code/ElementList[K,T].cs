@@ -12,10 +12,7 @@ namespace Yotei.ORM.Tests.Generators;
 public partial class ElementList_KT : IHost
 {
     /// <inheritdoc/>
-    protected override Builder Items => _Items ??= new(Comparison);
-    Builder? _Items = null;
-
-    // ------------------------------------------------
+    protected override Builder Items { get; }
 
     /// <summary>
     /// Initializes a new empty instance with a <see cref="StringComparison.OrdinalIgnoreCase"/>
@@ -36,7 +33,7 @@ public partial class ElementList_KT : IHost
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="comparison"></param>
-    public ElementList_KT(StringComparison comparison) => Comparison = comparison;
+    public ElementList_KT(StringComparison comparison) => Items = new(comparison);
 
     /// <summary>
     /// Initializes a new instance with the elements from the given range.
@@ -52,6 +49,9 @@ public partial class ElementList_KT : IHost
     /// <remarks>Needs to be protected for the 'IEnumerable(range)' constructor to work.</remarks>
     /// <param name="source"></param>
     protected ElementList_KT(THost source) : this(source.Comparison) => Items.AddRange(source);
+
+    /// <inheritdoc/>
+    public override string ToString() => Items.ToString();
 
     // ----------------------------------------------------
 
@@ -97,7 +97,11 @@ public partial class ElementList_KT : IHost
     /// <inheritdoc cref="IHost.GetBuilder"/>
     public virtual Builder GetBuilder() => new(Comparison, this);
     IHost.IBuilder IHost.GetBuilder() => GetBuilder();
-    
+
     /// <inheritdoc/>
-    public StringComparison Comparison { get; }
+    public StringComparison Comparison
+    {
+        get => Items.Comparison;
+        init => Items.Comparison = value;
+    }
 }

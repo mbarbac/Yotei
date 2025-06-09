@@ -3,12 +3,91 @@
 // ========================================================
 public static class Identifier
 {
+    /// <summary>
+    /// Returns a new identifier of the appropriate type using the given value.
+    /// </summary>
+    /// <param name="engine"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static IIdentifier Create(IEngine engine, string? value = null)
+    {
+        var item = new IdentifierChain(engine, value);
+
+        return
+            item.Count == 0 ? new IdentifierPart(engine) :
+            item.Count == 1 ? item[0]
+            : item;
+    }
+
+    /// <summary>
+    /// Returns a new identifier of the appropriate type using the given range of values.
+    /// </summary>
+    /// <param name="engine"></param>
+    /// <param name="range"></param>
+    /// <returns></returns>
+    public static IIdentifier Create(IEngine engine, IEnumerable<string?> range)
+    {
+        var item = new IdentifierChain(engine, range);
+
+        return
+            item.Count == 0 ? new IdentifierPart(engine) :
+            item.Count == 1 ? item[0]
+            : item;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if this instance matches the given specifications or not.
+    /// <br/> Comparison is performed comparing the respective parts, from right to left, where
+    /// an empty or null specification is taken as an implicit match.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="specs"></param>
+    /// <returns></returns>
+    public static bool Match(IIdentifier item, string? specs)
+    {
+        item.ThrowWhenNull();
+
+        var engine = item.Engine;
+        var target = new IdentifierChain(engine, specs);
+        if (target.Value is null) return true;
+
+        var source = item is IIdentifierChain chain
+            ? chain
+            : new IdentifierChain(engine, [(IIdentifierPart)item]);
+
+        // Looping...
+        for (int i = 0; ; i++)
+        {
+            if (i >= target.Count) break;
+            if (i >= source.Count)
+            {
+                while (i < target.Count)
+                {
+                    var value = target[^(i + 1)].UnwrappedValue;
+                    if (value is not null) return false;
+                    i++;
+                }
+                break;
+            }
+
+            var tvalue = target[^(i + 1)].UnwrappedValue; if (tvalue is null) continue;
+            var svalue = source[^(i + 1)].UnwrappedValue;
+
+            if (string.Compare(svalue, tvalue, !engine.CaseSensitiveNames) != 0) return false;
+        }
+
+        // Finishing...
+        return true;
+    }
+
     // ----------------------------------------------------
 
     /// <summary>
     /// Returns a list containing the dot-separated parts found in the given source. Empty parts
-    /// are transformed into null values, and engine terminators removed. By default, the returned
-    /// list is reduced by removing the empty or null heading parts.
+    /// are transformed into null values, and engine terminators are also removed. By default,
+    /// the returned list is reduced by removing the empty or null heading parts.
     /// </summary>
     /// <param name="engine"></param>
     /// <param name="value"></param>

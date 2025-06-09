@@ -11,10 +11,7 @@ namespace Yotei.ORM.Tests.Generators;
 public partial class ElementList_T : IHost
 {
     /// <inheritdoc/>
-    protected override Builder Items => _Items ??= new(Comparison);
-    Builder? _Items = null;
-
-    // ------------------------------------------------
+    protected override Builder Items { get; }
 
     /// <summary>
     /// Initializes a new empty instance with a <see cref="StringComparison.OrdinalIgnoreCase"/>
@@ -29,13 +26,16 @@ public partial class ElementList_T : IHost
     /// <param name="range"></param>
     public ElementList_T(params IEnumerable<IItem> range) : this() => Items.AddRange(range);
 
+    /// <inheritdoc/>
+    public override string ToString() => Items.ToString();
+
     // ------------------------------------------------
 
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="comparison"></param>
-    public ElementList_T(StringComparison comparison) => Comparison = comparison;
+    public ElementList_T(StringComparison comparison) => Items = new(comparison);
 
     /// <summary>
     /// Initializes a new instance with the elements from the given range.
@@ -96,7 +96,11 @@ public partial class ElementList_T : IHost
     /// <inheritdoc cref="IHost.GetBuilder"/>
     public virtual Builder GetBuilder() => new(Comparison, this);
     IHost.IBuilder IHost.GetBuilder() => GetBuilder();
-    
+
     /// <inheritdoc/>
-    public StringComparison Comparison { get; }
+    public StringComparison Comparison
+    {
+        get => Items.Comparison;
+        init => Items.Comparison = value;
+    }
 }

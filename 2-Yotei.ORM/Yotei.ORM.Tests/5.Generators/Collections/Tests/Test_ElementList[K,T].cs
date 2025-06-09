@@ -486,7 +486,8 @@ public static class Test_ElementList_KT
     [Fact]
     public static void Test_Remove_Item()
     {
-        var source = new Chain([xone, xtwo, xthree, xone]);
+        var comparison = StringComparison.OrdinalIgnoreCase;
+        var source = new Chain([xone, xtwo, xthree, xone]) { Comparison = comparison };
         var target = source.Remove("four");
         Assert.Same(source, target);
 

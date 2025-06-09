@@ -33,7 +33,7 @@ public class Element : IHost
     }
 
     /// <inheritdoc/>
-    public virtual bool Equals(IHost? other) => Equals(other, StringComparison.OrdinalIgnoreCase);
+    public virtual bool Equals(IHost? other) => Equals(other, StringComparison.CurrentCulture);
 
     /// <inheritdoc/>
     public override bool Equals(object? obj) => Equals(obj as IHost);

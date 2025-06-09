@@ -107,6 +107,20 @@ partial class ElementList_KT
         IHost IHost.IBuilder.ToInstance() => ToInstance();
 
         /// <inheritdoc/>
-        public StringComparison Comparison { get; }
+        public StringComparison Comparison
+        {
+            get => _Comparison;
+            set
+            {
+                if (value == _Comparison) return;
+
+                var range = ToList();
+                Clear();
+
+                _Comparison = value;
+                AddRange(range);
+            }
+        }
+        StringComparison _Comparison = default;
     }
 }

@@ -11,6 +11,8 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// </summary>
     protected abstract ICoreList<K, T> Items { get; }
 
+    // ----------------------------------------------------
+
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
