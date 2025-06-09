@@ -1,5 +1,3 @@
-﻿namespace Yotei.ORM;
+﻿namespace Yotei.ORM.Tools;
 
 // ========================================================
-
-public interface IFake { }
