@@ -65,9 +65,9 @@
    <!-- Emit generated files -->
    <ItemGroup>
 	  <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
-   </ItemGroup>
-   <ItemGroup>
-     <Folder Include="4.Internal\StringTokens\" />
+	  <Compile Remove="4.Internal\**" />
+	  <EmbeddedResource Remove="4.Internal\**" />
+	  <None Remove="4.Internal\**" />
    </ItemGroup>
 
    <PropertyGroup>
