@@ -123,6 +123,8 @@ partial class CommandInfo
             return true;
         }
 
+        // ------------------------------------------------
+
         /// <inheritdoc/>
         public virtual bool ReplaceText(string? text)
         {
@@ -138,22 +140,222 @@ partial class CommandInfo
             return true;
         }
 
+        // ------------------------------------------------
+
         /// <inheritdoc/>
         public virtual bool ReplaceValues(params object?[]? range)
         {
-            throw null;
+            range ??= [null];
+
+            if (range.Length == 1)
+            {
+                if (range[0] is IParameterList xlist) range = xlist.ToArray();
+                if (range[0] is IParameterList.IBuilder xbuilder) range = xbuilder.ToArray();
+            }
+
+            if (_Parameters.Count == 0 && range.Length == 0) return false;
+
+            var old = _Parameters.Clone(); // Keeps track of the original ones...
+
+            if (range.Length > 0) // Iterating...
+            {
+                var items = RangeElement.Capture(range);
+                var captured = new ParameterList.Builder(Engine);
+
+                for (int i = 0; i < items.Length; i++)
+                {
+                    var item = items[i]; switch (item.Value)
+                    {
+                        case IParameter par:
+                            Capture(par, captured);
+                            break;
+
+                        case AnonymousElement anon:
+                            var xpar = new Parameter(anon.Name, anon.Value);
+                            Capture(xpar, captured);
+                            break;
+
+                        default:
+                            _Parameters.AddNew(item.Value, out _);
+                            break;
+                    }
+                }
+
+                if (old.Equals(captured)) return false;
+            }
+
+            // Finishing...
+            if (old.Count > 0) _Parameters.RemoveRange(0, old.Count);
+            return true;
         }
 
         // ------------------------------------------------
 
         /// <inheritdoc/>
-        public virtual bool Add(ICommandInfo source) => throw null;
+        public virtual bool Add(ICommandInfo source)
+        {
+            source.ThrowWhenNull();
+
+            var text = source.Text;
+            var pars = source.Parameters;
+
+            var noRemainingSpecs = text.Length > 0;
+            var noUnusedValues = false;
+
+            return Add(noRemainingSpecs, noUnusedValues, text, pars);
+        }
 
         /// <inheritdoc/>
-        public virtual bool Add(ICommandInfo.IBuilder source) => throw null;
+        public virtual bool Add(ICommandInfo.IBuilder source)
+        {
+            source.ThrowWhenNull();
+
+            var text = source.Text;
+            var pars = source.Parameters;
+
+            var noRemainingSpecs = text.Length > 0;
+            var noUnusedValues = false;
+
+            return Add(noRemainingSpecs, noUnusedValues, text, pars);
+        }
 
         /// <inheritdoc/>
-        public virtual bool Add(string? text, params object?[]? range) => throw null;
+        public virtual bool Add(string? text, params object?[]? range)
+        {
+            var noRemainingSpecs = true;
+            var noUnusedValues = true;
+
+            return Add(noRemainingSpecs, noUnusedValues, text, range);
+        }
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Adds to this instance the given text and collection of parameters.
+        /// <br/>- If <paramref name="noRemainingSpecs"/> then no dangling specs are allowed.
+        /// <br/>- If <paramref name="noUnusedValues"/> the no unused values are allowed.
+        /// </summary>
+        bool Add(
+            bool noRemainingSpecs,
+            bool noUnusedValues,
+            string? text, params object?[]? range)
+        {
+            var textnull = text is null;
+            var rangeempty = range is not null && range.Length == 0;
+            if ((textnull || text!.Length == 0) && rangeempty) return false;
+
+            text ??= string.Empty;
+            range ??= [null];
+
+            // Capturing and validating optional values...
+            var items = RangeElement.Capture(range);
+
+            if (items.Length == 1)
+            {
+                if (items[0].Value is IParameterList parList) // Special case...
+                {
+                    text = NamesToOrdinalBrackets(text, parList, Comparison);
+                    range = parList.ToArray();
+                    return Add(noRemainingSpecs, noUnusedValues, text, range);
+                }
+                if (items[0].Value is IParameterList.IBuilder parBuilder) // Special case...
+                {
+                    text = NamesToOrdinalBrackets(text, parBuilder, Comparison);
+                    range = parBuilder.ToArray();
+                    return Add(noRemainingSpecs, noUnusedValues, text, range);
+                }
+            }
+
+            for (int i = 0; i < items.Length; i++)
+            {
+                var item = items[i];
+
+                if (item.Value is ICommand) throw new ArgumentException("Element cannot be a command itself.").WithData(item);
+                if (item.Value is ICommandInfo) throw new ArgumentException("Element cannot be a command info itself.").WithData(item);
+                if (item.Value is ICommandInfo.IBuilder) throw new ArgumentException("Element cannot be a command info builder itself.").WithData(item);
+            }
+
+            // Iterating through the given range of optional values...
+            var ret = !textnull;
+            var captured = new ParameterList.Builder(Engine);
+
+            for (int i = 0; i < items.Length; i++)
+            {
+                var item = items[i];
+                string name = null!;
+                IParameter par;
+
+                // Capturing a suitable parameter...
+                switch (item.Value)
+                {
+                    case IParameter xpar:
+                        par = Capture(xpar, captured);
+                        name = par.Name;
+                        break;
+
+                    case AnonymousElement anon:
+                        par = new Parameter(anon.Name, anon.Value);
+                        par = Capture(par, captured);
+                        name = par.Name;
+                        break;
+
+                    default:
+                        _Parameters.AddNew(item.Value, out par);
+                        captured.Add(par);
+                        name = par.Name;
+                        break;
+                }
+
+                // If no given text, no need to modify it...
+                if (textnull)
+                {
+                    item.Used = true;
+                    ret = true;
+                    continue;
+                }
+
+                // Modifying text by named brackets...
+                var pos = 0;
+                while ((pos = FindNamedBracket(name, text, pos, out var bracket)) >= 0)
+                {
+                    text = text.Remove(pos, bracket!.Length);
+                    text = text.Insert(pos, par.Name);
+
+                    pos += par.Name.Length;
+                    item.Used = true;
+                    ret = true;
+                }
+
+                // Modifying text by ordinal brackets...
+                pos = 0;
+                while ((pos = FindOrdinalBracket(i, text, pos, out var bracket)) >= 0)
+                {
+                    text = text.Remove(pos, bracket!.Length);
+                    text = text.Insert(pos, par.Name);
+
+                    pos += par.Name.Length;
+                    item.Used = true;
+                    ret = true;
+                }
+            }
+
+            // Validating no dangling specifications...
+            if (noRemainingSpecs &&
+                !textnull && AreRemainingBrackets(text)) throw new ArgumentException(
+                    "There are unused brackets in the given text.")
+                    .WithData(text);
+
+            // Validating no remaining unused elements...
+            if (noUnusedValues &&
+                items.Length > 0 && items.Any(x => !x.Used)) throw new ArgumentException(
+                    "There are unused elements in the range of values.")
+                    .WithData(range)
+                    .WithData(text);
+
+            // Finishing...
+            if (ret && !textnull) _Text.Append(text);
+            return ret;
+        }
 
         // ------------------------------------------------
 
@@ -268,7 +470,7 @@ partial class CommandInfo
         /// names. Returns either the given parameter, or a new one created to prevent collision
         /// of its name with any *original* ones.
         /// </summary>
-        IParameter Capture(IParameter par, IParameterList.IBuilder captured)
+        IParameter Capture(IParameter par, ParameterList.Builder captured)
         {
             par = ValidateName(par);
 
