@@ -14,10 +14,15 @@ public partial class ParameterList : IHost
     protected override Builder Items { get; }
 
     /// <summary>
+    /// Invoked to create the initial repository of contents of this instance.
+    /// </summary>
+    protected virtual Builder OnInitialize(IEngine engine) => new(engine);
+
+    /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="engine"></param>
-    public ParameterList(IEngine engine) => Items = new(engine);
+    public ParameterList(IEngine engine) => Items = OnInitialize(engine);
 
     /// <summary>
     /// Initializes a new instance with the elements of the given range.
@@ -31,8 +36,7 @@ public partial class ParameterList : IHost
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected ParameterList(
-        ParameterList source) : this(source.Engine) => Items.AddRange(source);
+    protected ParameterList(ParameterList source) => Items = source.Items.Clone();
 
     /// <inheritdoc/>
     public override string ToString() => Items.ToString();

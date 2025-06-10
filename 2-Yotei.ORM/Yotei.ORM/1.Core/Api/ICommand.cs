@@ -10,12 +10,12 @@ public partial interface ICommand
     /// <summary>
     /// The connection this instance is associated with.
     /// </summary>
-    [With] IConnection Connection { get; set; }
+    [With] IConnection Connection { get; }
 
     /// <summary>
     /// The locale to use with culture-sensitive objects in the database.
     /// </summary>
-    [With] Locale Locale { get; set; }
+    [With] Locale Locale { get; }
 
     /// <summary>
     /// Obtains the information needed to run a command, using its default iterable mode.

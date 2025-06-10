@@ -199,6 +199,9 @@ partial class CommandInfo
             var text = source.Text;
             var pars = source.Parameters;
 
+            // If 'source.Text' is not null, we don't want dangling specs. But it may happen that
+            // source carries unused values due to previous transformations...
+
             var noRemainingSpecs = text.Length > 0;
             var noUnusedValues = false;
 
@@ -212,6 +215,9 @@ partial class CommandInfo
 
             var text = source.Text;
             var pars = source.Parameters;
+
+            // If 'source.Text' is not null, we don't want dangling specs. But it may happen that
+            // source carries unused values due to previous transformations...
 
             var noRemainingSpecs = text.Length > 0;
             var noUnusedValues = false;
@@ -247,10 +253,10 @@ partial class CommandInfo
             text ??= string.Empty;
             range ??= [null];
 
-            // Capturing and validating optional values...
+            // Capturing optional values...
             var items = RangeElement.Capture(range);
 
-            if (items.Length == 1)
+            if (items.Length == 1) // Cases when range is just one special element...
             {
                 if (items[0].Value is IParameterList parList) // Special case...
                 {
@@ -266,7 +272,7 @@ partial class CommandInfo
                 }
             }
 
-            for (int i = 0; i < items.Length; i++)
+            for (int i = 0; i < items.Length; i++) // Command-alike parameters not allowed...
             {
                 var item = items[i];
 
@@ -283,6 +289,7 @@ partial class CommandInfo
             {
                 var item = items[i];
                 string name = null!;
+                bool changed = false;
                 IParameter par;
 
                 // Capturing a suitable parameter...
@@ -290,13 +297,13 @@ partial class CommandInfo
                 {
                     case IParameter xpar:
                         par = Capture(xpar, captured);
-                        name = par.Name;
+                        name = xpar.Name;
                         break;
 
                     case AnonymousElement anon:
                         par = new Parameter(anon.Name, anon.Value);
                         par = Capture(par, captured);
-                        name = par.Name;
+                        name = anon.Name;
                         break;
 
                     default:
@@ -314,7 +321,8 @@ partial class CommandInfo
                     continue;
                 }
 
-                // Modifying text by named brackets...
+                // Modifying text by named brackets, where 'name' is used to find the old name in
+                // the text, and needs not to be the same as the new 'par.Name'...
                 var pos = 0;
                 while ((pos = FindNamedBracket(name, text, pos, out var bracket)) >= 0)
                 {
@@ -381,7 +389,7 @@ partial class CommandInfo
             {
                 var i = 0; foreach (var par in pars)
                 {
-                    var bracket = $"{{{i}}}";
+                    var bracket = $"{{{i}}}"; i++;
                     var name = par.Name;
                     var pos = 0;
 
@@ -459,9 +467,14 @@ partial class CommandInfo
         /// </summary>
         IParameter ValidateName(IParameter par)
         {
-            return par.Name.StartsWith(Prefix, Comparison)
-                ? par
-                : par.WithName(Prefix + par.Name);
+            if (par.Name.StartsWith(Prefix, Comparison))
+            {
+                return par;
+            }
+            else
+            {
+                return par.WithName(Prefix + par.Name);
+            }
         }
 
         /// <summary>
@@ -478,7 +491,10 @@ partial class CommandInfo
                 "Duplicated element name detected.")
                 .WithData(par.Name);
 
-            if (_Parameters.Contains(par.Name)) _Parameters.AddNew(par.Value, out par);
+            if (_Parameters.Contains(par.Name))
+            {
+                _Parameters.AddNew(par.Value, out par);
+            }
             else _Parameters.Add(par);
 
             captured.Add(par);

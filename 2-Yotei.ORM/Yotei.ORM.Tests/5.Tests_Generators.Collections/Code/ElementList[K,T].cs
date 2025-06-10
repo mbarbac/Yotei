@@ -14,10 +14,15 @@ public partial class ElementList_KT : IHost
     protected override Builder Items { get; }
 
     /// <summary>
+    /// Invoked to create the initial repository of contents of this instance.
+    /// </summary>
+    protected virtual Builder OnInitialize(bool sensitive) => new(sensitive);
+
+    /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="sensitive"></param>
-    public ElementList_KT(bool sensitive) => Items = new(sensitive);
+    public ElementList_KT(bool sensitive) => Items = OnInitialize(sensitive);
 
     /// <summary>
     /// Initializes a new instance with the elements of the given range.
@@ -31,8 +36,7 @@ public partial class ElementList_KT : IHost
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected ElementList_KT(
-        ElementList_KT source) : this(source.CaseSensitive) => Items.AddRange(source);
+    protected ElementList_KT(ElementList_KT source) => Items = source.Items.Clone();
 
     /// <inheritdoc/>
     public override string ToString() => Items.ToString();
