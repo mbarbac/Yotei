@@ -289,7 +289,6 @@ partial class CommandInfo
             {
                 var item = items[i];
                 string name = null!;
-                bool changed = false;
                 IParameter par;
 
                 // Capturing a suitable parameter...
