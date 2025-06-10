@@ -1,10 +1,10 @@
-﻿namespace Yotei.ORM.Tools.Code;
+﻿namespace Yotei.ORM.Tools;
 
 // ========================================================
-/// <inheritdoc cref="ICoreList{K, T}"/>
+/// <inheritdoc cref="ICoreList{T}"/>
 [DebuggerDisplay("{ToDebugString(5)}")]
 [Cloneable]
-public abstract partial class CoreList<K, T> : ICoreList<K, T>
+public abstract partial class CoreList<T> : ICoreList<T>
 {
     readonly List<T> Items;
 
@@ -29,7 +29,7 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected CoreList(CoreList<K, T> source) : this() => AddRange(source);
+    protected CoreList(CoreList<T> source) : this() => AddRange(source);
 
     /// <inheritdoc/>
     public IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
@@ -68,23 +68,9 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     public abstract T ValidateItem(T item);
 
     /// <summary>
-    /// Invoked to obtain the key by which the given element will be known.
+    /// The comparer to use to determine equality between two elements.
     /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    public abstract K GetKey(T item);
-
-    /// <summary>
-    /// Invoked to validate the given key before using it in this collection.
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    public abstract K ValidateKey(K key);
-
-    /// <summary>
-    /// The comparer to use to determine equality between two keys.
-    /// </summary>
-    public abstract IEqualityComparer<K> Comparer { get; }
+    public abstract IEqualityComparer<T> Comparer { get; }
 
     /// <summary>
     /// Determines if when including in this collection elements that are themselves collections
@@ -123,37 +109,35 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     }
 
     /// <inheritdoc/>
-    public bool Contains(K key) => IndexOf(key) >= 0;
-    bool ICollection<T>.Contains(T item) => Contains(GetKey(item));
-    bool IList.Contains(object? value) => Contains(GetKey((T)value!));
+    public bool Contains(T item) => IndexOf(item) >= 0;
+    bool IList.Contains(object? value) => Contains((T)value!);
 
     /// <inheritdoc/>
-    public int IndexOf(K key) => IndexOf(key, validate: true);
-    int IList<T>.IndexOf(T item) => IndexOf(GetKey(item));
-    int IList.IndexOf(object? value) => IndexOf(GetKey((T)value!));
+    public int IndexOf(T item) => IndexOf(item, validate: true);
+    int IList.IndexOf(object? value) => IndexOf((T)value!);
 
-    int IndexOf(K key, bool validate)
+    int IndexOf(T item, bool validate)
     {
-        if (validate) key = ValidateKey(key);
-        return IndexOf(x => Comparer.Equals(key, GetKey(x)));
+        if (validate) item = ValidateItem(item);
+        return IndexOf(x => Comparer.Equals(item, x));
     }
 
     /// <inheritdoc/>
-    public int LastIndexOf(K key) => LastIndexOf(key, validate: true);
+    public int LastIndexOf(T item) => LastIndexOf(item, validate: true);
 
-    int LastIndexOf(K key, bool validate)
+    int LastIndexOf(T item, bool validate)
     {
-        if (validate) key = ValidateKey(key);
-        return LastIndexOf(x => Comparer.Equals(key, GetKey(x)));
+        if (validate) item = ValidateItem(item);
+        return LastIndexOf(x => Comparer.Equals(item, x));
     }
 
     /// <inheritdoc/>
-    public List<int> IndexesOf(K key) => IndexesOf(key, validate: true);
+    public List<int> IndexesOf(T item) => IndexesOf(item, validate: true);
 
-    List<int> IndexesOf(K key, bool validate)
+    List<int> IndexesOf(T item, bool validate)
     {
-        if (validate) key = ValidateKey(key);
-        return IndexesOf(x => Comparer.Equals(key, GetKey(x)));
+        if (validate) item = ValidateItem(item);
+        return IndexesOf(x => Comparer.Equals(item, x));
     }
 
     /// <inheritdoc/>
@@ -209,7 +193,7 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     /// Invoked to find the indexes of all the elements that shall be considered duplicates
     /// because carrying the given key.
     /// </summary>
-    protected virtual List<int> FindDuplicates(K key) => IndexesOf(key);
+    protected virtual List<int> FindDuplicates(T item) => IndexesOf(item);
 
     /// <summary>
     /// Determines if the given element is the same as the existing source one, or not. By default,
@@ -219,7 +203,7 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     protected virtual bool SameItem(T source, T item)
     {
         return typeof(T).IsValueType
-            ? Comparer.Equals(GetKey(source), GetKey(item))
+            ? Comparer.Equals(source, item)
             : ReferenceEquals(source, item);
     }
 
@@ -269,8 +253,7 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
 
         item = ValidateItem(item);
 
-        var key = GetKey(item);
-        var dups = FindDuplicates(key);
+        var dups = FindDuplicates(item);
         foreach (var dup in dups) if (!IsValidDuplicate(Items[dup], item)) return 0;
 
         Items.Add(item);
@@ -299,8 +282,7 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
 
         item = ValidateItem(item);
 
-        var key = GetKey(item);
-        var dups = FindDuplicates(key);
+        var dups = FindDuplicates(item);
         foreach (var dup in dups) if (!IsValidDuplicate(Items[dup], item)) return 0;
 
         Items.Insert(index, item);
@@ -342,34 +324,70 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     }
 
     /// <inheritdoc/>
-    public virtual int Remove(K key)
+    public virtual int Remove(T item)
     {
-        var index = IndexOf(key);
-        return index >= 0 ? RemoveAt(index) : 0;
-    }
-    bool ICollection<T>.Remove(T item) => Remove(GetKey(ValidateItem(item))) > 0;
-    void IList.Remove(object? value) => Remove(GetKey(ValidateItem((T)value!)));
-
-    /// <inheritdoc/>
-    public virtual int RemoveLast(K key)
-    {
-        var index = LastIndexOf(key);
-        return index >= 0 ? RemoveAt(index) : 0;
-    }
-
-    /// <inheritdoc/>
-    public virtual int RemoveAll(K key)
-    {
-        key = ValidateKey(key);
-
-        var num = 0; while (true)
+        if (item is IEnumerable<T> range && ExpandItems) // Enumerable expansion...
         {
-            var index = IndexOf(key, validate: false);
-
-            if (index >= 0) num += RemoveAt(index);
-            else break;
+            var num = 0; foreach (var temp in range)
+            {
+                var r = Remove(temp);
+                num += r;
+            }
+            return num;
         }
-        return num;
+        else // Standard case...
+        {
+            var index = IndexOf(item);
+            return index >= 0 ? RemoveAt(index) : 0;
+        }
+    }
+    bool ICollection<T>.Remove(T item) => Remove(ValidateItem(item)) > 0;
+    void IList.Remove(object? value) => Remove(ValidateItem((T)value!));
+
+    /// <inheritdoc/>
+    public virtual int RemoveLast(T item)
+    {
+        if (item is IEnumerable<T> range && ExpandItems) // Enumerable expansion...
+        {
+            var num = 0; foreach (var temp in range)
+            {
+                var r = RemoveLast(temp);
+                num += r;
+            }
+            return num;
+        }
+        else // Standard case...
+        {
+            var index = LastIndexOf(item);
+            return index >= 0 ? RemoveAt(index) : 0;
+        }
+    }
+
+    /// <inheritdoc/>
+    public virtual int RemoveAll(T item)
+    {
+        if (item is IEnumerable<T> range && ExpandItems) // Enumerable expansion...
+        {
+            var num = 0; foreach (var temp in range)
+            {
+                var r = RemoveAll(temp);
+                num += r;
+            }
+            return num;
+        }
+        else // Standard case...
+        {
+            item = ValidateItem(item);
+
+            var num = 0; while (true)
+            {
+                var index = IndexOf(item, validate: false);
+
+                if (index >= 0) num += RemoveAt(index);
+                else break;
+            }
+            return num;
+        }
     }
 
     /// <inheritdoc/>

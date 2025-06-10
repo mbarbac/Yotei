@@ -26,6 +26,6 @@ global using Yotei.Tools.WithGenerator;
 global using Yotei.ORM;
 global using Yotei.ORM.Code;
 global using Yotei.ORM.Tools;
-global using Yotei.ORM.Tools.Code;
+global using Yotei.ORM.Internals;
 global using Yotei.ORM.Relational;
 global using Yotei.ORM.Generators;

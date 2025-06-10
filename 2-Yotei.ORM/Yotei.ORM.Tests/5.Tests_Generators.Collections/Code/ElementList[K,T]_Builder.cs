@@ -78,7 +78,7 @@ partial class ElementList_KT
 
         // ------------------------------------------------
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="IHost.IBuilder.CreateInstance"/>
         public virtual ElementList_KT CreateInstance() => new(CaseSensitive, this);
         IHost IHost.IBuilder.CreateInstance() => CreateInstance();
 

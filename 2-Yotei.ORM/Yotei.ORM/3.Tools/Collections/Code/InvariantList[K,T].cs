@@ -1,15 +1,17 @@
-﻿namespace Yotei.ORM.Tools.Code;
+﻿namespace Yotei.ORM.Tools;
 
 // ========================================================
-/// <inheritdoc cref="IInvariantList{T}"/>
+/// <inheritdoc cref="IInvariantList{K, T}"/>
 [DebuggerDisplay("{ToDebugString(5)}")]
 [Cloneable]
-public abstract partial class InvariantList<T> : IInvariantList<T>
+public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
 {
     /// <summary>
     /// The actual repository of contents of this instance.
     /// </summary>
-    protected abstract ICoreList<T> Items { get; }
+    protected abstract ICoreList<K, T> Items { get; }
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// Initializes a new empty instance.
@@ -30,7 +32,7 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected InvariantList(InvariantList<T> source)
+    protected InvariantList(InvariantList<K, T> source)
     {
         Items.Capacity = source.Items.Count;
         Items.AddRange(source);
@@ -73,16 +75,16 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
     public T this[int index] => Items[index];
 
     /// <inheritdoc/>
-    public bool Contains(T item) => Items.Contains(item);
+    public bool Contains(K key) => Items.Contains(key);
 
     /// <inheritdoc/>
-    public int IndexOf(T item) => Items.IndexOf(item);
+    public int IndexOf(K key) => Items.IndexOf(key);
 
     /// <inheritdoc/>
-    public int LastIndexOf(T item) => Items.LastIndexOf(item);
+    public int LastIndexOf(K key) => Items.LastIndexOf(key);
 
     /// <inheritdoc/>
-    public List<int> IndexesOf(T item) => Items.IndexesOf(item);
+    public List<int> IndexesOf(K key) => Items.IndexesOf(key);
 
     /// <inheritdoc/>
     public bool Contains(Predicate<T> predicate) => Items.Contains(predicate);
@@ -108,7 +110,7 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public virtual InvariantList<T> GetRange(int index, int count)
+    public virtual InvariantList<K, T> GetRange(int index, int count)
     {
         if (index == 0 && count == Count) return this;
         if (index == 0 && count == 0) return Clear();
@@ -120,131 +122,131 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
         clone.Items.AddRange(range);
         return clone;
     }
-    IInvariantList<T> IInvariantList<T>.GetRange(int index, int count) => GetRange(index, count);
+    IInvariantList<K, T> IInvariantList<K, T>.GetRange(int index, int count) => GetRange(index, count);
 
     /// <inheritdoc/>
-    public virtual InvariantList<T> Replace(int index, T item)
+    public virtual InvariantList<K, T> Replace(int index, T item)
     {
         var clone = Clone();
         var done = clone.Items.Replace(index, item);
         return done > 0 ? clone : this;
     }
-    IInvariantList<T> IInvariantList<T>.Replace(int index, T item) => Replace(index, item);
+    IInvariantList<K, T> IInvariantList<K, T>.Replace(int index, T item) => Replace(index, item);
 
     /// <inheritdoc/>
-    public virtual InvariantList<T> Add(T item)
+    public virtual InvariantList<K, T> Add(T item)
     {
         var clone = Clone();
         var done = clone.Items.Add(item);
         return done > 0 ? clone : this;
     }
-    IInvariantList<T> IInvariantList<T>.Add(T item) => Add(item);
+    IInvariantList<K, T> IInvariantList<K, T>.Add(T item) => Add(item);
 
     /// <inheritdoc/>
-    public virtual InvariantList<T> AddRange(IEnumerable<T> range)
+    public virtual InvariantList<K, T> AddRange(IEnumerable<T> range)
     {
         var clone = Clone();
         var done = clone.Items.AddRange(range);
         return done > 0 ? clone : this;
     }
-    IInvariantList<T> IInvariantList<T>.AddRange(IEnumerable<T> range) => AddRange(range);
+    IInvariantList<K, T> IInvariantList<K, T>.AddRange(IEnumerable<T> range) => AddRange(range);
 
     /// <inheritdoc/>
-    public virtual InvariantList<T> Insert(int index, T item)
+    public virtual InvariantList<K, T> Insert(int index, T item)
     {
         var clone = Clone();
         var done = clone.Items.Insert(index, item);
         return done > 0 ? clone : this;
     }
-    IInvariantList<T> IInvariantList<T>.Insert(int index, T item) => Insert(index, item);
+    IInvariantList<K, T> IInvariantList<K, T>.Insert(int index, T item) => Insert(index, item);
 
     /// <inheritdoc/>
-    public virtual InvariantList<T> InsertRange(int index, IEnumerable<T> range)
+    public virtual InvariantList<K, T> InsertRange(int index, IEnumerable<T> range)
     {
         var clone = Clone();
         var done = clone.Items.InsertRange(index, range);
         return done > 0 ? clone : this;
     }
-    IInvariantList<T> IInvariantList<T>.InsertRange(int index, IEnumerable<T> range) => InsertRange(index, range);
+    IInvariantList<K, T> IInvariantList<K, T>.InsertRange(int index, IEnumerable<T> range) => InsertRange(index, range);
 
     /// <inheritdoc/>
-    public virtual InvariantList<T> RemoveAt(int index)
+    public virtual InvariantList<K, T> RemoveAt(int index)
     {
         var clone = Clone();
         var done = clone.Items.RemoveAt(index);
         return done > 0 ? clone : this;
     }
-    IInvariantList<T> IInvariantList<T>.RemoveAt(int index) => RemoveAt(index);
+    IInvariantList<K, T> IInvariantList<K, T>.RemoveAt(int index) => RemoveAt(index);
 
     /// <inheritdoc/>
-    public virtual InvariantList<T> RemoveRange(int index, int count)
+    public virtual InvariantList<K, T> RemoveRange(int index, int count)
     {
         var clone = Clone();
         var done = clone.Items.RemoveRange(index, count);
         return done > 0 ? clone : this;
     }
-    IInvariantList<T> IInvariantList<T>.RemoveRange(int index, int count) => RemoveRange(index, count);
+    IInvariantList<K, T> IInvariantList<K, T>.RemoveRange(int index, int count) => RemoveRange(index, count);
 
     /// <inheritdoc/>
-    public virtual InvariantList<T> Remove(T item)
+    public virtual InvariantList<K, T> Remove(K key)
     {
         var clone = Clone();
-        var done = clone.Items.Remove(item);
+        var done = clone.Items.Remove(key);
         return done > 0 ? clone : this;
     }
-    IInvariantList<T> IInvariantList<T>.Remove(T item) => Remove(item);
+    IInvariantList<K, T> IInvariantList<K, T>.Remove(K key) => Remove(key);
 
     /// <inheritdoc/>
-    public virtual InvariantList<T> RemoveLast(T item)
+    public virtual InvariantList<K, T> RemoveLast(K key)
     {
         var clone = Clone();
-        var done = clone.Items.RemoveLast(item);
+        var done = clone.Items.RemoveLast(key);
         return done > 0 ? clone : this;
     }
-    IInvariantList<T> IInvariantList<T>.RemoveLast(T item) => RemoveLast(item);
+    IInvariantList<K, T> IInvariantList<K, T>.RemoveLast(K key) => RemoveLast(key);
 
     /// <inheritdoc/>
-    public virtual InvariantList<T> RemoveAll(T item)
+    public virtual InvariantList<K, T> RemoveAll(K key)
     {
         var clone = Clone();
-        var done = clone.Items.RemoveAll(item);
+        var done = clone.Items.RemoveAll(key);
         return done > 0 ? clone : this;
     }
-    IInvariantList<T> IInvariantList<T>.RemoveAll(T item) => RemoveAll(item);
+    IInvariantList<K, T> IInvariantList<K, T>.RemoveAll(K key) => RemoveAll(key);
 
     /// <inheritdoc/>
-    public virtual InvariantList<T> Remove(Predicate<T> predicate)
+    public virtual InvariantList<K, T> Remove(Predicate<T> predicate)
     {
         var clone = Clone();
         var done = clone.Items.Remove(predicate);
         return done > 0 ? clone : this;
     }
-    IInvariantList<T> IInvariantList<T>.Remove(Predicate<T> predicate) => Remove(predicate);
+    IInvariantList<K, T> IInvariantList<K, T>.Remove(Predicate<T> predicate) => Remove(predicate);
 
     /// <inheritdoc/>
-    public virtual InvariantList<T> RemoveLast(Predicate<T> predicate)
+    public virtual InvariantList<K, T> RemoveLast(Predicate<T> predicate)
     {
         var clone = Clone();
         var done = clone.Items.RemoveLast(predicate);
         return done > 0 ? clone : this;
     }
-    IInvariantList<T> IInvariantList<T>.RemoveLast(Predicate<T> predicate) => RemoveLast(predicate);
+    IInvariantList<K, T> IInvariantList<K, T>.RemoveLast(Predicate<T> predicate) => RemoveLast(predicate);
 
     /// <inheritdoc/>
-    public virtual InvariantList<T> RemoveAll(Predicate<T> predicate)
+    public virtual InvariantList<K, T> RemoveAll(Predicate<T> predicate)
     {
         var clone = Clone();
         var done = clone.Items.RemoveAll(predicate);
         return done > 0 ? clone : this;
     }
-    IInvariantList<T> IInvariantList<T>.RemoveAll(Predicate<T> predicate) => RemoveAll(predicate);
+    IInvariantList<K, T> IInvariantList<K, T>.RemoveAll(Predicate<T> predicate) => RemoveAll(predicate);
 
     /// <inheritdoc/>
-    public virtual InvariantList<T> Clear()
+    public virtual InvariantList<K, T> Clear()
     {
         var clone = Clone();
         var done = clone.Items.Clear();
         return done > 0 ? clone : this;
     }
-    IInvariantList<T> IInvariantList<T>.Clear() => Clear();
+    IInvariantList<K, T> IInvariantList<K, T>.Clear() => Clear();
 }

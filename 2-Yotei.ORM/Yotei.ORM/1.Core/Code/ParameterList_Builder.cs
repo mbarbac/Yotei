@@ -78,7 +78,7 @@ partial class ParameterList
 
         // ------------------------------------------------
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="IHost.IBuilder.CreateInstance"/>
         public virtual ParameterList CreateInstance() => new(Engine, this);
         IHost IHost.IBuilder.CreateInstance() => CreateInstance();
 

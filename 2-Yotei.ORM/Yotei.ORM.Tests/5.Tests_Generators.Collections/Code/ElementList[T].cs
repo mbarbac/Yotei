@@ -77,7 +77,7 @@ public partial class ElementList_T : IHost
 
     // ----------------------------------------------------
 
-    /// <inheritdoc/>
+    /// <inheritdoc cref="IHost.CreateBuilder"/>
     public virtual Builder CreateBuilder() => Items.Clone();
     IHost.IBuilder IHost.CreateBuilder() => CreateBuilder();
 

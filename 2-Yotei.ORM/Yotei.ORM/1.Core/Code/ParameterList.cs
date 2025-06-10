@@ -79,7 +79,7 @@ public partial class ParameterList : IHost
 
     // ----------------------------------------------------
 
-    /// <inheritdoc/>
+    /// <inheritdoc cref="IHost.CreateBuilder"/>
     public virtual Builder CreateBuilder() => Items.Clone();
     IHost.IBuilder IHost.CreateBuilder() => CreateBuilder();
 

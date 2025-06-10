@@ -1,4 +1,4 @@
-﻿using System.Data;
+﻿#pragma warning disable IDE0130
 
 namespace Yotei.ORM.Generators;
 
@@ -12,7 +12,7 @@ internal class XTypeNode : TypeNode
     // ----------------------------------------------------
 
     const string IInvariantListNamespace = "Yotei.ORM.Tools";
-    const string InvariantListNamespace = "Yotei.ORM.Tools.Code";
+    const string InvariantListNamespace = "Yotei.ORM.Tools";
 
     const string IInvariantListName = "IInvariantList";
     const string InvariantListName = "InvariantList";
@@ -358,7 +358,7 @@ internal class XTypeNode : TypeNode
                         itype.TypeArguments.Length == 1)
                     {
                         var mtemp = mtype.GenericTypeArguments[0];
-                        var itemp = itype.TypeArguments[0];
+                        //var itemp = itype.TypeArguments[0];
 
                         if (mtemp.Name == "T" &&
                             comparer.Equals(itype, TType)) count--; // Found...

@@ -1,3 +1,3 @@
-﻿namespace Yotei.ORM.Tools.Code;
+﻿namespace Yotei.ORM.Internals;
 
 // ========================================================
