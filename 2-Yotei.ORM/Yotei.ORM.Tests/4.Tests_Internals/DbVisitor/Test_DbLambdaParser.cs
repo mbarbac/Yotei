@@ -13,7 +13,7 @@ public static class Test_DbLambdaParser
     {
         var engine = new FakeEngine();
         var parser = new DbLambdaParser(engine);
-        DbToken token;
+        IDbToken token;
         DbTokenArgument arg;
 
         token = parser.Parse(x => "any");

@@ -26,7 +26,7 @@ public class DbLambdaParser
     /// </summary>
     /// <param name="expression"></param>
     /// <returns></returns>
-    public DbToken Parse<T>(Func<dynamic, T> expression)
+    public IDbToken Parse<T>(Func<dynamic, T> expression)
     {
         expression.ThrowWhenNull();
 
