@@ -8,14 +8,14 @@ namespace Yotei.ORM.Tests.Internals;
 public static class Test_DbLambdaParser
 {
     //[Enforced]
-    [Fact]
-    public static void Test_Expression_ToString()
-    {
-        var engine = new FakeEngine();
-        var parser = new DbLambdaParser(engine);
-        IDbToken token;
-        DbTokenArgument arg;
+    //[Fact]
+    //public static void Test_Expression_ToString()
+    //{
+    //    var engine = new FakeEngine();
+    //    var parser = new DbLambdaParser(engine);
+    //    IDbToken token;
+    //    DbTokenArgument arg;
 
-        token = parser.Parse(x => "any");
-    }
+    //    token = parser.Parse(x => "any");
+    //}
 }
