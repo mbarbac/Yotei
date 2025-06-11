@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Internals;
+﻿using System.Xml.Serialization;
+
+namespace Yotei.ORM.Internals;
 
 // ========================================================
 public static class DbToken
@@ -32,4 +34,25 @@ public static class DbToken
     }
 
     static readonly string VALID_FIRST = "_$@#";
+
+    /// <summary>
+    /// Returns an immutable collection based upon the given one.
+    /// </summary>
+    /// <param name="types"></param>
+    /// <returns></returns>
+    public static ImmutableArray<Type> ToTypeArguments(IEnumerable<Type> types)
+    {
+        var list = types.ThrowWhenNull().ToImmutableArray();
+
+        if (list.Length == 0) throw new EmptyException(
+            "Collection of type arguments cannot be empty.");
+
+        for (int i = 0; i < list.Length; i++)
+        {
+            if (list[i] is null) throw new ArgumentException(
+                "Collection of type arguments has null elements.").WithData(list);
+        }
+
+        return list;
+    }
 }

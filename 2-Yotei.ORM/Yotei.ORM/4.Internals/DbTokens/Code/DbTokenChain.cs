@@ -36,7 +36,12 @@ public partial class DbTokenChain : IDbToken
     protected DbTokenChain(DbTokenChain source) => Items = source.Items.Clone();
 
     /// <inheritdoc cref="ICloneable.Clone"/>
-    public override DbTokenChain Clone() => new(this);
+    public override DbTokenChain Clone()
+    {
+        var chain = new DbTokenChain();
+        foreach (var item in this) chain.Add(item.Clone());
+        return chain;
+    }
     IDbToken IDbToken.Clone() => Clone();
 
     /// <inheritdoc/>

@@ -26,12 +26,12 @@ public class DbLambdaParser
     /// </summary>
     /// <param name="expression"></param>
     /// <returns></returns>
-    public IDbToken Parse<T>(Func<dynamic, T> expression)
-    {
-        expression.ThrowWhenNull();
+    //public IDbToken Parse<T>(Func<dynamic, T> expression)
+    //{
+    //    expression.ThrowWhenNull();
 
-        var method = expression.GetMethodInfo();
+    //    var method = expression.GetMethodInfo();
 
-        throw null;
-    }
+    //    throw null;
+    //}
 }
