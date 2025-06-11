@@ -72,7 +72,7 @@ public partial class DbTokenUnary : DbToken
     public ExpressionType Operation { get; }
 
     /// <summary>
-    /// The targett operand of the unary operation.
+    /// The target operand of the unary operation.
     /// </summary>
     public DbToken Target { get; }
 
