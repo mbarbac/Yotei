@@ -18,6 +18,7 @@ public abstract partial class Command : ICommand
     /// <param name="source"></param>
     protected Command(Command source) : this(source.Connection)
     {
+        source.ThrowWhenNull();
         Locale = source.Locale;
     }
 
