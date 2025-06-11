@@ -8,34 +8,43 @@
 public partial class DbTokenIdentifier : DbTokenHosted
 {
     /// <summary>
-    /// Initializes a new instance based upon the given identifier.
-    /// <br/> If it is not a single-part one, then a suitable chain of single-part identifiers is
-    /// built from the given host.
+    /// Returns a new instance where if the given identifier is a multi-part one, an appropriate
+    /// chain of hosts is built using its parts. Otherwise, reverts to a standard creation.
     /// </summary>
     /// <param name="host"></param>
     /// <param name="identifier"></param>
-    //public DbTokenIdentifier(IDbToken host, IIdentifier identifier) : base(host)
-    //{
-    //    identifier.ThrowWhenNull();
+    /// <returns></returns>
+    public static DbTokenIdentifier Create(IDbToken host, IIdentifier identifier)
+    {
+        host.ThrowWhenNull();
+        identifier.ThrowWhenNull();
 
-    //    if (identifier is IIdentifierPart part) Identifier = part;
-    //    else
-    //    {
-    //        var engine = identifier.Engine;
-    //        var chain = (IIdentifierChain)identifier;
+        if (identifier is IIdentifierPart part) return new(host, part);
 
-    //        if (chain.Count == 0 || chain.Value == null) Identifier = new IdentifierPart(engine);
-    //        else
-    //        {
-    //            for (int i = 0; i < (chain.Count - 1); i++)
-    //            {
-    //                var item = chain[i];
+        var engine = identifier.Engine;
+        var chain = (IIdentifierChain)identifier;
 
-    //            }
-    //            Identifier = chain[^1];
-    //        }
-    //    }
-    //}
+        if (chain.Count == 0 || chain.Value is null) return new(host, new IdentifierPart(engine));
+
+        for (int i = 0; i < chain.Count; i++)
+        {
+            part = chain[i];
+            host = new DbTokenIdentifier(host, part);
+        }
+
+        return (DbTokenIdentifier)host;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Initializes a new instance with the given host and single-part identifier.
+    /// </summary>
+    /// <param name="host"></param>
+    /// <param name="identifier"></param>
+    public DbTokenIdentifier(IDbToken host, IIdentifierPart identifier)
+        : base(host)
+        => Identifier = identifier.ThrowWhenNull();
 
     /// <summary>
     /// Copy constructor.

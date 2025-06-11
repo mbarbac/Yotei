@@ -12,7 +12,7 @@ public static class Test_DbTokenIdentifier
     public static void Test_Create_Empty()
     {
         IEngine engine = new FakeEngine();
-        IIdentifier id = new IdentifierPart(engine);
+        IIdentifierPart id = new IdentifierPart(engine);
         var arg = new DbTokenArgument("x");
         var token = new DbTokenIdentifier(arg, id);
 
@@ -24,7 +24,7 @@ public static class Test_DbTokenIdentifier
     public static void Test_Create_Single()
     {
         IEngine engine = new FakeEngine();
-        IIdentifier id = new IdentifierPart(engine, "Alpha");
+        IIdentifierPart id = new IdentifierPart(engine, "Alpha");
         var arg = new DbTokenArgument("x");
         var token = new DbTokenIdentifier(arg, id);
 
@@ -41,7 +41,7 @@ public static class Test_DbTokenIdentifier
         IIdentifier id = new IdentifierChain(engine, "Alpha.Beta.Gamma");
         var arg = new DbTokenArgument("x");
         
-        var token = new DbTokenIdentifier(arg, id);
+        var token = DbTokenIdentifier.Create(arg, id);
         Assert.Equal("[Gamma]", token.Value);
         token = Assert.IsType<DbTokenIdentifier>(token.Host);
         Assert.Equal("[Beta]", token.Value);
