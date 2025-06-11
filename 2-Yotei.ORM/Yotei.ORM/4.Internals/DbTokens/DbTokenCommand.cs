@@ -1,6 +1,7 @@
 ﻿namespace Yotei.ORM.Internals;
 
 // ========================================================
+/// <summary>
 /// Represents an embedded command in a database expression.
 /// </summary>
 [Cloneable]
@@ -10,27 +11,21 @@ public partial class DbTokenCommand : DbToken
     /// Initializes a new instance.
     /// </summary>
     /// <param name="command"></param>
-    public DbTokenCommand(ICommand command)
-        => CommandInfo = command.ThrowWhenNull().GetCommandInfo(iterable: false);
-
-    /// <summary>
-    /// Initializes a new instance.
-    /// </summary>
-    /// <param name="info"></param>
-    public DbTokenCommand(ICommandInfo info) => CommandInfo = info.ThrowWhenNull();
+    public DbTokenCommand(ICommand command) => Command = command.ThrowWhenNull().Clone();
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
     protected DbTokenCommand(DbTokenCommand source) : this(
-        source.CommandInfo.Clone())
+        source.Command.Clone())
     { }
 
     /// <inheritdoc/>
     public override string ToString()
     {
-        var str = CommandInfo.Text.UnWrap('(', ')', trim: true, recursive: true);
+        var info = Command.GetCommandInfo(iterable: false);
+        var str = info.Text.UnWrap('(', ')', trim: true, recursive: true);
         return $"({str})";
     }
 
@@ -46,12 +41,13 @@ public partial class DbTokenCommand : DbToken
         if (other is null) return false;
         if (other is not DbTokenCommand valid) return false;
 
-        if (CommandInfo.IsEmpty != valid.CommandInfo.IsEmpty) return false;
-        if (!CommandInfo.Engine.Equals(valid.CommandInfo.Engine)) return false;
+        var tinfo = Command.GetCommandInfo(iterable: false);
+        var xinfo = valid.Command.GetCommandInfo(iterable: false);
 
-        var sensitive = CommandInfo.Engine.CaseSensitiveNames;
-        if (string.Compare(CommandInfo.Text, valid.CommandInfo.Text, !sensitive) != 0) return false;
-        if (!CommandInfo.Parameters.Equals(valid.CommandInfo.Parameters)) return false;
+        if (tinfo.IsEmpty || xinfo.IsEmpty) return false;
+        if (!tinfo.Engine.Equals(xinfo.Engine)) return false;
+        if (string.Compare(tinfo.Text, xinfo.Text, !tinfo.Engine.CaseSensitiveNames) != 0) return false;
+        if (!tinfo.Parameters.Equals(xinfo.Parameters)) return false;
         return true;
     }
 
@@ -64,12 +60,13 @@ public partial class DbTokenCommand : DbToken
     public static bool operator !=(DbTokenCommand? host, DbToken? other) => !(host == other);
 
     /// <inheritdoc/>
-    public override int GetHashCode() => CommandInfo.GetHashCode();
+    public override int GetHashCode() => Command.GetHashCode();
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// The info about the embedded command carried by this instance.
+    /// The embedded command carried by this instance.
+    /// <br/> This command is a clone of the original one as IT IS NOT INTENDED for modifications.
     /// </summary>
-    public ICommandInfo CommandInfo { get; }
+    public ICommand Command { get; }
 }

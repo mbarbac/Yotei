@@ -1,6 +1,7 @@
 ﻿namespace Yotei.ORM.Internals;
 
 // ========================================================
+/// <summary>
 /// Represents a unary operation against a given token.
 /// </summary>
 [Cloneable]

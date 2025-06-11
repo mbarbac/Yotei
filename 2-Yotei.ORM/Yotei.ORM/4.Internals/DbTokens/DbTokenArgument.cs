@@ -1,6 +1,7 @@
 ﻿namespace Yotei.ORM.Internals;
 
 // ========================================================
+/// <summary>
 /// Represents a dynamic argument in a dynamic lambda expression.
 /// <br/> Instances of this type are considered translation artifacts, with no representation
 /// in a database command.

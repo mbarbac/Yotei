@@ -1,6 +1,7 @@
 ﻿namespace Yotei.ORM.Internals;
 
 // ========================================================
+/// <summary>
 /// Represents a '(left ?? right)' coalesce expression.
 /// </summary>
 [Cloneable]

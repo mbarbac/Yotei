@@ -1,6 +1,7 @@
 ﻿namespace Yotei.ORM.Internals;
 
 // ========================================================
+/// <summary>
 /// Represents an arbitrary value in a database expression.
 /// <br/> Values carried by instances of this type are typically intended to be captured as
 /// command arguments.

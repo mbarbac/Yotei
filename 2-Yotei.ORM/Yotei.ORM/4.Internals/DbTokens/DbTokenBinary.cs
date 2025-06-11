@@ -1,6 +1,7 @@
 ﻿namespace Yotei.ORM.Internals;
 
 // ========================================================
+/// <summary>
 /// Represents a binary operation between two given tokens.
 /// </summary>
 [Cloneable]
