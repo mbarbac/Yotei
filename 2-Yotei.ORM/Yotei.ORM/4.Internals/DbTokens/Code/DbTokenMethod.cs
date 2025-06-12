@@ -8,54 +8,54 @@
 public partial class DbTokenMethod : DbTokenHosted
 {
     /// <summary>
-    /// Initializes a new parameter-less instance.
+    /// Initializes a new instance.
     /// </summary>
     /// <param name="host"></param>
     /// <param name="name"></param>
-    public DbTokenMethod(IDbToken host, string name) : this(host, [], name, []) { }
+    public DbTokenMethod(IDbToken host, string name) : this(host, name, [], []) { }
 
     /// <summary>
-    /// Initializes a new instance with the given name and regular arguments
+    /// Initializes a new instance.
+    /// </summary>
+    /// <param name="host"></param>
+    /// <param name="name"></param>
+    /// <param name="types"></param>
+    public DbTokenMethod(
+        IDbToken host, string name, IEnumerable<Type> types) : this(host, name, types, []) { }
+
+    /// <summary>
+    /// Initializes a new instance.
     /// </summary>
     /// <param name="host"></param>
     /// <param name="name"></param>
     /// <param name="args"></param>
     public DbTokenMethod(
-        IDbToken host, string name, IEnumerable<IDbToken> args) : this(host, [], name, args) { }
+        IDbToken host, string name, IEnumerable<IDbToken> args) : this(host, name, [], args) { }
 
     /// <summary>
-    /// Initializes a new parameter-less instance with the given name and type arguments.
+    /// Initializes a new instance.
     /// </summary>
     /// <param name="host"></param>
-    /// <param name="types"></param>
     /// <param name="name"></param>
-    public DbTokenMethod(
-        IDbToken host, IEnumerable<Type> types, string name) : this(host, types, name, []) { }
-
-    /// <summary>
-    /// Initializes a new instance with the given name, type arguments, and regular ones.
-    /// </summary>
-    /// <param name="host"></param>
     /// <param name="types"></param>
-    /// <param name="name"></param>
     /// <param name="args"></param>
     public DbTokenMethod(
-        IDbToken host, IEnumerable<Type> types, string name, IEnumerable<IDbToken> args) : base(host)
+        IDbToken host, string name, IEnumerable<Type> types, IEnumerable<IDbToken> args) : base(host)
     {
         Name = DbToken.ValidateTokenName(name);
-        TypeArguments = DbToken.ToTypeArguments(types);
-        Arguments = new(args);
+        TypeArguments = DbToken.ToTypeArguments(types, allowEmpty: true);
+        Arguments = DbToken.ToArguments(args, allowEmpty: true);
     }
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected DbTokenMethod(DbTokenMethod source) : this(
+    public DbTokenMethod(DbTokenMethod source) : this(
         source.Host.Clone(),
-        source.TypeArguments,
         source.Name,
-        source.Arguments.Clone())
+        source.TypeArguments,
+        source.Arguments.Select(x => x.Clone()))
     { }
 
     /// <inheritdoc/>

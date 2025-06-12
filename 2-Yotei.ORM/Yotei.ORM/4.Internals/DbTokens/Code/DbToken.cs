@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using System.Runtime.InteropServices.Marshalling;
+using System.Xml.Serialization;
 
 namespace Yotei.ORM.Internals;
 
@@ -38,20 +39,41 @@ public static class DbToken
     /// <summary>
     /// Returns an immutable collection based upon the given one.
     /// </summary>
-    /// <param name="types"></param>
+    /// <param name="tokens"></param>
+    /// <param name="allowEmpty"></param>
     /// <returns></returns>
-    public static ImmutableArray<Type> ToTypeArguments(IEnumerable<Type> types)
+    public static DbTokenChain ToArguments(IEnumerable<IDbToken> tokens, bool allowEmpty)
+    {
+        tokens.ThrowWhenNull();
+
+        if (tokens is not DbTokenChain chain) chain = new DbTokenChain(tokens);
+
+        for (int i = 0; i < chain.Count; i++)
+            if (chain[i] is null) throw new ArgumentException(
+                "Collection of tokens carries null elements.").WithData(chain);
+
+        if (!allowEmpty && chain.Count == 0) throw new ArgumentException(
+            "Collection of tokens cannot be an empty one.");
+
+        return chain;
+    }
+
+    /// <summary>
+    /// Returns an immutable collection based upon the given one.
+    /// </summary>
+    /// <param name="types"></param>
+    /// <param name="allowEmpty"></param>
+    /// <returns></returns>
+    public static ImmutableArray<Type> ToTypeArguments(IEnumerable<Type> types, bool allowEmpty)
     {
         var list = types.ThrowWhenNull().ToImmutableArray();
 
-        if (list.Length == 0) throw new EmptyException(
-            "Collection of type arguments cannot be empty.");
-
         for (int i = 0; i < list.Length; i++)
-        {
             if (list[i] is null) throw new ArgumentException(
-                "Collection of type arguments has null elements.").WithData(list);
-        }
+                "Collection of type arguments carries null elements.").WithData(list);
+
+        if (!allowEmpty && list.Length == 0) throw new EmptyException(
+            "Collection of type arguments cannot be empty.");
 
         return list;
     }

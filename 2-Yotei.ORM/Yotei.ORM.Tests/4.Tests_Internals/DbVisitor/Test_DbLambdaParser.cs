@@ -308,17 +308,37 @@ public static class Test_DbLambdaParser
         var engine = new FakeEngine();
         var parser = new DbLambdaParser(engine);
         IDbToken token;
+        DbTokenInvoke invoke;
         DbTokenLiteral literal;
+        DbTokenIdentifier id;
 
         token = parser.Parse(x => x(""));
-        Assert.Equal("", token.ToString());
-        literal = Assert.IsType<DbTokenLiteral>(token);
+        Assert.Equal("x()", token.ToString());
+        invoke = Assert.IsType<DbTokenInvoke>(token);
+        Assert.Single(invoke.Arguments);
+        literal = Assert.IsType<DbTokenLiteral>(invoke.Arguments[0]);
         Assert.Empty(literal.Value);
 
         token = parser.Parse(x => x("any"));
-        Assert.Equal("any", token.ToString());
-        literal = Assert.IsType<DbTokenLiteral>(token);
+        Assert.Equal("x(any)", token.ToString());
+        invoke = Assert.IsType<DbTokenInvoke>(token);
+        Assert.Single(invoke.Arguments);
+        literal = Assert.IsType<DbTokenLiteral>(invoke.Arguments[0]);
         Assert.Equal("any", literal.Value);
+
+        token = parser.Parse(x => x(x.Alpha));
+        Assert.Equal("x(x.[Alpha])", token.ToString());
+        invoke = Assert.IsType<DbTokenInvoke>(token);
+        Assert.Single(invoke.Arguments);
+        id = Assert.IsType<DbTokenIdentifier>(invoke.Arguments[0]);
+        Assert.Equal("[Alpha]", id.Value);
+
+        token = parser.Parse(x => x.x(x.Alpha));
+        Assert.Equal("x(x.[Alpha])", token.ToString());
+        invoke = Assert.IsType<DbTokenInvoke>(token);
+        Assert.Single(invoke.Arguments);
+        id = Assert.IsType<DbTokenIdentifier>(invoke.Arguments[0]);
+        Assert.Equal("[Alpha]", id.Value);
     }
 
     //[Enforced]
@@ -328,24 +348,35 @@ public static class Test_DbLambdaParser
         var engine = new FakeEngine();
         var parser = new DbLambdaParser(engine);
         IDbToken token;
-        DbTokenInvoke item;
+        DbTokenInvoke invoke;
+        DbTokenLiteral literal;
+        DbTokenValue value;
         DbTokenIdentifier id;
 
         token = parser.Parse(x => x(x.Alpha)("33"));
-        Assert.Equal("x(x.[Alpha])33", token.ToString());
+        Assert.Equal("x(x.[Alpha])(33)", token.ToString());
+        invoke = Assert.IsType<DbTokenInvoke>(token);
+        Assert.Single(invoke.Arguments);
+        literal = Assert.IsType<DbTokenLiteral>(invoke.Arguments[0]);
+        Assert.Equal("33", literal.Value);
+
+        token = parser.Parse(x => x(x.Alpha)(33));
+        Assert.Equal("x(x.[Alpha])('33')", token.ToString());
+        invoke = Assert.IsType<DbTokenInvoke>(token);
+        Assert.Single(invoke.Arguments);
+        value = Assert.IsType<DbTokenValue>(invoke.Arguments[0]);
+        Assert.Equal(33, value.Value);
 
         token = parser.Parse(x => x(x.Alpha)(x.Beta));
         Assert.Equal("x(x.[Alpha])(x.[Beta])", token.ToString());
-        item = Assert.IsType<DbTokenInvoke>(token);
-        id = Assert.IsType<DbTokenIdentifier>(item.Arguments[0]);
+        invoke = Assert.IsType<DbTokenInvoke>(token);
+        id = Assert.IsType<DbTokenIdentifier>(invoke.Arguments[0]);
         Assert.Equal("[Beta]", id.Value);
-        item = Assert.IsType<DbTokenInvoke>(item.Host);
-        Assert.IsType<DbTokenArgument>(item.Host);
-        id = Assert.IsType<DbTokenIdentifier>(item.Arguments[0]);
+        invoke = Assert.IsType<DbTokenInvoke>(invoke.Host);
+        Assert.IsType<DbTokenArgument>(invoke.Host);
+        id = Assert.IsType<DbTokenIdentifier>(invoke.Arguments[0]);
         Assert.Equal("[Alpha]", id.Value);
     }
-
-    /*
 
     // ----------------------------------------------------
 
@@ -769,5 +800,4 @@ public static class Test_DbLambdaParser
         item = Assert.IsType<DbTokenValue>(token);
         Assert.True((bool)item.Value!);
     }
-    */
 }

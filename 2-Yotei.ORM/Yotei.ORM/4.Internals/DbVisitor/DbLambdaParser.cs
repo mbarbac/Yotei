@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Internals;
+﻿using System.Runtime.InteropServices.Marshalling;
+
+namespace Yotei.ORM.Internals;
 
 // ========================================================
 /// <summary>
@@ -271,9 +273,7 @@ public class DbLambdaParser
         var host = Parse(node.LambdaHost);
         var items = node.LambdaArguments.Select(x => Parse(x));
 
-        return node.LambdaGenericArguments.Count == 0
-            ? new DbTokenMethod(host, name, items)
-            : new DbTokenMethod(host, node.LambdaGenericArguments, name, items);
+        return new DbTokenMethod(host, name, node.LambdaGenericArguments, items);
     }
 
     /// <summary>
