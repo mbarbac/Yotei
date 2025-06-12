@@ -17,12 +17,14 @@ public partial interface IIdentifierChain : IIdentifier
     /// </summary>
     /// <returns></returns>
     IBuilder CreateBuilder();
-    
+
     // ----------------------------------------------------
 
     /// <summary>
     /// Returns a new instance where the element at the given index has been replaced by the
     /// ones obtained from the given value.
+    /// <br/> Note that the returned elements may not be the same as the original ones, but
+    /// clones instead.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="value"></param>
@@ -32,6 +34,8 @@ public partial interface IIdentifierChain : IIdentifier
     /// <summary>
     /// Returns a new instance where where the elements obtained from the given value have been
     /// added to the original collection.
+    /// <br/> Note that the returned elements may not be the same as the original ones, but
+    /// clones instead.
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
@@ -40,6 +44,8 @@ public partial interface IIdentifierChain : IIdentifier
     /// <summary>
     /// Returns a new instance where where the elements obtained from the given range of values
     /// have been added to the original collection.
+    /// <br/> Note that the returned elements may not be the same as the original ones, but
+    /// clones instead.
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
@@ -48,6 +54,8 @@ public partial interface IIdentifierChain : IIdentifier
     /// <summary>
     /// Returns a new instance where where the elements obtained from the given value have been
     /// inserted into the original collection, starting at the given index.
+    /// <br/> Note that the returned elements may not be the same as the original ones, but
+    /// clones instead.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="value"></param>
@@ -57,6 +65,8 @@ public partial interface IIdentifierChain : IIdentifier
     /// <summary>
     /// Returns a new instance where where the elements obtained from the given range of values
     /// have been inserted into the original collection, starting at the given index.
+    /// <br/> Note that the returned elements may not be the same as the original ones, but
+    /// clones instead.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="range"></param>

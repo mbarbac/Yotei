@@ -96,9 +96,9 @@ public static class Test_DbTokenChain
         var source = new Chain([xone, xtwo, xthree]);
         var target = source.Clone();
         Assert.Equal(3, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
+        Assert.Equal(xone, target[0]);
+        Assert.Equal(xtwo, target[1]);
+        Assert.Equal(xthree, target[2]);
     }
 
     //[Enforced]
@@ -185,15 +185,14 @@ public static class Test_DbTokenChain
         Assert.Same(source, target);
 
         target = source.Replace(1, new Literal("Two"));
-        Assert.NotSame(source, target);
-        Assert.True(source.Equals(target));
+        Assert.Same(source, target);
 
         target = source.Replace(1, xone);
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
-        Assert.Same(xone, target[0]);
+        Assert.Equal(xone, target[0]);
         Assert.Equal(xone, target[1]);
-        Assert.Same(xthree, target[2]);
+        Assert.Equal(xthree, target[2]);
     }
 
     //[Enforced]
@@ -206,10 +205,10 @@ public static class Test_DbTokenChain
 
         Assert.NotSame(source, target);
         Assert.Equal(4, target.Count);
-        Assert.Same(xone, target[0]);
+        Assert.Equal(xone, target[0]);
         Assert.Equal(xfour, target[1]);
-        Assert.Same(xfive, target[2]);
-        Assert.Same(xthree, target[3]);
+        Assert.Equal(xfive, target[2]);
+        Assert.Equal(xthree, target[3]);
     }
 
     //[Enforced]
@@ -234,9 +233,9 @@ public static class Test_DbTokenChain
 
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
+        Assert.Equal(xone, target[0]);
+        Assert.Equal(xtwo, target[1]);
+        Assert.Equal(xthree, target[2]);
 
         try { _ = source.Add(null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
@@ -251,9 +250,9 @@ public static class Test_DbTokenChain
 
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xone, target[2]);
+        Assert.Equal(xone, target[0]);
+        Assert.Equal(xtwo, target[1]);
+        Assert.Equal(xone, target[2]);
     }
 
     //[Enforced]
@@ -270,11 +269,11 @@ public static class Test_DbTokenChain
         target = source.Add(other);
         Assert.NotSame(source, target);
         Assert.Equal(5, target.Count);
-        Assert.Same(xone, target[0]);
+        Assert.Equal(xone, target[0]);
         Assert.Equal(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
-        Assert.Same(xfour, target[3]);
-        Assert.Same(xfive, target[4]);
+        Assert.Equal(xthree, target[2]);
+        Assert.Equal(xfour, target[3]);
+        Assert.Equal(xfive, target[4]);
     }
 
     //[Enforced]
@@ -288,10 +287,10 @@ public static class Test_DbTokenChain
         target = source.AddRange([xthree, xfour]);
         Assert.NotSame(source, target);
         Assert.Equal(4, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
-        Assert.Same(xfour, target[3]);
+        Assert.Equal(xone, target[0]);
+        Assert.Equal(xtwo, target[1]);
+        Assert.Equal(xthree, target[2]);
+        Assert.Equal(xfour, target[3]);
 
         try { _ = source.AddRange([xfive, null!]); Assert.Fail(); }
         catch (ArgumentNullException) { }
@@ -311,11 +310,11 @@ public static class Test_DbTokenChain
         target = source.AddRange([xthree, other]);
         Assert.NotSame(source, target);
         Assert.Equal(5, target.Count);
-        Assert.Same(xone, target[0]);
+        Assert.Equal(xone, target[0]);
         Assert.Equal(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
-        Assert.Same(xfour, target[3]);
-        Assert.Same(xfive, target[4]);
+        Assert.Equal(xthree, target[2]);
+        Assert.Equal(xfour, target[3]);
+        Assert.Equal(xfive, target[4]);
     }
 
     // ----------------------------------------------------
@@ -328,9 +327,9 @@ public static class Test_DbTokenChain
         var target = source.Insert(2, xthree);
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
+        Assert.Equal(xone, target[0]);
+        Assert.Equal(xtwo, target[1]);
+        Assert.Equal(xthree, target[2]);
 
         try { _ = source.Insert(0, null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
@@ -344,9 +343,9 @@ public static class Test_DbTokenChain
         var target = source.Insert(2, xone);
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xone, target[2]);
+        Assert.Equal(xone, target[0]);
+        Assert.Equal(xtwo, target[1]);
+        Assert.Equal(xone, target[2]);
     }
 
     //[Enforced]
@@ -363,11 +362,11 @@ public static class Test_DbTokenChain
         target = source.Insert(3, other);
         Assert.NotSame(source, target);
         Assert.Equal(5, target.Count);
-        Assert.Same(xone, target[0]);
+        Assert.Equal(xone, target[0]);
         Assert.Equal(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
-        Assert.Same(xfour, target[3]);
-        Assert.Same(xfive, target[4]);
+        Assert.Equal(xthree, target[2]);
+        Assert.Equal(xfour, target[3]);
+        Assert.Equal(xfive, target[4]);
     }
 
     //[Enforced]
@@ -381,10 +380,10 @@ public static class Test_DbTokenChain
         target = source.InsertRange(2, [xthree, xfour]);
         Assert.NotSame(source, target);
         Assert.Equal(4, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
-        Assert.Same(xfour, target[3]);
+        Assert.Equal(xone, target[0]);
+        Assert.Equal(xtwo, target[1]);
+        Assert.Equal(xthree, target[2]);
+        Assert.Equal(xfour, target[3]);
 
         try { _ = source.InsertRange(0, [xfive, null!]); Assert.Fail(); }
         catch (ArgumentNullException) { }
@@ -404,11 +403,11 @@ public static class Test_DbTokenChain
         target = source.InsertRange(2, [xthree, other]);
         Assert.NotSame(source, target);
         Assert.Equal(5, target.Count);
-        Assert.Same(xone, target[0]);
+        Assert.Equal(xone, target[0]);
         Assert.Equal(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
-        Assert.Same(xfour, target[3]);
-        Assert.Same(xfive, target[4]);
+        Assert.Equal(xthree, target[2]);
+        Assert.Equal(xfour, target[3]);
+        Assert.Equal(xfive, target[4]);
     }
 
     // ----------------------------------------------------
@@ -422,9 +421,9 @@ public static class Test_DbTokenChain
         var target = source.RemoveAt(0);
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
-        Assert.Same(xtwo, target[0]);
-        Assert.Same(xthree, target[1]);
-        Assert.Same(xone, target[2]);
+        Assert.Equal(xtwo, target[0]);
+        Assert.Equal(xthree, target[1]);
+        Assert.Equal(xone, target[2]);
 
         try { source.RemoveAt(999); Assert.Fail(); }
         catch (ArgumentOutOfRangeException) { }
@@ -445,9 +444,9 @@ public static class Test_DbTokenChain
         target = source.RemoveRange(0, 1);
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
-        Assert.Same(xtwo, target[0]);
-        Assert.Same(xthree, target[1]);
-        Assert.Same(xone, target[2]);
+        Assert.Equal(xtwo, target[0]);
+        Assert.Equal(xthree, target[1]);
+        Assert.Equal(xone, target[2]);
 
         try { _ = source.RemoveRange(0, -1); Assert.Fail(); }
         catch (ArgumentOutOfRangeException) { }
@@ -473,16 +472,16 @@ public static class Test_DbTokenChain
         target = source.Remove(xone);
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
-        Assert.Same(xtwo, target[0]);
-        Assert.Same(xthree, target[1]);
-        Assert.Same(xone, target[2]);
+        Assert.Equal(xtwo, target[0]);
+        Assert.Equal(xthree, target[1]);
+        Assert.Equal(xone, target[2]);
 
         target = source.Remove(new Literal("One"));
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
-        Assert.Same(xtwo, target[0]);
-        Assert.Same(xthree, target[1]);
-        Assert.Same(xone, target[2]);
+        Assert.Equal(xtwo, target[0]);
+        Assert.Equal(xthree, target[1]);
+        Assert.Equal(xone, target[2]);
 
         target = source.Remove(new Literal("ONE"));
         Assert.Same(source, target);
@@ -490,16 +489,16 @@ public static class Test_DbTokenChain
         target = source.RemoveLast(xone);
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
+        Assert.Equal(xone, target[0]);
+        Assert.Equal(xtwo, target[1]);
+        Assert.Equal(xthree, target[2]);
 
         target = source.RemoveLast(new Literal("One"));
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
+        Assert.Equal(xone, target[0]);
+        Assert.Equal(xtwo, target[1]);
+        Assert.Equal(xthree, target[2]);
 
         target = source.RemoveLast(new Literal("ONE"));
         Assert.Same(source, target);
@@ -507,14 +506,14 @@ public static class Test_DbTokenChain
         target = source.RemoveAll(xone);
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
-        Assert.Same(xtwo, target[0]);
-        Assert.Same(xthree, target[1]);
+        Assert.Equal(xtwo, target[0]);
+        Assert.Equal(xthree, target[1]);
 
         target = source.RemoveAll(new Literal("One"));
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
-        Assert.Same(xtwo, target[0]);
-        Assert.Same(xthree, target[1]);
+        Assert.Equal(xtwo, target[0]);
+        Assert.Equal(xthree, target[1]);
 
         target = source.RemoveAll(new Literal("ONE"));
         Assert.Same(source, target);
@@ -530,19 +529,19 @@ public static class Test_DbTokenChain
         var target = source.Remove(other);
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
-        Assert.Same(xtwo, target[0]);
-        Assert.Same(xone, target[1]);
+        Assert.Equal(xtwo, target[0]);
+        Assert.Equal(xone, target[1]);
 
         target = source.RemoveLast(other);
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
+        Assert.Equal(xone, target[0]);
+        Assert.Equal(xtwo, target[1]);
 
         target = source.RemoveAll(other);
         Assert.NotSame(source, target);
         Assert.Single(target);
-        Assert.Same(xtwo, target[0]);
+        Assert.Equal(xtwo, target[0]);
     }
 
     //[Enforced]
@@ -556,22 +555,22 @@ public static class Test_DbTokenChain
         target = source.Remove(x => ((Literal)x).Value.Contains('n'));
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
-        Assert.Same(xtwo, target[0]);
-        Assert.Same(xthree, target[1]);
-        Assert.Same(xone, target[2]);
+        Assert.Equal(xtwo, target[0]);
+        Assert.Equal(xthree, target[1]);
+        Assert.Equal(xone, target[2]);
 
         target = source.RemoveLast(x => ((Literal)x).Value.Contains('n'));
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
+        Assert.Equal(xone, target[0]);
+        Assert.Equal(xtwo, target[1]);
+        Assert.Equal(xthree, target[2]);
 
         target = source.RemoveAll(x => ((Literal)x).Value.Contains('n'));
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
-        Assert.Same(xtwo, target[0]);
-        Assert.Same(xthree, target[1]);
+        Assert.Equal(xtwo, target[0]);
+        Assert.Equal(xthree, target[1]);
     }
 
     //[Enforced]

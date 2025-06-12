@@ -28,6 +28,7 @@ public abstract partial class Connection : DisposableClass, IConnection
         Engine = source.Engine;
         Retries = source.Retries;
         RetryInterval = source.RetryInterval;
+        foreach (var item in source.ToDatabaseConverters) ToDatabaseConverters.Add(item);
     }
 
     /// <inheritdoc/>
@@ -244,4 +245,16 @@ public abstract partial class Connection : DisposableClass, IConnection
 
     /// <inheritdoc/>
     public abstract ITransaction CreateTransaction();
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to create a new collection of converters for this instance.
+    /// </summary>
+    /// <returns></returns>
+    protected IValueConverterList CreateToDatabaseConverters() => new ValueConverterList();
+
+    /// <inheritdoc/>
+    public IValueConverterList ToDatabaseConverters => _ToDatabaseConverters ??= CreateToDatabaseConverters();
+    IValueConverterList? _ToDatabaseConverters = null;
 }

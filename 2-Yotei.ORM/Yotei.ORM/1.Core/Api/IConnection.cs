@@ -61,4 +61,10 @@ public partial interface IConnection : IDisposableEx
     /// </summary>
     /// <returns></returns>
     ITransaction CreateTransaction();
+
+    /// <summary>
+    /// The collection of converters carried by this instance to convert application-level values
+    /// to database-level ones.
+    /// </summary>
+    IValueConverterList ToDatabaseConverters { get; }
 }

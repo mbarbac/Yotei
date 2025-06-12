@@ -39,7 +39,7 @@ public partial class DbTokenChain : IDbToken
     public override DbTokenChain Clone()
     {
         var chain = new DbTokenChain();
-        foreach (var item in this) chain.Add(item.Clone());
+        foreach (var item in this) chain.Items.Add(item.Clone());
         return chain;
     }
     IDbToken IDbToken.Clone() => Clone();

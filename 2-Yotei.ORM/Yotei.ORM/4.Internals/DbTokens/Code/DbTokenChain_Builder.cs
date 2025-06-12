@@ -69,10 +69,7 @@ partial class DbTokenChain
         public override bool ExpandItems => true;
 
         /// <inheritdoc/>
-        public override bool IsValidDuplicate(IDbToken source, IDbToken item)
-            => ReferenceEquals(source, item)
-            ? true
-            : throw new DuplicateException("Duplicated element.").WithData(item);
+        public override bool IsValidDuplicate(IDbToken source, IDbToken item) => true;
 
         /// <inheritdoc/>
         public override IEqualityComparer<IDbToken> Comparer => _Comparer ??= new ItemComparer();
@@ -88,6 +85,12 @@ partial class DbTokenChain
                 return x.Equals(y);
             }
             public int GetHashCode([DisallowNull] IDbToken obj) => throw new NotImplementedException();
+        }
+
+        /// <inheritdoc/>
+        protected override bool SameItem(IDbToken source, IDbToken item)
+        {
+            return ReferenceEquals(source, item) || source.Equals(item);
         }
 
         // ------------------------------------------------

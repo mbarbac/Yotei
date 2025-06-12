@@ -105,6 +105,8 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>
 
     /// <summary>
     /// Returns a new instance with the given number of elements, starting at the given index.
+    /// <br/> Note that the returned elements may not be the same as the original ones, but
+    /// clones instead.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
@@ -116,6 +118,8 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>
     /// given one.
     /// <br/> If an empty enumeration is given, then nothing is replaced (so this scenario cannot
     /// be used instead of the '<see cref="RemoveAt(int)"/>' method).
+    /// <br/> Note that the returned elements may not be the same as the original ones, but
+    /// clones instead.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
@@ -124,6 +128,8 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>
 
     /// <summary>
     /// Returns a new instance where the given element has been added to the collection.
+    /// <br/> Note that the returned elements may not be the same as the original ones, but
+    /// clones instead.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
@@ -132,6 +138,8 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>
     /// <summary>
     /// Returns a new instance where the elements from the given range have been added to the
     /// collection.
+    /// <br/> Note that the returned elements may not be the same as the original ones, but
+    /// clones instead.
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
@@ -140,6 +148,8 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>
     /// <summary>
     /// Returns a new instance where the given element has been inserted into the collection, at
     /// the given index.
+    /// <br/> Note that the returned elements may not be the same as the original ones, but
+    /// clones instead.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
@@ -149,6 +159,8 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>
     /// <summary>
     /// Returns a new instance where the elements from the given range have been inserted into
     /// the collection, starting at the given index.
+    /// <br/> Note that the returned elements may not be the same as the original ones, but
+    /// clones instead.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="range"></param>
@@ -157,6 +169,8 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>
 
     /// <summary>
     /// Returns a new instance where the element at the given index has been removed.
+    /// <br/> Note that the returned elements may not be the same as the original ones, but
+    /// clones instead.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
@@ -165,6 +179,8 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>
     /// <summary>
     /// Returns a new instance where the given number of elements, starting at the given index,
     /// have been removed.
+    /// <br/> Note that the returned elements may not be the same as the original ones, but
+    /// clones instead.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
@@ -173,6 +189,8 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>
 
     /// <summary>
     /// Returns a new instance where the first element with the given key has been removed.
+    /// <br/> Note that the returned elements may not be the same as the original ones, but
+    /// clones instead.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
@@ -180,6 +198,8 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>
 
     /// <summary>
     /// Returns a new instance where the last element with the given key has been removed.
+    /// <br/> Note that the returned elements may not be the same as the original ones, but
+    /// clones instead.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
@@ -187,6 +207,8 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>
 
     /// <summary>
     /// Returns a new instance where all the elements with the given key have been removed.
+    /// <br/> Note that the returned elements may not be the same as the original ones, but
+    /// clones instead.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
@@ -195,6 +217,8 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>
     /// <summary>
     /// Returns a new instance where the first element that matches the given predicate has been
     /// removed.
+    /// <br/> Note that the returned elements may not be the same as the original ones, but
+    /// clones instead.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
@@ -203,6 +227,8 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>
     /// <summary>
     /// Returns a new instance where the last element that matches the given predicate has been
     /// removed.
+    /// <br/> Note that the returned elements may not be the same as the original ones, but
+    /// clones instead.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
@@ -211,6 +237,8 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>
     /// <summary>
     /// Returns a new instance where all the elements that match the given predicate have been
     /// removed.
+    /// <br/> Note that the returned elements may not be the same as the original ones, but
+    /// clones instead.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
