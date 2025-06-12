@@ -40,13 +40,15 @@ public class DbLambdaParser
         var node = parser.Result;
         var method = expression.GetMethodInfo();
 
-        if (method.ReturnType == typeof(string) && // Special case for 'x => "..."' syntax...
-            node is LambdaNodeValue value &&
-            value.LambdaValue is string str)
+        // Special case for 'x => "..."' syntax...
+        if (method.ReturnType == typeof(string) &&
+            node is LambdaNodeValue value && value.LambdaValue is string str)
         {
             return new DbTokenLiteral(str);
         }
-        else // Standard 'x => ...' syntax...
+
+        // Standard 'x => ...' syntax...
+        else
         {
             var token = Parse(node);
             return token;
@@ -65,18 +67,18 @@ public class DbLambdaParser
 
         var temp = node switch
         {
-            LambdaNodeArgument item => ParseArgument(item),
-            LambdaNodeBinary item => ParseBinary(item),
-            LambdaNodeCoalesce item => ParseCoalesce(item),
-            LambdaNodeConvert item => ParseConvert(item),
-            LambdaNodeIndexed item => ParseIndexed(item),
-            LambdaNodeInvoke item => ParseInvoke(item),
-            LambdaNodeMember item => ParseMember(item),
-            LambdaNodeMethod item => ParseMethod(item),
-            LambdaNodeSetter item => ParseSetter(item),
-            LambdaNodeTernary item => ParseTernary(item),
-            LambdaNodeUnary item => ParseUnary(item),
-            LambdaNodeValue item => ParseValue(item),
+            LambdaNodeArgument item => Parse(item),
+            LambdaNodeBinary item => Parse(item),
+            LambdaNodeCoalesce item => Parse(item),
+            LambdaNodeConvert item => Parse(item),
+            LambdaNodeIndexed item => Parse(item),
+            LambdaNodeInvoke item => Parse(item),
+            LambdaNodeMember item => Parse(item),
+            LambdaNodeMethod item => Parse(item),
+            LambdaNodeSetter item => Parse(item),
+            LambdaNodeTernary item => Parse(item),
+            LambdaNodeUnary item => Parse(item),
+            LambdaNodeValue item => Parse(item),
 
             _ => throw new ArgumentException("Unknown node.").WithData(node)
         };
@@ -92,14 +94,14 @@ public class DbLambdaParser
     /// </summary>
     /// <param name="node"></param>
     /// <returns></returns>
-    static DbTokenArgument ParseArgument(LambdaNodeArgument node) => new(node.LambdaName);
+    static DbTokenArgument Parse(LambdaNodeArgument node) => new(node.LambdaName);
 
     /// <summary>
     /// Parses the given node.
     /// </summary>
     /// <param name="node"></param>
     /// <returns></returns>
-    DbTokenBinary ParseBinary(LambdaNodeBinary node)
+    DbTokenBinary Parse(LambdaNodeBinary node)
     {
         var left = Parse(node.LambdaLeft);
         var right = Parse(node.LambdaRight);
@@ -112,7 +114,7 @@ public class DbLambdaParser
     /// </summary>
     /// <param name="node"></param>
     /// <returns></returns>
-    IDbToken ParseCoalesce(LambdaNodeCoalesce node)
+    IDbToken Parse(LambdaNodeCoalesce node)
     {
         // Special case when we can intercept a null-alike left-argument...
         if (node.LambdaLeft is LambdaNodeValue value && value.LambdaValue is null)
@@ -133,7 +135,7 @@ public class DbLambdaParser
     /// </summary>
     /// <param name="node"></param>
     /// <returns></returns>
-    DbTokenConvert.ToType ParseConvert(LambdaNodeConvert node)
+    DbTokenConvert.ToType Parse(LambdaNodeConvert node)
     {
         var target = Parse(node.LambdaTarget);
         return new DbTokenConvert.ToType(node.LambdaType, target);
@@ -144,7 +146,7 @@ public class DbLambdaParser
     /// </summary>
     /// <param name="node"></param>
     /// <returns></returns>
-    DbTokenIndexed ParseIndexed(LambdaNodeIndexed node)
+    DbTokenIndexed Parse(LambdaNodeIndexed node)
     {
         var host = Parse(node.LambdaHost);
         var items = node.LambdaIndexes.Select(x => Parse(x));
@@ -159,7 +161,7 @@ public class DbLambdaParser
     /// </summary>
     /// <param name="node"></param>
     /// <returns></returns>
-    IDbToken ParseInvoke(LambdaNodeInvoke node)
+    IDbToken Parse(LambdaNodeInvoke node)
     {
         var host = Parse(node.LambdaHost);
         var items = node.LambdaArguments.Select(x => Parse(x)).ToList();
@@ -183,7 +185,7 @@ public class DbLambdaParser
     /// </summary>
     /// <param name="node"></param>
     /// <returns></returns>
-    DbTokenIdentifier ParseMember(LambdaNodeMember node)
+    DbTokenIdentifier Parse(LambdaNodeMember node)
     {
         var host = Parse(node.LambdaHost);
         var darg = node.GetArgument();
@@ -202,7 +204,7 @@ public class DbLambdaParser
     /// </summary>
     /// <param name="node"></param>
     /// <returns></returns>
-    IDbToken ParseMethod(LambdaNodeMethod node)
+    IDbToken Parse(LambdaNodeMethod node)
     {
         var darg = node.GetArgument();
         var name = node.LambdaName.NullWhenDynamicName(darg, Engine.CaseSensitiveNames);
@@ -215,7 +217,7 @@ public class DbLambdaParser
                 .WithData(node);
 
             var invoke = new LambdaNodeInvoke(node.LambdaHost, node.LambdaArguments);
-            return ParseInvoke(invoke);
+            return Parse(invoke);
         }
 
         // Intercepts 'Coalesce' virtual method...
@@ -281,7 +283,7 @@ public class DbLambdaParser
     /// </summary>
     /// <param name="node"></param>
     /// <returns></returns>
-    DbTokenSetter ParseSetter(LambdaNodeSetter node)
+    DbTokenSetter Parse(LambdaNodeSetter node)
     {
         var target = Parse(node.LambdaTarget);
         var value = Parse(node.LambdaValue);
@@ -294,7 +296,7 @@ public class DbLambdaParser
     /// </summary>
     /// <param name="node"></param>
     /// <returns></returns>
-    DbTokenTernary ParseTernary(LambdaNodeTernary node)
+    DbTokenTernary Parse(LambdaNodeTernary node)
     {
         var left = Parse(node.LambdaLeft);
         var middle = Parse(node.LambdaMiddle);
@@ -308,7 +310,7 @@ public class DbLambdaParser
     /// </summary>
     /// <param name="node"></param>
     /// <returns></returns>
-    DbTokenUnary ParseUnary(LambdaNodeUnary node)
+    DbTokenUnary Parse(LambdaNodeUnary node)
     {
         var target = Parse(node.LambdaTarget);
         return new(node.LambdaOperation, target);
@@ -319,7 +321,7 @@ public class DbLambdaParser
     /// </summary>
     /// <param name="node"></param>
     /// <returns></returns>
-    IDbToken ParseValue(LambdaNodeValue node) => node.LambdaValue switch
+    IDbToken Parse(LambdaNodeValue node) => node.LambdaValue switch
     {
         IDbToken item => item,
         LambdaNode item => Parse(item),
