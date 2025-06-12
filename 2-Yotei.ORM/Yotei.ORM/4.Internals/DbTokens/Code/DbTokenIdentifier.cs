@@ -8,43 +8,34 @@
 public partial class DbTokenIdentifier : DbTokenHosted
 {
     /// <summary>
-    /// Returns a new instance where if the given identifier is a multi-part one, an appropriate
-    /// chain of hosts is built using its parts. Otherwise, reverts to a standard creation.
+    /// Returns a new instance using the given host and identifier. If the identifier is not a
+    /// single-part one, a chain of host instances is built using the given chain of identifiers.
     /// </summary>
     /// <param name="host"></param>
     /// <param name="identifier"></param>
-    /// <returns></returns>
-    public static DbTokenIdentifier Create(IDbToken host, IIdentifier identifier)
+    public DbTokenIdentifier(IDbToken host, IIdentifier identifier) : base(host)
     {
-        host.ThrowWhenNull();
         identifier.ThrowWhenNull();
 
-        if (identifier is IIdentifierPart part) return new(host, part);
-
-        var engine = identifier.Engine;
-        var chain = (IIdentifierChain)identifier;
-
-        if (chain.Count == 0 || chain.Value is null) return new(host, new IdentifierPart(engine));
-
-        for (int i = 0; i < chain.Count; i++)
+        if (identifier is IIdentifierPart part) Identifier = part;
+        else
         {
-            part = chain[i];
-            host = new DbTokenIdentifier(host, part);
+            var engine = identifier.Engine;
+            var chain = (IIdentifierChain)identifier;
+
+            if (chain.Count == 0 || chain.Value is null) Identifier = new IdentifierPart(engine);
+            else
+            {
+                for (int i = 0; i < chain.Count; i++)
+                {
+                    Identifier = chain[i];
+                    Host = host;
+
+                    host = new DbTokenIdentifier(host, Identifier);
+                }
+            }
         }
-
-        return (DbTokenIdentifier)host;
     }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Initializes a new instance with the given host and single-part identifier.
-    /// </summary>
-    /// <param name="host"></param>
-    /// <param name="identifier"></param>
-    public DbTokenIdentifier(IDbToken host, IIdentifierPart identifier)
-        : base(host)
-        => Identifier = identifier.ThrowWhenNull();
 
     /// <summary>
     /// Copy constructor.
@@ -88,7 +79,7 @@ public partial class DbTokenIdentifier : DbTokenHosted
     /// <summary>
     /// The single-part identifier carried by this instance.
     /// </summary>
-    public IIdentifierPart Identifier { get; }
+    public IIdentifierPart Identifier { get; } = default!;
 
     /// <summary>
     /// The value carried by this identifier, or null if it represents an empty or missed one.

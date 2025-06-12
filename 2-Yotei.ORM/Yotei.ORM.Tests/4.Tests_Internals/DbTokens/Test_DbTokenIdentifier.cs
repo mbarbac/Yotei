@@ -40,8 +40,8 @@ public static class Test_DbTokenIdentifier
         IEngine engine = new FakeEngine();
         IIdentifier id = new IdentifierChain(engine, "Alpha.Beta.Gamma");
         var arg = new DbTokenArgument("x");
-        
-        var token = DbTokenIdentifier.Create(arg, id);
+
+        var token = new DbTokenIdentifier(arg, id);
         Assert.Equal("[Gamma]", token.Value);
         token = Assert.IsType<DbTokenIdentifier>(token.Host);
         Assert.Equal("[Beta]", token.Value);

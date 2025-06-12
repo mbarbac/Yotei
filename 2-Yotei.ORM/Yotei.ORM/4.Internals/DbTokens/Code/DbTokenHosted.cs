@@ -11,7 +11,7 @@ public abstract partial class DbTokenHosted : IDbToken
     /// Initializes a new instance.
     /// </summary>
     /// <param name="host"></param>
-    public DbTokenHosted(IDbToken host) => Host = host.ThrowWhenNull();
+    public DbTokenHosted(IDbToken host) => Host = host;
 
     /// <inheritdoc/>
     public virtual DbTokenArgument? GetArgument() => Host.GetArgument();
@@ -26,5 +26,10 @@ public abstract partial class DbTokenHosted : IDbToken
     /// <summary>
     /// The host of this instance.
     /// </summary>
-    public IDbToken Host { get; private set; }
+    public IDbToken Host
+    {
+        get => _Host;
+        init => _Host = value.ThrowWhenNull();
+    }
+    IDbToken _Host = default!;
 }
