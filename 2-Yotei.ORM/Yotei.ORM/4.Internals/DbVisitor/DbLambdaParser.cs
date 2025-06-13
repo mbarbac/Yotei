@@ -197,7 +197,7 @@ public class DbLambdaParser
 
     /// <summary>
     /// Parses the given node.
-    /// <br/> Translates 'x => x(...)' and 'x => x.Any.x(...)' to invoke.
+    /// <br/> Translates 'x => x(...)' and 'x => x.Any.x(...)' to invoke (case sensitive!).
     /// <br/> Intercepts 'x => x.Coalesce(...)' virtual method.
     /// <br/> Intercepts 'x => x.Ternary(...)' virtual method.
     /// <br/> Intercepts 'x => x.Convert(...)' and 'x => x.Cast(...)' virtual methods.
@@ -207,7 +207,7 @@ public class DbLambdaParser
     IDbToken Parse(LambdaNodeMethod node)
     {
         var darg = node.GetArgument();
-        var name = node.LambdaName.NullWhenDynamicName(darg, Engine.CaseSensitiveNames);
+        var name = node.LambdaName.NullWhenDynamicName(darg, caseSensitive: true);
 
         // 'x => x(...)' and 'x => x.Any.x(...)' to invoke...
         if (name == null)
