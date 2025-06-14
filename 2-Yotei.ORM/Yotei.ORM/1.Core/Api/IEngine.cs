@@ -53,4 +53,9 @@ public partial interface IEngine : IEquatable<IEngine>
     /// identifiers. The value of this setting is ignored if no terminators are used.
     /// </summary>
     [With] char RightTerminator { get; }
+
+    /// <summary>
+    /// The collection of metadata tags that are well-known to this engine.
+    /// </summary>
+    [With] IKnownTags KnownTags { get; }
 }

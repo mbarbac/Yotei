@@ -3,6 +3,7 @@
 // ========================================================
 /// <summary>
 /// Represents a metadata entry using its collection of tag names and its value.
+/// <para>Instances of this class are intended to be immutable ones.</para>
 /// </summary>
 public partial interface IMetadataEntry : IEquatable<IMetadataEntry>
 {

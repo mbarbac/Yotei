@@ -67,4 +67,9 @@ public partial interface IConnection : IDisposableEx
     /// to database-level ones.
     /// </summary>
     IValueConverterList ToDatabaseConverters { get; }
+
+    /// <summary>
+    /// Provides access to the records-oriented capabilities of this instance.
+    /// </summary>
+    IRecordsGate Records { get; }
 }

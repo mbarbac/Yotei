@@ -8,6 +8,7 @@ namespace Yotei.ORM;
 /// Represents the ordered collection of tags that describes the maximal structure of the allowed
 /// identifiers in an underlying database. Tag names in each tag are unique among all the elements
 /// in this collection.
+/// <para>Instances of this class are intended to be immutable ones.</para>
 /// </summary>
 [IInvariantList<IItem>]
 public partial interface IIdentifierTags : IEquatable<IHost>

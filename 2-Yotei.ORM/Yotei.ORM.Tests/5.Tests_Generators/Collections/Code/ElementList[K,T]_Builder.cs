@@ -7,9 +7,7 @@ namespace Yotei.ORM.Tests.Generators;
 partial class ElementList_KT
 {
     // ====================================================
-    /// <summary>
-    /// Represents a builder for <see cref="IHost"/> intances.
-    /// </summary>
+    /// /// <inheritdoc cref="IHost.IBuilder"/>
     [DebuggerDisplay("{ToDebugString(5)}")]
     [Cloneable]
     public partial class Builder : CoreList<TKey, IItem>, IHost.IBuilder

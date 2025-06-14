@@ -5,6 +5,7 @@
 /// Represents the not-empty collection of not-null and not-empty names by which a given
 /// metadata entry can be known because, often, the same metadata can be represented by entries
 /// with different names.
+/// <para>Instances of this class are intended to be immutable ones.</para>
 /// </summary>
 [Cloneable]
 public partial interface IMetadataTag : IEnumerable<string>, IEquatable<IMetadataTag>

@@ -252,9 +252,21 @@ public abstract partial class Connection : DisposableClass, IConnection
     /// Invoked to create a new collection of converters for this instance.
     /// </summary>
     /// <returns></returns>
-    protected IValueConverterList CreateToDatabaseConverters() => new ValueConverterList();
+    protected IValueConverterList CreateDatabaseConverters() => new ValueConverterList();
 
     /// <inheritdoc/>
-    public IValueConverterList ToDatabaseConverters => _ToDatabaseConverters ??= CreateToDatabaseConverters();
+    public IValueConverterList ToDatabaseConverters => _ToDatabaseConverters ??= CreateDatabaseConverters();
     IValueConverterList? _ToDatabaseConverters = null;
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public IRecordsGate Records => _Records ??= CreateRecordsGate();
+    IRecordsGate? _Records;
+
+    /// <summary>
+    /// Invoked to create an appropriate instance.
+    /// </summary>
+    /// <returns></returns>
+    protected abstract IRecordsGate CreateRecordsGate();
 }

@@ -3,6 +3,7 @@
 // ========================================================
 /// <summary>
 /// Represents the collection of metadata tags that are well-known to an underlying engine.
+/// <para>Instances of this class are intended to be immutable ones.</para>
 /// </summary>
 [Cloneable]
 public partial interface IKnownTags : IEnumerable<IMetadataTag>, IEquatable<IKnownTags>
