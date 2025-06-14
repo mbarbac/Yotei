@@ -8,10 +8,6 @@ public partial class SchemaEntry : ISchemaEntry
 {
     /// <inheritdoc/>
     protected Builder Items { get; }
-
-    /// <summary>
-    /// Invoked to create the initial repository of contents of this instance.
-    /// </summary>
     protected virtual Builder OnInitialize(IEngine engine) => new(engine);
 
     /// <summary>

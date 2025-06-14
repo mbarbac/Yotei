@@ -11,10 +11,6 @@ public partial class ElementList_T : IHost
 {
     /// <inheritdoc/>
     protected override Builder Items { get; }
-
-    /// <summary>
-    /// Invoked to create the initial repository of contents of this instance.
-    /// </summary>
     protected virtual Builder OnInitialize(bool sensitive) => new(sensitive);
 
     /// <summary>

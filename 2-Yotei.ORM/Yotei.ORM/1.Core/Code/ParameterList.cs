@@ -12,10 +12,6 @@ public partial class ParameterList : IHost
 {
     /// <inheritdoc/>
     protected override Builder Items { get; }
-
-    /// <summary>
-    /// Invoked to create the initial repository of contents of this instance.
-    /// </summary>
     protected virtual Builder OnInitialize(IEngine engine) => new(engine);
 
     /// <summary>

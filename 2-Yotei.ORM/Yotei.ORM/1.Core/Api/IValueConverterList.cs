@@ -51,6 +51,13 @@ public partial interface IValueConverterList : IEnumerable<IValueConverter>
     void Add(IValueConverter converter);
 
     /// <summary>
+    /// Adds to this collection the given converters, provided that their source types are not
+    /// yet registered into this instance.
+    /// </summary>
+    /// <param name="range"></param>
+    void AddRange(IEnumerable<IValueConverter> range);
+
+    /// <summary>
     /// Adds to this collection the given converter or, if its source type was already registered,
     /// replaces the existing one.
     /// </summary>

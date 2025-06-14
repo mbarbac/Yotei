@@ -116,6 +116,13 @@ public partial class ValueConverterList : IValueConverterList
     }
 
     /// <inheritdoc/>
+    public void AddRange(IEnumerable<IValueConverter> range)
+    {
+        range.ThrowWhenNull();
+        foreach (var item in range) Add(item);
+    }
+
+    /// <inheritdoc/>
     public void Replace(IValueConverter converter)
     {
         converter.ThrowWhenNull();
