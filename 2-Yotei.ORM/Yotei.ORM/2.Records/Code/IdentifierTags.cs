@@ -41,13 +41,50 @@ public partial class IdentifierTags : IHost
     public override string ToString() => Items.ToString();
 
     /// <inheritdoc/>
-    public virtual Builder CreateBuilder() => throw null;
+    public virtual Builder CreateBuilder() => Items.Clone();
     IHost.IBuilder IHost.CreateBuilder() => CreateBuilder();
 
     // ------------------------------------------------
 
     /// <inheritdoc/>
-    public bool Equals(IHost? other) => throw null;
+    public bool Equals(IHost? other)
+    {
+        if (ReferenceEquals(this, other)) return true;
+        if (other is null) return false;
+
+        if (CaseSensitiveTags != other.CaseSensitiveTags) return false;
+        if (Count != other.Count) return false;
+
+        for (int i = 0; i < Items.Count; i++)
+        {
+            var item = Items[i];
+            var equal = item.Equals(other[i]);
+            if (!equal) return false;
+        }
+        return true;
+    }
+
+    /// <inheritdoc/>
+    public override bool Equals(object? obj) => Equals(obj as IHost);
+
+    public static bool operator ==(IdentifierTags? host, IHost? item)
+    {
+        if (host is null && item is null) return true;
+        if (host is null || item is null) return false;
+
+        return host.Equals(item);
+    }
+
+    public static bool operator !=(IdentifierTags? host, IHost? item) => !(host == item);
+
+    /// <inheritdoc/>
+    public override int GetHashCode()
+    {
+        var code = 0;
+        code = HashCode.Combine(code, CaseSensitiveTags);
+        for (int i = 0; i < Count; i++) code = HashCode.Combine(code, Items[i]);
+        return code;
+    }
 
     // ------------------------------------------------
 
@@ -80,10 +117,20 @@ public partial class IdentifierTags : IHost
     // ------------------------------------------------
 
     /// <inheritdoc/>
-    public virtual IdentifierTags Remove(string name) => throw null;
+    public virtual IdentifierTags Remove(string name)
+    {
+        var builder = CreateBuilder();
+        var done = builder.Remove(name);
+        return done > 0 ? builder.CreateInstance() : this;
+    }
     IHost IHost.Remove(string name) => Remove(name);
 
     /// <inheritdoc/>
-    public virtual IdentifierTags Remove(IEnumerable<string> range) => throw null;
+    public virtual IdentifierTags Remove(IEnumerable<string> range)
+    {
+        var builder = CreateBuilder();
+        var done = builder.Remove(range);
+        return done > 0 ? builder.CreateInstance() : this;
+    }
     IHost IHost.Remove(IEnumerable<string> range) => Remove(range);
 }
