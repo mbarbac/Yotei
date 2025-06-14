@@ -72,9 +72,8 @@ public static class Test_RawCommand
         IRawCommand command;
         ICommandInfo info;
 
-        // We need to scape the literal using a 'x => x(...)' form...
         command = new RawCommand(connection);
-        command.Append(x => x("FROM [Emps] WHERE [Id] = '007'"));
+        command.Append(x => "FROM [Emps] WHERE [Id] = '007'");
         info = command.GetCommandInfo();
         Assert.Equal("FROM [Emps] WHERE [Id] = '007'", info.Text);
         Assert.Empty(info.Parameters);

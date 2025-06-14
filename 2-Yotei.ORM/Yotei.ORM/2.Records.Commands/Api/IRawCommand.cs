@@ -32,7 +32,7 @@ public partial interface IRawCommand : ICommand, IEnumerableCommand, IExecutable
     /// </summary>
     /// <param name="spec"></param>
     /// <returns></returns>
-    IRawCommand Append(Func<dynamic, object> spec);
+    IRawCommand Append<T>(Func<dynamic, T> spec);
 
     /// <inheritdoc cref="ICommand.Clear"/>
     new IRawCommand Clear();

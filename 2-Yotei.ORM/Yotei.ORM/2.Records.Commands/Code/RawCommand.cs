@@ -46,6 +46,16 @@ public partial class RawCommand : Command, IRawCommand
         Func<dynamic, object> spec) : this(connection) => Append(spec);
 
     /// <summary>
+    /// Initializes a new instance using the text and arguments obtained from parsing the given
+    /// dynamic lambda expression.
+    /// </summary>
+    /// <param name="connection"></param>
+    /// <param name="spec"></param>
+    public RawCommand(
+        IConnection connection,
+        Func<dynamic, string> spec) : this(connection) => Append(spec);
+
+    /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
@@ -120,17 +130,17 @@ public partial class RawCommand : Command, IRawCommand
     IRawCommand IRawCommand.Append(string? text, params object?[]? args) => Append(text, args);
 
     /// <inheritdoc/>
-    public virtual RawCommand Append(Func<dynamic, object> spec)
+    public virtual RawCommand Append<T>(Func<dynamic, T> spec)
     {
         spec.ThrowWhenNull();
 
         var visitor = Connection.Records.CreateDbTokenVisitor();
-        var info = visitor.Visit(spec);
+        var info = visitor.Visit<T>(spec);
 
         _Info.Add(info);
         return this;
     }
-    IRawCommand IRawCommand.Append(Func<dynamic, object> spec) => Append(spec);
+    IRawCommand IRawCommand.Append<T>(Func<dynamic, T> spec) => Append(spec);
 
     // ----------------------------------------------------
 
