@@ -47,39 +47,91 @@ public partial class Schema : IHost
     // ------------------------------------------------
 
     /// <inheritdoc/>
-    public virtual bool Equals(IHost? other) => throw null;
+    public virtual bool Equals(IHost? other)
+    {
+        if (ReferenceEquals(this, other)) return true;
+        if (other is null) return false;
+
+        if (!Engine.Equals(other.Engine)) return false;
+        if (Count != other.Count) return false;
+
+        for (int i = 0; i < Items.Count; i++)
+        {
+            var item = Items[i];
+            var equal = item.Equals(other[i]);
+            if (!equal) return false;
+        }
+        return true;
+    }
+
+    /// <inheritdoc/>
+    public override bool Equals(object? obj) => Equals(obj as IHost);
+
+    public static bool operator ==(Schema? host, IHost? item)
+    {
+        if (host is null && item is null) return true;
+        if (host is null || item is null) return false;
+
+        return host.Equals(item);
+    }
+
+    public static bool operator !=(Schema? host, IHost? item) => !(host == item);
+
+    /// <inheritdoc/>
+    public override int GetHashCode()
+    {
+        var code = 0;
+        code = HashCode.Combine(code, Engine);
+        for (int i = 0; i < Count; i++) code = HashCode.Combine(code, Items[i]);
+        return code;
+    }
 
     // ------------------------------------------------
 
     /// <inheritdoc/>
-    public bool Contains(string identifier) => throw null;
+    public bool Contains(string identifier) => Items.Contains(identifier);
 
     /// <inheritdoc/>
-    public int IndexOf(string identifier) => throw null;
+    public int IndexOf(string identifier) => Items.IndexOf(identifier);
 
     /// <inheritdoc/>
-    public int LastIndexOf(string identifier) => throw null;
+    public int LastIndexOf(string identifier) => Items.LastIndexOf(identifier);
 
     /// <inheritdoc/>
-    public List<int> IndexesOf(string identifier) => throw null;
+    public List<int> IndexesOf(string identifier) => Items.IndexesOf(identifier);
 
     /// <inheritdoc/>
-    public List<int> Match(string? specs) => throw null;
+    public List<int> Match(string? specs) => Items.Match(specs);
 
     /// <inheritdoc/>
-    public List<int> Match(string? specs, out IItem? unique) => throw null;
+    public List<int> Match(string? specs, out IItem? unique) => Items.Match(specs, out unique);
 
     // ------------------------------------------------
 
     /// <inheritdoc/>
-    public virtual Schema Remove(string identifier) => throw null;
-    IHost IHost.Remove(string identifier) => throw null;
+    public virtual Schema Remove(string identifier)
+    {
+        var builder = CreateBuilder();
+        var done = builder.Remove(identifier);
+        return done ? builder.CreateInstance() : this;
+    }
+    IHost IHost.Remove(string identifier) => Remove(identifier);
 
     /// <inheritdoc/>
-    public virtual Schema RemoveLast(string identifier) => throw null;
-    IHost IHost.RemoveLast(string identifier) => throw null;
+    public virtual Schema RemoveLast(string identifier)
+    {
+        var builder = CreateBuilder();
+        var done = builder.RemoveLast(identifier);
+        return done ? builder.CreateInstance() : this;
+    }
+    IHost IHost.RemoveLast(string identifier) => RemoveLast(identifier);
 
     /// <inheritdoc/>
-    public virtual Schema RemoveAll(string identifier) => throw null;
-    IHost IHost.RemoveAll(string identifier) => throw null;
+    public virtual Schema RemoveAll(string identifier)
+    {
+        var builder = CreateBuilder();
+        var done = builder.RemoveAll(identifier);
+        return done ? builder.CreateInstance() : this;
+    }
+    IHost IHost.RemoveAll(string identifier) => RemoveAll(identifier);
 }

@@ -45,6 +45,9 @@ public partial class ElementList_T : IHost
         if (other is null) return false;
         if (other is not IHost valid) return false;
 
+        if (CaseSensitive != valid.CaseSensitive) return false;
+        if (Count != valid.Count) return false;
+
         for (int i = 0; i < Items.Count; i++)
         {
             var item = Items[i];
