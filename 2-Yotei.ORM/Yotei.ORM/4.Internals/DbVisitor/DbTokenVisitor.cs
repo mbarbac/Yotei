@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// Represents the ability of parsing db-token chains returns the <see cref="ICommandInfo"/>
+/// Represents the ability of parsing db-token chains returning the <see cref="ICommandInfo"/>
 /// object that represents that chain for the underlying database engine.
 /// </summary>
 public record class DbTokenVisitor
