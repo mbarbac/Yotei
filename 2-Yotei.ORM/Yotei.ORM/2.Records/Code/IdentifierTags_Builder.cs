@@ -43,7 +43,9 @@ partial class IdentifierTags
         IHost IHost.IBuilder.CreateInstance() => CreateInstance();
 
         /// <inheritdoc/>
-        public override string ToString() => throw null;
+        public override string ToString() => Count == 0
+            ? string.Empty
+            : $"[{string.Join('.', this.Select(x => x.Default))}]";
 
         // ------------------------------------------------
 
