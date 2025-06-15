@@ -14,6 +14,17 @@ public interface IRecordsGate
     // ----------------------------------------------------
 
     /// <summary>
+    /// Returns an object that can execute the given command, and enumerate through the records
+    /// produced by that execution, if any.
+    /// </summary>
+    /// <param name="command"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    ICommandEnumerator CreateCommandEnumerator(IEnumerableCommand command, CancellationToken token = default);
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Factory method to create an object with the ability of parsing db-token chains returning
     /// the <see cref="ICommandInfo"/> object that represents that chain for the underlying
     /// database engine.
