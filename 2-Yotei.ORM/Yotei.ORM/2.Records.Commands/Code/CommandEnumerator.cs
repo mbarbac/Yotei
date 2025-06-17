@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <inheritdoc cref="ICommandEnumerator"/>
-public abstract partial class CommandEnumerator : DisposableClass, ICommandEnumerator
+public abstract class CommandEnumerator : DisposableClass, ICommandEnumerator
 {
     /// <summary>
     /// Initializes a new instance.

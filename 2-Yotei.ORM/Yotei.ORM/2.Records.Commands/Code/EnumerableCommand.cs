@@ -89,4 +89,9 @@ public abstract partial class EnumerableCommand : Command, IEnumerableCommand
         set => _Take = value >= 0 ? value : -1;
     }
     int _Take = -1;
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public abstract override EnumerableCommand Clear();
 }

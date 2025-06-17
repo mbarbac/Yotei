@@ -5,7 +5,7 @@
 /// Represents an object that can execute its associated enumerable command and enumerate the
 /// records produced by that execution, if any.
 /// </summary>
-public partial interface ICommandEnumerator
+public interface ICommandEnumerator
     : IDisposableEx
     , IEnumerator<IRecord?>, IAsyncEnumerator<IRecord?>
     , IEnumerable<IRecord?>, IAsyncEnumerable<IRecord?>
