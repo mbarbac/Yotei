@@ -67,4 +67,9 @@ public partial interface IEnumerableCommand
     /// The number of records to take, or a negative value to ignore this property.
     /// </summary>
     [With] int Take { get; set; }
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc cref="ICommand.Clear"/>
+    new IEnumerableCommand Clear();
 }

@@ -132,6 +132,14 @@ public partial class Record : IRecord
     public object? this[int index] => Items[index];
 
     /// <inheritdoc/>
+    public object? this[string identifier]
+    {
+        get => TryGet(identifier, out var value)
+            ? value
+            : throw new NotFoundException("Identifier not found").WithData(identifier);
+    }
+
+    /// <inheritdoc/>
     public bool TryGet(string identifier, out object? value) => Items.TryGet(identifier, out value);
 
     /// <inheritdoc/>

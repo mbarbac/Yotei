@@ -181,7 +181,8 @@ public abstract class CommandEnumerator : DisposableClass, ICommandEnumerator
                 "Cannot obtain a valid schema for the records produced by this command.")
                 .WithData(Command);
 
-            if (!Command.SupportsNativePaging) // Emulate paging...
+            var engine = Command.Connection.Engine;
+            if (!engine.SupportsNativePaging || !Command.SupportsNativePaging) // Emulate paging...
             {
                 var skip = Command.Skip;
                 if (skip >= 0)
@@ -322,7 +323,8 @@ public abstract class CommandEnumerator : DisposableClass, ICommandEnumerator
                 "Cannot obtain a valid schema for the records produced by this command.")
                 .WithData(Command);
 
-            if (!Command.SupportsNativePaging) // Emulate paging...
+            var engine = Command.Connection.Engine;
+            if (!engine.SupportsNativePaging || !Command.SupportsNativePaging) // Emulate paging...
             {
                 var skip = Command.Skip;
                 if (skip >= 0)

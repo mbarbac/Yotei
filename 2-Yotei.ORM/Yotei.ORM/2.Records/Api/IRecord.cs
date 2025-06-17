@@ -36,6 +36,15 @@ public partial interface IRecord : IEnumerable<object?>, IEquatable<IRecord>
     object? this[int index] { get; }
 
     /// <summary>
+    /// Gets the value associated to the entry whose unique identifier matches the one given. This
+    /// property throws an exception if this instance is a schema-less one, if more than one entry
+    /// matches the given identifier, or if that identifier is not found.
+    /// </summary>
+    /// <param name="identifier"></param>
+    /// <returns></returns>
+    object? this[string identifier] { get; }
+
+    /// <summary>
     /// Tries to get the value associated to the entry whose unique identifier matches the
     /// one given. This method throws an exception if this instance is a schema-less one, or
     /// if more than one entry matches the given identifier.

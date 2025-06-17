@@ -7,8 +7,6 @@ namespace Yotei.ORM;
 /// <inheritdoc cref="ICommandEnumerator{T}"/>
 public class CommandEnumerator<T> : DisposableClass, ICommandEnumerator<T>
 {
-    ICommandEnumerator Enumerator;
-
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
@@ -56,6 +54,9 @@ public class CommandEnumerator<T> : DisposableClass, ICommandEnumerator<T>
     // ----------------------------------------------------
 
     /// <inheritdoc/>
+    public ICommandEnumerator Enumerator { get; private set; }
+
+    /// <inheritdoc/>
     public IEnumerableCommand Command => Enumerator.Command;
 
     /// <inheritdoc/>
@@ -64,6 +65,8 @@ public class CommandEnumerator<T> : DisposableClass, ICommandEnumerator<T>
         get => Enumerator.CancellationToken;
         set => Enumerator.CancellationToken = value;
     }
+
+    // ----------------------------------------------------
 
     /// <inheritdoc/>
     public T? Current { get; private set; }

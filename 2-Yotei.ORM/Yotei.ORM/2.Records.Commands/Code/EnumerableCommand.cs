@@ -94,4 +94,5 @@ public abstract partial class EnumerableCommand : Command, IEnumerableCommand
 
     /// <inheritdoc/>
     public abstract override EnumerableCommand Clear();
+    IEnumerableCommand IEnumerableCommand.Clear() => Clear();
 }

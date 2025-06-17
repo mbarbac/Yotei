@@ -12,6 +12,11 @@ public interface ICommandEnumerator<T>
     , IEnumerable<T?>, IAsyncEnumerable<T?>
 {
     /// <summary>
+    /// The records-oriented enumerator this instance is built for.
+    /// </summary>
+    ICommandEnumerator Enumerator { get; }
+
+    /// <summary>
     /// The command this instance is associated with.
     /// </summary>
     IEnumerableCommand Command { get; }
@@ -20,6 +25,8 @@ public interface ICommandEnumerator<T>
     /// The cancellation token used by this instance.
     /// </summary>
     CancellationToken CancellationToken { get; set; }
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// Gets the result produced by the current iteration of the execution of the associated
