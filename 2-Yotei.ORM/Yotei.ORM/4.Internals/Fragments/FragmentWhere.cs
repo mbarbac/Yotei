@@ -113,7 +113,7 @@ public static partial class FragmentWhere
         /// Copy constructor.
         /// </summary>
         /// <param name="source"></param>
-        protected Master(Master source) : base(source.Command) { }
+        protected Master(Master source) : base(source) { }
 
         // ------------------------------------------------
 
@@ -127,10 +127,64 @@ public static partial class FragmentWhere
             return valid;
         }
 
+        // ------------------------------------------------
+
         /// <inheritdoc/>
         public override Entry Create(IDbToken body)
         {
-            throw null;
+            var useOR = false;
+
+            // Intercepting heading 'x => x.And(...)' and 'x => x.Or(...)' methods...
+            var item = body.RemoveFirst(x =>
+            {
+                if (x is not DbTokenMethod method) return false;
+                if (method.Host is not DbTokenArgument) return false;
+                if (method.Name.ToUpper() is not "AND" and not "OR") return false;
+                return true;
+            }
+            , out var removed);
+
+            if (removed is not null) // Found...
+            {
+                var method = (DbTokenMethod)removed;
+
+                useOR = method.Name.Equals("OR", StringComparison.OrdinalIgnoreCase);
+
+                switch (method.Arguments.Count)
+                {
+                    case 0:
+                        body = item;
+                        break;
+
+                    case 1:
+                        if (item is not DbTokenArgument) throw new ArgumentException(
+                            $"Body after '{method.Name}(arg)' must be empty.")
+                            .WithData(body);
+
+                        body = method.Arguments[0];
+                        break;
+
+                    default:
+                        throw new ArgumentException(
+                            $"Too many arguments in '{method.Name}(...)' method.")
+                            .WithData(body);
+                }
+            }
+
+            // Finishing...
+            if (body is DbTokenInvoke invoke &&
+                invoke.Arguments.Count == 1 &&
+                invoke.Arguments[0] is DbTokenLiteral literal) body = literal;
+
+            return body switch
+            {
+                DbTokenLiteral temp => new(useOR, temp),
+                DbTokenBinary temp => new(useOR, temp),
+
+                _ => throw new ArgumentException(
+                    $"Specification does not resolve into a valid {CLAUSE} clause.")
+                    .WithData(body)
+            };
         }
 
         // ------------------------------------------------

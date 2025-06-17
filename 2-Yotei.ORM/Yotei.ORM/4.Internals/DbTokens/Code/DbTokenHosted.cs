@@ -29,7 +29,13 @@ public abstract partial class DbTokenHosted : IDbToken
     public IDbToken Host
     {
         get => _Host;
-        init => _Host = value.ThrowWhenNull();
+
+        /// <remarks>
+        /// The setter is provided to allow advance scenarios, but it only does basic (not null)
+        /// validations of the given value. Also, it DOES NOT create a copy but rather modifies
+        /// this instance, so use with CAUTION.
+        /// </remarks>
+        internal set => _Host = value.ThrowWhenNull();
     }
     IDbToken _Host = default!;
 }

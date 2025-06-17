@@ -60,7 +60,7 @@ public static partial class FragmentTerminal
         /// Copy constructor.
         /// </summary>
         /// <param name="source"></param>
-        protected Master(Master source) : base(source.Command) { }
+        protected Master(Master source) : base(source) { }
 
         // ------------------------------------------------
 

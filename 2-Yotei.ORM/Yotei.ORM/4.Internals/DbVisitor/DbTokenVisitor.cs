@@ -192,8 +192,7 @@ public record class DbTokenVisitor
     {
         expression.ThrowWhenNull();
 
-        var parser = new DbLambdaParser(Engine);
-        var token = parser.Parse(expression);
+        var token = DbLambdaParser.Parse(Engine, expression);
         var info = Visit(token);
         return info;
     }
@@ -771,7 +770,7 @@ public record class DbTokenVisitor
                             break;
 
                         case LambdaNode temp:
-                            var other = new DbLambdaParser(Engine).Parse(temp);
+                            var other = DbLambdaParser.Parse(Engine, temp);
                             builder.Add(other);
                             break;
 

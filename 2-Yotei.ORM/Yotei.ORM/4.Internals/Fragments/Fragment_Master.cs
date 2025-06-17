@@ -167,9 +167,8 @@ public static partial class Fragment
             spec.ThrowWhenNull();
 
             var engine = Command.Connection.Engine;
-            var parser = new DbLambdaParser(engine);
 
-            var token = parser.Parse(spec);
+            var token = DbLambdaParser.Parse(engine, spec);
             var entry = Create(token);
             return entry;
         }
