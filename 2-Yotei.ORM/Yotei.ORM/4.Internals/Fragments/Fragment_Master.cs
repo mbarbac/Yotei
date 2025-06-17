@@ -193,7 +193,7 @@ public static partial class Fragment
         /// used to build the related clause of the associated command.
         /// </summary>
         /// <returns></returns>
-        public virtual ICommandInfo.IBuilder Visit()
+        public ICommandInfo.IBuilder Visit(Func<Entry, ICommandInfo.IBuilder> itemizer)
         {
             var connection = Command.Connection;
             var visitor = connection.Records.CreateDbTokenVisitor(Command.Locale);
