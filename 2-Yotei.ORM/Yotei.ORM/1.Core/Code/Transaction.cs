@@ -50,17 +50,15 @@ public abstract class Transaction : DisposableClass, ITransaction
     /// <inheritdoc/>
     public int Level { get; private set; }
 
+    /// <inheritdoc/>
+    public bool HasOpenedConnection { get; internal set; }
+
     // ----------------------------------------------------
 
     /// <summary>
     /// The object used to synchronize operations in this instance.
     /// </summary>
     protected AsyncLock AsyncLock { get; } = new();
-
-    /// <summary>
-    /// Determines if this instance has explicitly opened the associated connection, or not.
-    /// </summary>
-    protected bool OpenedByThis { get; private set; }
 
     /// <inheritdoc/>
     public void Start()
@@ -76,7 +74,7 @@ public abstract class Transaction : DisposableClass, ITransaction
                 if (!Connection.IsOpen)
                 {
                     Connection.Open();
-                    OpenedByThis = true;
+                    HasOpenedConnection = true;
                 }
 
                 OnStart();
@@ -99,7 +97,7 @@ public abstract class Transaction : DisposableClass, ITransaction
                 if (!Connection.IsOpen)
                 {
                     await Connection.OpenAsync(token).ConfigureAwait(false);
-                    OpenedByThis = true;
+                    HasOpenedConnection = true;
                 }
 
                 await OnStartAsync(token).ConfigureAwait(false);
@@ -125,10 +123,10 @@ public abstract class Transaction : DisposableClass, ITransaction
                 OnCommit();
                 Level = 0;
 
-                if (OpenedByThis)
+                if (HasOpenedConnection)
                 {
                     Connection.Close();
-                    OpenedByThis = false;
+                    HasOpenedConnection = false;
                 }
             }
             else
@@ -155,10 +153,10 @@ public abstract class Transaction : DisposableClass, ITransaction
                 await OnCommitAsync(token).ConfigureAwait(false);
                 Level = 0;
 
-                if (OpenedByThis)
+                if (HasOpenedConnection)
                 {
                     await Connection.CloseAsync().ConfigureAwait(false);
-                    OpenedByThis = false;
+                    HasOpenedConnection = false;
                 }
             }
             else
@@ -178,10 +176,10 @@ public abstract class Transaction : DisposableClass, ITransaction
                 OnAbort();
                 Level = 0;
 
-                if (OpenedByThis)
+                if (HasOpenedConnection)
                 {
                     Connection.Close();
-                    OpenedByThis = false;
+                    HasOpenedConnection = false;
                 }
             }
         }
@@ -197,10 +195,10 @@ public abstract class Transaction : DisposableClass, ITransaction
                 await OnAbortAsync().ConfigureAwait(false);
                 Level = 0;
 
-                if (OpenedByThis)
+                if (HasOpenedConnection)
                 {
                     await Connection.CloseAsync().ConfigureAwait(false);
-                    OpenedByThis = false;
+                    HasOpenedConnection = false;
                 }
             }
         }

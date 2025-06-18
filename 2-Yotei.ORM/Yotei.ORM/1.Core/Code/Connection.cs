@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Code;
+﻿using System.Runtime.Serialization;
+
+namespace Yotei.ORM.Code;
 
 // ========================================================
 /// <inheritdoc cref="IConnection"/>
@@ -171,10 +173,32 @@ public abstract partial class Connection : DisposableClass, IConnection
         if (IsDisposed) return;
         if (!IsOpen) return;
 
-        using (var disp = AsyncLock.Lock())
+        var taken = false;
+        try
         {
-            OnClose();
+            Monitor.Enter(ManagedTransactions, ref taken);
+            if (taken)
+            {
+                foreach (var item in ManagedTransactions)
+                {
+                    var valid = item as Transaction;
+                    if (valid is not null && valid.IsActive)
+                    {
+                        // We are already closing, so we don't need the transaction to re-enter
+                        // the close procedure again...
+                        valid.HasOpenedConnection = false;
+                        valid.Abort();
+                    }
+                }
+            }
         }
+        finally
+        {
+            if (taken) Monitor.Exit(ManagedTransactions);
+        }
+
+        using var disp = AsyncLock.Lock();
+        OnClose();
     }
 
     /// <inheritdoc/>
@@ -183,10 +207,32 @@ public abstract partial class Connection : DisposableClass, IConnection
         if (IsDisposed) return;
         if (!IsOpen) return;
 
-        await using (var disp = await AsyncLock.LockAsync().ConfigureAwait(false))
+        var taken = false;
+        try
         {
-            await OnCloseAsync().ConfigureAwait(false);
+            Monitor.Enter(ManagedTransactions, ref taken);
+            if (taken)
+            {
+                foreach (var item in ManagedTransactions)
+                {
+                    var valid = item as Transaction;
+                    if (valid is not null && valid.IsActive)
+                    {
+                        // We are already closing, so we don't need the transaction to re-enter
+                        // the close procedure again...
+                        valid.HasOpenedConnection = false;
+                        await valid.AbortAsync().ConfigureAwait(false);
+                    }
+                }
+            }
         }
+        finally
+        {
+            if (taken) Monitor.Exit(ManagedTransactions);
+        }
+
+        await using var disp = await AsyncLock.LockAsync().ConfigureAwait(false);
+        await OnCloseAsync().ConfigureAwait(false);
     }
 
     // ----------------------------------------------------

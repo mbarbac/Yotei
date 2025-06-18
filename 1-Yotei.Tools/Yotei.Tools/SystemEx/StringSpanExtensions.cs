@@ -148,6 +148,108 @@ public static class StringSpanExtensions
     }
 
     // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns the indexes of all ocurrences of the given character in the given source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="c"></param>
+    /// <param name="caseSensitive"></param>
+    /// <returns></returns>
+    public static List<int> IndexesOf(this StringSpan source, char c, bool caseSensitive)
+    {
+        var list = new List<int>();
+        var ini = 0;
+
+        while (ini < source.Length)
+        {
+            var span = source[ini..];
+            var index = span.IndexOf(c, caseSensitive);
+
+            if (index < 0) break;
+            list.Add(ini + index);
+            ini += (index + 1);
+        }
+
+        return list;
+    }
+
+    /// <summary>
+    /// Returns the indexes of all ocurrences of the given character in the given source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="c"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static List<int> IndexesOf(this StringSpan source, char c, IEqualityComparer<char> comparer)
+    {
+        var list = new List<int>();
+        var ini = 0;
+
+        while (ini < source.Length)
+        {
+            var span = source[ini..];
+            var index = span.IndexOf(c, comparer);
+
+            if (index < 0) break;
+            list.Add(ini + index);
+            ini += (index + 1);
+        }
+
+        return list;
+    }
+
+    /// <summary>
+    /// Returns the indexes of all ocurrences of the given character in the given source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="c"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static List<int> IndexesOf(this StringSpan source, char c, IEqualityComparer<string> comparer)
+    {
+        var list = new List<int>();
+        var ini = 0;
+
+        while (ini < source.Length)
+        {
+            var span = source[ini..];
+            var index = span.IndexOf(c, comparer);
+
+            if (index < 0) break;
+            list.Add(ini + index);
+            ini += (index + 1);
+        }
+
+        return list;
+    }
+
+    /// <summary>
+    /// Returns the indexes of all ocurrences of the given character in the given source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="c"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static List<int> IndexesOf(this StringSpan source, char c, StringComparison comparison)
+    {
+        var list = new List<int>();
+        var ini = 0;
+
+        while (ini < source.Length)
+        {
+            var span = source[ini..];
+            var index = span.IndexOf(c, comparison);
+
+            if (index < 0) break;
+            list.Add(ini + index);
+            ini += (index + 1);
+        }
+
+        return list;
+    }
+
+    // ----------------------------------------------------
     // int IndexOf(CharSpan)
     // int IndexOf(CharSpan, StringComparison)
 
@@ -163,7 +265,7 @@ public static class StringSpanExtensions
     {
         if (source.Length == 0 && value.Length == 0) return 0;
         if (source.Length == 0) return -1;
-        if (value.Length == 0) return 0;
+        if (value.Length == 0) return -1;
 
         for (int i = 0; i < source.Length; i++)
         {
@@ -192,7 +294,7 @@ public static class StringSpanExtensions
 
         if (source.Length == 0 && value.Length == 0) return 0;
         if (source.Length == 0) return -1;
-        if (value.Length == 0) return 0;
+        if (value.Length == 0) return -1;
 
         for (int i = 0; i < source.Length; i++)
         {
@@ -222,7 +324,7 @@ public static class StringSpanExtensions
 
         if (source.Length == 0 && value.Length == 0) return 0;
         if (source.Length == 0) return -1;
-        if (value.Length == 0) return 0;
+        if (value.Length == 0) return -1;
 
         for (int i = 0; i < source.Length; i++)
         {
@@ -253,7 +355,7 @@ public static class StringSpanExtensions
     {
         if (source.Length == 0 && value.Length == 0) return 0;
         if (source.Length == 0) return -1;
-        if (value.Length == 0) return 0;
+        if (value.Length == 0) return -1;
 
         for (int i = source.Length - 1; i >= 0; i--)
         {
@@ -283,7 +385,7 @@ public static class StringSpanExtensions
 
         if (source.Length == 0 && value.Length == 0) return 0;
         if (source.Length == 0) return -1;
-        if (value.Length == 0) return 0;
+        if (value.Length == 0) return -1;
 
         for (int i = source.Length - 1; i >= 0; i--)
         {
@@ -313,7 +415,7 @@ public static class StringSpanExtensions
 
         if (source.Length == 0 && value.Length == 0) return 0;
         if (source.Length == 0) return -1;
-        if (value.Length == 0) return 0;
+        if (value.Length == 0) return -1;
 
         for (int i = source.Length - 1; i >= 0; i--)
         {
@@ -326,6 +428,124 @@ public static class StringSpanExtensions
             if (found) return i;
         }
         return -1;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns the indexes of all ocurrences of the given value in the given source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="c"></param>
+    /// <param name="caseSensitive"></param>
+    /// <returns></returns>
+    public static List<int> IndexesOf(this StringSpan source, StringSpan value, bool caseSensitive)
+    {
+        if (source.Length == 0 && value.Length == 0) return [];
+        if (source.Length == 0) return [];
+        if (value.Length == 0) return [];
+
+        var list = new List<int>();
+        var ini = 0;
+
+        while (ini < source.Length)
+        {
+            var span = source[ini..];
+            var index = span.IndexOf(value, caseSensitive);
+
+            if (index < 0) break;
+            list.Add(ini + index);
+            ini += (index + value.Length);
+        }
+
+        return list;
+    }
+
+    /// <summary>
+    /// Returns the indexes of all ocurrences of the given value in the given source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="c"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static List<int> IndexesOf(this StringSpan source, StringSpan value, IEqualityComparer<char> comparer)
+    {
+        if (source.Length == 0 && value.Length == 0) return [];
+        if (source.Length == 0) return [];
+        if (value.Length == 0) return [];
+
+        var list = new List<int>();
+        var ini = 0;
+
+        while (ini < source.Length)
+        {
+            var span = source[ini..];
+            var index = span.IndexOf(value, comparer);
+
+            if (index < 0) break;
+            list.Add(ini + index);
+            ini += (index + value.Length);
+        }
+
+        return list;
+    }
+
+    /// <summary>
+    /// Returns the indexes of all ocurrences of the given value in the given source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="c"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static List<int> IndexesOf(this StringSpan source, StringSpan value, IEqualityComparer<string> comparer)
+    {
+        if (source.Length == 0 && value.Length == 0) return [];
+        if (source.Length == 0) return [];
+        if (value.Length == 0) return [];
+
+        var list = new List<int>();
+        var ini = 0;
+
+        while (ini < source.Length)
+        {
+            var span = source[ini..];
+            var index = span.IndexOf(value, comparer);
+
+            if (index < 0) break;
+            list.Add(ini + index);
+            ini += (index + value.Length);
+        }
+
+        return list;
+    }
+
+    /// <summary>
+    /// Returns the indexes of all ocurrences of the given value in the given source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="c"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static List<int> IndexesOf(this StringSpan source, StringSpan value, StringComparison comparison)
+    {
+        if (source.Length == 0 && value.Length == 0) return [];
+        if (source.Length == 0) return [];
+        if (value.Length == 0) return [];
+
+        var list = new List<int>();
+        var ini = 0;
+
+        while (ini < source.Length)
+        {
+            var span = source[ini..];
+            var index = span.IndexOf(value, comparison);
+
+            if (index < 0) break;
+            list.Add(ini + index);
+            ini += (index + value.Length);
+        }
+
+        return list;
     }
 
     // ----------------------------------------------------

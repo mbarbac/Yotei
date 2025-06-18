@@ -118,4 +118,41 @@ public static class Test_Connection
         Assert.False(connection.IsOpen);
         Assert.True(connection.IsDisposed);
     }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static async Task Test_Open_Close_With_Transactions()
+    {
+        IConnection connection;
+        ITransaction transaction;
+        List<ITransaction> transactions = [];
+
+        using (connection = new FakeConnection(new FakeEngine()))
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                transaction = connection.CreateTransaction();
+                transaction.Start();
+                transactions.Add(transaction);
+            }
+
+            // The first transaction has opened the connection, so here we are also testing if
+            // we have been able to prevent reentrancy...
+
+            await connection.CloseAsync();
+
+            foreach (var item in transactions)
+            {
+                Assert.False(item.IsActive);
+                Assert.False(item.IsDisposed);
+            }
+        }
+
+        foreach (var item in transactions)
+        {
+            Assert.True(item.IsDisposed);
+        }
+    }
 }

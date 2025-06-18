@@ -202,6 +202,30 @@ public static class Test_StringExtensions
 
     //[Enforced]
     [Fact]
+    public static void Test_String_IndexesOf_CaseSensitive()
+    {
+        var source = "xxaayyaazz";
+        var list = source.IndexesOf("aa", caseSensitive: false);
+        Assert.Equal(2, list.Count);
+        Assert.Equal(2, list[0]);
+        Assert.Equal(6, list[1]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Char_IndexesOf_CaseSensitive()
+    {
+        var source = "xxayyazz";
+        var list = source.IndexesOf('a', caseSensitive: false);
+        Assert.Equal(2, list.Count);
+        Assert.Equal(2, list[0]);
+        Assert.Equal(5, list[1]);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
     public static void Test_ContainsAny()
     {
         var source = "abc";

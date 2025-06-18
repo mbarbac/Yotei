@@ -125,6 +125,20 @@ public static class StringExtensions
         return source.AsSpan().IndexOf(c, comparer);
     }
 
+    /// <summary>
+    /// Returns the index of the first ocurrence of the given character in the given source,
+    /// or -1 if it cannot be found.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="c"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static int IndexOf(this string source, char c, StringComparison comparison)
+    {
+        source.ThrowWhenNull();
+        return source.AsSpan().IndexOf(c, comparison);
+    }
+
     // ----------------------------------------------------
     // int IndexOf(char)
     // int IndexOf(char, StringComparison)
@@ -169,6 +183,74 @@ public static class StringExtensions
     {
         source.ThrowWhenNull();
         return source.AsSpan().LastIndexOf(c, comparer);
+    }
+
+    /// <summary>
+    /// Returns the index of the last ocurrence of the given character in the given source,
+    /// or -1 if it cannot be found.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="c"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static int LastIndexOf(this string source, char c, StringComparison comparison)
+    {
+        source.ThrowWhenNull();
+        return source.AsSpan().LastIndexOf(c, comparison);
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns the indexes of all ocurrences of the given character in the given source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="c"></param>
+    /// <param name="caseSensitive"></param>
+    /// <returns></returns>
+    public static List<int> IndexesOf(this string source, char c, bool caseSensitive)
+    {
+        source.ThrowWhenNull();
+        return source.AsSpan().IndexesOf(c, caseSensitive);
+    }
+
+    /// <summary>
+    /// Returns the indexes of all ocurrences of the given character in the given source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="c"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static List<int> IndexesOf(this string source, char c, IEqualityComparer<char> comparer)
+    {
+        source.ThrowWhenNull();
+        return source.AsSpan().IndexesOf(c, comparer);
+    }
+
+    /// <summary>
+    /// Returns the indexes of all ocurrences of the given character in the given source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="c"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static List<int> IndexesOf(this string source, char c, IEqualityComparer<string> comparer)
+    {
+        source.ThrowWhenNull();
+        return source.AsSpan().IndexesOf(c, comparer);
+    }
+
+    /// <summary>
+    /// Returns the indexes of all ocurrences of the given character in the given source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="c"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static List<int> IndexesOf(this string source, char c, StringComparison comparison)
+    {
+        source.ThrowWhenNull();
+        return source.AsSpan().IndexesOf(c, comparison);
     }
 
     // ----------------------------------------------------
@@ -220,12 +302,27 @@ public static class StringExtensions
         return source.AsSpan().IndexOf(value, comparer);
     }
 
+    /// <summary>
+    /// Returns the index of the first ocurrence of the given character in the given source,
+    /// or -1 if it cannot be found.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static int IndexOf(this string source, string value, StringComparison comparison)
+    {
+        source.ThrowWhenNull();
+        value.ThrowWhenNull();
+        return source.AsSpan().IndexOf(value, comparison);
+    }
+
     // ----------------------------------------------------
     // int LastIndexOf(string)
     // int LastIndexOf(string, StringComparison)
 
     /// <summary>
-    /// Returns the index of the last ocurrence of the given character in the given source,
+    /// Returns the index of the last ocurrence of the given value in the given source,
     /// or -1 if it cannot be found.
     /// </summary>
     /// <param name="source"></param>
@@ -240,7 +337,7 @@ public static class StringExtensions
     }
 
     /// <summary>
-    /// Returns the index of the last ocurrence of the given character in the given source,
+    /// Returns the index of the last ocurrence of the given value in the given source,
     /// or -1 if it cannot be found.
     /// </summary>
     /// <param name="source"></param>
@@ -255,7 +352,7 @@ public static class StringExtensions
     }
 
     /// <summary>
-    /// Returns the index of the last ocurrence of the given character in the given source,
+    /// Returns the index of the last ocurrence of the given value in the given source,
     /// or -1 if it cannot be found.
     /// </summary>
     /// <param name="source"></param>
@@ -267,6 +364,79 @@ public static class StringExtensions
         source.ThrowWhenNull();
         value.ThrowWhenNull();
         return source.AsSpan().LastIndexOf(value, comparer);
+    }
+
+    /// <summary>
+    /// Returns the index of the last ocurrence of the given value in the given source,
+    /// or -1 if it cannot be found.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static int LastIndexOf(this string source, string value, StringComparison comparison)
+    {
+        source.ThrowWhenNull();
+        value.ThrowWhenNull();
+        return source.AsSpan().LastIndexOf(value, comparison);
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns the indexes of all ocurrences of the given value in the given source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="c"></param>
+    /// <param name="caseSensitive"></param>
+    /// <returns></returns>
+    public static List<int> IndexesOf(this string source, string value, bool caseSensitive)
+    {
+        source.ThrowWhenNull();
+        value.ThrowWhenNull();
+        return source.AsSpan().IndexesOf(value, caseSensitive);
+    }
+
+    /// <summary>
+    /// Returns the indexes of all ocurrences of the given value in the given source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="c"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static List<int> IndexesOf(this string source, string value, IEqualityComparer<char> comparer)
+    {
+        source.ThrowWhenNull();
+        value.ThrowWhenNull();
+        return source.AsSpan().IndexesOf(value, comparer);
+    }
+
+    /// <summary>
+    /// Returns the indexes of all ocurrences of the given value in the given source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="c"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static List<int> IndexesOf(this string source, string value, IEqualityComparer<string> comparer)
+    {
+        source.ThrowWhenNull();
+        value.ThrowWhenNull();
+        return source.AsSpan().IndexesOf(value, comparer);
+    }
+
+    /// <summary>
+    /// Returns the indexes of all ocurrences of the given value in the given source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="c"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static List<int> IndexesOf(this string source, string value, StringComparison comparison)
+    {
+        source.ThrowWhenNull();
+        value.ThrowWhenNull();
+        return source.AsSpan().IndexesOf(value, comparison);
     }
 
     // ----------------------------------------------------
@@ -292,12 +462,38 @@ public static class StringExtensions
     /// </summary>
     /// <param name="source"></param>
     /// <param name="c"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool Contains(this string source, char c, IEqualityComparer<char> comparer)
+    {
+        source.ThrowWhenNull();
+        return source.AsSpan().Contains(c, comparer);
+    }
+
+    /// <summary>
+    /// Determines if the given source contains the given char, or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="c"></param>
     /// <param name="caseSensitive"></param>
     /// <returns></returns>
     public static bool Contains(this string source, char c, IEqualityComparer<string> comparer)
     {
         source.ThrowWhenNull();
         return source.AsSpan().Contains(c, comparer);
+    }
+
+    /// <summary>
+    /// Determines if the given source contains the given char, or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="c"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static bool Contains(this string source, char c, StringComparison comparison)
+    {
+        source.ThrowWhenNull();
+        return source.AsSpan().Contains(c, comparison);
     }
 
     // ----------------------------------------------------
@@ -344,6 +540,20 @@ public static class StringExtensions
         source.ThrowWhenNull();
         value.ThrowWhenNull();
         return source.AsSpan().Contains(value, comparer);
+    }
+
+    /// <summary>
+    /// Determines if the given source contains the given value, or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static bool Contains(this string source, string value, StringComparison comparison)
+    {
+        source.ThrowWhenNull();
+        value.ThrowWhenNull();
+        return source.AsSpan().Contains(value, comparison);
     }
 
     // ----------------------------------------------------

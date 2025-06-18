@@ -22,6 +22,11 @@ public interface ITransaction : IDisposableEx
     /// </summary>
     int Level { get; }
 
+    /// <summary>
+    /// Determines if this instance has opened the associated connection, or not.
+    /// </summary>
+    bool HasOpenedConnection { get; }
+
     // ----------------------------------------------------
 
     /// <summary>

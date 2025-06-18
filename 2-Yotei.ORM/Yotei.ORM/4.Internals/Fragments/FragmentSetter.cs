@@ -52,6 +52,7 @@ public static partial class FragmentSetter
             return builder;
         }
 
+        /*
         /// <summary>
         /// Visits the name part of this instance.
         /// </summary>
@@ -70,8 +71,9 @@ public static partial class FragmentSetter
             {
                 throw null;
             }
-        }
+        }*/
 
+        /*
         /// <summary>
         /// Visits the value part of this instance.
         /// </summary>
@@ -90,7 +92,7 @@ public static partial class FragmentSetter
             {
                 throw null;
             }
-        }
+        }*/
     }
 
     // ====================================================
@@ -167,6 +169,7 @@ public static partial class FragmentSetter
             return Visit(Itemize);
         }
 
+        /*
         /// <summary>
         /// Visits the names of this instance.
         /// </summary>
@@ -182,8 +185,9 @@ public static partial class FragmentSetter
             }
 
             return Visit(Itemize);
-        }
+        }*/
 
+        /*
         /// <summary>
         /// Visits the names of this instance.
         /// </summary>
@@ -199,6 +203,6 @@ public static partial class FragmentSetter
             }
 
             return Visit(Itemize);
-        }
+        }*/
     }
 }
