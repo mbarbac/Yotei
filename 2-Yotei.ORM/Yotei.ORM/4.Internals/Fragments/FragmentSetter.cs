@@ -21,7 +21,18 @@ public static partial class FragmentSetter
         /// Initializes a new instance.
         /// </summary>
         /// <param name="body"></param>
-        public Entry(DbTokenLiteral body) : base() => Body = body.ThrowWhenNull();
+        public Entry(IEngine engine, DbTokenLiteral body) : base()
+        {
+            Body = body.ThrowWhenNull();
+
+            var parts = body.Value.ExtractLeftRight("=", engine, out var found);
+            if (!found) throw new ArgumentException(
+                "Literal has not a valid 'target = value' setter format.")
+                .WithData(body.Value);
+
+            StrTarget = parts.Left;
+            StrValue = parts.Right;
+        }
 
         /// <summary>
         /// Initializes a new instance.
@@ -33,7 +44,12 @@ public static partial class FragmentSetter
         /// Copy constructor.
         /// </summary>
         /// <param name="source"></param>
-        protected Entry(Entry source) : base(source) => Body = source.Body;
+        protected Entry(Entry source) : base(source)
+        {
+            Body = source.Body;
+            StrTarget = source.StrTarget;
+            StrValue = source.StrValue;
+        }
 
         /// <inheritdoc/>
         public override string ToString() => Body.ToString()!;
@@ -44,6 +60,8 @@ public static partial class FragmentSetter
         /// allowed.
         /// </summary>
         public IDbToken Body { get; }
+        string? StrTarget { get; }
+        string? StrValue { get; }
 
         /// <inheritdoc/>
         public override ICommandInfo.IBuilder Visit(DbTokenVisitor visitor, bool first, bool last)
@@ -52,7 +70,6 @@ public static partial class FragmentSetter
             return builder;
         }
 
-        /*
         /// <summary>
         /// Visits the name part of this instance.
         /// </summary>
@@ -60,6 +77,7 @@ public static partial class FragmentSetter
         /// <param name="first"></param>
         /// <param name="last"></param>
         /// <returns></returns>
+        [SuppressMessage("", "IDE0060")]
         public ICommandInfo.IBuilder VisitName(DbTokenVisitor visitor, bool first, bool last)
         {
             if (Body is DbTokenSetter setter)
@@ -69,8 +87,15 @@ public static partial class FragmentSetter
             }
             else
             {
-                throw null;
+                var builder = new CommandInfo.Builder()
             }
+        }
+
+        /*
+        
+        {
+            
+            
         }*/
 
         /*
