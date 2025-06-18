@@ -193,7 +193,23 @@ public static partial class Fragment
         /// used to build the related clause of the associated command.
         /// </summary>
         /// <returns></returns>
-        public ICommandInfo.IBuilder Visit(Func<Entry, ICommandInfo.IBuilder> itemizer)
+        public virtual ICommandInfo.IBuilder Visit()
+        {
+            static ICommandInfo.IBuilder Itemize(
+                Entry entry, DbTokenVisitor visitor, bool first, bool last)
+                => entry.Visit(visitor, first, last);
+
+            return Visit(Itemize);
+        }
+
+        /// <summary>
+        /// Visits the entries in this instance using the given delegate and returns a command
+        /// info object that can be used to build the related clause of the associated command.
+        /// </summary>
+        /// <param name="itemize"></param>
+        /// <returns></returns>
+        public ICommandInfo.IBuilder Visit(
+            Func<Entry, DbTokenVisitor, bool, bool, ICommandInfo.IBuilder> itemize)
         {
             var connection = Command.Connection;
             var visitor = connection.Records.CreateDbTokenVisitor(Command.Locale);
@@ -208,7 +224,7 @@ public static partial class Fragment
                 var item = Items[i];
 
                 if (!first && separator is not null) builder.Add(separator);
-                var temp = item.Visit(visitor, first, last);
+                var temp = itemize(item, visitor, first, last);
                 builder.Add(temp);
             }
 
