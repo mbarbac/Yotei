@@ -13,6 +13,11 @@ public static partial class Fragment
         readonly List<Entry> Items = [];
 
         /// <summary>
+        /// Returns a descriptor of the clause this instance is built for.
+        /// </summary>
+        public abstract string CLAUSE { get; }
+
+        /// <summary>
         /// Initializes a new instance.
         /// </summary>
         /// <param name="command"></param>

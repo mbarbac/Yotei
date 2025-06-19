@@ -11,6 +11,11 @@ public static partial class Fragment
     public abstract partial class Entry
     {
         /// <summary>
+        /// Returns a descriptor of the clause this instance is built for.
+        /// </summary>
+        public abstract string CLAUSE { get; }
+
+        /// <summary>
         /// Initializes a new instance.
         /// </summary>
         /// <param name="master"></param>

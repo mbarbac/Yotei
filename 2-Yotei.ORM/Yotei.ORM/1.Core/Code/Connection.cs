@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-namespace Yotei.ORM.Code;
+﻿namespace Yotei.ORM.Code;
 
 // ========================================================
 /// <inheritdoc cref="IConnection"/>

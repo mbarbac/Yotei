@@ -6,8 +6,6 @@
 /// </summary>
 public static partial class FragmentSetter
 {
-    readonly static string CLAUSE = "SETTER";
-
     // ====================================================
     /// <summary>
     /// Represents an entry in a collection of fragments used to build a SETTER clause.
@@ -15,6 +13,9 @@ public static partial class FragmentSetter
     [Cloneable]
     public partial class Entry : Fragment.Entry
     {
+        /// <inheritdoc/>
+        public override string CLAUSE => "SETTER";
+
         /// <summary>
         /// Initializes a new instance.
         /// </summary>
@@ -123,6 +124,9 @@ public static partial class FragmentSetter
     [Cloneable]
     public partial class Master : Fragment.Master
     {
+        /// <inheritdoc/>
+        public override string CLAUSE => "SETTER";
+
         /// <summary>
         /// Initializes a new instance.
         /// </summary>

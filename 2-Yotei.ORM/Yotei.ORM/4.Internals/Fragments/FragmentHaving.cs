@@ -8,8 +8,6 @@
 /// </summary>
 public static partial class FragmentHaving
 {
-    readonly static string CLAUSE = "HAVING";
-
     // ====================================================
     /// <summary>
     /// Represents an entry in a collection of fragments used to build a HAVING clause.
@@ -17,6 +15,9 @@ public static partial class FragmentHaving
     [Cloneable]
     public partial class Entry : FragmentWhere.Entry
     {
+        /// <inheritdoc/>
+        public override string CLAUSE => "HAVING";
+
         /// <summary>
         /// Initializes a new instance.
         /// </summary>
@@ -45,6 +46,9 @@ public static partial class FragmentHaving
     [Cloneable]
     public partial class Master : FragmentWhere.Master
     {
+        /// <inheritdoc/>
+        public override string CLAUSE => "HAVING";
+
         /// <summary>
         /// Initializes a new instance.
         /// </summary>

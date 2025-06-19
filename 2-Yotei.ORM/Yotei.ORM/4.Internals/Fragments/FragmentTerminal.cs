@@ -5,8 +5,6 @@
 /// </summary>
 public static partial class FragmentTerminal
 {
-    readonly static string CLAUSE = "TERMINAL";
-
     // ====================================================
     /// <summary>
     /// Represents an entry in a collection of fragments used to build a TERMINAL clause.
@@ -14,6 +12,9 @@ public static partial class FragmentTerminal
     [Cloneable]
     public partial class Entry : Fragment.Entry
     {
+        /// <inheritdoc/>
+        public override string CLAUSE => "TERMINAL";
+
         /// <summary>
         /// Initializes a new instance.
         /// </summary>
@@ -50,6 +51,9 @@ public static partial class FragmentTerminal
     [Cloneable]
     public partial class Master : Fragment.Master
     {
+        /// <inheritdoc/>
+        public override string CLAUSE => "TERMINAL";
+
         /// <summary>
         /// Initializes a new instance.
         /// </summary>

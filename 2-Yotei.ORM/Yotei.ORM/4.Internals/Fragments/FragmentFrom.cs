@@ -1,57 +1,28 @@
 ﻿namespace Yotei.ORM.Internals;
 
 /// <summary>
-/// Represents the ability of parsing WHERE clauses.
-/// <br/>- Standard syntax: 'x => Condition'.
-/// <br/>- Alternate syntax: 'x => x.And(...)'.
-/// <br/>- Alternate syntax: 'x => x.Or(...)'.
+/// Represents the ability of parsing FROM clauses.
+/// <br/>- Standard syntax: 'x => x.Source'.
+/// <br/>- Alternate syntax: 'x => x.Source.As(...)'.
 /// </summary>
-public static partial class FragmentWhere
+public static partial class FragmentFrom
 {
     // ====================================================
     /// <summary>
-    /// Represents an entry in a collection of fragments used to build a WHERE clause.
+    /// Represents an entry in a collection of fragments used to build a FROM clause.
     /// </summary>
     [Cloneable]
     public partial class Entry : Fragment.Entry
     {
         /// <inheritdoc/>
-        public override string CLAUSE => "WHERE";
+        public override string CLAUSE => "FROM";
 
         /// <summary>
         /// Initializes a new instance.
         /// </summary>
         /// <param name="master"></param>
         /// <param name="body"></param>
-        public Entry(
-            Master master, DbTokenLiteral body) : base(master) => Body = body.ThrowWhenNull();
-
-        /// <summary>
-        /// Initializes a new instance.
-        /// </summary>
-        /// <param name="master"></param>
-        /// <param name="body"></param>
-        public Entry(Master master, DbTokenBinary body) : base(master)
-        {
-            Body = body.ThrowWhenNull();
-
-            switch (body.Operation)
-            {
-                case ExpressionType.Equal:
-                case ExpressionType.NotEqual:
-                case ExpressionType.And:
-                case ExpressionType.Or:
-                case ExpressionType.GreaterThan:
-                case ExpressionType.GreaterThanOrEqual:
-                case ExpressionType.LessThan:
-                case ExpressionType.LessThanOrEqual:
-                    break;
-
-                default:
-                    throw new ArgumentException(
-                        $"Invalid binary {CLAUSE} entry.").WithData(body);
-            }
-        }
+        public Entry(Master master, IDbToken body) : base(master) => Body = body.ThrowWhenNull();
 
         /// <summary>
         /// Copy constructor.
@@ -60,57 +31,47 @@ public static partial class FragmentWhere
         protected Entry(Entry source) : base(source)
         {
             Body = source.Body;
-            UseOR = source.UseOR;
+            Alias = source.Alias?.Clone();
         }
 
         /// <inheritdoc/>
-        public override string ToString() => Body is DbTokenBinary && UseOR is not null
-            ? $"{(UseOR.Value ? "OR" : "AND")} {Body}"
-            : Body.ToString()!;
+        public override string ToString() => Alias is null
+            ? Body.ToString()!
+            : $"{Body} AS {Alias}";
 
         /// <summary>
         /// The actual contents carried by this instance.
-        /// <br/> Only <see cref="DbTokenLiteral"/> and <see cref="DbTokenBinary"/> objects are
-        /// allowed.
         /// </summary>
         public IDbToken Body { get; }
 
         /// <summary>
-        /// Determines if this instance chains with any previous one using an "OR" connector, or
-        /// rather is shall use the default "AND" one, or none of them.
-        /// <br/> This property only affects instances whose body is a binary one.
+        /// The alias that qualifies the source (Body), or null if any.
         /// </summary>
-        public bool? UseOR { get; init; }
+        public DbTokenIdentifier? Alias { get; init; }
 
         /// <inheritdoc/>
         public override ICommandInfo.IBuilder Visit(DbTokenVisitor visitor)
         {
             var builder = visitor.Visit(Body);
-
-            var index = Master.IndexOf(this);
-            if (index > 0 && Body is DbTokenBinary && UseOR is not null)
+            
+            if (Alias is not null)
             {
-                var valid = (Entry)Master[index - 1];
-                if (valid.Body is DbTokenBinary)
-                {
-                    var separator = UseOR.Value ? "OR" : "AND";
-                    builder.ReplaceText($"{separator} {builder.Text}");
-                }
+                var str = $"{builder.Text} AS {Alias}";
+                builder.ReplaceText(str);
             }
-
             return builder;
         }
     }
 
     // ====================================================
     /// <summary>
-    /// Represents the collection of fragments used to build a WHERE clause.
+    /// Represents the collection of fragments used to build a FROM clause.
     /// </summary>
     [Cloneable]
     public partial class Master : Fragment.Master
     {
         /// <inheritdoc/>
-        public override string CLAUSE => "WHERE";
+        public override string CLAUSE => "FROM";
 
         /// <summary>
         /// Initializes a new instance.
@@ -139,7 +100,10 @@ public static partial class FragmentWhere
         // ------------------------------------------------
 
         /// <inheritdoc/>
-        public override Entry Create(IDbToken body)
+        public override Entry Create(IDbToken body) => throw null;
+
+        /*
+         public override Entry Create(IDbToken body)
         {
             bool? useOR = null;
 
@@ -201,24 +165,6 @@ public static partial class FragmentWhere
                     .WithData(body)
             };
         }
-
-        // ------------------------------------------------
-
-        /// <inheritdoc/>
-        public override string? Separator(Fragment.Entry entry)
-        {
-            var valid = (Entry)entry;
-            var index = IndexOf(entry);
-
-            if (index > 0 && valid.Body is DbTokenBinary)
-            {
-                var item = this[index - 1];
-                var temp = (Entry)item;
-
-                if (temp.Body is DbTokenBinary) return " ";
-            }
-
-            return null;
-        }
+         */
     }
 }
