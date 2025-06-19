@@ -13,30 +13,28 @@ public static partial class Fragment
         /// <summary>
         /// Initializes a new instance.
         /// </summary>
-        /// <param name="command"></param>
-        public Entry(ICommand command) => Command = command.ThrowWhenNull();
+        /// <param name="master"></param>
+        public Entry(Master master) => Master = master.ThrowWhenNull();
 
         /// <summary>
         /// Copy constructor.
         /// </summary>
         /// <param name="source"></param>
-        protected Entry(Entry source) : this(source.ThrowWhenNull().Command) { }
+        protected Entry(Entry source) : this(source.ThrowWhenNull().Master) { }
 
         /// <summary>
-        /// The command this instance is associated with.
+        /// The master collection this instance is associated with.
         /// </summary>
-        public ICommand Command { get; }
+        public Master Master { get; internal set; }
+        protected ICommand Command => Master.Command;
         protected IEngine Engine => Command.Connection.Engine;
 
         /// <summary>
         /// Visits the contents of this instance and returns the command info object that can be
-        /// used to build the related clause of the command. The 'first' and 'last' parameters
-        /// determine if this instance is the first or last one in the collection it belongs to.
+        /// used to build the related clause of the command.
         /// </summary>
         /// <param name="visitor"></param>
-        /// <param name="first"></param>
-        /// <param name="last"></param>
         /// <returns></returns>
-        public abstract ICommandInfo.IBuilder Visit(DbTokenVisitor visitor, bool first, bool last);
+        public abstract ICommandInfo.IBuilder Visit(DbTokenVisitor visitor);
     }
 }

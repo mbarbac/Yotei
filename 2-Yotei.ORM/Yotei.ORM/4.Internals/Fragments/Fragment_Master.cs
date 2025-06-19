@@ -22,7 +22,11 @@ public static partial class Fragment
         /// Copy constructor.
         /// </summary>
         /// <param name="source"></param>
-        protected Master(Master source) : this(source.Command) => Items.AddRange(source);
+        protected Master(Master source) : this(source.Command)
+        {
+            Items.AddRange(source.Select(x => x.Clone()));
+            foreach (var item in this) item.Master = this;
+        }
 
         /// <inheritdoc/>
         public virtual IEnumerator<Entry> GetEnumerator() => Items.GetEnumerator();
@@ -198,8 +202,7 @@ public static partial class Fragment
         public virtual ICommandInfo.IBuilder Visit()
         {
             static ICommandInfo.IBuilder Itemize(
-                Entry entry, DbTokenVisitor visitor, bool first, bool last)
-                => entry.Visit(visitor, first, last);
+                Entry entry, DbTokenVisitor visitor) => entry.Visit(visitor);
 
             return Visit(Itemize);
         }
@@ -211,7 +214,7 @@ public static partial class Fragment
         /// <param name="itemize"></param>
         /// <returns></returns>
         public ICommandInfo.IBuilder Visit(
-            Func<Entry, DbTokenVisitor, bool, bool, ICommandInfo.IBuilder> itemize)
+            Func<Entry, DbTokenVisitor, ICommandInfo.IBuilder> itemize)
         {
             var connection = Command.Connection;
             var visitor = connection.Records.CreateDbTokenVisitor(Command.Locale);
@@ -221,12 +224,10 @@ public static partial class Fragment
 
             for (int i = 0; i < Items.Count; i++)
             {
-                var first = i == 0;
-                var last = i == Items.Count - 1;
                 var item = Items[i];
 
-                if (!first && separator is not null) builder.Add(separator);
-                var temp = itemize(item, visitor, first, last);
+                if (i != 0 && separator is not null) builder.Add(separator);
+                var temp = itemize(item, visitor);
                 builder.Add(temp);
             }
 

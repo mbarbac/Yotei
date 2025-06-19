@@ -18,10 +18,10 @@ public static partial class FragmentSetter
         /// <summary>
         /// Initializes a new instance.
         /// </summary>
-        /// <param name="command"></param>
+        /// <param name="master"></param>
         /// <param name="body"></param>
         [SuppressMessage("", "IDE0042")]
-        public Entry(ICommand command, DbTokenLiteral body) : base(command)
+        public Entry(Master master, DbTokenLiteral body) : base(master)
         {
             Body = body.ThrowWhenNull();
 
@@ -37,9 +37,9 @@ public static partial class FragmentSetter
         /// <summary>
         /// Initializes a new instance.
         /// </summary>
-        /// <param name="command"></param>
+        /// <param name="master"></param>
         /// <param name="body"></param>
-        public Entry(ICommand command, DbTokenSetter body) : base(command)
+        public Entry(Master master, DbTokenSetter body) : base(master)
         {
             Body = body.ThrowWhenNull();
         }
@@ -68,10 +68,10 @@ public static partial class FragmentSetter
         string? StrValue { get; }
 
         /// <inheritdoc/>
-        public override ICommandInfo.IBuilder Visit(DbTokenVisitor visitor, bool first, bool last)
+        public override ICommandInfo.IBuilder Visit(DbTokenVisitor visitor)
         {
             var builder = visitor.Visit(Body);
-            var str = builder.Text.UnWrap('(', ')');
+            var str = builder.Text.UnWrap('(', ')').Wrap('(', ')');
             builder.ReplaceText(str);
 
             return builder;
@@ -80,35 +80,39 @@ public static partial class FragmentSetter
         /// <summary>
         /// Visits the name of this instance.
         /// </summary>
-        public virtual ICommandInfo.IBuilder VisitName(DbTokenVisitor visitor, bool first, bool last)
+        /// <param name="visitor"></param>
+        public virtual ICommandInfo.IBuilder VisitName(DbTokenVisitor visitor)
         {
             if (Body is DbTokenSetter item)
             {
                 var builder = visitor.Visit(item.Target);
                 return builder;
             }
-            else
+            else if (Body is DbTokenLiteral)
             {
                 var builder = new CommandInfo.Builder(Engine, StrTarget);
                 return builder;
             }
+            else throw new UnExpectedException("Unsupported token.").WithData(Body);
         }
 
         /// <summary>
         /// Visits the value of this instance.
         /// </summary>
-        public virtual ICommandInfo.IBuilder VisitValue(DbTokenVisitor visitor, bool first, bool last)
+        /// <param name="visitor"></param>
+        public virtual ICommandInfo.IBuilder VisitValue(DbTokenVisitor visitor)
         {
             if (Body is DbTokenSetter item)
             {
                 var builder = visitor.Visit(item.Value);
                 return builder;
             }
-            else
+            else if (Body is DbTokenLiteral)
             {
                 var builder = new CommandInfo.Builder(Engine, StrValue);
                 return builder;
             }
+            else throw new UnExpectedException("Unsupported token.").WithData(Body);
         }
     }
 
@@ -155,8 +159,8 @@ public static partial class FragmentSetter
 
             return body switch
             {
-                DbTokenLiteral temp => new(Command, temp),
-                DbTokenSetter temp => new(Command, temp),
+                DbTokenLiteral temp => new(this, temp),
+                DbTokenSetter temp => new(this, temp),
 
                 _ => throw new ArgumentException(
                     $"Specification does not resolve into a valid {CLAUSE} clause.")
@@ -169,18 +173,31 @@ public static partial class FragmentSetter
         /// <inheritdoc/>
         public override string? Separator => ", ";
 
+        ICommandInfo.IBuilder OnVisit(Func<Fragment.Entry, DbTokenVisitor, ICommandInfo.IBuilder> itemize)
+        {
+            var builder = Visit(itemize);
+            var str = builder.Text;
+            if (str.Length > 0)
+            {
+                str = Count == 1
+                    ? builder.Text.UnWrap('(', ')').Wrap('(', ')')
+                    : $"({builder.Text})";
+
+                builder.ReplaceText(str);
+            }
+            return builder;
+        }
+
         /// <inheritdoc/>
         public override ICommandInfo.IBuilder Visit()
         {
-            static ICommandInfo.IBuilder Itemize(
-                Fragment.Entry entry, DbTokenVisitor visitor, bool first, bool last)
+            static ICommandInfo.IBuilder Itemize(Fragment.Entry entry, DbTokenVisitor visitor)
             {
                 var valid = (Entry)entry;
-                var builder = valid.Visit(visitor, first, last);
+                var builder = valid.Visit(visitor);
                 return builder;
             }
-
-            return Visit(Itemize);
+            return OnVisit(Itemize);
         }
 
         /// <summary>
@@ -188,15 +205,13 @@ public static partial class FragmentSetter
         /// </summary>
         public virtual ICommandInfo.IBuilder VisitNames()
         {
-            static ICommandInfo.IBuilder Itemize(
-                Fragment.Entry entry, DbTokenVisitor visitor, bool fisrt, bool last)
+            static ICommandInfo.IBuilder Itemize(Fragment.Entry entry, DbTokenVisitor visitor)
             {
                 var valid = (Entry)entry;
-                var builder = valid.VisitName(visitor, fisrt, last);
+                var builder = valid.VisitName(visitor);
                 return builder;
             }
-
-            return Visit(Itemize);
+            return OnVisit(Itemize);
         }
 
         /// <summary>
@@ -204,15 +219,13 @@ public static partial class FragmentSetter
         /// </summary>
         public virtual ICommandInfo.IBuilder VisitValues()
         {
-            static ICommandInfo.IBuilder Itemize(
-                Fragment.Entry entry, DbTokenVisitor visitor, bool fisrt, bool last)
+            static ICommandInfo.IBuilder Itemize(Fragment.Entry entry, DbTokenVisitor visitor)
             {
                 var valid = (Entry)entry;
-                var builder = valid.VisitValue(visitor, fisrt, last);
+                var builder = valid.VisitValue(visitor);
                 return builder;
             }
-
-            return Visit(Itemize);
+            return OnVisit(Itemize);
         }
     }
 }
