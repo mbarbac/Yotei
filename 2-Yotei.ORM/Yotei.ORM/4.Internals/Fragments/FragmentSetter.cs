@@ -171,7 +171,7 @@ public static partial class FragmentSetter
         // ------------------------------------------------
 
         /// <inheritdoc/>
-        public override string? Separator => ", ";
+        public override string? Separator(Fragment.Entry entry) => ", ";
 
         ICommandInfo.IBuilder OnVisit(Func<Fragment.Entry, DbTokenVisitor, ICommandInfo.IBuilder> itemize)
         {

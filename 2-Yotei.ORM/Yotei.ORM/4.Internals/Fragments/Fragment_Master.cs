@@ -189,10 +189,12 @@ public static partial class Fragment
         // ------------------------------------------------
 
         /// <summary>
-        /// The separator used between two consecutive entries in this collection.
-        /// <br/> If the value of this property is null (by default), then it is ignored.
+        /// Obtains the separator to use to separate the given entry from previous ones, if any.
+        /// If the returned value is <c>null</c>, then is ignored.
         /// </summary>
-        public virtual string? Separator => null;
+        /// <param name="entry"></param>
+        /// <returns></returns>
+        public virtual string? Separator(Entry entry) => null;
 
         /// <summary>
         /// Visits the entries in this instance and returns a command info object that can be
@@ -220,11 +222,11 @@ public static partial class Fragment
             var visitor = connection.Records.CreateDbTokenVisitor(Command.Locale);
             var engine = connection.Engine;
             var builder = new CommandInfo.Builder(engine);
-            var separator = Separator;
 
             for (int i = 0; i < Items.Count; i++)
             {
                 var item = Items[i];
+                var separator = Separator(item);
 
                 if (i != 0 && separator is not null) builder.Add(separator);
                 var temp = itemize(item, visitor);

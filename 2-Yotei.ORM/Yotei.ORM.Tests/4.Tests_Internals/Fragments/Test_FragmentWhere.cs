@@ -5,41 +5,22 @@ namespace Yotei.ORM.Tests.Internals;
 
 // ========================================================
 //[Enforced]
-public static class Test_FragmentSetter
+public static class Test_FragmentWhere
 {
-    //[Enforced]
-    [Fact]
-    public static void Test_ToLiteral_NotSupported()
-    {
-        var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentSetter.Master master = new(command);
-
-        try { master.Capture(x => "any"); Assert.Fail(); }
-        catch (ArgumentException) { }
-    }
-
     //[Enforced]
     [Fact]
     public static void Test_ToLiteral_Single()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentSetter.Master master;
+        FragmentWhere.Master master;
         ICommandInfo.IBuilder builder;
 
         master = new(command);
-        master.Capture(x => "any=other");
+        master.Capture(x => "any");
         Assert.Single(master);
 
         builder = master.Visit();
-        Assert.Equal("(any=other)", builder.Text);
-        Assert.Empty(builder.Parameters);
-
-        builder = master.VisitNames();
-        Assert.Equal("(any)", builder.Text);
-        Assert.Empty(builder.Parameters);
-
-        builder = master.VisitValues();
-        Assert.Equal("(other)", builder.Text);
+        Assert.Equal("any", builder.Text);
         Assert.Empty(builder.Parameters);
     }
 
@@ -48,24 +29,16 @@ public static class Test_FragmentSetter
     public static void Test_ToLiteral_Many()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentSetter.Master master;
+        FragmentWhere.Master master;
         ICommandInfo.IBuilder builder;
 
         master = new(command);
-        master.Capture(x => "First=James");
-        master.Capture(x => "Last=Bond");
+        master.Capture(x => "any");
+        master.Capture(x => "other");
         Assert.Equal(2, master.Count);
 
         builder = master.Visit();
-        Assert.Equal("((First=James), (Last=Bond))", builder.Text);
-        Assert.Empty(builder.Parameters);
-
-        builder = master.VisitNames();
-        Assert.Equal("(First, Last)", builder.Text);
-        Assert.Empty(builder.Parameters);
-
-        builder = master.VisitValues();
-        Assert.Equal("(James, Bond)", builder.Text);
+        Assert.Equal("anyother", builder.Text);
         Assert.Empty(builder.Parameters);
     }
 
@@ -76,7 +49,7 @@ public static class Test_FragmentSetter
     public static void Test_Expression_NotSupported()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentSetter.Master master = new(command);
+        FragmentWhere.Master master = new(command);
 
         try { master.Capture(x => x.One + 7); Assert.Fail(); }
         catch (ArgumentException) { }
@@ -87,23 +60,15 @@ public static class Test_FragmentSetter
     public static void Test_Expression_Single_Null()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentSetter.Master master;
+        FragmentWhere.Master master;
         ICommandInfo.IBuilder builder;
 
         master = new(command);
-        master.Capture(x => x.Id = null);
+        master.Capture(x => x.Id == null);
         Assert.Single(master);
 
         builder = master.Visit();
-        Assert.Equal("([Id] = NULL)", builder.Text);
-        Assert.Empty(builder.Parameters);
-
-        builder = master.VisitNames();
-        Assert.Equal("([Id])", builder.Text);
-        Assert.Empty(builder.Parameters);
-
-        builder = master.VisitValues();
-        Assert.Equal("(NULL)", builder.Text);
+        Assert.Equal("([Id] IS NULL)", builder.Text);
         Assert.Empty(builder.Parameters);
     }
 
@@ -112,53 +77,102 @@ public static class Test_FragmentSetter
     public static void Test_Expression_Single_Valued()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentSetter.Master master;
+        FragmentWhere.Master master;
         ICommandInfo.IBuilder builder;
 
         master = new(command);
-        master.Capture(x => x.Id = "007");
+        master.Capture(x => x.Id == "007");
         Assert.Single(master);
 
         builder = master.Visit();
         Assert.Equal("([Id] = #0)", builder.Text);
         Assert.Single(builder.Parameters);
         Assert.Equal("007", builder.Parameters[0].Value);
-
-        builder = master.VisitNames();
-        Assert.Equal("([Id])", builder.Text);
-        Assert.Empty(builder.Parameters);
-
-        builder = master.VisitValues();
-        Assert.Equal("(#0)", builder.Text);
-        Assert.Single(builder.Parameters);
-        Assert.Equal("007", builder.Parameters[0].Value);
     }
 
     //[Enforced]
     [Fact]
-    public static void Test_Expression_Many()
+    public static void Test_Expression_Many_OrWithArgument()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentSetter.Master master;
+        FragmentWhere.Master master;
         ICommandInfo.IBuilder builder;
 
         master = new(command);
-        master.Capture(x => x.First = "James");
-        master.Capture(x => x.Last = "Bond");
+        master.Capture(x => x.First == "James");
+        master.Capture(x => x.Or(x.Last == "Bond"));
         Assert.Equal(2, master.Count);
 
         builder = master.Visit();
-        Assert.Equal("(([First] = #0), ([Last] = #1))", builder.Text);
+        Assert.Equal("([First] = #0) OR ([Last] = #1)", builder.Text);
         Assert.Equal(2, builder.Parameters.Count);
         Assert.Equal("James", builder.Parameters[0].Value);
         Assert.Equal("Bond", builder.Parameters[1].Value);
 
-        builder = master.VisitNames();
-        Assert.Equal("([First], [Last])", builder.Text);
-        Assert.Empty(builder.Parameters);
+        try { master.Capture(x => x.Or(x.Last == "Bond", x.Other == null)); Assert.Fail(); }
+        catch (ArgumentException) { }
+    }
 
-        builder = master.VisitValues();
-        Assert.Equal("(#0, #1)", builder.Text);
+    //[Enforced]
+    [Fact]
+    public static void Test_Expression_Many_OrNoArgument()
+    {
+        var command = new FakeCommand(new FakeConnection(new FakeEngine()));
+        FragmentWhere.Master master;
+        ICommandInfo.IBuilder builder;
+
+        master = new(command);
+        master.Capture(x => x.First == "James");
+        master.Capture(x => x.And().Last == "Bond");
+        Assert.Equal(2, master.Count);
+
+        builder = master.Visit();
+        Assert.Equal("([First] = #0) AND ([Last] = #1)", builder.Text);
+        Assert.Equal(2, builder.Parameters.Count);
+        Assert.Equal("James", builder.Parameters[0].Value);
+        Assert.Equal("Bond", builder.Parameters[1].Value);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Expression_Many_No_Connector()
+    {
+        var command = new FakeCommand(new FakeConnection(new FakeEngine()));
+        FragmentWhere.Master master;
+        ICommandInfo.IBuilder builder;
+
+        master = new(command);
+        master.Capture(x => x.First == "James");
+        master.Capture(x => x.Last == "Bond");
+        Assert.Equal(2, master.Count);
+
+        builder = master.Visit();
+        Assert.Equal("([First] = #0) ([Last] = #1)", builder.Text);
+        Assert.Equal(2, builder.Parameters.Count);
+        Assert.Equal("James", builder.Parameters[0].Value);
+        Assert.Equal("Bond", builder.Parameters[1].Value);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Mixed_Elements()
+    {
+        var command = new FakeCommand(new FakeConnection(new FakeEngine()));
+        FragmentWhere.Master master;
+        ICommandInfo.IBuilder builder;
+
+        master = new(command);
+        master.Capture(x => x.Id == null);
+        master.Capture(x => " AND (");
+        master.Capture(x => x.First == "James"); // 'And() has no effect, previous is not binary...
+        master.Capture(x => x.Or(x.Last == "Bond"));
+        master.Capture(x => ")");
+        Assert.Equal(5, master.Count);
+
+        builder = master.Visit();
+        Assert.Equal("([Id] IS NULL) AND (([First] = #0) OR ([Last] = #1))", builder.Text);
         Assert.Equal(2, builder.Parameters.Count);
         Assert.Equal("James", builder.Parameters[0].Value);
         Assert.Equal("Bond", builder.Parameters[1].Value);
@@ -172,9 +186,9 @@ public static class Test_FragmentSetter
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
 
-        FragmentSetter.Master source = new(command);
-        source.Capture(x => x.First = "James");
-        source.Capture(x => x.Last = "Bond");
+        FragmentWhere.Master source = new(command);
+        source.Capture(x => x.First == "James");
+        source.Capture(x => x.Last == "Bond");
         Assert.Equal(2, source.Count);
 
         var target = source.Clone();
@@ -183,7 +197,7 @@ public static class Test_FragmentSetter
         Assert.Same(target, target[1].Master);
 
         var builder = target.Visit();
-        Assert.Equal("(([First] = #0), ([Last] = #1))", builder.Text);
+        Assert.Equal("([First] = #0) ([Last] = #1)", builder.Text);
         Assert.Equal(2, builder.Parameters.Count);
         Assert.Equal("James", builder.Parameters[0].Value);
         Assert.Equal("Bond", builder.Parameters[1].Value);
@@ -195,9 +209,9 @@ public static class Test_FragmentSetter
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
 
-        FragmentSetter.Master master = new(command);
-        master.Capture(x => x.First = "James");
-        master.Capture(x => x.Last = "Bond");
+        FragmentWhere.Master master = new(command);
+        master.Capture(x => x.First == "James");
+        master.Capture(x => x.Last == "Bond");
         Assert.Equal(2, master.Count);
 
         master.Clear();
