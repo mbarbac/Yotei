@@ -5,6 +5,10 @@
 /// <br/>- Standard syntax: 'x => x.Source'.
 /// <br/>- Alternate syntax: 'x => x.Source.As(...)'.
 /// </summary>
+/// <remarks>
+/// FROM clauses accept complex specifications:
+/// <br/>- Example: 'FROM (SELECT [Id], [Age] FROM Other) AS Another, ...'
+/// </remarks>
 public static partial class FragmentFrom
 {
     // ====================================================
@@ -22,7 +26,20 @@ public static partial class FragmentFrom
         /// </summary>
         /// <param name="master"></param>
         /// <param name="body"></param>
-        public Entry(Master master, IDbToken body) : base(master) => Body = body.ThrowWhenNull();
+        public Entry(Master master, IDbToken body) : base(master)
+        {
+            Body = body.ThrowWhenNull();
+
+            if (Body is DbTokenLiteral literal)
+            {
+                var (main, alias) = literal.Value.ExtractMainAlias(Engine, out var found);
+                if (found)
+                {
+                    Body = new DbTokenLiteral(main);
+                    Alias = alias;
+                }
+            }
+        }
 
         /// <summary>
         /// Copy constructor.
@@ -31,7 +48,7 @@ public static partial class FragmentFrom
         protected Entry(Entry source) : base(source)
         {
             Body = source.Body;
-            Alias = source.Alias?.Clone();
+            Alias = source.Alias;
         }
 
         /// <inheritdoc/>
@@ -47,7 +64,7 @@ public static partial class FragmentFrom
         /// <summary>
         /// The alias that qualifies the source (Body), or null if any.
         /// </summary>
-        public DbTokenIdentifier? Alias { get; init; }
+        public string? Alias { get; init; }
 
         /// <inheritdoc/>
         public override ICommandInfo.IBuilder Visit(DbTokenVisitor visitor)
@@ -100,54 +117,32 @@ public static partial class FragmentFrom
         // ------------------------------------------------
 
         /// <inheritdoc/>
-        public override Entry Create(IDbToken body) => throw null;
-
-        /*
-         public override Entry Create(IDbToken body)
+        public override Entry Create(IDbToken body)
         {
-            bool? useOR = null;
-
-            // Intercepting 'x => x.And(...)' and 'x => x.Or(...)' methods...
-            var item = body.RemoveFirst(x =>
+            // Intercepting alias...
+            string? alias = null;
+            var item = body.RemoveLast(x =>
             {
                 if (x is not DbTokenMethod method) return false;
-                if (method.Host is not DbTokenArgument) return false;
-                if (method.Name.ToUpper() is not "AND" and not "OR") return false;
+                if (method.Name.ToUpper() is not "AS") return false;
                 return true;
             }
             , out var removed);
 
-            if (removed is not null) // Virtual method found...
+            if (removed is not null) // As(...) method found...
             {
                 var method = (DbTokenMethod)removed;
-                var name = method.Name;
+                if (method.TypeArguments.Length != 0) throw new ArgumentException(
+                    "No type arguments allowed for 'As(...)' virtual method.")
+                    .WithData(body);
 
-                if (name.Equals("OR", StringComparison.OrdinalIgnoreCase)) useOR = true;
-                else if (name.Equals("AND", StringComparison.OrdinalIgnoreCase)) useOR = false;
-                else useOR = null;
+                var visitor = Connection.Records.CreateDbTokenVisitor(Command.Locale);
+                alias = visitor.ParseAlias(method.Arguments);
 
-                switch (method.Arguments.Count)
-                {
-                    // The remaining after the And() or Or() method...
-                    case 0:
-                        body = item;
-                        break;
-
-                    // The sole argument of the And(...) or Or(...) method...
-                    case 1:
-                        if (item is not DbTokenArgument) throw new ArgumentException(
-                            $"Body after '{method.Name}(arg)' must be empty.")
-                            .WithData(body);
-
-                        body = method.Arguments[0];
-                        break;
-
-                    // Using many arguments, what does it mean?...
-                    default:
-                        throw new ArgumentException(
-                            $"Too many arguments in '{method.Name}(...)' method.")
-                            .WithData(body);
-                }
+                if (item is DbTokenArgument) throw new ArgumentException(
+                    "Body cannot just carry an alias specification.")
+                    .WithData(body);
+                body = item;
             }
 
             // Finishing...
@@ -155,16 +150,14 @@ public static partial class FragmentFrom
                 invoke.Arguments.Count == 1 &&
                 invoke.Arguments[0] is DbTokenLiteral literal) body = literal;
 
-            return body switch
-            {
-                DbTokenLiteral temp => new(this, temp),
-                DbTokenBinary temp => new(this, temp) { UseOR = useOR },
-
-                _ => throw new ArgumentException(
-                    $"Specification does not resolve into a valid {CLAUSE} clause.")
-                    .WithData(body)
-            };
+            return alias is null
+                ? new(this, body)
+                : new(this, body) { Alias = alias };
         }
-         */
+
+        // ------------------------------------------------
+
+        /// <inheritdoc/>
+        public override string? Separator(Fragment.Entry _) => ", ";
     }
 }

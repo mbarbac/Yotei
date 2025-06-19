@@ -32,7 +32,8 @@ public static partial class Fragment
         /// </summary>
         public Master Master { get; internal set; }
         protected ICommand Command => Master.Command;
-        protected IEngine Engine => Command.Connection.Engine;
+        protected IConnection Connection => Command.Connection;
+        protected IEngine Engine => Connection.Engine;
 
         /// <summary>
         /// Visits the contents of this instance and returns the command info object that can be

@@ -627,7 +627,7 @@ public record class DbTokenVisitor
             {
                 case "AS":
                     if (token.Arguments.Count == 0) Throw($"AS(expr, ...) requires at least 1 argument.");
-                    name = ParseAlias(token.Arguments);
+                    name = this.ParseAlias(token.Arguments);
                     host.Add($" AS {name}");
                     return host;
 
@@ -712,6 +712,7 @@ public record class DbTokenVisitor
         return false;
     }
 
+    /*
     /// <summary>
     /// Invoked to build an alias using the contents of the given chain which, by default, are
     /// joined without using any separators among them.
@@ -741,7 +742,7 @@ public record class DbTokenVisitor
 
         return name ?? throw new ArgumentException(
             "Generated alias resolves into null.").WithData(chain);
-    }
+    }*/
 
     /// <summary>
     /// Expands the first element of the given chain, provided that it is an enumerable one,

@@ -46,7 +46,8 @@ public static partial class Fragment
         /// The command this instance is associated with.
         /// </summary>
         public ICommand Command { get; }
-        protected IEngine Engine => Command.Connection.Engine;
+        protected IConnection Connection => Command.Connection;
+        protected IEngine Engine => Connection.Engine;
 
         /// <summary>
         /// Gets the number of elements in this collection.
