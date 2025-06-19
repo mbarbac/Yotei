@@ -266,36 +266,6 @@ public record class DbTokenVisitor
 
         return builder;
     }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Returns a clone of this instance with the range separator set to ", ".
-    /// </summary>
-    /// <returns></returns>
-    public DbTokenVisitor ToCommaVisitor() => this with { RangeSeparator = ", " };
-
-    /// <summary>
-    /// Returns a clone of this instance with the range separator set null.
-    /// </summary>
-    /// <returns></returns>
-    public DbTokenVisitor ToNullSeparatorVisitor() => this with { RangeSeparator = null };
-
-    /// <summary>
-    /// Returns a clone of this instance with all its properties set to <c>false</c> or to
-    /// <c>null</c>.
-    /// </summary>
-    /// <returns></returns>
-    public DbTokenVisitor ToRawVisitor() => this with
-    {
-        UseNullString = false,
-        CaptureValues = false,
-        ConvertValues = false,
-        UseQuotes = false,
-        UseTerminators = false,
-        RangeSeparator = null,
-    };
-
     // ----------------------------------------------------
 
     /// <summary>
@@ -494,7 +464,7 @@ public record class DbTokenVisitor
     protected virtual ICommandInfo.IBuilder VisitToken(DbTokenIndexed token)
     {
         var host = Visit(token.Host);
-        var temp = ToCommaVisitor();
+        var temp = this.ToCommaVisitor();
         var args = temp.VisitRange(token.Indexes);
 
         args.ReplaceText($"[{args.Text}]");
@@ -513,7 +483,7 @@ public record class DbTokenVisitor
     protected virtual ICommandInfo.IBuilder VisitToken(DbTokenInvoke token)
     {
         var host = Visit(token.Host);
-        var temp = ToNullSeparatorVisitor();
+        var temp = this.ToNullSeparatorVisitor();
         var args = temp.VisitRange(token.Arguments);
 
         host.Add(args);
@@ -581,7 +551,7 @@ public record class DbTokenVisitor
                     if (IsEmptyOrSoleAsterisk(token.Arguments))
                         return new CommandInfo.Builder(Engine, "COUNT(*)");
 
-                    temp = ToCommaVisitor().VisitRange(token.Arguments);
+                    temp = this.ToCommaVisitor().VisitRange(token.Arguments);
                     temp.ReplaceText($"COUNT({temp.Text})");
                     return temp;
 
@@ -600,7 +570,7 @@ public record class DbTokenVisitor
                         temp = Visit(token.Arguments[0]);
                         temp.ReplaceText($"CAST({temp.Text} AS ");
 
-                        other = ToRawVisitor().Visit(token.Arguments[1]);
+                        other = this.ToRawVisitor().Visit(token.Arguments[1]);
                         temp.Add(other);
                         temp.Add(")");
                         return temp;
@@ -610,7 +580,7 @@ public record class DbTokenVisitor
 
                 case "CONVERT":
                     if (token.Arguments.Count != 2) Throw($"CONVERT(type, expr) requires just 2 arguments.");
-                    temp = ToRawVisitor().Visit(token.Arguments[0]);
+                    temp = this.ToRawVisitor().Visit(token.Arguments[0]);
                     temp.ReplaceText($"CONVERT({temp.Text}, ");
 
                     other = Visit(token.Arguments[1]);
@@ -634,7 +604,7 @@ public record class DbTokenVisitor
                 case "IN":
                     if (token.Arguments.Count == 0) Throw($"IN(expr, ...) requires at least 1 argument.");
                     chain = TryExpand(token.Arguments);
-                    temp = ToCommaVisitor().VisitRange(chain);
+                    temp = this.ToCommaVisitor().VisitRange(chain);
                     host.Add(" IN (");
                     host.Add(temp);
                     host.Add(")");
@@ -643,7 +613,7 @@ public record class DbTokenVisitor
                 case "NOTIN":
                     if (token.Arguments.Count == 0) Throw($"IN(expr, ...) requires at least 1 argument.");
                     chain = TryExpand(token.Arguments);
-                    temp = ToCommaVisitor().VisitRange(chain);
+                    temp = this.ToCommaVisitor().VisitRange(chain);
                     host.Add(" NOT IN (");
                     host.Add(temp);
                     host.Add(")");
@@ -684,7 +654,7 @@ public record class DbTokenVisitor
             host.Add(">");
         }
 
-        temp = ToCommaVisitor().VisitRange(token.Arguments);
+        temp = this.ToCommaVisitor().VisitRange(token.Arguments);
         host.Add("(");
         host.Add(temp);
         host.Add(")");
@@ -711,38 +681,6 @@ public record class DbTokenVisitor
 
         return false;
     }
-
-    /*
-    /// <summary>
-    /// Invoked to build an alias using the contents of the given chain which, by default, are
-    /// joined without using any separators among them.
-    /// </summary>
-    protected virtual string ParseAlias(DbTokenChain chain)
-    {
-        var visitor = ToRawVisitor();
-        var temp = visitor.VisitRange(chain);
-
-        var text = temp.Text;
-
-        //if (text is not null && ((text.Contains(' ') || text.Contains('.'))))
-        //{
-        //    if (!Engine.UseTerminators) throw new ArgumentException(
-        //        "Alias contains embedded dots or spaces.")
-        //        .WithData(text);
-
-        //    text = text
-        //        .UnWrap(Engine.LeftTerminator, Engine.RightTerminator)
-        //        .Wrap(Engine.LeftTerminator, Engine.RightTerminator);
-        //}
-
-        var id = new IdentifierPart(Engine, text);
-        var name = UseTerminators && Engine.UseTerminators
-            ? id.Value
-            : id.UnwrappedValue;
-
-        return name ?? throw new ArgumentException(
-            "Generated alias resolves into null.").WithData(chain);
-    }*/
 
     /// <summary>
     /// Expands the first element of the given chain, provided that it is an enumerable one,
