@@ -152,8 +152,15 @@ public static class DbLambdaParser
 
         if (items.Count == 1) // Intercepting special cases...
         {
+            // TODO: invoke conversion to command looses track of argument.
+            // In syntaxes as '(SELECT..).As()' the first token is rendered as a plain command
+            // one, losing track of the dynamic argument: this cause problems when methods as
+            // 'RemoveFirst()' are used, because they expect the first element in the tree to
+            // be a hosted one with a dynamic argument as a host. At the end of the day it looks
+            // like an over-engineered interception...
+
             // Command-alike tokens...
-            if (items[0] is DbTokenCommand command) return command;
+            // if (items[0] is DbTokenCommand command) return command;
 
             // Literal-alike tokens...
             if (items[0] is DbTokenValue value && value.Value is string str)

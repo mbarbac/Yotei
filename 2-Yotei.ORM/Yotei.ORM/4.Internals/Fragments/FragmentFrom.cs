@@ -136,12 +136,12 @@ public static partial class FragmentFrom
                     "No type arguments allowed for 'As(...)' virtual method.")
                     .WithData(body);
 
-                var visitor = Connection.Records.CreateDbTokenVisitor(Command.Locale);
-                alias = visitor.ParseAlias(method.Arguments);
-
                 if (item is DbTokenArgument) throw new ArgumentException(
                     "Body cannot just carry an alias specification.")
                     .WithData(body);
+
+                var visitor = Connection.Records.CreateDbTokenVisitor(Command.Locale);
+                alias = visitor.ParseAlias(method.Arguments);
                 body = item;
             }
 

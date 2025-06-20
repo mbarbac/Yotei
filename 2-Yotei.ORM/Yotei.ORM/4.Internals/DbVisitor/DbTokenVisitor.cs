@@ -208,7 +208,9 @@ public record class DbTokenVisitor
     /// <returns></returns>
     public virtual ICommandInfo.IBuilder Visit(IDbToken token)
     {
-        return token.ThrowWhenNull() switch
+        token.ThrowWhenNull();
+
+        return token switch
         {
             DbTokenArgument item => VisitToken(item),
             DbTokenBinary item => VisitToken(item),

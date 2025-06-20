@@ -95,6 +95,25 @@ public static class Test_FragmentFrom
         Assert.Equal("007", builder.Parameters[0].Value);
     }
 
+    //[Enforced]
+    [Fact]
+    public static void Test_Expression_Embedded_Command()
+    {
+        var engine = new FakeEngine();
+        var connection = new FakeConnection(engine);
+        var command = new FakeCommand(connection,
+            "SELECT * FROM Employees WHERE Id = {0}",
+            "007");
+
+        FragmentFrom.Master master = new(command);
+        master.Capture(x => x(command).As(x.Emps));
+        Assert.Single(master);
+        ICommandInfo.IBuilder builder = master.Visit();
+        Assert.Equal("(SELECT * FROM Employees WHERE Id = #0) AS [Emps]", builder.Text);
+        Assert.Single(builder.Parameters);
+        Assert.Equal("007", builder.Parameters[0].Value);
+    }
+
     // ----------------------------------------------------
 
     // TODO: decide about statement-level invoke tails.
