@@ -29,6 +29,8 @@ public partial interface IRawCommand : ICommand, IEnumerableCommand, IExecutable
     /// <summary>
     /// Adds to this instance the text and parameters obtained from parsing the given dynamic
     /// lambda expression.
+    /// <br/>- Standard syntax: 'x => ...'.
+    /// <br/>- Returns a reference to itself to enable a fluent syntax usage.
     /// </summary>
     /// <param name="spec"></param>
     /// <returns></returns>

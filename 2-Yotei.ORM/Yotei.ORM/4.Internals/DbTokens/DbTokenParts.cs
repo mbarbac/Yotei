@@ -27,11 +27,11 @@ public static class DbTokenPartsExtensions
     {
         source.ThrowWhenNull();
 
+        if (source is not DbTokenHosted) return new(null, source, null);
+
         var arg = source.GetArgument()
             ?? throw new InvalidOperationException(
                 "Cannot obtain dynamic argument from the given source-tree").WithData(source);
-
-        if (source is not DbTokenHosted) return new(null, source, null);
 
         IDbToken body = source.Clone(); // To prevent modifications in the original source...
         DbTokenInvoke? head = null;
