@@ -70,7 +70,7 @@ public static class DbTokenVisitorExtensions
     // ----------------------------------------------------
 
     /// <summary>
-    /// Reduces the given token to a suitable literal.
+    /// Reduces the given token to a string literal.
     /// </summary>
     /// <param name="visitor"></param>
     /// <param name="token"></param>
