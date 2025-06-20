@@ -33,7 +33,7 @@ public static partial class FragmentJoin
             }
 
             string main = text.Value;
-            string? temp = null;
+            string? temp;
 
             var parts = main.ExtractLeftRight(" ON ", sensitive: false, out var found);
             if (found)
@@ -53,6 +53,7 @@ public static partial class FragmentJoin
                 Alias = temp;
             }
 
+            main = main.Trim();
             var value = "JOIN "; if (TryStart(ref main, ref value)) JoinType = value;
             value = "LEFT JOIN "; if (TryStart(ref main, ref value)) JoinType = value;
             value = "RIGHT JOIN "; if (TryStart(ref main, ref value)) JoinType = value;
@@ -67,7 +68,7 @@ public static partial class FragmentJoin
             Body = new DbTokenLiteral(main);
             return;
 
-            bool TryStart(ref string source, ref string value)
+            static bool TryStart(ref string source, ref string value)
             {
                 var index = source.IndexOf(value, caseSensitive: false);
                 if (index == 0)
