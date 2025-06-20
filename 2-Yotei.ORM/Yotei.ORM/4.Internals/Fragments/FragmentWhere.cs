@@ -188,6 +188,7 @@ public static partial class FragmentWhere
 
             // Finishing...
             if (body is DbTokenInvoke invoke &&
+                invoke.Host is DbTokenArgument &&
                 invoke.Arguments.Count == 1 &&
                 invoke.Arguments[0] is DbTokenLiteral literal) body = literal;
 

@@ -72,7 +72,7 @@ public partial interface IQueryCommand : ICommand, IEnumerableCommand
     /// 'SELECT *' one.
     /// <br/>- Standard syntax: 'x => x.Element'.
     /// <br/>- Alternate syntax: 'x => x.Element.As(...)'.
-    /// <br/>- Alternate syntax: 'x => x.All()'.
+    /// <br/>- Alternate syntax: 'x => x.Source.All()'.
     /// <br/> Returns a reference to itself to enable a fluent syntax usage.
     /// </summary>
     /// <typeparam name="T"></typeparam>

@@ -146,10 +146,6 @@ public static partial class FragmentFrom
             }
 
             // Finishing...
-            if (body is DbTokenInvoke invoke &&
-                invoke.Arguments.Count == 1 &&
-                invoke.Arguments[0] is DbTokenLiteral literal) body = literal;
-
             return alias is null
                 ? new(this, body)
                 : new(this, body) { Alias = alias };
