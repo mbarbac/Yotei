@@ -51,7 +51,7 @@ public static partial class FragmentSetter
         /// <param name="source"></param>
         protected Entry(Entry source) : base(source)
         {
-            Body = source.Body;
+            Body = source.Body.Clone();
             StrTarget = source.StrTarget;
             StrValue = source.StrValue;
         }
@@ -158,6 +158,7 @@ public static partial class FragmentSetter
         {
             // Finishing...
             if (body is DbTokenInvoke invoke &&
+                invoke.Host is DbTokenArgument &&
                 invoke.Arguments.Count == 1 &&
                 invoke.Arguments[0] is DbTokenLiteral literal) body = literal;
 

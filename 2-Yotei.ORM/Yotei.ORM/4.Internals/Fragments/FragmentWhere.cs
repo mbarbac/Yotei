@@ -59,7 +59,7 @@ public static partial class FragmentWhere
         /// <param name="source"></param>
         protected Entry(Entry source) : base(source)
         {
-            Body = source.Body;
+            Body = source.Body.Clone();
             UseOR = source.UseOR;
         }
 
@@ -80,7 +80,12 @@ public static partial class FragmentWhere
         /// rather is shall use the default "AND" one, or none of them.
         /// <br/> This property only affects instances whose body is a binary one.
         /// </summary>
-        public bool? UseOR { get; init; }
+        public bool? UseOR
+        {
+            get => _UseOR;
+            init => _UseOR = value;
+        }
+        internal bool? _UseOR;
 
         /// <inheritdoc/>
         public override ICommandInfo.IBuilder Visit(DbTokenVisitor visitor)
@@ -157,6 +162,11 @@ public static partial class FragmentWhere
             {
                 var method = (DbTokenMethod)removed;
                 var name = method.Name;
+                var upper = name.ToUpper();
+
+                if (method.TypeArguments.Length != 0) throw new ArgumentException(
+                    $"No type arguments allowed for '{upper}(...)' virtual method.")
+                    .WithData(body);
 
                 if (name.Equals("OR", StringComparison.OrdinalIgnoreCase)) useOR = true;
                 else if (name.Equals("AND", StringComparison.OrdinalIgnoreCase)) useOR = false;
@@ -172,7 +182,7 @@ public static partial class FragmentWhere
                     // The sole argument of the And(...) or Or(...) method...
                     case 1:
                         if (item is not DbTokenArgument) throw new ArgumentException(
-                            $"Body after '{method.Name}(arg)' must be empty.")
+                            $"Body after '{upper}(arg)' must be empty.")
                             .WithData(body);
 
                         body = method.Arguments[0];
@@ -181,7 +191,7 @@ public static partial class FragmentWhere
                     // Using many arguments, what does it mean?...
                     default:
                         throw new ArgumentException(
-                            $"Too many arguments in '{method.Name}(...)' method.")
+                            $"Too many arguments in '{upper}(...)' method.")
                             .WithData(body);
                 }
             }
@@ -192,15 +202,17 @@ public static partial class FragmentWhere
                 invoke.Arguments.Count == 1 &&
                 invoke.Arguments[0] is DbTokenLiteral literal) body = literal;
 
-            return body switch
+            var entry = body switch
             {
-                DbTokenLiteral temp => new(this, temp),
-                DbTokenBinary temp => new(this, temp) { UseOR = useOR },
+                DbTokenLiteral temp => new Entry(this, temp),
+                DbTokenBinary temp => new Entry(this, temp),
 
                 _ => throw new ArgumentException(
                     $"Specification does not resolve into a valid {CLAUSE} clause.")
                     .WithData(body)
             };
+            if (useOR is not null) entry._UseOR = useOR;
+            return entry;
         }
 
         // ------------------------------------------------

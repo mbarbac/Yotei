@@ -95,7 +95,7 @@ public partial interface IQueryCommand : ICommand, IEnumerableCommand
     /// Adds to the JOIN clause the contents obtained from parsing the given dynamic lambda
     /// expressions.
     /// <br/>- Standard syntax: 'x => x.Source.As(...).On(...)'.
-    /// <br/>- Alternate syntax: 'x => x.Join(join-type).Source.As(...).On(...)'.
+    /// <br/>- Alternate syntax: 'x => x.JoinType(join-type).Source.As(...).On(...)'.
     /// <br/> Note that the underlying engine MAY NOT support this capability.
     /// <br/> Returns a reference to itself to enable a fluent syntax usage.
     /// </summary>

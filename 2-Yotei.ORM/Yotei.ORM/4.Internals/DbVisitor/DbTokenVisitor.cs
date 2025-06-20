@@ -599,7 +599,7 @@ public record class DbTokenVisitor
             {
                 case "AS":
                     if (token.Arguments.Count == 0) Throw($"AS(expr, ...) requires at least 1 argument.");
-                    name = this.ParseAlias(token.Arguments);
+                    name = this.ChainToAlias(token.Arguments);
                     host.Add($" AS {name}");
                     return host;
 

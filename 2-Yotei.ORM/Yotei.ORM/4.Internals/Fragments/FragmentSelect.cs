@@ -29,17 +29,21 @@ public static partial class FragmentSelect
         /// <param name="body"></param>
         public Entry(Master master, IDbToken body) : base(master)
         {
-            Body = body.ThrowWhenNull();
+            body.ThrowWhenNull();
 
-            if (Body is DbTokenLiteral literal)
+            if (body is not DbTokenLiteral text)
             {
-                var (main, alias) = literal.Value.ExtractMainAlias(Engine, out var found);
-                if (found)
-                {
-                    Body = new DbTokenLiteral(main);
-                    Alias = alias;
-                }
+                Body = body.ThrowWhenNull();
+                return;
             }
+
+            var (main, alias) = text.Value.ExtractMainAlias(Engine, out var found);
+            if (found)
+            {
+                Body = new DbTokenLiteral(main);
+                Alias = alias;
+            }
+            else Body = body;
         }
 
         /// <summary>
@@ -48,7 +52,7 @@ public static partial class FragmentSelect
         /// <param name="source"></param>
         protected Entry(Entry source) : base(source)
         {
-            Body = source.Body;
+            Body = source.Body.Clone();
             Alias = source.Alias;
             AllColumns = source.AllColumns;
         }
@@ -71,12 +75,22 @@ public static partial class FragmentSelect
         /// Whether the body is a source specification from which all columns are to be selected,
         /// as in 'Table.*'.
         /// </summary>
-        public bool AllColumns { get; init; }
+        public bool AllColumns
+        {
+            get => _AllColumns;
+            init => _AllColumns = value;
+        }
+        internal bool _AllColumns;
 
         /// <summary>
         /// The alias that qualifies the source (Body), or null if any.
         /// </summary>
-        public string? Alias { get; init; }
+        public string? Alias
+        {
+            get => _Alias;
+            init => _Alias = value?.NotNullNotEmpty();
+        }
+        internal string? _Alias;
 
         /// <inheritdoc/>
         public override ICommandInfo.IBuilder Visit(DbTokenVisitor visitor)
@@ -149,12 +163,16 @@ public static partial class FragmentSelect
             if (removed is not null) // All() method found...
             {
                 var method = (DbTokenMethod)removed;
+                if (method.TypeArguments.Length != 0) throw new ArgumentException(
+                    "No type arguments allowed for 'ALL()' virtual method.")
+                    .WithData(body);
+
                 if (method.Arguments.Count != 0) throw new ArgumentException(
-                    "'All()' virtual method must have no arguments.")
+                    "'ALL()' virtual method must have no arguments.")
                     .WithData(body);
 
                 if (item is DbTokenArgument) throw new ArgumentException(
-                    "Body cannot just carry an 'All()' specification.")
+                    "Body cannot just carry an 'ALL()' specification.")
                     .WithData(body);
 
                 allcolumns = true;
@@ -175,26 +193,28 @@ public static partial class FragmentSelect
             {
                 var method = (DbTokenMethod)removed;
                 if (method.TypeArguments.Length != 0) throw new ArgumentException(
-                    "No type arguments allowed for 'As(...)' virtual method.")
+                    "No type arguments allowed for 'AS(...)' virtual method.")
                     .WithData(body);
 
                 if (item is DbTokenArgument) throw new ArgumentException(
-                    "Body cannot just carry an 'As()' specification.")
+                    "Body cannot just carry an 'AS(...)' specification.")
                     .WithData(body);
 
                 var visitor = Connection.Records.CreateDbTokenVisitor(Command.Locale);
-                alias = visitor.ParseAlias(method.Arguments);
+                alias = visitor.ChainToAlias(method.Arguments);
                 body = item;
             }
 
             // Finishing...
             if (body is DbTokenInvoke invoke &&
+                invoke.Host is DbTokenArgument &&
                 invoke.Arguments.Count == 1 &&
                 invoke.Arguments[0] is DbTokenLiteral literal) body = literal;
 
-            return alias is null
-                ? new(this, body) { AllColumns = allcolumns }
-                : new(this, body) { AllColumns = allcolumns, Alias = alias };
+            var entry = new Entry(this, body);
+            if (alias is not null) entry._Alias = alias;
+            if (allcolumns) entry._AllColumns = true;
+            return entry;
         }
 
         // ------------------------------------------------

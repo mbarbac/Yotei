@@ -26,7 +26,7 @@ public static partial class FragmentTerminal
         /// Copy constructor.
         /// </summary>
         /// <param name="source"></param>
-        protected Entry(Entry source) : base(source) => Body = source.Body;
+        protected Entry(Entry source) : base(source) => Body = source.Body.Clone();
 
         /// <inheritdoc/>
         public override string ToString() => Body.ToString()!;

@@ -51,7 +51,7 @@ public static class DbTokenVisitorExtensions
     /// <param name="visitor"></param>
     /// <param name="chain"></param>
     /// <returns></returns>
-    public static string ParseAlias(this DbTokenVisitor visitor, DbTokenChain chain)
+    public static string ChainToAlias(this DbTokenVisitor visitor, DbTokenChain chain)
     {
         visitor.ThrowWhenNull();
         chain.ThrowWhenNull();
@@ -65,5 +65,24 @@ public static class DbTokenVisitorExtensions
         var name = engine.UseTerminators ? id.Value : id.UnwrappedValue;
         return name
             ?? throw new ArgumentException("Generated alias resolves into null.").WithData(chain);
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Reduces the given token to a suitable literal.
+    /// </summary>
+    /// <param name="visitor"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    public static string TokenToLiteral(this DbTokenVisitor visitor, IDbToken token)
+    {
+        visitor.ThrowWhenNull();
+        token.ThrowWhenNull();
+
+        visitor = visitor.ToRawVisitor();
+
+        var builder = visitor.Visit(token);
+        return builder.Text;
     }
 }
