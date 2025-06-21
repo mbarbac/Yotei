@@ -197,7 +197,9 @@ public static partial class Fragment
 
         /// <summary>
         /// Invoked to create a suitable entry for this instance based upon the given token,
-        /// whose head and tail parts will be extracted and kept with the returned entry.
+        /// where its unique (not recurrent) invoke head and tail elements are extracted and
+        /// kept into the returned entry. In case of ambiguity, head invoke elements take
+        /// precedence over tail ones.
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
@@ -205,7 +207,20 @@ public static partial class Fragment
         {
             token.ThrowWhenNull();
 
-            var (head, body, tail) = token.ExtractParts();
+            token.ExtractHeadInvokes(out var body, out var head, recurrent: false);
+            if (head is not null &&
+                body is DbTokenInvoke bodyHead &&
+                bodyHead.Host is DbTokenArgument &&
+                bodyHead.Arguments.Count == 1)
+                body = bodyHead.Arguments[0];
+
+            body.ExtractTailInvokes(out body, out var tail, recurrent: false);
+            if (tail is not null &&
+                body is DbTokenInvoke bodyTail &&
+                bodyTail.Host is DbTokenArgument &&
+                bodyTail.Arguments.Count == 1)
+                body = bodyTail.Arguments[0];
+
             return OnCreate(head, body, tail);
         }
 

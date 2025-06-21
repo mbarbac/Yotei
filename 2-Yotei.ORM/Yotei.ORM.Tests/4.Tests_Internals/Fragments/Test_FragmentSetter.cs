@@ -1,5 +1,6 @@
 ﻿using static Yotei.Tools.Diagnostics.ConsoleEx;
 using static System.ConsoleColor;
+using System.Runtime.Intrinsics.Arm;
 
 namespace Yotei.ORM.Tests.Internals;
 
@@ -132,6 +133,80 @@ public static class Test_FragmentSetter
 
     //[Enforced]
     [Fact]
+    public static void Test_Expression_Simple_WithHead()
+    {
+        var command = new FakeCommand(new FakeConnection(new FakeEngine()));
+        FragmentSetter.Master master;
+        ICommandInfo.IBuilder builder;
+
+        master = new(command);
+        master.Capture(x => x("-pre-")(x.Id = null));
+        Assert.Single(master);
+        builder = master.Visit();
+        Assert.Equal("-pre-([Id] = NULL)", builder.Text);
+        Assert.Empty(builder.Parameters);
+        builder = master.VisitNames(); Assert.Equal("([Id])", builder.Text);
+        builder = master.VisitValues(); Assert.Equal("(NULL)", builder.Text);
+
+        try { master.Capture(x => x("-pre-")); Assert.Fail(); }
+        catch (ArgumentException) { }
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Expression_Simple_WithTail()
+    {
+        var command = new FakeCommand(new FakeConnection(new FakeEngine()));
+        FragmentSetter.Master master;
+        ICommandInfo.IBuilder builder;
+
+        master = new(command);
+        master.Capture(x => (x.Id = null)("-post-"));
+        Assert.Single(master);
+        builder = master.Visit();
+        Assert.Equal("([Id] = NULL)-post-", builder.Text);
+        Assert.Empty(builder.Parameters);
+        builder = master.VisitNames(); Assert.Equal("([Id])", builder.Text);
+        builder = master.VisitValues(); Assert.Equal("(NULL)", builder.Text);
+
+        master = new(command);
+        master.Capture(x => (x.Id = null!).x("-post-"));
+        Assert.Single(master);
+        builder = master.Visit();
+        Assert.Equal("([Id] = NULL)-post-", builder.Text);
+        Assert.Empty(builder.Parameters);
+        builder = master.VisitNames(); Assert.Equal("([Id])", builder.Text);
+        builder = master.VisitValues(); Assert.Equal("(NULL)", builder.Text);
+
+        try { master.Capture(x => x("-post-")); Assert.Fail(); }
+        catch (ArgumentException) { }
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Expression_Simple_WithHeadAndTail()
+    {
+        var command = new FakeCommand(new FakeConnection(new FakeEngine()));
+        FragmentSetter.Master master;
+        ICommandInfo.IBuilder builder;
+
+        master = new(command);
+        master.Capture(x => x("-pre-")(x.Id = null).x("-post-"));
+        Assert.Single(master);
+        builder = master.Visit();
+        Assert.Equal("-pre-([Id] = NULL)-post-", builder.Text);
+        Assert.Empty(builder.Parameters);
+        builder = master.VisitNames(); Assert.Equal("([Id])", builder.Text);
+        builder = master.VisitValues(); Assert.Equal("(NULL)", builder.Text);
+
+        try { master.Capture(x => x("-pre-").x("-post-")); Assert.Fail(); }
+        catch (ArgumentException) { }
+    }
+
+    /*
+
+    //[Enforced]
+    [Fact]
     public static void Test_Expression_Simple_WithHeadTail()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
@@ -147,8 +222,6 @@ public static class Test_FragmentSetter
         builder = master.VisitNames(); Assert.Equal("([Id])", builder.Text);
         builder = master.VisitValues(); Assert.Equal("(NULL)", builder.Text);
     }
-
-    /*
 
     //[Enforced]
     [Fact]

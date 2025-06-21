@@ -63,7 +63,12 @@ public static partial class FragmentSetter
         /// <br/> Only <see cref="DbTokenLiteral"/> and <see cref="DbTokenSetter"/> instances
         /// are allowed.
         /// </summary>
-        public new IDbToken Body => base.Body;
+        public new IDbToken Body
+        {
+            get => base.Body;
+            internal protected set => base.Body = value;
+        }
+
         string? StrTarget { get; }
         string? StrValue { get; }
 
@@ -168,11 +173,6 @@ public static partial class FragmentSetter
         /// <inheritdoc/>
         protected override Entry OnCreate(DbTokenInvoke? head, IDbToken body, DbTokenInvoke? tail)
         {
-            if (body is DbTokenInvoke invoke &&
-                invoke.Host is DbTokenArgument &&
-                invoke.Arguments.Count == 1 &&
-                invoke.Arguments[0] is DbTokenLiteral literal) body = literal;
-
             var entry = new Entry(this, body);
             if (head is not null) entry._Head = head;
             if (tail is not null) entry._Tail = tail;

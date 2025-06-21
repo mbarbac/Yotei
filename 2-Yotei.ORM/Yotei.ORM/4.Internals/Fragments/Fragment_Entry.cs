@@ -62,7 +62,7 @@ public static partial class Fragment
         /// <summary>
         /// The actual body of contents carried by this instance.
         /// </summary>
-        public IDbToken Body { get; }
+        public IDbToken Body { get; internal protected set; }
 
         /// <summary>
         /// The head element carried by this instance, or <c>null</c> if any. If not null, then
