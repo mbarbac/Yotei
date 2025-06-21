@@ -139,7 +139,7 @@ public static class Test_FragmentSetter
         ICommandInfo.IBuilder builder;
 
         master = new(command);
-        master.Capture(x => x("-pre-").x(x.Id = null).x("-post-"));
+        master.Capture(x => x("-pre-")(x.Id = null).x("-post-"));
         Assert.Single(master);
         builder = master.Visit();
         Assert.Equal("-pre-([Id] = NULL)-post", builder.Text);
