@@ -1,13 +1,12 @@
-﻿using System.Windows.Markup;
-
-namespace Yotei.ORM.Internals;
+﻿namespace Yotei.ORM.Internals;
 
 /// <summary>
 /// Represents the ability of parsing SETTER clauses.
 /// <br/>- Standard syntax: 'x => Target = Value'.
 /// </summary>
 /// <remarks>
-/// SETTER only accept 'Source=Target' alike statements, either literal or actual setter ones.
+/// SETTER elements are special as that they only accept 'Source=Target' formats, either literal
+/// or actual setter ones. It is ok because they are intended to act as column specifications.
 /// </remarks>
 public static partial class FragmentSetter
 {
@@ -26,21 +25,27 @@ public static partial class FragmentSetter
         /// </summary>
         /// <param name="master"></param>
         /// <param name="body"></param>
-        public Entry(Master master, IDbToken body) : base(master, body) // Body captured by 'base'...
+        public Entry(Master master, IDbToken body) : base(master, body)
         {
-            if (body is DbTokenLiteral text)
+            switch (body)
             {
-                var (target, value) = text.Value.ExtractLeftRight("=", Engine, out var found);
-                if (!found) throw new ArgumentException(
-                    "Literal has not a valid 'target = value' setter format.")
-                    .WithData(body);
+                case DbTokenLiteral literal:
+                    var str = literal.Value.Trim().UnWrap('(', ')')!;
+                    var (target, value) = str.ExtractLeftRight("=", Engine, out var found);
+                    if (!found) throw new ArgumentException(
+                        "Literal has not a valid 'target = value' setter format.")
+                        .WithData(body);
 
-                StrTarget = target.NotNullNotEmpty(trim: true);
-                StrValue = value.NotNullNotEmpty(trim: true);
+                    StrTarget = target.NotNullNotEmpty(trim: true);
+                    StrValue = value.NotNullNotEmpty(trim: true);
+                    break;
+
+                case DbTokenSetter: break; // Body already captured by 'base'...
+
+                default:
+                    throw new ArgumentException(
+                        $"Invalid token type for a {CLAUSE} clause.").WithData(body);
             }
-            else if (body is DbTokenSetter)
-            { }
-            else throw new ArgumentException($"Invalid token type for a {CLAUSE} clause.").WithData(body);
         }
 
         /// <summary>
@@ -65,32 +70,28 @@ public static partial class FragmentSetter
         // ------------------------------------------------
 
         /// <inheritdoc/>
+        /// <remarks>Elements are wrapped: 'Target=Value'.</remarks>
         protected override ICommandInfo.IBuilder VisitBody(DbTokenVisitor visitor)
         {
             if (Body is DbTokenLiteral)
             {
-                var str = $"{StrTarget} = {StrValue}";
-                var builder = new CommandInfo.Builder(Engine, str);
+                var builder = new CommandInfo.Builder(Engine, $"({StrTarget} = {StrValue})");
                 return builder;
             }
-            else if (Body is DbTokenSetter)
+            else if (Body is DbTokenSetter setter)
             {
-                var builder = visitor.Visit(Body);
-                var str = builder.Text.UnWrap('(', ')').Wrap('(', ')');
-                builder.ReplaceText(str);
-
+                var builder = visitor.Visit(setter);
                 return builder;
             }
             else throw new UnExpectedException("Unexpected body type.").WithData(Body);
         }
-
-        // ------------------------------------------------
 
         /// <summary>
         /// Visits the name of this instance.
         /// </summary>
         /// <param name="visitor"></param>
         /// <returns></returns>
+        /// <remarks>Elements are NOT wrapped: 'Target'.</remarks>
         public virtual ICommandInfo.IBuilder VisitName(DbTokenVisitor visitor)
         {
             if (Body is DbTokenLiteral)
@@ -111,6 +112,7 @@ public static partial class FragmentSetter
         /// </summary>
         /// <param name="visitor"></param>
         /// <returns></returns>
+        /// <remarks>Elements are NOT wrapped: 'Value'.</remarks>
         public virtual ICommandInfo.IBuilder VisitValue(DbTokenVisitor visitor)
         {
             if (Body is DbTokenLiteral)
@@ -176,6 +178,67 @@ public static partial class FragmentSetter
             if (tail is not null) entry._Tail = tail;
 
             return entry;
+        }
+
+        // ------------------------------------------------
+
+        /// <inheritdoc/>
+        public override string? Separator(Fragment.Entry entry) => ", ";
+
+        /// <inheritdoc/>
+        public override ICommandInfo.IBuilder Visit()
+        {
+            static ICommandInfo.IBuilder VisitItem(Fragment.Entry entry, DbTokenVisitor visitor)
+            {
+                var valid = (Entry)entry;
+                var builder = valid.Visit(visitor);
+                return builder;
+            }
+
+            // Elements are wrapped, but we need an additional one if many are involved...
+            var builder = Visit(VisitItem);
+            if (Count > 1) builder.ReplaceText($"({builder.Text})");
+            return builder;
+        }
+
+        /// <summary>
+        /// Visits the names on this instaance and returns a command info object that can be
+        /// used to build the related clause of the associated command.
+        /// </summary>
+        /// <returns></returns>
+        public ICommandInfo.IBuilder VisitNames()
+        {
+            static ICommandInfo.IBuilder VisitItem(Fragment.Entry entry, DbTokenVisitor visitor)
+            {
+                var valid = (Entry)entry;
+                var builder = valid.VisitName(visitor);
+                return builder;
+            }
+
+            // Elements are not wrapped...
+            var builder = Visit(VisitItem);
+            builder.ReplaceText($"({builder.Text})");
+            return builder;
+        }
+
+        /// <summary>
+        /// Visits the values on this instaance and returns a command info object that can be
+        /// used to build the related clause of the associated command.
+        /// </summary>
+        /// <returns></returns>
+        public ICommandInfo.IBuilder VisitValues()
+        {
+            static ICommandInfo.IBuilder VisitItem(Fragment.Entry entry, DbTokenVisitor visitor)
+            {
+                var valid = (Entry)entry;
+                var builder = valid.VisitValue(visitor);
+                return builder;
+            }
+
+            // Elements are not wrapped...
+            var builder = Visit(VisitItem);
+            builder.ReplaceText($"({builder.Text})");
+            return builder;
         }
     }
 }

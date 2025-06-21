@@ -232,23 +232,23 @@ public static partial class Fragment
         /// <returns></returns>
         public virtual ICommandInfo.IBuilder Visit()
         {
-            static ICommandInfo.IBuilder OnVisit(Entry entry, DbTokenVisitor visitor)
+            static ICommandInfo.IBuilder VisitItem(Entry entry, DbTokenVisitor visitor)
             {
                 return entry.Visit(visitor);
             }
-            return Visit(OnVisit);
+            return Visit(VisitItem);
         }
 
         /// <summary>
         /// Visits the entries in this instance using the given delegate and returns a command
         /// info object that can be used to build the related clause of the associated command.
         /// </summary>
-        /// <param name="onvisit"></param>
+        /// <param name="visitItem"></param>
         /// <returns></returns>
         protected ICommandInfo.IBuilder Visit(
-            Func<Entry, DbTokenVisitor, ICommandInfo.IBuilder> onvisit)
+            Func<Entry, DbTokenVisitor, ICommandInfo.IBuilder> visitItem)
         {
-            onvisit.ThrowWhenNull();
+            visitItem.ThrowWhenNull();
 
             var visitor = Command.Connection.Records.CreateDbTokenVisitor(Command.Locale);
             var engine = Command.Connection.Engine;
@@ -256,11 +256,11 @@ public static partial class Fragment
 
             for (int i = 0; i < Items.Count; i++)
             {
-                var item = Items[i];
-                var separator = Separator(item);
+                var entry = Items[i];
+                var separator = Separator(entry);
 
                 if (i != 0 && separator is not null) builder.Add(separator);
-                var temp = onvisit(item, visitor);
+                var temp = visitItem(entry, visitor);
                 builder.Add(temp);
             }
 
