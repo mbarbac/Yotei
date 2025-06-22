@@ -203,60 +203,6 @@ public static class Test_FragmentSetter
         catch (ArgumentException) { }
     }
 
-    /*
-
-    //[Enforced]
-    [Fact]
-    public static void Test_Expression_Simple_WithHeadTail()
-    {
-        var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentSetter.Master master;
-        ICommandInfo.IBuilder builder;
-
-        master = new(command);
-        master.Capture(x => x("-pre-")(x.Id = null).x("-post-"));
-        Assert.Single(master);
-        builder = master.Visit();
-        Assert.Equal("-pre-([Id] = NULL)-post", builder.Text);
-        Assert.Empty(builder.Parameters);
-        builder = master.VisitNames(); Assert.Equal("([Id])", builder.Text);
-        builder = master.VisitValues(); Assert.Equal("(NULL)", builder.Text);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_Expression_Complex()
-    {
-        var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentTerminal.Master master;
-        ICommandInfo.IBuilder builder;
-
-        master = new(command);
-        master.Capture(x => x("-pre-").Other.x("-post-"));
-        master.Capture(x => x.Another);
-        Assert.Equal(2, master.Count);
-        builder = master.Visit();
-        Assert.Equal("-pre-[Other]-post-[Another]", builder.Text);
-        Assert.Empty(builder.Parameters);
-    }
-    
-    
-    //[Enforced]
-    [Fact]
-    public static void Test_Expression_Simple()
-    {
-        var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentSetter.Master master;
-        ICommandInfo.IBuilder builder;
-
-        master = new(command);
-        master.Capture(x => x("-pre-").Other.x("-post-"));
-        Assert.Single(master);
-        builder = master.Visit();
-        Assert.Equal("-pre-[Other]-post-", builder.Text);
-        Assert.Empty(builder.Parameters);
-    }
-
     //[Enforced]
     [Fact]
     public static void Test_Expression_Complex()
@@ -266,15 +212,26 @@ public static class Test_FragmentSetter
         ICommandInfo.IBuilder builder;
 
         master = new(command);
-        master.Capture(x => x("-pre-").Other.x("-post-"));
-        master.Capture(x => x.Another);
+        master.Capture(x => x.First = "James");
+        master.Capture(x => x.Last = "Bond");
         Assert.Equal(2, master.Count);
-        builder = master.Visit();
-        Assert.Equal("-pre-[Other]-post-[Another]", builder.Text);
-        Assert.Empty(builder.Parameters);
-    }
 
-    // ----------------------------------------------------
+        builder = master.Visit();
+        Assert.Equal("(([First] = #0), ([Last] = #1))", builder.Text);
+        Assert.Equal(2, builder.Parameters.Count);
+        Assert.Equal("James", builder.Parameters[0].Value);
+        Assert.Equal("Bond", builder.Parameters[1].Value);
+
+        builder = master.VisitNames();
+        Assert.Equal("([First], [Last])", builder.Text);
+        Assert.Empty(builder.Parameters);
+
+        builder = master.VisitValues();
+        Assert.Equal("(#0, #1)", builder.Text);
+        Assert.Equal(2, builder.Parameters.Count);
+        Assert.Equal("James", builder.Parameters[0].Value);
+        Assert.Equal("Bond", builder.Parameters[1].Value);
+    }// ----------------------------------------------------
 
     //[Enforced]
     [Fact]
@@ -285,8 +242,8 @@ public static class Test_FragmentSetter
         ICommandInfo.IBuilder builder;
 
         master = new(command);
-        master.Capture(x => x("-pre-").Other.x("-post-"));
-        master.Capture(x => x.Another);
+        master.Capture(x => x.First = "James");
+        master.Capture(x => x.Last = "Bond");
         Assert.Equal(2, master.Count);
 
         var target = master.Clone();
@@ -294,8 +251,10 @@ public static class Test_FragmentSetter
         Assert.Equal(2, target.Count);
         foreach (var item in target) Assert.Same(target, item.Master);
         builder = target.Visit();
-        Assert.Equal("-pre-[Other]-post-[Another]", builder.Text);
-        Assert.Empty(builder.Parameters);
+        Assert.Equal("(([First] = #0), ([Last] = #1))", builder.Text);
+        Assert.Equal(2, builder.Parameters.Count);
+        Assert.Equal("James", builder.Parameters[0].Value);
+        Assert.Equal("Bond", builder.Parameters[1].Value);
     }
 
     //[Enforced]
@@ -307,8 +266,8 @@ public static class Test_FragmentSetter
         ICommandInfo.IBuilder builder;
 
         master = new(command);
-        master.Capture(x => x("-pre-").Other.x("-post-"));
-        master.Capture(x => x.Another);
+        master.Capture(x => x.First = "James");
+        master.Capture(x => x.Last = "Bond");
         Assert.Equal(2, master.Count);
 
         master.Clear();
@@ -316,5 +275,4 @@ public static class Test_FragmentSetter
         builder = master.Visit();
         Assert.True(builder.IsEmpty);
     }
-    */
 }
