@@ -17,9 +17,6 @@ public static partial class FragmentSetter
     [Cloneable]
     public partial class Entry : Fragment.Entry
     {
-        /// <inheritdoc/>
-        public override string CLAUSE => "SETTER";
-
         /// <summary>
         /// Initializes a new instance.
         /// </summary>
@@ -44,7 +41,7 @@ public static partial class FragmentSetter
 
                 default:
                     throw new ArgumentException(
-                        $"Invalid token type for a {CLAUSE} clause.").WithData(body);
+                        $"Invalid token type for a {Master.CLAUSE} clause.").WithData(body);
             }
         }
 
@@ -142,7 +139,7 @@ public static partial class FragmentSetter
     public partial class Master : Fragment.Master
     {
         /// <inheritdoc/>
-        public override string CLAUSE => "SETTER";
+        public override string CLAUSE { get; set; } = "SETTER";
 
         /// <summary>
         /// Initializes a new instance.

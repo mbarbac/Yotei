@@ -46,7 +46,8 @@ public static class DbTokenVisitorExtensions
 
     /// <summary>
     /// Invoked to build an alias using the contents of the given chain which, by default, are
-    /// joined without using any separators among them.
+    /// joined without using any separators among them. Throws an exception if the alias chain
+    /// resolves into a <c>null</c> literal.
     /// </summary>
     /// <param name="visitor"></param>
     /// <param name="chain"></param>

@@ -12,9 +12,6 @@ public static partial class FragmentTerminal
     [Cloneable]
     public partial class Entry : Fragment.Entry
     {
-        /// <inheritdoc/>
-        public override string CLAUSE => "TERMINAL";
-
         /// <summary>
         /// Initializes a new instance.
         /// </summary>
@@ -37,7 +34,7 @@ public static partial class FragmentTerminal
     public partial class Master : Fragment.Master
     {
         /// <inheritdoc/>
-        public override string CLAUSE => "TERMINAL";
+        public override string CLAUSE { get; set; } = "TERMINAL";
 
         /// <summary>
         /// Initializes a new instance.

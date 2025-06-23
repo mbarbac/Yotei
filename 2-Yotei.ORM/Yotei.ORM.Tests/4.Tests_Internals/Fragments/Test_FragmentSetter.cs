@@ -1,6 +1,5 @@
 ﻿using static Yotei.Tools.Diagnostics.ConsoleEx;
 using static System.ConsoleColor;
-using System.Runtime.Intrinsics.Arm;
 
 namespace Yotei.ORM.Tests.Internals;
 
@@ -21,7 +20,7 @@ public static class Test_FragmentSetter
 
     //[Enforced]
     [Fact]
-    public static void Test_Literal_Simple()
+    public static void Test_Literal_Many()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
         FragmentSetter.Master master;

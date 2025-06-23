@@ -15,9 +15,6 @@ public static partial class FragmentWhere
     [Cloneable]
     public partial class Entry : Fragment.Entry
     {
-        /// <inheritdoc/>
-        public override string CLAUSE => "WHERE";
-
         /// <summary>
         /// Initializes a new instance.
         /// </summary>
@@ -63,6 +60,8 @@ public static partial class FragmentWhere
             : $"{Body}";
 
         /// <inheritdoc/>
+        /// Note that we are overriden 'VisitHead' and not 'VisitBody' as, by convention, the
+        /// connector shall appear before the head element.
         protected override ICommandInfo.IBuilder VisitHead(DbTokenVisitor visitor)
         {
             var index = Master.IndexOf(this); // Connectors are for not-first elements...
@@ -93,7 +92,7 @@ public static partial class FragmentWhere
     public partial class Master : Fragment.Master
     {
         /// <inheritdoc/>
-        public override string CLAUSE => "WHERE";
+        public override string CLAUSE { get; set; } = "WHERE";
 
         /// <summary>
         /// Initializes a new instance.

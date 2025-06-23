@@ -1,6 +1,5 @@
 ﻿using static Yotei.Tools.Diagnostics.ConsoleEx;
 using static System.ConsoleColor;
-using System.Runtime.Intrinsics.Arm;
 
 namespace Yotei.ORM.Tests.Internals;
 

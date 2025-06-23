@@ -18,7 +18,7 @@ public static partial class Fragment
         /// Returns a descriptor of the clause this instance is built for.
         /// <br/> This property is mainly used for informational purposes.
         /// </summary>
-        public abstract string CLAUSE { get; }
+        public abstract string CLAUSE { get; set; }
 
         /// <summary>
         /// Initializes a new instance.

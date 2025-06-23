@@ -25,7 +25,7 @@ public static class Test_FragmentTerminal
 
     //[Enforced]
     [Fact]
-    public static void Test_Literal_Complex()
+    public static void Test_Literal_Many()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
         FragmentTerminal.Master master;
