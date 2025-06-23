@@ -173,10 +173,11 @@ public static partial class FragmentSetter
         /// <inheritdoc/>
         protected override Entry OnCreate(DbTokenInvoke? head, IDbToken body, DbTokenInvoke? tail)
         {
+            // Finishing...
             var entry = new Entry(this, body);
+
             if (head is not null) entry._Head = head;
             if (tail is not null) entry._Tail = tail;
-
             return entry;
         }
 

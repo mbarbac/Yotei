@@ -1,4 +1,5 @@
-﻿using StringSpan = System.ReadOnlySpan<char>;
+﻿using System.Runtime.InteropServices.Marshalling;
+using StringSpan = System.ReadOnlySpan<char>;
 
 namespace Yotei.Tools;
 
@@ -269,14 +270,21 @@ public static class StringSpanExtensions
 
         for (int i = 0; i < source.Length; i++)
         {
-            var found = true; for (int j = 0; j < value.Length && (i + j) < source.Length; j++)
+            var span = source[i..];
+            if (span.Length < value.Length) break;
+
+            var found = true;
+            for (int j = 0; j < value.Length; j++)
             {
-                var s = source[i + j];
+                var s = span[j];
                 var v = value[j];
                 if (!s.Equals(v, caseSensitive)) { found = false; break; }
             }
-            if (found) return i;
+            if (!found) continue;
+
+            return i;
         }
+
         return -1;
     }
 
@@ -298,14 +306,21 @@ public static class StringSpanExtensions
 
         for (int i = 0; i < source.Length; i++)
         {
-            var found = true; for (int j = 0; j < value.Length && (i + j) < source.Length; j++)
+            var span = source[i..];
+            if (span.Length < value.Length) break;
+
+            var found = true;
+            for (int j = 0; j < value.Length; j++)
             {
-                var s = source[i + j];
+                var s = span[j];
                 var v = value[j];
                 if (!s.Equals(v, comparer)) { found = false; break; }
             }
-            if (found) return i;
+            if (!found) continue;
+
+            return i;
         }
+
         return -1;
     }
 
@@ -328,14 +343,21 @@ public static class StringSpanExtensions
 
         for (int i = 0; i < source.Length; i++)
         {
-            var found = true; for (int j = 0; j < value.Length && (i + j) < source.Length; j++)
+            var span = source[i..];
+            if (span.Length < value.Length) break;
+
+            var found = true;
+            for (int j = 0; j < value.Length; j++)
             {
-                var s = source[i + j];
+                var s = span[j];
                 var v = value[j];
                 if (!s.Equals(v, comparer)) { found = false; break; }
             }
-            if (found) return i;
+            if (!found) continue;
+
+            return i;
         }
+
         return -1;
     }
 
@@ -357,17 +379,26 @@ public static class StringSpanExtensions
         if (source.Length == 0) return -1;
         if (value.Length == 0) return -1;
 
-        for (int i = source.Length - 1; i >= 0; i--)
+        var r = -1;
+
+        for (int i = 0; i < source.Length; i++)
         {
-            var found = true; for (int j = 0; j < value.Length && (i + j) < source.Length; j++)
+            var span = source[i..];
+            if (span.Length < value.Length) break;
+
+            var found = true;
+            for (int j = 0; j < value.Length; j++)
             {
-                var s = source[i + j];
+                var s = span[j];
                 var v = value[j];
                 if (!s.Equals(v, caseSensitive)) { found = false; break; }
             }
-            if (found) return i;
+            if (!found) continue;
+
+            r = i;
         }
-        return -1;
+
+        return r;
     }
 
     /// <summary>
@@ -387,17 +418,26 @@ public static class StringSpanExtensions
         if (source.Length == 0) return -1;
         if (value.Length == 0) return -1;
 
-        for (int i = source.Length - 1; i >= 0; i--)
+        var r = -1;
+
+        for (int i = 0; i < source.Length; i++)
         {
-            var found = true; for (int j = 0; j < value.Length && (i + j) < source.Length; j++)
+            var span = source[i..];
+            if (span.Length < value.Length) break;
+
+            var found = true;
+            for (int j = 0; j < value.Length; j++)
             {
-                var s = source[i + j];
+                var s = span[j];
                 var v = value[j];
                 if (!s.Equals(v, comparer)) { found = false; break; }
             }
-            if (found) return i;
+            if (!found) continue;
+
+            r = i;
         }
-        return -1;
+
+        return r;
     }
 
     /// <summary>
@@ -417,17 +457,26 @@ public static class StringSpanExtensions
         if (source.Length == 0) return -1;
         if (value.Length == 0) return -1;
 
-        for (int i = source.Length - 1; i >= 0; i--)
+        var r = -1;
+
+        for (int i = 0; i < source.Length; i++)
         {
-            var found = true; for (int j = 0; j < value.Length && (i + j) < source.Length; j++)
+            var span = source[i..];
+            if (span.Length < value.Length) break;
+
+            var found = true;
+            for (int j = 0; j < value.Length; j++)
             {
-                var s = source[i + j];
+                var s = span[j];
                 var v = value[j];
                 if (!s.Equals(v, comparer)) { found = false; break; }
             }
-            if (found) return i;
+            if (!found) continue;
+
+            r = i;
         }
-        return -1;
+
+        return r;
     }
 
     // ----------------------------------------------------

@@ -191,6 +191,7 @@ public static partial class Fragment
 
             var engine = Command.Connection.Engine;
             var token = DbLambdaParser.Parse(engine, spec);
+            
             var entry = Create(token);
             return entry;
         }

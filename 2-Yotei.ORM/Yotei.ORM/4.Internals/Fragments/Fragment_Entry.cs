@@ -42,11 +42,47 @@ public static partial class Fragment
         }
 
         /// <inheritdoc/>
-        public override string ToString()
+        public override string ToString() => $"{Body}";
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Determines if the given source starts with the given value and, if so, extracts that
+        /// value from the source and trims all results.
+        /// </summary>
+        protected static bool TryExtractFirst(ref string source, ref string value, bool caseSensitive)
         {
-            var visitor = Connection.Records.CreateDbTokenVisitor(Command.Locale);
-            var builder = Visit(visitor);
-            return builder.ToString()!;
+            var index = source.IndexOf(value, caseSensitive);
+            if (index == 0)
+            {
+                var len = value.Length;
+                source = source[len..];
+
+                source = source.Trim();
+                value = value.Trim();
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Determines if the given source ends with the given value and, if so, extracts that
+        /// value from the source and trims all results.
+        /// </summary>
+        protected static bool TryExtractLast(ref string source, ref string value, bool caseSensitive)
+        {
+            var index = source.IndexOf(value, caseSensitive);
+            if (index > 0 && (index + value.Length) == source.Length)
+            {
+                source = source[..index];
+
+                source = source.Trim();
+                value = value.Trim();
+                return true;
+            }
+
+            return false;
         }
 
         // ------------------------------------------------
@@ -62,7 +98,27 @@ public static partial class Fragment
         /// <summary>
         /// The actual body of contents carried by this instance.
         /// </summary>
-        public IDbToken Body { get; internal protected set; }
+        public IDbToken Body
+        {
+            get => _Body;
+
+            protected set
+            {
+                value.ThrowWhenNull();
+
+                if (value is DbTokenArgument) throw new ArgumentException(
+                    "Fragment body cannot be just a dynamic argument.")
+                    .WithData(value);
+
+                if (value is DbTokenLiteral literal && literal.Value.Length == 0)
+                    throw new ArgumentException(
+                        "Literal fragment body cannot be empty.")
+                        .WithData(value);
+
+                _Body = value;
+            }
+        }
+        IDbToken _Body = default!;
 
         /// <summary>
         /// The head element carried by this instance, or <c>null</c> if any. If not null, then
@@ -73,7 +129,7 @@ public static partial class Fragment
             get => _Head;
             init => _Head = value;
         }
-        internal DbTokenInvoke? _Head;
+        internal DbTokenInvoke? _Head; // internal, because 'init' is a bit too restrictive
 
         /// <summary>
         /// The tail element carried by this instance, or <c>null</c> if any. If not null, then
@@ -84,7 +140,7 @@ public static partial class Fragment
             get => _Tail;
             init => _Tail = value;
         }
-        internal DbTokenInvoke? _Tail;
+        internal DbTokenInvoke? _Tail; // internal, because 'init' is a bit too restrictive
 
         // ------------------------------------------------
 
@@ -104,6 +160,8 @@ public static partial class Fragment
 
             return builder;
         }
+
+        // ------------------------------------------------
 
         /// <summary>
         /// Invoked to visit the head of this instance. If <see cref="Head"/> is null, then
