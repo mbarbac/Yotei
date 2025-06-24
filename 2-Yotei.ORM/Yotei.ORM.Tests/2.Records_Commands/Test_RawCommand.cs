@@ -193,6 +193,24 @@ public static class Test_RawCommand
 
     //[Enforced]
     [Fact]
+    public static void Test_Clone()
+    {
+        var engine = new FakeEngine();
+        var connection = new FakeConnection(engine);
+        
+        var command = connection.Records.Raw("FROM [Emps] WHERE [Id]={0}", "007");
+
+        var target = command.Clone();
+        var info = target.GetCommandInfo();
+        Assert.Equal("FROM [Emps] WHERE [Id]=#0", info.Text);
+        Assert.Single(info.Parameters);
+        Assert.Equal("#0", info.Parameters[0].Name); Assert.Equal("007", info.Parameters[0].Value);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
     public static void Test_Clear()
     {
         var engine = new FakeEngine();

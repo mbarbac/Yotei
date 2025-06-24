@@ -108,4 +108,18 @@ public interface IRecordsGate
     /// <param name="table"></param>
     /// <returns></returns>
     IUpdateCommand Update(Func<dynamic, string> table);
+
+    /// <summary>
+    /// Returns a new DELETE command associated with the given primary source.
+    /// </summary>
+    /// <param name="table"></param>
+    /// <returns></returns>
+    IDeleteCommand Delete(Func<dynamic, object> table);
+
+    /// <summary>
+    /// Returns a new DELETE command associated with the given primary source.
+    /// </summary>
+    /// <param name="table"></param>
+    /// <returns></returns>
+    IDeleteCommand Delete(Func<dynamic, string> table);
 }

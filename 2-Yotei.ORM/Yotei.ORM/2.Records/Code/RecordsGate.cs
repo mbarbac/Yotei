@@ -69,4 +69,12 @@ public abstract class RecordsGate : IRecordsGate
     /// <inheritdoc/>
     public virtual UpdateCommand Update(Func<dynamic, string> table) => new(Connection, table);
     IUpdateCommand IRecordsGate.Update(Func<dynamic, string> table) => Update(table);
+
+    /// <inheritdoc/>
+    public virtual DeleteCommand Delete(Func<dynamic, object> table) => new(Connection, table);
+    IDeleteCommand IRecordsGate.Delete(Func<dynamic, object> table) => Delete(table);
+
+    /// <inheritdoc/>
+    public virtual DeleteCommand Delete(Func<dynamic, string> table) => new(Connection, table);
+    IDeleteCommand IRecordsGate.Delete(Func<dynamic, string> table) => Delete(table);
 }

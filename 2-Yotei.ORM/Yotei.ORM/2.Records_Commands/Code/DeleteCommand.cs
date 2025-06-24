@@ -1,15 +1,14 @@
 ﻿namespace Yotei.ORM.Records.Code;
 
 // ========================================================
-/// <inheritdoc cref="IUpdateCommand"/>
+/// <inheritdoc cref="IDeleteCommand"/>
 [Cloneable]
 [InheritWiths]
-public partial class UpdateCommand : EnumerableCommand, IUpdateCommand
+public partial class DeleteCommand : EnumerableCommand, IDeleteCommand
 {
     FragmentTerminal.Master _HeadFragment = default!;
     FragmentTerminal.Master _TailFragment = default!;
     FragmentWhere.Master _WhereFragment = default!;
-    FragmentSetter.Master _ColumnsFragment = default!;
 
     void OnInitialize(IDbToken token)
     {
@@ -21,14 +20,13 @@ public partial class UpdateCommand : EnumerableCommand, IUpdateCommand
         _HeadFragment = new(this);
         _TailFragment = new(this);
         _WhereFragment = new(this);
-        _ColumnsFragment = new(this);
     }
 
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="connection"></param>
-    public UpdateCommand(IConnection connection, Func<dynamic, object> table) : base(connection)
+    public DeleteCommand(IConnection connection, Func<dynamic, object> table) : base(connection)
     {
         var token = DbLambdaParser.Parse(Engine, table);
         OnInitialize(token);
@@ -38,7 +36,7 @@ public partial class UpdateCommand : EnumerableCommand, IUpdateCommand
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="connection"></param>
-    public UpdateCommand(IConnection connection, Func<dynamic, string> table) : base(connection)
+    public DeleteCommand(IConnection connection, Func<dynamic, string> table) : base(connection)
     {
         var token = DbLambdaParser.Parse(Engine, table);
         OnInitialize(token);
@@ -48,17 +46,17 @@ public partial class UpdateCommand : EnumerableCommand, IUpdateCommand
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected UpdateCommand(UpdateCommand source) : base(source)
+    protected DeleteCommand(DeleteCommand source) : base(source)
     {
         PrimarySource = source.PrimarySource;
+        IsEmptyValid = source.IsEmptyValid;
         _HeadFragment = source._HeadFragment.Clone();
         _TailFragment = source._TailFragment.Clone();
         _WhereFragment = source._WhereFragment.Clone();
-        _ColumnsFragment = source._ColumnsFragment.Clone();
     }
 
     /// <inheritdoc/>
-    public override string ToString() => base.ToString();
+    public override string ToString() => GetCommandInfo(iterable: false, validateEmpty: false).ToString();
 
     // ----------------------------------------------------
 
@@ -76,17 +74,24 @@ public partial class UpdateCommand : EnumerableCommand, IUpdateCommand
     /// <inheritdoc/>
     public override CommandInfo GetCommandInfo(bool iterable)
     {
+        return GetCommandInfo(iterable, validateEmpty: true);
+    }
+
+    CommandInfo GetCommandInfo(bool iterable, bool validateEmpty)
+    {
         var heads = _HeadFragment.Visit();
         var tails = _TailFragment.Visit();
-        var columns = _ColumnsFragment.Visit();
         var where = _WhereFragment.Visit();
+
+        if (validateEmpty && where.IsEmpty && !IsEmptyValid) throw new InvalidOperationException(
+            "This DELETE command has not filters, is equivalent to a DELETE ALL one.")
+            .WithData(this);
 
         var builder = new CommandInfo.Builder(Engine);
         if (!heads.IsEmpty) builder.Add(heads);
 
-        builder.Add($"UPDATE {PrimarySource.Value}");
-        if (!columns.IsEmpty) { builder.Add(" SET "); builder.Add(columns); }
-        if (iterable) builder.Add(" OUTPUT INSERTED.*");
+        builder.Add($"DELETE FROM {PrimarySource.Value}");
+        if (iterable) builder.Add(" OUTPUT DELETED.*");
         if (!where.IsEmpty) { builder.Add(" WHERE "); builder.Add(where); }
 
         if (!tails.IsEmpty) builder.Add(tails);
@@ -96,7 +101,7 @@ public partial class UpdateCommand : EnumerableCommand, IUpdateCommand
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public virtual UpdateCommand WithHeads<T>(params Func<dynamic, T>[] specs)
+    public virtual DeleteCommand WithHeads<T>(params Func<dynamic, T>[] specs)
     {
         specs.ThrowWhenNull();
         for (int i = 0; i < specs.Length; i++)
@@ -106,10 +111,10 @@ public partial class UpdateCommand : EnumerableCommand, IUpdateCommand
         }
         return this;
     }
-    IUpdateCommand IUpdateCommand.WithHeads<T>(params Func<dynamic, T>[] specs) => WithHeads(specs);
+    IDeleteCommand IDeleteCommand.WithHeads<T>(params Func<dynamic, T>[] specs) => WithHeads(specs);
 
     /// <inheritdoc/>
-    public virtual UpdateCommand WithTails<T>(params Func<dynamic, T>[] specs)
+    public virtual DeleteCommand WithTails<T>(params Func<dynamic, T>[] specs)
     {
         specs.ThrowWhenNull();
         for (int i = 0; i < specs.Length; i++)
@@ -119,10 +124,10 @@ public partial class UpdateCommand : EnumerableCommand, IUpdateCommand
         }
         return this;
     }
-    IUpdateCommand IUpdateCommand.WithTails<T>(params Func<dynamic, T>[] specs) => WithTails(specs);
+    IDeleteCommand IDeleteCommand.WithTails<T>(params Func<dynamic, T>[] specs) => WithTails(specs);
 
     /// <inheritdoc/>
-    public virtual UpdateCommand Where<T>(params Func<dynamic, T>[] specs)
+    public virtual DeleteCommand Where<T>(params Func<dynamic, T>[] specs)
     {
         specs.ThrowWhenNull();
         for (int i = 0; i < specs.Length; i++)
@@ -132,30 +137,19 @@ public partial class UpdateCommand : EnumerableCommand, IUpdateCommand
         }
         return this;
     }
-    IUpdateCommand IUpdateCommand.Where<T>(params Func<dynamic, T>[] specs) => Where(specs);
+    IDeleteCommand IDeleteCommand.Where<T>(params Func<dynamic, T>[] specs) => Where(specs);
 
     /// <inheritdoc/>
-    public virtual UpdateCommand Columns<T>(params Func<dynamic, T>[] specs)
-    {
-        specs.ThrowWhenNull();
-        for (int i = 0; i < specs.Length; i++)
-        {
-            var spec = specs[i] ?? throw new ArgumentException($"Specification at index #{i} is null.");
-            _ColumnsFragment.Capture(spec);
-        }
-        return this;
-    }
-    IUpdateCommand IUpdateCommand.Columns<T>(params Func<dynamic, T>[] specs) => Columns(specs);
+    public bool IsEmptyValid { get; set; }
 
     /// <inheritdoc/>
-    public override UpdateCommand Clear()
+    public override DeleteCommand Clear()
     {
         _HeadFragment.Clear();
         _TailFragment.Clear();
-        _ColumnsFragment.Clear();
         _WhereFragment.Clear();
 
         return this;
     }
-    IUpdateCommand IUpdateCommand.Clear() => Clear();
+    IDeleteCommand IDeleteCommand.Clear() => Clear();
 }

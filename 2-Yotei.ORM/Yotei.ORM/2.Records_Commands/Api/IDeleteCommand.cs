@@ -46,8 +46,9 @@ public partial interface IDeleteCommand
 
     /// <summary>
     /// Determines if an empty instance with no WHERE clauses, equivalent to a 'DELETE ALL' one,
-    /// is valid or not. This property acts as a safety belt to prevent the execution of empty
-    /// instances.
+    /// is valid or not.
+    /// <br/> This property acts as a safety belt to prevent the execution of empty instances.
+    /// <br/> The value of this property is not modified by <see cref="Clear"/> operations.
     /// </summary>
     [With] bool IsEmptyValid { get; set; }
 
