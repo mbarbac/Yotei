@@ -2,9 +2,8 @@
 
 /// <summary>
 /// Represents the ability of parsing JOIN clauses.
-/// <br/>- Standard syntax: 'x => ArbitraryCondition'.
-/// <br/>- Alternate syntax: 'x => x.And(...)'.
-/// <br/>- Alternate syntax: 'x => x.Or(...)'.
+/// <br/>- Standard syntax: 'x => x.Source.As(...).On(...)'.
+/// <br/>- Alternate syntax: 'x => x.JoinType(join-type).Source.As(...).On(...)'.
 /// </summary>
 public static partial class FragmentJoin
 {

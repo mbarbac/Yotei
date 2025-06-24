@@ -46,6 +46,7 @@ public partial interface IQueryCommand : ICommand, IEnumerableCommand
     /// <br/>- Standard syntax: 'x => Condition'.
     /// <br/>- Alternate syntax: 'x => x.And(...)'.
     /// <br/>- Alternate syntax: 'x => x.Or(...)'.
+    /// <br/> Note that using an entry without an appropriate AND or OR connector may be invalid SQL syntax.
     /// <br/> Returns a reference to itself to enable a fluent syntax usage.
     /// </summary>
     /// <typeparam name="T"></typeparam>

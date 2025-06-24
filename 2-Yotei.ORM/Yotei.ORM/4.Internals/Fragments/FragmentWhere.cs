@@ -2,9 +2,11 @@
 
 /// <summary>
 /// Represents the ability of parsing WHERE clauses.
-/// <br/>- Standard syntax: 'x => ArbitraryCondition'.
+/// <br/>- Standard syntax: 'x => Expression'.
 /// <br/>- Alternate syntax: 'x => x.And(...)'.
 /// <br/>- Alternate syntax: 'x => x.Or(...)'.
+/// <br/> Note that using an entry without an appropriate AND or OR connector may be invalid SQL
+/// syntax.
 /// </summary>
 public static partial class FragmentWhere
 {

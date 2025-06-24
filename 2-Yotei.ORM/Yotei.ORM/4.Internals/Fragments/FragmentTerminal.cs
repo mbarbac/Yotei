@@ -1,7 +1,8 @@
 ﻿namespace Yotei.ORM.Internals;
 
 /// <summary>
-/// Represents the ability of parsing TERMINAL clauses.
+/// Represents the ability of parsing TERMINAL clauses, that accept any arbitrary database
+/// expression as their contents.
 /// </summary>
 public static partial class FragmentTerminal
 {
