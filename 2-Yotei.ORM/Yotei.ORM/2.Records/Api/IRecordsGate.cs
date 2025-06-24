@@ -33,6 +33,30 @@ public interface IRecordsGate
     // ----------------------------------------------------
 
     /// <summary>
+    /// Factory method to create an object with the ability of parsing db-token chains returning
+    /// the <see cref="ICommandInfo"/> object that represents that chain for the underlying
+    /// database engine.
+    /// </summary>
+    /// <param name="locale"></param>
+    /// <param name="useNullString"></param>
+    /// <param name="captureValues"></param>
+    /// <param name="convertValues"></param>
+    /// <param name="useQuotes"></param>
+    /// <param name="useTerminators"></param>
+    /// <param name="rangeSeparator"></param>
+    /// <returns></returns>
+    DbTokenVisitor CreateDbTokenVisitor(
+        Locale? locale = null,
+        bool useNullString = DbTokenVisitor.USENULLSTRING,
+        bool captureValues = DbTokenVisitor.CAPTUREVALUES,
+        bool convertValues = DbTokenVisitor.CONVERTVALUES,
+        bool useQuotes = DbTokenVisitor.USEQUOTES,
+        bool useTerminators = DbTokenVisitor.USETERMINATORS,
+        string? rangeSeparator = DbTokenVisitor.RANGESEPARATOR);
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Returns a new empty RAW command.
     /// </summary>
     /// <returns></returns>
@@ -63,27 +87,25 @@ public interface IRecordsGate
     /// <returns></returns>
     IRawCommand Raw(Func<dynamic, object> spec);
 
-    // ----------------------------------------------------
+    /// <summary>
+    /// Returns a new RAW command using the text and arguments obtained from parsing the given
+    /// dynamic lambda expressions.
+    /// </summary>
+    /// <param name="spec"></param>
+    /// <returns></returns>
+    IRawCommand Raw(Func<dynamic, string> spec);
 
     /// <summary>
-    /// Factory method to create an object with the ability of parsing db-token chains returning
-    /// the <see cref="ICommandInfo"/> object that represents that chain for the underlying
-    /// database engine.
+    /// Returns a new UPDATE command associated with the given primary source.
     /// </summary>
-    /// <param name="locale"></param>
-    /// <param name="useNullString"></param>
-    /// <param name="captureValues"></param>
-    /// <param name="convertValues"></param>
-    /// <param name="useQuotes"></param>
-    /// <param name="useTerminators"></param>
-    /// <param name="rangeSeparator"></param>
+    /// <param name="table"></param>
     /// <returns></returns>
-    DbTokenVisitor CreateDbTokenVisitor(
-        Locale? locale = null,
-        bool useNullString = DbTokenVisitor.USENULLSTRING,
-        bool captureValues = DbTokenVisitor.CAPTUREVALUES,
-        bool convertValues = DbTokenVisitor.CONVERTVALUES,
-        bool useQuotes = DbTokenVisitor.USEQUOTES,
-        bool useTerminators = DbTokenVisitor.USETERMINATORS,
-        string? rangeSeparator = DbTokenVisitor.RANGESEPARATOR);
+    IUpdateCommand Update(Func<dynamic, object> table);
+
+    /// <summary>
+    /// Returns a new UPDATE command associated with the given primary source.
+    /// </summary>
+    /// <param name="table"></param>
+    /// <returns></returns>
+    IUpdateCommand Update(Func<dynamic, string> table);
 }

@@ -17,6 +17,8 @@ public partial interface ICommand
     /// </summary>
     [With] Locale Locale { get; }
 
+    // ----------------------------------------------------
+
     /// <summary>
     /// Obtains the information needed to run a command, using its default iterable mode.
     /// </summary>

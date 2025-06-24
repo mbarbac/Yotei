@@ -35,6 +35,8 @@ public abstract partial class Command : ICommand
     }
     IConnection _Connection = default!;
 
+    protected IEngine Engine => Connection.Engine;
+
     /// <inheritdoc/>
     public Locale Locale
     {
@@ -42,6 +44,8 @@ public abstract partial class Command : ICommand
         init => _Locale = value.ThrowWhenNull();
     }
     Locale _Locale = new();
+
+    // ----------------------------------------------------
 
     /// <inheritdoc/>
     public abstract CommandInfo GetCommandInfo();

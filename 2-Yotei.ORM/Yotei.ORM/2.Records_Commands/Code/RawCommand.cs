@@ -13,7 +13,7 @@ public partial class RawCommand : EnumerableCommand, IRawCommand
     /// </summary>
     /// <param name="connection"></param>
     public RawCommand(
-        IConnection connection) : base(connection) => Info = new CommandInfo.Builder(connection.Engine);
+        IConnection connection) : base(connection) => Info = new CommandInfo.Builder(Engine);
 
     /// <summary>
     /// Initializes a new instance using the given text and optional arguments.
@@ -68,6 +68,8 @@ public partial class RawCommand : EnumerableCommand, IRawCommand
 
     /// <inheritdoc/>
     public ICommandExecutor GetExecutor() => Connection.Records.CreateCommandExecutor(this);
+
+    // ----------------------------------------------------
 
     /// <inheritdoc/>
     public override CommandInfo GetCommandInfo() => Info.CreateInstance();

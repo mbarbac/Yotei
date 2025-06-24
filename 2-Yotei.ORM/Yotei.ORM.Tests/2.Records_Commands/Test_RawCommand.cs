@@ -16,7 +16,7 @@ public static class Test_RawCommand
         IRawCommand command;
         ICommandInfo info;
 
-        command = new RawCommand(connection);
+        command = connection.Records.Raw();
         info = command.GetCommandInfo();
         Assert.True(info.IsEmpty);
         Assert.Empty(info.Text);
@@ -32,12 +32,12 @@ public static class Test_RawCommand
         IRawCommand command;
         ICommandInfo info;
 
-        command = new RawCommand(connection, "FROM [Emps]");
+        command = connection.Records.Raw("FROM [Emps]");
         info = command.GetCommandInfo();
         Assert.Equal("FROM [Emps]", info.Text);
         Assert.Empty(info.Parameters);
 
-        command = new RawCommand(connection, "FROM [Emps] WHERE [Id]={0}", "007");
+        command = connection.Records.Raw("FROM [Emps] WHERE [Id]={0}", "007");
         info = command.GetCommandInfo();
         Assert.Equal("FROM [Emps] WHERE [Id]=#0", info.Text);
         Assert.Single(info.Parameters);
@@ -55,7 +55,7 @@ public static class Test_RawCommand
         IRawCommand command;
         ICommandInfo info;
 
-        command = new RawCommand(connection);
+        command = connection.Records.Raw();
         command.Append(x => x("FROM [Emps] WHERE ")(x.Id = "007"));
         info = command.GetCommandInfo();
         Assert.Equal("FROM [Emps] WHERE ([Id] = #0)", info.Text);
@@ -72,7 +72,7 @@ public static class Test_RawCommand
         IRawCommand command;
         ICommandInfo info;
 
-        command = new RawCommand(connection);
+        command = connection.Records.Raw();
         command.Append(x => "FROM [Emps] WHERE [Id] = '007'");
         info = command.GetCommandInfo();
         Assert.Equal("FROM [Emps] WHERE [Id] = '007'", info.Text);
@@ -90,7 +90,7 @@ public static class Test_RawCommand
         IRawCommand command;
         ICommandInfo info;
 
-        command = new RawCommand(connection, "FROM [Emps] WHERE [Id]={0}", "007");
+        command = connection.Records.Raw("FROM [Emps] WHERE [Id]={0}", "007");
         command.Append(" ANY");
         info = command.GetCommandInfo();
         Assert.Equal("FROM [Emps] WHERE [Id]=#0 ANY", info.Text);
@@ -107,7 +107,7 @@ public static class Test_RawCommand
         IRawCommand command;
         ICommandInfo info;
 
-        command = new RawCommand(connection, "FROM [Emps] WHERE [Id]={0}", "007");
+        command = connection.Records.Raw("FROM [Emps] WHERE [Id]={0}", "007");
         command.Append(null, new Parameter("Age", 50));
         info = command.GetCommandInfo();
         Assert.Equal("FROM [Emps] WHERE [Id]=#0", info.Text);
@@ -125,7 +125,7 @@ public static class Test_RawCommand
         IRawCommand command;
         ICommandInfo info;
 
-        command = new RawCommand(connection, "FROM [Emps] WHERE [Id]={0}", "007");
+        command = connection.Records.Raw("FROM [Emps] WHERE [Id]={0}", "007");
         command.Append(" AND [Age]={0}", 50);
         info = command.GetCommandInfo();
         Assert.Equal("FROM [Emps] WHERE [Id]=#0 AND [Age]=#1", info.Text);
@@ -134,7 +134,7 @@ public static class Test_RawCommand
         Assert.Equal("#1", info.Parameters[1].Name); Assert.Equal(50, info.Parameters[1].Value);
 
         var page = new Parameter("Age", 50);
-        command = new RawCommand(connection, "FROM [Emps] WHERE [Id]={0}", "007");
+        command = connection.Records.Raw("FROM [Emps] WHERE [Id]={0}", "007");
         command.Append(" AND [Age]={0}", page);
         info = command.GetCommandInfo();
         Assert.Equal("FROM [Emps] WHERE [Id]=#0 AND [Age]=#Age", info.Text);
@@ -143,7 +143,7 @@ public static class Test_RawCommand
         Assert.Equal("#Age", info.Parameters[1].Name); Assert.Equal(50, info.Parameters[1].Value);
 
         var xage = new { Age = 50 };
-        command = new RawCommand(connection, "FROM [Emps] WHERE [Id]={0}", "007");
+        command = connection.Records.Raw("FROM [Emps] WHERE [Id]={0}", "007");
         command.Append(" AND [Age]={0}", xage);
         info = command.GetCommandInfo();
         Assert.Equal("FROM [Emps] WHERE [Id]=#0 AND [Age]=#Age", info.Text);
@@ -163,7 +163,7 @@ public static class Test_RawCommand
         IRawCommand command;
         ICommandInfo info;
 
-        command = new RawCommand(connection, "FROM [Emps] WHERE [Id]={0}", "007");
+        command = connection.Records.Raw("FROM [Emps] WHERE [Id]={0}", "007");
         command.Append(x => x(" AND ")(x.Age = 50));
         info = command.GetCommandInfo();
         Assert.Equal("FROM [Emps] WHERE [Id]=#0 AND ([Age] = #1)", info.Text);
@@ -181,7 +181,7 @@ public static class Test_RawCommand
         IRawCommand command;
         ICommandInfo info;
 
-        command = new RawCommand(connection, "FROM [Emps] WHERE [Id]={0}", "007");
+        command = connection.Records.Raw("FROM [Emps] WHERE [Id]={0}", "007");
         command.Append(x => x(" AND ")(x.Ctry != null));
         info = command.GetCommandInfo();
         Assert.Equal("FROM [Emps] WHERE [Id]=#0 AND ([Ctry] IS NOT NULL)", info.Text);
@@ -200,7 +200,7 @@ public static class Test_RawCommand
         IRawCommand command;
         ICommandInfo info;
 
-        command = new RawCommand(connection, "FROM [Emps] WHERE [Id]={0}", "007");
+        command = connection.Records.Raw("FROM [Emps] WHERE [Id]={0}", "007");
         command.Clear();
         info = command.GetCommandInfo();
         Assert.True(info.IsEmpty);

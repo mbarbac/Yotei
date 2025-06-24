@@ -24,19 +24,6 @@ public abstract class RecordsGate : IRecordsGate
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public virtual IRawCommand Raw() => new RawCommand(Connection);
-
-    /// <inheritdoc/>
-    public virtual IRawCommand Raw(
-        string? text, params object?[] args) => new RawCommand(Connection, text, args);
-
-    /// <inheritdoc/>
-    public virtual IRawCommand Raw(
-        Func<dynamic, object> spec) => new RawCommand(Connection, spec);
-
-    // ----------------------------------------------------
-
-    /// <inheritdoc/>
     public virtual DbTokenVisitor CreateDbTokenVisitor(
        Locale? locale = null,
        bool useNullString = DbTokenVisitor.USENULLSTRING,
@@ -56,4 +43,30 @@ public abstract class RecordsGate : IRecordsGate
             useTerminators,
             rangeSeparator);
     }
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public virtual RawCommand Raw() => new(Connection);
+    IRawCommand IRecordsGate.Raw() => Raw();
+
+    /// <inheritdoc/>
+    public virtual RawCommand Raw(string? text, params object?[] args) => new(Connection, text, args);
+    IRawCommand IRecordsGate.Raw(string? text, params object?[] args) => Raw(text, args);
+
+    /// <inheritdoc/>
+    public virtual RawCommand Raw(Func<dynamic, object> spec) => new(Connection, spec);
+    IRawCommand IRecordsGate.Raw(Func<dynamic, object> spec) => Raw(spec);
+
+    /// <inheritdoc/>
+    public virtual RawCommand Raw(Func<dynamic, string> spec) => new(Connection, spec);
+    IRawCommand IRecordsGate.Raw(Func<dynamic, string> spec) => Raw(spec);
+
+    /// <inheritdoc/>
+    public virtual UpdateCommand Update(Func<dynamic, object> table) => new(Connection, table);
+    IUpdateCommand IRecordsGate.Update(Func<dynamic, object> table) => Update(table);
+
+    /// <inheritdoc/>
+    public virtual UpdateCommand Update(Func<dynamic, string> table) => new(Connection, table);
+    IUpdateCommand IRecordsGate.Update(Func<dynamic, string> table) => Update(table);
 }
