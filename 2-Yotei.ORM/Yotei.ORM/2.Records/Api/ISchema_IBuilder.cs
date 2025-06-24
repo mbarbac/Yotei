@@ -1,8 +1,8 @@
-﻿using IHost = Yotei.ORM.ISchema;
-using IItem = Yotei.ORM.ISchemaEntry;
+﻿using IHost = Yotei.ORM.Records.ISchema;
+using IItem = Yotei.ORM.Records.ISchemaEntry;
 using TKey = Yotei.ORM.IIdentifier;
 
-namespace Yotei.ORM;
+namespace Yotei.ORM.Records;
 
 partial interface ISchema
 {

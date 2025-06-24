@@ -1,7 +1,7 @@
 ﻿using static Yotei.Tools.Diagnostics.ConsoleEx;
 using static System.ConsoleColor;
 
-using Tags = Yotei.ORM.Code.IdentifierTags;
+using Tags = Yotei.ORM.Records.Code.IdentifierTags;
 
 namespace Yotei.ORM.Tests.Records;
 

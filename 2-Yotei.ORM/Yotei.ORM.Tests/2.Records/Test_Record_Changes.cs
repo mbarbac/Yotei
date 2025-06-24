@@ -3,8 +3,8 @@
 using static Yotei.Tools.Diagnostics.ConsoleEx;
 using static System.ConsoleColor;
 
-using Record = Yotei.ORM.Code.Record;
-using Entry = Yotei.ORM.Code.SchemaEntry;
+using Record = Yotei.ORM.Records.Code.Record;
+using Entry = Yotei.ORM.Records.Code.SchemaEntry;
 
 namespace Yotei.ORM.Tests.Records;
 

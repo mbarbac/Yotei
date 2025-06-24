@@ -1,4 +1,4 @@
-﻿namespace Yotei.ORM.Code;
+﻿namespace Yotei.ORM.Records.Code;
 
 partial class MetadataTag
 {

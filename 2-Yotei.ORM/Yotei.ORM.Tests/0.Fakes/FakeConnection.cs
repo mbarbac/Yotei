@@ -2,7 +2,7 @@
 
 // ========================================================
 [Cloneable]
-public partial class FakeConnection : Code.Connection
+public partial class FakeConnection : Connection
 {
     public FakeConnection(IEngine engine) : base(engine) { }
     protected FakeConnection(FakeConnection source) : base(source) { }

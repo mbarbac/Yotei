@@ -1,7 +1,7 @@
 ﻿#pragma warning disable IDE0079
 #pragma warning disable CA1816
 
-namespace Yotei.ORM.Code;
+namespace Yotei.ORM.Records.Code;
 
 // ========================================================
 /// <inheritdoc cref="ICommandEnumerator{T}"/>
