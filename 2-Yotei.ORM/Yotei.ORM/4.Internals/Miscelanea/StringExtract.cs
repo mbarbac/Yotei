@@ -6,7 +6,7 @@ using Parts = (string Left, string? Right);
 namespace Yotei.ORM.Internals;
 
 // ========================================================
-public static partial class StringExtensions
+public static class StringExtract
 {
     /// <summary>
     /// Extracts the left and right parts of the given source, provided they are separated by the
