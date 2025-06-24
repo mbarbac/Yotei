@@ -24,6 +24,9 @@ public static partial class FragmentSetter
         /// <param name="body"></param>
         public Entry(Master master, IDbToken body) : base(master, body)
         {
+            StrTarget = null;
+            StrValue = null;
+
             switch (body)
             {
                 case DbTokenLiteral literal:

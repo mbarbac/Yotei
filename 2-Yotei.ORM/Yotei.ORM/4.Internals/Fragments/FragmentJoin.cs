@@ -26,6 +26,7 @@ public static partial class FragmentJoin
             string? temp;
             string main = literal.Value.Trim();
 
+            Condition = null;
             var parts = main.ExtractLeftRight(" ON ", sensitive: false, out var found);
             if (found)
             {
@@ -36,6 +37,7 @@ public static partial class FragmentJoin
             if (main.EndsWith(" ON", StringComparison.OrdinalIgnoreCase))
                 throw new ArgumentException("Body cannot end with 'ON'").WithData(body);
 
+            Alias = null;
             parts = main.ExtractLeftRight(" AS ", sensitive: false, out found);
             if (found)
             {
@@ -46,6 +48,7 @@ public static partial class FragmentJoin
             if (main.EndsWith(" AS", StringComparison.OrdinalIgnoreCase))
                 throw new ArgumentException("Body cannot end with 'AS'").WithData(body);
 
+            JoinType = null;
             main = main.Trim();
             temp = "JOIN "; if (TryExtractFirst(ref main, ref temp, false)) JoinType = temp;
             temp = "INNER JOIN "; if (TryExtractFirst(ref main, ref temp, false)) JoinType = temp;
@@ -104,7 +107,7 @@ public static partial class FragmentJoin
         public IDbToken? Condition
         {
             get => _Condition;
-            init => _Condition = value.ThrowWhenNull();
+            init => _Condition = value?.ThrowWhenNull();
         }
         internal IDbToken? _Condition;
 

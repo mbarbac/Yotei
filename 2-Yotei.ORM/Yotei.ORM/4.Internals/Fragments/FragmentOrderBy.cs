@@ -1,19 +1,20 @@
 ﻿namespace Yotei.ORM.Internals;
 
 /// <summary>
-///  Represents the ability of parsing FROM clauses.
-/// <br/>- Standard syntax: 'x => x.Source'.
-/// <br/>- Alternate syntax: 'x => x.Source.As(...)'.
+///  Represents the ability of parsing ORDER BY clauses.
+/// <br/>- Standard syntax: 'x => Element'.
+/// <br/>- Alternate syntax: 'x => Element.Ordering()', where 'Ordering' can be: ASCENDING,
+/// ASC, DESCENDING, DESC.
 /// </summary>
 /// <remarks>
-/// FROM clauses accept complex specifications:
-/// <br/>- Example: 'FROM (SELECT [Id], [Age] FROM Other) AS Another, ...'
+/// ORDER BY clauses accept complex specifications:
+/// <br/>- Example: 'ORDER BY CASE WHEN class IN('A', 'B') THEN 1 ELSE 2 END, ...'
 /// </remarks>
-public static partial class FragmentFrom
+public static partial class FragmentOrderBy
 {
     // ====================================================
     /// <summary>
-    /// Represents an entry in a collection of fragments used to build a FROM clause.
+    /// Represents an entry in a collection of fragments used to build a ORDER BY clause.
     /// </summary>
     [Cloneable]
     public partial class Entry : Fragment.Entry
@@ -27,57 +28,60 @@ public static partial class FragmentFrom
         {
             if (body is not DbTokenLiteral literal) return;
 
-            Alias = null;
-            var (main, alias) = literal.Value.Trim().ExtractMainAlias(Engine, out var found);
-            if (found)
-            {
-                Body = new DbTokenLiteral(main.NotNullNotEmpty());
-                Alias = alias.NotNullNotEmpty();
-            }
+            string value;
+            string main = literal.Value.Trim();
+
+            Ordering = null;
+            value = " ASC"; if (TryExtractLast(ref main, ref value, false)) Ordering = value;
+            value = " ASCENDING"; if (TryExtractLast(ref main, ref value, false)) Ordering = value;
+            value = " DESC"; if (TryExtractLast(ref main, ref value, false)) Ordering = value;
+            value = " DESCENDING"; if (TryExtractLast(ref main, ref value, false)) Ordering = value;
+
+            if (Ordering is not null) Body = new DbTokenLiteral(main);
         }
 
         /// <summary>
         /// Copy constructor.
         /// </summary>
         /// <param name="source"></param>
-        protected Entry(Entry source) : base(source) => Alias = source.Alias;
+        protected Entry(Entry source) : base(source) => Ordering = source.Ordering;
 
         /// <summary>
-        /// The alias that qualifies the source (Body), or null if any.
+        /// The order specification, or null if any.
         /// </summary>
-        public string? Alias
+        public string? Ordering
         {
-            get => _Alias;
-            init => _Alias = value?.NotNullNotEmpty();
+            get => _Order;
+            init => _Order = value?.NotNullNotEmpty();
         }
-        internal string? _Alias;
+        internal string? _Order;
 
         // ------------------------------------------------
 
         /// <inheritdoc/>
-        public override string ToString() => Alias is null
+        public override string ToString() => Ordering is null
             ? Body.ToString()!
-            : $"{Body} AS {Alias}";
+            : $"{Body} {Ordering}";
 
         /// <inheritdoc/>
         protected override ICommandInfo.IBuilder VisitBody(DbTokenVisitor visitor)
         {
             var builder = visitor.Visit(Body);
 
-            if (Alias is not null) builder.ReplaceText($"{builder.Text} AS {Alias}");
+            if (Ordering is not null) builder.ReplaceText($"{builder.Text} {Ordering}");
             return builder;
         }
     }
 
     // ====================================================
     /// <summary>
-    /// Represents the collection of fragments used to build a FROM clause.
+    /// Represents the collection of fragments used to build a ORDER BY clause.
     /// </summary>
     [Cloneable]
     public partial class Master : Fragment.Master
     {
         /// <inheritdoc/>
-        public override string CLAUSE { get; set; } = "FROM";
+        public override string CLAUSE { get; set; } = "ORDER BY";
 
         /// <summary>
         /// Initializes a new instance.
@@ -108,12 +112,15 @@ public static partial class FragmentFrom
         /// <inheritdoc/>
         protected override Entry OnCreate(DbTokenInvoke? head, IDbToken body, DbTokenInvoke? tail)
         {
-            // Intercepting 'As(...)'...
-            string? alias = null;
+            // Intercepting 'Order(...)'...
+            string? order = null;
             var item = body.RemoveFirst(x =>
             {
                 if (x is not DbTokenMethod method) return false;
-                if (method.Name.ToUpper() is not "AS") return false;
+                if (method.Name.ToUpper()
+                    is not "ASC" and not "ASCENDING"
+                    and not "DESC" and not "DESCENDING") return false;
+
                 return true;
             }
             , out var removed);
@@ -128,12 +135,15 @@ public static partial class FragmentFrom
                     $"No type arguments allowed for '{upper}()' virtual method.")
                     .WithData(body);
 
+                if (method.Arguments.Count != 0) throw new ArgumentException(
+                    $"'{upper}()' virtual method must have no arguments.")
+                    .WithData(body);
+
                 if (item is DbTokenArgument) throw new ArgumentException(
                     $"Body after '{upper}()' cannot be empty.")
                     .WithData(body);
 
-                var visitor = Connection.Records.CreateDbTokenVisitor(Command.Locale);
-                alias = visitor.ChainToAlias(method.Arguments);
+                order = upper;
                 body = item;
             }
 
@@ -142,7 +152,7 @@ public static partial class FragmentFrom
 
             if (head is not null) entry._Head = head;
             if (tail is not null) entry._Tail = tail;
-            if (alias is not null) entry._Alias = alias;
+            if (order is not null) entry._Order = order;
             return entry;
         }
 

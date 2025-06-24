@@ -191,7 +191,7 @@ public static partial class Fragment
 
             var engine = Command.Connection.Engine;
             var token = DbLambdaParser.Parse(engine, spec);
-            
+
             var entry = Create(token);
             return entry;
         }
@@ -208,6 +208,7 @@ public static partial class Fragment
         {
             token.ThrowWhenNull();
 
+            // x => x(...)...
             token.ExtractHeadInvokes(out var body, out var head, recurrent: false);
             if (head is not null &&
                 body is DbTokenInvoke bodyHead &&
@@ -215,12 +216,23 @@ public static partial class Fragment
                 bodyHead.Arguments.Count == 1)
                 body = bodyHead.Arguments[0];
 
+            // x => ...x(...)
             body.ExtractTailInvokes(out body, out var tail, recurrent: false);
             if (tail is not null &&
                 body is DbTokenInvoke bodyTail &&
                 bodyTail.Host is DbTokenArgument &&
                 bodyTail.Arguments.Count == 1)
                 body = bodyTail.Arguments[0];
+
+            //  x => x(arg).x
+            if (body is DbTokenArgument &&
+                tail is null &&
+                head is DbTokenInvoke invoke &&
+                invoke.Arguments.Count == 1)
+            {
+                body = invoke.Arguments[0];
+                head = null;
+            }
 
             return OnCreate(head, body, tail);
         }

@@ -112,10 +112,6 @@ public static class Test_FragmentWhere
         builder = master.Visit();
         Assert.Equal("-pre-([Id] = NULL)", builder.Text);
         Assert.Empty(builder.Parameters);
-
-        // Remaining body is empty...
-        try { master.Capture(x => x("-pre-")); Assert.Fail(); }
-        catch (ArgumentException) { }
     }
 
     //[Enforced]
@@ -139,10 +135,6 @@ public static class Test_FragmentWhere
         builder = master.Visit();
         Assert.Equal("([Id] = NULL)-post-", builder.Text);
         Assert.Empty(builder.Parameters);
-
-        // Remaining body is empty...
-        try { master.Capture(x => x("-post-")); Assert.Fail(); }
-        catch (ArgumentException) { }
     }
 
     //[Enforced]

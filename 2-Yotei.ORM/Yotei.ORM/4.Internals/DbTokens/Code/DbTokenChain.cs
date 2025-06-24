@@ -54,7 +54,8 @@ public partial class DbTokenChain : IDbToken
     /// <param name="rounded"></param>
     /// <param name="separator"></param>
     /// <returns></returns>
-    public string ToString(bool rounded, string separator = ", ") => Items.ToString(rounded, separator);
+    public string ToString(
+        bool rounded, string separator = ", ") => Items.ToString(rounded, separator);
 
     // ----------------------------------------------------
 

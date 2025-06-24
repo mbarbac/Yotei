@@ -29,6 +29,7 @@ public static partial class FragmentWhere
                 string value;
                 string main = literal.Value.Trim();
 
+                UseOR = null;
                 value = "OR "; if (TryExtractFirst(ref main, ref value, false)) UseOR = true;
                 value = "AND "; if (TryExtractFirst(ref main, ref value, false)) UseOR = false;
 

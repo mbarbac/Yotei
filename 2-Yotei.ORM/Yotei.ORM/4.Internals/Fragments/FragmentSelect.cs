@@ -28,6 +28,7 @@ public static partial class FragmentSelect
         {
             if (body is not DbTokenLiteral literal) return;
 
+            Alias = null;
             var (main, alias) = literal.Value.Trim().ExtractMainAlias(Engine, out var found);
             if (found)
             {
@@ -35,6 +36,7 @@ public static partial class FragmentSelect
                 Alias = alias.NotNullNotEmpty();
             }
 
+            AllColumns = false;
             main = literal.Value.Trim();
             var value = ".*"; if (TryExtractLast(ref main, ref value, false))
             {
