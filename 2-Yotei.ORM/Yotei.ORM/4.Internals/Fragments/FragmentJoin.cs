@@ -205,15 +205,15 @@ public static partial class FragmentJoin
                 var upper = name.ToUpper();
 
                 if (method.TypeArguments.Length != 0) throw new ArgumentException(
-                    $"No type arguments allowed for '{upper}(...)' virtual method.")
+                    $"No type arguments allowed for '{upper}()' virtual method.")
                     .WithData(body);
 
                 if (method.Arguments.Count != 1) throw new ArgumentException(
-                    $"'{upper}(type)' requieres one and only one argument..")
+                    $"'{upper}()' requieres one and only one argument..")
                     .WithData(body);
 
                 if (item is DbTokenArgument) throw new ArgumentException(
-                    $"Body after '{upper}(type)' cannot be empty.")
+                    $"Body after '{upper}()' cannot be empty.")
                     .WithData(body);
 
                 var visitor = Connection.Records.CreateDbTokenVisitor(Command.Locale);
@@ -239,11 +239,11 @@ public static partial class FragmentJoin
                 var upper = name.ToUpper();
 
                 if (method.TypeArguments.Length != 0) throw new ArgumentException(
-                    $"No type arguments allowed for '{upper}(...)' virtual method.")
+                    $"No type arguments allowed for '{upper}()' virtual method.")
                     .WithData(body);
 
                 if (item is DbTokenArgument) throw new ArgumentException(
-                    $"Body after '{upper}(type)' cannot be empty.")
+                    $"Body after '{upper}()' cannot be empty.")
                     .WithData(body);
 
                 var visitor = Connection.Records.CreateDbTokenVisitor(Command.Locale);
@@ -268,15 +268,15 @@ public static partial class FragmentJoin
                 var upper = name.ToUpper();
 
                 if (method.TypeArguments.Length != 0) throw new ArgumentException(
-                    $"No type arguments allowed for '{upper}(...)' virtual method.")
+                    $"No type arguments allowed for '{upper}()' virtual method.")
                     .WithData(body);
 
                 if (method.Arguments.Count != 1) throw new ArgumentException(
-                    $"'{upper}(type)' requieres one and only one argument..")
+                    $"'{upper}()' requieres one and only one argument..")
                     .WithData(body);
 
                 if (item is DbTokenArgument) throw new ArgumentException(
-                    $"Body after '{upper}(type)' cannot be empty.")
+                    $"Body after '{upper}()' cannot be empty.")
                     .WithData(body);
 
                 condition = method.Arguments[0];

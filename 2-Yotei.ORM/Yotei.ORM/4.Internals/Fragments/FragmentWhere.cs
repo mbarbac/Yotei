@@ -144,13 +144,13 @@ public static partial class FragmentWhere
                 var upper = name.ToUpper();
 
                 if (method.TypeArguments.Length != 0) throw new ArgumentException(
-                    $"No type arguments allowed for '{upper}(...)' virtual method.")
+                    $"No type arguments allowed for '{upper}()' virtual method.")
                     .WithData(body);
 
                 if (method.Arguments.Count == 1)
                 {
                     if (item is not DbTokenArgument) throw new ArgumentException(
-                        $"Remaining after '{upper}(arg)' must be empty.")
+                        $"Remaining after '{upper}()' must be empty.")
                         .WithData(body);
 
                     if (upper == "OR") useOr = true;

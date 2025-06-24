@@ -5,14 +5,14 @@ namespace Yotei.ORM.Tests.Internals;
 
 // ========================================================
 //[Enforced]
-public static class Test_FragmentSelect
+public static class Test_FragmentFrom
 {
     //[Enforced]
     [Fact]
     public static void Test_Literal_Simple()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentSelect.Master master;
+        FragmentFrom.Master master;
         ICommandInfo.IBuilder builder;
 
         master = new(command);
@@ -25,18 +25,8 @@ public static class Test_FragmentSelect
         master = new(command);
         master.Capture(x => "Employees as Emp");
         Assert.Single(master);
-        Assert.Equal("Emp", ((FragmentSelect.Entry)master[0]).Alias);
         builder = master.Visit();
         Assert.Equal("Employees AS Emp", builder.Text);
-        Assert.Empty(builder.Parameters);
-
-        master = new(command);
-        master.Capture(x => "Employees.* AS Emp");
-        Assert.Single(master);
-        Assert.Equal("Emp", ((FragmentSelect.Entry)master[0]).Alias);
-        Assert.True(((FragmentSelect.Entry)master[0]).AllColumns);
-        builder = master.Visit();
-        Assert.Equal("Employees.* AS Emp", builder.Text);
         Assert.Empty(builder.Parameters);
     }
 
@@ -45,15 +35,15 @@ public static class Test_FragmentSelect
     public static void Test_Literal_Many()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentSelect.Master master;
+        FragmentFrom.Master master;
         ICommandInfo.IBuilder builder;
 
         master = new(command);
-        master.Capture(x => "Employees.*");
-        master.Capture(x => "Countries as Ctry");
+        master.Capture(x => "Employees");
+        master.Capture(x => "Countries AS Ctry");
         Assert.Equal(2, master.Count);
         builder = master.Visit();
-        Assert.Equal("Employees.*, Countries AS Ctry", builder.Text);
+        Assert.Equal("Employees, Countries AS Ctry", builder.Text);
         Assert.Empty(builder.Parameters);
     }
 
@@ -69,7 +59,7 @@ public static class Test_FragmentSelect
         try { master.Capture(x => x.As(x.Emp)); Assert.Fail(); }
         catch (ArgumentException) { }
 
-        try { master.Capture(x => x.Employees.As()); Assert.Fail(); }
+        try { master.Capture(x => x.Id.As()); Assert.Fail(); }
         catch (ArgumentException) { }
     }
 
@@ -80,7 +70,7 @@ public static class Test_FragmentSelect
     public static void Test_Expression_Simple()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentSelect.Master master;
+        FragmentFrom.Master master;
         ICommandInfo.IBuilder builder;
 
         master = new(command);
@@ -89,13 +79,6 @@ public static class Test_FragmentSelect
         builder = master.Visit();
         Assert.Equal("[Employees] AS [Emp]", builder.Text);
         Assert.Empty(builder.Parameters);
-
-        master = new(command);
-        master.Capture(x => x.Employees.As(x.Emp).All());
-        Assert.Single(master);
-        builder = master.Visit();
-        Assert.Equal("[Employees].* AS [Emp]", builder.Text);
-        Assert.Empty(builder.Parameters);
     }
 
     //[Enforced]
@@ -103,7 +86,7 @@ public static class Test_FragmentSelect
     public static void Test_Expression_Simple_WithHead()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentSelect.Master master;
+        FragmentFrom.Master master;
         ICommandInfo.IBuilder builder;
 
         master = new(command);
@@ -119,7 +102,7 @@ public static class Test_FragmentSelect
     public static void Test_Expression_Simple_WithTail()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentSelect.Master master;
+        FragmentFrom.Master master;
         ICommandInfo.IBuilder builder;
 
         master = new(command);
@@ -132,10 +115,10 @@ public static class Test_FragmentSelect
 
     //[Enforced]
     [Fact]
-    public static void Test_Expression_Simple_WithHeadTail()
+    public static void Test_Expression_Simple_WithHeadAndTail()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentSelect.Master master;
+        FragmentFrom.Master master;
         ICommandInfo.IBuilder builder;
 
         master = new(command);
@@ -165,15 +148,15 @@ public static class Test_FragmentSelect
     public static void Test_Expression_Many()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentSelect.Master master;
+        FragmentFrom.Master master;
         ICommandInfo.IBuilder builder;
 
         master = new(command);
-        master.Capture(x => x.Employees.All());
+        master.Capture(x => x.Employees);
         master.Capture(x => x.Countries.As(x.Ctry));
         Assert.Equal(2, master.Count);
         builder = master.Visit();
-        Assert.Equal("[Employees].*, [Countries] AS [Ctry]",builder.Text);
+        Assert.Equal("[Employees], [Countries] AS [Ctry]", builder.Text);
         Assert.Empty(builder.Parameters);
     }
 
@@ -184,11 +167,11 @@ public static class Test_FragmentSelect
     public static void Test_Clone()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentSelect.Master master;
+        FragmentFrom.Master master;
         ICommandInfo.IBuilder builder;
 
         master = new(command);
-        master.Capture(x => x.Employees.All());
+        master.Capture(x => x.Employees);
         master.Capture(x => x.Countries.As(x.Ctry));
         Assert.Equal(2, master.Count);
 
@@ -197,7 +180,7 @@ public static class Test_FragmentSelect
         Assert.Equal(2, target.Count);
         foreach (var item in target) Assert.Same(target, item.Master);
         builder = target.Visit();
-        Assert.Equal("[Employees].*, [Countries] AS [Ctry]", builder.Text);
+        Assert.Equal("[Employees], [Countries] AS [Ctry]", builder.Text);
         Assert.Empty(builder.Parameters);
     }
 
@@ -206,11 +189,11 @@ public static class Test_FragmentSelect
     public static void Test_Clear()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentSelect.Master master;
+        FragmentFrom.Master master;
         ICommandInfo.IBuilder builder;
 
         master = new(command);
-        master.Capture(x => x.Employees.All());
+        master.Capture(x => x.Employees);
         master.Capture(x => x.Countries.As(x.Ctry));
         Assert.Equal(2, master.Count);
 

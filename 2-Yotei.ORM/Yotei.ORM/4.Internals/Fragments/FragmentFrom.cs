@@ -1,20 +1,19 @@
 ﻿namespace Yotei.ORM.Internals;
 
 /// <summary>
-/// Represents the ability of parsing SELECT clauses.
-/// <br/>- Standard syntax: 'x => x.Element'.
-/// <br/>- Alternate syntax: 'x => x.Element.As(...)'.
-/// <br/>- Alternate syntax: 'x => x.Source.All()'.
+///  Represents the ability of parsing FROM clauses.
+/// <br/>- Standard syntax: 'x => x.Source'.
+/// <br/>- Alternate syntax: 'x => x.Source.As(...)'.
 /// </summary>
 /// <remarks>
-/// SELECT clauses accept complex specifications:
-/// <br/>- Example: 'SELECT SUM([Amount]) AS TotalAmount, ...'
+/// FROM clauses accept complex specifications:
+/// <br/>- Example: 'FROM (SELECT [Id], [Age] FROM Other) AS Another, ...'
 /// </remarks>
-public static partial class FragmentSelect
+public static partial class FragmentFrom
 {
     // ====================================================
     /// <summary>
-    /// Represents an entry in a collection of fragments used to build a SELECT clause.
+    /// Represents an entry in a collection of fragments used to build a FROM clause.
     /// </summary>
     [Cloneable]
     public partial class Entry : Fragment.Entry
@@ -34,34 +33,13 @@ public static partial class FragmentSelect
                 Body = literal = new DbTokenLiteral(main.NotNullNotEmpty());
                 Alias = alias.NotNullNotEmpty();
             }
-
-            main = literal.Value.Trim();
-            var value = ".*"; if (TryExtractLast(ref main, ref value, false))
-            {
-                Body = new DbTokenLiteral(main.NotNullNotEmpty());
-                AllColumns = true;
-            }
         }
 
         /// <summary>
         /// Copy constructor.
         /// </summary>
         /// <param name="source"></param>
-        protected Entry(Entry source) : base(source)
-        {
-            AllColumns = source.AllColumns;
-            Alias = source.Alias;
-        }
-
-        /// <summary>
-        /// Determines if all columns from the given source shall be selected, as in 'Table.*'.
-        /// </summary>
-        public bool AllColumns
-        {
-            get => _AllColumns;
-            init => _AllColumns = value;
-        }
-        internal bool _AllColumns;
+        protected Entry(Entry source) : base(source) => Alias = source.Alias;
 
         /// <summary>
         /// The alias that qualifies the source (Body), or null if any.
@@ -76,35 +54,29 @@ public static partial class FragmentSelect
         // ------------------------------------------------
 
         /// <inheritdoc/>
-        public override string ToString()
-        {
-            var str = Body.ToString()!;
-            if (AllColumns) str += ".*";
-            if (Alias is not null) str += $" AS {Alias}";
-            return str;
-        }
+        public override string ToString() => Alias is null
+            ? Body.ToString()!
+            : $"{Body} AS {Alias}";
 
         /// <inheritdoc/>
         protected override ICommandInfo.IBuilder VisitBody(DbTokenVisitor visitor)
         {
             var builder = visitor.Visit(Body);
 
-            if (AllColumns) builder.ReplaceText($"{builder.Text}.*");
             if (Alias is not null) builder.ReplaceText($"{builder.Text} AS {Alias}");
-
             return builder;
         }
     }
 
     // ====================================================
     /// <summary>
-    /// Represents the collection of fragments used to build a SELECT clause.
+    /// Represents the collection of fragments used to build a FROM clause.
     /// </summary>
     [Cloneable]
     public partial class Master : Fragment.Master
     {
         /// <inheritdoc/>
-        public override string CLAUSE { get; set; } = "SELECT";
+        public override string CLAUSE { get; set; } = "FROM";
 
         /// <summary>
         /// Initializes a new instance.
@@ -135,47 +107,15 @@ public static partial class FragmentSelect
         /// <inheritdoc/>
         protected override Entry OnCreate(DbTokenInvoke? head, IDbToken body, DbTokenInvoke? tail)
         {
-            // Intercepting 'All()'...
-            bool allcolumns = false;
-            var item = body.RemoveFirst(x =>
-            {
-                if (x is not DbTokenMethod method) return false;
-                if (method.Name.ToUpper() is not "ALL") return false;
-                return true;
-            }
-            , out var removed);
-
-            if (removed is not null) // Found...
-            {
-                var method = (DbTokenMethod)removed;
-                var name = method.Name;
-                var upper = name.ToUpper();
-
-                if (method.TypeArguments.Length != 0) throw new ArgumentException(
-                    $"No type arguments allowed for '{upper}()' virtual method.")
-                    .WithData(body);
-
-                if (method.Arguments.Count != 0) throw new ArgumentException(
-                    $"'{upper}()' must be a parameterless method.")
-                    .WithData(body);
-
-                if (item is DbTokenArgument) throw new ArgumentException(
-                    $"Body after '{upper}()' cannot be empty.")
-                    .WithData(body);
-
-                allcolumns = true;
-                body = item;
-            }
-
             // Intercepting 'As(...)'...
             string? alias = null;
-            item = body.RemoveFirst(x =>
+            var item = body.RemoveFirst(x =>
             {
                 if (x is not DbTokenMethod method) return false;
                 if (method.Name.ToUpper() is not "AS") return false;
                 return true;
             }
-            , out removed);
+            , out var removed);
 
             if (removed is not null) // Found...
             {
@@ -201,7 +141,6 @@ public static partial class FragmentSelect
 
             if (head is not null) entry._Head = head;
             if (tail is not null) entry._Tail = tail;
-            if (allcolumns) entry._AllColumns = true;
             if (alias is not null) entry._Alias = alias;
             return entry;
         }
