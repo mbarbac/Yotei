@@ -1,8 +1,6 @@
 ﻿#pragma warning disable IDE0042
 #pragma warning disable IDE0057
 
-using Parts = (string Left, string? Right);
-
 namespace Yotei.ORM.Internals;
 
 // ========================================================
@@ -20,8 +18,9 @@ public static class StringExtract
     /// <param name="sensitive"></param>
     /// <param name="found"></param>
     /// <returns></returns>
-    public static Parts ExtractLeftRight(
-        this string source, string separator, bool sensitive, out bool found)
+    public static (string Left, string? Right) ExtractLeftRight(
+        this string source,
+        string separator, bool sensitive, out bool found)
     {
         source.NotNullNotEmpty(trim: false);
         separator.NotNullNotEmpty(trim: false);
@@ -59,7 +58,9 @@ public static class StringExtract
     /// <param name="separator"></param>
     /// <param name="sensitive"></param>
     /// <returns></returns>
-    public static Parts ExtractLeftRight(this string source, string separator, bool sensitive)
+    public static (string Left, string? Right) ExtractLeftRight(
+        this string source,
+        string separator, bool sensitive)
     {
         return source.ExtractLeftRight(separator, sensitive, out _);
     }
@@ -79,8 +80,9 @@ public static class StringExtract
     /// <param name="engine"></param>
     /// <param name="found"></param>
     /// <returns></returns>
-    public static Parts ExtractLeftRight(
-        this string source, string separator, IEngine engine, out bool found)
+    public static (string Left, string? Right) ExtractLeftRight(
+        this string source,
+        string separator, IEngine engine, out bool found)
     {
         source.NotNullNotEmpty(trim: false);
         separator.NotNullNotEmpty(trim: false);
@@ -129,7 +131,9 @@ public static class StringExtract
     /// <param name="separator"></param>
     /// <param name="engine"></param>
     /// <returns></returns>
-    public static Parts ExtractLeftRight(this string source, string separator, IEngine engine)
+    public static (string Left, string? Right) ExtractLeftRight(
+        this string source,
+        string separator, IEngine engine)
     {
         return source.ExtractLeftRight(separator, engine, out _);
     }
@@ -146,7 +150,9 @@ public static class StringExtract
     /// <param name="sensitive"></param>
     /// <param name="found"></param>
     /// <returns></returns>
-    public static Parts ExtractMainAlias(this string source, bool sensitive, out bool found)
+    public static (string Main, string? Alias) ExtractMainAlias(
+        this string source,
+        bool sensitive, out bool found)
     {
         return source.ExtractLeftRight(" AS ", sensitive, out found);
     }
@@ -160,7 +166,7 @@ public static class StringExtract
     /// <param name="source"></param>
     /// <param name="sensitive"></param>
     /// <returns></returns>
-    public static Parts ExtractMainAlias(this string source, bool sensitive)
+    public static (string Main, string? Alias) ExtractMainAlias(this string source, bool sensitive)
     {
         return source.ExtractLeftRight(" AS ", sensitive, out _);
     }
@@ -177,7 +183,9 @@ public static class StringExtract
     /// <param name="engine"></param>
     /// <param name="found"></param>
     /// <returns></returns>
-    public static Parts ExtractMainAlias(this string source, IEngine engine, out bool found)
+    public static (string Main, string? Alias) ExtractMainAlias(
+        this string source,
+        IEngine engine, out bool found)
     {
         return source.ExtractLeftRight(" AS ", engine, out found);
     }
@@ -193,7 +201,7 @@ public static class StringExtract
     /// <param name="source"></param>
     /// <param name="engine"></param>
     /// <returns></returns>
-    public static Parts ExtractMainAlias(this string source, IEngine engine)
+    public static (string Main, string? Alias) ExtractMainAlias(this string source, IEngine engine)
     {
         return source.ExtractLeftRight(" AS ", engine, out _);
     }
