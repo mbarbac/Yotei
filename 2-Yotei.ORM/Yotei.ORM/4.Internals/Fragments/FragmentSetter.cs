@@ -196,6 +196,9 @@ public static partial class FragmentSetter
                 return builder;
             }
 
+            // No entries, return an empty instance...
+            if (Count == 0) return new CommandInfo.Builder(Engine);
+
             // Elements are wrapped, but we need an additional one if many are involved...
             var builder = Visit(VisitItem);
             if (Count > 1) builder.ReplaceText($"({builder.Text})");
@@ -216,6 +219,9 @@ public static partial class FragmentSetter
                 return builder;
             }
 
+            // No entries, return an empty instance...
+            if (Count == 0) return new CommandInfo.Builder(Engine);
+
             // Elements are not wrapped...
             var builder = Visit(VisitItem);
             builder.ReplaceText($"({builder.Text})");
@@ -235,6 +241,9 @@ public static partial class FragmentSetter
                 var builder = valid.VisitValue(visitor);
                 return builder;
             }
+
+            // No entries, return an empty instance...
+            if (Count == 0) return new CommandInfo.Builder(Engine);
 
             // Elements are not wrapped...
             var builder = Visit(VisitItem);

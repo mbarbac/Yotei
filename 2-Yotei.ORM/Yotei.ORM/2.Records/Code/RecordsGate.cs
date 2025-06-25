@@ -63,6 +63,14 @@ public abstract class RecordsGate : IRecordsGate
     IRawCommand IRecordsGate.Raw(Func<dynamic, string> spec) => Raw(spec);
 
     /// <inheritdoc/>
+    public virtual InsertCommand Insert(Func<dynamic, object> table) => new(Connection, table);
+    IInsertCommand IRecordsGate.Insert(Func<dynamic, object> table) => Insert(table);
+
+    /// <inheritdoc/>
+    public virtual InsertCommand Insert(Func<dynamic, string> table) => new(Connection, table);
+    IInsertCommand IRecordsGate.Insert(Func<dynamic, string> table) => Insert(table);
+
+    /// <inheritdoc/>
     public virtual UpdateCommand Update(Func<dynamic, object> table) => new(Connection, table);
     IUpdateCommand IRecordsGate.Update(Func<dynamic, object> table) => Update(table);
 

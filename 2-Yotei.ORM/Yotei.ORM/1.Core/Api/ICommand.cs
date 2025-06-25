@@ -21,12 +21,14 @@ public partial interface ICommand
 
     /// <summary>
     /// Obtains the information needed to run a command, using its default iterable mode.
+    /// <br/> If the returned instance is an empty one, then the command is not execution ready.
     /// </summary>
     /// <returns></returns>
     ICommandInfo GetCommandInfo();
 
     /// <summary>
     /// Obtains the information needed to run a command, using the given iterable mode.
+    /// <br/> If the returned instance is an empty one, then the command is not execution ready.
     /// </summary>
     /// <param name="iterable"></param>
     /// <returns></returns>

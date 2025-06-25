@@ -74,9 +74,12 @@ public partial class DeleteCommand : EnumerableCommand, IDeleteCommand
     /// <inheritdoc/>
     public override CommandInfo GetCommandInfo(bool iterable)
     {
-        return GetCommandInfo(iterable, validateEmpty: true);
+        var validateEmpty = !IsEmptyValid;
+        return GetCommandInfo(iterable, validateEmpty);
     }
 
+    // Note that 'DeleteCommand' is a special one: it can be valid even if empty, if such is
+    // explicitly allowed...
     CommandInfo GetCommandInfo(bool iterable, bool validateEmpty)
     {
         var heads = _HeadFragment.Visit();

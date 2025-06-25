@@ -96,6 +96,20 @@ public interface IRecordsGate
     IRawCommand Raw(Func<dynamic, string> spec);
 
     /// <summary>
+    /// Returns a new INSERT command associated with the given primary source.
+    /// </summary>
+    /// <param name="table"></param>
+    /// <returns></returns>
+    IInsertCommand Insert(Func<dynamic, object> table);
+
+    /// <summary>
+    /// Returns a new INSERT command associated with the given primary source.
+    /// </summary>
+    /// <param name="table"></param>
+    /// <returns></returns>
+    IInsertCommand Insert(Func<dynamic, string> table);
+
+    /// <summary>
     /// Returns a new UPDATE command associated with the given primary source.
     /// </summary>
     /// <param name="table"></param>

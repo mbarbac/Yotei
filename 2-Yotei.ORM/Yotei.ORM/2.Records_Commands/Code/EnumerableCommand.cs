@@ -40,7 +40,8 @@ public abstract partial class EnumerableCommand : Command, IEnumerableCommand
         var temp = Connection.Records.CreateCommandEnumerator(this, token);
         return temp;
     }
-    IAsyncEnumerator<IRecord?> IAsyncEnumerable<IRecord?>.GetAsyncEnumerator(CancellationToken token) => GetAsyncEnumerator(token);
+    IAsyncEnumerator<IRecord?> IAsyncEnumerable<IRecord?>.GetAsyncEnumerator(
+        CancellationToken token) => GetAsyncEnumerator(token);
 
     /// <inheritdoc/>
     public ICommandEnumerator<T> SelectItems<T>(Func<IRecord, T> converter)
@@ -51,7 +52,8 @@ public abstract partial class EnumerableCommand : Command, IEnumerableCommand
     }
 
     /// <inheritdoc/>
-    public ICommandEnumerator<T> SelectItemsAsync<T>(Func<IRecord, T> converter, CancellationToken token = default)
+    public ICommandEnumerator<T> SelectItemsAsync<T>(
+        Func<IRecord, T> converter, CancellationToken token = default)
     {
         var iter = GetAsyncEnumerator(token);
         var temp = new CommandEnumerator<T>(iter, converter);
