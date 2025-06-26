@@ -104,6 +104,8 @@ public partial class RawCommand : EnumerableCommand, IRawCommand
     public override RawCommand Clear()
     {
         Info.Clear();
+
+        base.Clear();
         return this;
     }
     IRawCommand IRawCommand.Clear() => Clear();

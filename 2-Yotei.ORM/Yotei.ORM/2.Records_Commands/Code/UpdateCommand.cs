@@ -109,7 +109,7 @@ public partial class UpdateCommand : EnumerableCommand, IUpdateCommand
         }
         return this;
     }
-    IUpdateCommand IUpdateCommand.WithHeads<T>(params Func<dynamic, T>[] specs) => WithHeads(specs);
+    IUpdateCommand IUpdateCommand.WithHead<T>(params Func<dynamic, T>[] specs) => WithHeads(specs);
 
     /// <inheritdoc/>
     public virtual UpdateCommand WithTails<T>(params Func<dynamic, T>[] specs)
@@ -122,7 +122,7 @@ public partial class UpdateCommand : EnumerableCommand, IUpdateCommand
         }
         return this;
     }
-    IUpdateCommand IUpdateCommand.WithTails<T>(params Func<dynamic, T>[] specs) => WithTails(specs);
+    IUpdateCommand IUpdateCommand.WithTail<T>(params Func<dynamic, T>[] specs) => WithTails(specs);
 
     /// <inheritdoc/>
     public virtual UpdateCommand Where<T>(params Func<dynamic, T>[] specs)
@@ -158,6 +158,7 @@ public partial class UpdateCommand : EnumerableCommand, IUpdateCommand
         _ColumnsFragment.Clear();
         _WhereFragment.Clear();
 
+        base.Clear();
         return this;
     }
     IUpdateCommand IUpdateCommand.Clear() => Clear();

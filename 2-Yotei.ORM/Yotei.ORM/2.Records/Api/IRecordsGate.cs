@@ -67,7 +67,7 @@ public interface IRecordsGate
     /// <br/>- If the text is null, the it is ignored and the optional arguments are captured
     /// without any attempts of matching their names with any text specification.
     /// <br/>- Similarly, if there are no elements in the optional list of arguments, the text
-    /// is captured without intercepting any dangling spcifications.
+    /// is captured without intercepting any dangling specifications.
     /// <br/>- Otherwise, specifications are always bracket ones, either positional '{n}' ones,
     /// of named '{name}' ones (where name may or may not start with the engine parameters'
     /// prefix). No unused elements in the optional list of arguments are allowed, neither
@@ -94,6 +94,26 @@ public interface IRecordsGate
     /// <param name="spec"></param>
     /// <returns></returns>
     IRawCommand Raw(Func<dynamic, string> spec);
+
+    /// <summary>
+    /// Returns a new QUERY command.
+    /// </summary>
+    /// <returns></returns>
+    IQueryCommand Query();
+
+    /// <summary>
+    /// Returns a new QUERY command with the given specifications of its sources.
+    /// </summary>
+    /// <param name="specs"></param>
+    /// <returns></returns>
+    IQueryCommand From(params Func<dynamic, object>[] specs);
+
+    /// <summary>
+    /// Returns a new QUERY command with the given specifications of its sources.
+    /// </summary>
+    /// <param name="specs"></param>
+    /// <returns></returns>
+    IQueryCommand From(params Func<dynamic, string>[] specs);
 
     /// <summary>
     /// Returns a new INSERT command associated with the given primary source.

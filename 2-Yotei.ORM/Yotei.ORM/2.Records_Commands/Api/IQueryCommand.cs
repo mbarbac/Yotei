@@ -16,7 +16,7 @@ public partial interface IQueryCommand : ICommand, IEnumerableCommand
     /// <typeparam name="T"></typeparam>
     /// <param name="specs"></param>
     /// <returns></returns>
-    IQueryCommand WithHeads<T>(params Func<dynamic, T>[] specs);
+    IQueryCommand WithHead<T>(params Func<dynamic, T>[] specs);
 
     /// <summary>
     /// Adds to the TAIL of this instance the contents obtained from parsing the given dynamic
@@ -26,7 +26,7 @@ public partial interface IQueryCommand : ICommand, IEnumerableCommand
     /// <typeparam name="T"></typeparam>
     /// <param name="specs"></param>
     /// <returns></returns>
-    IQueryCommand WithTails<T>(params Func<dynamic, T>[] specs);
+    IQueryCommand WithTail<T>(params Func<dynamic, T>[] specs);
 
     /// <summary>
     /// Adds to the FROM clause the contents obtained from parsing the given dynamic lambda
@@ -80,6 +80,13 @@ public partial interface IQueryCommand : ICommand, IEnumerableCommand
     /// <param name="specs"></param>
     /// <returns></returns>
     IQueryCommand Select<T>(params Func<dynamic, T>[] specs);
+
+    /// <summary>
+    /// Gets or sets the value of the TOP clause.
+    /// <br/> A negative or cero value means that this clause is ignored.
+    /// <br/> The setter with a positive value clears the SKIP and TAKE ones.
+    /// </summary>
+    [With] int Top { get; set; }
 
     /// <inheritdoc cref="ICommand.Clear"/>
     new IQueryCommand Clear();

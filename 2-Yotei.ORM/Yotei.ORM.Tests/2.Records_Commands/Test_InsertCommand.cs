@@ -32,8 +32,8 @@ public static class Test_InsertCommand
         ICommandInfo info;
 
         command = connection.Records.Insert(x => x.Employees)
-            .WithHeads(x => "-pre-")
-            .WithTails(x => "-post");
+            .WithHead(x => "-pre-")
+            .WithTail(x => "-post");
         info = command.GetCommandInfo();
         Assert.Equal("-pre-INSERT INTO [Employees]-post", info.Text);
         Assert.Empty(info.Parameters);

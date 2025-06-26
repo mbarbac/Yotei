@@ -17,7 +17,7 @@ public partial interface IInsertCommand
     /// <typeparam name="T"></typeparam>
     /// <param name="specs"></param>
     /// <returns></returns>
-    IInsertCommand WithHeads<T>(params Func<dynamic, T>[] specs);
+    IInsertCommand WithHead<T>(params Func<dynamic, T>[] specs);
 
     /// <summary>
     /// Adds to the TAIL of this instance the contents obtained from parsing the given dynamic
@@ -27,7 +27,7 @@ public partial interface IInsertCommand
     /// <typeparam name="T"></typeparam>
     /// <param name="specs"></param>
     /// <returns></returns>
-    IInsertCommand WithTails<T>(params Func<dynamic, T>[] specs);
+    IInsertCommand WithTail<T>(params Func<dynamic, T>[] specs);
 
     /// <summary>
     /// Adds to this instance the specifications of the affected columns.

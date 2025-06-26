@@ -17,7 +17,7 @@ public partial interface IUpdateCommand
     /// <typeparam name="T"></typeparam>
     /// <param name="specs"></param>
     /// <returns></returns>
-    IUpdateCommand WithHeads<T>(params Func<dynamic, T>[] specs);
+    IUpdateCommand WithHead<T>(params Func<dynamic, T>[] specs);
 
     /// <summary>
     /// Adds to the TAIL of this instance the contents obtained from parsing the given dynamic
@@ -27,7 +27,7 @@ public partial interface IUpdateCommand
     /// <typeparam name="T"></typeparam>
     /// <param name="specs"></param>
     /// <returns></returns>
-    IUpdateCommand WithTails<T>(params Func<dynamic, T>[] specs);
+    IUpdateCommand WithTail<T>(params Func<dynamic, T>[] specs);
 
     /// <summary>
     /// Adds to the WHERE clause the contents obtained from parsing the given dynamic lambda

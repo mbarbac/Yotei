@@ -63,6 +63,18 @@ public abstract class RecordsGate : IRecordsGate
     IRawCommand IRecordsGate.Raw(Func<dynamic, string> spec) => Raw(spec);
 
     /// <inheritdoc/>
+    public virtual QueryCommand Query() => new(Connection);
+    IQueryCommand IRecordsGate.Query() => Query();
+
+    /// <inheritdoc/>
+    public virtual QueryCommand Query(params Func<dynamic, object>[] specs) => Query().From(specs);
+    IQueryCommand IRecordsGate.From(params Func<dynamic, object>[] specs) => Query(specs);
+
+    /// <inheritdoc/>
+    public virtual QueryCommand Query(params Func<dynamic, string>[] specs) => Query().From(specs);
+    IQueryCommand IRecordsGate.From(params Func<dynamic, string>[] specs) => Query(specs);
+
+    /// <inheritdoc/>
     public virtual InsertCommand Insert(Func<dynamic, object> table) => new(Connection, table);
     IInsertCommand IRecordsGate.Insert(Func<dynamic, object> table) => Insert(table);
 

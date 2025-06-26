@@ -49,10 +49,10 @@ public partial class DeleteCommand : EnumerableCommand, IDeleteCommand
     protected DeleteCommand(DeleteCommand source) : base(source)
     {
         PrimarySource = source.PrimarySource;
-        IsEmptyValid = source.IsEmptyValid;
         _HeadFragment = source._HeadFragment.Clone();
         _TailFragment = source._TailFragment.Clone();
         _WhereFragment = source._WhereFragment.Clone();
+        IsEmptyValid = source.IsEmptyValid;
     }
 
     /// <inheritdoc/>
@@ -86,7 +86,7 @@ public partial class DeleteCommand : EnumerableCommand, IDeleteCommand
         var tails = _TailFragment.Visit();
         var where = _WhereFragment.Visit();
 
-        if (validateEmpty && where.IsEmpty && !IsEmptyValid) throw new InvalidOperationException(
+        if (validateEmpty && !IsEmptyValid && where.IsEmpty) throw new InvalidOperationException(
             "This DELETE command has not filters, is equivalent to a DELETE ALL one.")
             .WithData(this);
 
@@ -114,7 +114,7 @@ public partial class DeleteCommand : EnumerableCommand, IDeleteCommand
         }
         return this;
     }
-    IDeleteCommand IDeleteCommand.WithHeads<T>(params Func<dynamic, T>[] specs) => WithHeads(specs);
+    IDeleteCommand IDeleteCommand.WithHead<T>(params Func<dynamic, T>[] specs) => WithHeads(specs);
 
     /// <inheritdoc/>
     public virtual DeleteCommand WithTails<T>(params Func<dynamic, T>[] specs)
@@ -127,7 +127,7 @@ public partial class DeleteCommand : EnumerableCommand, IDeleteCommand
         }
         return this;
     }
-    IDeleteCommand IDeleteCommand.WithTails<T>(params Func<dynamic, T>[] specs) => WithTails(specs);
+    IDeleteCommand IDeleteCommand.WithTail<T>(params Func<dynamic, T>[] specs) => WithTails(specs);
 
     /// <inheritdoc/>
     public virtual DeleteCommand Where<T>(params Func<dynamic, T>[] specs)
@@ -151,7 +151,9 @@ public partial class DeleteCommand : EnumerableCommand, IDeleteCommand
         _HeadFragment.Clear();
         _TailFragment.Clear();
         _WhereFragment.Clear();
+        IsEmptyValid = false;
 
+        base.Clear();
         return this;
     }
     IDeleteCommand IDeleteCommand.Clear() => Clear();

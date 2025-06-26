@@ -17,7 +17,7 @@ public partial interface IDeleteCommand
     /// <typeparam name="T"></typeparam>
     /// <param name="specs"></param>
     /// <returns></returns>
-    IDeleteCommand WithHeads<T>(params Func<dynamic, T>[] specs);
+    IDeleteCommand WithHead<T>(params Func<dynamic, T>[] specs);
 
     /// <summary>
     /// Adds to the TAIL of this instance the contents obtained from parsing the given dynamic
@@ -27,7 +27,7 @@ public partial interface IDeleteCommand
     /// <typeparam name="T"></typeparam>
     /// <param name="specs"></param>
     /// <returns></returns>
-    IDeleteCommand WithTails<T>(params Func<dynamic, T>[] specs);
+    IDeleteCommand WithTail<T>(params Func<dynamic, T>[] specs);
 
     /// <summary>
     /// Adds to the WHERE clause the contents obtained from parsing the given dynamic lambda

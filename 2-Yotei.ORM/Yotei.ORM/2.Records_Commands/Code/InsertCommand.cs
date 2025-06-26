@@ -106,7 +106,7 @@ public partial class InsertCommand : EnumerableCommand, IInsertCommand
         }
         return this;
     }
-    IInsertCommand IInsertCommand.WithHeads<T>(params Func<dynamic, T>[] specs) => WithHeads(specs);
+    IInsertCommand IInsertCommand.WithHead<T>(params Func<dynamic, T>[] specs) => WithHeads(specs);
 
     /// <inheritdoc/>
     public virtual InsertCommand WithTails<T>(params Func<dynamic, T>[] specs)
@@ -119,7 +119,7 @@ public partial class InsertCommand : EnumerableCommand, IInsertCommand
         }
         return this;
     }
-    IInsertCommand IInsertCommand.WithTails<T>(params Func<dynamic, T>[] specs) => WithTails(specs);
+    IInsertCommand IInsertCommand.WithTail<T>(params Func<dynamic, T>[] specs) => WithTails(specs);
 
     /// <inheritdoc/>
     public virtual InsertCommand Columns<T>(params Func<dynamic, T>[] specs)
@@ -141,6 +141,7 @@ public partial class InsertCommand : EnumerableCommand, IInsertCommand
         _TailFragment.Clear();
         _ColumnsFragment.Clear();
 
+        base.Clear();
         return this;
     }
     IInsertCommand IInsertCommand.Clear() => Clear();

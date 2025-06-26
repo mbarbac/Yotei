@@ -40,8 +40,8 @@ public static class Test_DeleteCommand
         ICommandInfo info;
 
         command = connection.Records.Delete(x => x.Employees).WithIsEmptyValid(true)
-            .WithHeads(x => "-pre-")
-            .WithTails(x => "-post");
+            .WithHead(x => "-pre-")
+            .WithTail(x => "-post");
         info = command.GetCommandInfo();
         Assert.Equal("-pre-DELETE FROM [Employees]-post", info.Text);
         Assert.Empty(info.Parameters);
