@@ -97,66 +97,6 @@ public static class Test_FragmentSetter
 
     //[Enforced]
     [Fact]
-    public static void Test_With_Head()
-    {
-        var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentSetter.Master master;
-        ICommandInfo.IBuilder builder;
-
-        master = new(command, "SETTER");
-        master.Head = new DbTokenLiteral("-pre-");
-        Assert.Empty(master);
-        Assert.NotNull(master.Head);
-        builder = master.Visit();
-        Assert.Equal("-pre-", builder.Text);
-        Assert.Empty(builder.Parameters);
-        builder = master.VisitNames(); Assert.True(builder.IsEmpty);
-        builder = master.VisitValues(); Assert.True(builder.IsEmpty);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_With_Tail()
-    {
-        var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentSetter.Master master;
-        ICommandInfo.IBuilder builder;
-
-        master = new(command, "SETTER");
-        master.Tail = new DbTokenLiteral("-post-");
-        Assert.Empty(master);
-        Assert.NotNull(master.Tail);
-        builder = master.Visit();
-        Assert.Equal("-post-", builder.Text);
-        Assert.Empty(builder.Parameters);
-        builder = master.VisitNames(); Assert.True(builder.IsEmpty);
-        builder = master.VisitValues(); Assert.True(builder.IsEmpty);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_With_HeadAndTail()
-    {
-        var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentSetter.Master master;
-        ICommandInfo.IBuilder builder;
-
-        master = new(command, "SETTER");
-        master.Head = new DbTokenLiteral("-pre-");
-        master.Tail = new DbTokenLiteral("-post-");
-        Assert.Empty(master);
-        Assert.NotNull(master.Tail);
-        builder = master.Visit();
-        Assert.Equal("-pre--post-", builder.Text);
-        Assert.Empty(builder.Parameters);
-        builder = master.VisitNames(); Assert.True(builder.IsEmpty);
-        builder = master.VisitValues(); Assert.True(builder.IsEmpty);
-    }
-
-    // ----------------------------------------------------
-
-    //[Enforced]
-    [Fact]
     public static void Test_Expression_Not_Supported()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
@@ -290,6 +230,32 @@ public static class Test_FragmentSetter
 
         builder = master.VisitValues();
         Assert.Equal("(#0, #1)", builder.Text);
+        Assert.Equal(2, builder.Parameters.Count);
+        Assert.Equal("James", builder.Parameters[0].Value);
+        Assert.Equal("Bond", builder.Parameters[1].Value);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_With_Terminals()
+    {
+        var command = new FakeCommand(new FakeConnection(new FakeEngine()));
+        FragmentSetter.Master master;
+        ICommandInfo.IBuilder builder;
+
+        master = new(command, "SETTER");
+        master.Head = new DbTokenLiteral("-pre-");
+        master.Tail = new DbTokenLiteral("-post-");
+        master.Capture(x => x.First = "James");
+        master.Capture(x => x.Last = "Bond");
+        Assert.NotNull(master.Head);
+        Assert.NotNull(master.Tail);
+        Assert.Equal(2, master.Count);
+
+        builder = master.Visit();
+        Assert.Equal("-pre-(([First] = #0), ([Last] = #1))-post-", builder.Text);
         Assert.Equal(2, builder.Parameters.Count);
         Assert.Equal("James", builder.Parameters[0].Value);
         Assert.Equal("Bond", builder.Parameters[1].Value);

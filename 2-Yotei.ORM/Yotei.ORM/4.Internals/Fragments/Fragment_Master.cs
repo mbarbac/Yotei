@@ -218,9 +218,9 @@ public static partial class Fragment
         /// <summary>
         /// Invoked to create a suitable entry for this instance based upon the given token.
         /// </summary>
-        /// <param name="token"></param>
+        /// <param name="body"></param>
         /// <returns></returns>
-        public abstract Entry CreateEntry(IDbToken token);
+        public abstract Entry CreateEntry(IDbToken body);
 
         // ------------------------------------------------
 

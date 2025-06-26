@@ -171,7 +171,7 @@ public static partial class FragmentSetter
         }
 
         /// <inheritdoc/>
-        public override Entry CreateEntry(IDbToken token) => new(this, token);
+        public override Entry CreateEntry(IDbToken body) => new(this, body);
 
         // ------------------------------------------------
 
