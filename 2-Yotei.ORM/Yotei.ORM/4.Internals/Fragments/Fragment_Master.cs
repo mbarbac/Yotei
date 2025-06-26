@@ -17,12 +17,12 @@ public static partial class Fragment
         /// <summary>
         /// Initializes a new instance.
         /// </summary>
-        /// <param name="clause"></param>
         /// <param name="command"></param>
-        public Master(string clause, ICommand command)
+        /// <param name="clause"></param>
+        public Master(ICommand command, string clause)
         {
-            Clause = clause.NotNullNotEmpty();
             Command = command.ThrowWhenNull();
+            Clause = clause.NotNullNotEmpty();
         }
 
         /// <summary>
@@ -33,8 +33,8 @@ public static partial class Fragment
         {
             source.ThrowWhenNull();
 
-            Clause = source.Clause;
             Command = source.Command;
+            Clause = source.Clause;
             Head = source.Head?.Clone();
             Tail = source.Tail?.Clone();
 
@@ -235,21 +235,9 @@ public static partial class Fragment
             var visitor = Connection.Records.CreateDbTokenVisitor(Command.Locale);
             var builder = new CommandInfo.Builder(Engine);
 
-            temp = VisitHead(visitor);
-            if (!temp.IsEmpty) builder.Add(temp);
-
-            for (int i = 0; i < Items.Count; i++)
-            {
-                var entry = Items[i];
-                var separator = EntrySeparator(entry);
-
-                if (i > 0 && separator is not null) builder.Add(separator);
-                temp = entry.Visit(visitor);
-                if (!temp.IsEmpty) builder.Add(temp);
-            }
-
-            temp = VisitTail(visitor);
-            if (!temp.IsEmpty) builder.Add(temp);
+            temp = VisitHead(visitor); if (!temp.IsEmpty) builder.Add(temp);
+            temp = VisitEntries(visitor); if (!temp.IsEmpty) builder.Add(temp);
+            temp = VisitTail(visitor); if (!temp.IsEmpty) builder.Add(temp);
 
             return builder;
         }
@@ -259,6 +247,41 @@ public static partial class Fragment
         /// the contents of the previous ones, if any. If <c>null</c>, then it is ignored.
         /// </summary>
         protected virtual string? EntrySeparator(Entry entry) => null;
+
+        /// <summary>
+        /// Invoked to visit the entries of this instance.
+        /// <br/> Returns an empty result if this instance carries no entries.
+        /// </summary>
+        protected virtual ICommandInfo.IBuilder VisitEntries(DbTokenVisitor visitor)
+        {
+            static ICommandInfo.IBuilder VisitEntry(
+                Entry entry,
+                DbTokenVisitor visitor) => entry.Visit(visitor);
+
+            return VisitEntries(visitor, VisitEntry);
+        }
+
+        /// <summary>
+        /// Invoked to visit the entries of this instance using the given delegate per each.
+        /// <br/> Returns an empty result if this instance carries no entries.
+        /// </summary>
+        protected virtual ICommandInfo.IBuilder VisitEntries(
+            DbTokenVisitor visitor,
+            Func<Entry, DbTokenVisitor, ICommandInfo.IBuilder> visitItem)
+        {
+            var builder = new CommandInfo.Builder(Engine);
+
+            for (int i = 0; i < Items.Count; i++)
+            {
+                var entry = Items[i];
+                var separator = EntrySeparator(entry);
+
+                if (i > 0 && separator is not null) builder.Add(separator);
+                var temp = visitItem(entry, visitor);
+                if (!temp.IsEmpty) builder.Add(temp);
+            }
+            return builder;
+        }
 
         /// <summary>
         /// Invoked to visit the head of this instance.
