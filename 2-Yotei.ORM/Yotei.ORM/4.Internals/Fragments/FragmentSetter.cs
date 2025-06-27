@@ -19,9 +19,6 @@ public static partial class FragmentSetter
     [Cloneable]
     public partial class Entry : Fragment.Entry
     {
-        string? StrTarget;
-        string? StrValue;
-
         /// <summary>
         /// Initializes a new instance.
         /// </summary>
@@ -36,16 +33,16 @@ public static partial class FragmentSetter
                 var (target, value) = str.ExtractLeftRight("==", Engine, out var found);
                 if (found)
                 {
-                    StrTarget = target.NotNullNotEmpty(trim: true);
-                    StrValue = value.NotNullNotEmpty(trim: true);
+                    LiteralTarget = target.NotNullNotEmpty(trim: true);
+                    LiteralValue = value.NotNullNotEmpty(trim: true);
                 }
                 else
                 {
                     (target, value) = str.ExtractLeftRight("=", Engine, out found);
                     if (found)
                     {
-                        StrTarget = target.NotNullNotEmpty(trim: true);
-                        StrValue = value.NotNullNotEmpty(trim: true);
+                        LiteralTarget = target.NotNullNotEmpty(trim: true);
+                        LiteralValue = value.NotNullNotEmpty(trim: true);
                     }
                     else
                     {
@@ -73,9 +70,19 @@ public static partial class FragmentSetter
         /// <param name="source"></param>
         protected Entry(Entry source) : base(source)
         {
-            StrTarget = source.StrTarget;
-            StrValue = source.StrValue;
+            LiteralTarget = source.LiteralTarget;
+            LiteralValue = source.LiteralValue;
         }
+
+        /// <summary>
+        /// If not null, then the captured literal acting as this instance's target.
+        /// </summary>
+        public string? LiteralTarget { get; }
+
+        /// <summary>
+        /// If not null, then the captured literal acting as this instance's value.
+        /// </summary>
+        public string? LiteralValue { get; }
 
         // ------------------------------------------------
 
@@ -84,7 +91,7 @@ public static partial class FragmentSetter
         {
             if (Body is DbTokenLiteral)
             {
-                var builder = new CommandInfo.Builder(Engine, $"({StrTarget} = {StrValue})");
+                var builder = new CommandInfo.Builder(Engine, $"({LiteralTarget} = {LiteralValue})");
                 return builder;
             }
             else if (Body is DbTokenSetter setter)
@@ -105,7 +112,7 @@ public static partial class FragmentSetter
         {
             if (Body is DbTokenLiteral)
             {
-                var builder = new CommandInfo.Builder(Engine, StrTarget);
+                var builder = new CommandInfo.Builder(Engine, LiteralTarget);
                 return builder;
             }
             else if (Body is DbTokenSetter setter)
@@ -126,7 +133,7 @@ public static partial class FragmentSetter
         {
             if (Body is DbTokenLiteral)
             {
-                var builder = new CommandInfo.Builder(Engine, StrValue);
+                var builder = new CommandInfo.Builder(Engine, LiteralValue);
                 return builder;
             }
             else if (Body is DbTokenSetter setter)

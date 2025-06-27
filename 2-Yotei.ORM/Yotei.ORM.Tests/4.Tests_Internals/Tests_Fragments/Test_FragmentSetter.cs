@@ -16,6 +16,9 @@ public static class Test_FragmentSetter
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
         FragmentSetter.Master master = new(command, "SETTER");
 
+        try { master.Capture(x => ""); Assert.Fail(); }
+        catch (EmptyException) { }
+
         try { master.Capture(x => "any"); Assert.Fail(); }
         catch (ArgumentException) { }
     }
@@ -26,11 +29,15 @@ public static class Test_FragmentSetter
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
         FragmentSetter.Master master;
+        FragmentSetter.Entry entry;
         ICommandInfo.IBuilder builder;
 
         master = new(command, "SETTER");
         master.Capture(x => "any=other");
         Assert.Single(master);
+        entry = Assert.IsType<FragmentSetter.Entry>(master[0]);
+        Assert.Equal("any", entry.LiteralTarget);
+        Assert.Equal("other", entry.LiteralValue);
         builder = master.Visit();
         Assert.Equal("(any = other)", builder.Text);
         Assert.Empty(builder.Parameters);
@@ -50,11 +57,15 @@ public static class Test_FragmentSetter
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
         FragmentSetter.Master master;
+        FragmentSetter.Entry entry;
         ICommandInfo.IBuilder builder;
 
         master = new(command, "SETTER");
         master.Capture(x => "any == other");
         Assert.Single(master);
+        entry = Assert.IsType<FragmentSetter.Entry>(master[0]);
+        Assert.Equal("any", entry.LiteralTarget);
+        Assert.Equal("other", entry.LiteralValue);
         builder = master.Visit();
         Assert.Equal("(any = other)", builder.Text);
         Assert.Empty(builder.Parameters);
@@ -74,12 +85,19 @@ public static class Test_FragmentSetter
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
         FragmentSetter.Master master;
+        FragmentSetter.Entry entry;
         ICommandInfo.IBuilder builder;
 
         master = new(command, "SETTER");
         master.Capture(x => "First=James");
         master.Capture(x => "Last = Bond");
         Assert.Equal(2, master.Count);
+        entry = Assert.IsType<FragmentSetter.Entry>(master[0]);
+        Assert.Equal("First", entry.LiteralTarget);
+        Assert.Equal("James", entry.LiteralValue);
+        entry = Assert.IsType<FragmentSetter.Entry>(master[1]);
+        Assert.Equal("Last", entry.LiteralTarget);
+        Assert.Equal("Bond", entry.LiteralValue);
         builder = master.Visit();
         Assert.Equal("((First = James), (Last = Bond))", builder.Text);
         Assert.Empty(builder.Parameters);

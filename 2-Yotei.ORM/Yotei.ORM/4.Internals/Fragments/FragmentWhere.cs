@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography;
-
-namespace Yotei.ORM.Internals;
+﻿namespace Yotei.ORM.Internals;
 
 /// <summary>
 /// Represents the ability of parsing WHERE clauses.

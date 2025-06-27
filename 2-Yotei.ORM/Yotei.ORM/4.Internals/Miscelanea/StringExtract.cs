@@ -154,7 +154,24 @@ public static class StringExtract
         this string source,
         bool sensitive, out bool found)
     {
-        return source.ExtractLeftRight(" AS ", sensitive, out found);
+        source.ThrowWhenNull();
+
+        var comparison = StringComparison.OrdinalIgnoreCase;
+        
+        if (source.StartsWith("AS ", comparison)) throw new ArgumentException(
+            "Source cannot start with 'AS '")
+            .WithData(source);
+
+        if (source.EndsWith(" AS", comparison)) throw new ArgumentException(
+            "Source cannot end with 'AS '")
+            .WithData(source);
+
+        var (main, alias) = source.ExtractLeftRight(" AS ", sensitive, out found);        
+        if (main.Trim().Equals("AS", comparison)) throw new ArgumentException(
+            "Source cannot just be 'AS'.")
+            .WithData(source);
+
+        return (main, alias);
     }
 
     /// <summary>
@@ -166,10 +183,9 @@ public static class StringExtract
     /// <param name="source"></param>
     /// <param name="sensitive"></param>
     /// <returns></returns>
-    public static (string Main, string? Alias) ExtractMainAlias(this string source, bool sensitive)
-    {
-        return source.ExtractLeftRight(" AS ", sensitive, out _);
-    }
+    public static (string Main, string? Alias) ExtractMainAlias(
+        this string source, bool sensitive)
+        => source.ExtractMainAlias(sensitive, out _);
 
     /// <summary>
     /// Extracts the 'main' and 'alias' parts of a source "main AS alias" source string. If found,
@@ -187,7 +203,24 @@ public static class StringExtract
         this string source,
         IEngine engine, out bool found)
     {
-        return source.ExtractLeftRight(" AS ", engine, out found);
+        source.ThrowWhenNull();
+
+        var comparison = StringComparison.OrdinalIgnoreCase;
+
+        if (source.StartsWith("AS ", comparison)) throw new ArgumentException(
+            "Source cannot start with 'AS '")
+            .WithData(source);
+
+        if (source.EndsWith(" AS", comparison)) throw new ArgumentException(
+            "Source cannot end with 'AS '")
+            .WithData(source);
+
+        var (main, alias) = source.ExtractLeftRight(" AS ", engine, out found);
+        if (main.Trim().Equals("AS", comparison)) throw new ArgumentException(
+            "Source cannot just be 'AS'.")
+            .WithData(source);
+
+        return (main, alias);
     }
 
     /// <summary>
@@ -201,8 +234,7 @@ public static class StringExtract
     /// <param name="source"></param>
     /// <param name="engine"></param>
     /// <returns></returns>
-    public static (string Main, string? Alias) ExtractMainAlias(this string source, IEngine engine)
-    {
-        return source.ExtractLeftRight(" AS ", engine, out _);
-    }
+    public static (string Main, string? Alias) ExtractMainAlias(
+        this string source, IEngine engine)
+        => source.ExtractMainAlias(engine, out _);
 }

@@ -7,20 +7,26 @@ namespace Yotei.ORM.Tests.Internals;
 
 // ========================================================
 //[Enforced]
-public static class Test_FragmentWhere
+public static class Test_FragmentSelect
 {
     //[Enforced]
     [Fact]
     public static void Test_Literal_Not_Supported()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentWhere.Master master = new(command);
+        FragmentSelect.Master master = new(command);
 
         try { master.Capture(x => ""); Assert.Fail(); }
         catch (EmptyException) { }
 
-        try { master.Capture(x => "OR "); Assert.Fail(); }
-        catch (EmptyException) { }
+        try { master.Capture(x => "AS"); Assert.Fail(); }
+        catch (ArgumentException) { }
+
+        try { master.Capture(x => "Id AS"); Assert.Fail(); }
+        catch (ArgumentException) { }
+
+        try { master.Capture(x => "AS Emp"); Assert.Fail(); }
+        catch (ArgumentException) { }
     }
 
     //[Enforced]
@@ -28,17 +34,38 @@ public static class Test_FragmentWhere
     public static void Test_Literal_Simple()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentWhere.Master master;
-        FragmentWhere.Entry entry;
+        FragmentSelect.Master master;
+        FragmentSelect.Entry entry;
         ICommandInfo.IBuilder builder;
 
+        //master = new(command);
+        //master.Capture(x => "Id");
+        //Assert.Single(master);
+        //entry = Assert.IsType<FragmentSelect.Entry>(master[0]);
+        //Assert.False(entry.AllColumns);
+        //Assert.Null(entry.Alias);
+        //builder = master.Visit();
+        //Assert.Equal("Id", builder.Text);
+        //Assert.Empty(builder.Parameters);
+
         master = new(command);
-        master.Capture(x => "any");
+        master.Capture(x => "Id as [Emp]");
         Assert.Single(master);
-        entry = Assert.IsType<FragmentWhere.Entry>(master[0]);
-        Assert.Null(entry.UseOR);
+        entry = Assert.IsType<FragmentSelect.Entry>(master[0]);
+        Assert.False(entry.AllColumns);
+        Assert.Equal("[Emp]", entry.Alias);
         builder = master.Visit();
-        Assert.Equal("any", builder.Text);
+        Assert.Equal("Id AS [Emp]", builder.Text);
+        Assert.Empty(builder.Parameters);
+
+        master = new(command);
+        master.Capture(x => "Employees.* as Emp");
+        Assert.Single(master);
+        entry = Assert.IsType<FragmentSelect.Entry>(master[0]);
+        Assert.True(entry.AllColumns);
+        Assert.Equal("Emp", entry.Alias);
+        builder = master.Visit();
+        Assert.Equal("Employees.* AS Emp", builder.Text);
         Assert.Empty(builder.Parameters);
     }
 
@@ -47,38 +74,22 @@ public static class Test_FragmentWhere
     public static void Test_Literal_Many()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentWhere.Master master;
-        FragmentWhere.Entry entry;
+        FragmentSelect.Master master;
+        FragmentSelect.Entry entry;
         ICommandInfo.IBuilder builder;
 
         master = new(command);
-        master.Capture(x => "any");
-        master.Capture(x => "other");
+        master.Capture(x => "Employees.*");
+        master.Capture(x => "Country.Id as Ctry");
         Assert.Equal(2, master.Count);
-        entry = Assert.IsType<FragmentWhere.Entry>(master[0]); Assert.Null(entry.UseOR);
-        entry = Assert.IsType<FragmentWhere.Entry>(master[1]); Assert.Null(entry.UseOR);
+        entry = Assert.IsType<FragmentSelect.Entry>(master[0]);
+        Assert.True(entry.AllColumns);
+        Assert.Null(entry.Alias);
+        entry = Assert.IsType<FragmentSelect.Entry>(master[1]);
+        Assert.False(entry.AllColumns);
+        Assert.Equal("Ctry", entry.Alias);
         builder = master.Visit();
-        Assert.Equal("anyother", builder.Text);
-        Assert.Empty(builder.Parameters);
-
-        master = new(command);
-        master.Capture(x => "any");
-        master.Capture(x => "and other");
-        Assert.Equal(2, master.Count);
-        entry = Assert.IsType<FragmentWhere.Entry>(master[0]); Assert.Null(entry.UseOR);
-        entry = Assert.IsType<FragmentWhere.Entry>(master[1]); Assert.False(entry.UseOR);
-        builder = master.Visit();
-        Assert.Equal("any AND other", builder.Text);
-        Assert.Empty(builder.Parameters);
-
-        master = new(command);
-        master.Capture(x => "any");
-        master.Capture(x => "or other");
-        Assert.Equal(2, master.Count);
-        entry = Assert.IsType<FragmentWhere.Entry>(master[0]); Assert.Null(entry.UseOR);
-        entry = Assert.IsType<FragmentWhere.Entry>(master[1]); Assert.True(entry.UseOR);
-        builder = master.Visit();
-        Assert.Equal("any OR other", builder.Text);
+        Assert.Equal("Employees.*, Country.Id AS Ctry", builder.Text);
         Assert.Empty(builder.Parameters);
     }
 
@@ -86,43 +97,66 @@ public static class Test_FragmentWhere
 
     //[Enforced]
     [Fact]
-    public static void Test_Expression_Simple_NullValue()
+    public static void Test_Expression_Not_Supported()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentWhere.Master master;
-        ICommandInfo.IBuilder builder;
+        FragmentSelect.Master master = new(command);
 
-        master = new(command);
-        master.Capture(x => x.Id == null);
-        Assert.Single(master);
-        builder = master.Visit();
-        Assert.Equal("([Id] IS NULL)", builder.Text);
-        Assert.Empty(builder.Parameters);
+        try { master.Capture(x => x.As(x.Emp)); Assert.Fail(); }
+        catch (ArgumentException) { }
+
+        try { master.Capture(x => x.Employees.As()); Assert.Fail(); }
+        catch (ArgumentException) { }
     }
 
     //[Enforced]
     [Fact]
-    public static void Test_Expression_Simple_Valued()
+    public static void Test_Expression_Simple()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentWhere.Master master;
+        FragmentSelect.Master master;
+        FragmentSelect.Entry entry;
         ICommandInfo.IBuilder builder;
 
         master = new(command);
-        master.Capture(x => x.Id == "007");
+        master.Capture(x => x.Id);
         Assert.Single(master);
+        entry = Assert.IsType<FragmentSelect.Entry>(master[0]);
+        Assert.False(entry.AllColumns);
+        Assert.Null(entry.Alias);
         builder = master.Visit();
-        Assert.Equal("([Id] = #0)", builder.Text);
-        Assert.Single(builder.Parameters);
-        Assert.Equal("007", builder.Parameters[0].Value);
+        Assert.Equal("[Id]", builder.Text);
+        Assert.Empty(builder.Parameters);
+
+        master = new(command);
+        master.Capture(x => x.Id.As(x.Emp));
+        Assert.Single(master);
+        entry = Assert.IsType<FragmentSelect.Entry>(master[0]);
+        Assert.False(entry.AllColumns);
+        Assert.Equal("[Emp]", entry.Alias);
+        builder = master.Visit();
+        Assert.Equal("[Id] AS [Emp]", builder.Text);
+        Assert.Empty(builder.Parameters);
+
+        master = new(command);
+        master.Capture(x => x.Employees.As(x.Emp).All());
+        Assert.Single(master);
+        entry = Assert.IsType<FragmentSelect.Entry>(master[0]);
+        Assert.True(entry.AllColumns);
+        Assert.Equal("[Emp]", entry.Alias);
+        builder = master.Visit();
+        Assert.Equal("[Employees].* AS [Emp]", builder.Text);
+        Assert.Empty(builder.Parameters);
     }
+
+    /*
 
     //[Enforced]
     [Fact]
     public static void Test_Expression_Alternate_NullValue()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentWhere.Master master;
+        FragmentSelect.Master master;
         ICommandInfo.IBuilder builder;
 
         master = new(command);
@@ -139,7 +173,7 @@ public static class Test_FragmentWhere
     public static void Test_Expression_Alternate_Valued()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentWhere.Master master;
+        FragmentSelect.Master master;
         ICommandInfo.IBuilder builder;
 
         master = new(command);
@@ -157,7 +191,7 @@ public static class Test_FragmentWhere
     public static void Test_Expression_Many_NoConnector()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentWhere.Master master;
+        FragmentSelect.Master master;
         ICommandInfo.IBuilder builder;
 
         master = new(command);
@@ -176,7 +210,7 @@ public static class Test_FragmentWhere
     public static void Test_Expression_Many_WithConnector()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentWhere.Master master;
+        FragmentSelect.Master master;
         ICommandInfo.IBuilder builder;
 
         master = new(command);
@@ -205,7 +239,7 @@ public static class Test_FragmentWhere
     public static void Test_With_Terminals()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentWhere.Master master;
+        FragmentSelect.Master master;
         ICommandInfo.IBuilder builder;
 
         master = new(command);
@@ -229,7 +263,7 @@ public static class Test_FragmentWhere
     public static void Test_Clone()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentWhere.Master master = new(command);
+        FragmentSelect.Master master = new(command);
 
         master.Capture(x => x.Id == null);
         master.Capture(x => x.Or(x.Age >= 50));
@@ -251,7 +285,7 @@ public static class Test_FragmentWhere
     public static void Test_Clear()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
-        FragmentWhere.Master master = new(command);
+        FragmentSelect.Master master = new(command);
 
         master.Capture(x => x.Id == null);
         master.Capture(x => x.Or(x.Age >= 50));
@@ -265,4 +299,5 @@ public static class Test_FragmentWhere
         var builder = master.Visit();
         Assert.True(builder.IsEmpty);
     }
+    */
 }

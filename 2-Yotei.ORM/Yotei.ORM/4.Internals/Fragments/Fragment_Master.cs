@@ -84,6 +84,11 @@ public static partial class Fragment
             Tail = null;
         }
 
+        /// <summary>
+        /// Determines if this instance is an empty one, or not.
+        /// </summary>
+        public bool IsEmpty => Count == 0 && Head is null && Tail is null;
+
         // ------------------------------------------------
 
         /// <summary>
@@ -194,8 +199,6 @@ public static partial class Fragment
         /// <returns></returns>
         public virtual Entry Capture<T>(Func<dynamic, T> spec)
         {
-            spec.ThrowWhenNull();
-
             var entry = CreateEntry(spec);
             Add(entry);
             return entry;
