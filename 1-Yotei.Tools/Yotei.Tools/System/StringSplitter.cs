@@ -32,6 +32,9 @@ public static class StringSplitterExtensions
 /// <br/> The class aligns with the 'string.Split()' family of methods' behavior, but accepts a
 /// custom string comparison, produces span-alike results, and the separators are also produced
 /// as valid results by default.
+/// <para>
+/// If <see cref="OmitSeparators"/> equals <c>true</c> and <see cref="OmitEmptyEntries"/>
+/// equals <c>false</c>, then it mimics the standard string's split behavior.</para>
 /// </summary>
 public record class StringSplitter : IEnumerable<ReadOnlyMemory<char>>, IEnumerator<ReadOnlyMemory<char>>
 {

@@ -5,7 +5,7 @@ namespace Yotei.ORM.Tests.Internals;
 
 // ========================================================
 //[Enforced]
-public static class Test_StringIsolated
+public static class Test_StringFindIsolated
 {
     //[Enforced]
     [Fact]

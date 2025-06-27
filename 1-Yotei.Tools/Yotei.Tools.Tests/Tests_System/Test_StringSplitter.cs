@@ -23,7 +23,7 @@ public static class Test_StringSplitter
     {
         string source = "";
 
-        string[] items = source.Split("..");
+        string[] items = source.Split(".."); // Standard string behavior...
         Assert.Single(items);
         Assert.Equal("", items[0]);
 
@@ -43,7 +43,7 @@ public static class Test_StringSplitter
     {
         string source = "ab";
 
-        string[] items = source.Split("..");
+        string[] items = source.Split(".."); // Standard string behavior...
         Assert.Single(items);
         Assert.Equal("ab", items[0]);
 
@@ -59,7 +59,7 @@ public static class Test_StringSplitter
     {
         string source = "..";
 
-        string[] items = source.Split("..");
+        string[] items = source.Split(".."); // Standard string behavior...
         Assert.Equal(2, items.Length);
         Assert.Equal("", items[0]);
         Assert.Equal("", items[1]);
@@ -87,7 +87,7 @@ public static class Test_StringSplitter
     {
         string source = "..ab";
 
-        string[] items = source.Split("..");
+        string[] items = source.Split(".."); // Standard string behavior...
         Assert.Equal(2, items.Length);
         Assert.Equal("", items[0]);
         Assert.Equal("ab", items[1]);
@@ -117,7 +117,7 @@ public static class Test_StringSplitter
     {
         string source = "ab..";
 
-        string[] items = source.Split("..");
+        string[] items = source.Split(".."); // Standard string behavior...
         Assert.Equal(2, items.Length);
         Assert.Equal("ab", items[0]);
         Assert.Equal("", items[1]);
@@ -147,7 +147,7 @@ public static class Test_StringSplitter
     {
         string source = "ab....ef";
 
-        string[] items = source.Split("..");
+        string[] items = source.Split(".."); // Standard string behavior...
         Assert.Equal(3, items.Length);
         Assert.Equal("ab", items[0]);
         Assert.Equal("", items[1]);
@@ -162,15 +162,14 @@ public static class Test_StringSplitter
         Assert.Equal("..", items[3]);
         Assert.Equal("ef", items[4]);
 
-        iter = iter with { OmitEmptyEntries = true };
-        items = iter.Select(x => x.ToString()).ToArray();
-        Assert.Equal(4, items.Length);
-        Assert.Equal("ab", items[0]);
-        Assert.Equal("..", items[1]);
-        Assert.Equal("..", items[2]);
-        Assert.Equal("ef", items[3]);
-
         iter = iter with { OmitSeparators = true };
+        items = iter.Select(x => x.ToString()).ToArray();
+        Assert.Equal(3, items.Length);
+        Assert.Equal("ab", items[0]);
+        Assert.Equal("", items[1]);
+        Assert.Equal("ef", items[2]);
+
+        iter = iter with { OmitEmptyEntries = true };
         items = iter.Select(x => x.ToString()).ToArray();
         Assert.Equal(2, items.Length);
         Assert.Equal("ab", items[0]);
