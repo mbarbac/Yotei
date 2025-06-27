@@ -191,7 +191,6 @@ public static partial class FragmentWhere
 
             // Finishing...
             var entry = new Entry(this, body);
-
             if (useOr is not null) entry._UseOR = useOr;
             return entry;
         }

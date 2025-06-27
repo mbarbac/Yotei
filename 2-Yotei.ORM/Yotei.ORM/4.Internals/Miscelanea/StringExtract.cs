@@ -132,16 +132,23 @@ public static class StringExtract
             throw new InvalidOperationException("Invalid separator.").WithData(separator);
 
         var (main, alias) = source.ExtractLeftRight(separator, sensitive, out found);
-        main.NotNullNotEmpty();
-        alias?.NotNullNotEmpty();
+        main = main.NotNullNotEmpty();
+        alias = alias?.NotNullNotEmpty();
 
-        separator = separator.Trim();
-        var temp = main.Trim();
-        if (string.Compare(temp, separator, !sensitive) == 0)
-            throw new ArgumentException(
-                $"Source resolves into a '{separator}'-alike element.")
-                .WithData(source);
-        
+        var comparison = sensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+
+        var xseparator = separator.AsSpan().TrimStart();
+        if (main.AsSpan().TrimStart().StartsWith(xseparator, comparison))
+            throw new ArgumentException($"Source starts with '{xseparator}'.").WithData(source);
+
+        xseparator = separator.AsSpan().TrimEnd();
+        if (main.AsSpan().TrimEnd().EndsWith(xseparator, comparison))
+            throw new ArgumentException($"Source ends with '{xseparator}'.").WithData(source);
+
+        xseparator = separator.AsSpan().Trim();
+        if (main.AsSpan().Trim().Equals(xseparator, comparison))
+            throw new ArgumentException($"Source is '{xseparator}'.").WithData(source);
+
         return (main, alias);
     }
 
@@ -169,15 +176,22 @@ public static class StringExtract
             throw new InvalidOperationException("Invalid separator.").WithData(separator);
 
         var (main, alias) = source.ExtractLeftRight(separator, engine, out found);
-        main.NotNullNotEmpty();
-        alias?.NotNullNotEmpty();
+        main = main.NotNullNotEmpty();
+        alias = alias?.NotNullNotEmpty();
 
-        separator = separator.Trim();
-        var temp = main.Trim();
-        if (string.Compare(temp, separator, !engine.CaseSensitiveNames) == 0)
-            throw new ArgumentException(
-                $"Source resolves into a '{separator}'-alike element.")
-                .WithData(source);
+        var comparison = engine.CaseSensitiveNames ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+
+        var xseparator = separator.AsSpan().TrimStart();
+        if (main.AsSpan().TrimStart().StartsWith(xseparator, comparison))
+            throw new ArgumentException($"Source starts with '{xseparator}'.").WithData(source);
+
+        xseparator = separator.AsSpan().TrimEnd();
+        if (main.AsSpan().TrimEnd().EndsWith(xseparator, comparison))
+            throw new ArgumentException($"Source ends with '{xseparator}'.").WithData(source);
+
+        xseparator = separator.AsSpan().Trim();
+        if (main.AsSpan().Trim().Equals(xseparator, comparison))
+            throw new ArgumentException($"Source is '{xseparator}'.").WithData(source);
 
         return (main, alias);
     }
