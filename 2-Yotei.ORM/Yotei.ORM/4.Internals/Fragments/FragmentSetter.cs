@@ -75,8 +75,6 @@ public static partial class FragmentSetter
             LiteralValue = source.LiteralValue;
         }
 
-        // ------------------------------------------------
-
         /// <summary>
         /// If not null, then the captured literal acting as this instance's target. This property
         /// is only set when <see cref="Body"/> is a literal one, otherwise it is <c>null</c>.
