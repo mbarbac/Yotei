@@ -5,6 +5,16 @@ namespace Yotei.Tools;
 // ========================================================
 public static class StringSpanExtensions
 {
+    /// <summary>
+    /// Casts this span as a char enumeration.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static IEnumerable<char> AsEnumerable(this StrSpan source)
+    {
+        foreach (var value in source) yield return value;
+    }
+
     // ----------------------------------------------------
     // IndexOf(char)
 
@@ -18,7 +28,10 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static int IndexOf(this StrSpan source, char value, bool sensitive)
     {
-        throw null;
+        for (int i = 0; i < source.Length; i++)
+            if (source[i].Equals(value, sensitive)) return i;
+
+        return -1;
     }
 
     /// <summary>
@@ -31,7 +44,12 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static int IndexOf(this StrSpan source, char value, IEqualityComparer<char> comparer)
     {
-        throw null;
+        comparer.ThrowWhenNull();
+
+        for (int i = 0; i < source.Length; i++)
+            if (source[i].Equals(value, comparer)) return i;
+
+        return -1;
     }
 
     /// <summary>
@@ -44,7 +62,10 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static int IndexOf(this StrSpan source, char value, IEqualityComparer<string> comparer)
     {
-        throw null;
+        comparer.ThrowWhenNull();
+
+        var temp = new string([value]);
+        return source.IndexOf(temp, comparer);
     }
 
     /// <summary>
@@ -57,7 +78,10 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static int IndexOf(this StrSpan source, char value, StringComparison comparison)
     {
-        throw null;
+        for (int i = 0; i < source.Length; i++)
+            if (source[i].Equals(value, comparison)) return i;
+
+        return -1;
     }
 
     // ----------------------------------------------------
@@ -73,7 +97,10 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static int LastIndexOf(this StrSpan source, char value, bool sensitive)
     {
-        throw null;
+        for (int i = source.Length -1; i >= 0; i--)
+            if (source[i].Equals(value, sensitive)) return i;
+
+        return -1;
     }
 
     /// <summary>
@@ -86,7 +113,12 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static int LastIndexOf(this StrSpan source, char value, IEqualityComparer<char> comparer)
     {
-        throw null;
+        comparer.ThrowWhenNull();
+
+        for (int i = source.Length - 1; i >= 0; i--)
+            if (source[i].Equals(value, comparer)) return i;
+
+        return -1;
     }
 
     /// <summary>
@@ -97,7 +129,13 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static int LastIndexOf(this StrSpan source, char value, IEqualityComparer<string> comparer) => throw null;
+    public static int LastIndexOf(this StrSpan source, char value, IEqualityComparer<string> comparer)
+    {
+        comparer.ThrowWhenNull();
+
+        var temp = new string([value]);
+        return source.LastIndexOf(temp, comparer);
+    }
 
     /// <summary>
     /// Returns the index of the last ocurrence of the given value in the given source, or -1
@@ -109,7 +147,10 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static int LastIndexOf(this StrSpan source, char value, StringComparison comparison)
     {
-        throw null;
+        for (int i = source.Length - 1; i >= 0; i--)
+            if (source[i].Equals(value, comparison)) return i;
+
+        return -1;
     }
 
     // ----------------------------------------------------
@@ -122,7 +163,20 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static List<int> IndexesOf(this StrSpan source, char value)
     {
-        throw null;
+        var list = new List<int>();
+        var ini = 0;
+
+        while (ini < source.Length)
+        {
+            var span = source[ini..];
+            var index = span.IndexOf(value);
+
+            if (index < 0) break;
+            list.Add(ini + index);
+            ini += (index + 1);
+        }
+
+        return list;
     }
 
     /// <summary>
@@ -134,7 +188,20 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static List<int> IndexesOf(this StrSpan source, char value, bool sensitive)
     {
-        throw null;
+        var list = new List<int>();
+        var ini = 0;
+
+        while (ini < source.Length)
+        {
+            var span = source[ini..];
+            var index = span.IndexOf(value, sensitive);
+
+            if (index < 0) break;
+            list.Add(ini + index);
+            ini += (index + 1);
+        }
+
+        return list;
     }
 
     /// <summary>
@@ -146,7 +213,20 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static List<int> IndexesOf(this StrSpan source, char value, IEqualityComparer<char> comparer)
     {
-        throw null;
+        var list = new List<int>();
+        var ini = 0;
+
+        while (ini < source.Length)
+        {
+            var span = source[ini..];
+            var index = span.IndexOf(value, comparer);
+
+            if (index < 0) break;
+            list.Add(ini + index);
+            ini += (index + 1);
+        }
+
+        return list;
     }
 
     /// <summary>
@@ -158,7 +238,20 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static List<int> IndexesOf(this StrSpan source, char value, IEqualityComparer<string> comparer)
     {
-        throw null;
+        var list = new List<int>();
+        var ini = 0;
+
+        while (ini < source.Length)
+        {
+            var span = source[ini..];
+            var index = span.IndexOf(value, comparer);
+
+            if (index < 0) break;
+            list.Add(ini + index);
+            ini += (index + 1);
+        }
+
+        return list;
     }
 
     /// <summary>
@@ -170,7 +263,20 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static List<int> IndexesOf(this StrSpan source, char value, StringComparison comparison)
     {
-        throw null;
+        var list = new List<int>();
+        var ini = 0;
+
+        while (ini < source.Length)
+        {
+            var span = source[ini..];
+            var index = span.IndexOf(value, comparison);
+
+            if (index < 0) break;
+            list.Add(ini + index);
+            ini += (index + 1);
+        }
+
+        return list;
     }
 
     // ----------------------------------------------------
@@ -187,7 +293,28 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static int IndexOf(this StrSpan source, StrSpan value, bool sensitive)
     {
-        throw null;
+        if (source.Length == 0 && value.Length == 0) return 0; // To mimic standard behavior...
+        if (source.Length == 0) return -1;
+        if (value.Length == 0) return -1;
+
+        for (int i = 0; i < source.Length; i++)
+        {
+            var span = source[i..];
+            if (span.Length < value.Length) break;
+
+            var found = true;
+            for (int k = 0; k < value.Length; k++)
+            {
+                var s = span[k];
+                var v = value[k];
+                if (!s.Equals(v, sensitive)) { found = false; break; }
+            }
+            if (!found) continue;
+
+            return i;
+        }
+
+        return -1;
     }
 
     /// <summary>
@@ -200,7 +327,28 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static int IndexOf(this StrSpan source, StrSpan value, IEqualityComparer<char> comparer)
     {
-        throw null;
+        if (source.Length == 0 && value.Length == 0) return 0; // To mimic standard behavior...
+        if (source.Length == 0) return -1;
+        if (value.Length == 0) return -1;
+
+        for (int i = 0; i < source.Length; i++)
+        {
+            var span = source[i..];
+            if (span.Length < value.Length) break;
+
+            var found = true;
+            for (int k = 0; k < value.Length; k++)
+            {
+                var s = span[k];
+                var v = value[k];
+                if (!s.Equals(v, comparer)) { found = false; break; }
+            }
+            if (!found) continue;
+
+            return i;
+        }
+
+        return -1;
     }
 
     /// <summary>
@@ -213,12 +361,35 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static int IndexOf(this StrSpan source, StrSpan value, IEqualityComparer<string> comparer)
     {
-        throw null;
+        if (source.Length == 0 && value.Length == 0) return 0; // To mimic standard behavior...
+        if (source.Length == 0) return -1;
+        if (value.Length == 0) return -1;
+
+        for (int i = 0; i < source.Length; i++)
+        {
+            var span = source[i..];
+            if (span.Length < value.Length) break;
+
+            var found = true;
+            for (int k = 0; k < value.Length; k++)
+            {
+                var s = span[k];
+                var v = value[k];
+                if (!s.Equals(v, comparer)) { found = false; break; }
+            }
+            if (!found) continue;
+
+            return i;
+        }
+
+        return -1;
     }
 
     // ----------------------------------------------------
     // LastIndexOf(span)
     // LastIndexOf(span, comparison)
+
+    // TODO: Optimize StrSpan.LastIndexOf()...
 
     /// <summary>
     /// Returns the index of the last ocurrence of the given value in the given source, or -1
@@ -230,7 +401,30 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static int LastIndexOf(this StrSpan source, StrSpan value, bool sensitive)
     {
-        throw null;
+        if (source.Length == 0 && value.Length == 0) return 0; // To mimic standard behavior...
+        if (source.Length == 0) return -1;
+        if (value.Length == 0) return -1;
+
+        var r = -1;
+
+        for (int i = 0; i < source.Length; i++)
+        {
+            var span = source[i..];
+            if (span.Length < value.Length) break;
+
+            var found = true;
+            for (int k = 0; k < value.Length; k++)
+            {
+                var s = span[k];
+                var v = value[k];
+                if (!s.Equals(v, sensitive)) { found = false; break; }
+            }
+            if (!found) continue;
+
+            r = i;
+        }
+
+        return r;
     }
 
     /// <summary>
@@ -243,7 +437,30 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static int LastIndexOf(this StrSpan source, StrSpan value, IEqualityComparer<char> comparer)
     {
-        throw null;
+        if (source.Length == 0 && value.Length == 0) return 0; // To mimic standard behavior...
+        if (source.Length == 0) return -1;
+        if (value.Length == 0) return -1;
+
+        var r = -1;
+
+        for (int i = 0; i < source.Length; i++)
+        {
+            var span = source[i..];
+            if (span.Length < value.Length) break;
+
+            var found = true;
+            for (int k = 0; k < value.Length; k++)
+            {
+                var s = span[k];
+                var v = value[k];
+                if (!s.Equals(v, comparer)) { found = false; break; }
+            }
+            if (!found) continue;
+
+            r = i;
+        }
+
+        return r;
     }
 
     /// <summary>
@@ -256,7 +473,30 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static int LastIndexOf(this StrSpan source, StrSpan value, IEqualityComparer<string> comparer)
     {
-        throw null;
+        if (source.Length == 0 && value.Length == 0) return 0; // To mimic standard behavior...
+        if (source.Length == 0) return -1;
+        if (value.Length == 0) return -1;
+
+        var r = -1;
+
+        for (int i = 0; i < source.Length; i++)
+        {
+            var span = source[i..];
+            if (span.Length < value.Length) break;
+
+            var found = true;
+            for (int k = 0; k < value.Length; k++)
+            {
+                var s = span[k];
+                var v = value[k];
+                if (!s.Equals(v, comparer)) { found = false; break; }
+            }
+            if (!found) continue;
+
+            r = i;
+        }
+
+        return r;
     }
 
     // ----------------------------------------------------
@@ -269,7 +509,24 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static List<int> IndexesOf(this StrSpan source, StrSpan value)
     {
-        throw null;
+        if (source.Length == 0 && value.Length == 0) return []; // To mimic standard behavior...
+        if (source.Length == 0) return [];
+        if (value.Length == 0) return [];
+
+        var list = new List<int>();
+        var ini = 0;
+
+        while (ini < source.Length)
+        {
+            var span = source[ini..];
+            var index = span.IndexOf(value);
+
+            if (index < 0) break;
+            list.Add(ini + index);
+            ini += (index + value.Length);
+        }
+
+        return list;
     }
 
     /// <summary>
@@ -281,7 +538,24 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static List<int> IndexesOf(this StrSpan source, StrSpan value, bool sensitive)
     {
-        throw null;
+        if (source.Length == 0 && value.Length == 0) return []; // To mimic standard behavior...
+        if (source.Length == 0) return [];
+        if (value.Length == 0) return [];
+
+        var list = new List<int>();
+        var ini = 0;
+
+        while (ini < source.Length)
+        {
+            var span = source[ini..];
+            var index = span.IndexOf(value, sensitive);
+
+            if (index < 0) break;
+            list.Add(ini + index);
+            ini += (index + value.Length);
+        }
+
+        return list;
     }
 
     /// <summary>
@@ -291,9 +565,27 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static List<int> IndexesOf(this StrSpan source, StrSpan value, IEqualityComparer<char> comparer)
+    public static List<int> IndexesOf(
+        this StrSpan source, StrSpan value, IEqualityComparer<char> comparer)
     {
-        throw null;
+        if (source.Length == 0 && value.Length == 0) return []; // To mimic standard behavior...
+        if (source.Length == 0) return [];
+        if (value.Length == 0) return [];
+
+        var list = new List<int>();
+        var ini = 0;
+
+        while (ini < source.Length)
+        {
+            var span = source[ini..];
+            var index = span.IndexOf(value, comparer);
+
+            if (index < 0) break;
+            list.Add(ini + index);
+            ini += (index + value.Length);
+        }
+
+        return list;
     }
 
     /// <summary>
@@ -303,9 +595,27 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static List<int> IndexesOf(this StrSpan source, StrSpan value, IEqualityComparer<string> comparer)
+    public static List<int> IndexesOf(
+        this StrSpan source, StrSpan value, IEqualityComparer<string> comparer)
     {
-        throw null;
+        if (source.Length == 0 && value.Length == 0) return []; // To mimic standard behavior...
+        if (source.Length == 0) return [];
+        if (value.Length == 0) return [];
+
+        var list = new List<int>();
+        var ini = 0;
+
+        while (ini < source.Length)
+        {
+            var span = source[ini..];
+            var index = span.IndexOf(value, comparer);
+
+            if (index < 0) break;
+            list.Add(ini + index);
+            ini += (index + value.Length);
+        }
+
+        return list;
     }
 
     /// <summary>
@@ -317,7 +627,24 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static List<int> IndexesOf(this StrSpan source, StrSpan value, StringComparison comparison)
     {
-        throw null;
+        if (source.Length == 0 && value.Length == 0) return []; // To mimic standard behavior...
+        if (source.Length == 0) return [];
+        if (value.Length == 0) return [];
+
+        var list = new List<int>();
+        var ini = 0;
+
+        while (ini < source.Length)
+        {
+            var span = source[ini..];
+            var index = span.IndexOf(value, comparison);
+
+            if (index < 0) break;
+            list.Add(ini + index);
+            ini += (index + value.Length);
+        }
+
+        return list;
     }
 
     // ----------------------------------------------------
@@ -330,10 +657,8 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="sensitive"></param>
     /// <returns></returns>
-    public static bool Contains(this StrSpan source, char value, bool sensitive)
-    {
-        throw null;
-    }
+    public static bool Contains(
+        this StrSpan source, char value, bool sensitive) => source.IndexOf(value, sensitive) >= 0;
 
     /// <summary>
     /// Determines if the given source contains the given value or not.
@@ -342,10 +667,9 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static bool Contains(this StrSpan source, char value, IEqualityComparer<char> comparer)
-    {
-        throw null;
-    }
+    public static bool Contains(
+        this StrSpan source, char value, IEqualityComparer<char> comparer)
+        => source.IndexOf(value, comparer) >= 0;
 
     /// <summary>
     /// Determines if the given source contains the given value or not.
@@ -354,10 +678,9 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static bool Contains(this StrSpan source, char value, IEqualityComparer<string> comparer)
-    {
-        throw null;
-    }
+    public static bool Contains(
+        this StrSpan source, char value, IEqualityComparer<string> comparer)
+        => source.IndexOf(value, comparer) >= 0;
 
     /// <summary>
     /// Determines if the given source contains the given value or not.
@@ -366,10 +689,9 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="comparison"></param>
     /// <returns></returns>
-    public static bool Contains(this StrSpan source, char value, StringComparison comparison)
-    {
-        throw null;
-    }
+    public static bool Contains(
+        this StrSpan source, char value, StringComparison comparison)
+        => source.IndexOf(value, comparison) >= 0;
 
     // ----------------------------------------------------
     // Contains(span, comparison)
@@ -380,10 +702,8 @@ public static class StringSpanExtensions
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static bool Contains(this StrSpan source, StrSpan value)
-    {
-        throw null;
-    }
+    public static bool Contains(
+        this StrSpan source, StrSpan value) => source.IndexOf(value) >= 0;
 
     /// <summary>
     /// Determines if the given source contains the given value or not.
@@ -392,10 +712,8 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="sensitive"></param>
     /// <returns></returns>
-    public static bool Contains(this StrSpan source, StrSpan value, bool sensitive)
-    {
-        throw null;
-    }
+    public static bool Contains(
+        this StrSpan source, StrSpan value, bool sensitive) => source.IndexOf(value, sensitive) >= 0;
 
     /// <summary>
     /// Determines if the given source contains the given value or not.
@@ -404,10 +722,9 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static bool Contains(this StrSpan source, StrSpan value, IEqualityComparer<char> comparer)
-    {
-        throw null;
-    }
+    public static bool Contains(
+        this StrSpan source, StrSpan value, IEqualityComparer<char> comparer)
+        => source.IndexOf(value, comparer) >= 0;
 
     /// <summary>
     /// Determines if the given source contains the given value or not.
@@ -416,10 +733,9 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static bool Contains(this StrSpan source, StrSpan value, IEqualityComparer<string> comparer)
-    {
-        throw null;
-    }
+    public static bool Contains(
+        this StrSpan source, StrSpan value, IEqualityComparer<string> comparer)
+        => source.IndexOf(value, comparer) >= 0;
 
     // ----------------------------------------------------
     // ContainsAny(char, char)
@@ -433,7 +749,10 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static bool ContainsAny(this StrSpan source, IEnumerable<char> values)
     {
-        throw null;
+        values.ThrowWhenNull();
+
+        foreach (var value in values) if (source.IndexOf(value) >= 0) return true;
+        return false;
     }
 
     /// <summary>
@@ -445,7 +764,10 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static bool ContainsAny(this StrSpan source, IEnumerable<char> values, bool sensitive)
     {
-        throw null;
+        values.ThrowWhenNull();
+
+        foreach (var value in values) if (source.IndexOf(value, sensitive) >= 0) return true;
+        return false;
     }
 
     /// <summary>
@@ -457,7 +779,10 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static bool ContainsAny(this StrSpan source, IEnumerable<char> values, IEqualityComparer<char> comparer)
     {
-        throw null;
+        values.ThrowWhenNull();
+
+        foreach (var value in values) if (source.IndexOf(value, comparer) >= 0) return true;
+        return false;
     }
 
     /// <summary>
@@ -469,7 +794,10 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static bool ContainsAny(this StrSpan source, IEnumerable<char> values, IEqualityComparer<string> comparer)
     {
-        throw null;
+        values.ThrowWhenNull();
+
+        foreach (var value in values) if (source.IndexOf(value, comparer) >= 0) return true;
+        return false;
     }
 
     /// <summary>
@@ -481,59 +809,23 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static bool ContainsAny(this StrSpan source, IEnumerable<char> values, StringComparison comparison)
     {
-        throw null;
+        values.ThrowWhenNull();
+
+        foreach (var value in values) if (source.IndexOf(value, comparison) >= 0) return true;
+        return false;
     }
 
     // ----------------------------------------------------
     // ContainsAny(span)
 
-    /// <summary>
-    /// Determines if the given source span contains any character from the given array, or not.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="values"></param>
-    /// <param name="sensitive"></param>
-    /// <returns></returns>
-    public static bool ContainsAny(this StrSpan source, StrSpan values, bool sensitive)
-    {
-        throw null;
-    }
+    // The compiler complains when using any of the following methods as cannot determine if
+    // source is a IEnumerable<char> or a ReadOnlySpan<char>... I still don't konw why. In any
+    // case, the source is to pass source as a enumerable one: 'source.AsEnumerable()'
 
-    /// <summary>
-    /// Determines if the given source span contains any character from the given array, or not.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="values"></param>
-    /// <param name="comparer"></param>
-    /// <returns></returns>
-    public static bool ContainsAny(this StrSpan source, StrSpan values, IEqualityComparer<char> comparer)
-    {
-        throw null;
-    }
-
-    /// <summary>
-    /// Determines if the given source span contains any character from the given array, or not.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="values"></param>
-    /// <param name="comparer"></param>
-    /// <returns></returns>
-    public static bool ContainsAny(this StrSpan source, StrSpan values, IEqualityComparer<string> comparer)
-    {
-        throw null;
-    }
-
-    /// <summary>
-    /// Determines if the given source span contains any character from the given array, or not.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="values"></param>
-    /// <param name="comparison"></param>
-    /// <returns></returns>
-    public static bool ContainsAny(this StrSpan source, StrSpan values, StringComparison comparison)
-    {
-        throw null;
-    }
+    // public static bool ContainsAny(this StrSpan source, StrSpan values, bool sensitive)
+    // public static bool ContainsAnyOfSpan(this StrSpan source, StrSpan values, IEqualityComparer<char> comparer)
+    // public static bool ContainsAnyOfSpan(this StrSpan source, StrSpan values, IEqualityComparer<string> comparer)
+    // public static bool ContainsAnyOfSpan(this StrSpan source, StrSpan values, StringComparison comparison)
 
     // ----------------------------------------------------
     // StartsWith(char)
@@ -547,7 +839,12 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static bool StartsWith(this StrSpan source, char value, bool sensitive)
     {
-        throw null;
+        if (source.Length > 0)
+        {
+            var index = source.IndexOf(value, sensitive);
+            if (index == 0) return true;
+        }
+        return false;
     }
 
     /// <summary>
@@ -559,7 +856,12 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static bool StartsWith(this StrSpan source, char value, IEqualityComparer<char> comparer)
     {
-        throw null;
+        if (source.Length > 0)
+        {
+            var index = source.IndexOf(value, comparer);
+            if (index == 0) return true;
+        }
+        return false;
     }
 
     /// <summary>
@@ -571,7 +873,12 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static bool StartsWith(this StrSpan source, char value, IEqualityComparer<string> comparer)
     {
-        throw null;
+        if (source.Length > 0)
+        {
+            var index = source.IndexOf(value, comparer);
+            if (index == 0) return true;
+        }
+        return false;
     }
 
     /// <summary>
@@ -583,7 +890,12 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static bool StartsWith(this StrSpan source, char value, StringComparison comparison)
     {
-        throw null;
+        if (source.Length > 0)
+        {
+            var index = source.IndexOf(value, comparison);
+            if (index == 0) return true;
+        }
+        return false;
     }
 
     // ----------------------------------------------------
@@ -599,7 +911,13 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static bool StartsWith(this StrSpan source, StrSpan value, bool sensitive)
     {
-        throw null;
+        if (source.Length == 0 && value.Length == 0) return true; // Mimics standard behavior...
+        if (source.Length > 0 && value.Length > 0)
+        {
+            var index = source.IndexOf(value, sensitive);
+            return index == 0;
+        }
+        return false;
     }
 
     /// <summary>
@@ -611,7 +929,13 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static bool StartsWith(this StrSpan source, StrSpan value, IEqualityComparer<char> comparer)
     {
-        throw null;
+        if (source.Length == 0 && value.Length == 0) return true; // Mimics standard behavior...
+        if (source.Length > 0 && value.Length > 0)
+        {
+            var index = source.IndexOf(value, comparer);
+            return index == 0;
+        }
+        return false;
     }
 
     /// <summary>
@@ -623,7 +947,13 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static bool StartsWith(this StrSpan source, StrSpan value, IEqualityComparer<string> comparer)
     {
-        throw null;
+        if (source.Length == 0 && value.Length == 0) return true; // Mimics standard behavior...
+        if (source.Length > 0 && value.Length > 0)
+        {
+            var index = source.IndexOf(value, comparer);
+            return index == 0;
+        }
+        return false;
     }
 
     // ----------------------------------------------------
@@ -638,7 +968,14 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static bool EndsWith(this StrSpan source, char value, bool sensitive)
     {
-        throw null;
+        if (source.Length > 0)
+        {
+            var max = source.Length - 1;
+
+            var index = source.IndexOf(value, sensitive);
+            if (index == max) return true;
+        }
+        return false;
     }
 
     /// <summary>
@@ -650,7 +987,14 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static bool EndsWith(this StrSpan source, char value, IEqualityComparer<char> comparer)
     {
-        throw null;
+        if (source.Length > 0)
+        {
+            var max = source.Length - 1;
+
+            var index = source.IndexOf(value, comparer);
+            if (index == max) return true;
+        }
+        return false;
     }
 
     /// <summary>
@@ -662,7 +1006,14 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static bool EndsWith(this StrSpan source, char value, IEqualityComparer<string> comparer)
     {
-        throw null;
+        if (source.Length > 0)
+        {
+            var max = source.Length - 1;
+
+            var index = source.IndexOf(value, comparer);
+            if (index == max) return true;
+        }
+        return false;
     }
 
     /// <summary>
@@ -674,7 +1025,14 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static bool EndsWith(this StrSpan source, char value, StringComparison comparison)
     {
-        throw null;
+        if (source.Length > 0)
+        {
+            var max = source.Length - 1;
+
+            var index = source.IndexOf(value, comparison);
+            if (index == max) return true;
+        }
+        return false;
     }
 
     // ----------------------------------------------------
@@ -690,7 +1048,15 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static bool EndsWith(this StrSpan source, StrSpan value, bool sensitive)
     {
-        throw null;
+        if (source.Length == 0 && value.Length == 0) return true; // Mimics standard behavior...
+        if (source.Length > 0 && value.Length > 0)
+        {
+            var max = source.Length - value.Length;
+
+            var index = source.LastIndexOf(value, sensitive);
+            if (index == max) return true;
+        }
+        return false;
     }
 
     /// <summary>
@@ -702,7 +1068,15 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static bool EndsWith(this StrSpan source, StrSpan value, IEqualityComparer<char> comparer)
     {
-        throw null;
+        if (source.Length == 0 && value.Length == 0) return true; // Mimics standard behavior...
+        if (source.Length > 0 && value.Length > 0)
+        {
+            var max = source.Length - value.Length;
+
+            var index = source.LastIndexOf(value, comparer);
+            if (index == max) return true;
+        }
+        return false;
     }
 
     /// <summary>
@@ -714,34 +1088,15 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static bool EndsWith(this StrSpan source, StrSpan value, IEqualityComparer<string> comparer)
     {
-        throw null;
-    }
+        if (source.Length == 0 && value.Length == 0) return true; // Mimics standard behavior...
+        if (source.Length > 0 && value.Length > 0)
+        {
+            var max = source.Length - value.Length;
 
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Returns a new instance in which all characters starting from the given index have been
-    /// removed.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="index"></param>
-    /// <returns></returns>
-    public static StrSpan Remove(this StrSpan source, int index)
-    {
-        throw null;
-    }
-
-    /// <summary>
-    /// Returns a new instance in which the requested number of characters starting from the given
-    /// index have been removed.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="index"></param>
-    /// <param name="count"></param>
-    /// <returns></returns>
-    public static StrSpan Remove(this StrSpan source, int index, int count)
-    {
-        throw null;
+            var index = source.LastIndexOf(value, comparer);
+            if (index == max) return true;
+        }
+        return false;
     }
 
     // ----------------------------------------------------
@@ -755,7 +1110,23 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static StrSpan Remove(this StrSpan source, char value, out bool removed)
     {
-        throw null;
+        removed = false;
+        if (source.Length == 0) return source;
+
+        var index = source.IndexOf(value);
+        if (index < 0) return source;
+
+        removed = true;
+        if (index == 0 && source.Length == 1) return StrSpan.Empty;
+
+        var array = new char[source.Length - 1];
+        source[..index].CopyTo(array);
+
+        var dest = array.AsSpan(index);
+        var ini = index + 1;
+        source[ini..].CopyTo(dest);
+
+        return array.AsSpan();
     }
 
     /// <summary>
@@ -768,7 +1139,23 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static StrSpan Remove(this StrSpan source, char value, bool sensitive, out bool removed)
     {
-        throw null;
+        removed = false;
+        if (source.Length == 0) return source;
+
+        var index = source.IndexOf(value, sensitive);
+        if (index < 0) return source;
+
+        removed = true;
+        if (index == 0 && source.Length == 1) return StrSpan.Empty;
+
+        var array = new char[source.Length - 1];
+        source[..index].CopyTo(array);
+
+        var dest = array.AsSpan(index);
+        var ini = index + 1;
+        source[ini..].CopyTo(dest);
+
+        return array.AsSpan();
     }
 
     /// <summary>
@@ -781,7 +1168,23 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static StrSpan Remove(this StrSpan source, char value, IEqualityComparer<char> comparer, out bool removed)
     {
-        throw null;
+        removed = false;
+        if (source.Length == 0) return source;
+
+        var index = source.IndexOf(value, comparer);
+        if (index < 0) return source;
+
+        removed = true;
+        if (index == 0 && source.Length == 1) return StrSpan.Empty;
+
+        var array = new char[source.Length - 1];
+        source[..index].CopyTo(array);
+
+        var dest = array.AsSpan(index);
+        var ini = index + 1;
+        source[ini..].CopyTo(dest);
+
+        return array.AsSpan();
     }
 
     /// <summary>
@@ -794,7 +1197,23 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static StrSpan Remove(this StrSpan source, char value, IEqualityComparer<string> comparer, out bool removed)
     {
-        throw null;
+        removed = false;
+        if (source.Length == 0) return source;
+
+        var index = source.IndexOf(value, comparer);
+        if (index < 0) return source;
+
+        removed = true;
+        if (index == 0 && source.Length == 1) return StrSpan.Empty;
+
+        var array = new char[source.Length - 1];
+        source[..index].CopyTo(array);
+
+        var dest = array.AsSpan(index);
+        var ini = index + 1;
+        source[ini..].CopyTo(dest);
+
+        return array.AsSpan();
     }
 
     /// <summary>
@@ -807,7 +1226,23 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static StrSpan Remove(this StrSpan source, char value, StringComparison comparison, out bool removed)
     {
-        throw null;
+        removed = false;
+        if (source.Length == 0) return source;
+
+        var index = source.IndexOf(value, comparison);
+        if (index < 0) return source;
+
+        removed = true;
+        if (index == 0 && source.Length == 1) return StrSpan.Empty;
+
+        var array = new char[source.Length - 1];
+        source[..index].CopyTo(array);
+
+        var dest = array.AsSpan(index);
+        var ini = index + 1;
+        source[ini..].CopyTo(dest);
+
+        return array.AsSpan();
     }
 
     // ----------------------------------------------------
@@ -818,10 +1253,8 @@ public static class StringSpanExtensions
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static StrSpan Remove(this StrSpan source, char value)
-    {
-        throw null;
-    }
+    public static StrSpan Remove(
+        this StrSpan source, char value) => source.Remove(value, out _);
 
     /// <summary>
     /// Returns a new instance in which the first ocurrence of the given value has been removed.
@@ -830,10 +1263,8 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="sensitive"></param>
     /// <returns></returns>
-    public static StrSpan Remove(this StrSpan source, char value, bool sensitive)
-    {
-        throw null;
-    }
+    public static StrSpan Remove(
+        this StrSpan source, char value, bool sensitive) => source.Remove(value, sensitive, out _);
 
     /// <summary>
     /// Returns a new instance in which the first ocurrence of the given value has been removed.
@@ -842,10 +1273,9 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static StrSpan Remove(this StrSpan source, char value, IEqualityComparer<char> comparer)
-    {
-        throw null;
-    }
+    public static StrSpan Remove(
+        this StrSpan source, char value, IEqualityComparer<char> comparer)
+        => source.Remove(value, comparer, out _);
 
     /// <summary>
     /// Returns a new instance in which the first ocurrence of the given value has been removed.
@@ -854,10 +1284,9 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static StrSpan Remove(this StrSpan source, char value, IEqualityComparer<string> comparer)
-    {
-        throw null;
-    }
+    public static StrSpan Remove(
+        this StrSpan source, char value, IEqualityComparer<string> comparer)
+        => source.Remove(value, comparer, out _);
 
     /// <summary>
     /// Returns a new instance in which the first ocurrence of the given value has been removed.
@@ -866,10 +1295,9 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="comparison"></param>
     /// <returns></returns>
-    public static StrSpan Remove(this StrSpan source, char value, StringComparison comparison)
-    {
-        throw null;
-    }
+    public static StrSpan Remove(
+        this StrSpan source, char value, StringComparison comparison)
+        => source.Remove(value, comparison, out _);
 
     // ----------------------------------------------------
 
@@ -882,7 +1310,23 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static StrSpan RemoveLast(this StrSpan source, char value, out bool removed)
     {
-        throw null;
+        removed = false;
+        if (source.Length == 0) return source;
+
+        var index = source.LastIndexOf(value);
+        if (index < 0) return source;
+
+        removed = true;
+        if (index == 0 && source.Length == 1) return StrSpan.Empty;
+
+        var array = new char[source.Length - 1];
+        source[..index].CopyTo(array);
+
+        var dest = array.AsSpan(index);
+        var ini = index + 1;
+        source[ini..].CopyTo(dest);
+
+        return array.AsSpan();
     }
 
     /// <summary>
@@ -895,7 +1339,23 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static StrSpan RemoveLast(this StrSpan source, char value, bool sensitive, out bool removed)
     {
-        throw null;
+        removed = false;
+        if (source.Length == 0) return source;
+
+        var index = source.LastIndexOf(value, sensitive);
+        if (index < 0) return source;
+
+        removed = true;
+        if (index == 0 && source.Length == 1) return StrSpan.Empty;
+
+        var array = new char[source.Length - 1];
+        source[..index].CopyTo(array);
+
+        var dest = array.AsSpan(index);
+        var ini = index + 1;
+        source[ini..].CopyTo(dest);
+
+        return array.AsSpan();
     }
 
     /// <summary>
@@ -908,7 +1368,23 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static StrSpan RemoveLast(this StrSpan source, char value, IEqualityComparer<char> comparer, out bool removed)
     {
-        throw null;
+        removed = false;
+        if (source.Length == 0) return source;
+
+        var index = source.LastIndexOf(value, comparer);
+        if (index < 0) return source;
+
+        removed = true;
+        if (index == 0 && source.Length == 1) return StrSpan.Empty;
+
+        var array = new char[source.Length - 1];
+        source[..index].CopyTo(array);
+
+        var dest = array.AsSpan(index);
+        var ini = index + 1;
+        source[ini..].CopyTo(dest);
+
+        return array.AsSpan();
     }
 
     /// <summary>
@@ -921,7 +1397,23 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static StrSpan RemoveLast(this StrSpan source, char value, IEqualityComparer<string> comparer, out bool removed)
     {
-        throw null;
+        removed = false;
+        if (source.Length == 0) return source;
+
+        var index = source.LastIndexOf(value, comparer);
+        if (index < 0) return source;
+
+        removed = true;
+        if (index == 0 && source.Length == 1) return StrSpan.Empty;
+
+        var array = new char[source.Length - 1];
+        source[..index].CopyTo(array);
+
+        var dest = array.AsSpan(index);
+        var ini = index + 1;
+        source[ini..].CopyTo(dest);
+
+        return array.AsSpan();
     }
 
     /// <summary>
@@ -934,7 +1426,23 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static StrSpan RemoveLast(this StrSpan source, char value, StringComparison comparison, out bool removed)
     {
-        throw null;
+        removed = false;
+        if (source.Length == 0) return source;
+
+        var index = source.LastIndexOf(value, comparison);
+        if (index < 0) return source;
+
+        removed = true;
+        if (index == 0 && source.Length == 1) return StrSpan.Empty;
+
+        var array = new char[source.Length - 1];
+        source[..index].CopyTo(array);
+
+        var dest = array.AsSpan(index);
+        var ini = index + 1;
+        source[ini..].CopyTo(dest);
+
+        return array.AsSpan();
     }
 
     // ----------------------------------------------------
@@ -945,10 +1453,8 @@ public static class StringSpanExtensions
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static StrSpan RemoveLast(this StrSpan source, char value)
-    {
-        throw null;
-    }
+    public static StrSpan RemoveLast(
+        this StrSpan source, char value) => source.RemoveLast(value, out _);
 
     /// <summary>
     /// Returns a new instance in which the last ocurrence of the given value has been removed.
@@ -957,10 +1463,8 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="sensitive"></param>
     /// <returns></returns>
-    public static StrSpan RemoveLast(this StrSpan source, char value, bool sensitive)
-    {
-        throw null;
-    }
+    public static StrSpan RemoveLast(
+        this StrSpan source, char value, bool sensitive) => source.RemoveLast(value, sensitive, out _);
 
     /// <summary>
     /// Returns a new instance in which the last ocurrence of the given value has been removed.
@@ -969,10 +1473,9 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static StrSpan RemoveLast(this StrSpan source, char value, IEqualityComparer<char> comparer)
-    {
-        throw null;
-    }
+    public static StrSpan RemoveLast(
+        this StrSpan source, char value, IEqualityComparer<char> comparer)
+        => source.RemoveLast(value, comparer, out _);
 
     /// <summary>
     /// Returns a new instance in which the last ocurrence of the given value has been removed.
@@ -981,10 +1484,9 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static StrSpan RemoveLast(this StrSpan source, char value, IEqualityComparer<string> comparer)
-    {
-        throw null;
-    }
+    public static StrSpan RemoveLast(
+        this StrSpan source, char value, IEqualityComparer<string> comparer)
+        => source.RemoveLast(value, comparer, out _);
 
     /// <summary>
     /// Returns a new instance in which the last ocurrence of the given value has been removed.
@@ -993,10 +1495,9 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="comparison"></param>
     /// <returns></returns>
-    public static StrSpan RemoveLast(this StrSpan source, char value, StringComparison comparison)
-    {
-        throw null;
-    }
+    public static StrSpan RemoveLast(
+        this StrSpan source, char value, StringComparison comparison)
+        => source.RemoveLast(value, comparison, out _);
 
     // ----------------------------------------------------
 
@@ -1009,7 +1510,16 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static StrSpan RemoveAll(this StrSpan source, char value, out bool removed)
     {
-        throw null;
+        removed = false;
+        if (source.Length == 0) return source;
+
+        while (true)
+        {
+            source = source.Remove(value, out var temp);
+            if (!temp) break;
+            removed = true;
+        }
+        return source;
     }
 
     /// <summary>
@@ -1022,7 +1532,16 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static StrSpan RemoveAll(this StrSpan source, char value, bool sensitive, out bool removed)
     {
-        throw null;
+        removed = false;
+        if (source.Length == 0) return source;
+
+        while (true)
+        {
+            source = source.Remove(value, sensitive, out var temp);
+            if (!temp) break;
+            removed = true;
+        }
+        return source;
     }
 
     /// <summary>
@@ -1035,7 +1554,16 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static StrSpan RemoveAll(this StrSpan source, char value, IEqualityComparer<char> comparer, out bool removed)
     {
-        throw null;
+        removed = false;
+        if (source.Length == 0) return source;
+
+        while (true)
+        {
+            source = source.Remove(value, comparer, out var temp);
+            if (!temp) break;
+            removed = true;
+        }
+        return source;
     }
 
     /// <summary>
@@ -1048,7 +1576,16 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static StrSpan RemoveAll(this StrSpan source, char value, IEqualityComparer<string> comparer, out bool removed)
     {
-        throw null;
+        removed = false;
+        if (source.Length == 0) return source;
+
+        while (true)
+        {
+            source = source.Remove(value, comparer, out var temp);
+            if (!temp) break;
+            removed = true;
+        }
+        return source;
     }
 
     /// <summary>
@@ -1061,7 +1598,16 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static StrSpan RemoveAll(this StrSpan source, char value, StringComparison comparison, out bool removed)
     {
-        throw null;
+        removed = false;
+        if (source.Length == 0) return source;
+
+        while (true)
+        {
+            source = source.Remove(value, comparison, out var temp);
+            if (!temp) break;
+            removed = true;
+        }
+        return source;
     }
 
     // ----------------------------------------------------
@@ -1072,10 +1618,8 @@ public static class StringSpanExtensions
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static StrSpan RemoveAll(this StrSpan source, char value)
-    {
-        throw null;
-    }
+    public static StrSpan RemoveAll(
+        this StrSpan source, char value) => source.RemoveAll(value, out _);
 
     /// <summary>
     /// Returns a new instance in which all the ocurrences of the given value have been removed.
@@ -1084,10 +1628,8 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="sensitive"></param>
     /// <returns></returns>
-    public static StrSpan RemoveAll(this StrSpan source, char value, bool sensitive)
-    {
-        throw null;
-    }
+    public static StrSpan RemoveAll(
+        this StrSpan source, char value, bool sensitive) => source.RemoveAll(value, sensitive, out _);
 
     /// <summary>
     /// Returns a new instance in which all the ocurrences of the given value have been removed.
@@ -1096,10 +1638,9 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static StrSpan RemoveAll(this StrSpan source, char value, IEqualityComparer<char> comparer)
-    {
-        throw null;
-    }
+    public static StrSpan RemoveAll(
+        this StrSpan source, char value, IEqualityComparer<char> comparer)
+        => source.RemoveAll(value, comparer, out _);
 
     /// <summary>
     /// Returns a new instance in which all the ocurrences of the given value have been removed.
@@ -1108,10 +1649,9 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static StrSpan RemoveAll(this StrSpan source, char value, IEqualityComparer<string> comparer)
-    {
-        throw null;
-    }
+    public static StrSpan RemoveAll(
+        this StrSpan source, char value, IEqualityComparer<string> comparer)
+        => source.RemoveAll(value, comparer, out _);
 
     /// <summary>
     /// Returns a new instance in which all the ocurrences of the given value have been removed.
@@ -1120,10 +1660,9 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="comparison"></param>
     /// <returns></returns>
-    public static StrSpan RemoveAll(this StrSpan source, char value, StringComparison comparison)
-    {
-        throw null;
-    }
+    public static StrSpan RemoveAll(
+        this StrSpan source, char value, StringComparison comparison)
+        => source.RemoveAll(value, comparison, out _);
 
     // ----------------------------------------------------
 
@@ -1136,7 +1675,24 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static StrSpan Remove(this StrSpan source, StrSpan value, out bool removed)
     {
-        throw null;
+        removed = false;
+        if (source.Length == 0) return source;
+        if (value.Length == 0) return source;
+
+        var index = source.IndexOf(value);
+        if (index < 0) return source;
+
+        removed = true;
+        if (index == 0 && source.Length == value.Length) return StrSpan.Empty;
+
+        var array = new char[source.Length - value.Length];
+        source[..index].CopyTo(array);
+
+        var dest = array.AsSpan(index);
+        var ini = index + value.Length;
+        source[ini..].CopyTo(dest);
+
+        return array.AsSpan();
     }
 
     /// <summary>
@@ -1149,7 +1705,24 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static StrSpan Remove(this StrSpan source, StrSpan value, bool sensitive, out bool removed)
     {
-        throw null;
+        removed = false;
+        if (source.Length == 0) return source;
+        if (value.Length == 0) return source;
+
+        var index = source.IndexOf(value, sensitive);
+        if (index < 0) return source;
+
+        removed = true;
+        if (index == 0 && source.Length == value.Length) return StrSpan.Empty;
+
+        var array = new char[source.Length - value.Length];
+        source[..index].CopyTo(array);
+
+        var dest = array.AsSpan(index);
+        var ini = index + value.Length;
+        source[ini..].CopyTo(dest);
+
+        return array.AsSpan();
     }
 
     /// <summary>
@@ -1162,7 +1735,24 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static StrSpan Remove(this StrSpan source, StrSpan value, IEqualityComparer<char> comparer, out bool removed)
     {
-        throw null;
+        removed = false;
+        if (source.Length == 0) return source;
+        if (value.Length == 0) return source;
+
+        var index = source.IndexOf(value, comparer);
+        if (index < 0) return source;
+
+        removed = true;
+        if (index == 0 && source.Length == value.Length) return StrSpan.Empty;
+
+        var array = new char[source.Length - value.Length];
+        source[..index].CopyTo(array);
+
+        var dest = array.AsSpan(index);
+        var ini = index + value.Length;
+        source[ini..].CopyTo(dest);
+
+        return array.AsSpan();
     }
 
     /// <summary>
@@ -1175,7 +1765,24 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static StrSpan Remove(this StrSpan source, StrSpan value, IEqualityComparer<string> comparer, out bool removed)
     {
-        throw null;
+        removed = false;
+        if (source.Length == 0) return source;
+        if (value.Length == 0) return source;
+
+        var index = source.IndexOf(value, comparer);
+        if (index < 0) return source;
+
+        removed = true;
+        if (index == 0 && source.Length == value.Length) return StrSpan.Empty;
+
+        var array = new char[source.Length - value.Length];
+        source[..index].CopyTo(array);
+
+        var dest = array.AsSpan(index);
+        var ini = index + value.Length;
+        source[ini..].CopyTo(dest);
+
+        return array.AsSpan();
     }
 
     /// <summary>
@@ -1188,7 +1795,24 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static StrSpan Remove(this StrSpan source, StrSpan value, StringComparison comparison, out bool removed)
     {
-        throw null;
+        removed = false;
+        if (source.Length == 0) return source;
+        if (value.Length == 0) return source;
+
+        var index = source.IndexOf(value, comparison);
+        if (index < 0) return source;
+
+        removed = true;
+        if (index == 0 && source.Length == value.Length) return StrSpan.Empty;
+
+        var array = new char[source.Length - value.Length];
+        source[..index].CopyTo(array);
+
+        var dest = array.AsSpan(index);
+        var ini = index + value.Length;
+        source[ini..].CopyTo(dest);
+
+        return array.AsSpan();
     }
 
     // ----------------------------------------------------
@@ -1199,10 +1823,8 @@ public static class StringSpanExtensions
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static StrSpan Remove(this StrSpan source, StrSpan value)
-    {
-        throw null;
-    }
+    public static StrSpan Remove(
+        this StrSpan source, StrSpan value) => source.Remove(value, out _);
 
     /// <summary>
     /// Returns a new instance in which the first ocurrence of the given value has been removed.
@@ -1211,10 +1833,8 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="sensitive"></param>
     /// <returns></returns>
-    public static StrSpan Remove(this StrSpan source, StrSpan value, bool sensitive)
-    {
-        throw null;
-    }
+    public static StrSpan Remove(
+        this StrSpan source, StrSpan value, bool sensitive) => source.Remove(value, sensitive, out _);
 
     /// <summary>
     /// Returns a new instance in which the first ocurrence of the given value has been removed.
@@ -1223,10 +1843,9 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static StrSpan Remove(this StrSpan source, StrSpan value, IEqualityComparer<char> comparer)
-    {
-        throw null;
-    }
+    public static StrSpan Remove(
+        this StrSpan source, StrSpan value, IEqualityComparer<char> comparer)
+        => source.Remove(value, comparer, out _);
 
     /// <summary>
     /// Returns a new instance in which the first ocurrence of the given value has been removed.
@@ -1235,10 +1854,9 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static StrSpan Remove(this StrSpan source, StrSpan value, IEqualityComparer<string> comparer)
-    {
-        throw null;
-    }
+    public static StrSpan Remove(
+        this StrSpan source, StrSpan value, IEqualityComparer<string> comparer)
+        => source.Remove(value, comparer, out _);
 
     /// <summary>
     /// Returns a new instance in which the first ocurrence of the given value has been removed.
@@ -1247,10 +1865,9 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="comparison"></param>
     /// <returns></returns>
-    public static StrSpan Remove(this StrSpan source, StrSpan value, StringComparison comparison)
-    {
-        throw null;
-    }
+    public static StrSpan Remove(
+        this StrSpan source, StrSpan value, StringComparison comparison)
+        => source.Remove(value, comparison, out _);
 
     // ----------------------------------------------------
 
@@ -1263,7 +1880,24 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static StrSpan RemoveLast(this StrSpan source, StrSpan value, out bool removed)
     {
-        throw null;
+        removed = false;
+        if (source.Length == 0) return source;
+        if (value.Length == 0) return source;
+
+        var index = source.LastIndexOf(value);
+        if (index < 0) return source;
+
+        removed = true;
+        if (index == 0 && source.Length == value.Length) return StrSpan.Empty;
+
+        var array = new char[source.Length - value.Length];
+        source[..index].CopyTo(array);
+
+        var dest = array.AsSpan(index);
+        var ini = index + value.Length;
+        source[ini..].CopyTo(dest);
+
+        return array.AsSpan();
     }
 
     /// <summary>
@@ -1276,7 +1910,24 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static StrSpan RemoveLast(this StrSpan source, StrSpan value, bool sensitive, out bool removed)
     {
-        throw null;
+        removed = false;
+        if (source.Length == 0) return source;
+        if (value.Length == 0) return source;
+
+        var index = source.LastIndexOf(value, sensitive);
+        if (index < 0) return source;
+
+        removed = true;
+        if (index == 0 && source.Length == value.Length) return StrSpan.Empty;
+
+        var array = new char[source.Length - value.Length];
+        source[..index].CopyTo(array);
+
+        var dest = array.AsSpan(index);
+        var ini = index + value.Length;
+        source[ini..].CopyTo(dest);
+
+        return array.AsSpan();
     }
 
     /// <summary>
@@ -1289,7 +1940,24 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static StrSpan RemoveLast(this StrSpan source, StrSpan value, IEqualityComparer<char> comparer, out bool removed)
     {
-        throw null;
+        removed = false;
+        if (source.Length == 0) return source;
+        if (value.Length == 0) return source;
+
+        var index = source.LastIndexOf(value, comparer);
+        if (index < 0) return source;
+
+        removed = true;
+        if (index == 0 && source.Length == value.Length) return StrSpan.Empty;
+
+        var array = new char[source.Length - value.Length];
+        source[..index].CopyTo(array);
+
+        var dest = array.AsSpan(index);
+        var ini = index + value.Length;
+        source[ini..].CopyTo(dest);
+
+        return array.AsSpan();
     }
 
     /// <summary>
@@ -1302,7 +1970,24 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static StrSpan RemoveLast(this StrSpan source, StrSpan value, IEqualityComparer<string> comparer, out bool removed)
     {
-        throw null;
+        removed = false;
+        if (source.Length == 0) return source;
+        if (value.Length == 0) return source;
+
+        var index = source.LastIndexOf(value, comparer);
+        if (index < 0) return source;
+
+        removed = true;
+        if (index == 0 && source.Length == value.Length) return StrSpan.Empty;
+
+        var array = new char[source.Length - value.Length];
+        source[..index].CopyTo(array);
+
+        var dest = array.AsSpan(index);
+        var ini = index + value.Length;
+        source[ini..].CopyTo(dest);
+
+        return array.AsSpan();
     }
 
     /// <summary>
@@ -1315,7 +2000,24 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static StrSpan RemoveLast(this StrSpan source, StrSpan value, StringComparison comparison, out bool removed)
     {
-        throw null;
+        removed = false;
+        if (source.Length == 0) return source;
+        if (value.Length == 0) return source;
+
+        var index = source.LastIndexOf(value, comparison);
+        if (index < 0) return source;
+
+        removed = true;
+        if (index == 0 && source.Length == value.Length) return StrSpan.Empty;
+
+        var array = new char[source.Length - value.Length];
+        source[..index].CopyTo(array);
+
+        var dest = array.AsSpan(index);
+        var ini = index + value.Length;
+        source[ini..].CopyTo(dest);
+
+        return array.AsSpan();
     }
 
     // ----------------------------------------------------
@@ -1326,10 +2028,8 @@ public static class StringSpanExtensions
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static StrSpan RemoveLast(this StrSpan source, StrSpan value)
-    {
-        throw null;
-    }
+    public static StrSpan RemoveLast(
+        this StrSpan source, StrSpan value) => source.RemoveLast(value, out _);
 
     /// <summary>
     /// Returns a new instance in which the last ocurrence of the given value has been removed.
@@ -1338,10 +2038,9 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="sensitive"></param>
     /// <returns></returns>
-    public static StrSpan RemoveLast(this StrSpan source, StrSpan value, bool sensitive)
-    {
-        throw null;
-    }
+    public static StrSpan RemoveLast(
+        this StrSpan source, StrSpan value, bool sensitive)
+        => source.RemoveLast(value, sensitive, out _);
 
     /// <summary>
     /// Returns a new instance in which the last ocurrence of the given value has been removed.
@@ -1350,10 +2049,9 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static StrSpan RemoveLast(this StrSpan source, StrSpan value, IEqualityComparer<char> comparer)
-    {
-        throw null;
-    }
+    public static StrSpan RemoveLast(
+        this StrSpan source, StrSpan value, IEqualityComparer<char> comparer)
+        => source.RemoveLast(value, comparer, out _);
 
     /// <summary>
     /// Returns a new instance in which the last ocurrence of the given value has been removed.
@@ -1362,10 +2060,9 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static StrSpan RemoveLast(this StrSpan source, StrSpan value, IEqualityComparer<string> comparer)
-    {
-        throw null;
-    }
+    public static StrSpan RemoveLast(
+        this StrSpan source, StrSpan value, IEqualityComparer<string> comparer)
+        => source.RemoveLast(value, comparer, out _);
 
     /// <summary>
     /// Returns a new instance in which the last ocurrence of the given value has been removed.
@@ -1374,10 +2071,9 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="comparison"></param>
     /// <returns></returns>
-    public static StrSpan RemoveLast(this StrSpan source, StrSpan value, StringComparison comparison)
-    {
-        throw null;
-    }
+    public static StrSpan RemoveLast(
+        this StrSpan source, StrSpan value, StringComparison comparison)
+        => source.RemoveLast(value, comparison, out _);
 
     // ----------------------------------------------------
 
@@ -1390,7 +2086,17 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static StrSpan RemoveAll(this StrSpan source, StrSpan value, out bool removed)
     {
-        throw null;
+        removed = false;
+        if (source.Length == 0) return source;
+        if (value.Length == 0) return source;
+
+        while (true)
+        {
+            source = source.Remove(value, out var temp);
+            if (!temp) break;
+            removed = true;
+        }
+        return source;
     }
 
     /// <summary>
@@ -1403,7 +2109,17 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static StrSpan RemoveAll(this StrSpan source, StrSpan value, bool sensitive, out bool removed)
     {
-        throw null;
+        removed = false;
+        if (source.Length == 0) return source;
+        if (value.Length == 0) return source;
+
+        while (true)
+        {
+            source = source.Remove(value, sensitive, out var temp);
+            if (!temp) break;
+            removed = true;
+        }
+        return source;
     }
 
     /// <summary>
@@ -1416,7 +2132,17 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static StrSpan RemoveAll(this StrSpan source, StrSpan value, IEqualityComparer<char> comparer, out bool removed)
     {
-        throw null;
+        removed = false;
+        if (source.Length == 0) return source;
+        if (value.Length == 0) return source;
+
+        while (true)
+        {
+            source = source.Remove(value, comparer, out var temp);
+            if (!temp) break;
+            removed = true;
+        }
+        return source;
     }
 
     /// <summary>
@@ -1429,7 +2155,17 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static StrSpan RemoveAll(this StrSpan source, StrSpan value, IEqualityComparer<string> comparer, out bool removed)
     {
-        throw null;
+        removed = false;
+        if (source.Length == 0) return source;
+        if (value.Length == 0) return source;
+
+        while (true)
+        {
+            source = source.Remove(value, comparer, out var temp);
+            if (!temp) break;
+            removed = true;
+        }
+        return source;
     }
 
     /// <summary>
@@ -1442,7 +2178,17 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static StrSpan RemoveAll(this StrSpan source, StrSpan value, StringComparison comparison, out bool removed)
     {
-        throw null;
+        removed = false;
+        if (source.Length == 0) return source;
+        if (value.Length == 0) return source;
+
+        while (true)
+        {
+            source = source.Remove(value, comparison, out var temp);
+            if (!temp) break;
+            removed = true;
+        }
+        return source;
     }
 
     // ----------------------------------------------------
@@ -1453,10 +2199,8 @@ public static class StringSpanExtensions
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static StrSpan RemoveAll(this StrSpan source, StrSpan value)
-    {
-        throw null;
-    }
+    public static StrSpan RemoveAll(
+        this StrSpan source, StrSpan value) => source.RemoveAll(value, out _);
 
     /// <summary>
     /// Returns a new instance in which all the ocurrences of the given value have been removed.
@@ -1465,10 +2209,9 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="sensitive"></param>
     /// <returns></returns>
-    public static StrSpan RemoveAll(this StrSpan source, StrSpan value, bool sensitive)
-    {
-        throw null;
-    }
+    public static StrSpan RemoveAll(
+        this StrSpan source, StrSpan value, bool sensitive)
+        => source.RemoveAll(value, sensitive, out _);
 
     /// <summary>
     /// Returns a new instance in which all the ocurrences of the given value have been removed.
@@ -1477,10 +2220,9 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static StrSpan RemoveAll(this StrSpan source, StrSpan value, IEqualityComparer<char> comparer)
-    {
-        throw null;
-    }
+    public static StrSpan RemoveAll(
+        this StrSpan source, StrSpan value, IEqualityComparer<char> comparer)
+        => source.RemoveAll(value, comparer, out _);
 
     /// <summary>
     /// Returns a new instance in which all the ocurrences of the given value have been removed.
@@ -1489,10 +2231,9 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static StrSpan RemoveAll(this StrSpan source, StrSpan value, IEqualityComparer<string> comparer)
-    {
-        throw null;
-    }
+    public static StrSpan RemoveAll(
+        this StrSpan source, StrSpan value, IEqualityComparer<string> comparer)
+        => source.RemoveAll(value, comparer, out _);
 
     /// <summary>
     /// Returns a new instance in which all the ocurrences of the given value have been removed.
@@ -1501,8 +2242,7 @@ public static class StringSpanExtensions
     /// <param name="value"></param>
     /// <param name="comparison"></param>
     /// <returns></returns>
-    public static StrSpan RemoveAll(this StrSpan source, StrSpan value, StringComparison comparison)
-    {
-        throw null;
-    }
+    public static StrSpan RemoveAll(
+        this StrSpan source, StrSpan value, StringComparison comparison)
+        => source.RemoveAll(value, comparison, out _);
 }

@@ -47,10 +47,6 @@ public static class CharExtensions
 
     // ----------------------------------------------------
 
-    static readonly Lock Locker = new();
-    static readonly char[] ValueArray = new char[1];
-    static readonly char[] OtherArray = new char[1];
-
     /// <summary>
     /// Determines if the value of this char is the same as the value of the other given one.
     /// </summary>
@@ -60,13 +56,10 @@ public static class CharExtensions
     /// <returns></returns>
     public static bool Equals(this char value, char other, StringComparison comparison)
     {
-        lock (Locker)
-        {
-            ValueArray[0] = value; var svalue = new ReadOnlySpan<char>(ValueArray);
-            OtherArray[0] = other; var sother = new ReadOnlySpan<char>(OtherArray);
+        var values = new ReadOnlySpan<char>([value]);
+        var others = new ReadOnlySpan<char>([other]);
 
-            return svalue.Equals(sother, comparison);
-        }
+        return values.Equals(others, comparison);
     }
 
     /// <summary>
