@@ -60,53 +60,6 @@ public static partial class FragmentSelect
                 if (foundAll || foundAs) Body = new DbTokenLiteral(str.NotNullNotEmpty());
             }
         }
-        /*
-            
-            {
-                // Invalid literals not intercepted afterwards...
-                string main = literal.Value;
-                if (main.EndsWith(" OR", StringComparison.OrdinalIgnoreCase) ||
-                    main.EndsWith(" AND", StringComparison.OrdinalIgnoreCase))
-                    throw new EmptyException("Source ends with a connector.").WithData(main);
-
-                // Extracting connector from literal sources, if any...
-                if (main.Length > 0 && main[0] == ' ') main = main[1..];
-
-                string connector;
-                UseOR = null;
-                connector = "OR "; if (ExtractFirst(ref main, ref connector, false)) UseOR = true;
-                connector = "AND "; if (ExtractFirst(ref main, ref connector, false)) UseOR = false;
-                if (UseOR is not null) main = main.NotNullNotEmpty();
-
-                // Transforming 'target==value' into proper 'target=value' SQL...
-                var (target, value) = main.ExtractLeftRight("==", Engine, out var found);
-                if (found)
-                {
-                    target = Adjust(target);
-                    value = Adjust(value!);
-                    main = $"({target} = {value})";
-
-                    string Adjust(string source)
-                    {
-                        if (source is not null)
-                        {
-                            if (source.StartsWith('(') && !source.EndsWith(')')) source = source[1..];
-                            if (!source.StartsWith('(') && source.EndsWith(')')) source = source[..^1];
-                        }
-                        return source.NotNullNotEmpty(trim: true);
-                    }
-                }
-
-                // Finalizing...
-                if (UseOR is not null || found) Body = new DbTokenLiteral(main);
-            }
-
-            // Using 'target=value' instead of the right 'target==value' one...
-            else if (body is DbTokenSetter setter)
-            {
-                Body = new DbTokenBinary(setter.Target, ExpressionType.Equal, setter.Value);
-            }
-        }*/
 
         /// <summary>
         /// Copy constructor.

@@ -73,6 +73,26 @@ public static class Test_FragmentSelect
 
     //[Enforced]
     [Fact]
+    public static void Test_Literal_Complex()
+    {
+        var command = new FakeCommand(new FakeConnection(new FakeEngine()));
+        FragmentSelect.Master master;
+        FragmentSelect.Entry entry;
+        ICommandInfo.IBuilder builder;
+
+        master = new(command);
+        master.Capture(x => "(SELECT [Id] FROM Employees).* AS Emps");
+        Assert.Single(master);
+        entry = Assert.IsType<FragmentSelect.Entry>(master[0]);
+        Assert.True(entry.AllColumns);
+        Assert.Equal("Emps", entry.Alias);
+        builder = master.Visit();
+        Assert.Equal("(SELECT [Id] FROM Employees).* AS Emps", builder.Text);
+        Assert.Empty(builder.Parameters);
+    }
+
+    //[Enforced]
+    [Fact]
     public static void Test_Literal_Not_Supported()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
