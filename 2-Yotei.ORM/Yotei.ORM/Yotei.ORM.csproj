@@ -70,7 +70,6 @@
 	  <None Remove="4.Internal\**" />
    </ItemGroup>
    <ItemGroup>
-     <Folder Include="4.Tools.Collections\" />
      <Folder Include="3.Entities\" />
      <Folder Include="2.Records\" />
    </ItemGroup>
