@@ -1,7 +1,7 @@
 ﻿namespace Yotei.ORM.Internals;
 
 // ========================================================
-public static class StringFindIsolated
+public static class StrFindIsolated
 {
     /// <summary>
     /// The default set of characters that act as separators for isolated strings.

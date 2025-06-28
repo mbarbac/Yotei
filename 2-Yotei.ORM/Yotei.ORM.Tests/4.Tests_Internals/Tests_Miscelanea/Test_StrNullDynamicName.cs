@@ -5,7 +5,7 @@ namespace Yotei.ORM.Tests.Internals;
 
 // ========================================================
 //[Enforced]
-public static class Test_StringNullDynamicName
+public static class Test_StrNullDynamicName
 {
     //[Enforced]
     [Fact]
