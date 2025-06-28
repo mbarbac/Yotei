@@ -71,7 +71,6 @@
    </ItemGroup>
    <ItemGroup>
      <Folder Include="4.Tools.Collections\" />
-     <Folder Include="5.Internals\" />
      <Folder Include="3.Entities\" />
      <Folder Include="2.Records\" />
    </ItemGroup>

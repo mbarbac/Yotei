@@ -1,4 +1,4 @@
-﻿namespace Yotei.ORM.Tests.Internals;
+﻿namespace Yotei.ORM.Tests.Internals.StrTokens;
 
 // ========================================================
 //[Enforced]
