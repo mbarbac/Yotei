@@ -5,16 +5,6 @@ namespace Yotei.Tools;
 // ========================================================
 public static class StringSpanExtensions
 {
-    /// <summary>
-    /// Casts this span as a char enumeration.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <returns></returns>
-    public static IEnumerable<char> AsEnumerable(this StrSpan source)
-    {
-        foreach (var value in source) yield return value;
-    }
-
     // ----------------------------------------------------
     // IndexOf(char)
 
@@ -97,7 +87,7 @@ public static class StringSpanExtensions
     /// <returns></returns>
     public static int LastIndexOf(this StrSpan source, char value, bool sensitive)
     {
-        for (int i = source.Length -1; i >= 0; i--)
+        for (int i = source.Length - 1; i >= 0; i--)
             if (source[i].Equals(value, sensitive)) return i;
 
         return -1;
@@ -818,14 +808,69 @@ public static class StringSpanExtensions
     // ----------------------------------------------------
     // ContainsAny(span)
 
-    // The compiler complains when using any of the following methods as cannot determine if
-    // source is a IEnumerable<char> or a ReadOnlySpan<char>... I still don't konw why. In any
-    // case, the source is to pass source as a enumerable one: 'source.AsEnumerable()'
+    /// <summary>
+    /// Determines if the given source span contains any character from the given span, or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="sensitive"></param>
+    /// <returns></returns>
+    public static bool ContainsAny(this StrSpan source, in StrSpan values, bool sensitive)
+    {
+        if (source.Length == 0) return false;
+        if (values.Length == 0) return false;
 
-    // public static bool ContainsAny(this StrSpan source, StrSpan values, bool sensitive)
-    // public static bool ContainsAnyOfSpan(this StrSpan source, StrSpan values, IEqualityComparer<char> comparer)
-    // public static bool ContainsAnyOfSpan(this StrSpan source, StrSpan values, IEqualityComparer<string> comparer)
-    // public static bool ContainsAnyOfSpan(this StrSpan source, StrSpan values, StringComparison comparison)
+        foreach (var value in values) if (source.Contains(value, sensitive)) return true;
+        return false;
+    }
+
+    /// <summary>
+    /// Determines if the given source span contains any character from the given span, or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool ContainsAny(this StrSpan source, in StrSpan values, IEqualityComparer<char> comparer)
+    {
+        if (source.Length == 0) return false;
+        if (values.Length == 0) return false;
+
+        foreach (var value in values) if (source.Contains(value, comparer)) return true;
+        return false;
+    }
+
+    /// <summary>
+    /// Determines if the given source span contains any character from the given span, or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool ContainsAny(this StrSpan source, in StrSpan values, IEqualityComparer<string> comparer)
+    {
+        if (source.Length == 0) return false;
+        if (values.Length == 0) return false;
+
+        foreach (var value in values) if (source.Contains(value, comparer)) return true;
+        return false;
+    }
+
+    /// <summary>
+    /// Determines if the given source span contains any character from the given span, or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static bool ContainsAny(this StrSpan source, in StrSpan values, StringComparison comparison)
+    {
+        if (source.Length == 0) return false;
+        if (values.Length == 0) return false;
+
+        foreach (var value in values) if (source.Contains(value, comparison)) return true;
+        return false;
+    }
 
     // ----------------------------------------------------
     // StartsWith(char)

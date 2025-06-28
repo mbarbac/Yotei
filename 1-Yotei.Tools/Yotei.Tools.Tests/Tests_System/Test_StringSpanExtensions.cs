@@ -189,10 +189,250 @@ public static class Test_StringSpanExtensions
         Assert.False("abc".AsSpan().ContainsAny(values));
         Assert.True("abcz".AsSpan().ContainsAny(values));
 
-        Assert.False("ABC".AsSpan().ContainsAny(values.AsEnumerable(), sensitive: true));
-        Assert.True("ABCZ".AsSpan().ContainsAny(values.AsEnumerable(), sensitive: false));
+        Assert.False("ABC".AsSpan().ContainsAny(values, sensitive: true));
+        Assert.True("ABCZ".AsSpan().ContainsAny(values, sensitive: false));
 
-        Assert.False("ABC".AsSpan().ContainsAny(values.AsEnumerable(), new CharComparer((x, y) => x.Equals(y, true))));
-        Assert.True("ABCZ".AsSpan().ContainsAny(values.AsEnumerable(), new CharComparer((x, y) => x.Equals(y, false))));
+        Assert.False("ABC".AsSpan().ContainsAny(values, new CharComparer((x, y) => x.Equals(y, true))));
+        Assert.True("ABCZ".AsSpan().ContainsAny(values, new CharComparer((x, y) => x.Equals(y, false))));
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_StartsWith_Char()
+    {
+        var source = "abcde".AsSpan();
+
+        Assert.False(source.StartsWith('z'));
+        Assert.True(source.StartsWith('a'));
+
+        Assert.False(source.StartsWith('A', sensitive: true));
+        Assert.True(source.StartsWith('A', sensitive: false));
+
+        Assert.False(source.StartsWith('A', new CharComparer((x, y) => x.Equals(y, true))));
+        Assert.True(source.StartsWith('A', new CharComparer((x, y) => x.Equals(y, false))));
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_EndsWith_Char()
+    {
+        var source = "abcde".AsSpan();
+
+        Assert.False(source.EndsWith('z'));
+        Assert.True(source.EndsWith('e'));
+
+        Assert.False(source.EndsWith('E', sensitive: true));
+        Assert.True(source.EndsWith('E', sensitive: false));
+
+        Assert.False(source.EndsWith('E', new CharComparer((x, y) => x.Equals(y, true))));
+        Assert.True(source.EndsWith('E', new CharComparer((x, y) => x.Equals(y, false))));
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_StartsWith_Value()
+    {
+        var source = "abcde".AsSpan();
+
+        Assert.False(source.StartsWith("zz"));
+        Assert.True(source.StartsWith("ab"));
+
+        Assert.False(source.StartsWith("AB", sensitive: true));
+        Assert.True(source.StartsWith("AB", sensitive: false));
+
+        Assert.False(source.StartsWith("AB", new CharComparer((x, y) => x.Equals(y, true))));
+        Assert.True(source.StartsWith("AB", new CharComparer((x, y) => x.Equals(y, false))));
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_EndsWith_Value()
+    {
+        var source = "abcde".AsSpan();
+
+        Assert.False(source.EndsWith("zz"));
+        Assert.True(source.EndsWith("de"));
+
+        Assert.False(source.EndsWith("DE", sensitive: true));
+        Assert.True(source.EndsWith("DE", sensitive: false));
+
+        Assert.False(source.EndsWith("DE", new CharComparer((x, y) => x.Equals(y, true))));
+        Assert.True(source.EndsWith("DE", new CharComparer((x, y) => x.Equals(y, false))));
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Remove_Char()
+    {
+        var source = "xxabyyab".AsSpan();
+
+        var target = source.Remove('z', out var removed);
+        Assert.False(removed);
+
+        target = source.Remove('a', out removed);
+        Assert.True(removed);
+        Assert.Equal("xxbyyab", target);
+
+        target = source.Remove('A', sensitive: true, out removed);
+        Assert.False(removed);
+
+        target = source.Remove('A', sensitive: false, out removed);
+        Assert.True(removed);
+        Assert.Equal("xxbyyab", target);
+
+        target = source.Remove('A', new CharComparer((x, y) => x.Equals(y, true)), out removed);
+        Assert.False(removed);
+
+        target = source.Remove('A', new CharComparer((x, y) => x.Equals(y, false)), out removed);
+        Assert.True(removed);
+        Assert.Equal("xxbyyab", target);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_RemoveLast_Char()
+    {
+        var source = "xxabyyab".AsSpan();
+
+        var target = source.RemoveLast('z', out var removed);
+        Assert.False(removed);
+
+        target = source.RemoveLast('a', out removed);
+        Assert.True(removed);
+        Assert.Equal("xxabyyb", target);
+
+        target = source.RemoveLast('A', sensitive: true, out removed);
+        Assert.False(removed);
+
+        target = source.RemoveLast('A', sensitive: false, out removed);
+        Assert.True(removed);
+        Assert.Equal("xxabyyb", target);
+
+        target = source.RemoveLast('A', new CharComparer((x, y) => x.Equals(y, true)), out removed);
+        Assert.False(removed);
+
+        target = source.RemoveLast('A', new CharComparer((x, y) => x.Equals(y, false)), out removed);
+        Assert.True(removed);
+        Assert.Equal("xxabyyb", target);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_RemoveAll_Char()
+    {
+        var source = "xxabyyab".AsSpan();
+
+        var target = source.RemoveAll('z', out var removed);
+        Assert.False(removed);
+
+        target = source.RemoveAll('a', out removed);
+        Assert.True(removed);
+        Assert.Equal("xxbyyb", target);
+
+        target = source.RemoveAll('A', sensitive: true, out removed);
+        Assert.False(removed);
+
+        target = source.RemoveAll('A', sensitive: false, out removed);
+        Assert.True(removed);
+        Assert.Equal("xxbyyb", target);
+
+        target = source.RemoveAll('A', new CharComparer((x, y) => x.Equals(y, true)), out removed);
+        Assert.False(removed);
+
+        target = source.RemoveAll('A', new CharComparer((x, y) => x.Equals(y, false)), out removed);
+        Assert.True(removed);
+        Assert.Equal("xxbyyb", target);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Remove_Value()
+    {
+        var source = "xxabyyab".AsSpan();
+
+        var target = source.Remove("zz", out var removed);
+        Assert.False(removed);
+
+        target = source.Remove("ab", out removed);
+        Assert.True(removed);
+        Assert.Equal("xxyyab", target);
+
+        target = source.Remove("AB", sensitive: true, out removed);
+        Assert.False(removed);
+
+        target = source.Remove("AB", sensitive: false, out removed);
+        Assert.True(removed);
+        Assert.Equal("xxyyab", target);
+
+        target = source.Remove("AB", new CharComparer((x, y) => x.Equals(y, true)), out removed);
+        Assert.False(removed);
+
+        target = source.Remove("AB", new CharComparer((x, y) => x.Equals(y, false)), out removed);
+        Assert.True(removed);
+        Assert.Equal("xxyyab", target);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_RemoveLast_Value()
+    {
+        var source = "xxabyyab".AsSpan();
+
+        var target = source.RemoveLast("zz", out var removed);
+        Assert.False(removed);
+
+        target = source.RemoveLast("ab", out removed);
+        Assert.True(removed);
+        Assert.Equal("xxabyy", target);
+
+        target = source.RemoveLast("AB", sensitive: true, out removed);
+        Assert.False(removed);
+
+        target = source.RemoveLast("AB", sensitive: false, out removed);
+        Assert.True(removed);
+        Assert.Equal("xxabyy", target);
+
+        target = source.RemoveLast("AB", new CharComparer((x, y) => x.Equals(y, true)), out removed);
+        Assert.False(removed);
+
+        target = source.RemoveLast("AB", new CharComparer((x, y) => x.Equals(y, false)), out removed);
+        Assert.True(removed);
+        Assert.Equal("xxabyy", target);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_RemoveAll_Value()
+    {
+        var source = "xxabyyab".AsSpan();
+
+        var target = source.RemoveAll("zz", out var removed);
+        Assert.False(removed);
+
+        target = source.RemoveAll("ab", out removed);
+        Assert.True(removed);
+        Assert.Equal("xxyy", target);
+
+        target = source.RemoveAll("AB", sensitive: true, out removed);
+        Assert.False(removed);
+
+        target = source.RemoveAll("AB", sensitive: false, out removed);
+        Assert.True(removed);
+        Assert.Equal("xxyy", target);
+
+        target = source.RemoveAll("AB", new CharComparer((x, y) => x.Equals(y, true)), out removed);
+        Assert.False(removed);
+
+        target = source.RemoveAll("AB", new CharComparer((x, y) => x.Equals(y, false)), out removed);
+        Assert.True(removed);
+        Assert.Equal("xxyy", target);
     }
 }

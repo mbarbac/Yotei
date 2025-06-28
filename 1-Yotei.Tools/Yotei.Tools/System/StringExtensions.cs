@@ -915,7 +915,7 @@ public static class StringExtensions
     {
         source.ThrowWhenNull();
 
-        var item = source.AsSpan().Remove(value, out removed);
+        var item = source.AsSpan().RemoveLast(value, out removed);
         return removed ? item.ToString() : source;
     }
 
@@ -931,7 +931,7 @@ public static class StringExtensions
     {
         source.ThrowWhenNull();
 
-        var item = source.AsSpan().Remove(value, sensitive, out removed);
+        var item = source.AsSpan().RemoveLast(value, sensitive, out removed);
         return removed ? item.ToString() : source;
     }
 
@@ -948,7 +948,7 @@ public static class StringExtensions
     {
         source.ThrowWhenNull();
 
-        var item = source.AsSpan().Remove(value, comparer, out removed);
+        var item = source.AsSpan().RemoveLast(value, comparer, out removed);
         return removed ? item.ToString() : source;
     }
 
@@ -965,7 +965,7 @@ public static class StringExtensions
     {
         source.ThrowWhenNull();
 
-        var item = source.AsSpan().Remove(value, comparer, out removed);
+        var item = source.AsSpan().RemoveLast(value, comparer, out removed);
         return removed ? item.ToString() : source;
     }
 
@@ -982,7 +982,7 @@ public static class StringExtensions
     {
         source.ThrowWhenNull();
 
-        var item = source.AsSpan().Remove(value, comparison, out removed);
+        var item = source.AsSpan().RemoveLast(value, comparison, out removed);
         return removed ? item.ToString() : source;
     }
 
@@ -1053,7 +1053,7 @@ public static class StringExtensions
     {
         source.ThrowWhenNull();
 
-        var item = source.AsSpan().Remove(value, out removed);
+        var item = source.AsSpan().RemoveAll(value, out removed);
         return removed ? item.ToString() : source;
     }
 
@@ -1069,7 +1069,7 @@ public static class StringExtensions
     {
         source.ThrowWhenNull();
 
-        var item = source.AsSpan().Remove(value, sensitive, out removed);
+        var item = source.AsSpan().RemoveAll(value, sensitive, out removed);
         return removed ? item.ToString() : source;
     }
 
@@ -1085,7 +1085,7 @@ public static class StringExtensions
     {
         source.ThrowWhenNull();
 
-        var item = source.AsSpan().Remove(value, comparer, out removed);
+        var item = source.AsSpan().RemoveAll(value, comparer, out removed);
         return removed ? item.ToString() : source;
     }
 
@@ -1101,7 +1101,7 @@ public static class StringExtensions
     {
         source.ThrowWhenNull();
 
-        var item = source.AsSpan().Remove(value, comparer, out removed);
+        var item = source.AsSpan().RemoveAll(value, comparer, out removed);
         return removed ? item.ToString() : source;
     }
 
@@ -1117,7 +1117,7 @@ public static class StringExtensions
     {
         source.ThrowWhenNull();
 
-        var item = source.AsSpan().Remove(value, comparison, out removed);
+        var item = source.AsSpan().RemoveAll(value, comparison, out removed);
         return removed ? item.ToString() : source;
     }
 
