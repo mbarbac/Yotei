@@ -4,9 +4,9 @@
 public static class StringExtensions
 {
     /// <summary>
-    /// Returns null if the given source string is null or empty after being trimmed, if such
-    /// has been requested (by default). Otherwise, returns either the original string or the
-    /// trimmed one.
+    /// Returns null if the given source string is null or empty after being trimmed, if such has
+    /// been requested (by default). Otherwise, returns either the original string or the trimmed
+    /// one.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="trim"></param>
@@ -16,7 +16,7 @@ public static class StringExtensions
     {
         if (source is null) return null;
 
-        if (trim) // Only if requested...
+        if (trim)
         {
             var span = source.AsSpan().Trim();
             if (span.Length == 0) return null;
@@ -29,15 +29,15 @@ public static class StringExtensions
     }
 
     /// <summary>
-    /// Throws an <see cref="EmptyException"/> is the given source string is null or empty after
-    /// being trimmed if such is requested (by default). Otherwise, returns either the original
-    /// or the trimmed string.
-    /// <br/> If no trim is requested, spaces-only strings are considered valid ones.
+    /// Throws an <see cref="EmptyException"/> if the given source string is null or empty, either
+    /// by itself or, by default, after being trimmed. Returns either the original string or the
+    /// trimmed one, if such was requested.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="trim"></param>
     /// <param name="description"></param>
     /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string NotNullNotEmpty(
         this string? source,
         bool trim = true,
@@ -45,14 +45,10 @@ public static class StringExtensions
     {
         description = description.NullWhenEmpty() ?? nameof(description);
 
-        // Null ones throw by default...
-        source = source.ThrowWhenNull(description);
-
-        // Removing head and tail spaces only if requested...
-        if (trim) source = source.NullWhenEmpty(trim);
-
-        // Finishing...
+        source.ThrowWhenNull();
+        source = source.NullWhenEmpty(trim);
         if (source is null || source.Length == 0) throw new EmptyException(description);
+
         return source;
     }
 
@@ -80,201 +76,189 @@ public static class StringExtensions
     }
 
     // ----------------------------------------------------
-    // int IndexOf(char)
-    // int IndexOf(char, StringComparison)
+    // IndexOf(char)
+    // IndexOf(char, comparison)
 
     /// <summary>
-    /// Returns the index of the first ocurrence of the given character in the given source,
-    /// or -1 if it cannot be found.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="c"></param>
-    /// <param name="caseSensitive"></param>
-    /// <returns></returns>
-    public static int IndexOf(this string source, char c, bool caseSensitive)
-    {
-        source.ThrowWhenNull();
-        return source.AsSpan().IndexOf(c, caseSensitive);
-    }
-
-    /// <summary>
-    /// Returns the index of the first ocurrence of the given character in the given source,
-    /// or -1 if it cannot be found.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="c"></param>
-    /// <param name="comparer"></param>
-    /// <returns></returns>
-    public static int IndexOf(this string source, char c, IEqualityComparer<char> comparer)
-    {
-        source.ThrowWhenNull();
-        return source.AsSpan().IndexOf(c, comparer);
-    }
-
-    /// <summary>
-    /// Returns the index of the first ocurrence of the given character in the given source,
-    /// or -1 if it cannot be found.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="c"></param>
-    /// <param name="comparer"></param>
-    /// <returns></returns>
-    public static int IndexOf(this string source, char c, IEqualityComparer<string> comparer)
-    {
-        source.ThrowWhenNull();
-        return source.AsSpan().IndexOf(c, comparer);
-    }
-
-    /// <summary>
-    /// Returns the index of the first ocurrence of the given character in the given source,
-    /// or -1 if it cannot be found.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="c"></param>
-    /// <param name="comparison"></param>
-    /// <returns></returns>
-    public static int IndexOf(this string source, char c, StringComparison comparison)
-    {
-        source.ThrowWhenNull();
-        return source.AsSpan().IndexOf(c, comparison);
-    }
-
-    // ----------------------------------------------------
-    // int IndexOf(char)
-    // int IndexOf(char, StringComparison)
-
-    /// <summary>
-    /// Returns the index of the last ocurrence of the given character in the given source,
-    /// or -1 if it cannot be found.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="c"></param>
-    /// <param name="caseSensitive"></param>
-    /// <returns></returns>
-    public static int LastIndexOf(this string source, char c, bool caseSensitive)
-    {
-        source.ThrowWhenNull();
-        return source.AsSpan().LastIndexOf(c, caseSensitive);
-    }
-
-    /// <summary>
-    /// Returns the index of the last ocurrence of the given character in the given source,
-    /// or -1 if it cannot be found.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="c"></param>
-    /// <param name="comparer"></param>
-    /// <returns></returns>
-    public static int LastIndexOf(this string source, char c, IEqualityComparer<char> comparer)
-    {
-        source.ThrowWhenNull();
-        return source.AsSpan().LastIndexOf(c, comparer);
-    }
-
-    /// <summary>
-    /// Returns the index of the last ocurrence of the given character in the given source,
-    /// or -1 if it cannot be found.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="c"></param>
-    /// <param name="comparer"></param>
-    /// <returns></returns>
-    public static int LastIndexOf(this string source, char c, IEqualityComparer<string> comparer)
-    {
-        source.ThrowWhenNull();
-        return source.AsSpan().LastIndexOf(c, comparer);
-    }
-
-    /// <summary>
-    /// Returns the index of the last ocurrence of the given character in the given source,
-    /// or -1 if it cannot be found.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="c"></param>
-    /// <param name="comparison"></param>
-    /// <returns></returns>
-    public static int LastIndexOf(this string source, char c, StringComparison comparison)
-    {
-        source.ThrowWhenNull();
-        return source.AsSpan().LastIndexOf(c, comparison);
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Returns the indexes of all ocurrences of the given character in the given source.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="c"></param>
-    /// <param name="caseSensitive"></param>
-    /// <returns></returns>
-    public static List<int> IndexesOf(this string source, char c, bool caseSensitive)
-    {
-        source.ThrowWhenNull();
-        return source.AsSpan().IndexesOf(c, caseSensitive);
-    }
-
-    /// <summary>
-    /// Returns the indexes of all ocurrences of the given character in the given source.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="c"></param>
-    /// <param name="comparer"></param>
-    /// <returns></returns>
-    public static List<int> IndexesOf(this string source, char c, IEqualityComparer<char> comparer)
-    {
-        source.ThrowWhenNull();
-        return source.AsSpan().IndexesOf(c, comparer);
-    }
-
-    /// <summary>
-    /// Returns the indexes of all ocurrences of the given character in the given source.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="c"></param>
-    /// <param name="comparer"></param>
-    /// <returns></returns>
-    public static List<int> IndexesOf(this string source, char c, IEqualityComparer<string> comparer)
-    {
-        source.ThrowWhenNull();
-        return source.AsSpan().IndexesOf(c, comparer);
-    }
-
-    /// <summary>
-    /// Returns the indexes of all ocurrences of the given character in the given source.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="c"></param>
-    /// <param name="comparison"></param>
-    /// <returns></returns>
-    public static List<int> IndexesOf(this string source, char c, StringComparison comparison)
-    {
-        source.ThrowWhenNull();
-        return source.AsSpan().IndexesOf(c, comparison);
-    }
-
-    // ----------------------------------------------------
-    // int IndexOf(string)
-    // int IndexOf(string, StringComparison)
-
-    /// <summary>
-    /// Returns the index of the first ocurrence of the given character in the given source,
-    /// or -1 if it cannot be found.
+    /// Returns the index of the first ocurrence of the given value in the given source, or -1
+    /// if it cannot be found.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="value"></param>
-    /// <param name="caseSensitive"></param>
+    /// <param name="sensitive"></param>
     /// <returns></returns>
-    public static int IndexOf(this string source, string value, bool caseSensitive)
+    public static int IndexOf(this string source, char value, bool sensitive)
     {
         source.ThrowWhenNull();
-        value.ThrowWhenNull();
-        return source.AsSpan().IndexOf(value, caseSensitive);
+        return source.AsSpan().IndexOf(value, sensitive);
     }
 
     /// <summary>
-    /// Returns the index of the first ocurrence of the given character in the given source,
-    /// or -1 if it cannot be found.
+    /// Returns the index of the first ocurrence of the given value in the given source, or -1
+    /// if it cannot be found.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int IndexOf(this string source, char value, IEqualityComparer<char> comparer)
+    {
+        source.ThrowWhenNull();
+        return source.AsSpan().IndexOf(value, comparer);
+    }
+
+    /// <summary>
+    /// Returns the index of the first ocurrence of the given value in the given source, or -1
+    /// if it cannot be found.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int IndexOf(this string source, char value, IEqualityComparer<string> comparer)
+    {
+        source.ThrowWhenNull();
+        return source.AsSpan().IndexOf(value, comparer);
+    }
+
+    // ----------------------------------------------------
+    // LastIndexOf(char)
+    // LastIndexOf(char, comparison)
+
+    /// <summary>
+    /// Returns the index of the last ocurrence of the given value in the given source, or -1
+    /// if it cannot be found.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="sensitive"></param>
+    /// <returns></returns>
+    public static int LastIndexOf(this string source, char value, bool sensitive)
+    {
+        source.ThrowWhenNull();
+        return source.AsSpan().LastIndexOf(value, sensitive);
+    }
+
+    /// <summary>
+    /// Returns the index of the last ocurrence of the given value in the given source, or -1
+    /// if it cannot be found.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int LastIndexOf(
+        this string source, char value, IEqualityComparer<char> comparer)
+    {
+        source.ThrowWhenNull();
+        return source.AsSpan().LastIndexOf(value, comparer);
+    }
+
+    /// <summary>
+    /// Returns the index of the last ocurrence of the given value in the given source, or -1
+    /// if it cannot be found.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int LastIndexOf(
+        this string source, char value, IEqualityComparer<string> comparer)
+    {
+        source.ThrowWhenNull();
+        return source.AsSpan().LastIndexOf(value, comparer);
+    }
+    
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns the indexes of the ocurrences of the given value in the given source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static List<int> IndexesOf(this string source, char value)
+    {
+        source.ThrowWhenNull();
+        return source.AsSpan().IndexesOf(value);
+    }
+
+    /// <summary>
+    /// Returns the indexes of the ocurrences of the given value in the given source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="sensitive"></param>
+    /// <returns></returns>
+    public static List<int> IndexesOf(this string source, char value, bool sensitive)
+    {
+        source.ThrowWhenNull();
+        return source.AsSpan().IndexesOf(value, sensitive);
+    }
+
+    /// <summary>
+    /// Returns the indexes of the ocurrences of the given value in the given source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static List<int> IndexesOf(
+        this string source, char value, IEqualityComparer<char> comparer)
+    {
+        source.ThrowWhenNull();
+        return source.AsSpan().IndexesOf(value, comparer);
+    }
+
+    /// <summary>
+    /// Returns the indexes of the ocurrences of the given value in the given source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static List<int> IndexesOf(
+        this string source, char value, IEqualityComparer<string> comparer)
+    {
+        source.ThrowWhenNull();
+        return source.AsSpan().IndexesOf(value, comparer);
+    }
+
+    /// <summary>
+    /// Returns the indexes of the ocurrences of the given value in the given source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static List<int> IndexesOf(this string source, char value, StringComparison comparison)
+    {
+        source.ThrowWhenNull();
+        return source.AsSpan().IndexesOf(value, comparison);
+    }
+
+    // ----------------------------------------------------
+    // IndexOf(string)
+    // IndexOf(string, comparison)
+
+    /// <summary>
+    /// Returns the index of the first ocurrence of the given value in the given source, or -1
+    /// if it cannot be found.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="sensitive"></param>
+    /// <returns></returns>
+    public static int IndexOf(this string source, string value, bool sensitive)
+    {
+        source.ThrowWhenNull();
+        value.ThrowWhenNull();
+        return source.AsSpan().IndexOf(value, sensitive);
+    }
+
+    /// <summary>
+    /// Returns the index of the first ocurrence of the given value in the given source, or -1
+    /// if it cannot be found.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="value"></param>
@@ -288,8 +272,8 @@ public static class StringExtensions
     }
 
     /// <summary>
-    /// Returns the index of the first ocurrence of the given character in the given source,
-    /// or -1 if it cannot be found.
+    /// Returns the index of the first ocurrence of the given value in the given source, or -1
+    /// if it cannot be found.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="value"></param>
@@ -302,49 +286,35 @@ public static class StringExtensions
         return source.AsSpan().IndexOf(value, comparer);
     }
 
-    /// <summary>
-    /// Returns the index of the first ocurrence of the given character in the given source,
-    /// or -1 if it cannot be found.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="value"></param>
-    /// <param name="comparison"></param>
-    /// <returns></returns>
-    public static int IndexOf(this string source, string value, StringComparison comparison)
-    {
-        source.ThrowWhenNull();
-        value.ThrowWhenNull();
-        return source.AsSpan().IndexOf(value, comparison);
-    }
-
     // ----------------------------------------------------
-    // int LastIndexOf(string)
-    // int LastIndexOf(string, StringComparison)
+    // LastIndexOf(span)
+    // LastIndexOf(span, comparison)
 
     /// <summary>
-    /// Returns the index of the last ocurrence of the given value in the given source,
-    /// or -1 if it cannot be found.
+    /// Returns the index of the last ocurrence of the given value in the given source, or -1
+    /// if it cannot be found.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="value"></param>
-    /// <param name="caseSensitive"></param>
+    /// <param name="sensitive"></param>
     /// <returns></returns>
-    public static int LastIndexOf(this string source, string value, bool caseSensitive)
+    public static int LastIndexOf(this string source, string value, bool sensitive)
     {
         source.ThrowWhenNull();
         value.ThrowWhenNull();
-        return source.AsSpan().LastIndexOf(value, caseSensitive);
+        return source.AsSpan().LastIndexOf(value, sensitive);
     }
 
     /// <summary>
-    /// Returns the index of the last ocurrence of the given value in the given source,
-    /// or -1 if it cannot be found.
+    /// Returns the index of the last ocurrence of the given value in the given source, or -1
+    /// if it cannot be found.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static int LastIndexOf(this string source, string value, IEqualityComparer<char> comparer)
+    public static int LastIndexOf(
+        this string source, string value, IEqualityComparer<char> comparer)
     {
         source.ThrowWhenNull();
         value.ThrowWhenNull();
@@ -352,59 +322,59 @@ public static class StringExtensions
     }
 
     /// <summary>
-    /// Returns the index of the last ocurrence of the given value in the given source,
-    /// or -1 if it cannot be found.
+    /// Returns the index of the last ocurrence of the given value in the given source, or -1
+    /// if it cannot be found.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static int LastIndexOf(this string source, string value, IEqualityComparer<string> comparer)
+    public static int LastIndexOf(
+        this string source, string value, IEqualityComparer<string> comparer)
     {
         source.ThrowWhenNull();
         value.ThrowWhenNull();
         return source.AsSpan().LastIndexOf(value, comparer);
     }
 
-    /// <summary>
-    /// Returns the index of the last ocurrence of the given value in the given source,
-    /// or -1 if it cannot be found.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="value"></param>
-    /// <param name="comparison"></param>
-    /// <returns></returns>
-    public static int LastIndexOf(this string source, string value, StringComparison comparison)
-    {
-        source.ThrowWhenNull();
-        value.ThrowWhenNull();
-        return source.AsSpan().LastIndexOf(value, comparison);
-    }
-
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns the indexes of all ocurrences of the given value in the given source.
+    /// Returns the indexes of the ocurrences of the given value in the given source.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="c"></param>
-    /// <param name="caseSensitive"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    public static List<int> IndexesOf(this string source, string value, bool caseSensitive)
+    public static List<int> IndexesOf(this string source, string value)
     {
         source.ThrowWhenNull();
         value.ThrowWhenNull();
-        return source.AsSpan().IndexesOf(value, caseSensitive);
+        return source.AsSpan().IndexesOf(value);
     }
 
     /// <summary>
-    /// Returns the indexes of all ocurrences of the given value in the given source.
+    /// Returns the indexes of the ocurrences of the given value in the given source.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="c"></param>
+    /// <param name="value"></param>
+    /// <param name="sensitive"></param>
+    /// <returns></returns>
+    public static List<int> IndexesOf(this string source, string value, bool sensitive)
+    {
+        source.ThrowWhenNull();
+        value.ThrowWhenNull();
+        return source.AsSpan().IndexesOf(value, sensitive);
+    }
+
+    /// <summary>
+    /// Returns the indexes of the ocurrences of the given value in the given source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static List<int> IndexesOf(this string source, string value, IEqualityComparer<char> comparer)
+    public static List<int> IndexesOf(
+        this string source, string value, IEqualityComparer<char> comparer)
     {
         source.ThrowWhenNull();
         value.ThrowWhenNull();
@@ -412,13 +382,14 @@ public static class StringExtensions
     }
 
     /// <summary>
-    /// Returns the indexes of all ocurrences of the given value in the given source.
+    /// Returns the indexes of the ocurrences of the given value in the given source.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="c"></param>
+    /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static List<int> IndexesOf(this string source, string value, IEqualityComparer<string> comparer)
+    public static List<int> IndexesOf(
+        this string source, string value, IEqualityComparer<string> comparer)
     {
         source.ThrowWhenNull();
         value.ThrowWhenNull();
@@ -426,10 +397,10 @@ public static class StringExtensions
     }
 
     /// <summary>
-    /// Returns the indexes of all ocurrences of the given value in the given source.
+    /// Returns the indexes of the ocurrences of the given value in the given source.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="c"></param>
+    /// <param name="value"></param>
     /// <param name="comparison"></param>
     /// <returns></returns>
     public static List<int> IndexesOf(this string source, string value, StringComparison comparison)
@@ -440,82 +411,56 @@ public static class StringExtensions
     }
 
     // ----------------------------------------------------
-    // bool Contains(char)
-    // bool Contains(char, StringComparison)
-    // bool Contains(char, IEqualityComparer<char>?)
+    // Contains(char)
+    // Contains(char, comparison)
+    // Contains(char, char comparer) - Enumerable, Linq
 
     /// <summary>
-    /// Determines if the given source contains the given char, or not.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="c"></param>
-    /// <param name="caseSensitive"></param>
-    /// <returns></returns>
-    public static bool Contains(this string source, char c, bool caseSensitive)
-    {
-        source.ThrowWhenNull();
-        return source.AsSpan().Contains(c, caseSensitive);
-    }
-
-    /// <summary>
-    /// Determines if the given source contains the given char, or not.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="c"></param>
-    /// <param name="comparer"></param>
-    /// <returns></returns>
-    public static bool Contains(this string source, char c, IEqualityComparer<char> comparer)
-    {
-        source.ThrowWhenNull();
-        return source.AsSpan().Contains(c, comparer);
-    }
-
-    /// <summary>
-    /// Determines if the given source contains the given char, or not.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="c"></param>
-    /// <param name="caseSensitive"></param>
-    /// <returns></returns>
-    public static bool Contains(this string source, char c, IEqualityComparer<string> comparer)
-    {
-        source.ThrowWhenNull();
-        return source.AsSpan().Contains(c, comparer);
-    }
-
-    /// <summary>
-    /// Determines if the given source contains the given char, or not.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="c"></param>
-    /// <param name="comparison"></param>
-    /// <returns></returns>
-    public static bool Contains(this string source, char c, StringComparison comparison)
-    {
-        source.ThrowWhenNull();
-        return source.AsSpan().Contains(c, comparison);
-    }
-
-    // ----------------------------------------------------
-    // bool Contains(string)
-    // bool Contains(string, StringComparison)
-
-    /// <summary>
-    /// Determines if the given source contains the given value, or not.
+    /// Determines if the given source contains the given value or not.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="value"></param>
-    /// <param name="caseSensitive"></param>
+    /// <param name="sensitive"></param>
     /// <returns></returns>
-    public static bool Contains(this string source, string value, bool caseSensitive)
+    public static bool Contains(this string source, char value, bool sensitive)
     {
         source.ThrowWhenNull();
-        value.ThrowWhenNull();
-        return source.AsSpan().Contains(value, caseSensitive);
+        return source.AsSpan().Contains(value, sensitive);
     }
 
     /// <summary>
-    /// Determines if the given source contains the given value, or not.
+    /// Determines if the given source contains the given value or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool Contains(this string source, char value, IEqualityComparer<string> comparer)
+    {
+        source.ThrowWhenNull();
+        return source.AsSpan().Contains(value, comparer);
+    }
+
+    // ----------------------------------------------------
+    // Contains(string)
+    // Contains(string, comparison)
+
+    /// <summary>
+    /// Determines if the given source contains the given value or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="sensitive"></param>
+    /// <returns></returns>
+    public static bool Contains(this string source, string value, bool sensitive)
+    {
+        source.ThrowWhenNull();
+        value.ThrowWhenNull();
+        return source.AsSpan().Contains(value, sensitive);
+    }
+
+    /// <summary>
+    /// Determines if the given source contains the given value or not.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="value"></param>
@@ -529,7 +474,7 @@ public static class StringExtensions
     }
 
     /// <summary>
-    /// Determines if the given source contains the given value, or not.
+    /// Determines if the given source contains the given value or not.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="value"></param>
@@ -542,554 +487,1114 @@ public static class StringExtensions
         return source.AsSpan().Contains(value, comparer);
     }
 
+    // ----------------------------------------------------
+
     /// <summary>
-    /// Determines if the given source contains the given value, or not.
+    /// Determines if the given source contains any of the given values or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static bool ContainsAny(this string source, IEnumerable<char> values)
+    {
+        source.ThrowWhenNull();
+        values.ThrowWhenNull();
+        return source.AsSpan().ContainsAny(values);
+    }
+
+    /// <summary>
+    /// Determines if the given source span contains any character from the given array, or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="sensitive"></param>
+    /// <returns></returns>
+    public static bool ContainsAny(this string source, IEnumerable<char> values, bool sensitive)
+    {
+        source.ThrowWhenNull();
+        values.ThrowWhenNull();
+        return source.AsSpan().ContainsAny(values, sensitive);
+    }
+
+    /// <summary>
+    /// Determines if the given source span contains any character from the given array, or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool ContainsAny(
+        this string source, IEnumerable<char> values, IEqualityComparer<char> comparer)
+    {
+        source.ThrowWhenNull();
+        values.ThrowWhenNull();
+        return source.AsSpan().ContainsAny(values, comparer);
+    }
+
+    /// <summary>
+    /// Determines if the given source span contains any character from the given array, or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool ContainsAny(
+        this string source, IEnumerable<char> values, IEqualityComparer<string> comparer)
+    {
+        source.ThrowWhenNull();
+        values.ThrowWhenNull();
+        return source.AsSpan().ContainsAny(values, comparer);
+    }
+
+    /// <summary>
+    /// Determines if the given source span contains any character from the given array, or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static bool ContainsAny(
+        this string source, IEnumerable<char> values, StringComparison comparison)
+    {
+        source.ThrowWhenNull();
+        values.ThrowWhenNull();
+        return source.AsSpan().ContainsAny(values, comparison);
+    }
+
+    // ----------------------------------------------------
+    // StartsWith(char)
+
+    /// <summary>
+    /// Determines if the given source starts with the given value or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="sensitive"></param>
+    /// <returns></returns>
+    public static bool StartsWith(this string source, char value, bool sensitive)
+    {
+        source.ThrowWhenNull();
+        return source.AsSpan().StartsWith(value, sensitive);
+    }
+
+    /// <summary>
+    /// Determines if the given source starts with the given value or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool StartsWith(this string source, char value, IEqualityComparer<char> comparer)
+    {
+        source.ThrowWhenNull();
+        return source.AsSpan().StartsWith(value, comparer);
+    }
+
+    /// <summary>
+    /// Determines if the given source starts with the given value or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool StartsWith(this string source, char value, IEqualityComparer<string> comparer)
+    {
+        source.ThrowWhenNull();
+        return source.AsSpan().StartsWith(value, comparer);
+    }
+
+    /// <summary>
+    /// Determines if the given source starts with the given value or not.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <param name="comparison"></param>
     /// <returns></returns>
-    public static bool Contains(this string source, string value, StringComparison comparison)
+    public static bool StartsWith(this string source, char value, StringComparison comparison)
+    {
+        source.ThrowWhenNull();
+        return source.AsSpan().StartsWith(value, comparison);
+    }
+
+    // ----------------------------------------------------
+    // StartsWith(string)
+    // StartsWith(string, comparison)
+    // StartsWith(string, ignoreCase, CultureInfo? culture)
+
+    /// <summary>
+    /// Determines if the given source starts with the given value or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="sensitive"></param>
+    /// <returns></returns>
+    public static bool StartsWith(this string source, string value, bool sensitive)
     {
         source.ThrowWhenNull();
         value.ThrowWhenNull();
-        return source.AsSpan().Contains(value, comparison);
+        return source.AsSpan().StartsWith(value, sensitive);
+    }
+
+    /// <summary>
+    /// Determines if the given source starts with the given value or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool StartsWith(this string source, string value, IEqualityComparer<char> comparer)
+    {
+        source.ThrowWhenNull();
+        value.ThrowWhenNull();
+        return source.AsSpan().StartsWith(value, comparer);
+    }
+
+    /// <summary>
+    /// Determines if the given source starts with the given value or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool StartsWith(this string source, string value, IEqualityComparer<string> comparer)
+    {
+        source.ThrowWhenNull();
+        value.ThrowWhenNull();
+        return source.AsSpan().StartsWith(value, comparer);
+    }
+
+    // ----------------------------------------------------
+    // EndsWith(char)
+
+    /// <summary>
+    /// Determines if the given source ends with the given value or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="sensitive"></param>
+    /// <returns></returns>
+    public static bool EndsWith(this string source, char value, bool sensitive)
+    {
+        source.ThrowWhenNull();
+        return source.AsSpan().EndsWith(value, sensitive);
+    }
+
+    /// <summary>
+    /// Determines if the given source ends with the given value or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool EndsWith(this string source, char value, IEqualityComparer<char> comparer)
+    {
+        source.ThrowWhenNull();
+        return source.AsSpan().EndsWith(value, comparer);
+    }
+
+    /// <summary>
+    /// Determines if the given source ends with the given value or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool EndsWith(this string source, char value, IEqualityComparer<string> comparer)
+    {
+        source.ThrowWhenNull();
+        return source.AsSpan().EndsWith(value, comparer);
+    }
+
+    /// <summary>
+    /// Determines if the given source ends with the given value or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static bool EndsWith(this string source, char value, StringComparison comparison)
+    {
+        source.ThrowWhenNull();
+        return source.AsSpan().EndsWith(value, comparison);
+    }
+
+    // ----------------------------------------------------
+    // EndsWith(span)
+    // EndsWith(span, comparison)
+
+    /// <summary>
+    /// Determines if the given source ends with the given value or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="sensitive"></param>
+    /// <returns></returns>
+    public static bool EndsWith(this string source, string value, bool sensitive)
+    {
+        source.ThrowWhenNull();
+        value.ThrowWhenNull();
+        return source.AsSpan().EndsWith(value, sensitive);
+    }
+
+    /// <summary>
+    /// Determines if the given source ends with the given value or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool EndsWith(this string source, string value, IEqualityComparer<char> comparer)
+    {
+        source.ThrowWhenNull();
+        value.ThrowWhenNull();
+        return source.AsSpan().EndsWith(value, comparer);
+    }
+
+    /// <summary>
+    /// Determines if the given source ends with the given value or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool EndsWith(this string source, string value, IEqualityComparer<string> comparer)
+    {
+        source.ThrowWhenNull();
+        value.ThrowWhenNull();
+        return source.AsSpan().EndsWith(value, comparer);
     }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Determines if the given source contains any char from the given array, or not.
+    /// Returns a new instance in which the first ocurrence of the given value has been removed.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="array"></param>
+    /// <param name="value"></param>
+    /// <param name="removed"></param>
     /// <returns></returns>
-    public static bool ContainsAny(this string source, IEnumerable<char> array)
+    public static string Remove(this string source, char value, out bool removed)
     {
         source.ThrowWhenNull();
-        return source.AsSpan().ContainsAny(array);
+
+        var item = source.AsSpan().Remove(value, out removed);
+        return removed ? item.ToString() : source;
     }
 
     /// <summary>
-    /// Determines if the given source contains any char from the given array, or not.
+    /// Returns a new instance in which the first ocurrence of the given value has been removed.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="array"></param>
-    /// <param name="caseSensitive"></param>
+    /// <param name="value"></param>
+    /// <param name="sensitive"></param>
+    /// <param name="removed"></param>
     /// <returns></returns>
-    public static bool ContainsAny(this string source, IEnumerable<char> array, bool caseSensitive)
+    public static string Remove(this string source, char value, bool sensitive, out bool removed)
     {
         source.ThrowWhenNull();
-        return source.AsSpan().ContainsAny(array, caseSensitive);
+
+        var item = source.AsSpan().Remove(value, sensitive, out removed);
+        return removed ? item.ToString() : source;
     }
 
     /// <summary>
-    /// Determines if the given source contains any char from the given array, or not.
+    /// Returns a new instance in which the first ocurrence of the given value has been removed.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="array"></param>
+    /// <param name="value"></param>
     /// <param name="comparer"></param>
+    /// <param name="removed"></param>
     /// <returns></returns>
-    public static bool ContainsAny(this string source, IEnumerable<char> array, IEqualityComparer<char> comparer)
+    public static string Remove(
+        this string source, char value, IEqualityComparer<char> comparer, out bool removed)
     {
         source.ThrowWhenNull();
-        return source.AsSpan().ContainsAny(array, comparer);
+
+        var item = source.AsSpan().Remove(value, comparer, out removed);
+        return removed ? item.ToString() : source;
     }
 
     /// <summary>
-    /// Determines if the given source contains any char from the given array, or not.
+    /// Returns a new instance in which the first ocurrence of the given value has been removed.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="array"></param>
+    /// <param name="value"></param>
     /// <param name="comparer"></param>
+    /// <param name="removed"></param>
     /// <returns></returns>
-    public static bool ContainsAny(this string source, IEnumerable<char> array, IEqualityComparer<string> comparer)
+    public static string Remove(
+        this string source, char value, IEqualityComparer<string> comparer, out bool removed)
     {
         source.ThrowWhenNull();
-        return source.AsSpan().ContainsAny(array, comparer);
+
+        var item = source.AsSpan().Remove(value, comparer, out removed);
+        return removed ? item.ToString() : source;
     }
 
     /// <summary>
-    /// Determines if the given source contains any char from the given array, or not.
+    /// Returns a new instance in which the first ocurrence of the given value has been removed.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="array"></param>
+    /// <param name="value"></param>
     /// <param name="comparison"></param>
+    /// <param name="removed"></param>
     /// <returns></returns>
-    public static bool ContainsAny(this string source, IEnumerable<char> array, StringComparison comparison)
+    public static string Remove(
+        this string source, char value, StringComparison comparison, out bool removed)
     {
         source.ThrowWhenNull();
-        return source.AsSpan().ContainsAny(array, comparison);
+
+        var item = source.AsSpan().Remove(value, comparison, out removed);
+        return removed ? item.ToString() : source;
     }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Removes from the given source the first ocurrence of the given value.
+    /// Returns a new instance in which the first ocurrence of the given value has been removed.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static string Remove(this string source, string value)
-    {
-        source.ThrowWhenNull();
-        value.ThrowWhenNull();
-
-        var r = source.AsSpan().Remove(value, out var removed);
-        return removed ? r.ToString() : source;
-    }
+    public static string Remove(
+        this string source, char value) => source.Remove(value, out _);
 
     /// <summary>
-    /// Removes from the given source the first ocurrence of the given value.
+    /// Returns a new instance in which the first ocurrence of the given value has been removed.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="value"></param>
-    /// <param name="caseSensitive"></param>
+    /// <param name="sensitive"></param>
     /// <returns></returns>
-    public static string Remove(this string source, string value, bool caseSensitive)
-    {
-        source.ThrowWhenNull();
-        value.ThrowWhenNull();
-
-        var r = source.AsSpan().Remove(value, caseSensitive, out var removed);
-        return removed ? r.ToString() : source;
-    }
+    public static string Remove(
+        this string source, char value, bool sensitive) => source.Remove(value, sensitive, out _);
 
     /// <summary>
-    /// Removes from the given source the first ocurrence of the given value.
+    /// Returns a new instance in which the first ocurrence of the given value has been removed.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="value"></param>
-    /// <param name="caseSensitive"></param>
+    /// <param name="comparer"></param>
     /// <returns></returns>
-    public static string Remove(this string source, string value, IEqualityComparer<char> comparer)
-    {
-        source.ThrowWhenNull();
-        value.ThrowWhenNull();
-
-        var r = source.AsSpan().Remove(value, comparer, out var removed);
-        return removed ? r.ToString() : source;
-    }
+    public static string Remove(
+        this string source, char value, IEqualityComparer<char> comparer)
+        => source.Remove(value, comparer, out _);
 
     /// <summary>
-    /// Removes from the given source the first ocurrence of the given value.
+    /// Returns a new instance in which the first ocurrence of the given value has been removed.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="value"></param>
-    /// <param name="caseSensitive"></param>
+    /// <param name="comparer"></param>
     /// <returns></returns>
-    public static string Remove(this string source, string value, IEqualityComparer<string> comparer)
-    {
-        source.ThrowWhenNull();
-        value.ThrowWhenNull();
-
-        var r = source.AsSpan().Remove(value, comparer, out var removed);
-        return removed ? r.ToString() : source;
-    }
+    public static string Remove(
+        this string source, char value, IEqualityComparer<string> comparer)
+        => source.Remove(value, comparer, out _);
 
     /// <summary>
-    /// Removes from the given source the first ocurrence of the given value.
+    /// Returns a new instance in which the first ocurrence of the given value has been removed.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <param name="comparison"></param>
     /// <returns></returns>
-    public static string Remove(this string source, string value, StringComparison comparison)
+    public static string Remove(
+        this string source, char value, StringComparison comparison)
+        => source.Remove(value, comparison, out _);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns a new instance in which the last ocurrence of the given value has been removed.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string RemoveLast(this string source, char value, out bool removed)
     {
         source.ThrowWhenNull();
-        value.ThrowWhenNull();
 
-        var r = source.AsSpan().Remove(value, comparison, out var removed);
-        return removed ? r.ToString() : source;
+        var item = source.AsSpan().Remove(value, out removed);
+        return removed ? item.ToString() : source;
+    }
+
+    /// <summary>
+    /// Returns a new instance in which the last ocurrence of the given value has been removed.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="sensitive"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string RemoveLast(this string source, char value, bool sensitive, out bool removed)
+    {
+        source.ThrowWhenNull();
+
+        var item = source.AsSpan().Remove(value, sensitive, out removed);
+        return removed ? item.ToString() : source;
+    }
+
+    /// <summary>
+    /// Returns a new instance in which the last ocurrence of the given value has been removed.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string RemoveLast(
+        this string source, char value, IEqualityComparer<char> comparer, out bool removed)
+    {
+        source.ThrowWhenNull();
+
+        var item = source.AsSpan().Remove(value, comparer, out removed);
+        return removed ? item.ToString() : source;
+    }
+
+    /// <summary>
+    /// Returns a new instance in which the last ocurrence of the given value has been removed.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string RemoveLast(
+        this string source, char value, IEqualityComparer<string> comparer, out bool removed)
+    {
+        source.ThrowWhenNull();
+
+        var item = source.AsSpan().Remove(value, comparer, out removed);
+        return removed ? item.ToString() : source;
+    }
+
+    /// <summary>
+    /// Returns a new instance in which the last ocurrence of the given value has been removed.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparison"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string RemoveLast(
+        this string source, char value, StringComparison comparison, out bool removed)
+    {
+        source.ThrowWhenNull();
+
+        var item = source.AsSpan().Remove(value, comparison, out removed);
+        return removed ? item.ToString() : source;
     }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Removes from the given source the last ocurrence of the given value.
+    /// Returns a new instance in which the last ocurrence of the given value has been removed.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static string RemoveLast(this string source, string value)
-    {
-        source.ThrowWhenNull();
-        value.ThrowWhenNull();
-
-        var r = source.AsSpan().RemoveLast(value, out var removed);
-        return removed ? r.ToString() : source;
-    }
+    public static string RemoveLast(
+        this string source, char value) => source.RemoveLast(value, out _);
 
     /// <summary>
-    /// Removes from the given source the last ocurrence of the given value.
+    /// Returns a new instance in which the last ocurrence of the given value has been removed.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="value"></param>
-    /// <param name="caseSensitive"></param>
+    /// <param name="sensitive"></param>
     /// <returns></returns>
-    public static string RemoveLast(this string source, string value, bool caseSensitive)
-    {
-        source.ThrowWhenNull();
-        value.ThrowWhenNull();
-
-        var r = source.AsSpan().RemoveLast(value, caseSensitive, out var removed);
-        return removed ? r.ToString() : source;
-    }
+    public static string RemoveLast(
+        this string source, char value, bool sensitive) => source.RemoveLast(value, sensitive, out _);
 
     /// <summary>
-    /// Removes from the given source the last ocurrence of the given value.
+    /// Returns a new instance in which the last ocurrence of the given value has been removed.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static string RemoveLast(this string source, string value, IEqualityComparer<char> comparer)
-    {
-        source.ThrowWhenNull();
-        value.ThrowWhenNull();
-
-        var r = source.AsSpan().RemoveLast(value, comparer, out var removed);
-        return removed ? r.ToString() : source;
-    }
+    public static string RemoveLast(
+        this string source, char value, IEqualityComparer<char> comparer)
+        => source.RemoveLast(value, comparer, out _);
 
     /// <summary>
-    /// Removes from the given source the last ocurrence of the given value.
+    /// Returns a new instance in which the last ocurrence of the given value has been removed.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static string RemoveLast(this string source, string value, IEqualityComparer<string> comparer)
-    {
-        source.ThrowWhenNull();
-        value.ThrowWhenNull();
-
-        var r = source.AsSpan().RemoveLast(value, comparer, out var removed);
-        return removed ? r.ToString() : source;
-    }
+    public static string RemoveLast(
+        this string source, char value, IEqualityComparer<string> comparer)
+        => source.RemoveLast(value, comparer, out _);
 
     /// <summary>
-    /// Removes from the given source the last ocurrence of the given value.
+    /// Returns a new instance in which the last ocurrence of the given value has been removed.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <param name="comparison"></param>
     /// <returns></returns>
-    public static string RemoveLast(this string source, string value, StringComparison comparison)
+    public static string RemoveLast(
+        this string source, char value, StringComparison comparison)
+        => source.RemoveLast(value, comparison, out _);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns a new instance in which all the ocurrences of the given value have been removed.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string RemoveAll(this string source, char value, out bool removed)
     {
         source.ThrowWhenNull();
-        value.ThrowWhenNull();
 
-        var r = source.AsSpan().RemoveLast(value, comparison, out var removed);
-        return removed ? r.ToString() : source;
+        var item = source.AsSpan().Remove(value, out removed);
+        return removed ? item.ToString() : source;
+    }
+
+    /// <summary>
+    /// Returns a new instance in which all the ocurrences of the given value have been removed.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="sensitive"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string RemoveAll(this string source, char value, bool sensitive, out bool removed)
+    {
+        source.ThrowWhenNull();
+
+        var item = source.AsSpan().Remove(value, sensitive, out removed);
+        return removed ? item.ToString() : source;
+    }
+
+    /// <summary>
+    /// Returns a new instance in which all the ocurrences of the given value have been removed.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string RemoveAll(this string source, char value, IEqualityComparer<char> comparer, out bool removed)
+    {
+        source.ThrowWhenNull();
+
+        var item = source.AsSpan().Remove(value, comparer, out removed);
+        return removed ? item.ToString() : source;
+    }
+
+    /// <summary>
+    /// Returns a new instance in which all the ocurrences of the given value have been removed.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string RemoveAll(this string source, char value, IEqualityComparer<string> comparer, out bool removed)
+    {
+        source.ThrowWhenNull();
+
+        var item = source.AsSpan().Remove(value, comparer, out removed);
+        return removed ? item.ToString() : source;
+    }
+
+    /// <summary>
+    /// Returns a new instance in which all the ocurrences of the given value have been removed.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparison"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string RemoveAll(this string source, char value, StringComparison comparison, out bool removed)
+    {
+        source.ThrowWhenNull();
+
+        var item = source.AsSpan().Remove(value, comparison, out removed);
+        return removed ? item.ToString() : source;
     }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Removes from the given source all the ocurrences of the given value.
+    /// Returns a new instance in which all the ocurrences of the given value have been removed.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static string RemoveAll(this string source, string value)
-    {
-        source.ThrowWhenNull();
-        value.ThrowWhenNull();
-
-        var r = source.AsSpan().RemoveAll(value, out var removed);
-        return removed ? r.ToString() : source;
-    }
+    public static string RemoveAll(
+        this string source, char value) => source.RemoveAll(value, out _);
 
     /// <summary>
-    /// Removes from the given source all the ocurrences of the given value.
+    /// Returns a new instance in which all the ocurrences of the given value have been removed.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="value"></param>
-    /// <param name="caseSensitive"></param>
+    /// <param name="sensitive"></param>
     /// <returns></returns>
-    public static string RemoveAll(this string source, string value, bool caseSensitive)
-    {
-        source.ThrowWhenNull();
-        value.ThrowWhenNull();
-
-        var r = source.AsSpan().RemoveAll(value, caseSensitive, out var removed);
-        return removed ? r.ToString() : source;
-    }
+    public static string RemoveAll(
+        this string source, char value, bool sensitive) => source.RemoveAll(value, sensitive, out _);
 
     /// <summary>
-    /// Removes from the given source all the ocurrences of the given value.
+    /// Returns a new instance in which all the ocurrences of the given value have been removed.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static string RemoveAll(this string source, string value, IEqualityComparer<char> comparer)
-    {
-        source.ThrowWhenNull();
-        value.ThrowWhenNull();
-
-        var r = source.AsSpan().RemoveAll(value, comparer, out var removed);
-        return removed ? r.ToString() : source;
-    }
+    public static string RemoveAll(
+        this string source, char value, IEqualityComparer<char> comparer)
+        => source.RemoveAll(value, comparer, out _);
 
     /// <summary>
-    /// Removes from the given source all the ocurrences of the given value.
+    /// Returns a new instance in which all the ocurrences of the given value have been removed.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static string RemoveAll(this string source, string value, IEqualityComparer<string> comparer)
-    {
-        source.ThrowWhenNull();
-        value.ThrowWhenNull();
-
-        var r = source.AsSpan().RemoveAll(value, comparer, out var removed);
-        return removed ? r.ToString() : source;
-    }
+    public static string RemoveAll(
+        this string source, char value, IEqualityComparer<string> comparer)
+        => source.RemoveAll(value, comparer, out _);
 
     /// <summary>
-    /// Removes from the given source all the ocurrences of the given value.
+    /// Returns a new instance in which all the ocurrences of the given value have been removed.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <param name="comparison"></param>
     /// <returns></returns>
-    public static string RemoveAll(this string source, string value, StringComparison comparison)
+    public static string RemoveAll(
+        this string source, char value, StringComparison comparison)
+        => source.RemoveAll(value, comparison, out _);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns a new instance in which the first ocurrence of the given value has been removed.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string Remove(this string source, string value, out bool removed)
     {
         source.ThrowWhenNull();
         value.ThrowWhenNull();
 
-        var r = source.AsSpan().RemoveAll(value, comparison, out var removed);
-        return removed ? r.ToString() : source;
+        var item = source.AsSpan().Remove(value, out removed);
+        return removed ? item.ToString() : source;
+    }
+
+    /// <summary>
+    /// Returns a new instance in which the first ocurrence of the given value has been removed.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="sensitive"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string Remove(this string source, string value, bool sensitive, out bool removed)
+    {
+        source.ThrowWhenNull();
+        value.ThrowWhenNull();
+
+        var item = source.AsSpan().Remove(value, sensitive, out removed);
+        return removed ? item.ToString() : source;
+    }
+
+    /// <summary>
+    /// Returns a new instance in which the first ocurrence of the given value has been removed.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string Remove(
+        this string source, string value, IEqualityComparer<char> comparer, out bool removed)
+    {
+        source.ThrowWhenNull();
+        value.ThrowWhenNull();
+
+        var item = source.AsSpan().Remove(value, comparer, out removed);
+        return removed ? item.ToString() : source;
+    }
+
+    /// <summary>
+    /// Returns a new instance in which the first ocurrence of the given value has been removed.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string Remove(
+        this string source, string value, IEqualityComparer<string> comparer, out bool removed)
+    {
+        source.ThrowWhenNull();
+        value.ThrowWhenNull();
+
+        var item = source.AsSpan().Remove(value, comparer, out removed);
+        return removed ? item.ToString() : source;
+    }
+
+    /// <summary>
+    /// Returns a new instance in which the first ocurrence of the given value has been removed.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparison"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string Remove(
+        this string source, string value, StringComparison comparison, out bool removed)
+    {
+        source.ThrowWhenNull();
+        value.ThrowWhenNull();
+
+        var item = source.AsSpan().Remove(value, comparison, out removed);
+        return removed ? item.ToString() : source;
     }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Removes from the given source the first ocurrence of the given char.
+    /// Returns a new instance in which the first ocurrence of the given value has been removed.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="c"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    public static string Remove(this string source, char c)
-    {
-        source.ThrowWhenNull();
-
-        var r = source.AsSpan().Remove(c, out var removed);
-        return removed ? r.ToString() : source;
-    }
+    public static string Remove(
+        this string source, string value) => source.Remove(value, out _);
 
     /// <summary>
-    /// Removes from the given source the first ocurrence of the given char.
+    /// Returns a new instance in which the first ocurrence of the given value has been removed.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="c"></param>
-    /// <param name="caseSensitive"></param>
+    /// <param name="value"></param>
+    /// <param name="sensitive"></param>
     /// <returns></returns>
-    public static string Remove(this string source, char c, bool caseSensitive)
-    {
-        source.ThrowWhenNull();
-
-        var r = source.AsSpan().Remove(c, caseSensitive, out var removed);
-        return removed ? r.ToString() : source;
-    }
+    public static string Remove(
+        this string source, string value, bool sensitive) => source.Remove(value, sensitive, out _);
 
     /// <summary>
-    /// Removes from the given source the first ocurrence of the given char.
+    /// Returns a new instance in which the first ocurrence of the given value has been removed.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="c"></param>
+    /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static string Remove(this string source, char c, IEqualityComparer<char> comparer)
-    {
-        source.ThrowWhenNull();
-
-        var r = source.AsSpan().Remove(c, comparer, out var removed);
-        return removed ? r.ToString() : source;
-    }
+    public static string Remove(
+        this string source, string value, IEqualityComparer<char> comparer)
+        => source.Remove(value, comparer, out _);
 
     /// <summary>
-    /// Removes from the given source the first ocurrence of the given char.
+    /// Returns a new instance in which the first ocurrence of the given value has been removed.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="c"></param>
+    /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static string Remove(this string source, char c, IEqualityComparer<string> comparer)
-    {
-        source.ThrowWhenNull();
-
-        var r = source.AsSpan().Remove(c, comparer, out var removed);
-        return removed ? r.ToString() : source;
-    }
+    public static string Remove(
+        this string source, string value, IEqualityComparer<string> comparer)
+        => source.Remove(value, comparer, out _);
 
     /// <summary>
-    /// Removes from the given source the first ocurrence of the given char.
+    /// Returns a new instance in which the first ocurrence of the given value has been removed.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="c"></param>
+    /// <param name="value"></param>
     /// <param name="comparison"></param>
     /// <returns></returns>
-    public static string Remove(this string source, char c, StringComparison comparison)
+    public static string Remove(
+        this string source, string value, StringComparison comparison)
+        => source.Remove(value, comparison, out _);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns a new instance in which the last ocurrence of the given value has been removed.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string RemoveLast(this string source, string value, out bool removed)
     {
         source.ThrowWhenNull();
+        value.ThrowWhenNull();
 
-        var r = source.AsSpan().Remove(c, comparison, out var removed);
-        return removed ? r.ToString() : source;
+        var item = source.AsSpan().RemoveLast(value, out removed);
+        return removed ? item.ToString() : source;
+    }
+
+    /// <summary>
+    /// Returns a new instance in which the last ocurrence of the given value has been removed.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="sensitive"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string RemoveLast(this string source, string value, bool sensitive, out bool removed)
+    {
+        source.ThrowWhenNull();
+        value.ThrowWhenNull();
+
+        var item = source.AsSpan().RemoveLast(value, sensitive, out removed);
+        return removed ? item.ToString() : source;
+    }
+
+    /// <summary>
+    /// Returns a new instance in which the last ocurrence of the given value has been removed.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string RemoveLast(this string source, string value, IEqualityComparer<char> comparer, out bool removed)
+    {
+        source.ThrowWhenNull();
+        value.ThrowWhenNull();
+
+        var item = source.AsSpan().RemoveLast(value, comparer, out removed);
+        return removed ? item.ToString() : source;
+    }
+
+    /// <summary>
+    /// Returns a new instance in which the last ocurrence of the given value has been removed.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string RemoveLast(this string source, string value, IEqualityComparer<string> comparer, out bool removed)
+    {
+        source.ThrowWhenNull();
+        value.ThrowWhenNull();
+
+        var item = source.AsSpan().RemoveLast(value, comparer, out removed);
+        return removed ? item.ToString() : source;
+    }
+
+    /// <summary>
+    /// Returns a new instance in which the last ocurrence of the given value has been removed.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparison"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string RemoveLast(this string source, string value, StringComparison comparison, out bool removed)
+    {
+        source.ThrowWhenNull();
+        value.ThrowWhenNull();
+
+        var item = source.AsSpan().RemoveLast(value, comparison, out removed);
+        return removed ? item.ToString() : source;
     }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Removes from the given source the last ocurrence of the given char.
+    /// Returns a new instance in which the last ocurrence of the given value has been removed.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="c"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    public static string RemoveLast(this string source, char c)
-    {
-        source.ThrowWhenNull();
-
-        var r = source.AsSpan().RemoveLast(c, out var removed);
-        return removed ? r.ToString() : source;
-    }
+    public static string RemoveLast(
+        this string source, string value) => source.RemoveLast(value, out _);
 
     /// <summary>
-    /// Removes from the given source the last ocurrence of the given char.
+    /// Returns a new instance in which the last ocurrence of the given value has been removed.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="c"></param>
-    /// <param name="caseSensitive"></param>
+    /// <param name="value"></param>
+    /// <param name="sensitive"></param>
     /// <returns></returns>
-    public static string RemoveLast(this string source, char c, bool caseSensitive)
-    {
-        source.ThrowWhenNull();
-
-        var r = source.AsSpan().RemoveLast(c, caseSensitive, out var removed);
-        return removed ? r.ToString() : source;
-    }
+    public static string RemoveLast(
+        this string source, string value, bool sensitive) => source.RemoveLast(value, sensitive, out _);
 
     /// <summary>
-    /// Removes from the given source the last ocurrence of the given char.
+    /// Returns a new instance in which the last ocurrence of the given value has been removed.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="c"></param>
+    /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static string RemoveLast(this string source, char c, IEqualityComparer<char> comparer)
-    {
-        source.ThrowWhenNull();
-
-        var r = source.AsSpan().RemoveLast(c, comparer, out var removed);
-        return removed ? r.ToString() : source;
-    }
+    public static string RemoveLast(
+        this string source, string value, IEqualityComparer<char> comparer)
+        => source.RemoveLast(value, comparer, out _);
 
     /// <summary>
-    /// Removes from the given source the last ocurrence of the given char.
+    /// Returns a new instance in which the last ocurrence of the given value has been removed.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="c"></param>
+    /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static string RemoveLast(this string source, char c, IEqualityComparer<string> comparer)
-    {
-        source.ThrowWhenNull();
-
-        var r = source.AsSpan().RemoveLast(c, comparer, out var removed);
-        return removed ? r.ToString() : source;
-    }
+    public static string RemoveLast(
+        this string source, string value, IEqualityComparer<string> comparer)
+        => source.RemoveLast(value, comparer, out _);
 
     /// <summary>
-    /// Removes from the given source the last ocurrence of the given char.
+    /// Returns a new instance in which the last ocurrence of the given value has been removed.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="c"></param>
+    /// <param name="value"></param>
     /// <param name="comparison"></param>
     /// <returns></returns>
-    public static string RemoveLast(this string source, char c, StringComparison comparison)
+    public static string RemoveLast(
+        this string source, string value, StringComparison comparison)
+        => source.RemoveLast(value, comparison, out _);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns a new instance in which all the ocurrences of the given value have been removed.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string RemoveAll(this string source, string value, out bool removed)
     {
         source.ThrowWhenNull();
+        value.ThrowWhenNull();
 
-        var r = source.AsSpan().RemoveLast(c, comparison, out var removed);
-        return removed ? r.ToString() : source;
+        var item = source.AsSpan().RemoveAll(value, out removed);
+        return removed ? item.ToString() : source;
+    }
+
+    /// <summary>
+    /// Returns a new instance in which all the ocurrences of the given value have been removed.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="sensitive"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string RemoveAll(this string source, string value, bool sensitive, out bool removed)
+    {
+        source.ThrowWhenNull();
+        value.ThrowWhenNull();
+
+        var item = source.AsSpan().RemoveAll(value, sensitive, out removed);
+        return removed ? item.ToString() : source;
+    }
+
+    /// <summary>
+    /// Returns a new instance in which all the ocurrences of the given value have been removed.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string RemoveAll(this string source, string value, IEqualityComparer<char> comparer, out bool removed)
+    {
+        source.ThrowWhenNull();
+        value.ThrowWhenNull();
+
+        var item = source.AsSpan().RemoveAll(value, comparer, out removed);
+        return removed ? item.ToString() : source;
+    }
+
+    /// <summary>
+    /// Returns a new instance in which all the ocurrences of the given value have been removed.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string RemoveAll(this string source, string value, IEqualityComparer<string> comparer, out bool removed)
+    {
+        source.ThrowWhenNull();
+        value.ThrowWhenNull();
+
+        var item = source.AsSpan().RemoveAll(value, comparer, out removed);
+        return removed ? item.ToString() : source;
+    }
+
+    /// <summary>
+    /// Returns a new instance in which all the ocurrences of the given value have been removed.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparison"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static string RemoveAll(this string source, string value, StringComparison comparison, out bool removed)
+    {
+        source.ThrowWhenNull();
+        value.ThrowWhenNull();
+
+        var item = source.AsSpan().RemoveAll(value, comparison, out removed);
+        return removed ? item.ToString() : source;
     }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Removes from the given source all ocurrences of the given char.
+    /// Returns a new instance in which all the ocurrences of the given value have been removed.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="c"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    public static string RemoveAll(this string source, char c)
-    {
-        source.ThrowWhenNull();
-
-        var r = source.AsSpan().RemoveAll(c, out var removed);
-        return removed ? r.ToString() : source;
-    }
+    public static string RemoveAll(
+        this string source, string value) => source.RemoveAll(value, out _);
 
     /// <summary>
-    /// Removes from the given source all ocurrences of the given char.
+    /// Returns a new instance in which all the ocurrences of the given value have been removed.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="c"></param>
-    /// <param name="caseSensitive"></param>
+    /// <param name="value"></param>
+    /// <param name="sensitive"></param>
     /// <returns></returns>
-    public static string RemoveAll(this string source, char c, bool caseSensitive)
-    {
-        source.ThrowWhenNull();
-
-        var r = source.AsSpan().RemoveAll(c, caseSensitive, out var removed);
-        return removed ? r.ToString() : source;
-    }
+    public static string RemoveAll(
+        this string source, string value, bool sensitive) => source.RemoveAll(value, sensitive, out _);
 
     /// <summary>
-    /// Removes from the given source all ocurrences of the given char.
+    /// Returns a new instance in which all the ocurrences of the given value have been removed.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="c"></param>
+    /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static string RemoveAll(this string source, char c, IEqualityComparer<char> comparer)
-    {
-        source.ThrowWhenNull();
-
-        var r = source.AsSpan().RemoveAll(c, comparer, out var removed);
-        return removed ? r.ToString() : source;
-    }
+    public static string RemoveAll(
+        this string source, string value, IEqualityComparer<char> comparer)
+        => source.RemoveAll(value, comparer, out _);
 
     /// <summary>
-    /// Removes from the given source all ocurrences of the given char.
+    /// Returns a new instance in which all the ocurrences of the given value have been removed.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="c"></param>
+    /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static string RemoveAll(this string source, char c, IEqualityComparer<string> comparer)
-    {
-        source.ThrowWhenNull();
-
-        var r = source.AsSpan().RemoveAll(c, comparer, out var removed);
-        return removed ? r.ToString() : source;
-    }
+    public static string RemoveAll(
+        this string source, string value, IEqualityComparer<string> comparer)
+        => source.RemoveAll(value, comparer, out _);
 
     /// <summary>
-    /// Removes from the given source all ocurrences of the given char.
+    /// Returns a new instance in which all the ocurrences of the given value have been removed.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="c"></param>
+    /// <param name="value"></param>
     /// <param name="comparison"></param>
     /// <returns></returns>
-    public static string RemoveAll(this string source, char c, StringComparison comparison)
-    {
-        source.ThrowWhenNull();
-
-        var r = source.AsSpan().RemoveAll(c, comparison, out var removed);
-        return removed ? r.ToString() : source;
-    }
+    public static string RemoveAll(
+        this string source, string value, StringComparison comparison)
+        => source.RemoveAll(value, comparison, out _);
 }
