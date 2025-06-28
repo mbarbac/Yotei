@@ -6,9 +6,10 @@
 	  <ImplicitUsings>disable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
 	  <Configurations>Debug;Release;Local</Configurations>
-	  <NoWarn>RS1038</NoWarn>
+	  <NoWarn>RS1038;IDE0130</NoWarn>
    </PropertyGroup>
    <!--RS1038: Generator implemented in assembly containing Microsoft.CodeAnalysis.Workspaces -->
+   <!--IDE0130: Structure folder does not match namespaces -->
 
    <PropertyGroup>
 	  <Description>Yotei With Methods Generator</Description>

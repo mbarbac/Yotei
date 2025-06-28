@@ -12,7 +12,7 @@ internal class XTypeNode : TypeNode
     // ----------------------------------------------------
 
     const string IInvariantListNamespace = "Yotei.ORM.Tools";
-    const string InvariantListNamespace = "Yotei.ORM.Tools";
+    const string InvariantListNamespace = "Yotei.ORM.Tools.Code";
 
     const string IInvariantListName = "IInvariantList";
     const string InvariantListName = "InvariantList";
