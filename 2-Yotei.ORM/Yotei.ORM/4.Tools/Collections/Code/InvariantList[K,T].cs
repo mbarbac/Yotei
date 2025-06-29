@@ -6,12 +6,7 @@
 [Cloneable]
 public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
 {
-    /// <summary>
-    /// The actual repository of contents of this instance.
-    /// </summary>
     protected abstract ICoreList<K, T> Items { get; }
-
-    // ----------------------------------------------------
 
     /// <summary>
     /// Initializes a new empty instance.
