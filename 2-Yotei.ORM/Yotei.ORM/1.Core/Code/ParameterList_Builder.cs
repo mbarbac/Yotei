@@ -1,10 +1,10 @@
-﻿using IHost = Yotei.ORM.Tests.Generators.IElementList_KT;
-using IItem = Yotei.ORM.Tests.Generators.IElement;
+﻿using IHost = Yotei.ORM.IParameterList;
+using IItem = Yotei.ORM.IParameter;
 using TKey = string;
 
-namespace Yotei.ORM.Tests.Generators;
+namespace Yotei.ORM.Code;
 
-partial class ElementList_KT
+partial class ParameterList
 {
     // ====================================================
     /// <inheritdoc cref="IHost.IBuilder"/>
@@ -15,28 +15,28 @@ partial class ElementList_KT
         /// <summary>
         /// Initializes a new instance.
         /// </summary>
-        /// <param name="sensitive"></param>
-        public Builder(bool sensitive) => CaseSensitive = sensitive;
+        /// <param name="engine"></param>
+        public Builder(IEngine engine) => Engine = engine;
 
         /// <summary>
         /// Initializes a new empty instance with the given initial capacity.
         /// </summary>
-        /// <param name="sensitive"></param>
+        /// <param name="engine"></param>
         /// <param name="capacity"></param>
-        public Builder(bool sensitive, int capacity) : this(sensitive) => Capacity = capacity;
+        public Builder(IEngine engine, int capacity) : this(engine) => Capacity = capacity;
 
         /// <summary>
         /// Initializes a new instance with the elements of the given range.
         /// </summary>
-        /// <param name="sensitive"></param>
+        /// <param name="engine"></param>
         /// <param name="range"></param>
-        public Builder(bool sensitive, IEnumerable<IItem> range) : this(sensitive) => AddRange(range);
+        public Builder(IEngine engine, IEnumerable<IItem> range) : this(engine) => AddRange(range);
 
         /// <summary>
         /// Copy constructor.
         /// </summary>
         /// <param name="source"></param>
-        protected Builder(Builder source) : this(source.CaseSensitive) => AddRange(source);
+        protected Builder(Builder source) : this(source.Engine) => AddRange(source);
 
         /// <inheritdoc/>
         public override string ToString() => base.ToString();
@@ -44,13 +44,7 @@ partial class ElementList_KT
         // ----------------------------------------------------
 
         /// <inheritdoc/>
-        public override IItem ValidateItem(IItem item)
-        {
-            item.ThrowWhenNull();
-            if (item is NamedElement named) named.Name.NotNullNotEmpty();
-
-            return item;
-        }
+        public override IItem ValidateItem(IItem item) => item.ThrowWhenNull();
 
         /// <inheritdoc/>
         public override TKey GetKey(IItem item) => item.Name;
@@ -59,18 +53,13 @@ partial class ElementList_KT
         public override TKey ValidateKey(TKey key) => key.NotNullNotEmpty();
 
         /// <inheritdoc/>
-        public override bool ExpandItems => true; // Flat collection allowed...
+        public override bool ExpandItems => false;
 
         /// <inheritdoc/>
         public override bool IsValidDuplicate(IItem source, IItem item)
-        {
-            // Only named elements are acceptable, but only if they are the same instance...
-            if (source is NamedElement &&
-                item is NamedElement &&
-                ReferenceEquals(source, item)) return true;
-
-            throw new DuplicateException("Duplicated element.").WithData(item).WithData(this);
-        }
+            => ReferenceEquals(source, item)
+            ? true
+            : throw new DuplicateException("Duplicated Element.").WithData(item);
 
         /// <inheritdoc/>
         public override IEqualityComparer<TKey> Comparer => _Comparer ??= new ItemComparer(this);
@@ -79,7 +68,7 @@ partial class ElementList_KT
         readonly struct ItemComparer(Builder Master) : IEqualityComparer<TKey>
         {
             public bool Equals(TKey? x, TKey? y)
-                => string.Compare(x, y, !Master.CaseSensitive) == 0;
+                => string.Compare(x, y, !Master.Engine.CaseSensitiveNames) == 0;
 
             public int GetHashCode([DisallowNull] TKey obj) => throw new NotImplementedException();
         }
@@ -87,27 +76,53 @@ partial class ElementList_KT
         // ------------------------------------------------
 
         /// <inheritdoc cref="IHost.IBuilder.CreateInstance"/>
-        public virtual ElementList_KT CreateInstance() => new(CaseSensitive, this);
+        public virtual ParameterList CreateInstance() => new(Engine, this);
         IHost IHost.IBuilder.CreateInstance() => CreateInstance();
 
         /// <inheritdoc/>
-        public bool CaseSensitive
+        public IEngine Engine
         {
-            get => _CaseSensitive;
+            get => _Engine;
             set
             {
-                if (value != _CaseSensitive)
+                if (!ReferenceEquals(_Engine, value))
                 {
                     var range = ToList();
-                    
-                    Clear(); _CaseSensitive = value;
+
+                    Clear(); _Engine = value;
                     AddRange(range);
                 }
             }
         }
-        bool _CaseSensitive;
+        IEngine _Engine = default!;
+
+        // ------------------------------------------------
 
         /// <inheritdoc/>
-        public string Name => Count == 0 ? string.Empty : string.Concat(this.Select(x => x.Name));
+        public string NextName()
+        {
+            for (int i = Count; i < int.MaxValue; i++)
+            {
+                var name = $"{Engine.ParameterPrefix}{i}";
+                var index = IndexOf(name);
+                if (index < 0) return name;
+            }
+
+            throw new UnExpectedException("Range of integers exahusted.");
+        }
+
+        /// <inheritdoc/>
+        public virtual int AddNew(object? value, out IItem item)
+        {
+            item = new Parameter(NextName(), value);
+            return Add(item);
+        }
+
+        /// <inheritdoc/>
+        public virtual int InsertNew(int index, object? value, out IItem item)
+        {
+            item = new Parameter(NextName(), value);
+            return Insert(index, item);
+        }
     }
 }

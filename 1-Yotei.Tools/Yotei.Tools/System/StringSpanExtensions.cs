@@ -1164,7 +1164,7 @@ public static class StringSpanExtensions
         removed = true;
         if (index == 0 && source.Length == 1) return StrSpan.Empty;
 
-        var array = new char[source.Length - 1];
+        var array = new char[source.Length - 1]; // Not stackalloc, source can be > 1 Kb...
         source[..index].CopyTo(array);
 
         var dest = array.AsSpan(index);
@@ -1193,7 +1193,7 @@ public static class StringSpanExtensions
         removed = true;
         if (index == 0 && source.Length == 1) return StrSpan.Empty;
 
-        var array = new char[source.Length - 1];
+        var array = new char[source.Length - 1]; // Not stackalloc, source can be > 1 Kb...
         source[..index].CopyTo(array);
 
         var dest = array.AsSpan(index);
@@ -1211,7 +1211,8 @@ public static class StringSpanExtensions
     /// <param name="comparer"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    public static StrSpan Remove(this StrSpan source, char value, IEqualityComparer<char> comparer, out bool removed)
+    public static StrSpan Remove(
+        this StrSpan source, char value, IEqualityComparer<char> comparer, out bool removed)
     {
         removed = false;
         if (source.Length == 0) return source;
@@ -1222,7 +1223,7 @@ public static class StringSpanExtensions
         removed = true;
         if (index == 0 && source.Length == 1) return StrSpan.Empty;
 
-        var array = new char[source.Length - 1];
+        var array = new char[source.Length - 1]; // Not stackalloc, source can be > 1 Kb...
         source[..index].CopyTo(array);
 
         var dest = array.AsSpan(index);
@@ -1240,7 +1241,8 @@ public static class StringSpanExtensions
     /// <param name="comparer"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    public static StrSpan Remove(this StrSpan source, char value, IEqualityComparer<string> comparer, out bool removed)
+    public static StrSpan Remove(
+        this StrSpan source, char value, IEqualityComparer<string> comparer, out bool removed)
     {
         removed = false;
         if (source.Length == 0) return source;
@@ -1251,7 +1253,7 @@ public static class StringSpanExtensions
         removed = true;
         if (index == 0 && source.Length == 1) return StrSpan.Empty;
 
-        var array = new char[source.Length - 1];
+        var array = new char[source.Length - 1]; // Not stackalloc, source can be > 1 Kb...
         source[..index].CopyTo(array);
 
         var dest = array.AsSpan(index);
@@ -1269,7 +1271,8 @@ public static class StringSpanExtensions
     /// <param name="comparison"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    public static StrSpan Remove(this StrSpan source, char value, StringComparison comparison, out bool removed)
+    public static StrSpan Remove(
+        this StrSpan source, char value, StringComparison comparison, out bool removed)
     {
         removed = false;
         if (source.Length == 0) return source;
@@ -1280,7 +1283,7 @@ public static class StringSpanExtensions
         removed = true;
         if (index == 0 && source.Length == 1) return StrSpan.Empty;
 
-        var array = new char[source.Length - 1];
+        var array = new char[source.Length - 1]; // Not stackalloc, source can be > 1 Kb...
         source[..index].CopyTo(array);
 
         var dest = array.AsSpan(index);
@@ -1364,7 +1367,7 @@ public static class StringSpanExtensions
         removed = true;
         if (index == 0 && source.Length == 1) return StrSpan.Empty;
 
-        var array = new char[source.Length - 1];
+        var array = new char[source.Length - 1]; // Not stackalloc, source can be > 1 Kb...
         source[..index].CopyTo(array);
 
         var dest = array.AsSpan(index);
@@ -1393,7 +1396,7 @@ public static class StringSpanExtensions
         removed = true;
         if (index == 0 && source.Length == 1) return StrSpan.Empty;
 
-        var array = new char[source.Length - 1];
+        var array = new char[source.Length - 1]; // Not stackalloc, source can be > 1 Kb...
         source[..index].CopyTo(array);
 
         var dest = array.AsSpan(index);
@@ -1411,7 +1414,8 @@ public static class StringSpanExtensions
     /// <param name="comparer"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    public static StrSpan RemoveLast(this StrSpan source, char value, IEqualityComparer<char> comparer, out bool removed)
+    public static StrSpan RemoveLast(
+        this StrSpan source, char value, IEqualityComparer<char> comparer, out bool removed)
     {
         removed = false;
         if (source.Length == 0) return source;
@@ -1422,7 +1426,7 @@ public static class StringSpanExtensions
         removed = true;
         if (index == 0 && source.Length == 1) return StrSpan.Empty;
 
-        var array = new char[source.Length - 1];
+        var array = new char[source.Length - 1]; // Not stackalloc, source can be > 1 Kb...
         source[..index].CopyTo(array);
 
         var dest = array.AsSpan(index);
@@ -1440,7 +1444,8 @@ public static class StringSpanExtensions
     /// <param name="comparer"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    public static StrSpan RemoveLast(this StrSpan source, char value, IEqualityComparer<string> comparer, out bool removed)
+    public static StrSpan RemoveLast(
+        this StrSpan source, char value, IEqualityComparer<string> comparer, out bool removed)
     {
         removed = false;
         if (source.Length == 0) return source;
@@ -1451,7 +1456,7 @@ public static class StringSpanExtensions
         removed = true;
         if (index == 0 && source.Length == 1) return StrSpan.Empty;
 
-        var array = new char[source.Length - 1];
+        var array = new char[source.Length - 1]; // Not stackalloc, source can be > 1 Kb...
         source[..index].CopyTo(array);
 
         var dest = array.AsSpan(index);
@@ -1469,7 +1474,8 @@ public static class StringSpanExtensions
     /// <param name="comparison"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    public static StrSpan RemoveLast(this StrSpan source, char value, StringComparison comparison, out bool removed)
+    public static StrSpan RemoveLast(
+        this StrSpan source, char value, StringComparison comparison, out bool removed)
     {
         removed = false;
         if (source.Length == 0) return source;
@@ -1480,7 +1486,7 @@ public static class StringSpanExtensions
         removed = true;
         if (index == 0 && source.Length == 1) return StrSpan.Empty;
 
-        var array = new char[source.Length - 1];
+        var array = new char[source.Length - 1]; // Not stackalloc, source can be > 1 Kb...
         source[..index].CopyTo(array);
 
         var dest = array.AsSpan(index);
@@ -1730,7 +1736,7 @@ public static class StringSpanExtensions
         removed = true;
         if (index == 0 && source.Length == value.Length) return StrSpan.Empty;
 
-        var array = new char[source.Length - value.Length];
+        var array = new char[source.Length - value.Length]; // Not stackalloc, can be > 1 Kb...
         source[..index].CopyTo(array);
 
         var dest = array.AsSpan(index);
@@ -1760,7 +1766,7 @@ public static class StringSpanExtensions
         removed = true;
         if (index == 0 && source.Length == value.Length) return StrSpan.Empty;
 
-        var array = new char[source.Length - value.Length];
+        var array = new char[source.Length - value.Length]; // Not stackalloc, can be > 1 Kb...
         source[..index].CopyTo(array);
 
         var dest = array.AsSpan(index);
@@ -1778,7 +1784,8 @@ public static class StringSpanExtensions
     /// <param name="comparer"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    public static StrSpan Remove(this StrSpan source, StrSpan value, IEqualityComparer<char> comparer, out bool removed)
+    public static StrSpan Remove(
+        this StrSpan source, StrSpan value, IEqualityComparer<char> comparer, out bool removed)
     {
         removed = false;
         if (source.Length == 0) return source;
@@ -1790,7 +1797,7 @@ public static class StringSpanExtensions
         removed = true;
         if (index == 0 && source.Length == value.Length) return StrSpan.Empty;
 
-        var array = new char[source.Length - value.Length];
+        var array = new char[source.Length - value.Length]; // Not stackalloc, can be > 1 Kb...
         source[..index].CopyTo(array);
 
         var dest = array.AsSpan(index);
@@ -1808,7 +1815,8 @@ public static class StringSpanExtensions
     /// <param name="comparer"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    public static StrSpan Remove(this StrSpan source, StrSpan value, IEqualityComparer<string> comparer, out bool removed)
+    public static StrSpan Remove(
+        this StrSpan source, StrSpan value, IEqualityComparer<string> comparer, out bool removed)
     {
         removed = false;
         if (source.Length == 0) return source;
@@ -1820,7 +1828,7 @@ public static class StringSpanExtensions
         removed = true;
         if (index == 0 && source.Length == value.Length) return StrSpan.Empty;
 
-        var array = new char[source.Length - value.Length];
+        var array = new char[source.Length - value.Length]; // Not stackalloc, can be > 1 Kb...
         source[..index].CopyTo(array);
 
         var dest = array.AsSpan(index);
@@ -1838,7 +1846,8 @@ public static class StringSpanExtensions
     /// <param name="comparison"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    public static StrSpan Remove(this StrSpan source, StrSpan value, StringComparison comparison, out bool removed)
+    public static StrSpan Remove(
+        this StrSpan source, StrSpan value, StringComparison comparison, out bool removed)
     {
         removed = false;
         if (source.Length == 0) return source;
@@ -1850,7 +1859,7 @@ public static class StringSpanExtensions
         removed = true;
         if (index == 0 && source.Length == value.Length) return StrSpan.Empty;
 
-        var array = new char[source.Length - value.Length];
+        var array = new char[source.Length - value.Length]; // Not stackalloc, can be > 1 Kb...
         source[..index].CopyTo(array);
 
         var dest = array.AsSpan(index);
@@ -1935,7 +1944,7 @@ public static class StringSpanExtensions
         removed = true;
         if (index == 0 && source.Length == value.Length) return StrSpan.Empty;
 
-        var array = new char[source.Length - value.Length];
+        var array = new char[source.Length - value.Length]; // Not stackalloc, can be > 1 Kb...
         source[..index].CopyTo(array);
 
         var dest = array.AsSpan(index);
@@ -1953,7 +1962,8 @@ public static class StringSpanExtensions
     /// <param name="sensitive"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    public static StrSpan RemoveLast(this StrSpan source, StrSpan value, bool sensitive, out bool removed)
+    public static StrSpan RemoveLast(
+        this StrSpan source, StrSpan value, bool sensitive, out bool removed)
     {
         removed = false;
         if (source.Length == 0) return source;
@@ -1965,7 +1975,7 @@ public static class StringSpanExtensions
         removed = true;
         if (index == 0 && source.Length == value.Length) return StrSpan.Empty;
 
-        var array = new char[source.Length - value.Length];
+        var array = new char[source.Length - value.Length]; // Not stackalloc, can be > 1 Kb...
         source[..index].CopyTo(array);
 
         var dest = array.AsSpan(index);
@@ -1983,7 +1993,8 @@ public static class StringSpanExtensions
     /// <param name="comparer"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    public static StrSpan RemoveLast(this StrSpan source, StrSpan value, IEqualityComparer<char> comparer, out bool removed)
+    public static StrSpan RemoveLast(
+        this StrSpan source, StrSpan value, IEqualityComparer<char> comparer, out bool removed)
     {
         removed = false;
         if (source.Length == 0) return source;
@@ -1995,7 +2006,7 @@ public static class StringSpanExtensions
         removed = true;
         if (index == 0 && source.Length == value.Length) return StrSpan.Empty;
 
-        var array = new char[source.Length - value.Length];
+        var array = new char[source.Length - value.Length]; // Not stackalloc, can be > 1 Kb...
         source[..index].CopyTo(array);
 
         var dest = array.AsSpan(index);
@@ -2013,7 +2024,8 @@ public static class StringSpanExtensions
     /// <param name="comparer"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    public static StrSpan RemoveLast(this StrSpan source, StrSpan value, IEqualityComparer<string> comparer, out bool removed)
+    public static StrSpan RemoveLast(
+        this StrSpan source, StrSpan value, IEqualityComparer<string> comparer, out bool removed)
     {
         removed = false;
         if (source.Length == 0) return source;
@@ -2025,7 +2037,7 @@ public static class StringSpanExtensions
         removed = true;
         if (index == 0 && source.Length == value.Length) return StrSpan.Empty;
 
-        var array = new char[source.Length - value.Length];
+        var array = new char[source.Length - value.Length]; // Not stackalloc, can be > 1 Kb...
         source[..index].CopyTo(array);
 
         var dest = array.AsSpan(index);
@@ -2043,7 +2055,8 @@ public static class StringSpanExtensions
     /// <param name="comparison"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    public static StrSpan RemoveLast(this StrSpan source, StrSpan value, StringComparison comparison, out bool removed)
+    public static StrSpan RemoveLast(
+        this StrSpan source, StrSpan value, StringComparison comparison, out bool removed)
     {
         removed = false;
         if (source.Length == 0) return source;
@@ -2055,7 +2068,7 @@ public static class StringSpanExtensions
         removed = true;
         if (index == 0 && source.Length == value.Length) return StrSpan.Empty;
 
-        var array = new char[source.Length - value.Length];
+        var array = new char[source.Length - value.Length]; // Not stackalloc, can be > 1 Kb...
         source[..index].CopyTo(array);
 
         var dest = array.AsSpan(index);
@@ -2175,7 +2188,8 @@ public static class StringSpanExtensions
     /// <param name="comparer"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    public static StrSpan RemoveAll(this StrSpan source, StrSpan value, IEqualityComparer<char> comparer, out bool removed)
+    public static StrSpan RemoveAll(
+        this StrSpan source, StrSpan value, IEqualityComparer<char> comparer, out bool removed)
     {
         removed = false;
         if (source.Length == 0) return source;
@@ -2198,7 +2212,8 @@ public static class StringSpanExtensions
     /// <param name="comparer"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    public static StrSpan RemoveAll(this StrSpan source, StrSpan value, IEqualityComparer<string> comparer, out bool removed)
+    public static StrSpan RemoveAll(
+        this StrSpan source, StrSpan value, IEqualityComparer<string> comparer, out bool removed)
     {
         removed = false;
         if (source.Length == 0) return source;
@@ -2221,7 +2236,8 @@ public static class StringSpanExtensions
     /// <param name="comparison"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    public static StrSpan RemoveAll(this StrSpan source, StrSpan value, StringComparison comparison, out bool removed)
+    public static StrSpan RemoveAll(
+        this StrSpan source, StrSpan value, StringComparison comparison, out bool removed)
     {
         removed = false;
         if (source.Length == 0) return source;

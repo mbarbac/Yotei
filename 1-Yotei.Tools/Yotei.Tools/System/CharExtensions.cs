@@ -1,4 +1,6 @@
 ﻿
+using System.Security;
+
 namespace Yotei.Tools;
 
 // ========================================================
@@ -56,8 +58,8 @@ public static class CharExtensions
     /// <returns></returns>
     public static bool Equals(this char value, char other, StringComparison comparison)
     {
-        var values = new ReadOnlySpan<char>([value]);
-        var others = new ReadOnlySpan<char>([other]);
+        ReadOnlySpan<char> values = [value];
+        ReadOnlySpan<char> others = [other];
 
         return values.Equals(others, comparison);
     }

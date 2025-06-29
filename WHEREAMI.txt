@@ -1,0 +1,6 @@
+
+
+
+TODO:
+- In Yotei.Tools, CharExtensions: equality using a IEqualityComparer<string> allocates two
+  strings (one per each character). See if it can be optimized using stackalloc or similar.

@@ -11,13 +11,13 @@ namespace Yotei.ORM.Code;
 public partial class IdentifierChain : IHost
 {
     protected override Builder Items { get; }
-    protected virtual Builder OnInitialize(IEngine engine) => new(engine);
+    protected IdentifierChain(Builder items) => Items = items;
 
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="engine"></param>
-    public IdentifierChain(IEngine engine) => Items = OnInitialize(engine);
+    public IdentifierChain(IEngine engine) : this(new Builder(engine)) { }
 
     /// <summary>
     /// Initializes a new instance with the elements of the given range.
