@@ -1,11 +1,11 @@
 ﻿using NItem = Yotei.ORM.Tests.Generators.NamedElement;
-using Chain = Yotei.ORM.Tests.Generators.ElementList_T;
+using Chain = Yotei.ORM.Tests.Generators.ElementList_KT;
 
 namespace Yotei.ORM.Tests.Generators;
 
 // ========================================================
 //[Enforced]
-public static class Test_ElementList_T
+public static class Test_ElementList_KT
 {
     static readonly NItem xone = new("one");
     static readonly NItem xtwo = new("two");
@@ -104,20 +104,20 @@ public static class Test_ElementList_T
     {
         var items = new Chain(false, [xone, xtwo, xthree, xone]);
 
-        Assert.Equal(-1, items.IndexOf(xfive));
+        Assert.Equal(-1, items.IndexOf("five"));
 
-        Assert.Equal(0, items.IndexOf(xone));
-        Assert.Equal(0, items.IndexOf(new NItem("ONE")));
+        Assert.Equal(0, items.IndexOf("one"));
+        Assert.Equal(0, items.IndexOf("ONE"));
 
-        Assert.Equal(3, items.LastIndexOf(xone));
-        Assert.Equal(3, items.LastIndexOf(new NItem("ONE")));
+        Assert.Equal(3, items.LastIndexOf("one"));
+        Assert.Equal(3, items.LastIndexOf("ONE"));
 
-        var list = items.IndexesOf(xone);
+        var list = items.IndexesOf("one");
         Assert.Equal(2, list.Count);
         Assert.Equal(0, list[0]);
         Assert.Equal(3, list[1]);
 
-        list = items.IndexesOf(new NItem("ONE"));
+        list = items.IndexesOf("ONE");
         Assert.Equal(2, list.Count);
         Assert.Equal(0, list[0]);
         Assert.Equal(3, list[1]);
@@ -513,74 +513,56 @@ public static class Test_ElementList_T
     public static void Test_Remove_Item()
     {
         var source = new Chain(false, [xone, xtwo, xthree, xone]);
-        var target = source.Remove(xfour);
+        var target = source.Remove("four");
         Assert.Same(source, target);
 
-        target = source.Remove(xone);
+        target = source.Remove("one");
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.Same(xtwo, target[0]);
         Assert.Same(xthree, target[1]);
         Assert.Same(xone, target[2]);
 
-        target = source.Remove(new NItem("ONE"));
+        target = source.Remove("ONE");
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.Same(xtwo, target[0]);
         Assert.Same(xthree, target[1]);
         Assert.Same(xone, target[2]);
 
-        target = source.RemoveLast(xone);
+        target = source.RemoveLast("one");
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
         Assert.Same(xthree, target[2]);
 
-        target = source.RemoveLast(new NItem("ONE"));
+        target = source.RemoveLast("ONE");
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
         Assert.Same(xthree, target[2]);
 
-        target = source.RemoveAll(xone);
+        target = source.RemoveAll("one");
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
         Assert.Same(xtwo, target[0]);
         Assert.Same(xthree, target[1]);
 
-        target = source.RemoveAll(new NItem("ONE"));
+        target = source.RemoveAll("ONE");
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
         Assert.Same(xtwo, target[0]);
         Assert.Same(xthree, target[1]);
     }
 
+    //This test does NOT apply, because 'IInvariantList<K,T>' does not have a 'Remove()' method
+    //that takes a 'IItem' as its argument, only methods that takes 'TKey'. So, we cannot pass
+    //a collection of elements to remove.
     //[Enforced]
-    [Fact]
-    public static void Test_Remove_Extended()
-    {
-        var source = new Chain(false, [xone, xtwo, xthree, xone]);
-        var other = new Chain(false, [xone, xthree]);
-
-        var target = source.Remove(other);
-        Assert.NotSame(source, target);
-        Assert.Equal(2, target.Count);
-        Assert.Same(xtwo, target[0]);
-        Assert.Same(xone, target[1]);
-
-        target = source.RemoveLast(other);
-        Assert.NotSame(source, target);
-        Assert.Equal(2, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-
-        target = source.RemoveAll(other);
-        Assert.NotSame(source, target);
-        Assert.Single(target);
-        Assert.Same(xtwo, target[0]);
-    }
+    //[Fact]
+    //public static void Test_Remove_Extended()
 
     //[Enforced]
     [Fact]

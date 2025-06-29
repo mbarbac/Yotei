@@ -1,15 +1,17 @@
-﻿using IHost = Yotei.ORM.Tests.Generators.IElementList_T;
+﻿using System.Runtime.InteropServices.Marshalling;
+using IHost = Yotei.ORM.Tests.Generators.IElementList_KT;
 using IItem = Yotei.ORM.Tests.Generators.IElement;
+using TKey = string;
 
 namespace Yotei.ORM.Tests.Generators;
 
-partial class ElementList_T
+partial class ElementList_KT
 {
     // ====================================================
     /// <inheritdoc cref="IHost.IBuilder"/>
     [DebuggerDisplay("{ToDebugString(5)}")]
     [Cloneable]
-    public partial class Builder : CoreList<IItem>, IHost.IBuilder
+    public partial class Builder : CoreList<TKey, IItem>, IHost.IBuilder
     {
         /// <summary>
         /// Initializes a new instance.
@@ -40,7 +42,7 @@ partial class ElementList_T
         /// <inheritdoc/>
         public override string ToString() => base.ToString();
 
-        // ------------------------------------------------
+        // ----------------------------------------------------
 
         /// <inheritdoc/>
         public override IItem ValidateItem(IItem item)
@@ -50,6 +52,12 @@ partial class ElementList_T
 
             return item;
         }
+
+        /// <inheritdoc/>
+        public override TKey GetKey(IItem item) => item.Name;
+
+        /// <inheritdoc/>
+        public override TKey ValidateKey(TKey key) => key.NotNullNotEmpty();
 
         /// <inheritdoc/>
         public override bool ExpandItems => true; // Flat collection allowed...
@@ -66,23 +74,21 @@ partial class ElementList_T
         }
 
         /// <inheritdoc/>
-        public override IEqualityComparer<IItem> Comparer => _Comparer ??= new ItemComparer(this);
+        public override IEqualityComparer<TKey> Comparer => _Comparer ??= new ItemComparer(this);
         ItemComparer? _Comparer = null;
 
-        readonly struct ItemComparer(Builder Master) : IEqualityComparer<IItem>
+        readonly struct ItemComparer(Builder Master) : IEqualityComparer<TKey>
         {
-            public bool Equals(IItem? x, IItem? y)
-                => x is NamedElement xnamed && y is NamedElement ynamed
-                ? string.Compare(xnamed.Name, ynamed.Name, !Master.CaseSensitive) == 0
-                : (x is not null && x.Equals(y));
+            public bool Equals(TKey? x, TKey? y)
+                => string.Compare(x, y, !Master.CaseSensitive) == 0;
 
-            public int GetHashCode([DisallowNull] IItem obj) => throw new NotImplementedException();
+            public int GetHashCode([DisallowNull] TKey obj) => throw new NotImplementedException();
         }
 
         // ------------------------------------------------
 
         /// <inheritdoc cref="IHost.IBuilder.CreateInstance"/>
-        public virtual ElementList_T CreateInstance() => new(CaseSensitive, this);
+        public virtual ElementList_KT CreateInstance() => new(CaseSensitive, this);
         IHost IHost.IBuilder.CreateInstance() => CreateInstance();
 
         /// <inheritdoc/>
