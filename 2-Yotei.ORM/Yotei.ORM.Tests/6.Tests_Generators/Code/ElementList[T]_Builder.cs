@@ -47,7 +47,7 @@ partial class ElementList_T
         {
             item.ThrowWhenNull();
 
-            if (item is INamedElement named) named.Name.NotNullNotEmpty();
+            if (item is NamedElement named) named.Name.NotNullNotEmpty();
             return item;
         }
 
@@ -59,8 +59,8 @@ partial class ElementList_T
         {
             // Only named elements may qualify for acceptable duplication, but only if they
             // strictly are the same instance...
-            if (source is INamedElement &&
-                item is INamedElement &&
+            if (source is NamedElement &&
+                item is NamedElement &&
                 ReferenceEquals(source, item)) return true;
 
             throw new DuplicateException("Duplicated element.").WithData(item).WithData(this);
@@ -73,14 +73,7 @@ partial class ElementList_T
         readonly struct ItemComparer(Builder Master) : IEqualityComparer<IItem>
         {
             // Only named element may be considered equal...
-            public bool Equals(IItem? x, IItem? y)
-            {
-                if (x is INamedElement xnamed &&
-                    y is INamedElement ynamed)
-                    return string.Compare(xnamed.Name, ynamed.Name, !Master.CaseSensitive) == 0;
-
-                return false;
-            }
+            public bool Equals(IItem? x, IItem? y) => x is not null && x.Equals(y, Master.CaseSensitive);
             public int GetHashCode([DisallowNull] IItem obj) => throw new NotImplementedException();
         }
 
@@ -106,5 +99,8 @@ partial class ElementList_T
             }
         }
         bool _CaseSensitive;
+
+        /// <inheritdoc/>
+        public string Name => Count == 0 ? string.Empty : string.Concat(this.Select(x => x.Name));
     }
 }

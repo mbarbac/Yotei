@@ -139,7 +139,29 @@ public static class Test_ElementList_T
         Assert.Equal(0, list[0]);
         Assert.Equal(3, list[1]);
     }
-    
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Equals()
+    {
+        var source = new Chain(false, []);
+        var target = new Chain(false, []);
+        Assert.True(source.Equals(target));
+
+        source = new Chain(false, [xone, xtwo]);
+        target = new Chain(false, [xone, xtwo]);
+        Assert.True(source.Equals(target));
+
+        target = new Chain(false, [new NItem("ONE"), new NItem("TWO")]);
+        Assert.True(source.Equals(target));
+        Assert.False(source.Equals(target, true));
+
+        target = new Chain(false, [xone]);
+        Assert.False(source.Equals(target));
+    }
+
     // ----------------------------------------------------
 
     //[Enforced]

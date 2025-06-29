@@ -23,5 +23,10 @@ partial interface IElementList_T
         /// element to compare is not a named one, then this property is ignored.
         /// </summary>
         bool CaseSensitive { get; }
+
+        /// <summary>
+        /// The name of this element.
+        /// </summary>
+        string Name { get; }
     }
 }

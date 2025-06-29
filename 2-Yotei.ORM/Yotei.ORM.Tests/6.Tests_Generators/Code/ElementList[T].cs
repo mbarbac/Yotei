@@ -38,27 +38,26 @@ public partial class ElementList_T : IHost
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public virtual bool Equals(IItem? other) // In this case, IHost inherits from IItem...
+    public bool Equals(IItem? other, bool caseSensitive) // IHost inherits from IItem...
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null) return false;
         if (other is not IHost valid) return false;
 
-        if(CaseSensitive != valid.CaseSensitive) return false;
+        if (CaseSensitive != valid.CaseSensitive) return false;
         if (Count != valid.Count) return false;
 
         for (int i = 0; i < Count; i++)
         {
             var item = Items[i];
             var temp = valid[i];
-            var equal = item is INamedElement inamed && temp is INamedElement tnamed
-                ? inamed.Equals(tnamed, CaseSensitive)
-                : item.Equals(temp);
-
-            if (!equal) return false;
+            if (!item.Equals(temp, caseSensitive)) return false;
         }
         return true;
     }
+
+    /// <inheritdoc/>
+    public virtual bool Equals(IItem? other) => Equals(other, CaseSensitive);
 
     /// <inheritdoc/>
     public override bool Equals(object? obj) => Equals(obj as IHost);
@@ -89,5 +88,8 @@ public partial class ElementList_T : IHost
     IHost.IBuilder IHost.CreateBuilder() => CreateBuilder();
 
     /// <inheritdoc/>
-    public bool CaseSensitive { get; }
+    public bool CaseSensitive => Items.CaseSensitive;
+
+    /// <inheritdoc/>
+    public string Name => Items.Name;
 }
