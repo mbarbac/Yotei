@@ -68,6 +68,10 @@
    <ItemGroup>
 	  <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
    </ItemGroup>
+   <ItemGroup>
+     <Folder Include="6.Tests_Generators\Code\" />
+     <Folder Include="6.Tests_Generators\Tests\" />
+   </ItemGroup>
 
    <PropertyGroup>
 	  <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
