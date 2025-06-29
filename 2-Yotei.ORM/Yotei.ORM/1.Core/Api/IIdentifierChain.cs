@@ -9,7 +9,7 @@ namespace Yotei.ORM;
 /// Represents a multi-part identifier.
 /// <para>Instances of this class are intended to be immutable ones.</para>
 /// </summary>
-[IInvariantList<AsNullable<TKey>, IItem>] // AsNullable<TKey> to mimic 'TKey?'...
+[IInvariantList<AsNullable<TKey>, IItem>] // 'AsNullable<TKey>' mimics nullable 'TKey?'...
 public partial interface IIdentifierChain : IIdentifier
 {
     /// <summary>
