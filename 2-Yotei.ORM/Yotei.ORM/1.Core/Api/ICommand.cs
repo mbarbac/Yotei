@@ -17,12 +17,12 @@ public partial interface ICommand
     /// </summary>
     [With] Locale Locale { get; }
 
-    // ----------------------------------------------------
-
     /// <summary>
     /// Determines if the state of this instance is execution ready, or not.
     /// </summary>
     bool IsValid { get; }
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// Obtains the information needed to run a command, using its default iterable mode.
