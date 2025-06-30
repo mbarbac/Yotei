@@ -24,6 +24,12 @@ public partial interface IConnection : IDisposableEx
     /// </summary>
     TimeSpan RetryInterval { get; }
 
+    /// <summary>
+    /// The collection of value converters from application-level values to database-level ones
+    /// maintained by this instance.
+    /// </summary>
+    IValueConverterList ToDatabaseConverters { get; }
+
     // ----------------------------------------------------
 
     /// <summary>
@@ -61,4 +67,9 @@ public partial interface IConnection : IDisposableEx
     /// </summary>
     /// <returns></returns>
     ITransaction CreateTransaction();
+
+    /// <summary>
+    /// Provides access to the records-oriented capabilities of this instance.
+    /// </summary>
+    IRecordsGate Records { get; }
 }

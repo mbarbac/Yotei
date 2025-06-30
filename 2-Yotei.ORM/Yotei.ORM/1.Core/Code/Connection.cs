@@ -25,6 +25,7 @@ public abstract partial class Connection : DisposableClass, IConnection
         Engine = source.Engine;
         Retries = source.Retries;
         RetryInterval = source.RetryInterval;
+        ToDatabaseConverters.AddRange(source.ToDatabaseConverters);
     }
 
     /// <inheritdoc/>
@@ -78,6 +79,10 @@ public abstract partial class Connection : DisposableClass, IConnection
             : throw new ArgumentException($"Retry interval '{value}' must be cero or greater.");
     }
     TimeSpan _RetryInterval = TimeSpan.FromMilliseconds(RETRYINTERVAL);
+
+    /// <inheritdoc/>
+    public ValueConverterList ToDatabaseConverters { get; } = new();
+    IValueConverterList IConnection.ToDatabaseConverters => ToDatabaseConverters;
 
     // ----------------------------------------------------
 
@@ -271,4 +276,16 @@ public abstract partial class Connection : DisposableClass, IConnection
 
     /// <inheritdoc/>
     public abstract ITransaction CreateTransaction();
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public IRecordsGate Records => _Records ??= CreateRecordsGate();
+    IRecordsGate? _Records;
+
+    /// <summary>
+    /// Invoked to create an appropriate instance.
+    /// </summary>
+    /// <returns></returns>
+    protected abstract IRecordsGate CreateRecordsGate();
 }
