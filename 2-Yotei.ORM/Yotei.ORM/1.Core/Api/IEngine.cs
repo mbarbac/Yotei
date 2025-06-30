@@ -3,7 +3,7 @@
 // ========================================================
 /// <summary>
 /// Describes an underlying database engine.
-/// <para>Instances of this class are intended to be immutable ones.</para>
+/// <para>Instances of this type are intended to be immutable ones.</para>
 /// </summary>
 [Cloneable]
 public partial interface IEngine : IEquatable<IEngine>
