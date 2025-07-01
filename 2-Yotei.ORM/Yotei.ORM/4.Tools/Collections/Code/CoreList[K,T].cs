@@ -212,9 +212,9 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     protected virtual List<int> FindDuplicates(K key) => IndexesOf(key);
 
     /// <summary>
-    /// Determines if the given element is the same as the existing source one, or not. By default,
-    /// value types are compared by the equality of their respective keys. Otherwise, reference
-    /// equality is used.
+    /// When replacing the source element by the given item one, determines if they can be
+    /// considered the same or not. By default, equality for value types is determined by the
+    /// equality of their respective keys. Otherwise, reference equality is used.
     /// </summary>
     protected virtual bool SameItem(T source, T item)
     {
