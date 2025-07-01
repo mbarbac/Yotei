@@ -108,22 +108,12 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataEntry>, IEquatable<
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a new instance where the original source entry associated with the given tag name
-    /// has been replaced with the target given one.
+    /// Returns a new instance where the original element that carries any of the tags of
+    /// the newly given one has been replaced by the later.
     /// </summary>
-    /// <param name="source"></param>
     /// <param name="target"></param>
     /// <returns></returns>
-    ISchemaEntry Replace(string name, IMetadataEntry target);
-
-    /// <summary>
-    /// Returns a new instance where the original source entry has been replaced with the target
-    /// given one.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="target"></param>
-    /// <returns></returns>
-    ISchemaEntry Replace(IMetadataEntry source, IMetadataEntry target);
+    ISchemaEntry Replace(IMetadataEntry target);
 
     /// <summary>
     /// Returns a new instance where the given element has been added to the collection.
@@ -139,6 +129,14 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataEntry>, IEquatable<
     /// <param name="range"></param>
     /// <returns></returns>
     ISchemaEntry AddRange(IEnumerable<IMetadataEntry> range);
+
+    /// <summary>
+    /// Returns a new instance where the entry whose tag contains the given name, if any, has been
+    /// removed from the original collection.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    ISchemaEntry Remove(string name);
 
     /// <summary>
     /// Returns a new instance where the given entry has been removed from the original collection.

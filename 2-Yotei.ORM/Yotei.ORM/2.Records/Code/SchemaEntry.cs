@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Records.Code;
+﻿using System.Runtime.InteropServices.Marshalling;
+
+namespace Yotei.ORM.Records.Code;
 
 // ========================================================
 /// <inheritdoc cref="ISchemaEntry"/>
@@ -6,21 +8,101 @@
 [InheritWiths]
 public partial class SchemaEntry : ISchemaEntry
 {
+    protected virtual Builder Items { get; }
+    protected SchemaEntry(Builder items) => Items = items;
+
+    /// <summary>
+    /// Initializes a new empty instance.
+    /// </summary>
+    /// <param name="engine"></param>
+    public SchemaEntry(IEngine engine) : this(new Builder(engine)) { }
+
+    /// <summary>
+    /// Initializes a new instance with the elements of the given range.
+    /// </summary>
+    /// <param name="engine"></param>
+    /// <param name="range"></param>
+    public SchemaEntry(
+        IEngine engine, IEnumerable<IMetadataEntry> range) : this(new Builder(engine, range)) { }
+
+    /// <summary>
+    /// Initializes a new instance with the given elements.
+    /// </summary>
+    /// <param name="identifier"></param>
+    /// <param name="isPrimaryKey"></param>
+    /// <param name="isUniqueValued"></param>
+    /// <param name="isReadOnly"></param>
+    /// <param name="range"></param>
+    public SchemaEntry(
+        IIdentifier identifier,
+        bool? isPrimaryKey = null,
+        bool? isUniqueValued = null,
+        bool? isReadOnly = null,
+        IEnumerable<IMetadataEntry>? range = null)
+        : this(new Builder(
+            identifier,
+            isPrimaryKey,
+            isUniqueValued,
+            isReadOnly,
+            range))
+    { }
+
+    /// <summary>
+    /// Initializes a new instance with the given elements.
+    /// </summary>
+    /// <param name="engine"></param>
+    /// <param name="identifier"></param>
+    /// <param name="isPrimaryKey"></param>
+    /// <param name="isUniqueValued"></param>
+    /// <param name="isReadOnly"></param>
+    /// <param name="range"></param>
+    public SchemaEntry(
+        IEngine engine,
+        string identifier,
+        bool? isPrimaryKey = null,
+        bool? isUniqueValued = null,
+        bool? isReadOnly = null,
+        IEnumerable<IMetadataEntry>? range = null)
+        : this(new Builder(
+            engine,
+            identifier,
+            isPrimaryKey,
+            isUniqueValued,
+            isReadOnly,
+            range))
+    { }
+
+    /*
+        /// <summary>
+        /// Copy constructor.
+        /// </summary>
+        /// <param name="source"></param>
+        protected SchemaEntry(SchemaEntry source) : this(source.Engine) => AddRange(source);
+     */
+
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected SchemaEntry(SchemaEntry source) => throw null;
+    protected SchemaEntry(SchemaEntry source) => Items = source.Items.Clone();
 
     /// <inheritdoc/>
-    public IEnumerator<IMetadataEntry> GetEnumerator() => throw null;
+    public IEnumerator<IMetadataEntry> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /// <inheritdoc/>
-    public override string ToString() => throw null;
+    public override string ToString() => Items.ToString();
+
+    /// <summary>
+    /// Returns the string representation of this instance using at most the given number of
+    /// metadata entries beyond the standard ones.
+    /// </summary>
+    /// <param name="num"></param>
+    /// <returns></returns>
+    public string ToString(int num) => Items.ToString(num);
 
     /// <inheritdoc/>
-    public virtual Builder CreateBuilder() => throw null;
+    public virtual Builder CreateBuilder() => Items.Clone();
     ISchemaEntry.IBuilder ISchemaEntry.CreateBuilder() => CreateBuilder();
 
     // ----------------------------------------------------
@@ -28,36 +110,32 @@ public partial class SchemaEntry : ISchemaEntry
     /// <inheritdoc/>
     public bool Equals(ISchemaEntry? other)
     {
-        throw null;
-    }
-
-    /*
-     /// <inheritdoc/>
-    public bool Equals(IItem? other, bool caseSensitive) // IHost inherits from IItem...
-    {
         if (ReferenceEquals(this, other)) return true;
         if (other is null) return false;
-        if (other is not IHost valid) return false;
 
-        if (CaseSensitive != valid.CaseSensitive) return false;
-        if (Count != valid.Count) return false;
+        if (!Identifier.Equals(other.Identifier)) return false;
+        if (!IsPrimaryKey.Equals(other.IsPrimaryKey)) return false;
+        if (!IsUniqueValued.Equals(other.IsUniqueValued)) return false;
+        if (!IsReadOnly.Equals(other.IsReadOnly)) return false;
 
-        for (int i = 0; i < Count; i++)
+        var targets = other.ToList();
+        foreach (var source in Items)
         {
-            var item = Items[i];
-            var temp = valid[i];
-            if (!item.Equals(temp, caseSensitive)) return false;
+            var index = targets.FindIndex(x => x.Tag.Contains(source.Tag));
+            if (index < 0) return false;
+            if (!source.Equals(targets[index])) return false;
+
+            targets.RemoveAt(index);
         }
-        return true;
+        return targets.Count == 0;
     }
 
-    /// <inheritdoc/>
-    public virtual bool Equals(IItem? other) => Equals(other, CaseSensitive);
+
 
     /// <inheritdoc/>
-    public override bool Equals(object? obj) => Equals(obj as IHost);
+    public override bool Equals(object? obj) => Equals(obj as ISchemaEntry);
 
-    public static bool operator ==(ElementList_T? host, IHost? item)
+    public static bool operator ==(SchemaEntry? host, ISchemaEntry? item)
     {
         if (host is null && item is null) return true;
         if (host is null || item is null) return false;
@@ -65,114 +143,162 @@ public partial class SchemaEntry : ISchemaEntry
         return host.Equals(item);
     }
 
-    public static bool operator !=(ElementList_T? host, IHost? item) => !(host == item);
+    public static bool operator !=(SchemaEntry? host, ISchemaEntry? item) => !(host == item);
 
     /// <inheritdoc/>
     public override int GetHashCode()
     {
         var code = 0;
-        code = HashCode.Combine(code, CaseSensitive);
-        for (int i = 0; i < Count; i++) code = HashCode.Combine(code, Items[i]);
+        code = HashCode.Combine(code, Identifier);
+        code = HashCode.Combine(code, IsPrimaryKey);
+        code = HashCode.Combine(code, IsUniqueValued);
+        code = HashCode.Combine(code, IsReadOnly);
+        foreach (var item in Items) code = HashCode.Combine(code, item);
         return code;
     }
-     */
+
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public IEngine Engine { get; }
+    public IEngine Engine => Items.Engine;
 
     /// <inheritdoc/>
     public IIdentifier Identifier
     {
-        get => throw null;
-        init => throw null;
+        get => Items.Identifier;
+        init => Items.Identifier = value;
     }
 
     /// <inheritdoc/>
     public bool IsPrimaryKey
     {
-        get => throw null;
-        init => throw null;
+        get => Items.IsPrimaryKey;
+        init => Items.IsPrimaryKey = value;
     }
 
     /// <inheritdoc/>
     public bool IsUniqueValued
     {
-        get => throw null;
-        init => throw null;
+        get => Items.IsUniqueValued;
+        init => Items.IsUniqueValued = value;
     }
 
     /// <inheritdoc/>
     public bool IsReadOnly
     {
-        get => throw null;
-        init => throw null;
+        get => Items.IsReadOnly;
+        init => Items.IsReadOnly = value;
     }
 
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public int Count => throw null;
+    public int Count => Items.Count;
 
     /// <inheritdoc/>
-    public IMetadataEntry this[string name] => throw null;
+    public IMetadataEntry this[string name] => Items[name];
 
     /// <inheritdoc/>
-    public IMetadataEntry? Find(string name) => throw null;
+    public IMetadataEntry? Find(string name) => Items.Find(name);
 
     /// <inheritdoc/>
-    public IMetadataEntry? Find(IEnumerable<string> range) => throw null;
+    public IMetadataEntry? Find(IEnumerable<string> range) => Items.Find(range);
 
     /// <inheritdoc/>
-    public bool Contains(string name) => throw null;
+    public bool Contains(string name) => Items.Contains(name);
 
     /// <inheritdoc/>
-    public bool Contains(IEnumerable<string> range) => throw null;
+    public bool Contains(IEnumerable<string> range) => Items.Contains(range);
 
     /// <inheritdoc/>
-    public IMetadataEntry[] ToArray() => throw null;
+    public IMetadataEntry[] ToArray() => Items.ToArray();
 
     /// <inheritdoc/>
-    public List<IMetadataEntry> ToList() => throw null;
+    public List<IMetadataEntry> ToList() => Items.ToList();
 
     /// <inheritdoc/>
-    public void Trim() => throw null;
+    public void Trim() => Items.Trim();
 
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public virtual SchemaEntry Replace(string name, IMetadataEntry target) => throw null;
-    ISchemaEntry ISchemaEntry.Replace(string name, IMetadataEntry target) => Replace(name, target);
+    public virtual SchemaEntry Replace(IMetadataEntry target)
+    {
+        var builder = CreateBuilder();
+        var done = builder.Replace(target);
+        return done ? builder.CreateInstance() : this;
+    }
+    ISchemaEntry ISchemaEntry.Replace(IMetadataEntry target) => Replace(target);
 
     /// <inheritdoc/>
-    public virtual SchemaEntry Replace(IMetadataEntry source, IMetadataEntry target) => throw null;
-    ISchemaEntry ISchemaEntry.Replace(IMetadataEntry source, IMetadataEntry target) => Replace(source, target);
-
-    /// <inheritdoc/>
-    public virtual SchemaEntry Add(IMetadataEntry item) => throw null;
+    public virtual SchemaEntry Add(IMetadataEntry item)
+    {
+        var builder = CreateBuilder();
+        var done = builder.Add(item);
+        return done ? builder.CreateInstance() : this;
+    }
     ISchemaEntry ISchemaEntry.Add(IMetadataEntry item) => Add(item);
 
     /// <inheritdoc/>
-    public virtual SchemaEntry AddRange(IEnumerable<IMetadataEntry> range) => throw null;
+    public virtual SchemaEntry AddRange(IEnumerable<IMetadataEntry> range)
+    {
+        var builder = CreateBuilder();
+        var done = builder.AddRange(range);
+        return done ? builder.CreateInstance() : this;
+    }
     ISchemaEntry ISchemaEntry.AddRange(IEnumerable<IMetadataEntry> range) => AddRange(range);
 
     /// <inheritdoc/>
-    public virtual SchemaEntry Remove(IMetadataEntry item) => throw null;
+    public virtual SchemaEntry Remove(string name)
+    {
+        var builder = CreateBuilder();
+        var done = builder.Remove(name);
+        return done ? builder.CreateInstance() : this;
+    }
+    ISchemaEntry ISchemaEntry.Remove(string name) => Remove(name);
+
+    /// <inheritdoc/>
+    public virtual SchemaEntry Remove(IMetadataEntry item)
+    {
+        var builder = CreateBuilder();
+        var done = builder.Remove(item);
+        return done ? builder.CreateInstance() : this;
+    }
     ISchemaEntry ISchemaEntry.Remove(IMetadataEntry item) => Remove(item);
 
     /// <inheritdoc/>
-    public virtual SchemaEntry Remove(Predicate<IMetadataEntry> predicate) => throw null;
+    public virtual SchemaEntry Remove(Predicate<IMetadataEntry> predicate)
+    {
+        var builder = CreateBuilder();
+        var done = builder.Remove(predicate);
+        return done ? builder.CreateInstance() : this;
+    }
     ISchemaEntry ISchemaEntry.Remove(Predicate<IMetadataEntry> predicate) => Remove(predicate);
 
     /// <inheritdoc/>
-    public virtual ISchemaEntry RemoveLast(Predicate<IMetadataEntry> predicate) => throw null;
+    public virtual ISchemaEntry RemoveLast(Predicate<IMetadataEntry> predicate)
+    {
+        var builder = CreateBuilder();
+        var done = builder.RemoveLast(predicate);
+        return done ? builder.CreateInstance() : this;
+    }
     ISchemaEntry ISchemaEntry.RemoveLast(Predicate<IMetadataEntry> predicate) => RemoveLast(predicate);
 
     /// <inheritdoc/>
-    public virtual SchemaEntry RemoveAll(Predicate<IMetadataEntry> predicate) => throw null;
+    public virtual SchemaEntry RemoveAll(Predicate<IMetadataEntry> predicate)
+    {
+        var builder = CreateBuilder();
+        var done = builder.RemoveAll(predicate);
+        return done ? builder.CreateInstance() : this;
+    }
     ISchemaEntry ISchemaEntry.RemoveAll(Predicate<IMetadataEntry> predicate) => RemoveAll(predicate);
 
     /// <inheritdoc/>
-    public virtual SchemaEntry Clear() => throw null;
+    public virtual SchemaEntry Clear()
+    {
+        var builder = CreateBuilder();
+        var done = builder.Clear();
+        return done ? builder.CreateInstance() : this;
+    }
     ISchemaEntry ISchemaEntry.Clear() => Clear();
 }

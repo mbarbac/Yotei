@@ -56,7 +56,7 @@ partial interface ISchemaEntry
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        IMetadataEntry this[string name] { get; set; }
+        IMetadataEntry this[string name] { get; }
 
         /// <summary>
         /// Returns the metadata entry whose tag contains the given name, or <c>null</c> if not found.
@@ -108,21 +108,12 @@ partial interface ISchemaEntry
         // ----------------------------------------------------
 
         /// <summary>
-        /// Replaces the original source entry associated with the given tag name by the given
-        /// target one.
+        /// Replaces with the given element the existing one whose tags contains any of the
+        /// tags of that given element.
         /// </summary>
-        /// <param name="source"></param>
         /// <param name="target"></param>
         /// <returns></returns>
-        bool Replace(string name, IMetadataEntry target);
-
-        /// <summary>
-        /// Replaces the source entry in this collection by the the target given one.
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="target"></param>
-        /// <returns></returns>
-        bool Replace(IMetadataEntry source, IMetadataEntry target);
+        bool Replace(IMetadataEntry target);
 
         /// <summary>
         /// Adds to this collection the given element.
@@ -137,6 +128,13 @@ partial interface ISchemaEntry
         /// <param name="range"></param>
         /// <returns></returns>
         bool AddRange(IEnumerable<IMetadataEntry> range);
+
+        /// <summary>
+        /// Removes from this collection the entry whose tag contains the given name, if any.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        bool Remove(string name);
 
         /// <summary>
         /// Removes from this collection the given element.
