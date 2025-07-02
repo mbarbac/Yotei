@@ -70,6 +70,8 @@ public partial class Record : IRecord
     public virtual Record Add(object? value) => throw null;
     IRecord Add(object? value) => throw null;
 
+    -- ME QUEDE AQUI! --
+
     /// <inheritdoc/>
     public virtual Record Add(object? value, ISchemaEntry entry) => throw null;
     IRecord Add(object? value, ISchemaEntry entry) => throw null;
