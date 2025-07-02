@@ -3,6 +3,9 @@
 partial interface IRecord
 {
     // ====================================================
+    /// <summary>
+    /// Represents a builder for <see cref="IRecord"/> instances.
+    /// </summary>
     [Cloneable]
     public partial interface IBuilder : IEnumerable<object?>
     {
@@ -25,20 +28,20 @@ partial interface IRecord
         int Count { get; }
 
         /// <summary>
-        /// Gets the value at the given index.
+        /// Gets or sets the value at the given index.
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        object? this[int index] { get; }
+        object? this[int index] { get; set;  }
 
         /// <summary>
-        /// Gets the value associated with the entry whose unique identifier is given. This property
-        /// throws an exception if that identifier is not found, or if this instance is a schema-less
-        /// one.
+        /// Gets or sets the value associated with the entry whose unique identifier is given. This
+        /// property throws an exception if that identifier is not found, or if this instance is a
+        /// schema-less one.
         /// </summary>
         /// <param name="identifier"></param>
         /// <returns></returns>
-        object? this[string identifier] { get; }
+        object? this[string identifier] { get; set; }
 
         /// <summary>
         /// Tries to get the value associated with the entry whose unique identifier is given. This
@@ -47,7 +50,7 @@ partial interface IRecord
         /// <param name="identifier"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        bool TryGet(string identifier, out object value);
+        bool TryGet(string identifier, out object? value);
 
         /// <summary>
         /// Gets an array with the values in this instance.
@@ -64,8 +67,7 @@ partial interface IRecord
         // ----------------------------------------------------
 
         /// <summary>
-        /// Removes all values and schema entries from this instance, except the given number
-        /// of them starting at the given index.
+        /// Keeps in this instance the given number of elements, starting at the given index.
         /// </summary>
         /// <param name="index"></param>
         /// <param name="count"></param>

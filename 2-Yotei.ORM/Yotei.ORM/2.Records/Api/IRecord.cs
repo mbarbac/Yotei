@@ -50,7 +50,7 @@ public partial interface IRecord : IEnumerable<object?>, IEquatable<IRecord>
     /// <param name="identifier"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    bool TryGet(string identifier, out object value);
+    bool TryGet(string identifier, out object? value);
 
     /// <summary>
     /// Gets an array with the values in this instance.
