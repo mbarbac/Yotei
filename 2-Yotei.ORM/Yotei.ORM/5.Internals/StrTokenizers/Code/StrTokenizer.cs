@@ -1,4 +1,4 @@
-﻿namespace Yotei.ORM.Internals.Code;
+﻿namespace Yotei.ORM.Internals;
 
 // ========================================================
 /// <inheritdoc cref="IStrTokenizer"/>

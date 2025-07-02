@@ -1,6 +1,6 @@
-﻿using Chain = Yotei.ORM.Internals.Code.StrTokenChain;
-using Text = Yotei.ORM.Internals.Code.StrTokenText;
-using Literal = Yotei.ORM.Internals.Code.StrTokenLiteral;
+﻿using Chain = Yotei.ORM.Internals.StrTokenChain;
+using Text = Yotei.ORM.Internals.StrTokenText;
+using Literal = Yotei.ORM.Internals.StrTokenLiteral;
 
 namespace Yotei.ORM.Tests.Internals.StrTokens;
 

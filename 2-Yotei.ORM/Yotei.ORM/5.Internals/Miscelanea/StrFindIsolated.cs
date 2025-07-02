@@ -1,6 +1,4 @@
-﻿using System.Security.Permissions;
-
-namespace Yotei.ORM.Internals;
+﻿namespace Yotei.ORM.Internals;
 
 // ========================================================
 public static class StrFindIsolated

@@ -1,7 +1,7 @@
-﻿using THost = Yotei.ORM.Internals.Code.StrTokenChain;
+﻿using THost = Yotei.ORM.Internals.StrTokenChain;
 using IItem = Yotei.ORM.Internals.IStrToken;
 
-namespace Yotei.ORM.Internals.Code;
+namespace Yotei.ORM.Internals;
 
 partial class StrTokenChain
 {
