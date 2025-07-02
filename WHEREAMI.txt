@@ -1,6 +1,4 @@
 TODO:
-- Revert back to use 'OnInitialize()' to obtain a 'Builder' instance in all collections that
-  need so. Reason: it is the only way for derived types to create an appropiate builder type.
 
 OPTIMIZATIONS:
 - In Yotei.Tools, CharExtensions: equality using a IEqualityComparer<string> allocates two

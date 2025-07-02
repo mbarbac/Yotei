@@ -11,13 +11,13 @@ namespace Yotei.ORM.Records.Code;
 public partial class Schema : IHost
 {
     protected override Builder Items { get; }
-    protected Schema(Builder items) => Items = items;
+    protected virtual Builder OnInitialize(IEngine engine) => new(engine);
 
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="engine"></param>
-    public Schema(IEngine engine) : this(new Builder(engine)) { }
+    public Schema(IEngine engine) => Items = OnInitialize(engine);
 
     /// <summary>
     /// Initializes a new instance with the elements of the given range.

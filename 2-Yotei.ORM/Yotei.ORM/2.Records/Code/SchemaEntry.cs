@@ -4,18 +4,19 @@ namespace Yotei.ORM.Records.Code;
 
 // ========================================================
 /// <inheritdoc cref="ISchemaEntry"/>
+[DebuggerDisplay("{ToString(5)}")]
 [Cloneable]
 [InheritWiths]
 public partial class SchemaEntry : ISchemaEntry
 {
     protected virtual Builder Items { get; }
-    protected SchemaEntry(Builder items) => Items = items;
+    protected virtual Builder OnInitialize(IEngine engine) => new(engine);
 
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="engine"></param>
-    public SchemaEntry(IEngine engine) : this(new Builder(engine)) { }
+    public SchemaEntry(IEngine engine) => Items = OnInitialize(engine);
 
     /// <summary>
     /// Initializes a new instance with the elements of the given range.
@@ -23,7 +24,7 @@ public partial class SchemaEntry : ISchemaEntry
     /// <param name="engine"></param>
     /// <param name="range"></param>
     public SchemaEntry(
-        IEngine engine, IEnumerable<IMetadataEntry> range) : this(new Builder(engine, range)) { }
+        IEngine engine, IEnumerable<IMetadataEntry> range) : this(engine) => Items.AddRange(range);
 
     /// <summary>
     /// Initializes a new instance with the given elements.
@@ -38,14 +39,14 @@ public partial class SchemaEntry : ISchemaEntry
         bool? isPrimaryKey = null,
         bool? isUniqueValued = null,
         bool? isReadOnly = null,
-        IEnumerable<IMetadataEntry>? range = null)
-        : this(new Builder(
-            identifier,
-            isPrimaryKey,
-            isUniqueValued,
-            isReadOnly,
-            range))
-    { }
+        IEnumerable<IMetadataEntry>? range = null) : this(identifier.Engine)
+    {
+        Identifier = identifier;
+        if (isPrimaryKey is not null) IsPrimaryKey = isPrimaryKey.Value;
+        if (isUniqueValued is not null) IsUniqueValued = isUniqueValued.Value;
+        if (isReadOnly is not null) IsReadOnly = isReadOnly.Value;
+        if (range != null) Items.AddRange(range);
+    }
 
     /// <summary>
     /// Initializes a new instance with the given elements.
@@ -62,23 +63,14 @@ public partial class SchemaEntry : ISchemaEntry
         bool? isPrimaryKey = null,
         bool? isUniqueValued = null,
         bool? isReadOnly = null,
-        IEnumerable<IMetadataEntry>? range = null)
-        : this(new Builder(
-            engine,
-            identifier,
-            isPrimaryKey,
-            isUniqueValued,
-            isReadOnly,
-            range))
-    { }
-
-    /*
-        /// <summary>
-        /// Copy constructor.
-        /// </summary>
-        /// <param name="source"></param>
-        protected SchemaEntry(SchemaEntry source) : this(source.Engine) => AddRange(source);
-     */
+        IEnumerable<IMetadataEntry>? range = null) : this(engine)
+    {
+        Identifier = ORM.Code.Identifier.Create(engine, identifier);
+        if (isPrimaryKey is not null) IsPrimaryKey = isPrimaryKey.Value;
+        if (isUniqueValued is not null) IsUniqueValued = isUniqueValued.Value;
+        if (isReadOnly is not null) IsReadOnly = isReadOnly.Value;
+        if (range != null) Items.AddRange(range);
+    }
 
     /// <summary>
     /// Copy constructor.

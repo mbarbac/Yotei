@@ -7,6 +7,7 @@ partial class SchemaEntry
 {
     // ====================================================
     /// <inheritdoc cref="ISchemaEntry.IBuilder"/>
+    [DebuggerDisplay("{ToString(5)}")]
     [Cloneable]
     public partial class Builder : ISchemaEntry.IBuilder
     {

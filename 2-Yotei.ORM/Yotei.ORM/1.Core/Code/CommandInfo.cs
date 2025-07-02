@@ -6,31 +6,31 @@
 public partial class CommandInfo : ICommandInfo
 {
     protected virtual Builder Items { get; }
-    protected CommandInfo(Builder items) => Items = items;
+    protected virtual Builder OnInitialize(IEngine engine) => new(engine);
 
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="engine"></param>
-    public CommandInfo(IEngine engine) : this(new Builder(engine)) { }
+    public CommandInfo(IEngine engine) => Items = OnInitialize(engine);
 
     /// <summary>
     /// Initializes a new instance with the contents of the given source.
     /// </summary>
     /// <param name="source"></param>
-    public CommandInfo(ICommand source) : this(new Builder(source)) { }
+    public CommandInfo(ICommand source) : this(source.GetCommandInfo()) { }
 
     /// <summary>
     /// Initializes a new instance with the contents of the given source.
     /// </summary>
     /// <param name="source"></param>
-    public CommandInfo(ICommandInfo source) : this(new Builder(source)) { }
+    public CommandInfo(ICommandInfo source) : this(source.Engine) => Items.Add(source);
 
     /// <summary>
     /// Initializes a new instance with the contents of the given source.
     /// </summary>
     /// <param name="source"></param>
-    public CommandInfo(ICommandInfo.IBuilder source) : this(new Builder(source)) { }
+    public CommandInfo(ICommandInfo.IBuilder source) : this(source.Engine) => Items.Add(source);
 
     /// <summary>
     /// Initializes a new instance using the given text and the collection of parameters
@@ -50,8 +50,8 @@ public partial class CommandInfo : ICommandInfo
     /// <param name="text"></param>
     /// <param name="range"></param>
     public CommandInfo(
-        IEngine engine, string? text, params object?[]? range)
-        : this(new Builder(engine, text, range)) { }
+        IEngine engine, string? text, params object?[]? range) : this(engine)
+        => Items.Add(text, range);
 
     /// <summary>
     /// Copy constructor.

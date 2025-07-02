@@ -10,13 +10,13 @@ namespace Yotei.ORM.Records.Code;
 public partial class IdentifierTags : IHost
 {
     protected override Builder Items { get; }
-    protected IdentifierTags(Builder item) => Items = item;
+    protected virtual Builder OnInitialize(bool sensitive) => new(sensitive);
 
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="sensitiveTags"></param>
-    public IdentifierTags(bool sensitiveTags) : this(new Builder(sensitiveTags)) { }
+    public IdentifierTags(bool sensitiveTags) => Items = OnInitialize(sensitiveTags);
 
     /// <summary>
     /// Initializes a new instance with the elements of the given range.

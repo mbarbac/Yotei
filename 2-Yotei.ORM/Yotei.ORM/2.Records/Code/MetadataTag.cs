@@ -6,7 +6,8 @@
 public partial class MetadataTag : IMetadataTag
 {
     protected virtual Builder Items { get; }
-    protected MetadataTag(Builder items) => Items = items;
+    protected virtual Builder OnInitialize(bool sensitive, string name) => new(sensitive, name);
+    protected virtual Builder OnInitialize(bool sensitive, IEnumerable<string> range) => new(sensitive, range);
 
     /// <summary>
     /// Initializes a new instance with the given default name.
@@ -14,7 +15,7 @@ public partial class MetadataTag : IMetadataTag
     /// <param name="caseSensitiveTags"></param>
     /// <param name="name"></param>
     public MetadataTag(
-        bool caseSensitiveTags, string name) : this(new Builder(caseSensitiveTags, name)) { }
+        bool caseSensitiveTags, string name) => Items = OnInitialize(caseSensitiveTags, name);
 
     /// <summary>
     /// Initializes a new instance with the names of the given range.
@@ -23,14 +24,13 @@ public partial class MetadataTag : IMetadataTag
     /// <param name="range"></param>
     public MetadataTag(
         bool caseSensitiveTags, IEnumerable<string> range)
-        : this(new Builder(caseSensitiveTags, range)) { }
+        => Items = OnInitialize(caseSensitiveTags, range);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected MetadataTag(
-        MetadataTag source) : this(new Builder(source.CaseSensitiveTags, source)) { }
+    protected MetadataTag(MetadataTag source) => Items = source.Items.Clone();
 
     /// <inheritdoc/>
     public override string ToString() => Items.ToString();

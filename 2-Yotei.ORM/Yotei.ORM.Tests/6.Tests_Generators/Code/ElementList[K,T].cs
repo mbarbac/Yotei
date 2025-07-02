@@ -11,13 +11,13 @@ namespace Yotei.ORM.Tests.Generators;
 public partial class ElementList_KT : IHost
 {
     protected override Builder Items { get; }
-    protected ElementList_KT(Builder items) => Items = items;
+    protected virtual Builder OnInitialize(bool sensitive) => new(sensitive);
 
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="sensitive"></param>
-    public ElementList_KT(bool sensitive) : this(new Builder(sensitive)) { }
+    public ElementList_KT(bool sensitive) => Items = OnInitialize(sensitive);
 
     /// <summary>
     /// Initializes a new instance with the elements of the given range.
