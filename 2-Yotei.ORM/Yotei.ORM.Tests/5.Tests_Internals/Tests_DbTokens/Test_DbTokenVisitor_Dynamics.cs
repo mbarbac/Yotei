@@ -468,15 +468,15 @@ public static class Test_DbTokenVisitor_Dynamics
         var visitor = new DbTokenVisitor(connection);
         ICommandInfo.IBuilder builder;
 
-        builder = visitor.Visit(x => (string?)null);
+        builder = visitor.Visit(x => null!);
         Assert.Equal("NULL", builder.Text);
         Assert.Empty(builder.Parameters);
 
-        builder = visitor.Visit(x => "");
-        Assert.Equal("", builder.Text);
+        builder = visitor.Visit(x => x());
+        Assert.Empty(builder.Text);
         Assert.Empty(builder.Parameters);
 
-        builder = visitor.Visit(x => "any");
+        builder = visitor.Visit(x => x("any"));
         Assert.Equal("any", builder.Text);
         Assert.Empty(builder.Parameters);
     }
@@ -886,24 +886,194 @@ public static class Test_DbTokenVisitor_Dynamics
         var visitor = new DbTokenVisitor(connection);
         ICommandInfo.IBuilder builder;
 
-        builder = visitor.Visit(x => (string?)null);
+        builder = visitor.Visit(x => null!);
         Assert.Equal("NULL", builder.Text);
         Assert.Empty(builder.Parameters);
 
         visitor = visitor with { UseNullString = false };
-        builder = visitor.Visit(x => (string?)null);
+        builder = visitor.Visit(x => null!);
         Assert.Equal("#0", builder.Text);
         Assert.Single(builder.Parameters);
         Assert.Equal("#0", builder.Parameters[0].Name); Assert.Null(builder.Parameters[0].Value);
 
         visitor = visitor with { CaptureValues = false };
-        builder = visitor.Visit(x => (string?)null);
+        builder = visitor.Visit(x => null!);
         Assert.Equal("''", builder.Text);
         Assert.Empty(builder.Parameters);
 
         visitor = visitor with { UseQuotes = false };
-        builder = visitor.Visit(x => (string?)null);
+        builder = visitor.Visit(x => null!);
         Assert.Equal("", builder.Text);
+        Assert.Empty(builder.Parameters);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Value_Strings()
+    {
+        var engine = new FakeEngine();
+        var connection = new FakeConnection(engine);
+        var visitor = new DbTokenVisitor(connection);
+        ICommandInfo.IBuilder builder;
+
+        builder = visitor.Visit(x => "any");
+        Assert.Equal("#0", builder.Text);
+        Assert.Single(builder.Parameters);
+        Assert.Equal("any", builder.Parameters[0].Value);
+
+        visitor = visitor with { CaptureValues = false };
+        builder = visitor.Visit(x => "any");
+        Assert.Equal("'any'", builder.Text);
+        Assert.Empty(builder.Parameters);
+
+        visitor = visitor with { UseQuotes = false };
+        builder = visitor.Visit(x => "any");
+        Assert.Equal("any", builder.Text);
+        Assert.Empty(builder.Parameters);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Value_Boolean()
+    {
+        var engine = new FakeEngine();
+        var connection = new FakeConnection(engine);
+        var visitor = new DbTokenVisitor(connection);
+        ICommandInfo.IBuilder builder;
+
+        builder = visitor.Visit(x => true);
+        Assert.Equal("#0", builder.Text);
+        Assert.Single(builder.Parameters);
+        Assert.Equal("#0", builder.Parameters[0].Name); Assert.Equal(true, builder.Parameters[0].Value);
+
+        visitor = visitor with { CaptureValues = false };
+        builder = visitor.Visit(x => true);
+        Assert.Equal("TRUE", builder.Text);
+        Assert.Empty(builder.Parameters);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Value_Decimal_Invariant_Culture()
+    {
+        var engine = new FakeEngine();
+        var connection = new FakeConnection(engine);
+        var locale = new Locale(CultureInfo.InvariantCulture);
+        var visitor = new DbTokenVisitor(connection) { Locale = locale };
+        ICommandInfo.IBuilder builder;
+        var value = new decimal(1234.56);
+
+        builder = visitor.Visit(x => value);
+        Assert.Equal("#0", builder.Text);
+        Assert.Single(builder.Parameters);
+        Assert.Equal("#0", builder.Parameters[0].Name); Assert.Equal(value, builder.Parameters[0].Value);
+
+        visitor = visitor with { CaptureValues = false };
+        builder = visitor.Visit(x => value);
+        Assert.Equal("1234.56", builder.Text);
+        Assert.Empty(builder.Parameters);
+
+        visitor = visitor with { UseQuotes = false };
+        builder = visitor.Visit(x => value);
+        Assert.Equal("1234.56", builder.Text);
+        Assert.Empty(builder.Parameters);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Value_Decimal_Custom_Culture()
+    {
+        var engine = new FakeEngine();
+        var connection = new FakeConnection(engine);
+        var locale = new Locale(CultureInfo.GetCultureInfo("es-ES"));
+        var visitor = new DbTokenVisitor(connection) { Locale = locale };
+        ICommandInfo.IBuilder builder;
+        var value = new decimal(1234.56);
+
+        builder = visitor.Visit(x => value);
+        Assert.Equal("#0", builder.Text);
+        Assert.Single(builder.Parameters);
+        Assert.Equal("#0", builder.Parameters[0].Name); Assert.Equal(value, builder.Parameters[0].Value);
+
+        visitor = visitor with { CaptureValues = false };
+        builder = visitor.Visit(x => value);
+        Assert.Equal("1234,56", builder.Text);
+        Assert.Empty(builder.Parameters);
+
+        visitor = visitor with { UseQuotes = false };
+        builder = visitor.Visit(x => value);
+        Assert.Equal("1234,56", builder.Text);
+        Assert.Empty(builder.Parameters);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Value_DateTime_Invariant_Culture()
+    {
+        var engine = new FakeEngine();
+        var connection = new FakeConnection(engine);
+        var locale = new Locale(CultureInfo.InvariantCulture);
+        var visitor = new DbTokenVisitor(connection) { Locale = locale, ConvertValues = false };
+        ICommandInfo.IBuilder builder;
+        var value = new DateTime(2001, 12, 31);
+
+        builder = visitor.Visit(x => value);
+        Assert.Equal("#0", builder.Text);
+        Assert.Single(builder.Parameters);
+        Assert.Equal("#0", builder.Parameters[0].Name); Assert.Equal(value, builder.Parameters[0].Value);
+
+        visitor = visitor with { CaptureValues = false };
+        builder = visitor.Visit(x => value);
+        Assert.Equal("'12/31/2001 00:00:00'", builder.Text);
+        Assert.Empty(builder.Parameters);
+
+        visitor = visitor with { UseQuotes = false };
+        builder = visitor.Visit(x => value);
+        Assert.Equal("12/31/2001 00:00:00", builder.Text);
+        Assert.Empty(builder.Parameters);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Value_DateTime_Custom_Culture()
+    {
+        var engine = new FakeEngine();
+        var connection = new FakeConnection(engine);
+        var locale = new Locale(CultureInfo.GetCultureInfo("es-ES"));
+        var visitor = new DbTokenVisitor(connection) { Locale = locale, ConvertValues = false };
+        ICommandInfo.IBuilder builder;
+        var value = new DateTime(2001, 12, 31);
+
+        builder = visitor.Visit(x => value);
+        Assert.Equal("#0", builder.Text);
+        Assert.Single(builder.Parameters);
+        Assert.Equal("#0", builder.Parameters[0].Name); Assert.Equal(value, builder.Parameters[0].Value);
+
+        visitor = visitor with { CaptureValues = false };
+        builder = visitor.Visit(x => value);
+        Assert.Equal("'31/12/2001 0:00:00'", builder.Text);
+        Assert.Empty(builder.Parameters);
+
+        visitor = visitor with { UseQuotes = false };
+        builder = visitor.Visit(x => value);
+        Assert.Equal("31/12/2001 0:00:00", builder.Text);
+        Assert.Empty(builder.Parameters);
+    }
+
+    // -----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Others()
+    {
+        var engine = new FakeEngine();
+        var connection = new FakeConnection(engine);
+        var locale = new Locale(CultureInfo.GetCultureInfo("es-ES"));
+        var visitor = new DbTokenVisitor(connection) { Locale = locale };
+        ICommandInfo.IBuilder builder;
+
+        builder = visitor.Visit(x => x("SELECT *")(x(" FROM "), x.Temp.As("My Alias")));
+        Assert.Equal("SELECT * FROM [Temp] AS [My Alias]", builder.Text);
         Assert.Empty(builder.Parameters);
     }
 }
