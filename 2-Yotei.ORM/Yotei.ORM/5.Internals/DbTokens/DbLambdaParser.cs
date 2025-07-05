@@ -21,41 +21,28 @@ public static class DbLambdaParser
     /// Parses the given dynamic lambda expression and returns the last database-alike token in
     /// the chain that contains the dynamic operations in that expression.
     /// <br/>- Standard syntax: 'x => x...'
-    /// <br/>- Alternate syntax: 'x => "..."', where the string contents are taken as literal ones.
+    /// <br/>- Alternate syntax: 'x => x(str)', where the sole string content is transformed into
+    /// a literal one.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     /// <param name="engine"></param>
     /// <param name="expression"></param>
     /// <returns></returns>
-    public static IDbToken Parse<T>(IEngine engine, Func<dynamic, T> expression)
+    public static IDbToken Parse(IEngine engine, Func<dynamic, object?> expression)
     {
         var parser = LambdaParser.Parse(expression);
         var node = parser.Result;
 
-        var method = expression.GetMethodInfo();
-
-        // Special case for 'x => "string"' syntax...
-        if (method.ReturnType == typeof(string) &&
-            node is LambdaNodeValue value &&
-            value.LambdaValue is string str)
-        {
-            return new DbTokenLiteral(str);
-        }
-
-        // Standard 'x => ...'  syntax...
-        {
-            var token = Parse(engine, node);
-            return token;
-        }
+        var token = Parse(engine, node);
+        return token;
     }
 
     /// <summary>
-    /// 
+    /// Parses the given dynamic lambda node representing a chain of dynamic operations, and
+    /// returns the corresponding database token that represents that chain.
     /// </summary>
     /// <param name="engine"></param>
     /// <param name="node"></param>
     /// <returns></returns>
-    /// <exception cref="System.NullReferenceException"></exception>
     public static IDbToken Parse(IEngine engine, LambdaNode node)
     {
         node.ThrowWhenNull();
