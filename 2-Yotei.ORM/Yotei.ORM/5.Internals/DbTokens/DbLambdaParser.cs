@@ -144,19 +144,26 @@ public static class DbLambdaParser
 
     /// <summary>
     /// Parses the given node.
-    /// <br/>- Single command-alike arguments '(cmd)' are translated into a command instances.
-    /// <br/>- Unique '(str)' string arguments are translated into literal **arguments**...
+    /// <br/>- If the first an unique argument is a valued string one, then that argument is
+    /// transformed into a literal one.
+    /// <br/>- If the first an unique argument is a command one, then that command is returned.
     /// </summary>
     static IDbToken ParseInvoke(IEngine engine, LambdaNodeInvoke node)
     {
         var host = Parse(engine, node.LambdaHost);
         var items = node.LambdaArguments.Select(x => Parse(engine, x)).ToList();
 
-        if (items.Count == 1) // Intercepting special cases...
+        // Special cases...
+        if (items.Count == 1)
         {
+            var item = items[0];
+
             // Literal-alike tokens...
-            if (items[0] is DbTokenValue value && value.Value is string str)
+            if (item is DbTokenValue value && value.Value is string str)
                 items[0] = new DbTokenLiteral(str);
+
+            // Command-alike tokens...
+            if (item is DbTokenCommand command) return command;
         }
 
         // Standard cases...
