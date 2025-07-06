@@ -119,6 +119,9 @@ partial class CommandInfo
         public string Text => _Text.ToString();
 
         /// <inheritdoc/>
+        public int TextLen => _Text.Length;
+
+        /// <inheritdoc/>
         public IParameterList Parameters => _Parameters.CreateInstance();
 
         /// <inheritdoc/>

@@ -1,16 +1,5 @@
 TODO:
 
-- In DbLambdaParser, ParseInvoke:
-  Invoke conversion to command looses track of argument.
-  In syntaxes as '(SELECT..).As()' the first token is rendered as a plain command one, losing
-  track of the dynamic argument: this cause problems when methods as 'RemoveFirst()' are used,
-  because they expect the first element in the tree to be a hosted one with a dynamic argument
-  as a host. At the end of the day it looks like an over-engineered interception...
-
-- In DbLamdaParser, ParseInvoke:
-  Command-alike tokens...
-  if (items[0] is DbTokenCommand command) return command;
-
 OPTIMIZATIONS:
 
 - In Yotei.Tools, CharExtensions: equality using a IEqualityComparer<string> allocates two

@@ -12,4 +12,27 @@ public abstract class RecordsGate : IRecordsGate
 
     /// <inheritdoc/>
     public IConnection Connection { get; }
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public virtual DbTokenVisitor CreateDbTokenVisitor(
+       Locale? locale = null,
+       bool useNullString = DbTokenVisitor.USENULLSTRING,
+       bool captureValues = DbTokenVisitor.CAPTUREVALUES,
+       bool convertValues = DbTokenVisitor.CONVERTVALUES,
+       bool useQuotes = DbTokenVisitor.USEQUOTES,
+       bool useTerminators = DbTokenVisitor.USETERMINATORS,
+       string? rangeSeparator = DbTokenVisitor.RANGESEPARATOR)
+    {
+        return new(
+            Connection,
+            locale,
+            useNullString,
+            captureValues,
+            convertValues,
+            useQuotes,
+            useTerminators,
+            rangeSeparator);
+    }
 }

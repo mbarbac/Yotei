@@ -26,6 +26,11 @@ partial interface ICommandInfo
         string Text { get; }
 
         /// <summary>
+        /// Gets the actual lenght of the text contents.
+        /// </summary>
+        int TextLen { get; }
+
+        /// <summary>
         /// The captured command's parameters.
         /// </summary>
         IParameterList Parameters { get; }
