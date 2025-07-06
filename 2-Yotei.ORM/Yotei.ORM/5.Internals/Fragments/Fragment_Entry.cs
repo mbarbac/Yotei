@@ -80,5 +80,56 @@ public static partial class Fragment
         /// <param name="visitor"></param>
         /// <returns></returns>
         public virtual ICommandInfo.IBuilder Visit(DbTokenVisitor visitor) => visitor.Visit(Body);
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Determines if the given source starts with the given value and, if so, extracts that
+        /// value from the source, and then trims both strings which may become empty ones.
+        /// <br/> If not, just returns false and does no trimming.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="value"></param>
+        /// <param name="sensitive"></param>
+        /// <returns></returns>
+        protected static bool ExtractFromHead(ref string source, ref string value, bool sensitive)
+        {
+            var index = source.IndexOf(value, sensitive);
+            if (index == 0)
+            {
+                var len = value.Length;
+                source = source[len..];
+
+                source = source.Trim();
+                value = value.Trim();
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Determines if the given source ends with the given value and, if so, extracts that
+        /// value from the source, and then trims both strings which may become empty ones.
+        /// <br/> If not, just returns false and does no trimming.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="value"></param>
+        /// <param name="sensitive"></param>
+        /// <returns></returns>
+        protected static bool ExtractFromTail(ref string source, ref string value, bool sensitive)
+        {
+            var index = source.LastIndexOf(value, sensitive);
+            if (index > 0 && (index + value.Length) == source.Length)
+            {
+                source = source[..index];
+
+                source = source.Trim();
+                value = value.Trim();
+                return true;
+            }
+
+            return false;
+        }
     }
 }
