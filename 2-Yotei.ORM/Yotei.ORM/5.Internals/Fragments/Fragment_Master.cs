@@ -102,7 +102,7 @@ public static partial class Fragment
         /// and it is not a duplicated one.
         /// </summary>
         /// <param name="entry"></param>
-        public void Add(Entry entry)
+        public virtual void Add(Entry entry)
         {
             entry = Validate(entry);
 
@@ -119,7 +119,7 @@ public static partial class Fragment
         /// this instance and not duplicated ones.
         /// </summary>
         /// <param name="range"></param>
-        public void AddRange(IEnumerable<Entry> range)
+        public virtual void AddRange(IEnumerable<Entry> range)
         {
             range.ThrowWhenNull();
             foreach (var item in range) Add(item);
@@ -131,7 +131,7 @@ public static partial class Fragment
         /// </summary>
         /// <param name="index"></param>
         /// <param name="entry"></param>
-        public void Insert(int index, Entry entry)
+        public virtual void Insert(int index, Entry entry)
         {
             entry = Validate(entry);
 
@@ -149,7 +149,7 @@ public static partial class Fragment
         /// </summary>
         /// <param name="index"></param>
         /// <param name="range"></param>
-        public void InsertRange(int index, IEnumerable<Entry> range)
+        public virtual void InsertRange(int index, IEnumerable<Entry> range)
         {
             range.ThrowWhenNull();
             foreach (var item in range) { Insert(index, item); index++; }
@@ -159,13 +159,13 @@ public static partial class Fragment
         /// Removes from this collection the given entry, if possible.
         /// </summary>
         /// <param name="item"></param>
-        public bool Remove(Entry entry) => Items.Remove(entry);
+        public virtual bool Remove(Entry entry) => Items.Remove(entry);
 
         /// <summary>
         /// Removes from this collection the entry at the given index.
         /// </summary>
         /// <param name="index"></param>
-        public void RemoveAt(int index) => Items.RemoveAt(index);
+        public virtual void RemoveAt(int index) => Items.RemoveAt(index);
 
         // ------------------------------------------------
 

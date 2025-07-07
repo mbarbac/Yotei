@@ -1,5 +1,7 @@
 ﻿#pragma warning disable IDE1006
 
+using System.Net.Sockets;
+
 namespace Yotei.ORM.Internals;
 
 /// <summary>
@@ -24,69 +26,94 @@ public static partial class FragmentWhere
         /// <param name="body"></param>
         public Entry(Master master, IDbToken body) : base(master, body)
         {
-            // First-level invokes with just one argument translated to that argument...
-            while (body is DbTokenInvoke invoke &&
-                invoke.Host is DbTokenArgument &&
-                invoke.Arguments.Count == 1)
-            {
-                Body = invoke.Arguments[0];
-                body = Body;
-            }
-
-            // Values carrying a string translated to literals...
-            if (body is DbTokenValue value && value.Value is string vstr)
-            {
-                Body = new DbTokenLiteral(vstr);
-                body = Body;
-            }
-
-            // Setter translated to binary comparison, for convenience...
-            if (body is DbTokenSetter setter)
+            // Setters translated to binary comparisons, for convenience...
+            if (Body is DbTokenSetter setter)
             {
                 Body = new DbTokenBinary(setter.Target, ExpressionType.Equal, setter.Value);
-                body = Body;
+                return;
             }
 
             // Literals...
-            if (body is DbTokenLiteral literal)
+            if (Body is DbTokenLiteral literal)
             {
-                var comparison = StringComparison.OrdinalIgnoreCase;
                 var main = literal.Value;
-                if (main.EndsWith(" OR", comparison) || main.EndsWith(" AND", comparison))
-                    throw new ArgumentException("Literal body ends with a connector.").WithData(body);
 
-                // Extracting heading connector, if any...
-                main = main.NotNullNotEmpty(trim: true);
-                string str;
+                // Intercepting a heading connector...
+                string conn;
+                var str = main.Trim();
+                var comparison = StringComparison.OrdinalIgnoreCase;
 
-                UseAND = null;
-                str = "AND "; if (ExtractFromHead(ref main, ref str)) UseAND = true;
-                str = "OR "; if (ExtractFromHead(ref main, ref str)) UseAND = false;
+                conn = "AND ";
+                if (str.StartsWith(conn, comparison))
+                {
+                    Connector = str[..conn.Length];
+                    main = str[conn.Length..];
+                    Body = new DbTokenLiteral(main);
+                }
+                conn = "AND";
+                if (str.Equals(conn, comparison))
+                {
+                    Connector = str;
+                    Body = DbTokenLiteral.Empty;
+                    return;
+                }
+                conn = "OR ";
+                if (str.StartsWith(conn, comparison))
+                {
+                    Connector = str[..conn.Length];
+                    main = str[conn.Length..];
+                    Body = new DbTokenLiteral(main);
+                }
+                conn = "OR";
+                if (str.Equals(conn, comparison))
+                {
+                    Connector = str;
+                    Body = DbTokenLiteral.Empty;
+                    return;
+                }
 
-                // Transforming 'target==value' into proper 'target=value'...
-                main = main.NotNullNotEmpty(trim: true);
+                // Transforming 'Target==Value' into SQL's 'left=right'...
                 var tokenizer = new StrWrappedTokenizer(Engine.LeftTerminator, Engine.RightTerminator);
                 var items = Engine.UseTerminators ? tokenizer.Tokenize(main) : new StrTokenText(main);
-
                 var (left, right) = items.ExtractFirst("==", false, out var found);
                 if (found)
                 {
                     main = left.ToString()!.Trim();
                     if (main.StartsWith('(') && !main.EndsWith(')')) main = main[1..];
                     if (!main.StartsWith('(') && main.EndsWith(')')) main = main[..^1];
-                    main = main.NotNullNotEmpty(trim: true, $"Target {Clause} part.");
+                    main = main.NotNullNotEmpty(trim: true, $"Left {Clause} part.");
 
                     str = right!.ToString()!.Trim();
                     if (str.StartsWith('(') && !str.EndsWith(')')) str = str[1..];
                     if (!str.StartsWith('(') && str.EndsWith(')')) str = str[..^1];
-                    str = str.NotNullNotEmpty(trim: true, $"Value {Clause} part.");
+                    str = str.NotNullNotEmpty(trim: true, $"Right {Clause} part.");
 
-                    Body = new DbTokenLiteral(main + str);
+                    Body = new DbTokenLiteral($"({main} = {str})");
+                    return;
+                }
+
+                // Intercepting 'left=right'...
+                tokenizer = new StrWrappedTokenizer(Engine.LeftTerminator, Engine.RightTerminator);
+                items = Engine.UseTerminators ? tokenizer.Tokenize(main) : new StrTokenText(main);
+                (left, right) = items.ExtractFirst("=", false, out found);
+                if (found)
+                {
+                    main = left.ToString()!.Trim();
+                    if (main.StartsWith('(') && !main.EndsWith(')')) main = main[1..];
+                    if (!main.StartsWith('(') && main.EndsWith(')')) main = main[..^1];
+                    main = main.NotNullNotEmpty(trim: true, $"Left {Clause} part.");
+
+                    str = right!.ToString()!.Trim();
+                    if (str.StartsWith('(') && !str.EndsWith(')')) str = str[1..];
+                    if (!str.StartsWith('(') && str.EndsWith(')')) str = str[..^1];
+                    str = str.NotNullNotEmpty(trim: true, $"Right {Clause} part.");
+
+                    Body = new DbTokenLiteral($"({main} = {str})");
                     return;
                 }
             }
 
-            // Any other token instance is just accepted...
+            // Any other token is just accepted..
             return;
         }
 
@@ -94,52 +121,39 @@ public static partial class FragmentWhere
         /// Copy constructor.
         /// </summary>
         /// <param name="source"></param>
-        protected Entry(Entry source) : base(source) => UseAND = source.UseAND;
+        protected Entry(Entry source) : base(source) => Connector = source.Connector;
 
         /// <summary>
-        /// If not <c>null</c>, whether this instance chains with any previous ones using an "AND"
-        /// connector, or an "OR" one. If null, no connector is injected.
+        /// If not null, the trimmed connector used to separate the contents of this entry from
+        /// any previous one, if neeed.
         /// </summary>
-        public bool? UseAND
+        public string? Connector
         {
-            get => _UseAND;
-            init => _UseAND = value;
+            get => _Connector;
+            init => _Connector = value;
         }
-        internal protected bool? _UseAND
+        internal protected string? _Connector
         {
-            get => __UseAND;
-            set => __UseAND = value;
+            get => __Connector;
+            set => __Connector = value?.NotNullNotEmpty(trim: true);
         }
-        bool? __UseAND;
+        string? __Connector;
 
         // ------------------------------------------------
 
         /// <inheritdoc/>
-        public override string ToString()
-        {
-            if (UseAND is not null)
-            {
-                var str = UseAND.Value ? "AND" : "OR";
-                return $"{str} {Body}";
-            }
-            return Body.ToString()!;
-        }
-            
-            
-            //=> UseAND is not null
-            //? $"{(UseAND.Value ? "AND" : "OR")} {Body}"
-            //: Body.ToString()!;
+        public override string ToString() => Connector is not null
+            ? $"{Connector} {Body}"
+            : Body.ToString()!;
 
         /// <inheritdoc/>
         public override ICommandInfo.IBuilder Visit(DbTokenVisitor visitor)
         {
             var builder = visitor.Visit(Body);
 
-            if (UseAND is not null)
-            {
-                var str = UseAND.Value ? "AND" : "OR";
-                builder.ReplaceText($"{str} {Body}");
-            }
+            if (Connector is not null) builder.ReplaceText(
+                builder.TextLen > 0 ? $"{Connector} {builder.Text}" : Connector);
+
             return builder;
         }
     }
@@ -177,10 +191,47 @@ public static partial class FragmentWhere
         }
 
         /// <inheritdoc/>
+        public override void Add(Fragment.Entry entry)
+        {
+            var valid = Validate(entry);
+            if (valid.Connector is null && Count > 0)
+            {
+                var index = Count - 1;
+                var temp = (Entry)this[index];
+                if (temp.Connector is not null && temp.Body.ToString()!.Length == 0)
+                {
+                    valid._Connector = temp.Connector;
+                    RemoveAt(index);
+                }
+            }
+
+            base.Add(valid);
+        }
+
+        /// <inheritdoc/>
+        public override void Insert(int index, Fragment.Entry entry)
+        {
+            var valid = Validate(entry);
+            if (valid.Connector is null && Count > 0 && index > 0)
+            {
+                var temp = (Entry)this[index - 1];
+                if (temp.Connector is not null && temp.Body.ToString()!.Length == 0)
+                {
+                    valid._Connector = temp.Connector;
+                    RemoveAt(index);
+                }
+            }
+
+            base.Insert(index, entry);
+        }
+
+        // ------------------------------------------------
+
+        /// <inheritdoc/>
         public override Entry CreateEntry(IDbToken body)
         {
             // Intercepting first-level 'x.And()' and 'x.Or()' methods...
-            bool? useAnd = null;
+            string? connector = null;
             var item = body.ExtractFirst(x =>
             {
                 if (x is not DbTokenMethod method) return false;
@@ -191,8 +242,7 @@ public static partial class FragmentWhere
             , out var removed); if (removed is not null)
             {
                 var method = (DbTokenMethod)removed;
-                var name = method.Name;
-                var upper = name.ToUpper();
+                var upper = method.Name.ToUpper();
 
                 if (method.TypeArguments.Length != 0) throw new ArgumentException(
                     $"No type arguments allowed for '{upper}()' virtual method.")
@@ -201,7 +251,7 @@ public static partial class FragmentWhere
                 // x => x.Name()...
                 if (method.Arguments.Count == 0)
                 {
-                    useAnd = upper == "AND";
+                    connector = method.Name;
                     body = item;
                 }
 
@@ -212,19 +262,19 @@ public static partial class FragmentWhere
                         $"Remaining after '{upper}()' must be empty.")
                         .WithData(body);
 
-                    useAnd = upper == "AND";
+                    connector = method.Name;
                     body = method.Arguments[0];
                 }
 
                 // Others...
                 else throw new ArgumentException(
-                    $"'{upper}(...) must have just one argument.")
+                    $"'{upper}(...) must have just none or just one argument.")
                     .WithData(body);
             }
 
             // Finishing...
             var entry = new Entry(this, body);
-            if (useAnd is not null) entry._UseAND = useAnd;
+            if (connector is not null) entry._Connector = connector;
             return entry;
         }
 
@@ -236,7 +286,7 @@ public static partial class FragmentWhere
             var valid = (Entry)entry;
             var index = IndexOf(entry);
 
-            if (index > 0 && valid.UseAND is not null) return " ";
+            if (index > 0 && valid.Connector is not null) return " ";
             return null;
         }
     }
