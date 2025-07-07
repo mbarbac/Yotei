@@ -87,12 +87,14 @@ public static partial class Fragment
         /// Determines if the given source starts with the given value and, if so, extracts that
         /// value from the source, and then trims both strings which may become empty ones.
         /// <br/> If not, just returns false and does no trimming.
+        /// <br/> By default, values are treated not case sensitive.
         /// </summary>
         /// <param name="source"></param>
         /// <param name="value"></param>
         /// <param name="sensitive"></param>
         /// <returns></returns>
-        protected static bool ExtractFromHead(ref string source, ref string value, bool sensitive)
+        protected static bool ExtractFromHead(
+            ref string source, ref string value, bool sensitive = false)
         {
             var index = source.IndexOf(value, sensitive);
             if (index == 0)
@@ -112,12 +114,14 @@ public static partial class Fragment
         /// Determines if the given source ends with the given value and, if so, extracts that
         /// value from the source, and then trims both strings which may become empty ones.
         /// <br/> If not, just returns false and does no trimming.
+        /// <br/> By default, values are treated not case sensitive.
         /// </summary>
         /// <param name="source"></param>
         /// <param name="value"></param>
         /// <param name="sensitive"></param>
         /// <returns></returns>
-        protected static bool ExtractFromTail(ref string source, ref string value, bool sensitive)
+        protected static bool ExtractFromTail(
+            ref string source, ref string value, bool sensitive = false)
         {
             var index = source.LastIndexOf(value, sensitive);
             if (index > 0 && (index + value.Length) == source.Length)

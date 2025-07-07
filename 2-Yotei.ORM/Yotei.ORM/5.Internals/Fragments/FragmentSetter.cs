@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿#pragma warning disable IDE1006
 
 namespace Yotei.ORM.Internals;
 
@@ -28,6 +28,7 @@ public static partial class FragmentSetter
         /// <param name="body"></param>
         public Entry(Master master, IDbToken body) : base(master, body)
         {
+            // First-level invokes with just one argument translated to that argument...
             while (body is DbTokenInvoke invoke &&
                 invoke.Host is DbTokenArgument &&
                 invoke.Arguments.Count == 1)
@@ -36,19 +37,14 @@ public static partial class FragmentSetter
                 body = Body;
             }
             
+            // Values carrying a string translated to literals...
             if (body is DbTokenValue value && value.Value is string vstr)
             {
                 Body = new DbTokenLiteral(vstr);
                 body = Body;
             }
 
-            if (body is DbTokenSetter setter)
-            {
-                Target = setter.Target;
-                Value = setter.Value;
-                return;
-            }
-
+            // Literals...
             if (body is DbTokenLiteral literal)
             {
                 var tokenizer = new StrWrappedTokenizer(Engine.LeftTerminator, Engine.RightTerminator);
@@ -74,6 +70,15 @@ public static partial class FragmentSetter
                 }
             }
 
+            // Standard setters...
+            if (body is DbTokenSetter setter)
+            {
+                Target = setter.Target;
+                Value = setter.Value;
+                return;
+            }
+
+            // Invalid ones...
             throw new ArgumentException(
                 $"{Clause} entry body has not the appropriate 'Target='Value' format.")
                 .WithData(body);
@@ -95,9 +100,14 @@ public static partial class FragmentSetter
         public IDbToken Target
         {
             get => _Target;
-            internal protected set => _Target = value.ThrowWhenNull();
+            init => _Target = value;
         }
-        IDbToken _Target = default!;
+        internal protected IDbToken _Target
+        {
+            get => __Target;
+            set => __Target = value.ThrowWhenNull();
+        }
+        IDbToken __Target = default!;
 
         /// <summary>
         /// The value of this setter operation.
@@ -105,9 +115,14 @@ public static partial class FragmentSetter
         public IDbToken Value
         {
             get => _Value;
-            internal protected set => _Value = value.ThrowWhenNull();
+            init => _Value = value.ThrowWhenNull();
         }
-        IDbToken _Value = default!;
+        internal protected IDbToken _Value
+        {
+            get => __Value;
+            set => __Value = value.ThrowWhenNull();
+        }
+        IDbToken __Value = default!;
 
         // ------------------------------------------------
 
