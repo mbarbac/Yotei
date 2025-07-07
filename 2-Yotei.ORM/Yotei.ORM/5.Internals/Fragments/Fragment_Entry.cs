@@ -41,6 +41,9 @@ public static partial class Fragment
             // Argument tokens are not acceptable...
             if (Body is DbTokenArgument) throw new ArgumentException(
                 $"Body of {Clause} clause cannot just be a dynamic argument.").WithData(body);
+
+            // Any other ones, even empty ones, are in principle acceptable...
+            return;
         }
 
         /// <summary>

@@ -1,7 +1,5 @@
 ﻿#pragma warning disable IDE1006
 
-using System.Net.Sockets;
-
 namespace Yotei.ORM.Internals;
 
 /// <summary>
@@ -26,7 +24,7 @@ public static partial class FragmentWhere
         /// <param name="body"></param>
         public Entry(Master master, IDbToken body) : base(master, body)
         {
-            // Setters translated to binary comparisons, for convenience...
+            // Setters translates into binary comparisons for convenience...
             if (Body is DbTokenSetter setter)
             {
                 Body = new DbTokenBinary(setter.Target, ExpressionType.Equal, setter.Value);
@@ -36,40 +34,21 @@ public static partial class FragmentWhere
             // Literals...
             if (Body is DbTokenLiteral literal)
             {
+                // Intercepting heading connector...
                 var main = literal.Value;
-
-                // Intercepting a heading connector...
-                string conn;
                 var str = main.Trim();
                 var comparison = StringComparison.OrdinalIgnoreCase;
 
-                conn = "AND ";
-                if (str.StartsWith(conn, comparison))
+                if (!Extract("AND")) Extract("OR");
+                bool Extract(string conn)
                 {
-                    Connector = str[..conn.Length];
-                    main = str[conn.Length..];
-                    Body = new DbTokenLiteral(main);
-                }
-                conn = "AND";
-                if (str.Equals(conn, comparison))
-                {
-                    Connector = str;
-                    Body = DbTokenLiteral.Empty;
-                    return;
-                }
-                conn = "OR ";
-                if (str.StartsWith(conn, comparison))
-                {
-                    Connector = str[..conn.Length];
-                    main = str[conn.Length..];
-                    Body = new DbTokenLiteral(main);
-                }
-                conn = "OR";
-                if (str.Equals(conn, comparison))
-                {
-                    Connector = str;
-                    Body = DbTokenLiteral.Empty;
-                    return;
+                    if (str.StartsWith(conn, comparison))
+                    {
+                        _Connector = str[..conn.Length].Trim();
+                        Body = new DbTokenLiteral(main = str[conn.Length..].Trim());
+                        return true;
+                    }
+                    return false;
                 }
 
                 // Transforming 'Target==Value' into SQL's 'left=right'...
@@ -113,7 +92,7 @@ public static partial class FragmentWhere
                 }
             }
 
-            // Any other token is just accepted..
+            // Any other token is just accepted, even empty ones...
             return;
         }
 
@@ -124,8 +103,9 @@ public static partial class FragmentWhere
         protected Entry(Entry source) : base(source) => Connector = source.Connector;
 
         /// <summary>
-        /// If not null, the trimmed connector used to separate the contents of this entry from
-        /// any previous one, if neeed.
+        /// If not null, the AND or OR trimmed connector to use to separate the contents of this
+        /// instance with previous ones, if any, provided this is not the first one in its master
+        /// collection.
         /// </summary>
         public string? Connector
         {
@@ -142,17 +122,37 @@ public static partial class FragmentWhere
         // ------------------------------------------------
 
         /// <inheritdoc/>
-        public override string ToString() => Connector is not null
-            ? $"{Connector} {Body}"
-            : Body.ToString()!;
+        public override string ToString()
+        {
+            return Connector is not null ? $"[{Connector}] {Body}" : Body.ToString()!;
+        }
 
         /// <inheritdoc/>
+        /// <remarks>
+        /// The <see cref="Connector"/> property goberns the separation of this instance from
+        /// any previous ones, so we deal with this complexity here, and the master's separator
+        /// producer will always return null.
+        /// </remarks>
         public override ICommandInfo.IBuilder Visit(DbTokenVisitor visitor)
         {
             var builder = visitor.Visit(Body);
+            var empty = builder.TextLen == 0;
 
-            if (Connector is not null) builder.ReplaceText(
-                builder.TextLen > 0 ? $"{Connector} {builder.Text}" : Connector);
+            if (Connector is not null)
+            {
+                var index = Master.IndexOf(this);
+
+                if (empty) // Stand-alone connector...
+                {
+                    builder.ReplaceText(index == 0
+                        ? $"{Connector} "
+                        : $" {Connector} ");
+                }
+                else // Connector with contents
+                {
+                    if (index > 0) builder.ReplaceText($" {Connector} {builder.Text}");
+                }
+            }
 
             return builder;
         }
@@ -190,41 +190,6 @@ public static partial class FragmentWhere
             return valid;
         }
 
-        /// <inheritdoc/>
-        public override void Add(Fragment.Entry entry)
-        {
-            var valid = Validate(entry);
-            if (valid.Connector is null && Count > 0)
-            {
-                var index = Count - 1;
-                var temp = (Entry)this[index];
-                if (temp.Connector is not null && temp.Body.ToString()!.Length == 0)
-                {
-                    valid._Connector = temp.Connector;
-                    RemoveAt(index);
-                }
-            }
-
-            base.Add(valid);
-        }
-
-        /// <inheritdoc/>
-        public override void Insert(int index, Fragment.Entry entry)
-        {
-            var valid = Validate(entry);
-            if (valid.Connector is null && Count > 0 && index > 0)
-            {
-                var temp = (Entry)this[index - 1];
-                if (temp.Connector is not null && temp.Body.ToString()!.Length == 0)
-                {
-                    valid._Connector = temp.Connector;
-                    RemoveAt(index);
-                }
-            }
-
-            base.Insert(index, entry);
-        }
-
         // ------------------------------------------------
 
         /// <inheritdoc/>
@@ -242,24 +207,23 @@ public static partial class FragmentWhere
             , out var removed); if (removed is not null)
             {
                 var method = (DbTokenMethod)removed;
-                var upper = method.Name.ToUpper();
 
                 if (method.TypeArguments.Length != 0) throw new ArgumentException(
-                    $"No type arguments allowed for '{upper}()' virtual method.")
+                    $"No type arguments allowed for '{method.Name}()' virtual method.")
                     .WithData(body);
 
                 // x => x.Name()...
                 if (method.Arguments.Count == 0)
                 {
                     connector = method.Name;
-                    body = item;
+                    body = item is DbTokenArgument ? DbTokenLiteral.Empty : item;
                 }
 
                 // x => x.Name(...)
                 else if (method.Arguments.Count == 1)
                 {
                     if (item is not DbTokenArgument) throw new ArgumentException(
-                        $"Remaining after '{upper}()' must be empty.")
+                        $"Remaining after '{method.Name}()' must be empty.")
                         .WithData(body);
 
                     connector = method.Name;
@@ -268,7 +232,7 @@ public static partial class FragmentWhere
 
                 // Others...
                 else throw new ArgumentException(
-                    $"'{upper}(...) must have just none or just one argument.")
+                    $"'{method.Name}(...) must have just none or just one argument.")
                     .WithData(body);
             }
 
@@ -276,18 +240,6 @@ public static partial class FragmentWhere
             var entry = new Entry(this, body);
             if (connector is not null) entry._Connector = connector;
             return entry;
-        }
-
-        // ------------------------------------------------
-
-        /// <inheritdoc/>
-        protected override string? EntrySeparator(Fragment.Entry entry)
-        {
-            var valid = (Entry)entry;
-            var index = IndexOf(entry);
-
-            if (index > 0 && valid.Connector is not null) return " ";
-            return null;
         }
     }
 }
