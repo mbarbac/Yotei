@@ -1,5 +1,7 @@
 ﻿#pragma warning disable IDE1006
 
+using System.Runtime.Intrinsics.Arm;
+
 namespace Yotei.ORM.Internals;
 
 /// <summary>
@@ -45,17 +47,27 @@ public static partial class FragmentWhere
                 var str = main.Trim();
                 var comparison = StringComparison.OrdinalIgnoreCase;
 
-                if (!Extract("AND")) Extract("OR");
-                bool Extract(string conn)
+                bool Extract(string spec)
                 {
-                    if (str.StartsWith(conn, comparison))
+                    var index = str.IndexOf(spec, comparison);
+                    if (index == 0 && spec.Length == str.Length) // stand-alone...
                     {
-                        _Connector = str[..conn.Length].Trim();
-                        Body = new DbTokenLiteral(main = str[conn.Length..].Trim());
+                        _Connector = str;
+                        main = string.Empty;
+                        return true;
+                    }
+                    spec = spec + " ";
+                    index = str.IndexOf(spec, comparison); // "spec "...
+                    if (index == 0)
+                    {
+                        _Connector = str[..spec.Length].Trim();
+                        main = str[spec.Length..].Trim();
                         return true;
                     }
                     return false;
                 }
+                var done = Extract("AND") || Extract("OR");
+                if (done) Body = main.Length == 0 ? DbTokenLiteral.Empty : new DbTokenLiteral(main);
 
                 // Transforming 'Target==Value' into SQL's 'left=right'...
                 var tokenizer = new StrWrappedTokenizer(Engine.LeftTerminator, Engine.RightTerminator);
@@ -247,5 +259,13 @@ public static partial class FragmentWhere
             if (connector is not null) entry._Connector = connector;
             return entry;
         }
+
+        // ------------------------------------------------
+
+        /// <inheritdoc/>
+        /// <remarks>
+        /// The entry itself takes care of adding an appropriate separator when needed.
+        /// </remarks>
+        protected override string? EntrySeparator(Fragment.Entry entry) => null;
     }
 }
