@@ -360,7 +360,7 @@ public static class Test_FragmentWhere
         ICommandInfo.IBuilder builder;
 
         master = new(command);
-        master.Capture(x => x.Id = null!);
+        master.Capture(x => x.Id = null!); // Setter instead of comparison for convenience...
         Assert.Single(master);
         entry = Assert.IsType<FragmentWhere.Entry>(master[0]);
         Assert.Null(entry.Connector);
@@ -370,7 +370,7 @@ public static class Test_FragmentWhere
         Assert.Empty(builder.Parameters);
 
         master = new(command);
-        master.Capture(x => x.Id = "007");
+        master.Capture(x => x.Id = "007"); // Setter instead of comparison for convenience...
         Assert.Single(master);
         entry = Assert.IsType<FragmentWhere.Entry>(master[0]);
         Assert.Null(entry.Connector);
@@ -391,7 +391,7 @@ public static class Test_FragmentWhere
         ICommandInfo.IBuilder builder;
 
         master = new(command);
-        master.Capture(x => x.And(x.Id = null!));
+        master.Capture(x => x.And(x.Id == null!));
         Assert.Single(master);
         entry = Assert.IsType<FragmentWhere.Entry>(master[0]);
         Assert.Equal("And", entry.Connector);
@@ -401,7 +401,7 @@ public static class Test_FragmentWhere
         Assert.Empty(builder.Parameters);
 
         master = new(command);
-        master.Capture(x => x.And().Id = null!);
+        master.Capture(x => x.And().Id == null!);
         Assert.Single(master);
         entry = Assert.IsType<FragmentWhere.Entry>(master[0]);
         Assert.Equal("And", entry.Connector);
@@ -453,8 +453,8 @@ public static class Test_FragmentWhere
         ICommandInfo.IBuilder builder;
 
         master = new(command);
-        master.Capture(x => x.First = "James");
-        master.Capture(x => x.Last = "Bond");
+        master.Capture(x => x.First == "James");
+        master.Capture(x => x.Last == "Bond");
         Assert.Equal(2, master.Count);
         entry = Assert.IsType<FragmentWhere.Entry>(master[0]);
         Assert.Null(entry.Connector);
@@ -479,8 +479,8 @@ public static class Test_FragmentWhere
         ICommandInfo.IBuilder builder;
 
         master = new(command);
-        master.Capture(x => x.First = "James");
-        master.Capture(x => x.And(x.Last = "Bond"));
+        master.Capture(x => x.First == "James");
+        master.Capture(x => x.And(x.Last == "Bond"));
         Assert.Equal(2, master.Count);
         entry = Assert.IsType<FragmentWhere.Entry>(master[0]);
         Assert.Null(entry.Connector);
@@ -495,8 +495,8 @@ public static class Test_FragmentWhere
         Assert.Equal("Bond", builder.Parameters[1].Value);
 
         master = new(command);
-        master.Capture(x => x.First = "James");
-        master.Capture(x => x.And().Last = "Bond");
+        master.Capture(x => x.First == "James");
+        master.Capture(x => x.And().Last == "Bond");
         Assert.Equal(2, master.Count);
         entry = Assert.IsType<FragmentWhere.Entry>(master[0]);
         Assert.Null(entry.Connector);
@@ -511,9 +511,9 @@ public static class Test_FragmentWhere
         Assert.Equal("Bond", builder.Parameters[1].Value);
 
         master = new(command);
-        master.Capture(x => x.First = "James");
+        master.Capture(x => x.First == "James");
         master.Capture(x => x.And());
-        master.Capture(x => x.Last = "Bond");
+        master.Capture(x => x.Last == "Bond");
         Assert.Equal(3, master.Count);
         entry = Assert.IsType<FragmentWhere.Entry>(master[0]);
         Assert.Null(entry.Connector);
@@ -542,8 +542,8 @@ public static class Test_FragmentWhere
         ICommandInfo.IBuilder builder;
 
         master = new(command);
-        master.Capture(x => x.First = "James");
-        master.Capture(x => x.And(x.Last = "Bond"));
+        master.Capture(x => x.First == "James");
+        master.Capture(x => x.And(x.Last == "Bond"));
         Assert.Equal(2, master.Count);
 
         var target = master.Clone();
@@ -569,8 +569,8 @@ public static class Test_FragmentWhere
         ICommandInfo.IBuilder builder;
 
         master = new(command);
-        master.Capture(x => x.First = "James");
-        master.Capture(x => x.And(x.Last = "Bond"));
+        master.Capture(x => x.First == "James");
+        master.Capture(x => x.And(x.Last == "Bond"));
         Assert.Equal(2, master.Count);
 
         master.Clear();

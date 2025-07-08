@@ -7,7 +7,13 @@ namespace Yotei.ORM.Internals;
 /// <br/>- Standard syntax: 'x => Expression'.
 /// <br/>- Alternate syntax: 'x => x.And(...)'.
 /// <br/>- Alternate syntax: 'x => x.Or(...)'.
+/// <br/>- Literal syntax: 'x => x("...")'.
 /// </summary>
+/// <remarks>
+/// Connector methods can either be parameterless (as in 'x => x.And()...) or with one parameter
+/// (as in 'x => x.And(...)'). In the former case, if the remaining is empty, then the entry is
+/// just an stand-alone connector one. In the latter one, no remaining is allowed.
+/// </remarks>
 public static partial class FragmentWhere
 {
     // ====================================================
