@@ -14,6 +14,7 @@ public static partial class Fragment
         /// Initializes a new instance.
         /// <br/> Bodies that are just a dynamic argument throw an exception.
         /// <br/> Bodies with a 'x => x(str)' format are translated into literal tokens.
+        /// <br/> String-valued bodies as 'x => str' are translated into literal tokens.
         /// </summary>
         /// <param name="master"></param>
         /// <param name="body"></param>
