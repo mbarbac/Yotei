@@ -5,19 +5,19 @@
 /// Represents an embedded command in a database expression.
 /// </summary>
 [Cloneable]
-public partial class DbTokenCommand : IDbToken
+public partial class DbTokenCommandInfo : IDbToken
 {
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
     /// <param name="info"></param>
-    public DbTokenCommand(ICommandInfo info) => CommandInfo = info.ThrowWhenNull();
+    public DbTokenCommandInfo(ICommandInfo info) => CommandInfo = info.ThrowWhenNull();
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected DbTokenCommand(DbTokenCommand source) : this(source.CommandInfo) { }
+    protected DbTokenCommandInfo(DbTokenCommandInfo source) : this(source.CommandInfo) { }
 
     /// <inheritdoc/>
     public override string ToString() => CommandInfo.IsEmpty
@@ -34,7 +34,7 @@ public partial class DbTokenCommand : IDbToken
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null) return false;
-        if (other is not DbTokenCommand valid) return false;
+        if (other is not DbTokenCommandInfo valid) return false;
 
         var sensitive = CommandInfo.Engine.CaseSensitiveNames;
         if (sensitive != valid.CommandInfo.Engine.CaseSensitiveNames) return false;
@@ -46,14 +46,18 @@ public partial class DbTokenCommand : IDbToken
     /// <inheritdoc/>
     public override bool Equals(object? obj) => Equals(obj as IDbToken);
 
-    public static bool operator ==(DbTokenCommand? host, IDbToken? other) => host?.Equals(other) ?? false;
+    public static bool operator ==(DbTokenCommandInfo? host, IDbToken? other) => host?.Equals(other) ?? false;
 
-    public static bool operator !=(DbTokenCommand? host, IDbToken? other) => !(host == other);
+    public static bool operator !=(DbTokenCommandInfo? host, IDbToken? other) => !(host == other);
 
     /// <inheritdoc/>
     public override int GetHashCode() => CommandInfo.GetHashCode();
 
     // ----------------------------------------------------
+
+    // We keep track of the command-info instead of the actual command, because:
+    // - ICommandInfo instances are immutable ones, useful when captured as embedded.
+    // - Permit them to be used as bodies in fragment entries.
 
     /// <summary>
     /// The info carried by this instance about the embedded command  it represents.

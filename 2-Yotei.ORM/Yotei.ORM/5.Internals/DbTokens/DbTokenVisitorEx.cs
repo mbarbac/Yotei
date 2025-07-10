@@ -35,7 +35,7 @@ partial record class DbTokenVisitor
             DbTokenBinary item => VisitBinary(item),
             DbTokenChain item => VisitChain(item),
             DbTokenCoalesce item => VisitCoalesce(item),
-            DbTokenCommand item => VisitCommand(item),
+            DbTokenCommandInfo item => VisitCommand(item),
             DbTokenConvert item => VisitConvert(item),
             DbTokenIdentifier item => VisitIdentifier(item),
             DbTokenIndexed item => VisitIndexed(item),
@@ -209,7 +209,7 @@ partial record class DbTokenVisitor
     /// </summary>
     /// <param name="token"></param>
     /// <returns></returns>
-    protected virtual ICommandInfo.IBuilder VisitCommand(DbTokenCommand token)
+    protected virtual ICommandInfo.IBuilder VisitCommand(DbTokenCommandInfo token)
     {
         var info = token.CommandInfo;
 
@@ -692,7 +692,7 @@ partial record class DbTokenVisitor
         // Value is a command...
         if (token.Value is ICommand command)
         {
-            var temp = new DbTokenCommand(command.GetCommandInfo(iterable: false));
+            var temp = new DbTokenCommandInfo(command.GetCommandInfo(iterable: false));
             return Visit(temp);
         }
 

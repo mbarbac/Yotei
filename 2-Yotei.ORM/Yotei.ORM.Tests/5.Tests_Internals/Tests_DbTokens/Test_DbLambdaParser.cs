@@ -122,7 +122,7 @@ public static class Test_DbLambdaParser
     public static void Parse_Command()
     {
         IDbToken token;
-        DbTokenCommand command;
+        DbTokenCommandInfo command;
         DbTokenMethod method;
 
         var engine = new FakeEngine();
@@ -130,12 +130,12 @@ public static class Test_DbLambdaParser
         var cmd = new FakeCommand(connection, "SELECT * FROM Employees WHERE Id = {0}", "007");
 
         token = DbLambdaParser.Parse(engine, x => cmd);
-        command = Assert.IsType<DbTokenCommand>(token);
+        command = Assert.IsType<DbTokenCommandInfo>(token);
         Assert.Equal("(SELECT * FROM Employees WHERE Id = #0)", token.ToString());
         Assert.Equal(token.ToString(), cmd.GetCommandInfo().Text.Wrap('(', ')'));
 
         token = DbLambdaParser.Parse(engine, x => x(cmd));
-        command = Assert.IsType<DbTokenCommand>(token);
+        command = Assert.IsType<DbTokenCommandInfo>(token);
         Assert.Equal("(SELECT * FROM Employees WHERE Id = #0)", token.ToString());
         Assert.Equal(token.ToString(), cmd.GetCommandInfo().Text.Wrap('(', ')'));
 
@@ -144,7 +144,7 @@ public static class Test_DbLambdaParser
         Assert.Equal("As", method.Name);
         Assert.Single(method.Arguments);
         Assert.Equal("'Any'", method.Arguments[0].ToString());
-        command = Assert.IsType<DbTokenCommand>(method.Host);
+        command = Assert.IsType<DbTokenCommandInfo>(method.Host);
         Assert.Equal("(SELECT * FROM Employees WHERE Id = #0)", command.ToString());
     }
 
