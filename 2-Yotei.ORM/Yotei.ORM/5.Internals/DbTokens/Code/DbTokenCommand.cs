@@ -10,22 +10,19 @@ public partial class DbTokenCommand : IDbToken
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
-    /// <param name="command"></param>
-    public DbTokenCommand(ICommand command) => Command = command.ThrowWhenNull().Clone();
+    /// <param name="info"></param>
+    public DbTokenCommand(ICommandInfo info) => CommandInfo = info.ThrowWhenNull();
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected DbTokenCommand(DbTokenCommand source) : this(source.Command) { }
+    protected DbTokenCommand(DbTokenCommand source) : this(source.CommandInfo) { }
 
     /// <inheritdoc/>
-    public override string ToString()
-    {
-        var info = Command.GetCommandInfo(iterable: false);
-        var str = info.Text.UnWrap('(', ')', trim: true, recursive: true);
-        return $"({str})";
-    }
+    public override string ToString() => CommandInfo.IsEmpty
+        ? string.Empty
+        : $"({CommandInfo.Text})";
 
     /// <inheritdoc/>
     public virtual DbTokenArgument? GetArgument() => null;
@@ -39,12 +36,10 @@ public partial class DbTokenCommand : IDbToken
         if (other is null) return false;
         if (other is not DbTokenCommand valid) return false;
 
-        var tinfo = Command.GetCommandInfo(iterable: false);
-        var xinfo = valid.Command.GetCommandInfo(iterable: false);
-
-        if (!tinfo.Engine.Equals(xinfo.Engine)) return false;
-        if (string.Compare(tinfo.Text, xinfo.Text, !tinfo.Engine.CaseSensitiveNames) != 0) return false;
-        if (!tinfo.Parameters.Equals(xinfo.Parameters)) return false;
+        var sensitive = CommandInfo.Engine.CaseSensitiveNames;
+        if (sensitive != valid.CommandInfo.Engine.CaseSensitiveNames) return false;
+        if (string.Compare(CommandInfo.Text, valid.CommandInfo.Text, !sensitive) != 0) return false;
+        if (!CommandInfo.Parameters.Equals(valid.CommandInfo.Parameters)) return false;
         return true;
     }
 
@@ -56,14 +51,12 @@ public partial class DbTokenCommand : IDbToken
     public static bool operator !=(DbTokenCommand? host, IDbToken? other) => !(host == other);
 
     /// <inheritdoc/>
-    public override int GetHashCode() => Command.GetHashCode();
+    public override int GetHashCode() => CommandInfo.GetHashCode();
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// The embedded command carried by this instance.
-    /// <para>This property captures a clone of the original command given at creation time
-    /// and, in principle, it is NOT INTENDED for any further modifications.</para>
+    /// The info carried by this instance about the embedded command  it represents.
     /// </summary>
-    public ICommand Command { get; }
+    public ICommandInfo CommandInfo { get; }
 }

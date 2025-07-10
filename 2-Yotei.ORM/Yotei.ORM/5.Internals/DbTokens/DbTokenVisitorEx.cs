@@ -211,7 +211,7 @@ partial record class DbTokenVisitor
     /// <returns></returns>
     protected virtual ICommandInfo.IBuilder VisitCommand(DbTokenCommand token)
     {
-        var info = token.Command.GetCommandInfo();
+        var info = token.CommandInfo;
 
         if (info.IsEmpty) return new CommandInfo.Builder(Engine);
         else
@@ -692,7 +692,7 @@ partial record class DbTokenVisitor
         // Value is a command...
         if (token.Value is ICommand command)
         {
-            var temp = new DbTokenCommand(command);
+            var temp = new DbTokenCommand(command.GetCommandInfo(iterable: false));
             return Visit(temp);
         }
 

@@ -290,7 +290,7 @@ public static class DbLambdaParser
     {
         IDbToken item => item,
         LambdaNode item => Parse(engine, item),
-        ICommand item => new DbTokenCommand(item),
+        ICommand item => new DbTokenCommand(item.GetCommandInfo(iterable: false)),
 
         Delegate => throw new ArgumentException(
             "Cannot use delegates as the value of tokens.")

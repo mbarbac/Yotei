@@ -32,6 +32,8 @@ public partial interface ICommand
 
     /// <summary>
     /// Obtains the information needed to run a command, using the given iterable mode.
+    /// <br/> This method is invoked with '<paramref name="iterable"/>' set to <c>false</c> when
+    /// obtaining the info about this command if it is an embedded one in a database expression.
     /// </summary>
     /// <param name="iterable"></param>
     /// <returns></returns>
