@@ -35,7 +35,6 @@ partial record class DbTokenVisitor
             DbTokenBinary item => VisitBinary(item),
             DbTokenChain item => VisitChain(item),
             DbTokenCoalesce item => VisitCoalesce(item),
-            DbTokenCommandInfo item => VisitCommand(item),
             DbTokenConvert item => VisitConvert(item),
             DbTokenIdentifier item => VisitIdentifier(item),
             DbTokenIndexed item => VisitIndexed(item),
@@ -197,56 +196,6 @@ partial record class DbTokenVisitor
         left.Add(right);
         left.Add(")");
         return left;
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Invoked to visit the given token.
-    /// <br/> This method, by default, wraps the not-iterable text element of the given command
-    /// between rounded brackets. If the command is an empty one, then an empty instance is
-    /// returned instead.
-    /// </summary>
-    /// <param name="token"></param>
-    /// <returns></returns>
-    protected virtual ICommandInfo.IBuilder VisitCommand(DbTokenCommandInfo token)
-    {
-        var info = token.CommandInfo;
-        var builder = info.CreateBuilder();
-
-        if (UseNullString)
-        {
-            var nstr = Engine.NullValueLiteral;
-            var pars = builder.Parameters.ToList();
-            var str = builder.Text;
-            var index = -1;
-
-            for (int i = 0; i < pars.Count; i++)
-            {
-                var par = builder.Parameters[i];
-                if (par.Value is not null) continue;
-
-                index = 0;
-                while ((index = str.FindIsolated(par.Name, index)) >= 0)
-                {
-                    str = str.Remove(index, par.Name.Length);
-                    str = str.Insert(index, nstr);
-                    index += nstr.Length;
-                }
-                pars.RemoveAt(i);
-                i--;
-            }
-
-            builder.Clear();
-            builder.Add(str, pars.ToArray());
-        }
-
-        if (!builder.IsEmpty && builder.TextLen > 0)
-        {
-            var str = builder.Text.UnWrap('(', ')').Wrap('(', ')');
-            builder.ReplaceText($"{str}");
-        }
-        return builder;
     }
 
     // ----------------------------------------------------
@@ -713,13 +662,6 @@ partial record class DbTokenVisitor
     /// <returns></returns>
     protected virtual ICommandInfo.IBuilder VisitValue(DbTokenValue token)
     {
-        // Value is a command...
-        if (token.Value is ICommand command)
-        {
-            var temp = new DbTokenCommandInfo(command.GetCommandInfo(iterable: false));
-            return Visit(temp);
-        }
-
         // Null-alike...
         if (token.Value is null && UseNullString)
         {

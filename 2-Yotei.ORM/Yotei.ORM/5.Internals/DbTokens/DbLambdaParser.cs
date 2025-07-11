@@ -148,9 +148,6 @@ public static class DbLambdaParser
             // Literal-alike tokens...
             if (item is DbTokenValue value && value.Value is string str)
                 items[0] = new DbTokenLiteral(str);
-
-            // Command-alike tokens...
-            if (item is DbTokenCommandInfo command) return command;
         }
 
         // Standard cases...
@@ -290,7 +287,6 @@ public static class DbLambdaParser
     {
         IDbToken item => item,
         LambdaNode item => Parse(engine, item),
-        ICommand item => new DbTokenCommandInfo(item.GetCommandInfo(iterable: false)),
 
         Delegate => throw new ArgumentException(
             "Cannot use delegates as the value of tokens.")

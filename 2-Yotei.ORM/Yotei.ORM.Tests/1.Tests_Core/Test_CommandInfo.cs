@@ -144,14 +144,14 @@ public static class Test_CommandInfo
         var xlast = new Parameter("Last", "Bond");
         var engine = new FakeEngine();
 
-        //var info = new CommandInfo(engine, "[First]={0} [Last]={1}", xfirst, xlast);
-        //Assert.False(info.IsEmpty);
-        //Assert.Equal("[First]=#First [Last]=#Last", info.Text);
-        //Assert.Equal(2, info.Parameters.Count);
-        //Assert.Equal("#First", info.Parameters[0].Name); Assert.Equal("James", info.Parameters[0].Value);
-        //Assert.Equal("#Last", info.Parameters[1].Name); Assert.Equal("Bond", info.Parameters[1].Value);
+        var info = new CommandInfo(engine, "[First]={0} [Last]={1}", xfirst, xlast);
+        Assert.False(info.IsEmpty);
+        Assert.Equal("[First]=#First [Last]=#Last", info.Text);
+        Assert.Equal(2, info.Parameters.Count);
+        Assert.Equal("#First", info.Parameters[0].Name); Assert.Equal("James", info.Parameters[0].Value);
+        Assert.Equal("#Last", info.Parameters[1].Name); Assert.Equal("Bond", info.Parameters[1].Value);
 
-        var info = new CommandInfo(engine, "[First]={First} [Last]={#Last}", xfirst, xlast);
+        info = new CommandInfo(engine, "[First]={First} [Last]={#Last}", xfirst, xlast);
         Assert.False(info.IsEmpty);
         Assert.Equal("[First]=#First [Last]=#Last", info.Text);
         Assert.Equal(2, info.Parameters.Count);

@@ -169,6 +169,7 @@ public static class Test_DbTokenVisitor_Dynamics
 
     // ----------------------------------------------------
 
+    /*
     //[Enforced]
     [Fact]
     public static void Test_Command_Direct()
@@ -225,6 +226,7 @@ public static class Test_DbTokenVisitor_Dynamics
         Assert.Single(builder.Parameters);
         Assert.Equal("#0", builder.Parameters[0].Name); Assert.Null(builder.Parameters[0].Value);
     }
+    */
 
     // ----------------------------------------------------
 
