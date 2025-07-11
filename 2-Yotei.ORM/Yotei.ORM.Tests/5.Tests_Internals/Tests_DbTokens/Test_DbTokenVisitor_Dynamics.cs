@@ -169,7 +169,6 @@ public static class Test_DbTokenVisitor_Dynamics
 
     // ----------------------------------------------------
 
-    /*
     //[Enforced]
     [Fact]
     public static void Test_Command_Direct()
@@ -180,13 +179,13 @@ public static class Test_DbTokenVisitor_Dynamics
         ICommandInfo.IBuilder builder;
 
         var command = new FakeCommand(connection,
-            "SELECT * FROM [Emp] WHERE [LastName] = {0}",
-            null!);
+            "SELECT * FROM Emps WHERE LastName = {0} AND Id = {1}",
+            null, "007");
 
         builder = visitor.Visit(x => command);
-        Assert.Equal("(SELECT * FROM [Emp] WHERE [LastName] = #0)", builder.Text);
+        Assert.Equal("(SELECT * FROM Emps WHERE LastName = NULL AND Id = #1)", builder.Text);
         Assert.Single(builder.Parameters);
-        Assert.Equal("#0", builder.Parameters[0].Name); Assert.Null(builder.Parameters[0].Value);
+        Assert.Equal("007", builder.Parameters[0].Value);
     }
 
     //[Enforced]
@@ -199,34 +198,14 @@ public static class Test_DbTokenVisitor_Dynamics
         ICommandInfo.IBuilder builder;
 
         var command = new FakeCommand(connection,
-            "SELECT * FROM [Emp] WHERE [LastName] = {0}",
-            null!);
-
-        builder = visitor.Visit(x => x(command));
-        Assert.Equal("(SELECT * FROM [Emp] WHERE [LastName] = #0)", builder.Text);
-        Assert.Single(builder.Parameters);
-        Assert.Equal("#0", builder.Parameters[0].Name); Assert.Null(builder.Parameters[0].Value);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_Command_Invoke_WithAlias()
-    {
-        var engine = new FakeEngine();
-        var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
-        ICommandInfo.IBuilder builder;
-
-        var command = new FakeCommand(connection,
-            "SELECT * FROM [Emp] WHERE [LastName] = {0}",
-            null!);
+            "SELECT * FROM Emps WHERE LastName = {0} AND Id = {1}",
+            null, "007");
 
         builder = visitor.Visit(x => x(command).As(x.Any));
-        Assert.Equal("(SELECT * FROM [Emp] WHERE [LastName] = #0) AS [Any]", builder.Text);
+        Assert.Equal("(SELECT * FROM Emps WHERE LastName = NULL AND Id = #1) AS [Any]", builder.Text);
         Assert.Single(builder.Parameters);
-        Assert.Equal("#0", builder.Parameters[0].Name); Assert.Null(builder.Parameters[0].Value);
+        Assert.Equal("007", builder.Parameters[0].Value);
     }
-    */
 
     // ----------------------------------------------------
 
@@ -317,8 +296,8 @@ public static class Test_DbTokenVisitor_Dynamics
         Assert.Single(builder.Parameters);
         Assert.Equal("#0", builder.Parameters[0].Name); Assert.Equal(27, builder.Parameters[0].Value);
 
-        builder = visitor.Visit(x => x[x.Alpha]);
-        Assert.Equal("[[Alpha]]", builder.Text);
+        builder = visitor.Visit(x => x[x.Alpha, x.Beta]);
+        Assert.Equal("[[Alpha], [Beta]]", builder.Text);
         Assert.Empty(builder.Parameters);
     }
 
@@ -452,7 +431,7 @@ public static class Test_DbTokenVisitor_Dynamics
         Assert.Equal("[Alpha].[Id]", builder.Text);
         Assert.Empty(builder.Parameters);
 
-        // Interception of dynamic argument name as method names is case sensitive...
+        // Interception of dynamic argument's name as method name is case sensitive...
         builder = visitor.Visit(x => x.Alpha.X("."));
         Assert.Equal("[Alpha].X(#0)", builder.Text);
         Assert.Single(builder.Parameters);

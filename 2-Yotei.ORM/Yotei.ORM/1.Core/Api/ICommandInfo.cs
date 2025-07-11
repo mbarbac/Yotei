@@ -6,7 +6,7 @@
 /// <para>Instances of this type are intended to be immutable ones.</para>
 /// </summary>
 [Cloneable]
-public partial interface ICommandInfo
+public partial interface ICommandInfo : IEquatable<ICommandInfo>
 {
     /// <summary>
     /// Returns a new builder based upon the contents of this instance.

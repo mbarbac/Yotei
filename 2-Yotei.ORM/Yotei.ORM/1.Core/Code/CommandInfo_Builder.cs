@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Code;
+﻿#pragma warning disable IDE0057
+
+namespace Yotei.ORM.Code;
 
 partial class CommandInfo
 {

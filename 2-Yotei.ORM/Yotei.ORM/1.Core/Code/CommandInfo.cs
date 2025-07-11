@@ -91,6 +91,35 @@ public partial class CommandInfo : ICommandInfo
     // ------------------------------------------------
 
     /// <inheritdoc/>
+    public virtual bool Equals(ICommandInfo? other)
+    {
+        if (ReferenceEquals(this, other)) return true;
+        if (other is null) return false;
+
+        var sensitive = Engine.CaseSensitiveNames;
+        if (string.Compare(Text, other.Text, !sensitive) != 0) return false;
+
+        return Parameters.Equals(other.Parameters);
+    }
+
+    /// <inheritdoc/>
+    public override bool Equals(object? obj) => Equals(obj as ICommandInfo);
+
+    public static bool operator ==(CommandInfo? host, ICommandInfo? other) => host?.Equals(other) ?? false;
+
+    public static bool operator !=(CommandInfo? host, ICommandInfo? other) => !(host == other);
+
+    /// <inheritdoc/>
+    public override int GetHashCode()
+    {
+        var code = Text.GetHashCode();
+        code = HashCode.Combine(code, Parameters);
+        return code;
+    }
+
+    // ------------------------------------------------
+
+    /// <inheritdoc/>
     public virtual CommandInfo Clear()
     {
         var builder = CreateBuilder();

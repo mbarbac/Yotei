@@ -35,6 +35,7 @@ partial record class DbTokenVisitor
             DbTokenBinary item => VisitBinary(item),
             DbTokenChain item => VisitChain(item),
             DbTokenCoalesce item => VisitCoalesce(item),
+            DbTokenCommand item => VisitCommand(item),
             DbTokenConvert item => VisitConvert(item),
             DbTokenIdentifier item => VisitIdentifier(item),
             DbTokenIndexed item => VisitIndexed(item),
@@ -196,6 +197,107 @@ partial record class DbTokenVisitor
         left.Add(right);
         left.Add(")");
         return left;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to visit the given token.
+    /// <br/> This method, by default, firstly obtains the not-iterable info object of the given
+    /// command, and the wraps it between rounded brackets, provided it is not an empty one.
+    /// </summary>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    protected virtual ICommandInfo.IBuilder VisitCommand(DbTokenCommand token)
+    {
+        var info = token.Command.GetCommandInfo(iterable: false);
+        var builder = VisitCommandInfoBuilder(info.CreateBuilder());
+
+        if (!builder.IsEmpty && builder.TextLen > 0)
+        {
+            var str = builder.Text.UnWrap('(', ')').Wrap('(', ')');
+            builder.ReplaceText($"{str}");
+        }
+        return builder;
+    }
+
+    // TODO:
+    Tenemos que hacer lo mismo pero con DbTokenCommandInfo:
+        El propio token
+        El DbLambdaParser(¿seguro?)
+        El DbTokenVisitor
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to visit the given command info builder object.
+    /// <br/> This method translates NULL values into the engine's literal, provided that using
+    /// null strings is enabled, removing that value from the list of captured parameters.
+    /// </summary>
+    protected virtual ICommandInfo.IBuilder VisitCommandInfoBuilder(ICommandInfo.IBuilder builder)
+    {
+        if (UseNullString)
+        {
+            var nstr = Engine.NullValueLiteral;
+            var pars = builder.Parameters.ToList();
+            var text = builder.Text;
+
+            for (int i = 0; i < pars.Count; i++)
+            {
+                var par = builder.Parameters[i];
+                if (par.Value is not null) continue;
+
+                var found = false;
+                var index = 0;
+                while ((index = text.FindIsolated(par.Name, index)) >= 0)
+                {
+                    text = text.Remove(index, par.Name.Length);
+                    text = text.Insert(index, nstr);
+                    index += nstr.Length;
+                    found = true;
+                }
+
+                if (found)
+                {
+                    pars.RemoveAt(i);
+                    i--;
+                }
+            }
+
+            var comparison = Engine.CaseSensitiveNames ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+            text = NamesToOrdinalBrackets(text, pars, comparison);
+
+            builder.Clear();
+            builder.Add(text, pars.ToArray());
+        }
+
+        return builder;
+    }
+
+    // Translates parameter names to ordinal brackets {n}...
+    static string? NamesToOrdinalBrackets(
+            string? text,
+            IEnumerable<IParameter> pars, StringComparison comparison)
+    {
+        if (text is not null && text.Length > 0)
+        {
+            var i = 0;
+            foreach (var par in pars)
+            {
+                var bracket = $"{{{i}}}"; i++;
+                var name = par.Name;
+                var pos = 0;
+
+                while ((pos = text.FindIsolated(name, pos, comparison)) >= 0)
+                {
+                    text = text.Remove(pos, par.Name.Length);
+                    text = text.Insert(pos, bracket);
+                    pos += bracket.Length;
+                }
+            }
+        }
+
+        return text;
     }
 
     // ----------------------------------------------------
@@ -662,6 +764,13 @@ partial record class DbTokenVisitor
     /// <returns></returns>
     protected virtual ICommandInfo.IBuilder VisitValue(DbTokenValue token)
     {
+        // Command-alike...
+        if (token.Value is ICommand command)
+        {
+            var temp = new DbTokenCommand(command);
+            return Visit(temp);
+        }
+
         // Null-alike...
         if (token.Value is null && UseNullString)
         {
