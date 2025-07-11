@@ -84,11 +84,9 @@ public static class Test_FragmentWhere
         Assert.Empty(builder.Parameters);
     }
 
-    /*
-
     //[Enforced]
     [Fact]
-    public static void Test_Literal_From_Info()
+    public static void Test_Literal_With_Connector()
     {
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
         FragmentWhere.Master master;
@@ -96,26 +94,14 @@ public static class Test_FragmentWhere
         ICommandInfo.IBuilder builder;
 
         master = new(command);
-        master.Capture(x => "Id {0}", "any"); // Just an example, no SQL sense...
+        master.Capture(x => " And Id = {0} ", null);
         Assert.Single(master);
         entry = Assert.IsType<FragmentWhere.Entry>(master[0]);
-        Assert.Null(entry.Connector);
-        Assert.IsType<DbTokenCommandInfo>(entry.Body); Assert.Equal("(Id #0)", entry.Body.ToString());
+        Assert.Equal("And", entry.Connector);
+        Assert.IsType<DbTokenCommandInfo>(entry.Body); Assert.Equal("((Id = #0))", entry.Body.ToString());
         builder = master.Visit();
-        Assert.Equal("Id #0", builder.Text);
-        Assert.Single(builder.Parameters);
-        Assert.Equal("any", builder.Parameters[0].Value);
-
-        master = new(command);
-        master.Capture(x => "Id {0} Asc", "any");
-        Assert.Single(master);
-        entry = Assert.IsType<FragmentWhere.Entry>(master[0]);
-        Assert.Equal("Asc", entry.Connector);
-        Assert.IsType<DbTokenCommandInfo>(entry.Body); Assert.Equal("(Id #0)", entry.Body.ToString());
-        builder = master.Visit();
-        Assert.Equal("Id #0 Asc", builder.Text);
-        Assert.Single(builder.Parameters);
-        Assert.Equal("any", builder.Parameters[0].Value);
+        Assert.Equal("And (Id = NULL)", builder.Text);
+        Assert.Empty(builder.Parameters);
     }
 
     //[Enforced]
@@ -125,12 +111,11 @@ public static class Test_FragmentWhere
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
         FragmentWhere.Master master = new(command);
 
-        try { master.Capture(x => "Asc"); Assert.Fail(); } // Resolves to raw ordering...
-        catch (ArgumentException) { }
-
         try { master.Capture(x => "value {0} {1}", "any"); Assert.Fail(); } // Parameters' mismatch...
         catch (ArgumentException) { }
     }
+
+    /*
 
     // ----------------------------------------------------
 

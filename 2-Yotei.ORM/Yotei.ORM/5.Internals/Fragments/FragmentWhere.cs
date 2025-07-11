@@ -49,9 +49,9 @@ public static partial class FragmentWhere
                         main = string.Empty;
                         return true;
                     }
-                    spec = " " + spec;
-                    index = main.LastIndexOf(spec, comparison);
-                    if (index == 0 && spec.Length == main.Length)
+                    spec = spec + " ";
+                    index = main.IndexOf(spec, comparison);
+                    if (index == 0)
                     {
                         _Connector = main[..spec.Length].Trim();
                         main = main[spec.Length..].Trim();

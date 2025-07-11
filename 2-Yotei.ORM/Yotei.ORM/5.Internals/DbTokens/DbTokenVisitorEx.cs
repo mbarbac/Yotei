@@ -214,6 +214,33 @@ partial record class DbTokenVisitor
         var info = token.CommandInfo;
         var builder = info.CreateBuilder();
 
+        if (UseNullString)
+        {
+            var nstr = Engine.NullValueLiteral;
+            var pars = builder.Parameters.ToList();
+            var str = builder.Text;
+            var index = -1;
+
+            for (int i = 0; i < pars.Count; i++)
+            {
+                var par = builder.Parameters[i];
+                if (par.Value is not null) continue;
+
+                index = 0;
+                while ((index = str.FindIsolated(par.Name, index)) >= 0)
+                {
+                    str = str.Remove(index, par.Name.Length);
+                    str = str.Insert(index, nstr);
+                    index += nstr.Length;
+                }
+                pars.RemoveAt(i);
+                i--;
+            }
+
+            builder.Clear();
+            builder.Add(str, pars.ToArray());
+        }
+
         if (!builder.IsEmpty && builder.TextLen > 0)
         {
             var str = builder.Text.UnWrap('(', ')').Wrap('(', ')');

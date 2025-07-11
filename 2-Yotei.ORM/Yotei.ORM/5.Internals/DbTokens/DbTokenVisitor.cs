@@ -158,7 +158,8 @@ public partial record class DbTokenVisitor
         {
             return
                 UseNullString ? Engine.NullValueLiteral :
-                UseQuotes ? "''" : string.Empty;
+                UseQuotes ? "''" :
+                string.Empty;
         }
 
         // May need to convert values...

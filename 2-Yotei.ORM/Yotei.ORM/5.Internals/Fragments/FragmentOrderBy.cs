@@ -51,7 +51,7 @@ public static partial class FragmentOrderBy
                 {
                     var spec = specs[i];
                     var index = main.LastIndexOf(spec, comparison);
-                    if (index >= 0 && (index + spec.Length) == main.Length)
+                    if (index >= 0 && spec.Length == main.Length)
                     {
                         _Order = main[index..].Trim();
                         main = main[..index].Trim();
