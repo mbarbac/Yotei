@@ -32,7 +32,7 @@ public static partial class FragmentOrderBy
             if (Body is DbTokenLiteral literal)
             {
                 var main = literal.Value.NotNullNotEmpty(trim: true);
-                var done = Extract(ref main, "ASCENDING", "ASC", "DESCENDING", "DESC");
+                var done = ExtractLast(ref main, "ASCENDING", "ASC", "DESCENDING", "DESC");
                 if (done)
                 {
                     if (main.Length == 0) throw new ArgumentException(
@@ -44,7 +44,7 @@ public static partial class FragmentOrderBy
                 return;
             }
 
-            bool Extract(ref string main, params string[] specs)
+            bool ExtractLast(ref string main, params string[] specs)
             {
                 var comparison = StringComparison.OrdinalIgnoreCase;
                 for (int i = 0; i < specs.Length; i++)
@@ -73,7 +73,7 @@ public static partial class FragmentOrderBy
             if (Body is DbTokenCommandInfo command)
             {
                 var main = command.CommandInfo.Text.NotNullNotEmpty(trim: true);
-                var done = Extract(ref main, "ASCENDING", "ASC", "DESCENDING", "DESC");
+                var done = ExtractLast(ref main, "ASCENDING", "ASC", "DESCENDING", "DESC");
                 if (done)
                 {
                     if (main.Length == 0) throw new ArgumentException(
@@ -144,7 +144,7 @@ public static partial class FragmentOrderBy
         /// </summary>
         /// <param name="command"></param>
         /// <param name="clause"></param>
-        public Master(ICommand command, string clause = "ORDER BY") : base(command, clause) { }
+        public Master(ICommand command) : base(command, "ORDER BY") { }
 
         /// <summary>
         /// Copy constructor.

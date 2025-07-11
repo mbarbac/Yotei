@@ -108,7 +108,8 @@ public static partial class Fragment
         /// used to build the related clause of the associated command. If an empty instance is
         /// returned, then it is ignored.
         /// <br/> The '<paramref name="separate"/>' argument indicates if this instance needs to
-        /// include an appropriate separator between its contents and previous ones.
+        /// include an appropriate separator between its contents and previous ones, because its
+        /// index is greater than cero, and because the previous contents are not empty.
         /// </summary>
         /// <param name="visitor"></param>
         /// <param name="separate"></param>

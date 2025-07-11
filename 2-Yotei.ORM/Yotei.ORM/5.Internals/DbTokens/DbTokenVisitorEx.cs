@@ -212,17 +212,14 @@ partial record class DbTokenVisitor
     protected virtual ICommandInfo.IBuilder VisitCommand(DbTokenCommandInfo token)
     {
         var info = token.CommandInfo;
+        var builder = info.CreateBuilder();
 
-        if (info.IsEmpty) return new CommandInfo.Builder(Engine);
-        else
+        if (!builder.IsEmpty && builder.TextLen > 0)
         {
-            var builder = new CommandInfo.Builder(info);
-            var str = builder.Text;
-            str = str.UnWrap('(', ')').Wrap('(', ')');
-
+            var str = builder.Text.UnWrap('(', ')').Wrap('(', ')');
             builder.ReplaceText($"{str}");
-            return builder;
         }
+        return builder;
     }
 
     // ----------------------------------------------------
