@@ -100,32 +100,19 @@ public static class Test_FragmentSetter
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
         FragmentSetter.Master master = new(command);
 
-        // Resolves to dynamic argument...
-        try { master.Capture(x => x); Assert.Fail(); }
+        try { master.Capture(x => "any"); Assert.Fail(); } // Invalid 'target=value' format...
         catch (ArgumentException) { }
 
-        // Resolves to dynamic argument...
-        try { master.Capture(x => x(x)); Assert.Fail(); }
-        catch (ArgumentException) { }
-
-        // Invalid 'target=value' format...
-        try { master.Capture(x => "any"); Assert.Fail(); }
-        catch (ArgumentException) { }
-
-        // No value part...
-        try { master.Capture(x => "target="); Assert.Fail(); }
+        try { master.Capture(x => "target="); Assert.Fail(); } // No value part...
         catch (EmptyException) { }
 
-        // No target part...
-        try { master.Capture(x => "=value"); Assert.Fail(); }
+        try { master.Capture(x => "=value"); Assert.Fail(); } // No target part...
         catch (EmptyException) { }
 
-        // No parameters in the target part...
-        try { master.Capture(x => "{0}=value", "any"); Assert.Fail(); }
+        try { master.Capture(x => "{0}=value", "any"); Assert.Fail(); } // No parameters in target...
         catch (ArgumentException) { }
 
-        // Mismatch in the parameters of value part...
-        try { master.Capture(x => "any=value {0} {1}", "any"); Assert.Fail(); }
+        try { master.Capture(x => "any=value {0} {1}", "any"); Assert.Fail(); } // Parameters' mismatch...
         catch (ArgumentException) { }
     }
 
@@ -268,16 +255,19 @@ public static class Test_FragmentSetter
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
         FragmentSetter.Master master = new(command);
 
-        try { master.Capture(x => x); Assert.Fail(); }
+        try { master.Capture(x => x); Assert.Fail(); } // Resolves to argument...
         catch (ArgumentException) { }
 
-        try { master.Capture(x => x(x)); Assert.Fail(); }
+        try { master.Capture(x => x(x)); Assert.Fail(); } // Resolves to argument...
         catch (ArgumentException) { }
 
-        try { master.Capture(x => x.Id); Assert.Fail(); }
+        try { master.Capture(x => 7); Assert.Fail(); } // Resolves to raw value...
         catch (ArgumentException) { }
 
-        try { master.Capture(x => x.Id == 7); Assert.Fail(); }
+        try { master.Capture(x => x.Id); Assert.Fail(); } // No target=value format...
+        catch (ArgumentException) { }
+
+        try { master.Capture(x => x.Id == 7); Assert.Fail(); } // Comparison is not setter...
         catch (ArgumentException) { }
     }
 

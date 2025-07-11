@@ -75,15 +75,18 @@ public static partial class Fragment
                     else if (arg is DbTokenLiteral literal) value = literal;
 
                     else if (
-                        arg is DbTokenValue temp && temp.Value is string tstr &&
-                        LiteralBodyFromStringValue(tstr, true))
+                        arg is DbTokenValue temp && temp.Value is string tstr)
                         value = new DbTokenLiteral(tstr);
                 }
 
-                // First-level string values...
-                if (value is DbTokenValue item && item.Value is string str &&
-                    LiteralBodyFromStringValue(str, false))
-                    value = new DbTokenLiteral(str);
+                // First-level values...
+                if (value is DbTokenValue item)
+                {
+                    if (item.Value is string str) value = new DbTokenLiteral(str);
+                    else throw new ArgumentException(
+                        "Raw values are not valid fragment entries.")
+                        .WithData(value);
+                }
 
                 // Dynamic argument bodies are not acceptable...
                 if (value is DbTokenArgument) throw new ArgumentException(
@@ -94,17 +97,6 @@ public static partial class Fragment
             }
         }
         IDbToken __Body = default!;
-
-        /// <summary>
-        /// Determines if the string value passed to this instance shall be translated into a
-        /// literal token, or not. The <paramref name="invoke"/> argument is set to <c>true</c>
-        /// when that string value was obtained from an invoke token, or to <c>false</c> when it
-        /// was obtained from a straight value one.
-        /// </summary>
-        /// <param name="str"></param>
-        /// <param name="invoke"></param>
-        /// <returns></returns>
-        protected virtual bool LiteralBodyFromStringValue(string str, bool invoke) => true;
 
         // ------------------------------------------------
 

@@ -1,12 +1,11 @@
 ﻿#pragma warning disable IDE1006
 
-using System.Runtime.InteropServices.Marshalling;
-
 namespace Yotei.ORM.Internals;
 
 /// <summary>
 /// Represents the ability of parsing SETTER clauses.
 /// <br/>- Standard syntax: 'x => Target = Value'.
+/// <br/>- Literal syntax: 'x => "Target = Value"'.
 /// </summary>
 /// <remarks>
 /// SETTER entries are special in the sense that they must always have a 'Target=Value' format,
@@ -61,7 +60,7 @@ public static partial class FragmentSetter
                 {
                     if (ContainsParameters(target, command.CommandInfo.Parameters))
                         throw new ArgumentException(
-                            $"Target {Clause} part cannot contain parameters.")
+                            $"Target part cannot contain parameters.")
                             .WithData(Body);
 
                     Target = new DbTokenLiteral(target);
@@ -73,34 +72,6 @@ public static partial class FragmentSetter
                 }
             }
 
-            bool ContainsParameters(string str, IParameterList pars)
-            {
-                for (int i = 0; i < pars.Count; i++)
-                {
-                    var par = pars[i];
-                    var index = par.Name.FindIsolated(str, 0, StringComparison.OrdinalIgnoreCase);
-                    if (index >= 0) return true;
-                }
-                return false;
-            }
-
-
-            /*
-             // Invoked to determine if there are brackets in the given text...
-            static bool RemainingBrackets(string str)
-            {
-                var ini = str.IndexOf('{'); if (ini < 0) return false;
-                var end = str.IndexOf('}', ini); if (end < 0) return false;
-                return true;
-            }
-             */
-
-            // Any other token is considered and invalid one...
-            throw new ArgumentException(
-                $"{Clause} entry has not the appropriate 'Target=Value' format.")
-                .WithData(Body);
-
-            // Invoke to extract the target and value parts...
             bool TryExtract(IStrToken items, out string target, out string value)
             {
                 var (left, right) = items.ExtractFirst("=", sensitive: false, out var found);
@@ -125,6 +96,23 @@ public static partial class FragmentSetter
                 value = null!;
                 return false;
             }
+
+            bool ContainsParameters(string str, IParameterList pars)
+            {
+                for (int i = 0; i < pars.Count; i++)
+                {
+                    var par = pars[i];
+                    var index = par.Name.FindIsolated(str, 0, StringComparison.OrdinalIgnoreCase);
+                    if (index >= 0) return true;
+                }
+                return false;
+            }
+
+            // Any other token is considered and invalid one...
+            throw new ArgumentException(
+                $"Entry has not the appropriate 'Target=Value' format.")
+                .WithData(Body);
+            
         }
 
         /// <summary>
@@ -259,6 +247,8 @@ public static partial class FragmentSetter
 
             return valid;
         }
+
+        // ------------------------------------------------
 
         /// <inheritdoc/>
         public override Entry CreateEntry(IDbToken body) => new(this, body);
