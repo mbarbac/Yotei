@@ -210,13 +210,13 @@ public static partial class Fragment
                 if (str.StartsWith('(') && !str.EndsWith(')'))
                 {
                     var index = str.IndexOf('(');
-                    str = str[index..];
+                    str = str[(index + 1)..].TrimStart();
                     done = true;
                 }
                 if (!str.StartsWith('(') && str.EndsWith(')'))
                 {
                     var index = str.LastIndexOf(')');
-                    str = str[..index];
+                    str = str[..index].TrimEnd();
                     done = true;
                 }
                 left = done ? str : main;
@@ -226,13 +226,13 @@ public static partial class Fragment
                 if (str.StartsWith('(') && !str.EndsWith(')'))
                 {
                     var index = str.IndexOf('(');
-                    str = str[index..];
+                    str = str[(index + 1)..].TrimStart();
                     done = true;
                 }
                 if (!str.StartsWith('(') && str.EndsWith(')'))
                 {
                     var index = str.LastIndexOf(')');
-                    str = str[..index];
+                    str = str[..index].TrimEnd();
                     done = true;
                 }
                 right = done ? str : main;
