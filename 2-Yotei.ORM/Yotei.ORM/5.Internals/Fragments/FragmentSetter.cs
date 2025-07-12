@@ -42,6 +42,9 @@ public static partial class FragmentSetter
                 var main = literal.Value;
                 if (ExtractSeparator(main, "=", Engine, out var left, out var right, out _))
                 {
+                    left.NotNullNotEmpty(trim: true);
+                    right.NotNullNotEmpty(trim: true);
+
                     Target = new DbTokenLiteral(left);
                     Value = new DbTokenLiteral(right);
                     return;
@@ -54,6 +57,9 @@ public static partial class FragmentSetter
                 var main = command.CommandInfo.Text;
                 if (ExtractSeparator(main, "=", Engine, out var left, out var right, out _))
                 {
+                    left.NotNullNotEmpty(trim: true);
+                    right.NotNullNotEmpty(trim: true);
+
                     if (ContainsAnyParameter(left, 0, command.CommandInfo.Parameters))
                         throw new ArgumentException(
                             "Target part cannot contain any encoded parameter.")

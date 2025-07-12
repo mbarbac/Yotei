@@ -119,12 +119,14 @@ public static partial class Fragment
         /// <summary>
         /// Extracts from the head of the given main string the first found spec. If so, both
         /// the main reference and the extracted one are updated.
+        /// <br/> If found, main and extracted are not null strings, but they can be empty or be
+        /// spaces-only ones.
         /// </summary>
         protected static bool ExtractHead(
             ref string main, ref string? extracted, bool sensitive, params string[] specs)
         {
             var comparison = sensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
-            var str = main.Trim();
+            var str = main.TrimStart();
 
             for (int i = 0; i < specs.Length; i++)
             {
@@ -141,8 +143,8 @@ public static partial class Fragment
                 index = str.IndexOf(spec, comparison);
                 if (index == 0)
                 {
-                    extracted = str[..spec.Length].Trim();
-                    main = str[spec.Length..].Trim();
+                    extracted = str[..spec.Length];
+                    main = str[spec.Length..];
                     return true;
                 }
             }
@@ -152,12 +154,14 @@ public static partial class Fragment
         /// <summary>
         /// Extracts from the tail of the given main string the first found spec. If so, both
         /// the main reference and the extracted one are updated.
+        /// <br/> If found, main and extracted are not null strings, but they can be empty or be
+        /// spaces-only ones.
         /// </summary>
         protected static bool ExtractTail(
             ref string main, ref string? extracted, bool sensitive, params string[] specs)
         {
             var comparison = sensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
-            var str = main.Trim();
+            var str = main.TrimEnd();
 
             for (int i = 0; i < specs.Length; i++)
             {
@@ -174,8 +178,8 @@ public static partial class Fragment
                 index = str.LastIndexOf(spec, comparison);
                 if (index >= 0 && (index + spec.Length) == str.Length)
                 {
-                    extracted = str[index..].Trim();
-                    main = str[..index].Trim();
+                    extracted = str[index..];
+                    main = str[..index];
                     return true;
                 }
             }
@@ -186,30 +190,52 @@ public static partial class Fragment
         /// Extracts from the given main string the left and right parts provided that they are
         /// separated by the given separator, and not protected by the engine terminators, if they
         /// are used.
+        /// <br/> If found, both left and right are not null strings, but they might be empty or
+        /// spaces-only ones.
+        /// </summary>
         protected static bool ExtractSeparator(
             string main, string separator, IEngine engine,
             out string left, out string right, [NotNullWhen(true)] out string? item)
         {
-            var str = main.Trim();
             item = null;
-
             var tokenizer = new StrWrappedTokenizer(engine.LeftTerminator, engine.RightTerminator);
-            var items = engine.UseTerminators ? tokenizer.Tokenize(str) : new StrTokenText(str);
+            var items = engine.UseTerminators ? tokenizer.Tokenize(main) : new StrTokenText(main);
 
             var (head, tail) = items.ExtractFirst(separator, engine.CaseSensitiveNames, out var found);
+
             if (found)
             {
-                str = head.ToString()!.Trim();
-                if (str.StartsWith('(') && !str.EndsWith(')')) str = str[1..];
-                if (!str.StartsWith('(') && str.EndsWith(')')) str = str[..^1];
-                str = str.NotNullNotEmpty(trim: true);
-                left = str;
+                var done = false; main = head.ToString()!;
+                var str = main.Trim();
+                if (str.StartsWith('(') && !str.EndsWith(')'))
+                {
+                    var index = str.IndexOf('(');
+                    str = str[index..];
+                    done = true;
+                }
+                if (!str.StartsWith('(') && str.EndsWith(')'))
+                {
+                    var index = str.LastIndexOf(')');
+                    str = str[..index];
+                    done = true;
+                }
+                left = done ? str : main;
 
-                str = tail!.ToString()!.Trim();
-                if (str.StartsWith('(') && !str.EndsWith(')')) str = str[1..];
-                if (!str.StartsWith('(') && str.EndsWith(')')) str = str[..^1];
-                str = str.NotNullNotEmpty(trim: true);
-                right = str;
+                done = false; main = tail!.ToString()!;
+                str = main.Trim();
+                if (str.StartsWith('(') && !str.EndsWith(')'))
+                {
+                    var index = str.IndexOf('(');
+                    str = str[index..];
+                    done = true;
+                }
+                if (!str.StartsWith('(') && str.EndsWith(')'))
+                {
+                    var index = str.LastIndexOf(')');
+                    str = str[..index];
+                    done = true;
+                }
+                right = done ? str : main;
 
                 item = separator;
                 return true;

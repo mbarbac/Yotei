@@ -66,13 +66,6 @@ public static partial class FragmentWhere
                     main = $"({left} = {right})";
                     Body = new DbTokenLiteral(main);
                 }
-
-                if (main.StartsWith(' ') || main.EndsWith(' '))
-                {
-                    main = main.NotNullNotEmpty(trim: true);
-                    Body = new DbTokenLiteral(main);
-                    return;
-                }
             }
 
             // Command-info...
@@ -111,14 +104,6 @@ public static partial class FragmentWhere
                     main = $"({left} = {right})";
                     var info = new CommandInfo(Engine, main, command.CommandInfo.Parameters);
                     Body = new DbTokenCommandInfo(info);
-                }
-
-                if (main.StartsWith(' ') || main.EndsWith(' '))
-                {
-                    main = main.NotNullNotEmpty(trim: true);
-                    var info = new CommandInfo(Engine, main, command.CommandInfo.Parameters);
-                    Body = new DbTokenCommandInfo(info);
-                    return;
                 }
             }
 

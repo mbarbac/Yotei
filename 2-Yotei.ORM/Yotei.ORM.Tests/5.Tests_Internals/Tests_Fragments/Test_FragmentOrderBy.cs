@@ -18,10 +18,10 @@ public static class Test_FragmentOrderBy
         Assert.Single(master);
         entry = Assert.IsType<FragmentOrderBy.Entry>(master[0]);
         Assert.Null(entry.Order);
-        Assert.IsType<DbTokenLiteral>(entry.Body); Assert.Equal("Id", entry.Body.ToString());
+        Assert.IsType<DbTokenLiteral>(entry.Body); Assert.Equal(" Id ", entry.Body.ToString());
         
         builder = master.Visit();
-        Assert.Equal("Id", builder.Text);
+        Assert.Equal(" Id ", builder.Text);
         Assert.Empty(builder.Parameters);
 
         master = new(command);
@@ -50,10 +50,10 @@ public static class Test_FragmentOrderBy
         Assert.Single(master);
         entry = Assert.IsType<FragmentOrderBy.Entry>(master[0]);
         Assert.Null(entry.Order);
-        Assert.IsType<DbTokenLiteral>(entry.Body); Assert.Equal("Id", entry.Body.ToString());
+        Assert.IsType<DbTokenLiteral>(entry.Body); Assert.Equal(" Id ", entry.Body.ToString());
         
         builder = master.Visit();
-        Assert.Equal("Id", builder.Text);
+        Assert.Equal(" Id ", builder.Text);
         Assert.Empty(builder.Parameters);
 
         master = new(command);
@@ -82,10 +82,10 @@ public static class Test_FragmentOrderBy
         Assert.Single(master);
         entry = Assert.IsType<FragmentOrderBy.Entry>(master[0]);
         Assert.Null(entry.Order);
-        Assert.IsType<DbTokenCommandInfo>(entry.Body); Assert.Equal("Id #0", entry.Body.ToString());
+        Assert.IsType<DbTokenCommandInfo>(entry.Body); Assert.Equal(" Id #0 ", entry.Body.ToString());
         
         builder = master.Visit();
-        Assert.Equal("Id NULL", builder.Text);
+        Assert.Equal(" Id NULL ", builder.Text);
         Assert.Empty(builder.Parameters);
 
         master = new(command);
@@ -114,10 +114,10 @@ public static class Test_FragmentOrderBy
         Assert.Single(master);
         entry = Assert.IsType<FragmentOrderBy.Entry>(master[0]);
         Assert.Null(entry.Order);
-        Assert.IsType<DbTokenCommandInfo>(entry.Body); Assert.Equal("Id #0", entry.Body.ToString());
+        Assert.IsType<DbTokenCommandInfo>(entry.Body); Assert.Equal(" Id #0 ", entry.Body.ToString());
         
         builder = master.Visit();
-        Assert.Equal("Id #0", builder.Text);
+        Assert.Equal(" Id #0 ", builder.Text);
         Assert.Single(builder.Parameters);
         Assert.Equal("007", builder.Parameters[0].Value);
 
@@ -142,7 +142,7 @@ public static class Test_FragmentOrderBy
         FragmentOrderBy.Master master = new(command);
 
         try { master.Capture(x => "Asc"); Assert.Fail(); } // Raw order...
-        catch (ArgumentException) { }
+        catch (EmptyException) { }
 
         try { master.Capture(x => "any {0} {1}", "other"); Assert.Fail(); } // Parameters' mismatch...
         catch (ArgumentException) { }

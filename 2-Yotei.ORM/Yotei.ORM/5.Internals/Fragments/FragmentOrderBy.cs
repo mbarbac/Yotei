@@ -36,19 +36,10 @@ public static partial class FragmentOrderBy
                 
                 if (ExtractTail(ref main, ref order, false, "ASCENDING", "ASC", "DESCENDING", "DESC"))
                 {
-                    if (main.Length == 0) throw new ArgumentException(
-                        "Body cannot just be an order specification.")
-                        .WithData(Body);
+                    main = main.NotNullNotEmpty();
 
                     Body = new DbTokenLiteral(main);
                     Order = order.NullWhenEmpty();
-                    return;
-                }
-
-                if (main.StartsWith(' ') || main.EndsWith(' '))
-                {
-                    main = main.NotNullNotEmpty(trim: true);
-                    Body = new DbTokenLiteral(main);
                     return;
                 }
             }
@@ -61,21 +52,11 @@ public static partial class FragmentOrderBy
 
                 if (ExtractTail(ref main, ref order, false, "ASCENDING", "ASC", "DESCENDING", "DESC"))
                 {
-                    if (main.Length == 0) throw new ArgumentException(
-                        "Body cannot just be an order specification.")
-                        .WithData(Body);
+                    main = main.NotNullNotEmpty();
 
                     var info = new CommandInfo(Engine, main, command.CommandInfo.Parameters);
                     Body = new DbTokenCommandInfo(info);
                     Order = order.NullWhenEmpty();
-                    return;
-                }
-                
-                if (main.StartsWith(' ') || main.EndsWith(' '))
-                {
-                    main = main.NotNullNotEmpty(trim: true);
-                    var info = new CommandInfo(Engine, main, command.CommandInfo.Parameters);
-                    Body = new DbTokenCommandInfo(info);
                     return;
                 }
             }
@@ -179,7 +160,7 @@ public static partial class FragmentOrderBy
                     .WithData(body);
 
                 if (item is DbTokenArgument) throw new ArgumentException(
-                    "Body cannot just be an order specification.")
+                    $"Body after '{method.Name}' removal cannot be empty.")
                     .WithData(body);
 
                 order = method.Name;
