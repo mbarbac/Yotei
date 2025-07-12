@@ -187,9 +187,11 @@ public static partial class Fragment
         /// separated by the given separator, and not protected by the engine terminators, if they
         /// are used.
         protected static bool ExtractSeparator(
-            string main, string separator, IEngine engine, out string left, out string right)
+            string main, string separator, IEngine engine,
+            out string left, out string right, [NotNullWhen(true)] out string? item)
         {
             var str = main.Trim();
+            item = null;
 
             var tokenizer = new StrWrappedTokenizer(engine.LeftTerminator, engine.RightTerminator);
             var items = engine.UseTerminators ? tokenizer.Tokenize(str) : new StrTokenText(str);
@@ -209,6 +211,7 @@ public static partial class Fragment
                 str = str.NotNullNotEmpty(trim: true);
                 right = str;
 
+                item = separator;
                 return true;
             }
 

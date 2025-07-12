@@ -40,7 +40,7 @@ public static partial class FragmentSetter
             if (Body is DbTokenLiteral literal)
             {
                 var main = literal.Value;
-                if (ExtractSeparator(main, "=", Engine, out var left, out var right))
+                if (ExtractSeparator(main, "=", Engine, out var left, out var right, out _))
                 {
                     Target = new DbTokenLiteral(left);
                     Value = new DbTokenLiteral(right);
@@ -52,7 +52,7 @@ public static partial class FragmentSetter
             if (Body is DbTokenCommandInfo command)
             {
                 var main = command.CommandInfo.Text;
-                if (ExtractSeparator(main, "=", Engine, out var left, out var right))
+                if (ExtractSeparator(main, "=", Engine, out var left, out var right, out _))
                 {
                     if (ContainsAnyParameter(left, 0, command.CommandInfo.Parameters))
                         throw new ArgumentException(

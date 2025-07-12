@@ -34,8 +34,7 @@ public static partial class FragmentOrderBy
                 string? order = null;
                 var main = literal.Value;
                 
-                var done = ExtractTail(ref main, ref order, false, "ASCENDING", "ASC", "DESCENDING", "DESC");
-                if (done)
+                if (ExtractTail(ref main, ref order, false, "ASCENDING", "ASC", "DESCENDING", "DESC"))
                 {
                     if (main.Length == 0) throw new ArgumentException(
                         "Body cannot just be an order specification.")
@@ -60,8 +59,7 @@ public static partial class FragmentOrderBy
                 string? order = null;
                 var main = command.CommandInfo.Text;
 
-                var done = ExtractTail(ref main, ref order, false, "ASCENDING", "ASC", "DESCENDING", "DESC");
-                if (done)
+                if (ExtractTail(ref main, ref order, false, "ASCENDING", "ASC", "DESCENDING", "DESC"))
                 {
                     if (main.Length == 0) throw new ArgumentException(
                         "Body cannot just be an order specification.")
@@ -135,7 +133,7 @@ public static partial class FragmentOrderBy
         /// Initializes a new instance.
         /// </summary>
         /// <param name="command"></param>
-        public Master(ICommand command) : base(command, "ORDER BY") { }
+        public Master(ICommand command, string clause = "ORDER BY") : base(command, clause) { }
 
         /// <summary>
         /// Copy constructor.
