@@ -36,6 +36,7 @@ partial record class DbTokenVisitor
             DbTokenChain item => VisitChain(item),
             DbTokenCoalesce item => VisitCoalesce(item),
             DbTokenCommand item => VisitCommand(item),
+            DbTokenCommandInfo item => VisitCommandInfo(item),
             DbTokenConvert item => VisitConvert(item),
             DbTokenIdentifier item => VisitIdentifier(item),
             DbTokenIndexed item => VisitIndexed(item),
@@ -211,7 +212,8 @@ partial record class DbTokenVisitor
     protected virtual ICommandInfo.IBuilder VisitCommand(DbTokenCommand token)
     {
         var info = token.Command.GetCommandInfo(iterable: false);
-        var builder = VisitCommandInfoBuilder(info.CreateBuilder());
+        var builder = info.CreateBuilder();
+        builder = VisitCommandBuilder(builder);
 
         if (!builder.IsEmpty && builder.TextLen > 0)
         {
@@ -221,20 +223,27 @@ partial record class DbTokenVisitor
         return builder;
     }
 
-    // TODO:
-    Tenemos que hacer lo mismo pero con DbTokenCommandInfo:
-        El propio token
-        El DbLambdaParser(¿seguro?)
-        El DbTokenVisitor
-
-    // ----------------------------------------------------
+    /// <summary>
+    /// Invoked to visit the given token.
+    /// <br/> Note that, by default, this method *DOES NOT* wrap the command info text with any
+    /// brackets, as the idea is to have a way of injecting arbitrary contents along with their
+    /// optional captured arguments.
+    /// </summary>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    protected virtual ICommandInfo.IBuilder VisitCommandInfo(DbTokenCommandInfo token)
+    {
+        var builder = token.CommandInfo.CreateBuilder();
+        builder = VisitCommandBuilder(builder);
+        return builder;
+    }
 
     /// <summary>
     /// Invoked to visit the given command info builder object.
     /// <br/> This method translates NULL values into the engine's literal, provided that using
     /// null strings is enabled, removing that value from the list of captured parameters.
     /// </summary>
-    protected virtual ICommandInfo.IBuilder VisitCommandInfoBuilder(ICommandInfo.IBuilder builder)
+    protected virtual ICommandInfo.IBuilder VisitCommandBuilder(ICommandInfo.IBuilder builder)
     {
         if (UseNullString)
         {
@@ -274,10 +283,12 @@ partial record class DbTokenVisitor
         return builder;
     }
 
-    // Translates parameter names to ordinal brackets {n}...
+    // Translates parameter names to ordinal brackets {n}.
+    // TODO: This code actually is a copy of the original one in CommandInfo.Builder. It would be
+    // nice to refactor.
     static string? NamesToOrdinalBrackets(
-            string? text,
-            IEnumerable<IParameter> pars, StringComparison comparison)
+        string? text,
+        IEnumerable<IParameter> pars, StringComparison comparison)
     {
         if (text is not null && text.Length > 0)
         {

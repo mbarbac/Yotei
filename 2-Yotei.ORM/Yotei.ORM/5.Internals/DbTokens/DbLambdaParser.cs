@@ -151,6 +151,7 @@ public static class DbLambdaParser
 
             // Command-alike...
             if (item is DbTokenCommand command) return command;
+            if (item is DbTokenCommandInfo info) return info;
         }
 
         // Standard cases...

@@ -211,6 +211,43 @@ public static class Test_DbTokenVisitor_Dynamics
 
     //[Enforced]
     [Fact]
+    public static void Test_CommandInfo_Null()
+    {
+        var engine = new FakeEngine();
+        var connection = new FakeConnection(engine);
+        var visitor = new DbTokenVisitor(connection);
+        ICommandInfo.IBuilder builder;
+
+        var info = new CommandInfo(engine, "[First] = {0}", null);
+        var token = new DbTokenCommandInfo(info);
+        builder = visitor.Visit(token);
+
+        Assert.Equal("[First] = NULL", builder.Text);
+        Assert.Empty(builder.Parameters);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_CommandInfo_Valued()
+    {
+        var engine = new FakeEngine();
+        var connection = new FakeConnection(engine);
+        var visitor = new DbTokenVisitor(connection);
+        ICommandInfo.IBuilder builder;
+
+        var info = new CommandInfo(engine, "[First] = {0}", "007");
+        var token = new DbTokenCommandInfo(info);
+        builder = visitor.Visit(token);
+
+        Assert.Equal("[First] = #0", builder.Text);
+        Assert.Single(builder.Parameters);
+        Assert.Equal("007", builder.Parameters[0].Value);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
     public static void Test_Identifier_Standard()
     {
         var engine = new FakeEngine();
