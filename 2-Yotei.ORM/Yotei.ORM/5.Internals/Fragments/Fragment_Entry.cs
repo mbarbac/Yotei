@@ -121,7 +121,7 @@ public static partial class Fragment
         /// the main reference and the extracted one are updated.
         /// </summary>
         protected static bool ExtractHead(
-            ref string main, ref string extracted, bool sensitive, params string[] specs)
+            ref string main, ref string? extracted, bool sensitive, params string[] specs)
         {
             var comparison = sensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
             var str = main.Trim();
@@ -154,7 +154,7 @@ public static partial class Fragment
         /// the main reference and the extracted one are updated.
         /// </summary>
         protected static bool ExtractTail(
-            ref string main, ref string extracted, bool sensitive, params string[] specs)
+            ref string main, ref string? extracted, bool sensitive, params string[] specs)
         {
             var comparison = sensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
             var str = main.Trim();
@@ -190,6 +190,7 @@ public static partial class Fragment
             string main, string separator, IEngine engine, out string left, out string right)
         {
             var str = main.Trim();
+
             var tokenizer = new StrWrappedTokenizer(engine.LeftTerminator, engine.RightTerminator);
             var items = engine.UseTerminators ? tokenizer.Tokenize(str) : new StrTokenText(str);
 

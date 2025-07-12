@@ -312,8 +312,6 @@ public static class Test_FragmentSetter
         Assert.Empty(builder.Parameters);
     }
 
-
-
     //[Enforced]
     [Fact]
     public static void Test_Dynamic_Valued()
