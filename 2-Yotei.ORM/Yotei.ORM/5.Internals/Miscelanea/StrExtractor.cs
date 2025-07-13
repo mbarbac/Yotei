@@ -1,4 +1,7 @@
-﻿#pragma warning disable IDE0042
+﻿FALTA ISOLATED
+
+
+#pragma warning disable IDE0042
 #pragma warning disable IDE0057
 
 namespace Yotei.ORM.Internals;
