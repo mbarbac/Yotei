@@ -225,17 +225,17 @@ public static class Test_Extractor
 
     //[Enforced]
     [Fact]
-    public static void Test_ExtractSeparator_NotFound()
+    public static void Test_ExtractFirstSeparator_NotFound()
     {
         bool found;
 
         string source = "abc";
-        var parts = Extractor.ExtractSeparator(source, false, isolated: false, out found, "=");
+        var parts = Extractor.ExtractFirstSeparator(source, false, isolated: false, out found, "=");
         Assert.False(found);
         Assert.Empty(parts.Left);
         Assert.Empty(parts.Spec);
         Assert.Empty(parts.Right);
-        parts = Extractor.ExtractSeparator(source, false, isolated: true, out found, "=");
+        parts = Extractor.ExtractFirstSeparator(source, false, isolated: true, out found, "=");
         Assert.False(found);
         Assert.Empty(parts.Left);
         Assert.Empty(parts.Spec);
@@ -244,53 +244,53 @@ public static class Test_Extractor
 
     //[Enforced]
     [Fact]
-    public static void Test_ExtractSeparator_StandAlone()
+    public static void Test_ExtractFirstSeparator_StandAlone()
     {
         bool found;
 
         string source = "=";
-        var parts = Extractor.ExtractSeparator(source, false, isolated: false, out found, "=");
+        var parts = Extractor.ExtractFirstSeparator(source, false, isolated: false, out found, "=");
         Assert.True(found);
         Assert.Empty(parts.Left);
         Assert.Equal("=", parts.Spec);
         Assert.Empty(parts.Right);
-        parts = Extractor.ExtractSeparator(source, false, isolated: true, out found, "=");
+        parts = Extractor.ExtractFirstSeparator(source, false, isolated: true, out found, "=");
         Assert.True(found);
         Assert.Empty(parts.Left);
         Assert.Equal("=", parts.Spec);
         Assert.Empty(parts.Right);
 
         source = " =";
-        parts = Extractor.ExtractSeparator(source, false, isolated: false, out found, "=");
+        parts = Extractor.ExtractFirstSeparator(source, false, isolated: false, out found, "=");
         Assert.True(found);
         Assert.Equal(" ", parts.Left);
         Assert.Equal("=", parts.Spec);
         Assert.Empty(parts.Right);
-        parts = Extractor.ExtractSeparator(source, false, isolated: true, out found, "=");
+        parts = Extractor.ExtractFirstSeparator(source, false, isolated: true, out found, "=");
         Assert.True(found);
         Assert.Equal(" ", parts.Left);
         Assert.Equal("=", parts.Spec);
         Assert.Empty(parts.Right);
 
         source = "= ";
-        parts = Extractor.ExtractSeparator(source, false, isolated: false, out found, "=");
+        parts = Extractor.ExtractFirstSeparator(source, false, isolated: false, out found, "=");
         Assert.True(found);
         Assert.Empty(parts.Left);
         Assert.Equal("=", parts.Spec);
         Assert.Equal(" ", parts.Right);
-        parts = Extractor.ExtractSeparator(source, false, isolated: true, out found, "=");
+        parts = Extractor.ExtractFirstSeparator(source, false, isolated: true, out found, "=");
         Assert.True(found);
         Assert.Empty(parts.Left);
         Assert.Equal("=", parts.Spec);
         Assert.Equal(" ", parts.Right);
 
         source = " = ";
-        parts = Extractor.ExtractSeparator(source, false, isolated: false, out found, "=");
+        parts = Extractor.ExtractFirstSeparator(source, false, isolated: false, out found, "=");
         Assert.True(found);
         Assert.Equal(" ", parts.Left);
         Assert.Equal("=", parts.Spec);
         Assert.Equal(" ", parts.Right);
-        parts = Extractor.ExtractSeparator(source, false, isolated: true, out found, "=");
+        parts = Extractor.ExtractFirstSeparator(source, false, isolated: true, out found, "=");
         Assert.True(found);
         Assert.Equal(" ", parts.Left);
         Assert.Equal("=", parts.Spec);
@@ -299,40 +299,40 @@ public static class Test_Extractor
 
     //[Enforced]
     [Fact]
-    public static void Test_ExtractSeparator_Not_Isolated()
+    public static void Test_ExtractFirstSeparator_Not_Isolated()
     {
         bool found;
 
         var source = "ab=cd";
-        var parts = Extractor.ExtractSeparator(source, false, isolated: false, out found, "=");
+        var parts = Extractor.ExtractFirstSeparator(source, false, isolated: false, out found, "=");
         Assert.True(found);
         Assert.Equal("ab", parts.Left);
         Assert.Equal("=", parts.Spec);
         Assert.Equal("cd", parts.Right);
 
         source = "ab =cd";
-        parts = Extractor.ExtractSeparator(source, false, isolated: false, out found, "=");
+        parts = Extractor.ExtractFirstSeparator(source, false, isolated: false, out found, "=");
         Assert.True(found);
         Assert.Equal("ab ", parts.Left);
         Assert.Equal("=", parts.Spec);
         Assert.Equal("cd", parts.Right);
 
         source = "ab= cd";
-        parts = Extractor.ExtractSeparator(source, false, isolated: false, out found, "=");
+        parts = Extractor.ExtractFirstSeparator(source, false, isolated: false, out found, "=");
         Assert.True(found);
         Assert.Equal("ab", parts.Left);
         Assert.Equal("=", parts.Spec);
         Assert.Equal(" cd", parts.Right);
 
         source = "ab = cd";
-        parts = Extractor.ExtractSeparator(source, false, isolated: false, out found, "=");
+        parts = Extractor.ExtractFirstSeparator(source, false, isolated: false, out found, "=");
         Assert.True(found);
         Assert.Equal("ab ", parts.Left);
         Assert.Equal("=", parts.Spec);
         Assert.Equal(" cd", parts.Right);
 
         source = " ab = cd ";
-        parts = Extractor.ExtractSeparator(source, false, isolated: false, out found, "=");
+        parts = Extractor.ExtractFirstSeparator(source, false, isolated: false, out found, "=");
         Assert.True(found);
         Assert.Equal(" ab ", parts.Left);
         Assert.Equal("=", parts.Spec);
@@ -341,43 +341,231 @@ public static class Test_Extractor
 
     //[Enforced]
     [Fact]
-    public static void Test_ExtractSeparator_Isolated()
+    public static void Test_ExtractFirstSeparator_Isolated()
     {
         bool found;
 
         var source = "ab=cd";
-        var parts = Extractor.ExtractSeparator(source, false, isolated: true, out found, "=");
+        var parts = Extractor.ExtractFirstSeparator(source, false, isolated: true, out found, "=");
         Assert.False(found);
         Assert.Empty(parts.Left);
         Assert.Empty(parts.Spec);
         Assert.Empty(parts.Right);
 
         source = "ab =cd";
-        parts = Extractor.ExtractSeparator(source, false, isolated: true, out found, "=");
+        parts = Extractor.ExtractFirstSeparator(source, false, isolated: true, out found, "=");
         Assert.False(found);
         Assert.Empty(parts.Left);
         Assert.Empty(parts.Spec);
         Assert.Empty(parts.Right);
 
         source = "ab= cd";
-        parts = Extractor.ExtractSeparator(source, false, isolated: true, out found, "=");
+        parts = Extractor.ExtractFirstSeparator(source, false, isolated: true, out found, "=");
         Assert.False(found);
         Assert.Empty(parts.Left);
         Assert.Empty(parts.Spec);
         Assert.Empty(parts.Right);
 
         source = "ab = cd";
-        parts = Extractor.ExtractSeparator(source, false, isolated: true, out found, "=");
+        parts = Extractor.ExtractFirstSeparator(source, false, isolated: true, out found, "=");
         Assert.True(found);
         Assert.Equal("ab ", parts.Left);
         Assert.Equal("=", parts.Spec);
         Assert.Equal(" cd", parts.Right);
 
         source = " ab = cd ";
-        parts = Extractor.ExtractSeparator(source, false, isolated: true, out found, "=");
+        parts = Extractor.ExtractFirstSeparator(source, false, isolated: true, out found, "=");
         Assert.True(found);
         Assert.Equal(" ab ", parts.Left);
         Assert.Equal("=", parts.Spec);
         Assert.Equal(" cd ", parts.Right);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_ExtractFirstSeparator_Several()
+    {
+        bool found;
+
+        var source = "ab=cd=ef";
+        var parts = Extractor.ExtractFirstSeparator(source, false, isolated: false, out found, "=");
+        Assert.True(found);
+        Assert.Equal("ab", parts.Left);
+        Assert.Equal("=", parts.Spec);
+        Assert.Equal("cd=ef", parts.Right);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_ExtractLastSeparator_NotFound()
+    {
+        bool found;
+
+        string source = "abc";
+        var parts = Extractor.ExtractLastSeparator(source, false, isolated: false, out found, "=");
+        Assert.False(found);
+        Assert.Empty(parts.Left);
+        Assert.Empty(parts.Spec);
+        Assert.Empty(parts.Right);
+        parts = Extractor.ExtractLastSeparator(source, false, isolated: true, out found, "=");
+        Assert.False(found);
+        Assert.Empty(parts.Left);
+        Assert.Empty(parts.Spec);
+        Assert.Empty(parts.Right);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_ExtractLastSeparator_StandAlone()
+    {
+        bool found;
+
+        string source = "=";
+        var parts = Extractor.ExtractLastSeparator(source, false, isolated: false, out found, "=");
+        Assert.True(found);
+        Assert.Empty(parts.Left);
+        Assert.Equal("=", parts.Spec);
+        Assert.Empty(parts.Right);
+        parts = Extractor.ExtractLastSeparator(source, false, isolated: true, out found, "=");
+        Assert.True(found);
+        Assert.Empty(parts.Left);
+        Assert.Equal("=", parts.Spec);
+        Assert.Empty(parts.Right);
+
+        source = " =";
+        parts = Extractor.ExtractLastSeparator(source, false, isolated: false, out found, "=");
+        Assert.True(found);
+        Assert.Equal(" ", parts.Left);
+        Assert.Equal("=", parts.Spec);
+        Assert.Empty(parts.Right);
+        parts = Extractor.ExtractLastSeparator(source, false, isolated: true, out found, "=");
+        Assert.True(found);
+        Assert.Equal(" ", parts.Left);
+        Assert.Equal("=", parts.Spec);
+        Assert.Empty(parts.Right);
+
+        source = "= ";
+        parts = Extractor.ExtractLastSeparator(source, false, isolated: false, out found, "=");
+        Assert.True(found);
+        Assert.Empty(parts.Left);
+        Assert.Equal("=", parts.Spec);
+        Assert.Equal(" ", parts.Right);
+        parts = Extractor.ExtractLastSeparator(source, false, isolated: true, out found, "=");
+        Assert.True(found);
+        Assert.Empty(parts.Left);
+        Assert.Equal("=", parts.Spec);
+        Assert.Equal(" ", parts.Right);
+
+        source = " = ";
+        parts = Extractor.ExtractLastSeparator(source, false, isolated: false, out found, "=");
+        Assert.True(found);
+        Assert.Equal(" ", parts.Left);
+        Assert.Equal("=", parts.Spec);
+        Assert.Equal(" ", parts.Right);
+        parts = Extractor.ExtractLastSeparator(source, false, isolated: true, out found, "=");
+        Assert.True(found);
+        Assert.Equal(" ", parts.Left);
+        Assert.Equal("=", parts.Spec);
+        Assert.Equal(" ", parts.Right);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_ExtractLastSeparator_Not_Isolated()
+    {
+        bool found;
+
+        var source = "ab=cd";
+        var parts = Extractor.ExtractLastSeparator(source, false, isolated: false, out found, "=");
+        Assert.True(found);
+        Assert.Equal("ab", parts.Left);
+        Assert.Equal("=", parts.Spec);
+        Assert.Equal("cd", parts.Right);
+
+        source = "ab =cd";
+        parts = Extractor.ExtractLastSeparator(source, false, isolated: false, out found, "=");
+        Assert.True(found);
+        Assert.Equal("ab ", parts.Left);
+        Assert.Equal("=", parts.Spec);
+        Assert.Equal("cd", parts.Right);
+
+        source = "ab= cd";
+        parts = Extractor.ExtractLastSeparator(source, false, isolated: false, out found, "=");
+        Assert.True(found);
+        Assert.Equal("ab", parts.Left);
+        Assert.Equal("=", parts.Spec);
+        Assert.Equal(" cd", parts.Right);
+
+        source = "ab = cd";
+        parts = Extractor.ExtractLastSeparator(source, false, isolated: false, out found, "=");
+        Assert.True(found);
+        Assert.Equal("ab ", parts.Left);
+        Assert.Equal("=", parts.Spec);
+        Assert.Equal(" cd", parts.Right);
+
+        source = " ab = cd ";
+        parts = Extractor.ExtractLastSeparator(source, false, isolated: false, out found, "=");
+        Assert.True(found);
+        Assert.Equal(" ab ", parts.Left);
+        Assert.Equal("=", parts.Spec);
+        Assert.Equal(" cd ", parts.Right);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_ExtractLastSeparator_Isolated()
+    {
+        bool found;
+
+        var source = "ab=cd";
+        var parts = Extractor.ExtractLastSeparator(source, false, isolated: true, out found, "=");
+        Assert.False(found);
+        Assert.Empty(parts.Left);
+        Assert.Empty(parts.Spec);
+        Assert.Empty(parts.Right);
+
+        source = "ab =cd";
+        parts = Extractor.ExtractLastSeparator(source, false, isolated: true, out found, "=");
+        Assert.False(found);
+        Assert.Empty(parts.Left);
+        Assert.Empty(parts.Spec);
+        Assert.Empty(parts.Right);
+
+        source = "ab= cd";
+        parts = Extractor.ExtractLastSeparator(source, false, isolated: true, out found, "=");
+        Assert.False(found);
+        Assert.Empty(parts.Left);
+        Assert.Empty(parts.Spec);
+        Assert.Empty(parts.Right);
+
+        source = "ab = cd";
+        parts = Extractor.ExtractLastSeparator(source, false, isolated: true, out found, "=");
+        Assert.True(found);
+        Assert.Equal("ab ", parts.Left);
+        Assert.Equal("=", parts.Spec);
+        Assert.Equal(" cd", parts.Right);
+
+        source = " ab = cd ";
+        parts = Extractor.ExtractLastSeparator(source, false, isolated: true, out found, "=");
+        Assert.True(found);
+        Assert.Equal(" ab ", parts.Left);
+        Assert.Equal("=", parts.Spec);
+        Assert.Equal(" cd ", parts.Right);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_ExtractLastSeparator_Several()
+    {
+        bool found;
+
+        var source = "ab=cd=ef";
+        var parts = Extractor.ExtractLastSeparator(source, false, isolated: false, out found, "=");
+        Assert.True(found);
+        Assert.Equal("ab=cd", parts.Left);
+        Assert.Equal("=", parts.Spec);
+        Assert.Equal("ef", parts.Right);
     }
 }

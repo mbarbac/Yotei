@@ -131,9 +131,9 @@ public static class Extractor
 
     /// <summary>
     /// Extracts from the given source the left and right parts that are separated by the first
-    /// matching specification, which must be isolated or not as requested. If a separator is
-    /// found, it is trimmed before returning, and all spaces are kept in both the left and right
-    /// parts.
+    /// separator that matches any of the given specifications, in order, which must be isolated
+    /// or not as requested. If a separator is found, it is trimmed before returning, and all
+    /// spaces are kept in both the left and right parts.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="sensitive"></param>
@@ -141,7 +141,7 @@ public static class Extractor
     /// <param name="found"></param>
     /// <param name="specs"></param>
     /// <returns></returns>
-    public static (string Left, string Spec, string Right) ExtractSeparator(
+    public static (string Left, string Spec, string Right) ExtractFirstSeparator(
         string source, bool sensitive, bool isolated, out bool found, params string[] specs)
     {
         for (int i = 0; i < specs.Length; i++)
@@ -161,6 +161,53 @@ public static class Extractor
 
                 var item = str.ToString().Substring(index, spec.Length);
                 index = source.IndexOf(spec, sensitive);
+                var main = source.Remove(index, spec.Length);
+                var left = main[..index];
+                var right = main[index..];
+
+                found = true;
+                return (left, item, right);
+            }
+        }
+
+        found = false;
+        return (string.Empty, string.Empty, string.Empty);
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Extracts from the given source the left and right parts that are separated by the last
+    /// separator that matches any of the given specifications, in order, which must be isolated
+    /// or not as requested. If a separator is found, it is trimmed before returning, and all
+    /// spaces are kept in both the left and right parts.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="sensitive"></param>
+    /// <param name="isolated"></param>
+    /// <param name="found"></param>
+    /// <param name="specs"></param>
+    /// <returns></returns>
+    public static (string Left, string Spec, string Right) ExtractLastSeparator(
+        string source, bool sensitive, bool isolated, out bool found, params string[] specs)
+    {
+        for (int i = 0; i < specs.Length; i++)
+        {
+            var str = source.AsSpan().Trim();
+            var spec = specs[i];
+            spec = spec.NotNullNotEmpty(trim: true);
+
+            var index = str.LastIndexOf(spec, sensitive);
+            if (index >= 0)
+            {
+                if (isolated)
+                {
+                    var temp = source.FindIsolated(spec, 0, sensitive);
+                    if (temp < 0) continue;
+                }
+
+                var item = str.ToString().Substring(index, spec.Length);
+                index = source.LastIndexOf(spec, sensitive);
                 var main = source.Remove(index, spec.Length);
                 var left = main[..index];
                 var right = main[index..];
