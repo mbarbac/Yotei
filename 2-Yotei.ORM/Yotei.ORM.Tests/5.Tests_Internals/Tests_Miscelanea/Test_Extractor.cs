@@ -1,10 +1,8 @@
-﻿#pragma warning disable IDE0042
-
-namespace Yotei.ORM.Tests.Internals.Fragments;
+﻿namespace Yotei.ORM.Tests.Internals.Miscelanea;
 
 // ========================================================
 //[Enforced]
-public static class Test_Fragment_Helpers
+public static class Test_Extractor
 {
     //[Enforced]
     [Fact]
@@ -12,7 +10,7 @@ public static class Test_Fragment_Helpers
     {
         var left = "ab";
         var right = "cd";
-        var done = Fragment.RemoveRoundedBrackets(ref left, ref right);
+        var done = Extractor.RemoveRoundedBrackets(ref left, ref right);
         Assert.False(done);
     }
 
@@ -22,12 +20,12 @@ public static class Test_Fragment_Helpers
     {
         var left = "(ab";
         var right = "cd";
-        var done = Fragment.RemoveRoundedBrackets(ref left, ref right);
+        var done = Extractor.RemoveRoundedBrackets(ref left, ref right);
         Assert.False(done);
 
         left = "ab";
         right = "cd)";
-        done = Fragment.RemoveRoundedBrackets(ref left, ref right);
+        done = Extractor.RemoveRoundedBrackets(ref left, ref right);
         Assert.False(done);
     }
 
@@ -37,21 +35,21 @@ public static class Test_Fragment_Helpers
     {
         var left = "(ab";
         var right = "cd)";
-        var done = Fragment.RemoveRoundedBrackets(ref left, ref right);
+        var done = Extractor.RemoveRoundedBrackets(ref left, ref right);
         Assert.True(done);
         Assert.Equal("ab", left);
         Assert.Equal("cd", right);
 
         left = "( ab";
         right = "cd )";
-        done = Fragment.RemoveRoundedBrackets(ref left, ref right);
+        done = Extractor.RemoveRoundedBrackets(ref left, ref right);
         Assert.True(done);
         Assert.Equal(" ab", left);
         Assert.Equal("cd ", right);
 
         left = " ( ab";
         right = "cd ) ";
-        done = Fragment.RemoveRoundedBrackets(ref left, ref right);
+        done = Extractor.RemoveRoundedBrackets(ref left, ref right);
         Assert.True(done);
         Assert.Equal(" ab", left);
         Assert.Equal("cd ", right);
@@ -66,12 +64,11 @@ public static class Test_Fragment_Helpers
         bool found;
 
         string source = "abc";
-        var parts = Fragment.ExtractHead(source, true, isolated: false, out found, "xy");
+        var parts = Extractor.ExtractHead(source, true, isolated: false, out found, "xy");
         Assert.False(found);
         Assert.Empty(parts.Main);
         Assert.Empty(parts.Spec);
-        
-        parts = Fragment.ExtractHead(source, true, isolated: true, out found, "xy");
+        parts = Extractor.ExtractHead(source, true, isolated: true, out found, "xy");
         Assert.False(found);
         Assert.Empty(parts.Main);
         Assert.Empty(parts.Spec);
@@ -84,23 +81,21 @@ public static class Test_Fragment_Helpers
         bool found;
 
         var source = "xy";
-        var parts = Fragment.ExtractHead(source, true, isolated: false, out found, "xy");
+        var parts = Extractor.ExtractHead(source, true, isolated: false, out found, "xy");
         Assert.True(found);
         Assert.Empty(parts.Main);
         Assert.Equal("xy", parts.Spec);
-        
-        parts = Fragment.ExtractHead(source, true, isolated: true, out found, "xy");
+        parts = Extractor.ExtractHead(source, true, isolated: true, out found, "xy");
         Assert.True(found);
         Assert.Empty(parts.Main);
         Assert.Equal("xy", parts.Spec);
 
         source = " xy ";
-        parts = Fragment.ExtractHead(source, true, isolated: false, out found, "xy");
+        parts = Extractor.ExtractHead(source, true, isolated: false, out found, "xy");
         Assert.True(found);
         Assert.Equal("  ", parts.Main);
         Assert.Equal("xy", parts.Spec);
-        
-        parts = Fragment.ExtractHead(source, true, isolated: true, out found, "xy");
+        parts = Extractor.ExtractHead(source, true, isolated: true, out found, "xy");
         Assert.True(found);
         Assert.Equal("  ", parts.Main);
         Assert.Equal("xy", parts.Spec);
@@ -113,34 +108,31 @@ public static class Test_Fragment_Helpers
         bool found;
 
         var source = "xyabc";
-        var parts = Fragment.ExtractHead(source, true, isolated: false, out found, "xy");
+        var parts = Extractor.ExtractHead(source, true, isolated: false, out found, "xy");
         Assert.True(found);
         Assert.Equal("abc", parts.Main);
         Assert.Equal("xy", parts.Spec);
-        
-        parts = Fragment.ExtractHead(source, true, isolated: true, out found, "xy");
+        parts = Extractor.ExtractHead(source, true, isolated: true, out found, "xy");
         Assert.False(found);
         Assert.Empty(parts.Main);
         Assert.Empty(parts.Spec);
 
         source = " xyabc ";
-        parts = Fragment.ExtractHead(source, true, isolated: false, out found, "xy");
+        parts = Extractor.ExtractHead(source, true, isolated: false, out found, "xy");
         Assert.True(found);
         Assert.Equal(" abc ", parts.Main);
         Assert.Equal("xy", parts.Spec);
-        
-        parts = Fragment.ExtractHead(source, true, isolated: true, out found, "xy");
+        parts = Extractor.ExtractHead(source, true, isolated: true, out found, "xy");
         Assert.False(found);
         Assert.Empty(parts.Main);
         Assert.Empty(parts.Spec);
 
         source = " xy abc ";
-        parts = Fragment.ExtractHead(source, true, isolated: false, out found, "xy");
+        parts = Extractor.ExtractHead(source, true, isolated: false, out found, "xy");
         Assert.True(found);
         Assert.Equal("  abc ", parts.Main);
         Assert.Equal("xy", parts.Spec);
-        
-        parts = Fragment.ExtractHead(source, true, isolated: true, out found, "xy");
+        parts = Extractor.ExtractHead(source, true, isolated: true, out found, "xy");
         Assert.True(found);
         Assert.Equal("  abc ", parts.Main);
         Assert.Equal("xy", parts.Spec);
@@ -155,12 +147,11 @@ public static class Test_Fragment_Helpers
         bool found;
 
         string source = "abc";
-        var parts = Fragment.ExtractTail(source, true, isolated: false, out found, "xy");
+        var parts = Extractor.ExtractTail(source, true, isolated: false, out found, "xy");
         Assert.False(found);
         Assert.Empty(parts.Main);
         Assert.Empty(parts.Spec);
-        
-        parts = Fragment.ExtractTail(source, true, isolated: true, out found, "xy");
+        parts = Extractor.ExtractTail(source, true, isolated: true, out found, "xy");
         Assert.False(found);
         Assert.Empty(parts.Main);
         Assert.Empty(parts.Spec);
@@ -171,25 +162,23 @@ public static class Test_Fragment_Helpers
     public static void Test_ExtractTail_StandAlone()
     {
         bool found;
-        
+
         var source = "xy";
-        var parts = Fragment.ExtractTail(source, true, isolated: false, out found, "xy");
+        var parts = Extractor.ExtractTail(source, true, isolated: false, out found, "xy");
         Assert.True(found);
         Assert.Empty(parts.Main);
         Assert.Equal("xy", parts.Spec);
-        
-        parts = Fragment.ExtractTail(source, true, isolated: true, out found, "xy");
+        parts = Extractor.ExtractTail(source, true, isolated: true, out found, "xy");
         Assert.True(found);
         Assert.Empty(parts.Main);
         Assert.Equal("xy", parts.Spec);
 
         source = " xy ";
-        parts = Fragment.ExtractTail(source, true, isolated: false, out found, "xy");
+        parts = Extractor.ExtractTail(source, true, isolated: false, out found, "xy");
         Assert.True(found);
         Assert.Equal("  ", parts.Main);
         Assert.Equal("xy", parts.Spec);
-        
-        parts = Fragment.ExtractTail(source, true, isolated: true, out found, "xy");
+        parts = Extractor.ExtractTail(source, true, isolated: true, out found, "xy");
         Assert.True(found);
         Assert.Equal("  ", parts.Main);
         Assert.Equal("xy", parts.Spec);
@@ -202,34 +191,31 @@ public static class Test_Fragment_Helpers
         bool found;
 
         var source = "abcxy";
-        var parts = Fragment.ExtractTail(source, true, isolated: false, out found, "xy");
+        var parts = Extractor.ExtractTail(source, true, isolated: false, out found, "xy");
         Assert.True(found);
         Assert.Equal("abc", parts.Main);
         Assert.Equal("xy", parts.Spec);
-        
-        parts = Fragment.ExtractTail(source, true, isolated: true, out found, "xy");
+        parts = Extractor.ExtractTail(source, true, isolated: true, out found, "xy");
         Assert.False(found);
         Assert.Empty(parts.Main);
         Assert.Empty(parts.Spec);
 
         source = " abcxy ";
-        parts = Fragment.ExtractTail(source, true, isolated: false, out found, "xy");
+        parts = Extractor.ExtractTail(source, true, isolated: false, out found, "xy");
         Assert.True(found);
         Assert.Equal(" abc ", parts.Main);
         Assert.Equal("xy", parts.Spec);
-        
-        parts = Fragment.ExtractTail(source, true, isolated: true, out found, "xy");
+        parts = Extractor.ExtractTail(source, true, isolated: true, out found, "xy");
         Assert.False(found);
         Assert.Empty(parts.Main);
         Assert.Empty(parts.Spec);
 
         source = " abc xy ";
-        parts = Fragment.ExtractTail(source, true, isolated: false, out found, "xy");
+        parts = Extractor.ExtractTail(source, true, isolated: false, out found, "xy");
         Assert.True(found);
         Assert.Equal(" abc  ", parts.Main);
         Assert.Equal("xy", parts.Spec);
-        
-        parts = Fragment.ExtractTail(source, true, isolated: true, out found, "xy");
+        parts = Extractor.ExtractTail(source, true, isolated: true, out found, "xy");
         Assert.True(found);
         Assert.Equal(" abc  ", parts.Main);
         Assert.Equal("xy", parts.Spec);
@@ -244,13 +230,12 @@ public static class Test_Fragment_Helpers
         bool found;
 
         string source = "abc";
-        var parts = Fragment.ExtractSeparator(source, false, isolated: false, out found, "=");
+        var parts = Extractor.ExtractSeparator(source, false, isolated: false, out found, "=");
         Assert.False(found);
         Assert.Empty(parts.Left);
         Assert.Empty(parts.Spec);
         Assert.Empty(parts.Right);
-
-        parts = Fragment.ExtractSeparator(source, false, isolated: true, out found, "=");
+        parts = Extractor.ExtractSeparator(source, false, isolated: true, out found, "=");
         Assert.False(found);
         Assert.Empty(parts.Left);
         Assert.Empty(parts.Spec);
@@ -264,52 +249,48 @@ public static class Test_Fragment_Helpers
         bool found;
 
         string source = "=";
-        var parts = Fragment.ExtractSeparator(source, false, isolated: false, out found, "=");
+        var parts = Extractor.ExtractSeparator(source, false, isolated: false, out found, "=");
         Assert.True(found);
         Assert.Empty(parts.Left);
         Assert.Equal("=", parts.Spec);
         Assert.Empty(parts.Right);
-
-        parts = Fragment.ExtractSeparator(source, false, isolated: true, out found, "=");
+        parts = Extractor.ExtractSeparator(source, false, isolated: true, out found, "=");
         Assert.True(found);
         Assert.Empty(parts.Left);
         Assert.Equal("=", parts.Spec);
         Assert.Empty(parts.Right);
 
         source = " =";
-        parts = Fragment.ExtractSeparator(source, false, isolated: false, out found, "=");
+        parts = Extractor.ExtractSeparator(source, false, isolated: false, out found, "=");
         Assert.True(found);
         Assert.Equal(" ", parts.Left);
         Assert.Equal("=", parts.Spec);
         Assert.Empty(parts.Right);
-
-        parts = Fragment.ExtractSeparator(source, false, isolated: true, out found, "=");
+        parts = Extractor.ExtractSeparator(source, false, isolated: true, out found, "=");
         Assert.True(found);
         Assert.Equal(" ", parts.Left);
         Assert.Equal("=", parts.Spec);
         Assert.Empty(parts.Right);
 
         source = "= ";
-        parts = Fragment.ExtractSeparator(source, false, isolated: false, out found, "=");
+        parts = Extractor.ExtractSeparator(source, false, isolated: false, out found, "=");
         Assert.True(found);
         Assert.Empty(parts.Left);
         Assert.Equal("=", parts.Spec);
         Assert.Equal(" ", parts.Right);
-
-        parts = Fragment.ExtractSeparator(source, false, isolated: true, out found, "=");
+        parts = Extractor.ExtractSeparator(source, false, isolated: true, out found, "=");
         Assert.True(found);
         Assert.Empty(parts.Left);
         Assert.Equal("=", parts.Spec);
         Assert.Equal(" ", parts.Right);
 
         source = " = ";
-        parts = Fragment.ExtractSeparator(source, false, isolated: false, out found, "=");
+        parts = Extractor.ExtractSeparator(source, false, isolated: false, out found, "=");
         Assert.True(found);
         Assert.Equal(" ", parts.Left);
         Assert.Equal("=", parts.Spec);
         Assert.Equal(" ", parts.Right);
-
-        parts = Fragment.ExtractSeparator(source, false, isolated: true, out found, "=");
+        parts = Extractor.ExtractSeparator(source, false, isolated: true, out found, "=");
         Assert.True(found);
         Assert.Equal(" ", parts.Left);
         Assert.Equal("=", parts.Spec);
@@ -323,35 +304,35 @@ public static class Test_Fragment_Helpers
         bool found;
 
         var source = "ab=cd";
-        var parts = Fragment.ExtractSeparator(source, false, isolated: false, out found, "=");
+        var parts = Extractor.ExtractSeparator(source, false, isolated: false, out found, "=");
         Assert.True(found);
         Assert.Equal("ab", parts.Left);
         Assert.Equal("=", parts.Spec);
         Assert.Equal("cd", parts.Right);
 
         source = "ab =cd";
-        parts = Fragment.ExtractSeparator(source, false, isolated: false, out found, "=");
+        parts = Extractor.ExtractSeparator(source, false, isolated: false, out found, "=");
         Assert.True(found);
         Assert.Equal("ab ", parts.Left);
         Assert.Equal("=", parts.Spec);
         Assert.Equal("cd", parts.Right);
 
         source = "ab= cd";
-        parts = Fragment.ExtractSeparator(source, false, isolated: false, out found, "=");
+        parts = Extractor.ExtractSeparator(source, false, isolated: false, out found, "=");
         Assert.True(found);
         Assert.Equal("ab", parts.Left);
         Assert.Equal("=", parts.Spec);
         Assert.Equal(" cd", parts.Right);
 
         source = "ab = cd";
-        parts = Fragment.ExtractSeparator(source, false, isolated: false, out found, "=");
+        parts = Extractor.ExtractSeparator(source, false, isolated: false, out found, "=");
         Assert.True(found);
         Assert.Equal("ab ", parts.Left);
         Assert.Equal("=", parts.Spec);
         Assert.Equal(" cd", parts.Right);
 
         source = " ab = cd ";
-        parts = Fragment.ExtractSeparator(source, false, isolated: false, out found, "=");
+        parts = Extractor.ExtractSeparator(source, false, isolated: false, out found, "=");
         Assert.True(found);
         Assert.Equal(" ab ", parts.Left);
         Assert.Equal("=", parts.Spec);
@@ -365,35 +346,35 @@ public static class Test_Fragment_Helpers
         bool found;
 
         var source = "ab=cd";
-        var parts = Fragment.ExtractSeparator(source, false, isolated: true, out found, "=");
+        var parts = Extractor.ExtractSeparator(source, false, isolated: true, out found, "=");
         Assert.False(found);
         Assert.Empty(parts.Left);
         Assert.Empty(parts.Spec);
         Assert.Empty(parts.Right);
 
         source = "ab =cd";
-        parts = Fragment.ExtractSeparator(source, false, isolated: true, out found, "=");
+        parts = Extractor.ExtractSeparator(source, false, isolated: true, out found, "=");
         Assert.False(found);
         Assert.Empty(parts.Left);
         Assert.Empty(parts.Spec);
         Assert.Empty(parts.Right);
 
         source = "ab= cd";
-        parts = Fragment.ExtractSeparator(source, false, isolated: true, out found, "=");
+        parts = Extractor.ExtractSeparator(source, false, isolated: true, out found, "=");
         Assert.False(found);
         Assert.Empty(parts.Left);
         Assert.Empty(parts.Spec);
         Assert.Empty(parts.Right);
 
         source = "ab = cd";
-        parts = Fragment.ExtractSeparator(source, false, isolated: true, out found, "=");
+        parts = Extractor.ExtractSeparator(source, false, isolated: true, out found, "=");
         Assert.True(found);
         Assert.Equal("ab ", parts.Left);
         Assert.Equal("=", parts.Spec);
         Assert.Equal(" cd", parts.Right);
 
         source = " ab = cd ";
-        parts = Fragment.ExtractSeparator(source, false, isolated: true, out found, "=");
+        parts = Extractor.ExtractSeparator(source, false, isolated: true, out found, "=");
         Assert.True(found);
         Assert.Equal(" ab ", parts.Left);
         Assert.Equal("=", parts.Spec);

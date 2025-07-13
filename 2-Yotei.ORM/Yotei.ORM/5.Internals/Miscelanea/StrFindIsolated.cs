@@ -9,7 +9,7 @@ public static class StrFindIsolated
     /// The default collection of character separators for isolated values.
     /// </summary>
     public static readonly ImmutableArray<char> SEPARATORS =
-        " ()[]{}<>\"^'`´\\|!&@#=+-*/%"
+        " ()[]{}<>\"'`´\\|!&@#=+-*/%^"
         .ToImmutableArray();
 
     /// <summary>

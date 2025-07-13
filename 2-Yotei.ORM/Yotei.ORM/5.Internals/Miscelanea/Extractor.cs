@@ -1,12 +1,12 @@
 ﻿namespace Yotei.ORM.Internals;
 
 // ========================================================
-public static partial class Fragment
+public static class Extractor
 {
     /// <summary>
-    /// Removes the heading and tailing rounded brackets from the given parts, which are used as
-    /// a single unit. Heading spaces before the first '(', and tailing ones after the last ')',
-    /// are removed.
+    /// Removes the heading and tailing rounded brackets from the given parts, interpreted as a
+    /// single unit. Heading spaces before the first '(', and tailing ones after the last ')',
+    /// are also removed.
     /// </summary>
     /// <param name="left"></param>
     /// <param name="right"></param>
@@ -76,40 +76,6 @@ public static partial class Fragment
 
         found = false;
         return (string.Empty, string.Empty);
-    }
-
-    /// <summary>
-    /// Extracts from the head of the given source the first matching specification, which must
-    /// be isolated or not as requested, provided it is not protected by the engine terminators,
-    /// if they are used. If found, the returned spec is trimmed, and all spaces are kept in main.
-    /// <br/> If '<paramref name="isolated"/>' is <c>true</c>, then only isolated specifications
-    /// are candidates for matching.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="sensitive"></param>
-    /// <param name="isolated"></param>
-    /// <param name="found"></param>
-    /// <param name="specs"></param>
-    /// <returns></returns>
-    public static (string Main, string Spec) ExtractHead(
-        string source, IEngine engine, bool isolated, out bool found, params string[] specs)
-    {
-        source.ThrowWhenNull();
-        engine.ThrowWhenNull();
-
-        var sensitive = engine.CaseSensitiveNames;
-
-        if (engine.UseTerminators)
-        {
-            var tokenizer = new StrWrappedTokenizer(engine.LeftTerminator, engine.RightTerminator);
-            var items = tokenizer.Tokenize(source);
-
-            items.ExtractFirst
-        }
-        else
-        {
-            return ExtractHead(source, sensitive, isolated, out found, specs);
-        }
     }
 
     // ----------------------------------------------------
