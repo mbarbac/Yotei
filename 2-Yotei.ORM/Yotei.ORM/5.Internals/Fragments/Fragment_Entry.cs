@@ -118,12 +118,10 @@ public static partial class Fragment
 
         /// <summary>
         /// Extracts from the head of the given main string the first found spec. If so, both
-        /// the main reference and the extracted one are updated.
-        /// <br/> If found, main and extracted are not null strings, but they can be empty or be
-        /// spaces-only ones.
+        /// the main and the extracted references are updated.
         /// </summary>
         protected static bool ExtractHead(
-            ref string main, ref string? extracted, bool sensitive, params string[] specs)
+            ref string main, ref string? item, bool sensitive, params string[] specs)
         {
             var comparison = sensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
             var str = main.TrimStart();
@@ -134,7 +132,7 @@ public static partial class Fragment
                 var index = str.IndexOf(spec, comparison);
                 if (index >= 0 && spec.Length == str.Length)
                 {
-                    extracted = str;
+                    item = str;
                     main = string.Empty;
                     return true;
                 }
@@ -143,7 +141,7 @@ public static partial class Fragment
                 index = str.IndexOf(spec, comparison);
                 if (index == 0)
                 {
-                    extracted = str[..spec.Length];
+                    item = str[..spec.Length];
                     main = str[spec.Length..];
                     return true;
                 }
@@ -152,10 +150,8 @@ public static partial class Fragment
         }
 
         /// <summary>
-        /// Extracts from the tail of the given main string the first found spec. If so, both
-        /// the main reference and the extracted one are updated.
-        /// <br/> If found, main and extracted are not null strings, but they can be empty or be
-        /// spaces-only ones.
+        /// Extracts from the tail of the given main string the last found spec. If so, both
+        /// the main and the extracted references are updated.
         /// </summary>
         protected static bool ExtractTail(
             ref string main, ref string? extracted, bool sensitive, params string[] specs)

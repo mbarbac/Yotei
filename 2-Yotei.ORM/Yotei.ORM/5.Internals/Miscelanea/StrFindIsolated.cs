@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Internals;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Yotei.ORM.Internals;
 
 // ========================================================
 public static class StrFindIsolated
@@ -9,26 +11,6 @@ public static class StrFindIsolated
     public static readonly ImmutableArray<char> SEPARATORS =
         " ()[]{}<>\"^'`´\\|!&@#=+-*/%"
         .ToImmutableArray();
-
-    /// <summary>
-    /// Returns the index of the first ocurrence of the isolated value in the given source,
-    /// starting at the given index, or -1 if not found. Isolation is tested using the given
-    /// heads and tails collection of separators that, if null, use a default one.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="value"></param>
-    /// <param name="ini"></param>
-    /// <param name="heads"></param>
-    /// <param name="tails"></param>
-    /// <returns></returns>
-    public static int FindIsolated(
-        this string source, string value, int ini,
-        IEnumerable<char>? heads = null,
-        IEnumerable<char>? tails = null)
-    {
-        var comparison = StringComparison.CurrentCulture;
-        return source.FindIsolated(value, ini, comparison, heads, tails);
-    }
 
     /// <summary>
     /// Returns the index of the first ocurrence of the isolated value in the given source,
@@ -74,5 +56,29 @@ public static class StrFindIsolated
         }
 
         return pos;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns the index of the first ocurrence of the isolated value in the given source,
+    /// starting at the given index, or -1 if not found. Isolation is tested using the given
+    /// heads and tails collection of separators that, if null, use a default one.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="ini"></param>
+    /// <param name="sensitive"></param>
+    /// <param name="heads"></param>
+    /// <param name="tails"></param>
+    /// <returns></returns>
+    public static int FindIsolated(
+        this string source, string value, int ini,
+        bool sensitive,
+        IEnumerable<char>? heads = null,
+        IEnumerable<char>? tails = null)
+    {
+        var comparison = sensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+        return source.FindIsolated(value, ini, comparison, heads, tails);
     }
 }

@@ -10,7 +10,7 @@ public static class Test_StrFindIsolated
     {
         var value = "xx";
         var source = "";
-        var index = source.FindIsolated(value, 0); Assert.True(index < 0);
+        var index = source.FindIsolated(value, 0, false); Assert.True(index < 0);
     }
 
     //[Enforced]
@@ -19,13 +19,13 @@ public static class Test_StrFindIsolated
     {
         var value = "xx";
         var source = "any";
-        var index = source.FindIsolated(value, 0); Assert.True(index < 0);
+        var index = source.FindIsolated(value, 0, false); Assert.True(index < 0);
 
         source = "xxany";
-        index = source.FindIsolated(value, 0); Assert.True(index < 0);
+        index = source.FindIsolated(value, 0, false); Assert.True(index < 0);
 
         source = "anyxx";
-        index = source.FindIsolated(value, 0); Assert.True(index < 0);
+        index = source.FindIsolated(value, 0, false); Assert.True(index < 0);
     }
 
     //[Enforced]
@@ -34,12 +34,12 @@ public static class Test_StrFindIsolated
     {
         var value = "xx";
         var source = "xx any";
-        var index = source.FindIsolated(value, 1); Assert.True(index < 0);
+        var index = source.FindIsolated(value, 1, false); Assert.True(index < 0);
 
         source = "any xx";
-        index = source.FindIsolated(value, 5); Assert.True(index < 0);
+        index = source.FindIsolated(value, 5, false); Assert.True(index < 0);
 
-        try { index = source.FindIsolated(value, 99); Assert.Fail(); }
+        try { index = source.FindIsolated(value, 99, false); Assert.Fail(); }
         catch (ArgumentOutOfRangeException) { }
     }
 
@@ -49,16 +49,16 @@ public static class Test_StrFindIsolated
     {
         var value = "xx";
         var source = "xx";
-        var index = source.FindIsolated(value, 0); Assert.Equal(0, index);
+        var index = source.FindIsolated(value, 0, false); Assert.Equal(0, index);
 
         source = "xx ";
-        index = source.FindIsolated(value, 0); Assert.Equal(0, index);
+        index = source.FindIsolated(value, 0, false); Assert.Equal(0, index);
 
         source = " xx";
-        index = source.FindIsolated(value, 0); Assert.Equal(1, index);
+        index = source.FindIsolated(value, 0, false); Assert.Equal(1, index);
 
         source = " xx ";
-        index = source.FindIsolated(value, 0); Assert.Equal(1, index);
+        index = source.FindIsolated(value, 0, false); Assert.Equal(1, index);
     }
 
     //[Enforced]
@@ -67,9 +67,9 @@ public static class Test_StrFindIsolated
     {
         var value = "xx";
         var source = "any xx";
-        var index = source.FindIsolated(value, 1); Assert.Equal(4, index);
+        var index = source.FindIsolated(value, 1, false); Assert.Equal(4, index);
 
         source = "any xx other";
-        index = source.FindIsolated(value, 1); Assert.Equal(4, index);
+        index = source.FindIsolated(value, 1, false); Assert.Equal(4, index);
     }
 }

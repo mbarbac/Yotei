@@ -30,3 +30,5 @@ global using Yotei.ORM.Tools;
 global using Yotei.ORM.Tools.Code;
 global using Yotei.ORM.Internals;
 global using Yotei.ORM.Generators;
+
+[assembly: InternalsVisibleTo("Yotei.ORM.Tests")]

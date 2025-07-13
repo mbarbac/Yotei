@@ -245,6 +245,8 @@ partial record class DbTokenVisitor
     /// </summary>
     protected virtual ICommandInfo.IBuilder VisitCommandBuilder(ICommandInfo.IBuilder builder)
     {
+        var comparison = Engine.CaseSensitiveNames ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+        
         if (UseNullString)
         {
             var nstr = Engine.NullValueLiteral;
@@ -258,7 +260,7 @@ partial record class DbTokenVisitor
 
                 var found = false;
                 var index = 0;
-                while ((index = text.FindIsolated(par.Name, index)) >= 0)
+                while ((index = text.FindIsolated(par.Name, index, comparison)) >= 0)
                 {
                     text = text.Remove(index, par.Name.Length);
                     text = text.Insert(index, nstr);
@@ -272,10 +274,8 @@ partial record class DbTokenVisitor
                     i--;
                 }
             }
-
-            var comparison = Engine.CaseSensitiveNames ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+            
             text = NamesToOrdinalBrackets(text, pars, comparison);
-
             builder.Clear();
             builder.Add(text, pars.ToArray());
         }
