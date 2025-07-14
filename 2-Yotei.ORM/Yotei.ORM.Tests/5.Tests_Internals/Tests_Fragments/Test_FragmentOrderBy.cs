@@ -184,6 +184,9 @@ public static class Test_FragmentOrderBy
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
         FragmentOrderBy.Master master = new(command);
 
+        try { master.Capture(x => ""); Assert.Fail(); } // Empty literal...
+        catch (ArgumentException) { }
+
         try { master.Capture(x => "any=value {0} {1}", "any"); Assert.Fail(); } // Parameters' mismatch...
         catch (ArgumentException) { }
     }

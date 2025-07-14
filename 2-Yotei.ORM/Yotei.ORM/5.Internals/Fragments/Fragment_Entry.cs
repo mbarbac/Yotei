@@ -87,6 +87,11 @@ public static partial class Fragment
                         .WithData(value);
                 }
 
+                // Empty literals are not acceptable...
+                if (value is DbTokenLiteral text && text.Value.Length == 0)
+                    throw new ArgumentException(
+                        "Literal bodies cannot just be empty.").WithData(Body);
+
                 // Dynamic argument bodies are not acceptable...
                 if (value is DbTokenArgument) throw new ArgumentException(
                     "Fragment bodies cannot just be a dynamic argument.").WithData(value);

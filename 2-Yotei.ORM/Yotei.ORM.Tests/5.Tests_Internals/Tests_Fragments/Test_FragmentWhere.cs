@@ -216,6 +216,9 @@ public static class Test_FragmentWhere
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
         FragmentWhere.Master master = new(command);
 
+        try { master.Capture(x => ""); Assert.Fail(); } // Empty literal...
+        catch (ArgumentException) { }
+
         try { master.Capture(x => "any=value {0} {1}", "any"); Assert.Fail(); } // Parameters' mismatch...
         catch (ArgumentException) { }
 

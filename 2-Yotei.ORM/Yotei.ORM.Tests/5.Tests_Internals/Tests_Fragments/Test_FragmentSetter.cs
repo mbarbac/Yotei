@@ -158,6 +158,9 @@ public static class Test_FragmentSetter
         var command = new FakeCommand(new FakeConnection(new FakeEngine()));
         FragmentSetter.Master master = new(command);
 
+        try { master.Capture(x => ""); Assert.Fail(); } // Empty literal...
+        catch (ArgumentException) { }
+
         try { master.Capture(x => x("target=value", "other")); Assert.Fail(); } // Too many arguments...
         catch (ArgumentException) { }
 
