@@ -161,6 +161,9 @@ public static class Test_FragmentSetter
         try { master.Capture(x => x("target=value", "other")); Assert.Fail(); } // Too many arguments...
         catch (ArgumentException) { }
 
+        try { master.Capture(x => "any=value {0} {1}", "any"); Assert.Fail(); } // Parameters' mismatch...
+        catch (ArgumentException) { }
+
         try { master.Capture(x => "any"); Assert.Fail(); } // Invalid 'target=value' format...
         catch (ArgumentException) { }
 
@@ -171,9 +174,6 @@ public static class Test_FragmentSetter
         catch (EmptyException) { }
 
         try { master.Capture(x => "{0}=value", "any"); Assert.Fail(); } // No parameters in target...
-        catch (ArgumentException) { }
-
-        try { master.Capture(x => "any=value {0} {1}", "any"); Assert.Fail(); } // Parameters' mismatch...
         catch (ArgumentException) { }
     }
 
