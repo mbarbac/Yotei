@@ -1,4 +1,7 @@
-﻿namespace Yotei.ORM.Tests.Internals.Miscelanea;
+﻿#pragma warning disable IDE0018
+#pragma warning disable IDE0042
+
+namespace Yotei.ORM.Tests.Internals.Miscelanea;
 
 // ========================================================
 //[Enforced]

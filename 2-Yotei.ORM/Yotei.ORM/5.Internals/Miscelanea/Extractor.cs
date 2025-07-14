@@ -1,7 +1,7 @@
 ﻿namespace Yotei.ORM.Internals;
 
 // ========================================================
-public static class Extractor
+public static partial class Extractor
 {
     /// <summary>
     /// Removes the heading and tailing rounded brackets from the given parts, interpreted as a

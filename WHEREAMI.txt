@@ -1,5 +1,3 @@
-TODO:
-
 OPTIMIZATIONS:
 
 - In Yotei.Tools, CharExtensions: equality using a IEqualityComparer<string> allocates two
