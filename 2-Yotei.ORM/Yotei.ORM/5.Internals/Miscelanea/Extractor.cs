@@ -11,21 +11,21 @@ public static partial class Extractor
     /// <param name="left"></param>
     /// <param name="right"></param>
     /// <returns></returns>
-    public static bool RemoveRoundedBrackets(ref string left, ref string right)
+    public static bool RoundedBrackets(ref string left, ref string right)
     {
-        var sleft = left.AsSpan().Trim();
-        var xleft = sleft.StartsWith('(') ? left.IndexOf('(') : -1;
+        left.ThrowWhenNull();
+        right.ThrowWhenNull();
 
-        var sright = right.AsSpan().Trim();
-        var xright = sright.EndsWith(')') ? sright.LastIndexOf(')') : -1;
+        var main = $"{left}{right}".Trim();
+        var tokenizer = new StrWrappedTokenizer('(', ')');
+        var token = tokenizer.Tokenize(main);
 
-        if (xleft >= 0 && xright >= 0)
+        if (token is StrTokenWrapped wrapped)
         {
-            left = left[(xleft + 1)..];
-            right = right[..xright];
+            var index = left.IndexOf('('); left = left[(index + 1)..];
+            index = right.LastIndexOf(')'); right = right[..index];
             return true;
         }
-
         return false;
     }
 
@@ -44,7 +44,7 @@ public static partial class Extractor
     /// <param name="found"></param>
     /// <param name="specs"></param>
     /// <returns></returns>
-    public static (string Main, string Spec) ExtractHead(
+    public static (string Main, string Spec) Head(
         string source, bool sensitive, bool isolated, out bool found, params string[] specs)
     {
         source.ThrowWhenNull();
@@ -93,7 +93,7 @@ public static partial class Extractor
     /// <param name="found"></param>
     /// <param name="specs"></param>
     /// <returns></returns>
-    public static (string Main, string Spec) ExtractTail(
+    public static (string Main, string Spec) Tail(
         string source, bool sensitive, bool isolated, out bool found, params string[] specs)
     {
         source.ThrowWhenNull();
@@ -141,7 +141,7 @@ public static partial class Extractor
     /// <param name="found"></param>
     /// <param name="specs"></param>
     /// <returns></returns>
-    public static (string Left, string Spec, string Right) ExtractFirstSeparator(
+    public static (string Left, string Spec, string Right) FirstSeparator(
         string source, bool sensitive, bool isolated, out bool found, params string[] specs)
     {
         for (int i = 0; i < specs.Length; i++)
@@ -188,7 +188,7 @@ public static partial class Extractor
     /// <param name="found"></param>
     /// <param name="specs"></param>
     /// <returns></returns>
-    public static (string Left, string Spec, string Right) ExtractLastSeparator(
+    public static (string Left, string Spec, string Right) LastSeparator(
         string source, bool sensitive, bool isolated, out bool found, params string[] specs)
     {
         for (int i = 0; i < specs.Length; i++)

@@ -18,7 +18,7 @@ public static partial class Extractor
     /// <param name="found"></param>
     /// <param name="specs"></param>
     /// <returns></returns>
-    public static (string Main, string Spec) ExtractHead(
+    public static (string Main, string Spec) Head(
         string source, IEngine engine, bool isolated, out bool found, params string[] specs)
     {
         source.ThrowWhenNull();
@@ -27,17 +27,17 @@ public static partial class Extractor
         var sensitive = engine.CaseSensitiveNames;
         if (!engine.UseTerminators ||
             (!source.Contains(engine.LeftTerminator) && !source.Contains(engine.RightTerminator)))
-            return ExtractHead(source, sensitive, isolated, out found, specs);
+            return Head(source, sensitive, isolated, out found, specs);
 
         // We can assume tokenizer only renders chains and text tokens...
         var tokenizer = new StrWrappedTokenizer(engine.LeftTerminator, engine.RightTerminator);
         var item = tokenizer.Tokenize(source);
         if (item is StrTokenText text)
-            return ExtractHead(text.Payload, sensitive, isolated, out found, specs);
+            return Head(text.Payload, sensitive, isolated, out found, specs);
 
         if (item is StrTokenChain chain && chain.Count > 0 && chain[0] is StrTokenText token)
         {
-            var parts = ExtractHead(token.Payload, sensitive, isolated, out found, specs);
+            var parts = Head(token.Payload, sensitive, isolated, out found, specs);
             if (found)
             {
                 var builder = new StrTokenChain.Builder();
@@ -65,7 +65,7 @@ public static partial class Extractor
     /// <param name="found"></param>
     /// <param name="specs"></param>
     /// <returns></returns>
-    public static (string Main, string Spec) ExtractTail(
+    public static (string Main, string Spec) Tail(
         string source, IEngine engine, bool isolated, out bool found, params string[] specs)
     {
         source.ThrowWhenNull();
@@ -74,17 +74,17 @@ public static partial class Extractor
         var sensitive = engine.CaseSensitiveNames;
         if (!engine.UseTerminators ||
             (!source.Contains(engine.LeftTerminator) && !source.Contains(engine.RightTerminator)))
-            return ExtractTail(source, sensitive, isolated, out found, specs);
+            return Tail(source, sensitive, isolated, out found, specs);
 
         // We can assume tokenizer only renders chains and text tokens...
         var tokenizer = new StrWrappedTokenizer(engine.LeftTerminator, engine.RightTerminator);
         var item = tokenizer.Tokenize(source);
         if (item is StrTokenText text)
-            return ExtractTail(text.Payload, sensitive, isolated, out found, specs);
+            return Tail(text.Payload, sensitive, isolated, out found, specs);
 
         if (item is StrTokenChain chain && chain.Count > 0 && chain[^1] is StrTokenText token)
         {
-            var parts = ExtractTail(token.Payload, sensitive, isolated, out found, specs);
+            var parts = Tail(token.Payload, sensitive, isolated, out found, specs);
             if (found)
             {
                 var builder = new StrTokenChain.Builder();
@@ -114,7 +114,7 @@ public static partial class Extractor
     /// <param name="found"></param>
     /// <param name="specs"></param>
     /// <returns></returns>
-    public static (string Left, string Spec, string Right) ExtractFirstSeparator(
+    public static (string Left, string Spec, string Right) FirstSeparator(
         string source, IEngine engine, bool isolated, out bool found, params string[] specs)
     {
         source.ThrowWhenNull();
@@ -123,7 +123,7 @@ public static partial class Extractor
         var sensitive = engine.CaseSensitiveNames;
         if (!engine.UseTerminators ||
             (!source.Contains(engine.LeftTerminator) && !source.Contains(engine.RightTerminator)))
-            return ExtractFirstSeparator(source, sensitive, isolated, out found, specs);
+            return FirstSeparator(source, sensitive, isolated, out found, specs);
 
         var tokenizer = new StrWrappedTokenizer(engine.LeftTerminator, engine.RightTerminator);
         var item = tokenizer.Tokenize(source);
@@ -134,7 +134,7 @@ public static partial class Extractor
             item = items[i];
             if (item is not StrTokenText text) continue;
 
-            var parts = ExtractFirstSeparator(text.Payload, sensitive, isolated, out found, specs);
+            var parts = FirstSeparator(text.Payload, sensitive, isolated, out found, specs);
             if (found)
             {
                 var left = new StrTokenChain.Builder();
@@ -166,7 +166,7 @@ public static partial class Extractor
     /// <param name="found"></param>
     /// <param name="specs"></param>
     /// <returns></returns>
-    public static (string Left, string Spec, string Right) ExtractLastSeparator(
+    public static (string Left, string Spec, string Right) LastSeparator(
         string source, IEngine engine, bool isolated, out bool found, params string[] specs)
     {
         source.ThrowWhenNull();
@@ -175,7 +175,7 @@ public static partial class Extractor
         var sensitive = engine.CaseSensitiveNames;
         if (!engine.UseTerminators ||
             (!source.Contains(engine.LeftTerminator) && !source.Contains(engine.RightTerminator)))
-            return ExtractLastSeparator(source, sensitive, isolated, out found, specs);
+            return LastSeparator(source, sensitive, isolated, out found, specs);
 
         var tokenizer = new StrWrappedTokenizer(engine.LeftTerminator, engine.RightTerminator);
         var item = tokenizer.Tokenize(source);
@@ -186,7 +186,7 @@ public static partial class Extractor
             item = items[i];
             if (item is not StrTokenText text) continue;
 
-            var parts = ExtractLastSeparator(text.Payload, sensitive, isolated, out found, specs);
+            var parts = LastSeparator(text.Payload, sensitive, isolated, out found, specs);
             if (found)
             {
                 var left = new StrTokenChain.Builder();

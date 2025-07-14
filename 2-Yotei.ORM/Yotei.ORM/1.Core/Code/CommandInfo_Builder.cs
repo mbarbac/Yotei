@@ -394,8 +394,10 @@ partial class CommandInfo
         /// <summary>
         /// Determines if there are any dangling '{...}' brackets in the given text.
         /// </summary>
-        static bool AreRemainingBrackets(string text)
+        public static bool AreRemainingBrackets(string text)
         {
+            text.ThrowWhenNull();
+
             var ini = text.IndexOf('{'); if (ini < 0) return false;
             var end = text.IndexOf('}', ini); if (end < 0) return false;
             return true;
@@ -405,10 +407,12 @@ partial class CommandInfo
         /// Replaces the names of the given parameters in the given text to ordinal bracket
         /// specifications, maintaining the order of the parameters in that collection.
         /// </summary>
-        static string? NamesToOrdinalBrackets(
+        public static string? NamesToOrdinalBrackets(
             string? text,
             IEnumerable<IParameter> pars, StringComparison comparison)
         {
+            pars.ThrowWhenNull();
+
             if (text is not null && text.Length > 0)
             {
                 var i = 0;
@@ -429,6 +433,8 @@ partial class CommandInfo
 
             return text;
         }
+
+        // ------------------------------------------------
 
         /// <summary>
         /// Returns the index of the first ocurrence of an ordinal '{value}' bracket in the given
