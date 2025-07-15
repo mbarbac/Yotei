@@ -140,6 +140,25 @@ public static class DbLambdaParser
         var host = Parse(engine, node.LambdaHost);
         var items = node.LambdaArguments.Select(x => Parse(engine, x)).ToList();
 
+        // First-level single-string argument escapes to literal...
+        if (host is DbTokenArgument &&
+            items.Count == 1 &&
+            items[0] is DbTokenValue value &&
+            value.Value is string str)
+        {
+            items[0] = new DbTokenLiteral(str);
+        }
+
+        // Other special cases...
+        else if (items.Count == 1)
+        {
+            // Command-alike...
+            if (items[0] is DbTokenCommand command) return command;
+            if (items[0] is DbTokenCommandInfo info) return info;
+        }
+
+
+        /*
         // Special cases...
         if (items.Count == 1)
         {
@@ -152,7 +171,7 @@ public static class DbLambdaParser
             // Command-alike...
             if (item is DbTokenCommand command) return command;
             if (item is DbTokenCommandInfo info) return info;
-        }
+        }*/
 
         // Standard cases...
         return new DbTokenInvoke(host, items);

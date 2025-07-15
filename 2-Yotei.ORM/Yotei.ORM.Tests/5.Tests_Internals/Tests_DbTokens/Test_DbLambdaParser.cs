@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Tests.Internals.DbTokens;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Yotei.ORM.Tests.Internals.DbTokens;
 
 // ========================================================
 //[Enforced]
@@ -262,81 +264,24 @@ public static class Test_DbLambdaParser
 
     //[Enforced]
     [Fact]
-    public static void Parse_Invoke_FirstLevel()
-    {
-        var engine = new FakeEngine();
-        IDbToken token;
-        DbTokenInvoke invoke;
-        DbTokenValue value;
-        DbTokenLiteral text;
-
-        // First-level sole strings are translated into literals...
-        token = DbLambdaParser.Parse(engine, x => x("any"));
-        Assert.Equal("x(any)", token.ToString());
-        invoke = Assert.IsType<DbTokenInvoke>(token);
-        Assert.Single(invoke.Arguments);
-        text = Assert.IsType<DbTokenLiteral>(invoke.Arguments[0]);
-        Assert.Equal("any", text.Value);
-
-        // To standard one...
-        token = DbLambdaParser.Parse(engine, x => x());
-        Assert.Equal("x()", token.ToString());
-        invoke = Assert.IsType<DbTokenInvoke>(token);
-        Assert.Empty(invoke.Arguments);
-
-        // To standard one...
-        token = DbLambdaParser.Parse(engine, x => x(50));
-        Assert.Equal("x('50')", token.ToString());
-        invoke = Assert.IsType<DbTokenInvoke>(token);
-        Assert.Single(invoke.Arguments);
-        value = Assert.IsType<DbTokenValue>(invoke.Arguments[0]); Assert.Equal(50, value.Value);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Parse_Invoke_FirstLevel_ManyArguments()
-    {
-        var engine = new FakeEngine();
-        IDbToken token;
-        DbTokenInvoke invoke;
-        DbTokenValue value;
-        DbTokenLiteral text;
-
-        token = DbLambdaParser.Parse(engine, x => x("any", "other"));
-        Assert.Equal("x('any', 'other')", token.ToString());
-        invoke = Assert.IsType<DbTokenInvoke>(token);
-        Assert.Equal(2, invoke.Arguments.Count);
-        value = Assert.IsType<DbTokenValue>(invoke.Arguments[0]); Assert.Equal("any", value.Value);
-        value = Assert.IsType<DbTokenValue>(invoke.Arguments[1]); Assert.Equal("other", value.Value);
-
-        token = DbLambdaParser.Parse(engine, x => x(x.Alpha, x.Beta, null, "any"));
-        Assert.Equal("x(x.[Alpha], x.[Beta], NULL, 'any')", token.ToString());
-        invoke = Assert.IsType<DbTokenInvoke>(token);
-        Assert.Equal(4, invoke.Arguments.Count);
-        Assert.IsType<DbTokenIdentifier>(invoke.Arguments[0]);
-        Assert.IsType<DbTokenIdentifier>(invoke.Arguments[1]);
-        value = Assert.IsType<DbTokenValue>(invoke.Arguments[2]); Assert.Null(value.Value);
-        value = Assert.IsType<DbTokenValue>(invoke.Arguments[3]); Assert.Equal("any", value.Value);
-
-        // Escaping an argument to prevent capturing it...
-        token = DbLambdaParser.Parse(engine, x => x(x.Alpha, x("any")));
-        Assert.Equal("x(x.[Alpha], x(any))", token.ToString());
-        invoke = Assert.IsType<DbTokenInvoke>(token);
-        Assert.Equal(2, invoke.Arguments.Count);
-        Assert.IsType<DbTokenIdentifier>(invoke.Arguments[0]);
-        invoke = Assert.IsType<DbTokenInvoke>(invoke.Arguments[1]);
-        Assert.Single(invoke.Arguments);
-        text = Assert.IsType<DbTokenLiteral>(invoke.Arguments[0]); Assert.Equal("any", text.Value);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Parse_Invoke_FirstLevel_Dynamic()
+    public static void Parse_Invoke_Single_Argument()
     {
         var engine = new FakeEngine();
         IDbToken token;
         DbTokenInvoke invoke;
         DbTokenIdentifier id;
+        DbTokenValue value;
+
+        token = DbLambdaParser.Parse(engine, x => x());
+        Assert.Equal("x()", token.ToString());
+        invoke = Assert.IsType<DbTokenInvoke>(token);
+        Assert.Empty(invoke.Arguments);
+
+        token = DbLambdaParser.Parse(engine, x => x(50));
+        Assert.Equal("x('50')", token.ToString());
+        invoke = Assert.IsType<DbTokenInvoke>(token);
+        Assert.Single(invoke.Arguments);
+        value = Assert.IsType<DbTokenValue>(invoke.Arguments[0]); Assert.Equal(50, value.Value);
 
         token = DbLambdaParser.Parse(engine, x => x(x.Alpha));
         Assert.Equal("x(x.[Alpha])", token.ToString());
@@ -355,21 +300,39 @@ public static class Test_DbLambdaParser
 
     //[Enforced]
     [Fact]
+    public static void Parse_Invoke_Many_Arguments()
+    {
+        var engine = new FakeEngine();
+        IDbToken token;
+        DbTokenInvoke invoke;
+        DbTokenValue value;
+
+        token = DbLambdaParser.Parse(engine, x => x("any", "other"));
+        Assert.Equal("x('any', 'other')", token.ToString());
+        invoke = Assert.IsType<DbTokenInvoke>(token);
+        Assert.Equal(2, invoke.Arguments.Count);
+        value = Assert.IsType<DbTokenValue>(invoke.Arguments[0]); Assert.Equal("any", value.Value);
+        value = Assert.IsType<DbTokenValue>(invoke.Arguments[1]); Assert.Equal("other", value.Value);
+
+        token = DbLambdaParser.Parse(engine, x => x(x.Alpha, x.Beta, null, "any"));
+        Assert.Equal("x(x.[Alpha], x.[Beta], NULL, 'any')", token.ToString());
+        invoke = Assert.IsType<DbTokenInvoke>(token);
+        Assert.Equal(4, invoke.Arguments.Count);
+        Assert.IsType<DbTokenIdentifier>(invoke.Arguments[0]);
+        Assert.IsType<DbTokenIdentifier>(invoke.Arguments[1]);
+        value = Assert.IsType<DbTokenValue>(invoke.Arguments[2]); Assert.Null(value.Value);
+        value = Assert.IsType<DbTokenValue>(invoke.Arguments[3]); Assert.Equal("any", value.Value);
+    }
+
+    //[Enforced]
+    [Fact]
     public static void Parse_Invoke_Chained()
     {
         var engine = new FakeEngine();
         IDbToken token;
         DbTokenInvoke invoke;
-        DbTokenLiteral literal;
-        DbTokenValue value;
         DbTokenIdentifier id;
-
-        token = DbLambdaParser.Parse(engine, x => x(x.Alpha)("33"));
-        Assert.Equal("x(x.[Alpha])(33)", token.ToString());
-        invoke = Assert.IsType<DbTokenInvoke>(token);
-        Assert.Single(invoke.Arguments);
-        literal = Assert.IsType<DbTokenLiteral>(invoke.Arguments[0]);
-        Assert.Equal("33", literal.Value);
+        DbTokenValue value;
 
         token = DbLambdaParser.Parse(engine, x => x(x.Alpha)(33));
         Assert.Equal("x(x.[Alpha])('33')", token.ToString());
@@ -387,6 +350,98 @@ public static class Test_DbLambdaParser
         Assert.IsType<DbTokenArgument>(invoke.Host);
         id = Assert.IsType<DbTokenIdentifier>(invoke.Arguments[0]);
         Assert.Equal("[Alpha]", id.Value);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Parse_Invoke_Escape()
+    {
+        var engine = new FakeEngine();
+        IDbToken token;
+        DbTokenInvoke invoke;
+        DbTokenLiteral text;
+
+        // First-level sole string are translated to literals...
+        token = DbLambdaParser.Parse(engine, x => x("any"));
+        Assert.Equal("x(any)", token.ToString());
+        invoke = Assert.IsType<DbTokenInvoke>(token);
+        Assert.Single(invoke.Arguments);
+        text = Assert.IsType<DbTokenLiteral>(invoke.Arguments[0]);
+        Assert.Equal("any", text.Value);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Parse_Invoke_Escape_Chained()
+    {
+        var engine = new FakeEngine();
+        IDbToken token;
+        DbTokenInvoke invoke;
+        DbTokenLiteral text;
+        DbTokenValue value;
+
+        // Escaping an argument to prevent capturing it...
+        token = DbLambdaParser.Parse(engine, x => x(x.Alpha, x("any")));
+        Assert.Equal("x(x.[Alpha], x(any))", token.ToString());
+        invoke = Assert.IsType<DbTokenInvoke>(token);
+        Assert.Equal(2, invoke.Arguments.Count);
+        Assert.IsType<DbTokenIdentifier>(invoke.Arguments[0]);
+        invoke = Assert.IsType<DbTokenInvoke>(invoke.Arguments[1]);
+        Assert.Single(invoke.Arguments);
+        text = Assert.IsType<DbTokenLiteral>(invoke.Arguments[0]); Assert.Equal("any", text.Value);
+
+        // Because we concatenate, the last invoke is not a 1st-level one, and so it does not
+        // escape its argument...
+        token = DbLambdaParser.Parse(engine, x => x(x.Alpha)("33"));
+        Assert.Equal("x(x.[Alpha])('33')", token.ToString());
+        invoke = Assert.IsType<DbTokenInvoke>(token);
+        Assert.Single(invoke.Arguments);
+        value = Assert.IsType<DbTokenValue>(invoke.Arguments[0]);
+        Assert.Equal("33", value.Value);
+
+        // To un-scape, we need to have a 1st-level single-string invoke..
+        token = DbLambdaParser.Parse(engine, x => x(x.Alpha)(x("33")));
+        Assert.Equal("x(x.[Alpha])(x(33))", token.ToString());
+        invoke = Assert.IsType<DbTokenInvoke>(token);
+        Assert.Single(invoke.Arguments);
+        invoke = Assert.IsType<DbTokenInvoke>(invoke.Arguments[0]);
+        Assert.Single(invoke.Arguments);
+        text = Assert.IsType<DbTokenLiteral>(invoke.Arguments[0]);
+        Assert.Equal("33", text.Value);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Parse_Invoke_Un_Escape()
+    {
+        var engine = new FakeEngine();
+        IDbToken token;
+        DbTokenInvoke invoke;
+        DbTokenLiteral literal;
+        DbTokenMethod method;
+
+        // Problem: concatenation requires chained invocation, but the argument of the 2nd
+        // is escaped as a literal instead of being captured as an argument.
+        token = DbLambdaParser.Parse(engine, x => x.Any(x("WHERE ID > ")("007")));
+        //Assert.Equal("x.Any(x(WHERE ID > )(007))", token.ToString());
+        //method = Assert.IsType<DbTokenMethod>(token);
+        //Assert.Single(method.Arguments);
+        //invoke = Assert.IsType<DbTokenInvoke>(method.Arguments[0]);
+        //Assert.Single(invoke.Arguments);
+        //literal = Assert.IsType<DbTokenLiteral>(invoke.Arguments[0]);
+        //Assert.Equal("007", literal.Value);
+        //invoke = Assert.IsType<DbTokenInvoke>(invoke.Host);
+        //Assert.Single(invoke.Arguments);
+        //literal = Assert.IsType<DbTokenLiteral>(invoke.Arguments[0]);
+        //Assert.Equal("WHERE ID > ", literal.Value);
+
+        var connection = new FakeConnection(engine);
+        var visitor = new DbTokenVisitor(connection);
+        var builder = visitor.Visit(token);
+        Assert.Equal("Any(WHERE ID > 007)", builder.Text);
+        Assert.Empty(builder.Parameters);
     }
 
     // ----------------------------------------------------

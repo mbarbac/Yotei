@@ -78,6 +78,25 @@ public static class Test_Invoke
         Assert.Equal("x(x(x(x.Alpha)))", node.ToString());
     });
 
+    //[Enforced]
+    [Fact]
+    public static void Parse_Nested_String_Value() => Repeater.Repeat(() =>
+    {
+        Func<dynamic, object> func;
+        LambdaNode node;
+
+        WriteLine();
+        func = x => x(x("007"));
+        node = LambdaParser.Parse(func).Result;
+        WriteLine($"> Result: {node}");
+        var invoke = Assert.IsType<LambdaNodeInvoke>(node);
+        Assert.Single(invoke.LambdaArguments);
+        invoke = Assert.IsType<LambdaNodeInvoke>(invoke.LambdaArguments[0]);
+        Assert.Single(invoke.LambdaArguments);
+        var value = Assert.IsType<LambdaNodeValue>(invoke.LambdaArguments[0]);
+        Assert.Equal("007", value.LambdaValue);
+    });
+
     // ----------------------------------------------------
 
     //[Enforced]

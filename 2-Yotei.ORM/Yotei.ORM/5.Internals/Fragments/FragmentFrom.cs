@@ -5,20 +5,19 @@
 namespace Yotei.ORM.Internals;
 
 /// <summary>
-/// Represents the ability of parsing SELECT clauses.
-/// <br/>- Standard syntax: 'x => x.Element'.
-/// <br/>- Alternate syntax: 'x => x.Element.As(...)'.
-/// <br/>- Alternate syntax: 'x => x.Source.All()'.
+///  Represents the ability of parsing FROM clauses.
+/// <br/>- Standard syntax: 'x => x.Source'.
+/// <br/>- Alternate syntax: 'x => x.Source.As(...)'.
 /// </summary>
 /// <remarks>
-/// SELECT clauses accept complex specifications.
-/// <br/>- Example: 'SELECT SUM([Amount]) AS TotalAmount, ...'
+/// FROM clauses accept complex specifications:
+/// <br/>- Example: 'FROM (SELECT [Id], [Age] FROM Other) AS Another, ...'
 /// </remarks>
-public static partial class FragmentSelect
+public static partial class FragmentFrom
 {
     // ====================================================
     /// <summary>
-    /// Represents an entry in a collection of fragments used to build SELECT-alike clauses.
+    /// Represents an entry in a collection of fragments used to build FROM-alike clauses.
     /// </summary>
     [Cloneable]
     public partial class Entry : Fragment.Entry
@@ -42,16 +41,6 @@ public static partial class FragmentSelect
                     Alias = parts.Right.NotNullNotEmpty();
                     AsSpec = parts.Spec;
                 }
-                parts = Extractor.FirstSeparator(main, Engine, false, out found, ".* ");
-                if (found)
-                {
-                    parts.Left = parts.Left.NotNullNotEmpty();
-                    parts.Right = parts.Right.Trim();
-
-                    main = $"{parts.Left} {parts.Right}".NotNullNotEmpty();
-                    Body = new DbTokenLiteral(main);
-                    AllColumns = true;
-                }
             }
 
             // Command-info...
@@ -69,17 +58,6 @@ public static partial class FragmentSelect
                     Alias = parts.Right.NotNullNotEmpty();
                     AsSpec = parts.Spec;
                 }
-                parts = Extractor.FirstSeparator(main, Engine, false, out found, ".* ");
-                if (found)
-                {
-                    parts.Left = parts.Left.NotNullNotEmpty();
-                    parts.Right = parts.Right.Trim();
-
-                    main = $"{parts.Left} {parts.Right}".NotNullNotEmpty();
-                    info = new CommandInfo(Engine, main, info.Parameters);
-                    Body = new DbTokenCommandInfo(info);
-                    AllColumns = true;
-                }
             }
 
             // Any other token is just accepted, even empty ones...
@@ -92,20 +70,9 @@ public static partial class FragmentSelect
         /// <param name="source"></param>
         protected Entry(Entry source) : base(source)
         {
-            AllColumns = source.AllColumns;
             Alias = source.Alias;
             AsSpec = source.AsSpec;
         }
-
-        /// <summary>
-        /// Determines if all columns from the given source are to be selected, as in 'Table.*'.
-        /// </summary>
-        public bool AllColumns
-        {
-            get => _AllColumns;
-            init => _AllColumns = value;
-        }
-        internal protected bool _AllColumns { get; set; }
 
         /// <summary>
         /// The alias that qualifies the source, if any.
@@ -144,7 +111,6 @@ public static partial class FragmentSelect
         {
             var str = Body.ToString()!;
 
-            if (AllColumns) str += ".*";
             if (Alias is not null) str += $" {AsSpec} {Alias}";
             return str;
         }
@@ -154,7 +120,6 @@ public static partial class FragmentSelect
         {
             var builder = visitor.Visit(Body);
 
-            if (AllColumns) builder.ReplaceText($"{builder.Text}.*");
             if (Alias is not null) builder.ReplaceText($"{builder.Text} {AsSpec} {Alias}");
 
             if (separate) builder.ReplaceText($", {builder.Text}");
@@ -164,7 +129,7 @@ public static partial class FragmentSelect
 
     // ====================================================
     /// <summary>
-    /// Represents the collection of fragments used to build SELECT-alike clauses.
+    /// Represents the collection of fragments used to build FROM-alike clauses.
     /// </summary>
     [Cloneable]
     public partial class Master : Fragment.Master
@@ -174,7 +139,7 @@ public static partial class FragmentSelect
         /// </summary>
         /// <param name="command"></param>
         /// <param name="clause"></param>
-        public Master(ICommand command, string clause = "SELECT") : base(command, clause) { }
+        public Master(ICommand command, string clause = "FROM") : base(command, clause) { }
 
         /// <summary>
         /// Copy constructor.
@@ -199,44 +164,16 @@ public static partial class FragmentSelect
         /// <inheritdoc/>
         public override Entry CreateEntry(IDbToken body)
         {
-            // Intercepting '...All()' method...
-            bool allcolumns = false;
-            var item = body.ExtractLast(x =>
-            {
-                if (x is not DbTokenMethod method) return false;
-                if (method.Name.ToUpper() is not "ALL") return false;
-                return true;
-            }
-            , out var removed); if (removed is not null)
-            {
-                var method = (DbTokenMethod)removed;
-
-                if (method.TypeArguments.Length != 0) throw new ArgumentException(
-                    $"No type arguments allowed for '{method.Name}()' virtual method.")
-                    .WithData(body);
-
-                if (method.Arguments.Count != 0) throw new ArgumentException(
-                    $"No arguments allowed for '{method.Name}()' virtual method.")
-                    .WithData(body);
-
-                if (item is DbTokenArgument) throw new ArgumentException(
-                    "Body cannot just be an order specification.")
-                    .WithData(body);
-
-                allcolumns = true;
-                body = item;
-            }
-
             // Intercepting '...As()' method...
             string? alias = null;
             string? asspec = null;
-            item = body.ExtractLast(x =>
+            var item = body.ExtractLast(x =>
             {
                 if (x is not DbTokenMethod method) return false;
                 if (method.Name.ToUpper() is not "AS") return false;
                 return true;
             }
-            , out removed); if (removed is not null)
+            , out var removed); if (removed is not null)
             {
                 var method = (DbTokenMethod)removed;
 
@@ -260,7 +197,6 @@ public static partial class FragmentSelect
 
             // Finishing...
             var entry = new Entry(this, body);
-            if (allcolumns) entry._AllColumns = true;
             if (alias is not null) entry._Alias = alias;
             if (asspec is not null) entry._AsSpec = asspec;
             return entry;
