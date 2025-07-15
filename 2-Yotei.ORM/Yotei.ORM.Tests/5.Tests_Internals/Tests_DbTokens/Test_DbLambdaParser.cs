@@ -414,34 +414,44 @@ public static class Test_DbLambdaParser
 
     //[Enforced]
     [Fact]
-    public static void Parse_Invoke_Un_Escape()
+    public static void Parse_Invoke_Escape_Arguments_Concatenated()
     {
         var engine = new FakeEngine();
         IDbToken token;
-        DbTokenInvoke invoke;
+        DbTokenInvoke invoke, invoke2;
         DbTokenLiteral literal;
         DbTokenMethod method;
+        DbTokenValue value;
 
-        // Problem: concatenation requires chained invocation, but the argument of the 2nd
-        // is escaped as a literal instead of being captured as an argument.
+        // 2nd argument is concatenated, but captured because not escaped with a 1st-level invoke...
         token = DbLambdaParser.Parse(engine, x => x.Any(x("WHERE ID > ")("007")));
-        //Assert.Equal("x.Any(x(WHERE ID > )(007))", token.ToString());
-        //method = Assert.IsType<DbTokenMethod>(token);
-        //Assert.Single(method.Arguments);
-        //invoke = Assert.IsType<DbTokenInvoke>(method.Arguments[0]);
-        //Assert.Single(invoke.Arguments);
-        //literal = Assert.IsType<DbTokenLiteral>(invoke.Arguments[0]);
-        //Assert.Equal("007", literal.Value);
-        //invoke = Assert.IsType<DbTokenInvoke>(invoke.Host);
-        //Assert.Single(invoke.Arguments);
-        //literal = Assert.IsType<DbTokenLiteral>(invoke.Arguments[0]);
-        //Assert.Equal("WHERE ID > ", literal.Value);
+        Assert.Equal("x.Any(x(WHERE ID > )('007'))", token.ToString());
+        method = Assert.IsType<DbTokenMethod>(token);
+        Assert.Single(method.Arguments);
+        invoke = Assert.IsType<DbTokenInvoke>(method.Arguments[0]);
+        Assert.Single(invoke.Arguments);
+        value = Assert.IsType<DbTokenValue>(invoke.Arguments[0]); // Not 1st level escape...
+        Assert.Equal("007", value.Value);
+        invoke = Assert.IsType<DbTokenInvoke>(invoke.Host);
+        Assert.Single(invoke.Arguments);
+        literal = Assert.IsType<DbTokenLiteral>(invoke.Arguments[0]); // 1st level escape...
+        Assert.Equal("WHERE ID > ", literal.Value);
 
-        var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
-        var builder = visitor.Visit(token);
-        Assert.Equal("Any(WHERE ID > 007)", builder.Text);
-        Assert.Empty(builder.Parameters);
+        // Now '007' is 1st-level escaped..
+        token = DbLambdaParser.Parse(engine, x => x.Any(x("WHERE ID > ")(x("007"))));
+        Assert.Equal("x.Any(x(WHERE ID > )(x(007)))", token.ToString());
+        method = Assert.IsType<DbTokenMethod>(token);
+        Assert.Single(method.Arguments);
+        invoke = Assert.IsType<DbTokenInvoke>(method.Arguments[0]);
+        Assert.Single(invoke.Arguments);
+        invoke2 = Assert.IsType<DbTokenInvoke>(invoke.Arguments[0]);
+        Assert.Single(invoke2.Arguments);
+        literal = Assert.IsType<DbTokenLiteral>(invoke2.Arguments[0]); // Not 1st level escape...
+        Assert.Equal("007", literal.Value);
+        invoke = Assert.IsType<DbTokenInvoke>(invoke.Host);
+        Assert.Single(invoke.Arguments);
+        literal = Assert.IsType<DbTokenLiteral>(invoke.Arguments[0]); // 1st level escape...
+        Assert.Equal("WHERE ID > ", literal.Value);
     }
 
     // ----------------------------------------------------

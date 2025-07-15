@@ -157,22 +157,6 @@ public static class DbLambdaParser
             if (items[0] is DbTokenCommandInfo info) return info;
         }
 
-
-        /*
-        // Special cases...
-        if (items.Count == 1)
-        {
-            var item = items[0];
-
-            // Literal-alike tokens...
-            if (item is DbTokenValue value && value.Value is string str)
-                items[0] = new DbTokenLiteral(str);
-
-            // Command-alike...
-            if (item is DbTokenCommand command) return command;
-            if (item is DbTokenCommandInfo info) return info;
-        }*/
-
         // Standard cases...
         return new DbTokenInvoke(host, items);
     }

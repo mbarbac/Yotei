@@ -1,9 +1,3 @@
-TODO:
-- En: master.Capture(x => x.Extract(x("YEAR FROM ").x("007")));
-  Ocurre que x("007") escapa '007' como un literal, no como un argumento.
-  Pero necesitamos esta construcción para concaternarlo con el literal anterior.
-  ARRRG!
-
 OPTIMIZATIONS:
 
 - In Yotei.Tools, CharExtensions: equality using a IEqualityComparer<string> allocates two
