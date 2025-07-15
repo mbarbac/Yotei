@@ -400,20 +400,6 @@ public static class Test_DbTokenVisitor_Dynamics
 
     //[Enforced]
     [Fact]
-    public static void Test_Invoke_ToLiteral()
-    {
-        var engine = new FakeEngine();
-        var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
-        ICommandInfo.IBuilder builder;
-
-        builder = visitor.Visit(x => x("50"));
-        Assert.Equal("50", builder.Text);
-        Assert.Empty(builder.Parameters); // Literal values are not captured...
-    }
-
-    //[Enforced]
-    [Fact]
     public static void Test_Invoke_OnArgument_For_Chaining()
     {
         var engine = new FakeEngine();
@@ -426,20 +412,61 @@ public static class Test_DbTokenVisitor_Dynamics
         Assert.Equal(2, builder.Parameters.Count);
         Assert.Equal("#0", builder.Parameters[0].Name); Assert.Equal(3, builder.Parameters[0].Value);
         Assert.Equal("#1", builder.Parameters[1].Name); Assert.Equal(" = ", builder.Parameters[1].Value);
+    }
 
-        builder = visitor.Visit(x => x(x.Alpha, 3, x(" = "), null)); // '=' is escaped :)!
-        Assert.Equal("[Alpha]#0 = NULL", builder.Text);
-        Assert.Single(builder.Parameters);
-        Assert.Equal("#0", builder.Parameters[0].Name); Assert.Equal(3, builder.Parameters[0].Value);
+    // -----------------------------------------------------
 
-        builder = visitor.Visit(x => x(x.Alpha, x("3"), x(" = "), null));
-        Assert.Equal("[Alpha]3 = NULL", builder.Text);
+    //[Enforced]
+    [Fact]
+    public static void Test_Invoke_ToLiteral()
+    {
+        var engine = new FakeEngine();
+        var connection = new FakeConnection(engine);
+        var visitor = new DbTokenVisitor(connection);
+        ICommandInfo.IBuilder builder;
+
+        builder = visitor.Visit(x => x("any")); // 1st-level single-string argument invoke...
+        Assert.Equal("any", builder.Text);
         Assert.Empty(builder.Parameters);
 
-        builder = visitor.Visit(x => x(x.Alpha)(x.Beta)(x(" = "), null));
+        builder = visitor.Visit(x => x.Any("other")); // String is captured...
+        Assert.Equal("Any(#0)", builder.Text);
+        Assert.Single(builder.Parameters);
+        Assert.Equal("other", builder.Parameters[0].Value);
+
+        builder = visitor.Visit(x => x.Any(x("other"))); // String is escaped by 1st-level invoke
+        Assert.Equal("Any(other)", builder.Text);
+        Assert.Empty(builder.Parameters);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Invoke_ToLiteral_Chaining()
+    {
+        var engine = new FakeEngine();
+        var connection = new FakeConnection(engine);
+        var visitor = new DbTokenVisitor(connection);
+        ICommandInfo.IBuilder builder;
+
+        builder = visitor.Visit(x => x("50")); // 1st-level single-string argument invoke...
+        Assert.Equal("50", builder.Text);
+        Assert.Empty(builder.Parameters);
+
+        builder = visitor.Visit(x => x(x(x.Alpha).x(" = ").x(null))); // Not 1st-level escape!
+        Assert.Equal("[Alpha]#0NULL", builder.Text);
+        Assert.Single(builder.Parameters);
+        Assert.Equal(" = ", builder.Parameters[0].Value);
+
+        builder = visitor.Visit(x => x(x(x.Alpha).x(x(" = ")).x(null))); // Enforced...
+        Assert.Equal("[Alpha] = NULL", builder.Text);
+        Assert.Empty(builder.Parameters);
+
+        builder = visitor.Visit(x => x(x.Alpha)(x.Beta)(x(" = ").x(null))); // 1st level at the beginning...
         Assert.Equal("[Alpha][Beta] = NULL", builder.Text);
         Assert.Empty(builder.Parameters);
     }
+
+    // -----------------------------------------------------
 
     //[Enforced]
     [Fact]
@@ -454,23 +481,19 @@ public static class Test_DbTokenVisitor_Dynamics
         Assert.Equal("[Alpha]", builder.Text);
         Assert.Empty(builder.Parameters);
 
-        builder = visitor.Visit(x => x.Alpha.x(x(" >= "), 50));
+        builder = visitor.Visit(x => x.Alpha.x(x(" >= "), "any"));
         Assert.Equal("[Alpha] >= #0", builder.Text);
-        Assert.Single(builder.Parameters);
-        Assert.Equal("#0", builder.Parameters[0].Name); Assert.Equal(50, builder.Parameters[0].Value);
-
-        builder = visitor.Visit(x => x.Alpha.x(x(), "any"));
-        Assert.Equal("[Alpha]#0", builder.Text);
         Assert.Single(builder.Parameters);
         Assert.Equal("#0", builder.Parameters[0].Name); Assert.Equal("any", builder.Parameters[0].Value);
 
-        builder = visitor.Visit(x => x.Alpha.x(".").Id);
-        Assert.Equal("[Alpha].[Id]", builder.Text);
-        Assert.Empty(builder.Parameters);
+        builder = visitor.Visit(x => x.Alpha.x(x(" >= ")).x("any")); // '>=' needs enforced escape
+        Assert.Equal("[Alpha] >= #0", builder.Text);
+        Assert.Single(builder.Parameters);
+        Assert.Equal("#0", builder.Parameters[0].Name); Assert.Equal("any", builder.Parameters[0].Value);
 
         // Interception of dynamic argument's name as method name is case sensitive...
-        builder = visitor.Visit(x => x.Alpha.X("."));
-        Assert.Equal("[Alpha].X(#0)", builder.Text);
+        builder = visitor.Visit(x => x.X("."));
+        Assert.Equal("X(#0)", builder.Text);
         Assert.Single(builder.Parameters);
         Assert.Equal(".", builder.Parameters[0].Value);
     }
@@ -496,28 +519,6 @@ public static class Test_DbTokenVisitor_Dynamics
 
         builder = visitor.Visit(x => x("any"));
         Assert.Equal("any", builder.Text);
-        Assert.Empty(builder.Parameters);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_Literal_From_Invoke()
-    {
-        var engine = new FakeEngine();
-        var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
-        ICommandInfo.IBuilder builder;
-
-        builder = visitor.Visit(x => x("any"));
-        Assert.Equal("any", builder.Text);
-        Assert.Empty(builder.Parameters);
-
-        builder = visitor.Visit(x => x.First.x("Name"));
-        Assert.Equal("[First]Name", builder.Text);
-        Assert.Empty(builder.Parameters);
-
-        builder = visitor.Visit(x => x(x.First, x("Name")));
-        Assert.Equal("[First]Name", builder.Text);
         Assert.Empty(builder.Parameters);
     }
 

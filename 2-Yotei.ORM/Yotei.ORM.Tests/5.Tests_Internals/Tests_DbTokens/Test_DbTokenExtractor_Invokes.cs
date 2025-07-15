@@ -48,13 +48,13 @@ public static class Test_DbTokenExtractor_Invokes
         result = source.ExtractHeadInvokes(out removed);
         Assert.NotSame(source, result);
         Assert.IsType<DbTokenArgument>(result); Assert.Equal("x", result.ToString());
-        Assert.IsType<DbTokenInvoke>(removed); Assert.Equal("x(h1, h2)", removed.ToString());
+        Assert.IsType<DbTokenInvoke>(removed); Assert.Equal("x(h1, 'h2')", removed.ToString());
 
-        source = DbLambdaParser.Parse(engine, x => x("h1").x("h2"));
+        source = DbLambdaParser.Parse(engine, x => x("h1").x(x("h2")));
         result = source.ExtractHeadInvokes(out removed);
         Assert.NotSame(source, result);
         Assert.IsType<DbTokenArgument>(result); Assert.Equal("x", result.ToString());
-        Assert.IsType<DbTokenInvoke>(removed); Assert.Equal("x(h1, h2)", removed.ToString());
+        Assert.IsType<DbTokenInvoke>(removed); Assert.Equal("x(h1, x(h2))", removed.ToString());
     }
 
     //[Enforced]
@@ -68,7 +68,7 @@ public static class Test_DbTokenExtractor_Invokes
         source = DbLambdaParser.Parse(engine, x => x("h1")("h2"));
         result = source.ExtractHeadInvokes(out removed, recurrent: false);
         Assert.NotSame(source, result);
-        Assert.IsType<DbTokenInvoke>(result); Assert.Equal("x(h2)", result.ToString());
+        Assert.IsType<DbTokenInvoke>(result); Assert.Equal("x('h2')", result.ToString());
         Assert.IsType<DbTokenInvoke>(removed); Assert.Equal("x(h1)", removed.ToString());
     }
 
@@ -89,14 +89,14 @@ public static class Test_DbTokenExtractor_Invokes
         source = DbLambdaParser.Parse(engine, x => x("h1").b1.x("t1"));
         result = source.ExtractHeadInvokes(out removed);
         Assert.NotSame(source, result);
-        Assert.IsType<DbTokenInvoke>(result); Assert.Equal("x.[b1](t1)", result.ToString());
+        Assert.IsType<DbTokenInvoke>(result); Assert.Equal("x.[b1]('t1')", result.ToString());
         Assert.IsType<DbTokenInvoke>(removed); Assert.Equal("x(h1)", removed.ToString());
 
         source = DbLambdaParser.Parse(engine, x => x("h1")("h2").b1.b2.x("t1"));
         result = source.ExtractHeadInvokes(out removed);
         Assert.NotSame(source, result);
-        Assert.IsType<DbTokenInvoke>(result); Assert.Equal("x.[b1].[b2](t1)", result.ToString());
-        Assert.IsType<DbTokenInvoke>(removed); Assert.Equal("x(h1, h2)", removed.ToString());
+        Assert.IsType<DbTokenInvoke>(result); Assert.Equal("x.[b1].[b2]('t1')", result.ToString());
+        Assert.IsType<DbTokenInvoke>(removed); Assert.Equal("x(h1, 'h2')", removed.ToString());
     }
 
     //[Enforced]
@@ -110,7 +110,7 @@ public static class Test_DbTokenExtractor_Invokes
         source = DbLambdaParser.Parse(engine, x => x("h1")("h2").b1.b2.x("t1"));
         result = source.ExtractHeadInvokes(out removed, recurrent: false);
         Assert.NotSame(source, result);
-        Assert.IsType<DbTokenInvoke>(result); Assert.Equal("x(h2).[b1].[b2](t1)", result.ToString());
+        Assert.IsType<DbTokenInvoke>(result); Assert.Equal("x('h2').[b1].[b2]('t1')", result.ToString());
         Assert.IsType<DbTokenInvoke>(removed); Assert.Equal("x(h1)", removed.ToString());
     }
 
@@ -158,13 +158,13 @@ public static class Test_DbTokenExtractor_Invokes
         result = source.ExtractTailInvokes(out removed);
         Assert.NotSame(source, result);
         Assert.IsType<DbTokenArgument>(result); Assert.Equal("x", result.ToString());
-        Assert.IsType<DbTokenInvoke>(removed); Assert.Equal("x(t1, t2)", removed.ToString());
+        Assert.IsType<DbTokenInvoke>(removed); Assert.Equal("x(t1, 't2')", removed.ToString());
 
         source = DbLambdaParser.Parse(engine, x => x("t1").x("t2"));
         result = source.ExtractTailInvokes(out removed);
         Assert.NotSame(source, result);
         Assert.IsType<DbTokenArgument>(result); Assert.Equal("x", result.ToString());
-        Assert.IsType<DbTokenInvoke>(removed); Assert.Equal("x(t1, t2)", removed.ToString());
+        Assert.IsType<DbTokenInvoke>(removed); Assert.Equal("x(t1, 't2')", removed.ToString());
     }
 
     //[Enforced]
@@ -179,7 +179,7 @@ public static class Test_DbTokenExtractor_Invokes
         result = source.ExtractTailInvokes(out removed, recurrent: false);
         Assert.NotSame(source, result);
         Assert.IsType<DbTokenInvoke>(result); Assert.Equal("x(t1)", result.ToString());
-        Assert.IsType<DbTokenInvoke>(removed); Assert.Equal("x(t2)", removed.ToString());
+        Assert.IsType<DbTokenInvoke>(removed); Assert.Equal("x('t2')", removed.ToString());
     }
 
     //[Enforced]
@@ -194,20 +194,21 @@ public static class Test_DbTokenExtractor_Invokes
         result = source.ExtractTailInvokes(out removed);
         Assert.NotSame(source, result);
         Assert.IsType<DbTokenIdentifier>(result); Assert.Equal("x.[b1]", result.ToString());
-        Assert.IsType<DbTokenInvoke>(removed); Assert.Equal("x(t1)", removed.ToString());
+        Assert.IsType<DbTokenInvoke>(removed); Assert.Equal("x('t1')", removed.ToString());
 
         source = DbLambdaParser.Parse(engine, x => x("h1").b1.x("t1"));
         result = source.ExtractTailInvokes(out removed);
         Assert.NotSame(source, result);
         Assert.IsType<DbTokenIdentifier>(result); Assert.Equal("x(h1).[b1]", result.ToString());
-        Assert.IsType<DbTokenInvoke>(removed); Assert.Equal("x(t1)", removed.ToString());
+        Assert.IsType<DbTokenInvoke>(removed); Assert.Equal("x('t1')", removed.ToString());
 
         source = DbLambdaParser.Parse(engine, x => x("h1").b1.b2.x("t1").x("t2"));
         result = source.ExtractTailInvokes(out removed);
         Assert.NotSame(source, result);
         Assert.IsType<DbTokenIdentifier>(result); Assert.Equal("x(h1).[b1].[b2]", result.ToString());
-        Assert.IsType<DbTokenInvoke>(removed); Assert.Equal("x(t1, t2)", removed.ToString());
+        Assert.IsType<DbTokenInvoke>(removed); Assert.Equal("x('t1', 't2')", removed.ToString());
     }
+
 
     //[Enforced]
     [Fact]
@@ -220,7 +221,8 @@ public static class Test_DbTokenExtractor_Invokes
         source = DbLambdaParser.Parse(engine, x => x("h1").b1.b2.x("t1").x("t2"));
         result = source.ExtractTailInvokes(out removed, recurrent: false);
         Assert.NotSame(source, result);
-        Assert.IsType<DbTokenInvoke>(result); Assert.Equal("x(h1).[b1].[b2](t1)", result.ToString());
-        Assert.IsType<DbTokenInvoke>(removed); Assert.Equal("x(t2)", removed.ToString());
+        Assert.IsType<DbTokenInvoke>(result); Assert.Equal("x(h1).[b1].[b2]('t1')", result.ToString());
+        Assert.IsType<DbTokenInvoke>(removed); Assert.Equal("x('t2')", removed.ToString());
     }
+
 }

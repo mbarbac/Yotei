@@ -201,19 +201,29 @@ public static class Test_FragmentGroupBy
         ICommandInfo.IBuilder builder;
 
         master = new(command);
-        master.Capture(x => x.Extract(x("YEAR FROM ").x("007")));
+        master.Capture(x => x.Extract(x("YEAR FROM ").x("007"))); // '007' not 1st-level escaped...
         Assert.Single(master);
         entry = Assert.IsType<FragmentGroupBy.Entry>(master[0]);
         Assert.IsType<DbTokenMethod>(entry.Body);
-        Assert.Equal("x.Extract(x(YEAR FROM )(007))", entry.Body.ToString());
+        Assert.Equal("x.Extract(x(YEAR FROM )('007'))", entry.Body.ToString());
+
+        builder = master.Visit();
+        Assert.Equal("Extract(YEAR FROM #0)", builder.Text);
+        Assert.Single(builder.Parameters);
+        Assert.Equal("007", builder.Parameters[0].Value);
+
+        master = new(command);
+        master.Capture(x => x.Extract(x("YEAR FROM ").x(x("007")))); // '007' 1st-level escaped...
+        Assert.Single(master);
+        entry = Assert.IsType<FragmentGroupBy.Entry>(master[0]);
+        Assert.IsType<DbTokenMethod>(entry.Body);
+        Assert.Equal("x.Extract(x(YEAR FROM )(x(007)))", entry.Body.ToString());
 
         builder = master.Visit();
         Assert.Equal("Extract(YEAR FROM 007)", builder.Text);
         Assert.Empty(builder.Parameters);
     }
 
-    /*
-    
     //[Enforced]
     [Fact]
     public static void Test_Dynamic_Invalid()
@@ -327,5 +337,4 @@ public static class Test_FragmentGroupBy
         builder = master.Visit();
         Assert.True(builder.IsEmpty);
     }
-    */
 }
