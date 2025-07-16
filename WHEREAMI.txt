@@ -1,3 +1,9 @@
+TODO:
+- Hacer que las API devuelvan los interfaces, y no las concrete implementations.
+  La idea es simplificar el API surface.
+  Empezar por los generadores.
+  Y luego todo el resto de los API.
+
 OPTIMIZATIONS:
 
 - In Yotei.Tools, CharExtensions: equality using a IEqualityComparer<string> allocates two
