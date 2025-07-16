@@ -24,6 +24,43 @@ public static partial class Fragment
         {
             Master = master.ThrowWhenNull();
             Body = body.ThrowWhenNull();
+
+            // Literal tokens...
+            if (Body is DbTokenLiteral literal)
+            {
+                var main = literal.Value;
+
+                if (main.Contains(Environment.NewLine))
+                {
+                    main = main.Replace(Environment.NewLine, " ");
+                    Body = new DbTokenLiteral(main);
+                }
+                else if (main.Contains('\n'))
+                {
+                    main = main.Replace('\n', ' ');
+                    Body = new DbTokenLiteral(main);
+                }
+            }
+
+            // Command-info tokens...
+            if (Body is DbTokenCommandInfo command)
+            {
+                var info = command.CommandInfo;
+                var main = info.Text;
+
+                if (main.Contains(Environment.NewLine))
+                {
+                    main = main.Replace(Environment.NewLine, " ");
+                    info = new CommandInfo(Engine, main, info.Parameters);
+                    Body = new DbTokenCommandInfo(info);
+                }
+                else if (main.Contains('\n'))
+                {
+                    main = main.Replace('\n', ' ');
+                    info = new CommandInfo(Engine, main, info.Parameters);
+                    Body = new DbTokenCommandInfo(info);
+                }
+            }
         }
 
         /// <summary>

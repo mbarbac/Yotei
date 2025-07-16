@@ -10,7 +10,7 @@ public partial interface IRawCommand : ICommand, IEnumerableCommand, IExecutable
 {
     /// <summary>
     /// Appends to this instance the contents obtained from parsing the given dynamic lambda
-    /// expression.
+    /// expression, and an optional collection of arguments.
     /// <br/> If an optional collection of arguments is provided, then the specification must
     /// resolve to a string, and those arguments must be encoded in that string using either a
     /// positional '{n}' or named '{name}' specification. If it is provided but the expression

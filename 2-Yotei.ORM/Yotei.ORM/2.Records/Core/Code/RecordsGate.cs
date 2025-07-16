@@ -43,4 +43,13 @@ public abstract class RecordsGate : IRecordsGate
             useTerminators,
             rangeSeparator);
     }
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public virtual IRawCommand Raw() => new RawCommand(Connection);
+
+    /// <inheritdoc/>
+    public virtual IRawCommand Raw(
+        Func<dynamic, object> spec, params object?[]? args) => new RawCommand(Connection, spec, args);
 }

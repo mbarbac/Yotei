@@ -49,8 +49,10 @@ public abstract partial class EnumerableCommand : Command, IEnumerableCommand
     /// <remarks>
     /// We cannot determine up-front if the contents of this abstract command, along with the
     /// capabilities of the underlying database engine, will support native paging or not. So,
-    /// this property is made virtual to be overriden as needed, and in addition, it can be
-    /// init-set to true/false.
+    /// this property is made virtual to be overriden as needed.
+    /// <br/> Its default value is <c>false</c>, so even if the engine supports native paging,
+    /// it will be emulated by the framework. If init-set to <c>true</c>, then the engine's value
+    /// determines if it will be emulated or not.
     /// </remarks>
     public virtual bool SupportsNativePaging
     {
