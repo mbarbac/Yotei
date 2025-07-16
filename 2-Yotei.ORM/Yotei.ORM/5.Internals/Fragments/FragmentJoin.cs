@@ -2,6 +2,8 @@
 #pragma warning disable IDE0042
 #pragma warning disable IDE1006
 
+using System.Net.WebSockets;
+
 namespace Yotei.ORM.Internals;
 
 /// <summary>
@@ -28,57 +30,123 @@ public static partial class FragmentJoin
             // Literals...
             if (Body is DbTokenLiteral literal)
             {
-                //var main = literal.Value;
-                //var parts = Extractor.LastSeparator(main, Engine, true, out var found, "AS");
-                //if (found)
-                //{
-                //    main = parts.Left.NotNullNotEmpty();
-                //    Body = new DbTokenLiteral(main);
-                //    Alias = parts.Right.NotNullNotEmpty();
-                //    AsSpec = parts.Spec;
-                //}
-                //parts = Extractor.FirstSeparator(main, Engine, false, out found, ".* ");
-                //if (found)
-                //{
-                //    parts.Left = parts.Left.NotNullNotEmpty();
-                //    parts.Right = parts.Right.Trim();
-
-                //    main = $"{parts.Left} {parts.Right}".NotNullNotEmpty();
-                //    Body = new DbTokenLiteral(main);
-                //    AllColumns = true;
-                //}
+                var main = literal.Value;
+                var twoparts = Extractor.Head(main, Engine, true, out var found, JoinSpecs);
+                if (found)
+                {
+                    Body = new DbTokenLiteral(main = twoparts.Main.NotNullNotEmpty());
+                    JoinType = twoparts.Spec;
+                }
+                var parts = Extractor.LastSeparator(main, Engine, true, out found, "ON");
+                if (found)
+                {
+                    Body = new DbTokenLiteral(main = parts.Left.NotNullNotEmpty());
+                    Condition = new DbTokenLiteral(parts.Right.NotNullNotEmpty());
+                    OnSpec = parts.Spec;
+                }
+                parts = Extractor.LastSeparator(main, Engine, true, out found, "AS");
+                if (found)
+                {
+                    Body = new DbTokenLiteral(parts.Left.NotNullNotEmpty());
+                    Alias = parts.Right.NotNullNotEmpty();
+                    AsSpec = parts.Spec;
+                }
             }
 
             // Command-info...
             if (Body is DbTokenCommandInfo command)
             {
-                //var info = command.CommandInfo;
-                //var main = info.Text;
+                var sensitive = Engine.CaseSensitiveNames;
+                var info = command.CommandInfo;
+                var main = info.Text;
 
-                //var parts = Extractor.LastSeparator(main, Engine, true, out var found, "AS");
-                //if (found)
-                //{
-                //    main = parts.Left.NotNullNotEmpty();
-                //    info = new CommandInfo(Engine, main, info.Parameters);
-                //    Body = new DbTokenCommandInfo(info);
-                //    Alias = parts.Right.NotNullNotEmpty();
-                //    AsSpec = parts.Spec;
-                //}
-                //parts = Extractor.FirstSeparator(main, Engine, false, out found, ".* ");
-                //if (found)
-                //{
-                //    parts.Left = parts.Left.NotNullNotEmpty();
-                //    parts.Right = parts.Right.Trim();
+                var twoparts = Extractor.Head(main, Engine, true, out var found, JoinSpecs);
+                if (found)
+                {
+                    main = twoparts.Main.NotNullNotEmpty();
+                    info = new CommandInfo(Engine, main, info.Parameters);
+                    Body = new DbTokenCommandInfo(info);
+                    JoinType = twoparts.Spec;
+                }
+                var parts = Extractor.LastSeparator(main, Engine, true, out found, "ON");
+                if (found)
+                {
+                    var items = Distribute(ref parts.Left, ref parts.Right, sensitive, info.Parameters);
+                    main = parts.Left.NotNullNotEmpty();
+                    info = new CommandInfo(Engine, main, items.Left.ToArray());
+                    Body = new DbTokenCommandInfo(info);
 
-                //    main = $"{parts.Left} {parts.Right}".NotNullNotEmpty();
-                //    info = new CommandInfo(Engine, main, info.Parameters);
-                //    Body = new DbTokenCommandInfo(info);
-                //    AllColumns = true;
-                //}
+                    var temp = parts.Right.NotNullNotEmpty();
+                    var xinfo = new CommandInfo(Engine, temp, items.Right.ToArray());
+                    Condition = new DbTokenCommandInfo(xinfo);
+                    OnSpec = parts.Spec;
+                }
+                parts = Extractor.LastSeparator(main, Engine, true, out found, "AS");
+                if (found)
+                {
+                    main = parts.Left.NotNullNotEmpty();
+                    info = new CommandInfo(Engine, main, info.Parameters);
+                    Body = new DbTokenCommandInfo(info);
+                    Alias = parts.Right.NotNullNotEmpty();
+                    AsSpec = parts.Spec;
+                }
             }
 
             // Any other token is just accepted, even empty ones...
             return;
+        }
+
+        /// <summary>
+        /// Invoked to distribute the given collection of parameters from the main and condition
+        /// strings to their respective lists. In addition, both string are updated so that they
+        /// can be used to build new command-info objects.
+        /// </summary>
+        static (List<IParameter> Left, List<IParameter> Right) Distribute(
+            ref string main, ref string condition, bool sensitive, IEnumerable<IParameter> parameters)
+        {
+            List<IParameter> left = [];
+            List<IParameter> right = [];
+            List<IParameter> pars = parameters.ToList();
+
+            for (int i = 0; i < pars.Count; i++)
+            {
+                var index = -1;
+                var par = pars[i];
+
+                if ((index = main.FindIsolated(par.Name, 0, sensitive)) >= 0)
+                {
+                    var temp = left.Find(x => string.Compare(x.Name, par.Name, !sensitive) == 0);
+                    if (temp is null) { left.Add(par); pars.RemoveAt(i); i--; }
+
+                    temp = right.Find(x => string.Compare(x.Name, par.Name, !sensitive) == 0);
+                    if (temp is not null) throw new ArgumentException(
+                        "Same argument cannot appear both in main and condition.")
+                        .WithData(main)
+                        .WithData(condition);
+                }
+                if ((index = condition.FindIsolated(par.Name, 0, sensitive)) >= 0)
+                {
+                    var temp = right.Find(x => string.Compare(x.Name, par.Name, !sensitive) == 0);
+                    if (temp is null) { right.Add(par); pars.RemoveAt(i); i--; }
+
+                    temp = left.Find(x => string.Compare(x.Name, par.Name, !sensitive) == 0);
+                    if (temp is not null) throw new ArgumentException(
+                        "Same argument cannot appear both in main and condition.")
+                        .WithData(main)
+                        .WithData(condition);
+                }
+            }
+
+            if (pars.Count > 0) throw new ArgumentException(
+                "Some parameters have not been distributed.")
+                .WithData(pars)
+                .WithData(main)
+                .WithData(condition);
+
+            var comparison = sensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+            main = CommandInfo.Builder.NamesToOrdinalBrackets(main, left, comparison)!;
+            condition = CommandInfo.Builder.NamesToOrdinalBrackets(condition, right, comparison)!;
+            return (left, right);
         }
 
         /// <summary>
@@ -99,7 +167,7 @@ public static partial class FragmentJoin
         /// </summary>
         public string? JoinType
         {
-            get => _JoinType;
+            get => _JoinType ?? "JOIN";
             init => _JoinType = value;
         }
         internal protected string? _JoinType
@@ -108,6 +176,17 @@ public static partial class FragmentJoin
             set => __JoinType = value?.NotNullNotEmpty(trim: true);
         }
         internal string? __JoinType;
+
+        internal readonly static string[] JoinSpecs =
+        {
+            "JOIN",
+            "INNER JOIN",
+            "LEFT JOIN",
+            "RIGHT JOIN",
+            "SELF JOIN",
+            "CROSS JOIN",
+            "FULL OUTER JOIN", "LEFT OUTER JOIN", "RIGHT OUTER JOIN", "OUTER JOIN",
+        };
 
         /// <summary>
         /// The alias that qualifies the source, if any.
@@ -129,7 +208,7 @@ public static partial class FragmentJoin
         /// </summary>
         public string? AsSpec
         {
-            get => _AsSpec ?? "ON";
+            get => _AsSpec ?? "AS";
             init => _AsSpec = value;
         }
         internal protected string? _AsSpec
@@ -154,7 +233,7 @@ public static partial class FragmentJoin
         /// </summary>
         public string? OnSpec
         {
-            get => _OnSpec ?? "AS";
+            get => _OnSpec ?? "ON";
             init => _OnSpec = value;
         }
         internal protected string? _OnSpec
@@ -171,7 +250,7 @@ public static partial class FragmentJoin
         {
             var str = Body.ToString()!;
 
-            str = $"{JoinType ?? "JOIN"} {str}";
+            str = $"{JoinType} {str}";
             if (Alias is not null) str += $" {AsSpec} {Alias}";
             if (Condition is not null) str += $" {OnSpec} {Condition}";
 
@@ -183,10 +262,14 @@ public static partial class FragmentJoin
         {
             var builder = visitor.Visit(Body);
 
-            builder.ReplaceText($"{JoinType ?? "JOIN"} {builder.Text}");
+            builder.ReplaceText($"{JoinType} {builder.Text}");
             if (Alias is not null) builder.ReplaceText($"{builder.Text} {AsSpec} {Alias}");
-            if (Condition is not null) builder.ReplaceText($"{builder.Text} {OnSpec} {Condition}");
-
+            if (Condition is not null)
+            {
+                var temp = visitor.Visit(Condition);
+                builder.Add($" {OnSpec} ");
+                builder.Add(temp);
+            }
             if (separate) builder.ReplaceText($" {builder.Text}");
             return builder;
         }
@@ -230,12 +313,17 @@ public static partial class FragmentJoin
         public override Entry CreateEntry(IDbToken body)
         {
             // Intercepting 1st-level 'x.Join(...)' method...
+            var comparer = StringComparer.OrdinalIgnoreCase;
             string? jointype = null;
             var item = body.ExtractFirst(x =>
             {
                 if (x is not DbTokenMethod method) return false;
                 if (method.Host is not DbTokenArgument) return false;
-                if (method.Name.ToUpper() is not "JOIN") return false;
+
+                var name = method.Name;
+                var index = name.IndexOf("JOIN", sensitive: false);
+                if (index > 0) name = name.Insert(index, " ");
+                if (!Entry.JoinSpecs.Contains(name, comparer)) return false;
                 return true;
             }
             , out var removed); if (removed is not null)
@@ -246,17 +334,17 @@ public static partial class FragmentJoin
                     $"No type arguments allowed for '{method.Name}()' virtual method.")
                     .WithData(body);
 
-                if (method.Arguments.Count != 1) throw new ArgumentException(
-                    $"'{method.Name}()' needs one and only one argument.")
+                if (method.Arguments.Count != 0) throw new ArgumentException(
+                    $"'{method.Name}()' must be parameterless.")
                     .WithData(body);
 
                 if (item is DbTokenArgument) throw new ArgumentException(
                     "Body cannot just be a join-type specification.")
                     .WithData(body);
 
-                var visitor = Connection.Records.CreateDbTokenVisitor(Command.Locale);
-                var arg = method.Arguments[0];
-                jointype = visitor.TokenToLiteral(arg);
+                jointype = method.Name;
+                var index = jointype.IndexOf("JOIN", sensitive: false);
+                if (index > 0) jointype = jointype.Insert(index, " ");
                 body = item;
             }
 

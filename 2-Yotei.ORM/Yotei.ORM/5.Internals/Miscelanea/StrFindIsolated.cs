@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Yotei.ORM.Internals;
+﻿namespace Yotei.ORM.Internals;
 
 // ========================================================
 public static class StrFindIsolated
@@ -21,12 +19,14 @@ public static class StrFindIsolated
     /// <param name="value"></param>
     /// <param name="ini"></param>
     /// <param name="comparison"></param>
+    /// <param name="semiIsolated"></param>
     /// <param name="heads"></param>
     /// <param name="tails"></param>
     /// <returns></returns>
     public static int FindIsolated(
         this string source, string value, int ini,
         StringComparison comparison,
+        bool semiIsolated = false,
         IEnumerable<char>? heads = null,
         IEnumerable<char>? tails = null)
     {
@@ -40,19 +40,25 @@ public static class StrFindIsolated
         tails ??= SEPARATORS;
 
         var pos = source.IndexOf(value, ini, comparison);
-        if (pos < 0) return -1;
-
-        if (pos > 0)
+        if (pos >= 0)
         {
-            var c = source[pos - 1];
-            if (!heads.Contains(c)) return -1;
-        }
+            var hdone = true;
+            if (pos > 0)
+            {
+                var c = source[pos - 1];
+                if (!heads.Contains(c)) hdone = false;
+            }
 
-        var len = pos + value.Length;
-        if (len < source.Length)
-        {
-            var c = source[len];
-            if (!tails.Contains(c)) return -1;
+            var tdone = true;
+            var len = pos + value.Length;
+            if (len < source.Length)
+            {
+                var c = source[len];
+                if (!tails.Contains(c)) tdone = false;
+            }
+
+            if (semiIsolated) { if (!hdone && !tdone) return -1; }
+            else { if (!hdone || !tdone) return -1; }
         }
 
         return pos;
@@ -69,16 +75,18 @@ public static class StrFindIsolated
     /// <param name="value"></param>
     /// <param name="ini"></param>
     /// <param name="sensitive"></param>
+    /// <param name="semiIsolated"></param>
     /// <param name="heads"></param>
     /// <param name="tails"></param>
     /// <returns></returns>
     public static int FindIsolated(
         this string source, string value, int ini,
         bool sensitive,
+        bool semiIsolated = false,
         IEnumerable<char>? heads = null,
         IEnumerable<char>? tails = null)
     {
         var comparison = sensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
-        return source.FindIsolated(value, ini, comparison, heads, tails);
+        return source.FindIsolated(value, ini, comparison, semiIsolated, heads, tails);
     }
 }

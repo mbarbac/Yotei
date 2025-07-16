@@ -275,40 +275,12 @@ partial record class DbTokenVisitor
                 }
             }
             
-            text = NamesToOrdinalBrackets(text, pars, comparison);
+            text = CommandInfo.Builder.NamesToOrdinalBrackets(text, pars, comparison);
             builder.Clear();
             builder.Add(text, pars.ToArray());
         }
 
         return builder;
-    }
-
-    // Translates parameter names to ordinal brackets {n}.
-    // TODO: This code actually is a copy of the original one in CommandInfo.Builder. It would be
-    // nice to refactor.
-    static string? NamesToOrdinalBrackets(
-        string? text,
-        IEnumerable<IParameter> pars, StringComparison comparison)
-    {
-        if (text is not null && text.Length > 0)
-        {
-            var i = 0;
-            foreach (var par in pars)
-            {
-                var bracket = $"{{{i}}}"; i++;
-                var name = par.Name;
-                var pos = 0;
-
-                while ((pos = text.FindIsolated(name, pos, comparison)) >= 0)
-                {
-                    text = text.Remove(pos, par.Name.Length);
-                    text = text.Insert(pos, bracket);
-                    pos += bracket.Length;
-                }
-            }
-        }
-
-        return text;
     }
 
     // ----------------------------------------------------

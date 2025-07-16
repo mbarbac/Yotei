@@ -62,6 +62,8 @@ public static class Test_FragmentSetter
         Assert.Empty(builder.Parameters);
     }
 
+    // ----------------------------------------------------
+
     //[Enforced]
     [Fact]
     public static void Test_Literal_Invoke()
@@ -90,6 +92,8 @@ public static class Test_FragmentSetter
         Assert.Equal("(other)", builder.Text);
         Assert.Empty(builder.Parameters);
     }
+
+    // ----------------------------------------------------
 
     //[Enforced]
     [Fact]
@@ -150,6 +154,8 @@ public static class Test_FragmentSetter
         Assert.Single(builder.Parameters);
         Assert.Equal("007", builder.Parameters[0].Value);
     }
+
+    // ----------------------------------------------------
 
     //[Enforced]
     [Fact]

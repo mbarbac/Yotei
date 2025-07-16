@@ -72,4 +72,34 @@ public static class Test_StrFindIsolated
         source = "any xx other";
         index = source.FindIsolated(value, 1, false); Assert.Equal(4, index);
     }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Semi_Isolated()
+    {
+        var semi = true;
+        var value = "xx";
+        var source = "xxABC";
+        var index = source.FindIsolated(value, 0, false, semi); Assert.Equal(0, index);
+
+        source = " xxABC";
+        index = source.FindIsolated(value, 0, false, semi); Assert.Equal(1, index);
+
+        source = "ABCxx";
+        index = source.FindIsolated(value, 0, false, semi); Assert.Equal(3, index);
+
+        source = "ABCxx ";
+        index = source.FindIsolated(value, 0, false, semi); Assert.Equal(3, index);
+
+        source = "ABCxxEF";
+        index = source.FindIsolated(value, 0, false, semi); Assert.Equal(-1, index);
+
+        source = "ABCxx EF";
+        index = source.FindIsolated(value, 0, false, semi); Assert.Equal(3, index); 
+        
+        source = "ABC xxEF";
+        index = source.FindIsolated(value, 0, false, semi); Assert.Equal(4, index);
+    }
 }
