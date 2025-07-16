@@ -8,12 +8,29 @@ public static class Test_CommandEnumerator
 {
     //[Enforced]
     [Fact]
-    public static void Test_()
+    public static async Task Test_As_Enumerable_With_CancellationToken()
     {
-        var connection = new FakeConnection(new FakeEngine());
-        var command = new FakeCommand(connection);
-        var records = new Record[] { new(["a1"]), new(["a2"]) };
+        var engine = new FakeEngine();
+        var connection = new FakeConnection(engine);
+        var command = new FakeEnumerableCommand(connection);
+        var records = new List<Record> { new(["a1"]), new(["a2"]) };
+        var schema = new Schema(engine, [new SchemaEntry(engine, "Id")]);
 
         var iter = new FakeCommandEnumerator(command);
+        iter.FakeRecords.AddRange(records);
+        iter.FakeSchema = schema;
+
+        var cts = new CancellationTokenSource(50 * 1000);
+        var token = cts.Token;
+
+        var results = new List<IRecord>();
+        await foreach (var record in iter.WithCancellation(token))
+            if (record is not null) results.Add(record);
+
+        Assert.Equal(records.Count, results.Count);
+
+        return;
     }
+
+    // ----------------------------------------------------
 }

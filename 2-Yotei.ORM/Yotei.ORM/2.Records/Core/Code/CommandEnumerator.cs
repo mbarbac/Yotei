@@ -43,7 +43,11 @@ public abstract class CommandEnumerator : DisposableClass, ICommandEnumerator
     IEnumerator IEnumerable.GetEnumerator() => this;
 
     /// <inheritdoc/>
-    public IAsyncEnumerator<IRecord?> GetAsyncEnumerator(CancellationToken cancellationToken = default) => this;
+    public IAsyncEnumerator<IRecord?> GetAsyncEnumerator(CancellationToken token = default)
+    {
+        CancellationToken = token;
+        return this;
+    }
 
     // ----------------------------------------------------
 

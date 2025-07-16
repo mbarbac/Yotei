@@ -15,4 +15,9 @@ public partial interface IExecutableCommand : ICommand
     /// </summary>
     /// <returns></returns>
     ICommandExecutor GetExecutor();
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc cref="ICommand.Clear"/>
+    new IExecutableCommand Clear();
 }
