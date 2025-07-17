@@ -1,7 +1,4 @@
-﻿
-using System.Security;
-
-namespace Yotei.Tools;
+﻿namespace Yotei.Tools;
 
 // ========================================================
 public static class CharExtensions

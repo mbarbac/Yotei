@@ -12,8 +12,7 @@ public interface IDisposableEx : IDisposable, IAsyncDisposable
     bool IsDisposed { get; }
     
     /// <summary>
-    /// Determines if this instance is being disposed when the value of this property was
-    /// obtained, or not.
+    /// Determines if this instance is being disposed at this very moment, or not.
     /// </summary>
     bool OnDisposing { get; }
 

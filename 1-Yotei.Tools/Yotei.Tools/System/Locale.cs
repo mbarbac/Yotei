@@ -1,4 +1,4 @@
-﻿using SpanChar = System.ReadOnlySpan<char>;
+﻿using StrSpan = System.ReadOnlySpan<char>;
 
 namespace Yotei.Tools;
 
@@ -7,8 +7,8 @@ namespace Yotei.Tools;
 /// Represents an immutable collection of culture sensitive settings and related methods.
 /// </summary>
 public sealed record class Locale
-    : IComparer<string?>, IComparer<char>, IComparer<SpanChar>
-    , IEqualityComparer<string?>, IEqualityComparer<char>, IEqualityComparer<SpanChar>
+    : IComparer<string?>, IComparer<char>, IComparer<StrSpan>
+    , IEqualityComparer<string?>, IEqualityComparer<char>, IEqualityComparer<StrSpan>
 {
     /// <summary>
     /// Initializes a new instance using the culture of the current thread and default comparison
@@ -89,7 +89,7 @@ public sealed record class Locale
     public int Compare(char x, char y) => Compare(x.ToString(), y.ToString());
 
     /// <inheritdoc/>
-    public int Compare(SpanChar x, SpanChar y) => CultureInfo.CompareInfo.Compare(x, y, CompareOptions);
+    public int Compare(StrSpan x, StrSpan y) => CultureInfo.CompareInfo.Compare(x, y, CompareOptions);
 
     // ----------------------------------------------------
 
@@ -100,7 +100,7 @@ public sealed record class Locale
     public bool Equals(char x, char y) => Compare(x, y) == 0;
 
     /// <inheritdoc/>
-    public bool Equals(SpanChar x, SpanChar y) => Compare(x, y) == 0;
+    public bool Equals(StrSpan x, StrSpan y) => Compare(x, y) == 0;
 
     // ----------------------------------------------------
 
@@ -111,43 +111,43 @@ public sealed record class Locale
     public int GetHashCode([DisallowNull] char obj) => obj.GetHashCode();
 
     /// <inheritdoc/>
-    public int GetHashCode([DisallowNull] SpanChar obj) => obj.ToString().GetHashCode();
+    public int GetHashCode([DisallowNull] StrSpan obj) => obj.ToString().GetHashCode();
 
     // ----------------------------------------------------
 
     /// <inheritdoc cref="CompareInfo.IsPrefix(string, string)"/>
-    public bool StartsWith(SpanChar source, char value) => StartsWith(source, value.ToString());
+    public bool StartsWith(StrSpan source, char value) => StartsWith(source, value.ToString());
 
     /// <inheritdoc cref="CompareInfo.IsPrefix(string, string)"/>
     public bool StartsWith(
-        SpanChar source, SpanChar value) => CultureInfo.CompareInfo.IsPrefix(source, value, CompareOptions);
+        StrSpan source, StrSpan value) => CultureInfo.CompareInfo.IsPrefix(source, value, CompareOptions);
 
     // ----------------------------------------------------
 
     /// <inheritdoc cref="CompareInfo.IsSuffix(string, string)"/>
-    public bool EndsWith(SpanChar source, char value) => EndsWith(source, value.ToString());
+    public bool EndsWith(StrSpan source, char value) => EndsWith(source, value.ToString());
 
     /// <inheritdoc cref="CompareInfo.IsSuffix(string, string)"/>
     public bool EndsWith(
-        SpanChar source, SpanChar value) => CultureInfo.CompareInfo.IsSuffix(source, value, CompareOptions);
+        StrSpan source, StrSpan value) => CultureInfo.CompareInfo.IsSuffix(source, value, CompareOptions);
 
     // ----------------------------------------------------
 
     /// <inheritdoc cref="CompareInfo.IndexOf(string, string)"/>
-    public int IndexOf(SpanChar source, char value) => IndexOf(source, value.ToString());
+    public int IndexOf(StrSpan source, char value) => IndexOf(source, value.ToString());
 
     /// <inheritdoc cref="CompareInfo.IndexOf(string, string)"/>
     public int IndexOf(
-        SpanChar source, SpanChar value) => CultureInfo.CompareInfo.IndexOf(source, value, CompareOptions);
+        StrSpan source, StrSpan value) => CultureInfo.CompareInfo.IndexOf(source, value, CompareOptions);
 
     // ----------------------------------------------------
 
     /// <inheritdoc cref="CompareInfo.LastIndexOf(string, string)"/>
-    public int LastIndexOf(SpanChar source, char value) => LastIndexOf(source, value.ToString());
+    public int LastIndexOf(StrSpan source, char value) => LastIndexOf(source, value.ToString());
 
     /// <inheritdoc cref="CompareInfo.LastIndexOf(string, string)"/>
     public int LastIndexOf(
-        SpanChar source, SpanChar value) => CultureInfo.CompareInfo.LastIndexOf(source, value, CompareOptions);
+        StrSpan source, StrSpan value) => CultureInfo.CompareInfo.LastIndexOf(source, value, CompareOptions);
 
     // ----------------------------------------------------
 
