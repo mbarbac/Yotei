@@ -1,10 +1,13 @@
 TODO:
-- Hacer que las API devuelvan los interfaces, y no las concrete implementations.
-  La idea es simplificar el API surface.
-  Empezar por los generadores.
-  Y luego todo el resto de los API.
 
 OPTIMIZATIONS:
+
+- En Yotei.ORM, hacer que las collections y otras API devuelvan las interfaces, en vez de los
+  tipos concretos donde son implementadas. La idea es simplificar las API. Sería empezar por
+  los generadores de las collection, y luego el resto de los API.
+  NOTA: DbTokenChain no define (y por tanto no implementa) una interfaz tipo collection. O sea,
+  que en estos casos deberíamos hacer que el override sea al tipo concreto, y no al interfaz
+  que haya implementado.
 
 - In Yotei.Tools, CharExtensions: equality using a IEqualityComparer<string> allocates two
   strings (one per each character). See if it can be optimized using stackalloc or similar.

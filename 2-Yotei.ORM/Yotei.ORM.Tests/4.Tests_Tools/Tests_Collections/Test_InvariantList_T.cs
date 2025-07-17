@@ -35,7 +35,9 @@ public static partial class Test_InvariantList_T
             if (item.ThrowWhenNull() is Element named) named.Name.NotNullNotEmpty();
             return item;
         }
+
         public override bool ExpandItems => true;
+        
         public override bool IsValidDuplicate(IElement source, IElement item)
             => ReferenceEquals(source, item)
             ? true

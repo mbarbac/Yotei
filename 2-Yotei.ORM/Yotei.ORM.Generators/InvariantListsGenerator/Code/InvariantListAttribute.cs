@@ -2,8 +2,8 @@
 
 // ========================================================
 /// <summary>
-/// Decorates classes for which the 'InvariantList{T}' or the 'InvariantList{K,T}' one is used
-/// as its base one.
+/// Decorates classes for which either the 'InvariantList{T}' or the 'InvariantList{K,T}' one is
+/// to be used as its base one.
 /// <br/> 'Clone()' capability is added automatically if needed.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]

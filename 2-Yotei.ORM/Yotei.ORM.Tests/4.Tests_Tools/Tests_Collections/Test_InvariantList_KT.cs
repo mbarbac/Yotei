@@ -31,20 +31,25 @@ public static partial class Test_InvariantList_KT
         protected Builder(Builder source) : this(source.Sensitive) => AddRange(source);
 
         public override IElement ValidateItem(IElement item) => item.ThrowWhenNull();
+
         public override string GetKey(IElement item)
             => item is Element named
             ? named.Name
             : throw new ArgumentException("Element is not a named instance.").WithData(item);
+        
         public override string ValidateKey(string key) => key.NotNullNotEmpty();
-        public override IEqualityComparer<string> Comparer
-            => Sensitive
-            ? StringComparer.Ordinal
-            : StringComparer.OrdinalIgnoreCase;
+        
         public override bool ExpandItems => true;
+        
         public override bool IsValidDuplicate(IElement source, IElement item)
             => ReferenceEquals(source, item)
             ? true
             : throw new DuplicateException("Duplicated element.").WithData(item);
+
+        public override IEqualityComparer<string> Comparer
+            => Sensitive
+            ? StringComparer.Ordinal
+            : StringComparer.OrdinalIgnoreCase;
 
         public bool Sensitive { get; }
     }

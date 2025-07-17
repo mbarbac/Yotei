@@ -2,8 +2,8 @@
 
 // ========================================================
 /// <summary>
-/// Decorates interfaces for which the 'IInvariantList{T}' or the 'IInvariantList{K,T}' one
-/// is reimplemented.
+/// Decorates interfaces for which either the 'IInvariantList{T}' or the 'IInvariantList{K,T}'
+/// ones are to be reimplemented.
 /// <br/> 'Clone()' capability is added automatically if needed.
 /// </summary>
 [AttributeUsage(AttributeTargets.Interface, Inherited = false, AllowMultiple = false)]

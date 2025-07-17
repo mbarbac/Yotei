@@ -105,7 +105,7 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public virtual InvariantList<T> GetRange(int index, int count)
+    public virtual IInvariantList<T> GetRange(int index, int count)
     {
         if (index == 0 && count == Count) return this;
         if (index == 0 && count == 0) return Clear();
@@ -117,131 +117,116 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
         clone.Items.AddRange(range);
         return clone;
     }
-    IInvariantList<T> IInvariantList<T>.GetRange(int index, int count) => GetRange(index, count);
 
     /// <inheritdoc/>
-    public virtual InvariantList<T> Replace(int index, T item)
+    public virtual IInvariantList<T> Replace(int index, T item)
     {
         var clone = Clone();
         var done = clone.Items.Replace(index, item);
         return done > 0 ? clone : this;
     }
-    IInvariantList<T> IInvariantList<T>.Replace(int index, T item) => Replace(index, item);
 
     /// <inheritdoc/>
-    public virtual InvariantList<T> Add(T item)
+    public virtual IInvariantList<T> Add(T item)
     {
         var clone = Clone();
         var done = clone.Items.Add(item);
         return done > 0 ? clone : this;
     }
-    IInvariantList<T> IInvariantList<T>.Add(T item) => Add(item);
 
     /// <inheritdoc/>
-    public virtual InvariantList<T> AddRange(IEnumerable<T> range)
+    public virtual IInvariantList<T> AddRange(IEnumerable<T> range)
     {
         var clone = Clone();
         var done = clone.Items.AddRange(range);
         return done > 0 ? clone : this;
     }
-    IInvariantList<T> IInvariantList<T>.AddRange(IEnumerable<T> range) => AddRange(range);
 
     /// <inheritdoc/>
-    public virtual InvariantList<T> Insert(int index, T item)
+    public virtual IInvariantList<T> Insert(int index, T item)
     {
         var clone = Clone();
         var done = clone.Items.Insert(index, item);
         return done > 0 ? clone : this;
     }
-    IInvariantList<T> IInvariantList<T>.Insert(int index, T item) => Insert(index, item);
 
     /// <inheritdoc/>
-    public virtual InvariantList<T> InsertRange(int index, IEnumerable<T> range)
+    public virtual IInvariantList<T> InsertRange(int index, IEnumerable<T> range)
     {
         var clone = Clone();
         var done = clone.Items.InsertRange(index, range);
         return done > 0 ? clone : this;
     }
-    IInvariantList<T> IInvariantList<T>.InsertRange(int index, IEnumerable<T> range) => InsertRange(index, range);
 
     /// <inheritdoc/>
-    public virtual InvariantList<T> RemoveAt(int index)
+    public virtual IInvariantList<T> RemoveAt(int index)
     {
         var clone = Clone();
         var done = clone.Items.RemoveAt(index);
         return done > 0 ? clone : this;
     }
-    IInvariantList<T> IInvariantList<T>.RemoveAt(int index) => RemoveAt(index);
 
     /// <inheritdoc/>
-    public virtual InvariantList<T> RemoveRange(int index, int count)
+    public virtual IInvariantList<T> RemoveRange(int index, int count)
     {
         var clone = Clone();
         var done = clone.Items.RemoveRange(index, count);
         return done > 0 ? clone : this;
     }
-    IInvariantList<T> IInvariantList<T>.RemoveRange(int index, int count) => RemoveRange(index, count);
 
     /// <inheritdoc/>
-    public virtual InvariantList<T> Remove(T item)
+    public virtual IInvariantList<T> Remove(T item)
     {
         var clone = Clone();
         var done = clone.Items.Remove(item);
         return done > 0 ? clone : this;
     }
-    IInvariantList<T> IInvariantList<T>.Remove(T item) => Remove(item);
 
     /// <inheritdoc/>
-    public virtual InvariantList<T> RemoveLast(T item)
+    public virtual IInvariantList<T> RemoveLast(T item)
     {
         var clone = Clone();
         var done = clone.Items.RemoveLast(item);
         return done > 0 ? clone : this;
     }
-    IInvariantList<T> IInvariantList<T>.RemoveLast(T item) => RemoveLast(item);
 
     /// <inheritdoc/>
-    public virtual InvariantList<T> RemoveAll(T item)
+    public virtual IInvariantList<T> RemoveAll(T item)
     {
         var clone = Clone();
         var done = clone.Items.RemoveAll(item);
         return done > 0 ? clone : this;
     }
-    IInvariantList<T> IInvariantList<T>.RemoveAll(T item) => RemoveAll(item);
 
     /// <inheritdoc/>
-    public virtual InvariantList<T> Remove(Predicate<T> predicate)
+    public virtual IInvariantList<T> Remove(Predicate<T> predicate)
     {
         var clone = Clone();
         var done = clone.Items.Remove(predicate);
         return done > 0 ? clone : this;
     }
-    IInvariantList<T> IInvariantList<T>.Remove(Predicate<T> predicate) => Remove(predicate);
 
     /// <inheritdoc/>
-    public virtual InvariantList<T> RemoveLast(Predicate<T> predicate)
+    public virtual IInvariantList<T> RemoveLast(Predicate<T> predicate)
     {
         var clone = Clone();
         var done = clone.Items.RemoveLast(predicate);
         return done > 0 ? clone : this;
     }
-    IInvariantList<T> IInvariantList<T>.RemoveLast(Predicate<T> predicate) => RemoveLast(predicate);
 
     /// <inheritdoc/>
-    public virtual InvariantList<T> RemoveAll(Predicate<T> predicate)
+    public virtual IInvariantList<T> RemoveAll(Predicate<T> predicate)
     {
         var clone = Clone();
         var done = clone.Items.RemoveAll(predicate);
         return done > 0 ? clone : this;
     }
-    IInvariantList<T> IInvariantList<T>.RemoveAll(Predicate<T> predicate) => RemoveAll(predicate);
 
     /// <inheritdoc/>
-    public virtual InvariantList<T> Clear()
+    public virtual IInvariantList<T> Clear()
     {
         var clone = Clone();
         var done = clone.Items.Clear();
         return done > 0 ? clone : this;
     }
-    IInvariantList<T> IInvariantList<T>.Clear() => Clear();
 }

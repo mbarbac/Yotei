@@ -71,4 +71,27 @@ internal static class InvariantListDiagnostics
             severity, isEnabledByDefault: true),
             location);
     }
+
+    /// <summary>
+    /// The given type does not implement an invariant-alike interface...
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="severity"></param>
+    /// <returns></returns>
+    public static Diagnostic NoInvariantInterface(
+        ITypeSymbol type,
+        DiagnosticSeverity severity = DiagnosticSeverity.Error)
+    {
+        var id = "InvariantList04";
+        var head = "The type has not an invariant-alike interface.";
+        var desc = $"The '{type.Name}' type has not an invariant-alike interface.";
+        var location =
+            type.Locations.FirstOrDefault() ??
+            type.GetSyntaxNodes().FirstOrDefault()?.GetLocation();
+
+        return Diagnostic.Create(new DiagnosticDescriptor(
+            id, head, desc, "Yotei",
+            severity, isEnabledByDefault: true),
+            location);
+    }
 }
