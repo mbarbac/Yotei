@@ -1,6 +1,4 @@
-﻿using System.Xml;
-
-namespace Yotei.ORM.Generators;
+﻿namespace Yotei.ORM.Generators;
 
 // ========================================================
 /// <inheritdoc cref="TypeNode"/>
@@ -304,7 +302,25 @@ internal class XTypeNode : TypeNode
     /// </summary>
     IEnumerable<INamedTypeSymbol> FindCloneInterfaces(INamedTypeSymbol type)
     {
-        throw null;
+        var comparer = SymbolComparer.Default;
+        List<INamedTypeSymbol> items = [];
+
+        foreach (var iface in type.Interfaces) Capture(iface);
+        return items;
+
+        // Tries to capture the given interface...
+        bool Capture(INamedTypeSymbol iface)
+        {
+            var need = HasCloneMethod(iface);
+            foreach (var child in iface.Interfaces) if (Capture(child)) need = true;
+
+            if (need)
+            {
+                var temp = items.Find(x => comparer.Equals(x, iface));
+                if (temp == null) items.Add(iface);
+            }
+            return need;
+        }
     }
 
     /// <summary>
