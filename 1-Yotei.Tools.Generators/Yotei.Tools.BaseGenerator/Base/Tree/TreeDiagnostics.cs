@@ -348,6 +348,77 @@ internal static class TreeDiagnostics
     // -----------------------------------------------------
 
     /// <summary>
+    /// Cannot find any suitable attribute decorating the given type.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="severity"></param>
+    /// <returns></returns>
+    public static Diagnostic NoAttributes(
+        ITypeSymbol type,
+        DiagnosticSeverity severity = DiagnosticSeverity.Error)
+    {
+        var id = "TreeGen10";
+        var head = "No suitable attribute found.";
+        var desc = $"Cannot find a suitable attribute decorating type '{type.Name}'.";
+        var location =
+            type.Locations.FirstOrDefault() ??
+            type.GetSyntaxNodes().FirstOrDefault()?.GetLocation();
+
+        return Diagnostic.Create(new DiagnosticDescriptor(
+            id, head, desc, "Yotei",
+            severity, isEnabledByDefault: true),
+            location);
+    }
+
+    /// <summary>
+    /// Too many attributes found decorating the given type.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="severity"></param>
+    /// <returns></returns>
+    public static Diagnostic TooManyAttributes(
+        ITypeSymbol type,
+        DiagnosticSeverity severity = DiagnosticSeverity.Error)
+    {
+        var id = "TreeGen11";
+        var head = "Too many attributes found.";
+        var desc = $"Too many attributes found decorating type '{type.Name}'.";
+        var location =
+            type.Locations.FirstOrDefault() ??
+            type.GetSyntaxNodes().FirstOrDefault()?.GetLocation();
+
+        return Diagnostic.Create(new DiagnosticDescriptor(
+            id, head, desc, "Yotei",
+            severity, isEnabledByDefault: true),
+            location);
+    }
+
+    /// <summary>
+    /// The attribute that decorates the given type is an invalid one.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="severity"></param>
+    /// <returns></returns>
+    public static Diagnostic InvalidAttribute(
+        ITypeSymbol type,
+        DiagnosticSeverity severity = DiagnosticSeverity.Error)
+    {
+        var id = "TreeGen12";
+        var head = "Invalid.";
+        var desc = $"An attribute that decorates '{type.Name}' is an invalid one.";
+        var location =
+            type.Locations.FirstOrDefault() ??
+            type.GetSyntaxNodes().FirstOrDefault()?.GetLocation();
+
+        return Diagnostic.Create(new DiagnosticDescriptor(
+            id, head, desc, "Yotei",
+            severity, isEnabledByDefault: true),
+            location);
+    }
+
+    // -----------------------------------------------------
+
+    /// <summary>
     /// Property has no getter.
     /// </summary>
     /// <param name="item"></param>
@@ -357,7 +428,7 @@ internal static class TreeDiagnostics
         IPropertySymbol item,
         DiagnosticSeverity severity = DiagnosticSeverity.Error)
     {
-        var id = "TreeGen08";
+        var id = "TreeGen20";
         var head = "Property has no getter.";
         var desc = $"Property '{item.Name}' has no getter.";
         var location =
@@ -382,7 +453,7 @@ internal static class TreeDiagnostics
         IPropertySymbol item,
         DiagnosticSeverity severity = DiagnosticSeverity.Error)
     {
-        var id = "TreeGen09";
+        var id = "TreeGen21";
         var head = "Property has no setter.";
         var desc = $"Property '{item.Name}' has no setter.";
         var location =
@@ -407,7 +478,7 @@ internal static class TreeDiagnostics
         IFieldSymbol item,
         DiagnosticSeverity severity = DiagnosticSeverity.Error)
     {
-        var id = "TreeGen10";
+        var id = "TreeGen22";
         var head = "Field is not writtable.";
         var desc = $"Field '{item.Name}' is not writtable.";
         var location =
@@ -432,7 +503,7 @@ internal static class TreeDiagnostics
         IPropertySymbol item,
         DiagnosticSeverity severity = DiagnosticSeverity.Error)
     {
-        var id = "TreeGen11";
+        var id = "TreeGen23";
         var head = "Indexed properties are not supported.";
         var desc = $"Indexed properties are not supported: '{item.Name}'.";
         var location =

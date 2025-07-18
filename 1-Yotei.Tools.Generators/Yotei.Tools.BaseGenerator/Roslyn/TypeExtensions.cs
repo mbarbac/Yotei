@@ -58,12 +58,12 @@ internal static class TypeExtensions
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
-    public static IEnumerable<ITypeSymbol> AllBaseTypes(this ITypeSymbol type)
+    public static IEnumerable<INamedTypeSymbol> AllBaseTypes(this ITypeSymbol type)
     {
         type.ThrowWhenNull();
-        ITypeSymbol? temp = type;
 
-        while ((temp = temp.BaseType) != null)
+        INamedTypeSymbol? temp = null;
+        while ((temp = (temp ?? type).BaseType) != null)
             if (!temp.IsNamespace) yield return temp;
     }
 
