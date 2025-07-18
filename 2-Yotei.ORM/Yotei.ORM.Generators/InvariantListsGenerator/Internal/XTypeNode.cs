@@ -12,8 +12,8 @@ internal class XTypeNode : TypeNode
     const string IListNamespace = "Yotei.ORM.Tools";
     const string ListNamespace = "Yotei.ORM.Tools.Code";
 
-    const string ListName = "InvariantList";
     const string IListName = "IInvariantList";
+    const string ListName = "InvariantList";    
 
     AttributeData AttributeData = null!;
     INamedTypeSymbol AttributeClass = null!;
@@ -21,7 +21,7 @@ internal class XTypeNode : TypeNode
     INamedTypeSymbol KType = null!; bool IsKTypeNullable = false; // Arity == 2
     INamedTypeSymbol TType = null!; bool IsTTypeNullable = false; // Arity == 1 or 2
 
-    INamedTypeSymbol ReturnType = null!;
+    INamedTypeSymbol ReturnType = default!; // Returns type for methods...
     Type Template = null!;
     string KTypeName = null!;
     string TTypeName = null!;
@@ -45,10 +45,8 @@ internal class XTypeNode : TypeNode
         // We need to validate copy constructor's presence if host is not an interface...
         if (!ValidateCopyConstructor(context)) return false;
 
-        // Capturing the return type to use...
-        if ((ReturnType = GetReturnType(context)) == null) return false;
-
         // Finishing...
+        CaptureReturnType();
         Template = Arity == 1 ? typeof(IChainTemplate<>) : typeof(IChainTemplate<,>);
         KTypeName = KType?.EasyName(RoslynNameOptions.Full)!; if (IsKTypeNullable) KTypeName += "?";
         TTypeName = TType?.EasyName(RoslynNameOptions.Full)!; if (IsTTypeNullable) TTypeName += "?";
@@ -205,24 +203,21 @@ internal class XTypeNode : TypeNode
     }
 
     /// <summary>
-    /// Returns the interface type to be used to redeclare or to reimplement the methods on the
-    /// invariant template. That type can either be the host symbol, if it is an interface, or
-    /// its top-most one that ultimately inherits from an invariant one.
-    /// <br/> Returns null and reports an error if that return interface type cannot be found.
+    /// Captures the return type to use with the template methods.
     /// </summary>
-    INamedTypeSymbol GetReturnType(SourceProductionContext context)
+    void CaptureReturnType()
     {
-        // Interfaces being implemented have as return type themselves...
-        if (Symbol.IsInterface()) return Symbol;
+        // Interfaces being implement have as return type themselves...
+        if (Symbol.IsInterface()) ReturnType = Symbol;
 
-        // Findind the top-most one...
-        foreach (var iface in Symbol.Interfaces) if (IsReturnType(iface)) return iface;
+        // Otherwise, finding the top-most one, if any...
+        foreach (var iface in Symbol.Interfaces) if (IsInvariant(iface)) ReturnType = iface;
 
-        InvariantListDiagnostics.NoInvariantInterface(Symbol).Report(context);
-        return null!;
+        // If no interface to inherit from, then the type itself is the return type...
+        ReturnType ??= Symbol;
 
-        // Determines if the given type ultimately inherits from an invariant one...
-        bool IsReturnType(INamedTypeSymbol iface)
+        // Determines if the iface ultimately inherits from an invariant one...
+        static bool IsInvariant(INamedTypeSymbol iface)
         {
             if (iface.Name.StartsWith(IListName)) return true;
 
@@ -231,7 +226,7 @@ internal class XTypeNode : TypeNode
                 if (at.AttributeClass != null &&
                     at.AttributeClass.Name.StartsWith(IListName)) return true;
 
-            foreach(var child in iface.Interfaces) if (IsReturnType(child)) return true;
+            foreach (var child in iface.Interfaces) if (IsInvariant(child)) return true;
 
             return false;
         }
@@ -256,6 +251,147 @@ internal class XTypeNode : TypeNode
     {
         // Emitting 'Clone()' method is needed...
         TryEmitCloneMethod(cb);
+
+        // Iterating through the template methods...
+        var methods = Template.GetMembers().OfType<MethodInfo>().Where(x => x.DeclaringType == Template);
+        var existing = Symbol.GetMembers().OfType<IMethodSymbol>().ToArray();
+
+        var ioptions = EasyNameOptions.Default with // For iface method names...
+        {
+            UseMemberArgumentsTypes = EasyNameOptions.Full,
+            UseMemberArgumentsNames = true,
+        };
+        var coptions = ioptions with // For base methods' invocations...
+        {
+            UseMemberArgumentsTypes = null,
+        };
+        var headdoc = Symbol.IsInterface() ? IListName : ListName;
+        var symbolname = Symbol.EasyName();
+        var retname = ReturnType.EasyName();
+
+        foreach (var method in methods)
+        {
+            if (!CanEmit(method, existing)) continue;
+
+            var mname = method.EasyName(ioptions);
+            mname = mname.Replace("K ", $"{KTypeName} "); // K key...
+            mname = mname.Replace("<K", $"<{KTypeName}"); // IComparer<K> comparer...
+            mname = mname.Replace("T ", $"{TTypeName} "); // T item...
+            mname = mname.Replace("T>", $"{TTypeName}>"); // IEnumerable<T> range...
+
+            // Interfaces...
+            if (Symbol.IsInterface())
+            {
+                var core = method.EasyName();
+                core = $"{headdoc}.{core}";
+                core = core.Replace('<', '{').Replace('>', '}');
+                core = $"/// <inheritdoc cref=\"{core}\"/>";
+
+                cb.AppendLine();
+                cb.AppendLine(core);
+                cb.AppendLine(AttributeDoc);
+
+                cb.AppendLine($"new {symbolname} {mname};");
+            }
+
+            // Classes...
+            else
+            {
+                var core = method.EasyName();
+                core = $"{headdoc}.{core}";
+                core = core.Replace('<', '{').Replace('>', '}');
+                core = $"/// <inheritdoc cref=\"{core}\"/>";
+
+                cb.AppendLine();
+                cb.AppendLine(core);
+                cb.AppendLine(AttributeDoc);
+
+                var args = method.EasyName(coptions);
+                cb.AppendLine($"public override {retname} {mname}");
+                cb.AppendLine($"=> ({retname})base.{args};");
+
+                // We don't need to reimplement the invariant-list interface because either it
+                // is already the return type, or such reimplementation is not needed because
+                // that interface is not in the host type...
+            }
+        }
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the given method can be emitted or, because it is already implemented, it
+    /// cannot.
+    /// </summary>
+    bool CanEmit(MethodInfo method, IMethodSymbol[] existing)
+    {
+        foreach (var item in existing)
+        {
+            var mname = method.Name;
+            var ename = item.Name;
+            if (mname != ename) continue; // Named differ, no impediment...
+
+            var mpars = method.GetParameters();
+            var epars = item.Parameters;
+            if (mpars.Length != epars.Length) continue; // Differ, so no impediment...
+
+            var comparer = SymbolComparer.Default;
+            var count = mpars.Length;
+
+            for (int i = 0; i < mpars.Length; i++)
+            {
+                var mpar = mpars[i]; var mtype = mpar.ParameterType;
+                var epar = epars[i]; var etype = (INamedTypeSymbol)epar.Type;
+
+                // Ej: Add(T item), Remove(K key)...
+                if (mtype.IsGenericParameter)
+                {
+                    if (mtype.Name == "T" && comparer.Equals(etype, TType)) count--; // Found...
+                    if (mtype.Name == "K" && comparer.Equals(etype, KType)) count--; // Found...
+                }
+
+                // Ej: AddRange(IEnumerable<T> range)...
+                else if (
+                    mtype.Name == "IEnumerable´1" &&
+                    mtype.FullName == null &&
+                    mtype.GenericTypeArguments[0].IsGenericParameter)
+                {
+                    if (etype.Name == "IEnumerable" && etype.TypeArguments.Length == 1)
+                    {
+                        var mtemp = mtype.GenericTypeArguments[0];
+
+                        if (mtemp.Name == "T" && comparer.Equals(etype, TType)) count--; // Found...
+                        if (mtemp.Name == "K" && comparer.Equals(etype, KType)) count--; // Found...
+                    }
+                }
+
+                // Ej: Remove(Predicate<T> predicate)...
+                else if (
+                    mtype.Name == "Predicate`1" &&
+                    mtype.FullName == null &&
+                    mtype.GenericTypeArguments[0].IsGenericParameter)
+                {
+                    if (etype.Name == "Predicate" && etype.TypeArguments.Length == 1)
+                    {
+                        var mtemp = mtype.GenericTypeArguments[0];
+
+                        if (mtemp.Name == "T" && comparer.Equals(etype, TType)) count--; // Found...
+                        if (mtemp.Name == "K" && comparer.Equals(etype, KType)) count--; // Found...
+                    }
+                }
+
+                // Ej: RemoveAt(int index)...
+                else
+                {
+                    if (etype.Match(mtype)) count--; // Found...
+                }
+            }
+
+            if (count == 0) return false; // All have matched, so is the same method...
+        }
+
+        // No impediments: we can emit the method...
+        return true;
     }
 
     // ----------------------------------------------------
