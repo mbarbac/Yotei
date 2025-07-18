@@ -1,4 +1,4 @@
-﻿namespace Yotei.ORM.Relational.Code;
+﻿namespace Yotei.ORM;
 
 // ========================================================
 
