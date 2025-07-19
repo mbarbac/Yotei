@@ -29,7 +29,7 @@ namespace Yotei.Tools.CloneGenerator.Tests.Interfaces
     {
         //[Enforced]
         [Fact]
-        public static void Test_IA_Methods()
+        public static void Test_IA()
         {
             var type = typeof(IOther.IA);
             var method = type.GetMethods().FirstOrDefault(x =>
@@ -45,7 +45,7 @@ namespace Yotei.Tools.CloneGenerator.Tests.Interfaces
 
         //[Enforced]
         [Fact]
-        public static void Test_IB_Methods()
+        public static void Test_IB()
         {
             var type = typeof(IOther.IB);
             var method = type.GetMethods().FirstOrDefault(x =>
@@ -61,7 +61,7 @@ namespace Yotei.Tools.CloneGenerator.Tests.Interfaces
 
         //[Enforced]
         [Fact]
-        public static void Test_IC_Methods()
+        public static void Test_IC()
         {
             var type = typeof(IOther.IC);
             var method = type.GetMethods().FirstOrDefault(x =>

@@ -23,6 +23,11 @@ internal class XTypeNode : TypeNode
             TreeDiagnostics.RecordsNotSupported(Symbol).Report(context);
             return false;
         }
+        if (!ValidateReturnInterface())
+        {
+            CloneableDiagnostics.InvalidReturnInterface(Symbol).Report(context);
+            return false;
+        }
 
         // Finishing...
         CaptureReturnType();
@@ -71,8 +76,6 @@ internal class XTypeNode : TypeNode
         // Gets the method modifiers, with a space separator, or null if any.
         string? GetModifiers()
         {
-            if (Symbol.Name == "IB") { } // DEBUG
-
             var found = false;
             if (!found) found = Symbol.AllInterfaces.Any(x => x.Name == "ICloneable");
             if (!found) found = GetAddICloneable(Symbol, out var value, true, true) && value;
@@ -157,7 +160,7 @@ internal class XTypeNode : TypeNode
         // Emitting...
         var modifiers = GetModifiers();
         var typename = Symbol.EasyName();
-        var retname = ReturnType.EasyName();
+        var retname = ReturnType.EasyName(RoslynNameOptions.Full with { UseTypeNullable = false });
 
         EmitDocumentation(cb);
         cb.AppendLine($"{modifiers}{retname} Clone()");
@@ -322,6 +325,78 @@ internal class XTypeNode : TypeNode
         ReturnType = Symbol;
     }
 
+    /// <summary>
+    /// When this host is not an interface and <see cref="CloneableAttribute.ReturnInterface"/>
+    /// is requested, then the return type of any base method must be an interface as well, or
+    /// otherwise is a C# syntax error.
+    /// </summary>
+    bool ValidateReturnInterface()
+    {
+        if (Symbol.Name == "TypeA2") { } // DEBUG-ONLY
+
+        // Not applicable for interface hosts...
+        if (Symbol.IsInterface()) return true;
+
+        // Not applicable if no return interface is requested...
+        var retiface = GetReturnInterface(Symbol, out var temp) && temp;
+        if (!retiface) return true;
+
+        // Error if a base method return type is not an interface...
+        var host = Symbol;
+        while ((host = host.BaseType) != null)
+        {
+            var method = FindCloneMethod(Symbol);
+            if (method != null && method.ReturnType.IsInterface()) return false;
+
+            var at = FindCloneableAttribute(host);
+            if (at == null) continue;
+
+            retiface = GetReturnInterface(at, out temp) && temp;
+            if (!retiface) return false;
+        }
+
+        // Validated...
+        return true;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Tries to find and return the <see cref="CloneableAttribute"/> attribute that decorates
+    /// the given type, or null if any. The base types and interfaces are also searched if such
+    /// is explicitly requested.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="chain"></param>
+    /// <param name="ifaces"></param>
+    /// <returns></returns>
+    static AttributeData? FindCloneableAttribute(
+        INamedTypeSymbol type, bool chain = false, bool ifaces = false)
+    {
+        var item = type.GetAttributes(typeof(CloneableAttribute)).FirstOrDefault();
+        if (item != null) return item;
+
+        if (chain)
+        {
+            foreach (var child in type.AllBaseTypes())
+            {
+                item = FindCloneableAttribute(child);
+                if (item != null) return item;
+            }
+        }
+
+        if (ifaces)
+        {
+            foreach (var child in type.AllInterfaces)
+            {
+                item = FindCloneableAttribute(child);
+                if (item != null) return item;
+            }
+        }
+
+        return null;
+    }
+
     // ----------------------------------------------------
 
     /// <summary>
@@ -380,42 +455,6 @@ internal class XTypeNode : TypeNode
             foreach (var child in type.AllInterfaces) if (IsCloneAlike(child)) return true;
 
         return false;
-    }
-
-    /// <summary>
-    /// Tries to find and return the <see cref="CloneableAttribute"/> attribute that decorates
-    /// the given type, or null if any. The base types and interfaces are also searched if such
-    /// is explicitly requested.
-    /// </summary>
-    /// <param name="type"></param>
-    /// <param name="chain"></param>
-    /// <param name="ifaces"></param>
-    /// <returns></returns>
-    static AttributeData? FindCloneableAttribute(
-        INamedTypeSymbol type, bool chain = false, bool ifaces = false)
-    {
-        var item = type.GetAttributes(typeof(CloneableAttribute)).FirstOrDefault();
-        if (item != null) return item;
-
-        if (chain)
-        {
-            foreach (var child in type.AllBaseTypes())
-            {
-                item = FindCloneableAttribute(child);
-                if (item != null) return item;
-            }
-        }
-
-        if (ifaces)
-        {
-            foreach (var child in type.AllInterfaces)
-            {
-                item = FindCloneableAttribute(child);
-                if (item != null) return item;
-            }
-        }
-
-        return null;
     }
 
     // ----------------------------------------------------
