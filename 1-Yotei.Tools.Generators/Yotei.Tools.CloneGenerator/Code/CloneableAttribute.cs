@@ -14,9 +14,10 @@
 public class CloneableAttribute : Attribute
 {
     /// <summary>
-    /// Instructs the generator to produce methods whose return type is the first interface of
-    /// the host type that ultimately is a cloneable one. Otherwise, the return type of these
-    /// methods is the host type itself.
+    /// Instructs the generator to produce methods whose return type is the first interface of the
+    /// host type that ultimately is a cloneable one. Otherwise, the return type of these methods
+    /// is the host type itself.
+    /// <br/> The host type MUST directly implement the interface for it to qualify.
     /// <br/> The default value of this property is <c>false</c>.
     /// <br/> This property is ignored if the host type is an interface.
     /// </summary>

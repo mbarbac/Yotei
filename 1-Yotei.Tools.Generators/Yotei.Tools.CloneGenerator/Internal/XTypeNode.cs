@@ -30,7 +30,6 @@ internal class XTypeNode : TypeNode
         }
 
         // Finishing...
-        CaptureReturnType();
         return true;
     }
 
@@ -101,8 +100,11 @@ internal class XTypeNode : TypeNode
     /// </summary>
     void EmitAsAbstract(SourceProductionContext context, CodeBuilder cb)
     {
+        CaptureReturnType();
         var modifiers = GetModifiers();
-        var retname = ReturnType.EasyName();
+
+        var options = ReturnType.IsInterface() ? RoslynNameOptions.Full with { UseTypeNullable = false } : RoslynNameOptions.Default;
+        var retname = ReturnType.EasyName(options);
 
         EmitDocumentation(cb);
         cb.AppendLine($"{modifiers}{retname} Clone();");
@@ -122,10 +124,9 @@ internal class XTypeNode : TypeNode
                 {
                     var access = method.DeclaredAccessibility;
                     if (access == Accessibility.Private) return null;
-
                     var str = access.ToCSharpString(addspace: true);
-                    var isvirtual = method.IsVirtual || method.IsOverride | method.IsAbstract;
 
+                    var isvirtual = method.IsVirtual || method.IsOverride | method.IsAbstract;
                     return isvirtual ? $"{str}abstract override " : $"{str}abstract ";
                 }
 
@@ -158,9 +159,12 @@ internal class XTypeNode : TypeNode
         }
 
         // Emitting...
+        CaptureReturnType();
         var modifiers = GetModifiers();
         var typename = Symbol.EasyName();
-        var retname = ReturnType.EasyName(RoslynNameOptions.Full with { UseTypeNullable = false });
+
+        var options = ReturnType.IsInterface() ? RoslynNameOptions.Full with { UseTypeNullable = false } : RoslynNameOptions.Default;
+        var retname = ReturnType.EasyName(options);
 
         EmitDocumentation(cb);
         cb.AppendLine($"{modifiers}{retname} Clone()");
@@ -191,18 +195,21 @@ internal class XTypeNode : TypeNode
                 {
                     var access = method.DeclaredAccessibility;
                     if (access == Accessibility.Private) return null;
-
                     var str = access.ToCSharpString(addspace: true);
-                    var isvirtual = method.IsVirtual || method.IsOverride | method.IsAbstract;
 
-                    return isvirtual ? $"{str}override " : $"{str}new ";
+                    if (prevent) return $"{str}override sealed ";
+                    else
+                    {
+                        var isvirtual = method.IsVirtual || method.IsOverride | method.IsAbstract;
+                        return isvirtual ? $"{str}override " : $"{str}new ";
+                    }   
                 }
 
                 // If the method is being implemented...
                 var at = FindCloneableAttribute(host, chain: true);
                 if (at != null)
                 {
-                    return prevent ? "public new " : "public override ";
+                    return host.IsAbstract || !prevent ? "public override " : "public new ";
                 }
             }
 
@@ -332,8 +339,6 @@ internal class XTypeNode : TypeNode
     /// </summary>
     bool ValidateReturnInterface()
     {
-        if (Symbol.Name == "TypeA2") { } // DEBUG-ONLY
-
         // Not applicable for interface hosts...
         if (Symbol.IsInterface()) return true;
 
