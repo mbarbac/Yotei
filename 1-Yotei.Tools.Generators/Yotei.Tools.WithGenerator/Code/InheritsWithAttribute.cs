@@ -2,9 +2,8 @@
 
 // ========================================================
 /// <summary>
-/// Use to decorate types for which the methods of their previously with-decorated members
-/// (properties and fields) are to be redeclared or reimplemented, provided such methods are
-/// not explicitly declared or implemented.
+/// Use to decorate types where the methods of their previously with-decorated members (properties
+/// and fields) are to be redeclared or reimplemented, using the original settings.
 /// <br/> Not-interface types must implement a private or protected copy constructor.
 /// <br/> C# record types are not supported.
 /// </summary>

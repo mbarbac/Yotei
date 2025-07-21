@@ -39,7 +39,7 @@ internal class XTypeNode : TypeNode
     protected override string? GetHeader(SourceProductionContext context)
     {
         var head = base.GetHeader(context);
-        var add = GetAddICloneable(Symbol, out var temp, chain: true, ifaces: true) && temp;
+        var add = ValueAddICloneable(Symbol, out var temp, chain: true, ifaces: true) && temp;
 
         if (add) head += " : ICloneable";
         return head;
@@ -77,7 +77,7 @@ internal class XTypeNode : TypeNode
         {
             var found = false;
             if (!found) found = Symbol.AllInterfaces.Any(x => x.Name == "ICloneable");
-            if (!found) found = GetAddICloneable(Symbol, out var value, true, true) && value;
+            if (!found) found = ValueAddICloneable(Symbol, out var value, true, true) && value;
 
             if (!found)
             {
@@ -183,7 +183,7 @@ internal class XTypeNode : TypeNode
         string? GetModifiers()
         {
             var issealed = Symbol.IsSealed;
-            var prevent = GetPreventVirtual(Symbol, out var temp, true, true) && temp;
+            var prevent = ValuePreventVirtual(Symbol, out var temp, true, true) && temp;
 
             // When symbol is a derived one...
             var host = Symbol.BaseType;
@@ -284,7 +284,7 @@ internal class XTypeNode : TypeNode
         // Tries to add the 'ICloneable' interface, if needed...
         void TryICloneable()
         {
-            var add = GetAddICloneable(Symbol, out var value, true, true) && value;
+            var add = ValueAddICloneable(Symbol, out var value, true, true) && value;
             if (add)
             {
                 var comp = GetBranchCompilation();
@@ -316,7 +316,7 @@ internal class XTypeNode : TypeNode
         if (!Symbol.IsInterface())
         {
             // If use interface is requested...
-            var value = GetReturnInterface(Symbol, out var temp) && temp;
+            var value = ValueReturnInterface(Symbol, out var temp) && temp;
             if (value)
             {
                 foreach (var iface in Symbol.Interfaces)
@@ -343,7 +343,7 @@ internal class XTypeNode : TypeNode
         if (Symbol.IsInterface()) return true;
 
         // Not applicable if no return interface is requested...
-        var retiface = GetReturnInterface(Symbol, out var temp) && temp;
+        var retiface = ValueReturnInterface(Symbol, out var temp) && temp;
         if (!retiface) return true;
 
         // Error if a base method return type is not an interface...
@@ -356,7 +356,7 @@ internal class XTypeNode : TypeNode
             var at = FindCloneableAttribute(host);
             if (at == null) continue;
 
-            retiface = GetReturnInterface(at, out temp) && temp;
+            retiface = ValueReturnInterface(at, out temp) && temp;
             if (!retiface) return false;
         }
 
@@ -371,10 +371,6 @@ internal class XTypeNode : TypeNode
     /// the given type, or null if any. The base types and interfaces are also searched if such
     /// is explicitly requested.
     /// </summary>
-    /// <param name="type"></param>
-    /// <param name="chain"></param>
-    /// <param name="ifaces"></param>
-    /// <returns></returns>
     static AttributeData? FindCloneableAttribute(
         INamedTypeSymbol type, bool chain = false, bool ifaces = false)
     {
@@ -469,7 +465,7 @@ internal class XTypeNode : TypeNode
     /// argument from the given attribute. If found among the used arguments, returns true and
     /// its actual value in the out argument. Otherwise, returns false.
     /// </summary>
-    static bool GetReturnInterface(AttributeData at, out bool value)
+    static bool ValueReturnInterface(AttributeData at, out bool value)
     {
         if (at.GetNamedArgument(nameof(CloneableAttribute.ReturnInterface), out var arg))
         {
@@ -490,24 +486,19 @@ internal class XTypeNode : TypeNode
     /// used arguments, returns true and its actual value in the out argument. Otherwise,
     /// returns false.
     /// </summary>
-    /// <param name="type"></param>
-    /// <param name="value"></param>
-    /// <param name="chain"></param>
-    /// <param name="ifaces"></param>
-    /// <returns></returns>
-    static bool GetReturnInterface(
+    static bool ValueReturnInterface(
         INamedTypeSymbol type, out bool value, bool chain = false, bool ifaces = false)
     {
         var at = FindCloneableAttribute(type, chain, ifaces);
-        if (at != null && GetReturnInterface(at, out value)) return true;
+        if (at != null && ValueReturnInterface(at, out value)) return true;
 
         if (chain)
             foreach (var child in type.AllBaseTypes())
-                if (GetReturnInterface(child, out value)) return true;
+                if (ValueReturnInterface(child, out value)) return true;
 
         if (ifaces)
             foreach (var child in type.AllInterfaces)
-                if (GetReturnInterface(child, out value)) return true;
+                if (ValueReturnInterface(child, out value)) return true;
 
         value = false;
         return false;
@@ -520,7 +511,7 @@ internal class XTypeNode : TypeNode
     /// argument from the given attribute. If found among the used arguments, returns true and
     /// its actual value in the out argument. Otherwise, returns false.
     /// </summary>
-    static bool GetPreventVirtual(AttributeData at, out bool value)
+    static bool ValuePreventVirtual(AttributeData at, out bool value)
     {
         if (at.GetNamedArgument(nameof(CloneableAttribute.PreventVirtual), out var arg))
         {
@@ -541,24 +532,19 @@ internal class XTypeNode : TypeNode
     /// used arguments, returns true and its actual value in the out argument. Otherwise,
     /// returns false.
     /// </summary>
-    /// <param name="type"></param>
-    /// <param name="value"></param>
-    /// <param name="chain"></param>
-    /// <param name="ifaces"></param>
-    /// <returns></returns>
-    static bool GetPreventVirtual(
+    static bool ValuePreventVirtual(
         INamedTypeSymbol type, out bool value, bool chain = false, bool ifaces = false)
     {
         var at = FindCloneableAttribute(type, chain, ifaces);
-        if (at != null && GetPreventVirtual(at, out value)) return true;
+        if (at != null && ValuePreventVirtual(at, out value)) return true;
 
         if (chain)
             foreach (var child in type.AllBaseTypes())
-                if (GetPreventVirtual(child, out value)) return true;
+                if (ValuePreventVirtual(child, out value)) return true;
 
         if (ifaces)
             foreach (var child in type.AllInterfaces)
-                if (GetPreventVirtual(child, out value)) return true;
+                if (ValuePreventVirtual(child, out value)) return true;
 
         value = false;
         return false;
@@ -571,7 +557,7 @@ internal class XTypeNode : TypeNode
     /// argument from the given attribute. If found among the used arguments, returns true and
     /// its actual value in the out argument. Otherwise, returns false.
     /// </summary>
-    static bool GetAddICloneable(AttributeData at, out bool value)
+    static bool ValueAddICloneable(AttributeData at, out bool value)
     {
         if (at.GetNamedArgument(nameof(CloneableAttribute.AddICloneable), out var arg))
         {
@@ -592,24 +578,19 @@ internal class XTypeNode : TypeNode
     /// used arguments, returns true and its actual value in the out argument. Otherwise,
     /// returns false.
     /// </summary>
-    /// <param name="type"></param>
-    /// <param name="value"></param>
-    /// <param name="chain"></param>
-    /// <param name="ifaces"></param>
-    /// <returns></returns>
-    static bool GetAddICloneable(
+    static bool ValueAddICloneable(
         INamedTypeSymbol type, out bool value, bool chain = false, bool ifaces = false)
     {
         var at = FindCloneableAttribute(type, chain, ifaces);
-        if (at != null && GetAddICloneable(at, out value)) return true;
+        if (at != null && ValueAddICloneable(at, out value)) return true;
 
         if (chain)
             foreach (var child in type.AllBaseTypes())
-                if (GetAddICloneable(child, out value)) return true;
+                if (ValueAddICloneable(child, out value)) return true;
 
         if (ifaces)
             foreach (var child in type.AllInterfaces)
-                if (GetAddICloneable(child, out value)) return true;
+                if (ValueAddICloneable(child, out value)) return true;
 
         value = false;
         return false;

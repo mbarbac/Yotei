@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// Comparer two <see cref="ISymbol"/> instance for equality, using the options captured. If
+/// Compares two <see cref="ISymbol"/> instance for equality, using the options captured. If
 /// no comparison can be performed, or if it is not conclusive, then the comparison reverts
 /// to the default <see cref="SymbolEqualityComparer"/> one.
 /// </summary>
