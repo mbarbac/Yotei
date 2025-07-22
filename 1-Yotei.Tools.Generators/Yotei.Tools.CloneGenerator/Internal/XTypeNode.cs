@@ -25,7 +25,7 @@ internal class XTypeNode : TypeNode
         }
         if (!CaptureReturnType())
         {
-            CloneableDiagnostics.InvalidReturnInterface(Symbol).Report(context);
+            TreeDiagnostics.InvalidReturnType(Symbol).Report(context);
             return false;
         }
 
@@ -156,8 +156,6 @@ internal class XTypeNode : TypeNode
     /// </summary>
     void EmitForConcrete(SourceProductionContext context, CodeBuilder cb)
     {
-        if (Symbol.Name == "Type1B") { } // DEBUG
-
         // We need a copy constructor...
         var ctor = Symbol.GetCopyConstructor(strict: false);
         if (ctor == null)
@@ -352,6 +350,17 @@ internal class XTypeNode : TypeNode
             if (!value) return false;
         }
 
+        // Finding a suitable direct interface, if any...
+        foreach (var iface in Symbol.Interfaces)
+        {
+            if (iface.Name == "ICloneable") continue; // ICloneable does not qualify...
+            if (IsCloneable(iface, false, false, true))
+            {
+                ReturnType = iface;
+                return true;
+            }
+        }
+
         // Validated...
         ReturnType = Symbol;
         return true;
@@ -362,7 +371,7 @@ internal class XTypeNode : TypeNode
     /// <summary>
     /// Tries to find a valid 'Clone()' method in the given type, or in its chain of base types
     /// and direct or all implemented interfaces if such is explicitly requested. Returns null
-    /// if not found, or found method otherwise.
+    /// if not found, or the found method otherwise.
     /// </summary>
     static IMethodSymbol? FindCloneMethod(
         ITypeSymbol type,
@@ -395,35 +404,6 @@ internal class XTypeNode : TypeNode
             return false;
         },
         chain, ifaces, allifaces);
-    }
-
-    /// <summary>
-    /// Determines if the given type is a 'Cloneable'-alike one, either because it implements a
-    /// 'Clone' method, or because it is decorated with the <see cref="CloneableAttribute"/>
-    /// attribute. The chains of its base types and direct or all implemented interfaces are also
-    /// used if such is explicitly requested.
-    /// </summary>
-    static bool IsCloneable(
-        ITypeSymbol type, out IMethodSymbol? method, out AttributeData? attr,
-        bool chain = false, bool ifaces = false, bool allifaces = false)
-    {
-        IMethodSymbol? _method = default;
-        AttributeData? _attr = default;
-
-        var found = type.Recursive(type =>
-        {
-            _method = null;
-            _attr = null;
-
-            _method = FindCloneMethod(type); if (_method != null) return true;
-            _attr = FindCloneableAttribute(type); if (_attr != null) return true;
-            return false;
-        },
-        chain, ifaces, allifaces);
-
-        method = found ? _method : null;
-        attr = found ? _attr : null;
-        return found;
     }
 
     // ----------------------------------------------------

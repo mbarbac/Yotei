@@ -7,7 +7,7 @@ internal class XTypeNode : TypeNode
     public XTypeNode(INode parent, INamedTypeSymbol symbol) : base(parent, symbol) { }
     public XTypeNode(INode parent, TypeCandidate candidate) : base(parent, candidate) { }
 
-    /*
+
     // ----------------------------------------------------
 
     /// <inheritdoc/>
@@ -30,6 +30,10 @@ internal class XTypeNode : TypeNode
     // ----------------------------------------------------
 
     /// <inheritdoc/>
+    /// If we are here the type is decorated with the <see cref="InheritWithsAttribute"/>, so
+    /// we need to find the decorated members that are inherited but not reimplemented in the
+    /// type itself. Note that at this moment the hierarchy of nodes is already captured, so
+    /// we can intercept duplications.
     public override void Emit(SourceProductionContext context, CodeBuilder cb)
     {
         CaptureInheritedProperties();
@@ -39,9 +43,8 @@ internal class XTypeNode : TypeNode
     }
 
     /// <summary>
-    /// Invoked to capture the inherited members that have not been captured yet, because this
-    /// host type is decorated with the <see cref="InheritWithsAttribute"/> attribute. Captured
-    /// members will have their <see cref="PropertyNode.Candidate"/> property set to null.
+    /// Invoked to capture the inherited members that have not been captured yet. Captured members
+    /// will have their <see cref="PropertyNode.Candidate"/> property set to null.
     /// </summary>
     void CaptureInheritedProperties()
     {
@@ -70,9 +73,8 @@ internal class XTypeNode : TypeNode
     }
 
     /// <summary>
-    /// Invoked to capture the inherited members that have not been captured yet, because this
-    /// host type is decorated with the <see cref="InheritWithsAttribute"/> attribute. Captured
-    /// members will have their <see cref="FieldNode.Candidate"/> property set to null.
+    /// Invoked to capture the inherited members that have not been captured yet. Captured members
+    /// will have their <see cref="FieldNode.Candidate"/> property set to null.
     /// </summary>
     void CaptureInheritedFields()
     {
@@ -99,37 +101,4 @@ internal class XTypeNode : TypeNode
             }
         }
     }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Returns the <see cref="InheritWithsAttribute"/> attribute applied to the given type, or
-    /// or null if any. The base types and interfaces of the type are also searched, if such is
-    /// explicitly requested.
-    /// </summary>
-    static internal AttributeData? FindInheritsWithAttribute(
-        INamedTypeSymbol type, bool chain = false, bool ifaces = false)
-    {
-        var at = type.GetAttributes(typeof(InheritWithsAttribute)).FirstOrDefault();
-
-        if (at == null && chain)
-        {
-            foreach (var child in type.AllBaseTypes())
-            {
-                at = FindInheritsWithAttribute(child);
-                if (at != null) break;
-            }
-        }
-
-        if (at == null && ifaces)
-        {
-            foreach (var child in type.AllInterfaces)
-            {
-                at = FindInheritsWithAttribute(child);
-                if (at != null) break;
-            }
-        }
-
-        return at;
-    }*/
 }

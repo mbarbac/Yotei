@@ -517,4 +517,29 @@ internal static class TreeDiagnostics
             severity, isEnabledByDefault: true),
             location);
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// The return type is an invalid one.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="severity"></param>
+    /// <returns></returns>
+    public static Diagnostic InvalidReturnType(
+        ISymbol item,
+        DiagnosticSeverity severity = DiagnosticSeverity.Error)
+    {
+        var id = "TreeGen30";
+        var head = "The return type is an invalid one.";
+        var desc = $"The return type for '{item.Name}' is an invalid one.";
+        var location =
+            item.Locations.FirstOrDefault() ??
+            item.GetSyntaxNodes().FirstOrDefault()?.GetLocation();
+
+        return Diagnostic.Create(new DiagnosticDescriptor(
+            id, head, desc, "Yotei",
+            severity, isEnabledByDefault: true),
+            location);
+    }
 }
