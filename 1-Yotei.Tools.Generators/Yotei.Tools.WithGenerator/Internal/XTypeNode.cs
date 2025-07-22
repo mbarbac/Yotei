@@ -98,4 +98,37 @@ internal class XTypeNode : TypeNode
             }
         }
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns the <see cref="InheritWithsAttribute"/> attribute applied to the given type, or
+    /// or null if any. The base types and interfaces of the type are also searched, if such is
+    /// explicitly requested.
+    /// </summary>
+    static internal AttributeData? FindInheritsWithAttribute(
+        INamedTypeSymbol type, bool chain = false, bool ifaces = false)
+    {
+        var at = type.GetAttributes(typeof(InheritWithsAttribute)).FirstOrDefault();
+
+        if (at == null && chain)
+        {
+            foreach (var child in type.AllBaseTypes())
+            {
+                at = FindInheritsWithAttribute(child);
+                if (at != null) break;
+            }
+        }
+
+        if (at == null && ifaces)
+        {
+            foreach (var child in type.AllInterfaces)
+            {
+                at = FindInheritsWithAttribute(child);
+                if (at != null) break;
+            }
+        }
+
+        return at;
+    }
 }

@@ -24,8 +24,13 @@ internal class XFieldNode : FieldNode
         // Other validations...
         if (Host.IsRecord) { TreeDiagnostics.RecordsNotSupported(Host).Report(context); r = false; }
         if (!Host.IsInterface() && !Symbol.IsWrittable()) { TreeDiagnostics.NotWrittable(Symbol).Report(context); r = false; }
+        if (!CanUseReturnInterface()) { WithDiagnostics.InvalidReturnInterface(Host).Report(context); return false; }
 
         // Finishing...
         return r;
     }
+
+    // ----------------------------------------------------
+
+    bool CanUseReturnInterface() => true;
 }

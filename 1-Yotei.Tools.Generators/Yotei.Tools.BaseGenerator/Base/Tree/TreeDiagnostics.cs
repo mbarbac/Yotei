@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools.BaseGenerator;
+﻿#pragma warning disable IDE1006
+
+namespace Yotei.Tools.BaseGenerator;
 
 // ========================================================
 internal static class TreeDiagnostics
@@ -42,7 +44,7 @@ internal static class TreeDiagnostics
     // ----------------------------------------------------
 
     // Factorizes common code.
-    private static Diagnostic CreateSymbolNotFoundForSyntax(
+    private static Diagnostic _SymbolNotFoundForSyntax(
         SyntaxNode syntax,
         string type,
         DiagnosticSeverity severity)
@@ -67,7 +69,7 @@ internal static class TreeDiagnostics
     public static Diagnostic SymbolNotFoundForSyntax(
         TypeDeclarationSyntax syntax,
         DiagnosticSeverity severity = DiagnosticSeverity.Error)
-        => CreateSymbolNotFoundForSyntax(syntax, "type", severity);
+        => _SymbolNotFoundForSyntax(syntax, "type", severity);
 
     /// <summary>
     /// Cannot find a symbol associated to the given syntax.
@@ -78,7 +80,7 @@ internal static class TreeDiagnostics
     public static Diagnostic SymbolNotFoundForSyntax(
         PropertyDeclarationSyntax syntax,
         DiagnosticSeverity severity = DiagnosticSeverity.Error)
-        => CreateSymbolNotFoundForSyntax(syntax, "property", severity);
+        => _SymbolNotFoundForSyntax(syntax, "property", severity);
 
     /// <summary>
     /// Cannot find a symbol associated to the given syntax.
@@ -89,7 +91,7 @@ internal static class TreeDiagnostics
     public static Diagnostic SymbolNotFoundForSyntax(
         FieldDeclarationSyntax syntax,
         DiagnosticSeverity severity = DiagnosticSeverity.Error)
-        => CreateSymbolNotFoundForSyntax(syntax, "field", severity);
+        => _SymbolNotFoundForSyntax(syntax, "field", severity);
 
     /// <summary>
     /// Cannot find a symbol associated to the given syntax.
@@ -100,12 +102,12 @@ internal static class TreeDiagnostics
     public static Diagnostic SymbolNotFoundForSyntax(
         MethodDeclarationSyntax syntax,
         DiagnosticSeverity severity = DiagnosticSeverity.Error)
-        => CreateSymbolNotFoundForSyntax(syntax, "method", severity);
+        => _SymbolNotFoundForSyntax(syntax, "method", severity);
 
     // ----------------------------------------------------
 
     // Factorizes common code.
-    private static Diagnostic CreateSymbolNotFound(
+    private static Diagnostic _SymbolNotFound(
         ISymbol symbol,
         string type,
         DiagnosticSeverity severity)
@@ -133,7 +135,7 @@ internal static class TreeDiagnostics
     public static Diagnostic SymbolNotFound(
         ITypeSymbol symbol,
         DiagnosticSeverity severity = DiagnosticSeverity.Error)
-        => CreateSymbolNotFound(symbol, "Type", severity);
+        => _SymbolNotFound(symbol, "Type", severity);
 
     /// <summary>
     /// Cannot find the given symbol.
@@ -144,7 +146,7 @@ internal static class TreeDiagnostics
     public static Diagnostic SymbolNotFound(
         IPropertySymbol symbol,
         DiagnosticSeverity severity = DiagnosticSeverity.Error)
-        => CreateSymbolNotFound(symbol, "Property", severity);
+        => _SymbolNotFound(symbol, "Property", severity);
 
     /// <summary>
     /// Cannot find the given symbol.
@@ -155,7 +157,7 @@ internal static class TreeDiagnostics
     public static Diagnostic SymbolNotFound(
         IFieldSymbol symbol,
         DiagnosticSeverity severity = DiagnosticSeverity.Error)
-        => CreateSymbolNotFound(symbol, "Field", severity);
+        => _SymbolNotFound(symbol, "Field", severity);
 
     /// <summary>
     /// Cannot find the given symbol.
@@ -166,7 +168,7 @@ internal static class TreeDiagnostics
     public static Diagnostic SymbolNotFound(
         IMethodSymbol symbol,
         DiagnosticSeverity severity = DiagnosticSeverity.Error)
-        => CreateSymbolNotFound(symbol, "Method", severity);
+        => _SymbolNotFound(symbol, "Method", severity);
 
     // ----------------------------------------------------
 
