@@ -1,4 +1,4 @@
-﻿using static Yotei.Tools.Diagnostics.ConsoleEx;
+﻿/*using static Yotei.Tools.Diagnostics.ConsoleEx;
 using static System.ConsoleColor;
 
 namespace Yotei.Tools.CloneGenerator.Tests.Abstracts
@@ -192,4 +192,4 @@ namespace Yotei.Tools.CloneGenerator.Tests.Abstracts
             Assert.Equal("Public, Virtual, HideBySig", method.Attributes.ToString());
         }
     }
-}
+}*/

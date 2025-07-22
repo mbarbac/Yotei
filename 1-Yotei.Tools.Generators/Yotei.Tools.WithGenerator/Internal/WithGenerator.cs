@@ -5,7 +5,7 @@
 /// Generates 'With()' methods for members decorated with the <see cref="WithAttribute"/> attribute
 /// and/or types decorated with the <see cref="InheritWithsAttribute"/> one.
 /// </summary>
-[Generator(LanguageNames.CSharp)]
+//[Generator(LanguageNames.CSharp)]
 internal class WithGenerator : TreeGenerator
 {
 #if DEBUG_WITH_GENERATOR

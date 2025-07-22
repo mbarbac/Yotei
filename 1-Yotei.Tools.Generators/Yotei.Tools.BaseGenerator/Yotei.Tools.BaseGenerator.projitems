@@ -65,6 +65,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\EasyNameExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\EasyNameOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CodeBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\RecursiveHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\DebugExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\StringExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\ObjectExtensions.cs" />

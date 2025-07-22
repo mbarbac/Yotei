@@ -23,7 +23,7 @@ internal class XTypeNode : TypeNode
             TreeDiagnostics.RecordsNotSupported(Symbol).Report(context);
             return false;
         }
-        if (!ValidateReturnInterface())
+        if (!CaptureReturnType())
         {
             CloneableDiagnostics.InvalidReturnInterface(Symbol).Report(context);
             return false;
@@ -39,7 +39,7 @@ internal class XTypeNode : TypeNode
     protected override string? GetHeader(SourceProductionContext context)
     {
         var head = base.GetHeader(context);
-        var add = ValueAddICloneable(Symbol, out var temp, chain: true, ifaces: true) && temp;
+        var add = GetAddICloneableValue(Symbol, out var temp) && temp;
 
         if (add) head += " : ICloneable";
         return head;
@@ -54,9 +54,9 @@ internal class XTypeNode : TypeNode
         if (FindCloneMethod(Symbol) != null) return;
 
         // Dispatching...
-        if (Symbol.IsInterface()) EmitAsInterface(context, cb);
-        else if (Symbol.IsAbstract) EmitAsAbstract(context, cb);
-        else EmitAsConcrete(context, cb);
+        if (Symbol.IsInterface()) EmitForInterface(context, cb);
+        else if (Symbol.IsAbstract) EmitForAbstract(context, cb);
+        else EmitForConcrete(context, cb);
     }
 
     // ----------------------------------------------------
@@ -64,7 +64,7 @@ internal class XTypeNode : TypeNode
     /// <summary>
     /// Invoked when the type is an interface.
     /// </summary>
-    void EmitAsInterface(SourceProductionContext _, CodeBuilder cb)
+    void EmitForInterface(SourceProductionContext _, CodeBuilder cb)
     {
         var modifiers = GetModifiers();
         var typename = Symbol.EasyName();
@@ -72,12 +72,16 @@ internal class XTypeNode : TypeNode
         EmitDocumentation(cb);
         cb.AppendLine($"{modifiers}{typename} Clone();");
 
-        // Gets the method modifiers, with a space separator, or null if any.
+        /// <summary>
+        /// Gets the method modifiers followed by a space separator, or null if any. The logic is:
+        /// if any base interface defines a 'Clone' method, then we return 'new'. Otherwise, we
+        /// don't need any modifier.
+        /// </summary>
         string? GetModifiers()
         {
             var found = false;
             if (!found) found = Symbol.AllInterfaces.Any(x => x.Name == "ICloneable");
-            if (!found) found = ValueAddICloneable(Symbol, out var value, true, true) && value;
+            if (!found) found = GetAddICloneableValue(Symbol, out var value, true, false, true) && value;
 
             if (!found)
             {
@@ -96,25 +100,25 @@ internal class XTypeNode : TypeNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// Invoked when the type is an abstract one.
+    /// Invoked when the type is an abstract class.
     /// </summary>
-    void EmitAsAbstract(SourceProductionContext context, CodeBuilder cb)
+    void EmitForAbstract(SourceProductionContext _, CodeBuilder cb)
     {
-        CaptureReturnType();
         var modifiers = GetModifiers();
-
         var options = ReturnType.IsInterface() ? RoslynNameOptions.Full with { UseTypeNullable = false } : RoslynNameOptions.Default;
         var retname = ReturnType.EasyName(options);
 
         EmitDocumentation(cb);
         cb.AppendLine($"{modifiers}{retname} Clone();");
 
-        EmitExplicitInterfaces(context, cb);
+        EmitExplicitInterfaces(cb);
 
-        // Gets the method modifiers, with a space separator, or null if any.
+        /// <summary>
+        /// Gets the method modifiers followed by a space separator, or null if any.
+        /// </summary>
         string? GetModifiers()
         {
-            // When symbol is a derived one...
+            // When the host is a derived one...
             var host = Symbol.BaseType;
             if (host != null && host.Name != "Object")
             {
@@ -122,15 +126,17 @@ internal class XTypeNode : TypeNode
                 var method = FindCloneMethod(host, chain: true);
                 if (method != null)
                 {
+                    // Reusing base method accessibility...
                     var access = method.DeclaredAccessibility;
                     if (access == Accessibility.Private) return null;
                     var str = access.ToCSharpString(addspace: true);
 
+                    // May need to re-asbtract...
                     var isvirtual = method.IsVirtual || method.IsOverride | method.IsAbstract;
                     return isvirtual ? $"{str}abstract override " : $"{str}abstract ";
                 }
 
-                // If the method is being implemented...
+                // Else, method might have been requested, and we always re-abstract...
                 var at = FindCloneableAttribute(host, chain: true);
                 if (at != null)
                 {
@@ -146,10 +152,12 @@ internal class XTypeNode : TypeNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// Invoked when the type is a concrete one.
+    /// Invoked when the type is a concrete class.
     /// </summary>
-    void EmitAsConcrete(SourceProductionContext context, CodeBuilder cb)
+    void EmitForConcrete(SourceProductionContext context, CodeBuilder cb)
     {
+        if (Symbol.Name == "Type1B") { } // DEBUG
+
         // We need a copy constructor...
         var ctor = Symbol.GetCopyConstructor(strict: false);
         if (ctor == null)
@@ -159,10 +167,8 @@ internal class XTypeNode : TypeNode
         }
 
         // Emitting...
-        CaptureReturnType();
         var modifiers = GetModifiers();
         var typename = Symbol.EasyName();
-
         var options = ReturnType.IsInterface() ? RoslynNameOptions.Full with { UseTypeNullable = false } : RoslynNameOptions.Default;
         var retname = ReturnType.EasyName(options);
 
@@ -177,15 +183,17 @@ internal class XTypeNode : TypeNode
         cb.IndentLevel--;
         cb.AppendLine("}");
 
-        EmitExplicitInterfaces(context, cb);
+        EmitExplicitInterfaces(cb);
 
-        // Gets the method modifiers, with a space separator, or null if any.
+        /// <summary>
+        /// Gets the method modifiers followed by a space separator, or null if any.
+        /// </summary>
         string? GetModifiers()
         {
             var issealed = Symbol.IsSealed;
-            var prevent = ValuePreventVirtual(Symbol, out var temp, true, true) && temp;
+            var prevent = GetPreventVirtualValue(Symbol, out var temp, true, false, true) && temp;
 
-            // When symbol is a derived one...
+            // When the host is a derived one...
             var host = Symbol.BaseType;
             if (host != null && host.Name != "Object")
             {
@@ -193,6 +201,7 @@ internal class XTypeNode : TypeNode
                 var method = FindCloneMethod(host, chain: true);
                 if (method != null)
                 {
+                    // Reusing base method accessibility...
                     var access = method.DeclaredAccessibility;
                     if (access == Accessibility.Private) return null;
                     var str = access.ToCSharpString(addspace: true);
@@ -202,10 +211,10 @@ internal class XTypeNode : TypeNode
                     {
                         var isvirtual = method.IsVirtual || method.IsOverride | method.IsAbstract;
                         return isvirtual ? $"{str}override " : $"{str}new ";
-                    }   
+                    }
                 }
 
-                // If the method is being implemented...
+                // Else, method might have been requested...
                 var at = FindCloneableAttribute(host, chain: true);
                 if (at != null)
                 {
@@ -223,7 +232,7 @@ internal class XTypeNode : TypeNode
     /// <summary>
     /// Invoked to emit the explicit interfaces' implementations associated to this type.
     /// </summary>
-    void EmitExplicitInterfaces(SourceProductionContext _, CodeBuilder cb)
+    void EmitExplicitInterfaces(CodeBuilder cb)
     {
         var comparer = SymbolComparer.Default;
         var ifaces = GetExplicitInterfaces();
@@ -250,22 +259,23 @@ internal class XTypeNode : TypeNode
         var list = new List<ITypeSymbol>();
 
         foreach (var iface in Symbol.Interfaces) TryCapture(iface);
-        TryICloneable();
+        TryAddICloneable();
         return list;
 
-        // Tries to capture the given interface...
+        /// <summary>
+        /// Tries to capture the given interface as an explicit one.
+        /// </summary>
         bool TryCapture(INamedTypeSymbol iface)
         {
+            // First, the childs...
             var found = false;
-
-            // First, its childs...
             foreach (var child in iface.Interfaces)
             {
                 var temp = TryCapture(child);
                 if (temp) found = true;
             }
 
-            // Then the interface itself...
+            // Then, the interface itself...
             found = found ||
                 iface.Name == "ICloneable" ||
                 FindCloneMethod(iface) != null ||
@@ -277,14 +287,15 @@ internal class XTypeNode : TypeNode
                 var temp = list.Find(x => comparer.Equals(x, iface));
                 if (temp == null) list.Add(iface);
             }
-
             return found;
         }
 
-        // Tries to add the 'ICloneable' interface, if needed...
-        void TryICloneable()
+        /// <summary>
+        /// Tries to add the <see cref="ICloneable"/> interface, if needed.
+        /// </summary>
+        void TryAddICloneable()
         {
-            var add = ValueAddICloneable(Symbol, out var value, true, true) && value;
+            var add = GetAddICloneableValue(Symbol, out var value) && value;
             if (add)
             {
                 var comp = GetBranchCompilation();
@@ -302,170 +313,145 @@ internal class XTypeNode : TypeNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns the type to use as the return type for the generated methods.
-    /// <br/> If the host type is an interface, the return type is always that interface.
-    /// <br/> If the attribute does not use the <see cref="CloneableAttribute.ReturnInterface"/>,
-    /// the return type is the host one, either concrete or abstract.
-    /// <br/> If that property is <c>true</c>, then the return type is the first interface in the
-    /// collection of directly implemented ones that is cloneable-alike. If none is found, then
-    /// the return type is the host type itself.
+    /// Captures the type to use as the return type of the generated method. Returns <c>false</c>
+    /// if the return type cannot be captured because returning an interface is requested and a
+    /// similar method in a base type returns a concrete type. Otherwise returns <c>true</c> and
+    /// sets the out argument to that return type.
     /// </summary>
-    void CaptureReturnType()
+    bool CaptureReturnType()
     {
-        // If host is interface, use that host type...
-        if (!Symbol.IsInterface())
+        // If host is an interface, use the host type itself...
+        if (Symbol.IsInterface())
         {
-            // If use interface is requested...
-            var value = ValueReturnInterface(Symbol, out var temp) && temp;
-            if (value)
-            {
-                foreach (var iface in Symbol.Interfaces)
-                {
-                    // ICloneable does not qualify...
-                    if (IsCloneAlike(iface) && iface.Name != "ICloneable")
-                    { ReturnType = iface; return; }
-                }
-            }
+            ReturnType = Symbol;
+            return true;
         }
 
-        // By default, the host type itself is returned...
-        ReturnType = Symbol;
-    }
+        // If no ReturnInterface is requested, also use the host type itself...
+        var value = GetReturnInterfaceValue(Symbol, out var temp) && temp;
+        if (!value)
+        {
+            ReturnType = Symbol;
+            return true;
+        }
 
-    /// <summary>
-    /// When this host is not an interface and <see cref="CloneableAttribute.ReturnInterface"/>
-    /// is requested, then the return type of any base method must be an interface as well, or
-    /// otherwise is a C# syntax error.
-    /// </summary>
-    bool ValidateReturnInterface()
-    {
-        // Not applicable for interface hosts...
-        if (Symbol.IsInterface()) return true;
-
-        // Not applicable if no return interface is requested...
-        var retiface = ValueReturnInterface(Symbol, out var temp) && temp;
-        if (!retiface) return true;
-
-        // Error if a base method return type is not an interface...
+        // Cannot override with an interface a base method with a concrete return type...
         var host = Symbol;
         while ((host = host.BaseType) != null)
         {
-            var method = FindCloneMethod(Symbol);
+            // Either because it has such method...
+            var method = FindCloneMethod(host);
             if (method != null && method.ReturnType.IsInterface()) return false;
 
-            var at = FindCloneableAttribute(host);
-            if (at == null) continue;
+            // Or because such method is requested...
+            var attr = FindCloneableAttribute(host);
+            if (attr == null) continue;
 
-            retiface = ValueReturnInterface(at, out temp) && temp;
-            if (!retiface) return false;
+            var found = GetReturnInterfaceValue(attr, out value);
+            if (!found) continue;
+            if (!value) return false;
         }
 
         // Validated...
+        ReturnType = Symbol;
         return true;
     }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Tries to find and return the <see cref="CloneableAttribute"/> attribute that decorates
-    /// the given type, or null if any. The base types and interfaces are also searched if such
-    /// is explicitly requested.
-    /// </summary>
-    static AttributeData? FindCloneableAttribute(
-        INamedTypeSymbol type, bool chain = false, bool ifaces = false)
-    {
-        var item = type.GetAttributes(typeof(CloneableAttribute)).FirstOrDefault();
-        if (item != null) return item;
-
-        if (chain)
-        {
-            foreach (var child in type.AllBaseTypes())
-            {
-                item = FindCloneableAttribute(child);
-                if (item != null) return item;
-            }
-        }
-
-        if (ifaces)
-        {
-            foreach (var child in type.AllInterfaces)
-            {
-                item = FindCloneableAttribute(child);
-                if (item != null) return item;
-            }
-        }
-
-        return null;
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Returns the 'Clone()' method declared or implemented by the given type. The base types
-    /// and interfaces are also searched if explicitly requested. Returns <c>null</c> if not
-    /// found.
+    /// Tries to find a valid 'Clone()' method in the given type, or in its chain of base types
+    /// and direct or all implemented interfaces if such is explicitly requested. Returns null
+    /// if not found, or found method otherwise.
     /// </summary>
     static IMethodSymbol? FindCloneMethod(
-        INamedTypeSymbol type, bool chain = false, bool ifaces = false)
+        ITypeSymbol type,
+        bool chain = false, bool ifaces = false, bool allifaces = false)
     {
-        var item = type.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(x =>
-            x.Name == "Clone" &&
-            x.Parameters.Length == 0 &&
-            x.ReturnsVoid == false);
-
-        if (item != null) return item;
-
-        if (chain)
+        return type.Recursive(type =>
         {
-            foreach (var child in type.AllBaseTypes())
-            {
-                item = FindCloneMethod(child);
-                if (item != null) return item;
-            }
-        }
-
-        if (ifaces)
-        {
-            foreach (var child in type.AllInterfaces)
-            {
-                item = FindCloneMethod(child);
-                if (item != null) return item;
-            }
-        }
-
-        return null;
+            return type.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(x =>
+                x.Name == "Clone" &&
+                x.Parameters.Length == 0 &&
+                x.ReturnsVoid == false);
+        },
+        chain, ifaces, allifaces);
     }
 
     /// <summary>
-    /// Determines if the given type is a 'Clone'-alike one, either because it implements or
-    /// declared a 'Clone' method, or because it is decorated with the <see cref="ICloneable"/>
-    /// attribute. The base types and interfaces are also searched if explicitly requested.
+    /// Determines if the given type is a 'Cloneable'-alike one, either because it implements a
+    /// 'Clone' method, or because it is decorated with the <see cref="CloneableAttribute"/>
+    /// attribute. The chains of its base types and direct or all implemented interfaces are also
+    /// used if such is explicitly requested.
     /// </summary>
-    static bool IsCloneAlike(INamedTypeSymbol type, bool chain = false, bool ifaces = false)
+    static bool IsCloneable(
+        ITypeSymbol type,
+        bool chain = false, bool ifaces = false, bool allifaces = false)
     {
-        var method = FindCloneMethod(type);
-        if (method != null) return true;
+        return type.Recursive(type =>
+        {
+            var method = FindCloneMethod(type); if (method != null) return true;
+            var attr = FindCloneableAttribute(type); if (attr != null) return true;
+            return false;
+        },
+        chain, ifaces, allifaces);
+    }
 
-        var at = FindCloneableAttribute(type);
-        if (at != null) return true;
+    /// <summary>
+    /// Determines if the given type is a 'Cloneable'-alike one, either because it implements a
+    /// 'Clone' method, or because it is decorated with the <see cref="CloneableAttribute"/>
+    /// attribute. The chains of its base types and direct or all implemented interfaces are also
+    /// used if such is explicitly requested.
+    /// </summary>
+    static bool IsCloneable(
+        ITypeSymbol type, out IMethodSymbol? method, out AttributeData? attr,
+        bool chain = false, bool ifaces = false, bool allifaces = false)
+    {
+        IMethodSymbol? _method = default;
+        AttributeData? _attr = default;
 
-        if (chain)
-            foreach (var child in type.AllBaseTypes()) if (IsCloneAlike(child)) return true;
+        var found = type.Recursive(type =>
+        {
+            _method = null;
+            _attr = null;
 
-        if (ifaces)
-            foreach (var child in type.AllInterfaces) if (IsCloneAlike(child)) return true;
+            _method = FindCloneMethod(type); if (_method != null) return true;
+            _attr = FindCloneableAttribute(type); if (_attr != null) return true;
+            return false;
+        },
+        chain, ifaces, allifaces);
 
-        return false;
+        method = found ? _method : null;
+        attr = found ? _attr : null;
+        return found;
     }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Tries to get the value of the <see cref="CloneableAttribute.ReturnInterface"/> named
-    /// argument from the given attribute. If found among the used arguments, returns true and
-    /// its actual value in the out argument. Otherwise, returns false.
+    /// Tries to find the <see cref="CloneableAttribute"/> attribute on the given type. The chain
+    /// of base types and direct or all implemented interfaces are also used if such is explicitly
+    /// requested.
     /// </summary>
-    static bool ValueReturnInterface(AttributeData at, out bool value)
+    static AttributeData? FindCloneableAttribute(
+        ITypeSymbol type,
+        bool chain = false, bool ifaces = false, bool allifaces = false)
+    {
+        return type.Recursive(type =>
+        {
+            return type.GetAttributes(typeof(CloneableAttribute)).FirstOrDefault();
+        },
+        chain, ifaces, allifaces);
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Tries to find the value of the <see cref="CloneableAttribute.ReturnInterface"/> property on
+    /// the given attribute. If found, returns <c>true</c> and sets the value of the out argument
+    /// to the value found. If not, returns <c>false</c>.
+    /// </summary>
+    static bool GetReturnInterfaceValue(AttributeData at, out bool value)
     {
         if (at.GetNamedArgument(nameof(CloneableAttribute.ReturnInterface), out var arg))
         {
@@ -475,89 +461,39 @@ internal class XTypeNode : TypeNode
                 return true;
             }
         }
-
         value = false;
         return false;
     }
 
     /// <summary>
-    /// Tries to get the value of the <see cref="CloneableAttribute.ReturnInterface"/> named
-    /// argument from the attribute that decorates the given type, if any. If found among the
-    /// used arguments, returns true and its actual value in the out argument. Otherwise,
-    /// returns false.
+    /// Tries to find the value of the <see cref="CloneableAttribute.ReturnInterface"/> property on
+    /// the given type, or in its chain of base types and direct or all implemented interfaces if
+    /// such is explicitly requested. If found, returns <c>true</c> and sets the value of the out
+    /// argument to the value found. If not, returns <c>false</c>.
     /// </summary>
-    static bool ValueReturnInterface(
-        INamedTypeSymbol type, out bool value, bool chain = false, bool ifaces = false)
+    static bool GetReturnInterfaceValue(
+        ITypeSymbol type, out bool value,
+        bool chain = false, bool ifaces = false, bool allifaces = false)
     {
-        var at = FindCloneableAttribute(type, chain, ifaces);
-        if (at != null && ValueReturnInterface(at, out value)) return true;
-
-        if (chain)
-            foreach (var child in type.AllBaseTypes())
-                if (ValueReturnInterface(child, out value)) return true;
-
-        if (ifaces)
-            foreach (var child in type.AllInterfaces)
-                if (ValueReturnInterface(child, out value)) return true;
-
-        value = false;
-        return false;
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Tries to get the value of the <see cref="CloneableAttribute.PreventVirtual"/> named
-    /// argument from the given attribute. If found among the used arguments, returns true and
-    /// its actual value in the out argument. Otherwise, returns false.
-    /// </summary>
-    static bool ValuePreventVirtual(AttributeData at, out bool value)
-    {
-        if (at.GetNamedArgument(nameof(CloneableAttribute.PreventVirtual), out var arg))
+        return type.RecursiveBool(out value, (ITypeSymbol type, out bool value) =>
         {
-            if (!arg.Value.IsNull && arg.Value.Value is bool temp)
-            {
-                value = temp;
-                return true;
-            }
-        }
+            var at = FindCloneableAttribute(type);
+            if (at != null && GetReturnInterfaceValue(at, out value)) return true;
 
-        value = false;
-        return false;
-    }
-
-    /// <summary>
-    /// Tries to get the value of the <see cref="CloneableAttribute.PreventVirtual"/> named
-    /// argument from the attribute that decorates the given type, if any. If found among the
-    /// used arguments, returns true and its actual value in the out argument. Otherwise,
-    /// returns false.
-    /// </summary>
-    static bool ValuePreventVirtual(
-        INamedTypeSymbol type, out bool value, bool chain = false, bool ifaces = false)
-    {
-        var at = FindCloneableAttribute(type, chain, ifaces);
-        if (at != null && ValuePreventVirtual(at, out value)) return true;
-
-        if (chain)
-            foreach (var child in type.AllBaseTypes())
-                if (ValuePreventVirtual(child, out value)) return true;
-
-        if (ifaces)
-            foreach (var child in type.AllInterfaces)
-                if (ValuePreventVirtual(child, out value)) return true;
-
-        value = false;
-        return false;
+            value = false;
+            return false;
+        },
+        chain, ifaces, allifaces);
     }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Tries to get the value of the <see cref="CloneableAttribute.AddICloneable"/> named
-    /// argument from the given attribute. If found among the used arguments, returns true and
-    /// its actual value in the out argument. Otherwise, returns false.
+    /// Tries to find the value of the <see cref="CloneableAttribute.AddICloneable"/> property on
+    /// the given attribute. If found, returns <c>true</c> and sets the value of the out argument
+    /// to the value found. If not, returns <c>false</c>.
     /// </summary>
-    static bool ValueAddICloneable(AttributeData at, out bool value)
+    static bool GetAddICloneableValue(AttributeData at, out bool value)
     {
         if (at.GetNamedArgument(nameof(CloneableAttribute.AddICloneable), out var arg))
         {
@@ -567,33 +503,71 @@ internal class XTypeNode : TypeNode
                 return true;
             }
         }
-
         value = false;
         return false;
     }
 
     /// <summary>
-    /// Tries to get the value of the <see cref="CloneableAttribute.AddICloneable"/> named
-    /// argument from the attribute that decorates the given type, if any. If found among the
-    /// used arguments, returns true and its actual value in the out argument. Otherwise,
-    /// returns false.
+    /// Tries to find the value of the <see cref="CloneableAttribute.AddICloneable"/> property on
+    /// the given type, or in its chain of base types and direct or all implemented interfaces if
+    /// such is explicitly requested. If found, returns <c>true</c> and sets the value of the out
+    /// argument to the value found. If not, returns <c>false</c>.
     /// </summary>
-    static bool ValueAddICloneable(
-        INamedTypeSymbol type, out bool value, bool chain = false, bool ifaces = false)
+    static bool GetAddICloneableValue(
+        ITypeSymbol type, out bool value,
+        bool chain = false, bool ifaces = false, bool allifaces = false)
     {
-        var at = FindCloneableAttribute(type, chain, ifaces);
-        if (at != null && ValueAddICloneable(at, out value)) return true;
+        return type.RecursiveBool(out value, (ITypeSymbol type, out bool value) =>
+        {
+            var at = FindCloneableAttribute(type);
+            if (at != null && GetAddICloneableValue(at, out value)) return true;
 
-        if (chain)
-            foreach (var child in type.AllBaseTypes())
-                if (ValueAddICloneable(child, out value)) return true;
+            value = false;
+            return false;
+        },
+        chain, ifaces, allifaces);
+    }
 
-        if (ifaces)
-            foreach (var child in type.AllInterfaces)
-                if (ValueAddICloneable(child, out value)) return true;
+    // ----------------------------------------------------
 
+    /// <summary>
+    /// Tries to find the value of the <see cref="CloneableAttribute.PreventVirtual"/> property on
+    /// the given attribute. If found, returns <c>true</c> and sets the value of the out argument
+    /// to the value found. If not, returns <c>false</c>.
+    /// </summary>
+    static bool GetPreventVirtualValue(AttributeData at, out bool value)
+    {
+        if (at.GetNamedArgument(nameof(CloneableAttribute.PreventVirtual), out var arg))
+        {
+            if (!arg.Value.IsNull && arg.Value.Value is bool temp)
+            {
+                value = temp;
+                return true;
+            }
+        }
         value = false;
         return false;
+    }
+
+    /// <summary>
+    /// Tries to find the value of the <see cref="CloneableAttribute.PreventVirtual"/> property on
+    /// the given type, or in its chain of base types and direct or all implemented interfaces if
+    /// such is explicitly requested. If found, returns <c>true</c> and sets the value of the out
+    /// argument to the value found. If not, returns <c>false</c>.
+    /// </summary>
+    static bool GetPreventVirtualValue(
+        ITypeSymbol type, out bool value,
+        bool chain = false, bool ifaces = false, bool allifaces = false)
+    {
+        return type.RecursiveBool(out value, (ITypeSymbol type, out bool value) =>
+        {
+            var at = FindCloneableAttribute(type);
+            if (at != null && GetPreventVirtualValue(at, out value)) return true;
+
+            value = false;
+            return false;
+        },
+        chain, ifaces, allifaces);
     }
 
     // ----------------------------------------------------
