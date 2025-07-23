@@ -9,14 +9,12 @@ internal class XPropertyNode : PropertyNode
     public XPropertyNode(TypeNode parent, IPropertySymbol symbol) : base(parent, symbol) { }
     public XPropertyNode(TypeNode parent, PropertyCandidate candidate) : base(parent, candidate) { }
 
+
     INamedTypeSymbol ReturnType = default!;
     bool IsInherited => Candidate is null;
     INamedTypeSymbol Host => ParentNode.Symbol;
     string MethodName => $"With{Symbol.Name}";
     string ArgumentName => $"v_{Symbol.Name}";
-
-    /*
-    
 
     // ----------------------------------------------------
 
@@ -27,37 +25,120 @@ internal class XPropertyNode : PropertyNode
         if (!base.Validate(context)) return false;
 
         // Other validations...
-        if (Symbol.IsRecord)
+        if (Host.IsRecord)
         {
-            TreeDiagnostics.RecordsNotSupported(Symbol).Report(context);
+            TreeDiagnostics.RecordsNotSupported(Host).Report(context);
             return false;
         }
-        if (!CaptureReturnType())
+        if (!ValidateReturnType())
         {
             TreeDiagnostics.InvalidReturnType(Symbol).Report(context);
             return false;
         }
+        if (!ValidateSpecific(context)) return false;
 
         // Finishing...
+        ReturnType = CaptureReturnType();
         return true;
     }
 
-    // ----------------------------------------------------
-
-    /// <inheritdoc/>
-    protected override string? GetHeader(SourceProductionContext context)
+    /// <summary>
+    /// Invoked to validate specific conditions of the member.
+    /// </summary>
+    bool ValidateSpecific(SourceProductionContext context)
     {
-        var head = base.GetHeader(context);
-        var add = GetAddICloneableValue(Symbol, out var temp) && temp;
+        if (Symbol.IsIndexer)
+        {
+            TreeDiagnostics.IndexerNotSupported(Symbol).Report(context);
+            return false;
+        }
+        if (!Symbol.HasGetter())
+        {
+            TreeDiagnostics.NoGetter(Symbol).Report(context);
+            return false;
+        }
+        if (!Host.IsInterface() && !Symbol.HasSetterOrInit())
+        {
+            TreeDiagnostics.NoSetter(Symbol).Report(context);
+            return false;
+        }
+        return true;
+    }
 
-        if (add) head += " : ICloneable";
-        return head;
+    /// <summary>
+    /// Validates that, if using an alternate return type is requested, such is valid because
+    /// there is no base type returning a concrete one. If either the host type is itself an
+    /// interface, or using an interface return type was not requested, validation is passed.
+    /// </summary>
+    bool ValidateReturnType()
+    {
+        if (Host.IsInterface()) return true; // // Interfaces are valid per-se...
+
+        var attr = FindWithAttribute(Host); // No member with attribute, weird...
+        if (attr == null) return true;
+
+        var found = GetReturnInterfaceValue(attr, out var value); // No alternate requested...
+        if (found && !value) return true;
+
+        var host = Host;
+        while ((host = host.BaseType) != null)
+        {
+            var method = FindWithMethod(host);
+            if (method != null && method.ReturnType.IsInterface()) return true; // Good base method...
+
+            attr = FindWithAttribute(host) ?? FindInheritWithsAttribute(host);
+            if (attr == null) continue;
+
+            found = GetReturnInterfaceValue(attr, out value);
+            if (!found) continue;
+            if (!value) return false; // Bad requested base method...
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Captures the return type to use with the generated methods.
+    /// </summary>
+    INamedTypeSymbol CaptureReturnType()
+    {
+        if (Host.IsInterface()) return Host; // Return type for interfaces is itself...
+
+        var attr = FindWithAttribute(Host); // Weird, return the host type itself...
+        if (attr == null) return Host;
+
+        if (IsInherited) attr = FindInheritWithsAttribute(Host);
+
+        var value = false;
+        var found = false;
+        if (attr != null) found = GetReturnInterfaceValue(attr, out value); // No requested, return itself...
+        if (found && !value) return Host;
+
+        foreach (var iface in Host.Interfaces)
+        {
+            found = iface.Recursive(iface =>
+            {
+                var method = FindWithMethod(iface); if (method != null) return true;
+                var member = FindMember(iface); if (member != null) return true;
+
+                attr = FindInheritWithsAttribute(iface); if (attr == null) return false;
+                found = GetReturnInterfaceValue(attr, out value);
+                if (found && value) return true;
+
+                return false;
+            },
+            allifaces: true);
+
+            if (found) return iface; // Found a first-level interface...
+        }
+
+        return Host; // Return host type by default...
     }
 
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    protected override void EmitCore(SourceProductionContext context, CodeBuilder cb)
+    /*protected override void EmitCore(SourceProductionContext context, CodeBuilder cb)
     {
         // Declared or implemented explicitly...
         if (FindCloneMethod(Symbol) != null) return;
@@ -66,14 +147,14 @@ internal class XPropertyNode : PropertyNode
         if (Symbol.IsInterface()) EmitForInterface(context, cb);
         else if (Symbol.IsAbstract) EmitForAbstract(context, cb);
         else EmitForConcrete(context, cb);
-    }
+    }*/
 
     // ----------------------------------------------------
 
     /// <summary>
     /// Invoked when the type is an interface.
     /// </summary>
-    void EmitForInterface(SourceProductionContext _, CodeBuilder cb)
+    /*void EmitForInterface(SourceProductionContext _, CodeBuilder cb)
     {
         var modifiers = GetModifiers();
         var typename = Symbol.EasyName();
@@ -104,14 +185,14 @@ internal class XPropertyNode : PropertyNode
 
             return found ? "new " : null;
         }
-    }
+    }*/
 
     // ----------------------------------------------------
 
     /// <summary>
     /// Invoked when the type is an abstract class.
     /// </summary>
-    void EmitForAbstract(SourceProductionContext _, CodeBuilder cb)
+    /*void EmitForAbstract(SourceProductionContext _, CodeBuilder cb)
     {
         var modifiers = GetModifiers();
         var options = ReturnType.IsInterface() ? RoslynNameOptions.Full with { UseTypeNullable = false } : RoslynNameOptions.Default;
@@ -156,14 +237,14 @@ internal class XPropertyNode : PropertyNode
             // Default for abstract types...
             return "public abstract ";
         }
-    }
+    }*/
 
     // ----------------------------------------------------
 
     /// <summary>
     /// Invoked when the type is a concrete class.
     /// </summary>
-    void EmitForConcrete(SourceProductionContext context, CodeBuilder cb)
+    /*void EmitForConcrete(SourceProductionContext context, CodeBuilder cb)
     {
         // We need a copy constructor...
         var ctor = Symbol.GetCopyConstructor(strict: false);
@@ -232,14 +313,14 @@ internal class XPropertyNode : PropertyNode
             // Default for concrete types...
             return prevent || issealed ? "public " : "public virtual ";
         }
-    }
+    }*/
 
     // ----------------------------------------------------
 
     /// <summary>
     /// Invoked to emit the explicit interfaces' implementations associated to this type.
     /// </summary>
-    void EmitExplicitInterfaces(CodeBuilder cb)
+    /*void EmitExplicitInterfaces(CodeBuilder cb)
     {
         if (Symbol.Name == "Type1B") { } // DEBUG
 
@@ -257,12 +338,12 @@ internal class XPropertyNode : PropertyNode
             cb.AppendLine(valuename);
             cb.AppendLine($"{typename}.Clone() => ({typename})Clone();");
         }
-    }
+    }*/
 
     /// <summary>
     /// Gets a list with the interfaces that need explicit implementation.
     /// </summary>
-    List<ITypeSymbol> GetExplicitInterfaces()
+    /*List<ITypeSymbol> GetExplicitInterfaces()
     {
         var comparer = SymbolEqualityComparer.Default;
         var list = new List<ITypeSymbol>();
@@ -317,68 +398,7 @@ internal class XPropertyNode : PropertyNode
                 }
             }
         }
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Captures the type to use as the return type of the generated method. Returns <c>false</c>
-    /// if the return type cannot be captured because returning an interface is requested and a
-    /// similar method in a base type returns a concrete type. Otherwise returns <c>true</c> and
-    /// sets the out argument to that return type.
-    /// </summary>
-    bool CaptureReturnType()
-    {
-        if (Symbol.Name == "Type1B") { } // DEBUG
-
-        // If host is an interface, use the host type itself...
-        if (Symbol.IsInterface())
-        {
-            ReturnType = Symbol;
-            return true;
-        }
-
-        // If no ReturnInterface is requested, also use the host type itself...
-        var value = GetReturnInterfaceValue(Symbol, out var temp) && temp;
-        if (!value)
-        {
-            ReturnType = Symbol;
-            return true;
-        }
-
-        // Cannot override with an interface a base method with a concrete return type...
-        var host = Symbol;
-        while ((host = host.BaseType) != null)
-        {
-            // Either because it has such method...
-            var method = FindCloneMethod(host);
-            if (method != null && method.ReturnType.IsInterface()) return false;
-
-            // Or because such method is requested...
-            var attr = FindCloneableAttribute(host);
-            if (attr == null) continue;
-
-            var found = GetReturnInterfaceValue(attr, out value);
-            if (!found) continue;
-            if (!value) return false;
-        }
-
-        // Finding a suitable direct interface, if any...
-        foreach (var iface in Symbol.Interfaces)
-        {
-            if (iface.Name == "ICloneable") continue; // ICloneable does not qualify...
-            if (IsCloneable(iface, false, false, true))
-            {
-                ReturnType = iface;
-                return true;
-            }
-        }
-
-        // Validated...
-        ReturnType = Symbol;
-        return true;
-    }
-    */
+    }*/
 
     // ----------------------------------------------------
 

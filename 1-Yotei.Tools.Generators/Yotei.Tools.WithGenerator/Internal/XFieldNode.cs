@@ -7,6 +7,7 @@ internal class XFieldNode : FieldNode
     public XFieldNode(TypeNode parent, IFieldSymbol symbol) : base(parent, symbol) { }
     public XFieldNode(TypeNode parent, FieldCandidate candidate) : base(parent, candidate) { }
 
+    
     INamedTypeSymbol ReturnType = default!;
     bool IsInherited => Candidate is null;
 }

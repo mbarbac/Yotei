@@ -23,8 +23,10 @@ internal static class RecursiveHelpers
         type.ThrowWhenNull();
         func.ThrowWhenNull();
 
+        // Delegate on the type itself...
         var found = func(type);
 
+        // Delegate on the base types...
         if (found is null && chain)
         {
             foreach (var child in type.AllBaseTypes())
@@ -34,6 +36,7 @@ internal static class RecursiveHelpers
             }
         }
 
+        // Delegate on the interfaces...
         if (found is null && (ifaces || allifaces))
         {
             var iter = ifaces ? type.Interfaces : type.AllInterfaces;
@@ -69,8 +72,10 @@ internal static class RecursiveHelpers
         type.ThrowWhenNull();
         func.ThrowWhenNull();
 
+        // Delegate on the type itself...
         var found = func(type, out value);
 
+        // Delegate on the base types...
         if (!found && chain)
         {
             foreach (var child in type.AllBaseTypes())
@@ -80,6 +85,7 @@ internal static class RecursiveHelpers
             }
         }
 
+        // Delegate on the interfaces...
         if (!found && (ifaces || allifaces))
         {
             var iter = ifaces ? type.Interfaces : type.AllInterfaces;
