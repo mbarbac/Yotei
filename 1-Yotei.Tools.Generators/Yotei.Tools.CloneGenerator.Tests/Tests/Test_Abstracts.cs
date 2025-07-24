@@ -4,66 +4,63 @@ using static System.ConsoleColor;
 namespace Yotei.Tools.CloneGenerator.Tests.Abstracts
 {
     /// <summary>
-    /// For testing nested elements.
+    /// Plain decoration.
     /// </summary>
-    public partial class TOther
+    [Cloneable]
+    public abstract partial class AType00
     {
-        /// <summary>
-        /// Plain decoration.
-        /// </summary>
-        [Cloneable]
-        public abstract partial class AType01
-        {
-            public AType01() { }
-            protected AType01(AType01 _) { }
-        }
-        
-        /// <summary>
-        /// Plain decoration. Adding ICloneable. Adding PreventVirtual: because it is an abstract
-        /// one, it must get an 'override' modifier instead of a 'new' one.
-        /// </summary>
-        [Cloneable(AddICloneable = true, PreventVirtual = true)]
-        public abstract partial class AType02 : AType01
-        {
-            public AType02() : base() { }
-            protected AType02(AType02 source) : base(source) { }
-        }
-
-        /// <summary>
-        /// ERROR: Cannot use ReturnInterface because Type03 inherits from Type01, whose method's
-        /// return type is NOT an interface.
-        /// </summary>
-        //[Cloneable(ReturnInterface = true)]
-        //public abstract partial class Type03 : Type01
-        //{
-        //    public Type03() : base() { }
-        //    protected Type03(Type03 source) : base(source) { }
-        //}
+        public AType00() { }
+        protected AType00(AType00 _) { }
     }
 
     public static partial class Tests
     {
         //[Enforced]
         [Fact]
-        public static void Test_Type0s()
+        public static void Test_AType00()
         {
-            var type = typeof(TOther.AType01);
+            var type = typeof(AType00);
             var method = type.GetMethod("Clone");
             Assert.NotNull(method);
             Assert.True(method.IsVirtual);
             Assert.Equal(type, method.ReturnType);
+            Assert.False(method.ReturnType.IsInterface);
             Assert.Null(type.GetInterface("ICloneable"));
-            Assert.Equal("Public, Virtual, HideBySig, VtableLayoutMask, Abstract", method.Attributes.ToString());
-
-            type = typeof(TOther.AType02);
-            method = type.GetMethod("Clone");
-            Assert.NotNull(method);
-            Assert.True(method.IsVirtual);
-            Assert.Equal(type, method.ReturnType);
-            Assert.NotNull(type.GetInterface("ICloneable"));
             Assert.Equal("Public, Virtual, HideBySig, VtableLayoutMask, Abstract", method.Attributes.ToString());
         }
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// AddICloneable. PreventVirtual: method DOES NOT get a 'new' modifier because the base
+    /// one it overrides is an abstract one, and C# insists in using 'override'
+    /// </summary>
+    [Cloneable(AddICloneable = true, PreventVirtual = true)]
+    public partial class CType00 : AType00
+    {
+        public CType00() : base() { }
+        protected CType00(CType00 source) : base(source) { }
+    }
+
+    public static partial class Tests
+    {
+        //[Enforced]
+        [Fact]
+        public static void Test_CType00()
+        {
+            var type = typeof(CType00);
+            var method = type.GetMethod("Clone");
+            Assert.NotNull(method);
+            Assert.True(method.IsVirtual);
+            Assert.Equal(type, method.ReturnType);
+            Assert.False(method.ReturnType.IsInterface);
+            Assert.NotNull(type.GetInterface("ICloneable"));
+            Assert.Equal("Public, Virtual, HideBySig, VtableLayoutMask", method.Attributes.ToString());
+        }
+    }
+}
+/*
 
     // ----------------------------------------------------
 
@@ -74,56 +71,28 @@ namespace Yotei.Tools.CloneGenerator.Tests.Abstracts
     public partial interface IFace1 { }
 
     /// <summary>
-    /// Plain decoration.
+    /// Cloneable and inherits interface.
     /// </summary>
     [Cloneable]
-    public abstract partial class AType1A : IFace1
+    public partial class Type10 : IFace1
     {
-        public AType1A() : base() { }
-        protected AType1A(AType1A _) { }
+        public Type10() { }
+        protected Type10(Type10 _) { }
     }
-
-    /// <summary>
-    /// Plain decoration. Adds ICloneable.
-    /// </summary>
-    [Cloneable(AddICloneable = true)]
-    public partial class CType1A : AType1A
-    {
-        public CType1A() : base() { }
-        protected CType1A(CType1A source) : base(source) { }
-    }
-
-    /// <summary>
-    /// ERROR: Cannot use ReturnInterface because Type03 inherits from Type01, whose method's
-    /// return type is NOT an interface.
-    /// </summary>
-    //[Cloneable(ReturnInterface = true)]
-    //public partial class CType1B : AType1A
-    //{
-    //    public CType1B() : base() { }
-    //    protected CType1B(CType1B source) : base(source) { }
-    //}
 
     public static partial class Tests
     {
         //[Enforced]
         [Fact]
-        public static void Test_Type1As()
+        public static void Test_Type10()
         {
-            var type = typeof(AType1A);
+            var type = typeof(Type10);
             var method = type.GetMethod("Clone");
             Assert.NotNull(method);
             Assert.True(method.IsVirtual);
             Assert.Equal(type, method.ReturnType);
+            Assert.False(method.ReturnType.IsInterface);
             Assert.Null(type.GetInterface("ICloneable"));
-            Assert.Equal("Public, Virtual, HideBySig, VtableLayoutMask, Abstract", method.Attributes.ToString());
-
-            type = typeof(CType1A);
-            method = type.GetMethod("Clone");
-            Assert.NotNull(method);
-            Assert.True(method.IsVirtual);
-            Assert.Equal(type, method.ReturnType);
-            Assert.NotNull(type.GetInterface("ICloneable"));
             Assert.Equal("Public, Virtual, HideBySig, VtableLayoutMask", method.Attributes.ToString());
         }
     }
@@ -131,65 +100,137 @@ namespace Yotei.Tools.CloneGenerator.Tests.Abstracts
     // ----------------------------------------------------
 
     /// <summary>
-    /// Plain decoration. Adding ReturnInterface.
+    /// ERROR: Type11 requests return interface, but base type returns concrete type.
     /// </summary>
-    [Cloneable(ReturnInterface = true)]
-    public abstract partial class AType1B : IFace1
-    {
-        public AType1B() : base() { }
-        protected AType1B(AType1B _) { }
-    }
+    //[Cloneable(ReturnInterface = true)]
+    //public partial class Type11 : Type10
+    //{
+    //    public Type11() : base() { }
+    //    protected Type11(Type11 source) : base(source) { }
+    //}
+
+    // ----------------------------------------------------
 
     /// <summary>
-    /// Adding ReturnInterface: because no directly implemented interface, return type is the
-    /// concrete one itself.
+    /// ReturnInterface requested at base type.
     /// </summary>
     [Cloneable(ReturnInterface = true)]
-    public partial class CType1B : AType1B
+    public partial class Type12 : IFace1
     {
-        public CType1B() : base() { }
-        protected CType1B(CType1B _) { }
-    }
-
-    /// <summary>
-    /// Adding ReturnInterface: using the direcly implemented interface.
-    /// </summary>
-    [Cloneable(ReturnInterface = true)]
-    public partial class CType1C : AType1B, IFace1
-    {
-        public CType1C() : base() { }
-        protected CType1C(CType1C source) : base(source) { }
+        public Type12() { }
+        protected Type12(Type12 _) { }
     }
 
     public static partial class Tests
     {
         //[Enforced]
         [Fact]
-        public static void Test_Type1Bs()
+        public static void Test_Type12()
         {
-            var type = typeof(AType1B);
+            var type = typeof(Type12);
             var method = type.GetMethod("Clone");
             Assert.NotNull(method);
             Assert.True(method.IsVirtual);
             Assert.Equal(typeof(IFace1), method.ReturnType);
+            Assert.True(method.ReturnType.IsInterface);
             Assert.Null(type.GetInterface("ICloneable"));
-            Assert.Equal("Public, Virtual, HideBySig, VtableLayoutMask, Abstract", method.Attributes.ToString());
+            Assert.Equal("Public, Virtual, HideBySig, VtableLayoutMask", method.Attributes.ToString());
+        }
+    }
 
-            type = typeof(CType1B);
-            method = type.GetMethod("Clone");
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// ReturnInterface requested at derived type, but not 1st-level interface
+    /// </summary>
+    [Cloneable(ReturnInterface = true)]
+    public partial class Type13 : Type12
+    {
+        public Type13() : base() { }
+        protected Type13(Type13 source) : base(source) { }
+    }
+
+    public static partial class Tests
+    {
+        //[Enforced]
+        [Fact]
+        public static void Test_Type13()
+        {
+            var type = typeof(Type13);
+            var method = type.GetMethod("Clone");
             Assert.NotNull(method);
             Assert.True(method.IsVirtual);
             Assert.Equal(type, method.ReturnType);
+            Assert.False(method.ReturnType.IsInterface);
             Assert.Null(type.GetInterface("ICloneable"));
             Assert.Equal("Public, Virtual, HideBySig, VtableLayoutMask", method.Attributes.ToString());
+        }
+    }
 
-            type = typeof(CType1C);
-            method = type.GetMethod("Clone");
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Plain decoration, inherited.
+    /// </summary>
+    [Cloneable]
+    public partial interface IFace2 : IFace1 { }
+
+    /// <summary>
+    /// ReturnInterface requested at derived type, with valid 1st-level interface. Note that
+    /// because IFace1 appears before IFace2, then it is selected even if it is less derived
+    /// than the second one.
+    /// </summary>
+    [Cloneable(ReturnInterface = true)]
+    public partial class Type14 : Type12, IFace1, IFace2
+    {
+        public Type14() : base() { }
+        protected Type14(Type14 source) : base(source) { }
+    }
+
+    public static partial class Tests
+    {
+        //[Enforced]
+        [Fact]
+        public static void Test_Type14()
+        {
+            var type = typeof(Type14);
+            var method = type.GetMethod("Clone");
             Assert.NotNull(method);
             Assert.True(method.IsVirtual);
             Assert.Equal(typeof(IFace1), method.ReturnType);
+            Assert.True(method.ReturnType.IsInterface);
             Assert.Null(type.GetInterface("ICloneable"));
             Assert.Equal("Public, Virtual, HideBySig", method.Attributes.ToString());
         }
     }
-}
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// ReturnInterface requested at derived type, with valid 1st-level interface. In this case
+    /// IFace2 is the selected one as it appears first.
+    /// </summary>
+    [Cloneable(ReturnInterface = true)]
+    public partial class Type15 : Type12, IFace2, IFace1
+    {
+        public Type15() : base() { }
+        protected Type15(Type15 source) : base(source) { }
+    }
+
+    public static partial class Tests
+    {
+        //[Enforced]
+        [Fact]
+        public static void Test_Type15()
+        {
+            var type = typeof(Type15);
+            var method = type.GetMethod("Clone");
+            Assert.NotNull(method);
+            Assert.True(method.IsVirtual);
+            Assert.Equal(typeof(IFace2), method.ReturnType);
+            Assert.True(method.ReturnType.IsInterface);
+            Assert.Null(type.GetInterface("ICloneable"));
+            Assert.Equal("Public, Virtual, HideBySig, VtableLayoutMask", method.Attributes.ToString());
+        }
+    }
+ */

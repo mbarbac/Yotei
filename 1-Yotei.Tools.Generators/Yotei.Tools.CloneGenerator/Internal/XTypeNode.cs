@@ -23,77 +23,64 @@ internal class XTypeNode : TypeNode
             TreeDiagnostics.RecordsNotSupported(Symbol).Report(context);
             return false;
         }
-        if (!ValidateReturnType())
+        if (!CaptureReturnType(out ReturnType))
         {
             TreeDiagnostics.InvalidReturnType(Symbol).Report(context);
             return false;
         }
 
         // Finishing...
-        ReturnType = CaptureReturnType();
         return true;
     }
 
     /// <summary>
-    /// Validates that, if using an alternate return type is requested, such is valid because
-    /// there is no base type returning a concrete one. If either the host type is itself an
-    /// interface, or using an interface return type was not requested, validation is passed.
+    /// Validates and captures the return type to use with the generated methods.
     /// </summary>
-    bool ValidateReturnType()
+    bool CaptureReturnType(out INamedTypeSymbol type)
     {
-        if (Symbol.IsInterface()) return true; // Interfaces are valid per-se...
+        // Interfaces are valid per-se...
+        if (Symbol.IsInterface()) { type = Symbol; return true; }
 
-        var attr = FindCloneableAttribute(Symbol); // No host attribute (if happens is weird)...
-        if (attr == null) return true;
+        // If no return interface requested, use host type...
+        var attr = FindCloneableAttribute(Symbol);
+        if (attr == null) { type = Symbol; return true; } // 'attr==null' should not happen...
 
-        var found = GetReturnInterfaceValue(attr, out var value); // No alternate requested...
-        if (found && !value) return true;
+        var found = GetReturnInterfaceValue(attr, out var value);
+        if (!found || !value) { type = Symbol; return true; }
 
+        // Validating no base type with a concrete return type...
         var host = Symbol;
         while ((host = host.BaseType) != null)
         {
             var method = FindCloneMethod(host);
-            if (method != null && method.ReturnType.IsInterface()) return true; // Good base method!
+            if (method != null && !method.ReturnType.IsInterface()) { type = null!; return false; }
 
             attr = FindCloneableAttribute(host);
             if (attr == null) continue;
 
             found = GetReturnInterfaceValue(attr, out value);
-            if (!found) continue;
-            if (!value) return false; // Bad requested base method...
+            if (!found|| !value) { type = null!; return false; }
         }
 
-        return true;
-    }
-
-    /// <summary>
-    /// Captures the return type to use with the generated methods.
-    /// </summary>
-    INamedTypeSymbol CaptureReturnType()
-    {
-        if (Symbol.IsInterface()) return Symbol; // Return type for interfaces is itself...
-
-        var attr = FindCloneableAttribute(Symbol); // Weird, return the host type itself...
-        if (attr == null) return Symbol;
-
-        var found = GetReturnInterfaceValue(attr, out var value); // No requested, return itself...
-        if (found && !value) return Symbol;
-
+        // Finding a suitable first-level interface...
         foreach (var iface in Symbol.Interfaces)
         {
             found = iface.Recursive(iface =>
             {
-                if (iface.Name == "ICloneable") return false;
+                if (iface.Name == "ICloneable") return false; // ICloneable doesn't qualify...
+
                 var method = FindCloneMethod(iface); if (method != null) return true;
                 var attr = FindCloneableAttribute(iface); if (attr != null) return true;
                 return false;
             },
             allifaces: true);
 
-            if (found) return iface; // Found a first-level interface...
+            if (found) { type = iface; return true; }
         }
 
-        return Symbol; // Return itself by default...
+        // Default is using the host type...
+        type = Symbol;
+        return true;
     }
 
     // ----------------------------------------------------
