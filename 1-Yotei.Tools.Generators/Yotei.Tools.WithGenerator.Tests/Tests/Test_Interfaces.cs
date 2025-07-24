@@ -1,7 +1,7 @@
 ﻿using static Yotei.Tools.Diagnostics.ConsoleEx;
 using static System.ConsoleColor;
 
-namespace Yotei.Tools.CloneGenerator.Tests.Interfaces
+namespace Yotei.Tools.WithGenerator.Tests.Interfaces
 {
     /// <summary>
     /// For testing nested elements.
@@ -11,9 +11,29 @@ namespace Yotei.Tools.CloneGenerator.Tests.Interfaces
         /// <summary>
         /// Plain decoration.
         /// </summary>
-        [Cloneable]
-        public partial interface IFace0 { }
+        public partial interface IFace0
+        {
+            [With] string Name { get; }
+        }
     }
+
+    public static partial class Tests
+    {
+        //[Enforced]
+        [Fact]
+        public static void Test_IFace0()
+        {
+            var type = typeof(IOther.IFace0);
+            var method = type.GetMethod("WithName");
+            Assert.NotNull(method);
+            Assert.True(method.IsVirtual);
+            Assert.Equal(type, method.ReturnType);
+            Assert.Equal("Public, Virtual, HideBySig, VtableLayoutMask, Abstract", method.Attributes.ToString());
+        }
+    }
+}
+
+/*
 
     public static partial class Tests
     {
@@ -103,3 +123,4 @@ namespace Yotei.Tools.CloneGenerator.Tests.Interfaces
         }
     }
 }
+ */

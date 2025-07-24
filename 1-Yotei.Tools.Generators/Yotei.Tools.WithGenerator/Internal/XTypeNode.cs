@@ -48,8 +48,6 @@ internal class XTypeNode : TypeNode
     /// </summary>
     void CaptureInheritedProperties()
     {
-        var comparer = SymbolComparer.Default;
-
         foreach (var type in Symbol.AllBaseTypes()) TryCapture(type);
         foreach (var type in Symbol.AllInterfaces) TryCapture(type);
 
@@ -62,10 +60,10 @@ internal class XTypeNode : TypeNode
 
             foreach (var member in members)
             {
-                var temp = ChildProperties.Find(x => comparer.Equals(x.Symbol, member));
+                var temp = ChildProperties.Find(x => x.Symbol.Name == member.Name);
                 if (temp == null)
                 {
-                    var node = new XPropertyNode(this, member);
+                    var node = new XPropertyNode(this, member) { IsInherited = true };
                     ChildProperties.Add(node);
                 }
             }
@@ -78,8 +76,6 @@ internal class XTypeNode : TypeNode
     /// </summary>
     void CaptureInheritedFields()
     {
-        var comparer = SymbolComparer.Default;
-
         foreach (var type in Symbol.AllBaseTypes()) TryCapture(type);
         foreach (var type in Symbol.AllInterfaces) TryCapture(type);
 
@@ -92,10 +88,10 @@ internal class XTypeNode : TypeNode
 
             foreach (var member in members)
             {
-                var temp = ChildFields.Find(x => comparer.Equals(x.Symbol, member));
+                var temp = ChildFields.Find(x => x.Symbol.Name == member.Name);
                 if (temp == null)
                 {
-                    var node = new XFieldNode(this, member);
+                    var node = new XFieldNode(this, member) { IsInherited = true };
                     ChildFields.Add(node);
                 }
             }

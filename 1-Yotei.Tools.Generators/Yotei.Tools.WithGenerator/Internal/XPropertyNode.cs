@@ -1,6 +1,4 @@
-﻿#pragma warning disable IDE0075
-
-namespace Yotei.Tools.WithGenerator;
+﻿namespace Yotei.Tools.WithGenerator;
 
 // ========================================================
 /// <inheritdoc cref="PropertyNode"/>
@@ -9,9 +7,9 @@ internal class XPropertyNode : PropertyNode
     public XPropertyNode(TypeNode parent, IPropertySymbol symbol) : base(parent, symbol) { }
     public XPropertyNode(TypeNode parent, PropertyCandidate candidate) : base(parent, candidate) { }
 
-
     INamedTypeSymbol ReturnType = default!;
-    bool IsInherited => Candidate is null;
+    internal bool IsInherited = false;
+
     INamedTypeSymbol Host => ParentNode.Symbol;
     string MethodName => $"With{Symbol.Name}";
     string ArgumentName => $"v_{Symbol.Name}";
@@ -30,7 +28,7 @@ internal class XPropertyNode : PropertyNode
             TreeDiagnostics.RecordsNotSupported(Host).Report(context);
             return false;
         }
-        if (!ValidateReturnType())
+        if (!CaptureReturnType(out ReturnType))
         {
             TreeDiagnostics.InvalidReturnType(Symbol).Report(context);
             return false;
@@ -38,7 +36,6 @@ internal class XPropertyNode : PropertyNode
         if (!ValidateSpecific(context)) return false;
 
         // Finishing...
-        ReturnType = CaptureReturnType();
         return true;
     }
 
@@ -66,142 +63,115 @@ internal class XPropertyNode : PropertyNode
     }
 
     /// <summary>
-    /// Validates that, if using an alternate return type is requested, such is valid because
-    /// there is no base type returning a concrete one. If either the host type is itself an
-    /// interface, or using an interface return type was not requested, validation is passed.
+    /// Validates and captures the return type to use with the generated methods.
     /// </summary>
-    bool ValidateReturnType()
+    bool CaptureReturnType(out INamedTypeSymbol type)
     {
-        if (Host.IsInterface()) return true; // // Interfaces are valid per-se...
+        // Interfaces are valid per-se...
+        if (Host.IsInterface()) { type = Host; return true; }
 
-        var attr = FindWithAttribute(Host); // No member with attribute, weird...
-        if (attr == null) return true;
+        // If no return interface requested, use host type...
+        var attr = FindWithAttribute(Host);
+        if (attr == null) { type = Host; return true; } // 'attr==null' should not happen...
 
-        var found = GetReturnInterfaceValue(attr, out var value); // No alternate requested...
-        if (found && !value) return true;
+        var found = GetReturnInterfaceValue(attr, out var value);
+        if (!found || !value) { type = Host; return true; }
 
+        // Validating no base type with a concrete return type...
         var host = Host;
         while ((host = host.BaseType) != null)
         {
             var method = FindWithMethod(host);
-            if (method != null && method.ReturnType.IsInterface()) return true; // Good base method...
+            if (method != null && !method.ReturnType.IsInterface()) { type = null!; return false; }
 
-            attr = FindWithAttribute(host) ?? FindInheritWithsAttribute(host);
+            attr = FindWithAttribute(host);
             if (attr == null) continue;
 
             found = GetReturnInterfaceValue(attr, out value);
-            if (!found) continue;
-            if (!value) return false; // Bad requested base method...
+            if (!found || !value) { type = null!; return false; } // We need returning iface...
         }
 
-        return true;
-    }
-
-    /// <summary>
-    /// Captures the return type to use with the generated methods.
-    /// </summary>
-    INamedTypeSymbol CaptureReturnType()
-    {
-        if (Host.IsInterface()) return Host; // Return type for interfaces is itself...
-
-        var attr = FindWithAttribute(Host); // Weird, return the host type itself...
-        if (attr == null) return Host;
-
-        if (IsInherited) attr = FindInheritWithsAttribute(Host);
-
-        var value = false;
-        var found = false;
-        if (attr != null) found = GetReturnInterfaceValue(attr, out value); // No requested, return itself...
-        if (found && !value) return Host;
-
+        // Finding a suitable first-level interface...
         foreach (var iface in Host.Interfaces)
         {
             found = iface.Recursive(iface =>
             {
                 var method = FindWithMethod(iface); if (method != null) return true;
-                var member = FindMember(iface); if (member != null) return true;
-
-                attr = FindInheritWithsAttribute(iface); if (attr == null) return false;
-                found = GetReturnInterfaceValue(attr, out value);
-                if (found && value) return true;
-
+                var attr = FindWithAttribute(iface); if (attr != null) return true;
                 return false;
             },
             allifaces: true);
 
-            if (found) return iface; // Found a first-level interface...
+            if (found) { type = iface; return true; }
         }
 
-        return Host; // Return host type by default...
+        // Default is using the host type...
+        type = Host;
+        return true;
     }
 
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    /*protected override void EmitCore(SourceProductionContext context, CodeBuilder cb)
+    public override void Emit(SourceProductionContext context, CodeBuilder cb)
     {
         // Declared or implemented explicitly...
-        if (FindCloneMethod(Symbol) != null) return;
+        if (FindWithMethod(Host) != null) return;
 
         // Dispatching...
-        if (Symbol.IsInterface()) EmitForInterface(context, cb);
+        if (Host.IsInterface()) EmitForInterface(context, cb);
         else if (Symbol.IsAbstract) EmitForAbstract(context, cb);
         else EmitForConcrete(context, cb);
-    }*/
+    }
 
     // ----------------------------------------------------
 
     /// <summary>
     /// Invoked when the type is an interface.
     /// </summary>
-    /*void EmitForInterface(SourceProductionContext _, CodeBuilder cb)
+    void EmitForInterface(SourceProductionContext _, CodeBuilder cb)
     {
         var modifiers = GetModifiers();
-        var typename = Symbol.EasyName();
+        var typename = Host.EasyName();
+        var membername = Symbol.Type.EasyName(RoslynNameOptions.Full);
 
         EmitDocumentation(cb);
-        cb.AppendLine($"{modifiers}{typename} Clone();");
+        cb.AppendLine($"{modifiers}{typename}");
+        cb.AppendLine($"{MethodName}({membername} {ArgumentName});");
 
         /// <summary>
-        /// Gets the method modifiers followed by a space separator, or null if any. The logic is:
-        /// if any base interface defines a 'Clone' method, then we return 'new'. Otherwise, we
-        /// don't need any modifier.
+        /// Gets the method modifiers followed by a space separator, or null if any. Logic is:
+        /// if any parent interface defines a method, return 'new', otherwise null.
         /// </summary>
         string? GetModifiers()
         {
-            var found = false;
-            if (!found) found = Symbol.AllInterfaces.Any(x => x.Name == "ICloneable");
-            if (!found) found = GetAddICloneableValue(Symbol, out var value, true, false, true) && value;
-
-            if (!found)
-            {
-                foreach (var iface in Symbol.Interfaces)
-                {
-                    if (!found) found = FindCloneMethod(iface, true, true) != null;
-                    if (!found) found = FindCloneableAttribute(iface, true, true) != null;
-                    if (found) break;
-                }
-            }
+            var found = false;            
+            if (IsInherited) found = true;// If inherited this is easy...
+            found |= Host.AllInterfaces.Any(x => FindWithMethod(x) != null);
+            found |= Host.AllInterfaces.Any(x => FindDecoratedMember(x) != null);
 
             return found ? "new " : null;
         }
-    }*/
+    }
 
     // ----------------------------------------------------
 
     /// <summary>
     /// Invoked when the type is an abstract class.
     /// </summary>
-    /*void EmitForAbstract(SourceProductionContext _, CodeBuilder cb)
+    void EmitForAbstract(SourceProductionContext context, CodeBuilder cb)
     {
-        var modifiers = GetModifiers();
         var options = ReturnType.IsInterface() ? RoslynNameOptions.Full with { UseTypeNullable = false } : RoslynNameOptions.Default;
-        var retname = ReturnType.EasyName(options);
+
+        var modifiers = GetModifiers();
+        var typename = ReturnType.EasyName();
+        var membername = Symbol.Type.EasyName(RoslynNameOptions.Full);
 
         EmitDocumentation(cb);
-        cb.AppendLine($"{modifiers}{retname} Clone();");
+        cb.AppendLine($"{modifiers}{typename}");
+        cb.AppendLine($"{MethodName}({membername} {ArgumentName});");
 
-        EmitExplicitInterfaces(cb);
+        EmitExplicitInterfaces(context, cb);
 
         /// <summary>
         /// Gets the method modifiers followed by a space separator, or null if any.
@@ -209,11 +179,11 @@ internal class XPropertyNode : PropertyNode
         string? GetModifiers()
         {
             // When the host is a derived one...
-            var host = Symbol.BaseType;
+            var host = Host.BaseType;
             if (host != null && host.Name != "Object")
             {
                 // If there is a base method...
-                var method = FindCloneMethod(host, chain: true);
+                var method = FindWithMethod(host, chain: true);
                 if (method != null)
                 {
                     // Reusing base method accessibility...
@@ -227,7 +197,7 @@ internal class XPropertyNode : PropertyNode
                 }
 
                 // Else, method might have been requested, and we always re-abstract...
-                var at = FindCloneableAttribute(host, chain: true);
+                var at = FindWithAttribute(host, chain: true);
                 if (at != null)
                 {
                     return "public abstract override ";
@@ -237,41 +207,52 @@ internal class XPropertyNode : PropertyNode
             // Default for abstract types...
             return "public abstract ";
         }
-    }*/
+    }
 
     // ----------------------------------------------------
 
     /// <summary>
     /// Invoked when the type is a concrete class.
     /// </summary>
-    /*void EmitForConcrete(SourceProductionContext context, CodeBuilder cb)
+    void EmitForConcrete(SourceProductionContext context, CodeBuilder cb)
     {
         // We need a copy constructor...
-        var ctor = Symbol.GetCopyConstructor(strict: false);
+        var ctor = Host.GetCopyConstructor(strict: false);
         if (ctor == null)
         {
-            TreeDiagnostics.NoCopyConstructor(Symbol).Report(context);
+            TreeDiagnostics.NoCopyConstructor(Host).Report(context);
             return;
         }
 
         // Emitting...
-        var modifiers = GetModifiers();
-        var typename = Symbol.EasyName();
         var options = ReturnType.IsInterface() ? RoslynNameOptions.Full with { UseTypeNullable = false } : RoslynNameOptions.Default;
-        var retname = ReturnType.EasyName(options);
+
+        var modifiers = GetModifiers();
+        var hostname = Host.EasyName();
+        var typename = ReturnType.EasyName();
+        var membername = Symbol.Type.EasyName(RoslynNameOptions.Full);
 
         EmitDocumentation(cb);
-        cb.AppendLine($"{modifiers}{retname} Clone()");
+        cb.AppendLine($"{modifiers}{typename}");
+        cb.AppendLine($"{MethodName}({membername} {ArgumentName})");
         cb.AppendLine("{");
         cb.IndentLevel++;
         {
-            cb.AppendLine($"var v_temp = new {typename}(this);");
-            cb.AppendLine("return v_temp;");
+            var xtemp = "x_temp";
+            cb.AppendLine($"var {xtemp} = new {hostname}(this)");
+            cb.AppendLine("{");
+            cb.IndentLevel++;
+            {
+                cb.AppendLine($"{Symbol.Name} = {ArgumentName}");
+            }
+            cb.IndentLevel--;
+            cb.AppendLine("};");
+            cb.AppendLine($"return {xtemp};");
         }
         cb.IndentLevel--;
         cb.AppendLine("}");
 
-        EmitExplicitInterfaces(cb);
+        EmitExplicitInterfaces(context, cb);
 
         /// <summary>
         /// Gets the method modifiers followed by a space separator, or null if any.
@@ -279,14 +260,14 @@ internal class XPropertyNode : PropertyNode
         string? GetModifiers()
         {
             var issealed = Symbol.IsSealed;
-            var prevent = GetPreventVirtualValue(Symbol, out var temp, true, false, true) && temp;
+            var prevent = GetPreventVirtualValue(Host, out var temp, true, false, true) && temp;
 
             // When the host is a derived one...
-            var host = Symbol.BaseType;
+            var host = Host.BaseType;
             if (host != null && host.Name != "Object")
             {
                 // If there is a base method...
-                var method = FindCloneMethod(host, chain: true);
+                var method = FindWithMethod(host, chain: true);
                 if (method != null)
                 {
                     // Reusing base method accessibility...
@@ -303,7 +284,7 @@ internal class XPropertyNode : PropertyNode
                 }
 
                 // Else, method might have been requested...
-                var at = FindCloneableAttribute(host, chain: true);
+                var at = FindWithAttribute(host, chain: true);
                 if (at != null)
                 {
                     return host.IsAbstract || !prevent ? "public override " : "public new ";
@@ -313,17 +294,15 @@ internal class XPropertyNode : PropertyNode
             // Default for concrete types...
             return prevent || issealed ? "public " : "public virtual ";
         }
-    }*/
+    }
 
     // ----------------------------------------------------
 
     /// <summary>
     /// Invoked to emit the explicit interfaces' implementations associated to this type.
     /// </summary>
-    /*void EmitExplicitInterfaces(CodeBuilder cb)
+    void EmitExplicitInterfaces(SourceProductionContext context, CodeBuilder cb)
     {
-        if (Symbol.Name == "Type1B") { } // DEBUG
-
         var comparer = SymbolComparer.Default;
         var ifaces = GetExplicitInterfaces();
 
@@ -331,25 +310,32 @@ internal class XPropertyNode : PropertyNode
         {
             if (comparer.Equals(iface, ReturnType)) continue;
 
+            var member = FindDecoratedMember(iface, allifaces: true);
+            if (member == null)
+            {
+                TreeDiagnostics.SymbolNotFound(iface).Report(context);
+                return;
+            }
+
             var typename = iface.EasyName(RoslynNameOptions.Full with { UseTypeNullable = false });
-            var valuename = iface.Name == "ICloneable" ? "object" : typename;
+            var membername = member.Type.EasyName(RoslynNameOptions.Full);
 
             cb.AppendLine();
-            cb.AppendLine(valuename);
-            cb.AppendLine($"{typename}.Clone() => ({typename})Clone();");
+            cb.AppendLine($"{typename}");
+            cb.Append($"{typename}.{MethodName}({membername} value)");
+            cb.AppendLine($" => {MethodName}(value);");
         }
-    }*/
+    }
 
     /// <summary>
     /// Gets a list with the interfaces that need explicit implementation.
     /// </summary>
-    /*List<ITypeSymbol> GetExplicitInterfaces()
+    List<ITypeSymbol> GetExplicitInterfaces()
     {
         var comparer = SymbolEqualityComparer.Default;
         var list = new List<ITypeSymbol>();
 
-        foreach (var iface in Symbol.Interfaces) TryCapture(iface);
-        TryAddICloneable();
+        foreach (var iface in Host.Interfaces) TryCapture(iface);
         return list;
 
         /// <summary>
@@ -366,10 +352,10 @@ internal class XPropertyNode : PropertyNode
             }
 
             // Then, the interface itself...
+
             found = found ||
-                iface.Name == "ICloneable" ||
-                FindCloneMethod(iface) != null ||
-                FindCloneableAttribute(iface) != null;
+                FindMember(iface) != null ||
+                FindDecoratedMember(iface) != null;
 
             // Adding to the list if needed, and finishing...
             if (found)
@@ -379,26 +365,7 @@ internal class XPropertyNode : PropertyNode
             }
             return found;
         }
-
-        /// <summary>
-        /// Tries to add the <see cref="ICloneable"/> interface, if needed.
-        /// </summary>
-        void TryAddICloneable()
-        {
-            var add = GetAddICloneableValue(Symbol, out var value) && value;
-            if (add)
-            {
-                var comp = GetBranchCompilation();
-                var item = comp.GetTypeByMetadataName("System.ICloneable");
-
-                if (item != null)
-                {
-                    var temp = list.Find(x => comparer.Equals(x, item));
-                    if (temp == null) list.Add(item);
-                }
-            }
-        }
-    }*/
+    }
 
     // ----------------------------------------------------
 
@@ -478,33 +445,20 @@ internal class XPropertyNode : PropertyNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// Tries to find the <see cref="InheritWithsAttribute"/> attribute on the given type. The
-    /// chain of base types and direct or all implemented interfaces are also used if such is
-    /// explicitly requested.
+    /// Tries to find the <see cref="WithAttribute"/> attribute on an appropriate member of the
+    /// given type. The chain of base types and direct or all implemented interfaces are also
+    /// used if such is explicitly requested.
     /// </summary>
-    static AttributeData? FindInheritWithsAttribute(
+    AttributeData? FindWithAttribute(
         ITypeSymbol type,
         bool chain = false, bool ifaces = false, bool allifaces = false)
     {
         return type.Recursive(type =>
         {
-            return type.GetAttributes(typeof(InheritWithsAttribute)).FirstOrDefault();
-        },
-        chain, ifaces, allifaces);
-    }
+            var member = FindDecoratedMember(type);
+            if (member == null) return null;
 
-    /// <summary>
-    /// Tries to find the <see cref="WithAttribute"/> attribute on the given type. The chain of
-    /// base types and direct or all implemented interfaces are also used if such is explicitly
-    /// requested.
-    /// </summary>
-    static AttributeData? FindWithAttribute(
-        ITypeSymbol type,
-        bool chain = false, bool ifaces = false, bool allifaces = false)
-    {
-        return type.Recursive(type =>
-        {
-            return type.GetAttributes(typeof(WithAttribute)).FirstOrDefault();
+            return member.GetAttributes(typeof(WithAttribute)).FirstOrDefault();
         },
         chain, ifaces, allifaces);
     }
@@ -516,7 +470,7 @@ internal class XPropertyNode : PropertyNode
     /// the given attribute. If found, returns <c>true</c> and sets the value of the out argument
     /// to the value found. If not, returns <c>false</c>.
     /// </summary>
-    static bool GetReturnInterfaceValue(AttributeData at, out bool value)
+    bool GetReturnInterfaceValue(AttributeData at, out bool value)
     {
         if (at.GetNamedArgument(nameof(WithAttribute.ReturnInterface), out var arg))
         {
@@ -536,7 +490,7 @@ internal class XPropertyNode : PropertyNode
     /// such is explicitly requested. If found, returns <c>true</c> and sets the value of the out
     /// argument to the value found. If not, returns <c>false</c>.
     /// </summary>
-    static bool GetReturnInterfaceValue(
+    bool GetReturnInterfaceValue(
         ITypeSymbol type, out bool value,
         bool chain = false, bool ifaces = false, bool allifaces = false)
     {
@@ -558,7 +512,7 @@ internal class XPropertyNode : PropertyNode
     /// given attribute. If found, returns <c>true</c> and sets the value of the out argument to
     /// the value found. If not, returns <c>false</c>.
     /// </summary>
-    static bool GetPreventVirtualValue(AttributeData at, out bool value)
+    bool GetPreventVirtualValue(AttributeData at, out bool value)
     {
         if (at.GetNamedArgument(nameof(WithAttribute.PreventVirtual), out var arg))
         {
@@ -578,7 +532,7 @@ internal class XPropertyNode : PropertyNode
     /// is explicitly requested. If found, returns <c>true</c> and sets the value of the out
     /// argument to the value found. If not, returns <c>false</c>.
     /// </summary>
-    static bool GetPreventVirtualValue(
+    bool GetPreventVirtualValue(
         ITypeSymbol type, out bool value,
         bool chain = false, bool ifaces = false, bool allifaces = false)
     {

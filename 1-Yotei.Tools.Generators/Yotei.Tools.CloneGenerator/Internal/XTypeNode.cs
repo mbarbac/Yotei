@@ -59,7 +59,7 @@ internal class XTypeNode : TypeNode
             if (attr == null) continue;
 
             found = GetReturnInterfaceValue(attr, out value);
-            if (!found|| !value) { type = null!; return false; }
+            if (!found || !value) { type = null!; return false; } // We need returning iface...
         }
 
         // Finding a suitable first-level interface...

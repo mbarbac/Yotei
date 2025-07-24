@@ -1,4 +1,4 @@
-﻿/*using static Yotei.Tools.Diagnostics.ConsoleEx;
+﻿using static Yotei.Tools.Diagnostics.ConsoleEx;
 using static System.ConsoleColor;
 
 namespace Yotei.Tools.CloneGenerator.Tests.Concretes
@@ -231,4 +231,4 @@ namespace Yotei.Tools.CloneGenerator.Tests.Concretes
             Assert.Equal("Public, Virtual, HideBySig, VtableLayoutMask", method.Attributes.ToString());
         }
     }
-}*/
+}
