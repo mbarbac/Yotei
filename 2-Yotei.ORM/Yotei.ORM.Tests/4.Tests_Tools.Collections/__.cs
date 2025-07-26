@@ -1,4 +1,4 @@
-﻿namespace Yotei.ORM.Tests;
+﻿namespace Yotei.ORM.Tests.Tools.Collections;
 
 // ========================================================
 //[Enforced]
@@ -10,5 +10,3 @@
 //    {
 //    }
 //}
-
-public interface IFake { }
