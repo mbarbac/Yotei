@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools.WithGenerator;
+﻿using System.Net.Sockets;
+
+namespace Yotei.Tools.WithGenerator;
 
 // ========================================================
 /// <inheritdoc cref="FieldNode"/>
@@ -28,11 +30,6 @@ internal class XFieldNode : FieldNode
             TreeDiagnostics.RecordsNotSupported(Host).Report(context);
             return false;
         }
-        if (!CaptureReturnType(out ReturnType))
-        {
-            TreeDiagnostics.InvalidReturnType(Symbol).Report(context);
-            return false;
-        }
         if (!ValidateSpecific(context)) return false;
 
         // Finishing...
@@ -52,6 +49,26 @@ internal class XFieldNode : FieldNode
         return true;
     }
 
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public override void Emit(SourceProductionContext context, CodeBuilder cb)
+    {
+        if (!CaptureReturnType(out ReturnType))
+        {
+            TreeDiagnostics.InvalidReturnType(Symbol).Report(context);
+            return;
+        }
+
+        // Declared or implemented explicitly...
+        if (FindWithMethod(Host) != null) return;
+
+        // Dispatching...
+        if (Host.IsInterface()) EmitForInterface(context, cb);
+        else if (Host.IsAbstract) EmitForAbstract(context, cb);
+        else EmitForConcrete(context, cb);
+    }
+
     /// <summary>
     /// Validates and captures the return type to use with the generated methods.
     /// </summary>
@@ -61,8 +78,8 @@ internal class XFieldNode : FieldNode
         if (Host.IsInterface()) { type = Host; return true; }
 
         // If no return interface requested, use host type...
-        var attr = FindWithAttribute(Host);
-        if (attr == null) { type = Host; return true; } // 'attr==null' should not happen...
+        var attr = FindWithAttribute(Host, chain: true, allifaces: true);
+        if (attr == null) { type = Host; return true; }
 
         var found = GetReturnInterfaceValue(attr, out var value);
         if (!found || !value) { type = Host; return true; }
@@ -102,20 +119,6 @@ internal class XFieldNode : FieldNode
 
     // ----------------------------------------------------
 
-    /// <inheritdoc/>
-    public override void Emit(SourceProductionContext context, CodeBuilder cb)
-    {
-        // Declared or implemented explicitly...
-        if (FindWithMethod(Host) != null) return;
-
-        // Dispatching...
-        if (Host.IsInterface()) EmitForInterface(context, cb);
-        else if (Symbol.IsAbstract) EmitForAbstract(context, cb);
-        else EmitForConcrete(context, cb);
-    }
-
-    // ----------------------------------------------------
-
     /// <summary>
     /// Invoked when the type is an interface.
     /// </summary>
@@ -149,16 +152,16 @@ internal class XFieldNode : FieldNode
     /// <summary>
     /// Invoked when the type is an abstract class.
     /// </summary>
-    void EmitForAbstract(SourceProductionContext context, CodeBuilder cb)
+    void EmitForAbstract(SourceProductionContext _, CodeBuilder cb)
     {
         var options = ReturnType.IsInterface() ? RoslynNameOptions.Full with { UseTypeNullable = false } : RoslynNameOptions.Default;
 
         var modifiers = GetModifiers();
-        var typename = ReturnType.EasyName();
+        var retname = ReturnType.EasyName(options);
         var membername = Symbol.Type.EasyName(RoslynNameOptions.Full);
 
         EmitDocumentation(cb);
-        cb.AppendLine($"{modifiers}{typename}");
+        cb.AppendLine($"{modifiers}{retname}");
         cb.AppendLine($"{MethodName}({membername} {ArgumentName});");
 
         /// <summary>
@@ -216,18 +219,18 @@ internal class XFieldNode : FieldNode
         var options = ReturnType.IsInterface() ? RoslynNameOptions.Full with { UseTypeNullable = false } : RoslynNameOptions.Default;
 
         var modifiers = GetModifiers();
-        var hostname = Host.EasyName();
-        var typename = ReturnType.EasyName();
+        var typename = Host.EasyName();
+        var retname = ReturnType.EasyName(options);
         var membername = Symbol.Type.EasyName(RoslynNameOptions.Full);
 
         EmitDocumentation(cb);
-        cb.AppendLine($"{modifiers}{typename}");
+        cb.AppendLine($"{modifiers}{retname}");
         cb.AppendLine($"{MethodName}({membername} {ArgumentName})");
         cb.AppendLine("{");
         cb.IndentLevel++;
         {
             var xtemp = "x_temp";
-            cb.AppendLine($"var {xtemp} = new {hostname}(this)");
+            cb.AppendLine($"var {xtemp} = new {typename}(this)");
             cb.AppendLine("{");
             cb.IndentLevel++;
             {
@@ -472,7 +475,7 @@ internal class XFieldNode : FieldNode
     /// </summary>
     void EmitDocumentation(CodeBuilder cb) => cb.AppendLine($$"""
         /// <summary>
-        /// Emulates the 'with' keyword for the {{Symbol.Name}} member.
+        /// Emulates the 'with' keyword for the '{{Symbol.Name}}' member.
         /// </summary>
         {{AttributeDoc}}
         """);

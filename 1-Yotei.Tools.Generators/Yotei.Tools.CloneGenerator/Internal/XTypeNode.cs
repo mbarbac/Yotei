@@ -23,14 +23,41 @@ internal class XTypeNode : TypeNode
             TreeDiagnostics.RecordsNotSupported(Symbol).Report(context);
             return false;
         }
-        if (!CaptureReturnType(out ReturnType))
-        {
-            TreeDiagnostics.InvalidReturnType(Symbol).Report(context);
-            return false;
-        }
 
         // Finishing...
         return true;
+    }
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    protected override string? GetHeader(SourceProductionContext context)
+    {
+        var head = base.GetHeader(context);
+        var add = GetAddICloneableValue(Symbol, out var temp) && temp;
+
+        if (add) head += " : ICloneable";
+        return head;
+    }
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    protected override void EmitCore(SourceProductionContext context, CodeBuilder cb)
+    {
+        if (!CaptureReturnType(out ReturnType))
+        {
+            TreeDiagnostics.InvalidReturnType(Symbol).Report(context);
+            return;
+        }
+
+        // Declared or implemented explicitly...
+        if (FindCloneMethod(Symbol) != null) return;
+
+        // Dispatching...
+        if (Symbol.IsInterface()) EmitForInterface(context, cb);
+        else if (Symbol.IsAbstract) EmitForAbstract(context, cb);
+        else EmitForConcrete(context, cb);
     }
 
     /// <summary>
@@ -81,32 +108,6 @@ internal class XTypeNode : TypeNode
         // Default is using the host type...
         type = Symbol;
         return true;
-    }
-
-    // ----------------------------------------------------
-
-    /// <inheritdoc/>
-    protected override string? GetHeader(SourceProductionContext context)
-    {
-        var head = base.GetHeader(context);
-        var add = GetAddICloneableValue(Symbol, out var temp) && temp;
-
-        if (add) head += " : ICloneable";
-        return head;
-    }
-
-    // ----------------------------------------------------
-
-    /// <inheritdoc/>
-    protected override void EmitCore(SourceProductionContext context, CodeBuilder cb)
-    {
-        // Declared or implemented explicitly...
-        if (FindCloneMethod(Symbol) != null) return;
-
-        // Dispatching...
-        if (Symbol.IsInterface()) EmitForInterface(context, cb);
-        else if (Symbol.IsAbstract) EmitForAbstract(context, cb);
-        else EmitForConcrete(context, cb);
     }
 
     // ----------------------------------------------------

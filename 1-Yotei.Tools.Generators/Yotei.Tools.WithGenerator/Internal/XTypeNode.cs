@@ -51,7 +51,8 @@ internal class XTypeNode : TypeNode
         foreach (var type in Symbol.AllBaseTypes()) TryCapture(type);
         foreach (var type in Symbol.AllInterfaces) TryCapture(type);
 
-        // Tries to capture members at the given symbol's level only.
+        // Tries to capture members at the given symbol's level, but only if there is not yet a
+        // member captured with the same name.
         void TryCapture(ITypeSymbol type)
         {
             var members = type.GetMembers().OfType<IPropertySymbol>()
@@ -79,7 +80,8 @@ internal class XTypeNode : TypeNode
         foreach (var type in Symbol.AllBaseTypes()) TryCapture(type);
         foreach (var type in Symbol.AllInterfaces) TryCapture(type);
 
-        // Tries to capture members at the given symbol's level only.
+        // Tries to capture members at the given symbol's level, but only if there is not yet a
+        // member captured with the same name.
         void TryCapture(ITypeSymbol type)
         {
             var members = type.GetMembers().OfType<IFieldSymbol>()

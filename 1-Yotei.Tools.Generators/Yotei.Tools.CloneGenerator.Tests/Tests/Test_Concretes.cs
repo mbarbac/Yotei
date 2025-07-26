@@ -9,8 +9,10 @@ namespace Yotei.Tools.CloneGenerator.Tests.Concretes
     [Cloneable]
     public partial class Type00
     {
-        public Type00() { }
-        protected Type00(Type00 _) { }
+        public Type00(string name) => Name = name;
+        protected Type00(Type00 source) => Name = source.Name;
+        public override string ToString() => Name ?? "-";
+        public string Name { get; set; }
     }
 
     public static partial class Tests
@@ -27,6 +29,11 @@ namespace Yotei.Tools.CloneGenerator.Tests.Concretes
             Assert.False(method.ReturnType.IsInterface);
             Assert.Null(type.GetInterface("ICloneable"));
             Assert.Equal("Public, Virtual, HideBySig, VtableLayoutMask", method.Attributes.ToString());
+
+            var source = new Type00("XYZ");
+            var target = source.Clone();
+            Assert.NotSame(source, target);
+            Assert.Equal(source.Name, target.Name);
         }
     }
 
@@ -39,7 +46,7 @@ namespace Yotei.Tools.CloneGenerator.Tests.Concretes
     [Cloneable(AddICloneable = true, PreventVirtual = true)]
     public partial class Type01 : Type00
     {
-        public Type01() : base() { }
+        public Type01(string name) : base(name) { }
         protected Type01(Type01 source) : base(source) { }
     }
 
@@ -57,6 +64,11 @@ namespace Yotei.Tools.CloneGenerator.Tests.Concretes
             Assert.False(method.ReturnType.IsInterface);
             Assert.NotNull(type.GetInterface("ICloneable"));
             Assert.Equal("Public, HideBySig", method.Attributes.ToString());
+
+            var source = new Type01("XYZ");
+            var target = source.Clone();
+            Assert.NotSame(source, target);
+            Assert.Equal(source.Name, target.Name);
         }
     }
 
@@ -66,7 +78,7 @@ namespace Yotei.Tools.CloneGenerator.Tests.Concretes
     /// Plain decoration.
     /// </summary>
     [Cloneable]
-    public partial interface IFace1 { }
+    public partial interface IFace1 { string Name { get; } }
 
     /// <summary>
     /// Cloneable and inherits interface.
@@ -74,8 +86,10 @@ namespace Yotei.Tools.CloneGenerator.Tests.Concretes
     [Cloneable]
     public partial class Type10 : IFace1
     {
-        public Type10() { }
-        protected Type10(Type10 _) { }
+        public Type10(string name) => Name = name;
+        protected Type10(Type10 source) => Name = source.Name;
+        public override string ToString() => Name ?? "-";
+        public string Name { get; set; }
     }
 
     public static partial class Tests
@@ -92,6 +106,11 @@ namespace Yotei.Tools.CloneGenerator.Tests.Concretes
             Assert.False(method.ReturnType.IsInterface);
             Assert.Null(type.GetInterface("ICloneable"));
             Assert.Equal("Public, Virtual, HideBySig, VtableLayoutMask", method.Attributes.ToString());
+
+            var source = new Type10("XYZ");
+            var target = source.Clone();
+            Assert.NotSame(source, target);
+            Assert.Equal(source.Name, target.Name);
         }
     }
 
@@ -115,8 +134,10 @@ namespace Yotei.Tools.CloneGenerator.Tests.Concretes
     [Cloneable(ReturnInterface = true)]
     public partial class Type12 : IFace1
     {
-        public Type12() { }
-        protected Type12(Type12 _) { }
+        public Type12(string name) => Name = name;
+        protected Type12(Type12 source) => Name = source.Name;
+        public override string ToString() => Name ?? "-";
+        public string Name { get; set; }
     }
 
     public static partial class Tests
@@ -133,6 +154,11 @@ namespace Yotei.Tools.CloneGenerator.Tests.Concretes
             Assert.True(method.ReturnType.IsInterface);
             Assert.Null(type.GetInterface("ICloneable"));
             Assert.Equal("Public, Virtual, HideBySig, VtableLayoutMask", method.Attributes.ToString());
+
+            var source = new Type12("XYZ");
+            var target = source.Clone();
+            Assert.NotSame(source, target);
+            Assert.Equal(source.Name, target.Name);
         }
     }
 
@@ -144,7 +170,7 @@ namespace Yotei.Tools.CloneGenerator.Tests.Concretes
     [Cloneable(ReturnInterface = true)]
     public partial class Type13 : Type12
     {
-        public Type13() : base() { }
+        public Type13(string name) : base(name) { }
         protected Type13(Type13 source) : base(source) { }
     }
 
@@ -162,6 +188,11 @@ namespace Yotei.Tools.CloneGenerator.Tests.Concretes
             Assert.False(method.ReturnType.IsInterface);
             Assert.Null(type.GetInterface("ICloneable"));
             Assert.Equal("Public, Virtual, HideBySig, VtableLayoutMask", method.Attributes.ToString());
+
+            var source = new Type13("XYZ");
+            var target = source.Clone();
+            Assert.NotSame(source, target);
+            Assert.Equal(source.Name, target.Name);
         }
     }
 
@@ -181,7 +212,7 @@ namespace Yotei.Tools.CloneGenerator.Tests.Concretes
     [Cloneable(ReturnInterface = true)]
     public partial class Type14 : Type12, IFace1, IFace2
     {
-        public Type14() : base() { }
+        public Type14(string name) : base(name) { }
         protected Type14(Type14 source) : base(source) { }
     }
 
@@ -199,6 +230,11 @@ namespace Yotei.Tools.CloneGenerator.Tests.Concretes
             Assert.True(method.ReturnType.IsInterface);
             Assert.Null(type.GetInterface("ICloneable"));
             Assert.Equal("Public, Virtual, HideBySig", method.Attributes.ToString());
+
+            var source = new Type14("XYZ");
+            var target = source.Clone();
+            Assert.NotSame(source, target);
+            Assert.Equal(source.Name, target.Name);
         }
     }
 
@@ -211,7 +247,7 @@ namespace Yotei.Tools.CloneGenerator.Tests.Concretes
     [Cloneable(ReturnInterface = true)]
     public partial class Type15 : Type12, IFace2, IFace1
     {
-        public Type15() : base() { }
+        public Type15(string name) : base(name) { }
         protected Type15(Type15 source) : base(source) { }
     }
 
@@ -229,6 +265,11 @@ namespace Yotei.Tools.CloneGenerator.Tests.Concretes
             Assert.True(method.ReturnType.IsInterface);
             Assert.Null(type.GetInterface("ICloneable"));
             Assert.Equal("Public, Virtual, HideBySig, VtableLayoutMask", method.Attributes.ToString());
+
+            var source = new Type15("XYZ");
+            var target = source.Clone();
+            Assert.NotSame(source, target);
+            Assert.Equal(source.Name, target.Name);
         }
     }
 }

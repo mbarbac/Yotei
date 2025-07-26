@@ -21,6 +21,12 @@ internal interface INode
     /// <summary>
     /// Invoked before generation to validate this node, and its child ones if any.
     /// </summary>
+    /// <remarks>
+    /// If the node needs to capture any information this is NOT the place for that code: reason
+    /// is because it may happen the node is created off-line and injected into its parent one,
+    /// and if this happens, this validation might not ever be invoked. For these scenarios the
+    /// right place to capture that information is in the 'Emit(...)' methods.
+    /// </remarks>
     /// <param name="context"></param>
     /// <returns></returns>
     bool Validate(SourceProductionContext context);
