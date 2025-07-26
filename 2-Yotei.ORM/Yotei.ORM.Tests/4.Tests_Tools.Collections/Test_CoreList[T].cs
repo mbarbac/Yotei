@@ -4,7 +4,7 @@ namespace Yotei.ORM.Tests.Tools.Collections;
 
 // ========================================================
 //[Enforced]
-public static partial class Test_CoreList_KT
+public static partial class Test_CoreList_T
 {
     public interface IElement { }
     public class Element(string name) : IElement
@@ -21,26 +21,35 @@ public static partial class Test_CoreList_KT
     // ----------------------------------------------------
 
     [Cloneable]
-    public partial class Chain : CoreList<string, IElement>, IElement
+    public partial class Chain : CoreList<IElement>, IElement
     {
         public Chain(bool sensitive) => Sensitive = sensitive;
         public Chain(bool sensitive, int capacity) : this(sensitive) => Capacity = capacity;
         public Chain(bool sensitive, IEnumerable<IElement> range) : this(sensitive) => AddRange(range);
         protected Chain(Chain source) : this(source.Sensitive) => AddRange(source);
 
-        public override IElement ValidateItem(IElement item) => item.ThrowWhenNull();
-        public override string GetKey(IElement item) => item is Element named
-            ? named.Name
-            : throw new ArgumentException("Element is not a named one.").WithData(item);
-        public override string ValidateKey(string key) => key.NotNullNotEmpty();
+        public override IElement ValidateItem(IElement item)
+        {
+            if (item.ThrowWhenNull() is Element named) named.Name.NotNullNotEmpty();
+            return item;
+        }
         public override bool ExpandItems => true;
         public override bool IsValidDuplicate(IElement source, IElement item)
             => ReferenceEquals(source, item)
             ? true
             : throw new DuplicateException("Duplicated element.").WithData(item);
-        public override IEqualityComparer<string> Comparer => Sensitive
-            ? StringComparer.Ordinal
-            : StringComparer.OrdinalIgnoreCase;
+        public override IEqualityComparer<IElement> Comparer => _Comparer ??= new ItemComparer(Sensitive);
+        IEqualityComparer<IElement>? _Comparer = null;
+        readonly struct ItemComparer(bool Sensitive) : IEqualityComparer<IElement>
+        {
+            public bool Equals(IElement? x, IElement? y)
+            {
+                return x is Element xnamed && y is Element ynamed
+                    ? string.Compare(xnamed.Name, ynamed.Name, !Sensitive) == 0
+                    : ReferenceEquals(x, y);
+            }
+            public int GetHashCode([DisallowNull] IElement obj) => throw new NotImplementedException();
+        }
 
         public bool Sensitive { get; }
     }
@@ -138,20 +147,20 @@ public static partial class Test_CoreList_KT
     {
         var items = new Chain(false, [xone, xtwo, xthree, xone]);
 
-        Assert.Equal(-1, items.IndexOf("xfive"));
+        Assert.Equal(-1, items.IndexOf(xfive));
 
-        Assert.Equal(0, items.IndexOf("one"));
-        Assert.Equal(0, items.IndexOf("ONE"));
+        Assert.Equal(0, items.IndexOf(xone));
+        Assert.Equal(0, items.IndexOf(new Element("ONE")));
 
-        Assert.Equal(3, items.LastIndexOf("one"));
-        Assert.Equal(3, items.LastIndexOf("ONE"));
+        Assert.Equal(3, items.LastIndexOf(xone));
+        Assert.Equal(3, items.LastIndexOf(new Element("ONE")));
 
-        var list = items.IndexesOf("one");
+        var list = items.IndexesOf(xone);
         Assert.Equal(2, list.Count);
         Assert.Equal(0, list[0]);
         Assert.Equal(3, list[1]);
 
-        list = items.IndexesOf("ONE");
+        list = items.IndexesOf(new Element("ONE"));
         Assert.Equal(2, list.Count);
         Assert.Equal(0, list[0]);
         Assert.Equal(3, list[1]);
@@ -504,11 +513,11 @@ public static partial class Test_CoreList_KT
     public static void Test_Remove_Item()
     {
         var items = new Chain(false, [xone, xtwo, xthree, xone]);
-        var num = items.Remove("four");
+        var num = items.Remove(xfour);
         Assert.Equal(0, num);
         Assert.Equal(4, items.Count);
 
-        num = items.Remove("one");
+        num = items.Remove(xone);
         Assert.Equal(1, num);
         Assert.Equal(3, items.Count);
         Assert.Same(xtwo, items[0]);
@@ -516,7 +525,7 @@ public static partial class Test_CoreList_KT
         Assert.Same(xone, items[2]);
 
         items = new Chain(false, [xone, xtwo, xthree, xone]);
-        num = items.Remove("ONE");
+        num = items.Remove(new Element("ONE"));
         Assert.Equal(1, num);
         Assert.Equal(3, items.Count);
         Assert.Same(xtwo, items[0]);
@@ -524,7 +533,7 @@ public static partial class Test_CoreList_KT
         Assert.Same(xone, items[2]);
 
         items = new Chain(false, [xone, xtwo, xthree, xone]);
-        num = items.RemoveLast("one");
+        num = items.RemoveLast(xone);
         Assert.Equal(1, num);
         Assert.Equal(3, items.Count);
         Assert.Same(xone, items[0]);
@@ -532,7 +541,7 @@ public static partial class Test_CoreList_KT
         Assert.Same(xthree, items[2]);
 
         items = new Chain(false, [xone, xtwo, xthree, xone]);
-        num = items.RemoveLast("ONE");
+        num = items.RemoveLast(new Element("ONE"));
         Assert.Equal(1, num);
         Assert.Equal(3, items.Count);
         Assert.Same(xone, items[0]);
@@ -540,14 +549,14 @@ public static partial class Test_CoreList_KT
         Assert.Same(xthree, items[2]);
 
         items = new Chain(false, [xone, xtwo, xthree, xone]);
-        num = items.RemoveAll("one");
+        num = items.RemoveAll(xone);
         Assert.Equal(2, num);
         Assert.Equal(2, items.Count);
         Assert.Same(xtwo, items[0]);
         Assert.Same(xthree, items[1]);
 
         items = new Chain(false, [xone, xtwo, xthree, xone]);
-        num = items.RemoveAll("ONE");
+        num = items.RemoveAll(new Element("ONE"));
         Assert.Equal(2, num);
         Assert.Equal(2, items.Count);
         Assert.Same(xtwo, items[0]);
@@ -558,9 +567,27 @@ public static partial class Test_CoreList_KT
     [Fact]
     public static void Test_Remove_Item_Extended()
     {
-        // By default, CoreList<K,T> has not this capability because removal of items is
-        // driven by keys equality, not item one - which would have been the way of passing
-        // an enumerable element to remove several at once.
+        var items = new Chain(false, [xone, xtwo, xthree, xone]);
+        var other = new Chain(false, [xone, xthree]);
+
+        var num = items.Remove(other);
+        Assert.Equal(2, num);
+        Assert.Equal(2, items.Count);
+        Assert.Same(xtwo, items[0]);
+        Assert.Same(xone, items[1]);
+
+        items = new Chain(false, [xone, xtwo, xthree, xone]);
+        num = items.RemoveLast(other);
+        Assert.Equal(2, num);
+        Assert.Equal(2, items.Count);
+        Assert.Same(xone, items[0]);
+        Assert.Same(xtwo, items[1]);
+
+        items = new Chain(false, [xone, xtwo, xthree, xone]);
+        num = items.RemoveAll(other);
+        Assert.Equal(3, num);
+        Assert.Single(items);
+        Assert.Same(xtwo, items[0]);
     }
 
     //[Enforced]
