@@ -1,6 +1,4 @@
-﻿using Yotei.ORM.Tools.Code;
-
-namespace Yotei.ORM.Tests.Tools.Collections;
+﻿namespace Yotei.ORM.Tests.Tools.Collections;
 
 // ========================================================
 //[Enforced]
