@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <inheritdoc cref="IInvariantList{K, T}"/>
-[Cloneable]
+[Cloneable(ReturnInterface = true)]
 [DebuggerDisplay("{Items.ToDebugString(5)}")]
 public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
 {
@@ -94,7 +94,7 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
         if (index == 0 && count == 0) return Clear();
 
         var range = Items.ToList(index, count);
-        var clone = Clone();
+        var clone = (InvariantList<K, T>)Clone();
 
         clone.Items.Clear();
         clone.Items.AddRange(range);
@@ -105,7 +105,7 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <inheritdoc/>
     public virtual IInvariantList<K, T> Replace(int index, T item)
     {
-        var clone = Clone();
+        var clone = (InvariantList<K, T>)Clone();
         var done = clone.Items.Replace(index, item);
 
         if (done > 0) clone.Trim();
@@ -115,7 +115,7 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <inheritdoc/>
     public virtual IInvariantList<K, T> Add(T item)
     {
-        var clone = Clone();
+        var clone = (InvariantList<K, T>)Clone();
         var done = clone.Items.Add(item);
 
         if (done > 0) clone.Trim();
@@ -125,7 +125,7 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <inheritdoc/>
     public virtual IInvariantList<K, T> AddRange(IEnumerable<T> range)
     {
-        var clone = Clone();
+        var clone = (InvariantList<K, T>)Clone();
         var done = clone.Items.AddRange(range);
 
         if (done > 0) clone.Trim();
@@ -135,7 +135,7 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <inheritdoc/>
     public virtual IInvariantList<K, T> Insert(int index, T item)
     {
-        var clone = Clone();
+        var clone = (InvariantList<K, T>)Clone();
         var done = clone.Items.Insert(index, item);
 
         if (done > 0) clone.Trim();
@@ -145,7 +145,7 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <inheritdoc/>
     public virtual IInvariantList<K, T> InsertRange(int index, IEnumerable<T> range)
     {
-        var clone = Clone();
+        var clone = (InvariantList<K, T>)Clone();
         var done = clone.Items.InsertRange(index, range);
 
         if (done > 0) clone.Trim();
@@ -155,7 +155,7 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <inheritdoc/>
     public virtual IInvariantList<K, T> RemoveAt(int index)
     {
-        var clone = Clone();
+        var clone = (InvariantList<K, T>)Clone();
         var done = clone.Items.RemoveAt(index);
 
         if (done > 0) clone.Trim();
@@ -165,7 +165,7 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <inheritdoc/>
     public virtual IInvariantList<K, T> RemoveRange(int index, int count)
     {
-        var clone = Clone();
+        var clone = (InvariantList<K, T>)Clone();
         var done = clone.Items.RemoveRange(index, count);
 
         if (done > 0) clone.Trim();
@@ -175,7 +175,7 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <inheritdoc/>
     public virtual IInvariantList<K, T> Remove(K key)
     {
-        var clone = Clone();
+        var clone = (InvariantList<K, T>)Clone();
         var done = clone.Items.Remove(key);
 
         if (done > 0) clone.Trim();
@@ -185,7 +185,7 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <inheritdoc/>
     public virtual IInvariantList<K, T> RemoveLast(K key)
     {
-        var clone = Clone();
+        var clone = (InvariantList<K, T>)Clone();
         var done = clone.Items.RemoveLast(key);
 
         if (done > 0) clone.Trim();
@@ -195,7 +195,7 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <inheritdoc/>
     public virtual IInvariantList<K, T> RemoveAll(K key)
     {
-        var clone = Clone();
+        var clone = (InvariantList<K, T>)Clone();
         var done = clone.Items.RemoveAll(key);
 
         if (done > 0) clone.Trim();
@@ -205,7 +205,7 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <inheritdoc/>
     public virtual IInvariantList<K, T> Remove(Predicate<T> predicate)
     {
-        var clone = Clone();
+        var clone = (InvariantList<K, T>)Clone();
         var done = clone.Items.Remove(predicate);
 
         if (done > 0) clone.Trim();
@@ -215,7 +215,7 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <inheritdoc/>
     public virtual IInvariantList<K, T> RemoveLast(Predicate<T> predicate)
     {
-        var clone = Clone();
+        var clone = (InvariantList<K, T>)Clone();
         var done = clone.Items.RemoveLast(predicate);
 
         if (done > 0) clone.Trim();
@@ -225,7 +225,7 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <inheritdoc/>
     public virtual IInvariantList<K, T> RemoveAll(Predicate<T> predicate)
     {
-        var clone = Clone();
+        var clone = (InvariantList<K, T>)Clone();
         var done = clone.Items.RemoveAll(predicate);
 
         if (done > 0) clone.Trim();
@@ -235,7 +235,7 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <inheritdoc/>
     public virtual IInvariantList<K, T> Clear()
     {
-        var clone = Clone();
+        var clone = (InvariantList<K, T>)Clone();
         var done = clone.Items.Clear();
 
         if (done > 0) clone.Trim();

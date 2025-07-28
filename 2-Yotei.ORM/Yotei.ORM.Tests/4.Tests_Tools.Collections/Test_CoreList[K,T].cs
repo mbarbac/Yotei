@@ -20,7 +20,7 @@ public static partial class Test_CoreList_KT
 
     // ----------------------------------------------------
 
-    [Cloneable]
+    [Cloneable(ReturnInterface = true)]
     public partial class Chain : CoreList<string, IElement>, IElement
     {
         public Chain(bool sensitive) => Sensitive = sensitive;

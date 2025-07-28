@@ -1,5 +1,4 @@
-﻿using Yotei.ORM.Tools;
-using Yotei.ORM.Tools.Code;
+﻿using Yotei.ORM.Tools.Code;
 
 namespace Yotei.ORM.Tests.Tools.Collections;
 
@@ -21,7 +20,7 @@ public static partial class Test_InvariantList_T
 
     // ----------------------------------------------------
 
-    [Cloneable]
+    [Cloneable(ReturnInterface = true)]
     public partial class Builder : CoreList<IElement>
     {
         public Builder(bool sensitive) => Sensitive = sensitive;
@@ -68,7 +67,7 @@ public static partial class Test_InvariantList_T
 
     // ----------------------------------------------------
 
-    [Cloneable]
+    [Cloneable(ReturnInterface = true)]
     public partial class Chain : InvariantList<IElement>, IElement
     {
         protected override Builder Items { get; }
