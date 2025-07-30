@@ -31,6 +31,9 @@ public partial class ElementList_T : IHost, IItem
     /// <param name="source"></param>
     protected ElementList_T(THost source) : this(source.CaseSensitive) => Items.AddRange(source);
 
+    /// <inheritdoc/>
+    public override string ToString() => Items.ToString();
+
     // ----------------------------------------------------
 
     /// <inheritdoc/>

@@ -30,9 +30,9 @@ partial class ElementList_KT
             => ReferenceEquals(source, item)
             ? true
             : throw new DuplicateException("Duplicated element.").WithData(item);
-        public override IEqualityComparer<TKey> Comparer => _Comparer ??= new ComparerType(this);
-        ComparerType? _Comparer = null;
-        readonly struct ComparerType(Builder Master) : IEqualityComparer<TKey>
+        public override IEqualityComparer<TKey> Comparer => _Comparer ??= new TComparer(this);
+        TComparer? _Comparer = null;
+        readonly struct TComparer(Builder Master) : IEqualityComparer<TKey>
         {
             public bool Equals(TKey? x, TKey? y)
                 => string.Compare(x, y, !Master.CaseSensitive) == 0;

@@ -25,9 +25,9 @@ partial class ElementList_T
             => ReferenceEquals(source, item)
             ? true
             : throw new DuplicateException("Duplicated element.").WithData(item);
-        public override IEqualityComparer<IItem> Comparer => _Comparer ??= new ComparerType(this);
-        ComparerType? _Comparer = null;
-        readonly struct ComparerType(Builder Master) : IEqualityComparer<IItem>
+        public override IEqualityComparer<IItem> Comparer => _Comparer ??= new TComparer(this);
+        TComparer? _Comparer = null;
+        readonly struct TComparer(Builder Master) : IEqualityComparer<IItem>
         {
             public bool Equals(IItem? x, IItem? y)
             {
