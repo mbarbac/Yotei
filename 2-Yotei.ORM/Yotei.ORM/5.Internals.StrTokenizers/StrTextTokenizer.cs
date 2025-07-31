@@ -4,21 +4,21 @@
 /// <summary>
 /// Represents the ability of extracting <see cref="StrTokenText"/> tokens.
 /// </summary>
-public record StrTokenizerText : StrTokenizer
+public record StrTextTokenizer : StrTokenizer
 {
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
-    /// <param name="value"></param>
-    public StrTokenizerText(string value) => Value = value;
+    /// <param name="sequence"></param>
+    public StrTextTokenizer(string sequence) => Sequence = sequence;
 
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
-    /// <param name="value"></param>
-    public StrTokenizerText(char value)
+    /// <param name="sequence"></param>
+    public StrTextTokenizer(char sequence)
     {
-        Value = Validate(value).ToString();
+        Sequence = Validate(sequence).ToString();
 
         static char Validate(char c) => c >= ' '
             ? c
@@ -26,30 +26,30 @@ public record StrTokenizerText : StrTokenizer
     }
 
     /// <inheritdoc/>
-    public override string ToString() => $"{Value}";
+    public override string ToString() => $"{Sequence}";
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// The not-null and not-empty value to extract.
+    /// The not-null and not-empty sequence to extract.
     /// <br/> Spaces-only values are considered valid ones.
     /// </summary>
-    public string Value
+    public string Sequence
     {
-        get => _Value;
-        init => _Value = value.NotNullNotEmpty(trim: false);
+        get => _Sequence;
+        init => _Sequence = value.NotNullNotEmpty(trim: false);
     }
-    string _Value = default!;
+    string _Sequence = default!;
 
     /// <summary>
-    /// Whether to keep the value specified in this instance, or rather use the value found in
-    /// the given source (by default).
+    /// Whether to keep the sequence as specified in this instance, or rather use the one found
+    /// in the given source (by default).
     /// </summary>
-    public bool KeepValue { get; init; }
+    public bool KeepSequence { get; init; }
 
     /// <summary>
-    /// If not null, the string sequence that if found preceding the requested value, prevents
-    /// it from being tokenized. If <c>null</c>, then this property is ignored.
+    /// If not null, the string sequence that if found preceding the requested one, prevents it
+    /// from being tokenized. If <c>null</c>, then this property is ignored.
     /// </summary>
     public string? Escape
     {
@@ -59,7 +59,7 @@ public record StrTokenizerText : StrTokenizer
     string? _Escape = null;
 
     /// <summary>
-    /// Whether, if a escape sequence is found, keep it in the returned result, or rather not
+    /// Whether, if a escape sequence is found, keep it in the returned result, or rather not to
     /// keep it (by default).
     /// </summary>
     public bool KeepEscape { get; init; }
@@ -69,9 +69,9 @@ public record StrTokenizerText : StrTokenizer
     /// <summary>
     /// Invoked to create a found token using the given value.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="sequence"></param>
     /// <returns></returns>
-    protected virtual IStrToken CreateToken(string value) => new StrTokenText(value);
+    protected virtual IStrToken CreateToken(string sequence) => new StrTokenText(sequence);
 
     /// <summary>
     /// Determines if the found value is a valid one or not, taking into consideration how it
@@ -92,7 +92,7 @@ public record StrTokenizerText : StrTokenizer
         if (source is null || source.Length == 0) return StrTokenText.Empty;
 
         // Main loop...
-        string? xcape = Escape is null ? null : (Escape + Value);
+        string? xcape = Escape is null ? null : (Escape + Sequence);
         StrTokenChain.Builder builder = [];
         StringBuilder sb = new();
 
@@ -108,14 +108,14 @@ public record StrTokenizerText : StrTokenizer
             {
                 sb.Append(KeepEscape
                     ? source.Substring(i, xcape.Length)
-                    : source.Substring(i + Escape!.Length, Value.Length));
+                    : source.Substring(i + Escape!.Length, Sequence.Length));
 
                 i += xcape.Length; i--;
                 continue;
             }
 
             // Value...
-            if (span.StartsWith(Value, Comparison))
+            if (span.StartsWith(Sequence, Comparison))
             {
                 if (!IsValueAtIndex(i, source)) continue;
 
@@ -126,11 +126,11 @@ public record StrTokenizerText : StrTokenizer
                     sb.Clear();
                 }
 
-                str = KeepValue ? Value : source.Substring(i, Value.Length);
+                str = KeepSequence ? Sequence : source.Substring(i, Sequence.Length);
                 token = CreateToken(str);
                 builder.Add(token);
 
-                i += Value.Length; i--;
+                i += Sequence.Length; i--;
                 continue;
             }
 

@@ -5,7 +5,7 @@
 /// Represents a string token that is itself a flat collection of arbitrary tokens.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
-[DebuggerDisplay("{ToDebugString(5)}")]
+[DebuggerDisplay("{Items.ToDebugString(5)}")]
 [InvariantList<IStrToken>]
 public partial class StrTokenChain : IStrToken
 {

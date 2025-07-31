@@ -2,14 +2,14 @@
 
 // ========================================================
 //[Enforced]
-public static class Test_TokenizerLiteral
+public static class Test_LiteralTokenizer
 {
     //[Enforced]
     [Fact]
     public static void Test_NotFound()
     {
         var comparison = StringComparison.OrdinalIgnoreCase;
-        var tokenizer = new StrTokenizerLiteral("XX") { Escape = ".", Comparison = comparison };
+        var tokenizer = new StrLiteralTokenizer("XX") { Escape = ".", Comparison = comparison };
         string source;
         IStrToken target;
         StrTokenText text;
@@ -35,7 +35,7 @@ public static class Test_TokenizerLiteral
     public static void Test_String_Source()
     {
         var comparison = StringComparison.OrdinalIgnoreCase;
-        var tokenizer = new StrTokenizerLiteral("XX") { Escape = ".", Comparison = comparison };
+        var tokenizer = new StrLiteralTokenizer("XX") { Escape = ".", Comparison = comparison };
         string source;
         IStrToken target;
         StrTokenText text;
@@ -49,7 +49,7 @@ public static class Test_TokenizerLiteral
         literal = Assert.IsType<StrTokenLiteral>(chain[1]); Assert.Equal("xx", literal.Payload);
         text = Assert.IsType<StrTokenText>(chain[2]); Assert.Equal("bbxxcc", text.Payload);
 
-        tokenizer = tokenizer with { KeepValue = true, KeepEscape = true };
+        tokenizer = tokenizer with { KeepSequence = true, KeepEscape = true };
         target = tokenizer.Tokenize(source);
         chain = Assert.IsType<StrTokenChain>(target); Assert.Equal(3, chain.Count);
         text = Assert.IsType<StrTokenText>(chain[0]); Assert.Equal("aa", text.Payload);
@@ -62,7 +62,7 @@ public static class Test_TokenizerLiteral
     public static void Test_Chained_Source()
     {
         var comparison = StringComparison.OrdinalIgnoreCase;
-        var tokenizer = new StrTokenizerLiteral("XX") { Escape = ".", Comparison = comparison };
+        var tokenizer = new StrLiteralTokenizer("XX") { Escape = ".", Comparison = comparison };
         StrTokenChain source;
         IStrToken target;
         StrTokenText text;
@@ -83,7 +83,7 @@ public static class Test_TokenizerLiteral
         literal = Assert.IsType<StrTokenLiteral>(chain[1]); Assert.Equal("xx", literal.Payload);
         text = Assert.IsType<StrTokenText>(chain[2]); Assert.Equal("bbxxcc", text.Payload);
 
-        tokenizer = tokenizer with { KeepValue = true, KeepEscape = true };
+        tokenizer = tokenizer with { KeepSequence = true, KeepEscape = true };
         target = tokenizer.Tokenize(source);
         chain = Assert.IsType<StrTokenChain>(target); Assert.Equal(3, chain.Count);
         text = Assert.IsType<StrTokenText>(chain[0]); Assert.Equal("aa", text.Payload);

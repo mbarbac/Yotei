@@ -6,14 +6,14 @@
 
 // ========================================================
 //[Enforced]
-public static class Test_TokenizerText
+public static class Test_TextTokenizer
 {
     //[Enforced]
     [Fact]
     public static void Test_NotFound()
     {
         var comparison = StringComparison.OrdinalIgnoreCase;
-        var tokenizer = new StrTokenizerText("XX") { Escape = ".", Comparison = comparison };
+        var tokenizer = new StrTextTokenizer("XX") { Escape = ".", Comparison = comparison };
         string source;
         IStrToken target;
         StrTokenText text;
@@ -39,7 +39,7 @@ public static class Test_TokenizerText
     public static void Test_String_Source()
     {
         var comparison = StringComparison.OrdinalIgnoreCase;
-        var tokenizer = new StrTokenizerText("XX") { Escape = ".", Comparison = comparison };
+        var tokenizer = new StrTextTokenizer("XX") { Escape = ".", Comparison = comparison };
         string source;
         IStrToken target;
         StrTokenText text;
@@ -52,7 +52,7 @@ public static class Test_TokenizerText
         text = Assert.IsType<StrTokenText>(chain[1]); Assert.Equal("xx", text.Payload);
         text = Assert.IsType<StrTokenText>(chain[2]); Assert.Equal("bbxxcc", text.Payload);
 
-        tokenizer = tokenizer with { KeepValue = true, KeepEscape = true };
+        tokenizer = tokenizer with { KeepSequence = true, KeepEscape = true };
         target = tokenizer.Tokenize(source, reduce: false);
         chain = Assert.IsType<StrTokenChain>(target); Assert.Equal(3, chain.Count);
         text = Assert.IsType<StrTokenText>(chain[0]); Assert.Equal("aa", text.Payload);
@@ -65,7 +65,7 @@ public static class Test_TokenizerText
     public static void Test_Chained_Source()
     {
         var comparison = StringComparison.OrdinalIgnoreCase;
-        var tokenizer = new StrTokenizerText("XX") { Escape = ".", Comparison = comparison };
+        var tokenizer = new StrTextTokenizer("XX") { Escape = ".", Comparison = comparison };
         StrTokenChain source;
         IStrToken target;
         StrTokenText text;
@@ -85,7 +85,7 @@ public static class Test_TokenizerText
         text = Assert.IsType<StrTokenText>(chain[1]); Assert.Equal("xx", text.Payload);
         text = Assert.IsType<StrTokenText>(chain[2]); Assert.Equal("bbxxcc", text.Payload);
 
-        tokenizer = tokenizer with { KeepValue = true, KeepEscape = true };
+        tokenizer = tokenizer with { KeepSequence = true, KeepEscape = true };
         target = tokenizer.Tokenize(source, reduce: false);
         chain = Assert.IsType<StrTokenChain>(target); Assert.Equal(3, chain.Count);
         text = Assert.IsType<StrTokenText>(chain[0]); Assert.Equal("aa", text.Payload);

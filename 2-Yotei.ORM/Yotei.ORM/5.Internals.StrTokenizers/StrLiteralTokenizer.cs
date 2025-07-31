@@ -4,19 +4,19 @@
 /// <summary>
 /// Represents the ability of extracting <see cref="StrTokenLiteral"/> tokens.
 /// </summary>
-public record StrTokenizerLiteral : StrTokenizerText
+public record StrLiteralTokenizer : StrTextTokenizer
 {
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
     /// <param name="value"></param>
-    public StrTokenizerLiteral(string value) : base(value) { }
+    public StrLiteralTokenizer(string value) : base(value) { }
 
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
     /// <param name="value"></param>
-    public StrTokenizerLiteral(char value) : base(value) { }
+    public StrLiteralTokenizer(char value) : base(value) { }
 
     // ----------------------------------------------------
 
