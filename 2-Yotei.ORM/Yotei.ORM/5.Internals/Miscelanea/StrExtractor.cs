@@ -6,6 +6,35 @@ namespace Yotei.ORM.Internals;
 public static class StrExtractor
 {
     /// <summary>
+    /// Tries to remove the left-most and right-most rounded brackets from the given parts,
+    /// considering them both as a single unit. Spaces before the first bracket and after the
+    /// last one are also removed.
+    /// <para>This method is typically invoked when a middle separator is removed from a source
+    /// wrapped by rounded brackets, as in '(a=b)', having '(a' and 'b)' as the left and right
+    /// parts.</para>
+    /// </summary>
+    /// <param name="left"></param>
+    /// <param name="right"></param>
+    /// <returns></returns>
+    public static bool RemoveBrackets(ref string left, ref string right)
+    {
+        left.ThrowWhenNull();
+        right.ThrowWhenNull();
+
+        var ini = left.IndexOf('('); if (ini < 0) return false;
+        var end = right.LastIndexOf(')'); if (end < 0) return false;
+
+        for (int i = 0; i < ini; i++) if (left[i] != ' ') return false;
+        for (int i = end + 1; i < right.Length; i++) if (right[i] != ' ') return false;
+
+        left = left[(ini + 1)..];
+        right = right[..end];
+        return true;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Tries to extract at the head of the given source any of the given specifications. If so,
     /// returns true and sets the out main argument to the remaining source without the found
     /// specification, and the out found argument to that specification. Otherwise returns false
@@ -84,7 +113,7 @@ public static class StrExtractor
                 }
 
                 found = main.Substring(index, spec.Length);
-                main = main.Remove(found);
+                main = main.RemoveLast(found);
                 return true;
             }
         }
@@ -97,10 +126,51 @@ public static class StrExtractor
     /// <summary>
     /// Tries to extract the first ocurrence of any of the given specifications. If so, returns
     /// true and sets the head and tail out arguments to the remainings without the found spec,
-    /// and the out found argument to that specification. Otherwise returns false and the out
+    /// and the out found argument to that specification. Otherwise, returns false and the out
     /// arguments are set to arbitrary values.
     /// </summary>
     public static bool ExtractFirst(
+        this string source,
+        bool sensitive, bool isolated, out string head, out string found, out string tail,
+        params string[] specs)
+    {
+        specs.ThrowWhenNull();
+
+        found = string.Empty;
+        tail = string.Empty;
+        head = source.ThrowWhenNull();
+
+        for (int i = 0; i < specs.Length; i++)
+        {
+            var spec = specs[i].NotNullNotEmpty(trim: false);
+            var index = head.IndexOf(spec, sensitive);
+            if (index >= 0)
+            {
+                if (isolated)
+                {
+                    var temp = head.FindIsolated(spec, 0, sensitive);
+                    if (temp != index) continue;
+                }
+
+                found = head.Substring(index, spec.Length);
+                tail = head[(index + spec.Length)..];
+                head = head[..index];
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Tries to extract the last ocurrence of any of the given specifications. If so, returns
+    /// true and sets the head and tail out arguments to the remainings without the found spec,
+    /// and the out found argument to that specification. Otherwise, returns false and the out
+    /// arguments are set to arbitrary values.
+    /// </summary>
+    public static bool ExtractLast(
         this string source,
         bool sensitive, bool isolated, out string head, out string found, out string tail,
         params string[] specs)
@@ -119,7 +189,10 @@ public static class StrExtractor
             {
                 if (isolated)
                 {
-                    var temp = head.FindIsolated(spec, 0, sensitive);
+                    var ini = index - 1;
+                    if (ini < 0) ini = 0;
+
+                    var temp = head.FindIsolated(spec, ini, sensitive);
                     if (temp != index) continue;
                 }
 
