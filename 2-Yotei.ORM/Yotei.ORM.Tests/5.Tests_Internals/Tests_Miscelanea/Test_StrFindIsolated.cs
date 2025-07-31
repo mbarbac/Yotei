@@ -1,4 +1,4 @@
-﻿namespace Yotei.ORM.Tests.Internals.StrTokenizers;
+﻿namespace Yotei.ORM.Tests.Internals.Miscelanea;
 
 // ========================================================
 //[Enforced]
