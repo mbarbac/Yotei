@@ -1,9 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Yotei.ORM.Internals;
+﻿namespace Yotei.ORM.Internals;
 
 // ========================================================
-public static class StrExtractor
+public static partial class StrExtractor
 {
     /// <summary>
     /// Tries to remove the left-most and right-most rounded brackets from the given parts,
@@ -13,9 +11,6 @@ public static class StrExtractor
     /// wrapped by rounded brackets, as in '(a=b)', having '(a' and 'b)' as the left and right
     /// parts.</para>
     /// </summary>
-    /// <param name="left"></param>
-    /// <param name="right"></param>
-    /// <returns></returns>
     public static bool RemoveBrackets(ref string left, ref string right)
     {
         left.ThrowWhenNull();
