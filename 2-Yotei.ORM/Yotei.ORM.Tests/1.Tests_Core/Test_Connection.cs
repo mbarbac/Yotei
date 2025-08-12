@@ -26,6 +26,15 @@ public static class Test_Connection
         Assert.NotSame(source, target);
         Assert.Equal(source.Retries, target.Retries);
         Assert.Equal(source.RetryInterval, target.RetryInterval);
+
+        var fakes = new FakeConverters();
+        source.ToDbConverters.AddRange(fakes);
+
+        target = source.Clone();
+        Assert.NotSame(source, target);
+        Assert.Equal(2, target.ToDbConverters.Count);
+        Assert.NotNull(target.ToDbConverters.Find<DateTime>());
+        Assert.NotNull(target.ToDbConverters.Find<DateOnly>());
     }
 
     // ----------------------------------------------------

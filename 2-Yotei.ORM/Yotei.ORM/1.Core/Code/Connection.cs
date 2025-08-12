@@ -25,6 +25,7 @@ public abstract partial class Connection : DisposableClass, IConnection
         Engine = source.Engine;
         Retries = source.Retries;
         RetryInterval = source.RetryInterval;
+        ToDbConverters.AddRange(source.ToDbConverters);
     }
 
     /// <inheritdoc/>
@@ -240,6 +241,11 @@ public abstract partial class Connection : DisposableClass, IConnection
     /// Invoked to close the connection with the underlying database.
     /// </summary>
     protected abstract ValueTask OnCloseAsync();
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public IValueConverterList ToDbConverters { get; } = new ValueConverterList();
 
     // ----------------------------------------------------
 
