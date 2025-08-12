@@ -192,7 +192,7 @@ internal class XTypeNode : TypeNode
         INamedTypeSymbol source, out bool nullable,
         SourceProductionContext? context = null, INamedTypeSymbol? symbol = null)
     {
-        if (source.Name == "Nullable")
+        if (source.Name == "IsNullable" || source.Name == "Nullable")
         {
             if (source.TypeArguments.Length == 1)
             {
@@ -467,7 +467,14 @@ internal class XTypeNode : TypeNode
                 // Ej: RemoveAt(int index)...
                 else
                 {
-                    if (etype.Match(mtype)) count--; // Found...
+                    // This check prevents matching 'IEnumerable<IItem>' and 'IEnumerable<string>'
+                    // (string or any other), which is common when adding functionality...
+
+                    if (mtype.GenericTypeArguments.Length > 0 &&
+                        !mtype.GenericTypeArguments[0].IsGenericParameter)
+                    {
+                        if (etype.Match(mtype)) count--; // Found...
+                    }
                 }
             }
 

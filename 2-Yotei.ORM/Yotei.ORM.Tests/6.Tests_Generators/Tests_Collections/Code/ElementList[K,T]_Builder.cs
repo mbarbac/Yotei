@@ -21,7 +21,7 @@ partial class ElementList_KT
         // ------------------------------------------------
 
         public override IItem ValidateItem(IItem item) => item.ThrowWhenNull();
-        public override string GetKey(IItem item) => item is NamedElement named
+        public override TKey GetKey(IItem item) => item is NamedElement named
             ? named.Name
             : throw new ArgumentException("Element is not a named one.").WithData(item);
         public override TKey ValidateKey(TKey key) => key.NotNullNotEmpty();
