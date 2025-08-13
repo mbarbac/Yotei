@@ -7,7 +7,7 @@ namespace Yotei.ORM;
 // ========================================================
 /// <summary>
 /// Represents a multi-part database identifier.
-/// <para>Instances of this type are intended to be immutable ones.</para>
+/// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
 [IInvariantList<IsNullable<TKey>, IItem>]
 public partial interface IIdentifierChain : IIdentifier

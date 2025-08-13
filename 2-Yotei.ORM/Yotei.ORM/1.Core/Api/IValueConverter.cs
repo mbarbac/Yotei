@@ -5,6 +5,7 @@
 /// Represents the ability of converting values of a given source type to values of a given target
 /// one. Instances of this type are typically used when there is not a standard conversion between
 /// an application-level type to any database one.
+/// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
 public interface IValueConverter
 {

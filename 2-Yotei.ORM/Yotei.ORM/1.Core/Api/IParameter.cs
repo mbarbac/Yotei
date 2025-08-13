@@ -3,7 +3,7 @@
 // ========================================================
 /// <summary>
 /// Represents a parameter in a command.
-/// <para>Instances of this type are intended to be immutable ones.</para>
+/// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
 public partial interface IParameter : IEquatable<IParameter>
 {

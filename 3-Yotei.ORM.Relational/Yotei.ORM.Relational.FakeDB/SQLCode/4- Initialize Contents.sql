@@ -78,6 +78,7 @@ VALUES
 	
 	,( 'za', 'Republic of South Africa', '225' )
 	
+	,( 'au', 'Australia', '300' )
 	,( 'jp', 'Japan', '310' )
 ;
 

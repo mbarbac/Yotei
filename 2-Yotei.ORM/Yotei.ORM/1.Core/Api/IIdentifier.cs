@@ -3,7 +3,7 @@
 // ========================================================
 /// <summary>
 /// Represents a database identifier.
-/// <para>Instances of this type are intended to be immutable ones.</para>
+/// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
 public interface IIdentifier : IEquatable<IIdentifier>
 {
