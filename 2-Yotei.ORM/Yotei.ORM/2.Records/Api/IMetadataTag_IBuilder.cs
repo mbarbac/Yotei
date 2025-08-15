@@ -1,10 +1,10 @@
 ﻿namespace Yotei.ORM.Records;
 
-partial interface IMetadataName
+partial interface IMetadataTag
 {
     // ====================================================
     /// <summary>
-    /// Represents a builder for <see cref="IMetadataName"/> instances.
+    /// Represents a builder for <see cref="IMetadataTag"/> instances.
     /// </summary>
     [Cloneable]
     public partial interface IBuilder : IEnumerable<string>
@@ -13,32 +13,32 @@ partial interface IMetadataName
         /// Returns a new instance based upon the contents of this builder.
         /// </summary>
         /// <returns></returns>
-        IMetadataName CreateInstance();
+        IMetadataTag CreateInstance();
 
         // ----------------------------------------------------
 
-        /// <inheritdoc cref="IMetadataName.CaseSensitiveNames"/>
-        bool CaseSensitiveNames { get; }
+        /// <inheritdoc cref="IMetadataTag.CaseSensitiveMetaNames"/>
+        bool CaseSensitiveMetaNames { get; }
 
-        /// <inheritdoc cref="IMetadataName.Default"/>
+        /// <inheritdoc cref="IMetadataTag.Default"/>
         string Default { get; set; }
 
-        /// <inheritdoc cref="IMetadataName.Count"/>
+        /// <inheritdoc cref="IMetadataTag.Count"/>
         int Count { get; }
 
-        /// <inheritdoc cref="IMetadataName.Contains(string)"/>
+        /// <inheritdoc cref="IMetadataTag.Contains(string)"/>
         bool Contains(string name);
 
-        /// <inheritdoc cref="IMetadataName.Contains(IEnumerable{string})"/>
+        /// <inheritdoc cref="IMetadataTag.Contains(IEnumerable{string})"/>
         bool Contains(IEnumerable<string> range);
 
-        /// <inheritdoc cref="IMetadataName.ToArray"/>
+        /// <inheritdoc cref="IMetadataTag.ToArray"/>
         string[] ToArray();
 
-        /// <inheritdoc cref="IMetadataName.ToList"/>
+        /// <inheritdoc cref="IMetadataTag.ToList"/>
         List<string> ToList();
 
-        /// <inheritdoc cref="IMetadataName.Trim"/>
+        /// <inheritdoc cref="IMetadataTag.Trim"/>
         void Trim();
 
         // ----------------------------------------------------

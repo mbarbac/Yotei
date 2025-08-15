@@ -1,9 +1,9 @@
 ﻿namespace Yotei.ORM.Records.Code;
 
 // ========================================================
-/// <inheritdoc cref="IMetadataName"/>
+/// <inheritdoc cref="IMetadataTag"/>
 [Cloneable]
-public partial class MetadataName : IMetadataName
+public partial class MetadataTag : IMetadataTag
 {
     protected virtual Builder Items { get; }
 
@@ -12,7 +12,7 @@ public partial class MetadataName : IMetadataName
     /// </summary>
     /// <param name="sensitive"></param>
     /// <param name="name"></param>
-    public MetadataName(bool sensitive, string name) => Items = new(sensitive, name);
+    public MetadataTag(bool sensitive, string name) => Items = new(sensitive, name);
 
     /// <summary>
     /// Initializes a new instance with the names of the given name. The first name becomes
@@ -20,14 +20,14 @@ public partial class MetadataName : IMetadataName
     /// </summary>
     /// <param name="sensitive"></param>
     /// <param name="range"></param>
-    public MetadataName(
+    public MetadataTag(
         bool sensitive, IEnumerable<string> range) => Items = new(sensitive, range);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected MetadataName(MetadataName source) => Items = source.Items.Clone();
+    protected MetadataTag(MetadataTag source) => Items = source.Items.Clone();
 
     /// <inheritdoc/>
     public override string ToString() => Items.ToString();
@@ -37,17 +37,17 @@ public partial class MetadataName : IMetadataName
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /// <inheritdoc/>
-    public virtual IMetadataName.IBuilder CreateBuilder() => Items.Clone();
+    public virtual IMetadataTag.IBuilder CreateBuilder() => Items.Clone();
 
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public virtual bool Equals(IMetadataName? other)
+    public virtual bool Equals(IMetadataTag? other)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null) return false;
 
-        if (CaseSensitiveNames != other.CaseSensitiveNames) return false;
+        if (CaseSensitiveMetaNames != other.CaseSensitiveMetaNames) return false;
         if (Count != other.Count) return false;
 
         var targets = new List<string>(other);
@@ -64,9 +64,9 @@ public partial class MetadataName : IMetadataName
     }
 
     /// <inheritdoc/>
-    public override bool Equals(object? obj) => Equals(obj as IMetadataName);
+    public override bool Equals(object? obj) => Equals(obj as IMetadataTag);
 
-    public static bool operator ==(MetadataName? host, IMetadataName? item)
+    public static bool operator ==(MetadataTag? host, IMetadataTag? item)
     {
         if (host is null && item is null) return true;
         if (host is null || item is null) return false;
@@ -74,14 +74,14 @@ public partial class MetadataName : IMetadataName
         return host.Equals(item);
     }
 
-    public static bool operator !=(MetadataName? host, IMetadataName? item) => !(host == item);
+    public static bool operator !=(MetadataTag? host, IMetadataTag? item) => !(host == item);
 
 
     /// <inheritdoc/>
     public override int GetHashCode()
     {
         var code = 0;
-        code = HashCode.Combine(code, CaseSensitiveNames);
+        code = HashCode.Combine(code, CaseSensitiveMetaNames);
         foreach (var name in Items) code = HashCode.Combine(code, name);
         return code;
     }
@@ -89,7 +89,7 @@ public partial class MetadataName : IMetadataName
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public bool CaseSensitiveNames => Items.CaseSensitiveNames;
+    public bool CaseSensitiveMetaNames => Items.CaseSensitiveMetaNames;
 
     /// <inheritdoc/>
     public string Default
@@ -119,7 +119,7 @@ public partial class MetadataName : IMetadataName
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public virtual IMetadataName Replace(string oldname, string newname)
+    public virtual IMetadataTag Replace(string oldname, string newname)
     {
         var builder = CreateBuilder();
         var done = builder.Replace(oldname, newname);
@@ -127,7 +127,7 @@ public partial class MetadataName : IMetadataName
     }
 
     /// <inheritdoc/>
-    public virtual IMetadataName Add(string name)
+    public virtual IMetadataTag Add(string name)
     {
         var builder = CreateBuilder();
         var done = builder.Add(name);
@@ -135,7 +135,7 @@ public partial class MetadataName : IMetadataName
     }
 
     /// <inheritdoc/>
-    public virtual IMetadataName AddRange(IEnumerable<string> range)
+    public virtual IMetadataTag AddRange(IEnumerable<string> range)
     {
         var builder = CreateBuilder();
         var done = builder.AddRange(range);
@@ -143,7 +143,7 @@ public partial class MetadataName : IMetadataName
     }
 
     /// <inheritdoc/>
-    public virtual IMetadataName Remove(string name)
+    public virtual IMetadataTag Remove(string name)
     {
         var builder = CreateBuilder();
         var done = builder.Remove(name);
@@ -151,7 +151,7 @@ public partial class MetadataName : IMetadataName
     }
 
     /// <inheritdoc/>
-    public virtual IMetadataName Clear()
+    public virtual IMetadataTag Clear()
     {
         var builder = CreateBuilder();
         var done = builder.Clear();

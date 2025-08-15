@@ -4,11 +4,10 @@
 /// <summary>
 /// Represents the not-empty collection of names by which a given metadata entry can be known,
 /// where one of these names is the default one.
-/// <br/> Instances of this type are intended to be immutable, with respect to their collection
-/// of names, but their default value can change.
+/// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
 [Cloneable]
-public partial interface IMetadataName : IEnumerable<string>, IEquatable<IMetadataName>
+public partial interface IMetadataTag : IEnumerable<string>, IEquatable<IMetadataTag>
 {
     /// <summary>
     /// Returns a new builder based upon the contents of this instance.
@@ -19,13 +18,15 @@ public partial interface IMetadataName : IEnumerable<string>, IEquatable<IMetada
     // ----------------------------------------------------
 
     /// <summary>
-    /// Determines if the metadata names are case sensitive or not.
+    /// Determines if the names are case sensitive or not.
     /// </summary>
-    bool CaseSensitiveNames { get; }
+    bool CaseSensitiveMetaNames { get; }
 
     /// <summary>
-    /// Gets or sets the default metadata name among the ones in this instance.
-    /// <br/> The setter throws an exception if the given value was not in this collection.
+    /// Gets or sets the default name among the ones in this instance.
+    /// <br/> The setter somehow an exception to the immutability of this instance, in the sense
+    /// that this value can change at will, but provided the given value already belong to this
+    /// collection.
     /// </summary>
     string Default { get; set; }
 
@@ -73,14 +74,14 @@ public partial interface IMetadataName : IEnumerable<string>, IEquatable<IMetada
     /// <param name="oldname"></param>
     /// <param name="newname"></param>
     /// <returns></returns>
-    IMetadataName Replace(string oldname, string newname);
+    IMetadataTag Replace(string oldname, string newname);
 
     /// <summary>
     /// Returns a new instance where the given name has been added to the original collection.
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    IMetadataName Add(string name);
+    IMetadataTag Add(string name);
 
     /// <summary>
     /// Returns a new instance where the names of the given range has been added to the original
@@ -88,7 +89,7 @@ public partial interface IMetadataName : IEnumerable<string>, IEquatable<IMetada
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    IMetadataName AddRange(IEnumerable<string> range);
+    IMetadataTag AddRange(IEnumerable<string> range);
 
     /// <summary>
     /// Returns a new instance where the given name has been removed from the original collection.
@@ -97,12 +98,12 @@ public partial interface IMetadataName : IEnumerable<string>, IEquatable<IMetada
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    IMetadataName Remove(string name);
+    IMetadataTag Remove(string name);
 
     /// <summary>
     /// Returns a new instance where all the original contents, except the default one, have
     /// been removed.
     /// </summary>
     /// <returns></returns>
-    IMetadataName Clear();
+    IMetadataTag Clear();
 }

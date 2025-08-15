@@ -2,24 +2,24 @@
 
 // ========================================================
 //[Enforced]
-public static class Test_MetadataName
+public static class Test_MetadataTag
 {
     //[Enforced]
     [Fact]
     public static void Test_Create_Single()
     {
-        var item = new MetadataName(false, "one");
+        var item = new MetadataTag(false, "one");
         Assert.Single(item);
         Assert.Equal("one", item.Default);
         Assert.True(item.Contains("one")); Assert.True(item.Contains("ONE"));
 
-        try { _ = new MetadataName(false, (string)null!); Assert.Fail(); }
+        try { _ = new MetadataTag(false, (string)null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
 
-        try { _ = new MetadataName(false, string.Empty); Assert.Fail(); }
+        try { _ = new MetadataTag(false, string.Empty); Assert.Fail(); }
         catch (EmptyException) { }
 
-        try { _ = new MetadataName(false, " "); Assert.Fail(); }
+        try { _ = new MetadataTag(false, " "); Assert.Fail(); }
         catch (EmptyException) { }
     }
 
@@ -27,16 +27,16 @@ public static class Test_MetadataName
     [Fact]
     public static void Test_Create_Many()
     {
-        var item = new MetadataName(false, ["one", "two"]);
+        var item = new MetadataTag(false, ["one", "two"]);
         Assert.Equal(2, item.Count);
         Assert.Equal("one", item.Default);
         Assert.True(item.Contains("one")); Assert.True(item.Contains("ONE"));
         Assert.True(item.Contains("two")); Assert.True(item.Contains("TWO"));
 
-        try { _ = new MetadataName(false, (IEnumerable<string>)null!); Assert.Fail(); }
+        try { _ = new MetadataTag(false, (IEnumerable<string>)null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
 
-        try { _ = new MetadataName(false, []); Assert.Fail(); }
+        try { _ = new MetadataTag(false, []); Assert.Fail(); }
         catch (EmptyException) { }
     }
 
@@ -44,7 +44,7 @@ public static class Test_MetadataName
     [Fact]
     public static void Test_Create_Many_CaseSensitive()
     {
-        var item = new MetadataName(true, ["one", "ONE"]);
+        var item = new MetadataTag(true, ["one", "ONE"]);
         Assert.Equal(2, item.Count);
         Assert.Equal("one", item.Default);
         Assert.True(item.Contains("one"));
@@ -57,8 +57,8 @@ public static class Test_MetadataName
     [Fact]
     public static void Test_Compare()
     {
-        var source = new MetadataName(false, ["one", "two", "three"]);
-        var target = new MetadataName(false, ["three", "two", "one"]);
+        var source = new MetadataTag(false, ["one", "two", "three"]);
+        var target = new MetadataTag(false, ["three", "two", "one"]);
 
         Assert.True(source.Equals(target)); // This is the expected behavior...
         Assert.NotEqual(source, target); // Fails because XUnit compares using enumeration...
@@ -68,7 +68,7 @@ public static class Test_MetadataName
     [Fact]
     public static void Test_Default()
     {
-        var item = new MetadataName(false, ["one", "two", "three"]);
+        var item = new MetadataTag(false, ["one", "two", "three"]);
         Assert.Equal("one", item.Default);
 
         item.Default = "TWO";
@@ -82,7 +82,7 @@ public static class Test_MetadataName
     [Fact]
     public static void Test_Find()
     {
-        var item = new MetadataName(false, ["one", "two", "three"]);
+        var item = new MetadataTag(false, ["one", "two", "three"]);
 
         Assert.True(item.Contains("one"));
         Assert.True(item.Contains("ONE"));
@@ -98,7 +98,7 @@ public static class Test_MetadataName
     [Fact]
     public static void Test_Replace()
     {
-        var source = new MetadataName(false, ["one", "two", "three"]);
+        var source = new MetadataTag(false, ["one", "two", "three"]);
         var target = source.Replace("any", "other");
         Assert.Same(source, target);
 
@@ -134,7 +134,7 @@ public static class Test_MetadataName
     [Fact]
     public static void Test_Add()
     {
-        var source = new MetadataName(false, ["one", "two"]);
+        var source = new MetadataTag(false, ["one", "two"]);
         var target = source.Add("three");
 
         Assert.NotSame(source, target);
@@ -161,7 +161,7 @@ public static class Test_MetadataName
     [Fact]
     public static void Test_AddRange()
     {
-        var source = new MetadataName(false, ["one"]);
+        var source = new MetadataTag(false, ["one"]);
         var target = source.AddRange([]);
         Assert.Same(source, target);
 
@@ -187,7 +187,7 @@ public static class Test_MetadataName
     [Fact]
     public static void Test_Remove()
     {
-        var source = new MetadataName(false, ["one", "two", "three"]);
+        var source = new MetadataTag(false, ["one", "two", "three"]);
         var target = source.Remove("four");
         Assert.Same(source, target);
 
@@ -199,7 +199,7 @@ public static class Test_MetadataName
         Assert.True(target.Contains("three"));
         Assert.Equal("two", target.Default);
 
-        source = new MetadataName(false, ["one"]);
+        source = new MetadataTag(false, ["one"]);
         try { source.Remove("one"); Assert.Fail(); }
         catch (InvalidOperationException) { }
     }
@@ -208,13 +208,13 @@ public static class Test_MetadataName
     [Fact]
     public static void Test_Clear()
     {
-        var source = new MetadataName(false, ["one", "two", "three"]);
+        var source = new MetadataTag(false, ["one", "two", "three"]);
         var target = source.Clear();
         Assert.NotSame(source, target);
         Assert.Single(target);
         Assert.True(target.Contains("one"));
 
-        source = new MetadataName(false, ["one"]);
+        source = new MetadataTag(false, ["one"]);
         target = source.Clear();
         Assert.Same(source, target);
     }

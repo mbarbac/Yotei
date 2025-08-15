@@ -8,7 +8,8 @@
 public partial interface IParameter : IEquatable<IParameter>
 {
     /// <summary>
-    /// Determines if this instance is equal to the other given one, using the given comparison.
+    /// Determines if this instance is equal to the other given one, using the given comparison
+    /// mode to compare their names.
     /// </summary>
     /// <param name="other"></param>
     /// <param name="caseSensitive"></param>

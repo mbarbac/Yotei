@@ -1,11 +1,11 @@
 ﻿namespace Yotei.ORM.Records.Code;
 
-partial class MetadataName
+partial class MetadataTag
 {
     // ====================================================
-    /// <inheritdoc cref="IMetadataName.IBuilder"/>
+    /// <inheritdoc cref="IMetadataTag.IBuilder"/>
     [Cloneable]
-    public partial class Builder : IMetadataName.IBuilder
+    public partial class Builder : IMetadataTag.IBuilder
     {
         readonly List<string> Items = [];
 
@@ -16,7 +16,7 @@ partial class MetadataName
         /// <param name="name"></param>
         public Builder(bool sensitive, string name)
         {
-            CaseSensitiveNames = sensitive;
+            CaseSensitiveMetaNames = sensitive;
             Add(name);
         }
 
@@ -28,7 +28,7 @@ partial class MetadataName
         /// <param name="range"></param>
         public Builder(bool sensitive, IEnumerable<string> range)
         {
-            CaseSensitiveNames = sensitive;
+            CaseSensitiveMetaNames = sensitive;
             AddRange(range);
 
             if (Items.Count == 0) throw new EmptyException("Range of tag names is empty.");
@@ -42,7 +42,7 @@ partial class MetadataName
         {
             source.ThrowWhenNull();
 
-            CaseSensitiveNames = source.CaseSensitiveNames;
+            CaseSensitiveMetaNames = source.CaseSensitiveMetaNames;
             AddRange(source);
         }
 
@@ -54,15 +54,18 @@ partial class MetadataName
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         /// <inheritdoc/>
-        public virtual IMetadataName CreateInstance() => new MetadataName(CaseSensitiveNames, this);
+        public virtual IMetadataTag CreateInstance()
+            => new MetadataTag(CaseSensitiveMetaNames, this);
 
         // ----------------------------------------------------
 
         /// <inheritdoc/>
-        public bool CaseSensitiveNames { get; }
+        public bool CaseSensitiveMetaNames { get; }
 
         /// <inheritdoc/>
-        /// <remarks>The default name is always the first one in the internal collection.</remarks>
+        /// <remarks>
+        /// The default name is always the first one in the internal collection.
+        /// </remarks>
         public string Default
         {
             get => Items[0];
@@ -113,7 +116,7 @@ partial class MetadataName
         /// <summary>
         /// Determines if the two given string can be considered equal or not.
         /// </summary>
-        bool AreEqual(string x, string y) => string.Compare(x, y, !CaseSensitiveNames) == 0;
+        bool AreEqual(string x, string y) => string.Compare(x, y, !CaseSensitiveMetaNames) == 0;
 
         /// <summary>
         /// Returns the index associated to the given name, or -1 if it is not found.
