@@ -70,16 +70,10 @@ partial class MetadataName
             {
                 var index = IndexOf(value = Validate(value));
 
-                if (index == 0) // Already the default one...
+                if (index >= 0) // Always inserting the given value, is the given one!...
                 {
-                    return;
-                }
-                else if (index > 0) // Default one is the first one...
-                {
-                    var item = Items[index];
-
                     Items.RemoveAt(index);
-                    Items.Insert(0, item);
+                    Items.Insert(0, value);
                 }
                 else throw new NotFoundException("Metadata name not found.").WithData(value);
             }

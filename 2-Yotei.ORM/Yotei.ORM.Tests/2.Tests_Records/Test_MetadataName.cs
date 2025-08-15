@@ -60,7 +60,7 @@ public static class Test_MetadataName
         var source = new MetadataName(false, ["one", "two", "three"]);
         var target = new MetadataName(false, ["three", "two", "one"]);
 
-        Assert.True(source.Equals(target));
+        Assert.True(source.Equals(target)); // This is the expected behavior...
         Assert.NotEqual(source, target); // Fails because XUnit compares using enumeration...
     }
 
