@@ -10,12 +10,14 @@ public partial interface ICommand
     /// <summary>
     /// The connection this instance is associated with.
     /// </summary>
-    [With] IConnection Connection { get; }
+    [With(ReturnInterface = true)]
+    IConnection Connection { get; }
 
     /// <summary>
     /// The locale to use with culture-sensitive objects in the database.
     /// </summary>
-    [With] Locale Locale { get; }
+    [With(ReturnInterface = true)]
+    Locale Locale { get; }
 
     /// <summary>
     /// Determines if the state of this instance is execution ready, or not.

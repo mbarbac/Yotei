@@ -19,10 +19,12 @@ public partial interface IParameter : IEquatable<IParameter>
     /// <summary>
     /// The name of this parameter.
     /// </summary>
-    [With] string Name { get; }
+    [With(ReturnInterface = true)]
+    string Name { get; }
 
     /// <summary>
     /// The value captured by this parameter.
     /// </summary>
-    [With] object? Value { get; }
+    [With(ReturnInterface = true)]
+    object? Value { get; }
 }

@@ -19,10 +19,12 @@ public partial interface IMetadataEntry : IEquatable<IMetadataEntry>
     /// <summary>
     /// The name by which this metadata entry is known.
     /// </summary>
-    [With] string Name { get; }
+    [With(ReturnInterface = true)]
+    string Name { get; }
 
     /// <summary>
     /// The value carried by this entry.
     /// </summary>
-    [With] object? Value { get; }
+    [With(ReturnInterface = true)]
+    object? Value { get; }
 }

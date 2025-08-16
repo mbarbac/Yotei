@@ -19,25 +19,29 @@ public partial interface IKnownTags : IEnumerable<IMetadataTag>, IEquatable<IKno
     /// identifiers in an underlying database, or an empty collection if this information
     /// is not available.
     /// </summary>
-    [With] IIdentifierTags IdentifierTags { get; }
+    [With(ReturnInterface = true)]
+    IIdentifierTags IdentifierTags { get; }
 
     /// <summary>
     /// The tag used to determine if a given element is a primary key one, or part of a primary
     /// key group, or null if this information is not available.
     /// </summary>
-    [With] IMetadataTag? PrimaryKeyTag { get; }
+    [With(ReturnInterface = true)]
+    IMetadataTag? PrimaryKeyTag { get; }
 
     /// <summary>
     /// The tag used to determine if a given element is a unique valued one, or part of a unique
     /// valued group, or null if this information is not available.
     /// </summary>
-    [With] IMetadataTag? UniqueValuedTag { get; }
+    [With(ReturnInterface = true)]
+    IMetadataTag? UniqueValuedTag { get; }
 
     /// <summary>
     /// The tag used to determine if a given element is a read only one, or null if this
     /// information is not available.
     /// </summary>
-    [With] IMetadataTag? ReadOnlyTag { get; }
+    [With(ReturnInterface = true)]
+    IMetadataTag? ReadOnlyTag { get; }
 
     /// <summary>
     /// The collection of names carried by all tags in this instance.
