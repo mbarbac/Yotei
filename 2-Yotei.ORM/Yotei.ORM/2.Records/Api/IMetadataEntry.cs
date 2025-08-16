@@ -3,7 +3,7 @@
 // ========================================================
 /// <summary>
 /// Represents a metadata entry, which carries a metadata name and a value.
-/// <para>Instances of this type are intended to be immutable ones.</para>
+/// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
 public partial interface IMetadataEntry : IEquatable<IMetadataEntry>
 {

@@ -16,7 +16,7 @@ partial class MetadataTag
         /// <param name="name"></param>
         public Builder(bool sensitive, string name)
         {
-            CaseSensitiveMetaNames = sensitive;
+            CaseSensitiveTag = sensitive;
             Add(name);
         }
 
@@ -28,7 +28,7 @@ partial class MetadataTag
         /// <param name="range"></param>
         public Builder(bool sensitive, IEnumerable<string> range)
         {
-            CaseSensitiveMetaNames = sensitive;
+            CaseSensitiveTag = sensitive;
             AddRange(range);
 
             if (Items.Count == 0) throw new EmptyException("Range of tag names is empty.");
@@ -42,7 +42,7 @@ partial class MetadataTag
         {
             source.ThrowWhenNull();
 
-            CaseSensitiveMetaNames = source.CaseSensitiveMetaNames;
+            CaseSensitiveTag = source.CaseSensitiveTag;
             AddRange(source);
         }
 
@@ -55,12 +55,12 @@ partial class MetadataTag
 
         /// <inheritdoc/>
         public virtual IMetadataTag CreateInstance()
-            => new MetadataTag(CaseSensitiveMetaNames, this);
+            => new MetadataTag(CaseSensitiveTag, this);
 
         // ----------------------------------------------------
 
         /// <inheritdoc/>
-        public bool CaseSensitiveMetaNames { get; }
+        public bool CaseSensitiveTag { get; }
 
         /// <inheritdoc/>
         /// <remarks>
@@ -116,7 +116,7 @@ partial class MetadataTag
         /// <summary>
         /// Determines if the two given string can be considered equal or not.
         /// </summary>
-        bool AreEqual(string x, string y) => string.Compare(x, y, !CaseSensitiveMetaNames) == 0;
+        bool AreEqual(string x, string y) => string.Compare(x, y, !CaseSensitiveTag) == 0;
 
         /// <summary>
         /// Returns the index associated to the given name, or -1 if it is not found.

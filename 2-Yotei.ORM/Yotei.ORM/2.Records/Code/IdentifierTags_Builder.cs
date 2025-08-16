@@ -43,7 +43,7 @@ partial class IdentifierTags
         {
             item.ThrowWhenNull();
 
-            if (CaseSensitiveTags != item.CaseSensitiveMetaNames) throw new ArgumentException(
+            if (CaseSensitiveTags != item.CaseSensitiveTag) throw new ArgumentException(
                 "Case Sensitive of the given element is not the same as this instance's one.")
                 .WithData(item)
                 .WithData(this);

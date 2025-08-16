@@ -20,7 +20,7 @@ public partial interface IMetadataTag : IEnumerable<string>, IEquatable<IMetadat
     /// <summary>
     /// Determines if the names are case sensitive or not.
     /// </summary>
-    bool CaseSensitiveMetaNames { get; }
+    bool CaseSensitiveTag { get; }
 
     /// <summary>
     /// Gets or sets the default name among the ones in this instance.

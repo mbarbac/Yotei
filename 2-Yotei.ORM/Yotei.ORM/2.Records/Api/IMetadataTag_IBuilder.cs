@@ -17,8 +17,8 @@ partial interface IMetadataTag
 
         // ----------------------------------------------------
 
-        /// <inheritdoc cref="IMetadataTag.CaseSensitiveMetaNames"/>
-        bool CaseSensitiveMetaNames { get; }
+        /// <inheritdoc cref="IMetadataTag.CaseSensitiveTag"/>
+        bool CaseSensitiveTag { get; }
 
         /// <inheritdoc cref="IMetadataTag.Default"/>
         string Default { get; set; }

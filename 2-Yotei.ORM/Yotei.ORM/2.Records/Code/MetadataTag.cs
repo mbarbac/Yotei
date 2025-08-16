@@ -47,7 +47,7 @@ public partial class MetadataTag : IMetadataTag
         if (ReferenceEquals(this, other)) return true;
         if (other is null) return false;
 
-        if (CaseSensitiveMetaNames != other.CaseSensitiveMetaNames) return false;
+        if (CaseSensitiveTag != other.CaseSensitiveTag) return false;
         if (Count != other.Count) return false;
 
         var targets = new List<string>(other);
@@ -81,7 +81,7 @@ public partial class MetadataTag : IMetadataTag
     public override int GetHashCode()
     {
         var code = 0;
-        code = HashCode.Combine(code, CaseSensitiveMetaNames);
+        code = HashCode.Combine(code, CaseSensitiveTag);
         foreach (var name in Items) code = HashCode.Combine(code, name);
         return code;
     }
@@ -89,7 +89,7 @@ public partial class MetadataTag : IMetadataTag
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public bool CaseSensitiveMetaNames => Items.CaseSensitiveMetaNames;
+    public bool CaseSensitiveTag => Items.CaseSensitiveTag;
 
     /// <inheritdoc/>
     public string Default
