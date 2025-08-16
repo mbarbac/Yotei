@@ -28,6 +28,9 @@ public partial class MetadataEntry : IMetadataEntry
         Value = source.Value;
     }
 
+    /// <inheritdoc/>
+    public override string ToString() => $"[{Name}='{Value.Sketch()}']";
+
     // ----------------------------------------------------
 
     /// <inheritdoc/>

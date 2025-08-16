@@ -66,4 +66,9 @@ public partial interface IConnection : IDisposableEx
     /// </summary>
     /// <returns></returns>
     ITransaction CreateTransaction();
+
+    /// <summary>
+    /// Provides access to the records-oriented capabilities of this instance.
+    /// </summary>
+    IRecordsGate Records { get; }
 }

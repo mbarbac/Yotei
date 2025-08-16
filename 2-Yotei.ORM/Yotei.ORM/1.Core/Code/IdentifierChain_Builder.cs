@@ -362,7 +362,7 @@ partial class IdentifierChain
 
             var r = 0; foreach (var item in range)
             {
-                var temp = Add(item, reduce: false);
+                var temp = Add(item ?? string.Empty, reduce: false); // We reduce later...
                 r += temp;
             }
 
@@ -393,7 +393,7 @@ partial class IdentifierChain
 
             var r = 0; foreach (var item in range)
             {
-                var temp = Insert(index, item, reduce: false);
+                var temp = Insert(index, item ?? string.Empty, reduce: false); // We reduce later...
                 r += temp;
                 index += temp;
             }
