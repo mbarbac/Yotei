@@ -2,10 +2,16 @@
 
 // ========================================================
 /// <summary>
-/// Represents the collection of metadata name-value pairs used to build a column-alike
-/// descriptor in a record.
+/// Represents the collection of metadata name-value pairs used to build a column descriptor for
+/// a record.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
+/// <remarks>
+/// Note that this type carries, for convenience, a number of standard properties whose values
+/// are calculated despite if they are associated with an existing entry or not. This is why the
+/// 'Count' property only reflects that actual number of entries, not necesarily including all
+/// the properties.
+/// </remarks>
 [Cloneable]
 public partial interface ISchemaEntry : IEnumerable<IMetadataEntry>, IEquatable<ISchemaEntry>
 {

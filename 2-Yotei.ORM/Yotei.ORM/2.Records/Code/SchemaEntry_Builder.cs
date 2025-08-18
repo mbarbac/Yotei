@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualBasic;
-
-namespace Yotei.ORM.Records.Code;
+﻿namespace Yotei.ORM.Records.Code;
 
 partial class SchemaEntry
 {
@@ -56,7 +54,16 @@ partial class SchemaEntry
             if (isPrimaryKey is not null) IsPrimaryKey = isPrimaryKey.Value;
             if (isUniqueValued is not null) IsUniqueValued = isUniqueValued.Value;
             if (isReadOnly is not null) IsReadOnly = isReadOnly.Value;
-            if (range != null) AddRange(range);
+
+            if (range != null)
+            {
+                foreach (var item in range)
+                {
+                    var index = IndexOf(item.Name);
+                    if (index >= 0) Items[index] = item;
+                    else Add(item);
+                }
+            }
         }
 
         /// <summary>
@@ -107,24 +114,24 @@ partial class SchemaEntry
             // Identifier tags...
             var values = Identifier is IdentifierPart part
                 ? (part.RawValue is null ? [] : [part.RawValue])
-                : ((IIdentifierChain)Identifier).Select(x => x.RawValue).ToList();
+                : ((IIdentifierChain)Identifier).Select(x => x.RawValue).ToArray();
 
-            var count = values.Count;
-            if (count > 0)
+            var tags = KnownTags.IdentifierTags.ToArray();
+
+            var max = values.Length > tags.Length ? values.Length : tags.Length;
+            values = values.ResizeHead(max);
+            tags = tags.ResizeHead(max)!;
+
+            var found = false;
+            for (int i = 0; i < max; i++)
             {
-                var tags = KnownTags.IdentifierTags;
-                var max = tags.Count;
+                var value = values[i]; if (value is null && !found) continue;
+                tag = tags[i];
 
-                for (int i = values.Count; i > 0; i--) // Beware the limits!
-                {
-                    index = max - i;
-                    tag = KnownTags.IdentifierTags[index];
-                    index = IndexOf(tag);
-
-                    yield return index >= 0
-                        ? Items[index]
-                        : new MetadataEntry(tag.Default, values[i]);
-                }
+                found = true;
+                index = IndexOf(tag);
+                if (index >= 0) yield return Items[index];
+                else yield return new MetadataEntry(tag.Default, value);
             }
 
             // PrimaryKey tag...
@@ -193,8 +200,12 @@ partial class SchemaEntry
         }
 
         /// <inheritdoc/>
-        public virtual ISchemaEntry CreateInstance()
-            => Count == 0 ? new SchemaEntry(Engine) : new SchemaEntry(Engine, this);
+        public virtual ISchemaEntry CreateInstance() => new SchemaEntry(
+            Identifier,
+            IsPrimaryKey,
+            IsUniqueValued,
+            IsReadOnly,
+            this);
 
         /// <inheritdoc/>
         public IEngine Engine { get; }
@@ -558,20 +569,38 @@ partial class SchemaEntry
         {
             name = Validate(name);
 
+            IMetadataEntry item;
             var tag = KnownTags.Find(name);
             var index = tag is null ? IndexOf(name) : IndexOf(tag);
-            if (index < 0) throw new NotFoundException(
+
+            // Existing metadata entry...
+            if (index >= 0)
+            {
+                item = Items[index];
+                if (item.Value.EqualsEx(value)) return false;
+
+                item = new MetadataEntry(name, value);
+                item = Validate(item);
+                Items[index] = item;
+                ClearCache(name);
+                return true;
+            }
+
+            // Not existing, it might be an standard one...
+            else
+            {
+                if (KnownTags.Contains(name))
+                {
+                    Add(new MetadataEntry(name, value));
+                    return true;
+                }
+            }
+
+            // Finishing...
+            throw new NotFoundException(
                 "No metadata entry found for the given metadata name.")
                 .WithData(name)
                 .WithData(this);
-
-            var item = Items[index];
-            if (item.Value.EqualsEx(value)) return false;
-
-            item = new MetadataEntry(name, value);
-            Items[index] = item;
-            ClearCache(name);
-            return true;
         }
 
         /// <inheritdoc/>
