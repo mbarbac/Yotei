@@ -1,4 +1,7 @@
-﻿namespace Yotei.ORM.Records.Code;
+﻿#pragma warning disable IDE0079
+#pragma warning disable CA1829
+
+namespace Yotei.ORM.Records.Code;
 
 partial class SchemaEntry
 {
@@ -9,6 +12,11 @@ partial class SchemaEntry
     public partial class Builder : ISchemaEntry.IBuilder
     {
         readonly List<IMetadataEntry> Items = [];
+        readonly List<IMetadataEntry> Computed = [];
+        IIdentifier? _Identifier;
+        bool? _IsPrimaryKey;
+        bool? _IsUniqueValued;
+        bool? _IsReadOnly;
 
         /// <summary>
         /// Initializes a new empty instance.
@@ -50,18 +58,15 @@ partial class SchemaEntry
 
             Engine = identifier.Engine;
             Identifier = identifier;
-
             if (isPrimaryKey is not null) IsPrimaryKey = isPrimaryKey.Value;
             if (isUniqueValued is not null) IsUniqueValued = isUniqueValued.Value;
             if (isReadOnly is not null) IsReadOnly = isReadOnly.Value;
 
+            // Intercepting ranges with duplicated standard entries...
             if (range != null)
             {
                 foreach (var item in range)
                 {
-                    // Happens often that range carries duplicates of a the previous standard
-                    // property, so we intercept to prevent exceptions...
-
                     var index = IndexOf(item.Name);
                     if (index >= 0) Items[index] = item;
                     else Add(item);
@@ -98,6 +103,8 @@ partial class SchemaEntry
         /// <param name="source"></param>
         protected Builder(Builder source)
         {
+            source.ThrowWhenNull();
+
             Engine = source.Engine;
             AddRange(source);
 
@@ -128,8 +135,8 @@ partial class SchemaEntry
             foreach (var item in Items)
             {
                 if (count <= 0) break;
-
                 if (KnownTags.Contains(item.Name)) continue;
+
                 if (sb.Length != 0) sb.Append(", ");
                 sb.Append($"{item.Name}='{item.Value.Sketch()}'");
                 count--;
@@ -143,81 +150,15 @@ partial class SchemaEntry
         /// <inheritdoc/>
         public virtual ISchemaEntry CreateInstance() => new SchemaEntry(
             Identifier,
-            IsPrimaryKey,
-            IsUniqueValued,
-            IsReadOnly,
-            this);
+            _IsPrimaryKey,
+            _IsUniqueValued,
+            _IsReadOnly,
+            Items);
 
         /// <inheritdoc/>
         public IEngine Engine { get; }
         IKnownTags KnownTags => Engine.KnownTags;
         bool CaseSensitiveTags => KnownTags.CaseSensitiveTags;
-
-        // ----------------------------------------------------
-
-        /// <inheritdoc/>
-        public virtual IEnumerator<IMetadataEntry> GetEnumerator()
-        {
-            // Identifier...
-            if (KnownTags.IdentifierTags.Count > 0 && Identifier.Value is not null)
-            {
-                var tags = KnownTags.IdentifierTags.ToArray();
-                var values = Identifier is IIdentifierPart part
-                    ? [part.RawValue]
-                    : ((IIdentifierChain)Identifier).Select(x => x.RawValue).ToArray();
-
-                var max = tags.Length > values.Length ? tags.Length : values.Length;
-                tags = tags.ResizeHead(max)!;
-                values = values.ResizeHead(max);
-
-                bool first = true;
-                for (int i = 0; i < max; i++)
-                {
-                    var tag = tags[i]; if (tag is null) continue;
-                    var value = values[i]; if (value is null && first) continue;
-
-                    first = false;
-                    var index = IndexOf(tag);
-                    if (index >= 0) yield return Items[index];
-                    else yield return new MetadataEntry(tag.Default, value);
-                }
-            }
-
-            // Primary ...
-            if (KnownTags.PrimaryKeyTag is not null)
-            {
-                var tag = KnownTags.PrimaryKeyTag;
-                var index = IndexOf(tag);
-                if (index >= 0) yield return Items[index];
-                else yield return new MetadataEntry(tag.Default, IsPrimaryKey);
-            }
-
-            // Unique Valued...
-            if (KnownTags.UniqueValuedTag is not null)
-            {
-                var tag = KnownTags.UniqueValuedTag;
-                var index = IndexOf(tag);
-                if (index >= 0) yield return Items[index];
-                else yield return new MetadataEntry(tag.Default, IsUniqueValued);
-            }
-
-            // Read only...
-            if (KnownTags.ReadOnlyTag is not null)
-            {
-                var tag = KnownTags.ReadOnlyTag;
-                var index = IndexOf(tag);
-                if (index >= 0) yield return Items[index];
-                else yield return new MetadataEntry(tag.Default, IsReadOnly);
-            }
-
-            // Other not standard ones...
-            foreach (var item in Items)
-            {
-                if (KnownTags.Contains(item.Name)) continue;
-                yield return item;
-            }
-        }
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         // ----------------------------------------------------
 
@@ -232,54 +173,48 @@ partial class SchemaEntry
         bool Compare(string x, string y) => string.Compare(x, y, !CaseSensitiveTags) == 0;
 
         /// <summary>
-        /// Gets the index of the first entry whose name is the given one, or -1 if any. Entries
-        /// with names associated to the given one via well-known tags are, by default, considered
-        /// a match.
+        /// Returns the index of the metadata entry whose name is given, or -1 if not found.
+        /// By default, extra alternate metadata names from the engine well-known tags are also
+        /// tried.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="usetags"></param>
-        /// <returns></returns>
-        int IndexOf(string name, bool usetags = true)
+        int IndexOf(string name, bool tryExtraTags = true)
         {
             name = Validate(name);
 
-            if (usetags)
+            var index = Items.FindIndex(x => Compare(x.Name, name));
+            if (index >= 0) return index;
+
+            if (tryExtraTags)
             {
                 var tag = Engine.KnownTags.Find(name);
                 if (tag is not null)
                 {
                     foreach (var temp in tag)
                     {
-                        var index = Find(temp);
+                        index = Items.FindIndex(x => Compare(x.Name, temp));
                         if (index >= 0) return index;
                     }
                 }
             }
-            return Find(name);
-
-            // Finds the index of the first entry with the given name.
-            int Find(string name)
-            {
-                for (int i = 0; i < Items.Count; i++) if (Compare(Items[i].Name, name)) return i;
-                return -1;
-            }
+            return -1;
         }
 
         /// <summary>
-        /// Gets the index of the first entry whose name is one of the given ones, or -1 if any.
-        /// Entries with names associated to the given ones via well-known tags are, by default,
-        /// considered a match.
-        /// <br/> If the range of names is itseld a metadata tag, then the optional parameter
-        /// is set to false to prevent wasting cycles.
+        /// Returns the index of the first metadata entry whose name appears in the given range,
+        /// or -1 if not found. By default, extra alternate metadata range names from the engine
+        /// well-known tags are also tried - except if the range itself is a metadata tag, in 
+        /// which case the value of the <paramref name="tryExtraTags"/> argument is set to false
+        /// to save cycles.
         /// </summary>
-        int IndexOf(IEnumerable<string> range, bool usetags = true)
+        int IndexOf(IEnumerable<string> range, bool tryExtraTags = true)
         {
             range.ThrowWhenNull();
 
-            if (range is IMetadataTag) usetags = false;
+            if (range is IMetadataTag) tryExtraTags = false;
+
             foreach (var name in range)
             {
-                var index = IndexOf(name, usetags);
+                var index = IndexOf(name, tryExtraTags);
                 if (index >= 0) return index;
             }
             return -1;
@@ -291,20 +226,10 @@ partial class SchemaEntry
         void ClearCache(string name)
         {
             if (KnownTags.IdentifierTags.Contains(name)) _Identifier = null;
-            if (KnownTags.PrimaryKeyTag?.Contains(name) ?? false) _IsPrimaryKey = null;
-            if (KnownTags.UniqueValuedTag?.Contains(name) ?? false) _IsUniqueValued = null;
-            if (KnownTags.ReadOnlyTag?.Contains(name) ?? false) _IsReadOnly = null;
+            else if (KnownTags.PrimaryKeyTag?.Contains(name) ?? false) _IsPrimaryKey = null;
+            else if (KnownTags.UniqueValuedTag?.Contains(name) ?? false) _IsUniqueValued = null;
+            else if (KnownTags.ReadOnlyTag?.Contains(name) ?? false) _IsReadOnly = null;
         }
-
-        /// <summary>
-        /// Clears the cached well-known entries whose tags carry any of the given names.
-        /// </summary>
-        void ClearCache(IEnumerable<string> range)
-        {
-            foreach (var name in range) ClearCache(name);
-        }
-
-        // ----------------------------------------------------
 
         /// <summary>
         /// Returns a validated metadata entry.
@@ -325,24 +250,24 @@ partial class SchemaEntry
                 if (string.Compare(value, temp) != 0) item = new MetadataEntry(item.Name, temp);
             }
 
-            // Primary...
-            else if (KnownTags.PrimaryKeyTag?.Contains(item.Name) ?? false)
+            // Primary key...
+            if (KnownTags.PrimaryKeyTag?.Contains(item.Name) ?? false)
             {
                 if (item.Value is not bool) throw new ArgumentException(
                     "Value of a primary key entry must be a boolean.")
                     .WithData(item);
             }
 
-            // Unique...
-            else if (KnownTags.UniqueValuedTag?.Contains(item.Name) ?? false)
+            // Unique valued...
+            if (KnownTags.UniqueValuedTag?.Contains(item.Name) ?? false)
             {
                 if (item.Value is not bool) throw new ArgumentException(
                     "Value of a unique valued entry must be a boolean.")
                     .WithData(item);
             }
 
-            // Readonly...
-            else if (KnownTags.ReadOnlyTag?.Contains(item.Name) ?? false)
+            // Read only...
+            if (KnownTags.ReadOnlyTag?.Contains(item.Name) ?? false)
             {
                 if (item.Value is not bool) throw new ArgumentException(
                     "Value of a read only entry must be a boolean.")
@@ -351,6 +276,92 @@ partial class SchemaEntry
 
             // Finishing...
             return item;
+        }
+
+        // ----------------------------------------------------
+
+        /// <inheritdoc/>
+        public virtual IEnumerator<IMetadataEntry> GetEnumerator() => GetComputed().GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        /// <summary>
+        /// Gets the computed collection, re-calculating it if needed.
+        /// </summary>
+        List<IMetadataEntry> GetComputed()
+        {
+            // We may need to recalculate...
+            if (Computed.Count == 0)
+            {
+                // Identifier entries...
+                if (KnownTags.IdentifierTags.Count > 0 && Identifier.Value is not null)
+                {
+                    var tags = KnownTags.IdentifierTags.ToArray();
+                    var values = Identifier is IIdentifierPart part
+                        ? [part.RawValue]
+                        : ((IdentifierChain)Identifier).Select(x => x.RawValue).ToArray();
+
+                    var max = tags.Length > values.Length ? tags.Length : values.Length;
+                    tags = tags.ResizeHead(max)!;
+                    values = values.ResizeHead(max);
+
+                    bool first = true;
+                    for (int i = 0; i < max; i++)
+                    {
+                        var tag = tags[i]; if (tag is null) continue;
+                        var value = values[i]; if (value is null && first) continue;
+
+                        first = false;
+                        var index = IndexOf(tag);
+
+                        Computed.Add(index >= 0
+                            ? Items[index]
+                            : new MetadataEntry(tag.Default, value));
+                    }
+                }
+
+                // Primary key entry...
+                if (KnownTags.PrimaryKeyTag is not null)
+                {
+                    var tag = KnownTags.PrimaryKeyTag;
+                    var index = IndexOf(tag);
+
+                    Computed.Add(index >= 0
+                        ? Items[index]
+                        : new MetadataEntry(tag.Default, IsPrimaryKey));
+                }
+
+                // Unique valued entry...
+                if (KnownTags.UniqueValuedTag is not null)
+                {
+                    var tag = KnownTags.UniqueValuedTag;
+                    var index = IndexOf(tag);
+
+                    Computed.Add(index >= 0
+                        ? Items[index]
+                        : new MetadataEntry(tag.Default, IsUniqueValued));
+                }
+
+                // Read only entry...
+                if (KnownTags.ReadOnlyTag is not null)
+                {
+                    var tag = KnownTags.ReadOnlyTag;
+                    var index = IndexOf(tag);
+
+                    Computed.Add(index >= 0
+                        ? Items[index]
+                        : new MetadataEntry(tag.Default, IsReadOnly));
+                }
+
+                // Not standard ones...
+                foreach (var item in Items)
+                {
+                    if (KnownTags.Contains(item.Name)) continue;
+                    Computed.Add(item);
+                }
+            }
+
+            // Finishing...
+            return Computed;
         }
 
         // ----------------------------------------------------
@@ -376,12 +387,11 @@ partial class SchemaEntry
                             var value = index >= 0 ? (string?)Items[index].Value : null;
                             values[i] = value;
                         }
-                        while (values.Length > 0 && values[0] is null) values = values.RemoveAt(0);
                         _Identifier = ORM.Code.Identifier.Create(Engine, values);
                     }
                 }
 
-                return _Identifier; // Cached value...
+                return _Identifier;
             }
 
             set // Engine may have not the corresponding well-known tags...
@@ -428,10 +438,10 @@ partial class SchemaEntry
                     }
                 }
 
-                _Identifier = value; // Cached value...
+                _Identifier = value;
+                Computed.Clear();
             }
         }
-        IIdentifier? _Identifier;
 
         // ----------------------------------------------------
 
@@ -452,7 +462,7 @@ partial class SchemaEntry
                     }
                 }
 
-                return _IsPrimaryKey.Value; // Cached value...
+                return _IsPrimaryKey.Value;
             }
 
             set // Engine may have not the corresponding well-known tags...
@@ -461,15 +471,21 @@ partial class SchemaEntry
                 if (tag is not null)
                 {
                     var index = IndexOf(tag);
-                    if (index >= 0) Items.RemoveAt(index);
-
-                    Items.Add(new MetadataEntry(tag.Default, value));
+                    if (index >= 0)
+                    {
+                        var item = Items[index];
+                        Items[index] = new MetadataEntry(item.Name, value);
+                    }
+                    else
+                    {
+                        Items.Add(new MetadataEntry(tag.Default, value));
+                    }
                 }
 
-                _IsPrimaryKey = value; // Cached value...
+                _IsPrimaryKey = value;
+                Computed.Clear();
             }
         }
-        bool? _IsPrimaryKey;
 
         // ----------------------------------------------------
 
@@ -490,7 +506,7 @@ partial class SchemaEntry
                     }
                 }
 
-                return _IsUniqueValued.Value; // Cached value...
+                return _IsUniqueValued.Value;
             }
 
             set // Engine may have not the corresponding well-known tags...
@@ -499,15 +515,21 @@ partial class SchemaEntry
                 if (tag is not null)
                 {
                     var index = IndexOf(tag);
-                    if (index >= 0) Items.RemoveAt(index);
-
-                    Items.Add(new MetadataEntry(tag.Default, value));
+                    if (index >= 0)
+                    {
+                        var item = Items[index];
+                        Items[index] = new MetadataEntry(item.Name, value);
+                    }
+                    else
+                    {
+                        Items.Add(new MetadataEntry(tag.Default, value));
+                    }
                 }
 
-                _IsUniqueValued = value; // Cached value...
+                _IsUniqueValued = value;
+                Computed.Clear();
             }
         }
-        bool? _IsUniqueValued;
 
         // ----------------------------------------------------
 
@@ -528,7 +550,7 @@ partial class SchemaEntry
                     }
                 }
 
-                return _IsReadOnly.Value; // Cached value...
+                return _IsReadOnly.Value;
             }
 
             set // Engine may have not the corresponding well-known tags...
@@ -537,34 +559,65 @@ partial class SchemaEntry
                 if (tag is not null)
                 {
                     var index = IndexOf(tag);
-                    if (index >= 0) Items.RemoveAt(index);
-
-                    Items.Add(new MetadataEntry(tag.Default, value));
+                    if (index >= 0)
+                    {
+                        var item = Items[index];
+                        Items[index] = new MetadataEntry(item.Name, value);
+                    }
+                    else
+                    {
+                        Items.Add(new MetadataEntry(tag.Default, value));
+                    }
                 }
 
-                _IsReadOnly = value; // Cached value...
+                _IsReadOnly = value;
+                Computed.Clear();
             }
         }
-        bool? _IsReadOnly;
 
         // ----------------------------------------------------
 
+        /// <summary>
+        /// Gets the actual number of physical metadata entries.
+        /// </summary>
+        public int RawCount => Items.Count;
+
         /// <inheritdoc/>
-        public int Count => ToList().Count;
+        public int Count => GetComputed().Count();
 
         /// <inheritdoc/>
         public IMetadataEntry? Find(string name)
         {
-            var index = IndexOf(name);
-            return index >= 0 ? Items[index] : null;
+            name = Validate(name);
+
+            var temps = GetComputed();
+            var index = temps.FindIndex(x => Compare(x.Name, name));
+            if (index >= 0) return temps[index];
+
+            var tag = Engine.KnownTags.Find(name);
+            if (tag is not null)
+            {
+                foreach (var str in tag)
+                {
+                    index = temps.FindIndex(x => Compare(x.Name, str));
+                    if (index >= 0) return temps[index];
+                }
+            }
+
+            return null;
         }
 
         /// <inheritdoc/>
         public IMetadataEntry? Find(IEnumerable<string> range)
         {
-            var usetags = range is IMetadataTag ? false : true;
-            var index = IndexOf(range, usetags);
-            return index >= 0 ? Items[index] : null;
+            range.ThrowWhenNull();
+
+            foreach (var name in range)
+            {
+                var item = Find(name);
+                if (item is not null) return item;
+            }
+            return null;
         }
 
         /// <inheritdoc/>
@@ -574,21 +627,17 @@ partial class SchemaEntry
         public bool Contains(IEnumerable<string> range) => Find(range) is not null;
 
         /// <inheritdoc/>
-        public IMetadataEntry[] ToArray() => ToList().ToArray();
+        public IMetadataEntry[] ToArray() => GetComputed().ToArray();
 
         /// <inheritdoc/>
-        public List<IMetadataEntry> ToList()
+        public List<IMetadataEntry> ToList() => new(GetComputed());
+
+        /// <inheritdoc/>
+        public void Trim()
         {
-            using var iter = GetEnumerator();
-            var items = new List<IMetadataEntry>();
-
-            while (iter.MoveNext()) items.Add(iter.Current);
-            return items;
-
+            Items.TrimExcess();
+            Computed.TrimExcess();
         }
-
-        /// <inheritdoc/>
-        public void Trim() => Items.TrimExcess();
 
         // ----------------------------------------------------
 
@@ -597,21 +646,22 @@ partial class SchemaEntry
         {
             name = Validate(name);
 
-            // Existing metadata entry...
+            // Existing physical entry...
             var index = IndexOf(name);
             if (index >= 0)
             {
                 var item = Items[index];
                 if (item.Value.EqualsEx(value)) return false;
 
-                item = new MetadataEntry(name, value);
+                item = new MetadataEntry(item.Name, value);
                 item = Validate(item);
                 Items[index] = item;
                 ClearCache(name);
+                Computed.Clear();
                 return true;
             }
 
-            // If not found, may correspond to a standard property...
+            // Not found, but might be a standard property one...
             if (KnownTags.Contains(name))
             {
                 var item = new MetadataEntry(name, value);
@@ -625,21 +675,23 @@ partial class SchemaEntry
                 .WithData(this);
         }
 
-        // ----------------------------------------------------
-
         /// <inheritdoc/>
         public virtual bool Add(IMetadataEntry item)
         {
             item = Validate(item);
 
             var index = IndexOf(item.Name);
-            if (index >= 0) throw new DuplicateException(
-                "This instance already carries the tag name of the given element.")
-                .WithData(item)
-                .WithData(this);
+            if (index >= 0)
+            {
+                throw new DuplicateException(
+                    "This instance already carries the tag name of the given element.")
+                    .WithData(item)
+                    .WithData(this);
+            }
 
             Items.Add(item);
             ClearCache(item.Name);
+            Computed.Clear();
             return true;
         }
 
@@ -659,10 +711,11 @@ partial class SchemaEntry
             name = Validate(name);
 
             var index = IndexOf(name);
-            if (index < 0) return false;
+            if (index <= 0) return false;
 
             Items.RemoveAt(index);
             ClearCache(name);
+            Computed.Clear();
             return true;
         }
 
@@ -677,6 +730,7 @@ partial class SchemaEntry
             var name = Items[index].Name;
             Items.RemoveAt(index);
             ClearCache(name);
+            Computed.Clear();
             return true;
         }
 
@@ -718,6 +772,8 @@ partial class SchemaEntry
                 return false;
 
             Items.Clear();
+            Computed.Clear();
+
             _Identifier = null;
             _IsPrimaryKey = null;
             _IsUniqueValued = null;

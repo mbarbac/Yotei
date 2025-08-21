@@ -16,15 +16,6 @@
 public partial interface ISchemaEntry : IEnumerable<IMetadataEntry>, IEquatable<ISchemaEntry>
 {
     /// <summary>
-    /// Returns an object that tries to enumerate the metadata entries in this collection. The
-    /// ones coming from the standard properties are returned only if there are corresponding
-    /// well-known tags in the associated engine. The ones kept in the internal collection are
-    /// always used.
-    /// </summary>
-    /// <returns></returns>
-    new IEnumerator<IMetadataEntry> GetEnumerator();
-
-    /// <summary>
     /// Returns a new builder based upon the contents of this instance.
     /// </summary>
     /// <returns></returns>

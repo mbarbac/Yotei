@@ -201,6 +201,11 @@ public partial class SchemaEntry : ISchemaEntry
 
     // ----------------------------------------------------
 
+    /// <summary>
+    /// Gets the actual number of physical metadata entries.
+    /// </summary>
+    public int RawCount => Items.RawCount;
+
     /// <inheritdoc/>
     public int Count => Items.Count;
 

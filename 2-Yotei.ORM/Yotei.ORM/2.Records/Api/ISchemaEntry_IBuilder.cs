@@ -9,9 +9,6 @@ partial interface ISchemaEntry
     [Cloneable]
     public partial interface IBuilder : IEnumerable<IMetadataEntry>
     {
-        /// <inheritdoc cref="ISchemaEntry.GetEnumerator"/>
-        new IEnumerator<IMetadataEntry> GetEnumerator();
-
         /// <summary>
         /// Returns a new instance based upon the contents of this builder.
         /// </summary>
