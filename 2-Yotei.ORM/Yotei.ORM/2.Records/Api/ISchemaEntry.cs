@@ -2,14 +2,8 @@
 
 // ========================================================
 /// <summary>
-/// Maintains the metadata used to describe a column in a given record.
-/// <br/> By default, this type maintains a collection of standard properties that need not to
-/// be in sync with the well-known metadata tags in the associated engine. But if so, then their
-/// values are synchronized with those tags to produce the appropriate entries, for information
-/// purposes.
-/// <br/> In addition, this type maintains a collection of metadata entries that can be populated
-/// at will. If any entry is associated with a standard property via a well-known metadata tag,
-/// then the entry and the standard property are synchronized.
+/// Maintains the metadata used to describe a column in a given record, both in a set of standard
+/// properties, and in an internal metadata entries' collection.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
 [Cloneable]
