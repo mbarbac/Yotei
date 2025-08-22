@@ -106,7 +106,7 @@ partial class SchemaEntry
             source.ThrowWhenNull();
 
             Engine = source.Engine;
-            AddRange(source);
+            AddRange(source.Items);
 
             if (source._Identifier is not null) _Identifier = source._Identifier;
             if (source._IsPrimaryKey is not null) _IsPrimaryKey = source._IsPrimaryKey.Value;
