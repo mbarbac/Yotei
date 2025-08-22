@@ -148,12 +148,37 @@ partial class SchemaEntry
         // ----------------------------------------------------
 
         /// <inheritdoc/>
-        public virtual ISchemaEntry CreateInstance() => new SchemaEntry(
-            Identifier,
-            _IsPrimaryKey,
-            _IsUniqueValued,
-            _IsReadOnly,
-            Items);
+        /// What follows is because we don't want to create entries that was not the original
+        /// ones. We want to pass 'null' for the standard properties that are not coming from
+        /// a physical entry.
+        public virtual ISchemaEntry CreateInstance()
+        {
+            var identifier = Identifier;
+            var isprimary = Valid(ref _IsPrimaryKey, Engine.KnownTags.PrimaryKeyTag);
+            var isunique = Valid(ref _IsUniqueValued, Engine.KnownTags.UniqueValuedTag);
+            var isreadonly = Valid(ref _IsReadOnly, Engine.KnownTags.ReadOnlyTag);
+
+            return new SchemaEntry(identifier, isprimary, isunique, isreadonly, Items);
+
+            // Obtains the value of the given standard property...
+            bool? Valid(ref bool? value, IMetadataTag? tag)
+            {
+                if (tag is not null)
+                {
+                    var index = IndexOf(tag); // Do not use 'Find'...
+                    if (index >= 0)
+                    {
+                        var item = Items[index];
+                        return (bool?)item.Value;
+                    }
+                }
+                else // without well-known tag...
+                {
+                    if (value.HasValue) return value.Value;
+                }
+                return null;
+            }
+        }
 
         /// <inheritdoc/>
         public IEngine Engine { get; }
@@ -251,7 +276,7 @@ partial class SchemaEntry
             }
 
             // Primary key...
-            if (KnownTags.PrimaryKeyTag?.Contains(item.Name) ?? false)
+            else if (KnownTags.PrimaryKeyTag?.Contains(item.Name) ?? false)
             {
                 if (item.Value is not bool) throw new ArgumentException(
                     "Value of a primary key entry must be a boolean.")
@@ -259,7 +284,7 @@ partial class SchemaEntry
             }
 
             // Unique valued...
-            if (KnownTags.UniqueValuedTag?.Contains(item.Name) ?? false)
+            else if (KnownTags.UniqueValuedTag?.Contains(item.Name) ?? false)
             {
                 if (item.Value is not bool) throw new ArgumentException(
                     "Value of a unique valued entry must be a boolean.")
@@ -267,7 +292,7 @@ partial class SchemaEntry
             }
 
             // Read only...
-            if (KnownTags.ReadOnlyTag?.Contains(item.Name) ?? false)
+            else if (KnownTags.ReadOnlyTag?.Contains(item.Name) ?? false)
             {
                 if (item.Value is not bool) throw new ArgumentException(
                     "Value of a read only entry must be a boolean.")
