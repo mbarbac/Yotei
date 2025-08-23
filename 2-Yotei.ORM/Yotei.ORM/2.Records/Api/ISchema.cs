@@ -33,11 +33,27 @@ public partial interface ISchema : IEquatable<IHost>
     bool Contains(string identifier);
 
     /// <summary>
-    /// Gets the index of the entry in this collection with the given identifier, or -1 if any.
+    /// Gets the index of the first entry in this collection with the given identifier, or -1
+    /// if any.
     /// </summary>
     /// <param name="identifier"></param>
     /// <returns></returns>
     int IndexOf(string identifier);
+
+    /// <summary>
+    /// Gets the index of the last entry in this collection with the given identifier, or -1
+    /// if any.
+    /// </summary>
+    /// <param name="identifier"></param>
+    /// <returns></returns>
+    int LastIndexOf(string identifier);
+
+    /// <summary>
+    /// Gets the indexes of the entries in this collection with the given identifier.
+    /// </summary>
+    /// <param name="identifier"></param>
+    /// <returns></returns>
+    List<int> IndexesOf(string identifier);
 
     /// <summary>
     /// Returns the indexes of the entries in this collection whose identifiers match the given
