@@ -84,9 +84,7 @@ partial class Schema
 
         /// <inheritdoc/>
         public override bool IsValidDuplicate(IItem source, IItem item)
-            => ReferenceEquals(source, item)
-            ? true
-            : throw new DuplicateException("Duplicated element.").WithData(item);
+            => throw new DuplicateException("Duplicated element.").WithData(item);
 
         /// <inheritdoc/>
         public override IEqualityComparer<TKey> Comparer => _Comparer ??= new TComparer(this);
@@ -139,20 +137,6 @@ partial class Schema
         {
             var key = Identifier.Create(Engine, identifier);
             return IndexOf(key);
-        }
-
-        /// <inheritdoc/>
-        public int LastIndexOf(string identifier)
-        {
-            var key = Identifier.Create(Engine, identifier);
-            return LastIndexOf(key);
-        }
-
-        /// <inheritdoc/>
-        public List<int> IndexesOf(string identifier)
-        {
-            var key = Identifier.Create(Engine, identifier);
-            return IndexesOf(key);
         }
 
         /// <inheritdoc/>

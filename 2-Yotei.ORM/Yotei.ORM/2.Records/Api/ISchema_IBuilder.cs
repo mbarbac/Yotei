@@ -30,12 +30,6 @@ partial interface ISchema
         /// <inheritdoc cref="IHost.IndexOf(string)"/>
         int IndexOf(string identifier);
 
-        /// <inheritdoc cref="IHost.LastIndexOf(string)"/>
-        int LastIndexOf(string identifier);
-
-        /// <inheritdoc cref="IHost.IndexesOf(string)"/>
-        List<int> IndexesOf(string identifier);
-
         /// <inheritdoc cref="IHost.Match(string?)"/>
         List<int> Match(string? specs);
 

@@ -62,30 +62,13 @@ public static class Test_Schema
         try { _ = new Schema(engine, [xid, null!]); Assert.Fail(); }
         catch (ArgumentException) { }
 
+        try { _ = new Schema(engine, [xid, xid]); Assert.Fail(); }
+        catch (DuplicateException) { }
+
         try { _ = new Schema(engine, [xid, new Entry(engine, "dbo.Employees.Id")]); Assert.Fail(); }
         catch (DuplicateException) { }
 
         try { _ = new Schema(engine, [xid, new Entry(engine, "Id")]); Assert.Fail(); }
-        catch (DuplicateException) { }
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_Create_Duplicates()
-    {
-        var engine = new FakeEngine();
-        var xid = new Entry(engine, "dbo.Employees.Id", isPrimaryKey: true);
-        var xfirst = new Entry(engine, "Employees.FirstName");
-
-        var source = new Schema(engine, [xid, xfirst, xid]);
-        Assert.Equal(3, source.Count);
-        Assert.Same(xid, source[0]);
-        Assert.Same(xfirst, source[1]);
-        Assert.Same(xid, source[2]);
-
-        // Not same instance...
-        var xid2 = new Entry(engine, "dbo.Employees.Id", isPrimaryKey: true);
-        try { _ = new Schema(engine, [xid, xfirst, xid2]); Assert.Fail(); }
         catch (DuplicateException) { }
     }
 
@@ -109,7 +92,9 @@ public static class Test_Schema
         Assert.Same(xfirst, target[1]);
         Assert.Same(xlast, target[2]);
         Assert.Same(xctry, target[3]);
-    }// ----------------------------------------------------
+    }
+    
+    // ----------------------------------------------------
 
     //[Enforced]
     [Fact]
@@ -119,7 +104,7 @@ public static class Test_Schema
         var xid = new Entry(engine, "dbo.Employees.Id", isPrimaryKey: true);
         var xfirst = new Entry(engine, "Employees.FirstName");
         var xlast = new Entry(engine, "LastName");
-        var source = new Schema(engine, [xid, xfirst, xlast, xid]);
+        var source = new Schema(engine, [xid, xfirst, xlast]);
 
         Assert.Equal(-1, source.IndexOf("Id"));
         Assert.Equal(-1, source.IndexOf("Employees.Id"));
@@ -127,13 +112,6 @@ public static class Test_Schema
         Assert.Equal(0, source.IndexOf("dbo.EMPLOYEES.Id"));
         Assert.Equal(1, source.IndexOf("Employees.FIRSTname"));
         Assert.Equal(2, source.IndexOf("LASTname"));
-
-        Assert.Equal(3, source.LastIndexOf("dbo.EMPLOYEES.Id"));
-
-        var nums = source.IndexesOf("dbo.employees.id");
-        Assert.Equal(2, nums.Count);
-        Assert.Equal(0, nums[0]);
-        Assert.Equal(3, nums[1]);
     }
 
     //[Enforced]
@@ -321,6 +299,9 @@ public static class Test_Schema
         try { source.AddRange(null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
 
+        try { source.AddRange([new Entry(engine, "any"), xid]); Assert.Fail(); }
+        catch (DuplicateException) { }
+
         try { source.AddRange([new Entry(engine, "any"), null!]); Assert.Fail(); }
         catch (ArgumentException) { }
     }
@@ -349,6 +330,9 @@ public static class Test_Schema
 
         try { source.Insert(0, new Entry(new FakeEngine() { UseTerminators = false }, "other")); Assert.Fail(); }
         catch (ArgumentException) { }
+
+        try { source.Insert(0, new Entry(engine, xid)); Assert.Fail(); }
+        catch (DuplicateException) { }
 
         try { source.Insert(0, new Entry(engine, "ID")); Assert.Fail(); }
         catch (DuplicateException) { }
@@ -384,6 +368,9 @@ public static class Test_Schema
 
         try { source.InsertRange(0, [new Entry(engine, "any"), null!]); Assert.Fail(); }
         catch (ArgumentException) { }
+
+        try { source.AddRange([new Entry(engine, "any"), xid]); Assert.Fail(); }
+        catch (DuplicateException) { }
     }
 
     //[Enforced]

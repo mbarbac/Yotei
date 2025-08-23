@@ -93,12 +93,6 @@ public partial class Schema : IHost
     public int IndexOf(string identifier) => Items.IndexOf(identifier);
 
     /// <inheritdoc/>
-    public int LastIndexOf(string identifier) => Items.LastIndexOf(identifier);
-
-    /// <inheritdoc/>
-    public List<int> IndexesOf(string identifier) => Items.IndexesOf(identifier);
-
-    /// <inheritdoc/>
     public List<int> Match(string? specs) => Items.Match(specs);
 
     /// <inheritdoc/>
