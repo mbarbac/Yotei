@@ -1,15 +1,5 @@
 TODO:
 
-- Hacer que los generadores, CloneGenerator y WithGenerator, produzcan de forma opcional, como
-  tipo de retorno, bien el interface implementado o bien como hasta ahora, el tipo concreto.
-  De esta manera ganamos flexibilidad.
-
-- En Yotei.ORM, hacer que las collections y otras API devuelvan las interfaces, en vez de los
-  tipos concretos donde son implementadas. La idea es simplificar las API. Sería empezar por
-  los generadores de las collection, y luego el resto de los API.
-  NOTA: DbTokenChain no define (y por tanto no implementa) una interfaz tipo collection. O sea,
-  que en estos casos deberíamos hacer que el override sea al tipo concreto, y no al interfaz
-  que haya implementado.
 
 OPTIMIZATIONS:
 
