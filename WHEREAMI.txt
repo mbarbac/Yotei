@@ -1,5 +1,9 @@
 TODO:
 
+- EnumerableCommand,
+   WithConnection does not return an interface (it is an abstract class)
+   Clone does not return an interface 
+
 
 OPTIMIZATIONS:
 
