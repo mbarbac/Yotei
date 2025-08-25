@@ -15,8 +15,8 @@ public class CloneableAttribute : Attribute
 {
     /// <summary>
     /// Instructs the generator to produce methods whose return type is the decorated one. The
-    /// default behavior is to try to use as the return type the first explicit interface that is
-    /// itself a cloneable one.
+    /// default behavior is to use as the return type the first explicit interface that is itself
+    /// a cloneable one, if such is possible.
     /// <br/> This property is ignored if the host type is an interface.
     /// </summary>
     public bool ReturnsDecorated { get; set; }
