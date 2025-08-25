@@ -19,7 +19,7 @@ public class CloneableAttribute : Attribute
     /// a cloneable one, if such is possible.
     /// <br/> This property is ignored if the host type is an interface.
     /// </summary>
-    public bool ReturnsDecorated { get; set; }
+    public bool ReturnDecorated { get; set; }
 
     /// <summary>
     /// If <c>true</c> instructs the generator not to emit a virtual-alike method.
