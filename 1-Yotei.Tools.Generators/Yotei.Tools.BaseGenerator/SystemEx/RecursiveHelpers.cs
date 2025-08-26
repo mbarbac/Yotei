@@ -4,36 +4,48 @@
 internal static class RecursiveHelper
 {
     /// <summary>
-    /// The delegate to invoke to obtain a requested value.
+    /// The signature of the delegate to invoke to obtain the requested value.
     /// </summary>
-    public delegate T? Finder<T>(INamedTypeSymbol type, out bool found);
+    /// <typeparam name="T"></typeparam>
+    /// <param name="type"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public delegate bool Finder<T>(INamedTypeSymbol type, out T value);
 
     /// <summary>
-    /// Tries to obtain a requested value using the given delegate with the given type, or with
-    /// the types in the given collections (ie: its base types or interfaces).
+    /// Tries to obtain a requested value using the given delegate on the given type, or if not
+    /// found, with the types in the optional collections. Returns whether the value has been
+    /// found or not.
     /// </summary>
-    public static T? Recursive<T>(
-        this INamedTypeSymbol type, Finder<T> func,
-        out bool found,
+    /// <typeparam name="T"></typeparam>
+    /// <param name="type"></param>
+    /// <param name="func"></param>
+    /// <param name="value"></param>
+    /// <param name="chains"></param>
+    /// <returns></returns>
+    public static bool Recursive<T>(
+        this INamedTypeSymbol type,
+        Finder<T> func,
+        out T value,
         params IEnumerable<INamedTypeSymbol>[] chains)
     {
         type.ThrowWhenNull();
         func.ThrowWhenNull();
-        var value = func(type, out found);
-        if (found) return value;
-
         chains.ThrowWhenNull();
-        foreach (var items in chains)
+
+        var found = func(type, out value);
+        if (found) return true;
+
+        foreach (var chain in chains)
         {
-            items.ThrowWhenNull();
-            foreach (var item in items)
+            chain.ThrowWhenNull();
+            foreach (var item in chain)
             {
-                item.ThrowWhenNull();
-                value = func(item, out found);
-                if (found) return value;
+                found = func(item, out value);
+                if (found) return true;
             }
         }
 
-        return default;
+        return false;
     }
 }

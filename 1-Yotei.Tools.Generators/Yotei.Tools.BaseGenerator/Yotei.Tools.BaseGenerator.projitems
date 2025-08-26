@@ -33,6 +33,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Base\Nodes\NodeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Tree\TreeGenerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Tree\TreeDiagnostics.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exported\IsNullable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\AllowNullAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\BitOperations.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\CallerArgumentExpressionAttribute.cs" />

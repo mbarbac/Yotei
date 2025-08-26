@@ -3,4 +3,6 @@ using static System.ConsoleColor;
 
 namespace Yotei.Tools.CloneGenerator.Tests.HostInterface
 {
+    [Cloneable]
+    public partial interface IFace00 { }
 }
