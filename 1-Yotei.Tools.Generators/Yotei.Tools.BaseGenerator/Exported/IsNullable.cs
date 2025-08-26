@@ -8,3 +8,6 @@
 /// </summary>
 /// <typeparam name="T"></typeparam>
 public class IsNullable<T> { }
+
+
+AÑADIR CODIGO PARA CAPTURAR SI EL TIPO ES NULLABLE OR NOT.
