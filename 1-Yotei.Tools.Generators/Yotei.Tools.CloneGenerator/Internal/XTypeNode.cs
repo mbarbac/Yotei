@@ -8,6 +8,7 @@ internal class XTypeNode : TypeNode
     public XTypeNode(INode parent, TypeCandidate candidate) : base(parent, candidate) { }
 
     readonly SymbolComparer Comparer = SymbolComparer.Default;
+    AttributeData ThisAttribute = default!;
     INamedTypeSymbol ReturnType = default!;
     RoslynNameOptions ReturnNameOptions = RoslynNameOptions.Default;
 
@@ -22,22 +23,14 @@ internal class XTypeNode : TypeNode
         if (!ValidateSingleAttribute(context)) r = false;
         if (!ValidateNoRecord(context)) r = false;
 
-        FindReturnTypeValue(Symbol, out _, out _);
-
         return r;
     }
 
     // Custom validations...
     bool ValidateSingleAttribute(SourceProductionContext context)
     {
-        var num = Candidate is not null
-            ? Candidate.Attributes.Length
-            : Symbol.GetAttributes().Count(x =>
-                x.AttributeClass != null &&
-                x.AttributeClass.Name.StartsWith(nameof(CloneableAttribute)));
-
-        if (num > 1) TreeDiagnostics.TooManyAttributes(Symbol).Report(context);
-        return num == 1;
+        ThisAttribute = GetThisAttribute(context, out var error)!;
+        return !error;
     }
 
     // Custom validations...
@@ -225,14 +218,13 @@ internal class XTypeNode : TypeNode
 
         foreach (var iface in ifaces)
         {
-            if (Comparer.Equals(iface, ReturnType)) continue;
-
             var typename = iface.EasyName(RoslynNameOptions.Full with { UseTypeNullable = false });
             var valuename = iface.Name == "ICloneable" ? "object" : typename;
 
             cb.AppendLine();
             cb.AppendLine(valuename);
-            cb.AppendLine($"{typename}.Clone() => ({typename})Clone();");
+            cb.AppendLine($"{typename}.Clone()");
+            cb.AppendLine($"=> ({valuename})Clone();");
         }
     }
 
@@ -243,22 +235,39 @@ internal class XTypeNode : TypeNode
     {
         var list = new List<ITypeSymbol>();
 
-        foreach (var iface in Symbol.AllInterfaces) TryCapture(iface);
+        foreach (var iface in Symbol.Interfaces) TryCapture(iface);
         return list;
 
         /// <summary>
         /// Tries to capture the given interface as an explicit one.
         /// </summary>
-        void TryCapture(INamedTypeSymbol iface)
+        bool TryCapture(INamedTypeSymbol iface)
         {
-            if (FindCloneMethod(iface, out _) || FindCloneableAttribute(iface, out _))
+            var found = false;
+
+            // Firstly child ones...
+            foreach (var child in iface.Interfaces)
+            {
+                var temp = TryCapture(child);
+                if (temp) found = true;
+            }
+
+            // Then, the given one if needed...
+            if (!found) found =
+                FindCloneMethod(iface, out _) ||
+                FindCloneableAttribute(iface, out _);
+
+            // Adding if needed and not duplicated...
+            if (found)
             {
                 var temp = list.Find(x => Comparer.Equals(x, iface));
                 if (temp is null) list.Add(iface);
             }
+
+            return found;
         }
     }
-    
+
     /*void TryAddICloneable()
     {
         var any = Symbol.AllInterfaces.Any(x => x.Name == "ICloneable");
@@ -301,6 +310,28 @@ internal class XTypeNode : TypeNode
     }
 
     // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns the attribute that decorates this member, or null if any. Detected erros are
+    /// reported in the given context.
+    /// </summary>
+    AttributeData? GetThisAttribute(SourceProductionContext context, out bool error)
+    {
+        var items = Candidate is not null
+            ? Candidate.Attributes
+            : Symbol.GetAttributes();
+
+        items = items.Where(x =>
+            x.AttributeClass is not null &&
+            x.AttributeClass.Name.StartsWith(nameof(CloneableAttribute))).ToImmutableArray();
+
+        switch (items.Length)
+        {
+            case 1: error = false; return items[0];
+            case 0: TreeDiagnostics.NoAttributes(Symbol).Report(context); error = true; return null!;
+            default: TreeDiagnostics.TooManyAttributes(Symbol).Report(context); error = true; return null!;
+        }
+    }
 
     /// <summary>
     /// Tries to find a <see cref="CloneableAttribute"/> or a <see cref="CloneableAttribute{T}"/>

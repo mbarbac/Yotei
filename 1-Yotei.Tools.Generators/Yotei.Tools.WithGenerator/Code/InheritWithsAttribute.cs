@@ -4,16 +4,16 @@ namespace Yotei.Tools.WithGenerator;
 
 // ========================================================
 /// <summary>
-/// Used to decorate members (properties and fields) of non-record C# types for which appropiate
-/// 'With[Name](value)' methods will be emitted, emulating the 'with' keyword.
+/// Used to decorate types for which their inherit 'With[Name](value)' methods will be redeclared
+/// or reimplemented.
 /// <br/> Not-interface types must implement a protected or private copy constructor.
 /// <br/> C# record types are not supported.
 /// </summary>
 [AttributeUsage(
-    AttributeTargets.Property | AttributeTargets.Field,
+    AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface,
     Inherited = false,
     AllowMultiple = false)]
-public class WithAttribute : Attribute
+public class InheritWithsAttribute : Attribute
 {
     /// <summary>
     /// If used then its value specifies the return type of the generated methods. If not used,

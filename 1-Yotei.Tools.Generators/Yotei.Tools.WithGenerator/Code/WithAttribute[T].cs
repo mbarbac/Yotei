@@ -1,11 +1,10 @@
-﻿#pragma warning disable CS8618
-
-namespace Yotei.Tools.WithGenerator;
+﻿namespace Yotei.Tools.WithGenerator;
 
 // ========================================================
 /// <summary>
 /// Used to decorate members (properties and fields) of non-record C# types for which appropiate
 /// 'With[Name](value)' methods will be emitted, emulating the 'with' keyword.
+/// <br/> The generic argument specifies the type used as the return one of the generated method.
 /// <br/> Not-interface types must implement a protected or private copy constructor.
 /// <br/> C# record types are not supported.
 /// </summary>
@@ -13,14 +12,8 @@ namespace Yotei.Tools.WithGenerator;
     AttributeTargets.Property | AttributeTargets.Field,
     Inherited = false,
     AllowMultiple = false)]
-public class WithAttribute : Attribute
+public class WithAttribute<T> : Attribute
 {
-    /// <summary>
-    /// If used then its value specifies the return type of the generated methods. If not used,
-    /// then the return type is the host type of the decorated member.
-    /// </summary>
-    public Type ReturnType { get; set; }
-
     /// <summary>
     /// If used specifies whether the generated methods are virtual-alike ones, or not. If not
     /// used, then the generator tries to generate virtual-alike ones.

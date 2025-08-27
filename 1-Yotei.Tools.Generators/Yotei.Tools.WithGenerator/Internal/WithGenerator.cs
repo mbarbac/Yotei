@@ -2,8 +2,8 @@
 
 // ========================================================
 /// <summary>
-/// Generates 'With()' methods for members decorated with the <see cref="WithAttribute"/> attribute
-/// and/or types decorated with the <see cref="InheritWithsAttribute"/> one.
+/// Generates 'With[Name](value)' methods for members decorated with <see cref="WithAttribute"/>
+/// attributes, or types decorated with <see cref="InheritWithsAttribute"/>.
 /// </summary>
 [Generator(LanguageNames.CSharp)]
 internal class WithGenerator : TreeGenerator
@@ -16,13 +16,19 @@ internal class WithGenerator : TreeGenerator
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    protected override Type[] TypeAttributes { get; } = [typeof(InheritWithsAttribute)];
+    protected override Type[] TypeAttributes { get; } = [
+        typeof(InheritWithsAttribute),
+        typeof(InheritWithsAttribute<>)];
 
     /// <inheritdoc/>
-    protected override Type[] PropertyAttributes { get; } = [typeof(WithAttribute)];
+    protected override Type[] PropertyAttributes { get; } = [
+        typeof(WithAttribute),
+        typeof(WithAttribute<>)];
 
     /// <inheritdoc/>
-    protected override Type[] FieldAttributes { get; } = [typeof(WithAttribute)];
+    protected override Type[] FieldAttributes { get; } = [
+        typeof(WithAttribute),
+        typeof(WithAttribute<>)];
 
     // ----------------------------------------------------
 

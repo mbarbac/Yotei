@@ -45,9 +45,9 @@ namespace Yotei.Tools.CloneGenerator.Tests.HostInterface
             Assert.NotNull(type.GetInterface("ICloneable"));
         }
     }
-    
-    // Adding and returning ICloneable...
-    [Cloneable<ICloneable>]
+
+    // Adding and returning ICloneable (object!)...
+    [Cloneable<object>]
     public partial interface IFace01B : ICloneable { }
 
     public static partial class Tests
@@ -60,7 +60,7 @@ namespace Yotei.Tools.CloneGenerator.Tests.HostInterface
             var method = type.GetMethod("Clone");
             Assert.NotNull(method);
             Assert.True(method.IsVirtual);
-            Assert.Equal(typeof(ICloneable), method.ReturnType);
+            Assert.Equal(typeof(object), method.ReturnType);
             Assert.NotNull(type.GetInterface("ICloneable"));
         }
     }
@@ -83,6 +83,65 @@ namespace Yotei.Tools.CloneGenerator.Tests.HostInterface
             Assert.True(method.IsVirtual);
             Assert.Equal(type, method.ReturnType);
             Assert.Null(type.GetInterface("ICloneable"));
+        }
+    }
+
+    // ----------------------------------------------------
+
+    // Simple inheritance...
+    [Cloneable] public partial interface IFace03 { }
+    [Cloneable] public partial interface IFace04 : IFace03 { }
+
+    public static partial class Tests
+    {
+        //[Enforced]
+        [Fact]
+        public static void Test_IFace0304()
+        {
+            var type = typeof(IFace03);
+            var method = type.GetMethod("Clone");
+            Assert.NotNull(method);
+            Assert.True(method.IsVirtual);
+            Assert.Equal(type, method.ReturnType);
+            Assert.Null(type.GetInterface("ICloneable"));
+
+            type = typeof(IFace04);
+            method = type.GetMethod("Clone");
+            Assert.NotNull(method);
+            Assert.True(method.IsVirtual);
+            Assert.Equal(type, method.ReturnType);
+            Assert.Null(type.GetInterface("ICloneable"));
+        }
+    }
+
+    // ----------------------------------------------------
+
+    // Complex inheritance...
+    [Cloneable]
+    public partial interface IFace05 : ICloneable { }
+
+    [Cloneable(ReturnType = typeof(IsNullable<IFace05>))]
+    public partial interface IFace06 : IFace05 { }
+
+    public static partial class Tests
+    {
+        //[Enforced]
+        [Fact]
+        public static void Test_IFace0506()
+        {
+            var type = typeof(IFace05);
+            var method = type.GetMethod("Clone");
+            Assert.NotNull(method);
+            Assert.True(method.IsVirtual);
+            Assert.Equal(type, method.ReturnType);
+            Assert.NotNull(type.GetInterface("ICloneable"));
+
+            type = typeof(IFace06);
+            method = type.GetMethod("Clone");
+            Assert.NotNull(method);
+            Assert.True(method.IsVirtual);
+            Assert.Equal(typeof(IFace05), method.ReturnType);
+            Assert.NotNull(type.GetInterface("ICloneable"));
         }
     }
 }
