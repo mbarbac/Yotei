@@ -33,7 +33,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Base\Nodes\NodeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Tree\TreeGenerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Tree\TreeDiagnostics.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Exported\IsNullable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Public\IsNullable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\AllowNullAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\BitOperations.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\CallerArgumentExpressionAttribute.cs" />
@@ -67,6 +67,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\EasyNameOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CodeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\RecursiveHelpers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\NullableHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\DebugExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\StringExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\ObjectExtensions.cs" />

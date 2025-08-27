@@ -7,6 +7,10 @@ internal class XTypeNode : TypeNode
     public XTypeNode(INode parent, INamedTypeSymbol symbol) : base(parent, symbol) { }
     public XTypeNode(INode parent, TypeCandidate candidate) : base(parent, candidate) { }
 
+    readonly SymbolComparer Comparer = SymbolComparer.Default;
+    INamedTypeSymbol ReturnType = default!;
+    RoslynNameOptions ReturnNameOptions = RoslynNameOptions.Default;
+
     // ----------------------------------------------------
 
     /// <inheritdoc/>
@@ -14,31 +18,35 @@ internal class XTypeNode : TypeNode
     {
         bool r = true;
 
-        // Base validations...
         if (!base.Validate(context)) r = false;
+        if (!ValidateSingleAttribute(context)) r = false;
+        if (!ValidateNoRecord(context)) r = false;
 
-        // Only one valid attribute at once...
+        FindReturnTypeValue(Symbol, out _, out _);
+
+        return r;
+    }
+
+    // Custom validations...
+    bool ValidateSingleAttribute(SourceProductionContext context)
+    {
         var num = Candidate is not null
             ? Candidate.Attributes.Length
             : Symbol.GetAttributes().Count(x =>
                 x.AttributeClass != null &&
                 x.AttributeClass.Name.StartsWith(nameof(CloneableAttribute)));
 
-        if (num > 1)
-        {
-            TreeDiagnostics.TooManyAttributes(Symbol).Report(context);
-            r = false;
-        }
+        if (num > 1) TreeDiagnostics.TooManyAttributes(Symbol).Report(context);
+        return num == 1;
+    }
 
-        // Records not supported...
-        if (Symbol.IsRecord)
-        {
-            TreeDiagnostics.RecordsNotSupported(Symbol).Report(context);
-            r = false;
-        }
+    // Custom validations...
+    bool ValidateNoRecord(SourceProductionContext context)
+    {
+        if (!Symbol.IsRecord) return true;
 
-        // Finishing...
-        return r;
+        TreeDiagnostics.RecordsNotSupported(Symbol).Report(context);
+        return false;
     }
 
     // ----------------------------------------------------
@@ -46,6 +54,9 @@ internal class XTypeNode : TypeNode
     /// <inheritdoc/>
     protected override void EmitCore(SourceProductionContext context, CodeBuilder cb)
     {
+        if (!FindReturnTypeValue(Symbol, out ReturnType, out _)) ReturnType = Symbol;
+        if (!Comparer.Equals(Symbol, ReturnType)) ReturnNameOptions = RoslynNameOptions.Full;
+
         // Declared or implemented explicitly...
         if (FindCloneMethod(Symbol, out _)) return;
 
@@ -60,10 +71,9 @@ internal class XTypeNode : TypeNode
     /// <summary>
     /// Invoked when the host type is an interface.
     /// </summary>
-    void EmitHostInterface(SourceProductionContext context, CodeBuilder cb)
+    void EmitHostInterface(SourceProductionContext __, CodeBuilder cb)
     {
-        if (!FindReturnTypeValue(Symbol, out var type)) type = Symbol;
-        var typename = type.EasyName(RoslynNameOptions.Full);
+        var typename = ReturnType.EasyName(ReturnNameOptions);
         var modifiers = GetModifiers();
 
         EmitDocumentation(cb);
@@ -74,7 +84,18 @@ internal class XTypeNode : TypeNode
         /// </summary>
         string? GetModifiers()
         {
-            throw null;
+            var done = Symbol.RecursiveOnly((INamedTypeSymbol iface, out bool value) =>
+            {
+                value = true;
+                if (FindCloneableAttribute(iface, out _)) return true;
+                if (FindCloneMethod(iface, out _)) return true;
+
+                value = false;
+                return false;
+            },
+            out bool found, Symbol.AllInterfaces);
+
+            return found && done ? "new " : null;
         }
     }
 
@@ -83,16 +104,44 @@ internal class XTypeNode : TypeNode
     /// <summary>
     /// Invoked when the host type is an abstract one.
     /// </summary>
-    void EmitHostAbstract(SourceProductionContext context, CodeBuilder cb)
+    void EmitHostAbstract(SourceProductionContext __, CodeBuilder cb)
     {
-        throw null;
+        var typename = ReturnType.EasyName(ReturnNameOptions);
+        var modifiers = GetModifiers();
+
+        EmitDocumentation(cb);
+        cb.AppendLine($"{modifiers}{typename} Clone();");
+
+        EmitExplicitInterfaces(cb);
 
         /// <summary>
         /// Gets the method modifiers followed by a space separator, or null if any.
         /// </summary>
         string? GetModifiers()
         {
-            throw null;
+            var host = Symbol.BaseType;
+            if (host != null && host.Name != "Object")
+            {
+                // A base method may exist already...
+                if (FindCloneMethod(host, out var method, host.AllBaseTypes()))
+                {
+                    var access = method.DeclaredAccessibility;
+                    if (access == Accessibility.Private) return null;
+                    var str = access.ToCSharpString(addspace: true);
+
+                    var isvirtual = method.IsVirtual || method.IsOverride | method.IsAbstract;
+                    return isvirtual ? $"{str}abstract override " : $"{str}abstract ";
+                }
+
+                // Or a base method was requested we need to reabstract...
+                if (FindCloneableAttribute(host, out _, host.AllBaseTypes()))
+                {
+                    return "public abstract override ";
+                }
+            }
+
+            // Default...
+            return "public abstract ";
         }
     }
 
@@ -103,14 +152,65 @@ internal class XTypeNode : TypeNode
     /// </summary>
     void EmitHostConcrete(SourceProductionContext context, CodeBuilder cb)
     {
-        throw null;
+        var ctor = Symbol.GetCopyConstructor(strict: false);
+        if (ctor == null)
+        {
+            TreeDiagnostics.NoCopyConstructor(Symbol).Report(context);
+            return;
+        }
+
+        var typename = ReturnType.EasyName(ReturnNameOptions);
+        var thisname = Symbol.EasyName();
+        var modifiers = GetModifiers();
+
+        EmitDocumentation(cb);
+        cb.AppendLine($"{modifiers}{typename} Clone()");
+        cb.AppendLine("{");
+        cb.IndentLevel++;
+        {
+            cb.AppendLine($"var v_temp = new {thisname}(this);");
+            cb.AppendLine("return v_temp;");
+        }
+        cb.IndentLevel--;
+        cb.AppendLine("}");
+
+        EmitExplicitInterfaces(cb);
 
         /// <summary>
         /// Gets the method modifiers followed by a space separator, or null if any.
         /// </summary>
         string? GetModifiers()
         {
-            throw null;
+            var issealed = Symbol.IsSealed;
+            var novirtual = FindVirtualMethodValue(Symbol, out var value) && !value;
+
+            var host = Symbol.BaseType;
+            if (host != null && host.Name != "Object")
+            {
+                // A base method may exist already...
+                if (FindCloneMethod(host, out var method, host.AllBaseTypes()))
+                {
+                    var access = method.DeclaredAccessibility;
+                    if (access == Accessibility.Private) return null;
+                    var str = access.ToCSharpString(addspace: true);
+
+                    if (novirtual) return $"{str}override sealed ";
+                    else
+                    {
+                        var isvirtual = method.IsVirtual || method.IsOverride | method.IsAbstract;
+                        return isvirtual ? $"{str}override " : $"{str}new ";
+                    }
+                }
+
+                // Or a base method was requested we need to reabstract...
+                if (FindCloneableAttribute(host, out _, host.AllBaseTypes()))
+                {
+                    return host.IsAbstract || novirtual ? "public new " : "public override ";
+                }
+            }
+
+            // Default...
+            return novirtual || issealed ? "public " : "public virtual ";
         }
     }
 
@@ -121,7 +221,19 @@ internal class XTypeNode : TypeNode
     /// </summary>
     void EmitExplicitInterfaces(CodeBuilder cb)
     {
-        throw null;
+        var ifaces = GetExplicitInterfaces();
+
+        foreach (var iface in ifaces)
+        {
+            if (Comparer.Equals(iface, ReturnType)) continue;
+
+            var typename = iface.EasyName(RoslynNameOptions.Full with { UseTypeNullable = false });
+            var valuename = iface.Name == "ICloneable" ? "object" : typename;
+
+            cb.AppendLine();
+            cb.AppendLine(valuename);
+            cb.AppendLine($"{typename}.Clone() => ({typename})Clone();");
+        }
     }
 
     /// <summary>
@@ -129,8 +241,41 @@ internal class XTypeNode : TypeNode
     /// </summary>
     List<ITypeSymbol> GetExplicitInterfaces()
     {
-        throw null;
+        var list = new List<ITypeSymbol>();
+
+        foreach (var iface in Symbol.AllInterfaces) TryCapture(iface);
+        return list;
+
+        /// <summary>
+        /// Tries to capture the given interface as an explicit one.
+        /// </summary>
+        void TryCapture(INamedTypeSymbol iface)
+        {
+            if (FindCloneMethod(iface, out _) || FindCloneableAttribute(iface, out _))
+            {
+                var temp = list.Find(x => Comparer.Equals(x, iface));
+                if (temp is null) list.Add(iface);
+            }
+        }
     }
+    
+    /*void TryAddICloneable()
+    {
+        var any = Symbol.AllInterfaces.Any(x => x.Name == "ICloneable");
+        var add = any || FindAddICloneableValue(Symbol, out var found) && found;
+
+        if (add)
+        {
+            var comp = GetBranchCompilation();
+            var item = comp.GetTypeByMetadataName("System.ICloneable");
+
+            if (item != null)
+            {
+                var temp = list.Find(x => comparer.Equals(x, item));
+                if (temp == null) list.Add(item);
+            }
+        }
+    }*/
 
     // ----------------------------------------------------
 
@@ -160,6 +305,7 @@ internal class XTypeNode : TypeNode
     /// <summary>
     /// Tries to find a <see cref="CloneableAttribute"/> or a <see cref="CloneableAttribute{T}"/>
     /// attribute decorating the given type, or the first valid one in the given chains.
+    /// <br/> If several attributes are found, the non-generic one takes precedence.
     /// </summary>
     static bool FindCloneableAttribute(
         INamedTypeSymbol type,
@@ -185,33 +331,33 @@ internal class XTypeNode : TypeNode
     /// Invoked to find the return type from the <see cref="CloneableAttribute.ReturnType"/>
     /// property, or from the <see cref="CloneableAttribute{T}"/> one.
     /// </summary>
-    static bool FindReturnTypeValue(AttributeData data, out INamedTypeSymbol value)
+    static bool FindReturnTypeValue(
+        AttributeData data, out INamedTypeSymbol value, out bool isnullable)
     {
-        var cls = data.AttributeClass;
-        if (cls is not null)
+        // Generic attribute...
+        if (data.AttributeClass is not null && data.AttributeClass.Arity == 1)
         {
-            // Not-generic attribute...
-            if (cls.Arity == 0)
-            {
-                if (data.GetNamedArgument(nameof(CloneableAttribute.ReturnType), out var arg))
-                {
-                    if (!arg.Value.IsNull && arg.Value.Value is INamedTypeSymbol temp)
-                    {
-                        value = temp;
-                        return true;
-                    }
-                }
-            }
+            value = (INamedTypeSymbol)data.AttributeClass.TypeArguments[0];
+            value = value.UnwrapNullable(out isnullable);
+            return true;
+        }
 
-            // Generic attribute...
-            else if (cls.Arity == 1)
+        // Not-generic attribute...
+        else
+        {
+            if (data.GetNamedArgument(nameof(CloneableAttribute.ReturnType), out var arg))
             {
-                value = (INamedTypeSymbol)cls.TypeArguments[0];
-                return true;
+                if (!arg.Value.IsNull && arg.Value.Value is INamedTypeSymbol temp)
+                {
+                    value = temp.UnwrapNullable(out isnullable);
+                    return true;
+                }
             }
         }
 
+        // None...
         value = null!;
+        isnullable = false;
         return false;
     }
 
@@ -223,12 +369,14 @@ internal class XTypeNode : TypeNode
     static bool FindReturnTypeValue(
         INamedTypeSymbol type,
         out INamedTypeSymbol value,
+        out bool isnullable,
         params IEnumerable<INamedTypeSymbol>[] chains)
     {
         value = null!;
-        
+        isnullable = false;
+
         var found = FindCloneableAttribute(type, out var data, chains);
-        if (found) found = FindReturnTypeValue(data, out value);
+        if (found) found = FindReturnTypeValue(data, out value, out isnullable);
         return found;
     }
 
