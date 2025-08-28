@@ -66,11 +66,11 @@ internal class XTypeNode : TypeNode
     /// </summary>
     void EmitHostInterface(SourceProductionContext __, CodeBuilder cb)
     {
-        var typename = ReturnType.EasyName(ReturnNameOptions);
+        var returntype = ReturnType.EasyName(ReturnNameOptions);
         var modifiers = GetModifiers();
 
         EmitDocumentation(cb);
-        cb.AppendLine($"{modifiers}{typename} Clone();");
+        cb.AppendLine($"{modifiers}{returntype} Clone();");
 
         /// <summary>
         /// Gets the method modifiers followed by a space separator, or null if any.
@@ -99,11 +99,11 @@ internal class XTypeNode : TypeNode
     /// </summary>
     void EmitHostAbstract(SourceProductionContext __, CodeBuilder cb)
     {
-        var typename = ReturnType.EasyName(ReturnNameOptions);
+        var returntype = ReturnType.EasyName(ReturnNameOptions);
         var modifiers = GetModifiers();
 
         EmitDocumentation(cb);
-        cb.AppendLine($"{modifiers}{typename} Clone();");
+        cb.AppendLine($"{modifiers}{returntype} Clone();");
 
         EmitExplicitInterfaces(cb);
 
@@ -152,12 +152,12 @@ internal class XTypeNode : TypeNode
             return;
         }
 
-        var typename = ReturnType.EasyName(ReturnNameOptions);
+        var returntype = ReturnType.EasyName(ReturnNameOptions);
         var thisname = Symbol.EasyName();
         var modifiers = GetModifiers();
 
         EmitDocumentation(cb);
-        cb.AppendLine($"{modifiers}{typename} Clone()");
+        cb.AppendLine($"{modifiers}{returntype} Clone()");
         cb.AppendLine("{");
         cb.IndentLevel++;
         {
@@ -245,7 +245,7 @@ internal class XTypeNode : TypeNode
         {
             var found = false;
 
-            // Firstly child ones...
+            // First child ones...
             foreach (var child in iface.Interfaces)
             {
                 var temp = TryCapture(child);
@@ -321,9 +321,9 @@ internal class XTypeNode : TypeNode
             ? Candidate.Attributes
             : Symbol.GetAttributes();
 
-        items = items.Where(x =>
+        items = [..items.Where(x =>
             x.AttributeClass is not null &&
-            x.AttributeClass.Name.StartsWith(nameof(CloneableAttribute))).ToImmutableArray();
+            x.AttributeClass.Name.StartsWith(nameof(CloneableAttribute)))];
 
         switch (items.Length)
         {

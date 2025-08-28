@@ -7,12 +7,15 @@ internal class XPropertyNode : PropertyNode
     public XPropertyNode(TypeNode parent, IPropertySymbol symbol) : base(parent, symbol) { }
     public XPropertyNode(TypeNode parent, PropertyCandidate candidate) : base(parent, candidate) { }
 
+    INamedTypeSymbol Host => ParentNode.Symbol;
+    string MethodName => $"With{Symbol.Name}";
+    string ArgumentName => $"v_{Symbol.Name}";
+    bool IsInherited => Candidate is null;
+
     readonly SymbolComparer Comparer = SymbolComparer.Default;
     INamedTypeSymbol ReturnType = default!;
     RoslynNameOptions ReturnNameOptions = RoslynNameOptions.Default;
     AttributeData ThisAttribute = default!;
-    INamedTypeSymbol Host => ParentNode.Symbol;
-    string MethodName => $"With{Symbol.Name}";
 
     // ----------------------------------------------------
 
@@ -23,13 +26,14 @@ internal class XPropertyNode : PropertyNode
 
         if (!base.Validate(context)) r = false;
         if (!ValidateSpecific(context)) r = false;
-        if (!ValidateSingleAttribute(context)) r = false;
         if (!ValidateHostNoRecord(context)) r = false;
 
         return r;
     }
 
-    // Specific validations...
+    /// <summary>
+    /// Specific validations.
+    /// </summary>
     bool ValidateSpecific(SourceProductionContext context)
     {
         bool r = true;
@@ -53,25 +57,9 @@ internal class XPropertyNode : PropertyNode
         return r;
     }
 
-    // Custom validations...
-    bool ValidateSingleAttribute(SourceProductionContext context)
-    {
-        ThisAttribute = GetThisAttribute(context, out var error)!;
-        if (error) return false;
-
-        if (ThisAttribute is null)
-        {
-            if (!FindInheritWithsAttribute(Host, out ThisAttribute))
-            {
-                TreeDiagnostics.NoAttributes(Host).Report(context);
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    // Custom validation
+    /// <summary>
+    /// Custom validations.
+    /// </summary>
     bool ValidateHostNoRecord(SourceProductionContext context)
     {
         if (!Host.IsRecord) return true;
@@ -85,16 +73,59 @@ internal class XPropertyNode : PropertyNode
     /// <inheritdoc/>
     public override void Emit(SourceProductionContext context, CodeBuilder cb)
     {
+        if (!ValidateSingleAttribute(context)) return;
         if (!FindReturnTypeValue(ThisAttribute, out ReturnType, out _)) ReturnType = Host;
         if (!Comparer.Equals(Host, ReturnType)) ReturnNameOptions = RoslynNameOptions.Full;
 
         // Declared or implemented explicitly...
-        if (FindWithMethod(Host, out _)) return;
+        if (FindMethod(Host, out _)) return;
 
         // Dispatching...
         if (Host.IsInterface()) EmitHostInterface(context, cb);
         else if (Host.IsAbstract) EmitHostAbstract(context, cb);
         else EmitHostConcrete(context, cb);
+    }
+
+    /// <summary>
+    /// This validation MUST be invoked in 'Emit()' because, if this instance is an inherited
+    /// member, then the hierarchy validations happens at host level, and not at member one.
+    /// </summary>
+    bool ValidateSingleAttribute(SourceProductionContext context)
+    {
+        // Inherited members use the attribute applied to their host...
+        if (IsInherited)
+        {
+            var name = nameof(InheritWithsAttribute);
+            var items = Host.GetAttributes().Where(x =>
+                x.AttributeClass is not null &&
+                x.AttributeClass.Name.StartsWith(name)).ToArray();
+
+            switch (items.Length)
+            {
+                case 1: ThisAttribute = items[0]; return true;
+                case 0: TreeDiagnostics.NoAttributes(Host).Report(context); return false;
+                default: TreeDiagnostics.TooManyAttributes(Host).Report(context); return false;
+            }
+        }
+
+        // Regular members use the attribute applied to themselves...
+        else
+        {
+            var items = Candidate is not null
+                ? Candidate.Attributes
+                : Symbol.GetAttributes();
+
+            items = [..items.Where(x =>
+                x.AttributeClass is not null &&
+                x.AttributeClass.Name.StartsWith(nameof(WithAttribute)))];
+
+            switch (items.Length)
+            {
+                case 1: ThisAttribute = items[0]; return true;
+                case 0: TreeDiagnostics.NoAttributes(Host).Report(context); return false;
+                default: TreeDiagnostics.TooManyAttributes(Host).Report(context); return false;
+            }
+        }
     }
 
     // ----------------------------------------------------
@@ -104,14 +135,45 @@ internal class XPropertyNode : PropertyNode
     /// </summary>
     void EmitHostInterface(SourceProductionContext __, CodeBuilder cb)
     {
-        throw null;
+        var membertype = Symbol.Type.EasyName(RoslynNameOptions.Full);
+        var returntype = ReturnType.EasyName(ReturnNameOptions);
+        var modifiers = GetModifiers();
+
+        EmitDocumentation(cb);
+        cb.AppendLine($"{modifiers}{returntype}");
+        cb.AppendLine($"{MethodName}({membertype} {ArgumentName});");
 
         /// <summary>
         /// Gets the method modifiers followed by a space separator, or null if any.
         /// </summary>
         string? GetModifiers()
         {
-            throw null;
+            var found = IsInherited;            
+            if (!found)
+            {
+                Host.RecursiveOnly((INamedTypeSymbol iface, out bool value) =>
+                {
+                    value = FindMethod(iface, out var method);
+                    if (value)
+                    {
+                        value = Comparer.Equals(Symbol.Type, method.Parameters[0].Type);
+                        return true;
+                    }
+
+                    value = FindDecoratedMember(iface, out var member);
+                    if (value)
+                    {
+                        value = Comparer.Equals(Symbol.Type, member.Type);
+                        return true;
+                    }
+
+                    value = false;
+                    return false;
+                },
+                out found, Host.AllInterfaces);
+            }
+
+            return found ? "new " : null;
         }
     }
 
@@ -120,16 +182,46 @@ internal class XPropertyNode : PropertyNode
     /// <summary>
     /// Invoked when the host type is an abstract one.
     /// </summary>
-    void EmitHostAbstract(SourceProductionContext __, CodeBuilder cb)
+    void EmitHostAbstract(SourceProductionContext context, CodeBuilder cb)
     {
-        throw null;
+        var membertype = Symbol.Type.EasyName(RoslynNameOptions.Full);
+        var returntype = ReturnType.EasyName(ReturnNameOptions);
+        var modifiers = GetModifiers();
+
+        EmitDocumentation(cb);
+        cb.AppendLine($"{modifiers}{returntype}");
+        cb.AppendLine($"{MethodName}({membertype} {ArgumentName});");
+
+        EmitExplicitInterfaces(context, cb);
 
         /// <summary>
         /// Gets the method modifiers followed by a space separator, or null if any.
         /// </summary>
         string? GetModifiers()
         {
-            throw null;
+            var parent = Host.BaseType;
+            if (parent != null)
+            {
+                // A base method already exist...
+                if (FindMethod(parent, out var method, parent.AllBaseTypes()))
+                {
+                    var access = method.DeclaredAccessibility;
+                    if (access == Accessibility.Private) return null;
+                    var str = access.ToCSharpString(addspace: true);
+
+                    var isvirtual = method.IsVirtual || method.IsOverride | method.IsAbstract;
+                    return isvirtual ? $"{str}abstract override " : $"{str}abstract ";
+                }
+
+                // Or a base method was requested...
+                if (FindWithAttribute(parent, out _, parent.AllBaseTypes()))
+                {
+                    return "public abstract override ";
+                }
+            }
+
+            // Default...
+            return "public abstract ";
         }
     }
 
@@ -140,14 +232,75 @@ internal class XPropertyNode : PropertyNode
     /// </summary>
     void EmitHostConcrete(SourceProductionContext context, CodeBuilder cb)
     {
-        throw null;
+        var ctor = Host.GetCopyConstructor(strict: false);
+        if (ctor == null)
+        {
+            TreeDiagnostics.NoCopyConstructor(Host).Report(context);
+            return;
+        }
+
+        var membertype = Symbol.Type.EasyName(RoslynNameOptions.Full);
+        var returntype = ReturnType.EasyName(ReturnNameOptions);
+        var hostname = Host.EasyName();
+        var modifiers = GetModifiers();
+
+        EmitDocumentation(cb);
+        cb.AppendLine($"{modifiers}{returntype}");
+        cb.AppendLine($"{MethodName}({membertype} {ArgumentName})");
+        cb.AppendLine("{");
+        cb.IndentLevel++;
+        {
+            cb.AppendLine($"var v_temp = new {hostname}(this)");
+            cb.AppendLine("{");
+            cb.IndentLevel++;
+            {
+                cb.AppendLine($"{Symbol.Name} = {ArgumentName}");
+            }
+            cb.IndentLevel--;
+            cb.AppendLine("};");
+            cb.AppendLine("return v_temp;");
+        }
+        cb.IndentLevel--;
+        cb.AppendLine("}");
+
+        EmitExplicitInterfaces(context, cb);
 
         /// <summary>
         /// Gets the method modifiers followed by a space separator, or null if any.
         /// </summary>
         string? GetModifiers()
         {
-            throw null;
+            var issealed = Host.IsSealed || Symbol.IsSealed;
+            var novirtual = FindVirtualMethodValue(ThisAttribute, out var temp) && !temp;
+
+            var parent = Host.BaseType;
+            if (parent != null)
+            {
+                // A base method already exist...
+                if (FindMethod(parent, out var method, parent.AllBaseTypes()))
+                {
+                    var access = method.DeclaredAccessibility;
+                    if (access == Accessibility.Private) return null;
+                    var str = access.ToCSharpString(addspace: true);
+
+                    if (novirtual) return $"{str}override sealed ";
+                    else
+                    {
+                        var isvirtual = method.IsVirtual || method.IsOverride | method.IsAbstract;
+                        return isvirtual ? $"{str}override " : $"{str}new ";
+                    }
+                }
+
+                // Or a base method was requested...
+                if (FindWithAttribute(parent, out _, parent.AllBaseTypes()))
+                {
+                    if (novirtual || issealed) return "public new ";
+                    return "public override ";
+                }
+            }
+
+            // Default...
+            return novirtual || issealed ? "public " : "public virtual ";
         }
     }
 
@@ -156,9 +309,25 @@ internal class XPropertyNode : PropertyNode
     /// <summary>
     /// Invoked to emit the interfaces that need explicit implementation.
     /// </summary>
-    void EmitExplicitInterfaces(CodeBuilder cb)
+    void EmitExplicitInterfaces(SourceProductionContext context, CodeBuilder cb)
     {
-        throw null;
+        var ifaces = GetExplicitInterfaces();
+        foreach (var iface in ifaces.Cast<INamedTypeSymbol>())
+        {
+            if (!FindDecoratedMember(iface, out var member, iface.AllInterfaces))
+            {
+                TreeDiagnostics.SymbolNotFound(iface).Report(context);
+                return;
+            }
+
+            var membername = member.Type.EasyName(RoslynNameOptions.Full);
+            var typename = iface.EasyName(RoslynNameOptions.Full with { UseTypeNullable = false });
+
+            cb.AppendLine();
+            cb.AppendLine($"{typename}");
+            cb.Append($"{typename}.{MethodName}({membername} value)");
+            cb.AppendLine($" => {MethodName}(value);");
+        }
     }
 
     /// <summary>
@@ -166,28 +335,49 @@ internal class XPropertyNode : PropertyNode
     /// </summary>
     List<ITypeSymbol> GetExplicitInterfaces()
     {
-        throw null;
+        var list = new List<ITypeSymbol>();
+        foreach (var iface in Host.Interfaces) TryCapture(iface);
+        return list;
 
         /// <summary>
         /// Tries to capture the given interface as an explicit one.
         /// </summary>
         bool TryCapture(INamedTypeSymbol iface)
         {
-            throw null;
+            var found = false;
+
+            // Firstly child ones...
+            foreach (var child in iface.Interfaces)
+            {
+                var temp = TryCapture(child);
+                if (temp) found = true;
+            }
+
+            // Then, the given one if needed...
+            if (!found) found =
+                FindDecoratedMember(iface, out _) || (
+                    FindMember(iface, out _) &&
+                    FindInheritWithsAttribute(iface, out _));
+
+            // Adding if needed and not duplicated...
+            if (found)
+            {
+                var temp = list.Find(x => Comparer.Equals(x, iface));
+                if (temp is null) list.Add(iface);
+            }
+
+            return found;
         }
     }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Tries to find a 'With[Name](value) method with the appropiate name and value type in
-    /// the given type, or in the first valid one in the given chains.
-    /// <br/> In strict mode, the value type must be the same or derived from this symbol one.
-    /// In non-strict mode, it just need to be a compatible one.
+    /// Invoked to find a 'With[Name](value)' method in the given type, or in the first valid one
+    /// in the given chains.
     /// </summary>
-    bool FindWithMethod(
+    bool FindMethod(
         INamedTypeSymbol type,
-        bool strict,
         out IMethodSymbol value,
         params IEnumerable<INamedTypeSymbol>[] chains)
     {
@@ -196,82 +386,65 @@ internal class XPropertyNode : PropertyNode
             value = type.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(x =>
                 x.Name == MethodName &&
                 x.Parameters.Length == 1 &&
-                (strict
-                    ? x.Parameters[0].Type.IsAssignableTo(Symbol.Type)
-                    : Symbol.Type.IsAssignableTo(x.Parameters[0].Type)));
+                Symbol.Type.IsAssignableTo(x.Parameters[0].Type));
 
             return value is not null;
         },
         out value, chains);
     }
 
-    /// <summary>
-    /// Tries to find a 'With[Name](value) method with the appropiate name and value type in
-    /// the given type, or in the first valid one in the given chains. The value type must be
-    /// a compatible one with this symbol.
-    /// </summary>
-    bool FindWithMethod(
-        INamedTypeSymbol type,
-        out IMethodSymbol value,
-        params IEnumerable<INamedTypeSymbol>[] chains)
-    {
-        return FindWithMethod(type, false, out value, chains);
-    }
-
     // ----------------------------------------------------
 
     /// <summary>
-    /// Tries to find a member with the appropiate name in the given type, or in the first valid
+    /// Invoked to find a member with the appropriate name in the given type, or in the first valid
     /// one in the given chains.
-    /// <br/> In strict mode, the member's type must be the same or derived from this symbol one.
-    /// In non-strict mode, it just need to be a compatible one.
     /// </summary>
     bool FindMember(
         INamedTypeSymbol type,
-        bool strict,
         out IPropertySymbol value,
         params IEnumerable<INamedTypeSymbol>[] chains)
     {
         return type.Recursive((INamedTypeSymbol type, out IPropertySymbol value) =>
         {
-            value = type.GetMembers().OfType<IPropertySymbol>().FirstOrDefault(x =>
-                x.Name == Symbol.Name &&
-                x.Parameters.Length == 0 &&
-                (strict
-                    ? x.Type.IsAssignableTo(Symbol.Type)
-                    : Symbol.Type.IsAssignableTo(x.Type)));
+            var items = type.GetMembers().OfType<IPropertySymbol>().ToArray();
+            foreach (var item in items)
+            {
+                if (item.Name != Symbol.Name) continue;
+                if (item.Parameters.Length != 0) continue;
 
-            return value is not null;
+                value = item;
+                return true;
+            }
+            value = null!;
+            return false;
         },
         out value, chains);
     }
 
     /// <summary>
-    /// Tries to find a member with the appropiate name in the given type, and decorated with
-    /// either the <see cref="WithAttribute"/> attribute of the <see cref="WithAttribute{T}"/>
-    /// one, in the given type or in the first valid one in the given chains.
-    /// <br/> In strict mode, the member's type must be the same or derived from this symbol one.
-    /// In non-strict mode, it just need to be a compatible one.
+    /// Invoked to find a decorated member with the appropriate name in the given type, or in the
+    /// first valid one in the given chains.
     /// </summary>
     bool FindDecoratedMember(
         INamedTypeSymbol type,
-        bool strict,
         out IPropertySymbol value,
         params IEnumerable<INamedTypeSymbol>[] chains)
     {
         return type.Recursive((INamedTypeSymbol type, out IPropertySymbol value) =>
         {
-            value = type.GetMembers().OfType<IPropertySymbol>().FirstOrDefault(x =>
-                x.Name == Symbol.Name &&
-                x.Parameters.Length == 0 &&
-                (strict
-                    ? x.Type.IsAssignableTo(Symbol.Type)
-                    : Symbol.Type.IsAssignableTo(x.Type)) &&
-                (x.HasAttributes(typeof(WithAttribute)) ||
-                 x.HasAttributes(typeof(WithAttribute<>)))
-                );
+            var items = type.GetMembers().OfType<IPropertySymbol>().ToArray();
+            foreach (var item in items)
+            {
+                if (item.Name != Symbol.Name) continue;
+                if (item.Parameters.Length != 0) continue;
+                if (!item.HasAttributes(typeof(WithAttribute)) &&
+                    !item.HasAttributes(typeof(WithAttribute<>))) continue;
 
-            return value is not null;
+                value = item;
+                return true;
+            }
+            value = null!;
+            return false;
         },
         out value, chains);
     }
@@ -279,31 +452,9 @@ internal class XPropertyNode : PropertyNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns the attribute that decorates this member, or null if any. Detected erros are
-    /// reported in the given context.
+    /// Invoked to find the 'With' attribute in a valid member of the given type, or in the first
+    /// valid type in the given chains. If several are found, the non-generic one takes precedence.
     /// </summary>
-    AttributeData? GetThisAttribute(SourceProductionContext context, out bool error)
-    {
-        var items = Candidate is not null
-            ? Candidate.Attributes
-            : Symbol.GetAttributes();
-
-        items = items.Where(x =>
-            x.AttributeClass is not null &&
-            x.AttributeClass.Name.StartsWith(nameof(WithAttribute))).ToImmutableArray();
-
-        switch (items.Length)
-        {
-            case 1: error = false;  return items[0];
-            case 0: error = false;  return null;
-            default: TreeDiagnostics.TooManyAttributes(Host).Report(context); error = true; return null!;
-        }
-    }
-
-    /// Tries to find either the the<see cref="WithAttribute"/> attribute, or the
-    /// <see cref="WithAttribute{T}"/> one, in the given type, or in the first valid one in the
-    /// given chains.
-    /// <br/> If several attributes are found, the non-generic one takes precedence.
     bool FindWithAttribute(
         INamedTypeSymbol type,
         out AttributeData value,
@@ -312,9 +463,8 @@ internal class XPropertyNode : PropertyNode
         return type.Recursive((INamedTypeSymbol type, out AttributeData value) =>
         {
             value = null!;
-            if (!FindDecoratedMember(type, strict: false, out var member)) return false;
-            if (member is null) return false;
-            
+            if (!FindDecoratedMember(type, out var member)) return false;
+
             value = member.GetAttributes(typeof(WithAttribute)).FirstOrDefault();
             if (value is not null) return true;
 
@@ -329,10 +479,8 @@ internal class XPropertyNode : PropertyNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// Tries to find either the the <see cref="InheritWithsAttribute"/> attribute, or the
-    /// <see cref="InheritWithsAttribute{T}"/> one, in the given type, or in the first valid
-    /// one in the given chains.
-    /// <br/> If several attributes are found, the non-generic one takes precedence.
+    /// Invoked to find the 'InheritWiths' attribute in the given type, or in the first valid one
+    /// in the given chains. If several are found, the non-generic one takes precedence.
     /// </summary>
     static bool FindInheritWithsAttribute(
         INamedTypeSymbol type,
@@ -355,8 +503,7 @@ internal class XPropertyNode : PropertyNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// Invoked to find the value of the <see cref="WithAttribute.ReturnType"/> property or
-    /// the <see cref="InheritWithsAttribute.ReturnType"/> one from the given attribute data.
+    /// Invoked to find the value of the 'ReturnType' property from the given attribute data.
     /// </summary>
     static bool FindReturnTypeValue(
         AttributeData data, out INamedTypeSymbol value, out bool isnullable)
@@ -393,8 +540,7 @@ internal class XPropertyNode : PropertyNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// Invoked to find the value of the <see cref="WithAttribute.VirtualMethod"/> property or
-    /// the <see cref="InheritWithsAttribute.VirtualMethod"/> one from the given attribute data.
+    /// Invoked to find the value of the 'VirtualMethod' property from the given attribute data.
     /// </summary>
     static bool FindVirtualMethodValue(AttributeData data, out bool value)
     {
