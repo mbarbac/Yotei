@@ -2,7 +2,8 @@
 
 // ========================================================
 /// <inheritdoc cref="IEngine"/>
-[Cloneable(ReturnInterface = true)]
+[Cloneable<IEngine>]
+[InheritWiths<IEngine>]
 public partial class Engine : IEngine
 {
     public const bool CASESENSITIVENAMES = false;
@@ -13,7 +14,6 @@ public partial class Engine : IEngine
     public const bool USETERMINATORS = true;
     public const char LEFTTERMINATOR = '[';
     public const char RIGHTTERMINATOR = ']';
-    public const bool CASESENSITIVETAGS = false;
 
     // ----------------------------------------------------
 
@@ -36,7 +36,6 @@ public partial class Engine : IEngine
         UseTerminators = source.UseTerminators;
         LeftTerminator = source.LeftTerminator;
         RightTerminator = source.RightTerminator;
-        KnownTags = source.KnownTags;
     }
 
     /// <inheritdoc/>
@@ -58,8 +57,7 @@ public partial class Engine : IEngine
             SupportsNativePaging == other.SupportsNativePaging &&
             UseTerminators == other.UseTerminators &&
             LeftTerminator == other.LeftTerminator &&
-            RightTerminator == other.RightTerminator &&
-            KnownTags.Equals(other.KnownTags);
+            RightTerminator == other.RightTerminator;
     }
 
     /// <inheritdoc/>
@@ -89,18 +87,15 @@ public partial class Engine : IEngine
         code = HashCode.Combine(code, UseTerminators);
         code = HashCode.Combine(code, LeftTerminator);
         code = HashCode.Combine(code, RightTerminator);
-        code = HashCode.Combine(code, KnownTags);
         return code;
     }
 
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    [With(ReturnInterface = true)]
     public bool CaseSensitiveNames { get; init; } = CASESENSITIVENAMES;
 
     /// <inheritdoc/>
-    [With(ReturnInterface = true)]
     public string NullValueLiteral
     {
         get => _NullValueLiteral;
@@ -109,11 +104,9 @@ public partial class Engine : IEngine
     string _NullValueLiteral = NULLVALUELITERAL;
 
     /// <inheritdoc/>
-    [With(ReturnInterface = true)]
     public bool PositionalParameters { get; init; } = POSITIONALPARAMETERS;
 
     /// <inheritdoc/>
-    [With(ReturnInterface = true)]
     public string ParameterPrefix
     {
         get => _ParameterPrefix;
@@ -122,11 +115,9 @@ public partial class Engine : IEngine
     string _ParameterPrefix = PARAMETERPREFIX;
 
     /// <inheritdoc/>
-    [With(ReturnInterface = true)]
     public bool SupportsNativePaging { get; init; } = SUPPORTSNATIVEPAGING;
 
     /// <inheritdoc/>
-    [With(ReturnInterface = true)]
     public bool UseTerminators { get; init; } = USETERMINATORS;
 
     static char ValidateTerminator(char value)
@@ -138,7 +129,6 @@ public partial class Engine : IEngine
     }
 
     /// <inheritdoc/>
-    [With(ReturnInterface = true)]
     public char LeftTerminator
     {
         get => _LeftTerminator;
@@ -147,20 +137,10 @@ public partial class Engine : IEngine
     char _LeftTerminator = LEFTTERMINATOR;
 
     /// <inheritdoc/>
-    [With(ReturnInterface = true)]
     public char RightTerminator
     {
         get => _RightTerminator;
         init => _RightTerminator = ValidateTerminator(value);
     }
     char _RightTerminator = RIGHTTERMINATOR;
-
-    /// <inheritdoc/>
-    [With(ReturnInterface = true)]
-    public IKnownTags KnownTags
-    {
-        get => _KnownTags;
-        init => _KnownTags = value.ThrowWhenNull();
-    }
-    IKnownTags _KnownTags = new KnownTags(CASESENSITIVETAGS);
 }

@@ -4,7 +4,6 @@ TODO:
    WithConnection does not return an interface (it is an abstract class)
    Clone does not return an interface 
 
-
 OPTIMIZATIONS:
 
 - In Yotei.Tools, CharExtensions: equality using a IEqualityComparer<string> allocates two
