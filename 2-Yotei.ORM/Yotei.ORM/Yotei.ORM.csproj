@@ -65,12 +65,6 @@
    <!-- Emit generated files -->
    <ItemGroup>
 	  <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
-	  <Compile Remove="3.Entities\**" />
-	  <Compile Remove="4.Internal\**" />
-	  <EmbeddedResource Remove="3.Entities\**" />
-	  <EmbeddedResource Remove="4.Internal\**" />
-	  <None Remove="3.Entities\**" />
-	  <None Remove="4.Internal\**" />
    </ItemGroup>
 
    <PropertyGroup>

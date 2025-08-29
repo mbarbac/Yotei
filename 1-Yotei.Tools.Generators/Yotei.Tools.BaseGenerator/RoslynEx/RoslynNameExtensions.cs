@@ -58,7 +58,7 @@ internal static class RoslynNameExtensions
     // ----------------------------------------------------
 
     /// <summary>
-    /// Invoked whrn the given symbol is a type-alike one.
+    /// Invoked when the given symbol is a type-alike one.
     /// </summary>
     static string EasyType(this ITypeSymbol item, RoslynNameOptions options)
     {
