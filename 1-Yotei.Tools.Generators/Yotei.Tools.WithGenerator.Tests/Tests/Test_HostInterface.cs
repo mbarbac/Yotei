@@ -1,8 +1,12 @@
-﻿/*using static Yotei.Tools.Diagnostics.ConsoleEx;
+﻿#define ENABLED
+
+using static Yotei.Tools.Diagnostics.ConsoleEx;
 using static System.ConsoleColor;
 
 namespace Yotei.Tools.WithGenerator.Tests.HostInterface
 {
+    // ----------------------------------------------------
+#if ENABLED
     // Nested elements...
     public partial interface IOther
     {
@@ -11,7 +15,6 @@ namespace Yotei.Tools.WithGenerator.Tests.HostInterface
             [With] string Name { get; }
         }
     }
-
     public static partial class Tests
     {
         //[Enforced]
@@ -27,12 +30,12 @@ namespace Yotei.Tools.WithGenerator.Tests.HostInterface
             Assert.Equal(typeof(string), method.GetParameters()[0].ParameterType);
         }
     }
+#endif
 
     // ----------------------------------------------------
-
+#if ENABLED
     // VirtualMethod no effect on interfaces...
     public partial interface IFace01 { [With(VirtualMethod = false)] int Age { get; } }
-
     public static partial class Tests
     {
         //[Enforced]
@@ -48,13 +51,13 @@ namespace Yotei.Tools.WithGenerator.Tests.HostInterface
             Assert.Equal(typeof(int), method.GetParameters()[0].ParameterType);
         }
     }
+#endif
 
     // ----------------------------------------------------
-
+#if ENABLED
     // Duplicated member changing type...
     public partial interface IFace02A { [With] int Age { get; } }
     public partial interface IFace02B : IFace02A { [With] new long Age { get; } }
-
     public static partial class Tests
     {
         //[Enforced]
@@ -78,13 +81,13 @@ namespace Yotei.Tools.WithGenerator.Tests.HostInterface
             Assert.Equal(typeof(long), method.GetParameters()[0].ParameterType);
         }
     }
+#endif
 
     // ----------------------------------------------------
-
+#if ENABLED
     // Duplicated member same type...
     public partial interface IFace03A { [With] int Age { get; } }
     public partial interface IFace03B : IFace03A { [With] new int Age { get; } }
-
     public static partial class Tests
     {
         //[Enforced]
@@ -108,13 +111,13 @@ namespace Yotei.Tools.WithGenerator.Tests.HostInterface
             Assert.Equal(typeof(int), method.GetParameters()[0].ParameterType);
         }
     }
+#endif
 
     // ----------------------------------------------------
-
+#if ENABLED
     // Using return type...
     public partial interface IFace04A { }
     public partial interface IFace04B { [With<IFace04A>] int Age { get; } }
-
     public static partial class Tests
     {
         //[Enforced]
@@ -130,4 +133,9 @@ namespace Yotei.Tools.WithGenerator.Tests.HostInterface
             Assert.Equal(typeof(int), method.GetParameters()[0].ParameterType);
         }
     }
-}*/
+#endif
+
+    // ----------------------------------------------------
+#if ENABLED
+#endif
+}

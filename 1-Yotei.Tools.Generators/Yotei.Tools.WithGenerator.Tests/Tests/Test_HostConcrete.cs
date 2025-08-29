@@ -3,17 +3,17 @@
 using static Yotei.Tools.Diagnostics.ConsoleEx;
 using static System.ConsoleColor;
 
-namespace Yotei.Tools.WithGenerator.Tests.HostAbstract
+namespace Yotei.Tools.WithGenerator.Tests.HostConcrete
 {
     // ----------------------------------------------------
 #if ENABLED
     // Nested elements...
     public static partial class TOther
     {
-        public abstract partial class AType00
+        public partial class CType00
         {
-            public AType00(string name, int age) { Name = name; Age = age; }
-            protected AType00(AType00 source) { Name = source.Name; Age = source.Age; }
+            public CType00(string name, int age) { Name = name; Age = age; }
+            protected CType00(CType00 source) { Name = source.Name; Age = source.Age; }
             public override string ToString() => $"{Name}, {Age}";
             [With] public string Name { get; set; }
             [With] public int Age;
@@ -23,20 +23,20 @@ namespace Yotei.Tools.WithGenerator.Tests.HostAbstract
     {
         //[Enforced]
         [Fact]
-        public static void Test_AType00()
+        public static void Test_CType00()
         {
-            var type = typeof(TOther.AType00);
+            var type = typeof(TOther.CType00);
 
             var method = type.GetMethod("WithName");
             Assert.NotNull(method);
-            Assert.True(method.IsAbstract);
+            Assert.True(method.IsVirtual);
             Assert.Equal(type, method.ReturnType);
             Assert.Single(method.GetParameters());
             Assert.Equal(typeof(string), method.GetParameters()[0].ParameterType);
 
             method = type.GetMethod("WithAge");
             Assert.NotNull(method);
-            Assert.True(method.IsAbstract);
+            Assert.True(method.IsVirtual);
             Assert.Equal(type, method.ReturnType);
             Assert.Single(method.GetParameters());
             Assert.Equal(typeof(int), method.GetParameters()[0].ParameterType);
@@ -46,11 +46,11 @@ namespace Yotei.Tools.WithGenerator.Tests.HostAbstract
 
     // ----------------------------------------------------
 #if ENABLED
-    // VirtualMethod no effect on abstract...
-    public abstract partial class AType01
+    // VirtualMethod...
+    public partial class CType01
     {
-        public AType01(string name, int age) { Name = name; Age = age; }
-        protected AType01(AType01 source) { Name = source.Name; Age = source.Age; }
+        public CType01(string name, int age) { Name = name; Age = age; }
+        protected CType01(CType01 source) { Name = source.Name; Age = source.Age; }
         public override string ToString() => $"{Name}, {Age}";
         [With(VirtualMethod = false)] public string Name { get; set; }
         [With(VirtualMethod = false)] public int Age;
@@ -59,20 +59,20 @@ namespace Yotei.Tools.WithGenerator.Tests.HostAbstract
     {
         //[Enforced]
         [Fact]
-        public static void Test_AType01()
+        public static void Test_CType01()
         {
-            var type = typeof(AType01);
+            var type = typeof(CType01);
 
             var method = type.GetMethod("WithName");
             Assert.NotNull(method);
-            Assert.True(method.IsAbstract);
+            Assert.False(method.IsVirtual);
             Assert.Equal(type, method.ReturnType);
             Assert.Single(method.GetParameters());
             Assert.Equal(typeof(string), method.GetParameters()[0].ParameterType);
 
             method = type.GetMethod("WithAge");
             Assert.NotNull(method);
-            Assert.True(method.IsAbstract);
+            Assert.False(method.IsVirtual);
             Assert.Equal(type, method.ReturnType);
             Assert.Single(method.GetParameters());
             Assert.Equal(typeof(int), method.GetParameters()[0].ParameterType);
@@ -87,10 +87,10 @@ namespace Yotei.Tools.WithGenerator.Tests.HostAbstract
     {
         [With] public string Name { get; set; }
     }
-    public abstract partial class AType02 : IFace02
+    public partial class CType02 : IFace02
     {
-        public AType02(string name, int age) { Name = name; Age = age; }
-        protected AType02(AType02 source) { Name = source.Name; Age = source.Age; }
+        public CType02(string name, int age) { Name = name; Age = age; }
+        protected CType02(CType02 source) { Name = source.Name; Age = source.Age; }
         public override string ToString() => $"{Name}, {Age}";
         [With<IFace02>] public string Name { get; set; }
         [With(ReturnType = typeof(IFace02))] public int Age;
@@ -99,20 +99,20 @@ namespace Yotei.Tools.WithGenerator.Tests.HostAbstract
     {
         //[Enforced]
         [Fact]
-        public static void Test_AType02()
+        public static void Test_CType02()
         {
-            var type = typeof(AType02);
+            var type = typeof(CType02);
 
             var method = type.GetMethod("WithName");
             Assert.NotNull(method);
-            Assert.True(method.IsAbstract);
+            Assert.True(method.IsVirtual);
             Assert.Equal(typeof(IFace02), method.ReturnType);
             Assert.Single(method.GetParameters());
             Assert.Equal(typeof(string), method.GetParameters()[0].ParameterType);
 
             method = type.GetMethod("WithAge");
             Assert.NotNull(method);
-            Assert.True(method.IsAbstract);
+            Assert.True(method.IsVirtual);
             Assert.Equal(typeof(IFace02), method.ReturnType);
             Assert.Single(method.GetParameters());
             Assert.Equal(typeof(int), method.GetParameters()[0].ParameterType);
@@ -128,10 +128,10 @@ namespace Yotei.Tools.WithGenerator.Tests.HostAbstract
         [With] public int Age { get; set; }
     }
     [InheritWiths]
-    public abstract partial class AType03 : IFace03
+    public abstract partial class CType03 : IFace03
     {
-        public AType03(int age) { Age = age; }
-        protected AType03(AType03 source) { Age = source.Age; }
+        public CType03(int age) { Age = age; }
+        protected CType03(CType03 source) { Age = source.Age; }
         public override string ToString() => $"{Age}";
 
         [With] public long Age { get; set; }
@@ -141,13 +141,13 @@ namespace Yotei.Tools.WithGenerator.Tests.HostAbstract
     {
         //[Enforced]
         [Fact]
-        public static void Test_AType03()
+        public static void Test_CType03()
         {
-            var type = typeof(AType03);
+            var type = typeof(CType03);
 
             var method = type.GetMethod("WithAge");
             Assert.NotNull(method);
-            Assert.True(method.IsAbstract);
+            Assert.True(method.IsVirtual);
             Assert.Equal(type, method.ReturnType);
             Assert.Single(method.GetParameters());
             Assert.Equal(typeof(long), method.GetParameters()[0].ParameterType);
@@ -157,70 +157,28 @@ namespace Yotei.Tools.WithGenerator.Tests.HostAbstract
 
     // ----------------------------------------------------
 #if ENABLED
-    // Abstract inherits from abstract
-    public abstract partial class AType04A
+    // Inheritance...
+    public partial class CType04A
     {
-        public AType04A(string name, int age) { Name = name; Age = age; }
-        protected AType04A(AType04A source) { Name = source.Name; Age = source.Age; }
+        public CType04A(string name, int age) { Name = name; Age = age; }
+        protected CType04A(CType04A source) { Name = source.Name; Age = source.Age; }
         public override string ToString() => $"{Name}, {Age}";
         [With] public string Name { get; set; }
         [With] public int Age;
     }
     [InheritWiths]
-    public abstract partial class AType04B : AType04A
+    public partial class CType04B : CType04A
     {
-        public AType04B(string name, int age) : base(name, age) { }
-        protected AType04B(AType04B source) : base(source) { }
+        public CType04B(string name, int age) : base(name, age) { }
+        protected CType04B(CType04B source) : base(source) { }
     }
     public static partial class Tests
     {
         //[Enforced]
         [Fact]
-        public static void Test_AType04()
+        public static void Test_CType04()
         {
-            var type = typeof(AType04B);
-
-            var method = type.GetMethod("WithName");
-            Assert.NotNull(method);
-            Assert.True(method.IsAbstract);
-            Assert.Equal(type, method.ReturnType);
-            Assert.Single(method.GetParameters());
-            Assert.Equal(typeof(string), method.GetParameters()[0].ParameterType);
-
-            method = type.GetMethod("WithAge");
-            Assert.NotNull(method);
-            Assert.True(method.IsAbstract);
-            Assert.Equal(type, method.ReturnType);
-            Assert.Single(method.GetParameters());
-            Assert.Equal(typeof(int), method.GetParameters()[0].ParameterType);
-        }
-    }
-#endif
-
-    // ----------------------------------------------------
-#if ENABLED
-    // Concrete inherits from abstract
-    public abstract partial class AType05A
-    {
-        public AType05A(string name, int age) { Name = name; Age = age; }
-        protected AType05A(AType05A source) { Name = source.Name; Age = source.Age; }
-        public override string ToString() => $"{Name}, {Age}";
-        [With] public string Name { get; set; }
-        [With] public int Age;
-    }
-    [InheritWiths]
-    public partial class CType05B : AType05A
-    {
-        public CType05B(string name, int age) : base(name, age) { }
-        protected CType05B(CType05B source) : base(source) { }
-    }
-    public static partial class Tests
-    {
-        //[Enforced]
-        [Fact]
-        public static void Test_AType05()
-        {
-            var type = typeof(CType05B);
+            var type = typeof(CType04B);
 
             var method = type.GetMethod("WithName");
             Assert.NotNull(method);
@@ -235,36 +193,27 @@ namespace Yotei.Tools.WithGenerator.Tests.HostAbstract
             Assert.Equal(type, method.ReturnType);
             Assert.Single(method.GetParameters());
             Assert.Equal(typeof(int), method.GetParameters()[0].ParameterType);
-
-            var source = new CType05B("James", 50);
-            var target = source.WithName("Bond");
-            Assert.NotSame(source, target);
-            Assert.Equal("Bond", target.Name);
-
-            target = source.WithAge(100);
-            Assert.NotSame(source, target);
-            Assert.Equal(100, target.Age);
         }
     }
 #endif
 
     // ----------------------------------------------------
 #if ENABLED
-    // Concrete inherits from abstract and changing type
+    // Changing type
     public partial interface IFace06
     {
         [With] string Name { get; set; }
     }
-    public abstract partial class AType06A : IFace06
+    public partial class CType06A : IFace06
     {
-        public AType06A(string name, int age) { Name = name; Age = age; }
-        protected AType06A(AType06A source) { Name = source.Name; Age = source.Age; }
+        public CType06A(string name, int age) { Name = name; Age = age; }
+        protected CType06A(CType06A source) { Name = source.Name; Age = source.Age; }
         public override string ToString() => $"{Name}, {Age}";
         [With] public string Name { get; set; }
         [With] public int Age;
     }
-    [InheritWiths<AType06A>]
-    public partial class CType06B : AType06A
+    [InheritWiths<CType06A>]
+    public partial class CType06B : CType06A
     {
         public CType06B(string name, int age) : base(name, age) { }
         protected CType06B(CType06B source) : base(source) { }
@@ -273,21 +222,21 @@ namespace Yotei.Tools.WithGenerator.Tests.HostAbstract
     {
         //[Enforced]
         [Fact]
-        public static void Test_AType06()
+        public static void Test_CType06()
         {
             var type = typeof(CType06B);
 
             var method = type.GetMethod("WithName");
             Assert.NotNull(method);
             Assert.True(method.IsVirtual);
-            Assert.Equal(typeof(AType06A), method.ReturnType);
+            Assert.Equal(typeof(CType06A), method.ReturnType);
             Assert.Single(method.GetParameters());
             Assert.Equal(typeof(string), method.GetParameters()[0].ParameterType);
 
             method = type.GetMethod("WithAge");
             Assert.NotNull(method);
             Assert.True(method.IsVirtual);
-            Assert.Equal(typeof(AType06A), method.ReturnType);
+            Assert.Equal(typeof(CType06A), method.ReturnType);
             Assert.Single(method.GetParameters());
             Assert.Equal(typeof(int), method.GetParameters()[0].ParameterType);
 

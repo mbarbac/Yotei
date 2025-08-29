@@ -1,15 +1,18 @@
-﻿using static Yotei.Tools.Diagnostics.ConsoleEx;
+﻿#define ENABLED
+
+using static Yotei.Tools.Diagnostics.ConsoleEx;
 using static System.ConsoleColor;
 
 namespace Yotei.Tools.CloneGenerator.Tests.HostInterface
 {
+    // ----------------------------------------------------
+#if ENABLED
     // Nested elements...
     public partial interface IOther
     {
         [Cloneable]
         public partial interface IFace00 { }
     }
-
     public static partial class Tests
     {
         //[Enforced]
@@ -24,13 +27,13 @@ namespace Yotei.Tools.CloneGenerator.Tests.HostInterface
             Assert.Null(type.GetInterface("ICloneable"));
         }
     }
+#endif
 
     // ----------------------------------------------------
-
+#if ENABLED
     // Adding ICloneable...
     [Cloneable]
     public partial interface IFace01A : ICloneable { }
-
     public static partial class Tests
     {
         //[Enforced]
@@ -49,7 +52,6 @@ namespace Yotei.Tools.CloneGenerator.Tests.HostInterface
     // Adding and returning ICloneable (object!)...
     [Cloneable<object>]
     public partial interface IFace01B : ICloneable { }
-
     public static partial class Tests
     {
         //[Enforced]
@@ -64,13 +66,13 @@ namespace Yotei.Tools.CloneGenerator.Tests.HostInterface
             Assert.NotNull(type.GetInterface("ICloneable"));
         }
     }
+#endif
 
     // ----------------------------------------------------
-
+#if ENABLED
     // VirtualMethod has no effect on interfaces...
     [Cloneable(VirtualMethod = false)]
     public partial interface IFace02 { }
-
     public static partial class Tests
     {
         //[Enforced]
@@ -85,13 +87,13 @@ namespace Yotei.Tools.CloneGenerator.Tests.HostInterface
             Assert.Null(type.GetInterface("ICloneable"));
         }
     }
+#endif
 
     // ----------------------------------------------------
-
+#if ENABLED
     // Simple inheritance...
     [Cloneable] public partial interface IFace03 { }
     [Cloneable] public partial interface IFace04 : IFace03 { }
-
     public static partial class Tests
     {
         //[Enforced]
@@ -113,9 +115,10 @@ namespace Yotei.Tools.CloneGenerator.Tests.HostInterface
             Assert.Null(type.GetInterface("ICloneable"));
         }
     }
+#endif
 
     // ----------------------------------------------------
-
+#if ENABLED
     // Complex inheritance...
     [Cloneable]
     public partial interface IFace05 : ICloneable { }
@@ -144,4 +147,9 @@ namespace Yotei.Tools.CloneGenerator.Tests.HostInterface
             Assert.NotNull(type.GetInterface("ICloneable"));
         }
     }
+#endif
+
+    // ----------------------------------------------------
+#if ENABLED
+#endif
 }

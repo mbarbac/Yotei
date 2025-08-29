@@ -1,4 +1,6 @@
-﻿using static Yotei.Tools.Diagnostics.ConsoleEx;
+﻿#define ENABLED
+
+using static Yotei.Tools.Diagnostics.ConsoleEx;
 using static System.ConsoleColor;
 
 namespace Yotei.Tools.CloneGenerator.Tests.HostAbstract
@@ -12,7 +14,7 @@ namespace Yotei.Tools.CloneGenerator.Tests.HostAbstract
     }
 
     // ----------------------------------------------------
-
+#if ENABLED
     // Nested elements...
     public static partial class TOther
     {
@@ -23,7 +25,6 @@ namespace Yotei.Tools.CloneGenerator.Tests.HostAbstract
             protected AType00(AType00 source) : base(source) { }
         }
     }
-
     public static partial class Tests
     {
         //[Enforced]
@@ -38,9 +39,10 @@ namespace Yotei.Tools.CloneGenerator.Tests.HostAbstract
             Assert.Null(type.GetInterface("ICloneable"));
         }
     }
+#endif
 
     // ----------------------------------------------------
-
+#if ENABLED
     // Adding ICloneable...
     [Cloneable]
     public abstract partial class AType01A : Core, ICloneable
@@ -48,7 +50,6 @@ namespace Yotei.Tools.CloneGenerator.Tests.HostAbstract
         public AType01A(string name) : base(name) { }
         protected AType01A(AType01A source) : base(source) { }
     }
-
     public static partial class Tests
     {
         //[Enforced]
@@ -71,7 +72,6 @@ namespace Yotei.Tools.CloneGenerator.Tests.HostAbstract
         public AType01B(string name) : base(name) { }
         protected AType01B(AType01B source) : base(source) { }
     }
-
     public static partial class Tests
     {
         //[Enforced]
@@ -86,9 +86,10 @@ namespace Yotei.Tools.CloneGenerator.Tests.HostAbstract
             Assert.NotNull(type.GetInterface("ICloneable"));
         }
     }
+#endif
 
     // ----------------------------------------------------
-
+#if ENABLED
     // VirtualMethod has no effect on abstract classes...
     [Cloneable(VirtualMethod = false)]
     public abstract partial class AType02 : Core
@@ -96,7 +97,6 @@ namespace Yotei.Tools.CloneGenerator.Tests.HostAbstract
         public AType02(string name) : base(name) { }
         protected AType02(AType02 source) : base(source) { }
     }
-
     public static partial class Tests
     {
         //[Enforced]
@@ -111,9 +111,10 @@ namespace Yotei.Tools.CloneGenerator.Tests.HostAbstract
             Assert.Null(type.GetInterface("ICloneable"));
         }
     }
+#endif
 
     // ----------------------------------------------------
-
+#if ENABLED
     // Inheritance...
     [Cloneable]
     public abstract partial class AType03 : Core
@@ -121,14 +122,12 @@ namespace Yotei.Tools.CloneGenerator.Tests.HostAbstract
         public AType03(string name) : base(name) { }
         protected AType03(AType03 source) : base(source) { }
     }
-
     [Cloneable(ReturnType = typeof(IsNullable<AType03>))]
     public abstract partial class AType04 : AType03
     {
         public AType04(string name) : base(name) { }
         protected AType04(AType04 source) : base(source) { }
     }
-
     public static partial class Tests
     {
         //[Enforced]
@@ -150,9 +149,10 @@ namespace Yotei.Tools.CloneGenerator.Tests.HostAbstract
             Assert.Null(type.GetInterface("ICloneable"));
         }
     }
+#endif
 
     // ----------------------------------------------------
-
+#if ENABLED
     // Re-abstract...
     [Cloneable]
     public partial class Type05 : Core
@@ -160,14 +160,12 @@ namespace Yotei.Tools.CloneGenerator.Tests.HostAbstract
         public Type05(string name) : base(name) { }
         protected Type05(Type05 source) : base(source) { }
     }
-
     [Cloneable]
     public abstract partial class AType05 : Type05
     {
         public AType05(string name) : base(name) { }
         protected AType05(AType05 source) : base(source) { }
     }
-
     public static partial class Tests
     {
         //[Enforced]
@@ -182,4 +180,9 @@ namespace Yotei.Tools.CloneGenerator.Tests.HostAbstract
             Assert.Null(type.GetInterface("ICloneable"));
         }
     }
+#endif
+
+    // ----------------------------------------------------
+#if ENABLED
+#endif
 }
