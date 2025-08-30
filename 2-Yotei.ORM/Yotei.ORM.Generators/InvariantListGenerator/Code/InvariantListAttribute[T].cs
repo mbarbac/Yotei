@@ -5,7 +5,7 @@ namespace Yotei.ORM.Generators;
 // ========================================================
 /// <summary>
 /// Decorates classes for which 'IInvariantList{T}' is to be used as their base one.
-/// <br/> Decorated types need to provide an appropriate clone capability.
+/// <br/> Clone capability is automatically implemented, the decorated host need a copy constructor.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
@@ -28,4 +28,10 @@ public class InvariantListAttribute<T> : Attribute
     /// The type of the elements of the implemented invariant base class.
     /// </summary>
     public Type TType => typeof(T);
+
+    /// <summary>
+    /// If used specifies whether the generated methods are virtual-alike ones, or not. If not
+    /// used, then the generator tries to generate virtual-alike ones.
+    /// </summary>
+    public bool VirtualMethod { get; set; }
 }

@@ -6,7 +6,7 @@ namespace Yotei.ORM.Generators;
 /// <summary>
 /// Decorates classes for which either 'InvariantList{K,T}' or 'InvariantList{T}' is to be used
 /// as their base one.
-/// <br/> Decorated types need to provide an appropriate clone capability.
+/// <br/> Clone capability is automatically implemented, the decorated host need a copy constructor.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
 public class InvariantListAttribute : Attribute
@@ -37,12 +37,6 @@ public class InvariantListAttribute : Attribute
     // ----------------------------------------------------
 
     /// <summary>
-    /// If used then its value specifies the return type of the generated methods. If not used,
-    /// then the return type is the host type itself.
-    /// </summary>
-    public Type ReturnType { get; set; }
-
-    /// <summary>
     /// If not null the type of the keys of the implemented invariant list interface. If null,
     /// then it is not used.
     /// </summary>
@@ -52,4 +46,16 @@ public class InvariantListAttribute : Attribute
     /// The type of the elements of the implemented invariant list interface.
     /// </summary>
     public Type TType { get; }
+
+    /// <summary>
+    /// If used then its value specifies the return type of the generated methods. If not used,
+    /// then the return type is the host type itself.
+    /// </summary>
+    public Type ReturnType { get; set; }
+
+    /// <summary>
+    /// If used specifies whether the generated methods are virtual-alike ones, or not. If not
+    /// used, then the generator tries to generate virtual-alike ones.
+    /// </summary>
+    public bool VirtualMethod { get; set; }
 }

@@ -67,6 +67,9 @@
    <!-- Emit generated files -->
    <ItemGroup>
 	  <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
+	  <Compile Remove="4.Tests_Tools\**" />
+	  <EmbeddedResource Remove="4.Tests_Tools\**" />
+	  <None Remove="4.Tests_Tools\**" />
    </ItemGroup>
 
    <PropertyGroup>

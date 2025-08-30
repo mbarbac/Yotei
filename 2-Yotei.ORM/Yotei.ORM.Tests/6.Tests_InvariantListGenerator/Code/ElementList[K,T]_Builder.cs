@@ -1,0 +1,98 @@
+﻿using THost = Yotei.ORM.Tests.InvariantListGenerator.ElementListKT;
+using IHost = Yotei.ORM.Tests.InvariantListGenerator.IElementListKT;
+using IItem = Yotei.ORM.Tests.InvariantListGenerator.IElement;
+using TKey = string;
+
+namespace Yotei.ORM.Tests.InvariantListGenerator;
+
+partial class ElementListKT
+{
+    // ====================================================
+    /// <inheritdoc cref="IHost.IBuilder"/>
+    [Cloneable<IHost.IBuilder>]
+    [DebuggerDisplay("{ToDebugString(5)}")]
+    public partial class Builder : CoreList<TKey, IItem>, IHost.IBuilder
+    {
+        /// <summary>
+        /// Initializes a new empty instance.
+        /// </summary>
+        /// <param name="sensitive"></param>
+        public Builder(bool sensitive) : base() => CaseSensitive = sensitive;
+
+        /// <summary>
+        /// Initializes a new instance with the elements from the given range.
+        /// </summary>
+        /// <param name="range"></param>
+        public Builder(
+            bool sensitive, IEnumerable<IItem> range) : this(sensitive) => AddRange(range);
+
+        /// <summary>
+        /// Copy constructor.
+        /// </summary>
+        /// <param name="source"></param>
+        protected Builder(Builder source) : this(source.CaseSensitive) => AddRange(source);
+
+        // ------------------------------------------------
+
+        /// <inheritdoc/>
+        public override IItem ValidateItem(IItem item) => item.ThrowWhenNull();
+
+        /// <inheritdoc/>
+        public override string GetKey(IItem item) => item is NamedElement named
+            ? named.Name
+            : throw new ArgumentException("Element is not a named one.").WithData(item);
+
+        /// <inheritdoc/>
+        public override string ValidateKey(string key) => key.NotNullNotEmpty();
+
+        /// <inheritdoc/>
+        public override bool ExpandItems => true;
+
+        /// <inheritdoc/>
+        public override bool IsValidDuplicate(IItem source, IItem item)
+            => ReferenceEquals(source, item)
+            ? true
+            : throw new DuplicateException("Duplicated element.").WithData(item);
+
+        /// <inheritdoc/>
+        public override IEqualityComparer<TKey> Comparer => _Comparer ??= new(CaseSensitive);
+        MyComparer? _Comparer;
+        readonly struct MyComparer(bool Sensitive) : IEqualityComparer<TKey>
+        {
+            public bool Equals(TKey? x, TKey? y)
+                => string.Compare(x, y, !Sensitive) == 0;
+
+            public int GetHashCode(TKey obj) => throw new NotImplementedException();
+        }
+
+        // ------------------------------------------------
+
+        /// <inheritdoc/>
+        protected override bool SameItem(IItem source, IItem item) => base.SameItem(source, item);
+
+        /// <inheritdoc/>
+        protected override List<int> FindDuplicates(string key) => base.FindDuplicates(key);
+
+        // ------------------------------------------------
+
+        /// <inheritdoc/>
+        public virtual IHost CreateInstance() => new THost(CaseSensitive, this);
+
+        /// <inheritdoc/>
+        public bool CaseSensitive
+        {
+            get => _CaseSensitive;
+            set
+            {
+                if (value == _CaseSensitive) return;
+                _CaseSensitive = value;
+
+                if (Count == 0) return;
+                var range = ToList();
+                Clear();
+                AddRange(range);
+            }
+        }
+        bool _CaseSensitive;
+    }
+}
