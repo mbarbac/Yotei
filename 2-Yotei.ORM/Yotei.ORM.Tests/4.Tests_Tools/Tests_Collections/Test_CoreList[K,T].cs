@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography;
-
-namespace Yotei.ORM.Tests.Tools.Collections;
+﻿namespace Yotei.ORM.Tests.Tools.Collections;
 
 // ========================================================
 //[Enforced]
