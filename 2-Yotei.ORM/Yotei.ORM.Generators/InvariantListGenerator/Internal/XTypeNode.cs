@@ -296,11 +296,14 @@ internal class XTypeNode : TypeNode
     /// <summary>
     /// Tries to emit a 'Clone()' method.
     /// </summary>
-    void TryEmitClone(SourceProductionContext context, CodeBuilder cb)
+    void TryEmitClone(SourceProductionContext __, CodeBuilder cb)
     {
         // If implemented or requested, we are done...
         if (FindCloneMethod(Symbol, out _)) return;
         if (FindCloneableAttribute(Symbol, out _)) return;
+
+        // Documentation...
+        cb.AppendLine($"/// <inheritdoc cref=\"ICloneable.Clone\"/>");
 
         // Host is an interface...
         if (Symbol.IsInterface())

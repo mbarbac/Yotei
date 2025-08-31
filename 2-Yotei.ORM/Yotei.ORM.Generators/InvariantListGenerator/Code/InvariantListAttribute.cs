@@ -6,7 +6,8 @@ namespace Yotei.ORM.Generators;
 /// <summary>
 /// Decorates classes for which either 'InvariantList{K,T}' or 'InvariantList{T}' is to be used
 /// as their base one.
-/// <br/> Clone capability is automatically implemented, the decorated host need a copy constructor.
+/// <br/> Clone capability is automatically implemented, hence why the decorated host need a copy
+/// constructor.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
 public class InvariantListAttribute : Attribute

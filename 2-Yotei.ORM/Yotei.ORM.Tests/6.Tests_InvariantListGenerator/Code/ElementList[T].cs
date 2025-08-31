@@ -1,15 +1,14 @@
-﻿using THost = Yotei.ORM.Tests.InvariantListGenerator.ElementListKT;
-using IHost = Yotei.ORM.Tests.InvariantListGenerator.IElementListKT;
+﻿using THost = Yotei.ORM.Tests.InvariantListGenerator.ElementListT;
+using IHost = Yotei.ORM.Tests.InvariantListGenerator.IElementListT;
 using IItem = Yotei.ORM.Tests.InvariantListGenerator.IElement;
-using TKey = string;
 
 namespace Yotei.ORM.Tests.InvariantListGenerator;
 
 // ========================================================
 /// <inheritdoc cref="IHost"/>
-[InvariantList<TKey, IItem>(ReturnType = typeof(IHost))]
+[InvariantList<IItem>(ReturnType = typeof(IHost))]
 [DebuggerDisplay("{ToDebugString(5)}")]
-public partial class ElementListKT : IHost, IItem
+public partial class ElementListT : IHost, IItem
 {
     protected override Builder Items { get; }
 
@@ -17,20 +16,20 @@ public partial class ElementListKT : IHost, IItem
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="sensitive"></param>
-    public ElementListKT(bool sensitive) => Items = new Builder(sensitive);
+    public ElementListT(bool sensitive) => Items = new Builder(sensitive);
 
     /// <summary>
     /// Initializes a new instance with the elements from the given range.
     /// </summary>
     /// <param name="range"></param>
-    public ElementListKT(
+    public ElementListT(
         bool sensitive, IEnumerable<IItem> range) : this(sensitive) => Items.AddRange(range);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected ElementListKT(THost source) : this(source.CaseSensitive) => Items.AddRange(source);
+    protected ElementListT(THost source) : this(source.CaseSensitive) => Items.AddRange(source);
 
     // ----------------------------------------------------
 

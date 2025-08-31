@@ -5,7 +5,8 @@ namespace Yotei.ORM.Generators;
 // ========================================================
 /// <summary>
 /// Decorates classes for which 'IInvariantList{T}' is to be used as their base one.
-/// <br/> Clone capability is automatically implemented, the decorated host need a copy constructor.
+/// <br/> Clone capability is automatically implemented, hence why the decorated host need a copy
+/// constructor.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]

@@ -1,95 +1,17 @@
-﻿namespace Yotei.ORM.Tests.Tools;
+﻿using Chain = Yotei.ORM.Tests.InvariantListGenerator.ElementListT;
+using Element = Yotei.ORM.Tests.InvariantListGenerator.NamedElement;
+
+namespace Yotei.ORM.Tests.InvariantListGenerator;
 
 // ========================================================
 //[Enforced]
-public static partial class Test_InvariantList_T
+public static class Test_ElementListT
 {
-    public interface IElement { }
-    public class Element(string name) : IElement
-    {
-        public string Name { get; set; } = name;
-        public override string ToString() => Name ?? string.Empty;
-    }
     static readonly Element xone = new("one");
     static readonly Element xtwo = new("two");
     static readonly Element xthree = new("three");
     static readonly Element xfour = new("four");
     static readonly Element xfive = new("five");
-
-    // ----------------------------------------------------
-
-    [DebuggerDisplay("{ToDebugString(5)}")]
-    [Cloneable<ICoreList<IElement>>]
-    public partial class Builder : CoreList<IElement>
-    {
-        public Builder(bool sensitive) => Sensitive = sensitive;
-        public Builder(bool sensitive, int capacity) : this(sensitive) => Capacity = capacity;
-        public Builder(bool sensitive, IEnumerable<IElement> range) : this(sensitive) => AddRange(range);
-        protected Builder(Builder source) : this(source.Sensitive) => AddRange(source);
-
-        public override IElement ValidateItem(IElement item)
-        {
-            if (item.ThrowWhenNull() is Element named) named.Name.NotNullNotEmpty();
-            return item;
-        }
-        public override bool ExpandItems => true;
-        public override bool IsValidDuplicate(IElement source, IElement item)
-            => ReferenceEquals(source, item)
-            ? true
-            : throw new DuplicateException("Duplicated element.").WithData(item);
-
-        public override IEqualityComparer<IElement> Comparer => _Comparer ??= new(Sensitive);
-        MyComparer? _Comparer;
-        readonly struct MyComparer(bool Sensitive) : IEqualityComparer<IElement>
-        {
-            public bool Equals(IElement? x, IElement? y)
-            {
-                return x is Element xnamed && y is Element ynamed
-                    ? string.Compare(xnamed.Name, ynamed.Name, !Sensitive) == 0
-                    : ReferenceEquals(x, y);
-            }
-            public int GetHashCode(IElement obj) => throw new NotImplementedException();
-        }
-
-        public bool Sensitive
-        {
-            get => _Sensitive;
-            set
-            {
-                if (value == _Sensitive) return;
-
-                var range = ToList();
-                Clear();
-
-                _Sensitive = value;
-                AddRange(range);
-            }
-        }
-        bool _Sensitive;
-
-        public virtual Chain ToInstance() => new(Sensitive, this);
-    }
-
-    // ----------------------------------------------------
-
-    [DebuggerDisplay("{Items.ToDebugString(5)}")]
-    [Cloneable<IInvariantList<IElement>>]
-    public partial class Chain : InvariantList<IElement>, IElement
-    {
-        protected override Builder Items { get; }
-
-        public Chain(bool sensitive) => Items = new(sensitive);
-        public Chain(bool sensitive, IEnumerable<IElement> range) : this(sensitive) => Items.AddRange(range);
-        protected Chain(Chain source) : this(source.Sensitive) => Items.AddRange(source);
-
-        public bool Sensitive
-        {
-            get => Items.Sensitive;
-            init => Items.Sensitive = value;
-        }
-
-        public virtual Builder ToBuilder() => (Builder)Items.Clone();
-    }
 
     // ----------------------------------------------------
 
