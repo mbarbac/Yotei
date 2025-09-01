@@ -14,7 +14,7 @@ public static class Test_Connection
         Assert.Equal(Connection.RETRIES, connection.Retries);
         Assert.Equal(Connection.RETRYINTERVAL, connection.RetryInterval.Milliseconds);
         Assert.NotNull(connection.Transaction);
-        
+
         Assert.False(connection.IsDisposed);
         Assert.False(connection.Transaction.IsDisposed);
     }

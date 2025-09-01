@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Code;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Yotei.ORM.Code;
 
 // ========================================================
 /// <inheritdoc cref="ITransaction"/>
@@ -11,12 +13,15 @@ public abstract class Transaction : DisposableClass, ITransaction
     public Transaction(IConnection connection)
     {
         Connection = connection.ThrowWhenNull();
+        if (connection is Connection valid) valid.AddTransaction(this);
     }
 
     /// <inheritdoc/>
     protected override void OnDispose(bool disposing)
     {
         if (IsDisposed || !disposing) return;
+
+        if (Connection is Connection valid) valid.RemoveTransaction(this);
 
         try { if (IsActive) Abort(); } catch { }
         try { Lock.Dispose(); } catch { }
@@ -26,6 +31,8 @@ public abstract class Transaction : DisposableClass, ITransaction
     protected override async ValueTask OnDisposeAsync(bool disposing)
     {
         if (IsDisposed || !disposing) return;
+
+        if (Connection is Connection valid) valid.RemoveTransaction(this);
 
         try { if (IsActive) await AbortAsync().ConfigureAwait(false); } catch { }
         try { await Lock.DisposeAsync().ConfigureAwait(false); } catch { }
@@ -66,20 +73,19 @@ public abstract class Transaction : DisposableClass, ITransaction
         ThrowIfDisposed();
         ThrowIfDisposing();
 
-        using (var disp = Lock.Lock())
-        {
-            if (Level >= 1) Level++;
-            else
-            {
-                if (!Connection.IsOpen)
-                {
-                    Connection.Open();
-                    HasOpenedConnection = true;
-                }
+        using var disp = Lock.Lock();
 
-                OnStart();
-                Level = 1;
+        if (Level >= 1) Level++;
+        else
+        {
+            if (!Connection.IsOpen)
+            {
+                Connection.Open();
+                HasOpenedConnection = true;
             }
+
+            OnStart();
+            Level = 1;
         }
     }
 
@@ -89,20 +95,19 @@ public abstract class Transaction : DisposableClass, ITransaction
         ThrowIfDisposed();
         ThrowIfDisposing();
 
-        await using (var disp = await Lock.LockAsync(token).ConfigureAwait(false))
-        {
-            if (Level >= 1) Level++;
-            else
-            {
-                if (!Connection.IsOpen)
-                {
-                    await Connection.OpenAsync(token).ConfigureAwait(false);
-                    HasOpenedConnection = true;
-                }
+        await using var disp = await Lock.LockAsync(token).ConfigureAwait(false);
 
-                await OnStartAsync(token).ConfigureAwait(false);
-                Level = 1;
+        if (Level >= 1) Level++;
+        else
+        {
+            if (!Connection.IsOpen)
+            {
+                await Connection.OpenAsync(token).ConfigureAwait(false);
+                HasOpenedConnection = true;
             }
+
+            await OnStartAsync(token).ConfigureAwait(false);
+            Level = 1;
         }
     }
 
@@ -114,27 +119,26 @@ public abstract class Transaction : DisposableClass, ITransaction
         ThrowIfDisposed();
         ThrowIfDisposing();
 
-        using (var disp = Lock.Lock())
-        {
-            if (Level == 0)
-            {
-                return;
-            }
-            else if (Level == 1)
-            {
-                OnCommit();
-                Level = 0;
+        using var disp = Lock.Lock();
 
-                if (HasOpenedConnection)
-                {
-                    Connection.Close();
-                    HasOpenedConnection = false;
-                }
-            }
-            else
+        if (Level == 0)
+        {
+            return;
+        }
+        else if (Level == 1)
+        {
+            OnCommit();
+            Level = 0;
+
+            if (HasOpenedConnection)
             {
-                Level--;
+                HasOpenedConnection = false;
+                Connection.Close();
             }
+        }
+        else
+        {
+            Level--;
         }
     }
 
@@ -144,27 +148,26 @@ public abstract class Transaction : DisposableClass, ITransaction
         ThrowIfDisposed();
         ThrowIfDisposing();
 
-        await using (var disp = await Lock.LockAsync(token).ConfigureAwait(false))
-        {
-            if (Level == 0)
-            {
-                return;
-            }
-            else if (Level == 1)
-            {
-                await OnCommitAsync(token).ConfigureAwait(false);
-                Level = 0;
+        await using var disp = await Lock.LockAsync(token).ConfigureAwait(false);
 
-                if (HasOpenedConnection)
-                {
-                    await Connection.CloseAsync().ConfigureAwait(false);
-                    HasOpenedConnection = false;
-                }
-            }
-            else
+        if (Level == 0)
+        {
+            return;
+        }
+        else if (Level == 1)
+        {
+            await OnCommitAsync(token).ConfigureAwait(false);
+            Level = 0;
+
+            if (HasOpenedConnection)
             {
-                Level--;
+                HasOpenedConnection = false;
+                await Connection.CloseAsync().ConfigureAwait(false);
             }
+        }
+        else
+        {
+            Level--;
         }
     }
 
@@ -175,16 +178,15 @@ public abstract class Transaction : DisposableClass, ITransaction
     {
         if (IsDisposed) return;
 
-        using (var disp = Lock.Lock())
-        {
-            OnAbort();
-            Level = 0;
+        using var disp = Lock.Lock();
 
-            if (HasOpenedConnection)
-            {
-                Connection.Close();
-                HasOpenedConnection = false;
-            }
+        OnAbort();
+        Level = 0;
+
+        if (HasOpenedConnection)
+        {
+            Connection.Close();
+            HasOpenedConnection = false;
         }
     }
 
@@ -193,16 +195,15 @@ public abstract class Transaction : DisposableClass, ITransaction
     {
         if (IsDisposed) return;
 
-        await using (var disp = await Lock.LockAsync().ConfigureAwait(false))
-        {
-            await OnAbortAsync().ConfigureAwait(false);
-            Level = 0;
+        await using var disp = await Lock.LockAsync().ConfigureAwait(false);
 
-            if (HasOpenedConnection)
-            {
-                await Connection.CloseAsync().ConfigureAwait(false);
-                HasOpenedConnection = false;
-            }
+        await OnAbortAsync().ConfigureAwait(false);
+        Level = 0;
+
+        if (HasOpenedConnection)
+        {
+            await Connection.CloseAsync().ConfigureAwait(false);
+            HasOpenedConnection = false;
         }
     }
 

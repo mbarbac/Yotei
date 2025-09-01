@@ -3,8 +3,11 @@
 // ========================================================
 public class FakeTransaction : Transaction
 {
-    public FakeTransaction(IConnection connection) : base(connection) { }
-    public override string ToString() => $"FakeTransaction({Connection})";
+    public FakeTransaction(IConnection connection) : base(connection) => Instance = Interlocked.Increment(ref Sequence);
+    public override string ToString() => $"#{Instance}:FakeTransaction({Connection})";
+
+    long Instance { get; }
+    static long Sequence = 0;
 
     protected override void OnStart() { }
     protected override ValueTask OnStartAsync(CancellationToken _) => ValueTask.CompletedTask;

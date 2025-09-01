@@ -1,4 +1,9 @@
-﻿namespace Yotei.ORM.Code;
+﻿#pragma warning disable IDE0008
+#pragma warning disable IDE0019
+
+using System.Text.Json;
+
+namespace Yotei.ORM.Code;
 
 // ========================================================
 /// <inheritdoc cref="IConnection"/>
@@ -32,14 +37,7 @@ public abstract partial class Connection : DisposableClass, IConnection
     {
         if (IsDisposed || !disposing) return;
 
-        var valid = _Transaction as Transaction;
-        if (valid is not null && !valid.IsDisposed)
-        {
-            valid.HasOpenedConnection = false;
-            try { valid.Dispose(); }
-            catch { }
-        }
-
+        try { EndKnownTransactions(true); } catch { }
         try { if (IsOpen) Close(); } catch { }
         try { Lock.Dispose(); } catch { }
     }
@@ -49,14 +47,7 @@ public abstract partial class Connection : DisposableClass, IConnection
     {
         if (IsDisposed || !disposing) return;
 
-        var valid = _Transaction as Transaction;
-        if (valid is not null && !valid.IsDisposed)
-        {
-            valid.HasOpenedConnection = false;
-            try { await valid.DisposeAsync().ConfigureAwait(false); }
-            catch { }
-        }
-
+        try { await EndKnownTransactionsAsync(true).ConfigureAwait(false); } catch { }
         try { if (IsOpen) await CloseAsync().ConfigureAwait(false); } catch { }
         try { await Lock.DisposeAsync().ConfigureAwait(false); } catch { }
     }
@@ -153,13 +144,7 @@ public abstract partial class Connection : DisposableClass, IConnection
 
         using var disp = Lock.Lock();
 
-        var valid = _Transaction as Transaction;
-        if (valid is not null && !valid.IsDisposed && valid.IsActive)
-        {
-            valid.HasOpenedConnection = false;
-            valid.Abort();
-        }
-
+        EndKnownTransactions(disposing: false);
         OnClose();
     }
 
@@ -170,14 +155,8 @@ public abstract partial class Connection : DisposableClass, IConnection
         if (!IsOpen) return;
 
         await using var disp = await Lock.LockAsync().ConfigureAwait(false);
-        
-        var valid = _Transaction as Transaction;
-        if (valid is not null && !valid.IsDisposed && valid.IsActive)
-        {
-            valid.HasOpenedConnection = false;
-            await valid.AbortAsync().ConfigureAwait(false);
-        }
 
+        await EndKnownTransactionsAsync(disposing: false).ConfigureAwait(false);
         await OnCloseAsync().ConfigureAwait(false);
     }
 
@@ -205,20 +184,122 @@ public abstract partial class Connection : DisposableClass, IConnection
 
     // ----------------------------------------------------
 
+    List<ITransaction> KnownTransactions { get; } = [];
+
+    /// <summary>
+    /// Invoked to terminate all know transactions.
+    /// </summary>
+    void EndKnownTransactions(bool disposing)
+    {
+        var taken = false;
+        try
+        {
+            Monitor.Enter(KnownTransactions, ref taken);
+            if (taken)
+            {
+                while (KnownTransactions.Count > 0)
+                {
+                    var transaction = KnownTransactions[0];
+                    KnownTransactions.RemoveAt(0);
+
+                    var valid = transaction as Transaction;
+                    if (valid != null) valid.HasOpenedConnection = false;
+
+                    if (disposing) transaction.Dispose();
+                    else if (transaction.IsActive) transaction.Abort();
+                }
+                if (!disposing)
+                {
+                    if (_Transaction != null && !KnownTransactions.Contains(_Transaction))
+                        KnownTransactions.Add(_Transaction);
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException(
+                    "Cannot obtain an exclusive lock on the collection of transactions.")
+                    .WithData(this);
+            }
+        }
+        finally { if (taken) Monitor.Exit(KnownTransactions); }
+    }
+
+    /// <summary>
+    /// Invoked to terminate all know transactions.
+    /// </summary>
+    async ValueTask EndKnownTransactionsAsync(bool disposing)
+    {
+        var taken = false;
+        try
+        {
+            Monitor.Enter(KnownTransactions, ref taken);
+            if (taken)
+            {
+                while (KnownTransactions.Count > 0)
+                {
+                    var transaction = KnownTransactions[0];
+                    KnownTransactions.RemoveAt(0);
+
+                    var valid = transaction as Transaction;
+                    if (valid != null) valid.HasOpenedConnection = false;
+
+                    if (disposing) await transaction.DisposeAsync().ConfigureAwait(false);
+                    else if (transaction.IsActive) await transaction.AbortAsync().ConfigureAwait(false);
+                }
+                if (!disposing)
+                {
+                    if (_Transaction != null && !KnownTransactions.Contains(_Transaction))
+                        KnownTransactions.Add(_Transaction);
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException(
+                    "Cannot obtain an exclusive lock on the collection of transactions.")
+                    .WithData(this);
+            }
+        }
+        finally { if (taken) Monitor.Exit(KnownTransactions); }
+    }
+
+    /// <summary>
+    /// Adds the given transaction to the internal collection of known ones.
+    /// </summary>
+    internal void AddTransaction(ITransaction transaction)
+    {
+        lock (KnownTransactions)
+            if (!KnownTransactions.Contains(transaction)) KnownTransactions.Add(transaction);
+    }
+
+    /// <summary>
+    /// Removes the given transaction from the internal collection of known ones.
+    /// </summary>
+    internal bool RemoveTransaction(ITransaction transaction)
+    {
+        lock (KnownTransactions)
+            return KnownTransactions.Remove(transaction);
+    }
+
     /// <inheritdoc/>
     public ITransaction Transaction
     {
         get
         {
-            if (_Transaction is null || _Transaction.IsDisposed)
+            bool disposing = IsDisposed || OnDisposing;
+
+            if (_Transaction == null) // We may need to return a disposed one...
             {
                 _Transaction = CreateTransaction();
-                if (IsDisposed || OnDisposing) _Transaction.Dispose();
+                if (disposing) _Transaction.Dispose();
+            }
+            else // We may need to create a not-disposed one...
+            {
+                if (_Transaction.IsDisposed && !disposing) _Transaction = CreateTransaction();
             }
             return _Transaction;
         }
     }
-    ITransaction? _Transaction = null;
+    ITransaction? _Transaction;
 
     /// <summary>
     /// Invoked to create a new object of the appropriate type for this instance.
