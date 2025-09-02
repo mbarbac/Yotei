@@ -16,10 +16,10 @@ public partial interface IElementListKT : IItem
     /// Returns a new builder based upon the contents of this instance.
     /// </summary>
     /// <returns></returns>
-    IBuilder CreateInstance();
+    IBuilder CreateBuilder();
 
     /// <summary>
-    /// Whether the names of the elements in this collection are case sensitive or not.
+    /// The engine this instance is associated with.
     /// </summary>
-    bool CaseSensitive { get; }
+    IEngine Engine { get; }
 }

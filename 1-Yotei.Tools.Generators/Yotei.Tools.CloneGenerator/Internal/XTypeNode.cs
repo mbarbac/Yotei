@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools.CloneGenerator;
+﻿using Microsoft.CodeAnalysis.Host;
+
+namespace Yotei.Tools.CloneGenerator;
 
 // ========================================================
 /// <inheritdoc/>
@@ -196,9 +198,12 @@ internal class XTypeNode : TypeNode
                 }
 
                 // Or a base method was requested we need to reabstract...
-                if (FindCloneableAttribute(host, out _, host.AllBaseTypes()))
+                if (FindCloneableAttribute(host, out var attr, host.AllBaseTypes()))
                 {
-                    return host.IsAbstract || novirtual ? "public new " : "public override ";
+                    if (FindVirtualMethodValue(attr, out var xtemp) && !xtemp)
+                        return "public new ";
+                    
+                    return (novirtual || issealed) ? "public new " : "public override ";
                 }
             }
 

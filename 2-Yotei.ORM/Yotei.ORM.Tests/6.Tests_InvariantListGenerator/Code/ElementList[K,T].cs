@@ -8,7 +8,7 @@ namespace Yotei.ORM.Tests.InvariantListGenerator;
 // ========================================================
 /// <inheritdoc cref="IHost"/>
 [InvariantList<TKey, IItem>(ReturnType = typeof(IHost))]
-[DebuggerDisplay("{ToDebugString(5)}")]
+[DebuggerDisplay("{Items.ToDebugString(5)}")]
 public partial class ElementListKT : IHost, IItem
 {
     protected override Builder Items { get; }
@@ -16,21 +16,25 @@ public partial class ElementListKT : IHost, IItem
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    /// <param name="sensitive"></param>
-    public ElementListKT(bool sensitive) => Items = new Builder(sensitive);
+    /// <param name="engine"></param>
+    public ElementListKT(IEngine engine) => Items = new Builder(engine);
 
     /// <summary>
     /// Initializes a new instance with the elements from the given range.
     /// </summary>
+    /// <param name="engine"></param>
     /// <param name="range"></param>
     public ElementListKT(
-        bool sensitive, IEnumerable<IItem> range) : this(sensitive) => Items.AddRange(range);
+        IEngine engine, IEnumerable<IItem> range) : this(engine) => Items.AddRange(range);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected ElementListKT(THost source) : this(source.CaseSensitive) => Items.AddRange(source);
+    protected ElementListKT(THost source) : this(source.Engine) => Items.AddRange(source);
+
+    /// <inheritdoc/>
+    public override string ToString() => Items.ToString();
 
     // ----------------------------------------------------
 
@@ -42,7 +46,7 @@ public partial class ElementListKT : IHost, IItem
         if (other is null) return false;
         if (other is not IHost valid) return false;
 
-        if (CaseSensitive != valid.CaseSensitive) return false;
+        if (!Engine.Equals(valid.Engine)) return false;
         if (Count != valid.Count) return false;
 
         for (int i = 0; i < Count; i++)
@@ -50,7 +54,7 @@ public partial class ElementListKT : IHost, IItem
             var item = Items[i];
             var temp = valid[i];
             var same = item is NamedElement xitem && temp is NamedElement xtemp
-                ? xitem.Equals(xtemp, CaseSensitive)
+                ? xitem.Equals(xtemp, Engine.CaseSensitiveNames)
                 : item.Equals(temp);
 
             if (!same) return false;
@@ -74,7 +78,7 @@ public partial class ElementListKT : IHost, IItem
     /// <inheritdoc/>
     public override int GetHashCode()
     {
-        var code = CaseSensitive.GetHashCode();
+        var code = Engine.GetHashCode();
         for (int i = 0; i < Count; i++) code = HashCode.Combine(code, Items[i]);
         return code;
     }
@@ -82,8 +86,8 @@ public partial class ElementListKT : IHost, IItem
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public virtual IHost.IBuilder CreateInstance() => Items.Clone();
+    public virtual IHost.IBuilder CreateBuilder() => Items.Clone();
 
     /// <inheritdoc/>
-    public bool CaseSensitive => Items.CaseSensitive;
+    public IEngine Engine => Items.Engine;
 }

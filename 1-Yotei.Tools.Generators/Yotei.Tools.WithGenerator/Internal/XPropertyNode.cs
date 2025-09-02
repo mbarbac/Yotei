@@ -292,10 +292,12 @@ internal class XPropertyNode : PropertyNode
                 }
 
                 // Or a base method was requested...
-                if (FindWithAttribute(parent, out _, parent.AllBaseTypes()))
+                if (FindWithAttribute(parent, out var attr, parent.AllBaseTypes()))
                 {
-                    if (novirtual || issealed) return "public new ";
-                    return "public override ";
+                    if (FindVirtualMethodValue(attr, out var xtemp) && !xtemp)
+                        return "public new ";
+
+                    return (novirtual || issealed) ? "public new " : "public override ";
                 }
             }
 

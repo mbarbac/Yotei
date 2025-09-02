@@ -16,21 +16,22 @@ partial class ElementListKT
         /// <summary>
         /// Initializes a new empty instance.
         /// </summary>
-        /// <param name="sensitive"></param>
-        public Builder(bool sensitive) : base() => CaseSensitive = sensitive;
+        /// <param name="engine"></param>
+        public Builder(IEngine engine) : base() => Engine = engine.ThrowWhenNull();
 
         /// <summary>
         /// Initializes a new instance with the elements from the given range.
         /// </summary>
+        /// <param name="engine"></param>
         /// <param name="range"></param>
         public Builder(
-            bool sensitive, IEnumerable<IItem> range) : this(sensitive) => AddRange(range);
+            IEngine engine, IEnumerable<IItem> range) : this(engine) => AddRange(range);
 
         /// <summary>
         /// Copy constructor.
         /// </summary>
         /// <param name="source"></param>
-        protected Builder(Builder source) : this(source.CaseSensitive) => AddRange(source);
+        protected Builder(Builder source) : this(source.Engine) => AddRange(source);
 
         // ------------------------------------------------
 
@@ -55,7 +56,7 @@ partial class ElementListKT
             : throw new DuplicateException("Duplicated element.").WithData(item);
 
         /// <inheritdoc/>
-        public override IEqualityComparer<TKey> Comparer => _Comparer ??= new(CaseSensitive);
+        public override IEqualityComparer<TKey> Comparer => _Comparer ??= new(Engine.CaseSensitiveNames);
         MyComparer? _Comparer;
         readonly struct MyComparer(bool Sensitive) : IEqualityComparer<TKey>
         {
@@ -76,16 +77,19 @@ partial class ElementListKT
         // ------------------------------------------------
 
         /// <inheritdoc/>
-        public virtual IHost CreateInstance() => new THost(CaseSensitive, this);
+        public virtual IHost CreateInstance()
+            => Count == 0 ? new THost(Engine) : new THost(Engine, this);
 
         /// <inheritdoc/>
-        public bool CaseSensitive
+        public IEngine Engine
         {
-            get => _CaseSensitive;
+            get => _Engine;
             set
             {
-                if (value == _CaseSensitive) return;
-                _CaseSensitive = value;
+                value.ThrowWhenNull();
+
+                if (_Engine?.Equals(value) ?? false) return;
+                _Engine = value;
 
                 if (Count == 0) return;
                 var range = ToList();
@@ -93,6 +97,6 @@ partial class ElementListKT
                 AddRange(range);
             }
         }
-        bool _CaseSensitive;
+        IEngine _Engine = default!;
     }
 }

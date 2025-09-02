@@ -1,4 +1,4 @@
-﻿#define ENABLED
+﻿#define ENABLEDX
 
 using static Yotei.Tools.Diagnostics.ConsoleEx;
 using static System.ConsoleColor;
@@ -111,7 +111,7 @@ namespace Yotei.Tools.CloneGenerator.Tests.HostConcrete
 #endif
 
     // ----------------------------------------------------
-#if ENABLED
+#if ENABLEDX
     // Using VirtualMethod...
     [Cloneable(VirtualMethod = false)]
     public partial class CType03A : Core

@@ -1,16 +1,17 @@
-﻿using THost = Yotei.ORM.Tests.InvariantListGenerator.ElementListT;
-using IHost = Yotei.ORM.Tests.InvariantListGenerator.IElementListT;
-using IItem = Yotei.ORM.Tests.InvariantListGenerator.IElement;
+﻿using THost = Yotei.ORM.Code.ParameterList;
+using IHost = Yotei.ORM.IParameterList;
+using IItem = Yotei.ORM.IParameter;
+using TKey = string;
 
-namespace Yotei.ORM.Tests.InvariantListGenerator;
+namespace Yotei.ORM.Code;
 
-partial class ElementListT
+partial class ParameterList
 {
     // ====================================================
     /// <inheritdoc cref="IHost.IBuilder"/>
     [Cloneable<IHost.IBuilder>]
     [DebuggerDisplay("{ToDebugString(5)}")]
-    public partial class Builder : CoreList<IItem>, IHost.IBuilder
+    public partial class Builder : CoreList<TKey, IItem>, IHost.IBuilder
     {
         /// <summary>
         /// Initializes a new empty instance.
@@ -38,7 +39,13 @@ partial class ElementListT
         public override IItem ValidateItem(IItem item) => item.ThrowWhenNull();
 
         /// <inheritdoc/>
-        public override bool ExpandItems => true;
+        public override string GetKey(IItem item) => item.Name;
+
+        /// <inheritdoc/>
+        public override string ValidateKey(string key) => key.NotNullNotEmpty();
+
+        /// <inheritdoc/>
+        public override bool ExpandItems => false;
 
         /// <inheritdoc/>
         public override bool IsValidDuplicate(IItem source, IItem item)
@@ -47,27 +54,15 @@ partial class ElementListT
             : throw new DuplicateException("Duplicated element.").WithData(item);
 
         /// <inheritdoc/>
-        public override IEqualityComparer<IItem> Comparer => _Comparer ??= new(Engine);
+        public override IEqualityComparer<TKey> Comparer => _Comparer ??= new(Engine.CaseSensitiveNames);
         MyComparer? _Comparer;
-        readonly struct MyComparer(IEngine Engine) : IEqualityComparer<IItem>
+        readonly struct MyComparer(bool Sensitive) : IEqualityComparer<TKey>
         {
-            public bool Equals(IItem? x, IItem? y)
-            {
-                return x is NamedElement xnamed && y is NamedElement ynamed
-                    ? string.Compare(xnamed.Name, ynamed.Name, !Engine.CaseSensitiveNames) == 0
-                    : x?.Equals(y) ?? false;
-            }
+            public bool Equals(TKey? x, TKey? y)
+                => string.Compare(x, y, !Sensitive) == 0;
 
-            public int GetHashCode(IItem obj) => throw new NotImplementedException();
+            public int GetHashCode(TKey obj) => throw new NotImplementedException();
         }
-
-        // ------------------------------------------------
-
-        /// <inheritdoc/>
-        protected override bool SameItem(IItem source, IItem item) => base.SameItem(source, item);
-
-        /// <inheritdoc/>
-        protected override List<int> FindDuplicates(IItem item) => base.FindDuplicates(item);
 
         // ------------------------------------------------
 
@@ -93,5 +88,34 @@ partial class ElementListT
             }
         }
         IEngine _Engine = default!;
+
+        // ------------------------------------------------
+
+        /// <inheritdoc/>
+        public string NextName()
+        {
+            for (int i = Count; i < int.MaxValue; i++)
+            {
+                var name = $"{Engine.ParameterPrefix}{i}";
+                var index = IndexOf(name);
+                if (index < 0) return name;
+            }
+
+            throw new UnExpectedException("Range of integers exahusted.");
+        }
+
+        /// <inheritdoc/>
+        public virtual int AddNew(object? value, out IItem item)
+        {
+            item = new Parameter(NextName(), value);
+            return Add(item);
+        }
+
+        /// <inheritdoc/>
+        public virtual int InsertNew(int index, object? value, out IItem item)
+        {
+            item = new Parameter(NextName(), value);
+            return Insert(index, item);
+        }
     }
 }

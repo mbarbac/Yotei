@@ -19,7 +19,8 @@ public static class Test_ElementListT
     [Fact]
     public static void Test_Create_Empty()
     {
-        var items = new Chain(false);
+        var engine = new FakeEngine();
+        var items = new Chain(engine);
         Assert.Empty(items);
     }
 
@@ -27,22 +28,23 @@ public static class Test_ElementListT
     [Fact]
     public static void Test_Create_Range()
     {
-        var items = new Chain(false, []);
+        var engine = new FakeEngine();
+        var items = new Chain(engine, []);
         Assert.Empty(items);
 
-        items = new Chain(false, [xone, xtwo, xthree]);
+        items = new Chain(engine, [xone, xtwo, xthree]);
         Assert.Equal(3, items.Count);
         Assert.Same(xone, items[0]);
         Assert.Same(xtwo, items[1]);
         Assert.Same(xthree, items[2]);
 
-        try { _ = new Chain(false, null!); Assert.Fail(); }
+        try { _ = new Chain(engine, null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
 
-        try { _ = new Chain(false, [null!]); Assert.Fail(); }
+        try { _ = new Chain(engine, [null!]); Assert.Fail(); }
         catch (ArgumentException) { }
 
-        try { _ = new Chain(false, [new Element("")]); Assert.Fail(); }
+        try { _ = new Chain(engine, [new Element("")]); Assert.Fail(); }
         catch (EmptyException) { }
     }
 
@@ -50,21 +52,23 @@ public static class Test_ElementListT
     [Fact]
     public static void Test_Create_With_Duplicates()
     {
-        var items = new Chain(false, [xone, xone]);
+        var engine = new FakeEngine();
+        var items = new Chain(engine, [xone, xone]);
         Assert.Equal(2, items.Count);
         Assert.Same(xone, items[0]);
         Assert.Same(xone, items[1]);
 
-        items = new Chain(false, [xone, xtwo, xone]);
+        items = new Chain(engine, [xone, xtwo, xone]);
         Assert.Equal(3, items.Count);
         Assert.Same(xone, items[0]);
         Assert.Same(xtwo, items[1]);
         Assert.Same(xone, items[2]);
 
-        try { _ = new Chain(false, [xone, new Element("ONE")]); Assert.Fail(); }
+        try { _ = new Chain(engine, [xone, new Element("ONE")]); Assert.Fail(); }
         catch (DuplicateException) { }
 
-        try { _ = new Chain(true, [xone, new Element("one")]); Assert.Fail(); }
+        engine = new FakeEngine() { CaseSensitiveNames = true };
+        try { _ = new Chain(engine, [xone, new Element("one")]); Assert.Fail(); }
         catch (DuplicateException) { }
     }
 
@@ -72,8 +76,9 @@ public static class Test_ElementListT
     [Fact]
     public static void Test_Create_Extended()
     {
-        var other = new Chain(false, [xtwo, xthree]);
-        var items = new Chain(false, [xone, other]);
+        var engine = new FakeEngine();
+        var other = new Chain(engine, [xtwo, xthree]);
+        var items = new Chain(engine, [xone, other]);
 
         Assert.Equal(3, items.Count);
         Assert.Same(xone, items[0]);
@@ -87,7 +92,8 @@ public static class Test_ElementListT
     [Fact]
     public static void Test_Clone()
     {
-        var source = new Chain(false, [xone, xtwo, xthree, xone]);
+        var engine = new FakeEngine();
+        var source = new Chain(engine, [xone, xtwo, xthree, xone]);
         var target = source.Clone();
 
         Assert.NotSame(source, target);
@@ -104,7 +110,8 @@ public static class Test_ElementListT
     [Fact]
     public static void Test_Find()
     {
-        var items = new Chain(false, [xone, xtwo, xthree, xone]);
+        var engine = new FakeEngine();
+        var items = new Chain(engine, [xone, xtwo, xthree, xone]);
 
         Assert.Equal(-1, items.IndexOf(xfive));
 
@@ -129,7 +136,8 @@ public static class Test_ElementListT
     [Fact]
     public static void Test_Find_Predicate()
     {
-        var items = new Chain(false, [xone, xtwo, xthree, xone]);
+        var engine = new FakeEngine();
+        var items = new Chain(engine, [xone, xtwo, xthree, xone]);
 
         Assert.Equal(-1, items.IndexOf(x => ((Element)x).Name.Contains('z')));
 
@@ -148,7 +156,8 @@ public static class Test_ElementListT
     [Fact]
     public static void Test_GetRange()
     {
-        var source = new Chain(false, [xone, xtwo, xthree, xfour]);
+        var engine = new FakeEngine();
+        var source = new Chain(engine, [xone, xtwo, xthree, xfour]);
         var target = source.GetRange(0, 0);
         Assert.Empty(target);
 
@@ -176,7 +185,8 @@ public static class Test_ElementListT
     [Fact]
     public static void Test_Replace()
     {
-        var source = new Chain(false, [xone, xtwo, xthree]);
+        var engine = new FakeEngine();
+        var source = new Chain(engine, [xone, xtwo, xthree]);
         var target = source.Replace(1, xtwo);
         Assert.Same(source, target);
 
@@ -195,8 +205,9 @@ public static class Test_ElementListT
     [Fact]
     public static void Test_Replace_Extended()
     {
-        var source = new Chain(false, [xone, xtwo, xthree]);
-        var other = new Chain(false, [xfour, xfive]);
+        var engine = new FakeEngine();
+        var source = new Chain(engine, [xone, xtwo, xthree]);
+        var other = new Chain(engine, [xfour, xfive]);
 
         var target = source.Replace(1, other);
         Assert.NotSame(source, target);
@@ -211,8 +222,9 @@ public static class Test_ElementListT
     [Fact]
     public static void Test_Replace_Extended_Empty()
     {
-        var source = new Chain(false, [xone, xtwo, xthree]);
-        var other = new Chain(false);
+        var engine = new FakeEngine();
+        var source = new Chain(engine, [xone, xtwo, xthree]);
+        var other = new Chain(engine);
 
         var target = source.Replace(1, other);
         Assert.Same(source, target);
@@ -225,7 +237,8 @@ public static class Test_ElementListT
     [Fact]
     public static void Test_Add()
     {
-        var source = new Chain(false, [xone, xtwo]);
+        var engine = new FakeEngine();
+        var source = new Chain(engine, [xone, xtwo]);
         var target = source.Add(xthree);
 
         Assert.NotSame(source, target);
@@ -245,7 +258,8 @@ public static class Test_ElementListT
     [Fact]
     public static void Test_Add_Duplicates()
     {
-        var source = new Chain(false, [xone, xtwo]);
+        var engine = new FakeEngine();
+        var source = new Chain(engine, [xone, xtwo]);
         var target = source.Add(xone);
 
         Assert.NotSame(source, target);
@@ -254,7 +268,7 @@ public static class Test_ElementListT
         Assert.Same(xtwo, target[1]);
         Assert.Same(xone, target[2]);
 
-        source = new Chain(false, [xone, xtwo]);
+        source = new Chain(engine, [xone, xtwo]);
         try { _ = source.Add(new Element("one")); Assert.Fail(); }
         catch (DuplicateException) { }
     }
@@ -263,13 +277,14 @@ public static class Test_ElementListT
     [Fact]
     public static void Test_Add_Extended()
     {
-        var source = new Chain(false, [xone, xtwo, xthree]);
-        var other = new Chain(false, []);
+        var engine = new FakeEngine();
+        var source = new Chain(engine, [xone, xtwo, xthree]);
+        var other = new Chain(engine, []);
 
         var target = source.Add(other);
         Assert.Same(source, target);
 
-        other = new Chain(false, [xfour, xfive]);
+        other = new Chain(engine, [xfour, xfive]);
         target = source.Add(other);
         Assert.NotSame(source, target);
         Assert.Equal(5, target.Count);
@@ -286,7 +301,8 @@ public static class Test_ElementListT
     [Fact]
     public static void Test_AddRange()
     {
-        var source = new Chain(false, [xone, xtwo]);
+        var engine = new FakeEngine();
+        var source = new Chain(engine, [xone, xtwo]);
         var target = source.AddRange([]);
         Assert.Same(source, target);
 
@@ -312,13 +328,14 @@ public static class Test_ElementListT
     [Fact]
     public static void Test_AddRange_Extended()
     {
-        var source = new Chain(false, [xone, xtwo]);
-        var other = new Chain(false, []);
+        var engine = new FakeEngine();
+        var source = new Chain(engine, [xone, xtwo]);
+        var other = new Chain(engine, []);
 
         var target = source.AddRange([other]);
         Assert.Same(source, target);
 
-        other = new Chain(false, [xfour, xfive]);
+        other = new Chain(engine, [xfour, xfive]);
         target = source.AddRange([xthree, other]);
         Assert.NotSame(source, target);
         Assert.Equal(5, target.Count);
@@ -335,7 +352,8 @@ public static class Test_ElementListT
     [Fact]
     public static void Test_Insert()
     {
-        var source = new Chain(false, [xone, xtwo]);
+        var engine = new FakeEngine();
+        var source = new Chain(engine, [xone, xtwo]);
         var target = source.Insert(2, xthree);
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
@@ -354,7 +372,8 @@ public static class Test_ElementListT
     [Fact]
     public static void Test_Insert_Duplicates()
     {
-        var source = new Chain(false, [xone, xtwo]);
+        var engine = new FakeEngine();
+        var source = new Chain(engine, [xone, xtwo]);
         var target = source.Insert(2, xone);
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
@@ -362,7 +381,7 @@ public static class Test_ElementListT
         Assert.Same(xtwo, target[1]);
         Assert.Same(xone, target[2]);
 
-        source = new Chain(false, [xone, xtwo]);
+        source = new Chain(engine, [xone, xtwo]);
         try { _ = source.Insert(0, new Element("one")); Assert.Fail(); }
         catch (DuplicateException) { }
     }
@@ -371,13 +390,14 @@ public static class Test_ElementListT
     [Fact]
     public static void Test_Insert_Extended()
     {
-        var source = new Chain(false, [xone, xtwo, xthree]);
-        var other = new Chain(false, []);
+        var engine = new FakeEngine();
+        var source = new Chain(engine, [xone, xtwo, xthree]);
+        var other = new Chain(engine, []);
 
         var target = source.Insert(3, other);
         Assert.Same(source, target);
 
-        other = new Chain(false, [xfour, xfive]);
+        other = new Chain(engine, [xfour, xfive]);
         target = source.Insert(3, other);
         Assert.NotSame(source, target);
         Assert.Equal(5, target.Count);
@@ -394,7 +414,8 @@ public static class Test_ElementListT
     [Fact]
     public static void Test_InsertRange()
     {
-        var source = new Chain(false, [xone, xtwo]);
+        var engine = new FakeEngine();
+        var source = new Chain(engine, [xone, xtwo]);
         var target = source.InsertRange(2, []);
         Assert.Same(source, target);
 
@@ -420,13 +441,14 @@ public static class Test_ElementListT
     [Fact]
     public static void Test_InsertRange_Extended()
     {
-        var source = new Chain(false, [xone, xtwo]);
-        var other = new Chain(false, []);
+        var engine = new FakeEngine();
+        var source = new Chain(engine, [xone, xtwo]);
+        var other = new Chain(engine, []);
 
         var target = source.InsertRange(2, [other]);
         Assert.Same(source, target);
 
-        other = new Chain(false, [xfour, xfive]);
+        other = new Chain(engine, [xfour, xfive]);
         target = source.InsertRange(2, [xthree, other]);
         Assert.NotSame(source, target);
         Assert.Equal(5, target.Count);
@@ -443,7 +465,8 @@ public static class Test_ElementListT
     [Fact]
     public static void Test_RemoveAt()
     {
-        var source = new Chain(false, [xone, xtwo, xthree, xone]);
+        var engine = new FakeEngine();
+        var source = new Chain(engine, [xone, xtwo, xthree, xone]);
 
         var target = source.RemoveAt(0);
         Assert.NotSame(source, target);
@@ -460,7 +483,8 @@ public static class Test_ElementListT
     [Fact]
     public static void Test_RemoveRange()
     {
-        var source = new Chain(false, [xone, xtwo, xthree, xone]);
+        var engine = new FakeEngine();
+        var source = new Chain(engine, [xone, xtwo, xthree, xone]);
         var target = source.RemoveRange(0, 0);
         Assert.Same(source, target);
 
@@ -494,7 +518,8 @@ public static class Test_ElementListT
     [Fact]
     public static void Test_Remove_Item()
     {
-        var source = new Chain(false, [xone, xtwo, xthree, xone]);
+        var engine = new FakeEngine();
+        var source = new Chain(engine, [xone, xtwo, xthree, xone]);
         var target = source.Remove(xfour);
         Assert.Same(source, target);
 
@@ -543,8 +568,9 @@ public static class Test_ElementListT
     [Fact]
     public static void Test_Remove_Item_Extended()
     {
-        var source = new Chain(false, [xone, xtwo, xthree, xone]);
-        var other = new Chain(false, [xone, xthree]);
+        var engine = new FakeEngine();
+        var source = new Chain(engine, [xone, xtwo, xthree, xone]);
+        var other = new Chain(engine, [xone, xthree]);
 
         var target = source.Remove(other);
         Assert.NotSame(source, target);
@@ -570,7 +596,8 @@ public static class Test_ElementListT
     [Fact]
     public static void Test_Remove_Predicate()
     {
-        var source = new Chain(false, [xone, xtwo, xthree, xone]);
+        var engine = new FakeEngine();
+        var source = new Chain(engine, [xone, xtwo, xthree, xone]);
         var target = source.Remove(x => ((Element)x).Name.Contains('z'));
         Assert.Same(source, target);
 
@@ -601,11 +628,12 @@ public static class Test_ElementListT
     [Fact]
     public static void Test_Clear()
     {
-        var source = new Chain(false);
+        var engine = new FakeEngine();
+        var source = new Chain(engine);
         var target = source.Clear();
         Assert.Same(source, target);
 
-        source = new Chain(false, [xone, xtwo, xthree, xone]);
+        source = new Chain(engine, [xone, xtwo, xthree, xone]);
         target = source.Clear();
         Assert.NotSame(source, target);
         Assert.Empty(target);

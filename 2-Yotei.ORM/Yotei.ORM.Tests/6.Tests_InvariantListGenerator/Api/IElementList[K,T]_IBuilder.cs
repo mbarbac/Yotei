@@ -19,7 +19,7 @@ partial interface IElementListKT
         /// <returns></returns>
         IHost CreateInstance();
 
-        /// <inheritdoc cref="IHost.CaseSensitive"/>
-        bool CaseSensitive { get; }
+        /// <inheritdoc cref="IHost.Engine"/>
+        IEngine Engine { get; }
     }
 }
