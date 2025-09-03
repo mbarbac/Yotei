@@ -28,7 +28,6 @@ public static class Test_StrTokenChain
     [Fact]
     public static void Test_Create_Range()
     {
-        var engine = new FakeEngine();
         var items = new Chain([]);
         Assert.Empty(items);
 
@@ -49,7 +48,6 @@ public static class Test_StrTokenChain
     [Fact]
     public static void Test_Create_With_Duplicates()
     {
-        var engine = new FakeEngine();
         var items = new Chain([xone, xone, new Text("ONE")]);
         Assert.Equal(3, items.Count);
         Assert.Same(xone, items[0]);
@@ -68,7 +66,6 @@ public static class Test_StrTokenChain
     [Fact]
     public static void Test_Create_Extended()
     {
-        var engine = new FakeEngine();
         var other = new Chain([xtwo, xthree]);
         var items = new Chain([xone, other]);
 
@@ -84,7 +81,6 @@ public static class Test_StrTokenChain
     [Fact]
     public static void Test_Clone()
     {
-        var engine = new FakeEngine();
         var source = new Chain([xone, xtwo, xthree, xone]);
         var target = source.Clone();
 
@@ -95,8 +91,6 @@ public static class Test_StrTokenChain
         Assert.Same(xthree, target[2]);
         Assert.Same(xone, target[3]);
     }
-}
-#if XXX
 
     // ----------------------------------------------------
 
@@ -104,16 +98,17 @@ public static class Test_StrTokenChain
     [Fact]
     public static void Test_Find()
     {
-        var engine = new FakeEngine();
-        var items = new Chain( [xone, xtwo, xthree, xone]);
+        var items = new Chain([xone, xtwo, xthree, xone]);
 
         Assert.Equal(-1, items.IndexOf(xfive));
 
         Assert.Equal(0, items.IndexOf(xone));
-        Assert.Equal(0, items.IndexOf(new Text("ONE")));
+        Assert.Equal(-1, items.IndexOf(new Text("ONE")));
+        Assert.Equal(0, items.IndexOf(new Text("one")));
 
         Assert.Equal(3, items.LastIndexOf(xone));
-        Assert.Equal(3, items.LastIndexOf(new Text("ONE")));
+        Assert.Equal(-1, items.LastIndexOf(new Text("ONE")));
+        Assert.Equal(3, items.LastIndexOf(new Text("one")));
 
         var list = items.IndexesOf(xone);
         Assert.Equal(2, list.Count);
@@ -121,6 +116,9 @@ public static class Test_StrTokenChain
         Assert.Equal(3, list[1]);
 
         list = items.IndexesOf(new Text("ONE"));
+        Assert.Empty(list);
+
+        list = items.IndexesOf(new Text("one"));
         Assert.Equal(2, list.Count);
         Assert.Equal(0, list[0]);
         Assert.Equal(3, list[1]);
@@ -130,15 +128,14 @@ public static class Test_StrTokenChain
     [Fact]
     public static void Test_Find_Predicate()
     {
-        var engine = new FakeEngine();
-        var items = new Chain( [xone, xtwo, xthree, xone]);
+        var items = new Chain([xone, xtwo, xthree, xone]);
 
-        Assert.Equal(-1, items.IndexOf(x => ((Text)x).Name.Contains('z')));
+        Assert.Equal(-1, items.IndexOf(x => ((Text)x).Payload.Contains('z')));
 
-        Assert.Equal(0, items.IndexOf(x => ((Text)x).Name.Contains('n')));
-        Assert.Equal(3, items.LastIndexOf(x => ((Text)x).Name.Contains('n')));
+        Assert.Equal(0, items.IndexOf(x => ((Text)x).Payload.Contains('n')));
+        Assert.Equal(3, items.LastIndexOf(x => ((Text)x).Payload.Contains('n')));
 
-        var list = items.IndexesOf(x => ((Text)x).Name.Contains('n'));
+        var list = items.IndexesOf(x => ((Text)x).Payload.Contains('n'));
         Assert.Equal(2, list.Count);
         Assert.Equal(0, list[0]);
         Assert.Equal(3, list[1]);
@@ -150,8 +147,7 @@ public static class Test_StrTokenChain
     [Fact]
     public static void Test_GetRange()
     {
-        var engine = new FakeEngine();
-        var source = new Chain( [xone, xtwo, xthree, xfour]);
+        var source = new Chain([xone, xtwo, xthree, xfour]);
         var target = source.GetRange(0, 0);
         Assert.Empty(target);
 
@@ -179,8 +175,7 @@ public static class Test_StrTokenChain
     [Fact]
     public static void Test_Replace()
     {
-        var engine = new FakeEngine();
-        var source = new Chain( [xone, xtwo, xthree]);
+        var source = new Chain([xone, xtwo, xthree]);
         var target = source.Replace(1, xtwo);
         Assert.Same(source, target);
 
@@ -190,18 +185,14 @@ public static class Test_StrTokenChain
         Assert.Same(xone, target[0]);
         Assert.Equal(xone, target[1]);
         Assert.Same(xthree, target[2]);
-
-        try { source.Replace(1, new Text("one")); Assert.Fail(); }
-        catch (DuplicateException) { }
     }
 
     //[Enforced]
     [Fact]
     public static void Test_Replace_Extended()
     {
-        var engine = new FakeEngine();
-        var source = new Chain( [xone, xtwo, xthree]);
-        var other = new Chain( [xfour, xfive]);
+        var source = new Chain([xone, xtwo, xthree]);
+        var other = new Chain([xfour, xfive]);
 
         var target = source.Replace(1, other);
         Assert.NotSame(source, target);
@@ -216,13 +207,11 @@ public static class Test_StrTokenChain
     [Fact]
     public static void Test_Replace_Extended_Empty()
     {
-        var engine = new FakeEngine();
-        var source = new Chain( [xone, xtwo, xthree]);
-        var other = new Chain(engine);
+        var source = new Chain([xone, xtwo, xthree]);
+        var other = new Chain();
 
         var target = source.Replace(1, other);
         Assert.Same(source, target);
-
     }
 
     // ----------------------------------------------------
@@ -231,8 +220,7 @@ public static class Test_StrTokenChain
     [Fact]
     public static void Test_Add()
     {
-        var engine = new FakeEngine();
-        var source = new Chain( [xone, xtwo]);
+        var source = new Chain([xone, xtwo]);
         var target = source.Add(xthree);
 
         Assert.NotSame(source, target);
@@ -243,17 +231,13 @@ public static class Test_StrTokenChain
 
         try { _ = source.Add(null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
-
-        try { _ = source.Add(new Text("")); Assert.Fail(); }
-        catch (EmptyException) { }
     }
 
     //[Enforced]
     [Fact]
     public static void Test_Add_Duplicates()
     {
-        var engine = new FakeEngine();
-        var source = new Chain( [xone, xtwo]);
+        var source = new Chain([xone, xtwo]);
         var target = source.Add(xone);
 
         Assert.NotSame(source, target);
@@ -261,24 +245,19 @@ public static class Test_StrTokenChain
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
         Assert.Same(xone, target[2]);
-
-        source = new Chain( [xone, xtwo]);
-        try { _ = source.Add(new Text("one")); Assert.Fail(); }
-        catch (DuplicateException) { }
     }
 
     //[Enforced]
     [Fact]
     public static void Test_Add_Extended()
     {
-        var engine = new FakeEngine();
-        var source = new Chain( [xone, xtwo, xthree]);
-        var other = new Chain( []);
+        var source = new Chain([xone, xtwo, xthree]);
+        var other = new Chain([]);
 
         var target = source.Add(other);
         Assert.Same(source, target);
 
-        other = new Chain( [xfour, xfive]);
+        other = new Chain([xfour, xfive]);
         target = source.Add(other);
         Assert.NotSame(source, target);
         Assert.Equal(5, target.Count);
@@ -295,8 +274,7 @@ public static class Test_StrTokenChain
     [Fact]
     public static void Test_AddRange()
     {
-        var engine = new FakeEngine();
-        var source = new Chain( [xone, xtwo]);
+        var source = new Chain([xone, xtwo]);
         var target = source.AddRange([]);
         Assert.Same(source, target);
 
@@ -308,28 +286,21 @@ public static class Test_StrTokenChain
         Assert.Same(xthree, target[2]);
         Assert.Same(xfour, target[3]);
 
-        try { _ = source.AddRange([new Text("one")]); Assert.Fail(); }
-        catch (DuplicateException) { }
-
         try { _ = source.AddRange([xfive, null!]); Assert.Fail(); }
         catch (ArgumentNullException) { }
-
-        try { _ = source.AddRange([xfive, new Text("")]); Assert.Fail(); }
-        catch (EmptyException) { }
     }
 
     //[Enforced]
     [Fact]
     public static void Test_AddRange_Extended()
     {
-        var engine = new FakeEngine();
-        var source = new Chain( [xone, xtwo]);
-        var other = new Chain( []);
+        var source = new Chain([xone, xtwo]);
+        var other = new Chain([]);
 
         var target = source.AddRange([other]);
         Assert.Same(source, target);
 
-        other = new Chain( [xfour, xfive]);
+        other = new Chain([xfour, xfive]);
         target = source.AddRange([xthree, other]);
         Assert.NotSame(source, target);
         Assert.Equal(5, target.Count);
@@ -346,8 +317,7 @@ public static class Test_StrTokenChain
     [Fact]
     public static void Test_Insert()
     {
-        var engine = new FakeEngine();
-        var source = new Chain( [xone, xtwo]);
+        var source = new Chain([xone, xtwo]);
         var target = source.Insert(2, xthree);
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
@@ -357,41 +327,32 @@ public static class Test_StrTokenChain
 
         try { _ = source.Insert(0, null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
-
-        try { _ = source.Insert(0, new Text("")); Assert.Fail(); }
-        catch (EmptyException) { }
     }
 
     //[Enforced]
     [Fact]
     public static void Test_Insert_Duplicates()
     {
-        var engine = new FakeEngine();
-        var source = new Chain( [xone, xtwo]);
+        var source = new Chain([xone, xtwo]);
         var target = source.Insert(2, xone);
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
         Assert.Same(xone, target[2]);
-
-        source = new Chain( [xone, xtwo]);
-        try { _ = source.Insert(0, new Text("one")); Assert.Fail(); }
-        catch (DuplicateException) { }
     }
 
     //[Enforced]
     [Fact]
     public static void Test_Insert_Extended()
     {
-        var engine = new FakeEngine();
-        var source = new Chain( [xone, xtwo, xthree]);
-        var other = new Chain( []);
+        var source = new Chain([xone, xtwo, xthree]);
+        var other = new Chain([]);
 
         var target = source.Insert(3, other);
         Assert.Same(source, target);
 
-        other = new Chain( [xfour, xfive]);
+        other = new Chain([xfour, xfive]);
         target = source.Insert(3, other);
         Assert.NotSame(source, target);
         Assert.Equal(5, target.Count);
@@ -408,8 +369,7 @@ public static class Test_StrTokenChain
     [Fact]
     public static void Test_InsertRange()
     {
-        var engine = new FakeEngine();
-        var source = new Chain( [xone, xtwo]);
+        var source = new Chain([xone, xtwo]);
         var target = source.InsertRange(2, []);
         Assert.Same(source, target);
 
@@ -421,28 +381,21 @@ public static class Test_StrTokenChain
         Assert.Same(xthree, target[2]);
         Assert.Same(xfour, target[3]);
 
-        try { _ = source.InsertRange(0, [new Text("one")]); Assert.Fail(); }
-        catch (DuplicateException) { }
-
         try { _ = source.InsertRange(0, [xfive, null!]); Assert.Fail(); }
         catch (ArgumentNullException) { }
-
-        try { _ = source.InsertRange(0, [xfive, new Text("")]); Assert.Fail(); }
-        catch (EmptyException) { }
     }
 
     //[Enforced]
     [Fact]
     public static void Test_InsertRange_Extended()
     {
-        var engine = new FakeEngine();
-        var source = new Chain( [xone, xtwo]);
-        var other = new Chain( []);
+        var source = new Chain([xone, xtwo]);
+        var other = new Chain([]);
 
         var target = source.InsertRange(2, [other]);
         Assert.Same(source, target);
 
-        other = new Chain( [xfour, xfive]);
+        other = new Chain([xfour, xfive]);
         target = source.InsertRange(2, [xthree, other]);
         Assert.NotSame(source, target);
         Assert.Equal(5, target.Count);
@@ -459,8 +412,7 @@ public static class Test_StrTokenChain
     [Fact]
     public static void Test_RemoveAt()
     {
-        var engine = new FakeEngine();
-        var source = new Chain( [xone, xtwo, xthree, xone]);
+        var source = new Chain([xone, xtwo, xthree, xone]);
 
         var target = source.RemoveAt(0);
         Assert.NotSame(source, target);
@@ -477,8 +429,7 @@ public static class Test_StrTokenChain
     [Fact]
     public static void Test_RemoveRange()
     {
-        var engine = new FakeEngine();
-        var source = new Chain( [xone, xtwo, xthree, xone]);
+        var source = new Chain([xone, xtwo, xthree, xone]);
         var target = source.RemoveRange(0, 0);
         Assert.Same(source, target);
 
@@ -512,8 +463,7 @@ public static class Test_StrTokenChain
     [Fact]
     public static void Test_Remove_Item()
     {
-        var engine = new FakeEngine();
-        var source = new Chain( [xone, xtwo, xthree, xone]);
+        var source = new Chain([xone, xtwo, xthree, xone]);
         var target = source.Remove(xfour);
         Assert.Same(source, target);
 
@@ -525,11 +475,7 @@ public static class Test_StrTokenChain
         Assert.Same(xone, target[2]);
 
         target = source.Remove(new Text("ONE"));
-        Assert.NotSame(source, target);
-        Assert.Equal(3, target.Count);
-        Assert.Same(xtwo, target[0]);
-        Assert.Same(xthree, target[1]);
-        Assert.Same(xone, target[2]);
+        Assert.Same(source, target);
 
         target = source.RemoveLast(xone);
         Assert.NotSame(source, target);
@@ -539,11 +485,7 @@ public static class Test_StrTokenChain
         Assert.Same(xthree, target[2]);
 
         target = source.RemoveLast(new Text("ONE"));
-        Assert.NotSame(source, target);
-        Assert.Equal(3, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
+        Assert.Same(source, target);
 
         target = source.RemoveAll(xone);
         Assert.NotSame(source, target);
@@ -552,19 +494,15 @@ public static class Test_StrTokenChain
         Assert.Same(xthree, target[1]);
 
         target = source.RemoveAll(new Text("ONE"));
-        Assert.NotSame(source, target);
-        Assert.Equal(2, target.Count);
-        Assert.Same(xtwo, target[0]);
-        Assert.Same(xthree, target[1]);
+        Assert.Same(source, target);
     }
 
     //[Enforced]
     [Fact]
     public static void Test_Remove_Item_Extended()
     {
-        var engine = new FakeEngine();
-        var source = new Chain( [xone, xtwo, xthree, xone]);
-        var other = new Chain( [xone, xthree]);
+        var source = new Chain([xone, xtwo, xthree, xone]);
+        var other = new Chain([xone, xthree]);
 
         var target = source.Remove(other);
         Assert.NotSame(source, target);
@@ -590,26 +528,25 @@ public static class Test_StrTokenChain
     [Fact]
     public static void Test_Remove_Predicate()
     {
-        var engine = new FakeEngine();
-        var source = new Chain( [xone, xtwo, xthree, xone]);
-        var target = source.Remove(x => ((Text)x).Name.Contains('z'));
+        var source = new Chain([xone, xtwo, xthree, xone]);
+        var target = source.Remove(x => ((Text)x).Payload.Contains('z'));
         Assert.Same(source, target);
 
-        target = source.Remove(x => ((Text)x).Name.Contains('n'));
+        target = source.Remove(x => ((Text)x).Payload.Contains('n'));
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.Same(xtwo, target[0]);
         Assert.Same(xthree, target[1]);
         Assert.Same(xone, target[2]);
 
-        target = source.RemoveLast(x => ((Text)x).Name.Contains('n'));
+        target = source.RemoveLast(x => ((Text)x).Payload.Contains('n'));
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
         Assert.Same(xthree, target[2]);
 
-        target = source.RemoveAll(x => ((Text)x).Name.Contains('n'));
+        target = source.RemoveAll(x => ((Text)x).Payload.Contains('n'));
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
         Assert.Same(xtwo, target[0]);
@@ -622,14 +559,48 @@ public static class Test_StrTokenChain
     [Fact]
     public static void Test_Clear()
     {
-        var engine = new FakeEngine();
-        var source = new Chain(engine);
+        var source = new Chain();
         var target = source.Clear();
         Assert.Same(source, target);
 
-        source = new Chain( [xone, xtwo, xthree, xone]);
+        source = new Chain([xone, xtwo, xthree, xone]);
         target = source.Clear();
         Assert.NotSame(source, target);
         Assert.Empty(target);
     }
-#endif
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Reduce_Text()
+    {
+        var comparison = StringComparison.OrdinalIgnoreCase;
+        var source = new Chain([xone, xtwo, xthree]);
+        var target = source.Reduce(comparison);
+
+        Assert.NotSame(source, target);
+        var text = Assert.IsType<Text>(target);
+        Assert.Equal("onetwothree", text.Payload);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Reduce_Literal()
+    {
+        var comparison = StringComparison.OrdinalIgnoreCase;
+        var source = new Chain([xone, new Literal("two"), xthree]);
+        var target = source.Reduce(comparison);
+        Assert.Same(source, target);
+
+        source = new Chain([xone, xtwo, new Literal("three")]);
+        target = source.Reduce(comparison);
+        Assert.NotSame(source, target);
+        var chain = Assert.IsType<Chain>(target);
+        Assert.Equal(2, chain.Count);
+        var text = Assert.IsType<Text>(chain[0]);
+        Assert.Equal("onetwo", text.Payload);
+        var literal = Assert.IsType<Literal>(chain[1]);
+        Assert.Equal("three", literal.Payload);
+    }
+}
