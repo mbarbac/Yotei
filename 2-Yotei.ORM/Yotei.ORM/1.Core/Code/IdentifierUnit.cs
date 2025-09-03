@@ -1,5 +1,5 @@
 ﻿namespace Yotei.ORM.Code;
-
+/*
 // ========================================================
 /// <inheritdoc cref="IIdentifierUnit"/>
 public class IdentifierUnit : IIdentifierUnit
@@ -62,4 +62,4 @@ public class IdentifierUnit : IIdentifierUnit
         get => throw null;
         init => throw null;
     }
-}
+}*/

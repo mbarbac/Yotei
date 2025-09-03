@@ -5,7 +5,7 @@ namespace Yotei.ORM.Tests.InvariantListGenerator;
 
 // ========================================================
 /// <summary>
-/// Represents an immutable list-alike collection of elements identified by their keys.
+/// Represents a string token that is itself a flat collection of arbitrary tokens.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
 [IInvariantList<IItem>]
