@@ -125,18 +125,25 @@ public class StrTokenWrapped : IStrToken
     /// <inheritdoc/>
     public IStrToken Reduce(StringComparison comparison)
     {
-        var item = Payload.Reduce(comparison);
+        IStrToken item = Payload.Reduce(comparison);
 
-        if (item is StrTokenChain range)
-        {
-            if (range.Count == 0) item = StrTokenText.Empty;
-            if (range.Count == 1) item = range[0];
-        }
+        //if (item is StrTokenChain range)
+        //{
+        //    if (range.Count == 0) item = StrTokenText.Empty;
+        //    if (range.Count == 1) item = range[0].Reduce(comparison);
+        //}
+        //if (item is StrTokenWrapped wrapped)
+        //{
+        //    var temp = wrapped.Payload.Reduce(comparison);
 
-        if (item is StrTokenWrapped temp &&
-            string.Compare(Head, temp.Head, comparison) == 0 &&
-            string.Compare(Tail, temp.Tail, comparison) == 0)
-            return temp;
+        //    if (!wrapped.Payload.Equals(temp))
+        //        item = new StrTokenWrapped(wrapped.Head, temp, wrapped.Tail);
+        //}
+
+        //if (item is StrTokenWrapped temp &&
+        //    string.Compare(Head, temp.Head, comparison) == 0 &&
+        //    string.Compare(Tail, temp.Tail, comparison) == 0)
+        //    item = temp.Reduce(comparison);
 
         return Payload.Equals(item)
             ? this

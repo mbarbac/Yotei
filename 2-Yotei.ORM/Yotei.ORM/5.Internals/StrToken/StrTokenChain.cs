@@ -136,7 +136,7 @@ public partial class StrTokenChain : IStrToken
         var token = this;
 
         // Reducing but only if needed...
-        if (token.Count > 1)
+        if (Count > 0)
         {
             var builder = new Builder(); // Empty!
             var changed = false;
@@ -153,7 +153,15 @@ public partial class StrTokenChain : IStrToken
             }
 
             // Recreating if needed...
-            if (changed) token = builder.CreateInstance();
+            if (changed)
+            {
+                switch (builder.Count)
+                {
+                    case 0: return StrTokenText.Empty;
+                    case 1: return builder[0];
+                    default: token = builder.CreateInstance(); break;
+                }
+            }
         }
 
         // Finishing by combining text elements...
@@ -186,7 +194,15 @@ public partial class StrTokenChain : IStrToken
             }
 
             // Recreating if needed...
-            if (changed) token = builder.CreateInstance();
+            if (changed)
+            {
+                switch (builder.Count)
+                {
+                    case 0: return StrTokenText.Empty;
+                    case 1: return builder[0];
+                    default: token = builder.CreateInstance(); break;
+                }
+            }
         }
 
         // Finishing...
