@@ -163,5 +163,33 @@ public partial class StrTokenChain : IStrToken
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public IStrToken TokenizeWith(Func<string, IStrToken> tokenizer) => throw null;
+    public IStrToken TokenizeWith(Func<string, IStrToken> tokenizer)
+    {
+        tokenizer.ThrowWhenNull();
+        var token = this;
+
+        // Only if needed...
+        if (Count > 0)
+        {
+            var builder = new Builder(); // Empty...
+            var changed = false;
+
+            // Iterating...
+            for (int i = 0; i < Count; i++)
+            {
+                var item = Items[i];
+                var temp = item.TokenizeWith(tokenizer);
+                if (temp is StrTokenChain range && range.Count == 1) temp = range[0];
+
+                builder.Add(temp);
+                if (!item.Equals(temp)) changed = true;
+            }
+
+            // Recreating if needed...
+            if (changed) token = builder.CreateInstance();
+        }
+
+        // Finishing...
+        return token;
+    }
 }
