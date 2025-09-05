@@ -15,8 +15,8 @@ public interface IStrToken : IEquatable<IStrToken>
     // ----------------------------------------------------
 
     /// <summary>
-    /// Reduces this instance to a simpler form, if possible, or returns the original one, using
-    /// the given comparison mode when needed.
+    /// Recursively reduces this instance to a simpler form, if possible, or returns the original
+    /// one, using the given comparison mode when needed.
     /// </summary>
     /// <param name="comparison"></param>
     /// <returns></returns>
@@ -24,7 +24,7 @@ public interface IStrToken : IEquatable<IStrToken>
 
     /// <summary>
     /// Invoked to tokenize the payload carried by this instance.
-    /// <br/> This method shall NOT reduce the produced result.
+    /// <br/> This method is not intended to reduce the produced result.
     /// </summary>
     /// <param name="tokenizer"></param>
     /// <returns></returns>
