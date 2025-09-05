@@ -20,6 +20,13 @@ partial class ElementListKT
         public Builder(IEngine engine) : base() => Engine = engine.ThrowWhenNull();
 
         /// <summary>
+        /// Initializes a new empty instance with the given initial capacity.
+        /// </summary>
+        /// <param name="engine"></param>
+        /// <param name="capacity"></param>
+        public Builder(IEngine engine, int capacity) : this(engine) => Capacity = capacity;
+
+        /// <summary>
         /// Initializes a new instance with the elements from the given range.
         /// </summary>
         /// <param name="engine"></param>
@@ -39,12 +46,12 @@ partial class ElementListKT
         public override IItem ValidateItem(IItem item) => item.ThrowWhenNull();
 
         /// <inheritdoc/>
-        public override string GetKey(IItem item) => item is NamedElement named
+        public override TKey GetKey(IItem item) => item is NamedElement named
             ? named.Name
             : throw new ArgumentException("Element is not a named one.").WithData(item);
 
         /// <inheritdoc/>
-        public override string ValidateKey(string key) => key.NotNullNotEmpty();
+        public override TKey ValidateKey(TKey key) => key.NotNullNotEmpty();
 
         /// <inheritdoc/>
         public override bool ExpandItems => true;
@@ -72,7 +79,7 @@ partial class ElementListKT
         protected override bool SameItem(IItem source, IItem item) => base.SameItem(source, item);
 
         /// <inheritdoc/>
-        protected override List<int> FindDuplicates(string key) => base.FindDuplicates(key);
+        protected override List<int> FindDuplicates(TKey key) => base.FindDuplicates(key);
 
         // ------------------------------------------------
 

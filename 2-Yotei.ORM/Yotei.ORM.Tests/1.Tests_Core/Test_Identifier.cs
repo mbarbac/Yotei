@@ -4,6 +4,33 @@
 //[Enforced]
 public static class Test_Identifier
 {
+    //[Enforced]
+    [Fact]
+    public static void Test_Create()
+    {
+        IIdentifier item;
+        IIdentifierUnit part;
+        IIdentifierChain chain;
+        var engine = new FakeEngine();
+
+        item = Identifier.Create(engine);
+        part = Assert.IsType<IdentifierUnit>(item);
+        Assert.Null(part.Value);
+
+        item = Identifier.Create(engine, "");
+        part = Assert.IsType<IdentifierUnit>(item);
+        Assert.Null(part.Value);
+
+        item = Identifier.Create(engine, "aa");
+        part = Assert.IsType<IdentifierUnit>(item);
+        Assert.Equal("[aa]", part.Value);
+
+        item = Identifier.Create(engine, "aa.bb");
+        chain = Assert.IsType<IdentifierChain>(item);
+        Assert.Equal("[aa]", chain[0].Value);
+        Assert.Equal("[bb]", chain[1].Value);
+    }
+
     // ----------------------------------------------------
 
     //[Enforced]

@@ -228,7 +228,6 @@ public static class Test_ElementListKT
 
         var target = source.Replace(1, other);
         Assert.Same(source, target);
-
     }
 
     // ----------------------------------------------------

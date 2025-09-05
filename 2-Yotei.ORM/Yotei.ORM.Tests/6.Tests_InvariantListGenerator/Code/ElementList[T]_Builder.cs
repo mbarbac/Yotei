@@ -19,6 +19,13 @@ partial class ElementListT
         public Builder(IEngine engine) : base() => Engine = engine.ThrowWhenNull();
 
         /// <summary>
+        /// Initializes a new empty instance with the given initial capacity.
+        /// </summary>
+        /// <param name="engine"></param>
+        /// <param name="capacity"></param>
+        public Builder(IEngine engine, int capacity) : this(engine) => Capacity = capacity;
+
+        /// <summary>
         /// Initializes a new instance with the elements from the given range.
         /// </summary>
         /// <param name="engine"></param>

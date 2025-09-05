@@ -1,6 +1,4 @@
-﻿using Yotei.Tools.Generators;
-
-namespace Yotei.Tools.BaseGenerator;
+﻿namespace Yotei.Tools.BaseGenerator;
 
 // ========================================================
 internal static class NullableHelpers

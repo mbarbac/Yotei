@@ -33,7 +33,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Base\Nodes\NodeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Tree\TreeGenerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Base\Tree\TreeDiagnostics.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Public\IsNullable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\AllowNullAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\BitOperations.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\CallerArgumentExpressionAttribute.cs" />
@@ -49,6 +48,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\RequiredMemberAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\SetsRequiredMembersAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\SkipLocalsInitAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Public\IsNullable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\RoslynNameExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\RoslynNameOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\SymbolComparer.cs" />

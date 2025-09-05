@@ -228,7 +228,6 @@ public static class Test_ElementListT
 
         var target = source.Replace(1, other);
         Assert.Same(source, target);
-
     }
 
     // ----------------------------------------------------

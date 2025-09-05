@@ -1,4 +1,4 @@
-﻿namespace Yotei.Tools.Generators;
+﻿namespace Yotei.Tools.CloneGenerator;
 
 // ========================================================
 /// <summary>
