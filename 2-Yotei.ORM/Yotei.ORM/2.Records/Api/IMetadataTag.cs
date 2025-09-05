@@ -5,6 +5,7 @@
 /// Represents the collection of names by which a given metadata entry can be known. Names are
 /// not-null and not-empy strings. This type is never an empty collection, and either the first
 /// name used or the one explicitly selected become the default one.
+/// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
 [Cloneable]
 public partial interface IMetadataTag : IEnumerable<string>, IEquatable<IMetadataTag>
@@ -25,8 +26,8 @@ public partial interface IMetadataTag : IEnumerable<string>, IEquatable<IMetadat
     /// <summary>
     /// Gets or sets the default name among the ones in this instance.
     /// <br/> Note that the setter somehow breaks immutability, but only in the sense that this
-    /// value can change at will, if the selected one already belongs to this instance, but cannot
-    /// add a new value.
+    /// value can change at will, provided that the selected one already belongs to this instance,
+    /// but it cannot otherwise modify the collection.
     /// </summary>
     string Default { get; set; }
 
