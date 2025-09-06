@@ -37,7 +37,8 @@ public partial class CommandInfo : ICommandInfo
     /// obtained from the given range of values.
     /// <br/> If values are used, then they must be encoded in the given text using either a '{n}'
     /// positional specification or a '{name}' named one. In the later case, 'name' may or may not
-    /// start with the engine's prefix. Unused values or dangling specifications are not allowed.
+    /// start with the engine's prefix.
+    /// <br/> Unused values or dangling specifications are not allowed.
     /// </summary>
     /// <param name="engine"></param>
     /// <param name="text"></param>
@@ -113,36 +114,18 @@ public partial class CommandInfo : ICommandInfo
     // ------------------------------------------------
 
     /// <inheritdoc/>
-    public virtual ICommandInfo AddTextUnsafe(string text)
+    public virtual ICommandInfo ReplaceText(string text)
     {
         var builder = CreateBuilder();
-        var done = builder.AddTextUnsafe(text);
+        var done = builder.ReplaceText(text);
         return done ? builder.CreateInstance() : this;
     }
 
     /// <inheritdoc/>
-    public virtual ICommandInfo AddValuesUnsafe(params object?[]? range)
+    public virtual ICommandInfo ReplaceValues(params object?[]? range)
     {
         var builder = CreateBuilder();
-        var done = builder.AddValuesUnsafe(range);
-        return done ? builder.CreateInstance() : this;
-    }
-
-    // ------------------------------------------------
-
-    /// <inheritdoc/>
-    public virtual ICommandInfo ReplaceTextUnsafe(string text)
-    {
-        var builder = CreateBuilder();
-        var done = builder.ReplaceTextUnsafe(text);
-        return done ? builder.CreateInstance() : this;
-    }
-
-    /// <inheritdoc/>
-    public virtual ICommandInfo ReplaceValuesUnsafe(params object?[]? range)
-    {
-        var builder = CreateBuilder();
-        var done = builder.ReplaceValuesUnsafe(range);
+        var done = builder.ReplaceValues(range);
         return done ? builder.CreateInstance() : this;
     }
 

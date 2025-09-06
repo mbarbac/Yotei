@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Code;
+﻿using System.Runtime.InteropServices.Marshalling;
+
+namespace Yotei.ORM.Code;
 
 partial class CommandInfo
 {
@@ -57,7 +59,8 @@ partial class CommandInfo
         /// obtained from the given range of values.
         /// <br/> If values are used, then they must be encoded in the given text using either a '{n}'
         /// positional specification or a '{name}' named one. In the later case, 'name' may or may not
-        /// start with the engine's prefix. Unused values or dangling specifications are not allowed.
+        /// start with the engine's prefix.
+        /// <br/> Unused values or dangling specifications are not allowed.
         /// </summary>
         /// <param name="engine"></param>
         /// <param name="text"></param>
@@ -118,13 +121,84 @@ partial class CommandInfo
         }
 
         /// <inheritdoc/>
-        public virtual bool Add(ICommandInfo source) => throw null;
+        public virtual bool Add(ICommandInfo source)
+        {
+            source.ThrowWhenNull();
+
+            var text = source.Text;
+            var pars = source.Parameters;
+
+            // 'source' may be in an inconsistent state, so we cannot enforce specs and values...
+            var noRemainingSpecs = false;
+            var noUnusedValues = false;
+            return Append(noRemainingSpecs, noUnusedValues, text, pars);
+        }
 
         /// <inheritdoc/>
-        public virtual bool Add(ICommandInfo.IBuilder source) => throw null;
+        public virtual bool Add(ICommandInfo.IBuilder source)
+        {
+            source.ThrowWhenNull();
+
+            var text = source.Text;
+            var pars = source.Parameters;
+
+            // 'source' may be in an inconsistent state, so we cannot enforce specs and values...
+            var noRemainingSpecs = false;
+            var noUnusedValues = false;
+            return Append(noRemainingSpecs, noUnusedValues, text, pars);
+        }
 
         /// <inheritdoc/>
-        public virtual bool Add(string text, params object?[]? range) => throw null;
+        public virtual bool Add(string text, params object?[]? range)
+        {
+            // Here we enforce adding a consistent state...
+            var noRemainingSpecs = true;
+            var noUnusedValues = true;
+            return Append(noRemainingSpecs, noUnusedValues, text, range);
+        }
+
+        // ------------------------------------------------
+
+        /// <inheritdoc/>
+        public virtual bool ReplaceText(string text)
+        {
+            text.ThrowWhenNull();
+
+            if (_Text.Length == 0 && text.Length == 0) return false;
+            if (string.Compare(_Text.ToString(), text) == 0) return false;
+
+            _Text.Clear();
+            _Text.Append(text);
+            return true;
+        }
+
+        /// <inheritdoc/>
+        public virtual bool ReplaceValues(params object?[]? range)
+        {
+            range ??= [null];
+
+            if (range.Length == 0)
+            {
+                if (_Parameters.Count == 0) return false;
+
+                _Parameters.Clear();
+                return true;
+            }
+
+            var old = _Parameters.ToImmutableArray();
+            _Parameters.Clear();
+
+            var noRemainingSpecs = false;
+            var noUnusedValues = false;
+            var changed = Append(noRemainingSpecs, noUnusedValues, string.Empty, range);
+
+            if (!changed)
+            {
+                _Parameters.Clear();
+                _Parameters.AddRange(old);
+            }
+            return changed;
+        }
 
         // ------------------------------------------------
 
@@ -141,10 +215,165 @@ partial class CommandInfo
         // ------------------------------------------------
 
         /// <summary>
+        /// Appends to this instance the given text and the collection of parameters obtained from
+        /// the given collection of values, if any. Values must be encoded in the text using either
+        /// a named '{name}' or an ordinal '{n}' bracket specification.
+        /// <br/> If a given 'name' already exist in this collection, it is changed in both the
+        /// given text and values so that it can be added without name collisions.
+        /// </summary>
+        bool Append(
+            bool noRemainingSpecs,
+            bool noUnusedValues,
+            string text, params object?[]? range)
+        {
+            text.ThrowWhenNull();
+            range ??= [null];
+
+            var changed = false;
+
+            // Capturing values, intercepting ranges with just one special element...
+            var items = RangeElement.Capture(range);
+            if (items.Length == 1)
+            {
+                if (items[0].Value is IParameterList parsList)
+                {
+                    text = NamesToOrdinals(text, parsList, Comparison);
+                    range = parsList.ToArray();
+                    return Append(noRemainingSpecs, noUnusedValues, text, range);
+                }
+                if (items[0].Value is IParameterList.IBuilder parsBuilder)
+                {
+                    text = NamesToOrdinals(text, parsBuilder, Comparison);
+                    range = parsBuilder.ToArray();
+                    return Append(noRemainingSpecs, noUnusedValues, text, range);
+                }
+            }
+
+            // Command-alike parameters not allowed...
+            for (int i = 0; i < items.Length; i++)
+            {
+                var item = items[i];
+
+                if (item.Value is ICommand) throw new ArgumentException("Element cannot be a command.").WithData(item);
+                if (item.Value is ICommandInfo) throw new ArgumentException("Element cannot be a command info.").WithData(item);
+                if (item.Value is ICommandInfo.IBuilder) throw new ArgumentException("Element cannot be a command info builder.").WithData(item);
+            }
+
+            // Iterating through the range of given values...
+            var captured = new ParameterList.Builder(Engine);
+            for (int i = 0; i < items.Length; i++)
+            {
+                var item = items[i];
+                string name = default!;
+                IParameter par;
+
+                // Capturing a suitable parameter...
+                switch (item.Value)
+                {
+                    case IParameter temp:
+                        par = Capture(temp, captured);
+                        name = temp.Name;
+                        changed = true;
+                        break;
+
+                    case AnonymousElement temp:
+                        par = new Parameter(temp.Name, temp.Value);
+                        par = Capture(par, captured);
+                        name = temp.Name;
+                        changed = true;
+                        break;
+
+                    default:
+                        _Parameters.AddNew(item.Value, out par);
+                        captured.Add(par);
+                        name = par.Name;
+                        changed = true;
+                        break;
+                }
+
+                // Finding the element's 'name' in the text, may not be the same as 'par.Name'...
+                var pos = 0;
+                while ((pos = FindNamedBracket(text, name, pos, out var bracket)) >= 0)
+                {
+                    text = text.Remove(pos, bracket!.Length);
+                    text = text.Insert(pos, par.Name);
+
+                    pos += par.Name.Length;
+                    item.Used = true;
+                }
+
+                // Finding by ordinal braket...
+                pos = 0;
+                while ((pos = FindOrdinalBracket(text, i, pos, out var bracket)) >= 0)
+                {
+                    text = text.Remove(pos, bracket!.Length);
+                    text = text.Insert(pos, par.Name);
+
+                    pos += par.Name.Length;
+                    item.Used = true;
+                }
+            }
+
+            // Adding the text if needed...
+            if (text.Length > 0)
+            {
+                _Text.Append(text);
+                changed = true;
+            }
+
+            // No remaining specifications...
+            if (noRemainingSpecs && AreRemainingBrackets(text))
+            {
+                throw new ArgumentException(
+                    "There are unused brackets in the given text.")
+                    .WithData(text);
+            }
+
+            // No unused values...
+            if (noUnusedValues && items.Length > 0 && items.Any(x => !x.Used))
+            {
+                throw new ArgumentException(
+                    "There are unused brackets in the given text.")
+                    .WithData(text);
+            }
+
+            // Finishing...
+            return changed;
+        }
+
+        /// <summary>
+        /// Replaces the named specifications of the given collection of parameters in the given
+        /// text with ordinal specifications.
+        /// </summary>
+        static string NamesToOrdinals(
+            string text, IEnumerable<IParameter> pars, StringComparison comparison)
+        {
+            var finder = new StrFindIsolated();
+            var i = 0;
+            foreach (var par in pars)
+            {
+                var bracket = $"{{{i}}}"; i++;
+                var name = par.Name;
+                var pos = 0;
+
+                while ((pos = finder.Find(text, name, pos, comparison)) >= 0)
+                {
+                    text = text.Remove(pos, par.Name.Length);
+                    text = text.Insert(pos, bracket);
+                    pos += bracket.Length;
+                }
+            }
+
+            return text;
+        }
+
+        /// <summary>
         /// Determines if the given text has any dangling '{...}' bracket specification, or not.
         /// </summary>
         static bool AreRemainingBrackets(string text)
         {
+            if (text.Length == 0) return false;
+
             var ini = text.IndexOf('{'); if (ini < 0) return false;
             var end = text.IndexOf('}', ini); if (end < 0) return false;
             return true;

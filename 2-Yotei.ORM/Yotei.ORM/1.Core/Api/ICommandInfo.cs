@@ -65,7 +65,8 @@ public partial interface ICommandInfo
     /// the given range of values, if any, have been added to the original ones.
     /// <br/> If values are used, then they must be encoded in the given text using either a '{n}'
     /// positional specification or a '{name}' named one. In the later case, 'name' may or may not
-    /// start with the engine's prefix. Unused values or dangling specifications are not allowed.
+    /// start with the engine's prefix.
+    /// <br/> Unused values or dangling specifications are not allowed.
     /// </summary>
     /// <param name="text"></param>
     /// <param name="range"></param>
@@ -75,45 +76,27 @@ public partial interface ICommandInfo
     // ------------------------------------------------
 
     /// <summary>
-    /// Returns a new instance where the given text has been added to the existing one, without
-    /// intercepting dangling specifications.
-    /// <br/> Incorrect usage of this method may render this instance in an inconsistent state.
-    /// </summary>
-    /// <param name="text"></param>
-    /// <returns></returns>
-    ICommandInfo AddTextUnsafe(string text);
-
-    /// <summary>
-    /// Returns a new instance where the parameters obtained from the given collection of values,
-    /// if any, have been added to the original ones, without trying to match their names with
-    /// any existing bracket specification in the existing text.
-    /// <br/> Incorrect usage of this method may render this instance in an inconsistent state.
-    /// </summary>
-    /// <param name="range"></param>
-    /// <returns></returns>
-    ICommandInfo AddValuesUnsafe(params object?[]? range);
-
-    // ------------------------------------------------
-
-    /// <summary>
     /// Returns a new instance where the existing text has been replaced by the new given one,
-    /// without trying to match the names of the captured parameters in that new text.
-    /// <br/> No bracket '{...}' specifications are allowed.
-    /// <br/> Incorrect usage of this method may render this instance in an inconsistent state.
+    /// without any attempt to match any existing parameter name with any bracket specification
+    /// in the given text.
+    /// <br/> This method may cause this instance to end up in an inconsistent state, so it
+    /// should be used with caution.
     /// </summary>
     /// <param name="text"></param>
     /// <returns></returns>
-    ICommandInfo ReplaceTextUnsafe(string text);
+    ICommandInfo ReplaceText(string text);
 
     /// <summary>
     /// Returns a new instance where the existing collection of parameters has been replaced by
-    /// a new one obtained from the given range of values (including empty collections), without
-    /// trying to match their names with any bracket specifications in the existing text.
-    /// <br/> Incorrect usage of this method may render this instance in an inconsistent state.
+    /// the one obtained from the given range of values, if any, including empty ranges, without
+    /// any attempt to match their names or ordinal positions with any bracket specification in
+    /// the existing text.
+    /// <br/> This method may cause this instance to end up in an inconsistent state, so it
+    /// should be used with caution.
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    ICommandInfo ReplaceValuesUnsafe(params object?[]? range);
+    ICommandInfo ReplaceValues(params object?[]? range);
 
     // ------------------------------------------------
 
