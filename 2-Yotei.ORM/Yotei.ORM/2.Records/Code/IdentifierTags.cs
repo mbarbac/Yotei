@@ -30,8 +30,7 @@ public partial class IdentifierTags : IHost
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected IdentifierTags(
-        THost source) : this(source.CaseSensitiveTags) => Items.AddRange(source);
+    protected IdentifierTags(THost source) : this(source.CaseSensitiveTags) => Items.AddRange(source);
 
     /// <inheritdoc/>
     public override string ToString() => Items.ToString();
@@ -39,27 +38,24 @@ public partial class IdentifierTags : IHost
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public virtual bool Equals(IHost? other) => throw null;
-    //{
-    //    if (ReferenceEquals(this, other)) return true;
-    //    if (other is null) return false;
-    //    if (other is not IHost valid) return false;
+    public virtual bool Equals(IHost? other)
+    {
+        if (ReferenceEquals(this, other)) return true;
+        if (other is null) return false;
 
-    //    if (!Engine.Equals(valid.Engine)) return false;
-    //    if (Count != valid.Count) return false;
+        if (CaseSensitiveTags != other.CaseSensitiveTags) return false;
+        if (Count != other.Count) return false;
 
-    //    for (int i = 0; i < Count; i++)
-    //    {
-    //        var item = Items[i];
-    //        var temp = valid[i];
-    //        var same = item is NamedElement xitem && temp is NamedElement xtemp
-    //            ? xitem.Equals(xtemp, Engine.CaseSensitiveNames)
-    //            : item.Equals(temp);
+        for (int i = 0; i < Count; i++)
+        {
+            var item = Items[i];
+            var temp = other[i];
+            var same = item.Equals(temp);
 
-    //        if (!same) return false;
-    //    }
-    //    return true;
-    //}
+            if (!same) return false;
+        }
+        return true;
+    }
 
     /// <inheritdoc/>
     public override bool Equals(object? obj) => Equals(obj as IItem);
@@ -75,46 +71,56 @@ public partial class IdentifierTags : IHost
     public static bool operator !=(THost? host, IHost? item) => !(host == item);
 
     /// <inheritdoc/>
-    public override int GetHashCode() => throw null;
-    //{
-    //    var code = Engine.GetHashCode();
-    //    for (int i = 0; i < Count; i++) code = HashCode.Combine(code, Items[i]);
-    //    return code;
-    //}
+    public override int GetHashCode()
+    {
+        var code = CaseSensitiveTags.GetHashCode();
+        for (int i = 0; i < Count; i++) code = HashCode.Combine(code, Items[i]);
+        return code;
+    }
 
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public bool CaseSensitiveTags { get; }
+    public bool CaseSensitiveTags => Items.CaseSensitiveTags;
 
     /// <inheritdoc/>
-    public IEnumerable<string> TagNames { get => throw null; }
+    public IEnumerable<string> TagNames => Items.TagNames;
 
     /// <inheritdoc/>
-    public virtual IHost.IBuilder CreateBuilder() => throw null;
+    public virtual IHost.IBuilder CreateBuilder() => Items.Clone();
 
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public bool Contains(string name) => throw null;
+    public bool Contains(string name) => Items.Contains(name);
 
     /// <inheritdoc/>
-    public bool Contains(IEnumerable<string> range) => throw null;
+    public bool Contains(IEnumerable<string> range) => Items.Contains(range);
 
     /// <inheritdoc/>
-    public int IndexOf(string name) => throw null;
+    public int IndexOf(string name) => Items.IndexOf(name);
 
     /// <inheritdoc/>
-    public int IndexOf(IEnumerable<string> range) => throw null;
+    public int IndexOf(IEnumerable<string> range) => Items.IndexOf(range);
 
     /// <inheritdoc/>
-    public List<int> IndexesOf(IEnumerable<string> range) => throw null;
+    public List<int> IndexesOf(IEnumerable<string> range) => Items.IndexesOf(range);
 
     // ------------------------------------------------
 
     /// <inheritdoc/>
-    public virtual IHost Remove(string name) => throw null;
+    public virtual IHost Remove(string name)
+    {
+        var builder = CreateBuilder();
+        var done = builder.Remove(name);
+        return done > 0 ? builder.CreateInstance() : this;
+    }
 
     /// <inheritdoc/>
-    public virtual IHost Remove(IEnumerable<string> range) => throw null;
+    public virtual IHost Remove(IEnumerable<string> range)
+    {
+        var builder = CreateBuilder();
+        var done = builder.Remove(range);
+        return done > 0 ? builder.CreateInstance() : this;
+    }
 }

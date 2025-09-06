@@ -116,26 +116,64 @@ partial class IdentifierTags
         // ----------------------------------------------------
 
         /// <inheritdoc/>
-        public bool Contains(string name) => throw null;
+        public bool Contains(string name) => IndexOf(name) >= 0;
 
         /// <inheritdoc/>
-        public bool Contains(IEnumerable<string> range) => throw null;
+        public bool Contains(IEnumerable<string> range) => IndexOf(range) >= 0;
 
         /// <inheritdoc/>
-        public int IndexOf(string name) => throw null;
+        public int IndexOf(string name)
+        {
+            name = name.NotNullNotEmpty();
+            return IndexOf(x => x.Contains(name));
+        }
 
         /// <inheritdoc/>
-        public int IndexOf(IEnumerable<string> range) => throw null;
+        public int IndexOf(IEnumerable<string> range)
+        {
+            range.ThrowWhenNull();
+
+            return IndexOf(x =>
+            {
+                foreach (var name in range) if (x.Contains(name)) return true;
+                return false;
+            });
+        }
 
         /// <inheritdoc/>
-        public List<int> IndexesOf(IEnumerable<string> range) => throw null;
+        public List<int> IndexesOf(IEnumerable<string> range)
+        {
+            range.ThrowWhenNull();
+
+            return IndexesOf(x =>
+            {
+                foreach (var name in range) if (x.Contains(name)) return true;
+                return false;
+            });
+        }
 
         // ------------------------------------------------
 
         /// <inheritdoc/>
-        public virtual int Remove(string name) => throw null;
+        public virtual int Remove(string name)
+        {
+            var index = IndexOf(name);
+            return index >= 0 ? RemoveAt(index) : 0;
+        }
 
         /// <inheritdoc/>
-        public virtual int Remove(IEnumerable<string> range) => throw null;
+        public virtual int Remove(IEnumerable<string> range)
+        {
+            range.ThrowWhenNull();
+
+            var num = 0; while (true)
+            {
+                var index = IndexOf(range);
+
+                if (index >= 0) { RemoveAt(index); num++; }
+                else break;
+            }
+            return num;
+        }
     }
 }
