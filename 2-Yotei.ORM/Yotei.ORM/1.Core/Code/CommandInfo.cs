@@ -75,6 +75,9 @@ public partial class CommandInfo : ICommandInfo
     public bool IsEmpty => Text.Length == 0 && Parameters.Count == 0;
 
     /// <inheritdoc/>
+    public bool IsConsistent() => Items.IsConsistent();
+
+    /// <inheritdoc/>
     public virtual ICommandInfo.IBuilder CreateBuilder() => Items.Clone();
 
     // ------------------------------------------------

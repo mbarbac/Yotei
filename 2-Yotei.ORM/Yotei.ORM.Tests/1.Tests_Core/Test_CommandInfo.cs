@@ -374,4 +374,39 @@ public static class Test_CommandInfo
         Assert.Equal("#Last", target.Parameters[1].Name); Assert.Equal("Bond", target.Parameters[1].Value);
         Assert.Equal("#Other", target.Parameters[2].Name); Assert.Equal("any", target.Parameters[2].Value);
     }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Consistent_True()
+    {
+        var engine = new FakeEngine();
+        var source = new CommandInfo(engine);
+        Assert.True(source.IsConsistent());
+
+        source = new CommandInfo(engine, "{0} {1}", new { First = "James" }, new { Last = "Bond" });
+        Assert.True(source.IsConsistent());
+
+        var target = source.ReplaceText("#First #Last #First #Last");
+        Assert.True(target.IsConsistent());
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Consistent_False()
+    {
+        var engine = new FakeEngine();
+        var source = new CommandInfo(engine, "{0} {1}", new { First = "James" }, new { Last = "Bond" });
+
+        var target = source.ReplaceText("#First #Last {any}"); // Dangling bracket...
+        Assert.False(target.IsConsistent());
+
+        target = source.ReplaceText("#First #Last #Other"); // Dangling specification...
+        Assert.False(target.IsConsistent());
+
+        var items = source.Parameters.Add(new Parameter("#Other", null)).ToArray(); // Unused par...
+        target = source.ReplaceValues(items);
+        Assert.False(target.IsConsistent());
+    }
 }

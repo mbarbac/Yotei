@@ -33,6 +33,13 @@ public partial interface ICommandInfo
     /// </summary>
     bool IsEmpty { get; }
 
+    /// <summary>
+    /// Determines if this instance is in a consistent state, defined as when the parameters
+    /// match with their normalized representation in text.
+    /// </summary>
+    /// <returns></returns>
+    bool IsConsistent();
+
     // ------------------------------------------------
 
     /// <summary>

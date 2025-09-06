@@ -1,5 +1,4 @@
 ﻿namespace Yotei.ORM.Code;
-
 partial class CommandInfo
 {
     // ====================================================
@@ -112,9 +111,42 @@ partial class CommandInfo
         // ------------------------------------------------
 
         /// <inheritdoc/>
-        public bool IsValid()
+        public bool IsConsistent()
         {
-            throw null;
+            if (IsEmpty) return true; // Empty are per-se consistent...
+
+            var text = _Text.ToString();
+            var pars = _Parameters.ToList();
+            var finder = new StrFindIsolated();
+            var sensitive = Engine.CaseSensitiveNames;
+            var prefix = Engine.ParameterPrefix;
+            var heads = StrFindIsolated.SEPARATORS;
+
+            // Finding dangling brackets...
+            if (AreRemainingBrackets(text)) return false;
+
+            // Finding unused parameters...
+            foreach (var par in _Parameters)
+            {
+                var pos = 0;
+                while ((pos = finder.Find(text, par.Name, pos, sensitive)) >= 0)
+                {
+                    text = text.Remove(pos, par.Name.Length);
+                    pars.Remove(par);
+                }
+            }
+            if (pars.Count != 0) return false;
+
+            // Finding dangling parameter specifications...
+            var ini = text.IndexOf(prefix, sensitive);
+            if (ini >= 0)
+            {
+                var span = text.AsSpan(ini);
+                if (span.Length > 0) return false;
+            }
+
+            // Finishing...
+            return true;
         }
 
         // ------------------------------------------------

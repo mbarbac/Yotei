@@ -36,6 +36,9 @@ partial interface ICommandInfo
         /// </summary>
         bool IsEmpty { get; }
 
+        /// <inheritdoc cref="ICommandInfo.IsConsistent"/>
+        bool IsConsistent();
+
         // ------------------------------------------------
 
         /// <summary>

@@ -9,8 +9,10 @@
 public class StrFindIsolated
 {
     /// <summary>
-    /// The default collection of char separators for isolated values.
+    /// The default collection of char separators for isolated values, typically identifier or
+    /// parameter names.
     /// </summary>
+    /// '_' not included as it is often used in identifier or parameter names.
     public static readonly ImmutableArray<char>
         SEPARATORS = " ()[]{}<>\"'`´\\|!&@#=+-*/%^".ToImmutableArray();
 
