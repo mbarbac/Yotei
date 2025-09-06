@@ -38,6 +38,7 @@ public partial interface ICommandInfo
     /// <summary>
     /// Returns a new instance where the contents of the given source have been added to the
     /// original ones.
+    /// <br/> This method accepts sources that are in an inconsistent state.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="iterable"></param>
@@ -47,6 +48,7 @@ public partial interface ICommandInfo
     /// <summary>
     /// Returns a new instance where the contents of the given source have been added to the
     /// original ones.
+    /// <br/> This method accepts sources that are in an inconsistent state.
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
@@ -55,6 +57,7 @@ public partial interface ICommandInfo
     /// <summary>
     /// Returns a new instance where the contents of the given source have been added to the
     /// original ones.
+    /// <br/> This method accepts sources that are in an inconsistent state.
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>

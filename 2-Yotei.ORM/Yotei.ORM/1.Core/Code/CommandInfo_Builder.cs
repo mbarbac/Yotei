@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices.Marshalling;
-
-namespace Yotei.ORM.Code;
+﻿namespace Yotei.ORM.Code;
 
 partial class CommandInfo
 {
@@ -110,6 +108,14 @@ partial class CommandInfo
 
         /// <inheritdoc/>
         public virtual ICommandInfo CreateInstance() => new CommandInfo(this);
+
+        // ------------------------------------------------
+
+        /// <inheritdoc/>
+        public bool IsValid()
+        {
+            throw null;
+        }
 
         // ------------------------------------------------
 

@@ -40,6 +40,7 @@ partial interface ICommandInfo
 
         /// <summary>
         /// Adds the contents of the given source to this instance.
+        /// <br/> This method accepts sources that are in an inconsistent state.
         /// <br/> Returns whether changes have been made, or not.
         /// </summary>
         /// <param name="source"></param>
@@ -49,6 +50,7 @@ partial interface ICommandInfo
 
         /// <summary>
         /// Adds the contents of the given source to this instance.
+        /// <br/> This method accepts sources that are in an inconsistent state.
         /// <br/> Returns whether changes have been made, or not.
         /// </summary>
         /// <param name="source"></param>
@@ -57,6 +59,7 @@ partial interface ICommandInfo
 
         /// <summary>
         /// Adds the contents of the given source to this instance.
+        /// <br/> This method accepts sources that are in an inconsistent state.
         /// <br/> Returns whether changes have been made, or not.
         /// </summary>
         /// <param name="source"></param>
