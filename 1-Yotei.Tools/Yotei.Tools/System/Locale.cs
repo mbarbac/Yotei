@@ -9,6 +9,7 @@ namespace Yotei.Tools;
 public sealed record class Locale
     : IComparer<string?>, IComparer<char>, IComparer<StrSpan>
     , IEqualityComparer<string?>, IEqualityComparer<char>, IEqualityComparer<StrSpan>
+    , IFormatProvider
 {
     /// <summary>
     /// Initializes a new instance using the culture of the current thread and default comparison
@@ -79,6 +80,9 @@ public sealed record class Locale
         init => _CompareOptions = value;
     }
     CompareOptions _CompareOptions = CompareOptions.None;
+
+    /// <inheritdoc/>
+    public object? GetFormat(Type? formatType) => CultureInfo.GetFormat(formatType);
 
     // ----------------------------------------------------
 

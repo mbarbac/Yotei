@@ -64,4 +64,14 @@ public partial interface IConnection : IDisposableEx
     /// not try to manage its life cycle.
     /// </summary>
     ITransaction Transaction { get; }
+
+    /// <summary>
+    /// The collection of value converters from application-level types to database-level ones.
+    /// </summary>
+    IValueConverterList ValueConverters { get; }
+
+    /// <summary>
+    /// Provides access to the records-oriented capabilities of this instance.
+    /// </summary>
+    IRecordsGate Records { get; }
 }

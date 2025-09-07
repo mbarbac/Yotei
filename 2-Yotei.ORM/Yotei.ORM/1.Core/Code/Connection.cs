@@ -1,8 +1,6 @@
 ﻿#pragma warning disable IDE0008
 #pragma warning disable IDE0019
 
-using System.Text.Json;
-
 namespace Yotei.ORM.Code;
 
 // ========================================================
@@ -30,6 +28,7 @@ public abstract partial class Connection : DisposableClass, IConnection
         Engine = source.Engine;
         Retries = source.Retries;
         RetryInterval = source.RetryInterval;
+        ValueConverters.AddRange(source.ValueConverters);
     }
 
     /// <inheritdoc/>
@@ -181,6 +180,23 @@ public abstract partial class Connection : DisposableClass, IConnection
     /// Invoked to close the connection with the underlying database.
     /// </summary>
     protected abstract ValueTask OnCloseAsync();
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public IValueConverterList ValueConverters { get; } = new ValueConverterList();
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public IRecordsGate Records => _Records ??= CreateRecordsGate();
+    IRecordsGate? _Records;
+
+    /// <summary>
+    /// Invoked to create a new object of the appropriate type for this instance.
+    /// </summary>
+    /// <returns></returns>
+    protected abstract IRecordsGate CreateRecordsGate();
 
     // ----------------------------------------------------
 
