@@ -98,10 +98,9 @@ public partial class Record : IRecord
     /// <inheritdoc/>
     public ISchema? Schema
     {
-        get => _Schema ??= Items.Schema;
-        init => _Schema = Items.Schema = value;
+        get => Items.Schema;
+        init => Items.Schema = value;
     }
-    ISchema? _Schema;
 
     /// <inheritdoc/>
     public int Count => Items.Count;
@@ -134,7 +133,7 @@ public partial class Record : IRecord
         var values = Items.ToList(index, count);
         var schema = Schema?.GetRange(index, count);
 
-        return schema is null ? new Record(this) : new Record(this) { Schema = schema };
+        return schema is null ? new Record(values) : new Record(values) { Schema = schema };
     }
 
     /// <inheritdoc/>

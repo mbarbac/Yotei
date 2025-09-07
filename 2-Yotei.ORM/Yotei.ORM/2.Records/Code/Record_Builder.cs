@@ -9,7 +9,7 @@ partial class Record
     public partial class Builder : IRecord.IBuilder
     {
         List<object?> _Values = [];
-        ISchema.IBuilder? _Schema = null;
+        ISchema? _Schema = null;
 
         /// <summary>
         /// Initializes a new empty schema-less instance.
@@ -30,7 +30,7 @@ partial class Record
         /// Initializes a new empty schema-full instance.
         /// </summary>
         /// <param name="engine"></param>
-        public Builder(IEngine engine) => _Schema = new Schema.Builder(engine);
+        public Builder(IEngine engine) => _Schema = new Schema(engine);
 
         /// <summary>
         /// Initializes a new schema-full instance with the given schema and values.
@@ -90,14 +90,14 @@ partial class Record
         /// <inheritdoc/>
         public virtual IRecord CreateInstance() => _Schema is null
             ? new Record(this)
-            : new Record(this) { Schema = _Schema.CreateInstance() };
+            : new Record(this) { Schema = _Schema };
 
         // ----------------------------------------------------
 
         /// <inheritdoc/>
         public ISchema? Schema
         {
-            get => _Schema?.CreateInstance();
+            get => _Schema;
             set
             {
                 if (value is null) _Schema = null;
@@ -108,7 +108,7 @@ partial class Record
                         .WithData(value)
                         .WithData(this);
 
-                    _Schema = value.CreateBuilder();
+                    _Schema = value;
                 }
             }
         }
@@ -304,7 +304,7 @@ partial class Record
         public virtual bool RemoveAt(int index)
         {
             _Values.RemoveAt(index);
-            _Schema?.RemoveAt(index);
+            Schema = Schema?.RemoveAt(index);
             return true;
         }
 
@@ -314,7 +314,7 @@ partial class Record
             if (count == 0) return false;
 
             _Values.RemoveRange(index, count);
-            _Schema?.RemoveRange(index, count);
+            Schema = Schema?.RemoveRange(index, count);
             return true;
         }
 
@@ -323,8 +323,8 @@ partial class Record
         {
             ThrowIfSchemaLess();
 
-            var index = _Schema!.IndexOf(identifier);
-            return RemoveAt(index);
+            var index = Schema!.IndexOf(identifier);
+            return index >= 0 ? RemoveAt(index) : false;
         }
 
         /// <inheritdoc/>
@@ -333,7 +333,7 @@ partial class Record
             if (Count == 0) return false;
 
             _Values = [];
-            _Schema?.Clear();
+            Schema = Schema?.Clear();
             return true;
         }
     }
