@@ -184,7 +184,14 @@ public abstract partial class Connection : DisposableClass, IConnection
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public IValueConverterList ValueConverters { get; } = new ValueConverterList();
+    public IValueConverterList ValueConverters => _ValueConverters ??= CreateValueConverters();
+    IValueConverterList? _ValueConverters;
+
+    /// <summary>
+    /// Invoked to create a new object of the appropriate type for this instance.
+    /// </summary>
+    /// <returns></returns>
+    protected virtual IValueConverterList CreateValueConverters() => new ValueConverterList();
 
     // ----------------------------------------------------
 
