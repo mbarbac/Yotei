@@ -1,4 +1,5 @@
 ﻿using Record = Yotei.ORM.Records.Code.Record;
+using Entry = Yotei.ORM.Records.Code.SchemaEntry;
 
 namespace Yotei.ORM.Tests.Records;
 
@@ -47,9 +48,9 @@ public static class Test_Record
     static IRecord CreateFull()
     {
         var engine = new FakeEngine();
-        var xid = new SchemaEntry(engine, "dbo.Employees.Id", isPrimaryKey: true);
-        var xfirst = new SchemaEntry(engine, "Employees.FirstName");
-        var xlast = new SchemaEntry(engine, "LastName");
+        var xid = new Entry(engine, "dbo.Employees.Id", isPrimaryKey: true);
+        var xfirst = new Entry(engine, "Employees.FirstName");
+        var xlast = new Entry(engine, "LastName");
         var schema = new Schema(engine, [xid, xfirst, xlast]);
 
         return new Record(schema, ["007", "James", "Bond"]);
@@ -93,7 +94,7 @@ public static class Test_Record
         Assert.False(source.Equals(target));
         Assert.False(target.Equals(source));
 
-        schema = (Schema)schema.Replace(0, new SchemaEntry(schema.Engine, "Any"));
+        schema = (Schema)schema.Replace(0, new Entry(schema.Engine, "Any"));
         target = new Record(schema, ["007", "James", "Bond"]);
         Assert.False(source.Equals(target));
         Assert.False(target.Equals(source));
@@ -162,7 +163,7 @@ public static class Test_Record
         Assert.NotSame(source, target);
         Assert.Null(target.Schema);
 
-        var schema = source.Schema!.Replace(0, new SchemaEntry(source.Schema.Engine, "Any"));
+        var schema = source.Schema!.Replace(0, new Entry(source.Schema.Engine, "Any"));
         target = source.WithSchema(schema);
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
@@ -264,7 +265,7 @@ public static class Test_Record
         Assert.Equal("James", target[1]);
         Assert.Equal("Bond", target[2]);
 
-        var schema = source.Schema!.Replace(0, new SchemaEntry(source.Schema.Engine, "Any"));
+        var schema = source.Schema!.Replace(0, new Entry(source.Schema.Engine, "Any"));
         target = source.Replace(0, "008", schema);
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
@@ -298,7 +299,7 @@ public static class Test_Record
         var schema = source.Schema!;
         var engine = schema.Engine;
 
-        var target = source.Add("UK", schema.Add(new SchemaEntry(engine, "Country")));
+        var target = source.Add("UK", schema.Add(new Entry(engine, "Country")));
         Assert.NotSame(source, target);
         Assert.NotNull(target.Schema);
         Assert.Equal(4, target.Count);
@@ -311,12 +312,40 @@ public static class Test_Record
     // ----------------------------------------------------
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_AddRange_SchemaLess() => throw null;
+    [Fact]
+    public static void Test_AddRange_SchemaLess()
+    {
+        var source = CreateLess();
+
+        var target = source.AddRange(["UK", 50]);
+        Assert.NotSame(source, target);
+        Assert.Equal(5, target.Count);
+        Assert.Equal("007", target[0]);
+        Assert.Equal("James", target[1]);
+        Assert.Equal("Bond", target[2]);
+        Assert.Equal("UK", target[3]);
+        Assert.Equal(50, target[4]);
+    }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_AddRange_SchemaFull() => throw null;
+    [Fact]
+    public static void Test_AddRange_SchemaFull()
+    {
+        var source = CreateFull();
+        var schema = source.Schema!;
+        var engine = schema.Engine;
+
+        schema = schema.AddRange([new Entry(engine, "Country"), new Entry(engine, "Age")]);
+        var target = source.AddRange(["UK", 50], schema);
+        Assert.NotSame(source, target);
+        Assert.NotNull(target.Schema);
+        Assert.Equal(5, target.Count);
+        Assert.Equal("007", target[0]); Assert.Equal(source.Schema![0], target.Schema![0]);
+        Assert.Equal("James", target[1]); Assert.Same(source.Schema![1], target.Schema![1]);
+        Assert.Equal("Bond", target[2]); Assert.Same(source.Schema![2], target.Schema![2]);
+        Assert.Equal("UK", target[3]); Assert.Equal("[Country]", target.Schema![3].Identifier.Value);
+        Assert.Equal(50, target[4]); Assert.Equal("[Age]", target.Schema![4].Identifier.Value);
+    }
 
     // ----------------------------------------------------
 
@@ -343,7 +372,7 @@ public static class Test_Record
         var schema = source.Schema!;
         var engine = schema.Engine;
 
-        var target = source.Insert(3, "UK", schema.Insert(3, new SchemaEntry(engine, "Country")));
+        var target = source.Insert(3, "UK", schema.Insert(3, new Entry(engine, "Country")));
         Assert.NotSame(source, target);
         Assert.NotNull(target.Schema);
         Assert.Equal(4, target.Count);
@@ -356,12 +385,40 @@ public static class Test_Record
     // ----------------------------------------------------
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_InsertRange_SchemaLess() => throw null;
+    [Fact]
+    public static void Test_InsertRange_SchemaLess()
+    {
+        var source = CreateLess();
+
+        var target = source.InsertRange(3, ["UK", 50]);
+        Assert.NotSame(source, target);
+        Assert.Equal(5, target.Count);
+        Assert.Equal("007", target[0]);
+        Assert.Equal("James", target[1]);
+        Assert.Equal("Bond", target[2]);
+        Assert.Equal("UK", target[3]);
+        Assert.Equal(50, target[4]);
+    }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_InsertRange_SchemaFull() => throw null;
+    [Fact]
+    public static void Test_InsertRange_SchemaFull()
+    {
+        var source = CreateFull();
+        var schema = source.Schema!;
+        var engine = schema.Engine;
+
+        schema = schema.InsertRange(3, [new Entry(engine, "Country"), new Entry(engine, "Age")]);
+        var target = source.InsertRange(3, ["UK", 50], schema);
+        Assert.NotSame(source, target);
+        Assert.NotNull(target.Schema);
+        Assert.Equal(5, target.Count);
+        Assert.Equal("007", target[0]); Assert.Equal(source.Schema![0], target.Schema![0]);
+        Assert.Equal("James", target[1]); Assert.Same(source.Schema![1], target.Schema![1]);
+        Assert.Equal("Bond", target[2]); Assert.Same(source.Schema![2], target.Schema![2]);
+        Assert.Equal("UK", target[3]); Assert.Equal("[Country]", target.Schema![3].Identifier.Value);
+        Assert.Equal(50, target[4]); Assert.Equal("[Age]", target.Schema![4].Identifier.Value);
+    }
 
     // ----------------------------------------------------
 
@@ -393,12 +450,41 @@ public static class Test_Record
     // ----------------------------------------------------
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_RemoveRange_SchemaLess() => throw null;
+    [Fact]
+    public static void Test_RemoveRange_SchemaLess()
+    {
+        var source = CreateLess();
+        var target = source.RemoveRange(0, 0);
+        Assert.Same(source, target);
+
+        target = source.RemoveRange(0, 3);
+        Assert.NotSame(source, target);
+        Assert.Empty(target);
+
+        target = source.RemoveRange(0, 2);
+        Assert.NotSame(source, target);
+        Assert.Single(target);
+        Assert.Equal("Bond", target[0]);
+    }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_RemoveRange_SchemaFull() => throw null;
+    [Fact]
+    public static void Test_RemoveRange_SchemaFull()
+    {
+        var source = CreateFull();
+        var target = source.RemoveRange(0, 0);
+        Assert.Same(source, target);
+
+        target = source.RemoveRange(0, 3);
+        Assert.NotSame(source, target);
+        Assert.Empty(target);
+        Assert.Empty(target.Schema!);
+
+        target = source.RemoveRange(0, 2);
+        Assert.NotSame(source, target);
+        Assert.Single(target);
+        Assert.Equal("Bond", target[0]); Assert.Equal("[LastName]", target.Schema![0].Identifier.Value);
+    }
 
     // ----------------------------------------------------
 

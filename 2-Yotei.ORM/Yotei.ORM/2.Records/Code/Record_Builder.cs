@@ -207,9 +207,10 @@ partial class Record
         }
 
         /// <inheritdoc/>
-        public virtual bool Add(object? value)
+        public virtual bool Add(object? value) => Add(value, validate: true);
+        bool Add(object? value, bool validate)
         {
-            ThrowIfSchemaFull();
+            if (validate) ThrowIfSchemaFull();
 
             _Values.Add(value);
             return true;
@@ -230,7 +231,7 @@ partial class Record
             ThrowIfSchemaFull();
 
             var done = false;
-            foreach (var item in range) if (Add(item)) done = true;
+            foreach (var item in range) if (Add(item, validate: false)) done = true;
             return done;
         }
 
@@ -240,18 +241,22 @@ partial class Record
             range.ThrowWhenNull();
 
             var done = false;
-            foreach (var item in range) if (Add(item)) done = true;
+            foreach (var item in range)
+            {
+                if (Add(item, validate: false)) done = true;
+            }
 
             if (done) Schema = schema;
             return done;
         }
 
         /// <inheritdoc/>
-        public virtual bool Insert(int index, object? value)
+        public virtual bool Insert(int index, object? value) => Insert(index, value, validate: true);
+        bool Insert(int index, object? value, bool validate)
         {
-            ThrowIfSchemaFull();
+            if (validate) ThrowIfSchemaFull();
 
-            _Values.Insert(index ,value);
+            _Values.Insert(index, value);
             return true;
         }
 
@@ -272,7 +277,7 @@ partial class Record
             var done = false;
             foreach (var item in range)
             {
-                if (Insert(index, item))
+                if (Insert(index, item, validate: false))
                 {
                     done = true;
                     index++;
@@ -289,7 +294,7 @@ partial class Record
             var done = false;
             foreach (var item in range)
             {
-                if (Insert(index, item))
+                if (Insert(index, item, validate: false))
                 {
                     done = true;
                     index++;
