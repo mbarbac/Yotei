@@ -17,7 +17,11 @@ public abstract partial class Connection : DisposableClass, IConnection
     /// Initializes a new instance.
     /// </summary>
     /// <param name="engine"></param>
-    public Connection(IEngine engine) => Engine = engine.ThrowWhenNull();
+    public Connection(IEngine engine)
+    {
+        Engine = engine.ThrowWhenNull();
+        ValueConverters = CreateValueConverters();
+    }
 
     /// <summary>
     /// Copy constructor
@@ -28,6 +32,9 @@ public abstract partial class Connection : DisposableClass, IConnection
         Engine = source.Engine;
         Retries = source.Retries;
         RetryInterval = source.RetryInterval;
+
+        ValueConverters = CreateValueConverters();
+        ValueConverters.Clear();
         ValueConverters.AddRange(source.ValueConverters);
     }
 
@@ -184,8 +191,7 @@ public abstract partial class Connection : DisposableClass, IConnection
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public IValueConverterList ValueConverters => _ValueConverters ??= CreateValueConverters();
-    IValueConverterList? _ValueConverters;
+    public IValueConverterList ValueConverters { get; }
 
     /// <summary>
     /// Invoked to create a new object of the appropriate type for this instance.

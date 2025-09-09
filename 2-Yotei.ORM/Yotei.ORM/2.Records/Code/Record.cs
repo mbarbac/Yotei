@@ -29,10 +29,12 @@ public partial class Record : IRecord
     /// <summary>
     /// Initializes a new schema-less instance with the given values and schema entries.
     /// </summary>
+    /// <param name="engine"></param>
     /// <param name="values"></param>
+    /// <param name="entries"></param>
     public Record(
-        IEnumerable<object?> values, IEnumerable<ISchemaEntry> entries)
-        => Items = new(values, entries);
+        IEngine engine, IEnumerable<object?> values, IEnumerable<ISchemaEntry> entries)
+        => Items = new(engine, values, entries);
 
     /// <summary>
     /// Copy constructor.
@@ -136,7 +138,9 @@ public partial class Record : IRecord
         var values = Items.ToList(index, count);
         var schema = Schema?.GetRange(index, count);
 
-        return schema is null ? new Record(values) : new Record(values, schema);
+        return schema is null
+            ? new Record(values)
+            : new Record(schema.Engine, values, schema);
     }
 
     /// <inheritdoc/>
@@ -343,7 +347,7 @@ public partial class Record : IRecord
         // Finishing...
         if (values.Count == 0) return null;
         if (entries.Count == 0) return new Record(values);
-        return new Record(values, entries);
+        return new Record(engine, values, entries);
     }
 
     // ----------------------------------------------------

@@ -30,7 +30,8 @@ public partial class IdentifierTags : IHost
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected IdentifierTags(THost source) : this(source.CaseSensitiveTags) => Items.AddRange(source);
+    protected IdentifierTags(
+        THost source) : this(source.CaseSensitiveTags) => Items.AddRange(source);
 
     /// <inheritdoc/>
     public override string ToString() => Items.ToString();

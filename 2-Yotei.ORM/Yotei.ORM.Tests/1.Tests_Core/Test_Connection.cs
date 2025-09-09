@@ -33,6 +33,7 @@ public static class Test_Connection
         Assert.Equal(source.Retries, target.Retries);
         Assert.Equal(source.RetryInterval, target.RetryInterval);
         Assert.NotSame(source.Transaction, target.Transaction);
+        Assert.NotSame(source.ValueConverters, target.ValueConverters);
     }
 
     // ----------------------------------------------------

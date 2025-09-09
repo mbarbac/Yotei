@@ -35,11 +35,17 @@ partial class Record
         /// <summary>
         /// Initializes a new schema-less instance with the given values and schema entries.
         /// </summary>
+        /// <param name="entries"></param>
         /// <param name="values"></param>
-        public Builder(IEnumerable<object?> values, IEnumerable<ISchemaEntry> entries)
+        /// <param name="engine"></param>
+        public Builder(
+            IEngine engine, IEnumerable<object?> values, IEnumerable<ISchemaEntry> entries)
         {
+            engine.ThrowWhenNull();
             values.ThrowWhenNull();
             entries.ThrowWhenNull();
+
+            _Schema = new Schema.Builder(engine);
             AddRange(values.Select(x => x.TryClone()), entries);
         }
 
@@ -93,7 +99,7 @@ partial class Record
         /// <inheritdoc/>
         public virtual IRecord CreateInstance() => _Schema is null
             ? new Record(this)
-            : new Record(this, _Schema);
+            : new Record(_Schema.Engine, this, _Schema);
 
         // ----------------------------------------------------
 
