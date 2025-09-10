@@ -45,13 +45,29 @@ public abstract partial class EnumerableCommand : Command, IEnumerableCommand
     public virtual bool SupportsNativePaging { get; init; }
 
     /// <inheritdoc/>
-    public int Skip { get; set; }
+    public int Skip
+    {
+        get => _Skip;
+        set => _Skip = value >= 0 ? value : -1;
+    }
+    int _Skip = -1;
 
     /// <inheritdoc/>
-    public int Take { get; set; }
+    public int Take
+    {
+        get => _Take;
+        set => _Take = value >= 0 ? value : -1;
+    }
+    int _Take = -1;
 
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public abstract override IEnumerableCommand Clear();
+    public override IEnumerableCommand Clear()
+    {
+        Skip = -1;
+        Take = -1;
+
+        return this;
+    }
 }
