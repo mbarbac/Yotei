@@ -467,7 +467,9 @@ public class MenuTester : MenuEntry
         {
             WriteLine(true);
             WriteLine(true, Red, Program.FatSeparator);
-            WriteLine(true, Red, ex.ToDisplayString());
+
+            var str = ex.ToDisplayString();
+            WriteLine(true, Red, str);
             WriteLine(true, Red, Program.FatSeparator);
             WriteLine(true);
 

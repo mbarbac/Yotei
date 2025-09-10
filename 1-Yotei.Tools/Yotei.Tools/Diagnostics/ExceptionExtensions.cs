@@ -13,35 +13,48 @@ public static class ExceptionExtensions
     {
         exception.ThrowWhenNull();
 
-        var sb = new StringBuilder();
-        while (exception != null)
-        {
-            sb.AppendLine($"> Exception: {exception.GetType().Name}");
-            if (exception.Message != null) sb.AppendLine($"- Message: {exception.Message}");
-            if (exception.Data.Count != 0)
-            {
-                sb.AppendLine("- Data:");
-                foreach (DictionaryEntry item in exception.Data)
-                {
-                    var key = item.Key.ToString();
-                    var value = item.Value is null ? "NULL" : item.Value.ToString();
-                    sb.AppendLine($"\t- {key} = '{value}'");
-                }
-            }
-            if (exception.StackTrace != null)
-            {
-                sb.AppendLine("- Trace:");
-                sb.AppendLine(exception.StackTrace);
-            }
+        var sb = new StringBuilder(); OnDisplayString(sb, exception);
+        return sb.ToString();
+    }
 
-            exception = exception.InnerException!;
-            if (exception != null)
+    // Used to generate the display string of the given exception...
+    static void OnDisplayString(StringBuilder sb, Exception ex)
+    {
+        sb.AppendLine($"> Exception: {ex.GetType().Name}");
+        if (ex.Message != null) sb.AppendLine($"- Message: {ex.Message}");
+        if (ex.Data.Count != 0)
+        {
+            sb.AppendLine("- Data:");
+            foreach (DictionaryEntry item in ex.Data)
+            {
+                var key = item.Key.ToString();
+                var value = item.Value is null ? "NULL" : item.Value.ToString();
+                sb.AppendLine($"\t- {key} = '{value}'");
+            }
+        }
+        
+        if (ex.StackTrace != null)
+        {
+            sb.AppendLine("- Trace:");
+            sb.AppendLine(ex.StackTrace);
+        }
+
+        if (ex is AggregateException agg)
+        {
+            foreach (var inner in agg.InnerExceptions)
             {
                 sb.AppendLine();
                 sb.AppendLine(_Separator);
+                OnDisplayString(sb, inner);
             }
         }
-        return sb.ToString();
+
+        else if (ex.InnerException is not null)
+        {
+            sb.AppendLine();
+            sb.AppendLine(_Separator);
+            OnDisplayString(sb, ex.InnerException);
+        }
     }
 
     // Used to separate inner exceptions...

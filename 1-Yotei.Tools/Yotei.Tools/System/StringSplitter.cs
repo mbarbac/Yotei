@@ -1,43 +1,23 @@
-﻿namespace Yotei.Tools;
+﻿using Microsoft.VisualBasic;
+using Entry = System.ReadOnlyMemory<char>;
 
-// ========================================================
-public static class StringSplitterExtensions
-{
-    /// <summary>
-    /// Returns a new splitter for the given source string and separators.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="separators"></param>
-    /// <returns></returns>
-    public static StringSplitter Splitter(this string source, params IEnumerable<string> separators)
-    {
-        return new StringSplitter(source, separators);
-    }
-
-    /// <summary>
-    /// Returns a new splitter for the given source string and separators.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="separators"></param>
-    /// <returns></returns>
-    public static StringSplitter Splitter(this string source, params IEnumerable<char> separators)
-    {
-        return new StringSplitter(source, separators);
-    }
-}
+namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>
 /// Represents a forward-only string splitter.
-/// <br/> The class aligns with the 'string.Split()' family of methods' behavior, but accepts a
-/// custom string comparison, produces span-alike results, and the separators are also produced
-/// as valid results by default.
-/// <para>
-/// If <see cref="OmitSeparators"/> equals <c>true</c> and <see cref="OmitEmptyEntries"/>
-/// equals <c>false</c>, then it mimics the standard string's split behavior.</para>
 /// </summary>
-public record class StringSplitter : IEnumerable<ReadOnlyMemory<char>>, IEnumerator<ReadOnlyMemory<char>>
+/// <remarks>
+/// This class' behavior is somehow similar to the standard 'string.sSplit(...)' one, but:
+/// <br/>- Provides custom comparison capabilities.
+/// <br/>- Found separators are included in the results set instead of being ignored, unless
+/// <see cref="OmitSeparators"/> is requested to mimic 'string.Split(...)' behavior.
+/// <br/>- And produces span-alike results.
+/// </remarks>
+public record class StringSplitter : IEnumerable<Entry>, IEnumerator<Entry>
 {
+    IEnumerator<StrItem>? Results = null;
+
     /// <summary>
     /// Initializes a new instance for the given source string and separators.
     /// </summary>
@@ -55,7 +35,10 @@ public record class StringSplitter : IEnumerable<ReadOnlyMemory<char>>, IEnumera
     /// <param name="source"></param>
     /// <param name="separators"></param>
     public StringSplitter(string source, params IEnumerable<char> separators)
-        : this(source, separators.ThrowWhenNull().Select(x => x.ToString())) { }
+    {
+        Source = source.ThrowWhenNull();
+        Separators = separators.ThrowWhenNull().Select(x => x.ToString()).ToImmutableArray();
+    }
 
     /// <inheritdoc/>
     void IDisposable.Dispose()
@@ -64,15 +47,15 @@ public record class StringSplitter : IEnumerable<ReadOnlyMemory<char>>, IEnumera
         GC.SuppressFinalize(this);
     }
 
-    /// <inheritdoc cref="IEnumerable.GetEnumerator"/>
-    public StringSplitter GetEnumerator() => this;
-    IEnumerator<ReadOnlyMemory<char>> IEnumerable<ReadOnlyMemory<char>>.GetEnumerator() => this;
-    IEnumerator IEnumerable.GetEnumerator() => this;
-
     // ----------------------------------------------------
 
     /// <summary>
-    /// The collection of separators to use to split the source string.
+    /// The source string being split.
+    /// </summary>
+    public string Source { get; }
+
+    /// <summary>
+    /// The collection of separators used by this instance to split the source string.
     /// </summary>
     public ImmutableArray<string> Separators
     {
@@ -85,7 +68,9 @@ public record class StringSplitter : IEnumerable<ReadOnlyMemory<char>>, IEnumera
             foreach (var item in value) item.NotNullNotEmpty(trim: false);
         }
     }
-    ImmutableArray<string> _Separators = default!;
+    ImmutableArray<string> _Separators = [];
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// The comparison to use to compare string values. If not set while constructing this
@@ -94,54 +79,50 @@ public record class StringSplitter : IEnumerable<ReadOnlyMemory<char>>, IEnumera
     public StringComparison Comparison { get; init; } = StringComparison.CurrentCulture;
 
     /// <summary>
-    /// Omit from the resulting set those elements that are any of the given separators.
+    /// Include in the results set the elements that are separators.
     /// </summary>
     public bool OmitSeparators { get; init; }
 
     /// <summary>
-    /// Omit from the resulting set those regular entries that are empty strings.
+    /// Omit from the results set those regular entries that are empty strings.
     /// </summary>
-    public bool OmitEmptyEntries { get; init; }
+    public bool RemoveEmptyEntries { get; init; }
 
     /// <summary>
-    /// Trim the regular not-separator entries in the resulting set. If this flag is set along
-    /// with the '<see cref="OmitEmptyEntries"/>' one, then white-space only regular strings are
-    /// removed from the resulting set.
+    /// Trim the regular not-separator entries in the results set.
+    /// If this flag is set along with the '<see cref="RemoveEmptyEntries"/>' one, then the white
+    /// space only regular strings are removed from the resulting set.
     /// </summary>
     public bool TrimEntries { get; init; }
 
     // ----------------------------------------------------
 
-    /// <summary>
-    /// The source string being split.
-    /// </summary>
-    public string Source { get; }
+    /// <inheritdoc cref="IEnumerable.GetEnumerator"/>
+    public StringSplitter GetEnumerator() => this;
+    IEnumerator<Entry> IEnumerable<Entry>.GetEnumerator() => this;
+    IEnumerator IEnumerable.GetEnumerator() => this;
 
-    /// <summary>
-    /// Gets the element at the current position of this enumerator.
-    /// </summary>
-    public ReadOnlyMemory<char> Current { get; private set; }
-    object IEnumerator.Current => Current;
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public Entry Current { get; private set; }
+    object IEnumerator.Current => this;
 
     /// <summary>
     /// Determines if the current element is one among the given separators, or not.
     /// </summary>
-    public bool IsSeparator { get; private set; }
-
-    // ----------------------------------------------------
-
-    int Index = 0;
-    int Last = 0;
-    IEnumerator<ReadOnlyMemory<char>>? Results = null;
+    public bool IsCurrentSeparator { get; private set; }
 
     /// <inheritdoc/>
     public void Reset()
     {
-        Index = 0;
-        Last = 0;
-
-        Results?.Dispose();
-        Results = null;
+        if (Results is not null)
+        {
+            Results.Dispose();
+            Results = null;
+        }
+        Current = default;
+        IsCurrentSeparator = false;
     }
 
     /// <inheritdoc/>
@@ -149,72 +130,64 @@ public record class StringSplitter : IEnumerable<ReadOnlyMemory<char>>, IEnumera
     {
         Results ??= GetResults();
 
-        while (Results.MoveNext()) return true;
+        while (Results.MoveNext())
+        {
+            Current = Results.Current.Value;
+            IsCurrentSeparator = Results.Current.IsSeparator;
+            return true;
+        }
         return false;
     }
 
-    /// <summary>
-    /// Invoked to produce the actual results of this iterator.
-    /// </summary>
-    IEnumerator<ReadOnlyMemory<char>> GetResults()
+    // ----------------------------------------------------
+
+    // Represents an individual item in the source string.
+    readonly record struct StrItem(Entry Value, bool IsSeparator);
+
+    // Enumerates the items in the souce string.
+    IEnumerator<StrItem> GetResults()
     {
-        Current = default;
-        IsSeparator = false;
+        int i = 0, last = 0;
+        int len;
+        Entry entry;
 
-        // Looping through source...
-        while (Index < Source.Length)
+        // Looping through the source...
+        LOOP:
+        while (i < Source.Length)
         {
-            var span = Source[Index..];
+            var span = Source[i..];
 
-            // First separator found wins...
-
+            // First separator wins...
             foreach (var item in Separators)
             {
                 if (!span.StartsWith(item, Comparison)) continue;
 
-                // Contents before the separator...
-                Current = Source.AsMemory(Last, Index - Last);
+                // Pending characters...
+                len = i - last;
+                entry = Source.AsMemory(last, len);
 
-                if (TrimEntries) Current = Current.Trim();
-                if (!OmitEmptyEntries || (OmitEmptyEntries && Current.Length > 0))
-                {
-                    yield return Current;
-                }
+                if (TrimEntries) entry = entry.Trim();
+                if (!RemoveEmptyEntries || (RemoveEmptyEntries && entry.Length > 0))
+                    yield return new(entry, false);
 
-                // Reporting the separator itself...
-                if (!OmitSeparators)
-                {
-                    Current = Source.AsMemory(Index, item.Length);
-                    IsSeparator = true;
+                // The found separator...
+                if (!OmitSeparators) yield return new(item.AsMemory(), true);
 
-                    yield return Current;
-                }
-
-                Index += item.Length;
-                Last = Index;
-                Index--;
-                break;
+                // Adjusting...
+                i = last = (i + item.Length);
+                goto LOOP;
             }
 
-            // Advance to next character...
-            Index++;
+            // Otherwise, advance to the next character...
+            i++;
         }
 
-        // Remaining...
-        var len = Source.Length - Last;
-        if (len >= 0)
-        {
-            Current = Source.AsMemory(Last, len);
-            Last = int.MaxValue;
+        // Remaining characters...
+        len = Source.Length - last;
+        entry = Source.AsMemory(last, len);
 
-            if (TrimEntries) Current = Current.Trim();
-            if (!OmitEmptyEntries || (OmitEmptyEntries && Current.Length > 0))
-            {
-                yield return Current;
-            }
-        }
-
-        // Finishing...
-        yield break;
+        if (TrimEntries) entry = entry.Trim();
+        if (!RemoveEmptyEntries || (RemoveEmptyEntries && entry.Length > 0))
+            yield return new(entry, false);
     }
 }

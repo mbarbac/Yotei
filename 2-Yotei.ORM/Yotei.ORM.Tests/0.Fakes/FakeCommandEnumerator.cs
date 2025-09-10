@@ -8,6 +8,7 @@ public class FakeCommandEnumerator : CommandEnumerator
     int Index = 0;
     public object?[][] FakeArrays { get; set; } = [];
     public ISchema? FakeSchema { get; set; }
+    public int FakeDelayMs { get; set; }
 
     // ----------------------------------------------------
 
@@ -18,6 +19,7 @@ public class FakeCommandEnumerator : CommandEnumerator
         {
             FakeArrays = temp.FakeArrays;
             FakeSchema = temp.FakeSchema;
+            FakeDelayMs = temp.FakeDelayMs;
         }
     }
 
@@ -40,7 +42,11 @@ public class FakeCommandEnumerator : CommandEnumerator
     // ----------------------------------------------------
 
     protected override ValueTask<ISchema?> OnInitializeAsync() => ValueTask.FromResult(OnInitialize());
-    protected override ValueTask<IRecord?> OnNextResultAsync() => ValueTask.FromResult(OnNextResult());
+    protected override async ValueTask<IRecord?> OnNextResultAsync()
+    {
+        if (FakeDelayMs > 0) await Task.Delay(FakeDelayMs);
+        return OnNextResult();
+    }
     protected override ValueTask OnTerminateAsync() { Index = 0; return ValueTask.CompletedTask; }
     protected override ValueTask OnAbortAsync() { Index = 0; return ValueTask.CompletedTask; }
 }

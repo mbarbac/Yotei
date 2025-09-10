@@ -276,6 +276,7 @@ public abstract class CommandEnumerator : DisposableClass, ICommandEnumerator
     {
         ThrowIfDisposed();
         ThrowIfDisposing();
+        CancellationToken.ThrowIfCancellationRequested();
 
         /// <summary>
         /// Main loop...

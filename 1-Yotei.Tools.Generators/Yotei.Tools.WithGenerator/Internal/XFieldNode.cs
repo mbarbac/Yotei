@@ -208,6 +208,12 @@ internal class XFieldNode : FieldNode
                 }
             }
 
+            // Base method requested at type's level...
+            // Implements member => abstract
+            // Has not member => abstract override
+            if (FindInheritWithsAttribute(Host, out _) && !FindMember(Host, out _))
+                return "public abstract override ";
+
             // Default...
             return "public abstract ";
         }

@@ -114,7 +114,7 @@ public static class DebugEx
         {
             if (DebugAtOrigin && console) Console.Write(header);
 
-            if (iter.IsSeparator)
+            if (iter.IsCurrentSeparator)
             {
                 Debug.WriteLine(string.Empty);
                 if (console) Console.WriteLine();
@@ -126,7 +126,7 @@ public static class DebugEx
             if (console) Console.Write(iter.Current);
 
             DebugAtOrigin =
-                iter.IsSeparator ||
+                iter.IsCurrentSeparator ||
                 (iter.Current.Length == 0 && DebugAtOrigin);
         }
 
@@ -237,7 +237,8 @@ public static class DebugEx
         args ??= [null];
         if (args.Length > 0) message = string.Format(message, args);
 
-        console = console && !Ambient.IsConsoleListener();
+        var ambient = Ambient.IsConsoleListener();
+        console = console && !ambient;
 
         var size = Debug.IndentSize;
         var level = Debug.IndentLevel;
@@ -248,7 +249,7 @@ public static class DebugEx
         {
             if (DebugAtOrigin && console) Console.Write(header);
 
-            if (iter.IsSeparator)
+            if (iter.IsCurrentSeparator)
             {
                 Debug.WriteLine(string.Empty);
                 if (console) Console.WriteLine();
@@ -260,7 +261,7 @@ public static class DebugEx
             if (console) Console.Write(iter.Current);
 
             DebugAtOrigin =
-                iter.IsSeparator ||
+                iter.IsCurrentSeparator ||
                 (iter.Current.Length == 0 && DebugAtOrigin);
         }
 

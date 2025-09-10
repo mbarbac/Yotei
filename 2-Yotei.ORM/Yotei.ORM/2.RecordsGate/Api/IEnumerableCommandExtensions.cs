@@ -13,11 +13,8 @@ public static class IEnumerableCommandExtensions
         command.ThrowWhenNull();
 
         List<IRecord> list = [];
-        using var iter = command.GetEnumerator();
-
-        while (iter.MoveNext())
+        foreach (var item in command)
         {
-            var item = iter.Current;
             if (item is not null) list.Add(item);
         }
         return list;
@@ -34,29 +31,122 @@ public static class IEnumerableCommandExtensions
         CancellationToken token = default)
     {
         command.ThrowWhenNull();
+
         List<IRecord> list = [];
-
-        await foreach (var item in command.WithCancellation(token))
+        await foreach (var item in command.WithCancellation(token).ConfigureAwait(false))
+        {
             if (item is not null) list.Add(item);
-
+        }
         return list;
     }
-    //{
-    //    //
+    
+    // ----------------------------------------------------
 
-    //    //
+    /// <summary>
+    /// Returns an array with the results produced by the execution of this command.
+    /// </summary>
+    /// <param name="command"></param>
+    /// <returns></returns>
+    public static IRecord[] ToArray(this IEnumerableCommand command)
+    {
+        var items = command.ToList();
+        return items.ToArray();
+    }
 
-    //    //await foreach (var item in command.WithCancellation(token))
-    //    //{
-    //    //}
+    /// <summary>
+    /// Returns a list with the results produced by the execution of this command.
+    /// </summary>
+    /// <param name="command"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    public static async ValueTask<IRecord[]> ToArrayAsync(
+        this IEnumerableCommand command, CancellationToken token = default)
+    {
+        var items = await command.ToListAsync(token).ConfigureAwait(false);
+        return items.ToArray();
+    }
 
-    //    throw null;
-    //    //await using var iter = command.GetAsyncEnumerator(token);
-    //    //while (await iter.MoveNextAsync().with)
-    //    //{
-    //    //    var item = iter.Current;
-    //    //    if (item is not null) list.Add(item);
-    //    //}
-    //    //return list;
-    //}
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns the first result produced by the execution of the command, or <c>null</c> if any.
+    /// </summary>
+    /// <param name="command"></param>
+    /// <returns></returns>
+    public static IRecord? First(this IEnumerableCommand command)
+    {
+        command.ThrowWhenNull();
+
+        foreach (var item in command)
+        {
+            if (item is not null) return item;
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Returns the first result produced by the execution of the command, or <c>null</c> if any.
+    /// </summary>
+    /// <param name="command"></param>
+    /// <returns></returns>
+    public static async ValueTask<IRecord?> FirstAsync(
+        this IEnumerableCommand command, CancellationToken token = default)
+    {
+        command.ThrowWhenNull();
+
+        await foreach (var item in command.WithCancellation(token).ConfigureAwait(false))
+        {
+            if (item is not null) return item;
+        }
+        return null;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns the last result produced by the execution of the command, or <c>null</c> if any.
+    /// <para>
+    /// This method is provided as a fall-back mechanism because it iterates through all possible
+    /// results, discarding them until the last one is found. The recommended approach is to modify
+    /// the logic of the original command, if such is possible.
+    /// </para>
+    /// </summary>
+    /// <param name="command"></param>
+    /// <returns></returns>
+    public static IRecord? Last(this IEnumerableCommand command)
+    {
+        command.ThrowWhenNull();
+
+        IRecord? record = null;
+        foreach (var item in command)
+        {
+            if (item is not null) record = item;
+        }
+        return record;
+    }
+
+    /// <summary>
+    /// Returns the last result produced by the execution of the command, or <c>null</c> if any.
+    /// <para>
+    /// This method is provided as a fall-back mechanism because it iterates through all possible
+    /// results, discarding them until the last one is found. The recommended approach is to modify
+    /// the logic of the original command, if such is possible.
+    /// </para>
+    /// </summary>
+    /// <param name="command"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    public static async ValueTask<IRecord?> LastAsync(
+        this IEnumerableCommand command,
+        CancellationToken token = default)
+    {
+        command.ThrowWhenNull();
+
+        IRecord? record = null;
+        await foreach (var item in command.WithCancellation(token).ConfigureAwait(false))
+        {
+            if (item is not null) record = item;
+        }
+        return record;
+    }
 }

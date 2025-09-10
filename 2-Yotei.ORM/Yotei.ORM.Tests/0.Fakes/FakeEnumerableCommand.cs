@@ -7,6 +7,7 @@ public partial class FakeEnumerableCommand : FakeCommand, IEnumerableCommand
 {
     public object?[][] FakeArrays { get; set; } = [];
     public ISchema? FakeSchema { get; set; }
+    public int FakeDelayMs { get; set; }
 
     // ----------------------------------------------------
 
