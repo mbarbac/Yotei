@@ -1,9 +1,9 @@
 ﻿namespace Yotei.ORM.Tests;
 
 // ========================================================
-[Cloneable<ICommand>]
-[InheritWiths<ICommand>]
-public partial class FakeCommand : Command
+[Cloneable]
+[InheritWiths]
+public partial class FakeCommand : Yotei.ORM.Records.Code.EnumerableCommand, IExecutableCommand
 {
     public CommandInfo FakeInfo
     {
@@ -11,6 +11,14 @@ public partial class FakeCommand : Command
         set => _FakeInfo = value.ThrowWhenNull();
     }
     CommandInfo _FakeInfo = default!;
+
+    // ----------------------------------------------------
+
+    public object?[][] FakeArrays { get; set; } = [];
+    public ISchema? FakeSchema { get; set; }
+    public int FakeDelayMs { get; set; }
+
+    public int FakeExecResult { get; set; }
 
     // ----------------------------------------------------
 
@@ -26,6 +34,8 @@ public partial class FakeCommand : Command
         : base(source)
         => FakeInfo = (CommandInfo)source.FakeInfo.Clone();
 
+    public ICommandExecutor GetExecutor() => Connection.Records.CreateCommandExecutor(this);
+
     // ----------------------------------------------------
 
     public override bool IsValid => !FakeInfo.IsEmpty && FakeInfo.IsConsistent();
@@ -34,5 +44,13 @@ public partial class FakeCommand : Command
 
     public override ICommandInfo GetCommandInfo(bool _) => FakeInfo;
 
-    public override ICommand Clear() { FakeInfo.Clear(); return this; }
+    public override FakeCommand Clear()
+    {
+        FakeInfo.Clear();
+        FakeArrays = [];
+        FakeSchema = FakeSchema?.Clear();
+
+        return this;
+    }
+    IExecutableCommand IExecutableCommand.Clear() => Clear();
 }

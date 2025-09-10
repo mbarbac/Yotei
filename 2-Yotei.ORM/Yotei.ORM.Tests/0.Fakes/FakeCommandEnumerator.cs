@@ -15,7 +15,7 @@ public class FakeCommandEnumerator : CommandEnumerator
     public FakeCommandEnumerator(IEnumerableCommand command, CancellationToken token = default)
         : base(command, token)
     {
-        if (command is FakeEnumerableCommand temp)
+        if (command is FakeCommand temp)
         {
             FakeArrays = temp.FakeArrays;
             FakeSchema = temp.FakeSchema;

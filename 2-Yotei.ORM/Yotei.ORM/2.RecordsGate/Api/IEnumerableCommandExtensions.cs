@@ -1,4 +1,5 @@
-﻿namespace Yotei.ORM.Records;
+﻿//#define USE_ITER
+namespace Yotei.ORM.Records;
 
 // ========================================================
 public static class IEnumerableCommandExtensions
@@ -9,6 +10,22 @@ public static class IEnumerableCommandExtensions
     /// <param name="command"></param>
     /// <returns></returns>
     public static List<IRecord> ToList(this IEnumerableCommand command)
+#if USE_ITER
+    {
+        command.ThrowWhenNull();
+
+        List<IRecord> list = [];
+
+        using var iter = command.GetEnumerator();
+        while (iter.MoveNext())
+        {
+            var item = iter.Current;
+            if (item is not null) list.Add(item);
+        }
+
+        return list;
+    }
+#else
     {
         command.ThrowWhenNull();
 
@@ -19,6 +36,7 @@ public static class IEnumerableCommandExtensions
         }
         return list;
     }
+#endif
 
     /// <summary>
     /// Returns a list with the records produced by the execution of the command.
@@ -29,6 +47,22 @@ public static class IEnumerableCommandExtensions
     public static async ValueTask<List<IRecord>> ToListAsync(
         this IEnumerableCommand command,
         CancellationToken token = default)
+#if USE_ITER
+    {
+        command.ThrowWhenNull();
+
+        List<IRecord> list = [];
+
+        await using var iter = command.GetAsyncEnumerator(token);
+        while (await iter.MoveNextAsync().ConfigureAwait(false))
+        {
+            var item = iter.Current;
+            if (item is not null) list.Add(item);
+        }
+
+        return list;
+    }
+#else
     {
         command.ThrowWhenNull();
 
@@ -39,7 +73,8 @@ public static class IEnumerableCommandExtensions
         }
         return list;
     }
-    
+#endif
+
     // ----------------------------------------------------
 
     /// <summary>
@@ -74,6 +109,20 @@ public static class IEnumerableCommandExtensions
     /// <param name="command"></param>
     /// <returns></returns>
     public static IRecord? First(this IEnumerableCommand command)
+#if USE_ITER
+    {
+        command.ThrowWhenNull();
+
+        using var iter = command.GetEnumerator();
+        while (iter.MoveNext())
+        {
+            var item = iter.Current;
+            if (item is not null) return item;
+        }
+
+        return null;
+    }
+#else
     {
         command.ThrowWhenNull();
 
@@ -83,6 +132,7 @@ public static class IEnumerableCommandExtensions
         }
         return null;
     }
+#endif
 
     /// <summary>
     /// Returns the first result produced by the execution of the command, or <c>null</c> if any.
@@ -91,6 +141,20 @@ public static class IEnumerableCommandExtensions
     /// <returns></returns>
     public static async ValueTask<IRecord?> FirstAsync(
         this IEnumerableCommand command, CancellationToken token = default)
+#if USE_ITER
+    {
+        command.ThrowWhenNull();
+
+        await using var iter = command.GetAsyncEnumerator(token);
+        while (await iter.MoveNextAsync().ConfigureAwait(false))
+        {
+            var item = iter.Current;
+            if (item is not null) return item;
+        }
+
+        return null;
+    }
+#else
     {
         command.ThrowWhenNull();
 
@@ -100,6 +164,7 @@ public static class IEnumerableCommandExtensions
         }
         return null;
     }
+#endif
 
     // ----------------------------------------------------
 
@@ -114,6 +179,22 @@ public static class IEnumerableCommandExtensions
     /// <param name="command"></param>
     /// <returns></returns>
     public static IRecord? Last(this IEnumerableCommand command)
+#if USE_ITER
+    {
+        command.ThrowWhenNull();
+
+        using var iter = command.GetEnumerator();
+        IRecord? record = null;
+
+        while (iter.MoveNext())
+        {
+            var item = iter.Current;
+            if (item is not null) record = item;
+        }
+
+        return record;
+    }
+#else
     {
         command.ThrowWhenNull();
 
@@ -124,6 +205,7 @@ public static class IEnumerableCommandExtensions
         }
         return record;
     }
+#endif
 
     /// <summary>
     /// Returns the last result produced by the execution of the command, or <c>null</c> if any.
@@ -139,6 +221,22 @@ public static class IEnumerableCommandExtensions
     public static async ValueTask<IRecord?> LastAsync(
         this IEnumerableCommand command,
         CancellationToken token = default)
+#if USE_ITER
+    {
+        command.ThrowWhenNull();
+
+        await using var iter = command.GetAsyncEnumerator(token);
+        IRecord? record = null;
+
+        while (await iter.MoveNextAsync().ConfigureAwait(false))
+        {
+            var item = iter.Current;
+            if (item is not null) record = item;
+        }
+
+        return record;
+    }
+#else
     {
         command.ThrowWhenNull();
 
@@ -149,4 +247,5 @@ public static class IEnumerableCommandExtensions
         }
         return record;
     }
+#endif
 }

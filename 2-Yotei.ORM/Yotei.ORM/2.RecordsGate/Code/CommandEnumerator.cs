@@ -175,7 +175,7 @@ public abstract class CommandEnumerator : DisposableClass, ICommandEnumerator
             if (!engine.SupportsNativePaging || !Command.SupportsNativePaging) // Emulate paging...
             {
                 var skip = Command.Skip;
-                if (skip >= 0)
+                if (skip > 0)
                 {
                     for (int i = 0; i < skip; i++)
                     {
@@ -185,7 +185,7 @@ public abstract class CommandEnumerator : DisposableClass, ICommandEnumerator
                 }
 
                 var take = Command.Take;
-                if (take >= 0)
+                if (take > 0)
                 {
                     TakeEmulated = true;
                     TakeRemaining = take;
@@ -310,15 +310,12 @@ public abstract class CommandEnumerator : DisposableClass, ICommandEnumerator
             await TryOpenConnectionAsync().ConfigureAwait(false);
 
             Schema = await OnInitializeAsync().ConfigureAwait(false);
-            if (Schema is null) throw new InvalidOperationException(
-                "Cannot obtain a valid schema for the records produced by this command.")
-                .WithData(Command);
 
             var engine = Command.Connection.Engine;
             if (!engine.SupportsNativePaging || !Command.SupportsNativePaging) // Emulate paging...
             {
                 var skip = Command.Skip;
-                if (skip >= 0)
+                if (skip > 0)
                 {
                     for (int i = 0; i < skip; i++)
                     {
@@ -328,7 +325,7 @@ public abstract class CommandEnumerator : DisposableClass, ICommandEnumerator
                 }
 
                 var take = Command.Take;
-                if (take >= 0)
+                if (take > 0)
                 {
                     TakeEmulated = true;
                     TakeRemaining = take;

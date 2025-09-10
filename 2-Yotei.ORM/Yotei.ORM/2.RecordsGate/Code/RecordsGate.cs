@@ -17,4 +17,7 @@ public abstract class RecordsGate : IRecordsGate
 
     /// <inheritdoc/>
     public abstract ICommandEnumerator CreateCommandEnumerator(IEnumerableCommand command, CancellationToken token = default);
+
+    /// <inheritdoc/>
+    public abstract ICommandExecutor CreateCommandExecutor(IExecutableCommand command);
 }
