@@ -12,4 +12,9 @@ public abstract class RecordsGate : IRecordsGate
 
     /// <inheritdoc/>
     public IConnection Connection { get; }
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public abstract ICommandEnumerator CreateCommandEnumerator(IEnumerableCommand command, CancellationToken token = default);
 }
