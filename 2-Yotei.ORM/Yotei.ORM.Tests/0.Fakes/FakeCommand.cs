@@ -18,7 +18,7 @@ public partial class FakeCommand : Yotei.ORM.Records.Code.EnumerableCommand, IEx
     public ISchema? FakeSchema { get; set; }
     public int FakeDelayMs { get; set; }
 
-    public int FakeExecResult { get; set; }
+    public int FakeExeResult { get; set; }
 
     // ----------------------------------------------------
 

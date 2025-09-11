@@ -97,8 +97,6 @@ public abstract class CommandEnumerator : DisposableClass, ICommandEnumerator
         OpenedByThis = false;
     }
 
-
-
     // ----------------------------------------------------
 
     /// <inheritdoc/>

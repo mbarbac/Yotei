@@ -2,88 +2,46 @@
 
 // ========================================================
 //[Enforced]
-//public static class Test_CommandExecutor
-//{
-//    //[Enforced]
-//    [Fact]
-//    public static void Test_()
-//    {
-//    }
-//}
-/*
+public static class Test_CommandExecutor
+{
     //[Enforced]
     [Fact]
-    public static void Test_Simple_Enumerate_All()
+    public static void Test_Simple_Execution()
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
         var command = new FakeCommand(connection);
+        command.FakeExeResult = 7;
 
-        var xid = new SchemaEntry(engine, "Employees.Id", isPrimaryKey: true);
-        var xfirst = new SchemaEntry(engine, "Employees.FirstName");
-        var xlast = new SchemaEntry(engine, "LastName");
-        command.FakeSchema = new Schema(engine, [xid, xfirst, xlast]);
-        command.FakeArrays = [
-            ["007", "James", "Bond"],
-            ["SP1", "Miguel", "Cervantes"],
-            ["SP2", "Diego", "Velazquez"]];
-
-        var items = command.ToList();
-        Assert.Equal(3, items.Count);
-        for (int i = 0; i < 3; i++) Assert.Equal(command.FakeSchema, items[i].Schema!);
-        Assert.Equal("007", items[0][0]);
-        Assert.Equal("SP1", items[1][0]);
-        Assert.Equal("SP2", items[2][0]);
+        var value = command.Execute();
+        Assert.Equal(7, value);
     }
 
     //[Enforced]
     [Fact]
-    public static async Task Test_Async_Enumerate_All()
+    public static async Task Test_Async_Execution()
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
         var command = new FakeCommand(connection);
+        command.FakeExeResult = 7;
 
-        var xid = new SchemaEntry(engine, "Employees.Id", isPrimaryKey: true);
-        var xfirst = new SchemaEntry(engine, "Employees.FirstName");
-        var xlast = new SchemaEntry(engine, "LastName");
-        command.FakeSchema = new Schema(engine, [xid, xfirst, xlast]);
-        command.FakeArrays = [
-            ["007", "James", "Bond"],
-            ["SP1", "Miguel", "Cervantes"],
-            ["SP2", "Diego", "Velazquez"]];
-
-        var source = new CancellationTokenSource();
-        var items = await command.ToListAsync(source.Token);
-        Assert.Equal(3, items.Count);
-        for (int i = 0; i < 3; i++) Assert.Equal(command.FakeSchema, items[i].Schema!);
-        Assert.Equal("007", items[0][0]);
-        Assert.Equal("SP1", items[1][0]);
-        Assert.Equal("SP2", items[2][0]);
+        var value = await command.ExecuteAsync();
+        Assert.Equal(7, value);
     }
 
     //[Enforced]
     [Fact]
-    public static async Task Test_Async_Enumerate_All_Cancelled()
+    public static async Task Test_Async_Execution_Cancelled()
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
         var command = new FakeCommand(connection);
-
-        var xid = new SchemaEntry(engine, "Employees.Id", isPrimaryKey: true);
-        var xfirst = new SchemaEntry(engine, "Employees.FirstName");
-        var xlast = new SchemaEntry(engine, "LastName");
-        command.FakeSchema = new Schema(engine, [xid, xfirst, xlast]);
-        command.FakeArrays = [
-            ["007", "James", "Bond"],
-            ["SP1", "Miguel", "Cervantes"],
-            ["SP2", "Diego", "Velazquez"]];
-
-        var ms = 150;
-        command.FakeDelayMs = ms;
-
-        var source = new CancellationTokenSource(ms * 2);
-        try { await command.ToListAsync(source.Token); Assert.Fail(); }
+        
+        command.FakeExeResult = 7;
+        command.FakeDelayMs = 300;
+        var source = new CancellationTokenSource(command.FakeDelayMs / 2);
+        try { await command.ExecuteAsync(source.Token); Assert.Fail(); }
         catch (OperationCanceledException) { }
     }
- */
+}

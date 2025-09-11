@@ -7,17 +7,17 @@ public class FakeCommandExecutor : CommandExecutor
     {
         if (command is FakeCommand temp)
         {
-            FakeExecResult = temp.FakeExecResult;
+            FakeExeResult = temp.FakeExeResult;
             FakeDelayMs = temp.FakeDelayMs;
         }
     }
 
-    public int FakeExecResult { get; set; }
+    public int FakeExeResult { get; set; }
     public int FakeDelayMs { get; set; }
 
     // -----------------------------------------------------
 
-    protected override int OnExecute() => FakeExecResult;
+    protected override int OnExecute() => FakeExeResult;
     protected override async ValueTask<int> OnExecuteAsync(CancellationToken token)
     {
         if (FakeDelayMs > 0)
@@ -25,6 +25,6 @@ public class FakeCommandExecutor : CommandExecutor
             await Task.Delay(FakeDelayMs, token);
             token.ThrowIfCancellationRequested();
         }
-        return FakeExecResult;
+        return FakeExeResult;
     }
 }
