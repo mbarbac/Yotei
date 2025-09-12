@@ -1,0 +1,40 @@
+﻿namespace Yotei.ORM.Records;
+
+// ========================================================
+/// <summary>
+/// Represents a database command whose contents are explicitly set.
+/// </summary>
+[Cloneable]
+[InheritWiths]
+public partial interface IRawCommand : ICommand, IEnumerableCommand, IExecutableCommand
+{
+    /// <inheritdoc cref="ICommand.Clear"/>
+    new IRawCommand Clear();
+
+    /// <summary>
+    /// Adds to this instance the contents obtained from the given text and optional collection
+    /// of values for the command arguments.
+    /// <br/> If any values are used, then they must be encoded in the given text using either a
+    /// '{n}' positional specification or a '{name}' named one. In the later case, 'name' may or
+    /// may not start with the engine's prefix. Unused values or dangling specifications are not
+    /// allowed.
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="range"></param>
+    /// <returns></returns>
+    IRawCommand Append(string text, params object?[]? range);
+
+    /// <summary>
+    /// Adds to this instance the contents obtained from both parsing the given dynamic lambda
+    /// expression, and the optional collection of values for the command arguments (which are
+    /// used only when the expression resolves into a string).
+    /// <br/> If any values are used, then they must be encoded in the given text using either a
+    /// '{n}' positional specification or a '{name}' named one. In the later case, 'name' may or
+    /// may not start with the engine's prefix. Unused values or dangling specifications are not
+    /// allowed.
+    /// </summary>
+    /// <param name="spec"></param>
+    /// <param name="range"></param>
+    /// <returns></returns>
+    IRawCommand Append(Func<dynamic, object> spec, params object?[]? range);
+}
