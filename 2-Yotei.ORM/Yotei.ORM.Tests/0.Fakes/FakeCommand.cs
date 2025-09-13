@@ -3,7 +3,7 @@
 // ========================================================
 [Cloneable]
 [InheritWiths]
-public partial class FakeCommand : Command
+public partial class FakeCommand : EnumerableCommand, ICommand
 {
     public CommandInfo FakeInfo
     {
@@ -35,6 +35,10 @@ public partial class FakeCommand : Command
         => FakeInfo = (CommandInfo)source.FakeInfo.Clone();
 
     // ----------------------------------------------------
+
+    public override bool SupportsNativePaging => _SupportsNativePaging;
+    public FakeCommand SetSupportsNativePaging(bool value) { _SupportsNativePaging = value; return this; }
+    bool _SupportsNativePaging;
 
     public override bool IsValid => !FakeInfo.IsEmpty && FakeInfo.IsConsistent();
 

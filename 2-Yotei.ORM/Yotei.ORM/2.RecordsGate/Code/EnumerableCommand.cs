@@ -1,0 +1,75 @@
+﻿namespace Yotei.ORM.Records.Code;
+
+// ========================================================
+/// <inheritdoc cref="IEnumerableCommand"/>
+[Cloneable<IEnumerableCommand>]
+[InheritWiths<IEnumerableCommand>]
+public abstract partial class EnumerableCommand : Command, IEnumerableCommand
+{
+    /// <summary>
+    /// Initializes a new empty instance.
+    /// </summary>
+    /// <param name="connection"></param>
+    public EnumerableCommand(IConnection connection) : base(connection) { }
+
+    /// <summary>
+    /// Copy constructor.
+    /// </summary>
+    /// <param name="source"></param>
+    protected EnumerableCommand(EnumerableCommand source) : base(source)
+    {
+        Skip = source.Skip;
+        Take = source.Take;
+    }
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public virtual ICommandEnumerator GetEnumerator()
+        => Connection.Records.CreateCommandEnumerator(this);
+
+    IEnumerator<IRecord> IEnumerable<IRecord>.GetEnumerator() => GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    /// <inheritdoc/>
+    public virtual ICommandEnumerator GetAsyncEnumerator(
+        CancellationToken token = default)
+        => Connection.Records.CreateCommandEnumerator(this, token);
+
+    IAsyncEnumerator<IRecord> IAsyncEnumerable<IRecord>.GetAsyncEnumerator(
+        CancellationToken token)
+        => GetAsyncEnumerator(token);
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public abstract bool SupportsNativePaging { get; }
+
+    /// <inheritdoc/>
+    public int Skip
+    {
+        get => _Skip;
+        set => _Skip = value >= 0 ? value
+            : throw new ArgumentOutOfRangeException(nameof(value)).WithData(value);
+    }
+    int _Skip = -1;
+
+    /// <inheritdoc/>
+    public int Take
+    {
+        get => _Take;
+        set => _Take = value >= 0 ? value
+            : throw new ArgumentOutOfRangeException(nameof(value)).WithData(value);
+    }
+    int _Take = -1;
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public override IEnumerableCommand Clear()
+    {
+        Take = 0;
+        Skip = 0;
+        return this;
+    }
+}
