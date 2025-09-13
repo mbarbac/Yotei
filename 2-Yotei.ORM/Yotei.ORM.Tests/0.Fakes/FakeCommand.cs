@@ -3,7 +3,7 @@
 // ========================================================
 [Cloneable]
 [InheritWiths]
-public partial class FakeCommand : EnumerableCommand, ICommand
+public partial class FakeCommand : EnumerableCommand, ICommand, IExecutableCommand
 {
     public CommandInfo FakeInfo
     {
@@ -36,15 +36,22 @@ public partial class FakeCommand : EnumerableCommand, ICommand
 
     // ----------------------------------------------------
 
+    public ICommandExecutor GetExecutor() => Connection.Records.CreateCommandExecutor(this);
+
     public override bool SupportsNativePaging => _SupportsNativePaging;
+
     public FakeCommand SetSupportsNativePaging(bool value) { _SupportsNativePaging = value; return this; }
     bool _SupportsNativePaging;
+
+    // ----------------------------------------------------
 
     public override bool IsValid => !FakeInfo.IsEmpty && FakeInfo.IsConsistent();
 
     public override ICommandInfo GetCommandInfo() => FakeInfo;
 
     public override ICommandInfo GetCommandInfo(bool _) => FakeInfo;
+
+    // ----------------------------------------------------
 
     public override FakeCommand Clear()
     {
@@ -54,4 +61,5 @@ public partial class FakeCommand : EnumerableCommand, ICommand
 
         return this;
     }
+    IExecutableCommand IExecutableCommand.Clear() => Clear();
 }
