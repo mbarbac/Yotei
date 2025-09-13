@@ -10,9 +10,11 @@ partial interface IParameterList
     /// <summary>
     /// Represents a builder for <see cref="IHost"/> instances.
     /// </summary>
-    [Cloneable]
     public partial interface IBuilder : ICoreList<TKey, IItem>
     {
+        /// <inheritdoc cref="ICloneable.Clone"/>
+        IBuilder Clone();
+
         /// <summary>
         /// Returns a new instance based upon the contents of this builder.
         /// </summary>

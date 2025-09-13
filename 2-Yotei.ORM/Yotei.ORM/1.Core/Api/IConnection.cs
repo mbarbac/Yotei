@@ -4,15 +4,17 @@
 /// <summary>
 /// Represents a connection with an underlying database.
 /// </summary>
-[Cloneable]
 public partial interface IConnection : IDisposableEx
 {
+    /// <inheritdoc cref="ICloneable.Clone"/>
+    IConnection Clone();
+
+    // ----------------------------------------------------
+
     /// <summary>
     /// Describes the underlying engine this instance connects to.
     /// </summary>
     IEngine Engine { get; }
-
-    // ----------------------------------------------------
 
     /// <summary>
     /// The number of times this instance will try to recover from transient connection errors

@@ -6,9 +6,29 @@ partial interface ICommandInfo
     /// <summary>
     /// Represents a builder for <see cref="ICommandInfo"/> instances.
     /// </summary>
-    [Cloneable]
     public partial interface IBuilder
     {
+        /// <inheritdoc cref="ICloneable.Clone"/>
+        IBuilder Clone();
+
+        // ----------------------------------------------------
+
+        /// <summary>
+        /// Emulates the 'with' keyword with instances of this type.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        ICommand WithConnection(IConnection value);
+
+        /// <summary>
+        /// Emulates the 'with' keyword with instances of this type.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        ICommand WithLocale(Locale value);
+
+        // ----------------------------------------------------
+
         /// <summary>
         /// Returns a new instance based upon the contents of this builder.
         /// </summary>

@@ -5,18 +5,32 @@
 /// Represents a database command that can be executed on its associated connection.
 /// <br/> Instances of this type typically are mutables ones.
 /// </summary>
-[Cloneable]
 public partial interface ICommand
 {
+    /// <inheritdoc cref="ICloneable.Clone"/>
+    ICommand Clone();
+
+    // ----------------------------------------------------
+
     /// <summary>
     /// The connection this instance is associated with.
     /// </summary>
-    [With] IConnection Connection { get; }
+    IConnection Connection { get; }
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    ICommand WithConnection(IConnection value);
 
     /// <summary>
     /// The locale to use with culture-sensitive objects in the underlying database.
     /// </summary>
-    [With] Locale Locale { get; }
+    Locale Locale { get; }
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    ICommand WithLocale(Locale value);
 
     /// <summary>
     /// Determines if this instance is in an execution-ready state, or not.

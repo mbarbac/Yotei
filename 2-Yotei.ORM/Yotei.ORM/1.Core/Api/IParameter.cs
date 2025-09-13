@@ -19,12 +19,22 @@ public partial interface IParameter : IEquatable<IParameter>
     /// <summary>
     /// The name of this parameter.
     /// </summary>
-    [With]
     string Name { get; }
 
     /// <summary>
     /// The value captured by this parameter.
     /// </summary>
-    [With]
     object? Value { get; }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    IParameter WithName(string value);
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    IParameter WithValue(object? value);
 }

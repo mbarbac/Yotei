@@ -10,9 +10,11 @@ partial interface IIdentifierChain
     /// <summary>
     /// Represents a builder for <see cref="IHost"/> instances.
     /// </summary>
-    [Cloneable]
     public partial interface IBuilder : ICoreList<TKey?, IItem>
     {
+        /// <inheritdoc cref="ICloneable.Clone"/>
+        new IBuilder Clone();
+
         /// <inheritdoc cref="IIdentifier.Engine"/>
         IEngine Engine { get; }
 
