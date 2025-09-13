@@ -1,0 +1,45 @@
+﻿namespace Yotei.ORM.Records;
+
+// ========================================================
+/// <summary>
+/// Represents a records-oriented command that, when executed using its associated connection,
+/// enumerates the results produced by that execution.
+/// </summary>
+/// <remarks>
+/// Instances of this type work by wrapping an original enumerable command.
+/// </remarks>
+/// <typeparam name="T"></typeparam>
+[Cloneable]
+[InheritWiths]
+public partial interface IEnumerableCommand<T>
+    : ICommand
+    , IEnumerable<T>, IAsyncEnumerable<T>
+{
+    /// <summary>
+    /// Returns an object that can execute this command and enumerate the results produced by that
+    /// execution. Returned results may be <c>null</c> if no more ones are available.
+    /// </summary>
+    /// <returns></returns>
+    new ICommandEnumerator<T> GetEnumerator();
+
+    /// <summary>
+    /// Returns an object that can execute this command and enumerate the results produced by that
+    /// execution. Returned results may be <c>null</c> if no more ones are available.
+    /// </summary>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    new ICommandEnumerator<T> GetAsyncEnumerator(CancellationToken token = default);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// The original command wrapped by this instance.
+    /// </summary>
+    IEnumerableCommand Command { get; }
+
+    /// <summary>
+    /// The delegate to use to convert the original records produced by the execution of this
+    /// command to the type of the arbitrary results this instance is created for.
+    /// </summary>
+    Func<IRecord, T> Converter { get; }
+}
