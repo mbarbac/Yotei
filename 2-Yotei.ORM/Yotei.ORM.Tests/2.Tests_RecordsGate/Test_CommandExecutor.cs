@@ -46,7 +46,8 @@ public static class Test_CommandExecutor
 
         command.FakeExeResult = 7;
         command.FakeDelayMs = 300;
-        var source = new CancellationTokenSource(command.FakeDelayMs / 2);
+        using var source = new CancellationTokenSource(command.FakeDelayMs / 2);
+
         try { await command.ExecuteAsync(source.Token).ConfigureAwait(false); Assert.Fail(); }
         catch (OperationCanceledException) { }
     }

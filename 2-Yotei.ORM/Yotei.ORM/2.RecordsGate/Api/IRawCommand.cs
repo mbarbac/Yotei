@@ -18,6 +18,7 @@ public partial interface IRawCommand : ICommand, IEnumerableCommand, IExecutable
     /// '{n}' positional specification or a '{name}' named one. In the later case, 'name' may or
     /// may not start with the engine's prefix. Unused values or dangling specifications are not
     /// allowed.
+    /// <br/> Returns a reference to itself to support fluent syntax usage.
     /// </summary>
     /// <param name="text"></param>
     /// <param name="range"></param>
@@ -32,6 +33,7 @@ public partial interface IRawCommand : ICommand, IEnumerableCommand, IExecutable
     /// '{n}' positional specification or a '{name}' named one. In the later case, 'name' may or
     /// may not start with the engine's prefix. Unused values or dangling specifications are not
     /// allowed.
+    /// <br/> Returns a reference to itself to support fluent syntax usage.
     /// </summary>
     /// <param name="spec"></param>
     /// <param name="range"></param>

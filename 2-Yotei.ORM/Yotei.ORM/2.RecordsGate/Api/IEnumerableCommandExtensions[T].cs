@@ -20,7 +20,7 @@ public static class IEnumerableCommandExtensions_T
         converter.ThrowWhenNull();
         return new EnumerableCommand<T>(command, converter);
     }
-
+/*
     // ----------------------------------------------------
 
     /// <summary>
@@ -217,5 +217,5 @@ public static class IEnumerableCommandExtensions_T
             if (item is not null) record = item;
 #endif
         return record;
-    }
+    }*/
 }

@@ -1,5 +1,5 @@
 ﻿namespace Yotei.ORM.Records;
-
+/*
 // ========================================================
 public static class IEnumerableCommandExtensions
 {
@@ -191,4 +191,4 @@ public static class IEnumerableCommandExtensions
 #endif
         return record;
     }
-}
+}*/

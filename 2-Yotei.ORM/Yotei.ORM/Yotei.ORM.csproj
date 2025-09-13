@@ -26,6 +26,11 @@
 	  <None Include="LICENSE" Pack="true" PackagePath="" />
    </ItemGroup>
 
+   <!-- ALL configurations -->
+   <ItemGroup>
+	  <PackageReference Include="System.Linq.Async" Version="6.0.3" />
+   </ItemGroup>
+
    <!-- DEBUG configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Debug'">
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />

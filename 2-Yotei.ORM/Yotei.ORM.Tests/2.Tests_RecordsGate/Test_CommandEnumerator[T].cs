@@ -83,7 +83,8 @@ public static class Test_CommandEnumerator_T
 
         var ms = 150;
         command.FakeDelayMs = ms;
-        var source = new CancellationTokenSource(ms * 2);
+        using var source = new CancellationTokenSource(ms * 2);
+
         List<Persona> items = [];
         try
         {
@@ -142,10 +143,9 @@ public static class Test_CommandEnumerator_T
             ["SP1", "Miguel", "Cervantes"],
             ["SP2", "Diego", "Velazquez"]];
 
-        var source = new CancellationTokenSource();
         var items = await command
             .ConvertInto(ToPersona)
-            .ToListAsync(source.Token).ConfigureAwait(false);
+            .ToListAsync().ConfigureAwait(false);
 
         Assert.Equal(3, items.Count);
         Assert.Equal("007", items[0].Id);
@@ -174,8 +174,8 @@ public static class Test_CommandEnumerator_T
 
         var ms = 150;
         command.FakeDelayMs = ms;
+        using var source = new CancellationTokenSource(ms * 2);
 
-        var source = new CancellationTokenSource(ms * 2);
         try
         {
             await command

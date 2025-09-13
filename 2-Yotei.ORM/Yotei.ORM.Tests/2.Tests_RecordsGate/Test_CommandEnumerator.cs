@@ -77,7 +77,8 @@ public static class Test_CommandEnumerator
 
         var ms = 150;
         command.FakeDelayMs = ms;
-        var source = new CancellationTokenSource(ms * 2);
+        using var source = new CancellationTokenSource(ms * 2);
+
         List<IRecord> items = [];
         try
         {
@@ -136,8 +137,7 @@ public static class Test_CommandEnumerator
             ["SP1", "Miguel", "Cervantes"],
             ["SP2", "Diego", "Velazquez"]];
 
-        var source = new CancellationTokenSource();
-        var items = await command.ToListAsync(source.Token).ConfigureAwait(false);
+        var items = await command.ToListAsync().ConfigureAwait(false);
         Assert.Equal(3, items.Count);
         for (int i = 0; i < 3; i++) Assert.Equal(command.FakeSchema, items[i].Schema!);
         Assert.Equal("007", items[0][0]);
@@ -166,8 +166,8 @@ public static class Test_CommandEnumerator
 
         var ms = 150;
         command.FakeDelayMs = ms;
+        using var source = new CancellationTokenSource(ms * 2);
 
-        var source = new CancellationTokenSource(ms * 2);
         try { await command.ToListAsync(source.Token).ConfigureAwait(false); Assert.Fail(); }
         catch (OperationCanceledException) { }
     }
@@ -304,8 +304,8 @@ public static class Test_CommandEnumerator
 
         var ms = 150;
         command.FakeDelayMs = ms;
+        using var source = new CancellationTokenSource(ms * 2);
 
-        var source = new CancellationTokenSource(ms * 2);
         try { await command.LastAsync(source.Token).ConfigureAwait(false); Assert.Fail(); }
         catch (OperationCanceledException) { }
     }
