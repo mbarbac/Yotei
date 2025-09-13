@@ -3,7 +3,7 @@
 // ========================================================
 [Cloneable]
 [InheritWiths]
-public partial class FakeCommand : Yotei.ORM.Records.Code.EnumerableCommand, IExecutableCommand
+public partial class FakeCommand : Command
 {
     public CommandInfo FakeInfo
     {
@@ -34,8 +34,6 @@ public partial class FakeCommand : Yotei.ORM.Records.Code.EnumerableCommand, IEx
         : base(source)
         => FakeInfo = (CommandInfo)source.FakeInfo.Clone();
 
-    public ICommandExecutor GetExecutor() => Connection.Records.CreateCommandExecutor(this);
-
     // ----------------------------------------------------
 
     public override bool IsValid => !FakeInfo.IsEmpty && FakeInfo.IsConsistent();
@@ -52,5 +50,4 @@ public partial class FakeCommand : Yotei.ORM.Records.Code.EnumerableCommand, IEx
 
         return this;
     }
-    IExecutableCommand IExecutableCommand.Clear() => Clear();
 }
