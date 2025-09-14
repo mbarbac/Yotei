@@ -14,6 +14,8 @@ public partial interface ICoreList<K, T>
     /// <inheritdoc cref="ICloneable.Clone"/>
     ICoreList<K, T> Clone();
 
+    // ----------------------------------------------------
+
     /// <summary>
     /// Gets the number of elements in this collection.
     /// </summary>

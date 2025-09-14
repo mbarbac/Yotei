@@ -10,9 +10,13 @@ partial interface IElementListKT
     /// <summary>
     /// Represents a builder for <see cref="IHost"/> instances.
     /// </summary>
-    [Cloneable]
     public partial interface IBuilder : ICoreList<TKey, IItem>
     {
+        /// <inheritdoc cref="ICloneable.Clone"/>
+        new IBuilder Clone();
+
+        // ------------------------------------------------
+
         /// <summary>
         /// Returns a new instance based upon the contents of this builder.
         /// </summary>

@@ -18,13 +18,14 @@ public static partial class Test_CoreList_T
 
     // ----------------------------------------------------
 
-    [Cloneable<ICoreList<IElement>>]
     public partial class Chain : CoreList<IElement>, IElement
     {
         public Chain(bool sensitive) => Sensitive = sensitive;
         public Chain(bool sensitive, int capacity) : this(sensitive) => Capacity = capacity;
         public Chain(bool sensitive, IEnumerable<IElement> range) : this(sensitive) => AddRange(range);
         protected Chain(Chain source) : this(source.Sensitive) => AddRange(source);
+
+        public override ICoreList<IElement> Clone() => new Chain(this);
 
         public override IElement ValidateItem(IElement item)
         {

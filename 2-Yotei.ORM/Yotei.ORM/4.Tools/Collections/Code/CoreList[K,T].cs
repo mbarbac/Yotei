@@ -2,7 +2,6 @@
 
 // ========================================================
 /// <inheritdoc cref="ICoreList{K, T}"/>
-[Cloneable(ReturnType = typeof(ICoreList<,>))]
 [DebuggerDisplay("{ToDebugString(5)}")]
 public abstract partial class CoreList<K, T> : ICoreList<K, T>
 {
@@ -56,6 +55,9 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     /// Invoked to obtain the debug string of the given element.
     /// </summary>
     protected virtual string ToDebugItem(T item) => item?.ToString() ?? "-";
+
+    /// <inheritdoc/>
+    public abstract ICoreList<K, T> Clone();
 
     // ----------------------------------------------------
 

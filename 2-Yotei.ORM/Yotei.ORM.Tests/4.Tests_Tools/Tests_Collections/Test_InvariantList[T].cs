@@ -19,13 +19,14 @@ public static partial class Test_InvariantList_T
     // ----------------------------------------------------
 
     [DebuggerDisplay("{ToDebugString(5)}")]
-    [Cloneable<ICoreList<IElement>>]
     public partial class Builder : CoreList<IElement>
     {
         public Builder(bool sensitive) => Sensitive = sensitive;
         public Builder(bool sensitive, int capacity) : this(sensitive) => Capacity = capacity;
         public Builder(bool sensitive, IEnumerable<IElement> range) : this(sensitive) => AddRange(range);
         protected Builder(Builder source) : this(source.Sensitive) => AddRange(source);
+
+        public override ICoreList<IElement> Clone() => new Builder(this);
 
         public override IElement ValidateItem(IElement item)
         {
@@ -73,7 +74,6 @@ public static partial class Test_InvariantList_T
     // ----------------------------------------------------
 
     [DebuggerDisplay("{Items.ToDebugString(5)}")]
-    [Cloneable<IInvariantList<IElement>>]
     public partial class Chain : InvariantList<IElement>, IElement
     {
         protected override Builder Items { get; }
@@ -81,6 +81,8 @@ public static partial class Test_InvariantList_T
         public Chain(bool sensitive) => Items = new(sensitive);
         public Chain(bool sensitive, IEnumerable<IElement> range) : this(sensitive) => Items.AddRange(range);
         protected Chain(Chain source) : this(source.Sensitive) => Items.AddRange(source);
+
+        public override IInvariantList<IElement> Clone() => new Chain(Sensitive, this);
 
         public bool Sensitive
         {

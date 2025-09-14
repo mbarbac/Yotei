@@ -8,7 +8,6 @@ partial class ElementListT
 {
     // ====================================================
     /// <inheritdoc cref="IHost.IBuilder"/>
-    [Cloneable<IHost.IBuilder>]
     [DebuggerDisplay("{ToDebugString(5)}")]
     public partial class Builder : CoreList<IItem>, IHost.IBuilder
     {
@@ -38,6 +37,9 @@ partial class ElementListT
         /// </summary>
         /// <param name="source"></param>
         protected Builder(Builder source) : this(source.Engine) => AddRange(source);
+
+        /// <inheritdoc/>
+        public override IHost.IBuilder Clone() => new Builder(this);
 
         // ------------------------------------------------
 

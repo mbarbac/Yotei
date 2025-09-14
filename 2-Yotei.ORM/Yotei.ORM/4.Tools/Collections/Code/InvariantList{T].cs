@@ -2,7 +2,6 @@
 
 // ========================================================
 /// <inheritdoc cref="IInvariantList{T}"/>
-[Cloneable(ReturnType = typeof(IInvariantList<>))]
 [DebuggerDisplay("{Items.ToDebugString(5)}")]
 public abstract partial class InvariantList<T> : IInvariantList<T>
 {
@@ -40,6 +39,9 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
 
     /// <inheritdoc/>
     public override string ToString() => Items.ToString() ?? string.Empty;
+
+    /// <inheritdoc/>
+    public abstract IInvariantList<T> Clone();
 
     // ----------------------------------------------------
 

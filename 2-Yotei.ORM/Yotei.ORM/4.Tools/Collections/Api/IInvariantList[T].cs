@@ -11,6 +11,8 @@ public partial interface IInvariantList<T> : IReadOnlyCollection<T>
     /// <inheritdoc cref="ICloneable.Clone"/>
     IInvariantList<T> Clone();
 
+    // ----------------------------------------------------
+
     /// <summary>
     /// Gets the number of elements in this collection.
     /// </summary>
