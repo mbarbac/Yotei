@@ -6,9 +6,38 @@
 /// are unique among all tags in this instance.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
-[Cloneable]
 public partial interface IKnownTags : IEnumerable<IMetadataTag>, IEquatable<IKnownTags>
 {
+    /// <inheritdoc cref="ICloneable.Clone"/>
+    IKnownTags Clone();
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    IKnownTags WithCaseSensitivTags(bool value);
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    IKnownTags WithIdentifierTags(IIdentifierTags value);
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    IKnownTags WithPrimaryKeyTag(IMetadataTag? value);
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    IKnownTags WithUniqueValuedTag(IMetadataTag? value);
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    IKnownTags WithReadOnlyTag(IMetadataTag? value);
+
+    // ----------------------------------------------------
+
     /// <summary>
     /// Determines if the tags in this instance are case sensitive, or not.
     /// </summary>
@@ -19,25 +48,25 @@ public partial interface IKnownTags : IEnumerable<IMetadataTag>, IEquatable<IKno
     /// identifiers in an underlying database, or an empty collection if this information
     /// is not available.
     /// </summary>
-    [With] IIdentifierTags IdentifierTags { get; }
+    IIdentifierTags IdentifierTags { get; }
 
     /// <summary>
     /// The tag used to determine if a given element is a primary key one, or part of a primary
     /// key group, or null if this information is not available.
     /// </summary>
-    [With] IMetadataTag? PrimaryKeyTag { get; }
+    IMetadataTag? PrimaryKeyTag { get; }
 
     /// <summary>
     /// The tag used to determine if a given element is a unique valued one, or part of a unique
     /// valued group, or null if this information is not available.
     /// </summary>
-    [With] IMetadataTag? UniqueValuedTag { get; }
+    IMetadataTag? UniqueValuedTag { get; }
 
     /// <summary>
     /// The tag used to determine if a given element is a read only one, or null if this
     /// information is not available.
     /// </summary>
-    [With] IMetadataTag? ReadOnlyTag { get; }
+    IMetadataTag? ReadOnlyTag { get; }
 
     /// <summary>
     /// The collection of names carried by all tags in this instance.

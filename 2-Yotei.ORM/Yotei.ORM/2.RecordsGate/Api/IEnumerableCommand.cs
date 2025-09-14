@@ -5,12 +5,35 @@
 /// Represents a records-oriented command that, when executed using its associated connection,
 /// enumerates the records produced by that execution.
 /// </summary>
-[Cloneable]
-[InheritWiths]
 public partial interface IEnumerableCommand
     : ICommand
     , IEnumerable<IRecord>, IAsyncEnumerable<IRecord>
 {
+    /// <inheritdoc cref="ICloneable.Clone"/>
+    new IEnumerableCommand Clone();
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    new IEnumerableCommand WithConnection(IConnection value);
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    new IEnumerableCommand WithLocale(Locale value);
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    IEnumerableCommand WithSkip(int value);
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    IEnumerableCommand WithTake(int value);
+
+    // ----------------------------------------------------
+
     /// <summary>
     /// Returns an object that can execute this command and enumerate the records produced by that
     /// execution. Returned records may be <c>null</c> if no more ones are available.
@@ -38,12 +61,12 @@ public partial interface IEnumerableCommand
     /// <summary>
     /// The number of records to skip, or cero or a negative value to ignore this property.
     /// </summary>
-    [With] int Skip { get; set; }
+    int Skip { get; set; }
 
     /// <summary>
     /// The number of records to take, or cero or a negative value to ignore this property.
     /// </summary>
-    [With] int Take { get; set; }
+    int Take { get; set; }
 
     // ----------------------------------------------------
 

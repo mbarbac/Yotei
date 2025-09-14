@@ -15,6 +15,8 @@ partial interface IIdentifierChain
         /// <inheritdoc cref="ICloneable.Clone"/>
         new IBuilder Clone();
 
+        // ------------------------------------------------
+
         /// <inheritdoc cref="IIdentifier.Engine"/>
         IEngine Engine { get; }
 

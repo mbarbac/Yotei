@@ -8,9 +8,11 @@
 /// </summary>
 /// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>
-[Cloneable]
 public partial interface IInvariantList<K, T> : IReadOnlyList<T>
 {
+    /// <inheritdoc cref="ICloneable.Clone"/>
+    IInvariantList<K, T> Clone();
+
     /// <summary>
     /// Gets the number of elements in this collection.
     /// </summary>

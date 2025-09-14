@@ -4,10 +4,23 @@
 /// <summary>
 /// Represents a database command whose contents are explicitly set.
 /// </summary>
-[Cloneable]
-[InheritWiths]
 public partial interface IRawCommand : ICommand, IEnumerableCommand, IExecutableCommand
 {
+    /// <inheritdoc cref="ICloneable.Clone"/>
+    new IRawCommand Clone();
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    new IRawCommand WithConnection(IConnection value);
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    new IRawCommand WithLocale(Locale value);
+
+    // ----------------------------------------------------
+
     /// <inheritdoc cref="ICommand.Clear"/>
     new IRawCommand Clear();
 

@@ -13,7 +13,9 @@ partial interface IParameterList
     public partial interface IBuilder : ICoreList<TKey, IItem>
     {
         /// <inheritdoc cref="ICloneable.Clone"/>
-        IBuilder Clone();
+        new IBuilder Clone();
+
+        // ------------------------------------------------
 
         /// <summary>
         /// Returns a new instance based upon the contents of this builder.

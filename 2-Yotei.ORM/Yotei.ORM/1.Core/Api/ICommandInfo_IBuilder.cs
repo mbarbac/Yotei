@@ -11,8 +11,6 @@ partial interface ICommandInfo
         /// <inheritdoc cref="ICloneable.Clone"/>
         IBuilder Clone();
 
-        // ----------------------------------------------------
-
         /// <summary>
         /// Emulates the 'with' keyword with instances of this type.
         /// </summary>

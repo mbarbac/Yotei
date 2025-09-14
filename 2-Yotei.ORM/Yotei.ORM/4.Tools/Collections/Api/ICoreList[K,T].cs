@@ -7,11 +7,13 @@
 /// </summary>
 /// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>
-[Cloneable]
 public partial interface ICoreList<K, T>
     : IList<T>, IReadOnlyList<T>, IReadOnlyCollection<T>, ICollection<T>
     , IList, ICollection
 {
+    /// <inheritdoc cref="ICloneable.Clone"/>
+    ICoreList<K, T> Clone();
+
     /// <summary>
     /// Gets the number of elements in this collection.
     /// </summary>

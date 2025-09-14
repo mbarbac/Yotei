@@ -8,6 +8,18 @@
 public partial interface IParameter : IEquatable<IParameter>
 {
     /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    IParameter WithName(string value);
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    IParameter WithValue(object? value);
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Determines if this instance is equal to the other given one, using the given comparison
     /// mode to compare their names.
     /// </summary>
@@ -25,16 +37,4 @@ public partial interface IParameter : IEquatable<IParameter>
     /// The value captured by this parameter.
     /// </summary>
     object? Value { get; }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Emulates the 'with' keyword with instances of this type.
-    /// </summary>
-    IParameter WithName(string value);
-
-    /// <summary>
-    /// Emulates the 'with' keyword with instances of this type.
-    /// </summary>
-    IParameter WithValue(object? value);
 }

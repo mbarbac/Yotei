@@ -10,7 +10,53 @@ public partial interface IEngine : IEquatable<IEngine>
     /// <inheritdoc cref="ICloneable.Clone"/>
     IEngine Clone();
 
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    IEngine WithCaseSensitiveNames(bool value);
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    IEngine WithNullValueLiteral(string value);
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    IEngine WithPositionalParameters(bool value);
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    IEngine WithParameterPrefix(string value);
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    IEngine WithSupportsNativePaging(bool value);
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    IEngine WithUseTerminators(bool value);
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    IEngine WithLeftTerminator(char value);
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    IEngine WithRightTerminator(char value);
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    IEngine WithKnownTags(IKnownTags value);
+
     // ----------------------------------------------------
+
     /// <summary>
     /// Determines if this engine treats its identifier-alike names and reserved keywords as........
     /// case-sensitive or not.
@@ -61,51 +107,4 @@ public partial interface IEngine : IEquatable<IEngine>
     /// The collection of metadata tags that are well-known to this engine.
     /// </summary>
     IKnownTags KnownTags { get; }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Emulates the 'with' keyword with instances of this type.
-    /// </summary>
-    IEngine WithCaseSensitiveNames(bool value);
-
-    /// <summary>
-    /// Emulates the 'with' keyword with instances of this type.
-    /// </summary>
-    IEngine WithNullValueLiteral(string value);
-
-    /// <summary>
-    /// Emulates the 'with' keyword with instances of this type.
-    /// </summary>
-    IEngine WithPositionalParameters(bool value);
-
-    /// <summary>
-    /// Emulates the 'with' keyword with instances of this type.
-    /// </summary>
-    IEngine WithParameterPrefix(string value);
-
-    /// <summary>
-    /// Emulates the 'with' keyword with instances of this type.
-    /// </summary>
-    IEngine WithSupportsNativePaging(bool value);
-
-    /// <summary>
-    /// Emulates the 'with' keyword with instances of this type.
-    /// </summary>
-    IEngine WithUseTerminators(bool value);
-
-    /// <summary>
-    /// Emulates the 'with' keyword with instances of this type.
-    /// </summary>
-    IEngine WithLeftTerminator(char value);
-
-    /// <summary>
-    /// Emulates the 'with' keyword with instances of this type.
-    /// </summary>
-    IEngine WithRightTerminator(char value);
-
-    /// <summary>
-    /// Emulates the 'with' keyword with instances of this type.
-    /// </summary>
-    IEngine WithKnownTags(IKnownTags value);
 }

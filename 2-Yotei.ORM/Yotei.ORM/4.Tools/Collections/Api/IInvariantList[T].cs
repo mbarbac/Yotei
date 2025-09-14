@@ -6,9 +6,11 @@
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
 /// <typeparam name="T"></typeparam>
-[Cloneable]
 public partial interface IInvariantList<T> : IReadOnlyCollection<T>
 {
+    /// <inheritdoc cref="ICloneable.Clone"/>
+    IInvariantList<T> Clone();
+
     /// <summary>
     /// Gets the number of elements in this collection.
     /// </summary>

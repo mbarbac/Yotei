@@ -21,14 +21,16 @@ public partial interface IConnection : IDisposableEx
     /// before throwing an exception. The value of this property is positive and greater than
     /// cero.
     /// </summary>
-    int Retries { get; }
+    int Retries { get; set; }
 
     /// <summary>
     /// The amount of time this instance waits before a new attempt to recover from transient
     /// connection errors. The value of this property must conceptually be a positive number,
     /// or cero if no wait time is requested.
     /// </summary>
-    TimeSpan RetryInterval { get; }
+    TimeSpan RetryInterval { get; set; }
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// Determines if this instance is opened or not.

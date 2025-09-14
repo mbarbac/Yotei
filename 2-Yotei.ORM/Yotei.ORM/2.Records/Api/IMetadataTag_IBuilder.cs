@@ -6,9 +6,13 @@ partial interface IMetadataTag
     /// <summary>
     /// Represents a builder for <see cref="IMetadataTag"/> instances.
     /// </summary>
-    [Cloneable]
     public partial interface IBuilder : IEnumerable<string>
     {
+        /// <inheritdoc cref="ICloneable.Clone"/>
+        IBuilder Clone();
+
+        // ----------------------------------------------------
+
         /// <summary>
         /// Returns a new instance based upon the contents of this builder.
         /// </summary>

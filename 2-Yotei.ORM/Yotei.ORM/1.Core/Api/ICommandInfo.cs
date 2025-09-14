@@ -9,7 +9,7 @@ public partial interface ICommandInfo
     /// <inheritdoc cref="ICloneable.Clone"/>
     ICommandInfo Clone();
 
-    // ----------------------------------------------------
+    // ------------------------------------------------
 
     /// <summary>
     /// Returns a new builder based upon the contents of this instance.

@@ -11,6 +11,10 @@ partial class StrTokenChain
     [DebuggerDisplay("{ToDebugString(5)}")]
     public partial class Builder : CoreList<IStrToken>
     {
+
+
+        // ------------------------------------------------
+
         /// <summary>
         /// Initializes a new empty instance.
         /// </summary>

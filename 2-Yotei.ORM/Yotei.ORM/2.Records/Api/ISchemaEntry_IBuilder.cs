@@ -6,9 +6,13 @@ partial interface ISchemaEntry
     /// <summary>
     /// Represents a builder for <see cref="ISchemaEntry"/> instances.
     /// </summary>
-    [Cloneable]
     public partial interface IBuilder : IEnumerable<IMetadataEntry>
     {
+        /// <inheritdoc cref="ICloneable.Clone"/>
+        IBuilder Clone();
+
+        // ----------------------------------------------------
+
         /// <summary>
         /// Returns a new instance based upon the contents of this builder.
         /// </summary>

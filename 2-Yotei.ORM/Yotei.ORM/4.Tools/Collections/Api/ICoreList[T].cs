@@ -5,11 +5,13 @@
 /// Represents a customizable list-alike collection of elements.
 /// </summary>
 /// <typeparam name="T"></typeparam>
-[Cloneable]
 public partial interface ICoreList<T>
     : IList<T>, IReadOnlyList<T>, IReadOnlyCollection<T>, ICollection<T>
     , IList, ICollection
 {
+    /// <inheritdoc cref="ICloneable.Clone"/>
+    ICoreList<T> Clone();
+
     /// <summary>
     /// Gets the number of elements in this collection.
     /// </summary>

@@ -6,9 +6,18 @@
 /// an underlying database as a single unit. Instances of this type may carry a schema that, if
 /// not null, acts as a descriptor for the record structure and contents.
 /// </summary>
-[Cloneable]
 public partial interface IRecord : IEnumerable<object?>, IEquatable<IRecord>
 {
+    /// <inheritdoc cref="ICloneable.Clone"/>
+    IRecord Clone();
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    IRecord WithSchema(ISchema? value);
+
+    // ----------------------------------------------------
+
     /// <summary>
     /// Returns a new builder based upon the contents of this instance.
     /// </summary>
@@ -16,12 +25,6 @@ public partial interface IRecord : IEnumerable<object?>, IEquatable<IRecord>
     IBuilder CreateBuilder();
 
     // ----------------------------------------------------
-
-    /// <summary>
-    /// If not null, the schema that describes the structure and contents of this record.
-    /// <br/> If null, then this instance is a schema-less one.
-    /// </summary>
-    [With] ISchema? Schema { get; }
 
     /// <summary>
     /// The number of elements carried by this instance.

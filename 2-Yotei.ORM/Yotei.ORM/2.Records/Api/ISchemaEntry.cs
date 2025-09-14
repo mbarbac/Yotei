@@ -6,9 +6,33 @@
 /// properties, and in an internal metadata entries' collection.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
-[Cloneable]
 public partial interface ISchemaEntry : IEnumerable<IMetadataEntry>, IEquatable<ISchemaEntry>
 {
+    /// <inheritdoc cref="ICloneable.Clone"/>
+    ISchemaEntry Clone();
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    ISchemaEntry WithIdentifier(IIdentifier value);
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    ISchemaEntry WithIsPrimaryKey(bool value);
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    ISchemaEntry WithIsUniqueValued(bool value);
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    ISchemaEntry WithIsReadOnly(bool value);
+
+    // ----------------------------------------------------
+
     /// <summary>
     /// Returns a new builder based upon the contents of this instance.
     /// </summary>
@@ -25,25 +49,25 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataEntry>, IEquatable<
     /// <summary>
     /// The standard property that represents the identifier by which this instance is known.
     /// </summary>
-    [With] IIdentifier Identifier { get; }
+    IIdentifier Identifier { get; }
 
     /// <summary>
     /// The standard property that determines if this instance represents a primary key column,
     /// or if it is part of a primary key column group, or not.
     /// </summary>
-    [With] bool IsPrimaryKey { get; }
+    bool IsPrimaryKey { get; }
 
     /// <summary>
     /// The standard property that determines if this instance represents a unique valued column,
     /// or if it is part of a unique valued column group, or not.
     /// </summary>
-    [With] bool IsUniqueValued { get; }
+    bool IsUniqueValued { get; }
 
     /// <summary>
     /// The standard property that determines if this instance represents a read only column,
     /// or not.
     /// </summary>
-    [With] bool IsReadOnly { get; }
+    bool IsReadOnly { get; }
 
     // ----------------------------------------------------
 

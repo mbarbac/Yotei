@@ -8,6 +8,18 @@
 public partial interface IMetadataEntry : IEquatable<IMetadataEntry>
 {
     /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    IMetadataEntry WithName(string value);
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    IMetadataEntry WithValue(object? value);
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Determines if this instance is equal to the other given one, using the given comparison
     /// mode to compare their metadata names.
     /// </summary>
@@ -19,12 +31,10 @@ public partial interface IMetadataEntry : IEquatable<IMetadataEntry>
     /// <summary>
     /// The name by which this metadata entry is known.
     /// </summary>
-    [With]
     string Name { get; }
 
     /// <summary>
     /// The value carried by this entry.
     /// </summary>
-    [With]
     object? Value { get; }
 }

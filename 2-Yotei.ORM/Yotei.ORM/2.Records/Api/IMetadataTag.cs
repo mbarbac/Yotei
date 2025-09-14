@@ -7,9 +7,13 @@
 /// name used or the one explicitly selected become the default one.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
-[Cloneable]
 public partial interface IMetadataTag : IEnumerable<string>, IEquatable<IMetadataTag>
 {
+    /// <inheritdoc cref="ICloneable.Clone"/>
+    IMetadataTag Clone();
+
+    // ----------------------------------------------------
+
     /// <summary>
     /// Returns a new builder based upon the contents of this instance.
     /// </summary>

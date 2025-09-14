@@ -10,6 +10,16 @@ public partial interface ICommand
     /// <inheritdoc cref="ICloneable.Clone"/>
     ICommand Clone();
 
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    ICommand WithConnection(IConnection value);
+
+    /// <summary>
+    /// Emulates the 'with' keyword with instances of this type.
+    /// </summary>
+    ICommand WithLocale(Locale value);
+
     // ----------------------------------------------------
 
     /// <summary>
@@ -18,19 +28,9 @@ public partial interface ICommand
     IConnection Connection { get; }
 
     /// <summary>
-    /// Emulates the 'with' keyword with instances of this type.
-    /// </summary>
-    ICommand WithConnection(IConnection value);
-
-    /// <summary>
     /// The locale to use with culture-sensitive objects in the underlying database.
     /// </summary>
     Locale Locale { get; }
-
-    /// <summary>
-    /// Emulates the 'with' keyword with instances of this type.
-    /// </summary>
-    ICommand WithLocale(Locale value);
 
     /// <summary>
     /// Determines if this instance is in an execution-ready state, or not.

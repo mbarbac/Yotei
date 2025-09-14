@@ -12,6 +12,8 @@ public partial interface IValueConverterList : IEnumerable<IValueConverter>
     /// <inheritdoc cref="ICloneable.Clone"/>
     IValueConverterList Clone();
 
+    // ----------------------------------------------------
+
     /// <summary>
     /// Gets the number of elements in this collection.
     /// </summary>
