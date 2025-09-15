@@ -55,12 +55,12 @@ public partial interface IEnumerableCommand
     bool SupportsNativePaging { get; }
 
     /// <summary>
-    /// The number of records to skip, or cero or a negative value to ignore this property.
+    /// The number of records to skip, or cero to ignore this property.
     /// </summary>
     int Skip { get; set; }
 
     /// <summary>
-    /// The number of records to take, or cero or a negative value to ignore this property.
+    /// The number of records to take, or cero to ignore this property.
     /// </summary>
     int Take { get; set; }
 

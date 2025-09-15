@@ -65,7 +65,7 @@ public abstract partial class EnumerableCommand : Command, IEnumerableCommand
         set => _Skip = value >= 0 ? value
             : throw new ArgumentOutOfRangeException(nameof(value)).WithData(value);
     }
-    int _Skip = -1;
+    int _Skip = 0;
 
     /// <inheritdoc/>
     public int Take
@@ -74,7 +74,7 @@ public abstract partial class EnumerableCommand : Command, IEnumerableCommand
         set => _Take = value >= 0 ? value
             : throw new ArgumentOutOfRangeException(nameof(value)).WithData(value);
     }
-    int _Take = -1;
+    int _Take = 0;
 
     // ----------------------------------------------------
 

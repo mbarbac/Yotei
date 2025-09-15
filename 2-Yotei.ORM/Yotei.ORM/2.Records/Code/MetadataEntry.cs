@@ -2,7 +2,6 @@
 
 // ========================================================
 /// <inheritdoc cref="IMetadataEntry"/>
-[InheritWiths<IMetadataEntry>]
 public partial class MetadataEntry : IMetadataEntry
 {
     /// <summary>
