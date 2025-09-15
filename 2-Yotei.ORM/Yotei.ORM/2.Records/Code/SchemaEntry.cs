@@ -2,8 +2,6 @@
 
 // ========================================================
 /// <inheritdoc cref="ISchemaEntry"/>
-[Cloneable<ISchemaEntry>]
-[InheritWiths<ISchemaEntry>]
 [DebuggerDisplay("{Items.ToString(5)}")]
 public partial class SchemaEntry : ISchemaEntry
 {
@@ -80,6 +78,21 @@ public partial class SchemaEntry : ISchemaEntry
 
     /// <inheritdoc/>
     public virtual ISchemaEntry.IBuilder CreateBuilder() => Items.Clone();
+
+    /// <inheritdoc/>
+    public virtual ISchemaEntry Clone() => new SchemaEntry(this);
+
+    /// <inheritdoc/>
+    public virtual ISchemaEntry WithIdentifier(IIdentifier value) => new SchemaEntry(this) { Identifier = value };
+
+    /// <inheritdoc/>
+    public virtual ISchemaEntry WithIsPrimaryKey(bool value) => new SchemaEntry(this) { IsPrimaryKey = value };
+
+    /// <inheritdoc/>
+    public virtual ISchemaEntry WithIsUniqueValued(bool value) => new SchemaEntry(this) { IsUniqueValued = value };
+
+    /// <inheritdoc/>
+    public virtual ISchemaEntry WithIsReadOnly(bool value) => new SchemaEntry(this) { IsReadOnly = value };
 
     // ----------------------------------------------------
 

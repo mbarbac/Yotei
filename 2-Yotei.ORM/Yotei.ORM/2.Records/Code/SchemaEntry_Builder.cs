@@ -4,7 +4,6 @@ partial class SchemaEntry
 {
     // ====================================================
     /// <inheritdoc cref="ISchemaEntry.IBuilder"/>
-    [Cloneable<ISchemaEntry.IBuilder>]
     [DebuggerDisplay("{ToString(5)}")]
     public partial class Builder : ISchemaEntry.IBuilder
     {
@@ -141,6 +140,9 @@ partial class SchemaEntry
 
             return sb.ToString();
         }
+
+        /// <inheritdoc/>
+        public virtual ISchemaEntry.IBuilder Clone() => new Builder(this);
 
         // ----------------------------------------------------
 

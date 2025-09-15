@@ -1,8 +1,6 @@
 ﻿namespace Yotei.ORM.Tests;
 
 // ========================================================
-[Cloneable<IKnownTags>]
-[InheritWiths<IKnownTags>]
 public partial class FakeKnownTags : KnownTags
 {
     public FakeKnownTags(bool sensitive) : base(
@@ -17,4 +15,16 @@ public partial class FakeKnownTags : KnownTags
     { }
 
     protected FakeKnownTags(FakeKnownTags source) : base(source) { }
+
+    public override FakeKnownTags Clone() => new(this);
+
+    public override FakeKnownTags WithCaseSensitiveTags(bool value) => new(this) { CaseSensitiveTags = value };
+
+    public override FakeKnownTags WithIdentifierTags(IIdentifierTags value) => new(this) { IdentifierTags = value };
+
+    public override FakeKnownTags WithPrimaryKeyTag(IMetadataTag? value) => new(this) { PrimaryKeyTag = value };
+
+    public override FakeKnownTags WithUniqueValuedTag(IMetadataTag? value) => new(this) { UniqueValuedTag = value };
+
+    public override FakeKnownTags WithReadOnlyTag(IMetadataTag? value) => new(this) { ReadOnlyTag = value };
 }

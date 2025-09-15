@@ -5,6 +5,7 @@
 /// Represents the ordered collection of related values to be retrieved from, or persisted into,
 /// an underlying database as a single unit. Instances of this type may carry a schema that, if
 /// not null, acts as a descriptor for the record structure and contents.
+/// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
 public partial interface IRecord : IEnumerable<object?>, IEquatable<IRecord>
 {
@@ -25,6 +26,12 @@ public partial interface IRecord : IEnumerable<object?>, IEquatable<IRecord>
     IBuilder CreateBuilder();
 
     // ----------------------------------------------------
+
+    /// <summary>
+    /// The schema that describes the structure and contents of this instance, or <c>null</c> if
+    /// it is a schema-less one.
+    /// </summary>
+    ISchema? Schema { get; }
 
     /// <summary>
     /// The number of elements carried by this instance.

@@ -2,8 +2,6 @@
 
 // ========================================================
 /// <inheritdoc cref="IRawCommand"/>
-[Cloneable<IRawCommand>]
-[InheritWiths<IRawCommand>]
 public partial class RawCommand : EnumerableCommand, IRawCommand
 {
     /// <summary>
@@ -20,6 +18,21 @@ public partial class RawCommand : EnumerableCommand, IRawCommand
 
     /// <inheritdoc/>
     public ICommandExecutor GetExecutor() => Connection.Records.CreateCommandExecutor(this);
+
+    /// <inheritdoc/>
+    public override IRawCommand Clone() => new RawCommand(this);
+    IEnumerableCommand IEnumerableCommand.Clone() => Clone();
+    IExecutableCommand IExecutableCommand.Clone() => Clone();
+
+    /// <inheritdoc/>
+    public override IRawCommand WithConnection(IConnection value) => new RawCommand(this) { Connection = value };
+    IEnumerableCommand IEnumerableCommand.WithConnection(IConnection value) => WithConnection(value);
+    IExecutableCommand IExecutableCommand.WithConnection(IConnection value) => WithConnection(value);
+
+    /// <inheritdoc/>
+    public override IRawCommand WithLocale(Locale value) => new RawCommand(this) { Locale = value };
+    IEnumerableCommand IEnumerableCommand.WithLocale(Locale value) => WithLocale(value);
+    IExecutableCommand IExecutableCommand.WithLocale(Locale value) => WithLocale(value);
 
     // ----------------------------------------------------
 

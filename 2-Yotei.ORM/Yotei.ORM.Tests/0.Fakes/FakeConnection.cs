@@ -1,12 +1,13 @@
 ﻿namespace Yotei.ORM.Tests;
 
 // ========================================================
-[Cloneable<IConnection>]
 public partial class FakeConnection : Connection
 {
     public FakeConnection(IEngine engine) : base(engine) { }
     protected FakeConnection(FakeConnection source) : base(source) { }
     public override string ToString() => $"FakeConnection({Engine})";
+
+    public override FakeConnection Clone() => new(this);
 
     public override bool IsOpen => _IsOpen;
     bool _IsOpen = false;

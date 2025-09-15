@@ -2,8 +2,6 @@
 
 // ========================================================
 /// <inheritdoc cref="IExecutableCommand"/>
-[Cloneable<IExecutableCommand>]
-[InheritWiths<IExecutableCommand>]
 public abstract partial class ExecutableCommand : Command, IExecutableCommand
 {
     /// <summary>
@@ -17,6 +15,15 @@ public abstract partial class ExecutableCommand : Command, IExecutableCommand
     /// </summary>
     /// <param name="source"></param>
     protected ExecutableCommand(ExecutableCommand source) : base(source) { }
+
+    /// <inheritdoc/>
+    public abstract override IExecutableCommand Clone();
+
+    /// <inheritdoc/>
+    public abstract override IExecutableCommand WithConnection(IConnection value);
+
+    /// <inheritdoc/>
+    public abstract override IExecutableCommand WithLocale(Locale value);
 
     // ----------------------------------------------------
 

@@ -4,7 +4,6 @@ partial class Record
 {
     // ====================================================
     /// <inheritdoc cref="IRecord.IBuilder"/>
-    [Cloneable<IRecord.IBuilder>]
     [DebuggerDisplay("{ToDebugString(5)}")]
     public partial class Builder : IRecord.IBuilder
     {
@@ -100,6 +99,9 @@ partial class Record
         public virtual IRecord CreateInstance() => _Schema is null
             ? new Record(this)
             : new Record(_Schema.Engine, this, _Schema);
+
+        /// <inheritdoc/>
+        public virtual IRecord.IBuilder Clone() => new Builder(this);
 
         // ----------------------------------------------------
 

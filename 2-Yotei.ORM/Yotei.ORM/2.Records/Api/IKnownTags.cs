@@ -14,7 +14,7 @@ public partial interface IKnownTags : IEnumerable<IMetadataTag>, IEquatable<IKno
     /// <summary>
     /// Emulates the 'with' keyword with instances of this type.
     /// </summary>
-    IKnownTags WithCaseSensitivTags(bool value);
+    IKnownTags WithCaseSensitiveTags(bool value);
 
     /// <summary>
     /// Emulates the 'with' keyword with instances of this type.

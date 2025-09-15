@@ -2,8 +2,6 @@
 
 // ========================================================
 /// <inheritdoc cref="IRecord"/>
-[Cloneable<IRecord>]
-[InheritWiths<IRecord>]
 [DebuggerDisplay("{Items.ToDebugString(5)}")]
 public partial class Record : IRecord
 {
@@ -51,6 +49,12 @@ public partial class Record : IRecord
 
     /// <inheritdoc/>
     public virtual IRecord.IBuilder CreateBuilder() => Items.Clone();
+
+    /// <inheritdoc/>
+    public virtual IRecord Clone() => new Record(this);
+
+    /// <inheritdoc/>
+    public virtual IRecord WithSchema(ISchema? value) => new Record(this) { Schema = value };
 
     // ----------------------------------------------------
 

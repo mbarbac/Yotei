@@ -9,7 +9,6 @@ partial class Schema
 {
     // ====================================================
     /// <inheritdoc cref="IHost.IBuilder"/>
-    [Cloneable<IHost.IBuilder>]
     [DebuggerDisplay("{ToDebugString(5)}")]
     public partial class Builder : CoreList<TKey, IItem>, IHost.IBuilder
     {
@@ -39,6 +38,9 @@ partial class Schema
         /// </summary>
         /// <param name="source"></param>
         protected Builder(Builder source) : this(source.Engine) => AddRange(source);
+
+        /// <inheritdoc/>
+        public override IHost.IBuilder Clone() => new Builder(this);
 
         // ------------------------------------------------
 

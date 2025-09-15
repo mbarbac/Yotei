@@ -4,8 +4,7 @@ partial class MetadataTag
 {
     // ====================================================
     /// <inheritdoc cref="IMetadataTag.IBuilder"/>
-    [Cloneable<IMetadataTag.IBuilder>]
-    public partial class Builder : IMetadataTag.IBuilder
+        public partial class Builder : IMetadataTag.IBuilder
     {
         readonly List<string> Items = [];
 
@@ -56,6 +55,9 @@ partial class MetadataTag
         /// <inheritdoc/>
         public virtual IMetadataTag CreateInstance()
             => new MetadataTag(CaseSensitiveTags, this);
+
+        /// <inheritdoc/>
+        public virtual IMetadataTag.IBuilder Clone() => new Builder(this);
 
         // ----------------------------------------------------
 

@@ -8,7 +8,6 @@ partial class IdentifierTags
 {
     // ====================================================
     /// <inheritdoc cref="IHost.IBuilder"/>
-    [Cloneable<IHost.IBuilder>]
     [DebuggerDisplay("{ToDebugString(5)}")]
     public partial class Builder : CoreList<IItem>, IHost.IBuilder
     {
@@ -43,6 +42,9 @@ partial class IdentifierTags
         public override string ToString() => Count == 0
             ? string.Empty
             : $"[{string.Join('.', this.Select(x => x.Default))}]";
+
+        /// <inheritdoc/>
+        public override IHost.IBuilder Clone() => new Builder(this);
 
         // ------------------------------------------------
 

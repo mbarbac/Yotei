@@ -1,7 +1,6 @@
 ﻿namespace Yotei.ORM.Tests;
 
 // ========================================================
-[Cloneable<IValueConverterList>]
 public partial class FakeConverters : ValueConverterList
 {
     public FakeConverters()
@@ -11,4 +10,6 @@ public partial class FakeConverters : ValueConverterList
     }
 
     protected FakeConverters(FakeConverters source) : base(source) { }
+
+    public override FakeConverters Clone() => new(this);
 }

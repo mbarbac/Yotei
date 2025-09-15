@@ -10,14 +10,10 @@ public partial interface IExecutableCommand : ICommand
     /// <inheritdoc cref="ICloneable.Clone"/>
     new IExecutableCommand Clone();
 
-    /// <summary>
-    /// Emulates the 'with' keyword with instances of this type.
-    /// </summary>
+    /// <inheritdoc cref="ICommand.WithConnection(IConnection)"/>
     new IExecutableCommand WithConnection(IConnection value);
 
-    /// <summary>
-    /// Emulates the 'with' keyword with instances of this type.
-    /// </summary>
+    /// <inheritdoc cref="ICommand.WithLocale(Locale)"/>
     new IExecutableCommand WithLocale(Locale value);
 
     // ----------------------------------------------------

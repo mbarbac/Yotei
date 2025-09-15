@@ -2,7 +2,6 @@
 
 // ========================================================
 /// <inheritdoc cref="IMetadataTag"/>
-[Cloneable<IMetadataTag>]
 public partial class MetadataTag : IMetadataTag
 {
     protected virtual Builder Items { get; }
@@ -38,6 +37,9 @@ public partial class MetadataTag : IMetadataTag
 
     /// <inheritdoc/>
     public virtual IMetadataTag.IBuilder CreateBuilder() => Items.Clone();
+
+    /// <inheritdoc/>
+    public virtual IMetadataTag Clone() => new MetadataTag(this);
 
     // ----------------------------------------------------
 

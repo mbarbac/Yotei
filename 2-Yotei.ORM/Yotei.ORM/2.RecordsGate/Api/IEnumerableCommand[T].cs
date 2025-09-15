@@ -16,14 +16,10 @@ public partial interface IEnumerableCommand<T>
     /// <inheritdoc cref="ICloneable.Clone"/>
     new IEnumerableCommand<T> Clone();
 
-    /// <summary>
-    /// Emulates the 'with' keyword with instances of this type.
-    /// </summary>
+    /// <inheritdoc cref="ICommand.WithConnection(IConnection)"/>
     new IEnumerableCommand<T> WithConnection(IConnection value);
 
-    /// <summary>
-    /// Emulates the 'with' keyword with instances of this type.
-    /// </summary>
+    /// <inheritdoc cref="ICommand.WithLocale(Locale)"/>
     new IEnumerableCommand<T> WithLocale(Locale value);
 
     // ----------------------------------------------------

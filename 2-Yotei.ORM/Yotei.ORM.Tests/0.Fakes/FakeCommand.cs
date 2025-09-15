@@ -1,8 +1,6 @@
 ﻿namespace Yotei.ORM.Tests;
 
 // ========================================================
-[Cloneable]
-[InheritWiths]
 public partial class FakeCommand : EnumerableCommand, ICommand, IExecutableCommand
 {
     public CommandInfo FakeInfo
@@ -33,6 +31,19 @@ public partial class FakeCommand : EnumerableCommand, ICommand, IExecutableComma
     protected FakeCommand(FakeCommand source)
         : base(source)
         => FakeInfo = (CommandInfo)source.FakeInfo.Clone();
+
+    public override FakeCommand Clone() => new(this);
+    IExecutableCommand IExecutableCommand.Clone() => Clone();
+
+    public override FakeCommand WithConnection(IConnection value) => new(this) { Connection = value };
+    IExecutableCommand IExecutableCommand.WithConnection(IConnection value) => WithConnection(value);
+
+    public override FakeCommand WithLocale(Locale value) => new(this) { Locale = value };
+    IExecutableCommand IExecutableCommand.WithLocale(Locale value) => WithLocale(value);
+
+    public override FakeCommand WithSkip(int value) => new(this) { Skip = value };
+
+    public override FakeCommand WithTake(int value) => new(this) { Take = value };
 
     // ----------------------------------------------------
 

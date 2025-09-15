@@ -7,14 +7,9 @@ partial class StrTokenChain
     /// <summary>
     /// Represents a builder for <see cref="IHost"/> instances.
     /// </summary>
-    [Cloneable]
     [DebuggerDisplay("{ToDebugString(5)}")]
     public partial class Builder : CoreList<IStrToken>
     {
-
-
-        // ------------------------------------------------
-
         /// <summary>
         /// Initializes a new empty instance.
         /// </summary>
@@ -42,6 +37,9 @@ partial class StrTokenChain
         public override string ToString() => Count == 0
             ? string.Empty
             : string.Concat(this.Select(x => x.ToString()));
+
+        /// <inheritdoc/>
+        public override Builder Clone() => new Builder(this);
 
         // ------------------------------------------------
 

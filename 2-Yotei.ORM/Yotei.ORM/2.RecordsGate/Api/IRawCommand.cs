@@ -9,14 +9,10 @@ public partial interface IRawCommand : ICommand, IEnumerableCommand, IExecutable
     /// <inheritdoc cref="ICloneable.Clone"/>
     new IRawCommand Clone();
 
-    /// <summary>
-    /// Emulates the 'with' keyword with instances of this type.
-    /// </summary>
+    /// <inheritdoc cref="ICommand.WithConnection(IConnection)"/>
     new IRawCommand WithConnection(IConnection value);
 
-    /// <summary>
-    /// Emulates the 'with' keyword with instances of this type.
-    /// </summary>
+    /// <inheritdoc cref="ICommand.WithLocale(Locale)"/>
     new IRawCommand WithLocale(Locale value);
 
     // ----------------------------------------------------

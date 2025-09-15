@@ -2,8 +2,6 @@
 
 // ========================================================
 /// <inheritdoc cref="IEnumerableCommand"/>
-[Cloneable<IEnumerableCommand>]
-[InheritWiths<IEnumerableCommand>]
 public abstract partial class EnumerableCommand : Command, IEnumerableCommand
 {
     /// <summary>
@@ -21,6 +19,21 @@ public abstract partial class EnumerableCommand : Command, IEnumerableCommand
         Skip = source.Skip;
         Take = source.Take;
     }
+
+    /// <inheritdoc/>
+    public abstract override IEnumerableCommand Clone();
+
+    /// <inheritdoc/>
+    public abstract override IEnumerableCommand WithConnection(IConnection value);
+
+    /// <inheritdoc/>
+    public abstract override IEnumerableCommand WithLocale(Locale value);
+
+    /// <inheritdoc/>
+    public abstract IEnumerableCommand WithSkip(int value);
+
+    /// <inheritdoc/>
+    public abstract IEnumerableCommand WithTake(int value);
 
     // ----------------------------------------------------
 

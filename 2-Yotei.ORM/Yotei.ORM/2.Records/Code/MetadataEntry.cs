@@ -31,6 +31,12 @@ public partial class MetadataEntry : IMetadataEntry
     /// <inheritdoc/>
     public override string ToString() => $"[{Name}='{Value.Sketch()}']";
 
+    /// <inheritdoc/>
+    public virtual IMetadataEntry WithName(string value) => new MetadataEntry(this) { Name = value };
+
+    /// <inheritdoc/>
+    public virtual IMetadataEntry WithValue(object? value) => new MetadataEntry(this) { Value = value };
+
     // ----------------------------------------------------
 
     /// <inheritdoc/>

@@ -2,8 +2,6 @@
 
 // ========================================================
 /// <inheritdoc cref="IEnumerableCommand{T}"/>
-[Cloneable(ReturnType = typeof(IEnumerableCommand<>))]
-[InheritWiths(ReturnType = typeof(IEnumerableCommand<>))]
 public partial class EnumerableCommand<T> : IEnumerableCommand<T>
 {
     /// <summary>
@@ -31,6 +29,22 @@ public partial class EnumerableCommand<T> : IEnumerableCommand<T>
 
     /// <inheritdoc/>
     public override string ToString() => Command.ToString()!;
+
+    /// <inheritdoc/>
+    public virtual IEnumerableCommand<T> Clone() => new EnumerableCommand<T>(this);
+    ICommand ICommand.Clone() => Clone();
+
+    /// <inheritdoc/>
+    public virtual IEnumerableCommand<T> WithConnection(
+        IConnection value)
+        => new EnumerableCommand<T>(this) { Command = Command.WithConnection(value) };
+    ICommand ICommand.WithConnection(IConnection value) => WithConnection(value);
+
+    /// <inheritdoc/>
+    public virtual IEnumerableCommand<T> WithLocale(
+        Locale value)
+        => new EnumerableCommand<T>(this) { Command = Command.WithLocale(value) };
+    ICommand ICommand.WithLocale(Locale value) => WithLocale(value);
 
     // ----------------------------------------------------
 

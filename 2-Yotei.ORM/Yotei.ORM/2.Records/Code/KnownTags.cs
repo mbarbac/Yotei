@@ -2,8 +2,6 @@
 
 // ========================================================
 /// <inheritdoc cref="IKnownTags"/>
-[Cloneable<IKnownTags>]
-[InheritWiths<IKnownTags>]
 public partial class KnownTags : IKnownTags
 {
     /// <summary>
@@ -82,6 +80,24 @@ public partial class KnownTags : IKnownTags
         return sb.ToString();
     }
 
+    /// <inheritdoc/>
+    public virtual IKnownTags Clone() => new KnownTags(this);
+
+    /// <inheritdoc/>
+    public virtual IKnownTags WithCaseSensitiveTags(bool value) => new KnownTags(this) { CaseSensitiveTags = value };
+
+    /// <inheritdoc/>
+    public virtual IKnownTags WithIdentifierTags(IIdentifierTags value) => new KnownTags(this) { IdentifierTags = value };
+
+    /// <inheritdoc/>
+    public virtual IKnownTags WithPrimaryKeyTag(IMetadataTag? value) => new KnownTags(this) { PrimaryKeyTag = value };
+
+    /// <inheritdoc/>
+    public virtual IKnownTags WithUniqueValuedTag(IMetadataTag? value) => new KnownTags(this) { UniqueValuedTag = value };
+
+    /// <inheritdoc/>
+    public virtual IKnownTags WithReadOnlyTag(IMetadataTag? value) => new KnownTags(this) { ReadOnlyTag = value };
+
     // ----------------------------------------------------
 
     /// <inheritdoc/>
@@ -126,7 +142,7 @@ public partial class KnownTags : IKnownTags
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public bool CaseSensitiveTags { get; }
+    public bool CaseSensitiveTags { get; init; }
 
     /// <inheritdoc/>
     public IIdentifierTags IdentifierTags
