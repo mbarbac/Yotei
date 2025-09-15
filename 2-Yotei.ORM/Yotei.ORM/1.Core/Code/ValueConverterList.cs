@@ -2,7 +2,6 @@
 
 // ========================================================
 /// <inheritdoc cref="IValueConverterList"/>
-[Cloneable<IValueConverterList>]
 [DebuggerDisplay("{ToDebugString(5)}")]
 public partial class ValueConverterList : IValueConverterList
 {
@@ -49,6 +48,9 @@ public partial class ValueConverterList : IValueConverterList
     }
 
     string ToDebugItem(IValueConverter item) => item.SourceType.EasyName();
+
+    /// <inheritdoc/>
+    public virtual IValueConverterList Clone() => new ValueConverterList(this);
 
     // ----------------------------------------------------
 

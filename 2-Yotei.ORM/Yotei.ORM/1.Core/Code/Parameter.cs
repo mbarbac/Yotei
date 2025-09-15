@@ -2,7 +2,6 @@
 
 // ========================================================
 /// <inheritdoc cref="IParameter"/>
-[InheritWiths<IParameter>]
 public partial class Parameter : IParameter
 {
     /// <summary>
@@ -30,6 +29,12 @@ public partial class Parameter : IParameter
 
     /// <inheritdoc/>
     public override string ToString() => $"{Name}='{Value.Sketch()}'";
+
+    /// <inheritdoc/>
+    public virtual IParameter WithName(string value) => new Parameter(value, Value);
+
+    /// <inheritdoc/>
+    public virtual IParameter WithValue(object? value) => new Parameter(Name, value);
 
     // ----------------------------------------------------
 

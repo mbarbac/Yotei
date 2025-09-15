@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Yotei.ORM.Code;
+﻿namespace Yotei.ORM.Code;
 
 // ========================================================
 /// <inheritdoc cref="ITransaction"/>

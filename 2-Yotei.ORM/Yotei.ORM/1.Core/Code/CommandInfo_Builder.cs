@@ -3,7 +3,6 @@ partial class CommandInfo
 {
     // ====================================================
     /// <inheritdoc cref="ICommandInfo.IBuilder"/>
-    [Cloneable<ICommandInfo.IBuilder>]
     public partial class Builder : ICommandInfo.IBuilder
     {
         readonly StringBuilder _Text;
@@ -86,6 +85,9 @@ partial class CommandInfo
             var pars = $"[{string.Join(", ", _Parameters)}]";
             return _Text.Length == 0 ? pars : $"{_Text} : {pars}";
         }
+
+        /// <inheritdoc/>
+        public virtual ICommandInfo.IBuilder Clone() => new Builder(this);
 
         // ------------------------------------------------
 

@@ -2,7 +2,6 @@
 
 // ========================================================
 /// <inheritdoc cref="ICommandInfo"/>
-[Cloneable<ICommandInfo>]
 public partial class CommandInfo : ICommandInfo
 {
     protected virtual Builder Items { get; }
@@ -54,6 +53,9 @@ public partial class CommandInfo : ICommandInfo
 
     /// <inheritdoc/>
     public override string ToString() => Items.ToString();
+
+    /// <inheritdoc/>
+    public virtual ICommandInfo Clone() => new CommandInfo(this);
 
     // ------------------------------------------------
 

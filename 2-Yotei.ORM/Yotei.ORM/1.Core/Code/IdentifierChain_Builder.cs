@@ -9,7 +9,6 @@ partial class IdentifierChain
 {
     // ====================================================
     /// <inheritdoc cref="IHost.IBuilder"/>
-    [Cloneable<IHost.IBuilder>]
     [DebuggerDisplay("{ToDebugString(5)}")]
     public partial class Builder : CoreList<TKey?, IItem>, IHost.IBuilder
     {
@@ -42,6 +41,9 @@ partial class IdentifierChain
 
         /// <inheritdoc/>
         public override string ToString() => Value ?? string.Empty;
+
+        /// <inheritdoc/>
+        public override IHost.IBuilder Clone() => new Builder(this);
 
         // ------------------------------------------------
 

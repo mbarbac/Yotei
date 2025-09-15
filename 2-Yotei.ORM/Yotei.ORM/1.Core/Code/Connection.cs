@@ -5,7 +5,6 @@ namespace Yotei.ORM.Code;
 
 // ========================================================
 /// <inheritdoc cref="IConnection"/>
-[Cloneable<IConnection>]
 public abstract partial class Connection : DisposableClass, IConnection
 {
     public const int RETRIES = 4;
@@ -60,6 +59,9 @@ public abstract partial class Connection : DisposableClass, IConnection
 
     /// <inheritdoc/>
     public override string ToString() => $"ORM.Connection({Engine})";
+
+    /// <inheritdoc/>
+    public abstract IConnection Clone();
 
     // ----------------------------------------------------
 

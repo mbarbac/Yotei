@@ -2,8 +2,6 @@
 
 // ========================================================
 /// <inheritdoc cref="ICommand"/>
-[Cloneable<ICommand>]
-[InheritWiths<ICommand>]
 public abstract partial class Command : ICommand
 {
     /// <summary>
@@ -26,6 +24,15 @@ public abstract partial class Command : ICommand
 
     /// <inheritdoc/>
     public override string ToString() => GetCommandInfo().ToString() ?? string.Empty;
+
+    /// <inheritdoc/>
+    public abstract ICommand Clone();
+
+    /// <inheritdoc/>
+    public abstract ICommand WithConnection(IConnection value);
+
+    /// <inheritdoc/>
+    public abstract ICommand WithLocale(Locale value);
 
     // ----------------------------------------------------
 

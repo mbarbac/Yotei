@@ -11,20 +11,6 @@ partial interface ICommandInfo
         /// <inheritdoc cref="ICloneable.Clone"/>
         IBuilder Clone();
 
-        /// <summary>
-        /// Emulates the 'with' keyword with instances of this type.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        ICommand WithConnection(IConnection value);
-
-        /// <summary>
-        /// Emulates the 'with' keyword with instances of this type.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        ICommand WithLocale(Locale value);
-
         // ----------------------------------------------------
 
         /// <summary>

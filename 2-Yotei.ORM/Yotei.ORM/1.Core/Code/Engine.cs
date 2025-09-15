@@ -2,8 +2,6 @@
 
 // ========================================================
 /// <inheritdoc cref="IEngine"/>
-[Cloneable<IEngine>]
-[InheritWiths<IEngine>]
 public partial class Engine : IEngine
 {
     public const bool CASESENSITIVENAMES = false;
@@ -42,6 +40,36 @@ public partial class Engine : IEngine
 
     /// <inheritdoc/>
     public override string ToString() => "ORM.Engine";
+
+    /// <inheritdoc/>
+    public virtual IEngine Clone() => new Engine(this);
+
+    /// <inheritdoc/>
+    public virtual IEngine WithCaseSensitiveNames(bool value) => new Engine(this) { CaseSensitiveNames = value };
+
+    /// <inheritdoc/>
+    public virtual IEngine WithNullValueLiteral(string value) => new Engine(this) { NullValueLiteral = value };
+
+    /// <inheritdoc/>
+    public virtual IEngine WithPositionalParameters(bool value) => new Engine(this) { PositionalParameters = value };
+
+    /// <inheritdoc/>
+    public virtual IEngine WithParameterPrefix(string value) => new Engine(this) { ParameterPrefix = value };
+
+    /// <inheritdoc/>
+    public virtual IEngine WithSupportsNativePaging(bool value) => new Engine(this) { SupportsNativePaging = value };
+
+    /// <inheritdoc/>
+    public virtual IEngine WithUseTerminators(bool value) => new Engine(this) { UseTerminators = value };
+
+    /// <inheritdoc/>
+    public virtual IEngine WithLeftTerminator(char value) => new Engine(this) { LeftTerminator = value };
+
+    /// <inheritdoc/>
+    public virtual IEngine WithRightTerminator(char value) => new Engine(this) { RightTerminator = value };
+
+    /// <inheritdoc/>
+    public virtual IEngine WithKnownTags(IKnownTags value) => new Engine(this) { KnownTags = value };
 
     // ----------------------------------------------------
 
