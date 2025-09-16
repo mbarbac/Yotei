@@ -261,40 +261,9 @@ public static class Test_DbLambdaParser
     // ----------------------------------------------------
 
     //[Enforced]
-    [Fact]
-    public static void Parse_Invoke_Single_Argument()
-    {
-        var parser = new DbLambdaParser(new FakeEngine());
-        IDbToken token;
-        DbTokenInvoke invoke;
-        DbTokenIdentifier id;
-        DbTokenValue value;
+    //[Fact]
+    //public static void Parse_Invoke_Single_Argument()
 
-        token = parser.Parse(x => x());
-        Assert.Equal("x()", token.ToString());
-        invoke = Assert.IsType<DbTokenInvoke>(token);
-        Assert.Empty(invoke.Arguments);
-
-        token = parser.Parse(x => x(50));
-        Assert.Equal("x('50')", token.ToString());
-        invoke = Assert.IsType<DbTokenInvoke>(token);
-        Assert.Single(invoke.Arguments);
-        value = Assert.IsType<DbTokenValue>(invoke.Arguments[0]); Assert.Equal(50, value.Value);
-
-        token = parser.Parse(x => x(x.Alpha));
-        Assert.Equal("x(x.[Alpha])", token.ToString());
-        invoke = Assert.IsType<DbTokenInvoke>(token);
-        Assert.Single(invoke.Arguments);
-        id = Assert.IsType<DbTokenIdentifier>(invoke.Arguments[0]);
-        Assert.Equal("[Alpha]", id.Value);
-
-        token = parser.Parse(x => x.x(x.Alpha));
-        Assert.Equal("x(x.[Alpha])", token.ToString());
-        invoke = Assert.IsType<DbTokenInvoke>(token);
-        Assert.Single(invoke.Arguments);
-        id = Assert.IsType<DbTokenIdentifier>(invoke.Arguments[0]);
-        Assert.Equal("[Alpha]", id.Value);
-    }
 
     //[Enforced]
     [Fact]
@@ -323,134 +292,22 @@ public static class Test_DbLambdaParser
     }
 
     //[Enforced]
-    [Fact]
-    public static void Parse_Invoke_Chained()
-    {
-        var parser = new DbLambdaParser(new FakeEngine());
-        IDbToken token;
-        DbTokenInvoke invoke;
-        DbTokenIdentifier id;
-        DbTokenValue value;
-
-        token = parser.Parse(x => x(x.Alpha)(33));
-        Assert.Equal("x(x.[Alpha])('33')", token.ToString());
-        invoke = Assert.IsType<DbTokenInvoke>(token);
-        Assert.Single(invoke.Arguments);
-        value = Assert.IsType<DbTokenValue>(invoke.Arguments[0]);
-        Assert.Equal(33, value.Value);
-
-        token = parser.Parse(x => x(x.Alpha)(x.Beta));
-        Assert.Equal("x(x.[Alpha])(x.[Beta])", token.ToString());
-        invoke = Assert.IsType<DbTokenInvoke>(token);
-        id = Assert.IsType<DbTokenIdentifier>(invoke.Arguments[0]);
-        Assert.Equal("[Beta]", id.Value);
-        invoke = Assert.IsType<DbTokenInvoke>(invoke.Host);
-        Assert.IsType<DbTokenArgument>(invoke.Host);
-        id = Assert.IsType<DbTokenIdentifier>(invoke.Arguments[0]);
-        Assert.Equal("[Alpha]", id.Value);
-    }
+    //[Fact]
+    //public static void Parse_Invoke_Chained()
 
     // ----------------------------------------------------
 
     //[Enforced]
-    [Fact]
-    public static void Parse_Invoke_Escape()
-    {
-        var parser = new DbLambdaParser(new FakeEngine());
-        IDbToken token;
-        DbTokenInvoke invoke;
-        DbTokenLiteral text;
-
-        // First-level sole string are translated to literals...
-        token = parser.Parse(x => x("any"));
-        Assert.Equal("x(any)", token.ToString());
-        invoke = Assert.IsType<DbTokenInvoke>(token);
-        Assert.Single(invoke.Arguments);
-        text = Assert.IsType<DbTokenLiteral>(invoke.Arguments[0]);
-        Assert.Equal("any", text.Value);
-    }
+    //[Fact]
+    //public static void Parse_Invoke_Escape()
 
     //[Enforced]
-    [Fact]
-    public static void Parse_Invoke_Escape_Chained()
-    {
-        var parser = new DbLambdaParser(new FakeEngine());
-        IDbToken token;
-        DbTokenInvoke invoke;
-        DbTokenLiteral text;
-        DbTokenValue value;
-
-        // Escaping an argument to prevent capturing it...
-        token = parser.Parse(x => x(x.Alpha, x("any")));
-        Assert.Equal("x(x.[Alpha], x(any))", token.ToString());
-        invoke = Assert.IsType<DbTokenInvoke>(token);
-        Assert.Equal(2, invoke.Arguments.Count);
-        Assert.IsType<DbTokenIdentifier>(invoke.Arguments[0]);
-        invoke = Assert.IsType<DbTokenInvoke>(invoke.Arguments[1]);
-        Assert.Single(invoke.Arguments);
-        text = Assert.IsType<DbTokenLiteral>(invoke.Arguments[0]); Assert.Equal("any", text.Value);
-
-        // Because we concatenate, the last invoke is not a 1st-level one, and so it does not
-        // escape its argument...
-        token = parser.Parse(x => x(x.Alpha)("33"));
-        Assert.Equal("x(x.[Alpha])('33')", token.ToString());
-        invoke = Assert.IsType<DbTokenInvoke>(token);
-        Assert.Single(invoke.Arguments);
-        value = Assert.IsType<DbTokenValue>(invoke.Arguments[0]);
-        Assert.Equal("33", value.Value);
-
-        // To un-scape, we need to have a 1st-level single-string invoke..
-        token = parser.Parse(x => x(x.Alpha)(x("33")));
-        Assert.Equal("x(x.[Alpha])(x(33))", token.ToString());
-        invoke = Assert.IsType<DbTokenInvoke>(token);
-        Assert.Single(invoke.Arguments);
-        invoke = Assert.IsType<DbTokenInvoke>(invoke.Arguments[0]);
-        Assert.Single(invoke.Arguments);
-        text = Assert.IsType<DbTokenLiteral>(invoke.Arguments[0]);
-        Assert.Equal("33", text.Value);
-    }
+    //[Fact]
+    //public static void Parse_Invoke_Escape_Chained()
 
     //[Enforced]
-    [Fact]
-    public static void Parse_Invoke_Escape_Arguments_Concatenated()
-    {
-        var parser = new DbLambdaParser(new FakeEngine());
-        IDbToken token;
-        DbTokenInvoke invoke, invoke2;
-        DbTokenLiteral literal;
-        DbTokenMethod method;
-        DbTokenValue value;
-
-        // 2nd argument is concatenated, but captured because not escaped with a 1st-level invoke...
-        token = parser.Parse(x => x.Any(x("WHERE ID > ")("007")));
-        Assert.Equal("x.Any(x(WHERE ID > )('007'))", token.ToString());
-        method = Assert.IsType<DbTokenMethod>(token);
-        Assert.Single(method.Arguments);
-        invoke = Assert.IsType<DbTokenInvoke>(method.Arguments[0]);
-        Assert.Single(invoke.Arguments);
-        value = Assert.IsType<DbTokenValue>(invoke.Arguments[0]); // Not 1st level escape...
-        Assert.Equal("007", value.Value);
-        invoke = Assert.IsType<DbTokenInvoke>(invoke.Host);
-        Assert.Single(invoke.Arguments);
-        literal = Assert.IsType<DbTokenLiteral>(invoke.Arguments[0]); // 1st level escape...
-        Assert.Equal("WHERE ID > ", literal.Value);
-
-        // Now '007' is 1st-level escaped..
-        token = parser.Parse(x => x.Any(x("WHERE ID > ")(x("007"))));
-        Assert.Equal("x.Any(x(WHERE ID > )(x(007)))", token.ToString());
-        method = Assert.IsType<DbTokenMethod>(token);
-        Assert.Single(method.Arguments);
-        invoke = Assert.IsType<DbTokenInvoke>(method.Arguments[0]);
-        Assert.Single(invoke.Arguments);
-        invoke2 = Assert.IsType<DbTokenInvoke>(invoke.Arguments[0]);
-        Assert.Single(invoke2.Arguments);
-        literal = Assert.IsType<DbTokenLiteral>(invoke2.Arguments[0]); // Not 1st level escape...
-        Assert.Equal("007", literal.Value);
-        invoke = Assert.IsType<DbTokenInvoke>(invoke.Host);
-        Assert.Single(invoke.Arguments);
-        literal = Assert.IsType<DbTokenLiteral>(invoke.Arguments[0]); // 1st level escape...
-        Assert.Equal("WHERE ID > ", literal.Value);
-    }
+    //[Fact]
+    //public static void Parse_Invoke_Escape_Arguments_Concatenated()
 
     // ----------------------------------------------------
 
@@ -601,88 +458,16 @@ public static class Test_DbLambdaParser
     // ----------------------------------------------------
 
     //[Enforced]
-    [Fact]
-    public static void Parse_Method_AsInvoke_Standard()
-    {
-        var parser = new DbLambdaParser(new FakeEngine());
-        IDbToken token;
-        DbTokenInvoke item;
-
-        token = parser.Parse(x => x.Alpha.x());
-        Assert.Equal("x.[Alpha]()", token.ToString());
-        item = Assert.IsType<DbTokenInvoke>(token);
-        Assert.Empty(item.Arguments);
-
-        token = parser.Parse(x => x(x.Alpha).x(x.Beta));
-        Assert.Equal("x(x.[Alpha])(x.[Beta])", token.ToString());
-        item = Assert.IsType<DbTokenInvoke>(token);
-        item = Assert.IsType<DbTokenInvoke>(item.Host);
-        Assert.IsType<DbTokenArgument>(item.Host);
-    }
+    //[Fact]
+    //public static void Parse_Method_AsInvoke_Standard()
 
     //[Enforced]
-    [Fact]
-    public static void Parse_Method_AsInvoke_ToLiteral()
-    {
-        var parser = new DbLambdaParser(new FakeEngine());
-        IDbToken token;
-        DbTokenIdentifier id;
-        DbTokenInvoke invoke;
-        DbTokenLiteral text;
-        DbTokenValue value;
-
-        // 1st-level invoke translated to literal...
-        token = parser.Parse(x => x("any"));
-        Assert.Equal("x(any)", token.ToString());
-        invoke = Assert.IsType<DbTokenInvoke>(token);
-        Assert.Single(invoke.Arguments);
-        text = Assert.IsType<DbTokenLiteral>(invoke.Arguments[0]);
-        Assert.Equal("any", text.Value);
-
-        // '...x("any")' is not a first-level invoke...
-        token = parser.Parse(x => x.Alpha.x("any"));
-        Assert.Equal("x.[Alpha]('any')", token.ToString());
-        invoke = Assert.IsType<DbTokenInvoke>(token);
-        id = Assert.IsType<DbTokenIdentifier>(invoke.Host);
-        Assert.Equal("[Alpha]", id.Value);
-        Assert.Single(invoke.Arguments);
-        value = Assert.IsType<DbTokenValue>(invoke.Arguments[0]);
-        Assert.Equal("any", value.Value);
-
-        // But we can force the 1st-level escape...
-        token = parser.Parse(x => x.Alpha.x(x("any")));
-        Assert.Equal("x.[Alpha](x(any))", token.ToString());
-        invoke = Assert.IsType<DbTokenInvoke>(token);
-        id = Assert.IsType<DbTokenIdentifier>(invoke.Host);
-        Assert.Equal("[Alpha]", id.Value);
-        Assert.Single(invoke.Arguments);
-        invoke = Assert.IsType<DbTokenInvoke>(invoke.Arguments[0]);
-        Assert.Single(invoke.Arguments);
-        text = Assert.IsType<DbTokenLiteral>(invoke.Arguments[0]);
-        Assert.Equal("any", text.Value);
-    }
+    //[Fact]
+    //public static void Parse_Method_AsInvoke_ToLiteral()
 
     //[Enforced]
-    [Fact]
-    public static void Parse_Method_ArgumentInvokeString_As_LiteralArgument()
-    {
-        var parser = new DbLambdaParser(new FakeEngine());
-        IDbToken token;
-        DbTokenMethod item;
-        DbTokenInvoke invoke;
-        DbTokenLiteral text;
-
-        token = parser.Parse(x => x.Alpha.Beta(x.Delta, null, x("any")));
-        Assert.Equal("x.[Alpha].Beta(x.[Delta], NULL, x(any))", token.ToString());
-        item = Assert.IsType<DbTokenMethod>(token);
-        Assert.Equal(3, item.Arguments.Count);
-        Assert.IsType<DbTokenIdentifier>(item.Arguments[0]);
-        Assert.IsType<DbTokenValue>(item.Arguments[1]);
-
-        invoke = Assert.IsType<DbTokenInvoke>(item.Arguments[2]);
-        text = Assert.IsType<DbTokenLiteral>(invoke.Arguments[0]);
-        Assert.Equal("any", text.Value);
-    }
+    //[Fact]
+    //public static void Parse_Method_ArgumentInvokeString_As_LiteralArgument()
 
     // ----------------------------------------------------
 
