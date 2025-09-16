@@ -1,4 +1,8 @@
-﻿namespace Yotei.ORM.Internals;
+﻿#pragma warning disable IDE0079
+#pragma warning disable CA1822
+#pragma warning disable CA1859
+
+namespace Yotei.ORM.Internals;
 
 // ========================================================
 /// <summary>
@@ -6,20 +10,42 @@
 /// token in the chain that contains the dynamic operations of that expression.
 /// </summary>
 /// The objective of this class is to provide a fast parsing of dynamic lambda expressions into
-/// database alike-tokens. Later, visitor instances can translate those token chains into the
-/// command-info objects that contains the appropriate text and arguments for the underlying
-/// database.
-public static class DbLambdaParser
+/// database alike-tokens. Later, visitors can translate those token chains into the command-info
+/// objects that contains the appropriate text and arguments for the underlying database.
+public record DbLambdaParser
 {
+    /// <summary>
+    /// Initializes a new instance.
+    /// </summary>
+    /// <param name="engine"></param>
+    public DbLambdaParser(IEngine engine) => Engine = engine.ThrowWhenNull();
+
+    /// <summary>
+    /// The engine used by this instance.
+    /// </summary>
+    public IEngine Engine { get; }
+
+    /// <summary>
+    /// Determines if, in invoke tokens with a single argument that itself is a string valued one,
+    /// that value argument is converted to a literal one, or not.
+    /// </summary>
+    public bool InvokeArgumentSingleValueStringToLiteral { get; init; }
+
+    // ----------------------------------------------------
+
     /// <summary>
     /// Parses the given dynamic lambda expression and returns the last database-alike token in
     /// the chain that contains the dynamic operations of that expression.
     /// </summary>
-    /// <param name="engine"></param>
     /// <param name="expression"></param>
     /// <returns></returns>
-    public static IDbToken Parse(IEngine engine, Func<dynamic, object?> expression)
+    public IDbToken Parse(Func<dynamic, object?> expression)
     {
+        var parser = LambdaParser.Parse(expression);
+        var node = parser.Result;
+
+        var token = Parse(node);
+        return token;
     }
 
     /// <summary>
@@ -27,11 +53,33 @@ public static class DbLambdaParser
     /// returns the last database-alike token in the chain that contains the dynamic operations
     /// of that lambda token.
     /// </summary>
-    /// <param name="engine"></param>
     /// <param name="node"></param>
     /// <returns></returns>
-    public static IDbToken Parse(IEngine engine, LambdaNode node)
+    public IDbToken Parse(LambdaNode node)
     {
+        Engine.ThrowWhenNull();
+        node.ThrowWhenNull();
+
+        var temp = node switch
+        {
+            LambdaNodeArgument item => ParseNode(item),
+            LambdaNodeBinary item => ParseNode(item),
+            LambdaNodeCoalesce item => ParseNode(item),
+            LambdaNodeConvert item => ParseNode(item),
+            LambdaNodeIndexed item => ParseNode(item),
+            LambdaNodeInvoke item => ParseNode(item),
+            LambdaNodeMember item => ParseNode(item),
+            LambdaNodeMethod item => ParseNode(item),
+            LambdaNodeSetter item => ParseNode(item),
+            LambdaNodeTernary item => ParseNode(item),
+            LambdaNodeUnary item => ParseNode(item),
+            LambdaNodeValue item => ParseNode(item),
+
+            _ => throw new ArgumentException("Unknown node.").WithData(node)
+        };
+
+        if (temp is DbTokenChain chain) temp = chain.Reduce();
+        return temp;
     }
 
     // ====================================================
@@ -39,96 +87,252 @@ public static class DbLambdaParser
     /// <summary>
     /// Parses the given node.
     /// </summary>
-    static IDbToken ParseNode(IEngine engine, LambdaNodeArgument node)
+    IDbToken ParseNode(LambdaNodeArgument node)
     {
-        throw null;
+        return new DbTokenArgument(node.LambdaName);
     }
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// Parses the given node.
     /// </summary>
-    static IDbToken ParseNode(IEngine engine, LambdaNodeBinary node)
+    IDbToken ParseNode(LambdaNodeBinary node)
     {
-        throw null;
+        var left = Parse(node.LambdaLeft);
+        var right = Parse(node.LambdaRight);
+
+        return new DbTokenBinary(left, node.LambdaOperation, right);
     }
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// Parses the given node.
     /// </summary>
-    static IDbToken ParseNode(IEngine engine, LambdaNodeCoalesce node)
+    IDbToken ParseNode(LambdaNodeCoalesce node)
     {
-        throw null;
+        // Special case when we can intercept a null-alike left-argument...
+        if (node.LambdaLeft is LambdaNodeValue value && value.LambdaValue is null)
+        {
+            return Parse(node.LambdaRight);
+        }
+        else // Standard case...
+        {
+            var left = Parse(node.LambdaLeft);
+            var right = Parse(node.LambdaRight);
+
+            return new DbTokenCoalesce(left, right);
+        }
     }
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// Parses the given node.
     /// </summary>
-    static IDbToken ParseNode(IEngine engine, LambdaNodeConvert node)
+    IDbToken ParseNode(LambdaNodeConvert node)
     {
-        throw null;
+        var target = Parse(node.LambdaTarget);
+        return new DbTokenConvert.ToType(node.LambdaType, target);
     }
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// Parses the given node.
     /// </summary>
-    static IDbToken ParseNode(IEngine engine, LambdaNodeIndexed node)
+    IDbToken ParseNode(LambdaNodeIndexed node)
     {
-        throw null;
+        var host = Parse(node.LambdaHost);
+        var items = node.LambdaIndexes.Select(x => Parse(x));
+
+        return new DbTokenIndexed(host, items);
     }
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// Parses the given node.
     /// </summary>
-    static IDbToken ParseNode(IEngine engine, LambdaNodeInvoke node)
+    IDbToken ParseNode(LambdaNodeInvoke node)
     {
-        throw null;
+        var host = Parse(node.LambdaHost);
+        var items = node.LambdaArguments.Select(x => Parse(x)).ToList();
+
+        // Single argument cases...
+        if (items.Count == 1)
+        {
+            var item = items[0];
+
+            // Single string values transformed into literal tokens...
+            if (InvokeArgumentSingleValueStringToLiteral &&
+                item is DbTokenValue value &&
+                value.Value is string str)
+                return new DbTokenLiteral(str);
+
+            // Single tokens just returned
+            if (item is IDbToken token) return token;
+        }
+
+        // Standar case...
+        return new DbTokenInvoke(host, items);
     }
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// Parses the given node.
     /// </summary>
-    static IDbToken ParseNode(IEngine engine, LambdaNodeMember node)
+    IDbToken ParseNode(LambdaNodeMember node)
     {
-        throw null;
+        var host = Parse(node.LambdaHost);
+        var darg = node.GetArgument();
+        var name = node.LambdaName.NullWhenDynamicName(darg, Engine.CaseSensitiveNames);
+
+        var id = name == null ? new IdentifierUnit(Engine) : new IdentifierUnit(Engine, name);
+        return new DbTokenIdentifier(host, id);
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Parses the given node.
+    /// <br/> Translates 'x => x(...)' and 'x => x.Any.x(...)' to invoke (case sensitive!).
+    /// <br/> Intercepts 'x => x.Coalesce(...)' virtual method.
+    /// <br/> Intercepts 'x => x.Ternary(...)' virtual method.
+    /// <br/> Intercepts 'x => x.Convert(...)' and 'x => x.Cast(...)' virtual methods.
+    /// </summary>
+    IDbToken ParseNode(LambdaNodeMethod node)
+    {
+        var darg = node.GetArgument();
+        var name = node.LambdaName.NullWhenDynamicName(darg, caseSensitive: true);
+
+        // 'x => x(...)' and 'x => x.Any.x(...)' to invoke...
+        if (name == null)
+        {
+            if (node.LambdaGenericArguments.Count != 0) throw new ArgumentException(
+                "Cannot use type arguments with invoke tokens.")
+                .WithData(node);
+
+            var invoke = new LambdaNodeInvoke(node.LambdaHost, node.LambdaArguments);
+            return ParseNode(invoke);
+        }
+
+        // Intercepts 'Coalesce' virtual method...
+        if (node.LambdaHost is LambdaNodeArgument &&
+            node.LambdaArguments.Count == 2 &&
+            string.Compare(name, "Coalesce", !Engine.CaseSensitiveNames) == 0)
+        {
+            var left = Parse(node.LambdaArguments[0]);
+            var right = Parse(node.LambdaArguments[1]);
+
+            return new DbTokenCoalesce(left, right);
+        }
+
+        // Intercepts 'Ternary' virtual method...
+        if (node.LambdaHost is LambdaNodeArgument &&
+            node.LambdaArguments.Count == 3 &&
+            string.Compare(name, "Ternary", !Engine.CaseSensitiveNames) == 0)
+        {
+            var left = Parse(node.LambdaArguments[0]);
+            var middle = Parse(node.LambdaArguments[1]);
+            var right = Parse(node.LambdaArguments[2]);
+
+            return new DbTokenTernary(left, middle, right);
+        }
+
+        // Intercepts 'Convert' and 'Cast' virtual methods...
+        if (node.LambdaHost is LambdaNodeArgument && (
+            string.Compare(name, "Convert", !Engine.CaseSensitiveNames) == 0 ||
+            string.Compare(name, "Cast", !Engine.CaseSensitiveNames) == 0))
+        {
+            // x => x.Convert<T>(target)...
+            if (node.LambdaGenericArguments.Count == 1 &&
+                node.LambdaArguments.Count == 1)
+            {
+                var type = node.LambdaGenericArguments[0];
+                var target = Parse(node.LambdaArguments[0]);
+
+                return new DbTokenConvert.ToType(type, target);
+            }
+
+            // x => x.Convert(type|spec, target)...
+            if (node.LambdaArguments.Count == 2 &&
+                node.LambdaArguments[0] is LambdaNodeValue value)
+            {
+                var target = Parse(node.LambdaArguments[1]);
+                switch (value.LambdaValue)
+                {
+                    case Type vtype: return new DbTokenConvert.ToType(vtype, target);
+                    case string vspec: return new DbTokenConvert.ToSpec(vspec, target);
+                }
+            }
+        }
+
+        // Standard case...
+        var host = Parse(node.LambdaHost);
+        var items = node.LambdaArguments.Select(x => Parse(x));
+
+        return new DbTokenMethod(host, name, node.LambdaGenericArguments, items);
+    }
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// Parses the given node.
     /// </summary>
-    static IDbToken ParseNode(IEngine engine, LambdaNodeMethod node)
+    IDbToken ParseNode(LambdaNodeSetter node)
     {
-        throw null;
+        var target = Parse(node.LambdaTarget);
+        var value = Parse(node.LambdaValue);
+
+        return new DbTokenSetter(target, value);
     }
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// Parses the given node.
     /// </summary>
-    static IDbToken ParseNode(IEngine engine, LambdaNodeSetter node)
+    IDbToken ParseNode(LambdaNodeTernary node)
     {
-        throw null;
+        var left = Parse(node.LambdaLeft);
+        var middle = Parse(node.LambdaMiddle);
+        var right = Parse(node.LambdaRight);
+
+        return new DbTokenTernary(left, middle, right);
     }
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// Parses the given node.
     /// </summary>
-    static IDbToken ParseNode(IEngine engine, LambdaNodeTernary node)
+    IDbToken ParseNode(LambdaNodeUnary node)
     {
-        throw null;
+        var target = Parse(node.LambdaTarget);
+        return new DbTokenUnary(node.LambdaOperation, target);
     }
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// Parses the given node.
     /// </summary>
-    static IDbToken ParseNode(IEngine engine, LambdaNodeUnary node)
+    IDbToken ParseNode(LambdaNodeValue node)
     {
-        throw null;
-    }
+        return node.LambdaValue switch
+        {
+            IDbToken item => item,
+            LambdaNode item => Parse(item),
+            ICommand item => new DbTokenCommand(item),
 
-    /// <summary>
-    /// Parses the given node.
-    /// </summary>
-    static IDbToken ParseNode(IEngine engine, LambdaNodeValue node)
-    {
-        throw null;
+            Delegate => throw new ArgumentException(
+                "Cannot use delegate as the value of lambda nodes.")
+                .WithData(node),
+
+            _ => new DbTokenValue(node.LambdaValue),
+        };
     }
 }
