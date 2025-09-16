@@ -3,6 +3,7 @@
 // ========================================================
 /// <summary>
 /// Represents the information needed to run a command.
+/// <br/
 /// </summary>
 public partial interface ICommandInfo
 {

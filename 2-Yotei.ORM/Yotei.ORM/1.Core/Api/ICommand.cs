@@ -3,7 +3,6 @@
 // ========================================================
 /// <summary>
 /// Represents a database command that can be executed on its associated connection.
-/// <br/> Instances of this type typically are mutables ones.
 /// </summary>
 public interface ICommand
 {
