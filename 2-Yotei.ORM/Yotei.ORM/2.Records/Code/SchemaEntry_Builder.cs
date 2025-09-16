@@ -5,7 +5,7 @@ partial class SchemaEntry
     // ====================================================
     /// <inheritdoc cref="ISchemaEntry.IBuilder"/>
     [DebuggerDisplay("{ToString(5)}")]
-    public partial class Builder : ISchemaEntry.IBuilder
+    public class Builder : ISchemaEntry.IBuilder
     {
         readonly List<IMetadataEntry> Items = [];
         readonly List<IMetadataEntry> Computed = [];

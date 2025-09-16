@@ -3,7 +3,7 @@
 // ========================================================
 /// <inheritdoc cref="IValueConverterList"/>
 [DebuggerDisplay("{ToDebugString(5)}")]
-public partial class ValueConverterList : IValueConverterList
+public class ValueConverterList : IValueConverterList
 {
     readonly List<IValueConverter> Items;
 

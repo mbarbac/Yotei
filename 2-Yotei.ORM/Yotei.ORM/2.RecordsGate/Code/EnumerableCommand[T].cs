@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <inheritdoc cref="IEnumerableCommand{T}"/>
-public partial class EnumerableCommand<T> : IEnumerableCommand<T>
+public class EnumerableCommand<T> : IEnumerableCommand<T>
 {
     /// <summary>
     /// Initializes a new instance.

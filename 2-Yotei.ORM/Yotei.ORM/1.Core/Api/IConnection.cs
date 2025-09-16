@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents a connection with an underlying database.
 /// </summary>
-public partial interface IConnection : IDisposableEx
+public interface IConnection : IDisposableEx
 {
     /// <inheritdoc cref="ICloneable.Clone"/>
     IConnection Clone();

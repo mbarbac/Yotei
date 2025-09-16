@@ -10,7 +10,7 @@ partial class IdentifierChain
     // ====================================================
     /// <inheritdoc cref="IHost.IBuilder"/>
     [DebuggerDisplay("{ToDebugString(5)}")]
-    public partial class Builder : CoreList<TKey?, IItem>, IHost.IBuilder
+    public class Builder : CoreList<TKey?, IItem>, IHost.IBuilder
     {
         /// <summary>
         /// Initializes a new empty instance.

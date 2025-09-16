@@ -9,7 +9,7 @@ partial interface IElementListT
     /// <summary>
     /// Represents a builder for <see cref="IHost"/> instances.
     /// </summary>
-    public partial interface IBuilder : ICoreList<IItem>
+    public interface IBuilder : ICoreList<IItem>
     {
         /// <inheritdoc cref="ICloneable.Clone"/>
         new IBuilder Clone();

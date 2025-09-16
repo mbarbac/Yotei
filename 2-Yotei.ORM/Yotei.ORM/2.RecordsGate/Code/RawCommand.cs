@@ -2,17 +2,12 @@
 
 // ========================================================
 /// <inheritdoc cref="IRawCommand"/>
-public partial class RawCommand : EnumerableCommand, IRawCommand
+public class RawCommand : EnumerableCommand, IRawCommand
 {
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="connection"></param>
-    public RawCommand(IConnection connection) : base(connection)
-    {
-        throw null;
-    }
-
     public RawCommand(IConnection connection) : base(connection)
     {
         throw null;

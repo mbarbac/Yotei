@@ -5,7 +5,7 @@ partial class Record
     // ====================================================
     /// <inheritdoc cref="IRecord.IBuilder"/>
     [DebuggerDisplay("{ToDebugString(5)}")]
-    public partial class Builder : IRecord.IBuilder
+    public class Builder : IRecord.IBuilder
     {
         readonly List<object?> _Values = [];
         ISchema.IBuilder? _Schema = null;

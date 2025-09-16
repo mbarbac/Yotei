@@ -5,7 +5,7 @@
 /// Represents a metadata entry, which carries a metadata name and a value.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
-public partial interface IMetadataEntry : IEquatable<IMetadataEntry>
+public interface IMetadataEntry : IEquatable<IMetadataEntry>
 {
     /// <summary>
     /// Emulates the 'with' keyword with instances of this type.

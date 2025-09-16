@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <inheritdoc cref="IMetadataEntry"/>
-public partial class MetadataEntry : IMetadataEntry
+public class MetadataEntry : IMetadataEntry
 {
     /// <summary>
     /// Initialiazes a new instance.

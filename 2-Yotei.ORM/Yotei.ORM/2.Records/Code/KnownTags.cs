@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <inheritdoc cref="IKnownTags"/>
-public partial class KnownTags : IKnownTags
+public class KnownTags : IKnownTags
 {
     /// <summary>
     /// Initializes a new empty instance.

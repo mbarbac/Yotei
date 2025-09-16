@@ -8,7 +8,7 @@
 /// </summary>
 /// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>
-public partial interface IInvariantList<K, T> : IReadOnlyList<T>
+public interface IInvariantList<K, T> : IReadOnlyList<T>
 {
     /// <inheritdoc cref="ICloneable.Clone"/>
     IInvariantList<K, T> Clone();

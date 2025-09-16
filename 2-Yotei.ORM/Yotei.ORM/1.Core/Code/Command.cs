@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <inheritdoc cref="ICommand"/>
-public abstract partial class Command : ICommand
+public abstract class Command : ICommand
 {
     /// <summary>
     /// Initializes a new empty instance.

@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <inheritdoc cref="IElement"/>
-public partial class NamedElement : IElement
+public class NamedElement : IElement
 {
     /// <summary>
     /// Initializes a new instance.

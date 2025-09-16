@@ -9,7 +9,7 @@
 /// Instances of this type work by wrapping an original enumerable command.
 /// </remarks>
 /// <typeparam name="T"></typeparam>
-public partial interface IEnumerableCommand<T>
+public interface IEnumerableCommand<T>
     : ICommand
     , IEnumerable<T>, IAsyncEnumerable<T>
 {

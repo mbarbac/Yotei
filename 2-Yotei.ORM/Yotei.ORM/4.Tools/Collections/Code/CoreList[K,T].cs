@@ -3,7 +3,7 @@
 // ========================================================
 /// <inheritdoc cref="ICoreList{K, T}"/>
 [DebuggerDisplay("{ToDebugString(5)}")]
-public abstract partial class CoreList<K, T> : ICoreList<K, T>
+public abstract class CoreList<K, T> : ICoreList<K, T>
 {
     readonly List<T> Items;
 

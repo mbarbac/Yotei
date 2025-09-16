@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <inheritdoc cref="IEnumerableCommand"/>
-public abstract partial class EnumerableCommand : Command, IEnumerableCommand
+public abstract class EnumerableCommand : Command, IEnumerableCommand
 {
     /// <summary>
     /// Initializes a new empty instance.

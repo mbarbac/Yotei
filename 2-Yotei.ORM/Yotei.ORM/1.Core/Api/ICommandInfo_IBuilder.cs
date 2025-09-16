@@ -6,7 +6,7 @@ partial interface ICommandInfo
     /// <summary>
     /// Represents a builder for <see cref="ICommandInfo"/> instances.
     /// </summary>
-    public partial interface IBuilder
+    public interface IBuilder
     {
         /// <inheritdoc cref="ICloneable.Clone"/>
         IBuilder Clone();

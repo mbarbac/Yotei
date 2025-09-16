@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <inheritdoc cref="IExecutableCommand"/>
-public abstract partial class ExecutableCommand : Command, IExecutableCommand
+public abstract class ExecutableCommand : Command, IExecutableCommand
 {
     /// <summary>
     /// Initializes a new empty instance.

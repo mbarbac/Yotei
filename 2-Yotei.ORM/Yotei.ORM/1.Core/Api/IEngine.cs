@@ -5,7 +5,7 @@
 /// Describes an underlying database.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
-public partial interface IEngine : IEquatable<IEngine>
+public interface IEngine : IEquatable<IEngine>
 {
     /// <inheritdoc cref="ICloneable.Clone"/>
     IEngine Clone();

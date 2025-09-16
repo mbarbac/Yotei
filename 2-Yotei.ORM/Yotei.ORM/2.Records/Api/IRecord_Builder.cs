@@ -6,7 +6,7 @@ partial interface IRecord
     /// <summary>
     /// Represents a builder for <see cref="IRecord"/> instances.
     /// </summary>
-    public partial interface IBuilder : IEnumerable<object?>
+    public interface IBuilder : IEnumerable<object?>
     {
         /// <inheritdoc cref="ICloneable.Clone"/>
         IBuilder Clone();

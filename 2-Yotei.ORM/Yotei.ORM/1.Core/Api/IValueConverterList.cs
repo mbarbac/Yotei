@@ -7,7 +7,7 @@
 /// level types to database ones, and viceversa.
 /// <br/> Instances this type are not synchronized.
 /// </summary>
-public partial interface IValueConverterList : IEnumerable<IValueConverter>
+public interface IValueConverterList : IEnumerable<IValueConverter>
 {
     /// <inheritdoc cref="ICloneable.Clone"/>
     IValueConverterList Clone();

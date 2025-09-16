@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents a database command whose contents are explicitly set.
 /// </summary>
-public partial interface IRawCommand : ICommand, IEnumerableCommand, IExecutableCommand
+public interface IRawCommand : ICommand, IEnumerableCommand, IExecutableCommand
 {
     /// <inheritdoc cref="ICloneable.Clone"/>
     new IRawCommand Clone();

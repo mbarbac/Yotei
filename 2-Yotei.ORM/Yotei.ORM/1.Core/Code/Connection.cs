@@ -5,7 +5,7 @@ namespace Yotei.ORM.Code;
 
 // ========================================================
 /// <inheritdoc cref="IConnection"/>
-public abstract partial class Connection : DisposableClass, IConnection
+public abstract class Connection : DisposableClass, IConnection
 {
     public const int RETRIES = 4;
     public const int RETRYINTERVAL = 250;

@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <inheritdoc cref="IParameter"/>
-public partial class Parameter : IParameter
+public class Parameter : IParameter
 {
     /// <summary>
     /// Initializes a new instance.

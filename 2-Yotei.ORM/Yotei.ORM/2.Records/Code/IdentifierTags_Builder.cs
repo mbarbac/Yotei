@@ -9,7 +9,7 @@ partial class IdentifierTags
     // ====================================================
     /// <inheritdoc cref="IHost.IBuilder"/>
     [DebuggerDisplay("{ToDebugString(5)}")]
-    public partial class Builder : CoreList<IItem>, IHost.IBuilder
+    public class Builder : CoreList<IItem>, IHost.IBuilder
     {
         /// <summary>
         /// Initializes a new empty instance.

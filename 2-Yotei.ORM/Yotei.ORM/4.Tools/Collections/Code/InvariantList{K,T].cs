@@ -3,7 +3,7 @@
 // ========================================================
 /// <inheritdoc cref="IInvariantList{K, T}"/>
 [DebuggerDisplay("{Items.ToDebugString(5)}")]
-public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
+public abstract class InvariantList<K, T> : IInvariantList<K, T>
 {
     protected abstract ICoreList<K, T> Items { get; }
 

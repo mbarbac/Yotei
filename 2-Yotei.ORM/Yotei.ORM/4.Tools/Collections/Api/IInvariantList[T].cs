@@ -6,7 +6,7 @@
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public partial interface IInvariantList<T> : IReadOnlyCollection<T>
+public interface IInvariantList<T> : IReadOnlyCollection<T>
 {
     /// <inheritdoc cref="ICloneable.Clone"/>
     IInvariantList<T> Clone();

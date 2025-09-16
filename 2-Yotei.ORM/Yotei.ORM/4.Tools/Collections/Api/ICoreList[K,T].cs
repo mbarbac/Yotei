@@ -7,7 +7,7 @@
 /// </summary>
 /// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>
-public partial interface ICoreList<K, T>
+public interface ICoreList<K, T>
     : IList<T>, IReadOnlyList<T>, IReadOnlyCollection<T>, ICollection<T>
     , IList, ICollection
 {

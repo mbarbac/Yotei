@@ -4,7 +4,7 @@ partial class MetadataTag
 {
     // ====================================================
     /// <inheritdoc cref="IMetadataTag.IBuilder"/>
-        public partial class Builder : IMetadataTag.IBuilder
+    public class Builder : IMetadataTag.IBuilder
     {
         readonly List<string> Items = [];
 

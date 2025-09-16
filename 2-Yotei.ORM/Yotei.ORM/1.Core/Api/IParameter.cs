@@ -5,7 +5,7 @@
 /// Represents a parameter in a command.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
-public partial interface IParameter : IEquatable<IParameter>
+public interface IParameter : IEquatable<IParameter>
 {
     /// <summary>
     /// Emulates the 'with' keyword with instances of this type.

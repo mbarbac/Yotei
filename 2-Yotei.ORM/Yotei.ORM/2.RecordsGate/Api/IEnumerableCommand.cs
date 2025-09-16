@@ -5,7 +5,7 @@
 /// Represents a records-oriented command that, when executed using its associated connection,
 /// enumerates the records produced by that execution.
 /// </summary>
-public partial interface IEnumerableCommand
+public interface IEnumerableCommand
     : ICommand
     , IEnumerable<IRecord>, IAsyncEnumerable<IRecord>
 {

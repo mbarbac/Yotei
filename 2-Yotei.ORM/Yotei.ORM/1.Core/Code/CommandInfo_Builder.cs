@@ -3,7 +3,7 @@ partial class CommandInfo
 {
     // ====================================================
     /// <inheritdoc cref="ICommandInfo.IBuilder"/>
-    public partial class Builder : ICommandInfo.IBuilder
+    public class Builder : ICommandInfo.IBuilder
     {
         readonly StringBuilder _Text;
         readonly ParameterList.Builder _Parameters;

@@ -5,7 +5,7 @@
 /// Represents a records-oriented database command that, when executed using a given connection,
 /// produces an integer as the result of that execution.
 /// </summary>
-public partial interface IExecutableCommand : ICommand
+public interface IExecutableCommand : ICommand
 {
     /// <inheritdoc cref="ICloneable.Clone"/>
     new IExecutableCommand Clone();

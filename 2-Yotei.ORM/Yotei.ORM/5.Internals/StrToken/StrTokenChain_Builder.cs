@@ -8,7 +8,7 @@ partial class StrTokenChain
     /// Represents a builder for <see cref="IHost"/> instances.
     /// </summary>
     [DebuggerDisplay("{ToDebugString(5)}")]
-    public partial class Builder : CoreList<IStrToken>
+    public class Builder : CoreList<IStrToken>
     {
         /// <summary>
         /// Initializes a new empty instance.

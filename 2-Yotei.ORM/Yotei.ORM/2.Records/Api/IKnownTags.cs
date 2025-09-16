@@ -6,7 +6,7 @@
 /// are unique among all tags in this instance.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
-public partial interface IKnownTags : IEnumerable<IMetadataTag>, IEquatable<IKnownTags>
+public interface IKnownTags : IEnumerable<IMetadataTag>, IEquatable<IKnownTags>
 {
     /// <inheritdoc cref="ICloneable.Clone"/>
     IKnownTags Clone();
