@@ -5,7 +5,7 @@
 /// Represents a ternary '(left ? middle : right)' expression  in a database expression.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
-public partial class DbTokenTernary : IDbToken
+public class DbTokenTernary : IDbToken
 {
     /// <summary>
     /// Initializes a new instance.
@@ -34,7 +34,7 @@ public partial class DbTokenTernary : IDbToken
     public override string ToString() => $"({Left} ? {Middle} : {Right})";
 
     /// <inheritdoc cref="ICloneable.Clone"/>
-    public virtual DbTokenTernary Clone() => new(Left, Middle, Right);
+    public virtual DbTokenTernary Clone() => new(this);
     IDbToken IDbToken.Clone() => Clone();
 
     /// <inheritdoc/>

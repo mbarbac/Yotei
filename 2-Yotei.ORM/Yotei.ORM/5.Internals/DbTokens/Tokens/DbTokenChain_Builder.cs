@@ -31,7 +31,7 @@ partial class DbTokenChain
         /// </summary>
         /// <param name="source"></param>
         protected Builder(Builder source) : this()
-            => AddRange(source.Select(x => x.Clone())); // Manages mutable elements...
+            => AddRange(source.Select(x => x.Clone())); // Manages mutable elements, if any...
 
         /// <inheritdoc/>
         public override Builder Clone() => new(this);

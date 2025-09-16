@@ -5,7 +5,7 @@
 /// Represents a binary operation between two given tokens.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
-public partial class DbTokenBinary : IDbToken
+public class DbTokenBinary : IDbToken
 {
     /// <summary>
     /// Initializes a new instance.
@@ -34,7 +34,7 @@ public partial class DbTokenBinary : IDbToken
     public override string ToString() => $"({Left} {Operation} {Right})";
 
     /// <inheritdoc cref="ICloneable.Clone"/>
-    public virtual DbTokenBinary Clone() => new(Left, Operation, Right);
+    public virtual DbTokenBinary Clone() => new(this);
     IDbToken IDbToken.Clone() => Clone();
 
     /// <inheritdoc/>

@@ -3,7 +3,7 @@
 // ========================================================
 /// <summary>
 /// Represents the information needed to run a command.
-/// <br/
+/// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
 public partial interface ICommandInfo
 {

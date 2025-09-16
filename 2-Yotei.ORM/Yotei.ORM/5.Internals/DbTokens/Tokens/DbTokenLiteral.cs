@@ -6,7 +6,7 @@
 /// captured as an argument.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
-public partial class DbTokenLiteral : IDbToken
+public class DbTokenLiteral : IDbToken
 {
     /// <summary>
     /// Represents an empty literal.

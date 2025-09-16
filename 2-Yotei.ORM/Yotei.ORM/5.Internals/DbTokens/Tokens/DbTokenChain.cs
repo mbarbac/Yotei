@@ -20,7 +20,9 @@ public partial class DbTokenChain : IDbToken
     /// Initializes a new instance with the elements from the given range.
     /// </summary>
     /// <param name="range"></param>
-    public DbTokenChain(IEnumerable<IDbToken> range) : this() => Items.AddRange(range);
+    public DbTokenChain(IEnumerable<IDbToken> range)
+        : this()
+        => Items.AddRange(range.Select(x => x.Clone())); // Manages mutable members, if any...
 
     /// <summary>
     /// Copy constructor.

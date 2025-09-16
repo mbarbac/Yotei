@@ -5,7 +5,7 @@
 /// Represents the assignation of an arbitrary token to a target one.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
-public partial class DbTokenSetter : IDbToken
+public class DbTokenSetter : IDbToken
 {
     /// <summary>
     /// Initializes a new instance.
@@ -31,7 +31,7 @@ public partial class DbTokenSetter : IDbToken
     public override string ToString() => $"({Target} = {Value})";
 
     /// <inheritdoc cref="ICloneable.Clone"/>
-    public virtual DbTokenSetter Clone() => new(Target, Value);
+    public virtual DbTokenSetter Clone() => new(this);
     IDbToken IDbToken.Clone() => Clone();
 
     /// <inheritdoc/>

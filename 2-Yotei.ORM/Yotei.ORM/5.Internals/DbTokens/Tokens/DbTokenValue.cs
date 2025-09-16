@@ -6,7 +6,7 @@
 /// type are typically intended to be captured as command arguments.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
-public partial class DbTokenValue : IDbToken
+public class DbTokenValue : IDbToken
 {
     /// <summary>
     /// Initializes a new instance.
@@ -33,7 +33,7 @@ public partial class DbTokenValue : IDbToken
     };
 
     /// <inheritdoc cref="ICloneable.Clone"/>
-    public virtual DbTokenValue Clone() => new(Value);
+    public virtual DbTokenValue Clone() => new(this);
     IDbToken IDbToken.Clone() => Clone();
 
     /// <inheritdoc/>

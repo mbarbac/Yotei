@@ -5,7 +5,7 @@
 /// Represents a conversion or cast operation of a given token.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
-public abstract partial class DbTokenConvert : IDbToken
+public abstract class DbTokenConvert : IDbToken
 {
     /// <summary>
     /// Initializes a new instance.
@@ -32,7 +32,7 @@ public abstract partial class DbTokenConvert : IDbToken
     /// <summary>
     /// Represents a conversion or cast operation of a given token to a given actual type.
     /// </summary>
-    public partial class ToType : DbTokenConvert
+    public class ToType : DbTokenConvert
     {
         /// <summary>
         /// Initializes a new instance.
@@ -99,7 +99,7 @@ public abstract partial class DbTokenConvert : IDbToken
     /// Represents a conversion or cast operation of a given token to a type specification
     /// specified by an arbitrary not-null and not-empty string.
     /// </summary>
-    public partial class ToSpec : DbTokenConvert
+    public class ToSpec : DbTokenConvert
     {
         /// <summary>
         /// Initializes a new instance.

@@ -5,7 +5,7 @@
 /// Represents a unary operation against a given token.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
-public partial class DbTokenUnary : IDbToken
+public class DbTokenUnary : IDbToken
 {
     /// <summary>
     /// Initializes a new instance.
@@ -31,7 +31,7 @@ public partial class DbTokenUnary : IDbToken
     public override string ToString() => $"({Operation} {Target})";
 
     /// <inheritdoc cref="ICloneable.Clone"/>
-    public virtual DbTokenUnary Clone() => new(Operation, Target);
+    public virtual DbTokenUnary Clone() => new(this);
     IDbToken IDbToken.Clone() => Clone();
 
     /// <inheritdoc/>
