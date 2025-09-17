@@ -20,32 +20,11 @@ public partial record class DbTokenVisitor
     /// Initializes a new instance.
     /// </summary>
     /// <param name="connection"></param>
-    /// <param name="locale">If null then using a default with the current culture.</param>
-    /// <param name="useNullString"></param>
-    /// <param name="captureValues"></param>
-    /// <param name="convertValues"></param>
-    /// <param name="useQuotes"></param>
-    /// <param name="useTerminators"></param>
-    /// <param name="rangeSeparator"></param>
-    public DbTokenVisitor(
-        IConnection connection,
-        Locale? locale = null,
-        bool useNullString = USENULLSTRING,
-        bool captureValues = CAPTUREVALUES,
-        bool convertValues = CONVERTVALUES,
-        bool useQuotes = USEQUOTES,
-        bool useTerminators = USETERMINATORS,
-        string? rangeSeparator = RANGESEPARATOR)
+    /// <param name="locale"></param>
+    public DbTokenVisitor(IConnection connection, Locale locale)
     {
         Connection = connection.ThrowWhenNull();
-
-        Locale = locale ?? new();
-        UseNullString = useNullString;
-        CaptureValues = captureValues;
-        ConvertValues = convertValues;
-        UseQuotes = useQuotes;
-        UseTerminators = useTerminators;
-        RangeSeparator = rangeSeparator;
+        Locale = locale.ThrowWhenNull();
     }
 
     /// <summary>
@@ -123,34 +102,34 @@ public partial record class DbTokenVisitor
     /// Whether to use the engine's null value literal when translating null values, or rather
     /// treat them as regular ones.
     /// </summary>
-    public bool UseNullString { get; init; }
+    public bool UseNullString { get; init; } = USENULLSTRING;
 
     /// <summary>
     /// Whether to capture into parameters the values found while parsing, or not.
     /// </summary>
-    public bool CaptureValues { get; init; }
+    public bool CaptureValues { get; init; } = CAPTUREVALUES;
 
     /// <summary>
     /// Whether to to convert the captured values into database understood ones, or not.
     /// </summary>
-    public bool ConvertValues { get; init; }
+    public bool ConvertValues { get; init; } = CONVERTVALUES;
 
     /// <summary>
     /// Whether to wrap values not captured between quotes, or rather to emit their raw string
     /// representation.
     /// </summary>
-    public bool UseQuotes { get; init; }
+    public bool UseQuotes { get; init; } = USEQUOTES;
 
     /// <summary>
     /// Whether to use the engine terminators when emitting identifiers, if the engine use them,
     /// or rather to use their raw values.
     /// </summary>
-    public bool UseTerminators { get; init; }
+    public bool UseTerminators { get; init; } = USETERMINATORS;
 
     /// <summary>
     /// The separator to use elements in a range, or null if it is not used.
     /// </summary>
-    public string? RangeSeparator { get; init; }
+    public string? RangeSeparator { get; init; } = RANGESEPARATOR;
 
     // -----------------------------------------------------
 

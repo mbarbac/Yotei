@@ -10,7 +10,7 @@ public static class Test_DbTokenVisitor_Values
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         string str;
 
         str = visitor.ToValueString(null);
@@ -34,7 +34,7 @@ public static class Test_DbTokenVisitor_Values
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         string str;
 
         str = visitor.ToValueString(true);
@@ -52,7 +52,7 @@ public static class Test_DbTokenVisitor_Values
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         string str;
         var value = new decimal(1234.56);
 
@@ -73,7 +73,7 @@ public static class Test_DbTokenVisitor_Values
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection) { ConvertValues = false };
+        var visitor = new DbTokenVisitor(connection, new()) { ConvertValues = false };
         string str;
         var value = new DateTime(2001, 12, 31);
 
@@ -92,7 +92,7 @@ public static class Test_DbTokenVisitor_Values
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection) { ConvertValues = false };
+        var visitor = new DbTokenVisitor(connection, new()) { ConvertValues = false };
         string str;
         var value = new DateOnly(2001, 12, 31);
 
@@ -113,7 +113,7 @@ public static class Test_DbTokenVisitor_Values
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         string str;
         var value = new TimeOnly(23, 55, 59, 800, 900);
 

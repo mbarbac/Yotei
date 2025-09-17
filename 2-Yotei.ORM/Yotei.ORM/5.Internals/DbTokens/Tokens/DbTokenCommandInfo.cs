@@ -8,7 +8,7 @@
 public class DbTokenCommandInfo : IDbToken
 {
     /// <summary>
-    /// Initializes a new instance with a clone of the given command.
+    /// Initializes a new instance with the given command info.
     /// </summary>
     /// <param name="info"></param>
     public DbTokenCommandInfo(ICommandInfo info) => CommandInfo = info.ThrowWhenNull();
@@ -20,7 +20,16 @@ public class DbTokenCommandInfo : IDbToken
     protected DbTokenCommandInfo(DbTokenCommandInfo source) : this(source.CommandInfo) { }
 
     /// <inheritdoc/>
-    public override string ToString() => CommandInfo.IsEmpty ? string.Empty : CommandInfo.Text;
+    public override string ToString()
+    {
+        return CommandInfo.IsEmpty ? string.Empty : $"({CommandInfo.Text})";
+    }
+        
+    /*=> CommandInfo.IsEmpty ? string.Empty : CommandInfo.Text;
+    {
+        var info = Command.GetCommandInfo(iterable: false);
+        return info.IsEmpty? string.Empty : $"({info.Text})";
+    }*/
 
     /// <inheritdoc cref="ICloneable.Clone"/>
     public virtual DbTokenCommandInfo Clone() => new(this);

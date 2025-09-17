@@ -10,7 +10,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x);
@@ -26,7 +26,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x.Alpha & null);
@@ -40,7 +40,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x.Alpha == null);
@@ -74,7 +74,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x.Alpha >= "any");
@@ -94,7 +94,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x.Alpha && x.Beta);
@@ -114,7 +114,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         var token = new DbTokenChain([
@@ -145,7 +145,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x.Coalesce(x.Alpha, x.Beta));
@@ -159,7 +159,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x.Coalesce(null, x.Alpha));
@@ -175,7 +175,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         var command = new FakeCommand(connection,
@@ -194,7 +194,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         var command = new FakeCommand(connection,
@@ -215,7 +215,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         var info = new CommandInfo(engine, "[First] = {0}", null);
@@ -232,7 +232,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         var info = new CommandInfo(engine, "[First] = {0}", "007");
@@ -252,7 +252,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x.Alpha);
@@ -275,7 +275,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x.x.x.x);
@@ -309,7 +309,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => (x.Alpha + x.Beta).Delta);
@@ -325,7 +325,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x[27]);
@@ -344,7 +344,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x.Alpha[x.Beta, null, "any"]);
@@ -369,7 +369,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x.Alpha[null, x[x.Alpha], x[x.Beta[x.Alpha]]]);
@@ -385,7 +385,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x());
@@ -404,7 +404,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x(x.Alpha, 3, " = ", null));
@@ -422,7 +422,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x("any")); // 1st-level single-string argument invoke...
@@ -445,7 +445,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x("50")); // 1st-level single-string argument invoke...
@@ -474,7 +474,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x.Alpha.x());
@@ -506,7 +506,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => null!);
@@ -530,7 +530,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x.Alpha());
@@ -549,7 +549,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x.Alpha.Beta());
@@ -568,7 +568,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x.Alpha.Beta<string>(x.Delta, 50));
@@ -585,7 +585,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x.Not(x.Id));
@@ -603,7 +603,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x.Count());
@@ -633,7 +633,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x.Cast(x.Alpha, "DECIMAL(2,5)"));
@@ -651,7 +651,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x.Convert("DECIMAL(2,5)", x.Alpha));
@@ -669,7 +669,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x.Id.As(x.Any));
@@ -695,7 +695,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x.Id.In("007", null, x.Alpha));
@@ -715,7 +715,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x.Id.NotIn("007", null, x.Alpha));
@@ -735,7 +735,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x.Id.Between(x.Alpha, 50));
@@ -750,7 +750,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x.Id.Like("00*"));
@@ -769,7 +769,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x.Id.NotLike("00*"));
@@ -790,7 +790,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x = "007");
@@ -811,7 +811,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x.Alpha = "007");
@@ -832,7 +832,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x.Alpha = x.Beta);
@@ -848,7 +848,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x.Ternary(x.Alpha, x.Beta, x.Delta));
@@ -864,7 +864,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => !x);
@@ -882,7 +882,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => !x.Alpha);
@@ -902,7 +902,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => null!);
@@ -932,7 +932,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => "any");
@@ -957,7 +957,7 @@ public static class Test_DbTokenVisitor_Tokens
     {
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
-        var visitor = new DbTokenVisitor(connection);
+        var visitor = new DbTokenVisitor(connection, new());
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => true);
@@ -978,7 +978,7 @@ public static class Test_DbTokenVisitor_Tokens
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
         var locale = new Locale(CultureInfo.InvariantCulture);
-        var visitor = new DbTokenVisitor(connection) { Locale = locale };
+        var visitor = new DbTokenVisitor(connection, locale);
         ICommandInfo.IBuilder builder;
         var value = new decimal(1234.56);
 
@@ -1005,7 +1005,7 @@ public static class Test_DbTokenVisitor_Tokens
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
         var locale = new Locale(CultureInfo.GetCultureInfo("es-ES"));
-        var visitor = new DbTokenVisitor(connection) { Locale = locale };
+        var visitor = new DbTokenVisitor(connection, locale);
         ICommandInfo.IBuilder builder;
         var value = new decimal(1234.56);
 
@@ -1032,7 +1032,7 @@ public static class Test_DbTokenVisitor_Tokens
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
         var locale = new Locale(CultureInfo.InvariantCulture);
-        var visitor = new DbTokenVisitor(connection) { Locale = locale, ConvertValues = false };
+        var visitor = new DbTokenVisitor(connection, locale) { ConvertValues = false };
         ICommandInfo.IBuilder builder;
         var value = new DateTime(2001, 12, 31);
 
@@ -1059,7 +1059,7 @@ public static class Test_DbTokenVisitor_Tokens
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
         var locale = new Locale(CultureInfo.GetCultureInfo("es-ES"));
-        var visitor = new DbTokenVisitor(connection) { Locale = locale, ConvertValues = false };
+        var visitor = new DbTokenVisitor(connection, locale) { ConvertValues = false };
         ICommandInfo.IBuilder builder;
         var value = new DateTime(2001, 12, 31);
 
@@ -1088,7 +1088,7 @@ public static class Test_DbTokenVisitor_Tokens
         var engine = new FakeEngine();
         var connection = new FakeConnection(engine);
         var locale = new Locale(CultureInfo.GetCultureInfo("es-ES"));
-        var visitor = new DbTokenVisitor(connection) { Locale = locale };
+        var visitor = new DbTokenVisitor(connection, locale);
         ICommandInfo.IBuilder builder;
 
         builder = visitor.Visit(x => x("SELECT *")(x(" FROM "), x.Temp.As("My Alias")));

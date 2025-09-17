@@ -30,4 +30,15 @@ public interface IRecordsGate
     /// <param name="command"></param>
     /// <returns></returns>
     ICommandExecutor CreateCommandExecutor(IExecutableCommand command);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Factory method to create an object with the ability of parsing database token chains
+    /// returning the <see cref="ICommandInfo"/> object that represents that chain for the
+    /// underlying database engine.
+    /// </summary>
+    /// <param name="locale"></param>
+    /// <returns></returns>
+    DbTokenVisitor CreateDbTokenVisitor(Locale locale);
 }
