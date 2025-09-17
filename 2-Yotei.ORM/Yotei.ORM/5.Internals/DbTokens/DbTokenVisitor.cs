@@ -90,13 +90,17 @@ public partial record class DbTokenVisitor
     /// Returns a clone of this instance but with the range separator set to null.
     /// </summary>
     /// <returns></returns>
-    public DbTokenVisitor ToNullSeparatorVisitor() => this with { RangeSeparator = null };
+    public DbTokenVisitor ToNullSeparatorVisitor() => RangeSeparator is null
+        ? this
+        : this with { RangeSeparator = null };
 
     /// <summary>
     /// Returns a clone of this instance but with the range separator set to ", ".
     /// </summary>
     /// <returns></returns>
-    public DbTokenVisitor ToCommaVisitor() => this with { RangeSeparator = ", " };
+    public DbTokenVisitor ToCommaVisitor() => RangeSeparator is ", "
+        ? this
+        : this with { RangeSeparator = ", " };
 
     // ----------------------------------------------------
 
@@ -106,6 +110,9 @@ public partial record class DbTokenVisitor
     public IConnection Connection { get; }
     IEngine Engine => Connection.Engine;
     IValueConverterList Converters => Connection.ValueConverters;
+    StringComparison Comparison => Engine.CaseSensitiveNames
+        ? StringComparison.Ordinal
+        : StringComparison.OrdinalIgnoreCase;
 
     /// <summary>
     /// The locale to use with culture-sensitive elements.

@@ -29,6 +29,12 @@ public partial interface ICommandInfo
     string Text { get; }
 
     /// <summary>
+    /// The length of the captured command's text.
+    /// <br/> This property returns that length without the need of creating a text string.
+    /// </summary>
+    int TextLen { get; }
+
+    /// <summary>
     /// The command's parameters.
     /// </summary>
     IParameterList Parameters { get; }

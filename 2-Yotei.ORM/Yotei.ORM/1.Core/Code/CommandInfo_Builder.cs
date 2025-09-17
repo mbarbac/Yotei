@@ -102,6 +102,9 @@ partial class CommandInfo
         public string Text => _Text.ToString();
 
         /// <inheritdoc/>
+        public int TextLen => _Text.Length;
+
+        /// <inheritdoc/>
         public IParameterList Parameters => _Parameters.CreateInstance();
 
         /// <inheritdoc/>
@@ -385,7 +388,8 @@ partial class CommandInfo
         /// Replaces the named specifications of the given collection of parameters in the given
         /// text with ordinal specifications.
         /// </summary>
-        static string NamesToOrdinals(
+        /// This method is public because its refactored code is used by others.
+        public static string NamesToOrdinals(
             string text, IEnumerable<IParameter> pars, StringComparison comparison)
         {
             var finder = new StrFindIsolated();

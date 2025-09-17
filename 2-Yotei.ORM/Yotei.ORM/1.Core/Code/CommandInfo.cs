@@ -68,6 +68,9 @@ public partial class CommandInfo : ICommandInfo
     string? _Text = null;
 
     /// <inheritdoc/>
+    public int TextLen => Items.TextLen;
+
+    /// <inheritdoc/>
     /// Caching value...
     public IParameterList Parameters => _Parameters ??= Items.Parameters;
     IParameterList? _Parameters = null;
