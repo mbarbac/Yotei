@@ -26,10 +26,10 @@ public record DbLambdaParser
     public IEngine Engine { get; }
 
     /// <summary>
-    /// Determines if, in invoke tokens with a single argument that itself is a string valued one,
-    /// that value argument is converted to a literal one, or not.
+    /// If set, prevents conversion of invoke nodes whose unique argument is a string to literal
+    /// nodes.
     /// </summary>
-    public bool InvokeArgumentSingleValueStringToLiteral { get; init; }
+    public bool PreventValueStringToLiteral { get; init; }
 
     // ----------------------------------------------------
 
@@ -157,25 +157,39 @@ public record DbLambdaParser
     /// </summary>
     IDbToken ParseNode(LambdaNodeInvoke node)
     {
-        var host = Parse(node.LambdaHost);
-        var items = node.LambdaArguments.Select(x => Parse(x)).ToList();
-
-        // Single argument cases...
-        if (items.Count == 1)
+        // Intercepting special cases...
+        if (node.LambdaHost is LambdaNodeArgument)
         {
-            var item = items[0];
+            // Single-argument...
+            if (node.LambdaArguments.Count == 1)
+            {
+                if (node.LambdaArguments[0] is LambdaNodeValue value)
+                {
+                    // Convert to literal...
+                    if (!PreventValueStringToLiteral &&
+                        value.LambdaValue is string str)
+                        return new DbTokenLiteral(str);
 
-            // Single string values transformed into literal tokens...
-            if (InvokeArgumentSingleValueStringToLiteral &&
-                item is DbTokenValue value &&
-                value.Value is string str)
-                return new DbTokenLiteral(str);
+                    // Command-alike...
+                    if (value.LambdaValue is ICommand command) return new DbTokenCommand(command);
+                    if (value.LambdaValue is ICommandInfo info) return new DbTokenCommandInfo(info);
+                }
+            }
 
-            // Single tokens just returned
-            if (item is IDbToken token) return token;
+            // Two-arguments...
+            if (node.LambdaArguments.Count == 2)
+            {
+                if (node.LambdaArguments[0] is LambdaNodeValue value &&
+                    node.LambdaArguments[1] is LambdaNodeValue temp &&
+                    value.LambdaValue is ICommand command &&
+                    temp.LambdaValue is bool clone)
+                    return new DbTokenCommand(command, clone);
+            }
         }
 
-        // Standar case...
+        // Default-case...
+        var host = Parse(node.LambdaHost);
+        var items = node.LambdaArguments.Select(x => Parse(x)).ToList();
         return new DbTokenInvoke(host, items);
     }
 
@@ -327,6 +341,7 @@ public record DbLambdaParser
             IDbToken item => item,
             LambdaNode item => Parse(item),
             ICommand item => new DbTokenCommand(item),
+            ICommandInfo item => new DbTokenCommandInfo(item),
 
             Delegate => throw new ArgumentException(
                 "Cannot use delegate as the value of lambda nodes.")

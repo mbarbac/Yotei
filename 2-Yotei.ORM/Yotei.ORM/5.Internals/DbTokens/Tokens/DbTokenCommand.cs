@@ -2,21 +2,21 @@
 
 // ========================================================
 /// <summary>
-/// Represents a token that represents an arbitrary command instance.
-/// <para>
-/// Note that instances of this type carries a reference to a given <see cref="ICommand"/> and,
-/// even if the reference itself is immutable, the underlying command may be not. This breaks
-/// somehow the immutability semantics and so instances of this type only should be used in
-/// controlled scenarios.
-/// </para>
+/// Represents a token that carries a reference to an arbitrary command instance.
+/// <br/> Note that despite that reference is immutable the command itself may be not, which
+/// somehow breaks the immutability semantics. For that reason, by default, the carried command
+/// is a clone of the original one.
 /// </summary>
 public class DbTokenCommand : IDbToken
 {
     /// <summary>
-    /// Initializes a new instance with a clone of the given command.
+    /// Initializes a new instance for a command, which by default is a clone of the original
+    /// given one.
     /// </summary>
     /// <param name="command"></param>
-    public DbTokenCommand(ICommand command) => Command = command.ThrowWhenNull();
+    public DbTokenCommand(ICommand command, bool clone = true) => Command = clone
+        ? command.ThrowWhenNull().Clone()
+        : command.ThrowWhenNull();
 
     /// <summary>
     /// Copy constructor.
