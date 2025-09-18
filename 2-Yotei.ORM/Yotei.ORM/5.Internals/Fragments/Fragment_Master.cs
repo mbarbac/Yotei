@@ -171,7 +171,7 @@ static partial class Fragment
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        protected abstract Entry CreateEntry(IDbToken token);
+        public abstract Entry CreateEntry(IDbToken token);
 
         // ------------------------------------------------
 

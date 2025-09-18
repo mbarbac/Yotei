@@ -20,16 +20,11 @@ public class DbTokenCommandInfo : IDbToken
     protected DbTokenCommandInfo(DbTokenCommandInfo source) : this(source.CommandInfo) { }
 
     /// <inheritdoc/>
+    /// Info objects are NOT wrapped with any brackets because they may refer to a partial part.
     public override string ToString()
     {
-        return CommandInfo.IsEmpty ? string.Empty : $"({CommandInfo.Text})";
+        return CommandInfo.IsEmpty ? string.Empty : $"{CommandInfo.Text}";
     }
-        
-    /*=> CommandInfo.IsEmpty ? string.Empty : CommandInfo.Text;
-    {
-        var info = Command.GetCommandInfo(iterable: false);
-        return info.IsEmpty? string.Empty : $"({info.Text})";
-    }*/
 
     /// <inheritdoc cref="ICloneable.Clone"/>
     public virtual DbTokenCommandInfo Clone() => new(this);

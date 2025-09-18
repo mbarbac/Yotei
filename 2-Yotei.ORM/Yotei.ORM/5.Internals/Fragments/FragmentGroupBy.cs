@@ -1,13 +1,13 @@
 ﻿namespace Yotei.ORM.Internals;
 
 /// <summary>
-/// Represents a RAW fragment.
+/// Represents a GROUP BY fragment.
 /// </summary>
-public static class FragmentRaw
+public static class FragmentGroupBy
 {
     // ====================================================
     /// <summary>
-    /// Represents an entry in a collection of fragments used to build a RAW-alike clause.
+    /// Represents an entry in a collection of fragments used to build a GROUP BY-alike clause.
     /// </summary>
     public class Entry : Fragment.Entry
     {
@@ -30,16 +30,18 @@ public static class FragmentRaw
         // ------------------------------------------------
 
         /// <inheritdoc/>
-        public override ICommandInfo.IBuilder Visit(DbTokenVisitor visitor, bool _)
+        public override ICommandInfo.IBuilder Visit(DbTokenVisitor visitor, bool separate)
         {
             var builder = visitor.Visit(Body);
+
+            if (separate) builder.ReplaceText($", {builder.Text}");
             return builder;
         }
     }
 
     // ====================================================
     /// <summary>
-    /// Represents a collection of fragments used to build a RAW-alike clause.
+    /// Represents a collection of fragments used to build a GROUP BY-alike clause.
     /// </summary>
     public class Master : Fragment.Master
     {
@@ -47,7 +49,7 @@ public static class FragmentRaw
         /// Initializes a new instance.
         /// </summary>
         /// <param name="command"></param>
-        public Master(ICommand command, string descriptor = "RAW")
+        public Master(ICommand command, string descriptor = "GROUP BY")
             : base(command, descriptor) { }
 
         /// <summary>

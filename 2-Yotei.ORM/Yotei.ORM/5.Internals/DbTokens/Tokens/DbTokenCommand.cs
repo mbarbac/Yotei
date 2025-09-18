@@ -25,6 +25,7 @@ public class DbTokenCommand : IDbToken
     protected DbTokenCommand(DbTokenCommand source) : this(source.Command) { }
 
     /// <inheritdoc/>
+    /// Commands are wrapped with rounded brackets by convention.
     public override string ToString()
     {
         var info = Command.GetCommandInfo(iterable: false);

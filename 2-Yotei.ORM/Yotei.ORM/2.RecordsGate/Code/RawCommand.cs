@@ -15,6 +15,20 @@ public class RawCommand : EnumerableCommand, IRawCommand
     public RawCommand(IConnection connection) : base(connection) => FragmentRaw = new(this);
 
     /// <summary>
+    /// Initializes a new instance with the contents obtained from the given text and optional
+    /// collection of values for the command arguments.
+    /// <br/> If any values are used, then they must be encoded in the given text using either a
+    /// '{n}' positional specification or a '{name}' named one. In the later case, 'name' may or
+    /// may not start with the engine's prefix. Unused values or dangling specifications are not
+    /// allowed.
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="args"></param>
+    public RawCommand(IConnection connection, string text, params object?[]? args)
+        : this(connection)
+        => Append(text, args);
+
+    /// <summary>
     /// Initializes a new instance with the contents obtained from both parsing the given dynamic
     /// lambda expression, and the optional collection of values for the command arguments (which
     /// are used only when the expression resolves into a string).
@@ -99,7 +113,19 @@ public class RawCommand : EnumerableCommand, IRawCommand
     /// <inheritdoc/>
     public virtual IRawCommand Append(string text, params object?[]? args)
     {
-        var info = new CommandInfo.Builder(Connection.Engine, text, args);
+        text.NotNullNotEmpty(trim: false);
+        args ??= [null];
+
+        if (text.Length == 0) throw new ArgumentException(
+            "Empty literals are not accepted.")
+            .WithData(text);
+
+        var info = new CommandInfo(Connection.Engine, text, args);
+        var token = new DbTokenCommandInfo(info);
+        var entry = FragmentRaw.CreateEntry(token);
+
+        FragmentRaw.Add(entry);
+        return this;
     }
 
     /// <inheritdoc/>

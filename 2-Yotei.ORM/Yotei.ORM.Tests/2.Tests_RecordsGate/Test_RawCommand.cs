@@ -21,7 +21,7 @@ public static class Test_RawCommand
 
     //[Enforced]
     [Fact]
-    public static void Test_Create_Only_Text()
+    public static void Test_Create_Text()
     {
         var connection = new FakeConnection(new FakeEngine());
         IRawCommand command;
@@ -65,6 +65,57 @@ public static class Test_RawCommand
         catch (ArgumentException) { }
 
         try { _ = new RawCommand(connection, x => "Any", "007"); Assert.Fail(); }
+        catch (ArgumentException) { }
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Create_Reduced_Text()
+    {
+        var connection = new FakeConnection(new FakeEngine());
+        IRawCommand command;
+        ICommandInfo info;
+
+        command = connection.Records.Raw("SELECT *");
+        info = command.GetCommandInfo();
+        Assert.False(info.IsEmpty);
+        Assert.Equal("SELECT *", info.Text);
+        Assert.Empty(info.Parameters);
+
+        try { _ = new RawCommand(connection, (string)null!); Assert.Fail(); }
+        catch (ArgumentException) { }
+
+        try { _ = new RawCommand(connection, ""); Assert.Fail(); }
+        catch (EmptyException) { }
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Create_Reduced_Text_Arguments()
+    {
+        var connection = new FakeConnection(new FakeEngine());
+        IRawCommand command;
+        ICommandInfo info;
+
+        command = connection.Records.Raw("""
+            SELECT *
+            FROM [Emps]
+            WHERE [Id] = {0}
+            """,
+            "007");
+
+        info = command.GetCommandInfo();
+        Assert.False(info.IsEmpty);
+        Assert.Equal("SELECT * FROM [Emps] WHERE [Id] = #0", info.Text);
+        Assert.Single(info.Parameters);
+        Assert.Equal("#0", info.Parameters[0].Name); Assert.Equal("007", info.Parameters[0].Value);
+
+        try { _ = new RawCommand(connection, "[Id] = {0}"); Assert.Fail(); }
+        catch (ArgumentException) { }
+
+        try { _ = new RawCommand(connection, "Any", "007"); Assert.Fail(); }
         catch (ArgumentException) { }
     }
 

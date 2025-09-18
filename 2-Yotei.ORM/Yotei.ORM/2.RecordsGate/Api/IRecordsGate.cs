@@ -51,6 +51,19 @@ public interface IRecordsGate
     IRawCommand Raw();
 
     /// <summary>
+    /// Returns a new RAW instance with the contents obtained from the given text and optional
+    /// collection of values for the command arguments.
+    /// <br/> If any values are used, then they must be encoded in the given text using either a
+    /// '{n}' positional specification or a '{name}' named one. In the later case, 'name' may or
+    /// may not start with the engine's prefix. Unused values or dangling specifications are not
+    /// allowed.
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="args"></param>
+    /// <returns></returns>
+    IRawCommand Raw(string text, params object?[]? args);
+
+    /// <summary>
     /// Returns a new RAW command using the contents obtained from both parsing the given dynamic
     /// lambda expression, and the optional collection of values for the command arguments (which
     /// are used only when the expression resolves into a string).
