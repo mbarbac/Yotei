@@ -63,8 +63,6 @@ static partial class Fragment
         }
         IDbToken _Body = default!;
 
-        // ------------------------------------------------
-
         /// <summary>
         /// Invoked to parse and return what the body carried by this instance will be, maybe
         /// extracting and validating other contents before returning. Inheritors may want to
