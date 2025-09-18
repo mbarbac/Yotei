@@ -4,13 +4,13 @@
 /// <inheritdoc cref="IRawCommand"/>
 public class RawCommand : EnumerableCommand, IRawCommand
 {
-    readonly FragmentRaw.Master _FragmentRaw;
+    readonly FragmentRaw.Master FragmentRaw;
 
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="connection"></param>
-    public RawCommand(IConnection connection) : base(connection) => _FragmentRaw = new(this);
+    public RawCommand(IConnection connection) : base(connection) => FragmentRaw = new(this);
 
     /// <summary>
     /// Initializes a new instance with the contents obtained from both parsing the given dynamic
@@ -34,7 +34,7 @@ public class RawCommand : EnumerableCommand, IRawCommand
     /// <param name="source"></param>
     protected RawCommand(RawCommand source)
         : base(source)
-        => _FragmentRaw = source._FragmentRaw.Clone();
+        => FragmentRaw = source.FragmentRaw.Clone();
 
     /// <inheritdoc/>
     public ICommandExecutor GetExecutor() => Connection.Records.CreateCommandExecutor(this);
@@ -74,10 +74,10 @@ public class RawCommand : EnumerableCommand, IRawCommand
     }
 
     /// <inheritdoc/>
-    public override bool IsValid => _FragmentRaw.Count > 0;
+    public override bool IsValid => FragmentRaw.Count > 0;
 
     /// <inheritdoc/>
-    public override ICommandInfo GetCommandInfo() => _FragmentRaw.Visit().CreateInstance();
+    public override ICommandInfo GetCommandInfo() => FragmentRaw.Visit().CreateInstance();
 
     /// <inheritdoc/>
     public override ICommandInfo GetCommandInfo(bool _) => GetCommandInfo();
@@ -87,7 +87,7 @@ public class RawCommand : EnumerableCommand, IRawCommand
     /// <inheritdoc/>
     public override IRawCommand Clear()
     {
-        _FragmentRaw.Clear();
+        FragmentRaw.Clear();
         return this;
     }
     IExecutableCommand IExecutableCommand.Clear() => Clear();
@@ -97,7 +97,7 @@ public class RawCommand : EnumerableCommand, IRawCommand
     /// <inheritdoc/>
     public virtual IRawCommand Append(Func<dynamic, object> spec, params object?[]? range)
     {
-        _FragmentRaw.Capture(spec, range);
+        FragmentRaw.Capture(spec, range);
         return this;
     }
 }

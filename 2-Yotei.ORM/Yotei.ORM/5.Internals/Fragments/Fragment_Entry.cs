@@ -94,7 +94,15 @@ static partial class Fragment
             // First-level values...
             if (token is DbTokenValue value)
             {
-                if (value.Value is string str) token = new DbTokenLiteral(str);
+                if (value.Value is string str)
+                {
+                    if (HasDanglingBrackets(str))
+                        throw new ArgumentException(
+                            "Literals cannot contain dangling parameter specifications.")
+                            .WithData(token);
+
+                    token = new DbTokenLiteral(str);
+                }
                 else throw new ArgumentException(
                     "Raw values that are not string are not valid fragment entries.")
                     .WithData(value);

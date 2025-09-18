@@ -414,7 +414,9 @@ partial class CommandInfo
         /// <summary>
         /// Determines if the given text has any dangling '{...}' bracket specification, or not.
         /// </summary>
-        static bool AreRemainingBrackets(string text)
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static bool AreRemainingBrackets(string text)
         {
             if (text.Length == 0) return false;
 

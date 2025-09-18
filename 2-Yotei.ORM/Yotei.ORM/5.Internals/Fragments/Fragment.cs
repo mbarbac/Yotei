@@ -35,4 +35,12 @@ public static partial class Fragment
 
         return token;
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the given text has any dangling '{...}' bracket specifications.
+    /// </summary>
+    internal static bool HasDanglingBrackets(string str)
+        => CommandInfo.Builder.AreRemainingBrackets(str);
 }
