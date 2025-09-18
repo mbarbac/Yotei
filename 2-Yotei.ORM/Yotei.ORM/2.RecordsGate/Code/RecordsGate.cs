@@ -21,4 +21,19 @@ public abstract class RecordsGate : IRecordsGate
 
     /// <inheritdoc/>
     public abstract ICommandExecutor CreateCommandExecutor(IExecutableCommand command);
+    
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public virtual DbTokenVisitor CreateDbTokenVisitor(Locale locale) => new(Connection, locale);
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public virtual IRawCommand Raw() => new RawCommand(Connection);
+
+    /// <inheritdoc/>
+    public virtual IRawCommand Raw(
+        Func<dynamic, object> spec, params object?[]? args)
+        => new RawCommand(Connection, spec, args);
 }
