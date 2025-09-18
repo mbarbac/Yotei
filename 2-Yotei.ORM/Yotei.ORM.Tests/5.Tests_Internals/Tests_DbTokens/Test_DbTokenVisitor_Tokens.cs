@@ -222,7 +222,7 @@ public static class Test_DbTokenVisitor_Tokens
         var token = new DbTokenCommandInfo(info);
         builder = visitor.Visit(token);
 
-        Assert.Equal("([First] = NULL)", builder.Text);
+        Assert.Equal("[First] = NULL", builder.Text); // No parenthesis as it is an info object!
         Assert.Empty(builder.Parameters);
     }
 
@@ -239,7 +239,7 @@ public static class Test_DbTokenVisitor_Tokens
         var token = new DbTokenCommandInfo(info);
         builder = visitor.Visit(token);
 
-        Assert.Equal("([First] = #0)", builder.Text);
+        Assert.Equal("[First] = #0", builder.Text); // No parenthesis as it is an info object!
         Assert.Single(builder.Parameters);
         Assert.Equal("007", builder.Parameters[0].Value);
     }

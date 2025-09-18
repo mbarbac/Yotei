@@ -225,7 +225,7 @@ partial record class DbTokenVisitor
 
         if (!builder.IsEmpty && builder.TextLen > 0)
         {
-            var str = builder.Text.UnWrap('(', ')').Wrap('(', ')');
+            var str = builder.Text.UnWrap('(', ')'); // No wrap here!
             builder.ReplaceText($"{str}");
         }
         return builder;

@@ -48,9 +48,9 @@ public interface IEnumerableCommand
     // ----------------------------------------------------
 
     /// <summary>
-    /// Determines if this instance supports native paging, based upon both its current contents
-    /// and the capabilities of the underlying engine or, rather, if it has to be emulated by the
-    /// framework.
+    /// Determines if this instance supports native paging based upon its captured contents only.
+    /// Later, this value will be combined with the engine's one to determine if native paging is
+    /// available or rather shall be emulated by the framework.
     /// </summary>
     bool SupportsNativePaging { get; }
 

@@ -4,14 +4,13 @@
 /// <inheritdoc cref="IRawCommand"/>
 public class RawCommand : EnumerableCommand, IRawCommand
 {
+    readonly FragmentRaw.Master _FragmentRaw;
+
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="connection"></param>
-    public RawCommand(IConnection connection) : base(connection)
-    {
-        throw null;
-    }
+    public RawCommand(IConnection connection) : base(connection) => _FragmentRaw = new(this);
 
     /// <summary>
     /// Initializes a new instance with the contents obtained from both parsing the given dynamic
@@ -25,18 +24,17 @@ public class RawCommand : EnumerableCommand, IRawCommand
     /// <param name="connection"></param>
     /// <param name="spec"></param>
     /// <param name="range"></param>
-    public RawCommand(
-        IConnection connection,
-        Func<dynamic, object> spec, params object?[]? range) : this(connection) => throw null;
+    public RawCommand(IConnection connection, Func<dynamic, object> spec, params object?[]? range)
+        : this(connection)
+        => Append(spec, range);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected RawCommand(RawCommand source) : base(source)
-    {
-        throw null;
-    }
+    protected RawCommand(RawCommand source)
+        : base(source)
+        => _FragmentRaw = source._FragmentRaw.Clone();
 
     /// <inheritdoc/>
     public ICommandExecutor GetExecutor() => Connection.Records.CreateCommandExecutor(this);
@@ -67,33 +65,30 @@ public class RawCommand : EnumerableCommand, IRawCommand
     /// <inheritdoc/>
     public override bool SupportsNativePaging
     {
-        get => throw null;
+        get
+        {
+            var sensitive = Connection.Engine.CaseSensitiveNames;
+            var str = GetCommandInfo().Text;
+            return str.StartsWith("SELECT", !sensitive);
+        }
     }
 
     /// <inheritdoc/>
-    public override bool IsValid
-    {
-        get => throw null;
-    }
+    public override bool IsValid => _FragmentRaw.Count > 0;
 
     /// <inheritdoc/>
-    public override ICommandInfo GetCommandInfo()
-    {
-        throw null;
-    }
+    public override ICommandInfo GetCommandInfo() => _FragmentRaw.Visit().CreateInstance();
 
     /// <inheritdoc/>
-    public override ICommandInfo GetCommandInfo(bool iterable)
-    {
-        throw null;
-    }
+    public override ICommandInfo GetCommandInfo(bool _) => GetCommandInfo();
 
     // ----------------------------------------------------
 
     /// <inheritdoc/>
     public override IRawCommand Clear()
     {
-        throw null;
+        _FragmentRaw.Clear();
+        return this;
     }
     IExecutableCommand IExecutableCommand.Clear() => Clear();
 
@@ -102,6 +97,7 @@ public class RawCommand : EnumerableCommand, IRawCommand
     /// <inheritdoc/>
     public virtual IRawCommand Append(Func<dynamic, object> spec, params object?[]? range)
     {
-        throw null;
+        _FragmentRaw.Capture(spec, range);
+        return this;
     }
 }
