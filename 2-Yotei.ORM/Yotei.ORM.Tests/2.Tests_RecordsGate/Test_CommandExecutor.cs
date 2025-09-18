@@ -1,6 +1,6 @@
 ﻿#pragma warning disable IDE0017
 
-namespace Yotei.ORM.Tests.Records;
+namespace Yotei.ORM.Tests.RecordsGated;
 
 // ========================================================
 //[Enforced]

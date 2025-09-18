@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Records.Code;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Yotei.ORM.Records.Code;
 
 // ========================================================
 /// <inheritdoc cref="IRawCommand"/>
@@ -93,6 +95,12 @@ public class RawCommand : EnumerableCommand, IRawCommand
     IExecutableCommand IExecutableCommand.Clear() => Clear();
 
     // ----------------------------------------------------
+
+    /// <inheritdoc/>
+    public virtual IRawCommand Append(string text, params object?[]? args)
+    {
+        var info = new CommandInfo.Builder(Connection.Engine, text, args);
+    }
 
     /// <inheritdoc/>
     public virtual IRawCommand Append(Func<dynamic, object> spec, params object?[]? range)
