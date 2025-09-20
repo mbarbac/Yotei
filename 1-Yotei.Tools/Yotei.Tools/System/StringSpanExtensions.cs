@@ -1147,6 +1147,32 @@ public static class StringSpanExtensions
     // ----------------------------------------------------
 
     /// <summary>
+    /// Removes from the given source the given number of characters (1 by default), starting from
+    /// the given index.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="index"></param>
+    /// <param name="count"></param>
+    /// <returns></returns>
+    public static StrSpan RemoveAt(this StrSpan source, int index, int count = 1)
+    {
+        if (index < 0) throw new ArgumentException("Index is negative.").WithData(index);
+        if (count < 0) throw new ArgumentException("Count is negative.").WithData(count);
+        if (index >= source.Length) throw new ArgumentException("Invalid index.").WithData(source.ToString()).WithData(index);
+        if ((index + count) > source.Length) throw new ArgumentException("Too many to remove.").WithData(source.ToString()).WithData(index).WithData(count);
+
+        if (count == 0) return source;
+
+        var items = source.ToArray();
+        if (count == 1) items = items.RemoveAt(index);
+        else items = items.RemoveRange(index, count);
+
+        return items.AsSpan();
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Returns a new instance in which the first ocurrence of the given value has been removed.
     /// </summary>
     /// <param name="source"></param>
@@ -2306,4 +2332,211 @@ public static class StringSpanExtensions
     public static StrSpan RemoveAll(
         this StrSpan source, StrSpan value, StringComparison comparison)
         => source.RemoveAll(value, comparison, out _);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the given source starts with the given character ignoring any previous
+    /// spaces. If so, returns the index of that first ocurrence. If not, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static int FindHeadIgnoreSpaces(this StrSpan source, char value)
+    {
+        if (source.Length == 0) return -1;
+
+        var index = source.IndexOf(value);
+        if (index >= 0)
+        {
+            for (int i = 0; i < index; i++) if (source[i] != ' ') { index = -1; break; }
+        }
+        return index;
+    }
+
+    /// <summary>
+    /// Determines if the given source starts with the given character ignoring any previous
+    /// spaces. If so, returns the index of that first ocurrence. If not, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="sensitive"></param>
+    /// <returns></returns>
+    public static int FindHeadIgnoreSpaces(this StrSpan source, char value, bool sensitive)
+    {
+        if (source.Length == 0) return -1;
+
+        var index = source.IndexOf(value, sensitive);
+        if (index >= 0)
+        {
+            for (int i = 0; i < index; i++) if (source[i] != ' ') { index = -1; break; }
+        }
+        return index;
+    }
+
+    /// <summary>
+    /// Determines if the given source starts with the given character ignoring any previous
+    /// spaces. If so, returns the index of that first ocurrence. If not, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int FindHeadIgnoreSpaces(this StrSpan source, char value, IEqualityComparer<char> comparer)
+    {
+        if (source.Length == 0) return -1;
+
+        var index = source.IndexOf(value, comparer);
+        if (index >= 0)
+        {
+            for (int i = 0; i < index; i++) if (source[i] != ' ') { index = -1; break; }
+        }
+        return index;
+    }
+
+    /// <summary>
+    /// Determines if the given source starts with the given character ignoring any previous
+    /// spaces. If so, returns the index of that first ocurrence. If not, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int FindHeadIgnoreSpaces(this StrSpan source, char value, IEqualityComparer<string> comparer)
+    {
+        if (source.Length == 0) return -1;
+
+        var index = source.IndexOf(value, comparer);
+        if (index >= 0)
+        {
+            for (int i = 0; i < index; i++) if (source[i] != ' ') { index = -1; break; }
+        }
+        return index;
+    }
+
+    /// <summary>
+    /// Determines if the given source starts with the given character ignoring any previous
+    /// spaces. If so, returns the index of that first ocurrence. If not, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static int FindHeadIgnoreSpaces(this StrSpan source, char value, StringComparison comparison)
+    {
+        if (source.Length == 0) return -1;
+
+        var index = source.IndexOf(value, comparison);
+        if (index >= 0)
+        {
+            for (int i = 0; i < index; i++) if (source[i] != ' ') { index = -1; break; }
+        }
+        return index;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the given source end with the given character ignoring any spaces after
+    /// it. If so, returns the index of that first ocurrence. If not, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static int FindTailIgnoreSpaces(this StrSpan source, char value)
+    {
+        if (source.Length == 0) return -1;
+
+        var index = source.LastIndexOf(value);
+        if (index >= 0)
+        {
+            for (int i = source.Length - 1; i > index; i--)
+                if (source[i] != ' ') { index = -1; break; }
+        }
+        return index;
+    }
+
+    /// <summary>
+    /// Determines if the given source end with the given character ignoring any spaces after
+    /// it. If so, returns the index of that first ocurrence. If not, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="sensitive"></param>
+    /// <returns></returns>
+    public static int FindTailIgnoreSpaces(this StrSpan source, char value, bool sensitive)
+    {
+        if (source.Length == 0) return -1;
+
+        var index = source.LastIndexOf(value, sensitive);
+        if (index >= 0)
+        {
+            for (int i = source.Length - 1; i > index; i--)
+                if (source[i] != ' ') { index = -1; break; }
+        }
+        return index;
+    }
+
+    /// <summary>
+    /// Determines if the given source end with the given character ignoring any spaces after
+    /// it. If so, returns the index of that first ocurrence. If not, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int FindTailIgnoreSpaces(this StrSpan source, char value, IEqualityComparer<char> comparer)
+    {
+        if (source.Length == 0) return -1;
+
+        var index = source.LastIndexOf(value, comparer);
+        if (index >= 0)
+        {
+            for (int i = source.Length - 1; i > index; i--)
+                if (source[i] != ' ') { index = -1; break; }
+        }
+        return index;
+    }
+
+    /// <summary>
+    /// Determines if the given source end with the given character ignoring any spaces after
+    /// it. If so, returns the index of that first ocurrence. If not, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int FindTailIgnoreSpaces(this StrSpan source, char value, IEqualityComparer<string> comparer)
+    {
+        if (source.Length == 0) return -1;
+
+        var index = source.LastIndexOf(value, comparer);
+        if (index >= 0)
+        {
+            for (int i = source.Length - 1; i > index; i--)
+                if (source[i] != ' ') { index = -1; break; }
+        }
+        return index;
+    }
+
+    /// <summary>
+    /// Determines if the given source end with the given character ignoring any spaces after
+    /// it. If so, returns the index of that first ocurrence. If not, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static int FindTailIgnoreSpaces(this StrSpan source, char value, StringComparison comparison)
+    {
+        if (source.Length == 0) return -1;
+
+        var index = source.LastIndexOf(value, comparison);
+        if (index >= 0)
+        {
+            for (int i = source.Length - 1; i > index; i--)
+                if (source[i] != ' ') { index = -1; break; }
+        }
+        return index;
+    }
 }

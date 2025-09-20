@@ -58,13 +58,13 @@ public static class Test_FragmentGroupBy
         ICommandInfo.IBuilder builder;
 
         master = new(command);
-        master.Capture(x => "EXTRACT(YEAR FROM {0})", null);
+        master.Capture(x => "Other(YEAR FROM {0})", null);
         Assert.Single(master);
         entry = Assert.IsType<FragmentGroupBy.Entry>(master[0]);
-        Assert.Equal("EXTRACT(YEAR FROM #0)", entry.Body.ToString()); Assert.IsType<DbTokenCommandInfo>(entry.Body);
+        Assert.Equal("Other(YEAR FROM #0)", entry.Body.ToString()); Assert.IsType<DbTokenCommandInfo>(entry.Body);
 
         builder = master.Visit();
-        Assert.Equal("EXTRACT(YEAR FROM NULL)", builder.Text);
+        Assert.Equal("Other(YEAR FROM NULL)", builder.Text);
         Assert.Empty(builder.Parameters);
     }
 
@@ -78,13 +78,13 @@ public static class Test_FragmentGroupBy
         ICommandInfo.IBuilder builder;
 
         master = new(command);
-        master.Capture(x => "EXTRACT(YEAR FROM {0})", "007");
+        master.Capture(x => "Other(YEAR FROM {0})", "007");
         Assert.Single(master);
         entry = Assert.IsType<FragmentGroupBy.Entry>(master[0]);
-        Assert.Equal("EXTRACT(YEAR FROM #0)", entry.Body.ToString()); Assert.IsType<DbTokenCommandInfo>(entry.Body);
+        Assert.Equal("Other(YEAR FROM #0)", entry.Body.ToString()); Assert.IsType<DbTokenCommandInfo>(entry.Body);
 
         builder = master.Visit();
-        Assert.Equal("EXTRACT(YEAR FROM #0)", builder.Text);
+        Assert.Equal("Other(YEAR FROM #0)", builder.Text);
         Assert.Single(builder.Parameters);
         Assert.Equal("007", builder.Parameters[0].Value);
     }
@@ -143,16 +143,16 @@ public static class Test_FragmentGroupBy
         ICommandInfo.IBuilder builder;
 
         master = new(command);
-        master.Capture(x => "EXTRACT(YEAR FROM {0})", null);
+        master.Capture(x => "Other(YEAR FROM {0})", null);
         master.Capture(x => "(..WHERE [Name] <= {0})", "James");
         Assert.Equal(2, master.Count);
         entry = Assert.IsType<FragmentGroupBy.Entry>(master[0]);
-        Assert.Equal("EXTRACT(YEAR FROM #0)", entry.Body.ToString()); Assert.IsType<DbTokenCommandInfo>(entry.Body);
+        Assert.Equal("Other(YEAR FROM #0)", entry.Body.ToString()); Assert.IsType<DbTokenCommandInfo>(entry.Body);
         entry = Assert.IsType<FragmentGroupBy.Entry>(master[1]);
         Assert.Equal("(..WHERE [Name] <= #0)", entry.Body.ToString()); Assert.IsType<DbTokenCommandInfo>(entry.Body);
 
         builder = master.Visit();
-        Assert.Equal("EXTRACT(YEAR FROM NULL), (..WHERE [Name] <= #0)", builder.Text);
+        Assert.Equal("Other(YEAR FROM NULL), (..WHERE [Name] <= #0)", builder.Text);
         Assert.Single(builder.Parameters);
         Assert.Equal("James", builder.Parameters[0].Value);
     }
@@ -189,14 +189,14 @@ public static class Test_FragmentGroupBy
         ICommandInfo.IBuilder builder;
 
         master = new(command);
-        master.Capture(x => x.Extract(x("YEAR FROM ").x(null)));
+        master.Capture(x => x.Other(x("YEAR FROM ").x(null)));
         Assert.Single(master);
         entry = Assert.IsType<FragmentGroupBy.Entry>(master[0]);
         Assert.IsType<DbTokenMethod>(entry.Body);
-        Assert.Equal("x.Extract(YEAR FROM (NULL))", entry.Body.ToString());
+        Assert.Equal("x.Other(YEAR FROM (NULL))", entry.Body.ToString());
 
         builder = master.Visit();
-        Assert.Equal("Extract(YEAR FROM NULL)", builder.Text);
+        Assert.Equal("Other(YEAR FROM NULL)", builder.Text);
         Assert.Empty(builder.Parameters);
     }
 
@@ -210,26 +210,26 @@ public static class Test_FragmentGroupBy
         ICommandInfo.IBuilder builder;
 
         master = new(command);
-        master.Capture(x => x.Extract(x("YEAR FROM ").x("007"))); // '007' not 1st-level escaped...
+        master.Capture(x => x.Other(x("YEAR FROM ").x("007"))); // '007' not 1st-level escaped...
         Assert.Single(master);
         entry = Assert.IsType<FragmentGroupBy.Entry>(master[0]);
         Assert.IsType<DbTokenMethod>(entry.Body);
-        Assert.Equal("x.Extract(YEAR FROM ('007'))", entry.Body.ToString());
+        Assert.Equal("x.Other(YEAR FROM ('007'))", entry.Body.ToString());
 
         builder = master.Visit();
-        Assert.Equal("Extract(YEAR FROM #0)", builder.Text);
+        Assert.Equal("Other(YEAR FROM #0)", builder.Text);
         Assert.Single(builder.Parameters);
         Assert.Equal("007", builder.Parameters[0].Value);
 
         master = new(command);
-        master.Capture(x => x.Extract(x("YEAR FROM ").x(x("007")))); // '007' 1st-level escaped...
+        master.Capture(x => x.Other(x("YEAR FROM ").x(x("007")))); // '007' 1st-level escaped...
         Assert.Single(master);
         entry = Assert.IsType<FragmentGroupBy.Entry>(master[0]);
         Assert.IsType<DbTokenMethod>(entry.Body);
-        Assert.Equal("x.Extract(YEAR FROM (007))", entry.Body.ToString());
+        Assert.Equal("x.Other(YEAR FROM (007))", entry.Body.ToString());
 
         builder = master.Visit();
-        Assert.Equal("Extract(YEAR FROM 007)", builder.Text);
+        Assert.Equal("Other(YEAR FROM 007)", builder.Text);
         Assert.Empty(builder.Parameters);
     }
 
@@ -286,15 +286,15 @@ public static class Test_FragmentGroupBy
 
         master = new(command);
         master.Capture(x => x.Sum(x.Id = null));
-        master.Capture(x => x.Extract(x.Name >= "James"));
+        master.Capture(x => x.Other(x.Name >= "James"));
         Assert.Equal(2, master.Count);
         entry = Assert.IsType<FragmentGroupBy.Entry>(master[0]);
         Assert.Equal("x.Sum((x.[Id] = NULL))", entry.Body.ToString()); Assert.IsType<DbTokenMethod>(entry.Body);
         entry = Assert.IsType<FragmentGroupBy.Entry>(master[1]);
-        Assert.Equal("x.Extract((x.[Name] GreaterThanOrEqual 'James'))", entry.Body.ToString()); Assert.IsType<DbTokenMethod>(entry.Body);
+        Assert.Equal("x.Other((x.[Name] GreaterThanOrEqual 'James'))", entry.Body.ToString()); Assert.IsType<DbTokenMethod>(entry.Body);
 
         builder = master.Visit();
-        Assert.Equal("Sum(([Id] = NULL)), Extract(([Name] >= #0))", builder.Text);
+        Assert.Equal("Sum(([Id] = NULL)), Other(([Name] >= #0))", builder.Text);
         Assert.Single(builder.Parameters);
         Assert.Equal("James", builder.Parameters[0].Value);
     }
@@ -311,7 +311,7 @@ public static class Test_FragmentGroupBy
 
         master = new(command);
         master.Capture(x => x.Sum(x.Id = null));
-        master.Capture(x => x.Extract(x.Name >= "James"));
+        master.Capture(x => x.Other(x.Name >= "James"));
         Assert.Equal(2, master.Count);
 
         var target = master.Clone();
@@ -320,7 +320,7 @@ public static class Test_FragmentGroupBy
         foreach (var item in target) Assert.Same(target, item.Master);
 
         builder = target.Visit();
-        Assert.Equal("Sum(([Id] = NULL)), Extract(([Name] >= #0))", builder.Text);
+        Assert.Equal("Sum(([Id] = NULL)), Other(([Name] >= #0))", builder.Text);
         Assert.Single(builder.Parameters);
         Assert.Equal("James", builder.Parameters[0].Value);
     }
@@ -337,7 +337,7 @@ public static class Test_FragmentGroupBy
 
         master = new(command);
         master.Capture(x => x.Sum(x.Id = null));
-        master.Capture(x => x.Extract(x.Name >= "James"));
+        master.Capture(x => x.Other(x.Name >= "James"));
         Assert.Equal(2, master.Count);
 
         master.Clear();

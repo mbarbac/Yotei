@@ -435,4 +435,68 @@ public static class Test_StringSpanExtensions
         Assert.True(removed);
         Assert.Equal("xxyy", target);
     }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_FindHeadIgnoreSpaces()
+    {
+        var source = "".AsSpan();
+        var index = source.FindHeadIgnoreSpaces('x');
+        Assert.Equal(-1, index);
+
+        source = "abc".AsSpan();
+        index = source.FindHeadIgnoreSpaces('x');
+        Assert.Equal(-1, index);
+
+        source = "ax".AsSpan();
+        index = source.FindHeadIgnoreSpaces('x');
+        Assert.Equal(-1, index);
+
+        source = "xyz".AsSpan();
+        index = source.FindHeadIgnoreSpaces('x');
+        Assert.Equal(0, index);
+
+        source = " xyz".AsSpan();
+        index = source.FindHeadIgnoreSpaces('x');
+        Assert.Equal(1, index);
+
+        source = "  xyz".AsSpan();
+        index = source.FindHeadIgnoreSpaces('x');
+        Assert.Equal(2, index);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_FindTailIgnoreSpaces()
+    {
+        var source = "".AsSpan();
+        var index = source.FindTailIgnoreSpaces('x');
+        Assert.Equal(-1, index);
+
+        source = "abc".AsSpan();
+        index = source.FindTailIgnoreSpaces('x');
+        Assert.Equal(-1, index);
+
+        source = "xa".AsSpan();
+        index = source.FindTailIgnoreSpaces('x');
+        Assert.Equal(-1, index);
+
+        source = "x".AsSpan();
+        index = source.FindTailIgnoreSpaces('x');
+        Assert.Equal(0, index);
+
+        source = "abx".AsSpan();
+        index = source.FindTailIgnoreSpaces('x');
+        Assert.Equal(2, index);
+
+        source = "abx ".AsSpan();
+        index = source.FindTailIgnoreSpaces('x');
+        Assert.Equal(2, index);
+
+        source = "abx  ".AsSpan();
+        index = source.FindTailIgnoreSpaces('x');
+        Assert.Equal(2, index);
+    }
 }

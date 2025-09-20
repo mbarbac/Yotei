@@ -168,7 +168,7 @@ public static class StringExtensions
         source.ThrowWhenNull();
         return source.AsSpan().LastIndexOf(value, comparer);
     }
-    
+
     // ----------------------------------------------------
 
     /// <summary>
@@ -762,6 +762,24 @@ public static class StringExtensions
         source.ThrowWhenNull();
         value.ThrowWhenNull();
         return source.AsSpan().EndsWith(value, comparer);
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Removes from the given source the given number of characters (1 by default), starting from
+    /// the given index.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="index"></param>
+    /// <param name="count"></param>
+    /// <returns></returns>
+    public static string RemoveAt(this string source, int index, int count = 1)
+    {
+        source.ThrowWhenNull();
+
+        var span = source.AsSpan().RemoveAt(index, count);
+        return span.Length == source.Length ? source : span.ToString();
     }
 
     // ----------------------------------------------------
@@ -1597,4 +1615,126 @@ public static class StringExtensions
     public static string RemoveAll(
         this string source, string value, StringComparison comparison)
         => source.RemoveAll(value, comparison, out _);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the given source starts with the given character ignoring any previous
+    /// spaces. If so, returns the index of that first ocurrence. If not, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static int FindHeadIgnoreSpaces(
+        this string source, char value)
+        => source.ThrowWhenNull().AsSpan().FindHeadIgnoreSpaces(value);
+
+    /// <summary>
+    /// Determines if the given source starts with the given character ignoring any previous
+    /// spaces. If so, returns the index of that first ocurrence. If not, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="sensitive"></param>
+    /// <returns></returns>
+    public static int FindHeadIgnoreSpaces(
+        this string source, char value, bool sensitive)
+        => source.ThrowWhenNull().AsSpan().FindHeadIgnoreSpaces(value, sensitive);
+
+    /// <summary>
+    /// Determines if the given source starts with the given character ignoring any previous
+    /// spaces. If so, returns the index of that first ocurrence. If not, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int FindHeadIgnoreSpaces(
+        this string source, char value, IEqualityComparer<char> comparer)
+        => source.ThrowWhenNull().AsSpan().FindHeadIgnoreSpaces(value, comparer);
+
+    /// <summary>
+    /// Determines if the given source starts with the given character ignoring any previous
+    /// spaces. If so, returns the index of that first ocurrence. If not, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int FindHeadIgnoreSpaces(
+        this string source, char value, IEqualityComparer<string> comparer)
+        => source.ThrowWhenNull().AsSpan().FindHeadIgnoreSpaces(value, comparer);
+
+    /// <summary>
+    /// Determines if the given source starts with the given character ignoring any previous
+    /// spaces. If so, returns the index of that first ocurrence. If not, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static int FindHeadIgnoreSpaces(
+        this string source, char value, StringComparison comparison)
+        => source.ThrowWhenNull().AsSpan().FindHeadIgnoreSpaces(value, comparison);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the given source end with the given character ignoring any spaces after
+    /// it. If so, returns the index of that first ocurrence. If not, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static int FindTailIgnoreSpaces(
+        this string source, char value)
+        => source.ThrowWhenNull().AsSpan().FindTailIgnoreSpaces(value);
+
+    /// <summary>
+    /// Determines if the given source end with the given character ignoring any spaces after
+    /// it. If so, returns the index of that first ocurrence. If not, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="sensitive"></param>
+    /// <returns></returns>
+    public static int FindTailIgnoreSpaces(
+        this string source, char value, bool sensitive)
+        => source.ThrowWhenNull().AsSpan().FindTailIgnoreSpaces(value, sensitive);
+
+    /// <summary>
+    /// Determines if the given source end with the given character ignoring any spaces after
+    /// it. If so, returns the index of that first ocurrence. If not, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int FindTailIgnoreSpaces(
+        this string source, char value, IEqualityComparer<char> comparer)
+        => source.ThrowWhenNull().AsSpan().FindTailIgnoreSpaces(value, comparer);
+
+    /// <summary>
+    /// Determines if the given source end with the given character ignoring any spaces after
+    /// it. If so, returns the index of that first ocurrence. If not, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int FindTailIgnoreSpaces(
+        this string source, char value, IEqualityComparer<string> comparer)
+        => source.ThrowWhenNull().AsSpan().FindTailIgnoreSpaces(value, comparer);
+
+    /// <summary>
+    /// Determines if the given source end with the given character ignoring any spaces after
+    /// it. If so, returns the index of that first ocurrence. If not, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static int FindTailIgnoreSpaces(
+        this string source, char value, StringComparison comparison)
+        => source.ThrowWhenNull().AsSpan().FindTailIgnoreSpaces(value, comparison);
 }

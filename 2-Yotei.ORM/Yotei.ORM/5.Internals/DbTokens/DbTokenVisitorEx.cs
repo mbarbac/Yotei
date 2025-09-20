@@ -226,8 +226,8 @@ partial record class DbTokenVisitor
         if (!builder.IsEmpty && builder.TextLen > 0)
         {
             var str = builder.Text;
-            var ini = FindFirst(str);
-            var end = FindLast(str);
+            var ini = str.FindHeadIgnoreSpaces(' ');
+            var end = str.FindTailIgnoreSpaces(' ');
 
             if (ini >= 0 && end >= 0 && end > ini)
             {
@@ -236,28 +236,6 @@ partial record class DbTokenVisitor
             }
         }
         return builder;
-
-        // Gets the first rounded bracket...
-        int FindFirst(string str)
-        {
-            for (int i = 0; i < str.Length; i++)
-            {
-                if (str[i] == '(') return i;
-                if (str[i] != ' ') break;
-            }
-            return -1;
-        }
-
-        // Gets the last rounded bracket...
-        int FindLast(string str)
-        {
-            for (int i = str.Length - 1; i >= 0; i--)
-            {
-                if (str[i] == '(') return i;
-                if (str[i] != ' ') break;
-            }
-            return -1;
-        }
     }
 
     /// <summary>

@@ -361,6 +361,35 @@ public static class Test_StringExtensions
 
     //[Enforced]
     [Fact]
+    public static void Test_RemoveAt()
+    {
+        var source = "abcd";
+        var target = source.RemoveAt(0, 0);
+        Assert.Equal(source, target);
+
+        target = source.RemoveAt(0);
+        Assert.Equal("bcd", target);
+
+        target = source.RemoveAt(0, 2);
+        Assert.Equal("cd", target);
+
+        target = source.RemoveAt(2);
+        Assert.Equal("abd", target);
+
+        target = source.RemoveAt(2, 2);
+        Assert.Equal("ab", target);
+
+        try { "".RemoveAt(0, 0); Assert.Fail(); }
+        catch (ArgumentException) { }
+
+        try { "abcd".RemoveAt(2, 3); Assert.Fail(); }
+        catch (ArgumentException) { }
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
     public static void Test_Remove_Char()
     {
         var source = "xxabyyab";
