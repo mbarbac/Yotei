@@ -1,8 +1,4 @@
-﻿#pragma warning disable IDE0305
-
-using Entry = (System.ReadOnlyMemory<char> Value, bool IsSeparator);
-
-namespace Yotei.Tools.Tests;
+﻿namespace Yotei.Tools.Tests;
 
 // ========================================================
 //[Enforced]
@@ -14,49 +10,107 @@ public static class Test_StringSplitter
     {
         string source = "";
 
-        var options = new StringSplitOptions();
+        // No options...
+        var options = StringSplitOptions.None;
         var items = source.Split('.', options);
         Assert.Single(items);
         Assert.Equal("", items[0]);
 
-        var optionsEx = new StringSplitOptionsEx();
-        var entries = source.Split(optionsEx, '.').ToArray();
-        Assert.Single(items);
-        Assert.Equal("", entries[0].Value.ToString());
+        var temps = new StringSplitter(source, '.').ToArray();
+        Assert.Single(temps);
+        Assert.Equal("", source[temps[0].Range].ToString());
+
+        // Remove empty entries...
+        options = StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries;
+        items = source.Split('.', options);
+        Assert.Empty(items);
+
+        temps = new StringSplitter(source, '.') { TrimEntries = true, RemoveEmptyEntries = true }.ToArray();
+        Assert.Empty(temps);
     }
 
     //[Enforced]
     [Fact]
-    public static void Test_No_Separators()
+    public static void Test_No_Separators_Empty()
+    {
+        string source = "";
+
+        // No options...
+        var options = StringSplitOptions.None;
+        var items = source.Split((char[])[], options);
+        Assert.Single(items);
+        Assert.Equal("", items[0]);
+
+        var temps = new StringSplitter(source, (char[])[]).ToArray();
+        Assert.Single(temps);
+        Assert.Equal("", source[temps[0].Range].ToString());
+
+        // Remove empty entries...
+        options = StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries;
+        items = source.Split((char[])[], options);
+        Assert.Empty(items);
+
+        temps = new StringSplitter(source, (char[])[]) { TrimEntries = true, RemoveEmptyEntries = true }.ToArray();
+        Assert.Empty(temps);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_No_Separators_Populated()
     {
         string source = "abc";
 
-        var options = new StringSplitOptions();
+        // No options...
+        var options = StringSplitOptions.None;
         var items = source.Split((char[])[], options);
         Assert.Single(items);
         Assert.Equal("abc", items[0]);
 
-        var optionsEx = new StringSplitOptionsEx();
-        var entries = source.Split(optionsEx, (char[])[]).ToArray();
-        Assert.Single(items);
-        Assert.Equal("abc", entries[0].Value.ToString());
+        var temps = new StringSplitter(source, (char[])[]).ToArray();
+        Assert.Single(temps);
+        Assert.Equal("abc", source[temps[0].Range].ToString());
     }
 
     //[Enforced]
     [Fact]
-    public static void Test_Not_Found()
+    public static void Test_Not_Found_Empty()
+    {
+        string source = "";
+
+        // No options...
+        var options = StringSplitOptions.None;
+        var items = source.Split('.', options);
+        Assert.Single(items);
+        Assert.Equal("", items[0]);
+
+        var temps = new StringSplitter(source, '.').ToArray();
+        Assert.Single(temps);
+        Assert.Equal("", source[temps[0].Range].ToString());
+
+        // Remove empty entries...
+        options = StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries;
+        items = source.Split('.', options);
+        Assert.Empty(items);
+
+        temps = new StringSplitter(source, '.') { TrimEntries = true, RemoveEmptyEntries = true }.ToArray();
+        Assert.Empty(temps);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Not_Found_Populated()
     {
         string source = "abc";
 
-        var options = new StringSplitOptions();
+        // No options...
+        var options = StringSplitOptions.None;
         var items = source.Split('.', options);
         Assert.Single(items);
         Assert.Equal("abc", items[0]);
 
-        var optionsEx = new StringSplitOptionsEx();
-        var entries = source.Split(optionsEx, '.').ToArray();
-        Assert.Single(items);
-        Assert.Equal("abc", entries[0].Value.ToString());
+        var temps = new StringSplitter(source, '.').ToArray();
+        Assert.Single(temps);
+        Assert.Equal("abc", source[temps[0].Range].ToString());
     }
 
     //[Enforced]
@@ -66,17 +120,16 @@ public static class Test_StringSplitter
         string source = " . cd ";
 
         // No options...
-        var options = new StringSplitOptions();
+        var options = StringSplitOptions.None;
         var items = source.Split('.', options);
         Assert.Equal(2, items.Length);
         Assert.Equal(" ", items[0]);
         Assert.Equal(" cd ", items[1]);
 
-        var optionsEx = new StringSplitOptionsEx();
-        var entries = source.Split(optionsEx, '.').ToArray();
-        Assert.Equal(2, entries.Length);
-        Assert.Equal(" ", entries[0].Value.ToString());
-        Assert.Equal(" cd ", entries[1].Value.ToString());
+        var temps = new StringSplitter(source, '.').ToArray();
+        Assert.Equal(2, temps.Length);
+        Assert.Equal(" ", source[temps[0].Range].ToString());
+        Assert.Equal(" cd ", source[temps[1].Range].ToString());
 
         // Trim entries...
         options = StringSplitOptions.TrimEntries;
@@ -85,36 +138,92 @@ public static class Test_StringSplitter
         Assert.Equal("", items[0]);
         Assert.Equal("cd", items[1]);
 
-        optionsEx = new() { TrimEntries = true };
-        entries = source.Split(optionsEx, '.').ToArray();
-        Assert.Equal(2, entries.Length);
-        Assert.Equal("", entries[0].Value.ToString());
-        Assert.Equal("cd", entries[1].Value.ToString());
+        temps = new StringSplitter(source, '.') { TrimEntries = true }.ToArray();
+        Assert.Equal(2, temps.Length);
+        Assert.Equal("", source[temps[0].Range].ToString());
+        Assert.Equal("cd", source[temps[1].Range].ToString());
 
-        // Trim and remove empty entries...
+        // Trim and remove entries...
         options = StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries;
         items = source.Split('.', options);
         Assert.Single(items);
         Assert.Equal("cd", items[0]);
 
-        optionsEx = new() { TrimEntries = true, RemoveEmptyEntries = true };
-        entries = source.Split(optionsEx, '.').ToArray();
+        temps = new StringSplitter(source, '.') { TrimEntries = true, RemoveEmptyEntries = true }.ToArray();
+        Assert.Single(temps);
+        Assert.Equal("cd", source[temps[0].Range].ToString());
+
+        // Keep separators...
+        temps = new StringSplitter(source, '.') { KeepSeparators = true }.ToArray();
+        Assert.Equal(3, temps.Length);
+        Assert.Equal(" ", source[temps[0].Range].ToString());
+        Assert.Equal(".", source[temps[1].Range].ToString());
+        Assert.Equal(" cd ", source[temps[2].Range].ToString());
+
+        temps = new StringSplitter(source, '.') { KeepSeparators = true, TrimEntries = true, RemoveEmptyEntries = true }.ToArray();
+        Assert.Equal(2, temps.Length);
+        Assert.Equal(".", source[temps[0].Range].ToString());
+        Assert.Equal("cd", source[temps[1].Range].ToString());
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Found_First_Chained()
+    {
+        string source = ". . cd ";
+
+        // No options...
+        var options = StringSplitOptions.None;
+        var items = source.Split('.', options);
+        Assert.Equal(3, items.Length);
+        Assert.Equal("", items[0]);
+        Assert.Equal(" ", items[1]);
+        Assert.Equal(" cd ", items[2]);
+
+        var temps = new StringSplitter(source, '.').ToArray();
+        Assert.Equal(3, temps.Length);
+        Assert.Equal("", source[temps[0].Range].ToString());
+        Assert.Equal(" ", source[temps[1].Range].ToString());
+        Assert.Equal(" cd ", source[temps[2].Range].ToString());
+
+        // Trim entries...
+        options = StringSplitOptions.TrimEntries;
+        items = source.Split('.', options);
+        Assert.Equal(3, items.Length);
+        Assert.Equal("", items[0]);
+        Assert.Equal("", items[1]);
+        Assert.Equal("cd", items[2]);
+
+        temps = new StringSplitter(source, '.') { TrimEntries = true }.ToArray();
+        Assert.Equal(3, temps.Length);
+        Assert.Equal("", source[temps[0].Range].ToString());
+        Assert.Equal("", source[temps[1].Range].ToString());
+        Assert.Equal("cd", source[temps[2].Range].ToString());
+
+        // Trim and remove entries...
+        options = StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries;
+        items = source.Split('.', options);
         Assert.Single(items);
         Assert.Equal("cd", items[0]);
 
-        // Keep separators...
-        optionsEx = new() { RemoveSeparators = false };
-        entries = source.Split(optionsEx, '.').ToArray();
-        Assert.Equal(3, entries.Length);
-        Assert.Equal(" ", entries[0].Value.ToString());
-        Assert.Equal(".", entries[1].Value.ToString());
-        Assert.Equal(" cd ", entries[2].Value.ToString());
+        temps = new StringSplitter(source, '.') { TrimEntries = true, RemoveEmptyEntries = true }.ToArray();
+        Assert.Single(temps);
+        Assert.Equal("cd", source[temps[0].Range].ToString());
 
-        optionsEx = new() { RemoveSeparators = false, TrimEntries = true, RemoveEmptyEntries = true };
-        entries = source.Split(optionsEx, '.').ToArray();
-        Assert.Equal(2, entries.Length);
-        Assert.Equal(".", entries[0].Value.ToString());
-        Assert.Equal("cd", entries[1].Value.ToString());
+        // Keep separators...
+        temps = new StringSplitter(source, '.') { KeepSeparators = true }.ToArray();
+        Assert.Equal(5, temps.Length);
+        Assert.Equal("", source[temps[0].Range].ToString());
+        Assert.Equal(".", source[temps[1].Range].ToString());
+        Assert.Equal(" ", source[temps[2].Range].ToString());
+        Assert.Equal(".", source[temps[3].Range].ToString());
+        Assert.Equal(" cd ", source[temps[4].Range].ToString());
+
+        temps = new StringSplitter(source, '.') { KeepSeparators = true, TrimEntries = true, RemoveEmptyEntries = true }.ToArray();
+        Assert.Equal(3, temps.Length);
+        Assert.Equal(".", source[temps[0].Range].ToString());
+        Assert.Equal(".", source[temps[1].Range].ToString());
+        Assert.Equal("cd", source[temps[2].Range].ToString());
     }
 
     //[Enforced]
@@ -124,17 +233,16 @@ public static class Test_StringSplitter
         string source = " ab . cd ";
 
         // No options...
-        var options = new StringSplitOptions();
+        var options = StringSplitOptions.None;
         var items = source.Split('.', options);
         Assert.Equal(2, items.Length);
         Assert.Equal(" ab ", items[0]);
         Assert.Equal(" cd ", items[1]);
 
-        var optionsEx = new StringSplitOptionsEx();
-        var entries = source.Split(optionsEx, '.').ToArray();
-        Assert.Equal(2, entries.Length);
-        Assert.Equal(" ab ", entries[0].Value.ToString());
-        Assert.Equal(" cd ", entries[1].Value.ToString());
+        var temps = new StringSplitter(source, '.').ToArray();
+        Assert.Equal(2, temps.Length);
+        Assert.Equal(" ab ", source[temps[0].Range].ToString());
+        Assert.Equal(" cd ", source[temps[1].Range].ToString());
 
         // Trim entries...
         options = StringSplitOptions.TrimEntries;
@@ -143,32 +251,161 @@ public static class Test_StringSplitter
         Assert.Equal("ab", items[0]);
         Assert.Equal("cd", items[1]);
 
-        optionsEx = new() { TrimEntries = true };
-        entries = source.Split(optionsEx, '.').ToArray();
-        Assert.Equal(2, entries.Length);
-        Assert.Equal("ab", entries[0].Value.ToString());
-        Assert.Equal("cd", entries[1].Value.ToString());
+        temps = new StringSplitter(source, '.') { TrimEntries = true }.ToArray();
+        Assert.Equal(2, temps.Length);
+        Assert.Equal("ab", source[temps[0].Range].ToString());
+        Assert.Equal("cd", source[temps[1].Range].ToString());
 
-        // Trim and remove empty entries...
+        // Trim and remove entries...
         options = StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries;
         items = source.Split('.', options);
         Assert.Equal(2, items.Length);
         Assert.Equal("ab", items[0]);
         Assert.Equal("cd", items[1]);
 
-        optionsEx = new() { TrimEntries = true, RemoveEmptyEntries = true };
-        entries = source.Split(optionsEx, '.').ToArray();
-        Assert.Equal(2, entries.Length);
-        Assert.Equal("ab", entries[0].Value.ToString());
-        Assert.Equal("cd", entries[1].Value.ToString());
+        temps = new StringSplitter(source, '.') { TrimEntries = true, RemoveEmptyEntries = true }.ToArray();
+        Assert.Equal(2, temps.Length);
+        Assert.Equal("ab", source[temps[0].Range].ToString());
+        Assert.Equal("cd", source[temps[1].Range].ToString());
 
         // Keep separators...
-        optionsEx = new() { RemoveSeparators = false };
-        entries = source.Split(optionsEx, '.').ToArray();
-        Assert.Equal(3, entries.Length);
-        Assert.Equal(" ab ", entries[0].Value.ToString());
-        Assert.Equal(".", entries[1].Value.ToString());
-        Assert.Equal(" cd ", entries[2].Value.ToString());
+        temps = new StringSplitter(source, '.') { KeepSeparators = true }.ToArray();
+        Assert.Equal(3, temps.Length);
+        Assert.Equal(" ab ", source[temps[0].Range].ToString());
+        Assert.Equal(".", source[temps[1].Range].ToString());
+        Assert.Equal(" cd ", source[temps[2].Range].ToString());
+        
+        temps = new StringSplitter(source, '.') { KeepSeparators = true, TrimEntries = true, RemoveEmptyEntries = true }.ToArray();
+        Assert.Equal(3, temps.Length);
+        Assert.Equal("ab", source[temps[0].Range].ToString());
+        Assert.Equal(".", source[temps[1].Range].ToString());
+        Assert.Equal("cd", source[temps[2].Range].ToString());
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Found_Middle_Chained_Empty()
+    {
+        string source = " ab .. cd ";
+
+        // No options...
+        var options = StringSplitOptions.None;
+        var items = source.Split('.', options);
+        Assert.Equal(3, items.Length);
+        Assert.Equal(" ab ", items[0]);
+        Assert.Equal("", items[1]);
+        Assert.Equal(" cd ", items[2]);
+
+        var temps = new StringSplitter(source, '.').ToArray();
+        Assert.Equal(3, temps.Length);
+        Assert.Equal(" ab ", source[temps[0].Range].ToString());
+        Assert.Equal("", source[temps[1].Range].ToString());
+        Assert.Equal(" cd ", source[temps[2].Range].ToString());
+
+        // Trim entries...
+        options = StringSplitOptions.TrimEntries;
+        items = source.Split('.', options);
+        Assert.Equal(3, items.Length);
+        Assert.Equal("ab", items[0]);
+        Assert.Equal("", items[1]);
+        Assert.Equal("cd", items[2]);
+
+        temps = new StringSplitter(source, '.') { TrimEntries = true }.ToArray();
+        Assert.Equal(3, temps.Length);
+        Assert.Equal("ab", source[temps[0].Range].ToString());
+        Assert.Equal("", source[temps[1].Range].ToString());
+        Assert.Equal("cd", source[temps[2].Range].ToString());
+
+        // Trim and remove entries...
+        options = StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries;
+        items = source.Split('.', options);
+        Assert.Equal(2, items.Length);
+        Assert.Equal("ab", items[0]);
+        Assert.Equal("cd", items[1]);
+
+        temps = new StringSplitter(source, '.') { TrimEntries = true, RemoveEmptyEntries = true }.ToArray();
+        Assert.Equal(2, temps.Length);
+        Assert.Equal("ab", source[temps[0].Range].ToString());
+        Assert.Equal("cd", source[temps[1].Range].ToString());
+
+        // Keep separators...
+        temps = new StringSplitter(source, '.') { KeepSeparators = true }.ToArray();
+        Assert.Equal(5, temps.Length);
+        Assert.Equal(" ab ", source[temps[0].Range].ToString());
+        Assert.Equal(".", source[temps[1].Range].ToString());
+        Assert.Equal("", source[temps[2].Range].ToString());
+        Assert.Equal(".", source[temps[3].Range].ToString());
+        Assert.Equal(" cd ", source[temps[4].Range].ToString());
+
+        temps = new StringSplitter(source, '.') { KeepSeparators = true, TrimEntries = true, RemoveEmptyEntries = true }.ToArray();
+        Assert.Equal(4, temps.Length);
+        Assert.Equal("ab", source[temps[0].Range].ToString());
+        Assert.Equal(".", source[temps[1].Range].ToString());
+        Assert.Equal(".", source[temps[2].Range].ToString());
+        Assert.Equal("cd", source[temps[3].Range].ToString());
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Found_Middle_Chained_Space()
+    {
+        string source = " ab . . cd ";
+
+        // No options...
+        var options = StringSplitOptions.None;
+        var items = source.Split('.', options);
+        Assert.Equal(3, items.Length);
+        Assert.Equal(" ab ", items[0]);
+        Assert.Equal(" ", items[1]);
+        Assert.Equal(" cd ", items[2]);
+
+        var temps = new StringSplitter(source, '.').ToArray();
+        Assert.Equal(3, temps.Length);
+        Assert.Equal(" ab ", source[temps[0].Range].ToString());
+        Assert.Equal(" ", source[temps[1].Range].ToString());
+        Assert.Equal(" cd ", source[temps[2].Range].ToString());
+
+        // Trim entries...
+        options = StringSplitOptions.TrimEntries;
+        items = source.Split('.', options);
+        Assert.Equal(3, items.Length);
+        Assert.Equal("ab", items[0]);
+        Assert.Equal("", items[1]);
+        Assert.Equal("cd", items[2]);
+
+        temps = new StringSplitter(source, '.') { TrimEntries = true }.ToArray();
+        Assert.Equal(3, temps.Length);
+        Assert.Equal("ab", source[temps[0].Range].ToString());
+        Assert.Equal("", source[temps[1].Range].ToString());
+        Assert.Equal("cd", source[temps[2].Range].ToString());
+
+        // Trim and remove entries...
+        options = StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries;
+        items = source.Split('.', options);
+        Assert.Equal(2, items.Length);
+        Assert.Equal("ab", items[0]);
+        Assert.Equal("cd", items[1]);
+
+        temps = new StringSplitter(source, '.') { TrimEntries = true, RemoveEmptyEntries = true }.ToArray();
+        Assert.Equal(2, temps.Length);
+        Assert.Equal("ab", source[temps[0].Range].ToString());
+        Assert.Equal("cd", source[temps[1].Range].ToString());
+
+        // Keep separators...
+        temps = new StringSplitter(source, '.') { KeepSeparators = true }.ToArray();
+        Assert.Equal(5, temps.Length);
+        Assert.Equal(" ab ", source[temps[0].Range].ToString());
+        Assert.Equal(".", source[temps[1].Range].ToString());
+        Assert.Equal(" ", source[temps[2].Range].ToString());
+        Assert.Equal(".", source[temps[3].Range].ToString());
+        Assert.Equal(" cd ", source[temps[4].Range].ToString());
+
+        temps = new StringSplitter(source, '.') { KeepSeparators = true, TrimEntries = true, RemoveEmptyEntries = true }.ToArray();
+        Assert.Equal(4, temps.Length);
+        Assert.Equal("ab", source[temps[0].Range].ToString());
+        Assert.Equal(".", source[temps[1].Range].ToString());
+        Assert.Equal(".", source[temps[2].Range].ToString());
+        Assert.Equal("cd", source[temps[3].Range].ToString());
     }
 
     //[Enforced]
@@ -178,17 +415,16 @@ public static class Test_StringSplitter
         string source = " ab . ";
 
         // No options...
-        var options = new StringSplitOptions();
+        var options = StringSplitOptions.None;
         var items = source.Split('.', options);
         Assert.Equal(2, items.Length);
         Assert.Equal(" ab ", items[0]);
         Assert.Equal(" ", items[1]);
 
-        var optionsEx = new StringSplitOptionsEx();
-        var entries = source.Split(optionsEx, '.').ToArray();
-        Assert.Equal(2, entries.Length);
-        Assert.Equal(" ab ", entries[0].Value.ToString());
-        Assert.Equal(" ", entries[1].Value.ToString());
+        var temps = new StringSplitter(source, '.').ToArray();
+        Assert.Equal(2, temps.Length);
+        Assert.Equal(" ab ", source[temps[0].Range].ToString());
+        Assert.Equal(" ", source[temps[1].Range].ToString());
 
         // Trim entries...
         options = StringSplitOptions.TrimEntries;
@@ -197,35 +433,91 @@ public static class Test_StringSplitter
         Assert.Equal("ab", items[0]);
         Assert.Equal("", items[1]);
 
-        optionsEx = new() { TrimEntries = true };
-        entries = source.Split(optionsEx, '.').ToArray();
-        Assert.Equal(2, entries.Length);
-        Assert.Equal("ab", entries[0].Value.ToString());
-        Assert.Equal("", entries[1].Value.ToString());
+        temps = new StringSplitter(source, '.') { TrimEntries = true }.ToArray();
+        Assert.Equal(2, temps.Length);
+        Assert.Equal("ab", source[temps[0].Range].ToString());
+        Assert.Equal("", source[temps[1].Range].ToString());
 
-        // Trim and remove empty entries...
+        // Trim and remove entries...
         options = StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries;
         items = source.Split('.', options);
         Assert.Single(items);
         Assert.Equal("ab", items[0]);
 
-        optionsEx = new() { TrimEntries = true, RemoveEmptyEntries = true };
-        entries = source.Split(optionsEx, '.').ToArray();
+        temps = new StringSplitter(source, '.') { TrimEntries = true, RemoveEmptyEntries = true }.ToArray();
+        Assert.Single(temps);
+        Assert.Equal("ab", source[temps[0].Range].ToString());
+
+        // Keep separators...
+        temps = new StringSplitter(source, '.') { KeepSeparators = true }.ToArray();
+        Assert.Equal(3, temps.Length);
+        Assert.Equal(" ab ", source[temps[0].Range].ToString());
+        Assert.Equal(".", source[temps[1].Range].ToString());
+        Assert.Equal(" ", source[temps[2].Range].ToString());
+
+        temps = new StringSplitter(source, '.') { KeepSeparators = true, TrimEntries = true, RemoveEmptyEntries = true }.ToArray();
+        Assert.Equal(2, temps.Length);
+        Assert.Equal("ab", source[temps[0].Range].ToString());
+        Assert.Equal(".", source[temps[1].Range].ToString());
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Found_Last_Chained()
+    {
+        string source = " ab . .";
+
+        // No options...
+        var options = StringSplitOptions.None;
+        var items = source.Split('.', options);
+        Assert.Equal(3, items.Length);
+        Assert.Equal(" ab ", items[0]);
+        Assert.Equal(" ", items[1]);
+        Assert.Equal("", items[2]);
+
+        var temps = new StringSplitter(source, '.').ToArray();
+        Assert.Equal(3, temps.Length);
+        Assert.Equal(" ab ", source[temps[0].Range].ToString());
+        Assert.Equal(" ", source[temps[1].Range].ToString());
+        Assert.Equal("", source[temps[2].Range].ToString());
+
+        // Trim entries...
+        options = StringSplitOptions.TrimEntries;
+        items = source.Split('.', options);
+        Assert.Equal(3, items.Length);
+        Assert.Equal("ab", items[0]);
+        Assert.Equal("", items[1]);
+        Assert.Equal("", items[2]);
+
+        temps = new StringSplitter(source, '.') { TrimEntries = true }.ToArray();
+        Assert.Equal(3, temps.Length);
+        Assert.Equal("ab", source[temps[0].Range].ToString());
+        Assert.Equal("", source[temps[1].Range].ToString());
+        Assert.Equal("", source[temps[2].Range].ToString());
+
+        // Trim and remove entries...
+        options = StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries;
+        items = source.Split('.', options);
         Assert.Single(items);
         Assert.Equal("ab", items[0]);
 
-        // Keep separators...
-        optionsEx = new() { RemoveSeparators = false };
-        entries = source.Split(optionsEx, '.').ToArray();
-        Assert.Equal(3, entries.Length);
-        Assert.Equal(" ab ", entries[0].Value.ToString());
-        Assert.Equal(".", entries[1].Value.ToString());
-        Assert.Equal(" ", entries[2].Value.ToString());
+        temps = new StringSplitter(source, '.') { TrimEntries = true, RemoveEmptyEntries = true }.ToArray();
+        Assert.Single(temps);
+        Assert.Equal("ab", source[temps[0].Range].ToString());
 
-        optionsEx = new() { RemoveSeparators = false, TrimEntries = true, RemoveEmptyEntries = true };
-        entries = source.Split(optionsEx, '.').ToArray();
-        Assert.Equal(2, entries.Length);
-        Assert.Equal("ab", entries[0].Value.ToString());
-        Assert.Equal(".", entries[1].Value.ToString());
+        // Keep separators...
+        temps = new StringSplitter(source, '.') { KeepSeparators = true }.ToArray();
+        Assert.Equal(5, temps.Length);
+        Assert.Equal(" ab ", source[temps[0].Range].ToString());
+        Assert.Equal(".", source[temps[1].Range].ToString());
+        Assert.Equal(" ", source[temps[2].Range].ToString());
+        Assert.Equal(".", source[temps[3].Range].ToString());
+        Assert.Equal("", source[temps[4].Range].ToString());
+
+        temps = new StringSplitter(source, '.') { KeepSeparators = true, TrimEntries = true, RemoveEmptyEntries = true }.ToArray();
+        Assert.Equal(3, temps.Length);
+        Assert.Equal("ab", source[temps[0].Range].ToString());
+        Assert.Equal(".", source[temps[1].Range].ToString());
+        Assert.Equal(".", source[temps[2].Range].ToString());
     }
 }

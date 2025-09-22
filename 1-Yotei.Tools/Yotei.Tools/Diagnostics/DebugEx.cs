@@ -7,7 +7,7 @@
 /// </summary>
 public static class DebugEx
 {
-    static readonly object Sync = new();
+    static readonly Lock Sync = new();
 
     // ----------------------------------------------------
 
