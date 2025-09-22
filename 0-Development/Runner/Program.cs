@@ -8,6 +8,9 @@ internal class Program
     /// </summary>
     static void Main()
     {
-        Console.WriteLine("Hello, World!");
+        Ambient.AddConsoleListener();
+
+        DebugEx.Write(true, ConsoleColor.Green, "Enter value: ");
+        var str = ConsoleEx.ReadLine(true);
     }
 }

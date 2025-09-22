@@ -192,4 +192,85 @@ public static class ConsoleEx
         Console.ForegroundColor = oldfore;
         Console.BackgroundColor = oldback;
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Reads the next available line from the console. Returns either the read string, or null
+    /// if no more lines are available.
+    /// </summary>
+    /// <returns></returns>
+    public static string? ReadLine() => ReadLine(false);
+
+    /// <summary>
+    /// Reads the next available line from the console. Returns either the read string, or null
+    /// if no more lines are available.
+    /// </summary>
+    /// <param name="debug"></param>
+    /// <param name="forecolor"></param>
+    /// <returns></returns>
+    public static string? ReadLine(ConsoleColor forecolor) => ReadLine(false, forecolor);
+
+    /// <summary>
+    /// Reads the next available line from the console. Returns either the read string, or null
+    /// if no more lines are available.
+    /// </summary>
+    /// <param name="debug"></param>
+    /// <param name="forecolor"></param>
+    /// <param name="backcolor"></param>
+    /// <returns></returns>
+    public static string? ReadLine(
+        ConsoleColor forecolor, ConsoleColor backcolor) => ReadLine(false, forecolor, backcolor);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Reads the next available line from the console, and replicates the result in the debug
+    /// environment if requested. Returns either the read string, or null if no more lines are
+    /// available.
+    /// </summary>
+    /// <param name="debug"></param>
+    /// <returns></returns>
+    public static string? ReadLine(bool debug)
+    {
+        var str = Console.ReadLine();
+
+        if (str is not null && debug) DebugEx.WriteLine(false, str);
+        return str;
+    }
+
+    /// <summary>
+    /// Reads the next available line from the console, and replicates the result in the debug
+    /// environment if requested. Returns either the read string, or null if no more lines are
+    /// available.
+    /// </summary>
+    /// <param name="debug"></param>
+    /// <param name="forecolor"></param>
+    /// <returns></returns>
+    public static string? ReadLine(bool debug, ConsoleColor forecolor)
+    {
+        var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
+        var r = ReadLine(debug);
+        Console.ForegroundColor = oldfore;
+        return r;
+    }
+
+    /// <summary>
+    /// Reads the next available line from the console, and replicates the result in the debug
+    /// environment if requested. Returns either the read string, or null if no more lines are
+    /// available.
+    /// </summary>
+    /// <param name="debug"></param>
+    /// <param name="forecolor"></param>
+    /// <param name="backcolor"></param>
+    /// <returns></returns>
+    public static string? ReadLine(bool debug, ConsoleColor forecolor, ConsoleColor backcolor)
+    {
+        var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
+        var oldback = Console.BackgroundColor; Console.BackgroundColor = backcolor;
+        var r = ReadLine(debug);
+        Console.ForegroundColor = oldfore;
+        Console.BackgroundColor = oldback;
+        return r;
+    }
 }
