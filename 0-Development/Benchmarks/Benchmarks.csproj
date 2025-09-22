@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+   <PropertyGroup>
+	  <OutputType>Exe</OutputType>
+	  <TargetFramework>net9.0</TargetFramework>
+	  <ImplicitUsings>disable</ImplicitUsings>
+	  <Nullable>enable</Nullable>
+	  <NoWarn>IDE0130;CA1822</NoWarn>
+   </PropertyGroup>
+   <!--IDE0130: Folder structure-->
+   <!--CA1822: Static methods-->
+
+   <ItemGroup>
+	  <PackageReference Include="BenchmarkDotNet" Version="0.15.2" />
+	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
+   </ItemGroup>
+
+</Project>

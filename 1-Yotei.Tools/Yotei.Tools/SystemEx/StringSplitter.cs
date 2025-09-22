@@ -1,66 +1,18 @@
-﻿using Entry = (System.Range Range, bool IsSeparator);
+﻿using System.Net.Sockets;
+using Entry = (System.ReadOnlyMemory<char> Item, bool IsSeparator);
 
 namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>
-/// Represents the ability of split source string in its components. Instances of this type are
-/// forward-only enumerators.
+/// Provides options for the extended 'string.Split' capabilities.
 /// </summary>
-public record struct StringSplitter : IEnumerable<Entry>, IEnumerator<Entry>
+public readonly record struct StringSplitterOptions
 {
     /// <summary>
-    /// Initializes a new instance.
+    /// Initializes a default instance.
     /// </summary>
-    /// <param name="source"></param>
-    /// <param name="separators"></param>
-    public StringSplitter(string source, params IEnumerable<string> separators)
-    {
-        Source = source.ThrowWhenNull();
-        Separators = Validate(separators.ThrowWhenNull());
-
-        static string[] Validate(IEnumerable<string> separators)
-        {
-            var items = separators.ToArray();
-            foreach (var item in items)
-                if (string.IsNullOrWhiteSpace(item)) throw new ArgumentException(
-                    "Collection of split separators carries null or empty elements.")
-                    .WithData(separators);
-
-            return items;
-        }
-    }
-
-    /// <summary>
-    /// Initializes a new instance.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="separators"></param>
-    public StringSplitter(string source, params IEnumerable<char> separators)
-    {
-        Source = source.ThrowWhenNull();
-        Separators = Validate(separators.ThrowWhenNull());
-
-        static string[] Validate(IEnumerable<char> separators)
-        {
-            foreach (var temp in separators)
-                if (temp == 0) throw new ArgumentException(
-                    "Collection of split separators carries invalid elements.")
-                    .WithData(separators);
-
-            var items = separators.Select(x => x.ToString()).ToArray();
-            return items;
-        }
-    }
-
-    /// <inheritdoc/>
-    public void Dispose() => Reset();
-
-    /// <inheritdoc/>
-    readonly public IEnumerator<Entry> GetEnumerator() => this;
-    readonly IEnumerator IEnumerable.GetEnumerator() => this;
-
-    // ----------------------------------------------------
+    public StringSplitterOptions() { }
 
     /// <summary>
     /// The comparison mode used to find separators in the source.
@@ -83,65 +35,65 @@ public record struct StringSplitter : IEnumerable<Entry>, IEnumerator<Entry>
     /// If requested, separators are kept in the results' set instead of being removed.
     /// </summary>
     public bool KeepSeparators { get; init; }
+}
 
-    // ----------------------------------------------------
-
-    readonly string Source;
-    readonly string[] Separators;
-    IEnumerator<Entry>? Results;
-
-    /// <inheritdoc/>
-    public Entry Current { get; private set; }
-    readonly object IEnumerator.Current => Current;
-
-    /// <inheritdoc/>
-    public void Reset()
+// ========================================================
+public static class StringSplitterExtensions
+{
+    /// <summary>
+    /// Splits the given source string into its components, identified by their respective values
+    /// and whether they are one of the given separators, or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="options"></param>
+    /// <param name="separators"></param>
+    /// <returns></returns>
+    public static IEnumerable<Entry> Split(
+        this string source,
+        StringSplitterOptions options,
+        params IEnumerable<char> separators)
     {
-        if (Results is not null)
-        {
-            Results.Dispose();
-            Results = null!;
-        }
-    }
+        source.ThrowWhenNull();
+        separators.ThrowWhenNull();
 
-    /// <inheritdoc/>
-    public bool MoveNext()
-    {
-        Results ??= GetResults();
-
-        if (Results.MoveNext())
-        {
-            Current = Results.Current;
-            return true;
-        }
-        return false;
+        var temps = separators.Select(x => x.ToString());
+        return source.Split(options, temps);
     }
 
     /// <summary>
-    /// Invoked to obtain the actual enumerable instance.
+    /// Splits the given source string into its components, identified by their respective values
+    /// and whether they are one of the given separators, or not.
     /// </summary>
-    readonly IEnumerator<Entry> GetResults()
+    /// <param name="source"></param>
+    /// <param name="options"></param>
+    /// <param name="separators"></param>
+    /// <returns></returns>
+    public static IEnumerable<Entry> Split(
+        this string source,
+        StringSplitterOptions options,
+        params IEnumerable<string> separators)
     {
         int i = 0, last = 0;
         int len;
-        Range range;
+        ReadOnlyMemory<char> item;
 
         // Loop through source contents...
         LOOP:
-        while (i < Source.Length)
+        while (i < source.Length)
         {
             // First separator wins...
-            foreach (var separator in Separators)
+            foreach (var separator in separators)
             {
-                if (!Source.AsSpan(i).StartsWith(separator, Comparison)) continue;
+                if (!source.AsSpan(i).StartsWith(separator, options.Comparison)) continue;
 
-                // Pending characters..
+                // Pending characters...
                 len = i - last;
-                range = Compute(Source, TrimEntries, last, len);
-                if (!RemoveEmptyEntries || Len(range) > 0) yield return (range, false);
+                item = source.AsMemory(last, len);
+                if (options.TrimEntries) item = item.Trim();
+                if (!options.RemoveEmptyEntries || item.Length > 0) yield return (item, false);
 
                 // Found separator...
-                if (KeepSeparators) yield return (new(i, i + separator.Length), true);
+                if (options.KeepSeparators) yield return (separator.AsMemory(), true);
 
                 // Adjusting...
                 i = last = (i + separator.Length);
@@ -153,22 +105,9 @@ public record struct StringSplitter : IEnumerable<Entry>, IEnumerator<Entry>
         }
 
         // Remaining...
-        len = Source.Length - last;
-        range = Compute(Source, TrimEntries, last, len);
-        if (!RemoveEmptyEntries || Len(range) > 0) yield return (range, false);
-
-        // Computes the suitable range...
-        static Range Compute(string source, bool trim, int ini, int len)
-        {
-            var end = ini + len;
-            if (!trim) return new Range(ini, end);
-
-            while (ini < end) { if (source[ini] == ' ') ini++; else break; }
-            while (end > ini) { if (source[end - 1] == ' ') end--; else break; }
-            return new Range(ini, end);
-        }
-
-        // Returns the lenght of the given range...
-        static int Len(Range range) => range.End.Value - range.Start.Value;
+        len = source.Length - last;
+        item = source.AsMemory(last, len);
+        if (options.TrimEntries) item = item.Trim();
+        if (!options.RemoveEmptyEntries || item.Length > 0) yield return (item, false);
     }
 }
