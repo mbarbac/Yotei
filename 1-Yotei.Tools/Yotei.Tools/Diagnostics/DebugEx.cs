@@ -102,7 +102,7 @@ public static class DebugEx
 
             var manipulate = Ambient.IsConsoleListener();
             var listeners = manipulate ? Ambient.GetConsoleListeners().ToArray() : null;
-            if (manipulate) Ambient.RemoveConsoleListeners();
+            if (manipulate) Ambient.RemoveRangeListeners(listeners!);
 
             var size = Debug.IndentSize;
             var level = Debug.IndentLevel;
@@ -244,7 +244,7 @@ public static class DebugEx
 
             var manipulate = Ambient.IsConsoleListener();
             var listeners = manipulate ? Ambient.GetConsoleListeners().ToArray() : null;
-            if (manipulate) Ambient.RemoveConsoleListeners();
+            if (manipulate) Ambient.RemoveRangeListeners(listeners!);
 
             var size = Debug.IndentSize;
             var level = Debug.IndentLevel;

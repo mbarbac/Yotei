@@ -1,3 +1,3 @@
 echo off
-dotnet run -c release 
+dotnet run -c release
 pause

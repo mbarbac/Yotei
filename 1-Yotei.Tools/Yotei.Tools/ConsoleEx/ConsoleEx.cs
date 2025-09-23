@@ -10,6 +10,13 @@ namespace Yotei.Tools.ConsoleEx;
 public static class ConsoleEx
 {
     /// <summary>
+    /// Clears the console.
+    /// </summary>
+    public static void Clear() => Console.Clear();
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Writes the given message.
     /// </summary>
     /// <param name="message"></param>
@@ -273,4 +280,181 @@ public static class ConsoleEx
         Console.BackgroundColor = oldback;
         return r;
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns the next available key from the console, or '<c>null</c>' if no key was available.
+    /// </summary>
+    /// <returns></returns>
+    public static ConsoleKeyInfo? ReadKey() => ReadKey(false, false, Timeout.InfiniteTimeSpan);
+
+    /// <summary>
+    /// Returns the next available key from the console, or '<c>null</c>' if no key was available.
+    /// The key is also displayed in the console if such is requested.
+    /// </summary>
+    /// <param name="display"></param>
+    /// <returns></returns>
+    public static ConsoleKeyInfo? ReadKey(
+        bool display) => ReadKey(false, display, Timeout.InfiniteTimeSpan);
+
+    /// <summary>
+    /// Reads the next available key from the console, waiting for at most the given amount of
+    /// time. Returns that key or '<c>null</c>' if no key was available.The key is also displayed
+    /// in the console if such is requested.
+    /// </summary>
+    /// <param name="display"></param>
+    /// <param name="timeout"></param>
+    /// <returns></returns>
+    public static ConsoleKeyInfo? ReadKey(
+        bool display, TimeSpan timeout) => ReadKey(false, display, timeout);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns the next available key from the console or '<c>null</c>' if no key was available.
+    /// The key is also displayed in the console and replicated in the debug environment if such
+    /// is requested.
+    /// </summary>
+    /// <param name="debug"></param>
+    /// <param name="display"></param>
+    /// <returns></returns>
+    public static ConsoleKeyInfo? ReadKey(
+        bool debug, bool display) => ReadKey(debug, display, Timeout.InfiniteTimeSpan);
+
+    /// <summary>
+    /// Reads the next available key from the console, waiting for at most the given amount of
+    /// time. Returns that key or '<c>null</c>' if no key was available or if the timeout period
+    /// expired. The key is also displayed in the console and replicated in the debug environment
+    /// if such is requested.
+    /// </summary>
+    /// <param name="debug"></param>
+    /// <param name="display"></param>
+    /// <param name="timeout"></param>
+    /// <returns></returns>
+    public static ConsoleKeyInfo? ReadKey(bool debug, bool display, TimeSpan timeout)
+    {
+        var ms = timeout.ValidateTimeout();
+        var ini = DateTime.UtcNow;
+
+        while (true)
+        {
+            // There is a key to process...
+            if (Console.KeyAvailable)
+            {
+                var info = Console.ReadKey(intercept: true);
+                if (display)
+                {
+                    var ch = info.KeyChar < 32 ? $"[{info.Key}]" : $"{info.KeyChar}";
+                    if (debug) DebugEx.Write(false, ch);
+                    Console.Write(ch);
+                }
+                return info;
+            }
+
+            // Let's wait if requested...
+            if (ms != -1)
+            {
+                var now = DateTime.UtcNow;
+                if ((now - ini) > timeout) return null;
+            }
+            Thread.Sleep(10);
+        }
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Edits in the console the given source string, returning whether the user has accepted
+    /// that edition, or it was cancelled.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="result"></param>
+    /// <returns></returns>
+    public static bool EditLine(
+        string? source, [NotNullWhen(true)] out string? result)
+        => EditLine(false, Timeout.InfiniteTimeSpan, source, out result);
+
+    public static bool EditLine(
+        ConsoleColor forecolor,
+        string? source, [NotNullWhen(true)] out string? result) => throw null;
+
+    public static bool EditLine(
+        ConsoleColor forecolor, ConsoleColor backcolor,
+        string? source, [NotNullWhen(true)] out string? result) => throw null;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Edits in the console the given source string, returning whether the user has accepted
+    /// that edition, or either it was cancelled or the timeout expired.
+    /// </summary>
+    /// <param name="timeout"></param>
+    /// <param name="source"></param>
+    /// <param name="result"></param>
+    /// <returns></returns>
+    public static bool EditLine(
+        TimeSpan timeout, string? source, [NotNullWhen(true)] out string? result)
+        => EditLine(false, timeout, source, out result);
+
+    public static bool EditLine(
+        ConsoleColor forecolor,
+        TimeSpan timeout, string? source, [NotNullWhen(true)] out string? result) => throw null;
+
+    public static bool EditLine(
+        ConsoleColor forecolor, ConsoleColor backcolor,
+        TimeSpan timeout, string? source, [NotNullWhen(true)] out string? result) => throw null;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Edits in the console the given source string, returning whether the user has accepted
+    /// that edition, or either it was cancelled. If accepted, the result is replicated in the
+    /// debug environment if such is requested.
+    /// </summary>
+    /// <param name="debug"></param>
+    /// <param name="source"></param>
+    /// <param name="result"></param>
+    /// <returns></returns>
+    public static bool EditLine(
+        bool debug,
+        string? source, [NotNullWhen(true)] out string? result)
+        => EditLine(debug, Timeout.InfiniteTimeSpan, source, out result);
+
+    public static bool EditLine(
+        ConsoleColor forecolor, bool debug,
+        string? source, [NotNullWhen(true)] out string? result) => throw null;
+
+    public static bool EditLine(
+        ConsoleColor forecolor, ConsoleColor backcolor, bool debug,
+        string? source, [NotNullWhen(true)] out string? result) => throw null;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Edits in the console the given source string, returning whether the user has accepted
+    /// that edition, or either it was cancelled or the timeout expired. If accepted, the result
+    /// is replicated in the debug environment if such is requested.
+    /// </summary>
+    /// <param name="debug"></param>
+    /// <param name="timeout"></param>
+    /// <param name="source"></param>
+    /// <param name="result"></param>
+    /// <returns></returns>
+    public static bool EditLine(
+        bool debug, TimeSpan timeout,
+        string? source, [NotNullWhen(true)] out string? result)
+    {
+        throw null;
+    }
+
+    public static bool EditLine(
+        ConsoleColor forecolor,
+        bool debug, TimeSpan timeout,
+        string? source, [NotNullWhen(true)] out string? result) => throw null;
+
+    public static bool EditLine(
+        ConsoleColor forecolor, ConsoleColor backcolor,
+        bool debug, TimeSpan timeout,
+        string? source, [NotNullWhen(true)] out string? result) => throw null;
 }

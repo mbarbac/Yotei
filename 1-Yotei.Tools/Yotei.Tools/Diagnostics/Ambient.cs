@@ -59,7 +59,7 @@ public static class Ambient
     /// yet. Returns the added listener, or null otherwise.
     /// </summary>
     /// <returns></returns>
-    public static TraceListener? AddConsoleListener()
+    public static TraceListener? AddNewConsoleListener()
     {
         var items = GetConsoleListeners().ToArray();
         if (items.Length == 0)
@@ -74,9 +74,10 @@ public static class Ambient
     /// <summary>
     /// Removes from the collection of trace listeners all the console-alike ones.
     /// </summary>
-    public static void RemoveConsoleListeners()
+    /// <param name="range"></param>
+    public static void RemoveRangeListeners(IEnumerable<TraceListener> range)
     {
-        var items = GetConsoleListeners().ToArray();
-        foreach (var item in items) Trace.Listeners.Remove(item);
+        range.ThrowWhenNull();
+        foreach (var item in range) Trace.Listeners.Remove(item);
     }
 }
