@@ -599,9 +599,6 @@ public static class ConsoleEx
         var left = Console.CursorLeft;
         var insert = false;
 
-        var windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-        var visible = windows ? Console.CursorVisible : true;
-
         var sb = new StringBuilder(source ?? string.Empty);
         var pos = sb.Length;
         int len;
@@ -725,6 +722,7 @@ public static class ConsoleEx
         /// </summary>
         void SetInsert(bool value)
         {
+            var windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             if (windows) Console.CursorSize = value ? 100 : size;
             insert = value;
         }
