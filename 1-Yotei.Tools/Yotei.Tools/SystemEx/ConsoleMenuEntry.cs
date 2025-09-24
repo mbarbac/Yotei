@@ -1,4 +1,4 @@
-﻿namespace Yotei.Tools.ConsoleEx;
+﻿namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>
@@ -6,7 +6,7 @@
 /// </summary>
 /// <param name="header"></param>
 /// <param name="execute"></param>
-public class MenuEntry(string? header = null, Action? execute = null)
+public class ConsoleMenuEntry(string? header = null, Action? execute = null)
 {
     readonly string? _Header = header;
     readonly Action? _Execute = execute;

@@ -1,8 +1,4 @@
-﻿#pragma warning disable IDE0075
-
-using Yotei.Tools.Diagnostics;
-
-namespace Yotei.Tools.ConsoleEx;
+﻿namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>
@@ -59,10 +55,9 @@ public static class ConsoleEx
         bool debug,
         string? message, params object?[] args)
     {
-        if (message is null) return;
-        if (message.Length == 0) return;
-
+        message ??= string.Empty;
         args ??= [null];
+
         if (args.Length > 0) message = string.Format(message, args);
         Console.Write(message);
         if (debug) DebugEx.Write(false, message);
@@ -156,10 +151,9 @@ public static class ConsoleEx
     /// <param name="args"></param>
     public static void WriteLine(bool debug, string? message, params object?[] args)
     {
-        if (message is null) return;
-        if (message.Length == 0) return;
-
+        message ??= string.Empty;
         args ??= [null];
+
         if (args.Length > 0) message = string.Format(message, args);
         Console.WriteLine(message);
         if (debug) DebugEx.WriteLine(false, message);

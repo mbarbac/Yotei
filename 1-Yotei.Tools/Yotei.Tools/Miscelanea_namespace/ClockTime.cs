@@ -98,7 +98,7 @@ public record class ClockTime
 
     /// <summary>
     /// Returns a string representation of this instance using the given format and culture
-    /// information. Format uses the 'hh', 'mm', 'ss' and 'fff' specifications.
+    /// information. Format uses the 'hh', 'mm', 'ss' and 'fff' case sensitive specifications.
     /// </summary>
     /// <param name="format"></param>
     /// <param name="provider"></param>

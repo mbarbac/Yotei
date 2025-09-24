@@ -1,28 +1,27 @@
-﻿using static Yotei.Tools.ConsoleEx.ConsoleEx;
+﻿using static Yotei.Tools.ConsoleEx;
 using static System.ConsoleColor;
-using Yotei.Tools.Diagnostics;
 
-namespace Yotei.Tools.ConsoleEx;
+namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>
 /// Represents a console menu that permits the user to select among its entries, executing their
 /// associated actions, if any.
 /// </summary>
-public class MenuConsole : IEnumerable<MenuEntry>
+public class ConsoleMenu : IEnumerable<ConsoleMenuEntry>
 {
-    List<MenuEntry> Entries { get; } = [];
+    List<ConsoleMenuEntry> Entries { get; } = [];
 
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    public MenuConsole() { }
+    public ConsoleMenu() { }
 
     /// <summary>
     /// Initializes a new instance with the given collection of elements.
     /// </summary>
     /// <param name="entries"></param>
-    public MenuConsole(params IEnumerable<MenuEntry> entries) => AddRange(entries);
+    public ConsoleMenu(params IEnumerable<ConsoleMenuEntry> entries) => AddRange(entries);
 
     /// <inheritdoc/>
     public override string ToString() => $"Count: {Entries.Count}";
@@ -30,7 +29,7 @@ public class MenuConsole : IEnumerable<MenuEntry>
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public IEnumerator<MenuEntry> GetEnumerator() => Entries.GetEnumerator();
+    public IEnumerator<ConsoleMenuEntry> GetEnumerator() => Entries.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /// <summary>
@@ -43,20 +42,20 @@ public class MenuConsole : IEnumerable<MenuEntry>
     /// </summary>
     /// <param name="entry"></param>
     /// <returns></returns>
-    public int IndexOf(MenuEntry entry) => Entries.IndexOf(entry.ThrowWhenNull());
+    public int IndexOf(ConsoleMenuEntry entry) => Entries.IndexOf(entry.ThrowWhenNull());
 
     /// <summary>
     /// Gets the entry stored at the given index.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public MenuEntry this[int index] => Entries[index];
+    public ConsoleMenuEntry this[int index] => Entries[index];
 
     /// <summary>
     /// Adds the given menu entry to this instance, provided it is not a duplicated one.
     /// </summary>
     /// <param name="entry"></param>
-    public void Add(MenuEntry entry)
+    public void Add(ConsoleMenuEntry entry)
     {
         entry.ThrowWhenNull();
 
@@ -69,7 +68,7 @@ public class MenuConsole : IEnumerable<MenuEntry>
     /// duplicated ones.
     /// </summary>
     /// <param name="range"></param>
-    public void AddRange(IEnumerable<MenuEntry> range)
+    public void AddRange(IEnumerable<ConsoleMenuEntry> range)
     {
         range.ThrowWhenNull();
         foreach (var entry in range) Add(entry);
@@ -81,7 +80,7 @@ public class MenuConsole : IEnumerable<MenuEntry>
     /// </summary>
     /// <param name="index"></param>
     /// <param name="entry"></param>
-    public void Insert(int index, MenuEntry entry)
+    public void Insert(int index, ConsoleMenuEntry entry)
     {
         entry.ThrowWhenNull();
 
@@ -95,7 +94,7 @@ public class MenuConsole : IEnumerable<MenuEntry>
     /// </summary>
     /// <param name="index"></param>
     /// <param name="range"></param>
-    public void InsertRange(int index, IEnumerable<MenuEntry> range)
+    public void InsertRange(int index, IEnumerable<ConsoleMenuEntry> range)
     {
         range.ThrowWhenNull();
         foreach (var entry in range) Insert(index++, entry);
@@ -112,7 +111,7 @@ public class MenuConsole : IEnumerable<MenuEntry>
     /// </summary>
     /// <param name="entry"></param>
     /// <returns></returns>
-    public bool Remove(MenuEntry entry) => Entries.Remove(entry.ThrowWhenNull());
+    public bool Remove(ConsoleMenuEntry entry) => Entries.Remove(entry.ThrowWhenNull());
 
     /// <summary>
     /// Removes all the menu entries from this collection.

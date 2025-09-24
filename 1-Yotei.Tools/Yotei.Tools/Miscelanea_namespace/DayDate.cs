@@ -72,13 +72,40 @@ public record class DayDate
     /// <returns></returns>
     public string ToString([StringSyntax(StringSyntaxAttribute.DateOnlyFormat)] string? format)
     {
-        if (Year >= DateOnly.MinValue.Year &&
-            Year <= DateOnly.MaxValue.Year) return ((DateOnly)this).ToString(format);
-        else
+        return
+            Year >= DateOnly.MinValue.Year && Year <= DateOnly.MaxValue.Year
+            ? ((DateOnly)this).ToString(format)
+            : ToStringInternal(format);
+    }
+
+    string ToStringInternal(string? format)
+    {
+        if (format is null || format.Length == 0) return ToString();
+
+        var fake = new DateTime(2000, Month, Day); // 2000 was a leap year.
+        var sb = new StringBuilder();
+        for (int i = 0; i < format.Length; i++)
         {
-            // TODO: DayDate ToString for BC values or BIG AC ones...
-            throw null;
+            var span = format.AsSpan(i);
+            
+            if (span.StartsWith("yyyy")) { sb.Append($"{Year:0000}"); i += 4; i--;  continue; }
+            if (span.StartsWith("yyy")) { sb.Append($"{Year:0000}"); i += 3; i--; continue; }
+            if (span.StartsWith("yy")) { sb.Append($"{Year:00}"); i += 2; i--; continue; }
+            if (span.StartsWith("y")) { sb.Append($"{Year:0}"); i += 1; i--; continue; }
+
+            if (span.StartsWith("MMMM")) { sb.Append(fake.ToString("MMMM")); i += 4; i--; continue; }
+            if (span.StartsWith("MMM")) { sb.Append(fake.ToString("MMM")); i += 3; i--; continue; }
+            if (span.StartsWith("MM")) { sb.Append($"{Month:00}"); i += 2; i--; continue; }
+            if (span.StartsWith("M")) { sb.Append($"{Month:0}"); i += 1; i--; continue; }
+
+            if (span.StartsWith("dddd")) { sb.Append(fake.ToString("dddd")); i += 4; i--; continue; }
+            if (span.StartsWith("ddd")) { sb.Append(fake.ToString("ddd")); i += 3; i--; continue; }
+            if (span.StartsWith("dd")) { sb.Append($"{Day:00}"); i += 2; i--; continue; }
+            if (span.StartsWith("d")) { sb.Append($"{Day:0}"); i += 1; i--; continue; }
+
+            sb.Append(format[i]);
         }
+        return sb.ToString();
     }
 
     /// <summary>
@@ -88,18 +115,16 @@ public record class DayDate
     /// <returns></returns>
     public string ToString(IFormatProvider? provider)
     {
-        if (Year >= DateOnly.MinValue.Year &&
-            Year <= DateOnly.MaxValue.Year) return ((DateOnly)this).ToString(provider);
-        else
-        {
-            // TODO: DayDate ToString for BC values or BIG AC ones...
-            throw null;
-        }
+        return
+            Year >= DateOnly.MinValue.Year && Year <= DateOnly.MaxValue.Year
+            ? ((DateOnly)this).ToString(provider)
+            : ToString(); // TODO: DayDate.ToString(provider) for BC values and big AC ones.
     }
 
     /// <summary>
     /// Returns a string representation of this instance using the given format and culture
-    /// information. Format uses the 'hh', 'mm', 'ss' and 'fff' specifications.
+    /// information. Format uses the 'y|yy|yyyy', 'MM|MMM|MMMM' and 'd|dd|ddd|dddd' case
+    /// sensitive specifications.
     /// </summary>
     /// <param name="format"></param>
     /// <param name="provider"></param>
@@ -108,13 +133,10 @@ public record class DayDate
         [StringSyntax(StringSyntaxAttribute.DateOnlyFormat)] string? format,
         IFormatProvider? provider)
     {
-        if (Year >= DateOnly.MinValue.Year &&
-            Year <= DateOnly.MaxValue.Year) return ((DateOnly)this).ToString(format, provider);
-        else
-        {
-            // TODO: DayDate ToString for BC values or BIG AC ones...
-            throw null;
-        }
+        return
+            Year >= DateOnly.MinValue.Year && Year <= DateOnly.MaxValue.Year
+            ? ((DateOnly)this).ToString(format, provider)
+            : ToString(format); // TODO: DayDate.ToString(format, provider) for BC values and big AC ones.
     }
 
     // ----------------------------------------------------

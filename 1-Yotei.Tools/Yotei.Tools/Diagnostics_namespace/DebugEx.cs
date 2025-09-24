@@ -94,10 +94,9 @@ public static class DebugEx
     {
         lock (Sync)
         {
-            if (message is null) return;
-            if (message.Length == 0) return;
-
+            message ??= string.Empty;
             args ??= [null];
+
             if (args.Length > 0) message = string.Format(message, args);
 
             var manipulate = Ambient.IsConsoleListener();
@@ -240,6 +239,7 @@ public static class DebugEx
         {
             message ??= string.Empty;
             args ??= [null];
+
             if (args.Length > 0) message = string.Format(message, args);
 
             var manipulate = Ambient.IsConsoleListener();

@@ -1,4 +1,4 @@
-﻿using static Yotei.Tools.ConsoleEx.ConsoleEx;
+﻿using static Yotei.Tools.ConsoleEx;
 using static System.ConsoleColor;
 
 namespace Runner;
@@ -25,20 +25,15 @@ internal class Program
             WriteLine(true);
             WriteLine(true, Green, FatSeparator);
             WriteLine(true, Green, "Main Menu:");
-            option = new MenuConsole
+            option = new ConsoleMenu
             {
-                new MenuEntry("Exit"),
-                new MenuEntry("First option", () => WriteLine("1st option selected.")),
-                new MenuEntry("Second option", () => WriteLine("2nd option selected.")),
-                new MenuEntry("Examples", () =>
+                new("Exit"),
+                new("First option", () => WriteLine("1st option selected.")),
+                new("Examples", () =>
                 {
-                    var item = new DateOnly(1, 1, 1);
-                    var str = item.ToString();
-                    Write(Cyan, "Value: ");
-                    WriteLine(str);
                 })
             }
-            .Run(true, Green, Timeout, option);
+            .Run(true, Green, Timeout);
         }
         while (option > 0);
     }
