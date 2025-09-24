@@ -7,6 +7,7 @@
 	  <LangVersion>latest</LangVersion>
 	  <ImplicitUsings>disable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
+	  <Configurations>Debug;Release;Local</Configurations>
 	  <NoWarn>IDE0130</NoWarn>
    </PropertyGroup>
    <!--IDE0130: Folder structure-->
@@ -24,8 +25,23 @@
 	  </PackageReference>
    </ItemGroup>
 
-   <ItemGroup>
+   <!-- DEBUG configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Debug'">
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
+   </ItemGroup>
+
+   <!-- RELEASE configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Release'">
+	  <PackageReference Include="Yotei.Tools" Version="0.7.0" />
+   </ItemGroup>
+
+   <!-- LOCAL configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Release'">
+	  <PackageReference Include="Yotei.Tools" Version="0.7.0-v0001" />
+   </ItemGroup>
+
+   <!--TEST Files-->
+   <ItemGroup>
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Tests\Yotei.Tools.Tests.csproj" />
    </ItemGroup>
 

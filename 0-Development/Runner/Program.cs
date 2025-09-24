@@ -42,6 +42,7 @@ internal class Program
                 new("Exit"),
                 new MenuTester(breakOnError: true),
                 new MenuArtifacts(),
+                new MenuBuilder(),
                 new("Examples", () =>
                 {
                 })

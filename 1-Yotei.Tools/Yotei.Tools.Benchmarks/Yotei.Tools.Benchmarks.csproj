@@ -14,7 +14,7 @@
 
    <ItemGroup>
 	  <PackageReference Include="BenchmarkDotNet" Version="0.15.3" />
-	  <ProjectReference Include="..\Yotei.Tools\Yotei.Tools.csproj" />
+	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
    </ItemGroup>
 
 </Project>
