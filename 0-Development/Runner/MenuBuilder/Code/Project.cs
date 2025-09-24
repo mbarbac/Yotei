@@ -67,7 +67,7 @@ public class Project : IEnumerable<ProjectLine>
     /// The name and extension of this project file.
     /// </summary>
     public string NameExtension => _NameExtension ??= Name + (Extension.Length > 0 ? $".{Extension}" : string.Empty);
-    string ? _NameExtension;
+    string? _NameExtension;
 
     /// <summary>
     /// The name and version, if any, of this project.
@@ -185,6 +185,25 @@ public class Project : IEnumerable<ProjectLine>
     /// </summary>
     public void Clear() => Lines.Clear();
 
+    /// <summary>
+    /// Gets a list with the current lines in this instance.
+    /// </summary>
+    /// <returns></returns>
+    public List<ProjectLine> ToList() => [.. Lines];
+
+    /// <summary>
+    /// Restores the contents of this file using the given range of lines, removing any previous
+    /// ones.
+    /// </summary>
+    /// <param name="items"></param>
+    public void FromLines(IEnumerable<ProjectLine> items)
+    {
+        items.ThrowWhenNull();
+
+        Clear();
+        AddRange(items);
+    }
+
     // ----------------------------------------------------
 
     /// <summary>
@@ -225,7 +244,7 @@ public class Project : IEnumerable<ProjectLine>
             {
                 version = new(value);
                 return true;
-            }   
+            }
         }
 
         version = null;
@@ -256,4 +275,65 @@ public class Project : IEnumerable<ProjectLine>
         old = null;
         return false;
     }
+
+    // ----------------------------------------------------
+
+    const string ISPACKABLE = "IsPackable";
+    const string TRUE = "true";
+
+    /// <summary>
+    /// Determines if this project is a packable one, or not.
+    /// </summary>
+    /// <returns></returns>
+    public bool IsPackable()
+    {
+        foreach (var line in Lines)
+        {
+            if (line.GetXMLWrappedValue(ISPACKABLE, out var value) &&
+                string.Compare(TRUE, value, ignoreCase: true) == 0)
+                return true;
+        }
+
+        return false;
+    }
+
+    /*
+        foreach (var line in Lines)
+        {
+            if (line.GetXMLWrappedValue(VERSION, out var value))
+            {
+                version = new(value);
+                return true;
+            }
+        }
+
+        version = null;
+        return false;
+    }
+
+    /// <summary>
+    /// Tries to set the semantic version of this project file, using the current collection of
+    /// lines. If so, the old value is returned in the out argument.
+    /// </summary>
+    /// <param name="version"></param>
+    /// <param name="old"></param>
+    /// <returns></returns>
+    public bool SetVersion(SemanticVersion version, [NotNullWhen(true)] out SemanticVersion? old)
+    {
+        version.ThrowWhenNull();
+
+        foreach (var line in Lines)
+        {
+            if (!line.GetXMLWrappedValue(VERSION, out var temp)) continue;
+            if (line.SetXMLWrappedValue(VERSION, version))
+            {
+                old = temp;
+                return true;
+            }
+        }
+
+        old = null;
+        return false;
+    }
+    */
 }
