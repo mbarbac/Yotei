@@ -6,7 +6,7 @@
 /// <br/> Instances of this type takes into consideration the XVI century conversion from the
 /// Julian calendar to the Gregorian one.
 /// </summary>
-public record class DayDate
+public record class DayDate : IComparable<DayDate>
 {
     /// <summary>
     /// Initializes a new instance.
@@ -35,6 +35,17 @@ public record class DayDate
     }
 
     /// <summary>
+    /// Returns a new object using the values of this instance and the ones from the given time.
+    /// </summary>
+    /// <param name="time"></param>
+    /// <returns></returns>
+    public DateTime ToDateTime(ClockTime time)
+    {
+        time.ThrowWhenNull();
+        return new(Year, Month, Day, time.Hour, time.Minute, time.Second, time.Millisecond);
+    }
+
+    /// <summary>
     /// Conversion operator.
     /// </summary>
     public static implicit operator DayDate(DateTime item)
@@ -43,7 +54,7 @@ public record class DayDate
     /// <summary>
     /// Conversion operator.
     /// </summary>
-    public static implicit operator DateTime(DayDate item)
+    public static implicit operator DateOnly(DayDate item)
         => new(item.Year, item.Month, item.Day);
 
     /// <summary>
@@ -52,11 +63,7 @@ public record class DayDate
     public static implicit operator DayDate(DateOnly item)
         => new(item.Year, item.Month, item.Day);
 
-    /// <summary>
-    /// Conversion operator.
-    /// </summary>
-    public static implicit operator DateOnly(DayDate item)
-        => new(item.Year, item.Month, item.Day);
+    // ----------------------------------------------------
 
     /// <summary>
     /// Returns a string that represents this instance in a standard ISO format.
@@ -186,6 +193,33 @@ public record class DayDate
 
     // ----------------------------------------------------
 
+    /// <summary>
+    /// Gets a new instance with the current date in local coordinates.
+    /// </summary>
+    public static DayDate Now => DateTime.Now;
+
+    /// <summary>
+    /// Gets a new instance with the current date in global coordinates.
+    /// </summary>
+    public static DayDate UtcNow => DateTime.UtcNow;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns the number of days in the given month, taking into consideration if the given
+    /// year is a leap one or not.
+    /// </summary>
+    /// <param name="year"></param>
+    /// <param name="month"></param>
+    /// <returns></returns>
+    public static int DaysInMonth(int year, int month)
+    {
+        var temp = new DayDate(year, month, 1);
+        month = temp.Month;
+
+        return DaysInMonthInternal(year, month);
+    }
+
     // Computes the days in the given month, without validations.
     static int DaysInMonthInternal(int year, int month)
     {
@@ -193,13 +227,19 @@ public record class DayDate
         {
             1 or 3 or 5 or 7 or 8 or 10 or 12 => 31,
             4 or 6 or 9 or 11 => 30,
-            _ => IsLeapYearInternal(year) ? 29 : 28,
+            _ => IsLeapYear(year) ? 29 : 28,
         };
     }
 
-    // Computes wheter the given year is a leap one, without validations.
-    static bool IsLeapYearInternal(int year)
+    /// <summary>
+    /// Determines if the given year is a leap one or not.
+    /// </summary>
+    /// <param name="year"></param>
+    /// <returns></returns>
+    public static bool IsLeapYear(int year)
     {
+        if (year == 0) throw new ArgumentException("Year cannot be cero.");
+    
         if (year >= 1582) // Gregorian calendar...
         {
             if ((year % 4) == 0) // The 4 years rule...
@@ -225,4 +265,80 @@ public record class DayDate
 
         return false;
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns a new instance where the given number of days have been added to (or substracted
+    /// from) the current ones.
+    /// </summary>
+    /// <param name="days"></param>
+    /// <returns></returns>
+    public DayDate Add(int days)
+    {
+        if (days == 0) return this;
+
+        int year = Year;
+        int month = Month;
+        int day = Day;
+
+        while (days < 0) // Decreasing...
+        {
+            days++;
+
+            if ((--day) < 1)
+            {
+                if ((--month) < 1)
+                {
+                    if ((--year) == 0) year = -1;
+                    month = 12;
+                }
+                day = DaysInMonth(year, month);
+            }
+            if (year == 1582 && month == 10 && day == 14) day = 4;
+        }
+
+        while (days > 0) // Increasing...
+        {
+            days--;
+
+            int max = DaysInMonth(year, month);
+            if ((++day) > max)
+            {
+                if ((++month) > 12)
+                {
+                    if ((++year) == 0) year = 1;
+                    month = 1;
+                }
+                day = 1;
+            }
+            if (year == 1582 && month == 10 && day == 5) day = 15;
+        }
+
+        return new(year, month, day);
+    }
+
+    // ----------------------------------------------------
+
+    /// <inheritdoc cref="IComparable.CompareTo(object?)"/>
+    public static int Compare(DayDate? x, DayDate? y)
+    {
+        if (x is null && y is null) return 0;
+        if (x is null) return -1;
+        if (y is null) return +1;
+
+        if (x.Year != y.Year) return x.Year < y.Year ? -1 : +1;
+        if (x.Month != y.Month) return x.Month < y.Month ? -1 : +1;
+        if (x.Day != y.Day) return x.Day < y.Day ? -1 : +1;
+
+        return 0;
+    }
+
+    /// <inheritdoc/>
+    public int CompareTo(DayDate? other) => Compare(this, other);
+
+    public static bool operator >(DayDate? x, DayDate? y) => Compare(x, y) > 0;
+    public static bool operator <(DayDate? x, DayDate? y) => Compare(x, y) < 0;
+    public static bool operator >=(DayDate? x, DayDate? y) => Compare(x, y) >= 0;
+    public static bool operator <=(DayDate? x, DayDate? y) => Compare(x, y) <= 0;
 }
