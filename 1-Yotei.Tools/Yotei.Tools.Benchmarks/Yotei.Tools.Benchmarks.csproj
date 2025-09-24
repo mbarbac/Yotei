@@ -5,6 +5,7 @@
 	  <TargetFramework>net9.0</TargetFramework>
 	  <ImplicitUsings>disable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
+	  <ServerGarbageCollection>true</ServerGarbageCollection>
 	  <NoWarn>IDE0130;CA1822</NoWarn>
    </PropertyGroup>
    <!--IDE0130: Folder structure-->

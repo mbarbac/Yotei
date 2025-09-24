@@ -3,7 +3,7 @@
 // ========================================================
 //[DisassemblyDiagnoser]
 [MemoryDiagnoser(displayGenColumns: false)]
-[HideColumns("Job", "Error", "StdDev", "Median", "RatioSD", "y")]
+[HideColumns("Job", "Error", "StdDev", "Median")]
 public partial class Bench_StringSplitter
 {
     [Benchmark]
