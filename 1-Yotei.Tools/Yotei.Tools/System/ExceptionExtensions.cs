@@ -23,7 +23,7 @@ public static class ExceptionExtensions
     {
         exception.ThrowWhenNull();
 
-        name = name.NotNullNotEmpty();
+        name = name.NotNullNotEmpty(true);
         exception.Data[name] = value;
         return exception;
     }

@@ -43,7 +43,7 @@ public static class StringExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string NotNullNotEmpty(
         this string? source,
-        bool trim = true,
+        bool trim,
         [CallerArgumentExpression(nameof(source))] string? description = null)
     {
         description = description.NullWhenEmpty(true) ?? nameof(description);

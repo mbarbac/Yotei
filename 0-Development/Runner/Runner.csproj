@@ -2,21 +2,31 @@
 
    <PropertyGroup>
 	  <OutputType>Exe</OutputType>
+	  <StartupObject>Runner.Program</StartupObject>
 	  <TargetFramework>net9.0</TargetFramework>
+	  <LangVersion>latest</LangVersion>
 	  <ImplicitUsings>disable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
 	  <NoWarn>IDE0130</NoWarn>
    </PropertyGroup>
    <!--IDE0130: Folder structure-->
 
-   <!-- DEBUG configuration -->
-   <ItemGroup Condition="'$(Configuration)'=='Debug'">
-	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
+   <ItemGroup>
+	  <PackageReference Include="coverlet.collector" Version="6.0.4">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
+	  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+	  <PackageReference Include="xunit" Version="2.9.3" />
+	  <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
    </ItemGroup>
 
-   <!-- RELEASE configuration -->
-   <ItemGroup Condition="'$(Configuration)'=='Release'">
-	  <PackageReference Include="Yotei.Tools" Version="0.7.0" />
+   <ItemGroup>
+	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
+	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Tests\Yotei.Tools.Tests.csproj" />
    </ItemGroup>
 
 </Project>
