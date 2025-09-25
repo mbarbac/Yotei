@@ -12,7 +12,7 @@
 
    <PropertyGroup>
 	  <Description>Yotei Common Tools</Description>
-	  <Version>0.7.0-v0002</Version>
+	  <Version>0.7.0-v0001</Version>
 	  <Authors>mbarbac@hotmail.com</Authors>
 	  <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
 	  <IsPackable>true</IsPackable>
