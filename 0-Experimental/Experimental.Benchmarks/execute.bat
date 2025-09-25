@@ -15,13 +15,13 @@ echo.
 ::dotnet run -c debug
 
 :::LOCAL
-::echo EXECUTING IN 'LOCAL' MODE...
-::echo PLEASE SELECT THE TEST TO RUN:
-::dotnet run -c local
+echo EXECUTING IN 'LOCAL' MODE...
+echo PLEASE SELECT THE TEST TO RUN:
+dotnet run -c local
 
 :::RELEASE
 ::echo EXECUTING IN 'RELEASE' MODE...
-echo PLEASE SELECT THE TEST TO RUN:
-dotnet run -c release
+::echo PLEASE SELECT THE TEST TO RUN:
+::dotnet run -c release
 
 :::END
