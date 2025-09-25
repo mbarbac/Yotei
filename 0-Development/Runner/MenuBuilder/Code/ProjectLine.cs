@@ -46,10 +46,9 @@ public class ProjectLine
     /// <returns></returns>
     public bool Contains(
         string value,
-        bool trim = true,
         StringComparison comparison = StringComparison.OrdinalIgnoreCase)
     {
-        value = value.NotNullNotEmpty(trim);
+        value = value.NotNullNotEmpty(true);
         return Value.Contains(value, comparison);
     }
 
@@ -160,5 +159,93 @@ public class ProjectLine
         var head = $"<{delimiter}>";
         var tail = $"</{delimiter}>";
         return SetWrappedValue(head, tail, value, comparison);
+    }
+
+    // ----------------------------------------------------
+
+    const string PACKAGEREFERENCE = "<PackageReference";
+    const string INCLUDE = "Include=\"";
+    const string VERSION = "Version=\"";
+    const string TAIL = "\"";
+
+    /// <summary>
+    /// Determines if this line represents a NuGet package reference or not.
+    /// </summary>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public bool IsNuReference(
+        StringComparison comparison = StringComparison.OrdinalIgnoreCase)
+        => IsNuReference(out _, out _, comparison);
+
+    /// <summary>
+    /// Determines if this line represents a NuGet package reference and, if so, gets the package
+    /// name and version.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="version"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public bool IsNuReference(
+        [NotNullWhen(true)] out string? name, [NotNullWhen(true)] out SemanticVersion? version,
+        StringComparison comparison = StringComparison.OrdinalIgnoreCase)
+    {
+        name = null;
+        version = null;
+
+        if (!Contains(PACKAGEREFERENCE, comparison)) return false;
+        if (!GetWrappedValue(INCLUDE, TAIL, out name)) return false;
+        if ((name = name.NullWhenEmpty(true)) is null) return false;
+        if (!GetWrappedValue(VERSION, TAIL, out var temp)) return false;
+        if ((temp = temp.NullWhenEmpty(true)) is null) return false;
+        version = temp;
+        return true;
+    }
+
+    /// <summary>
+    /// Tries to get a NuGet package name from this line.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public bool GetNuName(
+        [NotNullWhen(true)] out string? name) => GetWrappedValue(INCLUDE, TAIL, out name);
+
+    /// <summary>
+    /// Sets the package name, provided this line represents a NuGet package.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public bool SetNuName(string name)
+    {
+        name = name.NotNullNotEmpty(true);
+        return SetWrappedValue(INCLUDE, TAIL, name);
+    }
+
+    /// <summary>
+    /// Tries to get a NuGet package version from this line.
+    /// </summary>
+    /// <param name="version"></param>
+    /// <returns></returns>
+    public bool GetNuVersion([NotNullWhen(true)] out SemanticVersion? version)
+    {
+        version = null;
+
+        var done = GetWrappedValue(VERSION, TAIL, out var temp);
+        if (!done) return false;
+
+        if ((temp = temp.NotNullNotEmpty(true)) is null) return false;
+        version = temp;
+        return true;
+    }
+
+    /// <summary>
+    /// Sets the package version, provided this line represents a NuGet package.
+    /// </summary>
+    /// <param name="version"></param>
+    /// <returns></returns>
+    public bool SetNuVersion(SemanticVersion version)
+    {
+        version.ThrowWhenNull();
+        if (version.IsEmpty) throw new ArgumentException("Version cannot be empty.");
+        return SetWrappedValue(VERSION, TAIL, version);
     }
 }

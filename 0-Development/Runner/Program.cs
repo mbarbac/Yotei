@@ -36,7 +36,7 @@ internal class Program
         {
             WriteLine(true);
             WriteLine(true, Green, FatSeparator);
-            WriteLine(true, Green, "Main Menu:");
+            WriteLine(true, Green, "Main Menu");
             option = new ConsoleMenu
             {
                 new("Exit"),

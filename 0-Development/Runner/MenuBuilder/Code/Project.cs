@@ -296,44 +296,4 @@ public class Project : IEnumerable<ProjectLine>
 
         return false;
     }
-
-    /*
-        foreach (var line in Lines)
-        {
-            if (line.GetXMLWrappedValue(VERSION, out var value))
-            {
-                version = new(value);
-                return true;
-            }
-        }
-
-        version = null;
-        return false;
-    }
-
-    /// <summary>
-    /// Tries to set the semantic version of this project file, using the current collection of
-    /// lines. If so, the old value is returned in the out argument.
-    /// </summary>
-    /// <param name="version"></param>
-    /// <param name="old"></param>
-    /// <returns></returns>
-    public bool SetVersion(SemanticVersion version, [NotNullWhen(true)] out SemanticVersion? old)
-    {
-        version.ThrowWhenNull();
-
-        foreach (var line in Lines)
-        {
-            if (!line.GetXMLWrappedValue(VERSION, out var temp)) continue;
-            if (line.SetXMLWrappedValue(VERSION, version))
-            {
-                old = temp;
-                return true;
-            }
-        }
-
-        old = null;
-        return false;
-    }
-    */
 }

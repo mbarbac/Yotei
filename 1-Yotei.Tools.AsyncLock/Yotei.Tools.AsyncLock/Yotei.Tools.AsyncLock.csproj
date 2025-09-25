@@ -5,28 +5,32 @@
 	  <LangVersion>latest</LangVersion>
 	  <ImplicitUsings>disable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
-	  <IsPackable>false</IsPackable>
 	  <Configurations>Debug;Release;Local</Configurations>
 	  <NoWarn>IDE0130</NoWarn>
    </PropertyGroup>
    <!--IDE0130: Folder structure-->
 
+   <PropertyGroup>
+	  <Description>Yotei AsyncLock</Description>
+	  <Version>0.7.0-v001</Version>
+	  <Authors>mbarbac@hotmail.com</Authors>
+	  <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
+	  <IsPackable>true</IsPackable>
+	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	  <IncludeSymbols>true</IncludeSymbols>
+	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	  <PackageReadmeFile>README.md</PackageReadmeFile>
+	  <PackageLicenseFile>LICENSE</PackageLicenseFile>
+   </PropertyGroup>
+
    <ItemGroup>
-	  <PackageReference Include="coverlet.collector" Version="6.0.4">
-	    <PrivateAssets>all</PrivateAssets>
-	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-	  </PackageReference>
-	  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-	  <PackageReference Include="xunit" Version="2.9.3" />
-	  <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4">
-	    <PrivateAssets>all</PrivateAssets>
-	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-	  </PackageReference>
+	  <None Include="README.md" Pack="true" PackagePath="" />
+	  <None Include="LICENSE" Pack="true" PackagePath="" />
    </ItemGroup>
 
    <!-- DEBUG configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Debug'">
-	  <ProjectReference Include="..\Yotei.Tools\Yotei.Tools.csproj" />
+	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
    </ItemGroup>
 
    <!-- RELEASE configuration -->

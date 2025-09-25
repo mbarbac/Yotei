@@ -8,6 +8,7 @@
 	  <Nullable>enable</Nullable>
 	  <ServerGarbageCollection>true</ServerGarbageCollection>
 	  <NoWarn>IDE0130;CA1822</NoWarn>
+	  <Configurations>Debug;Release;Local</Configurations>
    </PropertyGroup>
    <!--IDE0130: Folder structure-->
    <!--CA1822: Static methods-->
