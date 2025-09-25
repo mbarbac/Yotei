@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+   <PropertyGroup>
+	  <TargetFramework>net9.0</TargetFramework>
+	  <LangVersion>latest</LangVersion>
+	  <ImplicitUsings>disable</ImplicitUsings>
+	  <Nullable>enable</Nullable>
+	  <Configurations>Debug;Release;Local</Configurations>
+	  <NoWarn>IDE0130</NoWarn>
+   </PropertyGroup>
+   <!--IDE0130: Folder structure-->
+
+   <!-- DEBUG configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Debug'">
+	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
+	  <ProjectReference Include="..\..\1-Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser.csproj" />
+	  <ProjectReference Include="..\..\1-Yotei.Tools.AsyncLock\Yotei.Tools.AsyncLock\Yotei.Tools.AsyncLock.csproj" />
+   </ItemGroup>
+
+   <!-- RELEASE configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Release'">
+	  <PackageReference Include="Yotei.Tools" Version="0.7.0" />
+	  <PackageReference Include="Yotei.Tools.AsyncLock" Version="0.7.0" />
+	  <PackageReference Include="Yotei.Tools.LambdaParser" Version="0.7.0" />
+   </ItemGroup>
+
+   <!-- LOCAL configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Local'">
+	  <PackageReference Include="Yotei.Tools" Version="0.7.0-v0002" />
+	  <PackageReference Include="Yotei.Tools.AsyncLock" Version="0.7.0-v0001" />
+	  <PackageReference Include="Yotei.Tools.LambdaParser" Version="0.7.0-v0001" />
+   </ItemGroup>
+
+</Project>

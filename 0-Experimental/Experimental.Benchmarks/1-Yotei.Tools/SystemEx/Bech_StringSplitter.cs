@@ -1,4 +1,4 @@
-﻿namespace Yotei.Tools.Benchmarks;
+﻿namespace Experimental.Benchmarks;
 
 // ========================================================
 //[DisassemblyDiagnoser]

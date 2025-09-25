@@ -1,3 +1,5 @@
-﻿namespace Yotei.Tools.Benchmarks;
+﻿namespace Experimental;
 
 // ========================================================
+
+public interface IFake { }
