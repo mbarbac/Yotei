@@ -253,6 +253,14 @@ public class Project : IEnumerable<ProjectLine>
 
     /// <summary>
     /// Tries to set the semantic version of this project file, using the current collection of
+    /// lines.
+    /// </summary>
+    /// <param name="version"></param>
+    /// <returns></returns>
+    public bool SetVersion(SemanticVersion version) => SetVersion(version, out _);
+
+    /// <summary>
+    /// Tries to set the semantic version of this project file, using the current collection of
     /// lines. If so, the old value is returned in the out argument.
     /// </summary>
     /// <param name="version"></param>

@@ -32,6 +32,20 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yotei.Tools.AsyncLock", "1-
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yotei.Tools.AsyncLock.Tests", "1-Yotei.Tools.AsyncLock\Yotei.Tools.AsyncLock.Tests\Yotei.Tools.AsyncLock.Tests.csproj", "{78D3CA51-B84A-438D-BCA2-5E2DE7554F87}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2-Yotei.ORM", "2-Yotei.ORM", "{5A5D6506-5485-4495-AFEE-DBBFB3CB38B5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2-Yotei.ORM.Records", "2-Yotei.ORM.Records", "{D5790D2A-AD0E-4291-935E-1F5171AA7051}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2-Yotei.ORM.Entities", "2-Yotei.ORM.Entities", "{93CF0E64-8031-4096-8B1E-6D7B25300B62}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3-Yotei.ORM.Relational", "3-Yotei.ORM.Relational", "{D3782D74-CA99-4D7B-93F9-FE3F4D12BFF0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4-Yotei.ORM.SqlServer", "4-Yotei.ORM.SqlServer", "{893E2F6F-575C-4DD7-9EDF-D3AE4E5B53E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yotei.Tools.LambdaParser", "1-Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser.csproj", "{C6965545-200C-483C-965C-AF9855FCBA1B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yotei.Tools.LambdaParser.Tests", "1-Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser.Tests\Yotei.Tools.LambdaParser.Tests.csproj", "{AFA6E0BC-C32C-4568-BB08-2F8BB0560612}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +89,18 @@ Global
 		{78D3CA51-B84A-438D-BCA2-5E2DE7554F87}.Local|Any CPU.Build.0 = Local|Any CPU
 		{78D3CA51-B84A-438D-BCA2-5E2DE7554F87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78D3CA51-B84A-438D-BCA2-5E2DE7554F87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6965545-200C-483C-965C-AF9855FCBA1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6965545-200C-483C-965C-AF9855FCBA1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6965545-200C-483C-965C-AF9855FCBA1B}.Local|Any CPU.ActiveCfg = Local|Any CPU
+		{C6965545-200C-483C-965C-AF9855FCBA1B}.Local|Any CPU.Build.0 = Local|Any CPU
+		{C6965545-200C-483C-965C-AF9855FCBA1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6965545-200C-483C-965C-AF9855FCBA1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFA6E0BC-C32C-4568-BB08-2F8BB0560612}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFA6E0BC-C32C-4568-BB08-2F8BB0560612}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFA6E0BC-C32C-4568-BB08-2F8BB0560612}.Local|Any CPU.ActiveCfg = Local|Any CPU
+		{AFA6E0BC-C32C-4568-BB08-2F8BB0560612}.Local|Any CPU.Build.0 = Local|Any CPU
+		{AFA6E0BC-C32C-4568-BB08-2F8BB0560612}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFA6E0BC-C32C-4568-BB08-2F8BB0560612}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -86,6 +112,8 @@ Global
 		{DF267F36-C980-4105-97DD-6AB78D942733} = {916823FE-ADC3-44C0-9871-BF470B42899A}
 		{BB9B8456-C1B5-41A7-B997-45650FE57A35} = {C962A65C-C8E5-444F-B3A5-1F7CA9A43B45}
 		{78D3CA51-B84A-438D-BCA2-5E2DE7554F87} = {C962A65C-C8E5-444F-B3A5-1F7CA9A43B45}
+		{C6965545-200C-483C-965C-AF9855FCBA1B} = {8C7CAE23-AB8B-49F8-9414-0E323E296E0B}
+		{AFA6E0BC-C32C-4568-BB08-2F8BB0560612} = {8C7CAE23-AB8B-49F8-9414-0E323E296E0B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AEF42FAD-4726-4118-BC26-830FEC7FD440}

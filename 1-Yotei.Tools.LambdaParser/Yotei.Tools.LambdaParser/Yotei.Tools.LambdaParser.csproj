@@ -11,7 +11,7 @@
    <!--IDE0130: Folder structure-->
 
    <PropertyGroup>
-	  <Description>Yotei AsyncLock</Description>
+	  <Description>Yotei Dynamic Lambda Expression Parser</Description>
 	  <Version>0.7.0-v0001</Version>
 	  <Authors>mbarbac@hotmail.com</Authors>
 	  <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>

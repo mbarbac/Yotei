@@ -43,9 +43,9 @@ internal class Program
                 new MenuTester(breakOnError: true),
                 new MenuArtifacts(),
                 new MenuBuilder(),
-                new("Examples", () =>
-                {
-                })
+                //new("Examples", () =>
+                //{
+                //})
             }
             .Run(true, Green, Timeout);
         }

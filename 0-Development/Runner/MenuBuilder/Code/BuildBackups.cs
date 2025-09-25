@@ -23,48 +23,32 @@ public class BuildBackups
     // ----------------------------------------------------
 
     /// <summary>
-    /// Adds the given project to this collection. If it has been already added, an exception is
-    /// thrown.
+    /// Determines if this collection contains the given project and, if so, returns the list
+    /// of saved lines.
     /// </summary>
     /// <param name="project"></param>
-    public void Add(Project project)
+    /// <param name="lines"></param>
+    /// <returns></returns>
+    public bool Contains(Project project, [NotNullWhen(true)] out List<ProjectLine>? lines)
     {
         project.ThrowWhenNull();
 
-        if (Items.ContainsKey(project)) throw new DuplicateException(
-            "This collection already contains the given project.")
-            .WithData(project);
-
-        var lines = project.ToList();
-        Items.Add(project, lines);
+        var done = Items.TryGetValue(project, out lines);
+        return done;
     }
 
     /// <summary>
-    /// Tries to add the given project to this collection or, if it was already added, then just
-    /// ignore it.
+    /// Adds the given project to this collection, provided it has not been added yet, and
+    /// returns the list of saved lines.
     /// </summary>
     /// <param name="project"></param>
-    public void AddOrIgnore(Project project)
+    /// <returns></returns>
+    public List<ProjectLine> Add(Project project)
     {
         project.ThrowWhenNull();
 
-        if (Items.ContainsKey(project)) return;
-
-        var lines = project.ToList();
-        Items.Add(project, lines);
-    }
-
-    /// <summary>
-    /// Tries to add the given project to this collection. If it was already added, then updates
-    /// the saved collection of lines with the new ones from the project.
-    /// </summary>
-    /// <param name="project"></param>
-    public void AddOrUpdate(Project project)
-    {
-        project.ThrowWhenNull();
-
-        var lines = project.ToList();
-        Items[project] = lines;
+        if (!Items.ContainsKey(project)) Items.Add(project, []);
+        return Items[project];
     }
 
     /// <summary>

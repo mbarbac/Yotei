@@ -117,31 +117,4 @@ public class MenuBuilder : ConsoleMenuEntry
             }
         }
     }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Invoked to capture the desired build mode.
-    /// </summary>
-    /// <param name="mode"></param>
-    /// <returns></returns>
-    public static bool CaptureMode(ref BuildMode mode)
-    {
-        var option = new ConsoleMenu
-        {
-            new("Debug"),
-            new("Local"),
-            new("Release"),
-        }
-        .Run(true, Green, Program.Timeout);
-
-        switch (option)
-        {
-            case 0: mode = BuildMode.Debug; return true;
-            case 1: mode = BuildMode.Local; return true;
-            case 2: mode = BuildMode.Release; return true;
-        }
-
-        return false;
-    }
 }
