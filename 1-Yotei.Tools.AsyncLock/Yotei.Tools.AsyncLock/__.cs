@@ -1,5 +1,3 @@
-﻿namespace Yotei.Tools.AsyncLock;
+﻿namespace Yotei.Tools;
 
 // ========================================================
-
-public interface IFake { }

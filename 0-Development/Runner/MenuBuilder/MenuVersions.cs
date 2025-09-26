@@ -16,13 +16,13 @@ public class MenuVersions : ConsoleMenuEntry
         {
             var root = Program.GetSolutionDirectory();
             var projects = Program.FindProjects(root);
-            projects = projects.Where(x => x.GetVersion(out _)).ToList();
+            projects = [.. projects.Where(x => x.GetVersion(out _))];
             projects.Sort((x, y) => x.Name.CompareTo(y.Name));
 
             if (projects.Count == 0)
             {
                 WriteLine(true);
-                Write(true, Red, "No projects found from: "); WriteLine(true, root);
+                Write(true, Red, "No versioned projects found from: "); WriteLine(true, root);
                 return;
             }
 
@@ -38,7 +38,26 @@ public class MenuVersions : ConsoleMenuEntry
             if (option > 0)
             {
                 var project = projects[option - 1];
-                Execute(project);
+                var backups = new BuildBackups();
+                var saved = backups.Add(project);
+                saved.AddRange(project);
+
+                try { Execute(project, backups); }
+                catch (Exception ex)
+                {
+                    WriteLine(true);
+                    WriteLine(true, Red, "Exception intercepted:");
+                    WriteLine(true, ex.ToDisplayString());
+
+                    WriteLine(true);
+                    WriteLine(true, Green, Program.SlimSeparator);
+                    WriteLine(true, Green, "Reverting to previous state...");
+                    backups.Restore();
+
+                    WriteLine(true);
+                    Write(true, Green, "Press [Enter] to continue...");
+                    Console.ReadLine();
+                }
             }
         }
         while (option > 0);
@@ -49,9 +68,11 @@ public class MenuVersions : ConsoleMenuEntry
     /// <summary>
     /// Invoked to manage the version of the given project.
     /// </summary>
-    /// <param name="project"></param>
-    static void Execute(Project project)
+    static void Execute(Project project, BuildBackups backups)
     {
+        bool done;
+        string? str;
+
         WriteLine(true);
         WriteLine(true, Green, Program.SlimSeparator);
         Write(true, Green, "Project: "); WriteLine(true, project.NameVersion);
@@ -62,92 +83,69 @@ public class MenuVersions : ConsoleMenuEntry
             WriteLine(true, Red, "Cannot obtain the version of this project.");
             return;
         }
-        string str = original;
 
         WriteLine(true);
         Write(true, Green, "New version: ");
-        var done = EditLine(true, Program.Timeout, str, out str!);
+        done = EditLine(true, Program.Timeout, original, out str);
         if (!done || str is null || str.Length == 0) return;
+        var updated = new SemanticVersion(str);
 
-        // Executing under a backup umbrella...
-        var backups = new BuildBackups();
-        var saved = backups.Add(project);
-        saved.AddRange(project);
+        WriteLine(true);
+        Write(true, Green, "'Release' references ([Blank|Escape] to ignore): ");
+        done = EditLine(true, Program.Timeout, updated with { PreRelease = "" }, out str);
+        var reduced = new SemanticVersion(done ? str! : "");
 
-        try
+        Write(true, Green, "'Local' references ([Blank|Escape] to ignore):   ");
+        done = EditLine(true, Program.Timeout, updated.PreRelease.IsEmpty ? updated with { PreRelease = "v0001" } : updated, out str);
+        var enlarged = new SemanticVersion(done ? str! : "");
+
+        // Setting the project's version...
+        if (!project.SetVersion(updated)) throw new Exception("Cannot set project version.");
+        project.SaveContents();
+
+        // Updating references...
+        if (reduced.IsEmpty && enlarged.IsEmpty) return;
+
+        var root = Program.GetSolutionDirectory();
+        var items = Program.FindProjects(root);
+        var first = true;
+
+        foreach (var item in items)
         {
-            // Setting and saving the project's version...
-            var updated = new SemanticVersion(str);
-            var reduced = updated.PreRelease.IsEmpty ? updated : updated with { PreRelease = "" };
-            var enlarged = updated.PreRelease.IsEmpty ? updated with { PreRelease = "v0001" } : updated;
+            // Pre-saving state...
+            var temps = item.Select(x => new ProjectLine(x)).ToList();
+            var modified = false;
 
-            if (!project.SetVersion(updated))
+            // Iterating item's lines...
+            var ilines = item.Where(x => x.IsNuReference()).ToList();
+            foreach (var iline in ilines)
             {
-                WriteLine(true);
-                WriteLine(true, Red, "Cannot set the new version of this project.");
-                return;
-            }
-            project.SaveContents();
+                if (!iline.GetNuName(out var iname)) continue;
+                if (!iline.GetNuVersion(out var iversion)) continue;
+                if (string.Compare(project.Name, iname, ignoreCase: true) != 0) continue;
 
-            // Updating references in all solution's projects...
-            WriteLine(true);
-            WriteLine(true, Green, "Updating references... ");
-
-            var root = Program.GetSolutionDirectory();
-            var items = Program.FindProjects(root);
-            var first = true;
-
-            foreach (var item in items)
-            {
-                // Pre-saving state...
-                var temps = item.Select(x => new ProjectLine(x)).ToList();
-                var modified = false;
-
-                // Iterating through item's lines...
-                var ulines = item.Where(x => x.IsNuReference()).ToList();
-                foreach (var uline in ulines)
+                if (!modified) // First-time modification...
                 {
-                    if (!uline.GetNuName(out var uname)) continue;
-                    if (!uline.GetNuVersion(out var uversion)) continue;
-                    if (string.Compare(project.Name, uname, ignoreCase: true) != 0) continue;
+                    if (first) WriteLine(true);
+                    Write(true, Green, "Updating: "); WriteLine(true, item.NameExtension);
+                    first = false;
 
-                    if (!modified) // First-time modification...
-                    {
-                        if (first) WriteLine(true);
-                        Write(true, Green, "Modifying: "); WriteLine(true, item.NameExtension);
-                        first = false;
-
-                        saved = backups.Add(item);
-                        saved.Clear();
-                        saved.AddRange(temps);
-                        modified = true;
-                    }
-
-                    done = uversion.PreRelease.IsEmpty
-                        ? uline.SetNuVersion(reduced)
-                        : uline.SetNuVersion(enlarged);
-
-                    if (!done) throw new Exception($"Cannot modify line: {uline}");
+                    var saved = backups.Add(item);
+                    saved.Clear();
+                    saved.AddRange(temps);
+                    modified = true;
                 }
 
-                // If modified, saved the new contents...
-                if (modified) item.SaveContents();
+                done = iversion.PreRelease.IsEmpty switch
+                {
+                    true => reduced.IsEmpty || iline.SetNuVersion(reduced),
+                    false => enlarged.IsEmpty || iline.SetNuVersion(enlarged),
+                };
+                if (!done) throw new Exception($"Cannot modify line: {iline}");
             }
 
-        }
-        catch (Exception ex) // Intercepting failures and reverting to original state...
-        {
-            WriteLine(true);
-            WriteLine(true, Red, "Exception intercepted:");
-            WriteLine(true, ex.ToDisplayString());
-
-            WriteLine(true);
-            WriteLine(true, Red, "Reverting to previous state...");
-            backups.Restore();
-
-            WriteLine(true);
-            Write(true, Green, "Press [Enter] to continue...");
-            Console.ReadLine();
+            // If modified save contents...
+            if (modified) item.SaveContents();
         }
     }
 }

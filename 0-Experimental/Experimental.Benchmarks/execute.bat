@@ -9,19 +9,9 @@ echo.
 ::echo Selection: %input%
 ::goto END
 
-:::DEBUG
-::echo EXECUTING IN 'DEBUG' MODE...
-::echo PLEASE SELECT THE TEST TO RUN:
-::dotnet run -c debug
-
-:::LOCAL
-echo EXECUTING IN 'LOCAL' MODE...
+:RELEASE
+echo EXECUTING IN 'RELEASE' MODE...
 echo PLEASE SELECT THE TEST TO RUN:
-dotnet run -c local
-
-:::RELEASE
-::echo EXECUTING IN 'RELEASE' MODE...
-::echo PLEASE SELECT THE TEST TO RUN:
-::dotnet run -c release
+dotnet run -c release
 
 :::END

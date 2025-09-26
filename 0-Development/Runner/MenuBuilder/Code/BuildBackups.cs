@@ -72,7 +72,7 @@ public class BuildBackups
         WriteLine(true);
         foreach (var (project, lines) in Items)
         {
-            Write(true, Red, "Restoring project: ");
+            Write(true, Cyan, "Restoring project: ");
             WriteLine(project.Name);
 
             project.FromLines(lines);
