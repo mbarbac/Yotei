@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// Represents a holder for a test assembly.
+/// Represents a test assembly.
 /// </summary>
 public class AssemblyHolder
 {
@@ -10,10 +10,16 @@ public class AssemblyHolder
     /// Initializes a new instance.
     /// </summary>
     /// <param name="assembly"></param>
-    public AssemblyHolder(Assembly assembly) => Assembly = assembly.ThrowWhenNull();
+    public AssemblyHolder(Assembly assembly)
+    {
+        Assembly = assembly.ThrowWhenNull();
+        _ = Name;
+    }
 
     /// <inheritdoc/>
     public override string ToString() => Name;
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// The assembly this instance refers to.
@@ -23,7 +29,8 @@ public class AssemblyHolder
     /// <summary>
     /// The name of this assembly.
     /// </summary>
-    public string Name => Assembly.GetName().Name!;
+    public string Name => Assembly.GetName().Name
+        ?? throw new InvalidOperationException("Assembly name is null.");
 
     /// <summary>
     /// The list of type holders in this instance.

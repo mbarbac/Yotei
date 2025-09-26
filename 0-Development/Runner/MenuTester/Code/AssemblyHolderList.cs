@@ -2,11 +2,11 @@
 
 // ========================================================
 /// <summary>
-/// Represents a list-alike collection of test assembly holders.
+/// Represents a collection of test assemblies.
 /// </summary>
 public class AssemblyHolderList : IEnumerable<AssemblyHolder>
 {
-    readonly List<AssemblyHolder> _Items = [];
+    readonly List<AssemblyHolder> Items = [];
 
     /// <summary>
     /// Initializes a new instance.
@@ -16,37 +16,39 @@ public class AssemblyHolderList : IEnumerable<AssemblyHolder>
     /// <inheritdoc/>
     public override string ToString() => $"Count: {Count}";
 
+    // ----------------------------------------------------
+
     /// <inheritdoc/>
-    public IEnumerator<AssemblyHolder> GetEnumerator() => _Items.GetEnumerator();
+    public IEnumerator<AssemblyHolder> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /// <summary>
     /// Gets the number of elements in this collection.
     /// </summary>
-    public int Count => _Items.Count;
+    public int Count => Items.Count;
 
     /// <summary>
     /// Gets the element stored at the given index.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public AssemblyHolder this[int index] => _Items[index];
-
-    // ----------------------------------------------------
+    public AssemblyHolder this[int index] => Items[index];
 
     /// <summary>
-    /// Returns the holder whose case insensitive name is given, or null if any can be found.
+    /// Returns the holder whose case insentive name is given, or null if any can be found in this
+    /// collection.
     /// </summary>
     /// <param name="assemblyName"></param>
     /// <returns></returns>
     public AssemblyHolder? Find(string assemblyName)
     {
         assemblyName = assemblyName.NotNullNotEmpty(true);
-        return _Items.Find(x => string.Compare(assemblyName, x.Name, ignoreCase: true) == 0);
+        return Items.Find(x => string.Compare(assemblyName, x.Name, ignoreCase: true) == 0);
     }
 
     /// <summary>
-    /// Returns the holder whose assembly is given, or null if any can be found.
+    /// Returns the holder whose case insentive name matches the one of the given assembly, or
+    /// null if any can be found in this collection.
     /// </summary>
     /// <param name="assembly"></param>
     /// <returns></returns>
@@ -54,15 +56,12 @@ public class AssemblyHolderList : IEnumerable<AssemblyHolder>
     {
         assembly.ThrowWhenNull();
 
-        var name = assembly.GetName().Name ?? throw new ArgumentException(
-            "Assembly has not a valid name.")
-            .WithData(assembly);
-
+        var name = assembly.GetName().Name ?? throw new ArgumentNullException(nameof(assembly));
         return Find(name);
     }
 
     /// <summary>
-    /// Adds the given holder to this collection, or throws a duplicate exception.
+    /// Adds the given element to this collection.
     /// </summary>
     /// <param name="holder"></param>
     public void Add(AssemblyHolder holder)
@@ -73,22 +72,22 @@ public class AssemblyHolderList : IEnumerable<AssemblyHolder>
             "This collection already contains a duplicated element.")
             .WithData(holder);
 
-        _Items.Add(holder);
+        Items.Add(holder);
     }
 
     /// <summary>
-    /// Removes the given holder from this collection.
+    /// Removes the given element from this collection.
     /// </summary>
     /// <param name="holder"></param>
     /// <returns></returns>
     public bool Remove(AssemblyHolder holder)
     {
         holder.ThrowWhenNull();
-        return _Items.Remove(holder);
+        return Items.Remove(holder);
     }
 
     /// <summary>
     /// Clears this collection.
     /// </summary>
-    public void Clear() => _Items.Clear();
+    public void Clear() => Items.Clear();
 }

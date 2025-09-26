@@ -2,11 +2,11 @@
 
 // ========================================================
 /// <summary>
-/// Represents a list-alike collection of test class holders.
+/// Represents a collection of test types.
 /// </summary>
 public class TypeHolderList : IEnumerable<TypeHolder>
 {
-    readonly List<TypeHolder> _Items = [];
+    readonly List<TypeHolder> Items = [];
 
     /// <summary>
     /// Initializes a new instance.
@@ -16,53 +16,52 @@ public class TypeHolderList : IEnumerable<TypeHolder>
     /// <inheritdoc/>
     public override string ToString() => $"Count: {Count}";
 
+    // ----------------------------------------------------
+
     /// <inheritdoc/>
-    public IEnumerator<TypeHolder> GetEnumerator() => _Items.GetEnumerator();
+    public IEnumerator<TypeHolder> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /// <summary>
     /// Gets the number of elements in this collection.
     /// </summary>
-    public int Count => _Items.Count;
+    public int Count => Items.Count;
 
     /// <summary>
     /// Gets the element stored at the given index.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public TypeHolder this[int index] => _Items[index];
-
-    // ----------------------------------------------------
+    public TypeHolder this[int index] => Items[index];
 
     /// <summary>
-    /// Returns the holder whose type full name is given, or null if any can be found.
+    /// Returns the holder whose full name is given, or null if any can be found in this
+    /// collection.
     /// </summary>
     /// <param name="fullName"></param>
     /// <returns></returns>
     public TypeHolder? Find(string fullName)
     {
         fullName = fullName.NotNullNotEmpty(true);
-        return _Items.Find(x => string.Compare(fullName, x.FullName) == 0);
+        return Items.Find(x => string.Compare(fullName, x.Name) == 0);
     }
 
     /// <summary>
-    /// Returns the holder whose type is given, or null if any can be found.
+    /// Returns the holder whose case sensitive name matches the one of the given type, or
+    /// null if any can be found in this collection.
     /// </summary>
-    /// <param name="assembly"></param>
+    /// <param name="type"></param>
     /// <returns></returns>
     public TypeHolder? Find(Type type)
     {
         type.ThrowWhenNull();
 
-        var name = type.FullName ?? throw new ArgumentException(
-            "Cannot find the full name of the given type.")
-            .WithData(type);
-
+        var name = type.FullName ?? throw new ArgumentNullException(nameof(type));
         return Find(name);
     }
 
     /// <summary>
-    /// Adds the given holder to this collection, or throws a duplicate exception.
+    /// Adds the given element to this collection.
     /// </summary>
     /// <param name="holder"></param>
     public void Add(TypeHolder holder)
@@ -73,22 +72,22 @@ public class TypeHolderList : IEnumerable<TypeHolder>
             "This collection already contains a duplicated element.")
             .WithData(holder);
 
-        _Items.Add(holder);
+        Items.Add(holder);
     }
 
     /// <summary>
-    /// Removes the given holder from this collection.
+    /// Removes the given element from this collection.
     /// </summary>
     /// <param name="holder"></param>
     /// <returns></returns>
     public bool Remove(TypeHolder holder)
     {
         holder.ThrowWhenNull();
-        return _Items.Remove(holder);
+        return Items.Remove(holder);
     }
 
     /// <summary>
     /// Clears this collection.
     /// </summary>
-    public void Clear() => _Items.Clear();
+    public void Clear() => Items.Clear();
 }

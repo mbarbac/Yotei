@@ -2,13 +2,15 @@
 
 // ========================================================
 /// <summary>
-/// Represents a explicit inclusion or exclusion request.
+/// Represents an explicit inclusion or exclusion request.
 /// </summary>
 public class Request
 {
     /// <summary>
-    /// Initializes a new instance.
-    /// <br/> The three arguments, used as filters, must not be null simultaneously.
+    /// Initializes a new instance with the given filters, which can be null to be ignored. If a
+    /// filter ends with '*' then any element that starts with the given specification will be
+    /// considered a match. Otherwise, only exact matches are then considered.
+    /// <br/> Type and method names are case sensitive. Assemblies are case insensitive.
     /// </summary>
     /// <param name="assemblyName"></param>
     /// <param name="typeName"></param>
@@ -27,21 +29,22 @@ public class Request
 
     /// <inheritdoc/>
     public override string ToString()
-        => $"({AssemblyName ?? "-"}, {TypeName ?? "-"}, {MethodName ?? "-"})";
+        => $"({AssemblyName ?? "-"}.{TypeName ?? "-"}.{MethodName ?? "-"})";
+
+    // ----------------------------------------------------
 
     /// <summary>
-    /// The assembly name, or <c>null</c> if this filter is not used.
+    /// The assembly name, or '<c>null</c>' if this filter is not used.
     /// </summary>
     public string? AssemblyName { get; }
 
     /// <summary>
-    /// The type name, or <c>null</c> if this filter is not used.
-    /// <br/> Type names that ends with the value of this property are considered a match.
+    /// The type name, or '<c>null</c>' if this filter is not used.
     /// </summary>
     public string? TypeName { get; }
 
     /// <summary>
-    /// The method name, or <c>null</c> if this filter is not used.
+    /// The method name, or '<c>null</c>' if this filter is not used.
     /// </summary>
     public string? MethodName { get; }
 }

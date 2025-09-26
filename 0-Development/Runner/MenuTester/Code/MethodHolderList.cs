@@ -2,11 +2,11 @@
 
 // ========================================================
 /// <summary>
-/// Represents a list-alike collection of test method holders.
+/// Represents a collection of test methods.
 /// </summary>
 public class MethodHolderList : IEnumerable<MethodHolder>
 {
-    readonly List<MethodHolder> _Items = [];
+    readonly List<MethodHolder> Items = [];
 
     /// <summary>
     /// Initializes a new instance.
@@ -16,48 +16,51 @@ public class MethodHolderList : IEnumerable<MethodHolder>
     /// <inheritdoc/>
     public override string ToString() => $"Count: {Count}";
 
+    // ----------------------------------------------------
+
     /// <inheritdoc/>
-    public IEnumerator<MethodHolder> GetEnumerator() => _Items.GetEnumerator();
+    public IEnumerator<MethodHolder> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /// <summary>
     /// Gets the number of elements in this collection.
     /// </summary>
-    public int Count => _Items.Count;
+    public int Count => Items.Count;
 
     /// <summary>
     /// Gets the element stored at the given index.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public MethodHolder this[int index] => _Items[index];
-
-    // ----------------------------------------------------
+    public MethodHolder this[int index] => Items[index];
 
     /// <summary>
-    /// Returns the holder whose name is given, or null if any can be found.
+    /// Returns the holder whose name is given, or null if any can be found in this collection.
     /// </summary>
-    /// <param name="methodName"></param>
+    /// <param name="name"></param>
     /// <returns></returns>
-    public MethodHolder? Find(string methodName)
+    public MethodHolder? Find(string name)
     {
-        methodName = methodName.NotNullNotEmpty(true);
-        return _Items.Find(x => string.Compare(methodName, x.Name) == 0);
+        name = name.NotNullNotEmpty(true);
+        return Items.Find(x => string.Compare(name, x.Name) == 0);
     }
 
     /// <summary>
-    /// Returns the holder whose method is given, or null if any can be found.
+    /// Returns the holder whose case sensitive name matches the one of the given method, or
+    /// null if any can be found in this collection.
     /// </summary>
-    /// <param name="assembly"></param>
+    /// <param name="method"></param>
     /// <returns></returns>
     public MethodHolder? Find(MethodInfo method)
     {
         method.ThrowWhenNull();
-        return Find(method.Name);
+
+        var name = method.Name;
+        return Find(name);
     }
 
     /// <summary>
-    /// Adds the given holder to this collection, or throws a duplicate exception.
+    /// Adds the given element to this collection.
     /// </summary>
     /// <param name="holder"></param>
     public void Add(MethodHolder holder)
@@ -68,22 +71,22 @@ public class MethodHolderList : IEnumerable<MethodHolder>
             "This collection already contains a duplicated element.")
             .WithData(holder);
 
-        _Items.Add(holder);
+        Items.Add(holder);
     }
 
     /// <summary>
-    /// Removes the given holder from this collection.
+    /// Removes the given element from this collection.
     /// </summary>
     /// <param name="holder"></param>
     /// <returns></returns>
     public bool Remove(MethodHolder holder)
     {
         holder.ThrowWhenNull();
-        return _Items.Remove(holder);
+        return Items.Remove(holder);
     }
 
     /// <summary>
     /// Clears this collection.
     /// </summary>
-    public void Clear() => _Items.Clear();
+    public void Clear() => Items.Clear();
 }

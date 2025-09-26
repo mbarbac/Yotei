@@ -10,13 +10,13 @@ internal class Program
     public static readonly string SlimSeparator = new('-', 30);
     public static readonly TimeSpan Timeout = TimeSpan.FromSeconds(60);
 
-    public static RequestList Includes = [];
-    public static RequestList Excludes = [];
-
     public static string LocalRepoPath = @"C:\Dev\Packages";
 
     public static string NuGetRepoSource = @"https://api.nuget.org/v3/index.json";
     public static string LocalRepoSource = "Local";
+
+    public static RequestList Includes = [];
+    public static RequestList Excludes = [];
 
     /// <summary>
     /// Program entry point.
@@ -29,7 +29,7 @@ internal class Program
         DebugEx.AutoFlush = true;
 
         // Explicit includes and excludes...
-        //Includes.Add(new("xxx.Tests", null, null));
+        Excludes.Add(new(null, null, "Create*"));
 
         // Main menu...
         var option = 0; do

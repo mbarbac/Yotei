@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// Represents a holder for a test method
+/// Represents a test method.
 /// </summary>
 public class MethodHolder
 {
@@ -13,14 +13,15 @@ public class MethodHolder
     public MethodHolder(MethodInfo method)
     {
         Method = method.ThrowWhenNull();
-        IsEnforced = HasEnforcedAttribute(method);
 
-        if (!IsValidTestMethod(method))
-            throw new ArgumentException($"Type '{Name}' is not a valid test method.");
+        if (!IsValidTest(method)) throw new ArgumentException(
+            $"Method '{method.Name}' is not a valid test one.");
     }
 
     /// <inheritdoc/>
     public override string ToString() => Name;
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// The method this instance refers to.
@@ -33,9 +34,10 @@ public class MethodHolder
     public string Name => Method.Name;
 
     /// <summary>
-    /// Whether this instance shall be considered as an enforced one, or not.
+    /// Determines if this instance is decorated with the <see cref="EnforcedAttribute"/>.
     /// </summary>
-    public bool IsEnforced { get; set; }
+    public bool IsEnforced => _IsEnforced ??= HasEnforcedAttribute(Method);
+    bool? _IsEnforced;
 
     // ----------------------------------------------------
 
@@ -44,19 +46,16 @@ public class MethodHolder
     /// </summary>
     /// <param name="method"></param>
     /// <returns></returns>
-    public static bool HasEnforcedAttribute(MethodInfo method)
-    {
-        return method.ThrowWhenNull()
-            .GetCustomAttributes(true)
-            .Any(x => x.GetType().Name == nameof(EnforcedAttribute));
-    }
+    public static bool HasEnforcedAttribute(MethodInfo method) => method.ThrowWhenNull()
+        .GetCustomAttributes(true)
+        .Any(x => x.GetType().Name == nameof(EnforcedAttribute));
 
     /// <summary>
-    /// Determines if the given type is a valid test method.
+    /// Determines if the given method is a valid test one, or not.
     /// </summary>
     /// <param name="method"></param>
     /// <returns></returns>
-    public static bool IsValidTestMethod(MethodInfo method)
+    public static bool IsValidTest(MethodInfo method)
     {
         method.ThrowWhenNull();
 
@@ -64,7 +63,7 @@ public class MethodHolder
         var pars = method.GetParameters();
         if (pars.Length != 0) return false;
 
-        // Decorated method...
+        // [Fact] decorated method...
         var attrs = method.GetCustomAttributes(typeof(FactAttribute), true);
         if (attrs.Length == 0) return false;
 

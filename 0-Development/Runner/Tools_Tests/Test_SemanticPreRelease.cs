@@ -224,7 +224,7 @@ public static class Test_SemanticPreRelease
 
     //[Enforced]
     [Fact]
-    public static void Test_Equals()
+    public static void Test_Equality()
     {
         var source = new SemanticPreRelease();
         var target = new SemanticPreRelease();

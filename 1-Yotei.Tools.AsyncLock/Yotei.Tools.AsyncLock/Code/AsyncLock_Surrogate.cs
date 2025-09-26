@@ -1,7 +1,4 @@
-﻿using static Yotei.Tools.Diagnostics.DebugEx;
-using static System.ConsoleColor;
-
-namespace Yotei.Tools;
+﻿namespace Yotei.Tools;
 
 partial class AsyncLock
 {
@@ -79,12 +76,12 @@ partial class AsyncLock
                         // Capturing the lock...
                         if (Parent.AsyncId == 0)
                         {
-                            WriteLine(true, $"Capturing Sync: {this}");
+                            Print($"Capturing Sync: {this}");
                             Parent.ThreadId = EnvironmentId;
                             Parent.AsyncId = AsyncHolder.Value;
                             Parent.Count++;
 
-                            WriteLine(true, $"Captured Sync: {this}");
+                            Print($"Captured Sync: {this}");
                             Captured = true;
                             break;
                         }
@@ -92,11 +89,11 @@ partial class AsyncLock
                         // Increasing the lock...
                         if (Parent.AsyncId == OldAsyncId)
                         {
-                            WriteLine(true, $"Increasing Sync: {this}");
+                            Print($"Increasing Sync: {this}");
                             Parent.AsyncId = AsyncHolder.Value;
                             Parent.Count++;
 
-                            WriteLine(true, $"Increased Sync: {this}");
+                            Print($"Increased Sync: {this}");
                             Captured = true;
                             break;
                         }
@@ -140,7 +137,7 @@ partial class AsyncLock
                 Parent.Semaphore.Wait();
                 try
                 {
-                    WriteLine(true, Gray, $"Disposing Sync: {this}");
+                    Print(ConsoleColor.Gray, $"Disposing Sync: {this}");
 
                     Parent.Count--;
                     Parent.ThreadId = Parent.Count == 0 ? 0 : OldThreadId;
@@ -183,12 +180,12 @@ partial class AsyncLock
                         // Capturing the lock...
                         if (Parent.AsyncId == 0)
                         {
-                            WriteLine(true, $"Capturing Async: {this}");
+                            Print($"Capturing Async: {this}");
                             Parent.ThreadId = EnvironmentId;
                             Parent.AsyncId = AsyncHolder.Value;
                             Parent.Count++;
 
-                            WriteLine(true, $"Captured Async: {this}");
+                            Print($"Captured Async: {this}");
                             Captured = true;
                             break;
                         }
@@ -196,11 +193,11 @@ partial class AsyncLock
                         // Increasing the lock...
                         if (Parent.AsyncId == OldAsyncId)
                         {
-                            WriteLine(true, $"Increasing Async: {this}");
+                            Print($"Increasing Async: {this}");
                             Parent.AsyncId = AsyncHolder.Value;
                             Parent.Count++;
 
-                            WriteLine(true, $"Increased Async: {this}");
+                            Print($"Increased Async: {this}");
                             Captured = true;
                             break;
                         }
@@ -244,7 +241,7 @@ partial class AsyncLock
                 await Parent.Semaphore.WaitAsync().ConfigureAwait(false);
                 try
                 {
-                    WriteLine(true, Gray, $"Disposing Async: {this}");
+                    Print(ConsoleColor.Gray, $"Disposing Async: {this}");
 
                     Parent.Count--;
                     Parent.ThreadId = Parent.Count == 0 ? 0 : OldThreadId;
@@ -258,5 +255,14 @@ partial class AsyncLock
                 }
             }
         }
+
+        // ------------------------------------------------
+
+        [Conditional("DEBUG_ASYNC_LOCK")]
+        public static void Print(string message) => DebugEx.WriteLine(true, message);
+
+        [Conditional("DEBUG_ASYNC_LOCK")]
+        public static void Print(
+        ConsoleColor color, string message) => DebugEx.WriteLine(true, color, message);
     }
 }

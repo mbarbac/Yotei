@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// Represents a holder for a test class.
+/// Represents a test type.
 /// </summary>
 public class TypeHolder
 {
@@ -13,19 +13,25 @@ public class TypeHolder
     public TypeHolder(Type type)
     {
         Type = type.ThrowWhenNull();
-        IsEnforced = HasEnforcedAttribute(type);
 
-        if (!IsValidTestClass(type))
-            throw new ArgumentException($"Type '{Type.Name}' is not a valid test class.");
+        if (!IsValidTest(type)) throw new ArgumentException(
+            $"Type '{type.Name}' is not a valid test one.");
     }
 
     /// <inheritdoc/>
-    public override string ToString() => Type.Name;
+    public override string ToString() => Name;
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// The class this instance refers to.
     /// </summary>
     public Type Type { get; }
+
+    /// <summary>
+    /// The name of this Type.
+    /// </summary>
+    public string Name => Type.Name;
 
     /// <summary>
     /// The full name of this type, including its namespace.
@@ -38,9 +44,10 @@ public class TypeHolder
     public string AssemblyQualifiedName => Type.AssemblyQualifiedName!;
 
     /// <summary>
-    /// Whether this instance shall be considered as an enforced one, or not.
+    /// Determines if this instance is decorated with the <see cref="EnforcedAttribute"/>.
     /// </summary>
-    public bool IsEnforced { get; set; }
+    public bool IsEnforced => _IsEnforced ??= HasEnforcedAttribute(Type);
+    bool? _IsEnforced;
 
     /// <summary>
     /// The collection of method holders in this instance.
@@ -54,21 +61,18 @@ public class TypeHolder
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
-    public static bool HasEnforcedAttribute(Type type)
-    {
-        return type.ThrowWhenNull()
-            .GetCustomAttributes(true)
-            .Any(x => x.GetType().Name == nameof(EnforcedAttribute));
-    }
+    public static bool HasEnforcedAttribute(Type type) => type.ThrowWhenNull()
+        .GetCustomAttributes(true)
+        .Any(x => x.GetType().Name == nameof(EnforcedAttribute));
 
     /// <summary>
-    /// Determines if the given type is a valid test class.
+    /// Determines if the given type is a valid test one, or not.
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
-    public static bool IsValidTestClass(Type type)
+    public static bool IsValidTest(Type type)
     {
-        type.ThrowWhenNull();
-        return type.IsClass;
+        // Type must be  class...
+        return type.ThrowWhenNull().IsClass;
     }
 }
