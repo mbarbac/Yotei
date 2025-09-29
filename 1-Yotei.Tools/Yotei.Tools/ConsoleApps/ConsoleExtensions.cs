@@ -1,6 +1,4 @@
-﻿using System.IO.Pipes;
-
-namespace Yotei.Tools;
+﻿namespace Yotei.Tools;
 
 // =============================================================
 public static class ConsoleExtensions

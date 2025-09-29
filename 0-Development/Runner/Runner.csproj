@@ -6,7 +6,9 @@
 	  <LangVersion>preview</LangVersion>
 	  <ImplicitUsings>disable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
+	  <NoWarn>IDE0130</NoWarn>
    </PropertyGroup>
+   <!--IDE0130: Folder structure-->
 
    <ItemGroup>
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
