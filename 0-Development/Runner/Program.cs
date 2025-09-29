@@ -12,7 +12,13 @@ internal class Program
     /// <param name="args"></param>
     static void Main(string[] args)
     {
-        Console.Write(ConsoleColor.Green, "0}", ["Hello "]);
+        Ambient.AddConsoleListener();
+        Debug.AutoFlush = true;
+
+        Console.WriteEx(true, ConsoleColor.Green, "{0} ", ["Hello"]);
+        Console.WriteLineEx(true, ConsoleColor.Yellow, "World!");
+
+        Debug.WriteLineEx(true, "From debug!");
         Console.ReadLine();
     }
 }

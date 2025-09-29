@@ -3,21 +3,22 @@
 // =============================================================
 public static class StringExtensions
 {
-    /// <summary>
-    /// Returns null if the given source string is null or empty, or the resulting string after
-    /// trimming it, if such is requested.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="trim"></param>
-    /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string? NullWhenEmpty(this string? source, bool trim)
+    extension(string? source)
     {
-        return trim switch
+        /// <summary>
+        /// Returns null if this source string is null or empty, or the resulting string after
+        /// trimming it, if such is requested.
+        /// </summary>
+        /// <param name="trim"></param>
+        /// <returns></returns>
+        public string? NullWhenEmpty(bool trim)
         {
-            true => string.IsNullOrWhiteSpace(source) ? null : source.Trim(),
-            false => string.IsNullOrWhiteSpace(source) ? null : source
-        };
+            return trim switch
+            {
+                true => string.IsNullOrWhiteSpace(source) ? null : source.Trim(),
+                false => string.IsNullOrWhiteSpace(source) ? null : source
+            };
+        }
     }
 
     /// <summary>
@@ -29,14 +30,13 @@ public static class StringExtensions
     /// <param name="trim"></param>
     /// <param name="description"></param>
     /// <returns></returns>
-    /// <exception cref="EmptyException"></exception>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    /// Need to be placed outside extension block for CallerArgumentExpression to work.
     public static string NotNullNotEmpty(
         this string? source,
         bool trim,
         [CallerArgumentExpression(nameof(source))] string? description = null)
     {
-        description = description.NullWhenEmpty(true) ?? nameof(description);
+        description = description.NullWhenEmpty(true) ?? nameof(source);
 
         source.ThrowWhenNull();
         source = source.NullWhenEmpty(trim);

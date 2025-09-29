@@ -1,4 +1,4 @@
-﻿namespace Yotei.Tools;
+﻿namespace Yotei.Tools.Diagnostics;
 
 // =============================================================
 /// <summary>
@@ -8,6 +8,7 @@ public static class Ambient
 {
     static TraceListener? Listener = null;
     static bool Computed = false;
+    static readonly object Lock = new();
 
     /// <summary>
     /// Determines if there is a console-alike listener registered in the collection of trace
@@ -31,13 +32,16 @@ public static class Ambient
         [NotNullWhen(true)] out TraceListener? listener,
         bool recompute = false)
     {
-        if (!Computed || recompute)
+        lock (Lock)
         {
-            Listener = GetConsoleListeners().FirstOrDefault();
-            Computed = true;
+            if (!Computed || recompute)
+            {
+                Listener = GetConsoleListeners().FirstOrDefault();
+                Computed = true;
+            }
+            listener = Listener;
+            return listener is not null;
         }
-        listener = Listener;
-        return listener is not null;
     }
 
     /// <summary>
@@ -46,12 +50,17 @@ public static class Ambient
     /// <returns></returns>
     public static IEnumerable<TraceListener> GetConsoleListeners()
     {
-        foreach (var item in Trace.Listeners)
+        Monitor.Enter(Lock);
+        try
         {
-            if (item is TextWriterTraceListener temp &&
-                ReferenceEquals(Console.Out, temp.Writer))
-                yield return temp;
+            foreach (var item in Trace.Listeners)
+            {
+                if (item is TextWriterTraceListener temp &&
+                    ReferenceEquals(Console.Out, temp.Writer))
+                    yield return temp;
+            }
         }
+        finally { Monitor.Exit(Lock); }
     }
 
     /// <summary>
@@ -70,17 +79,32 @@ public static class Ambient
     /// <returns></returns>
     public static TraceListener? AddConsoleListener(out bool created)
     {
-        var items = GetConsoleListeners().ToArray();
-        if (items.Length == 0)
+        lock (Lock)
         {
-            var item = new TextWriterTraceListener(Console.Out);
-            Trace.Listeners.Add(item);
-            created = true;
-            return item;
+            var items = GetConsoleListeners().ToArray();
+            if (items.Length == 0)
+            {
+                var item = new TextWriterTraceListener(Console.Out);
+                Trace.Listeners.Add(item);
+                created = true;
+                return item;
+            }
+            created = false;
+            return items[0];
         }
+    }
 
-        created = false;
-        return items[0];
+    /// <summary>
+    /// Adds to the collection of trace listeners the listeners from the given range.
+    /// </summary>
+    /// <param name="range"></param>
+    public static void AddListeners(IEnumerable<TraceListener> range)
+    {
+        lock (Lock)
+        {
+            range.ThrowWhenNull();
+            foreach (var item in range) Trace.Listeners.Add(item);
+        }
     }
 
     /// <summary>
@@ -89,7 +113,10 @@ public static class Ambient
     /// <param name="range"></param>
     public static void RemoveListeners(IEnumerable<TraceListener> range)
     {
-        range.ThrowWhenNull();
-        foreach (var item in range) Trace.Listeners.Remove(item);
+        lock (Lock)
+        {
+            range.ThrowWhenNull();
+            foreach (var item in range) Trace.Listeners.Remove(item);
+        }
     }
 }

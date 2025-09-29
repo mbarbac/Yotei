@@ -4,13 +4,14 @@
 public static class ObjectExtensions
 {
     /// <summary>
-    /// Throws an <see cref="ArgumentNullException"/> when the given value is null. Otherise,
+    /// Throws an <see cref="ArgumentNullException"/> when the given value is null. Otherwise,
     /// returns the given value.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="value"></param>
     /// <param name="description"></param>
     /// <returns></returns>
+    /// Need to place outside extension block for CallerArgumentExpression to work.
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T ThrowWhenNull<T>(
         [AllowNull] this T value,
