@@ -17,8 +17,12 @@ internal class Program
 
         Console.WriteEx(true, ConsoleColor.Green, "{0} ", ["Hello"]);
         Console.WriteLineEx(true, ConsoleColor.Yellow, "World!");
-
         Debug.WriteLineEx(true, "From debug!");
+
+        Console.ReadKey(TimeSpan.FromSeconds(5));
+        Console.WriteLine();
+
+        Console.Write("Press ENTER to exit...");
         Console.ReadLine();
     }
 }

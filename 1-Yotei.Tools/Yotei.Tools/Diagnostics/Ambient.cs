@@ -8,7 +8,11 @@ public static class Ambient
 {
     static TraceListener? Listener = null;
     static bool Computed = false;
-    static readonly object Lock = new();
+
+    /// <summary>
+    /// The object used for locking access to static members of this class.
+    /// </summary>
+    internal static object Lock { get; } = new();
 
     /// <summary>
     /// Determines if there is a console-alike listener registered in the collection of trace

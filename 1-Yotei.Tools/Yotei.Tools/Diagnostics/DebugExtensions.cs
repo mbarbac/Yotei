@@ -6,6 +6,25 @@ public static class DebugExtensions
     extension(Debug)
     {
         /// <summary>
+        /// Writes the given message, formatted using the given arguments, if any.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="args"></param>
+        [Conditional("DEBUG")]
+        public static void WriteEx(
+            [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string message,
+            params object?[]? args)
+        {
+            message ??= string.Empty;
+            args ??= [null];
+            if (args.Length > 0) message = string.Format(message, args);
+
+            Debug.Write(message);
+        }
+
+        // -----------------------------------------------------
+
+        /// <summary>
         /// Writes the given message, formatted using the given arguments, if any, and optionally
         /// replicates it to the console (provided there is no console-alike listener registered).
         /// </summary>
@@ -22,9 +41,8 @@ public static class DebugExtensions
             args ??= [null];
             if (args.Length > 0) message = string.Format(message, args);
             
-            Debug.Write(message);
+            WriteEx(message);
 
-            // To console: only if requested and if there are no console-alike listeners...
             if (console)
             {
                 if (Ambient.IsConsoleListener()) return;
@@ -90,6 +108,24 @@ public static class DebugExtensions
 
         /// <summary>
         /// Writes the given message, formatted using the given arguments, if any, followed by the
+        /// current line terminator.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="args"></param>
+        [Conditional("DEBUG")]
+        public static void WriteLineEx(
+            [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string message,
+            params object?[]? args)
+        {
+            message ??= string.Empty;
+            args ??= [null];
+            if (args.Length > 0) message = string.Format(message, args);
+
+            Debug.WriteLine(message);
+        }
+
+        /// <summary>
+        /// Writes the given message, formatted using the given arguments, if any, followed by the
         /// current line terminator, and optionally replicates it to the console (provided there is
         /// no console-alike listener registered).
         /// </summary>
@@ -106,9 +142,8 @@ public static class DebugExtensions
             args ??= [null];
             if (args.Length > 0) message = string.Format(message, args);
 
-            Debug.WriteLine(message);
+            WriteLineEx(message);
 
-            // To console: only if requested and if there are no console-alike listeners...
             if (console)
             {
                 if (Ambient.IsConsoleListener()) return;
