@@ -12,6 +12,7 @@ public class ClearLocalPackages : ConsoleMenuEntry
     /// <inheritdoc/>
     public override void Execute()
     {
+        Console.Clear();
         WriteLine(true);
         WriteLine(true, Green, Program.FatSeparator);
         WriteLine(true, Green, Header());

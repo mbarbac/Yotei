@@ -12,6 +12,7 @@ public class MenuPackages : ConsoleMenuEntry
     /// <inheritdoc/>
     public override void Execute()
     {
+        Console.Clear();
         var position = 0; do
         {
             WriteLine(true);

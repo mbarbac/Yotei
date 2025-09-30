@@ -46,11 +46,11 @@ internal class Program
                 new MenuTester(breakOnError: true),
                 new MenuArtifacts(),
                 new MenuPackages(),
-                new("Examples", () =>
-                {
-                    Write(Green, "Directory: "); path = EditDirectory(path);
-                    Write(Cyan, "Editted: "); WriteLine(path ?? "<null>");
-                }),
+                //new("Examples", () =>
+                //{
+                //    Write(Green, "Directory: "); path = EditDirectory(path);
+                //    Write(Cyan, "Editted: "); WriteLine(path ?? "<null>");
+                //}),
             }
             .Run(MenuOptions, position);
         }

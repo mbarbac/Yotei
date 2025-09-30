@@ -17,6 +17,7 @@ public class ClearDiskArtifacts : ConsoleMenuEntry
     /// <inheritdoc/>
     public override void Execute()
     {
+        Console.Clear();
         WriteLine(true);
         WriteLine(true, Green, Program.SlimSeparator);
         WriteLine(true, Green, Header());
