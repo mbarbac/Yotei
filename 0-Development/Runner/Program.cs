@@ -1,4 +1,8 @@
-﻿namespace Runner;
+﻿using static Yotei.Tools.ConsoleEx;
+using static System.ConsoleColor;
+using Debug = Yotei.Tools.Diagnostics.DebugEx;
+
+namespace Runner;
 
 // =============================================================
 /// <summary>
@@ -6,6 +10,10 @@
 /// </summary>
 internal class Program
 {
+    public static readonly string FatSeparator = new('*', 50);
+    public static readonly string SlimSeparator = new('-', 30);
+    public static readonly TimeSpan Timeout = TimeSpan.FromSeconds(60);
+
     /// <summary>
     /// Program entry point.
     /// </summary>
@@ -13,16 +21,28 @@ internal class Program
     static void Main(string[] args)
     {
         Ambient.AddConsoleListener();
+        Debug.IndentSize = 2;
         Debug.AutoFlush = true;
 
-        Console.WriteEx(true, ConsoleColor.Green, "{0} ", ["Hello"]);
-        Console.WriteLineEx(true, ConsoleColor.Yellow, "World!");
-        Debug.WriteLineEx(true, "From debug!");
+        var options = new ConsoleMenuOptions() with { Debug = true, Timeout = Timeout };
+        var position = 0; do
+        {
+            WriteLine(true);
+            WriteLine(true, Green, FatSeparator);
+            WriteLine(true, Green, "Main Menu");
+            WriteLine(true);
 
-        Console.ReadKey(TimeSpan.FromSeconds(5));
-        Console.WriteLine();
-
-        Console.Write("Press ENTER to exit...");
-        Console.ReadLine();
+            position = new ConsoleMenu
+            {
+                new("Exit"),
+                new("Manage Artifacts"),
+                new("Manage Project Packages"),
+                new("Examples", () =>
+                {
+                }),
+            }
+            .Run(options, position);
+        }
+        while (position > 0);
     }
 }
