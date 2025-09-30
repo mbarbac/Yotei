@@ -195,7 +195,7 @@ public static class DebugEx
     /// <summary>
     /// Returns a header with the given number of spaces.
     /// </summary>
-    static string Header(int size)
+    internal static string Header(int size)
     {
         switch (size)
         {

@@ -10,7 +10,7 @@ public static class ConsoleEx
     /// Executes the given action in an ambient with no console listeners.
     /// </summary>
     /// <param name="action"></param>
-    public static void WithNoConsoleListeners(Action action)
+    internal static void WithNoConsoleListeners(Action action)
     {
         action.ThrowWhenNull();
 
@@ -308,6 +308,13 @@ public static class ConsoleEx
 
     // ---------------------------------------------------------
 
+    // It bothers me that the first parameter of the standard 'ReadKey(...)' method is a boolean
+    // one ('intercepts') because when 'debug' is used in all 'ConsoleEx' methods it appears as
+    // the first one. As the idea is that 'ConsoleEx' mimics the standard APIs we have very no
+    // that much room to manouver: we've decided to include 'debug' as the 2nd parameter after
+    // the 1st 'intercept' one. If only one boolean is used, it is a pitty, but it is the standard
+    // intercept one.
+
     /// <summary>
     /// Waits to read from the console the next character or function key pressed by the user
     /// and displays it.
@@ -396,5 +403,304 @@ public static class ConsoleEx
             }
             Thread.Sleep(1);
         }
+    }
+
+    // ---------------------------------------------------------
+
+    /// <summary>
+    /// Edits in the console the given source string (null ones are translated into empty ones),
+    /// and returns the result of that editing, or null if it was cancelled or if the timeout has
+    /// expired. Replicates the result to the not console-alike debug outputs if requested.
+    /// </summary>
+    /// <param name="debug"></param>
+    /// <param name="timeout"></param>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static string? EditLine(bool debug, TimeSpan timeout, string? source)
+    {
+        var size = Console.CursorSize;
+        var left = Console.CursorLeft;
+        var insert = false;
+
+        var sb = new StringBuilder(source ?? string.Empty);
+        var pos = sb.Length;
+        int len;
+
+        SetInsert(false);
+        ShowLine(pos);
+        while (true)
+        {
+            var info = ReadKey(true, false, timeout);
+            info ??= new('\0', ConsoleKey.Escape, false, false, false);
+
+            // Special keys...
+            switch (info.Value.Key)
+            {
+                case ConsoleKey.Enter:
+                    SetInsert(false);
+                    Console.WriteLine();
+                    if (debug) WithNoConsoleListeners(() => Debug.WriteLine(sb.ToString()));
+                    return sb.ToString();
+
+                case ConsoleKey.Escape:
+                    SetInsert(false);
+                    len = sb.Length; sb.Clear(); ShowLine(0, len);
+                    Console.WriteLine();
+                    return null;
+
+                case ConsoleKey.Insert:
+                    SetInsert(!insert);
+                    break;
+
+                case ConsoleKey.Home:
+                    pos = 0;
+                    Console.CursorLeft = left + pos;
+                    break;
+
+                case ConsoleKey.End:
+                    pos = sb.Length;
+                    Console.CursorLeft = left + pos;
+                    break;
+
+                case ConsoleKey.Delete:
+                    if (pos >= sb.Length) break;
+                    len = sb.Length;
+                    sb.Remove(pos, 1);
+                    ShowLine(pos, len);
+                    break;
+
+                case ConsoleKey.Backspace:
+                    if (pos == 0) break;
+                    len = sb.Length;
+                    sb.Remove(--pos, 1);
+                    ShowLine(pos, len);
+                    break;
+
+                case ConsoleKey.LeftArrow:
+                    if (info.Value.Modifiers.HasFlag(ConsoleModifiers.Control))
+                    {
+                        if (pos == 0) break;
+                        var ascii = char.IsLetterOrDigit(sb[pos - 1]);
+                        while (pos > 0)
+                        {
+                            var temp = char.IsLetterOrDigit(sb[pos - 1]);
+                            if (temp == ascii) { pos--; Console.CursorLeft--; }
+                            else break;
+                        }
+                    }
+                    else
+                    {
+                        if (pos > 0) { pos--; Console.CursorLeft--; }
+                    }
+                    break;
+
+                case ConsoleKey.RightArrow:
+                    if (info.Value.Modifiers.HasFlag(ConsoleModifiers.Control))
+                    {
+                        if (pos >= sb.Length) break;
+                        var ascii = char.IsLetterOrDigit(sb[pos]);
+                        while (pos < sb.Length)
+                        {
+                            var temp = char.IsLetterOrDigit(sb[pos]);
+                            if (temp == ascii) { pos++; Console.CursorLeft++; }
+                            else break;
+                        }
+                    }
+                    else
+                    {
+                        if (pos < sb.Length) { pos++; Console.CursorLeft++; }
+                    }
+                    break;
+            }
+
+            // Standard keys...
+            if (info.Value.KeyChar < ' ') continue;
+
+            if (insert)
+            {
+                sb.Insert(pos, info.Value.KeyChar);
+                ShowLine(++pos);
+                continue;
+            }
+
+            if (pos < sb.Length)
+            {
+                sb[pos] = info.Value.KeyChar;
+                ShowLine(++pos);
+            }
+            else
+            {
+                sb.Append(info.Value.KeyChar);
+                Console.Write(info.Value.KeyChar);
+                pos++;
+            }
+        }
+
+        /// <summary>
+        /// Sets the insert mode to ON (true) of OFF (false).
+        /// </summary>
+        void SetInsert(bool value)
+        {
+            var windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            if (windows) Console.CursorSize = value ? 100 : size;
+            insert = value;
+        }
+
+        /// <summary>
+        /// Shows the current value, clears up to remaining len, and sets cursos position.
+        /// </summary>
+        void ShowLine(int pos, int len = 0)
+        {
+            Console.CursorLeft = left;
+            Console.Write(sb);
+
+            len -= sb.Length;
+            if (len > 0) Console.Write(DebugEx.Header(len));
+            Console.CursorLeft = left + pos;
+        }
+    }
+
+    /// <summary>
+    /// Edits in the console the given source string (null ones are translated into empty ones),
+    /// and returns the result of that editing, or null if it was cancelled or if the timeout has
+    /// expired. Replicates the result to the not console-alike debug outputs if requested.
+    /// </summary>
+    /// <param name="debug"></param>
+    /// <param name="forecolor"></param>
+    /// <param name="timeout"></param>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static string? EditLine(
+        bool debug, ConsoleColor forecolor, TimeSpan timeout, string? source)
+    {
+        var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
+        var result = EditLine(debug, timeout, source);
+        Console.ForegroundColor = oldfore;
+        return result;
+    }
+
+    /// <summary>
+    /// Edits in the console the given source string (null ones are translated into empty ones),
+    /// and returns the result of that editing, or null if it was cancelled or if the timeout has
+    /// expired. Replicates the result to the not console-alike debug outputs if requested.
+    /// </summary>
+    /// <param name="debug"></param>
+    /// <param name="forecolor"></param>
+    /// <param name="backcolor"></param>
+    /// <param name="timeout"></param>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static string? EditLine(
+        bool debug,
+        ConsoleColor forecolor, ConsoleColor backcolor, TimeSpan timeout, string? source)
+    {
+        var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
+        var oldback = Console.BackgroundColor; Console.BackgroundColor = backcolor;
+        var result = EditLine(debug, timeout, source);
+        Console.ForegroundColor = oldfore;
+        Console.BackgroundColor = oldback;
+        return result;
+    }
+
+    // ---------------------------------------------------------
+
+    /// <summary>
+    /// Edits in the console the given source string (null ones are translated into empty ones),
+    /// and returns the result of that editing, or null if it was cancelled or if the timeout has
+    /// expired.
+    /// </summary>
+    /// <param name="timeout"></param>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static string? EditLine(
+        TimeSpan timeout, string? source) => EditLine(false, timeout, source);
+
+    /// <summary>
+    /// Edits in the console the given source string (null ones are translated into empty ones),
+    /// and returns the result of that editing, or null if it was cancelled or if the timeout has
+    /// expired.
+    /// </summary>
+    /// <param name="forecolor"></param>
+    /// <param name="timeout"></param>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static string? EditLine( ConsoleColor forecolor, TimeSpan timeout, string? source)
+    {
+        var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
+        var result = EditLine(false, timeout, source);
+        Console.ForegroundColor = oldfore;
+        return result;
+    }
+
+    /// <summary>
+    /// Edits in the console the given source string (null ones are translated into empty ones),
+    /// and returns the result of that editing, or null if it was cancelled or if the timeout has
+    /// expired.
+    /// </summary>
+    /// <param name="forecolor"></param>
+    /// <param name="backcolor"></param>
+    /// <param name="timeout"></param>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static string? EditLine(
+        ConsoleColor forecolor, ConsoleColor backcolor, TimeSpan timeout, string? source)
+    {
+        var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
+        var oldback = Console.BackgroundColor; Console.BackgroundColor = backcolor;
+        var result = EditLine(false, timeout, source);
+        Console.ForegroundColor = oldfore;
+        Console.BackgroundColor = oldback;
+        return result;
+    }
+
+    // ---------------------------------------------------------
+
+    /// <summary>
+    /// Edits in the console the given source string (null ones are translated into empty ones),
+    /// and returns the result of that editing, or null if it was cancelled. Replicates the result
+    /// to the not console-alike debug outputs if requested.
+    /// </summary>
+    /// <param name="debug"></param>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static string? EditLine(
+        bool debug, string? source) => EditLine(debug, Timeout.InfiniteTimeSpan, source);
+
+    /// <summary>
+    /// Edits in the console the given source string (null ones are translated into empty ones),
+    /// and returns the result of that editing, or null if it was cancelled. Replicates the result
+    /// to the not console-alike debug outputs if requested.
+    /// </summary>
+    /// <param name="debug"></param>
+    /// <param name="forecolor"></param>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static string? EditLine( bool debug, ConsoleColor forecolor, string? source)
+    {
+        var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
+        var result = EditLine(debug, Timeout.InfiniteTimeSpan, source);
+        Console.ForegroundColor = oldfore;
+        return result;
+    }
+
+    /// <summary>
+    /// Edits in the console the given source string (null ones are translated into empty ones),
+    /// and returns the result of that editing, or null if it was cancelled. Replicates the result
+    /// to the not console-alike debug outputs if requested.
+    /// </summary>
+    /// <param name="debug"></param>
+    /// <param name="forecolor"></param>
+    /// <param name="backcolor"></param>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static string? EditLine(
+        bool debug, ConsoleColor forecolor, ConsoleColor backcolor, string? source)
+    {
+        var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
+        var oldback = Console.BackgroundColor; Console.BackgroundColor = backcolor;
+        var result = EditLine(debug, Timeout.InfiniteTimeSpan, source);
+        Console.ForegroundColor = oldfore;
+        Console.BackgroundColor = oldback;
+        return result;
     }
 }

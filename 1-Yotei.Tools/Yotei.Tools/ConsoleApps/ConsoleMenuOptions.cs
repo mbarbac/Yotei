@@ -23,7 +23,7 @@ public record struct ConsoleMenuOptions
     /// </summary>
     public TimeSpan Timeout
     {
-        get => TimeSpan.FromMilliseconds(Milliseconds);
+        readonly get => TimeSpan.FromMilliseconds(Milliseconds);
         set => Milliseconds = value.ValidatedTimeout;
     }
     long Milliseconds = -1;

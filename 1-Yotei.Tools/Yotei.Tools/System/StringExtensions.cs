@@ -16,7 +16,7 @@ public static class StringExtensions
             return trim switch
             {
                 true => string.IsNullOrWhiteSpace(source) ? null : source.Trim(),
-                false => string.IsNullOrWhiteSpace(source) ? null : source
+                false => string.IsNullOrEmpty(source) ? null : source
             };
         }
     }

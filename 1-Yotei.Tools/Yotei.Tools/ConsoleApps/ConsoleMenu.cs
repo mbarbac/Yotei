@@ -186,6 +186,7 @@ public class ConsoleMenu : IEnumerable<ConsoleMenuEntry>
             Console.CursorLeft = 1;
 
             var info = ConsoleEx.ReadKey(true, false, timeout);
+            var none = info is null;
             info ??= new ConsoleKeyInfo('\0', ConsoleKey.Escape, false, false, false);
 
             switch (info.Value.Key)
@@ -204,7 +205,8 @@ public class ConsoleMenu : IEnumerable<ConsoleMenuEntry>
                     Console.CursorTop = top + Entries.Count;
                     Console.CursorLeft = 0;
 
-                    if (debug) ConsoleEx.WithNoConsoleListeners(() => Debug.WriteLine("Cancelled."));
+                    if (debug) ConsoleEx.WithNoConsoleListeners(
+                        () => Debug.WriteLine(none ? "Expired." : "Cancelled."));                    
                     return -1;
 
                 case ConsoleKey.UpArrow:
