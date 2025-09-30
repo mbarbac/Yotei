@@ -10,7 +10,7 @@ public static class ConsoleEx
     /// Executes the given action in an ambient with no console listeners.
     /// </summary>
     /// <param name="action"></param>
-    internal static void WithNoConsoleListeners(Action action)
+    public static void WithNoConsoleListeners(Action action)
     {
         action.ThrowWhenNull();
 

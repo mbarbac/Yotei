@@ -36,14 +36,13 @@ public record struct ConsoleMenuOptions
 
     /// <summary>
     /// The color to use for entry description after the selector.
-    /// <br/> The default value of this property is 'White'.
+    /// <br/> The default value of this property is the foreground color at this instance creation.
     /// </summary>
-    public ConsoleColor DescriptionColor { get; set; } = ConsoleColor.White;
+    public ConsoleColor DescriptionColor { get; set; } = Console.ForegroundColor;
 
     /// <summary>
     /// The background color to use.
-    /// <br/> The default value of this property is the background color when this instance was
-    /// created.
+    /// <br/> The default value of this property is the background color at this instance creation.
     /// </summary>
     public ConsoleColor BackgroundColor { get; set; } = Console.BackgroundColor;
 }

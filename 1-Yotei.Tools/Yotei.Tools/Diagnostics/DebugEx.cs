@@ -195,8 +195,10 @@ public static class DebugEx
     /// <summary>
     /// Returns a header with the given number of spaces.
     /// </summary>
-    internal static string Header(int size)
+    public static string Header(int size)
     {
+        if (size < 0) throw new ArgumentException("Size cannot be negative.").WithData(size);
+
         switch (size)
         {
             case 0: return Header0;

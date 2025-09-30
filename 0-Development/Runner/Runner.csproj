@@ -2,6 +2,8 @@
 
    <PropertyGroup>
 	  <OutputType>Exe</OutputType>
+	  <StartupObject>Runner.Program</StartupObject>
+	  <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
 	  <TargetFramework>net10.0</TargetFramework>
 	  <LangVersion>preview</LangVersion>
 	  <ImplicitUsings>disable</ImplicitUsings>
@@ -11,7 +13,14 @@
    <!--IDE0130: Folder structure-->
 
    <ItemGroup>
+	  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+	  <PackageReference Include="xunit.v3" Version="3.0.0" />
+	  <PackageReference Include="xunit.runner.visualstudio" Version="3.1.3" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
+   </ItemGroup>
+
+   <ItemGroup>
+	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Tests\Yotei.Tools.Tests.csproj" />
    </ItemGroup>
 
 </Project>
