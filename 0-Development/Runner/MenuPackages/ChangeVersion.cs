@@ -23,14 +23,7 @@ public class ChangeVersion(Project project) : ConsoleMenuEntry
         var saved = backups.Add(Project);
         saved.AddRange(Project);
 
-        try
-        {
-            WriteLine(true);
-            WriteLine(true, Green, Program.SlimSeparator);
-            Write(true, Green, "Project: "); WriteLine(true, project.Name);
-
-            return Consumate(backups);
-        }
+        try { return Consumate(backups); }
         catch (Exception e)
         {
             WriteLine(true);
@@ -40,7 +33,7 @@ public class ChangeVersion(Project project) : ConsoleMenuEntry
             WriteLine(true);
             WriteLine(true, Green, Program.SlimSeparator);
             WriteLine(true, Green, "Reverting to previous state...");
-            backups.Restore();
+            backups.Restore(display: true);
 
             WriteLine(true);
             Write(true, Green, "Press [Enter] to continue...");
@@ -57,6 +50,10 @@ public class ChangeVersion(Project project) : ConsoleMenuEntry
     /// </summary>
     bool Consumate(BuildBackups backups)
     {
+        WriteLine(true);
+        WriteLine(true, Green, Program.SlimSeparator);
+        Write(true, Green, "Project: "); WriteLine(true, project.Name);
+
         if (!project.GetVersion(out var original))
         {
             WriteLine(true);
@@ -69,20 +66,32 @@ public class ChangeVersion(Project project) : ConsoleMenuEntry
         Write(true, Green, "    New Version: ");
         var str = EditLine(true, Program.Timeout, original);
         if (str is null || str.Length == 0) return false;
-
         var updated = new SemanticVersion(str);
+
         var reduced = updated with { PreRelease = "" };
+        WriteLine(true);
+        Write(true, Green, "Release Version: ");
+        str = EditLine(true, Program.Timeout, reduced);
+        reduced = new SemanticVersion(str ?? "");
+
         var enlarged = updated.PreRelease.IsEmpty ? updated with { PreRelease = "v0001" } : updated;
+        Write(true, Green, "  Local Version: ");
+        str = EditLine(true, Program.Timeout, enlarged);
+        enlarged = new SemanticVersion(str ?? "");
 
         // Setting project's version...
         if (!project.SetVersion(updated)) throw new Exception("Cannot set project version.");
         project.SaveContents();
 
-        // Updating references...
+        // Updating references if needed...
+        if (reduced.IsEmpty && enlarged.IsEmpty) return true; 
+
         var root = Program.GetSolutionDirectory();
         var items = Program.FindProjects(root);
         var first = true;
 
+        WriteLine(true);
+        WriteLine(true, Green, "Updating references...");
         foreach (var item in items)
         {
             // Pre-saving state---

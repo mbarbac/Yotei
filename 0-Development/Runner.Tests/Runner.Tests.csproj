@@ -8,7 +8,7 @@
 <!-- https://learn.microsoft.comdotnet/core/testing/microsoft-testing-platform-extensions-code-coverage -->
 
 <Project Sdk="Microsoft.NET.Sdk">
-
+   
    <PropertyGroup>
 	  <!--<OutputType>Exe</OutputType>-->
 	  <TargetFramework>net10.0</TargetFramework>
@@ -22,27 +22,27 @@
    <!--IDE0130: Folder structure-->
 
    <ItemGroup>
+	  <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
 	  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
 	  <PackageReference Include="xunit.v3" Version="3.0.0" />
 	  <PackageReference Include="xunit.runner.visualstudio" Version="3.1.3" />
    </ItemGroup>
 
-   <ItemGroup>
-	  <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
-   </ItemGroup>
-
    <!-- DEBUG configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Debug'">
-	  <ProjectReference Include="..\Yotei.Tools\Yotei.Tools.csproj" />
+	  <ProjectReference Include="..\Runner\Runner.csproj" />
+	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
    </ItemGroup>
 
    <!-- LOCAL configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Local'">
+	  <ProjectReference Include="..\Runner\Runner.csproj" />
 	  <PackageReference Include="Yotei.Tools" Version="0.7.1-v0001" />
    </ItemGroup>
 
    <!-- RELEASE configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Release'">
+	  <ProjectReference Include="..\Runner\Runner.csproj" />
 	  <PackageReference Include="Yotei.Tools" Version="0.7.1" />
    </ItemGroup>
 

@@ -49,9 +49,9 @@ public class MenuPackages : ConsoleMenuEntry
     {
         var items = new List<ConsoleMenuEntry> { new("Exit") };
         if (project.GetVersion(out _)) items.Add(new ChangeVersion(project));
-        items.Add(new("Compile Debug"));
-        items.Add(new("Compile Local"));
-        items.Add(new("Compile Release"));
+        items.Add(new CompilePackage(project, BuildMode.Debug));
+        items.Add(new CompilePackage(project, BuildMode.Local));
+        items.Add(new CompilePackage(project, BuildMode.Release));
 
         var menu = new ConsoleMenu().AddRange([.. items]);
 

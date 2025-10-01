@@ -67,14 +67,17 @@ public class BuildBackups
     /// <summary>
     /// Restores, for all projects registered into this instance, their saved lines.
     /// </summary>
-    public void Restore()
+    public void Restore(bool display)
     {
-        WriteLine(true);
+        if (display) WriteLine(true);
+
         foreach (var (project, lines) in Items)
         {
-            Write(true, Cyan, "Restoring project: ");
-            WriteLine(project.Name);
-
+            if (display)
+            {
+                Write(true, Cyan, "Restoring project: ");
+                WriteLine(project.Name);
+            }
             project.FromLines(lines);
             project.SaveContents();
         }

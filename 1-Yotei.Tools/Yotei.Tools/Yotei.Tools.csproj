@@ -5,13 +5,14 @@
 	  <LangVersion>preview</LangVersion>
 	  <ImplicitUsings>disable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
+	  <Configurations>Debug;Release;Local</Configurations>
 	  <NoWarn>IDE0130</NoWarn>
    </PropertyGroup>
    <!--IDE0130: Folder structure-->
 
    <PropertyGroup>
 	  <Description>Yotei Common Tools</Description>
-	  <Version>0.7.1-v0002</Version>
+	  <Version>0.7.1-v0001</Version>
 	  <Authors>mbarbac@hotmail.com</Authors>
 	  <PackageProjectUrl>https://gitbug.com/mbarbac/Yotei</PackageProjectUrl>
 	  <IsPackable>true</IsPackable>

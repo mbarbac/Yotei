@@ -1,5 +1,13 @@
 <Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="Local" />
+    <BuildType Name="Release" />
+  </Configurations>
   <Folder Name="/0-Development/">
+    <Project Path="0-Development/Runner.Tests/Runner.Tests.csproj" Id="077b8ff2-c624-4d0e-9183-1300b7960aef">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
     <Project Path="0-Development/Runner/Runner.csproj" Id="6318209e-7090-4965-8321-ca5af2726287" />
   </Folder>
   <Folder Name="/1-Yotei.Tools/">
