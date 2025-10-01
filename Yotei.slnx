@@ -5,17 +5,14 @@
     <BuildType Name="Release" />
   </Configurations>
   <Folder Name="/0-Development/">
-    <Project Path="0-Development/Runner.Tests/Runner.Tests.csproj" Id="077b8ff2-c624-4d0e-9183-1300b7960aef">
-      <BuildType Solution="Local|*" Project="Debug" />
-    </Project>
     <Project Path="0-Development/Runner/Runner.csproj" Id="6318209e-7090-4965-8321-ca5af2726287" />
   </Folder>
   <Folder Name="/1-Yotei.Tools/">
-    <Project Path="1-Yotei.Tools/Yotei.Tools.Tests/Yotei.Tools.Tests.csproj" Id="1f69c657-44d5-4e49-80a7-cc27920d623e" />
     <Project Path="1-Yotei.Tools/Yotei.Tools/Yotei.Tools.csproj" Id="eed4ba91-a8a8-4fde-8d81-c122183b455a" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".gitignore" />
+    <File Path="dotnet.config" />
     <File Path="LICENSE.txt" />
     <File Path="README.md" />
   </Folder>

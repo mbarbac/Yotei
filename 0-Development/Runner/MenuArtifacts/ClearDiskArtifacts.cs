@@ -97,7 +97,12 @@ public class ClearDiskArtifacts : ConsoleMenuEntry
         if (delete)
         {
             try { directory.Delete(); }
-            catch (Exception e) { WriteLine(true, Red, $" Delete: {e.Message}"); }
+            catch (Exception e)
+            {
+                Write(true, Red, $" Delete: ");
+                Write(true, $" {directory.FullName} ");
+                WriteLine(true, Red, $"Error: {e.Message}");
+            }
         }
     }
 }

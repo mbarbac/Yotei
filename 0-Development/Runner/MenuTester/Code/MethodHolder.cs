@@ -64,9 +64,10 @@ public class MethodHolder
         if (pars.Length != 0) return false;
 
         // [Fact] decorated method...
-        var attrs = method.GetCustomAttributes(typeof(FactAttribute), true);
-        if (attrs.Length == 0) return false;
+        var attrs = method.GetCustomAttributes(true).Where(x =>
+            x is not null &&
+            x.GetType().Name == "FactAttribute");
 
-        return true;
+        return attrs.Any();
     }
 }

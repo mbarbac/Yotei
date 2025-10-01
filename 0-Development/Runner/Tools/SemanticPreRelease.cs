@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-
-namespace Runner;
+﻿namespace Runner;
 
 // ========================================================
 /// <summary>
