@@ -26,7 +26,7 @@ public class MenuArtifacts : ConsoleMenuEntry
                 new ClearDiskArtifacts(),
                 new ClearLocalPackages(),
             }
-            .Run(Program.MenuOptions, position);
+            .Run(Program.MenuOptions);
         }
         while (position > 0);
     }

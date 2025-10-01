@@ -52,7 +52,7 @@ internal class Program
                 //    Write(Cyan, "Editted: "); WriteLine(path ?? "<null>");
                 //}),
             }
-            .Run(MenuOptions, position);
+            .Run(MenuOptions);
         }
         while (position > 0);
     }
@@ -155,41 +155,41 @@ internal class Program
 
     // ----------------------------------------------------
 
-    /// <summary>
-    /// Invoked to capture the desired increase mode, if any.
-    /// </summary>
-    /// <param name="mode"></param>
-    /// <returns></returns>
-    static internal bool CaptureIncreaseMode(ref IncreaseMode mode)
-    {
-        var position = mode switch
-        {
-            IncreaseMode.Major => 1,
-            IncreaseMode.Minor => 2,
-            IncreaseMode.Patch => 3,
-            IncreaseMode.PreRelease => 4,
-            _ => 0,
-        };
+    ///// <summary>
+    ///// Invoked to capture the desired increase mode, if any.
+    ///// </summary>
+    ///// <param name="mode"></param>
+    ///// <returns></returns>
+    //static internal bool CaptureIncreaseMode(ref IncreaseMode mode)
+    //{
+    //    var position = mode switch
+    //    {
+    //        IncreaseMode.Major => 1,
+    //        IncreaseMode.Minor => 2,
+    //        IncreaseMode.Patch => 3,
+    //        IncreaseMode.PreRelease => 4,
+    //        _ => 0,
+    //    };
 
-        position = new ConsoleMenu
-        {
-            new("Exit"),
-            new("Major"),
-            new("Minor"),
-            new("Patch"),
-            new("PreRelease"),
-        }
-        .Run(MenuOptions, position);
+    //    position = new ConsoleMenu
+    //    {
+    //        new("Exit"),
+    //        new("Major"),
+    //        new("Minor"),
+    //        new("Patch"),
+    //        new("PreRelease"),
+    //    }
+    //    .Run(MenuOptions, position);
 
-        switch (position)
-        {
-            case 1: mode = IncreaseMode.Major; return true;
-            case 2: mode = IncreaseMode.Minor; return true;
-            case 3: mode = IncreaseMode.Patch; return true;
-            case 4: mode = IncreaseMode.PreRelease; return true;
-        }
-        return false;
-    }
+    //    switch (position)
+    //    {
+    //        case 1: mode = IncreaseMode.Major; return true;
+    //        case 2: mode = IncreaseMode.Minor; return true;
+    //        case 3: mode = IncreaseMode.Patch; return true;
+    //        case 4: mode = IncreaseMode.PreRelease; return true;
+    //    }
+    //    return false;
+    //}
 
     // ----------------------------------------------------
 
