@@ -1,6 +1,6 @@
 ﻿namespace Yotei.Tools;
 
-// =============================================================
+// ========================================================
 /// <summary>
 /// Represents the ocurrence of a situation that was not suppose to happen.
 /// </summary>

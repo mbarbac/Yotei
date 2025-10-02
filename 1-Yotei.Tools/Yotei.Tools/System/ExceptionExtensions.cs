@@ -1,6 +1,6 @@
 ﻿namespace Yotei.Tools;
 
-// =============================================================
+// ========================================================
 public static class ExceptionExtensions
 {
     /// <summary>
@@ -25,7 +25,7 @@ public static class ExceptionExtensions
         return exception;
     }
 
-    // ---------------------------------------------------------
+    // ----------------------------------------------------
 
     static readonly string SEPARATOR = new('-', 40);
 

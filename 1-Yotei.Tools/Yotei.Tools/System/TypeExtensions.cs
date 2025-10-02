@@ -1,6 +1,6 @@
 ﻿namespace Yotei.Tools;
 
-// =============================================================
+// ========================================================
 public static class TypeExtensions
 {
     extension(Type type)

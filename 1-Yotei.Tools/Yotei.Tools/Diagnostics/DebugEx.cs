@@ -1,6 +1,6 @@
 ﻿namespace Yotei.Tools.Diagnostics;
 
-// =============================================================
+// ========================================================
 /// <summary>
 /// Provides a <see cref="Debug"/> replacement with extensions for console apps.
 /// </summary>
@@ -27,7 +27,7 @@ public static class DebugEx
         set => Debug.IndentSize = value;
     }
 
-    // ---------------------------------------------------------
+    // ----------------------------------------------------
 
     /// <inheritdoc cref="Debug.Flush"/>
     public static void Flush() => Debug.Flush();
@@ -38,7 +38,7 @@ public static class DebugEx
     /// <inheritdoc cref="Debug.Unindent"/>/>
     public static void Unindent() => Debug.Unindent();
 
-    // ---------------------------------------------------------
+    // ----------------------------------------------------
 
     /// <summary>
     /// Writes the given message, formatted with the given arguments, if any, and replicates it
@@ -103,7 +103,7 @@ public static class DebugEx
         Console.BackgroundColor = oldback;
     }
 
-    // ---------------------------------------------------------
+    // ----------------------------------------------------
 
     /// <summary>
     /// Writes a line terminator and replicates it to the console output if requested.
@@ -180,7 +180,7 @@ public static class DebugEx
         Console.BackgroundColor = oldback;
     }
 
-    // ---------------------------------------------------------
+    // ----------------------------------------------------
 
     /// <summary>
     /// Invoked to write a console header.

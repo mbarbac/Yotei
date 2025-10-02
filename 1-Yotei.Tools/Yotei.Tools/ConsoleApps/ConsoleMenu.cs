@@ -1,6 +1,6 @@
 ﻿namespace Yotei.Tools;
 
-// =============================================================
+// ========================================================
 /// <summary>
 /// Represents a console menu where the user can select from multiple entries associated with
 /// their respective actions.

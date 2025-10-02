@@ -1,6 +1,6 @@
 ﻿namespace Yotei.Tools;
 
-// =============================================================
+// ========================================================
 /// <summary>
 /// Represents an attempt of using an empty object when such is not allowed.
 /// </summary>

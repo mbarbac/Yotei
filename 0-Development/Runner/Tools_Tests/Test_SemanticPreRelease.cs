@@ -1,6 +1,6 @@
 ﻿namespace Runner.Tests;
 
-// =============================================================
+// ========================================================
 //[Enforced]
 public static class Test_SemanticPreRelease
 {

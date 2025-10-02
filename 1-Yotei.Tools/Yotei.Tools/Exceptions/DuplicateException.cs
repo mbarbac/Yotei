@@ -1,6 +1,6 @@
 ﻿namespace Yotei.Tools;
 
-// =============================================================
+// ========================================================
 /// <summary>
 /// Represents an attempt of using an object that can be considered as a duplicated one.
 /// </summary>

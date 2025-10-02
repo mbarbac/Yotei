@@ -1,6 +1,6 @@
 ﻿namespace Yotei.Tools;
 
-// =============================================================
+// ========================================================
 public static class ObjectExtensions
 {
     /// <summary>
@@ -23,7 +23,7 @@ public static class ObjectExtensions
         return value;
     }
 
-    // ---------------------------------------------------------
+    // ----------------------------------------------------
 
     /// <summary>
     /// Determines if the two given object can be considered equal or not. If both are null, then

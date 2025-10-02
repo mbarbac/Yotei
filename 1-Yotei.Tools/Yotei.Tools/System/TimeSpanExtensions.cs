@@ -1,6 +1,6 @@
 ﻿namespace Yotei.Tools;
 
-// =============================================================
+// ========================================================
 public static class TimeSpanExtensions
 {    
     extension(TimeSpan value)

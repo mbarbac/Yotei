@@ -3,7 +3,7 @@ using static System.ConsoleColor;
 
 namespace Runner;
 
-// =============================================================
+// ========================================================
 public class ClearLocalPackages : ConsoleMenuEntry
 {
     /// <inheritdoc/>

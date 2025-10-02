@@ -1,6 +1,6 @@
 ﻿namespace Yotei.Tools;
 
-// =============================================================
+// ========================================================
 /// <summary>
 /// Provides a <see cref="Console"/> replacement with extended functionalities.
 /// </summary>
@@ -23,12 +23,12 @@ public static class ConsoleEx
         }
     }
 
-    // ---------------------------------------------------------
+    // ----------------------------------------------------
 
     /// <inheritdoc cref="Console.Clear"/>
     public static void Clear() => Console.Clear();
 
-    // ---------------------------------------------------------
+    // ----------------------------------------------------
 
     /// <summary>
     /// Writes the given message, formatted with the given arguments, if any.
@@ -70,7 +70,7 @@ public static class ConsoleEx
         Console.BackgroundColor = oldback;
     }
 
-    // ---------------------------------------------------------
+    // ----------------------------------------------------
 
     /// <summary>
     /// Writes the given message, formatted with the given arguments, if any, and replicates it
@@ -129,7 +129,7 @@ public static class ConsoleEx
         Console.BackgroundColor = oldback;
     }
 
-    // ---------------------------------------------------------
+    // ----------------------------------------------------
 
     /// <summary>
     /// Writes a line terminator.
@@ -180,7 +180,7 @@ public static class ConsoleEx
         Console.BackgroundColor = oldback;
     }
 
-    // ---------------------------------------------------------
+    // ----------------------------------------------------
 
     /// <summary>
     /// Writes a line terminator and replicates it to the not console-alike debug outputs if
@@ -250,7 +250,7 @@ public static class ConsoleEx
         Console.BackgroundColor = oldback;
     }
 
-    // ---------------------------------------------------------
+    // ----------------------------------------------------
 
     /// <summary>
     /// Returns the next line of characters read from the console, or null if no characters are
@@ -306,7 +306,7 @@ public static class ConsoleEx
         return result;
     }
 
-    // ---------------------------------------------------------
+    // ----------------------------------------------------
 
     // It bothers me that the first parameter of the standard 'ReadKey(...)' method is a boolean
     // one ('intercepts') because when 'debug' is used in all 'ConsoleEx' methods it appears as
@@ -405,7 +405,7 @@ public static class ConsoleEx
         }
     }
 
-    // ---------------------------------------------------------
+    // ----------------------------------------------------
 
     /// <summary>
     /// Edits in the console the given source string (null ones are translated into empty ones),
@@ -602,7 +602,7 @@ public static class ConsoleEx
         return result;
     }
 
-    // ---------------------------------------------------------
+    // ----------------------------------------------------
 
     /// <summary>
     /// Edits in the console the given source string (null ones are translated into empty ones),
@@ -653,7 +653,7 @@ public static class ConsoleEx
         return result;
     }
 
-    // ---------------------------------------------------------
+    // ----------------------------------------------------
 
     /// <summary>
     /// Edits in the console the given source string (null ones are translated into empty ones),

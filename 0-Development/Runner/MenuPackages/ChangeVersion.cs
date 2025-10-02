@@ -3,7 +3,7 @@ using static System.ConsoleColor;
 
 namespace Runner;
 
-// =============================================================
+// ========================================================
 public class ChangeVersion(Project project) : ConsoleMenuEntry
 {
     readonly Project Project = project.ThrowWhenNull();
@@ -43,7 +43,7 @@ public class ChangeVersion(Project project) : ConsoleMenuEntry
         }
     }
 
-    // ---------------------------------------------------------
+    // ----------------------------------------------------
 
     /// <summary>
     /// Executes under a backups-protected umbrella.

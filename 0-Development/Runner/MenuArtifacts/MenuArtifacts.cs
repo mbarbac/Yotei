@@ -3,7 +3,7 @@ using static System.ConsoleColor;
 
 namespace Runner;
 
-// =============================================================
+// ========================================================
 public class MenuArtifacts : ConsoleMenuEntry
 {
     /// <inheritdoc/>

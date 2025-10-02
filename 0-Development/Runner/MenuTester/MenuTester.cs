@@ -3,7 +3,7 @@ using static System.ConsoleColor;
 
 namespace Runner;
 
-// =============================================================
+// ========================================================
 public class MenuTester(bool breakOnError) : ConsoleMenuEntry
 {
     static readonly StringComparison Ordinal = StringComparison.Ordinal;

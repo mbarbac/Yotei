@@ -3,7 +3,7 @@ using static System.ConsoleColor;
 
 namespace Runner;
 
-// =============================================================
+// ========================================================
 public class MenuPackages : ConsoleMenuEntry
 {
     /// <inheritdoc/>
@@ -39,7 +39,7 @@ public class MenuPackages : ConsoleMenuEntry
         while (position > 0);
     }
 
-    // ---------------------------------------------------------
+    // ----------------------------------------------------
 
     /// <summary>
     /// Executes on the given project.

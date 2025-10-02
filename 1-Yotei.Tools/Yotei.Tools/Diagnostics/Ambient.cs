@@ -1,6 +1,6 @@
 ﻿namespace Yotei.Tools.Diagnostics;
 
-// =============================================================
+// ========================================================
 /// <summary>
 /// Provides access to ambient capabilities.
 /// </summary>

@@ -5,7 +5,7 @@ using static System.ConsoleColor;
 
 namespace Runner;
 
-// =============================================================
+// ========================================================
 public class ClearDiskArtifacts : ConsoleMenuEntry
 {
     static StringComparison Comparison = StringComparison.OrdinalIgnoreCase;
@@ -32,7 +32,7 @@ public class ClearDiskArtifacts : ConsoleMenuEntry
         Execute(Root, Root, false);
     }
 
-    // ---------------------------------------------------------
+    // ----------------------------------------------------
 
     /// <summary>
     /// Executes on the given path.

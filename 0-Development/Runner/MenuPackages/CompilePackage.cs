@@ -1,10 +1,9 @@
 ﻿using static Yotei.Tools.ConsoleEx;
 using static System.ConsoleColor;
-using System.ComponentModel.DataAnnotations;
 
 namespace Runner;
 
-// =============================================================
+// ========================================================
 public class CompilePackage(Project project, BuildMode mode) : ConsoleMenuEntry
 {
     readonly Project Project = project.ThrowWhenNull();
@@ -50,7 +49,7 @@ public class CompilePackage(Project project, BuildMode mode) : ConsoleMenuEntry
         }
     }
 
-    // ---------------------------------------------------------
+    // ----------------------------------------------------
 
     /// <summary>
     /// Executes under a backups-protected umbrella.
