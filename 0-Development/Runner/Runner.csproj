@@ -13,6 +13,7 @@
    <!--IDE0130: Folder structure-->
 
    <ItemGroup>
+	  <PackageReference Include="xunit.v3" Version="3.0.0" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
    </ItemGroup>
 

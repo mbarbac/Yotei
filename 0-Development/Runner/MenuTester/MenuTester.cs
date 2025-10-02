@@ -41,20 +41,20 @@ public class MenuTester(bool breakOnError) : ConsoleMenuEntry
 
         var root = new DirectoryInfo(AppContext.BaseDirectory);
         WriteLine(true);
-        Write(true, Green, "Populating from: "); Write(true, root.FullName); Write(true, " ");
+        Write(true, DarkYellow, "Populating from: "); Write(true, root.FullName); Write(true, " ");
         var pos = Console.CursorLeft;
         var num = 0;
 
         var files = root.GetFiles();
         foreach (var file in files)
         {
+            Print(pos, ref num);
+
             // Assembly must have a valid termination...
             var name = file.Name;
             if (!name.EndsWith(".DLL", IgnoreCase) &&
                 !name.EndsWith(".EXE", IgnoreCase))
                 continue;
-
-            Print(pos, ref num);
 
             // Try to load and populate the assembly...
             try
