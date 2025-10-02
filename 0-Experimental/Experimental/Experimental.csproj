@@ -1,22 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
    <PropertyGroup>
-	  <OutputType>Exe</OutputType>
-	  <StartupObject>Runner.Program</StartupObject>
 	  <TargetFramework>net10.0</TargetFramework>
 	  <LangVersion>preview</LangVersion>
 	  <ImplicitUsings>disable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
-	  <Configurations>Debug;Release;Local</Configurations>
 	  <NoWarn>IDE0130</NoWarn>
    </PropertyGroup>
    <!--IDE0130: Folder structure-->
 
    <ItemGroup>
-	  <PackageReference Include="xunit.v3" Version="3.0.0" />
-	  <ProjectReference Include="..\..\0-Experimental\Experimental.Tests\Experimental.Tests.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
-	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Tests\Yotei.Tools.Tests.csproj" />
    </ItemGroup>
 
 </Project>
