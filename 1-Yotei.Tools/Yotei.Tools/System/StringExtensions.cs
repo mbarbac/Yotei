@@ -1,26 +1,8 @@
 ﻿namespace Yotei.Tools;
 
 // ========================================================
-public static class StringExtensions
+public static partial class StringExtensions
 {
-    extension(string? source)
-    {
-        /// <summary>
-        /// Returns null if this source string is null or empty, or the resulting string after
-        /// trimming it, if such is requested.
-        /// </summary>
-        /// <param name="trim"></param>
-        /// <returns></returns>
-        public string? NullWhenEmpty(bool trim)
-        {
-            return trim switch
-            {
-                true => string.IsNullOrWhiteSpace(source) ? null : source.Trim(),
-                false => string.IsNullOrEmpty(source) ? null : source
-            };
-        }
-    }
-
     /// <summary>
     /// Throws an <see cref="EmptyException"/> if the given source string is null or empty. The
     /// the source is trimmed before validating if requested. Returns either the original string
@@ -43,5 +25,29 @@ public static class StringExtensions
         if (source is null || source.Length == 0) throw new EmptyException(description);
 
         return source;
+    }
+}
+
+// ========================================================
+public static partial class StringExtensions
+{
+    extension(string? source)
+    {
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Returns null if this source string is null or empty, or the resulting string after
+        /// trimming it, if such is requested.
+        /// </summary>
+        /// <param name="trim"></param>
+        /// <returns></returns>
+        public string? NullWhenEmpty(bool trim)
+        {
+            return trim switch
+            {
+                true => string.IsNullOrWhiteSpace(source) ? null : source.Trim(),
+                false => string.IsNullOrEmpty(source) ? null : source
+            };
+        }
     }
 }

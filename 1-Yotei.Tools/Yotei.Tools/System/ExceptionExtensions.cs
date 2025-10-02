@@ -1,7 +1,7 @@
 ﻿namespace Yotei.Tools;
 
 // ========================================================
-public static class ExceptionExtensions
+public static partial class ExceptionExtensions
 {
     /// <summary>
     /// Adds or replaces in the exception's data dictionary the entry with the given name and
@@ -24,9 +24,11 @@ public static class ExceptionExtensions
         exception.Data[name] = value;
         return exception;
     }
+}
 
-    // ----------------------------------------------------
-
+// ========================================================
+public static partial class ExceptionExtensions
+{
     static readonly string SEPARATOR = new('-', 40);
 
     extension(Exception exception)

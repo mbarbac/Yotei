@@ -48,7 +48,6 @@ internal class Program
                 new MenuPackages(),
                 new("Examples", () =>
                 {
-                    Span<int> items = [1,1];
                 }),
             }
             .Run(MenuOptions);
