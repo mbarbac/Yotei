@@ -48,6 +48,8 @@ internal class Program
                 new MenuPackages(),
                 new("Examples", () =>
                 {
+                    var source = "abcXYZ";
+                    var value = 'x';
                 }),
             }
             .Run(MenuOptions);

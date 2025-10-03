@@ -73,4 +73,26 @@ public static class Test_StringExtensions
         source = " ";
         Assert.Equal(" ", source.NotNullNotEmpty(false));
     }
+
+    // --------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_RemoveDiacritics()
+    {
+        string value, temp;
+
+        value = "é"; temp = value.RemoveDiacritics(); Assert.Equal("e", temp);
+        value = "É"; temp = value.RemoveDiacritics(); Assert.Equal("E", temp);
+        value = "ñ"; temp = value.RemoveDiacritics(); Assert.Equal("n", temp);
+        value = "Ñ"; temp = value.RemoveDiacritics(); Assert.Equal("N", temp);
+        value = "ç"; temp = value.RemoveDiacritics(); Assert.Equal("c", temp);
+        value = "Ç"; temp = value.RemoveDiacritics(); Assert.Equal("C", temp);
+        value = "ü"; temp = value.RemoveDiacritics(); Assert.Equal("u", temp);
+        value = "Ü"; temp = value.RemoveDiacritics(); Assert.Equal("U", temp);
+        value = "ô"; temp = value.RemoveDiacritics(); Assert.Equal("o", temp);
+        value = "Ô"; temp = value.RemoveDiacritics(); Assert.Equal("O", temp);
+        value = "à"; temp = value.RemoveDiacritics(); Assert.Equal("a", temp);
+        value = "À"; temp = value.RemoveDiacritics(); Assert.Equal("A", temp);
+    }
 }

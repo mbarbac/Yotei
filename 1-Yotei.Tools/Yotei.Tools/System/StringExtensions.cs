@@ -49,5 +49,25 @@ public static partial class StringExtensions
                 false => string.IsNullOrEmpty(source) ? null : source
             };
         }
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Returns a new string where the original diacritics marks have been removed.
+        /// </summary>
+        /// <returns></returns>
+        public string RemoveDiacritics()
+        {
+            source.ThrowWhenNull();
+            source = source!.Normalize(NormalizationForm.FormD);
+
+            var sb = new StringBuilder();
+            foreach (var c in source)
+            {
+                var uc = CharUnicodeInfo.GetUnicodeCategory(c);
+                if (uc != UnicodeCategory.NonSpacingMark) sb.Append(c);
+            }
+            return sb.ToString();
+        }
     }
 }
