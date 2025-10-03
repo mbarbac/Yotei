@@ -46,11 +46,11 @@ internal class Program
                 new MenuTester(breakOnError: true),
                 new MenuArtifacts(),
                 new MenuPackages(),
-                new("Examples", () =>
-                {
-                    var source = "abcXYZ";
-                    var value = 'x';
-                }),
+                //new("Examples", () =>
+                //{
+                //    var source = "abcXYZ";
+                //    var value = 'x';
+                //}),
             }
             .Run(MenuOptions);
         }
