@@ -69,5 +69,95 @@ public static partial class StringExtensions
             }
             return sb.ToString();
         }
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Returns a string with the original value wrapped with the head and tail characters,
+        /// provided that value is not null and not empty. If trimming is requested, the that
+        /// value is trimmed before validating it.
+        /// </summary>
+        /// <param name="head"></param>
+        /// <param name="tail"></param>
+        /// <param name="trim"></param>
+        /// <returns></returns>
+        public string? Wrap(char head, char tail, bool trim)
+        {
+            if (head <= 0) throw new ArgumentException("Invalid head.").WithData(head);
+            if (tail <= 0) throw new ArgumentException("Invalid tail.").WithData(tail);
+
+            if (source is not null)
+            {
+                if (trim) source = source.Trim();
+
+                if (source.Length > 0 &&
+                    source[0] != head &&
+                    source[^1] != tail)
+                    source = $"{head}{source}{tail}";
+            }
+            return source;
+        }
+
+        /// <summary>
+        /// Returns a string with the original value wrapped with the given character, provided
+        /// that value is not null and not empty. If trimming is requested, the that value is
+        /// trimmed before validating it.
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="trim"></param>
+        /// <returns></returns>
+        public string? Wrap(char c, bool trim) => source.Wrap(c, c, trim);
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Returns a string where the given head and tail characters have been removed from the
+        /// original value, provided they are paired. If trimming is requested, the value is then
+        /// trimmed before and after the removal. By default, unwrapping is perfomed recursively
+        /// unless otherwise requested.
+        /// </summary>
+        /// <param name="head"></param>
+        /// <param name="tail"></param>
+        /// <param name="trim"></param>
+        /// <param name="recursive"></param>
+        /// <returns></returns>
+        public string? Unwrap(char head, char tail, bool trim, bool recursive = true)
+        {
+            if (head <= 0) throw new ArgumentException("Invalid head.").WithData(head);
+            if (tail <= 0) throw new ArgumentException("Invalid tail.").WithData(tail);
+
+            if (source is not null)
+            {
+                var span = source.AsSpan();
+
+                while (true)
+                {
+                    if (trim) span = span.Trim();
+                    if (span.Length < 2) break;
+                    if (span[0] != head || span[^1] != tail) break;
+
+                    span = span[1..^1];
+                    if (!recursive) break;
+                }
+
+                if (trim) span = span.Trim();
+                source = span.ToString();
+            }
+
+            return source;
+        }
+
+        /// <summary>
+        /// Returns a string where the given character is removed from the head and tail of the
+        /// original value, provided it appeard paired. If trimming is requested, the value is then
+        /// trimmed before and after the removal. By default, unwrapping is perfomed recursively
+        /// unless otherwise requested.
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="trim"></param>
+        /// <param name="recursive"></param>
+        /// <returns></returns>
+        public string? Unwrap(
+            char c, bool trim, bool recursive = true) => source.Unwrap(c, c, trim, recursive);
     }
 }

@@ -95,4 +95,102 @@ public static class Test_StringExtensions
         value = "à"; temp = value.RemoveDiacritics(); Assert.Equal("a", temp);
         value = "À"; temp = value.RemoveDiacritics(); Assert.Equal("A", temp);
     }
+
+    // --------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Wrap_Empty_Source()
+    {
+        var head = '[';
+        var tail = ']';
+
+        var source = (string?)null;
+        var result = source.Wrap(head, tail, true);
+        Assert.Null(result);
+
+        source = string.Empty;
+        result = source.Wrap(head, tail, true);
+        Assert.Equal(string.Empty, result);
+
+        source = " ";
+        result = source.Wrap(head, tail, true);
+        Assert.Equal(string.Empty, result);
+
+        result = source.Wrap(head, tail, false);
+        Assert.Equal("[ ]", result);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Wrap_Regular_Source()
+    {
+        var head = '[';
+        var tail = ']';
+
+        var source = "   ";
+        var result = source.Wrap(head, tail, true);
+        Assert.Equal(string.Empty, result);
+
+        source = "   ";
+        result = source.Wrap(head, tail, false);
+        Assert.Equal("[   ]", result);
+
+        source = " Hello World ";
+        result = source.Wrap(head, tail, true);
+        Assert.Equal("[Hello World]", result);
+    }
+
+    // --------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_UnWrap_Empty_Source()
+    {
+        var head = '[';
+        var tail = ']';
+
+        var source = (string?)null;
+        var result = source!.Unwrap(head, tail, true);
+        Assert.Null(result);
+
+        source = string.Empty;
+        result = source.Unwrap(head, tail, true);
+        Assert.Equal(string.Empty, result);
+
+        source = " [  ] ";
+        result = source.Unwrap(head, tail, true);
+        Assert.Equal(string.Empty, result);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_UnWrap_One_Character_Source()
+    {
+        var ch = '\'';
+
+        var source = "'";
+        var result = source.Unwrap(ch, true);
+        Assert.Equal("'", result);
+
+        source = " ' ";
+        result = source.Unwrap(ch, true);
+        Assert.Equal("'", result);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_UnWrap_Regular_Source()
+    {
+        var head = '[';
+        var tail = ']';
+
+        var source = "[ Whatever ]";
+        var result = source.Unwrap(head, tail, true);
+        Assert.Equal("Whatever", result);
+
+        source = " [ [ Whatever ] ] ";
+        result = source.Unwrap(head, tail, true);
+        Assert.Equal("Whatever", result);
+    }
 }
