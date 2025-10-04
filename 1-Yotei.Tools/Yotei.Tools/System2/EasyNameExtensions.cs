@@ -318,8 +318,9 @@ public static class EasyNameExtensions
         }
 
         // Member arguments...
-        if (options.UseMemberArguments ||
-            options.UseMemberArgumentNames || options.UseMemberArgumentTypes != null)
+        if (pars.Length > 0 && (
+            options.UseMemberArguments ||
+            options.UseMemberArgumentNames || options.UseMemberArgumentTypes != null))
         {
             sb.Append('[');
 
@@ -345,7 +346,7 @@ public static class EasyNameExtensions
 
             sb.Append(']');
         }
-        
+
         // Finishing...
         return StringBuilder.Pool.Return(sb);
     }
