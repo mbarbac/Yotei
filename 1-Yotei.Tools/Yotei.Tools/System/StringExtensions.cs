@@ -61,13 +61,13 @@ public static partial class StringExtensions
             source.ThrowWhenNull();
             source = source!.Normalize(NormalizationForm.FormD);
 
-            var sb = new StringBuilder();
+            var sb = StringBuilder.Pool.Rent();
             foreach (var c in source)
             {
                 var uc = CharUnicodeInfo.GetUnicodeCategory(c);
                 if (uc != UnicodeCategory.NonSpacingMark) sb.Append(c);
             }
-            return sb.ToString();
+            return StringBuilder.Pool.Return(sb);
         }
 
         // ------------------------------------------------

@@ -422,7 +422,7 @@ public static class ConsoleEx
         var left = Console.CursorLeft;
         var insert = false;
 
-        var sb = new StringBuilder(source ?? string.Empty);
+        var sb = StringBuilder.Pool.Rent(source ?? string.Empty);
         var pos = sb.Length;
         int len;
 
@@ -440,12 +440,13 @@ public static class ConsoleEx
                     SetInsert(false);
                     Console.WriteLine();
                     if (debug) WithNoConsoleListeners(() => Debug.WriteLine(sb.ToString()));
-                    return sb.ToString();
+                    return StringBuilder.Pool.Return(sb);
 
                 case ConsoleKey.Escape:
                     SetInsert(false);
                     len = sb.Length; sb.Clear(); ShowLine(0, len);
                     Console.WriteLine();
+                    StringBuilder.Pool.Return(sb, false);
                     return null;
 
                 case ConsoleKey.Insert:
