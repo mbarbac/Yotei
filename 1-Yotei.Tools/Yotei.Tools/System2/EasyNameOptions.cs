@@ -8,32 +8,51 @@
 public record EasyNameOptions
 {
     /// <summary>
-    /// A shared default instance.
-    /// </summary>
-    public static EasyNameOptions Default { get; } = new();
-
-    /// <summary>
     /// A shared instance with all settings set to false or null.
     /// </summary>
-    public static EasyNameOptions Empty
+    public static EasyNameOptions Empty { get; } = new();
+
+    /// <summary>
+    /// A shared instance with useful default settings:
+    /// <br/>- Type: Name[K, T]
+    /// <br/>- Member: Name(Type, Type)
+    /// </summary>
+    public static EasyNameOptions Default
     {
         get
         {
-            if (_Empty is null)
+            if (_Default == null)
             {
-                _Empty = new()
+                _Default = new()
                 {
                     UseTypeNamespace = false,
                     UseTypeHost = false,
-                    UseTypeName = false,
-                    UseMemberName = false,
+                    UseTypeName = true,
+                    UseMemberName = true,
+                    UseMemberArguments = true,
                     UseMemberArgumentNames = false,
                 };
+                var type = typeof(EasyNameOptions);
+                
+                var prop = type.GetProperty(nameof(UseTypeGenericArguments))!;
+                prop!.SetValue(_Default, _Default);
+                
+                prop = type.GetProperty(nameof(UseMemberReturnType))!;
+                prop!.SetValue(_Default, null);
+                
+                prop = type.GetProperty(nameof(UseMemberHostType))!;
+                prop!.SetValue(_Default, null);
+                
+                prop = type.GetProperty(nameof(UseMemberGenericArguments))!;
+                prop!.SetValue(_Default, _Default);
+                
+                prop = type.GetProperty(nameof(UseMemberArgumentTypes))!;
+                prop!.SetValue(_Default, _Default);
             }
-            return _Empty;
+            return _Default;
         }
     }
-    static EasyNameOptions _Empty = default!;
+    static EasyNameOptions _Default = null!;
 
     /// <summary>
     /// A shared instance with full settings enabled.
@@ -42,7 +61,7 @@ public record EasyNameOptions
     {
         get
         {
-            if (_Full is null)
+            if (_Full == null)
             {
                 _Full = new()
                 {
@@ -50,33 +69,35 @@ public record EasyNameOptions
                     UseTypeHost = true,
                     UseTypeName = true,
                     UseMemberName = true,
+                    UseMemberArguments = true,
                     UseMemberArgumentNames = true,
                 };
                 var type = typeof(EasyNameOptions);
 
-                var prop = type.GetProperty(nameof(UseTypeGenericArguments));
+                var prop = type.GetProperty(nameof(UseTypeGenericArguments))!;
                 prop!.SetValue(_Full, _Full);
-
-                prop = type.GetProperty(nameof(UseMemberReturnType));
+                
+                prop = type.GetProperty(nameof(UseMemberReturnType))!;
                 prop!.SetValue(_Full, _Full);
-
-                prop = type.GetProperty(nameof(UseMemberHostType));
+                
+                prop = type.GetProperty(nameof(UseMemberHostType))!;
                 prop!.SetValue(_Full, _Full);
-
-                prop = type.GetProperty(nameof(UseMemberGenericArguments));
+                
+                prop = type.GetProperty(nameof(UseMemberGenericArguments))!;
                 prop!.SetValue(_Full, _Full);
-
-                prop = type.GetProperty(nameof(UseMemberArgumentTypes));
+                
+                prop = type.GetProperty(nameof(UseMemberArgumentTypes))!;
+                prop!.SetValue(_Full, _Full);
             }
             return _Full;
         }
     }
-    static EasyNameOptions _Full = default!;
+    static EasyNameOptions _Full = null!;
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Initializes a new default instance.
+    /// Initializes a new empty instance.
     /// </summary>
     public EasyNameOptions() { }
 
@@ -95,10 +116,9 @@ public record EasyNameOptions
     /// <summary>
     /// If true, indicates that the name of the given type shall be included, which is
     /// usefull to control the appearance of generic types.
-    /// <br/> The default value of this property is '<c>true</c>'.
     /// <br/> This property is ignored if the element is not a type.
     /// </summary>
-    public bool UseTypeName { get; init; } = true;
+    public bool UseTypeName { get; init; }
 
     /// <summary>
     /// If not null, indicates that the generic arguments of the given type shall be included,
@@ -126,10 +146,9 @@ public record EasyNameOptions
     /// <summary>
     /// If true, indicates that the name of the member shall be included, which is usefull to
     /// control the appearance of arguments of methods and properties.
-    /// <br/> The default value of this property is '<c>true</c>'.
     /// <br/> This property is ignored if the element is not a suitable member.
     /// </summary>
-    public bool UseMemberName { get; init; } = true;
+    public bool UseMemberName { get; init; }
 
     /// <summary>
     /// If not null, indicates that the generic arguments of the member shall be included, and
@@ -137,6 +156,13 @@ public record EasyNameOptions
     /// <br/> This property is ignored if the element is not a suitable member.
     /// </summary>
     public EasyNameOptions? UseMemberGenericArguments { get; init; }
+
+    /// <summary>
+    /// If true, indicates that even if no names and no types of the arguments are included,
+    /// the brackets and placeholders of that arguments shall be included.
+    /// <br/> This property is ignored if the element is not a suitable member.
+    /// </summary>
+    public bool UseMemberArguments { get; init; }
 
     /// <summary>
     /// If not null, indicates that the types of the arguments of the member shall be included,

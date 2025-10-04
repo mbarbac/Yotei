@@ -21,6 +21,8 @@ public static class EasyNameExtensions
         item.ThrowWhenNull();
         options.ThrowWhenNull();
 
+        var under = item.UnderlyingSystemType;
+
         var types = item.GetGenericArguments().AsSpan();
         var usedtypes = 0;
         return item.EasyName(options, types, ref usedtypes);
@@ -170,7 +172,8 @@ public static class EasyNameExtensions
         }
 
         // Member arguments...
-        if (options.UseMemberArgumentNames || options.UseMemberArgumentTypes != null)
+        if (options.UseMemberArguments ||
+            options.UseMemberArgumentNames || options.UseMemberArgumentTypes != null)
         {
             sb.Append('(');
 
@@ -236,8 +239,8 @@ public static class EasyNameExtensions
         if (options.UseMemberName) sb.Append("new");
 
         // Member arguments...
-        if (options.UseMemberArgumentNames || options.UseMemberArgumentTypes != null ||
-            options.UseMemberName)
+        if (options.UseMemberArguments || options.UseMemberName ||
+            options.UseMemberArgumentNames || options.UseMemberArgumentTypes != null)
         {
             sb.Append('(');
 
@@ -315,7 +318,8 @@ public static class EasyNameExtensions
         }
 
         // Member arguments...
-        if (options.UseMemberArgumentNames || options.UseMemberArgumentTypes != null)
+        if (options.UseMemberArguments ||
+            options.UseMemberArgumentNames || options.UseMemberArgumentTypes != null)
         {
             sb.Append('[');
 
