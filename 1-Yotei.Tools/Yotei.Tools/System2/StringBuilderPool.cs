@@ -72,7 +72,13 @@ public class StringBuilderPool
         lock (Items)
         {
             TryPrune();
-            return Items.Count > 0 ? Items.Pop() : new StringBuilder();
+
+            if (Items.Count == 0) return new StringBuilder();
+            else
+            {
+                var sb = Items.Pop(); sb.Clear();
+                return sb;
+            }
         }
     }
 
@@ -88,9 +94,9 @@ public class StringBuilderPool
     }
 
     /// <summary>
-    /// Returns the builder to the pool.
-    /// <br/> Returns either the stored string or an empty one if 'create' is false.
-    /// <br/> In any case, the builder is always cleared before being returned to the pool.
+    /// Returns the builder to the pool. The caller shall not use the builder any longer.
+    /// <br/> By default, unless <paramref name="create"/> is false, the string value of the
+    /// builder is returned. If it is false, then an empty string is returned.
     /// </summary>
     /// <param name="sb"></param>
     /// <param name="create"></param>
@@ -101,11 +107,7 @@ public class StringBuilderPool
             var str = create ? sb.ToString() : string.Empty;
 
             TryPrune();
-            if (Items.Count < MaxPoolSize)
-            {
-                sb.Clear();
-                Items.Push(sb);
-            }
+            if (Items.Count < MaxPoolSize) Items.Push(sb);
 
             return str;
         }

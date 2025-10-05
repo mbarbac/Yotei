@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools;
+﻿#pragma warning disable IDE0057
+
+namespace Yotei.Tools;
 
 // ========================================================
 public static class EasyNameExtensions
@@ -20,8 +22,6 @@ public static class EasyNameExtensions
     {
         item.ThrowWhenNull();
         options.ThrowWhenNull();
-
-        var under = item.UnderlyingSystemType;
 
         var types = item.GetGenericArguments().AsSpan();
         var usedtypes = 0;
@@ -52,14 +52,14 @@ public static class EasyNameExtensions
             var str = host.EasyName(options, types, ref usedtypes);
 
             // Using host if requested or needed...
-            if ((options.UseTypeHost || options.UseTypeNamespace) &&
+            if ((options.UseTypeHost is not null || options.UseTypeNamespace) &&
                 str.Length > 0)
                 sb.Append($"{str}.");
         }
 
         // Name...
         var name = string.Empty;
-        if (options.UseTypeName || options.UseTypeHost || options.UseTypeNamespace)
+        if (options.UseTypeName || options.UseTypeHost is not null || options.UseTypeNamespace)
         {
             name = item.Name;
             var index = name.IndexOf('`');
@@ -228,10 +228,17 @@ public static class EasyNameExtensions
         var sb = StringBuilder.Pool.Rent();
         var host = item.DeclaringType;
 
-        // Member host...
-        if (options.UseMemberHostType != null && host != null)
+        // Return type...
+        if (options.UseMemberReturnType != null)
         {
-            var str = host.EasyName(options.UseMemberHostType);
+            var str = host!.EasyName(options.UseMemberReturnType);
+            if (str.Length > 0) sb.Append($"{str} ");
+        }
+
+        // Member host...
+        if (options.UseMemberHostType != null)
+        {
+            var str = host!.EasyName(options.UseMemberHostType);
             if (str.Length > 0) sb.Append($"{str}.");
         }
 
