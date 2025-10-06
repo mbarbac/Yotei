@@ -12,7 +12,7 @@ internal class Program
 {
     public static readonly string FatSeparator = new('*', 50);
     public static readonly string SlimSeparator = new('-', 30);
-    public static readonly TimeSpan Timeout = TimeSpan.FromSeconds(30);
+    public static readonly TimeSpan Timeout = TimeSpan.FromSeconds(60);
     public static readonly ConsoleMenuOptions MenuOptions = new() { Debug = true, Timeout = Timeout };
 
     public static string LocalRepoPath = @"C:\Dev\Packages";
@@ -48,8 +48,6 @@ internal class Program
                 new MenuPackages(),
                 //new("Examples", () =>
                 //{
-                //    var source = "abcXYZ";
-                //    var value = 'x';
                 //}),
             }
             .Run(MenuOptions);

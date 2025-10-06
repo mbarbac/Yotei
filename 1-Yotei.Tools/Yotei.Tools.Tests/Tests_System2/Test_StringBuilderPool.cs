@@ -17,6 +17,8 @@ public static class Test_StringBuilderPool
             sb.Append(str);
 
             var ret = StringBuilder.Pool.Return(sb);
+            StringBuilder.Pool.Return(sb);
+            StringBuilder.Pool.Return(sb);
             Assert.Equal(str, ret);
         }
     }

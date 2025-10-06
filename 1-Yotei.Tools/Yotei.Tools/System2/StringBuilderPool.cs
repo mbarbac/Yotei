@@ -112,6 +112,10 @@ public class StringBuilderPool
     /// </summary>
     /// <param name="sb"></param>
     /// <param name="create"></param>
+    /// NOTES: We prevent adding to the pool when it gets big enough, or when the builder is too
+    /// big (we don't want to keep big buffers around to easy GC work). If the builder is already
+    /// in the pool we could throw a duplicated exception, but at the end of the day it is just ok
+    /// to keep moving.
     public string Return(StringBuilder sb, bool create = true)
     {
         lock (Items)
@@ -119,10 +123,11 @@ public class StringBuilderPool
             TryPrune();
 
             var str = create ? sb.ToString() : string.Empty;
-            
+
             if (Items.Count < MaxPoolSize &&
-                sb.Capacity < MaxBuilderCapacity) Items.Push(sb);
-            
+                sb.Capacity < MaxBuilderCapacity &&
+                !Items.Contains(sb)) Items.Push(sb);
+
             return str;
         }
     }
