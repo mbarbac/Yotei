@@ -31,7 +31,7 @@ public class StringBuilderPool
         set => field = value > TimeSpan.Zero ? value
             : throw new ArgumentOutOfRangeException(nameof(value), "Must be greater than zero.");
     }
-    = TimeSpan.FromSeconds(10);
+    = TimeSpan.FromMicroseconds(250);
 
     /// <summary>
     /// Used to limit the number of builders in the pool.
@@ -43,6 +43,18 @@ public class StringBuilderPool
             : throw new ArgumentOutOfRangeException(nameof(value), "Must be greater than zero.");
     }
     = 31;
+
+    /// <summary>
+    /// Used to limit the size of the builders returned to the pool, so that preveting keeping
+    /// big buffers around.
+    /// </summary>
+    public int MaxBuilderCapacity
+    {
+        get;
+        set => field = value > 0 ? value
+            : throw new ArgumentOutOfRangeException(nameof(value), "Must be greater than zero.");
+    }
+    = 1024 * 8;
 
     // ----------------------------------------------------
 
@@ -96,7 +108,7 @@ public class StringBuilderPool
     /// <summary>
     /// Returns the builder to the pool. The caller shall not use the builder any longer.
     /// <br/> By default, unless <paramref name="create"/> is false, the string value of the
-    /// builder is returned. If it is false, then an empty string is returned.
+    /// builder is returned.
     /// </summary>
     /// <param name="sb"></param>
     /// <param name="create"></param>
@@ -104,11 +116,13 @@ public class StringBuilderPool
     {
         lock (Items)
         {
-            var str = create ? sb.ToString() : string.Empty;
-
             TryPrune();
-            if (Items.Count < MaxPoolSize) Items.Push(sb);
 
+            var str = create ? sb.ToString() : string.Empty;
+            
+            if (Items.Count < MaxPoolSize &&
+                sb.Capacity < MaxBuilderCapacity) Items.Push(sb);
+            
             return str;
         }
     }
