@@ -11,7 +11,7 @@
    <!--IDE0130: Folder structure-->
 
    <PropertyGroup>
-	  <Description>Yotei Lambda Parser</Description>
+	  <Description>Yotei Async Lock</Description>
 	  <Version>0.7.0-v0001</Version>
 	  <Authors>mbarbac@hotmail.com</Authors>
 	  <PackageProjectUrl>https://gitbug.com/mbarbac/Yotei</PackageProjectUrl>
@@ -27,10 +27,6 @@
 	  <None Include="README.md" Pack="true" PackagePath="" />
 	  <None Include="LICENSE.txt" Pack="true" PackagePath="" />
    </ItemGroup>
-
-   <PropertyGroup>
-	  <!--<DefineConstants>$(DefineConstants);DEBUG_LAMBDA_PARSER</DefineConstants>-->
-   </PropertyGroup>
 
    <!-- DEBUG configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Debug'">

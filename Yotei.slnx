@@ -15,6 +15,14 @@
       <BuildType Solution="Local|*" Project="Debug" />
     </Project>
   </Folder>
+  <Folder Name="/1-Yotei.Tools.AsyncLock/">
+    <Project Path="1-Yotei.Tools.AsyncLock/Yotei.Tools.AsyncLock.Tests/Yotei.Tools.AsyncLock.Tests.csproj" Id="857048f6-92c5-4d22-ae3a-5234f6eada31">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
+    <Project Path="1-Yotei.Tools.AsyncLock/Yotei.Tools.AsyncLock/Yotei.Tools.AsyncLock.csproj" Id="8a4855bc-7723-48e8-b628-494da2632c7e">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
+  </Folder>
   <Folder Name="/1-Yotei.Tools.LambdaParser/">
     <Project Path="1-Yotei.Tools.LamdaParser/Yotei.Tools.LambdaParser.Tests/Yotei.Tools.LamdaParser.Tests.csproj" />
     <Project Path="1-Yotei.Tools.LamdaParser/Yotei.Tools.LambdaParser/Yotei.Tools.LambdaParser.csproj" />
