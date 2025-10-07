@@ -1,6 +1,7 @@
 ﻿using static Yotei.Tools.ConsoleEx;
 using static System.ConsoleColor;
 using Debug = Yotei.Tools.Diagnostics.DebugEx;
+using System.Diagnostics.Contracts;
 
 namespace Runner;
 

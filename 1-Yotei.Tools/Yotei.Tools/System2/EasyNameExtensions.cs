@@ -257,7 +257,7 @@ public static class EasyNameExtensions
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    //public static string EasyName(this PropertyInfo item) => item.EasyName(EasyNameOptions.Default);
+    public static string EasyName(this PropertyInfo item) => item.EasyName(EasyNameOptions.Default);
 
     /// <summary>
     /// Returns the C#-alike name of this property, using the given options.
@@ -265,8 +265,104 @@ public static class EasyNameExtensions
     /// <param name="item"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    //public static string EasyName(this PropertyInfo item, EasyNameOptions options)
-    //{
-    //    throw null;
-    //}
+    public static string EasyName(this PropertyInfo item, EasyNameOptions options)
+    {
+        item.ThrowWhenNull();
+        options.ThrowWhenNull();
+
+        var sb = StringBuilder.Pool.Rent();
+        var host = item.DeclaringType;
+
+        // Return type...
+        if (options.MemberReturnTypeOptions != null)
+        {
+            var str = item.PropertyType.EasyName(options.MemberReturnTypeOptions);
+            if (str.Length > 0) sb.Append($"{str} ");
+        }
+
+        // Host type...
+        if (options.MemberHostTypeOptions != null && host != null)
+        {
+            var str = host.EasyName(options.MemberHostTypeOptions);
+            if (str.Length > 0) sb.Append($"{str}.");
+        }
+
+        // Name...
+        var pars = item.GetIndexParameters();
+        var name = pars.Length == 0 || !options.MemberIndexerThis ? item.Name : "this";
+        sb.Append(name);
+
+        // Member arguments...
+        if (pars.Length > 0 && (
+            options.MemberArgumentTypesOptions != null || options.MemberArgumentsNames))
+        {
+            sb.Append('['); for (int i = 0; i < pars.Length; i++)
+            {
+                var par = pars[i];
+                var str = StringBuilder.Pool.Rent();
+
+                if (options.MemberArgumentTypesOptions != null)
+                {
+                    var type = par.ParameterType.EasyName(options.MemberArgumentTypesOptions);
+                    if (type.Length > 0)
+                    {
+                        str.Append(type);
+                        if (options.MemberArgumentsNames) str.Append(' ');
+                    }
+                }
+                if (options.MemberArgumentsNames) str.Append(par.Name);
+
+                if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
+                sb.Append(StringBuilder.Pool.Return(str, str.Length > 0));
+            }
+            sb.Append(']');
+        }
+
+        // Finishing...
+        return StringBuilder.Pool.Return(sb);
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns the C#-alike name of this field, using default options.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    public static string EasyName(this FieldInfo item) => item.EasyName(EasyNameOptions.Default);
+
+    /// <summary>
+    /// Returns the C#-alike name of this field, using the given options.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="options"></param>
+    /// <returns></returns>
+    public static string EasyName(this FieldInfo item, EasyNameOptions options)
+    {
+        item.ThrowWhenNull();
+        options.ThrowWhenNull();
+
+        var sb = StringBuilder.Pool.Rent();
+        var host = item.DeclaringType;
+
+        // Return type...
+        if (options.MemberReturnTypeOptions != null)
+        {
+            var str = item.FieldType.EasyName(options.MemberReturnTypeOptions);
+            if (str.Length > 0) sb.Append($"{str} ");
+        }
+
+        // Host type...
+        if (options.MemberHostTypeOptions != null && host != null)
+        {
+            var str = host.EasyName(options.MemberHostTypeOptions);
+            if (str.Length > 0) sb.Append($"{str}.");
+        }
+
+        // Name...
+        sb.Append(item.Name);
+
+        // Finishing...
+        return StringBuilder.Pool.Return(sb);
+    }
 }
