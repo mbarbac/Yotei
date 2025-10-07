@@ -67,10 +67,10 @@ public record SemanticPreRelease : IComparable<SemanticPreRelease>
     {
         if (IsEmpty) return string.Empty;
 
-        var sb = StringBuilder.Pool.Rent();
+        var sb = new StringBuilder();
         if (Value.Length > 0) sb.Append($"-{Value}");
         if (Metadata.Length > 0) sb.Append($"+{Metadata}");
-        return StringBuilder.Pool.Return(sb);
+        return sb.ToString();
     }
 
     // ----------------------------------------------------

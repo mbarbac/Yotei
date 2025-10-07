@@ -76,9 +76,9 @@ public class Project : IEnumerable<ProjectLine>
     {
         get
         {
-            var sb = StringBuilder.Pool.Rent();
+            var sb = new StringBuilder();
             if (GetVersion(out var version)) sb.Append($" v:{version}");
-            return StringBuilder.Pool.Return(sb);
+            return sb.ToString();
         }
     }
 
@@ -89,10 +89,10 @@ public class Project : IEnumerable<ProjectLine>
     {
         get
         {
-            var sb = StringBuilder.Pool.Rent();
+            var sb = new StringBuilder();
             sb.Append(NameExtension);
             if (GetVersion(out var version)) sb.Append($" v:{version}");
-            return StringBuilder.Pool.Return(sb);
+            return sb.ToString();
         }
     }
 

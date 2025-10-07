@@ -13,40 +13,40 @@ public static class EasyNameExtensions
     /// <summary>
     /// Returns the C#-alike name of this type, using default options.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="source"></param>
     /// <returns></returns>
-    public static string EasyName(this Type item) => item.EasyName(EasyNameOptions.Default);
+    public static string EasyName(this Type source) => source.EasyName(EasyNameOptions.Default);
 
     /// <summary>
     /// Returns the C#-alike name of this type, using the given options.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
     /// NOTE: Generic arguments must be captured upfront because when getting the type's host,
     /// the bound information is lost.
-    public static string EasyName(this Type item, EasyNameOptions options)
+    public static string EasyName(this Type source, EasyNameOptions options)
     {
-        item.ThrowWhenNull();
+        source.ThrowWhenNull();
         options.ThrowWhenNull();
 
-        var types = item.GetGenericArguments();
-        return item.EasyName(options, types);
+        var types = source.GetGenericArguments();
+        return source.EasyName(options, types);
     }
 
     /// <summary>
     /// Invoked after the actual closed generic arguments are captured.
     /// </summary>
-    static string EasyName(this Type item, EasyNameOptions options, Type[] types)
+    static string EasyName(this Type source, EasyNameOptions options, Type[] types)
     {
-        var sb = StringBuilder.Pool.Rent();
-        var isgen = item.FullName == null;
-        var host = item.DeclaringType;
+        var sb = new StringBuilder();
+        var isgen = source.FullName == null;
+        var host = source.DeclaringType;
 
         // Namespace...
         if (options.TypeUseNamespace && !isgen && host is null)
         {
-            var str = item.Namespace;
+            var str = source.Namespace;
             if (str is not null && str.Length > 0) sb.Append($"{str}.");
         }
 
@@ -61,7 +61,7 @@ public static class EasyNameExtensions
         var name = string.Empty;
         if (options.TypeUseName || options.TypeUseHost || options.TypeUseNamespace)
         {
-            name = item.Name;
+            name = source.Name;
             var index = name.IndexOf('`');
             if (index >= 0) name = name.Remove(index, name.Length - index);
             sb.Append(name);
@@ -70,7 +70,7 @@ public static class EasyNameExtensions
         // Generic arguments...
         if (options.TypeGenericArgumentsOptions != null)
         {
-            var args = item.GetGenericArguments().Length;
+            var args = source.GetGenericArguments().Length;
             if (args > 0)
             {
                 var used = host == null ? 0 : host.GetGenericArguments().Length;
@@ -94,7 +94,7 @@ public static class EasyNameExtensions
         }
 
         // Finishing...
-        return StringBuilder.Pool.Return(sb);
+        return sb.ToString();
     }
 
     // ----------------------------------------------------
@@ -102,28 +102,28 @@ public static class EasyNameExtensions
     /// <summary>
     /// Returns the C#-alike name of this method, using default options.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="source"></param>
     /// <returns></returns>
-    public static string EasyName(this MethodInfo item) => item.EasyName(EasyNameOptions.Default);
+    public static string EasyName(this MethodInfo source) => source.EasyName(EasyNameOptions.Default);
 
     /// <summary>
     /// Returns the C#-alike name of this method, using the given options.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this MethodInfo item, EasyNameOptions options)
+    public static string EasyName(this MethodInfo source, EasyNameOptions options)
     {
-        item.ThrowWhenNull();
+        source.ThrowWhenNull();
         options.ThrowWhenNull();
 
-        var sb = StringBuilder.Pool.Rent();
-        var host = item.DeclaringType;
+        var sb = new StringBuilder();
+        var host = source.DeclaringType;
 
         // Return type...
         if (options.MemberReturnTypeOptions != null)
         {
-            var str = item.ReturnType.EasyName(options.MemberReturnTypeOptions);
+            var str = source.ReturnType.EasyName(options.MemberReturnTypeOptions);
             if (str.Length > 0) sb.Append($"{str} ");
         }
 
@@ -135,12 +135,12 @@ public static class EasyNameExtensions
         }
 
         // Name...
-        sb.Append(item.Name);
+        sb.Append(source.Name);
 
         // Generic arguments...
         if (options.MemberGenericArgumentsOptions != null)
         {
-            var args = item.GetGenericArguments();
+            var args = source.GetGenericArguments();
             if (args.Length > 0)
             {
                 sb.Append('<'); for (int i = 0; i < args.Length; i++)
@@ -157,12 +157,12 @@ public static class EasyNameExtensions
         // Member arguments...
         if (options.MemberArgumentTypesOptions != null || options.MemberArgumentsNames)
         {
-            var pars = item.GetParameters();
+            var pars = source.GetParameters();
 
             sb.Append('('); for (int i = 0; i < pars.Length; i++)
             {
                 var par = pars[i];
-                var str = StringBuilder.Pool.Rent();
+                var str = new StringBuilder();
 
                 if (options.MemberArgumentTypesOptions != null)
                 {
@@ -176,13 +176,13 @@ public static class EasyNameExtensions
                 if (options.MemberArgumentsNames) str.Append(par.Name);
 
                 if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
-                sb.Append(StringBuilder.Pool.Return(str, str.Length > 0));
+                if (str.Length > 0) sb.Append(str);
             }
             sb.Append(')');
         }
 
         // Finishing...
-        return StringBuilder.Pool.Return(sb);
+        return sb.ToString();
     }
 
     // ----------------------------------------------------
@@ -190,23 +190,23 @@ public static class EasyNameExtensions
     /// <summary>
     /// Returns the C#-alike name of this constructor, using default options.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="source"></param>
     /// <returns></returns>
-    public static string EasyName(this ConstructorInfo item) => item.EasyName(EasyNameOptions.Default);
+    public static string EasyName(this ConstructorInfo source) => source.EasyName(EasyNameOptions.Default);
 
     /// <summary>
     /// Returns the C#-alike name of this constructor, using the given options.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this ConstructorInfo item, EasyNameOptions options)
+    public static string EasyName(this ConstructorInfo source, EasyNameOptions options)
     {
-        item.ThrowWhenNull();
+        source.ThrowWhenNull();
         options.ThrowWhenNull();
 
-        var sb = StringBuilder.Pool.Rent();
-        var host = item.DeclaringType;
+        var sb = new StringBuilder();
+        var host = source.DeclaringType;
 
         // Host type...
         if (options.MemberHostTypeOptions != null && host != null)
@@ -222,12 +222,12 @@ public static class EasyNameExtensions
         // Member arguments...
         if (options.MemberArgumentTypesOptions != null || options.MemberArgumentsNames)
         {
-            var pars = item.GetParameters();
+            var pars = source.GetParameters();
 
             sb.Append('('); for (int i = 0; i < pars.Length; i++)
             {
                 var par = pars[i];
-                var str = StringBuilder.Pool.Rent();
+                var str = new StringBuilder();
 
                 if (options.MemberArgumentTypesOptions != null)
                 {
@@ -241,13 +241,13 @@ public static class EasyNameExtensions
                 if (options.MemberArgumentsNames) str.Append(par.Name);
 
                 if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
-                sb.Append(StringBuilder.Pool.Return(str, str.Length > 0));
+                if (str.Length > 0) sb.Append(str);
             }
             sb.Append(')');
         }
 
         // Finishing...
-        return StringBuilder.Pool.Return(sb);
+        return sb.ToString();
     }
 
     // ----------------------------------------------------
@@ -255,28 +255,28 @@ public static class EasyNameExtensions
     /// <summary>
     /// Returns the C#-alike name of this property, using default options.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="source"></param>
     /// <returns></returns>
-    public static string EasyName(this PropertyInfo item) => item.EasyName(EasyNameOptions.Default);
+    public static string EasyName(this PropertyInfo source) => source.EasyName(EasyNameOptions.Default);
 
     /// <summary>
     /// Returns the C#-alike name of this property, using the given options.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this PropertyInfo item, EasyNameOptions options)
+    public static string EasyName(this PropertyInfo source, EasyNameOptions options)
     {
-        item.ThrowWhenNull();
+        source.ThrowWhenNull();
         options.ThrowWhenNull();
 
-        var sb = StringBuilder.Pool.Rent();
-        var host = item.DeclaringType;
+        var sb = new StringBuilder();
+        var host = source.DeclaringType;
 
         // Return type...
         if (options.MemberReturnTypeOptions != null)
         {
-            var str = item.PropertyType.EasyName(options.MemberReturnTypeOptions);
+            var str = source.PropertyType.EasyName(options.MemberReturnTypeOptions);
             if (str.Length > 0) sb.Append($"{str} ");
         }
 
@@ -288,8 +288,8 @@ public static class EasyNameExtensions
         }
 
         // Name...
-        var pars = item.GetIndexParameters();
-        var name = pars.Length == 0 || !options.MemberIndexerThis ? item.Name : "this";
+        var pars = source.GetIndexParameters();
+        var name = pars.Length == 0 || !options.MemberIndexerThis ? source.Name : "this";
         sb.Append(name);
 
         // Member arguments...
@@ -299,7 +299,7 @@ public static class EasyNameExtensions
             sb.Append('['); for (int i = 0; i < pars.Length; i++)
             {
                 var par = pars[i];
-                var str = StringBuilder.Pool.Rent();
+                var str = new StringBuilder();
 
                 if (options.MemberArgumentTypesOptions != null)
                 {
@@ -313,13 +313,13 @@ public static class EasyNameExtensions
                 if (options.MemberArgumentsNames) str.Append(par.Name);
 
                 if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
-                sb.Append(StringBuilder.Pool.Return(str, str.Length > 0));
+                if (str.Length > 0) sb.Append(str);
             }
             sb.Append(']');
         }
 
         // Finishing...
-        return StringBuilder.Pool.Return(sb);
+        return sb.ToString();
     }
 
     // ----------------------------------------------------
@@ -327,28 +327,28 @@ public static class EasyNameExtensions
     /// <summary>
     /// Returns the C#-alike name of this field, using default options.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="source"></param>
     /// <returns></returns>
-    public static string EasyName(this FieldInfo item) => item.EasyName(EasyNameOptions.Default);
+    public static string EasyName(this FieldInfo source) => source.EasyName(EasyNameOptions.Default);
 
     /// <summary>
     /// Returns the C#-alike name of this field, using the given options.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this FieldInfo item, EasyNameOptions options)
+    public static string EasyName(this FieldInfo source, EasyNameOptions options)
     {
-        item.ThrowWhenNull();
+        source.ThrowWhenNull();
         options.ThrowWhenNull();
 
-        var sb = StringBuilder.Pool.Rent();
-        var host = item.DeclaringType;
+        var sb = new StringBuilder();
+        var host = source.DeclaringType;
 
         // Return type...
         if (options.MemberReturnTypeOptions != null)
         {
-            var str = item.FieldType.EasyName(options.MemberReturnTypeOptions);
+            var str = source.FieldType.EasyName(options.MemberReturnTypeOptions);
             if (str.Length > 0) sb.Append($"{str} ");
         }
 
@@ -360,9 +360,9 @@ public static class EasyNameExtensions
         }
 
         // Name...
-        sb.Append(item.Name);
+        sb.Append(source.Name);
 
         // Finishing...
-        return StringBuilder.Pool.Return(sb);
+        return sb.ToString();
     }
 }

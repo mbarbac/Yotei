@@ -8,20 +8,56 @@ public record EasyNameOptions
 {
     enum BuildMode { Default, Empty, Full };
 
-    [SuppressMessage("", "IDE0075")]
-    EasyNameOptions(BuildMode mode)
+    private EasyNameOptions(BuildMode mode)
     {
-        TypeUseNamespace = mode == BuildMode.Full ? true : false;
-        TypeUseHost = mode == BuildMode.Full ? true : false;
-        TypeUseName = mode != BuildMode.Empty ? true : false;
-        TypeGenericArgumentsOptions = mode != BuildMode.Empty ? this : null;
-        MemberReturnTypeOptions = mode == BuildMode.Full ? this : null;
-        MemberHostTypeOptions = mode == BuildMode.Full ? this : null;
-        MemberConstructorNew = mode != BuildMode.Empty ? true : false;
-        MemberIndexerThis = mode != BuildMode.Empty ? true : false;
-        MemberGenericArgumentsOptions = mode != BuildMode.Empty ? this : null;
-        MemberArgumentTypesOptions = mode != BuildMode.Empty ? this : null;
-        MemberArgumentsNames = mode == BuildMode.Full ? true : false;
+        switch (mode)
+        {
+            // All false or null...
+            case BuildMode.Empty:
+                TypeUseNamespace = false;
+                TypeUseHost = false;
+                TypeUseName = false;
+                TypeGenericArgumentsOptions = null;
+                MemberReturnTypeOptions = null;
+                MemberHostTypeOptions = null;
+                MemberConstructorNew = false;
+                MemberIndexerThis = false;
+                MemberGenericArgumentsOptions = null;
+                MemberArgumentTypesOptions = null;
+                MemberArgumentsNames = false;
+                break;
+
+            // True: TypeUseName, ConstructorNew, IndexerThis..
+            // Null: ReturnType, HostType
+            case BuildMode.Default:
+                TypeUseNamespace = false;
+                TypeUseHost = false;
+                TypeUseName = true;
+                TypeGenericArgumentsOptions = this;
+                MemberReturnTypeOptions = null;
+                MemberHostTypeOptions = null;
+                MemberConstructorNew = true;
+                MemberIndexerThis = true;
+                MemberGenericArgumentsOptions = this;
+                MemberArgumentTypesOptions = this;
+                MemberArgumentsNames = false;
+                break;
+
+            // All true or this...
+            default:
+                TypeUseNamespace = true;
+                TypeUseHost = true;
+                TypeUseName = true;
+                TypeGenericArgumentsOptions = this;
+                MemberReturnTypeOptions = this;
+                MemberHostTypeOptions = this;
+                MemberConstructorNew = true;
+                MemberIndexerThis = true;
+                MemberGenericArgumentsOptions = this;
+                MemberArgumentTypesOptions = this;
+                MemberArgumentsNames = true;
+                break;
+        }
     }
 
     /// <summary>

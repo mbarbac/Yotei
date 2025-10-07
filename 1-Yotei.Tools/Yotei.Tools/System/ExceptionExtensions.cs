@@ -42,8 +42,8 @@ public static partial class ExceptionExtensions
         {
             exception.ThrowWhenNull();
 
-            var sb = StringBuilder.Pool.Rent(); Generate(sb, exception);
-            return StringBuilder.Pool.Return(sb);
+            var sb = new StringBuilder(); Generate(sb, exception);
+            return sb.ToString();
 
             /// <summary>
             /// Invoked to generate the display string of the given exception.
