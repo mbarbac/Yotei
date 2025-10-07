@@ -208,6 +208,115 @@ public static class Test_SketchExtensions
 
     // ----------------------------------------------------
 
+    //[Enforced]
+    [Fact]
+    public static void Test_Array_Empty()
+    {
+        // Default...
+        var source = Array.Empty<char>();
+        var options = SketchOptions.Default;
+        var name = source.Sketch(options); Assert.Equal("[]", name);
+
+        options = options with
+        { SourceTypeOptions = EasyNameOptions.Default with { } };
+        name = source.Sketch(options); Assert.Equal("(Char[]) []", name);
+
+        // Empty...
+        options = SketchOptions.Empty;
+        name = source.Sketch(options); Assert.Equal("[]", name);
+
+        // Full...
+        options = SketchOptions.Full;
+        name = source.Sketch(options);
+        Assert.Equal("(System.Char[]) []", name);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Array_Populated()
+    {
+        // Default...
+        var source = new int[] { 1, 2, 3 };
+        var options = SketchOptions.Default;
+        var name = source.Sketch(options); Assert.Equal("[1, 2, 3]", name);
+
+        options = options with
+        { SourceTypeOptions = EasyNameOptions.Default with { } };
+        name = source.Sketch(options); Assert.Equal("(Int32[]) [(Int32) 1, (Int32) 2, (Int32) 3]", name);
+
+        // Empty...
+        options = SketchOptions.Empty;
+        name = source.Sketch(options); Assert.Equal("[1, 2, 3]", name);
+
+        // Full...
+        options = SketchOptions.Full;
+        name = source.Sketch(options);
+        Assert.Equal("(System.Int32[]) [(System.Int32) 1, (System.Int32) 2, (System.Int32) 3]", name);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Dictionary()
+    {
+        // Default...
+        var source = new Dictionary<string, int>() { { "James", 50 }, { "Maria", 25 } };
+        var options = SketchOptions.Default;
+        var name = source.Sketch(options); Assert.Equal("{James = 50, Maria = 25}", name);
+
+        options = options with
+        { SourceTypeOptions = EasyNameOptions.Default with { } };
+        name = source.Sketch(options);
+        Assert.Equal(
+            "(Dictionary<String, Int32>) " +
+            "{(String) James = (Int32) 50, (String) Maria = (Int32) 25}",
+            name);
+
+        // Empty...
+        options = SketchOptions.Empty;
+        name = source.Sketch(options); Assert.Equal("{James = 50, Maria = 25}", name);
+
+        // Full...
+        options = SketchOptions.Full;
+        name = source.Sketch(options);
+        Assert.Equal(
+            "(System.Collections.Generic.Dictionary<System.String, System.Int32>) " +
+            "{(System.String) James = (System.Int32) 50, (System.String) Maria = (System.Int32) 25}",
+            name);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_List()
+    {
+        // Default...
+        var source = new List<string>() { "James", "Maria" };
+        var options = SketchOptions.Default;
+        var name = source.Sketch(options); Assert.Equal("[James, Maria]", name);
+
+        options = options with
+        { SourceTypeOptions = EasyNameOptions.Default with { } };
+        name = source.Sketch(options);
+        Assert.Equal(
+            "(List<String>) [(String) James, (String) Maria]",
+            name);
+
+        // Empty...
+        options = SketchOptions.Empty;
+        name = source.Sketch(options); Assert.Equal("[James, Maria]", name);
+
+        // Full...
+        options = SketchOptions.Full;
+        name = source.Sketch(options);
+        Assert.Equal(
+            "(System.Collections.Generic.List<System.String>) " +
+            "[(System.String) James, (System.String) Maria]",
+            name);
+    }
+
+    // ----------------------------------------------------
+
     public class AX
     {
         public AX(string name, int age) { Name = name; Age = age; }
@@ -272,5 +381,75 @@ public static class Test_SketchExtensions
         options = SketchOptions.Full;
         name = source.Sketch(options);
         Assert.Equal($"({NAMESPACE}.{CLASSNAME}.AZ) AY&James&50", name);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Dynamics()
+    {
+        // Default...
+        var source = new ExpandoObject();
+        dynamic obj = source;
+        obj.Name = "James";
+        obj.Age = 50;
+
+        var options = SketchOptions.Default;
+        var name = source.Sketch(options); Assert.Equal("{ [Name, James], [Age, 50] }", name);
+
+        options = options with
+        { SourceTypeOptions = EasyNameOptions.Default with { } };
+        name = source.Sketch(options);
+        Assert.Equal(
+            "(ExpandoObject) { " +
+            "(KeyValuePair<String, Object>) [Name, James], " +
+            "(KeyValuePair<String, Object>) [Age, 50] " +
+            "}",
+            name);
+
+        // Empty...
+        options = SketchOptions.Empty;
+        name = source.Sketch(options);
+        Assert.Equal("{ [Name, James], [Age, 50] }", name);
+
+        // Full...
+        options = SketchOptions.Full;
+        name = source.Sketch(options);
+        Assert.Equal(
+            "(System.Dynamic.ExpandoObject) { " +
+            "(System.Collections.Generic.KeyValuePair<System.String, System.Object>) [Name, James], " +
+            "(System.Collections.Generic.KeyValuePair<System.String, System.Object>) [Age, 50] " +
+            "}",
+            name);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Anonymous()
+    {
+        // Default...
+        var source = new { Name = "James", Age = 50 };
+        var options = SketchOptions.Default;
+        var name = source.Sketch(options); Assert.Equal("{ Name = James, Age = 50 }", name);
+
+        // TODO: Sketch anonymous: would be nice to have the values' types.
+
+        options = options with
+        { SourceTypeOptions = EasyNameOptions.Default with { } };
+        name = source.Sketch(options);
+        Assert.EndsWith("<String, Int32>) { Name = James, Age = 50 }", name);
+
+        // Empty...
+        options = SketchOptions.Empty;
+        name = source.Sketch(options);
+        Assert.Equal("{ Name = James, Age = 50 }", name);
+
+        // Full...
+        options = SketchOptions.Full;
+        name = source.Sketch(options);
+        Assert.EndsWith("<System.String, System.Int32>) { Name = James, Age = 50 }", name);
     }
 }
