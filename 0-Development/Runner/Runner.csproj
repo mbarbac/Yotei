@@ -13,10 +13,11 @@
    <!--IDE0130: Folder structure-->
 
    <ItemGroup>
+	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
 	  <PackageReference Include="xunit.v3" Version="3.1.0" />
 	  <ProjectReference Include="..\..\0-Experimental\Experimental.Tests\Experimental.Tests.csproj" />
-	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Tests\Yotei.Tools.Tests.csproj" />
+	  <ProjectReference Include="..\..\1-Yotei.Tools.LamdaParser\Yotei.Tools.LambdaParser.Tests\Yotei.Tools.LamdaParser.Tests.csproj" />
    </ItemGroup>
 
 </Project>

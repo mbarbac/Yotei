@@ -15,10 +15,12 @@
       <BuildType Solution="Local|*" Project="Debug" />
     </Project>
   </Folder>
+  <Folder Name="/1-Yotei.Tools.LambdaParser/">
+    <Project Path="1-Yotei.Tools.LamdaParser/Yotei.Tools.LambdaParser.Tests/Yotei.Tools.LamdaParser.Tests.csproj" />
+    <Project Path="1-Yotei.Tools.LamdaParser/Yotei.Tools.LambdaParser/Yotei.Tools.LambdaParser.csproj" />
+  </Folder>
   <Folder Name="/1-Yotei.Tools/">
-    <Project Path="1-Yotei.Tools/Yotei.Tools.Tests/Yotei.Tools.Tests.csproj" Id="37465de9-8d79-44ba-adf8-6954e29df92b">
-      <BuildType Solution="Local|*" Project="Debug" />
-    </Project>
+    <Project Path="1-Yotei.Tools/Yotei.Tools.Tests/Yotei.Tools.Tests.csproj" Id="37465de9-8d79-44ba-adf8-6954e29df92b" />
     <Project Path="1-Yotei.Tools/Yotei.Tools/Yotei.Tools.csproj" Id="eed4ba91-a8a8-4fde-8d81-c122183b455a" />
   </Folder>
   <Folder Name="/Solution Items/">
