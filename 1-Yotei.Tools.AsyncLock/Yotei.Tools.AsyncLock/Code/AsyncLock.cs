@@ -94,7 +94,7 @@ public sealed partial class AsyncLock : DisposableClass
     }
 
     // ----------------------------------------------------
-    /*
+    
     /// <summary>
     /// Wait until the lock is entered. Returns a disposable instance that indicates if the
     /// lock has been entered or not, and that when disposed either releases the parent lock,
@@ -104,7 +104,7 @@ public sealed partial class AsyncLock : DisposableClass
     /// <returns></returns>
     public ValueTask<Surrogate> EnterAsync(
         CancellationToken token = default)
-        => EnterAsync(Timeout.InfiniteTimeSpan, null, token);*/
+        => EnterAsync(Timeout.InfiniteTimeSpan, null, token);
 
     /// <summary>
     /// Tries to enter the lock observing the given cancellation token. Returns a disposable
