@@ -201,6 +201,7 @@ public abstract class Transaction : DisposableClass
 
         if (Level > 0)
         {
+            Level = 0; // Prevents reentrancy via Connection.Close()...
             OnAbort();
 
             if (HasOpenedConnection)
@@ -209,7 +210,6 @@ public abstract class Transaction : DisposableClass
                 Connection.Close();
             }
         }
-        Level = 0;
     }
 
     /// <summary>

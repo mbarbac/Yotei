@@ -43,33 +43,9 @@ public abstract class Connection : DisposableClass
     {
         if (IsDisposed || !disposing) return;
 
-        try { EndTransactions(disposing); } catch { }
+        try { EndTransactions(dispose: true); } catch { }
         try { if (IsOpen) Close(); } catch { }
         try { Lock.Dispose(); } catch { }
-    }
-    void EndTransactions(bool disposing)
-    {
-        if (!disposing) _Transactions.Clear();
-        else
-        {
-            var taken = false;
-            try
-            {
-                Monitor.Enter(_Transactions, ref taken);
-                if (taken)
-                {
-                    foreach (var item in _Transactions.ToList())
-                    {
-                        if (item.IsDisposed) continue;
-                        item.Dispose();
-                    }
-                }
-                else throw new InvalidOperationException(
-                    "Cannot obtain an exclusive lock on the collection of transactions.")
-                    .WithData(this);
-            }
-            finally { if (taken) Monitor.Exit(_Transactions); }
-        }
     }
 
     /// <inheritdoc/>
@@ -77,34 +53,17 @@ public abstract class Connection : DisposableClass
     {
         if (IsDisposed || !disposing) return;
 
-        try { await EndTransactionsAsync(disposing).ConfigureAwait(false); } catch { }
+        try { await EndTransactionsAsync(dispose: true).ConfigureAwait(false); } catch { }
         try { if (IsOpen) await CloseAsync().ConfigureAwait(false); } catch { }
         try { await Lock.DisposeAsync().ConfigureAwait(false); } catch { }
     }
-    async ValueTask EndTransactionsAsync(bool disposing)
-    {
-        if (!disposing) _Transactions.Clear();
-        else
-        {
-            var taken = false;
-            try
-            {
-                Monitor.Enter(_Transactions, ref taken);
-                if (taken)
-                {
-                    foreach (var item in _Transactions.ToList())
-                    {
-                        if (item.IsDisposed) continue;
-                        await item.DisposeAsync().ConfigureAwait(false);
-                    }
-                }
-                else throw new InvalidOperationException(
-                    "Cannot obtain an exclusive lock on the collection of transactions.")
-                    .WithData(this);
-            }
-            finally { if (taken) Monitor.Exit(_Transactions); }
-        }
-    }
+
+    /// <summary>
+    /// <inheritdoc cref="ICloneable.Clone"/>
+    /// Transient elements (such as the registered transactions and others) are not copied.
+    /// </summary>
+    /// <returns></returns>
+    public abstract Connection Clone();
 
     // ----------------------------------------------------
 
@@ -205,21 +164,7 @@ public abstract class Connection : DisposableClass
 
         using var disp = Lock.Enter();
 
-        var taken = false;
-        try
-        {
-            Monitor.Enter(_Transactions, ref taken);
-            if (taken)
-            {
-                foreach (var item in _Transactions)
-                    if (item.IsActive) item.Abort();
-            }
-            else throw new InvalidOperationException(
-                "Cannot obtain an exclusive lock on the collection of transactions.")
-                .WithData(this);
-        }
-        finally { if (taken) Monitor.Exit(_Transactions); }
-
+        EndTransactions(dispose: false);
         OnClose();
     }
 
@@ -234,21 +179,7 @@ public abstract class Connection : DisposableClass
 
         await using var disp = await Lock.EnterAsync().ConfigureAwait(false);
 
-        var taken = false;
-        try
-        {
-            Monitor.Enter(_Transactions, ref taken);
-            if (taken)
-            {
-                foreach (var item in _Transactions)
-                    if (item.IsActive) await item.AbortAsync().ConfigureAwait(false);
-            }
-            else throw new InvalidOperationException(
-                "Cannot obtain an exclusive lock on the collection of transactions.")
-                .WithData(this);
-        }
-        finally { if (taken) Monitor.Exit(_Transactions); }
-
+        await EndTransactionsAsync(dispose: false).ConfigureAwait(false);
         await OnCloseAsync().ConfigureAwait(false);
     }
 
@@ -307,23 +238,65 @@ public abstract class Connection : DisposableClass
     protected abstract Transaction CreateTransaction();
 
     /// <summary>
-    /// Returns a transaction associated with this instance.
+    /// Returns a default nestable transaction associated with this instance. The object returned
+    /// is guaranteed to  to be valid at the moment when it is obtained, unless the connection is
+    /// disposed. Subsequent calls to this property may not return the same object.
     /// </summary>
     public Transaction Transaction
     {
         get
         {
-            ThrowIfDisposed();
-            ThrowIfDisposing();
-
-            lock (_Transactions)
+            if (IsDisposed || OnDisposing) // Special case...
             {
-                foreach (var transaction in _Transactions)
-                    if (!transaction.IsDisposed) return transaction;
-
-                var item = CreateTransaction(); // Adds automatically...
-                return item;
+                if (_Transactions is null) _Transaction = CreateTransaction();
+                _Transaction!.Dispose();
             }
+            else // Standard case, a valid one shall be returned...
+            {
+                if (_Transaction is null || _Transaction.IsDisposed)
+                    _Transaction = CreateTransaction();
+            }
+            return _Transaction;
+        }
+    }
+    Transaction? _Transaction;
+
+    /// <summary>
+    /// Invoked to terminate the known transactions, and optionally to dispose them.
+    /// </summary>
+    void EndTransactions(bool dispose)
+    {
+        if (dispose) // Invoked from dispose operation...
+        {
+            foreach (var item in _Transactions.ToList())
+            {
+                if (!item.IsDisposed) item.Dispose();
+                _Transactions.Remove(item);
+            }
+        }
+        else // Invoked from close operation...
+        {
+            foreach (var item in _Transactions) if (item.IsActive) item.Abort();
+        }
+    }
+
+    /// <summary>
+    /// Invoked to terminate the known transactions, and optionally to dispose them.
+    /// </summary>
+    async ValueTask EndTransactionsAsync(bool dispose)
+    {
+        if (dispose) // Invoked from dispose operation...
+        {
+            foreach (var item in _Transactions.ToList())
+            {
+                if (!item.IsDisposed) await item.DisposeAsync().ConfigureAwait(false);
+                _Transactions.Remove(item);
+            }
+        }
+        else // Invoked from close operation...
+        {
+            foreach (var item in _Transactions)
+                if (item.IsActive) await item.AbortAsync().ConfigureAwait(false);
         }
     }
 }

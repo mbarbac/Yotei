@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents an underlying database engine.
 /// </summary>
-public record Engine
+public abstract record Engine
 {
     public const bool CASESENSITIVENAMES = false;
     public const string NULLVALUELITERAL = "NULL";
