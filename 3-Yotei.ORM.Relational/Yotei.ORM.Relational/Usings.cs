@@ -19,6 +19,7 @@ global using System.Threading.Tasks;
 global using Yotei.Tools;
 global using Yotei.Tools.Diagnostics;
 global using Yotei.Tools.Miscelanea;
+global using Yotei.Tools.AsyncLock;
 global using Yotei.ORM;
 global using Yotei.ORM.Entities;
 global using Yotei.ORM.Relational;

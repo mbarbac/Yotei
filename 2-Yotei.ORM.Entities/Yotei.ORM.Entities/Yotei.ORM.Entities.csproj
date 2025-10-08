@@ -33,6 +33,7 @@
    <ItemGroup Condition="'$(Configuration)'=='Debug'">
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools.LamdaParser\Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser.csproj" />
+	  <ProjectReference Include="..\..\1-Yotei.Tools.AsyncLock\Yotei.Tools.AsyncLock\Yotei.Tools.AsyncLock.csproj" />
 	  <ProjectReference Include="..\..\2-Yotei.ORM\Yotei.ORM\Yotei.ORM.csproj" />
    </ItemGroup>
 
@@ -41,12 +42,14 @@
 	  <PackageReference Include="Yotei.Tools" Version="0.7.1" />
 	  <PackageReference Include="Yotei.Tools.AsyncLock" Version="0.7.0" />
 	  <PackageReference Include="Yotei.Tools.LambdaParser" Version="0.7.0" />
+	  <PackageReference Include="Yotei.Tools.AsyncLock" Version="0.7.0" />
 	  <PackageReference Include="Yotei.Tools.ORM" Version="0.7.0" />
    </ItemGroup>
 
    <!-- LOCAL configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Local'">
 	  <PackageReference Include="Yotei.Tools" Version="0.7.1-v0001" />
+	  <PackageReference Include="Yotei.Tools.LambdaParser" Version="0.7.0-v0001" />
 	  <PackageReference Include="Yotei.Tools.AsyncLock" Version="0.7.0-v0001" />
 	  <PackageReference Include="Yotei.Tools.ORM" Version="0.7.0-v0001" />
    </ItemGroup>
