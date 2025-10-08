@@ -17,8 +17,12 @@
 	  <PackageReference Include="xunit.v3" Version="3.1.0" />
 	  <ProjectReference Include="..\..\0-Experimental\Experimental.Tests\Experimental.Tests.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Tests\Yotei.Tools.Tests.csproj" />
-	  <ProjectReference Include="..\..\1-Yotei.Tools.LamdaParser\Yotei.Tools.LambdaParser.Tests\Yotei.Tools.LamdaParser.Tests.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools.AsyncLock\Yotei.Tools.AsyncLock.Tests\Yotei.Tools.AsyncLock.Tests.csproj" />
+	  <ProjectReference Include="..\..\1-Yotei.Tools.LamdaParser\Yotei.Tools.LambdaParser.Tests\Yotei.Tools.LamdaParser.Tests.csproj" />
+	  <ProjectReference Include="..\..\2-Yotei.ORM\Yotei.ORM.Tests\Yotei.ORM.Tests.csproj" />
+	  <ProjectReference Include="..\..\2-Yotei.ORM.Entities\Yotei.ORM.Entities.Tests\Yotei.ORM.Entities.Tests.csproj" />
+	  <ProjectReference Include="..\..\3-Yotei.ORM.Relational\Yotei.ORM.Relational.Tests\Yotei.ORM.Relational.Tests.csproj" />
+	  <ProjectReference Include="..\..\4-Yotei.ORM.SqlServer\Yotei.ORM.SqlServer.Tests\Yotei.ORM.SqlServer.Tests.csproj" />
    </ItemGroup>
 
 </Project>
