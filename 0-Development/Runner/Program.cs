@@ -32,7 +32,7 @@ internal class Program
         Debug.IndentSize = 2;
         Debug.AutoFlush = true;
 
-        string? path = GetSolutionDirectory();
+        //Includes.Add(new("Yotei.Tools.AsyncLock.Tests", null, null));
 
         var position = 0; do
         {

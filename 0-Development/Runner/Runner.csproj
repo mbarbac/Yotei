@@ -18,6 +18,7 @@
 	  <ProjectReference Include="..\..\0-Experimental\Experimental.Tests\Experimental.Tests.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Tests\Yotei.Tools.Tests.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools.LamdaParser\Yotei.Tools.LambdaParser.Tests\Yotei.Tools.LamdaParser.Tests.csproj" />
+	  <ProjectReference Include="..\..\1-Yotei.Tools.AsyncLock\Yotei.Tools.AsyncLock.Tests\Yotei.Tools.AsyncLock.Tests.csproj" />
    </ItemGroup>
 
 </Project>
