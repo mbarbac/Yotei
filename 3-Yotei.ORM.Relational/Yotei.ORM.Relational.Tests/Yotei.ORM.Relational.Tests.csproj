@@ -1,0 +1,58 @@
+﻿<!-- To enable Microsoft.Testing.Platform, uncomment the following line. -->
+<!-- <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner> -->
+<!-- Note: to use Microsoft.Testing.Platform correctly with dotnet test: -->
+<!-- 1. You must add dotnet.config specifying the test runner to be Microsoft.Testing.Platform -->
+<!-- 2. You must use .NET 10 SDK or later -->
+<!-- For more information, see https://aka.ms/dotnet-test/mtp and https://xunit.net/docs/getting-started/v3/microsoft-testing-platform -->
+<!-- To enable code coverage with Microsoft.Testing.Platform, add a package reference to Microsoft.Testing.Extensions.CodeCoverage -->
+<!-- https://learn.microsoft.comdotnet/core/testing/microsoft-testing-platform-extensions-code-coverage -->
+
+<Project Sdk="Microsoft.NET.Sdk">
+
+   <PropertyGroup>
+	  <OutputType>Exe</OutputType>
+	  <TargetFramework>net10.0</TargetFramework>
+	  <LangVersion>preview</LangVersion>
+	  <ImplicitUsings>disable</ImplicitUsings>
+	  <Nullable>enable</Nullable>
+	  <IsPackable>false</IsPackable>
+	  <Configurations>Debug;Release;Local</Configurations>
+	  <NoWarn>IDE0130</NoWarn>
+   </PropertyGroup>
+   <!--IDE0130: Folder structure-->
+
+   <ItemGroup>
+	  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
+	  <PackageReference Include="xunit.v3" Version="3.1.0" />
+	  <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+		 <PrivateAssets>all</PrivateAssets>
+		 <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
+	  <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+   </ItemGroup>
+
+   <!-- DEBUG configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Debug'">
+	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
+	  <ProjectReference Include="..\..\2-Yotei.ORM\Yotei.ORM\Yotei.ORM.csproj" />
+	  <ProjectReference Include="..\..\2-Yotei.ORM.Entities\Yotei.ORM.Entities\Yotei.ORM.Entities.csproj" />
+	  <ProjectReference Include="..\Yotei.ORM.Relational\Yotei.ORM.Relational.csproj" />
+   </ItemGroup>
+
+   <!-- RELEASE configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Release'">
+	  <PackageReference Include="Yotei.Tools" Version="0.7.1" />
+	  <PackageReference Include="Yotei.ORM" Version="0.7.0" />
+	  <PackageReference Include="Yotei.ORM.Entities" Version="0.7.0" />
+	  <PackageReference Include="Yotei.ORM.Relational" Version="0.7.0" />
+   </ItemGroup>
+
+   <!-- LOCAL configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Local'">
+	  <PackageReference Include="Yotei.Tools" Version="0.7.1-v0001" />
+	  <PackageReference Include="Yotei.ORM" Version="0.7.0-v0001" />
+	  <PackageReference Include="Yotei.ORM.Entities" Version="0.7.0-v0001" />
+	  <PackageReference Include="Yotei.ORM.Relational" Version="0.7.0-v0001" />
+   </ItemGroup>
+
+</Project>
