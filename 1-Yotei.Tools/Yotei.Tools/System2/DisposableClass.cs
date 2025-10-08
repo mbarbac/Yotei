@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <inheritdoc cref="IAsyncDisposableEx"/>
-public abstract class DisposableClass : IAsyncDisposableEx
+public abstract class DisposableClass : IAsyncDisposableEx, IDisposableEx
 {
     /// <inheritdoc/>
     public bool IsDisposed { get; private set; }

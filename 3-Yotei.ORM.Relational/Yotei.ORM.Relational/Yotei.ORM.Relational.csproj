@@ -6,9 +6,10 @@
 	  <ImplicitUsings>disable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
 	  <Configurations>Debug;Release;Local</Configurations>
-	  <NoWarn>IDE0130</NoWarn>
+	  <NoWarn>IDE0130;IDE0290</NoWarn>
    </PropertyGroup>
    <!--IDE0130: Folder structure-->
+   <!--IDE0290: Primary constructor-->
 
    <PropertyGroup>
 	  <Description>Yotei ORM Entities</Description>
@@ -31,7 +32,6 @@
    <!-- DEBUG configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Debug'">
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
-	  <ProjectReference Include="..\..\1-Yotei.Tools.AsyncLock\Yotei.Tools.AsyncLock\Yotei.Tools.AsyncLock.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools.LamdaParser\Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser.csproj" />
 	  <ProjectReference Include="..\..\2-Yotei.ORM\Yotei.ORM\Yotei.ORM.csproj" />
 	  <ProjectReference Include="..\..\2-Yotei.ORM.Entities\Yotei.ORM.Entities\Yotei.ORM.Entities.csproj" />
