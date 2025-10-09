@@ -436,7 +436,6 @@ public static class Test_SketchExtensions
         var name = source.Sketch(options); Assert.Equal("{ Name = James, Age = 50 }", name);
 
         // TODO: Sketch anonymous: would be nice to have the values' types.
-
         options = options with
         { SourceTypeOptions = EasyNameOptions.Default with { } };
         name = source.Sketch(options);

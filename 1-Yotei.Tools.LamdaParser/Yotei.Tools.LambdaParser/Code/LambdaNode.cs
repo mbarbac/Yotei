@@ -130,8 +130,8 @@ public abstract class LambdaNode : DynamicObject
         LambdaParser.Print(UpdateLambdaColor,
             $"- VERSION Updating: {old} to {neo}, {ToDebugString()}");
 
-        // Hack that permits to grab this instance even when the dynamic binding is not invoked.
-        // This happens, for instance, the 2nd time a conversion is invoked.
+        // This permits to grab this instance even when the dynamic binding is not invoked.
+        // Which happens, for instance, the 2nd time a conversion is invoked.
         LambdaParser.Instance.LastNode = this;
     }
 
