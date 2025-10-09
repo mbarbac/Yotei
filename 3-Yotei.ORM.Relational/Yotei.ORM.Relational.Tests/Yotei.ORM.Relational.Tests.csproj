@@ -51,5 +51,8 @@
 	  <PackageReference Include="Yotei.ORM" Version="0.7.0-v0001" />
 	  <PackageReference Include="Yotei.ORM.Relational" Version="0.7.0-v0001" />
    </ItemGroup>
+   <ItemGroup>
+     <Folder Include="SQLCode\" />
+   </ItemGroup>
 
 </Project>

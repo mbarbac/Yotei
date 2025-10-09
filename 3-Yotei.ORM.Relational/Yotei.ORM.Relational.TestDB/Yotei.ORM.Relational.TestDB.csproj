@@ -11,29 +11,11 @@
    <!--IDE0130: Folder structure-->
    <!--IDE0290: Primary constructor-->
 
-   <PropertyGroup>
-	  <Description>Yotei ORM SqlServer</Description>
-	  <Version>0.7.0-v0001</Version>
-	  <Authors>mbarbac@hotmail.com</Authors>
-	  <PackageProjectUrl>https://gitbug.com/mbarbac/Yotei</PackageProjectUrl>
-	  <IsPackable>true</IsPackable>
-	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-	  <IncludeSymbols>true</IncludeSymbols>
-	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-	  <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-	  <PackageReadmeFile>README.md</PackageReadmeFile>
-   </PropertyGroup>
-
-   <ItemGroup>
-	  <None Include="README.md" Pack="true" PackagePath="" />
-	  <None Include="LICENSE.txt" Pack="true" PackagePath="" />
-   </ItemGroup>
-
    <!-- DEBUG configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Debug'">
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
 	  <ProjectReference Include="..\..\2-Yotei.ORM\Yotei.ORM\Yotei.ORM.csproj" />
-	  <ProjectReference Include="..\..\3-Yotei.ORM.Relational\Yotei.ORM.Relational\Yotei.ORM.Relational.csproj" />
+	  <ProjectReference Include="..\Yotei.ORM.Relational\Yotei.ORM.Relational.csproj" />
    </ItemGroup>
 
    <!-- RELEASE configuration -->

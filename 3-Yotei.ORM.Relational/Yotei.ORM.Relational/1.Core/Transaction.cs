@@ -62,7 +62,7 @@ public class Transaction : ORM.Transaction
     /// <inheritdoc/>
     protected override void OnStart()
     {
-        if (!Connection.IsOpen) throw new InvalidOperationException(
+        if (Connection.DbConnection is null) throw new InvalidOperationException(
             "The associated connection is not opened.")
             .WithData(this);
 
@@ -76,7 +76,7 @@ public class Transaction : ORM.Transaction
     /// <inheritdoc/>
     protected override async ValueTask OnStartAsync(CancellationToken token)
     {
-        if (!Connection.IsOpen) throw new InvalidOperationException(
+        if (Connection.DbConnection is null) throw new InvalidOperationException(
             "The associated connection is not opened.")
             .WithData(this);
 

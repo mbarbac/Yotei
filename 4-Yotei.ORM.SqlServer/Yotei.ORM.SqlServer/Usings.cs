@@ -22,6 +22,5 @@ global using Yotei.Tools.Miscelanea;
 global using Yotei.Tools.AsyncLock;
 global using Yotei.ORM;
 global using Yotei.ORM.Tools;
-global using Yotei.ORM.Entities;
 global using Yotei.ORM.Relational;
 global using Yotei.ORM.SqlServer;

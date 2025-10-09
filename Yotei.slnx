@@ -40,6 +40,9 @@
     <Project Path="2-Yotei.ORM/Yotei.ORM/Yotei.ORM.csproj" Id="a545ae00-72a7-4a67-b61b-6a895a0bee9a" />
   </Folder>
   <Folder Name="/3-Yotei.ORM.Relational/">
+    <Project Path="3-Yotei.ORM.Relational/Yotei.ORM.Relational.TestDB/Yotei.ORM.Relational.TestDB.csproj" Id="cf587a7d-7538-45cf-8bb5-c92bee561c57">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
     <Project Path="3-Yotei.ORM.Relational/Yotei.ORM.Relational.Tests/Yotei.ORM.Relational.Tests.csproj" Id="5396503a-f0ca-4faa-af8f-1dcf229e3bbd" />
     <Project Path="3-Yotei.ORM.Relational/Yotei.ORM.Relational/Yotei.ORM.Relational.csproj" Id="c6edc91b-183f-4fb3-8ae2-998e83a3d2b9" />
   </Folder>

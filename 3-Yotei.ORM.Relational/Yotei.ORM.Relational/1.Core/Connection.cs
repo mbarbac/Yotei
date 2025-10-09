@@ -154,24 +154,74 @@ public class Connection : ORM.Connection
     /// <inheritdoc/>
     protected override void OnOpen()
     {
-        throw null;
+        try
+        {
+            if (_Builder is null) throw new InvalidOperationException(
+            "Connection string is null.")
+            .WithData(this);
+
+            if (DbConnection is not null) throw new InvalidOperationException(
+                "This instance is already opened.")
+                .WithData(this);
+
+            DbConnection = Engine.ProviderFactory.CreateConnection() ??
+                throw new DataException("Cannot create a physical database connection.")
+                .WithData(this);
+
+            DbConnection.Open();
+        }
+        catch
+        {
+            DbConnection = null;
+            throw;
+        }
     }
 
     /// <inheritdoc/>
-    protected override ValueTask OnOpenAsync(CancellationToken token)
+    protected override async ValueTask OnOpenAsync(CancellationToken token)
     {
-        throw null;
+        try
+        {
+            if (_Builder is null) throw new InvalidOperationException(
+            "Connection string is null.")
+            .WithData(this);
+
+            if (DbConnection is not null) throw new InvalidOperationException(
+                "This instance is already opened.")
+                .WithData(this);
+
+            DbConnection = Engine.ProviderFactory.CreateConnection() ??
+                throw new DataException("Cannot create a physical database connection.")
+                .WithData(this);
+
+            await DbConnection.OpenAsync(token).ConfigureAwait(false);
+        }
+        catch
+        {
+            DbConnection = null;
+            throw;
+        }
     }
 
     /// <inheritdoc/>
     protected override void OnClose()
     {
-        throw null;
+        if (DbConnection is not null)
+        {
+            DbConnection.Close();
+            DbConnection.Dispose();
+            DbConnection = null;
+        }
     }
 
     /// <inheritdoc/>
-    protected override ValueTask OnCloseAsync()
+    protected override async ValueTask OnCloseAsync()
     {
-        throw null;
+        if (DbConnection is not null)
+        {
+            await DbConnection.CloseAsync().ConfigureAwait(false);
+            await DbConnection.DisposeAsync().ConfigureAwait(false);
+            DbConnection = null;
+        }
     }
 }
