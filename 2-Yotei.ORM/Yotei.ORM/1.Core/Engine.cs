@@ -64,40 +64,6 @@ public abstract record Engine
 
     // ----------------------------------------------------
 
-    /// <inheritdoc/>
-    public virtual bool Equals(Engine? other)
-    {
-        if (ReferenceEquals(this, other)) return true;
-        if (other is null) return false;
-
-        return
-            CaseSensitiveNames == other.CaseSensitiveNames &&
-            string.Compare(NullValueLiteral, other.NullValueLiteral, !CaseSensitiveNames) == 0 &&
-            PositionalParameters == other.PositionalParameters &&
-            string.Compare(ParameterPrefix, other.ParameterPrefix, !CaseSensitiveNames) == 0 &&
-            NativePaging == other.NativePaging &&
-            UseTerminators == other.UseTerminators &&
-            LeftTerminator == other.LeftTerminator &&
-            RightTerminator == other.RightTerminator;
-    }
-
-    /// <inheritdoc/>
-    public override int GetHashCode()
-    {
-        var code = 0;
-        code = HashCode.Combine(code, CaseSensitiveNames);
-        code = HashCode.Combine(code, NullValueLiteral);
-        code = HashCode.Combine(code, PositionalParameters);
-        code = HashCode.Combine(code, ParameterPrefix);
-        code = HashCode.Combine(code, NativePaging);
-        code = HashCode.Combine(code, UseTerminators);
-        code = HashCode.Combine(code, LeftTerminator);
-        code = HashCode.Combine(code, RightTerminator);
-        return code;
-    }
-
-    // ----------------------------------------------------
-
     /// <summary>
     /// Determines if the identifier-alike names in the database are case sensitive or not.
     /// </summary>

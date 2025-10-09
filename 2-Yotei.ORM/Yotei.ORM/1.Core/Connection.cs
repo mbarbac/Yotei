@@ -3,6 +3,7 @@
 // ========================================================
 /// <summary>
 /// Represents a connection with an underlying database.
+/// <br/> Instances of this type are not supposed to be shared among threads.
 /// </summary>
 public abstract class Connection : DisposableClass, ICloneable
 {
@@ -35,6 +36,14 @@ public abstract class Connection : DisposableClass, ICloneable
         RetryInterval = source.RetryInterval;
     }
 
+    /// <summary>
+    /// <inheritdoc cref="ICloneable.Clone"/>
+    /// Transient or instance-only elements are not copied.
+    /// </summary>
+    /// <returns></returns>
+    public abstract Connection Clone();
+    object ICloneable.Clone() => Clone();
+
     /// <inheritdoc/>
     public override string ToString() => $"ORM.Connection({Engine})";
 
@@ -57,14 +66,6 @@ public abstract class Connection : DisposableClass, ICloneable
         try { if (IsOpen) await CloseAsync().ConfigureAwait(false); } catch { }
         try { await Lock.DisposeAsync().ConfigureAwait(false); } catch { }
     }
-
-    /// <summary>
-    /// <inheritdoc cref="ICloneable.Clone"/>
-    /// Transient elements (such as the registered transactions and others) are not copied.
-    /// </summary>
-    /// <returns></returns>
-    public abstract Connection Clone();
-    object ICloneable.Clone() => Clone();
 
     // ----------------------------------------------------
 
@@ -233,36 +234,6 @@ public abstract class Connection : DisposableClass, ICloneable
     }
 
     /// <summary>
-    /// Invoked to create a new transaction of the appropriate type for this instance.
-    /// </summary>
-    /// <returns></returns>
-    protected abstract Transaction CreateTransaction();
-
-    /// <summary>
-    /// Returns a default nestable transaction associated with this instance. The object returned
-    /// is guaranteed to  to be valid at the moment when it is obtained, unless the connection is
-    /// disposed. Subsequent calls to this property may not return the same object.
-    /// </summary>
-    public Transaction Transaction
-    {
-        get
-        {
-            if (IsDisposed || OnDisposing) // Special case...
-            {
-                if (_Transaction is null) _Transaction = CreateTransaction();
-                _Transaction!.Dispose();
-            }
-            else // Standard case, a valid one shall be returned...
-            {
-                if (_Transaction is null || _Transaction.IsDisposed)
-                    _Transaction = CreateTransaction();
-            }
-            return _Transaction;
-        }
-    }
-    Transaction? _Transaction;
-
-    /// <summary>
     /// Invoked to terminate the known transactions, and optionally to dispose them.
     /// </summary>
     void EndTransactions(bool dispose)
@@ -300,4 +271,36 @@ public abstract class Connection : DisposableClass, ICloneable
                 if (item.IsActive) await item.AbortAsync().ConfigureAwait(false);
         }
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to create a new transaction of the appropriate type for this instance.
+    /// </summary>
+    /// <returns></returns>
+    public abstract Transaction CreateTransaction();
+
+    /// <summary>
+    /// Returns a default nestable transaction associated with this instance. The object returned
+    /// is guaranteed to  to be valid at the moment when it is obtained, unless the connection is
+    /// disposed. Subsequent calls to this property may not return the same object.
+    /// </summary>
+    public Transaction Transaction
+    {
+        get
+        {
+            if (IsDisposed || OnDisposing) // Special case...
+            {
+                _Transaction ??= CreateTransaction();
+                _Transaction.Dispose();
+            }
+            else // Standard case, a valid one shall be returned...
+            {
+                if (_Transaction is null || _Transaction.IsDisposed)
+                    _Transaction = CreateTransaction();
+            }
+            return _Transaction;
+        }
+    }
+    Transaction? _Transaction;
 }

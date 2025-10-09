@@ -17,5 +17,5 @@ public class FakeConnection : Connection
     protected override void OnClose() => _IsOpen = false;
     protected override ValueTask OnCloseAsync() { OnClose(); return ValueTask.CompletedTask; }
 
-    protected override Transaction CreateTransaction() => new FakeTransaction(this);
+    public override Transaction CreateTransaction() => new FakeTransaction(this);
 }
