@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents a connection with an underlying database.
 /// </summary>
-public abstract class Connection : DisposableClass
+public abstract class Connection : DisposableClass, ICloneable
 {
     public const int RETRIES = 4;
     public const int RETRYINTERVALMS = 250;
@@ -64,6 +64,7 @@ public abstract class Connection : DisposableClass
     /// </summary>
     /// <returns></returns>
     public abstract Connection Clone();
+    object ICloneable.Clone() => Clone();
 
     // ----------------------------------------------------
 
@@ -248,7 +249,7 @@ public abstract class Connection : DisposableClass
         {
             if (IsDisposed || OnDisposing) // Special case...
             {
-                if (_Transactions is null) _Transaction = CreateTransaction();
+                if (_Transaction is null) _Transaction = CreateTransaction();
                 _Transaction!.Dispose();
             }
             else // Standard case, a valid one shall be returned...
