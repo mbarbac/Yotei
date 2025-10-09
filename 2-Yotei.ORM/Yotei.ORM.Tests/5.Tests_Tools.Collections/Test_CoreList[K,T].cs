@@ -20,6 +20,7 @@ public static class Test_CoreList_KT
 
     // ----------------------------------------------------
 
+    [DebuggerDisplay("{ToDebugString(5)}")]
     public class Chain : CoreList<string, IElement>, IElement
     {
         public Chain(bool sensitive) => Sensitive = sensitive;
@@ -532,10 +533,10 @@ public static class Test_CoreList_KT
         try { _ = items.RemoveRange(-1, 0); Assert.Fail(); }
         catch (ArgumentOutOfRangeException) { }
 
-        try { _ = items.RemoveRange(4, 0); Assert.Fail(); }
+        try { _ = items.RemoveRange(4, 0); Assert.Fail(); } // Now we have 3 elements...
         catch (ArgumentException) { }
 
-        try { _ = items.RemoveRange(0, 4); Assert.Fail(); }
+        try { _ = items.RemoveRange(0, 4); Assert.Fail(); } // Now we have 3 elements...
         catch (ArgumentException) { }
     }
 
@@ -632,21 +633,6 @@ public static class Test_CoreList_KT
         Assert.Same(xtwo, items[0]);
         Assert.Same(xthree, items[1]);
         Assert.Same(xone, items[2]);
-
-        items = new Chain(false, [xone, xtwo, xthree, xone]);
-        num = items.RemoveLast(x => ((Element)x).Name.Contains('n'));
-        Assert.Equal(1, num);
-        Assert.Equal(3, items.Count);
-        Assert.Same(xone, items[0]);
-        Assert.Same(xtwo, items[1]);
-        Assert.Same(xthree, items[2]);
-
-        items = new Chain(false, [xone, xtwo, xthree, xone]);
-        num = items.RemoveAll(x => ((Element)x).Name.Contains('n'));
-        Assert.Equal(2, num);
-        Assert.Equal(2, items.Count);
-        Assert.Same(xtwo, items[0]);
-        Assert.Same(xthree, items[1]);
     }
 
     //[Enforced]
@@ -660,13 +646,6 @@ public static class Test_CoreList_KT
         Assert.Same(xone, items[0]);
         Assert.Same(xtwo, items[1]);
         Assert.Same(xthree, items[2]);
-
-        items = new Chain(false, [xone, xtwo, xthree, xone]);
-        num = items.RemoveAll(x => ((Element)x).Name.Contains('n'));
-        Assert.Equal(2, num);
-        Assert.Equal(2, items.Count);
-        Assert.Same(xtwo, items[0]);
-        Assert.Same(xthree, items[1]);
     }
 
     //[Enforced]

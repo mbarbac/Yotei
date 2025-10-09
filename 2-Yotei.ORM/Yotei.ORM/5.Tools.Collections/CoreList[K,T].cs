@@ -460,8 +460,9 @@ public abstract class CoreList<K, T>
     /// <returns></returns>
     public virtual int RemoveRange(int index, int count)
     {
-        if (count == 0 &&
-            index >= 0 && index < Count) return 0;
+        if (count == 0 && index >= 0 && index < Count) return 0;
+        if (index < 0) throw new ArgumentOutOfRangeException(nameof(index), "Index is negative.").WithData(index);
+        if (index >= Items.Count) throw new ArgumentOutOfRangeException(nameof(index), "Index too big.").WithData(index);
 
         Items.RemoveRange(index, count);
         return count;
