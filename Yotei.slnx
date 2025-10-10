@@ -16,16 +16,17 @@
     </Project>
   </Folder>
   <Folder Name="/1-Yotei.Tools.AsyncLock/">
-    <Project Path="1-Yotei.Tools.AsyncLock/Yotei.Tools.AsyncLock.Tests/Yotei.Tools.AsyncLock.Tests.csproj" Id="c2f8e252-162d-4ae2-a644-e48956f3fbc6">
-      <BuildType Solution="Local|*" Project="Debug" />
-    </Project>
-    <Project Path="1-Yotei.Tools.AsyncLock/Yotei.Tools.AsyncLock/Yotei.Tools.AsyncLock.csproj" Id="d4cedbd0-89bb-4b57-bc91-2850f6019a44">
-      <BuildType Solution="Local|*" Project="Debug" />
-    </Project>
+    <Project Path="1-Yotei.Tools.AsyncLock/Yotei.Tools.AsyncLock.Tests/Yotei.Tools.AsyncLock.Tests.csproj" Id="c2f8e252-162d-4ae2-a644-e48956f3fbc6" />
+    <Project Path="1-Yotei.Tools.AsyncLock/Yotei.Tools.AsyncLock/Yotei.Tools.AsyncLock.csproj" Id="d4cedbd0-89bb-4b57-bc91-2850f6019a44" />
   </Folder>
   <Folder Name="/1-Yotei.Tools.Generators/" />
-  <Folder Name="/1-Yotei.Tools.Generators/CoreGenerator/" />
-  <Folder Name="/1-Yotei.Tools.Generators/WithGenerator/" />
+  <Folder Name="/1-Yotei.Tools.Generators/CoreGenerator/">
+    <Project Path="1-Yotei.Tools.Generators/Yotei.Tools.CoreGenerator/Yotei.Tools.CoreGenerator.shproj" Id="35ca4364-387b-438a-b1fa-e46b52b64e49" />
+  </Folder>
+  <Folder Name="/1-Yotei.Tools.Generators/WithGenerator/">
+    <Project Path="1-Yotei.Tools.Generators/Yotei.Tools.WithGenerator.Tests/Yotei.Tools.WithGenerator.Tests.csproj" Id="4f0b97d9-16f5-4754-b051-0dbc75188a2a" />
+    <Project Path="1-Yotei.Tools.Generators/Yotei.Tools.WithGenerator/Yotei.Tools.WithGenerator.csproj" Id="8899f169-b861-49c8-8127-714dc8ebbc16" />
+  </Folder>
   <Folder Name="/1-Yotei.Tools.LambdaParser/">
     <Project Path="1-Yotei.Tools.LamdaParser/Yotei.Tools.LambdaParser.Tests/Yotei.Tools.LamdaParser.Tests.csproj" />
     <Project Path="1-Yotei.Tools.LamdaParser/Yotei.Tools.LambdaParser/Yotei.Tools.LambdaParser.csproj" />
@@ -43,19 +44,13 @@
     <Project Path="2-Yotei.ORM/Yotei.ORM/Yotei.ORM.csproj" Id="a545ae00-72a7-4a67-b61b-6a895a0bee9a" />
   </Folder>
   <Folder Name="/3-Yotei.ORM.Relational/">
-    <Project Path="3-Yotei.ORM.Relational/Yotei.ORM.Relational.TestDB/Yotei.ORM.Relational.TestDB.csproj" Id="cf587a7d-7538-45cf-8bb5-c92bee561c57">
-      <BuildType Solution="Local|*" Project="Debug" />
-    </Project>
+    <Project Path="3-Yotei.ORM.Relational/Yotei.ORM.Relational.TestDB/Yotei.ORM.Relational.TestDB.csproj" Id="cf587a7d-7538-45cf-8bb5-c92bee561c57" />
     <Project Path="3-Yotei.ORM.Relational/Yotei.ORM.Relational.Tests/Yotei.ORM.Relational.Tests.csproj" Id="5396503a-f0ca-4faa-af8f-1dcf229e3bbd" />
     <Project Path="3-Yotei.ORM.Relational/Yotei.ORM.Relational/Yotei.ORM.Relational.csproj" Id="c6edc91b-183f-4fb3-8ae2-998e83a3d2b9" />
   </Folder>
   <Folder Name="/4-Yotei.ORM.SqlServer/">
-    <Project Path="4-Yotei.ORM.SqlServer/Yotei.ORM.SqlServer.Tests/Yotei.ORM.SqlServer.Tests.csproj" Id="cbe4a372-841c-4787-a346-a02c474fa365">
-      <BuildType Solution="Local|*" Project="Debug" />
-    </Project>
-    <Project Path="4-Yotei.ORM.SqlServer/Yotei.ORM.SqlServer/Yotei.ORM.SqlServer.csproj" Id="28c21424-0bd3-40e7-85d3-f24a9288a2df">
-      <BuildType Solution="Local|*" Project="Debug" />
-    </Project>
+    <Project Path="4-Yotei.ORM.SqlServer/Yotei.ORM.SqlServer.Tests/Yotei.ORM.SqlServer.Tests.csproj" Id="cbe4a372-841c-4787-a346-a02c474fa365" />
+    <Project Path="4-Yotei.ORM.SqlServer/Yotei.ORM.SqlServer/Yotei.ORM.SqlServer.csproj" Id="28c21424-0bd3-40e7-85d3-f24a9288a2df" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".gitignore" />

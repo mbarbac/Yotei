@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+   <PropertyGroup>
+	  <TargetFramework>netstandard2.0</TargetFramework>
+	  <LangVersion>preview</LangVersion>
+	  <ImplicitUsings>disable</ImplicitUsings>
+	  <Nullable>enable</Nullable>
+	  <Configurations>Debug;Release;Local</Configurations>
+	  <NoWarn>IDE0130;IDE0290</NoWarn>
+   </PropertyGroup>
+   <!--IDE0130: Folder structure-->
+   <!--IDE0290: Primary constructor-->
+
+   <PropertyGroup>
+	  <Description>Yotei ORM With Generator</Description>
+	  <Version>0.7.0-v0001</Version>
+	  <Authors>mbarbac@hotmail.com</Authors>
+	  <PackageProjectUrl>https://gitbug.com/mbarbac/Yotei</PackageProjectUrl>
+	  <IsPackable>true</IsPackable>
+	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	  <IncludeSymbols>true</IncludeSymbols>
+	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	  <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+	  <PackageReadmeFile>README.md</PackageReadmeFile>
+   </PropertyGroup>
+
+   <ItemGroup>
+	  <None Include="README.md" Pack="true" PackagePath="" />
+	  <None Include="LICENSE.txt" Pack="true" PackagePath="" />
+   </ItemGroup>
+
+   <Import Project="..\Yotei.Tools.CoreGenerator\Yotei.Tools.CoreGenerator.projitems" Label="Shared" />
+   <ItemGroup>
+	  <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.14.0" />
+   </ItemGroup>
+
+   <PropertyGroup>
+	  <!--<DefineConstants>$(DefineConstants);DEBUG_WITH_GENERATOR</DefineConstants>-->
+	  <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+   </PropertyGroup>
+
+   <ItemGroup>
+	  <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+   </ItemGroup>
+
+</Project>
