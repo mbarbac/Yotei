@@ -1,4 +1,4 @@
-﻿namespace Experimental.Monads;
+﻿namespace Experimental;
 
 // ========================================================
 /// <summary>

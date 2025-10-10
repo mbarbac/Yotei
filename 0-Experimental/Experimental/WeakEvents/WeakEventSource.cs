@@ -1,4 +1,4 @@
-﻿namespace Experimental.WeakEvents;
+﻿namespace Experimental;
 
 // ========================================================
 public sealed class WeakEventSource

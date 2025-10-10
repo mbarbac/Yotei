@@ -1,3 +1,3 @@
-﻿namespace Experimental.Monads;
+﻿namespace Experimental;
 
 // ========================================================
