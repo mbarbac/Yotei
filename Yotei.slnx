@@ -23,6 +23,9 @@
       <BuildType Solution="Local|*" Project="Debug" />
     </Project>
   </Folder>
+  <Folder Name="/1-Yotei.Tools.Generators/" />
+  <Folder Name="/1-Yotei.Tools.Generators/CoreGenerator/" />
+  <Folder Name="/1-Yotei.Tools.Generators/WithGenerator/" />
   <Folder Name="/1-Yotei.Tools.LambdaParser/">
     <Project Path="1-Yotei.Tools.LamdaParser/Yotei.Tools.LambdaParser.Tests/Yotei.Tools.LamdaParser.Tests.csproj" />
     <Project Path="1-Yotei.Tools.LamdaParser/Yotei.Tools.LambdaParser/Yotei.Tools.LambdaParser.csproj" />

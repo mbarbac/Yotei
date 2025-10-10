@@ -1,2 +1,5 @@
 Necesito volver al esquema de API-CODE
 Pj: IdentifierChain necesita heredar tanto de IInvariantList como de IIdentifier
+
+Y, por tanto, necesito generadores para [With] e [InheritWiths]
+Por aquello de facilitar el codigo.
