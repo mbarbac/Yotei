@@ -32,6 +32,7 @@
 
    <ItemGroup>
      <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
+     <ProjectReference Include="..\Experimental\Experimental.csproj" />
    </ItemGroup>
 
 </Project>
