@@ -16,9 +16,11 @@
 	  <ImplicitUsings>disable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
 	  <IsPackable>false</IsPackable>
-	  <NoWarn>IDE0130</NoWarn>
+	  <NoWarn>IDE0130;IDE0290;IDE0051</NoWarn>
    </PropertyGroup>
    <!--IDE0130: Folder structure-->
+   <!--IDE0290: Use primary constructor-->
+   <!--IDE0051: Remove unused private members-->
 
    <ItemGroup>
 	  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />

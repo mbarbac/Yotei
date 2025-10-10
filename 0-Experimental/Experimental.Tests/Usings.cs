@@ -22,3 +22,4 @@ global using Yotei.Tools.Diagnostics;
 global using Yotei.Tools.Miscelanea;
 
 global using Experimental.Monads;
+global using Experimental.WeakEvents;
