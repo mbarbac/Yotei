@@ -35,6 +35,7 @@
    <ItemGroup Condition="'$(Configuration)'=='Debug'">
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
 	  <ProjectReference Include="..\..\2-Yotei.ORM\Yotei.ORM\Yotei.ORM.csproj" />
+	  <ProjectReference Include="..\..\2-Yotei.ORM.Entities\Yotei.ORM.Entities\Yotei.ORM.Entities.csproj" />
 	  <ProjectReference Include="..\..\3-Yotei.ORM.Relational\Yotei.ORM.Relational\Yotei.ORM.Relational.csproj" />
 	  <ProjectReference Include="..\Yotei.ORM.SqlServer\Yotei.ORM.SqlServer.csproj" />
    </ItemGroup>
@@ -43,6 +44,7 @@
    <ItemGroup Condition="'$(Configuration)'=='Release'">
 	  <PackageReference Include="Yotei.Tools" Version="0.7.1" />
 	  <PackageReference Include="Yotei.ORM" Version="0.7.0" />
+	  <PackageReference Include="Yotei.ORM.Entities" Version="0.7.0" />
 	  <PackageReference Include="Yotei.ORM.Relational" Version="0.7.0" />
 	  <PackageReference Include="Yotei.ORM.SqlServer" Version="0.7.0" />
    </ItemGroup>
@@ -51,6 +53,7 @@
    <ItemGroup Condition="'$(Configuration)'=='Local'">
 	  <PackageReference Include="Yotei.Tools" Version="0.7.1-v0001" />
 	  <PackageReference Include="Yotei.ORM" Version="0.7.0-v0001" />
+	  <PackageReference Include="Yotei.ORM.Entities" Version="0.7.0-v0001" />
 	  <PackageReference Include="Yotei.ORM.Relational" Version="0.7.0-v0001" />
 	  <PackageReference Include="Yotei.ORM.SqlServer" Version="0.7.0-v0001" />
    </ItemGroup>
