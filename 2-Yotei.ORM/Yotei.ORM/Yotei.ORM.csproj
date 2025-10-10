@@ -25,13 +25,12 @@
    </PropertyGroup>
 
    <ItemGroup>
-     <Compile Remove="1.Core\Connection.cs" />
-     <Compile Remove="1.Core\Engine.cs" />
-     <Compile Remove="1.Core\Identifier.cs" />
-     <Compile Remove="1.Core\IdentifierChain.cs" />
-     <Compile Remove="1.Core\IdentifierChain_Builder.cs" />
-     <Compile Remove="1.Core\IdentifierUnit.cs" />
-     <Compile Remove="1.Core\Transaction.cs" />
+     <Compile Remove="1.Core\**" />
+     <EmbeddedResource Remove="1.Core\**" />
+     <None Remove="1.Core\**" />
+   </ItemGroup>
+
+   <ItemGroup>
      <Compile Remove="5.Tools.Collections\CoreList[K,T].cs" />
      <Compile Remove="5.Tools.Collections\CoreList[T].cs" />
      <Compile Remove="5.Tools.Collections\InvariantList[K,T].cs" />
@@ -64,9 +63,6 @@
 	  <PackageReference Include="Yotei.Tools.AsyncLock" Version="0.7.0-v0001" />
 	  <PackageReference Include="Yotei.Tools.LambdaParser" Version="0.7.0-v0001" />
 	  <PackageReference Include="Yotei.Tools.AsyncLock" Version="0.7.0-v0001" />
-   </ItemGroup>
-   <ItemGroup>
-     <Folder Include="1.Core\" />
    </ItemGroup>
 
 </Project>
