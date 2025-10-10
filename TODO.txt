@@ -1,0 +1,2 @@
+Necesito volver al esquema de API-CODE
+Pj: IdentifierChain necesita heredar tanto de IInvariantList como de IIdentifier

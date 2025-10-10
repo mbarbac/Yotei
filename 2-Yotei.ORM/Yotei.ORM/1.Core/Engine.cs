@@ -27,6 +27,48 @@ public abstract record Engine
     // ----------------------------------------------------
 
     /// <summary>
+    /// Determines if the two given instances can be considered the same.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <returns></returns>
+    public static bool Compare(Engine? x, Engine? y)
+    {
+        if (x is null && y is null) return true;
+        if (x is null || y is null) return false;
+
+        return
+            x.CaseSensitiveNames == y.CaseSensitiveNames &&
+            string.Compare(x.NullValueLiteral, y.NullValueLiteral, !x.CaseSensitiveNames) == 0 &&
+            x.PositionalParameters == y.PositionalParameters &&
+            string.Compare(x.ParameterPrefix, y.ParameterPrefix, !x.CaseSensitiveNames) == 0 &&
+            x.NativePaging == y.NativePaging &&
+            x.UseTerminators == y.UseTerminators &&
+            x.LeftTerminator == y.LeftTerminator &&
+            x.RightTerminator == y.RightTerminator;
+    }
+
+    /// <inheritdoc/>
+    public virtual bool Equals(Engine? other) => Compare(this, other);
+
+    /// <inheritdoc/>
+    public override int GetHashCode()
+    {
+        var code = 0;
+        code = HashCode.Combine(code, CaseSensitiveNames);
+        code = HashCode.Combine(code, NullValueLiteral);
+        code = HashCode.Combine(code, PositionalParameters);
+        code = HashCode.Combine(code, ParameterPrefix);
+        code = HashCode.Combine(code, NativePaging);
+        code = HashCode.Combine(code, UseTerminators);
+        code = HashCode.Combine(code, LeftTerminator);
+        code = HashCode.Combine(code, RightTerminator);
+        return code;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Initializes a new instance.
     /// </summary>
     public Engine()

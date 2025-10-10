@@ -30,6 +30,30 @@ public record Engine : ORM.Engine
     // ----------------------------------------------------
 
     /// <summary>
+    /// Determines if the two given instances can be considered the same.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <returns></returns>
+    public static bool Compare(Engine? x, Engine? y)
+    {
+        if (x is null && y is null) return true;
+        if (x is null || y is null) return false;
+
+        return
+            ORM.Engine.Compare(x, y) &&
+            ReferenceEquals(x.ProviderFactory, y.ProviderFactory);
+    }
+
+    /// <inheritdoc/>
+    public virtual bool Equals(Engine? other) => Compare(this, other);
+
+    /// <inheritdoc/>
+    public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), ProviderFactory);
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// The underlying ADO.NET factory used by this instance.
     /// </summary>
     public DbProviderFactory ProviderFactory { get; init => field = value.ThrowWhenNull(); }

@@ -19,6 +19,22 @@
 	  <Configurations>Debug;Release;Local</Configurations>
 	  <NoWarn>IDE0130</NoWarn>
    </PropertyGroup>
+
+   <ItemGroup>
+     <Compile Remove="0.Fakes\FakeConnection.cs" />
+     <Compile Remove="0.Fakes\FakeEngine.cs" />
+     <Compile Remove="0.Fakes\FakeTransactions.cs" />
+     <Compile Remove="1.Tests_Core\Test_Connection.cs" />
+     <Compile Remove="1.Tests_Core\Test_Engine.cs" />
+     <Compile Remove="1.Tests_Core\Test_Identifier.cs" />
+     <Compile Remove="1.Tests_Core\Test_IdentifierUnit.cs" />
+     <Compile Remove="1.Tests_Core\Test_Transaction_Custom.cs" />
+     <Compile Remove="1.Tests_Core\Test_Transaction_Default.cs" />
+     <Compile Remove="5.Tests_Tools.Collections\Test_CoreList[K,T].cs" />
+     <Compile Remove="5.Tests_Tools.Collections\Test_CoreList[T].cs" />
+     <Compile Remove="5.Tests_Tools.Collections\Test_InvariantList[K,T].cs" />
+     <Compile Remove="5.Tests_Tools.Collections\Test_InvariantList[T].cs" />
+   </ItemGroup>
    <!--IDE0130: Folder structure-->
 
    <ItemGroup>
