@@ -11,7 +11,10 @@ internal sealed class ErrorCandidate : ICandidate
     /// Initializes a new instance.
     /// </summary>
     /// <param name="diagnostic"></param>
-    public ErrorCandidate(Diagnostic diagnostic) => throw null;
+    public ErrorCandidate(Diagnostic diagnostic)
+    {
+        throw null;
+    }
 
     /// <inheritdoc/>
     public override string ToString() => Diagnostic.GetMessage();

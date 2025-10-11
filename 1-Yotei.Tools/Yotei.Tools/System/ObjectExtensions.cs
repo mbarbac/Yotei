@@ -39,6 +39,7 @@ public static partial class ObjectExtensions
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool EqualsEx([AllowNull] T other)
         {
             if (value is null && other is null) return true;
