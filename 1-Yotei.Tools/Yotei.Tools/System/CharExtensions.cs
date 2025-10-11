@@ -1,7 +1,7 @@
-﻿namespace Yotei.Tools.CoreGenerator;
+﻿namespace Yotei.Tools;
 
 // ========================================================
-internal static class CharExtensions
+public static class CharExtensions
 {
     // bool Equals(value)
 

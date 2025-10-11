@@ -5,8 +5,6 @@ namespace Yotei.Tools.CoreGenerator;
 // ========================================================
 internal static class StringSpanCharTargetExtensions
 {
-    // int IndexOf(value)
-
     /// <summary>
     /// Returns the index of the first ocurrence of the given value in the source, or -1 if it
     /// cannot be found.
@@ -97,8 +95,6 @@ internal static class StringSpanCharTargetExtensions
     }
 
     // ----------------------------------------------------
-
-    // int LastIndexOf(value)
 
     /// <summary>
     /// Returns the index of the last ocurrence of the given value in the source, or -1 if it

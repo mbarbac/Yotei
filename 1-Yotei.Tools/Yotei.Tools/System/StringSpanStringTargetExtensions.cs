@@ -1,9 +1,9 @@
 ﻿using StringSpan = System.ReadOnlySpan<char>;
 
-namespace Yotei.Tools.CoreGenerator;
+namespace Yotei.Tools;
 
 // ========================================================
-internal static class StringSpanStringTargetExtensions
+public static class StringSpanStringTargetExtensions
 {
     /// <summary>
     /// Returns the index of the first ocurrence of the given value in the source, or -1 if it
@@ -29,40 +29,6 @@ internal static class StringSpanStringTargetExtensions
                 var s = source[i + k];
                 var v = value[k];
                 if (s.Equals(v, caseSensitive)) found = true;
-                else { found = false; break; }
-            }
-            if (found) return i;
-        }
-        return -1;
-    }
-
-    /// <summary>
-    /// Returns the index of the first ocurrence of the given value in the source, or -1 if it
-    /// cannot be found.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="value"></param>
-    /// <param name="comparer"></param>
-    /// <returns></returns>
-    public static int IndexOf(
-        this StringSpan source, StringSpan value, IEqualityComparer<char> comparer)
-    {
-        comparer.ThrowWhenNull();
-
-        if (source.Length == 0 && value.Length == 0) return 0;
-        if (source.Length == 0) return -1;
-        if (value.Length == 0) return 0;
-
-        for (int i = 0; i < source.Length; i++)
-        {
-            var found = false;
-            for (int k = 0; k < value.Length; k++)
-            {
-                if ((i + k) >= source.Length) break;
-
-                var s = source[i + k];
-                var v = value[k];
-                if (s.Equals(v, comparer)) found = true;
                 else { found = false; break; }
             }
             if (found) return i;
@@ -105,7 +71,7 @@ internal static class StringSpanStringTargetExtensions
     }
 
     // ----------------------------------------------------
-
+    
     /// <summary>
     /// Returns the index of the last ocurrence of the given value in the source, or -1 if it
     /// cannot be found.
@@ -146,40 +112,6 @@ internal static class StringSpanStringTargetExtensions
     /// <param name="comparer"></param>
     /// <returns></returns>
     public static int LastIndexOf(
-        this StringSpan source, StringSpan value, IEqualityComparer<char> comparer)
-    {
-        comparer.ThrowWhenNull();
-
-        if (source.Length == 0 && value.Length == 0) return 0;
-        if (source.Length == 0) return -1;
-        if (value.Length == 0) return 0;
-
-        for (int i = source.Length - 1; i >= 0; i--)
-        {
-            var found = false;
-            for (int k = 0; k < value.Length; k++)
-            {
-                if ((i + k) >= source.Length) break;
-
-                var s = source[i + k];
-                var v = value[k];
-                if (s.Equals(v, comparer)) found = true;
-                else { found = false; break; }
-            }
-            if (found) return i;
-        }
-        return -1;
-    }
-
-    /// <summary>
-    /// Returns the index of the last ocurrence of the given value in the source, or -1 if it
-    /// cannot be found.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="value"></param>
-    /// <param name="comparer"></param>
-    /// <returns></returns>
-    public static int LastIndexOf(
         this StringSpan source, StringSpan value, IEqualityComparer<string> comparer)
     {
         comparer.ThrowWhenNull();
@@ -198,38 +130,6 @@ internal static class StringSpanStringTargetExtensions
                 var s = source[i + k];
                 var v = value[k];
                 if (s.Equals(v, comparer)) found = true;
-                else { found = false; break; }
-            }
-            if (found) return i;
-        }
-        return -1;
-    }
-
-    /// <summary>
-    /// Returns the index of the last ocurrence of the given value in the source, or -1 if it
-    /// cannot be found.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="value"></param>
-    /// <param name="comparison"></param>
-    /// <returns></returns>
-    public static int LastIndexOf(
-        this StringSpan source, StringSpan value, StringComparison comparison)
-    {
-        if (source.Length == 0 && value.Length == 0) return 0;
-        if (source.Length == 0) return -1;
-        if (value.Length == 0) return 0;
-
-        for (int i = source.Length - 1; i >= 0; i--)
-        {
-            var found = false;
-            for (int k = 0; k < value.Length; k++)
-            {
-                if ((i + k) >= source.Length) break;
-
-                var s = source[i + k];
-                var v = value[k];
-                if (s.Equals(v, comparison)) found = true;
                 else { found = false; break; }
             }
             if (found) return i;
@@ -302,17 +202,6 @@ internal static class StringSpanStringTargetExtensions
     /// <param name="comparer"></param>
     /// <returns></returns>
     public static bool StartsWith(
-        this StringSpan source, StringSpan value, IEqualityComparer<char> comparer)
-        => source.IndexOf(value, comparer) == 0;
-
-    /// <summary>
-    /// Determines if the source starts with the given value, or not.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="value"></param>
-    /// <param name="comparer"></param>
-    /// <returns></returns>
-    public static bool StartsWith(
         this StringSpan source, StringSpan value, IEqualityComparer<string> comparer)
         => source.IndexOf(value, comparer) == 0;
 
@@ -328,17 +217,6 @@ internal static class StringSpanStringTargetExtensions
     public static bool EndsWith(
         this StringSpan source, StringSpan value, bool caseSensitive)
         => source.LastIndexOf(value, caseSensitive) == source.Length - value.Length;
-
-    /// <summary>
-    /// Determines if the source ends with the given value, or not.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="value"></param>
-    /// <param name="comparer"></param>
-    /// <returns></returns>
-    public static bool EndsWith(
-        this StringSpan source, StringSpan value, IEqualityComparer<char> comparer)
-        => source.LastIndexOf(value, comparer) == source.Length - value.Length;
 
     /// <summary>
     /// Determines if the source ends with the given value, or not.
