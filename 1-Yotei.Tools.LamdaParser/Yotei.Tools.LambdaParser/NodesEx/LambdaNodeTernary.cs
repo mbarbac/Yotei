@@ -23,10 +23,16 @@ public sealed class LambdaNodeTernary : LambdaNode
         LambdaParser.Print(NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => $"({LambdaLeft} ? {LambdaMiddle} : {LambdaRight})";
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override LambdaNodeArgument? GetArgument()
         => LambdaLeft.GetArgument()
         ?? LambdaMiddle.GetArgument()

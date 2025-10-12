@@ -28,10 +28,16 @@ public sealed class LambdaNodeValue : LambdaNode
         LambdaParser.Print(NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => $"'{LambdaValue.Sketch()}'";
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override LambdaNodeArgument? GetArgument() => LambdaValue is LambdaNode node
         ? node.GetArgument()
         : null;

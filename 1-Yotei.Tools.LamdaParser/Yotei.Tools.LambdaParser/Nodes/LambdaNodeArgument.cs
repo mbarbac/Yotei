@@ -17,10 +17,16 @@ public class LambdaNodeArgument : LambdaNode
         LambdaParser.Print(NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => LambdaName;
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override LambdaNodeArgument? GetArgument() => this;
 
     // ----------------------------------------------------

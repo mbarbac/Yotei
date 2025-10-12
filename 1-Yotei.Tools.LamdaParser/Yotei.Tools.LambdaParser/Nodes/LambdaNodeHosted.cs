@@ -13,7 +13,10 @@ public abstract class LambdaNodeHosted : LambdaNode
     /// <param name="host"></param>
     public LambdaNodeHosted(LambdaNode host) : base() => LambdaHost = host.ThrowWhenNull();
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override LambdaNodeArgument? GetArgument() => LambdaHost.GetArgument();
 
     // ----------------------------------------------------

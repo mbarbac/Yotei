@@ -19,7 +19,10 @@ public sealed class LambdaNodeMember : LambdaNodeHosted
         LambdaParser.Print(NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => $"{LambdaHost}.{LambdaName}";
 
     // ----------------------------------------------------

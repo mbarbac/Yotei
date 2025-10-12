@@ -21,10 +21,16 @@ public sealed class LambdaNodeConvert : LambdaNode
         LambdaParser.Print(NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => $"(({LambdaType.EasyName()}) {LambdaTarget})";
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override LambdaNodeArgument? GetArgument() => LambdaTarget.GetArgument();
 
     // ----------------------------------------------------

@@ -21,10 +21,16 @@ public sealed class LambdaNodeUnary : LambdaNode
         LambdaParser.Print(NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => $"({LambdaOperation} {LambdaTarget})";
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override LambdaNodeArgument? GetArgument() => LambdaTarget.GetArgument();
 
     // ----------------------------------------------------

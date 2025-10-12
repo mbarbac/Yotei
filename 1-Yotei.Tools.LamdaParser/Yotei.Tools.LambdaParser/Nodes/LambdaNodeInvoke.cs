@@ -19,7 +19,10 @@ public sealed class LambdaNodeInvoke : LambdaNodeHosted
         LambdaParser.Print(NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString()
         => $"{LambdaHost}({string.Join(", ", LambdaArguments.Select(x => x.ToString()))})";
 

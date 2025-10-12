@@ -21,10 +21,16 @@ public sealed class LambdaNodeCoalesce : LambdaNode
         LambdaParser.Print(NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => $"({LambdaLeft} ?? {LambdaRight})";
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override LambdaNodeArgument? GetArgument()
         => LambdaLeft.GetArgument()
         ?? LambdaRight.GetArgument();

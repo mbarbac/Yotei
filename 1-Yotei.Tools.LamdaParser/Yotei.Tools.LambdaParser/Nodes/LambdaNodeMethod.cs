@@ -46,7 +46,10 @@ public sealed class LambdaNodeMethod : LambdaNodeHosted
         LambdaParser.Print(NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString()
     {
         var sb = new StringBuilder();

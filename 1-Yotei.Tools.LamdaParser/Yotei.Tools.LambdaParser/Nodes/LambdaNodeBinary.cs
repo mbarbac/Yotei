@@ -23,10 +23,16 @@ public sealed class LambdaNodeBinary : LambdaNode
         LambdaParser.Print(NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => $"({LambdaLeft} {LambdaOperation} {LambdaRight})";
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override LambdaNodeArgument? GetArgument()
         => LambdaLeft.GetArgument()
         ?? LambdaRight.GetArgument();
