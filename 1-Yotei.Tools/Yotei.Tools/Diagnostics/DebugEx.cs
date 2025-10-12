@@ -6,21 +6,27 @@
 /// </summary>
 public static class DebugEx
 {
+    /// <summary>
     /// <inheritdoc cref="Debug.AutoFlush"/>
+    /// </summary>
     public static bool AutoFlush
     {
         get => Debug.AutoFlush;
         set => Debug.AutoFlush = value;
     }
 
+    /// <summary>
     /// <inheritdoc cref="Debug.IndentLevel"/>"/>
+    /// </summary>
     public static int IndentLevel
     {
         get => Debug.IndentLevel;
         set => Debug.IndentLevel = value;
     }
 
+    /// <summary>
     /// <inheritdoc cref="Debug.IndentSize"/>"/>
+    /// </summary>
     public static int IndentSize
     {
         get => Debug.IndentSize;
@@ -29,13 +35,19 @@ public static class DebugEx
 
     // ----------------------------------------------------
 
+    /// <summary>
     /// <inheritdoc cref="Debug.Flush"/>
+    /// </summary>
     public static void Flush() => Debug.Flush();
 
-    /// <inheritdoc cref="Debug.Indent"/>/>
+    /// <summary>
+    /// <inheritdoc cref="Debug.Indent"/>
+    /// </summary>
     public static void Indent() => Debug.Indent();
 
-    /// <inheritdoc cref="Debug.Unindent"/>/>
+    /// <summary>
+    /// <inheritdoc cref="Debug.Unindent"/>
+    /// </summary>
     public static void Unindent() => Debug.Unindent();
 
     // ----------------------------------------------------

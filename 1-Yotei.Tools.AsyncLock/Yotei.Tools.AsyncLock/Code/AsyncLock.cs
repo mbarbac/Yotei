@@ -13,14 +13,21 @@ public sealed partial class AsyncLock : DisposableClass
     /// </summary>
     public AsyncLock() { }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <param name="disposing"><inheritdoc/></param>
     protected override void OnDispose(bool disposing)
     {
         if (IsDisposed || !disposing) return;
         Semaphore.Dispose();
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <param name="disposing"><inheritdoc/></param>
+    /// <returns><inheritdoc/></returns>
     protected override ValueTask OnDisposeAsync(bool disposing)
     {
         // We must NOT run this asynchronously (ie: in the thread pool) to prevent a mismatch
@@ -33,7 +40,10 @@ public sealed partial class AsyncLock : DisposableClass
         return ValueTask.CompletedTask;
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString()
         => $"(Thread:{ThreadId}/Async:{AsyncId}, #Count:{Count})";
 

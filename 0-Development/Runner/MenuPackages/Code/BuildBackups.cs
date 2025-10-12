@@ -17,7 +17,10 @@ public class BuildBackups
     /// </summary>
     public BuildBackups() { }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => $"Count: {Items.Count}";
 
     // ----------------------------------------------------
@@ -67,6 +70,7 @@ public class BuildBackups
     /// <summary>
     /// Restores, for all projects registered into this instance, their saved lines.
     /// </summary>
+    /// <param name="display"></param>
     public void Restore(bool display)
     {
         if (display) WriteLine(true);

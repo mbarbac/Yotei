@@ -8,10 +8,15 @@ public class ChangeVersion(Project project) : ConsoleMenuEntry
 {
     readonly Project Project = project.ThrowWhenNull();
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string Header() => "Change Version";
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
     public override void Execute() => OnExecute(interactive: true);
 
     /// <summary>

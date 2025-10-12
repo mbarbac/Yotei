@@ -6,10 +6,15 @@ namespace Runner;
 // ========================================================
 public class ClearLocalPackages : ConsoleMenuEntry
 {
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string Header() => "Clean Local Packages";
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
     public override void Execute()
     {
         Console.Clear();

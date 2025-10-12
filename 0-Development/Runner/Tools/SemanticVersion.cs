@@ -27,6 +27,9 @@
 /// </summary>
 public record SemanticVersion : IComparable<SemanticVersion>
 {
+    /// <summary>
+    /// A common shared empty instance.
+    /// </summary>
     public static SemanticVersion Empty { get; } = new();
 
     // ----------------------------------------------------
@@ -139,7 +142,10 @@ public record SemanticVersion : IComparable<SemanticVersion>
     /// <param name="value"></param>
     public static implicit operator SemanticVersion(string value) => new(value);
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString()
     {
         var str = $"{Major}.{Minor}.{Patch}";
@@ -202,7 +208,12 @@ public record SemanticVersion : IComparable<SemanticVersion>
 
     // ----------------------------------------------------
 
+    /// <summary>
     /// <inheritdoc cref="IComparable.CompareTo(object?)"/>
+    /// </summary>
+    /// <param name="x"><inheritdoc cref="IComparable.CompareTo(object?)"/></param>
+    /// <param name="y"><inheritdoc cref="IComparable.CompareTo(object?)"/></param>
+    /// <returns><inheritdoc cref="IComparable.CompareTo(object?)"/></returns>
     public static int Compare(SemanticVersion? x, SemanticVersion? y)
     {
         if (x is null && y is null) return 0;
@@ -216,7 +227,11 @@ public record SemanticVersion : IComparable<SemanticVersion>
         return x.PreRelease.CompareTo(y.PreRelease);
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <param name="other"><inheritdoc/></param>
+    /// <returns><inheritdoc/></returns>
     public int CompareTo(SemanticVersion? other) => Compare(this, other);
 
     public static bool operator >(SemanticVersion? x, SemanticVersion? y) => Compare(x, y) > 0;
@@ -226,7 +241,11 @@ public record SemanticVersion : IComparable<SemanticVersion>
 
     // ----------------------------------------------------
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <param name="other"><inheritdoc/></param>
+    /// <returns><inheritdoc/></returns>
     public virtual bool Equals(SemanticVersion? other)
     {
         if (other is null) return false;
@@ -237,7 +256,10 @@ public record SemanticVersion : IComparable<SemanticVersion>
         return true;
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override int GetHashCode() => HashCode.Combine(Major, Minor, Patch, PreRelease);
 
     // ----------------------------------------------------

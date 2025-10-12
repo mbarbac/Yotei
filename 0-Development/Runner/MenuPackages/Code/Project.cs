@@ -37,7 +37,10 @@ public class Project : IEnumerable<ProjectLine>
         LoadContents();
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => NameExtension;
 
     // ----------------------------------------------------
@@ -100,7 +103,10 @@ public class Project : IEnumerable<ProjectLine>
 
     readonly List<ProjectLine> Lines = [];
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public IEnumerator<ProjectLine> GetEnumerator() => Lines.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 

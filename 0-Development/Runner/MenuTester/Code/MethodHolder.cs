@@ -18,7 +18,10 @@ public class MethodHolder
             $"Method '{method.Name}' is not a valid test one.");
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => Name;
 
     // ----------------------------------------------------

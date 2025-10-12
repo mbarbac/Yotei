@@ -27,7 +27,6 @@ internal class CoreGenerator : IIncrementalGenerator
     /// <br/> This method is infrastructure only and shall not be used by application code.
     /// </summary>
     /// <param name="context"></param>
-    /// <exception cref="NotImplementedException"></exception>
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         throw new NotImplementedException();

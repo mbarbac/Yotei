@@ -187,7 +187,10 @@ public class LambdaParser
     /// </summary>
     private LambdaParser() { }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString()
     {
         var args = DynamicArguments.Select(x => x.Sketch()).Sketch();

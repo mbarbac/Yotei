@@ -26,7 +26,11 @@ internal class CodeBuilder
     //    IndentSize = this.IndentSize,
     //};
 
+    /// <summary>
     /// <inheritdoc/>
+    /// <br/> This method can actually be used to obtain the builder contents to emit code.
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => Builder.ToString();
 
     /// <summary>

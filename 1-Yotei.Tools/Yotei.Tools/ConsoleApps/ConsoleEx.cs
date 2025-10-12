@@ -27,7 +27,9 @@ public static class ConsoleEx
 
     // ----------------------------------------------------
 
+    /// <summary>
     /// <inheritdoc cref="Console.Clear"/>
+    /// </summary>
     public static void Clear() => Console.Clear();
 
     // ----------------------------------------------------

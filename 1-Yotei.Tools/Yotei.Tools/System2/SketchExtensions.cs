@@ -1,6 +1,4 @@
-﻿using System.Net.Http.Headers;
-
-namespace Yotei.Tools;
+﻿namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>

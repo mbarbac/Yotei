@@ -53,7 +53,11 @@ public abstract class LambdaNode : DynamicObject
 
     // ----------------------------------------------------
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <param name="expression"><inheritdoc/></param>
+    /// <returns><inheritdoc/></returns>
     public override DynamicMetaObject GetMetaObject(Expression expression)
     {
         var master = base.GetMetaObject(expression);
@@ -140,7 +144,13 @@ public abstract class LambdaNode : DynamicObject
 
     // ---------------------------------------------------- Overriden
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <param name="binder"><inheritdoc/></param>
+    /// <param name="indexes"><inheritdoc/></param>
+    /// <param name="result"><inheritdoc/></param>
+    /// <returns><inheritdoc/></returns>
     public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object? result)
     {
         LambdaParser.Print(NodeBindedColor, $"* GetIndex:");
@@ -158,7 +168,12 @@ public abstract class LambdaNode : DynamicObject
         return true;
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <param name="binder"><inheritdoc/></param>
+    /// <param name="result"><inheritdoc/></param>
+    /// <returns><inheritdoc/></returns>
     public override bool TryGetMember(GetMemberBinder binder, out object? result)
     {
         LambdaParser.Print(NodeBindedColor, $"* GetMember:");
@@ -173,7 +188,13 @@ public abstract class LambdaNode : DynamicObject
         return true;
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <param name="binder"><inheritdoc/></param>
+    /// <param name="args"><inheritdoc/></param>
+    /// <param name="result"><inheritdoc/></param>
+    /// <returns><inheritdoc/></returns>
     public override bool TryInvoke(InvokeBinder binder, object?[]? args, out object? result)
     {
         LambdaParser.Print(NodeBindedColor, $"* Invoke:");
@@ -191,7 +212,13 @@ public abstract class LambdaNode : DynamicObject
         return true;
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <param name="binder"><inheritdoc/></param>
+    /// <param name="args"><inheritdoc/></param>
+    /// <param name="result"><inheritdoc/></param>
+    /// <returns><inheritdoc/></returns>
     public override bool TryInvokeMember(
         InvokeMemberBinder binder, object?[]? args, out object? result)
     {

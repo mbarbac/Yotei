@@ -16,7 +16,10 @@ internal sealed class ErrorCandidate : ICandidate
         throw null;
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => Diagnostic.GetMessage();
 
     /// <summary>

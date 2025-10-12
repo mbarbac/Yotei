@@ -3,8 +3,6 @@
 // ========================================================
 public static class CharExtensions
 {
-    // bool Equals(value)
-
     /// <summary>
     /// Determines if this character is the same as the given one.
     /// <br/> This method works by comparing the lower case version of both characters.

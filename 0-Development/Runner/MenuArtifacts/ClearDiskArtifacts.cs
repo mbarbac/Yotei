@@ -11,10 +11,15 @@ public class ClearDiskArtifacts : ConsoleMenuEntry
     static StringComparison Comparison = StringComparison.OrdinalIgnoreCase;
     static string? Root;
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string Header() => "Clear Disk Artifacts";
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
     public override void Execute()
     {
         Console.Clear();

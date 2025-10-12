@@ -14,10 +14,15 @@ public class MenuTester(bool breakOnError) : ConsoleMenuEntry
 
     bool BreakOnError { get; } = breakOnError;
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string Header() => "Execute Tests";
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
     public override void Execute()
     {
         Console.Clear();
@@ -109,8 +114,6 @@ public class MenuTester(bool breakOnError) : ConsoleMenuEntry
     /// <summary>
     /// Invoked to populate the given type holder in the given assembly holder.
     /// </summary>
-    /// <param name="assemblyHolder"></param>
-    /// <param name="typeHolder"></param>
     static void Populate(AssemblyHolder assemblyHolder, TypeHolder typeHolder)
     {
         foreach (var method in typeHolder.Type.GetMethods(MethodFlags))

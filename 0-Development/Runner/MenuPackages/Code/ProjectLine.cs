@@ -22,7 +22,10 @@ public class ProjectLine
     /// </summary>
     public static implicit operator ProjectLine(string value) => new(value);
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => Value.Trim();
 
     /// <summary>

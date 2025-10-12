@@ -18,7 +18,10 @@ public class TypeHolder
             $"Type '{type.Name}' is not a valid test one.");
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => Name;
 
     // ----------------------------------------------------

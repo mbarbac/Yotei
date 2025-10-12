@@ -18,14 +18,20 @@ public class ConsoleMenu : IEnumerable<ConsoleMenuEntry>
     /// <param name="entries"></param>
     public ConsoleMenu(params ConsoleMenuEntry[] entries) => AddRange(entries);
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => $"Count: {Entries.Count}";
 
     // ----------------------------------------------------
 
     readonly List<ConsoleMenuEntry> Entries = [];
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public IEnumerator<ConsoleMenuEntry> GetEnumerator() => Entries.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 

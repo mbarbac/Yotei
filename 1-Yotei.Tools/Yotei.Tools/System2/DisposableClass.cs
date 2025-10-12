@@ -1,16 +1,24 @@
 ﻿namespace Yotei.Tools;
 
 // ========================================================
+/// <summary>
 /// <inheritdoc cref="IAsyncDisposableEx"/>
+/// </summary>
 public abstract class DisposableClass : IAsyncDisposableEx, IDisposableEx
 {
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
     public bool IsDisposed { get; private set; }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
     public bool OnDisposing { get; private set; }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
     public void ThrowIfDisposed()
     {
         if (IsDisposed) throw new ObjectDisposedException(
@@ -18,7 +26,9 @@ public abstract class DisposableClass : IAsyncDisposableEx, IDisposableEx
             .WithData(this);
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
     public void ThrowIfDisposing()
     {
         if (IsDisposed) throw new InvalidOperationException(
@@ -28,7 +38,9 @@ public abstract class DisposableClass : IAsyncDisposableEx, IDisposableEx
 
     // ----------------------------------------------------
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
     public void Dispose()
     {
         if (!IsDisposed)
@@ -45,12 +57,15 @@ public abstract class DisposableClass : IAsyncDisposableEx, IDisposableEx
     /// <summary>
     /// Invoked when disposing this instance.
     /// </summary>
-    /// <param name="disposing"></param>
+    /// <param name="disposing"><inheritdoc/></param>
     protected abstract void OnDispose(bool disposing);
 
     // ----------------------------------------------------
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public async ValueTask DisposeAsync()
     {
         if (!IsDisposed)
@@ -67,7 +82,7 @@ public abstract class DisposableClass : IAsyncDisposableEx, IDisposableEx
     /// <summary>
     /// Invoked when disposing this instance.
     /// </summary>
-    /// <param name="disposing"></param>
-    /// <returns></returns>
+    /// <param name="disposing"><inheritdoc/></param>
+    /// <returns><inheritdoc/></returns>
     protected abstract ValueTask OnDisposeAsync(bool disposing);
 }

@@ -9,10 +9,15 @@ public class CompilePackage(Project project, BuildMode mode) : ConsoleMenuEntry
     readonly Project Project = project.ThrowWhenNull();
     readonly BuildMode Mode = mode;
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string Header() => $"Compile {Mode}";
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
     public override void Execute() => OnExecute(interactive: true);
 
     /// <summary>

@@ -49,14 +49,23 @@ internal class CustomList<T> : IEnumerable<T> where T : class
         AddRange(source);
     }
 
+    /// <summary>
     /// <inheritdoc cref="ICloneable.Clone"/>
+    /// </summary>
+    /// <returns><inheritdoc cref="ICloneable.Clone"/></returns>
     public virtual CustomList<T> Clone() => new(this);
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => $"Count: {Count}";
 
     /// <summary>

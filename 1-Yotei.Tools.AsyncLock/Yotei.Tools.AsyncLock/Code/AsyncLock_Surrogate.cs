@@ -24,7 +24,10 @@ partial class AsyncLock
             OldAsyncId = AsyncHolder.Value;
         }
 
+        /// <summary>
         /// <inheritdoc/>
+        /// </summary>
+        /// <returns><inheritdoc/></returns>
         public override string ToString()
             => $"Old:(Thread:{OldThreadId}/Async:{OldAsyncId}), Parent:{Parent} {ContextData}";
 
@@ -122,7 +125,10 @@ partial class AsyncLock
 
         // ------------------------------------------------
 
+        /// <summary>
         /// <inheritdoc/>
+        /// </summary>
+        /// <param name="disposing"></param>
         protected override void OnDispose(bool disposing)
         {
             if (IsDisposed || !disposing) return;
@@ -226,7 +232,11 @@ partial class AsyncLock
 
         // ------------------------------------------------
 
+        /// <summary>
         /// <inheritdoc/>
+        /// </summary>
+        /// <param name="disposing"><inheritdoc/></param>
+        /// <returns><inheritdoc/></returns>
         protected override async ValueTask OnDisposeAsync(bool disposing)
         {
             if (IsDisposed || !disposing) return;

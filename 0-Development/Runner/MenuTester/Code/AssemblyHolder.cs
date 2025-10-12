@@ -16,7 +16,10 @@ public class AssemblyHolder
         _ = Name;
     }
 
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
     public override string ToString() => Name;
 
     // ----------------------------------------------------
