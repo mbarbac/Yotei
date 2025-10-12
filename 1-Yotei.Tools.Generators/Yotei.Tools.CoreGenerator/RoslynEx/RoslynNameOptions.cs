@@ -42,6 +42,7 @@ internal record RoslynNameOptions
                 break;
 
             // All true or this...
+            case BuildMode.Full:
             default:
                 TypeUseNamespace = true;
                 TypeUseHost = true;

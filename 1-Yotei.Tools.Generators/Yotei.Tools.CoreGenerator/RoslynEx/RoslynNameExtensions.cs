@@ -422,86 +422,112 @@ internal static class RoslynNameExtensions
             sb.Append(name);
         }
 
-        // Attribute arguments...
-
-
-        /*
-        
         // Generic arguments...
-        if (options.MemberGenericArgumentsOptions != null && source.TypeArguments.Length > 0)
+        if (options.MemberGenericArgumentsOptions != null)
         {
-            if (name.Length == 0) { name = "$"; sb.Append(name); }
-
-            sb.Append('<'); for (int i = 0; i < source.TypeArguments.Length; i++)
-            {
-                var arg = source.TypeArguments[i];
-                var str = arg.RoslynName(options.MemberGenericArgumentsOptions);
-
-                if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
-                sb.Append(str);
-            }
-            sb.Append('>');
+            // HIGH: find generic arguments of AttributeData.RoslynName()
+            // Something like: source.AttributeConstructor.TypeArguments, etc...
         }
 
-        // Member arguments...
+        // Attribute constructor arguments...
         if (options.MemberUseArguments ||
             options.MemberArgumentTypesOptions != null || options.MemberArgumentsNames)
         {
-            if (name.Length == 0) { name = "$"; sb.Append(name); }
+            var done = false;
 
-            sb.Append('('); for (int i = 0; i < source.Parameters.Length; i++)
+            sb.Append('(');
+            for (int i = 0; i < source.ConstructorArguments.Length; i++) // Only values...
             {
-                var str = new StringBuilder();
-                if (options.MemberArgumentTypesOptions != null || options.MemberArgumentsNames)
-                {
-                    var par = source.Parameters[i];
-                    var pname = options.MemberArgumentsNames ? par.Name : "";
-                    var ptype = options.MemberArgumentTypesOptions == null ? ""
-                        : par.Type.RoslynName(options.MemberArgumentTypesOptions);
+                var arg = source.ConstructorArguments[i];
+                var opt = options.MemberArgumentTypesOptions ?? RoslynNameOptions.Empty;
+                var str = arg.RoslynName(opt);
 
-                    if (ptype.Length > 0)
-                    {
-                        sb.Append(ptype);
-                        if (pname.Length > 0) sb.Append(' ');
-                    }
-                    sb.Append(pname);
-                }
+                if (done) sb.Append(str.Length == 0 ? "," : ", ");
+                sb.Append(str);
+            }
+            for (int i = 0; i < source.NamedArguments.Length; i++) // Name: value...
+            {
+                var arg = source.NamedArguments[i];
+                var opt = options.MemberArgumentTypesOptions ?? RoslynNameOptions.Empty;
+                var str = arg.Value.RoslynName(opt, options.MemberArgumentsNames ? arg.Key : null);
 
-                if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
-                if (str.Length > 0) sb.Append(str);
+                if (done) sb.Append(str.Length == 0 ? "," : ", ");
+                sb.Append(str);
             }
             sb.Append(')');
-        }*/
+        }
 
         // Finishing...
-        throw null; // return sb.ToString();
+        return sb.ToString();
     }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns the C#-alike name of this element, using default options.
+    /// Returns the C#-alike name of this element, using default options, and the given optional
+    /// name, if not null.
     /// </summary>
     /// <param name="source"></param>
+    /// <param name="name"></param>
     /// <returns></returns>
-    public static string RoslynName(
-        this TypedConstant source) => source.RoslynName(RoslynNameOptions.Default);
+    public static string RoslynName(this TypedConstant source, string? name = null)
+    {
+        return source.RoslynName(RoslynNameOptions.Default, name);
+    }
 
     /// <summary>
-    /// Returns the C#-alike name of this element, using the given options.
+    /// Returns the C#-alike name of this element, using the given options, and the given optional
+    /// name, if not null.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="options"></param>
+    /// <param name="name"></param>
     /// <returns></returns>
-    public static string RoslynName(this TypedConstant source, RoslynNameOptions options)
+    public static string RoslynName(
+        this TypedConstant source, RoslynNameOptions options, string? name = null)
     {
         source.ThrowWhenNull();
         options.ThrowWhenNull();
 
         var sb = new StringBuilder();
 
+        if (name != null)
+        {
+            sb.Append(name);
+            sb.Append(": ");
+        }
+
+        if (options.MemberReturnTypeOptions != null && source.Type is not null)
+        {
+            sb.Append('(');
+            var str = source.Type.RoslynName(options); sb.Append(str);
+            if (source.Kind == TypedConstantKind.Array) sb.Append("[]");
+            sb.Append(") ");
+        }
+
+        if (source.IsNull) sb.Append("null");
+        else
+        {
+            if (source.Kind == TypedConstantKind.Array)
+            {
+                sb.Append('['); for (int i = 0; i < source.Values.Length; i++)
+                {
+                    if (i > 0) sb.Append(", ");
+
+                    var str = source.Values[i].RoslynName(options, null);
+                    sb.Append(str);
+                }
+                sb.Append(']');
+            }
+            else
+            {
+                var str = ObjectValue(source.Value, options);
+                sb.Append(str);
+            }
+        }
+
         // Finishing...
-        throw null; // return sb.ToString();
+        return sb.ToString();
     }
 
     /// <summary>

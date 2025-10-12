@@ -7,7 +7,7 @@ namespace Yotei.Tools;
 /// Maintains the '<c>EasyName(...)</c>' family of methods, which return a C#-alike name of the
 /// given element: types or type members' info instances.
 /// </summary>
-/// TODO: there seems to be no way to tell if a type is null-annotated, workarounds are weak.
+/// LOW: There seems to be no way to tell if a type is null-annotated, workarounds are weak.
 public static class EasyNameExtensions
 {
     /// <summary>

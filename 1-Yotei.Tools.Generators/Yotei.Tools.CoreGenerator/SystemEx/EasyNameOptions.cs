@@ -44,6 +44,7 @@ internal record EasyNameOptions
                 break;
 
             // All true or this...
+            case BuildMode.Full:
             default:
                 TypeUseNamespace = true;
                 TypeUseHost = true;
