@@ -33,6 +33,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\SkipLocalsInitAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\__.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\__.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CodeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CustomList[T].cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\CharExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\ExceptionExtensions.cs" />
