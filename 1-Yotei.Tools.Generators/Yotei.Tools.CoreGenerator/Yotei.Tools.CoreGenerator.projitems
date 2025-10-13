@@ -34,11 +34,14 @@
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\__.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\__.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CustomList[T].cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\CharExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\ExceptionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\IEnumerableExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\ObjectExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\StringExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\DebugExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\StringSpanExtensions[Char].cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\StringSpanExtensions[String].cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
   </ItemGroup>
 </Project>

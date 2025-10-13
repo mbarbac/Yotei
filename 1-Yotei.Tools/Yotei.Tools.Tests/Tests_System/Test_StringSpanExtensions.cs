@@ -355,8 +355,8 @@ public static class Test_StringSpanExtensions
     {
         StringSpan target;
         var source = "".AsSpan();
-        target = source.Remove(0); Assert.True(target.IsEmpty);
-        try { source.Remove(1); Assert.Fail(); } catch (ArgumentException) { }
+        target = source.Remove(0, 0); Assert.True(target.IsEmpty);
+        try { source.Remove(1, 0); Assert.Fail(); } catch (ArgumentException) { }
 
         source = "0123".AsSpan();
 
