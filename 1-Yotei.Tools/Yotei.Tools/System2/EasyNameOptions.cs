@@ -7,17 +7,17 @@
 public record EasyNameOptions
 {
     /// <summary>
-    /// An instance with all settings set to false or null.
+    /// A shared instance with all settings set to false or null.
     /// </summary>
     public static EasyNameOptions Empty => new(BuildMode.Empty);
 
     /// <summary>
-    /// An instance with common useful settings.
+    /// A shared instance with default useful settings.
     /// </summary>
     public static EasyNameOptions Default => new(BuildMode.Default);
 
     /// <summary>
-    /// An instance with full settings enabled.
+    /// A shared instance with full settings enabled.
     /// </summary>
     public static EasyNameOptions Full => new(BuildMode.Full);
 
@@ -44,6 +44,14 @@ public record EasyNameOptions
     /// <br/> This setting is mostly used to prevent generic names to appear.
     /// </summary>
     public bool TypeUseName { get; init; }
+
+    /// <summary>
+    /// EXPERIMENTAL <br/>
+    /// Determines if the nullable annotation of the type element shall be used.
+    /// </summary>
+    /// LOW: Find a robust way to determine if '?' is applied to reference types.
+    /// HACK: for value types we intercept 'Nullable{T}' ones.
+    public bool TypeUseNullable { get; init; }
 
     /// <summary>
     /// If not null, the options to use with the generic type arguments of the type element.
@@ -113,6 +121,7 @@ public record EasyNameOptions
                 TypeUseNamespace = false;
                 TypeUseHost = false;
                 TypeUseName = false;
+                TypeUseNullable = false;
                 TypeGenericArgumentOptions = null;
                 MemberReturnTypeOptions = null;
                 MemberHostTypeOptions = null;
@@ -125,6 +134,7 @@ public record EasyNameOptions
                 TypeUseNamespace = false;
                 TypeUseHost = false;
                 TypeUseName = true; // Use the type element name
+                TypeUseNullable = false;
                 TypeGenericArgumentOptions = this; // Use type generic arguments
                 MemberReturnTypeOptions = null;
                 MemberHostTypeOptions = null;
@@ -138,6 +148,7 @@ public record EasyNameOptions
                 TypeUseNamespace = true;
                 TypeUseHost = true;
                 TypeUseName = true;
+                TypeUseNullable = true;
                 TypeGenericArgumentOptions = this;
                 MemberReturnTypeOptions = this;
                 MemberHostTypeOptions = this;
