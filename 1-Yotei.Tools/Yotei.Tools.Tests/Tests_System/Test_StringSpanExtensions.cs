@@ -637,4 +637,106 @@ public static class Test_StringSpanExtensions
         target = source.RemoveTail(value, StringComparison.Ordinal); Assert.Equal(source, target);
         target = source.RemoveTail(value, StringComparison.OrdinalIgnoreCase); Assert.Equal("-x-", target);
     }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_HeadIndex_Char()
+    {
+        char value;
+        StringSpan source;
+
+        value = ' '; source = "".AsSpan(); Assert.Equal(-1, source.HeadIndex(value));
+        value = 'x'; source = " x "; Assert.Equal(1, source.HeadIndex(value));
+
+        source = " x--".AsSpan();
+        value = 'X';
+        Assert.Equal(-1, source.HeadIndex(value));
+        Assert.Equal(-1, source.HeadIndex(value, ignoreCase: false));
+        Assert.Equal(1, source.HeadIndex(value, ignoreCase: true));
+        Assert.Equal(-1, source.HeadIndex(value, new CharComparer(false)));
+        Assert.Equal(1, source.HeadIndex(value, new CharComparer(true)));
+        Assert.Equal(-1, source.HeadIndex(value, StringComparer.Ordinal));
+        Assert.Equal(1, source.HeadIndex(value, StringComparer.OrdinalIgnoreCase));
+        Assert.Equal(-1, source.HeadIndex(value, StringComparison.Ordinal));
+        Assert.Equal(1, source.HeadIndex(value, StringComparison.OrdinalIgnoreCase));
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_HeadIndex_String()
+    {
+        string value;
+        StringSpan source;
+
+        value = ""; source = "".AsSpan(); Assert.Equal(0, source.HeadIndex(value));
+        value = ""; source = " ".AsSpan(); Assert.Equal(0, source.HeadIndex(value));
+        value = " "; source = "".AsSpan(); Assert.Equal(-1, source.HeadIndex(value));
+
+        value = "x "; source = " x "; Assert.Equal(1, source.HeadIndex(value));
+
+        source = "  x--".AsSpan();
+        value = " X";
+        Assert.Equal(-1, source.HeadIndex(value));
+        Assert.Equal(-1, source.HeadIndex(value, ignoreCase: false));
+        Assert.Equal(1, source.HeadIndex(value, ignoreCase: true));
+        Assert.Equal(-1, source.HeadIndex(value, new CharComparer(false)));
+        Assert.Equal(1, source.HeadIndex(value, new CharComparer(true)));
+        Assert.Equal(-1, source.HeadIndex(value, StringComparer.Ordinal));
+        Assert.Equal(1, source.HeadIndex(value, StringComparer.OrdinalIgnoreCase));
+        Assert.Equal(-1, source.HeadIndex(value, StringComparison.Ordinal));
+        Assert.Equal(1, source.HeadIndex(value, StringComparison.OrdinalIgnoreCase));
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_TailIndex_Char()
+    {
+        char value;
+        StringSpan source;
+
+        value = ' '; source = "".AsSpan(); Assert.Equal(-1, source.TailIndex(value));
+        value = 'x'; source = " x "; Assert.Equal(1, source.TailIndex(value));
+
+        value = 'X';
+        source = "--x  ";
+        Assert.Equal(-1, source.TailIndex(value));
+        Assert.Equal(-1, source.TailIndex(value, ignoreCase: false));
+        Assert.Equal(2, source.TailIndex(value, ignoreCase: true));
+        Assert.Equal(-1, source.TailIndex(value, new CharComparer(false)));
+        Assert.Equal(2, source.TailIndex(value, new CharComparer(true)));
+        Assert.Equal(-1, source.TailIndex(value, StringComparer.Ordinal));
+        Assert.Equal(2, source.TailIndex(value, StringComparer.OrdinalIgnoreCase));
+        Assert.Equal(-1, source.TailIndex(value, StringComparison.Ordinal));
+        Assert.Equal(2, source.TailIndex(value, StringComparison.OrdinalIgnoreCase));
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_TailIndex_String()
+    {
+        string value;
+        StringSpan source;
+
+        value = ""; source = "".AsSpan(); Assert.Equal(0, source.TailIndex(value));
+        value = ""; source = " ".AsSpan(); Assert.Equal(1, source.TailIndex(value));
+        value = " "; source = "".AsSpan(); Assert.Equal(-1, source.TailIndex(value));
+
+        value = "x "; source = " x "; Assert.Equal(1, source.TailIndex(value));
+
+        source = "--x  ".AsSpan();
+        value = "X ";
+        Assert.Equal(-1, source.TailIndex(value));
+        Assert.Equal(-1, source.TailIndex(value, ignoreCase: false));
+        Assert.Equal(2, source.TailIndex(value, ignoreCase: true));
+        Assert.Equal(-1, source.TailIndex(value, new CharComparer(false)));
+        Assert.Equal(2, source.TailIndex(value, new CharComparer(true)));
+        Assert.Equal(-1, source.TailIndex(value, StringComparer.Ordinal));
+        Assert.Equal(2, source.TailIndex(value, StringComparer.OrdinalIgnoreCase));
+        Assert.Equal(-1, source.TailIndex(value, StringComparison.Ordinal));
+        Assert.Equal(2, source.TailIndex(value, StringComparison.OrdinalIgnoreCase));
+    }
 }

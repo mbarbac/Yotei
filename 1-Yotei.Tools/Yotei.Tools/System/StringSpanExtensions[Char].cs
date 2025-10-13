@@ -1020,4 +1020,217 @@ public static class StringSpanExtensions_CharTarget
 
         return source.Remove(index, 1, out removed);
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the source starts with the given value as if the source contains no head
+    /// spaces. If so, returns the actual index at with the value appears after those spaces. If
+    /// not, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static int HeadIndex(this StringSpan source, char value)
+    {
+        var index = source.IndexOf(value);
+        if (index >= 0)
+        {
+            for (int i = 0; i < index; i++) if (source[i] != ' ') return -1;
+            return index;
+        }
+        return -1;
+    }
+
+    /// <summary>
+    /// Determines if the source starts with the given value as if the source contains no head
+    /// spaces. If so, returns the actual index at with the value appears after those spaces. If
+    /// not, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="ignoreCase"></param>
+    /// <returns></returns>
+    public static int HeadIndex(this StringSpan source, char value, bool ignoreCase)
+    {
+        var index = source.IndexOf(value, ignoreCase);
+        if (index >= 0)
+        {
+            for (int i = 0; i < index; i++) if (source[i] != ' ') return -1;
+            return index;
+        }
+        return -1;
+    }
+
+    /// <summary>
+    /// Determines if the source starts with the given value as if the source contains no head
+    /// spaces. If so, returns the actual index at with the value appears after those spaces. If
+    /// not, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int HeadIndex(
+        this StringSpan source, char value, IEqualityComparer<char> comparer)
+    {
+        var index = source.IndexOf(value, comparer);
+        if (index >= 0)
+        {
+            for (int i = 0; i < index; i++) if (source[i] != ' ') return -1;
+            return index;
+        }
+        return -1;
+    }
+
+    /// <summary>
+    /// Determines if the source starts with the given value as if the source contains no head
+    /// spaces. If so, returns the actual index at with the value appears after those spaces. If
+    /// not, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int HeadIndex(
+        this StringSpan source, char value, IEqualityComparer<string> comparer)
+    {
+        var index = source.IndexOf(value, comparer);
+        if (index >= 0)
+        {
+            for (int i = 0; i < index; i++) if (source[i] != ' ') return -1;
+            return index;
+        }
+        return -1;
+    }
+
+    /// <summary>
+    /// Determines if the source starts with the given value as if the source contains no head
+    /// spaces. If so, returns the actual index at with the value appears after those spaces. If
+    /// not, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static int HeadIndex(
+        this StringSpan source, char value, StringComparison comparison)
+    {
+        var index = source.IndexOf(value, comparison);
+        if (index >= 0)
+        {
+            for (int i = 0; i < index; i++) if (source[i] != ' ') return -1;
+            return index;
+        }
+        return -1;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the source ends with the given value as if the source contains no tail
+    /// spaces. If so, returns the actual index at with the value appears before those spaces.
+    /// If not, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static int TailIndex(this StringSpan source, char value)
+    {
+        var index = source.LastIndexOf(value);
+        if (index >= 0)
+        {
+            var max = index + 1;
+            for (int i = source.Length - 1; i > max; i--) if (source[i] != ' ') return -1;
+            return index;
+        }
+        return -1;
+    }
+
+    /// <summary>
+    /// Determines if the source ends with the given value as if the source contains no tail
+    /// spaces. If so, returns the actual index at with the value appears before those spaces.
+    /// If not, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="ignoreCase"></param>
+    /// <returns></returns>
+    public static int TailIndex(this StringSpan source, char value, bool ignoreCase)
+    {
+        var index = source.LastIndexOf(value, ignoreCase);
+        if (index >= 0)
+        {
+            var max = index + 1;
+            for (int i = source.Length - 1; i > max; i--) if (source[i] != ' ') return -1;
+            return index;
+        }
+        return -1;
+    }
+
+    /// <summary>
+    /// Determines if the source ends with the given value as if the source contains no tail
+    /// spaces. If so, returns the actual index at with the value appears before those spaces.
+    /// If not, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int TailIndex(
+        this StringSpan source, char value, IEqualityComparer<char> comparer)
+    {
+        var index = source.LastIndexOf(value, comparer);
+        if (index >= 0)
+        {
+            var max = index + 1;
+            for (int i = source.Length - 1; i > max; i--) if (source[i] != ' ') return -1;
+            return index;
+        }
+        return -1;
+    }
+
+    /// <summary>
+    /// Determines if the source ends with the given value as if the source contains no tail
+    /// spaces. If so, returns the actual index at with the value appears before those spaces.
+    /// If not, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int TailIndex(
+        this StringSpan source, char value, IEqualityComparer<string> comparer)
+    {
+        var index = source.LastIndexOf(value, comparer);
+        if (index >= 0)
+        {
+            var max = index + 1;
+            for (int i = source.Length - 1; i > max; i--) if (source[i] != ' ') return -1;
+            return index;
+        }
+        return -1;
+    }
+
+    /// <summary>
+    /// Determines if the source ends with the given value as if the source contains no tail
+    /// spaces. If so, returns the actual index at with the value appears before those spaces.
+    /// If not, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static int TailIndex(
+        this StringSpan source, char value, StringComparison comparison)
+    {
+        var index = source.LastIndexOf(value, comparison);
+        if (index >= 0)
+        {
+            var max = index + 1;
+            for (int i = source.Length - 1; i > max; i--) if (source[i] != ' ') return -1;
+            return index;
+        }
+        return -1;
+    }
 }
