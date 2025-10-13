@@ -74,8 +74,9 @@ public static partial class StringExtensions
 
         /// <summary>
         /// Returns a string with the original value wrapped with the head and tail characters,
-        /// provided that value is not null and not empty. If trimming is requested, the that
-        /// value is trimmed before validating it.
+        /// provided that value is not null and not empty. If trimming is requested, then the 
+        /// value
+        /// is trimmed before validating it.
         /// </summary>
         /// <param name="head"></param>
         /// <param name="tail"></param>
@@ -100,7 +101,7 @@ public static partial class StringExtensions
 
         /// <summary>
         /// Returns a string with the original value wrapped with the given character, provided
-        /// that value is not null and not empty. If trimming is requested, the that value is
+        /// that value is not null and not empty. If trimming is requested, then the value is
         /// trimmed before validating it.
         /// </summary>
         /// <param name="c"></param>
