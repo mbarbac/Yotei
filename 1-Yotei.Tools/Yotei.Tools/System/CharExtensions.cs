@@ -12,9 +12,9 @@ public static class CharExtensions
     /// <param name="caseSensitive"></param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool Equals(this char source, char value, bool caseSensitive)
+    public static bool Equals(this char source, char value, bool ignoreCase)
     {
-        return caseSensitive
+        return ignoreCase
             ? char.ToLower(source) == char.ToLower(value)
             : source == value;
     }
