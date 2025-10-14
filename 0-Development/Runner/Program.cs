@@ -2,6 +2,8 @@
 using static System.ConsoleColor;
 using Debug = Yotei.Tools.Diagnostics.DebugEx;
 using System.Diagnostics.Contracts;
+using System.ComponentModel.DataAnnotations;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Runner;
 
@@ -47,65 +49,17 @@ internal class Program
                 new MenuTester(breakOnError: true),
                 new MenuArtifacts(),
                 new MenuPackages(),
-                new("Examples", () =>
-                {
-                    ReadOnlySpan<char> target;
-                    var source = "abc".AsSpan();
-
-                    target = Remove(source, 0, 0); WriteLine(true, $"Result: '{target}'");
-                    target = Remove(source, 0, 1); WriteLine(true, $"Result: '{target}'");
-                    target = Remove(source, 0, 2); WriteLine(true, $"Result: '{target}'");
-                    target = Remove(source, 0, 3); WriteLine(true, $"Result: '{target}'");
-                    try { Remove(source, 0, 4); throw new Exception(); } catch (ArgumentException) { }
-
-                    target = Remove(source, 1, 0); WriteLine(true, $"Result: '{target}'");
-                    target = Remove(source, 1, 1); WriteLine(true, $"Result: '{target}'");
-                    target = Remove(source, 1, 2); WriteLine(true, $"Result: '{target}'");
-                    try { Remove(source, 1, 3); throw new Exception(); } catch (ArgumentException) { }
-
-                    target = Remove(source, 2, 0); WriteLine(true, $"Result: '{target}'");
-                    target = Remove(source, 2, 1); WriteLine(true, $"Result: '{target}'");
-                    try { Remove(source, 2, 2); throw new Exception(); } catch (ArgumentException) { }
-
-                    target = Remove(source, 0); WriteLine(true, $"Result: '{target}'");
-                    target = Remove(source, 1); WriteLine(true, $"Result: '{target}'");
-                    target = Remove(source, 2); WriteLine(true, $"Result: '{target}'");
-                    try { Remove(source, 3); throw new Exception(); } catch (ArgumentException) { }
-                }),
+                //new("Examples", () =>
+                //{
+                //}),
             }
             .Run(MenuOptions);
         }
         while (position > 0);
     }
-    public static ReadOnlySpan<char> Remove(ReadOnlySpan<char> source, int index)
-    {
-        if (index < 0) throw new ArgumentException("Index cannot be negative").WithData(index);
-        if (index >= source.Length) throw new ArgumentException("Index is too big.").WithData(index).WithData(source.ToString());
 
-        var count = source.Length - index;
-        return Remove(source, index, count);
-    }
-
-    public static ReadOnlySpan<char> Remove(ReadOnlySpan<char> source, int index, int count)
-    {
-        if (index < 0) throw new ArgumentException("Index cannot be negative").WithData(index);
-        if (count < 0) throw new ArgumentException("Count cannot be negative").WithData(index);
-
-        if (index == 0 && count == source.Length) return [];
-        if (index >= source.Length) throw new ArgumentException("Index is too big.").WithData(index).WithData(source.ToString());
-        if ((index + count) > source.Length) throw new ArgumentException("Index + Count is too big.").WithData(index).WithData(count).WithData(source.ToString());
-
-        if (source.Length == 0) return source;
-        if (count == 0) return source;
-
-        ReadOnlySpan<char> temp;
-        var array = new char[source.Length - count];
-        temp = source[..index]; temp.CopyTo(array);
-
-        var dest = array.AsSpan(index);
-        temp = source[(index + count)..]; temp.CopyTo(dest);
-        return array.AsSpan();
-    }
+    public class XClass<T> { }
+    public class YClass : XClass<CultureInfo?> { }
 
     // ----------------------------------------------------
 

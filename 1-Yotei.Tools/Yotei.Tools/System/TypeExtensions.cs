@@ -58,12 +58,16 @@ public static class TypeExtensions
             {
                 type.ThrowWhenNull();
 
-                if (type.IsClass || type.IsInterface || type.IsArray) return true;
+                //if (type.IsClass || type.IsInterface || type.IsArray) return true;
+                if (!type.IsValueType) return true;
+
+                if (Nullable.GetUnderlyingType(type) != null) return true;
                 if (type.IsGenericType)
                 {
                     var temp = type.GetGenericTypeDefinition();
                     if (temp == typeof(Nullable<>)) return true;
                 }
+
                 return false;
             }
         }
