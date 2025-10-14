@@ -31,10 +31,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\RequiredMemberAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\SetsRequiredMembersAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\SkipLocalsInitAttribute.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\__.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\RoslynNameExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\__.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CodeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CustomList[T].cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\EasyNameExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\EasyNameOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\CharExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\ExceptionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\IEnumerableExtensions.cs" />
