@@ -70,6 +70,7 @@ public record EasyNameOptions
     /// <summary>
     /// The literal to use as the name of constructor members.
     /// <br/> The default value of this property is 'new'.
+    /// <br/> If the value is '$', then the name of the constructor method is used.
     /// </summary>
     public string ConstructorName { get; init => field = value.NotNullNotEmpty(true); }
 

@@ -35,6 +35,9 @@ public static class Test_EasyName_Constructors
         { MemberArgumentTypeOptions = null, MemberUseArgumentNames = true };
         name = item.EasyName(options); Assert.Equal("new(one, two)", name);
 
+        options = options with { ConstructorName = "$" };
+        name = item.EasyName(options); Assert.Equal(".ctor(one, two)", name);
+
         // Empty...
 
         options = EasyNameOptions.Empty;
@@ -48,7 +51,7 @@ public static class Test_EasyName_Constructors
             $"{NAMESPACE}.{CLASSNAME}.TXA.TA.new(System.Byte one, System.Int32 two)",
             name);
 
-        options = options with { ConstructorName = ".ctor" };
+        options = options with { ConstructorName = "$" };
         name = item.EasyName(options);
         Assert.Equal(
             $"{NAMESPACE}.{CLASSNAME}.TXA.TA.ctor(System.Byte one, System.Int32 two)",
@@ -104,7 +107,7 @@ public static class Test_EasyName_Constructors
             $"{NAMESPACE}.{CLASSNAME}.TXB<K, T>.TB<S>.new(T one, S two)",
             name);
 
-        options = options with { ConstructorName = ".ctor" };
+        options = options with { ConstructorName = "$" };
         name = item.EasyName(options);
         Assert.Equal(
             $"{NAMESPACE}.{CLASSNAME}.TXB<K, T>.TB<S>.ctor(T one, S two)",
@@ -157,7 +160,7 @@ public static class Test_EasyName_Constructors
             "(System.Int32 one, System.String two)",
             name);
 
-        options = options with { ConstructorName = ".ctor" };
+        options = options with { ConstructorName = "$" };
         name = item.EasyName(options);
         Assert.Equal(
             $"{NAMESPACE}.{CLASSNAME}.TXB<System.Byte, System.Int32>.TB<System.String>.ctor" +

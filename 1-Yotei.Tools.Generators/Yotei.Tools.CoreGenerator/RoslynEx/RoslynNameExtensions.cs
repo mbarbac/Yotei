@@ -192,9 +192,9 @@ internal static class RoslynNameExtensions
         var name = source.Name;
         if (isctor)
         {
-            name = options.ConstructorName[0] == '.' && sb.Length > 0 && sb[^1] == '.'
-                ? options.ConstructorName[1..]
-                : options.ConstructorName;
+            if (options.ConstructorName != "$") name = options.ConstructorName;
+            if (name[0] == '.' && sb.Length > 0 && sb[^1] == '.') name = name[1..];
+            if (name.Length == 0) name = "$";
         }
         sb.Append(name);
 

@@ -98,7 +98,8 @@ internal static class EasyNameExtensions
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
-    public static string EasyName(this MethodInfo source) => source.EasyName(EasyNameOptions.Default);
+    public static string EasyName(
+        this MethodInfo source) => source.EasyName(EasyNameOptions.Default);
 
     /// <summary>
     /// Returns the C#-alike name of the source method, using the given options.
@@ -187,7 +188,8 @@ internal static class EasyNameExtensions
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
-    public static string EasyName(this ConstructorInfo source) => source.EasyName(EasyNameOptions.Default);
+    public static string EasyName(
+        this ConstructorInfo source) => source.EasyName(EasyNameOptions.Default);
 
     /// <summary>
     /// Returns the C#-alike name of the source constructor, using the given options.
@@ -211,13 +213,10 @@ internal static class EasyNameExtensions
         }
 
         // Name...
-        if (options.ConstructorName[0] == '.')
-        {
-            sb.Append(sb.Length > 0 && sb[^1] == '.'
-                ? options.ConstructorName[1..]
-                : options.ConstructorName);
-        }
-        else sb.Append(options.ConstructorName);
+        var name = options.ConstructorName == "$" ? source.Name : options.ConstructorName;
+        if (name[0] == '.' && sb.Length > 0 && sb[^1] == '.') name = name[1..];
+        if (name.Length == 0) name = "$";
+        sb.Append(name);
 
         // Member arguments...
         if (options.MemberArgumentTypeOptions is not null || options.MemberUseArgumentNames)
@@ -257,7 +256,8 @@ internal static class EasyNameExtensions
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
-    public static string EasyName(this PropertyInfo source) => source.EasyName(EasyNameOptions.Default);
+    public static string EasyName(
+        this PropertyInfo source) => source.EasyName(EasyNameOptions.Default);
 
     /// <summary>
     /// Returns the C#-alike name of the source property, using the given options.
@@ -331,7 +331,8 @@ internal static class EasyNameExtensions
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
-    public static string EasyName(this FieldInfo source) => source.EasyName(EasyNameOptions.Default);
+    public static string EasyName(
+        this FieldInfo source) => source.EasyName(EasyNameOptions.Default);
 
     /// <summary>
     /// Returns the C#-alike name of the source field, using the given options.
