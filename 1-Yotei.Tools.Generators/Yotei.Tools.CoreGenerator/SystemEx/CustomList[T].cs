@@ -1,6 +1,4 @@
-﻿using System.Data;
-
-namespace Yotei.Tools.CoreGenerator;
+﻿namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
 /// <summary>
