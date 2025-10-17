@@ -6,8 +6,9 @@
 	  <ImplicitUsings>disable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
 	  <Configurations>Debug;Release;Local</Configurations>
-	  <NoWarn>IDE0130;IDE0290</NoWarn>
+	  <NoWarn>RS1038;IDE0130;IDE0290</NoWarn>
    </PropertyGroup>
+   <!--RS1038: Fixes VS and Roslyn IDE integration-->
    <!--IDE0130: Folder structure-->
    <!--IDE0290: Primary constructor-->
 

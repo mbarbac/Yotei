@@ -1,23 +1,18 @@
 ﻿namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
-internal static class FinderHelpers
+internal static class RecursiveFinders
 {
     /// <summary>
-    /// The signature of the delegate to invoke to obtain a value of the requested type using
-    /// the given symbol. If found, these delegates shall return 'true' and the value itself in
-    /// the out parameter, or return 'false' otherwise.
+    /// The signature of the delegate to invoke to find a value of the requested type using the
+    /// given symbol. If found, it shall return 'true' and the value itself in the out parameter,
+    /// or return 'false' otherwise.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="type"></param>
     /// <param name="value"></param>
     /// <returns></returns>
     public delegate bool Finder<T>(INamedTypeSymbol type, out T value);
-
-    static void Example()
-    {
-        INamedTypeSymbol type = null;
-    }
 
     /// <summary>
     /// Tries to find a value of the requested type using the given finder predicate with the
@@ -30,9 +25,22 @@ internal static class FinderHelpers
     /// <param name="chains"></param>
     /// <returns></returns>
     public static bool Find<T>(
-        this Finder<T> predicate, out T value, params INamedTypeSymbol[] chains)
+        this Finder<T> predicate, out T value,
+        params IEnumerable<INamedTypeSymbol>[] chains)
     {
-        throw null;
+        predicate.ThrowWhenNull();
+        chains.ThrowWhenNull();
+        foreach (var chain in chains)
+        {
+            chain.ThrowWhenNull();
+            foreach (var type in chain)
+            {
+                type.ThrowWhenNull();
+                if (predicate(type, out value)) return true;
+            }
+        }
+        value = default!;
+        return false;
     }
 
     /// <summary>
@@ -47,7 +55,8 @@ internal static class FinderHelpers
     /// <param name="chains"></param>
     /// <returns></returns>
     public static bool Find<T>(
-        this Finder<T> predicate, out T value, INamedTypeSymbol type, params INamedTypeSymbol[] chains)
+        this Finder<T> predicate, out T value, INamedTypeSymbol type,
+        params IEnumerable<INamedTypeSymbol>[] chains)
     {
         predicate.ThrowWhenNull();
         type.ThrowWhenNull();

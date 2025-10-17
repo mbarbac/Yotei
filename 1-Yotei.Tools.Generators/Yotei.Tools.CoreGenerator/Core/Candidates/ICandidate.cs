@@ -2,6 +2,6 @@
 
 // ========================================================
 /// <summary>
-/// Represents a capture candidate for source code generation.
+/// Represents a captured source code generation candidate, or an error condition.
 /// </summary>
 internal interface ICandidate { }

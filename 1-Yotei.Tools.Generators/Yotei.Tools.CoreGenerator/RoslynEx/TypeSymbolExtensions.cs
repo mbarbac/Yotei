@@ -16,7 +16,7 @@ internal static class TypeSymbolExtensions
         public bool IsPartial => symbol.GetSyntaxNodes().Any(x => x.IsPartial);
 
         /// <summary>
-        /// Enumerates, in inheritance order, all the base types of this one.
+        /// The base types of this one, in inheritance order.
         /// </summary>
         public IEnumerable<INamedTypeSymbol> AllBaseTypes
         {

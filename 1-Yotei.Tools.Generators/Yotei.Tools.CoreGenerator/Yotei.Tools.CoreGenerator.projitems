@@ -9,9 +9,10 @@
     <Import_RootNamespace>Yotei.Tools.CoreGenerator</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Candidates\Code\ErrorCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Candidates\Code\__.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Candidates\ICandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\CoreGenerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\TreeGenerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\TreeDiagnostics.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\DuplicateException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\EmptyException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\NotFoundException.cs" />
@@ -35,7 +36,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\RoslynNameExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\MatchExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\NullableHelpers.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\FinderExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Roslyn\DiagnosticExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\RecursiveFinder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\TypeSymbolExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\TypeSyntaxExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\SyntaxNodeExtensions.cs" />
