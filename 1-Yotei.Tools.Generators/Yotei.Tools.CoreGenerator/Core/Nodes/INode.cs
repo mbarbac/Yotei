@@ -2,6 +2,6 @@
 
 // ========================================================
 /// <summary>
-/// Represents a captured source code generation candidate, or an error condition.
+/// Represents a captured source code generation node, or an error condition.
 /// </summary>
-internal interface ICandidate { }
+internal interface INode { }

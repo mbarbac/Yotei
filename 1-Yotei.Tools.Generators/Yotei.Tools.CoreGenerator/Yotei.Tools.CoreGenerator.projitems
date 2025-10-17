@@ -9,8 +9,9 @@
     <Import_RootNamespace>Yotei.Tools.CoreGenerator</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Candidates\Code\__.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Candidates\ICandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Nodes\Code\__.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Nodes\INode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Nodes\ErrorNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\TreeGenerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\TreeDiagnostics.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\DuplicateException.cs" />

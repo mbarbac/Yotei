@@ -25,6 +25,8 @@ internal class TreeGenerator : IIncrementalGenerator
     /// <param name="context"></param>
     protected virtual void OnInitialized(IncrementalGeneratorPostInitializationContext context) { }
 
+    // ----------------------------------------------------
+
     /// <summary>
     /// Invoked automatically by the compiler to initialize the generator and to register source
     /// code generation steps via callbacks on the context.
@@ -116,6 +118,8 @@ internal class TreeGenerator : IIncrementalGenerator
     protected virtual Type[] MethodAttributes { get; } = [];
     string[] MethodAttributeNames = [];
 
+    // ----------------------------------------------------
+
     /// <summary>
     /// Invoked by the compiler to quickly determine if the given syntax node shall be considered
     /// as a potential candidate for source code generation, or not.
@@ -166,16 +170,127 @@ internal class TreeGenerator : IIncrementalGenerator
     // ====================================================
 
     /// <summary>
+    /// Invoked to create a source generation node of the requested type. If the node cannot be
+    /// created then this method shall return an error one with the appropriate diagnostic.
+    /// </summary>
+    /// <returns></returns>
+    protected virtual INode CreateNode(
+        SemanticModel model,
+        TypeDeclarationSyntax syntax,
+        INamedTypeSymbol symbol,
+        ImmutableArray<AttributeData> attributes) => throw null;
+
+    /// <summary>
+    /// Invoked to create a source generation node of the requested type. If the node cannot be
+    /// created then this method shall return an error one with the appropriate diagnostic.
+    /// </summary>
+    /// <returns></returns>
+    protected virtual INode CreateNode(
+        SemanticModel model,
+        MethodDeclarationSyntax syntax,
+        IMethodSymbol symbol,
+        ImmutableArray<AttributeData> attributes) => throw null;
+
+    /// <summary>
+    /// Invoked to create a source generation node of the requested type. If the node cannot be
+    /// created then this method shall return an error one with the appropriate diagnostic.
+    /// </summary>
+    /// <returns></returns>
+    protected virtual INode CreateNode(
+        SemanticModel model,
+        PropertyDeclarationSyntax syntax,
+        IPropertySymbol symbol,
+        ImmutableArray<AttributeData> attributes) => throw null;
+
+    /// <summary>
+    /// Invoked to create a source generation node of the requested type. If the node cannot be
+    /// created then this method shall return an error one with the appropriate diagnostic.
+    /// </summary>
+    /// <returns></returns>
+    protected virtual INode CreateNode(
+        SemanticModel model,
+        FieldDeclarationSyntax syntax,
+        IFieldSymbol symbol,
+        ImmutableArray<AttributeData> attributes) => throw null;
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Invoked by the compiler to transform given the syntax node, carried by the given context,
-    /// into a valid source generation tree-oriented node, or to an error one that describes why
-    /// the transformation was not possible.
+    /// into a valid source generation one, or to an error condition that describes why that
+    /// transformation was not possible.
     /// </summary>
     /// <param name="context"></param>
     /// <param name="token"></param>
     /// <returns></returns>
-    protected virtual ICandidate Transform(GeneratorSyntaxContext context, CancellationToken token)
+    [SuppressMessage("", "IDE0019")]
+    protected virtual INode Transform(GeneratorSyntaxContext context, CancellationToken token)
     {
-        throw null;
+        token.ThrowIfCancellationRequested();
+
+        var syntax = context.Node;
+        var model = context.SemanticModel;
+
+        // Types...
+        if (syntax is TypeDeclarationSyntax typeSyntax)
+        {
+            var symbol = model.GetDeclaredSymbol(typeSyntax, token);
+            if (symbol == null) return new ErrorNode(TreeDiagnostics.SymbolNotFound(syntax));
+
+            var ats = Filter(symbol.GetAttributes(), TypeAttributes);
+            return ats.Length == 0
+                ? new ErrorNode(TreeDiagnostics.AttributesNotFound(typeSyntax))
+                : CreateNode(model, typeSyntax, symbol, ats);
+        }
+
+        // Methods...
+        else if (syntax is MethodDeclarationSyntax methodSyntax)
+        {
+            var symbol = model.GetDeclaredSymbol(methodSyntax, token);
+            if (symbol == null) return new ErrorNode(TreeDiagnostics.SymbolNotFound(syntax));
+
+            var ats = Filter(symbol.GetAttributes(), TypeAttributes);
+            return ats.Length == 0
+                ? new ErrorNode(TreeDiagnostics.AttributesNotFound(methodSyntax))
+                : CreateNode(model, methodSyntax, symbol, ats);
+        }
+
+        // Properties...
+        else if (syntax is PropertyDeclarationSyntax propertySyntax)
+        {
+            var symbol = model.GetDeclaredSymbol(propertySyntax, token);
+            if (symbol == null) return new ErrorNode(TreeDiagnostics.SymbolNotFound(syntax));
+
+            var ats = Filter(symbol.GetAttributes(), TypeAttributes);
+            return ats.Length == 0
+                ? new ErrorNode(TreeDiagnostics.AttributesNotFound(propertySyntax))
+                : CreateNode(model, propertySyntax, symbol, ats);
+        }
+
+        // Fields...
+        else if (syntax is FieldDeclarationSyntax fieldSyntax)
+        {
+            var items = fieldSyntax.Declaration.Variables;
+            IFieldSymbol? centinel = null;
+
+            foreach (var item in items)
+            {
+                var symbol = model.GetDeclaredSymbol(item, token) as IFieldSymbol;
+                if (symbol != null)
+                {
+                    centinel = symbol;
+                    var ats = Filter(symbol.GetAttributes(), TypeAttributes);
+                    if (ats.Length != 0) return CreateNode(model, fieldSyntax, symbol, ats);
+                }
+            }
+
+            return centinel is null
+                ? new ErrorNode(TreeDiagnostics.SymbolNotFound(syntax))
+                : new ErrorNode(TreeDiagnostics.AttributesNotFound(fieldSyntax));
+        }
+
+        // Not supported...
+        return new ErrorNode(TreeDiagnostics.SyntaxNotSupported(syntax));
     }
 
     /// <summary>
@@ -199,7 +314,7 @@ internal class TreeGenerator : IIncrementalGenerator
     /// </summary>
     /// <param name="context"></param>
     /// <param name="candidates"></param>
-    void Execute(SourceProductionContext context, ImmutableArray<ICandidate> candidates)
+    void Execute(SourceProductionContext context, ImmutableArray<INode> candidates)
     {
         throw null;
     }
