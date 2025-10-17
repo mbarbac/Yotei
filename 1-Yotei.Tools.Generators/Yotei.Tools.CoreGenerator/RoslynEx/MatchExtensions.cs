@@ -18,7 +18,8 @@ internal static class MatchExtensions
 
         // Trivial cases...
         if (symbol.IsNamespace) return false;
-        if (symbol.Kind == SymbolKind.TypeParameter || type.IsGenericParameter) return true;
+        if (symbol.Kind == SymbolKind.TypeParameter) return true;
+        if (type.IsGenericParameter) return true;
 
         // Capturing type arguments...
         var s_args = (symbol as INamedTypeSymbol)?.TypeArguments ?? [];
@@ -32,21 +33,21 @@ internal static class MatchExtensions
         var s_host = symbol.ContainingType;
         var t_host = type.DeclaringType;
 
-        if (s_host is null && t_host is null)
+        if (s_host == null && t_host == null)
         {
             var s_space = symbol.ContainingNamespace?.ToString() ?? string.Empty;
             var t_space = type.Namespace ?? string.Empty;
 
             if (s_space != t_space) return false;
         }
-        else if (s_host is null || t_host is null) return false;
+        else if (s_host == null || t_host == null) return false;
 
         // Nested types...
-        if (s_host is not null && t_host is not null)
+        if (s_host != null && t_host != null)
         {
             if (!s_host.Match(t_host)) return false;
         }
-        else if (s_host is null || t_host is null) return false;
+        else if (s_host != null || t_host != null) return false;
 
         // Names...
         var s_name = symbol.Name; if (s_args.Length > 0) s_name += $"`{s_args.Length}";

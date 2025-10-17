@@ -6,12 +6,12 @@
 /// with the '<see cref="WithAttribute"/>' attribute, or for the inherited members of non-record
 /// types decorated with the '<see cref="InheritWithsAttribute"/>' one.
 /// </summary>
-//[Generator(LanguageNames.CSharp)]
+[Generator(LanguageNames.CSharp)]
 internal class WithGenerator : TreeGenerator
 {
 #if DEBUG_WITH_GENERATOR
     /// <inheritdoc/>
-    protected override bool LaunchDebugger => true;
+    //protected override bool LaunchDebugger => true;
 #endif
 
     /// <inheritdoc/>
