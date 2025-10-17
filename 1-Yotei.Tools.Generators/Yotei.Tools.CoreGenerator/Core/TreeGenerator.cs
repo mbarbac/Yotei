@@ -334,5 +334,92 @@ internal class TreeGenerator : IIncrementalGenerator
         if (candidates.Any(x => x is null)) throw new ArgumentException(
             "Collection of source code generation candidates carries null elements.")
             .WithData(candidates);
+
+        candidates.OfType<ErrorCandidate>().ForEach(x => x.Diagnostic.Report(context));
+        candidates.OfType<TypeCandidate>().ForEach(OnExecute);
+        candidates.OfType<IValidCandidate>().ForEach(x => x is not TypeCandidate, OnExecute);
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Invoked to process the given candidate.
+        /// </summary>
+        void OnExecute(IValidCandidate candidate)
+        {
+            context.CancellationToken.ThrowIfCancellationRequested();
+
+            if (!CaptureFile(candidate)) return;
+            if (!CaptureNamespace(candidate)) return;
+            if (!CaptureType(candidate)) return;
+            if (!CaptureProperty(candidate)) return;
+            if (!CaptureField(candidate)) return;
+            if (!CaptureMethod(candidate)) return;
+        }
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Invoked to process the candidate at this level of the hierarchy.
+        /// <br/> Returns 'false' is errors are detected that prevents further execution.
+        /// </summary>
+        bool CaptureFile(IValidCandidate candidate)
+        {
+            throw null;
+        }
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Invoked to process the candidate at this level of the hierarchy.
+        /// <br/> Returns 'false' is errors are detected that prevents further execution.
+        /// </summary>
+        bool CaptureNamespace(IValidCandidate candidate)
+        {
+            throw null;
+        }
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Invoked to process the candidate at this level of the hierarchy.
+        /// <br/> Returns 'false' is errors are detected that prevents further execution.
+        /// </summary>
+        bool CaptureType(IValidCandidate candidate)
+        {
+            throw null;
+        }
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Invoked to process the candidate at this level of the hierarchy.
+        /// <br/> Returns 'false' is errors are detected that prevents further execution.
+        /// </summary>
+        bool CaptureProperty(IValidCandidate candidate)
+        {
+            throw null;
+        }
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Invoked to process the candidate at this level of the hierarchy.
+        /// <br/> Returns 'false' is errors are detected that prevents further execution.
+        /// </summary>
+        bool CaptureField(IValidCandidate candidate)
+        {
+            throw null;
+        }
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Invoked to process the candidate at this level of the hierarchy.
+        /// <br/> Returns 'false' is errors are detected that prevents further execution.
+        /// </summary>
+        bool CaptureMethod(IValidCandidate candidate)
+        {
+            throw null;
+        }
     }
 }

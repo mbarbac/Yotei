@@ -13,6 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Core\Candidates\Concrete\PropertyCandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Candidates\Concrete\MethodCandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Candidates\Concrete\TypeCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Candidates\IValidCandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Candidates\ICandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Candidates\Concrete\ErrorCandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\TreeGenerator.cs" />

@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents a property-alike candidate for source code generation.
 /// </summary>
-public class PropertyCandidate : ICandidate
+public class PropertyCandidate : IValidCandidate
 {
     /// <summary>
     /// Initializes a new instance.
@@ -24,13 +24,13 @@ public class PropertyCandidate : ICandidate
     /// <inheritdoc cref="ICandidate.Symbol"/>
     /// </summary>
     public IPropertySymbol Symbol { get; private set => field = value.ThrowWhenNull(); }
-    ISymbol ICandidate.Symbol => Symbol;
+    ISymbol IValidCandidate.Symbol => Symbol;
 
     /// <summary>
     /// <inheritdoc cref="ICandidate.Syntax"/>
     /// </summary>
     public PropertyDeclarationSyntax? Syntax { get; init => field = value; }
-    SyntaxNode? ICandidate.Syntax => Syntax;
+    SyntaxNode? IValidCandidate.Syntax => Syntax;
 
     /// <summary>
     /// <inheritdoc/>

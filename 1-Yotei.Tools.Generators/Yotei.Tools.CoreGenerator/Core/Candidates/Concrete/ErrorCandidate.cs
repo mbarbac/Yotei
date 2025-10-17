@@ -19,10 +19,4 @@ public sealed class ErrorCandidate : ICandidate
     /// The diagnostic that describes the error situation.
     /// </summary>
     public Diagnostic Diagnostic { get; }
-
-    // ----------------------------------------------------
-
-    ISymbol ICandidate.Symbol => throw new NotSupportedException("Error candidate.");
-    SyntaxNode? ICandidate.Syntax => throw new NotSupportedException("Error candidate.");
-    ImmutableArray<AttributeData> ICandidate.Attributes => throw new NotSupportedException("Error candidate.");
 }

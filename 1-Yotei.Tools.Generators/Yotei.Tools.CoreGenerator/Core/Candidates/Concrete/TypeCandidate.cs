@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents a type-alike candidate for source code generation.
 /// </summary>
-public class TypeCandidate : ICandidate
+public class TypeCandidate : IValidCandidate
 {
     /// <summary>
     /// Initializes a new instance.
@@ -24,13 +24,13 @@ public class TypeCandidate : ICandidate
     /// <inheritdoc cref="ICandidate.Symbol"/>
     /// </summary>
     public INamedTypeSymbol Symbol { get; private set => field = value.ThrowWhenNull(); }
-    ISymbol ICandidate.Symbol => Symbol;
+    ISymbol IValidCandidate.Symbol => Symbol;
 
     /// <summary>
     /// <inheritdoc cref="ICandidate.Syntax"/>
     /// </summary>
     public TypeDeclarationSyntax? Syntax { get; init => field = value; }
-    SyntaxNode? ICandidate.Syntax => Syntax;
+    SyntaxNode? IValidCandidate.Syntax => Syntax;
 
     /// <summary>
     /// <inheritdoc/>

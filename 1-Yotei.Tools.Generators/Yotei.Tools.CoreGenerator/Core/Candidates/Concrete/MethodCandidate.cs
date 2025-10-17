@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents a method-alike candidate for source code generation.
 /// </summary>
-public class MethodCandidate : ICandidate
+public class MethodCandidate : IValidCandidate
 {
     /// <summary>
     /// Initializes a new instance.
@@ -24,13 +24,13 @@ public class MethodCandidate : ICandidate
     /// <inheritdoc cref="ICandidate.Symbol"/>
     /// </summary>
     public IMethodSymbol Symbol { get; private set => field = value.ThrowWhenNull(); }
-    ISymbol ICandidate.Symbol => Symbol;
+    ISymbol IValidCandidate.Symbol => Symbol;
 
     /// <summary>
     /// <inheritdoc cref="ICandidate.Syntax"/>
     /// </summary>
     public MethodDeclarationSyntax? Syntax { get; init => field = value; }
-    SyntaxNode? ICandidate.Syntax => Syntax;
+    SyntaxNode? IValidCandidate.Syntax => Syntax;
 
     /// <summary>
     /// <inheritdoc/>
