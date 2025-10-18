@@ -2,7 +2,8 @@
 
 // ========================================================
 /// <summary>
-/// Represents a valid candidate for source code generation.
+/// Represents valid candidates for source code generation, which will be later used to build
+/// the hierarchical tree-oriented nodes actually in charge of emitting source code.
 /// </summary>
 internal interface IValidCandidate : ICandidate
 {

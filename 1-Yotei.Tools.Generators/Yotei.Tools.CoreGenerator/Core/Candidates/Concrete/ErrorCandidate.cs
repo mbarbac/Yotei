@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents an error condition while capturing a source code generation candidate.
 /// </summary>
-public sealed class ErrorCandidate : ICandidate
+internal sealed class ErrorCandidate : ICandidate
 {
     /// <summary>
     /// Initializes a new instance.

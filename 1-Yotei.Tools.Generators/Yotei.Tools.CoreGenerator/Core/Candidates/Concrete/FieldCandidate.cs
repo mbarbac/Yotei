@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents a field-alike candidate for source code generation.
 /// </summary>
-public class FieldCandidate : IValidCandidate
+internal class FieldCandidate : IValidCandidate
 {
     /// <summary>
     /// Initializes a new instance.
@@ -21,13 +21,13 @@ public class FieldCandidate : IValidCandidate
     // ----------------------------------------------------
 
     /// <summary>
-    /// <inheritdoc cref="ICandidate.Symbol"/>
+    /// <inheritdoc cref="IValidCandidate.Symbol"/>
     /// </summary>
     public IFieldSymbol Symbol { get; private set => field = value.ThrowWhenNull(); }
     ISymbol IValidCandidate.Symbol => Symbol;
 
     /// <summary>
-    /// <inheritdoc cref="ICandidate.Syntax"/>
+    /// <inheritdoc cref="IValidCandidate.Syntax"/>
     /// </summary>
     public FieldDeclarationSyntax? Syntax { get; init => field = value; }
     SyntaxNode? IValidCandidate.Syntax => Syntax;

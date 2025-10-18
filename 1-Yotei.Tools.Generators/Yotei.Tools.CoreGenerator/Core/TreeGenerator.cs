@@ -255,7 +255,7 @@ internal class TreeGenerator : IIncrementalGenerator
 
             var ats = Matches(symbol.GetAttributes(), TypeAttributes);
             return ats.Length == 0
-                ? new ErrorCandidate(TreeDiagnostics.AttributesNotFound(syntax))
+                ? new ErrorCandidate(TreeDiagnostics.NoAttributes(syntax))
                 : CreateCandidate(symbol, typeSyntax, ats, model);
         }
 
@@ -267,7 +267,7 @@ internal class TreeGenerator : IIncrementalGenerator
 
             var ats = Matches(symbol.GetAttributes(), MethodAttributes);
             return ats.Length == 0
-                ? new ErrorCandidate(TreeDiagnostics.AttributesNotFound(syntax))
+                ? new ErrorCandidate(TreeDiagnostics.NoAttributes(syntax))
                 : CreateCandidate(symbol, methodSyntax, ats, model);
         }
 
@@ -279,7 +279,7 @@ internal class TreeGenerator : IIncrementalGenerator
 
             var ats = Matches(symbol.GetAttributes(), PropertyAttributes);
             return ats.Length == 0
-                ? new ErrorCandidate(TreeDiagnostics.AttributesNotFound(syntax))
+                ? new ErrorCandidate(TreeDiagnostics.NoAttributes(syntax))
                 : CreateCandidate(symbol, propertySyntax, ats, model);
         }
 
@@ -301,7 +301,7 @@ internal class TreeGenerator : IIncrementalGenerator
             }
             return symbol is null
                 ? new ErrorCandidate(TreeDiagnostics.SymbolNotFound(syntax))
-                : new ErrorCandidate(TreeDiagnostics.AttributesNotFound(syntax));
+                : new ErrorCandidate(TreeDiagnostics.NoAttributes(syntax));
         }
 
         // Not supported...

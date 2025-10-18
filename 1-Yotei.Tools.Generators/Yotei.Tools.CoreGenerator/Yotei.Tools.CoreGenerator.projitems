@@ -16,6 +16,14 @@
     <Compile Include="$(MSBuildThisFileDirectory)Core\Candidates\IValidCandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Candidates\ICandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Candidates\Concrete\ErrorCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Nodes\Concrete\FieldNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Nodes\Concrete\PropertyNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Nodes\Concrete\MethodNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Nodes\Sealed\FileNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Nodes\Sealed\NamespaceNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Nodes\Concrete\TypeNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Nodes\INode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Nodes\IChildNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\TreeGenerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\TreeDiagnostics.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\DuplicateException.cs" />
