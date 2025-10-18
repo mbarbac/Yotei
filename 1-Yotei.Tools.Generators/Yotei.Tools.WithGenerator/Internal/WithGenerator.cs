@@ -11,7 +11,7 @@ internal class WithGenerator : TreeGenerator
 {
 #if DEBUG_WITH_GENERATOR
     /// <inheritdoc/>
-    //protected override bool LaunchDebugger => true;
+    protected override bool LaunchDebugger => true;
 #endif
 
     /// <inheritdoc/>

@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools.CoreGenerator;
+﻿using System.Xml.Schema;
+
+namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
 /// <summary>
@@ -171,11 +173,8 @@ internal class TreeGenerator : IIncrementalGenerator
 
     /// <summary>
     /// Invoked to create a candidate of the appropriate type.
+    /// <br/> By default, syntax and attributes are captured.
     /// </summary>
-    /// <param name="symbol"></param>
-    /// <param name="syntax"></param>
-    /// <param name="attributes"></param>
-    /// <param name="model"></param>
     /// <returns></returns>
     protected virtual TypeCandidate CreateCandidate(
         INamedTypeSymbol symbol,
@@ -186,12 +185,8 @@ internal class TreeGenerator : IIncrementalGenerator
 
     /// <summary>
     /// Invoked to create a candidate of the appropriate type.
+    /// <br/> By default, syntax and attributes are captured.
     /// </summary>
-    /// <param name="symbol"></param>
-    /// <param name="syntax"></param>
-    /// <param name="attributes"></param>
-    /// <param name="model"></param>
-    /// <returns></returns>
     protected virtual MethodCandidate CreateCandidate(
         IMethodSymbol symbol,
         MethodDeclarationSyntax syntax,
@@ -201,12 +196,8 @@ internal class TreeGenerator : IIncrementalGenerator
 
     /// <summary>
     /// Invoked to create a candidate of the appropriate type.
+    /// <br/> By default, syntax and attributes are captured.
     /// </summary>
-    /// <param name="symbol"></param>
-    /// <param name="syntax"></param>
-    /// <param name="attributes"></param>
-    /// <param name="model"></param>
-    /// <returns></returns>
     protected virtual PropertyCandidate CreateCandidate(
         IPropertySymbol symbol,
         PropertyDeclarationSyntax syntax,
@@ -216,12 +207,8 @@ internal class TreeGenerator : IIncrementalGenerator
 
     /// <summary>
     /// Invoked to create a candidate of the appropriate type.
+    /// <br/> By default, syntax and attributes are captured.
     /// </summary>
-    /// <param name="symbol"></param>
-    /// <param name="syntax"></param>
-    /// <param name="attributes"></param>
-    /// <param name="model"></param>
-    /// <returns></returns>
     protected virtual FieldCandidate CreateCandidate(
         IFieldSymbol symbol,
         FieldDeclarationSyntax syntax,
@@ -335,6 +322,13 @@ internal class TreeGenerator : IIncrementalGenerator
             "Collection of source code generation candidates carries null elements.")
             .WithData(candidates);
 
+        CustomList<FileNode> files = new()
+        { AreEqual = (x, y) => string.Compare(x.Name, y.Name) == 0 };
+
+        List<SyntaxNode> syntaxes;
+        List<ISymbol> symbols; int ixsymbol = 0;
+        FileNode fnode;
+
         candidates.OfType<ErrorCandidate>().ForEach(x => x.Diagnostic.Report(context));
         candidates.OfType<TypeCandidate>().ForEach(OnExecute);
         candidates.OfType<IValidCandidate>().ForEach(x => x is not TypeCandidate, OnExecute);
@@ -348,78 +342,55 @@ internal class TreeGenerator : IIncrementalGenerator
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
-            if (!CaptureFile(candidate)) return;
-            if (!CaptureNamespace(candidate)) return;
-            if (!CaptureType(candidate)) return;
-            if (!CaptureProperty(candidate)) return;
-            if (!CaptureField(candidate)) return;
-            if (!CaptureMethod(candidate)) return;
+            syntaxes = candidate.Syntax!.GetChain();
+            symbols = candidate.Symbol.GetChain();
+
+            var fname = GetFileName(symbols);
+            fnode = files.Find(x => string.Compare(fname, x.Name) == 0) ?? new(fname);
+
+            var nslist = fnode.ChildNamespaces;
         }
+    }
 
-        // ------------------------------------------------
+    // ----------------------------------------------------
 
-        /// <summary>
-        /// Invoked to process the candidate at this level of the hierarchy.
-        /// <br/> Returns 'false' is errors are detected that prevents further execution.
-        /// </summary>
-        bool CaptureFile(IValidCandidate candidate)
+    /// <summary>
+    /// Invoked to obtain a file name based upon the given symbol chain.
+    /// </summary>
+    static string GetFileName(List<ISymbol> symbolchain)
+    {
+        var sb = new StringBuilder();
+        var index = symbolchain.FindLastIndex(x => x is INamedTypeSymbol);
+        var first = true;
+
+        for (int i = index; i >= 0; i--)
         {
-            throw null;
+            var symbol = symbolchain[i];
+            var name = GetName(symbol);
+            if (name.Length > 0)
+            {
+                if (!first) sb.Append('.'); first = false;
+                sb.Append(name);
+            }
         }
+        return sb.ToString();
 
-        // ------------------------------------------------
-
-        /// <summary>
-        /// Invoked to process the candidate at this level of the hierarchy.
-        /// <br/> Returns 'false' is errors are detected that prevents further execution.
-        /// </summary>
-        bool CaptureNamespace(IValidCandidate candidate)
+        // Gets the name of the given symbol...
+        static string GetName(ISymbol symbol)
         {
-            throw null;
-        }
-
-        // ------------------------------------------------
-
-        /// <summary>
-        /// Invoked to process the candidate at this level of the hierarchy.
-        /// <br/> Returns 'false' is errors are detected that prevents further execution.
-        /// </summary>
-        bool CaptureType(IValidCandidate candidate)
-        {
-            throw null;
-        }
-
-        // ------------------------------------------------
-
-        /// <summary>
-        /// Invoked to process the candidate at this level of the hierarchy.
-        /// <br/> Returns 'false' is errors are detected that prevents further execution.
-        /// </summary>
-        bool CaptureProperty(IValidCandidate candidate)
-        {
-            throw null;
-        }
-
-        // ------------------------------------------------
-
-        /// <summary>
-        /// Invoked to process the candidate at this level of the hierarchy.
-        /// <br/> Returns 'false' is errors are detected that prevents further execution.
-        /// </summary>
-        bool CaptureField(IValidCandidate candidate)
-        {
-            throw null;
-        }
-
-        // ------------------------------------------------
-
-        /// <summary>
-        /// Invoked to process the candidate at this level of the hierarchy.
-        /// <br/> Returns 'false' is errors are detected that prevents further execution.
-        /// </summary>
-        bool CaptureMethod(IValidCandidate candidate)
-        {
-            throw null;
+            if (symbol is not INamedTypeSymbol named || named.Arity == 0) return symbol.Name;
+            else
+            {
+                var sb = new StringBuilder(named.Name);
+                sb.Append('['); for (int i = 0; i < named.TypeArguments.Length; i++)
+                {
+                    if (i > 0) sb.Append(',');
+                    var name = GetName(named.TypeArguments[i]);
+                    sb.Append(name);
+                }
+                sb.Append(']');
+                return sb.ToString();
+            }
         }
     }
 }

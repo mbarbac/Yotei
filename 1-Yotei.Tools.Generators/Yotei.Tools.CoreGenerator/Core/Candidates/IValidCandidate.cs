@@ -13,7 +13,8 @@ internal interface IValidCandidate : ICandidate
     ISymbol Symbol { get; }
 
     /// <summary>
-    /// The syntax associated with this candidate, or null if not captured.
+    /// The syntax by which this candidate was captured, or null if this information is not
+    /// avalilable.
     /// </summary>
     SyntaxNode? Syntax { get; }
 

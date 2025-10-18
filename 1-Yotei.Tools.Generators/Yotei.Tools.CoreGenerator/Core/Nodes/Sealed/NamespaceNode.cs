@@ -41,9 +41,37 @@ internal sealed class NamespaceNode : IChildNode
     }
 
     /// <summary>
-    /// The actual case sensitive name of this namespace.
+    /// The actual case sensitive name of this namespace, without dots.
     /// </summary>
-    public string Name { get; private set => field = value.NotNullNotEmpty(true); }
+    public string Name
+    {
+        get;
+        private set
+        {
+            value = value.NotNullNotEmpty(true);
+            field = !value.Contains('.') ? value : throw new ArgumentException(
+                "Namespace's name cannot contain dots.").WithData(value);
+        }
+    }
+
+    /// <summary>
+    /// The full name of this namespace.
+    /// </summary>
+    public string FullName => _FullName
+        ??= (ParentNode is NamespaceNode parent ? $"{parent.Name}.{Name}" : Name);
+    string? _FullName;
+
+    /// <summary>
+    /// The collection of child namespaces.
+    /// </summary>
+    public CustomList<NamespaceNode> ChildNamespaces = new()
+    { AreEqual = (x, y) => string.Compare(x.Name, y.Name) == 0 };
+
+    /// <summary>
+    /// The collection of child types.
+    /// </summary>
+    public CustomList<TypeNode> ChildTypes = new()
+    { AreEqual = (x, y) => SymbolEqualityComparer.Default.Equals(x.Symbol, y.Symbol) };
 
     // ----------------------------------------------------
 

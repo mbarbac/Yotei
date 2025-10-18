@@ -2,8 +2,8 @@
 
 // ========================================================
 /// <summary>
-/// Represents a list-alike collection that prevents null or duplicated ones. Instance of this
-/// type use initially a default comparer to determine duplicates, that can be changed at will.
+/// Represents a list-alike collection that prevents null or duplicated ones. Unless otherwise
+/// set, instances of this type use a default comparer to determine duplicates.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 [DebuggerDisplay("{ToDebugString(3)}")]
@@ -17,7 +17,6 @@ internal class CustomList<T> : IEnumerable<T> where T : class
     public CustomList()
     {
         Items = [];
-        Comparer = EqualityComparer<T>.Default;
     }
 
     /// <summary>
@@ -27,7 +26,6 @@ internal class CustomList<T> : IEnumerable<T> where T : class
     public CustomList(int capacity)
     {
         Items = new(capacity);
-        Comparer = EqualityComparer<T>.Default;
     }
 
     /// <summary>
@@ -43,7 +41,7 @@ internal class CustomList<T> : IEnumerable<T> where T : class
     protected CustomList(CustomList<T> source)
     {
         Items = new(source.Count);
-        Comparer = source.Comparer;
+        AreEqual = source.AreEqual;
         AddRange(source);
     }
 
@@ -90,22 +88,10 @@ internal class CustomList<T> : IEnumerable<T> where T : class
     // ----------------------------------------------------
 
     /// <summary>
-    /// The comparer used by this instance to determine if two given elements are duplicated,
-    /// or not. The setter essentially re-creates the collection, validating that there are no
-    /// duplicates with the new comparer.
+    /// The delegate to invoke to determine the equality of the two given instances.
     /// </summary>
-    public IEqualityComparer<T> Comparer
-    {
-        get;
-        set
-        {
-            value.ThrowWhenNull();
-            if (ReferenceEquals(field, value)) return;
-
-            var range = ToList(); Clear();
-            field = value; AddRange(range);
-        }
-    }
+    public Func<T, T, bool> AreEqual { get; init => field = value.ThrowWhenNull(); }
+    = EqualityComparer<T>.Default.Equals;
 
     /// <summary>
     /// Gets the number of elements in this collection.
@@ -132,21 +118,22 @@ internal class CustomList<T> : IEnumerable<T> where T : class
     }
 
     /// <summary>
-    /// Determines if this collection contains the given element.
+    /// Determines if this collection contains the given element, using this instance's comparer.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
     public bool Contains(T item) => IndexOf(item) >= 0;
 
     /// <summary>
-    /// Returns the index of the given element in this collection, or -1 if it is not found.
+    /// Returns the index of the given element in this collection, or -1 if it is not found,
+    /// using this instance's comparer.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
     public int IndexOf(T item)
     {
         item.ThrowWhenNull();
-        return IndexOf(x => Comparer.Equals(x, item));
+        return IndexOf(x => AreEqual(x, item));
     }
 
     /// <summary>
@@ -273,7 +260,9 @@ internal class CustomList<T> : IEnumerable<T> where T : class
         var index = IndexOf(item);
         if (index >= 0)
         {
-            if (!ignoreDuplicates) throw new DuplicateException("Duplicated element.").WithData(item);
+            if (!ignoreDuplicates)
+                throw new DuplicateException("Duplicated element.").WithData(item);
+            
             return 0;
         }
         else
@@ -318,7 +307,9 @@ internal class CustomList<T> : IEnumerable<T> where T : class
         var temp = IndexOf(item);
         if (temp >= 0)
         {
-            if (!ignoreDuplicates) throw new DuplicateException("Duplicated element.").WithData(item);
+            if (!ignoreDuplicates)
+                throw new DuplicateException("Duplicated element.").WithData(item);
+            
             return 0;
         }
         else
@@ -365,10 +356,16 @@ internal class CustomList<T> : IEnumerable<T> where T : class
     public void RemoveRange(int index, int count) => Items.RemoveRange(index, count);
 
     /// <summary>
-    /// Removes the given element from this collection.
+    /// Removes the given element from this collection, using this instance's comparer.
     /// </summary>
     /// <param name="item"></param>
-    public bool Remove(T item) => Items.Remove(item.ThrowWhenNull());
+    public bool Remove(T item)
+    {
+        var index = IndexOf(item);
+
+        if (index >= 0) RemoveAt(index);
+        return index >= 0;
+    }
 
     /// <summary>
     /// Removes from this collection the first element that matches the given predicate.
@@ -379,9 +376,8 @@ internal class CustomList<T> : IEnumerable<T> where T : class
     {
         var index = IndexOf(predicate);
 
-        if (index < 0) return 0;
-        RemoveAt(index);
-        return 1;
+        if (index >= 0) RemoveAt(index);
+        return index >= 0 ? 1 : 0;
     }
 
     /// <summary>
@@ -393,9 +389,8 @@ internal class CustomList<T> : IEnumerable<T> where T : class
     {
         var index = LastIndexOf(predicate);
 
-        if (index < 0) return 0;
-        RemoveAt(index);
-        return 1;
+        if (index >= 0) RemoveAt(index);
+        return index >= 0 ? 1 : 0;
     }
 
     /// <summary>

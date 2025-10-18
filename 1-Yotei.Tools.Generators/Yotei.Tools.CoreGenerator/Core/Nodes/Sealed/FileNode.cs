@@ -24,9 +24,15 @@ internal sealed class FileNode : INode
     // ----------------------------------------------------
 
     /// <summary>
-    /// The actual case insensitive name of this namespace.
+    /// The actual case-insensitive name of this namespace.
     /// </summary>
     public string Name { get; private set => field = value.NotNullNotEmpty(true); }
+
+    /// <summary>
+    /// The collection of child namespaces.
+    /// </summary>
+    public CustomList<NamespaceNode> ChildNamespaces = new()
+    { AreEqual = (x, y) => string.Compare(x.Name, y.Name) == 0 };
 
     // ----------------------------------------------------
 

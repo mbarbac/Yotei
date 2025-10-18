@@ -49,6 +49,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\RoslynNameExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\MatchExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\NullableHelpers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\ChainExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Roslyn\DiagnosticExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\RecursiveFinder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\TypeSymbolExtensions.cs" />
