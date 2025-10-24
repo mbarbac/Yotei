@@ -1,0 +1,15 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="Local" />
+    <BuildType Name="Release" />
+  </Configurations>
+  <Folder Name="/1-Yotei.Tools/">
+    <Project Path="1-Yotei.Tools/Yotei.Tools/Yotei.Tools.csproj" Id="25ab7c95-6c79-4d28-97be-e0954facad8b" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".gitignore" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+  </Folder>
+</Solution>
