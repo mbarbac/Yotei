@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools.Diagnostics;
+﻿#pragma warning disable CA1510
+
+namespace Yotei.Tools.Diagnostics;
 
 // ========================================================
 /// <summary>
@@ -40,7 +42,7 @@ public static class Ambient
     }
     static TraceListener? Listener = null;
     static bool Computed = false;
-    static object Lock = new object();
+    readonly static object Lock = new();
 
     // ----------------------------------------------------
 
@@ -92,7 +94,7 @@ public static class Ambient
     /// <param name="range"></param>
     public static void AddListeners(IEnumerable<TraceListener> range)
     {
-        ArgumentNullException.ThrowIfNull(nameof(range));
+        if (range is null) throw new ArgumentNullException(nameof(range));
         lock (Lock)
         {
             foreach (var item in range) Trace.Listeners.Add(item);
@@ -105,7 +107,7 @@ public static class Ambient
     /// <param name="range"></param>
     public static void RemoveListeners(IEnumerable<TraceListener> range)
     {
-        ArgumentNullException.ThrowIfNull(nameof(range));
+        if (range is null) throw new ArgumentNullException(nameof(range));
         lock (Lock)
         {
             foreach (var item in range) Trace.Listeners.Remove(item);

@@ -5,14 +5,11 @@
     <BuildType Name="Release" />
   </Configurations>
   <Folder Name="/0-Development/">
-    <Project Path="0-Development/Runner.Tests/Runner.Tests.csproj" Id="3b16c19b-e14d-494d-b9e4-37bfabc1361a">
-      <BuildType Solution="Local|*" Project="Debug" />
-    </Project>
-    <Project Path="0-Development/Runner/Runner.csproj" Id="dc37768b-4851-45f8-80f9-bf430770aec1">
-      <BuildType Solution="Local|*" Project="Debug" />
-    </Project>
+    <Project Path="0-Development/Runner.Tests/Runner.Tests.csproj" Id="3b16c19b-e14d-494d-b9e4-37bfabc1361a" />
+    <Project Path="0-Development/Runner/Runner.csproj" Id="dc37768b-4851-45f8-80f9-bf430770aec1" />
   </Folder>
   <Folder Name="/1-Yotei.Tools/">
+    <Project Path="1-Yotei.Tools/Yotei.Tools.ConsoleEx/Yotei.Tools.ConsoleEx.csproj" Id="51738f8a-fc39-4258-b144-dfa2015c6995" />
     <Project Path="1-Yotei.Tools/Yotei.Tools.Diagnostics/Yotei.Tools.Diagnostics.csproj" Id="ff141cdb-7814-48ae-bd52-5ee7a6e5ca79" />
     <Project Path="1-Yotei.Tools/Yotei.Tools.Tests/Yotei.Tools.Tests.csproj" Id="34f24ace-8cc1-4125-9c95-7d4dc6863e8b" />
     <Project Path="1-Yotei.Tools/Yotei.Tools/Yotei.Tools.csproj" Id="25ab7c95-6c79-4d28-97be-e0954facad8b" />

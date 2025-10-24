@@ -7,7 +7,9 @@
 	  <Nullable>enable</Nullable>
 	  <IsPackable>false</IsPackable>
 	  <Configurations>Debug;Release;Local</Configurations>
+	  <NoWarn>IDE0130</NoWarn>
    </PropertyGroup>
+   <!--IDE0130: Folder structure-->
 
    <ItemGroup>
 	  <PackageReference Include="coverlet.collector" Version="6.0.4" />

@@ -1,5 +1,3 @@
-﻿namespace Runner.Console;
+﻿namespace Yotei.Tools;
 
 // ========================================================
-
-public interface IFake { }
