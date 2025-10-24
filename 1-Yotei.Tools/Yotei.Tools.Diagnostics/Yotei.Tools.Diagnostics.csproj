@@ -12,9 +12,9 @@
 	  <None Include="README.md" Pack="true" PackagePath="" />
 	  <None Include="LICENSE" Pack="true" PackagePath="" />
    </ItemGroup>
-   
+
    <PropertyGroup>
-	  <Description>Yotei Common Tools</Description>
+	  <Description>Yotei Diagnostic Tools</Description>
 	  <Version>0.7.0-v0001</Version>
 	  <Authors>mbarbac@hotmail.com</Authors>
 	  <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>

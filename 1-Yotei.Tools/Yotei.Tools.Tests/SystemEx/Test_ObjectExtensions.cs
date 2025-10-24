@@ -1,8 +1,10 @@
 ﻿namespace Yotei.Tools.Tests;
 
 // ========================================================
+//[Enforced]
 public class Test_ObjectExtensions
 {
+    //[Enforced]
     [Fact]
     public void Test_ThrowWhenNull()
     {
@@ -10,11 +12,12 @@ public class Test_ObjectExtensions
         name.ThrowWhenNull();
 
         try { name = null; name.ThrowWhenNull(); Assert.Fail(); }
-        catch (ArgumentNullException ex) { }
+        catch (ArgumentNullException) { }
     }
 
     // ----------------------------------------------------
 
+    //[Enforced]
     [Fact]
     public void Test_EqualsEx()
     {

@@ -19,10 +19,14 @@
 	  </PackageReference>
    </ItemGroup>
 
+   <ItemGroup>
+	  <ProjectReference Include="..\Runner\Runner.csproj" />
+   </ItemGroup>
+
    <!-- DEBUG configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Debug'">
-	  <ProjectReference Include="..\Yotei.Tools\Yotei.Tools.csproj" />
-	  <ProjectReference Include="..\Yotei.Tools.Diagnostics\Yotei.Tools.Diagnostics.csproj" />
+	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
+	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Diagnostics\Yotei.Tools.Diagnostics.csproj" />
    </ItemGroup>
 
    <!-- RELEASE configuration -->

@@ -1,4 +1,4 @@
-﻿namespace Yotei.Tools.Tests;
+﻿namespace Runner.Tests;
 
 // ========================================================
 ////[Enforced]
@@ -10,3 +10,5 @@
 //    {
 //    }
 //}
+
+public interface IFake { }
