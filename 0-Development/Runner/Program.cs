@@ -42,7 +42,7 @@ internal class Program
                 new("Exit"),
                 new MenuTester(breakOnError: true),
                 new MenuArtifacts(),
-                new("Manage Packages"),
+                new MenuPackages(),
             }
             .Run(MenuOptions);
         }
