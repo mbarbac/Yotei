@@ -9,6 +9,13 @@ namespace Yotei.Tools.Diagnostics;
 public static class Ambient
 {
     /// <summary>
+    /// A shared object used to synchronize operations of this instance.
+    /// </summary>
+    public static object Lock { get; } = new();
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Determines if there is a console-alike listener registered in the collection of trace
     /// ones. This method uses by default a cached value that can be recomputed if needed.
     /// </summary>
@@ -42,7 +49,6 @@ public static class Ambient
     }
     static TraceListener? Listener = null;
     static bool Computed = false;
-    readonly static object Lock = new();
 
     // ----------------------------------------------------
 
