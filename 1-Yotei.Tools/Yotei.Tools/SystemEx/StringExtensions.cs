@@ -11,7 +11,7 @@ public static class StringExtensions
     /// <param name="trim"></param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public string? NullWhenEmpty(this string? source, bool trim) => trim switch
+    public static string? NullWhenEmpty(this string? source, bool trim) => trim switch
     {
         true => string.IsNullOrWhiteSpace(source) ? null : source.Trim(),
         false => string.IsNullOrEmpty(source) ? null : source
@@ -28,7 +28,7 @@ public static class StringExtensions
     public static string NotNullNotEmpty(
         this string? source,
         bool trim,
-        [CallerArgumentExpression(nameof(source)] string? description = null)
+        [CallerArgumentExpression(nameof(source))] string? description = null)
     {
         if (string.IsNullOrWhiteSpace(description)) description = nameof(source);
 

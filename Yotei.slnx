@@ -5,6 +5,9 @@
     <BuildType Name="Release" />
   </Configurations>
   <Folder Name="/1-Yotei.Tools/">
+    <Project Path="1-Yotei.Tools/Yotei.Tools.Tests/Yotei.Tools.Tests.csproj" Id="34f24ace-8cc1-4125-9c95-7d4dc6863e8b">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
     <Project Path="1-Yotei.Tools/Yotei.Tools/Yotei.Tools.csproj" Id="25ab7c95-6c79-4d28-97be-e0954facad8b" />
   </Folder>
   <Folder Name="/Solution Items/">
