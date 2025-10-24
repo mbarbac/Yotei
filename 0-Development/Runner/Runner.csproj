@@ -36,4 +36,9 @@
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Tests\Yotei.Tools.Tests.csproj" />
    </ItemGroup>
 
+   <ItemGroup>
+     <Folder Include="MenuTester\" />
+     <Folder Include="MenuPackages\" />
+   </ItemGroup>
+
 </Project>

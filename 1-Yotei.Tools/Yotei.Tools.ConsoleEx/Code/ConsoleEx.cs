@@ -527,6 +527,7 @@ public static class ConsoleEx
                         Console.WriteLine();
                         Console.ForegroundColor = oldfore;
                         Console.BackgroundColor = oldback;
+                        if (debug) WithNoConsoleListeners(() => Debug.WriteLine(sb));
                         return sb.ToString();
 
                     case ConsoleKey.Escape:
@@ -702,15 +703,19 @@ public static class ConsoleEx
     /// <summary>
     /// Executes the given action with no active console listerners.
     /// </summary>
-    static void WithNoConsoleListeners(Action action)
+    public static void WithNoConsoleListeners(Action action)
     {
+        action.ThrowWhenNull();
+
         lock (Ambient.Lock)
         {
             var items = Ambient.GetConsoleListeners().ToArray();
             Ambient.RemoveListeners(items);
 
+            Debug.Flush();
             try { action(); }
             finally { Ambient.AddListeners(items); }
+            Debug.Flush();
         }
     }
 
@@ -719,8 +724,10 @@ public static class ConsoleEx
     /// <summary>
     /// Returns a string header with the requested number of spaces.
     /// </summary>
-    static string Header(int size)
+    public static string Header(int size)
     {
+        if (size < 0) throw new ArgumentException($"Size cannot be negative: {size}.");
+
         switch (size)
         {
             case 0: return Header0;

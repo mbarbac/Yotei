@@ -1,0 +1,37 @@
+﻿using static System.ConsoleColor;
+
+namespace Runner;
+
+// ========================================================
+public class MenuArtifacts : ConsoleMenuEntry
+{
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
+    public override string Header() => "Manage Artifacts";
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public override void Execute()
+    {
+        Console.Clear();
+        var position = 0; do
+        {
+            Console.WriteLine(true, "");
+            Console.WriteLine(true, Green, Program.FatSeparator);
+            Console.WriteLine(true, Green, Header());
+            Console.WriteLine(true, "");
+
+            position = new ConsoleMenu
+            {
+                new("Exit"),
+                new ClearDiskArtifacts(),
+                new ClearLocalPackages(),
+            }
+            .Run(Program.MenuOptions);
+        }
+        while (position > 0);
+    }
+}
