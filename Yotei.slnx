@@ -5,6 +5,9 @@
     <BuildType Name="Release" />
   </Configurations>
   <Folder Name="/0-Development/">
+    <Project Path="0-Development/Runner.Benchmarks/Runner.Benchmarks.csproj" Id="81697f48-2158-4a4f-b008-fba1a5a3d114">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
     <Project Path="0-Development/Runner.Tests/Runner.Tests.csproj" Id="3b16c19b-e14d-494d-b9e4-37bfabc1361a" />
     <Project Path="0-Development/Runner/Runner.csproj" Id="dc37768b-4851-45f8-80f9-bf430770aec1" />
   </Folder>
