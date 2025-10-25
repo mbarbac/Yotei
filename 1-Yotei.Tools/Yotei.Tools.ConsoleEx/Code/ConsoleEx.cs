@@ -1,709 +1,698 @@
 ﻿namespace Yotei.Tools;
 
 // ========================================================
+/// <summary>
+/// Represents a <see cref="Console"/>-alike class that provides some extended capabilities, but
+/// without replacing it.
+/// </summary>
 public static class ConsoleEx
 {
-    extension(Console)
+    /// <summary>
+    /// <inheritdoc cref="Console.ForegroundColor"/>
+    /// </summary>
+    public static ConsoleColor ForegroundColor
     {
-        /// <summary>
-        /// <inheritdoc cref="Console.Write(string, ReadOnlySpan{object?})"/>
-        /// </summary>
-        /// <param name="forecolor"></param>
-        /// <param name="message"></param>
-        /// <param name="args"></param>
-        public static void Write(ConsoleColor forecolor, string message, params object?[]? args)
-        {
-            var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
-            Console.Write(message, args);
-            Console.ForegroundColor = oldfore;
-        }
-
-        /// <summary>
-        /// <inheritdoc cref="Console.Write(string, ReadOnlySpan{object?})"/>
-        /// </summary>
-        /// <param name="forecolor"></param>
-        /// <param name="backcolor"></param>
-        /// <param name="message"></param>
-        /// <param name="args"></param>
-        public static void Write(
-            ConsoleColor forecolor, ConsoleColor backcolor, string message, params object?[]? args)
-        {
-            var oldback = Console.BackgroundColor; Console.BackgroundColor = backcolor;
-            Console.Write(forecolor, message, args);
-            Console.BackgroundColor = oldback;
-        }
-
-        // ------------------------------------------------
-
-        /// <summary>
-        /// <inheritdoc cref="Console.Write(string, ReadOnlySpan{object?})"/>
-        /// If '<paramref name="debug"/>' is requested, the message is also written in the debug
-        /// environment.
-        /// </summary>
-        /// <param name="debug"></param>
-        /// <param name="message"></param>
-        /// <param name="args"></param>
-        public static void Write(bool debug, string message, params object?[]? args)
-        {
-            message ??= string.Empty;
-            args ??= [null];
-            if (args.Length > 0) message = string.Format(message, args);
-
-            Console.Write(message);
-            if (debug) WithNoConsoleListeners(() => Debug.Write(message));
-        }
-
-        /// <summary>
-        /// <inheritdoc cref="Console.Write(string, ReadOnlySpan{object?})"/>
-        /// If '<paramref name="debug"/>' is requested, the message is also written in the debug
-        /// environment.
-        /// </summary>
-        /// <param name="debug"></param>
-        /// <param name="forecolor"></param>
-        /// <param name="message"></param>
-        /// <param name="args"></param>
-        public static void Write(
-            bool debug,
-            ConsoleColor forecolor,
-            string message, params object?[]? args)
-        {
-            var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
-            Console.Write(debug, message, args);
-            Console.ForegroundColor = oldfore;
-        }
-
-        /// <summary>
-        /// <inheritdoc cref="Console.Write(string, ReadOnlySpan{object?})"/>
-        /// If '<paramref name="debug"/>' is requested, the message is also written in the debug
-        /// environment.
-        /// </summary>
-        /// <param name="debug"></param>
-        /// <param name="forecolor"></param>
-        /// <param name="backcolor"></param>
-        /// <param name="message"></param>
-        /// <param name="args"></param>
-        public static void Write(
-            bool debug,
-            ConsoleColor forecolor, ConsoleColor backcolor,
-            string message, params object?[]? args)
-        {
-            var oldback = Console.BackgroundColor; Console.BackgroundColor = backcolor;
-            Console.Write(debug, forecolor, message, args);
-            Console.BackgroundColor = oldback;
-        }
-
-        // ------------------------------------------------
-
-        /// <summary>
-        /// <inheritdoc cref="Console.WriteLine(string, ReadOnlySpan{object?})"/>
-        /// </summary>
-        /// <param name="forecolor"></param>
-        /// <param name="message"></param>
-        /// <param name="args"></param>
-        public static void WriteLine(ConsoleColor forecolor, string message, params object?[]? args)
-        {
-            var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
-            Console.WriteLine(message, args);
-            Console.ForegroundColor = oldfore;
-        }
-
-        /// <summary>
-        /// <inheritdoc cref="Console.WriteLine(string, ReadOnlySpan{object?})"/>
-        /// </summary>
-        /// <param name="forecolor"></param>
-        /// <param name="backcolor"></param>
-        /// <param name="message"></param>
-        /// <param name="args"></param>
-        public static void WriteLine(
-            ConsoleColor forecolor, ConsoleColor backcolor, string message, params object?[]? args)
-        {
-            var oldback = Console.BackgroundColor; Console.BackgroundColor = backcolor;
-            Console.WriteLine(forecolor, message, args);
-            Console.BackgroundColor = oldback;
-        }
-
-        // ------------------------------------------------
-
-        /// <summary>
-        /// <inheritdoc cref="Console.WriteLine(string, ReadOnlySpan{object?})"/>
-        /// If '<paramref name="debug"/>' is requested, the message is also written in the debug
-        /// environment.
-        /// </summary>
-        /// <param name="debug"></param>
-        /// <param name="message"></param>
-        /// <param name="args"></param>
-        public static void WriteLine(bool debug, string message, params object?[]? args)
-        {
-            message ??= string.Empty;
-            args ??= [null];
-            if (args.Length > 0) message = string.Format(message, args);
-
-            Console.WriteLine(message);
-            if (debug) WithNoConsoleListeners(() => Debug.WriteLine(message));
-        }
-
-        /// <summary>
-        /// <inheritdoc cref="Console.WriteLine(string, ReadOnlySpan{object?})"/>
-        /// If '<paramref name="debug"/>' is requested, the message is also written in the debug
-        /// environment.
-        /// </summary>
-        /// <param name="debug"></param>
-        /// <param name="forecolor"></param>
-        /// <param name="message"></param>
-        /// <param name="args"></param>
-        public static void WriteLine(
-            bool debug,
-            ConsoleColor forecolor,
-            string message, params object?[]? args)
-        {
-            var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
-            Console.WriteLine(debug, message, args);
-            Console.ForegroundColor = oldfore;
-        }
-
-        /// <summary>
-        /// <inheritdoc cref="Console.WriteLine(string, ReadOnlySpan{object?})"/>
-        /// If '<paramref name="debug"/>' is requested, the message is also written in the debug
-        /// environment.
-        /// </summary>
-        /// <param name="debug"></param>
-        /// <param name="forecolor"></param>
-        /// <param name="backcolor"></param>
-        /// <param name="message"></param>
-        /// <param name="args"></param>
-        public static void WriteLine(
-            bool debug,
-            ConsoleColor forecolor, ConsoleColor backcolor,
-            string message, params object?[]? args)
-        {
-            var oldback = Console.BackgroundColor; Console.BackgroundColor = backcolor;
-            Console.WriteLine(debug, forecolor, message, args);
-            Console.BackgroundColor = oldback;
-        }
-
-        // ------------------------------------------------
-
-        /// <summary>
-        /// <inheritdoc cref="Console.ReadLine"/>
-        /// </summary>
-        /// <param name="forecolor"></param>
-        /// <returns></returns>
-        public static string? ReadLine(ConsoleColor forecolor)
-        {
-            var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
-            var str = Console.ReadLine();
-            Console.ForegroundColor = oldfore;
-            return str;
-        }
-
-        /// <summary>
-        /// <inheritdoc cref="Console.ReadLine"/>
-        /// </summary>
-        /// <param name="forecolor"></param>
-        /// <param name="backcolor"></param>
-        /// <returns></returns>
-        public static string? ReadLine(ConsoleColor forecolor, ConsoleColor backcolor)
-        {
-            var oldback = Console.BackgroundColor; Console.BackgroundColor = backcolor;
-            var str = Console.ReadLine(forecolor);
-            Console.BackgroundColor = oldback;
-            return str;
-        }
-
-        // ------------------------------------------------
-
-        /// <summary>
-        /// <inheritdoc cref="Console.ReadLine"/>
-        /// If '<paramref name="debug"/>' is requested, the result is also written in the debug
-        /// environment, if any.
-        /// </summary>
-        /// <param name="debug"></param>
-        /// <returns></returns>
-        public static string? ReadLine(bool debug)
-        {
-            var str = Console.ReadLine();
-            if (debug && str is not null) WithNoConsoleListeners(() => Debug.WriteLine(str));
-            return str;
-        }
-
-        /// <summary>
-        /// <inheritdoc cref="Console.ReadLine"/>
-        /// If '<paramref name="debug"/>' is requested, the result is also written in the debug
-        /// environment, if any.
-        /// </summary>
-        /// <param name="debug"></param>
-        /// <param name="forecolor"></param>
-        /// <returns></returns>
-        public static string? ReadLine(bool debug, ConsoleColor forecolor)
-        {
-            var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
-            var str = Console.ReadLine(debug);
-            Console.ForegroundColor = oldfore;
-            return str;
-        }
-
-        /// <summary>
-        /// <inheritdoc cref="Console.ReadLine"/>
-        /// If '<paramref name="debug"/>' is requested, the result is also written in the debug
-        /// environment, if any.
-        /// </summary>
-        /// <param name="debug"></param>
-        /// <param name="forecolor"></param>
-        /// <param name="backcolor"></param>
-        /// <returns></returns>
-        public static string? ReadLine(bool debug, ConsoleColor forecolor, ConsoleColor backcolor)
-        {
-            var oldback = Console.BackgroundColor; Console.BackgroundColor = backcolor;
-            var str = Console.ReadLine(debug, forecolor);
-            Console.BackgroundColor = oldback;
-            return str;
-        }
-
-        // ------------------------------------------------
-
-        /// <summary>
-        /// <inheritdoc cref="Console.ReadKey(bool)"/> Use '<c>false</c> to prevent interception
-        /// and display the key. If '<paramref name="debug"/>' is requested, the result is also
-        /// written in the debug environment, if any.
-        /// </summary>
-        /// <param name="debug"></param>
-        /// <param name="intercept"></param>
-        /// <returns></returns>
-        public static ConsoleKeyInfo ReadKey(bool debug, bool intercept)
-        {
-            var info = Console.ReadKey(intercept);
-            if (debug) WithNoConsoleListeners(() =>
-            {
-                var ch = info.KeyChar < 32 ? $"[{info.Key}]" : $"{info.KeyChar}";
-                Debug.Write(ch);
-            });
-            return info;
-        }
-
-        /// <summary>
-        /// <inheritdoc cref="Console.ReadKey(bool)"/> Use '<c>false</c> to prevent interception
-        /// and display the key. If '<paramref name="debug"/>' is requested, the result is also
-        /// written in the debug environment, if any.
-        /// </summary>
-        /// <param name="debug"></param>
-        /// <param name="forecolor"></param>
-        /// <param name="intercept"></param>
-        /// <returns></returns>
-        public static ConsoleKeyInfo ReadKey(
-            bool debug,
-            ConsoleColor forecolor, bool intercept)
-        {
-            var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
-            var info = ReadKey(debug, intercept);
-            Console.ForegroundColor = oldfore;
-            return info;
-        }
-
-        /// <summary>
-        /// <inheritdoc cref="Console.ReadKey(bool)"/> Use '<c>false</c> to prevent interception
-        /// and display the key. If '<paramref name="debug"/>' is requested, the result is also
-        /// written in the debug environment, if any.
-        /// </summary>
-        /// <param name="debug"></param>
-        /// <param name="forecolor"></param>
-        /// <param name="backcolor"></param>
-        /// <param name="intercept"></param>
-        /// <returns></returns>
-        public static ConsoleKeyInfo ReadKey(
-            bool debug,
-            ConsoleColor forecolor, ConsoleColor backcolor, bool intercept)
-        {
-            var oldback = Console.BackgroundColor; Console.BackgroundColor = backcolor;
-            var info = ReadKey(debug, forecolor, intercept);
-            Console.BackgroundColor = oldback;
-            return info;
-        }
-
-        // ------------------------------------------------
-
-        /// <summary>
-        /// <inheritdoc cref="Console.ReadKey(bool)"/> Use '<c>false</c> to prevent interception
-        /// and display the key. If '<paramref name="debug"/>' is requested, the result is also
-        /// written in the debug environment, if any. Returns '<c>null</c> if no key was pressed
-        /// when the timeout expired.
-        /// </summary>
-        /// <param name="debug"></param>
-        /// <param name="timeout"></param>
-        /// <param name="intercept"></param>
-        /// <returns></returns>
-        public static ConsoleKeyInfo? ReadKey(bool debug, TimeSpan timeout, bool intercept)
-        {
-            var ms = timeout.ValidatedTimeout;
-            var ini = DateTime.UtcNow;
-
-            while (true)
-            {
-                // Trying an available key...
-                if (Console.KeyAvailable)
-                {
-                    var info = Console.ReadKey(intercept: true);
-                    var ch = info.KeyChar < 32 ? $"[{info.Key}]" : $"{info.KeyChar}";
-
-                    if (!intercept) Console.Write(ch);
-                    if (debug) WithNoConsoleListeners(() => Debug.Write(ch));
-                    return info;
-                }
-
-                // Waiting...
-                if (ms > -1)
-                {
-                    var now = DateTime.UtcNow;
-                    var span = now - ini;
-                    if (span >= timeout) return null;
-                }
-                Thread.Yield();
-            }
-        }
-
-        /// <summary>
-        /// <inheritdoc cref="Console.ReadKey(bool)"/> Use '<c>false</c> to prevent interception
-        /// and display the key. If '<paramref name="debug"/>' is requested, the result is also
-        /// written in the debug environment, if any. Returns '<c>null</c> if no key was pressed
-        /// when the timeout expired.
-        /// </summary>
-        /// <param name="debug"></param>
-        /// <param name="forecolor"></param>
-        /// <param name="timeout"></param>
-        /// <param name="intercept"></param>
-        /// <returns></returns>
-        public static ConsoleKeyInfo? ReadKey(
-            bool debug, ConsoleColor forecolor, TimeSpan timeout, bool intercept)
-        {
-            var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
-            var info = Console.ReadKey(debug, timeout, intercept);
-            Console.ForegroundColor = oldfore;
-            return info;
-        }
-
-        /// <summary>
-        /// <inheritdoc cref="Console.ReadKey(bool)"/> Use '<c>false</c> to prevent interception
-        /// and display the key. If '<paramref name="debug"/>' is requested, the result is also
-        /// written in the debug environment, if any. Returns '<c>null</c> if no key was pressed
-        /// when the timeout expired.
-        /// </summary>
-        /// <param name="debug"></param>
-        /// <param name="forecolor"></param>
-        /// <param name="backcolor"></param>
-        /// <param name="timeout"></param>
-        /// <param name="intercept"></param>
-        /// <returns></returns>
-        public static ConsoleKeyInfo? ReadKey(
-            bool debug,
-            ConsoleColor forecolor, ConsoleColor backcolor, TimeSpan timeout, bool intercept)
-        {
-            var oldback = Console.BackgroundColor; Console.BackgroundColor = backcolor;
-            var info = Console.ReadKey(debug, forecolor, timeout, intercept);
-            Console.BackgroundColor = oldback;
-            return info;
-        }
-
-        // ------------------------------------------------
-
-        /// <summary>
-        /// <inheritdoc cref="Console.ReadKey(bool)"/> Use '<c>false</c> to prevent interception
-        /// and display the key. Returns '<c>null</c> if no key was pressed when the timeout
-        /// expired.
-        /// </summary>
-        /// <param name="timeout"></param>
-        /// <param name="intercept"></param>
-        /// <returns></returns>
-        public static ConsoleKeyInfo? ReadKey(
-            TimeSpan timeout, bool intercept) => ReadKey(false, timeout, intercept);
-
-        /// <summary>
-        /// <inheritdoc cref="Console.ReadKey(bool)"/> Use '<c>false</c> to prevent interception
-        /// and display the key. Returns '<c>null</c> if no key was pressed when the timeout
-        /// expired.
-        /// </summary>
-        /// <param name="forecolor"></param>
-        /// <param name="timeout"></param>
-        /// <param name="intercept"></param>
-        /// <returns></returns>
-        public static ConsoleKeyInfo? ReadKey(
-            ConsoleColor forecolor, TimeSpan timeout, bool intercept)
-        {
-            var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
-            var info = Console.ReadKey(timeout, intercept);
-            Console.ForegroundColor = oldfore;
-            return info;
-        }
-
-        /// <summary>
-        /// <inheritdoc cref="Console.ReadKey(bool)"/> Use '<c>false</c> to prevent interception
-        /// and display the key. Returns '<c>null</c> if no key was pressed when the timeout
-        /// expired.
-        /// </summary>
-        /// <param name="forecolor"></param>
-        /// <param name="backcolor"></param>
-        /// <param name="timeout"></param>
-        /// <param name="intercept"></param>
-        /// <returns></returns>
-        public static ConsoleKeyInfo? ReadKey(
-            ConsoleColor forecolor, ConsoleColor backcolor, TimeSpan timeout, bool intercept)
-        {
-            var oldback = Console.BackgroundColor; Console.BackgroundColor = backcolor;
-            var info = Console.ReadKey(forecolor, timeout, intercept);
-            Console.BackgroundColor = oldback;
-            return info;
-        }
-
-        // ------------------------------------------------
-
-        /// <summary>
-        /// Edits in the console the given source string and returns the result of that edition,
-        /// or <c>null</c> if the user cancelled it by pressing [Escape], or if the timeout has
-        /// expired. Null source strings are treated as empty ones. If '<paramref name="debug"/>'
-        /// is requested, the result is also written in the debug environment, if any.
-        /// </summary>
-        /// <param name="debug"></param>
-        /// <param name="timeout"></param>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public static string? EditLine(bool debug, TimeSpan timeout, string? source = null)
-            => EditLine(debug, Console.ForegroundColor, Console.BackgroundColor, timeout, source);
-
-        /// <summary>
-        /// Edits in the console the given source string and returns the result of that edition,
-        /// or <c>null</c> if the user cancelled it by pressing [Escape], or if the timeout has
-        /// expired. Null source strings are treated as empty ones. If '<paramref name="debug"/>'
-        /// is requested, the result is also written in the debug environment, if any.
-        /// </summary>
-        /// <param name="debug"></param>
-        /// <param name="forecolor"></param>
-        /// <param name="timeout"></param>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public static string? EditLine(
-            bool debug,
-            ConsoleColor forecolor, TimeSpan timeout, string? source = null)
-            => EditLine(debug, forecolor, Console.BackgroundColor, timeout, source);
-
-        /// <summary>
-        /// Edits in the console the given source string and returns the result of that edition,
-        /// or <c>null</c> if the user cancelled it by pressing [Escape], or if the timeout has
-        /// expired. Null source strings are treated as empty ones. If '<paramref name="debug"/>'
-        /// is requested, the result is also written in the debug environment, if any.
-        /// </summary>
-        /// <param name="debug"></param>
-        /// <param name="forecolor"></param>
-        /// <param name="backcolor"></param>
-        /// <param name="timeout"></param>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public static string? EditLine(
-            bool debug,
-            ConsoleColor forecolor, ConsoleColor backcolor, TimeSpan timeout, string? source = null)
-        {
-            var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
-            var oldback = Console.BackgroundColor; Console.BackgroundColor = backcolor;
-            var size = Console.CursorSize;
-            var left = Console.CursorLeft;
-            bool insert;
-
-            var sb = new StringBuilder(); sb.Append(source ?? string.Empty);
-            var pos = sb.Length;
-            int len;
-
-            SetInsertSize(insert = true);
-            ShowLine(pos);
-
-            while (true)
-            {
-                var info = ReadKey(timeout, intercept: true);
-                info ??= new('\0', ConsoleKey.Escape, false, false, false);
-
-                /// <summary>
-                /// Special keys.
-                /// </summary>
-                switch (info.Value.Key)
-                {
-                    case ConsoleKey.Enter:
-                        SetInsertSize(true);
-                        Console.WriteLine();
-                        Console.ForegroundColor = oldfore;
-                        Console.BackgroundColor = oldback;
-                        if (debug) WithNoConsoleListeners(() => Debug.WriteLine(sb));
-                        return sb.ToString();
-
-                    case ConsoleKey.Escape:
-                        SetInsertSize(true);
-                        len = sb.Length; sb.Clear(); ShowLine(0, len);
-                        Console.WriteLine();
-                        Console.ForegroundColor = oldfore;
-                        Console.BackgroundColor = oldback;
-                        return null;
-
-                    case ConsoleKey.Insert:
-                        SetInsertSize(insert = !insert);
-                        break;
-
-                    case ConsoleKey.Home:
-                        pos = 0;
-                        Console.CursorLeft = left + pos;
-                        break;
-
-                    case ConsoleKey.End:
-                        pos = sb.Length;
-                        Console.CursorLeft = left + pos;
-                        break;
-
-                    case ConsoleKey.Delete:
-                        if (pos >= sb.Length) break;
-                        len = sb.Length;
-                        sb.Remove(pos, 1);
-                        ShowLine(pos, len);
-                        break;
-
-                    case ConsoleKey.Backspace:
-                        if (pos == 0) break;
-                        len = sb.Length;
-                        sb.Remove(--pos, 1);
-                        ShowLine(pos, len);
-                        break;
-
-                    case ConsoleKey.LeftArrow:
-                        if (info.Value.Modifiers.HasFlag(ConsoleModifiers.Control))
-                        {
-                            if (pos == 0) break;
-                            var ascii = char.IsLetterOrDigit(sb[pos - 1]);
-                            while (pos > 0)
-                            {
-                                var temp = char.IsLetterOrDigit(sb[pos - 1]);
-                                if (temp == ascii) { pos--; Console.CursorLeft--; }
-                                else break;
-                            }
-                        }
-                        else
-                        {
-                            if (pos > 0) { pos--; Console.CursorLeft--; }
-                        }
-                        break;
-
-                    case ConsoleKey.RightArrow:
-                        if (info.Value.Modifiers.HasFlag(ConsoleModifiers.Control))
-                        {
-                            if (pos >= sb.Length) break;
-                            var ascii = char.IsLetterOrDigit(sb[pos]);
-                            while (pos < sb.Length)
-                            {
-                                var temp = char.IsLetterOrDigit(sb[pos]);
-                                if (temp == ascii) { pos++; Console.CursorLeft++; }
-                                else break;
-                            }
-                        }
-                        else
-                        {
-                            if (pos < sb.Length) { pos++; Console.CursorLeft++; }
-                        }
-                        break;
-                }
-
-                /// <summary>
-                /// Special keys.
-                /// </summary>
-                if (info.Value.KeyChar >= ' ')
-                {
-                    if (insert)
-                    {
-                        sb.Insert(pos, info.Value.KeyChar);
-                        ShowLine(++pos);
-                        continue;
-                    }
-                    if (pos < sb.Length)
-                    {
-                        sb[pos] = info.Value.KeyChar;
-                        ShowLine(++pos);
-                    }
-                    else
-                    {
-                        sb.Append(info.Value.KeyChar);
-                        Console.Write(info.Value.KeyChar);
-                        pos++;
-                    }
-                }
-            }
-
-            /// <summary>
-            /// Sets the cursor size for the insert mode ON (true) or OFF (false).
-            /// </summary>
-            void SetInsertSize(bool value)
-            {
-                var windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-                if (windows) Console.CursorSize = value ? size : 100;
-            }
-
-            /// <summary>
-            /// Shows the current value clearing up to the remaining len, and sets the cursor
-            /// position to the given one.
-            /// </summary>
-            void ShowLine(int pos, int len = 0)
-            {
-                Console.CursorLeft = left;
-                Console.Write(sb);
-
-                Console.ForegroundColor = oldfore;
-                Console.BackgroundColor = oldback;
-                len -= sb.Length;
-                if (len > 0) Console.Write(Header(len));
-                Console.CursorLeft = left + pos;
-
-                Console.ForegroundColor = forecolor;
-                Console.BackgroundColor = backcolor;
-            }
-        }
-
-        // ------------------------------------------------
-
-        /// <summary>
-        /// Edits in the console the given source string and returns the result of that edition,
-        /// or <c>null</c> if the user cancelled it by pressing [Escape], or if the timeout has
-        /// expired. Null source strings are treated as empty ones.
-        /// </summary>
-        /// <param name="timeout"></param>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public static string? EditLine(
-            TimeSpan timeout, string? source = null) => EditLine(false, timeout, source);
-
-        /// <summary>
-        /// Edits in the console the given source string and returns the result of that edition,
-        /// or <c>null</c> if the user cancelled it by pressing [Escape], or if the timeout has
-        /// expired. Null source strings are treated as empty ones.
-        /// </summary>
-        /// <param name="forecolor"></param>
-        /// <param name="timeout"></param>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public static string? EditLine(
-            ConsoleColor forecolor, TimeSpan timeout, string? source = null)
-            => EditLine(false, forecolor, timeout, source);
-
-        /// <summary>
-        /// Edits in the console the given source string and returns the result of that edition,
-        /// or <c>null</c> if the user cancelled it by pressing [Escape], or if the timeout has
-        /// expired. Null source strings are treated as empty ones.
-        /// </summary>
-        /// <param name="forecolor"></param>
-        /// <param name="backcolor"></param>
-        /// <param name="timeout"></param>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public static string? EditLine(
-            ConsoleColor forecolor, ConsoleColor backcolor, TimeSpan timeout, string? source = null)
-            => EditLine(false, forecolor, backcolor, timeout, source);
+        get => Console.ForegroundColor;
+        set => Console.ForegroundColor = value;
     }
 
-    // ====================================================
+    /// <summary>
+    /// <inheritdoc cref="Console.BackgroundColor"/>
+    /// </summary>
+    public static ConsoleColor BackgroundColor
+    {
+        get => Console.BackgroundColor;
+        set => Console.BackgroundColor = value;
+    }
+
+    // ----------------------------------------------------
 
     /// <summary>
-    /// Executes the given action with no active console listerners.
+    /// <inheritdoc cref="Console.Clear"/>
     /// </summary>
-    public static void WithNoConsoleListeners(Action action)
+    public static void Clear() => Console.Clear();
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc cref="Console.Write(string, ReadOnlySpan{object?})"/>
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="args"></param>
+    public static void Write(
+        string message, params object?[]? args) => Write(false, message, args);
+
+    /// <summary>
+    /// <inheritdoc cref="Console.Write(string, ReadOnlySpan{object?})"/>
+    /// </summary>
+    /// <param name="forecolor"></param>
+    /// <param name="message"></param>
+    /// <param name="args"></param>
+    public static void Write(
+        ConsoleColor forecolor, string message, params object?[]? args)
+    {
+        var oldfore = ForegroundColor; ForegroundColor = forecolor;
+        Write(message, args);
+        ForegroundColor = oldfore;
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="Console.Write(string, ReadOnlySpan{object?})"/>
+    /// </summary>
+    /// <param name="forecolor"></param>
+    /// <param name="backcolor"></param>
+    /// <param name="message"></param>
+    /// <param name="args"></param>
+    public static void Write(
+        ConsoleColor forecolor, ConsoleColor backcolor, string message, params object?[]? args)
+    {
+        var oldback = BackgroundColor; BackgroundColor = backcolor;
+        Write(forecolor, message, args);
+        BackgroundColor = oldback;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc cref="Console.Write(string, ReadOnlySpan{object?})"/> If requested, the
+    /// displayed formatted message is replicated in the not-console listerners of the DEBUG
+    /// environment.
+    /// </summary>
+    /// <param name="debug"></param>
+    /// <param name="message"></param>
+    /// <param name="args"></param>
+    public static void Write(bool debug, string message, params object?[]? args)
+    {
+        message ??= string.Empty;
+        args ??= [null];
+        if (args.Length > 0) message = string.Format(message, args);
+
+        Console.Write(message);
+        if (debug) WithNoListeners(() => Debug.Write(message));
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="Console.Write(string, ReadOnlySpan{object?})"/> If requested, the
+    /// displayed formatted message is replicated in the not-console listerners of the DEBUG
+    /// environment.
+    /// </summary>
+    /// <param name="debug"></param>
+    /// <param name="forecolor"></param>
+    /// <param name="message"></param>
+    /// <param name="args"></param>
+    public static void Write(
+        bool debug, ConsoleColor forecolor, string message, params object?[]? args)
+    {
+        var oldfore = ForegroundColor; ForegroundColor = forecolor;
+        Write(debug, message, args);
+        ForegroundColor = oldfore;
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="Console.Write(string, ReadOnlySpan{object?})"/> If requested, the
+    /// displayed formatted message is replicated in the not-console listerners of the DEBUG
+    /// environment.
+    /// </summary>
+    /// <param name="debug"></param>
+    /// <param name="forecolor"></param>
+    /// <param name="backcolor"></param>
+    /// <param name="message"></param>
+    /// <param name="args"></param>
+    public static void Write(
+        bool debug, ConsoleColor forecolor, ConsoleColor backcolor,
+        string message, params object?[]? args)
+    {
+        var oldback = BackgroundColor; BackgroundColor = backcolor;
+        Write(debug, forecolor, message, args);
+        BackgroundColor = oldback;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc cref="Console.WriteLine(string, ReadOnlySpan{object?})"/>
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="args"></param>
+    public static void WriteLine(
+        string message, params object?[]? args) => WriteLine(false, message, args);
+
+    /// <summary>
+    /// <inheritdoc cref="Console.WriteLine(string, ReadOnlySpan{object?})"/>
+    /// </summary>
+    /// <param name="forecolor"></param>
+    /// <param name="message"></param>
+    /// <param name="args"></param>
+    public static void WriteLine(
+        ConsoleColor forecolor, string message, params object?[]? args)
+    {
+        var oldfore = ForegroundColor; ForegroundColor = forecolor;
+        WriteLine(message, args);
+        ForegroundColor = oldfore;
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="Console.WriteLine(string, ReadOnlySpan{object?})"/>
+    /// </summary>
+    /// <param name="forecolor"></param>
+    /// <param name="backcolor"></param>
+    /// <param name="message"></param>
+    /// <param name="args"></param>
+    public static void WriteLine(
+        ConsoleColor forecolor, ConsoleColor backcolor, string message, params object?[]? args)
+    {
+        var oldback = BackgroundColor; BackgroundColor = backcolor;
+        WriteLine(forecolor, message, args);
+        BackgroundColor = oldback;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc cref="Console.WriteLine(string, ReadOnlySpan{object?})"/> If requested, the
+    /// displayed formatted message is replicated in the not-console listerners of the DEBUG
+    /// environment.
+    /// </summary>
+    /// <param name="debug"></param>
+    /// <param name="message"></param>
+    /// <param name="args"></param>
+    public static void WriteLine(bool debug, string message, params object?[]? args)
+    {
+        message ??= string.Empty;
+        args ??= [null];
+        if (args.Length > 0) message = string.Format(message, args);
+
+        Console.WriteLine(message);
+        if (debug) WithNoListeners(() => Debug.WriteLine(message));
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="Console.WriteLine(string, ReadOnlySpan{object?})"/> If requested, the
+    /// displayed formatted message is replicated in the not-console listerners of the DEBUG
+    /// environment.
+    /// </summary>
+    /// <param name="debug"></param>
+    /// <param name="forecolor"></param>
+    /// <param name="message"></param>
+    /// <param name="args"></param>
+    public static void WriteLine(
+        bool debug, ConsoleColor forecolor, string message, params object?[]? args)
+    {
+        var oldfore = ForegroundColor; ForegroundColor = forecolor;
+        WriteLine(debug, message, args);
+        ForegroundColor = oldfore;
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="Console.WriteLine(string, ReadOnlySpan{object?})"/> If requested, the
+    /// displayed formatted message is replicated in the not-console listerners of the DEBUG
+    /// environment.
+    /// </summary>
+    /// <param name="debug"></param>
+    /// <param name="forecolor"></param>
+    /// <param name="backcolor"></param>
+    /// <param name="message"></param>
+    /// <param name="args"></param>
+    public static void WriteLine(
+        bool debug, ConsoleColor forecolor, ConsoleColor backcolor,
+        string message, params object?[]? args)
+    {
+        var oldback = BackgroundColor; BackgroundColor = backcolor;
+        WriteLine(debug, forecolor, message, args);
+        BackgroundColor = oldback;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc cref="Console.ReadLine"/>
+    /// </summary>
+    /// <returns></returns>
+    public static string? ReadLine() => Console.ReadLine();
+
+    /// <summary>
+    /// <inheritdoc cref="Console.ReadLine"/>
+    /// </summary>
+    /// <param name="forecolor"></param>
+    /// <returns></returns>
+    public static string? ReadLine(ConsoleColor forecolor)
+    {
+        var oldfore = ForegroundColor; ForegroundColor = forecolor;
+        var r = ReadLine();
+        ForegroundColor = oldfore;
+        return r;
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="Console.ReadLine"/>
+    /// </summary>
+    /// <param name="forecolor"></param>
+    /// <param name="backcolor"></param>
+    /// <returns></returns>
+    public static string? ReadLine(ConsoleColor forecolor, ConsoleColor backcolor)
+    {
+        var oldback = BackgroundColor; BackgroundColor = backcolor;
+        var r = ReadLine(forecolor);
+        BackgroundColor = oldback;
+        return r;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc cref="Console.ReadLine"/> If requested, the read string, if any, is also
+    /// replicated in the not-console listerners of the DEBUG environment.
+    /// </summary>
+    /// <param name="debug"></param>
+    /// <returns></returns>
+    public static string? ReadLine(bool debug)
+    {
+        var r = ReadLine();
+        if (r is not null && debug) WithNoListeners(() => Debug.WriteLine(r));
+        return r;
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="Console.ReadLine"/> If requested, the read string, if any, is also
+    /// replicated in the not-console listerners of the DEBUG environment.
+    /// </summary>
+    /// <param name="debug"></param>
+    /// <param name="forecolor"></param>
+    /// <returns></returns>
+    public static string? ReadLine(bool debug, ConsoleColor forecolor)
+    {
+        var oldfore = ForegroundColor; ForegroundColor = forecolor;
+        var r = ReadLine(debug);
+        ForegroundColor = oldfore;
+        return r;
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="Console.ReadLine"/> If requested, the read string, if any, is also
+    /// replicated in the not-console listerners of the DEBUG environment.
+    /// </summary>
+    /// <param name="debug"></param>
+    /// <param name="forecolor"></param>
+    /// <param name="backcolor"></param>
+    /// <returns></returns>
+    public static string? ReadLine(bool debug, ConsoleColor forecolor, ConsoleColor backcolor)
+    {
+        var oldback = BackgroundColor; BackgroundColor = backcolor;
+        var r = ReadLine(debug, forecolor);
+        BackgroundColor = oldback;
+        return r;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to obtain a string representation of the given key.
+    /// </summary>
+    static string KeyToString(
+        this ConsoleKeyInfo info) => info.KeyChar < 32 ? $"[{info.Key}]" : $"{info.KeyChar}";
+
+    /// <summary>
+    /// <inheritdoc cref="Console.ReadKey"/>
+    /// </summary>
+    /// <returns></returns>
+    public static ConsoleKeyInfo ReadKey()
+    {
+        var r = Console.ReadKey(intercept: true);
+        Console.Write(r.KeyToString());
+        return r;
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="Console.ReadKey"/>
+    /// </summary>
+    /// <param name="forecolor"></param>
+    /// <returns></returns>
+    public static ConsoleKeyInfo ReadKey(ConsoleColor forecolor)
+    {
+        var oldfore = ForegroundColor; ForegroundColor = forecolor;
+        var r = ReadKey();
+        ForegroundColor = oldfore;
+        return r;
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="Console.ReadKey"/>
+    /// </summary>
+    /// <param name="forecolor"></param>
+    /// <param name="backcolor"></param>
+    /// <returns></returns>
+    public static ConsoleKeyInfo ReadKey(ConsoleColor forecolor, ConsoleColor backcolor)
+    {
+        var oldback = BackgroundColor; BackgroundColor = backcolor;
+        var r = ReadKey(forecolor);
+        BackgroundColor = oldback;
+        return r;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc cref="Console.ReadKey(bool)"/>
+    /// Use 'intercept=true' to prevent displaying the key.
+    /// </summary>
+    /// <param name="intercept"></param>
+    /// <returns></returns>
+    public static ConsoleKeyInfo ReadKey(bool intercept)
+    {
+        var r = Console.ReadKey(intercept: true);
+        if (!intercept) Console.Write(r.KeyToString());
+        return r;
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="Console.ReadKey(bool)"/>
+    /// Use 'intercept=true' to prevent displaying the key.
+    /// </summary>
+    /// <param name="intercept"></param>
+    /// <param name="forecolor"></param>
+    /// <returns></returns>
+    public static ConsoleKeyInfo ReadKey(bool intercept, ConsoleColor forecolor)
+    {
+        var oldfore = ForegroundColor; ForegroundColor = forecolor;
+        var r = ReadKey(intercept);
+        ForegroundColor = oldfore;
+        return r;
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="Console.ReadKey(bool)"/>
+    /// Use 'intercept=true' to prevent displaying the key.
+    /// </summary>
+    /// <param name="intercept"></param>
+    /// <param name="forecolor"></param>
+    /// <param name="backcolor"></param>
+    /// <returns></returns>
+    public static ConsoleKeyInfo ReadKey(
+        bool intercept, ConsoleColor forecolor, ConsoleColor backcolor)
+    {
+        var oldback = BackgroundColor; BackgroundColor = backcolor;
+        var r = ReadKey(intercept, forecolor);
+        BackgroundColor = oldback;
+        return r;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc cref="Console.ReadKey"/>
+    /// Returns '<c>null</c>' if the timeout has expired with no pressed key.
+    /// <para>
+    /// Because the first parameter in the corresponding method of the <see cref="Console"/> class
+    /// is a boolean one ('intercept'), then we will not use a 'debug' one. If you want to write
+    /// the result into the DEBUG environment, then you must do that explicitly.
+    /// </para>
+    /// </summary>
+    /// <param name="timeout"></param>
+    /// <returns></returns>
+    public static ConsoleKeyInfo? ReadKey(TimeSpan timeout) => ReadKey(false, timeout);
+
+    /// <summary>
+    /// <inheritdoc cref="Console.ReadKey"/>
+    /// Returns '<c>null</c>' if the timeout has expired with no pressed key.
+    /// <para>
+    /// Because the first parameter in the corresponding method of the <see cref="Console"/> class
+    /// is a boolean one ('intercept'), then we will not use a 'debug' one. If you want to write
+    /// the result into the DEBUG environment, then you must do that explicitly.
+    /// </para>
+    /// </summary>
+    /// <param name="timeout"></param>
+    /// <param name="forecolor"></param>
+    /// <returns></returns>
+    public static ConsoleKeyInfo? ReadKey(TimeSpan timeout, ConsoleColor forecolor)
+    {
+        var oldfore = ForegroundColor; ForegroundColor = forecolor;
+        var r = ReadKey(timeout);
+        ForegroundColor = oldfore;
+        return r;
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="Console.ReadKey"/>
+    /// Returns '<c>null</c>' if the timeout has expired with no pressed key.
+    /// <para>
+    /// Because the first parameter in the corresponding method of the <see cref="Console"/> class
+    /// is a boolean one ('intercept'), then we will not use a 'debug' one. If you want to write
+    /// the result into the DEBUG environment, then you must do that explicitly.
+    /// </para>
+    /// </summary>
+    /// <param name="timeout"></param>
+    /// <param name="forecolor"></param>
+    /// <param name="backcolor"></param>
+    /// <returns></returns>
+    public static ConsoleKeyInfo? ReadKey(
+        TimeSpan timeout, ConsoleColor forecolor, ConsoleColor backcolor)
+    {
+        var oldback = BackgroundColor; BackgroundColor = backcolor;
+        var r = ReadKey(timeout, forecolor);
+        BackgroundColor = oldback;
+        return r;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc cref="Console.ReadKey(bool)"/> Use 'intercept=true' to prevent displaying the
+    /// key. Returns '<c>null</c>' if the timeout has expired with no pressed key.
+    /// <para>
+    /// Because the first parameter in the corresponding method of the <see cref="Console"/> class
+    /// is a boolean one ('intercept'), then we will not use a 'debug' one. If you want to write
+    /// the result into the DEBUG environment, then you must do that explicitly.
+    /// </para>
+    /// </summary>
+    /// <param name="intercept"></param>
+    /// <param name="timeout"></param>
+    /// <returns></returns>
+    public static ConsoleKeyInfo? ReadKey(bool intercept, TimeSpan timeout)
+    {
+        var ms = timeout.ValidatedTimeout;
+        var ini = DateTime.UtcNow;
+
+        while (true)
+        {
+            // Trying an available key...
+            if (Console.KeyAvailable)
+            {
+                var info = Console.ReadKey(intercept: true);
+
+                if (!intercept) Console.Write(info.KeyToString());
+                return info;
+            }
+
+            // Waiting...
+            if (ms > -1)
+            {
+                var now = DateTime.UtcNow;
+                var span = now - ini;
+                if (span >= timeout) return null;
+            }
+            Thread.Yield();
+        }
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="Console.ReadKey(bool)"/> Use 'intercept=true' to prevent displaying the
+    /// key. Returns '<c>null</c>' if the timeout has expired with no pressed key.
+    /// <para>
+    /// Because the first parameter in the corresponding method of the <see cref="Console"/> class
+    /// is a boolean one ('intercept'), then we will not use a 'debug' one. If you want to write
+    /// the result into the DEBUG environment, then you must do that explicitly.
+    /// </para>
+    /// </summary>
+    /// <param name="intercept"></param>
+    /// <param name="timeout"></param>
+    /// <param name="forecolor"></param>
+    /// <returns></returns>
+    public static ConsoleKeyInfo? ReadKey(bool intercept, TimeSpan timeout, ConsoleColor forecolor)
+    {
+        var oldfore = ForegroundColor; ForegroundColor = forecolor;
+        var r = ReadKey(intercept,timeout);
+        ForegroundColor = oldfore;
+        return r;
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="Console.ReadKey(bool)"/> Use 'intercept=true' to prevent displaying the
+    /// key. Returns '<c>null</c>' if the timeout has expired with no pressed key.
+    /// <para>
+    /// Because the first parameter in the corresponding method of the <see cref="Console"/> class
+    /// is a boolean one ('intercept'), then we will not use a 'debug' one. If you want to write
+    /// the result into the DEBUG environment, then you must do that explicitly.
+    /// </para>
+    /// </summary>
+    /// <param name="intercept"></param>
+    /// <param name="timeout"></param>
+    /// <param name="forecolor"></param>
+    /// <param name="backcolor"></param>
+    /// <returns></returns>
+    public static ConsoleKeyInfo? ReadKey(
+        bool intercept, TimeSpan timeout, ConsoleColor forecolor, ConsoleColor backcolor)
+    {
+        var oldback = BackgroundColor; BackgroundColor = backcolor;
+        var r = ReadKey(intercept, timeout, forecolor);
+        BackgroundColor = oldback;
+        return r;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Edits in the console the given source string (or an empty one it it was '<c>null</c>'),
+    /// and returns the result of that edition. Returns '<c>null</c>' if it was cancelled by the
+    /// user pressing [Escape].
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static string? EditLine(
+        string? source = null)
+        => EditLine(false, Timeout.InfiniteTimeSpan, ForegroundColor, BackgroundColor, source);
+
+    /// <summary>
+    /// Edits in the console the given source string (or an empty one it it was '<c>null</c>'),
+    /// and returns the result of that edition. Returns '<c>null</c>' if it was cancelled by the
+    /// user pressing [Escape].
+    /// </summary>
+    /// <param name="forecolor"></param>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static string? EditLine(
+        ConsoleColor forecolor, string? source = null)
+        => EditLine(false, Timeout.InfiniteTimeSpan, forecolor, BackgroundColor, source);
+
+    /// <summary>
+    /// Edits in the console the given source string (or an empty one it it was '<c>null</c>'),
+    /// and returns the result of that edition. Returns '<c>null</c>' if it was cancelled by the
+    /// user pressing [Escape].
+    /// </summary>
+    /// <param name="forecolor"></param>
+    /// <param name="backcolor"></param>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static string? EditLine(
+        ConsoleColor forecolor, ConsoleColor backcolor, string? source = null)
+        => EditLine(false, Timeout.InfiniteTimeSpan, forecolor, backcolor, source);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Edits in the console the given source string (or an empty one it it was '<c>null</c>'),
+    /// and returns the result of that edition. Returns '<c>null</c>' if it was cancelled by the
+    /// user pressing [Escape]. If requested, the result is replicated in the not-console
+    /// listerners of the DEBUG environment.
+    /// </summary>
+    /// <param name="debug"></param>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static string? EditLine(
+        bool debug, string? source = null)
+        => EditLine(debug, Timeout.InfiniteTimeSpan, ForegroundColor, BackgroundColor, source);
+
+    /// <summary>
+    /// Edits in the console the given source string (or an empty one it it was '<c>null</c>'),
+    /// and returns the result of that edition. Returns '<c>null</c>' if it was cancelled by the
+    /// user pressing [Escape]. If requested, the result is replicated in the not-console
+    /// listerners of the DEBUG environment.
+    /// </summary>
+    /// <param name="debug"></param>
+    /// <param name="forecolor"></param>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static string? EditLine(
+        bool debug, ConsoleColor forecolor, string? source = null)
+        => EditLine(debug, Timeout.InfiniteTimeSpan, forecolor, BackgroundColor, source);
+
+    /// <summary>
+    /// Edits in the console the given source string (or an empty one it it was '<c>null</c>'),
+    /// and returns the result of that edition. Returns '<c>null</c>' if it was cancelled by the
+    /// user pressing [Escape]. If requested, the result is replicated in the not-console
+    /// listerners of the DEBUG environment.
+    /// </summary>
+    /// <param name="debug"></param>
+    /// <param name="forecolor"></param>
+    /// <param name="backcolor"></param>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static string? EditLine(
+        bool debug, ConsoleColor forecolor, ConsoleColor backcolor, string? source = null)
+        => EditLine(debug, Timeout.InfiniteTimeSpan, forecolor, backcolor, source);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Edits in the console the given source string (or an empty one it it was '<c>null</c>'),
+    /// and returns the result of that edition. Returns '<c>null</c>' if it was cancelled by the
+    /// user pressing [Escape], or if the given timeout has expired.
+    /// </summary>
+    /// <param name="timeout"></param>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static string? EditLine(
+        TimeSpan timeout, string? source = null)
+        => EditLine(false, timeout, ForegroundColor, BackgroundColor, source);
+
+    /// <summary>
+    /// Edits in the console the given source string (or an empty one it it was '<c>null</c>'),
+    /// and returns the result of that edition. Returns '<c>null</c>' if it was cancelled by the
+    /// user pressing [Escape], or if the given timeout has expired.
+    /// </summary>
+    /// <param name="timeout"></param>
+    /// <param name="forecolor"></param>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static string? EditLine(
+        TimeSpan timeout, ConsoleColor forecolor, string? source = null)
+        => EditLine(false, timeout, forecolor, BackgroundColor, source);
+
+    /// <summary>
+    /// Edits in the console the given source string (or an empty one it it was '<c>null</c>'),
+    /// and returns the result of that edition. Returns '<c>null</c>' if it was cancelled by the
+    /// user pressing [Escape], or if the given timeout has expired.
+    /// </summary>
+    /// <param name="timeout"></param>
+    /// <param name="forecolor"></param>
+    /// <param name="backcolor"></param>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static string? EditLine(
+        TimeSpan timeout, ConsoleColor forecolor, ConsoleColor backcolor, string? source = null)
+        => EditLine(false, timeout, forecolor, backcolor, source);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Edits in the console the given source string (or an empty one it it was '<c>null</c>'),
+    /// and returns the result of that edition. Returns '<c>null</c>' if it was cancelled by the
+    /// user pressing [Escape], or if the given timeout has expired. If requested, the result is
+    /// replicated in the not-console listerners of the DEBUG environment.
+    /// </summary>
+    /// <param name="debug"></param>
+    /// <param name="timeout"></param>
+    /// <param name="forecolor"></param>
+    /// <param name="backcolor"></param>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static string? EditLine(
+        bool debug,
+        TimeSpan timeout,
+        ConsoleColor forecolor, ConsoleColor backcolor,
+        string? source = null)
+    {
+        throw null;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Executes the given action in a debug/trace environment with no console listeners, and
+    /// under an <see cref="Ambient"/> lock. Once the action is executed, any previous console
+    /// listener is restored.
+    /// </summary>
+    /// <param name="action"></param>
+    public static void WithNoListeners(Action action)
     {
         action.ThrowWhenNull();
 
@@ -724,7 +713,9 @@ public static class ConsoleEx
     /// <summary>
     /// Returns a string header with the requested number of spaces.
     /// </summary>
-    public static string Header(int size)
+    /// <param name="size"></param>
+    /// <returns></returns>
+    public static string Spaces(int size)
     {
         if (size < 0) throw new ArgumentException($"Size cannot be negative: {size}.");
 
