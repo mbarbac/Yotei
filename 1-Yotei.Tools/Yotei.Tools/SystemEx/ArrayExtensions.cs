@@ -152,27 +152,57 @@ public static class ArrayExtensions
 
     /// <summary>
     /// Returns a new array where all leading and trailing default values have been removed.
+    /// <br/> Returns the original one if no changes were made.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="source"></param>
     /// <returns></returns>
-    public static T[] Trim<T>(this T[] source) => throw null;
+    public static T[] Trim<T>(this T[] source) => source.TrimStart().TrimEnd();
 
     /// <summary>
     /// Returns a new array where all leading default values have been removed.
+    /// <br/> Returns the original one if no changes were made.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="source"></param>
     /// <returns></returns>
-    public static T[] TrimStart<T>(this T[] source) => throw null;
+    public static T[] TrimStart<T>(this T[] source)
+    {
+        source.ThrowWhenNull();
+
+        if (source.Length == 0) return source;
+
+        var index = source.IndexOf(x => !x.EqualsEx(default));
+        if (index <= 0) return source;
+
+        var num = source.Length - index;
+        var target = new T[num];
+        Array.Copy(source, index, target, 0, num);
+        return target;
+    }
 
     /// <summary>
     /// Returns a new array where all trailing default values have been removed.
+    /// <br/> Returns the original one if no changes were made.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="source"></param>
     /// <returns></returns>
-    public static T[] TrimEnd<T>(this T[] source) => throw null;
+    public static T[] TrimEnd<T>(this T[] source)
+    {
+        source.ThrowWhenNull();
+
+        if (source.Length == 0) return source;
+
+        var index = source.LastIndexOf(x => !x.EqualsEx(default));
+        if (index < 0) return source;
+        if (index ==  source.Length - 1) return source;
+
+        var num = index + 1;
+        var target = new T[num];
+        Array.Copy(source, 0, target, 0, num);
+        return target;
+    }
 
     // ----------------------------------------------------
 

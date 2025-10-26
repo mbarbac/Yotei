@@ -37,8 +37,11 @@ public static partial class ObjectExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool EqualsEx<T>([AllowNull] this T source, [AllowNull] T target)
     {
-        if (source is null && target is null) return true;
-        if (source is null || target is null) return false;
+        if (!typeof(T).IsValueType)
+        {
+            if (source is null && target is null) return true;
+            if (source is null || target is null) return false;
+        }
         return source.Equals(target);
     }
 }
