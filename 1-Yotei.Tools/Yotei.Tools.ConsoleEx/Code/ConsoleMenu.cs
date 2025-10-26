@@ -1,4 +1,7 @@
-﻿namespace Yotei.Tools;
+﻿using static Yotei.Tools.ConsoleEx;
+using static System.ConsoleColor;
+
+namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>
@@ -172,7 +175,7 @@ public class ConsoleMenu : IEnumerable<ConsoleMenuEntry>
             throw new ArgumentException("Invalid menu index.").WithData(position);
 
         // Initializing...
-        var top = Console.CursorTop; ValidateCursorTop(ref top);
+        var top = Console.CursorTop; EnsureTopInRange(Entries.Count, ref top);
 
         var selector = options.SelectorColor;
         var descriptor = options.DescriptionColor;
@@ -182,37 +185,37 @@ public class ConsoleMenu : IEnumerable<ConsoleMenuEntry>
 
         for (int i = 0; i < Entries.Count; i++)
         {
-            Console.Write(debug, selector, background, "[ ] ");
-            Console.WriteLine(debug, descriptor, background, Entries[i].Header());
+            Write(debug, selector, background, "[ ] ");
+            WriteLine(debug, descriptor, background, Entries[i].Header());
         }
 
         // Executing...
         while (true)
         {
-            Console.CursorTop = top + position;
-            Console.CursorLeft = 1;
+            CursorTop = top + position;
+            CursorLeft = 1;
 
-            var info = Console.ReadKey(false, timeout, intercept: true);            
+            var info = ReadKey(true, timeout);
             var none = info is null;
             info ??= new ConsoleKeyInfo('\0', ConsoleKey.Escape, false, false, false);
 
             switch (info.Value.Key)
             {
                 case ConsoleKey.Enter:
-                    Console.Write(descriptor, background, "\u2588");
-                    if (debug) ConsoleEx.WithNoConsoleListeners(
+                    Write(descriptor, background, "\u2588");
+                    if (debug) WithNoListeners(
                         () => Debug.WriteLine($"Selected: {position}."));
 
-                    Console.CursorTop = top + Entries.Count;
-                    Console.CursorLeft = 0;
+                    CursorTop = top + Entries.Count;
+                    CursorLeft = 0;
                     Entries[position].Execute();
                     return position;
 
                 case ConsoleKey.Escape:
-                    Console.CursorTop = top + Entries.Count;
-                    Console.CursorLeft = 0;
+                    CursorTop = top + Entries.Count;
+                    CursorLeft = 0;
 
-                    if (debug) ConsoleEx.WithNoConsoleListeners(
+                    if (debug) WithNoListeners(
                         () => Debug.WriteLine(none ? "Expired." : "Cancelled."));
                     return -1;
 
@@ -231,22 +234,6 @@ public class ConsoleMenu : IEnumerable<ConsoleMenuEntry>
                 case ConsoleKey.End:
                     position = Entries.Count - 1;
                     break;
-            }
-        }
-
-        /// <summary>
-        /// Invoked to validate the top cursor position.
-        /// </summary>
-        void ValidateCursorTop(ref int top)
-        {
-            var max = Console.BufferHeight - Entries.Count - 1;
-            if (top >= max)
-            {
-                Clear();
-                Console.Clear();
-                ConsoleEx.WriteLine(ConsoleColor.Red, "Screen buffer exhausted and cleared!");
-                Console.WriteLine();
-                top = Console.CursorTop;
             }
         }
     }

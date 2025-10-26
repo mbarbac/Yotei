@@ -2,11 +2,48 @@
 
 // ========================================================
 /// <summary>
-/// Represents a <see cref="Console"/>-alike class that provides some extended capabilities, but
-/// without replacing it.
+/// Represents a '<see cref="Console"/>'-alike class that provides some extended capabilities.
+/// This class is not intended to fully replace the standard <see cref="Console"/> one.
 /// </summary>
 public static class ConsoleEx
 {
+    /// <summary>
+    /// <inheritdoc cref="Console.CursorTop"/>
+    /// This property is not available in some OS platforms.
+    /// </summary>
+    public static int CursorTop
+    {
+        get => Console.CursorTop;
+        set => Console.CursorTop = value;
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="Console.CursorLeft"/>
+    /// This property is not available in some OS platforms.
+    /// </summary>
+    public static int CursorLeft
+    {
+        get => Console.CursorLeft;
+        set => Console.CursorLeft = value;
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="Console.CursorSize"/>
+    /// This property is not available in some OS platforms.
+    /// </summary>  
+    public static int CursorSize
+    {
+        get => Console.CursorSize;
+
+        [SuppressMessage("", "CA1416")]
+        set => Console.CursorSize = value;
+    }
+
+    /// <summary>
+    /// <inheritdoc cref="Console.KeyAvailable"/>
+    /// </summary>
+    public static bool KeyAvailable => Console.KeyAvailable;
+
     /// <summary>
     /// <inheritdoc cref="Console.ForegroundColor"/>
     /// </summary>
@@ -130,6 +167,11 @@ public static class ConsoleEx
     // ----------------------------------------------------
 
     /// <summary>
+    /// <inheritdoc cref="Console.WriteLine()"/>
+    /// </summary>
+    public static void WriteLine() => WriteLine(string.Empty);
+
+    /// <summary>
     /// <inheritdoc cref="Console.WriteLine(string, ReadOnlySpan{object?})"/>
     /// </summary>
     /// <param name="message"></param>
@@ -167,6 +209,13 @@ public static class ConsoleEx
     }
 
     // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc cref="Console.WriteLine()"/> If requested, the new line is replicated in the
+    /// not-console listerners of the DEBUG environment.
+    /// </summary>
+    /// <param name="debug"></param>
+    public static void WriteLine(bool debug) => WriteLine(debug, string.Empty);
 
     /// <summary>
     /// <inheritdoc cref="Console.WriteLine(string, ReadOnlySpan{object?})"/> If requested, the
@@ -507,10 +556,11 @@ public static class ConsoleEx
     /// <param name="timeout"></param>
     /// <param name="forecolor"></param>
     /// <returns></returns>
-    public static ConsoleKeyInfo? ReadKey(bool intercept, TimeSpan timeout, ConsoleColor forecolor)
+    public static ConsoleKeyInfo? ReadKey(
+        bool intercept, TimeSpan timeout, ConsoleColor forecolor)
     {
         var oldfore = ForegroundColor; ForegroundColor = forecolor;
-        var r = ReadKey(intercept,timeout);
+        var r = ReadKey(intercept, timeout);
         ForegroundColor = oldfore;
         return r;
     }
@@ -681,7 +731,180 @@ public static class ConsoleEx
         ConsoleColor forecolor, ConsoleColor backcolor,
         string? source = null)
     {
-        throw null;
+        var oldfore = ForegroundColor; ForegroundColor = forecolor;
+        var oldback = BackgroundColor; BackgroundColor = backcolor;
+        var size = CursorSize;
+        var left = CursorLeft;
+        bool insert;
+
+        var sb = new StringBuilder(); sb.Append(source ?? string.Empty);
+        var pos = sb.Length;
+        int len;
+
+        SetCursorSize(insert = true);
+        ShowLine(pos);
+
+        while (true)
+        {
+            var info = ReadKey(intercept: true, timeout);
+            info ??= new('\0', ConsoleKey.Escape, false, false, false);
+
+            /// <summary>
+            /// Special keys.
+            /// </summary>
+            switch (info.Value.Key)
+            {
+                case ConsoleKey.Enter:
+                    SetCursorSize(true);
+                    WriteLine();
+                    ForegroundColor = oldfore;
+                    BackgroundColor = oldback;
+                    if (debug) WithNoListeners(() => Debug.WriteLine(sb));
+                    return sb.ToString();
+
+                case ConsoleKey.Escape:
+                    SetCursorSize(true);
+                    len = sb.Length; sb.Clear(); ShowLine(0, len);
+                    WriteLine();
+                    ForegroundColor = oldfore;
+                    BackgroundColor = oldback;
+                    return null;
+
+                case ConsoleKey.Insert:
+                    SetCursorSize(insert = !insert);
+                    break;
+
+                case ConsoleKey.Home:
+                    pos = 0;
+                    CursorLeft = left + pos;
+                    break;
+
+                case ConsoleKey.End:
+                    pos = sb.Length;
+                    CursorLeft = left + pos;
+                    break;
+
+                case ConsoleKey.Delete:
+                    if (pos >= sb.Length) break;
+                    len = sb.Length;
+                    sb.Remove(pos, 1);
+                    ShowLine(pos, len);
+                    break;
+
+                case ConsoleKey.Backspace:
+                    if (pos == 0) break;
+                    len = sb.Length;
+                    sb.Remove(--pos, 1);
+                    ShowLine(pos, len);
+                    break;
+
+                case ConsoleKey.LeftArrow:
+                    if (info.Value.Modifiers.HasFlag(ConsoleModifiers.Control))
+                    {
+                        if (pos == 0) break;
+                        var ascii = char.IsLetterOrDigit(sb[pos - 1]);
+                        while (pos > 0)
+                        {
+                            var temp = char.IsLetterOrDigit(sb[pos - 1]);
+                            if (temp == ascii) { pos--; CursorLeft--; }
+                            else break;
+                        }
+                    }
+                    else
+                    {
+                        if (pos > 0) { pos--; CursorLeft--; }
+                    }
+                    break;
+
+                case ConsoleKey.RightArrow:
+                    if (info.Value.Modifiers.HasFlag(ConsoleModifiers.Control))
+                    {
+                        if (pos >= sb.Length) break;
+                        var ascii = char.IsLetterOrDigit(sb[pos]);
+                        while (pos < sb.Length)
+                        {
+                            var temp = char.IsLetterOrDigit(sb[pos]);
+                            if (temp == ascii) { pos++; CursorLeft++; }
+                            else break;
+                        }
+                    }
+                    else
+                    {
+                        if (pos < sb.Length) { pos++; CursorLeft++; }
+                    }
+                    break;
+            }
+
+            /// <summary>
+            /// Standard keys.
+            /// </summary>
+            if (info.Value.KeyChar >= ' ')
+            {
+                if (insert)
+                {
+                    sb.Insert(pos, info.Value.KeyChar);
+                    ShowLine(++pos);
+                    continue;
+                }
+                if (pos < sb.Length)
+                {
+                    sb[pos] = info.Value.KeyChar;
+                    ShowLine(++pos);
+                }
+                else
+                {
+                    sb.Append(info.Value.KeyChar);
+                    Console.Write(info.Value.KeyChar); // Using 'Console' because char...
+                    pos++;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sets the cursor size for the insert mode ON (true) or OFF (false).
+        /// </summary>
+        void SetCursorSize(bool insert)
+        {
+            var windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            if (windows) CursorSize = insert ? size : 100;
+        }
+
+        /// <summary>
+        /// Shows the current value clearing up to the remaining len, and sets the cursor
+        /// position to the given one.
+        /// </summary>
+        void ShowLine(int pos, int len = 0)
+        {
+            CursorLeft = left;
+            Write(sb.ToString());
+
+            ForegroundColor = oldfore;
+            BackgroundColor = oldback;
+            len -= sb.Length;
+            if (len > 0) Write(Spaces(len));
+            CursorLeft = left + pos;
+
+            ForegroundColor = forecolor;
+            BackgroundColor = backcolor;
+        }
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Ensures that the remaining console buffer capacity is enough to support the requested
+    /// number of lines. If not, the buffer if cleared and the 'top' value reset.
+    /// </summary>
+    public static void EnsureTopInRange(int lines, ref int top)
+    {
+        var max = Console.BufferHeight - lines - 1;
+        if (top >= max)
+        {
+            Clear();
+            WriteLine(ConsoleColor.Red, "Console buffer exhausted and cleared.");
+            WriteLine();
+            top = CursorTop;
+        }
     }
 
     // ----------------------------------------------------

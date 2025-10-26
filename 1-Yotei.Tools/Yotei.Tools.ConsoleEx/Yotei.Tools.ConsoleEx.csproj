@@ -8,12 +8,6 @@
 	  <Configurations>Debug;Release;Local</Configurations>
 	  <NoWarn>IDE0130</NoWarn>
    </PropertyGroup>
-
-   <ItemGroup>
-     <Compile Remove="Code\ConsoleMenu.cs" />
-     <Compile Remove="Code\ConsoleMenuEntry.cs" />
-     <Compile Remove="Code\ConsoleMenuOptions.cs" />
-   </ItemGroup>
    <!--IDE0130: Folder structure-->
 
    <ItemGroup>
