@@ -11,6 +11,14 @@
     <Project Path="0-Development/Runner.Tests/Runner.Tests.csproj" Id="3b16c19b-e14d-494d-b9e4-37bfabc1361a" />
     <Project Path="0-Development/Runner/Runner.csproj" Id="dc37768b-4851-45f8-80f9-bf430770aec1" />
   </Folder>
+  <Folder Name="/0-Experimental/">
+    <Project Path="0-Experimental/Experimental.Tests/Experimental.Tests.csproj" Id="5dd1bf66-29bc-448d-94cb-075100e1b5b8">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
+    <Project Path="0-Experimental/Experimental/Experimental.csproj" Id="69a0df24-6e55-4e0b-a5e9-883334a9dba0">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
+  </Folder>
   <Folder Name="/1-Yotei.Tools/">
     <Project Path="1-Yotei.Tools/Yotei.Tools.ConsoleEx/Yotei.Tools.ConsoleEx.csproj" Id="51738f8a-fc39-4258-b144-dfa2015c6995" />
     <Project Path="1-Yotei.Tools/Yotei.Tools.Diagnostics/Yotei.Tools.Diagnostics.csproj" Id="ff141cdb-7814-48ae-bd52-5ee7a6e5ca79" />

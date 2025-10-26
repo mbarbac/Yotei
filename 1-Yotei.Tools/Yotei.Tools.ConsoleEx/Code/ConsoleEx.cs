@@ -721,6 +721,40 @@ public static class ConsoleEx
     /// </summary>
     /// <param name="debug"></param>
     /// <param name="timeout"></param>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static string? EditLine(
+        bool debug,
+        TimeSpan timeout,
+        string? source = null)
+        => EditLine(debug, timeout, ForegroundColor, BackgroundColor, source);
+
+    /// <summary>
+    /// Edits in the console the given source string (or an empty one it it was '<c>null</c>'),
+    /// and returns the result of that edition. Returns '<c>null</c>' if it was cancelled by the
+    /// user pressing [Escape], or if the given timeout has expired. If requested, the result is
+    /// replicated in the not-console listerners of the DEBUG environment.
+    /// </summary>
+    /// <param name="debug"></param>
+    /// <param name="timeout"></param>
+    /// <param name="forecolor"></param>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static string? EditLine(
+        bool debug,
+        TimeSpan timeout,
+        ConsoleColor forecolor,
+        string? source = null)
+        => EditLine(debug, timeout, forecolor, BackgroundColor, source);
+
+    /// <summary>
+    /// Edits in the console the given source string (or an empty one it it was '<c>null</c>'),
+    /// and returns the result of that edition. Returns '<c>null</c>' if it was cancelled by the
+    /// user pressing [Escape], or if the given timeout has expired. If requested, the result is
+    /// replicated in the not-console listerners of the DEBUG environment.
+    /// </summary>
+    /// <param name="debug"></param>
+    /// <param name="timeout"></param>
     /// <param name="forecolor"></param>
     /// <param name="backcolor"></param>
     /// <param name="source"></param>

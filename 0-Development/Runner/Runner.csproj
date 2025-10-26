@@ -11,6 +11,11 @@
    </PropertyGroup>
    <!--IDE0130: Folder structure-->
 
+   <ItemGroup>
+	  <ProjectReference Include="..\..\0-Experimental\Experimental.Tests\Experimental.Tests.csproj" />
+	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Tests\Yotei.Tools.Tests.csproj" />
+   </ItemGroup>
+
    <!-- DEBUG configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Debug'">
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
@@ -30,15 +35,6 @@
 	  <PackageReference Include="Yotei.Tools" Version="0.7.0-v0001" />
 	  <PackageReference Include="Yotei.Tools.ConsoleEx" Version="0.7.0-v0001" />
 	  <PackageReference Include="Yotei.Tools.Diagnostics" Version="0.7.0-v0001" />
-   </ItemGroup>
-
-   <ItemGroup>
-	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Tests\Yotei.Tools.Tests.csproj" />
-   </ItemGroup>
-
-   <ItemGroup>
-     <Folder Include="MenuTester\" />
-     <Folder Include="MenuPackages\" />
    </ItemGroup>
 
 </Project>

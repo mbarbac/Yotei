@@ -1,4 +1,5 @@
-﻿using static System.ConsoleColor;
+﻿using static Yotei.Tools.ConsoleEx;
+using static System.ConsoleColor;
 
 namespace Runner;
 
@@ -19,10 +20,10 @@ public class MenuArtifacts : ConsoleMenuEntry
         Console.Clear();
         var position = 0; do
         {
-            Console.WriteLine(true, "");
-            Console.WriteLine(true, Green, Program.FatSeparator);
-            Console.WriteLine(true, Green, Header());
-            Console.WriteLine(true, "");
+            WriteLine(true);
+            WriteLine(true, Green, Program.FatSeparator);
+            WriteLine(true, Green, Header());
+            WriteLine(true);
 
             position = new ConsoleMenu
             {

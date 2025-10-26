@@ -1,4 +1,5 @@
-﻿using static System.ConsoleColor;
+﻿using static Yotei.Tools.ConsoleEx;
+using static System.ConsoleColor;
 
 namespace Runner;
 
@@ -24,10 +25,10 @@ public class MenuTester(bool breakOnError) : ConsoleMenuEntry
     /// </summary>
     public override void Execute()
     {
-        Console.Clear();
-        Console.WriteLine(true, "");
-        Console.WriteLine(true, Green, Program.FatSeparator);
-        Console.WriteLine(true, Green, Header());
+        Clear();
+        WriteLine(true);
+        WriteLine(true, Green, Program.FatSeparator);
+        WriteLine(true, Green, Header());
 
         Populate(out var assemblyHolders);
         ValidateEnforced(assemblyHolders);
@@ -44,10 +45,10 @@ public class MenuTester(bool breakOnError) : ConsoleMenuEntry
         assemblyHolders = [];
 
         var root = new DirectoryInfo(AppContext.BaseDirectory);
-        Console.WriteLine(true, "");
-        Console.Write(true, DarkYellow, "Populating from: ");
-        Console.Write(true, root.FullName);
-        Console.Write(true, " ");
+        WriteLine(true);
+        Write(true, DarkYellow, "Populating from: ");
+        Write(true, root.FullName);
+        Write(true, " ");
 
         var top = Console.CursorTop;
         var pos = Console.CursorLeft;
@@ -80,37 +81,24 @@ public class MenuTester(bool breakOnError) : ConsoleMenuEntry
         }
 
         Print("");
-        Console.WriteLine(true, "");
+        WriteLine(true);
 
         /// <summary>
         /// Clears the printed buffer and captures and prints the new name.
+        /// No need to replicate on DEBUG.
         /// </summary>
         void Print(string name)
         {
-            Console.CursorTop = top;
-            Console.CursorLeft = pos;
+            CursorTop = top;
+            CursorLeft = pos;
             var len = sb.Length; for (int i = 0; i < len; i++) sb[i] = ' ';            
-            Console.Write(sb);
+            Write(sb.ToString());
             
-            Console.CursorTop = top;
-            Console.CursorLeft = pos;
+            CursorTop = top;
+            CursorLeft = pos;
             sb.Clear(); sb.Append(name);
-            Console.Write(name);
+            Write(name);
         }
-
-        ///// <summary>
-        ///// Prints a 'on-going' sequence at the given pos...
-        ///// </summary>
-        //static void Print(int pos, ref int num)
-        //{
-        //    Console.CursorLeft = pos; Console.Write(Printed);
-        //    Console.CursorLeft = pos; Console.Write(new string('.', num + 1));
-        //    num++;
-        //    if (num == PrintMax) num = 0;
-        //    Thread.Sleep(10);
-        //}
-        //const int PrintMax = 4;
-        //static readonly string Printed = new(' ', PrintMax);
     }
 
     // ----------------------------------------------------
@@ -305,21 +293,21 @@ public class MenuTester(bool breakOnError) : ConsoleMenuEntry
                 foreach (var methodHolder in typeHolder.MethodHolders)
                 {
                     // [Escape] might have been pressed...
-                    var key = Console.ReadKey(TimeSpan.Zero, intercept: true);
+                    var key = ReadKey(true, TimeSpan.Zero);
                     if (key != null && key.Value.Key == ConsoleKey.Escape) done = true;
                     if (done) break;
 
                     // Method header...
                     var name = $"{assemblyHolder.Name}.{typeHolder.Name}.{methodHolder.Name}";
-                    Console.WriteLine(true, "");
-                    Console.WriteLine(true, Green, Program.FatSeparator);
-                    Console.WriteLine(true, Green, $"Executing: {name}");
-                    Console.WriteLine(true, Green, Program.FatSeparator);
+                    WriteLine(true);
+                    WriteLine(true, Green, Program.FatSeparator);
+                    WriteLine(true, Green, $"Executing: {name}");
+                    WriteLine(true, Green, Program.FatSeparator);
 
-                    Console.ForegroundColor = old;
+                    ForegroundColor = old;
                     var span = Execute(instance, methodHolder.Method, breakOnError);
-                    Console.ForegroundColor = old;
-                    Console.WriteLine(true, "");
+                    ForegroundColor = old;
+                    WriteLine(true);
                     PrintResults(span);
 
                     ts = ts.Add(span);
@@ -332,14 +320,14 @@ public class MenuTester(bool breakOnError) : ConsoleMenuEntry
         }
 
         // Finishing...
-        Console.WriteLine(true, "");
-        Console.WriteLine(true, Green, Program.FatSeparator);
-        Console.WriteLine(true, Green, "Execution summary...");
-        Console.WriteLine(true, Green, Program.FatSeparator);
+        WriteLine(true);
+        WriteLine(true, Green, Program.FatSeparator);
+        WriteLine(true, Green, "Execution summary...");
+        WriteLine(true, Green, Program.FatSeparator);
 
-        Console.WriteLine(true, "");
-        Console.Write(true, "Number of tests executed: ");
-        Console.WriteLine(true, Cyan, num.ToString());
+        WriteLine(true);
+        Write(true, "Number of tests executed: ");
+        WriteLine(true, Cyan, num.ToString());
         PrintResults(ts);
     }
 
@@ -374,19 +362,19 @@ public class MenuTester(bool breakOnError) : ConsoleMenuEntry
         }
         catch (Exception ex) // We may need to break further execution if requested...
         {
-            Console.WriteLine(true, "");
-            Console.WriteLine(true, Red, Program.FatSeparator);
+            WriteLine(true);
+            WriteLine(true, Red, Program.FatSeparator);
 
             var str = ex.ToDisplayString();
-            Console.WriteLine(true, Red, str);
-            Console.WriteLine(true, Red, Program.FatSeparator);
-            Console.WriteLine(true, "");
+            WriteLine(true, Red, str);
+            WriteLine(true, Red, Program.FatSeparator);
+            WriteLine(true);
 
             if (breakOnError)
             {
-                Console.WriteLine(true, "");
-                Console.WriteLine(true, "Executor cannot proceed further and will finish.");
-                Console.ReadLine();
+                WriteLine(true);
+                WriteLine(true, "Executor cannot proceed further and will finish.");
+                ReadLine();
                 Environment.FailFast(null);
             }
         }
@@ -405,7 +393,7 @@ public class MenuTester(bool breakOnError) : ConsoleMenuEntry
     {
         var ms = ts.TotalMilliseconds;
 
-        Console.Write(true, "Execution time: ");
-        Console.WriteLine(true, Cyan, ms < 1000 ? $"{ms:#.00} ms" : $"{ms / 1000:#.000}");
+        Write(true, "Execution time: ");
+        WriteLine(true, Cyan, ms < 1000 ? $"{ms:#.00} ms" : $"{ms / 1000:#.000}");
     }
 }

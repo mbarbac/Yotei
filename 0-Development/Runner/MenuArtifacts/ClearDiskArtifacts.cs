@@ -1,5 +1,6 @@
 ﻿#pragma warning disable IDE0057
 
+using static Yotei.Tools.ConsoleEx;
 using static System.ConsoleColor;
 
 namespace Runner;
@@ -21,18 +22,18 @@ public class ClearDiskArtifacts : ConsoleMenuEntry
     /// </summary>
     public override void Execute()
     {
-        Console.Clear();
-        Console.WriteLine(true, "");
-        Console.WriteLine(true, Green, Program.SlimSeparator);
-        Console.WriteLine(true, Green, Header());
+        Clear();
+        WriteLine(true);
+        WriteLine(true, Green, Program.SlimSeparator);
+        WriteLine(true, Green, Header());
 
-        Console.WriteLine(true, "");
+        WriteLine(true);
         Root ??= Program.GetSolutionDirectory();
         Root = Program.EditDirectory(Root, "Root directory: ");
         if (Root is null || Root.Length == 0) return;
 
-        Console.WriteLine(true, "");
-        Console.WriteLine(true, Green, Program.SlimSeparator);
+        WriteLine(true);
+        WriteLine(true, Green, Program.SlimSeparator);
         Execute(Root, Root, false);
     }
 
@@ -50,36 +51,37 @@ public class ClearDiskArtifacts : ConsoleMenuEntry
 
         var reduced = path.Remove(0, root.Length);
         if (reduced.Length > 0 && reduced[0] == '\\') reduced = reduced[1..];
-        Console.Write(true, Green, $"...{reduced}");
-        if (delete) Console.Write(true, DarkYellow, " -- DELETE");
-        Console.WriteLine(true, "");
+        Write(true, Green, $"...{reduced}");
+        
+        if (delete) Write(true, DarkYellow, " -- DELETE");
+        WriteLine(true);
 
         // Child files...
         if (delete)
         {
-            var row = Console.CursorTop;
+            var row = CursorTop;
             int len = 0;
             var files = directory.GetFiles();
 
             foreach (var file in files)
             {
-                Console.CursorTop = row;
-                Console.CursorLeft = 0; Console.Write(ConsoleEx.Header(len + 1));
-                Console.CursorLeft = 0; Console.Write(true, file.Name);
+                CursorTop = row;
+                CursorLeft = 0; Write(Spaces(len + 1));
+                CursorLeft = 0; Write(true, file.Name);
                 len = file.Name.Length;
 
                 try { file.Delete(); }
                 catch (Exception e)
                 {
-                    Console.WriteLine(true, Red, $" Delete: {e.Message}");
+                    WriteLine(true, Red, $" Delete: {e.Message}");
                     row = Console.CursorTop;
                     len = 0;
                 }
             }
 
-            Console.CursorTop = row;
-            Console.CursorLeft = 0; Console.Write(ConsoleEx.Header(len + 1));
-            Console.CursorLeft = 0;
+            CursorTop = row;
+            CursorLeft = 0; Write(Spaces(len + 1));
+            CursorLeft = 0;
         }
 
         // Child directories...
@@ -103,9 +105,9 @@ public class ClearDiskArtifacts : ConsoleMenuEntry
             try { directory.Delete(); }
             catch (Exception e)
             {
-                Console.Write(true, Red, $" Delete: ");
-                Console.Write(true, $" {directory.FullName} ");
-                Console.WriteLine(true, Red, $"Error: {e.Message}");
+                Write(true, Red, $" Delete: ");
+                Write(true, $" {directory.FullName} ");
+                WriteLine(true, Red, $"Error: {e.Message}");
             }
         }
     }

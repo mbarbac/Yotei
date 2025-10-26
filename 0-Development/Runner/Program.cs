@@ -1,4 +1,5 @@
-﻿using static System.ConsoleColor;
+﻿using static Yotei.Tools.ConsoleEx;
+using static System.ConsoleColor;
 
 namespace Runner;
 
@@ -32,10 +33,10 @@ internal class Program
 
         var position = 0; do
         {
-            Console.WriteLine(true, "");
-            Console.WriteLine(true, Green, FatSeparator);
-            Console.WriteLine(true, Green, "Main Menu");
-            Console.WriteLine(true, "");
+            WriteLine(true, "");
+            WriteLine(true, Green, FatSeparator);
+            WriteLine(true, Green, "Main Menu");
+            WriteLine(true, "");
 
             position = new ConsoleMenu
             {
@@ -84,9 +85,9 @@ internal class Program
 
         while (true)
         {
-            if (description is not null) Console.Write(true, Green, $"{description}: ");
+            if (description is not null) Write(true, Green, $"{description}: ");
 
-            path = Console.EditLine(true, Timeout, path);
+            path = EditLine(true, Timeout, path);
             path = path.NullWhenEmpty(true);
             if (path is null || path.Length == 0) return null;
 
@@ -95,88 +96,9 @@ internal class Program
                 var dir = new DirectoryInfo(path);
                 if (dir.Exists) return dir.FullName;
 
-                Console.WriteLine(true, Red, " <Invalid>");
+                WriteLine(true, Red, " <Invalid>");
             }
             catch (FileNotFoundException) { }
         }
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Returns a list with the projects found starting at the given root directory, and its
-    /// child, provided none if part of the given exclusion branch, if any.
-    /// </summary>
-    /// <param name="root"></param>
-    /// <param name="exclude"></param>
-    /// <param name="comparison"></param>
-    /// <returns></returns>
-    static internal List<Project> FindProjects(
-        string root,
-        string? exclude = null,
-        StringComparison comparison = StringComparison.OrdinalIgnoreCase)
-    {
-        root = root.NotNullNotEmpty(true);
-        exclude = exclude?.NotNullNotEmpty(true);
-
-        var list = new List<Project>();
-        Populate(root);
-        return list;
-
-        /// <summary>
-        /// Recursively populates the list of projects, starting at the given path.
-        /// </summary>
-        void Populate(string path)
-        {
-            if (path.Contains(".git", comparison)) return;
-            if (path.Contains(".vs", comparison)) return;
-            if (path.Contains("\\bin\\", comparison)) return;
-            if (path.Contains("\\obj\\", comparison)) return;
-            if (exclude is not null && path.StartsWith(exclude, comparison)) return;
-
-            var dir = new DirectoryInfo(path);
-            if (!dir.Exists) return;
-
-            var files = dir.GetFiles("*.csproj");
-            foreach (var file in files) list.Add(new(file.FullName));
-
-            var dirs = dir.GetDirectories();
-            foreach (var temp in dirs) Populate(temp.FullName);
-        }
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Invoked to capture the desired build mode, if any.
-    /// </summary>
-    /// <param name="mode"></param>
-    /// <returns></returns>
-    static internal bool CaptureBuildMode(ref BuildMode mode)
-    {
-        var position = mode switch
-        {
-            BuildMode.Debug => 1,
-            BuildMode.Local => 2,
-            BuildMode.Release => 3,
-            _ => 0,
-        };
-
-        position = new ConsoleMenu
-        {
-            new("Exit"),
-            new("Debug"),
-            new("Local"),
-            new("Release"),
-        }
-        .Run(MenuOptions, position);
-
-        switch (position)
-        {
-            case 1: mode = BuildMode.Debug; return true;
-            case 2: mode = BuildMode.Local; return true;
-            case 3: mode = BuildMode.Release; return true;
-        }
-        return false;
     }
 }

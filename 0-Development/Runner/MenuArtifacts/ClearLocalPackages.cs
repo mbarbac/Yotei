@@ -1,4 +1,5 @@
-﻿using static System.ConsoleColor;
+﻿using static Yotei.Tools.ConsoleEx;
+using static System.ConsoleColor;
 
 namespace Runner;
 
@@ -16,10 +17,10 @@ public class ClearLocalPackages : ConsoleMenuEntry
     /// </summary>
     public override void Execute()
     {
-        Console.Clear();
-        Console.WriteLine(true, "");
-        Console.WriteLine(true, Green, Program.FatSeparator);
-        Console.WriteLine(true, Green, Header());
+        Clear();
+        WriteLine(true);
+        WriteLine(true, Green, Program.FatSeparator);
+        WriteLine(true, Green, Header());
 
         CleanNuGet();
         CleanLocalRepo();
@@ -32,10 +33,10 @@ public class ClearLocalPackages : ConsoleMenuEntry
     /// </summary>
     static void CleanNuGet()
     {
-        Console.WriteLine(true, "");
-        Console.WriteLine(true, Green, Program.SlimSeparator);
-        Console.WriteLine(true, Green, "Cleaning NuGet Caches...");
-        Console.WriteLine(true, "");
+        WriteLine(true);
+        WriteLine(true, Green, Program.SlimSeparator);
+        WriteLine(true, Green, "Cleaning NuGet Caches...");
+        WriteLine(true);
 
         var path = AppContext.BaseDirectory;
 
@@ -52,10 +53,10 @@ public class ClearLocalPackages : ConsoleMenuEntry
     /// </summary>
     static void CleanLocalRepo()
     {
-        Console.WriteLine(true, "");
-        Console.WriteLine(true, Green, Program.SlimSeparator);
-        Console.WriteLine(true, Green, "Cleaning Local Repo...");
-        Console.WriteLine(true, "");
+        WriteLine(true);
+        WriteLine(true, Green, Program.SlimSeparator);
+        WriteLine(true, Green, "Cleaning Local Repo...");
+        WriteLine(true);
 
         var dir = new DirectoryInfo(Program.LocalRepoPath);
         try
@@ -69,9 +70,9 @@ public class ClearLocalPackages : ConsoleMenuEntry
         }
         catch (DirectoryNotFoundException)
         {
-            Console.WriteLine(true, "");
-            Console.Write(true, Red, "Cannot find packages' folder: ");
-            Console.WriteLine(true, Program.LocalRepoPath);
+            WriteLine(true);
+            Write(true, Red, "Cannot find packages' folder: ");
+            WriteLine(true, Program.LocalRepoPath);
         }
     }
 }
