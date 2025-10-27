@@ -42,6 +42,6 @@ public static partial class ObjectExtensions
             if (source is null && target is null) return true;
             if (source is null || target is null) return false;
         }
-        return source.Equals(target);
+        return source!.Equals(target);
     }
 }

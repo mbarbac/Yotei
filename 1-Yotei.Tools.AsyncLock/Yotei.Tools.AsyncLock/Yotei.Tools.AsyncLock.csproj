@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
    <PropertyGroup>
-	  <OutputType>Exe</OutputType>
 	  <TargetFramework>net10.0</TargetFramework>
 	  <LangVersion>preview</LangVersion>
 	  <ImplicitUsings>disable</ImplicitUsings>
@@ -12,30 +11,40 @@
    <!--IDE0130: Folder structure-->
 
    <ItemGroup>
-	  <ProjectReference Include="..\..\0-Experimental\Experimental.Tests\Experimental.Tests.csproj" />
-	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Tests\Yotei.Tools.Tests.csproj" />
-	  <ProjectReference Include="..\..\1-Yotei.Tools.AsyncLock\Yotei.Tools.AsyncLock.Tests\Yotei.Tools.AsyncLock.Tests.csproj" />
+	  <None Include="README.md" Pack="true" PackagePath="" />
+	  <None Include="LICENSE" Pack="true" PackagePath="" />
    </ItemGroup>
+
+   <PropertyGroup>
+	  <Description>Yotei AsyncLock</Description>
+	  <Version>0.7.0-v0001</Version>
+	  <Authors>mbarbac@hotmail.com</Authors>
+	  <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
+	  <PackageLicenseFile>LICENSE</PackageLicenseFile>
+	  <PackageReadmeFile>README.md</PackageReadmeFile>
+	  <IsPackable>true</IsPackable>
+	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	  <IncludeSymbols>true</IncludeSymbols>
+	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+   </PropertyGroup>
+
+   <PropertyGroup>
+	  <DefineConstants>$(DefineConstants);DEBUG_ASYNC_LOCK</DefineConstants>
+   </PropertyGroup>
 
    <!-- DEBUG configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Debug'">
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
-	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.ConsoleEx\Yotei.Tools.ConsoleEx.csproj" />
-	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Diagnostics\Yotei.Tools.Diagnostics.csproj" />
    </ItemGroup>
 
    <!-- RELEASE configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Release'">
 	  <PackageReference Include="Yotei.Tools" Version="0.7.0" />
-	  <PackageReference Include="Yotei.Tools.ConsoleEx" Version="0.7.0" />
-	  <PackageReference Include="Yotei.Tools.Diagnostics" Version="0.7.0" />
    </ItemGroup>
 
    <!-- LOCAL configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Local'">
 	  <PackageReference Include="Yotei.Tools" Version="0.7.0-v0001" />
-	  <PackageReference Include="Yotei.Tools.ConsoleEx" Version="0.7.0-v0001" />
-	  <PackageReference Include="Yotei.Tools.Diagnostics" Version="0.7.0-v0001" />
    </ItemGroup>
 
 </Project>
