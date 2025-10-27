@@ -712,7 +712,19 @@ public static class ArrayExtensions
     /// <returns></returns>
     public static T[] ResizeHead<T>(this T[] source, int len, T pad = default!)
     {
-        throw null;
+        source.ThrowWhenNull();
+
+        if (len < 0) throw new ArgumentException(
+            $"Requested length '{len}' cannot be less than cero.");
+
+        if (len == 0) return [];
+
+        if (len < source.Length) return source.AsSpan(source.Length - len).ToArray();
+
+        var target = new T[len];
+        Array.Fill(target, pad);
+        Array.Copy(source, 0, target, len - source.Length, source.Length);
+        return target;
     }
 
     /// <summary>
@@ -727,6 +739,18 @@ public static class ArrayExtensions
     /// <returns></returns>
     public static T[] ResizeTail<T>(this T[] source, int len, T pad = default!)
     {
-        throw null;
+        source = source.ThrowWhenNull();
+
+        if (len < 0) throw new ArgumentException(
+            $"Requested length '{len}' cannot be less than cero.");
+
+        if (len == 0) return [];
+
+        if (len < source.Length) return source.AsSpan(0, len).ToArray();
+
+        var target = new T[len];
+        Array.Fill(target, pad);
+        Array.Copy(source, 0, target, 0, source.Length);
+        return target;
     }
 }

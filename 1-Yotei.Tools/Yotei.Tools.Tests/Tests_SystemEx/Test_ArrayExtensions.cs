@@ -435,4 +435,44 @@ public class Test_ArrayExtensions
         Assert.Equal(source.Length, target.Length);
         for (int i = 0; i < num; i++) Assert.Null(target[i]);
     }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_ResizeHead()
+    {
+        var source = new[] { "1", "2", "3" };
+        var target = source.ResizeHead(2);
+        Assert.Equal(2, target.Length);
+        Assert.Equal(source[1], target[0]);
+        Assert.Equal(source[2], target[1]);
+
+        target = source.ResizeHead(5, "x");
+        Assert.Equal(5, target.Length);
+        Assert.Equal("x", target[0]);
+        Assert.Equal("x", target[1]);
+        Assert.Equal(source[0], target[2]);
+        Assert.Equal(source[1], target[3]);
+        Assert.Equal(source[2], target[4]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_ResizeTail()
+    {
+        var source = new[] { "1", "2", "3" };
+        var target = source.ResizeTail(2);
+        Assert.Equal(2, target.Length);
+        Assert.Equal(source[0], target[0]);
+        Assert.Equal(source[1], target[1]);
+
+        target = source.ResizeTail(5, "x");
+        Assert.Equal(5, target.Length);
+        Assert.Equal(source[0], target[0]);
+        Assert.Equal(source[1], target[1]);
+        Assert.Equal(source[2], target[2]);
+        Assert.Equal("x", target[3]);
+        Assert.Equal("x", target[4]);
+    }
 }
