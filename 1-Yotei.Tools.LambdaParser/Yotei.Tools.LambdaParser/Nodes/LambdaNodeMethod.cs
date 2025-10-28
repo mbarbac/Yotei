@@ -18,8 +18,8 @@ public class LambdaNodeMethod : LambdaNodeHosted
         string name,
         IEnumerable<LambdaNode> arguments) : base(host)
     {
-        LambdaName = ValidateName(name);
-        LambdaArguments = ValidateArguments(arguments, canBeEmpty: true);
+        LambdaName = LambdaParser.ValidateName(name);
+        LambdaArguments = LambdaParser.ValidateArguments(arguments, canBeEmpty: true);
         LambdaTypeArguments = [];
         LambdaParser.Print(LambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
@@ -37,9 +37,9 @@ public class LambdaNodeMethod : LambdaNodeHosted
         IEnumerable<Type> types,
         IEnumerable<LambdaNode> arguments) : base(host)
     {
-        LambdaName = ValidateName(name);
-        LambdaArguments = ValidateArguments(arguments, canBeEmpty: true);
-        LambdaTypeArguments = ValidateTypeArguments(types);
+        LambdaName = LambdaParser.ValidateName(name);
+        LambdaArguments = LambdaParser.ValidateArguments(arguments, canBeEmpty: true);
+        LambdaTypeArguments = LambdaParser.ValidateTypeArguments(types);
         LambdaParser.Print(LambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 

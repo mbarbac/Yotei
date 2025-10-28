@@ -14,7 +14,7 @@ public class LambdaNodeMember : LambdaNodeHosted
     /// <param name="name"></param>
     public LambdaNodeMember(LambdaNode host, string name) : base(host)
     {
-        LambdaName = ValidateName(name);
+        LambdaName = LambdaParser.ValidateName(name);
         LambdaParser.Print(LambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 

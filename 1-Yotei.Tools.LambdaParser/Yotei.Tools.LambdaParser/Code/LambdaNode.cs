@@ -2,17 +2,32 @@
 
 // ========================================================
 /// <summary>
-/// Represent a node in a chain of dynamic operations.
+/// Represent a node in a chain of dynamic operations. Instances of this type are used to specify
+/// the arbitrary logic that instances represent, so that they can be combined to represent a
+/// chain of dynamic operations.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
 [DebuggerDisplay("{ToDebugString()}")]
-public abstract class LambdaNode
+public abstract class LambdaNode : DynamicObject
 {
+    /// <summary>
+    /// Initializes a new instance.
+    /// </summary>
+    public LambdaNode()
+    {
+        LambdaId = NextLambdaId();
+        LambdaVersion = NextLambdaVersion();
+    }
+
     /// <summary>
     /// Obtains a debug representation of this instance.
     /// </summary>
     /// <returns></returns>
-    public string ToDebugString() => throw null;
+    public string ToDebugString()
+    {
+        var name = GetType().EasyName();
+        return $"[{name}]#{LambdaId}/{LambdaVersion}({ToString()})";
+    }
 
     /// <summary>
     /// Returns the dynamic argument this instance is ultimately associated with, or null if any.
@@ -23,80 +38,264 @@ public abstract class LambdaNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// Validates that the given name can be used to name dynamic elements.
+    /// The unique ID of this instance.
     /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    public static string ValidateName(string name)
-    {
-        name = name.NotNullNotEmpty(true);
+    public ulong LambdaId { get; }
+    static ulong LastLambdaId = 0;
 
-        if (!VALID_FIRST.Contains(name[0])) throw new ArgumentException(
-            "Name first character is invalid.")
-            .WithData(name);
-
-        for (int i = 1; i < name.Length; i++)
-            if (!VALID_OTHER.Contains(name[i])) throw new ArgumentException(
-            "Name contains an invalid character.")
-            .WithData(name);
-
-        return name;
-    }
-
-    readonly static string VALID_FIRST =
-        "_$@"
-        + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        + "abcdefghijklmnopqrstuvwxyz";
-
-    readonly static string VALID_OTHER = VALID_FIRST
-        + "#"
-        + "0123456789";
+    internal static ulong NextLambdaId() => Interlocked.Increment(ref LastLambdaId);
 
     /// <summary>
-    /// Validates that the given collection of lambda nodes can be used as the arguments of a
-    /// method or indexer. The collection can be empty or not, as requested, but if not, cannot
-    /// carry null elements.
+    /// The current version of this instance.
     /// </summary>
-    /// <param name="args"></param>
-    /// <param name="canBeEmpty"></param>
-    /// <returns></returns>
-    public static ImmutableArray<LambdaNode> ValidateArguments(
-        IEnumerable<LambdaNode> args,
-        bool canBeEmpty)
+    internal ulong LambdaVersion { get; set; }
+    static ulong LastLambdaVersion = 0;
+
+    internal static ulong NextLambdaVersion() => Interlocked.Increment(ref LastLambdaVersion);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="expression"><inheritdoc/></param>
+    /// <returns><inheritdoc/></returns>
+    public override DynamicMetaObject GetMetaObject(Expression expression)
     {
-        args.ThrowWhenNull();
+        var master = base.GetMetaObject(expression);
+        var rest = BindingRestrictions.GetInstanceRestriction(expression, this);
+        var meta = new LambdaMetaNode(master, expression, rest, this);
 
-        var list = args is ImmutableArray<LambdaNode> temp ? temp : [.. args];
-
-        if (list.Length == 0 && !canBeEmpty) throw new ArgumentException(
-            "Collection of arguments cannot be empty.");
-
-        if (list.Length != 0 && list.Any(x => x is null)) throw new ArgumentException(
-            "Collection of arguments carries null elements.")
-            .WithData(args);
-
-        return list;
+        return meta;
     }
 
     /// <summary>
-    /// Validates that the given collection of types can be used as the type arguments of a
-    /// method. The collection cannot be empty and cannot carry null elements.
+    /// Obtains binding restrictions that validate that the version of this instance is equal to
+    /// the latest one and, if not, update it.
+    /// <para>
+    /// The DLR caches the results it obtains using both the type of the call site and the type
+    /// of the arguments used. For the purposes of <see cref="LambdaParser"/> this mechanism will
+    /// render the same nodes over and over again, instead of new binded ones. So, this method
+    /// is a hack that intercepts the original mechanism by using a custom binding restriction
+    /// that forces the cache to discard previous nodes and use new binded ones.
+    /// </para>
     /// </summary>
-    /// <param name="args"></param>
+    /// <param name="updateExpr"></param>
     /// <returns></returns>
-    public static ImmutableArray<Type> ValidateTypeArguments(IEnumerable<Type> args)
+    internal BindingRestrictions GetBindingRestrictions(Expression updateExpr)
     {
-        args.ThrowWhenNull();
+        var nodeExpr = Expression.Constant(this);
+        var argExpr = Expression.Parameter(typeof(object));
 
-        var list = args is ImmutableArray<Type> temp ? temp : [.. args];
+        var condition = Expression.Block(
+            new[] { argExpr },
+            Expression.Assign(argExpr, nodeExpr),
+            Expression.Condition(
+                Expression.IsFalse(
+                    Expression.Call(
+                        Expression.Convert(argExpr, typeof(LambdaNode)),
+                        ValidateLambdaVersionInfo)),
+                Expression.Block(
+                    Expression.Call(
+                        Expression.Convert(argExpr, typeof(LambdaNode)),
+                        UpdateLambdaVersionInfo),
+                    updateExpr),
+                Expression.Constant(true)));
 
-        if (list.Length == 0) throw new EmptyException(
-            "Collection of type arguments cannot be empty.");
-
-        if (list.Any(x => x is null)) throw new ArgumentException(
-            "Collection of type arguments carries null elements.")
-            .WithData(args);
-
-        return list;
+        var rest = BindingRestrictions.GetExpressionRestriction(condition);
+        return rest;
     }
+
+    /// <summary>
+    /// Flags to find the method info of the version-related methods.
+    /// </summary>
+    static readonly BindingFlags LAMBDA_FLAGS =
+        BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+
+    /// <summary>
+    /// Determines if the version of this instance is the same as the latest one, or not.
+    /// </summary>
+    internal bool ValidateLambdaVersion()
+    {
+        var result = LambdaVersion == LastLambdaVersion;
+        var valid = result ? "Valid" : "Invalid";
+
+        LambdaParser.Print(
+            LambdaParser.ValidateLambdaColor,
+            $"- VERSION {valid}: {ToDebugString()}");
+
+        return result;
+    }
+
+    static MethodInfo ValidateLambdaVersionInfo
+        => typeof(LambdaNode).GetMethod(nameof(ValidateLambdaVersion), LAMBDA_FLAGS)!;
+
+    /// <summary>
+    /// Updates the version of this instance to the lates one, which is also incremented.
+    /// </summary>
+    void UpdateLambdaVersion()
+    {
+        var old = LambdaVersion;
+        var neo = LambdaVersion = NextLambdaVersion();
+
+        LambdaParser.Print(
+            LambdaParser.UpdateLambdaColor,
+            $"- VERSION Updating: {old} to {neo}, {ToDebugString()}");
+
+        // This permits to grab this instance even when the dynamic binding is not invoked.
+        // Which happens, for instance, the 2nd time a conversion is invoked.
+        LambdaParser.Instance.LastNode = this;
+    }
+
+    static MethodInfo UpdateLambdaVersionInfo
+        => typeof(LambdaNode).GetMethod(nameof(UpdateLambdaVersion), LAMBDA_FLAGS)!;
+
+    // ---------------------------------------------------- Overriden
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="binder"><inheritdoc/></param>
+    /// <param name="indexes"><inheritdoc/></param>
+    /// <param name="result"><inheritdoc/></param>
+    /// <returns><inheritdoc/></returns>
+    public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object? result)
+    {
+        LambdaParser.Print(LambdaParser.NodeBindedColor, $"* GetIndex:");
+        LambdaParser.Print(LambdaParser.NodeBindedColor, $"- This: {ToDebugString()}");
+
+        var list = LambdaParser.Instance.ToLambdaNodes(indexes);
+        foreach (var temp in list)
+            LambdaParser.Print(LambdaParser.NodeBindedColor, $"- Index: {temp.ToDebugString()}");
+
+        var node = new LambdaNodeIndexed(this, list);
+        LambdaParser.Instance.LastNode = node;
+        result = node;
+
+        LambdaParser.Print(LambdaParser.NodeBindedColor, $"- Result: {node.ToDebugString()}");
+        return true;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="binder"><inheritdoc/></param>
+    /// <param name="result"><inheritdoc/></param>
+    /// <returns><inheritdoc/></returns>
+    public override bool TryGetMember(GetMemberBinder binder, out object? result)
+    {
+        LambdaParser.Print(LambdaParser.NodeBindedColor, $"* GetMember:");
+        LambdaParser.Print(LambdaParser.NodeBindedColor, $"- This: {ToDebugString()}");
+        LambdaParser.Print(LambdaParser.NodeBindedColor, $"- Name: {binder.Name}");
+
+        var node = new LambdaNodeMember(this, binder.Name);
+        LambdaParser.Instance.LastNode = node;
+        result = node;
+
+        LambdaParser.Print(LambdaParser.NodeBindedColor, $"- Result: {node.ToDebugString()}");
+        return true;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="binder"><inheritdoc/></param>
+    /// <param name="args"><inheritdoc/></param>
+    /// <param name="result"><inheritdoc/></param>
+    /// <returns><inheritdoc/></returns>
+    public override bool TryInvoke(InvokeBinder binder, object?[]? args, out object? result)
+    {
+        LambdaParser.Print(LambdaParser.NodeBindedColor, $"* Invoke:");
+        LambdaParser.Print(LambdaParser.NodeBindedColor, $"- This: {ToDebugString()}");
+
+        var list = LambdaParser.Instance.ToLambdaNodes(args);
+        foreach (var temp in list)
+            LambdaParser.Print(LambdaParser.NodeBindedColor, $"- Argument: {temp.ToDebugString()}");
+
+        var node = new LambdaNodeInvoke(this, list);
+        LambdaParser.Instance.LastNode = node;
+        result = node;
+
+        LambdaParser.Print(LambdaParser.NodeBindedColor, $"- Result: {node.ToDebugString()}");
+        return true;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="binder"><inheritdoc/></param>
+    /// <param name="args"><inheritdoc/></param>
+    /// <param name="result"><inheritdoc/></param>
+    /// <returns><inheritdoc/></returns>
+    public override bool TryInvokeMember(
+        InvokeMemberBinder binder, object?[]? args, out object? result)
+    {
+        LambdaParser.Print(LambdaParser.NodeBindedColor, $"* Method:");
+        LambdaParser.Print(LambdaParser.NodeBindedColor, $"- This: {ToDebugString()}");
+        LambdaParser.Print(LambdaParser.NodeBindedColor, $"- Name: {binder.Name}");
+
+        var list = LambdaParser.Instance.ToLambdaNodes(args);
+        foreach (var temp in list)
+            LambdaParser.Print(LambdaParser.NodeBindedColor, $"- Argument: {temp.ToDebugString()}");
+
+        LambdaNode node;
+
+        // Intercepting 'Coalesce' methods...
+        if (this is LambdaNodeArgument && binder.Name == "Coalesce" && list.Length == 2)
+        {
+            LambdaParser.Print(LambdaParser.NodeBindedColor, $"* Intercepting 'Coalesce' method...");
+
+            node = new LambdaNodeCoalesce(list[0], list[1]);
+            LambdaParser.Instance.LastNode = node;
+            result = node;
+        }
+
+        // Intercepting 'Ternary' methods...
+        else if (this is LambdaNodeArgument && binder.Name == "Ternary" && list.Length == 3)
+        {
+            LambdaParser.Print(LambdaParser.NodeBindedColor, $"* Intercepting 'Ternary' method...");
+
+            node = new LambdaNodeTernary(list[0], list[1], list[2]);
+            LambdaParser.Instance.LastNode = node;
+            result = node;
+        }
+
+        // Regular methods...
+        else
+        {
+            var types = Array.Empty<Type>();
+
+            if (binder.GetType().Name == "CSharpInvokeMemberBinder") // Not public!
+            {
+                var flags = BindingFlags.Instance | BindingFlags.Public;
+                var info = binder.GetType().GetProperty("TypeArguments", flags);
+                types = (Type[])info!.GetValue(binder)!;
+            }
+
+            node = types.Length == 0
+                ? new LambdaNodeMethod(this, binder.Name, list)
+                : new LambdaNodeMethod(this, binder.Name, types, list);
+
+            LambdaParser.Instance.LastNode = node;
+            result = node;
+        }
+
+        // Finishing...
+        LambdaParser.Print(LambdaParser.NodeBindedColor, $"- Result: {node.ToDebugString()}");
+        return true;
+    }
+
+    // ---------------------------------------------------- Intercepted by the meta node...
+
+    /*public override bool TryBinaryOperation(BinaryOperationBinder binder, object arg, out object? result)*/
+    /*public override bool TryConvert(ConvertBinder binder, out object? result)*/
+    /*public override bool TrySetIndex(SetIndexBinder binder, object[] indexes, object? value)*/
+    /*public override bool TrySetMember(SetMemberBinder binder, object? value)*/
+    /*public override bool TryUnaryOperation(UnaryOperationBinder binder, out object? result)*/
+
+    // ---------------------------------------------------- Not Supported...
+
+    /*public override bool TryCreateInstance(CreateInstanceBinder binder, object?[]? args, [NotNullWhen(true)] out object? result)*/
+    /*public override bool TryDeleteIndex(DeleteIndexBinder binder, object[] indexes)*/
+    /*public override bool TryDeleteMember(DeleteMemberBinder binder)*/
 }
