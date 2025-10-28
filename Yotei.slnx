@@ -23,6 +23,20 @@
     <Project Path="1-Yotei.Tools.AsyncLock/Yotei.Tools.AsyncLock.Tests/Yotei.Tools.AsyncLock.Tests.csproj" Id="a529ad5b-274c-4909-9d16-431931f911b1" />
     <Project Path="1-Yotei.Tools.AsyncLock/Yotei.Tools.AsyncLock/Yotei.Tools.AsyncLock.csproj" Id="5ada0c7f-e9f7-4639-9b7f-c12e6e0716bc" />
   </Folder>
+  <Folder Name="/1-Yotei.Tools.Generators/" />
+  <Folder Name="/1-Yotei.Tools.Generators/CoreGenerator/">
+    <File Path="1-Yotei.Tools/Yotei.Tools/LICENSE" />
+    <File Path="1-Yotei.Tools/Yotei.Tools/README.md" />
+    <Project Path="1-Yotei.Tools.Generators/CoreGenerator/Yotei.Tools.CoreGenerator/Yotei.Tools.CoreGenerator.shproj" Id="723309b9-f888-4101-a288-6529f466691c" />
+  </Folder>
+  <Folder Name="/1-Yotei.Tools.Generators/WithGenerator/">
+    <Project Path="1-Yotei.Tools.Generators/WithGenerator/Yotei.Tools.WithGenerator.Tests/Yotei.Tools.WithGenerator.Tests.csproj" Id="f9c168f9-ffa2-4cf7-b91d-83e2b3b17955">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
+    <Project Path="1-Yotei.Tools.Generators/WithGenerator/Yotei.Tools.WithGenerator/Yotei.Tools.WithGenerator.csproj" Id="1063a0ee-f32d-49c9-b575-f22f6e76d89b">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
+  </Folder>
   <Folder Name="/1-Yotei.Tools.LambdaParser/">
     <Project Path="1-Yotei.Tools.LambdaParser/Yotei.Tools.LambdaParser.Tests/Yotei.Tools.LambdaParser.Tests.csproj" Id="af0245c4-40ba-492a-909b-e17386350d8c">
       <BuildType Solution="Local|*" Project="Debug" />

@@ -1,2 +1,2 @@
-# Yotei.Tools
+# Yotei.Tools.CoreGenerator
 Yotei Framework
