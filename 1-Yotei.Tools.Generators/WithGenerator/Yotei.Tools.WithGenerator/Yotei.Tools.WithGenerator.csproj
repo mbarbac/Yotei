@@ -6,9 +6,10 @@
 	  <ImplicitUsings>disable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
 	  <Configurations>Debug;Release;Local</Configurations>
-	  <NoWarn>IDE0130</NoWarn>
+	  <NoWarn>IDE0130;RS1038</NoWarn>
    </PropertyGroup>
    <!--IDE0130: Folder structure-->
+   <!--RS1038: Relaxed validation for Roslyn workspaces-->
 
    <ItemGroup>
 	  <None Include="README.md" Pack="true" PackagePath="" />
