@@ -52,6 +52,9 @@ internal class Program
         while (position > 0);
     }
 
+    public class TA { public void Method() { } }
+    public class TB : TA { public void Method() { } }
+
     // ----------------------------------------------------
 
     /// <summary>

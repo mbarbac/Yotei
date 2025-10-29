@@ -7,6 +7,11 @@
 internal interface IXNode : INode
 {
     /// <summary>
+    /// The name of the method to generate.
+    /// </summary>
+    public string MethodName { get; }
+
+    /// <summary>
     /// Determines if this instance was created to represent an inherited member or not.
     /// </summary>
     public bool IsInherited { get; }
@@ -125,7 +130,41 @@ internal static class XNode
         /// is added to the returned string.
         /// </summary>
         /// <returns></returns>
-        public string? GetInterfaceModifiers() => throw null;
+        public string? GetInterfaceModifiers()
+        {
+            var comparer = SymbolEqualityComparer.Default;
+            var name = node.Symbol.Name;
+            var host = node.Host;
+
+            // Shortcut for inherited members...
+            if (node.IsInherited) return "new ";
+
+            // There might be a member already declared...
+            var found = host.Finder<bool>(false, (parent, out value) =>
+            {
+                var itype = (node.Symbol as IPropertySymbol)?.Type ?? ((IFieldSymbol)node.Symbol).Type;
+
+                if (parent.FindDecoratedMember(true, name, out var member))
+                {
+                    var mtype = (member as IPropertySymbol)?.Type ?? ((IFieldSymbol)member).Type;
+                    value = comparer.Equals(itype, mtype);
+                    return true;
+                }
+
+                if (parent.FindMethod(true, node.MethodName, itype, out var method))
+                {
+                    value = comparer.Equals(itype, method.Parameters[0].Type);
+                    return true;
+                }
+
+                value = default;
+                return false;
+            },
+            out var value, node.Host.AllInterfaces);
+
+            // Finishing...
+            return found && value ? "new " : null;
+        }
 
         // ------------------------------------------------
 
@@ -135,7 +174,61 @@ internal static class XNode
         /// is added to the returned string.
         /// </summary>
         /// <returns></returns>
-        public string? GetAbstractModifiers() => throw null;
+        public string? GetAbstractModifiers()
+        {
+            var host = node.Host;
+            var name = node.Symbol.Name;
+            var itype = (node.Symbol as IPropertySymbol)?.Type ?? ((IFieldSymbol)node.Symbol).Type;
+
+            // Shortcut if the member is a captured one...
+            if (!node.IsInherited) goto FINISH;
+
+            // With inherited members, we need to understand what has been declared or implemented
+            // in the chain: it drives what modifiers we need to use...
+            var found = host.Finder<string?>(false, (parent, out value) =>
+            {
+                value = null!;
+
+                // Existing method rules...
+                if (parent.FindMethod(true, node.MethodName, itype, out var method))
+                {
+                    var access = method.DeclaredAccessibility;
+                    if (access != Accessibility.Private) return false;
+
+                    var str = access.EasyName(addspace: true);
+                    var usevirtual = method.IsVirtual || method.IsOverride | method.IsAbstract;
+                    value = usevirtual ? $"{str} abstract override " : $"{str} abstract ";
+                    return true;
+                }
+
+                // There might be a decorated member or requested one...
+                if (parent.FindWithAttribute(true, name, out var at) ||
+                    parent.FindInheritWithsAttribute(true, out at))
+                {
+                    // For simplicity, we assume interface parents bring no modifiers...
+                    if (parent.IsInterface) { value = "public abstract "; return true; }
+
+                    // Parent not an abstract one...
+                    if (!parent.IsAbstract) { value = "public abstract new "; return true; }
+
+                    // Otherwise, we may need to override...
+                    var usevirtual = node.UseVirtual;
+                    if (at.GetUseVirtual(out var temp)) usevirtual = temp;
+
+                    value = usevirtual ? "public abstract override " : "public abstract ";
+                    return true;
+                }
+
+                // Not found, try next...
+                return false;
+            },
+            out var value, host.AllBaseTypes, host.AllInterfaces);
+            if (found) return value;
+
+            // Finishing...
+            FINISH:
+            return "public abstract ";
+        }
 
         // ------------------------------------------------
 
@@ -145,10 +238,68 @@ internal static class XNode
         /// is added to the returned string.
         /// </summary>
         /// <returns></returns>
-        public string? GetRegularModifiers() => throw null;
+        public string? GetRegularModifiers()
+        {
+            var host = node.Host;
+            var name = node.Symbol.Name;
+            var itype = (node.Symbol as IPropertySymbol)?.Type ?? ((IFieldSymbol)node.Symbol).Type;
+
+            // Shortcut if the member is a captured one...
+            if (!node.IsInherited) goto FINISH;
+
+            // With inherited members, we need to understand what has been declared or implemented
+            // in the chain: it drives what modifiers we need to use...
+            var found = host.Finder<string?>(false, (parent, out value) =>
+            {
+                value = null;
+
+                // Existing method rules...
+                if (parent.FindMethod(true, node.MethodName, itype, out var method))
+                {
+                    var access = method.DeclaredAccessibility;
+                    if (access != Accessibility.Private) return false;
+
+                    var str = access.EasyName(addspace: true);
+                    var usevirtual = method.IsVirtual || method.IsOverride | method.IsAbstract;
+                    value = usevirtual ? $"{str} override " : $"{str} ";
+                    return true;
+                }
+
+                // There might be a decorated member or requested one...
+                if (parent.FindWithAttribute(true, name, out var at) ||
+                    parent.FindInheritWithsAttribute(true, out at))
+                {
+                    // For simplicity, we assume interface parents bring no modifiers...
+                    if (parent.IsInterface)
+                    {
+                        value = !node.UseVirtual || host.IsSealed ? "public " : "public virtual ";
+                        return true;
+                    }
+
+                    // If parent is abstract we always need to override...
+                    if (parent.IsAbstract) { value = "public override "; return true; }
+
+                    // Otherwise, we may need to override...
+                    var usevirtual = node.UseVirtual;
+                    if (at.GetUseVirtual(out var temp)) usevirtual = temp;
+
+                    value = !usevirtual ? "public new " : "public override ";
+                    return true;
+                }
+
+                // Not found, try next...
+                return false;
+            },
+            out var value, host.AllBaseTypes, host.AllInterfaces);
+            if (found) return value;
+
+            // Finishing...
+            FINISH:
+            return !node.UseVirtual || host.IsSealed ? "public " : "public virtual ";
+        }
     }
 
-    // ----------------------------------------------------
+    // ====================================================
 
     /// <summary>
     /// Emits the appropriate documentation for the generated code of the given symbol.

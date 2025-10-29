@@ -35,9 +35,9 @@ internal class XPropertyNode : PropertyNode, IXNode
         MethodName = $"With{Symbol.Name}";
         ArgumentName = $"v_{Symbol.Name}";
     }
-    readonly string MethodName;
     readonly string ArgumentName;
 
+    public string MethodName { get; }
     public bool IsInherited { get; init; }
     public INamedTypeSymbol ReturnType { get; set; } = default!;
     public bool ReturnNullable { get; set; }
