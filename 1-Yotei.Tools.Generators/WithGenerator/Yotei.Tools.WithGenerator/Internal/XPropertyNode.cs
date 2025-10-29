@@ -192,23 +192,38 @@ internal class XPropertyNode : PropertyNode, IXNode
     /// </summary>
     List<INamedTypeSymbol> GetExplicitInterfaces()
     {
+        var comparer = SymbolEqualityComparer.Default;
         List<INamedTypeSymbol> list = [];
-        foreach (var iface in Host.AllInterfaces) TryCapture(iface);
+        foreach (var iface in Host.Interfaces) TryCapture(iface);
         return list;
 
         /// <summary>
         /// Tries to capture the given interface as an explicit one.
         /// </summary>
-        void TryCapture(INamedTypeSymbol iface)
+        bool TryCapture(INamedTypeSymbol iface)
         {
-            var comparer = SymbolEqualityComparer.Default;
+            var found = false;
 
-            if (iface.FindDecoratedMember(true, Symbol.Name, out _) ||
-                iface.FindMethod(true, Symbol.Name, (INamedTypeSymbol)Symbol.Type, out _))
+            // First its childs...
+            foreach (var child in iface.Interfaces) if (TryCapture(child)) found = true;
+
+            // If no child, then maybe this interface by itself...
+            if (!found)
+            {
+                if (iface.FindDecoratedMember(true, Symbol.Name, out _) ||
+                    iface.FindMethod(true, MethodName, (INamedTypeSymbol)Symbol.Type, out _))
+                    found = true;
+            }
+
+            // If found, add to the list...
+            if (found)
             {
                 var temp = list.Find(x => comparer.Equals(x, iface));
                 if (temp is null) list.Add(iface);
             }
+
+            // Finishing...
+            return found;
         }
     }
 }

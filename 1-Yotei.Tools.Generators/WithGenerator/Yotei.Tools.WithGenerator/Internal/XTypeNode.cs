@@ -28,6 +28,7 @@ internal class XTypeNode : TypeNode
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    [SuppressMessage("", "IDE0290")]
     public XTypeNode(INamedTypeSymbol symbol) : base(symbol) { }
 
     /// <summary>

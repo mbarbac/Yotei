@@ -369,7 +369,9 @@ internal class CoreGenerator : IIncrementalGenerator
         {
             if (!file.Validate(context)) continue;
 
-            var cb = new CodeBuilder(); file.Emit(context, cb);
+            var cb = new CodeBuilder();
+            file.Emit(context, cb);
+
             var code = cb.ToString();
             var name = file.FileName() + ".g.cs";
             context.AddSource(name, code);
