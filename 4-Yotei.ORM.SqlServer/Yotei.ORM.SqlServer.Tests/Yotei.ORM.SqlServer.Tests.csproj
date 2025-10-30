@@ -21,4 +21,16 @@
 	  </PackageReference>
    </ItemGroup>
 
+   <!-- DEBUG configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Debug'">
+   </ItemGroup>
+
+   <!-- RELEASE configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Release'">
+   </ItemGroup>
+
+   <!-- LOCAL configuration -->
+   <ItemGroup Condition="'$(Configuration)'=='Local'">
+   </ItemGroup>
+
 </Project>
