@@ -132,7 +132,7 @@ internal class XPropertyNode : PropertyNode, IXNode
         var rtype = ReturnType.EasyName(ReturnOptions);
         var rnull = ReturnNullable ? "?" : string.Empty;
         var ptype = Symbol.Type.EasyName(EasyNameOptions.Full);
-        var modifiers = this.GetRegularModifiers();
+        var modifiers = this.GetRegularModifiers(context);
         var hostname = Host.EasyName();
 
         XNode.EmitDocumentation(Symbol, cb);

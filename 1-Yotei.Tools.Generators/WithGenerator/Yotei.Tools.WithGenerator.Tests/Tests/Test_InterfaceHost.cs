@@ -1,4 +1,4 @@
-﻿/*namespace Yotei.Tools.WithGenerator.Tests;
+﻿namespace Yotei.Tools.WithGenerator.Tests;
 
 // ========================================================
 //[Enforced]
@@ -101,4 +101,4 @@ public partial class Test_InterfaceHost
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
     }
-}*/
+}

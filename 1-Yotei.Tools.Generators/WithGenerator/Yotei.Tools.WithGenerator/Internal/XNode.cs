@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools.WithGenerator;
+﻿using System.ComponentModel.Design;
+
+namespace Yotei.Tools.WithGenerator;
 
 // ========================================================
 /// <summary>
@@ -238,7 +240,7 @@ internal static class XNode
         /// is added to the returned string.
         /// </summary>
         /// <returns></returns>
-        public string? GetRegularModifiers()
+        public string? GetRegularModifiers(SourceProductionContext context)
         {
             var host = node.Host;
             var name = node.Symbol.Name;
@@ -263,12 +265,21 @@ internal static class XNode
                     var usevirtual = method.IsVirtual || method.IsOverride | method.IsAbstract;
                     value = usevirtual ? $"{str} override " : $"{str} ";
                     return true;
-                }
+                }                
 
                 // There might be a decorated member or requested one...
                 if (parent.FindWithAttribute(true, name, out var at) ||
                     parent.FindInheritWithsAttribute(true, out at))
                 {
+                    // Validating return type...
+                    if (!at.GetReturnType(out var type, out var nullable)) type = host;
+                    if (!host.IsAssignableTo(node.ReturnType))
+                    {
+                        CoreDiagnostics.InvalidReturnType(host, node.ReturnType).Report(context);
+                        CoreDiagnostics.InvalidReturnType(node.Symbol, node.ReturnType).Report(context);
+                        return false;
+                    }
+
                     // For simplicity, we assume interface parents bring no modifiers...
                     if (parent.IsInterface)
                     {
