@@ -34,6 +34,9 @@
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools.AsyncLock\Yotei.Tools.AsyncLock\Yotei.Tools.AsyncLock.csproj" />
 	  <ProjectReference Include="..\..\1-Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser\Yotei.Tools.LambdaParser.csproj" />
+	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\WithGenerator\Yotei.Tools.WithGenerator\Yotei.Tools.WithGenerator.csproj">
+		 <OutputItemType>Analyzer</OutputItemType>
+	  </ProjectReference>
 	  <ProjectReference Include="..\..\2-Yotei.ORM\Yotei.ORM\Yotei.ORM.csproj" />
 	  <ProjectReference Include="..\..\3-Yotei.ORM.Relational\Yotei.ORM.Relational\Yotei.ORM.Relational.csproj" />
    </ItemGroup>
@@ -43,6 +46,7 @@
 	  <PackageReference Include="Yotei.Tools" Version="0.7.0" />
 	  <PackageReference Include="Yotei.Tools.AsyncLock" Version="0.7.0" />
 	  <PackageReference Include="Yotei.Tools.LambdaParser" Version="0.7.0" />
+	  <PackageReference Include="Yotei.Tools.WithGenerator" Version="0.7.0" />
 	  <PackageReference Include="Yotei.ORM" Version="0.7.0" />
 	  <PackageReference Include="Yotei.ORM.Relational" Version="0.7.0" />
    </ItemGroup>
@@ -52,8 +56,26 @@
 	  <PackageReference Include="Yotei.Tools" Version="0.7.0-v0001" />
 	  <PackageReference Include="Yotei.Tools.AsyncLock" Version="0.7.0-v0001" />
 	  <PackageReference Include="Yotei.Tools.LambdaParser" Version="0.7.0-v0001" />
+	  <PackageReference Include="Yotei.Tools.WithGenerator" Version="0.7.0-v0001" />
 	  <PackageReference Include="Yotei.ORM" Version="0.7.0-v0001" />
 	  <PackageReference Include="Yotei.ORM.Relational" Version="0.7.0-v0001" />
    </ItemGroup>
+
+   <!-- Emit generated files -->
+   <ItemGroup>
+	  <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
+   </ItemGroup>
+   <PropertyGroup>
+	  <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+	  <CompilerGeneratedFilesOutputPath>Generated\$(TargetFramework)</CompilerGeneratedFilesOutputPath>
+   </PropertyGroup>
+
+   <!-- Clear generated files each compile or build (need to be at the end of the file)-->
+   <Target Name="CustomBeforeCompile" BeforeTargets="BeforeCompile">
+	  <RemoveDir Directories="$(ProjectDir)\Generated\" />
+   </Target>
+   <Target Name="CustomBeforeBuild" BeforeTargets="BeforeBuild">
+	  <RemoveDir Directories="$(ProjectDir)\Generated\" />
+   </Target>
 
 </Project>

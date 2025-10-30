@@ -23,14 +23,46 @@
 
    <!-- DEBUG configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Debug'">
+	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
+	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Diagnostics\Yotei.Tools.Diagnostics.csproj" />
+	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\WithGenerator\Yotei.Tools.WithGenerator\Yotei.Tools.WithGenerator.csproj">
+		 <OutputItemType>Analyzer</OutputItemType>
+	  </ProjectReference>
+	  <ProjectReference Include="..\Yotei.ORM.SqlServer\Yotei.ORM.SqlServer.csproj" />
    </ItemGroup>
 
    <!-- RELEASE configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Release'">
+	  <PackageReference Include="Yotei.Tools" Version="0.7.0" />
+	  <PackageReference Include="Yotei.Tools.Diagnostics" Version="0.7.0" />
+	  <PackageReference Include="Yotei.Tools.WithGenerator" Version="0.7.0" />
+	  <PackageReference Include="Yotei.ORM.SqlServer" Version="0.7.0" />
    </ItemGroup>
 
    <!-- LOCAL configuration -->
    <ItemGroup Condition="'$(Configuration)'=='Local'">
+	  <PackageReference Include="Yotei.Tools" Version="0.7.0-v0001" />
+	  <PackageReference Include="Yotei.Tools.Diagnostics" Version="0.7.0-v0001" />
+	  <PackageReference Include="Yotei.Tools.WithGenerator" Version="0.7.0-v0001" />
+	  <PackageReference Include="Yotei.ORM.SqlServer" Version="0.7.0-v0001" />
    </ItemGroup>
+
+   <!-- Emit generated files -->
+   <ItemGroup>
+	  <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
+   </ItemGroup>
+   
+   <PropertyGroup>
+	  <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+	  <CompilerGeneratedFilesOutputPath>Generated\$(TargetFramework)</CompilerGeneratedFilesOutputPath>
+   </PropertyGroup>
+
+   <!-- Clear generated files each compile or build (need to be at the end of the file)-->
+   <Target Name="CustomBeforeCompile" BeforeTargets="BeforeCompile">
+	  <RemoveDir Directories="$(ProjectDir)\Generated\" />
+   </Target>
+   <Target Name="CustomBeforeBuild" BeforeTargets="BeforeBuild">
+	  <RemoveDir Directories="$(ProjectDir)\Generated\" />
+   </Target>
 
 </Project>
