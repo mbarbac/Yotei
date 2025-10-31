@@ -31,7 +31,8 @@ internal class Program
         Debug.IndentSize = 2;
         Debug.AutoFlush = true;
 
-        Includes.Add(new("Yotei.Tools.LambdaParser.*", null, null));
+        //Includes.Add(new("Yotei.Tools.LambdaParser.*", null, null));
+        //Includes.Add(new("Yotei.Tools.CloneGenerator.*", null, null));
 
         var position = 0; do
         {

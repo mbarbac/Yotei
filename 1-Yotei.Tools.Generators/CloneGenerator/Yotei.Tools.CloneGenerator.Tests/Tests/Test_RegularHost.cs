@@ -1,240 +1,116 @@
-﻿namespace Yotei.Tools.CloneGenerator.Tests;
+﻿#pragma warning disable CS9113
+
+namespace Yotei.Tools.CloneGenerator.Tests;
 
 // ========================================================
 //[Enforced]
-public class Test_RegularHost
+public partial class Test_RegularHost
 {
-    //[Enforced]
-    [Fact]
-    public void Test()
-    {
-    }
-}
-/*{
     // Default case...
-    partial class RType01A
-    {
-        public RType01A(string name) => Name = name;
-        protected RType01A(RType01A source) => Name = source.Name;
-        [With] public string? Name { get; init; }
-        [With] public int Age = 0;
-    }
+
+    [Cloneable] partial class RType01(RType01 _) { }
 
     //[Enforced]
     [Fact]
-    public static void Test_Type01A()
+    public static void Test_Type01()
     {
         MethodInfo? method;
         ParameterInfo[] pars;
-        var type = typeof(RType01A);
+        var type = typeof(RType01);
 
-        method = type.GetMethod("WithName");
-        pars = method!.GetParameters();
+        method = type.GetMethod("Clone"); Assert.NotNull(method);
+        pars = method!.GetParameters(); Assert.Empty(pars);
         Assert.True(method.IsVirtual);
         Assert.Equal(type, method.ReturnType);
-        Assert.Single(pars);
-        Assert.Equal(typeof(string), pars[0].ParameterType);
-
-        method = type.GetMethod("WithAge");
-        pars = method!.GetParameters();
-        Assert.True(method.IsVirtual);
-        Assert.Equal(type, method.ReturnType);
-        Assert.Single(pars);
-        Assert.Equal(typeof(int), pars[0].ParameterType);
     }
 
     // ----------------------------------------------------
+    // Inheriting from interface...
 
-    // Default case inheritance...
-    [InheritWiths]
-    partial class RType01B : RType01A
-    {
-        public RType01B(string name) : base(name) { }
-        protected RType01B(RType01B source) : base(source) { }
-    }
+    [Cloneable] partial interface IFace02 { }
+    [Cloneable] partial class RType02A(RType02A _) : IFace02 { }
+    [Cloneable<IFace02>] partial class RType02B(RType02B _) : IFace02 { }
 
     //[Enforced]
     [Fact]
-    public static void Test_Type01B()
+    public static void Test_Type02()
     {
         MethodInfo? method;
         ParameterInfo[] pars;
-        var type = typeof(RType01B);
 
-        method = type.GetMethod("WithName");
-        pars = method!.GetParameters();
-        Assert.True(method.IsVirtual);
-        Assert.Equal(type, method.ReturnType);
-        Assert.Single(pars);
-        Assert.Equal(typeof(string), pars[0].ParameterType);
-
-        method = type.GetMethod("WithAge");
-        pars = method!.GetParameters();
-        Assert.True(method.IsVirtual);
-        Assert.Equal(type, method.ReturnType);
-        Assert.Single(pars);
-        Assert.Equal(typeof(int), pars[0].ParameterType);
-    }
-
-    // ----------------------------------------------------
-
-    // Default with UseVirtual...
-    partial class RType02A
-    {
-        public RType02A(string name) => Name = name;
-        protected RType02A(RType02A source) => Name = source.Name;
-        [With(UseVirtual = false)] public string? Name { get; init; }
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_Type02A()
-    {
-        MethodInfo? method;
-        ParameterInfo[] pars;
         var type = typeof(RType02A);
-
-        method = type.GetMethod("WithName");
-        pars = method!.GetParameters();
-        Assert.False(method.IsVirtual);
+        method = type.GetMethod("Clone"); Assert.NotNull(method);
+        pars = method!.GetParameters(); Assert.Empty(pars);
+        Assert.True(method.IsVirtual);
         Assert.Equal(type, method.ReturnType);
-        Assert.Single(pars);
-        Assert.Equal(typeof(string), pars[0].ParameterType);
+
+        type = typeof(RType02B);
+        method = type.GetMethod("Clone"); Assert.NotNull(method);
+        pars = method!.GetParameters(); Assert.Empty(pars);
+        Assert.True(method.IsVirtual);
+        Assert.Equal(typeof(IFace02), method.ReturnType);
     }
 
     // ----------------------------------------------------
+    // UseVirtual effects...
 
-    // Default UseVirtual inheritance...
-    [InheritWiths]
-    partial class RType02B : RType02A
-    {
-        public RType02B(string name) : base(name) { }
-        protected RType02B(RType02B source) : base(source) { }
-    }
+    [Cloneable(UseVirtual = false)] partial class RType03(RType03 _) { }
 
     //[Enforced]
     [Fact]
-    public static void Test_Type02B()
+    public static void Test_Type03()
     {
         MethodInfo? method;
         ParameterInfo[] pars;
-        var type = typeof(RType02B);
 
-        method = type.GetMethod("WithName");
-        pars = method!.GetParameters();
+        var type = typeof(RType03);
+        method = type.GetMethod("Clone"); Assert.NotNull(method);
+        pars = method!.GetParameters(); Assert.Empty(pars);
         Assert.False(method.IsVirtual);
         Assert.Equal(type, method.ReturnType);
-        Assert.Single(pars);
-        Assert.Equal(typeof(string), pars[0].ParameterType);
     }
 
     // ----------------------------------------------------
+    // UseVirtual inheritance...
 
-    // Inheriting from interface, and return type for inherited...
-    partial interface IFace03A { [With] string? Name { get; } }
-
-    [InheritWiths<IFace03A>]
-    partial class RType03A : IFace03A
-    {
-        public RType03A(string name) => Name = name;
-        protected RType03A(RType03A source) => Name = source.Name;
-
-        public string? Name { get; init; }
-        [With] public int Age = 0;
-    }
+    [Cloneable(UseVirtual = true)]
+    partial class RType04 : RType03 { RType04(RType04 x) : base(x) { } }
 
     //[Enforced]
     [Fact]
-    public static void Test_Type03A()
+    public static void Test_Type04()
     {
         MethodInfo? method;
         ParameterInfo[] pars;
-        var type = typeof(RType03A);
 
-        method = type.GetMethod("WithName");
-        pars = method!.GetParameters();
-        Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(IFace03A), method.ReturnType);
-        Assert.Single(pars);
-        Assert.Equal(typeof(string), pars[0].ParameterType);
-
-        method = type.GetMethod("WithAge");
-        pars = method!.GetParameters();
+        var type = typeof(RType04);
+        method = type.GetMethod("Clone"); Assert.NotNull(method);
+        pars = method!.GetParameters(); Assert.Empty(pars);
         Assert.True(method.IsVirtual);
         Assert.Equal(type, method.ReturnType);
-        Assert.Single(pars);
-        Assert.Equal(typeof(int), pars[0].ParameterType);
     }
 
     // ----------------------------------------------------
-
     // Double inheritance from interface and base class...
-    [InheritWiths] partial interface IFace04A : IFace03A { }
 
-    [InheritWiths]
-    partial class RType04A : RType03A, IFace04A
-    {
-        public RType04A(string name) : base(name) { }
-        protected RType04A(RType04A source) : base(source) { }
-    }
+    [Cloneable] partial interface IFace05A { }
+    [Cloneable<IFace05A>] partial class RType05A(RType05A _) : IFace05A { }
 
-    Note: If we specify that 'RType04A' inherits with-members with return type 'IFace03A', what
-     * happens is that we have a base method that returns the class 'RType03', with a generated one
-     * that returns that 'IFace03A' interface - so a kind-of downcast scenario not supported by the
-     * compiler.
+    [Cloneable] partial interface IFace05B : IFace05A { }
+    [Cloneable<IFace05B>]
+    partial class RType05B : RType05A, IFace05B { RType05B(RType05B x) : base(x) { } }
 
     //[Enforced]
     [Fact]
-    public static void Test_Type04A()
+    public static void Test_Type05()
     {
         MethodInfo? method;
         ParameterInfo[] pars;
-        var type = typeof(RType04A);
 
-        method = type.GetMethod("WithName");
-        pars = method!.GetParameters();
+        var type = typeof(RType05B);
+        method = type.GetMethod("Clone"); Assert.NotNull(method);
+        pars = method!.GetParameters(); Assert.Empty(pars);
         Assert.True(method.IsVirtual);
-        Assert.Equal(type, method.ReturnType);
-        Assert.Single(pars);
-        Assert.Equal(typeof(string), pars[0].ParameterType);
-
-        method = type.GetMethod("WithAge");
-        pars = method!.GetParameters();
-        Assert.True(method.IsVirtual);
-        Assert.Equal(type, method.ReturnType);
-        Assert.Single(pars);
-        Assert.Equal(typeof(int), pars[0].ParameterType);
-    }
-
-    // ----------------------------------------------------
-
-    // Inheriting from interface and abstract...
-    partial interface IFace05A { [With] string? Name { get; } }
-
-[InheritWiths<IFace05A>]
-abstract partial class AType05A : IFace05A { public string? Name { get; init; } }
-
-[InheritWiths<IFace05A>]
-partial class RType05A : AType05A
-{
-    public RType05A(string name) => Name = name;
-    protected RType05A(RType05A source) => Name = source.Name;
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_Type05A()
-    {
-        MethodInfo? method;
-        ParameterInfo[] pars;
-        var type = typeof(RType05A);
-
-        method = type.GetMethod("WithName");
-        pars = method!.GetParameters();
-        Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(IFace05A), method.ReturnType);
-        Assert.Single(pars);
-        Assert.Equal(typeof(string), pars[0].ParameterType);
+        Assert.Equal(typeof(IFace05B), method.ReturnType);
     }
 }
-*/

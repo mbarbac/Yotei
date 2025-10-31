@@ -76,9 +76,9 @@ internal class XTypeNode : TypeNode
             var same = SymbolEqualityComparer.Default.Equals(Symbol, type);
             if (!same) ReturnOptions = EasyNameOptions.Full with
             { TypeUseNullable = false };
-
-            if (at.GetUseVirtual(out var temp)) UseVirtual = temp;
         }
+
+        if (at.GetUseVirtual(out var temp)) UseVirtual = temp;
     }
 
     // ----------------------------------------------------
@@ -286,7 +286,9 @@ internal class XTypeNode : TypeNode
 
                 var usevirtual = UseVirtual;
                 if (at.GetUseVirtual(out var temp)) usevirtual = temp;
-                value = usevirtual ? "public override " : "public new ";
+
+                if (UseVirtual && !usevirtual) value = "public virtual new ";
+                else value = usevirtual ? "public override " : "public new ";
                 return true;
             }
 

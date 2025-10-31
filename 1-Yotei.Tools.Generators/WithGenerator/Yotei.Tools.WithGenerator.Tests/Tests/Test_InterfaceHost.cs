@@ -5,6 +5,7 @@
 public partial class Test_InterfaceHost
 {
     // Default case...
+
     partial interface IFace01 { [With] string? Name { get; } }
 
     //[Enforced]
@@ -21,8 +22,8 @@ public partial class Test_InterfaceHost
     }
 
     // ----------------------------------------------------
-
     // UseVirtual has no effect on interfaces...
+
     partial interface IFace02 { [With(UseVirtual = false)] string? Name { get; } }
 
     //[Enforced]
@@ -39,8 +40,8 @@ public partial class Test_InterfaceHost
     }
 
     // ----------------------------------------------------
-
     // Enforcing return type as parameter...
+
     partial interface IFace03A { [With] string? Name { get; } }
 
     [InheritWiths(ReturnType = typeof(IFace03A))]
@@ -60,8 +61,8 @@ public partial class Test_InterfaceHost
     }
 
     // ----------------------------------------------------
-
     // Enforcing return type as generic...
+
     partial interface IFace04A { [With] string? Name { get; } }
 
     [InheritWiths<IsNullable<IFace04A>>]
@@ -81,8 +82,8 @@ public partial class Test_InterfaceHost
     }
 
     // ----------------------------------------------------
-
     // Enforcing return type as generic nullable...
+
     partial interface IFace05A
     { [With(ReturnType = typeof(IsNullable<IFace05A>))] string? Name { get; } }
 

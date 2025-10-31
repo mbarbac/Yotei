@@ -5,6 +5,7 @@
 public partial class Test_RegularHost
 {
     // Default case...
+
     partial class RType01A
     {
         public RType01A(string name) => Name = name;
@@ -37,8 +38,8 @@ public partial class Test_RegularHost
     }
 
     // ----------------------------------------------------
-
     // Default case inheritance...
+
     [InheritWiths]
     partial class RType01B : RType01A
     {
@@ -70,8 +71,8 @@ public partial class Test_RegularHost
     }
 
     // ----------------------------------------------------
-
     // Default with UseVirtual...
+
     partial class RType02A
     {
         public RType02A(string name) => Name = name;
@@ -96,8 +97,8 @@ public partial class Test_RegularHost
     }
 
     // ----------------------------------------------------
-
     // Default UseVirtual inheritance...
+
     [InheritWiths]
     partial class RType02B : RType02A
     {
@@ -122,8 +123,8 @@ public partial class Test_RegularHost
     }
 
     // ----------------------------------------------------
-
     // Inheriting from interface, and return type for inherited...
+
     partial interface IFace03A { [With] string? Name { get; } }
 
     [InheritWiths<IFace03A>]
@@ -160,8 +161,8 @@ public partial class Test_RegularHost
     }
 
     // ----------------------------------------------------
-
     // Double inheritance from interface and base class...
+
     [InheritWiths] partial interface IFace04A : IFace03A { }
 
     [InheritWiths]
@@ -200,8 +201,8 @@ public partial class Test_RegularHost
     }
 
     // ----------------------------------------------------
-
     // Inheriting from interface and abstract...
+
     partial interface IFace05A { [With] string? Name { get; } }
 
     [InheritWiths<IFace05A>]

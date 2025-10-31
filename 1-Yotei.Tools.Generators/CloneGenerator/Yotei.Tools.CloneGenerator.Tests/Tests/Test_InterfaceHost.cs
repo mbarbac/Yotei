@@ -1,10 +1,11 @@
-﻿/*namespace Yotei.Tools.CloneGenerator.Tests;
+﻿namespace Yotei.Tools.CloneGenerator.Tests;
 
 // ========================================================
 //[Enforced]
 public partial class Test_InterfaceHost
 {
     // Default case...
+
     [Cloneable] partial interface IFace01 { }
 
     //[Enforced]
@@ -22,8 +23,8 @@ public partial class Test_InterfaceHost
     }
 
     // ----------------------------------------------------
-
     // UseVirtual has no effect on interfaces...
+
     [Cloneable(UseVirtual = false)] partial interface IFace02 { }
 
     //[Enforced]
@@ -41,8 +42,8 @@ public partial class Test_InterfaceHost
     }
 
     // ----------------------------------------------------
-
     // Enforcing return type...
+
     [Cloneable] partial interface IFace03A { }
     [Cloneable<IFace03A>] partial interface IFace03B : IFace03A { }
     [Cloneable(ReturnType = typeof(IFace03A))] partial interface IFace03C : IFace03A { }
@@ -76,8 +77,8 @@ public partial class Test_InterfaceHost
     }
 
     // ----------------------------------------------------
-
     // Enforcing return type as nullable...
+
     [Cloneable<IsNullable<IFace04A>>] partial interface IFace04A { }
     [Cloneable<IsNullable<IFace04A>>] partial interface IFace04B : IFace04A { }
 
@@ -108,4 +109,4 @@ public partial class Test_InterfaceHost
         Assert.True(method.IsVirtual);
         Assert.Equal(typeof(IFace04A), method.ReturnType);
     }
-}*/
+}

@@ -1,12 +1,15 @@
-﻿namespace Yotei.Tools.CloneGenerator.Tests;
+﻿#pragma warning disable IDE0290
+
+namespace Yotei.Tools.CloneGenerator.Tests;
 
 // ========================================================
 //[Enforced]
-public abstract partial class Test_AbstractHost
+public partial class Test_AbstractHost
 {
     // Default case...
+
     [Cloneable] abstract partial class AType01 { }
-    
+
     //[Enforced]
     [Fact]
     public static void Test_Type01()
@@ -20,20 +23,12 @@ public abstract partial class Test_AbstractHost
         Assert.True(method.IsVirtual);
         Assert.Equal(type, method.ReturnType);
     }
-}
-/*
-
-    
 
     // ----------------------------------------------------
-
     // UseVirtual has no effect on abstract classes...
-    abstract partial class AType02
-    {
-        [With(UseVirtual = true)] public string? Name { get; init; }
-        [With(UseVirtual = false)] public int Age = 0;
-    }
-    
+
+    [Cloneable(UseVirtual = false)] abstract partial class AType02 { }
+
     //[Enforced]
     [Fact]
     public static void Test_Type02()
@@ -42,32 +37,19 @@ public abstract partial class Test_AbstractHost
         ParameterInfo[] pars;
         var type = typeof(AType02);
 
-        method = type.GetMethod("WithName");
-        pars = method!.GetParameters();
+        method = type.GetMethod("Clone"); Assert.NotNull(method);
+        pars = method!.GetParameters(); Assert.Empty(pars);
         Assert.True(method.IsVirtual);
         Assert.Equal(type, method.ReturnType);
-        Assert.Single(pars);
-        Assert.Equal(typeof(string), pars[0].ParameterType);
-
-        method = type.GetMethod("WithAge");
-        pars = method!.GetParameters();
-        Assert.True(method.IsVirtual);
-        Assert.Equal(type, method.ReturnType);
-        Assert.Single(pars);
-        Assert.Equal(typeof(int), pars[0].ParameterType);
     }
 
     // ----------------------------------------------------
-
     // Inheriting from interface...
-    partial interface IFace03A { [With<IsNullable<IFace03A>>] string? Name { get; } }
 
-    [InheritWiths(ReturnType = typeof(IsNullable<IFace03A>))]
-    abstract partial class AType03A : IFace03A
-    {
-        public string? Name { get; init; }
-        [With] public int Age = 0;
-    }
+    [Cloneable] partial interface IFace03 { }
+    [Cloneable] abstract partial class AType03A : IFace03 { }
+    [Cloneable(ReturnType = typeof(IFace03))] abstract partial class AType03B : IFace03 { }
+    [Cloneable<IFace03>] abstract partial class AType03C : IFace03 { }
 
     //[Enforced]
     [Fact]
@@ -75,39 +57,32 @@ public abstract partial class Test_AbstractHost
     {
         MethodInfo? method;
         ParameterInfo[] pars;
+
         var type = typeof(AType03A);
-
-        method = type.GetMethod("WithName");
-        pars = method!.GetParameters();
-        Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(IFace03A), method.ReturnType);
-        Assert.Single(pars);
-        Assert.Equal(typeof(string), pars[0].ParameterType);
-
-        method = type.GetMethod("WithAge");
-        pars = method!.GetParameters();
+        method = type.GetMethod("Clone"); Assert.NotNull(method);
+        pars = method!.GetParameters(); Assert.Empty(pars);
         Assert.True(method.IsVirtual);
         Assert.Equal(type, method.ReturnType);
-        Assert.Single(pars);
-        Assert.Equal(typeof(int), pars[0].ParameterType);
+
+        type = typeof(AType03B);
+        method = type.GetMethod("Clone"); Assert.NotNull(method);
+        pars = method!.GetParameters(); Assert.Empty(pars);
+        Assert.True(method.IsVirtual);
+        Assert.Equal(typeof(IFace03), method.ReturnType);
+
+        type = typeof(AType03C);
+        method = type.GetMethod("Clone"); Assert.NotNull(method);
+        pars = method!.GetParameters(); Assert.Empty(pars);
+        Assert.True(method.IsVirtual);
+        Assert.Equal(typeof(IFace03), method.ReturnType);
     }
 
     // ----------------------------------------------------
+    // Inheriting from interface and abstract...
 
-    // Double inheriting from interface and abstract...
-
-    partial interface IFace04A { [With] string? Name { get; } }
-
-    [InheritWiths]
-    abstract partial class AType04A : IFace04A
-    {
-        public string? Name { get; } = default!;
-        [With] public int Age = 0;
-    }
-
-    [InheritWiths] partial interface IFace04B : IFace04A { }
-    [InheritWiths]
-    abstract partial class AType04B : AType04A, IFace04B { }
+    [Cloneable] partial interface IFace04 { }
+    [Cloneable] abstract partial class AType04A : IFace04 { }
+    [Cloneable] abstract partial class AType04B : AType04A { }
 
     //[Enforced]
     [Fact]
@@ -115,42 +90,28 @@ public abstract partial class Test_AbstractHost
     {
         MethodInfo? method;
         ParameterInfo[] pars;
-        var type = typeof(AType04B);
 
-        method = type.GetMethod("WithName");
-        pars = method!.GetParameters();
+        var type = typeof(AType04A);
+        method = type.GetMethod("Clone"); Assert.NotNull(method);
+        pars = method!.GetParameters(); Assert.Empty(pars);
         Assert.True(method.IsVirtual);
         Assert.Equal(type, method.ReturnType);
-        Assert.Single(pars);
-        Assert.Equal(typeof(string), pars[0].ParameterType);
 
-        method = type.GetMethod("WithAge");
-        pars = method!.GetParameters();
+        type = typeof(AType04B);
+        method = type.GetMethod("Clone"); Assert.NotNull(method);
+        pars = method!.GetParameters(); Assert.Empty(pars);
         Assert.True(method.IsVirtual);
         Assert.Equal(type, method.ReturnType);
-        Assert.Single(pars);
-        Assert.Equal(typeof(int), pars[0].ParameterType);
     }
 
     // ----------------------------------------------------
-
     // Double inheriting from interface and concrete...
 
-    partial interface IFace05A { [With] string? Name { get; } }
+    [Cloneable] partial interface IFace05A { }
+    [Cloneable] partial class CType05A : IFace05A { public CType05A(CType05A _) { } }
 
-    [InheritWiths]
-    partial class CType05A : IFace05A
-    {
-        public CType05A() { }
-        protected CType05A(CType05A _) { }
-
-        public string? Name { get; init; } = default!;
-        [With] public int Age = 0;
-    }
-
-    [InheritWiths] partial interface IFace05B : IFace05A { }
-    [InheritWiths]
-    abstract partial class AType05B : CType05A, IFace05B { }
+    [Cloneable] partial interface IFace05B : IFace05A { }
+    [Cloneable] abstract partial class AType05B : CType05A { public AType05B(AType05B x) : base(x) { } }
 
     //[Enforced]
     [Fact]
@@ -158,20 +119,11 @@ public abstract partial class Test_AbstractHost
     {
         MethodInfo? method;
         ParameterInfo[] pars;
+
         var type = typeof(AType05B);
-
-        method = type.GetMethod("WithName");
-        pars = method!.GetParameters();
+        method = type.GetMethod("Clone"); Assert.NotNull(method);
+        pars = method!.GetParameters(); Assert.Empty(pars);
         Assert.True(method.IsVirtual);
         Assert.Equal(type, method.ReturnType);
-        Assert.Single(pars);
-        Assert.Equal(typeof(string), pars[0].ParameterType);
-
-        method = type.GetMethod("WithAge");
-        pars = method!.GetParameters();
-        Assert.True(method.IsVirtual);
-        Assert.Equal(type, method.ReturnType);
-        Assert.Single(pars);
-        Assert.Equal(typeof(int), pars[0].ParameterType);
     }
-}*/
+}

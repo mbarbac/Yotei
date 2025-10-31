@@ -5,6 +5,7 @@
 public partial class Test_AbstractHost
 {
     // Default case...
+
     abstract partial class AType01
     {
         [With] public string? Name { get; init; }
@@ -35,8 +36,8 @@ public partial class Test_AbstractHost
     }
 
     // ----------------------------------------------------
-
     // UseVirtual has no effect on abstract classes...
+
     abstract partial class AType02
     {
         [With(UseVirtual = true)] public string? Name { get; init; }
@@ -67,8 +68,8 @@ public partial class Test_AbstractHost
     }
 
     // ----------------------------------------------------
-
     // Inheriting from interface...
+
     partial interface IFace03A { [With<IsNullable<IFace03A>>] string? Name { get; } }
 
     [InheritWiths(ReturnType = typeof(IsNullable<IFace03A>))]
@@ -102,8 +103,8 @@ public partial class Test_AbstractHost
     }
 
     // ----------------------------------------------------
-
     // Double inheriting from interface and abstract...
+
 
     partial interface IFace04A { [With] string? Name { get; } }
 
@@ -142,7 +143,6 @@ public partial class Test_AbstractHost
     }
 
     // ----------------------------------------------------
-
     // Double inheriting from interface and concrete...
 
     partial interface IFace05A { [With] string? Name { get; } }
