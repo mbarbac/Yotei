@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents a connection with an underlying database.
 /// </summary>
-public interface IConnection
+public interface IConnection : IAsyncDisposableEx
 {
     /// <summary>
     /// The descriptor of the database engine this instance connects to.
@@ -53,4 +53,13 @@ public interface IConnection
     /// </summary>
     /// <returns></returns>
     ValueTask CloseAsync();
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Gets a default nestable transaction for this instance, which is guaranteed to be a valid
+    /// one, not disposed, at the moment when it was obtained, provided that this connection is
+    /// also not disposed.
+    /// </summary>
+    ITransaction Transaction { get; }
 }
