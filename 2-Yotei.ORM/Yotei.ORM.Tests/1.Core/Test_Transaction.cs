@@ -103,4 +103,32 @@ public class Test_Transaction
         Assert.True(connection.IsDisposed);
         Assert.True(transaction.IsDisposed);
     }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Start_Implicit_Abort()
+    {
+        IConnection connection;
+        ITransaction transaction;
+        var engine = new FakeEngine();
+
+        using (connection = new FakeConnection(engine))
+        {
+            transaction = connection.Transaction;
+
+            Assert.False(connection.IsOpen);
+            Assert.False(transaction.IsActive);
+
+            var max = 3; for (int i = 1; i <= max; i++)
+            {
+                transaction.Start();
+                Assert.True(connection.IsOpen);
+                Assert.True(transaction.IsActive);
+                Assert.Equal(i, (transaction as FakeTransaction)?.Level);
+            }
+        }
+
+        Assert.True(connection.IsDisposed);
+        Assert.True(transaction.IsDisposed);
+    }
 }
