@@ -193,7 +193,7 @@ internal static class XNode
                 if (parent.FindMethod(true, node.MethodName, itype, out var method))
                 {
                     var access = method.DeclaredAccessibility;
-                    if (access != Accessibility.Private) return false;
+                    if (access == Accessibility.Private) return false;
 
                     var str = access.EasyName(addspace: true);
                     var usevirtual = method.IsVirtual || method.IsOverride | method.IsAbstract;
@@ -257,7 +257,7 @@ internal static class XNode
                 if (parent.FindMethod(true, node.MethodName, itype, out var method))
                 {
                     var access = method.DeclaredAccessibility;
-                    if (access != Accessibility.Private) return false;
+                    if (access == Accessibility.Private) return false;
 
                     var str = access.EasyName(addspace: true);
                     var usevirtual = method.IsVirtual || method.IsOverride | method.IsAbstract;

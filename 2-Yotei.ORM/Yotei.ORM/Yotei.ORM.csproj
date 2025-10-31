@@ -37,6 +37,9 @@
 	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\WithGenerator\Yotei.Tools.WithGenerator\Yotei.Tools.WithGenerator.csproj">
 		 <OutputItemType>Analyzer</OutputItemType>
 	  </ProjectReference>
+	  <ProjectReference Include="..\..\1-Yotei.Tools.Generators\CloneGenerator\Yotei.Tools.CloneGenerator\Yotei.Tools.CloneGenerator.csproj">
+		 <OutputItemType>Analyzer</OutputItemType>
+	  </ProjectReference>
    </ItemGroup>
 
    <!-- RELEASE configuration -->
@@ -45,6 +48,7 @@
 	  <PackageReference Include="Yotei.Tools.AsyncLock" Version="0.7.0" />
 	  <PackageReference Include="Yotei.Tools.LambdaParser" Version="0.7.0" />
 	  <PackageReference Include="Yotei.Tools.WithGenerator" Version="0.7.0" />
+	  <PackageReference Include="Yotei.Tools.CloneGenerator" Version="0.7.0" />
    </ItemGroup>
 
    <!-- LOCAL configuration -->
@@ -53,6 +57,7 @@
 	  <PackageReference Include="Yotei.Tools.AsyncLock" Version="0.7.0-v0001" />
 	  <PackageReference Include="Yotei.Tools.LambdaParser" Version="0.7.0-v0001" />
 	  <PackageReference Include="Yotei.Tools.WithGenerator" Version="0.7.0-v0001" />
+	  <PackageReference Include="Yotei.Tools.CloneGenerator" Version="0.7.0-v0001" />
    </ItemGroup>
 
    <!-- Emit generated files -->

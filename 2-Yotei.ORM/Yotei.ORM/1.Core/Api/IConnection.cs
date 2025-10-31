@@ -3,8 +3,10 @@
 // ========================================================
 /// <summary>
 /// Represents a connection with an underlying database.
+/// <br/> Instances of this type shall not be shared by multiple threads.
 /// </summary>
-public interface IConnection : IAsyncDisposableEx
+[Cloneable]
+public partial interface IConnection : IAsyncDisposableEx
 {
     /// <summary>
     /// The descriptor of the database engine this instance connects to.

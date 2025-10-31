@@ -6,6 +6,7 @@
 /// <br/> Nestable transactions are not started automatically when created. They are logical ones
 /// that can be started and committed many times, reverting to the physical transaction only when
 /// needed. Aborting a nestable transaction aborts the whole logical chain.
+/// <br/> Instances of this type shall not be shared by multiple threads.
 /// </summary>
 public interface ITransaction : IAsyncDisposableEx
 {

@@ -4,7 +4,8 @@
 /// <summary>
 /// <inheritdoc cref="IConnection"/>
 /// </summary>
-public abstract class Connection : DisposableClass, IConnection
+[Cloneable<IConnection>]
+public abstract partial class Connection : DisposableClass, IConnection
 {
     public const int RETRIES = 4;
     public const int RETRYINTERVALMS = 250;
@@ -23,12 +24,28 @@ public abstract class Connection : DisposableClass, IConnection
     }
 
     /// <summary>
+    /// Copy constructor.
+    /// </summary>
+    /// <param name="source"></param>
+    protected Connection(Connection source)
+    {
+        source.ThrowWhenNull();
+
+        Engine = source.Engine;
+        Retries = source.Retries;
+        RetryInterval = source.RetryInterval;
+    }
+
+    /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="disposing"></param>
     protected override void OnDispose(bool disposing)
     {
-        throw null;
+        if (IsDisposed || !disposing) return;
+
+        try { EndTransactions(disposing); } catch { }
+        try { if (IsOpen) Close(); } catch { }
     }
 
     /// <summary>
@@ -36,16 +53,19 @@ public abstract class Connection : DisposableClass, IConnection
     /// </summary>
     /// <param name="disposing"></param>
     /// <returns></returns>
-    protected override ValueTask OnDisposeAsync(bool disposing)
+    protected override async ValueTask OnDisposeAsync(bool disposing)
     {
-        throw null;
+        if (IsDisposed || !disposing) return;
+
+        try { await EndTransactionsAsync(disposing).ConfigureAwait(false); } catch { }
+        try { if (IsOpen) await CloseAsync().ConfigureAwait(false); } catch { }
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => throw null;
+    public override string ToString() => $"ORM.Connection({Engine})";
 
     // ----------------------------------------------------
 
@@ -86,30 +106,210 @@ public abstract class Connection : DisposableClass, IConnection
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public abstract void Open();
+    public void Open()
+    {
+        var num = Retries;
+        do
+        {
+            ThrowIfDisposed();
+            ThrowIfDisposing();
+
+            if (IsOpen) return;
+
+            try { OnOpen(); return; }
+            catch { if (num == 0) throw; }
+
+            if (num > 0)
+            {
+                if (RetryInterval.Ticks > 0) Thread.Sleep(RetryInterval);
+                else Thread.Yield();
+            }
+            num--;
+        }
+        while (num >= 0);
+        throw new TimeoutException("Cannot open this connection.").WithData(this);
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="token"></param>
     /// <returns></returns>
-    public abstract ValueTask OpenAsync(CancellationToken token = default);
+    public async ValueTask OpenAsync(CancellationToken token = default)
+    {
+        var num = Retries;
+        do
+        {
+            ThrowIfDisposed();
+            ThrowIfDisposing();
 
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    public abstract void Close();
+            if (IsOpen) return;
 
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
-    public abstract ValueTask CloseAsync();
+            try { await OnOpenAsync(token).ConfigureAwait(false); return; }
+            catch { if (num == 0) throw; }
+
+            if (num > 0)
+            {
+                if (RetryInterval.Ticks > 0) await Task.Delay(RetryInterval, token).ConfigureAwait(false);
+                else await Task.Yield();
+            }
+            num--;
+        }
+        while (num >= 0);
+        throw new TimeoutException("Cannot open this connection.").WithData(this);
+    }
 
     // ----------------------------------------------------
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public ITransaction Transaction { get; } = null!; // HIGH: Connection's transaction.
+    public void Close()
+    {
+        if (IsDisposed) return;
+        if (!IsOpen) return;
+
+        EndTransactions(dispose: false);
+        OnClose();
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public async ValueTask CloseAsync()
+    {
+        if (IsDisposed) return;
+        if (!IsOpen) return;
+
+        await EndTransactionsAsync(dispose: false).ConfigureAwait(false);
+        await OnCloseAsync().ConfigureAwait(false);
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to open the connection with the underlying database.
+    /// </summary>
+    protected abstract void OnOpen();
+
+    /// <summary>
+    /// Invoked to open the connection with the underlying database.
+    /// </summary>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    protected abstract ValueTask OnOpenAsync(CancellationToken token);
+
+    /// <summary>
+    /// Invoked to close the connection with the underlying database.
+    /// </summary>
+    protected abstract void OnClose();
+
+    /// <summary>
+    /// Invoked to close the connection with the underlying database.
+    /// </summary>
+    /// <returns></returns>
+    protected abstract ValueTask OnCloseAsync();
+
+    // ----------------------------------------------------
+
+    readonly List<ITransaction> _Transactions = [];
+
+    /// <summary>
+    /// Adds the given transaction into the collection of registered ones.
+    /// </summary>
+    /// <param name="transaction"></param>
+    internal void AddTransaction(ITransaction transaction)
+    {
+        lock (_Transactions)
+        {
+            if (!ReferenceEquals(this, transaction.Connection))
+                throw new ArgumentException(
+                    "The connection of the transaction is not this instance.")
+                    .WithData(transaction)
+                    .WithData(this);
+
+            if (!_Transactions.Contains(transaction)) _Transactions.Add(transaction);
+        }
+    }
+
+    /// <summary>
+    /// Removes the given transaction from the collection of registered ones.
+    /// </summary>
+    /// <param name="transaction"></param>
+    internal bool RemoveTransaction(ITransaction transaction)
+    {
+        lock (_Transactions) return _Transactions.Remove(transaction);
+    }
+
+    /// <summary>
+    /// Invoked to terminate the transactions registered in this instance and, optionally,
+    /// dispose them.
+    /// </summary>
+    /// <param name="dispose"></param>
+    internal void EndTransactions(bool dispose)
+    {
+        foreach (var item in _Transactions.ToList())
+        {
+            if (dispose)
+            {
+                if (!item.IsDisposed) item.Dispose();
+                _Transactions.Remove(item);
+            }
+            else
+            {
+                if (item.IsActive) item.Abort();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Invoked to terminate the transactions registered in this instance and, optionally,
+    /// dispose them.
+    /// </summary>
+    /// <param name="dispose"></param>
+    /// <returns></returns>
+    internal async ValueTask EndTransactionsAsync(bool dispose)
+    {
+        foreach (var item in _Transactions.ToList())
+        {
+            if (dispose)
+            {
+                if (!item.IsDisposed) await item.DisposeAsync().ConfigureAwait(false);
+                _Transactions.Remove(item);
+            }
+            else
+            {
+                if (item.IsActive) await item.AbortAsync().ConfigureAwait(false);
+            }
+        }
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to create a transaction of the appropriate type for this instance.
+    /// </summary>
+    /// <returns></returns>
+    protected abstract ITransaction CreateTransaction();
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public ITransaction Transaction
+    {
+        get
+        {
+            if (IsDisposed || OnDisposing) // Special case, returning a disposed one...
+            {
+                field ??= CreateTransaction();
+                field.Dispose();
+            }
+            else // Standard case, returning a valid one...
+            {
+                if (field is null || field.IsDisposed) field = CreateTransaction();
+            }
+            return field;
+        }
+    }
 }

@@ -17,4 +17,7 @@ global using System.Threading;
 global using System.Threading.Tasks;
 
 global using Yotei.Tools;
+global using Yotei.Tools.LambdaParser;
+global using Yotei.Tools.AsyncLock;
 global using Yotei.Tools.WithGenerator;
+global using Yotei.Tools.CloneGenerator;

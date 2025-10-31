@@ -176,7 +176,7 @@ internal class XTypeNode : TypeNode
             if (parent.FindMethod(true, out var method))
             {
                 var access = method.DeclaredAccessibility;
-                if (access != Accessibility.Private) return false;
+                if (access == Accessibility.Private) return false;
 
                 var str = access.EasyName(addspace: true);
                 var isvirtual = method.IsVirtual || method.IsOverride | method.IsAbstract;
@@ -248,7 +248,7 @@ internal class XTypeNode : TypeNode
             if (parent.FindMethod(true, out var method))
             {
                 var access = method.DeclaredAccessibility;
-                if (access != Accessibility.Private) return false;
+                if (access == Accessibility.Private) return false;
 
                 var str = access.EasyName(addspace: true);
                 var isvirtual = method.IsVirtual || method.IsOverride | method.IsAbstract;
