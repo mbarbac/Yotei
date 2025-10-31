@@ -24,6 +24,14 @@
     <Project Path="1-Yotei.Tools.AsyncLock/Yotei.Tools.AsyncLock/Yotei.Tools.AsyncLock.csproj" Id="5ada0c7f-e9f7-4639-9b7f-c12e6e0716bc" />
   </Folder>
   <Folder Name="/1-Yotei.Tools.Generators/" />
+  <Folder Name="/1-Yotei.Tools.Generators/CloneGenerator/">
+    <Project Path="1-Yotei.Tools.Generators/CloneGenerator/Yotei.Tools.CloneGenerator.Tests/Yotei.Tools.CloneGenerator.Tests.csproj" Id="a606f41b-fed4-464c-8d53-dddb15d49134">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
+    <Project Path="1-Yotei.Tools.Generators/CloneGenerator/Yotei.Tools.CloneGenerator/Yotei.Tools.CloneGenerator.csproj" Id="56a49c81-1f0c-4bd5-9b81-d93a44840fd3">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
+  </Folder>
   <Folder Name="/1-Yotei.Tools.Generators/CoreGenerator/">
     <File Path="1-Yotei.Tools/Yotei.Tools/LICENSE" />
     <File Path="1-Yotei.Tools/Yotei.Tools/README.md" />

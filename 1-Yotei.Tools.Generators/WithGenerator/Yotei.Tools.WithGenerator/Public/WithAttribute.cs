@@ -5,6 +5,7 @@
 /// Emulates the '<c>with</c>' keyword for the decorated properties and fields of non-record types
 /// for which their respective '<c>With[Name](value)</c>' methods will be declared (interfaces) or
 /// implemented (regular classes and structs).
+/// <br/> Regular types must implement a copy constructor.
 /// </summary>
 [AttributeUsage(
     AttributeTargets.Property | AttributeTargets.Field,

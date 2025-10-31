@@ -38,8 +38,9 @@ internal static class CharExtensions
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    /// OPTIMIZE: char.Equals(char, string comparer) allocates two temporary strings.
-    /// Problem is that StringSpan has not a CompareTo(target, StringComparer)
+    /// NOTE: char.Equals(char, string comparer) allocates two temporary strings.
+    /// Problem is that StringSpan has not a CompareTo(target, StringComparer).
+    /// But using shared ones means we need to introduce a lock.
     public static bool Equals(
         this char source, char value, IEqualityComparer<string> comparer)
         => new CharComparerByStringComparer(comparer.ThrowWhenNull()).Equals(source, value);

@@ -1,9 +1,16 @@
-﻿namespace Yotei.Tools.WithGenerator.Tests;
+﻿namespace Yotei.Tools.CloneGenerator.Tests;
 
 // ========================================================
 //[Enforced]
-public partial class Test_RegularHost
+public class Test_RegularHost
 {
+    //[Enforced]
+    [Fact]
+    public void Test()
+    {
+    }
+}
+/*{
     // Default case...
     partial class RType01A
     {
@@ -171,10 +178,10 @@ public partial class Test_RegularHost
         protected RType04A(RType04A source) : base(source) { }
     }
 
-    // Note: If we specify that 'RType04A' inherits with-members with return type 'IFace03A', what
-    // happens is that we have a base method that returns the class 'RType03', with a generated one
-    // that returns that 'IFace03A' interface - so a kind-of downcast scenario not supported by the
-    // compiler.
+    Note: If we specify that 'RType04A' inherits with-members with return type 'IFace03A', what
+     * happens is that we have a base method that returns the class 'RType03', with a generated one
+     * that returns that 'IFace03A' interface - so a kind-of downcast scenario not supported by the
+     * compiler.
 
     //[Enforced]
     [Fact]
@@ -204,14 +211,14 @@ public partial class Test_RegularHost
     // Inheriting from interface and abstract...
     partial interface IFace05A { [With] string? Name { get; } }
 
-    [InheritWiths<IFace05A>]
-    abstract partial class AType05A : IFace05A { public string? Name { get; init; } }
+[InheritWiths<IFace05A>]
+abstract partial class AType05A : IFace05A { public string? Name { get; init; } }
 
-    [InheritWiths<IFace05A>]
-    partial class RType05A : AType05A
-    {
-        public RType05A(string name) => Name = name;
-        protected RType05A(RType05A source) => Name = source.Name;
+[InheritWiths<IFace05A>]
+partial class RType05A : AType05A
+{
+    public RType05A(string name) => Name = name;
+    protected RType05A(RType05A source) => Name = source.Name;
     }
 
     //[Enforced]
@@ -230,3 +237,4 @@ public partial class Test_RegularHost
         Assert.Equal(typeof(string), pars[0].ParameterType);
     }
 }
+*/

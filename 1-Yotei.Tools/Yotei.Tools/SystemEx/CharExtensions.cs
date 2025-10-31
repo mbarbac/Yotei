@@ -38,13 +38,15 @@ public static class CharExtensions
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
+    /// NOTE: char.Equals(char, string comparer) allocates two temporary strings.
+    /// Problem is that StringSpan has not a CompareTo(target, StringComparer).
+    /// But using shared ones means we need to introduce a lock.
     public static bool Equals(
         this char source, char value, IEqualityComparer<string> comparer)
         => new CharComparerByStringComparer(comparer.ThrowWhenNull()).Equals(source, value);
 
     readonly struct CharComparerByStringComparer(IEqualityComparer<string> Comparer) : IEqualityComparer<char>
     {
-        // OPTIMIZE: We need to allocate 2 temporary strings because StringSpan has not a Compare(target, StringComparer) method.
         public bool Equals(char x, char y)
         {
             var xs = x.ToString();

@@ -1,26 +1,24 @@
-﻿namespace Yotei.Tools.WithGenerator;
+﻿namespace Yotei.Tools.CloneGenerator;
 
 // ========================================================
 /// <summary>
-/// Used to decorate non-record types for which the inherited '<c>With[Name](value)</c>' methods
-/// of the <see cref="WithAttribute"/>-decorated members will be redeclated (for interfaces) or
-/// reimplemented (for regular classes and structs).
+/// Used to decorate types for which a <see cref="ICloneable.Clone"/> method will be generated.
 /// <br/> Regular types must implement a copy constructor.
 /// </summary>
 [AttributeUsage(
     AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface,
     Inherited = false,
     AllowMultiple = false)]
-public class InheritWithsAttribute : Attribute
+public class CloneableAttribute : Attribute
 {
     /// <summary>
-    /// The return type of the generated methods.
-    /// <br/> The default value of this setting is the type of the decorated host.
+    /// The return type of the generated method.
+    /// <br/> The default value of this setting is the decorated type itself.
     /// </summary>
     public Type ReturnType { get; set; } = null!;
 
     /// <summary>
-    /// Whether the generated methods are virtual or not.
+    /// Whether the generated method is virtual or not.
     /// <br/> The default value of this setting is considered to be '<c>true</c>'.
     /// </summary>
     public bool UseVirtual { get; set; }
@@ -28,18 +26,18 @@ public class InheritWithsAttribute : Attribute
 
 // ========================================================
 /// <summary>
-/// <inheritdoc cref="InheritWithsAttribute"/>
-/// <br/> The generic type argument provides the return type of the generated methods.
+/// <inheritdoc cref="CloneableAttribute"/>
+/// <br/> The generic type argument provides the return type of the generated method.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 [AttributeUsage(
     AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface,
     Inherited = false,
     AllowMultiple = false)]
-public class InheritWithsAttribute<T> : Attribute
+public class CloneableAttribute<T> : Attribute
 {
     /// <summary>
-    /// Whether the generated methods are virtual or not.
+    /// Whether the generated method is virtual or not.
     /// <br/> The default value of this setting is considered to be '<c>true</c>'.
     /// </summary>
     public bool UseVirtual { get; set; }

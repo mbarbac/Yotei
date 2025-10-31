@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.Design;
-
-namespace Yotei.Tools.WithGenerator;
+﻿namespace Yotei.Tools.WithGenerator;
 
 // ========================================================
 /// <summary>
@@ -199,7 +197,7 @@ internal static class XNode
 
                     var str = access.EasyName(addspace: true);
                     var usevirtual = method.IsVirtual || method.IsOverride | method.IsAbstract;
-                    value = usevirtual ? $"{str} abstract override " : $"{str} abstract ";
+                    value = usevirtual ? $"{str}abstract override " : $"{str}abstract ";
                     return true;
                 }
 
@@ -348,7 +346,7 @@ internal static class XNode
         // Not-generic attribute...
         else if (data.AttributeClass!.Arity == 0)
         {
-            var name = "ReturnType";
+            var name = nameof(WithAttribute.ReturnType);
 
             if (data.GetNamedArgument(name, out var arg))
             {
@@ -377,7 +375,7 @@ internal static class XNode
     /// <returns></returns>
     public static bool GetUseVirtual(this AttributeData data, out bool value)
     {
-        var name = "UseVirtual";
+        var name = nameof(WithAttribute.UseVirtual);
 
         if (data.GetNamedArgument(name, out var arg))
         {

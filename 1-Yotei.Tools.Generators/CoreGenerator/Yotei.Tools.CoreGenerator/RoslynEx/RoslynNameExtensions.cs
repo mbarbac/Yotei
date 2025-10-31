@@ -289,7 +289,7 @@ internal static class RoslynNameExtensions
         var name = source.Name;
         if (pars.Length != 0)
         {
-            // HIGH: Intercept IndexerName '$', maybe up the tree for custom attributes?
+            // TODO: Intercept IndexerName '$', maybe up the tree for custom attributes?
             // Something like: ISymbol.GetAttributes => AttributeData[] to investigate
             name = options.IndexerName;
         }
@@ -411,7 +411,7 @@ internal static class RoslynNameExtensions
         }
 
         // Generic arguments...
-        // HIGH: Find generic arguments of AttributeData.EasyName()
+        // TODO: Find generic arguments of AttributeData.EasyName()
         // Something like: ISymbol.GetAttributes => AttributeData[] to investigate
         /*if (options.MemberGenericArgumentOptions is not null && source.TypeArguments.Length > 0)
         {
