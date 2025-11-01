@@ -213,7 +213,11 @@ public abstract partial class CoreList<T> : ICoreList<T>
         predicate.ThrowWhenNull();
 
         List<int> list = [];
-        for (int i = 0; i < Items.Count; i++) if (predicate(Items[i])) list.Add(i);
+        for (int i = 0; i < Items.Count; i++)
+        {
+            var item = Items[i];
+            if (predicate(item)) list.Add(i);
+        }
         return list;
     }
 
