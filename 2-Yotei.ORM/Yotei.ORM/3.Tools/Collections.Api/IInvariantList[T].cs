@@ -198,6 +198,30 @@ public partial interface IInvariantList<T> : IReadOnlyList<T>
     IInvariantList<T> RemoveAll(T item);
 
     /// <summary>
+    /// Returns a new instance with the first element that matches the given predicate removed.
+    /// <br/> Returns the original instance if no changes were made.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    IInvariantList<T> Remove(Predicate<T> predicate);
+
+    /// <summary>
+    /// Returns a new instance with the last element that matches the given predicate removed.
+    /// <br/> Returns the original instance if no changes were made.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    IInvariantList<T> RemoveLast(Predicate<T> predicate);
+
+    /// <summary>
+    /// Returns a new instance with all the elements that match the given predicate removed.
+    /// <br/> Returns the original instance if no changes were made.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    IInvariantList<T> RemoveAll(Predicate<T> predicate);
+
+    /// <summary>
     /// Returns a new instance with all the elements removed.
     /// <br/> Returns the original instance if no changes were made.
     /// </summary>

@@ -266,12 +266,12 @@ internal class XTypeNode : TypeNode
             // Or method requested...
             if (parent.FindCloneableAttribute(true, out var at))
             {
-                if (!at.GetReturnType(out var type, out var nullable)) type = Symbol;
-                if (!Symbol.IsAssignableTo(ReturnType))
-                {
-                    CoreDiagnostics.InvalidReturnType(Symbol, ReturnType).Report(context);
-                    return false;
-                }
+                //if (!at.GetReturnType(out var type, out var nullable)) type = Symbol;
+                //if (!Symbol.IsAssignableTo(ReturnType))
+                //{
+                //    CoreDiagnostics.InvalidReturnType(Symbol, ReturnType).Report(context);
+                //    return false;
+                //}
 
                 if (parent.IsInterface)
                 {

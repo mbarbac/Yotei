@@ -1,5 +1,8 @@
 ﻿namespace Yotei.Tools.WithGenerator;
 
+// TODO: copy CloneGenerator logic into WithGenerator.
+// CloneGenerator is more recent, may have better logic.
+
 // ========================================================
 /// <summary>
 /// Represents working data for either a property or a field node.
@@ -269,14 +272,14 @@ internal static class XNode
                 if (parent.FindWithAttribute(true, name, out var at) ||
                     parent.FindInheritWithsAttribute(true, out at))
                 {
-                    // Validating return type...
-                    if (!at.GetReturnType(out var type, out var nullable)) type = host;
-                    if (!host.IsAssignableTo(node.ReturnType))
-                    {
-                        CoreDiagnostics.InvalidReturnType(host, node.ReturnType).Report(context);
-                        CoreDiagnostics.InvalidReturnType(node.Symbol, node.ReturnType).Report(context);
-                        return false;
-                    }
+                    //// Validating return type...
+                    //if (!at.GetReturnType(out var type, out var nullable)) type = host;
+                    //if (!host.IsAssignableTo(node.ReturnType))
+                    //{
+                    //    CoreDiagnostics.InvalidReturnType(host, node.ReturnType).Report(context);
+                    //    CoreDiagnostics.InvalidReturnType(node.Symbol, node.ReturnType).Report(context);
+                    //    return false;
+                    //}
 
                     // For simplicity, we assume interface parents bring no modifiers...
                     if (parent.IsInterface)

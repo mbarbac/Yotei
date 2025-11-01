@@ -198,6 +198,30 @@ public partial interface ICoreList<T>
     int RemoveAll(T item);
 
     /// <summary>
+    /// Removes from this collection the first element that matches the given predicate.
+    /// <br/> Returns the number of changes made.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    int Remove(Predicate<T> predicate);
+
+    /// <summary>
+    /// Removes from this collection the last element that matches the given predicate.
+    /// <br/> Returns the number of changes made.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    int RemoveLast(Predicate<T> predicate);
+
+    /// <summary>
+    /// Removes from this collection all the elements that match the given predicate.
+    /// <br/> Returns the number of changes made.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    int RemoveAll(Predicate<T> predicate);
+
+    /// <summary>
     /// Clears this collection.
     /// <br/> Returns the number of changes made.
     /// </summary>
