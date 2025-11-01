@@ -2,13 +2,13 @@
 
 // ========================================================
 /// <summary>
-/// <inheritdoc cref="ICoreList{K, T}"/>
+/// <inheritdoc cref="ICoreList{T}"/>
 /// </summary>
 /// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>
-[Cloneable(ReturnType = typeof(ICoreList<,>))]
+[Cloneable(ReturnType = typeof(ICoreList<>))]
 [DebuggerDisplay("{ToDebugString(5)}")]
-public abstract partial class CoreList<K, T> : ICoreList<K, T>
+public abstract partial class CoreList<T> : ICoreList<T>
 {
     readonly List<T> Items;
 
@@ -33,7 +33,7 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected CoreList(CoreList<K, T> source) : this() => AddRange(source);
+    protected CoreList(CoreList<T> source) : this() => AddRange(source);
 
     /// <summary>
     /// <inheritdoc/>
@@ -79,20 +79,6 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     protected abstract T ValidateItem(T item);
 
     /// <summary>
-    /// Invoked to obtain the key associated with the given element.
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    protected abstract K GetKey(T item);
-
-    /// <summary>
-    /// Invoked to validate the given key before using it.
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    protected abstract K ValidateKey(K key);
-
-    /// <summary>
     /// Determines if the element that are themselves collections of elements (of the type of the
     /// elements of this instance) shall be expanded when included in this collection, or not.
     /// <br/> This setting is used to flatten collections so preventing embedded ones.
@@ -112,9 +98,9 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     protected abstract bool IsValidDuplicate(T source, T item);
 
     /// <summary>
-    /// The comparer used by this instance to determine equality of keys.
+    /// The comparer used by this instance to determine equality of elements.
     /// </summary>
-    protected abstract IEqualityComparer<K> Comparer { get; }
+    protected abstract IEqualityComparer<T> Comparer { get; }
 
     // ----------------------------------------------------
 
@@ -142,24 +128,34 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    public bool Contains(K key) => IndexOf(key) >= 0;
-    bool ICollection<T>.Contains(T item) => Contains(GetKey(item));
-    bool IList.Contains(object? value) => Contains(GetKey((T)value!));
+    public bool Contains(T item) => IndexOf(item) >= 0;
+    bool IList.Contains(object? value) => Contains((T)value!);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    public int IndexOf(K key) => IndexOf(key, validate: true);
-    int IList<T>.IndexOf(T item) => IndexOf(GetKey(item));
-    int IList.IndexOf(object? value) => IndexOf(GetKey((T)value!));
-    int IndexOf(K key, bool validate)
+    public int IndexOf(T item) => IndexOf(item, validate: true);
+    int IList.IndexOf(object? value) => IndexOf((T)value!);
+    int IndexOf(T item, bool validate)
     {
-        if (validate) key = ValidateKey(key);
-        return IndexOf(x => Comparer.Equals(key, GetKey(x)));
+        if (validate) item = ValidateItem(item);
+        return IndexOf(x => Comparer.Equals(x, item));
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    public int LastIndexOf(T item) => LastIndexOf(item, validate: true);
+    int LastIndexOf(T item, bool validate)
+    {
+        if (validate) item = ValidateItem(item);
+        return LastIndexOf(x => Comparer.Equals(x, item));
     }
 
     /// <summary>
@@ -167,23 +163,11 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public int LastIndexOf(K key) => LastIndexOf(key, validate: true);
-    int LastIndexOf(K key, bool validate)
+    public List<int> IndexesOf(T item) => IndexesOf(item, validate: true);
+    List<int> IndexesOf(T item, bool validate)
     {
-        if (validate) key = ValidateKey(key);
-        return LastIndexOf(x => Comparer.Equals(key, GetKey(x)));
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    public List<int> IndexesOf(K key) => IndexesOf(key, validate: true);
-    List<int> IndexesOf(K key, bool validate)
-    {
-        if (validate) key = ValidateKey(key);
-        return IndexesOf(x => Comparer.Equals(key, GetKey(x)));
+        if (validate) item = ValidateItem(item);
+        return IndexesOf(x => Comparer.Equals(x, item));
     }
 
     /// <summary>
@@ -266,12 +250,12 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns the indexes of the elements whose keys can be considered as duplicates of the
-    /// given one. By default, this method just invokes '<see cref="IndexesOf(K)"/>'.
+    /// Returns the indexes of the elements that can be considered as duplicates of the given one.
+    /// By default, this method just invokes '<see cref="IndexesOf(T)"/>'.
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    protected virtual List<int> FindDuplicates(K key) => IndexesOf(key);
+    protected virtual List<int> FindDuplicates(T item) => IndexesOf(item);
 
     /// <summary>
     /// Determines if the existing source element can be considered the same as the given target
@@ -336,8 +320,7 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
         if (ExpandElements && item is IEnumerable<T> range) return AddRange(range);
 
         item = ValidateItem(item);
-        var key = ValidateKey(GetKey(item));
-        var dups = FindDuplicates(key);
+        var dups = FindDuplicates(item);
 
         foreach (var dup in dups)
         {
@@ -379,8 +362,7 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
         if (ExpandElements && item is IEnumerable<T> range) return InsertRange(index, range);
 
         item = ValidateItem(item);
-        var key = ValidateKey(GetKey(item));
-        var dups = FindDuplicates(key);
+        var dups = FindDuplicates(item);
 
         foreach (var dup in dups)
         {
@@ -445,45 +427,89 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    public virtual int Remove(K key)
+    public virtual int Remove(T item)
     {
-        var index = IndexOf(key);
-        return index >= 0 ? RemoveAt(index) : 0;
+        // Removing a range...
+        if (ExpandElements && item is IEnumerable<T> range)
+        {
+            var num = 0; foreach (var temp in range)
+            {
+                var r = Remove(temp);
+                num += r;
+            }
+            return num;
+        }
+
+        // Standard case...
+        else
+        {
+            var index = IndexOf(item);
+            return index >= 0 ? RemoveAt(index) : 0;
+        }
     }
-    bool ICollection<T>.Remove(T item) => Remove(GetKey(item)) > 0;
-    void IList.Remove(object? value) => Remove(GetKey((T)value!));
+    bool ICollection<T>.Remove(T item) => Remove(item) > 0;
+    void IList.Remove(object? value) => Remove((T)value!);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    public virtual int RemoveLast(K key)
+    public virtual int RemoveLast(T item)
     {
-        var index = LastIndexOf(key);
-        return index >= 0 ? RemoveAt(index) : 0;
+        // Removing a range...
+        if (ExpandElements && item is IEnumerable<T> range)
+        {
+            var num = 0; foreach (var temp in range)
+            {
+                var r = RemoveLast(temp);
+                num += r;
+            }
+            return num;
+        }
+
+        // Standard case...
+        else
+        {
+            var index = LastIndexOf(item);
+            return index >= 0 ? RemoveAt(index) : 0;
+        }
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
     /// We assume that 'IndexesOf' produces an ordered list of indexes.
-    public virtual int RemoveAll(K key)
+    public virtual int RemoveAll(T item)
     {
-        key = ValidateKey(key);
-        var nums = IndexesOf(key, validate: false);
-
-        var num = 0;
-        for (int i = nums.Count - 1; i >= 0; i--)
+        // Removing a range...
+        if (ExpandElements && item is IEnumerable<T> range)
         {
-            var index = nums[i];
-            num += RemoveAt(index);
+            var num = 0; foreach (var temp in range)
+            {
+                var r = RemoveAll(temp);
+                num += r;
+            }
+            return num;
         }
-        return num;
+
+        // Standard case...
+        else
+        {
+            var nums = IndexesOf(item);
+
+            var num = 0;
+            for (int i = nums.Count - 1; i >= 0; i--)
+            {
+                var index = nums[i];
+                num += RemoveAt(index);
+            }
+            return num;
+        }
     }
 
     /// <summary>

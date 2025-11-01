@@ -33,6 +33,7 @@ internal class Program
 
         //Includes.Add(new("Yotei.Tools.LambdaParser.*", null, null));
         //Includes.Add(new("Yotei.Tools.CloneGenerator.*", null, null));
+        //Includes.Add(new("Yotei.ORM.Tests.*", null, null));
 
         var position = 0; do
         {

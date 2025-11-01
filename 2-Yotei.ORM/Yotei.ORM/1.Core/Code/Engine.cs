@@ -7,7 +7,7 @@
 [InheritWiths<IEngine>]
 public partial class Engine : IEngine
 {
-    public const bool IGNORECASE = true;
+    public const bool CASESENSITIVE = false;
     public const string NULLVALUELITERAL = "NULL";
     public const bool POSITIONALPARAMETERS = false;
     public const string PARAMETERPREFIX = "#";
@@ -30,7 +30,7 @@ public partial class Engine : IEngine
     /// </summary>
     public Engine()
     {
-        IgnoreCase = IGNORECASE;
+        CaseSensitive = CASESENSITIVE;
         NullValueLiteral = NULLVALUELITERAL;
         PositionalParameters = POSITIONALPARAMETERS;
         ParameterPrefix = PARAMETERPREFIX;
@@ -48,7 +48,7 @@ public partial class Engine : IEngine
     {
         source.ThrowWhenNull();
 
-        IgnoreCase = source.IgnoreCase;
+        CaseSensitive = source.CaseSensitive;
         NullValueLiteral = source.NullValueLiteral;
         PositionalParameters = source.PositionalParameters;
         ParameterPrefix = source.ParameterPrefix;
@@ -76,10 +76,10 @@ public partial class Engine : IEngine
         if (other is null) return false;
 
         return
-            IgnoreCase == other.IgnoreCase &&
-            string.Compare(NullValueLiteral, other.NullValueLiteral, IgnoreCase) == 0 &&
+            CaseSensitive == other.CaseSensitive &&
+            string.Compare(NullValueLiteral, other.NullValueLiteral, CaseSensitive) == 0 &&
             PositionalParameters == other.PositionalParameters &&
-            string.Compare(ParameterPrefix, other.ParameterPrefix, IgnoreCase) == 0 &&
+            string.Compare(ParameterPrefix, other.ParameterPrefix, CaseSensitive) == 0 &&
             NativePaging == other.NativePaging &&
             UseTerminators == other.UseTerminators &&
             LeftTerminator == other.LeftTerminator &&
@@ -100,7 +100,7 @@ public partial class Engine : IEngine
     public override int GetHashCode()
     {
         var code = 0;
-        code = HashCode.Combine(code, IgnoreCase);
+        code = HashCode.Combine(code, CaseSensitive);
         code = HashCode.Combine(code, NullValueLiteral);
         code = HashCode.Combine(code, PositionalParameters);
         code = HashCode.Combine(code, ParameterPrefix);
@@ -116,7 +116,7 @@ public partial class Engine : IEngine
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public bool IgnoreCase { get; init; }
+    public bool CaseSensitive { get; init; }
 
     /// <summary>
     /// <inheritdoc/>

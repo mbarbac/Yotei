@@ -8,9 +8,10 @@
 public partial interface IEngine : IEquatable<IEngine>
 {
     /// <summary>
-    /// Determines if this engine ignores the case of identifier-alike names and reserved keywords.
+    /// Determines if the identifier-alike elements and reserved keywords are case sensitive,
+    /// or not.
     /// </summary>
-    [With] bool IgnoreCase { get; }
+    [With] bool CaseSensitive { get; }
 
     /// <summary>
     /// The literal used by this engine to represents NULL values.

@@ -8,7 +8,7 @@ namespace Runner;
 // ========================================================
 public class ClearDiskArtifacts : ConsoleMenuEntry
 {
-    static StringComparison Comparison = StringComparison.OrdinalIgnoreCase;
+    static readonly StringComparison Comparison = StringComparison.OrdinalIgnoreCase;
     static string? Root;
 
     /// <summary>
