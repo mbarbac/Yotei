@@ -173,17 +173,6 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
     // ----------------------------------------------------
 
     /// <summary>
-    /// Invoked to obtain an instance to return.
-    /// </summary>
-    IInvariantList<T> ToReturn(IEnumerable<T> range)
-    {
-        var clone = Clone();
-        clone.Clear();
-        clone.AddRange(range);
-        return clone;
-    }
-
-    /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="index"></param>
@@ -194,18 +183,19 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
         if (index < 0) throw new IndexOutOfRangeException(nameof(index)).WithData(index);
         if (count < 0) throw new ArgumentOutOfRangeException(nameof(index)).WithData(count);
         if (count > (Items.Count - index)) throw new ArgumentException(
-            "Index plus count is bigger than collections' lenght.")
+            "Index plus count is bigger than collections' length.")
             .WithData(index)
             .WithData(count)
             .WithData(this);
 
-        if (count == 0) return this;
+        if (index == 0 && count == Items.Count) return this;
+        if (count == 0) return Clear();
 
-        var clone = Items.Clone(); clone.Clear();
         var range = Items.ToList(index, count);
-        var num = clone.AddRange(range);
-
-        return num == 0 ? this : ToReturn(clone);
+        var clone = (InvariantList<T>)Clone();
+        clone.Items.Clear();
+        clone.Items.AddRange(range);
+        return clone;
     }
 
     /// <summary>
@@ -216,10 +206,9 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
     /// <returns></returns>
     public virtual IInvariantList<T> Replace(int index, T item)
     {
-        var clone = Items.Clone();
-        var num = clone.Replace(index, item);
-
-        return num == 0 ? this : ToReturn(clone);
+        var clone = (InvariantList<T>)Clone();
+        var num = clone.Items.Replace(index, item);
+        return num > 0 ? clone : this;
     }
 
     /// <summary>
@@ -229,10 +218,9 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
     /// <returns></returns>
     public virtual IInvariantList<T> Add(T item)
     {
-        var clone = Items.Clone();
-        var num = clone.Add(item);
-
-        return num == 0 ? this : ToReturn(clone);
+        var clone = (InvariantList<T>)Clone();
+        var num = clone.Items.Add(item);
+        return num > 0 ? clone : this;
     }
 
     /// <summary>
@@ -242,10 +230,9 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
     /// <returns></returns>
     public virtual IInvariantList<T> AddRange(IEnumerable<T> range)
     {
-        var clone = Items.Clone();
-        var num = clone.AddRange(range);
-
-        return num == 0 ? this : ToReturn(clone);
+        var clone = (InvariantList<T>)Clone();
+        var num = clone.Items.AddRange(range);
+        return num > 0 ? clone : this;
     }
 
     /// <summary>
@@ -256,10 +243,9 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
     /// <returns></returns>
     public virtual IInvariantList<T> Insert(int index, T item)
     {
-        var clone = Items.Clone();
-        var num = clone.Insert(index, item);
-
-        return num == 0 ? this : ToReturn(clone);
+        var clone = (InvariantList<T>)Clone();
+        var num = clone.Items.Insert(index, item);
+        return num > 0 ? clone : this;
     }
 
     /// <summary>
@@ -270,10 +256,9 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
     /// <returns></returns>
     public virtual IInvariantList<T> InsertRange(int index, IEnumerable<T> range)
     {
-        var clone = Items.Clone();
-        var num = clone.InsertRange(index, range);
-
-        return num == 0 ? this : ToReturn(clone);
+        var clone = (InvariantList<T>)Clone();
+        var num = clone.Items.InsertRange(index, range);
+        return num > 0 ? clone : this;
     }
 
     /// <summary>
@@ -283,10 +268,9 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
     /// <returns></returns>
     public virtual IInvariantList<T> RemoveAt(int index)
     {
-        var clone = Items.Clone();
-        var num = clone.RemoveAt(index);
-
-        return num == 0 ? this : ToReturn(clone);
+        var clone = (InvariantList<T>)Clone();
+        var num = clone.Items.RemoveAt(index);
+        return num > 0 ? clone : this;
     }
 
     /// <summary>
@@ -297,10 +281,9 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
     /// <returns></returns>
     public virtual IInvariantList<T> RemoveRange(int index, int count)
     {
-        var clone = Items.Clone();
-        var num = clone.RemoveRange(index, count);
-
-        return num == 0 ? this : ToReturn(clone);
+        var clone = (InvariantList<T>)Clone();
+        var num = clone.Items.RemoveRange(index, count);
+        return num > 0 ? clone : this;
     }
 
     /// <summary>
@@ -310,10 +293,9 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
     /// <returns></returns>
     public virtual IInvariantList<T> Remove(T item)
     {
-        var clone = Items.Clone();
-        var num = clone.Remove(item);
-
-        return num == 0 ? this : ToReturn(clone);
+        var clone = (InvariantList<T>)Clone();
+        var num = clone.Items.Remove(item);
+        return num > 0 ? clone : this;
     }
 
     /// <summary>
@@ -323,10 +305,9 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
     /// <returns></returns>
     public virtual IInvariantList<T> RemoveLast(T item)
     {
-        var clone = Items.Clone();
-        var num = clone.RemoveLast(item);
-
-        return num == 0 ? this : ToReturn(clone);
+        var clone = (InvariantList<T>)Clone();
+        var num = clone.Items.RemoveLast(item);
+        return num > 0 ? clone : this;
     }
 
     /// <summary>
@@ -336,10 +317,9 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
     /// <returns></returns>
     public virtual IInvariantList<T> RemoveAll(T item)
     {
-        var clone = Items.Clone();
-        var num = clone.RemoveAll(item);
-
-        return num == 0 ? this : ToReturn(clone);
+        var clone = (InvariantList<T>)Clone();
+        var num = clone.Items.RemoveAll(item);
+        return num > 0 ? clone : this;
     }
 
     /// <summary>
@@ -349,10 +329,9 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
     /// <returns></returns>
     public virtual IInvariantList<T> Remove(Predicate<T> predicate)
     {
-        var clone = Items.Clone();
-        var num = clone.Remove(predicate);
-
-        return num == 0 ? this : ToReturn(clone);
+        var clone = (InvariantList<T>)Clone();
+        var num = clone.Items.Remove(predicate);
+        return num > 0 ? clone : this;
     }
 
     /// <summary>
@@ -362,10 +341,9 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
     /// <returns></returns>
     public virtual IInvariantList<T> RemoveLast(Predicate<T> predicate)
     {
-        var clone = Items.Clone();
-        var num = clone.RemoveLast(predicate);
-
-        return num == 0 ? this : ToReturn(clone);
+        var clone = (InvariantList<T>)Clone();
+        var num = clone.Items.RemoveLast(predicate);
+        return num > 0 ? clone : this;
     }
 
     /// <summary>
@@ -375,10 +353,9 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
     /// <returns></returns>
     public virtual IInvariantList<T> RemoveAll(Predicate<T> predicate)
     {
-        var clone = Items.Clone();
-        var num = clone.RemoveAll(predicate);
-
-        return num == 0 ? this : ToReturn(clone);
+        var clone = (InvariantList<T>)Clone();
+        var num = clone.Items.RemoveAll(predicate);
+        return num > 0 ? clone : this;
     }
 
     /// <summary>
@@ -387,9 +364,8 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
     /// <returns></returns>
     public virtual IInvariantList<T> Clear()
     {
-        var clone = Items.Clone();
-        var num = clone.Clear();
-
-        return num == 0 ? this : ToReturn(clone);
+        var clone = (InvariantList<T>)Clone();
+        var num = clone.Items.Clear();
+        return num > 0 ? clone : this;
     }
 }
