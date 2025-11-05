@@ -54,6 +54,11 @@ internal class Program
         while (position > 0);
     }
 
+    public class TA { public void My() { } }
+    public sealed class TB : TA { public new void My() { } }
+
+    
+
     // ----------------------------------------------------
 
     /// <summary>

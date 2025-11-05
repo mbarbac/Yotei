@@ -1,6 +1,4 @@
-﻿using System.Reflection.Metadata;
-
-namespace Yotei.Tools.CloneGenerator;
+﻿namespace Yotei.Tools.CloneGenerator;
 
 // ========================================================
 internal partial class CloneGenerator
@@ -37,10 +35,10 @@ internal class XTypeNode : TypeNode
         ReturnOptions = EasyNameOptions.Default;
         UseVirtual = true;
     }
-    INamedTypeSymbol ReturnType;
-    bool ReturnNullable;
-    EasyNameOptions ReturnOptions;
-    bool UseVirtual;
+    internal INamedTypeSymbol ReturnType;
+    internal bool ReturnNullable;
+    internal EasyNameOptions ReturnOptions;
+    internal bool UseVirtual;
 
     // ----------------------------------------------------
 
@@ -113,34 +111,10 @@ internal class XTypeNode : TypeNode
     {
         var rtype = ReturnType.EasyName(ReturnOptions);
         var rnull = ReturnNullable ? "?" : string.Empty;
-        var modifiers = GetInterfaceModifiers();
+        var modifiers = this.GetInterfaceModifiers();
 
         EmitDocumentation(cb);
         cb.AppendLine($"{modifiers}{rtype}{rnull} Clone();");
-    }
-
-    /// <summary>
-    /// Gets the appropriate method modifiers when the host instance is an interface one, or
-    /// '<c>null</c>' if any can be obtained or are not needed. If not null, a space separator
-    /// is added to the returned string.
-    /// </summary>
-    /// <returns></returns>
-    string? GetInterfaceModifiers()
-    {
-        var found = Symbol.Finder<string?>(false, (parent, out value) =>
-        {
-            if (parent.FindMethod(true, out _) ||
-                parent.FindCloneableAttribute(true, out _))
-            {
-                value = "new ";
-                return true;
-            }
-
-            value = null!;
-            return false;
-        },
-        out var value, Symbol.AllInterfaces);
-        return found ? value : null;
     }
 
     // ----------------------------------------------------
@@ -152,55 +126,12 @@ internal class XTypeNode : TypeNode
     {
         var rtype = ReturnType.EasyName(ReturnOptions);
         var rnull = ReturnNullable ? "?" : string.Empty;
-        var modifiers = GetAbstractModifiers();
+        var modifiers = this.GetAbstractModifiers();
 
         EmitDocumentation(cb);
         cb.AppendLine($"{modifiers}{rtype}{rnull} Clone();");
 
         EmitExplicitInterfaces(context, cb);
-    }
-
-    /// <summary>
-    /// Gets the appropriate method modifiers when the host instance is an abstract one, or
-    /// '<c>null</c>' if any can be obtained or are not needed. If not null, a space separator
-    /// is added to the returned string.
-    /// </summary>
-    /// <returns></returns>
-    string? GetAbstractModifiers()
-    {
-        var found = Symbol.Finder<string?>(false, (parent, out value) =>
-        {
-            value = null;
-
-            // Existing base method...
-            if (parent.FindMethod(true, out var method))
-            {
-                var access = method.DeclaredAccessibility;
-                if (access == Accessibility.Private) return false;
-
-                var str = access.EasyName(addspace: true);
-                var isvirtual = method.IsVirtual || method.IsOverride | method.IsAbstract;
-                value = isvirtual ? $"{str}abstract override " : $"{str}abstract ";
-                return true;
-            }
-
-            // Or method requested...
-            if (parent.FindCloneableAttribute(true, out var at))
-            {
-                if (parent.IsInterface) { value = "public abstract "; return true; }
-                if (!parent.IsAbstract) { value = "public abstract new "; return true; }
-
-                var usevirtual = UseVirtual;
-                if (at.GetUseVirtual(out var temp)) usevirtual = temp;
-                value = usevirtual ? "public abstract override " : "public abstract ";
-                return true;
-            }
-
-            // Not found, try next...
-            return false;
-        },
-        out var value, Symbol.AllBaseTypes, Symbol.AllInterfaces);
-        return found ? value : "public abstract ";
     }
 
     // ----------------------------------------------------
@@ -215,7 +146,7 @@ internal class XTypeNode : TypeNode
 
         var rtype = ReturnType.EasyName(ReturnOptions);
         var rnull = ReturnNullable ? "?" : string.Empty;
-        var modifiers = GetRegularModifiers(context);
+        var modifiers = this.GetRegularModifiers(context);
         var hostname = Symbol.EasyName();
 
         EmitDocumentation(cb);
@@ -230,75 +161,6 @@ internal class XTypeNode : TypeNode
         cb.AppendLine("}");
 
         EmitExplicitInterfaces(context, cb);
-    }
-
-    /// <summary>
-    /// Gets the appropriate method modifiers when the host instance is a regular one, or
-    /// '<c>null</c>' if any can be obtained or are not needed. If not null, a space separator
-    /// is added to the returned string.
-    /// </summary>
-    /// <returns></returns>
-    string? GetRegularModifiers(SourceProductionContext context)
-    {
-        var found = Symbol.Finder<string?>(false, (parent, out value) =>
-        {
-            value = null;
-
-            // Existing base method...
-            if (parent.FindMethod(true, out var method))
-            {
-                var access = method.DeclaredAccessibility;
-                if (access == Accessibility.Private) return false;
-
-                var str = access.EasyName(addspace: true);
-                var isvirtual = method.IsVirtual || method.IsOverride | method.IsAbstract;
-
-                if (!UseVirtual)
-                {
-                    value = isvirtual ? $"{str}override sealed " : $"{str}new ";
-                    return true;
-                }
-
-                value = isvirtual ? $"{str}override " : $"{str}new ";
-                return true;
-            }
-
-            // Or method requested...
-            if (parent.FindCloneableAttribute(true, out var at))
-            {
-                //if (!at.GetReturnType(out var type, out var nullable)) type = Symbol;
-                //if (!Symbol.IsAssignableTo(ReturnType))
-                //{
-                //    CoreDiagnostics.InvalidReturnType(Symbol, ReturnType).Report(context);
-                //    return false;
-                //}
-
-                if (parent.IsInterface)
-                {
-                    value = Symbol.IsSealed || !UseVirtual ? "public " : "public virtual ";
-                    return true;
-                }
-                if (parent.IsAbstract)
-                {
-                    value = "public override ";
-                    return true;
-                }
-
-                var usevirtual = UseVirtual;
-                if (at.GetUseVirtual(out var temp)) usevirtual = temp;
-
-                if (UseVirtual && !usevirtual) value = "public virtual new ";
-                else value = usevirtual ? "public override " : "public new ";
-                return true;
-            }
-
-            // Not found, try next...
-            return false;
-        },
-        out var value, Symbol.AllBaseTypes, Symbol.AllInterfaces);
-        if (found) return value;
-
-        return !UseVirtual || Symbol.IsSealed ? "public " : "public virtual ";
     }
 
     // ----------------------------------------------------
