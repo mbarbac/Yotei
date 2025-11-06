@@ -20,7 +20,7 @@ public partial class Test_InterfaceHost
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
     }
-
+    
     // ----------------------------------------------------
     // UseVirtual has no effect on interfaces...
 
@@ -38,7 +38,7 @@ public partial class Test_InterfaceHost
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
     }
-
+    
     // ----------------------------------------------------
     // Enforcing return type as parameter...
 
@@ -59,7 +59,7 @@ public partial class Test_InterfaceHost
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
     }
-
+    
     // ----------------------------------------------------
     // Enforcing return type as generic...
 

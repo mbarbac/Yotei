@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools.WithGenerator;
+﻿#pragma warning disable IDE0075
+
+namespace Yotei.Tools.WithGenerator;
 
 // TODO: copy CloneGenerator logic into WithGenerator.
 // CloneGenerator is more recent, may have better logic.
@@ -135,38 +137,27 @@ internal static class XNode
         /// <returns></returns>
         public string? GetInterfaceModifiers()
         {
-            var comparer = SymbolEqualityComparer.Default;
-            var name = node.Symbol.Name;
-            var host = node.Host;
-
-            // Shortcut for inherited members...
-            if (node.IsInherited) return "new ";
-
-            // There might be a member already declared...
-            var found = host.Finder<bool>(false, (parent, out value) =>
+            var argtype = (node.Symbol as IPropertySymbol)?.Type ?? ((IFieldSymbol)node.Symbol).Type;
+            var found = node.Host.Finder<string?>(false, (parent, out value) =>
             {
-                var itype = (node.Symbol as IPropertySymbol)?.Type ?? ((IFieldSymbol)node.Symbol).Type;
-
-                if (parent.FindDecoratedMember(true, name, out var member))
+                // If existing or requested...
+                if (parent.FindMethod(true, node.MethodName, argtype, out _) ||
+                    parent.FindWithAttribute(true, node.Symbol.Name, out _) ||
+                    parent.FindInheritWithsAttribute(true, out _))
                 {
-                    var mtype = (member as IPropertySymbol)?.Type ?? ((IFieldSymbol)member).Type;
-                    value = comparer.Equals(itype, mtype);
+                    value = "new ";
                     return true;
                 }
 
-                if (parent.FindMethod(true, node.MethodName, itype, out var method))
-                {
-                    value = comparer.Equals(itype, method.Parameters[0].Type);
-                    return true;
-                }
-
-                value = default;
+                // Not found, try next...
+                value = null;
                 return false;
             },
             out var value, node.Host.AllInterfaces);
+            if (found) return value;
 
-            // Finishing...
-            return found && value ? "new " : null;
+            // Default...
+            return null;
         }
 
         // ------------------------------------------------
@@ -177,59 +168,53 @@ internal static class XNode
         /// is added to the returned string.
         /// </summary>
         /// <returns></returns>
+        /// Base Method     Derived Class   Modifier
+        /// --------------- --------------- ---------------
+        /// abstract        abstract        abstract override / override
+        /// abstract        abstract        abstract override / override
+        /// --------------- --------------- ----------------
+        /// concrete-virt   abstract        abstract override
+        /// concrete-nonv   abstract        abstract new
+        /// --------------- --------------- ----------------
         public string? GetAbstractModifiers()
         {
-            var host = node.Host;
-            var name = node.Symbol.Name;
-            var itype = (node.Symbol as IPropertySymbol)?.Type ?? ((IFieldSymbol)node.Symbol).Type;
-
-            // Shortcut if the member is a captured one...
-            if (!node.IsInherited) goto FINISH;
-
-            // With inherited members, we need to understand what has been declared or implemented
-            // in the chain: it drives what modifiers we need to use...
-            var found = host.Finder<string?>(false, (parent, out value) =>
+            var argtype = (node.Symbol as IPropertySymbol)?.Type ?? ((IFieldSymbol)node.Symbol).Type;
+            var found = node.Host.Finder<string?>(false, (parent, out value) =>
             {
-                value = null!;
+                value = null;
 
-                // Existing method rules...
-                if (parent.FindMethod(true, node.MethodName, itype, out var method))
+                // Existing parent method...
+                if (parent.FindMethod(true, node.MethodName, argtype, out var method))
                 {
-                    var access = method.DeclaredAccessibility;
-                    if (access == Accessibility.Private) return false;
+                    var dec = method.DeclaredAccessibility;
+                    if (dec == Accessibility.Private) return false;
+                    var str = dec.EasyName(addspace: true) ?? "public ";
 
-                    var str = access.EasyName(addspace: true);
-                    var usevirtual = method.IsVirtual || method.IsOverride | method.IsAbstract;
-                    value = usevirtual ? $"{str}abstract override " : $"{str}abstract ";
+                    if (parent.IsInterface) { value = $"{str}abstract "; return true; }
+
+                    var basevirt = method.IsVirtual || method.IsAbstract || method.IsOverride;
+                    value = !basevirt ? $"{str}abstract new " : $"{str}abstract override ";
                     return true;
                 }
 
-                // There might be a decorated member or requested one...
-                if (parent.FindWithAttribute(true, name, out var at) ||
+                // Element requested...
+                if (parent.FindWithAttribute(true, node.Symbol.Name, out var at) ||
                     parent.FindInheritWithsAttribute(true, out at))
                 {
-                    // For simplicity, we assume interface parents bring no modifiers...
-                    if (parent.IsInterface) { value = "public abstract "; return true; }
+                    if (parent.IsInterface) { value = $"public abstract "; return true; }
 
-                    // Parent not an abstract one...
-                    if (!parent.IsAbstract) { value = "public abstract new "; return true; }
-
-                    // Otherwise, we may need to override...
-                    var usevirtual = node.UseVirtual;
-                    if (at.GetUseVirtual(out var temp)) usevirtual = temp;
-
-                    value = usevirtual ? "public abstract override " : "public abstract ";
+                    var basevirt = at.GetUseVirtual(out var temp) ? temp : true;
+                    value = !basevirt ? "public abstract new " : "public abstract override ";
                     return true;
                 }
 
                 // Not found, try next...
                 return false;
             },
-            out var value, host.AllBaseTypes, host.AllInterfaces);
+            out var value, node.Host.AllBaseTypes, node.Host.AllInterfaces);
             if (found) return value;
 
-            // Finishing...
-            FINISH:
+            // Default...
             return "public abstract ";
         }
 
@@ -241,73 +226,85 @@ internal static class XNode
         /// is added to the returned string.
         /// </summary>
         /// <returns></returns>
-        public string? GetRegularModifiers(SourceProductionContext context)
+        /// Base Method  Derived Class   Sealed  Modifier
+        /// ------------ --------------- ------- -----------
+        /// Not-virt     Not-virt        No      new
+        /// Not-virt     virt            No      new virtual
+        /// Not-virt     Not-virt        Yes     new
+        /// Not-virt     virt            Yes     new
+        /// ------------ --------------- ------- -----------
+        /// Virt         Not-virt        No      new
+        /// Virt         virt            No      override
+        /// Virt         Not-virt        Yes     override
+        /// Virt         virt            Yes     override
+        /// ------------ --------------- ------- -----------
+        public string? GetRegularModifiers(SourceProductionContext _)
         {
-            var host = node.Host;
-            var name = node.Symbol.Name;
-            var itype = (node.Symbol as IPropertySymbol)?.Type ?? ((IFieldSymbol)node.Symbol).Type;
+            var nodevirt = node.UseVirtual;
+            var nodesealed = node.Symbol.IsSealed;
+            var argtype = (node.Symbol as IPropertySymbol)?.Type ?? ((IFieldSymbol)node.Symbol).Type;
 
-            // Shortcut if the member is a captured one...
-            if (!node.IsInherited) goto FINISH;
-
-            // With inherited members, we need to understand what has been declared or implemented
-            // in the chain: it drives what modifiers we need to use...
-            var found = host.Finder<string?>(false, (parent, out value) =>
+            var found = node.Host.Finder<string?>(false, (parent, out value) =>
             {
                 value = null;
 
-                // Existing method rules...
-                if (parent.FindMethod(true, node.MethodName, itype, out var method))
+                // Existing parent method...
+                if (parent.FindMethod(true, node.MethodName, argtype, out var method))
                 {
-                    var access = method.DeclaredAccessibility;
-                    if (access == Accessibility.Private) return false;
+                    var dec = method.DeclaredAccessibility;
+                    if (dec == Accessibility.Private) return false;
+                    var str = dec.EasyName(addspace: true) ?? "public ";
 
-                    var str = access.EasyName(addspace: true);
-                    var usevirtual = method.IsVirtual || method.IsOverride | method.IsAbstract;
-                    value = usevirtual ? $"{str} override " : $"{str} ";
-                    return true;
-                }                
-
-                // There might be a decorated member or requested one...
-                if (parent.FindWithAttribute(true, name, out var at) ||
-                    parent.FindInheritWithsAttribute(true, out at))
-                {
-                    //// Validating return type...
-                    //if (!at.GetReturnType(out var type, out var nullable)) type = host;
-                    //if (!host.IsAssignableTo(node.ReturnType))
-                    //{
-                    //    CoreDiagnostics.InvalidReturnType(host, node.ReturnType).Report(context);
-                    //    CoreDiagnostics.InvalidReturnType(node.Symbol, node.ReturnType).Report(context);
-                    //    return false;
-                    //}
-
-                    // For simplicity, we assume interface parents bring no modifiers...
                     if (parent.IsInterface)
                     {
-                        value = !node.UseVirtual || host.IsSealed ? "public " : "public virtual ";
+                        value = !nodevirt || nodesealed ? str : $"{str}virtual ";
                         return true;
                     }
 
-                    // If parent is abstract we always need to override...
-                    if (parent.IsAbstract) { value = "public override "; return true; }
+                    var basevirt = method.IsVirtual || method.IsAbstract || method.IsOverride;
+                    if (!basevirt)
+                    {
+                        value = nodevirt && !nodesealed ? $"{str}new virtual " : $"{str}new ";
+                        return true;
+                    }
+                    else
+                    {
+                        value = !nodevirt && !nodesealed ? $"{str}new " : $"{str}override ";
+                        return true;
+                    }
+                }
 
-                    // Otherwise, we may need to override...
-                    var usevirtual = node.UseVirtual;
-                    if (at.GetUseVirtual(out var temp)) usevirtual = temp;
+                // Elemment requested...
+                if (parent.FindWithAttribute(true, node.Symbol.Name, out var at) ||
+                    parent.FindInheritWithsAttribute(true, out at))
+                {
+                    if (parent.IsInterface)
+                    {
+                        value = !nodevirt || nodesealed ? "public " : "public virtual ";
+                        return true;
+                    }
 
-                    value = !usevirtual ? "public new " : "public override ";
-                    return true;
+                    var basevirt = at.GetUseVirtual(out var temp) ? temp : true;
+                    if (!basevirt)
+                    {
+                        value = nodevirt && !nodesealed ? "public new virtual " : "public new ";
+                        return true;
+                    }
+                    else
+                    {
+                        value = !nodevirt && !nodesealed ? "public new " : "public override ";
+                        return true;
+                    }
                 }
 
                 // Not found, try next...
                 return false;
             },
-            out var value, host.AllBaseTypes, host.AllInterfaces);
+            out var value, node.Host.AllBaseTypes, node.Host.AllInterfaces);
             if (found) return value;
 
-            // Finishing...
-            FINISH:
-            return !node.UseVirtual || host.IsSealed ? "public " : "public virtual ";
+            // Default...
+            return !nodevirt || nodesealed ? "public " : "public virtual ";
         }
     }
 

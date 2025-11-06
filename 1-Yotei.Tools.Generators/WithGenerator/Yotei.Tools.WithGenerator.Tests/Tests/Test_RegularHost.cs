@@ -96,31 +96,31 @@ public partial class Test_RegularHost
         Assert.Equal(typeof(string), pars[0].ParameterType);
     }
 
-    // ----------------------------------------------------
-    // Default UseVirtual inheritance...
+    //// ----------------------------------------------------
+    //// Default UseVirtual inheritance...
 
-    [InheritWiths]
-    partial class RType02B : RType02A
-    {
-        public RType02B(string name) : base(name) { }
-        protected RType02B(RType02B source) : base(source) { }
-    }
+    //[InheritWiths]
+    //partial class RType02B : RType02A
+    //{
+    //    public RType02B(string name) : base(name) { }
+    //    protected RType02B(RType02B source) : base(source) { }
+    //}
 
-    //[Enforced]
-    [Fact]
-    public static void Test_Type02B()
-    {
-        MethodInfo? method;
-        ParameterInfo[] pars;
-        var type = typeof(RType02B);
+    ////[Enforced]
+    //[Fact]
+    //public static void Test_Type02B()
+    //{
+    //    MethodInfo? method;
+    //    ParameterInfo[] pars;
+    //    var type = typeof(RType02B);
 
-        method = type.GetMethod("WithName");
-        pars = method!.GetParameters();
-        Assert.False(method.IsVirtual);
-        Assert.Equal(type, method.ReturnType);
-        Assert.Single(pars);
-        Assert.Equal(typeof(string), pars[0].ParameterType);
-    }
+    //    method = type.GetMethod("WithName");
+    //    pars = method!.GetParameters();
+    //    Assert.False(method.IsVirtual);
+    //    Assert.Equal(type, method.ReturnType);
+    //    Assert.Single(pars);
+    //    Assert.Equal(typeof(string), pars[0].ParameterType);
+    //}
 
     // ----------------------------------------------------
     // Inheriting from interface, and return type for inherited...

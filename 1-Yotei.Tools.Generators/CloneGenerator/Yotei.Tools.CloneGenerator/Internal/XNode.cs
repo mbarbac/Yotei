@@ -166,9 +166,10 @@ internal static class XNode
                 value = null;
                 return false;
             },
-            out var value, node.Symbol.AllBaseTypes, node.Symbol.AllInterfaces);
+            out var value, node.Symbol.AllInterfaces);
             if (found) return value;
 
+            // Default...
             return null;
         }
 
@@ -224,6 +225,7 @@ internal static class XNode
             out var value, node.Symbol.AllBaseTypes, node.Symbol.AllInterfaces);
             if (found) return value;
 
+            // Default...
             return "public abstract ";
         }
 
@@ -310,6 +312,7 @@ internal static class XNode
             out var value, node.Symbol.AllBaseTypes, node.Symbol.AllInterfaces);
             if (found) return value;
 
+            // Default...
             return !nodevirt || nodesealed ? "public " : "public virtual ";
         }
     }
