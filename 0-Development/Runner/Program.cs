@@ -1,4 +1,6 @@
-﻿using static Yotei.Tools.ConsoleEx;
+﻿#pragma warning disable CA1822 // Mark members as static
+
+using static Yotei.Tools.ConsoleEx;
 using static System.ConsoleColor;
 
 namespace Runner;
@@ -53,13 +55,6 @@ internal class Program
         }
         while (position > 0);
     }
-
-    public class TA { public void My() { } }
-    public sealed class TB : TA { public new void My() { } }
-
-    
-
-    // ----------------------------------------------------
 
     /// <summary>
     /// Returns the path to the solution's directory.

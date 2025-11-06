@@ -20,7 +20,7 @@ public partial class Test_AbstractHost
 
         method = type.GetMethod("Clone"); Assert.NotNull(method);
         pars = method!.GetParameters(); Assert.Empty(pars);
-        Assert.True(method.IsVirtual);
+        Assert.True(method.IsAbstract);
         Assert.Equal(type, method.ReturnType);
     }
 
