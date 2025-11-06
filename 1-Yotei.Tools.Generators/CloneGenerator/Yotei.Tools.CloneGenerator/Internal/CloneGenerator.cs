@@ -9,7 +9,7 @@ internal partial class CloneGenerator : CoreGenerator.CoreGenerator
 {
 #if DEBUG_CLONE_GENERATOR
     /// <inheritdoc/>
-    protected override bool LaunchDebugger => true;
+    //protected override bool LaunchDebugger => true;
 #endif
 
     // ----------------------------------------------------
