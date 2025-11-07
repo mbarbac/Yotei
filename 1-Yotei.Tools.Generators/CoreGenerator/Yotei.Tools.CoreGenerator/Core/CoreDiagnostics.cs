@@ -236,6 +236,7 @@ internal static class CoreDiagnostics
     /// Invalid attribute.
     /// </summary>
     /// <param name="symbol"></param>
+    /// <param name="message"></param>
     /// <param name="severity"></param>
     /// <returns></returns>
     public static Diagnostic InvalidAttribute(

@@ -55,6 +55,11 @@
     <Project Path="2-Yotei.ORM.Entitites/Yotei.ORM.Entities.Tests/Yotei.ORM.Entities.Tests.csproj" />
     <Project Path="2-Yotei.ORM.Entitites/Yotei.ORM.Entities/Yotei.ORM.Entities.csproj" />
   </Folder>
+  <Folder Name="/2-Yotei.ORM.Generators/">
+    <Project Path="2-Yotei.ORM.Generators/Yotei.ORM.Generators/Yotei.ORM.Generators.csproj" Id="49787871-e3bd-4657-807b-0e5e4a0e3de6">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
+  </Folder>
   <Folder Name="/2-Yotei.ORM/">
     <Project Path="2-Yotei.ORM/Yotei.ORM.Tests/Yotei.ORM.Tests.csproj" Id="f6755fa5-ef4f-4c38-a22d-eff90c3e261f" />
     <Project Path="2-Yotei.ORM/Yotei.ORM/Yotei.ORM.csproj" Id="327edad2-6d25-4bcf-a515-ceaa56c6d8e8" />

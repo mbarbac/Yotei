@@ -86,8 +86,7 @@ internal class XTypeNode : TypeNode
     /// </summary>
     /// <param name="context"></param>
     /// <param name="cb"></param>
-    /// <param name="needNL"></param>
-    protected override void EmitCore(SourceProductionContext context, CodeBuilder cb, bool needNL)
+    protected override void EmitCore(SourceProductionContext context, CodeBuilder cb)
     {
         // Explicitly declared or implemented...
         if (Symbol.FindMethod(true, out _)) return;
@@ -96,7 +95,6 @@ internal class XTypeNode : TypeNode
         CaptureEmit();
 
         // Dispatching...
-        if (needNL) cb.AppendLine();
         if (Symbol.IsInterface) EmitHostInterface(context, cb);
         else if (Symbol.IsAbstract) EmitHostAbstract(context, cb);
         else EmitHostRegular(context, cb);

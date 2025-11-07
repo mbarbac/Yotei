@@ -11,6 +11,4 @@
 /// importing this shared project, this type will appear as duplicated. So, if those generators
 /// need this capability, they need to declare a type with this name and a single generatic
 /// argument in their own namespaces.
-internal class IsNullable<T>
-{
-}
+internal class IsNullable<T> { }

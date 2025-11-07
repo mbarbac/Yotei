@@ -181,9 +181,11 @@ internal class TypeNode : INode
         cb.AppendLine("{");
         cb.IndentLevel++;
         {
-            var old = cb.Length; EmitChilds(context, cb);
+            var old = cb.Length; EmitCore(context, cb);
             var len = cb.Length;
-            EmitCore(context, cb, old != len);
+
+            if (old != len) cb.AppendLine();
+            EmitChilds(context, cb);
         }
         cb.IndentLevel--;
         cb.AppendLine("}");
@@ -217,12 +219,11 @@ internal class TypeNode : INode
 
     /// <summary>
     /// Invoked to emit the source code of this type, without taking into consideration its child
-    /// elements. If '<paramref name="needNL"/>' is '<c>true</c>', then it is expected that this
-    /// method emits a new line before appending its own contents.
+    /// elements.
     /// </summary>
     /// <param name="context"></param>
     /// <param name="cb"></param>
-    protected virtual void EmitCore(SourceProductionContext context, CodeBuilder cb, bool needNL)
+    protected virtual void EmitCore(SourceProductionContext context, CodeBuilder cb)
     { }
 
     /// <summary>

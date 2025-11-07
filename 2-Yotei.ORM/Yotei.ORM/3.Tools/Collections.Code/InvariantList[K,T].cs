@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Reflection.Metadata;
-
-namespace Yotei.ORM.Tools;
+﻿namespace Yotei.ORM.Tools;
 
 // ========================================================
 /// <summary>
