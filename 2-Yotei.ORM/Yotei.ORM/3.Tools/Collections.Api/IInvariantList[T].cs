@@ -3,6 +3,7 @@
 // ========================================================
 /// <summary>
 /// Represents an immutable collection of elements with customizable behavior.
+/// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 [Cloneable]

@@ -184,8 +184,8 @@ internal class TypeNode : INode
             var old = cb.Length; EmitCore(context, cb);
             var len = cb.Length;
 
-            if (old != len) cb.AppendLine();
-            EmitChilds(context, cb);
+            var needNL = old != len;
+            EmitChilds(context, cb, needNL);
         }
         cb.IndentLevel--;
         cb.AppendLine("}");
@@ -232,23 +232,22 @@ internal class TypeNode : INode
     /// </summary>
     /// <param name="context"></param>
     /// <param name="cb"></param>
-    protected virtual void EmitChilds(SourceProductionContext context, CodeBuilder cb)
+    /// <param name="needNL"></param>
+    protected virtual void EmitChilds(SourceProductionContext context, CodeBuilder cb, bool needNL)
     {
-        var done = false;
-
         foreach (var node in ChildProperties)
         {
-            if (done) cb.AppendLine(); done = true;
+            if (needNL) cb.AppendLine(); needNL = true;
             node.Emit(context, cb);
         }
         foreach (var node in ChildFields)
         {
-            if (done) cb.AppendLine(); done = true;
+            if (needNL) cb.AppendLine(); needNL = true;
             node.Emit(context, cb);
         }
         foreach (var node in ChildMethods)
         {
-            if (done) cb.AppendLine(); done = true;
+            if (needNL) cb.AppendLine(); needNL = true;
             node.Emit(context, cb);
         }
     }

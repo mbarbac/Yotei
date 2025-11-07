@@ -4,6 +4,7 @@
 /// <summary>
 /// Represents an immutable collection of elements identified by their respective keys, with
 /// customizable behavior.
+/// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
 /// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>

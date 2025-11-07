@@ -9,7 +9,7 @@ internal partial class InvariantGenerator : CoreGenerator
 {
 #if INVARIANT_GENERATOR
     /// <inheritdoc/>
-    //protected override bool LaunchDebugger => true;
+    protected override bool LaunchDebugger => true;
 #endif
 
     // ----------------------------------------------------

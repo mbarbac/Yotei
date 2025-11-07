@@ -151,16 +151,51 @@ internal class XTypeNode : TypeNode
 
         foreach (var method in methods)
         {
-            if (!CanEmit(method)) continue;
+            if (!CanEmit(method, existing)) continue;
+        }
+    }
+
+    /// <summary>
+    /// Determines if the given method can be emitted, or not.
+    /// </summary>
+    /// <param name="method"></param>
+    /// <returns></returns>
+    bool CanEmit(MethodInfo method, IMethodSymbol[] existing)
+    {
+        // Comparing the candidate method against the existing ones...
+        foreach (var item in existing)
+        {
+            var mname = method.Name;
+            var ename = item.Name;
+            if (mname != ename) continue; // Names differ, no impediment...
+
+            var mpars = method.GetParameters();
+            var epars = item.Parameters;
+            if (mpars.Length != epars.Length) continue; // Number of pars differ, no impediment...
+
+            for (int i = 0; i < mpars.Length; i++) // Comparing their arguments, in order...
+            {
+                var mpar = mpars[i]; var mtype = mpar.ParameterType;
+                var epar = epars[i]; var etype = (INamedTypeSymbol)epar.Type;
+
+                // Add(T item), Remove(K key)...
+                if (mtype.IsGenericParameter)
+                {
+                }
+
+                // AddRange(IEnumerable<T> range)...
+
+                // Remove(Predicate<T> predicate)...
+
+                // RemoveAt(int index)...
+                else
+                {
+                }
+            }
         }
 
-        /// <summary>
-        /// Determines if the given method can be emitted, or not.
-        /// </summary>
-        bool CanEmit(MethodInfo method)
-        {
-            throw null;
-        }
+        // No impediments found...
+        return true;
     }
 
     // ----------------------------------------------------
