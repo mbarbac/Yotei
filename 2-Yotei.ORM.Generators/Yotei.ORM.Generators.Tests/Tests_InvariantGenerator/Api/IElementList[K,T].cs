@@ -8,8 +8,8 @@ namespace Yotei.ORM.Generators.Invariant.Tests;
 /// <summary>
 /// <inheritdoc cref="IInvariantList{K, T}"/>
 /// </summary>
-[Cloneable<IHost>]
-public partial interface IElementList_KT : IInvariantList<TKey, IItem>, IItem
+[IInvariantList<TKey, IItem>(ReturnType = typeof(IHost))]
+public partial interface IElementList_KT : IItem
 {
     /// <summary>
     /// Returns a new builder base upon the contents of this instance.

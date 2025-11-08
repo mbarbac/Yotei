@@ -4,6 +4,7 @@
 /// <summary>
 /// Decorates interfaces for which either 'IInvariantList[K,T]' or 'IInvariantList[T]' will be
 /// implemented.
+/// <br/> Clone functionality is automatically handled.
 /// </summary>
 [AttributeUsage(AttributeTargets.Interface, Inherited = false, AllowMultiple = false)]
 public class IInvariantListAttribute : Attribute

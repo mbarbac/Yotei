@@ -3,6 +3,7 @@
 // ========================================================
 /// <summary>
 /// Decorates interfaces for 'IInvariantList[K,T]' will be implemented.
+/// <br/> Clone functionality is automatically handled.
 /// </summary>
 /// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>

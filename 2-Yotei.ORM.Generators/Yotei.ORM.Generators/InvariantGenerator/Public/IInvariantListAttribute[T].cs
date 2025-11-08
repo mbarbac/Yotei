@@ -3,6 +3,7 @@
 // ========================================================
 /// <summary>
 /// Decorates interfaces for 'IInvariantList[T]' will be implemented.
+/// <br/> Clone functionality is automatically handled.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 [AttributeUsage(AttributeTargets.Interface, Inherited = false, AllowMultiple = false)]

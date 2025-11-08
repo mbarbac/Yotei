@@ -9,9 +9,9 @@ namespace Yotei.ORM.Generators.Invariant.Tests;
 /// <summary>
 /// <inheritdoc cref="IHost"/>
 /// </summary>
-[Cloneable<IHost>]
+[InvariantList<TKey, IItem>(ReturnType = typeof(IHost))]
 [DebuggerDisplay("{ToDebugString(5)}")]
-public partial class ElementList_KT : InvariantList<TKey, IItem>, IHost
+public partial class ElementList_KT : IHost
 {
     /// <summary>
     /// Initializes a new empty instance.

@@ -4,6 +4,7 @@
 /// <summary>
 /// Decorates types for which 'InvariantList[T]' will be used as their base one. Unless abstract,
 /// decorated hosts must implement a copy constructor.
+/// <br/> Clone functionality is automatically handled.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]

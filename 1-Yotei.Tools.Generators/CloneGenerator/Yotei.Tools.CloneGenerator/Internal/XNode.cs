@@ -25,7 +25,7 @@ internal static class XNode
 
         var name = nameof(ICloneable.Clone);
 
-        return type.Finder<IMethodSymbol?>(useHost, (type, out value) =>
+        return type.Finder(useHost, (type, out value) =>
         {
             value = type.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(x =>
                 x.Name == name &&
@@ -126,7 +126,7 @@ internal static class XNode
         chains.ThrowWhenNull();
         value = null;
 
-        return type.Finder<AttributeData?>(useHost, (type, out value) =>
+        return type.Finder(useHost, (type, out value) =>
         {
             value = type.GetAttributes(typeof(CloneableAttribute)).FirstOrDefault();
             if (value != null) return true;
