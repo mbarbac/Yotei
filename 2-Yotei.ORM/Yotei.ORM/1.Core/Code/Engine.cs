@@ -5,7 +5,7 @@
 /// <inheritdoc cref="IEngine"/>
 /// </summary>
 [InheritWiths<IEngine>]
-public partial class Engine : IEngine
+public abstract partial class Engine : IEngine
 {
     public const bool CASESENSITIVE = false;
     public const string NULLVALUELITERAL = "NULL";

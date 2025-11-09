@@ -20,7 +20,7 @@ public class Test_ElementList_T
     [Fact]
     public void Test_Create_Empty()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var items = new Chain(engine); Assert.Empty(items);
     }
 
@@ -28,7 +28,7 @@ public class Test_ElementList_T
     [Fact]
     public void Test_Create_Range()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var items = new Chain(engine, []);
         Assert.Empty(items);
 
@@ -52,7 +52,7 @@ public class Test_ElementList_T
     [Fact]
     public void Test_Create_With_Duplicates()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var items = new Chain(engine, [xone, xone]);
         Assert.Equal(2, items.Count);
         Assert.Same(xone, items[0]);
@@ -75,7 +75,7 @@ public class Test_ElementList_T
     [Fact]
     public static void Test_Create_With_Embedded()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var other = new Chain(engine, [xtwo, xthree]);
         var items = new Chain(engine, [xone, other]);
 
@@ -91,7 +91,7 @@ public class Test_ElementList_T
     [Fact]
     public static void Test_Clone()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var items = new Chain(engine, [xone, xtwo, xthree, xone]);
         var target = items.Clone();
 
@@ -109,7 +109,7 @@ public class Test_ElementList_T
     [Fact]
     public static void Test_Find()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var items = new Chain(engine, [xone, xtwo, xthree, xone]);
 
         Assert.Equal(-1, items.IndexOf(xfive));
@@ -135,7 +135,7 @@ public class Test_ElementList_T
     [Fact]
     public static void Test_Find_Predicate()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var items = new Chain(engine, [xone, xtwo, xthree, xone]);
 
         Assert.Equal(-1, items.IndexOf(x => ((Element)x).Name.Contains('z')));
@@ -155,7 +155,7 @@ public class Test_ElementList_T
     [Fact]
     public static void Test_GetRange()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var source = new Chain(engine);
         var target = source.GetRange(0, 0); Assert.Same(source, target);
 
@@ -188,7 +188,7 @@ public class Test_ElementList_T
     [Fact]
     public static void Test_Replace_Empty()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var source = new Chain(engine, [xone, xtwo, xthree]);
         var target = source.Replace(1, new Chain(engine, []));
         Assert.Same(source, target);
@@ -198,7 +198,7 @@ public class Test_ElementList_T
     [Fact]
     public static void Test_Replace_Same()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var source = new Chain(engine, [xone, xtwo, xthree]);
         var target = source.Replace(1, xtwo);
         Assert.Same(source, target);
@@ -208,7 +208,7 @@ public class Test_ElementList_T
     [Fact]
     public static void Test_Replace_Standard()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var source = new Chain(engine, [xone, xtwo, xthree]);
         var target = source.Replace(1, xone);
         Assert.Equal(3, target.Count);
@@ -224,7 +224,7 @@ public class Test_ElementList_T
     [Fact]
     public static void Test_Replace_Embedded()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var source = new Chain(engine, [xone, xtwo, xthree]);
         var other = new Chain(engine, [xfour, xfive]);
 
@@ -242,7 +242,7 @@ public class Test_ElementList_T
     [Fact]
     public static void Test_Add()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var source = new Chain(engine, [xone, xtwo]);
         var target = source.Add(xthree);
         Assert.Equal(3, target.Count);
@@ -261,7 +261,7 @@ public class Test_ElementList_T
     [Fact]
     public static void Test_Add_Duplicates()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var source = new Chain(engine, [xone, xtwo]);
         var target = source.Add(xone);
         Assert.Equal(3, target.Count);
@@ -277,7 +277,7 @@ public class Test_ElementList_T
     [Fact]
     public static void Test_Add_Extended()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var other = new Chain(engine, []);
         var source = new Chain(engine, [xone, xtwo, xthree]);
         var target = source.Add(other);
@@ -299,7 +299,7 @@ public class Test_ElementList_T
     [Fact]
     public static void Test_AddRange()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var source = new Chain(engine, [xone, xtwo]);
         var target = source.AddRange([]);
         Assert.Same(source, target);
@@ -325,7 +325,7 @@ public class Test_ElementList_T
     [Fact]
     public static void Test_AddRange_Extended()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var other = new Chain(engine, []);
         var source = new Chain(engine, [xone, xtwo]);
         var target = source.AddRange([other]);
@@ -347,7 +347,7 @@ public class Test_ElementList_T
     [Fact]
     public static void Test_Insert()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var source = new Chain(engine, [xone, xtwo]);
         var target = source.Insert(2, xthree);
         Assert.Equal(3, target.Count);
@@ -366,7 +366,7 @@ public class Test_ElementList_T
     [Fact]
     public static void Test_Insert_Duplicates()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var source = new Chain(engine, [xone, xtwo]);
         var target = source.Insert(2, xone);
         Assert.Equal(3, target.Count);
@@ -382,7 +382,7 @@ public class Test_ElementList_T
     [Fact]
     public static void Test_Insert_Extended()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var other = new Chain(engine, []);
         var source = new Chain(engine, [xone, xtwo, xthree]);
         var target = source.Insert(3, other);
@@ -404,7 +404,7 @@ public class Test_ElementList_T
     [Fact]
     public static void Test_InsertRange()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var source = new Chain(engine, [xone, xtwo]);
         var target = source.InsertRange(2, []);
         Assert.Same(source, target);
@@ -430,7 +430,7 @@ public class Test_ElementList_T
     [Fact]
     public static void Test_InsertRange_Extended()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var other = new Chain(engine, []);
         var source = new Chain(engine, [xone, xtwo]);
         var target = source.InsertRange(2, [other]);
@@ -452,7 +452,7 @@ public class Test_ElementList_T
     [Fact]
     public static void Test_RemoveAt()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var source = new Chain(engine, [xone, xtwo, xthree, xone]);
         var target = source.RemoveAt(0);
         Assert.Equal(3, target.Count);
@@ -474,7 +474,7 @@ public class Test_ElementList_T
     [Fact]
     public static void Test_RemoveRange()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var source = new Chain(engine, [xone, xtwo, xthree, xone]);
         var target = source.RemoveRange(0, 0);
         Assert.Same(source, target);
@@ -513,7 +513,7 @@ public class Test_ElementList_T
     [Fact]
     public static void Test_Remove_Item()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var source = new Chain(engine, [xone, xtwo, xthree, xone]);
         var target = source.Remove(xfour);
         Assert.Same(source, target);
@@ -535,7 +535,7 @@ public class Test_ElementList_T
     [Fact]
     public static void Test_Remove_Item_Last()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var source = new Chain(engine, [xone, xtwo, xthree, xone]);
         var target = source.RemoveLast(xone);
         Assert.Equal(3, target.Count);
@@ -554,7 +554,7 @@ public class Test_ElementList_T
     [Fact]
     public static void Test_Remove_Item_All()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var source = new Chain(engine, [xone, xtwo, xthree, xone]);
         var target = source.RemoveAll(xone);
         Assert.Equal(2, target.Count);
@@ -573,7 +573,7 @@ public class Test_ElementList_T
     [Fact]
     public static void Test_Remove_Item_Extended()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var source = new Chain(engine, [xone, xtwo, xthree, xone]);
         var other = new Chain(engine, [xone, xthree]);
 
@@ -598,7 +598,7 @@ public class Test_ElementList_T
     [Fact]
     public static void Test_Remove_Predicate()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var source = new Chain(engine, [xone, xtwo, xthree, xone]);
         var target = source.Remove(x => ((Element)x).Name.Contains('z'));
         Assert.Same(source, target);
@@ -614,7 +614,7 @@ public class Test_ElementList_T
     [Fact]
     public static void Test_Remove_Predicate_Last()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var source = new Chain(engine, [xone, xtwo, xthree, xone]);
         var target = source.RemoveLast(x => ((Element)x).Name.Contains('n'));
         Assert.Equal(3, target.Count);
@@ -627,7 +627,7 @@ public class Test_ElementList_T
     [Fact]
     public static void Test_Remove_Predicate_All()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var source = new Chain(engine, [xone, xtwo, xthree, xone]);
         var target = source.RemoveAll(x => ((Element)x).Name.Contains('n'));
         Assert.Equal(2, target.Count);
@@ -641,7 +641,7 @@ public class Test_ElementList_T
     [Fact]
     public static void Test_Clear()
     {
-        IEngine engine = new Engine();
+        IEngine engine = new FakeEngine();
         var source = new Chain(engine);
         var target = source.Clear();
         Assert.Same(source, target);

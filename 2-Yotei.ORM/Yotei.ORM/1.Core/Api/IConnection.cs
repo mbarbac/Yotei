@@ -59,9 +59,9 @@ public partial interface IConnection : IAsyncDisposableEx
     // ----------------------------------------------------
 
     /// <summary>
-    /// Gets a default nestable transaction for this instance, which is guaranteed to be a valid
-    /// one, not disposed, at the moment when it was obtained, provided that this connection is
-    /// also not disposed.
+    /// Gets a default nestable transaction for this instance, which is guaranteed to be not
+    /// disposed at the moment when it was obtained, provided that this connection is also not
+    /// disposed.
     /// </summary>
     ITransaction Transaction { get; }
 }
