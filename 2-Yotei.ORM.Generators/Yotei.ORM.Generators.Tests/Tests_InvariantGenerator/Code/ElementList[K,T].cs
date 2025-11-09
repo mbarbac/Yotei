@@ -1,8 +1,8 @@
-﻿using THost = Yotei.ORM.Generators.Invariant.Tests.ElementList_KT;
+﻿//using THost = Yotei.ORM.Generators.Invariant.Tests.ElementList_KT;
 using IHost = Yotei.ORM.Generators.Invariant.Tests.IElementList_KT;
 using IItem = Yotei.ORM.Generators.Invariant.Tests.IElement;
 using TKey = string;
-
+/*
 namespace Yotei.ORM.Generators.Invariant.Tests;
 
 // ========================================================
@@ -110,4 +110,4 @@ public partial class ElementList_KT : IHost
     /// The engine this instance is associated with.
     /// </summary>
     public IEngine Engine => Items.Engine;
-}
+}*/

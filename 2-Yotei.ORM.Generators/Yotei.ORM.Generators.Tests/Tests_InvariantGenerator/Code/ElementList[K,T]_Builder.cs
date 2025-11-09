@@ -1,9 +1,8 @@
-﻿using THost = Yotei.ORM.Generators.Invariant.Tests.ElementList_KT;
+﻿//using THost = Yotei.ORM.Generators.Invariant.Tests.ElementList_KT;
 using IHost = Yotei.ORM.Generators.Invariant.Tests.IElementList_KT;
 using IItem = Yotei.ORM.Generators.Invariant.Tests.IElement;
 using TKey = string;
-using System.Data;
-
+/*
 namespace Yotei.ORM.Generators.Invariant.Tests;
 
 partial class ElementList_KT
@@ -87,12 +86,13 @@ partial class ElementList_KT
 
         // ------------------------------------------------
 
+        // TODO: Enable CreateInstance method generation once supported.
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public virtual IHost CreateInstance()
-            => Count == 0 ? new THost(Engine) : new THost(Engine, this);
+        //public virtual IHost CreateInstance()
+        //    => Count == 0 ? new THost(Engine) : new THost(Engine, this);
 
         /// <summary>
         /// The engine this instance is associated with.
@@ -109,4 +109,4 @@ partial class ElementList_KT
             }
         }
     }
-}
+}*/

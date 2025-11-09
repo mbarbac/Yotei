@@ -21,4 +21,6 @@ public partial interface IElementList_KT : IItem
     /// The engine this instance is associated with.
     /// </summary>
     IEngine Engine { get; }
+
+    IHost AddRange(IEnumerable<DateTime> range);
 }

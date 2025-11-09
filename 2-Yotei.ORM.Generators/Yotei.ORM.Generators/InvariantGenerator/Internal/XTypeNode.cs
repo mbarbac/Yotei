@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace Yotei.ORM.Generators.Invariant;
+﻿namespace Yotei.ORM.Generators.Invariant;
 
 // ========================================================
 /// <summary>
@@ -49,7 +47,7 @@ internal class XTypeNode : TypeNode
         if (Symbol.IsRecord) { CoreDiagnostics.RecordsNotSupported(Symbol).Report(context); return false; }
         if (Attributes.Length == 0) { CoreDiagnostics.NoAttributes(Symbol).Report(context); return false; }
         if (Attributes.Length > 1) { CoreDiagnostics.TooManyAttributes(Symbol).Report(context); return false; }
-        
+
         var at = Attributes[0];
         var atc = at.AttributeClass;
         if (atc is null) { CoreDiagnostics.InvalidAttribute(Symbol).Report(context); return false; }
@@ -175,58 +173,113 @@ internal class XTypeNode : TypeNode
         // Try to emit 'Clone()' if needed...
         EmitClone(cb);
 
-        //// Iterating through the template methods...
-        //var existing = Symbol.GetMembers().OfType<IMethodSymbol>().ToArray();
-        //var methods = Template.GetMembers().OfType<MethodInfo>().Where(x => x.DeclaringType == Template);
+        // Iterating through the template methods...
+        var existing = Symbol.GetMembers().OfType<IMethodSymbol>().ToArray();
+        var methods = Template.GetMembers().OfType<MethodInfo>().Where(x => x.DeclaringType == Template);
 
-        //foreach (var method in methods)
-        //{
-        //    if (!CanEmit(method, existing)) continue;
-        //}
+        foreach (var method in methods)
+        {
+            if (existing.Any(x => SameMethod(method, x))) continue; // Already exists...
+
+            // Documentation...
+            var headdoc = Symbol.IsInterface ? IListName : ListName;
+            var name = method.EasyName();
+            name = $"{headdoc}{Bracket}.{name}";
+            name = name.Replace('<', '{').Replace('>', '}');
+            name = $"/// <inheritdoc cref=\"{name}\"/>";
+
+            cb.AppendLine();
+            cb.AppendLine(name);
+            cb.AppendLine($"{InvariantGenerator.AttributeDoc}");
+
+            // Emitting method...
+            var options = EasyNameOptions.Default with
+            { MemberArgumentTypeOptions = EasyNameOptions.Full, MemberUseArgumentNames = true };
+
+            name = method.EasyName(options);
+            name = name.Replace("K ", $"{KTypeName} "); // K key...
+            name = name.Replace("<K", $"<{KTypeName}"); // IComparer<K> comparer...
+            name = name.Replace("T ", $"{TTypeName} "); // T item...
+            name = namexx.Replace("T>", $"{TTypeName}>"); // IEnumerable<T> range...
+
+            // Host is interface...
+            if (Symbol.IsInterface)
+            {
+                var rtype = ReturnType.EasyName(ReturnOptions);
+                var rnull = ReturnNullable ? "?" : string.Empty;
+            }
+
+            // Otherwise, inheriting from an abstract class...
+            else
+            {
+
+
+                // Explicit interfaces...
+            }
+        }
     }
 
     /// <summary>
-    /// Determines if the given method can be emitted, or not.
+    /// Determines if the given method is the same as the existing one.
     /// </summary>
     /// <param name="method"></param>
+    /// <param name="existing"></param>
     /// <returns></returns>
-    //public bool CanEmit(MethodInfo method, IMethodSymbol[] existing)
-    //{
-    //    // Comparing the candidate method against the existing ones...
-    //    foreach (var item in existing)
-    //    {
-    //        var mname = method.Name;
-    //        var ename = item.Name;
-    //        if (mname != ename) continue; // Names differ, no impediment...
+    public bool SameMethod(MethodInfo method, IMethodSymbol existing)
+    {
+        var mname = method.Name;
+        var ename = existing.Name;
+        if (mname != ename) return false; // Names differ...
 
-    //        var mpars = method.GetParameters();
-    //        var epars = item.Parameters;
-    //        if (mpars.Length != epars.Length) continue; // Number of pars differ, no impediment...
+        var mpars = method.GetParameters();
+        var epars = existing.Parameters;
+        if (mpars.Length != epars.Length) return false; // Number of pars differ...
 
-    //        for (int i = 0; i < mpars.Length; i++) // Comparing their arguments, in order...
-    //        {
-    //            var mpar = mpars[i]; var mtype = mpar.ParameterType;
-    //            var epar = epars[i]; var etype = (INamedTypeSymbol)epar.Type;
+        for (int i = 0; i < mpars.Length; i++) // Comparing their arguments, in order...
+        {
+            var mpar = mpars[i]; var mtype = mpar.ParameterType;
+            var epar = epars[i]; var etype = (INamedTypeSymbol)epar.Type;
 
-    //            // Add(T item), Remove(K key)...
-    //            if (mtype.IsGenericParameter)
-    //            {
-    //            }
+            var same = SameArgument(mtype, etype);
+            if (!same) return false;
+        }
 
-    //            // AddRange(IEnumerable<T> range)...
+        // Same method...
+        return true;
+    }
 
-    //            // Remove(Predicate<T> predicate)...
+    /// <summary>
+    /// Determines if the given parameter types are the same: if we only use 'Match', then any
+    /// generic argument will always match, and we don't want that to happen when the argument
+    /// if not the "K" or "T" given ones.
+    /// </summary>
+    /// <param name="mpar"></param>
+    /// <param name="epar"></param>
+    /// <returns></returns>
+    public bool SameArgument(Type mtype, INamedTypeSymbol etype)
+    {
+        var comparer = SymbolEqualityComparer.Default;
+        switch (mtype.Name)
+        {
+            case "K": if (!comparer.Equals(KType, etype)) return false; break;
+            case "T": if (!comparer.Equals(TType, etype)) return false; break;
+            default: if (!etype.Match(mtype)) return false; break;
+        }
 
-    //            // RemoveAt(int index)...
-    //            else
-    //            {
-    //            }
-    //        }
-    //    }
+        var margs = mtype.GenericTypeArguments;
+        var eargs = etype.TypeArguments;
+        if (margs.Length != eargs.Length) return false;
 
-    //    // No impediments found...
-    //    return true;
-    //}
+        for (int i = 0; i < margs.Length; i++)
+        {
+            var marg = margs[i];
+            var earg = eargs[i];
+            var same = SameArgument(marg, (INamedTypeSymbol)earg);
+            if (!same) return false;
+        }
+        
+        return true;
+    }
 
     // ----------------------------------------------------
 
@@ -241,6 +294,7 @@ internal class XTypeNode : TypeNode
 
         // Documentation...
         cb.AppendLine($"/// <inheritdoc cref=\"ICloneable.Clone\"/>");
+        cb.AppendLine($"{InvariantGenerator.AttributeDoc}");
 
         // Interface...
         if (Symbol.IsInterface)
@@ -326,7 +380,7 @@ internal class XTypeNode : TypeNode
             if (!found)
             {
                 found =
-                    FindInvariantAttribute(iface, true, out _) ||
+                    FindInvariantAttribute(iface, true, out _) || // Acts as 'Cloneable' !!!
                     HasClone(iface, out _, out _);
             }
 
