@@ -30,7 +30,7 @@
    </ItemGroup>
 
    <PropertyGroup>
-	  <DefineConstants>$(DefineConstants);INVARIANT_GENERATOR </DefineConstants>
+	  <!--<DefineConstants>$(DefineConstants);INVARIANT_GENERATOR </DefineConstants>-->
 	  <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
    </PropertyGroup>
 

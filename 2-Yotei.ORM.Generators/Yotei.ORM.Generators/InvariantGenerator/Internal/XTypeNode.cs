@@ -14,7 +14,6 @@ internal class XTypeNode : TypeNode
         ReturnType = Symbol;
         ReturnNullable = false;
         ReturnOptions = EasyNameOptions.Default;
-        Arity = 0;
         KType = null!; KTypeNullable = false; KTypeName = null!;
         TType = null!; TTypeNullable = false; TTypeName = null!;
         Template = null!;
@@ -23,7 +22,6 @@ internal class XTypeNode : TypeNode
     INamedTypeSymbol ReturnType;
     bool ReturnNullable;
     EasyNameOptions ReturnOptions;
-    int Arity;
     INamedTypeSymbol KType; bool KTypeNullable; string KTypeName;
     INamedTypeSymbol TType; bool TTypeNullable; string TTypeName;
     Type Template;
@@ -74,7 +72,6 @@ internal class XTypeNode : TypeNode
             if (args.Length == 1) // One type argument: <T>...
             {
                 Template = typeof(IChainTemplate<>);
-                Arity = 1;
                 TType = args[0].UnwrapNullable(out TTypeNullable);
                 TTypeName = TType.EasyName(EasyNameOptions.Full) + (TTypeNullable ? "?" : "");
                 Bracket = $"<{TTypeName}>";
@@ -83,7 +80,6 @@ internal class XTypeNode : TypeNode
             if (args.Length == 2) // Two type arguments: <K, T>...
             {
                 Template = typeof(IChainTemplate<,>);
-                Arity = 2;
                 KType = args[0].UnwrapNullable(out KTypeNullable);
                 TType = args[1].UnwrapNullable(out TTypeNullable);
 
@@ -97,7 +93,6 @@ internal class XTypeNode : TypeNode
         if (atc.Arity == 1)
         {
             Template = typeof(IChainTemplate<>);
-            Arity = 1;
             TType = ((INamedTypeSymbol)atc.TypeArguments[0]).UnwrapNullable(out TTypeNullable);
             TTypeName = TType.EasyName(EasyNameOptions.Full) + (TTypeNullable ? "?" : "");
             Bracket = $"<{TTypeName}>";
@@ -107,7 +102,6 @@ internal class XTypeNode : TypeNode
         if (atc.Arity == 2)
         {
             Template = typeof(IChainTemplate<,>);
-            Arity = 2;
             KType = ((INamedTypeSymbol)atc.TypeArguments[0]).UnwrapNullable(out KTypeNullable);
             TType = ((INamedTypeSymbol)atc.TypeArguments[1]).UnwrapNullable(out TTypeNullable);
 
@@ -141,7 +135,7 @@ internal class XTypeNode : TypeNode
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    public bool HasHeader(out string? name)
+    bool HasHeader(out string? name)
     {
         var atr = Attributes[0].AttributeClass!.Name;
         atr = atr.RemoveTail("Attribute").ToString();
@@ -167,19 +161,25 @@ internal class XTypeNode : TypeNode
     /// </summary>
     /// <param name="context"></param>
     /// <param name="cb"></param>
-    /// <param name="needNL"></param>
     protected override void EmitCore(SourceProductionContext context, CodeBuilder cb)
     {
+        var nameoptions = EasyNameOptions.Default with
+        { MemberArgumentTypeOptions = EasyNameOptions.Full, MemberUseArgumentNames = true };
+
+        var argoptions = EasyNameOptions.Default with
+        { MemberArgumentTypeOptions = null, MemberUseArgumentNames = true };
+
         // Try to emit 'Clone()' if needed...
         EmitClone(cb);
 
-        // Iterating through the template methods...
-        var existing = Symbol.GetMembers().OfType<IMethodSymbol>().ToArray();
+        // Iterating through template methods...
         var methods = Template.GetMembers().OfType<MethodInfo>().Where(x => x.DeclaringType == Template);
+        var existing = Symbol.GetMembers().OfType<IMethodSymbol>().ToArray();
 
         foreach (var method in methods)
         {
-            if (existing.Any(x => SameMethod(method, x))) continue; // Already exists...
+            // If already existing one, we're done...
+            if (existing.Any(x => SameMethod(method, x))) continue;
 
             // Documentation...
             var headdoc = Symbol.IsInterface ? IListName : ListName;
@@ -193,28 +193,33 @@ internal class XTypeNode : TypeNode
             cb.AppendLine($"{InvariantGenerator.AttributeDoc}");
 
             // Emitting method...
-            var options = EasyNameOptions.Default with
-            { MemberArgumentTypeOptions = EasyNameOptions.Full, MemberUseArgumentNames = true };
-
-            name = method.EasyName(options);
+            name = method.EasyName(nameoptions);
             name = name.Replace("K ", $"{KTypeName} "); // K key...
             name = name.Replace("<K", $"<{KTypeName}"); // IComparer<K> comparer...
             name = name.Replace("T ", $"{TTypeName} "); // T item...
-            name = namexx.Replace("T>", $"{TTypeName}>"); // IEnumerable<T> range...
+            name = name.Replace("T>", $"{TTypeName}>"); // IEnumerable<T> range...
+
+            var rtype = ReturnType.EasyName(ReturnOptions);
+            var rnull = ReturnNullable ? "?" : string.Empty;
 
             // Host is interface...
-            if (Symbol.IsInterface)
-            {
-                var rtype = ReturnType.EasyName(ReturnOptions);
-                var rnull = ReturnNullable ? "?" : string.Empty;
-            }
+            if (Symbol.IsInterface) cb.AppendLine($"new {rtype}{rnull} {name};");
 
             // Otherwise, inheriting from an abstract class...
             else
             {
+                var args = method.EasyName(argoptions);
+                var mods = Symbol.IsAbstract ? "abstract override" : "override";
 
+                cb.AppendLine($"public {mods} {rtype}{rnull} {name}");
+                cb.AppendLine($"=> ({rtype}{rnull})base.{args};");
 
-                // Explicit interfaces...
+                foreach (var iface in GetMethodInterfaces(method))
+                {
+                    cb.AppendLine();
+                    cb.AppendLine(iface);
+                    cb.AppendLine($"{iface}.{name} => {args};");
+                }
             }
         }
     }
@@ -225,7 +230,7 @@ internal class XTypeNode : TypeNode
     /// <param name="method"></param>
     /// <param name="existing"></param>
     /// <returns></returns>
-    public bool SameMethod(MethodInfo method, IMethodSymbol existing)
+    bool SameMethod(MethodInfo method, IMethodSymbol existing)
     {
         var mname = method.Name;
         var ename = existing.Name;
@@ -256,7 +261,7 @@ internal class XTypeNode : TypeNode
     /// <param name="mpar"></param>
     /// <param name="epar"></param>
     /// <returns></returns>
-    public bool SameArgument(Type mtype, INamedTypeSymbol etype)
+    bool SameArgument(Type mtype, INamedTypeSymbol etype)
     {
         var comparer = SymbolEqualityComparer.Default;
         switch (mtype.Name)
@@ -281,13 +286,61 @@ internal class XTypeNode : TypeNode
         return true;
     }
 
+    /// <summary>
+    /// Obtains a list of the interfaces that need explicit implementation for the given method.
+    /// </summary>
+    /// <param name="method"></param>
+    /// <returns></returns>
+    List<string> GetMethodInterfaces(MethodInfo method)
+    {
+        var types = method.GetParameters().Select(x => x.ParameterType).ToArray();
+        var comparer = SymbolEqualityComparer.Default;
+        List<INamedTypeSymbol> list = [];
+        foreach (var iface in Symbol.Interfaces) TryCapture(iface);
+
+        var items = list.Select(x => x.EasyName(EasyNameOptions.Full)).ToList();
+        var core = $"IInvariantList{Bracket}";
+        if (!items.Contains(core)) items.Add(core);
+        return items;
+
+        // Tries to capture the given interface as an explicit one.
+        bool TryCapture(INamedTypeSymbol iface)
+        {
+            var found = false;
+
+            // First the iface's childs...
+            foreach (var child in iface.Interfaces) if (TryCapture(child)) found = true;
+
+            // If no child, then maybe this iface itself...
+            if (!found)
+            {
+                if (FindInvariantAttribute(iface, true, out _)) found = true;
+                else
+                {
+                    var existing = iface.GetMembers().OfType<IMethodSymbol>().ToDebugArray();
+                    found = existing.Any(x => SameMethod(method, x));
+                }   
+            }
+
+            // If found, add to the list...
+            if (found)
+            {
+                var temp = list.Find(x => comparer.Equals(x, iface));
+                if (temp is null) list.Add(iface);
+            }
+
+            // Finishing...
+            return found;
+        }
+    }
+
     // ----------------------------------------------------
 
     /// <summary>
     /// Tries to emit the 'Clone' method.
     /// </summary>
     /// <param name="cb"></param>
-    public void EmitClone(CodeBuilder cb)
+    void EmitClone(CodeBuilder cb)
     {
         // If existing or requested by the host, skip...
         if (HasClone(Symbol, out _, out _)) return;
@@ -340,7 +393,7 @@ internal class XTypeNode : TypeNode
     /// Determines if a 'Clone()' method exists or has been requested for the given type.
     /// </summary>
     /// <returns></returns>
-    public static bool HasClone(
+    static bool HasClone(
         INamedTypeSymbol type, out IMethodSymbol? method, out AttributeData? atr)
     {
         method = type.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(x =>
@@ -359,7 +412,7 @@ internal class XTypeNode : TypeNode
     /// Obtains a list with the 'Clone'-alike interfaces that need explicit implementation.
     /// </summary>
     /// <returns></returns>
-    public List<string> GetCloneInterfaces()
+    List<string> GetCloneInterfaces()
     {
         var comparer = SymbolEqualityComparer.Default;
         List<INamedTypeSymbol> list = [];
@@ -410,7 +463,7 @@ internal class XTypeNode : TypeNode
     /// <param name="value"></param>
     /// <param name="chains"></param>
     /// <returns></returns>
-    public static bool FindMethod(
+    static bool FindMethod(
         INamedTypeSymbol type,
         bool usehost,
         string name,
@@ -452,7 +505,7 @@ internal class XTypeNode : TypeNode
     /// <param name="value"></param>
     /// <param name="chains"></param>
     /// <returns></returns>
-    public static bool FindInvariantAttribute(
+    static bool FindInvariantAttribute(
         INamedTypeSymbol type,
         bool usehost,
         [NotNullWhen(true)] out AttributeData? value,
@@ -483,7 +536,7 @@ internal class XTypeNode : TypeNode
     /// <param name="value"></param>
     /// <param name="nullable"></param>
     /// <returns></returns>
-    public static bool GetReturnType(
+    static bool GetReturnType(
         AttributeData at,
         [NotNullWhen(true)] out INamedTypeSymbol? value, out bool nullable)
     {

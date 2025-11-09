@@ -1,15 +1,14 @@
-﻿using IHost = Yotei.ORM.Generators.Invariant.Tests.IElementList_KT;
+﻿using IHost = Yotei.ORM.Generators.Invariant.Tests.IElementList_T;
 using IItem = Yotei.ORM.Generators.Invariant.Tests.IElement;
-using TKey = string;
 
 namespace Yotei.ORM.Generators.Invariant.Tests;
 
 // ========================================================
 /// <summary>
-/// <inheritdoc cref="IInvariantList{K, T}"/>
+/// <inheritdoc cref="IInvariantList{T}"/>
 /// </summary>
-[IInvariantList<TKey, IItem>(ReturnType = typeof(IHost))]
-public partial interface IElementList_KT : IItem
+[IInvariantList<IItem>(ReturnType = typeof(IHost))]
+public partial interface IElementList_T : IItem
 {
     /// <summary>
     /// Returns a new builder base upon the contents of this instance.

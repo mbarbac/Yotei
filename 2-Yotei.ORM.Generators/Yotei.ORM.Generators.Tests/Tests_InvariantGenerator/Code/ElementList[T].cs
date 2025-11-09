@@ -1,7 +1,6 @@
-﻿using THost = Yotei.ORM.Generators.Invariant.Tests.ElementList_KT;
-using IHost = Yotei.ORM.Generators.Invariant.Tests.IElementList_KT;
+﻿using THost = Yotei.ORM.Generators.Invariant.Tests.ElementList_T;
+using IHost = Yotei.ORM.Generators.Invariant.Tests.IElementList_T;
 using IItem = Yotei.ORM.Generators.Invariant.Tests.IElement;
-using TKey = string;
 
 namespace Yotei.ORM.Generators.Invariant.Tests;
 
@@ -9,29 +8,29 @@ namespace Yotei.ORM.Generators.Invariant.Tests;
 /// <summary>
 /// <inheritdoc cref="IHost"/>
 /// </summary>
-[InvariantList<TKey, IItem>(ReturnType = typeof(IHost))]
+[InvariantList<IItem>(ReturnType = typeof(IHost))]
 [DebuggerDisplay("{ToDebugString(5)}")]
-public partial class ElementList_KT : IHost
+public partial class ElementList_T : IHost
 {
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="engine"></param>
-    public ElementList_KT(IEngine engine) => Items = new Builder(engine);
+    public ElementList_T(IEngine engine) => Items = new Builder(engine);
 
     /// <summary>
     /// Initializes a new instance with the elements from the given range.
     /// </summary>
     /// <param name="engine"></param>
     /// <param name="range"></param>
-    public ElementList_KT(
+    public ElementList_T(
         IEngine engine, IEnumerable<IItem> range) : this(engine) => Items.AddRange(range);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected ElementList_KT(THost source) : this(source.Engine) => Items.AddRange(source);
+    protected ElementList_T(THost source) : this(source.Engine) => Items.AddRange(source);
 
     /// <inheritdoc/>
     public override string ToString() => Items.ToString();

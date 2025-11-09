@@ -1,11 +1,10 @@
-﻿using THost = Yotei.ORM.Generators.Invariant.Tests.ElementList_KT;
-using IHost = Yotei.ORM.Generators.Invariant.Tests.IElementList_KT;
+﻿using THost = Yotei.ORM.Generators.Invariant.Tests.ElementList_T;
+using IHost = Yotei.ORM.Generators.Invariant.Tests.IElementList_T;
 using IItem = Yotei.ORM.Generators.Invariant.Tests.IElement;
-using TKey = string;
 
 namespace Yotei.ORM.Generators.Invariant.Tests;
 
-partial class ElementList_KT
+partial class ElementList_T
 {
     // ====================================================
     /// <summary>
@@ -13,7 +12,7 @@ partial class ElementList_KT
     /// </summary>
     [Cloneable<IHost.IBuilder>]
     [DebuggerDisplay("{ToDebugString(5)}")]
-    public partial class Builder : CoreList<TKey, IItem>, IHost.IBuilder
+    public partial class Builder : CoreList<IItem>, IHost.IBuilder
     {
         /// <summary>
         /// Initializes a new empty instance.
@@ -45,15 +44,11 @@ partial class ElementList_KT
         // ------------------------------------------------
 
         /// <inheritdoc/>
-        protected override IItem ValidateItem(IItem item) => item.ThrowWhenNull();
-
-        /// <inheritdoc/>
-        protected override TKey GetKey(IItem item) => item is NamedElement named
-            ? named.Name
-            : throw new ArgumentException("Element is not a named one.").WithData(item);
-
-        /// <inheritdoc/>
-        protected override TKey ValidateKey(TKey key) => key.NotNullNotEmpty(true);
+        protected override IItem ValidateItem(IItem item)
+        {
+            if (item.ThrowWhenNull() is NamedElement named) named.Name.NotNullNotEmpty(true);
+            return item;
+        }
 
         /// <inheritdoc/>
         protected override bool ExpandElements => true;
@@ -65,21 +60,25 @@ partial class ElementList_KT
             : throw new DuplicateException("Duplicated element.").WithData(item);
 
         /// <inheritdoc/>
-        protected override IEqualityComparer<TKey> Comparer => _Comparer ??= new(Engine.CaseSensitive);
+        protected override IEqualityComparer<IItem> Comparer => _Comparer ??= new(Engine.CaseSensitive);
         MyComparer? _Comparer;
 
-        readonly struct MyComparer(bool Sensitive) : IEqualityComparer<TKey>
+        readonly struct MyComparer(bool Sensitive) : IEqualityComparer<IItem>
         {
-            public bool Equals(TKey? x, TKey? y)
-                => string.Compare(x, y, !Sensitive) == 0;
+            public bool Equals(IItem? x, IItem? y)
+            {
+                return x is NamedElement xnamed && y is NamedElement ynamed
+                    ? string.Compare(xnamed.Name, ynamed.Name, !Sensitive) == 0
+                    : ReferenceEquals(x, y);
+            }
 
-            public int GetHashCode(TKey obj) => throw new NotImplementedException();
+            public int GetHashCode(IItem obj) => throw new NotImplementedException();
         }
 
         // ------------------------------------------------
 
         /// <inheritdoc/>
-        protected override List<int> FindDuplicates(TKey key) => base.FindDuplicates(key);
+        protected override List<int> FindDuplicates(IItem item) => base.FindDuplicates(item);
 
         /// <inheritdoc/>
         protected override bool SameItem(IItem source, IItem target) => base.SameItem(source, target);
