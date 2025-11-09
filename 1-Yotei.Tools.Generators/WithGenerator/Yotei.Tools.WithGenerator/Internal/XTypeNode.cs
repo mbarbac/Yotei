@@ -71,8 +71,8 @@ internal class XTypeNode : TypeNode
         // Tries to capture members are the given type level...
         void TryCapture(INamedTypeSymbol type)
         {
-            var members = type.GetMembers().OfType<IPropertySymbol>().Where(x =>
-                x.GetAttributes().Any(y =>
+            var members = type.GetMembers().OfType<IPropertySymbol>().Where(static x =>
+                x.GetAttributes().Any(static y =>
                 y.AttributeClass is not null &&
                 y.AttributeClass.Name.StartsWith("WithAttribute")))
                 .ToDebugArray();
@@ -102,8 +102,8 @@ internal class XTypeNode : TypeNode
         // Tries to capture members are the given type level...
         void TryCapture(INamedTypeSymbol type)
         {
-            var members = type.GetMembers().OfType<IFieldSymbol>().Where(x =>
-                x.GetAttributes().Any(y =>
+            var members = type.GetMembers().OfType<IFieldSymbol>().Where(static x =>
+                x.GetAttributes().Any(static y =>
                 y.AttributeClass is not null &&
                 y.AttributeClass.Name.StartsWith("WithAttribute")))
                 .ToDebugArray();

@@ -14,18 +14,6 @@ internal class CodeBuilder
     /// </summary>
     public CodeBuilder() { }
 
-    ///// <summary>
-    ///// Returns a new instance that is a clone of the original one.
-    ///// </summary>
-    ///// <returns></returns>*/
-    //public CodeBuilder Clone() => new()
-    //{
-    //    Builder = new(this.Builder.ToString()),
-    //    AtOrigin = this.AtOrigin,
-    //    IndentLevel = this.IndentLevel,
-    //    IndentSize = this.IndentSize,
-    //};
-
     /// <summary>
     /// <inheritdoc/>
     /// <br/> This method can actually be used to obtain the builder contents to emit code.
@@ -72,7 +60,7 @@ internal class CodeBuilder
         args ??= [null];
         if (message.Length > 0 && args.Length > 0) message = string.Format(message, args);
 
-        var count = message.Count(x => x == '\n');
+        var count = message.Count(static x => x == '\n');
         if (count == 0)
         {
             if (AtOrigin) Builder.Append(Header());

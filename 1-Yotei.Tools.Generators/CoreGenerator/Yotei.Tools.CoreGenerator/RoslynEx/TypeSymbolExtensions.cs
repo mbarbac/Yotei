@@ -13,7 +13,7 @@ internal static class TypeSymbolExtensions
         /// <summary>
         /// Determines if the type is a partial one, or not.
         /// </summary>
-        public bool IsPartial => symbol.GetSyntaxNodes().Any(x => x.IsPartial);
+        public bool IsPartial => symbol.GetSyntaxNodes().Any(static x => x.IsPartial);
 
         /// <summary>
         /// The base types of this one, in inheritance order.
@@ -60,7 +60,7 @@ internal static class TypeSymbolExtensions
         public IMethodSymbol? FindCopyConstructor(bool strict = true)
         {
             var comparer = SymbolEqualityComparer.Default;
-            var methods = symbol.GetMembers().OfType<IMethodSymbol>().Where(x =>
+            var methods = symbol.GetMembers().OfType<IMethodSymbol>().Where(static x =>
                 x.MethodKind == MethodKind.Constructor &&
                 x.IsStatic == false &&
                 x.Parameters.Length == 1)

@@ -503,7 +503,7 @@ internal static class XNode
         type.ThrowWhenNull();
         chains.ThrowWhenNull();
 
-        return type.Finder(usehost, (INamedTypeSymbol type, out AttributeData value) =>
+        return type.Finder(usehost, (type, out value) =>
         {
             var found = type.FindDecoratedMember(true, name, out var member);
             if (found)
@@ -541,7 +541,7 @@ internal static class XNode
         type.ThrowWhenNull();
         chains.ThrowWhenNull();
 
-        return type.Finder(usehost, (INamedTypeSymbol type, out AttributeData value) =>
+        return type.Finder(usehost, static (type, out value) =>
         {
             value = type.GetAttributes(typeof(InheritWithsAttribute)).FirstOrDefault();
             if (value != null) return true;

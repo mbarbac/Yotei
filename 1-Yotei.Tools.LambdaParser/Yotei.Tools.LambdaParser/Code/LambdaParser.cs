@@ -204,7 +204,7 @@ public class LambdaParser
     /// <returns><inheritdoc/></returns>
     public override string ToString()
     {
-        var args = DynamicArguments.Select(x => x.Sketch()).Sketch();
+        var args = DynamicArguments.Select(static x => x.Sketch()).Sketch();
         return $"({args}) => {Result}";
     }
 
@@ -335,7 +335,7 @@ public class LambdaParser
         if (list.Length == 0 && !canBeEmpty) throw new ArgumentException(
             "Collection of arguments cannot be empty.");
 
-        if (list.Length != 0 && list.Any(x => x is null)) throw new ArgumentException(
+        if (list.Length != 0 && list.Any(static x => x is null)) throw new ArgumentException(
             "Collection of arguments carries null elements.")
             .WithData(args);
 
@@ -357,7 +357,7 @@ public class LambdaParser
         if (list.Length == 0) throw new EmptyException(
             "Collection of type arguments cannot be empty.");
 
-        if (list.Any(x => x is null)) throw new ArgumentException(
+        if (list.Any(static x => x is null)) throw new ArgumentException(
             "Collection of type arguments carries null elements.")
             .WithData(args);
 

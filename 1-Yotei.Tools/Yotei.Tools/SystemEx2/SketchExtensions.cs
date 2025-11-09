@@ -167,7 +167,7 @@ public static class SketchExtensions
             foreach (var field in fields)
             {
                 if (field.CustomAttributes.Any(
-                    x => x.AttributeType == typeof(CompilerGeneratedAttribute)))
+                    static x => x.AttributeType == typeof(CompilerGeneratedAttribute)))
                     continue;
 
                 var name = field.EasyName();
@@ -215,7 +215,7 @@ public static class SketchExtensions
             if (type == typeof(object)) return; // Exiting recursion...
 
             var flags = BindingFlags.Instance | BindingFlags.Public;
-            var methods = type.GetMethods(flags).Where(x => x.Name == "ToString");
+            var methods = type.GetMethods(flags).Where(static x => x.Name == "ToString");
 
             if (options.FormatString != null && options.FormatProvider != null)
             {

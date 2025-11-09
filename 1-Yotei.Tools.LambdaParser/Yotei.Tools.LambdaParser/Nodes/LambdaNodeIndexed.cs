@@ -26,7 +26,7 @@ public class LambdaNodeIndexed : LambdaNodeHosted
     /// <returns><inheritdoc/></returns>
     public override string ToString()
     {
-        var str = $"{LambdaHost}[{string.Join(", ", LambdaIndexes.Select(x => x.ToString()))}]";
+        var str = $"{LambdaHost}[{string.Join(", ", LambdaIndexes.Select(static x => x.ToString()))}]";
         return str;
     }
 

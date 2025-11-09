@@ -123,7 +123,7 @@ internal class FileNode : INode
         /// </summary>
         void EmitNoSyntax()
         {
-            var nschain = Node.Symbol.GetChain().Where(x => x is INamespaceSymbol);
+            var nschain = Node.Symbol.GetChain().Where(static x => x is INamespaceSymbol);
             var first = true;
             var sb = new StringBuilder(); foreach (var ns in nschain)
             {
@@ -171,7 +171,7 @@ internal class FileNode : INode
         void EmitTypes()
         {
             // Get the chain of intermediate parent types...
-            var tpchain = Symbol.GetChain().Where(x => x is INamedTypeSymbol).ToList();
+            var tpchain = Symbol.GetChain().Where(static x => x is INamedTypeSymbol).ToList();
             tpchain = tpchain.GetRange(0, tpchain.Count - 1);
 
             // Emit them, and the one of this instance as the tail one...

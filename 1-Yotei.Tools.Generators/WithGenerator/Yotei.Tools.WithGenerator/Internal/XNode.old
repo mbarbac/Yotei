@@ -16,7 +16,7 @@ public string? GetInterfaceModifiers()
     if (node.IsInherited) return "new ";
 
     // There might be a member already declared...
-    var found = host.Finder<bool>(false, (parent, out value) =>
+    var found = host.Finder<bool>(false, static (parent, out value) =>
     {
         var itype = (node.Symbol as IPropertySymbol)?.Type ?? ((IFieldSymbol)node.Symbol).Type;
 
@@ -61,7 +61,7 @@ public string? GetAbstractModifiers()
 
     // With inherited members, we need to understand what has been declared or implemented
     // in the chain: it drives what modifiers we need to use...
-    var found = host.Finder<string?>(false, (parent, out value) =>
+    var found = host.Finder<string?>(false, static (parent, out value) =>
     {
         value = null!;
 
@@ -125,7 +125,7 @@ public string? GetRegularModifiers(SourceProductionContext context)
 
     // With inherited members, we need to understand what has been declared or implemented
     // in the chain: it drives what modifiers we need to use...
-    var found = host.Finder<string?>(false, (parent, out value) =>
+    var found = host.Finder<string?>(false, static (parent, out value) =>
     {
         value = null;
 

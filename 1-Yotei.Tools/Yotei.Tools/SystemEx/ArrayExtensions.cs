@@ -181,7 +181,7 @@ public static class ArrayExtensions
 
         if (source.Length == 0) return source;
 
-        var index = source.IndexOf(x => !x.EqualsEx(default));
+        var index = source.IndexOf(static x => !x.EqualsEx(default));
         if (index <= 0) return source;
 
         var num = source.Length - index;
@@ -203,7 +203,7 @@ public static class ArrayExtensions
 
         if (source.Length == 0) return source;
 
-        var index = source.LastIndexOf(x => !x.EqualsEx(default));
+        var index = source.LastIndexOf(static x => !x.EqualsEx(default));
         if (index < 0) return source;
         if (index ==  source.Length - 1) return source;
 

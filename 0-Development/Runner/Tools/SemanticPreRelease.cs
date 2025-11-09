@@ -58,7 +58,8 @@ public record SemanticPreRelease : IComparable<SemanticPreRelease>
     /// <summary>
     /// Conversion operator.
     /// </summary>
-    public static implicit operator string(SemanticPreRelease value) => value.ThrowWhenNull().ToString();
+    public static implicit operator string(
+        SemanticPreRelease value) => value.ThrowWhenNull().ToString();
 
     /// <summary>
     /// Conversion operator.

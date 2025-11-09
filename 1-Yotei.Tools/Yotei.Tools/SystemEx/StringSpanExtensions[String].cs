@@ -439,7 +439,7 @@ public static class StringSpanExtensions_StringTarget
         if (count == 0) return source;
 
         removed = true;
-        ReadOnlySpan<char> temp;
+        StringSpan temp;
         var array = new char[source.Length - count];
         temp = source[..index]; temp.CopyTo(array);
 

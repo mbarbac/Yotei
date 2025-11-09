@@ -65,8 +65,8 @@ internal class XTypeNode : TypeNode
         if (atc.Arity == 0)
         {
             var args = at.ConstructorArguments
-                .Where(x => !x.IsNull && x.Kind == TypedConstantKind.Type)
-                .Select(x => (INamedTypeSymbol)x.Value!)
+                .Where(static x => !x.IsNull && x.Kind == TypedConstantKind.Type)
+                .Select(static x => (INamedTypeSymbol)x.Value!)
                 .ToArray();
 
             if (args.Length == 1) // One type argument: <T>...
@@ -293,12 +293,12 @@ internal class XTypeNode : TypeNode
     /// <returns></returns>
     List<string> GetMethodInterfaces(MethodInfo method)
     {
-        var types = method.GetParameters().Select(x => x.ParameterType).ToArray();
+        var types = method.GetParameters().Select(static x => x.ParameterType).ToArray();
         var comparer = SymbolEqualityComparer.Default;
         List<INamedTypeSymbol> list = [];
         foreach (var iface in Symbol.Interfaces) TryCapture(iface);
 
-        var items = list.Select(x => x.EasyName(EasyNameOptions.Full)).ToList();
+        var items = list.Select(static x => x.EasyName(EasyNameOptions.Full)).ToList();
         var core = $"IInvariantList{Bracket}";
         if (!items.Contains(core)) items.Add(core);
         return items;
@@ -396,12 +396,12 @@ internal class XTypeNode : TypeNode
     static bool HasClone(
         INamedTypeSymbol type, out IMethodSymbol? method, out AttributeData? atr)
     {
-        method = type.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(x =>
+        method = type.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(static x =>
             x.Name == "Clone" &&
             x.Parameters.Length == 0 &&
             x.ReturnsVoid == false);
 
-        atr = type.GetAttributes().FirstOrDefault(x =>
+        atr = type.GetAttributes().FirstOrDefault(static x =>
             x.AttributeClass is not null &&
             x.AttributeClass.Name == "Cloneable");
 
@@ -418,7 +418,7 @@ internal class XTypeNode : TypeNode
         List<INamedTypeSymbol> list = [];
         foreach (var iface in Symbol.Interfaces) TryCapture(iface);
 
-        var items = list.Select(x => x.EasyName(EasyNameOptions.Full)).ToList();
+        var items = list.Select(static x => x.EasyName(EasyNameOptions.Full)).ToList();
         return items;
 
         // Tries to capture the given interface as an explicit one.
@@ -483,7 +483,7 @@ internal class XTypeNode : TypeNode
                 x.Name == name &&
                 x.Parameters.Length == argtypes.Length &&
                 argtypes
-                    .Select((t, i) => new { T = t, I = i })
+                    .Select(static (t, i) => new { T = t, I = i })
                     .All(arg => strict ?
                         SymbolEqualityComparer.Default.Equals(arg.T, x.Parameters[arg.I].Type) :
                         arg.T.IsAssignableTo(x.Parameters[arg.I].Type)));
@@ -514,9 +514,9 @@ internal class XTypeNode : TypeNode
         type.ThrowWhenNull();
         chains.ThrowWhenNull();
 
-        return type.Finder(usehost, (type, out value) =>
+        return type.Finder(usehost, static (type, out value) =>
         {
-            value = type.GetAttributes().FirstOrDefault(x =>
+            value = type.GetAttributes().FirstOrDefault(static x =>
                 x.AttributeClass is not null && (
                 x.AttributeClass.Name.StartsWith("InvariantList") ||
                 x.AttributeClass.Name.StartsWith("IInvariantList")));

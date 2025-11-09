@@ -51,7 +51,7 @@ public class MethodHolder
     /// <returns></returns>
     public static bool HasEnforcedAttribute(MethodInfo method) => method.ThrowWhenNull()
         .GetCustomAttributes(true)
-        .Any(x => x.GetType().Name == nameof(EnforcedAttribute));
+        .Any(static x => x.GetType().Name == nameof(EnforcedAttribute));
 
     /// <summary>
     /// Determines if the given method is a valid test one, or not.
@@ -67,7 +67,7 @@ public class MethodHolder
         if (pars.Length != 0) return false;
 
         // [Fact] decorated method...
-        var attrs = method.GetCustomAttributes(true).Where(x =>
+        var attrs = method.GetCustomAttributes(true).Where(static x =>
             x is not null &&
             x.GetType().Name == "FactAttribute");
 

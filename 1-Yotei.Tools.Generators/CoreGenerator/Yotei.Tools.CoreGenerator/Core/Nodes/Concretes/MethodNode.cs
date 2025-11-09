@@ -72,7 +72,7 @@ internal class MethodNode : INode
     public ImmutableArray<AttributeData> Attributes
     {
         get;
-        init => field = value.Length == 0 ? [] : (value.Any(x => x is null)
+        init => field = value.Length == 0 ? [] : (value.Any(static x => x is null)
             ? throw new ArgumentException("Collection of attributes carries null elements.").WithData(value)
             : value);
     } = [];

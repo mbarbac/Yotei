@@ -39,7 +39,7 @@ internal class TypeNode : INode
     public ImmutableArray<AttributeData> Attributes
     {
         get;
-        init => field = value.Length == 0 ? [] : (value.Any(x => x is null)
+        init => field = value.Length == 0 ? [] : (value.Any(static x => x is null)
             ? throw new ArgumentException("Collection of attributes carries null elements.").WithData(value)
             : value);
     } = [];
@@ -50,7 +50,7 @@ internal class TypeNode : INode
     /// The collection of child properties registered into this instance.
     /// </summary>
     public CustomList<PropertyNode> ChildProperties { get; }
-    = new() { AreEqual = (x, y) => Compare(x.Symbol, y.Symbol, strict: true) };
+    = new() { AreEqual = static (x, y) => Compare(x.Symbol, y.Symbol, strict: true) };
 
     /// <summary>
     /// Determines if the two given properties can be considered the same, or not. In strict mode,
@@ -86,7 +86,7 @@ internal class TypeNode : INode
     /// The collection of child fields registered into this instance.
     /// </summary>
     public CustomList<FieldNode> ChildFields { get; }
-    = new() { AreEqual = (x, y) => Compare(x.Symbol, y.Symbol) };
+    = new() { AreEqual = static (x, y) => Compare(x.Symbol, y.Symbol) };
 
     /// <summary>
     /// Determines if the two given methods can be considered the same, or not. In strict mode,
@@ -106,7 +106,7 @@ internal class TypeNode : INode
     /// The collection of child methods registered into this instance.
     /// </summary>
     public CustomList<MethodNode> ChildMethods { get; }
-    = new() { AreEqual = (x, y) => Compare(x.Symbol, y.Symbol, strict: true) };
+    = new() { AreEqual = static (x, y) => Compare(x.Symbol, y.Symbol, strict: true) };
 
     /// <summary>
     /// Determines if the two given methods can be considered the same, or not. In strict mode,

@@ -10,7 +10,8 @@ internal static class AttributeExtensions
     /// <param name="sources"></param>
     /// <returns></returns>
     public static IEnumerable<AttributeSyntax> GetAttributes(
-        this SyntaxList<AttributeListSyntax> sources) => sources.SelectMany(x => x.Attributes);
+        this SyntaxList<AttributeListSyntax> sources)
+        => sources.SelectMany(static x => x.Attributes);
 
     // ----------------------------------------------------
 

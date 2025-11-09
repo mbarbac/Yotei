@@ -52,7 +52,7 @@ internal class CoreGenerator : IIncrementalGenerator
         // Registering actions...
         var items = context.SyntaxProvider
             .CreateSyntaxProvider(Predicate, Transform)
-            .Where(x => x != null)
+            .Where(static x => x != null)
             .Collect();
 
         // Registering source code emission...
@@ -353,7 +353,7 @@ internal class CoreGenerator : IIncrementalGenerator
     /// <param name="candidates"></param>
     void Execute(SourceProductionContext context, ImmutableArray<ICandidate> candidates)
     {
-        if (candidates.Any(x => x is null)) throw new ArgumentException(
+        if (candidates.Any(static x => x is null)) throw new ArgumentException(
             "Collection of source code generation candidates carries null elements.")
             .WithData(candidates);
 
@@ -363,7 +363,7 @@ internal class CoreGenerator : IIncrementalGenerator
 
         candidates.OfType<ErrorCandidate>().ForEach(x => x.Diagnostic.Report(context));
         candidates.OfType<TypeCandidate>().ForEach(OnExecute);
-        candidates.OfType<IValidCandidate>().ForEach(x => x is not TypeCandidate, OnExecute);
+        candidates.OfType<IValidCandidate>().ForEach(static x => x is not TypeCandidate, OnExecute);
 
         foreach (var file in files)
         {

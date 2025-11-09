@@ -66,7 +66,7 @@ public class TypeHolder
     /// <returns></returns>
     public static bool HasEnforcedAttribute(Type type) => type.ThrowWhenNull()
         .GetCustomAttributes(true)
-        .Any(x => x.GetType().Name == nameof(EnforcedAttribute));
+        .Any(static x => x.GetType().Name == nameof(EnforcedAttribute));
 
     /// <summary>
     /// Determines if the given type is a valid test one, or not.

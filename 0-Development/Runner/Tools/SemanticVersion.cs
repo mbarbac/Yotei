@@ -134,7 +134,8 @@ public record SemanticVersion : IComparable<SemanticVersion>
     /// Conversion operator.
     /// </summary>
     /// <param name="value"></param>
-    public static implicit operator string(SemanticVersion value) => value.ThrowWhenNull().ToString();
+    public static implicit operator string(
+        SemanticVersion value) => value.ThrowWhenNull().ToString();
 
     /// <summary>
     /// Conversion operator.

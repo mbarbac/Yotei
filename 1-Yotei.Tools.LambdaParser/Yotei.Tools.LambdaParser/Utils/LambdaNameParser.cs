@@ -65,7 +65,7 @@ public static class LambdaNameParser
         parts = [.. items];
         arg = parser.DynamicArguments[0];
 
-        return parts.Length == 0 || parts.All(x => x.Length == 0)
+        return parts.Length == 0 || parts.All(static x => x.Length == 0)
             ? string.Empty
             : string.Join(".", parts);
     }

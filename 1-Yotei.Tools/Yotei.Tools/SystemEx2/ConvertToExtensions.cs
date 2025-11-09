@@ -486,7 +486,7 @@ public static class ConvertToExtensions
     {
         if (StandardToString.TryGetValue(type, out var temp)) return temp;
 
-        var methods = type.GetMethods().Where(x => x.Name == "ToString");
+        var methods = type.GetMethods().Where(static x => x.Name == "ToString");
         foreach (var method in methods)
         {
             if (method.DeclaringType != type) continue;
@@ -511,7 +511,7 @@ public static class ConvertToExtensions
     {
         if (FormattedToString.TryGetValue(type, out var temp)) return temp;
 
-        var methods = type.GetMethods().Where(x => x.Name == "ToString");
+        var methods = type.GetMethods().Where(static x => x.Name == "ToString");
         foreach (var method in methods)
         {
             if (method.DeclaringType != type) continue;
@@ -537,7 +537,7 @@ public static class ConvertToExtensions
     {
         if (StandardTryParser.TryGetValue(type, out var temp)) return temp;
 
-        var methods = type.GetMethods().Where(x => x.Name == "TryParse");
+        var methods = type.GetMethods().Where(static x => x.Name == "TryParse");
         foreach (var method in methods)
         {
             if (!method.IsStatic) continue;
@@ -568,7 +568,7 @@ public static class ConvertToExtensions
     {
         if (FormattedTryParser.TryGetValue(type, out var temp)) return temp;
 
-        var methods = type.GetMethods().Where(x => x.Name == "TryParse");
+        var methods = type.GetMethods().Where(static x => x.Name == "TryParse");
         foreach (var method in methods)
         {
             if (!method.IsStatic) continue;

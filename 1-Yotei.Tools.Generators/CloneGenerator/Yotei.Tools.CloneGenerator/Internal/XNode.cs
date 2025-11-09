@@ -126,7 +126,7 @@ internal static class XNode
         chains.ThrowWhenNull();
         value = null;
 
-        return type.Finder(useHost, (type, out value) =>
+        return type.Finder(useHost, static (type, out value) =>
         {
             value = type.GetAttributes(typeof(CloneableAttribute)).FirstOrDefault();
             if (value != null) return true;
@@ -152,7 +152,7 @@ internal static class XNode
         /// <returns></returns>
         public string? GetInterfaceModifiers()
         {
-            var found = node.Symbol.Finder<string?>(false, (parent, out value) =>
+            var found = node.Symbol.Finder<string?>(false, static (parent, out value) =>
             {
                 // If existing or requested...
                 if (parent.FindMethod(true, out _) ||
@@ -191,7 +191,7 @@ internal static class XNode
         /// --------------- --------------- ----------------
         public string? GetAbstractModifiers()
         {
-            var found = node.Symbol.Finder<string?>(false, (parent, out value) =>
+            var found = node.Symbol.Finder<string?>(false, static (parent, out value) =>
             {
                 value = null;
 
