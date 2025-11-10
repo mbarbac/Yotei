@@ -70,9 +70,7 @@ partial class ElementList_KT
 
         readonly struct MyComparer(bool Sensitive) : IEqualityComparer<TKey>
         {
-            public bool Equals(TKey? x, TKey? y)
-                => string.Compare(x, y, !Sensitive) == 0;
-
+            public bool Equals(TKey? x, TKey? y) => string.Compare(x, y, !Sensitive) == 0;
             public int GetHashCode(TKey obj) => throw new NotImplementedException();
         }
 

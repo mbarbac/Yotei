@@ -71,7 +71,6 @@ partial class ElementList_T
                     ? string.Compare(xnamed.Name, ynamed.Name, !Sensitive) == 0
                     : ReferenceEquals(x, y);
             }
-
             public int GetHashCode(IItem obj) => throw new NotImplementedException();
         }
 
