@@ -37,6 +37,23 @@ public partial class IdentifierChain : IHost
     /// <inheritdoc/>
     public override string ToString() => Items.ToString();
 
+    // ------------------------------------------------
+
+    /// <summary>
+    /// Initializes a new instance with the elements obtained from the given value.
+    /// </summary>
+    /// <param name="engine"></param>
+    /// <param name="value"></param>
+    public IdentifierChain(IEngine engine, string? value) : this(engine) => Items.Add(value);
+
+    /// <summary>
+    /// Initializes a new instance with the elements obtained from the given range of values.
+    /// </summary>
+    /// <param name="engine"></param>
+    /// <param name="range"></param>
+    public IdentifierChain(
+        IEngine engine, IEnumerable<string?> range) : this(engine) => Items.AddRange(range);
+
     // ----------------------------------------------------
 
     /// <summary>
@@ -44,28 +61,23 @@ public partial class IdentifierChain : IHost
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
-    public bool Equals(IIdentifier? other) => throw null;
-    //{
-    //    if (ReferenceEquals(this, other)) return true;
-    //    if (other is null) return false;
-    //    if (other is not IHost valid) return false;
+    public bool Equals(IIdentifier? other)
+    {
+        if (ReferenceEquals(this, other)) return true;
+        if (other is null) return false;
+        if (other is not IHost valid) return false;
 
-    //    if (!Engine.Equals(valid.Engine)) return false;
-    //    if (Count != valid.Count) return false;
+        if (!Engine.Equals(valid.Engine)) return false;
+        if (Count != valid.Count) return false;
 
-    //    for (int i = 0; i < Count; i++)
-    //    {
-    //        var item = Items[i];
-    //        var temp = valid[i];
-    //        var same = item is NamedElement xitem && temp is NamedElement xtemp
-    //            ? xitem.Equals(xtemp, Engine.CaseSensitiveNames)
-    //            : item.Equals(temp);
-
-    //        if (!same) return false;
-    //    }
-
-    //    return true;
-    //}
+        for (int i = 0; i < Count; i++)
+        {
+            var item = Items[i];
+            var temp = valid[i];
+            var same = item.Equals(temp); if (!same) return false;
+        }
+        return true;
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -88,12 +100,12 @@ public partial class IdentifierChain : IHost
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override int GetHashCode() => throw null;
-    //{
-    //    var code = Engine.GetHashCode();
-    //    for (int i = 0; i < Count; i++) code = HashCode.Combine(code, Items[i]);
-    //    return code;
-    //}
+    public override int GetHashCode()
+    {
+        var code = Engine.GetHashCode();
+        for (int i = 0; i < Count; i++) code = HashCode.Combine(code, Items[i]);
+        return code;
+    }
 
     // ----------------------------------------------------
 
@@ -114,11 +126,7 @@ public partial class IdentifierChain : IHost
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public string? Value
-    {
-        get => throw null;
-        init => throw null;
-    }
+    public string? Value => Items.Value;
 
     // ------------------------------------------------
 
@@ -128,21 +136,36 @@ public partial class IdentifierChain : IHost
     /// <param name="index"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public virtual IHost Replace(int index, string? value)=> throw null;
+    public virtual IHost Replace(int index, string? value)
+    {
+        var builder = CreateBuilder();
+        var done = builder.Replace(index, value);
+        return done > 0 ? builder.CreateInstance() : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IHost Add(string? value)=> throw null;
+    public virtual IHost Add(string? value)
+    {
+        var builder = CreateBuilder();
+        var done = builder.Add(value);
+        return done > 0 ? builder.CreateInstance() : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual IHost AddRange(IEnumerable<string?> range)=> throw null;
+    public virtual IHost AddRange(IEnumerable<string?> range)
+    {
+        var builder = CreateBuilder();
+        var done = builder.AddRange(range);
+        return done > 0 ? builder.CreateInstance() : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -150,7 +173,12 @@ public partial class IdentifierChain : IHost
     /// <param name="index"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public virtual IHost Insert(int index, string? value)=> throw null;
+    public virtual IHost Insert(int index, string? value)
+    {
+        var builder = CreateBuilder();
+        var done = builder.Insert(index, value);
+        return done > 0 ? builder.CreateInstance() : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -158,5 +186,10 @@ public partial class IdentifierChain : IHost
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual IHost InsertRange(int index, IEnumerable<string?> range)=> throw null;
+    public virtual IHost InsertRange(int index, IEnumerable<string?> range)
+    {
+        var builder = CreateBuilder();
+        var done = builder.InsertRange(index, range);
+        return done > 0 ? builder.CreateInstance() : this;
+    }
 }

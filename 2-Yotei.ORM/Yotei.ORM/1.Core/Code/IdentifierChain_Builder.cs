@@ -397,9 +397,14 @@ partial class IdentifierChain
             var items = Identifier.GetParts(Engine, value, reduce);
             if (items.Count == 0) return [];
 
+            // It may happen that some parts have embedded dots if they were protected by the
+            // engine terminators. If so, to prevent single-part exceptions, we need to re-wrap.
+
             return [.. items.Select(x => x is null
                 ? new IdentifierUnit(Engine)
-                : new IdentifierUnit(Engine, x))];
+                : new IdentifierUnit(Engine, x.Contains('.')
+                    ? x.Wrap(Engine.LeftTerminator, Engine.RightTerminator, false)
+                    : x))];
         }
 
         /// <summary>
@@ -412,7 +417,16 @@ partial class IdentifierChain
         int Replace(int index, string? value, bool reduce)
         {
             var parts = GetParts(value, false);
-            throw null;
+            if (parts.Count == 0) parts.Add(new IdentifierUnit(Engine));
+
+            var r = 0; foreach (var part in parts)
+            {
+                var num = Replace(index, part);
+                r += num;
+                index += num;
+            }
+            if (r > 0 && reduce) Reduce();
+            return r;
         }
 
         /// <summary>
@@ -423,16 +437,8 @@ partial class IdentifierChain
         public virtual int Add(string? value) => Add(value, true);
         int Add(string? value, bool reduce)
         {
-            var parts = GetParts(value, false);
-            if (Count == 0 && reduce && parts.All(static x => x.Value is null)) return 0;
-
-            var r = 0; foreach (var part in parts)
-            {
-                var num = Add(part, false);
-                r += num;
-            }
-            if (r > 0 && reduce) Reduce();
-            return r;
+            var parts = value is null ? [new IdentifierUnit(Engine)] : GetParts(value, false);
+            return AddRange(parts, reduce);
         }
 
         /// <summary>
@@ -445,13 +451,8 @@ partial class IdentifierChain
         {
             range.ThrowWhenNull();
 
-            var r = 0; foreach (var item in range)
-            {
-                var num = Add(item ?? string.Empty, false);
-                r += num;
-            }
-            if (r > 0 && reduce) Reduce();
-            return r;
+            var parts = range.SelectMany(x => GetParts(x, false));
+            return AddRange(parts, reduce);
         }
 
         /// <summary>
@@ -463,18 +464,8 @@ partial class IdentifierChain
         public virtual int Insert(int index, string? value) => Insert(index, value, true);
         int Insert(int index, string? value, bool reduce)
         {
-            var parts = GetParts(value, false);
-            if (Count == 0 && reduce && parts.All(static x => x.Value is null)) return 0;
-            if (index == 0 && reduce && parts.All(static x => x.Value is null)) return 0;
-
-            var r = 0; foreach (var part in parts)
-            {
-                var num = Insert(index, part, false);
-                r += num;
-                index += num;
-            }
-            if (r > 0 && reduce) Reduce();
-            return r;
+            var parts = value is null ? [new IdentifierUnit(Engine)] : GetParts(value, false);
+            return InsertRange(index, parts, reduce);
         }
 
         /// <summary>
@@ -488,14 +479,8 @@ partial class IdentifierChain
         {
             range.ThrowWhenNull();
 
-            var r = 0; foreach (var item in range)
-            {
-                var num = Insert(index, item ?? string.Empty, false);
-                r += num;
-                index += num;
-            }
-            if (r > 0 && reduce) Reduce();
-            return r;
+            var parts = range.SelectMany(x => GetParts(x, false));
+            return InsertRange(index, parts, reduce);
         }
     }
 }
