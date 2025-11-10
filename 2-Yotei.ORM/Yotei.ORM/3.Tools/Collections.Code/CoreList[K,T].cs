@@ -179,11 +179,11 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public List<int> IndexesOf(K key) => IndexesOf(key, validate: true);
-    List<int> IndexesOf(K key, bool validate)
+    public List<int> AllIndexesOf(K key) => AllIndexesOf(key, validate: true);
+    List<int> AllIndexesOf(K key, bool validate)
     {
         if (validate) key = ValidateKey(key);
-        return IndexesOf(x => Comparer.Equals(key, GetKey(x)));
+        return AllIndexesOf(x => Comparer.Equals(key, GetKey(x)));
     }
 
     /// <summary>
@@ -224,7 +224,7 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public List<int> IndexesOf(Predicate<T> predicate)
+    public List<int> AllIndexesOf(Predicate<T> predicate)
     {
         predicate.ThrowWhenNull();
 
@@ -267,11 +267,11 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
 
     /// <summary>
     /// Returns the indexes of the elements whose keys can be considered as duplicates of the
-    /// given one. By default, this method just invokes '<see cref="IndexesOf(K)"/>'.
+    /// given one. By default, this method just invokes '<see cref="AllIndexesOf(K)"/>'.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    protected virtual List<int> FindDuplicates(K key) => IndexesOf(key);
+    protected virtual List<int> FindDuplicates(K key) => AllIndexesOf(key);
 
     /// <summary>
     /// Determines if the existing source element can be considered the same as the given target
@@ -475,7 +475,7 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     public virtual int RemoveAll(K key)
     {
         key = ValidateKey(key);
-        var nums = IndexesOf(key, validate: false);
+        var nums = AllIndexesOf(key, validate: false);
 
         var num = 0;
         for (int i = nums.Count - 1; i >= 0; i--)
@@ -516,7 +516,7 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     /// We assume that 'IndexesOf' produces an ordered list of indexes.
     public virtual int RemoveAll(Predicate<T> predicate)
     {
-        var nums = IndexesOf(predicate);
+        var nums = AllIndexesOf(predicate);
 
         var num = 0;
         for (int i = nums.Count - 1; i >= 0; i--)

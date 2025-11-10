@@ -116,7 +116,7 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public List<int> IndexesOf(K key) => Items.IndexesOf(key);
+    public List<int> AllIndexesOf(K key) => Items.AllIndexesOf(key);
 
     /// <summary>
     /// <inheritdoc/>
@@ -144,7 +144,7 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public List<int> IndexesOf(Predicate<T> predicate) => Items.IndexesOf(predicate);
+    public List<int> AllIndexesOf(Predicate<T> predicate) => Items.AllIndexesOf(predicate);
 
     /// <summary>
     /// <inheritdoc/>

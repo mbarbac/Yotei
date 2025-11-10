@@ -120,12 +120,12 @@ public class Test_ElementList_KT
         Assert.Equal(3, items.LastIndexOf("one"));
         Assert.Equal(3, items.LastIndexOf("ONE"));
 
-        var list = items.IndexesOf("one");
+        var list = items.AllIndexesOf("one");
         Assert.Equal(2, list.Count);
         Assert.Equal(0, list[0]);
         Assert.Equal(3, list[1]);
 
-        list = items.IndexesOf("ONE");
+        list = items.AllIndexesOf("ONE");
         Assert.Equal(2, list.Count);
         Assert.Equal(0, list[0]);
         Assert.Equal(3, list[1]);
@@ -143,7 +143,7 @@ public class Test_ElementList_KT
         Assert.Equal(0, items.IndexOf(x => ((Element)x).Name.Contains('n')));
         Assert.Equal(3, items.LastIndexOf(x => ((Element)x).Name.Contains('n')));
 
-        var list = items.IndexesOf(x => ((Element)x).Name.Contains('n'));
+        var list = items.AllIndexesOf(x => ((Element)x).Name.Contains('n'));
         Assert.Equal(2, list.Count);
         Assert.Equal(0, list[0]);
         Assert.Equal(3, list[1]);

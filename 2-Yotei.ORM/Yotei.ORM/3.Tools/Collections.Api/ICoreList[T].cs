@@ -49,7 +49,7 @@ public partial interface ICoreList<T>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    List<int> IndexesOf(T item);
+    List<int> AllIndexesOf(T item);
 
     /// <summary>
     /// Determines if this collection contains an element that matches the given predicate.
@@ -77,7 +77,7 @@ public partial interface ICoreList<T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    List<int> IndexesOf(Predicate<T> predicate);
+    List<int> AllIndexesOf(Predicate<T> predicate);
 
     /// <summary>
     /// Returns an array with the elements of this collection.
