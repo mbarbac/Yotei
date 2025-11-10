@@ -33,6 +33,8 @@ public static class Identifier
         return items;
     }
 
+    // ----------------------------------------------------
+
     /// <summary>
     /// Invoked to obtain the raw dot-separated parts of the given value when the engine does
     /// not use terminators.
@@ -41,8 +43,26 @@ public static class Identifier
     /// <returns></returns>
     static List<string?> GetRawParts(string value)
     {
-        throw null;
+        string?[] items = value.Contains('.') ? value.Split('.') : [value];
+
+        for (int i = 0; i < items.Length; i++)
+        {
+            var part = items[i] = items[i].NullWhenEmpty(true);
+            if (part is not null)
+            {
+                if (part.Contains(' ')) throw new ArgumentException(
+                "Not-terminated identifier part cannot contain spaces.")
+                .WithData(part);
+
+                if (part.Contains('.')) throw new ArgumentException(
+                    "Not-terminated identifier part cannot contain dots.")
+                    .WithData(part);
+            }
+        }
+        return [.. items];
     }
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// Invoked to obtain the raw dot-separated parts of the given value when the engine uses
@@ -53,6 +73,97 @@ public static class Identifier
     /// <returns></returns>
     static List<string?> GetRawParts(string value, IEngine engine)
     {
-        throw null;
+        var parts = engine.UseTerminators ? Split(value, engine) : [.. value.Split('.')];
+        for (int i = 0; i < parts.Count; i++)
+        {
+            var part = parts[i];
+            part = engine.UseTerminators ? part.Unwrap(engine.LeftTerminator, engine.RightTerminator, true) : part;
+            part = parts[i] = part.NullWhenEmpty(true);
+
+            if (part is not null)
+            {
+                if (part.StartsWith('.') || part.EndsWith('.')) throw new ArgumentException(
+                    "Identifier part cannot begin or end with dots.")
+                    .WithData(part);
+            }
+        }
+        return parts;
+
+        /// <summary>
+        /// Splits the given value into dot-separated parts when terminators are used.
+        /// </summary>
+        static List<string?> Split(string value, IEngine engine)
+        {
+            var dots = GetDots(value, engine);
+            List<string?> parts = [];
+            int ini = 0;
+            int end, len;
+            string str;
+
+            for (int i = 0; i < dots.Count; i++)
+            {
+                end = dots[i];
+                len = end - ini;
+                str = value.Substring(ini, len); parts.Add(str);
+                ini = end + 1;
+            }
+            end = value.Length;
+            len = end - ini;
+            str = value.Substring(ini, len); parts.Add(str);
+
+            return parts;
+        }
+
+        /// <summary>
+        /// Obtains the indexes of the unprotected dots.
+        /// </summary>
+        static List<int> GetDots(string value, IEngine engine)
+        {
+            return engine.LeftTerminator == engine.RightTerminator
+                ? GetDotsOne(value, engine.LeftTerminator)
+                : GetDotsTwo(value, engine.LeftTerminator, engine.RightTerminator);
+        }
+
+        /// <summary>
+        /// Obtains the indexes of the unprotected dots when both terminators are the same.
+        /// </summary>
+        static List<int> GetDotsOne(string value, char ch)
+        {
+            List<int> dots = [];
+            bool found = false;
+
+            for (int i = 0; i < value.Length; i++)
+            {
+                var c = value[i];
+                if (c == ch) { found = !found; continue; }
+                if (c == '.') { if (!found) dots.Add(i); continue; }
+            }
+            return dots;
+        }
+
+        /// <summary>
+        /// Obtains the indexes of the unprotected dots when terminators differ.
+        /// </summary>
+        static List<int> GetDotsTwo(string value, char left, char right)
+        {
+            List<int> temps = [];
+            List<int> dots = [];
+
+            for (int i = 0; i < value.Length; i++)
+            {
+                var c = value[i];
+                if (c == left) { temps.Add(i); continue; }
+                if (c == right)
+                {
+                    if (temps.Count == 0) continue;
+
+                    var last = temps[^1];
+                    temps.RemoveAt(temps.Count - 1);
+                    dots = [.. dots.Where(x => x < last)];
+                }
+                if (c == '.') { dots.Add(i); continue; }
+            }
+            return dots;
+        }
     }
 }

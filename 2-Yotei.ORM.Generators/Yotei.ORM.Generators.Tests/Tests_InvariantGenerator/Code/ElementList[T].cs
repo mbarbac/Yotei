@@ -57,7 +57,7 @@ public partial class ElementList_T : IHost
             var item = Items[i];
             var temp = valid[i];
             var same = item is NamedElement xitem && temp is NamedElement xtemp
-                ? xitem.Equals(xtemp, Engine.CaseSensitive)
+                ? xitem.Equals(xtemp, Engine.CaseSensitiveNames)
                 : item.Equals(temp);
 
             if (!same) return false;

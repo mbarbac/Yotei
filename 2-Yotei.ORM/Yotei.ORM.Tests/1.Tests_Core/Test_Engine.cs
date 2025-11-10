@@ -10,7 +10,7 @@ public class Test_Engine
     {
         var engine = new FakeEngine();
 
-        Assert.Equal(Code.Engine.CASESENSITIVE, engine.CaseSensitive);
+        Assert.Equal(Code.Engine.CASESENSITIVENAMES, engine.CaseSensitiveNames);
         Assert.Equal(Code.Engine.NULLVALUELITERAL, engine.NullValueLiteral);
         Assert.Equal(Code.Engine.POSITIONALPARAMETERS, engine.PositionalParameters);
         Assert.Equal(Code.Engine.PARAMETERPREFIX, engine.ParameterPrefix);
@@ -38,9 +38,9 @@ public class Test_Engine
     public static void Test_WithMethods()
     {
         var source = new FakeEngine();
-        var target = source.WithCaseSensitive(true);
+        var target = source.WithCaseSensitiveNames(true);
         Assert.NotSame(source, target);
-        Assert.True(target.CaseSensitive);
+        Assert.True(target.CaseSensitiveNames);
 
         target = source.WithNullValueLiteral("other");
         Assert.NotSame(source, target);

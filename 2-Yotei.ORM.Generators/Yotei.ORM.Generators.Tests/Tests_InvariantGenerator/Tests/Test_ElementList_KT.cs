@@ -32,7 +32,7 @@ public class Test_ElementList_KT
         var items = new Chain(engine, []);
         Assert.Empty(items);
 
-        items = new Chain(engine.WithCaseSensitive(true), [xone, xtwo, xthree]);
+        items = new Chain(engine.WithCaseSensitiveNames(true), [xone, xtwo, xthree]);
         Assert.Equal(3, items.Count);
         Assert.Same(xone, items[0]);
         Assert.Same(xtwo, items[1]);

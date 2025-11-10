@@ -1,7 +1,7 @@
 ﻿namespace Yotei.ORM.Tests;
 
 // ========================================================
-public class FakeTransaction : Code.Transaction
+public class FakeTransaction : Transaction
 {
     public FakeTransaction(IConnection connection) : base(connection) { }
     public override string ToString() => $"FakeTransaction({Connection}, {Level})";

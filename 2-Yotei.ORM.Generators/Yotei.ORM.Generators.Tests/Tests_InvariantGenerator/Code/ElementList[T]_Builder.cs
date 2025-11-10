@@ -60,7 +60,7 @@ partial class ElementList_T
             : throw new DuplicateException("Duplicated element.").WithData(item);
 
         /// <inheritdoc/>
-        protected override IEqualityComparer<IItem> Comparer => _Comparer ??= new(Engine.CaseSensitive);
+        protected override IEqualityComparer<IItem> Comparer => _Comparer ??= new(Engine.CaseSensitiveNames);
         MyComparer? _Comparer;
 
         readonly struct MyComparer(bool Sensitive) : IEqualityComparer<IItem>

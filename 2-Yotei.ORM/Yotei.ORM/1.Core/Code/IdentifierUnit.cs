@@ -35,7 +35,7 @@ public class IdentifierUnit : IIdentifierUnit
         if (ReferenceEquals(this, other)) return true;
         if (other is null) return false;
 
-        return string.Compare(Value, other.Value, !Engine.CaseSensitive) == 0;
+        return string.Compare(Value, other.Value, !Engine.CaseSensitiveNames) == 0;
     }
 
     /// <summary>
@@ -76,6 +76,24 @@ public class IdentifierUnit : IIdentifierUnit
         get => _Value;
         init
         {
+            if (value is null) { _Value = _RawValue = null; return; }
+
+            var parts = Identifier.GetParts(Engine, value);
+            switch (parts.Count)
+            {
+                case 0: _Value = _RawValue = null; break;
+
+                case 1:
+                    _RawValue = value = parts[0];
+                    _Value = value is null ? null :
+                        Engine.UseTerminators
+                        ? $"{Engine.LeftTerminator}{value}{Engine.RightTerminator}"
+                        : value;                    
+                    break;
+
+                default:
+                    throw new ArgumentException("More than one part detected.").WithData(value);
+            }
         }
     }
     string? _Value;

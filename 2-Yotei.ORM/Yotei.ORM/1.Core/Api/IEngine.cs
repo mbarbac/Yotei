@@ -11,7 +11,7 @@ public partial interface IEngine : IEquatable<IEngine>
     /// Determines if the identifier-alike elements and reserved keywords are case sensitive,
     /// or not.
     /// </summary>
-    [With] bool CaseSensitive { get; }
+    [With] bool CaseSensitiveNames { get; }
 
     /// <summary>
     /// The literal used by this engine to represents NULL values.
