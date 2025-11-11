@@ -1,5 +1,4 @@
-﻿using Yotei.ORM.Code;
-using Chain = Yotei.ORM.Generators.Invariant.Tests.ElementList_KT;
+﻿using Chain = Yotei.ORM.Generators.Invariant.Tests.ElementList_KT;
 using Element = Yotei.ORM.Generators.Invariant.Tests.NamedElement;
 
 namespace Yotei.ORM.Generators.Invariant.Tests;
