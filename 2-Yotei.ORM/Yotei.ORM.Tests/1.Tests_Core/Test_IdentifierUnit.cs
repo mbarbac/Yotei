@@ -141,4 +141,31 @@ public class Test_IdentifierUnit
         Assert.NotEqual(yitem, xitem);
         Assert.False(yitem == xitem);
     }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Match_Empty()
+    {
+        var engine = new FakeEngine();
+        var item = new IdentifierUnit(engine);
+
+        Assert.False(item.Match("other"));
+        Assert.True(item.Match(null));
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Match_Populated()
+    {
+        var engine = new FakeEngine();
+        var item = new IdentifierUnit(engine, "one");
+
+        Assert.False(item.Match("other"));
+
+        Assert.True(item.Match("one"));
+        Assert.True(item.Match("ONE"));
+        Assert.True(item.Match(null));
+    }
 }

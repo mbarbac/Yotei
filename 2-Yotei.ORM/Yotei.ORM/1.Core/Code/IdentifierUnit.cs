@@ -107,4 +107,11 @@ public class IdentifierUnit : IIdentifierUnit
         init => Value = value;
     }
     string? _RawValue;
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="specs"></param>
+    /// <returns></returns>
+    public bool Match(string? specs) => Identifier.Match(this, specs);
 }

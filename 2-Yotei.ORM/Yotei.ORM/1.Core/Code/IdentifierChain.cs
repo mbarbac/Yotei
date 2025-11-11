@@ -128,6 +128,13 @@ public partial class IdentifierChain : IHost
     /// </summary>
     public string? Value => Items.Value;
 
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="specs"></param>
+    /// <returns></returns>
+    public bool Match(string? specs) => Identifier.Match(this, specs);
+
     // ------------------------------------------------
 
     /// <summary>

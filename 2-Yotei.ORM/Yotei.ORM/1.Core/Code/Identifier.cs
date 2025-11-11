@@ -7,6 +7,83 @@
 public static class Identifier
 {
     /// <summary>
+    /// Creates a new identifier using the given value.
+    /// </summary>
+    /// <param name="engine"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static IIdentifier Create(IEngine engine, string? value)
+    {
+        var chain = new IdentifierChain(engine, value);
+        return
+            chain.Count == 0 ? new IdentifierUnit(engine) :
+            chain.Count == 1 ? chain[0] :
+            chain;
+    }
+
+    /// <summary>
+    /// Creates a new identifier using the given range of values.
+    /// </summary>
+    /// <param name="engine"></param>
+    /// <param name="range"></param>
+    /// <returns></returns>
+    public static IIdentifier CreateRange(IEngine engine, IEnumerable<string?> range)
+    {
+        var chain = new IdentifierChain(engine, range);
+        return
+            chain.Count == 0 ? new IdentifierUnit(engine) :
+            chain.Count == 1 ? chain[0] :
+            chain;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc cref="IIdentifier.Match(string?)"/>
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="specs"></param>
+    /// <returns></returns>
+    public static bool Match(IIdentifier item, string? specs)
+    {
+        item.ThrowWhenNull();
+
+        var engine = item.Engine;
+        var target = new IdentifierChain(engine, specs);
+        if (target.Value is null) return true;
+
+        var source = item is IIdentifierChain chain
+            ? chain
+            : new IdentifierChain(engine, [(IIdentifierUnit)item]);
+
+        // Looping...
+        for (int i = 0; ; i++)
+        {
+            if (i >= target.Count) break;
+            if (i >= source.Count)
+            {
+                while (i < target.Count)
+                {
+                    var value = target[^(i + 1)].RawValue;
+                    if (value is not null) return false;
+                    i++;
+                }
+                break;
+            }
+
+            var tvalue = target[^(i + 1)].RawValue; if (tvalue is null) continue;
+            var svalue = source[^(i + 1)].RawValue;
+
+            if (string.Compare(svalue, tvalue, !engine.CaseSensitiveNames) != 0) return false;
+        }
+
+        // Finishing...
+        return true;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Returns a list with the dot-separated parts found in the given source. Engine terminators
     /// (if used) are always removed, and the parts are trimmed. Empty parts are returned as null
     /// ones. The returned list is, by default, reduced by removing its empty or null heads.

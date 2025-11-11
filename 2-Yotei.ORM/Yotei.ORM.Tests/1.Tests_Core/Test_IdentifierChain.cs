@@ -839,4 +839,56 @@ public class Test_IdentifierChain
         target = source.Clear();
         Assert.Empty(target);
     }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Match_Empty()
+    {
+        var engine = new FakeEngine();
+        var item = new IdentifierChain(engine);
+
+        Assert.True(Identifier.Match(item, null));
+        Assert.True(Identifier.Match(item, ""));
+
+        Assert.False(Identifier.Match(item, "two"));
+        Assert.False(Identifier.Match(item, "two."));
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Match_Populated_Smaller()
+    {
+        var engine = new FakeEngine();
+        var item = new IdentifierChain(engine, "one");
+
+        Assert.True(Identifier.Match(item, null));
+        Assert.True(Identifier.Match(item, ""));
+
+        Assert.True(Identifier.Match(item, "one"));
+        Assert.True(Identifier.Match(item, ".one"));
+
+        Assert.False(Identifier.Match(item, "two"));
+        Assert.False(Identifier.Match(item, "two."));
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Match_Populated_Bigger()
+    {
+        var engine = new FakeEngine();
+        var item = new IdentifierChain(engine, "two.one");
+
+        Assert.True(Identifier.Match(item, null));
+        Assert.True(Identifier.Match(item, ""));
+
+        Assert.True(Identifier.Match(item, "one"));
+        Assert.True(Identifier.Match(item, ".one"));
+        Assert.True(Identifier.Match(item, "two.one"));
+        Assert.True(Identifier.Match(item, "two."));
+
+        Assert.False(Identifier.Match(item, "two"));
+        Assert.False(Identifier.Match(item, "one."));
+    }
 }
