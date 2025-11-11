@@ -315,7 +315,7 @@ partial class IdentifierChain
         public override int RemoveLast(TKey? key) => RemoveLast(key, true);
         int RemoveLast(TKey? key, bool reduce)
         {
-            var r = base.Remove(key);
+            var r = base.RemoveLast(key);
             if (r > 0 && reduce) Reduce();
             return r;
         }
@@ -328,7 +328,7 @@ partial class IdentifierChain
         public override int RemoveAll(TKey? key) => RemoveAll(key, true);
         int RemoveAll(TKey? key, bool reduce)
         {
-            var r = base.Remove(key);
+            var r = base.RemoveAll(key);
             if (r > 0 && reduce) Reduce();
             return r;
         }
@@ -354,7 +354,7 @@ partial class IdentifierChain
         public override int RemoveLast(Predicate<IItem> predicate) => RemoveLast(predicate, true);
         int RemoveLast(Predicate<IItem> predicate, bool reduce)
         {
-            var r = base.Remove(predicate);
+            var r = base.RemoveLast(predicate);
             if (r > 0 && reduce) Reduce();
             return r;
         }
@@ -367,7 +367,7 @@ partial class IdentifierChain
         public override int RemoveAll(Predicate<IItem> predicate) => RemoveAll(predicate, true);
         int RemoveAll(Predicate<IItem> predicate, bool reduce)
         {
-            var r = base.Remove(predicate);
+            var r = base.RemoveAll(predicate);
             if (r > 0 && reduce) Reduce();
             return r;
         }
@@ -419,11 +419,20 @@ partial class IdentifierChain
             var parts = GetParts(value, false);
             if (parts.Count == 0) parts.Add(new IdentifierUnit(Engine));
 
-            var r = 0; foreach (var part in parts)
+            var source = this[index];
+            var r = base.RemoveAt(index);
+            if (r > 0)
             {
-                var num = Replace(index, part);
-                r += num;
-                index += num;
+                r = base.InsertRange(index, parts);
+                if (r == 0)
+                {
+                    // Restoring if needed...
+                    if (base.Insert(index, source) == 0) throw new InvalidOperationException(
+                        "Cannot restore removed source element after failing replacement.")
+                        .WithData(index)
+                        .WithData(source)
+                        .WithData(this);
+                }
             }
             if (r > 0 && reduce) Reduce();
             return r;

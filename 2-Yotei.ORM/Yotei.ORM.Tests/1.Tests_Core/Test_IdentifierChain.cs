@@ -211,6 +211,7 @@ public class Test_IdentifierChain
         source = new Chain(engine, [xone, xtwo, xthree, xone]);
         target = source.Clone();
         Assert.NotSame(source, target);
+        Assert.Equal("[one].[two].[three].[one]", target.Value);
         Assert.Equal(4, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
@@ -311,7 +312,7 @@ public class Test_IdentifierChain
 
     //[Enforced]
     [Fact]
-    public static void Test_Replace()
+    public static void Test_Replace_Item()
     {
         IEngine engine = new FakeEngine();
         var xone = new Item(engine, "one");
@@ -321,6 +322,7 @@ public class Test_IdentifierChain
 
         var target = source.Replace(1, xone);
         Assert.NotSame(source, target);
+        Assert.Equal("[one].[one].[three].[one]", target.Value);
         Assert.Equal(4, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Equal(xone, target[1]);
@@ -340,6 +342,7 @@ public class Test_IdentifierChain
         var source = new Chain(engine, [xone, xtwo, xthree, xone]);
         var target = source.Replace(1, null);
         Assert.NotSame(source, target);
+        Assert.Equal("[one]..[three].[one]", target.Value);
         Assert.Equal(4, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Null(target[1].RawValue);
@@ -357,17 +360,19 @@ public class Test_IdentifierChain
         var xthree = new Item(engine, "three");
 
         var source = new Chain(engine, [xone, xtwo, xthree, xone]);
-        //var target = source.Replace(1, "TWO");
-        //Assert.NotSame(source, target);
-        //Assert.Equal(4, target.Count);
-        //Assert.Same(xone, target[0]);
-        //Assert.Equal("TWO", target[1].RawValue);
-        //Assert.Same(xthree, target[2]);
-        //Assert.Same(xone, target[3]);
+        var target = source.Replace(1, "TWO");
+        Assert.NotSame(source, target);
+        Assert.Equal(4, target.Count);
+        Assert.Equal("[one].[TWO].[three].[one]", target.Value);
+        Assert.Same(xone, target[0]);
+        Assert.Equal("TWO", target[1].RawValue);
+        Assert.Same(xthree, target[2]);
+        Assert.Same(xone, target[3]);
 
         target = source.Replace(1, "TWO.THREE");
         Assert.NotSame(source, target);
-        Assert.Equal(4, target.Count);
+        Assert.Equal(5, target.Count);
+        Assert.Equal("[one].[TWO].[THREE].[three].[one]", target.Value);
         Assert.Same(xone, target[0]);
         Assert.Equal("TWO", target[1].RawValue);
         Assert.Equal("THREE", target[2].RawValue);
@@ -375,274 +380,273 @@ public class Test_IdentifierChain
         Assert.Same(xone, target[4]);
     }
 
-    /*
-    //[Enforced]
-    [Fact]
-    public static void Test_Replace_Same()
-    {
-        IEngine engine = new FakeEngine();
-        var source = new Chain(engine, [xone, xtwo, xthree]);
-        var target = source.Replace(1, xtwo);
-        Assert.Same(source, target);
-    }*/
-
-    /*
-    //[Enforced]
-    [Fact]
-    public static void Test_Replace_Embedded()
-    {
-        IEngine engine = new FakeEngine();
-        var source = new Chain(engine, [xone, xtwo, xthree]);
-        var other = new Chain(engine, [xfour, xfive]);
-
-        var target = source.Replace(1, other);
-        Assert.Equal(4, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Equal(xfour, target[1]);
-        Assert.Same(xfive, target[2]);
-        Assert.Same(xthree, target[3]);
-    }
-    */
     // ----------------------------------------------------
-    /*
+
     //[Enforced]
     [Fact]
-    public static void Test_Add()
+    public static void Test_Add_Item()
     {
         IEngine engine = new FakeEngine();
+        var xone = new Item(engine, "one");
+        var xtwo = new Item(engine, "two");
+        var xthree = new Item(engine, "three");
+
         var source = new Chain(engine, [xone, xtwo]);
         var target = source.Add(xthree);
+        Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
+        Assert.Equal("[one].[two].[three]", target.Value);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
         Assert.Same(xthree, target[2]);
 
-        try { _ = source.Add(null!); Assert.Fail(); }
+        try { _ = source.Add((IIdentifierUnit)null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
+    }
 
-        try { _ = source.Add(new Element("")); Assert.Fail(); }
-        catch (EmptyException) { }
-    }*/
-    /*
     //[Enforced]
     [Fact]
-    public static void Test_Add_Duplicates()
+    public static void Test_Add_Null_String()
     {
         IEngine engine = new FakeEngine();
+        var xone = new Item(engine, "one");
+        var xtwo = new Item(engine, "two");
+
         var source = new Chain(engine, [xone, xtwo]);
-        var target = source.Add(xone);
+        var target = source.Add(null);
+        Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
+        Assert.Equal("[one].[two].", target.Value);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
-        Assert.Same(xone, target[2]);
+        Assert.Null(target[2].Value);
+    }
 
-        try { _ = source.Add(new Element("one")); Assert.Fail(); }
-        catch (DuplicateException) { }
-    }*/
-    /*
     //[Enforced]
     [Fact]
-    public static void Test_Add_Extended()
+    public static void Test_Add_Populated_String()
     {
         IEngine engine = new FakeEngine();
-        var other = new Chain(engine, []);
-        var source = new Chain(engine, [xone, xtwo, xthree]);
-        var target = source.Add(other);
-        Assert.Same(source, target);
+        var xone = new Item(engine, "one");
+        var xtwo = new Item(engine, "two");
 
-        other = new Chain(engine, [xfour, xfive]);
-        target = source.Add(other);
-        Assert.Equal(5, target.Count);
+        var source = new Chain(engine, [xone, xtwo]);
+        var target = source.Add(".");
+        Assert.NotSame(source, target);
+        Assert.Equal(4, target.Count);
+        Assert.Equal("[one].[two]..", target.Value);
         Assert.Same(xone, target[0]);
-        Assert.Equal(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
-        Assert.Same(xfour, target[3]);
-        Assert.Same(xfive, target[4]);
-    }*/
+        Assert.Same(xtwo, target[1]);
+        Assert.Null(target[2].Value);
+        Assert.Null(target[3].Value);
+
+        target = source.Add("THREE.FOUR");
+        Assert.NotSame(source, target);
+        Assert.Equal(4, target.Count);
+        Assert.Equal("[one].[two].[THREE].[FOUR]", target.Value);
+        Assert.Same(xone, target[0]);
+        Assert.Same(xtwo, target[1]);
+        Assert.Equal("THREE", target[2].RawValue);
+        Assert.Equal("FOUR", target[3].RawValue);
+    }
 
     // ----------------------------------------------------
-    /*
+
     //[Enforced]
     [Fact]
-    public static void Test_AddRange()
+    public static void Test_AddRange_Items()
     {
         IEngine engine = new FakeEngine();
+        var xone = new Item(engine, "one");
+        var xtwo = new Item(engine, "two");
         var source = new Chain(engine, [xone, xtwo]);
         var target = source.AddRange([]);
         Assert.Same(source, target);
 
-        target = source.AddRange([xthree, xfour]);
+        var xthree = new Item(engine, "three");
+        target = source.AddRange([xthree, xone]);
+        Assert.NotSame(source, target);
         Assert.Equal(4, target.Count);
+        Assert.Equal("[one].[two].[three].[one]", target.Value);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
         Assert.Same(xthree, target[2]);
-        Assert.Same(xfour, target[3]);
+        Assert.Same(xone, target[3]);
 
-        try { _ = source.AddRange([new Element("one")]); Assert.Fail(); }
-        catch (DuplicateException) { }
-
-        try { _ = source.AddRange([xfive, null!]); Assert.Fail(); }
+        try { _ = source.AddRange(null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
 
-        try { _ = source.AddRange([xfive, new Element("")]); Assert.Fail(); }
-        catch (EmptyException) { }
-    }*/
-    /*
-    //[Enforced]
-    [Fact]
-    public static void Test_AddRange_Extended()
-    {
-        IEngine engine = new FakeEngine();
-        var other = new Chain(engine, []);
-        var source = new Chain(engine, [xone, xtwo]);
-        var target = source.AddRange([other]);
-        Assert.Same(source, target);
-
-        other = new Chain(engine, [xfour, xfive]);
-        target = source.AddRange([xthree, other]);
-        Assert.Equal(5, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Equal(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
-        Assert.Same(xfour, target[3]);
-        Assert.Same(xfive, target[4]);
-    }*/
+        try { _ = source.AddRange([xthree, null!]); Assert.Fail(); }
+        catch (ArgumentNullException) { }
+    }
 
     // ----------------------------------------------------
-    /*
+
     //[Enforced]
     [Fact]
-    public static void Test_Insert()
+    public static void Test_Insert_Item()
     {
         IEngine engine = new FakeEngine();
+        var xone = new Item(engine, "one");
+        var xtwo = new Item(engine, "two");
         var source = new Chain(engine, [xone, xtwo]);
-        var target = source.Insert(2, xthree);
-        Assert.Equal(3, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
 
-        try { _ = source.Insert(0, null!); Assert.Fail(); }
+        var xthree = new Item(engine);
+        var target = source.Insert(0, xthree);
+        Assert.Same(source, target);
+
+        xthree = new Item(engine, "three");
+        target = source.Insert(0, xthree);
+        Assert.NotSame(source, target);
+        Assert.Equal(3, target.Count);
+        Assert.Equal("[three].[one].[two]", target.Value);
+        Assert.Same(xthree, target[0]);
+        Assert.Same(xone, target[1]);
+        Assert.Same(xtwo, target[2]);
+
+        try { _ = source.Add((IIdentifierUnit)null!); Assert.Fail(); }
         catch (ArgumentNullException) { }
+    }
 
-        try { _ = source.Insert(0, new Element("")); Assert.Fail(); }
-        catch (EmptyException) { }
-    }*/
-    /*
     //[Enforced]
     [Fact]
-    public static void Test_Insert_Duplicates()
+    public static void Test_Insert_Null_String()
     {
         IEngine engine = new FakeEngine();
+        var xone = new Item(engine, "one");
+        var xtwo = new Item(engine, "two");
         var source = new Chain(engine, [xone, xtwo]);
-        var target = source.Insert(2, xone);
+
+        var target = source.Insert(0, null);
+        Assert.Same(source, target);
+
+        target = source.Insert(1, null);
+        Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
+        Assert.Equal("[one]..[two]", target.Value);
+        Assert.Same(xone, target[0]);
+        Assert.Null(target[1].Value);
+        Assert.Same(xtwo, target[2]);
+
+        target = source.Insert(2, null);
+        Assert.NotSame(source, target);
+        Assert.Equal(3, target.Count);
+        Assert.Equal("[one].[two].", target.Value);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
+        Assert.Null(target[2].Value);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Insert_Populated_String()
+    {
+        IEngine engine = new FakeEngine();
+        var xone = new Item(engine, "one");
+        var xtwo = new Item(engine, "two");
+        var source = new Chain(engine, [xone, xtwo]);
+
+        var target = source.Insert(0, ".");
+        Assert.Same(source, target);
+
+        target = source.Insert(0, "ALPHA.");
+        Assert.NotSame(source, target);
+        Assert.Equal(4, target.Count);
+        Assert.Equal("[ALPHA]..[one].[two]", target.Value);
+        Assert.Equal("ALPHA", target[0].RawValue);
+        Assert.Null(target[1].RawValue);
         Assert.Same(xone, target[2]);
+        Assert.Same(xtwo, target[3]);
 
-        try { _ = source.Insert(0, new Element("one")); Assert.Fail(); }
-        catch (DuplicateException) { }
-    }*/
-    /*
-    //[Enforced]
-    [Fact]
-    public static void Test_Insert_Extended()
-    {
-        IEngine engine = new FakeEngine();
-        var other = new Chain(engine, []);
-        var source = new Chain(engine, [xone, xtwo, xthree]);
-        var target = source.Insert(3, other);
-        Assert.Same(source, target);
-
-        other = new Chain(engine, [xfour, xfive]);
-        target = source.Insert(3, other);
-        Assert.Equal(5, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Equal(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
-        Assert.Same(xfour, target[3]);
-        Assert.Same(xfive, target[4]);
-    }*/
-
-    // ----------------------------------------------------
-    /*
-    //[Enforced]
-    [Fact]
-    public static void Test_InsertRange()
-    {
-        IEngine engine = new FakeEngine();
-        var source = new Chain(engine, [xone, xtwo]);
-        var target = source.InsertRange(2, []);
-        Assert.Same(source, target);
-
-        target = source.InsertRange(2, [xthree, xfour]);
+        target = source.Insert(2, "THREE.");
+        Assert.NotSame(source, target);
         Assert.Equal(4, target.Count);
+        Assert.Equal("[one].[two].[THREE].", target.Value);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
-        Assert.Same(xfour, target[3]);
-
-        try { _ = source.InsertRange(0, [new Element("one")]); Assert.Fail(); }
-        catch (DuplicateException) { }
-
-        try { _ = source.InsertRange(0, [xfive, null!]); Assert.Fail(); }
-        catch (ArgumentNullException) { }
-
-        try { _ = source.InsertRange(0, [xfive, new Element("")]); Assert.Fail(); }
-        catch (EmptyException) { }
-    }*/
-    /*
-    //[Enforced]
-    [Fact]
-    public static void Test_InsertRange_Extended()
-    {
-        IEngine engine = new FakeEngine();
-        var other = new Chain(engine, []);
-        var source = new Chain(engine, [xone, xtwo]);
-        var target = source.InsertRange(2, [other]);
-        Assert.Same(source, target);
-
-        other = new Chain(engine, [xfour, xfive]);
-        target = source.InsertRange(2, [xthree, other]);
-        Assert.Equal(5, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Equal(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
-        Assert.Same(xfour, target[3]);
-        Assert.Same(xfive, target[4]);
-    }*/
+        Assert.Equal("THREE", target[2].RawValue);
+        Assert.Null(target[3].RawValue);
+    }
 
     // ----------------------------------------------------
-    /*
+
+    //[Enforced]
+    [Fact]
+    public static void Test_InsertRange_Items()
+    {
+        IEngine engine = new FakeEngine();
+        var xone = new Item(engine, "one");
+        var xtwo = new Item(engine, "two");
+        var source = new Chain(engine, [xone, xtwo]);
+        
+        var target = source.InsertRange(0, []); Assert.Same(source, target);
+        target = source.InsertRange(1, []); Assert.Same(source, target);
+
+        var xitem = new Item(engine);
+        target = source.InsertRange(0, [xitem, xitem]);
+        Assert.Same(source, target);
+
+        var xthree = new Item(engine, "three");
+        target = source.InsertRange(1, [xthree, xone]);
+        Assert.NotSame(source, target);
+        Assert.Equal(4, target.Count);
+        Assert.Equal("[one].[three].[one].[two]", target.Value);
+        Assert.Same(xone, target[0]);
+        Assert.Same(xthree, target[1]);
+        Assert.Same(xone, target[2]);
+        Assert.Same(xtwo, target[3]);
+
+        try { _ = source.AddRange(null!); Assert.Fail(); }
+        catch (ArgumentNullException) { }
+
+        try { _ = source.AddRange([xthree, null!]); Assert.Fail(); }
+        catch (ArgumentNullException) { }
+    }
+
+    // ----------------------------------------------------
+
     //[Enforced]
     [Fact]
     public static void Test_RemoveAt()
     {
         IEngine engine = new FakeEngine();
-        var source = new Chain(engine, [xone, xtwo, xthree, xone]);
+        var xone = new Item(engine, "one");
+        var xtwo = new Item(engine, "two");
+        var xthree = new Item(engine, "three");
+        var source = new Chain(engine, [xone, xtwo, xthree]);
+
         var target = source.RemoveAt(0);
-        Assert.Equal(3, target.Count);
+        Assert.NotSame(source, target);
+        Assert.Equal(2, target.Count);
+        Assert.Equal("[two].[three]", target.Value);
         Assert.Same(xtwo, target[0]);
         Assert.Same(xthree, target[1]);
-        Assert.Same(xone, target[2]);
+
+        source = new Chain(engine, [xone, new Item(engine), xthree]);
+        target = source.RemoveAt(0);
+        Assert.NotSame(source, target);
+        Assert.Single(target);
+        Assert.Equal("[three]", target.Value);
+        Assert.Same(xthree, target[0]);
 
         target = source.RemoveAt(2);
-        Assert.Equal(3, target.Count);
+        Assert.NotSame(source, target);
+        Assert.Equal(2, target.Count);
+        Assert.Equal("[one].", target.Value);
         Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xone, target[2]);
+        Assert.Null(target[1].Value);
+    }
 
-        try { source.RemoveAt(999); Assert.Fail(); }
-        catch (ArgumentOutOfRangeException) { }
-    }*/
-    /*
     //[Enforced]
     [Fact]
-    public static void Test_RemoveRange()
+    public static void Test_Remove_Range()
     {
         IEngine engine = new FakeEngine();
+        var xone = new Item(engine, "one");
+        var xtwo = new Item(engine, "two");
+        var xthree = new Item(engine, "three");
         var source = new Chain(engine, [xone, xtwo, xthree, xone]);
+
         var target = source.RemoveRange(0, 0);
         Assert.Same(source, target);
 
@@ -651,12 +655,14 @@ public class Test_IdentifierChain
 
         target = source.RemoveRange(0, 1);
         Assert.Equal(3, target.Count);
+        Assert.Equal("[two].[three].[one]", target.Value);
         Assert.Same(xtwo, target[0]);
         Assert.Same(xthree, target[1]);
         Assert.Same(xone, target[2]);
 
         target = source.RemoveRange(3, 1);
         Assert.Equal(3, target.Count);
+        Assert.Equal("[one].[two].[three]", target.Value);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
         Assert.Same(xthree, target[2]);
@@ -672,123 +678,151 @@ public class Test_IdentifierChain
 
         try { _ = source.RemoveRange(0, 5); Assert.Fail(); }
         catch (ArgumentException) { }
-    }*/
+    }
 
     // ----------------------------------------------------
-    /*
+
     //[Enforced]
     [Fact]
     public static void Test_Remove_Item()
     {
         IEngine engine = new FakeEngine();
+        var xone = new Item(engine, "one");
+        var xtwo = new Item(engine, "two");
+        var xthree = new Item(engine, "three");
         var source = new Chain(engine, [xone, xtwo, xthree, xone]);
+
         var target = source.Remove("four");
         Assert.Same(source, target);
 
         target = source.Remove("one");
         Assert.Equal(3, target.Count);
+        Assert.Equal("[two].[three].[one]", target.Value);
         Assert.Same(xtwo, target[0]);
         Assert.Same(xthree, target[1]);
         Assert.Same(xone, target[2]);
 
         target = source.Remove("ONE");
         Assert.Equal(3, target.Count);
+        Assert.Equal("[two].[three].[one]", target.Value);
         Assert.Same(xtwo, target[0]);
         Assert.Same(xthree, target[1]);
         Assert.Same(xone, target[2]);
-    }*/
-    /*
+
+        source = new Chain(engine, [xone, new Item(engine), xthree, xone]);
+        target = source.Remove("one");
+        Assert.NotSame(source, target);
+        Assert.Equal(2, target.Count);
+        Assert.Equal("[three].[one]", target.Value);
+        Assert.Same(xthree, target[0]);
+        Assert.Same(xone, target[1]);
+    }
+
     //[Enforced]
     [Fact]
     public static void Test_Remove_Item_Last()
     {
         IEngine engine = new FakeEngine();
+        var xone = new Item(engine, "one");
+        var xtwo = new Item(engine, "two");
+        var xthree = new Item(engine, "three");
         var source = new Chain(engine, [xone, xtwo, xthree, xone]);
+
         var target = source.RemoveLast("one");
         Assert.Equal(3, target.Count);
+        Assert.Equal("[one].[two].[three]", target.Value);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
         Assert.Same(xthree, target[2]);
 
-        target = source.RemoveLast("ONE");
+        source = new Chain(engine, [xone, xtwo, new Item(engine), xone]);
+        target = source.RemoveLast("one");
+        Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
+        Assert.Equal("[one].[two].", target.Value);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
-    }*/
-    /*
+        Assert.Null(target[2].Value);
+    }
+
     //[Enforced]
     [Fact]
     public static void Test_Remove_Item_All()
     {
         IEngine engine = new FakeEngine();
+        var xone = new Item(engine, "one");
+        var xtwo = new Item(engine, "two");
+        var xthree = new Item(engine, "three");
         var source = new Chain(engine, [xone, xtwo, xthree, xone]);
+
         var target = source.RemoveAll("one");
         Assert.Equal(2, target.Count);
+        Assert.Equal("[two].[three]", target.Value);
         Assert.Same(xtwo, target[0]);
         Assert.Same(xthree, target[1]);
 
-        target = source.RemoveAll("ONE");
-        Assert.Equal(2, target.Count);
-        Assert.Same(xtwo, target[0]);
-        Assert.Same(xthree, target[1]);
-    }*/
+        source = new Chain(engine, [xone, new Item(engine), xone]);
+        target = source.RemoveAll("one");
+        Assert.Empty(target);
+    }
 
     // ----------------------------------------------------
-    /*
-    //[Enforced]
-    [Fact]
-    public static void Test_Remove_Item_Extended()
-    {
-        // By default, CoreList<K,T> has not this capability because there is no expansion of
-        // keys into several elements and so, InvariantList<K,T> has it not.
-    }*/
 
-    // ----------------------------------------------------
-    /*
     //[Enforced]
     [Fact]
     public static void Test_Remove_Predicate()
     {
         IEngine engine = new FakeEngine();
+        var xone = new Item(engine, "one");
+        var xtwo = new Item(engine, "two");
+        var xthree = new Item(engine, "three");
         var source = new Chain(engine, [xone, xtwo, xthree, xone]);
-        var target = source.Remove(x => ((Element)x).Name.Contains('z'));
+
+        var target = source.Remove(x => ((Item)x).Value!.Contains('z'));
         Assert.Same(source, target);
 
-        target = source.Remove(x => ((Element)x).Name.Contains('n'));
+        target = source.Remove(x => ((Item)x).Value!.Contains('n'));
         Assert.Equal(3, target.Count);
         Assert.Same(xtwo, target[0]);
         Assert.Same(xthree, target[1]);
         Assert.Same(xone, target[2]);
-    }*/
-    /*
+    }
+
     //[Enforced]
     [Fact]
     public static void Test_Remove_Predicate_Last()
     {
         IEngine engine = new FakeEngine();
+        var xone = new Item(engine, "one");
+        var xtwo = new Item(engine, "two");
+        var xthree = new Item(engine, "three");
         var source = new Chain(engine, [xone, xtwo, xthree, xone]);
-        var target = source.RemoveLast(x => ((Element)x).Name.Contains('n'));
+
+        var target = source.RemoveLast(x => ((Item)x).Value!.Contains('n'));
         Assert.Equal(3, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
         Assert.Same(xthree, target[2]);
-    }*/
-    /*
+    }
+
     //[Enforced]
     [Fact]
     public static void Test_Remove_Predicate_All()
     {
         IEngine engine = new FakeEngine();
+        var xone = new Item(engine, "one");
+        var xtwo = new Item(engine, "two");
+        var xthree = new Item(engine, "three");
         var source = new Chain(engine, [xone, xtwo, xthree, xone]);
-        var target = source.RemoveAll(x => ((Element)x).Name.Contains('n'));
+
+        var target = source.RemoveAll(x => ((Item)x).Value!.Contains('n'));
         Assert.Equal(2, target.Count);
         Assert.Same(xtwo, target[0]);
         Assert.Same(xthree, target[1]);
-    }*/
+    }
 
     // ----------------------------------------------------
-    /*
+
     //[Enforced]
     [Fact]
     public static void Test_Clear()
@@ -798,8 +832,11 @@ public class Test_IdentifierChain
         var target = source.Clear();
         Assert.Same(source, target);
 
+        var xone = new Item(engine, "one");
+        var xtwo = new Item(engine, "two");
+        var xthree = new Item(engine, "three");
         source = new Chain(engine, [xone, xtwo, xthree, xone]);
         target = source.Clear();
         Assert.Empty(target);
-    }*/
+    }
 }

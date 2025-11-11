@@ -299,7 +299,7 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
 
         // Tentative removal of the source element...
         var num = RemoveAt(index);
-        if (num >= 1)
+        if (num > 0)
         {
             // Element is a collection to be flattened...
             if (ExpandElements && item is IEnumerable<T> range)
