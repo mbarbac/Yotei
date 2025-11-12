@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices.Marshalling;
-
-namespace Yotei.ORM.Code;
+﻿namespace Yotei.ORM.Code;
 
 partial class CommandInfo
 {
