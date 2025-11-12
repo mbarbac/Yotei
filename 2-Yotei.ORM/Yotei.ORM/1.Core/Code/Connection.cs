@@ -34,6 +34,7 @@ public abstract partial class Connection : DisposableClass, IConnection
         Engine = source.Engine;
         Retries = source.Retries;
         RetryInterval = source.RetryInterval;
+        Locale = source.Locale;
     }
 
     /// <summary>
@@ -95,6 +96,11 @@ public abstract partial class Connection : DisposableClass, IConnection
             throw new ArgumentException("Retry interval must be equal or greater than zero.")
             .WithData(value);
     }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public ILocale Locale { get; set => field = value.ThrowWhenNull(); } = new Locale();
 
     // ----------------------------------------------------
 

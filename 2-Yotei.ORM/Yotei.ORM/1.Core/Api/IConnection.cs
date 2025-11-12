@@ -26,6 +26,12 @@ public partial interface IConnection : IAsyncDisposableEx
     /// </summary>
     TimeSpan RetryInterval { get; set; }
 
+    /// <summary>
+    /// The default locale used by this connection that, by default, uses an invariant culture and
+    /// default comparison options.
+    /// </summary>
+    ILocale Locale { get; set; }
+
     // ----------------------------------------------------
 
     /// <summary>

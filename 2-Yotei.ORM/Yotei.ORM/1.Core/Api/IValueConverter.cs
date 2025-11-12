@@ -1,5 +1,4 @@
-﻿/*
-namespace Yotei.ORM;
+﻿namespace Yotei.ORM;
 
 // ========================================================
 /// <summary>
@@ -24,8 +23,9 @@ public interface IValueConverter
     /// this instance) to the target one.
     /// </summary>
     /// <param name="value"></param>
+    /// <param name="locale"></param>
     /// <returns></returns>
-    object? Convert(object? value
+    object? Convert(object? value, ILocale? locale = null);
 }
 
 // ========================================================
@@ -40,6 +40,7 @@ public interface IValueConverter<TSource, TTarget> : IValueConverter
     /// Converts the given value from its source type to the target one.
     /// </summary>
     /// <param name="value"></param>
+    /// <param name="locale"></param>
     /// <returns></returns>
-    [return: MaybeNull] TTarget Convert([AllowNull] TSource value);
-}*/
+    [return: MaybeNull] TTarget Convert([AllowNull] TSource value, ILocale? locale = null);
+}

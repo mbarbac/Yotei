@@ -1,5 +1,4 @@
-﻿/*
- namespace Yotei.ORM.Code;
+﻿namespace Yotei.ORM.Code;
 
 // ========================================================
 /// <summary>
@@ -9,10 +8,23 @@
 /// <typeparam name="TTarget"></typeparam>
 public class ValueConverter<TSource, TTarget> : IValueConverter<TSource, TTarget>
 {
+    readonly Func<TSource?, ILocale?, TTarget?> Converter;
+
     /// <summary>
     /// Initializes a new default converter.
     /// </summary>
-    public ValueConverter() { }
+    public ValueConverter() => Converter = static (x, locale)
+        => locale is null
+        ? x.ConvertTo<TTarget?>()
+        : x.ConvertTo<TTarget?>(locale.CultureInfo);
+
+    /// <summary>
+    /// Initializes a new instance with the given converter.
+    /// </summary>
+    /// <param name="converter"></param>
+    public ValueConverter(
+        Func<TSource?, ILocale?, TTarget?> converter)
+        => Converter = converter.ThrowWhenNull();
 
     /// <summary>
     /// <inheritdoc/>
@@ -34,16 +46,15 @@ public class ValueConverter<TSource, TTarget> : IValueConverter<TSource, TTarget
 
     // ----------------------------------------------------
 
-    Func<TSource?, IFormatProvider?, TTarget> _Converter =
-        (x, provider) => x.ConvertTo<TTarget?>(provider)!;
-
     /// <summary>
-    /// <inheritdoc cref="IValueConverter{TSource, TTarget}.Convert(TSource)"/>
+    /// <inheritdoc cref="IValueConverter.Convert(object?, ILocale)"/>
     /// </summary>
     /// <param name="value"></param>
+    /// <param name="locale"></param>
     /// <returns></returns>
     [return: MaybeNull]
-    public virtual TTarget Convert([AllowNull] TSource value) => throw null;
+    public virtual TTarget Convert(
+        [AllowNull] TSource value, ILocale? locale = null) => Converter(value, locale);
 
-    object? IValueConverter.Convert(object? value) => Convert((TSource)value!);
-}*/
+    object? IValueConverter.Convert(object? value, ILocale? locale) => Convert((TSource)value!, locale);
+}
