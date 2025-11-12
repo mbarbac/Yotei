@@ -24,6 +24,24 @@ partial class CommandInfo
         }
 
         /// <summary>
+        /// Initializes a new instance using the contents from the given source.
+        /// </summary>
+        /// <param name="source"></param>
+        public Builder(ICommand source) => throw null;
+
+        /// <summary>
+        /// Initializes a new instance using the contents from the given source.
+        /// </summary>
+        /// <param name="source"></param>
+        public Builder(ICommandInfo source) => throw null;
+
+        /// <summary>
+        /// Initializes a new instance using the contents from the given source.
+        /// </summary>
+        /// <param name="source"></param>
+        public Builder(ICommandInfo.IBuilder source) => throw null;
+
+        /// <summary>
         /// Copy constructor.
         /// </summary>
         /// <param name="source"></param>
@@ -54,7 +72,7 @@ partial class CommandInfo
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public virtual ICommandInfo CreateInstance() => throw null;
+        public virtual ICommandInfo CreateInstance() => new CommandInfo(this);
 
         /// <summary>
         /// <inheritdoc/>
@@ -99,7 +117,29 @@ partial class CommandInfo
         /// </summary>
         public virtual bool IsConsistent
         {
-            get => throw null;
+            get
+            {
+                var text = _Text.ToString();
+                var finder = new IsolatedFinder();
+                var sensitive = Engine.CaseSensitiveNames;
+                var prefix = Engine.ParameterPrefix;
+
+                // Empty instances are consistent by definition...
+                if (IsEmpty) return true;
+
+                // Finding dangling brackets...
+                if (AreRemainingBrackets(text)) return false;
+
+                // Finding unused parameters...
+                var count = 0;
+                foreach (var par in _Parameters)
+                    if (finder.Find(text, 0, par.Name, !sensitive) >= 0) count++;
+
+                if (_Parameters.Count != count) return false;               
+
+                // Finishing...
+                return true;
+            }
         }
 
         // ----------------------------------------------------
@@ -108,8 +148,9 @@ partial class CommandInfo
         /// <inheritdoc/>
         /// </summary>
         /// <param name="source"></param>
+        /// <param name="iterable"></param>
         /// <returns></returns>
-        public virtual bool Add(ICommand source)
+        public virtual bool Add(ICommand source, bool iterable)
         {
             throw null;
         }
@@ -181,6 +222,20 @@ partial class CommandInfo
 
             _Text.Clear();
             _Parameters.Clear();
+            return true;
+        }
+
+        // ----------------------------------------------------
+
+        /// <summary>
+        /// Determines if the given text has any dangling '{...}' braket specification.
+        /// </summary>
+        static bool AreRemainingBrackets(string text)
+        {
+            if (text.Length == 0) return false;
+
+            var ini = text.IndexOf('{'); if (ini < 0) return false;
+            var end = text.IndexOf('}', ini); if (end < 0) return false;
             return true;
         }
     }

@@ -64,8 +64,9 @@ partial interface ICommandInfo
         /// <br/> Returns whether changes has been made or not.
         /// </summary>
         /// <param name="source"></param>
+        /// <param name="iterable"></param>
         /// <returns></returns>
-        bool Add(ICommand source);
+        bool Add(ICommand source, bool iterable);
 
         /// <summary>
         /// Adds the contents of the given source to this instance.

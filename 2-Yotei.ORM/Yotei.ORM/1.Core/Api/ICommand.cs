@@ -13,10 +13,16 @@ public partial interface ICommand
     IConnection Connection { get; }
 
     /// <summary>
-    /// The locale used by this command, or null (by default) to use the one of its associated
-    /// connection.
+    /// The effective locale used by this instance, which may be the one explicitly assigned to
+    /// it, or the one of its associated connection.
     /// </summary>
-    [With] ILocale? Locale { get; set; }
+    ILocale Locale { get; }
+
+    /// <summary>
+    /// The locale used by this instance, or a default '<c>null</c>' value to indicate that the
+    /// one of the associated connection shall be used instead.
+    /// </summary>
+    [With] ILocale? RawLocale { get; set; }
 
     /// <summary>
     /// Determines if this command is in a execution-ready state, or not.

@@ -1,7 +1,7 @@
 ﻿namespace Experimental.Tests;
 
 // ========================================================
-////[Enforced]
+//[Enforced]
 //public class Test_
 //{
 //    //[Enforced]

@@ -64,8 +64,9 @@ public partial interface ICommandInfo
     /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="source"></param>
+    /// <param name="iterable"></param>
     /// <returns></returns>
-    ICommandInfo Add(ICommand source);
+    ICommandInfo Add(ICommand source, bool iterable);
 
     /// <summary>
     /// Returns a new instance where the contents of the given source have been added to the
