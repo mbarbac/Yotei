@@ -13,7 +13,7 @@ public partial class CommandInfo : ICommandInfo
     /// Initializes a new instance.
     /// </summary>
     /// <param name="connection"></param>
-    public CommandInfo(IConnection connection) => Items = new(connection);
+    public CommandInfo(IConnection connection) => throw null;
 
     /// <summary>
     /// Initializes a new instance using the contents from the given source.
@@ -113,15 +113,13 @@ public partial class CommandInfo : ICommandInfo
     /// <returns></returns>
     public virtual ICommandInfo Add(ICommandInfo.IBuilder source) => throw null;
 
-    // ----------------------------------------------------
-
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="text"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual ICommandInfo Add(string text, params object?[]? range) => throw null;
+    public virtual ICommandInfo Add(string? text, params object?[]? range) => throw null;
 
     // ----------------------------------------------------
 

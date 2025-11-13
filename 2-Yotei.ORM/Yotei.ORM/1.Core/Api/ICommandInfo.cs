@@ -88,21 +88,20 @@ public partial interface ICommandInfo
     /// <returns></returns>
     ICommandInfo Add(IBuilder source);
 
-    // ----------------------------------------------------
-
     /// <summary>
     /// Returns a new instance where the given text and the collection of parameters obtained from
     /// the given range of values, if any, have been added to the original ones.
-    /// <br/> If values are used, then they must be encoded in the given text using either a '{n}'
-    /// positional specification, or a '{name}' named one (where 'name' may or may not start with
-    /// the engine parameter prefix).
+    /// <br/> If text is null, then the range of values is captured without validanting that their
+    /// names are encoded in the text. Otherwise, if both text and values are used, then they must
+    /// be encoded in the text using either a positional '{n}' or a named '{name}' specification,
+    /// where 'name' may or may not start with the engine prefix.
     /// <br/> Unused values or dangling specifications are not allowed.
     /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="text"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    ICommandInfo Add(string text, params object?[]? range);
+    ICommandInfo Add(string? text, params object?[]? range);
 
     // ----------------------------------------------------
 

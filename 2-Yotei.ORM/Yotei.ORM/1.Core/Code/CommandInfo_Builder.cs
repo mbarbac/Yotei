@@ -25,21 +25,55 @@ partial class CommandInfo
 
         /// <summary>
         /// Initializes a new instance using the contents from the given source.
+        /// <br/> This method accepts sources in inconsistent states.
         /// </summary>
         /// <param name="source"></param>
-        public Builder(ICommand source) => throw null;
+        /// <param name="iterable"></param>
+        public Builder(ICommand source, bool iterable)
+            : this(source.ThrowWhenNull().GetCommandInfo(iterable)) { }
 
         /// <summary>
         /// Initializes a new instance using the contents from the given source.
+        /// <br/> This method accepts sources in inconsistent states.
         /// </summary>
         /// <param name="source"></param>
-        public Builder(ICommandInfo source) => throw null;
+        public Builder(ICommandInfo source)
+        {
+            source.ThrowWhenNull();
+
+            Connection = source.Connection;
+            _Text = new(source.Text);
+            _Parameters = new(Engine, source.Parameters);
+        }
 
         /// <summary>
         /// Initializes a new instance using the contents from the given source.
+        /// <br/> This method accepts sources in inconsistent states.
         /// </summary>
         /// <param name="source"></param>
-        public Builder(ICommandInfo.IBuilder source) => throw null;
+        public Builder(ICommandInfo.IBuilder source)
+        {
+            source.ThrowWhenNull();
+
+            Connection = source.Connection;
+            _Text = new(source.Text);
+            _Parameters = new(Engine, source.Parameters);
+        }
+
+        /// <summary>
+        /// Initializes a new instance with the given text and the collection of parameters
+        /// obtained from the given range of values, if any.
+        /// <br/> If values are used, then they must be encoded in the given text using either a
+        /// '{n}' positional specification, or a '{name}' named one (where 'name' may or may not
+        /// start with the engine parameter prefix).
+        /// <br/> Unused values or dangling specifications are not allowed.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="text"></param>
+        /// <param name="range"></param>
+        public Builder(IConnection connection, string text, params object?[]? range)
+            : this(connection)
+            => Add(text, range);
 
         /// <summary>
         /// Copy constructor.
@@ -122,7 +156,6 @@ partial class CommandInfo
                 var text = _Text.ToString();
                 var finder = new IsolatedFinder();
                 var sensitive = Engine.CaseSensitiveNames;
-                var prefix = Engine.ParameterPrefix;
 
                 // Empty instances are consistent by definition...
                 if (IsEmpty) return true;
@@ -152,7 +185,8 @@ partial class CommandInfo
         /// <returns></returns>
         public virtual bool Add(ICommand source, bool iterable)
         {
-            throw null;
+            source.ThrowWhenNull();
+            return Add(source.GetCommandInfo(iterable));
         }
 
         /// <summary>
@@ -162,7 +196,11 @@ partial class CommandInfo
         /// <returns></returns>
         public virtual bool Add(ICommandInfo source)
         {
-            throw null;
+            source.ThrowWhenNull();
+
+            var noRemainingSpecs = false;
+            var noUnusedValues = false;
+            return Append(noRemainingSpecs, noUnusedValues, source.Text, source.Parameters);
         }
 
         /// <summary>
@@ -172,10 +210,12 @@ partial class CommandInfo
         /// <returns></returns>
         public virtual bool Add(ICommandInfo.IBuilder source)
         {
-            throw null;
-        }
+            source.ThrowWhenNull();
 
-        // ----------------------------------------------------
+            var noRemainingSpecs = false;
+            var noUnusedValues = false;
+            return Append(noRemainingSpecs, noUnusedValues, source.Text, source.Parameters);
+        }
 
         /// <summary>
         /// <inheritdoc/>
@@ -183,9 +223,14 @@ partial class CommandInfo
         /// <param name="text"></param>
         /// <param name="range"></param>
         /// <returns></returns>
-        public virtual bool Add(string text, params object?[]? range)
+        public virtual bool Add(string? text, params object?[]? range)
         {
-            throw null;
+            text ??= string.Empty;
+            range ??= [null];
+
+            var noRemainingSpecs = true;
+            var noUnusedValues = true;
+            return Append(noRemainingSpecs, noUnusedValues, text, range);
         }
 
         // ----------------------------------------------------
@@ -197,7 +242,14 @@ partial class CommandInfo
         /// <returns></returns>
         public virtual bool ReplaceText(string text, bool strict = true)
         {
-            throw null;
+            text.ThrowWhenNull();
+
+            if (TextLen == 0 && text.Length == 0) return false;
+            if (string.Compare(Text, text) == 0) return false;
+
+            _Text.Clear();
+            _Text.Append(text);
+            return true;
         }
 
         /// <summary>
@@ -207,7 +259,29 @@ partial class CommandInfo
         /// <returns></returns>
         public virtual bool ReplaceParameters(params object?[]? range)
         {
-            throw null;
+            range ??= [null];
+
+            // Shortcuts when given range is empty...
+            if (range.Length == 0)
+            {
+                if (_Parameters.Count != 0) return false;
+
+                _Parameters.Clear();
+                return true;
+            }
+
+            // Standard case...
+            var old = _Parameters.ToArray(); _Parameters.Clear();
+            var noRemainingSpecs = false;
+            var noUnusedValues = false;
+            var changed = Append(noRemainingSpecs, noUnusedValues, null, range);
+
+            if (!changed)
+            {
+                _Parameters.Clear();
+                _Parameters.AddRange(old);
+            }
+            return changed;
         }
 
         // ----------------------------------------------------
@@ -226,6 +300,31 @@ partial class CommandInfo
         }
 
         // ----------------------------------------------------
+
+        /// <summary>
+        /// Appends to this instance the given text and the collection of parameters obtained from
+        /// the given range of values, if any.
+        /// <br/> If text is null, then the range of values is captured without validanting that
+        /// their names are encoded in the text. Otherwise, if both text and values are used, then
+        /// they must be encoded in the text using either a positional '{n}' or a named '{name}'
+        /// specification, where 'name' may or may not start with the engine prefix.
+        /// <br/> If a 'name' is already captured, then it is changed in both the text and parameter
+        /// names to prevent colisions (so enabling using positional '{0}' in the input text).
+        /// <br/> Unused values or dangling specifications are allowed only if explicitly requested.
+        /// <br/> Returns whether changes has been made or not.
+        /// </summary>
+        /// <param name="noRemainingSpecs"></param>
+        /// <param name="noUnusedValues"></param>
+        /// <param name="text"></param>
+        /// <param name="range"></param>
+        /// <returns></returns>
+        bool Append(
+            bool noRemainingSpecs,
+            bool noUnusedValues,
+            string? text, params object?[]? range)
+        {
+            throw null;
+        }
 
         /// <summary>
         /// Determines if the given text has any dangling '{...}' braket specification.
