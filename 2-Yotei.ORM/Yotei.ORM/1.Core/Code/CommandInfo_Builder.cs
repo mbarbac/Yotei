@@ -326,6 +326,42 @@ partial class CommandInfo
             throw null;
         }
 
+        // ----------------------------------------------------
+
+        /// <summary>
+        /// Replaces the named '{name}' specifications of the given parameters in the given text
+        /// with their ordinal '{n}' ones.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="pars"></param>
+        /// <param name="comparison"></param>
+        /// <returns></returns>
+        /// This method needs to be public as it is used in other places.
+        public static string NamesToOrdinals(
+            string text,
+            IEnumerable<IParameter> pars,
+            StringComparison comparison)
+        {
+            text.ThrowWhenNull();
+            pars.ThrowWhenNull();
+
+            var finder = new IsolatedFinder();
+            var i = 0;
+            foreach (var par in pars)
+            {
+                var bracket = $"{{{i}}}"; i++;
+                var pos = 0;
+
+                while ((pos = finder.Find(text, pos, par.Name, comparison)) >= 0)
+                {
+                    text = text.Remove(pos, par.Name.Length);
+                    text = text.Insert(pos, bracket);
+                    pos += bracket.Length;
+                }
+            }
+            return text;
+        }
+
         /// <summary>
         /// Determines if the given text has any dangling '{...}' braket specification.
         /// </summary>
