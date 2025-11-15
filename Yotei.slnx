@@ -76,6 +76,7 @@
     <Project Path="4-Yotei.ORM.SqlServer/Yotei.ORM.SqlServer/Yotei.ORM.SqlServer.csproj" />
   </Folder>
   <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
     <File Path=".gitignore" />
     <File Path="LICENSE" />
     <File Path="README.md" />

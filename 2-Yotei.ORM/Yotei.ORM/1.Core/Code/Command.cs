@@ -9,7 +9,7 @@
 public abstract partial class Command : ICommand
 {
     /// <summary>
-    /// Initializes a new instance.
+    /// Initializes a new empty instance.
     /// </summary>
     /// <param name="connection"></param>
     public Command(IConnection connection) => Connection = connection.ThrowWhenNull();

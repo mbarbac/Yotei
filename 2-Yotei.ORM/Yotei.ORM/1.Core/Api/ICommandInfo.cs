@@ -51,7 +51,8 @@ public partial interface ICommandInfo
     /// <summary>
     /// Determines if this instance is or not in a consistent state (defined as so when the captured
     /// parameters match their normalized representation in the captured text).
-    /// <br/> Instances may become not consistent when the 'Replace' methods are used.
+    /// <br/> Instances may become not consistent when the 'Replace' methods are used, or when
+    /// adding only text or values.
     /// </summary>
     bool IsConsistent { get; }
 
@@ -113,7 +114,7 @@ public partial interface ICommandInfo
     /// </summary>
     /// <param name="text"></param>
     /// <returns></returns>
-    ICommandInfo ReplaceText(string text, bool strict = true);
+    ICommandInfo ReplaceText(string text);
 
     /// <summary>
     /// Returns a new instance where the existing collection of parameters has been replaced by

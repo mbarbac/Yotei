@@ -55,7 +55,9 @@ partial interface ICommandInfo
         // ----------------------------------------------------
 
         /// <summary>
-        /// <inheritdoc cref="ICommandInfo.Add(ICommand, bool)"/>
+        /// Adds to this instance the contents of the given source.
+        /// <br/> This method accepts sources in inconsistent states.
+        /// <br/> Returns whether changes has been made or not.
         /// </summary>
         /// <param name="source"></param>
         /// <param name="iterable"></param>
@@ -63,22 +65,32 @@ partial interface ICommandInfo
         bool Add(ICommand source, bool iterable);
 
         /// <summary>
-        /// <inheritdoc cref="ICommandInfo.Add(ICommandInfo)"/>
+        /// Adds to this instance the contents of the given source.
+        /// <br/> This method accepts sources in inconsistent states.
+        /// <br/> Returns whether changes has been made or not.
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
         bool Add(ICommandInfo source);
 
         /// <summary>
-        /// 
-        /// <inheritdoc cref="ICommandInfo.Add(IBuilder)"/>
+        /// Adds to this instance the contents of the given source.
+        /// <br/> This method accepts sources in inconsistent states.
+        /// <br/> Returns whether changes has been made or not.
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
         bool Add(IBuilder source);
 
         /// <summary>
-        /// <inheritdoc cref="ICommandInfo.Add(string, object?[]?)"/>
+        /// Adds to this instance the given text and the collection of parameters obtained from
+        /// the given range of values, if any.
+        /// <br/> If text is null, then the range of values is captured without validanting that
+        /// their names are encoded in the text. Otherwise, if both text and values are used, then
+        /// they must be encoded in the text using either a positional '{n}' or a named '{name}'
+        /// specification, where 'name' may or may not start with the engine prefix.
+        /// <br/> Unused values or dangling specifications are not allowed.
+        /// <br/> Returns whether changes has been made or not.
         /// </summary>
         /// <param name="text"></param>
         /// <param name="range"></param>
@@ -88,14 +100,21 @@ partial interface ICommandInfo
         // ----------------------------------------------------
 
         /// <summary>
-        /// <inheritdoc cref="ICommandInfo.ReplaceText(string, bool)"/>
+        /// Replaces the original text with the new given one.
+        /// <br/> This method does not try to match the names of the existing parameters with their
+        /// representation in the given text, so this instance may end up in an inconsistent state.
+        /// <br/> Returns whether changes has been made or not.
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        bool ReplaceText(string text, bool strict = true);
+        bool ReplaceText(string text);
 
         /// <summary>
-        /// <inheritdoc cref="ICommandInfo.ReplaceParameters(object?[]?)"/>
+        /// Replaces the existing collection of parameters with  a new one obtained from the given
+        /// range of values.
+        /// <br/> This method does not try to match the names of the given parameters with the ones
+        /// in the existing text, so this instance may end up in an inconsistent state.
+        /// <br/> Returns whether changes has been made or not.
         /// </summary>
         /// <param name="range"></param>
         /// <returns></returns>
@@ -104,7 +123,8 @@ partial interface ICommandInfo
         // ----------------------------------------------------
 
         /// <summary>
-        /// <inheritdoc cref="ICommandInfo.Clear"/>
+        /// Clears the contents of this instance.
+        /// <br/> Returns whether changes has been made or not.
         /// </summary>
         /// <returns></returns>
         bool Clear();
