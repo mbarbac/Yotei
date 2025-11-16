@@ -181,10 +181,10 @@ public partial class CommandInfo : ICommandInfo
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual ICommandInfo ReplaceParameters(params object?[]? range)
+    public virtual ICommandInfo ReplaceValues(params object?[]? range)
     {
         var builder = CreateBuilder();
-        var done = builder.ReplaceParameters(range);
+        var done = builder.ReplaceValues(range);
         return done ? builder.CreateInstance() : this;
     }
 

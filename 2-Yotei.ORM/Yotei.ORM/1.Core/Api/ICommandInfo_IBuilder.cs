@@ -114,7 +114,7 @@ partial interface ICommandInfo
         /// </summary>
         /// <param name="range"></param>
         /// <returns></returns>
-        bool ReplaceParameters(params object?[]? range);
+        bool ReplaceValues(params object?[]? range);
 
         // ----------------------------------------------------
 

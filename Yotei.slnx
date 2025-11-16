@@ -33,8 +33,6 @@
     </Project>
   </Folder>
   <Folder Name="/1-Yotei.Tools.Generators/CoreGenerator/">
-    <File Path="1-Yotei.Tools/Yotei.Tools/LICENSE" />
-    <File Path="1-Yotei.Tools/Yotei.Tools/README.md" />
     <Project Path="1-Yotei.Tools.Generators/CoreGenerator/Yotei.Tools.CoreGenerator/Yotei.Tools.CoreGenerator.shproj" Id="723309b9-f888-4101-a288-6529f466691c" />
   </Folder>
   <Folder Name="/1-Yotei.Tools.Generators/WithGenerator/">
@@ -79,6 +77,7 @@
     <File Path=".editorconfig" />
     <File Path=".gitignore" />
     <File Path="LICENSE" />
+    <File Path="PENDING.txt" />
     <File Path="README.md" />
   </Folder>
 </Solution>

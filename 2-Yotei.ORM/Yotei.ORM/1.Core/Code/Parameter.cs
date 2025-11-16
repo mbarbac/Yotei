@@ -34,7 +34,9 @@ public partial class Parameter : IParameter
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"{Name}='{Value.Sketch()}'";
+    public override string ToString() => Value is null
+        ? $"{Name}=NULL"
+        : $"{Name}='{Value.Sketch()}'";
 
     // ----------------------------------------------------
 

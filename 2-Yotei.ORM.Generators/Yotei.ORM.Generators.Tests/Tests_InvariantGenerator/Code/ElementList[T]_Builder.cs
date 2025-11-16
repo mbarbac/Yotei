@@ -12,7 +12,7 @@ partial class ElementList_T
     /// </summary>
     [Cloneable<IHost.IBuilder>]
     [DebuggerDisplay("{ToDebugString(5)}")]
-    public partial class Builder : CoreList<IItem>, IHost.IBuilder
+    public partial class Builder : XCoreList<IItem>, IHost.IBuilder
     {
         /// <summary>
         /// Initializes a new empty instance.

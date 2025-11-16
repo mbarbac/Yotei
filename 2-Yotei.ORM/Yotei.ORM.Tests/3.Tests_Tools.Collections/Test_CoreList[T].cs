@@ -22,7 +22,7 @@ public partial class Test_CoreList_T
 
     [Cloneable(ReturnType = typeof(ICoreList<IElement>))]
     [DebuggerDisplay("{ToDebugString(5)}")]
-    public partial class Chain : CoreList<IElement>, IElement
+    public partial class Chain : XCoreList<IElement>, IElement
     {
         public Chain(bool sensitive) : base() => Sensitive = sensitive;
         public Chain(bool sensitive, int capacity) : base(capacity) => Sensitive = sensitive;

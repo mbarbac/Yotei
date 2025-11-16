@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Code;
+﻿using System.ComponentModel.DataAnnotations;
+using StrSpan = System.ReadOnlySpan<char>;
+namespace Yotei.ORM.Code;
 
 partial class CommandInfo
 {
@@ -209,10 +211,11 @@ partial class CommandInfo
         {
             source.ThrowWhenNull();
 
-            var noRemainingSpecs = false;
-            var noUnusedValues = false;
-            var noDanglingNames = false;
-            return Append(noRemainingSpecs, noUnusedValues, noDanglingNames, source.Text, source.Parameters);
+            if (source.IsEmpty) return false;
+
+            var strictNames = false;
+            var strictValues = false;
+            return Append(strictNames, strictValues, source.Text, source.Parameters);
         }
 
         /// <summary>
@@ -224,10 +227,11 @@ partial class CommandInfo
         {
             source.ThrowWhenNull();
 
-            var noRemainingSpecs = false;
-            var noUnusedValues = false;
-            var noDanglingNames = false;
-            return Append(noRemainingSpecs, noUnusedValues, noDanglingNames, source.Text, source.Parameters);
+            if (source.IsEmpty) return false;
+
+            var strictNames = false;
+            var strictValues = false;
+            return Append(strictNames, strictValues, source.Text, source.Parameters);
         }
 
         /// <summary>
@@ -238,11 +242,10 @@ partial class CommandInfo
         /// <returns></returns>
         public virtual bool Add(string? text, params object?[]? range)
         {
-            var noRemainingSpecs = true;
-            var noUnusedValues = text is not null; // Null => only capture values...
-            var noDanglingNames = true;
+            var strictNames = true;
+            var strictValues = text is not null; // Null => only capture values...
 
-            return Append(noRemainingSpecs, noUnusedValues, noDanglingNames, text, range);
+            return Append(strictNames, strictValues, text, range);
         }
 
         // ----------------------------------------------------
@@ -269,7 +272,7 @@ partial class CommandInfo
         /// </summary>
         /// <param name="range"></param>
         /// <returns></returns>
-        public virtual bool ReplaceParameters(params object?[]? range)
+        public virtual bool ReplaceValues(params object?[]? range)
         {
             range ??= [null];
 
@@ -284,10 +287,9 @@ partial class CommandInfo
 
             // Standard case...
             var old = _Parameters.Clone();
-            var noRemainingSpecs = false;
-            var noUnusedValues = false;
-            var noDanglingNames = false;
-            var changed = Append(noRemainingSpecs, noUnusedValues, noDanglingNames, null, range);
+            var strictNames = false;
+            var strictValues = false;
+            var changed = Append(strictNames, strictValues, null, range);
 
             if (changed) { for (int i = 0; i < old.Count; i++) _Parameters.RemoveAt(0); }
             else { _Parameters.Clear(); _Parameters.AddRange(old); }
@@ -328,9 +330,8 @@ partial class CommandInfo
         /// <br/> Returns whether changes has been made or not.
         /// </summary>
         bool Append(
-            bool noRemainingSpecs,
-            bool noUnusedValues,
-            bool noDanglingNames,
+            bool strictNames,
+            bool strictValues,
             string? text, params object?[]? range)
         {
             bool textnull = text is null;
@@ -351,12 +352,12 @@ partial class CommandInfo
                     case IParameterList parsList:
                         text = NamesToOrdinals(text, parsList, Comparison);
                         range = [.. parsList];
-                        return Append(noRemainingSpecs, noUnusedValues, noDanglingNames, text, range);
+                        return Append(strictNames, strictValues, text, range);
 
                     case IParameterList.IBuilder parsBuilder:
                         text = NamesToOrdinals(text, parsBuilder, Comparison);
                         range = [.. parsBuilder];
-                        return Append(noRemainingSpecs, noUnusedValues, noDanglingNames, text, range);
+                        return Append(strictNames, strictValues, text, range);
                 }
             }
 
@@ -410,10 +411,45 @@ partial class CommandInfo
             }
 
             /// <summary>
+            /// Before using the text, verify that ordinal brackets '{n}' are valid ones..
+            /// </summary>
+            if (text.Length > 0 && strictNames)
+            {
+                pos = 0;
+                while (NextOrdinal(pos, out var span))
+                {
+                    if (int.TryParse(span, out var value))
+                    {
+                        if (value >= items.Length) throw new ArgumentException(
+                            "Ordinal bracket value bigger than number of values.")
+                            .WithData(text);
+                    }
+                    pos += span.Length + 2 + 1;
+                }
+
+                // Gets the next ordinal span from the ini position, if any. Empty brackets are
+                // ignored and not reported.
+                bool NextOrdinal(int pos, out StrSpan span)
+                {
+                    while (pos < text.Length)
+                    {
+                        var ini = text.IndexOf('{', pos); if (ini < 0) break;
+                        var end = text.IndexOf('}', ini); if (end < 0) break;
+                        span = text.AsSpan(ini + 1, end - ini - 1);
+
+                        if (span.Length == 0) { pos = ini + 1; continue; }
+                        return true;
+                    }
+                    span = StrSpan.Empty;
+                    return false;
+                }
+            }
+
+            /// <summary>
             /// Before using the text, validate there are no '#...' specs in it (#: prefix), as far
             /// as they are not protected in a bracket '{#...}' which is perfectly acceptable...
             /// </summary>
-            if (noDanglingNames && text.Length > 0)
+            if (text.Length > 0 && strictNames)
             {
                 pos = 0;
                 while ((pos = NextPrefix(pos)) >= 0)
@@ -502,7 +538,7 @@ partial class CommandInfo
             /// <summary>
             /// No remaining specs....
             /// </summary>
-            if (noRemainingSpecs &&
+            if (strictNames &&
                 text.Length > 0 &&
                 AreRemainingBrackets(text))
             {
@@ -514,7 +550,7 @@ partial class CommandInfo
             /// <summary>
             /// No unused values...
             /// </summary>
-            if (noUnusedValues &&
+            if (strictValues &&
                 !textnull &&
                 items.Length > 0 &&
                 items.Any(static x => !x.Used))

@@ -107,7 +107,7 @@ public partial interface ICommandInfo
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    ICommandInfo ReplaceParameters(params object?[]? range);
+    ICommandInfo ReplaceValues(params object?[]? range);
 
     // ----------------------------------------------------
 

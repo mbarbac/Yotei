@@ -8,32 +8,32 @@
 /// <typeparam name="T"></typeparam>
 [Cloneable(ReturnType = typeof(ICoreList<>))]
 [DebuggerDisplay("{ToDebugString(5)}")]
-public abstract partial class CoreList<T> : ICoreList<T>
+public abstract partial class XCoreList<T> : ICoreList<T>
 {
     readonly List<T> Items;
 
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    public CoreList() => Items = [];
+    public XCoreList() => Items = [];
 
     /// <summary>
     /// Initializes a new empty instance with the given initial capacity.
     /// </summary>
     /// <param name="capacity"></param>
-    public CoreList(int capacity) => Items = new(capacity);
+    public XCoreList(int capacity) => Items = new(capacity);
 
     /// <summary>
     /// Initializes a new instance with the elements of the given range.
     /// </summary>
     /// <param name="range"></param>
-    public CoreList(IEnumerable<T> range) : this() => AddRange(range);
+    public XCoreList(IEnumerable<T> range) : this() => AddRange(range);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected CoreList(CoreList<T> source) : this() => AddRange(source);
+    protected XCoreList(XCoreList<T> source) : this() => AddRange(source);
 
     /// <summary>
     /// <inheritdoc/>
