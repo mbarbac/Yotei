@@ -145,7 +145,7 @@ internal static class StringSpanExtensions_StringTarget
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    /// HACK: Solves that StrinSpan.Equals(SpanTarget, CharComparer) doesn't invoke the comparer.
+    /// NOTE: Solves that StrinSpan.Equals(SpanTarget, CharComparer) doesn't invoke the comparer.
     public static int LastIndexOf(
         this StringSpan source, StringSpan value, IEqualityComparer<char> comparer)
     {

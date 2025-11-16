@@ -2,7 +2,7 @@
 
 namespace Yotei.Tools.WithGenerator;
 
-// TODO: copy CloneGenerator logic into WithGenerator.
+// LOW: copy CloneGenerator logic into WithGenerator.
 // CloneGenerator is more recent, may have better logic.
 
 // ========================================================

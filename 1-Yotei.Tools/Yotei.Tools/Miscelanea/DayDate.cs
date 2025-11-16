@@ -125,7 +125,7 @@ public record class DayDate : IComparable<DayDate>
         return
             Year >= DateOnly.MinValue.Year && Year <= DateOnly.MaxValue.Year
             ? ((DateOnly)this).ToString(provider)
-            : ToString(); // TODO: DayDate.ToString(provider) for BC values and big AC ones.
+            : ToString(); // LOW: DayDate.ToString(provider) for BC values and big AC ones.
     }
 
     /// <summary>
@@ -143,7 +143,7 @@ public record class DayDate : IComparable<DayDate>
         return
             Year >= DateOnly.MinValue.Year && Year <= DateOnly.MaxValue.Year
             ? ((DateOnly)this).ToString(format, provider)
-            : ToString(format); // TODO: DayDate.ToString(format, provider) for BC values and big AC ones.
+            : ToString(format); // LOW: DayDate.ToString(format, provider) for BC values and big AC ones.
     }
 
     // ----------------------------------------------------

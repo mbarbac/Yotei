@@ -1,4 +1,3 @@
 - Terminar prototipo de CommandInfo.Builder
 - Pasar todas las funciones auxiliares a retornar un out StrSpan
-- En IsolatedFinder y Char: normalizar los CharComparers
 - StrSpan necesita IndexOf con parametro ini

@@ -3,78 +3,144 @@
 // ========================================================
 public static class CharExtensions
 {
-    /// <summary>
-    /// Determines if this character is the same as the given one.
-    /// <br/> This method works by comparing the lower case version of both characters.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="value"></param>
-    /// <param name="caseSensitive"></param>
-    /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool Equals(this char source, char value, bool ignoreCase)
+    extension(char source)
     {
-        return ignoreCase
-            ? char.ToLower(source) == char.ToLower(value)
-            : source == value;
+        /// <summary>
+        /// Determines if the source character is the same as the given one.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Equals(
+            char value, bool ignoreCase)
+            => char.CharComparer(ignoreCase).Equals(source, value);
+
+        /// <summary>
+        /// Determines if the source character is the same as the given one.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public bool Equals(
+            char value, IEqualityComparer<char> comparer)
+            => comparer.ThrowWhenNull().Equals(source, value);
+
+        /// <summary>
+        /// Determines if the source character is the same as the given one.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public bool Equals(
+            char value, IEqualityComparer<string> comparer)
+            => char.CharComparer(comparer.ThrowWhenNull()).Equals(source, value);
+
+        /// <summary>
+        /// Determines if the source character is the same as the given one.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparison"></param>
+        /// <returns></returns>
+        public bool Equals(
+            char value, StringComparison comparison)
+            => char.CharComparer(comparison).Equals(source, value);
+    }
+
+    // ----------------------------------------------------
+
+    extension(char)
+    {
+        /// <summary>
+        /// Returns a default char comparer.
+        /// </summary>
+        public static IEqualityComparer<char> DefaultComparer => new ComparerDefault();
+
+        /// <summary>
+        /// Gets a char comparer that ignores or not the case as requested.
+        /// <br/> When ignoring case, this instance works by comparing their low case versions.
+        /// </summary>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public static IEqualityComparer<char> CharComparer(bool ignoreCase) => new ComparerByIgnoreCase(ignoreCase);
+
+        /// <summary>
+        /// Gets a char comparer that uses the given string comparer instance.
+        /// </summary>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public static IEqualityComparer<char> CharComparer(IEqualityComparer<string> comparer) => new ComparerByComparer(comparer);
+
+        /// <summary>
+        /// Gets a char comparer that uses the given comparison mode.
+        /// </summary>
+        /// <param name="comparison"></param>
+        /// <returns></returns>
+        public static IEqualityComparer<char> CharComparer(StringComparison comparison) => new ComparerByComparison(comparison);
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Compares two chars.
+    /// </summary>
+    readonly struct ComparerDefault() : IEqualityComparer<char>
+    {
+        public bool Equals(char x, char y) => x == y;
+        public int GetHashCode(char obj) => obj.GetHashCode();
     }
 
     /// <summary>
-    /// Determines if this character is the same as the given one.
+    /// Compares two chars ignoring or not the case as requested.
     /// </summary>
-    /// <param name="source"></param>
-    /// <param name="value"></param>
-    /// <param name="comparer"></param>
-    /// <returns></returns>
-    public static bool Equals(this char source, char value, IEqualityComparer<char> comparer)
+    /// <param name="ignoreCase"></param>
+    readonly struct ComparerByIgnoreCase(bool ignoreCase) : IEqualityComparer<char>
     {
-        return comparer.ThrowWhenNull().Equals(source, value);
+        public bool Equals(char x, char y) => ignoreCase
+            ? char.ToLower(x) == char.ToLower(y)
+            : x == y;
+
+        public int GetHashCode(char obj) => ignoreCase
+            ? char.ToLower(obj).GetHashCode()
+            : obj.GetHashCode();
     }
 
     /// <summary>
-    /// Determines if this character is the same as the given one.
+    /// Compares to chars using the given string comparer.
     /// </summary>
-    /// <param name="source"></param>
-    /// <param name="value"></param>
     /// <param name="comparer"></param>
-    /// <returns></returns>
-    /// NOTE: char.Equals(char, string comparer) allocates two temporary strings.
-    /// Problem is that StringSpan has not a CompareTo(target, StringComparer).
-    /// But using shared ones means we need to introduce a lock.
-    public static bool Equals(
-        this char source, char value, IEqualityComparer<string> comparer)
-        => new CharComparerByStringComparer(comparer.ThrowWhenNull()).Equals(source, value);
-
-    readonly struct CharComparerByStringComparer(IEqualityComparer<string> Comparer) : IEqualityComparer<char>
+    /// TODO: CharComparerByComparer: StrSpan has not a CompareTo(target, StringComparer) method...
+    readonly struct ComparerByComparer(IEqualityComparer<string> comparer) : IEqualityComparer<char>
     {
         public bool Equals(char x, char y)
         {
             var xs = x.ToString();
             var ys = y.ToString();
-            return Comparer.Equals(xs, ys);
+            return comparer.Equals(xs, ys);
         }
-        public int GetHashCode(char obj) => throw new NotImplementedException();
+
+        public int GetHashCode(char obj) => comparer.GetHashCode(obj.ToString());
     }
 
     /// <summary>
-    /// Determines if this character is the same as the given one.
+    /// Compares two chars using the given comparison mode.
     /// </summary>
-    /// <param name="source"></param>
-    /// <param name="value"></param>
     /// <param name="comparison"></param>
-    /// <returns></returns>
-    public static bool Equals(
-        this char source, char value, StringComparison comparison)
-        => new CharComparerByComparison(comparison).Equals(source, value);
-
-    readonly struct CharComparerByComparison(StringComparison Comparison) : IEqualityComparer<char>
+    readonly struct ComparerByComparison(StringComparison comparison) : IEqualityComparer<char>
     {
+        [SuppressMessage("", "IDE0302")]
         public bool Equals(char x, char y)
         {
-            Span<char> xs = [x];
-            Span<char> ys = [y];
-            return xs.CompareTo(ys, Comparison) == 0;
+            Span<char> xs = stackalloc char[] { x };
+            Span<char> ys = stackalloc char[] { y };
+            return xs.CompareTo(ys, comparison) == 0;
         }
-        public int GetHashCode(char obj) => throw new NotImplementedException();
+
+        public int GetHashCode(char obj) => comparison is
+            StringComparison.CurrentCultureIgnoreCase or
+            StringComparison.InvariantCultureIgnoreCase or
+            StringComparison.OrdinalIgnoreCase
+            ? char.ToLower(obj).GetHashCode()
+            : obj.GetHashCode();
     }
 }
