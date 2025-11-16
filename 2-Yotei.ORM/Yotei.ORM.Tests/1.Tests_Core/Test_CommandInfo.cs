@@ -157,6 +157,9 @@ public class Test_CommandIndo
 
         try { builder = new Builder(connection, "{0} {1}", "James"); Assert.Fail(); }
         catch (ArgumentException) { }
+
+        try { builder = new Builder(connection, "any #0"); Assert.Fail(); }
+        catch (ArgumentException) { }
     }
 
     //[Enforced]
@@ -181,8 +184,6 @@ public class Test_CommandIndo
         info = builder.CreateInstance();
         Assert.Equal("#First #Last -- [#First='James', #Last='Bond']", info.ToString());
 
-        // ISSUE: # shall not be identified because **is protected** in a {} bracket...
-
         builder = new Builder(connection, "{#First} {Last}", pfirst, plast);
         Assert.False(builder.IsEmpty);
         Assert.Equal("#First #Last", builder.Text);
@@ -199,4 +200,193 @@ public class Test_CommandIndo
         try { builder = new Builder(connection, "{0} {1}", pfirst); Assert.Fail(); }
         catch (ArgumentException) { }
     }
+
+    //[Enforced]
+    [Fact]
+    public void Test_Create_Text_And_Anonymous()
+    {
+        IBuilder builder;
+        ICommandInfo info;
+        var engine = new FakeEngine() { ParameterPrefix = "@" };
+        var connection = new FakeConnection(engine);
+
+        var xfirst = new { First = "James" };
+        var xlast = new { @Last = "Bond" };
+
+        builder = new Builder(connection, "{0} {1}", xfirst, xlast);
+        Assert.False(builder.IsEmpty);
+        Assert.Equal("@First @Last", builder.Text);
+        Assert.Equal(2, builder.Parameters.Count);
+        Assert.Equal("@First", builder.Parameters[0].Name); Assert.Equal("James", builder.Parameters[0].Value);
+        Assert.Equal("@Last", builder.Parameters[1].Name); Assert.Equal("Bond", builder.Parameters[1].Value);
+        Assert.True(builder.IsConsistent);
+        info = builder.CreateInstance();
+        Assert.Equal("@First @Last -- [@First='James', @Last='Bond']", info.ToString());
+
+        builder = new Builder(connection, "{@First} {Last}", xfirst, xlast);
+        Assert.False(builder.IsEmpty);
+        Assert.Equal("@First @Last", builder.Text);
+        Assert.Equal(2, builder.Parameters.Count);
+        Assert.Equal("@First", builder.Parameters[0].Name); Assert.Equal("James", builder.Parameters[0].Value);
+        Assert.Equal("@Last", builder.Parameters[1].Name); Assert.Equal("Bond", builder.Parameters[1].Value);
+        Assert.True(builder.IsConsistent);
+        info = builder.CreateInstance();
+        Assert.Equal("@First @Last -- [@First='James', @Last='Bond']", info.ToString());
+
+        try { builder = new Builder(connection, "{0}", xfirst, xlast); Assert.Fail(); }
+        catch (ArgumentException) { }
+
+        try { builder = new Builder(connection, "{0} {1}", xfirst); Assert.Fail(); }
+        catch (ArgumentException) { }
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public void Test_Create_Values_As_Colection()
+    {
+        IBuilder builder;
+        ICommandInfo info;
+        var engine = new FakeEngine();
+        var connection = new FakeConnection(engine);
+
+        // Because of the signature, arrays are the receiving type of variable values, so when
+        // the first an unique one is itself an array it is taken as a collection of arguments...
+        builder = new Builder(connection, "{0} {1}", [null, "any"]);
+        Assert.False(builder.IsEmpty);
+        Assert.Equal("#0 #1", builder.Text);
+        Assert.Equal(2, builder.Parameters.Count);
+        Assert.Equal("#0", builder.Parameters[0].Name); Assert.Null(builder.Parameters[0].Value);
+        Assert.Equal("#1", builder.Parameters[1].Name); Assert.Equal("any", builder.Parameters[1].Value);
+        Assert.True(builder.IsConsistent);
+        info = builder.CreateInstance();
+        Assert.Equal("#0 #1 -- [#0='NULL', #1='any']", info.ToString());
+
+        // A idiomatic workaround is to use a parameter as the argument...
+        object?[] array = { null, "any" };
+        builder = new Builder(connection, "{0}", new Parameter("#0", array));
+        Assert.Single(builder.Parameters);
+        Assert.Equal("#0", builder.Parameters[0].Name);
+        array = Assert.IsType<object?[]>(builder.Parameters[0].Value);
+        Assert.Equal(2, array.Length);
+        Assert.Null(array[0]);
+        Assert.Equal("any", array[1]);
+        Assert.True(builder.IsConsistent);
+        info = builder.CreateInstance();
+        Assert.Equal("#0 -- [#0='[NULL, any]']", info.ToString());
+
+        // When the collection is the 2nd argument, we have not such problem...
+        builder = new Builder(connection, "{0} {1}", null, new object?[] { null, "any" });
+        Assert.Equal(2, builder.Parameters.Count);
+        Assert.Equal("#0", builder.Parameters[0].Name); Assert.Null(builder.Parameters[0].Value);
+        Assert.Equal("#1", builder.Parameters[1].Name);
+        array = Assert.IsType<object?[]>(builder.Parameters[1].Value);
+        Assert.Equal(2, array.Length);
+        Assert.Null(array[0]);
+        Assert.Equal("any", array[1]);
+        Assert.True(builder.IsConsistent);
+        info = builder.CreateInstance();
+        Assert.Equal("#0 #1 -- [#0='NULL', #1='[NULL, any]']", info.ToString());
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public void Test_Create_Duplicate_Value_Names()
+    {
+        IBuilder builder;
+        var engine = new FakeEngine() { ParameterPrefix = "@" };
+        var connection = new FakeConnection(engine);
+
+        var pfirst = new Parameter("One", "any");
+        var plast = new Parameter("@One", "other");
+        try { builder = new Builder(connection, "{0} {1}", pfirst, plast); Assert.Fail(); }
+        catch (DuplicateException) { }
+
+        var xfirst = new { One = "any" };
+        var xlast = new { @One = "other" };
+        try { builder = new Builder(connection, "{0} {1}", xfirst, xlast); Assert.Fail(); }
+        catch (DuplicateException) { }
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public void Test_Clone()
+    {
+        IBuilder source, target;
+        ICommandInfo info;
+        var engine = new FakeEngine();
+        var connection = new FakeConnection(engine);
+
+        source = new Builder(connection);
+        target = source.Clone();
+        Assert.NotSame(source, target);
+        Assert.Empty(target.Text);
+        Assert.Empty(target.Parameters);
+        Assert.True(target.IsConsistent);
+
+        source = new Builder(connection, "{0} {1}", "James", "Bond");
+        target = source.Clone();
+        Assert.NotSame(source, target);
+        Assert.False(target.IsEmpty);
+        Assert.Equal("#0 #1", target.Text);
+        Assert.Equal(2, target.Parameters.Count);
+        Assert.Equal("#0", target.Parameters[0].Name); Assert.Equal("James", target.Parameters[0].Value);
+        Assert.Equal("#1", target.Parameters[1].Name); Assert.Equal("Bond", target.Parameters[1].Value);
+        Assert.True(target.IsConsistent);
+        info = target.CreateInstance();
+        Assert.Equal("#0 #1 -- [#0='James', #1='Bond']", info.ToString());
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    //[Fact]
+    //public void Test_Add_Command()
+
+    //[Enforced]
+    //[Fact]
+    //public void Test_Add_CommandInfo()
+
+    //[Enforced]
+    //[Fact]
+    //public void Test_Add_CommandInfoBuilder()
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    //[Fact]
+    //public void Test_Add_Only_Text()
+
+    //[Enforced]
+    //[Fact]
+    //public void Test_Add_Only_Values()
+
+    //[Enforced]
+    //[Fact]
+    //public void Test_Add_Only_Parameters()
+
+    //[Enforced]
+    //[Fact]
+    //public void Test_Add_Only_Anonymous()
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    //[Fact]
+    //public void Test_Replace_Text()
+
+    //[Enforced]
+    //[Fact]
+    //public void Test_Replace_Values()
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    //[Fact]
+    //public void Test_Clear()
 }

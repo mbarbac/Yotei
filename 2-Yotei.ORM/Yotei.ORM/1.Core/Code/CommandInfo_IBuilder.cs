@@ -339,8 +339,11 @@ partial class CommandInfo
 
             var items = RangeElement.Capture(range);
             var changed = false;
+            var pos = 0;
 
-            // Intercepting ranges with just one special element...
+            /// <summary>
+            /// Intercepting ranges with just one special element...
+            /// </summary>
             if (items.Length == 1)
             {
                 switch (items[0].Value)
@@ -357,45 +360,95 @@ partial class CommandInfo
                 }
             }
 
-            // Command-alike parameters are not allowed...
-            for (int i = 0; i < items.Length; i++)
+            /// <summary>
+            /// Command-alike parameters are not allowed...
+            /// </summary>
+            foreach (var item in items)
             {
-                switch (items[i].Value)
+                switch (item.Value)
                 {
                     case ICommand:
                     case ICommandInfo:
                     case ICommandInfo.IBuilder:
                         throw new ArgumentException("Element cannot be a command-alike one.")
-                        .WithData(items[i].Value);
+                        .WithData(item.Value);
                 }
             }
 
-            // Duplicated names in given range not allowed...
-            if (DuplicatedNames(items)) throw new DuplicateException(
-                "Range of given values contains duplicated names.")
-                .WithData(items);
+            /// <summary>
+            /// Before using the range, validate there are no duplicate names in it...
+            /// </summary>
+            List<string> names = [];
+            foreach (var item in items)
+            {
+                // Only parameters and anonymous carry names...
+                var name = item.Value switch
+                {
+                    IParameter temp => temp.Name,
+                    AnonymousElement temp => temp.Name,
+                    _ => null
+                };
+                if (name is null) continue;
 
-            // Before modifying text, let see if we have dangling '#...' specs, as far as they are
-            // not protected by a '{#...}' bracket, which is completely acceptable...
-            var pos = 0;
+                // Normalizing (and maybe re-storing) the names...
+                if (!name.StartsWith(Prefix, Comparison))
+                {
+                    name = Prefix + name;
+                    switch (item.Value)
+                    {
+                        case IParameter temp: item.Value = new Parameter(name, temp.Value); break;
+                        case AnonymousElement temp: item.Value = new Parameter(name, temp.Value); break;
+                    }
+                }
 
-            ////// Before messing with 'text', let's see if we have dangling '#...' names
-            ////var pos = 0;
-            ////if (noDanglingNames && text.Length > 0)
-            ////{
-            ////    while ((pos = text.IndexOf(Prefix, pos, Comparison)) >= 0)
-            ////    {
-            ////        if (pos == 0 ||
-            ////            IsolatedFinder.SEPARATORS.Contains(text[pos - 1]))
-            ////            throw new ArgumentException(
-            ////                "There are dangling name specs in the given text.")
-            ////                .WithData(text);
+                // Intercepting duplicates...
+                if (names.Any(x => string.Compare(x, name, Comparison) == 0))
+                    throw new DuplicateException(
+                        "Range of given values contains duplicated names.").WithData(items);
 
-            ////        pos += Prefix.Length;
-            ////    }
-            ////}
+                names.Add(name);
+            }
 
-            // Iterating though the range of values...
+            /// <summary>
+            /// Before using the text, validate there are no '#...' specs in it (#: prefix), as far
+            /// as they are not protected in a bracket '{#...}' which is perfectly acceptable...
+            /// </summary>
+            if (noDanglingNames && text.Length > 0)
+            {
+                pos = 0;
+                while ((pos = NextPrefix(pos)) >= 0)
+                {
+                    if (pos == 0 ||
+                        IsolatedFinder.SEPARATORS.Contains(text[pos - 1]))
+                        throw new ArgumentException(
+                            "Given text contains dangling name specifications.")
+                            .WithData(text);
+
+                    pos += Prefix.Length;
+                }
+
+                // Gets the index of the next prefix from the ini position, that is not protected
+                // between brackets ('{#...}' is absolutely acceptable)...
+                int NextPrefix(int ini)
+                {
+                    var inside = 0;
+                    for (int i = ini; i < text.Length; i++)
+                    {
+                        char c = text[i];
+                        if (c == '{') { inside++; continue; }
+                        if (c == '}') { inside--; if (inside < 0) inside = 0; continue; }
+
+                        if (inside > 0) continue;
+                        var span = text.AsSpan(i);
+                        if (span.StartsWith(Prefix, Comparison)) return i;
+                    }
+                    return -1;
+                }
+            }
+
+            /// <summary>
+            /// Iterating though the range of values...
+            /// </summary>
             for (int i = 0; i < items.Length; i++)
             {
                 var item = items[i];
@@ -446,7 +499,9 @@ partial class CommandInfo
                 }
             }
 
-            // No remaining specs....
+            /// <summary>
+            /// No remaining specs....
+            /// </summary>
             if (noRemainingSpecs &&
                 text.Length > 0 &&
                 AreRemainingBrackets(text))
@@ -456,7 +511,9 @@ partial class CommandInfo
                     .WithData(text);
             }
 
-            // No unused values...
+            /// <summary>
+            /// No unused values...
+            /// </summary>
             if (noUnusedValues &&
                 !textnull &&
                 items.Length > 0 &&
@@ -467,47 +524,12 @@ partial class CommandInfo
                     .WithData(text);
             }
 
-            // Finishing...
+            /// <summary>
+            /// Finishing...
+            /// </summary>
             if (text.Length > 0) { _Text.Append(text); changed = true; }
             if (items.Length > 0) changed = true;
             return changed;
-        }
-
-        /// <summary>
-        /// Determines if there are duplicated names in the given range of values.
-        /// </summary>
-        bool DuplicatedNames(RangeElement[] items)
-        {
-            List<string> names = [];
-            foreach (var item in items)
-            {
-                // Filtering out those that are not a parameter nor an anonymous one...
-                var name = item.Value switch
-                {
-                    IParameter temp => temp.Name,
-                    AnonymousElement temp => temp.Name,
-                    _ => null
-                };
-                if (name is null) continue;
-
-                // Normalizing (and storing) names...
-                if (!name.StartsWith(Prefix, Comparison))
-                {
-                    name = Prefix + name;
-                    switch (item.Value)
-                    {
-                        case IParameter temp: item.Value = new Parameter(name, temp.Value); break;
-                        case AnonymousElement temp: item.Value = new Parameter(name, temp.Value); break;
-                    }
-                }
-
-                // Intercepting duplicates...
-                if (names.Any(x => string.Compare(x, name, Comparison) == 0)) return true;
-                names.Add(name);
-            }
-
-            // No duplicates detected...
-            return false;
         }
 
         // ----------------------------------------------------
