@@ -71,6 +71,123 @@ public static class StringSpanExtensions_StringTarget
     // ----------------------------------------------------
 
     /// <summary>
+    /// Returns the zero-based index of the first ocurrence of the given value in the source one,
+    /// or -1 if it is not found. The search starts at the given index.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="pos"></param>
+    /// <returns></returns>
+    public static int IndexOf(this StringSpan source, StringSpan value, int pos)
+    {
+        if (source.Length == 0 && value.Length == 0) return 0;
+        if (source.Length == 0 || value.Length == 0) return -1;
+
+        for (int i = pos; i < source.Length; i++)
+        {
+            var span = source[i..];
+            if (span.StartsWith(value)) return i;
+        }
+        return -1;
+    }
+
+    /// <summary>
+    /// Returns the zero-based index of the first ocurrence of the given value in the source one,
+    /// or -1 if it is not found. The search starts at the given index.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="pos"></param>
+    /// <param name="ignoreCase"></param>
+    /// <returns></returns>
+    public static int IndexOf(
+        this StringSpan source, StringSpan value, int pos, bool ignoreCase)
+    {
+        if (source.Length == 0 && value.Length == 0) return 0;
+        if (source.Length == 0 || value.Length == 0) return -1;
+
+        for (int i = pos; i < source.Length; i++)
+        {
+            var span = source[i..];
+            if (span.StartsWith(value, ignoreCase)) return i;
+        }
+        return -1;
+    }
+
+    /// <summary>
+    /// Returns the zero-based index of the first ocurrence of the given value in the source one,
+    /// or -1 if it is not found. The search starts at the given index.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="pos"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int IndexOf(
+        this StringSpan source, StringSpan value, int pos, IEqualityComparer<char> comparer)
+    {
+        comparer.ThrowWhenNull();
+        if (source.Length == 0 && value.Length == 0) return 0;
+        if (source.Length == 0 || value.Length == 0) return -1;
+
+        for (int i = pos; i < source.Length; i++)
+        {
+            var span = source[i..];
+            if (span.StartsWith(value, comparer)) return i;
+        }
+        return -1;
+    }
+
+    /// <summary>
+    /// Returns the zero-based index of the first ocurrence of the given value in the source one,
+    /// or -1 if it is not found. The search starts at the given index.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="pos"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int IndexOf(
+        this StringSpan source, StringSpan value, int pos, IEqualityComparer<string> comparer)
+    {
+        comparer.ThrowWhenNull();
+        if (source.Length == 0 && value.Length == 0) return 0;
+        if (source.Length == 0 || value.Length == 0) return -1;
+
+        for (int i = pos; i < source.Length; i++)
+        {
+            var span = source[i..];
+            if (span.StartsWith(value, comparer)) return i;
+        }
+        return -1;
+    }
+
+    /// <summary>
+    /// Returns the zero-based index of the first ocurrence of the given value in the source one,
+    /// or -1 if it is not found. The search starts at the given index.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="pos"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static int IndexOf(
+        this StringSpan source, StringSpan value, int pos, StringComparison comparison)
+    {
+        if (source.Length == 0 && value.Length == 0) return 0;
+        if (source.Length == 0 || value.Length == 0) return -1;
+
+        for (int i = pos; i < source.Length; i++)
+        {
+            var span = source[i..];
+            if (span.StartsWith(value, comparison)) return i;
+        }
+        return -1;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Returns the index of the last ocurrence of the given value in the source, or -1 if it
     /// cannot be found.
     /// </summary>

@@ -54,7 +54,7 @@ public static class CharExtensions
         /// <summary>
         /// Returns a default char comparer.
         /// </summary>
-        public static IEqualityComparer<char> DefaultComparer => new ComparerDefault();
+        public static IEqualityComparer<char> CharComparer() => new ComparerDefault();
 
         /// <summary>
         /// Gets a char comparer that ignores or not the case as requested.

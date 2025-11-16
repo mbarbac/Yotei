@@ -1,3 +1,2 @@
 - Terminar prototipo de CommandInfo.Builder
 - Pasar todas las funciones auxiliares a retornar un out StrSpan
-- StrSpan necesita IndexOf con parametro ini

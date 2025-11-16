@@ -59,7 +59,7 @@ public record IsolatedFinder
     /// <returns></returns>
     public int Find(
         StrSpan source, int ini, StrSpan value)
-        => Find(source, ini, value, char.DefaultComparer);
+        => Find(source, ini, value, char.CharComparer());
 
     /// <summary>
     /// Returns the index of the first isoltaed ocurrence of the given value in the given source
