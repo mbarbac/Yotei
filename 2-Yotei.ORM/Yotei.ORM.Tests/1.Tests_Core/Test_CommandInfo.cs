@@ -403,7 +403,7 @@ public class Test_CommandInfo
     [Fact]
     public void Test_Add_CommandInfoBuilder()
     {
-        ICommandInfo.IBuilder source;
+        IBuilder source;
         IBuilder builder;
         ICommandInfo info;
         var engine = new FakeEngine();

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Runtime.InteropServices.Marshalling;
 using StrSpan = System.ReadOnlySpan<char>;
 namespace Yotei.ORM.Code;
 
@@ -184,6 +184,7 @@ partial class CommandInfo
                     pos += Prefix.Length;
                 }
 
+
                 // Finishing without impediments...
                 return true;
             }
@@ -215,7 +216,10 @@ partial class CommandInfo
 
             var strictNames = false;
             var strictValues = false;
-            return Append(strictNames, strictValues, source.Text, source.Parameters);
+
+            var pars = source.Parameters;
+            var text = NamesToOrdinals(source.Text, pars, Comparison);
+            return Append(strictNames, strictValues, text, pars);
         }
 
         /// <summary>
@@ -231,7 +235,10 @@ partial class CommandInfo
 
             var strictNames = false;
             var strictValues = false;
-            return Append(strictNames, strictValues, source.Text, source.Parameters);
+
+            var pars = source.Parameters;
+            var text = NamesToOrdinals(source.Text, pars, Comparison);            
+            return Append(strictNames, strictValues, text, pars);
         }
 
         /// <summary>
@@ -342,149 +349,40 @@ partial class CommandInfo
             var changed = false;
             var pos = 0;
 
-            /// <summary>
-            /// Intercepting ranges with just one special element...
-            /// </summary>
+            // Intercepting ranges with just one special element...
             if (items.Length == 1)
             {
                 switch (items[0].Value)
                 {
-                    case IParameterList parsList:
-                        text = NamesToOrdinals(text, parsList, Comparison);
-                        range = [.. parsList];
-                        return Append(strictNames, strictValues, text, range);
+                    case IParameterList pars:
+                        if (pars.Count != 1)
+                        {
+                            text = NamesToOrdinals(text, pars, Comparison);
+                            range = [.. pars];
+                            return Append(strictNames, strictValues, text, range);
+                        }
+                        items[0] = new RangeElement(pars[0], false);
+                        break;
 
-                    case IParameterList.IBuilder parsBuilder:
-                        text = NamesToOrdinals(text, parsBuilder, Comparison);
-                        range = [.. parsBuilder];
-                        return Append(strictNames, strictValues, text, range);
+                    case IParameterList.IBuilder pars:
+                        if (pars.Count != 1)
+                        {
+                            text = NamesToOrdinals(text, pars, Comparison);
+                            range = [.. pars];
+                            return Append(strictNames, strictValues, text, range);
+                        }
+                        items[0] = new RangeElement(pars[0], false);
+                        break;
                 }
             }
 
-            /// <summary>
-            /// Command-alike parameters are not allowed...
-            /// </summary>
-            foreach (var item in items)
-            {
-                switch (item.Value)
-                {
-                    case ICommand:
-                    case ICommandInfo:
-                    case ICommandInfo.IBuilder:
-                        throw new ArgumentException("Element cannot be a command-alike one.")
-                        .WithData(item.Value);
-                }
-            }
+            // Validations...
+            PreventInitialCommandAlikeValues();
+            PreventInitialDuplicatedNames();
+            PreventInitialInvalidOrdinals();
+            PreventInitialNamedSpecs();
 
-            /// <summary>
-            /// Before using the range, validate there are no duplicate names in it...
-            /// </summary>
-            List<string> names = [];
-            foreach (var item in items)
-            {
-                // Only parameters and anonymous carry names...
-                var name = item.Value switch
-                {
-                    IParameter temp => temp.Name,
-                    AnonymousElement temp => temp.Name,
-                    _ => null
-                };
-                if (name is null) continue;
-
-                // Normalizing (and maybe re-storing) the names...
-                if (!name.StartsWith(Prefix, Comparison))
-                {
-                    name = Prefix + name;
-                    switch (item.Value)
-                    {
-                        case IParameter temp: item.Value = new Parameter(name, temp.Value); break;
-                        case AnonymousElement temp: item.Value = new Parameter(name, temp.Value); break;
-                    }
-                }
-
-                // Intercepting duplicates...
-                if (names.Any(x => string.Compare(x, name, Comparison) == 0))
-                    throw new DuplicateException(
-                        "Range of given values contains duplicated names.").WithData(items);
-
-                names.Add(name);
-            }
-
-            /// <summary>
-            /// Before using the text, verify that ordinal brackets '{n}' are valid ones..
-            /// </summary>
-            if (text.Length > 0 && strictNames)
-            {
-                pos = 0;
-                while (NextOrdinal(pos, out var span))
-                {
-                    if (int.TryParse(span, out var value))
-                    {
-                        if (value >= items.Length) throw new ArgumentException(
-                            "Ordinal bracket value bigger than number of values.")
-                            .WithData(text);
-                    }
-                    pos += span.Length + 2 + 1;
-                }
-
-                // Gets the next ordinal span from the ini position, if any. Empty brackets are
-                // ignored and not reported.
-                bool NextOrdinal(int pos, out StrSpan span)
-                {
-                    while (pos < text.Length)
-                    {
-                        var ini = text.IndexOf('{', pos); if (ini < 0) break;
-                        var end = text.IndexOf('}', ini); if (end < 0) break;
-                        span = text.AsSpan(ini + 1, end - ini - 1);
-
-                        if (span.Length == 0) { pos = ini + 1; continue; }
-                        return true;
-                    }
-                    span = StrSpan.Empty;
-                    return false;
-                }
-            }
-
-            /// <summary>
-            /// Before using the text, validate there are no '#...' specs in it (#: prefix), as far
-            /// as they are not protected in a bracket '{#...}' which is perfectly acceptable...
-            /// </summary>
-            if (text.Length > 0 && strictNames)
-            {
-                pos = 0;
-                while ((pos = NextPrefix(pos)) >= 0)
-                {
-                    if (pos == 0 ||
-                        IsolatedFinder.SEPARATORS.Contains(text[pos - 1]))
-                        throw new ArgumentException(
-                            "Given text contains dangling name specifications.")
-                            .WithData(text);
-
-                    pos += Prefix.Length;
-                }
-
-                // Gets the index of the next prefix from the ini position, that is not protected
-                // between brackets ('{#...}' is absolutely acceptable)...
-                int NextPrefix(int ini)
-                {
-                    var inside = 0;
-                    for (int i = ini; i < text.Length; i++)
-                    {
-                        char c = text[i];
-                        if (c == '{') { inside++; continue; }
-                        if (c == '}') { inside--; if (inside < 0) inside = 0; continue; }
-
-                        if (inside > 0) continue;
-                        var span = text.AsSpan(i);
-                        if (span.StartsWith(Prefix, Comparison)) return i;
-                    }
-                    return -1;
-                }
-            }
-
-            /// <summary>
-            /// Iterating though the range of values...
-            /// </summary>
+            // Iterating through the values...
             for (int i = 0; i < items.Length; i++)
             {
                 var item = items[i];
@@ -535,37 +433,171 @@ partial class CommandInfo
                 }
             }
 
-            /// <summary>
-            /// No remaining specs....
-            /// </summary>
-            if (strictNames &&
-                text.Length > 0 &&
-                AreRemainingBrackets(text))
-            {
-                throw new ArgumentException(
-                    "There are unused brackets in the given text.")
-                    .WithData(text);
-            }
+            // Finishing...
+            PreventFinalUnusedValues();
+            PreventFinalRemainingSpecs();
 
-            /// <summary>
-            /// No unused values...
-            /// </summary>
-            if (strictValues &&
-                !textnull &&
-                items.Length > 0 &&
-                items.Any(static x => !x.Used))
-            {
-                throw new ArgumentException(
-                    "There are unused values in the given range.")
-                    .WithData(text);
-            }
-
-            /// <summary>
-            /// Finishing...
-            /// </summary>
             if (text.Length > 0) { _Text.Append(text); changed = true; }
             if (items.Length > 0) changed = true;
             return changed;
+
+            /// <summary>
+            /// Command-alike values are not allowed.
+            /// </summary>
+            void PreventInitialCommandAlikeValues()
+            {
+                foreach (var item in items)
+                {
+                    switch (item.Value)
+                    {
+                        case ICommand:
+                        case ICommandInfo:
+                        case ICommandInfo.IBuilder:
+                            throw new ArgumentException("Element cannot be a command-alike one.")
+                            .WithData(item.Value);
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Ranges with elements whose names are duplicated are not allowed.
+            /// </summary>
+            void PreventInitialDuplicatedNames()
+            {
+                List<string> names = [];
+                foreach (var item in items)
+                {
+                    // Only parameters and anonymous carry names...
+                    var name = item.Value switch
+                    {
+                        IParameter temp => temp.Name,
+                        AnonymousElement temp => temp.Name,
+                        _ => null
+                    };
+                    if (name is null) continue;
+
+                    // Normalizing (and maybe re-storing) the names...
+                    if (!name.StartsWith(Prefix, Comparison))
+                    {
+                        name = Prefix + name;
+                        switch (item.Value)
+                        {
+                            case IParameter temp: item.Value = new Parameter(name, temp.Value); break;
+                            case AnonymousElement temp: item.Value = new Parameter(name, temp.Value); break;
+                        }
+                    }
+
+                    // Intercepting duplicates...
+                    if (names.Any(x => string.Compare(x, name, Comparison) == 0))
+                        throw new DuplicateException(
+                            "Range of given values contains duplicated names.").WithData(items);
+
+                    names.Add(name);
+                }
+            }
+
+            /// <summary>
+            /// Ordinal specifications in the given text must be valid ones.
+            /// </summary>
+            void PreventInitialInvalidOrdinals()
+            {
+                if (!strictNames) return;
+
+                pos = 0;
+                while (NextOrdinal(pos, out var span))
+                {
+                    if (int.TryParse(span, out var value))
+                    {
+                        if (value >= items.Length) throw new ArgumentException(
+                            "Ordinal bracket value bigger than number of values.")
+                            .WithData(text);
+                    }
+                    pos += span.Length + 2 + 1;
+                }
+
+                // Gets the next ordinal span from the ini position, not between brackets...
+                bool NextOrdinal(int pos, out StrSpan span)
+                {
+                    while (pos < text.Length)
+                    {
+                        var ini = text.IndexOf('{', pos); if (ini < 0) break;
+                        var end = text.IndexOf('}', ini); if (end < 0) break;
+                        span = text.AsSpan(ini + 1, end - ini - 1);
+
+                        if (span.Length == 0) { pos = ini + 1; continue; }
+                        return true;
+                    }
+                    span = StrSpan.Empty;
+                    return false;
+                }
+            }
+
+            /// <summary>
+            /// Prevents initial '#...' specifications, where '#' stands for the prefix, provided
+            /// they are not bracket-protected '{#...}', which are perfectly valid ones.
+            /// </summary>
+            void PreventInitialNamedSpecs()
+            {
+                if (!strictNames) return;
+
+                pos = 0;
+                while ((pos = NextPrefix(pos)) >= 0)
+                {
+                    if (pos == 0 ||
+                        IsolatedFinder.SEPARATORS.Contains(text[pos - 1]))
+                        throw new ArgumentException(
+                            "Given text contains dangling name specifications.")
+                            .WithData(text);
+
+                    pos += Prefix.Length;
+                }
+
+                // Gets the index of the next prefix, from the ini position...
+                int NextPrefix(int ini)
+                {
+                    var inside = 0;
+                    for (int i = ini; i < text.Length; i++)
+                    {
+                        char c = text[i];
+                        if (c == '{') { inside++; continue; }
+                        if (c == '}') { inside--; if (inside < 0) inside = 0; continue; }
+
+                        if (inside > 0) continue;
+                        var span = text.AsSpan(i);
+                        if (span.StartsWith(Prefix, Comparison)) return i;
+                    }
+                    return -1;
+                }
+            }
+
+            /// <summary>
+            /// Prevents remaining specs after processing.
+            /// </summary>
+            void PreventFinalRemainingSpecs()
+            {
+                if (strictNames &&
+                    text.Length > 0 &&
+                    AreRemainingBrackets(text))
+                    throw new ArgumentException(
+                        "There are unused bracket specifications in the given text.")
+                        .WithData(text)
+                        .WithData(items);
+            }
+
+            /// <summary>
+            /// Precent unused values after processing.
+            /// </summary>
+            void PreventFinalUnusedValues()
+            {
+                if (strictValues &&
+                    !textnull &&
+                    items.Length > 0 &&
+                    items.Any(static x => !x.Used))
+                    throw new ArgumentException(
+                        "There are unused values in the given text.")
+                        .WithData(text)
+                        .WithData(items);
+            }
         }
 
         // ----------------------------------------------------
@@ -609,11 +641,6 @@ partial class CommandInfo
         /// text, starting at the given position, or -1 if the bracket was not found. The out
         /// argument contains the found bracket, if any.
         /// </summary>
-        /// <param name="text"></param>
-        /// <param name="value"></param>
-        /// <param name="ini"></param>
-        /// <param name="bracket"></param>
-        /// <returns></returns>
         static int FindOrdinalBracket(string text, int value, int ini, out string? bracket)
         {
             if (ini < text.Length)
@@ -623,6 +650,7 @@ partial class CommandInfo
                 var pos = text.IndexOf(bracket, ini);
                 if (pos >= 0) return pos;
             }
+
             bracket = null;
             return -1;
         }
