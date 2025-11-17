@@ -318,4 +318,18 @@ public abstract partial class Connection : DisposableClass, IConnection
             return field;
         }
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public IRecordsGate Records => _Records ??= CreateRecordsGate();
+    IRecordsGate? _Records;
+
+    /// <summary>
+    /// Invoked to create a records gate of the appropriate type for this instance.
+    /// </summary>
+    /// <returns></returns>
+    protected abstract IRecordsGate CreateRecordsGate();
 }

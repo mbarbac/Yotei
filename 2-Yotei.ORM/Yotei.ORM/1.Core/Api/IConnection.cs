@@ -70,4 +70,9 @@ public partial interface IConnection : IAsyncDisposableEx
     /// disposed.
     /// </summary>
     ITransaction Transaction { get; }
+
+    /// <summary>
+    /// Provides access to the record-oriented capabilities of this instance.
+    /// </summary>
+    IRecordsGate Records { get; }
 }
