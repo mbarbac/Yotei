@@ -6,7 +6,7 @@ partial class MetadataTag
     /// <summary>
     /// <inheritdoc cref="IMetadataTag.IBuilder"/>
     /// </summary>
-    [Cloneable]
+    [Cloneable<IMetadataTag.IBuilder>]
     public partial class Builder : IMetadataTag.IBuilder
     {
         readonly List<string> Items;

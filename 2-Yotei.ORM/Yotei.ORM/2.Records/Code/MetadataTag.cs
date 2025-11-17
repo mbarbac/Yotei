@@ -6,7 +6,7 @@ namespace Yotei.ORM.Records.Code;
 /// <summary>
 /// <inheritdoc cref="IMetadataTag"/>
 /// </summary>
-[Cloneable]
+[Cloneable<IMetadataTag>]
 public partial class MetadataTag : IMetadataTag
 {
     protected virtual Builder Items { get; }
