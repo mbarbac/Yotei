@@ -43,8 +43,7 @@ public partial class ElementList_KT : IHost
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
-    /// Note that 'other' is 'IItem' instead of 'IHost' because the collection can be an element.
-    public bool Equals(IItem? other)
+    public bool Equals(IItem? other) // BEWARE! If copied, it most probably be IHost !!!
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null) return false;

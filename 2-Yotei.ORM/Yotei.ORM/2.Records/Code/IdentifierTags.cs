@@ -66,7 +66,7 @@ public partial class IdentifierTags : IHost
     /// </summary>
     /// <param name="obj"></param>
     /// <returns></returns>
-    public override bool Equals(object? obj) => Equals(obj as IItem);
+    public override bool Equals(object? obj) => Equals(obj as IHost);
 
     public static bool operator ==(THost? host, IHost? item)
     {
