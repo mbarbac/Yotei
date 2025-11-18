@@ -12,9 +12,9 @@ public partial interface IMetadataEntry : IEquatable<IMetadataEntry>
     /// mode to compare their metadata names.
     /// </summary>
     /// <param name="other"></param>
-    /// <param name="caseSensitiveNames"></param>
+    /// <param name="caseSensitiveTags"></param>
     /// <returns></returns>
-    bool Equals(IMetadataEntry? other, bool caseSensitiveNames);
+    bool Equals(IMetadataEntry? other, bool caseSensitiveTags);
 
     /// <summary>
     /// The name by which this metadata entry is known.

@@ -8,32 +8,32 @@
 /// <typeparam name="T"></typeparam>
 [Cloneable(ReturnType = typeof(ICoreList<>))]
 [DebuggerDisplay("{ToDebugString(5)}")]
-public abstract partial class XCoreList<T> : ICoreList<T>
+public abstract partial class CoreList<T> : ICoreList<T>
 {
     readonly List<T> Items;
 
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    public XCoreList() => Items = [];
+    public CoreList() => Items = [];
 
     /// <summary>
     /// Initializes a new empty instance with the given initial capacity.
     /// </summary>
     /// <param name="capacity"></param>
-    public XCoreList(int capacity) => Items = new(capacity);
+    public CoreList(int capacity) => Items = new(capacity);
 
     /// <summary>
     /// Initializes a new instance with the elements of the given range.
     /// </summary>
     /// <param name="range"></param>
-    public XCoreList(IEnumerable<T> range) : this() => AddRange(range);
+    public CoreList(IEnumerable<T> range) : this() => AddRange(range);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected XCoreList(XCoreList<T> source) : this() => AddRange(source);
+    protected CoreList(CoreList<T> source) : this() => AddRange(source);
 
     /// <summary>
     /// <inheritdoc/>
@@ -417,6 +417,7 @@ public abstract partial class XCoreList<T> : ICoreList<T>
     public virtual int RemoveRange(int index, int count)
     {
         if (index < 0) throw new IndexOutOfRangeException(nameof(index)).WithData(index);
+        if (index >= Items.Count) throw new IndexOutOfRangeException(nameof(index)).WithData(index);
         if (count < 0) throw new ArgumentOutOfRangeException(nameof(index)).WithData(count);
         if (count > (Items.Count - index)) throw new ArgumentException(
             "Index plus count is bigger than collections' lenght.")

@@ -22,7 +22,7 @@ public partial class Test_CoreList_T
 
     [Cloneable(ReturnType = typeof(ICoreList<IElement>))]
     [DebuggerDisplay("{ToDebugString(5)}")]
-    public partial class Chain : XCoreList<IElement>, IElement
+    public partial class Chain : CoreList<IElement>, IElement
     {
         public Chain(bool sensitive) : base() => Sensitive = sensitive;
         public Chain(bool sensitive, int capacity) : base(capacity) => Sensitive = sensitive;
@@ -551,7 +551,7 @@ public partial class Test_CoreList_T
         catch (IndexOutOfRangeException) { }
 
         try { _ = items.RemoveRange(4, 0); Assert.Fail(); } // Now we have 3 elements...
-        catch (ArgumentException) { }
+        catch (IndexOutOfRangeException) { }
 
         try { _ = items.RemoveRange(0, 4); Assert.Fail(); } // Now we have 3 elements...
         catch (ArgumentException) { }

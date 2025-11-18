@@ -534,7 +534,7 @@ public partial class Test_InvariantList_KT
         catch (IndexOutOfRangeException) { }
 
         try { _ = source.RemoveRange(5, 0); Assert.Fail(); }
-        catch (ArgumentException) { }
+        catch (IndexOutOfRangeException) { }
 
         try { _ = source.RemoveRange(0, 5); Assert.Fail(); }
         catch (ArgumentException) { }

@@ -31,7 +31,10 @@ public partial class MetadataTag : IMetadataTag
     /// </summary>
     /// <param name="source"></param>
     protected MetadataTag(MetadataTag source)
-        => Items = new(source.ThrowWhenNull().CaseSensitiveTags, source);
+    {
+        source.ThrowWhenNull();
+        Items = new(source.CaseSensitiveTags, source);
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -114,7 +117,7 @@ public partial class MetadataTag : IMetadataTag
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public bool CaseSensitiveTags { get; }
+    public bool CaseSensitiveTags => Items.CaseSensitiveTags;
 
     /// <summary>
     /// <inheritdoc/>

@@ -39,14 +39,14 @@ public partial class MetadataEntry : IMetadataEntry
     /// <inheritdoc/>
     /// </summary>
     /// <param name="other"></param>
-    /// <param name="caseSensitiveNames"></param>
+    /// <param name="caseSensitiveTags"></param>
     /// <returns></returns>
-    public virtual bool Equals(IMetadataEntry? other, bool caseSensitiveNames)
+    public virtual bool Equals(IMetadataEntry? other, bool caseSensitiveTags)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null) return false;
 
-        if (string.Compare(Name, other.Name, !caseSensitiveNames) != 0) return false;
+        if (string.Compare(Name, other.Name, !caseSensitiveTags) != 0) return false;
         if (!Value.EqualsEx(other.Value)) return false;
         return true;
     }

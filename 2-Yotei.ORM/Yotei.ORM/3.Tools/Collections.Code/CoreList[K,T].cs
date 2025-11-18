@@ -431,6 +431,7 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     public virtual int RemoveRange(int index, int count)
     {
         if (index < 0) throw new IndexOutOfRangeException(nameof(index)).WithData(index);
+        if (index >= Items.Count) throw new IndexOutOfRangeException(nameof(index)).WithData(index);
         if (count < 0) throw new ArgumentOutOfRangeException(nameof(index)).WithData(count);
         if (count > (Items.Count - index)) throw new ArgumentException(
             "Index plus count is bigger than collections' lenght.")

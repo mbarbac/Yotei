@@ -396,7 +396,7 @@ public class Test_ParameterList
         catch (IndexOutOfRangeException) { }
 
         try { _ = source.RemoveRange(5, 0); Assert.Fail(); }
-        catch (ArgumentException) { }
+        catch (IndexOutOfRangeException) { }
 
         try { _ = source.RemoveRange(0, 5); Assert.Fail(); }
         catch (ArgumentException) { }

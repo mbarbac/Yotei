@@ -22,7 +22,7 @@ public partial class Test_InvariantList_T
 
     [Cloneable(ReturnType = typeof(ICoreList<IElement>))]
     [DebuggerDisplay("{ToDebugString(5)}")]
-    public partial class Builder : XCoreList<IElement>
+    public partial class Builder : CoreList<IElement>
     {
         public Builder(bool sensitive) : base() => Sensitive = sensitive;
         public Builder(bool sensitive, int capacity) : base(capacity) => Sensitive = sensitive;
@@ -543,7 +543,7 @@ public partial class Test_InvariantList_T
         catch (IndexOutOfRangeException) { }
 
         try { _ = source.RemoveRange(5, 0); Assert.Fail(); }
-        catch (ArgumentException) { }
+        catch (IndexOutOfRangeException) { }
 
         try { _ = source.RemoveRange(0, 5); Assert.Fail(); }
         catch (ArgumentException) { }

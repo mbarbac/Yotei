@@ -24,6 +24,6 @@ public static class Test_MetadataEntry
         var target = new MetadataEntry("LEN", 25);
 
         Assert.False(source.Equals(target));
-        Assert.True(source.Equals(target, caseSensitiveNames: false));
+        Assert.True(source.Equals(target, caseSensitiveTags: false));
     }
 }
