@@ -18,6 +18,7 @@ public class Test_Engine
         Assert.Equal(Code.Engine.USETERMINATORS, engine.UseTerminators);
         Assert.Equal(Code.Engine.LEFTTERMINATOR, engine.LeftTerminator);
         Assert.Equal(Code.Engine.RIGHTTERMINATOR, engine.RightTerminator);
+        Assert.True(engine.KnownTags.Equals(new FakeKnownTags(Engine.CASESENSITIVETAGS)));
     }
     
     //[Enforced]
@@ -69,5 +70,10 @@ public class Test_Engine
         target = source.WithRightTerminator('x');
         Assert.NotSame(source, target);
         Assert.Equal('x', target.RightTerminator);
+
+        var tags = new KnownTags(true);
+        target = source.WithKnownTags(tags);
+        Assert.NotSame(source, target);
+        Assert.Same(tags, target.KnownTags);
     }
 }

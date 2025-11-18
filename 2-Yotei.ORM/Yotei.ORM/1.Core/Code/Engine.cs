@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Code;
+﻿using Yotei.ORM.Records.Code;
+
+namespace Yotei.ORM.Code;
 
 // ========================================================
 /// <summary>
@@ -15,6 +17,7 @@ public abstract partial class Engine : IEngine
     public const bool USETERMINATORS = true;
     public const char LEFTTERMINATOR = '[';
     public const char RIGHTTERMINATOR = ']';
+    public const bool CASESENSITIVETAGS = false;
 
     static char ValidateTerminator(char value)
     {
@@ -56,6 +59,7 @@ public abstract partial class Engine : IEngine
         UseTerminators = source.UseTerminators;
         LeftTerminator = source.LeftTerminator;
         RightTerminator = source.RightTerminator;
+        KnownTags = source.KnownTags;
     }
 
     /// <summary>
@@ -83,7 +87,8 @@ public abstract partial class Engine : IEngine
             NativePaging == other.NativePaging &&
             UseTerminators == other.UseTerminators &&
             LeftTerminator == other.LeftTerminator &&
-            RightTerminator == other.RightTerminator;
+            RightTerminator == other.RightTerminator &&
+            KnownTags.Equals(other.KnownTags);
     }
 
     /// <summary>
@@ -108,6 +113,7 @@ public abstract partial class Engine : IEngine
         code = HashCode.Combine(code, UseTerminators);
         code = HashCode.Combine(code, LeftTerminator);
         code = HashCode.Combine(code, RightTerminator);
+        code = HashCode.Combine(code, KnownTags);
         return code;
     }
 
@@ -152,4 +158,10 @@ public abstract partial class Engine : IEngine
     /// <inheritdoc/>
     /// </summary>
     public char RightTerminator { get; init => field = ValidateTerminator(value); }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public IKnownTags KnownTags { get; init => field = value.ThrowWhenNull(); }
+    = new KnownTags(CASESENSITIVETAGS);
 }
