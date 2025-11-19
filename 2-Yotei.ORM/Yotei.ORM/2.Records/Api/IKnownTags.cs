@@ -44,6 +44,13 @@ public partial interface IKnownTags : IEnumerable<IMetadataTag>, IEquatable<IKno
     /// </summary>
     IEnumerable<string> Names { get; }
 
+    /// <summary>
+    /// The number of well-known metadata tags.
+    /// <br/> Note that this number is not the same as the number of names, because each tag may
+    /// carry more than one name.
+    /// </summary>
+    int Count { get; }
+
     // ----------------------------------------------------
 
     /// <summary>

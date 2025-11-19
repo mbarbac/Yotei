@@ -1,4 +1,7 @@
-﻿namespace Yotei.ORM.Records.Code;
+﻿using Microsoft.CodeAnalysis.Operations;
+using System.Data;
+
+namespace Yotei.ORM.Records.Code;
 
 partial class SchemaEntry
 {
@@ -10,20 +13,19 @@ partial class SchemaEntry
     [DebuggerDisplay("{ToDebugString(5)}")]
     public partial class Builder : ISchemaEntry.IBuilder
     {
-        readonly List<IMetadataEntry> Items = [];
-        
         /// <summary>
         /// Initializes a new empty instance.
         /// </summary>
         /// <param name="engine"></param>
-        public Builder(IEngine engine) => throw null;
+        public Builder(IEngine engine) => Engine = engine.ThrowWhenNull();
 
         /// <summary>
         /// Initializes a new instance with the given metadata pairs.
         /// </summary>
         /// <param name="engine"></param>
         /// <param name="range"></param>
-        public Builder(IEngine engine, IEnumerable<IMetadataEntry> range) => throw null;
+        public Builder(
+            IEngine engine, IEnumerable<IMetadataEntry> range) : this(engine) => Add(range);
 
         /// <summary>
         /// Initializes a new instance with the given metadata.
@@ -44,7 +46,7 @@ partial class SchemaEntry
         /// Copy constructor.
         /// </summary>
         /// <param name="source"></param>
-        protected Builder(Builder source) => throw null;
+        protected Builder(Builder source) : this(source.ThrowWhenNull().Engine, source) { }
 
         /// <summary>
         /// <inheritdoc/>
@@ -64,16 +66,9 @@ partial class SchemaEntry
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public IEnumerator<IMetadataEntry> GetEnumerator() => throw null;
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        public virtual ISchemaEntry CreateInstance() => throw null;
 
         // ------------------------------------------------
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <returns></returns>
-        public virtual ISchemaEntry CreateInstance() => throw null;
 
         /// <summary>
         /// <inheritdoc/>
@@ -82,9 +77,64 @@ partial class SchemaEntry
         IKnownTags KnownTags => Engine.KnownTags;
         bool CaseSensitiveTags => KnownTags.CaseSensitiveTags;
         bool CaseSensitiveNames => Engine.CaseSensitiveNames;
-        
+
+        /// <summary>
+        /// Determines if the two tag names are equal or not.
+        /// </summary>
         bool SameTagNames(string x, string y) => string.Compare(x, y, !CaseSensitiveTags) == 0;
+
+        /// <summary>
+        /// Determines if the two element names are equal or not.
+        /// </summary>
         bool SameNameValues(string x, string y) => string.Compare(x, y, !CaseSensitiveNames) == 0;
+
+        // ------------------------------------------------
+
+        readonly List<IMetadataEntry> Items = [];
+        IIdentifier? _Identifier;
+        bool? _IsPrimaryKey;
+        bool? _IsUniqueValued;
+        bool? _IsReadonly;
+
+        /// <summary>
+        /// Obtains the internal index of the entry whose name is given, or -1 if any.
+        /// </summary>
+        int IndexOf(string name)
+        {
+            var index = Items.FindIndex(x => SameTagNames(x.Name, name));
+            if (index >= 0) return index;
+
+            var tag = Engine.KnownTags.Find(name);
+            if (tag is not null)
+            {
+                foreach (var temp in tag)
+                {
+                    index = Items.FindIndex(x => SameTagNames(x.Name, temp));
+                    if (index >= 0) return index;
+                }
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// Obtains the internal index of the entry whose name is one of the given, or -1 if any.
+        /// </summary>
+        int IndexOf(IEnumerable<string> range)
+        {
+            foreach (var name in range)
+            {
+                var index = IndexOf(name);
+                if (index >= 0) return index;
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerator<IMetadataEntry> GetEnumerator() => throw null;
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         // ------------------------------------------------
 

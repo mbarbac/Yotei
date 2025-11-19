@@ -111,81 +111,97 @@ public partial class SchemaEntry : ISchemaEntry
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public IEngine Engine { get => throw null; }
+    public IEngine Engine => Items.Engine;
 
     // ------------------------------------------------
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public IIdentifier Identifier { get => throw null; init => throw null; }
+    public IIdentifier Identifier
+    {
+        get => Items.Identifier;
+        init => Items.Identifier = value;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public bool IsPrimaryKey { get => throw null; init => throw null; }
+    public bool IsPrimaryKey
+    {
+        get => Items.IsPrimaryKey;
+        init => Items.IsPrimaryKey = value;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public bool IsUniqueValued { get => throw null; init => throw null; }
+    public bool IsUniqueValued
+    {
+        get => Items.IsUniqueValued;
+        init => Items.IsUniqueValued = value;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public bool IsReadOnly { get => throw null; init => throw null; }
+    public bool IsReadOnly
+    {
+        get => Items.IsReadOnly;
+        init => Items.IsReadOnly = value;
+    }
 
     // ------------------------------------------------
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public int Count { get => throw null; }
+    public int Count => Items.Count;
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    public bool Contains(string name) => throw null;
+    public bool Contains(string name) => Items.Contains(name);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public bool Contains(IEnumerable<string> range) => throw null;
+    public bool Contains(IEnumerable<string> range) => Items.Contains(range);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    public IMetadataEntry? Find(string name) => throw null;
+    public IMetadataEntry? Find(string name) => Items.Find(name);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public IMetadataEntry? Find(IEnumerable<string> range) => throw null;
+    public IMetadataEntry? Find(IEnumerable<string> range) => Items.Find(range);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public IMetadataEntry[] ToArray() => throw null;
+    public IMetadataEntry[] ToArray() => Items.ToArray();
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public List<IMetadataEntry> ToList() => throw null;
+    public List<IMetadataEntry> ToList() => Items.ToList();
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public void Trim() => throw null;
+    public void Trim() => Items.Trim();
 
     // ----------------------------------------------------
 
@@ -194,46 +210,81 @@ public partial class SchemaEntry : ISchemaEntry
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual ISchemaEntry Add(IMetadataEntry item) => throw null;
+    public virtual ISchemaEntry Add(IMetadataEntry item)
+    {
+        var builder = CreateBuilder();
+        var done = builder.Add(item);
+        return done ? builder.CreateInstance() : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual ISchemaEntry Add(IEnumerable<IMetadataEntry> range) => throw null;
+    public virtual ISchemaEntry Add(IEnumerable<IMetadataEntry> range)
+    {
+        var builder = CreateBuilder();
+        var done = builder.Add(range);
+        return done ? builder.CreateInstance() : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    public virtual ISchemaEntry Remove(string name) => throw null;
+    public virtual ISchemaEntry Remove(string name)
+    {
+        var builder = CreateBuilder();
+        var done = builder.Remove(name);
+        return done ? builder.CreateInstance() : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual ISchemaEntry Remove(Predicate<IMetadataEntry> predicate) => throw null;
+    public virtual ISchemaEntry Remove(Predicate<IMetadataEntry> predicate)
+    {
+        var builder = CreateBuilder();
+        var done = builder.Remove(predicate);
+        return done ? builder.CreateInstance() : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual ISchemaEntry RemoveLast(Predicate<IMetadataEntry> predicate) => throw null;
+    public virtual ISchemaEntry RemoveLast(Predicate<IMetadataEntry> predicate)
+    {
+        var builder = CreateBuilder();
+        var done = builder.RemoveLast(predicate);
+        return done ? builder.CreateInstance() : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual ISchemaEntry RemoveAll(Predicate<IMetadataEntry> predicate) => throw null;
+    public virtual ISchemaEntry RemoveAll(Predicate<IMetadataEntry> predicate)
+    {
+        var builder = CreateBuilder();
+        var done = builder.RemoveAll(predicate);
+        return done ? builder.CreateInstance() : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual ISchemaEntry Clear() => throw null;
+    public virtual ISchemaEntry Clear()
+    {
+        var builder = CreateBuilder();
+        var done = builder.Clear();
+        return done ? builder.CreateInstance() : this;
+    }
 }

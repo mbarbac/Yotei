@@ -157,6 +157,21 @@ public partial class KnownTags : IKnownTags
         }
     }
 
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public int Count
+    {
+        get
+        {
+            var num = IdentifierTags.Count;
+            if (PrimaryKeyTag is not null) num++;
+            if (UniqueValuedTag is not null) num++;
+            if (ReadOnlyTag is not null) num++;
+            return num;
+        }
+    }
+
     // ----------------------------------------------------
 
     /// <summary>

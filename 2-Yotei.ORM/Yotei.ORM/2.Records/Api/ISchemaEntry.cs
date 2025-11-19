@@ -44,8 +44,7 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataEntry>, IEquatable<
     // ------------------------------------------------
 
     /// <summary>
-    /// Gets the number of metadata pairs in this collection, taking into consideration both the
-    /// standard and not-standard ones.
+    /// Gets the number of metadata pairs in this collection.
     /// </summary>
     int Count { get; }
 
