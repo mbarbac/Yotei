@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices.Marshalling;
-
-namespace Yotei.ORM.Records.Code;
+﻿namespace Yotei.ORM.Records.Code;
 
 partial class SchemaEntry
 {
@@ -13,7 +11,7 @@ partial class SchemaEntry
     public partial class Builder : ISchemaEntry.IBuilder
     {
         readonly List<IMetadataEntry> Items = [];
-
+        
         /// <summary>
         /// Initializes a new empty instance.
         /// </summary>
@@ -60,33 +58,13 @@ partial class SchemaEntry
         /// </summary>
         /// <param name="max"></param>
         /// <returns></returns>
-        public virtual string ToDebugString(int max)
-        {
-            var sb = new StringBuilder();
-
-            sb.Append(Identifier.Value ?? "-");
-            if (IsPrimaryKey) sb.Append(", Primary");
-            if (IsUniqueValued) sb.Append(", Unique");
-            if (IsReadOnly) sb.Append(", ReadOnly");
-
-            var ix = 0;
-            for (; ix < Items.Count && ix < max; ix++)
-            {
-                var item = Items[ix];
-                sb.Append($", {item.Name}='{item.Value.Sketch()}'");
-            }
-            if (ix < Items.Count) sb.Append(", ...");
-            return sb.ToString();
-        }
+        public virtual string ToDebugString(int max) => throw null;
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public IEnumerator<IMetadataEntry> GetEnumerator()
-        {
-            throw null;
-        }
+        public IEnumerator<IMetadataEntry> GetEnumerator() => throw null;
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         // ------------------------------------------------
@@ -151,10 +129,7 @@ partial class SchemaEntry
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public int Count
-        {
-            get => throw null;
-        }
+        public int Count => throw null;
 
         /// <summary>
         /// <inheritdoc/>
@@ -177,40 +152,12 @@ partial class SchemaEntry
         /// <returns></returns>
         public IMetadataEntry? Find(string name) => throw null;
 
-        int IndexOf(string name)
-        {
-            var index = Items.FindIndex(x => SameTagNames(x.Name, name));
-            if (index >= 0) return index;
-
-            var tag = Engine.KnownTags.Find(name);
-            if (tag is not null)
-            {
-                foreach (var temp in tag)
-                {
-                    index = Items.FindIndex(x => SameTagNames(x.Name, temp));
-                    if (index >= 0) return index;
-                }
-            }
-
-            return -1;
-        }
-
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="range"></param>
         /// <returns></returns>
         public IMetadataEntry? Find(IEnumerable<string> range) => throw null;
-
-        int IndexOf(IEnumerable<string> range)
-        {
-            foreach (var name in range)
-            {
-                var index = IndexOf(name);
-                if (index >= 0) return index;
-            }
-            return -1;
-        }
 
         /// <summary>
         /// <inheritdoc/>

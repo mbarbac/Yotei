@@ -13,14 +13,15 @@ public partial class SchemaEntry : ISchemaEntry
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="engine"></param>
-    public SchemaEntry(IEngine engine) => throw null;
+    public SchemaEntry(IEngine engine) => Items = new(engine);
 
     /// <summary>
     /// Initializes a new instance with the given metadata pairs.
     /// </summary>
     /// <param name="engine"></param>
     /// <param name="range"></param>
-    public SchemaEntry(IEngine engine, IEnumerable<IMetadataEntry> range) => throw null;
+    public SchemaEntry(
+        IEngine engine, IEnumerable<IMetadataEntry> range) => Items = new(engine, range);
 
     /// <summary>
     /// Initializes a new instance with the given metadata.
@@ -35,19 +36,20 @@ public partial class SchemaEntry : ISchemaEntry
         bool? isPrimaryKey = null,
         bool? isUniqueValued = null,
         bool? isReadonly = null,
-        IEnumerable<IMetadataEntry>? range = null) => throw null;
+        IEnumerable<IMetadataEntry>? range = null)
+        => Items = new(identifier, isPrimaryKey, isUniqueValued, isReadonly, range);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected SchemaEntry(SchemaEntry source) => throw null;
+    protected SchemaEntry(SchemaEntry source) => Items = (Builder)source.Items.Clone();
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => throw null;
+    public override string ToString() => Items.ToString();
 
     /// <summary>
     /// Returns a string representation of this instance suitable for debug purposes, with
@@ -55,13 +57,13 @@ public partial class SchemaEntry : ISchemaEntry
     /// </summary>
     /// <param name="max"></param>
     /// <returns></returns>
-    public virtual string ToDebugString(int max) => throw null;
+    public virtual string ToDebugString(int max) => Items.ToDebugString(max);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public IEnumerator<IMetadataEntry> GetEnumerator() => throw null;
+    public IEnumerator<IMetadataEntry> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     // ------------------------------------------------
@@ -98,11 +100,13 @@ public partial class SchemaEntry : ISchemaEntry
 
     // ------------------------------------------------
 
+    protected virtual Builder Items { get; }
+
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual ISchemaEntry.IBuilder CreateBuilder() => throw null;
+    public virtual ISchemaEntry.IBuilder CreateBuilder() => Items.Clone();
 
     /// <summary>
     /// <inheritdoc/>
