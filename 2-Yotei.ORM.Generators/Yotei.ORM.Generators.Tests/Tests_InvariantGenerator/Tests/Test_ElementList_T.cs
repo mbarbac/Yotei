@@ -1,12 +1,11 @@
-﻿using Yotei.ORM.Code;
-using Chain = Yotei.ORM.Generators.Invariant.Tests.ElementList_T;
+﻿using Chain = Yotei.ORM.Generators.Invariant.Tests.ElementList_T;
 using Element = Yotei.ORM.Generators.Invariant.Tests.NamedElement;
 
 namespace Yotei.ORM.Generators.Invariant.Tests;
 
 // ========================================================
 ////[Enforced]
-public class Test_ElementList_T
+public static class Test_ElementList_T
 {
     static readonly Element xone = new("one");
     static readonly Element xtwo = new("two");
@@ -18,7 +17,7 @@ public class Test_ElementList_T
 
     //[Enforced]
     [Fact]
-    public void Test_Create_Empty()
+    public static void Test_Create_Empty()
     {
         IEngine engine = new FakeEngine();
         var items = new Chain(engine); Assert.Empty(items);
@@ -26,7 +25,7 @@ public class Test_ElementList_T
 
     //[Enforced]
     [Fact]
-    public void Test_Create_Range()
+    public static void Test_Create_Range()
     {
         IEngine engine = new FakeEngine();
         var items = new Chain(engine, []);
@@ -50,7 +49,7 @@ public class Test_ElementList_T
 
     //[Enforced]
     [Fact]
-    public void Test_Create_With_Duplicates()
+    public static void Test_Create_With_Duplicates()
     {
         IEngine engine = new FakeEngine();
         var items = new Chain(engine, [xone, xone]);

@@ -2,7 +2,7 @@
 
 // ========================================================
 //[Enforced]
-public class Test_GetMember
+public static class Test_GetMember
 {
     //[Enforced]
     [Fact]

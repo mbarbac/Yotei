@@ -7,11 +7,11 @@ namespace Yotei.ORM.Tests.Core;
 
 // ========================================================
 //[Enforced]
-public class Test_IdentifierChain
+public static class Test_IdentifierChain
 {
     //[Enforced]
     [Fact]
-    public void Test_Create_Empty()
+    public static void Test_Create_Empty()
     {
         IChain chain;
         IEngine engine = new FakeEngine();
@@ -35,7 +35,7 @@ public class Test_IdentifierChain
 
     //[Enforced]
     [Fact]
-    public void Test_Create_Empty_From_String_Distinct_Terminators()
+    public static void Test_Create_Empty_From_String_Distinct_Terminators()
     {
         IChain chain;
         IEngine engine = new FakeEngine();
@@ -59,7 +59,7 @@ public class Test_IdentifierChain
 
     //[Enforced]
     [Fact]
-    public void Test_Create_Empty_From_String_Same_Terminators()
+    public static void Test_Create_Empty_From_String_Same_Terminators()
     {
         IChain chain;
         IEngine engine = new FakeEngine() { LeftTerminator = '#', RightTerminator = '#' };
@@ -85,7 +85,7 @@ public class Test_IdentifierChain
 
     //[Enforced]
     [Fact]
-    public void Test_Create_Range_Parts()
+    public static void Test_Create_Range_Parts()
     {
         IChain chain;
         IEngine engine = new FakeEngine();
@@ -123,7 +123,7 @@ public class Test_IdentifierChain
 
     //[Enforced]
     [Fact]
-    public void Test_Create_Single_String()
+    public static void Test_Create_Single_String()
     {
         IChain chain;
         IEngine engine = new FakeEngine();
@@ -146,7 +146,7 @@ public class Test_IdentifierChain
 
     //[Enforced]
     [Fact]
-    public void Test_Create_Range_String()
+    public static void Test_Create_Range_String()
     {
         IChain chain;
         IEngine engine = new FakeEngine();

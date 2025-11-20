@@ -2,7 +2,7 @@
 
 // ========================================================
 //[Enforced]
-public class Test_ManyArguments
+public static class Test_ManyArguments
 {
     //[Enforced]
     [Fact]

@@ -5,7 +5,7 @@ namespace Yotei.ORM.Tests.Core;
 
 // ========================================================
 //[Enforced]
-public class Test_ParameterList
+public static class Test_ParameterList
 {
     readonly static Item x007 = new("Id", "007");
     readonly static Item xJames = new("FirstName", "James");
@@ -17,7 +17,7 @@ public class Test_ParameterList
 
     //[Enforced]
     [Fact]
-    public void Test_Create_Empty()
+    public static void Test_Create_Empty()
     {
         IEngine engine = new FakeEngine();
         var items = new Chain(engine); Assert.Empty(items);
@@ -25,7 +25,7 @@ public class Test_ParameterList
 
     //[Enforced]
     [Fact]
-    public void Test_Create_Range()
+    public static void Test_Create_Range()
     {
         IEngine engine = new FakeEngine();
         var items = new Chain(engine, []);
@@ -49,7 +49,7 @@ public class Test_ParameterList
 
     //[Enforced]
     [Fact]
-    public void Test_Create_With_Duplicates()
+    public static void Test_Create_With_Duplicates()
     {
         IEngine engine = new FakeEngine();
         var items = new Chain(engine, [x007, x007]);

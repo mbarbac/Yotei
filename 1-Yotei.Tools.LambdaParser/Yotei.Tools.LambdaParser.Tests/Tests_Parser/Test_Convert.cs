@@ -2,7 +2,7 @@
 
 // ========================================================
 //[Enforced]
-public class Test_Convert
+public static class Test_Convert
 {
     // Type with no parameterless constructor.
     public class Person(string name)

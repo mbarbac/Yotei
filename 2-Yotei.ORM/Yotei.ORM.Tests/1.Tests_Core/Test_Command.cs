@@ -2,11 +2,11 @@
 
 // ========================================================
 //[Enforced]
-public class Test_Command
+public static class Test_Command
 {
     //[Enforced]
     [Fact]
-    public void Test_Create_Empty()
+    public static void Test_Create_Empty()
     {
         ICommand command;
         ICommandInfo info;
@@ -25,7 +25,7 @@ public class Test_Command
 
     //[Enforced]
     [Fact]
-    public void Test_Create_Populated()
+    public static void Test_Create_Populated()
     {
         ICommand command;
         ICommandInfo info;

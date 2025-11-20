@@ -2,11 +2,11 @@
 
 // ========================================================
 //[Enforced]
-public class Test_Locale
+public static class Test_Locale
 {
     //[Enforced]
     [Fact]
-    public void Test_Create()
+    public static void Test_Create()
     {
         var locale = new Locale();
         Assert.Equal(CultureInfo.InvariantCulture, locale.CultureInfo);
@@ -22,7 +22,7 @@ public class Test_Locale
 
     //[Enforced]
     [Fact]
-    public void Test_With()
+    public static void Test_With()
     {
         var locale = new Locale();
         Assert.Equal(CultureInfo.InvariantCulture, locale.CultureInfo);

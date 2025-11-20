@@ -4,7 +4,7 @@ namespace Yotei.ORM.Tests.Tools.Collections;
 
 // ========================================================
 //[Enforced]
-public partial class Test_CoreList_T
+public static partial class Test_CoreList_T
 {
     public interface IElement { }
     public class Element(string name) : IElement
@@ -70,7 +70,7 @@ public partial class Test_CoreList_T
 
     //[Enforced]
     [Fact]
-    public void Test_Create_Empty()
+    public static void Test_Create_Empty()
     {
         var items = new Chain(false); Assert.Empty(items);
         items = new Chain(false, 15); Assert.Empty(items); Assert.Equal(15, items.Capacity);
@@ -80,7 +80,7 @@ public partial class Test_CoreList_T
 
     //[Enforced]
     [Fact]
-    public void Test_Create_Range()
+    public static void Test_Create_Range()
     {
         var items = new Chain(false, []);
         Assert.Empty(items);
@@ -103,7 +103,7 @@ public partial class Test_CoreList_T
 
     //[Enforced]
     [Fact]
-    public void Test_Create_With_Duplicates()
+    public static void Test_Create_With_Duplicates()
     {
         var items = new Chain(false, [xone, xone]);
         Assert.Equal(2, items.Count);

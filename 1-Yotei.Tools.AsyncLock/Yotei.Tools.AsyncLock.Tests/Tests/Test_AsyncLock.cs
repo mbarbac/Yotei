@@ -5,7 +5,7 @@ namespace Yotei.Tools.AsyncLock.Tests;
 
 // ========================================================
 ////[Enforced]
-public class Test_AsyncLock
+public static class Test_AsyncLock
 {
     static void Print(ConsoleColor color, string message)
     {

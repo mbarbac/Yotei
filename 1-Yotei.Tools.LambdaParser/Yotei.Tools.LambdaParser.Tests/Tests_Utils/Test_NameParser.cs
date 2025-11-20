@@ -2,7 +2,7 @@
 
 // ========================================================
 //[Enforced]
-public class Test_NameParser
+public static class Test_NameParser
 {
     //[Enforced]
     [Fact]

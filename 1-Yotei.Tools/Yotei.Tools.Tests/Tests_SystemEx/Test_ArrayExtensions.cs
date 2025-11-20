@@ -2,7 +2,7 @@
 
 // ========================================================
 //[Enforced]
-public class Test_ArrayExtensions
+public static class Test_ArrayExtensions
 {
     static string?[] Generate(int num) => [.. Enumerable.Range(0, num).Select(i => i.ToString())];
 
@@ -10,7 +10,7 @@ public class Test_ArrayExtensions
 
     //[Enforced]
     [Fact]
-    public void Test_TypedEnumeration()
+    public static void Test_TypedEnumeration()
     {
         var num = 100;
         var source = Generate(num);
@@ -23,7 +23,7 @@ public class Test_ArrayExtensions
 
     //[Enforced]
     [Fact]
-    public void Test_Clone_Standard()
+    public static void Test_Clone_Standard()
     {
         var source = Array.Empty<string?>();
         var target = (string[])source.Clone();
@@ -47,7 +47,7 @@ public class Test_ArrayExtensions
 
     //[Enforced]
     [Fact]
-    public void Test_Clone_Deep()
+    public static void Test_Clone_Deep()
     {
         var source = Array.Empty<Element?>();
         var target = source.Clone(false); Assert.NotSame(source, target);
@@ -71,7 +71,7 @@ public class Test_ArrayExtensions
 
     //[Enforced]
     [Fact]
-    public void Test_IndexOf()
+    public static void Test_IndexOf()
     {
         var item = "1";
         string?[] source = [item, ..Generate(5)];
@@ -87,7 +87,7 @@ public class Test_ArrayExtensions
 
     //[Enforced]
     [Fact]
-    public void Test_Trim()
+    public static void Test_Trim()
     {
         var source = Generate(3);
         var target = source.Trim();
@@ -104,7 +104,7 @@ public class Test_ArrayExtensions
 
     //[Enforced]
     [Fact]
-    public void Test_TrimStart()
+    public static void Test_TrimStart()
     {
         var source = Generate(3);
         var target = source.TrimStart();
@@ -123,7 +123,7 @@ public class Test_ArrayExtensions
 
     //[Enforced]
     [Fact]
-    public void TrimEnd()
+    public static void TrimEnd()
     {
         var source = Generate(3);
         var target = source.TrimEnd();
@@ -144,7 +144,7 @@ public class Test_ArrayExtensions
 
     //[Enforced]
     [Fact]
-    public void Test_GetRange()
+    public static void Test_GetRange()
     {
         var source = Array.Empty<string?>();
         var target = source.GetRange(0, 0); Assert.Empty(target);
@@ -171,7 +171,7 @@ public class Test_ArrayExtensions
 
     //[Enforced]
     [Fact]
-    public void Test_GetRange_Errors()
+    public static void Test_GetRange_Errors()
     {
         var source = Generate(3);
 
@@ -190,7 +190,7 @@ public class Test_ArrayExtensions
 
     //[Enforced]
     [Fact]
-    public void Test_ReplaceValue()
+    public static void Test_ReplaceValue()
     {
         var source = Array.Empty<string?>();
         var target = source.Replace(null, null);
@@ -217,7 +217,7 @@ public class Test_ArrayExtensions
 
     //[Enforced]
     [Fact]
-    public void Test_ReplaceAt()
+    public static void Test_ReplaceAt()
     {
         string?[] target;
         var source = Array.Empty<string?>();
@@ -235,7 +235,7 @@ public class Test_ArrayExtensions
 
     //[Enforced]
     [Fact]
-    public void Test_Add()
+    public static void Test_Add()
     {
         var source = Array.Empty<string?>();
         var target = source.Add("name");
@@ -246,7 +246,7 @@ public class Test_ArrayExtensions
 
     //[Enforced]
     [Fact]
-    public void Test_AddRange()
+    public static void Test_AddRange()
     {
         var source = Array.Empty<string?>();
         var target = source.AddRange([]);
@@ -265,7 +265,7 @@ public class Test_ArrayExtensions
 
     //[Enforced]
     [Fact]
-    public void Test_Insert()
+    public static void Test_Insert()
     {
         var source = Array.Empty<string?>();
         var target = source.Insert(0, "name");
@@ -280,7 +280,7 @@ public class Test_ArrayExtensions
 
     //[Enforced]
     [Fact]
-    public void Test_InsertRange()
+    public static void Test_InsertRange()
     {
         var source = Array.Empty<string?>();
         var target = source.InsertRange(0, []);
@@ -307,7 +307,7 @@ public class Test_ArrayExtensions
 
     //[Enforced]
     [Fact]
-    public void Test_RemoveAt()
+    public static void Test_RemoveAt()
     {
         var source = Array.Empty<string?>();
         var target = source.RemoveAt(0);
@@ -328,7 +328,7 @@ public class Test_ArrayExtensions
 
     //[Enforced]
     [Fact]
-    public void Test_RemoveRange()
+    public static void Test_RemoveRange()
     {
         var source = Array.Empty<string?>();
         var target = source.RemoveRange(0, 0);
@@ -347,7 +347,7 @@ public class Test_ArrayExtensions
 
     //[Enforced]
     [Fact]
-    public void Test_Remove_Item()
+    public static void Test_Remove_Item()
     {
         var source = new[] { "1", "2", "3", "2" };
         var target = source.Remove("2");
@@ -359,7 +359,7 @@ public class Test_ArrayExtensions
 
     //[Enforced]
     [Fact]
-    public void Test_Remove_LastItem()
+    public static void Test_Remove_LastItem()
     {
         var source = new[] { "1", "2", "3", "2" };
         var target = source.RemoveLast("2");
@@ -371,7 +371,7 @@ public class Test_ArrayExtensions
 
     //[Enforced]
     [Fact]
-    public void Test_Remove_AllItems()
+    public static void Test_Remove_AllItems()
     {
         var source = new[] { "1", "2", "3", "2" };
         var target = source.RemoveAll("2");
@@ -421,7 +421,7 @@ public class Test_ArrayExtensions
 
     //[Enforced]
     [Fact]
-    public void Test_Clear()
+    public static void Test_Clear()
     {
         var source = Array.Empty<string?>();
         var target = source.Clear();

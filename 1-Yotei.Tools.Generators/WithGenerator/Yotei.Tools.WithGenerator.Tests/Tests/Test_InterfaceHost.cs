@@ -2,7 +2,7 @@
 
 // ========================================================
 //[Enforced]
-public partial class Test_InterfaceHost
+public static partial class Test_InterfaceHost
 {
     // Default case...
 

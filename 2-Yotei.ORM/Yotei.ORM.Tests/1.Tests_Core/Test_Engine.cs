@@ -2,7 +2,7 @@
 
 // ========================================================
 //[Enforced]
-public class Test_Engine
+public static class Test_Engine
 {
     //[Enforced]
     [Fact]

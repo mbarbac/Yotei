@@ -2,11 +2,11 @@
 
 // ========================================================
 //[Enforced]
-public class Test_Transaction
+public static class Test_Transaction
 {
     //[Enforced]
     [Fact]
-    public void Test_Default_Always_Valid()
+    public static void Test_Default_Always_Valid()
     {
         IConnection connection;
         ITransaction transaction;

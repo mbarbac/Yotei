@@ -2,7 +2,7 @@
 
 // ========================================================
 ////[Enforced]
-public class Test_StringExtensions
+public static class Test_StringExtensions
 {
     // [Enforced]
     [Fact]

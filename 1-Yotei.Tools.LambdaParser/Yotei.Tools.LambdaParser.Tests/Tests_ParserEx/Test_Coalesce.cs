@@ -2,7 +2,7 @@
 
 // ========================================================
 //[Enforced]
-public class Test_Coalesce
+public static class Test_Coalesce
 {
     //[Enforced]
     [Fact]

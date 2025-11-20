@@ -2,7 +2,7 @@
 
 // ========================================================
 //[Enforced]
-public class Test_Invoke
+public static class Test_Invoke
 {
     //[Enforced]
     [Fact]

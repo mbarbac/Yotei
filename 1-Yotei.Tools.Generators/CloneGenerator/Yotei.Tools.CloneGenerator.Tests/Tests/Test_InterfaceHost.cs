@@ -2,7 +2,7 @@
 
 // ========================================================
 //[Enforced]
-public partial class Test_InterfaceHost
+public static partial class Test_InterfaceHost
 {
     // Default case...
 
@@ -10,7 +10,7 @@ public partial class Test_InterfaceHost
 
     //[Enforced]
     [Fact]
-    public void Test_IFace01()
+    public static void Test_IFace01()
     {
         MethodInfo? method;
         ParameterInfo[]? pars;
@@ -29,7 +29,7 @@ public partial class Test_InterfaceHost
 
     //[Enforced]
     [Fact]
-    public void Test_IFace02()
+    public static void Test_IFace02()
     {
         MethodInfo? method;
         ParameterInfo[]? pars;
@@ -50,7 +50,7 @@ public partial class Test_InterfaceHost
 
     //[Enforced]
     [Fact]
-    public void Test_IFace03B()
+    public static void Test_IFace03B()
     {
         MethodInfo? method;
         ParameterInfo[]? pars;
@@ -64,7 +64,7 @@ public partial class Test_InterfaceHost
 
     //[Enforced]
     [Fact]
-    public void Test_IFace03C()
+    public static void Test_IFace03C()
     {
         MethodInfo? method;
         ParameterInfo[]? pars;
@@ -84,7 +84,7 @@ public partial class Test_InterfaceHost
 
     //[Enforced]
     [Fact]
-    public void Test_IFace04A()
+    public static void Test_IFace04A()
     {
         MethodInfo? method;
         ParameterInfo[]? pars;
@@ -98,7 +98,7 @@ public partial class Test_InterfaceHost
 
     //[Enforced]
     [Fact]
-    public void Test_IFace04B()
+    public static void Test_IFace04B()
     {
         MethodInfo? method;
         ParameterInfo[]? pars;

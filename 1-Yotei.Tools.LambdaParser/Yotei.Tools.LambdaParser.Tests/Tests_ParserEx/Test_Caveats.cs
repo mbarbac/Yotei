@@ -2,7 +2,7 @@
 
 // ========================================================
 //[Enforced]
-public class Test_Caveats
+public static class Test_Caveats
 {
     //[Enforced]
     [Fact]

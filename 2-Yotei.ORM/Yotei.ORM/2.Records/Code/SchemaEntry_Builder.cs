@@ -196,7 +196,7 @@ partial class SchemaEntry
         /// <returns></returns>
         public IEnumerator<IMetadataEntry> GetEnumerator() => ExpectedItems().GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
+        
         /// <summary>
         /// The collection of entries as expected by external code.
         /// </summary>
@@ -272,7 +272,7 @@ partial class SchemaEntry
                 }
             }
         }
-
+        
         // ------------------------------------------------
 
         /// <summary>
@@ -306,7 +306,7 @@ partial class SchemaEntry
 
             return _Identifier;
         }
-        IEnumerable<IMetadataEntry> SetIdentifier(IIdentifier value)
+        List<IMetadataEntry> SetIdentifier(IIdentifier value)
         {
             value.ThrowWhenNull();
 
@@ -314,6 +314,8 @@ partial class SchemaEntry
                 "Identifier engine is not the same as the one of this instance.")
                 .WithData(value)
                 .WithData(this);
+
+            List<IMetadataEntry> list = [];
 
             var tags = KnownTags.IdentifierTags;
             if (tags.Count > 0)
@@ -351,12 +353,13 @@ partial class SchemaEntry
 
                         first = false;
                         var item = new MetadataEntry(tagnames[i], temp); Items.Add(item);
-                        yield return item;
+                        list.Add(item);
                     }
                 }
             }
 
             _Identifier = value;
+            return list;
         }
 
         /// <summary>

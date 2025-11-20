@@ -2,11 +2,11 @@
 
 // ========================================================
 //[Enforced]
-public class Test_IsoltatedFinder
+public static class Test_IsoltatedFinder
 {
     //[Enforced]
     [Fact]
-    public void Test_Source_Empty()
+    public static void Test_Source_Empty()
     {
         var finder = new IsolatedFinder();
 
@@ -16,7 +16,7 @@ public class Test_IsoltatedFinder
 
     //[Enforced]
     [Fact]
-    public void Test_Not_Isolated()
+    public static void Test_Not_Isolated()
     {
         var finder = new IsolatedFinder();
         var value = "xx";
@@ -29,7 +29,7 @@ public class Test_IsoltatedFinder
 
     //[Enforced]
     [Fact]
-    public void Test_Not_Isolated_From_Index()
+    public static void Test_Not_Isolated_From_Index()
     {
         var finder = new IsolatedFinder();
         var value = "xx";
@@ -41,7 +41,7 @@ public class Test_IsoltatedFinder
 
     //[Enforced]
     [Fact]
-    public void Test_Isolated()
+    public static void Test_Isolated()
     {
         var finder = new IsolatedFinder();
         var value = "xx";
@@ -54,7 +54,7 @@ public class Test_IsoltatedFinder
 
     //[Enforced]
     [Fact]
-    public void Test_Isolated_From_Index()
+    public static void Test_Isolated_From_Index()
     {
         var finder = new IsolatedFinder();
         var value = "xx";

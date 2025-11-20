@@ -2,11 +2,11 @@
 
 // ========================================================
 //[Enforced]
-public class Test_Parameter
+public static class Test_Parameter
 {
     //[Enforced]
     [Fact]
-    public void Test_Create()
+    public static void Test_Create()
     {
         var item = new Parameter("#one", null);
         Assert.Equal("#one", item.Name);

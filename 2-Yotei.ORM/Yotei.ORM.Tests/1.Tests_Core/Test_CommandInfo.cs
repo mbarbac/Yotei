@@ -5,11 +5,11 @@ namespace Yotei.ORM.Tests.Core;
 
 // ========================================================
 //[Enforced]
-public class Test_CommandInfo
+public static class Test_CommandInfo
 {
     //[Enforced]
     [Fact]
-    public void Test_Create_Empty()
+    public static void Test_Create_Empty()
     {
         IBuilder builder;
         ICommandInfo info;
@@ -59,7 +59,7 @@ public class Test_CommandInfo
 
     //[Enforced]
     [Fact]
-    public void Test_Create_Only_Text()
+    public static void Test_Create_Only_Text()
     {
         IBuilder builder;
         ICommandInfo info;
@@ -97,7 +97,7 @@ public class Test_CommandInfo
     
     //[Enforced]
     [Fact]
-    public void Test_Create_Only_Values()
+    public static void Test_Create_Only_Values()
     {
         IBuilder builder;
         var engine = new FakeEngine();
@@ -126,7 +126,7 @@ public class Test_CommandInfo
 
     //[Enforced]
     [Fact]
-    public void Test_Create_Text_And_Values()
+    public static void Test_Create_Text_And_Values()
     {
         IBuilder builder;
         ICommandInfo info;
@@ -167,7 +167,7 @@ public class Test_CommandInfo
 
     //[Enforced]
     [Fact]
-    public void Test_Create_Text_And_Parameters()
+    public static void Test_Create_Text_And_Parameters()
     {
         IBuilder builder;
         ICommandInfo info;
@@ -209,7 +209,7 @@ public class Test_CommandInfo
 
     //[Enforced]
     [Fact]
-    public void Test_Create_Text_And_Anonymous()
+    public static void Test_Create_Text_And_Anonymous()
     {
         IBuilder builder;
         ICommandInfo info;
@@ -250,7 +250,7 @@ public class Test_CommandInfo
 
     //[Enforced]
     [Fact]
-    public void Test_Create_Values_As_Colection()
+    public static void Test_Create_Values_As_Colection()
     {
         IBuilder builder;
         ICommandInfo info;
@@ -300,7 +300,7 @@ public class Test_CommandInfo
 
     //[Enforced]
     [Fact]
-    public void Test_Create_Duplicate_Value_Names()
+    public static void Test_Create_Duplicate_Value_Names()
     {
         IBuilder builder;
         var engine = new FakeEngine() { ParameterPrefix = "@" };
@@ -321,7 +321,7 @@ public class Test_CommandInfo
 
     //[Enforced]
     [Fact]
-    public void Test_Clone()
+    public static void Test_Clone()
     {
         IBuilder source, target;
         ICommandInfo info;
@@ -352,7 +352,7 @@ public class Test_CommandInfo
 
     //[Enforced]
     [Fact]
-    public void Test_Add_Command()
+    public static void Test_Add_Command()
     {
         ICommand source;
         IBuilder builder;
@@ -377,7 +377,7 @@ public class Test_CommandInfo
 
     //[Enforced]
     [Fact]
-    public void Test_Add_CommandInfo()
+    public static void Test_Add_CommandInfo()
     {
         ICommandInfo source, info;
         IBuilder builder;
@@ -401,7 +401,7 @@ public class Test_CommandInfo
 
     //[Enforced]
     [Fact]
-    public void Test_Add_CommandInfoBuilder()
+    public static void Test_Add_CommandInfoBuilder()
     {
         IBuilder source;
         IBuilder builder;
@@ -438,7 +438,7 @@ public class Test_CommandInfo
 
     //[Enforced]
     [Fact]
-    public void Test_Add_Only_Text()
+    public static void Test_Add_Only_Text()
     {
         IBuilder builder;
         ICommandInfo info;
@@ -463,7 +463,7 @@ public class Test_CommandInfo
 
     //[Enforced]
     [Fact]
-    public void Test_Add_Only_Values()
+    public static void Test_Add_Only_Values()
     {
         IBuilder builder;
         var engine = new FakeEngine();
@@ -485,7 +485,7 @@ public class Test_CommandInfo
 
     //[Enforced]
     [Fact]
-    public void Test_Add_Only_Parameters()
+    public static void Test_Add_Only_Parameters()
     {
         IBuilder builder;
         var engine = new FakeEngine();
@@ -507,7 +507,7 @@ public class Test_CommandInfo
 
     //[Enforced]
     [Fact]
-    public void Test_Add_Only_Anonymous()
+    public static void Test_Add_Only_Anonymous()
     {
         IBuilder builder;
         var engine = new FakeEngine();
@@ -531,7 +531,7 @@ public class Test_CommandInfo
 
     //[Enforced]
     [Fact]
-    public void Test_Add_Text_And_Values()
+    public static void Test_Add_Text_And_Values()
     {
         IBuilder builder;
         ICommandInfo info;
@@ -563,7 +563,7 @@ public class Test_CommandInfo
 
     //[Enforced]
     [Fact]
-    public void Test_Add_Text_And_Parameters()
+    public static void Test_Add_Text_And_Parameters()
     {
         IBuilder builder;
         ICommandInfo info;
@@ -597,7 +597,7 @@ public class Test_CommandInfo
 
     //[Enforced]
     [Fact]
-    public void Test_Add_Text_And_Anonymous()
+    public static void Test_Add_Text_And_Anonymous()
     {
         IBuilder builder;
         ICommandInfo info;
@@ -633,7 +633,7 @@ public class Test_CommandInfo
 
     //[Enforced]
     [Fact]
-    public void Test_Replace_Text()
+    public static void Test_Replace_Text()
     {
         IBuilder builder;
         var engine = new FakeEngine();
@@ -673,7 +673,7 @@ public class Test_CommandInfo
 
     //[Enforced]
     [Fact]
-    public void Test_Replace_Values()
+    public static void Test_Replace_Values()
     {
         IBuilder builder;
         var engine = new FakeEngine();
@@ -711,7 +711,7 @@ public class Test_CommandInfo
 
     //[Enforced]
     [Fact]
-    public void Test_Replace_Values_Parameters()
+    public static void Test_Replace_Values_Parameters()
     {
         IBuilder builder;
         var engine = new FakeEngine();
@@ -741,7 +741,7 @@ public class Test_CommandInfo
 
     //[Enforced]
     [Fact]
-    public void Test_Replace_Values_Anonymous()
+    public static void Test_Replace_Values_Anonymous()
     {
         IBuilder builder;
         var engine = new FakeEngine();
@@ -773,7 +773,7 @@ public class Test_CommandInfo
 
     //[Enforced]
     [Fact]
-    public void Test_Clear()
+    public static void Test_Clear()
     {
         IBuilder builder;
         ICommandInfo info;

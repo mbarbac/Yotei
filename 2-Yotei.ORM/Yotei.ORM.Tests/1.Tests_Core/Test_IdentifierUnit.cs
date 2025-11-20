@@ -2,7 +2,7 @@
 
 // ========================================================
 //[Enforced]
-public class Test_IdentifierUnit
+public static class Test_IdentifierUnit
 {
     //[Enforced]
     [Fact]

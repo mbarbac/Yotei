@@ -2,7 +2,7 @@
 
 // ========================================================
 //[Enforced]
-public class Test_SetIndexedArgument
+public static class Test_SetIndexedArgument
 {
     //[Enforced]
     [Fact]

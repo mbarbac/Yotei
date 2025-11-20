@@ -2,11 +2,11 @@
 
 // ========================================================
 //[Enforced]
-public class Test_ObjectExtensions
+public static class Test_ObjectExtensions
 {
     //[Enforced]
     [Fact]
-    public void Test_ThrowWhenNull()
+    public static void Test_ThrowWhenNull()
     {
         string? name = "James";
         name.ThrowWhenNull();
@@ -19,7 +19,7 @@ public class Test_ObjectExtensions
 
     //[Enforced]
     [Fact]
-    public void Test_EqualsEx()
+    public static void Test_EqualsEx()
     {
         string? x = null;
         string? y = null;

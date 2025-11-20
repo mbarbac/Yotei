@@ -4,7 +4,7 @@ namespace Yotei.Tools.LambdaParser.Tests;
 
 // ========================================================
 //[Enforced]
-public class Test_SetArgument
+public static class Test_SetArgument
 {
     //[Enforced]
     [Fact]

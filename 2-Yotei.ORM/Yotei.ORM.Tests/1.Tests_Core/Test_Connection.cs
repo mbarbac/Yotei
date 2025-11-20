@@ -2,7 +2,7 @@
 
 // ========================================================
 //[Enforced]
-public class Test_Connection
+public static class Test_Connection
 {
     //[Enforced]
     [Fact]

@@ -4,7 +4,7 @@ namespace Yotei.Tools.LambdaParser.Tests;
 
 // ========================================================
 ////[Enforced]
-public class Test_Binary
+public static class Test_Binary
 {
     //[Enforced]
     [Fact]

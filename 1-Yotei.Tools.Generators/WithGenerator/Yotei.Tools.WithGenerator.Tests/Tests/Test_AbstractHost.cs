@@ -2,7 +2,7 @@
 
 // ========================================================
 //[Enforced]
-public partial class Test_AbstractHost
+public static partial class Test_AbstractHost
 {
     // Default case...
 

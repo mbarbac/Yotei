@@ -2,7 +2,7 @@
 
 // ========================================================
 //[Enforced]
-public class Test_Unary
+public static class Test_Unary
 {
     //[Enforced]
     [Fact]

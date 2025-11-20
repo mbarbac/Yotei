@@ -4,7 +4,7 @@ namespace Yotei.Tools.CloneGenerator.Tests;
 
 // ========================================================
 //[Enforced]
-public partial class Test_RegularHost
+public static partial class Test_RegularHost
 {
     // Default case...
 

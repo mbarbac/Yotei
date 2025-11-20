@@ -5,9 +5,9 @@ namespace Yotei.ORM.Tests.Records;
 
 // ========================================================
 //[Enforced]
-public class Test_SchemaEntry
+public static class Test_SchemaEntry
 {
-    static bool Contains(ISchemaEntry entry, string name, object? value)
+    static bool Contains(this ISchemaEntry entry, string name, object? value)
     {
         var item = entry.Find(name);
         return item is not null && item.Value.EqualsEx(value);
@@ -17,52 +17,52 @@ public class Test_SchemaEntry
 
     //[Enforced]
     [Fact]
-    public void Test_Create_Empty()
+    public static void Test_Create_Empty()
     {
         var engine = new FakeEngine() { KnownTags = new KnownTags(false) };
-        var item = new Entry(engine);
+        var entry = new Entry(engine);
 
-        Assert.Null(item.Identifier.Value);
-        Assert.False(item.IsPrimaryKey);
-        Assert.False(item.IsUniqueValued);
-        Assert.False(item.IsReadOnly);
-        Assert.Equal(0, item.Count);
+        Assert.Null(entry.Identifier.Value);
+        Assert.False(entry.IsPrimaryKey);
+        Assert.False(entry.IsUniqueValued);
+        Assert.False(entry.IsReadOnly);
+        Assert.Equal(0, entry.Count);
 
         engine = new FakeEngine();
-        item = new Entry(engine);
+        entry = new Entry(engine);
 
-        Assert.Null(item.Identifier.Value);
-        Assert.False(item.IsPrimaryKey);
-        Assert.False(item.IsUniqueValued);
-        Assert.False(item.IsReadOnly);
-        Assert.Equal(3, item.Count);
+        Assert.Null(entry.Identifier.Value);
+        Assert.False(entry.IsPrimaryKey);
+        Assert.False(entry.IsUniqueValued);
+        Assert.False(entry.IsReadOnly);
+        Assert.Equal(3, entry.Count);
     }
 
     //[Enforced]
     [Fact]
-    public void Test_Create_From_Values()
+    public static void Test_Create_From_Values()
     {
         var engine = new FakeEngine() { KnownTags = new KnownTags(false) };
-        var item = new Entry(engine, "column", isReadonly: true);
-        Assert.Equal("[column]", item.Identifier.Value);
-        Assert.False(item.IsPrimaryKey);
-        Assert.False(item.IsUniqueValued);
-        Assert.True(item.IsReadOnly);
-        Assert.Equal(4, item.Count);
+        var entry = new Entry(engine, "column", isReadonly: true);
+        Assert.Equal("[column]", entry.Identifier.Value);
+        Assert.False(entry.IsPrimaryKey);
+        Assert.False(entry.IsUniqueValued);
+        Assert.True(entry.IsReadOnly);
+        Assert.Equal(0, entry.Count);
 
-        //Assert.NotNull(item.Identifier); Assert.Null(item.Identifier.Value);
-        //Assert.False(item.IsPrimaryKey);
-        //Assert.False(item.IsUniqueValued);
-        //Assert.False(item.IsReadOnly);
-        //Assert.Equal(0, item.Count);
+        engine = new FakeEngine();
+        entry = new Entry(engine, "column", isUniqueValued: true);
+        Assert.Equal("[column]", entry.Identifier.Value);
+        Assert.False(entry.IsPrimaryKey);
+        Assert.True(entry.IsUniqueValued);
+        Assert.False(entry.IsReadOnly);
+        Assert.Equal(4, entry.Count);
 
-        //engine = new FakeEngine();
-        //item = new Entry(engine);
-
-        //Assert.NotNull(item.Identifier); Assert.Null(item.Identifier.Value);
-        //Assert.False(item.IsPrimaryKey);
-        //Assert.False(item.IsUniqueValued);
-        //Assert.False(item.IsReadOnly);
-        //Assert.Equal(3, item.Count);
+        entry = new Entry(engine, "schema..", isPrimaryKey: true);
+        Assert.Equal("[schema]..", entry.Identifier.Value);
+        Assert.True(entry.IsPrimaryKey);
+        Assert.False(entry.IsUniqueValued);
+        Assert.False(entry.IsReadOnly);
+        Assert.Equal(6, entry.Count);
     }
 }

@@ -2,7 +2,7 @@
 
 // ========================================================
 ////[Enforced]
-public class Test_Action
+public static class Test_Action
 {
     //[Enforced]
     [Fact]
