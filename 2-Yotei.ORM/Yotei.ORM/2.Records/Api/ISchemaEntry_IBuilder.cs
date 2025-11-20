@@ -110,7 +110,7 @@ partial interface ISchemaEntry
         /// </summary>
         /// <param name="range"></param>
         /// <returns></returns>
-        bool Add(IEnumerable<IMetadataEntry> range);
+        bool AddRange(IEnumerable<IMetadataEntry> range);
 
         /// <summary>
         /// Removes from this collection the metadata pair whose name is given, or with a name

@@ -44,7 +44,7 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataEntry>, IEquatable<
     // ------------------------------------------------
 
     /// <summary>
-    /// Gets the number of metadata pairs in this collection.
+    /// Provides a point estimate of the number of metadata pairs in this collection.
     /// </summary>
     int Count { get; }
 
@@ -114,7 +114,7 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataEntry>, IEquatable<
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    ISchemaEntry Add(IEnumerable<IMetadataEntry> range);
+    ISchemaEntry AddRange(IEnumerable<IMetadataEntry> range);
 
     /// <summary>
     /// Returns a new instance where the metadata pair whose name is given, or with a name that

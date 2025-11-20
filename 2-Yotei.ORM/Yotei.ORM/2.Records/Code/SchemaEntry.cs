@@ -24,7 +24,7 @@ public partial class SchemaEntry : ISchemaEntry
         IEngine engine, IEnumerable<IMetadataEntry> range) => Items = new(engine, range);
 
     /// <summary>
-    /// Initializes a new instance with the given metadata.
+    /// Initializes a new instance with the given values and metadata.
     /// </summary>
     /// <param name="identifier"></param>
     /// <param name="isPrimaryKey"></param>
@@ -38,6 +38,24 @@ public partial class SchemaEntry : ISchemaEntry
         bool? isReadonly = null,
         IEnumerable<IMetadataEntry>? range = null)
         => Items = new(identifier, isPrimaryKey, isUniqueValued, isReadonly, range);
+
+    /// <summary>
+    /// Initializes a new instance with the given values and metadata.
+    /// </summary>
+    /// <param name="engine"></param>
+    /// <param name="identifier"></param>
+    /// <param name="isPrimaryKey"></param>
+    /// <param name="isUniqueValued"></param>
+    /// <param name="isReadonly"></param>
+    /// <param name="range"></param>
+    public SchemaEntry(
+        IEngine engine,
+        string identifier,
+        bool? isPrimaryKey = null,
+        bool? isUniqueValued = null,
+        bool? isReadonly = null,
+        IEnumerable<IMetadataEntry>? range = null)
+        => Items = new(engine, identifier, isPrimaryKey, isUniqueValued, isReadonly, range);
 
     /// <summary>
     /// Copy constructor.
@@ -73,7 +91,40 @@ public partial class SchemaEntry : ISchemaEntry
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
-    public virtual bool Equals(ISchemaEntry? other) => throw null;
+    public virtual bool Equals(ISchemaEntry? other)
+    {
+        if (ReferenceEquals(this, other)) return true;
+        if (other is null) return false;
+
+        var sources = ToList();
+        var targets = other.ToList();
+        if (sources.Count != targets.Count) return false;
+
+        for (int i = 0; i < sources.Count; i++)
+        {
+            var source = sources[i];
+            var index = FindIndex(source.Name, targets);
+            if (index < 0) return false;
+
+            var vsource = source.Value;
+            var vtarget = targets[index].Value;
+            var same = vsource.EqualsEx(vtarget); if (!same) return false;
+
+            targets.RemoveAt(index);
+        }
+        return targets.Count == 0;
+
+        int FindIndex(string name, List<IMetadataEntry> items)
+        {
+            for (int i = 0; i < items.Count; i++)
+            {
+                var item = items[i];
+                var tag = Engine.KnownTags.Find(item.Name);
+                if (tag is not null && tag.Contains(name)) return i;
+            }
+            return -1;
+        }
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -96,7 +147,21 @@ public partial class SchemaEntry : ISchemaEntry
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override int GetHashCode() => throw null;
+    public override int GetHashCode()
+    {
+        var code = 0;
+        code = HashCode.Combine(code, Items._Identifier?.GetHashCode() ?? 0);
+        code = HashCode.Combine(code, Items._IsPrimaryKey?.GetHashCode() ?? 0);
+        code = HashCode.Combine(code, Items._IsUniqueValued?.GetHashCode() ?? 0);
+        code = HashCode.Combine(code, Items._IsReadOnly?.GetHashCode() ?? 0);
+
+        foreach (var item in Items)
+        {
+            if (Engine.KnownTags.Contains(item.Name)) continue;
+            code = HashCode.Combine(code, item);
+        }
+        return code;
+    }
 
     // ------------------------------------------------
 
@@ -222,10 +287,10 @@ public partial class SchemaEntry : ISchemaEntry
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual ISchemaEntry Add(IEnumerable<IMetadataEntry> range)
+    public virtual ISchemaEntry AddRange(IEnumerable<IMetadataEntry> range)
     {
         var builder = CreateBuilder();
-        var done = builder.Add(range);
+        var done = builder.AddRange(range);
         return done ? builder.CreateInstance() : this;
     }
 
