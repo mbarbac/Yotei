@@ -150,10 +150,10 @@ public partial class SchemaEntry : ISchemaEntry
     public override int GetHashCode()
     {
         var code = 0;
-        code = HashCode.Combine(code, Items._Identifier?.GetHashCode() ?? 0);
-        code = HashCode.Combine(code, Items._IsPrimaryKey?.GetHashCode() ?? 0);
-        code = HashCode.Combine(code, Items._IsUniqueValued?.GetHashCode() ?? 0);
-        code = HashCode.Combine(code, Items._IsReadOnly?.GetHashCode() ?? 0);
+        code = HashCode.Combine(code, Identifier.GetHashCode());
+        code = HashCode.Combine(code, Items.IsPrimaryKey.GetHashCode());
+        code = HashCode.Combine(code, Items.IsUniqueValued.GetHashCode());
+        code = HashCode.Combine(code, Items.IsReadOnly.GetHashCode());
 
         foreach (var item in Items)
         {
