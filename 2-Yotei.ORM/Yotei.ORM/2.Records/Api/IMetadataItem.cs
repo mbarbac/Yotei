@@ -5,7 +5,7 @@
 /// Represents a metadata entry.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
-public partial interface IMetadataEntry : IEquatable<IMetadataEntry>
+public partial interface IMetadataItem : IEquatable<IMetadataItem>
 {
     /// <summary>
     /// Determines if this instance is equal to the other given one, using the given comparison
@@ -14,7 +14,7 @@ public partial interface IMetadataEntry : IEquatable<IMetadataEntry>
     /// <param name="other"></param>
     /// <param name="caseSensitiveTags"></param>
     /// <returns></returns>
-    bool Equals(IMetadataEntry? other, bool caseSensitiveTags);
+    bool Equals(IMetadataItem? other, bool caseSensitiveTags);
 
     /// <summary>
     /// The name by which this metadata entry is known.

@@ -7,7 +7,7 @@ partial interface ISchemaEntry
     /// Represents a builder for <see cref="ISchemaEntry"/> instances.
     /// </summary>
     [Cloneable]
-    public partial interface IBuilder : IEnumerable<IMetadataEntry>
+    public partial interface IBuilder : IEnumerable<IMetadataItem>
     {
         /// <summary>
         /// Returns a new instance based upon the contents of this builder.
@@ -68,26 +68,26 @@ partial interface ISchemaEntry
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        IMetadataEntry? Find(string name);
+        IMetadataItem? Find(string name);
 
         /// <summary>
         /// <inheritdoc cref="ISchemaEntry.Find(IEnumerable{string})"/>
         /// </summary>
         /// <param name="range"></param>
         /// <returns></returns>
-        IMetadataEntry? Find(IEnumerable<string> range);
+        IMetadataItem? Find(IEnumerable<string> range);
 
         /// <summary>
         /// <inheritdoc cref="ISchemaEntry.ToArray"/>
         /// </summary>
         /// <returns></returns>
-        IMetadataEntry[] ToArray();
+        IMetadataItem[] ToArray();
 
         /// <summary>
         /// <inheritdoc cref="ISchemaEntry.ToList"/>
         /// </summary>
         /// <returns></returns>
-        List<IMetadataEntry> ToList();
+        List<IMetadataItem> ToList();
 
         /// <summary>
         /// <inheritdoc cref="ISchemaEntry.Trim"/>
@@ -102,7 +102,7 @@ partial interface ISchemaEntry
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        bool Add(IMetadataEntry item);
+        bool Add(IMetadataItem item);
 
         /// <summary>
         /// Adds to this collection the metadata pairs of the given range.
@@ -110,7 +110,7 @@ partial interface ISchemaEntry
         /// </summary>
         /// <param name="range"></param>
         /// <returns></returns>
-        bool AddRange(IEnumerable<IMetadataEntry> range);
+        bool AddRange(IEnumerable<IMetadataItem> range);
 
         /// <summary>
         /// Removes from this collection the metadata pair whose name is given, or with a name
@@ -127,7 +127,7 @@ partial interface ISchemaEntry
         /// </summary>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        bool Remove(Predicate<IMetadataEntry> predicate);
+        bool Remove(Predicate<IMetadataItem> predicate);
 
         /// <summary>
         /// Removes from this collection the last metadata pair that matches the given predicate.
@@ -135,7 +135,7 @@ partial interface ISchemaEntry
         /// </summary>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        bool RemoveLast(Predicate<IMetadataEntry> predicate);
+        bool RemoveLast(Predicate<IMetadataItem> predicate);
 
         /// <summary>
         /// Removes from this collection all the metadata pairs that match the given predicate.
@@ -143,7 +143,7 @@ partial interface ISchemaEntry
         /// </summary>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        bool RemoveAll(Predicate<IMetadataEntry> predicate);
+        bool RemoveAll(Predicate<IMetadataItem> predicate);
 
         /// <summary>
         /// Clears this collection.

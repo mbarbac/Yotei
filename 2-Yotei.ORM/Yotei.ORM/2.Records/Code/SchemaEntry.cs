@@ -21,7 +21,7 @@ public partial class SchemaEntry : ISchemaEntry
     /// <param name="engine"></param>
     /// <param name="range"></param>
     public SchemaEntry(
-        IEngine engine, IEnumerable<IMetadataEntry> range) => Items = new(engine, range);
+        IEngine engine, IEnumerable<IMetadataItem> range) => Items = new(engine, range);
 
     /// <summary>
     /// Initializes a new instance with the given values and metadata.
@@ -36,7 +36,7 @@ public partial class SchemaEntry : ISchemaEntry
         bool? isPrimaryKey = null,
         bool? isUniqueValued = null,
         bool? isReadonly = null,
-        IEnumerable<IMetadataEntry>? range = null)
+        IEnumerable<IMetadataItem>? range = null)
         => Items = new(identifier, isPrimaryKey, isUniqueValued, isReadonly, range);
 
     /// <summary>
@@ -54,7 +54,7 @@ public partial class SchemaEntry : ISchemaEntry
         bool? isPrimaryKey = null,
         bool? isUniqueValued = null,
         bool? isReadonly = null,
-        IEnumerable<IMetadataEntry>? range = null)
+        IEnumerable<IMetadataItem>? range = null)
         => Items = new(engine, identifier, isPrimaryKey, isUniqueValued, isReadonly, range);
 
     /// <summary>
@@ -81,7 +81,7 @@ public partial class SchemaEntry : ISchemaEntry
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public IEnumerator<IMetadataEntry> GetEnumerator() => Items.GetEnumerator();
+    public IEnumerator<IMetadataItem> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     // ------------------------------------------------
@@ -114,7 +114,7 @@ public partial class SchemaEntry : ISchemaEntry
         }
         return targets.Count == 0;
 
-        int FindIndex(string name, List<IMetadataEntry> items)
+        int FindIndex(string name, List<IMetadataItem> items)
         {
             for (int i = 0; i < items.Count; i++)
             {
@@ -242,26 +242,26 @@ public partial class SchemaEntry : ISchemaEntry
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    public IMetadataEntry? Find(string name) => Items.Find(name);
+    public IMetadataItem? Find(string name) => Items.Find(name);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public IMetadataEntry? Find(IEnumerable<string> range) => Items.Find(range);
+    public IMetadataItem? Find(IEnumerable<string> range) => Items.Find(range);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public IMetadataEntry[] ToArray() => Items.ToArray();
+    public IMetadataItem[] ToArray() => Items.ToArray();
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public List<IMetadataEntry> ToList() => Items.ToList();
+    public List<IMetadataItem> ToList() => Items.ToList();
 
     /// <summary>
     /// <inheritdoc/>
@@ -275,7 +275,7 @@ public partial class SchemaEntry : ISchemaEntry
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual ISchemaEntry Add(IMetadataEntry item)
+    public virtual ISchemaEntry Add(IMetadataItem item)
     {
         var builder = CreateBuilder();
         var done = builder.Add(item);
@@ -287,7 +287,7 @@ public partial class SchemaEntry : ISchemaEntry
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual ISchemaEntry AddRange(IEnumerable<IMetadataEntry> range)
+    public virtual ISchemaEntry AddRange(IEnumerable<IMetadataItem> range)
     {
         var builder = CreateBuilder();
         var done = builder.AddRange(range);
@@ -311,7 +311,7 @@ public partial class SchemaEntry : ISchemaEntry
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual ISchemaEntry Remove(Predicate<IMetadataEntry> predicate)
+    public virtual ISchemaEntry Remove(Predicate<IMetadataItem> predicate)
     {
         var builder = CreateBuilder();
         var done = builder.Remove(predicate);
@@ -323,7 +323,7 @@ public partial class SchemaEntry : ISchemaEntry
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual ISchemaEntry RemoveLast(Predicate<IMetadataEntry> predicate)
+    public virtual ISchemaEntry RemoveLast(Predicate<IMetadataItem> predicate)
     {
         var builder = CreateBuilder();
         var done = builder.RemoveLast(predicate);
@@ -335,7 +335,7 @@ public partial class SchemaEntry : ISchemaEntry
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual ISchemaEntry RemoveAll(Predicate<IMetadataEntry> predicate)
+    public virtual ISchemaEntry RemoveAll(Predicate<IMetadataItem> predicate)
     {
         var builder = CreateBuilder();
         var done = builder.RemoveAll(predicate);

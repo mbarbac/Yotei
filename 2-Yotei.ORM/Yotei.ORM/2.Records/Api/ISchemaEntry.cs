@@ -6,7 +6,7 @@
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
 [Cloneable]
-public partial interface ISchemaEntry : IEnumerable<IMetadataEntry>, IEquatable<ISchemaEntry>
+public partial interface ISchemaEntry : IEnumerable<IMetadataItem>, IEquatable<ISchemaEntry>
 {
     /// <summary>
     /// Returns a new builder base upon the contents of this instance.
@@ -70,7 +70,7 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataEntry>, IEquatable<
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    IMetadataEntry? Find(string name);
+    IMetadataItem? Find(string name);
 
     /// <summary>
     /// Returns the metadata entry whose name is one of the given ones (including those that can
@@ -79,19 +79,19 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataEntry>, IEquatable<
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    IMetadataEntry? Find(IEnumerable<string> range);
+    IMetadataItem? Find(IEnumerable<string> range);
 
     /// <summary>
     /// Gets an array with the metadata pairs in this collection.
     /// </summary>
     /// <returns></returns>
-    IMetadataEntry[] ToArray();
+    IMetadataItem[] ToArray();
 
     /// <summary>
     /// Gets a list with the metadata pairs in this collection.
     /// </summary>
     /// <returns></returns>
-    List<IMetadataEntry> ToList();
+    List<IMetadataItem> ToList();
 
     /// <summary>
     /// Trims the internal structures of this collection.
@@ -106,7 +106,7 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataEntry>, IEquatable<
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    ISchemaEntry Add(IMetadataEntry item);
+    ISchemaEntry Add(IMetadataItem item);
 
     /// <summary>
     /// Returns a new instance with the element of the given range added to it.
@@ -114,7 +114,7 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataEntry>, IEquatable<
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    ISchemaEntry AddRange(IEnumerable<IMetadataEntry> range);
+    ISchemaEntry AddRange(IEnumerable<IMetadataItem> range);
 
     /// <summary>
     /// Returns a new instance where the metadata pair whose name is given, or with a name that
@@ -132,7 +132,7 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataEntry>, IEquatable<
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    ISchemaEntry Remove(Predicate<IMetadataEntry> predicate);
+    ISchemaEntry Remove(Predicate<IMetadataItem> predicate);
 
     /// <summary>
     /// Returns a new instance where the last metadata pair that matches the given predicate
@@ -141,7 +141,7 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataEntry>, IEquatable<
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    ISchemaEntry RemoveLast(Predicate<IMetadataEntry> predicate);
+    ISchemaEntry RemoveLast(Predicate<IMetadataItem> predicate);
 
     /// <summary>
     /// Returns a new instance where all the metadata pairs that match the given predicate have
@@ -150,7 +150,7 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataEntry>, IEquatable<
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    ISchemaEntry RemoveAll(Predicate<IMetadataEntry> predicate);
+    ISchemaEntry RemoveAll(Predicate<IMetadataItem> predicate);
 
     /// <summary>
     /// Returns a new instance where all the elements have been removed.

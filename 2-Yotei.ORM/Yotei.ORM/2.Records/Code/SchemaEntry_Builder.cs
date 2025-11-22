@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Runtime.ExceptionServices;
-
-namespace Yotei.ORM.Records.Code;
+﻿namespace Yotei.ORM.Records.Code;
 
 partial class SchemaEntry
 {
@@ -25,7 +22,7 @@ partial class SchemaEntry
         /// <param name="engine"></param>
         /// <param name="range"></param>
         public Builder(
-            IEngine engine, IEnumerable<IMetadataEntry> range) : this(engine) => AddRange(range);
+            IEngine engine, IEnumerable<IMetadataItem> range) : this(engine) => AddRange(range);
 
         /// <summary>
         /// Initializes a new instance with the given values and metadata.
@@ -40,7 +37,7 @@ partial class SchemaEntry
             bool? isPrimaryKey = null,
             bool? isUniqueValued = null,
             bool? isReadonly = null,
-            IEnumerable<IMetadataEntry>? range = null) : this(identifier.ThrowWhenNull().Engine)
+            IEnumerable<IMetadataItem>? range = null) : this(identifier.ThrowWhenNull().Engine)
         {
             Identifier = identifier;
             if (isPrimaryKey is not null) IsPrimaryKey = isPrimaryKey.Value;
@@ -66,7 +63,7 @@ partial class SchemaEntry
             bool? isPrimaryKey = null,
             bool? isUniqueValued = null,
             bool? isReadonly = null,
-            IEnumerable<IMetadataEntry>? range = null) : this(
+            IEnumerable<IMetadataItem>? range = null) : this(
                 ORM.Code.Identifier.Create(engine, identifier),
                 isPrimaryKey,
                 isUniqueValued,
@@ -98,7 +95,7 @@ partial class SchemaEntry
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public IEnumerator<IMetadataEntry> GetEnumerator() => throw null;
+        public IEnumerator<IMetadataItem> GetEnumerator() => throw null;
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         /// <summary>
@@ -135,40 +132,17 @@ partial class SchemaEntry
         public IIdentifier Identifier
         {
             get => throw null;
-            set
-            {
-            }
-        }        
+            set => throw null;
+        }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         public bool IsPrimaryKey
         {
-            get
-            {
-                if (_PrimaryKeyEntry is null)
-                {
-                    var tag = KnownTags.PrimaryKeyTag;
-                    if (tag is not null) _PrimaryKeyEntry = new MetadataEntry(tag.Default, false);
-                }
-                return field;
-            }
-            set
-            {
-                var tag = KnownTags.PrimaryKeyTag;
-                if (tag is not null)
-                {
-                    if (_PrimaryKeyEntry is null)
-                        _PrimaryKeyEntry = new MetadataEntry(tag.Default, false);
-
-                    else if (value != (bool)_PrimaryKeyEntry.Value!)
-                        _PrimaryKeyEntry = new MetadataEntry(_PrimaryKeyEntry.Name, value);
-                }
-                field = value;
-            }
+            get => throw null;
+            set => throw null;
         }
-        IMetadataEntry? _PrimaryKeyEntry;
 
         /// <summary>
         /// <inheritdoc/>
@@ -214,26 +188,26 @@ partial class SchemaEntry
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public IMetadataEntry? Find(string name) => throw null;
+        public IMetadataItem? Find(string name) => throw null;
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="range"></param>
         /// <returns></returns>
-        public IMetadataEntry? Find(IEnumerable<string> range) => throw null;
+        public IMetadataItem? Find(IEnumerable<string> range) => throw null;
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public IMetadataEntry[] ToArray() => throw null;
+        public IMetadataItem[] ToArray() => throw null;
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public List<IMetadataEntry> ToList() => throw null;
+        public List<IMetadataItem> ToList() => throw null;
 
         /// <summary>
         /// <inheritdoc/>
@@ -247,14 +221,14 @@ partial class SchemaEntry
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public virtual bool Add(IMetadataEntry item) => throw null;
+        public virtual bool Add(IMetadataItem item) => throw null;
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="range"></param>
         /// <returns></returns>
-        public virtual bool AddRange(IEnumerable<IMetadataEntry> range) => throw null;
+        public virtual bool AddRange(IEnumerable<IMetadataItem> range) => throw null;
 
         /// <summary>
         /// <inheritdoc/>
@@ -268,20 +242,20 @@ partial class SchemaEntry
         /// </summary>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        public virtual bool Remove(Predicate<IMetadataEntry> predicate) => throw null;
+        public virtual bool Remove(Predicate<IMetadataItem> predicate) => throw null;
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        public virtual bool RemoveLast(Predicate<IMetadataEntry> predicate) => throw null;
+        public virtual bool RemoveLast(Predicate<IMetadataItem> predicate) => throw null;
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        public virtual bool RemoveAll(Predicate<IMetadataEntry> predicate) => throw null;
+        public virtual bool RemoveAll(Predicate<IMetadataItem> predicate) => throw null;
 
         /// <summary>
         /// <inheritdoc/>

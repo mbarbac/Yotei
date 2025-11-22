@@ -1,6 +1,6 @@
 ﻿using Tag = Yotei.ORM.Records.Code.MetadataTag;
 using Entry = Yotei.ORM.Records.Code.SchemaEntry;
-using Pair = Yotei.ORM.Records.Code.MetadataEntry;
+using Pair = Yotei.ORM.Records.Code.MetadataItem;
 
 namespace Yotei.ORM.Tests.Records;
 
