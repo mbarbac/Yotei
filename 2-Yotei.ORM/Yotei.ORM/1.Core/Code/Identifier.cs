@@ -74,7 +74,7 @@ public static class Identifier
             var tvalue = target[^(i + 1)].RawValue; if (tvalue is null) continue;
             var svalue = source[^(i + 1)].RawValue;
 
-            if (string.Compare(svalue, tvalue, !engine.CaseSensitiveNames) != 0) return false;
+            if (!engine.SameNames(svalue, tvalue)) return false;
         }
 
         // Finishing...

@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices.Marshalling;
-using StrSpan = System.ReadOnlySpan<char>;
+﻿using StrSpan = System.ReadOnlySpan<char>;
 namespace Yotei.ORM.Code;
 
 partial class CommandInfo

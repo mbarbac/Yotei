@@ -58,3 +58,33 @@ public partial interface IEngine : IEquatable<IEngine>
     /// </summary>
     [With] IKnownTags KnownTags { get; }
 }
+
+// ========================================================
+public static class IEngineExtensions
+{
+    /// <summary>
+    /// Determines if, according to this engine, the two given names are the same, or not.
+    /// </summary>
+    /// <param name="engine"></param>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <returns></returns>
+    public static bool SameNames(this IEngine engine, string? x, string? y)
+    {
+        engine.ThrowWhenNull();
+        return string.Compare(x, y, !engine.CaseSensitiveNames) == 0;
+    }
+
+    /// <summary>
+    /// Determines if, according to this engine, the two given tag names are the same, or not.
+    /// </summary>
+    /// <param name="engine"></param>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <returns></returns>
+    public static bool SameTagNames(this IEngine engine, string? x, string? y)
+    {
+        engine.ThrowWhenNull();
+        return string.Compare(x, y, !engine.KnownTags.CaseSensitiveTags) == 0;
+    }
+}

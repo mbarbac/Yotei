@@ -2,7 +2,6 @@
 using IHost = Yotei.ORM.IParameterList;
 using IItem = Yotei.ORM.IParameter;
 using TKey = string;
-using System.CodeDom.Compiler;
 
 namespace Yotei.ORM.Code;
 

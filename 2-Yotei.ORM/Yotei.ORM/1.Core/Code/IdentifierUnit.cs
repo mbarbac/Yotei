@@ -35,7 +35,7 @@ public class IdentifierUnit : IIdentifierUnit
         if (ReferenceEquals(this, other)) return true;
         if (other is null) return false;
 
-        return string.Compare(Value, other.Value, !Engine.CaseSensitiveNames) == 0;
+        return Engine.SameNames(Value, other.Value);
     }
 
     /// <summary>

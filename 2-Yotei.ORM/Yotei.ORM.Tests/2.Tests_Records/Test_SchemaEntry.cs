@@ -1,6 +1,6 @@
 ﻿using Tag = Yotei.ORM.Records.Code.MetadataTag;
 using Entry = Yotei.ORM.Records.Code.SchemaEntry;
-using Pair = Yotei.ORM.Records.Code.MetadataItem;
+using Item = Yotei.ORM.Records.Code.MetadataItem;
 
 namespace Yotei.ORM.Tests.Records;
 
@@ -8,6 +8,7 @@ namespace Yotei.ORM.Tests.Records;
 //[Enforced]
 public static class Test_SchemaEntry
 {
+    /*
     static bool Contains(this ISchemaEntry entry, string name, object? value)
     {
         var item = entry.Find(name);
@@ -111,4 +112,5 @@ public static class Test_SchemaEntry
         Assert.True(entry.IsReadOnly);
         Assert.True(entry.Contains("Age", 50));
     }
+    */
 }

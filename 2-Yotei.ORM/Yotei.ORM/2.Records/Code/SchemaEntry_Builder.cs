@@ -1,4 +1,8 @@
-﻿namespace Yotei.ORM.Records.Code;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Net.NetworkInformation;
+using System.Reflection.Metadata.Ecma335;
+
+namespace Yotei.ORM.Records.Code;
 
 partial class SchemaEntry
 {
@@ -111,18 +115,17 @@ partial class SchemaEntry
         /// </summary>
         public IEngine Engine { get; }
         IKnownTags KnownTags => Engine.KnownTags;
-        bool CaseSensitiveTags => KnownTags.CaseSensitiveTags;
-        bool CaseSensitiveNames => Engine.CaseSensitiveNames;
 
-        /// <summary>
-        /// Determines if the two tag names are equal or not.
-        /// </summary>
-        bool SameTagNames(string x, string y) => string.Compare(x, y, !CaseSensitiveTags) == 0;
-
-        /// <summary>
-        /// Determines if the two element names are equal or not.
-        /// </summary>
-        bool SameNameValues(string x, string y) => string.Compare(x, y, !CaseSensitiveNames) == 0;
+        static void UnderLock(ref bool obj, Action action)
+        {
+            if (obj) return;
+            try
+            {
+                obj = true;
+                action();
+            }
+            finally { obj = false; }
+        }
 
         // ------------------------------------------------
 
@@ -131,9 +134,14 @@ partial class SchemaEntry
         /// </summary>
         public IIdentifier Identifier
         {
-            get => throw null;
-            set => throw null;
+            get => field;
+            set => field = value;
         }
+
+        // ------------------------------------------------
+
+        bool PrimaryLockRepo;
+        bool PrimaryLockItem;
 
         /// <summary>
         /// <inheritdoc/>
@@ -141,25 +149,90 @@ partial class SchemaEntry
         public bool IsPrimaryKey
         {
             get => throw null;
-            set => throw null;
+            set
+            {
+                var tag = KnownTags.PrimaryKeyTag;
+                if (tag is not null)
+                    UnderLock(ref PrimaryLockRepo, () => PrimaryKeyRepo = value);
+
+                field = value;
+            }
         }
+
+        bool? PrimaryKeyRepo
+        {
+            get => throw null;
+            set
+            {
+                var tag = KnownTags.PrimaryKeyTag;
+                if (field is null && tag is not null)
+                {
+                    UnderLock(ref PrimaryLockRepo, () =>
+                    {
+                        IsPrimaryKey = value is not null && (bool)value;
+                    });
+                    UnderLock(ref PrimaryLockItem, () =>
+                    {
+                        if (value is null) PrimaryKeyItem = null;
+                        else
+                        {
+                            if (PrimaryKeyItem is null)
+                                PrimaryKeyItem = new MetadataItem(tag.Default, value);
+
+                            else if (value != (bool)PrimaryKeyItem.Value!)
+                                PrimaryKeyItem = new MetadataItem(PrimaryKeyItem.Name, value);
+                        }
+                    });
+                }
+
+                field = value;
+            }
+        }
+        IMetadataItem? PrimaryKeyItem
+        {
+            get
+            {
+                var tag = KnownTags.PrimaryKeyTag;
+                if (field is null && tag is not null)
+                    field = new MetadataItem(tag.Default, IsPrimaryKey);
+
+                return field;
+            }
+            set
+            {
+                var tag = KnownTags.PrimaryKeyTag;
+                if (field is null && tag is not null) UnderLock(ref PrimaryLockItem, () =>
+                {
+                    PrimaryKeyRepo = value is null
+                        ? null
+                        : (bool)value.Value!;
+                });
+
+                field = value;
+            }
+        }
+
+
+        // ------------------------------------------------
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         public bool IsUniqueValued
         {
-            get => throw null;
-            set => throw null;
+            get => field;
+            set => field = value;
         }
+
+        // ------------------------------------------------
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         public bool IsReadOnly
         {
-            get => throw null;
-            set => throw null;
+            get => field;
+            set => field = value;
         }
 
         // ------------------------------------------------
