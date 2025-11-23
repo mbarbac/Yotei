@@ -165,6 +165,28 @@ partial class IdentifierTags
             });
         }
 
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public IItem? Find(string name)
+        {
+            var index = IndexOf(name);
+            return index >= 0 ? this[index] : null;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="range"></param>
+        /// <returns></returns>
+        public IItem? Find(IEnumerable<string> range)
+        {
+            var index = IndexOf(range);
+            return index >= 0 ? this[index] : null;
+        }
+
         // ----------------------------------------------------
 
         /// <summary>

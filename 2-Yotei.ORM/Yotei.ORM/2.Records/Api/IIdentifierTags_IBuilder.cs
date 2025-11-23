@@ -60,6 +60,21 @@ partial interface IIdentifierTags
         /// <returns></returns>
         int IndexOf(IEnumerable<string> range);
 
+        /// <summary>
+        /// Returns the collection of tag names the given one belongs to, or null if any.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        IItem? Find(string name);
+
+        /// <summary>
+        /// Returns the collection of tag names the first match on the given onea belongs to, or
+        /// null if any.
+        /// </summary>
+        /// <param name="range"></param>
+        /// <returns></returns>
+        IItem? Find(IEnumerable<string> range);
+
         // ----------------------------------------------------
 
         /// <summary>

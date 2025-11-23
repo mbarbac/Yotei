@@ -17,12 +17,12 @@ public partial interface IMetadataItem : IEquatable<IMetadataItem>
     bool Equals(IMetadataItem? other, bool caseSensitiveTags);
 
     /// <summary>
-    /// The name by which this metadata entry is known.
+    /// The name by which this metadata item is known.
     /// </summary>
     [With] string Name { get; }
 
     /// <summary>
-    /// The value carried by this entry.
+    /// The value carried by this metadata item.
     /// </summary>
     [With] object? Value { get; }
 }

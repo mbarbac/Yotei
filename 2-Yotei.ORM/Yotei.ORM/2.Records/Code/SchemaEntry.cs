@@ -178,8 +178,6 @@ public partial class SchemaEntry : ISchemaEntry
     /// </summary>
     public IEngine Engine => Items.Engine;
 
-    // ------------------------------------------------
-
     /// <summary>
     /// <inheritdoc/>
     /// </summary>

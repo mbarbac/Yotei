@@ -1,6 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.Net.NetworkInformation;
-using System.Reflection.Metadata.Ecma335;
+﻿using System.Composition;
 
 namespace Yotei.ORM.Records.Code;
 
@@ -18,7 +16,14 @@ partial class SchemaEntry
         /// Initializes a new empty instance.
         /// </summary>
         /// <param name="engine"></param>
-        public Builder(IEngine engine) => Engine = engine.ThrowWhenNull();
+        public Builder(IEngine engine)
+        {
+            Engine = engine.ThrowWhenNull();
+            Identifier = new IdentifierUnit(Engine);
+            IsPrimaryKey = false;
+            IsUniqueValued = false;
+            IsReadOnly = false;
+        }
 
         /// <summary>
         /// Initializes a new instance with the given metadata pairs.
@@ -41,12 +46,13 @@ partial class SchemaEntry
             bool? isPrimaryKey = null,
             bool? isUniqueValued = null,
             bool? isReadonly = null,
-            IEnumerable<IMetadataItem>? range = null) : this(identifier.ThrowWhenNull().Engine)
+            IEnumerable<IMetadataItem>? range = null)
         {
+            Engine = identifier.ThrowWhenNull().Engine;
             Identifier = identifier;
-            if (isPrimaryKey is not null) IsPrimaryKey = isPrimaryKey.Value;
-            if (isUniqueValued is not null) IsUniqueValued = isUniqueValued.Value;
-            if (isReadonly is not null) IsReadOnly = isReadonly.Value;
+            IsPrimaryKey = isPrimaryKey is not null && isPrimaryKey.Value;
+            IsUniqueValued = isUniqueValued is not null && isUniqueValued.Value;
+            IsReadOnly = isReadonly is not null && isReadonly.Value;
 
             if (range is not null)
                 foreach (var item in range) Add(item);
@@ -79,7 +85,15 @@ partial class SchemaEntry
         /// Copy constructor.
         /// </summary>
         /// <param name="source"></param>
-        protected Builder(Builder source) => throw null;
+        protected Builder(Builder source)
+        {
+            Engine = source.ThrowWhenNull().Engine;
+            Identifier = source.Identifier;
+            IsPrimaryKey = source.IsPrimaryKey;
+            IsUniqueValued = source.IsUniqueValued;
+            IsReadOnly = source.IsReadOnly;
+            Others.AddRange(source.Others);
+        }
 
         /// <summary>
         /// <inheritdoc/>
@@ -91,24 +105,54 @@ partial class SchemaEntry
         /// Returns a string representation of this instance suitable for debug purposes, with
         /// at most the given number of elements.
         /// </summary>
-        /// <param name="max"></param>
+        /// <param name="count"></param>
         /// <returns></returns>
-        public virtual string ToDebugString(int max) => throw null;
+        public virtual string ToDebugString(int count)
+        {
+            var sb = new StringBuilder();
+
+            sb.Append(Identifier.Value ?? "-");
+            if (IsPrimaryKey) sb.Append(", Primary");
+            if (IsUniqueValued) sb.Append(", Unique");
+            if (IsReadOnly) sb.Append(", ReadOnly");
+
+            foreach (var item in Others)
+            {
+                if (count <= 0) break;
+                count--;
+                sb.Append($", {item.Name}='{item.Value.Sketch()}'");
+            }
+
+            return sb.ToString();
+        }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public IEnumerator<IMetadataItem> GetEnumerator() => throw null;
+        public IEnumerator<IMetadataItem> GetEnumerator()
+        {
+            var items = IdentifierItems;
+            if (items is not null) foreach (var item in items) yield return item;
+
+            if (PrimaryKeyItem is not null) yield return PrimaryKeyItem;
+            if (UniqueValuedItem is not null) yield return UniqueValuedItem;
+            if (ReadOnlyItem is not null) yield return ReadOnlyItem;
+
+            foreach (var item in Others) yield return item;
+        }
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public virtual ISchemaEntry CreateInstance() => throw null;
+        public virtual ISchemaEntry CreateInstance()
+            => Count == 0 ? new SchemaEntry(Engine) : new SchemaEntry(Engine, this);
 
         // ------------------------------------------------
+
+        readonly List<IMetadataItem> Others = [];
 
         /// <summary>
         /// <inheritdoc/>
@@ -116,15 +160,61 @@ partial class SchemaEntry
         public IEngine Engine { get; }
         IKnownTags KnownTags => Engine.KnownTags;
 
-        static void UnderLock(ref bool obj, Action action)
+        /// <summary>
+        /// Determines if the name of the given item matches the given one, or not.
+        /// </summary>
+        bool Match(IMetadataItem? item, string name)
         {
-            if (obj) return;
-            try
+            if (item is not null && name is not null)
             {
-                obj = true;
-                action();
+                var tag = KnownTags.Find(name);
+                if (tag is not null)
+                {
+                    foreach (var tagname in tag)
+                        if (Engine.SameTagNames(name, tagname)) return true;
+                }
             }
-            finally { obj = false; }
+            return false;
+        }
+
+        /// <summary>
+        /// Determines if the name of the given item matches any of the given ones, or not.
+        /// </summary>
+        bool Match(IMetadataItem? item, IEnumerable<string> range)
+        {
+            if (item is not null && range is not null)
+            {
+                foreach (var name in range) if (Match(item, name)) return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Gets the index of the first element whose name matches the given one, or -1 if any
+        /// is found.
+        /// </summary>
+        int IndexOf(List<IMetadataItem>? items, string name)
+        {
+            if (items is not null && name is not null)
+            {
+                var index = items.FindIndex(x => Match(x, name));
+                if (index >= 0) return index;
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// Gets the index of the first element whose name matches any of the given ones, or -1
+        /// if any is found.
+        /// </summary>
+        int IndexOf(List<IMetadataItem>? items, IEnumerable<string> range)
+        {
+            if (items is not null && range is not null)
+            {
+                var index = items.FindIndex(x => Match(x, range));
+                if (index >= 0) return index;
+            }
+            return -1;
         }
 
         // ------------------------------------------------
@@ -132,16 +222,21 @@ partial class SchemaEntry
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
+        /// REPO getter with no side effects.
+        /// ITEM setter with no side effects.
         public IIdentifier Identifier
         {
-            get => field;
-            set => field = value;
+            get => throw null;
+            set => throw null;
         }
+        List<IMetadataItem>? IdentifierItems
+        {
+            get => throw null;
+            set => throw null;
+        }
+        bool IdentifierValid;
 
         // ------------------------------------------------
-
-        bool PrimaryLockRepo;
-        bool PrimaryLockItem;
 
         /// <summary>
         /// <inheritdoc/>
@@ -149,69 +244,14 @@ partial class SchemaEntry
         public bool IsPrimaryKey
         {
             get => throw null;
-            set
-            {
-                var tag = KnownTags.PrimaryKeyTag;
-                if (tag is not null)
-                    UnderLock(ref PrimaryLockRepo, () => PrimaryKeyRepo = value);
-
-                field = value;
-            }
-        }
-
-        bool? PrimaryKeyRepo
-        {
-            get => throw null;
-            set
-            {
-                var tag = KnownTags.PrimaryKeyTag;
-                if (field is null && tag is not null)
-                {
-                    UnderLock(ref PrimaryLockRepo, () =>
-                    {
-                        IsPrimaryKey = value is not null && (bool)value;
-                    });
-                    UnderLock(ref PrimaryLockItem, () =>
-                    {
-                        if (value is null) PrimaryKeyItem = null;
-                        else
-                        {
-                            if (PrimaryKeyItem is null)
-                                PrimaryKeyItem = new MetadataItem(tag.Default, value);
-
-                            else if (value != (bool)PrimaryKeyItem.Value!)
-                                PrimaryKeyItem = new MetadataItem(PrimaryKeyItem.Name, value);
-                        }
-                    });
-                }
-
-                field = value;
-            }
+            set => throw null;
         }
         IMetadataItem? PrimaryKeyItem
         {
-            get
-            {
-                var tag = KnownTags.PrimaryKeyTag;
-                if (field is null && tag is not null)
-                    field = new MetadataItem(tag.Default, IsPrimaryKey);
-
-                return field;
-            }
-            set
-            {
-                var tag = KnownTags.PrimaryKeyTag;
-                if (field is null && tag is not null) UnderLock(ref PrimaryLockItem, () =>
-                {
-                    PrimaryKeyRepo = value is null
-                        ? null
-                        : (bool)value.Value!;
-                });
-
-                field = value;
-            }
+            get => throw null;
+            set => throw null;
         }
-
+        bool PrimaryKeyValid;
 
         // ------------------------------------------------
 
@@ -220,9 +260,15 @@ partial class SchemaEntry
         /// </summary>
         public bool IsUniqueValued
         {
-            get => field;
-            set => field = value;
+            get => throw null;
+            set => throw null;
         }
+        IMetadataItem? UniqueValuedItem
+        {
+            get => throw null;
+            set => throw null;
+        }
+        bool UniqueValuedValid;
 
         // ------------------------------------------------
 
@@ -231,9 +277,15 @@ partial class SchemaEntry
         /// </summary>
         public bool IsReadOnly
         {
-            get => field;
-            set => field = value;
+            get => throw null;
+            set => throw null;
         }
+        IMetadataItem? ReadOnlyItem
+        {
+            get => throw null;
+            set => throw null;
+        }
+        bool ReadOnlyValid;
 
         // ------------------------------------------------
 
@@ -261,14 +313,27 @@ partial class SchemaEntry
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public IMetadataItem? Find(string name) => throw null;
+        public IMetadataItem? Find(string name)
+        {
+            throw null;
+        }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="range"></param>
         /// <returns></returns>
-        public IMetadataItem? Find(IEnumerable<string> range) => throw null;
+        public IMetadataItem? Find(IEnumerable<string> range)
+        {
+            range.ThrowWhenNull();
+
+            foreach (var name in range)
+            {
+                var item = Find(name);
+                if (item is not null) return item;
+            }
+            return null;
+        }
 
         /// <summary>
         /// <inheritdoc/>
@@ -294,7 +359,62 @@ partial class SchemaEntry
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public virtual bool Add(IMetadataItem item) => throw null;
+        public virtual bool Add(IMetadataItem item)
+        {
+            IMetadataTag? tag;
+            IMetadataItem? temp;
+            int index;
+
+            item.ThrowWhenNull();
+
+            // No duplicates interception for well-known identifiers...
+            tag = KnownTags.IdentifierTags.Find(item.Name);
+            if (tag is not null)
+            {
+                if (item.Value is not null and not string) throw new ArgumentException(
+                    "Value of 'Identifier' element must be null or string.")
+                    .WithData(item);
+
+                index = IndexOf(IdentifierItems, item.Name);
+                temp = index < 0 ? null : IdentifierItems![index];
+                if (temp is null)
+                {
+                    IdentifierItems!.Add(item);
+                    IdentifierValid = false;
+                    return true;
+                }
+
+                if (!Engine.SameNames((string?)temp.Value, (string?)item.Value) ||
+                    !Engine.SameTagNames(temp.Name, item.Name))
+                {
+                    IdentifierItems!.Remove(temp);
+                    IdentifierItems!.Add(item);
+                    IdentifierValid = false;
+                    return true;
+                }
+
+                return false;
+            }
+
+            // No duplicates interception for well-known primary key...
+            // TODO: PrimaryKey
+
+            // No duplicates interception for well-known unique value...
+            // TODO: UniqueValued
+
+            // No duplicates interception for well-known read only...
+            // TODO: ReadOnly
+
+            // Duplicated names not allowed for not well-known items....
+            index = IndexOf(Others, item.Name);
+            if (index >= 0) throw new DuplicateException(
+                "This instance already carries an element with the given tag name.")
+                .WithData(item)
+                .WithData(this);
+
+            Others.Add(item);
+            return true;
+        }
 
         /// <summary>
         /// <inheritdoc/>
@@ -316,6 +436,7 @@ partial class SchemaEntry
         /// <param name="predicate"></param>
         /// <returns></returns>
         public virtual bool Remove(Predicate<IMetadataItem> predicate) => throw null;
+
         /// <summary>
         /// <inheritdoc/>
         /// </summary>

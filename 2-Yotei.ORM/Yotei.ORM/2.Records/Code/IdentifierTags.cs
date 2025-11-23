@@ -140,6 +140,20 @@ public partial class IdentifierTags : IHost
     /// <returns></returns>
     public int IndexOf(IEnumerable<string> range) => Items.IndexOf(range);
 
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public IItem? Find(string name) => Items.Find(name);
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="range"></param>
+    /// <returns></returns>
+    public IItem? Find(IEnumerable<string> range) => Items.Find(range);
+
     // ----------------------------------------------------
 
     /// <summary>
