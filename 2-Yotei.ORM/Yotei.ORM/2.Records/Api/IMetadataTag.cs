@@ -34,9 +34,9 @@ public partial interface IMetadataTag : IEnumerable<string>, IEquatable<IMetadat
     /// <summary>
     /// Determines if this instance contains the given tag name, or not.
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="tagname"></param>
     /// <returns></returns>
-    bool Contains(string name);
+    bool Contains(string tagname);
 
     /// <summary>
     /// Determines if this instance contains any tag name in the given range, or not.
@@ -69,18 +69,18 @@ public partial interface IMetadataTag : IEnumerable<string>, IEquatable<IMetadat
     /// by the new given one.
     /// <br/> Returns the original instance if no changes were made.
     /// </summary>
-    /// <param name="oldname"></param>
-    /// <param name="newname"></param>
+    /// <param name="oldtagname"></param>
+    /// <param name="newtagname"></param>
     /// <returns></returns>
-    IMetadataTag Replace(string oldname, string newname);
+    IMetadataTag Replace(string oldtagname, string newtagname);
 
     /// <summary>
     /// Returns a new instance with the given name added to the collection.
     /// <br/> Returns the original instance if no changes were made.
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="tagname"></param>
     /// <returns></returns>
-    IMetadataTag Add(string name);
+    IMetadataTag Add(string tagname);
 
     /// <summary>
     /// Returns a new instance with the names of the given range added to the collection.
@@ -94,9 +94,9 @@ public partial interface IMetadataTag : IEnumerable<string>, IEquatable<IMetadat
     /// Returns a new instance where the given name has been removed.
     /// <br/> Returns the original instance if no changes were made.
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="tagname"></param>
     /// <returns></returns>
-    IMetadataTag Remove(string name);
+    IMetadataTag Remove(string tagname);
 
     /// <summary>
     /// Returns a new instance with all the elements removed.

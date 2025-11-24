@@ -13,7 +13,7 @@ public static class Test_Identifier
         IIdentifierChain chain;
         var engine = new FakeEngine();
 
-        item = Identifier.Create(engine, null);
+        item = Identifier.Create(engine, (string?)null);
         part = Assert.IsType<IdentifierUnit>(item);
         Assert.Null(part.Value);
 
@@ -39,7 +39,7 @@ public static class Test_Identifier
         IIdentifierChain chain;
         var engine = new FakeEngine();
 
-        item = Identifier.CreateRange(engine, ["aa", "bb"]);
+        item = Identifier.Create(engine, ["aa", "bb"]);
         chain = Assert.IsType<IdentifierChain>(item);
         Assert.Equal("[aa].[bb]", chain.Value);
     }

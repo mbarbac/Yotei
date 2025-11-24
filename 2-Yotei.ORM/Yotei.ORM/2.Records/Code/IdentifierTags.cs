@@ -115,9 +115,9 @@ public partial class IdentifierTags : IHost
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="tagname"></param>
     /// <returns></returns>
-    public bool Contains(string name) => Items.Contains(name);
+    public bool Contains(string tagname) => Items.Contains(tagname);
 
     /// <summary>
     /// <inheritdoc/>
@@ -129,9 +129,9 @@ public partial class IdentifierTags : IHost
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="tagname"></param>
     /// <returns></returns>
-    public int IndexOf(string name) => Items.IndexOf(name);
+    public int IndexOf(string tagname) => Items.IndexOf(tagname);
 
     /// <summary>
     /// <inheritdoc/>
@@ -143,9 +143,9 @@ public partial class IdentifierTags : IHost
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="tagname"></param>
     /// <returns></returns>
-    public IItem? Find(string name) => Items.Find(name);
+    public IItem? Find(string tagname) => Items.Find(tagname);
 
     /// <summary>
     /// <inheritdoc/>
@@ -159,12 +159,12 @@ public partial class IdentifierTags : IHost
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="tagname"></param>
     /// <returns></returns>
-    public virtual IHost Remove(string name)
+    public virtual IHost Remove(string tagname)
     {
         var builder = CreateBuilder();
-        var done = builder.Remove(name);
+        var done = builder.Remove(tagname);
         return done ? builder.CreateInstance() : this;
     }
 }

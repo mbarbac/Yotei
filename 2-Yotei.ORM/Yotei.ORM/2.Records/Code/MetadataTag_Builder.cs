@@ -15,11 +15,11 @@ partial class MetadataTag
         /// Initializes a new instance with the given default tag name.
         /// </summary>
         /// <param name="sensitive"></param>
-        /// <param name="name"></param>
-        public Builder(bool sensitive, string name)
+        /// <param name="tagname"></param>
+        public Builder(bool sensitive, string tagname)
         {
             CaseSensitiveTags = sensitive;
-            Items = [Validate(name)];
+            Items = [Validate(tagname)];
         }
 
         /// <summary>
@@ -85,9 +85,9 @@ partial class MetadataTag
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="tagname"></param>
         /// <returns></returns>
-        public bool Contains(string name) => IndexOf(Validate(name)) >= 0;
+        public bool Contains(string tagname) => IndexOf(Validate(tagname)) >= 0;
 
         /// <summary>
         /// <inheritdoc/>
@@ -124,19 +124,19 @@ partial class MetadataTag
         /// <summary>
         /// Invoked to validate the given tag name.
         /// </summary>
-        static string Validate(string name) => name.NotNullNotEmpty(true);
+        static string Validate(string tagname) => tagname.NotNullNotEmpty(true);
 
         /// <summary>
         /// Determines if the two given tag names can be considered equal, or not.
         /// </summary>
-        bool AreEqual(string x, string y) => string.Compare(x, y, !CaseSensitiveTags) == 0;
+        bool AreEqual(string tagx, string tagy) => string.Compare(tagx, tagy, !CaseSensitiveTags) == 0;
 
         /// <summary>
         /// Returns the internal index associated with the given name, or -1 if any.
         /// </summary>
-        int IndexOf(string name)
+        int IndexOf(string tagname)
         {
-            for (int i = 0; i < Items.Count; i++) if (AreEqual(name, Items[i])) return i;
+            for (int i = 0; i < Items.Count; i++) if (AreEqual(tagname, Items[i])) return i;
             return -1;
         }
 
@@ -145,28 +145,28 @@ partial class MetadataTag
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        /// <param name="oldname"></param>
-        /// <param name="newname"></param>
+        /// <param name="oldtagname"></param>
+        /// <param name="newtagname"></param>
         /// <returns></returns>
-        public virtual bool Replace(string oldname, string newname)
+        public virtual bool Replace(string oldtagname, string newtagname)
         {
-            oldname = Validate(oldname);
-            newname = Validate(newname);
-            if (AreEqual(oldname, newname)) return false;
+            oldtagname = Validate(oldtagname);
+            newtagname = Validate(newtagname);
+            if (AreEqual(oldtagname, newtagname)) return false;
 
             // Replacing source element, if any...
-            var index = IndexOf(oldname);
+            var index = IndexOf(oldtagname);
             if (index >= 0)
             {
                 Items.RemoveAt(index);
 
-                var temp = IndexOf(newname);
+                var temp = IndexOf(newtagname);
                 if (temp >= 0) throw new DuplicateException(
                     "Metadata name is already in this collection.")
-                    .WithData(newname)
+                    .WithData(newtagname)
                     .WithData(this);
 
-                Items.Insert(index, newname);
+                Items.Insert(index, newtagname);
                 return true;
             }
 
@@ -177,17 +177,17 @@ partial class MetadataTag
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="tagname"></param>
         /// <returns></returns>
-        public virtual bool Add(string name)
+        public virtual bool Add(string tagname)
         {
-            var index = IndexOf(name = Validate(name));
+            var index = IndexOf(tagname = Validate(tagname));
             if (index >= 0) throw new DuplicateException(
                 "Metadata name is already in this collection.")
-                .WithData(name)
+                .WithData(tagname)
                 .WithData(this);
 
-            Items.Add(name);
+            Items.Add(tagname);
             return true;
         }
 
@@ -208,16 +208,16 @@ partial class MetadataTag
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="tagname"></param>
         /// <returns></returns>
-        public virtual bool Remove(string name)
+        public virtual bool Remove(string tagname)
         {
-            var index = IndexOf(Validate(name));
+            var index = IndexOf(Validate(tagname));
             if (index >= 0)
             {
                 if (Count == 1) throw new InvalidOperationException(
                     "Cannot remove the unique remaining tag name.")
-                    .WithData(name)
+                    .WithData(tagname)
                     .WithData(this);
 
                 Items.RemoveAt(index);

@@ -34,9 +34,9 @@ public partial interface IIdentifierTags
     /// <summary>
     /// Determines if this collection contains the given tag name, or not.
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="tagname"></param>
     /// <returns></returns>
-    bool Contains(string name);
+    bool Contains(string tagname);
 
     /// <summary>
     /// Determines if this collection contains any tag name in the given range, or not.
@@ -49,9 +49,9 @@ public partial interface IIdentifierTags
     /// Gets the index of the element in this collection that carries the given tag name, or
     /// -1 if any.
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="tagname"></param>
     /// <returns></returns>
-    int IndexOf(string name);
+    int IndexOf(string tagname);
 
     /// <summary>
     /// Gets the index of the first element in this collection that carries any of the tag names
@@ -64,9 +64,9 @@ public partial interface IIdentifierTags
     /// <summary>
     /// Returns the collection of tag names the given one belongs to, or null if any.
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="tagname"></param>
     /// <returns></returns>
-    IItem? Find(string name);
+    IItem? Find(string tagname);
 
     /// <summary>
     /// Returns the collection of tag names the first match on the given onea belongs to, or
@@ -82,7 +82,7 @@ public partial interface IIdentifierTags
     /// Returns a new instance where the element that carries the given tag name has been removed.
     /// <br/> Returns the original instance if no changes have been made.
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="tagname"></param>
     /// <returns></returns>
-    IHost Remove(string name);
+    IHost Remove(string tagname);
 }

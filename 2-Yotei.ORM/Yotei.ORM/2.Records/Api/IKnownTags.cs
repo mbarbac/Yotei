@@ -56,9 +56,9 @@ public partial interface IKnownTags : IEnumerable<IMetadataTag>, IEquatable<IKno
     /// <summary>
     /// Determines if this collection contains a tag that carries the given name.
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="tagname"></param>
     /// <returns></returns>
-    bool Contains(string name);
+    bool Contains(string tagname);
 
     /// <summary>
     /// Determines if this collection contains any of the tag names in the given range.
@@ -70,9 +70,9 @@ public partial interface IKnownTags : IEnumerable<IMetadataTag>, IEquatable<IKno
     /// <summary>
     /// Returns the tag that contains the given name, or null if any.
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="tagname"></param>
     /// <returns></returns>
-    IMetadataTag? Find(string name);
+    IMetadataTag? Find(string tagname);
 
     // ----------------------------------------------------
 

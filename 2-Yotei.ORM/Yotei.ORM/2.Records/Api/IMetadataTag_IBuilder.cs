@@ -33,9 +33,9 @@ partial interface IMetadataTag
         /// <summary>
         /// Determines if this instance contains the given tag name, or not.
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="tagname"></param>
         /// <returns></returns>
-        bool Contains(string name);
+        bool Contains(string tagname);
 
         /// <summary>
         /// Determines if this instance contains any tag name in the given range, or not.
@@ -67,18 +67,18 @@ partial interface IMetadataTag
         /// Replaces the specified original tag name with the new given one.
         /// <br/> Returns whether changes have been made or not.
         /// </summary>
-        /// <param name="oldname"></param>
-        /// <param name="newname"></param>
+        /// <param name="oldtagname"></param>
+        /// <param name="newtagname"></param>
         /// <returns></returns>
-        bool Replace(string oldname, string newname);
+        bool Replace(string oldtagname, string newtagname);
 
         /// <summary>
         /// Adds the given name to this instance.
         /// <br/> Returns whether changes have been made or not.
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="tagname"></param>
         /// <returns></returns>
-        bool Add(string name);
+        bool Add(string tagname);
 
         /// <summary>
         /// Adds the names from the given range to this instance.
@@ -92,9 +92,9 @@ partial interface IMetadataTag
         /// Removes from this instance the given name, if possible.
         /// <br/> Returns whether changes have been made or not.
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="tagname"></param>
         /// <returns></returns>
-        bool Remove(string name);
+        bool Remove(string tagname);
 
         /// <summary>
         /// Clears this instance, keeping a default name.

@@ -44,7 +44,8 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataItem>, IEquatable<I
     // ------------------------------------------------
 
     /// <summary>
-    /// Provides a point estimate of the number of metadata pairs in this collection.
+    /// Provides an estimate of the number of internal slots consumed by the  metadata pairs in
+    /// this collection.
     /// </summary>
     int Count { get; }
 
@@ -52,9 +53,9 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataItem>, IEquatable<I
     /// Determines if this instance contains a metadata pair with the given name, or with a name
     /// that can be associated to it via the well-known multi-name metadata tags.
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="tagname"></param>
     /// <returns></returns>
-    bool Contains(string name);
+    bool Contains(string tagname);
 
     /// <summary>
     /// Determines if this instance contains a metadata pair with the a name in the given range,
@@ -68,9 +69,9 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataItem>, IEquatable<I
     /// Returns the metadata entry whose name is given (including those that can be associated
     /// to it via the well-known multi-name metadata taga), or null if it cannot be found.
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="tagname"></param>
     /// <returns></returns>
-    IMetadataItem? Find(string name);
+    IMetadataItem? Find(string tagname);
 
     /// <summary>
     /// Returns the metadata entry whose name is one of the given ones (including those that can
@@ -92,11 +93,6 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataItem>, IEquatable<I
     /// </summary>
     /// <returns></returns>
     List<IMetadataItem> ToList();
-
-    /// <summary>
-    /// Trims the internal structures of this collection.
-    /// </summary>
-    void Trim();
 
     // ----------------------------------------------------
 
@@ -121,9 +117,9 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataItem>, IEquatable<I
     /// can be associated to it via the well-known multi-name metadata tags, has been removed.
     /// <br/> Returns the original instance if no changes have veen made.
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="tagname"></param>
     /// <returns></returns>
-    ISchemaEntry Remove(string name);
+    ISchemaEntry Remove(string tagname);
 
     /// <summary>
     /// Returns a new instance where the first metadata pair that matches the given predicate

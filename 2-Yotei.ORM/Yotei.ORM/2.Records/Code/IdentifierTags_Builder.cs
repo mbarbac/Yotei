@@ -127,9 +127,9 @@ partial class IdentifierTags
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="tagname"></param>
         /// <returns></returns>
-        public bool Contains(string name) => IndexOf(name) >= 0;
+        public bool Contains(string tagname) => IndexOf(tagname) >= 0;
 
         /// <summary>
         /// <inheritdoc/>
@@ -141,12 +141,12 @@ partial class IdentifierTags
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="tagname"></param>
         /// <returns></returns>
-        public int IndexOf(string name)
+        public int IndexOf(string tagname)
         {
-            name = name.NotNullNotEmpty(true);
-            return IndexOf(x => x.Contains(name));
+            tagname = tagname.NotNullNotEmpty(true);
+            return IndexOf(x => x.Contains(tagname));
         }
 
         /// <summary>
@@ -168,11 +168,11 @@ partial class IdentifierTags
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="tagname"></param>
         /// <returns></returns>
-        public IItem? Find(string name)
+        public IItem? Find(string tagname)
         {
-            var index = IndexOf(name);
+            var index = IndexOf(tagname);
             return index >= 0 ? this[index] : null;
         }
 
@@ -192,11 +192,11 @@ partial class IdentifierTags
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="tagname"></param>
         /// <returns></returns>
-        public virtual bool Remove(string name)
+        public virtual bool Remove(string tagname)
         {
-            var index = IndexOf(name);
+            var index = IndexOf(tagname);
             return index >= 0 && RemoveAt(index) > 0;
         }
     }

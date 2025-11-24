@@ -52,9 +52,9 @@ partial interface ISchemaEntry
         /// <summary>
         /// <inheritdoc cref="ISchemaEntry.Contains(string)"/>
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="tagname"></param>
         /// <returns></returns>
-        bool Contains(string name);
+        bool Contains(string tagname);
 
         /// <summary>
         /// <inheritdoc cref="ISchemaEntry.Contains(IEnumerable{string})"/>
@@ -66,9 +66,9 @@ partial interface ISchemaEntry
         /// <summary>
         /// <inheritdoc cref="ISchemaEntry.Find(string)"/>
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="tagname"></param>
         /// <returns></returns>
-        IMetadataItem? Find(string name);
+        IMetadataItem? Find(string tagname);
 
         /// <summary>
         /// <inheritdoc cref="ISchemaEntry.Find(IEnumerable{string})"/>
@@ -88,11 +88,6 @@ partial interface ISchemaEntry
         /// </summary>
         /// <returns></returns>
         List<IMetadataItem> ToList();
-
-        /// <summary>
-        /// <inheritdoc cref="ISchemaEntry.Trim"/>
-        /// </summary>
-        void Trim();
 
         // ----------------------------------------------------
 

@@ -33,9 +33,9 @@ partial interface IIdentifierTags
         /// <summary>
         /// Determines if this collection contains the given tag name, or not.
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="tagname"></param>
         /// <returns></returns>
-        bool Contains(string name);
+        bool Contains(string tagname);
 
         /// <summary>
         /// Determines if this collection contains any tag name in the given range, or not.
@@ -48,9 +48,9 @@ partial interface IIdentifierTags
         /// Gets the index of the element in this collection that carries the given tag name, or
         /// -1 if any.
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="tagname"></param>
         /// <returns></returns>
-        int IndexOf(string name);
+        int IndexOf(string tagname);
 
         /// <summary>
         /// Gets the index of the first element in this collection that carries any of the tag
@@ -63,9 +63,9 @@ partial interface IIdentifierTags
         /// <summary>
         /// Returns the collection of tag names the given one belongs to, or null if any.
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="tagname"></param>
         /// <returns></returns>
-        IItem? Find(string name);
+        IItem? Find(string tagname);
 
         /// <summary>
         /// Returns the collection of tag names the first match on the given onea belongs to, or
@@ -81,8 +81,8 @@ partial interface IIdentifierTags
         /// Removes from this instance the element that carried the given tag name, if any,
         /// <br/> Returns whether changes has been made, or not.
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="tagname"></param>
         /// <returns></returns>
-        bool Remove(string name);
+        bool Remove(string tagname);
     }
 }

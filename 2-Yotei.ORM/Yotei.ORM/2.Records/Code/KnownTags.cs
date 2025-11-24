@@ -293,9 +293,9 @@ public partial class KnownTags : IKnownTags
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="tagname"></param>
     /// <returns></returns>
-    public bool Contains(string name) => Find(name) is not null;
+    public bool Contains(string tagname) => Find(tagname) is not null;
 
     /// <summary>
     /// <inheritdoc/>
@@ -306,25 +306,25 @@ public partial class KnownTags : IKnownTags
     {
         range.ThrowWhenNull();
 
-        foreach (var name in range) if (Contains(name)) return true;
+        foreach (var tagname in range) if (Contains(tagname)) return true;
         return false;
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="tagname"></param>
     /// <returns></returns>
-    public IMetadataTag? Find(string name)
+    public IMetadataTag? Find(string tagname)
     {
-        name = name.NotNullNotEmpty(true);
+        tagname = tagname.NotNullNotEmpty(true);
 
-        var index = IdentifierTags.IndexOf(name);
+        var index = IdentifierTags.IndexOf(tagname);
         if (index >= 0) return IdentifierTags[index];
 
-        if (PrimaryKeyTag is not null && PrimaryKeyTag.Contains(name)) return PrimaryKeyTag;
-        if (UniqueValuedTag is not null && UniqueValuedTag.Contains(name)) return UniqueValuedTag;
-        if (ReadOnlyTag is not null && ReadOnlyTag.Contains(name)) return ReadOnlyTag;
+        if (PrimaryKeyTag is not null && PrimaryKeyTag.Contains(tagname)) return PrimaryKeyTag;
+        if (UniqueValuedTag is not null && UniqueValuedTag.Contains(tagname)) return UniqueValuedTag;
+        if (ReadOnlyTag is not null && ReadOnlyTag.Contains(tagname)) return ReadOnlyTag;
 
         return null;
     }

@@ -13,8 +13,8 @@ public partial class MetadataTag : IMetadataTag
     /// Initializes a new instance with the given default tag name.
     /// </summary>
     /// <param name="sensitive"></param>
-    /// <param name="name"></param>
-    public MetadataTag(bool sensitive, string name) => Items = new(sensitive, name);
+    /// <param name="tagname"></param>
+    public MetadataTag(bool sensitive, string tagname) => Items = new(sensitive, tagname);
 
     /// <summary>
     /// Initializes a new instance with the names from the given range.
@@ -130,9 +130,9 @@ public partial class MetadataTag : IMetadataTag
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="tagname"></param>
     /// <returns></returns>
-    public bool Contains(string name) => Items.Contains(name);
+    public bool Contains(string tagname) => Items.Contains(tagname);
 
     /// <summary>
     /// <inheritdoc/>
@@ -163,25 +163,25 @@ public partial class MetadataTag : IMetadataTag
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="oldname"></param>
-    /// <param name="newname"></param>
+    /// <param name="oldtagname"></param>
+    /// <param name="newtagname"></param>
     /// <returns></returns>
-    public virtual IMetadataTag Replace(string oldname, string newname)
+    public virtual IMetadataTag Replace(string oldtagname, string newtagname)
     {
         var builder = CreateBuilder();
-        var done = builder.Replace(oldname, newname);
+        var done = builder.Replace(oldtagname, newtagname);
         return done ? builder.CreateInstance() : this;
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="tagname"></param>
     /// <returns></returns>
-    public virtual IMetadataTag Add(string name)
+    public virtual IMetadataTag Add(string tagname)
     {
         var builder = CreateBuilder();
-        var done = builder.Add(name);
+        var done = builder.Add(tagname);
         return done ? builder.CreateInstance() : this;
     }
 
@@ -200,12 +200,12 @@ public partial class MetadataTag : IMetadataTag
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="tagname"></param>
     /// <returns></returns>
-    public virtual IMetadataTag Remove(string name)
+    public virtual IMetadataTag Remove(string tagname)
     {
         var builder = CreateBuilder();
-        var done = builder.Remove(name);
+        var done = builder.Remove(tagname);
         return done ? builder.CreateInstance() : this;
     }
 

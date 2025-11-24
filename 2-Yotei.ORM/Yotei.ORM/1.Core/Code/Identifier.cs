@@ -27,7 +27,7 @@ public static class Identifier
     /// <param name="engine"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    public static IIdentifier CreateRange(IEngine engine, IEnumerable<string?> range)
+    public static IIdentifier Create(IEngine engine, IEnumerable<string?> range)
     {
         var chain = new IdentifierChain(engine, range);
         return

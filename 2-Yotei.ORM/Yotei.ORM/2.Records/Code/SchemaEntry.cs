@@ -29,15 +29,15 @@ public partial class SchemaEntry : ISchemaEntry
     /// <param name="identifier"></param>
     /// <param name="isPrimaryKey"></param>
     /// <param name="isUniqueValued"></param>
-    /// <param name="isReadonly"></param>
+    /// <param name="isReadOnly"></param>
     /// <param name="range"></param>
     public SchemaEntry(
         IIdentifier identifier,
         bool? isPrimaryKey = null,
         bool? isUniqueValued = null,
-        bool? isReadonly = null,
+        bool? isReadOnly = null,
         IEnumerable<IMetadataItem>? range = null)
-        => Items = new(identifier, isPrimaryKey, isUniqueValued, isReadonly, range);
+        => Items = new(identifier, isPrimaryKey, isUniqueValued, isReadOnly, range);
 
     /// <summary>
     /// Initializes a new instance with the given values and metadata.
@@ -46,16 +46,16 @@ public partial class SchemaEntry : ISchemaEntry
     /// <param name="identifier"></param>
     /// <param name="isPrimaryKey"></param>
     /// <param name="isUniqueValued"></param>
-    /// <param name="isReadonly"></param>
+    /// <param name="isReadOnly"></param>
     /// <param name="range"></param>
     public SchemaEntry(
         IEngine engine,
         string identifier,
         bool? isPrimaryKey = null,
         bool? isUniqueValued = null,
-        bool? isReadonly = null,
+        bool? isReadOnly = null,
         IEnumerable<IMetadataItem>? range = null)
-        => Items = new(engine, identifier, isPrimaryKey, isUniqueValued, isReadonly, range);
+        => Items = new(engine, identifier, isPrimaryKey, isUniqueValued, isReadOnly, range);
 
     /// <summary>
     /// Copy constructor.
@@ -224,9 +224,9 @@ public partial class SchemaEntry : ISchemaEntry
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="tagname"></param>
     /// <returns></returns>
-    public bool Contains(string name) => Items.Contains(name);
+    public bool Contains(string tagname) => Items.Contains(tagname);
 
     /// <summary>
     /// <inheritdoc/>
@@ -238,9 +238,9 @@ public partial class SchemaEntry : ISchemaEntry
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="tagname"></param>
     /// <returns></returns>
-    public IMetadataItem? Find(string name) => Items.Find(name);
+    public IMetadataItem? Find(string tagname) => Items.Find(tagname);
 
     /// <summary>
     /// <inheritdoc/>
@@ -260,11 +260,6 @@ public partial class SchemaEntry : ISchemaEntry
     /// </summary>
     /// <returns></returns>
     public List<IMetadataItem> ToList() => Items.ToList();
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    public void Trim() => Items.Trim();
 
     // ----------------------------------------------------
 
@@ -295,12 +290,12 @@ public partial class SchemaEntry : ISchemaEntry
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="tagname"></param>
     /// <returns></returns>
-    public virtual ISchemaEntry Remove(string name)
+    public virtual ISchemaEntry Remove(string tagname)
     {
         var builder = CreateBuilder();
-        var done = builder.Remove(name);
+        var done = builder.Remove(tagname);
         return done ? builder.CreateInstance() : this;
     }
 
