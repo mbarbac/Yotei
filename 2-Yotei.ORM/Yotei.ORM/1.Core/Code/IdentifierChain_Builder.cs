@@ -460,8 +460,11 @@ partial class IdentifierChain
         {
             range.ThrowWhenNull();
 
-            var parts = range.SelectMany(x => GetParts(x, false));
-            return AddRange(parts, reduce);
+            var r = 0;
+            foreach (var value in range) r += Add(value, false);
+
+            if (r > 0 && reduce) Reduce();
+            return r;
         }
 
         /// <summary>

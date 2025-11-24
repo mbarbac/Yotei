@@ -74,13 +74,22 @@ public static class Test_SchemaEntry
         Assert.False(entry.IsUniqueValued);
         Assert.True(entry.IsReadOnly);
 
-        entry = new Entry(engine, "..column", isUniqueValued: true);
+        entry = new Entry(engine, "column", isUniqueValued: true);
 
         Assert.Equal(4, entry.Count);
         Assert.Equal("[column]", entry.Identifier.Value);
         Assert.False(entry.IsPrimaryKey);
         Assert.True(entry.IsUniqueValued);
         Assert.False(entry.IsReadOnly);
+
+        entry = new Entry(engine, "[table].", range: [new Item("Age", 50)]);
+
+        Assert.Equal(6, entry.Count);
+        Assert.Equal("[table].", entry.Identifier.Value);
+        Assert.False(entry.IsPrimaryKey);
+        Assert.False(entry.IsUniqueValued);
+        Assert.False(entry.IsReadOnly);
+        Assert.True(entry.Contains("Age", 50));
 
         entry = new Entry(engine, "[schema]..", isPrimaryKey: true, range: [new Item("Age", 50)]);
 
@@ -97,25 +106,56 @@ public static class Test_SchemaEntry
 
     // ----------------------------------------------------
 
-    /*
+    //[Enforced]
+    [Fact]
+    public static void Test_Create_From_Metadata_NoKnowns()
+    {
+        var engine = new FakeEngine() { KnownTags = new KnownTags(false) };
+        var entry = new Entry(engine, [new Item("Age", 50)]);
+
+        Assert.Equal(1, entry.Count);
+        Assert.Null(entry.Identifier.Value);
+        Assert.False(entry.IsPrimaryKey);
+        Assert.False(entry.IsUniqueValued);
+        Assert.False(entry.IsReadOnly);
+        Assert.True(entry.Contains("Age", 50));
+
+        entry = new Entry(engine, "table.", range: [new Item("Age", 50)]);
+
+        Assert.Equal(1, entry.Count);
+        Assert.Equal("[table].", entry.Identifier.Value);
+        Assert.False(entry.IsPrimaryKey);
+        Assert.False(entry.IsUniqueValued);
+        Assert.False(entry.IsReadOnly);
+        Assert.True(entry.Contains("Age", 50));
+    }
 
     //[Enforced]
     [Fact]
-    public static void Test_Create_From_Metadata()
+    public static void Test_Create_From_Metadata_WithKnowns()
     {
         var engine = new FakeEngine();
-        var entry = new Entry(engine, [
-            new Item("SchemaTag", "[schema]"),
-            new Item("TableTag", "table"),
-            new Item("ReadOnlyTag", true),
-            new Item("Age", 50)]);
+        var entry = new Entry(engine, [new Item("Age", 50)]);
 
-        Assert.Equal(7, entry.Count);
-        Assert.Equal("[schema].[table].", entry.Identifier.Value);
+        Assert.Equal(4, entry.Count);
+        Assert.Null(entry.Identifier.Value);
         Assert.False(entry.IsPrimaryKey);
         Assert.False(entry.IsUniqueValued);
-        Assert.True(entry.IsReadOnly);
+        Assert.False(entry.IsReadOnly);
+        Assert.True(entry.Contains("Age", 50));
+
+        entry = new Entry(engine, [
+            new Item("TableTag2", "table"),
+            new Item("PrimaryTag3", true),
+            new Item("Age", 50)]);
+
+        Assert.Equal(6, entry.Count);
+        Assert.Equal("[table].", entry.Identifier.Value);
+        Assert.True(entry.IsPrimaryKey);
+        Assert.False(entry.IsUniqueValued);
+        Assert.False(entry.IsReadOnly);
         Assert.True(entry.Contains("Age", 50));
     }
-    */
+
+    // ----------------------------------------------------
 }

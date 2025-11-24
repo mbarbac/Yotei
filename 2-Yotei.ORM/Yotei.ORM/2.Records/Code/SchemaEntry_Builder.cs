@@ -1,6 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-
-namespace Yotei.ORM.Records.Code;
+﻿namespace Yotei.ORM.Records.Code;
 
 partial class SchemaEntry
 {
@@ -16,14 +14,7 @@ partial class SchemaEntry
         /// Initializes a new empty instance.
         /// </summary>
         /// <param name="engine"></param>
-        public Builder(IEngine engine)
-        {
-            Engine = engine.ThrowWhenNull();
-            Identifier = new IdentifierUnit(Engine);
-            IsPrimaryKey = false;
-            IsUniqueValued = false;
-            IsReadOnly = false;
-        }
+        public Builder(IEngine engine) => Engine = engine.ThrowWhenNull();
 
         /// <summary>
         /// Initializes a new instance with the given metadata pairs.
@@ -50,12 +41,11 @@ partial class SchemaEntry
         {
             Engine = identifier.ThrowWhenNull().Engine;
             Identifier = identifier;
-            IsPrimaryKey = isPrimaryKey is not null && isPrimaryKey.Value;
-            IsUniqueValued = isUniqueValued is not null && isUniqueValued.Value;
-            IsReadOnly = isReadOnly is not null && isReadOnly.Value;
+            if (isPrimaryKey is not null) IsPrimaryKey = isPrimaryKey.Value;
+            if (isUniqueValued is not null) IsUniqueValued = isUniqueValued.Value;
+            if (isReadOnly is not null) IsReadOnly = isReadOnly.Value;
 
-            if (range is not null)
-                foreach (var item in range) Add(item);
+            if (range is not null) foreach (var item in range) Add(item);
         }
 
         /// <summary>
@@ -173,7 +163,7 @@ partial class SchemaEntry
                 if (tag is not null)
                 {
                     foreach (var temp in tag)
-                        if (Engine.SameTagNames(temp, tagname)) return true;
+                        if (Engine.SameTagNames(item.Name, temp)) return true;
                 }
             }
             return false;
@@ -186,7 +176,7 @@ partial class SchemaEntry
         {
             if (item is not null && range is not null)
             {
-                foreach (var name in range) if (Match(item, name)) return true;
+                foreach (var tagname in range) if (Match(item, tagname)) return true;
             }
             return false;
         }
@@ -322,10 +312,14 @@ partial class SchemaEntry
                 first = false;
 
                 var tag = tags[i];
-                var index = IndexOf(IdentifierItems, tag);
-                var item = index >= 0 ? IdentifierItems![index] : null;
+                var index = IndexOf(_IdentifierItems, tag);
+                var item = index >= 0 ? _IdentifierItems![index] : null;
+                var name = item is null ? tags[i].Default : item.Name;
 
-                throw null;
+                if (item is null || !Engine.SameNames(temp, (string?)item.Value))
+                    item = new MetadataItem(name, temp);
+
+                items.Add(item);
             }
 
             return items;
@@ -351,7 +345,7 @@ partial class SchemaEntry
                     _PrimaryKeyItem = _PrimaryKeyItem is null
                         ? new MetadataItem(tag.Default, value)
                         : new MetadataItem(_PrimaryKeyItem.Name, value);
-                }                
+                }
                 _IsPrimaryKey = value;
             }
         }
@@ -499,10 +493,16 @@ partial class SchemaEntry
         {
             get
             {
-                var num = IdentifierItems?.Count ?? 0;
-                num += PrimaryKeyItem is null ? 0 : 1;
-                num += UniqueValuedItem is null ? 0 : 1;
-                num += ReadOnlyItem is null ? 0 : 1;
+                var num = 0;
+
+                if (KnownTags.IdentifierTags.Count > 0) num +=
+                    Identifier.Value is null ? 0 :
+                    Identifier is IIdentifierChain chain ? chain.Count : 1;
+
+                if (KnownTags.PrimaryKeyTag is not null) num++;
+                if (KnownTags.UniqueValuedTag is not null) num++;
+                if (KnownTags.ReadOnlyTag is not null) num++;
+
                 num += Others.Count;
                 return num;
             }
@@ -591,9 +591,12 @@ partial class SchemaEntry
         public virtual bool Add(IMetadataItem item)
         {
             item.ThrowWhenNull();
+            int index;
+            IMetadataTag? tag;
+            IMetadataItem? temp;
 
             // No duplicates interception for well-known 'Identifier' elements...
-            var tag = KnownTags.IdentifierTags.Find(item.Name);
+            tag = KnownTags.IdentifierTags.Find(item.Name);
             if (tag is not null)
             {
                 if (item.Value is not null and not string) throw new ArgumentException(
@@ -607,16 +610,16 @@ partial class SchemaEntry
                     return true;
                 }
 
-                var index = IndexOf(_IdentifierItems, item.Name);
-                var temp = index < 0 ? null : _IdentifierItems[index];
-                
+                index = IndexOf(_IdentifierItems, item.Name);
+                temp = index < 0 ? null : _IdentifierItems[index];
+
                 if (temp is null)
                 {
                     _IdentifierItems.Add(item);
                     _Identifier = null;
                     return true;
                 }
-                else if(
+                else if (
                     !Engine.SameNames((string?)temp.Value, (string?)item.Value) ||
                     !Engine.SameTagNames(temp.Name, item.Name))
                 {
@@ -624,13 +627,13 @@ partial class SchemaEntry
                     _Identifier = null;
                     return true;
                 }
-                
+
                 return false;
             }
 
             // No duplicates interception for well-known 'PrimaryKey' elements...
             tag = KnownTags.PrimaryKeyTag;
-            if (tag is not null)
+            if (tag is not null && tag.Contains(item.Name))
             {
                 if (item.Value is not bool value) throw new ArgumentException(
                     "Value of 'PrimaryKey' must be a boolean.")
@@ -647,14 +650,50 @@ partial class SchemaEntry
             }
 
             // No duplicates interception for well-known 'UniqueValued' elements...
-            // HIGH: SchemaEntry.Builder.Add(... UniqueValued)
+            tag = KnownTags.UniqueValuedTag;
+            if (tag is not null && tag.Contains(item.Name))
+            {
+                if (item.Value is not bool value) throw new ArgumentException(
+                    "Value of 'UniqueValued' must be a boolean.")
+                    .WithData(item);
+
+                if (_UniqueValuedItem is null || value != (bool)_UniqueValuedItem.Value!)
+                {
+                    _UniqueValuedItem = item;
+                    _IsUniqueValued = null;
+                    return true;
+                }
+
+                return false;
+            }
 
             // No duplicates interception for well-known 'ReadOnly' elements...
-            // HIGH: SchemaEntry.Builder.Add(... ReadOnly)
+            tag = KnownTags.ReadOnlyTag;
+            if (tag is not null && tag.Contains(item.Name))
+            {
+                if (item.Value is not bool value) throw new ArgumentException(
+                    "Value of 'ReadOnly' must be a boolean.")
+                    .WithData(item);
+
+                if (_ReadOnlyItem is null || value != (bool)_ReadOnlyItem.Value!)
+                {
+                    _ReadOnlyItem = item;
+                    _IsReadOnly = null;
+                    return true;
+                }
+
+                return false;
+            }
 
             // Duplicated tag names not allowed for not well-known elements...
-            // HIGH: SchemaEntry.Builder.Add(...Others)
-            throw null;
+            index = IndexOf(Others, item.Name);
+            if (index >= 0) throw new DuplicateException(
+                "This instance already carries an element with the given tag name.")
+                .WithData(item)
+                .WithData(this);
+
+            Others.Add(item);
+            return true;
         }
 
         /// <summary>
@@ -676,21 +715,131 @@ partial class SchemaEntry
         /// </summary>
         /// <param name="tagname"></param>
         /// <returns></returns>
-        public virtual bool Remove(string tagname) => throw null;
+        public virtual bool Remove(string tagname)
+        {
+            tagname = tagname.NotNullNotEmpty(true);
+
+            var index = IndexOf(IdentifierItems, tagname);
+            if (index >= 0)
+            {
+                _IdentifierItems!.RemoveAt(index);
+                _Identifier = null;
+                return true;
+            }
+
+            if (Match(PrimaryKeyItem, tagname))
+            {
+                _PrimaryKeyItem = null;
+                _IsPrimaryKey = null;
+                return true;
+            }
+
+            if (Match(UniqueValuedItem, tagname))
+            {
+                _UniqueValuedItem = null;
+                _IsUniqueValued = null;
+                return true;
+            }
+
+            if (Match(ReadOnlyItem, tagname))
+            {
+                _ReadOnlyItem = null;
+                _IsReadOnly = null;
+                return true;
+            }
+
+            index = IndexOf(Others, tagname);
+            if (index >= 0) Others.RemoveAt(index);
+            return index >= 0;
+        }
+
+        /// <summary>
+        /// Invoked to remove the given metadata item. As this method uses reference equality,
+        /// and not tagname one, if shall remain an internal one.
+        /// </summary>
+        bool Remove(IMetadataItem item)
+        {
+            item.ThrowWhenNull();
+
+            var index = IdentifierItems?.IndexOf(item) ?? -1;
+            if (index >= 0)
+            {
+                _IdentifierItems!.RemoveAt(index);
+                _Identifier = null;
+                return true;
+            }
+
+            if (ReferenceEquals(item, PrimaryKeyItem))
+            {
+                _PrimaryKeyItem = null;
+                _IsPrimaryKey = null;
+                return true;
+            }
+
+            if (ReferenceEquals(item, UniqueValuedItem))
+            {
+                _UniqueValuedItem = null;
+                _IsUniqueValued = null;
+                return true;
+            }
+
+            if (ReferenceEquals(item, ReadOnlyItem))
+            {
+                _ReadOnlyItem = null;
+                _IsReadOnly = null;
+                return true;
+            }
+
+            index = Others.IndexOf(item);
+            if (index >= 0) Others.RemoveAt(index);
+            return index >= 0;
+        }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        public virtual bool Remove(Predicate<IMetadataItem> predicate) => throw null;
+        public virtual bool Remove(Predicate<IMetadataItem> predicate)
+        {
+            predicate.ThrowWhenNull();
+
+            var items = IdentifierItems;
+            var item = items?.Find(predicate);
+            if (item is not null) return Remove(item);
+
+            item = PrimaryKeyItem; if (item is not null && predicate(item)) return Remove(item);
+            item = UniqueValuedItem; if (item is not null && predicate(item)) return Remove(item);
+            item = ReadOnlyItem; if (item is not null && predicate(item)) return Remove(item);
+
+            item = Others.Find(predicate);
+            if (item is not null) return Remove(item);
+
+            return false;
+        }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        public virtual bool RemoveLast(Predicate<IMetadataItem> predicate) => throw null;
+        public virtual bool RemoveLast(Predicate<IMetadataItem> predicate)
+        {
+            predicate.ThrowWhenNull();
+
+            var item = Others.FindLast(predicate);
+            if (item is not null) return Remove(item);
+
+            item = ReadOnlyItem; if (item is not null && predicate(item)) return Remove(item);
+            item = UniqueValuedItem; if (item is not null && predicate(item)) return Remove(item);
+            item = PrimaryKeyItem; if (item is not null && predicate(item)) return Remove(item);
+
+            var items = IdentifierItems;
+            item = items?.FindLast(predicate);
+            if (item is not null) return Remove(item);
+
+            return false;
+        }
 
         /// <summary>
         /// <inheritdoc/>
@@ -699,7 +848,7 @@ partial class SchemaEntry
         /// <returns></returns>
         public virtual bool RemoveAll(Predicate<IMetadataItem> predicate)
         {
-            var done = false; while(Remove(predicate)) done = true;
+            var done = false; while (Remove(predicate)) done = true;
             return done;
         }
 
@@ -707,6 +856,21 @@ partial class SchemaEntry
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public virtual bool Clear() => throw null;
+        public virtual bool Clear()
+        {
+            if (Identifier.Value is null &&
+                IsPrimaryKey == false &&
+                IsUniqueValued == false &&
+                IsReadOnly == false &&
+                Others.Count == 0)
+                return false;
+
+            _Identifier = new IdentifierUnit(Engine); _IdentifierItems = null;
+            _IsPrimaryKey = false; _PrimaryKeyItem = null;
+            _IsUniqueValued = false; _UniqueValuedItem = null;
+            _IsReadOnly = false; _ReadOnlyItem = null;
+            Others.Clear();
+            return true;
+        }
     }
 }
