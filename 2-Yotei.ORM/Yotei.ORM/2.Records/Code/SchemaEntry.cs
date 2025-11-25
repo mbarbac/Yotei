@@ -84,6 +84,17 @@ public partial class SchemaEntry : ISchemaEntry
     public IEnumerator<IMetadataItem> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public virtual ISchemaEntry WithIdentifier(string value)
+    {
+        var id = ORM.Code.Identifier.Create(Engine, value);
+        return WithIdentifier(id);
+    }
+
     // ------------------------------------------------
 
     /// <summary>

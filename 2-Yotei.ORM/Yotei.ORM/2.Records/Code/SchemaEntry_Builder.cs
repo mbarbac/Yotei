@@ -605,9 +605,11 @@ partial class SchemaEntry
 
                 if (_IdentifierItems is null)
                 {
+                    var old = Identifier;
                     _IdentifierItems = [item];
                     _Identifier = null;
-                    return true;
+
+                    return !Engine.SameNames(old.Value, Identifier.Value);
                 }
 
                 index = IndexOf(_IdentifierItems, item.Name);
@@ -615,17 +617,21 @@ partial class SchemaEntry
 
                 if (temp is null)
                 {
+                    var old = Identifier;
                     _IdentifierItems.Add(item);
                     _Identifier = null;
-                    return true;
+
+                    return !Engine.SameNames(old.Value, Identifier.Value);
                 }
                 else if (
                     !Engine.SameNames((string?)temp.Value, (string?)item.Value) ||
                     !Engine.SameTagNames(temp.Name, item.Name))
                 {
+                    var old = Identifier;
                     _IdentifierItems[index] = item;
                     _Identifier = null;
-                    return true;
+
+                    return !Engine.SameNames(old.Value, Identifier.Value);
                 }
 
                 return false;

@@ -27,6 +27,13 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataItem>, IEquatable<I
     [With] IIdentifier Identifier { get; }
 
     /// <summary>
+    /// Returns a new instance with the given identifier.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    ISchemaEntry WithIdentifier(string value);
+
+    /// <summary>
     /// Determines if this column is a primary key (or part of a primary key group), or not.
     /// </summary>
     [With] bool IsPrimaryKey { get; }

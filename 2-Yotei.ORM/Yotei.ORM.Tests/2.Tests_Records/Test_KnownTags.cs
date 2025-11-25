@@ -28,8 +28,8 @@ public static class Test_KnownTags
         Assert.Equal("SchemaTag", tags.IdentifierTags[0].Default);
         Assert.Equal("TableTag", tags.IdentifierTags[1].Default);
         Assert.Equal("ColumnTag", tags.IdentifierTags[2].Default);
-        Assert.Equal("PrimaryTag", tags.PrimaryKeyTag!.Default);
-        Assert.Equal("UniqueTag", tags.UniqueValuedTag!.Default);
+        Assert.Equal("PrimaryKeyTag", tags.PrimaryKeyTag!.Default);
+        Assert.Equal("UniqueValuedTag", tags.UniqueValuedTag!.Default);
         Assert.Equal("ReadOnlyTag", tags.ReadOnlyTag!.Default);
     }
 
@@ -96,7 +96,7 @@ public static class Test_KnownTags
         Assert.NotSame(source, target);
         Assert.Same(items, target.IdentifierTags);
 
-        items = new IdentifierTags(false, [new MetadataTag(false, "PRIMARYTAG")]);
+        items = new IdentifierTags(false, [new MetadataTag(false, "PRIMARYKEYTAG")]);
         try { source.WithIdentifierTags(items); Assert.Fail(); }
         catch (DuplicateException) { }
 
