@@ -9,7 +9,7 @@ public partial class FakeKnownTags : KnownTags
         new IdentifierTags(sensitive, [
             new MetadataTag(sensitive, ["SchemaTag", "SchemaTag2", "SchemaTag3"]),
             new MetadataTag(sensitive, ["TableTag", "TableTag2", "TableTag3"]),
-            new MetadataTag(sensitive, ["ColumnTag", "Column2", "Column3"])]),
+            new MetadataTag(sensitive, ["ColumnTag", "ColumnTag2", "ColumnTag3"])]),
         new MetadataTag(sensitive, ["PrimaryKeyTag", "PrimaryKeyTag2", "PrimaryKeyTag3"]),
         new MetadataTag(sensitive, ["UniqueValuedTag", "UniqueValuedTag2", "UniqueValuedTag3"]),
         new MetadataTag(sensitive, ["ReadOnlyTag", "ReadOnlyTag2", "ReadOnlyTag3"]))

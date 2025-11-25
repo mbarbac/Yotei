@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Records.Code;
+﻿using System.Xml;
+
+namespace Yotei.ORM.Records.Code;
 
 partial class SchemaEntry
 {
@@ -647,9 +649,11 @@ partial class SchemaEntry
 
                 if (_PrimaryKeyItem is null || value != (bool)_PrimaryKeyItem.Value!)
                 {
+                    var old = IsPrimaryKey;
                     _PrimaryKeyItem = item;
                     _IsPrimaryKey = null;
-                    return true;
+
+                    return old != IsPrimaryKey;
                 }
 
                 return false;
@@ -665,9 +669,11 @@ partial class SchemaEntry
 
                 if (_UniqueValuedItem is null || value != (bool)_UniqueValuedItem.Value!)
                 {
+                    var old = IsUniqueValued;
                     _UniqueValuedItem = item;
                     _IsUniqueValued = null;
-                    return true;
+
+                    return old != IsUniqueValued;
                 }
 
                 return false;
@@ -683,9 +689,11 @@ partial class SchemaEntry
 
                 if (_ReadOnlyItem is null || value != (bool)_ReadOnlyItem.Value!)
                 {
+                    var old = IsReadOnly;
                     _ReadOnlyItem = item;
                     _IsReadOnly = null;
-                    return true;
+
+                    return old != IsReadOnly;
                 }
 
                 return false;
@@ -728,36 +736,48 @@ partial class SchemaEntry
             var index = IndexOf(IdentifierItems, tagname);
             if (index >= 0)
             {
+                var old = Identifier;
                 _IdentifierItems!.RemoveAt(index);
                 _Identifier = null;
-                return true;
+
+                return !Engine.SameNames(old.Value, Identifier.Value);
             }
 
             if (Match(PrimaryKeyItem, tagname))
             {
+                var old = IsPrimaryKey;
                 _PrimaryKeyItem = null;
                 _IsPrimaryKey = null;
-                return true;
+
+                return old != IsPrimaryKey;
             }
 
             if (Match(UniqueValuedItem, tagname))
             {
+                var old = IsUniqueValued;
                 _UniqueValuedItem = null;
                 _IsUniqueValued = null;
-                return true;
+
+                return old != IsUniqueValued;
             }
 
             if (Match(ReadOnlyItem, tagname))
             {
+                var old = IsReadOnly;
                 _ReadOnlyItem = null;
                 _IsReadOnly = null;
-                return true;
+
+                return old != IsReadOnly;
             }
 
             index = IndexOf(Others, tagname);
             if (index >= 0) Others.RemoveAt(index);
             return index >= 0;
         }
+
+        // ------------------------------------------------
+
+        HACER replicar este codigo para las tres secuencias.
 
         /// <summary>
         /// Invoked to remove the given metadata item. As this method uses reference equality,
@@ -770,30 +790,38 @@ partial class SchemaEntry
             var index = IdentifierItems?.IndexOf(item) ?? -1;
             if (index >= 0)
             {
+                var old = Identifier;
                 _IdentifierItems!.RemoveAt(index);
                 _Identifier = null;
-                return true;
+
+                return !Engine.SameNames(old.Value, Identifier.Value);
             }
 
             if (ReferenceEquals(item, PrimaryKeyItem))
             {
+                var old = IsPrimaryKey;
                 _PrimaryKeyItem = null;
                 _IsPrimaryKey = null;
-                return true;
+
+                return old != IsPrimaryKey;
             }
 
             if (ReferenceEquals(item, UniqueValuedItem))
             {
+                var old = IsUniqueValued;
                 _UniqueValuedItem = null;
                 _IsUniqueValued = null;
-                return true;
+
+                return old != IsUniqueValued;
             }
 
             if (ReferenceEquals(item, ReadOnlyItem))
             {
+                var old = IsReadOnly;
                 _ReadOnlyItem = null;
                 _IsReadOnly = null;
-                return true;
+
+                return old != IsReadOnly;
             }
 
             index = Others.IndexOf(item);
@@ -854,9 +882,13 @@ partial class SchemaEntry
         /// <returns></returns>
         public virtual bool RemoveAll(Predicate<IMetadataItem> predicate)
         {
-            var done = false; while (Remove(predicate)) done = true;
-            return done;
+            // TEMA: dado que Remove(item) aplica sobre el primer elemento
+
+            //var done = false; while (Remove(predicate)) done = true;
+            //return done;
         }
+
+        // ------------------------------------------------
 
         /// <summary>
         /// <inheritdoc/>

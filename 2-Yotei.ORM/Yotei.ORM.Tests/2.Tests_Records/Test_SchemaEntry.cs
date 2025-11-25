@@ -349,6 +349,15 @@ public static class Test_SchemaEntry
         var target = source.Add(new Item("SchemaTag2", null));
         Assert.Same(source, target);
 
+        target = source.Add(new Item("SchemaTag2", "schema"));
+        Assert.NotSame(source, target);
+        Assert.Equal(7, target.Count);
+        Assert.Equal("[schema]..[column]", target.Identifier.Value);
+        Assert.False(target.IsPrimaryKey);
+        Assert.False(target.IsUniqueValued);
+        Assert.True(target.IsReadOnly);
+        Assert.True(target.Contains("Age", 50));
+
         target = source.Add(new Item("PrimaryKeyTag3", true));
         Assert.NotSame(source, target);
         Assert.Equal(5, target.Count);
@@ -378,9 +387,21 @@ public static class Test_SchemaEntry
     }
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_Add_ArbitraryTag
-    // Duplicates not allowed
+    [Fact]
+    public static void Test_Add_ArbitraryTag() // Duplicates not allowed...
+    {
+        var engine = new FakeEngine() { KnownTags = new KnownTags(false) };
+        var source = new Entry(engine, "table.", isReadOnly: true, range: [new Item("Age", 50)]);
+
+        var target = source.Add(new Item("Name", "any"));
+        Assert.NotSame(source, target);
+        Assert.Equal(2, target.Count);
+        Assert.True(target.Contains("Age", 50));
+        Assert.True(target.Contains("NAME", "any"));
+
+        try { source.Add(new Item("AGE", 60)); Assert.Fail(); }
+        catch (DuplicateException) { }
+    }
 
     // ----------------------------------------------------
 
@@ -391,14 +412,126 @@ public static class Test_SchemaEntry
     // ----------------------------------------------------
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_Remove
+    [Fact]
+    public static void Test_Remove_IdentifierTag()
+    {
+        var engine = new FakeEngine();
+        var source = new Entry(engine, "schema..column");
+        Assert.Equal("[schema]..[column]", source.Identifier.Value);
+
+        var target = source.Remove("ColumnTag2");
+        Assert.NotSame(source, target);
+        Assert.Equal("[schema]..", target.Identifier.Value);
+        Assert.Equal(6, target.Count);
+
+        target = source.Remove("SchemaTag3");
+        Assert.NotSame(source, target);
+        Assert.Equal("[column]", target.Identifier.Value);
+        Assert.Equal(4, target.Count);
+
+        source = new Entry(engine, "column");
+        target = source.Remove("TableTag2"); Assert.Same(source, target);
+        target = source.Remove("SchemaTag3"); Assert.Same(source, target);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Remove_OtherKnownTags()
+    {
+        var engine = new FakeEngine();
+        var source = new Entry(engine, "column", isReadOnly: true, range: [new Item("Age", 50)]);
+
+        var target = source.Remove("PrimaryKeyTag");
+        Assert.Same(source, target);
+
+        target = source.Remove("UniqueValued2");
+        Assert.Same(source, target);
+
+        target = source.Remove("ReadOnlyTag3");
+        Assert.NotSame(source, target);
+        Assert.False(target.IsReadOnly);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Remove_Arbitrary()
+    {
+        var engine = new FakeEngine();
+        var source = new Entry(engine, "column", isReadOnly: true, range: [new Item("Age", 50)]);
+        
+        var target = source.Remove("any");
+        Assert.Same(source, target);
+
+        target = source.Remove("AGE");
+        Assert.NotSame(source, target);
+        Assert.Null(target.Find("Age"));
+    }
 
     // ----------------------------------------------------
 
     //[Enforced]
-    //[Fact]
-    //public static void Test_RemovePredicate
+    [Fact]
+    public static void Test_Remove_Predicate_KnownTags()
+    {
+        var engine = new FakeEngine();
+        var source = new Entry(engine, "table.", isReadOnly: true);
+
+        var target = source.Remove(x => x.Name.Contains("Table"));
+        Assert.NotSame(source, target);
+        Assert.Null(target.Identifier.Value);
+
+        source = new Entry(engine, "", isPrimaryKey: true, isReadOnly: true);
+        Assert.True(source.IsPrimaryKey);
+        Assert.True(source.IsReadOnly);
+
+        target = source.Remove(x => x.Name.Contains('y'));
+        Assert.NotSame(source, target);
+        Assert.False(target.IsPrimaryKey);
+        Assert.True(target.IsReadOnly);
+
+        target = source.RemoveLast(x => x.Name.Contains('y'));
+        Assert.NotSame(source, target);
+        Assert.True(target.IsPrimaryKey);
+        Assert.False(target.IsReadOnly);
+
+        target = source.RemoveAll(x => x.Name.Contains('y'));
+        Assert.NotSame(source, target);
+        Assert.False(target.IsPrimaryKey);
+        Assert.False(target.IsReadOnly);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Remove_Predicate_Arbitrary()
+    {
+        var source = new Entry(
+            new FakeEngine() { KnownTags = new KnownTags(false) },
+            [new Item("xOne", 50), new Item("zTwo", 50), new Item("xThree", 50)]);
+
+        var target = source.Remove(x => x.Name.Contains('@'));
+        Assert.Same(source, target);
+
+        target = source.Remove(x => x.Name.Contains('x'));
+        Assert.NotSame(source, target);
+        Assert.Equal(2, target.Count);
+        Assert.False(target.Contains("xOne"));
+        Assert.True(target.Contains("zTwo"));
+        Assert.True(target.Contains("xThree"));
+
+        target = source.RemoveLast(x => x.Name.Contains('x'));
+        Assert.NotSame(source, target);
+        Assert.Equal(2, target.Count);
+        Assert.True(target.Contains("xOne"));
+        Assert.True(target.Contains("zTwo"));
+        Assert.False(target.Contains("xThree"));
+
+        target = source.RemoveAll(x => x.Name.Contains('x'));
+        Assert.NotSame(source, target);
+        Assert.Single(target);
+        Assert.False(target.Contains("xOne"));
+        Assert.True(target.Contains("zTwo"));
+        Assert.False(target.Contains("xThree"));
+    }
 
     // ----------------------------------------------------
 
