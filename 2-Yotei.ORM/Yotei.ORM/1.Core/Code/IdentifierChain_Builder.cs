@@ -491,8 +491,16 @@ partial class IdentifierChain
         {
             range.ThrowWhenNull();
 
-            var parts = range.SelectMany(x => GetParts(x, false));
-            return InsertRange(index, parts, reduce);
+            var r = 0;
+            foreach (var value in range)
+            {
+                var num = Insert(index, value, false);
+                r += num;
+                index += num;
+            }
+
+            if (r > 0 && reduce) Reduce();
+            return r;
         }
     }
 }

@@ -480,6 +480,32 @@ public static class Test_IdentifierChain
         catch (ArgumentNullException) { }
     }
 
+    //[Enforced]
+    [Fact]
+    public static void Test_AddRange_Values()
+    {
+        IEngine engine = new FakeEngine();
+        var source = new Chain(engine);
+        var target = source.AddRange([]);
+        Assert.Same(source, target);
+
+        target = source.AddRange(["", ".one"]);
+        Assert.NotSame(source, target);
+        Assert.Single(target);
+        Assert.Equal("[one]", target.Value);
+
+        source = new Chain(engine, "one.two");
+        target = source.AddRange([""]);
+        Assert.NotSame(source, target);
+        Assert.Equal(3, target.Count);
+        Assert.Equal("[one].[two].", target.Value);
+
+        target = source.AddRange(["", ".five"]);
+        Assert.NotSame(source, target);
+        Assert.Equal(5, target.Count);
+        Assert.Equal("[one].[two]...[five]", target.Value);
+    }
+
     // ----------------------------------------------------
 
     //[Enforced]
@@ -601,6 +627,29 @@ public static class Test_IdentifierChain
 
         try { _ = source.AddRange([xthree, null!]); Assert.Fail(); }
         catch (ArgumentNullException) { }
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_InsertRange_Values()
+    {
+        IEngine engine = new FakeEngine();
+        var source = new Chain(engine);
+        var target = source.InsertRange(0, []);
+        Assert.Same(source, target);
+
+        target = source.InsertRange(0, ["", ".one"]);
+        Assert.NotSame(source, target);
+        Assert.Single(target);
+        Assert.Equal("[one]", target.Value);
+
+        source = new Chain(engine, "one.two");
+        target = source.InsertRange(0, [""]); Assert.Same(source, target);
+        target = source.InsertRange(0, ["", ".."]); Assert.Same(source, target);
+
+        target = source.InsertRange(0, ["..alpha", "..beta"]);
+        Assert.NotSame(source, target);
+        Assert.Equal("[alpha]...[beta].[one].[two]", target.Value);
     }
 
     // ----------------------------------------------------

@@ -96,7 +96,8 @@ public static class Identifier
     {
         engine.ThrowWhenNull();
 
-        if ((value = value.NullWhenEmpty(true)) is null) return [];
+        value = value.NullWhenEmpty(true);
+        if (value is null) return reduce ? [] : [null];
 
         var items = engine.UseTerminators ? GetRawParts(value, engine) : GetRawParts(value);
         if (reduce)
