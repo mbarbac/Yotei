@@ -6,7 +6,7 @@
 //{
 //    //[Enforced]
 //    [Fact]
-//    public void Test()
+//    public static void Test()
 //    {
 //    }
 //}

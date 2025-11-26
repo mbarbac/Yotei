@@ -30,22 +30,6 @@ public partial interface ICoreList<T>
     new bool Contains(T item);
 
     /// <summary>
-    /// Determines if this collection contains elements that match the given predicate.
-    /// </summary>
-    /// <param name="predicate"></param>
-    /// <returns></returns>
-    bool Contains(Predicate<T> predicate);
-
-    /// <summary>
-    /// Determines if this collection contains elements that match the given predicate and,
-    /// if so, returns that elements in the out argument.
-    /// </summary>
-    /// <param name="predicate"></param>
-    /// <param name="items"></param>
-    /// <returns></returns>
-    bool Contains(Predicate<T> predicate, out List<T> items);
-
-    /// <summary>
     /// Returns the index of the first ocurrence of the given element, or -1 if any.
     /// </summary>
     /// <param name="item"></param>
@@ -88,7 +72,8 @@ public partial interface ICoreList<T>
     List<int> AllIndexesOf(Predicate<T> predicate);
 
     /// <summary>
-    /// Tries to find the first ocurrence of an element that matches the given predicate.
+    /// Determines if this collection contains any elements that match the given predicate and,
+    /// if so, returns the first one in the out argument.
     /// </summary>
     /// <param name="predicate"></param>
     /// <param name="item"></param>
@@ -96,7 +81,8 @@ public partial interface ICoreList<T>
     bool Find(Predicate<T> predicate, [MaybeNull] out T item);
 
     /// <summary>
-    /// Tries to find the last ocurrence of an element that matches the given predicate.
+    /// Determines if this collection contains any elements that match the given predicate and,
+    /// if so, returns the last one in the out argument.
     /// </summary>
     /// <param name="predicate"></param>
     /// <param name="item"></param>
@@ -104,12 +90,13 @@ public partial interface ICoreList<T>
     bool FindLast(Predicate<T> predicate, [MaybeNull] out T item);
 
     /// <summary>
-    /// Tries to find all the ocurrences of elements that match the given predicate.
+    /// Determines if this collection contains any elements that match the given predicate and,
+    /// if so, returns them in the out argument.
     /// </summary>
     /// <param name="predicate"></param>
     /// <param name="items"></param>
     /// <returns></returns>
-    bool FindAll(Predicate<T> predicate, [MaybeNull] out List<T> items);
+    bool FindAll(Predicate<T> predicate, out List<T> items);
 
     /// <summary>
     /// Returns an array with the elements in this collection.
@@ -159,21 +146,24 @@ public partial interface ICoreList<T>
     int InsertRange(int index, IEnumerable<T> range);
 
     /// <summary>
-    /// Removes from this collection the element at the given index.
+    /// Removes from this collection the element at the given index, and returns it in the out
+    /// argument.
     /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="index"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    new int RemoveAt(int index);
+    int RemoveAt(int index, [MaybeNull] out T item);
 
     /// <summary>
-    /// Removes from this collection the given number of elements, starting at the given index.
+    /// Removes from this collection the given number of elements, starting at the given index,
+    /// and returns the removed ones in the out argument.
     /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    int RemoveRange(int index, int count);
+    int RemoveRange(int index, int count, out List<T> items);
 
     /// <summary>
     /// Removes the first ocurrence of the given element from this collection.

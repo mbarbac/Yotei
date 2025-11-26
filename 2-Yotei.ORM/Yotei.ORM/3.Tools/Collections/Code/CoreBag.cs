@@ -14,21 +14,7 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    public CoreBag()
-    {
-        Comparer = EqualityComparer<T>.Default;
-        Items = [];
-    }
-
-    /// <summary>
-    /// Initializes a new empty instance with the given comparer.
-    /// </summary>
-    /// <param name="comparer"></param>
-    public CoreBag(IEqualityComparer<T> comparer)
-    {
-        Comparer = comparer.ThrowWhenNull();
-        Items = [];
-    }
+    public CoreBag() => Items = [];
 
     /// <summary>
     /// Initializes a new instance with the elements of the given range.
@@ -37,22 +23,16 @@ public partial class CoreBag<T> : ICoreBag<T>
     public CoreBag(IEnumerable<T> range) : this() => AddRange(range);
 
     /// <summary>
-    /// Initializes a new instance with the given comparer and the elements of the given range.
-    /// </summary>
-    /// <param name="comparer"></param>
-    /// <param name="range"></param>
-    public CoreBag(IEqualityComparer<T> comparer, IEnumerable<T> range)
-        : this(comparer)
-        => AddRange(range);
-
-    /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
     protected CoreBag(CoreBag<T> source)
     {
+        Validate = source.Validate;
+        FlattenElements = source.FlattenElements;
+        IsValidDuplicate = source.IsValidDuplicate;
+        AreEqual = source.AreEqual;
         Items = [.. source.ThrowWhenNull()];
-        Comparer = source.Comparer;
     }
 
     /// <summary>
@@ -95,29 +75,93 @@ public partial class CoreBag<T> : ICoreBag<T>
     // ----------------------------------------------------
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Invoked to return a validated element before using it in this collection.
     /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    public virtual T Validate(T item) => item;
+    public Func<T, T> Validate
+    {
+        get;
+        init
+        {
+            if (ReferenceEquals(field, value)) return;
+
+            if (Items is null || Items.Count == 0) field = value;
+            else
+            {
+                var range = Items.ToArray();
+                Items.Clear();
+                field = value; AddRange(range);
+            }
+        }
+    }
+    = static x => x;
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Invoked to determine if the elements that are themselves collections of elements of the
+    /// type of this instance will be flattened when included in this collection, or not.
     /// </summary>
-    public virtual bool FlattenElements => true;
+    public virtual bool FlattenElements
+    {
+        get;
+        init
+        {
+            if (field == value) return;
+
+            if (Items is null || Items.Count == 0) field = value;
+            else
+            {
+                var range = Items.ToArray();
+                Items.Clear();
+                field = value; AddRange(range);
+            }
+        }
+    }
+    = true;
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Invoked to determine if two elements shall be considered equal, or not.
     /// </summary>
-    /// <param name="source"></param>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    public virtual bool IsValidDuplicate(T source, T item) => true;
+    public Func<T, T, bool> AreEqual
+    {
+        get;
+        init
+        {
+            if (ReferenceEquals(field, value)) return;
+
+            if (Items is null || Items.Count == 0) field = value;
+            else
+            {
+                var range = Items.ToArray();
+                Items.Clear();
+                field = value; AddRange(range);
+            }
+        }
+    }
+    = static (x, y) => EqualityComparer<T>.Default.Equals(x, y);
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Invoked to determine if the given 2nd argument, which has been found to be a duplicate
+    /// of the 1st one, can be included in this collection or not. This method shall:
+    /// <br/>- Return '<c>true</c>' to include the given duplicated element.
+    /// <br/>- Return '<c>false</c>' to ignore the inclusion operation.
+    /// <br/>- Throw an appropriate exception if duplicates are not allowed.
     /// </summary>
-    public virtual IEqualityComparer<T> Comparer { get; }
+    public Func<T, T, bool> IsValidDuplicate
+    {
+        get;
+        init
+        {
+            if (ReferenceEquals(field, value)) return;
+
+            if (Items is null || Items.Count == 0) field = value;
+            else
+            {
+                var range = Items.ToArray();
+                Items.Clear();
+                field = value; AddRange(range);
+            }
+        }
+    }
+    = static (x, y) => true;
 
     // ----------------------------------------------------
 
@@ -131,14 +175,31 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public bool Contains(T item) => throw null;
+    public bool Contains(T item)
+    {
+        item = Validate(item);
+        return Find(x => AreEqual(x, item), out _);
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    public bool Contains(Predicate<T> predicate) => throw null;
+    public bool Find(Predicate<T> predicate, [MaybeNull] out T item)
+    {
+        predicate.ThrowWhenNull();
+
+        for (int i = 0; i < Items.Count; i++)
+        {
+            item = Items[i];
+            if (predicate(item)) return true;
+        }
+
+        item = default;
+        return false;
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -146,7 +207,18 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// <param name="predicate"></param>
     /// <param name="items"></param>
     /// <returns></returns>
-    public bool Contains(Predicate<T> predicate, out List<T> items) => throw null;
+    public bool FindAll(Predicate<T> predicate, out List<T> items)
+    {
+        predicate.ThrowWhenNull();
+        items = [];
+
+        for (int i = 0; i < Items.Count; i++)
+        {
+            var item = Items[i];
+            if (predicate(item)) items.Add(item);
+        }
+        return items.Count > 0;
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -186,7 +258,21 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual int Add(T item) => throw null;
+    public virtual int Add(T item)
+    {
+        if (FlattenElements && item is IEnumerable<T> range) return AddRange(range);
+
+        item = Validate(item);
+
+        if (FindAll(x => AreEqual(x, item), out var sources))
+        {
+            foreach (var source in sources)
+                if (!IsValidDuplicate(source, item)) return 0;
+        }
+
+        Items.Add(item);
+        return 1;
+    }
     void ICollection<T>.Add(T item) => Add(item);
 
     /// <summary>
@@ -194,14 +280,36 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual int AddRange(IEnumerable<T> range) => throw null;
+    public virtual int AddRange(IEnumerable<T> range)
+    {
+        range.ThrowWhenNull();
+
+        var num = 0; foreach (var item in range) num += Add(item);
+        return num;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual int Remove(T item) => throw null;
+    public virtual int Remove(T item)
+    {
+        // Removing a range...
+        if (FlattenElements && item is IEnumerable<T> range)
+        {
+            var num = 0; foreach (var temp in range) num += Remove(temp);
+            return num;
+        }
+
+        // Standard case...
+        else
+        {
+            var index = Items.FindIndex(x => AreEqual(x, item));
+            if (index >= 0) Items.RemoveAt(index);
+            return index >= 0 ? 1 : 0;
+        }
+    }
     bool ICollection<T>.Remove(T item) => Remove(item) > 0;
 
     /// <summary>
@@ -210,7 +318,11 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// <param name="item"></param>
     /// <param name="items"></param>
     /// <returns></returns>
-    public virtual int RemoveAll(T item, out List<T> items) => throw null;
+    public virtual int RemoveAll(T item, out List<T> items)
+    {
+        item = Validate(item);
+        return RemoveAll(x => AreEqual(x, item), out items);
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -218,7 +330,19 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// <param name="predicate"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual int Remove(Predicate<T> predicate, [MaybeNull] out T item) => throw null;
+    public virtual int Remove(Predicate<T> predicate, [MaybeNull] out T item)
+    {
+        predicate.ThrowWhenNull();
+
+        if (Find(predicate, out var temp))
+        {
+            var r = Remove(temp!);
+            if (r > 0) { item = temp; return r; }
+        }
+
+        item = default;
+        return 0;
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -226,7 +350,22 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// <param name="predicate"></param>
     /// <param name="items"></param>
     /// <returns></returns>
-    public virtual int RemoveAll(Predicate<T> predicate, out List<T> items) => throw null;
+    public virtual int RemoveAll(Predicate<T> predicate, out List<T> items)
+    {
+        predicate.ThrowWhenNull();
+
+        items = [];
+        var num = 0; if (FindAll(predicate, out var temps))
+        {
+            foreach (var temp in temps)
+            {
+                var r = Remove(temp);
+                if (r > 0) items.Add(temp);
+                num += r;
+            }
+        }
+        return num;
+    }
 
     /// <summary>
     /// <inheritdoc/>

@@ -10,38 +10,6 @@
 public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, ICollection
 {
     /// <summary>
-    /// Invoked to return a validated element before using it in this collection.
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    T Validate(T item);
-
-    /// <summary>
-    /// Determines whether elements that are themselves collections of elements of the type of
-    /// this instance will be flattened when included in this collection, or not
-    /// </summary>
-    bool FlattenElements { get; }
-
-    /// <summary>
-    /// Determines whether the given item, which has been found to be a duplicate of the existing
-    /// source element, can be included in this collection or not. This method shall:
-    /// <br/>- Return '<c>true</c>' to include the given duplicated element.
-    /// <br/>- Return '<c>false</c>' to ignore the inclusion operation.
-    /// <br/>- Throw an appropriate exception if duplicates are not allowed.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    bool IsValidDuplicate(T source, T item);
-
-    /// <summary>
-    /// The comparer used by this instance to determine equality of elements.
-    /// </summary>
-    IEqualityComparer<T> Comparer { get; }
-
-    // ----------------------------------------------------
-
-    /// <summary>
     /// Gets the number of elements in this collection.
     /// </summary>
     new int Count { get; }
@@ -54,20 +22,22 @@ public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, I
     new bool Contains(T item);
 
     /// <summary>
-    /// Determines if this collection contains elements that match the given predicate.
+    /// Determines if this collection contains any elements that match the given predicate and,
+    /// if so, returns the first found one in the out argument.
     /// </summary>
     /// <param name="predicate"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    bool Contains(Predicate<T> predicate);
+    bool Find(Predicate<T> predicate, [MaybeNull] out T item);
 
     /// <summary>
-    /// Determines if this collection contains elements that match the given predicate and,
-    /// if so, returns that elements in the out argument.
+    /// Determines if this collection contains any elements that match the given predicate and,
+    /// if so, returns them in the out argument.
     /// </summary>
     /// <param name="predicate"></param>
     /// <param name="items"></param>
     /// <returns></returns>
-    bool Contains(Predicate<T> predicate, out List<T> items);
+    bool FindAll(Predicate<T> predicate, out List<T> items);
 
     /// <summary>
     /// Returns an array with the elements in this collection.
@@ -100,7 +70,7 @@ public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, I
     int AddRange(IEnumerable<T> range);
 
     /// <summary>
-    /// Removes one ocurrence of the given element from this collection, if any.
+    /// Removes from this collection the first ocurrence found of the given element, if any.
     /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="item"></param>
@@ -118,8 +88,8 @@ public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, I
     int RemoveAll(T item, out List<T> items);
 
     /// <summary>
-    /// Removes from this collection one ocurrence of an element that matches the given predicate,
-    /// and returns the removed one, if any, in the out argument.
+    /// Removes from this collection the first ocurrence found of an element that matches the
+    /// given predicate, and returns the removed one, if any, in the out argument.
     /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="predicate"></param>
