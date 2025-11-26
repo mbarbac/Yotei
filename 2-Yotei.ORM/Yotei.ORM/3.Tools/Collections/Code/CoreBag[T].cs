@@ -76,6 +76,7 @@ public partial class CoreBag<T> : ICoreBag<T>
 
     /// <summary>
     /// Invoked to return a validated element before using it in this collection.
+    /// <br/> The default behavior of this delegate is just to return the given element.
     /// </summary>
     public Func<T, T> Validate
     {
@@ -98,6 +99,7 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// <summary>
     /// Invoked to determine if the elements that are themselves collections of elements of the
     /// type of this instance will be flattened when included in this collection, or not.
+    /// <br/> The default value of this property is to flatten elements.
     /// </summary>
     public virtual bool FlattenElements
     {
@@ -119,6 +121,7 @@ public partial class CoreBag<T> : ICoreBag<T>
 
     /// <summary>
     /// Invoked to determine if two elements shall be considered equal, or not.
+    /// <br/> The default behavior of this delegate is to use the default comparer for the type.
     /// </summary>
     public Func<T, T, bool> AreEqual
     {
@@ -144,6 +147,7 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// <br/>- Return '<c>true</c>' to include the given duplicated element.
     /// <br/>- Return '<c>false</c>' to ignore the inclusion operation.
     /// <br/>- Throw an appropriate exception if duplicates are not allowed.
+    /// <br/> The default behavior of this delegate is to accept duplicates.
     /// </summary>
     public Func<T, T, bool> IsValidDuplicate
     {
@@ -162,6 +166,17 @@ public partial class CoreBag<T> : ICoreBag<T>
         }
     }
     = static (x, y) => true;
+
+    /// <summary>
+    /// Invoked to find all the existing elements that shall be considered duplicates of the
+    /// given one.
+    /// </summary>
+    protected virtual List<T> FindDuplicates(T item)
+    {
+        return FindAll(x => AreEqual(x, item), out var sources)
+            ? sources
+            : [];
+    }
 
     // ----------------------------------------------------
 
@@ -264,11 +279,9 @@ public partial class CoreBag<T> : ICoreBag<T>
 
         item = Validate(item);
 
-        if (FindAll(x => AreEqual(x, item), out var sources))
-        {
-            foreach (var source in sources)
-                if (!IsValidDuplicate(source, item)) return 0;
-        }
+        var sources = FindDuplicates(item);
+        foreach (var source in sources)
+            if (!IsValidDuplicate(source, item)) return 0;
 
         Items.Add(item);
         return 1;

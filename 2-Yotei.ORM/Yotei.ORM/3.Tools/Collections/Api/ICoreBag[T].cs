@@ -15,7 +15,8 @@ public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, I
     new int Count { get; }
 
     /// <summary>
-    /// Determines if this collection contains the given element.
+    /// Determines if this collection contains at least one ocurrence the given element, as
+    /// determined by the rules of this instance.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
@@ -70,7 +71,8 @@ public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, I
     int AddRange(IEnumerable<T> range);
 
     /// <summary>
-    /// Removes from this collection the first ocurrence found of the given element, if any.
+    /// Removes from this collection the first ocurrence found of the given element, if any, as
+    /// determined by the rules of this instance.
     /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="item"></param>
@@ -78,8 +80,8 @@ public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, I
     new int Remove(T item);
 
     /// <summary>
-    /// Removes all the ocurrences of the given element from this collection, if any, and returns
-    /// the removed elements.
+    /// Removes all the ocurrences of the given element from this collection, as determined by
+    /// the rules of this instance, and returns the removed elements.
     /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="item"></param>
