@@ -2,15 +2,13 @@
 
 // ========================================================
 /// <summary>
-/// Represents a bag-alike collection of elements.
+/// Represents a bag-alike collection of elements (with no ordering guarantees).
 /// <br/> Each instance define its own behavior related to the equality comparison of elements,
 /// to whether null (for nullable types) and duplicated values are allowed or not, if elements
 /// that are themselves collections of elements shall be flattened before using them, as well as
 /// any other rules or behaviors appropriate for their context.
 /// </summary>
 /// <typeparam name="T"></typeparam>
-/// NOTE: By default it is expected that the default behaviors mimics the ones of the standard
-/// collections, unless explicit overrides are used.
 [Cloneable]
 public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, ICollection
 {
@@ -23,18 +21,18 @@ public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, I
     /// Determines if this collection contains at least one ocurrence of the given value, as
     /// determined by the rules in this instance.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    new bool Contains(T value);
+    new bool Contains(T item);
 
     /// <summary>
     /// Tries to find the first ocurrence of an element that matches the given predicate and,
     /// if so, returns it in the out argument.
     /// </summary>
     /// <param name="predicate"></param>
-    /// <param name="value"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    bool Find(Predicate<T> predicate, out T value);
+    bool Find(Predicate<T> predicate, out T item);
 
     /// <summary>
     /// Tries to find all the ocurrences of elements that match the given predicate and returns
@@ -43,7 +41,7 @@ public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, I
     /// <param name="predicate"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    bool FindAll(Predicate<T> predicate, out List<T> values);
+    bool FindAll(Predicate<T> predicate, out List<T> items);
 
     /// <summary>
     /// Returns an array with the elements in this collection.
@@ -88,10 +86,10 @@ public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, I
     /// removed elements, if any.
     /// <br/> Returns the number of changes made.
     /// </summary>
-    /// <param name="value"></param>
-    /// <param name="onremove"></param>
+    /// <param name="item"></param>
+    /// <param name="onremoved"></param>
     /// <returns></returns>
-    int Remove(T value, Action<T>? onremove = null);
+    int Remove(T item, Action<T>? onremoved = null);
 
     /// <summary>
     /// Removes from this collection all the ocurrences of the given value, as determined by the
@@ -99,10 +97,10 @@ public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, I
     /// removed elements, if any.
     /// <br/> Returns the number of changes made.
     /// </summary>
-    /// <param name="value"></param>
-    /// <param name="onremove"></param>
+    /// <param name="item"></param>
+    /// <param name="onremoved"></param>
     /// <returns></returns>
-    int RemoveAll(T value, Action<T>? onremove = null);
+    int RemoveAll(T item, Action<T>? onremoved = null);
 
     /// <summary>
     /// Removes from this collection the first ocurrence of an element that matches the given
@@ -111,9 +109,9 @@ public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, I
     /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="predicate"></param>
-    /// <param name="onremove"></param>
+    /// <param name="onremoved"></param>
     /// <returns></returns>
-    int Remove(Predicate<T> predicate, Action<T>? onremove = null);
+    int Remove(Predicate<T> predicate, Action<T>? onremoved = null);
 
     /// <summary>
     /// Removes from this collection all the ocurrences of elements that matches the given
@@ -122,9 +120,9 @@ public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, I
     /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="predicate"></param>
-    /// <param name="onremove"></param>
+    /// <param name="onremoved"></param>
     /// <returns></returns>
-    int RemoveAll(Predicate<T> predicate, Action<T>? onremove = null);
+    int RemoveAll(Predicate<T> predicate, Action<T>? onremoved = null);
 
     /// <summary>
     /// Clears this collection.

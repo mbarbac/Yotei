@@ -9,8 +9,6 @@
 /// any other rules or behaviors appropriate for their context.
 /// </summary>
 /// <typeparam name="T"></typeparam>
-/// NOTE: By default it is expected that the default behaviors mimics the ones of the standard
-/// collections, unless explicit overrides are used.
 [Cloneable]
 public partial interface ICoreList<T>
     : IList<T>, IReadOnlyList<T>, IList
@@ -33,33 +31,33 @@ public partial interface ICoreList<T>
     /// Determines if this collection contains at least one ocurrence of the given value, as
     /// determined by the rules in this instance.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    new bool Contains(T value);
+    new bool Contains(T item);
 
     /// <summary>
     /// Returns the index of the first ocurrence of the given value, as determined by the rules
     /// in this instance, or -1 if any.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    new int IndexOf(T value);
+    new int IndexOf(T item);
 
     /// <summary>
     /// Returns the index of the last ocurrence of the given value, as determined by the rules
     /// in this instance, or -1 if any.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    int LastIndexOf(T value);
+    int LastIndexOf(T item);
 
     /// <summary>
     /// Returns the indexes of all ocurrences of the given value, as determined by the rules in
     /// this instance.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    List<int> AllIndexes(T value);
+    List<int> AllIndexes(T item);
 
     /// <summary>
     /// Returns the index of the first element that matches the given predicate, or -1 if any.
@@ -87,27 +85,27 @@ public partial interface ICoreList<T>
     /// if so, returns it in the out argument.
     /// </summary>
     /// <param name="predicate"></param>
-    /// <param name="value"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    bool Find(Predicate<T> predicate, out T value);
+    bool Find(Predicate<T> predicate, out T item);
 
     /// <summary>
     /// Tries to find the last ocurrence of an element that matches the given predicate and,
     /// if so, returns it in the out argument.
     /// </summary>
     /// <param name="predicate"></param>
-    /// <param name="value"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    bool FindLast(Predicate<T> predicate, out T value);
+    bool FindLast(Predicate<T> predicate, out T item);
 
     /// <summary>
     /// Tries to find all the ocurrences of elements that match the given predicate and returns
     /// them in the out argument.
     /// </summary>
     /// <param name="predicate"></param>
-    /// <param name="item"></param>
+    /// <param name="items"></param>
     /// <returns></returns>
-    bool FindAll(Predicate<T> predicate, out List<T> values);
+    bool FindAll(Predicate<T> predicate, out List<T> items);
 
     /// <summary>
     /// Returns an array with the elements in this collection.
@@ -171,20 +169,20 @@ public partial interface ICoreList<T>
     /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="index"></param>
-    /// <param name="value"></param>
-    /// <param name="onremove"></param>
+    /// <param name="item"></param>
+    /// <param name="onremoved"></param>
     /// <returns></returns>
-    int Replace(int index, T value, Action<T>? onremove = null);
+    int Replace(int index, T item, Action<T>? onremoved = null);
 
     /// <summary>
     /// Removes from this collection the element at the given index. If a remove delegate is
     /// provided, it is invoked with each of the removed elements, if any.
-    /// <br/> Returns the number of changes made.
+    /// <br/> Returns whether changes have been made or not.
     /// </summary>
     /// <param name="index"></param>
-    /// <param name="onremove"></param>
+    /// <param name="onremoved"></param>
     /// <returns></returns>
-    int RemoveAt(int index, Action<T>? onremove = null);
+    bool RemoveAt(int index, Action<T>? onremoved = null);
 
     /// <summary>
     /// Removes from this collection the given number of elements, starting at the given index.
@@ -194,9 +192,9 @@ public partial interface ICoreList<T>
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
-    /// <param name="onremove"></param>
+    /// <param name="onremoved"></param>
     /// <returns></returns>
-    int RemoveRange(int index, int count, Action<T>? onremove = null);
+    int RemoveRange(int index, int count, Action<T>? onremoved = null);
 
     /// <summary>
     /// Removes from this collection the first ocurrence of the given value, as determined by the
@@ -204,10 +202,10 @@ public partial interface ICoreList<T>
     /// removed elements, if any.
     /// <br/> Returns the number of changes made.
     /// </summary>
-    /// <param name="value"></param>
-    /// <param name="onremove"></param>
+    /// <param name="item"></param>
+    /// <param name="onremoved"></param>
     /// <returns></returns>
-    int Remove(T value, Action<T>? onremove = null);
+    int Remove(T item, Action<T>? onremoved = null);
 
     /// <summary>
     /// Removes from this collection the last ocurrence of the given value, as determined by the
@@ -215,10 +213,10 @@ public partial interface ICoreList<T>
     /// removed elements, if any.
     /// <br/> Returns the number of changes made.
     /// </summary>
-    /// <param name="value"></param>
-    /// <param name="onremove"></param>
+    /// <param name="item"></param>
+    /// <param name="onremoved"></param>
     /// <returns></returns>
-    int RemoveLast(T value, Action<T>? onremove = null);
+    int RemoveLast(T item, Action<T>? onremoved = null);
 
     /// <summary>
     /// Removes from this collection all the ocurrences of the given value, as determined by the
@@ -226,10 +224,10 @@ public partial interface ICoreList<T>
     /// removed elements, if any.
     /// <br/> Returns the number of changes made.
     /// </summary>
-    /// <param name="value"></param>
-    /// <param name="onremove"></param>
+    /// <param name="item"></param>
+    /// <param name="onremoved"></param>
     /// <returns></returns>
-    int RemoveAll(T value, Action<T>? onremove = null);
+    int RemoveAll(T item, Action<T>? onremoved = null);
 
     /// <summary>
     /// Removes from this collection the first ocurrence of an element that matches the given
@@ -238,9 +236,9 @@ public partial interface ICoreList<T>
     /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="predicate"></param>
-    /// <param name="onremove"></param>
+    /// <param name="onremoved"></param>
     /// <returns></returns>
-    int Remove(Predicate<T> predicate, Action<T>? onremove = null);
+    int Remove(Predicate<T> predicate, Action<T>? onremoved = null);
 
     /// <summary>
     /// Removes from this collection the last ocurrence of an element that matches the given
@@ -249,9 +247,9 @@ public partial interface ICoreList<T>
     /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="predicate"></param>
-    /// <param name="onremove"></param>
+    /// <param name="onremoved"></param>
     /// <returns></returns>
-    int RemoveLast(Predicate<T> predicate, Action<T>? onremove = null);
+    int RemoveLast(Predicate<T> predicate, Action<T>? onremoved = null);
 
     /// <summary>
     /// Removes from this collection all the ocurrences of elements that matches the given
@@ -260,9 +258,9 @@ public partial interface ICoreList<T>
     /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="predicate"></param>
-    /// <param name="onremove"></param>
+    /// <param name="onremoved"></param>
     /// <returns></returns>
-    int RemoveAll(Predicate<T> predicate, Action<T>? onremove = null);
+    int RemoveAll(Predicate<T> predicate, Action<T>? onremoved = null);
 
     /// <summary>
     /// Clears this collection.
