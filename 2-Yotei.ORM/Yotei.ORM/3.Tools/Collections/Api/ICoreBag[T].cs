@@ -52,6 +52,11 @@ public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, I
     /// <returns></returns>
     List<T> ToList();
 
+    /// <summary>
+    /// Trims the internal structures used by this instance.
+    /// </summary>
+    void Trim();
+
     // ----------------------------------------------------
 
     /// <summary>
@@ -69,6 +74,8 @@ public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, I
     /// <param name="range"></param>
     /// <returns></returns>
     int AddRange(IEnumerable<T> range);
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// Removes from this collection the first ocurrence found of the given element, if any, as

@@ -3,6 +3,9 @@
 // ========================================================
 /// <summary>
 /// <inheritdoc cref="ICoreBag{T}"/>
+/// <br/> The default behavior of this collection mimics the standard ones: null and duplicated
+/// values are accepted, equality is determined by the type's default comparer, and collection
+/// elements are not flattened.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 [Cloneable(ReturnType = typeof(ICoreBag<>))]
@@ -117,7 +120,7 @@ public partial class CoreBag<T> : ICoreBag<T>
             }
         }
     }
-    = true;
+    = false;
 
     /// <summary>
     /// Invoked to determine if two elements shall be considered equal, or not.
@@ -301,6 +304,8 @@ public partial class CoreBag<T> : ICoreBag<T>
         return num;
     }
 
+    // ----------------------------------------------------
+
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
@@ -333,8 +338,10 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// <returns></returns>
     public virtual int RemoveAll(T item, out List<T> items)
     {
-        item = Validate(item);
-        return RemoveAll(x => AreEqual(x, item), out items);
+        //item = Validate(item);
+        //return RemoveAll(x => AreEqual(x, item), out items);
+
+        throw null;
     }
 
     /// <summary>

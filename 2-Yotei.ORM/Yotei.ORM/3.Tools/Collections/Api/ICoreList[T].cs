@@ -7,7 +7,7 @@
 /// <typeparam name="T"></typeparam>
 [Cloneable]
 public partial interface ICoreList<T>
-    : IList<T>, IReadOnlyList<T>
+    : IList<T>, IReadOnlyList<T>, IList
     , ICollection<T>, IReadOnlyCollection<T> , ICollection
 {
     /// <summary>
@@ -114,7 +114,23 @@ public partial interface ICoreList<T>
     /// <returns></returns>
     List<T> ToList();
 
+    /// <summary>
+    /// Trims the internal structures used by this instance.
+    /// </summary>
+    void Trim();
+
     // ----------------------------------------------------
+
+    /// <summary>
+    /// Replaces the element at the given index with the new given one.
+    /// <br/> If the given element is an empty enumeration, and it happens that this instance
+    /// flattens the input elements that are collections of the type, then no changes are made.
+    /// <br/> Returns the number of changes made.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    int Replace(int index, T item);
 
     /// <summary>
     /// Adds to this collection the given element.
@@ -149,6 +165,8 @@ public partial interface ICoreList<T>
     /// <returns></returns>
     int InsertRange(int index, IEnumerable<T> range);
 
+    // ----------------------------------------------------
+
     /// <summary>
     /// Removes from this collection the element at the given index.
     /// <br/> Returns the number of changes made.
@@ -168,12 +186,22 @@ public partial interface ICoreList<T>
     int RemoveAt(int index, [MaybeNull] out T item);
 
     /// <summary>
+    /// Removes from this collection the given number of elements, starting at the given index.
+    /// <br/> Returns the number of changes made.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="count"></param>
+    /// <returns></returns>
+    int RemoveRange(int index, int count);
+
+    /// <summary>
     /// Removes from this collection the given number of elements, starting at the given index,
     /// and returns the removed ones in the out argument.
     /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
+    /// <param name="items"></param>
     /// <returns></returns>
     int RemoveRange(int index, int count, out List<T> items);
 
@@ -196,13 +224,23 @@ public partial interface ICoreList<T>
     int RemoveLast(T item);
 
     /// <summary>
-    /// Removes from this collection all the ocurrences of the given element, as determined by the
-    /// rules of this instance.
+    /// Removes from this collection all the ocurrences of the given element, as determined by
+    /// the rules of this instance.
     /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
     int RemoveAll(T item);
+
+    /// <summary>
+    /// Removes from this collection all the ocurrences of the given element, as determined by
+    /// the rules of this instance, and returns the removed elements.
+    /// <br/> Returns the number of changes made.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="items"></param>
+    /// <returns></returns>
+    int RemoveAll(T item, out List<T> items);
 
     /// <summary>
     /// Removes the first ocurrence of the given element from this collection and returns the
