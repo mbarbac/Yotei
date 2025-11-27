@@ -2,11 +2,11 @@
 
 // ========================================================
 //[Enforced]
-//public static class Test_
-//{
-//    //[Enforced]
-//    [Fact]
-//    public static void Test()
-//    {
-//    }
-//}
+public static class Test_CoreList
+{
+    //[Enforced]
+    [Fact]
+    public static void Test()
+    {
+    }
+}
