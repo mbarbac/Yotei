@@ -255,10 +255,10 @@ public partial class CoreList<T> : ICoreList<T>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public List<int> AllIndexes(T item)
+    public List<int> AllIndexesOf(T item)
     {
         item = Validate(item);
-        return AllIndexes(x => AreEqual(x, item));
+        return AllIndexesOf(x => AreEqual(x, item));
     }
 
     /// <summary>
@@ -282,7 +282,7 @@ public partial class CoreList<T> : ICoreList<T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public List<int> AllIndexes(Predicate<T> predicate)
+    public List<int> AllIndexesOf(Predicate<T> predicate)
     {
         predicate.ThrowWhenNull();
 
@@ -330,7 +330,7 @@ public partial class CoreList<T> : ICoreList<T>
     /// <returns></returns>
     public bool FindAll(Predicate<T> predicate, out List<T> items)
     {
-        var values = AllIndexes(predicate);
+        var values = AllIndexesOf(predicate);
 
         items = values.Count == 0 ? [] : [.. values.Select(i => Items[i])];
         return items.Count > 0;

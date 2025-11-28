@@ -57,7 +57,7 @@ public partial interface ICoreList<T>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    List<int> AllIndexes(T item);
+    List<int> AllIndexesOf(T item);
 
     /// <summary>
     /// Returns the index of the first element that matches the given predicate, or -1 if any.
@@ -78,7 +78,7 @@ public partial interface ICoreList<T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    List<int> AllIndexes(Predicate<T> predicate);
+    List<int> AllIndexesOf(Predicate<T> predicate);
 
     /// <summary>
     /// Tries to find the first ocurrence of an element that matches the given predicate and,
