@@ -102,7 +102,7 @@ public static partial class Test_CoreList
         Assert.Same(source.ValidateItem, ((Chain)target).ValidateItem);
         Assert.Equal(source.FlattenElements, ((Chain)target).FlattenElements);
         Assert.Same(source.CompareItems, ((Chain)target).CompareItems);
-        Assert.Same(source.GetDuplicates, ((Chain)target).GetDuplicates);
+        Assert.Same(source.GetItemDuplicates, ((Chain)target).GetItemDuplicates);
         Assert.Same(source.IncludeDuplicate, ((Chain)target).IncludeDuplicate);
         Assert.Equal(source.Sensitive, ((Chain)target).Sensitive);
     }

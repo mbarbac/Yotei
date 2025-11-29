@@ -19,7 +19,7 @@ public partial class CoreList<T> : ICoreList<T>
         ValidateItem = static x => x;
         FlattenElements = false;
         CompareItems = static (x, y) => EqualityComparer<T>.Default.Equals(x, y);
-        GetDuplicates = x => FindAll(y => CompareItems(x, y), out var items) ? items : [];
+        GetItemDuplicates = x => FindAll(y => CompareItems(x, y), out var items) ? items : [];
         IncludeDuplicate = static (_, _) => true;
         Items = [];
     }
@@ -41,7 +41,7 @@ public partial class CoreList<T> : ICoreList<T>
         ValidateItem = source.ValidateItem;
         FlattenElements = source.FlattenElements;
         CompareItems = source.CompareItems;
-        GetDuplicates = source.GetDuplicates;
+        GetItemDuplicates = source.GetItemDuplicates;
         IncludeDuplicate = source.IncludeDuplicate;
         Items = [.. source];
     }
@@ -147,7 +147,7 @@ public partial class CoreList<T> : ICoreList<T>
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public Func<T, IEnumerable<T>> GetDuplicates
+    public Func<T, IEnumerable<T>> GetItemDuplicates
     {
         get;
         set
@@ -407,7 +407,7 @@ public partial class CoreList<T> : ICoreList<T>
     {
         if (FlattenElements && item is IEnumerable<T> range) return AddRange(range);
 
-        var values = GetDuplicates(item = ValidateItem(item));
+        var values = GetItemDuplicates(item = ValidateItem(item));
         foreach (var value in values)
             if (!IncludeDuplicate(value, item)) return 0;
 
@@ -440,7 +440,7 @@ public partial class CoreList<T> : ICoreList<T>
     {
         if (FlattenElements && item is IEnumerable<T> range) return InsertRange(index, range);
 
-        var values = GetDuplicates(item = ValidateItem(item));
+        var values = GetItemDuplicates(item = ValidateItem(item));
         foreach (var value in values)
             if (!IncludeDuplicate(value, item)) return 0;
 
@@ -614,12 +614,12 @@ public partial class CoreList<T> : ICoreList<T>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="item"></param>
-    /// <param name="items"></param>
+    /// <param name="removed"></param>
     /// <returns></returns>
-    public virtual int Remove(T item, out List<T> items)
+    public virtual int Remove(T item, out List<T> removed)
     {
         List<T> temps = [];
-        var done = Remove(item, temps.Add); items = temps;
+        var done = Remove(item, temps.Add); removed = temps;
         return done;
     }
 

@@ -19,7 +19,7 @@ public partial class CoreBag<T> : ICoreBag<T>
         ValidateItem = static x => x;
         FlattenElements = false;
         CompareItems = static (x, y) => EqualityComparer<T>.Default.Equals(x, y);
-        GetDuplicates = x => FindAll(y => CompareItems(x, y), out var items) ? items : [];
+        GetItemDuplicates = x => FindAll(y => CompareItems(x, y), out var items) ? items : [];
         IncludeDuplicate = static (_, _) => true;
         Items = [];
     }
@@ -41,7 +41,7 @@ public partial class CoreBag<T> : ICoreBag<T>
         ValidateItem = source.ValidateItem;
         FlattenElements = source.FlattenElements;
         CompareItems = source.CompareItems;
-        GetDuplicates = source.GetDuplicates;
+        GetItemDuplicates = source.GetItemDuplicates;
         IncludeDuplicate = source.IncludeDuplicate;
         Items = [.. source];
     }
@@ -147,7 +147,7 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public Func<T, IEnumerable<T>> GetDuplicates
+    public Func<T, IEnumerable<T>> GetItemDuplicates
     {
         get;
         set
@@ -335,7 +335,7 @@ public partial class CoreBag<T> : ICoreBag<T>
     {
         if (FlattenElements && item is IEnumerable<T> range) return AddRange(range);
 
-        var values = GetDuplicates(item = ValidateItem(item));
+        var values = GetItemDuplicates(item = ValidateItem(item));
         foreach (var value in values)
             if (!IncludeDuplicate(value, item)) return 0;
 

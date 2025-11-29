@@ -3,6 +3,8 @@
 // ========================================================
 /// <summary>
 /// Represents a list-alike collection of elements.
+/// <br/> The semantics are that two given elements are considered equal if the rules in this
+/// instance determine so.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 [Cloneable]
@@ -30,7 +32,7 @@ public partial interface ICoreList<T>
     /// <summary>
     /// Invoked to find the duplicates of the given element.
     /// </summary>
-    Func<T, IEnumerable<T>> GetDuplicates { get; }
+    Func<T, IEnumerable<T>> GetItemDuplicates { get; }
 
     /// <summary>
     /// Invoked to determine if the 2nd argument, which is a duplicate of the 1st one, can be
