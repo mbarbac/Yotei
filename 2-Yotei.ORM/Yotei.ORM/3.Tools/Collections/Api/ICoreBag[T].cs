@@ -14,7 +14,7 @@ public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, I
     Func<T, T> ValidateItem { get; }
 
     /// <summary>
-    /// Invoked to determine if the values that are themselves enumerations of elements of the
+    /// Invoked to determine if the elements that are themselves enumerations of elements of the
     /// type of this collection shall be flattened before using them, or not.
     /// </summary>
     bool FlattenElements { get; }
@@ -68,7 +68,7 @@ public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, I
     /// <param name="predicate"></param>
     /// <param name="found"></param>
     /// <returns></returns>
-    bool Find(Predicate<T> predicate, out T item);
+    bool Find(Predicate<T> predicate, out T found);
 
     /// <summary>
     /// Tries to find all the ocurrences of elements that match the given predicate and, if so
@@ -84,9 +84,9 @@ public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, I
     /// returns the found elements in the out argument.
     /// </summary>
     /// <param name="predicate"></param>
-    /// <param name="items"></param>
+    /// <param name="found"></param>
     /// <returns></returns>
-    bool FindAll(Predicate<T> predicate, out List<T> items);
+    bool FindAll(Predicate<T> predicate, out List<T> found);
 
     /// <summary>
     /// Returns an array with the elements in this collection.
@@ -143,9 +143,9 @@ public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, I
     /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="item"></param>
-    /// <param name="items"></param>
+    /// <param name="removed"></param>
     /// <returns></returns>
-    int Remove(T item, out List<T> items);
+    int Remove(T item, out List<T> removed);
 
     /// <summary>
     /// Removes from this collection all the ocurrences of the given element, as determined by the
@@ -165,9 +165,9 @@ public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, I
     /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="item"></param>
-    /// <param name="items"></param>
+    /// <param name="removed"></param>
     /// <returns></returns>
-    int RemoveAll(T item, out List<T> items);
+    int RemoveAll(T item, out List<T> removed);
 
     /// <summary>
     /// Removes from this collection the first element that matches the given predicate. If the
@@ -205,9 +205,9 @@ public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, I
     /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="predicate"></param>
-    /// <param name="items"></param>
+    /// <param name="removed"></param>
     /// <returns></returns>
-    int RemoveAll(Predicate<T> predicate, out List<T> items);
+    int RemoveAll(Predicate<T> predicate, out List<T> removed);
 
     /// <summary>
     /// Clears this collection.

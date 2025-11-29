@@ -258,10 +258,10 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// <param name="predicate"></param>
     /// <param name="found"></param>
     /// <returns></returns>
-    public bool Find(Predicate<T> predicate, out T item)
+    public bool Find(Predicate<T> predicate, out T found)
     {
         T temp = default!;
-        var done = Find(predicate, x => temp = x); item = temp;
+        var done = Find(predicate, x => temp = x); found = temp;
         return done;
     }
 
@@ -284,12 +284,12 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
-    /// <param name="items"></param>
+    /// <param name="found"></param>
     /// <returns></returns>
-    public bool FindAll(Predicate<T> predicate, out List<T> items)
+    public bool FindAll(Predicate<T> predicate, out List<T> found)
     {
         List<T> temps = [];
-        var done = FindAll(predicate, temps.Add); items = temps;
+        var done = FindAll(predicate, temps.Add); found = temps;
         return done;
     }
 
@@ -385,12 +385,12 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="item"></param>
-    /// <param name="items"></param>
+    /// <param name="removed"></param>
     /// <returns></returns>
-    public virtual int Remove(T item, out List<T> items)
+    public virtual int Remove(T item, out List<T> removed)
     {
         List<T> temps = [];
-        var done = Remove(item, temps.Add); items = temps;
+        var done = Remove(item, temps.Add); removed = temps;
         return done;
     }
 
@@ -425,12 +425,12 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="item"></param>
-    /// <param name="items"></param>
+    /// <param name="removed"></param>
     /// <returns></returns>
-    public virtual int RemoveAll(T item, out List<T> items)
+    public virtual int RemoveAll(T item, out List<T> removed)
     {
         List<T> temps = [];
-        var done = RemoveAll(item, temps.Add); items = temps;
+        var done = RemoveAll(item, temps.Add); removed = temps;
         return done;
     }
 
@@ -483,12 +483,12 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="predicate"></param>
-    /// <param name="items"></param>
+    /// <param name="removed"></param>
     /// <returns></returns>
-    public virtual int RemoveAll(Predicate<T> predicate, out List<T> items)
+    public virtual int RemoveAll(Predicate<T> predicate, out List<T> removed)
     {
         List<T> temps = [];
-        var done = RemoveAll(predicate, temps.Add); items = temps;
+        var done = RemoveAll(predicate, temps.Add); removed = temps;
         return done;
     }
 
