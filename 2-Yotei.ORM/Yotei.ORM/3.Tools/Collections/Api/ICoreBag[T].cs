@@ -11,7 +11,7 @@ public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, I
     /// <summary>
     /// Invoked to return a validated element before using it in this collection.
     /// </summary>
-    Func<T, T> Validate { get; }
+    Func<T, T> ValidateItem { get; }
 
     /// <summary>
     /// Invoked to determine if the values that are themselves enumerations of elements of the
@@ -20,10 +20,10 @@ public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, I
     bool FlattenElements { get; }
 
     /// <summary>
-    /// Invoked to determine if, for the purposes of this collection, if two given elements are
+    /// Invoked to determine if, for the purposes of this collection, the two given elements are
     /// equal or not.
     /// </summary>
-    Func<T, T, bool> AreEqual { get; }
+    Func<T, T, bool> CompareItems { get; }
 
     /// <summary>
     /// Invoked to find the duplicates of the given element.
@@ -35,7 +35,7 @@ public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, I
     /// included in this collection, or not, by returning 'true' or 'false' as appropriate. In
     /// addition, may throw an exception if duplicates are not allowed.
     /// </summary>
-    Func<T, T, bool> IsValidDuplicate { get; }
+    Func<T, T, bool> IncludeDuplicate { get; }
 
     // ----------------------------------------------------
 
@@ -45,7 +45,7 @@ public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, I
     new int Count { get; }
 
     /// <summary>
-    /// Determines if this collection contains at least one ocurrence of the given value, as
+    /// Determines if this collection contains at least one ocurrence of the given element, as
     /// determined by the rules in this instance.
     /// </summary>
     /// <param name="item"></param>

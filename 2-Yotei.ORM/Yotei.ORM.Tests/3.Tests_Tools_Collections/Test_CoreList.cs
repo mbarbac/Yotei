@@ -23,10 +23,10 @@ public static partial class Test_CoreList
         public Chain(bool sensitive) : base()
         {
             Sensitive = sensitive;
-            Validate = static x => x.ThrowWhenNull(); // Nulls not accepted...
+            ValidateItem = static x => x.ThrowWhenNull(); // Nulls not accepted...
             FlattenElements = true; // Flatten input elements...
-            AreEqual = (x, y) => new MyComparer(Sensitive).Equals(x, y); // On-stack just for testing...
-            IsValidDuplicate = static (_, _) => throw new DuplicateException(); // No duplicates...
+            CompareItems = (x, y) => new MyComparer(Sensitive).Equals(x, y); // On-stack just for testing...
+            IncludeDuplicate = static (_, _) => throw new DuplicateException(); // No duplicates...
         }
 
         public Chain(bool sensitive, IEnumerable<IElement> range)
@@ -99,11 +99,11 @@ public static partial class Test_CoreList
         Assert.Same(xtwo, target[1]);
         Assert.Same(xthree, target[2]);
 
-        Assert.Same(source.Validate, ((Chain)target).Validate);
+        Assert.Same(source.ValidateItem, ((Chain)target).ValidateItem);
         Assert.Equal(source.FlattenElements, ((Chain)target).FlattenElements);
-        Assert.Same(source.AreEqual, ((Chain)target).AreEqual);
+        Assert.Same(source.CompareItems, ((Chain)target).CompareItems);
         Assert.Same(source.GetDuplicates, ((Chain)target).GetDuplicates);
-        Assert.Same(source.IsValidDuplicate, ((Chain)target).IsValidDuplicate);
+        Assert.Same(source.IncludeDuplicate, ((Chain)target).IncludeDuplicate);
         Assert.Equal(source.Sensitive, ((Chain)target).Sensitive);
     }
 
@@ -113,7 +113,7 @@ public static partial class Test_CoreList
     [Fact]
     public static void Test_IndexOf_Item()
     {
-        var chain = new Chain(false) { IsValidDuplicate = (_, _) => true };
+        var chain = new Chain(false) { IncludeDuplicate = (_, _) => true };
         chain.AddRange([xone, xtwo, xone, xthree]);
 
         var index = chain.IndexOf(xfour); Assert.Equal(-1, index);
@@ -139,7 +139,7 @@ public static partial class Test_CoreList
     [Fact]
     public static void Test_IndexOf_Predicate()
     {
-        var chain = new Chain(false) { IsValidDuplicate = (_, _) => true };
+        var chain = new Chain(false) { IncludeDuplicate = (_, _) => true };
         chain.AddRange([xone, xtwo, xone, xthree]);
 
         var index = chain.IndexOf(x => x is null);
@@ -180,7 +180,7 @@ public static partial class Test_CoreList
     [Fact]
     public static void Test_Find_Predicate()
     {
-        var chain = new Chain(false) { IsValidDuplicate = (_, _) => true };
+        var chain = new Chain(false) { IncludeDuplicate = (_, _) => true };
         chain.AddRange([xone, xtwo, xone, xthree]);
 
         Assert.False(chain.Find(x => x is null, out var item));
@@ -217,7 +217,7 @@ public static partial class Test_CoreList
         try { chain.Add(xone); Assert.Fail(); } catch (DuplicateException) { }
         try { chain.Add(new Named("ONE")); Assert.Fail(); } catch (DuplicateException) { }
 
-        chain = new Chain(false, [xone, xtwo]) { IsValidDuplicate = (_, _) => true };
+        chain = new Chain(false, [xone, xtwo]) { IncludeDuplicate = (_, _) => true };
         done = chain.Add(xone);
         Assert.Equal(1, done);
         Assert.Equal(3, chain.Count);
@@ -304,7 +304,7 @@ public static partial class Test_CoreList
         try { chain.Insert(0, xone); Assert.Fail(); } catch (DuplicateException) { }
         try { chain.Insert(0, new Named("ONE")); Assert.Fail(); } catch (DuplicateException) { }
 
-        chain = new Chain(false, [xone, xtwo]) { IsValidDuplicate = (_, _) => true };
+        chain = new Chain(false, [xone, xtwo]) { IncludeDuplicate = (_, _) => true };
         done = chain.Insert(2, xone);
         Assert.Equal(1, done);
         Assert.Equal(3, chain.Count);
@@ -514,7 +514,7 @@ public static partial class Test_CoreList
     public static void Test_Remove_Item()
     {
         var done = 0;
-        var chain = new Chain(false) { IsValidDuplicate = (_, _) => true };
+        var chain = new Chain(false) { IncludeDuplicate = (_, _) => true };
 
         chain.Clear(); chain.AddRange([xone, xtwo, xthree, xone]);
         done = chain.Remove(xfour, out var items);
@@ -552,7 +552,7 @@ public static partial class Test_CoreList
     public static void Test_RemoveLast_Item()
     {
         var done = 0;
-        var chain = new Chain(false) { IsValidDuplicate = (_, _) => true };
+        var chain = new Chain(false) { IncludeDuplicate = (_, _) => true };
 
         chain.Clear(); chain.AddRange([xone, xtwo, xthree, xone]);
         done = chain.RemoveLast(xone, out var items);
@@ -570,7 +570,7 @@ public static partial class Test_CoreList
     public static void Test_RemoveAll_Item()
     {
         var done = 0;
-        var chain = new Chain(false) { IsValidDuplicate = (_, _) => true };
+        var chain = new Chain(false) { IncludeDuplicate = (_, _) => true };
 
         chain.Clear(); chain.AddRange([xone, xtwo, xthree, xone]);
         done = chain.RemoveAll(xone, out var items);
@@ -600,7 +600,7 @@ public static partial class Test_CoreList
     public static void Test_Remove_Item_Flatten()
     {
         var done = 0;
-        var chain = new Chain(false) { IsValidDuplicate = (_, _) => true };
+        var chain = new Chain(false) { IncludeDuplicate = (_, _) => true };
 
         chain.Clear(); chain.AddRange([xone, xtwo, xthree, xone]);
         done = chain.Remove(new Chain(false));
@@ -644,7 +644,7 @@ public static partial class Test_CoreList
     public static void Test_Remove_Predicate()
     {
         var done = 0;
-        var chain = new Chain(false) { IsValidDuplicate = (_, _) => true };
+        var chain = new Chain(false) { IncludeDuplicate = (_, _) => true };
 
         chain.Clear(); chain.AddRange([xone, xtwo, xthree, xone]);
         done = chain.Remove(x => x is Named named && named.Name.Contains('e'), out var item);
