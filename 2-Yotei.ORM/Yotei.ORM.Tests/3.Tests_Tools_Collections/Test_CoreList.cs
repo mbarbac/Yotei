@@ -23,7 +23,7 @@ public static partial class Test_CoreList
         public Chain(bool sensitive) : base()
         {
             Sensitive = sensitive;
-            ValidateItem = static x => x.ThrowWhenNull(); // Nulls not accepted...
+            ValidateElement = static x => x.ThrowWhenNull(); // Nulls not accepted...
             FlattenElements = true; // Flatten input elements...
             CompareItems = (x, y) => new MyComparer(Sensitive).Equals(x, y); // On-stack just for testing...
             IncludeDuplicate = static (_, _) => throw new DuplicateException(); // No duplicates...
@@ -99,10 +99,10 @@ public static partial class Test_CoreList
         Assert.Same(xtwo, target[1]);
         Assert.Same(xthree, target[2]);
 
-        Assert.Same(source.ValidateItem, ((Chain)target).ValidateItem);
+        Assert.Same(source.ValidateElement, ((Chain)target).ValidateElement);
         Assert.Equal(source.FlattenElements, ((Chain)target).FlattenElements);
         Assert.Same(source.CompareItems, ((Chain)target).CompareItems);
-        Assert.Same(source.GetItemDuplicates, ((Chain)target).GetItemDuplicates);
+        Assert.Same(source.GetDuplicates, ((Chain)target).GetDuplicates);
         Assert.Same(source.IncludeDuplicate, ((Chain)target).IncludeDuplicate);
         Assert.Equal(source.Sensitive, ((Chain)target).Sensitive);
     }

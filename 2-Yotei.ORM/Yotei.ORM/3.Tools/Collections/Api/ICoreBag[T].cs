@@ -3,8 +3,8 @@
 // ========================================================
 /// <summary>
 /// Represents a bag-alike collection of elements with no ordering guarantees.
-/// <br/> The semantics are that two given elements are considered equal if the rules in this
-/// instance determine so.
+/// <br/> The semantics are that two given elements are considered equal only if the equality
+/// rules in this instance determine so.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 [Cloneable]
@@ -13,7 +13,7 @@ public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, I
     /// <summary>
     /// Invoked to return a validated element before using it in this collection.
     /// </summary>
-    Func<T, T> ValidateItem { get; }
+    Func<T, T> ValidateElement { get; }
 
     /// <summary>
     /// Invoked to determine if the elements that are themselves enumerations of elements of the
@@ -30,7 +30,7 @@ public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, I
     /// <summary>
     /// Invoked to find the duplicates of the given element.
     /// </summary>
-    Func<T, IEnumerable<T>> GetItemDuplicates { get; }
+    Func<T, IEnumerable<T>> GetDuplicates { get; }
 
     /// <summary>
     /// Invoked to determine if the 2nd argument, which is a duplicate of the 1st one, can be

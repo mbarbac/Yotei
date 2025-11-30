@@ -2,16 +2,33 @@
 
 // ========================================================
 /// <summary>
-/// Represents a list-alike collection of elements.
+/// Represents a list-alike collection of elements identified by their respective keys.
 /// <br/> The semantics are that two given elements are considered equal only if the equality
-/// rules in this instance determine so.
+/// rules in this instance for their keys determine so.
 /// </summary>
+/// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>
 [Cloneable]
-public partial interface ICoreList<T>
+public partial interface ICoreList<K, T>
     : IList<T>, IReadOnlyList<T>, IList
     , ICollection<T>, IReadOnlyCollection<T>, ICollection
 {
+    /// <summary>
+    /// Invoked to obtain the key associated with the given element.
+    /// </summary>
+    Func<T, K> GetKey { get; }
+
+    /// <summary>
+    /// Invoked to return a validated key before using it in this collection.
+    /// </summary>
+    Func<K, K> ValidateKey { get; }
+
+    /// <summary>
+    /// Invoked to determine if, for the purposes of this collection, the two given keys are
+    /// equal or not.
+    /// </summary>
+    Func<K, K, bool> CompareItems { get; }
+
     /// <summary>
     /// Invoked to return a validated element before using it in this collection.
     /// </summary>
@@ -24,15 +41,9 @@ public partial interface ICoreList<T>
     bool FlattenElements { get; }
 
     /// <summary>
-    /// Invoked to determine if, for the purposes of this collection, the two given elements are
-    /// equal or not.
+    /// Invoked to find the duplicates of the given key.
     /// </summary>
-    Func<T, T, bool> CompareItems { get; }
-
-    /// <summary>
-    /// Invoked to find the duplicates of the given element.
-    /// </summary>
-    Func<T, IEnumerable<T>> GetDuplicates { get; }
+    Func<K, IEnumerable<T>> GetDuplicates { get; }
 
     /// <summary>
     /// Invoked to determine if the 2nd argument, which is a duplicate of the 1st one, can be
@@ -56,36 +67,36 @@ public partial interface ICoreList<T>
     new T this[int index] { get; set; }
 
     /// <summary>
-    /// Determines if this collection contains at least one ocurrence of the given element, as
-    /// determined by the rules in this instance.
+    /// Determines if this collection contains at least one element whose key matches the given
+    /// one, as determined by the rules in this instance.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    new bool Contains(T item);
+    bool Contains(K key);
 
     /// <summary>
-    /// Returns the index of the first ocurrence of the given element, as determined by the rules
-    /// in this instance, or -1 if any.
+    /// Returns the index of the first element whose key matches the given one, as determined by
+    /// the rules in this instace.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    new int IndexOf(T item);
+    int IndexOf(K key);
 
     /// <summary>
-    /// Returns the index of the last ocurrence of the given element, as determined by the rules
-    /// in this instance, or -1 if any.
+    /// Returns the index of the last element whose key matches the given one, as determined by
+    /// the rules in this instace.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    int LastIndexOf(T item);
+    int LastIndexOf(K key);
 
     /// <summary>
-    /// Returns the indexes of all ocurrences of the given element, as determined by the rules in
-    /// this instance.
+    /// Returns the indexes of all the elements whose key matches the given one, as determined by
+    /// the rules in this instace.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    List<int> IndexesOf(T item);
+    List<int> IndexesOf(K key);
 
     /// <summary>
     /// Returns the index of the first element that matches the given predicate, or -1 if any.
@@ -283,70 +294,70 @@ public partial interface ICoreList<T>
     int RemoveRange(int index, int count, out List<T> removed);
 
     /// <summary>
-    /// Removes from this collection the first ocurrence of the given element, as determined by
-    /// the rules in this instance. If it is an empty collection of elements, and if this instance
-    /// flattens input elements, then each element of that collection is removed instead. If the
-    /// given delegate is not null, it is invoked with the removed elements.
+    /// Removes from this collection the first element whose key matches the given one, as
+    /// determined by the rules in this instance. If the given delegate is not null, it is
+    /// invoked with the removed element.
     /// <br/> Returns the number of changes made.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    int Remove(T item, Action<T>? removed = null);
+    int Remove(K key, Action<T>? removed = null);
 
     /// <summary>
-    /// Removes from this collection the first ocurrence of the given element, as determined by
-    /// the rules in this instance. If so, returns the removed elements in the out argument.
+    /// Removes from this collection the first element whose key matches the given one, as
+    /// determined by the rules in this instance. If so, returns the removed element in the
+    /// out argument.
     /// <br/> Returns the number of changes made.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    int Remove(T item, out List<T> removed);
+    int Remove(K key, out T removed);
 
     /// <summary>
-    /// Removes from this collection the last ocurrence of the given element, as determined by
-    /// the rules in this instance. If it is an empty collection of elements, and if this instance
-    /// flattens input elements, then each element of that collection is removed instead. If the
-    /// given delegate is not null, it is invoked with the removed elements.
+    /// Removes from this collection the last element whose key matches the given one, as
+    /// determined by the rules in this instance. If the given delegate is not null, it is
+    /// invoked with the removed element.
     /// <br/> Returns the number of changes made.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    int RemoveLast(T item, Action<T>? removed = null);
+    int RemoveLast(K key, Action<T>? removed = null);
 
     /// <summary>
-    /// Removes from this collection the last ocurrence of the given element, as determined by
-    /// the rules in this instance. If so, returns the removed elements in the out argument.
+    /// Removes from this collection the last element whose key matches the given one, as
+    /// determined by the rules in this instance. If so, returns the removed element in the
+    /// out argument.
     /// <br/> Returns the number of changes made.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    int RemoveLast(T item, out List<T> removed);
+    int RemoveLast(K key, out T removed);
 
     /// <summary>
-    /// Removes from this collection all the ocurrences of the given element, as determined by the
-    /// rules in this instance. If any is an empty collection of elements, and if this instance
-    /// flattens input elements, then each element of that collection is removed instead. If the
-    /// given delegate is not null, it is invoked with the removed elements.
+    /// Removes from this collection all the elements whose key matches the given one, as
+    /// determined by the rules in this instance. If the given delegate is not null, it is
+    /// invoked with the removed elements.
     /// <br/> Returns the number of changes made.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    int RemoveAll(T item, Action<T>? removed = null);
+    int RemoveAll(K key, Action<T>? removed = null);
 
     /// <summary>
-    /// Removes from this collection all the ocurrences of the given element, as determined by the
-    /// rules in this instance and, if so, returns the removed elements in the out argument.
+    /// Removes from this collection all the elements whose key matches the given one, as
+    /// determined by the rules in this instance. If so, returns the removed elements in the
+    /// out argument.
     /// <br/> Returns the number of changes made.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    int RemoveAll(T item, out List<T> removed);
+    int RemoveAll(K key, out List<T> removed);
 
     /// <summary>
     /// Removes from this collection the first element that matches the given predicate. If the
