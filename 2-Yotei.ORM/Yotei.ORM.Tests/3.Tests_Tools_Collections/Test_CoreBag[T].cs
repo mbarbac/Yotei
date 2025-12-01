@@ -27,7 +27,7 @@ public static partial class Test_CoreBag
             Sensitive = sensitive;
             ValidateElement = static x => x.ThrowWhenNull(); // Nulls not accepted...
             FlattenElements = true; // Flatten input elements...
-            CompareItems = (x, y) => new MyComparer(Sensitive).Equals(x, y); // On-stack just for testing...
+            CompareElements = (x, y) => new MyComparer(Sensitive).Equals(x, y); // On-stack just for testing...
             IncludeDuplicate = static (_, _) => throw new DuplicateException(); // No duplicates...
         }
 
@@ -101,11 +101,11 @@ public static partial class Test_CoreBag
         Assert.True(target.Contains(xtwo));
         Assert.True(target.Contains(xthree));
 
-        Assert.Same(source.ValidateElement, ((Chain)target).ValidateElement);
-        Assert.Equal(source.FlattenElements, ((Chain)target).FlattenElements);
-        Assert.Same(source.CompareItems, ((Chain)target).CompareItems);
-        Assert.Same(source.GetDuplicates, ((Chain)target).GetDuplicates);
-        Assert.Same(source.IncludeDuplicate, ((Chain)target).IncludeDuplicate);
+        Assert.Same(source.ValidateElement, target.ValidateElement);
+        Assert.Equal(source.FlattenElements, target.FlattenElements);
+        Assert.Same(source.CompareElements, target.CompareElements);
+        Assert.Same(source.GetDuplicates, target.GetDuplicates);
+        Assert.Same(source.IncludeDuplicate, target.IncludeDuplicate);
         Assert.Equal(source.Sensitive, ((Chain)target).Sensitive);
     }
 

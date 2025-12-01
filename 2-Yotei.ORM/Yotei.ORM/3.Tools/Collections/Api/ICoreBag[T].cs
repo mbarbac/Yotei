@@ -25,7 +25,7 @@ public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, I
     /// Invoked to determine if, for the purposes of this collection, the two given elements are
     /// equal or not.
     /// </summary>
-    Func<T, T, bool> CompareItems { get; }
+    Func<T, T, bool> CompareElements { get; }
 
     /// <summary>
     /// Invoked to find the duplicates of the given element.

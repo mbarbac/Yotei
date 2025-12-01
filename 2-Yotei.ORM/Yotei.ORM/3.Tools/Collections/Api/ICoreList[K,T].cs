@@ -27,7 +27,7 @@ public partial interface ICoreList<K, T>
     /// Invoked to determine if, for the purposes of this collection, the two given keys are
     /// equal or not.
     /// </summary>
-    Func<K, K, bool> CompareItems { get; }
+    Func<K, K, bool> CompareKeys { get; }
 
     /// <summary>
     /// Invoked to return a validated element before using it in this collection.

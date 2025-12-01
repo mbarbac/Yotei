@@ -28,8 +28,8 @@ public class MenuArtifacts : ConsoleMenuEntry
             position = new ConsoleMenu
             {
                 new("Exit"),
-                new ClearDiskArtifacts(),
                 new ClearLocalPackages(),
+                new ClearDiskArtifacts(),                
             }
             .Run(Program.MenuOptions);
         }

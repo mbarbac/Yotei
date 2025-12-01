@@ -18,8 +18,8 @@ public partial class CoreList<T> : ICoreList<T>
     {
         ValidateElement = static x => x;
         FlattenElements = false;
-        CompareItems = static (x, y) => EqualityComparer<T>.Default.Equals(x, y);
-        GetDuplicates = x => FindAll(y => CompareItems(x, y), out var items) ? items : [];
+        CompareElements = static (x, y) => EqualityComparer<T>.Default.Equals(x, y);
+        GetDuplicates = x => FindAll(y => CompareElements(x, y), out var items) ? items : [];
         IncludeDuplicate = static (_, _) => true;
         Items = [];
     }
@@ -40,7 +40,7 @@ public partial class CoreList<T> : ICoreList<T>
 
         ValidateElement = source.ValidateElement;
         FlattenElements = source.FlattenElements;
-        CompareItems = source.CompareItems;
+        CompareElements = source.CompareElements;
         GetDuplicates = source.GetDuplicates;
         IncludeDuplicate = source.IncludeDuplicate;
         Items = [.. source];
@@ -127,7 +127,7 @@ public partial class CoreList<T> : ICoreList<T>
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public Func<T, T, bool> CompareItems
+    public Func<T, T, bool> CompareElements
     {
         get;
         set
@@ -223,7 +223,7 @@ public partial class CoreList<T> : ICoreList<T>
     public int IndexOf(T item)
     {
         item = ValidateElement(item);
-        return IndexOf(x => CompareItems(x, item));
+        return IndexOf(x => CompareElements(x, item));
     }
     int IList.IndexOf(object? item) => IndexOf((T)item!);
 
@@ -235,7 +235,7 @@ public partial class CoreList<T> : ICoreList<T>
     public int LastIndexOf(T item)
     {
         item = ValidateElement(item);
-        return LastIndexOf(x => CompareItems(x, item));
+        return LastIndexOf(x => CompareElements(x, item));
     }
 
     /// <summary>
@@ -246,7 +246,7 @@ public partial class CoreList<T> : ICoreList<T>
     public List<int> IndexesOf(T item)
     {
         item = ValidateElement(item);
-        return IndexesOf(x => CompareItems(x, item));
+        return IndexesOf(x => CompareElements(x, item));
     }
 
     /// <summary>
@@ -479,9 +479,11 @@ public partial class CoreList<T> : ICoreList<T>
     /// <returns></returns>
     public virtual int Replace(int index, T item, Action<T>? removed = null)
     {
-        if (item is not IEnumerable<T>) item = ValidateElement(item);
         var source = Items[index];
-        if (CompareItems(source, item)) return 0;
+
+        // Same element needs no replacement...
+        item = ValidateElement(item);
+        if (CompareElements(source, item)) return 0;
 
         // Tentative removal...
         if (!RemoveAt(index)) throw new InvalidOperationException(
@@ -494,6 +496,7 @@ public partial class CoreList<T> : ICoreList<T>
             ? InsertRange(index, range)
             : Insert(index, item);
 
+        // Finishing...
         if (num > 0)
         {
             if (removed is not null) removed(source);
