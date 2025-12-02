@@ -1,10 +1,10 @@
-﻿namespace Runner.Benchmarks;
+﻿namespace Benchmarks;
 
 // ========================================================
 [DisassemblyDiagnoser]
 [MemoryDiagnoser(displayGenColumns: false)]
 [HideColumns("Job", "Error", "StdDev", "Median")]
-public partial class Example
+public partial class Bench_StringSplit
 {
     [Benchmark]
     public void Split_Empty()

@@ -1,4 +1,4 @@
-﻿namespace Runner.Benchmarks;
+﻿namespace Benchmarks;
 
 // ========================================================
 internal class Program
