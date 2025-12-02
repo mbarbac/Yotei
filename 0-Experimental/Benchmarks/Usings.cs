@@ -21,3 +21,4 @@ global using BenchmarkDotNet.Attributes;
 global using BenchmarkDotNet.Running;
 
 global using Yotei.Tools;
+global using Experimental;

@@ -10,8 +10,8 @@ public partial class Bench_StringBuilderPool
 {
     static void UseValue(string str) { if (str.Length == 0) throw new Exception(); }
 
-    [Benchmark]
     [SuppressMessage("", "CA1822")]
+    [Benchmark]
     public void Standard()
     {
         for (int i = 0; i < 100_000; i++)
@@ -22,6 +22,7 @@ public partial class Bench_StringBuilderPool
         }
     }
 
+    [SuppressMessage("", "CA1822")]
     [Benchmark]
     public void Pooled()
     {
@@ -35,4 +36,16 @@ public partial class Bench_StringBuilderPool
     }
     static readonly StringBuilderPooledObjectPolicy policy = new();
     static readonly DefaultObjectPool<StringBuilder> pool = new(policy);
+
+    [SuppressMessage("", "CA1822")]
+    [Benchmark]
+    public void DisposableBuilder()
+    {
+        for (int i = 0; i < 100_000; i++)
+        {
+            var builder = new DisposableStringBuilder();
+            builder.AppendLine($"Example #{i}");
+            UseValue(builder.ToString());
+        }
+    }
 }

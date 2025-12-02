@@ -15,6 +15,7 @@
 		<PackageReference Include="BenchmarkDotNet" Version="0.15.8" />
 		<PackageReference Include="Microsoft.Extensions.ObjectPool" Version="10.0.0" />
 		<ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
+		<ProjectReference Include="..\Experimental\Experimental.csproj" />
 	</ItemGroup>
 
 </Project>
