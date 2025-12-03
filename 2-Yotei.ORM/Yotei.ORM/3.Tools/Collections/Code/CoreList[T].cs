@@ -86,7 +86,7 @@ public partial class CoreList<T> : ICoreList<T>
     // ----------------------------------------------------
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Invoked to return a validated element before using it in this collection.
     /// </summary>
     public Func<T, T> ValidateElement
     {
@@ -106,7 +106,8 @@ public partial class CoreList<T> : ICoreList<T>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Invoked to determine if the elements that are themselves enumerations of elements of the
+    /// type of this collection shall be flattened before using them, or not.
     /// </summary>
     public bool FlattenElements
     {
@@ -125,7 +126,8 @@ public partial class CoreList<T> : ICoreList<T>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Invoked to determine if, for the purposes of this collection, the two given elements are
+    /// equal or not.
     /// </summary>
     public Func<T, T, bool> CompareElements
     {
@@ -145,7 +147,7 @@ public partial class CoreList<T> : ICoreList<T>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Invoked to find the duplicates of the given element.
     /// </summary>
     public Func<T, IEnumerable<T>> GetDuplicates
     {
@@ -165,7 +167,9 @@ public partial class CoreList<T> : ICoreList<T>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Invoked to determine if the 2nd argument, which is a duplicate of the 1st one, can be
+    /// included in this collection, or not, by returning 'true' or 'false' as appropriate. In
+    /// addition, may throw an exception if duplicates are not allowed.
     /// </summary>
     public Func<T, T, bool> IncludeDuplicate
     {

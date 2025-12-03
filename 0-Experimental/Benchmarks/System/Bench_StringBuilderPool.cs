@@ -4,7 +4,7 @@ namespace Benchmarks;
 
 // ========================================================
 [DisassemblyDiagnoser]
-[MemoryDiagnoser(displayGenColumns: false)]
+[MemoryDiagnoser(displayGenColumns: true)]
 [HideColumns("Job", "Error", "StdDev", "Median")]
 public partial class Bench_StringBuilderPool
 {
@@ -43,7 +43,7 @@ public partial class Bench_StringBuilderPool
     {
         for (int i = 0; i < 100_000; i++)
         {
-            var builder = new DisposableStringBuilder();
+            using var builder = new DisposableStringBuilder();
             builder.AppendLine($"Example #{i}");
             UseValue(builder.ToString());
         }

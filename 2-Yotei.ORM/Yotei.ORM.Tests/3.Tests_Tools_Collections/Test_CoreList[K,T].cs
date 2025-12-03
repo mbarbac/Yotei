@@ -94,13 +94,13 @@ public static partial class Test_CoreList_KT
         Assert.Same(xtwo, target[1]);
         Assert.Same(xthree, target[2]);
 
-        Assert.Same(source.GetKey, target.GetKey);
-        Assert.Same(source.ValidateKey, target.ValidateKey);
-        Assert.Same(source.CompareKeys, target.CompareKeys);
-        Assert.Same(source.ValidateElement, target.ValidateElement);
-        Assert.Equal(source.FlattenElements, target.FlattenElements);
-        Assert.Same(source.GetDuplicates, target.GetDuplicates);
-        Assert.Same(source.IncludeDuplicate, target.IncludeDuplicate);
+        Assert.Same(source.GetKey, ((Chain)target).GetKey);
+        Assert.Same(source.ValidateKey, ((Chain)target).ValidateKey);
+        Assert.Same(source.CompareKeys, ((Chain)target).CompareKeys);
+        Assert.Same(source.ValidateElement, ((Chain)target).ValidateElement);
+        Assert.Equal(source.FlattenElements, ((Chain)target).FlattenElements);
+        Assert.Same(source.GetDuplicates, ((Chain)target).GetDuplicates);
+        Assert.Same(source.IncludeDuplicate, ((Chain)target).IncludeDuplicate);
         Assert.Equal(source.Sensitive, ((Chain)target).Sensitive);
     }
 

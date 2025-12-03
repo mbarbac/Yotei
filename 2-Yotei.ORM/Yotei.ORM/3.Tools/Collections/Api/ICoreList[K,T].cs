@@ -14,47 +14,6 @@ public partial interface ICoreList<K, T>
     , ICollection<T>, IReadOnlyCollection<T>, ICollection
 {
     /// <summary>
-    /// Invoked to obtain the key associated with the given element.
-    /// </summary>
-    Func<T, K> GetKey { get; }
-
-    /// <summary>
-    /// Invoked to return a validated key before using it in this collection.
-    /// </summary>
-    Func<K, K> ValidateKey { get; }
-
-    /// <summary>
-    /// Invoked to determine if, for the purposes of this collection, the two given keys are
-    /// equal or not.
-    /// </summary>
-    Func<K, K, bool> CompareKeys { get; }
-
-    /// <summary>
-    /// Invoked to return a validated element before using it in this collection.
-    /// </summary>
-    Func<T, T> ValidateElement { get; }
-
-    /// <summary>
-    /// Invoked to determine if the elements that are themselves enumerations of elements of the
-    /// type of this collection shall be flattened before using them, or not.
-    /// </summary>
-    bool FlattenElements { get; }
-
-    /// <summary>
-    /// Invoked to find the duplicates of the given key.
-    /// </summary>
-    Func<K, IEnumerable<T>> GetDuplicates { get; }
-
-    /// <summary>
-    /// Invoked to determine if the 2nd argument, which is a duplicate of the 1st one, can be
-    /// included in this collection, or not, by returning 'true' or 'false' as appropriate. In
-    /// addition, may throw an exception if duplicates are not allowed.
-    /// </summary>
-    Func<T, T, bool> IncludeDuplicate { get; }
-
-    // ----------------------------------------------------
-
-    /// <summary>
     /// Gets the number of elements in this collection.
     /// </summary>
     new int Count { get; }

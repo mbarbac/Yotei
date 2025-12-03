@@ -93,7 +93,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     // ----------------------------------------------------
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Invoked to obtain the key associated with the given element.
     /// </summary>
     public Func<T, K> GetKey
     {
@@ -113,7 +113,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Invoked to return a validated key before using it in this collection.
     /// </summary>
     public Func<K, K> ValidateKey
     {
@@ -133,7 +133,8 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Invoked to determine if, for the purposes of this collection, the two given keys are
+    /// equal or not.
     /// </summary>
     public Func<K, K, bool> CompareKeys
     {
@@ -153,7 +154,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Invoked to return a validated element before using it in this collection.
     /// </summary>
     public Func<T, T> ValidateElement
     {
@@ -173,7 +174,8 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Invoked to determine if the elements that are themselves enumerations of elements of the
+    /// type of this collection shall be flattened before using them, or not.
     /// </summary>
     public bool FlattenElements
     {
@@ -192,7 +194,7 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Invoked to find the duplicates of the given key.
     /// </summary>
     public Func<K, IEnumerable<T>> GetDuplicates
     {
@@ -212,7 +214,9 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Invoked to determine if the 2nd argument, which is a duplicate of the 1st one, can be
+    /// included in this collection, or not, by returning 'true' or 'false' as appropriate. In
+    /// addition, may throw an exception if duplicates are not allowed.
     /// </summary>
     public Func<T, T, bool> IncludeDuplicate
     {
