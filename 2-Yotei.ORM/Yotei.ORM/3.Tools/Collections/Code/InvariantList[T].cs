@@ -303,7 +303,7 @@ public partial class InvariantList<T> : IInvariantList<T>
         var builder = Items.Clone();
         builder.Clear();
 
-        var range = Items.ToList().GetRange(index, count); // LOW: Optimize
+        var range = Items.ToList().GetRange(index, count); // LOW: Optimize InvariantList GetRange()
         var num = builder.AddRange(range);
         return num > 0 ? builder.ToInvariant() : this;
     }
