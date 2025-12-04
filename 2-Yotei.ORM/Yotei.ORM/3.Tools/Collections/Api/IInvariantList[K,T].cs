@@ -2,25 +2,26 @@
 
 // ========================================================
 /// <summary>
-/// Represents an immutable list-alike collection of elements.
+/// Represents an immutable list-alike collection of elements identified by their respective keys.
 /// <br/> Semantics are that two given elements are considered equal only if the equality rules
-/// in this instance determine so. Instances of this type are intended to be immutable ones.
+/// for their keys determine so. Instances of this type are intended to be immutable ones.
 /// </summary>
+/// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>
 [Cloneable]
-public partial interface IInvariantList<T> : IReadOnlyList<T>, ICollection
+public partial interface IInvariantList<K, T> : IReadOnlyList<T>, ICollection
 {
     /// <summary>
-    /// Represents a builder for <see cref="IInvariantList{T}"/> instances.
+    /// Represents a builder for <see cref="IInvariantList{K,T}"/> instances.
     /// </summary>
     [Cloneable]
-    public partial interface ICoreBuilder : ICoreList<T>
+    public partial interface ICoreBuilder : ICoreList<K, T>
     {
         /// <summary>
         /// Returns a new invariant instance based upon the contents of this builder.
         /// </summary>
         /// <returns></returns>
-        IInvariantList<T> ToInvariant();
+        IInvariantList<K, T> ToInvariant();
     }
 
     /// <summary>
@@ -44,36 +45,36 @@ public partial interface IInvariantList<T> : IReadOnlyList<T>, ICollection
     new T this[int index] { get; }
 
     /// <summary>
-    /// Determines if this collection contains at least one ocurrence of the given element, as
-    /// determined by the rules in this instance.
+    /// Determines if this collection contains at least one element whose key matches the given
+    /// one, as determined by the rules in this instance.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    bool Contains(T item);
+    bool Contains(K key);
 
     /// <summary>
-    /// Returns the index of the first ocurrence of the given element, as determined by the rules
-    /// in this instance, or -1 if any.
+    /// Returns the index of the first element whose key matches the given one, as determined by
+    /// the rules in this instace.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    int IndexOf(T item);
+    int IndexOf(K key);
 
     /// <summary>
-    /// Returns the index of the last ocurrence of the given element, as determined by the rules
-    /// in this instance, or -1 if any.
+    /// Returns the index of the last element whose key matches the given one, as determined by
+    /// the rules in this instace.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    int LastIndexOf(T item);
+    int LastIndexOf(K key);
 
     /// <summary>
-    /// Returns the indexes of all ocurrences of the given element, as determined by the rules in
-    /// this instance.
+    /// Returns the indexes of all the elements whose key matches the given one, as determined by
+    /// the rules in this instace.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    List<int> IndexesOf(T item);
+    List<int> IndexesOf(K key);
 
     /// <summary>
     /// Returns the index of the first element that matches the given predicate, or -1 if any.
@@ -166,7 +167,7 @@ public partial interface IInvariantList<T> : IReadOnlyList<T>, ICollection
     /// Trims the internal structures used by this instance.
     /// </summary>
     void Trim();
-
+    
     // ----------------------------------------------------
 
     /// <summary>
@@ -175,7 +176,7 @@ public partial interface IInvariantList<T> : IReadOnlyList<T>, ICollection
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    IInvariantList<T> Add(T item);
+    IInvariantList<K, T> Add(T item);
 
     /// <summary>
     /// Returns a new instance with the elements of the given range added to it.
@@ -183,7 +184,7 @@ public partial interface IInvariantList<T> : IReadOnlyList<T>, ICollection
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    IInvariantList<T> AddRange(IEnumerable<T> range);
+    IInvariantList<K, T> AddRange(IEnumerable<T> range);
 
     /// <summary>
     /// Returns a new instance with the given element inserted into it at the given index.
@@ -192,7 +193,7 @@ public partial interface IInvariantList<T> : IReadOnlyList<T>, ICollection
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    IInvariantList<T> Insert(int index, T item);
+    IInvariantList<K, T> Insert(int index, T item);
 
     /// <summary>
     /// Returns a new instance with the elements of the given range inserted into it, starting
@@ -202,7 +203,7 @@ public partial interface IInvariantList<T> : IReadOnlyList<T>, ICollection
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    IInvariantList<T> InsertRange(int index, IEnumerable<T> range);
+    IInvariantList<K, T> InsertRange(int index, IEnumerable<T> range);
 
     // ----------------------------------------------------
 
@@ -213,7 +214,7 @@ public partial interface IInvariantList<T> : IReadOnlyList<T>, ICollection
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    IInvariantList<T> GetRange(int index, int count);
+    IInvariantList<K, T> GetRange(int index, int count);
 
     /// <summary>
     /// Returns a new instance with the element at the given index replaced by the given one. If
@@ -226,7 +227,7 @@ public partial interface IInvariantList<T> : IReadOnlyList<T>, ICollection
     /// <param name="item"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    IInvariantList<T> Replace(int index, T item, Action<T>? removed = null);
+    IInvariantList<K, T> Replace(int index, T item, Action<T>? removed = null);
 
     /// <summary>
     /// Returns a new instance with the element at the given index replaced by the given one. If
@@ -238,7 +239,7 @@ public partial interface IInvariantList<T> : IReadOnlyList<T>, ICollection
     /// <param name="item"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    IInvariantList<T> Replace(int index, T item, out T removed);
+    IInvariantList<K, T> Replace(int index, T item, out T removed);
 
     /// <summary>
     /// Returns a new instance with the element at the given index removed. If the given delegate
@@ -248,7 +249,7 @@ public partial interface IInvariantList<T> : IReadOnlyList<T>, ICollection
     /// <param name="index"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveAt(int index, Action<T>? removed = null);
+    IInvariantList<K, T> RemoveAt(int index, Action<T>? removed = null);
 
     /// <summary>
     /// Returns a new instance with the element at the given index removed. Returns the removed
@@ -258,7 +259,7 @@ public partial interface IInvariantList<T> : IReadOnlyList<T>, ICollection
     /// <param name="index"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveAt(int index, out T removed);
+    IInvariantList<K, T> RemoveAt(int index, out T removed);
 
     /// <summary>
     /// Returns a new instance with the given number of elements, starting at the given index,
@@ -269,7 +270,7 @@ public partial interface IInvariantList<T> : IReadOnlyList<T>, ICollection
     /// <param name="count"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveRange(int index, int count, Action<T>? removed = null);
+    IInvariantList<K, T> RemoveRange(int index, int count, Action<T>? removed = null);
 
     /// <summary>
     /// Returns a new instance with the given number of elements, starting at the given index,
@@ -280,79 +281,73 @@ public partial interface IInvariantList<T> : IReadOnlyList<T>, ICollection
     /// <param name="count"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveRange(int index, int count, out List<T> removed);
+    IInvariantList<K, T> RemoveRange(int index, int count, out List<T> removed);
 
     /// <summary>
-    /// Returns a new instance with the first ocurrence of the given element, as determined by
-    /// the rules in this instance, removed. If it is itself a collection of elements, and this
-    /// instance flattens input elements, then its own elements are removed instead. If the given
-    /// delegate is not null, it is invoked with the removed elements.
+    /// Returns a new instance with the first ocurrence of an element whose key matches the given
+    /// one, as determined by the rules in this instance, removed. If the given delegate is not
+    /// null, it is invoked with the removed element.
     /// <br/> Returns the original instance if no changes were made.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    IInvariantList<T> Remove(T item, Action<T>? removed = null);
+    IInvariantList<K, T> Remove(K key, Action<T>? removed = null);
 
     /// <summary>
-    /// Returns a new instance with the first ocurrence of the given element, as determined by
-    /// the rules in this instance, removed. If it is itself a collection of elements, and this
-    /// instance flattens input elements, then its own elements are removed instead. Returns the
-    /// removed elements in the out argument.
+    /// Returns a new instance with the first ocurrence of an element whose key matches the given
+    /// one, as determined by the rules in this instance, removed. Returns the removed element in
+    /// the out argument.
     /// <br/> Returns the original instance if no changes were made.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    IInvariantList<T> Remove(T item, out List<T> removed);
+    IInvariantList<K, T> Remove(K key, out T removed);
 
     /// <summary>
-    /// Returns a new instance with the last ocurrence of the given element, as determined by
-    /// the rules in this instance, removed. If it is itself a collection of elements, and this
-    /// instance flattens input elements, then its own elements are removed instead. If the given
-    /// delegate is not null, it is invoked with the removed elements.
+    /// Returns a new instance with the last ocurrence of an element whose key matches the given
+    /// one, as determined by the rules in this instance, removed. If the given delegate is not
+    /// null, it is invoked with the removed element.
     /// <br/> Returns the original instance if no changes were made.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveLast(T item, Action<T>? removed = null);
+    IInvariantList<K, T> RemoveLast(K key, Action<T>? removed = null);
 
     /// <summary>
-    /// Returns a new instance with the last ocurrence of the given element, as determined by
-    /// the rules in this instance, removed. If it is itself a collection of elements, and this
-    /// instance flattens input elements, then its own elements are removed instead. Returns the
-    /// removed elements in the out argument.
+    /// Returns a new instance with the last ocurrence of an element whose key matches the given
+    /// one, as determined by the rules in this instance, removed. Returns the removed element in
+    /// the out argument.
     /// <br/> Returns the original instance if no changes were made.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveLast(T item, out List<T> removed);
+    IInvariantList<K, T> RemoveLast(K key, out T removed);
 
     /// <summary>
-    /// Returns a new instance with all the ocurrences of the given element, as determined by
-    /// the rules in this instance, removed. If it is itself a collection of elements, and this
-    /// instance flattens input elements, then its own elements are removed instead. If the given
-    /// delegate is not null, it is invoked with the removed elements.
+    /// Returns a new instance with all the ocurrences of elements whose keys match the given
+    /// one, as determined by the rules in this instance, removed. If the given delegate is not
+    /// null, it is invoked with the removed elements.
     /// <br/> Returns the original instance if no changes were made.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveAll(T item, Action<T>? removed = null);
+    IInvariantList<K, T> RemoveAll(K key, Action<T>? removed = null);
 
     /// <summary>
-    /// Returns a new instance with all the ocurrences of the given element, as determined by
-    /// the rules in this instance, removed. If it is itself a collection of elements, and this
-    /// instance flattens input elements, then its own elements are removed instead. Returns the
-    /// removed elements in the out argument.
+    /// Returns a new instance with all the ocurrences of elements whose keys match the given
+    /// one, as determined by the rules in this instance, removed. Returns the removed elements
+    /// in the out argument.
     /// <br/> Returns the original instance if no changes were made.
     /// </summary>
-    /// <param name="item"></param>
+    /// <param name="key"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveAll(T item, out List<T> removed);
+    IInvariantList<K, T> RemoveAll(K key, out List<T> removed);
 
     /// <summary>
     /// Returns a new instance with the first element that matches the given predicate removed.
@@ -362,7 +357,7 @@ public partial interface IInvariantList<T> : IReadOnlyList<T>, ICollection
     /// <param name="predicate"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    IInvariantList<T> Remove(Predicate<T> predicate, Action<T>? removed = null);
+    IInvariantList<K, T> Remove(Predicate<T> predicate, Action<T>? removed = null);
 
     /// <summary>
     /// Returns a new instance with the first element that matches the given predicate removed.
@@ -372,7 +367,7 @@ public partial interface IInvariantList<T> : IReadOnlyList<T>, ICollection
     /// <param name="predicate"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    IInvariantList<T> Remove(Predicate<T> predicate, out T removed);
+    IInvariantList<K, T> Remove(Predicate<T> predicate, out T removed);
 
     /// <summary>
     /// Returns a new instance with the last element that matches the given predicate removed.
@@ -382,7 +377,7 @@ public partial interface IInvariantList<T> : IReadOnlyList<T>, ICollection
     /// <param name="predicate"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveLast(Predicate<T> predicate, Action<T>? removed = null);
+    IInvariantList<K, T> RemoveLast(Predicate<T> predicate, Action<T>? removed = null);
 
     /// <summary>
     /// Returns a new instance with the last element that matches the given predicate removed.
@@ -392,7 +387,7 @@ public partial interface IInvariantList<T> : IReadOnlyList<T>, ICollection
     /// <param name="predicate"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveLast(Predicate<T> predicate, out T removed);
+    IInvariantList<K, T> RemoveLast(Predicate<T> predicate, out T removed);
 
     /// <summary>
     /// Returns a new instance with all the element that matches the given predicate removed.
@@ -402,7 +397,7 @@ public partial interface IInvariantList<T> : IReadOnlyList<T>, ICollection
     /// <param name="predicate"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveAll(Predicate<T> predicate, Action<T>? removed = null);
+    IInvariantList<K, T> RemoveAll(Predicate<T> predicate, Action<T>? removed = null);
 
     /// <summary>
     /// Returns a new instance with all the elements that matches the given predicate removed.
@@ -412,12 +407,12 @@ public partial interface IInvariantList<T> : IReadOnlyList<T>, ICollection
     /// <param name="predicate"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveAll(Predicate<T> predicate, out List<T> removed);
+    IInvariantList<K, T> RemoveAll(Predicate<T> predicate, out List<T> removed);
 
     /// <summary>
     /// Returns a new instance with all the original elements removed.
     /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <returns></returns>
-    IInvariantList<T> Clear();
+    IInvariantList<K, T> Clear();
 }

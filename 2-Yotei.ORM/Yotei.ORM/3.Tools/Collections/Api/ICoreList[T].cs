@@ -253,9 +253,9 @@ public partial interface ICoreList<T>
 
     /// <summary>
     /// Removes from this collection the first ocurrence of the given element, as determined by
-    /// the rules in this instance. If it is an empty collection of elements, and if this instance
-    /// flattens input elements, then each element of that collection is removed instead. If the
-    /// given delegate is not null, it is invoked with the removed elements.
+    /// the rules in this instance. If it is itself a collection of elements, and this instance
+    /// flattens input elements, then its own elements are removed instead. If the given delegate
+    /// is not null, it is invoked with the removed elements.
     /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="item"></param>
@@ -265,7 +265,9 @@ public partial interface ICoreList<T>
 
     /// <summary>
     /// Removes from this collection the first ocurrence of the given element, as determined by
-    /// the rules in this instance. If so, returns the removed elements in the out argument.
+    /// the rules in this instance. If it is itself a collection of elements, and this instance
+    /// flattens input elements, then its own elements are removed instead. Returns the removed
+    /// elements in the out argument.
     /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="item"></param>
@@ -275,9 +277,9 @@ public partial interface ICoreList<T>
 
     /// <summary>
     /// Removes from this collection the last ocurrence of the given element, as determined by
-    /// the rules in this instance. If it is an empty collection of elements, and if this instance
-    /// flattens input elements, then each element of that collection is removed instead. If the
-    /// given delegate is not null, it is invoked with the removed elements.
+    /// the rules in this instance. If it is itself a collection of elements, and this instance
+    /// flattens input elements, then its own elements are removed instead. If the given delegate
+    /// is not null, it is invoked with the removed elements.
     /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="item"></param>
@@ -287,7 +289,9 @@ public partial interface ICoreList<T>
 
     /// <summary>
     /// Removes from this collection the last ocurrence of the given element, as determined by
-    /// the rules in this instance. If so, returns the removed elements in the out argument.
+    /// the rules in this instance. If it is itself a collection of elements, and this instance
+    /// flattens input elements, then its own elements are removed instead. Returns the removed
+    /// elements in the out argument.
     /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="item"></param>
@@ -296,10 +300,10 @@ public partial interface ICoreList<T>
     int RemoveLast(T item, out List<T> removed);
 
     /// <summary>
-    /// Removes from this collection all the ocurrences of the given element, as determined by the
-    /// rules in this instance. If any is an empty collection of elements, and if this instance
-    /// flattens input elements, then each element of that collection is removed instead. If the
-    /// given delegate is not null, it is invoked with the removed elements.
+    /// Removes from this collection all the ocurrences of the given element, as determined by
+    /// the rules in this instance. If it is itself a collection of elements, and this instance
+    /// flattens input elements, then its own elements are removed instead. If the given delegate
+    /// is not null, it is invoked with the removed elements.
     /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="item"></param>
@@ -308,8 +312,10 @@ public partial interface ICoreList<T>
     int RemoveAll(T item, Action<T>? removed = null);
 
     /// <summary>
-    /// Removes from this collection all the ocurrences of the given element, as determined by the
-    /// rules in this instance and, if so, returns the removed elements in the out argument.
+    /// Removes from this collection all the ocurrences of the given element, as determined by
+    /// the rules in this instance. If it is itself a collection of elements, and this instance
+    /// flattens input elements, then its own elements are removed instead. Returns the removed
+    /// elements in the out argument.
     /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="item"></param>
