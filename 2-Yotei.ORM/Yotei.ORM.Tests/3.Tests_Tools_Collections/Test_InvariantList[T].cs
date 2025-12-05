@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using System.Security.Principal;
 
 namespace Yotei.ORM.Tests.Collections;
 
@@ -29,10 +30,20 @@ public static partial class Test_InvariantList_T
             public Builder(bool sensitive)
             {
                 Sensitive = sensitive;
-                ValidateElement = static x => x.ThrowWhenNull(); // No nulls...
+
                 FlattenElements = true; // Flatten input elements...
-                CompareElements = (x, y) => new MyComparer(Sensitive).Equals(x, y); // On-stack just for testing...
-                IncludeDuplicate = static (_, _) => throw new DuplicateException(); // No duplicates...
+                ValidateElement = static x => // No nulls allowed...
+                {
+                    return x.ThrowWhenNull();
+                };
+                CompareElements = (x, y) => // On-stack just for testing...
+                {
+                    return new MyComparer(Sensitive).Equals(x, y);
+                };
+                IncludeDuplicate = static (_, _) => // No duplicates...
+                {
+                    throw new DuplicateException();
+                };
             }
 
             public Builder(
@@ -71,7 +82,7 @@ public static partial class Test_InvariantList_T
         public Chain(bool sensitive) => Items = new Builder(sensitive);
         public Chain(bool sensitive, IEnumerable<IElement> range) : this(sensitive) => Items.AddRange(range);
         protected Chain(Chain source) => Items = source.ThrowWhenNull().Items.Clone();
-        
+
         public override Builder ToBuilder() => (Builder)base.ToBuilder();
         public bool Sensitive => Items.Sensitive;
     }
@@ -132,19 +143,39 @@ public static partial class Test_InvariantList_T
 
         static void ValidateSetting(Chain source, Chain target, string name)
         {
-            var flags = BindingFlags.NonPublic | BindingFlags.Instance;
-            var items = typeof(Chain).GetProperties(flags).Where(x =>
-                x.Name == "Items" &&
-                x.DeclaringType == typeof(Chain)).First();
+            var bsource = GetBuilder(source);
+            var btarget = GetBuilder(target);
 
-            flags = BindingFlags.Public | BindingFlags.Instance;
-            var prop = typeof(Chain.Builder).GetProperty(name, flags);
-            Assert.NotNull(prop);
-
-            var svalue = prop.GetValue(items.GetValue(source));
-            var tvalue = prop.GetValue(items.GetValue(target));
-            Assert.Equal(svalue, tvalue);
+            var vsource = GetBuilderValue(bsource, name);
+            var vtarget = GetBuilderValue(btarget, name);
+            Assert.Equal(vsource, vtarget);
         }
+    }
+
+    public static Chain.Builder GetBuilder(Chain chain)
+    {
+        var flags = BindingFlags.NonPublic | BindingFlags.Instance;
+        var prop = typeof(Chain).GetProperties(flags).Where(x =>
+            x.Name == "Items" &&
+            x.DeclaringType == typeof(Chain)).First();
+
+        var builder = (Chain.Builder)prop.GetValue(chain)!;
+        Assert.NotNull(builder);
+        return builder;
+    }
+
+    public static PropertyInfo GetBuilderProperty(string name)
+    {
+        var flags = BindingFlags.Public | BindingFlags.Instance;
+        var prop = typeof(Chain.Builder).GetProperty(name, flags);
+        Assert.NotNull(prop);
+        return prop;
+    }
+
+    public static object? GetBuilderValue(Chain.Builder builder, string name)
+    {
+        var prop = GetBuilderProperty(name);
+        return prop.GetValue(builder);
     }
 
     // ----------------------------------------------------
@@ -249,7 +280,7 @@ public static partial class Test_InvariantList_T
     public static void Test_Add()
     {
         var source = new Chain(false, [xone, xtwo]);
-        
+
         var target = source.Add(xthree);
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
@@ -316,7 +347,7 @@ public static partial class Test_InvariantList_T
     {
         var source = new Chain(false, [xone, xtwo]);
         var target = source.AddRange([new Chain(false, [xthree, xfour]), new Named("FIVE")]);
-        
+
         Assert.NotSame(source, target);
         Assert.Equal(5, target.Count);
         Assert.Same(xone, target[0]);
@@ -461,5 +492,264 @@ public static partial class Test_InvariantList_T
 
         var target = source.Replace(1, new Chain(false, []), out var item);
         Assert.Same(source, target);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Replace_Many()
+    {
+        var source = new Chain(false, [xone, xtwo, xthree]);
+
+        var xalpha = new Named("alpha");
+        var xbeta = new Named("beta");
+        var target = source.Replace(1, new Chain(false, [xalpha, xbeta]), out var item);
+
+        Assert.NotSame(source, target);
+        Assert.Same(xtwo, item);
+        Assert.Equal(4, target.Count);
+        Assert.Same(xone, target[0]);
+        Assert.Same(xalpha, target[1]);
+        Assert.Same(xbeta, target[2]);
+        Assert.Same(xthree, target[3]);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_RemoveAt()
+    {
+        var source = new Chain(false, [xone, xtwo, xthree]);
+
+        var target = source.RemoveAt(0, out var item);
+        Assert.NotSame(source, target);
+        Assert.Same(xone, item);
+        Assert.Equal(2, target.Count);
+        Assert.Same(xtwo, target[0]);
+        Assert.Same(xthree, target[1]);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_RemoveRange_Empty()
+    {
+        var source = new Chain(false, [xone, xtwo, xthree, xfour]);
+        var target = source.RemoveRange(0, 0, out var items);
+        
+        Assert.Same(source, target);
+        Assert.Empty(items);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_RemoveRange_Others()
+    {
+        var source = new Chain(false, [xone, xtwo, xthree, xfour]);
+        
+        var target = source.RemoveRange(1, 3, out var items);
+        Assert.NotSame(source, target);
+        Assert.Equal(3, items.Count);
+        Assert.Same(xtwo, items[0]);
+        Assert.Same(xthree, items[1]);
+        Assert.Same(xfour, items[2]);
+        Assert.Single(target);
+        Assert.Same(xone, target[0]);
+
+        target = source.RemoveRange(0, 4, out items);
+        Assert.NotSame(source, target);
+        Assert.Equal(4, items.Count);
+        Assert.Same(xone, items[0]);
+        Assert.Same(xtwo, items[1]);
+        Assert.Same(xthree, items[2]);
+        Assert.Same(xfour, items[3]);
+        Assert.Empty(target);
+
+        try { source.RemoveRange(0, -1); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+        try { source.RemoveRange(-1, 0); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+        try { source.RemoveRange(5, 0); Assert.Fail(); } catch (ArgumentException) { }
+        try { source.RemoveRange(0, 5); Assert.Fail(); } catch (ArgumentException) { }
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Remove_Item()
+    {
+        var builder = new Chain.Builder(false) { IncludeDuplicate = (_, _) => true };
+        var source = new Chain(builder);
+        source = (Chain)source.AddRange([xone, xtwo, xthree, xone]);
+
+        var target = source.Remove(xfour, out var items);
+        Assert.Same(source, target);
+        Assert.Empty(items);
+
+        target = source.Remove(xone, out items);
+        Assert.NotSame(source, target);
+        Assert.Single(items);
+        Assert.Same(xone, items[0]);
+        Assert.Equal(3, target.Count);
+        Assert.Same(xtwo, target[0]);
+        Assert.Same(xthree, target[1]);
+        Assert.Same(xone, target[2]);
+
+        target = source.Remove(new Named("ONE"), out items);
+        Assert.NotSame(source, target);
+        Assert.Single(items);
+        Assert.Same(xone, items[0]);
+        Assert.Equal(3, target.Count);
+        Assert.Same(xtwo, target[0]);
+        Assert.Same(xthree, target[1]);
+        Assert.Same(xone, target[2]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_RemoveLast_Item()
+    {
+        var builder = new Chain.Builder(false) { IncludeDuplicate = (_, _) => true };
+        var source = new Chain(builder);
+        source = (Chain)source.AddRange([xone, xtwo, xthree, xone]);
+
+        var target = source.RemoveLast(xone, out var items);
+        Assert.NotSame(source, target);
+        Assert.Single(items);
+        Assert.Same(xone, items[0]);
+        Assert.Equal(3, target.Count);
+        Assert.Same(xone, target[0]);
+        Assert.Same(xtwo, target[1]);
+        Assert.Same(xthree, target[2]);
+
+        target = source.RemoveLast(new Named("ONE"), out items);
+        Assert.NotSame(source, target);
+        Assert.Single(items);
+        Assert.Same(xone, items[0]);
+        Assert.Equal(3, target.Count);
+        Assert.Same(xone, target[0]);
+        Assert.Same(xtwo, target[1]);
+        Assert.Same(xthree, target[2]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_RemoveAll_Item()
+    {
+        var builder = new Chain.Builder(false) { IncludeDuplicate = (_, _) => true };
+        var source = new Chain(builder);
+        source = (Chain)source.AddRange([xone, xtwo, xthree, xone]);
+
+        var target = source.RemoveAll(xone, out var items);
+        Assert.NotSame(source, target);
+        Assert.Equal(2, items.Count);
+        Assert.Same(xone, items[0]);
+        Assert.Same(xone, items[1]);
+        Assert.Equal(2, target.Count);
+        Assert.Same(xtwo, target[0]);
+        Assert.Same(xthree, target[1]);
+
+        target = source.RemoveAll(new Named("ONE"), out items);
+        Assert.NotSame(source, target);
+        Assert.Equal(2, items.Count);
+        Assert.Same(xone, items[0]);
+        Assert.Same(xone, items[1]);
+        Assert.Equal(2, target.Count);
+        Assert.Same(xtwo, target[0]);
+        Assert.Same(xthree, target[1]);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Remove_Item_Flatten()
+    {
+        var builder = new Chain.Builder(false) { IncludeDuplicate = (_, _) => true };
+        var source = new Chain(builder);
+        source = (Chain)source.AddRange([xone, xtwo, xthree, xone]);
+
+        var target = source.Remove(new Chain(false), out var items);
+        Assert.Same(source, target);
+        Assert.Empty(items);
+
+        target = source.Remove(new Chain(false, [xone, xthree]), out items);
+        Assert.NotSame(source, target);
+        Assert.Equal(2, items.Count);
+        Assert.Same(xone, items[0]);
+        Assert.Same(xthree, items[1]);
+        Assert.Equal(2, target.Count);
+        Assert.Same(xtwo, target[0]);
+        Assert.Same(xone, target[1]);
+
+        target = source.RemoveLast(new Chain(false, [xone, xthree]), out items);
+        Assert.NotSame(source, target);
+        Assert.Equal(2, items.Count);
+        Assert.Same(xone, items[0]);
+        Assert.Same(xthree, items[1]);
+        Assert.Equal(2, target.Count);
+        Assert.Same(xone, target[0]);
+        Assert.Same(xtwo, target[1]);
+
+        target = source.RemoveAll(new Chain(false, [xone, xthree]), out items);
+        Assert.NotSame(source, target);
+        Assert.Equal(3, items.Count);
+        Assert.Same(xone, items[0]);
+        Assert.Same(xone, items[1]);
+        Assert.Same(xthree, items[2]);
+        Assert.Single(target);
+        Assert.Same(xtwo, target[0]);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Remove_Predicate()
+    {
+        var builder = new Chain.Builder(false) { IncludeDuplicate = (_, _) => true };
+        var source = new Chain(builder);
+        source = (Chain)source.AddRange([xone, xtwo, xthree, xone]);
+
+        var target = source.Remove(x => x is Named named && named.Name.Contains('e'), out var item);
+        Assert.NotSame(source, target);
+        Assert.Same(xone, item);
+        Assert.Equal(3, target.Count);
+        Assert.Same(xtwo, target[0]);
+        Assert.Same(xthree, target[1]);
+        Assert.Same(xone, target[2]);
+
+        target = source.RemoveLast(x => x is Named named && named.Name.Contains('e'), out item);
+        Assert.NotSame(source, target);
+        Assert.Same(xone, item);
+        Assert.Equal(3, target.Count);
+        Assert.Same(xone, target[0]);
+        Assert.Same(xtwo, target[1]);
+        Assert.Same(xthree, target[2]);
+
+        target = source.RemoveAll(x => x is Named named && named.Name.Contains('e'), out var items);
+        Assert.NotSame(source, target);
+        Assert.Equal(3, items.Count);
+        Assert.Same(xone, items[0]);
+        Assert.Same(xthree, items[1]);
+        Assert.Same(xone, items[2]);
+        Assert.Single(target);
+        Assert.Same(xtwo, target[0]);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Clear()
+    {
+        var source = new Chain(false);
+        var target = source.Clear();
+        Assert.Same(source, target);
+
+        source = new Chain(false, [xone, xtwo, xthree]);
+        target = source.Clear();
+        Assert.NotSame(source, target);
+        Assert.Empty(target);
     }
 }

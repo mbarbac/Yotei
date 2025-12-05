@@ -463,10 +463,11 @@ public static partial class Test_CoreList_KT
         Assert.Same(xfour, items[3]);
         Assert.Empty(chain);
 
-        try { items.RemoveRange(0, -1); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
-        try { items.RemoveRange(-1, 0); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
-        try { items.RemoveRange(5, 0); Assert.Fail(); } catch (ArgumentException) { }
-        try { items.RemoveRange(0, 5); Assert.Fail(); } catch (ArgumentException) { }
+        chain = new Chain(false, [xone, xtwo, xthree, xfour]);
+        try { chain.RemoveRange(0, -1); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+        try { chain.RemoveRange(-1, 0); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+        try { chain.RemoveRange(5, 0); Assert.Fail(); } catch (ArgumentException) { }
+        try { chain.RemoveRange(0, 5); Assert.Fail(); } catch (ArgumentException) { }
     }
 
     // ----------------------------------------------------

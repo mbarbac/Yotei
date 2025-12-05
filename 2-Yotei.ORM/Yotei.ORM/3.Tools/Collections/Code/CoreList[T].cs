@@ -518,12 +518,7 @@ public partial class CoreList<T> : ICoreList<T>
         }
 
         // Restoring if failure...
-        if (Insert(index, source) == 0) throw new InvalidOperationException(
-            "Cannot restore removed source element after failed replacement.")
-            .WithData(index)
-            .WithData(source)
-            .WithData(this);
-
+        Items.Insert(index, source);
         return 0;
     }
 
@@ -580,6 +575,10 @@ public partial class CoreList<T> : ICoreList<T>
     /// <returns></returns>
     public virtual int RemoveRange(int index, int count, Action<T>? removed = null)
     {
+        ArgumentOutOfRangeException.ThrowIfNegative(index);
+        ArgumentOutOfRangeException.ThrowIfNegative(count);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(count, Count - index);
+
         var num = 0; while (count > 0)
         {
             if (RemoveAt(index, removed)) num++;
