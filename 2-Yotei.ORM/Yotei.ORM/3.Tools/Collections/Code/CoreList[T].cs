@@ -384,6 +384,14 @@ public partial class CoreList<T> : ICoreList<T>
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    /// <param name="index"></param>
+    /// <param name="count"></param>
+    /// <returns></returns>
+    public List<T> ToList(int index, int count) => Items.GetRange(index, count);
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public void Trim() => Items.TrimExcess();
 
     /// <summary>
@@ -444,7 +452,9 @@ public partial class CoreList<T> : ICoreList<T>
     {
         if (FlattenElements && item is IEnumerable<T> range) return InsertRange(index, range);
 
-        var values = GetDuplicates(item = ValidateElement(item));
+        item = ValidateElement(item);
+        
+        var values = GetDuplicates(item);
         foreach (var value in values)
             if (!IncludeDuplicate(value, item)) return 0;
 

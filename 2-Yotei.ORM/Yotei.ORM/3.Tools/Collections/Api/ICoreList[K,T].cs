@@ -145,6 +145,15 @@ public partial interface ICoreList<K, T>
     List<T> ToList();
 
     /// <summary>
+    /// Returns a list with the given number of elements of this collection, starting at the given
+    /// index.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="count"></param>
+    /// <returns></returns>
+    List<T> ToList(int index, int count);
+
+    /// <summary>
     /// Trims the internal structures used by this instance.
     /// </summary>
     void Trim();

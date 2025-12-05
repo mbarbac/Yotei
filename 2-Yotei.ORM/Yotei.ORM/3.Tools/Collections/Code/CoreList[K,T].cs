@@ -433,6 +433,14 @@ public partial class CoreList<K, T> : ICoreList<K, T>
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    /// <param name="index"></param>
+    /// <param name="count"></param>
+    /// <returns></returns>
+    public List<T> ToList(int index, int count) => Items.GetRange(index, count);
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public void Trim() => Items.TrimExcess();
 
     /// <summary>
