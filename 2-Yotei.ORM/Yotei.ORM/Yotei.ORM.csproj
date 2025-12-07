@@ -71,9 +71,7 @@
    </ItemGroup>
    <ItemGroup>
      <Compile Remove="3.Tools\Collections\Api\IInvariantBag[T].cs" />
-     <Compile Remove="3.Tools\Collections\Api\IInvariantList[K,T].cs" />
      <Compile Remove="3.Tools\Collections\Code\InvariantBag[T].cs" />
-     <Compile Remove="3.Tools\Collections\Code\InvariantList[K,T].cs" />
    </ItemGroup>
    <PropertyGroup>
 	  <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
