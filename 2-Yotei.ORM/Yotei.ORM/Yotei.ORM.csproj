@@ -70,8 +70,7 @@
 	  <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
    </ItemGroup>
    <ItemGroup>
-     <Compile Remove="3.Tools\Collections\Api\IInvariantBag[T].cs" />
-     <Compile Remove="3.Tools\Collections\Code\InvariantBag[T].cs" />
+     <Folder Include="3.Tools\Collections\" />
    </ItemGroup>
    <PropertyGroup>
 	  <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
