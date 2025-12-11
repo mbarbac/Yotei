@@ -1,8 +1,10 @@
-﻿namespace Yotei.ORM.Tests.Collections;
+﻿using Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
+
+namespace Yotei.ORM.Tests.Collections;
 
 // ========================================================
 //[Enforced]
-public static partial class Test_CoreList_T
+public static partial class Test_InvariantList_T
 {
     public interface IElement { }
 
@@ -19,55 +21,85 @@ public static partial class Test_CoreList_T
 
     // ----------------------------------------------------
 
-    [Cloneable(ReturnType = typeof(ICoreList<IElement>))]
-    [DebuggerDisplay("{ToDebugString(3)}")]
-    public partial class Chain : CoreList<IElement>, IElement
+    partial class Chain
     {
-        public Chain(bool sensitive) => Comparer = new(sensitive);
-        public Chain(bool sensitive, IEnumerable<IElement> range) : this(sensitive) => AddRange(range);
-        protected Chain(Chain source) : this(source.ThrowWhenNull().Sensitive) => AddRange(source);
-
-        public override IElement ValidateElement(IElement item) => item.ThrowWhenNull();
-        public override bool CompareElements(IElement source, IElement target) => Comparer.Equals(source, target);
-        public override bool FlattenElements => true;
-        public override IEnumerable<IElement> GetDuplicates(IElement item) => base.GetDuplicates(item);
-        public override bool IncludeDuplicate(IElement source, IElement target)
-            => AcceptDuplicates
-            ? true
-            : throw new DuplicateException().WithData(source).WithData(target);
-
-        public bool AcceptDuplicates
+        [Cloneable]
+        [DebuggerDisplay("{ToDebugString(3)}")]
+        public partial class Builder : CoreList<IElement>, IElement
         {
-            get;
-            set
+            [SuppressMessage("", "IDE0290")]
+            public Builder(bool sensitive) => Comparer = new(sensitive);
+            public Builder(bool sensitive, IEnumerable<IElement> range) : this(sensitive) => AddRange(range);
+            protected Builder(Builder source) : this(source.ThrowWhenNull().Sensitive)
             {
-                if (field == value) return;
-                if (Count == 0) { field = value; return; }
-
-                var range = ToList(); Clear();
-                field = value;
-                AddRange(range);
+                AcceptDuplicates = source.AcceptDuplicates;
+                AddRange(source);
             }
-        }
 
-        public bool Sensitive => Comparer.Sensitive;
-        readonly MyComparer Comparer;
-        readonly struct MyComparer(bool sensitive) : IEqualityComparer<IElement>
-        {
-            public readonly bool Sensitive = sensitive;
-            public bool Equals(IElement? x, IElement? y)
+            public override IElement ValidateElement(IElement item) => item.ThrowWhenNull();
+            public override bool CompareElements(IElement source, IElement target) => Comparer.Equals(source, target);
+            public override bool FlattenElements => true;
+            public override IEnumerable<IElement> GetDuplicates(IElement item) => base.GetDuplicates(item);
+            public override bool IncludeDuplicate(IElement source, IElement target)
+                => AcceptDuplicates
+                ? true
+                : throw new DuplicateException().WithData(source).WithData(target);
+
+            public bool AcceptDuplicates
             {
-                if (x is null && y is null) return true;
-                if (x is null || y is null) return false;
+                get;
+                set
+                {
+                    if (field == value) return;
+                    if (Count == 0) { field = value; return; }
 
-                return x is Named xnamed && y is Named ynamed
-                    ? string.Compare(xnamed.Name, ynamed.Name, !Sensitive) == 0
-                    : ReferenceEquals(x, y);
+                    var range = ToList(); Clear();
+                    field = value;
+                    AddRange(range);
+                }
             }
-            public int GetHashCode(IElement obj) => throw new NotImplementedException();
+
+            public bool Sensitive => Comparer.Sensitive;
+            readonly MyComparer Comparer;
+            readonly struct MyComparer(bool sensitive) : IEqualityComparer<IElement>
+            {
+                public readonly bool Sensitive = sensitive;
+                public bool Equals(IElement? x, IElement? y)
+                {
+                    if (x is null && y is null) return true;
+                    if (x is null || y is null) return false;
+
+                    return x is Named xnamed && y is Named ynamed
+                        ? string.Compare(xnamed.Name, ynamed.Name, !Sensitive) == 0
+                        : ReferenceEquals(x, y);
+                }
+                public int GetHashCode(IElement obj) => throw new NotImplementedException();
+            }
         }
     }
 
+    // ----------------------------------------------------
+
+    [Cloneable(ReturnType = typeof(IInvariantList<IElement>))]
+    [DebuggerDisplay("{ToDebugString(3)}")]
+    public partial class Chain : InvariantList<IElement>, IElement
+    {
+        protected override Builder Items { get; }
+        public Chain(Builder builder) => Items = builder.ThrowWhenNull();
+
+        public Chain(bool sensitive) => Items = new Builder(sensitive);
+        public Chain(bool sensitive, IEnumerable<IElement> range) : this(sensitive) => Items.AddRange(range);
+        protected Chain(Chain source) => Items = source.ThrowWhenNull().Items.Clone();
+
+        public override Builder ToBuilder() => (Builder)base.ToBuilder();
+        public bool Sensitive => Items.Sensitive;
+        public bool AcceptDuplicates
+        {
+            get => Items.AcceptDuplicates;
+            set => Items.AcceptDuplicates = value;
+        }
+    }
+    
     // ----------------------------------------------------
 
     //[Enforced]
@@ -100,16 +132,8 @@ public static partial class Test_CoreList_T
         try { _ = new Chain(false, [xone, null!]); Assert.Fail(); } catch (ArgumentNullException) { }
         try { _ = new Chain(false, [xone, xone]); Assert.Fail(); } catch (DuplicateException) { }
         try { _ = new Chain(false, [xone, new Named("ONE")]); Assert.Fail(); } catch (DuplicateException) { }
-
-        chain = new Chain(false) { AcceptDuplicates = true };
-        chain.AddRange([xone, xone]);
-        Assert.Equal(2, chain.Count);
-        Assert.Same(xone, chain[0]);
-        Assert.Same(xone, chain[1]);
-
-        try { chain.AcceptDuplicates = false; }
-        catch (DuplicateException) { }
     }
+
 
     // ----------------------------------------------------
 
@@ -133,7 +157,7 @@ public static partial class Test_CoreList_T
     public static void Test_IndexOf_Item()
     {
         var chain = new Chain(false) { AcceptDuplicates = true };
-        chain.AddRange([xone, xtwo, xone, xthree]);
+        chain = (Chain)chain.AddRange([xone, xtwo, xone, xthree]);
 
         var index = chain.IndexOf(xfour); Assert.Equal(-1, index);
 
@@ -159,7 +183,7 @@ public static partial class Test_CoreList_T
     public static void Test_IndexOf_Predicate()
     {
         var chain = new Chain(false) { AcceptDuplicates = true };
-        chain.AddRange([xone, xtwo, xone, xthree]);
+        chain = (Chain)chain.AddRange([xone, xtwo, xone, xthree]);
 
         var index = chain.IndexOf(x => x is null);
         Assert.Equal(-1, index);
@@ -181,26 +205,10 @@ public static partial class Test_CoreList_T
 
     //[Enforced]
     [Fact]
-    public static void Test_Find_Values()
-    {
-        var chain = new CoreList<int>([1, 2, 3, 4]);
-
-        Assert.False(chain.Find(x => x > 10, out var value));
-
-        Assert.True(chain.Find(x => x is > 1 and < 4, out value)); Assert.Equal(2, value);
-        Assert.True(chain.FindLast(x => x is > 1 and < 4, out value)); Assert.Equal(3, value);
-        Assert.True(chain.FindAll(x => x is > 1 and < 4, out var values));
-        Assert.Equal(2, values.Count);
-        Assert.Equal(2, values[0]);
-        Assert.Equal(3, values[1]);
-    }
-
-    //[Enforced]
-    [Fact]
     public static void Test_Find_Predicate()
     {
         var chain = new Chain(false) { AcceptDuplicates = true };
-        chain.AddRange([xone, xtwo, xone, xthree]);
+        chain = (Chain)chain.AddRange([xone, xtwo, xone, xthree]);
 
         Assert.False(chain.Find(x => x is null, out var item));
         Assert.Null(item);
@@ -224,44 +232,45 @@ public static partial class Test_CoreList_T
     [Fact]
     public static void Test_Add()
     {
-        var chain = new Chain(false, [xone, xtwo]);
-        var done = chain.Add(xthree);
-        Assert.Equal(1, done);
-        Assert.Equal(3, chain.Count);
-        Assert.Same(xone, chain[0]);
-        Assert.Same(xtwo, chain[1]);
-        Assert.Same(xthree, chain[2]);
+        var source = new Chain(false, [xone, xtwo]);
+        var target = source.Add(xthree);
+        Assert.NotSame(source, target);
+        Assert.Equal(3, target.Count);
+        Assert.Same(xone, target[0]);
+        Assert.Same(xtwo, target[1]);
+        Assert.Same(xthree, target[2]);
 
-        try { chain.Add(null!); Assert.Fail(); } catch (ArgumentNullException) { }
-        try { chain.Add(xone); Assert.Fail(); } catch (DuplicateException) { }
-        try { chain.Add(new Named("ONE")); Assert.Fail(); } catch (DuplicateException) { }
+        try { source.Add(null!); Assert.Fail(); } catch (ArgumentNullException) { }
+        try { source.Add(xone); Assert.Fail(); } catch (DuplicateException) { }
+        try { source.Add(new Named("ONE")); Assert.Fail(); } catch (DuplicateException) { }
 
-        chain = new Chain(false, [xone, xtwo]) { AcceptDuplicates = true };
-        done = chain.Add(xone);
-        Assert.Equal(1, done);
-        Assert.Equal(3, chain.Count);
-        Assert.Same(xone, chain[0]);
-        Assert.Same(xtwo, chain[1]);
-        Assert.Same(xone, chain[2]);
+        source = new Chain(false) { AcceptDuplicates = true };
+        source = (Chain)source.AddRange([xone, xtwo]);
+        target = source.Add(xone);
+        Assert.NotSame(source, target);
+        Assert.Equal(3, target.Count);
+        Assert.Same(xone, target[0]);
+        Assert.Same(xtwo, target[1]);
+        Assert.Same(xone, target[2]);
     }
 
     //[Enforced]
     [Fact]
     public static void Test_Add_Flatten()
     {
-        var chain = new Chain(false, [xone, xtwo]);
-        var done = chain.Add(new Chain(false));
-        Assert.Equal(0, done);
+        var source = new Chain(false, [xone, xtwo]);
+        var target = source.Add(new Chain(false));
+        Assert.Same(source, target);
 
-        done = chain.Add(new Chain(false, [xthree, xfour]));
-        Assert.Equal(2, done);
-        Assert.Equal(4, chain.Count);
-        Assert.Same(xone, chain[0]);
-        Assert.Same(xtwo, chain[1]);
-        Assert.Same(xthree, chain[2]);
-        Assert.Same(xfour, chain[3]);
+        target = source.Add(new Chain(false, [xthree, xfour]));
+        Assert.NotSame(source, target);
+        Assert.Equal(4, target.Count);
+        Assert.Same(xone, target[0]);
+        Assert.Same(xtwo, target[1]);
+        Assert.Same(xthree, target[2]);
+        Assert.Same(xfour, target[3]);
 
-        try { chain.Add(new Chain(false, [new Named("ONE")])); Assert.Fail(); }
+        try { source.Add(new Chain(false, [new Named("ONE")])); Assert.Fail(); }
         catch (DuplicateException) { }
     }
 
@@ -269,33 +278,49 @@ public static partial class Test_CoreList_T
     [Fact]
     public static void Test_Add_Range()
     {
-        var chain = new Chain(false, [xone, xtwo]);
-        var done = chain.AddRange([]);
-        Assert.Equal(0, done);
+        var source = new Chain(false, [xone, xtwo]);
+        var target = source.AddRange([]);
+        Assert.Same(source, target);
 
-        done = chain.AddRange([xthree, xfour]);
-        Assert.Equal(2, done);
-        Assert.Equal(4, chain.Count);
-        Assert.Same(xone, chain[0]);
-        Assert.Same(xtwo, chain[1]);
-        Assert.Same(xthree, chain[2]);
-        Assert.Same(xfour, chain[3]);
+        target = source.AddRange([xthree, xfour]);
+        Assert.NotSame(source, target);
+        Assert.Equal(4, target.Count);
+        Assert.Same(xone, target[0]);
+        Assert.Same(xtwo, target[1]);
+        Assert.Same(xthree, target[2]);
+        Assert.Same(xfour, target[3]);
+
+        source = new Chain(false) { AcceptDuplicates = true };
+        source = (Chain)source.AddRange([xone, xone]);
+        target = source.AddRange([xtwo, xone]);
+        Assert.NotSame(source, target);
+        Assert.Equal(4, target.Count);
+        Assert.Same(xone, target[0]);
+        Assert.Same(xone, target[1]);
+        Assert.Same(xtwo, target[2]);
+        Assert.Same(xone, target[3]);
+
+        source = new Chain(false, [xone, xtwo]);
+        try { source.AddRange([xthree, xone]); Assert.Fail(); }
+        catch (DuplicateException) { }
     }
 
     //[Enforced]
     [Fact]
     public static void Test_Add_Range_Flatten()
     {
-        var chain = new Chain(false, [xone, xtwo]);
-        var done = chain.AddRange([new Chain(false, [xthree, xfour]), new Named("FIVE")]);
-        Assert.Equal(3, done);
-        Assert.Equal(5, chain.Count);
-        Assert.Same(xone, chain[0]);
-        Assert.Same(xtwo, chain[1]);
-        Assert.Same(xthree, chain[2]);
-        Assert.Same(xfour, chain[3]);
-        Assert.Equal("FIVE", ((Named)chain[4]).Name);
+        var source = new Chain(false, [xone, xtwo]);
+        var target = source.AddRange([new Chain(false, [xthree, xfour]), new Named("FIVE")]);
+        Assert.NotSame(source, target);
+        Assert.Equal(5, target.Count);
+        Assert.Same(xone, target[0]);
+        Assert.Same(xtwo, target[1]);
+        Assert.Same(xthree, target[2]);
+        Assert.Same(xfour, target[3]);
+        Assert.Equal("FIVE", ((Named)target[4]).Name);
     }
+
+    /*
 
     // ----------------------------------------------------
 
@@ -710,4 +735,5 @@ public static partial class Test_CoreList_T
         Assert.Equal(3, done);
         Assert.Empty(chain);
     }
+     */
 }

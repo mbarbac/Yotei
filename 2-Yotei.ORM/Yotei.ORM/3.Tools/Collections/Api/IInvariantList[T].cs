@@ -8,8 +8,14 @@
 /// </summary>
 /// <typeparam name="T"></typeparam>
 [Cloneable]
-public partial interface IInvariantList<T> : IReadOnlyList<T>, IReadOnlyCollection<T>
+public partial interface IInvariantList<T> : IReadOnlyList<T>, IReadOnlyCollection<T>, ICollection
 {
+    /// <summary>
+    /// Returns a new builder based upon the contents of this instance.
+    /// </summary>
+    /// <returns></returns>
+    ICoreList<T> ToBuilder();
+
     /// <summary>
     /// Gets the number of elements in this collection.
     /// </summary>
@@ -194,6 +200,15 @@ public partial interface IInvariantList<T> : IReadOnlyList<T>, IReadOnlyCollecti
     // ----------------------------------------------------
 
     /// <summary>
+    /// Returns a new instance with the given number of elements, starting at the given index.
+    /// <br/> Returns the original instance if no changes were made.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="count"></param>
+    /// <returns></returns>
+    IInvariantList<T> GetRange(int index, int count);
+
+    /// <summary>
     /// Returns a new instance with the element at the given index replaced by the given one. If
     /// it is an empty collection of elements, and if this instance flattens input elements, then
     /// no replacement is made. If the given delegate is not null, it is invoked with the removed
@@ -288,6 +303,7 @@ public partial interface IInvariantList<T> : IReadOnlyList<T>, IReadOnlyCollecti
     /// itself a collection of elements, and this instance flattens input elements, then its own
     /// elements are removed instead. If the given delegate is not null, it is invoked with the
     /// removed elements.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="item"></param>
     /// <param name="removed"></param>
@@ -310,6 +326,7 @@ public partial interface IInvariantList<T> : IReadOnlyList<T>, IReadOnlyCollecti
     /// itself a collection of elements, and this instance flattens input elements, then its own
     /// elements are removed instead. If the given delegate is not null, it is invoked with the
     /// removed elements.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="item"></param>
     /// <param name="removed"></param>

@@ -20,6 +20,7 @@ public static partial class Test_CoreList_KT
     // ----------------------------------------------------
 
     [Cloneable(ReturnType = typeof(ICoreList<string, IElement>))]
+    [DebuggerDisplay("{ToDebugString(3)}")]
     public partial class Chain : CoreList<string, IElement>, IElement
     {
         static string OnGetKey(IElement item) =>
