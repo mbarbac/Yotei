@@ -2,15 +2,13 @@
 
 // ========================================================
 /// <summary>
-/// Represents a list-alike collection of elements.
-/// <br/> Semantics are that two given elements are considered equal only if the equality rules
-/// in this instance determine so.
+/// Represents an immutable list-alike collection of elements.
+/// <br/> The semantics are that two given elements are considered equal only if the equality
+/// rules in this instance determine so.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 [Cloneable]
-public partial interface ICoreList<T>
-    : IList<T>, IReadOnlyList<T>, IList
-    , ICollection<T>, IReadOnlyCollection<T>, ICollection
+public partial interface IInvariantList<T> : IReadOnlyList<T>, IReadOnlyCollection<T>
 {
     /// <summary>
     /// Gets the number of elements in this collection.
@@ -18,11 +16,11 @@ public partial interface ICoreList<T>
     new int Count { get; }
 
     /// <summary>
-    /// Gets or sets the element at the given index.
+    /// Gets the element at the given index.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    new T this[int index] { get; set; }
+    new T this[int index] { get; }
 
     /// <summary>
     /// Determines if this collection contains at least one ocurrence of the given element, as
@@ -30,7 +28,7 @@ public partial interface ICoreList<T>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    new bool Contains(T item);
+    bool Contains(T item);
 
     /// <summary>
     /// Returns the index of the first ocurrence of the given element, as determined by the rules
@@ -38,7 +36,7 @@ public partial interface ICoreList<T>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    new int IndexOf(T item);
+    int IndexOf(T item);
 
     /// <summary>
     /// Returns the index of the last ocurrence of the given element, as determined by the rules
@@ -160,241 +158,241 @@ public partial interface ICoreList<T>
     // ----------------------------------------------------
 
     /// <summary>
-    /// Adds to this collection the given element.
-    /// <br/> Returns the number of changes made.
+    /// Returns a new instance with the given element added to it.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    new int Add(T item);
+    IInvariantList<T> Add(T item);
 
     /// <summary>
-    /// Adds to this collection the elements of the given range.
-    /// <br/> Returns the number of changes made.
+    /// Returns a new instance with the elements of the given range added to it.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    int AddRange(IEnumerable<T> range);
+    IInvariantList<T> AddRange(IEnumerable<T> range);
 
     /// <summary>
-    /// Inserts into this collection the given element at the given index.
-    /// <br/> Returns the number of changes made.
+    /// Returns a new instance with the given element inserted into it at the given index.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    new int Insert(int index, T item);
+    IInvariantList<T> Insert(int index, T item);
 
     /// <summary>
-    /// Inserts into this collection the elements of the given range starting at the given index.
-    /// <br/> Returns the number of changes made.
+    /// Returns a new instance with the elements from the given range inserted into it, starting
+    /// at the given index.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    int InsertRange(int index, IEnumerable<T> range);
+    IInvariantList<T> InsertRange(int index, IEnumerable<T> range);
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Replaces the element at the given index with the given one. If it is an empty collection
-    /// of elements, and if this instance flattens input elements, then no replacement is made.
-    /// If the given delegate is not null, it is invoked with the removed element.
-    /// <br/> Returns the number of changes made.
+    /// Returns a new instance with the element at the given index replaced by the given one. If
+    /// it is an empty collection of elements, and if this instance flattens input elements, then
+    /// no replacement is made. If the given delegate is not null, it is invoked with the removed
+    /// element.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    int Replace(int index, T item, Action<T>? removed = null);
+    IInvariantList<T> Replace(int index, T item, Action<T>? removed = null);
 
     /// <summary>
-    /// Replaces the element at the given index with the given one. If it is an empty collection
-    /// of elements, and if this instance flattens input elements, then no replacement is made.
-    /// Returns the removed element, if any, in the out argument.
-    /// <br/> Returns the number of changes made.
+    /// Returns a new instance with the element at the given index replaced by the given one. If
+    /// it is an empty collection of elements, and if this instance flattens input elements, then
+    /// no replacement is made. Returns the removed element, if any, in the out argument.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="item"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    int Replace(int index, T item, out T removed);
+    IInvariantList<T> Replace(int index, T item, out T removed);
 
     /// <summary>
-    /// Removes from this collection the element at the given index. If the given delegate is not
-    /// null, it is invoked with the removed element.
-    /// <br/> Returns whether the element has been removed or not.
+    /// Returns a new instance with the element at the given index removed. f the given delegate
+    /// is not null, it is invoked with the removed element.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    bool RemoveAt(int index, Action<T>? removed = null);
+    IInvariantList<T> RemoveAt(int index, Action<T>? removed = null);
 
     /// <summary>
-    /// Removes from this collection the element at the given index. Returns the removed element,
-    /// if any, in the out argument.
-    /// <br/> Returns whether the element has been removed or not.
+    /// Returns a new instance with the element at the given index removed. Returns the removed
+    /// element, if any, in the out argument.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    bool RemoveAt(int index, out T removed);
+    IInvariantList<T> RemoveAt(int index, out T removed);
 
     /// <summary>
-    /// Removes from this collection the given number of elements, starting at the given index.
-    /// If the given delegate is not null, it is invoked with the removed elements.
-    /// <br/> Returns the number of changes made.
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="count"></param>
-    /// <param name="removed"></param>
-    /// <returns></returns>
-    int RemoveRange(int index, int count, Action<T>? removed = null);
-
-    /// <summary>
-    /// Removes from this collection the given number of elements, starting at the given index.
-    /// Returns the removed elements, if any, in the out argument.
-    /// <br/> Returns the number of changes made.
+    /// Returns a new instance with the given number of elements, starting at the given index,
+    /// removed. If the given delegate is not null, it is invoked with the removed elements.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    int RemoveRange(int index, int count, out List<T> removed);
+    IInvariantList<T> RemoveRange(int index, int count, Action<T>? removed = null);
 
     /// <summary>
-    /// Removes from this collection the first ocurrence of the given element, as determined by
-    /// the rules in this instance. If it is itself a collection of elements, and this instance
-    /// flattens input elements, then its own elements are removed instead. If the given delegate
-    /// is not null, it is invoked with the removed elements.
-    /// <br/> Returns the number of changes made.
+    /// Returns a new instance with the given number of elements, starting at the given index,
+    /// removed. Returns the removed elements, if any, in the out argument.
+    /// <br/> Returns the original instance if no changes were made.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="count"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    IInvariantList<T> RemoveRange(int index, int count, out List<T> removed);
+
+    /// <summary>
+    /// Returns a new instance with the first ocurrence of the given element removed. If it is
+    /// itself a collection of elements, and this instance flattens input elements, then its own
+    /// elements are removed instead. If the given delegate is not null, it is invoked with the
+    /// removed elements.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="item"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    int Remove(T item, Action<T>? removed = null);
+    IInvariantList<T> Remove(T item, Action<T>? removed = null);
 
     /// <summary>
-    /// Removes from this collection the first ocurrence of the given element, as determined by
-    /// the rules in this instance. If it is itself a collection of elements, and this instance
-    /// flattens input elements, then its own elements are removed instead. Returns the removed
-    /// elements in the out argument.
-    /// <br/> Returns the number of changes made.
+    /// Returns a new instance with the first ocurrence of the given element removed. If it is
+    /// itself a collection of elements, and this instance flattens input elements, then its own
+    /// elements are removed instead. Returns the removed elements in the out argument.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="item"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    int Remove(T item, out List<T> removed);
+    IInvariantList<T> Remove(T item, out List<T> removed);
 
     /// <summary>
-    /// Removes from this collection the last ocurrence of the given element, as determined by
-    /// the rules in this instance. If it is itself a collection of elements, and this instance
-    /// flattens input elements, then its own elements are removed instead. If the given delegate
-    /// is not null, it is invoked with the removed elements.
-    /// <br/> Returns the number of changes made.
+    /// Returns a new instance with the last ocurrence of the given element removed. If it is
+    /// itself a collection of elements, and this instance flattens input elements, then its own
+    /// elements are removed instead. If the given delegate is not null, it is invoked with the
+    /// removed elements.
     /// </summary>
     /// <param name="item"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    int RemoveLast(T item, Action<T>? removed = null);
+    IInvariantList<T> RemoveLast(T item, Action<T>? removed = null);
 
     /// <summary>
-    /// Removes from this collection the last ocurrence of the given element, as determined by
-    /// the rules in this instance. If it is itself a collection of elements, and this instance
-    /// flattens input elements, then its own elements are removed instead. Returns the removed
-    /// elements in the out argument.
-    /// <br/> Returns the number of changes made.
+    /// Returns a new instance with the last ocurrence of the given element removed. If it is
+    /// itself a collection of elements, and this instance flattens input elements, then its own
+    /// elements are removed instead. Returns the removed elements in the out argument.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="item"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    int RemoveLast(T item, out List<T> removed);
+    IInvariantList<T> RemoveLast(T item, out List<T> removed);
 
     /// <summary>
-    /// Removes from this collection all the ocurrences of the given element, as determined by
-    /// the rules in this instance. If it is itself a collection of elements, and this instance
-    /// flattens input elements, then its own elements are removed instead. If the given delegate
-    /// is not null, it is invoked with the removed elements.
-    /// <br/> Returns the number of changes made.
+    /// Returns a new instance with all the ocurrences of the given element removed. If it is
+    /// itself a collection of elements, and this instance flattens input elements, then its own
+    /// elements are removed instead. If the given delegate is not null, it is invoked with the
+    /// removed elements.
     /// </summary>
     /// <param name="item"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    int RemoveAll(T item, Action<T>? removed = null);
+    IInvariantList<T> RemoveAll(T item, Action<T>? removed = null);
 
     /// <summary>
-    /// Removes from this collection all the ocurrences of the given element, as determined by
-    /// the rules in this instance. If it is itself a collection of elements, and this instance
-    /// flattens input elements, then its own elements are removed instead. Returns the removed
-    /// elements in the out argument.
-    /// <br/> Returns the number of changes made.
+    /// Returns a new instance with all the ocurrences of the given element removed. If it is
+    /// itself a collection of elements, and this instance flattens input elements, then its own
+    /// elements are removed instead. Returns the removed elements in the out argument.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="item"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    int RemoveAll(T item, out List<T> removed);
+    IInvariantList<T> RemoveAll(T item, out List<T> removed);
 
     /// <summary>
-    /// Removes from this collection the first element that matches the given predicate. If the
-    /// given delegate is not null, it is invoked with the removed element.
-    /// <br/> Returns the number of changes made.
+    /// Returns a new instance with the first ocurrence of an element that matches the given
+    /// predicate removed. If the given delegate is not null, it is invoked with the removed
+    /// element.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="predicate"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    int Remove(Predicate<T> predicate, Action<T>? removed = null);
+    IInvariantList<T> Remove(Predicate<T> predicate, Action<T>? removed = null);
 
     /// <summary>
-    /// Removes from this collection the first element that matches the given predicate. Returns
-    /// the removed element, if any, in the out argument.
-    /// <br/> Returns the number of changes made.
+    /// Returns a new instance with the first ocurrence of an element that matches the given
+    /// predicate removed. Returns the removed element in the out argument.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="predicate"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    int Remove(Predicate<T> predicate, out T removed);
+    IInvariantList<T> Remove(Predicate<T> predicate, out T removed);
 
     /// <summary>
-    /// Removes from this collection the last element that matches the given predicate. If the
-    /// given delegate is not null, it is invoked with the removed element.
-    /// <br/> Returns the number of changes made.
+    /// Returns a new instance with the last ocurrence of an element that matches the given
+    /// predicate removed. If the given delegate is not null, it is invoked with the removed
+    /// element.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="predicate"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    int RemoveLast(Predicate<T> predicate, Action<T>? removed = null);
+    IInvariantList<T> RemoveLast(Predicate<T> predicate, Action<T>? removed = null);
 
     /// <summary>
-    /// Removes from this collection the last element that matches the given predicate. Returns
-    /// the removed element, if any, in the out argument.
+    /// Returns a new instance with the last ocurrence of an element that matches the given
+    /// predicate removed. Returns the removed element in the out argument.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="predicate"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    int RemoveLast(Predicate<T> predicate, out T removed);
+    IInvariantList<T> RemoveLast(Predicate<T> predicate, out T removed);
 
     /// <summary>
-    /// Removes from this collection all the elements that match the given predicate. If the
-    /// given delegate is not null, it is invoked with the removed elements.
-    /// <br/> Returns the number of changes made.
+    /// Returns a new instance with all the ocurrences of elements that match the given predicate
+    /// removed. If the given delegate is not null, it is invoked with the removed elements.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="predicate"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    int RemoveAll(Predicate<T> predicate, Action<T>? removed = null);
+    IInvariantList<T> RemoveAll(Predicate<T> predicate, Action<T>? removed = null);
 
     /// <summary>
-    /// Removes from this collection all the elements that match the given predicate and, if so,
-    /// returns the removed elements in the out argument.
-    /// <br/> Returns the number of changes made.
+    /// Returns a new instance with all the ocurrences of elements that match the given predicate
+    /// removed. Returns the removed elements in the out argument.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="predicate"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    int RemoveAll(Predicate<T> predicate, out List<T> removed);
+    IInvariantList<T> RemoveAll(Predicate<T> predicate, out List<T> removed);
 
     /// <summary>
-    /// Clears this collection.
-    /// <br/> Returns the number of changes made.
+    /// Returns a new instance with all the original elements removed.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <returns></returns>
-    new int Clear();
+    IInvariantList<T> Clear();
 }

@@ -14,7 +14,7 @@ public partial class CoreBag<T> : ICoreBag<T>
     {
         readonly CoreBag<T> Master;
         public MyItems(CoreBag<T> master) : base() => Master = master;
-        protected MyItems(MyItems source) : base(source) => Master = source.Master;
+        protected MyItems(MyItems source) => throw new UnExpectedException();
 
         public override T ValidateElement(T item) => Master.ValidateElement(item);
         public override bool CompareElements(T source, T target) => Master.CompareElements(source, target);

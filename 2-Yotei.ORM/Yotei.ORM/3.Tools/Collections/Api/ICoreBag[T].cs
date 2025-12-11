@@ -3,8 +3,8 @@
 // ========================================================
 /// <summary>
 /// Represents a bag-alike collection of elements with no order.
-/// <br/> The semantics are that two given elements are considered equal only if the equality
-/// rules in this instance determine so.
+/// <br/> Semantics are that two given elements are considered equal only if the equality rules
+/// in this instance determine so.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 [Cloneable]
