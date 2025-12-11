@@ -21,7 +21,7 @@ public partial interface IEngine : IEquatable<IEngine>
     /// Determines if this engine uses positional parameters in its database commands, or rather,
     /// use them by name.
     /// </summary>
-    [With] bool PositionalParametes { get; }
+    [With] bool PositionalParameters { get; }
 
     /// <summary>
     /// The literal prefix used with parameters to identify them as such in database commands.
