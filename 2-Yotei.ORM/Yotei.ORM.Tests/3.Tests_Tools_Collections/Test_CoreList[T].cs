@@ -25,7 +25,11 @@ public static partial class Test_CoreList_T
     {
         public Chain(bool sensitive) => Comparer = new(sensitive);
         public Chain(bool sensitive, IEnumerable<IElement> range) : this(sensitive) => AddRange(range);
-        protected Chain(Chain source) : this(source.ThrowWhenNull().Sensitive) => AddRange(source);
+        protected Chain(Chain source) : this(source.ThrowWhenNull().Sensitive)
+        {
+            AcceptDuplicates = source.AcceptDuplicates;
+            AddRange(source);
+        }
 
         public override IElement ValidateElement(IElement item) => item.ThrowWhenNull();
         public override bool CompareElements(IElement source, IElement target) => Comparer.Equals(source, target);

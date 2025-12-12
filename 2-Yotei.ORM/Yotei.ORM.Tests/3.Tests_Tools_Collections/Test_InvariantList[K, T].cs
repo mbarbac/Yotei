@@ -2,7 +2,7 @@
 
 // ========================================================
 //[Enforced]
-public static partial class Test_InvariantList_T
+public static partial class Test_InvariantList_KT
 {
     public interface IElement { }
 
@@ -23,10 +23,12 @@ public static partial class Test_InvariantList_T
     {
         [Cloneable]
         [DebuggerDisplay("{ToDebugString(3)}")]
-        public partial class Builder : CoreList<IElement>, IElement
+        public partial class Builder : CoreListEx<string, IElement>, IElement
         {
-            [SuppressMessage("", "IDE0290")]
-            public Builder(bool sensitive) => Comparer = new(sensitive);
+            static string OnGetKey(IElement item) =>
+                item is null || item is not Named named ? null! : named.Name;
+
+            public Builder(bool sensitive) : base(OnGetKey) => Comparer = new(sensitive);
             public Builder(bool sensitive, IEnumerable<IElement> range) : this(sensitive) => AddRange(range);
             protected Builder(Builder source) : this(source.ThrowWhenNull().Sensitive)
             {
@@ -34,10 +36,11 @@ public static partial class Test_InvariantList_T
                 AddRange(source);
             }
 
+            public override string ValidateKey(string key) => key.NotNullNotEmpty(true);
+            public override bool CompareKeys(string source, string target) => Comparer.Equals(source, target);
             public override IElement ValidateElement(IElement item) => item.ThrowWhenNull();
-            public override bool CompareElements(IElement source, IElement target) => Comparer.Equals(source, target);
             public override bool FlattenElements => true;
-            public override IEnumerable<IElement> GetDuplicates(IElement item) => base.GetDuplicates(item);
+            public override IEnumerable<IElement> GetDuplicates(string key) => base.GetDuplicates(key);
             public override bool IncludeDuplicate(IElement source, IElement target)
                 => AcceptDuplicates
                 ? true
@@ -59,28 +62,20 @@ public static partial class Test_InvariantList_T
 
             public bool Sensitive => Comparer.Sensitive;
             readonly MyComparer Comparer;
-            readonly struct MyComparer(bool sensitive) : IEqualityComparer<IElement>
+            readonly struct MyComparer(bool sensitive) : IEqualityComparer<string>
             {
-                public readonly bool Sensitive = sensitive;
-                public bool Equals(IElement? x, IElement? y)
-                {
-                    if (x is null && y is null) return true;
-                    if (x is null || y is null) return false;
-
-                    return x is Named xnamed && y is Named ynamed
-                        ? string.Compare(xnamed.Name, ynamed.Name, !Sensitive) == 0
-                        : ReferenceEquals(x, y);
-                }
-                public int GetHashCode(IElement obj) => throw new NotImplementedException();
+                readonly public bool Sensitive = sensitive;
+                public bool Equals(string? x, string? y) => string.Compare(x, y, !Sensitive) == 0;
+                public int GetHashCode(string? obj) => throw new NotImplementedException();
             }
         }
     }
 
     // ----------------------------------------------------
 
-    [Cloneable(ReturnType = typeof(IInvariantList<IElement>))]
+    [Cloneable(ReturnType = typeof(IInvariantList<string, IElement>))]
     [DebuggerDisplay("{ToDebugString(3)}")]
-    public partial class Chain : InvariantList<IElement>, IElement
+    public partial class Chain : InvariantList<string, IElement>, IElement
     {
         protected override Builder Items { get; }
         public Chain(Builder builder) => Items = builder.ThrowWhenNull();
@@ -97,7 +92,7 @@ public static partial class Test_InvariantList_T
             set => Items.AcceptDuplicates = value;
         }
     }
-    
+
     // ----------------------------------------------------
 
     //[Enforced]
@@ -151,25 +146,25 @@ public static partial class Test_InvariantList_T
 
     //[Enforced]
     [Fact]
-    public static void Test_IndexOf_Item()
+    public static void Test_IndexOf_Key()
     {
         var chain = new Chain(false) { AcceptDuplicates = true };
         chain = (Chain)chain.AddRange([xone, xtwo, xone, xthree]);
 
-        var index = chain.IndexOf(xfour); Assert.Equal(-1, index);
+        var index = chain.IndexOf("four"); Assert.Equal(-1, index);
 
-        index = chain.IndexOf(xone); Assert.Equal(0, index);
-        index = chain.IndexOf(new Named("ONE")); Assert.Equal(0, index);
+        index = chain.IndexOf("one"); Assert.Equal(0, index);
+        index = chain.IndexOf("ONE"); Assert.Equal(0, index);
 
-        index = chain.LastIndexOf(xone); Assert.Equal(2, index);
-        index = chain.LastIndexOf(new Named("ONE")); Assert.Equal(2, index);
+        index = chain.LastIndexOf("one"); Assert.Equal(2, index);
+        index = chain.LastIndexOf("ONE"); Assert.Equal(2, index);
 
-        var nums = chain.IndexesOf(xone);
+        var nums = chain.IndexesOf("one");
         Assert.Equal(2, nums.Count);
         Assert.Equal(0, nums[0]);
         Assert.Equal(2, nums[1]);
 
-        nums = chain.IndexesOf(new Named("ONE"));
+        nums = chain.IndexesOf("ONE");
         Assert.Equal(2, nums.Count);
         Assert.Equal(0, nums[0]);
         Assert.Equal(2, nums[1]);
@@ -532,28 +527,26 @@ public static partial class Test_InvariantList_T
 
     //[Enforced]
     [Fact]
-    public static void Test_Remove_Item()
+    public static void Test_Remove_Key()
     {
         var source = new Chain(false) { AcceptDuplicates = true };
         source = (Chain)source.AddRange([xone, xtwo, xthree, xone]);
 
-        var target = source.Remove(xfour, out var items);
+        var target = source.Remove("four", out var item);
         Assert.Same(source, target);
-        Assert.Empty(items);
+        Assert.Null(item);
 
-        target = source.Remove(xone, out items);
+        target = source.Remove("one", out item);
         Assert.NotSame(source, target);
-        Assert.Single(items);
-        Assert.Same(xone, items[0]);
+        Assert.Same(xone, item);
         Assert.Equal(3, target.Count);
         Assert.Same(xtwo, target[0]);
         Assert.Same(xthree, target[1]);
         Assert.Same(xone, target[2]);
 
-        target = source.Remove(new Named("ONE"), out items);
+        target = source.Remove("ONE", out item);
         Assert.NotSame(source, target);
-        Assert.Single(items);
-        Assert.Same(xone, items[0]);
+        Assert.Same(xone, item);
         Assert.Equal(3, target.Count);
         Assert.Same(xtwo, target[0]);
         Assert.Same(xthree, target[1]);
@@ -567,10 +560,9 @@ public static partial class Test_InvariantList_T
         var source = new Chain(false) { AcceptDuplicates = true };
         source = (Chain)source.AddRange([xone, xtwo, xthree, xone]);
 
-        var target = source.RemoveLast(xone, out var items);
+        var target = source.RemoveLast("one", out var item);
         Assert.NotSame(source, target);
-        Assert.Single(items);
-        Assert.Same(xone, items[0]);
+        Assert.Same(xone, item);
         Assert.Equal(3, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
@@ -584,7 +576,7 @@ public static partial class Test_InvariantList_T
         var source = new Chain(false) { AcceptDuplicates = true };
         source = (Chain)source.AddRange([xone, xtwo, xthree, xone]);
 
-        var target = source.RemoveAll(xone, out var items);
+        var target = source.RemoveAll("one", out var items);
         Assert.NotSame(source, target);
         Assert.Equal(2, items.Count);
         Assert.Same(xone, items[0]);
@@ -593,7 +585,7 @@ public static partial class Test_InvariantList_T
         Assert.Same(xtwo, target[0]);
         Assert.Same(xthree, target[1]);
 
-        target = source.RemoveAll(new Named("ONE"), out items);
+        target = source.RemoveAll("ONE", out items);
         Assert.NotSame(source, target);
         Assert.Equal(2, items.Count);
         Assert.Same(xone, items[0]);
@@ -601,46 +593,6 @@ public static partial class Test_InvariantList_T
         Assert.Equal(2, target.Count);
         Assert.Same(xtwo, target[0]);
         Assert.Same(xthree, target[1]);
-    }
-
-    // ----------------------------------------------------
-
-    //[Enforced]
-    [Fact]
-    public static void Test_Remove_Item_Flatten()
-    {
-        var source = new Chain(false) { AcceptDuplicates = true };
-        source = (Chain)source.AddRange([xone, xtwo, xthree, xone]);
-
-        var target = source.Remove(new Chain(false));
-        Assert.Same(source, target);
-
-        target = source.Remove(new Chain(false, [xone, xthree]), out var items);
-        Assert.NotSame(source, target);
-        Assert.Equal(2, items.Count);
-        Assert.Same(xone, items[0]);
-        Assert.Same(xthree, items[1]);
-        Assert.Equal(2, target.Count);
-        Assert.Same(xtwo, target[0]);
-        Assert.Same(xone, target[1]);
-
-        target = source.RemoveLast(new Chain(false, [xone, xthree]), out items);
-        Assert.NotSame(source, target);
-        Assert.Equal(2, items.Count);
-        Assert.Same(xone, items[0]);
-        Assert.Same(xthree, items[1]);
-        Assert.Equal(2, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-
-        target = source.RemoveAll(new Chain(false, [xone, xthree]), out items);
-        Assert.NotSame(source, target);
-        Assert.Equal(3, items.Count);
-        Assert.Same(xone, items[0]);
-        Assert.Same(xone, items[1]);
-        Assert.Same(xthree, items[2]);
-        Assert.Single(target);
-        Assert.Same(xtwo, target[0]);
     }
 
     // ----------------------------------------------------

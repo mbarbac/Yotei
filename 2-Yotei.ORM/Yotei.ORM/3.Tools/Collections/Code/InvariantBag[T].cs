@@ -2,48 +2,39 @@
 
 // ========================================================
 /// <summary>
-/// <inheritdoc cref="ICoreBag{T}"/>
+/// <inheritdoc cref="IInvariantBag{T}"/>
 /// </summary>
 /// <typeparam name="T"></typeparam>
-[Cloneable(ReturnType = typeof(ICoreBag<>))]
+[Cloneable(ReturnType = typeof(IInvariantBag<>))]
 [DebuggerDisplay("{ToDebugString(3)}")]
-public partial class CoreBag<T> : ICoreBag<T>
+public abstract partial class InvariantBag<T> : IInvariantBag<T>
 {
-    [Cloneable]
-    partial class MyItems : CoreList<T>
-    {
-        readonly CoreBag<T> Master;
-        public MyItems(CoreBag<T> master) : base() => Master = master;
-        protected MyItems(MyItems source) => throw new UnExpectedException();
-
-        public override T ValidateElement(T item) => Master.ValidateElement(item);
-        public override bool CompareElements(T source, T target) => Master.CompareElements(source, target);
-        public override bool FlattenElements => Master.FlattenElements;
-        public override IEnumerable<T> GetDuplicates(T item) => Master.GetDuplicates(item);
-        public override bool IncludeDuplicate(T source, T target) => Master.IncludeDuplicate(source, target);
-        protected override string ToDebugItem(T item) => Master.ToDebugItem(item);
-    }
-
-    // ----------------------------------------------------
-
-    readonly MyItems Items;
+    protected abstract ICoreBag<T> Items { get; }
 
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    public CoreBag() => Items = new(this);
+    public InvariantBag() { }
 
     /// <summary>
     /// Initializes a new instance with the elements of the given range.
     /// </summary>
     /// <param name="range"></param>
-    public CoreBag(IEnumerable<T> range) : this() => AddRange(range);
+    public InvariantBag(IEnumerable<T> range)
+    {
+        Items.AddRange(range.ThrowWhenNull());
+        Items.Trim();
+    }
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected CoreBag(CoreBag<T> source) : this() => AddRange(source);
+    protected InvariantBag(InvariantBag<T> source)
+    {
+        Items.AddRange(source.ThrowWhenNull());
+        Items.Trim();
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -56,7 +47,7 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => Items.ToString();
+    public override string ToString() => $"Count: {Count}";
 
     /// <summary>
     /// Returns a string representation of this instance suitable for debug purposes with at most
@@ -64,7 +55,15 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// </summary>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual string ToDebugString(int count) => Items.ToDebugString(count);
+    public virtual string ToDebugString(int count)
+    {
+        if (Count == 0) return "0:[]";
+        if (count == 0) return $"{Count}:[...]";
+
+        return Count <= count
+            ? $"{Count}:[{string.Join(", ", this.Select(ToDebugItem))}]"
+            : $"{Count}:[{string.Join(", ", this.Take(count).Select(ToDebugItem))}, ...]";
+    }
 
     /// <summary>
     /// Invoked to obtain a string representation of the given element suitable for debug
@@ -77,49 +76,10 @@ public partial class CoreBag<T> : ICoreBag<T>
     // ----------------------------------------------------
 
     /// <summary>
-    /// Invoked to validate the given element before using it in this collection.
+    /// <inheritdoc/>
     /// </summary>
-    /// <param name="item"></param>
     /// <returns></returns>
-    public virtual T ValidateElement(T item) => item;
-
-    /// <summary>
-    /// Invoked to determine, for the purposes of this collection, if the given source and target
-    /// elements shall be considered equal or not.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="target"></param>
-    /// <returns></returns>
-    public virtual bool CompareElements(
-        T source, T target) => EqualityComparer<T>.Default.Equals(source, target);
-
-    /// <summary>
-    /// Determines if the elements that are themselves collections of elements of the type of
-    /// this collection ('<typeparamref name="T"/>') shall be flattened before using them, or
-    /// not.
-    /// </summary>
-    public virtual bool FlattenElements => true;
-
-    /// <summary>
-    /// Invoked to find the duplicates of the given element.
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    public virtual IEnumerable<T> GetDuplicates(
-        T item) => FindAll(x => CompareElements(x, item), out var found) ? found : [];
-
-    /// <summary>
-    /// Invoked to determine if the target element, which is considered a duplicate of the source
-    /// one, can be included in this collection or not. Returns '<c>true</c>' to include it, or
-    /// '<c>false</c>' to ignore the inclusion operation. In addition, an exception may be thrown
-    /// if duplicates are not allowed.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="target"></param>
-    /// <returns></returns>
-    public virtual bool IncludeDuplicate(T source, T target) => true;
-
-    // ----------------------------------------------------
+    public ICoreBag<T> ToBuilder() => Items.Clone();
 
     /// <summary>
     /// <inheritdoc/>
@@ -158,7 +118,7 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// <param name="found"></param>
     /// <returns></returns>
     public bool FindAll(
-        Predicate<T> predicate, Action<T>? found = null) => Items.FindAll(predicate, found);
+        Predicate<T> predicate, Action<T>? found = null) => FindAll(predicate, found);
 
     /// <summary>
     /// <inheritdoc/>
@@ -167,7 +127,7 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// <param name="found"></param>
     /// <returns></returns>
     public bool FindAll(
-        Predicate<T> predicate, out List<T> found) => Items.FindAll(predicate, out found);
+        Predicate<T> predicate, out List<T> found) => FindAll(predicate, out found);
 
     /// <summary>
     /// <inheritdoc/>
@@ -191,13 +151,6 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// </summary>
     /// <param name="array"></param>
     /// <param name="index"></param>
-    public void CopyTo(T[] array, int index) => Items.CopyTo(array, index);
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="array"></param>
-    /// <param name="index"></param>
     public void CopyTo(Array array, int index) => Items.CopyTo(array, index);
 
     // ----------------------------------------------------
@@ -207,15 +160,24 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual int Add(T item) => Items.Add(item);
-    void ICollection<T>.Add(T item) => Add(item);
+    public virtual IInvariantBag<T> Add(T item)
+    {
+        var clone = (InvariantBag<T>)Clone();
+        var num = clone.Items.Add(item);
+        return num > 0 ? clone : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual int AddRange(IEnumerable<T> range) => Items.AddRange(range);
+    public virtual IInvariantBag<T> AddRange(IEnumerable<T> range)
+    {
+        var clone = (InvariantBag<T>)Clone();
+        var num = clone.Items.AddRange(range);
+        return num > 0 ? clone : this;
+    }
 
     // ----------------------------------------------------
 
@@ -225,8 +187,12 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// <param name="item"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    public virtual int Remove(T item, Action<T>? removed = null) => Items.Remove(item, removed);
-    bool ICollection<T>.Remove(T item) => Remove(item) > 0;
+    public virtual IInvariantBag<T> Remove(T item, Action<T>? removed = null)
+    {
+        var clone = (InvariantBag<T>)Clone();
+        var num = clone.Items.Remove(item, removed);
+        return num > 0 ? clone : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -234,7 +200,12 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// <param name="item"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    public virtual int Remove(T item, out List<T> removed) => Items.Remove(item, out removed);
+    public virtual IInvariantBag<T> Remove(T item, out List<T> removed)
+    {
+        var clone = (InvariantBag<T>)Clone();
+        var num = clone.Items.Remove(item, out removed);
+        return num > 0 ? clone : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -242,8 +213,12 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// <param name="item"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    public virtual int RemoveAll(
-        T item, Action<T>? removed = null) => Items.RemoveAll(item, removed);
+    public virtual IInvariantBag<T> RemoveAll(T item, Action<T>? removed = null)
+    {
+        var clone = (InvariantBag<T>)Clone();
+        var num = clone.Items.RemoveAll(item, removed);
+        return num > 0 ? clone : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -251,7 +226,12 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// <param name="item"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    public virtual int RemoveAll(T item, out List<T> removed) => Items.RemoveAll(item, out removed);
+    public virtual IInvariantBag<T> RemoveAll(T item, out List<T> removed)
+    {
+        var clone = (InvariantBag<T>)Clone();
+        var num = clone.Items.RemoveAll(item, out removed);
+        return num > 0 ? clone : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -259,8 +239,12 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// <param name="predicate"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    public virtual int Remove(
-        Predicate<T> predicate, Action<T>? removed = null) => Items.Remove(predicate, removed);
+    public virtual IInvariantBag<T> Remove(Predicate<T> predicate, Action<T>? removed = null)
+    {
+        var clone = (InvariantBag<T>)Clone();
+        var num = clone.Items.Remove(predicate, removed);
+        return num > 0 ? clone : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -268,8 +252,12 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// <param name="predicate"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    public virtual int Remove(
-        Predicate<T> predicate, out T removed) => Items.Remove(predicate, out removed);
+    public virtual IInvariantBag<T> Remove(Predicate<T> predicate, out T removed)
+    {
+        var clone = (InvariantBag<T>)Clone();
+        var num = clone.Items.Remove(predicate, out removed);
+        return num > 0 ? clone : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -277,8 +265,12 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// <param name="predicate"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    public virtual int RemoveAll(
-        Predicate<T> predicate, Action<T>? removed = null) => Items.RemoveAll(predicate, removed);
+    public virtual IInvariantBag<T> RemoveAll(Predicate<T> predicate, Action<T>? removed = null)
+    {
+        var clone = (InvariantBag<T>)Clone();
+        var num = clone.Items.RemoveAll(predicate, removed);
+        return num > 0 ? clone : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -286,19 +278,26 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// <param name="predicate"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    public virtual int RemoveAll(
-        Predicate<T> predicate, out List<T> removed) => Items.RemoveAll(predicate, out removed);
+    public virtual IInvariantBag<T> RemoveAll(Predicate<T> predicate, out List<T> removed)
+    {
+        var clone = (InvariantBag<T>)Clone();
+        var num = clone.Items.RemoveAll(predicate, out removed);
+        return num > 0 ? clone : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual int Clear() => Items.Clear();
-    void ICollection<T>.Clear() => Clear();
+    public virtual IInvariantBag<T> Clear()
+    {
+        var clone = (InvariantBag<T>)Clone();
+        var num = clone.Items.Clear();
+        return num > 0 ? clone : this;
+    }
 
     // ----------------------------------------------------
 
-    bool ICollection<T>.IsReadOnly => false;
     bool ICollection.IsSynchronized => false;
-    object ICollection.SyncRoot => ((ICollection)Items).SyncRoot;
+    object ICollection.SyncRoot => Items.SyncRoot;
 }

@@ -2,14 +2,20 @@
 
 // ========================================================
 /// <summary>
-/// Represents a bag-alike collection of elements with no order.
+/// Represents an immutable bag-alike collection of elements with no order.
 /// <br/> Semantics are that two given elements are considered equal only if the equality rules
 /// in this instance determine so.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 [Cloneable]
-public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, ICollection
+public partial interface IInvariantBag<T> : IReadOnlyCollection<T>, ICollection
 {
+    /// <summary>
+    /// Returns a new builder based upon the contents of this instance.
+    /// </summary>
+    /// <returns></returns>
+    ICoreBag<T> ToBuilder();
+
     /// <summary>
     /// Gets the number of elements in this collection.
     /// </summary>
@@ -21,7 +27,7 @@ public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, I
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    new bool Contains(T item);
+    bool Contains(T item);
 
     /// <summary>
     /// Tries to find an ocurrence of an element that matches the given predicate and, if so and
@@ -79,115 +85,115 @@ public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, I
     // ----------------------------------------------------
 
     /// <summary>
-    /// Adds to this collection the given element.
-    /// <br/> Returns the number of changes made.
+    /// Returns a new instance with the given element added to it.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    new int Add(T item);
+    IInvariantBag<T> Add(T item);
 
     /// <summary>
-    /// Adds to this collection the elements of the given range.
-    /// <br/> Returns the number of changes made.
+    /// Returns a new instance with the elements of the given range added to it.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    int AddRange(IEnumerable<T> range);
+    IInvariantBag<T> AddRange(IEnumerable<T> range);
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Removes from this collection an ocurrence of the given element, as determined by the rules
-    /// in this instance. If it is itself a collection of elements, and if this instance flattens
-    /// input elements, then its own elements are removed instead. If the given delegate is not
-    /// null, it is invoked with the removed elements.
-    /// <br/> Returns the number of changes made.
-    /// </summary>
-    /// <param name="item"></param>
-    /// <param name="removed"></param>
-    /// <returns></returns>
-    int Remove(T item, Action<T>? removed = null);
-
-    /// <summary>
-    /// Removes from this collection an ocurrence of the given element, as determined by the rules
-    /// in this instance. If it is itself a collection of elements, and if this instance flattens
-    /// input elements, then its own elements are removed instead. Returns the removed elements
-    /// in the out argument.
-    /// <br/> Returns the number of changes made.
-    /// </summary>
-    /// <param name="item"></param>
-    /// <param name="removed"></param>
-    /// <returns></returns>
-    int Remove(T item, out List<T> removed);
-
-    /// <summary>
-    /// Removes from this collection all the ocurrences of the given element, as determined by
-    /// the rules in this instance. If it is itself a collection of elements, and this instance
+    /// Returns a new instance with an ocurrence of the given element, according to the rules of
+    /// this instance, removed. If it is itself a collection of elements, and if this instance
     /// flattens input elements, then its own elements are removed instead. If the given delegate
     /// is not null, it is invoked with the removed elements.
-    /// <br/> Returns the number of changes made.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="item"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    int RemoveAll(T item, Action<T>? removed = null);
+    IInvariantBag<T> Remove(T item, Action<T>? removed = null);
 
     /// <summary>
-    /// Removes from this collection all the ocurrences of the given element, as determined by
-    /// the rules in this instance. If it is itself a collection of elements, and this instance
+    /// Returns a new instance with an ocurrence of the given element, according to the rules of
+    /// this instance, removed. If it is itself a collection of elements, and if this instance
+    /// flattens input elements, then its own elements are removed instead. Returns the removed
+    /// elements, if any, in the out argument.
+    /// <br/> Returns the original instance if no changes were made.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    IInvariantBag<T> Remove(T item, out List<T> removed);
+
+    /// <summary>
+    /// Returns a new instance with all the ocurrences of the given element, accoring to the rules
+    /// of this instance, removed. If it is itself a collection of elements, and this instance
+    /// flattens input elements, then its own elements are removed instead. If the given delegate
+    /// is not null, it is invoked with the removed elements.
+    /// <br/> Returns the original instance if no changes were made.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    IInvariantBag<T> RemoveAll(T item, Action<T>? removed = null);
+
+    /// <summary>
+    /// Returns a new instance with all the ocurrences of the given element, accoring to the rules
+    /// of this instance, removed. If it is itself a collection of elements, and this instance
     /// flattens input elements, then its own elements are removed instead. Returns the removed
     /// elements in the out argument.
-    /// <br/> Returns the number of changes made.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="item"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    int RemoveAll(T item, out List<T> removed);
+    IInvariantBag<T> RemoveAll(T item, out List<T> removed);
 
     /// <summary>
-    /// Removes from this collection an element that matches the given predicate. If the given
-    /// delegate is not null, it is invoked with the removed element.
-    /// <br/> Returns the number of changes made.
+    /// Returns a new instance with an element that matches the given predicate removed. If the
+    /// given delegate is not null, it is invoked with the removed element, if any.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="predicate"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    int Remove(Predicate<T> predicate, Action<T>? removed = null);
+    IInvariantBag<T> Remove(Predicate<T> predicate, Action<T>? removed = null);
 
     /// <summary>
-    /// Removes from this collection an element that matches the given predicate. Returns the
-    /// removed element, if any, in the out argument.
-    /// <br/> Returns the number of changes made.
+    /// Returns a new instance with an element that matches the given predicate removed. Returns
+    /// the removed element, if any, in the out argument.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="predicate"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    int Remove(Predicate<T> predicate, out T removed);
+    IInvariantBag<T> Remove(Predicate<T> predicate, out T removed);
 
     /// <summary>
-    /// Removes from this collection all the elements that match the given predicate. If the
-    /// given delegate is not null, it is invoked with the removed elements.
-    /// <br/> Returns the number of changes made.
+    /// Returns a new instance with all the elements that match the given predicate removed. If
+    /// the given delegate is not null, it is invoked with the removed elements.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="predicate"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    int RemoveAll(Predicate<T> predicate, Action<T>? removed = null);
+    IInvariantBag<T> RemoveAll(Predicate<T> predicate, Action<T>? removed = null);
 
     /// <summary>
-    /// Removes from this collection all the elements that match the given predicate and, if so,
-    /// returns the removed elements in the out argument.
-    /// <br/> Returns the number of changes made.
+    /// Returns a new instance with all the elements that match the given predicate removed. If
+    /// so, returns the removed elements in the out argument.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <param name="predicate"></param>
     /// <param name="removed"></param>
     /// <returns></returns>
-    int RemoveAll(Predicate<T> predicate, out List<T> removed);
+    IInvariantBag<T> RemoveAll(Predicate<T> predicate, out List<T> removed);
 
     /// <summary>
-    /// Clears this collection.
-    /// <br/> Returns the number of changes made.
+    /// Returns a new instance with all the original elements removed.
+    /// <br/> Returns the original instance if no changes were made.
     /// </summary>
     /// <returns></returns>
-    new int Clear();
+    IInvariantBag<T> Clear();
 }

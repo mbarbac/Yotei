@@ -21,14 +21,18 @@ public static partial class Test_CoreList_KT
 
     [Cloneable(ReturnType = typeof(ICoreList<string, IElement>))]
     [DebuggerDisplay("{ToDebugString(3)}")]
-    public partial class Chain : CoreList<string, IElement>, IElement
+    public partial class Chain : CoreListEx<string, IElement>, IElement
     {
         static string OnGetKey(IElement item) =>
             item is null || item is not Named named ? null! : named.Name;
 
         public Chain(bool sensitive) : base(OnGetKey) => Comparer = new(sensitive);
         public Chain(bool sensitive, IEnumerable<IElement> range) : this(sensitive) => AddRange(range);
-        protected Chain(Chain source) : this(source.ThrowWhenNull().Sensitive) => AddRange(source);
+        protected Chain(Chain source) : this(source.ThrowWhenNull().Sensitive)
+        {
+            AcceptDuplicates = source.AcceptDuplicates;
+            AddRange(source);
+        }
 
         public override string ValidateKey(string key) => key.NotNullNotEmpty(true);
         public override bool CompareKeys(string source, string target) => Comparer.Equals(source, target);

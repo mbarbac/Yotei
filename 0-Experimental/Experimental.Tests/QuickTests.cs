@@ -2,10 +2,10 @@
 
 // ========================================================
 //[Enforced]
-public static class QuickAndDirty
+public static class QuickTests
 {
     //[Enforced]
-    //[Fact]
+    [Fact]
     public static void Test()
     {
     }
