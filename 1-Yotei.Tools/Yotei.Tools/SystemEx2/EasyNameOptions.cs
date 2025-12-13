@@ -1,40 +1,81 @@
 ﻿namespace Yotei.Tools;
 
-// LOW: Find if there is a way to see if nullable annotations are used with reference types.
-// It is easy for value ones: nullables are 'Nullable{type}'.
-// It is also possible when the reference type comes from an argument.
-
 // ========================================================
 /// <summary>
 /// Provides options for the 'EasyName(...)' family of methods.
+/// <br/> Instances of this type are immutable ones.
 /// </summary>
 public record EasyNameOptions
 {
     /// <summary>
-    /// A shared instance with all settings set to false or null.
+    /// A shared read-only instance that represents empty options.
+    /// <br/> All settings are set to 'false' or 'null'.
     /// </summary>
     public static EasyNameOptions Empty => new(BuildMode.Empty);
 
     /// <summary>
-    /// A shared instance with default useful settings.
+    /// A shared read-only instance that represents default options:
+    /// <br/>- Use type names.
+    /// <br/>- Use type nullable annotation.
+    /// <br/>- Use generic types both in types and in members.
+    /// <br/>- Use parameter types but not their names.
     /// </summary>
     public static EasyNameOptions Default => new(BuildMode.Default);
 
     /// <summary>
-    /// A shared instance with full settings enabled.
+    /// A shared read-only instance that represents full options.
+    /// <br/> All seetings are set to 'true' or to a full-instance's reference.
     /// </summary>
     public static EasyNameOptions Full => new(BuildMode.Full);
 
+    // ----------------------------------------------------
+
     /// <summary>
-    /// Initializes a new default instance.
+    /// Initializes a new default instance that:
+    /// <br/>- Use type names.
+    /// <br/>- Use type nullable annotation.
+    /// <br/>- Use generic types both in types and in members.
+    /// <br/>- Use parameter types but not their names.
     /// </summary>
     public EasyNameOptions() : this(BuildMode.Default) { }
+
+    enum BuildMode { Empty, Default, Full }
+    private EasyNameOptions(BuildMode mode)
+    {
+        switch (mode)
+        {
+            case BuildMode.Empty:
+                break;
+
+            case BuildMode.Default:
+                TypeUseName = true;
+                TypeUseNullable = true;
+                TypeGenericArgumentOptions = this;
+                MemberGenericArgumentOptions = this;
+                ParameterTypeOptions = this;
+                break;
+
+            case BuildMode.Full:
+                TypeUseNamespace = true;
+                TypeUseHost = true;
+                TypeUseName = true;
+                TypeUseNullable = true;
+                TypeGenericArgumentOptions = this;
+                MemberReturnTypeOptions = this;
+                MemberHostTypeOptions = this;
+                MemberGenericArgumentOptions = this;
+                ConstructorTechName = true;
+                IndexerTechName = true;
+                ParameterTypeOptions = this;
+                ParameterUseName = true;
+                break;
+        }
+    }
 
     // ----------------------------------------------------
 
     /// <summary>
     /// Determines if the namespace of the type element shall be used.
-    /// <br/> Setting this property implies <see cref="TypeUseHost"/>.
     /// </summary>
     public bool TypeUseNamespace { get; init; }
 
@@ -44,112 +85,63 @@ public record EasyNameOptions
     public bool TypeUseHost { get; init; }
 
     /// <summary>
-    /// Determines if the name of the type element shall be used, or rather just its placeholder.
+    /// Determines if the name of the type element shall be used.
     /// <br/> This setting is mostly used to prevent generic names to appear.
     /// </summary>
     public bool TypeUseName { get; init; }
 
     /// <summary>
-    /// If not null, the options to use with the generic type arguments of the type element.
-    /// <br/> If null, then the generic type arguments are not used.
+    /// Determines if the nullable annotation, if any, shall be used.
+    /// </summary>
+    public bool TypeUseNullable { get; init; }
+
+    /// <summary>
+    /// If not null, the options to use with the type's generic arguments.
+    /// <br/> If 'null', then generic type arguments are ignored.
     /// </summary>
     public EasyNameOptions? TypeGenericArgumentOptions { get; init; }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// If not null, the options to use with the return type of the member.
-    /// <br/> If null, then the member return type is not used.
+    /// If not null, the options to use with the return type of the member element.
+    /// <br/> If 'null', then return types are ignored.
     /// </summary>
     public EasyNameOptions? MemberReturnTypeOptions { get; init; }
 
     /// <summary>
-    /// If not null, the options to use with the host type of the member.
-    /// <br/> If null, then the member host type is not used.
+    /// If not null, the options to use with the host type of the member element.
+    /// <br/> If 'null', then members' host types are ignored.
     /// </summary>
     public EasyNameOptions? MemberHostTypeOptions { get; init; }
 
     /// <summary>
-    /// The literal to use as the name of constructor members.
-    /// <br/> The default value of this property is 'new'.
-    /// <br/> If the value is '$', then the name of the constructor method is used.
-    /// </summary>
-    public string ConstructorName { get; init => field = value.NotNullNotEmpty(true); }
-
-    /// <summary>
-    /// The literal to use as the name of indexed members.
-    /// <br/> The default value of this property is 'this'.
-    /// <br/> If the value is '$', then the name of the internal property is found and used.
-    /// </summary>
-    public string IndexerName { get; init => field = value.NotNullNotEmpty(true); }
-
-    /// <summary>
-    /// If not null, the options to use with the generic type arguments of the member element.
-    /// <br/> If null, then the generic type arguments are not used.
+    /// If not null, the options to use with the generic arguments of members and methods.
     /// </summary>
     public EasyNameOptions? MemberGenericArgumentOptions { get; init; }
 
     /// <summary>
-    /// If not null, the options to use with the arguments of the member element.
-    /// <br/> If null, and <see cref="MemberUseArgumentNames"/> is not set, then member arguments
-    /// are not used.
+    /// Determines if the technical name of constructor elements shall be used, instead of the
+    /// default 'new' one.
     /// </summary>
-    public EasyNameOptions? MemberArgumentTypeOptions { get; init; }
+    public bool ConstructorTechName { get; init; }
 
     /// <summary>
-    /// Determines if the names of the member arguments shall be used.
-    /// <br/> If null, and <see cref="MemberArgumentTypeOptions"/> is null, then member arguments
-    /// are not used.
+    /// Determines if the technical name of constructor elements shall be used, instead of the
+    /// default 'this' one.
     /// </summary>
-    public bool MemberUseArgumentNames { get; init; }
+    public bool IndexerTechName { get; init; }
 
     // ----------------------------------------------------
 
-    enum BuildMode { Empty, Default, Full };
+    /// <summary>
+    /// If not null, the options to use with the types of parameter elements.
+    /// <br/> If 'null', then parameter types are ignored.
+    /// </summary>
+    public EasyNameOptions? ParameterTypeOptions { get; init; }
 
-    private EasyNameOptions(BuildMode mode)
-    {
-        ConstructorName = "new";
-        IndexerName = "this";
-
-        switch (mode)
-        {
-            case BuildMode.Empty:
-                TypeUseNamespace = false;
-                TypeUseHost = false;
-                TypeUseName = false;
-                TypeGenericArgumentOptions = null;
-                MemberReturnTypeOptions = null;
-                MemberHostTypeOptions = null;
-                MemberGenericArgumentOptions = null;
-                MemberArgumentTypeOptions = null;
-                MemberUseArgumentNames = false;
-                break;
-
-            case BuildMode.Default:
-                TypeUseNamespace = false;
-                TypeUseHost = false;
-                TypeUseName = true; // Use the type element name
-                TypeGenericArgumentOptions = this; // Use type generic arguments
-                MemberReturnTypeOptions = null;
-                MemberHostTypeOptions = null;
-                MemberGenericArgumentOptions = this; // Use member generic arguments
-                MemberArgumentTypeOptions = this; // Use the types of the member arguments
-                MemberUseArgumentNames = false;
-                break;
-
-            case BuildMode.Full:
-            default:
-                TypeUseNamespace = true;
-                TypeUseHost = true;
-                TypeUseName = true;
-                TypeGenericArgumentOptions = this;
-                MemberReturnTypeOptions = this;
-                MemberHostTypeOptions = this;
-                MemberGenericArgumentOptions = this;
-                MemberArgumentTypeOptions = this;
-                MemberUseArgumentNames = true;
-                break;
-        }
-    }
+    /// <summary>
+    /// Determines if the name of the parameter element shall be used.
+    /// </summary>
+    public bool ParameterUseName { get; init; }
 }
