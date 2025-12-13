@@ -3,9 +3,9 @@
 namespace Benchmarks;
 
 // ========================================================
-[DisassemblyDiagnoser]
+//[DisassemblyDiagnoser]
+//[HideColumns("Job", "Error", "StdDev", "Median")]
 [MemoryDiagnoser(displayGenColumns: true)]
-[HideColumns("Job", "Error", "StdDev", "Median")]
 public partial class Bench_StringBuilderPool
 {
     static void UseValue(string str) { if (str.Length == 0) throw new Exception(); }

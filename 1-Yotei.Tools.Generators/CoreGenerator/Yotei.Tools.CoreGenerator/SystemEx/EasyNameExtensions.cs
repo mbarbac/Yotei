@@ -162,6 +162,8 @@ internal static class EasyNameExtensions
 
                 if (options.MemberArgumentTypeOptions is not null)
                 {
+                    // DEBUGING: out type not recognized
+
                     var type = par.ParameterType.EasyName(options.MemberArgumentTypeOptions);
                     if (type.Length > 0) str.Append(type);
                 }

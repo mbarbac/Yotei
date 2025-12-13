@@ -18,6 +18,7 @@ internal class XTypeNode : TypeNode
     bool ReturnNullable;
     EasyNameOptions ReturnOptions;
 
+    bool IsBag;
     string Bracket;
     Type Template;
     INamedTypeSymbol KType; string KTypeName; bool KTypeNullable;
@@ -27,13 +28,13 @@ internal class XTypeNode : TypeNode
     /// <inheritdoc/>
     /// </summary>
     /// <param name="symbol"></param>
-    [SuppressMessage("", "IDE0290")]
     public XTypeNode(INamedTypeSymbol symbol) : base(symbol)
     {
         ReturnType = Symbol;
         ReturnNullable = false;
         ReturnOptions = EasyNameOptions.Default;
 
+        IsBag = false;
         Bracket = null!;
         Template = null!;
         KType = null!; KTypeName = null!; KTypeNullable = false;
@@ -73,7 +74,7 @@ internal class XTypeNode : TypeNode
         }
 
         // Identifies if attribute is an invariant bag, or otherwise an invariant list...
-        var isbag = atc.Name.Contains("InvariantBag");
+        IsBag = atc.Name.Contains(BagName);
 
         // Attribute that uses no generic arguments...
         if (atc.Arity == 0)
@@ -86,14 +87,14 @@ internal class XTypeNode : TypeNode
             // One type argument: <T>...
             if (args.Length == 1)
             {
-                Template = isbag ? typeof(IBagTemplate<>) : typeof(IListTemplate<>);
+                Template = IsBag ? typeof(IBagTemplate<>) : typeof(IListTemplate<>);
                 TType = args[0].UnwrapNullable(out TTypeNullable);
                 TTypeName = TType.EasyName(EasyNameOptions.Full) + (TTypeNullable ? "?" : "");
                 Bracket = $"<{TTypeName}>";
             }
 
             // Two type arguments: <K, T>...
-            if (args.Length == 2 && !isbag)
+            if (args.Length == 2 && !IsBag)
             {
                 Template = typeof(IListTemplate<,>);
                 KType = args[0].UnwrapNullable(out KTypeNullable);
@@ -108,14 +109,14 @@ internal class XTypeNode : TypeNode
         // Attribute that uses one generic argument: <T>...
         if (atc.Arity == 1)
         {
-            Template = isbag ? typeof(IBagTemplate<>) : typeof(IListTemplate<>);
+            Template = IsBag ? typeof(IBagTemplate<>) : typeof(IListTemplate<>);
             TType = ((INamedTypeSymbol)atc.TypeArguments[0]).UnwrapNullable(out TTypeNullable);
             TTypeName = TType.EasyName(EasyNameOptions.Full) + (TTypeNullable ? "?" : "");
             Bracket = $"<{TTypeName}>";
         }
 
         // Attribute that uses two generic arguments: <K, T>...
-        if (atc.Arity == 2 && !isbag)
+        if (atc.Arity == 2 && !IsBag)
         {
             Template = typeof(IListTemplate<,>);
             KType = ((INamedTypeSymbol)atc.TypeArguments[0]).UnwrapNullable(out KTypeNullable);
@@ -167,6 +168,169 @@ internal class XTypeNode : TypeNode
             return value;
         },
         out _, Symbol.AllBaseTypes, Symbol.AllInterfaces);
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="cb"></param>
+    protected override void EmitCore(SourceProductionContext context, CodeBuilder cb)
+    {
+        // Emits 'Clone()' if needed...
+        EmitClone(cb);
+
+        // Iterating through template's methods...
+        var methods = Template.GetMembers().OfType<MethodInfo>().Where(x => x.DeclaringType == Template);
+        var existing = Symbol.GetMembers().OfType<IMethodSymbol>().ToArray();
+
+        foreach (var method in methods)
+        {
+            // If already exists, we're done...
+            if (existing.Any(x => SameMethod(method, x))) continue;
+
+            // Emit documentation...
+            var headdoc = Symbol.IsInterface
+                ? (IsBag ? IBagName : IListName)
+                : (IsBag ? BagName : ListName);
+
+            var name = method.EasyName();
+            name = $"{headdoc}{Bracket}.{name}";
+            name = name.Replace('<', '{').Replace('>', '}');
+            name = $"/// <inheritdoc cref=\"{name}\"/>";
+
+            cb.AppendLine();
+            cb.AppendLine(name);
+            cb.AppendLine($"{InvariantGenerator.AttributeDoc}");
+
+            // Prepare to emit method...
+            var nameoptions = EasyNameOptions.Default with
+            { MemberArgumentTypeOptions = EasyNameOptions.Full, MemberUseArgumentNames = true };
+
+            if (method.Name == "Replace") { } // DEBUGING Replace method with out argument
+
+            name = method.EasyName(nameoptions);
+            name = name.Replace("K ", $"{KTypeName} "); // K key...
+            name = name.Replace("<K", $"<{KTypeName}"); // IComparer<K> comparer...
+            name = name.Replace("T ", $"{TTypeName} "); // T item...
+            name = name.Replace("T>", $"{TTypeName}>"); // IEnumerable<T> range...
+
+            var rtype = ReturnType.EasyName(ReturnOptions);
+            var rnull = ReturnNullable ? "?" : string.Empty;
+
+            // Emit when host is an interface...
+            if (Symbol.IsInterface) cb.AppendLine($"new {rtype}{rnull} {name};");
+
+            // Otherwise, emit inheriting from a base class...
+            else
+            {
+                var argoptions = EasyNameOptions.Default with
+                { MemberArgumentTypeOptions = null, MemberUseArgumentNames = true };
+
+                var args = method.EasyName(argoptions);
+                var mods = Symbol.IsAbstract ? "abstract override" : "override";
+
+                cb.AppendLine($"public {mods} {rtype}{rnull} {name}");
+                cb.AppendLine($"=> ({rtype}{rnull})base.{args};");
+
+                foreach (var iface in GetMethodInterfaces(method))
+                {
+                    cb.AppendLine();
+                    cb.AppendLine(iface);
+                    cb.AppendLine($"{iface}.{name} => {args};");
+                }
+            }
+        }
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the given method is the same as the given existing one.
+    /// </summary>
+    bool SameMethod(MethodInfo method, IMethodSymbol existing)
+    {
+        var mname = method.Name;
+        var ename = existing.Name;
+        if (mname != ename) return false; // Names differ...
+
+        var mpars = method.GetParameters();
+        var epars = existing.Parameters;
+        if (mpars.Length != epars.Length) return false; // Number of pars differ...
+
+        for (int i = 0; i < mpars.Length; i++)
+        {
+            var mpar = mpars[i];
+            var epar = epars[i];
+            if (!SameArgument(mpar, epar)) return false; // Parameter differ...
+        }
+
+        return true; // Same method...
+    }
+
+    /// <summary>
+    /// Determines if the given arguments are the same or not.
+    /// </summary>
+    /// **********
+    /// HIGH: In SameArgumen() determine also by 'out' modifier!!!
+    /// **********
+    bool SameArgument(ParameterInfo mpar, IParameterSymbol epar)
+    {
+        var mtype = mpar.ParameterType;
+        var etype = (INamedTypeSymbol)epar.Type;
+
+        return SameArgument(mtype, etype);
+    }
+
+    /// <summary>
+    /// Determines if the types of the given arguments are the same or not.
+    /// </summary>
+    bool SameArgument(Type mtype, INamedTypeSymbol etype)
+    {
+        var comparer = SymbolEqualityComparer.Default;
+        switch (mtype.Name)
+        {
+            case "K": if (!comparer.Equals(KType, etype)) return false; break;
+            case "T": if (!comparer.Equals(TType, etype)) return false; break;
+            default: if (!etype.Match(mtype)) return false; break;
+        }
+
+        var margs = mtype.GenericTypeArguments;
+        var eargs = etype.TypeArguments;
+        if (margs.Length != eargs.Length) return false;
+
+        for (int i = 0; i < margs.Length; i++)
+        {
+            var marg = margs[i];
+            var earg = eargs[i];
+            var same = SameArgument(marg, (INamedTypeSymbol)earg);
+            if (!same) return false;
+        }
+
+        return true;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Obtains the interfaces for which the given method needs explicit implementation.
+    /// </summary>
+    List<string> GetMethodInterfaces(MethodInfo method)
+    {
+        // HIGH: GetMethodInterfaces()...
+        return [];
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Tries to emit a 'Clone()' method if needed.
+    /// </summary>
+    void EmitClone(CodeBuilder cb)
+    {
+        // HIGH: EmitClone();
     }
 
     // ----------------------------------------------------

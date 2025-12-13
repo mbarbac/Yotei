@@ -1,0 +1,10 @@
+Problema:
+- En el generador de Invariant collections los argumentos 'out T' aparacen como 'T&'.
+- El problema está en EasyName
+Hay un problema mayor:
+- Library hace too much, pero no puede ser completamente generica.
+- Solution:
+	- CoreGenerator debe restringirse a generar la jerarquía, y ya está.
+	- Helpers lo mas escuetos posible.
+
+

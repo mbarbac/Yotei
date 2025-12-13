@@ -1,5 +1,4 @@
-﻿#pragma warning disable CA8597
-#pragma warning disable CA1822
+﻿#pragma warning disable CA1822
 
 namespace Experimental;
 
@@ -14,12 +13,12 @@ public ref struct DisposableStringBuilder : IDisposable
 
     public void Dispose() => Clear();
 
-    public override string ToString() => ToString(true);
+    public override string ToString() => ToString(false);
 
-    public string ToString(bool dispose)
+    public string ToString(bool clear)
     {
         var str = _array is null || _len == 0 ? string.Empty : new(_array, 0, _len);
-        if (dispose) Dispose();
+        if (clear) Clear();
         return str;
     }
 

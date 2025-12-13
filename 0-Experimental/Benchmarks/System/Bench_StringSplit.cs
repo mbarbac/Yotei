@@ -1,9 +1,9 @@
 ﻿namespace Benchmarks;
 
 // ========================================================
-[DisassemblyDiagnoser]
-[MemoryDiagnoser(displayGenColumns: false)]
-[HideColumns("Job", "Error", "StdDev", "Median")]
+//[DisassemblyDiagnoser]
+//[HideColumns("Job", "Error", "StdDev", "Median")]
+[MemoryDiagnoser(displayGenColumns: true)]
 public partial class Bench_StringSplit
 {
     [Benchmark]
