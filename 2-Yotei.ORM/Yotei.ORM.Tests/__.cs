@@ -1,8 +1,8 @@
-﻿namespace Yotei.ORM.Tests.Collections;
+﻿namespace Yotei.ORM.Tests;
 
 // ========================================================
 //[Enforced]
-//public static class Test_CoreBag_T
+//public static class Test_
 //{
 //    //[Enforced]
 //    [Fact]
@@ -10,3 +10,5 @@
 //    {
 //    }
 //}
+
+public interface IFake { }
