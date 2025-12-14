@@ -15,7 +15,7 @@ public static class Test_EasyName_Type
 
     //[Enforced]
     [Fact]
-    public static void Test1_System()
+    public static void Test0_System()
     {
         EasyNameOptions options;
         string name;
@@ -40,7 +40,7 @@ public static class Test_EasyName_Type
 
     //[Enforced]
     [Fact]
-    public static void Test2_Standard()
+    public static void Test1_Standard()
     {
         EasyNameOptions options;
         string name;
@@ -74,7 +74,7 @@ public static class Test_EasyName_Type
 
     //[Enforced]
     [Fact]
-    public static void Test3_Generic_Unbound()
+    public static void Test2_Generic_Unbound()
     {
         EasyNameOptions options;
         string name;
@@ -116,7 +116,7 @@ public static class Test_EasyName_Type
 
     //[Enforced]
     [Fact]
-    public static void Test3_Generic_Bound()
+    public static void Test2_Generic_Bound()
     {
         EasyNameOptions options;
         string name;
@@ -163,4 +163,111 @@ public static class Test_EasyName_Type
             $"{NAMESPACE}.{CLASSNAME}.T2A<System.Byte, System.Int32>.T2B<System.String>",
             name);
     }
+
+    // ----------------------------------------------------
+
+    public class T3A<K, T> { public class T3B<S> { public class T3C<V> { } } }
+
+    //[Enforced]
+    [Fact]
+    public static void Test3_Nested_Unbound()
+    {
+        EasyNameOptions options;
+        string name;
+        var item = typeof(T3A<,>.T3B<>.T3C<>);
+
+        // Empty...
+        options = EMPTY;
+        name = item.EasyName(options); Assert.Equal("", name);
+
+        options = EMPTY with { TypeUseName = true };
+        name = item.EasyName(options);
+        Assert.Equal("T3C", name);
+
+        options = EMPTY with { TypeGenericArgumentOptions = EMPTY };
+        name = item.EasyName(options);
+        Assert.Equal("T3C<>", name);
+
+        options = EMPTY with { TypeGenericArgumentOptions = EMPTY, TypeUseHost = true };
+        name = item.EasyName(options);
+        Assert.Equal($"{CLASSNAME}.T3A<,>.T3B<>.T3C<>", name);
+
+        // Default...
+        options = DEFAULT;
+        name = item.EasyName(options); Assert.Equal("T3C<V>", name);
+
+        options = DEFAULT with { TypeUseHost = true };
+        name = item.EasyName(options);
+        Assert.Equal($"{CLASSNAME}.T3A<K, T>.T3B<S>.T3C<V>", name);
+
+        options = DEFAULT with { TypeUseNamespace = true };
+        name = item.EasyName(options);
+        Assert.Equal($"{NAMESPACE}.{CLASSNAME}.T3A<K, T>.T3B<S>.T3C<V>", name);
+
+        // Full...
+        options = FULL;
+        name = item.EasyName(options);
+        Assert.Equal($"{NAMESPACE}.{CLASSNAME}.T3A<K, T>.T3B<S>.T3C<V>", name);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test3_Nested_Bound()
+    {
+        EasyNameOptions options;
+        string name;
+        var item = typeof(T3A<byte, int>.T3B<string>.T3C<long   >);
+
+        // Empty...
+        options = EMPTY;
+        name = item.EasyName(options); Assert.Equal("", name);
+
+        options = EMPTY with { TypeUseName = true };
+        name = item.EasyName(options);
+        Assert.Equal("T3C", name);
+
+        options = EMPTY with { TypeGenericArgumentOptions = EMPTY };
+        name = item.EasyName(options);
+        Assert.Equal("T3C<>", name);
+
+        options = EMPTY with { TypeGenericArgumentOptions = EMPTY, TypeUseHost = true };
+        name = item.EasyName(options);
+        Assert.Equal($"{CLASSNAME}.T3A<,>.T3B<>.T3C<>", name);
+
+        options = EMPTY with { TypeGenericArgumentOptions = DEFAULT, TypeUseHost = true };
+        name = item.EasyName(options);
+        Assert.Equal($"{CLASSNAME}.T3A<Byte, Int32>.T3B<String>.T3C<Int64>", name);
+
+        // Default...
+        options = DEFAULT;
+        name = item.EasyName(options); Assert.Equal("T3C<Int64>", name);
+
+        options = DEFAULT with { TypeUseHost = true };
+        name = item.EasyName(options);
+        Assert.Equal($"{CLASSNAME}.T3A<Byte, Int32>.T3B<String>.T3C<Int64>", name);
+
+        options = DEFAULT with { TypeUseNamespace = true };
+        name = item.EasyName(options);
+        Assert.Equal($"{NAMESPACE}.{CLASSNAME}.T3A<Byte, Int32>.T3B<String>.T3C<Int64>", name);
+
+        // Full...
+        options = FULL;
+        name = item.EasyName(options);
+        Assert.Equal(
+            $"{NAMESPACE}.{CLASSNAME}.T3A<System.Byte, System.Int32>.T3B<System.String>.T3C<System.Int64>",
+            name);
+    }
+
+    // ----------------------------------------------------
+
+    public interface I4A<K, T, V> { }
+    public class T4A<K, T, V> : I4A<K, T, V> { }
+
+    //[Enforced]
+    //[Fact]
+    //TODO:public static void Test4_Inherit_Unbound() { }
+
+    //[Enforced]
+    //[Fact]
+    //TODO:public static void Test4_Inherit_Bound() { }
 }

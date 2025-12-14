@@ -1,4 +1,5 @@
-﻿using System.Net.NetworkInformation;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Net.NetworkInformation;
 
 namespace Yotei.Tools;
 
@@ -15,6 +16,7 @@ public static class EasyNameExtensions
 
     /// <summary>
     /// Returns the C#-alike name of the given source element, using the given options.
+    /// <br/>
     /// </summary>
     /// <param name="source"></param>
     /// <param name="options"></param>
@@ -108,22 +110,34 @@ public static class EasyNameExtensions
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns the C#-alike name of the given source element, using default options.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <returns></returns>
-    public static string EasyName(
-        this ParameterInfo source) => EasyName(source, EasyNameOptions.Default);
-
-    /// <summary>
     /// Returns the C#-alike name of the given source element, using the given options.
     /// </summary>
-    /// <param name="source"></param>
-    /// <param name="options"></param>
-    /// <returns></returns>
-    public static string EasyName(this ParameterInfo source, EasyNameOptions options)
+    static string EasyName(this ParameterInfo source, EasyNameOptions options)
     {
-        throw null;
+        var sb = new StringBuilder();
+
+        if (options.ParameterTypeOptions is not null)
+        {
+            var str = source.ParameterType.EasyName(options.ParameterTypeOptions);
+            sb.Append(str);
+
+            if (sb.Length > 0)
+            {
+                var ctx = new NullabilityInfoContext();
+                var info = ctx.Create(source);
+                if (info.ReadState == NullabilityState.Nullable ||
+                    info.WriteState == NullabilityState.Nullable)
+                    sb.Append('?');
+            }
+        }
+
+        if (options.ParameterUseName)
+        {
+            if (sb.Length > 0) sb.Append(' ');
+            sb.Append(source.Name);
+        }
+
+        return sb.ToString();
     }
 
     // ----------------------------------------------------
@@ -184,33 +198,18 @@ public static class EasyNameExtensions
             }
         }
 
-        // HIGH: code for emit parameters shall be moved above!
-
         // Member parameters...
         if (options.MemberUseParameters ||
             options.ParameterTypeOptions is not null || options.ParameterUseName)
         {
             sb.Append('(');
-            if (options.ParameterTypeOptions is not null || options.ParameterUseName)
+            var pars = source.GetParameters();
+            for (int i = 0; i < pars.Length; i++)
             {
-                var pars = source.GetParameters();
-                for (int i = 0; i < pars.Length; i++)
-                {
-                    var par = pars[i];
-                    var str = string.Empty;
-
-                    if (options.ParameterTypeOptions is not null)
-                        str = par.ParameterType.EasyName(options.ParameterTypeOptions);
-
-                    if (options.ParameterUseName)
-                    {
-                        if (str.Length > 0) sb.Append(' ');
-                        str += par.Name;
-                    }
-
-                    if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
-                    if (str.Length > 0) sb.Append(str);
-                }
+                var par = pars[i];
+                var str = par.EasyName(options);
+                if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
+                if (str.Length > 0) sb.Append(str);
             }
             sb.Append(')');
         }
@@ -237,7 +236,46 @@ public static class EasyNameExtensions
     /// <returns></returns>
     public static string EasyName(this ConstructorInfo source, EasyNameOptions options)
     {
-        throw null;
+        source.ThrowWhenNull();
+        options.ThrowWhenNull();
+
+        var sb = new StringBuilder();
+        var host = source.DeclaringType;
+
+        // Host type...
+        if (options.MemberHostTypeOptions is not null && host is not null)
+        {
+            var str = host.EasyName(options.MemberHostTypeOptions);
+            if (str.Length > 0) sb.Append($"{str}.");
+        }
+
+        // Name...
+        var name = "new"; if (options.ConstructorTechName)
+        {
+            name = source.Name;
+            if (name[0] == '.' && sb.Length > 0 && sb[^1] == '.') name = name[1..];
+            if (name.Length == 0) name = "new";
+        }
+        sb.Append(name);
+
+        // Member parameters...
+        if (options.MemberUseParameters ||
+            options.ParameterTypeOptions is not null || options.ParameterUseName)
+        {
+            sb.Append('(');
+            var pars = source.GetParameters();
+            for (int i = 0; i < pars.Length; i++)
+            {
+                var par = pars[i];
+                var str = par.EasyName(options);
+                if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
+                if (str.Length > 0) sb.Append(str);
+            }
+            sb.Append(')');
+        }
+
+        // Finishing...
+        return sb.ToString();
     }
 
     // ----------------------------------------------------
@@ -258,7 +296,50 @@ public static class EasyNameExtensions
     /// <returns></returns>
     public static string EasyName(this PropertyInfo source, EasyNameOptions options)
     {
-        throw null;
+        source.ThrowWhenNull();
+        options.ThrowWhenNull();
+
+        var sb = new StringBuilder();
+        var host = source.DeclaringType;
+
+        // Return type...
+        if (options.MemberReturnTypeOptions is not null)
+        {
+            var str = source.PropertyType.EasyName(options.MemberReturnTypeOptions);
+            if (str.Length > 0) sb.Append($"{str} ");
+        }
+
+        // Host type...
+        if (options.MemberHostTypeOptions is not null && host is not null)
+        {
+            var str = host.EasyName(options.MemberHostTypeOptions);
+            if (str.Length > 0) sb.Append($"{str}.");
+        }
+
+        // Name...
+        var name = source.Name;
+        var pars = source.GetIndexParameters();
+        if (pars.Length > 0 && !options.IndexerTechName) name = "this";
+        sb.Append(name);
+
+        // Member parameters...
+        if (pars.Length > 0 && (
+            options.MemberUseParameters ||
+            options.ParameterTypeOptions is not null || options.ParameterUseName))
+        {
+            sb.Append('[');
+            for (int i = 0; i < pars.Length; i++)
+            {
+                var par = pars[i];
+                var str = par.EasyName(options);
+                if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
+                if (str.Length > 0) sb.Append(str);
+            }
+            sb.Append(']');
+        }
+
+        // Finishing...
+        return sb.ToString();
     }
 
     // ----------------------------------------------------
@@ -279,6 +360,31 @@ public static class EasyNameExtensions
     /// <returns></returns>
     public static string EasyName(this FieldInfo source, EasyNameOptions options)
     {
-        throw null;
+        source.ThrowWhenNull();
+        options.ThrowWhenNull();
+
+        var sb = new StringBuilder();
+        var host = source.DeclaringType;
+
+        // Return type...
+        if (options.MemberReturnTypeOptions is not null)
+        {
+            var str = source.FieldType.EasyName(options.MemberReturnTypeOptions);
+            if (str.Length > 0) sb.Append($"{str} ");
+        }
+
+        // Host type...
+        if (options.MemberHostTypeOptions is not null && host is not null)
+        {
+            var str = host.EasyName(options.MemberHostTypeOptions);
+            if (str.Length > 0) sb.Append($"{str}.");
+        }
+
+        // Name...
+        var name = source.Name;
+        sb.Append(name);
+
+        // Finishing...
+        return sb.ToString();
     }
 }
