@@ -49,7 +49,6 @@ public record EasyNameOptions
 
             case BuildMode.Default:
                 TypeUseName = true;
-                TypeUseNullable = true;
                 TypeGenericArgumentOptions = this;
                 MemberGenericArgumentOptions = this;
                 ParameterTypeOptions = this;
@@ -59,13 +58,13 @@ public record EasyNameOptions
                 TypeUseNamespace = true;
                 TypeUseHost = true;
                 TypeUseName = true;
-                TypeUseNullable = true;
                 TypeGenericArgumentOptions = this;
                 MemberReturnTypeOptions = this;
                 MemberHostTypeOptions = this;
                 MemberGenericArgumentOptions = this;
                 ConstructorTechName = true;
                 IndexerTechName = true;
+                MemberUseParameters = true;
                 ParameterTypeOptions = this;
                 ParameterUseName = true;
                 break;
@@ -89,11 +88,6 @@ public record EasyNameOptions
     /// <br/> This setting is mostly used to prevent generic names to appear.
     /// </summary>
     public bool TypeUseName { get; init; }
-
-    /// <summary>
-    /// Determines if the nullable annotation, if any, shall be used.
-    /// </summary>
-    public bool TypeUseNullable { get; init; }
 
     /// <summary>
     /// If not null, the options to use with the type's generic arguments.
@@ -133,6 +127,11 @@ public record EasyNameOptions
     public bool IndexerTechName { get; init; }
 
     // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the parameters of the member shall be used, or not.
+    /// </summary>
+    public bool MemberUseParameters { get; init; }
 
     /// <summary>
     /// If not null, the options to use with the types of parameter elements.

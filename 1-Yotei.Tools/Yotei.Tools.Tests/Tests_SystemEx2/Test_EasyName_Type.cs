@@ -163,48 +163,4 @@ public static class Test_EasyName_Type
             $"{NAMESPACE}.{CLASSNAME}.T2A<System.Byte, System.Int32>.T2B<System.String>",
             name);
     }
-
-    // ----------------------------------------------------
-
-
-
-    // ----------------------------------------------------
-    /*
-    public class T4A<K, T, S> { }
-    public class T4B<K, T, S> : T4A<K, T, S?> { }
-
-    //[Enforced]
-    [Fact]
-    public static void Test4_Nullable_Unbound()
-    {
-        EasyNameOptions options;
-        string name;
-        var item = typeof(T4B<,,>).BaseType!;
-
-        // Empty...
-        options = EMPTY;
-        name = item.EasyName(options); Assert.Equal("", name);
-
-        // Default...
-        options = DEFAULT;
-        name = item.EasyName(options); Assert.Equal("T4A<K, T?>", name);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test4_Nullable_Bound()
-    {
-        EasyNameOptions options;
-        string name;
-        var item = typeof(T4B<string, byte, int>).BaseType!;
-
-        // Empty...
-        options = EMPTY;
-        name = item.EasyName(options); Assert.Equal("", name);
-
-        // Default...
-        options = DEFAULT;
-        name = item.EasyName(options); Assert.Equal("T4A<K, T?>", name);
-    }
-    */
 }
