@@ -14,11 +14,7 @@ public record EasyNameOptions
     public static EasyNameOptions Empty => new(BuildMode.Empty);
 
     /// <summary>
-    /// A shared read-only instance that represents default options:
-    /// <br/>- Use type names.
-    /// <br/>- Use type nullable annotation.
-    /// <br/>- Use generic types both in types and in members.
-    /// <br/>- Use parameter types but not their names.
+    /// A shared read-only instance that represents default options.
     /// </summary>
     public static EasyNameOptions Default => new(BuildMode.Default);
 
@@ -31,11 +27,7 @@ public record EasyNameOptions
     // ----------------------------------------------------
 
     /// <summary>
-    /// Initializes a new default instance that:
-    /// <br/>- Use type names.
-    /// <br/>- Use type nullable annotation.
-    /// <br/>- Use generic types both in types and in members.
-    /// <br/>- Use parameter types but not their names.
+    /// Initializes a new default instance.
     /// </summary>
     public EasyNameOptions() : this(BuildMode.Default) { }
 
@@ -48,7 +40,6 @@ public record EasyNameOptions
                 break;
 
             case BuildMode.Default:
-                TypeUseName = true;
                 TypeGenericArgumentOptions = this;
                 MemberGenericArgumentOptions = this;
                 ParameterTypeOptions = this;
@@ -57,7 +48,6 @@ public record EasyNameOptions
             case BuildMode.Full:
                 TypeUseNamespace = true;
                 TypeUseHost = true;
-                TypeUseName = true;
                 TypeGenericArgumentOptions = this;
                 MemberReturnTypeOptions = this;
                 MemberHostTypeOptions = this;
@@ -84,10 +74,10 @@ public record EasyNameOptions
     public bool TypeUseHost { get; init; }
 
     /// <summary>
-    /// Determines if the name of the type element shall be used.
+    /// Determines if the type name shall be hidden or not.
     /// <br/> This setting is mostly used to prevent generic names to appear.
     /// </summary>
-    public bool TypeUseName { get; init; }
+    public bool TypeHideName { get; init; }
 
     /// <summary>
     /// If not null, the options to use with the type's generic arguments.

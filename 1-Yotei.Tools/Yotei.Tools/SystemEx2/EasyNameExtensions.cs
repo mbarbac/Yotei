@@ -36,9 +36,35 @@ public static class EasyNameExtensions
     /// </summary>
     static string EasyName(this Type source, EasyNameOptions options, Type[] types)
     {
-        var sb = new StringBuilder();
         var isgen = source.FullName == null;
         var host = source.DeclaringType;
+
+        var args = source.GetGenericArguments();
+        var used = host == null ? 0 : host.GetGenericArguments().Length;
+        var need = args.Length - used;        
+
+        // Shortcut hide name...
+        if (options.TypeHideName &&
+            !options.TypeUseHost && !options.TypeUseNamespace &&
+            (need > 0 || options.TypeGenericArgumentOptions is null))
+            return string.Empty;
+
+        // Shortcut nullable value types...
+        if (source.Name.StartsWith("Nullable"))
+        {
+            var type = source.GetGenericArguments()[0];
+            var str = type.EasyName(options);
+            str += "?";
+            return str;
+        }
+
+        // TODO: Obtain nullable annotation of generic types.
+        // TODO: Obtain nullable annotation of reference types.
+        // https://devblogs.microsoft.com/dotnet/announcing-net-6-preview-7/#libraries-reflection-apis-for-nullability-information
+        // https://github.com/dotnet/roslyn/blob/main/docs/features/nullable-metadata.md
+
+        // Other cases...
+        var sb = new StringBuilder();
 
         // Namespace...
         if (options.TypeUseNamespace && !isgen && host is null)
@@ -58,53 +84,38 @@ public static class EasyNameExtensions
 
         // Name...
         var name = string.Empty;
-        if (options.TypeUseName || options.TypeUseHost || options.TypeUseNamespace)
+        if (!options.TypeHideName ||
+            options.TypeUseHost || options.TypeUseNamespace ||
+            (args.Length > 0 && options.TypeGenericArgumentOptions is not null))
         {
-            name = GetTypeName(source, options);
+            name = GetTypeName(source);
             sb.Append(name);
+        }        
+        static string GetTypeName(Type source)
+        {
+            var name = source.Name;
+            var index = name.IndexOf('`');
+            if (index >= 0) name = name[..index];
+            return name;
         }
 
         // Generic arguments...
-        if (options.TypeGenericArgumentOptions is not null)
+        if (need > 0 && options.TypeGenericArgumentOptions is not null)
         {
-            var args = source.GetGenericArguments().Length;
-            if (args > 0)
-            {
-                var used = host == null ? 0 : host.GetGenericArguments().Length;
-                var need = args - used;
-                if (need > 0)
-                {
-                    if (name.Length == 0) sb.Append(GetTypeName(source, options));
+            if (name.Length == 0) sb.Append(GetTypeName(source));
 
-                    sb.Append('<'); for (int i = 0; i < need; i++)
-                    {
-                        var arg = types[i + used];
-                        var str = arg.EasyName(options.TypeGenericArgumentOptions);
-                        if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
-                        sb.Append(str);
-                    }
-                    sb.Append('>');
-                }
+            sb.Append('<'); for (int i = 0; i < need; i++)
+            {
+                var arg = types[i + used];
+                var str = arg.EasyName(options.TypeGenericArgumentOptions);
+                if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
+                sb.Append(str);
             }
+            sb.Append('>');
         }
 
         // Finishing...
         return sb.ToString();
-    }
-
-    /// <summary>
-    /// Returns the name of the given source type.
-    /// </summary>
-    /// TODO: get nullability annotation of types.
-    /// It seems that, for types, the annotation is just used by the compiler for static analysis,
-    /// but it is not persisted in metadata. There are no APIs for types for whatever reasons.
-    static string GetTypeName(Type source, EasyNameOptions options)
-    {
-        var name = source.Name;
-        var index = name.IndexOf('`');
-        if (index >= 0) name = name[..index];
-
-        return name;
     }
 
     // ----------------------------------------------------
@@ -120,15 +131,6 @@ public static class EasyNameExtensions
         {
             var str = source.ParameterType.EasyName(options.ParameterTypeOptions);
             sb.Append(str);
-
-            if (sb.Length > 0)
-            {
-                var ctx = new NullabilityInfoContext();
-                var info = ctx.Create(source);
-                if (info.ReadState == NullabilityState.Nullable ||
-                    info.WriteState == NullabilityState.Nullable)
-                    sb.Append('?');
-            }
         }
 
         if (options.ParameterUseName)
@@ -250,12 +252,7 @@ public static class EasyNameExtensions
         }
 
         // Name...
-        var name = "new"; if (options.ConstructorTechName)
-        {
-            name = source.Name;
-            if (name[0] == '.' && sb.Length > 0 && sb[^1] == '.') name = name[1..];
-            if (name.Length == 0) name = "new";
-        }
+        var name = !options.ConstructorTechName ? "new" : source.Name;
         sb.Append(name);
 
         // Member parameters...

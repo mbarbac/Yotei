@@ -1,10 +1,10 @@
-﻿namespace Yotei.Tools.Tests;
+﻿namespace Yotei.Tools.Tests.EasyNames;
 
 // ========================================================
-////[Enforced]
+//[Enforced]
 public static class Test_EasyName_Type
 {
-    const string NAMESPACE = "Yotei.Tools.Tests";
+    const string NAMESPACE = "Yotei.Tools.Tests.EasyNames";
     const string CLASSNAME = nameof(Test_EasyName_Type);
 
     readonly static EasyNameOptions EMPTY = EasyNameOptions.Empty;
@@ -23,7 +23,7 @@ public static class Test_EasyName_Type
 
         // Empty...
         options = EMPTY;
-        name = item.EasyName(options); Assert.Equal("", name);
+        name = item.EasyName(options); Assert.Equal("String", name);
 
         // Default...
         options = DEFAULT;
@@ -48,6 +48,9 @@ public static class Test_EasyName_Type
 
         // Empty...
         options = EMPTY;
+        name = item.EasyName(options); Assert.Equal("T1B", name);
+
+        options = EMPTY with { TypeHideName = true };
         name = item.EasyName(options); Assert.Equal("", name);
 
         // Default...
@@ -82,17 +85,18 @@ public static class Test_EasyName_Type
 
         // Empty...
         options = EMPTY;
-        name = item.EasyName(options); Assert.Equal("", name);
+        name = item.EasyName(options); Assert.Equal("T2B", name);
 
-        options = EMPTY with { TypeUseName = true };
+        options = EMPTY with { TypeHideName = true };
         name = item.EasyName(options);
-        Assert.Equal("T2B", name);
+        Assert.Equal("", name);
 
         options = EMPTY with { TypeGenericArgumentOptions = EMPTY };
         name = item.EasyName(options);
-        Assert.Equal("T2B<>", name);
+        Assert.Equal("T2B<S>", name);
 
-        options = EMPTY with { TypeGenericArgumentOptions = EMPTY, TypeUseHost = true };
+        var temp = EMPTY with { TypeHideName = true };
+        options = EMPTY with { TypeGenericArgumentOptions = temp, TypeUseHost = true };
         name = item.EasyName(options);
         Assert.Equal($"{CLASSNAME}.T2A<,>.T2B<>", name);
 
@@ -120,25 +124,22 @@ public static class Test_EasyName_Type
     {
         EasyNameOptions options;
         string name;
-        var item = typeof(T2A<byte, int>.T2B<string>);
+        var item = typeof(T2A<byte?, int>.T2B<string>);
 
         // Empty...
         options = EMPTY;
-        name = item.EasyName(options); Assert.Equal("", name);
+        name = item.EasyName(options); Assert.Equal("T2B", name);
 
-        options = EMPTY with { TypeUseName = true };
+        options = EMPTY with { TypeHideName = true };
         name = item.EasyName(options);
-        Assert.Equal("T2B", name);
+        Assert.Equal("", name);
 
         options = EMPTY with { TypeGenericArgumentOptions = EMPTY };
         name = item.EasyName(options);
-        Assert.Equal("T2B<>", name);
-
-        options = EMPTY with { TypeGenericArgumentOptions = DEFAULT };
-        name = item.EasyName(options);
         Assert.Equal("T2B<String>", name);
 
-        options = EMPTY with { TypeGenericArgumentOptions = EMPTY, TypeUseHost = true };
+        var temp = EMPTY with { TypeHideName = true };
+        options = EMPTY with { TypeGenericArgumentOptions = temp, TypeUseHost = true };
         name = item.EasyName(options);
         Assert.Equal($"{CLASSNAME}.T2A<,>.T2B<>", name);
 
@@ -148,19 +149,19 @@ public static class Test_EasyName_Type
 
         options = DEFAULT with { TypeUseHost = true };
         name = item.EasyName(options);
-        Assert.Equal($"{CLASSNAME}.T2A<Byte, Int32>.T2B<String>", name);
+        Assert.Equal($"{CLASSNAME}.T2A<Byte?, Int32>.T2B<String>", name);
 
         options = DEFAULT with { TypeUseNamespace = true };
         name = item.EasyName(options);
         Assert.Equal(
-            $"{NAMESPACE}.{CLASSNAME}.T2A<Byte, Int32>.T2B<String>",
+            $"{NAMESPACE}.{CLASSNAME}.T2A<Byte?, Int32>.T2B<String>",
             name);
 
         // Full...
         options = FULL;
         name = item.EasyName(options);
         Assert.Equal(
-            $"{NAMESPACE}.{CLASSNAME}.T2A<System.Byte, System.Int32>.T2B<System.String>",
+            $"{NAMESPACE}.{CLASSNAME}.T2A<System.Byte?, System.Int32>.T2B<System.String>",
             name);
     }
 
@@ -178,17 +179,18 @@ public static class Test_EasyName_Type
 
         // Empty...
         options = EMPTY;
-        name = item.EasyName(options); Assert.Equal("", name);
+        name = item.EasyName(options); Assert.Equal("T3C", name);
 
-        options = EMPTY with { TypeUseName = true };
+        options = EMPTY with { TypeHideName = true };
         name = item.EasyName(options);
-        Assert.Equal("T3C", name);
+        Assert.Equal("", name);
 
         options = EMPTY with { TypeGenericArgumentOptions = EMPTY };
         name = item.EasyName(options);
-        Assert.Equal("T3C<>", name);
+        Assert.Equal("T3C<V>", name);
 
-        options = EMPTY with { TypeGenericArgumentOptions = EMPTY, TypeUseHost = true };
+        var temp = EMPTY with { TypeHideName = true };
+        options = EMPTY with { TypeGenericArgumentOptions = temp, TypeUseHost = true };
         name = item.EasyName(options);
         Assert.Equal($"{CLASSNAME}.T3A<,>.T3B<>.T3C<>", name);
 
@@ -220,17 +222,18 @@ public static class Test_EasyName_Type
 
         // Empty...
         options = EMPTY;
-        name = item.EasyName(options); Assert.Equal("", name);
+        name = item.EasyName(options); Assert.Equal("T3C", name);
 
-        options = EMPTY with { TypeUseName = true };
+        options = EMPTY with { TypeHideName = true };
         name = item.EasyName(options);
-        Assert.Equal("T3C", name);
+        Assert.Equal("", name);
 
         options = EMPTY with { TypeGenericArgumentOptions = EMPTY };
         name = item.EasyName(options);
-        Assert.Equal("T3C<>", name);
+        Assert.Equal("T3C<Int64>", name);
 
-        options = EMPTY with { TypeGenericArgumentOptions = EMPTY, TypeUseHost = true };
+        var temp = EMPTY with { TypeHideName = true };
+        options = EMPTY with { TypeGenericArgumentOptions = temp, TypeUseHost = true };
         name = item.EasyName(options);
         Assert.Equal($"{CLASSNAME}.T3A<,>.T3B<>.T3C<>", name);
 
@@ -260,14 +263,36 @@ public static class Test_EasyName_Type
 
     // ----------------------------------------------------
 
-    public interface I4A<K, T, V> { }
-    public class T4A<K, T, V> : I4A<K, T, V> { }
+    public interface I4A<K, T> { }
+    public class T4A<K, T> : I4A<K, T?> { }
 
     //[Enforced]
-    //[Fact]
-    //TODO:public static void Test4_Inherit_Unbound() { }
+    [Fact]
+    public static void Test4_Inherit_Nullable_Unbound_NotComplete()
+    {
+        EasyNameOptions options;
+        string name;
+        var type = typeof(T4A<,>);
+        var item = type.GetInterfaces()[0]!;
+
+        // Empty...
+        options = EMPTY with { TypeGenericArgumentOptions = EMPTY };
+        name = item.EasyName(options);
+        Assert.Equal("I4A<K, T>", name);  // Does not recognize 'T?'
+    }
 
     //[Enforced]
-    //[Fact]
-    //TODO:public static void Test4_Inherit_Bound() { }
+    [Fact]
+    public static void Test4_Inherit_Nullable_Bound_NotComplete()
+    {
+        EasyNameOptions options;
+        string name;
+        var type = typeof(T4A<int?, string?>);
+        var item = type.GetInterfaces()[0]!;
+
+        // Empty...
+        options = EMPTY with { TypeGenericArgumentOptions = EMPTY };
+        name = item.EasyName(options);
+        Assert.Equal("I4A<Int32?, String>", name); // Does not recognize 'string?'
+    }
 }
