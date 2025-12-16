@@ -9,7 +9,6 @@ public record EasyNameOptions
 {
     /// <summary>
     /// A shared read-only instance that represents empty options.
-    /// <br/> All settings are set to 'false' or 'null'.
     /// </summary>
     public static EasyNameOptions Empty => new(BuildMode.Empty);
 
@@ -20,7 +19,6 @@ public record EasyNameOptions
 
     /// <summary>
     /// A shared read-only instance that represents full options.
-    /// <br/> All seetings are set to 'true' or to a full-instance's reference.
     /// </summary>
     public static EasyNameOptions Full => new(BuildMode.Full);
 
