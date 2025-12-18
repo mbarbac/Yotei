@@ -110,19 +110,19 @@ public static class Test_StringSpanExtensions
     {
         var value = 'X';
         var source = "".AsSpan();
-        var target = source.AllIndexesOf(value, ignoreCase: true); Assert.Empty(target);
+        var target = source.IndexesOf(value, ignoreCase: true); Assert.Empty(target);
 
         source = "-x-x-".AsSpan();
 
-        target = source.AllIndexesOf(value); Assert.Empty(target);
-        target = source.AllIndexesOf(value, ignoreCase: false); Assert.Empty(target);
-        target = source.AllIndexesOf(value, ignoreCase: true); Assert.Equal(target, [1, 3]);
-        target = source.AllIndexesOf(value, new CharComparer(false)); Assert.Empty(target);
-        target = source.AllIndexesOf(value, new CharComparer(true)); Assert.Equal(target, [1, 3]);
-        target = source.AllIndexesOf(value, StringComparer.Ordinal); Assert.Empty(target);
-        target = source.AllIndexesOf(value, StringComparer.OrdinalIgnoreCase); Assert.Equal(target, [1, 3]);
-        target = source.AllIndexesOf(value, StringComparison.Ordinal); Assert.Empty(target);
-        target = source.AllIndexesOf(value, StringComparison.OrdinalIgnoreCase); Assert.Equal(target, [1, 3]);
+        target = source.IndexesOf(value); Assert.Empty(target);
+        target = source.IndexesOf(value, ignoreCase: false); Assert.Empty(target);
+        target = source.IndexesOf(value, ignoreCase: true); Assert.Equal(target, [1, 3]);
+        target = source.IndexesOf(value, new CharComparer(false)); Assert.Empty(target);
+        target = source.IndexesOf(value, new CharComparer(true)); Assert.Equal(target, [1, 3]);
+        target = source.IndexesOf(value, StringComparer.Ordinal); Assert.Empty(target);
+        target = source.IndexesOf(value, StringComparer.OrdinalIgnoreCase); Assert.Equal(target, [1, 3]);
+        target = source.IndexesOf(value, StringComparison.Ordinal); Assert.Empty(target);
+        target = source.IndexesOf(value, StringComparison.OrdinalIgnoreCase); Assert.Equal(target, [1, 3]);
     }
 
     //[Enforced]
@@ -132,22 +132,22 @@ public static class Test_StringSpanExtensions
 
         var value = "";
         var source = "".AsSpan();
-        var target = source.AllIndexesOf(value, ignoreCase: true); Assert.Equal(target, [0]);
+        var target = source.IndexesOf(value, ignoreCase: true); Assert.Equal(target, [0]);
 
         value = "X";
-        target = source.AllIndexesOf(value); Assert.Empty(target);
+        target = source.IndexesOf(value); Assert.Empty(target);
 
         source = "-x-x-".AsSpan();
 
-        target = source.AllIndexesOf(value); Assert.Empty(target);
-        target = source.AllIndexesOf(value, ignoreCase: false); Assert.Empty(target);
-        target = source.AllIndexesOf(value, ignoreCase: true); Assert.Equal(target, [1, 3]);
-        target = source.AllIndexesOf(value, new CharComparer(false)); Assert.Empty(target);
-        target = source.AllIndexesOf(value, new CharComparer(true)); Assert.Equal(target, [1, 3]);
-        target = source.AllIndexesOf(value, StringComparer.Ordinal); Assert.Empty(target);
-        target = source.AllIndexesOf(value, StringComparer.OrdinalIgnoreCase); Assert.Equal(target, [1, 3]);
-        target = source.AllIndexesOf(value, StringComparison.Ordinal); Assert.Empty(target);
-        target = source.AllIndexesOf(value, StringComparison.OrdinalIgnoreCase); Assert.Equal(target, [1, 3]);
+        target = source.IndexesOf(value); Assert.Empty(target);
+        target = source.IndexesOf(value, ignoreCase: false); Assert.Empty(target);
+        target = source.IndexesOf(value, ignoreCase: true); Assert.Equal(target, [1, 3]);
+        target = source.IndexesOf(value, new CharComparer(false)); Assert.Empty(target);
+        target = source.IndexesOf(value, new CharComparer(true)); Assert.Equal(target, [1, 3]);
+        target = source.IndexesOf(value, StringComparer.Ordinal); Assert.Empty(target);
+        target = source.IndexesOf(value, StringComparer.OrdinalIgnoreCase); Assert.Equal(target, [1, 3]);
+        target = source.IndexesOf(value, StringComparison.Ordinal); Assert.Empty(target);
+        target = source.IndexesOf(value, StringComparison.OrdinalIgnoreCase); Assert.Equal(target, [1, 3]);
     }
 
     // ----------------------------------------------------

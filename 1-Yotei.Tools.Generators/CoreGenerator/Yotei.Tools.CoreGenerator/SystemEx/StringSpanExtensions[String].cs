@@ -1,8 +1,13 @@
-﻿namespace Yotei.Tools;
+﻿using StringSpan = System.ReadOnlySpan<char>;
+
+namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
-public static class StringSpanExtensions_StringTarget
+internal static class StringSpanExtensions_StringTarget
 {
+    // span.IndexOf(StringSpan value);
+    // span.IndexOf(StringSpan value, StringComparison comparison);
+
     /// <summary>
     /// Returns the index of the first ocurrence of the given value in the source, or -1 if it
     /// cannot be found.
@@ -10,7 +15,6 @@ public static class StringSpanExtensions_StringTarget
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <param name="ignoreCase"></param>
-    /// <returns></returns>
     public static int IndexOf(this StringSpan source, StringSpan value, bool ignoreCase)
     {
         if (source.Length == 0 && value.Length == 0) return 0;
@@ -40,7 +44,36 @@ public static class StringSpanExtensions_StringTarget
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <param name="comparer"></param>
-    /// <returns></returns>
+    public static int IndexOf(
+        this StringSpan source, StringSpan value, IEqualityComparer<char> comparer)
+    {
+        if (source.Length == 0 && value.Length == 0) return 0;
+        if (source.Length == 0 || value.Length == 0) return -1;
+
+        for (int i = 0; i < source.Length; i++)
+        {
+            if ((i + value.Length) > source.Length) break;
+
+            var found = false; for (int k = 0; i < value.Length; k++)
+            {
+                var s = source[i + k];
+                var v = value[k];
+                if (s.Equals(v, comparer)) { found = true; continue; }
+                found = false;
+                break;
+            }
+            if (found) return i;
+        }
+        return -1;
+    }
+
+    /// <summary>
+    /// Returns the index of the first ocurrence of the given value in the source, or -1 if it
+    /// cannot be found.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
     public static int IndexOf(
         this StringSpan source, StringSpan value, IEqualityComparer<string> comparer)
     {
@@ -66,14 +99,15 @@ public static class StringSpanExtensions_StringTarget
 
     // ----------------------------------------------------
 
+    // span.LastIndexOf(StringSpan value);
+
     /// <summary>
-    /// Returns the index of the last ocurrence of the given value in the source, or -1 if it
+    /// Returns the index of the first ocurrence of the given value in the source, or -1 if it
     /// cannot be found.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <param name="ignoreCase"></param>
-    /// <returns></returns>
     public static int LastIndexOf(this StringSpan source, StringSpan value, bool ignoreCase)
     {
         if (source.Length == 0 && value.Length == 0) return 0;
@@ -98,14 +132,12 @@ public static class StringSpanExtensions_StringTarget
     }
 
     /// <summary>
-    /// Returns the index of the last ocurrence of the given value in the source, or -1 if it
+    /// Returns the index of the first ocurrence of the given value in the source, or -1 if it
     /// cannot be found.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <param name="comparer"></param>
-    /// <returns></returns>
-    /// NOTE: Solves that StrinSpan.Equals(SpanTarget, CharComparer) doesn't invoke the comparer.
     public static int LastIndexOf(
         this StringSpan source, StringSpan value, IEqualityComparer<char> comparer)
     {
@@ -131,13 +163,12 @@ public static class StringSpanExtensions_StringTarget
     }
 
     /// <summary>
-    /// Returns the index of the last ocurrence of the given value in the source, or -1 if it
+    /// Returns the index of the first ocurrence of the given value in the source, or -1 if it
     /// cannot be found.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <param name="comparer"></param>
-    /// <returns></returns>
     public static int LastIndexOf(
         this StringSpan source, StringSpan value, IEqualityComparer<string> comparer)
     {
@@ -154,6 +185,37 @@ public static class StringSpanExtensions_StringTarget
                 var s = source[i + k];
                 var v = value[k];
                 if (s.Equals(v, comparer)) { temp = true; continue; }
+                temp = false;
+                break;
+            }
+            if (temp) found = i;
+        }
+        return found;
+    }
+
+    /// <summary>
+    /// Returns the index of the first ocurrence of the given value in the source, or -1 if it
+    /// cannot be found.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparison"></param>
+    public static int LastIndexOf(
+        this StringSpan source, StringSpan value, StringComparison comparison)
+    {
+        if (source.Length == 0 && value.Length == 0) return 0;
+        if (source.Length == 0 || value.Length == 0) return -1;
+
+        var found = -1;
+        for (int i = 0; i < source.Length; i++)
+        {
+            if ((i + value.Length) > source.Length) break;
+
+            var temp = false; for (int k = 0; i < value.Length; k++)
+            {
+                var s = source[i + k];
+                var v = value[k];
+                if (s.Equals(v, comparison)) { temp = true; continue; }
                 temp = false;
                 break;
             }
@@ -175,9 +237,7 @@ public static class StringSpanExtensions_StringTarget
         if (source.Length == 0 && value.Length == 0) return [0];
         if (source.Length == 0 || value.Length == 0) return [];
 
-        List<int> list = [];
-
-        for (int i = 0; i < source.Length; i++)
+        List<int> list = []; for (int i = 0; i < source.Length; i++)
         {
             var temp = source[i..];
             if (temp.StartsWith(value)) list.Add(i);
@@ -192,14 +252,13 @@ public static class StringSpanExtensions_StringTarget
     /// <param name="value"></param>
     /// <param name="ignoreCase"></param>
     /// <returns></returns>
-    public static List<int> IndexesOf(this StringSpan source, StringSpan value, bool ignoreCase)
+    public static List<int> IndexesOf(
+        this StringSpan source, StringSpan value, bool ignoreCase)
     {
         if (source.Length == 0 && value.Length == 0) return [0];
         if (source.Length == 0 || value.Length == 0) return [];
 
-        List<int> list = [];
-
-        for (int i = 0; i < source.Length; i++)
+        List<int> list = []; for (int i = 0; i < source.Length; i++)
         {
             var temp = source[i..];
             if (temp.StartsWith(value, ignoreCase)) list.Add(i);
@@ -220,9 +279,7 @@ public static class StringSpanExtensions_StringTarget
         if (source.Length == 0 && value.Length == 0) return [0];
         if (source.Length == 0 || value.Length == 0) return [];
 
-        List<int> list = [];
-
-        for (int i = 0; i < source.Length; i++)
+        List<int> list = []; for (int i = 0; i < source.Length; i++)
         {
             var temp = source[i..];
             if (temp.StartsWith(value, comparer)) list.Add(i);
@@ -243,9 +300,7 @@ public static class StringSpanExtensions_StringTarget
         if (source.Length == 0 && value.Length == 0) return [0];
         if (source.Length == 0 || value.Length == 0) return [];
 
-        List<int> list = [];
-
-        for (int i = 0; i < source.Length; i++)
+        List<int> list = []; for (int i = 0; i < source.Length; i++)
         {
             var temp = source[i..];
             if (temp.StartsWith(value, comparer)) list.Add(i);
@@ -266,9 +321,7 @@ public static class StringSpanExtensions_StringTarget
         if (source.Length == 0 && value.Length == 0) return [0];
         if (source.Length == 0 || value.Length == 0) return [];
 
-        List<int> list = [];
-
-        for (int i = 0; i < source.Length; i++)
+        List<int> list = []; for (int i = 0; i < source.Length; i++)
         {
             var temp = source[i..];
             if (temp.StartsWith(value, comparison)) list.Add(i);
@@ -320,7 +373,21 @@ public static class StringSpanExtensions_StringTarget
         this StringSpan source, StringSpan value, IEqualityComparer<string> comparer)
         => source.IndexOf(value, comparer) >= 0;
 
+    /// <summary>
+    /// Determines if the source contains the given value, or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static bool Contains(
+        this StringSpan source, StringSpan value, StringComparison comparison)
+        => source.IndexOf(value, comparison) >= 0;
+
     // ----------------------------------------------------
+
+    // span.StartsWith(StringSpan value);
+    // span.StartsWith(StringSpan value, StringComparison);
 
     /// <summary>
     /// Determines if the source starts with the given value, or not.
@@ -329,9 +396,43 @@ public static class StringSpanExtensions_StringTarget
     /// <param name="value"></param>
     /// <param name="ignoreCase"></param>
     /// <returns></returns>
+    public static bool StartsWith(this StringSpan source, StringSpan value, bool ignoreCase)
+    {
+        if (source.Length == 0 && value.Length == 0) return true;
+        if (source.Length == 0 || value.Length == 0) return false;
+        if (value.Length > source.Length) return false;
+
+        for (int i = 0; i < value.Length; i++)
+        {
+            var s = source[i];
+            var v = value[i];
+            if (!s.Equals(v)) return false;
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Determines if the source starts with the given value, or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
     public static bool StartsWith(
-        this StringSpan source, StringSpan value, bool ignoreCase)
-        => source.IndexOf(value, ignoreCase) == 0;
+        this StringSpan source, StringSpan value, IEqualityComparer<char> comparer)
+    {
+        if (source.Length == 0 && value.Length == 0) return true;
+        if (source.Length == 0 || value.Length == 0) return false;
+        if (value.Length > source.Length) return false;
+
+        for (int i = 0; i < value.Length; i++)
+        {
+            var s = source[i];
+            var v = value[i];
+            if (!s.Equals(v, comparer)) return false;
+        }
+        return true;
+    }
 
     /// <summary>
     /// Determines if the source starts with the given value, or not.
@@ -342,9 +443,24 @@ public static class StringSpanExtensions_StringTarget
     /// <returns></returns>
     public static bool StartsWith(
         this StringSpan source, StringSpan value, IEqualityComparer<string> comparer)
-        => source.IndexOf(value, comparer) == 0;
+    {
+        if (source.Length == 0 && value.Length == 0) return true;
+        if (source.Length == 0 || value.Length == 0) return false;
+        if (value.Length > source.Length) return false;
+
+        for (int i = 0; i < value.Length; i++)
+        {
+            var s = source[i];
+            var v = value[i];
+            if (!s.Equals(v, comparer)) return false;
+        }
+        return true;
+    }
 
     // ----------------------------------------------------
+
+    // span.EndsWith(StringSpan value);
+    // span.EndsWith(StringSpan value, StringComparison);
 
     /// <summary>
     /// Determines if the source ends with the given value, or not.
@@ -356,10 +472,26 @@ public static class StringSpanExtensions_StringTarget
     public static bool EndsWith(this StringSpan source, StringSpan value, bool ignoreCase)
     {
         if (source.Length == 0 && value.Length == 0) return true;
+        if (source.Length == 0 || value.Length == 0) return false;
+
+        return source.LastIndexOf(value, ignoreCase) == source.Length - value.Length;
+    }
+
+    /// <summary>
+    /// Determines if the source ends with the given value, or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool EndsWith(
+        this StringSpan source, StringSpan value, IEqualityComparer<char> comparer)
+    {
+        if (source.Length == 0 && value.Length == 0) return true;
         if (source.Length == 0) return false;
         if (value.Length == 0) return true;
 
-        return source.LastIndexOf(value, ignoreCase) == source.Length - value.Length;
+        return source.LastIndexOf(value, comparer) == source.Length - value.Length;
     }
 
     /// <summary>
@@ -382,58 +514,169 @@ public static class StringSpanExtensions_StringTarget
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns either a new instance where all the characters from the given index to the end
-    /// have been removed, or the original one if no characters are removed.
+    /// Returns either a new instance where the first ocurrence of the given value has been
+    /// removed from the source, or the source itself if the value was not found.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="index"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    public static StringSpan Remove(this StringSpan source, int index)
+    public static StringSpan Remove(
+        this StringSpan source, StringSpan value) => source.Remove(value, out _);
+
+    /// <summary>
+    /// Returns either a new instance where the first ocurrence of the given value has been
+    /// removed from the source, or the source itself if the value was not found.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static StringSpan Remove(this StringSpan source, StringSpan value, out bool removed)
     {
-        if (index < 0) throw new ArgumentException("Index cannot be negative").WithData(index);
+        removed = false;
+        if (source.Length == 0) return source;
+        if (value.Length == 0) return source;
 
-        if (index >= source.Length &&
-            index != 0)
-            throw new ArgumentException("Index is too big.").WithData(index).WithData(source.ToString());
-
-        var count = source.Length - index;
-        return source.Remove(index, count);
+        var index = source.IndexOf(value);
+        if (index >= 0) { source = source.Slice(index, value.Length); removed = true; }
+        return source;
     }
 
     /// <summary>
-    /// Returns either a new instance where the given number of characters, starting from the
-    /// given index, have been removed, or the original one if no characters are removed.
+    /// Returns either a new instance where the first ocurrence of the given value has been
+    /// removed from the source, or the source itself if the value was not found.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="index"></param>
-    /// <param name="count"></param>
+    /// <param name="value"></param>
+    /// <param name="ignoreCase"></param>
     /// <returns></returns>
     public static StringSpan Remove(
-        this StringSpan source, int index, int count) => source.Remove(index, count, out _);
+        this StringSpan source, StringSpan value, bool ignoreCase)
+        => source.Remove(value, ignoreCase, out _);
 
-    public static StringSpan Remove(this StringSpan source, int index, int count, out bool removed)
+    /// <summary>
+    /// Returns either a new instance where the first ocurrence of the given value has been
+    /// removed from the source, or the source itself if the value was not found.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="ignoreCase"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static StringSpan Remove(
+        this StringSpan source, StringSpan value, bool ignoreCase, out bool removed)
     {
-        if (index < 0) throw new ArgumentException("Index cannot be negative").WithData(index);
-        if (count < 0) throw new ArgumentException("Count cannot be negative").WithData(index);
-
         removed = false;
-        if (index == 0 && count == source.Length) return [];
-        if (index >= source.Length &&
-            index != 0) throw new ArgumentException("Index is too big.").WithData(index).WithData(source.ToString());
-        if ((index + count) > source.Length) throw new ArgumentException("Index + Count is too big.").WithData(index).WithData(count).WithData(source.ToString());
-
         if (source.Length == 0) return source;
-        if (count == 0) return source;
+        if (value.Length == 0) return source;
 
-        removed = true;
-        StringSpan temp;
-        var array = new char[source.Length - count];
-        temp = source[..index]; temp.CopyTo(array);
-
-        var dest = array.AsSpan(index);
-        temp = source[(index + count)..]; temp.CopyTo(dest);
-        return array.AsSpan();
+        var index = source.IndexOf(value, ignoreCase);
+        if (index >= 0) { source = source.Slice(index, value.Length); removed = true; }
+        return source;
     }
+
+    /// <summary>
+    /// Returns either a new instance where the first ocurrence of the given value has been
+    /// removed from the source, or the source itself if the value was not found.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static StringSpan Remove(
+        this StringSpan source, StringSpan value, IEqualityComparer<char> comparer)
+        => source.Remove(value, comparer, out _);
+
+    /// <summary>
+    /// Returns either a new instance where the first ocurrence of the given value has been
+    /// removed from the source, or the source itself if the value was not found.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static StringSpan Remove(
+        this StringSpan source, StringSpan value, IEqualityComparer<char> comparer, out bool removed)
+    {
+        removed = false;
+        if (source.Length == 0) return source;
+        if (value.Length == 0) return source;
+
+        var index = source.IndexOf(value, comparer);
+        if (index >= 0) { source = source.Slice(index, value.Length); removed = true; }
+        return source;
+    }
+
+    /// <summary>
+    /// Returns either a new instance where the first ocurrence of the given value has been
+    /// removed from the source, or the source itself if the value was not found.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static StringSpan Remove(
+        this StringSpan source, StringSpan value, IEqualityComparer<string> comparer)
+        => source.Remove(value, comparer, out _);
+
+    /// <summary>
+    /// Returns either a new instance where the first ocurrence of the given value has been
+    /// removed from the source, or the source itself if the value was not found.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static StringSpan Remove(
+        this StringSpan source, StringSpan value, IEqualityComparer<string> comparer, out bool removed)
+    {
+        removed = false;
+        if (source.Length == 0) return source;
+        if (value.Length == 0) return source;
+
+        var index = source.IndexOf(value, comparer);
+        if (index >= 0) { source = source.Slice(index, value.Length); removed = true; }
+        return source;
+    }
+
+    /// <summary>
+    /// Returns either a new instance where the first ocurrence of the given value has been
+    /// removed from the source, or the source itself if the value was not found.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static StringSpan Remove(
+        this StringSpan source, StringSpan value, StringComparison comparison)
+        => source.Remove(value, comparison, out _);
+
+    /// <summary>
+    /// Returns either a new instance where the first ocurrence of the given value has been
+    /// removed from the source, or the source itself if the value was not found.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <param name="removed"></param>
+    /// <returns></returns>
+    public static StringSpan Remove(
+        this StringSpan source, StringSpan value, StringComparison comparison, out bool removed)
+    {
+        removed = false;
+        if (source.Length == 0) return source;
+        if (value.Length == 0) return source;
+
+        var index = source.IndexOf(value, comparison);
+        if (index >= 0) { source = source.Slice(index, value.Length); removed = true; }
+        return source;
+    }
+
+    //static void EXAMPLE() { "hh".AsSpan().Remove; }
+}
+/*
 
     // ----------------------------------------------------
 
@@ -1292,4 +1535,4 @@ public static class StringSpanExtensions_StringTarget
         }
         return -1;
     }
-}
+}*/

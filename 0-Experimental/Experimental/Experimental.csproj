@@ -9,8 +9,4 @@
    </PropertyGroup>
    <!--IDE0130: Folder structure-->
 
-   <ItemGroup>
-	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
-   </ItemGroup>
-
 </Project>

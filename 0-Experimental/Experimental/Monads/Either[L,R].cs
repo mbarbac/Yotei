@@ -26,9 +26,7 @@ public readonly struct Either<L, R> : IComparable<Either<L, R>>, IEquatable<Eith
     public Either(L value)
     {
         if (typeof(L) == typeof(R)) throw new InvalidOperationException(
-            "Left type cannot be the same as the right one.")
-            .WithData(typeof(L), "Left Type")
-            .WithData(typeof(R), "Right Type");
+            "Left type cannot be the same as the right one.");
 
         _Left = value;
         _IsLeft = true;
@@ -41,9 +39,7 @@ public readonly struct Either<L, R> : IComparable<Either<L, R>>, IEquatable<Eith
     public Either(R value)
     {
         if (typeof(L) == typeof(R)) throw new InvalidOperationException(
-            "Left type cannot be the same as the right one.")
-            .WithData(typeof(L), "Left Type")
-            .WithData(typeof(R), "Right Type");
+            "Left type cannot be the same as the right one.");
 
         _Right = value;
         _IsLeft = false;
@@ -72,8 +68,8 @@ public readonly struct Either<L, R> : IComparable<Either<L, R>>, IEquatable<Eith
     /// <param name="onRight"></param>
     public readonly void Match(Action<L> onLeft, Action<R> onRight)
     {
-        onLeft.ThrowWhenNull();
-        onRight.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(onLeft);
+        ArgumentNullException.ThrowIfNull(onRight);
 
         if (_IsLeft) onLeft(_Left); else onRight(_Right);
     }
@@ -85,8 +81,8 @@ public readonly struct Either<L, R> : IComparable<Either<L, R>>, IEquatable<Eith
     /// <param name="onRight"></param>
     public readonly T Match<T>(Func<L, T> onLeft, Func<R, T> onRight)
     {
-        onLeft.ThrowWhenNull();
-        onRight.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(onLeft);
+        ArgumentNullException.ThrowIfNull(onRight);
 
         return _IsLeft ? onLeft(_Left) : onRight(_Right);
     }

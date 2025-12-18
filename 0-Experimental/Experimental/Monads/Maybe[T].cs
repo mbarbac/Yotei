@@ -49,8 +49,8 @@ public readonly struct Maybe<T> : IComparable<Maybe<T>>, IEquatable<Maybe<T>>
     /// <param name="invalid"></param>
     public readonly void Match(Action<T> valid, Action invalid)
     {
-        valid.ThrowWhenNull();
-        invalid.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(valid);
+        ArgumentNullException.ThrowIfNull(invalid);
 
         if (_IsValid) valid(_Value); else invalid();
     }
@@ -65,8 +65,8 @@ public readonly struct Maybe<T> : IComparable<Maybe<T>>, IEquatable<Maybe<T>>
     /// <returns></returns>
     public readonly V Match<V>(Func<T, V> valid, Func<V> invalid)
     {
-        valid.ThrowWhenNull();
-        invalid.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(valid);
+        ArgumentNullException.ThrowIfNull(invalid);
 
         return _IsValid ? valid(_Value) : invalid();
     }
@@ -186,7 +186,7 @@ public readonly struct Maybe<T> : IComparable<Maybe<T>>, IEquatable<Maybe<T>>
     /// <returns></returns>
     public T Or(Func<T> func)
     {
-        func.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(func);
         return _IsValid ? _Value : func();
     }
 
@@ -205,7 +205,7 @@ public readonly struct Maybe<T> : IComparable<Maybe<T>>, IEquatable<Maybe<T>>
     /// <returns></returns>
     public Maybe<T> Or(Func<Maybe<T>> func)
     {
-        func.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(func);
         return _IsValid ? _Value : func();
     }
 
@@ -221,7 +221,7 @@ public readonly struct Maybe<T> : IComparable<Maybe<T>>, IEquatable<Maybe<T>>
     /// <returns></returns>
     public Maybe<R> Select<R>(Func<T, R> proyector)
     {
-        proyector.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(proyector);
         return _IsValid ? new Maybe<R>(proyector(_Value)) : Maybe.None;
     }
 
@@ -235,7 +235,7 @@ public readonly struct Maybe<T> : IComparable<Maybe<T>>, IEquatable<Maybe<T>>
     /// <returns></returns>
     public Maybe<R> SelectMany<R>(Func<T, Maybe<R>> proyector)
     {
-        proyector.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(proyector);
         return _IsValid ? proyector(_Value) : Maybe.None;
     }
 
@@ -252,8 +252,8 @@ public readonly struct Maybe<T> : IComparable<Maybe<T>>, IEquatable<Maybe<T>>
     /// <returns></returns>
     public Maybe<R> SelectMany<U, R>(Func<T, Maybe<U>> selector, Func<T, U, R> proyector)
     {
-        selector.ThrowWhenNull();
-        proyector.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(selector);
+        ArgumentNullException.ThrowIfNull(proyector);
 
         var temp = selector(_Value); if (!temp.IsValid) return Maybe.None;
         try

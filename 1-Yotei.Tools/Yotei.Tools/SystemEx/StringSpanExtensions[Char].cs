@@ -248,7 +248,7 @@ public static class StringSpanExtensions_CharTarget
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static List<int> AllIndexesOf(this StringSpan source, char value)
+    public static List<int> IndexesOf(this StringSpan source, char value)
     {
         List<int> list = [];
 
@@ -267,7 +267,7 @@ public static class StringSpanExtensions_CharTarget
     /// <param name="value"></param>
     /// <param name="ignoreCase"></param>
     /// <returns></returns>
-    public static List<int> AllIndexesOf(this StringSpan source, char value, bool ignoreCase)
+    public static List<int> IndexesOf(this StringSpan source, char value, bool ignoreCase)
     {
         List<int> list = [];
 
@@ -286,7 +286,7 @@ public static class StringSpanExtensions_CharTarget
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static List<int> AllIndexesOf(
+    public static List<int> IndexesOf(
         this StringSpan source, char value, IEqualityComparer<char> comparer)
     {
         List<int> list = [];
@@ -306,7 +306,7 @@ public static class StringSpanExtensions_CharTarget
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static List<int> AllIndexesOf(
+    public static List<int> IndexesOf(
         this StringSpan source, char value, IEqualityComparer<string> comparer)
     {
         List<int> list = [];
@@ -326,7 +326,7 @@ public static class StringSpanExtensions_CharTarget
     /// <param name="value"></param>
     /// <param name="comparison"></param>
     /// <returns></returns>
-    public static List<int> AllIndexesOf(
+    public static List<int> IndexesOf(
         this StringSpan source, char value, StringComparison comparison)
     {
         List<int> list = [];

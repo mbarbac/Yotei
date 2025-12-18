@@ -8,7 +8,7 @@ public sealed class WeakEvent<TArgs>
 
     public void Suscribe(EventHandler<TArgs> handler)
     {
-        handler.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(handler);
         Handlers.Add(new(handler));
 
         if (handler.Target != null)
@@ -20,7 +20,7 @@ public sealed class WeakEvent<TArgs>
 
     public void Unsubscribe(EventHandler<TArgs> handler)
     {
-        handler.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(handler);
 
         Handlers.RemoveAll(x =>
             x.TryGetTarget(out var existingHandler) &&
