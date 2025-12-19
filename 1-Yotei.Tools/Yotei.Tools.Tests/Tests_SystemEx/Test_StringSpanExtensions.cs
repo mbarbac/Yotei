@@ -6,12 +6,148 @@ public static class Test_StringSpanExtensions
 {
     readonly struct CharComparer(bool IgnoreCase) : IEqualityComparer<char>
     {
-        public bool Equals(char x, char y)
-        {
-            var same = IgnoreCase ? char.ToLower(x) == char.ToLower(y) : x == y;
-            return same;
-        }
+        public bool Equals(char x, char y) => IgnoreCase ? char.ToLower(x) == char.ToLower(y) : x == y;
         public int GetHashCode([DisallowNull] char obj) => throw new NotImplementedException();
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_StartsWith_Char()
+    {
+        var source = "".AsSpan();
+        var value = 'x';
+        Assert.False(source.StartsWith(value));
+        Assert.False(source.StartsWith(value, ignoreCase: true));
+        Assert.False(source.StartsWith(value, new CharComparer(true)));
+        Assert.False(source.StartsWith(value, StringComparer.OrdinalIgnoreCase));
+        Assert.False(source.StartsWith(value, StringComparison.OrdinalIgnoreCase));
+
+        source = "--x";
+        Assert.False(source.StartsWith(value));
+        Assert.False(source.StartsWith(value, ignoreCase: true));
+        Assert.False(source.StartsWith(value, new CharComparer(true)));
+        Assert.False(source.StartsWith(value, StringComparer.OrdinalIgnoreCase));
+        Assert.False(source.StartsWith(value, StringComparison.OrdinalIgnoreCase));
+
+        source = "x--";
+        Assert.True(source.StartsWith(value));
+        Assert.True(source.StartsWith(value, ignoreCase: true));
+        Assert.True(source.StartsWith(value, new CharComparer(true)));
+        Assert.True(source.StartsWith(value, StringComparer.OrdinalIgnoreCase));
+        Assert.True(source.StartsWith(value, StringComparison.OrdinalIgnoreCase));
+
+        source = "X--";
+        Assert.False(source.StartsWith(value));
+        Assert.True(source.StartsWith(value, ignoreCase: true));
+        Assert.True(source.StartsWith(value, new CharComparer(true)));
+        Assert.True(source.StartsWith(value, StringComparer.OrdinalIgnoreCase));
+        Assert.True(source.StartsWith(value, StringComparison.OrdinalIgnoreCase));
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_StartsWith_String()
+    {
+        var source = "".AsSpan();
+        var value = "xy";
+        Assert.False(source.StartsWith(value));
+        Assert.False(source.StartsWith(value, ignoreCase: true));
+        Assert.False(source.StartsWith(value, new CharComparer(true)));
+        Assert.False(source.StartsWith(value, StringComparer.OrdinalIgnoreCase));
+        Assert.False(source.StartsWith(value, StringComparison.OrdinalIgnoreCase));
+
+        source = "--xy";
+        Assert.False(source.StartsWith(value));
+        Assert.False(source.StartsWith(value, ignoreCase: true));
+        Assert.False(source.StartsWith(value, new CharComparer(true)));
+        Assert.False(source.StartsWith(value, StringComparer.OrdinalIgnoreCase));
+        Assert.False(source.StartsWith(value, StringComparison.OrdinalIgnoreCase));
+
+        source = "xy--";
+        Assert.True(source.StartsWith(value));
+        Assert.True(source.StartsWith(value, ignoreCase: true));
+        Assert.True(source.StartsWith(value, new CharComparer(true)));
+        Assert.True(source.StartsWith(value, StringComparer.OrdinalIgnoreCase));
+        Assert.True(source.StartsWith(value, StringComparison.OrdinalIgnoreCase));
+
+        source = "XY--";
+        Assert.False(source.StartsWith(value));
+        Assert.True(source.StartsWith(value, ignoreCase: true));
+        Assert.True(source.StartsWith(value, new CharComparer(true)));
+        Assert.True(source.StartsWith(value, StringComparer.OrdinalIgnoreCase));
+        Assert.True(source.StartsWith(value, StringComparison.OrdinalIgnoreCase));
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_EndsWith_Char()
+    {
+        var source = "".AsSpan();
+        var value = 'x';
+        Assert.False(source.EndsWith(value));
+        Assert.False(source.EndsWith(value, ignoreCase: true));
+        Assert.False(source.EndsWith(value, new CharComparer(true)));
+        Assert.False(source.EndsWith(value, StringComparer.OrdinalIgnoreCase));
+        Assert.False(source.EndsWith(value, StringComparison.OrdinalIgnoreCase));
+
+        source = "x--";
+        Assert.False(source.EndsWith(value));
+        Assert.False(source.EndsWith(value, ignoreCase: true));
+        Assert.False(source.EndsWith(value, new CharComparer(true)));
+        Assert.False(source.EndsWith(value, StringComparer.OrdinalIgnoreCase));
+        Assert.False(source.EndsWith(value, StringComparison.OrdinalIgnoreCase));
+
+        source = "--x";
+        Assert.True(source.EndsWith(value));
+        Assert.True(source.EndsWith(value, ignoreCase: true));
+        Assert.True(source.EndsWith(value, new CharComparer(true)));
+        Assert.True(source.EndsWith(value, StringComparer.OrdinalIgnoreCase));
+        Assert.True(source.EndsWith(value, StringComparison.OrdinalIgnoreCase));
+
+        source = "--X";
+        Assert.False(source.EndsWith(value));
+        Assert.True(source.EndsWith(value, ignoreCase: true));
+        Assert.True(source.EndsWith(value, new CharComparer(true)));
+        Assert.True(source.EndsWith(value, StringComparer.OrdinalIgnoreCase));
+        Assert.True(source.EndsWith(value, StringComparison.OrdinalIgnoreCase));
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_EndsWith_String()
+    {
+        var source = "".AsSpan();
+        var value = "xy";
+        Assert.False(source.EndsWith(value));
+        Assert.False(source.EndsWith(value, ignoreCase: true));
+        Assert.False(source.EndsWith(value, new CharComparer(true)));
+        Assert.False(source.EndsWith(value, StringComparer.OrdinalIgnoreCase));
+        Assert.False(source.EndsWith(value, StringComparison.OrdinalIgnoreCase));
+
+        source = "xy--";
+        Assert.False(source.EndsWith(value));
+        Assert.False(source.EndsWith(value, ignoreCase: true));
+        Assert.False(source.EndsWith(value, new CharComparer(true)));
+        Assert.False(source.EndsWith(value, StringComparer.OrdinalIgnoreCase));
+        Assert.False(source.EndsWith(value, StringComparison.OrdinalIgnoreCase));
+
+        source = "--xy";
+        Assert.True(source.EndsWith(value));
+        Assert.True(source.EndsWith(value, ignoreCase: true));
+        Assert.True(source.EndsWith(value, new CharComparer(true)));
+        Assert.True(source.EndsWith(value, StringComparer.OrdinalIgnoreCase));
+        Assert.True(source.EndsWith(value, StringComparison.OrdinalIgnoreCase));
+
+        source = "--XY";
+        Assert.False(source.EndsWith(value));
+        Assert.True(source.EndsWith(value, ignoreCase: true));
+        Assert.True(source.EndsWith(value, new CharComparer(true)));
+        Assert.True(source.EndsWith(value, StringComparer.OrdinalIgnoreCase));
+        Assert.True(source.EndsWith(value, StringComparison.OrdinalIgnoreCase));
     }
 
     // ----------------------------------------------------
@@ -20,19 +156,26 @@ public static class Test_StringSpanExtensions
     [Fact]
     public static void Test_IndexOf_Char()
     {
-        var value = 'X';
-        var source = "".AsSpan(); Assert.Equal(-1, source.IndexOf(value, ignoreCase: true));
-
-        source = "--x--x--".AsSpan();
-
+        var source = "".AsSpan();
+        var value = 'x';
         Assert.Equal(-1, source.IndexOf(value));
-        Assert.Equal(-1, source.IndexOf(value, ignoreCase: false));
+        Assert.Equal(-1, source.IndexOf(value, ignoreCase: true));
+        Assert.Equal(-1, source.IndexOf(value, new CharComparer(true)));
+        Assert.Equal(-1, source.IndexOf(value, StringComparer.OrdinalIgnoreCase));
+        Assert.Equal(-1, source.IndexOf(value, StringComparison.OrdinalIgnoreCase));
+
+        source = "--x--x";
+        Assert.Equal(2, source.IndexOf(value));
         Assert.Equal(2, source.IndexOf(value, ignoreCase: true));
-        Assert.Equal(-1, source.IndexOf(value, new CharComparer(false)));
         Assert.Equal(2, source.IndexOf(value, new CharComparer(true)));
-        Assert.Equal(-1, source.IndexOf(value, StringComparer.Ordinal));
         Assert.Equal(2, source.IndexOf(value, StringComparer.OrdinalIgnoreCase));
-        Assert.Equal(-1, source.IndexOf(value, StringComparison.Ordinal));
+        Assert.Equal(2, source.IndexOf(value, StringComparison.OrdinalIgnoreCase));
+
+        source = "--X--x";
+        Assert.Equal(5, source.IndexOf(value));
+        Assert.Equal(2, source.IndexOf(value, ignoreCase: true));
+        Assert.Equal(2, source.IndexOf(value, new CharComparer(true)));
+        Assert.Equal(2, source.IndexOf(value, StringComparer.OrdinalIgnoreCase));
         Assert.Equal(2, source.IndexOf(value, StringComparison.OrdinalIgnoreCase));
     }
 
@@ -40,21 +183,26 @@ public static class Test_StringSpanExtensions
     [Fact]
     public static void Test_IndexOf_String()
     {
-        var value = "";
-        var source = "".AsSpan(); Assert.Equal(0, source.IndexOf(value, ignoreCase: true));
-
-        value = "X"; Assert.Equal(-1, source.IndexOf(value));
-
-        source = "--x--x--".AsSpan();
-
+        var source = "".AsSpan();
+        var value = "xy";
         Assert.Equal(-1, source.IndexOf(value));
-        Assert.Equal(-1, source.IndexOf(value, ignoreCase: false));
+        Assert.Equal(-1, source.IndexOf(value, ignoreCase: true));
+        Assert.Equal(-1, source.IndexOf(value, new CharComparer(true)));
+        Assert.Equal(-1, source.IndexOf(value, StringComparer.OrdinalIgnoreCase));
+        Assert.Equal(-1, source.IndexOf(value, StringComparison.OrdinalIgnoreCase));
+
+        source = "--xy--xy";
+        Assert.Equal(2, source.IndexOf(value));
         Assert.Equal(2, source.IndexOf(value, ignoreCase: true));
-        Assert.Equal(-1, source.IndexOf(value, new CharComparer(false)));
         Assert.Equal(2, source.IndexOf(value, new CharComparer(true)));
-        Assert.Equal(-1, source.IndexOf(value, StringComparer.Ordinal));
         Assert.Equal(2, source.IndexOf(value, StringComparer.OrdinalIgnoreCase));
-        Assert.Equal(-1, source.IndexOf(value, StringComparison.Ordinal));
+        Assert.Equal(2, source.IndexOf(value, StringComparison.OrdinalIgnoreCase));
+
+        source = "--XY--xy";
+        Assert.Equal(6, source.IndexOf(value));
+        Assert.Equal(2, source.IndexOf(value, ignoreCase: true));
+        Assert.Equal(2, source.IndexOf(value, new CharComparer(true)));
+        Assert.Equal(2, source.IndexOf(value, StringComparer.OrdinalIgnoreCase));
         Assert.Equal(2, source.IndexOf(value, StringComparison.OrdinalIgnoreCase));
     }
 
@@ -64,90 +212,150 @@ public static class Test_StringSpanExtensions
     [Fact]
     public static void Test_LastIndexOf_Char()
     {
-        var value = 'X';
-        var source = "".AsSpan(); Assert.Equal(-1, source.LastIndexOf(value, ignoreCase: true));
-
-        source = "--x--x--".AsSpan();
-
+        var source = "".AsSpan();
+        var value = 'x';
         Assert.Equal(-1, source.LastIndexOf(value));
-        Assert.Equal(-1, source.LastIndexOf(value, ignoreCase: false));
-        Assert.Equal(5, source.LastIndexOf(value, ignoreCase: true));
-        Assert.Equal(-1, source.LastIndexOf(value, new CharComparer(false)));
-        Assert.Equal(5, source.LastIndexOf(value, new CharComparer(true)));
-        Assert.Equal(-1, source.LastIndexOf(value, StringComparer.Ordinal));
-        Assert.Equal(5, source.LastIndexOf(value, StringComparer.OrdinalIgnoreCase));
-        Assert.Equal(-1, source.LastIndexOf(value, StringComparison.Ordinal));
-        Assert.Equal(5, source.LastIndexOf(value, StringComparison.OrdinalIgnoreCase));
+        Assert.Equal(-1, source.LastIndexOf(value, ignoreCase: true));
+        Assert.Equal(-1, source.LastIndexOf(value, new CharComparer(true)));
+        Assert.Equal(-1, source.LastIndexOf(value, StringComparer.OrdinalIgnoreCase));
+        Assert.Equal(-1, source.LastIndexOf(value, StringComparison.OrdinalIgnoreCase));
+
+        source = "-x-x-";
+        Assert.Equal(3, source.LastIndexOf(value));
+        Assert.Equal(3, source.LastIndexOf(value, ignoreCase: true));
+        Assert.Equal(3, source.LastIndexOf(value, new CharComparer(true)));
+        Assert.Equal(3, source.LastIndexOf(value, StringComparer.OrdinalIgnoreCase));
+        Assert.Equal(3, source.LastIndexOf(value, StringComparison.OrdinalIgnoreCase));
+
+        source = "-x-X-";
+        Assert.Equal(1, source.LastIndexOf(value));
+        Assert.Equal(3, source.LastIndexOf(value, ignoreCase: true));
+        Assert.Equal(3, source.LastIndexOf(value, new CharComparer(true)));
+        Assert.Equal(3, source.LastIndexOf(value, StringComparer.OrdinalIgnoreCase));
+        Assert.Equal(3, source.LastIndexOf(value, StringComparison.OrdinalIgnoreCase));
     }
 
     //[Enforced]
     [Fact]
     public static void Test_LastIndexOf_String()
     {
-        var value = "";
-        var source = "".AsSpan(); Assert.Equal(0, source.LastIndexOf(value, ignoreCase: true));
-
-        value = "X"; Assert.Equal(-1, source.LastIndexOf(value));
-
-        source = "--x--x--".AsSpan();
-
+        var source = "".AsSpan();
+        var value = "xy";
         Assert.Equal(-1, source.LastIndexOf(value));
-        Assert.Equal(-1, source.LastIndexOf(value, ignoreCase: false));
-        Assert.Equal(5, source.LastIndexOf(value, ignoreCase: true));
-        Assert.Equal(-1, source.LastIndexOf(value, new CharComparer(false)));
-        Assert.Equal(5, source.LastIndexOf(value, new CharComparer(true)));
-        Assert.Equal(-1, source.LastIndexOf(value, StringComparer.Ordinal));
-        Assert.Equal(5, source.LastIndexOf(value, StringComparer.OrdinalIgnoreCase));
-        Assert.Equal(-1, source.LastIndexOf(value, StringComparison.Ordinal));
-        Assert.Equal(5, source.LastIndexOf(value, StringComparison.OrdinalIgnoreCase));
+        Assert.Equal(-1, source.LastIndexOf(value, ignoreCase: true));
+        Assert.Equal(-1, source.LastIndexOf(value, new CharComparer(true)));
+        Assert.Equal(-1, source.LastIndexOf(value, StringComparer.OrdinalIgnoreCase));
+        Assert.Equal(-1, source.LastIndexOf(value, StringComparison.OrdinalIgnoreCase));
+
+        source = "-xy-xy-";
+        Assert.Equal(4, source.LastIndexOf(value));
+        Assert.Equal(4, source.LastIndexOf(value, ignoreCase: true));
+        Assert.Equal(4, source.LastIndexOf(value, new CharComparer(true)));
+        Assert.Equal(4, source.LastIndexOf(value, StringComparer.OrdinalIgnoreCase));
+        Assert.Equal(4, source.LastIndexOf(value, StringComparison.OrdinalIgnoreCase));
+
+        source = "-xy-XY-";
+        Assert.Equal(1, source.LastIndexOf(value));
+        Assert.Equal(4, source.LastIndexOf(value, ignoreCase: true));
+        Assert.Equal(4, source.LastIndexOf(value, new CharComparer(true)));
+        Assert.Equal(4, source.LastIndexOf(value, StringComparer.OrdinalIgnoreCase));
+        Assert.Equal(4, source.LastIndexOf(value, StringComparison.OrdinalIgnoreCase));
     }
 
     // ----------------------------------------------------
 
     //[Enforced]
     [Fact]
-    public static void Test_AllIndexesOf_Char()
+    public static void Test_IndexesOf_Char()
     {
-        var value = 'X';
+        List<int> list;
         var source = "".AsSpan();
-        var target = source.IndexesOf(value, ignoreCase: true); Assert.Empty(target);
+        var target = 'x';
+        Assert.Empty(source.IndexesOf(target));
+        Assert.Empty(source.IndexesOf(target, ignoreCase: true));
+        Assert.Empty(source.IndexesOf(target, new CharComparer(true)));
+        Assert.Empty(source.IndexesOf(target, StringComparer.OrdinalIgnoreCase));
+        Assert.Empty(source.IndexesOf(target, StringComparison.OrdinalIgnoreCase));
 
-        source = "-x-x-".AsSpan();
+        source = "-x-x-";
+        Assert.Equal(2, (list = source.IndexesOf(target)).Count);
+        Assert.Equal(1, list[0]);
+        Assert.Equal(3, list[1]);
+        Assert.Equal(2, (list = source.IndexesOf(target, ignoreCase: true)).Count);
+        Assert.Equal(1, list[0]);
+        Assert.Equal(3, list[1]);
+        Assert.Equal(2, (list = source.IndexesOf(target, new CharComparer(true))).Count);
+        Assert.Equal(1, list[0]);
+        Assert.Equal(3, list[1]);
+        Assert.Equal(2, (list = source.IndexesOf(target, StringComparer.OrdinalIgnoreCase)).Count);
+        Assert.Equal(1, list[0]);
+        Assert.Equal(3, list[1]);
+        Assert.Equal(2, (list = source.IndexesOf(target, StringComparison.OrdinalIgnoreCase)).Count);
+        Assert.Equal(1, list[0]);
+        Assert.Equal(3, list[1]);
 
-        target = source.IndexesOf(value); Assert.Empty(target);
-        target = source.IndexesOf(value, ignoreCase: false); Assert.Empty(target);
-        target = source.IndexesOf(value, ignoreCase: true); Assert.Equal(target, [1, 3]);
-        target = source.IndexesOf(value, new CharComparer(false)); Assert.Empty(target);
-        target = source.IndexesOf(value, new CharComparer(true)); Assert.Equal(target, [1, 3]);
-        target = source.IndexesOf(value, StringComparer.Ordinal); Assert.Empty(target);
-        target = source.IndexesOf(value, StringComparer.OrdinalIgnoreCase); Assert.Equal(target, [1, 3]);
-        target = source.IndexesOf(value, StringComparison.Ordinal); Assert.Empty(target);
-        target = source.IndexesOf(value, StringComparison.OrdinalIgnoreCase); Assert.Equal(target, [1, 3]);
+        source = "-x-X-";
+        Assert.Single(list = source.IndexesOf(target));
+        Assert.Equal(1, list[0]);
+        Assert.Equal(2, (list = source.IndexesOf(target, ignoreCase: true)).Count);
+        Assert.Equal(1, list[0]);
+        Assert.Equal(3, list[1]);
+        Assert.Equal(2, (list = source.IndexesOf(target, new CharComparer(true))).Count);
+        Assert.Equal(1, list[0]);
+        Assert.Equal(3, list[1]);
+        Assert.Equal(2, (list = source.IndexesOf(target, StringComparer.OrdinalIgnoreCase)).Count);
+        Assert.Equal(1, list[0]);
+        Assert.Equal(3, list[1]);
+        Assert.Equal(2, (list = source.IndexesOf(target, StringComparison.OrdinalIgnoreCase)).Count);
+        Assert.Equal(1, list[0]);
+        Assert.Equal(3, list[1]);
     }
 
     //[Enforced]
     [Fact]
-    public static void Test_AllIndexesOf_String()
+    public static void Test_IndexesOf_String()
     {
-
-        var value = "";
+        List<int> list;
         var source = "".AsSpan();
-        var target = source.IndexesOf(value, ignoreCase: true); Assert.Equal(target, [0]);
+        var target = "xy";
+        Assert.Empty(source.IndexesOf(target));
+        Assert.Empty(source.IndexesOf(target, ignoreCase: true));
+        Assert.Empty(source.IndexesOf(target, new CharComparer(true)));
+        Assert.Empty(source.IndexesOf(target, StringComparer.OrdinalIgnoreCase));
+        Assert.Empty(source.IndexesOf(target, StringComparison.OrdinalIgnoreCase));
 
-        value = "X";
-        target = source.IndexesOf(value); Assert.Empty(target);
+        source = "-xy-xy-";
+        Assert.Equal(2, (list = source.IndexesOf(target)).Count);
+        Assert.Equal(1, list[0]);
+        Assert.Equal(4, list[1]);
+        Assert.Equal(2, (list = source.IndexesOf(target, ignoreCase: true)).Count);
+        Assert.Equal(1, list[0]);
+        Assert.Equal(4, list[1]);
+        Assert.Equal(2, (list = source.IndexesOf(target, new CharComparer(true))).Count);
+        Assert.Equal(1, list[0]);
+        Assert.Equal(4, list[1]);
+        Assert.Equal(2, (list = source.IndexesOf(target, StringComparer.OrdinalIgnoreCase)).Count);
+        Assert.Equal(1, list[0]);
+        Assert.Equal(4, list[1]);
+        Assert.Equal(2, (list = source.IndexesOf(target, StringComparison.OrdinalIgnoreCase)).Count);
+        Assert.Equal(1, list[0]);
+        Assert.Equal(4, list[1]);
 
-        source = "-x-x-".AsSpan();
-
-        target = source.IndexesOf(value); Assert.Empty(target);
-        target = source.IndexesOf(value, ignoreCase: false); Assert.Empty(target);
-        target = source.IndexesOf(value, ignoreCase: true); Assert.Equal(target, [1, 3]);
-        target = source.IndexesOf(value, new CharComparer(false)); Assert.Empty(target);
-        target = source.IndexesOf(value, new CharComparer(true)); Assert.Equal(target, [1, 3]);
-        target = source.IndexesOf(value, StringComparer.Ordinal); Assert.Empty(target);
-        target = source.IndexesOf(value, StringComparer.OrdinalIgnoreCase); Assert.Equal(target, [1, 3]);
-        target = source.IndexesOf(value, StringComparison.Ordinal); Assert.Empty(target);
-        target = source.IndexesOf(value, StringComparison.OrdinalIgnoreCase); Assert.Equal(target, [1, 3]);
+        source = "-xy-XY-";
+        Assert.Single(list = source.IndexesOf(target));
+        Assert.Equal(1, list[0]);
+        Assert.Equal(2, (list = source.IndexesOf(target, ignoreCase: true)).Count);
+        Assert.Equal(1, list[0]);
+        Assert.Equal(4, list[1]);
+        Assert.Equal(2, (list = source.IndexesOf(target, new CharComparer(true))).Count);
+        Assert.Equal(1, list[0]);
+        Assert.Equal(4, list[1]);
+        Assert.Equal(2, (list = source.IndexesOf(target, StringComparer.OrdinalIgnoreCase)).Count);
+        Assert.Equal(1, list[0]);
+        Assert.Equal(4, list[1]);
+        Assert.Equal(2, (list = source.IndexesOf(target, StringComparison.OrdinalIgnoreCase)).Count);
+        Assert.Equal(1, list[0]);
+        Assert.Equal(4, list[1]);
     }
 
     // ----------------------------------------------------
@@ -156,20 +364,26 @@ public static class Test_StringSpanExtensions
     [Fact]
     public static void Test_Contains_Char()
     {
-        var value = 'X';
         var source = "".AsSpan();
-        Assert.False(source.Contains(value, ignoreCase: true));
-
-        source = "--x--x--".AsSpan();
-
+        var value = 'x';
         Assert.False(source.Contains(value));
-        Assert.False(source.Contains(value, ignoreCase: false));
+        Assert.False(source.Contains(value, ignoreCase: true));
+        Assert.False(source.Contains(value, new CharComparer(true)));
+        Assert.False(source.Contains(value, StringComparer.OrdinalIgnoreCase));
+        Assert.False(source.Contains(value, StringComparison.OrdinalIgnoreCase));
+
+        source = "-x-";
+        Assert.True(source.Contains(value));
         Assert.True(source.Contains(value, ignoreCase: true));
-        Assert.False(source.Contains(value, new CharComparer(false)));
         Assert.True(source.Contains(value, new CharComparer(true)));
-        Assert.False(source.Contains(value, StringComparer.Ordinal));
         Assert.True(source.Contains(value, StringComparer.OrdinalIgnoreCase));
-        Assert.False(source.Contains(value, StringComparison.Ordinal));
+        Assert.True(source.Contains(value, StringComparison.OrdinalIgnoreCase));
+
+        source = "-X-";
+        Assert.False(source.Contains(value));
+        Assert.True(source.Contains(value, ignoreCase: true));
+        Assert.True(source.Contains(value, new CharComparer(true)));
+        Assert.True(source.Contains(value, StringComparer.OrdinalIgnoreCase));
         Assert.True(source.Contains(value, StringComparison.OrdinalIgnoreCase));
     }
 
@@ -177,21 +391,26 @@ public static class Test_StringSpanExtensions
     [Fact]
     public static void Test_Contains_String()
     {
-        var value = "";
-        var source = "".AsSpan(); Assert.True(source.Contains(value, ignoreCase: true));
-
-        value = "X"; Assert.False(source.Contains(value));
-
-        source = "--x--x--".AsSpan();
-
+        var source = "".AsSpan();
+        var value = "xy";
         Assert.False(source.Contains(value));
-        Assert.False(source.Contains(value, ignoreCase: false));
+        Assert.False(source.Contains(value, ignoreCase: true));
+        Assert.False(source.Contains(value, new CharComparer(true)));
+        Assert.False(source.Contains(value, StringComparer.OrdinalIgnoreCase));
+        Assert.False(source.Contains(value, StringComparison.OrdinalIgnoreCase));
+
+        source = "-xy-";
+        Assert.True(source.Contains(value));
         Assert.True(source.Contains(value, ignoreCase: true));
-        Assert.False(source.Contains(value, new CharComparer(false)));
         Assert.True(source.Contains(value, new CharComparer(true)));
-        Assert.False(source.Contains(value, StringComparer.Ordinal));
         Assert.True(source.Contains(value, StringComparer.OrdinalIgnoreCase));
-        Assert.False(source.Contains(value, StringComparison.Ordinal));
+        Assert.True(source.Contains(value, StringComparison.OrdinalIgnoreCase));
+
+        source = "-XY-";
+        Assert.False(source.Contains(value));
+        Assert.True(source.Contains(value, ignoreCase: true));
+        Assert.True(source.Contains(value, new CharComparer(true)));
+        Assert.True(source.Contains(value, StringComparer.OrdinalIgnoreCase));
         Assert.True(source.Contains(value, StringComparison.OrdinalIgnoreCase));
     }
 
@@ -202,185 +421,87 @@ public static class Test_StringSpanExtensions
     public static void Test_ContainsAny_Char()
     {
         var source = "".AsSpan();
-        var target = Array.Empty<char>();
-        Assert.False(source.ContainsAny(target, ignoreCase: true));
+        var values = new char[] { 'x', 'y' };
+        Assert.False(source.ContainsAny(values));
+        Assert.False(source.ContainsAny(values, ignoreCase: true));
+        Assert.False(source.ContainsAny(values, new CharComparer(true)));
+        Assert.False(source.ContainsAny(values, StringComparer.OrdinalIgnoreCase));
+        Assert.False(source.ContainsAny(values, StringComparison.OrdinalIgnoreCase));
 
-        source = "--x--x--";
-        Assert.False(source.ContainsAny(target, ignoreCase: true));
+        source = "-x-";
+        Assert.True(source.ContainsAny(values));
+        Assert.True(source.ContainsAny(values, ignoreCase: true));
+        Assert.True(source.ContainsAny(values, new CharComparer(true)));
+        Assert.True(source.ContainsAny(values, StringComparer.OrdinalIgnoreCase));
+        Assert.True(source.ContainsAny(values, StringComparison.OrdinalIgnoreCase));
 
-        target = ['a', 'b', 'X'];
+        source = "-X-";
+        Assert.False(source.ContainsAny(values));
+        Assert.True(source.ContainsAny(values, ignoreCase: true));
+        Assert.True(source.ContainsAny(values, new CharComparer(true)));
+        Assert.True(source.ContainsAny(values, StringComparer.OrdinalIgnoreCase));
+        Assert.True(source.ContainsAny(values, StringComparison.OrdinalIgnoreCase));
+    }
 
-        Assert.False(source.ContainsAny(target));
-        Assert.False(source.ContainsAny(target, ignoreCase: false));
-        Assert.True(source.ContainsAny(target, ignoreCase: true));
-        Assert.False(source.ContainsAny(target, new CharComparer(false)));
-        Assert.True(source.ContainsAny(target, new CharComparer(true)));
-        Assert.False(source.ContainsAny(target, StringComparer.Ordinal));
-        Assert.True(source.ContainsAny(target, StringComparer.OrdinalIgnoreCase));
-        Assert.False(source.ContainsAny(target, StringComparison.Ordinal));
-        Assert.True(source.ContainsAny(target, StringComparison.OrdinalIgnoreCase));
+    //[Enforced]
+    [Fact]
+    public static void Test_ContainsAny_String()
+    {
+        var source = "".AsSpan();
+        var values = new string[] { "xy", "yz" };
+        Assert.False(source.ContainsAny(values));
+        Assert.False(source.ContainsAny(values, ignoreCase: true));
+        Assert.False(source.ContainsAny(values, new CharComparer(true)));
+        Assert.False(source.ContainsAny(values, StringComparer.OrdinalIgnoreCase));
+        Assert.False(source.ContainsAny(values, StringComparison.OrdinalIgnoreCase));
+
+        source = "-yz-";
+        Assert.True(source.ContainsAny(values));
+        Assert.True(source.ContainsAny(values, ignoreCase: true));
+        Assert.True(source.ContainsAny(values, new CharComparer(true)));
+        Assert.True(source.ContainsAny(values, StringComparer.OrdinalIgnoreCase));
+        Assert.True(source.ContainsAny(values, StringComparison.OrdinalIgnoreCase));
+
+        source = "-YZ-";
+        Assert.False(source.ContainsAny(values));
+        Assert.True(source.ContainsAny(values, ignoreCase: true));
+        Assert.True(source.ContainsAny(values, new CharComparer(true)));
+        Assert.True(source.ContainsAny(values, StringComparer.OrdinalIgnoreCase));
+        Assert.True(source.ContainsAny(values, StringComparison.OrdinalIgnoreCase));
     }
 
     // ----------------------------------------------------
 
     //[Enforced]
     [Fact]
-    public static void Test_StartsWith_Char()
+    public static void Test_RemoveIndex()
     {
         var source = "".AsSpan();
-        var target = 'X';
-        Assert.False(source.StartsWith(target, ignoreCase: true));
+        var target = source.Remove(0); Assert.Equal(0, target.Length);
+        try { source.Remove(1); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
 
-        source = "x";
-        Assert.True(source.StartsWith(target, ignoreCase: true));
+        source = "abcxy";
+        target = source.Remove(3); Assert.Equal("abc", target.ToString());
+        try { source.Remove(-1); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
 
-        source = "x--x".AsSpan();
-
-        Assert.False(source.StartsWith(target));
-        Assert.False(source.StartsWith(target, ignoreCase: false));
-        Assert.True(source.StartsWith(target, ignoreCase: true));
-        Assert.False(source.StartsWith(target, new CharComparer(false)));
-        Assert.True(source.StartsWith(target, new CharComparer(true)));
-        Assert.False(source.StartsWith(target, StringComparer.Ordinal));
-        Assert.True(source.StartsWith(target, StringComparer.OrdinalIgnoreCase));
-        Assert.False(source.StartsWith(target, StringComparison.Ordinal));
-        Assert.True(source.StartsWith(target, StringComparison.OrdinalIgnoreCase));
+        target = source.Remove(5); Assert.Equal("abcxy", target.ToString());
+        try { source.Remove(6); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
     }
 
     //[Enforced]
     [Fact]
-    public static void Test_StartsWith_String()
+    public static void Test_RemoveIndexCount()
     {
         var source = "".AsSpan();
-        var target = "";
-        Assert.True(source.StartsWith(target, ignoreCase: true));
+        var target = source.Remove(0, 0); Assert.Equal(0, target.Length);
+        try { source.Remove(0, 1); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+        try { source.Remove(-1, 0); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
 
-        target = "X";
-        Assert.False(source.StartsWith(target, ignoreCase: true));
-
-        source = "x";
-        Assert.True(source.StartsWith(target, ignoreCase: true));
-
-        source = "x--x".AsSpan();
-
-        Assert.False(source.StartsWith(target));
-        Assert.False(source.StartsWith(target, ignoreCase: false));
-        Assert.True(source.StartsWith(target, ignoreCase: true));
-        Assert.False(source.StartsWith(target, new CharComparer(false)));
-        Assert.True(source.StartsWith(target, new CharComparer(true)));
-        Assert.False(source.StartsWith(target, StringComparer.Ordinal));
-        Assert.True(source.StartsWith(target, StringComparer.OrdinalIgnoreCase));
-        Assert.False(source.StartsWith(target, StringComparison.Ordinal));
-        Assert.True(source.StartsWith(target, StringComparison.OrdinalIgnoreCase));
-    }
-
-    // ----------------------------------------------------
-
-    //[Enforced]
-    [Fact]
-    public static void Test_EndsWith_Char()
-    {
-        var source = "".AsSpan();
-        var target = 'X';
-        Assert.False(source.EndsWith(target, ignoreCase: true));
-
-        source = "x";
-        Assert.True(source.EndsWith(target, ignoreCase: true));
-
-        source = "x--x".AsSpan();
-
-        Assert.False(source.EndsWith(target));
-        Assert.False(source.EndsWith(target, ignoreCase: false));
-        Assert.True(source.EndsWith(target, ignoreCase: true));
-        Assert.False(source.EndsWith(target, new CharComparer(false)));
-        Assert.True(source.EndsWith(target, new CharComparer(true)));
-        Assert.False(source.EndsWith(target, StringComparer.Ordinal));
-        Assert.True(source.EndsWith(target, StringComparer.OrdinalIgnoreCase));
-        Assert.False(source.EndsWith(target, StringComparison.Ordinal));
-        Assert.True(source.EndsWith(target, StringComparison.OrdinalIgnoreCase));
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_EndsWith_String()
-    {
-        var source = "".AsSpan();
-        var target = "";
-        Assert.True(source.EndsWith(target, ignoreCase: true));
-
-        target = "X";
-        Assert.False(source.EndsWith(target, ignoreCase: true));
-
-        source = "x";
-        Assert.True(source.EndsWith(target, ignoreCase: true));
-
-        source = "x--x".AsSpan();
-
-        Assert.False(source.EndsWith(target));
-        Assert.False(source.EndsWith(target, ignoreCase: false));
-        Assert.True(source.EndsWith(target, ignoreCase: true));
-        Assert.False(source.EndsWith(target, new CharComparer(false)));
-        Assert.True(source.EndsWith(target, new CharComparer(true)));
-        Assert.False(source.EndsWith(target, StringComparer.Ordinal));
-        Assert.True(source.EndsWith(target, StringComparer.OrdinalIgnoreCase));
-        Assert.False(source.EndsWith(target, StringComparison.Ordinal));
-        Assert.True(source.EndsWith(target, StringComparison.OrdinalIgnoreCase));
-    }
-
-    // ----------------------------------------------------
-
-    //[Enforced]
-    [Fact]
-    public static void Test_RemoveIndex_String()
-    {
-        StringSpan target;
-        var source = "".AsSpan();
-        target = source.Remove(0); Assert.True(target.IsEmpty);
-        try { source.Remove(1); Assert.Fail(); } catch (ArgumentException) { }
-
-        source = "0123".AsSpan();
-
-        target = source.Remove(0); Assert.True(target.IsEmpty);
-        target = source.Remove(1); Assert.Equal("0", target);
-        target = source.Remove(2); Assert.Equal("01", target);
-        target = source.Remove(3); Assert.Equal("012", target);
-        try { source.Remove(4); Assert.Fail(); } catch (ArgumentException) { }
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_RemoveIndexCount_String()
-    {
-        StringSpan target;
-        var source = "".AsSpan();
-        target = source.Remove(0, 0); Assert.True(target.IsEmpty);
-        try { source.Remove(1, 0); Assert.Fail(); } catch (ArgumentException) { }
-
-        source = "0123".AsSpan();
-
-        target = source.Remove(0, 0); Assert.Equal(source, target);
-        target = source.Remove(0, 1); Assert.Equal("123", target);
-        target = source.Remove(0, 2); Assert.Equal("23", target);
-        target = source.Remove(0, 3); Assert.Equal("3", target);
-        target = source.Remove(0, 4); Assert.True(target.IsEmpty);
-        try { source.Remove(0, 5); Assert.Fail(); } catch (ArgumentException) { }
-
-        target = source.Remove(1, 0); Assert.Equal(source, target);
-        target = source.Remove(1, 1); Assert.Equal("023", target);
-        target = source.Remove(1, 2); Assert.Equal("03", target);
-        target = source.Remove(1, 3); Assert.Equal("0", target);
-        try { source.Remove(1, 4); Assert.Fail(); } catch (ArgumentException) { }
-
-        target = source.Remove(2, 0); Assert.Equal(source, target);
-        target = source.Remove(2, 1); Assert.Equal("013", target);
-        target = source.Remove(2, 2); Assert.Equal("01", target);
-        try { source.Remove(2, 3); Assert.Fail(); } catch (ArgumentException) { }
-
-        target = source.Remove(3, 0); Assert.Equal(source, target);
-        target = source.Remove(3, 1); Assert.Equal("012", target);
-        try { source.Remove(3, 2); Assert.Fail(); } catch (ArgumentException) { }
-
-        try { source.Remove(4, 0); Assert.Fail(); } catch (ArgumentException) { }
+        source = "abcxy";
+        target = source.Remove(0, 1); Assert.Equal("bcxy", target);
+        target = source.Remove(3, 2); Assert.Equal("abc", target);
+        target = source.Remove(0, 5); Assert.Equal(0, target.Length);
+        try { source.Remove(0, 6); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
     }
 
     // ----------------------------------------------------
@@ -389,47 +510,46 @@ public static class Test_StringSpanExtensions
     [Fact]
     public static void Test_Remove_Char()
     {
-        StringSpan target;
         var source = "".AsSpan();
-        var value = 'X';
-        target = source.Remove(value); Assert.Equal(source, target);
+        var value = 'x';
+        Assert.Equal(source, source.Remove(value, out var r)); Assert.False(r);
 
-        source = "-x-x-".AsSpan();
+        source = "x-x";
+        Assert.Equal("-x", source.Remove(value, out r)); Assert.True(r);
+        Assert.Equal("-x", source.Remove(value, ignoreCase: true, out r)); Assert.True(r);
+        Assert.Equal("-x", source.Remove(value, new CharComparer(true), out r)); Assert.True(r);
+        Assert.Equal("-x", source.Remove(value, StringComparer.OrdinalIgnoreCase, out r)); Assert.True(r);
+        Assert.Equal("-x", source.Remove(value, StringComparison.OrdinalIgnoreCase, out r)); Assert.True(r);
 
-        target = source.Remove(value); Assert.Equal(source, target);
-        target = source.Remove(value, ignoreCase: false); Assert.Equal(source, target);
-        target = source.Remove(value, ignoreCase: true); Assert.Equal("--x-", target);
-        target = source.Remove(value, new CharComparer(false)); Assert.Equal(source, target);
-        target = source.Remove(value, new CharComparer(true)); Assert.Equal("--x-", target);
-        target = source.Remove(value, StringComparer.Ordinal); Assert.Equal(source, target);
-        target = source.Remove(value, StringComparer.OrdinalIgnoreCase); Assert.Equal("--x-", target);
-        target = source.Remove(value, StringComparison.Ordinal); Assert.Equal(source, target);
-        target = source.Remove(value, StringComparison.OrdinalIgnoreCase); Assert.Equal("--x-", target);
+        source = "X-X";
+        Assert.Equal("X-X", source.Remove(value, out r)); Assert.False(r);
+        Assert.Equal("-X", source.Remove(value, ignoreCase: true, out r)); Assert.True(r);
+        Assert.Equal("-X", source.Remove(value, new CharComparer(true), out r)); Assert.True(r);
+        Assert.Equal("-X", source.Remove(value, StringComparer.OrdinalIgnoreCase, out r)); Assert.True(r);
+        Assert.Equal("-X", source.Remove(value, StringComparison.OrdinalIgnoreCase, out r)); Assert.True(r);
     }
 
     //[Enforced]
     [Fact]
     public static void Test_Remove_String()
     {
-        StringSpan target;
         var source = "".AsSpan();
-        var value = "";
-        target = source.Remove(value); Assert.Equal(source, target);
+        var value = "xy";
+        Assert.Equal(source, source.Remove(value, out var r)); Assert.False(r);
 
-        value = "X";
-        target = source.Remove(value); Assert.Equal(source, target);
+        source = "xy-xy";
+        Assert.Equal("-xy", source.Remove(value, out r)); Assert.True(r);
+        Assert.Equal("-xy", source.Remove(value, ignoreCase: true, out r)); Assert.True(r);
+        Assert.Equal("-xy", source.Remove(value, new CharComparer(true), out r)); Assert.True(r);
+        Assert.Equal("-xy", source.Remove(value, StringComparer.OrdinalIgnoreCase, out r)); Assert.True(r);
+        Assert.Equal("-xy", source.Remove(value, StringComparison.OrdinalIgnoreCase, out r)); Assert.True(r);
 
-        source = "-x-x-".AsSpan();
-
-        target = source.Remove(value); Assert.Equal(source, target);
-        target = source.Remove(value, ignoreCase: false); Assert.Equal(source, target);
-        target = source.Remove(value, ignoreCase: true); Assert.Equal("--x-", target);
-        target = source.Remove(value, new CharComparer(false)); Assert.Equal(source, target);
-        target = source.Remove(value, new CharComparer(true)); Assert.Equal("--x-", target);
-        target = source.Remove(value, StringComparer.Ordinal); Assert.Equal(source, target);
-        target = source.Remove(value, StringComparer.OrdinalIgnoreCase); Assert.Equal("--x-", target);
-        target = source.Remove(value, StringComparison.Ordinal); Assert.Equal(source, target);
-        target = source.Remove(value, StringComparison.OrdinalIgnoreCase); Assert.Equal("--x-", target);
+        source = "XY-XY";
+        Assert.Equal("XY-XY", source.Remove(value, out r)); Assert.False(r);
+        Assert.Equal("-XY", source.Remove(value, ignoreCase: true, out r)); Assert.True(r);
+        Assert.Equal("-XY", source.Remove(value, new CharComparer(true), out r)); Assert.True(r);
+        Assert.Equal("-XY", source.Remove(value, StringComparer.OrdinalIgnoreCase, out r)); Assert.True(r);
+        Assert.Equal("-XY", source.Remove(value, StringComparison.OrdinalIgnoreCase, out r)); Assert.True(r);
     }
 
     // ----------------------------------------------------
@@ -438,47 +558,46 @@ public static class Test_StringSpanExtensions
     [Fact]
     public static void Test_RemoveLast_Char()
     {
-        StringSpan target;
         var source = "".AsSpan();
-        var value = 'X';
-        target = source.RemoveLast(value); Assert.Equal(source, target);
+        var value = 'x';
+        Assert.Equal(source, source.RemoveLast(value, out var r)); Assert.False(r);
 
-        source = "-x-x-".AsSpan();
+        source = "x-x";
+        Assert.Equal("x-", source.RemoveLast(value, out r)); Assert.True(r);
+        Assert.Equal("x-", source.RemoveLast(value, ignoreCase: true, out r)); Assert.True(r);
+        Assert.Equal("x-", source.RemoveLast(value, new CharComparer(true), out r)); Assert.True(r);
+        Assert.Equal("x-", source.RemoveLast(value, StringComparer.OrdinalIgnoreCase, out r)); Assert.True(r);
+        Assert.Equal("x-", source.RemoveLast(value, StringComparison.OrdinalIgnoreCase, out r)); Assert.True(r);
 
-        target = source.RemoveLast(value); Assert.Equal(source, target);
-        target = source.RemoveLast(value, ignoreCase: false); Assert.Equal(source, target);
-        target = source.RemoveLast(value, ignoreCase: true); Assert.Equal("-x--", target);
-        target = source.RemoveLast(value, new CharComparer(false)); Assert.Equal(source, target);
-        target = source.RemoveLast(value, new CharComparer(true)); Assert.Equal("-x--", target);
-        target = source.RemoveLast(value, StringComparer.Ordinal); Assert.Equal(source, target);
-        target = source.RemoveLast(value, StringComparer.OrdinalIgnoreCase); Assert.Equal("-x--", target);
-        target = source.RemoveLast(value, StringComparison.Ordinal); Assert.Equal(source, target);
-        target = source.RemoveLast(value, StringComparison.OrdinalIgnoreCase); Assert.Equal("-x--", target);
+        source = "X-X";
+        Assert.Equal("X-X", source.RemoveLast(value, out r)); Assert.False(r);
+        Assert.Equal("X-", source.RemoveLast(value, ignoreCase: true, out r)); Assert.True(r);
+        Assert.Equal("X-", source.RemoveLast(value, new CharComparer(true), out r)); Assert.True(r);
+        Assert.Equal("X-", source.RemoveLast(value, StringComparer.OrdinalIgnoreCase, out r)); Assert.True(r);
+        Assert.Equal("X-", source.RemoveLast(value, StringComparison.OrdinalIgnoreCase, out r)); Assert.True(r);
     }
 
     //[Enforced]
     [Fact]
     public static void Test_RemoveLast_String()
     {
-        StringSpan target;
         var source = "".AsSpan();
-        var value = "";
-        target = source.RemoveLast(value); Assert.Equal(source, target);
+        var value = "xy";
+        Assert.Equal(source, source.RemoveLast(value, out var r)); Assert.False(r);
 
-        value = "X";
-        target = source.RemoveLast(value); Assert.Equal(source, target);
+        source = "xy-xy";
+        Assert.Equal("xy-", source.RemoveLast(value, out r)); Assert.True(r);
+        Assert.Equal("xy-", source.RemoveLast(value, ignoreCase: true, out r)); Assert.True(r);
+        Assert.Equal("xy-", source.RemoveLast(value, new CharComparer(true), out r)); Assert.True(r);
+        Assert.Equal("xy-", source.RemoveLast(value, StringComparer.OrdinalIgnoreCase, out r)); Assert.True(r);
+        Assert.Equal("xy-", source.RemoveLast(value, StringComparison.OrdinalIgnoreCase, out r)); Assert.True(r);
 
-        source = "-x-x-".AsSpan();
-
-        target = source.RemoveLast(value); Assert.Equal(source, target);
-        target = source.RemoveLast(value, ignoreCase: false); Assert.Equal(source, target);
-        target = source.RemoveLast(value, ignoreCase: true); Assert.Equal("-x--", target);
-        target = source.RemoveLast(value, new CharComparer(false)); Assert.Equal(source, target);
-        target = source.RemoveLast(value, new CharComparer(true)); Assert.Equal("-x--", target);
-        target = source.RemoveLast(value, StringComparer.Ordinal); Assert.Equal(source, target);
-        target = source.RemoveLast(value, StringComparer.OrdinalIgnoreCase); Assert.Equal("-x--", target);
-        target = source.RemoveLast(value, StringComparison.Ordinal); Assert.Equal(source, target);
-        target = source.RemoveLast(value, StringComparison.OrdinalIgnoreCase); Assert.Equal("-x--", target);
+        source = "XY-XY";
+        Assert.Equal("XY-XY", source.RemoveLast(value, out r)); Assert.False(r);
+        Assert.Equal("XY-", source.RemoveLast(value, ignoreCase: true, out r)); Assert.True(r);
+        Assert.Equal("XY-", source.RemoveLast(value, new CharComparer(true), out r)); Assert.True(r);
+        Assert.Equal("XY-", source.RemoveLast(value, StringComparer.OrdinalIgnoreCase, out r)); Assert.True(r);
+        Assert.Equal("XY-", source.RemoveLast(value, StringComparison.OrdinalIgnoreCase, out r)); Assert.True(r);
     }
 
     // ----------------------------------------------------
@@ -487,153 +606,46 @@ public static class Test_StringSpanExtensions
     [Fact]
     public static void Test_RemoveAll_Char()
     {
-        StringSpan target;
         var source = "".AsSpan();
-        var value = 'X';
-        target = source.RemoveAll(value); Assert.Equal(source, target);
+        var value = 'x';
+        Assert.Equal(source, source.RemoveAll(value, out var r)); Assert.False(r);
 
-        source = "-x-x-".AsSpan();
+        source = "x-x";
+        Assert.Equal("-", source.RemoveAll(value, out r)); Assert.True(r);
+        Assert.Equal("-", source.RemoveAll(value, ignoreCase: true, out r)); Assert.True(r);
+        Assert.Equal("-", source.RemoveAll(value, new CharComparer(true), out r)); Assert.True(r);
+        Assert.Equal("-", source.RemoveAll(value, StringComparer.OrdinalIgnoreCase, out r)); Assert.True(r);
+        Assert.Equal("-", source.RemoveAll(value, StringComparison.OrdinalIgnoreCase, out r)); Assert.True(r);
 
-        target = source.RemoveAll(value); Assert.Equal(source, target);
-        target = source.RemoveAll(value, ignoreCase: false); Assert.Equal(source, target);
-        target = source.RemoveAll(value, ignoreCase: true); Assert.Equal("---", target);
-        target = source.RemoveAll(value, new CharComparer(false)); Assert.Equal(source, target);
-        target = source.RemoveAll(value, new CharComparer(true)); Assert.Equal("---", target);
-        target = source.RemoveAll(value, StringComparer.Ordinal); Assert.Equal(source, target);
-        target = source.RemoveAll(value, StringComparer.OrdinalIgnoreCase); Assert.Equal("---", target);
-        target = source.RemoveAll(value, StringComparison.Ordinal); Assert.Equal(source, target);
-        target = source.RemoveAll(value, StringComparison.OrdinalIgnoreCase); Assert.Equal("---", target);
+        source = "X-X";
+        Assert.Equal("X-X", source.RemoveAll(value, out r)); Assert.False(r);
+        Assert.Equal("-", source.RemoveAll(value, ignoreCase: true, out r)); Assert.True(r);
+        Assert.Equal("-", source.RemoveAll(value, new CharComparer(true), out r)); Assert.True(r);
+        Assert.Equal("-", source.RemoveAll(value, StringComparer.OrdinalIgnoreCase, out r)); Assert.True(r);
+        Assert.Equal("-", source.RemoveAll(value, StringComparison.OrdinalIgnoreCase, out r)); Assert.True(r);
     }
 
     //[Enforced]
     [Fact]
     public static void Test_RemoveAll_String()
     {
-        StringSpan target;
         var source = "".AsSpan();
-        var value = "";
-        target = source.RemoveAll(value); Assert.Equal(source, target);
+        var value = "xy";
+        Assert.Equal(source, source.RemoveAll(value, out var r)); Assert.False(r);
 
-        value = "X";
-        target = source.RemoveAll(value); Assert.Equal(source, target);
+        source = "xy-xy";
+        Assert.Equal("-", source.RemoveAll(value, out r)); Assert.True(r);
+        Assert.Equal("-", source.RemoveAll(value, ignoreCase: true, out r)); Assert.True(r);
+        Assert.Equal("-", source.RemoveAll(value, new CharComparer(true), out r)); Assert.True(r);
+        Assert.Equal("-", source.RemoveAll(value, StringComparer.OrdinalIgnoreCase, out r)); Assert.True(r);
+        Assert.Equal("-", source.RemoveAll(value, StringComparison.OrdinalIgnoreCase, out r)); Assert.True(r);
 
-        source = "-x-x-".AsSpan();
-
-        target = source.RemoveAll(value); Assert.Equal(source, target);
-        target = source.RemoveAll(value, ignoreCase: false); Assert.Equal(source, target);
-        target = source.RemoveAll(value, ignoreCase: true); Assert.Equal("---", target);
-        target = source.RemoveAll(value, new CharComparer(false)); Assert.Equal(source, target);
-        target = source.RemoveAll(value, new CharComparer(true)); Assert.Equal("---", target);
-        target = source.RemoveAll(value, StringComparer.Ordinal); Assert.Equal(source, target);
-        target = source.RemoveAll(value, StringComparer.OrdinalIgnoreCase); Assert.Equal("---", target);
-        target = source.RemoveAll(value, StringComparison.Ordinal); Assert.Equal(source, target);
-        target = source.RemoveAll(value, StringComparison.OrdinalIgnoreCase); Assert.Equal("---", target);
-    }
-
-    // ----------------------------------------------------
-
-    //[Enforced]
-    [Fact]
-    public static void Test_RemoveHead_Char()
-    {
-        StringSpan target;
-        var source = "".AsSpan();
-        var value = 'X';
-        target = source.RemoveHead(value); Assert.Equal(source, target);
-
-        source = "-x-x-".AsSpan();
-        target = source.RemoveHead(value); Assert.Equal(source, target);
-
-        source = "x-x-".AsSpan();
-        target = source.RemoveHead(value); Assert.Equal(source, target);
-        target = source.RemoveHead(value, ignoreCase: false); Assert.Equal(source, target);
-        target = source.RemoveHead(value, ignoreCase: true); Assert.Equal("-x-", target);
-        target = source.RemoveHead(value, new CharComparer(false)); Assert.Equal(source, target);
-        target = source.RemoveHead(value, new CharComparer(true)); Assert.Equal("-x-", target);
-        target = source.RemoveHead(value, StringComparer.Ordinal); Assert.Equal(source, target);
-        target = source.RemoveHead(value, StringComparer.OrdinalIgnoreCase); Assert.Equal("-x-", target);
-        target = source.RemoveHead(value, StringComparison.Ordinal); Assert.Equal(source, target);
-        target = source.RemoveHead(value, StringComparison.OrdinalIgnoreCase); Assert.Equal("-x-", target);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_RemoveHead_String()
-    {
-        StringSpan target;
-        var source = "".AsSpan();
-        var value = "";
-        target = source.RemoveHead(value); Assert.Equal(source, target);
-
-        value = "X";
-        target = source.RemoveHead(value); Assert.Equal(source, target);
-
-        source = "-x-x-".AsSpan();
-        target = source.RemoveHead(value); Assert.Equal(source, target);
-
-        source = "x-x-".AsSpan();
-        target = source.RemoveHead(value); Assert.Equal(source, target);
-        target = source.RemoveHead(value, ignoreCase: false); Assert.Equal(source, target);
-        target = source.RemoveHead(value, ignoreCase: true); Assert.Equal("-x-", target);
-        target = source.RemoveHead(value, new CharComparer(false)); Assert.Equal(source, target);
-        target = source.RemoveHead(value, new CharComparer(true)); Assert.Equal("-x-", target);
-        target = source.RemoveHead(value, StringComparer.Ordinal); Assert.Equal(source, target);
-        target = source.RemoveHead(value, StringComparer.OrdinalIgnoreCase); Assert.Equal("-x-", target);
-        target = source.RemoveHead(value, StringComparison.Ordinal); Assert.Equal(source, target);
-        target = source.RemoveHead(value, StringComparison.OrdinalIgnoreCase); Assert.Equal("-x-", target);
-    }
-
-    // ----------------------------------------------------
-
-    //[Enforced]
-    [Fact]
-    public static void Test_RemoveTail_Char()
-    {
-        StringSpan target;
-        var source = "".AsSpan();
-        var value = 'X';
-        target = source.RemoveTail(value); Assert.Equal(source, target);
-
-        source = "-x-x-".AsSpan();
-        target = source.RemoveTail(value); Assert.Equal(source, target);
-
-        source = "-x-x".AsSpan();
-        target = source.RemoveTail(value); Assert.Equal(source, target);
-        target = source.RemoveTail(value, ignoreCase: false); Assert.Equal(source, target);
-        target = source.RemoveTail(value, ignoreCase: true); Assert.Equal("-x-", target);
-        target = source.RemoveTail(value, new CharComparer(false)); Assert.Equal(source, target);
-        target = source.RemoveTail(value, new CharComparer(true)); Assert.Equal("-x-", target);
-        target = source.RemoveTail(value, StringComparer.Ordinal); Assert.Equal(source, target);
-        target = source.RemoveTail(value, StringComparer.OrdinalIgnoreCase); Assert.Equal("-x-", target);
-        target = source.RemoveTail(value, StringComparison.Ordinal); Assert.Equal(source, target);
-        target = source.RemoveTail(value, StringComparison.OrdinalIgnoreCase); Assert.Equal("-x-", target);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_RemoveTail_String()
-    {
-        StringSpan target;
-        var source = "".AsSpan();
-        var value = "";
-        target = source.RemoveTail(value); Assert.Equal(source, target);
-
-        value = "X";
-        target = source.RemoveTail(value); Assert.Equal(source, target);
-
-        source = "-x-x-".AsSpan();
-        target = source.RemoveTail(value); Assert.Equal(source, target);
-
-        source = "-x-x".AsSpan();
-        target = source.RemoveTail(value); Assert.Equal(source, target);
-        target = source.RemoveTail(value, ignoreCase: false); Assert.Equal(source, target);
-        target = source.RemoveTail(value, ignoreCase: true); Assert.Equal("-x-", target);
-        target = source.RemoveTail(value, new CharComparer(false)); Assert.Equal(source, target);
-        target = source.RemoveTail(value, new CharComparer(true)); Assert.Equal("-x-", target);
-        target = source.RemoveTail(value, StringComparer.Ordinal); Assert.Equal(source, target);
-        target = source.RemoveTail(value, StringComparer.OrdinalIgnoreCase); Assert.Equal("-x-", target);
-        target = source.RemoveTail(value, StringComparison.Ordinal); Assert.Equal(source, target);
-        target = source.RemoveTail(value, StringComparison.OrdinalIgnoreCase); Assert.Equal("-x-", target);
+        source = "XY-XY";
+        Assert.Equal("XY-XY", source.RemoveAll(value, out r)); Assert.False(r);
+        Assert.Equal("-", source.RemoveAll(value, ignoreCase: true, out r)); Assert.True(r);
+        Assert.Equal("-", source.RemoveAll(value, new CharComparer(true), out r)); Assert.True(r);
+        Assert.Equal("-", source.RemoveAll(value, StringComparer.OrdinalIgnoreCase, out r)); Assert.True(r);
+        Assert.Equal("-", source.RemoveAll(value, StringComparison.OrdinalIgnoreCase, out r)); Assert.True(r);
     }
 
     // ----------------------------------------------------
@@ -642,22 +654,24 @@ public static class Test_StringSpanExtensions
     [Fact]
     public static void Test_HeadIndex_Char()
     {
-        char value;
-        StringSpan source;
+        ReadOnlySpan<char> source;
+        var value = 'x';
 
-        value = ' '; source = "".AsSpan(); Assert.Equal(-1, source.HeadIndex(value));
-        value = 'x'; source = " x "; Assert.Equal(1, source.HeadIndex(value));
+        source = ""; Assert.Equal(-1, source.HeadIndex(value));
+        source = "-x"; Assert.Equal(-1, source.HeadIndex(value));
 
-        source = " x--".AsSpan();
-        value = 'X';
-        Assert.Equal(-1, source.HeadIndex(value));
-        Assert.Equal(-1, source.HeadIndex(value, ignoreCase: false));
+        source = " x-x ";
+        Assert.Equal(1, source.HeadIndex(value));
         Assert.Equal(1, source.HeadIndex(value, ignoreCase: true));
-        Assert.Equal(-1, source.HeadIndex(value, new CharComparer(false)));
         Assert.Equal(1, source.HeadIndex(value, new CharComparer(true)));
-        Assert.Equal(-1, source.HeadIndex(value, StringComparer.Ordinal));
         Assert.Equal(1, source.HeadIndex(value, StringComparer.OrdinalIgnoreCase));
-        Assert.Equal(-1, source.HeadIndex(value, StringComparison.Ordinal));
+        Assert.Equal(1, source.HeadIndex(value, StringComparison.OrdinalIgnoreCase));
+
+        source = " X-X ";
+        Assert.Equal(-1, source.HeadIndex(value));
+        Assert.Equal(1, source.HeadIndex(value, ignoreCase: true));
+        Assert.Equal(1, source.HeadIndex(value, new CharComparer(true)));
+        Assert.Equal(1, source.HeadIndex(value, StringComparer.OrdinalIgnoreCase));
         Assert.Equal(1, source.HeadIndex(value, StringComparison.OrdinalIgnoreCase));
     }
 
@@ -665,25 +679,24 @@ public static class Test_StringSpanExtensions
     [Fact]
     public static void Test_HeadIndex_String()
     {
-        string value;
-        StringSpan source;
+        ReadOnlySpan<char> source;
+        var value = "xy";
 
-        value = ""; source = "".AsSpan(); Assert.Equal(0, source.HeadIndex(value));
-        value = ""; source = " ".AsSpan(); Assert.Equal(0, source.HeadIndex(value));
-        value = " "; source = "".AsSpan(); Assert.Equal(-1, source.HeadIndex(value));
+        source = ""; Assert.Equal(-1, source.HeadIndex(value));
+        source = "-xy"; Assert.Equal(-1, source.HeadIndex(value));
 
-        value = "x "; source = " x "; Assert.Equal(1, source.HeadIndex(value));
-
-        source = "  x--".AsSpan();
-        value = " X";
-        Assert.Equal(-1, source.HeadIndex(value));
-        Assert.Equal(-1, source.HeadIndex(value, ignoreCase: false));
+        source = " xy-xy ";
+        Assert.Equal(1, source.HeadIndex(value));
         Assert.Equal(1, source.HeadIndex(value, ignoreCase: true));
-        Assert.Equal(-1, source.HeadIndex(value, new CharComparer(false)));
         Assert.Equal(1, source.HeadIndex(value, new CharComparer(true)));
-        Assert.Equal(-1, source.HeadIndex(value, StringComparer.Ordinal));
         Assert.Equal(1, source.HeadIndex(value, StringComparer.OrdinalIgnoreCase));
-        Assert.Equal(-1, source.HeadIndex(value, StringComparison.Ordinal));
+        Assert.Equal(1, source.HeadIndex(value, StringComparison.OrdinalIgnoreCase));
+
+        source = " XY-XY ";
+        Assert.Equal(-1, source.HeadIndex(value));
+        Assert.Equal(1, source.HeadIndex(value, ignoreCase: true));
+        Assert.Equal(1, source.HeadIndex(value, new CharComparer(true)));
+        Assert.Equal(1, source.HeadIndex(value, StringComparer.OrdinalIgnoreCase));
         Assert.Equal(1, source.HeadIndex(value, StringComparison.OrdinalIgnoreCase));
     }
 
@@ -693,48 +706,153 @@ public static class Test_StringSpanExtensions
     [Fact]
     public static void Test_TailIndex_Char()
     {
-        char value;
-        StringSpan source;
+        ReadOnlySpan<char> source;
+        var value = 'x';
 
-        value = ' '; source = "".AsSpan(); Assert.Equal(-1, source.TailIndex(value));
-        value = 'x'; source = " x "; Assert.Equal(1, source.TailIndex(value));
+        source = ""; Assert.Equal(-1, source.TailIndex(value));
+        source = "x-"; Assert.Equal(-1, source.TailIndex(value));
 
-        value = 'X';
-        source = "--x  ";
+        source = " x-x ";
+        Assert.Equal(3, source.TailIndex(value));
+        Assert.Equal(3, source.TailIndex(value, ignoreCase: true));
+        Assert.Equal(3, source.TailIndex(value, new CharComparer(true)));
+        Assert.Equal(3, source.TailIndex(value, StringComparer.OrdinalIgnoreCase));
+        Assert.Equal(3, source.TailIndex(value, StringComparison.OrdinalIgnoreCase));
+
+        source = " X-X ";
         Assert.Equal(-1, source.TailIndex(value));
-        Assert.Equal(-1, source.TailIndex(value, ignoreCase: false));
-        Assert.Equal(2, source.TailIndex(value, ignoreCase: true));
-        Assert.Equal(-1, source.TailIndex(value, new CharComparer(false)));
-        Assert.Equal(2, source.TailIndex(value, new CharComparer(true)));
-        Assert.Equal(-1, source.TailIndex(value, StringComparer.Ordinal));
-        Assert.Equal(2, source.TailIndex(value, StringComparer.OrdinalIgnoreCase));
-        Assert.Equal(-1, source.TailIndex(value, StringComparison.Ordinal));
-        Assert.Equal(2, source.TailIndex(value, StringComparison.OrdinalIgnoreCase));
+        Assert.Equal(3, source.TailIndex(value, ignoreCase: true));
+        Assert.Equal(3, source.TailIndex(value, new CharComparer(true)));
+        Assert.Equal(3, source.TailIndex(value, StringComparer.OrdinalIgnoreCase));
+        Assert.Equal(3, source.TailIndex(value, StringComparison.OrdinalIgnoreCase));
     }
 
     //[Enforced]
     [Fact]
     public static void Test_TailIndex_String()
     {
-        string value;
-        StringSpan source;
+        ReadOnlySpan<char> source;
+        var value = "xy";
 
-        value = ""; source = "".AsSpan(); Assert.Equal(0, source.TailIndex(value));
-        value = ""; source = " ".AsSpan(); Assert.Equal(1, source.TailIndex(value));
-        value = " "; source = "".AsSpan(); Assert.Equal(-1, source.TailIndex(value));
+        source = ""; Assert.Equal(-1, source.TailIndex(value));
+        source = "xy-"; Assert.Equal(-1, source.TailIndex(value));
 
-        value = "x "; source = " x "; Assert.Equal(1, source.TailIndex(value));
+        source = " xy-xy ";
+        Assert.Equal(4, source.TailIndex(value));
+        Assert.Equal(4, source.TailIndex(value, ignoreCase: true));
+        Assert.Equal(4, source.TailIndex(value, new CharComparer(true)));
+        Assert.Equal(4, source.TailIndex(value, StringComparer.OrdinalIgnoreCase));
+        Assert.Equal(4, source.TailIndex(value, StringComparison.OrdinalIgnoreCase));
 
-        source = "--x  ".AsSpan();
-        value = "X ";
+        source = " XY-XY ";
         Assert.Equal(-1, source.TailIndex(value));
-        Assert.Equal(-1, source.TailIndex(value, ignoreCase: false));
-        Assert.Equal(2, source.TailIndex(value, ignoreCase: true));
-        Assert.Equal(-1, source.TailIndex(value, new CharComparer(false)));
-        Assert.Equal(2, source.TailIndex(value, new CharComparer(true)));
-        Assert.Equal(-1, source.TailIndex(value, StringComparer.Ordinal));
-        Assert.Equal(2, source.TailIndex(value, StringComparer.OrdinalIgnoreCase));
-        Assert.Equal(-1, source.TailIndex(value, StringComparison.Ordinal));
-        Assert.Equal(2, source.TailIndex(value, StringComparison.OrdinalIgnoreCase));
+        Assert.Equal(4, source.TailIndex(value, ignoreCase: true));
+        Assert.Equal(4, source.TailIndex(value, new CharComparer(true)));
+        Assert.Equal(4, source.TailIndex(value, StringComparer.OrdinalIgnoreCase));
+        Assert.Equal(4, source.TailIndex(value, StringComparison.OrdinalIgnoreCase));
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_RemoveHead_Char()
+    {
+        ReadOnlySpan<char> source;
+        var value = 'x';
+
+        source = "";
+        Assert.Equal(source, source.RemoveHead(value, out var r)); Assert.False(r);
+
+        source = " x-x ";
+        Assert.Equal(" -x ", source.RemoveHead(value, out r)); Assert.True(r);
+        Assert.Equal(" -x ", source.RemoveHead(value, ignoreCase: true, out r)); Assert.True(r);
+        Assert.Equal(" -x ", source.RemoveHead(value, new CharComparer(true), out r)); Assert.True(r);
+        Assert.Equal(" -x ", source.RemoveHead(value, StringComparer.OrdinalIgnoreCase, out r)); Assert.True(r);
+        Assert.Equal(" -x ", source.RemoveHead(value, StringComparison.OrdinalIgnoreCase, out r)); Assert.True(r);
+
+        source = " X-X ";
+        Assert.Equal(" X-X ", source.RemoveHead(value, out r)); Assert.False(r);
+        Assert.Equal(" -X ", source.RemoveHead(value, ignoreCase: true, out r)); Assert.True(r);
+        Assert.Equal(" -X ", source.RemoveHead(value, new CharComparer(true), out r)); Assert.True(r);
+        Assert.Equal(" -X ", source.RemoveHead(value, StringComparer.OrdinalIgnoreCase, out r)); Assert.True(r);
+        Assert.Equal(" -X ", source.RemoveHead(value, StringComparison.OrdinalIgnoreCase, out r)); Assert.True(r);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_RemoveHead_String()
+    {
+        ReadOnlySpan<char> source;
+        var value = "xy";
+
+        source = "";
+        Assert.Equal(source, source.RemoveHead(value, out var r)); Assert.False(r);
+
+        source = " xy-xy ";
+        Assert.Equal(" -xy ", source.RemoveHead(value, out r)); Assert.True(r);
+        Assert.Equal(" -xy ", source.RemoveHead(value, ignoreCase: true, out r)); Assert.True(r);
+        Assert.Equal(" -xy ", source.RemoveHead(value, new CharComparer(true), out r)); Assert.True(r);
+        Assert.Equal(" -xy ", source.RemoveHead(value, StringComparer.OrdinalIgnoreCase, out r)); Assert.True(r);
+        Assert.Equal(" -xy ", source.RemoveHead(value, StringComparison.OrdinalIgnoreCase, out r)); Assert.True(r);
+
+        source = " XY-XY ";
+        Assert.Equal(" XY-XY ", source.RemoveHead(value, out r)); Assert.False(r);
+        Assert.Equal(" -XY ", source.RemoveHead(value, ignoreCase: true, out r)); Assert.True(r);
+        Assert.Equal(" -XY ", source.RemoveHead(value, new CharComparer(true), out r)); Assert.True(r);
+        Assert.Equal(" -XY ", source.RemoveHead(value, StringComparer.OrdinalIgnoreCase, out r)); Assert.True(r);
+        Assert.Equal(" -XY ", source.RemoveHead(value, StringComparison.OrdinalIgnoreCase, out r)); Assert.True(r);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_RemoveTail_Char()
+    {
+        ReadOnlySpan<char> source;
+        var value = 'x';
+
+        source = "";
+        Assert.Equal(source, source.RemoveTail(value, out var r)); Assert.False(r);
+
+        source = " x-x ";
+        Assert.Equal(" x- ", source.RemoveTail(value, out r)); Assert.True(r);
+        Assert.Equal(" x- ", source.RemoveTail(value, ignoreCase: true, out r)); Assert.True(r);
+        Assert.Equal(" x- ", source.RemoveTail(value, new CharComparer(true), out r)); Assert.True(r);
+        Assert.Equal(" x- ", source.RemoveTail(value, StringComparer.OrdinalIgnoreCase, out r)); Assert.True(r);
+        Assert.Equal(" x- ", source.RemoveTail(value, StringComparison.OrdinalIgnoreCase, out r)); Assert.True(r);
+
+        source = " X-X ";
+        Assert.Equal(" X-X ", source.RemoveTail(value, out r)); Assert.False(r);
+        Assert.Equal(" X- ", source.RemoveTail(value, ignoreCase: true, out r)); Assert.True(r);
+        Assert.Equal(" X- ", source.RemoveTail(value, new CharComparer(true), out r)); Assert.True(r);
+        Assert.Equal(" X- ", source.RemoveTail(value, StringComparer.OrdinalIgnoreCase, out r)); Assert.True(r);
+        Assert.Equal(" X- ", source.RemoveTail(value, StringComparison.OrdinalIgnoreCase, out r)); Assert.True(r);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_RemoveTail_String()
+    {
+        ReadOnlySpan<char> source;
+        var value = "xy";
+
+        source = "";
+        Assert.Equal(source, source.RemoveTail(value, out var r)); Assert.False(r);
+
+        source = " xy-xy ";
+        Assert.Equal(" xy- ", source.RemoveTail(value, out r)); Assert.True(r);
+        Assert.Equal(" xy- ", source.RemoveTail(value, ignoreCase: true, out r)); Assert.True(r);
+        Assert.Equal(" xy- ", source.RemoveTail(value, new CharComparer(true), out r)); Assert.True(r);
+        Assert.Equal(" xy- ", source.RemoveTail(value, StringComparer.OrdinalIgnoreCase, out r)); Assert.True(r);
+        Assert.Equal(" xy- ", source.RemoveTail(value, StringComparison.OrdinalIgnoreCase, out r)); Assert.True(r);
+
+        source = " XY-XY ";
+        Assert.Equal(" XY-XY ", source.RemoveTail(value, out r)); Assert.False(r);
+        Assert.Equal(" XY- ", source.RemoveTail(value, ignoreCase: true, out r)); Assert.True(r);
+        Assert.Equal(" XY- ", source.RemoveTail(value, new CharComparer(true), out r)); Assert.True(r);
+        Assert.Equal(" XY- ", source.RemoveTail(value, StringComparer.OrdinalIgnoreCase, out r)); Assert.True(r);
+        Assert.Equal(" XY- ", source.RemoveTail(value, StringComparison.OrdinalIgnoreCase, out r)); Assert.True(r);
     }
 }

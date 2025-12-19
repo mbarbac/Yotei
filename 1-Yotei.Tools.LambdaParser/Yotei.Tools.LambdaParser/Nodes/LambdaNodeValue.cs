@@ -30,7 +30,13 @@ public class LambdaNodeValue : LambdaNode
     /// <inheritdoc/>
     /// </summary>
     /// <returns><inheritdoc/></returns>
-    public override string ToString() => $"'{LambdaValue.Sketch()}'";
+    public override string ToString()
+    {
+        var options = SketchOptions.Default with
+        { TypeOptions = EasyNameOptions.Default with { TypeHideName = true } };
+
+        return $"'{LambdaValue.Sketch(options)}'";
+    }
 
     /// <summary>
     /// <inheritdoc/>

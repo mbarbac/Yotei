@@ -184,12 +184,14 @@ public static class SketchExtensions
         /// <summary>
         /// Tries to preceed the value with a rounded brackets type header, if any.
         /// </summary>
-        string TryRoundedHead(string value) => typename is null ? value : $"({typename}) {value}";
+        string TryRoundedHead(string value)
+            => (typename is null || typename.Length == 0) ? value : $"({typename}) {value}";
 
         /// <summary>
         /// Tries to preceed the value with a dotted type header, if any.
         /// </summary>
-        string TryDottedHead(string value) => typename is null ? value : $"{typename}.{value}";
+        string TryDottedHead(string value)
+            => (typename is null || typename.Length == 0) ? value : $"{typename}.{value}";
 
         /// <summary>
         /// Invokes the appropriate 'ToString(...)' method, if any was captured.
