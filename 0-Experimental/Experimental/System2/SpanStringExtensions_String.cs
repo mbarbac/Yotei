@@ -315,6 +315,266 @@ public static class SpanStringExtensions_String
 
     // ----------------------------------------------------
 
+    // span.IndexOfAny(SearchValues<string> values)
+
+    static int IndexOfAny(
+        StringSpan source, IEnumerable<StringSpan> values, Func<char, char, bool> predicate)
+    {
+        foreach (var item in values)
+        {
+            var index = IndexOf(source, item, predicate);
+            if (index >= 0) return index;
+        }
+        return -1;
+    }
+
+    /// <summary>
+    /// Determines if the given source contains any of the given values and, if so, returns the
+    /// index of the first match. Otherwise, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static int IndexOfAny(
+        this StringSpan source, IEnumerable<StringSpan> values)
+        => IndexOfAny(source, values, static (x, y) => x == y);
+
+    /// <summary>
+    /// Determines if the given source contains any of the given values and, if so, returns the
+    /// index of the first match. Otherwise, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="ignoreCase"></param>
+    /// <returns></returns>
+    public static int IndexOfAny(
+        this StringSpan source, IEnumerable<StringSpan> values, bool ignoreCase)
+        => IndexOfAny(source, values, (x, y) => x.Equals(y, ignoreCase));
+
+    /// <summary>
+    /// Determines if the given source contains any of the given values and, if so, returns the
+    /// index of the first match. Otherwise, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int IndexOfAny(
+        this StringSpan source, IEnumerable<StringSpan> values, IEqualityComparer<char> comparer)
+        => IndexOfAny(source, values, (x, y) => x.Equals(y, comparer));
+
+    /// <summary>
+    /// Determines if the given source contains any of the given values and, if so, returns the
+    /// index of the first match. Otherwise, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int IndexOfAny(
+        this StringSpan source, IEnumerable<StringSpan> values, IEqualityComparer<string> comparer)
+        => IndexOfAny(source, values, (x, y) => x.Equals(y, comparer));
+
+    /// <summary>
+    /// Determines if the given source contains any of the given values and, if so, returns the
+    /// index of the first match. Otherwise, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static int IndexOfAny(
+        this StringSpan source, IEnumerable<StringSpan> values, StringComparison comparison)
+        => IndexOfAny(source, values, (x, y) => x.Equals(y, comparison));
+
+    // ----------------------------------------------------
+
+    // span.ContainsAny(SearchValues<string> values)
+
+    /// <summary>
+    /// Determines if the given source contains any of the given values.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static bool ContainsAny(
+        this StringSpan source, IEnumerable<StringSpan> values)
+        => source.IndexOfAny(values) >= 0;
+
+    /// <summary>
+    /// Determines if the given source contains any of the given values.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="ignoreCase"></param>
+    /// <returns></returns>
+    public static bool ContainsAny(
+        this StringSpan source, IEnumerable<StringSpan> values, bool ignoreCase)
+        => source.IndexOfAny(values, ignoreCase) >= 0;
+
+    /// <summary>
+    /// Determines if the given source contains any of the given values.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool ContainsAny(
+        this StringSpan source, IEnumerable<StringSpan> values, IEqualityComparer<char> comparer)
+        => source.IndexOfAny(values, comparer) >= 0;
+
+    /// <summary>
+    /// Determines if the given source contains any of the given values.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool ContainsAny(
+        this StringSpan source, IEnumerable<StringSpan> values, IEqualityComparer<string> comparer)
+        => source.IndexOfAny(values, comparer) >= 0;
+
+    /// <summary>
+    /// Determines if the given source contains any of the given values.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static bool ContainsAny(
+        this StringSpan source, IEnumerable<StringSpan> values, StringComparison comparison)
+        => source.IndexOfAny(values, comparison) >= 0;
+
+    // ----------------------------------------------------
+
+    static int IndexOfAny(
+       StringSpan source, IEnumerable<string> values, Func<char, char, bool> predicate)
+    {
+        foreach (var item in values)
+        {
+            var index = IndexOf(source, item, predicate);
+            if (index >= 0) return index;
+        }
+        return -1;
+    }
+
+    /// <summary>
+    /// Determines if the given source contains any of the given values and, if so, returns the
+    /// index of the first match. Otherwise, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static int IndexOfAny(
+        this StringSpan source, IEnumerable<string> values)
+        => IndexOfAny(source, values, static (x, y) => x == y);
+
+    /// <summary>
+    /// Determines if the given source contains any of the given values and, if so, returns the
+    /// index of the first match. Otherwise, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="ignoreCase"></param>
+    /// <returns></returns>
+    public static int IndexOfAny(
+        this StringSpan source, IEnumerable<string> values, bool ignoreCase)
+        => IndexOfAny(source, values, (x, y) => x.Equals(y, ignoreCase));
+
+    /// <summary>
+    /// Determines if the given source contains any of the given values and, if so, returns the
+    /// index of the first match. Otherwise, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int IndexOfAny(
+        this StringSpan source, IEnumerable<string> values, IEqualityComparer<char> comparer)
+        => IndexOfAny(source, values, (x, y) => x.Equals(y, comparer));
+
+    /// <summary>
+    /// Determines if the given source contains any of the given values and, if so, returns the
+    /// index of the first match. Otherwise, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int IndexOfAny(
+        this StringSpan source, IEnumerable<string> values, IEqualityComparer<string> comparer)
+        => IndexOfAny(source, values, (x, y) => x.Equals(y, comparer));
+
+    /// <summary>
+    /// Determines if the given source contains any of the given values and, if so, returns the
+    /// index of the first match. Otherwise, returns -1.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static int IndexOfAny(
+        this StringSpan source, IEnumerable<string> values, StringComparison comparison)
+        => IndexOfAny(source, values, (x, y) => x.Equals(y, comparison));
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the given source contains any of the given values.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static bool ContainsAny(
+        this StringSpan source, IEnumerable<string> values)
+        => source.IndexOfAny(values) >= 0;
+
+    /// <summary>
+    /// Determines if the given source contains any of the given values.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="ignoreCase"></param>
+    /// <returns></returns>
+    public static bool ContainsAny(
+        this StringSpan source, IEnumerable<string> values, bool ignoreCase)
+        => source.IndexOfAny(values, ignoreCase) >= 0;
+
+    /// <summary>
+    /// Determines if the given source contains any of the given values.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool ContainsAny(
+        this StringSpan source, IEnumerable<string> values, IEqualityComparer<char> comparer)
+        => source.IndexOfAny(values, comparer) >= 0;
+
+    /// <summary>
+    /// Determines if the given source contains any of the given values.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool ContainsAny(
+        this StringSpan source, IEnumerable<string> values, IEqualityComparer<string> comparer)
+        => source.IndexOfAny(values, comparer) >= 0;
+
+    /// <summary>
+    /// Determines if the given source contains any of the given values.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static bool ContainsAny(
+        this StringSpan source, IEnumerable<string> values, StringComparison comparison)
+        => source.IndexOfAny(values, comparison) >= 0;
+
+    // ----------------------------------------------------
+
     /// <summary>
     /// Returns a new instance in which all the characters from the given index till the last
     /// position have been deleted.
@@ -322,6 +582,8 @@ public static class SpanStringExtensions_String
     /// <param name="source"></param>
     /// <param name="index"></param>
     /// <returns></returns>
+    /// The following is OK because we are anyhow modifying the span...
+    /// <remarks>This method is implemented via the corresponding 'string' one.</remarks>
     [SuppressMessage("", "IDE0057")]
     public static StringSpan Remove(
         this StringSpan source, int index) => source.ToString().Remove(index);
@@ -333,6 +595,8 @@ public static class SpanStringExtensions_String
     /// <param name="source"></param>
     /// <param name="index"></param>
     /// <returns></returns>
+    /// The following is OK because we are anyhow modifying the span...
+    /// <remarks>This method is implemented via the corresponding 'string' one.</remarks>
     public static StringSpan Remove(this StringSpan source, int index, int count)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(index, 0);
@@ -601,7 +865,7 @@ public static class SpanStringExtensions_String
     /// <returns></returns>
     public static StringSpan RemoveLast(
         this StringSpan source, StringSpan value, StringComparison comparison, out bool removed)
-        => Remove(source, value, (x, y) => x.Equals(y, comparison), out removed);
+        => RemoveLast(source, value, (x, y) => x.Equals(y, comparison), out removed);
 
     // ----------------------------------------------------
 
@@ -735,7 +999,7 @@ public static class SpanStringExtensions_String
     /// <returns></returns>
     public static StringSpan RemoveAll(
         this StringSpan source, StringSpan value, StringComparison comparison, out bool removed)
-        => Remove(source, value, (x, y) => x.Equals(y, comparison), out removed);
+        => RemoveAll(source, value, (x, y) => x.Equals(y, comparison), out removed);
 
     // ----------------------------------------------------
 
@@ -748,8 +1012,7 @@ public static class SpanStringExtensions_String
         var index = IndexOf(source, value, predicate);
         if (index >= 0)
         {
-            for (int i = index - 1; i >= 0; i--)
-                if (source[index] != ' ') return -1;
+            for (int i = index - 1; i >= 0; i--) if (source[i] != ' ') return -1;
         }
         return index;
     }
@@ -762,7 +1025,7 @@ public static class SpanStringExtensions_String
     /// <param name="value"></param>
     /// <returns></returns>
     public static int HeadIndex(
-        StringSpan source, StringSpan value) => HeadIndex(source, value, static (x, y) => x == y);
+        this StringSpan source,StringSpan value) => HeadIndex(source, value, static (x, y) => x == y);
 
     /// <summary>
     /// Determines if the given source starts with the given value, ignoring the heading spaces.
@@ -773,7 +1036,7 @@ public static class SpanStringExtensions_String
     /// <param name="ignoreCase"></param>
     /// <returns></returns>
     public static int HeadIndex(
-        StringSpan source, StringSpan value, bool ignoreCase)
+        this StringSpan source,StringSpan value, bool ignoreCase)
         => HeadIndex(source, value, (x, y) => x.Equals(y, ignoreCase));
 
     /// <summary>
@@ -785,7 +1048,7 @@ public static class SpanStringExtensions_String
     /// <param name="comparer"></param>
     /// <returns></returns>
     public static int HeadIndex(
-        StringSpan source, StringSpan value, IEqualityComparer<char> comparer)
+        this StringSpan source,StringSpan value, IEqualityComparer<char> comparer)
         => HeadIndex(source, value, (x, y) => x.Equals(y, comparer));
 
     /// <summary>
@@ -797,7 +1060,7 @@ public static class SpanStringExtensions_String
     /// <param name="comparer"></param>
     /// <returns></returns>
     public static int HeadIndex(
-        StringSpan source, StringSpan value, IEqualityComparer<string> comparer)
+        this StringSpan source,StringSpan value, IEqualityComparer<string> comparer)
         => HeadIndex(source, value, (x, y) => x.Equals(y, comparer));
 
     /// <summary>
@@ -809,7 +1072,7 @@ public static class SpanStringExtensions_String
     /// <param name="comparison"></param>
     /// <returns></returns>
     public static int HeadIndex(
-        StringSpan source, StringSpan value, StringComparison comparison)
+        this StringSpan source,StringSpan value, StringComparison comparison)
         => HeadIndex(source, value, (x, y) => x.Equals(y, comparison));
 
     // ----------------------------------------------------
@@ -837,7 +1100,7 @@ public static class SpanStringExtensions_String
     /// <param name="value"></param>
     /// <returns></returns>
     public static int TailIndex(
-        StringSpan source, StringSpan value) => TailIndex(source, value, static (x, y) => x == y);
+        this StringSpan source, StringSpan value) => TailIndex(source, value, static (x, y) => x == y);
 
     /// <summary>
     /// Determines if the given source ends with the given value, ignoring the tailing spaces.
@@ -848,7 +1111,7 @@ public static class SpanStringExtensions_String
     /// <param name="ignoreCase"></param>
     /// <returns></returns>
     public static int TailIndex(
-        StringSpan source, StringSpan value, bool ignoreCase)
+        this StringSpan source, StringSpan value, bool ignoreCase)
         => TailIndex(source, value, (x, y) => x.Equals(y, ignoreCase));
 
     /// <summary>
@@ -860,7 +1123,7 @@ public static class SpanStringExtensions_String
     /// <param name="comparer"></param>
     /// <returns></returns>
     public static int TailIndex(
-        StringSpan source, StringSpan value, IEqualityComparer<char> comparer)
+        this StringSpan source, StringSpan value, IEqualityComparer<char> comparer)
         => TailIndex(source, value, (x, y) => x.Equals(y, comparer));
 
     /// <summary>
@@ -872,7 +1135,7 @@ public static class SpanStringExtensions_String
     /// <param name="comparer"></param>
     /// <returns></returns>
     public static int TailIndex(
-        StringSpan source, StringSpan value, IEqualityComparer<string> comparer)
+        this StringSpan source, StringSpan value, IEqualityComparer<string> comparer)
         => TailIndex(source, value, (x, y) => x.Equals(y, comparer));
 
     /// <summary>
@@ -884,13 +1147,13 @@ public static class SpanStringExtensions_String
     /// <param name="comparison"></param>
     /// <returns></returns>
     public static int TailIndex(
-        StringSpan source, StringSpan value, StringComparison comparison)
+        this StringSpan source, StringSpan value, StringComparison comparison)
         => TailIndex(source, value, (x, y) => x.Equals(y, comparison));
 
     // ----------------------------------------------------
 
     static StringSpan RemoveHead(
-        this StringSpan source, StringSpan value,
+        StringSpan source, StringSpan value,
         Func<char, char, bool> predicate,
         out bool removed)
     {
@@ -912,7 +1175,7 @@ public static class SpanStringExtensions_String
     /// <param name="value"></param>
     /// <returns></returns>
     public static StringSpan RemoveHead(
-        StringSpan source, StringSpan value)
+        this StringSpan source, StringSpan value)
         => RemoveHead(source, value, static (x, y) => x == y, out _);
 
     /// <summary>
@@ -924,7 +1187,7 @@ public static class SpanStringExtensions_String
     /// <param name="removed"></param>
     /// <returns></returns>
     public static StringSpan RemoveHead(
-        StringSpan source, StringSpan value, out bool removed)
+        this StringSpan source, StringSpan value, out bool removed)
         => RemoveHead(source, value, static (x, y) => x == y, out removed);
 
     /// <summary>
@@ -936,7 +1199,7 @@ public static class SpanStringExtensions_String
     /// <param name="ignoreCase"></param>
     /// <returns></returns>
     public static StringSpan RemoveHead(
-        StringSpan source, StringSpan value, bool ignoreCase)
+        this StringSpan source, StringSpan value, bool ignoreCase)
         => RemoveHead(source, value, (x, y) => x.Equals(y, ignoreCase), out _);
 
     /// <summary>
@@ -949,7 +1212,7 @@ public static class SpanStringExtensions_String
     /// <param name="removed"></param>
     /// <returns></returns>
     public static StringSpan RemoveHead(
-        StringSpan source, StringSpan value, bool ignoreCase, out bool removed)
+        this StringSpan source, StringSpan value, bool ignoreCase, out bool removed)
         => RemoveHead(source, value, (x, y) => x.Equals(y, ignoreCase), out removed);
 
     /// <summary>
@@ -961,7 +1224,7 @@ public static class SpanStringExtensions_String
     /// <param name="comparer"></param>
     /// <returns></returns>
     public static StringSpan RemoveHead(
-        StringSpan source, StringSpan value, IEqualityComparer<char> comparer)
+        this StringSpan source, StringSpan value, IEqualityComparer<char> comparer)
         => RemoveHead(source, value, (x, y) => x.Equals(y, comparer), out _);
 
     /// <summary>
@@ -974,7 +1237,7 @@ public static class SpanStringExtensions_String
     /// <param name="removed"></param>
     /// <returns></returns>
     public static StringSpan RemoveHead(
-        StringSpan source, StringSpan value, IEqualityComparer<char> comparer, out bool removed)
+        this StringSpan source, StringSpan value, IEqualityComparer<char> comparer, out bool removed)
         => RemoveHead(source, value, (x, y) => x.Equals(y, comparer), out removed);
 
     /// <summary>
@@ -986,7 +1249,7 @@ public static class SpanStringExtensions_String
     /// <param name="comparer"></param>
     /// <returns></returns>
     public static StringSpan RemoveHead(
-        StringSpan source, StringSpan value, IEqualityComparer<string> comparer)
+        this StringSpan source, StringSpan value, IEqualityComparer<string> comparer)
         => RemoveHead(source, value, (x, y) => x.Equals(y, comparer), out _);
 
     /// <summary>
@@ -999,7 +1262,7 @@ public static class SpanStringExtensions_String
     /// <param name="removed"></param>
     /// <returns></returns>
     public static StringSpan RemoveHead(
-        StringSpan source, StringSpan value, IEqualityComparer<string> comparer, out bool removed)
+        this StringSpan source, StringSpan value, IEqualityComparer<string> comparer, out bool removed)
         => RemoveHead(source, value, (x, y) => x.Equals(y, comparer), out removed);
 
     /// <summary>
@@ -1011,7 +1274,7 @@ public static class SpanStringExtensions_String
     /// <param name="comparer"></param>
     /// <returns></returns>
     public static StringSpan RemoveHead(
-        StringSpan source, StringSpan value, StringComparison comparison)
+        this StringSpan source, StringSpan value, StringComparison comparison)
         => RemoveHead(source, value, (x, y) => x.Equals(y, comparison), out _);
 
     /// <summary>
@@ -1024,13 +1287,13 @@ public static class SpanStringExtensions_String
     /// <param name="removed"></param>
     /// <returns></returns>
     public static StringSpan RemoveHead(
-        StringSpan source, StringSpan value, StringComparison comparison, out bool removed)
+        this StringSpan source, StringSpan value, StringComparison comparison, out bool removed)
         => RemoveHead(source, value, (x, y) => x.Equals(y, comparison), out removed);
 
     // ----------------------------------------------------
 
     static StringSpan RemoveTail(
-        this StringSpan source, StringSpan value,
+        StringSpan source, StringSpan value,
         Func<char, char, bool> predicate,
         out bool removed)
     {
@@ -1052,7 +1315,7 @@ public static class SpanStringExtensions_String
     /// <param name="value"></param>
     /// <returns></returns>
     public static StringSpan RemoveTail(
-        StringSpan source, StringSpan value)
+        this StringSpan source, StringSpan value)
         => RemoveTail(source, value, static (x, y) => x == y, out _);
 
     /// <summary>
@@ -1064,7 +1327,7 @@ public static class SpanStringExtensions_String
     /// <param name="removed"></param>
     /// <returns></returns>
     public static StringSpan RemoveTail(
-        StringSpan source, StringSpan value, out bool removed)
+        this StringSpan source, StringSpan value, out bool removed)
         => RemoveTail(source, value, static (x, y) => x == y, out removed);
 
     /// <summary>
@@ -1076,7 +1339,7 @@ public static class SpanStringExtensions_String
     /// <param name="ignoreCase"></param>
     /// <returns></returns>
     public static StringSpan RemoveTail(
-        StringSpan source, StringSpan value, bool ignoreCase)
+        this StringSpan source, StringSpan value, bool ignoreCase)
         => RemoveTail(source, value, (x, y) => x.Equals(y, ignoreCase), out _);
 
     /// <summary>
@@ -1089,7 +1352,7 @@ public static class SpanStringExtensions_String
     /// <param name="removed"></param>
     /// <returns></returns>
     public static StringSpan RemoveTail(
-        StringSpan source, StringSpan value, bool ignoreCase, out bool removed)
+        this StringSpan source, StringSpan value, bool ignoreCase, out bool removed)
         => RemoveTail(source, value, (x, y) => x.Equals(y, ignoreCase), out removed);
 
     /// <summary>
@@ -1101,7 +1364,7 @@ public static class SpanStringExtensions_String
     /// <param name="comparer"></param>
     /// <returns></returns>
     public static StringSpan RemoveTail(
-        StringSpan source, StringSpan value, IEqualityComparer<char> comparer)
+        this StringSpan source, StringSpan value, IEqualityComparer<char> comparer)
         => RemoveTail(source, value, (x, y) => x.Equals(y, comparer), out _);
 
     /// <summary>
@@ -1114,7 +1377,7 @@ public static class SpanStringExtensions_String
     /// <param name="removed"></param>
     /// <returns></returns>
     public static StringSpan RemoveTail(
-        StringSpan source, StringSpan value, IEqualityComparer<char> comparer, out bool removed)
+        this StringSpan source, StringSpan value, IEqualityComparer<char> comparer, out bool removed)
         => RemoveTail(source, value, (x, y) => x.Equals(y, comparer), out removed);
 
     /// <summary>
@@ -1126,7 +1389,7 @@ public static class SpanStringExtensions_String
     /// <param name="comparer"></param>
     /// <returns></returns>
     public static StringSpan RemoveTail(
-        StringSpan source, StringSpan value, IEqualityComparer<string> comparer)
+        this StringSpan source, StringSpan value, IEqualityComparer<string> comparer)
         => RemoveTail(source, value, (x, y) => x.Equals(y, comparer), out _);
 
     /// <summary>
@@ -1139,7 +1402,7 @@ public static class SpanStringExtensions_String
     /// <param name="removed"></param>
     /// <returns></returns>
     public static StringSpan RemoveTail(
-        StringSpan source, StringSpan value, IEqualityComparer<string> comparer, out bool removed)
+        this StringSpan source, StringSpan value, IEqualityComparer<string> comparer, out bool removed)
         => RemoveTail(source, value, (x, y) => x.Equals(y, comparer), out removed);
 
     /// <summary>
@@ -1151,7 +1414,7 @@ public static class SpanStringExtensions_String
     /// <param name="comparer"></param>
     /// <returns></returns>
     public static StringSpan RemoveTail(
-        StringSpan source, StringSpan value, StringComparison comparison)
+        this StringSpan source, StringSpan value, StringComparison comparison)
         => RemoveTail(source, value, (x, y) => x.Equals(y, comparison), out _);
 
     /// <summary>
@@ -1164,6 +1427,6 @@ public static class SpanStringExtensions_String
     /// <param name="removed"></param>
     /// <returns></returns>
     public static StringSpan RemoveTail(
-        StringSpan source, StringSpan value, StringComparison comparison, out bool removed)
+        this StringSpan source, StringSpan value, StringComparison comparison, out bool removed)
         => RemoveTail(source, value, (x, y) => x.Equals(y, comparison), out removed);
 }
