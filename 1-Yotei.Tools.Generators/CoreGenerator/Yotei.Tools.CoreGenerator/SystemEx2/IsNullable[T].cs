@@ -3,7 +3,7 @@
 // ========================================================
 /// <summary>
 /// Used to identify types that shall be treated as nullable ones by source code generators. This
-/// type is mostly used when neither '<typeparamref name="T"/>' nor '<see cref="IsNullable{T}"/>'
+/// type is mostly used when neither '<typeparamref name="T"/>?' nor '<see cref="Nullable{T}"/>'
 /// are accepted by the compiler, as for instance in generic arguments.
 /// </summary>
 /// <typeparam name="T"></typeparam>

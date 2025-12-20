@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools.CoreGenerator;
+﻿using Microsoft.CodeAnalysis.FindSymbols;
+
+namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
 /// <summary>
@@ -13,25 +15,21 @@ internal class CustomList<T> : IList<T>, IList, ICollection<T>, ICollection
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    public CustomList() => Items = [];
+    public CustomList()
+    {
+        ValidateElement = static (item) => item.ThrowWhenNull();
+        CompareElements = static (source, item) => EqualityComparer<T>.Default.Equals(source, item);
+        FlattenElements = true;
+        GetDuplicates = (item) => FindAll(x => CompareElements(item, x), out var found) ? found : [];
+        IncludeDuplicate = (source, item) => throw new DuplicateException("Duplicated element.").WithData(source).WithData(item);
+        Items = [];
+    }
 
     /// <summary>
     /// Initializes a new instance with the elements of the given range.
     /// </summary>
     /// <param name="range"></param>
     public CustomList(IEnumerable<T> range) : this() => AddRange(range);
-
-    /// <summary>
-    /// Copy constructor.
-    /// </summary>
-    /// <param name="source"></param>
-    protected CustomList(CustomList<T> source) => Items = [.. source.ThrowWhenNull()];
-
-    /// <summary>
-    /// <inheritdoc cref="ICloneable.Clone"/>
-    /// </summary>
-    /// <returns></returns>
-    public virtual CustomList<T> Clone() => [.. this];
 
     /// <summary>
     /// <inheritdoc/>
@@ -76,34 +74,86 @@ internal class CustomList<T> : IList<T>, IList, ICollection<T>, ICollection
     /// Invoked to validate the given element before using it in this collection.
     /// <br/> By default, instances of this type do not allow null values and throw an appropriate
     /// exception.
+    /// <para>Do not copy a reference from other instance, prefer references to static methods.</para>
     /// </summary>
     /// <param name="item"></param>
-    public virtual T ValidateElement(T item) => item.ThrowWhenNull();
+    public Func<T, T> ValidateElement
+    {
+        get;
+        init
+        {
+            value.ThrowWhenNull();
+
+            if (field == value) return;
+            if (field is null || Items.Count == 0) { field = value; return; }
+
+            var range = ToList(); Items.Clear();
+            field = value; AddRange(range);
+        }
+    }
 
     /// <summary>
     /// Determines if the two given elements are equal, for the purposes of this collection.
     /// <br/> By default, instances of this type use the default equality comparer of the type
     /// of its elements.
+    /// <para>Do not copy a reference from other instance, prefer references to static methods.</para>
     /// </summary>
     /// <param name="x"></param>
     /// <param name="y"></param>
-    public virtual bool CompareElements(T x, T y) => EqualityComparer<T>.Default.Equals(x, y);
+    public Func<T, T, bool> CompareElements
+    {
+        get;
+        init
+        {
+            value.ThrowWhenNull();
+
+            if (field is null || field == value) return;
+            if (Items.Count == 0) { field = value; return; }
+
+            var range = ToList(); Items.Clear();
+            field = value; AddRange(range);
+        }
+    }
 
     /// <summary>
     /// Determines if the elements that are themselves collection of elements of the type of the
     /// elements of this collection shall be flattened before using them, or not.
     /// <br/> By default, instances of this type flattens input elements.
     /// </summary>
-    public virtual bool FlattenElements { get; init; } = true;
+    public bool FlattenElements
+    {
+        get;
+        init
+        {
+            if (field == value) return;
+            if (Items.Count == 0) { field = value; return; }
+
+            var range = ToList(); Items.Clear();
+            field = value; AddRange(range);
+        }
+    }
 
     /// <summary>
     /// Invoked to find in this collection the duplicates of the given element.
     /// <br/> By default, instances of this type use their virtual comparison method.
+    /// <para>Do not copy a reference from other instance, prefer references to static methods.</para>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IEnumerable<T> GetDuplicates(
-        T item) => FindAll(x => CompareElements(x, item), out var found) ? found : [];
+    public Func<T, IEnumerable<T>> GetDuplicates
+    {
+        get;
+        init
+        {
+            value.ThrowWhenNull();
+
+            if (field is null || field == value) return;
+            if (Items.Count == 0) { field = value; return; }
+
+            var range = ToList(); Items.Clear();
+            field = value; AddRange(range);
+        }
+    }
 
     /// <summary>
     /// Invoked to determine if the given element, which is considered to be a duplicate of the
@@ -111,14 +161,25 @@ internal class CustomList<T> : IList<T>, IList, ICollection<T>, ICollection
     /// '<c>false</c>' if not and ignore the inclusion operation, or otherwise throws an exception
     /// if duplicates are not allowed.
     /// <br/> By default, instances of this type throw an appropriate exception.
+    /// <para>Do not copy a reference from other instance, prefer references to static methods.</para>
     /// </summary>
     /// <param name="source"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public bool IncludeDuplicate(T source, T item) => throw new DuplicateException(
-        "Duplicated element.")
-        .WithData(source)
-        .WithData(item);
+    public Func<T, T, bool> IncludeDuplicate
+    {
+        get;
+        init
+        {
+            value.ThrowWhenNull();
+
+            if (field is null || field == value) return;
+            if (Items.Count == 0) { field = value; return; }
+
+            var range = ToList(); Items.Clear();
+            field = value; AddRange(range);
+        }
+    }
 
     // ----------------------------------------------------
 
