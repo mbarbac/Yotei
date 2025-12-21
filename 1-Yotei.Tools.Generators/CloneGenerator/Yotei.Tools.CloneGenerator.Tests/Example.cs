@@ -10,3 +10,9 @@
 //    {
 //    }
 //}
+
+[Cloneable]
+public partial interface IFake { }
+
+[Cloneable<IFake>]
+partial interface IFake { }

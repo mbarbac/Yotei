@@ -13,12 +13,38 @@
 /// </summary>
 internal class CoreGenerator : IIncrementalGenerator
 {
-    const string ATTRIBUTE = "Attribute";
-
     /// <summary>
     /// Determines if this instance tries to launch a compile-time debug session when compiling.
     /// </summary>
     protected virtual bool LaunchDebugger => false;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// The collection of attributes types used by this generator to identify type candidates
+    /// for source code generation.
+    /// </summary>
+    protected virtual Type[] TypeAttributes { get; } = [];
+
+    /// <summary>
+    /// The collection of attributes types used by this generator to identify property candidates
+    /// for source code generation.
+    /// </summary>
+    protected virtual Type[] PropertyAttributes { get; } = [];
+
+    /// <summary>
+    /// The collection of attributes types used by this generator to identify field candidates
+    /// for source code generation.
+    /// </summary>
+    protected virtual Type[] FieldAttributes { get; } = [];
+
+    /// <summary>
+    /// The collection of attributes types used by this generator to identify method candidates
+    /// for source code generation.
+    /// </summary>
+    protected virtual Type[] MethodAttributes { get; } = [];
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// Invoked at initialization time to register register post-initialization actions, such as
@@ -28,42 +54,11 @@ internal class CoreGenerator : IIncrementalGenerator
     protected virtual void OnInitialized(IncrementalGeneratorPostInitializationContext context) { }
 
     /// <summary>
-    /// The collection of attributes types used by this generator to identify type candidates
-    /// for source code generation.
-    /// </summary>
-    protected virtual Type[] TypeAttributes { get; } = [];
-    string[] TypeAttributeNames = [];
-
-    /// <summary>
-    /// The collection of attributes types used by this generator to identify property candidates
-    /// for source code generation.
-    /// </summary>
-    protected virtual Type[] PropertyAttributes { get; } = [];
-    string[] PropertyAttributeNames = [];
-
-    /// <summary>
-    /// The collection of attributes types used by this generator to identify field candidates
-    /// for source code generation.
-    /// </summary>
-    protected virtual Type[] FieldAttributes { get; } = [];
-    string[] FieldAttributeNames = [];
-
-    /// <summary>
-    /// The collection of attributes types used by this generator to identify method candidates
-    /// for source code generation.
-    /// </summary>
-    protected virtual Type[] MethodAttributes { get; } = [];
-    string[] MethodAttributeNames = [];
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// <inheritdoc/>.
-    /// <para>
-    /// This method is INFRASTRUCTURE ONLY, it shall not be used by application code.</para>
+    /// <inheritdoc/>. By default, this method register actions to identify candidate elements
+    /// whose attributes match any of the given ones for that element kind.
     /// </summary>
     /// <param name="context"></param>
-    public void Initialize(IncrementalGeneratorInitializationContext context)
+    public virtual void Initialize(IncrementalGeneratorInitializationContext context)
     {
         // Launching a compile-time debug session if needed...
         if (LaunchDebugger && !Debugger.IsAttached) Debugger.Launch();
@@ -83,32 +78,174 @@ internal class CoreGenerator : IIncrementalGenerator
 
     /// <summary>
     /// Invoked by the compiler to quickly determine if the given syntax node shall be considered
-    /// as a potential candidate for source code generation, or not.
-    /// <para>
-    /// Unless overriden, this method selects nodes by determining if any of their decorating
-    /// attributes match any of those specified in this instance for that node kind.</para>
+    /// as a potential candidate for source code generation, or not. Only potential candidates are
+    /// passed to the transform phase.
     /// </summary>
     /// <param name="node"></param>
     /// <param name="token"></param>
     /// <returns></returns>
     protected virtual bool Predicate(SyntaxNode node, CancellationToken token)
     {
-        throw null;
+        token.ThrowIfCancellationRequested();
+
+        return node
+            is TypeDeclarationSyntax
+            or PropertyDeclarationSyntax
+            or FieldDeclarationSyntax
+            or MethodDeclarationSyntax;
     }
 
     // ----------------------------------------------------
 
     /// <summary>
+    /// Invoked to create a valid candidate for source code generation. Inheritors may choose
+    /// what elements to use to cache in the returned object.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <param name="syntax"></param>
+    /// <param name="attributes"></param>
+    /// <param name="mode"></param>
+    /// <returns></returns>
+    protected virtual TypeCandidate CreateCandidate(
+        INamedTypeSymbol symbol,
+        TypeDeclarationSyntax syntax,
+        ImmutableArray<AttributeData> attributes,
+        SemanticModel mode)
+        => new(symbol) { Syntax = syntax, Attributes = attributes };
+
+    /// <summary>
+    /// Invoked to create a valid candidate for source code generation. Inheritors may choose
+    /// what elements to use to cache in the returned object.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <param name="syntax"></param>
+    /// <param name="attributes"></param>
+    /// <param name="mode"></param>
+    /// <returns></returns>
+    protected virtual PropertyCandidate CreateCandidate(
+        IPropertySymbol symbol,
+        PropertyDeclarationSyntax syntax,
+        ImmutableArray<AttributeData> attributes,
+        SemanticModel mode)
+        => new(symbol) { Syntax = syntax, Attributes = attributes };
+
+    /// <summary>
+    /// Invoked to create a valid candidate for source code generation. Inheritors may choose
+    /// what elements to use to cache in the returned object.
+    /// </summary>
+    /// <param name="parent"></param>
+    /// <param name="symbol"></param>
+    /// <param name="syntax"></param>
+    /// <param name="attributes"></param>
+    /// <param name="mode"></param>
+    /// <returns></returns>
+    protected virtual FieldCandidate CreateCandidate(
+        IFieldSymbol symbol,
+        FieldDeclarationSyntax syntax,
+        ImmutableArray<AttributeData> attributes,
+        SemanticModel mode)
+        => new(symbol) { Syntax = syntax, Attributes = attributes };
+
+    /// <summary>
+    /// Invoked to create a valid candidate for source code generation. Inheritors may choose
+    /// what elements to use to cache in the returned object.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <param name="syntax"></param>
+    /// <param name="attributes"></param>
+    /// <param name="mode"></param>
+    /// <returns></returns>
+    protected virtual MethodCandidate CreateCandidate(
+        IMethodSymbol symbol,
+        MethodDeclarationSyntax syntax,
+        ImmutableArray<AttributeData> attributes,
+        SemanticModel mode)
+        => new(symbol) { Syntax = syntax, Attributes = attributes };
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Invoked by the compiler to transform the syntax node carried by the given context into a
-    /// source code generation candidate. Returning values can also be error or null ones, which
-    /// are ignored.
+    /// source code generation candidate. This method may also return '<c>null</c>' values if the
+    /// node shall be ignored, or error candidates to report their diagnostics.
     /// </summary>
     /// <param name="context"></param>
     /// <param name="token"></param>
     /// <returns></returns>
+    [SuppressMessage("", "IDE0019")]
     protected virtual ICandidate Transform(GeneratorSyntaxContext context, CancellationToken token)
     {
-        throw null;
+        token.ThrowIfCancellationRequested();
+
+        var syntax = context.Node;
+        var model = context.SemanticModel;
+
+        // Types...
+        while (syntax is TypeDeclarationSyntax typeSyntax)
+        {
+            var symbol = model.GetDeclaredSymbol(typeSyntax, token);
+            if (symbol is null) break;
+
+            var ats = Matches(symbol.GetAttributes(), TypeAttributes).ToArray();
+            if (ats.Length == 0) break;
+
+            return CreateCandidate(symbol, typeSyntax, [.. ats], model);
+        }
+
+        // Properties...
+        while (syntax is MethodDeclarationSyntax propertySyntax)
+        {
+            var symbol = model.GetDeclaredSymbol(propertySyntax, token);
+            if (symbol is null) break;
+
+            var ats = Matches(symbol.GetAttributes(), PropertyAttributes).ToArray();
+            if (ats.Length == 0) break;
+
+            return CreateCandidate(symbol, propertySyntax, [.. ats], model);
+        }
+
+        // Fields...
+        while (syntax is FieldDeclarationSyntax fieldSyntax)
+        {
+            var items = fieldSyntax.Declaration.Variables;
+            foreach (var item in items)
+            {
+                var symbol = model.GetDeclaredSymbol(item, token) as IFieldSymbol;
+                if (symbol is null) continue;
+
+                var ats = Matches(symbol.GetAttributes(), FieldAttributes).ToArray();
+                if (ats.Length == 0) continue;
+
+                return CreateCandidate(symbol, fieldSyntax, [.. ats], model);
+            }
+            break;
+        }
+
+        // Methods...
+        while (syntax is MethodDeclarationSyntax methodSyntax)
+        {
+            var symbol = model.GetDeclaredSymbol(methodSyntax, token);
+            if (symbol is null) break;
+
+            var ats = Matches(symbol.GetAttributes(), MethodAttributes).ToArray();
+            if (ats.Length == 0) break;
+
+            return CreateCandidate(symbol, methodSyntax, [.. ats], model);
+        }
+
+        // Finishing ignoring the node...
+        return null!;
+    }
+
+    /// <summary>
+    /// Selects from the given collection the attributes whose classes match any of the given
+    /// types.
+    /// </summary>
+    static IEnumerable<AttributeData> Matches(IEnumerable<AttributeData> ats, Type[] types)
+    {
+        foreach (var at in ats)
+            foreach (var type in types)
+                if (at.Match(type)) yield return at;
     }
 
     // ----------------------------------------------------

@@ -1,6 +1,4 @@
-﻿using Microsoft.CodeAnalysis.FindSymbols;
-
-namespace Yotei.Tools.CoreGenerator;
+﻿namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
 /// <summary>
