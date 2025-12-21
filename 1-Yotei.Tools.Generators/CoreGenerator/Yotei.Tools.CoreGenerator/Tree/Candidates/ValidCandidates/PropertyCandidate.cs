@@ -3,6 +3,8 @@
 // ========================================================
 /// <summary>
 /// Represents a property-alike valid candidate for source code generation.
+/// <br/> Candidates have not notion of source code generation hierarchy, which is only created
+/// at source code emitting phase.
 /// </summary>
 internal class PropertyCandidate : IValidCandidate
 {
@@ -33,12 +35,10 @@ internal class PropertyCandidate : IValidCandidate
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public ImmutableArray<AttributeData> Attributes
+    public CustomList<AttributeData> Attributes { get; } = new CustomList<AttributeData>()
     {
-        get;
-        init => field = value.Length == 0 ? [] : (
-            value.Any(static x => x is null)
-            ? throw new ArgumentException("Collection of attributes carry null elements.").WithData(value)
-            : value);
-    }
+        ValidateElement = static (x) => x.ThrowWhenNull(),
+        CompareElements = static (x, y) => x.EqualTo(y),
+        IncludeDuplicate = static (_, _) => true,
+    };
 }

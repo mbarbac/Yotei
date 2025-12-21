@@ -3,6 +3,8 @@
 // ========================================================
 /// <summary>
 /// Represents a valid candidate for source code generation.
+/// <br/> Candidates have not notion of source code generation hierarchy, which is only created
+/// at source code emitting phase.
 /// </summary>
 internal interface IValidCandidate : ICandidate
 {
@@ -18,7 +20,7 @@ internal interface IValidCandidate : ICandidate
     SyntaxNode? Syntax { get; }
 
     /// <summary>
-    /// The attributes captured for this instance, or an empty array if any.
+    /// The attributes captured for this instance, or an empty one if any.
     /// </summary>
-    ImmutableArray<AttributeData> Attributes { get; }
+    CustomList<AttributeData> Attributes { get; }
 }

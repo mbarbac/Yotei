@@ -4,22 +4,23 @@
 internal static class MatchExtensions
 {
     /// <summary>
-    /// Determines if the class of the given attribute data matches the given regular type.
+    /// Determines if the given type symbol matches any of the given regular types.
     /// </summary>
-    /// <param name="atd"></param>
-    /// <param name="type"></param>
+    /// <param name="symbol"></param>
+    /// <param name="types"></param>
     /// <returns></returns>
-    public static bool Match(this AttributeData atd, Type type)
+    public static bool MatchAny(this ITypeSymbol symbol, Type[] types)
     {
-        atd.ThrowWhenNull();
-        type.ThrowWhenNull();
+        symbol.ThrowWhenNull();
+        types.ThrowWhenNull();
 
-        return atd.AttributeClass is not null && atd.AttributeClass.Match(type);
+        return types.Any(x => symbol.Match(x));
     }
 
     /// <summary>
     /// Determines if the given type symbol matches the given regular type.
     /// </summary>
+    /// LOW: Match(symbol, type): there might be constrains in symbol or type we should check when both represent generic types.
     /// <param name="symbol"></param>
     /// <param name="type"></param>
     /// <returns></returns>
@@ -28,10 +29,10 @@ internal static class MatchExtensions
         symbol.ThrowWhenNull();
         type.ThrowWhenNull();
 
-        // HIGH: Trivial cases...
+        // Trivial cases...
         if (symbol.IsNamespace) return false;
-        //if (symbol.Kind == SymbolKind.TypeParameter) return true;
-        //if (type.IsGenericParameter) return true;
+        if (symbol.Kind == SymbolKind.TypeParameter) return true;
+        if (type.IsGenericParameter) return true;
 
         // Capturing...
         var sargs = (symbol as INamedTypeSymbol)?.TypeArguments ?? [];

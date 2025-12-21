@@ -59,7 +59,6 @@ public static class EasyNameExtensions
         }
 
         // TODO: Obtain nullable annotation of generic types.
-        // TODO: Obtain nullable annotation of reference types.
         // https://devblogs.microsoft.com/dotnet/announcing-net-6-preview-7/#libraries-reflection-apis-for-nullability-information
         // https://github.com/dotnet/roslyn/blob/main/docs/features/nullable-metadata.md
 

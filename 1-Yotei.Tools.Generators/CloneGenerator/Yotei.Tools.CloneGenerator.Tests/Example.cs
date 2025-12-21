@@ -11,8 +11,8 @@
 //    }
 //}
 
-[Cloneable]
-public partial interface IFake { }
+[Cloneable(ReturnType = typeof(string))]
+public partial interface IFake2 { }
 
-[Cloneable<IFake>]
-partial interface IFake { }
+[Cloneable<IFake2>]
+partial interface IFake2 { }

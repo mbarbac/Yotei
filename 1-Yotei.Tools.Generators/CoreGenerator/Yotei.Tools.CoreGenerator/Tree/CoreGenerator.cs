@@ -109,9 +109,13 @@ internal class CoreGenerator : IIncrementalGenerator
     protected virtual TypeCandidate CreateCandidate(
         INamedTypeSymbol symbol,
         TypeDeclarationSyntax syntax,
-        ImmutableArray<AttributeData> attributes,
+        IEnumerable<AttributeData> attributes,
         SemanticModel mode)
-        => new(symbol) { Syntax = syntax, Attributes = attributes };
+    {
+        var item = new TypeCandidate(symbol) { Syntax = syntax };
+        item.Attributes.AddRange(attributes);
+        return item;
+    }
 
     /// <summary>
     /// Invoked to create a valid candidate for source code generation. Inheritors may choose
@@ -125,9 +129,13 @@ internal class CoreGenerator : IIncrementalGenerator
     protected virtual PropertyCandidate CreateCandidate(
         IPropertySymbol symbol,
         PropertyDeclarationSyntax syntax,
-        ImmutableArray<AttributeData> attributes,
+        IEnumerable<AttributeData> attributes,
         SemanticModel mode)
-        => new(symbol) { Syntax = syntax, Attributes = attributes };
+    {
+        var item = new PropertyCandidate(symbol) { Syntax = syntax };
+        item.Attributes.AddRange(attributes);
+        return item;
+    }
 
     /// <summary>
     /// Invoked to create a valid candidate for source code generation. Inheritors may choose
@@ -142,9 +150,13 @@ internal class CoreGenerator : IIncrementalGenerator
     protected virtual FieldCandidate CreateCandidate(
         IFieldSymbol symbol,
         FieldDeclarationSyntax syntax,
-        ImmutableArray<AttributeData> attributes,
+        IEnumerable<AttributeData> attributes,
         SemanticModel mode)
-        => new(symbol) { Syntax = syntax, Attributes = attributes };
+    {
+        var item = new FieldCandidate(symbol) { Syntax = syntax };
+        item.Attributes.AddRange(attributes);
+        return item;
+    }
 
     /// <summary>
     /// Invoked to create a valid candidate for source code generation. Inheritors may choose
@@ -158,9 +170,13 @@ internal class CoreGenerator : IIncrementalGenerator
     protected virtual MethodCandidate CreateCandidate(
         IMethodSymbol symbol,
         MethodDeclarationSyntax syntax,
-        ImmutableArray<AttributeData> attributes,
+        IEnumerable<AttributeData> attributes,
         SemanticModel mode)
-        => new(symbol) { Syntax = syntax, Attributes = attributes };
+    {
+        var item = new MethodCandidate(symbol) { Syntax = syntax };
+        item.Attributes.AddRange(attributes);
+        return item;
+    }
 
     // ----------------------------------------------------
 
@@ -172,7 +188,6 @@ internal class CoreGenerator : IIncrementalGenerator
     /// <param name="context"></param>
     /// <param name="token"></param>
     /// <returns></returns>
-    [SuppressMessage("", "IDE0019")]
     protected virtual ICandidate Transform(GeneratorSyntaxContext context, CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
@@ -180,14 +195,25 @@ internal class CoreGenerator : IIncrementalGenerator
         var syntax = context.Node;
         var model = context.SemanticModel;
 
+        static IEnumerable<AttributeData> FindAttributes(
+            ISymbol symbol, MemberDeclarationSyntax syntax, Type[] types)
+        {
+            var ats = symbol.GetAttributes(syntax).ToDebugArray();
+            var items = ats.Where(x =>
+                x.AttributeClass is not null &&
+                x.AttributeClass.MatchAny(types)).ToDebugArray();
+
+            return items;
+        }
+
         // Types...
         while (syntax is TypeDeclarationSyntax typeSyntax)
         {
             var symbol = model.GetDeclaredSymbol(typeSyntax, token);
             if (symbol is null) break;
 
-            var ats = Matches(symbol.GetAttributes(), TypeAttributes).ToArray();
-            if (ats.Length == 0) break;
+            var ats = FindAttributes(symbol, typeSyntax, TypeAttributes).ToDebugArray();
+            if (!ats.Any()) break;
 
             return CreateCandidate(symbol, typeSyntax, [.. ats], model);
         }
@@ -198,8 +224,8 @@ internal class CoreGenerator : IIncrementalGenerator
             var symbol = model.GetDeclaredSymbol(propertySyntax, token);
             if (symbol is null) break;
 
-            var ats = Matches(symbol.GetAttributes(), PropertyAttributes).ToArray();
-            if (ats.Length == 0) break;
+            var ats = FindAttributes(symbol, propertySyntax, PropertyAttributes).ToDebugArray();
+            if (!ats.Any()) break;
 
             return CreateCandidate(symbol, propertySyntax, [.. ats], model);
         }
@@ -213,8 +239,8 @@ internal class CoreGenerator : IIncrementalGenerator
                 var symbol = model.GetDeclaredSymbol(item, token) as IFieldSymbol;
                 if (symbol is null) continue;
 
-                var ats = Matches(symbol.GetAttributes(), FieldAttributes).ToArray();
-                if (ats.Length == 0) continue;
+                var ats = FindAttributes(symbol, fieldSyntax, FieldAttributes).ToDebugArray();
+                if (!ats.Any()) break;
 
                 return CreateCandidate(symbol, fieldSyntax, [.. ats], model);
             }
@@ -227,8 +253,8 @@ internal class CoreGenerator : IIncrementalGenerator
             var symbol = model.GetDeclaredSymbol(methodSyntax, token);
             if (symbol is null) break;
 
-            var ats = Matches(symbol.GetAttributes(), MethodAttributes).ToArray();
-            if (ats.Length == 0) break;
+            var ats = FindAttributes(symbol, methodSyntax, MethodAttributes).ToDebugArray();
+            if (!ats.Any()) break;
 
             return CreateCandidate(symbol, methodSyntax, [.. ats], model);
         }
@@ -237,15 +263,51 @@ internal class CoreGenerator : IIncrementalGenerator
         return null!;
     }
 
+    // ----------------------------------------------------
+
     /// <summary>
-    /// Selects from the given collection the attributes whose classes match any of the given
-    /// types.
+    /// Invoked to create a new file to carry the given type.
     /// </summary>
-    static IEnumerable<AttributeData> Matches(IEnumerable<AttributeData> ats, Type[] types)
+    protected virtual FileNode CreateFile(TypeNode node) => new(node);
+
+    /// <summary>
+    /// Invoked to create a new hierarchy node.
+    /// </summary>
+    protected virtual TypeNode CreateNode(TypeCandidate candidate)
     {
-        foreach (var at in ats)
-            foreach (var type in types)
-                if (at.Match(type)) yield return at;
+        var item = new TypeNode(candidate.Symbol) { Syntax = candidate.Syntax };
+        item.Attributes.AddRange(candidate.Attributes);
+        return item;
+    }
+
+    /// <summary>
+    /// Invoked to create a new hierarchy node.
+    /// </summary>
+    protected virtual PropertyNode CreateNode(TypeNode parent, PropertyCandidate candidate)
+    {
+        var item = new PropertyNode(parent, candidate.Symbol) { Syntax = candidate.Syntax };
+        item.Attributes.AddRange(candidate.Attributes);
+        return item;
+    }
+
+    /// <summary>
+    /// Invoked to create a new hierarchy node.
+    /// </summary>
+    protected virtual FieldNode CreateNode(TypeNode parent, FieldCandidate candidate)
+    {
+        var item = new FieldNode(parent, candidate.Symbol) { Syntax = candidate.Syntax };
+        item.Attributes.AddRange(candidate.Attributes);
+        return item;
+    }
+
+    /// <summary>
+    /// Invoked to create a new hierarchy node.
+    /// </summary>
+    protected virtual MethodNode CreateNode(TypeNode parent, MethodCandidate candidate)
+    {
+        var item = new MethodNode(parent, candidate.Symbol) { Syntax = candidate.Syntax };
+        item.Attributes.AddRange(candidate.Attributes);
+        return item;
     }
 
     // ----------------------------------------------------
@@ -257,5 +319,104 @@ internal class CoreGenerator : IIncrementalGenerator
     /// <param name="candidates"></param>
     void Execute(SourceProductionContext context, ImmutableArray<ICandidate> candidates)
     {
+        // Removing null candidates...
+        Extract(candidates, out candidates, static x => x is null);
+
+        // Reporting error candidates...
+        Extract(candidates, out candidates, static x => x is ErrorCandidate)
+            .ForEach(x => ((ErrorCandidate)x).Diagnostic.Report(context));
+
+        // Creating hierarchy for types...
+        var comparer = SymbolEqualityComparer.Default;
+        var files = new List<FileNode>();
+        Extract(candidates, out candidates, static x => x is TypeCandidate)
+            .ForEach(x => OnExecute((IValidCandidate)x));
+
+        // Remaining candidates...
+        candidates.ForEach(x => OnExecute((IValidCandidate)x));
+
+        // Finishing...
+        foreach (var file in files)
+        {
+            // HIGH: emit soure code for each file...
+        }
+
+        /// <summary>
+        /// Invoked to process the given candidate...
+        /// </summary>
+        void OnExecute(IValidCandidate candidate)
+        {
+            context.CancellationToken.ThrowIfCancellationRequested();
+
+            var tpcandidate = candidate as TypeCandidate;
+            var tpsymbol = FindTypeSymbol(candidate.Symbol);
+            var file = files.Find(x => comparer.Equals(tpsymbol, x.Node.Symbol));
+
+            if (file is null)
+            {
+                var tpsyntax = FindTypeDeclaration(candidate.Syntax);
+                var node = tpcandidate is null
+                    ? new TypeNode(tpsymbol) { Syntax = tpsyntax } // Not a type candidate
+                    : CreateNode(tpcandidate);
+
+                file = CreateFile(node);
+                files.Add(file);
+            }
+            else if (tpcandidate is not null)
+            {
+                // LOW: add a collection of syntaxes for duplicated type elements...
+                // So far, we just add the newly captured attributes...
+                file.Attributes.AddRange(candidate.Attributes);
+            }
+
+            // HIGH: remaining candidate kinds in the hierarchy...
+        }
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Finds the type symbol associated with the given element.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <returns></returns>
+    static INamedTypeSymbol FindTypeSymbol(ISymbol symbol)
+    {
+        return symbol is INamedTypeSymbol named ? named : symbol.ContainingType;
+    }
+
+    /// <summary>
+    /// Finds the type declaration associated with the given element.
+    /// </summary>
+    /// <param name="syntax"></param>
+    /// <returns></returns>
+    static TypeDeclarationSyntax? FindTypeDeclaration(SyntaxNode? syntax)
+    {
+        while (syntax != null)
+        {
+            if (syntax is TypeDeclarationSyntax type) return type;
+            syntax = syntax.Parent;
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Returns from the given collection of element those that match the given predicate. The
+    /// remaining ones are returned in the out argument.
+    /// </summary>
+    static IEnumerable<T> Extract<T>(
+        ImmutableArray<T> items, out ImmutableArray<T> remaining, Predicate<T> predicate)
+    {
+        List<T> found = [];
+        List<T> survived = [];
+
+        foreach (var item in items)
+        {
+            if (predicate(item)) found.Add(item);
+            else survived.Add(item);
+        }
+        remaining = [.. survived];
+        return found;
+    }
+
 }

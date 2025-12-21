@@ -35,6 +35,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\TypeSyntaxExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\NameSyntaxExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\AttributeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\DiagnosticExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx2\IsNullable[T].cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx2\CodeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx2\CustomList[T].cs" />
@@ -54,6 +55,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\IValidCandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\ICandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\CoreGenerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\TypeNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\FileNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\MethodNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\FieldNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\PropertyNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\INode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
   </ItemGroup>
   <ItemGroup>

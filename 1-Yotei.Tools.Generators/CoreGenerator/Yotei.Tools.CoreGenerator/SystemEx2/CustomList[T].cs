@@ -83,7 +83,7 @@ internal class CustomList<T> : IList<T>, IList, ICollection<T>, ICollection
             value.ThrowWhenNull();
 
             if (field == value) return;
-            if (field is null || Items.Count == 0) { field = value; return; }
+            if (Items is null || Items.Count == 0) { field = value; return; }
 
             var range = ToList(); Items.Clear();
             field = value; AddRange(range);
@@ -105,8 +105,8 @@ internal class CustomList<T> : IList<T>, IList, ICollection<T>, ICollection
         {
             value.ThrowWhenNull();
 
-            if (field is null || field == value) return;
-            if (Items.Count == 0) { field = value; return; }
+            if (field == value) return;
+            if (Items is null || Items.Count == 0) { field = value; return; }
 
             var range = ToList(); Items.Clear();
             field = value; AddRange(range);
@@ -124,7 +124,7 @@ internal class CustomList<T> : IList<T>, IList, ICollection<T>, ICollection
         init
         {
             if (field == value) return;
-            if (Items.Count == 0) { field = value; return; }
+            if (Items is null || Items.Count == 0) { field = value; return; }
 
             var range = ToList(); Items.Clear();
             field = value; AddRange(range);
@@ -145,8 +145,8 @@ internal class CustomList<T> : IList<T>, IList, ICollection<T>, ICollection
         {
             value.ThrowWhenNull();
 
-            if (field is null || field == value) return;
-            if (Items.Count == 0) { field = value; return; }
+            if (field == value) return;
+            if (Items is null || Items.Count == 0) { field = value; return; }
 
             var range = ToList(); Items.Clear();
             field = value; AddRange(range);
@@ -171,8 +171,8 @@ internal class CustomList<T> : IList<T>, IList, ICollection<T>, ICollection
         {
             value.ThrowWhenNull();
 
-            if (field is null || field == value) return;
-            if (Items.Count == 0) { field = value; return; }
+            if (field == value) return;
+            if (Items is null || Items.Count == 0) { field = value; return; }
 
             var range = ToList(); Items.Clear();
             field = value; AddRange(range);
