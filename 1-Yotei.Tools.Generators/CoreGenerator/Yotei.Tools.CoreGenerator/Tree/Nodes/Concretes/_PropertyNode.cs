@@ -1,17 +1,17 @@
-﻿namespace Yotei.Tools.CoreGenerator;
+﻿/*namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
 /// <summary>
-/// Represents a field-alike node in the source code generation hierarchy.
+/// Represents a property-alike node in the source code generation hierarchy.
 /// </summary>
-internal class FieldNode : FieldCandidate, INode
+internal class PropertyNode : PropertyCandidate, INode
 {
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
     /// <param name="parent"></param>
     /// <param name="symbol"></param>
-    public FieldNode(TypeNode parent, IFieldSymbol symbol) : base(symbol) => Parent = parent;
+    public PropertyNode(TypeNode parent, IPropertySymbol symbol) : base(symbol) => Parent = parent;
 
     /// <summary>
     /// The node this instance belongs to in the source code generation hierarchy.
@@ -37,4 +37,4 @@ internal class FieldNode : FieldCandidate, INode
     /// <param name="cb"></param>
     public virtual void Emit(
         SourceProductionContext context, CodeBuilder cb) => cb.Append($"// {this}");
-}
+}*/

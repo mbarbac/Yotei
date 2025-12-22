@@ -1,4 +1,4 @@
-﻿namespace Yotei.Tools.CoreGenerator;
+﻿/*namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
 /// <summary>
@@ -38,6 +38,12 @@ internal class FileNode : INode
     // ----------------------------------------------------
 
     /// <summary>
+    /// Auxiliary instances are created by the generator to hold members found for source code
+    /// generation, when their host types are not found as such.
+    /// </summary>
+    public bool Auxiliary { get; init; }
+
+    /// <summary>
     /// The type node this file refers to.
     /// </summary>
     public TypeNode Node { get; }
@@ -46,18 +52,27 @@ internal class FileNode : INode
     /// <inheritdoc cref="IValidCandidate.Symbol"/>
     /// </summary>
     public INamedTypeSymbol Symbol => Node.Symbol;
-    ISymbol IValidCandidate.Symbol => Symbol;
-
-    /// <summary>
-    /// <inheritdoc cref="IValidCandidate.Syntax"/>
-    /// </summary>
-    public TypeDeclarationSyntax? Syntax => Node.Syntax;
-    SyntaxNode? IValidCandidate.Syntax => Syntax;
+    ISymbol INode.Symbol => Symbol;
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public CustomList<AttributeData> Attributes => Node.Attributes;
+    public CustomList<TypeDeclarationSyntax> Syntaxes { get; } = new CustomList<TypeDeclarationSyntax>()
+    {
+        ValidateElement = static (x) => x.ThrowWhenNull(),
+        CompareElements = static (_, _) => false,
+        IncludeDuplicate = static (_, _) => true,
+    };
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public CustomList<AttributeData> Attributes { get; } = new CustomList<AttributeData>()
+    {
+        ValidateElement = static (x) => x.ThrowWhenNull(),
+        CompareElements = static (x, y) => x.EqualTo(y),
+        IncludeDuplicate = static (_, _) => true,
+    };
 
     // ----------------------------------------------------
 
@@ -77,4 +92,4 @@ internal class FileNode : INode
     /// <param name="cb"></param>
     public virtual void Emit(
         SourceProductionContext context, CodeBuilder cb) => cb.Append($"// {this}");
-}
+}*/

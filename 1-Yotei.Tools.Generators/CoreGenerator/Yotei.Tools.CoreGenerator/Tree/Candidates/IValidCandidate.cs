@@ -20,7 +20,7 @@ internal interface IValidCandidate : ICandidate
     SyntaxNode? Syntax { get; }
 
     /// <summary>
-    /// The attributes captured for this instance, or an empty one if any.
+    /// The attributes captured for this instance, at its syntax site, or an empty one if any.
     /// </summary>
-    CustomList<AttributeData> Attributes { get; }
+    ImmutableArray<AttributeData> Attributes { get; }
 }

@@ -46,10 +46,12 @@ internal class MethodCandidate : IValidCandidate
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public CustomList<AttributeData> Attributes { get; } = new CustomList<AttributeData>()
+    public ImmutableArray<AttributeData> Attributes
     {
-        ValidateElement = static (x) => x.ThrowWhenNull(),
-        CompareElements = static (x, y) => x.EqualTo(y),
-        IncludeDuplicate = static (_, _) => true,
-    };
+        get;
+        init => field = value.Length == 0 ? [] : (value.Any(x => x is null)
+            ? throw new ArgumentException("Attributes carries null elements.").WithData(value)
+            : value);
+    }
+    = [];
 }

@@ -7,7 +7,7 @@
 [Generator(LanguageNames.CSharp)]
 internal class CloneGenerator : CoreGenerator.CoreGenerator
 {
-#if DEBUG_CLONE_GENERATOR
+#if DEBUG_CLONE_GENERATOR2
     /// <inheritdoc/>
     protected override bool LaunchDebugger => true;
 #endif
