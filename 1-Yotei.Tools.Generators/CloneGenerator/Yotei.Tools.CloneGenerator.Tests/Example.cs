@@ -1,18 +1,19 @@
 ﻿namespace Yotei.Tools.CloneGenerator.Tests;
 
 // ========================================================
-////[Enforced]
-//public static class Test_
-//{
-//    //[Enforced]
-//    [Fact]
-//    public static void Test()
-//    {
-//    }
-//}
+
+public partial interface IFake2
+{
+    [Named]
+    public string FirstName { get; set; }
+}
 
 [Cloneable(ReturnType = typeof(string))]
-public partial interface IFake2 { }
+partial interface IFake2
+{
+}
 
 [Cloneable<IFake2>]
-partial interface IFake2 { }
+partial interface IFake2
+{
+}

@@ -42,3 +42,8 @@ public class CloneableAttribute<T> : Attribute
     /// </summary>
     public bool UseVirtual { get; set; }
 }
+
+
+// ========================================================
+// DEBUG-ONLY: remove attribute when done
+public class NamedAttribute : Attribute { }

@@ -7,8 +7,10 @@
 [Generator(LanguageNames.CSharp)]
 internal class CloneGenerator : CoreGenerator.CoreGenerator
 {
-#if DEBUG_CLONE_GENERATOR2
+#if DEBUG_CLONE_GENERATOR__
+    /// <summary>
     /// <inheritdoc/>
+    /// </summary>
     protected override bool LaunchDebugger => true;
 #endif
 
@@ -20,6 +22,10 @@ internal class CloneGenerator : CoreGenerator.CoreGenerator
     protected override Type[] TypeAttributes { get; } = [
         typeof(CloneableAttribute),
         typeof(CloneableAttribute<>),];
+
+    // DEBUG-ONLY remove attribute types when done
+    protected override Type[] PropertyAttributes { get; } = [
+        typeof(NamedAttribute),];
 
     // ----------------------------------------------------
 

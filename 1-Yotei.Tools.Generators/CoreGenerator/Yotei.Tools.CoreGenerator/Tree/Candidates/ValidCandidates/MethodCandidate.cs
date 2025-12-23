@@ -38,13 +38,12 @@ internal class MethodCandidate : IValidCandidate
     ISymbol IValidCandidate.Symbol => Symbol;
 
     /// <summary>
-    /// <inheritdoc cref="IValidCandidate.Syntax"/>
+    /// The syntax captured for this instance, or '<c>null</c>' if any.
     /// </summary>
     public MethodDeclarationSyntax? Syntax { get; init => field = value.ThrowWhenNull(); }
-    SyntaxNode? IValidCandidate.Syntax => Syntax;
 
     /// <summary>
-    /// <inheritdoc/>
+    /// The attributes by which this instance was found.
     /// </summary>
     public ImmutableArray<AttributeData> Attributes
     {

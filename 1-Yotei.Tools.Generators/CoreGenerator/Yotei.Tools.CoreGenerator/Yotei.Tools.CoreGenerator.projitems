@@ -54,13 +54,14 @@
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\IValidCandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\ICandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\CoreGenerator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\_TypeNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\_FileNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\_MethodNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\_FieldNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\_PropertyNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\TypeNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\MethodNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\FieldNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\PropertyNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\IBaseNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\INode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\CoreDiagnostics.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\FileNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
   </ItemGroup>
   <ItemGroup>
