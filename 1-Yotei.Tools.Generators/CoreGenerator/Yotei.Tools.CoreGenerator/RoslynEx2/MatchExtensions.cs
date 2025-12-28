@@ -4,23 +4,8 @@
 internal static class MatchExtensions
 {
     /// <summary>
-    /// Determines if the given type symbol matches any of the given regular types.
-    /// </summary>
-    /// <param name="symbol"></param>
-    /// <param name="types"></param>
-    /// <returns></returns>
-    public static bool MatchAny(this ITypeSymbol symbol, Type[] types)
-    {
-        symbol.ThrowWhenNull();
-        types.ThrowWhenNull();
-
-        return types.Any(x => symbol.Match(x));
-    }
-
-    /// <summary>
     /// Determines if the given type symbol matches the given regular type.
     /// </summary>
-    /// LOW: Match(symbol, type): there might be constrains in symbol or type we should check when both represent generic types.
     /// <param name="symbol"></param>
     /// <param name="type"></param>
     /// <returns></returns>
@@ -78,5 +63,21 @@ internal static class MatchExtensions
 
         // Finishing...
         return true;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the given type symbol matches any of the given regular types.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <param name="types"></param>
+    /// <returns></returns>
+    public static bool MatchAny(this ITypeSymbol symbol, Type[] types)
+    {
+        symbol.ThrowWhenNull();
+        types.ThrowWhenNull();
+
+        return types.Any(x => symbol.Match(x));
     }
 }

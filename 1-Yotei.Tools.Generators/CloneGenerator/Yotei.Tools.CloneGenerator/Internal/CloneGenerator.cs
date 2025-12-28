@@ -5,7 +5,7 @@
 /// <inheritdoc/>
 /// </summary>
 [Generator(LanguageNames.CSharp)]
-internal class CloneGenerator : CoreGenerator.CoreGenerator
+internal class CloneGenerator : CoreGenerator.TreeGenerator
 {
 #if DEBUG_CLONE_GENERATOR__
     /// <summary>

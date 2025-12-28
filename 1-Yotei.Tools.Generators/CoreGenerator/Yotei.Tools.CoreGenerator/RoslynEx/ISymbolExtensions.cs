@@ -13,15 +13,7 @@ internal static class ISymbolExtensions
             (ISymbol?)symbol.ContainingType ??
             (ISymbol?)symbol.ContainingNamespace;
 
-        /// <summary>
-        /// Gets the collection of syntax nodes where this symbol was declared in source code. If
-        /// the symbol was declared in metadata or it was implicitly declared, then it may return
-        /// an empty array.
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerable<SyntaxNode> GetSyntaxNodes() => symbol
-            .DeclaringSyntaxReferences
-            .Select(x => x.GetSyntax());
+        // ------------------------------------------------
 
         /// <summary>
         /// Gets the first known syntax location where this symbol is found. This property might
@@ -31,5 +23,17 @@ internal static class ISymbolExtensions
         public Location? FirstLocation =>
             symbol.Locations.FirstOrDefault() ??
             symbol.GetSyntaxNodes().FirstOrDefault()?.GetLocation();
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Gets the collection of syntax nodes where this symbol was declared in source code. If
+        /// the symbol was declared in metadata or it was implicitly declared, then it may return
+        /// an empty array.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<SyntaxNode> GetSyntaxNodes() => symbol
+            .DeclaringSyntaxReferences
+            .Select(x => x.GetSyntax());
     }
 }

@@ -109,11 +109,11 @@ internal static class CharExtensions
     /// Compares to chars using the given string comparer.
     /// </summary>
     /// <param name="comparer"></param>
-    /// TODO: CharComparerByComparer: StrSpan has not a CompareTo(target, StringComparer) method...
     readonly struct ComparerByComparer(IEqualityComparer<string> comparer) : IEqualityComparer<char>
     {
         public bool Equals(char x, char y)
         {
+            // We need to convert chars to strings to use the given comparer...
             var xs = x.ToString();
             var ys = y.ToString();
             return comparer.Equals(xs, ys);

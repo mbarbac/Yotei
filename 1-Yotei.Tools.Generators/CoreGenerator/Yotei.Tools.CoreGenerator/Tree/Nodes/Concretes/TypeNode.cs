@@ -91,18 +91,118 @@ internal class TypeNode : INode
     // ----------------------------------------------------
 
     /// <summary>
-    /// <inheritdoc/>
+    /// <inheritdoc/> This method also validates, in cascade, its child nodes, if any.
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
-    public virtual bool Validate(SourceProductionContext context) => throw null;
+    public virtual bool Validate(SourceProductionContext context)
+    {
+        if (!Symbol.IsPartial) { Symbol.ReportError(TreeError.TypeNotPartial, context); return false; }
+        if (!IsSupportedKind()) { Symbol.ReportError(TreeError.KindNotSupported, context); return false; }
+
+        foreach (var node in ChildProperties) if (!node.Validate(context)) return false;
+        foreach (var node in ChildFields) if (!node.Validate(context)) return false;
+        foreach (var node in ChildMethods) if (!node.Validate(context)) return false;
+
+        return true;
+    }
+
+    /// <summary>
+    /// Determines if this type's kind is supported for code generation.
+    /// </summary>
+    /// <returns></returns>
+    protected virtual bool IsSupportedKind() => Symbol.TypeKind is
+        TypeKind.Class or
+        TypeKind.Struct or
+        TypeKind.Interface;
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// <inheritdoc/>
+    /// <inheritdoc/> This method emits the type's header, its core contents, and then in cascade
+    /// the source code of its child nodes, if any.
     /// </summary>
     /// <param name="context"></param>
     /// <param name="cb"></param>
-    public virtual void Emit(SourceProductionContext context, CodeBuilder cb) => throw null;
+    public virtual void Emit(SourceProductionContext context, CodeBuilder cb)
+    {
+        var head = GetHeader(context);
+        cb.AppendLine(head);
+        
+        cb.AppendLine("{");
+        cb.IndentLevel++;
+        {
+            var old = cb.Length; EmitCore(context, cb);            
+            var len = cb.Length; if (old != len) cb.AppendLine();
+            EmitChilds(context, cb);
+        }
+        cb.IndentLevel--;
+        cb.AppendLine("}");
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to obtain the type's header. By default this method returns a string with the
+    /// 'partial Name' format. Inheritors can then add a base list ('... : TBase, IFace, ...)
+    /// as needed.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    protected virtual string GetHeader(SourceProductionContext context)
+    {
+        var rec = Symbol.IsRecord ? "record " : string.Empty;
+
+        string kind;
+        switch (Symbol.TypeKind)
+        {
+            case TypeKind.Class: kind = "class"; break;
+            case TypeKind.Struct: kind = "struct"; break;
+            case TypeKind.Interface: kind = "interface"; break;
+
+            default:
+                var diag = Symbol.ReportError(TreeError.KindNotSupported, context);
+                throw new ArgumentException(diag.GetMessage());
+        }
+
+        //var options = xxx;
+        //var name = Symbol.EasyName(options);
+        //return $"partial {rec}{kind} {name}";
+
+        // HIGH: terminar GetGeader()
+        throw null;
+    }
+
+    /// <summary>
+    /// Invoked to emit the core contents of this type.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="cb"></param>
+    protected virtual void EmitCore(SourceProductionContext context, CodeBuilder cb) { }
+
+    /// <summary>
+    /// Invoked to emit the source code of the captured child nodes, if any.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="cb"></param>
+    protected virtual void EmitChilds(SourceProductionContext context, CodeBuilder cb)
+    {
+        var nl = false;
+
+        foreach (var node in ChildFields)
+        {
+            if (nl) cb.AppendLine(); nl = true;
+            node.Emit(context, cb);
+        }
+        foreach (var node in ChildProperties)
+        {
+            if (nl) cb.AppendLine(); nl = true;
+            node.Emit(context, cb);
+        }
+        foreach (var node in ChildMethods)
+        {
+            if (nl) cb.AppendLine(); nl = true;
+            node.Emit(context, cb);
+        }
+    }
 }

@@ -7,16 +7,16 @@
 internal interface IBaseNode
 {
     /// <summary>
-    /// Invoked to validate this node before source code generation, and its child ones. Returns
-    /// '<c>false</c>' if it is not valid and source code generation shall be aborted.
-    /// <br/> This method might not be invoked if its parent node is not a valid one.
+    /// Invoked to validate this node before source code generation. Returns '<c>false</c>' if it
+    /// is not valid and source code generation shall be aborted. This method might not be invoked
+    /// if its parent node is not a valid one.
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
     bool Validate(SourceProductionContext context);
 
     /// <summary>
-    /// Invoked to emit the source code of this node, and its child ones, if any.
+    /// Invoked to emit the source code of this node.
     /// </summary>
     /// <param name="context"></param>
     /// <param name="cb"></param>

@@ -6,33 +6,6 @@ internal static class INamedTypeSymbolExtensions
     extension(INamedTypeSymbol symbol)
     {
         /// <summary>
-        /// Tries to find a copy constructor defined in this named type.
-        /// <br/> In the default strict mode, the sole constructor parameter must be of the same
-        /// type as this one. In not-strict mode, it is enough if if the parameter can be assigned
-        /// to this type.
-        /// <br/> Parameter nullability is not taken into consideration.
-        /// </summary>
-        /// <param name="strict"></param>
-        /// <returns></returns>
-        public IMethodSymbol? FindCopyConstructor(bool strict = true)
-        {
-            var comparer = SymbolEqualityComparer.Default;
-            var methods = symbol.GetMembers().OfType<IMethodSymbol>().Where(static x =>
-                x.MethodKind == MethodKind.Constructor &&
-                x.IsStatic == false &&
-                x.Parameters.Length == 1)
-                .ToDebugArray();
-
-            var method = methods.FirstOrDefault(x => comparer.Equals(symbol, x.Parameters[0].Type));
-            if (method == null && !strict)
-                method = methods.FirstOrDefault(x => symbol.IsAssignableTo(x.Parameters[0].Type));
-
-            return method;
-        }
-
-        // ------------------------------------------------
-
-        /// <summary>
         /// Determines if this type is a nullable one, or not.
         /// <br/> This property also takes into consideration '<see cref="IsNullable{T}"/>' ones.
         /// </summary>
@@ -73,6 +46,33 @@ internal static class INamedTypeSymbolExtensions
 
             isnullable = false;
             return symbol;
+        }
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Tries to find a copy constructor defined in this named type.
+        /// <br/> In the default strict mode, the sole constructor parameter must be of the same
+        /// type as this one. In not-strict mode, it is enough if if the parameter can be assigned
+        /// to this type.
+        /// <br/> Parameter nullability is not taken into consideration.
+        /// </summary>
+        /// <param name="strict"></param>
+        /// <returns></returns>
+        public IMethodSymbol? FindCopyConstructor(bool strict = true)
+        {
+            var comparer = SymbolEqualityComparer.Default;
+            var methods = symbol.GetMembers().OfType<IMethodSymbol>().Where(static x =>
+                x.MethodKind == MethodKind.Constructor &&
+                x.IsStatic == false &&
+                x.Parameters.Length == 1)
+                .ToDebugArray();
+
+            var method = methods.FirstOrDefault(x => comparer.Equals(symbol, x.Parameters[0].Type));
+            if (method == null && !strict)
+                method = methods.FirstOrDefault(x => symbol.IsAssignableTo(x.Parameters[0].Type));
+
+            return method;
         }
     }
 }

@@ -11,7 +11,7 @@
 /// decorate them with the ones specified for that node kind, and produce candidate objects that
 /// carry the information needed to build the respective hierarchies and emit code.</para>
 /// </summary>
-internal class CoreGenerator : IIncrementalGenerator
+internal class TreeGenerator : IIncrementalGenerator
 {
     /// <summary>
     /// Determines if this instance tries to launch a compile-time debug session when compiling.
