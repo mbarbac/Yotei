@@ -18,68 +18,115 @@ internal class TreeGenerator : IIncrementalGenerator
     /// </summary>
     protected virtual bool LaunchDebugger => false;
 
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// The collection of attributes types used by this generator to identify type candidates
-    /// for source code generation.
-    /// </summary>
-    protected virtual Type[] TypeAttributes { get; } = [];
-
-    /// <summary>
-    /// The collection of attributes types used by this generator to identify property candidates
-    /// for source code generation.
-    /// </summary>
-    protected virtual Type[] PropertyAttributes { get; } = [];
-
-    /// <summary>
-    /// The collection of attributes types used by this generator to identify field candidates
-    /// for source code generation.
-    /// </summary>
-    protected virtual Type[] FieldAttributes { get; } = [];
-
-    /// <summary>
-    /// The collection of attributes types used by this generator to identify method candidates
-    /// for source code generation.
-    /// </summary>
-    protected virtual Type[] MethodAttributes { get; } = [];
-
-    // ----------------------------------------------------
-
     /// <summary>
     /// Invoked at initialization time to register register post-initialization actions, such as
-    /// generating additional code, reading external files, and so on.
+    /// generating additional code for marker attributes, reading external files, etc. Inheritors
+    /// must invoke first this base implementation.
     /// </summary>
     /// <param name="context"></param>
-    protected virtual void OnInitialized(IncrementalGeneratorPostInitializationContext context) { }
+    protected virtual void OnInitialize(IncrementalGeneratorPostInitializationContext context)
+    {
+        context.AddEmbeddedAttributeDefinition();
+        context.AddSource("IsNullable[T].g.cs", IsNullableTypeCode);
+    }
+
+    // Source code for the 'IsNullable<T>' type...
+    private readonly static string IsNullableTypeCode = """
+        namespace Yotei.Tools.CoreGenerator;
+        /// <summary>
+        /// Used to specify that the wrapped type shall be treated as a nullable one when either
+        /// the compiler prevents nullable annotations, or when these annotations are not persisted
+        /// in metadata (for instance, when used with reference types).
+        /// </summary>
+        [global::Microsoft.CodeAnalysis.EmbeddedAttribute]
+        public partial class IsNullable<T> { }
+        """;
 
     /// <summary>
-    /// <inheritdoc/>. By default, this method register actions to identify candidate elements
-    /// whose attributes match any of the given ones for that element kind.
+    /// <inheritdoc/>. This method is infrastructure only, not for public usage.
     /// </summary>
     /// <param name="context"></param>
-    public virtual void Initialize(IncrementalGeneratorInitializationContext context)
+    public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+        if (TypeAttributes is null) throw new ArgumentNullException(nameof(TypeAttributes));
+        if (PropertyAttributes is null) throw new ArgumentNullException(nameof(PropertyAttributes));
+        if (FieldAttributes is null) throw new ArgumentNullException(nameof(FieldAttributes));
+        if (MethodAttributes is null) throw new ArgumentNullException(nameof(MethodAttributes));
+
+        if (TypeAttributesNames is null) throw new ArgumentNullException(nameof(TypeAttributesNames));
+        if (PropertyAttributesNames is null) throw new ArgumentNullException(nameof(PropertyAttributesNames));
+        if (FieldAttributesNames is null) throw new ArgumentNullException(nameof(FieldAttributesNames));
+        if (MethodAttributesNames is null) throw new ArgumentNullException(nameof(MethodAttributesNames));
+
         // Launching a compile-time debug session if needed...
         if (LaunchDebugger && !Debugger.IsAttached) Debugger.Launch();
 
-        // Register actions....
-        context.RegisterPostInitializationOutput(OnInitialized);
+        // Registering post-initialization actions....
+        context.RegisterPostInitializationOutput(OnInitialize);
 
+        // Registering filtering and transforming actions...
         var items = context.SyntaxProvider
             .CreateSyntaxProvider(Predicate, Transform)
             .Where(static x => x != null)
             .Collect();
 
+        // Registering source code emit actions...
         context.RegisterSourceOutput(items, Execute);
     }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Invoked by the compiler to quickly determine if the given syntax node shall be considered
-    /// as a potential candidate for source code generation, or not. Only potential candidates are
-    /// passed to the transform phase.
+    /// The collection of attribute types used by this generator to identify type candidates.
+    /// </summary>
+    protected virtual List<Type> TypeAttributes { get; } = [];
+
+    /// <summary>
+    /// The collection of attribute types used by this generator to identify property candidates.
+    /// </summary>
+    protected virtual List<Type> PropertyAttributes { get; } = [];
+
+    /// <summary>
+    /// The collection of attribute types used by this generator to identify field candidates.
+    /// </summary>
+    protected virtual List<Type> FieldAttributes { get; } = [];
+
+    /// <summary>
+    /// The collection of attribute types used by this generator to identify method candidates.
+    /// </summary>
+    protected virtual List<Type> MethodAttributes { get; } = [];
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// The collection of attribute full qualified type names used by this generator to identify
+    /// type candidates.
+    /// </summary>
+    protected virtual List<string> TypeAttributesNames { get; } = [];
+
+    /// <summary>
+    /// The collection of attribute full qualified type names used by this generator to identify
+    /// property candidates.
+    /// </summary>
+    protected virtual List<string> PropertyAttributesNames { get; } = [];
+
+    /// <summary>
+    /// The collection of attribute full qualified type names used by this generator to identify
+    /// field candidates.
+    /// </summary>
+    protected virtual List<string> FieldAttributesNames { get; } = [];
+
+    /// <summary>
+    /// The collection of attribute full qualified type names used by this generator to identify
+    /// method candidates.
+    /// </summary>
+    protected virtual List<string> MethodAttributesNames { get; } = [];
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to quickly determine if the given syntax node shall be considered as a potential
+    /// candidate for source code generation, or not.
     /// </summary>
     /// <param name="node"></param>
     /// <param name="token"></param>
@@ -98,76 +145,55 @@ internal class TreeGenerator : IIncrementalGenerator
     // ----------------------------------------------------
 
     /// <summary>
-    /// Invoked to create a valid candidate for source code generation. Inheritors may choose
-    /// what elements to use to cache in the returned object.
+    /// Invoked to create a source code generation candidate. Inheritors can choose how much data
+    /// to cache in the returned object.
     /// </summary>
-    /// <param name="symbol"></param>
-    /// <param name="syntax"></param>
-    /// <param name="attributes"></param>
-    /// <param name="model"></param>
-    /// <returns></returns>
     protected virtual TypeCandidate CreateCandidate(
         INamedTypeSymbol symbol,
         TypeDeclarationSyntax syntax,
         IEnumerable<AttributeData> attributes,
         SemanticModel model)
-        => new(symbol) { Syntax = syntax, Attributes = [.. attributes] };
+        => throw null;
 
     /// <summary>
-    /// Invoked to create a valid candidate for source code generation. Inheritors may choose
-    /// what elements to use to cache in the returned object.
+    /// Invoked to create a source code generation candidate. Inheritors can choose how much data
+    /// to cache in the returned object.
     /// </summary>
-    /// <param name="symbol"></param>
-    /// <param name="syntax"></param>
-    /// <param name="attributes"></param>
-    /// <param name="model"></param>
-    /// <returns></returns>
-    protected virtual PropertyCandidate CreateCandidate(
+    protected virtual TypeCandidate CreateCandidate(
         IPropertySymbol symbol,
         PropertyDeclarationSyntax syntax,
         IEnumerable<AttributeData> attributes,
         SemanticModel model)
-        => new(symbol) { Syntax = syntax, Attributes = [.. attributes] };
+        => throw null;
 
     /// <summary>
-    /// Invoked to create a valid candidate for source code generation. Inheritors may choose
-    /// what elements to use to cache in the returned object.
+    /// Invoked to create a source code generation candidate. Inheritors can choose how much data
+    /// to cache in the returned object.
     /// </summary>
-    /// <param name="parent"></param>
-    /// <param name="symbol"></param>
-    /// <param name="syntax"></param>
-    /// <param name="attributes"></param>
-    /// <param name="model"></param>
-    /// <returns></returns>
-    protected virtual FieldCandidate CreateCandidate(
+    protected virtual TypeCandidate CreateCandidate(
         IFieldSymbol symbol,
         FieldDeclarationSyntax syntax,
         IEnumerable<AttributeData> attributes,
         SemanticModel model)
-        => new(symbol) { Syntax = syntax, Attributes = [.. attributes] };
+        => throw null;
 
     /// <summary>
-    /// Invoked to create a valid candidate for source code generation. Inheritors may choose
-    /// what elements to use to cache in the returned object.
+    /// Invoked to create a source code generation candidate. Inheritors can choose how much data
+    /// to cache in the returned object.
     /// </summary>
-    /// <param name="symbol"></param>
-    /// <param name="syntax"></param>
-    /// <param name="attributes"></param>
-    /// <param name="model"></param>
-    /// <returns></returns>
-    protected virtual MethodCandidate CreateCandidate(
+    protected virtual TypeCandidate CreateCandidate(
         IMethodSymbol symbol,
         MethodDeclarationSyntax syntax,
         IEnumerable<AttributeData> attributes,
         SemanticModel model)
-        => new(symbol) { Syntax = syntax, Attributes = [.. attributes] };
+        => throw null;
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Invoked by the compiler to transform the syntax node carried by the given context into a
-    /// source code generation candidate. This method may also return '<c>null</c>' values if the
-    /// node shall be ignored, or error candidates to report their diagnostics.
+    /// Invoked to transform the syntax node carried by the given context into a valid source code
+    /// generation candidate. This method may also  return '<c>null</c>' if the syntax node shall
+    /// be ignored, or an error candidate to report an error diagnostic.
     /// </summary>
     /// <param name="context"></param>
     /// <param name="token"></param>
@@ -179,130 +205,132 @@ internal class TreeGenerator : IIncrementalGenerator
         var syntax = context.Node;
         var model = context.SemanticModel;
 
-        static IEnumerable<AttributeData> FindAttributes(
-            ISymbol symbol, MemberDeclarationSyntax syntax, Type[] types)
-        {
-            var ats = symbol.GetAttributes(syntax).ToDebugArray();
-            var items = ats.Where(x =>
-                x.AttributeClass is not null &&
-                x.AttributeClass.MatchAny(types)).ToDebugArray();
-
-            return items;
-        }
-
         // Types...
-        while (syntax is TypeDeclarationSyntax typeSyntax)
+        while (syntax is TypeDeclarationSyntax typesyntax)
         {
-            var symbol = model.GetDeclaredSymbol(typeSyntax, token);
+            var symbol = model.GetDeclaredSymbol(typesyntax, token);
             if (symbol is null) break;
 
-            var ats = FindAttributes(symbol, typeSyntax, TypeAttributes).ToDebugArray();
-            if (!ats.Any()) break;
+            var ats = FindAttributes(symbol, typesyntax, TypeAttributes, TypeAttributesNames);
+            if (ats.Count == 0) break;
 
-            var candidate = CreateCandidate(symbol, typeSyntax, [.. ats], model);
+            var candidate = CreateCandidate(symbol, typesyntax, ats, model);
             return candidate;
         }
 
         // Properties...
-        while (syntax is PropertyDeclarationSyntax propertySyntax)
+        while (syntax is PropertyDeclarationSyntax propertysyntax)
         {
-            var symbol = model.GetDeclaredSymbol(propertySyntax, token);
+            var symbol = model.GetDeclaredSymbol(propertysyntax, token);
             if (symbol is null) break;
 
-            var ats = FindAttributes(symbol, propertySyntax, PropertyAttributes).ToDebugArray();
-            if (!ats.Any()) break;
+            var ats = FindAttributes(symbol, propertysyntax, PropertyAttributes, PropertyAttributesNames);
+            if (ats.Count == 0) break;
 
-            var candidate = CreateCandidate(symbol, propertySyntax, [.. ats], model);
+            var candidate = CreateCandidate(symbol, propertysyntax, ats, model);
             return candidate;
         }
 
-        // Fields...
-        while (syntax is FieldDeclarationSyntax fieldSyntax)
+        // Properties...
+        while (syntax is PropertyDeclarationSyntax propertysyntax)
         {
-            var items = fieldSyntax.Declaration.Variables;
+            var symbol = model.GetDeclaredSymbol(propertysyntax, token);
+            if (symbol is null) break;
+
+            var ats = FindAttributes(symbol, propertysyntax, PropertyAttributes, PropertyAttributesNames);
+            if (ats.Count == 0) break;
+
+            var candidate = CreateCandidate(symbol, propertysyntax, ats, model);
+            return candidate;
+        }
+
+        // Properties...
+        while (syntax is FieldDeclarationSyntax fieldsyntax)
+        {
+            var items = fieldsyntax.Declaration.Variables;
             foreach (var item in items)
             {
                 var symbol = model.GetDeclaredSymbol(item, token) as IFieldSymbol;
-                if (symbol is null) continue;
+                if (symbol is null) break;
 
-                var ats = FindAttributes(symbol, fieldSyntax, FieldAttributes).ToDebugArray();
-                if (!ats.Any()) break;
+                var ats = FindAttributes(symbol, fieldsyntax, FieldAttributes, FieldAttributesNames);
+                if (ats.Count == 0) break;
 
-                var candidate = CreateCandidate(symbol, fieldSyntax, [.. ats], model);
+                var candidate = CreateCandidate(symbol, fieldsyntax, ats, model);
                 return candidate;
             }
             break;
         }
 
-        // Methods...
-        while (syntax is MethodDeclarationSyntax methodSyntax)
+        // Properties...
+        while (syntax is MethodDeclarationSyntax methodsyntax)
         {
-            var symbol = model.GetDeclaredSymbol(methodSyntax, token);
+            var symbol = model.GetDeclaredSymbol(methodsyntax, token);
             if (symbol is null) break;
 
-            var ats = FindAttributes(symbol, methodSyntax, MethodAttributes).ToDebugArray();
-            if (!ats.Any()) break;
+            var ats = FindAttributes(symbol, methodsyntax, MethodAttributes, MethodAttributesNames);
+            if (ats.Count == 0) break;
 
-            var candidate = CreateCandidate(symbol, methodSyntax, [.. ats], model);
+            var candidate = CreateCandidate(symbol, methodsyntax, ats, model);
             return candidate;
         }
 
-        // Finishing ignoring the node...
+        // Finishing by ignoring the node...
         return null!;
     }
 
-    // ----------------------------------------------------
-
     /// <summary>
-    /// Invoked to create a new file node.
+    /// Returns the collection of attributes that decorate the given element, either from the
+    /// given collection of types, or from the given collection of full qualified type names.
     /// </summary>
-    protected virtual FileNode CreateFileNode(TypeNode node) => new(node);
-
-    /// <summary>
-    /// Invoked to create a new hierarchy node.
-    /// </summary>
-    protected virtual TypeNode CreateNode(TypeCandidate candidate)
+    static List<AttributeData> FindAttributes(
+        ISymbol symbol,
+        MemberDeclarationSyntax syntax,
+        List<Type> types, List<string> names)
     {
-        var item = new TypeNode(candidate.Symbol);
-        if (candidate.Syntax is not null) item.SyntaxNodes.Add(candidate.Syntax);
-        item.Attributes.AddRange(candidate.Attributes);
-        return item;
-    }
+        var ats = symbol.GetAttributes(syntax);
 
-    /// <summary>
-    /// Invoked to create a new hierarchy node.
-    /// </summary>
-    protected virtual PropertyNode CreateNode(TypeNode parent, PropertyCandidate candidate)
-    {
-        var item = new PropertyNode(parent, candidate.Symbol);
-        if (candidate.Syntax is not null) item.SyntaxNodes.Add(candidate.Syntax);
-        item.Attributes.AddRange(candidate.Attributes);
-        return item;
-    }
+        // By matching the decorating attributes with the given types...
+        var list = ats.Where(x =>
+            x.AttributeClass is not null &&
+            x.AttributeClass.MatchAny(types)).ToList();
 
-    /// <summary>
-    /// Invoked to create a new hierarchy node.
-    /// </summary>
-    protected virtual FieldNode CreateNode(TypeNode parent, FieldCandidate candidate)
-    {
-        var item = new FieldNode(parent, candidate.Symbol);
-        if (candidate.Syntax is not null) item.SyntaxNodes.Add(candidate.Syntax);
-        item.Attributes.AddRange(candidate.Attributes);
-        return item;
-    }
+        // By matching the decorating attributes with the given names...
+        foreach (var name in names)
+        {
+            var temps = ats.Where(x => x.AttributeClass?.Name == name);
+            foreach (var temp in temps) if (!list.Contains(temp)) list.Add(temp);
+        }
 
-    /// <summary>
-    /// Invoked to create a new hierarchy node.
-    /// </summary>
-    protected virtual MethodNode CreateNode(TypeNode parent, MethodCandidate candidate)
-    {
-        var item = new MethodNode(parent, candidate.Symbol);
-        if (candidate.Syntax is not null) item.SyntaxNodes.Add(candidate.Syntax);
-        item.Attributes.AddRange(candidate.Attributes);
-        return item;
+        return list;
     }
 
     // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to create a new file to hold the given type node.
+    /// </summary>
+    protected virtual FileNode CreateFileNode(TypeNode node) => throw null;
+
+    /// <summary>
+    /// Invoked to create a new hierarchy node based upon the given candidate.
+    /// </summary>
+    protected virtual TypeNode CreateNode(TypeCandidate candidate) => throw null;
+
+    /// <summary>
+    /// Invoked to create a new hierarchy node based upon the given candidate.
+    /// </summary>
+    protected virtual PropertyNode CreateNode(TypeNode parent, PropertyCandidate candiate) => throw null;
+
+    /// <summary>
+    /// Invoked to create a new hierarchy node based upon the given candidate.
+    /// </summary>
+    protected virtual FieldNode CreateNode(TypeNode parent, FieldCandidate candiate) => throw null;
+
+    /// <summary>
+    /// Invoked to create a new hierarchy node based upon the given candidate.
+    /// </summary>
+    protected virtual MethodNode CreateNode(TypeNode parent, MethodCandidate candiate) => throw null;
 
     /// <summary>
     /// Invoked to emit the source code for the captured candidates.
@@ -311,111 +339,6 @@ internal class TreeGenerator : IIncrementalGenerator
     /// <param name="candidates"></param>
     void Execute(SourceProductionContext context, ImmutableArray<ICandidate> candidates)
     {
-        // Error candidates...
-        candidates.ForEach(
-            x => x is ErrorCandidate,
-            x => ((ErrorCandidate)x).Diagnostic.Report(context));
-
-        // Capturing hierarchy...
-        var comparer = SymbolEqualityComparer.Default;
-        List<FileNode> files = [];
-
-        candidates.ForEach(
-            x => x is IValidCandidate,
-            x => Capture((IValidCandidate)x));
-
-        // Finishing...
-        foreach (var file in files)
-        {
-            context.CancellationToken.ThrowIfCancellationRequested();
-
-            if (!file.Validate(context)) continue;
-            var cb = new CodeBuilder();
-            file.Emit(context, cb);
-
-            var code = cb.ToString();
-            var name = file.FileName() + ".g.cs";
-            context.AddSource(name, code);
-        }
-
-        /// <summary>
-        /// Invoked to capture in the hierarchy the given candidate.
-        /// </summary>
-        void Capture(IValidCandidate candidate)
-        {
-            context.CancellationToken.ThrowIfCancellationRequested();
-
-            var tpcandidate = candidate as TypeCandidate;
-            var tpsymbol = candidate.Symbol is INamedTypeSymbol named
-                ? named
-                : candidate.Symbol.ContainingType;
-
-            // Capturing the file-alike element...            
-            var file = files.Find(x => comparer.Equals(tpsymbol, x.Node.Symbol));
-            if (file == null)
-            {
-                var node = tpcandidate is not null
-                    ? CreateNode(tpcandidate)
-                    : new TypeNode(tpsymbol) { IsAutoGenerated = true };
-
-                file = CreateFileNode(node);
-                files.Add(file);
-            }
-            else if (tpcandidate is not null)
-            {
-                if (file.Node.IsAutoGenerated)
-                {
-                    var node = CreateNode(tpcandidate);
-                    node.Augment(file.Node);
-
-                    files.Remove(file);
-                    file = CreateFileNode(node);
-                    files.Add(file);
-                }
-                else file.Node.Augment(tpcandidate);
-            }
-
-            // Capturing property-alike elements...
-            if (candidate is PropertyCandidate propertyCandidate)
-            {
-                var node = file.Node.ChildProperties.Find(
-                    x => comparer.Equals(x.Symbol, propertyCandidate.Symbol));
-
-                if (node is null)
-                {
-                    node = CreateNode(file.Node, propertyCandidate);
-                    file.Node.ChildProperties.Add(node);
-                }
-                else node.Augment(propertyCandidate);
-            }
-
-            // Capturing field-alike elements...
-            else if (candidate is FieldCandidate fieldCandidate)
-            {
-                var node = file.Node.ChildFields.Find(
-                    x => comparer.Equals(x.Symbol, fieldCandidate.Symbol));
-
-                if (node is null)
-                {
-                    node = CreateNode(file.Node, fieldCandidate);
-                    file.Node.ChildFields.Add(node);
-                }
-                else node.Augment(fieldCandidate);
-            }
-
-            // Capturing method-alike elements...
-            else if (candidate is MethodCandidate methodCandidate)
-            {
-                var node = file.Node.ChildMethods.Find(
-                    x => comparer.Equals(x.Symbol, methodCandidate.Symbol));
-
-                if (node is null)
-                {
-                    node = CreateNode(file.Node, methodCandidate);
-                    file.Node.ChildMethods.Add(node);
-                }
-                else node.Augment(methodCandidate);
-            }
-        }
+        throw null;
     }
 }

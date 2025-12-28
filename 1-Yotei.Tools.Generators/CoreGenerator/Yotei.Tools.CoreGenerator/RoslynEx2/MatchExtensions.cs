@@ -73,7 +73,7 @@ internal static class MatchExtensions
     /// <param name="symbol"></param>
     /// <param name="types"></param>
     /// <returns></returns>
-    public static bool MatchAny(this ITypeSymbol symbol, Type[] types)
+    public static bool MatchAny(this ITypeSymbol symbol, IEnumerable<Type> types)
     {
         symbol.ThrowWhenNull();
         types.ThrowWhenNull();

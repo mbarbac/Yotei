@@ -37,7 +37,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\NameSyntaxExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\AttributeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\DiagnosticExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SystemEx2\IsNullable[T].cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx2\CodeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CharExtension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\ObjectExtensions.cs" />
@@ -47,22 +46,22 @@
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\ExceptionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\DebugExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\IEnumerableExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\Concretes\FieldCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\Concretes\MethodCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\Concretes\PropertyCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\Concretes\TypeCandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\ErrorCandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\ValidCandidates\TypeCandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\ValidCandidates\PropertyCandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\ValidCandidates\MethodCandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\ValidCandidates\FieldCandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\IValidCandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\ICandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\TreeGenerator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\TypeNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\MethodNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\FieldNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\MethodNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\PropertyNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\IBaseNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\INode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\TreeError.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\TypeNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Candidates\ICandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\FileNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\TreeError.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\TreeGenerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
   </ItemGroup>
   <ItemGroup>

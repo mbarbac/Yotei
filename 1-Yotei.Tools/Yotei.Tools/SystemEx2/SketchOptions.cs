@@ -24,39 +24,6 @@ public record SketchOptions
     // ----------------------------------------------------
 
     /// <summary>
-    /// Initializes a new default instance.
-    /// </summary>
-    public SketchOptions() : this(BuildMode.Default) { }
-
-    enum BuildMode { Empty, Default, Full }
-    private SketchOptions(BuildMode mode)
-    {
-        switch (mode)
-        {
-            case BuildMode.Empty:
-                break;
-
-            case BuildMode.Default:
-                NullString = "NULL";
-                TypeOptions = EasyNameOptions.Default;
-                MemberInfoOptions = EasyNameOptions.Default;
-                UseShape = true;
-                break;
-
-            case BuildMode.Full:
-                NullString = "NULL";
-                TypeOptions = EasyNameOptions.Full;
-                MemberInfoOptions = EasyNameOptions.Full;
-                UseShape = true;
-                UsePrivateMembers = true;
-                UseStaticMembers = true;
-                break;
-        }
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
     /// If not null, then the format string used when formatting the value.
     /// </summary>
     public string? FormatString { get; init => field = value?.NotNullNotEmpty(true); }
@@ -95,4 +62,37 @@ public record SketchOptions
     /// When using the value shape, if true also include its static members.
     /// </summary>
     public bool UseStaticMembers { get; init; }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Initializes a new default instance.
+    /// </summary>
+    public SketchOptions() : this(BuildMode.Default) { }
+
+    enum BuildMode { Empty, Default, Full }
+    private SketchOptions(BuildMode mode)
+    {
+        switch (mode)
+        {
+            case BuildMode.Empty:
+                break;
+
+            case BuildMode.Default:
+                NullString = "NULL";
+                TypeOptions = EasyNameOptions.Default;
+                MemberInfoOptions = EasyNameOptions.Default;
+                UseShape = true;
+                break;
+
+            case BuildMode.Full:
+                NullString = "NULL";
+                TypeOptions = EasyNameOptions.Full;
+                MemberInfoOptions = EasyNameOptions.Full;
+                UseShape = true;
+                UsePrivateMembers = true;
+                UseStaticMembers = true;
+                break;
+        }
+    }
 }

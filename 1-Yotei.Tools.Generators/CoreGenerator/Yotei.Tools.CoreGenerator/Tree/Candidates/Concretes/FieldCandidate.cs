@@ -1,6 +1,6 @@
 ﻿namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
-internal interface IValidCandidate : ICandidate
+internal class FieldCandidate : IValidCandidate
 {
 }

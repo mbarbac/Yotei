@@ -1,46 +1,56 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-   <PropertyGroup>
-	  <TargetFramework>netstandard2.0</TargetFramework>
-	  <LangVersion>preview</LangVersion>
-	  <ImplicitUsings>disable</ImplicitUsings>
-	  <Nullable>enable</Nullable>
-	  <Configurations>Debug;Release;Local</Configurations>
-	  <NoWarn>IDE0130;RS1038</NoWarn>
-   </PropertyGroup>
-   <!--IDE0130: Folder structure-->
-   <!--RS1038: Relaxed validation for Roslyn workspaces-->
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<LangVersion>preview</LangVersion>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<IsRoslynComponent>true</IsRoslynComponent>
+		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+		<Configurations>Debug;Release;Local</Configurations>
+		<NoWarn>IDE0130;RS1038</NoWarn>
+	</PropertyGroup>
+	<!--IDE0130: Folder structure-->
+	<!--RS1038: Relaxed validation for Roslyn workspaces-->
 
-   <ItemGroup>
-	  <None Include="README.md" Pack="true" PackagePath="" />
-	  <None Include="LICENSE" Pack="true" PackagePath="" />
-   </ItemGroup>
+	<ItemGroup>
+		<None Include="README.md" Pack="true" PackagePath="" />
+		<None Include="LICENSE" Pack="true" PackagePath="" />
+	</ItemGroup>
 
-   <PropertyGroup>
-	  <Description>Yotei Clone Generator</Description>
-	  <Version>0.7.0-v0001</Version>
-	  <Authors>mbarbac@hotmail.com</Authors>
-	  <PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
-	  <PackageLicenseFile>LICENSE</PackageLicenseFile>
-	  <PackageReadmeFile>README.md</PackageReadmeFile>
-	  <IsPackable>true</IsPackable>
-	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-	  <IncludeSymbols>true</IncludeSymbols>
-	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-   </PropertyGroup>
+	<PropertyGroup>
+		<Description>Yotei Clone Generator</Description>
+		<Version>0.7.0-v0001</Version>
+		<Authors>mbarbac@hotmail.com</Authors>
+		<PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<IsPackable>true</IsPackable>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	</PropertyGroup>
 
-   <PropertyGroup>
-	  <DefineConstants>$(DefineConstants);DEBUG_CLONE_GENERATOR </DefineConstants>
-	  <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-   </PropertyGroup>
+	<PropertyGroup>
+		<!--If the following line is uncommented, public types may not be reachable-->
+		<!--<IncludeBuildOutput>false</IncludeBuildOutput>-->
+		<DefineConstants>$(DefineConstants);DEBUG_CLONE_GENERATOR </DefineConstants>
+	</PropertyGroup>
 
-   <ItemGroup>
-	  <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-   </ItemGroup>
+	<ItemGroup>
+		<None Include="$(OutputPath)\$(AssemblyName).dll"
+			  Pack="true"
+			  PackagePath="analyzers/dotnet/cs"
+			  Visible="false" />
+	</ItemGroup>
 
-   <Import Project="..\..\CoreGenerator\Yotei.Tools.CoreGenerator\Yotei.Tools.CoreGenerator.projitems" Label="Shared" />
-   <ItemGroup>
-	  <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.0.0" />
-   </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0"
+						  PrivateAssets="all"
+						  IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive"/>
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
+	</ItemGroup>
+	<Import Project="..\..\CoreGenerator\Yotei.Tools.CoreGenerator\Yotei.Tools.CoreGenerator.projitems"
+			Label="Shared" />
 
 </Project>
