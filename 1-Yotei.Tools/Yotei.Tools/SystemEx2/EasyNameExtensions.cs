@@ -4,16 +4,30 @@
 public static class EasyNameExtensions
 {
     /// <summary>
-    /// Returns the C#-alike name of the given source element, using default options.
+    /// Returns the C#-alike name of the given element, using default options.
+    /// <para>
+    /// Nullable annotations for reference types are just syntactic sugar used by the compiler
+    /// but not persisted as metadata. In addition, nullable annotations are not accepted by the
+    /// compiler in some constructions. The '<see cref="IsNullable{T}"/>' workaround can be used
+    /// to specify this metadata-alike information when this modification is not harmful.
+    /// <br/> Nullable value types are translated to <see cref="Nullable{T}"/> instances which,
+    /// if found and if type annotations are enabled, are returned as 'T?' literals.
+    /// </para>
     /// </summary>
-    /// <param name="source"></param>
+    /// <param name="souce"></param>
     /// <returns></returns>
-    public static string EasyName(
-        this Type source) => EasyName(source, EasyNameOptions.Default);
+    public static string EasyName(this Type souce) => souce.EasyName(EasyNameOptions.Default);
 
     /// <summary>
-    /// Returns the C#-alike name of the given source element, using the given options.
-    /// <br/>
+    /// Returns the C#-alike name of the given element, using the given options.
+    /// <para>
+    /// Nullable annotations for reference types are just syntactic sugar used by the compiler
+    /// but not persisted as metadata. In addition, nullable annotations are not accepted by the
+    /// compiler in some constructions. The '<see cref="IsNullable{T}"/>' workaround can be used
+    /// to specify this metadata-alike information when this modification is not harmful.
+    /// <br/> Nullable value types are translated to <see cref="Nullable{T}"/> instances which,
+    /// if found and if type annotations are enabled, are returned as 'T?' literals.
+    /// </para>
     /// </summary>
     /// <param name="source"></param>
     /// <param name="options"></param>
@@ -28,9 +42,26 @@ public static class EasyNameExtensions
     }
 
     /// <summary>
-    /// Invoked after the closed generic arguments are captured. Otherwise, when using recursion,
-    /// the actual information about the closed types is lost, and only the generic remains.
+    /// Determines if the given type is a value nullable one, or not.
     /// </summary>
+    static bool IsNullableValueType(this Type type)
+        => type.Name.StartsWith("Nullable`1") && type.GetGenericArguments().Length == 1;
+
+    /// <summary>
+    /// Determines if the given type is a faked nullable one, or not.
+    /// </summary>
+    static bool IsNullableFakedType(this Type type)
+        => type.Name.StartsWith("IsNullable`1") && type.GetGenericArguments().Length == 1;
+
+    /// <summary>
+    /// Invoked to return the C#-alike name of the given type element, after its closed generic
+    /// type arguments have been obtained. Otherwise, this information is lost if asking for it
+    /// in a recursive fashion.
+    /// </summary>
+    /// <remarks>
+    /// <br/> https://devblogs.microsoft.com/dotnet/announcing-net-6-preview-7/#libraries-reflection-apis-for-nullability-information
+    /// <br/> https://github.com/dotnet/roslyn/blob/main/docs/features/nullable-metadata.md
+    /// </remarks>
     static string EasyName(this Type source, EasyNameOptions options, Type[] types)
     {
         var isgen = source.FullName == null;
@@ -38,26 +69,29 @@ public static class EasyNameExtensions
 
         var args = source.GetGenericArguments();
         var used = host == null ? 0 : host.GetGenericArguments().Length;
-        var need = args.Length - used;        
+        var need = args.Length - used;
 
         // Shortcut hide name...
-        if (options.TypeHideName &&
-            !options.TypeUseHost && !options.TypeUseNamespace &&
-            (need > 0 || options.TypeGenericArgumentOptions is null))
-            return string.Empty;
+        var hide = options.TypeHideName;
+        if (options.TypeUseNamespace || options.TypeUseHost ||
+            (need > 0 && options.TypeArgumentsOptions is not null))
+            hide = false;
 
-        // Shortcut nullable value types...
-        if (source.Name.StartsWith("Nullable"))
+        if (hide) return string.Empty;
+
+        // Shortcut nullable types...
+        if (options.TypeUseAnnotation)
         {
-            var type = source.GetGenericArguments()[0];
-            var str = type.EasyName(options);
-            str += "?";
-            return str;
-        }
+            var isnullablevalue = IsNullableValueType(source);
+            var isnullablefaked = IsNullableFakedType(source);
 
-        // TODO: Obtain nullable annotation of generic types.
-        // https://devblogs.microsoft.com/dotnet/announcing-net-6-preview-7/#libraries-reflection-apis-for-nullability-information
-        // https://github.com/dotnet/roslyn/blob/main/docs/features/nullable-metadata.md
+            if (isnullablevalue || isnullablefaked)
+            {
+                var str = args[0].EasyName(options);
+                if (!str.EndsWith('?')) str += '?';
+                return str;
+            }
+        }
 
         // Other cases...
         var sb = new StringBuilder();
@@ -79,31 +113,22 @@ public static class EasyNameExtensions
         }
 
         // Name...
-        var name = string.Empty;
-        if (!options.TypeHideName ||
-            options.TypeUseHost || options.TypeUseNamespace ||
-            (args.Length > 0 && options.TypeGenericArgumentOptions is not null))
-        {
-            name = GetTypeName(source);
-            sb.Append(name);
-        }        
-        static string GetTypeName(Type source)
-        {
-            var name = source.Name;
-            var index = name.IndexOf('`');
-            if (index >= 0) name = name[..index];
-            return name;
-        }
+        var name = source.Name;
+        var index = name.IndexOf('`'); if (index >= 0) name = name[..index];
+        if (name.EndsWith('&')) name = name[..^1];
+        sb.Append(name);
 
         // Generic arguments...
-        if (need > 0 && options.TypeGenericArgumentOptions is not null)
+        if (need > 0 && options.TypeArgumentsOptions is not null)
         {
-            if (name.Length == 0) sb.Append(GetTypeName(source));
+            var xoptions = options.TypeArgumentsOptions;
+            if (xoptions.TypeArgumentsOptions is null)
+                xoptions = xoptions with { TypeArgumentsOptions = xoptions };
 
             sb.Append('<'); for (int i = 0; i < need; i++)
             {
                 var arg = types[i + used];
-                var str = arg.EasyName(options.TypeGenericArgumentOptions);
+                var str = arg.EasyName(xoptions);
                 if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
                 sb.Append(str);
             }
@@ -117,19 +142,57 @@ public static class EasyNameExtensions
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns the C#-alike name of the given source element, using the given options.
+    /// Returns the C#-alike name of the given element, using default options.
     /// </summary>
-    static string EasyName(this ParameterInfo source, EasyNameOptions options)
+    /// <param name="souce"></param>
+    /// <returns></returns>
+    public static string EasyName(this ParameterInfo souce) => souce.EasyName(EasyNameOptions.Default);
+
+    /// <summary>
+    /// Returns the C#-alike name of the given element, using the given options.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="options"></param>
+    /// <returns></returns>
+    public static string EasyName(this ParameterInfo source, EasyNameOptions options)
     {
         var sb = new StringBuilder();
 
-        if (options.ParameterTypeOptions is not null)
+        if (options.MemberUseArgumentTypes)
         {
-            var str = source.ParameterType.EasyName(options.ParameterTypeOptions);
-            sb.Append(str);
-        }
+            var str = source.ParameterType.EasyName(options);
+            if (str.Length > 0)
+            {
+                if (source.IsIn) sb.Append("in ");
+                else if (source.IsOut) sb.Append("out ");
+                else if (source.ParameterType.IsByRef) sb.Append("ref ");
+                sb.Append(str);
 
-        if (options.ParameterUseName)
+                if (options.TypeUseAnnotation && sb[^1] != '?')
+                {
+                    // Nullability API not reliable for generic types...
+                    if (source.ParameterType.FullName == null)
+                    {
+                        var at = source.GetCustomAttribute<NullableAttribute>();
+                        if (at is not null &&
+                            at.NullableFlags.Length > 0 &&
+                            at.NullableFlags[0] == 2)
+                            sb.Append('?');
+                    }
+                    // Standard case using nullability API...
+                    else
+                    {
+                        var nic = new NullabilityInfoContext();
+                        var info = nic.Create(source);
+
+                        if (info.ReadState == NullabilityState.Nullable ||
+                            info.WriteState == NullabilityState.Nullable)
+                            sb.Append('?');
+                    }
+                }
+            }
+        }
+        if (options.MemberUseArgumentNames)
         {
             if (sb.Length > 0) sb.Append(' ');
             sb.Append(source.Name);
@@ -141,15 +204,14 @@ public static class EasyNameExtensions
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns the C#-alike name of the given source element, using default options.
+    /// Returns the C#-alike name of the given element, using default options.
     /// </summary>
-    /// <param name="source"></param>
+    /// <param name="souce"></param>
     /// <returns></returns>
-    public static string EasyName(
-        this MethodInfo source) => EasyName(source, EasyNameOptions.Default);
+    public static string EasyName(this MethodInfo souce) => souce.EasyName(EasyNameOptions.Default);
 
     /// <summary>
-    /// Returns the C#-alike name of the given source element, using the given options.
+    /// Returns the C#-alike name of the given element, using the given options.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="options"></param>
@@ -159,8 +221,8 @@ public static class EasyNameExtensions
         source.ThrowWhenNull();
         options.ThrowWhenNull();
 
-        var sb = new StringBuilder();
         var host = source.DeclaringType;
+        var sb = new StringBuilder();
 
         // Return type...
         if (options.MemberReturnTypeOptions is not null)
@@ -169,7 +231,7 @@ public static class EasyNameExtensions
             if (str.Length > 0) sb.Append($"{str} ");
         }
 
-        // Host type...
+        // Host...
         if (options.MemberHostTypeOptions is not null && host is not null)
         {
             var str = host.EasyName(options.MemberHostTypeOptions);
@@ -180,15 +242,19 @@ public static class EasyNameExtensions
         sb.Append(source.Name);
 
         // Generic arguments...
-        if (options.MemberGenericArgumentOptions is not null)
+        if (options.MemberGenericArgumentsOptions is not null)
         {
             var args = source.GetGenericArguments();
             if (args.Length > 0)
             {
+                var xoptions = options.MemberGenericArgumentsOptions;
+                if (xoptions.MemberGenericArgumentsOptions is null)
+                    xoptions = xoptions with { MemberGenericArgumentsOptions = xoptions };
+
                 sb.Append('<'); for (int i = 0; i < args.Length; i++)
                 {
                     var arg = args[i];
-                    var str = arg.EasyName(options.MemberGenericArgumentOptions);
+                    var str = arg.EasyName(xoptions);
                     if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
                     sb.Append(str);
                 }
@@ -196,18 +262,16 @@ public static class EasyNameExtensions
             }
         }
 
-        // Member parameters...
-        if (options.MemberUseParameters ||
-            options.ParameterTypeOptions is not null || options.ParameterUseName)
+        // Member arguments...
+        if (options.MemberUseArgumentTypes || options.MemberUseArgumentNames)
         {
             sb.Append('(');
-            var pars = source.GetParameters();
-            for (int i = 0; i < pars.Length; i++)
+            var args = source.GetParameters(); for (int i = 0; i < args.Length; i++)
             {
-                var par = pars[i];
-                var str = par.EasyName(options);
+                var arg = args[i];
+                var str = arg.EasyName(options);
                 if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
-                if (str.Length > 0) sb.Append(str);
+                sb.Append(str);
             }
             sb.Append(')');
         }
@@ -219,15 +283,15 @@ public static class EasyNameExtensions
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns the C#-alike name of the given source element, using default options.
+    /// Returns the C#-alike name of the given element, using default options.
     /// </summary>
-    /// <param name="source"></param>
+    /// <param name="souce"></param>
     /// <returns></returns>
     public static string EasyName(
-        this ConstructorInfo source) => EasyName(source, EasyNameOptions.Default);
+        this ConstructorInfo souce) => souce.EasyName(EasyNameOptions.Default);
 
     /// <summary>
-    /// Returns the C#-alike name of the given source element, using the given options.
+    /// Returns the C#-alike name of the given element, using the given options.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="options"></param>
@@ -237,10 +301,10 @@ public static class EasyNameExtensions
         source.ThrowWhenNull();
         options.ThrowWhenNull();
 
-        var sb = new StringBuilder();
         var host = source.DeclaringType;
+        var sb = new StringBuilder();
 
-        // Host type...
+        // Host...
         if (options.MemberHostTypeOptions is not null && host is not null)
         {
             var str = host.EasyName(options.MemberHostTypeOptions);
@@ -251,18 +315,16 @@ public static class EasyNameExtensions
         var name = !options.ConstructorTechName ? "new" : source.Name;
         sb.Append(name);
 
-        // Member parameters...
-        if (options.MemberUseParameters ||
-            options.ParameterTypeOptions is not null || options.ParameterUseName)
+        // Member arguments...
+        if (options.MemberUseArgumentTypes || options.MemberUseArgumentNames)
         {
             sb.Append('(');
-            var pars = source.GetParameters();
-            for (int i = 0; i < pars.Length; i++)
+            var args = source.GetParameters(); for (int i = 0; i < args.Length; i++)
             {
-                var par = pars[i];
-                var str = par.EasyName(options);
+                var arg = args[i];
+                var str = arg.EasyName(options);
                 if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
-                if (str.Length > 0) sb.Append(str);
+                sb.Append(str);
             }
             sb.Append(')');
         }
@@ -274,15 +336,14 @@ public static class EasyNameExtensions
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns the C#-alike name of the given source element, using default options.
+    /// Returns the C#-alike name of the given element, using default options.
     /// </summary>
-    /// <param name="source"></param>
+    /// <param name="souce"></param>
     /// <returns></returns>
-    public static string EasyName(
-        this PropertyInfo source) => EasyName(source, EasyNameOptions.Default);
+    public static string EasyName(this PropertyInfo souce) => souce.EasyName(EasyNameOptions.Default);
 
     /// <summary>
-    /// Returns the C#-alike name of the given source element, using the given options.
+    /// Returns the C#-alike name of the given element, using the given options.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="options"></param>
@@ -292,8 +353,8 @@ public static class EasyNameExtensions
         source.ThrowWhenNull();
         options.ThrowWhenNull();
 
-        var sb = new StringBuilder();
         var host = source.DeclaringType;
+        var sb = new StringBuilder();
 
         // Return type...
         if (options.MemberReturnTypeOptions is not null)
@@ -302,7 +363,7 @@ public static class EasyNameExtensions
             if (str.Length > 0) sb.Append($"{str} ");
         }
 
-        // Host type...
+        // Host...
         if (options.MemberHostTypeOptions is not null && host is not null)
         {
             var str = host.EasyName(options.MemberHostTypeOptions);
@@ -311,22 +372,19 @@ public static class EasyNameExtensions
 
         // Name...
         var name = source.Name;
-        var pars = source.GetIndexParameters();
-        if (pars.Length > 0 && !options.IndexerTechName) name = "this";
+        var args = source.GetIndexParameters();
+        if (args.Length > 0 && !options.IndexerTechName) name = "this";
         sb.Append(name);
 
-        // Member parameters...
-        if (pars.Length > 0 && (
-            options.MemberUseParameters ||
-            options.ParameterTypeOptions is not null || options.ParameterUseName))
+        // Member arguments...
+        if (args.Length > 0 && (options.MemberUseArgumentTypes || options.MemberUseArgumentNames))
         {
-            sb.Append('[');
-            for (int i = 0; i < pars.Length; i++)
+            sb.Append('['); for (int i = 0; i < args.Length; i++)
             {
-                var par = pars[i];
-                var str = par.EasyName(options);
+                var arg = args[i];
+                var str = arg.EasyName(options);
                 if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
-                if (str.Length > 0) sb.Append(str);
+                sb.Append(str);
             }
             sb.Append(']');
         }
@@ -338,15 +396,14 @@ public static class EasyNameExtensions
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns the C#-alike name of the given source element, using default options.
+    /// Returns the C#-alike name of the given element, using default options.
     /// </summary>
-    /// <param name="source"></param>
+    /// <param name="souce"></param>
     /// <returns></returns>
-    public static string EasyName(
-        this FieldInfo source) => EasyName(source, EasyNameOptions.Default);
+    public static string EasyName(this FieldInfo souce) => souce.EasyName(EasyNameOptions.Default);
 
     /// <summary>
-    /// Returns the C#-alike name of the given source element, using the given options.
+    /// Returns the C#-alike name of the given element, using the given options.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="options"></param>
@@ -356,8 +413,8 @@ public static class EasyNameExtensions
         source.ThrowWhenNull();
         options.ThrowWhenNull();
 
-        var sb = new StringBuilder();
         var host = source.DeclaringType;
+        var sb = new StringBuilder();
 
         // Return type...
         if (options.MemberReturnTypeOptions is not null)
@@ -366,7 +423,7 @@ public static class EasyNameExtensions
             if (str.Length > 0) sb.Append($"{str} ");
         }
 
-        // Host type...
+        // Host...
         if (options.MemberHostTypeOptions is not null && host is not null)
         {
             var str = host.EasyName(options.MemberHostTypeOptions);
@@ -374,8 +431,7 @@ public static class EasyNameExtensions
         }
 
         // Name...
-        var name = source.Name;
-        sb.Append(name);
+        sb.Append(source.Name);
 
         // Finishing...
         return sb.ToString();

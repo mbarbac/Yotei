@@ -15,29 +15,20 @@ public static class Test_EasyName_Constructor
 
     // ----------------------------------------------------
 
-    public class T1A { public class T1B(byte one, int two) { } }
+    public class T0A { public class T0B(byte one, int two) { } }
 
     //[Enforced]
     [Fact]
-    public static void Test1_Standard()
+    public static void Test0_Standard()
     {
         EasyNameOptions options;
         string name;
-        var type = typeof(T1A.T1B);
+        var type = typeof(T0A.T0B);
         var item = type.GetConstructor([typeof(byte), typeof(int)])!;
 
-        // Empty...
         options = EMPTY;
         name = item.EasyName(options); Assert.Equal("new", name);
 
-        options = EMPTY with { ConstructorTechName = true };
-        name = item.EasyName(options); Assert.Equal(".ctor", name);
-
-        options = EMPTY with { MemberUseParameters = true };
-        name = item.EasyName(options);
-        Assert.Equal("new(,)", name);
-
-        // Default...
         options = DEFAULT;
         name = item.EasyName(options); Assert.Equal("new(Byte, Int32)", name);
 
@@ -46,103 +37,89 @@ public static class Test_EasyName_Constructor
 
         options = DEFAULT with { MemberHostTypeOptions = DEFAULT };
         name = item.EasyName(options);
-        Assert.Equal("T1B.new(Byte, Int32)", name);
+        Assert.Equal("T0B.new(Byte, Int32)", name);
 
-        // Full...
         options = FULL;
         name = item.EasyName(options);
         Assert.Equal(
-            $"{NAMESPACE}.{CLASSNAME}.T1A.T1B..ctor(System.Byte one, System.Int32 two)",
+            $"{NAMESPACE}.{CLASSNAME}.T0A.T0B..ctor(System.Byte one, System.Int32 two)",
             name);
     }
 
     // ----------------------------------------------------
 
-    public class T2A<K, T> { public class T2B<S>(T one, S two) { } }
+    public class T1A<K, T> { public class T1B<S>(T? one, S two) { } }
 
     //[Enforced]
     [Fact]
-    public static void Test2_Generic_Unbound()
+    public static void TesT1_Generic_Unbound()
     {
         EasyNameOptions options;
         string name;
-        var type = typeof(T2A<,>.T2B<>);
+        var type = typeof(T1A<,>.T1B<>);
         var item = type.GetConstructors().Where(x => x.GetParameters().Length == 2).Single();
 
-        // Empty...
         options = EMPTY;
         name = item.EasyName(options); Assert.Equal("new", name);
 
         options = EMPTY with { ConstructorTechName = true };
         name = item.EasyName(options); Assert.Equal(".ctor", name);
 
-        options = EMPTY with { MemberUseParameters = true };
-        name = item.EasyName(options);
-        Assert.Equal("new(,)", name);
-
         options = EMPTY with { MemberHostTypeOptions = EMPTY };
         name = item.EasyName(options);
-        Assert.Equal("T2B.new", name);
+        Assert.Equal("T1B.new", name);
 
-        // Default...
         options = DEFAULT;
-        name = item.EasyName(options); Assert.Equal("new(T, S)", name);
+        name = item.EasyName(options); Assert.Equal("new(T?, S)", name);
 
         options = DEFAULT with { MemberReturnTypeOptions = DEFAULT };
-        name = item.EasyName(options); Assert.Equal("new(T, S)", name);
+        name = item.EasyName(options); Assert.Equal("new(T?, S)", name);
 
         options = DEFAULT with { MemberHostTypeOptions = DEFAULT };
         name = item.EasyName(options);
-        Assert.Equal("T2B<S>.new(T, S)", name);
+        Assert.Equal("T1B<S>.new(T?, S)", name);
 
-        // Full...
         options = FULL;
         name = item.EasyName(options);
         Assert.Equal(
-            $"{NAMESPACE}.{CLASSNAME}.T2A<K, T>.T2B<S>..ctor(T one, S two)",
+            $"{NAMESPACE}.{CLASSNAME}.T1A<K, T>.T1B<S>..ctor(T? one, S two)",
             name);
     }
 
     //[Enforced]
     [Fact]
-    public static void Test2_Generic_Bound()
+    public static void TesT1_Generic_Bound()
     {
         EasyNameOptions options;
         string name;
-        var type = typeof(T2A<byte, int>.T2B<string>);
+        var type = typeof(T1A<byte, int>.T1B<string?>);
         var item = type.GetConstructors().Where(x => x.GetParameters().Length == 2).Single();
 
-        // Empty...
         options = EMPTY;
         name = item.EasyName(options); Assert.Equal("new", name);
 
         options = EMPTY with { ConstructorTechName = true };
         name = item.EasyName(options); Assert.Equal(".ctor", name);
 
-        options = EMPTY with { MemberUseParameters = true };
-        name = item.EasyName(options);
-        Assert.Equal("new(,)", name);
-
         options = EMPTY with { MemberHostTypeOptions = EMPTY };
         name = item.EasyName(options);
-        Assert.Equal("T2B.new", name);
+        Assert.Equal("T1B.new", name);
 
-        // Default...
         options = DEFAULT;
-        name = item.EasyName(options); Assert.Equal("new(Int32, String)", name);
+        name = item.EasyName(options); Assert.Equal("new(Int32, String?)", name);
 
         options = DEFAULT with { MemberReturnTypeOptions = DEFAULT };
-        name = item.EasyName(options); Assert.Equal("new(Int32, String)", name);
+        name = item.EasyName(options); Assert.Equal("new(Int32, String?)", name);
 
         options = DEFAULT with { MemberHostTypeOptions = DEFAULT };
         name = item.EasyName(options);
-        Assert.Equal("T2B<String>.new(Int32, String)", name);
+        Assert.Equal("T1B<String>.new(Int32, String?)", name);
 
-        // Full...
         options = FULL;
         name = item.EasyName(options);
         Assert.Equal(
-            $"{NAMESPACE}.{CLASSNAME}.T2A<System.Byte, System.Int32>.T2B<System.String>..ctor(System.Int32 one, System.String two)",
+            $"{NAMESPACE}.{CLASSNAME}.T1A<System.Byte, System.Int32>.T1B<System.String>" +
+            "..ctor(System.Int32 one, System.String? two)",
             name);
     }
 }

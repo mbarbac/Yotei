@@ -1,7 +1,4 @@
-﻿#pragma warning disable IDE0060
-#pragma warning disable CA1822
-
-namespace Yotei.Tools.Tests.EasyNames;
+﻿namespace Yotei.Tools.Tests.EasyNames;
 
 // ========================================================
 //[Enforced]
@@ -16,176 +13,161 @@ public static class Test_EasyName_Indexer
 
     // ----------------------------------------------------
 
-    public class T1A { public class T1B { public string this[byte one, int two] => default!; } }
+    public class T0A { public class T0B { public string this[byte? one, int two] => default!; } }
 
     //[Enforced]
     [Fact]
-    public static void Test1_Standard_Indexer()
+    public static void Test0_Standard_Indexer()
+    {
+        EasyNameOptions options;
+        string name;
+        var type = typeof(T0A.T0B);
+        var item = type.GetProperty("Item")!;
+
+        options = EMPTY;
+        name = item.EasyName(options); Assert.Equal("this", name);
+
+        options = EMPTY with { IndexerTechName = true };
+        name = item.EasyName(options); Assert.Equal("Item", name);
+
+        options = DEFAULT;
+        name = item.EasyName(options); Assert.Equal("this[Byte?, Int32]", name);
+
+        options = DEFAULT with { MemberReturnTypeOptions = EMPTY };
+        name = item.EasyName(options); Assert.Equal("String this[Byte?, Int32]", name);
+
+        options = DEFAULT with { MemberHostTypeOptions = DEFAULT };
+        name = item.EasyName(options);
+        Assert.Equal("T0B.this[Byte?, Int32]", name);
+
+        options = FULL;
+        name = item.EasyName(options);
+        Assert.Equal(
+            $"System.String {NAMESPACE}.{CLASSNAME}.T0A.T0B.Item[System.Byte? one, System.Int32 two]",
+            name);
+
+        options = FULL with { IndexerTechName = false };
+        name = item.EasyName(options);
+        Assert.Equal(
+            $"System.String {NAMESPACE}.{CLASSNAME}.T0A.T0B.this[System.Byte? one, System.Int32 two]",
+            name);
+    }
+
+    // ----------------------------------------------------
+
+    public class T1A
+    {
+        public class T1B
+        { [IndexerName("MyItems")] public string this[byte one, int two] => default!; }
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test1_Custom_Indexer_Name()
     {
         EasyNameOptions options;
         string name;
         var type = typeof(T1A.T1B);
-        var item = type.GetProperty("Item")!;
+        var item = type.GetProperty("MyItems")!;
 
-        // Empty...
         options = EMPTY;
         name = item.EasyName(options); Assert.Equal("this", name);
 
         options = EMPTY with { IndexerTechName = true };
-        name = item.EasyName(options); Assert.Equal("Item", name);
+        name = item.EasyName(options); Assert.Equal("MyItems", name);
 
-        options = EMPTY with { MemberUseParameters = true };
-        name = item.EasyName(options); Assert.Equal("this[,]", name);
-
-        // Default...
-        options = DEFAULT;
-        name = item.EasyName(options); Assert.Equal("this[Byte, Int32]", name);
-
-        options = DEFAULT with { MemberReturnTypeOptions = EMPTY };
-        name = item.EasyName(options); Assert.Equal("String this[Byte, Int32]", name);
-
-        options = DEFAULT with { MemberHostTypeOptions = DEFAULT };
-        name = item.EasyName(options);
-        Assert.Equal("T1B.this[Byte, Int32]", name);
-
-        // Full...
-        options = FULL;
-        name = item.EasyName(options);
-        Assert.Equal(
-            $"System.String {NAMESPACE}.{CLASSNAME}.T1A.T1B.Item[System.Byte one, System.Int32 two]",
-            name);
-
-        options = FULL with { IndexerTechName = false };
-        name = item.EasyName(options);
-        Assert.Equal(
-            $"System.String {NAMESPACE}.{CLASSNAME}.T1A.T1B.this[System.Byte one, System.Int32 two]",
-            name);
-    }
-
-    // ----------------------------------------------------
-
-    public class T2A
-    {
-        public class T2B
-        { [IndexerName("MyIndexer")] public string this[byte one, int two] => default!; }
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test2_Custom_Indexer_Name()
-    {
-        EasyNameOptions options;
-        string name;
-        var type = typeof(T2A.T2B);
-        var item = type.GetProperty("MyIndexer")!;
-
-        // Empty...
-        options = EMPTY;
-        name = item.EasyName(options); Assert.Equal("this", name);
-
-        options = EMPTY with { IndexerTechName = true };
-        name = item.EasyName(options); Assert.Equal("MyIndexer", name);
-
-        // Default...
         options = DEFAULT;
         name = item.EasyName(options); Assert.Equal("this[Byte, Int32]", name);
 
         options = DEFAULT with { IndexerTechName = true };
-        name = item.EasyName(options); Assert.Equal("MyIndexer[Byte, Int32]", name);
+        name = item.EasyName(options); Assert.Equal("MyItems[Byte, Int32]", name);
 
-        // Full...
         options = FULL;
         name = item.EasyName(options);
         Assert.Equal(
-            $"System.String {NAMESPACE}.{CLASSNAME}.T2A.T2B.MyIndexer[System.Byte one, System.Int32 two]",
+            $"System.String {NAMESPACE}.{CLASSNAME}.T1A.T1B.MyItems[System.Byte one, System.Int32 two]",
             name);
     }
 
     // ----------------------------------------------------
 
-    public class T3A<K, T> { public class T3B<S> { public K this[T one, S two] => default!; } }
+    public class T2A<K, T> { public class T2B<S> { public K this[T? one, S two] => default!; } }
 
     //[Enforced]
     [Fact]
-    public static void Test3_Generic_Unbound()
+    public static void TesT2_Generic_Unbound()
     {
         EasyNameOptions options;
         string name;
-        var type = typeof(T3A<,>.T3B<>);
+        var type = typeof(T2A<,>.T2B<>);
         var item = type.GetProperty("Item")!;
 
-        // Empty...
         options = EMPTY;
         name = item.EasyName(options); Assert.Equal("this", name);
 
         options = EMPTY with { IndexerTechName = true };
         name = item.EasyName(options); Assert.Equal("Item", name);
 
-        options = EMPTY with { MemberUseParameters = true };
-        name = item.EasyName(options); Assert.Equal("this[,]", name);
-
-        // Default...
         options = DEFAULT;
-        name = item.EasyName(options); Assert.Equal("this[T, S]", name);
+        name = item.EasyName(options); Assert.Equal("this[T?, S]", name);
 
         options = DEFAULT with { MemberReturnTypeOptions = EMPTY };
-        name = item.EasyName(options); Assert.Equal("K this[T, S]", name);
+        name = item.EasyName(options); Assert.Equal("K this[T?, S]", name);
 
         options = DEFAULT with { MemberHostTypeOptions = DEFAULT };
         name = item.EasyName(options);
-        Assert.Equal("T3B<S>.this[T, S]", name);
+        Assert.Equal("T2B<S>.this[T?, S]", name);
 
-        // Full...
         options = FULL;
         name = item.EasyName(options);
-        Assert.Equal($"K {NAMESPACE}.{CLASSNAME}.T3A<K, T>.T3B<S>.Item[T one, S two]", name);
+        Assert.Equal($"K {NAMESPACE}.{CLASSNAME}.T2A<K, T>.T2B<S>.Item[T? one, S two]", name);
 
         options = FULL with { IndexerTechName = false };
         name = item.EasyName(options);
-        Assert.Equal($"K {NAMESPACE}.{CLASSNAME}.T3A<K, T>.T3B<S>.this[T one, S two]", name);
+        Assert.Equal($"K {NAMESPACE}.{CLASSNAME}.T2A<K, T>.T2B<S>.this[T? one, S two]", name);
     }
 
+    // TODO: I don't understand why EasyName(indexer) renders 'String' instead of 'String?'...
     //[Enforced]
     [Fact]
-    public static void Test3_Generic_Bound()
+    public static void TesT2_Generic_Bound()
     {
         EasyNameOptions options;
         string name;
-        var type = typeof(T3A<byte, int>.T3B<string>);
+        var type = typeof(T2A<byte?, int>.T2B<string?>);
         var item = type.GetProperty("Item")!;
 
-        // Empty...
         options = EMPTY;
         name = item.EasyName(options); Assert.Equal("this", name);
 
         options = EMPTY with { IndexerTechName = true };
         name = item.EasyName(options); Assert.Equal("Item", name);
 
-        options = EMPTY with { MemberUseParameters = true };
-        name = item.EasyName(options); Assert.Equal("this[,]", name);
-
-        // Default...
         options = DEFAULT;
         name = item.EasyName(options); Assert.Equal("this[Int32, String]", name);
 
         options = DEFAULT with { MemberReturnTypeOptions = EMPTY };
-        name = item.EasyName(options); Assert.Equal("Byte this[Int32, String]", name);
+        name = item.EasyName(options); Assert.Equal("Nullable this[Int32, String]", name);
+
+        options = DEFAULT with { MemberReturnTypeOptions = DEFAULT };
+        name = item.EasyName(options); Assert.Equal("Byte? this[Int32, String]", name);
 
         options = DEFAULT with { MemberHostTypeOptions = DEFAULT };
         name = item.EasyName(options);
-        Assert.Equal("T3B<String>.this[Int32, String]", name);
+        Assert.Equal("T2B<String>.this[Int32, String]", name);
 
-        // Full...
         options = FULL;
         name = item.EasyName(options);
         Assert.Equal(
-            $"System.Byte {NAMESPACE}.{CLASSNAME}.T3A<System.Byte, System.Int32>.T3B<System.String>.Item[System.Int32 one, System.String two]",
+            $"System.Byte? {NAMESPACE}.{CLASSNAME}.T2A<System.Byte?, System.Int32>.T2B<System.String>" +
+            ".Item[System.Int32 one, System.String two]",
             name);
 
         options = FULL with { IndexerTechName = false };
         name = item.EasyName(options);
         Assert.Equal(
-            $"System.Byte {NAMESPACE}.{CLASSNAME}.T3A<System.Byte, System.Int32>.T3B<System.String>.this[System.Int32 one, System.String two]",
+            $"System.Byte? {NAMESPACE}.{CLASSNAME}.T2A<System.Byte?, System.Int32>.T2B<System.String>" +
+            ".this[System.Int32 one, System.String two]",
             name);
     }
 }

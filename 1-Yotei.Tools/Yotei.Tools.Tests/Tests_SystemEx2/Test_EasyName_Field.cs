@@ -13,22 +13,20 @@ public static class Test_EasyName_Field
 
     // ----------------------------------------------------
 
-    public class T1A { public class T1B { public string Name = default!; } }
+    public class T0A { public class T0B { public string Name = default!; } }
 
     //[Enforced]
     [Fact]
-    public static void Test1_Standard_Indexer()
+    public static void Test0_Standard_Indexer()
     {
         EasyNameOptions options;
         string name;
-        var type = typeof(T1A.T1B);
+        var type = typeof(T0A.T0B);
         var item = type.GetField("Name")!;
 
-        // Empty...
         options = EMPTY;
         name = item.EasyName(options); Assert.Equal("Name", name);
 
-        // Default...
         options = DEFAULT;
         name = item.EasyName(options); Assert.Equal("Name", name);
 
@@ -37,32 +35,31 @@ public static class Test_EasyName_Field
 
         options = DEFAULT with { MemberHostTypeOptions = DEFAULT };
         name = item.EasyName(options);
-        Assert.Equal("T1B.Name", name);
+        Assert.Equal("T0B.Name", name);
 
-        // Full...
         options = FULL;
         name = item.EasyName(options);
-        Assert.Equal($"System.String {NAMESPACE}.{CLASSNAME}.T1A.T1B.Name", name);
+        Assert.Equal(
+            $"System.String {NAMESPACE}.{CLASSNAME}.T0A.T0B.Name",
+            name);
     }
 
     // ----------------------------------------------------
 
-    public class T2A<K, T> { public class T2B<S> { public K Name = default!; } }
+    public class T1A<K, T> { public class T1B<S> { public K Name = default!; } }
 
     //[Enforced]
     [Fact]
-    public static void Test3_Generic_Unbound()
+    public static void TesT1_Generic_Unbound()
     {
         EasyNameOptions options;
         string name;
-        var type = typeof(T2A<,>.T2B<>);
+        var type = typeof(T1A<,>.T1B<>);
         var item = type.GetField("Name")!;
 
-        // Empty...
         options = EMPTY;
         name = item.EasyName(options); Assert.Equal("Name", name);
 
-        // Default...
         options = DEFAULT;
         name = item.EasyName(options); Assert.Equal("Name", name);
 
@@ -71,28 +68,25 @@ public static class Test_EasyName_Field
 
         options = DEFAULT with { MemberHostTypeOptions = DEFAULT };
         name = item.EasyName(options);
-        Assert.Equal("T2B<S>.Name", name);
+        Assert.Equal("T1B<S>.Name", name);
 
-        // Full...
         options = FULL;
         name = item.EasyName(options);
-        Assert.Equal($"K {NAMESPACE}.{CLASSNAME}.T2A<K, T>.T2B<S>.Name", name);
+        Assert.Equal($"K {NAMESPACE}.{CLASSNAME}.T1A<K, T>.T1B<S>.Name", name);
     }
 
     //[Enforced]
     [Fact]
-    public static void Test3_Generic_Bound()
+    public static void TesT1_Generic_Bound()
     {
         EasyNameOptions options;
         string name;
-        var type = typeof(T2A<byte, Int32>.T2B<string>);
+        var type = typeof(T1A<byte, int>.T1B<string?>);
         var item = type.GetField("Name")!;
 
-        // Empty...
         options = EMPTY;
         name = item.EasyName(options); Assert.Equal("Name", name);
 
-        // Default...
         options = DEFAULT;
         name = item.EasyName(options); Assert.Equal("Name", name);
 
@@ -101,13 +95,13 @@ public static class Test_EasyName_Field
 
         options = DEFAULT with { MemberHostTypeOptions = DEFAULT };
         name = item.EasyName(options);
-        Assert.Equal("T2B<String>.Name", name);
+        Assert.Equal("T1B<String>.Name", name);
 
-        // Full...
         options = FULL;
         name = item.EasyName(options);
         Assert.Equal(
-            $"System.Byte {NAMESPACE}.{CLASSNAME}.T2A<System.Byte, System.Int32>.T2B<System.String>.Name",
+            $"System.Byte {NAMESPACE}.{CLASSNAME}.T1A<System.Byte, System.Int32>.T1B<System.String>" +
+            ".Name",
             name);
     }
 }
