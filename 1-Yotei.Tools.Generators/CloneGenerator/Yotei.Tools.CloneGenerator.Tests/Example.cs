@@ -2,18 +2,9 @@
 
 // ========================================================
 
-public partial interface IFake2
+public partial class Foo<K, T>
 {
     [Named]
-    public string FirstName { get; set; }
+    public Foo(out K one) { one = default!; }
 }
 
-[Cloneable(ReturnType = typeof(string))]
-partial interface IFake2
-{
-}
-
-[Cloneable<IFake2>]
-partial interface IFake2
-{
-}

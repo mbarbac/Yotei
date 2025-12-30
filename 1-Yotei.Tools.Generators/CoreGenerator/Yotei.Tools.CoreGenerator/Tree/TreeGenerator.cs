@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools.CoreGenerator;
+﻿#pragma warning IDE0019
+
+namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
 /// <summary>
@@ -18,10 +20,11 @@ internal class TreeGenerator : IIncrementalGenerator
     /// </summary>
     protected virtual bool LaunchDebugger => false;
 
+#if EMIT_ISNULLABLE_TYPE
     /// <summary>
     /// Invoked at initialization time to register register post-initialization actions, such as
     /// generating additional code for marker attributes, reading external files, etc. Inheritors
-    /// must invoke first this base implementation.
+    /// must call this base method to emit the 'IsNullable{T}' class.
     /// </summary>
     /// <param name="context"></param>
     protected virtual void OnInitialize(IncrementalGeneratorPostInitializationContext context)
@@ -29,8 +32,6 @@ internal class TreeGenerator : IIncrementalGenerator
         context.AddEmbeddedAttributeDefinition();
         context.AddSource("IsNullable[T].g.cs", IsNullableTypeCode);
     }
-
-    // Source code for the 'IsNullable<T>' type...
     private readonly static string IsNullableTypeCode = """
         namespace Yotei.Tools.CoreGenerator;
         /// <summary>
@@ -41,6 +42,14 @@ internal class TreeGenerator : IIncrementalGenerator
         [global::Microsoft.CodeAnalysis.EmbeddedAttribute]
         public partial class IsNullable<T> { }
         """;
+#else
+    /// <summary>
+    /// Invoked at initialization time to register register post-initialization actions, such as
+    /// generating additional code for marker attributes, reading external files, etc.
+    /// </summary>
+    /// <param name="context"></param>
+    protected virtual void OnInitialize(IncrementalGeneratorPostInitializationContext context) { }
+#endif
 
     /// <summary>
     /// <inheritdoc/>. This method is infrastructure only, not for public usage.
@@ -70,8 +79,10 @@ internal class TreeGenerator : IIncrementalGenerator
             .Where(static x => x != null)
             .Collect();
 
+        var combined = context.CompilationProvider.Combine(items);
+
         // Registering source code emit actions...
-        context.RegisterSourceOutput(items, Execute);
+        context.RegisterSourceOutput(combined, Execute);
     }
 
     // ----------------------------------------------------
@@ -137,9 +148,9 @@ internal class TreeGenerator : IIncrementalGenerator
 
         return node
             is TypeDeclarationSyntax
-            or PropertyDeclarationSyntax
+            or BasePropertyDeclarationSyntax
             or FieldDeclarationSyntax
-            or MethodDeclarationSyntax;
+            or BaseMethodDeclarationSyntax;
     }
 
     // ----------------------------------------------------
@@ -153,40 +164,56 @@ internal class TreeGenerator : IIncrementalGenerator
         TypeDeclarationSyntax syntax,
         IEnumerable<AttributeData> attributes,
         SemanticModel model)
-        => throw null;
+    {
+        var item = new TypeCandidate(symbol) { Syntax = syntax };
+        item.Attributes.AddRange(attributes);
+        return item;
+    }
 
     /// <summary>
     /// Invoked to create a source code generation candidate. Inheritors can choose how much data
     /// to cache in the returned object.
     /// </summary>
-    protected virtual TypeCandidate CreateCandidate(
+    protected virtual PropertyCandidate CreateCandidate(
         IPropertySymbol symbol,
-        PropertyDeclarationSyntax syntax,
+        BasePropertyDeclarationSyntax syntax,
         IEnumerable<AttributeData> attributes,
         SemanticModel model)
-        => throw null;
+    {
+        var item = new PropertyCandidate(symbol) { Syntax = syntax };
+        item.Attributes.AddRange(attributes);
+        return item;
+    }
 
     /// <summary>
     /// Invoked to create a source code generation candidate. Inheritors can choose how much data
     /// to cache in the returned object.
     /// </summary>
-    protected virtual TypeCandidate CreateCandidate(
+    protected virtual FieldCandidate CreateCandidate(
         IFieldSymbol symbol,
         FieldDeclarationSyntax syntax,
         IEnumerable<AttributeData> attributes,
         SemanticModel model)
-        => throw null;
+    {
+        var item = new FieldCandidate(symbol) { Syntax = syntax };
+        item.Attributes.AddRange(attributes);
+        return item;
+    }
 
     /// <summary>
     /// Invoked to create a source code generation candidate. Inheritors can choose how much data
     /// to cache in the returned object.
     /// </summary>
-    protected virtual TypeCandidate CreateCandidate(
+    protected virtual MethodCandidate CreateCandidate(
         IMethodSymbol symbol,
-        MethodDeclarationSyntax syntax,
+        BaseMethodDeclarationSyntax syntax,
         IEnumerable<AttributeData> attributes,
         SemanticModel model)
-        => throw null;
+    {
+        var item = new MethodCandidate(symbol) { Syntax = syntax };
+        item.Attributes.AddRange(attributes);
+        return item;
+    }
 
     // ----------------------------------------------------
 
@@ -219,22 +246,9 @@ internal class TreeGenerator : IIncrementalGenerator
         }
 
         // Properties...
-        while (syntax is PropertyDeclarationSyntax propertysyntax)
+        while (syntax is BasePropertyDeclarationSyntax propertysyntax)
         {
-            var symbol = model.GetDeclaredSymbol(propertysyntax, token);
-            if (symbol is null) break;
-
-            var ats = FindAttributes(symbol, propertysyntax, PropertyAttributes, PropertyAttributesNames);
-            if (ats.Count == 0) break;
-
-            var candidate = CreateCandidate(symbol, propertysyntax, ats, model);
-            return candidate;
-        }
-
-        // Properties...
-        while (syntax is PropertyDeclarationSyntax propertysyntax)
-        {
-            var symbol = model.GetDeclaredSymbol(propertysyntax, token);
+            var symbol = model.GetDeclaredSymbol(propertysyntax, token) as IPropertySymbol;
             if (symbol is null) break;
 
             var ats = FindAttributes(symbol, propertysyntax, PropertyAttributes, PropertyAttributesNames);
@@ -263,13 +277,18 @@ internal class TreeGenerator : IIncrementalGenerator
         }
 
         // Properties...
-        while (syntax is MethodDeclarationSyntax methodsyntax)
+        while (syntax is BaseMethodDeclarationSyntax methodsyntax)
         {
             var symbol = model.GetDeclaredSymbol(methodsyntax, token);
             if (symbol is null) break;
 
             var ats = FindAttributes(symbol, methodsyntax, MethodAttributes, MethodAttributesNames);
             if (ats.Count == 0) break;
+
+            // DEBUG-ONLY
+            var options = EasyNameOptions.Default with { MemberReturnTypeOptions = EasyNameOptions.Default };
+            var name = symbol.EasyName(options);
+            Debug.Assert(name != null);
 
             var candidate = CreateCandidate(symbol, methodsyntax, ats, model);
             return candidate;
@@ -310,35 +329,174 @@ internal class TreeGenerator : IIncrementalGenerator
     /// <summary>
     /// Invoked to create a new file to hold the given type node.
     /// </summary>
-    protected virtual FileNode CreateFileNode(TypeNode node) => throw null;
+    protected virtual FileNode CreateFileNode(
+        Compilation compilation, TypeNode node) => new(compilation, node);
 
     /// <summary>
     /// Invoked to create a new hierarchy node based upon the given candidate.
     /// </summary>
-    protected virtual TypeNode CreateNode(TypeCandidate candidate) => throw null;
+    protected virtual TypeNode CreateNode(TypeCandidate candidate)
+    {
+        var item = new TypeNode(candidate.Symbol);
+        if (candidate.Syntax != null) item.SyntaxNodes.Add(candidate.Syntax);
+        item.Attributes.AddRange(candidate.Attributes);
+        return item;
+    }
 
     /// <summary>
     /// Invoked to create a new hierarchy node based upon the given candidate.
     /// </summary>
-    protected virtual PropertyNode CreateNode(TypeNode parent, PropertyCandidate candiate) => throw null;
+    protected virtual PropertyNode CreateNode(TypeNode parent, PropertyCandidate candidate)
+    {
+        var item = new PropertyNode(parent, candidate.Symbol);
+        if (candidate.Syntax != null) item.SyntaxNodes.Add(candidate.Syntax);
+        item.Attributes.AddRange(candidate.Attributes);
+        return item;
+    }
 
     /// <summary>
     /// Invoked to create a new hierarchy node based upon the given candidate.
     /// </summary>
-    protected virtual FieldNode CreateNode(TypeNode parent, FieldCandidate candiate) => throw null;
+    protected virtual FieldNode CreateNode(TypeNode parent, FieldCandidate candidate)
+    {
+        var item = new FieldNode(parent, candidate.Symbol);
+        if (candidate.Syntax != null) item.SyntaxNodes.Add(candidate.Syntax);
+        item.Attributes.AddRange(candidate.Attributes);
+        return item;
+    }
 
     /// <summary>
     /// Invoked to create a new hierarchy node based upon the given candidate.
     /// </summary>
-    protected virtual MethodNode CreateNode(TypeNode parent, MethodCandidate candiate) => throw null;
+    protected virtual MethodNode CreateNode(TypeNode parent, MethodCandidate candidate)
+    {
+        var item = new MethodNode(parent, candidate.Symbol);
+        if (candidate.Syntax != null) item.SyntaxNodes.Add(candidate.Syntax);
+        item.Attributes.AddRange(candidate.Attributes);
+        return item;
+    }
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// Invoked to emit the source code for the captured candidates.
     /// </summary>
-    /// <param name="context"></param>
-    /// <param name="candidates"></param>
-    void Execute(SourceProductionContext context, ImmutableArray<ICandidate> candidates)
+    void Execute(SourceProductionContext context, (Compilation, ImmutableArray<ICandidate>) source)
     {
-        throw null;
+        var compilation = source.Item1;
+        var candidates = source.Item2;
+        var comparer = SymbolEqualityComparer.Default;
+        List<FileNode> files = [];
+
+        // Error candidates...
+        candidates.ForEach(x =>
+            x is ErrorCandidate,
+            x => ((ErrorCandidate)x).Diagnostic.Report(context));
+
+        // Creating hierarchy...
+        candidates.ForEach(
+            x => x is IValidCandidate,
+            x => Capture((IValidCandidate)x));
+
+        // Generating source code...
+        foreach (var file in files)
+        {
+            context.CancellationToken.ThrowIfCancellationRequested();
+
+            if (!file.Validate(context)) continue;
+            var cb = new CodeBuilder();
+            file.Emit(context, cb);
+
+            var code = cb.ToString();
+            var name = file.FileName() + ".g.cs";
+            context.AddSource(name, code);
+        }
+
+        /// <summary>
+        /// Invoked to capture the hierarchy of the given candidate...
+        /// </summary>
+        void Capture(IValidCandidate candidate)
+        {
+            context.CancellationToken.ThrowIfCancellationRequested();
+
+            // Capturing file-alike element...
+            var tpcandidate = candidate as TypeCandidate;
+            var tpsymbol = candidate.Symbol is INamedTypeSymbol named
+                ? named
+                : candidate.Symbol.ContainingType;
+
+            var file = files.Find(x => comparer.Equals(tpsymbol, x.Node.Symbol));
+            if (file == null)
+            {
+                // Creating a type node, either identified or auto-generated...
+                var node = tpcandidate is null
+                    ? new TypeNode(tpsymbol) { IsAutoGenerated = true }
+                    : CreateNode(tpcandidate);
+
+                // Creating a file holder for that type node...
+                file = CreateFileNode(compilation, node);
+                files.Add(file);
+            }
+            else if (tpcandidate is not null) // Collision detected...
+            {
+                // Existing node was auto-generated...
+                if (file.Node.IsAutoGenerated)
+                {
+                    var node = CreateNode(tpcandidate);
+                    node.Augment(file.Node);
+
+                    files.Remove(file);
+                    files.Add(file = CreateFileNode(compilation, node));
+                }
+
+                // Existing already was a valid one...
+                else
+                {
+                    file.Node.Augment(tpcandidate);
+                }
+            }
+
+            // Capturing property-alike element...
+            if (candidate is PropertyCandidate propertyCandidate)
+            {
+                var node = file.Node.ChildProperties.Find(
+                    x => comparer.Equals(x.Symbol, propertyCandidate.Symbol));
+                
+                if (node is null)
+                {
+                    node = CreateNode(file.Node, propertyCandidate);
+                    file.Node.ChildProperties.Add(node);
+                }
+                else node.Augment(propertyCandidate);
+            }
+
+            // Capturing field-alike element...
+            if (candidate is FieldCandidate fieldCandidate)
+            {
+                var node = file.Node.ChildFields.Find(
+                    x => comparer.Equals(x.Symbol, fieldCandidate.Symbol));
+
+                if (node is null)
+                {
+                    node = CreateNode(file.Node, fieldCandidate);
+                    file.Node.ChildFields.Add(node);
+                }
+                else node.Augment(fieldCandidate);
+            }
+
+            // Capturing method-alike element...
+            if (candidate is MethodCandidate methodCandidate)
+            {
+                var node = file.Node.ChildMethods.Find(
+                    x => comparer.Equals(x.Symbol, methodCandidate.Symbol));
+
+                if (node is null)
+                {
+                    node = CreateNode(file.Node, methodCandidate);
+                    file.Node.ChildMethods.Add(node);
+                }
+                else node.Augment(methodCandidate);
+            }
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
-internal interface ICandidate
-{
-}
+/// <summary>
+/// Represents a source code generation candidate, or an error condition.
+/// </summary>
+internal interface ICandidate { }

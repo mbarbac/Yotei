@@ -5,9 +5,9 @@
 /// <inheritdoc/>
 /// </summary>
 [Generator(LanguageNames.CSharp)]
-internal class CloneGenerator : CoreGenerator.TreeGenerator
+internal class CloneGenerator : TreeGenerator
 {
-#if DEBUG_CLONE_GENERATOR__
+#if DEBUG_CLONE_GENERATOR
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
@@ -19,12 +19,17 @@ internal class CloneGenerator : CoreGenerator.TreeGenerator
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    protected override Type[] TypeAttributes { get; } = [
+    protected override List<Type> TypeAttributes { get; } = [
+        typeof(NamedAttribute), // DEBUG-ONLY remove type when done...
         typeof(CloneableAttribute),
         typeof(CloneableAttribute<>),];
 
-    // DEBUG-ONLY remove attribute types when done
-    protected override Type[] PropertyAttributes { get; } = [
+    // DEBUG-ONLY remove attribute types when done...
+    protected override List<Type> PropertyAttributes { get; } = [
+        typeof(NamedAttribute),];
+
+    // DEBUG-ONLY remove attribute types when done...
+    protected override List<Type> MethodAttributes { get; } = [
         typeof(NamedAttribute),];
 
     // ----------------------------------------------------

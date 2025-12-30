@@ -1,6 +1,10 @@
 ﻿namespace Yotei.Tools.CloneGenerator;
 
 // ========================================================
+// DEBUG-ONLY: remove attribute when done
+public class NamedAttribute : Attribute { }
+
+// ========================================================
 /// <summary>
 /// Used to decorate types for which a parameterless 'Clone()' method will be generated.
 /// <br/> Regular types must implement a copy constructor.
@@ -42,8 +46,3 @@ public class CloneableAttribute<T> : Attribute
     /// </summary>
     public bool UseVirtual { get; set; }
 }
-
-
-// ========================================================
-// DEBUG-ONLY: remove attribute when done
-public class NamedAttribute : Attribute { }

@@ -1,18 +1,11 @@
-﻿namespace Yotei.Tools;
+﻿namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
-public static class EasyNameExtensions
+internal static class EasyNameExtensions
 {
     /// <summary>
     /// Returns the C#-alike name of the given element, using default options.
     /// <para>
-    /// Nullable annotations for reference types are just syntactic sugar used by the compiler
-    /// but not persisted as metadata. In addition, nullable annotations are not accepted by the
-    /// compiler in some constructions. The '<see cref="IsNullable{T}"/>' workaround can be used
-    /// to specify this metadata-alike information when this modification is not harmful.
-    /// <br/> Nullable value types are translated to <see cref="Nullable{T}"/> instances which,
-    /// if found and if type annotations are enabled, are returned as 'T?' literals.
-    /// </para>
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
@@ -20,14 +13,6 @@ public static class EasyNameExtensions
 
     /// <summary>
     /// Returns the C#-alike name of the given element, using the given options.
-    /// <para>
-    /// Nullable annotations for reference types are just syntactic sugar used by the compiler
-    /// but not persisted as metadata. In addition, nullable annotations are not accepted by the
-    /// compiler in some constructions. The '<see cref="IsNullable{T}"/>' workaround can be used
-    /// to specify this metadata-alike information when this modification is not harmful.
-    /// <br/> Nullable value types are translated to <see cref="Nullable{T}"/> instances which,
-    /// if found and if type annotations are enabled, are returned as 'T?' literals.
-    /// </para>
     /// </summary>
     /// <param name="source"></param>
     /// <param name="options"></param>
@@ -60,10 +45,6 @@ public static class EasyNameExtensions
     /// type arguments have been obtained. Otherwise, this information is lost if asking for it
     /// in a recursive fashion.
     /// </summary>
-    /// <remarks>
-    /// <br/> https://devblogs.microsoft.com/dotnet/announcing-net-6-preview-7/#libraries-reflection-apis-for-nullability-information
-    /// <br/> https://github.com/dotnet/roslyn/blob/main/docs/features/nullable-metadata.md
-    /// </remarks>
     static string EasyName(this Type source, EasyNameOptions options, Type[] types)
     {
         var isgen = source.FullName == null;
@@ -169,31 +150,33 @@ public static class EasyNameExtensions
                 else if (source.IsOut) sb.Append("out ");
                 else if (source.ParameterType.IsByRef) sb.Append("ref ");
                 sb.Append(str);
-
-                if (options.TypeUseAnnotation && sb[^1] != '?')
-                {
-                    // Nullability API not reliable for generic types...
-                    if (source.ParameterType.FullName == null)
-                    {
-                        var at = source.GetCustomAttribute<NullableAttribute>();
-                        if (at is not null &&
-                            at.NullableFlags.Length > 0 &&
-                            at.NullableFlags[0] == 2)
-                            sb.Append('?');
-                    }
-                    // Standard case using nullability API...
-                    else
-                    {
-                        var nic = new NullabilityInfoContext();
-                        var info = nic.Create(source);
-
-                        if (info.ReadState == NullabilityState.Nullable ||
-                            info.WriteState == NullabilityState.Nullable)
-                            sb.Append('?');
-                    }
-                }
             }
+
+            /* Net Standard 2.0 does not support nullability APIs...
+            if (options.TypeUseAnnotation && sb[^1] != '?')
+            {
+                // Nullability API not reliable for generic types...
+                if (source.ParameterType.FullName == null)
+                {
+                    var at = source.GetCustomAttribute<NullableAttribute>();
+                    if (at is not null &&
+                        at.NullableFlags.Length > 0 &&
+                        at.NullableFlags[0] == 2)
+                        sb.Append('?');
+                }
+                // Standard case using nullability API...
+                else
+                {
+                    var nic = new NullabilityInfoContext();
+                    var info = nic.Create(source);
+
+                    if (info.ReadState == NullabilityState.Nullable ||
+                        info.WriteState == NullabilityState.Nullable)
+                        sb.Append('?');
+                }
+            }*/
         }
+
         if (options.MemberUseArgumentNames)
         {
             if (sb.Length > 0) sb.Append(' ');
