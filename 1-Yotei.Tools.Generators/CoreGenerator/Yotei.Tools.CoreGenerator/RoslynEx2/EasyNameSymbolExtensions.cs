@@ -60,6 +60,7 @@ internal static class EasyNameSymbolExtensions
     /// <summary>
     /// Invoked when the symbol represents an actual type.
     /// </summary>
+    [SuppressMessage("", "IDE0019")]
     static string EasyNameType(this ITypeSymbol source, EasyNameOptions options)
     {
         var isgen = source.TypeKind == TypeKind.TypeParameter;
@@ -76,7 +77,7 @@ internal static class EasyNameSymbolExtensions
         if (hide) return string.Empty;
 
         // Shortcut (some) nullable types...
-        if (options.TypeUseAnnotation)
+        if (options.TypeUseNullability)
         {
             if (args.Length == 1 && (source.Name == "Nullable" || source.Name == "IsNullable"))
             {
@@ -128,7 +129,7 @@ internal static class EasyNameSymbolExtensions
         }
 
         // Nullable annotations (when not intecepted before)...
-        if (options.TypeUseAnnotation &&
+        if (options.TypeUseNullability &&
             source.NullableAnnotation == NullableAnnotation.Annotated) sb.Append('?');
 
         // Finishing...
@@ -161,19 +162,22 @@ internal static class EasyNameSymbolExtensions
             var str = source.Type.EasyName(options);
             if (str.Length > 0)
             {
-                var prefix = source.RefKind switch
+                if (options.MemberModifiers)
                 {
-                    RefKind.Ref => "ref",
-                    RefKind.Out => "out",
-                    RefKind.In => "in",
-                    RefKind.RefReadOnlyParameter => "ref readonly",
-                    _ => null
-                };
-                if (prefix is not null) sb.Append($"{prefix} ");
+                    var prefix = source.RefKind switch
+                    {
+                        RefKind.Ref => "ref",
+                        RefKind.Out => "out",
+                        RefKind.In => "in",
+                        RefKind.RefReadOnlyParameter => "ref readonly",
+                        _ => null
+                    };
+                    if (prefix is not null) sb.Append($"{prefix} ");
+                }
                 sb.Append(str);
             }
 
-            if (options.TypeUseAnnotation && sb[^1] != '?')
+            if (options.TypeUseNullability && sb[^1] != '?')
             {
                 var need = source.NullableAnnotation == NullableAnnotation.Annotated;
                 if (need) sb.Append('?');
@@ -221,14 +225,17 @@ internal static class EasyNameSymbolExtensions
             var str = source.ReturnType.EasyName(options.MemberReturnTypeOptions);
             if (str.Length > 0)
             {
-                var prefix = source.RefKind switch
+                if (options.MemberModifiers)
                 {
-                    RefKind.Ref => "ref",
-                    RefKind.Out => "out",
-                    RefKind.RefReadOnly => "ref readonly",
-                    _ => null
-                };
-                if (prefix is not null) sb.Append($"{prefix} ");
+                    var prefix = source.RefKind switch
+                    {
+                        RefKind.Ref => "ref",
+                        RefKind.Out => "out",
+                        RefKind.RefReadOnly => "ref readonly",
+                        _ => null
+                    };
+                    if (prefix is not null) sb.Append($"{prefix} ");
+                }
                 sb.Append($"{str} ");
             }
         }
@@ -254,8 +261,7 @@ internal static class EasyNameSymbolExtensions
                 if (options.ConstructorTechName) sb.Append(source.Name);
                 else
                 {
-                    sb.Insert(0, "static ");
-
+                    if (options.MemberModifiers) sb.Insert(0, "static ");
                     var name = source.ContainingType.EasyName(options);
                     sb.Append(name);
                 }
@@ -335,14 +341,17 @@ internal static class EasyNameSymbolExtensions
             var str = source.Type.EasyName(options.MemberReturnTypeOptions);
             if (str.Length > 0)
             {
-                var prefix = source.RefKind switch
+                if (options.MemberModifiers)
                 {
-                    RefKind.Ref => "ref",
-                    RefKind.Out => "out",
-                    RefKind.RefReadOnly => "ref readonly",
-                    _ => null
-                };
-                if (prefix is not null) sb.Append($"{prefix} ");
+                    var prefix = source.RefKind switch
+                    {
+                        RefKind.Ref => "ref",
+                        RefKind.Out => "out",
+                        RefKind.RefReadOnly => "ref readonly",
+                        _ => null
+                    };
+                    if (prefix is not null) sb.Append($"{prefix} ");
+                }
                 sb.Append($"{str} ");
             }
         }
@@ -407,6 +416,56 @@ internal static class EasyNameSymbolExtensions
     /// <returns></returns>
     public static string EasyName(this IFieldSymbol source, EasyNameOptions options)
     {
+        // TODO: field EasyName...
+        // Recordar usar custom modifiers...
+        throw null;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns the C#-alike name of the given element, using default options.
+    /// <para>
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static string EasyName(
+        this AttributeData source) => source.EasyName(EasyNameOptions.Default);
+
+    /// <summary>
+    /// Returns the C#-alike name of the given element, using the given options.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="options"></param>
+    /// <returns></returns>
+    public static string EasyName(this AttributeData source, EasyNameOptions options)
+    {
+        // TODO: field EasyName...
+        // Recordar usar custom modifiers...
+        throw null;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns the C#-alike name of the given element, using default options.
+    /// <para>
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static string EasyName(
+        this TypedConstant source) => source.EasyName(EasyNameOptions.Default);
+
+    /// <summary>
+    /// Returns the C#-alike name of the given element, using the given options.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="options"></param>
+    /// <returns></returns>
+    public static string EasyName(this TypedConstant source, EasyNameOptions options)
+    {
+        // TODO: field EasyName...
+        // Recordar usar custom modifiers...
         throw null;
     }
 }

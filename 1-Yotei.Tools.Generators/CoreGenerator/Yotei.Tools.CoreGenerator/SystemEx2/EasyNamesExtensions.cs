@@ -29,18 +29,6 @@ internal static class EasyNameExtensions
     // ----------------------------------------------------
 
     /// <summary>
-    /// Determines if the given type is a value nullable one, or not.
-    /// </summary>
-    static bool IsNullableValueType(this Type type)
-        => type.Name.StartsWith("Nullable`1") && type.GetGenericArguments().Length == 1;
-
-    /// <summary>
-    /// Determines if the given type is a faked nullable one, or not.
-    /// </summary>
-    static bool IsNullableFakedType(this Type type)
-        => type.Name.StartsWith("IsNullable`1") && type.GetGenericArguments().Length == 1;
-
-    /// <summary>
     /// Invoked to return the C#-alike name of the given type element, after its closed generic
     /// type arguments have been obtained. Otherwise, this information is lost if asking for it
     /// in a recursive fashion.
@@ -63,7 +51,7 @@ internal static class EasyNameExtensions
         if (hide) return string.Empty;
 
         // Shortcut nullable types...
-        if (options.TypeUseAnnotation)
+        if (options.TypeUseNullability)
         {
             var isnullablevalue = IsNullableValueType(source);
             var isnullablefaked = IsNullableFakedType(source);
@@ -75,6 +63,12 @@ internal static class EasyNameExtensions
                 return str;
             }
         }
+
+        static bool IsNullableValueType(Type type)
+            => type.Name.StartsWith("Nullable`1") && type.GetGenericArguments().Length == 1;
+
+        static bool IsNullableFakedType(Type type)
+            => type.Name.StartsWith("IsNullable`1") && type.GetGenericArguments().Length == 1;
 
         // Other cases...
         var sb = new StringBuilder();
@@ -146,9 +140,12 @@ internal static class EasyNameExtensions
             var str = source.ParameterType.EasyName(options);
             if (str.Length > 0)
             {
-                if (source.IsIn) sb.Append("in ");
-                else if (source.IsOut) sb.Append("out ");
-                else if (source.ParameterType.IsByRef) sb.Append("ref ");
+                if (options.MemberModifiers)
+                {
+                    if (source.IsIn) sb.Append("in ");
+                    else if (source.IsOut) sb.Append("out ");
+                    else if (source.ParameterType.IsByRef) sb.Append("ref ");
+                }
                 sb.Append(str);
             }
 

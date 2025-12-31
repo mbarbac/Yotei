@@ -1,4 +1,4 @@
-﻿#pragma warning IDE0019
+﻿#pragma warning disable IDE0019
 
 namespace Yotei.Tools.CoreGenerator;
 

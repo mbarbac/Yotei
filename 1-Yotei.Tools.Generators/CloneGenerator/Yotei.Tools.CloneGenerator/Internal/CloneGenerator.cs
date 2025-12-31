@@ -32,6 +32,10 @@ internal class CloneGenerator : TreeGenerator
     protected override List<Type> MethodAttributes { get; } = [
         typeof(NamedAttribute),];
 
+    // DEBUG-ONLY remove attribute types when done...
+    protected override List<Type> FieldAttributes { get; } = [
+        typeof(NamedAttribute),];
+
     // ----------------------------------------------------
 
     /// <summary>

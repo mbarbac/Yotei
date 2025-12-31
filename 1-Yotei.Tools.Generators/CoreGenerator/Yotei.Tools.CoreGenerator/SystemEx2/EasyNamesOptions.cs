@@ -48,7 +48,7 @@ internal record EasyNameOptions
     /// Determines if the nullability annotation of the type element shall be used. Note that
     /// for reflection reference types it cannot be found in most circumstances.
     /// </summary>
-    public bool TypeUseAnnotation { get; init; }
+    public bool TypeUseNullability { get; init; }
 
     /// <summary>
     /// The options to use with the generic arguments of the type element, or '<c>null</c>' if
@@ -57,6 +57,11 @@ internal record EasyNameOptions
     public EasyNameOptions? TypeArgumentsOptions { get; init; }
 
     // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if member prefixes (ie: 'ref', 'static', etc.) shall be used or not.
+    /// </summary>
+    public bool MemberModifiers { get; init; }
 
     /// <summary>
     /// The options to use with the return type of the member element, or '<c>null</c>' if it
@@ -108,8 +113,9 @@ internal record EasyNameOptions
             case Mode.Empty: break;
 
             case Mode.Default:
-                TypeUseAnnotation = true;
+                TypeUseNullability = true;
                 TypeArgumentsOptions = this;
+                MemberModifiers = true;
                 MemberGenericArgumentsOptions = this;
                 MemberUseArgumentTypes = true;
                 break;
@@ -118,8 +124,9 @@ internal record EasyNameOptions
                 TypeUseNamespace = true;
                 TypeUseHost = true;
                 TypeHideName = false;
-                TypeUseAnnotation = true;
+                TypeUseNullability = true;
                 TypeArgumentsOptions = this;
+                MemberModifiers = true;
                 MemberReturnTypeOptions = this;
                 MemberHostTypeOptions = this;
                 ConstructorTechName = true;

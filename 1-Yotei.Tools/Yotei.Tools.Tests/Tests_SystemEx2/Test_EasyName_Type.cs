@@ -60,7 +60,7 @@ public static class Test_EasyName_Type
     {
         EasyNameOptions options;
         string name;
-        var item = typeof(Nullable<int>);
+        var item = typeof(Nullable<int>); // equivalent to: 'int?'
 
         options = EMPTY;
         name = item.EasyName(options); Assert.Equal("Nullable", name);
@@ -81,7 +81,7 @@ public static class Test_EasyName_Type
     {
         EasyNameOptions options;
         string name;
-        var item = typeof(IsNullable<int?>);
+        var item = typeof(IsNullable<int?>); // Forced recursion, must dissapear
 
         options = EMPTY;
         name = item.EasyName(options); Assert.Equal("IsNullable", name);
@@ -102,7 +102,7 @@ public static class Test_EasyName_Type
     {
         EasyNameOptions options;
         string name;
-        var item = typeof(IsNullable<IsNullable<int?>>);
+        var item = typeof(IsNullable<IsNullable<int?>>); // Forced recursion, must dissapear
 
         options = EMPTY;
         name = item.EasyName(options); Assert.Equal("IsNullable", name);

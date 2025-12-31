@@ -5,6 +5,6 @@
 public partial class Foo<K, T>
 {
     [Named]
-    public const int One = 7;
+    public void MyMethod(ref int one) { }
 }
 
