@@ -204,8 +204,10 @@ public class LambdaParser
     /// <returns><inheritdoc/></returns>
     public override string ToString()
     {
-        var args = DynamicArguments.Select(static x => x.Sketch()).Sketch();
-        return $"({args}) => {Result}";
+        // HIGH: EasyName related
+        //var args = DynamicArguments.Select(static x => x.Sketch()).Sketch();
+        //return $"({args}) => {Result}";
+        return "";
     }
 
     /// <summary>

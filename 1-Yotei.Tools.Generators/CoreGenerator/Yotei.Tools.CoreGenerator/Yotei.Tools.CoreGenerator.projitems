@@ -30,7 +30,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\SkipLocalsInitAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx2\MatchExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx2\Finder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx2\EasyNameSymbolExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\INamedTypeSymbolExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\ITypeSymbolExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\ISymbolExtensions.cs" />
@@ -39,8 +38,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\AttributeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\DiagnosticExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx2\CodeBuilder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SystemEx2\EasyNamesExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SystemEx2\EasyNamesOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx2\IsNullable[T].cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CharExtension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\ObjectExtensions.cs" />

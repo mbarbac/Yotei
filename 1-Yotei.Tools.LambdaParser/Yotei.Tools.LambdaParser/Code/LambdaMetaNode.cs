@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools.LambdaParser;
+﻿#pragma warning disable IDE0300
+
+namespace Yotei.Tools.LambdaParser;
 
 // ========================================================
 /// <summary>
@@ -99,9 +101,10 @@ internal class LambdaMetaNode : DynamicMetaObject
     /// <returns><inheritdoc/></returns>
     public override DynamicMetaObject BindConvert(ConvertBinder binder)
     {
-        LambdaParser.Print(LambdaParser.MetaBindedColor, $"* META BindConvert:");
-        LambdaParser.Print(LambdaParser.MetaBindedColor, $"- This: {this}");
-        LambdaParser.Print(LambdaParser.MetaBindedColor, $"- Type: {binder.Type.EasyName()}");
+        // HIGH: EasyName related
+        //LambdaParser.Print(LambdaParser.MetaBindedColor, $"* META BindConvert:");
+        //LambdaParser.Print(LambdaParser.MetaBindedColor, $"- This: {this}");
+        //LambdaParser.Print(LambdaParser.MetaBindedColor, $"- Type: {binder.Type.EasyName()}");
 
         var node = new LambdaNodeConvert(binder.Type, ValueNode);
         LambdaParser.Instance.LastNode = node;

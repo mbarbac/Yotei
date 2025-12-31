@@ -22,7 +22,7 @@ internal class FieldNode : ITreeNode
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"Field: {Symbol.EasyName()}";
+    public override string ToString() => $"Field: {Symbol.Name}";
 
     // ----------------------------------------------------
 

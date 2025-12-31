@@ -20,7 +20,7 @@ internal class TypeNode : ITreeNode
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"Type: {Symbol.EasyName()}";
+    public override string ToString() => $"Type: {Symbol.Name}";
 
     // ----------------------------------------------------
 
@@ -191,7 +191,8 @@ internal class TypeNode : ITreeNode
                 throw new ArgumentException(diag.GetMessage());
         }
 
-        var name = Symbol.EasyName();
+        // HIGH: substitute with 'Symbol.EasyName()'...
+        var name = Symbol.Name;
         return $"partial {rec}{kind} {name}";
     }
 

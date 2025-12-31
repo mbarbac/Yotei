@@ -24,7 +24,7 @@ internal class FileNode : INode
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"File: {Node.Symbol.EasyName()}";
+    public override string ToString() => $"File: {Node.Symbol.Name}";
 
     // ----------------------------------------------------
 

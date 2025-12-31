@@ -22,7 +22,7 @@ internal class PropertyNode : ITreeNode
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"Property: {Symbol.EasyName()}";
+    public override string ToString() => $"Property: {Symbol.Name}";
 
     // ----------------------------------------------------
 

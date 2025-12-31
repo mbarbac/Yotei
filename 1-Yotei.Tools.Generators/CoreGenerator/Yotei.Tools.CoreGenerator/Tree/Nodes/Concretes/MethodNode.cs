@@ -22,7 +22,18 @@ internal class MethodNode : ITreeNode
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"Method: {Symbol.EasyName()}";
+    public override string ToString()
+    {
+        var sb = new StringBuilder($"Method: {Symbol.Name}");
+
+        sb.Append('('); for (int i = 0; i < Symbol.Parameters.Length; i++)
+        {
+            if (i > 0) sb.Append(", ");
+            sb.Append(Symbol.Parameters[i].Type.Name);
+        }
+        sb.Append(')');
+        return sb.ToString();
+    }
 
     // ----------------------------------------------------
 

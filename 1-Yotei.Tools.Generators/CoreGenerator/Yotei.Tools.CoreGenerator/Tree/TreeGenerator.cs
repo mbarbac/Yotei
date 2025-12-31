@@ -285,14 +285,6 @@ internal class TreeGenerator : IIncrementalGenerator
             var ats = FindAttributes(symbol, methodsyntax, MethodAttributes, MethodAttributesNames);
             if (ats.Count == 0) break;
 
-            // DEBUG-ONLY
-            var options = EasyNameOptions.Default with
-            {
-                MemberReturnTypeOptions = EasyNameOptions.Default,
-            };
-            var name = symbol.EasyName(options);
-            Debug.Assert(name != null);
-
             var candidate = CreateCandidate(symbol, methodsyntax, ats, model);
             return candidate;
         }

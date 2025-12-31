@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools.LambdaParser;
+﻿#pragma warning disable IDE0300
+
+namespace Yotei.Tools.LambdaParser;
 
 // ========================================================
 /// <summary>
@@ -23,10 +25,13 @@ public abstract class LambdaNode : DynamicObject
     /// Obtains a debug representation of this instance.
     /// </summary>
     /// <returns></returns>
+    [SuppressMessage("", "CA1822")] // HIGH: EasyName related
     public string ToDebugString()
     {
-        var name = GetType().EasyName();
-        return $"[{name}]#{LambdaId}/{LambdaVersion}({ToString()})";
+        // HIGH: EasyName related
+        //var name = GetType().EasyName();
+        //return $"[{name}]#{LambdaId}/{LambdaVersion}({ToString()})";
+        return "";
     }
 
     /// <summary>
