@@ -211,7 +211,7 @@ internal static class EasyNameSymbolExtensions
         source.ThrowWhenNull();
         options.ThrowWhenNull();
 
-        var isctor = source.MethodKind == MethodKind.Constructor;
+        var isctor = source.MethodKind is MethodKind.Constructor or MethodKind.StaticConstructor;
         var host = source.ContainingType;
         var sb = new StringBuilder();
 
@@ -241,9 +241,26 @@ internal static class EasyNameSymbolExtensions
         }
 
         // Name...
-        var name = source.Name;
-        if (isctor) name = options.ConstructorTechName ? source.MetadataName : "new";
-        sb.Append(name);
+        if (!isctor) sb.Append(source.Name);
+        else
+        {
+            // The default name can either be '.ctor' or '..ctor' for static ones.
+            if (source.MethodKind is MethodKind.Constructor)
+            {
+                sb.Append(options.ConstructorTechName ? source.Name : "new");
+            }
+            else
+            {
+                if (options.ConstructorTechName) sb.Append(source.Name);
+                else
+                {
+                    sb.Insert(0, "static ");
+
+                    var name = source.ContainingType.EasyName(options);
+                    sb.Append(name);
+                }
+            }
+        }
 
         // Generic arguments...
         if (options.MemberGenericArgumentsOptions is not null)

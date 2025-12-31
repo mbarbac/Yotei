@@ -5,6 +5,6 @@
 public partial class Foo<K, T>
 {
     [Named]
-    public Foo(out K one) { one = default!; }
+    public const int One = 7;
 }
 

@@ -286,7 +286,10 @@ internal class TreeGenerator : IIncrementalGenerator
             if (ats.Count == 0) break;
 
             // DEBUG-ONLY
-            var options = EasyNameOptions.Default with { MemberReturnTypeOptions = EasyNameOptions.Default };
+            var options = EasyNameOptions.Default with
+            {
+                MemberReturnTypeOptions = EasyNameOptions.Default,
+            };
             var name = symbol.EasyName(options);
             Debug.Assert(name != null);
 
