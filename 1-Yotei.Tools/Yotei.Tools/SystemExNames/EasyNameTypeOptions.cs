@@ -1,6 +1,4 @@
-﻿using System.Xml.Schema;
-
-namespace Yotei.Tools;
+﻿namespace Yotei.Tools;
 
 // ========================================================
 public static partial class EasyNameExtensions
@@ -8,109 +6,112 @@ public static partial class EasyNameExtensions
     /// <summary>
     /// Obtains the C#-alike easy name of the given element using default options.
     /// </summary>
-    /// <param name="type"></param>
+    /// <param name="source"></param>
     /// <returns></returns>
-    public static string EasName(
-        this Type type) => TypeEasyName.Default.EasyName(type);
+    public static string EasyName(
+        this Type source) => EasyNameTypeOptions.Default.EasyName(source);
 
     /// <summary>
     /// Obtains the C#-alike easy name of the given element using the given options.
     /// </summary>
-    /// <param name="type"></param>
+    /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasName(this Type type, TypeEasyName options)
+    public static string EasyName(this Type source, EasyNameTypeOptions options)
     {
         options.ThrowWhenNull();
-        return options.EasyName(type);
+        return options.EasyName(source);
     }
 }
 
 // ========================================================
 /// <summary>
 /// Provides 'EasyName' capabilities for <see cref="Type"/> instances.
+/// <br/> Empty options render an empty string.
+/// <br/> Default options just render the name of the element.
 /// </summary>
-public record TypeEasyName
+public record EasyNameTypeOptions
 {
-    /// <summary>
-    /// A shared read-only instance that represents empty options.
-    /// </summary>
-    public static TypeEasyName Empty { get; } = new(Mode.Empty);
-
     /// <summary>
     /// A shared read-only instance that represents default options.
     /// </summary>
-    public static TypeEasyName Default { get; } = new(Mode.Default);
+    public static EasyNameTypeOptions Default { get; } = new(Mode.Default);
 
     /// <summary>
     /// A shared read-only instance that represents full options.
     /// </summary>
-    public static TypeEasyName Full { get; } = new(Mode.Full);
+    public static EasyNameTypeOptions Full { get; } = new(Mode.Full);
 
     /// <summary>
     /// Initializes a new default instance.
     /// </summary>
-    public TypeEasyName() : this(Mode.Default) { }
+    public EasyNameTypeOptions() : this(Mode.Default) { }
 
     // ----------------------------------------------------
 
     /// <summary>
     /// Determines if the 'in' and 'out' variance specifiers shall be used or not.
-    /// <br/> This setting is only used with generic-alike types.
-    /// <br/> The value of this property is 'false' by default.
     /// </summary>
     public bool UseVarianceMask { get; init; }
 
     /// <summary>
     /// Determines if the namespace of the type shall be used.
-    /// <br/> The value of this property is 'false' by default.
     /// </summary>
     public bool UseNamespace { get; init; }
 
     /// <summary>
     /// Determines if the host of the type shall be used.
-    /// <br/> The value of this property is 'false' by default.
     /// </summary>
     public bool UseHost { get; init; }
 
     /// <summary>
-    /// Determines if the name of the type shall be hidden.
-    /// <br/> The value of this property is 'false' by default. When used, then it shortcuts
-    /// any other setting.
+    /// Determines if the name of the type shall be hidden, and shortcuts any other setting.
     /// </summary>
     public bool HideName { get; init; }
 
     /// <summary>
-    /// Determines if the nullability annotation of the type element shall be used.
-    /// <br/> The value of this property is 'true' by default.
-    /// <br/> For reference types, or generic ones, nullable annotations are just syntactic sugar
-    /// used by the compiler but, in most circumstances, not persisted in metadata or in custom
-    /// attributes. The <see cref="IsNullable{T}"/> type can be used as a workaround when this
-    /// metadata-alike must be specified somehow.
-    /// <br/> By contrast, value types are translated to <see cref="Nullable{T}"/> instances.
+    /// If 'true', the <see cref="Nullable{T}"/> and <see cref="IsNullable{T}"/> nullable wrappers
+    /// are removed, and the wrapped value used instead.
+    /// </summary>
+    public bool RemoveNullableWrapper { get; init; }
+
+    /// <summary>
+    /// If 'true', tries to add to the type's name the nullable annotation, if any.
+    /// <br/> For reference or generic types, nullable annotations are just syntactic sugar used by
+    /// the compiler, but in most circumstances not persisted in metadata or in custom attributes.
+    /// By contrast, nullable value types are translated to <see cref="Nullable{T}"/> instances.
+    /// <br/> The <see cref="IsNullable{T}"/> type can be used as a workaround when nullability
+    /// must be specified and persisted.
     /// </summary>
     public bool UseNullability { get; init; }
 
+    public class PepeAttribute : Attribute { }
+
+    public class BB<[Pepe]S> { }
+
+    /*
+    /// <summary>
+    /// Determines if the nullability annotation of the type element shall be used.
+    /// <br/> For reference types, or generic ones, nullable annotations are just syntactic sugar
+    /// used by the compiler but, in most circumstances, not persisted in metadata or in custom
+    /// attributes. The 
+    /// <br/> By contrast, value types are translated to 
+    /// </summary>
+    public bool UseNullability { get; init; }*/
+
     /// <summary>
     /// Determines if the generic type arguments of the type shall be used, or not.
-    /// <br/> The value of this property is 'true' by default.
     /// </summary>
-    public bool UseGenerics { get; init; }
+    public bool UseGenericArguments { get; init; }
 
     // ----------------------------------------------------
 
-    enum Mode { Empty, Default, Full };
-    private TypeEasyName(Mode mode)
+    enum Mode { Default, Full };
+    private EasyNameTypeOptions(Mode mode)
     {
         switch (mode)
         {
-            case Mode.Empty:
-                HideName = true;
-                break;
-
             case Mode.Default:
-                UseNullability = true;
-                UseGenerics = true;
                 break;
 
             case Mode.Full:
@@ -118,7 +119,7 @@ public record TypeEasyName
                 UseNamespace = true;
                 UseHost = true;
                 UseNullability = true;
-                UseGenerics = true;
+                UseGenericArguments = true;
                 break;
         }
     }
@@ -204,7 +205,7 @@ public record TypeEasyName
         sb.Append(name);
 
         // Generic arguments...
-        if (need > 0 && UseGenerics)
+        if (need > 0 && UseGenericArguments)
         {
             sb.Append('<'); for (int i = 0; i < need; i++)
             {
