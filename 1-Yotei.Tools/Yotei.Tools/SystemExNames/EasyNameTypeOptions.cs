@@ -69,6 +69,7 @@ public record EasyNameTypeOptions
     /// </summary>
     public bool HideName { get; init; }
 
+    /*
     /// <summary>
     /// If 'true', the <see cref="Nullable{T}"/> and <see cref="IsNullable{T}"/> nullable wrappers
     /// are removed, and the wrapped value used instead.
@@ -87,7 +88,7 @@ public record EasyNameTypeOptions
 
     public class PepeAttribute : Attribute { }
 
-    public class BB<[Pepe]S> { }
+    public class BB<[Pepe]S> { }*/
 
     /*
     /// <summary>

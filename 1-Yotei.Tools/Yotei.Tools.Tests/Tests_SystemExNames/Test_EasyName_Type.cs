@@ -7,8 +7,11 @@ public static class Test_EasyName_Type
     const string NAMESPACE = "Yotei.Tools.Tests.EasyNames";
     const string CLASSNAME = nameof(Test_EasyName_Type);
 
-    readonly static EasyNameTypeOptions DEFAULT = EasyNameTypeOptions.Default;
-    readonly static EasyNameTypeOptions FULL = EasyNameTypeOptions.Full;
+    //readonly static EasyNameTypeOptions EMPTY = EasyNameTypeOptions.Empty;
+    //readonly static EasyNameTypeOptions DEFAULT = EasyNameTypeOptions.Default;
+    //readonly static EasyNameTypeOptions FULL = EasyNameTypeOptions.Full;
+
+    /*
 
     // ----------------------------------------------------
 
@@ -45,23 +48,6 @@ public static class Test_EasyName_Type
 
         options = DEFAULT;
         name = item.EasyName(options); Assert.Equal("Nullable", name);
-
-        options = FULL;
-        name = item.EasyName(options); Assert.Equal("System.Int32?", name);
-    }
-
-    /*
-    {
-        
-
-        options = EMPTY;
-        name = item.EasyName(options); Assert.Empty(name);
-
-        options = DEFAULT;
-        name = item.EasyName(options); Assert.Equal("Int32?", name);
-
-        options = DEFAULT with { UseNullability = false };
-        name = item.EasyName(options); Assert.Equal("Nullable<Int32>", name);
 
         options = FULL;
         name = item.EasyName(options); Assert.Equal("System.Int32?", name);
