@@ -7,11 +7,8 @@ public static class Test_EasyName_Type
     const string NAMESPACE = "Yotei.Tools.Tests.EasyNames";
     const string CLASSNAME = nameof(Test_EasyName_Type);
 
-    //readonly static EasyNameTypeOptions EMPTY = EasyNameTypeOptions.Empty;
-    //readonly static EasyNameTypeOptions DEFAULT = EasyNameTypeOptions.Default;
-    //readonly static EasyNameTypeOptions FULL = EasyNameTypeOptions.Full;
-
-    /*
+    readonly static EasyNameTypeOptions DEFAULT = EasyNameTypeOptions.Default;
+    readonly static EasyNameTypeOptions FULL = EasyNameTypeOptions.Full;
 
     // ----------------------------------------------------
 
@@ -24,7 +21,7 @@ public static class Test_EasyName_Type
         var item = typeof(string);
 
         options = DEFAULT with { HideName = true };
-        name = item.EasyName(options); Assert.Empty(name);
+        name = item.EasyName(options); Assert.Equal("", name);
 
         options = DEFAULT;
         name = item.EasyName(options); Assert.Equal("String", name);
@@ -44,13 +41,13 @@ public static class Test_EasyName_Type
         var item = typeof(int?);
 
         options = DEFAULT with { HideName = true };
-        name = item.EasyName(options); Assert.Empty(name);
+        name = item.EasyName(options); Assert.Equal("", name);
 
         options = DEFAULT;
-        name = item.EasyName(options); Assert.Equal("Nullable", name);
+        name = item.EasyName(options); Assert.Equal("Int32?", name);
 
         options = FULL;
-        name = item.EasyName(options); Assert.Equal("System.Int32?", name);
+        name = item.EasyName(options); Assert.Equal("System.Nullable<System.Int32>", name);
     }
 
     //[Enforced]
@@ -61,204 +58,110 @@ public static class Test_EasyName_Type
         string name;
         var item = typeof(Nullable<int>);
 
-        options = EMPTY;
-        name = item.EasyName(options); Assert.Empty(name);
+        options = DEFAULT with { HideName = true };
+        name = item.EasyName(options); Assert.Equal("", name);
 
         options = DEFAULT;
         name = item.EasyName(options); Assert.Equal("Int32?", name);
 
-        options = DEFAULT with { UseNullability = false };
-        name = item.EasyName(options); Assert.Equal("Nullable<Int32>", name);
-
         options = FULL;
-        name = item.EasyName(options); Assert.Equal("System.Int32?", name);
+        name = item.EasyName(options); Assert.Equal("System.Nullable<System.Int32>", name);
     }
 
     // ----------------------------------------------------
 
-    public interface I0A<T> { }
-    public interface I0B<T> : I0A<T?> { }
-
-    // typeof(string?): typeof operator cannot be used with a reference type, we use this indirect approach...
-    public interface I0C<T> : I0A<IsNullable<T>> { }
-
-    // Nullable generics act as reference types: nullability not persisted!
-    //[Enforced]
-    [Fact]
-    public static void Test0_System_NullableGeneric_Unbound()
-    {
-        EasyNameTypeOptions options;
-        string name;
-        var type = typeof(I0B<>);
-        var item = type.GetInterface("I0A`1")!;
-
-        options = EMPTY;
-        name = item.EasyName(options); Assert.Empty(name);
-
-        options = DEFAULT;
-        name = item.EasyName(options); Assert.Equal("I0A<T>", name);
-
-        options = DEFAULT with { UseNullability = false };
-        name = item.EasyName(options); Assert.Equal("I0A<T>", name);
-
-        options = FULL;
-        name = item.EasyName(options); Assert.Equal("I0A<T>", name);
-    }
+    public interface IFace1A<[IsNullable] K, in T> { }
 
     //[Enforced]
     [Fact]
-    public static void Test0_System_NullableGeneric_FakedUnbound()
+    public static void Test1_NullableAttribute_Generic_Unbound()
     {
         EasyNameTypeOptions options;
         string name;
-        var type = typeof(I0C<>);
-        var item = type.GetInterface("I0A`1")!;
-
-        options = EMPTY;
-        name = item.EasyName(options); Assert.Empty(name);
+        var item = typeof(IFace1A<,>);
 
         options = DEFAULT;
-        name = item.EasyName(options); Assert.Equal("I0A<T?>", name);
+        name = item.EasyName(options); Assert.Equal("IFace1A", name);
 
-        options = DEFAULT with { UseNullability = false };
-        name = item.EasyName(options); Assert.Equal("I0A<IsNullable<T>>", name);
-
-        options = FULL;
-        name = item.EasyName(options); Assert.Equal("I0A<T?>", name);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test0_System_NullableGeneric_BoundNotNullable()
-    {
-        EasyNameTypeOptions options;
-        string name;
-        var type = typeof(I0B<string>);
-        var item = type.GetInterface("I0A`1")!;
-
-        options = EMPTY;
-        name = item.EasyName(options); Assert.Empty(name);
-
-        options = DEFAULT;
-        name = item.EasyName(options); Assert.Equal("I0A<String>", name);
+        options = DEFAULT with { UseGenericArguments = true };
+        name = item.EasyName(options); Assert.Equal("IFace1A<K?, T>", name);
 
         options = FULL;
         name = item.EasyName(options);
-        Assert.Equal($"{NAMESPACE}.{CLASSNAME}.I0A<System.String>", name);
+        Assert.Equal($"{NAMESPACE}.{CLASSNAME}.IFace1A<K?, in T>", name);
     }
 
     //[Enforced]
     [Fact]
-    public static void Test0_System_NullableGeneric_BoundNullable()
+    public static void Test1_NullableAttribute_Generic_Bound()
     {
         EasyNameTypeOptions options;
         string name;
-        var type = typeof(I0B<string?>);
-        var item = type.GetInterface("I0A`1")!;
-
-        options = EMPTY;
-        name = item.EasyName(options); Assert.Empty(name);
+        var item = typeof(IFace1A<string?, int?>);
 
         options = DEFAULT;
-        name = item.EasyName(options); Assert.Equal("I0A<String>", name); // not persisted!
+        name = item.EasyName(options); Assert.Equal("IFace1A", name);
 
-        options = DEFAULT with { UseNullability = false };
-        name = item.EasyName(options); Assert.Equal("I0A<String>", name); // not persisted!
+        // string? not persisted, [IsNullable] not allowed
+        options = DEFAULT with { UseGenericArguments = true };
+        name = item.EasyName(options); Assert.Equal("IFace1A<String, Int32?>", name);
 
+        // variance modifiers lost when using typeof(...)
         options = FULL;
         name = item.EasyName(options);
-        Assert.Equal($"{NAMESPACE}.{CLASSNAME}.I0A<System.String>", name); // not persisted!
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test0_System_NullableGeneric_BoundFakedNullable()
-    {
-        EasyNameTypeOptions options;
-        string name;
-        var type = typeof(I0B<IsNullable<string?>>);
-        var item = type.GetInterface("I0A`1")!;
-
-        options = EMPTY;
-        name = item.EasyName(options); Assert.Empty(name);
-
-        options = DEFAULT;
-        name = item.EasyName(options); Assert.Equal("I0A<String?>", name);
-
-        options = DEFAULT with { UseNullability = false };
-        name = item.EasyName(options); Assert.Equal("I0A<IsNullable<String>>", name);
-
-        options = FULL;
-        name = item.EasyName(options);
-        Assert.Equal($"{NAMESPACE}.{CLASSNAME}.I0A<System.String?>", name);
+        Assert.Equal(
+            $"{NAMESPACE}.{CLASSNAME}." +
+            "IFace1A<System.String, System.Nullable<System.Int32>>", name);
     }
 
     // ----------------------------------------------------
 
-    public interface I1A<K, in T> { public interface I1B<out S> { } }
+    public interface IFace2A<T> { }
+    public interface IFace2B<T> : IFace2A<T?> { }
 
     //[Enforced]
     [Fact]
-    public static void Test1_Nested_Unbound()
+    public static void Test2_NullableAnnotation_Generic_Unbound()
     {
         EasyNameTypeOptions options;
         string name;
-        var item = typeof(I1A<,>.I1B<>);
-
-        options = EMPTY;
-        name = item.EasyName(options); Assert.Empty(name);
+        var type = typeof(IFace2B<>);
+        var item = type.GetInterface("IFace2A`1")!;
 
         options = DEFAULT;
-        name = item.EasyName(options); Assert.Equal("I1B<S>", name);
+        name = item.EasyName(options); Assert.Equal("IFace2A", name);
+
+        // nullable annotation lost, as if the type was a reference one
+        options = DEFAULT with { UseGenericArguments = true };
+        name = item.EasyName(options); Assert.Equal("IFace2A<T>", name);
 
         options = FULL;
-        name = item.EasyName(options);
-        Assert.Equal($"{NAMESPACE}.{CLASSNAME}.I1A<K, in T>.I1B<out S>", name);
+        name = item.EasyName(options); Assert.Equal("IFace2A<T>", name);
     }
 
     //[Enforced]
     [Fact]
-    public static void Test1_Nested_Bound()
+    public static void Test2_NullableAnnotation_Generic_Bound()
     {
         EasyNameTypeOptions options;
         string name;
-        var item = typeof(I1A<byte, int?>.I1B<string?>);
-
-        options = EMPTY;
-        name = item.EasyName(options); Assert.Empty(name);
+        var type = typeof(IFace2B<string?>);
+        var item = type.GetInterface("IFace2A`1")!;
 
         options = DEFAULT;
-        name = item.EasyName(options); Assert.Equal("I1B<String>", name);
+        name = item.EasyName(options); Assert.Equal("IFace2A", name);
+
+        // nullable annotation not persisted
+        options = DEFAULT with { UseGenericArguments = true };
+        name = item.EasyName(options); Assert.Equal("IFace2A<String>", name);
 
         options = FULL;
         name = item.EasyName(options);
-        Assert.Equal(
-            $"{NAMESPACE}.{CLASSNAME}.I1A<System.Byte, System.Int32?>.I1B<System.String>",
-            name);
+        Assert.Equal($"{NAMESPACE}.{CLASSNAME}.IFace2A<System.String>", name);
     }
 
-    //[Enforced]
-    [Fact]
-    public static void Test1_Nested_Bound_Faked()
-    {
-        EasyNameTypeOptions options;
-        string name;
-        var item = typeof(I1A<byte, int?>.I1B<IsNullable<string?>>);
+    // ----------------------------------------------------
 
-        options = EMPTY;
-        name = item.EasyName(options); Assert.Empty(name);
-
-        options = DEFAULT;
-        name = item.EasyName(options); Assert.Equal("I1B<String?>", name);
-
-        options = DEFAULT with { UseNullability = false };
-        name = item.EasyName(options); Assert.Equal("I1B<IsNullable<String>>", name);
-
-        options = FULL;
-        name = item.EasyName(options);
-        Assert.Equal(
-            $"{NAMESPACE}.{CLASSNAME}.I1A<System.Byte, System.Int32?>.I1B<System.String?>",
-            name);
-    }
-    */
+    public interface IFace3A<T> { }
+    public interface IFace3B<T> : IFace3A<IsNullable<T>> { }
 }

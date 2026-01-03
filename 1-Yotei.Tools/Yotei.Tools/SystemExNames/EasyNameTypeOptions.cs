@@ -27,8 +27,7 @@ public static partial class EasyNameExtensions
 // ========================================================
 /// <summary>
 /// Provides 'EasyName' capabilities for <see cref="Type"/> instances.
-/// <br/> Empty options render an empty string.
-/// <br/> Default options just render the name of the element.
+/// <br/> Default instances just obtain the name of the type with its nullable annotation, if any.
 /// </summary>
 public record EasyNameTypeOptions
 {
@@ -69,39 +68,19 @@ public record EasyNameTypeOptions
     /// </summary>
     public bool HideName { get; init; }
 
-    /*
     /// <summary>
-    /// If 'true', the <see cref="Nullable{T}"/> and <see cref="IsNullable{T}"/> nullable wrappers
-    /// are removed, and the wrapped value used instead.
-    /// </summary>
-    public bool RemoveNullableWrapper { get; init; }
-
-    /// <summary>
-    /// If 'true', tries to add to the type's name the nullable annotation, if any.
-    /// <br/> For reference or generic types, nullable annotations are just syntactic sugar used by
-    /// the compiler, but in most circumstances not persisted in metadata or in custom attributes.
-    /// By contrast, nullable value types are translated to <see cref="Nullable{T}"/> instances.
-    /// <br/> The <see cref="IsNullable{T}"/> type can be used as a workaround when nullability
-    /// must be specified and persisted.
+    /// Determines if the nullability annotation of the type, if any, shall be used.
     /// </summary>
     public bool UseNullability { get; init; }
 
-    public class PepeAttribute : Attribute { }
-
-    public class BB<[Pepe]S> { }*/
-
-    /*
     /// <summary>
-    /// Determines if the nullability annotation of the type element shall be used.
-    /// <br/> For reference types, or generic ones, nullable annotations are just syntactic sugar
-    /// used by the compiler but, in most circumstances, not persisted in metadata or in custom
-    /// attributes. The 
-    /// <br/> By contrast, value types are translated to 
+    /// Determines if the <see cref="Nullable{T}"/> and <see cref="IsNullable{T}"/> nullable
+    /// wrappers shall be printed, or print the annotated wrapped type instead.
     /// </summary>
-    public bool UseNullability { get; init; }*/
+    public bool UseNullableWrappers { get; init; }
 
     /// <summary>
-    /// Determines if the generic type arguments of the type shall be used, or not.
+    /// Determines if the generic type arguments of the type shall be used.
     /// </summary>
     public bool UseGenericArguments { get; init; }
 
@@ -113,6 +92,7 @@ public record EasyNameTypeOptions
         switch (mode)
         {
             case Mode.Default:
+                UseNullability = true;
                 break;
 
             case Mode.Full:
@@ -120,6 +100,7 @@ public record EasyNameTypeOptions
                 UseNamespace = true;
                 UseHost = true;
                 UseNullability = true;
+                UseNullableWrappers = true;
                 UseGenericArguments = true;
                 break;
         }
@@ -141,18 +122,13 @@ public record EasyNameTypeOptions
     }
 
     /// <summary>
-    /// Invoked to obtain the C#-alike name of the given type, after its closed generic type
-    /// arguments have been obtained. Otherwise, the detailed information is lost when asking
-    /// in a recursive fashion.
+    /// Invoked to obtain the C#-alike name of the given type, once its closed generic arguments,
+    /// if any, have been captured to prevent loosing them. These are the ones in the source along
+    /// with all the ones in its inheritance chain.
     /// </summary>
-    /// <param name="source"></param>
-    /// <param name="types"></param>
-    /// <returns></returns>
     string EasyName(Type source, Type[] types)
     {
-        var isgen = source.FullName == null;
         var host = source.DeclaringType;
-
         var args = source.GetGenericArguments();
         var used = host is null ? 0 : host.GetGenericArguments().Length;
         var need = args.Length - used;
@@ -160,20 +136,23 @@ public record EasyNameTypeOptions
         // Shortcut hide name...
         if (HideName) return string.Empty;
 
-        // Shortcut explicit nullable types...
-        if (UseNullability && (IsNullableValueType() || IsNullableFakedType()))
+        // Shortcut not decorated nullability...
+        if (UseNullability && !UseNullableWrappers &&
+            source.GetCustomAttribute<IsNullableAttribute>() == null)
         {
-            var str = EasyName(args[0]);
-            if (!str.EndsWith('?')) str += '?';
-            return str;
+            if ((need == 1 && source.Name.StartsWith("Nullable`1")) ||
+                (need == 1 && source.Name.StartsWith("IsNullable`1")))
+            {
+                var type = types[used];
+                var str = EasyName(type); if (!str.EndsWith('?')) str += '?';
+                return str;
+            }
         }
-        bool IsNullableValueType() => source.Name.StartsWith("Nullable`1") && args.Length == 1;
-        bool IsNullableFakedType() => source.Name.StartsWith("IsNullable`1") && args.Length == 1;
 
-        // Standard case...
+        // Processing...
         var sb = new StringBuilder();
 
-        // Variance attributes...
+        // Variance mask...
         if (UseVarianceMask && source.IsGenericParameter)
         {
             var gpa = source.GenericParameterAttributes;
@@ -184,29 +163,28 @@ public record EasyNameTypeOptions
         }
 
         // Namespace...
-        if (UseNamespace && !isgen && host is null)
+        if (UseNamespace && host is null)
         {
             var str = source.Namespace;
             if (str is not null && str.Length > 0) { sb.Append(str); sb.Append('.'); }
         }
 
         // Host...
-        if ((UseHost || UseNamespace) && !isgen && host is not null)
+        if ((UseHost || UseNamespace) && host is not null)
         {
             // Using 'types' to prevent loosing bound information...
             var str = EasyName(host, types);
             if (str is not null && str.Length > 0) { sb.Append(str); sb.Append('.'); }
         }
 
-        // Name& is a 'ref' type, which shall be intercepted in a parameterinfo instance...
-        // Name...
+        // Name (name& is a ref type, 'ref' to be intercepted elsewhere)...
         var name = source.Name;
         var index = name.IndexOf('`'); if (index >= 0) name = name[..index];
         if (name.EndsWith('&')) name = name[..^1];
         sb.Append(name);
 
         // Generic arguments...
-        if (need > 0 && UseGenericArguments)
+        if (UseGenericArguments && need > 0)
         {
             sb.Append('<'); for (int i = 0; i < need; i++)
             {
@@ -217,6 +195,11 @@ public record EasyNameTypeOptions
             }
             sb.Append('>');
         }
+
+        // Decorated nullability...
+        if (UseNullability && !UseNullableWrappers &&
+            source.GetCustomAttribute<IsNullableAttribute>() != null)
+            if (sb.Length > 0 && sb[^1] != '?') sb.Append('?');
 
         // Finishing...
         return sb.ToString();
