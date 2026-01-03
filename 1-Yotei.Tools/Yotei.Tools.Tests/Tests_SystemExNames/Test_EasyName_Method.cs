@@ -2,13 +2,15 @@
 
 // ========================================================
 ////[Enforced]
-public static class Test_EasyName_Type
+public static class Test_EasyName_Method
 {
     const string NAMESPACE = "Yotei.Tools.Tests.EasyNames";
-    const string TESTNAME = nameof(Test_EasyName_Type);
+    const string TESTNAME = nameof(Test_EasyName_Method);
 
     readonly static EasyNameTypeOptions DEFAULT = EasyNameTypeOptions.Default;
     readonly static EasyNameTypeOptions FULL = EasyNameTypeOptions.Full;
+
+    /*
 
     // ----------------------------------------------------
 
@@ -276,4 +278,5 @@ public static class Test_EasyName_Type
             "Yotei.Tools.IsNullable<System.String>>",
             name);
     }
+    */
 }

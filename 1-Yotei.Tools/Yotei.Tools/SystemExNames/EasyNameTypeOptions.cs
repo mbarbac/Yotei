@@ -128,6 +128,7 @@ public record EasyNameTypeOptions
     /// </summary>
     string EasyName(Type source, Type[] types)
     {
+        var isgen = source.FullName == null;
         var host = source.DeclaringType;
         var args = source.GetGenericArguments();
         var used = host is null ? 0 : host.GetGenericArguments().Length;
@@ -137,16 +138,15 @@ public record EasyNameTypeOptions
         if (HideName) return string.Empty;
 
         // Shortcut not decorated nullability...
-        if (UseNullability && !UseNullableWrappers &&
-            source.GetCustomAttribute<IsNullableAttribute>() == null)
+        if (UseNullability &&
+            !UseNullableWrappers &&
+            source.GetCustomAttribute<IsNullableAttribute>() == null && (
+            (need == 1 && source.Name.StartsWith("Nullable`1")) ||
+            (need == 1 && source.Name.StartsWith("IsNullable`1"))))
         {
-            if ((need == 1 && source.Name.StartsWith("Nullable`1")) ||
-                (need == 1 && source.Name.StartsWith("IsNullable`1")))
-            {
-                var type = types[used];
-                var str = EasyName(type); if (!str.EndsWith('?')) str += '?';
-                return str;
-            }
+            var type = types[used];
+            var str = EasyName(type); if (!str.EndsWith('?')) str += '?';
+            return str;
         }
 
         // Processing...
@@ -163,14 +163,14 @@ public record EasyNameTypeOptions
         }
 
         // Namespace...
-        if (UseNamespace && host is null)
+        if (UseNamespace && host is null && !isgen)
         {
             var str = source.Namespace;
             if (str is not null && str.Length > 0) { sb.Append(str); sb.Append('.'); }
         }
 
         // Host...
-        if ((UseHost || UseNamespace) && host is not null)
+        if ((UseHost || UseNamespace) && host is not null && !isgen)
         {
             // Using 'types' to prevent loosing bound information...
             var str = EasyName(host, types);
@@ -197,7 +197,7 @@ public record EasyNameTypeOptions
         }
 
         // Decorated nullability...
-        if (UseNullability && !UseNullableWrappers &&
+        if (UseNullability &&
             source.GetCustomAttribute<IsNullableAttribute>() != null)
             if (sb.Length > 0 && sb[^1] != '?') sb.Append('?');
 
