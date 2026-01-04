@@ -32,6 +32,11 @@ public static partial class EasyNameExtensions
 public record EasyNameTypeOptions
 {
     /// <summary>
+    /// A shared read-only instance that represents empty options.
+    /// </summary>
+    public static EasyNameTypeOptions Empty { get; } = new(Mode.Empty);
+
+    /// <summary>
     /// A shared read-only instance that represents default options.
     /// </summary>
     public static EasyNameTypeOptions Default { get; } = new(Mode.Default);
@@ -86,11 +91,15 @@ public record EasyNameTypeOptions
 
     // ----------------------------------------------------
 
-    enum Mode { Default, Full };
+    enum Mode { Empty, Default, Full };
     private EasyNameTypeOptions(Mode mode)
     {
         switch (mode)
         {
+            case Mode.Empty:
+                HideName = true;
+                break;
+
             case Mode.Default:
                 UseNullability = true;
                 break;

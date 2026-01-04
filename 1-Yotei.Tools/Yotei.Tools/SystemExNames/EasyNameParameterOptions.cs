@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools;
+﻿using System.Diagnostics.Tracing;
+
+namespace Yotei.Tools;
 
 // ========================================================
 public static partial class EasyNameExtensions
@@ -31,6 +33,11 @@ public static partial class EasyNameExtensions
 /// </summary>
 public record EasyNameParameterOptions
 {
+    /// <summary>
+    /// A shared read-only instance that represents empty options.
+    /// </summary>
+    public static EasyNameParameterOptions Empty { get; } = new(Mode.Empty);
+
     /// <summary>
     /// A shared read-only instance that represents default options.
     /// </summary>
@@ -66,11 +73,14 @@ public record EasyNameParameterOptions
 
     // ----------------------------------------------------
 
-    enum Mode { Default, Full };
+    enum Mode { Empty, Default, Full };
     private EasyNameParameterOptions(Mode mode)
     {
         switch (mode)
         {
+            case Mode.Empty:
+                break;
+
             case Mode.Default:
                 UseModifiers = true;
                 TypeOptions = EasyNameTypeOptions.Default;
@@ -105,8 +115,16 @@ public record EasyNameParameterOptions
 
             while (TypeOptions.UseNullability && str.Length > 0 && sb[^1] != '?')
             {
+                var type = source.ParameterType;
+                var name = type.Name;
+
+                // Special case: nullable wrappers...
+                if (TypeOptions.UseNullableWrappers &&
+                    (name == "Nullable`1" || name == "IsNullable`1"))
+                    break;
+
                 // Special case for generic types...
-                if (source.ParameterType.Name == null)
+                if (name == null)
                 {
                     var at = source.GetCustomAttribute<NullableAttribute>();
                     if (at is not null &&
@@ -129,7 +147,6 @@ public record EasyNameParameterOptions
                     break;
                 }
 
-                // HIGH: ParameterInfo EasyName: validate no other nullable cases
                 // End of nullability...
                 break;
             }

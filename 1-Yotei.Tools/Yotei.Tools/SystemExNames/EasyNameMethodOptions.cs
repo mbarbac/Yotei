@@ -32,6 +32,11 @@ public static partial class EasyNameExtensions
 public record EasyNameMethodOptions
 {
     /// <summary>
+    /// A shared read-only instance that represents empty options.
+    /// </summary>
+    public static EasyNameMethodOptions Empty { get; } = new(Mode.Empty);
+
+    /// <summary>
     /// A shared read-only instance that represents default options.
     /// </summary>
     public static EasyNameMethodOptions Default { get; } = new(Mode.Default);
@@ -80,11 +85,14 @@ public record EasyNameMethodOptions
 
     // ----------------------------------------------------
 
-    enum Mode { Default, Full };
+    enum Mode { Empty, Default, Full };
     private EasyNameMethodOptions(Mode mode)
     {
         switch (mode)
         {
+            case Mode.Empty:
+                break;
+
             case Mode.Default:
                 break;
 
@@ -149,20 +157,20 @@ public record EasyNameMethodOptions
         // Method parameters...
         if (UseParentheses || ParameterOptions is not null)
         {
-            sb.Append('(');
-
-            var args = source.GetParameters();
-            if (args.Length > 0)
+            sb.Append('('); if (ParameterOptions is not null)
             {
-                for (int i = 0; i < args.Length; i++)
+                var args = source.GetParameters();
+                if (args.Length > 0)
                 {
-                    var arg = args[i];
-                    var str = ParameterOptions?.EasyName(arg);
-                    if (i > 0) sb.Append((str != null && str.Length > 0) ? ", " : ",");
-                    sb.Append(str);
+                    for (int i = 0; i < args.Length; i++)
+                    {
+                        var arg = args[i];
+                        var str = ParameterOptions.EasyName(arg);
+                        if (i > 0) sb.Append((str != null && str.Length > 0) ? ", " : ",");
+                        sb.Append(str);
+                    }
                 }
             }
-
             sb.Append(')');
         }
 
