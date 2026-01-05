@@ -26,8 +26,7 @@ public static partial class EasyNameExtensions
 
 // ========================================================
 /// <summary>
-/// Provides 'EasyName' capabilities for <see cref="Type"/> instances.
-/// <br/> Default instances just obtain the name of the type with its nullable annotation, if any.
+/// Provides 'EasyName' capabilities for 'type' instances.
 /// </summary>
 public record EasyNameTypeOptions
 {

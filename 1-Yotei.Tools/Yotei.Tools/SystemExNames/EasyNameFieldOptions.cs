@@ -1,0 +1,121 @@
+﻿namespace Yotei.Tools;
+
+// ========================================================
+public static partial class EasyNameExtensions
+{
+    /// <summary>
+    /// Obtains the C#-alike easy name of the given element using default options.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static string EasyName(
+        this FieldInfo source) => EasyNameFieldOptions.Default.EasyName(source);
+
+    /// <summary>
+    /// Obtains the C#-alike easy name of the given element using the given options.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="options"></param>
+    /// <returns></returns>
+    public static string EasyName(this FieldInfo source, EasyNameFieldOptions options)
+    {
+        options.ThrowWhenNull();
+        return options.EasyName(source);
+    }
+}
+
+// ========================================================
+/// <summary>
+/// Provides 'EasyName' capabilities for 'field' instances.
+/// </summary>
+public record EasyNameFieldOptions
+{
+    /// <summary>
+    /// A shared read-only instance that represents empty options.
+    /// </summary>
+    public static EasyNameFieldOptions Empty { get; } = new(Mode.Empty);
+
+    /// <summary>
+    /// A shared read-only instance that represents default options.
+    /// </summary>
+    public static EasyNameFieldOptions Default { get; } = new(Mode.Default);
+
+    /// <summary>
+    /// A shared read-only instance that represents full options.
+    /// </summary>
+    public static EasyNameFieldOptions Full { get; } = new(Mode.Full);
+
+    /// <summary>
+    /// Initializes a new default instance.
+    /// </summary>
+    public EasyNameFieldOptions() : this(Mode.Default) { }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// If not null, then the options to use to print the return type of the field. If null,
+    /// it is ignored.
+    /// </summary>
+    public EasyNameTypeOptions? ReturnTypeOptions { get; init; }
+
+    /// <summary>
+    /// If not null, then the options to use to print the host type of the field. If null, it
+    /// is ignored.
+    /// </summary>
+    public EasyNameTypeOptions? HostTypeOptions { get; init; }
+
+    // ----------------------------------------------------
+
+    enum Mode { Empty, Default, Full };
+    private EasyNameFieldOptions(Mode mode)
+    {
+        switch (mode)
+        {
+            case Mode.Empty:
+                break;
+
+            case Mode.Default:
+                break;
+
+            case Mode.Full:
+                ReturnTypeOptions = EasyNameTypeOptions.Full;
+                HostTypeOptions = EasyNameTypeOptions.Full;
+                break;
+        }
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Obtains the C#-alike easy name of the given element.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public string EasyName(FieldInfo source)
+    {
+        source.ThrowWhenNull();
+
+        var host = source.DeclaringType;
+        var sb = new StringBuilder();
+
+        // Return type...
+        if (ReturnTypeOptions is not null)
+        {
+            var str = ReturnTypeOptions.EasyName(source.FieldType);
+            if (str.Length > 0) { sb.Append(str); sb.Append(' '); }
+        }
+
+        // Host type...
+        if (HostTypeOptions is not null && host is not null)
+        {
+            var str = HostTypeOptions.EasyName(host);
+            if (str.Length > 0) { sb.Append(str); sb.Append('.'); }
+        }
+
+        // Name...
+        sb.Append(source.Name);
+
+        // Finishing...
+        return sb.ToString();
+    }
+}

@@ -114,7 +114,8 @@ public static class Test_EasyName_Type
         EasyNameTypeOptions options;
         string name;
         var type = typeof(IFace1B);
-        var item = type.GetInterface("IFace1A`1")!;
+        var item = type.GetInterface("IFace1A`1");
+        Assert.NotNull(item);
 
         options = DEFAULT with { HideName = true };
         name = item.EasyName(options); Assert.Equal("", name);
@@ -136,7 +137,8 @@ public static class Test_EasyName_Type
         EasyNameTypeOptions options;
         string name;
         var type = typeof(IFace1C);
-        var item = type.GetInterface("IFace1A`1")!;
+        var item = type.GetInterface("IFace1A`1");
+        Assert.NotNull(item);
 
         options = DEFAULT with { HideName = true };
         name = item.EasyName(options); Assert.Equal("", name);

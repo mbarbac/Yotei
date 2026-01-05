@@ -9,7 +9,7 @@ public static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <returns></returns>
     public static string EasyName(
-        this MethodInfo source) => EasyNameMethodOptions.Default.EasyName(source);
+        this PropertyInfo source) => EasyNamePropertyOptions.Default.EasyName(source);
 
     /// <summary>
     /// Obtains the C#-alike easy name of the given element using the given options.
@@ -17,7 +17,7 @@ public static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this MethodInfo source, EasyNameMethodOptions options)
+    public static string EasyName(this PropertyInfo source, EasyNamePropertyOptions options)
     {
         options.ThrowWhenNull();
         return options.EasyName(source);
@@ -26,58 +26,57 @@ public static partial class EasyNameExtensions
 
 // ========================================================
 /// <summary>
-/// Provides 'EasyName' capabilities for 'method' instances.
+/// Provides 'EasyName' capabilities for 'property' instances.
 /// </summary>
-public record EasyNameMethodOptions
+public record EasyNamePropertyOptions
 {
     /// <summary>
     /// A shared read-only instance that represents empty options.
     /// </summary>
-    public static EasyNameMethodOptions Empty { get; } = new(Mode.Empty);
+    public static EasyNamePropertyOptions Empty { get; } = new(Mode.Empty);
 
     /// <summary>
     /// A shared read-only instance that represents default options.
     /// </summary>
-    public static EasyNameMethodOptions Default { get; } = new(Mode.Default);
+    public static EasyNamePropertyOptions Default { get; } = new(Mode.Default);
 
     /// <summary>
     /// A shared read-only instance that represents full options.
     /// </summary>
-    public static EasyNameMethodOptions Full { get; } = new(Mode.Full);
+    public static EasyNamePropertyOptions Full { get; } = new(Mode.Full);
 
     /// <summary>
     /// Initializes a new default instance.
     /// </summary>
-    public EasyNameMethodOptions() : this(Mode.Default) { }
+    public EasyNamePropertyOptions() : this(Mode.Default) { }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// If not null, then the options to use to print the return type of the method. If null, the
-    /// return type is ignored.
+    /// If not null, then the options to use to print the return type of the property. If null,
+    /// it is ignored.
     /// </summary>
     public EasyNameTypeOptions? ReturnTypeOptions { get; init; }
 
     /// <summary>
-    /// If not null, then the options to use to print the host type of the method. If null, the
-    /// host type is ignored.
+    /// If not null, then the options to use to print the host type of the property. If null, it
+    /// is ignored.
     /// </summary>
     public EasyNameTypeOptions? HostTypeOptions { get; init; }
 
     /// <summary>
-    /// If not null, then the options to use to print the generic type arguments of the method, if
-    /// any. If null, the generic type arguments are ignored.
+    /// Determines if the property tech name shall be used, instead of the default "this" one.
     /// </summary>
-    public EasyNameTypeOptions? GenericArgumentOptions { get; init; }
+    public bool UseTechName { get; init; }
 
     /// <summary>
-    /// Determines if, at least, the method parentheses shall be used even if no parameter options
-    /// were given.
+    /// Determines if, at least, the indexed property squared bracket shall be used even if no
+    /// parameter options were given.
     /// </summary>
     public bool UseBrackets { get; init; }
 
     /// <summary>
-    /// If not null, then the options to use with the method parameters. If null, then they are
+    /// If not null, then the options to use with the property parameters. If null, then they are
     /// ignored.
     /// </summary>
     public EasyNameParameterOptions? ParameterOptions { get; init; }
@@ -85,7 +84,7 @@ public record EasyNameMethodOptions
     // ----------------------------------------------------
 
     enum Mode { Empty, Default, Full };
-    private EasyNameMethodOptions(Mode mode)
+    private EasyNamePropertyOptions(Mode mode)
     {
         switch (mode)
         {
@@ -98,7 +97,7 @@ public record EasyNameMethodOptions
             case Mode.Full:
                 ReturnTypeOptions = EasyNameTypeOptions.Full;
                 HostTypeOptions = EasyNameTypeOptions.Full;
-                GenericArgumentOptions = EasyNameTypeOptions.Full;
+                UseTechName = true;
                 UseBrackets = true;
                 ParameterOptions = EasyNameParameterOptions.Full;
                 break;
@@ -112,7 +111,7 @@ public record EasyNameMethodOptions
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
-    public string EasyName(MethodInfo source)
+    public string EasyName(PropertyInfo source)
     {
         source.ThrowWhenNull();
 
@@ -122,7 +121,7 @@ public record EasyNameMethodOptions
         // Return type...
         if (ReturnTypeOptions is not null)
         {
-            var str = ReturnTypeOptions.EasyName(source.ReturnType);
+            var str = ReturnTypeOptions.EasyName(source.PropertyType);
             if (str.Length > 0) { sb.Append(str); sb.Append(' '); }
         }
 
@@ -134,43 +133,25 @@ public record EasyNameMethodOptions
         }
 
         // Name...
-        sb.Append(source.Name);
-
-        // Generic arguments...
-        if (GenericArgumentOptions is not null)
-        {
-            var args = source.GetGenericArguments();
-            if (args.Length > 0)
-            {
-                sb.Append('<'); for (int i = 0; i < args.Length; i++)
-                {
-                    var arg = args[i];
-                    var str = GenericArgumentOptions.EasyName(arg);
-                    if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
-                    sb.Append(str);
-                }
-                sb.Append('>');
-            }
-        }
+        var name = source.Name;
+        var args = source.GetIndexParameters();
+        if (args.Length > 0 && !UseTechName) name = "this";
+        sb.Append(name);
 
         // Method parameters...
-        if (UseBrackets || ParameterOptions is not null)
+        if (args.Length > 0 && (UseBrackets || ParameterOptions is not null))
         {
-            sb.Append('('); if (ParameterOptions is not null)
+            sb.Append('['); if (ParameterOptions is not null)
             {
-                var args = source.GetParameters();
-                if (args.Length > 0)
+                for (int i = 0; i < args.Length; i++)
                 {
-                    for (int i = 0; i < args.Length; i++)
-                    {
-                        var arg = args[i];
-                        var str = ParameterOptions.EasyName(arg);
-                        if (i > 0) sb.Append((str != null && str.Length > 0) ? ", " : ",");
-                        sb.Append(str);
-                    }
+                    var arg = args[i];
+                    var str = ParameterOptions.EasyName(arg);
+                    if (i > 0) sb.Append((str != null && str.Length > 0) ? ", " : ",");
+                    sb.Append(str);
                 }
             }
-            sb.Append(')');
+            sb.Append(']');
         }
 
         // Finishing...

@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.Tracing;
-
-namespace Yotei.Tools;
+﻿namespace Yotei.Tools;
 
 // ========================================================
 public static partial class EasyNameExtensions
@@ -28,8 +26,7 @@ public static partial class EasyNameExtensions
 
 // ========================================================
 /// <summary>
-/// Provides 'EasyName' capabilities for <see cref="Type"/> instances.
-/// <br/> Default instances just obtain the name of the type with its nullable annotation, if any.
+/// Provides 'EasyName' capabilities for 'parameter' instances.
 /// </summary>
 public record EasyNameParameterOptions
 {
@@ -61,8 +58,8 @@ public record EasyNameParameterOptions
     public bool UseModifiers { get; init; }
 
     /// <summary>
-    /// If not null, then the options to use with the type of the argument. If null, then this
-    /// type is ignored.
+    /// If not null, then the options to use with the type of the parameter. If null, then it is
+    /// ignored.
     /// </summary>
     public EasyNameTypeOptions? TypeOptions { get; init; }
 
@@ -120,7 +117,7 @@ public record EasyNameParameterOptions
 
                 // Special case: nullable wrappers...
                 if (TypeOptions.UseNullableWrappers &&
-                    (name == "Nullable`1" || name == "IsNullable`1"))
+                    (name.StartsWith("Nullable`1") || name.StartsWith("IsNullable`1")))
                     break;
 
                 // Special case for generic types...

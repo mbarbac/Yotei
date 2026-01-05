@@ -21,12 +21,13 @@ public static class Test_EasyName_Method
         EasyNameMethodOptions options;
         string name;
         var type = typeof(IFace0);
-        var item = type.GetMethod("Name")!;
+        var item = type.GetMethod("Name");
+        Assert.NotNull(item);
 
         options = DEFAULT;
         name = item.EasyName(options); Assert.Equal("Name", name);
 
-        options = DEFAULT with { UseParentheses = true };
+        options = DEFAULT with { UseBrackets = true };
         name = item.EasyName(options); Assert.Equal("Name()", name);
 
         options = DEFAULT with { ParameterOptions = EasyNameParameterOptions.Empty };
@@ -44,7 +45,7 @@ public static class Test_EasyName_Method
         name = item.EasyName(options);
         Assert.Equal(
             $"System.Void {NAMESPACE}.{TESTNAME}." +
-            "IFace0.Name(System.Byte one, out System.Nullable<System.Int32>? two, ref System.String? three, in System.Int64 four)",
+            "IFace0.Name(System.Byte one, out System.Nullable<System.Int32> two, ref System.String? three, in System.Int64 four)",
             name);
     }
 
@@ -59,7 +60,8 @@ public static class Test_EasyName_Method
         EasyNameMethodOptions options;
         string name;
         var type = typeof(I1A<,>.I1B<>);
-        var item = type.GetMethod("Name")!;
+        var item = type.GetMethod("Name");
+        Assert.NotNull(item);
 
         options = DEFAULT;
         name = item.EasyName(options); Assert.Equal("Name", name);
@@ -88,7 +90,8 @@ public static class Test_EasyName_Method
         EasyNameMethodOptions options;
         string name;
         var type = typeof(I1A<byte, int>.I1B<IsNullable<string>>);
-        var item = type.GetMethod("Name")!;
+        var item = type.GetMethod("Name");
+        Assert.NotNull(item);
 
         options = DEFAULT;
         name = item.EasyName(options); Assert.Equal("Name", name);
