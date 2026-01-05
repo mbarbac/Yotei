@@ -1,8 +1,8 @@
-﻿namespace Yotei.Tools.Tests.EasyNames;
+﻿namespace Yotei.Tools.Tests;
 
 // ========================================================
 ////[Enforced]
-//public static class Test_
+//public static class Test_SketchExtensions
 //{
 //    //[Enforced]
 //    [Fact]
