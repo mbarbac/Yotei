@@ -1,7 +1,7 @@
-﻿namespace Yotei.Tools;
+﻿namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
-public static partial class EasyNameExtensions
+internal static partial class EasyNameExtensions
 {
     /// <summary>
     /// Obtains the C#-alike easy name of the given element using default options.
@@ -28,11 +28,10 @@ public static partial class EasyNameExtensions
 /// <summary>
 /// Provides 'EasyName' capabilities for 'parameter' instances.
 /// </summary>
-public record EasyNameParameterOptions
-{
-    /// <summary>
-    /// A shared read-only instance that represents empty options.
-    /// </summary>
+internal record EasyNameParameterOptions
+{/// <summary>
+ /// A shared read-only instance that represents empty options.
+ /// </summary>
     public static EasyNameParameterOptions Empty { get; } = new(Mode.Empty);
 
     /// <summary>
@@ -121,23 +120,36 @@ public record EasyNameParameterOptions
                     break;
 
                 // Nullable attribute...
-                var at = source.GetCustomAttribute<NullableAttribute>();
-                if (at is not null &&
-                    at.NullableFlags.Length > 0 &&
-                    at.NullableFlags[0] == 2)
+                var at = source.GetCustomAttributes().FirstOrDefault(
+                    x => x.GetType().Name == "NullableAttribute");
+
+                if (at is not null)
                 {
-                    sb.Append('?');
-                    break;
+                    type = at.GetType();
+
+                    var member = type.GetProperty("NullableFlags");
+                    if (member != null)
+                    {
+                        var value = member.GetValue(at) as byte[];
+                        if (value is not null &&
+                            value.Length > 0 &&
+                            value[0] == 2)
+                        {
+                            sb.Append('?');
+                            break;
+                        }
+                    }
                 }
 
                 // IsNullable attribute...
-                var isat = source.GetCustomAttribute<IsNullableAttribute>();
-                if (isat is not null)
+                at = source.GetCustomAttribute<IsNullableAttribute>();
+                if (at is not null)
                 {
                     sb.Append('?');
                     break;
                 }
 
+                /* Net Standard 2.0 doesn't support nullability API...
                 // Standard case via nullability API, althoug limited...
                 var nic = new NullabilityInfoContext();
                 var info = nic.Create(source);
@@ -147,7 +159,7 @@ public record EasyNameParameterOptions
                 {
                     sb.Append('?');
                     break;
-                }
+                }*/
 
                 // End of nullability...
                 break;

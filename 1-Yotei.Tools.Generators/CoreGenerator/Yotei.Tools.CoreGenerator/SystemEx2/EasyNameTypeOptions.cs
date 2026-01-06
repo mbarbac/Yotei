@@ -1,7 +1,7 @@
-﻿namespace Yotei.Tools;
+﻿namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
-public static partial class EasyNameExtensions
+internal static partial class EasyNameExtensions
 {
     /// <summary>
     /// Obtains the C#-alike easy name of the given element using default options.
@@ -28,7 +28,7 @@ public static partial class EasyNameExtensions
 /// <summary>
 /// Provides 'EasyName' capabilities for 'type' instances.
 /// </summary>
-public record EasyNameTypeOptions
+internal record EasyNameTypeOptions
 {
     /// <summary>
     /// A shared read-only instance that represents empty options.

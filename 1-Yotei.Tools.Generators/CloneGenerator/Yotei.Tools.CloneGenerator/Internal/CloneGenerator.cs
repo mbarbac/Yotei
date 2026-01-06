@@ -7,12 +7,31 @@
 [Generator(LanguageNames.CSharp)]
 internal class CloneGenerator : TreeGenerator
 {
-#if DEBUG_CLONE_GENERATOR__
+#if DEBUG_CLONE_GENERATOR
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     protected override bool LaunchDebugger => true;
 #endif
+
+    // DEBUG-ONLY: remove when done...
+    protected override void OnInitialize(IncrementalGeneratorPostInitializationContext context)
+    {
+        var type = typeof(Foo<,>);
+        var item = type.GetMethod("MyMethod");
+
+        var options = EasyNameMethodOptions.Default with
+        { ParameterOptions = EasyNameParameterOptions.Default };
+        var name = item.EasyName(options);
+        Debug.Assert(name != null);
+    }
+
+    // DEBUG-ONLY: remove when done...
+    public partial class Foo<K, T>
+    {
+        [Named]
+        public void MyMethod([IsNullable] K? one) { }
+    }
 
     // ----------------------------------------------------
 
@@ -20,19 +39,19 @@ internal class CloneGenerator : TreeGenerator
     /// <inheritdoc/>
     /// </summary>
     protected override List<Type> TypeAttributes { get; } = [
-        typeof(NamedAttribute), // DEBUG-ONLY remove type when done...
+        typeof(NamedAttribute), // DEBUG-ONLY: remove when done...
         typeof(CloneableAttribute),
         typeof(CloneableAttribute<>),];
 
-    // DEBUG-ONLY remove attribute types when done...
+    // DEBUG-ONLY: remove when done...
     protected override List<Type> PropertyAttributes { get; } = [
         typeof(NamedAttribute),];
 
-    // DEBUG-ONLY remove attribute types when done...
+    // DEBUG-ONLY: remove when done...
     protected override List<Type> MethodAttributes { get; } = [
         typeof(NamedAttribute),];
 
-    // DEBUG-ONLY remove attribute types when done...
+    // DEBUG-ONLY: remove when done...
     protected override List<Type> FieldAttributes { get; } = [
         typeof(NamedAttribute),];
 
