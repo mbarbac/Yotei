@@ -29,6 +29,11 @@ public record SketchOptions
     // ----------------------------------------------------
 
     /// <summary>
+    /// If 'true', prevents the use of the 'ToString' method of the value.
+    /// </summary>
+    public bool PreventToString { get; init; }
+
+    /// <summary>
     /// If not null, the format string to use when formatting the value.
     /// </summary>
     public string? FormatString { get; init; }
@@ -37,6 +42,12 @@ public record SketchOptions
     /// If not null, the format provider to use when formatting the value.
     /// </summary>
     public IFormatProvider? FormatProvider { get; init; }
+
+    /// <summary>
+    /// Determines if a head with the type of the value shall be used. Note that, if not null,
+    /// the type options are used to obtain the type head.
+    /// </summary>
+    public bool UseTypeHead { get; init; }
 
     /// <summary>
     /// If not null, the literal used to represent NULL values. If null, then an empty string
@@ -112,6 +123,7 @@ public record SketchOptions
                 break;
 
             case Mode.Full:
+                UseTypeHead = true;
                 NullString = "NULL";
                 TypeOptions = EasyNameTypeOptions.Full;
                 ConstructorOptions = EasyNameConstructorOptions.Full;
