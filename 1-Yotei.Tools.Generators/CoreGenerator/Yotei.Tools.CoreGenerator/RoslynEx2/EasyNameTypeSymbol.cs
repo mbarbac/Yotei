@@ -9,7 +9,7 @@ internal static partial class RoslynNameExtensions
     /// <param name="source"></param>
     /// <returns></returns>
     public static string EasyName(
-        this ITypeSymbol source) => RoslynNameTypeOptions.Default.EasyName(source);
+        this ITypeSymbol source) => EasyNameTypeSymbol.Default.EasyName(source);
 
     /// <summary>
     /// Obtains the C#-alike easy name of the given element using the given options.
@@ -17,7 +17,7 @@ internal static partial class RoslynNameExtensions
     /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this ITypeSymbol source, RoslynNameTypeOptions options)
+    public static string EasyName(this ITypeSymbol source, EasyNameTypeSymbol options)
     {
         options.ThrowWhenNull();
         return options.EasyName(source);
@@ -26,29 +26,29 @@ internal static partial class RoslynNameExtensions
 
 // ========================================================
 /// <summary>
-/// Provides 'EasyName' capabilities for 'type' instances.
+/// Provides 'EasyName' capabilities for 'type symbol' instances.
 /// </summary>
-internal record RoslynNameTypeOptions
+internal record EasyNameTypeSymbol
 {
     /// <summary>
     /// A shared read-only instance that represents empty options.
     /// </summary>
-    public static RoslynNameTypeOptions Empty { get; } = new(Mode.Empty);
+    public static EasyNameTypeSymbol Empty { get; } = new(Mode.Empty);
 
     /// <summary>
     /// A shared read-only instance that represents default options.
     /// </summary>
-    public static RoslynNameTypeOptions Default { get; } = new(Mode.Default);
+    public static EasyNameTypeSymbol Default { get; } = new(Mode.Default);
 
     /// <summary>
     /// A shared read-only instance that represents full options.
     /// </summary>
-    public static RoslynNameTypeOptions Full { get; } = new(Mode.Full);
+    public static EasyNameTypeSymbol Full { get; } = new(Mode.Full);
 
     /// <summary>
     /// Initializes a new default instance.
     /// </summary>
-    public RoslynNameTypeOptions() : this(Mode.Default) { }
+    public EasyNameTypeSymbol() : this(Mode.Default) { }
 
     // ----------------------------------------------------
 
@@ -91,7 +91,7 @@ internal record RoslynNameTypeOptions
     // ----------------------------------------------------
 
     enum Mode { Empty, Default, Full };
-    private RoslynNameTypeOptions(Mode mode)
+    private EasyNameTypeSymbol(Mode mode)
     {
         switch (mode)
         {

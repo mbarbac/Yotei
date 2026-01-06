@@ -9,7 +9,7 @@ internal static partial class RoslynNameExtensions
     /// <param name="source"></param>
     /// <returns></returns>
     public static string EasyName(
-        this IFieldSymbol source) => RoslynNameFieldOptions.Default.EasyName(source);
+        this TypedConstant source) => EasyNameTypedConstant.Default.EasyName(source);
 
     /// <summary>
     /// Obtains the C#-alike easy name of the given element using the given options.
@@ -17,7 +17,7 @@ internal static partial class RoslynNameExtensions
     /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this IFieldSymbol source, RoslynNameFieldOptions options)
+    public static string EasyName(this TypedConstant source, EasyNameTypedConstant options)
     {
         options.ThrowWhenNull();
         return options.EasyName(source);
@@ -26,36 +26,36 @@ internal static partial class RoslynNameExtensions
 
 // ========================================================
 /// <summary>
-/// Provides 'EasyName' capabilities for 'type' instances.
+/// Provides 'EasyName' capabilities for 'typed constant' instances.
 /// </summary>
-internal record RoslynNameFieldOptions
+internal record EasyNameTypedConstant
 {
     /// <summary>
     /// A shared read-only instance that represents empty options.
     /// </summary>
-    public static RoslynNameFieldOptions Empty { get; } = new(Mode.Empty);
+    public static EasyNameTypedConstant Empty { get; } = new(Mode.Empty);
 
     /// <summary>
     /// A shared read-only instance that represents default options.
     /// </summary>
-    public static RoslynNameFieldOptions Default { get; } = new(Mode.Default);
+    public static EasyNameTypedConstant Default { get; } = new(Mode.Default);
 
     /// <summary>
     /// A shared read-only instance that represents full options.
     /// </summary>
-    public static RoslynNameFieldOptions Full { get; } = new(Mode.Full);
+    public static EasyNameTypedConstant Full { get; } = new(Mode.Full);
 
     /// <summary>
     /// Initializes a new default instance.
     /// </summary>
-    public RoslynNameFieldOptions() : this(Mode.Default) { }
+    public EasyNameTypedConstant() : this(Mode.Default) { }
 
     // ----------------------------------------------------
 
     // ----------------------------------------------------
 
     enum Mode { Empty, Default, Full };
-    private RoslynNameFieldOptions(Mode mode)
+    private EasyNameTypedConstant(Mode mode)
     {
         switch (mode)
         {
@@ -77,7 +77,7 @@ internal record RoslynNameFieldOptions
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
-    public string EasyName(IFieldSymbol source)
+    public string EasyName(TypedConstant source)
     {
         throw null;
     }

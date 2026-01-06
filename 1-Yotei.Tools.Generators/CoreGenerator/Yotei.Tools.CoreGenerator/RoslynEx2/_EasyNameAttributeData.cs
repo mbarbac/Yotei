@@ -9,7 +9,7 @@ internal static partial class RoslynNameExtensions
     /// <param name="source"></param>
     /// <returns></returns>
     public static string EasyName(
-        this TypedConstant source) => RoslynNameTypedConstantOptions.Default.EasyName(source);
+        this AttributeData source) => EasyNameAttributeData.Default.EasyName(source);
 
     /// <summary>
     /// Obtains the C#-alike easy name of the given element using the given options.
@@ -17,7 +17,7 @@ internal static partial class RoslynNameExtensions
     /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this TypedConstant source, RoslynNameTypedConstantOptions options)
+    public static string EasyName(this AttributeData source, EasyNameAttributeData options)
     {
         options.ThrowWhenNull();
         return options.EasyName(source);
@@ -26,36 +26,36 @@ internal static partial class RoslynNameExtensions
 
 // ========================================================
 /// <summary>
-/// Provides 'EasyName' capabilities for 'type' instances.
+/// Provides 'EasyName' capabilities for 'attribute data' instances.
 /// </summary>
-internal record RoslynNameTypedConstantOptions
+internal record EasyNameAttributeData
 {
     /// <summary>
     /// A shared read-only instance that represents empty options.
     /// </summary>
-    public static RoslynNameTypedConstantOptions Empty { get; } = new(Mode.Empty);
+    public static EasyNameAttributeData Empty { get; } = new(Mode.Empty);
 
     /// <summary>
     /// A shared read-only instance that represents default options.
     /// </summary>
-    public static RoslynNameTypedConstantOptions Default { get; } = new(Mode.Default);
+    public static EasyNameAttributeData Default { get; } = new(Mode.Default);
 
     /// <summary>
     /// A shared read-only instance that represents full options.
     /// </summary>
-    public static RoslynNameTypedConstantOptions Full { get; } = new(Mode.Full);
+    public static EasyNameAttributeData Full { get; } = new(Mode.Full);
 
     /// <summary>
     /// Initializes a new default instance.
     /// </summary>
-    public RoslynNameTypedConstantOptions() : this(Mode.Default) { }
+    public EasyNameAttributeData() : this(Mode.Default) { }
 
     // ----------------------------------------------------
 
     // ----------------------------------------------------
 
     enum Mode { Empty, Default, Full };
-    private RoslynNameTypedConstantOptions(Mode mode)
+    private EasyNameAttributeData(Mode mode)
     {
         switch (mode)
         {
@@ -77,7 +77,7 @@ internal record RoslynNameTypedConstantOptions
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
-    public string EasyName(TypedConstant source)
+    public string EasyName(AttributeData source)
     {
         throw null;
     }
