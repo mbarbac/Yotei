@@ -1,7 +1,7 @@
-﻿namespace Yotei.Tools.CoreGenerator;
+﻿namespace Yotei.Tools;
 
 // ========================================================
-internal static partial class EasyNameExtensions
+public static partial class EasyNameExtensions
 {
     /// <summary>
     /// Obtains the C#-alike easy name of the given element using default options.
@@ -9,7 +9,7 @@ internal static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <returns></returns>
     public static string EasyName(
-        this PropertyInfo source) => EasyNamePropertyOptions.Default.EasyName(source);
+        this PropertyInfo source) => EasyNamePropertyInfo.Default.EasyName(source);
 
     /// <summary>
     /// Obtains the C#-alike easy name of the given element using the given options.
@@ -17,7 +17,7 @@ internal static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this PropertyInfo source, EasyNamePropertyOptions options)
+    public static string EasyName(this PropertyInfo source, EasyNamePropertyInfo options)
     {
         options.ThrowWhenNull();
         return options.EasyName(source);
@@ -28,27 +28,27 @@ internal static partial class EasyNameExtensions
 /// <summary>
 /// Provides 'EasyName' capabilities for 'property' instances.
 /// </summary>
-internal record EasyNamePropertyOptions
+public record EasyNamePropertyInfo
 {
     /// <summary>
     /// A shared read-only instance that represents empty options.
     /// </summary>
-    public static EasyNamePropertyOptions Empty { get; } = new(Mode.Empty);
+    public static EasyNamePropertyInfo Empty { get; } = new(Mode.Empty);
 
     /// <summary>
     /// A shared read-only instance that represents default options.
     /// </summary>
-    public static EasyNamePropertyOptions Default { get; } = new(Mode.Default);
+    public static EasyNamePropertyInfo Default { get; } = new(Mode.Default);
 
     /// <summary>
     /// A shared read-only instance that represents full options.
     /// </summary>
-    public static EasyNamePropertyOptions Full { get; } = new(Mode.Full);
+    public static EasyNamePropertyInfo Full { get; } = new(Mode.Full);
 
     /// <summary>
     /// Initializes a new default instance.
     /// </summary>
-    public EasyNamePropertyOptions() : this(Mode.Default) { }
+    public EasyNamePropertyInfo() : this(Mode.Default) { }
 
     // ----------------------------------------------------
 
@@ -56,13 +56,13 @@ internal record EasyNamePropertyOptions
     /// If not null, then the options to use to print the return type of the property. If null,
     /// it is ignored.
     /// </summary>
-    public EasyNameTypeOptions? ReturnTypeOptions { get; init; }
+    public EasyNameType? ReturnTypeOptions { get; init; }
 
     /// <summary>
     /// If not null, then the options to use to print the host type of the property. If null, it
     /// is ignored.
     /// </summary>
-    public EasyNameTypeOptions? HostTypeOptions { get; init; }
+    public EasyNameType? HostTypeOptions { get; init; }
 
     /// <summary>
     /// Determines if the property tech name shall be used, instead of the default "this" one.
@@ -79,12 +79,12 @@ internal record EasyNamePropertyOptions
     /// If not null, then the options to use with the property parameters. If null, then they are
     /// ignored.
     /// </summary>
-    public EasyNameParameterOptions? ParameterOptions { get; init; }
+    public EasyNameParameterInfo? ParameterOptions { get; init; }
 
     // ----------------------------------------------------
 
     enum Mode { Empty, Default, Full };
-    private EasyNamePropertyOptions(Mode mode)
+    private EasyNamePropertyInfo(Mode mode)
     {
         switch (mode)
         {
@@ -95,11 +95,11 @@ internal record EasyNamePropertyOptions
                 break;
 
             case Mode.Full:
-                ReturnTypeOptions = EasyNameTypeOptions.Full;
-                HostTypeOptions = EasyNameTypeOptions.Full;
+                ReturnTypeOptions = EasyNameType.Full;
+                HostTypeOptions = EasyNameType.Full;
                 UseTechName = true;
                 UseBrackets = true;
-                ParameterOptions = EasyNameParameterOptions.Full;
+                ParameterOptions = EasyNameParameterInfo.Full;
                 break;
         }
     }

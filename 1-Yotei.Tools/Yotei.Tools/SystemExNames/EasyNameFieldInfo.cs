@@ -9,7 +9,7 @@ public static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <returns></returns>
     public static string EasyName(
-        this FieldInfo source) => EasyNameFieldOptions.Default.EasyName(source);
+        this FieldInfo source) => EasyNameFieldInfo.Default.EasyName(source);
 
     /// <summary>
     /// Obtains the C#-alike easy name of the given element using the given options.
@@ -17,7 +17,7 @@ public static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this FieldInfo source, EasyNameFieldOptions options)
+    public static string EasyName(this FieldInfo source, EasyNameFieldInfo options)
     {
         options.ThrowWhenNull();
         return options.EasyName(source);
@@ -28,27 +28,27 @@ public static partial class EasyNameExtensions
 /// <summary>
 /// Provides 'EasyName' capabilities for 'field' instances.
 /// </summary>
-public record EasyNameFieldOptions
+public record EasyNameFieldInfo
 {
     /// <summary>
     /// A shared read-only instance that represents empty options.
     /// </summary>
-    public static EasyNameFieldOptions Empty { get; } = new(Mode.Empty);
+    public static EasyNameFieldInfo Empty { get; } = new(Mode.Empty);
 
     /// <summary>
     /// A shared read-only instance that represents default options.
     /// </summary>
-    public static EasyNameFieldOptions Default { get; } = new(Mode.Default);
+    public static EasyNameFieldInfo Default { get; } = new(Mode.Default);
 
     /// <summary>
     /// A shared read-only instance that represents full options.
     /// </summary>
-    public static EasyNameFieldOptions Full { get; } = new(Mode.Full);
+    public static EasyNameFieldInfo Full { get; } = new(Mode.Full);
 
     /// <summary>
     /// Initializes a new default instance.
     /// </summary>
-    public EasyNameFieldOptions() : this(Mode.Default) { }
+    public EasyNameFieldInfo() : this(Mode.Default) { }
 
     // ----------------------------------------------------
 
@@ -56,18 +56,18 @@ public record EasyNameFieldOptions
     /// If not null, then the options to use to print the return type of the field. If null,
     /// it is ignored.
     /// </summary>
-    public EasyNameTypeOptions? ReturnTypeOptions { get; init; }
+    public EasyNameType? ReturnTypeOptions { get; init; }
 
     /// <summary>
     /// If not null, then the options to use to print the host type of the field. If null, it
     /// is ignored.
     /// </summary>
-    public EasyNameTypeOptions? HostTypeOptions { get; init; }
+    public EasyNameType? HostTypeOptions { get; init; }
 
     // ----------------------------------------------------
 
     enum Mode { Empty, Default, Full };
-    private EasyNameFieldOptions(Mode mode)
+    private EasyNameFieldInfo(Mode mode)
     {
         switch (mode)
         {
@@ -78,8 +78,8 @@ public record EasyNameFieldOptions
                 break;
 
             case Mode.Full:
-                ReturnTypeOptions = EasyNameTypeOptions.Full;
-                HostTypeOptions = EasyNameTypeOptions.Full;
+                ReturnTypeOptions = EasyNameType.Full;
+                HostTypeOptions = EasyNameType.Full;
                 break;
         }
     }

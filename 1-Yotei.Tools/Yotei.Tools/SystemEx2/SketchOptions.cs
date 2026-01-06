@@ -58,32 +58,32 @@ public record SketchOptions
     /// <summary>
     /// If not null, the options to use when the value is a type.
     /// </summary>
-    public EasyNameTypeOptions? TypeOptions { get; init; }
+    public EasyNameType? TypeOptions { get; init; }
 
     /// <summary>
     /// If not null, the options to use when the value is a constructor.
     /// </summary>
-    public EasyNameConstructorOptions? ConstructorOptions { get; init; }
+    public EasyNameConstructorInfo? ConstructorOptions { get; init; }
 
     /// <summary>
     /// If not null, the options to use when the value is a method.
     /// </summary>
-    public EasyNameMethodOptions? MethodOptions { get; init; }
+    public EasyNameMethodInfo? MethodOptions { get; init; }
 
     /// <summary>
     /// If not null, the options to use when the value is a property.
     /// </summary>
-    public EasyNamePropertyOptions? PropertyOptions { get; init; }
+    public EasyNamePropertyInfo? PropertyOptions { get; init; }
 
     /// <summary>
     /// If not null, the options to use when the value is a field.
     /// </summary>
-    public EasyNameFieldOptions? FieldOptions { get; init; }
+    public EasyNameFieldInfo? FieldOptions { get; init; }
 
     /// <summary>
     /// If not null, the options to use when the value is a parameter.
     /// </summary>
-    public EasyNameParameterOptions? ParameterOptions { get; init; }
+    public EasyNameParameterInfo? ParameterOptions { get; init; }
 
     /// <summary>
     /// Determines if the shape of the value shall be used, if no other procedure has obtained
@@ -113,24 +113,24 @@ public record SketchOptions
 
             case Mode.Default:
                 NullString = "NULL";
-                TypeOptions = EasyNameTypeOptions.Default;
-                ConstructorOptions = EasyNameConstructorOptions.Default;
-                MethodOptions = EasyNameMethodOptions.Default;
-                PropertyOptions = EasyNamePropertyOptions.Default;
-                FieldOptions = EasyNameFieldOptions.Default;
-                ParameterOptions = EasyNameParameterOptions.Default;
+                TypeOptions = EasyNameType.Default;
+                ConstructorOptions = EasyNameConstructorInfo.Default;
+                MethodOptions = EasyNameMethodInfo.Default;
+                PropertyOptions = EasyNamePropertyInfo.Default;
+                FieldOptions = EasyNameFieldInfo.Default;
+                ParameterOptions = EasyNameParameterInfo.Default;
                 UseShape = true;
                 break;
 
             case Mode.Full:
                 UseTypeHead = true;
                 NullString = "NULL";
-                TypeOptions = EasyNameTypeOptions.Full;
-                ConstructorOptions = EasyNameConstructorOptions.Full;
-                MethodOptions = EasyNameMethodOptions.Full;
-                PropertyOptions = EasyNamePropertyOptions.Full;
-                FieldOptions = EasyNameFieldOptions.Full;
-                ParameterOptions = EasyNameParameterOptions.Full;
+                TypeOptions = EasyNameType.Full;
+                ConstructorOptions = EasyNameConstructorInfo.Full;
+                MethodOptions = EasyNameMethodInfo.Full;
+                PropertyOptions = EasyNamePropertyInfo.Full;
+                FieldOptions = EasyNameFieldInfo.Full;
+                ParameterOptions = EasyNameParameterInfo.Full;
                 UseShape = true;
                 UsePrivateMembers = true;
                 UseStaticMembers = true;

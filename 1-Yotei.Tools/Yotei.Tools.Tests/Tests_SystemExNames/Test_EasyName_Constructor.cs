@@ -10,8 +10,8 @@ public static class Test_EasyName_Constructor
     const string NAMESPACE = "Yotei.Tools.Tests.EasyNames";
     const string TESTNAME = nameof(Test_EasyName_Constructor);
 
-    readonly static EasyNameConstructorOptions DEFAULT = EasyNameConstructorOptions.Default;
-    readonly static EasyNameConstructorOptions FULL = EasyNameConstructorOptions.Full;
+    readonly static EasyNameConstructorInfo DEFAULT = EasyNameConstructorInfo.Default;
+    readonly static EasyNameConstructorInfo FULL = EasyNameConstructorInfo.Full;
 
     // ----------------------------------------------------
 
@@ -22,7 +22,7 @@ public static class Test_EasyName_Constructor
     [Fact]
     public static void Test0_Standard()
     {
-        EasyNameConstructorOptions options;
+        EasyNameConstructorInfo options;
         string name;
         var type = typeof(T0A.T0B);
         var item = type.GetConstructor([typeof(int).MakeByRefType(), typeof(string).MakeByRefType()]);
@@ -34,7 +34,7 @@ public static class Test_EasyName_Constructor
         options = DEFAULT with { UseBrackets = true };
         name = item.EasyName(options); Assert.Equal("new()", name);
 
-        options = DEFAULT with { ParameterOptions = EasyNameParameterOptions.Empty };
+        options = DEFAULT with { ParameterOptions = EasyNameParameterInfo.Empty };
         name = item.EasyName(options); Assert.Equal("new(,)", name);
 
         options = DEFAULT with { UseTechName = true };
@@ -54,7 +54,7 @@ public static class Test_EasyName_Constructor
     [Fact]
     public static void Test0_Standard_Static()
     {
-        EasyNameConstructorOptions options;
+        EasyNameConstructorInfo options;
         string name;
         var type = typeof(T0C.T0D);
         var item = type.TypeInitializer;
@@ -66,13 +66,13 @@ public static class Test_EasyName_Constructor
         options = DEFAULT with { UseBrackets = true };
         name = item.EasyName(options); Assert.Equal("T0D()", name);
 
-        options = DEFAULT with { ParameterOptions = EasyNameParameterOptions.Empty };
+        options = DEFAULT with { ParameterOptions = EasyNameParameterInfo.Empty };
         name = item.EasyName(options); Assert.Equal("T0D()", name);
 
         options = DEFAULT with { UseTechName = true };
         name = item.EasyName(options); Assert.Equal(".cctor", name);
 
-        options = options with { HostTypeOptions = EasyNameTypeOptions.Default };
+        options = options with { HostTypeOptions = EasyNameType.Default };
         name = item.EasyName(options); Assert.Equal("T0D..cctor", name);
 
         options = FULL;
@@ -88,7 +88,7 @@ public static class Test_EasyName_Constructor
     [Fact]
     public static void Test0_Generic_Unbound()
     {
-        EasyNameConstructorOptions options;
+        EasyNameConstructorInfo options;
         string name;
         var type = typeof(T1A<,>.T1B<>);
         var item = type.GetConstructors().Where(x => x.GetParameters().Length == 2).Single();
@@ -100,7 +100,7 @@ public static class Test_EasyName_Constructor
         options = DEFAULT with { UseBrackets = true };
         name = item.EasyName(options); Assert.Equal("new()", name);
 
-        options = DEFAULT with { ParameterOptions = EasyNameParameterOptions.Empty };
+        options = DEFAULT with { ParameterOptions = EasyNameParameterInfo.Empty };
         name = item.EasyName(options); Assert.Equal("new(,)", name);
 
         options = DEFAULT with { UseTechName = true };
@@ -118,7 +118,7 @@ public static class Test_EasyName_Constructor
     [Fact]
     public static void Test0_Generic_Bound()
     {
-        EasyNameConstructorOptions options;
+        EasyNameConstructorInfo options;
         string name;
         var type = typeof(T1A<byte, int?>.T1B<string?>);
         var item = type.GetConstructors().Where(x => x.GetParameters().Length == 2).Single();
@@ -130,7 +130,7 @@ public static class Test_EasyName_Constructor
         options = DEFAULT with { UseBrackets = true };
         name = item.EasyName(options); Assert.Equal("new()", name);
 
-        options = DEFAULT with { ParameterOptions = EasyNameParameterOptions.Empty };
+        options = DEFAULT with { ParameterOptions = EasyNameParameterInfo.Empty };
         name = item.EasyName(options); Assert.Equal("new(,)", name);
 
         options = DEFAULT with { UseTechName = true };

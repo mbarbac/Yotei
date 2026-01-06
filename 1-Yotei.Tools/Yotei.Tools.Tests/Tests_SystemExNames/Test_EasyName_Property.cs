@@ -9,8 +9,8 @@ public static class Test_EasyName_Property
     const string NAMESPACE = "Yotei.Tools.Tests.EasyNames";
     const string TESTNAME = nameof(Test_EasyName_Property);
 
-    readonly static EasyNamePropertyOptions DEFAULT = EasyNamePropertyOptions.Default;
-    readonly static EasyNamePropertyOptions FULL = EasyNamePropertyOptions.Full;
+    readonly static EasyNamePropertyInfo DEFAULT = EasyNamePropertyInfo.Default;
+    readonly static EasyNamePropertyInfo FULL = EasyNamePropertyInfo.Full;
 
     // ----------------------------------------------------
 
@@ -20,7 +20,7 @@ public static class Test_EasyName_Property
     [Fact]
     public static void Test0_Standard()
     {
-        EasyNamePropertyOptions options;
+        EasyNamePropertyInfo options;
         string name;
         var type = typeof(T0A.T0B);
         var item = type.GetProperty("Name");
@@ -32,13 +32,13 @@ public static class Test_EasyName_Property
         options = DEFAULT with { UseBrackets = true };
         name = item.EasyName(options); Assert.Equal("Name", name);
 
-        options = options with { ParameterOptions = EasyNameParameterOptions.Empty };
+        options = options with { ParameterOptions = EasyNameParameterInfo.Empty };
         name = item.EasyName(options); Assert.Equal("Name", name);
 
-        options = options with { ParameterOptions = EasyNameParameterOptions.Default };
+        options = options with { ParameterOptions = EasyNameParameterInfo.Default };
         name = item.EasyName(options); Assert.Equal("Name", name);
 
-        options = DEFAULT with { ReturnTypeOptions = EasyNameTypeOptions.Default };
+        options = DEFAULT with { ReturnTypeOptions = EasyNameType.Default };
         name = item.EasyName(options); Assert.Equal("String Name", name);
 
         options = FULL;
@@ -54,7 +54,7 @@ public static class Test_EasyName_Property
     [Fact]
     public static void Test2_Generic_Unbound()
     {
-        EasyNamePropertyOptions options;
+        EasyNamePropertyInfo options;
         string name;
         var type = typeof(T1A<,>.T1B<>);
         var item = type.GetProperty("Name");
@@ -66,13 +66,13 @@ public static class Test_EasyName_Property
         options = DEFAULT with { UseTechName = true };
         name = item.EasyName(options); Assert.Equal("Name", name);
 
-        options = DEFAULT with { ParameterOptions = EasyNameParameterOptions.Default };
+        options = DEFAULT with { ParameterOptions = EasyNameParameterInfo.Default };
         name = item.EasyName(options); Assert.Equal("Name", name);
 
-        options = options with { HostTypeOptions = EasyNameTypeOptions.Default with { UseGenericArguments = true } };
+        options = options with { HostTypeOptions = EasyNameType.Default with { UseGenericArguments = true } };
         name = item.EasyName(options); Assert.Equal("T1B<S>.Name", name);
 
-        options = options with { ReturnTypeOptions = EasyNameTypeOptions.Default };
+        options = options with { ReturnTypeOptions = EasyNameType.Default };
         name = item.EasyName(options); Assert.Equal("K T1B<S>.Name", name);
 
         options = FULL;
@@ -84,7 +84,7 @@ public static class Test_EasyName_Property
     [Fact]
     public static void Test2_Generic_Bound()
     {
-        EasyNamePropertyOptions options;
+        EasyNamePropertyInfo options;
         string name;
         var type = typeof(T1A<byte, int?>.T1B<string?>);
         var item = type.GetProperty("Name");
@@ -96,13 +96,13 @@ public static class Test_EasyName_Property
         options = DEFAULT with { UseTechName = true };
         name = item.EasyName(options); Assert.Equal("Name", name);
 
-        options = DEFAULT with { ParameterOptions = EasyNameParameterOptions.Default };
+        options = DEFAULT with { ParameterOptions = EasyNameParameterInfo.Default };
         name = item.EasyName(options); Assert.Equal("Name", name);
 
-        options = options with { HostTypeOptions = EasyNameTypeOptions.Default with { UseGenericArguments = true } };
+        options = options with { HostTypeOptions = EasyNameType.Default with { UseGenericArguments = true } };
         name = item.EasyName(options); Assert.Equal("T1B<String>.Name", name);
 
-        options = options with { ReturnTypeOptions = EasyNameTypeOptions.Default };
+        options = options with { ReturnTypeOptions = EasyNameType.Default };
         name = item.EasyName(options); Assert.Equal("Byte T1B<String>.Name", name);
 
         options = FULL;
@@ -118,7 +118,7 @@ public static class Test_EasyName_Property
     [Fact]
     public static void Test2_Generic_Bound_WithNullableReferenceType()
     {
-        EasyNamePropertyOptions options;
+        EasyNamePropertyInfo options;
         string name;
         var type = typeof(T1A<byte, int?>.T1B<IsNullable<string?>>);
         var item = type.GetProperty("Name");
@@ -130,13 +130,13 @@ public static class Test_EasyName_Property
         options = DEFAULT with { UseTechName = true };
         name = item.EasyName(options); Assert.Equal("Name", name);
 
-        options = DEFAULT with { ParameterOptions = EasyNameParameterOptions.Default };
+        options = DEFAULT with { ParameterOptions = EasyNameParameterInfo.Default };
         name = item.EasyName(options); Assert.Equal("Name", name);
 
-        options = options with { HostTypeOptions = EasyNameTypeOptions.Default with { UseGenericArguments = true } };
+        options = options with { HostTypeOptions = EasyNameType.Default with { UseGenericArguments = true } };
         name = item.EasyName(options); Assert.Equal("T1B<String?>.Name", name);
 
-        options = options with { ReturnTypeOptions = EasyNameTypeOptions.Default };
+        options = options with { ReturnTypeOptions = EasyNameType.Default };
         name = item.EasyName(options); Assert.Equal("Byte T1B<String?>.Name", name);
 
         options = FULL;

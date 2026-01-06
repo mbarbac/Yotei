@@ -7,7 +7,7 @@
 [Generator(LanguageNames.CSharp)]
 internal class CloneGenerator : TreeGenerator
 {
-#if DEBUG_CLONE_GENERATOR
+#if DEBUG_CLONE_GENERATOR__
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
@@ -20,8 +20,8 @@ internal class CloneGenerator : TreeGenerator
         var type = typeof(Foo<,>);
         var item = type.GetMethod("MyMethod");
 
-        var options = EasyNameMethodOptions.Default with
-        { ParameterOptions = EasyNameParameterOptions.Default };
+        var options = EasyNameMethodInfo.Default with
+        { ParameterOptions = EasyNameParameterInfo.Default };
         var name = item.EasyName(options);
         Debug.Assert(name != null);
     }

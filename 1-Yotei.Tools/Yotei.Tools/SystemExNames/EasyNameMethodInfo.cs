@@ -9,7 +9,7 @@ public static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <returns></returns>
     public static string EasyName(
-        this MethodInfo source) => EasyNameMethodOptions.Default.EasyName(source);
+        this MethodInfo source) => EasyNameMethodInfo.Default.EasyName(source);
 
     /// <summary>
     /// Obtains the C#-alike easy name of the given element using the given options.
@@ -17,7 +17,7 @@ public static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this MethodInfo source, EasyNameMethodOptions options)
+    public static string EasyName(this MethodInfo source, EasyNameMethodInfo options)
     {
         options.ThrowWhenNull();
         return options.EasyName(source);
@@ -28,27 +28,27 @@ public static partial class EasyNameExtensions
 /// <summary>
 /// Provides 'EasyName' capabilities for 'method' instances.
 /// </summary>
-public record EasyNameMethodOptions
+public record EasyNameMethodInfo
 {
     /// <summary>
     /// A shared read-only instance that represents empty options.
     /// </summary>
-    public static EasyNameMethodOptions Empty { get; } = new(Mode.Empty);
+    public static EasyNameMethodInfo Empty { get; } = new(Mode.Empty);
 
     /// <summary>
     /// A shared read-only instance that represents default options.
     /// </summary>
-    public static EasyNameMethodOptions Default { get; } = new(Mode.Default);
+    public static EasyNameMethodInfo Default { get; } = new(Mode.Default);
 
     /// <summary>
     /// A shared read-only instance that represents full options.
     /// </summary>
-    public static EasyNameMethodOptions Full { get; } = new(Mode.Full);
+    public static EasyNameMethodInfo Full { get; } = new(Mode.Full);
 
     /// <summary>
     /// Initializes a new default instance.
     /// </summary>
-    public EasyNameMethodOptions() : this(Mode.Default) { }
+    public EasyNameMethodInfo() : this(Mode.Default) { }
 
     // ----------------------------------------------------
 
@@ -56,19 +56,19 @@ public record EasyNameMethodOptions
     /// If not null, then the options to use to print the return type of the method. If null, the
     /// return type is ignored.
     /// </summary>
-    public EasyNameTypeOptions? ReturnTypeOptions { get; init; }
+    public EasyNameType? ReturnTypeOptions { get; init; }
 
     /// <summary>
     /// If not null, then the options to use to print the host type of the method. If null, the
     /// host type is ignored.
     /// </summary>
-    public EasyNameTypeOptions? HostTypeOptions { get; init; }
+    public EasyNameType? HostTypeOptions { get; init; }
 
     /// <summary>
     /// If not null, then the options to use to print the generic type arguments of the method, if
     /// any. If null, the generic type arguments are ignored.
     /// </summary>
-    public EasyNameTypeOptions? GenericArgumentOptions { get; init; }
+    public EasyNameType? GenericArgumentOptions { get; init; }
 
     /// <summary>
     /// Determines if, at least, the method parentheses shall be used even if no parameter options
@@ -80,12 +80,12 @@ public record EasyNameMethodOptions
     /// If not null, then the options to use with the method parameters. If null, then they are
     /// ignored.
     /// </summary>
-    public EasyNameParameterOptions? ParameterOptions { get; init; }
+    public EasyNameParameterInfo? ParameterOptions { get; init; }
 
     // ----------------------------------------------------
 
     enum Mode { Empty, Default, Full };
-    private EasyNameMethodOptions(Mode mode)
+    private EasyNameMethodInfo(Mode mode)
     {
         switch (mode)
         {
@@ -96,11 +96,11 @@ public record EasyNameMethodOptions
                 break;
 
             case Mode.Full:
-                ReturnTypeOptions = EasyNameTypeOptions.Full;
-                HostTypeOptions = EasyNameTypeOptions.Full;
-                GenericArgumentOptions = EasyNameTypeOptions.Full;
+                ReturnTypeOptions = EasyNameType.Full;
+                HostTypeOptions = EasyNameType.Full;
+                GenericArgumentOptions = EasyNameType.Full;
                 UseBrackets = true;
-                ParameterOptions = EasyNameParameterOptions.Full;
+                ParameterOptions = EasyNameParameterInfo.Full;
                 break;
         }
     }

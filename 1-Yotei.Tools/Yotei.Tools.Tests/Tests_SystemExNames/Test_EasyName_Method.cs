@@ -7,8 +7,8 @@ public static class Test_EasyName_Method
     const string NAMESPACE = "Yotei.Tools.Tests.EasyNames";
     const string TESTNAME = nameof(Test_EasyName_Method);
 
-    readonly static EasyNameMethodOptions DEFAULT = EasyNameMethodOptions.Default;
-    readonly static EasyNameMethodOptions FULL = EasyNameMethodOptions.Full;
+    readonly static EasyNameMethodInfo DEFAULT = EasyNameMethodInfo.Default;
+    readonly static EasyNameMethodInfo FULL = EasyNameMethodInfo.Full;
 
     // ----------------------------------------------------
 
@@ -18,7 +18,7 @@ public static class Test_EasyName_Method
     [Fact]
     public static void Test0_Standard()
     {
-        EasyNameMethodOptions options;
+        EasyNameMethodInfo options;
         string name;
         var type = typeof(IFace0);
         var item = type.GetMethod("Name");
@@ -30,10 +30,10 @@ public static class Test_EasyName_Method
         options = DEFAULT with { UseBrackets = true };
         name = item.EasyName(options); Assert.Equal("Name()", name);
 
-        options = DEFAULT with { ParameterOptions = EasyNameParameterOptions.Empty };
+        options = DEFAULT with { ParameterOptions = EasyNameParameterInfo.Empty };
         name = item.EasyName(options); Assert.Equal("Name(,,,)", name);
 
-        options = DEFAULT with { ParameterOptions = EasyNameParameterOptions.Default };
+        options = DEFAULT with { ParameterOptions = EasyNameParameterInfo.Default };
         name = item.EasyName(options);
         Assert.Equal("Name(Byte, out Int32?, ref String?, in Int64)", name);
 
@@ -57,7 +57,7 @@ public static class Test_EasyName_Method
     [Fact]
     public static void Test1_Generic_Unbound()
     {
-        EasyNameMethodOptions options;
+        EasyNameMethodInfo options;
         string name;
         var type = typeof(I1A<,>.I1B<>);
         var item = type.GetMethod("Name");
@@ -87,7 +87,7 @@ public static class Test_EasyName_Method
     [Fact]
     public static void Test1_Generic_Bound()
     {
-        EasyNameMethodOptions options;
+        EasyNameMethodInfo options;
         string name;
         var type = typeof(I1A<byte, int>.I1B<IsNullable<string>>);
         var item = type.GetMethod("Name");

@@ -1,7 +1,7 @@
-﻿namespace Yotei.Tools;
+﻿namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
-public static partial class EasyNameExtensions
+internal static partial class EasyNameExtensions
 {
     /// <summary>
     /// Obtains the C#-alike easy name of the given element using default options.
@@ -9,7 +9,7 @@ public static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <returns></returns>
     public static string EasyName(
-        this ConstructorInfo source) => EasyNameConstructorOptions.Default.EasyName(source);
+        this ConstructorInfo source) => EasyNameConstructorInfo.Default.EasyName(source);
 
     /// <summary>
     /// Obtains the C#-alike easy name of the given element using the given options.
@@ -17,7 +17,7 @@ public static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this ConstructorInfo source, EasyNameConstructorOptions options)
+    public static string EasyName(this ConstructorInfo source, EasyNameConstructorInfo options)
     {
         options.ThrowWhenNull();
         return options.EasyName(source);
@@ -28,27 +28,27 @@ public static partial class EasyNameExtensions
 /// <summary>
 /// Provides 'EasyName' capabilities for 'constructor' instances.
 /// </summary>
-public record EasyNameConstructorOptions
+internal record EasyNameConstructorInfo
 {
     /// <summary>
     /// A shared read-only instance that represents empty options.
     /// </summary>
-    public static EasyNameConstructorOptions Empty { get; } = new(Mode.Empty);
+    public static EasyNameConstructorInfo Empty { get; } = new(Mode.Empty);
 
     /// <summary>
     /// A shared read-only instance that represents default options.
     /// </summary>
-    public static EasyNameConstructorOptions Default { get; } = new(Mode.Default);
+    public static EasyNameConstructorInfo Default { get; } = new(Mode.Default);
 
     /// <summary>
     /// A shared read-only instance that represents full options.
     /// </summary>
-    public static EasyNameConstructorOptions Full { get; } = new(Mode.Full);
+    public static EasyNameConstructorInfo Full { get; } = new(Mode.Full);
 
     /// <summary>
     /// Initializes a new default instance.
     /// </summary>
-    public EasyNameConstructorOptions() : this(Mode.Default) { }
+    public EasyNameConstructorInfo() : this(Mode.Default) { }
 
     // ----------------------------------------------------
 
@@ -56,7 +56,7 @@ public record EasyNameConstructorOptions
     /// If not null, then the options to use to print the host type of the constructor. If null,
     /// it is unless the constructor is a static one.
     /// </summary>
-    public EasyNameTypeOptions? HostTypeOptions { get; init; }
+    public EasyNameType? HostTypeOptions { get; init; }
 
     /// <summary>
     /// Determines if the constructor tech name shall be used, instead of the default "new" one.
@@ -73,12 +73,12 @@ public record EasyNameConstructorOptions
     /// If not null, then the options to use with the constructor parameters. If null, then they
     /// are ignored.
     /// </summary>
-    public EasyNameParameterOptions? ParameterOptions { get; init; }
+    public EasyNameParameterInfo? ParameterOptions { get; init; }
 
     // ----------------------------------------------------
 
     enum Mode { Empty, Default, Full };
-    private EasyNameConstructorOptions(Mode mode)
+    private EasyNameConstructorInfo(Mode mode)
     {
         switch (mode)
         {
@@ -89,10 +89,10 @@ public record EasyNameConstructorOptions
                 break;
 
             case Mode.Full:
-                HostTypeOptions = EasyNameTypeOptions.Full;
+                HostTypeOptions = EasyNameType.Full;
                 UseTechName = true;
                 UseBrackets = true;
-                ParameterOptions = EasyNameParameterOptions.Full;
+                ParameterOptions = EasyNameParameterInfo.Full;
                 break;
         }
     }
@@ -116,7 +116,7 @@ public record EasyNameConstructorOptions
         {
             if (HostTypeOptions is not null || !UseTechName)
             {
-                var options = HostTypeOptions ?? EasyNameTypeOptions.Empty with { HideName = false };
+                var options = HostTypeOptions ?? EasyNameType.Empty with { HideName = false };
                 var str = options.EasyName(host);
                 sb.Append(str);
             }

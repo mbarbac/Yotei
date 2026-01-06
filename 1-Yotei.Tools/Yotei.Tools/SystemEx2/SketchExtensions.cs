@@ -34,7 +34,7 @@ public static class SketchExtensions
         var type = source == null ? typeof(T) : source.GetType();
         var typename = !options.UseTypeHead
             ? null
-            : (options.TypeOptions ?? EasyNameTypeOptions.Default).EasyName(type);
+            : (options.TypeOptions ?? EasyNameType.Default).EasyName(type);
 
         MethodInfo ? toString_Core = null;
         MethodInfo? toString_Format = null;

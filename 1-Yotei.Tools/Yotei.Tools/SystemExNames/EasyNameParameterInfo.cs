@@ -9,7 +9,7 @@ public static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <returns></returns>
     public static string EasyName(
-        this ParameterInfo source) => EasyNameParameterOptions.Default.EasyName(source);
+        this ParameterInfo source) => EasyNameParameterInfo.Default.EasyName(source);
 
     /// <summary>
     /// Obtains the C#-alike easy name of the given element using the given options.
@@ -17,7 +17,7 @@ public static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this ParameterInfo source, EasyNameParameterOptions options)
+    public static string EasyName(this ParameterInfo source, EasyNameParameterInfo options)
     {
         options.ThrowWhenNull();
         return options.EasyName(source);
@@ -28,27 +28,27 @@ public static partial class EasyNameExtensions
 /// <summary>
 /// Provides 'EasyName' capabilities for 'parameter' instances.
 /// </summary>
-public record EasyNameParameterOptions
+public record EasyNameParameterInfo
 {
     /// <summary>
     /// A shared read-only instance that represents empty options.
     /// </summary>
-    public static EasyNameParameterOptions Empty { get; } = new(Mode.Empty);
+    public static EasyNameParameterInfo Empty { get; } = new(Mode.Empty);
 
     /// <summary>
     /// A shared read-only instance that represents default options.
     /// </summary>
-    public static EasyNameParameterOptions Default { get; } = new(Mode.Default);
+    public static EasyNameParameterInfo Default { get; } = new(Mode.Default);
 
     /// <summary>
     /// A shared read-only instance that represents full options.
     /// </summary>
-    public static EasyNameParameterOptions Full { get; } = new(Mode.Full);
+    public static EasyNameParameterInfo Full { get; } = new(Mode.Full);
 
     /// <summary>
     /// Initializes a new default instance.
     /// </summary>
-    public EasyNameParameterOptions() : this(Mode.Default) { }
+    public EasyNameParameterInfo() : this(Mode.Default) { }
 
     // ----------------------------------------------------
 
@@ -61,7 +61,7 @@ public record EasyNameParameterOptions
     /// If not null, then the options to use with the type of the parameter. If null, then it is
     /// ignored.
     /// </summary>
-    public EasyNameTypeOptions? TypeOptions { get; init; }
+    public EasyNameType? TypeOptions { get; init; }
 
     /// <summary>
     /// Determines if the name of the parameter shall be used or not.
@@ -71,7 +71,7 @@ public record EasyNameParameterOptions
     // ----------------------------------------------------
 
     enum Mode { Empty, Default, Full };
-    private EasyNameParameterOptions(Mode mode)
+    private EasyNameParameterInfo(Mode mode)
     {
         switch (mode)
         {
@@ -80,12 +80,12 @@ public record EasyNameParameterOptions
 
             case Mode.Default:
                 UseModifiers = true;
-                TypeOptions = EasyNameTypeOptions.Default;
+                TypeOptions = EasyNameType.Default;
                 break;
 
             case Mode.Full:
                 UseModifiers = true;
-                TypeOptions = EasyNameTypeOptions.Full;
+                TypeOptions = EasyNameType.Full;
                 UseName = true;
                 break;
         }

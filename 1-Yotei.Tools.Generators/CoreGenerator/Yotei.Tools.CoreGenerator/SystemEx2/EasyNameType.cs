@@ -9,7 +9,7 @@ internal static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <returns></returns>
     public static string EasyName(
-        this Type source) => EasyNameTypeOptions.Default.EasyName(source);
+        this Type source) => EasyNameType.Default.EasyName(source);
 
     /// <summary>
     /// Obtains the C#-alike easy name of the given element using the given options.
@@ -17,7 +17,7 @@ internal static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this Type source, EasyNameTypeOptions options)
+    public static string EasyName(this Type source, EasyNameType options)
     {
         options.ThrowWhenNull();
         return options.EasyName(source);
@@ -28,27 +28,27 @@ internal static partial class EasyNameExtensions
 /// <summary>
 /// Provides 'EasyName' capabilities for 'type' instances.
 /// </summary>
-internal record EasyNameTypeOptions
+internal record EasyNameType
 {
     /// <summary>
     /// A shared read-only instance that represents empty options.
     /// </summary>
-    public static EasyNameTypeOptions Empty { get; } = new(Mode.Empty);
+    public static EasyNameType Empty { get; } = new(Mode.Empty);
 
     /// <summary>
     /// A shared read-only instance that represents default options.
     /// </summary>
-    public static EasyNameTypeOptions Default { get; } = new(Mode.Default);
+    public static EasyNameType Default { get; } = new(Mode.Default);
 
     /// <summary>
     /// A shared read-only instance that represents full options.
     /// </summary>
-    public static EasyNameTypeOptions Full { get; } = new(Mode.Full);
+    public static EasyNameType Full { get; } = new(Mode.Full);
 
     /// <summary>
     /// Initializes a new default instance.
     /// </summary>
-    public EasyNameTypeOptions() : this(Mode.Default) { }
+    public EasyNameType() : this(Mode.Default) { }
 
     // ----------------------------------------------------
 
@@ -91,7 +91,7 @@ internal record EasyNameTypeOptions
     // ----------------------------------------------------
 
     enum Mode { Empty, Default, Full };
-    private EasyNameTypeOptions(Mode mode)
+    private EasyNameType(Mode mode)
     {
         switch (mode)
         {

@@ -244,7 +244,7 @@ public static class Test_SketchExtensions
         Assert.Equal("(Dictionary) {(String) James = (Int32) 50, (String) Maria = (Int32) 25}", name);
 
         options = options with
-        { TypeOptions = EasyNameTypeOptions.Default with { UseGenericArguments = true } };
+        { TypeOptions = EasyNameType.Default with { UseGenericArguments = true } };
         name = source.Sketch(options);
         Assert.Equal(
             "(Dictionary<String, Int32>) {(String) James = (Int32) 50, (String) Maria = (Int32) 25}",
@@ -274,7 +274,7 @@ public static class Test_SketchExtensions
         Assert.Equal("(List) [(String) James, (String) Maria]", name);
 
         options = options with
-        { TypeOptions = EasyNameTypeOptions.Default with { UseGenericArguments = true } };
+        { TypeOptions = EasyNameType.Default with { UseGenericArguments = true } };
         name = source.Sketch(options);
         Assert.Equal(
             "(List<String>) [(String) James, (String) Maria]",

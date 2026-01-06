@@ -7,8 +7,8 @@ public static class Test_EasyName_Type
     const string NAMESPACE = "Yotei.Tools.Tests.EasyNames";
     const string TESTNAME = nameof(Test_EasyName_Type);
 
-    readonly static EasyNameTypeOptions DEFAULT = EasyNameTypeOptions.Default;
-    readonly static EasyNameTypeOptions FULL = EasyNameTypeOptions.Full;
+    readonly static EasyNameType DEFAULT = EasyNameType.Default;
+    readonly static EasyNameType FULL = EasyNameType.Full;
 
     // ----------------------------------------------------
 
@@ -16,7 +16,7 @@ public static class Test_EasyName_Type
     [Fact]
     public static void Test0_System_Nullable_ValueType()
     {
-        EasyNameTypeOptions options;
+        EasyNameType options;
         string name;
         var item = typeof(int?);
 
@@ -43,7 +43,7 @@ public static class Test_EasyName_Type
     [Fact]
     public static void Test0_System_ReferenceType()
     {
-        EasyNameTypeOptions options;
+        EasyNameType options;
         string name;
         var item = typeof(string);
 
@@ -68,7 +68,7 @@ public static class Test_EasyName_Type
     [Fact]
     public static void Test1_NullableGeneric()
     {
-        EasyNameTypeOptions options;
+        EasyNameType options;
         string name;
         var item = typeof(IFace1A<>);
 
@@ -111,7 +111,7 @@ public static class Test_EasyName_Type
     [Fact]
     public static void Test1_Annotated_ReferenceType_Argument()
     {
-        EasyNameTypeOptions options;
+        EasyNameType options;
         string name;
         var type = typeof(IFace1B);
         var item = type.GetInterface("IFace1A`1");
@@ -134,7 +134,7 @@ public static class Test_EasyName_Type
     [Fact]
     public static void Test1_Wrapped_ReferenceType_Argument()
     {
-        EasyNameTypeOptions options;
+        EasyNameType options;
         string name;
         var type = typeof(IFace1C);
         var item = type.GetInterface("IFace1A`1");
@@ -162,7 +162,7 @@ public static class Test_EasyName_Type
     [Fact]
     public static void Test2_VarianceModifiers()
     {
-        EasyNameTypeOptions options;
+        EasyNameType options;
         string name;
         var item = typeof(IFace2A<,>);
 
@@ -191,7 +191,7 @@ public static class Test_EasyName_Type
     [Fact]
     public static void Test3_Inheritance_Unbound()
     {
-        EasyNameTypeOptions options;
+        EasyNameType options;
         string name;
         var item = typeof(Type3A<,>.Type3B<>.Type3C<,>);
 
@@ -216,7 +216,7 @@ public static class Test_EasyName_Type
     [Fact]
     public static void Test3_Inheritance_Bound()
     {
-        EasyNameTypeOptions options;
+        EasyNameType options;
         string name;
         var item = typeof(Type3A<byte, short>.Type3B<int>.Type3C<long, string>);
 
@@ -249,7 +249,7 @@ public static class Test_EasyName_Type
     [Fact]
     public static void Test3_Inheritance_Bound_Nullable()
     {
-        EasyNameTypeOptions options;
+        EasyNameType options;
         string name;
         var item = typeof(Type3A<byte, short>.Type3B<int>.Type3C<long, IsNullable<string>>);
 

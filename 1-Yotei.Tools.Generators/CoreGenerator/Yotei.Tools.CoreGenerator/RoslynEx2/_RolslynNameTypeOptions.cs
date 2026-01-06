@@ -1,7 +1,7 @@
-﻿namespace Yotei.Tools;
+﻿namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
-public static partial class EasyNameExtensions
+internal static partial class RoslynNameExtensions
 {
     /// <summary>
     /// Obtains the C#-alike easy name of the given element using default options.
@@ -9,7 +9,7 @@ public static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <returns></returns>
     public static string EasyName(
-        this Type source) => EasyNameTypeOptions.Default.EasyName(source);
+        this ITypeSymbol source) => RoslynNameTypeOptions.Default.EasyName(source);
 
     /// <summary>
     /// Obtains the C#-alike easy name of the given element using the given options.
@@ -17,7 +17,7 @@ public static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this Type source, EasyNameTypeOptions options)
+    public static string EasyName(this ITypeSymbol source, RoslynNameTypeOptions options)
     {
         options.ThrowWhenNull();
         return options.EasyName(source);
@@ -28,27 +28,27 @@ public static partial class EasyNameExtensions
 /// <summary>
 /// Provides 'EasyName' capabilities for 'type' instances.
 /// </summary>
-public record EasyNameTypeOptions
+internal record RoslynNameTypeOptions
 {
     /// <summary>
     /// A shared read-only instance that represents empty options.
     /// </summary>
-    public static EasyNameTypeOptions Empty { get; } = new(Mode.Empty);
+    public static RoslynNameTypeOptions Empty { get; } = new(Mode.Empty);
 
     /// <summary>
     /// A shared read-only instance that represents default options.
     /// </summary>
-    public static EasyNameTypeOptions Default { get; } = new(Mode.Default);
+    public static RoslynNameTypeOptions Default { get; } = new(Mode.Default);
 
     /// <summary>
     /// A shared read-only instance that represents full options.
     /// </summary>
-    public static EasyNameTypeOptions Full { get; } = new(Mode.Full);
+    public static RoslynNameTypeOptions Full { get; } = new(Mode.Full);
 
     /// <summary>
     /// Initializes a new default instance.
     /// </summary>
-    public EasyNameTypeOptions() : this(Mode.Default) { }
+    public RoslynNameTypeOptions() : this(Mode.Default) { }
 
     // ----------------------------------------------------
 
@@ -91,7 +91,7 @@ public record EasyNameTypeOptions
     // ----------------------------------------------------
 
     enum Mode { Empty, Default, Full };
-    private EasyNameTypeOptions(Mode mode)
+    private RoslynNameTypeOptions(Mode mode)
     {
         switch (mode)
         {
@@ -117,86 +117,100 @@ public record EasyNameTypeOptions
     // ----------------------------------------------------
 
     /// <summary>
+    /// Invoked when the source is a namespace.
+    /// </summary>
+    string EasyName(INamespaceSymbol source)
+    {
+        List<string> names = [];
+
+        ISymbol? node = source;
+        while (node != null)
+        {
+            if (node is INamespaceSymbol ns &&
+                ns.Name != null &&
+                ns.Name.Length > 0) names.Add(ns.Name);
+
+            if (!UseNamespace) break; // But at least done once!
+            node = node.ContainingSymbol;
+        }
+
+        if (names.Count == 0) return string.Empty;
+
+        names.Reverse();
+        return string.Join(".", names);
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Obtains the C#-alike easy name of the given element.
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
-    public string EasyName(Type source)
+    public string EasyName(ITypeSymbol source)
     {
         source.ThrowWhenNull();
 
-        var types = source.GetGenericArguments();
-        return EasyName(source, types);
-    }
-
-    /// <summary>
-    /// Invoked to obtain the C#-alike name of the given type, once its closed generic arguments,
-    /// if any, have been captured to prevent loosing them. These are the ones in the source along
-    /// with all the ones in its inheritance chain.
-    /// </summary>
-    string EasyName(Type source, Type[] types)
-    {
-        var isgen = source.FullName == null;
-        var host = source.DeclaringType;
-        var args = source.GetGenericArguments();
-        var used = host is null ? 0 : host.GetGenericArguments().Length;
-        var need = args.Length - used;
-
-        // Shortcut hide name...
+        // Shortcuts...
         if (HideName) return string.Empty;
+        if (source is INamespaceSymbol nsx) return EasyName(nsx);
 
-        // Shortcut not decorated nullability...
-        if (UseNullability &&
-            !UseNullableWrappers &&
-            source.GetCustomAttribute<IsNullableAttribute>() == null && (
-            (need == 1 && source.Name.StartsWith("Nullable`1")) ||
-            (need == 1 && source.Name.StartsWith("IsNullable`1"))))
+        // Capturing...
+        var isgen = source.TypeKind == TypeKind.TypeParameter;
+        var host = source.ContainingType;
+        var named = source as INamedTypeSymbol;
+        var args = named is null ? [] : named.TypeArguments;
+
+        // Shortcut wrapped nullability...
+        if (UseNullability && !UseNullableWrappers && args.Length == 1)
         {
-            var type = types[used];
-            var str = EasyName(type); if (!str.EndsWith('?')) str += '?';
-            return str;
+            if (source.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T ||
+                source.OriginalDefinition.Name == "IsNullable")
+            {
+                var type = args[0];
+                var str = EasyName(type); if (!str.EndsWith('?')) str += '?';
+                return str;
+            }
         }
 
         // Processing...
         var sb = new StringBuilder();
 
         // Variance mask...
-        if (UseVarianceMask && source.IsGenericParameter)
+        if (UseVarianceMask && source is ITypeParameterSymbol par)
         {
-            var gpa = source.GenericParameterAttributes;
-            var variance = gpa & GenericParameterAttributes.VarianceMask;
-
-            if ((variance & GenericParameterAttributes.Covariant) != 0) sb.Append("out ");
-            if ((variance & GenericParameterAttributes.Contravariant) != 0) sb.Append("in ");
+            switch (par.Variance)
+            {
+                case VarianceKind.Out: sb.Append("out "); break;
+                case VarianceKind.In: sb.Append("in "); break;
+            }
         }
 
         // Namespace...
         if (UseNamespace && host is null && !isgen)
         {
-            var str = source.Namespace;
+            var ns = source.ContainingNamespace;
+            var str = EasyName(ns);
             if (str is not null && str.Length > 0) { sb.Append(str); sb.Append('.'); }
         }
 
         // Host...
         if ((UseHost || UseNamespace) && host is not null && !isgen)
         {
-            // Using 'types' to prevent loosing bound information...
-            var str = EasyName(host, types);
+            var str = EasyName(host);
             if (str is not null && str.Length > 0) { sb.Append(str); sb.Append('.'); }
         }
 
-        // Name (name& is a ref type, 'ref' to be intercepted elsewhere)...
+        // Name...
         var name = source.Name;
-        var index = name.IndexOf('`'); if (index >= 0) name = name[..index];
-        if (name.Length > 0 && name[^1] == '&') name = name[..^1];
         sb.Append(name);
 
         // Generic arguments...
-        if (UseGenericArguments && need > 0)
+        if (UseGenericArguments && args.Length > 0)
         {
-            sb.Append('<'); for (int i = 0; i < need; i++)
+            sb.Append('<'); for (int i = 0; i < args.Length; i++)
             {
-                var arg = types[i + used];
+                var arg = args[i];
                 var str = EasyName(arg);
                 if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
                 sb.Append(str);
@@ -204,9 +218,13 @@ public record EasyNameTypeOptions
             sb.Append('>');
         }
 
+        // Nullable annotations...
+        if (UseNullability && source.NullableAnnotation == NullableAnnotation.Annotated)
+            if (sb.Length > 0 && sb[^1] != '?') sb.Append('?');
+
         // Decorated nullability...
-        if (UseNullability &&
-            source.GetCustomAttribute<IsNullableAttribute>() != null)
+        if (source.GetAttributes()
+            .FirstOrDefault(x => x.AttributeClass?.Name == "IsNullableAttribute") != null)
             if (sb.Length > 0 && sb[^1] != '?') sb.Append('?');
 
         // Finishing...
