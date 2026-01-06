@@ -25,13 +25,10 @@ public abstract class LambdaNode : DynamicObject
     /// Obtains a debug representation of this instance.
     /// </summary>
     /// <returns></returns>
-    [SuppressMessage("", "CA1822")] // HIGH: EasyName related
     public string ToDebugString()
     {
-        // HIGH: EasyName related
-        //var name = GetType().EasyName();
-        //return $"[{name}]#{LambdaId}/{LambdaVersion}({ToString()})";
-        return "";
+        var name = GetType().EasyName();
+        return $"[{name}]#{LambdaId}/{LambdaVersion}({ToString()})";
     }
 
     /// <summary>
