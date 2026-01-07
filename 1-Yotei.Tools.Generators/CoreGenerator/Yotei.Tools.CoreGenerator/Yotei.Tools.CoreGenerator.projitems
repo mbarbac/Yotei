@@ -32,10 +32,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx2\Finder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx2\_EasyNameTypedConstant.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx2\_EasyNameAttributeData.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx2\_EasyNameFieldSymbol.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx2\_EasyNamePropertySymbol.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx2\_EasyNameMethodSymbol.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx2\_EasyNameParameterSymbol.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx2\EasyNameFieldSymbol.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx2\EasyNamePropertySymbol.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx2\EasyNameMethodSymbol.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx2\EasyNameParameterSymbol.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx2\EasyNameTypeSymbol.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx2\__.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\INamedTypeSymbolExtensions.cs" />

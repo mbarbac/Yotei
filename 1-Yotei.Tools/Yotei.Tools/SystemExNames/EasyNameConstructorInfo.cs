@@ -132,7 +132,11 @@ public record EasyNameConstructorInfo
         {
             if (HostTypeOptions is not null)
             {
-                var str = HostTypeOptions.EasyName(host);
+                var options = HostTypeOptions.HideName
+                    ? HostTypeOptions with { HideName = false }
+                    : HostTypeOptions;
+
+                var str = options.EasyName(host);
                 if (str.Length > 0) { sb.Append(str); sb.Append('.'); }
             }
             var name = UseTechName ? source.Name : "new";

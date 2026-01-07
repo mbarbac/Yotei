@@ -20,7 +20,7 @@ internal class TreeGenerator : IIncrementalGenerator
     /// </summary>
     protected virtual bool LaunchDebugger => false;
 
-#if EMIT_ISNULLABLE_TYPE
+#if ONLY_WHEN_EMIT_ISNULLABLE_TYPE
     /// <summary>
     /// Invoked at initialization time to register register post-initialization actions, such as
     /// generating additional code for marker attributes, reading external files, etc. Inheritors
@@ -456,7 +456,7 @@ internal class TreeGenerator : IIncrementalGenerator
             {
                 var node = file.Node.ChildProperties.Find(
                     x => comparer.Equals(x.Symbol, propertyCandidate.Symbol));
-                
+
                 if (node is null)
                 {
                     node = CreateNode(file.Node, propertyCandidate);

@@ -1,7 +1,7 @@
-﻿namespace Yotei.Tools;
+﻿namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
-public static partial class EasyNameExtensions
+internal static partial class RoslynNameExtensions
 {
     /// <summary>
     /// Obtains the C#-alike easy name of the given element using default options.
@@ -9,7 +9,7 @@ public static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <returns></returns>
     public static string EasyName(
-        this PropertyInfo source) => EasyNamePropertyInfo.Default.EasyName(source);
+        this IPropertySymbol source) => EasyNamePropertySymbol.Default.EasyName(source);
 
     /// <summary>
     /// Obtains the C#-alike easy name of the given element using the given options.
@@ -17,7 +17,7 @@ public static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this PropertyInfo source, EasyNamePropertyInfo options)
+    public static string EasyName(this IPropertySymbol source, EasyNamePropertySymbol options)
     {
         options.ThrowWhenNull();
         return options.EasyName(source);
@@ -26,29 +26,29 @@ public static partial class EasyNameExtensions
 
 // ========================================================
 /// <summary>
-/// Provides 'EasyName' capabilities for 'property' instances.
+/// Provides 'EasyName' capabilities for 'type' instances.
 /// </summary>
-public record EasyNamePropertyInfo
+internal record EasyNamePropertySymbol
 {
     /// <summary>
     /// A shared read-only instance that represents empty options.
     /// </summary>
-    public static EasyNamePropertyInfo Empty { get; } = new(Mode.Empty);
+    public static EasyNamePropertySymbol Empty { get; } = new(Mode.Empty);
 
     /// <summary>
     /// A shared read-only instance that represents default options.
     /// </summary>
-    public static EasyNamePropertyInfo Default { get; } = new(Mode.Default);
+    public static EasyNamePropertySymbol Default { get; } = new(Mode.Default);
 
     /// <summary>
     /// A shared read-only instance that represents full options.
     /// </summary>
-    public static EasyNamePropertyInfo Full { get; } = new(Mode.Full);
+    public static EasyNamePropertySymbol Full { get; } = new(Mode.Full);
 
     /// <summary>
     /// Initializes a new default instance.
     /// </summary>
-    public EasyNamePropertyInfo() : this(Mode.Default) { }
+    public EasyNamePropertySymbol() : this(Mode.Default) { }
 
     // ----------------------------------------------------
 
@@ -56,17 +56,16 @@ public record EasyNamePropertyInfo
     /// If not null, then the options to use to print the return type of the property. If null,
     /// it is ignored.
     /// </summary>
-    public EasyNameType? ReturnTypeOptions { get; init; }
+    public EasyNameTypeSymbol? ReturnTypeOptions { get; init; }
 
     /// <summary>
     /// If not null, then the options to use to print the host type of the property. If null, it
     /// is ignored.
     /// </summary>
-    public EasyNameType? HostTypeOptions { get; init; }
+    public EasyNameTypeSymbol? HostTypeOptions { get; init; }
 
     /// <summary>
-    /// Determines if the indexed property tech name shall be used, instead of the default "this"
-    /// one. This setting is ignored if the property is not an indexed one.
+    /// Determines if the property tech name shall be used, instead of the default "this" one.
     /// </summary>
     public bool UseTechName { get; init; }
 
@@ -80,12 +79,12 @@ public record EasyNamePropertyInfo
     /// If not null, then the options to use with the property parameters. If null, then they are
     /// ignored.
     /// </summary>
-    public EasyNameParameterInfo? ParameterOptions { get; init; }
+    public EasyNameParameterSymbol? ParameterOptions { get; init; }
 
     // ----------------------------------------------------
 
     enum Mode { Empty, Default, Full };
-    private EasyNamePropertyInfo(Mode mode)
+    private EasyNamePropertySymbol(Mode mode)
     {
         switch (mode)
         {
@@ -96,11 +95,11 @@ public record EasyNamePropertyInfo
                 break;
 
             case Mode.Full:
-                ReturnTypeOptions = EasyNameType.Full;
-                HostTypeOptions = EasyNameType.Full;
+                ReturnTypeOptions = EasyNameTypeSymbol.Full;
+                HostTypeOptions = EasyNameTypeSymbol.Full;
                 UseTechName = true;
                 UseBrackets = true;
-                ParameterOptions = EasyNameParameterInfo.Full;
+                ParameterOptions = EasyNameParameterSymbol.Full;
                 break;
         }
     }
@@ -112,12 +111,26 @@ public record EasyNamePropertyInfo
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
-    public string EasyName(PropertyInfo source)
+    public string EasyName(IPropertySymbol source)
     {
         source.ThrowWhenNull();
 
-        var host = source.DeclaringType;
+        var host = source.ContainingType;
         var sb = new StringBuilder();
+
+#if USE_MODIFIERS
+        // Modifiers...
+        if (UseModifiers)
+        {
+            var prefix = source.RefKind switch
+            {
+                RefKind.Ref => "ref ",
+                RefKind.RefReadOnly => "ref readonly ",
+                _ => string.Empty
+            };
+            if (prefix is not null) sb.Append(prefix);
+        }
+#endif
 
         // Return type...
         if (ReturnTypeOptions is not null)
@@ -126,8 +139,8 @@ public record EasyNamePropertyInfo
                 ? ReturnTypeOptions with { HideName = false }
                 : ReturnTypeOptions;
 
-            var str = options.EasyName(source.PropertyType);
-            if (str.Length > 0) { sb.Append(str); sb.Append(' '); }
+            var str = options.EasyName(source.Type);
+            sb.Append(str); sb.Append(' ');
         }
 
         // Host type...
@@ -138,13 +151,13 @@ public record EasyNamePropertyInfo
                 : HostTypeOptions;
 
             var str = options.EasyName(host);
-            if (str.Length > 0) { sb.Append(str); sb.Append('.'); }
+            sb.Append(str); sb.Append('.');
         }
 
         // Name...
         var name = source.Name;
-        var args = source.GetIndexParameters();
-        if (args.Length > 0 && !UseTechName) name = "this";
+        var args = source.Parameters;
+        if (args.Length > 0) name = UseTechName ? source.MetadataName : "this";
         sb.Append(name);
 
         // Indexer parameters...

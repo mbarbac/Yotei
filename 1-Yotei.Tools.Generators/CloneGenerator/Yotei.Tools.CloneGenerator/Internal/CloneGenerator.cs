@@ -7,31 +7,12 @@
 [Generator(LanguageNames.CSharp)]
 internal class CloneGenerator : TreeGenerator
 {
-#if DEBUG_CLONE_GENERATOR__
+#if DEBUG_CLONE_GENERATOR
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     protected override bool LaunchDebugger => true;
 #endif
-
-    // DEBUG-ONLY: remove when done...
-    protected override void OnInitialize(IncrementalGeneratorPostInitializationContext context)
-    {
-        var type = typeof(Foo<,>);
-        var item = type.GetMethod("MyMethod");
-
-        var options = EasyNameMethodInfo.Default with
-        { ParameterOptions = EasyNameParameterInfo.Default };
-        var name = item.EasyName(options);
-        Debug.Assert(name != null);
-    }
-
-    // DEBUG-ONLY: remove when done...
-    public partial class Foo<K, T>
-    {
-        [Named]
-        public void MyMethod([IsNullable] K? one) { }
-    }
 
     // ----------------------------------------------------
 

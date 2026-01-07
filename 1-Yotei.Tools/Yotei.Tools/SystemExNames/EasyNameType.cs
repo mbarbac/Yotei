@@ -180,8 +180,10 @@ public record EasyNameType
         // Host...
         if ((UseHost || UseNamespace) && host is not null && !isgen)
         {
+            var options = HideName ? this with { HideName = false } : this;
+
             // Using 'types' to prevent loosing bound information...
-            var str = EasyName(host, types);
+            var str = options.EasyName(host, types);
             if (str is not null && str.Length > 0) { sb.Append(str); sb.Append('.'); }
         }
 

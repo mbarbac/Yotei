@@ -1,7 +1,7 @@
-﻿namespace Yotei.Tools;
+﻿namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
-public static partial class EasyNameExtensions
+internal static partial class RoslynNameExtensions
 {
     /// <summary>
     /// Obtains the C#-alike easy name of the given element using default options.
@@ -9,7 +9,7 @@ public static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <returns></returns>
     public static string EasyName(
-        this ParameterInfo source) => EasyNameParameterInfo.Default.EasyName(source);
+        this IParameterSymbol source) => EasyNameParameterSymbol.Default.EasyName(source);
 
     /// <summary>
     /// Obtains the C#-alike easy name of the given element using the given options.
@@ -17,7 +17,7 @@ public static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this ParameterInfo source, EasyNameParameterInfo options)
+    public static string EasyName(this IParameterSymbol source, EasyNameParameterSymbol options)
     {
         options.ThrowWhenNull();
         return options.EasyName(source);
@@ -26,29 +26,29 @@ public static partial class EasyNameExtensions
 
 // ========================================================
 /// <summary>
-/// Provides 'EasyName' capabilities for 'parameter' instances.
+/// Provides 'EasyName' capabilities for 'type' instances.
 /// </summary>
-public record EasyNameParameterInfo
+internal record EasyNameParameterSymbol
 {
     /// <summary>
     /// A shared read-only instance that represents empty options.
     /// </summary>
-    public static EasyNameParameterInfo Empty { get; } = new(Mode.Empty);
+    public static EasyNameParameterSymbol Empty { get; } = new(Mode.Empty);
 
     /// <summary>
     /// A shared read-only instance that represents default options.
     /// </summary>
-    public static EasyNameParameterInfo Default { get; } = new(Mode.Default);
+    public static EasyNameParameterSymbol Default { get; } = new(Mode.Default);
 
     /// <summary>
     /// A shared read-only instance that represents full options.
     /// </summary>
-    public static EasyNameParameterInfo Full { get; } = new(Mode.Full);
+    public static EasyNameParameterSymbol Full { get; } = new(Mode.Full);
 
     /// <summary>
     /// Initializes a new default instance.
     /// </summary>
-    public EasyNameParameterInfo() : this(Mode.Default) { }
+    public EasyNameParameterSymbol() : this(Mode.Default) { }
 
     // ----------------------------------------------------
 
@@ -61,7 +61,7 @@ public record EasyNameParameterInfo
     /// If not null, then the options to use with the type of the parameter. If null, then it is
     /// ignored.
     /// </summary>
-    public EasyNameType? TypeOptions { get; init; }
+    public EasyNameTypeSymbol? TypeOptions { get; init; }
 
     /// <summary>
     /// Determines if the name of the parameter shall be used or not.
@@ -71,7 +71,7 @@ public record EasyNameParameterInfo
     // ----------------------------------------------------
 
     enum Mode { Empty, Default, Full };
-    private EasyNameParameterInfo(Mode mode)
+    private EasyNameParameterSymbol(Mode mode)
     {
         switch (mode)
         {
@@ -80,12 +80,12 @@ public record EasyNameParameterInfo
 
             case Mode.Default:
                 UseModifiers = true;
-                TypeOptions = EasyNameType.Default;
+                TypeOptions = EasyNameTypeSymbol.Default;
                 break;
 
             case Mode.Full:
                 UseModifiers = true;
-                TypeOptions = EasyNameType.Full;
+                TypeOptions = EasyNameTypeSymbol.Full;
                 UseName = true;
                 break;
         }
@@ -98,7 +98,7 @@ public record EasyNameParameterInfo
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
-    public string EasyName(ParameterInfo source)
+    public string EasyName(IParameterSymbol source)
     {
         source.ThrowWhenNull();
 
@@ -108,43 +108,30 @@ public record EasyNameParameterInfo
         if (TypeOptions is not null)
         {
             var options = TypeOptions.HideName ? TypeOptions with { HideName = false } : TypeOptions;
-            var str = options.EasyName(source.ParameterType);
+            var str = options.EasyName(source.Type);
             if (str.Length > 0) sb.Append(str);
 
             while (TypeOptions.UseNullability && str.Length > 0 && sb[^1] != '?')
             {
-                var type = source.ParameterType;
+                var type = source.Type;
                 var name = type.Name;
+                var arity = type is INamedTypeSymbol named ? named.Arity : 0;
 
                 // Special case: nullable wrappers...
                 if (TypeOptions.UseNullableWrappers &&
-                    (name.StartsWith("Nullable`1") || name.StartsWith("IsNullable`1")))
+                    arity == 1 && (name == "Nullable" || name == "IsNullable"))
                     break;
+
+                // Nullable annotation...
+                if (source.NullableAnnotation == NullableAnnotation.Annotated)
+                {
+                    sb.Append('?');
+                    break;
+                }
 
                 // Nullable attribute...
-                var at = source.GetCustomAttribute<NullableAttribute>();
-                if (at is not null &&
-                    at.NullableFlags.Length > 0 &&
-                    at.NullableFlags[0] == 2)
-                {
-                    sb.Append('?');
-                    break;
-                }
-
-                // IsNullable attribute...
-                var isat = source.GetCustomAttribute<IsNullableAttribute>();
-                if (isat is not null)
-                {
-                    sb.Append('?');
-                    break;
-                }
-
-                // Standard case via nullability API, althoug limited...
-                var nic = new NullabilityInfoContext();
-                var info = nic.Create(source);
-
-                if (info.ReadState == NullabilityState.Nullable ||
-                    info.WriteState == NullabilityState.Nullable)
+                if (source.GetAttributes()
+                    .FirstOrDefault(a => a.AttributeClass?.Name == "NullableAttribute") != null)
                 {
                     sb.Append('?');
                     break;
@@ -156,20 +143,19 @@ public record EasyNameParameterInfo
         }
 
         // Parameter name...
-        if (UseName)
-        {
-            if (sb.Length > 0) sb.Append(' ');
-            sb.Append(source.Name);
-        }
+        if (UseName) sb.Append(source.Name);
 
         // Parameter modifiers...
         if (UseModifiers && sb.Length > 0)
         {
-            string? prefix = null;
-            if (source.IsIn) prefix = "in ";
-            else if (source.IsOut) prefix = "out ";
-            else if (source.ParameterType.IsByRef) prefix = "ref ";
-
+            var prefix = source.RefKind switch
+            {
+                RefKind.In => "in ",
+                RefKind.Out => "out ",
+                RefKind.Ref => "ref ",
+                RefKind.RefReadOnlyParameter => "ref readonly ",
+                _ => null
+            };
             if (prefix is not null) sb.Insert(0, prefix);
         }
 

@@ -101,14 +101,22 @@ public record EasyNameFieldInfo
         // Return type...
         if (ReturnTypeOptions is not null)
         {
-            var str = ReturnTypeOptions.EasyName(source.FieldType);
+            var options = ReturnTypeOptions.HideName
+                ? ReturnTypeOptions with { HideName = false }
+                : ReturnTypeOptions;
+
+            var str = options.EasyName(source.FieldType);
             if (str.Length > 0) { sb.Append(str); sb.Append(' '); }
         }
 
         // Host type...
         if (HostTypeOptions is not null && host is not null)
         {
-            var str = HostTypeOptions.EasyName(host);
+            var options = HostTypeOptions.HideName
+                ? HostTypeOptions with { HideName = false }
+                : HostTypeOptions;
+
+            var str = options.EasyName(host);
             if (str.Length > 0) { sb.Append(str); sb.Append('.'); }
         }
 

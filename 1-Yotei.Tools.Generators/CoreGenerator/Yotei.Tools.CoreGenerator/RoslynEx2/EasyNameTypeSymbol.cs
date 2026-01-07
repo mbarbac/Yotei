@@ -197,7 +197,9 @@ internal record EasyNameTypeSymbol
         // Host...
         if ((UseHost || UseNamespace) && host is not null && !isgen)
         {
-            var str = EasyName(host);
+            var options = HideName ? this with { HideName = false } : this;
+
+            var str = options.EasyName(host);
             if (str is not null && str.Length > 0) { sb.Append(str); sb.Append('.'); }
         }
 

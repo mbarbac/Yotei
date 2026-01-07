@@ -51,6 +51,18 @@ internal record EasyNameFieldSymbol
     public EasyNameFieldSymbol() : this(Mode.Default) { }
 
     // ----------------------------------------------------
+    
+    /// <summary>
+    /// If not null, then the options to use to print the return type of the field. If null,
+    /// it is ignored.
+    /// </summary>
+    public EasyNameTypeSymbol? ReturnTypeOptions { get; init; }
+
+    /// <summary>
+    /// If not null, then the options to use to print the host type of the field. If null, it
+    /// is ignored.
+    /// </summary>
+    public EasyNameTypeSymbol? HostTypeOptions { get; init; }
 
     // ----------------------------------------------------
 
@@ -66,6 +78,8 @@ internal record EasyNameFieldSymbol
                 break;
 
             case Mode.Full:
+                ReturnTypeOptions = EasyNameTypeSymbol.Full;
+                HostTypeOptions = EasyNameTypeSymbol.Full;
                 break;
         }
     }
@@ -79,6 +93,51 @@ internal record EasyNameFieldSymbol
     /// <returns></returns>
     public string EasyName(IFieldSymbol source)
     {
-        throw null;
+        source.ThrowWhenNull();
+
+        var host = source.ContainingType;
+        var sb = new StringBuilder();
+
+#if USE_MODIFIERS
+        // Modifiers...
+        if (UseModifiers)
+        {
+            var prefix = source.RefKind switch
+            {
+                RefKind.Ref => "ref ",
+                RefKind.RefReadOnly => "ref readonly ",
+                _ => string.Empty
+            };
+            if (prefix is not null) sb.Append(prefix);
+        }
+#endif
+
+        // Return type...
+        if (ReturnTypeOptions is not null)
+        {
+            var options = ReturnTypeOptions.HideName
+                ? ReturnTypeOptions with { HideName = false }
+                : ReturnTypeOptions;
+
+            var str = options.EasyName(source.Type);
+            sb.Append(str); sb.Append(' ');
+        }
+
+        // Host type...
+        if (HostTypeOptions is not null && host is not null)
+        {
+            var options = HostTypeOptions.HideName
+                ? HostTypeOptions with { HideName = false }
+                : HostTypeOptions;
+
+            var str = options.EasyName(host);
+            sb.Append(str); sb.Append('.');
+        }
+
+        // Name...
+        sb.Append(source.Name);
+
+        // Finishing...
+        return sb.ToString();
     }
 }

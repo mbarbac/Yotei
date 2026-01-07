@@ -2,9 +2,9 @@
 
 // ========================================================
 
-public partial class Foo<K, T>
+public class Foo<K, [IsNullable] T>
 {
     [Named]
-    public void MyMethod(ref int? one) { }
+    public T this[T one] => default!;
 }
 
