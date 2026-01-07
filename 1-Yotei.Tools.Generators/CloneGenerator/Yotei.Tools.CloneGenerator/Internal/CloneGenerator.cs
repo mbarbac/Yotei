@@ -7,7 +7,7 @@
 [Generator(LanguageNames.CSharp)]
 internal class CloneGenerator : TreeGenerator
 {
-#if DEBUG_CLONE_GENERATOR
+#if DEBUG_CLONE_GENERATOR__
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
