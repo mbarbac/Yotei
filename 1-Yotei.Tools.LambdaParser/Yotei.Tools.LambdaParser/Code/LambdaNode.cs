@@ -27,8 +27,10 @@ public abstract class LambdaNode : DynamicObject
     /// <returns></returns>
     public string ToDebugString()
     {
-        var name = GetType().EasyName();
-        return $"[{name}]#{LambdaId}/{LambdaVersion}({ToString()})";
+        // HIGH: EasyName related...
+        //var name = GetType().EasyName();
+        //return $"[{name}]#{LambdaId}/{LambdaVersion}({ToString()})";
+        throw null;
     }
 
     /// <summary>

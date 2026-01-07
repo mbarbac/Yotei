@@ -54,9 +54,10 @@ public class LambdaNodeMethod : LambdaNodeHosted
 
         if (LambdaTypeArguments.Length != 0)
         {
-            sb.Append('<');
-            sb.Append(string.Join(", ", LambdaTypeArguments.Select(static x => x.EasyName())));
-            sb.Append('>');
+            // HIGH: EasyName related...
+            //sb.Append('<');
+            //sb.Append(string.Join(", ", LambdaTypeArguments.Select(static x => x.EasyName())));
+            //sb.Append('>');
         }
         sb.Append('(');
         sb.Append(string.Join(", ", LambdaArguments.Select(static x => x.ToString())));

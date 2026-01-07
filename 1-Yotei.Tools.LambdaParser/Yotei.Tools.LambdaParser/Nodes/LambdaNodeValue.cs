@@ -32,9 +32,11 @@ public class LambdaNodeValue : LambdaNode
     /// <returns><inheritdoc/></returns>
     public override string ToString()
     {
-        var options = SketchOptions.Default with { TypeOptions = null };
-        var str = $"'{LambdaValue.Sketch(options)}'";
-        return str;
+        // HIGH: EasyName related...
+        //var options = SketchOptions.Default with { TypeOptions = null };
+        //var str = $"'{LambdaValue.Sketch(options)}'";
+        //return str;
+        throw null;
     }
 
     /// <summary>

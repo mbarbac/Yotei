@@ -24,7 +24,9 @@ public class LambdaNodeConvert : LambdaNode
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"(({LambdaType.EasyName()}) {LambdaTarget})";
+    // HIGH: EasyName related...
+    //public override string ToString() => $"(({LambdaType.EasyName()}) {LambdaTarget})";
+    public override string ToString() => throw null;
 
     /// <summary>
     /// <inheritdoc/>
