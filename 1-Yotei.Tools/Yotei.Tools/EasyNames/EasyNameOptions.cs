@@ -58,6 +58,11 @@ public class EasyNameOptions
     // ----------------------------------------------------
 
     /// <summary>
+    /// Determines if the member modifiers shall be used or not.
+    /// </summary>
+    public bool MemberUseModifiers { get; set; }
+
+    /// <summary>
     /// If not null, the options to use to print the return type of the member, if any. If null,
     /// then it is ignored.
     /// </summary>
@@ -136,6 +141,12 @@ public class EasyNameOptions
     /// </summary>
     public EasyNameOptions() : this(Mode.Default) { }
 
+    /// <summary>
+    /// Used to determine what mode is used when initializing this instance. The main ideas are:
+    /// - Empty: prints an empty string.
+    /// - Default: just prints the name of the element.
+    /// - Full: prints the most complete name of the element.
+    /// </summary>
     enum Mode { Empty, Default, Full }
     EasyNameOptions(Mode mode)
     {
@@ -154,7 +165,7 @@ public class EasyNameOptions
                 TypeUseVarianceMask = true;
                 TypeUseNamespace = true;
                 TypeHostOptions = this;
-                TypeNullableStyle = TypeEasyNullableStyle.Wrapped;
+                TypeNullableStyle = EasyNullableStyle.Wrapped;
                 TypeGenericArgumentOptions = this;
                 MemberReturnTypeOptions = this;
                 MemberHostOptions = this;
