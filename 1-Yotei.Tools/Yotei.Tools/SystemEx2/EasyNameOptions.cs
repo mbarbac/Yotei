@@ -2,122 +2,110 @@
 
 // ========================================================
 /// <summary>
-/// Determines the style to use with nullable elements.
-/// </summary>
-public enum EasyNullableStyle { None, Annotated, Wrapped }
-
-// ========================================================
-/// <summary>
 /// Provides options for the 'EasyName' family of methods.
 /// </summary>
-public class EasyNameOptions
+public record EasyNameOptions
 {
     /// <summary>
     /// Determines if the 'in' and 'out' variance specifiers of the type are used or not.
     /// </summary>
-    public bool TypeUseVarianceMask { get; set; }
+    public bool TypeUseVarianceMask { get; init; }
 
     /// <summary>
-    /// Determines if type elements use their namespace, or not.
+    /// Determines if the namespace of the given type elements is used, or not.
     /// </summary>
-    public bool TypeUseNamespace { get; set; }
+    public bool TypeUseNamespace { get; init; }
 
     /// <summary>
-    /// If not null, and it the type is a nested one, the options to use to print the type host.
-    /// If null, then it is ignored.
+    /// Determines if the host type of the nested type element is used, or not.
     /// </summary>
-    public EasyNameOptions? TypeHostOptions { get; set; }
+    public bool TypeUseHost { get; init; }
 
     /// <summary>
     /// Determines if type elements hide their name, or not. If this setting is enabled, then
     /// it shorcuts other settings related to the type elements.
     /// </summary>
-    public bool TypeHideName { get; set; }
+    public bool TypeHideName { get; init; }
 
     /// <summary>
-    /// Determines the style to use with nullable types, or annotated or wrapped ones.
+    /// Determines if nullable annotations are printed, or not.
     /// </summary>
-    public EasyNullableStyle TypeNullableStyle
-    {
-        get;
-        set => field = value switch
-        {
-            EasyNullableStyle.None => value,
-            EasyNullableStyle.Annotated => value,
-            EasyNullableStyle.Wrapped => value,
-            _ => throw new ArgumentOutOfRangeException(nameof(value), value, null)
-        };
-    }
+    public bool TypeUseNullability { get; init; }
 
     /// <summary>
-    /// If not null, the options to use to print the generic arguments of the type. If null,
-    /// then they are ignored.
+    /// Determines if the nullable wrappers are kept instead of being replaced by '?'.
     /// </summary>
-    public EasyNameOptions? TypeGenericArgumentOptions { get; set; }
+    public bool TypeKeepNullableWrappers { get; init; }
+
+    /// <summary>
+    /// Determines if the type generic arguments of the given type element are used, or not.
+    /// </summary>
+    public bool TypeUseGenericArguments { get; init; }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Determines if the member modifiers shall be used or not.
+    /// Determines if the member modifiers are used or not.
     /// </summary>
-    public bool MemberUseModifiers { get; set; }
+    public bool MemberUseModifiers { get; init; }
 
     /// <summary>
-    /// If not null, the options to use to print the return type of the member, if any. If null,
-    /// then it is ignored.
+    /// If not null, the options to use to print the return type of the member, if any.
+    /// If null, then it is ignored.
     /// </summary>
-    public EasyNameOptions? MemberReturnTypeOptions { get; set; }
+    public EasyNameOptions? MemberReturnTypeOptions { get; init; }
 
     /// <summary>
-    /// If not null, the options to use to print the member host. If null, then it is ignored.
+    /// If not null, the options to use to print the member host.
+    /// If null, then it is ignored.
     /// </summary>
-    public EasyNameOptions? MemberHostOptions { get; set; }
+    public EasyNameOptions? MemberHostOptions { get; init; }
 
     /// <summary>
-    /// If not null, the options to use to print the generic arguments of the member. If null,
-    /// then they are ignored.
+    /// If not null, the options to use to print the generic arguments of the member.
+    /// If null, then they are ignored.
     /// </summary>
-    public EasyNameOptions? MemberGenericArgumentOptions { get; set; }
+    public EasyNameOptions? MemberGenericArgumentOptions { get; init; }
 
     /// <summary>
-    /// Determines if constructors shall use their tech name, instead of the default 'new' one.
+    /// Determines if constructors use their tech name instead of the default 'new' one.
     /// </summary>
-    public bool UseConstructorTechName { get; set; }
+    public bool UseConstructorTechName { get; init; }
 
     /// <summary>
-    /// Determines if indexers shall use their tech name, instead of the default 'this' one.
+    /// Determines if indexers use their tech name instead of the default 'this' one.
     /// </summary>
-    public bool UseIndexerTechName { get; set; }
+    public bool UseIndexerTechName { get; init; }
 
     /// <summary>
     /// Determines if, even if no argument options are provided for the member, at least its
-    /// brakets shall be printed or not.
+    /// brakets are printed, or not.
     /// </summary>
-    public bool MemberUseBrackets { get; set; }
+    public bool MemberUseBrackets { get; init; }
 
     /// <summary>
-    /// If not null, the options to use to print the arguments of the member. If null, then they
-    /// are ignored.
+    /// If not null, the options to use to print the arguments of the member.
+    /// If null, then they are ignored.
     /// </summary>
-    public EasyNameOptions? MemberArgumentOptions { get; set; }
+    public EasyNameOptions? MemberArgumentOptions { get; init; }
 
     // ----------------------------------------------------
 
     /// <summary>
     /// Determines if parameter modifiers (ref, out, in, etc.) are used or not.
     /// </summary>
-    public bool ParameterUseModifiers { get; set; }
+    public bool ParameterUseModifiers { get; init; }
 
     /// <summary>
-    /// If not null, the options to use to print the type of parameters. If null, then they are
-    /// ignored.
+    /// If not null, the options to use to print the type of parameters.
+    /// If null, then they are ignored.
     /// </summary>
-    public EasyNameOptions? ParameterTypeOptions { get; set; }
+    public EasyNameOptions? ParameterTypeOptions { get; init; }
 
     /// <summary>
     /// Determines if the names of the parameters are used or not.
     /// </summary>
-    public bool ParameterUseName { get; set; }
+    public bool ParameterUseName { get; init; }
 
     // ----------------------------------------------------
 
@@ -164,9 +152,10 @@ public class EasyNameOptions
             case Mode.Full:
                 TypeUseVarianceMask = true;
                 TypeUseNamespace = true;
-                TypeHostOptions = this;
-                TypeNullableStyle = EasyNullableStyle.Wrapped;
-                TypeGenericArgumentOptions = this;
+                TypeUseHost = true;
+                TypeUseNullability = true;
+                TypeKeepNullableWrappers = true;
+                TypeUseGenericArguments = true;
                 MemberReturnTypeOptions = this;
                 MemberHostOptions = this;
                 MemberGenericArgumentOptions = this;
