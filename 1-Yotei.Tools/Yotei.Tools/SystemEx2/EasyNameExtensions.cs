@@ -33,7 +33,7 @@ public static class EasyNameExtensions
     /// </summary>
     static string EasyName(this Type source, Type[] types, EasyNameOptions options)
     {
-        var isgen = 
+        var isgen =
             (!source.IsGenericType && source.FullName == null) ||
             source.IsGenericParameter ||
             source.IsGenericTypeParameter ||
@@ -414,6 +414,8 @@ public static class EasyNameExtensions
             var str = source.PropertyType.EasyName(options);
             if (str.Length > 0)
             {
+                sb.Append(str);
+
                 // Validating nullability...
                 while (options.ArgumentNullableStyle is not EasyNullableStyle.None &&
                     sb.Length > 0 &&
@@ -451,8 +453,7 @@ public static class EasyNameExtensions
                     break;
                 }
 
-                // Appending return type...
-                sb.Append(str);
+                // Separator...
                 sb.Append(' ');
             }
         }
@@ -523,6 +524,8 @@ public static class EasyNameExtensions
             var str = source.FieldType.EasyName(options);
             if (str.Length > 0)
             {
+                sb.Append(str);
+
                 // Validating nullability...
                 while (options.ArgumentNullableStyle is not EasyNullableStyle.None &&
                     sb.Length > 0 &&
@@ -560,8 +563,7 @@ public static class EasyNameExtensions
                     break;
                 }
 
-                // Appending return type...
-                sb.Append(str);
+                // Separator...
                 sb.Append(' ');
             }
         }
