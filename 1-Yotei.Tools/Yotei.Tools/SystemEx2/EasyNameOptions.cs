@@ -8,18 +8,6 @@ public enum EasyNullableStyle { None, UseAnnotations, KeepWrappers }
 
 // ========================================================
 /// <summary>
-/// Determines the style to use with the names of constructor elements.
-/// </summary>
-public enum EasyConstructorStyle { HostName, HostAndTechName }
-
-// ========================================================
-/// <summary>
-/// Determines the style to use with the names of indexed properties.
-/// </summary>
-public enum EasyIndexedStyle { ThisName, TechName }
-
-// ========================================================
-/// <summary>
 /// Provides options for the 'EasyName' family of methods.
 /// </summary>
 public record EasyNameOptions
@@ -53,14 +41,14 @@ public record EasyNameOptions
     public EasyNullableStyle TypeNullableStyle { get; init; }
 
     /// <summary>
-    /// Determines the style to use with the names of constructor elements.
+    /// Determines if the constructo tech name shall be used, or not.
     /// </summary>
-    public EasyConstructorStyle ConstructorStyle { get; init; }
+    public bool UseConstructorTechName { get; init; }
 
     /// <summary>
-    /// Determines the style to use with the names of indexed property elements.
+    /// Determines if the indexed property tech name shall be used, or not.
     /// </summary>
-    public EasyIndexedStyle IndexedStyle { get; init; }
+    public bool UseIndexedTechName { get; init; }
 
     /// <summary>
     /// Determines if the generic arguments of the element are used, or not.
@@ -87,7 +75,7 @@ public record EasyNameOptions
     /// <summary>
     /// Determines if the types of the member arguments are used, or not.
     /// </summary>
-    public bool UseArgumentTypes { get; init; }
+    public bool UseArgumentType { get; init; }
 
     /// <summary>
     /// Determines the nullable style to use with the member argument types.
@@ -97,7 +85,7 @@ public record EasyNameOptions
     /// <summary>
     /// Determines if the names of the member arguments are used, or not.
     /// </summary>
-    public bool UseArgumentNames { get; init; }
+    public bool UseArgumentName { get; init; }
 
     // ----------------------------------------------------
 
@@ -130,11 +118,9 @@ public record EasyNameOptions
             default:
             case Mode.Default:
                 TypeNullableStyle = EasyNullableStyle.UseAnnotations;
-                ConstructorStyle = EasyConstructorStyle.HostName;
-                IndexedStyle = EasyIndexedStyle.ThisName;
                 UseGenericArguments = true;
                 UseArgumentModifiers = true;
-                UseArgumentTypes = true;
+                UseArgumentType = true;
                 ArgumentNullableStyle = EasyNullableStyle.UseAnnotations;
                 break;
 
@@ -143,14 +129,14 @@ public record EasyNameOptions
                 UseTypeNamespace = true;
                 UseHost = true;
                 TypeNullableStyle = EasyNullableStyle.KeepWrappers;
-                ConstructorStyle = EasyConstructorStyle.HostAndTechName;
-                IndexedStyle = EasyIndexedStyle.TechName;
+                UseConstructorTechName = true;
+                UseIndexedTechName = true;
                 UseGenericArguments = true;
                 UseReturnType = true;
                 UseArgumentModifiers = true;
-                UseArgumentTypes = true;
+                UseArgumentType = true;
                 ArgumentNullableStyle = EasyNullableStyle.KeepWrappers;
-                UseArgumentNames = true;
+                UseArgumentName = true;
                 break;
         }
     }
