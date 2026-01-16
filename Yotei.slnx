@@ -8,6 +8,9 @@
     <Project Path="0-Environment/Runner/Runner.csproj" Id="105b0414-e228-4630-bccd-392b292a6da7" />
   </Folder>
   <Folder Name="/1-Yotei.Tools/">
+    <Project Path="1-Yotei.Tools/Yotei.Tools.ConsoleEx/Yotei.Tools.ConsoleEx.csproj" Id="36bb7f7a-ea83-4097-b700-ec5369ba618f">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
     <Project Path="1-Yotei.Tools/Yotei.Tools.Diagnostics/Yotei.Tools.Diagnostics.csproj" Id="d68c677d-83c0-460b-a8fd-21be7d2595c0" />
     <Project Path="1-Yotei.Tools/Yotei.Tools/Yotei.Tools.csproj" Id="008529fe-c6f6-43ea-98d4-a963500bceef" />
   </Folder>
