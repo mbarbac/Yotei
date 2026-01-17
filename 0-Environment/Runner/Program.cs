@@ -1,4 +1,6 @@
-﻿namespace Runner;
+﻿using Color = System.ConsoleColor;
+
+namespace Runner;
 
 // ========================================================
 /// <summary>
@@ -15,6 +17,12 @@ internal class Program
         Debug.IndentSize = 2;
         Debug.AutoFlush = true;
 
-        Console.WriteLine("Hello, World!");
+        var str = "Hello world!";
+        Console.Write(Color.Green, "Text: ");
+        Console.WriteLine(str);
+
+        Console.Write(Color.Green, "Edit: ");
+        var r = Console.EditLine(Color.White, Color.Blue, str);
+        Console.WriteLine(r);
     }
 }

@@ -15,18 +15,21 @@
 	<ItemGroup Condition="'$(Configuration)'=='Debug'">
 		<ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
 		<ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Diagnostics\Yotei.Tools.Diagnostics.csproj" />
+		<ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.ConsoleEx\Yotei.Tools.ConsoleEx.csproj" />
 	</ItemGroup>
 
 	<!-- RELEASE configuration -->
 	<ItemGroup Condition="'$(Configuration)'=='Release'">
 		<PackageReference Include="Yotei.Tools" Version="0.7.0" />
 		<PackageReference Include="Yotei.Tools.Diagnostics" Version="0.7.0" />
+		<PackageReference Include="Yotei.Tools.ConsoleEx" Version="0.7.0" />
 	</ItemGroup>
 
 	<!-- LOCAL configuration -->
 	<ItemGroup Condition="'$(Configuration)'=='Local'">
 		<PackageReference Include="Yotei.Tools" Version="0.7.0-v0001" />
 		<PackageReference Include="Yotei.Tools.Diagnostics" Version="0.7.0-v0001" />
+		<PackageReference Include="Yotei.Tools.ConsoleEx" Version="0.7.0-v0001" />
 	</ItemGroup>
 
 </Project>

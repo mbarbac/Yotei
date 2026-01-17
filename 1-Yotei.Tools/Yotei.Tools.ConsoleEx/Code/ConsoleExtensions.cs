@@ -709,7 +709,7 @@ public static class ConsoleExtensions
         /// <param name="timeout"></param>
         /// <param name="source"></param>
         /// <returns></returns>
-        public static string? EditLineEx( bool debug, TimeSpan timeout, string? source = null)
+        public static string? EditLineEx(bool debug, TimeSpan timeout, string? source = null)
         {
             return EditLineEx(
                 debug,
@@ -758,7 +758,159 @@ public static class ConsoleExtensions
             TimeSpan timeout, ConsoleColor forecolor, ConsoleColor backcolor,
             string? source = null)
         {
-            throw null;
+            var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
+            var oldback = Console.BackgroundColor; Console.BackgroundColor = backcolor;
+            var oldsize = Console.CursorSize;
+            int oldleft = Console.CursorLeft;
+
+            var sb = new StringBuilder(source ?? string.Empty);
+            var pos = sb.Length;
+            bool insert = false;
+            int len;
+
+            SetInsertMode(false);
+            ShowLine(pos);
+
+            while (true)
+            {
+                // Capturing key, or ESC if timeout...
+                var info = ReadKey(timeout, intercept: true);
+                info ??= new('\0', ConsoleKey.Escape, false, false, false);
+
+                // Special keys...
+                switch (info.Value.Key)
+                {
+                    case ConsoleKey.Enter:
+                        Console.WriteLine();
+                        SetInsertMode(false);
+                        Console.ForegroundColor = oldfore;
+                        Console.BackgroundColor = oldback;
+                        if (DoDebug(debug)) Debug.WriteLine(sb.ToString());
+                        return sb.ToString();
+
+                    case ConsoleKey.Escape:
+                        len = sb.Length; sb.Clear(); ShowLine(0, len);
+                        Console.WriteLine();
+                        SetInsertMode(false);
+                        Console.ForegroundColor = oldfore;
+                        Console.BackgroundColor = oldback;
+                        return null;
+
+                    case ConsoleKey.Insert:
+                        SetInsertMode(!insert);
+                        break;
+
+                    case ConsoleKey.Home:
+                        pos = 0; Console.CursorLeft = oldleft;
+                        break;
+
+                    case ConsoleKey.End:
+                        pos = sb.Length; Console.CursorLeft = oldleft + pos;
+                        break;
+
+                    case ConsoleKey.Delete:
+                        if (pos >= sb.Length) break;
+                        len = sb.Length;
+                        sb.Remove(pos, 1);
+                        ShowLine(pos, len);
+                        break;
+
+                    case ConsoleKey.Backspace:
+                        if (pos == 0) break;
+                        len = sb.Length;
+                        sb.Remove(--pos, 1);
+                        ShowLine(pos, len);
+                        break;
+
+                    case ConsoleKey.LeftArrow:
+                        if (pos == 0) break;
+
+                        if (!info.Value.Modifiers.HasFlag(ConsoleModifiers.Control))
+                        { pos--; Console.CursorLeft--; }
+                        else
+                        {
+                            var ascii = char.IsLetterOrDigit(sb[pos - 1]);
+                            while (pos > 0)
+                            {
+                                var temp = char.IsLetterOrDigit(sb[pos - 1]);
+                                if (temp == ascii) { pos--; Console.CursorLeft--; }
+                                else break;
+                            }
+                        }
+                        break;
+
+                    case ConsoleKey.RightArrow:
+                        if (pos >= sb.Length) break;
+                        if (!info.Value.Modifiers.HasFlag(ConsoleModifiers.Control))
+                        { pos++; Console.CursorLeft++; }
+                        else
+                        {
+                            var ascii = char.IsLetterOrDigit(sb[pos]);
+                            while (pos < sb.Length)
+                            {
+                                var temp = char.IsLetterOrDigit(sb[pos]);
+                                if (temp == ascii) { pos++; Console.CursorLeft++; }
+                                else break;
+                            }
+                        }
+                        break;
+                }
+
+                // Standard keys...
+                if (info.Value.KeyChar >= ' ')
+                {
+                    if (insert)
+                    {
+                        sb.Insert(pos, info.Value.KeyChar);
+                        ShowLine(++pos);
+                        continue;
+                    }
+                    if (pos < sb.Length)
+                    {
+                        sb[pos] = info.Value.KeyChar;
+                        ShowLine(++pos);
+                        continue;
+                    }
+                    else
+                    {
+                        sb.Append(info.Value.KeyChar);
+                        Console.Write(info.Value.KeyChar);
+                        pos++;
+                        continue;
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Shows the current value, clearing up to the remaining len.
+            /// Sets the cursor position to the given one.
+            /// </summary>
+            void ShowLine(int pos, int len = 0)
+            {
+                Console.CursorLeft = oldleft;
+                Console.Write(sb.ToString());
+
+                len -= sb.Length; if (len > 0)
+                {
+                    Console.ForegroundColor = oldfore;
+                    Console.BackgroundColor = oldback;
+                    Console.Write(FromSpaces(len));
+                    Console.ForegroundColor = forecolor;
+                    Console.BackgroundColor = backcolor;
+                }
+                Console.CursorLeft = oldleft + pos;
+            }
+
+            /// <summary>
+            /// Sets the insert mode to the given value.
+            /// The setter is only supported in windows.
+            /// </summary>
+            void SetInsertMode(bool value)
+            {
+                var windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+                if (windows) Console.CursorSize = value ? 100 : oldsize;
+                insert = value;
+            }
         }
     }
 
