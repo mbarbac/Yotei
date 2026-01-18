@@ -51,7 +51,7 @@ public static partial class ConsoleExtensions
         {
             var str = FormatMessage(message, args);
             Console.Write(str);
-            DebugWrite(debug, str);
+            TryDebugWrite(debug, str);
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ public static partial class ConsoleExtensions
             var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
             var str = FormatMessage(message, args);
             Console.Write(str);
-            DebugWrite(debug, str);
+            TryDebugWrite(debug, str);
             Console.ForegroundColor = oldfore;
         }
 
@@ -90,7 +90,7 @@ public static partial class ConsoleExtensions
             var oldback = Console.BackgroundColor; Console.BackgroundColor = backcolor;
             var str = FormatMessage(message, args);
             Console.Write(str);
-            DebugWrite(debug, str);
+            TryDebugWrite(debug, str);
             Console.BackgroundColor = oldback;
             Console.ForegroundColor = oldfore;
         }
@@ -138,7 +138,7 @@ public static partial class ConsoleExtensions
         public static void WriteLineEx(bool debug)
         {
             Console.WriteLine();
-            DebugWriteLine(debug, string.Empty);
+            TryDebugWriteLine(debug, string.Empty);
         }
 
         /// <summary>
@@ -153,7 +153,7 @@ public static partial class ConsoleExtensions
         {
             var str = FormatMessage(message, args);
             Console.WriteLine(str);
-            DebugWriteLine(debug, str);
+            TryDebugWriteLine(debug, str);
         }
 
         /// <summary>
@@ -171,7 +171,7 @@ public static partial class ConsoleExtensions
             var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
             var str = FormatMessage(message, args);
             Console.WriteLine(str);
-            DebugWriteLine(debug, str);
+            TryDebugWriteLine(debug, str);
             Console.ForegroundColor = oldfore;
         }
 
@@ -191,7 +191,7 @@ public static partial class ConsoleExtensions
             var oldback = Console.BackgroundColor; Console.BackgroundColor = backcolor;
             var str = FormatMessage(message, args);
             Console.WriteLine(str);
-            DebugWriteLine(debug, str);
+            TryDebugWriteLine(debug, str);
             Console.BackgroundColor = oldback;
             Console.ForegroundColor = oldfore;
         }
@@ -242,7 +242,7 @@ public static partial class ConsoleExtensions
         public static string? ReadLineEx(bool debug)
         {
             var str = Console.ReadLine();
-            if (str != null) DebugWriteLine(debug, str);
+            if (str != null) TryDebugWriteLine(debug, str);
             return str;
         }
 
@@ -259,7 +259,7 @@ public static partial class ConsoleExtensions
         {
             var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
             var str = Console.ReadLine();
-            if (str != null) DebugWriteLine(debug, str);
+            if (str != null) TryDebugWriteLine(debug, str);
             Console.ForegroundColor = oldfore;
             return str;
         }
@@ -279,7 +279,7 @@ public static partial class ConsoleExtensions
             var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
             var oldback = Console.BackgroundColor; Console.BackgroundColor = backcolor;
             var str = Console.ReadLine();
-            if (str != null) DebugWriteLine(debug, str);
+            if (str != null) TryDebugWriteLine(debug, str);
             Console.BackgroundColor = oldback;
             Console.ForegroundColor = oldfore;
             return str;
@@ -455,7 +455,7 @@ public static partial class ConsoleExtensions
                 if (Console.KeyAvailable)
                 {
                     var info = Console.ReadKey(intercept);
-                    DebugWriteLine(debug, ToHumanString(info));
+                    TryDebugWriteLine(debug, ToHumanString(info));
                     return info;
                 }
 
@@ -703,7 +703,7 @@ public static partial class ConsoleExtensions
                         SetInsertMode(false);
                         Console.ForegroundColor = oldfore;
                         Console.BackgroundColor = oldback;
-                        DebugWriteLine(debug, sb.ToString());
+                        TryDebugWriteLine(debug, sb.ToString());
                         return sb.ToString();
 
                     case ConsoleKey.Escape:

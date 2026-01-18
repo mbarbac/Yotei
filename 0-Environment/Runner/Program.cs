@@ -1,4 +1,6 @@
-﻿using Color = System.ConsoleColor;
+﻿using static Yotei.Tools.ConsoleExtensions;
+using static System.Console;
+using static System.ConsoleColor;
 
 namespace Runner;
 
@@ -8,6 +10,13 @@ namespace Runner;
 /// </summary>
 internal class Program
 {
+    public static readonly bool ToDebug = true;
+    public static readonly TimeSpan Timeout = TimeSpan.FromSeconds(5);
+    public static readonly string FatSeparator = new('*', 50);
+    public static readonly string SlimSeparator = new('-', 30);
+
+    // ----------------------------------------------------
+
     /// <summary>
     /// Program entry point.
     /// </summary>
@@ -17,21 +26,20 @@ internal class Program
         Debug.IndentSize = 2;
         Debug.AutoFlush = true;
 
-        Console.WriteLine();
-        Console.Write("Edit: ");
-        var span = TimeSpan.FromSeconds(5);
-        var str = Console.EditLineEx(true, span, Color.Yellow, Color.Blue, "Hello world!");
-        Console.WriteLine($"Text: {str ?? "<null>"}");
+        var menu = new ConsoleMenu { ToDebug = ToDebug, Timeout = Timeout }
+        .Add(new("Exit"))
+        .Add(new("Execute Tests"))
+        .Add(new("Manage Artifacts"))
+        .Add(new("Manage Packages"));
 
-        //var menu = new ConsoleMenu { ToDebug = true }
-        //.Add(new("One"))
-        //.Add(new("Two"));
-
-        //var target = menu with { Timeout = TimeSpan.FromSeconds(10) };
-        //Debug.Assert(target.Count == 2);
-        //Debug.Assert(target[0].Header() == "One");
-        //Debug.Assert(target[1].Header() == "Two");
-        //Debug.Assert(target.ToDebug = true);
-        //Debug.Assert(target.Timeout.Seconds == 10);
+        var position = 0; do
+        {
+            WriteLineEx(true);
+            WriteLineEx(true, Green, FatSeparator);
+            WriteLineEx(true, Green, "Main Menu");
+            WriteLineEx(true);
+            position = menu.Run(position);
+        }
+        while (position > 0);
     }
 }

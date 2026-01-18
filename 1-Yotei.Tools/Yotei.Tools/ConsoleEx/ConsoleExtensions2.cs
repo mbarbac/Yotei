@@ -6,7 +6,7 @@ public static partial class ConsoleExtensions
     /// <summary>
     /// Obtains a human description of the key or character.
     /// </summary>
-    static string ToHumanString(ConsoleKeyInfo info)
+    internal static string ToHumanString(ConsoleKeyInfo info)
         => info.KeyChar < 32 ? $"[{info.Key}]" : $"{info.KeyChar}";
 
     // ----------------------------------------------------
@@ -14,7 +14,7 @@ public static partial class ConsoleExtensions
     /// <summary>
     /// Writes the given message in the no-console-alike listeners, if debug is requested.
     /// </summary>
-    static void DebugWrite(bool debug, string message)
+    internal static void TryDebugWrite(bool debug, string message)
     {
         if (debug)
         {
@@ -29,7 +29,7 @@ public static partial class ConsoleExtensions
     /// </summary>
     /// <param name="debug"></param>
     /// <param name="message"></param>
-    static void DebugWriteLine(bool debug, string message)
+    internal static void TryDebugWriteLine(bool debug, string message)
     {
         if (debug)
         {
@@ -43,7 +43,7 @@ public static partial class ConsoleExtensions
     /// <summary>
     /// Obtains a formatted message.
     /// </summary>
-    static string FormatMessage(string message, params object?[]? args)
+    internal static string FormatMessage(string message, params object?[]? args)
     {
         message ??= string.Empty;
         args ??= [null];
@@ -53,7 +53,7 @@ public static partial class ConsoleExtensions
     /// <summary>
     /// Obtains a string with the given number of spaces.
     /// </summary>
-    static string FromSpaces(int num)
+    internal static string FromSpaces(int num)
     {
         switch (num)
         {
