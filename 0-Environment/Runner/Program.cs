@@ -13,9 +13,15 @@ internal class Program
     /// </summary>
     static void Main()
     {
-        //Trace.Listeners.EnsureConsoleListener();
-        //Debug.IndentSize = 2;
-        //Debug.AutoFlush = true;
+        Trace.Listeners.EnsureConsoleListener();
+        Debug.IndentSize = 2;
+        Debug.AutoFlush = true;
+
+        Console.WriteLine();
+        Console.Write("Edit: ");
+        var span = TimeSpan.FromSeconds(5);
+        var str = Console.EditLineEx(true, span, Color.Yellow, Color.Blue, "Hello world!");
+        Console.WriteLine($"Text: {str ?? "<null>"}");
 
         //var menu = new ConsoleMenu { ToDebug = true }
         //.Add(new("One"))
