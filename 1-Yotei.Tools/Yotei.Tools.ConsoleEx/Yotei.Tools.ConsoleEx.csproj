@@ -31,9 +31,6 @@
 	</PropertyGroup>
 	
 	<!-- DEBUG configuration -->
-	<ItemGroup Condition="'$(Configuration)'=='Debug'">
-		<ProjectReference Include="..\Yotei.Tools.Diagnostics\Yotei.Tools.Diagnostics.csproj" />
-	</ItemGroup>
 
 	<!-- RELEASE configuration -->
 	<ItemGroup Condition="'$(Configuration)'=='Release'">

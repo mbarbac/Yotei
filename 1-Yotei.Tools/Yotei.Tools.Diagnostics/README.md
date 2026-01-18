@@ -1,2 +1,0 @@
-# Yotei
-Yotei

@@ -14,7 +14,6 @@
 	<!-- DEBUG configuration -->
 	<ItemGroup Condition="'$(Configuration)'=='Debug'">
 		<ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
-		<ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Diagnostics\Yotei.Tools.Diagnostics.csproj" />
 		<ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.ConsoleEx\Yotei.Tools.ConsoleEx.csproj" />
 	</ItemGroup>
 

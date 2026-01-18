@@ -17,12 +17,15 @@ internal class Program
         Debug.IndentSize = 2;
         Debug.AutoFlush = true;
 
-        var str = "Hello world!";
-        Console.Write(Color.Green, "Text: ");
-        Console.WriteLine(str);
+        var menu = new ConsoleMenu { ToDebug = true }
+        .Add(new("One"))
+        .Add(new("Two"));
 
-        Console.Write(Color.Green, "Edit: ");
-        var r = Console.EditLine(Color.White, Color.Blue, str);
-        Console.WriteLine(r);
+        var target = menu with { Timeout = TimeSpan.FromSeconds(10) };
+        Debug.Assert(target.Count == 2);
+        Debug.Assert(target[0].Header() == "One");
+        Debug.Assert(target[1].Header() == "Two");
+        Debug.Assert(target.ToDebug = true);
+        Debug.Assert(target.Timeout.Seconds == 10);
     }
 }
