@@ -31,14 +31,18 @@
 	</PropertyGroup>
 	
 	<!-- DEBUG configuration -->
+	<ItemGroup Condition="'$(Configuration)'=='Debug'">
+		<ProjectReference Include="..\Yotei.Tools\Yotei.Tools.csproj" />
+	</ItemGroup>
 
 	<!-- RELEASE configuration -->
 	<ItemGroup Condition="'$(Configuration)'=='Release'">
-		<PackageReference Include="Yotei.Tools.Diagnostics" Version="0.7.0" />
+		<PackageReference Include="Yotei.Tools" Version="0.7.0" />
 	</ItemGroup>
 
 	<!-- LOCAL configuration -->
 	<ItemGroup Condition="'$(Configuration)'=='Local'">
-		<PackageReference Include="Yotei.Tools.Diagnostics" Version="0.7.0-v0001" />
+		<PackageReference Include="Yotei.Tools" Version="0.7.0-v0001" />
 	</ItemGroup>
+	
 </Project>

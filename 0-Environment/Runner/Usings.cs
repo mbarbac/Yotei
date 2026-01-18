@@ -17,4 +17,3 @@ global using System.Threading;
 global using System.Threading.Tasks;
 
 global using Yotei.Tools;
-global using Yotei.Tools.Diagnostics;
