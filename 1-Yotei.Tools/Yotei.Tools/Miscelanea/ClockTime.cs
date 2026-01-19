@@ -1,4 +1,4 @@
-﻿namespace Yotei.Tools;
+﻿namespace Yotei.Tools.Miscelanea;
 
 // ========================================================
 /// <summary>

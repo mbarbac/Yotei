@@ -35,10 +35,10 @@ public static class TypeExtensions
         {
             get
             {
-                if (source.IsValueType) return false;
-                if (source.IsClass || source.IsInterface || source.IsArray) return true;
                 if (Nullable.GetUnderlyingType(source) != null) return true;
+                if (source.IsValueType) return false;
 
+                if (source.IsClass || source.IsInterface || source.IsArray) return true;
                 if (source.IsGenericType &&
                     source.GetGenericTypeDefinition() == typeof(Nullable<>))
                     return true;
