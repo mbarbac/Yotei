@@ -1,59 +1,6 @@
 ﻿namespace Yotei.Tools;
 
 // ========================================================
-/// <summary>
-/// Used to provide a char comparer that uses the given comparison mode.
-/// </summary>
-readonly struct ByIgnoreCase(bool ignoreCase) : IEqualityComparer<char>
-{
-    public bool Equals(char x, char y) => ignoreCase
-        ? char.ToLower(x) == char.ToLower(y)
-        : x == y;
-
-    public int GetHashCode(char obj) => ignoreCase
-        ? char.ToLower(obj).GetHashCode()
-        : obj.GetHashCode();
-}
-
-// ========================================================
-/// <summary>
-/// Used to provide a char comparer that uses the rules of the given string comparer.
-/// </summary>
-readonly struct ByStringComparer(IEqualityComparer<string> comparer) : IEqualityComparer<char>
-{
-    // We cannot avoid converting the chars to strings for the comparer.
-    public bool Equals(char x, char y)
-    {
-        var xs = x.ToString();
-        var ys = y.ToString();
-        return comparer.Equals(xs, ys);
-    }
-    public int GetHashCode(char obj) => comparer.GetHashCode(obj.ToString());
-}
-
-// ========================================================
-/// <summary>
-/// Used to provide a char comparer that uses the rules of the given string comparison.
-/// </summary>
-readonly struct ByStringComparison(StringComparison comparison) : IEqualityComparer<char>
-{
-    [SuppressMessage("", "IDE0302")]
-    public bool Equals(char x, char y)
-    {
-        Span<char> xs = stackalloc char[] { x };
-        Span<char> ys = stackalloc char[] { y };
-        return xs.CompareTo(ys, comparison) == 0;
-    }
-
-    public int GetHashCode(char obj) => comparison is
-        StringComparison.CurrentCultureIgnoreCase or
-        StringComparison.InvariantCultureIgnoreCase or
-        StringComparison.OrdinalIgnoreCase
-        ? char.ToLower(obj).GetHashCode()
-        : obj.GetHashCode();
-}
-
-// ========================================================
 public static class CharExtensions
 {
     extension(char source)
@@ -144,4 +91,57 @@ public static class CharExtensions
         public static IEqualityComparer<char> CharComparer(StringComparison comparison)
             => new ByStringComparison(comparison);
     }
+}
+
+// ========================================================
+/// <summary>
+/// Used to provide a char comparer that uses the given comparison mode.
+/// </summary>
+readonly struct ByIgnoreCase(bool ignoreCase) : IEqualityComparer<char>
+{
+    public bool Equals(char x, char y) => ignoreCase
+        ? char.ToLower(x) == char.ToLower(y)
+        : x == y;
+
+    public int GetHashCode(char obj) => ignoreCase
+        ? char.ToLower(obj).GetHashCode()
+        : obj.GetHashCode();
+}
+
+// ========================================================
+/// <summary>
+/// Used to provide a char comparer that uses the rules of the given string comparer.
+/// </summary>
+readonly struct ByStringComparer(IEqualityComparer<string> comparer) : IEqualityComparer<char>
+{
+    // We cannot avoid converting the chars to strings for the comparer.
+    public bool Equals(char x, char y)
+    {
+        var xs = x.ToString();
+        var ys = y.ToString();
+        return comparer.Equals(xs, ys);
+    }
+    public int GetHashCode(char obj) => comparer.GetHashCode(obj.ToString());
+}
+
+// ========================================================
+/// <summary>
+/// Used to provide a char comparer that uses the rules of the given string comparison.
+/// </summary>
+readonly struct ByStringComparison(StringComparison comparison) : IEqualityComparer<char>
+{
+    [SuppressMessage("", "IDE0302")]
+    public bool Equals(char x, char y)
+    {
+        Span<char> xs = stackalloc char[] { x };
+        Span<char> ys = stackalloc char[] { y };
+        return xs.CompareTo(ys, comparison) == 0;
+    }
+
+    public int GetHashCode(char obj) => comparison is
+        StringComparison.CurrentCultureIgnoreCase or
+        StringComparison.InvariantCultureIgnoreCase or
+        StringComparison.OrdinalIgnoreCase
+        ? char.ToLower(obj).GetHashCode()
+        : obj.GetHashCode();
 }

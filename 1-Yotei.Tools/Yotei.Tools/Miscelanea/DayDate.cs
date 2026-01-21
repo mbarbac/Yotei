@@ -120,12 +120,18 @@ public record class DayDate : IComparable<DayDate>
     /// </summary>
     /// <param name="provider"></param>
     /// <returns></returns>
+    /// <remarks>
+    /// NOTE: The format provider is currently only used for values allowed by DateTime. If not,
+    /// then the standard 'ToString' method is used. This is an implementation detail that can
+    /// change in future versions.
+    /// </remarks>
     public string ToString(IFormatProvider? provider)
     {
+        // LOW: DayDate.ToString(provider) for BC values and big AC ones.
         return
             Year >= DateOnly.MinValue.Year && Year <= DateOnly.MaxValue.Year
             ? ((DateOnly)this).ToString(provider)
-            : ToString(); // LOW: DayDate.ToString(provider) for BC values and big AC ones.
+            : ToString();
     }
 
     /// <summary>
@@ -136,14 +142,20 @@ public record class DayDate : IComparable<DayDate>
     /// <param name="format"></param>
     /// <param name="provider"></param>
     /// <returns></returns>
+    /// <remarks>
+    /// NOTE: The format provider is currently only used for values allowed by DateTime. If not,
+    /// then the standard 'ToString(format)' method is used. This is an implementation detail
+    /// that can change in future versions.
+    /// </remarks>
     public string ToString(
         [StringSyntax(StringSyntaxAttribute.DateOnlyFormat)] string? format,
         IFormatProvider? provider)
     {
+        // LOW: DayDate.ToString(format, provider) for BC values and big AC ones.
         return
             Year >= DateOnly.MinValue.Year && Year <= DateOnly.MaxValue.Year
             ? ((DateOnly)this).ToString(format, provider)
-            : ToString(format); // LOW: DayDate.ToString(format, provider) for BC values and big AC ones.
+            : ToString(format);
     }
 
     // ----------------------------------------------------
