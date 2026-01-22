@@ -4,6 +4,10 @@
 // array is the element being extended. In particular 'CS9293: Cannot use an extension parameter
 // in this context'.
 
+// NOTE: the list-alike extension methods will always return a new instance, even if no changes
+// were made. The reason is that T[] is itself mutable, and the expectation is that once you get
+// the result the original instance will remain intact.
+
 // ========================================================
 public static class ArrayExtensions
 {
@@ -111,8 +115,8 @@ public static class ArrayExtensions
     {
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(predicate);
-        ArgumentOutOfRangeException.ThrowIfLessThan(start, 0);
-        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(start, source.Length);
+        IndexOutOfRangeException.ThrowIfLessThan(start, 0);
+        IndexOutOfRangeException.ThrowIfGreaterThanOrEqual(start, source.Length);
 
         for (int i = start; i < source.Length; i++) if (predicate(source[i])) return i;
         return -1;
@@ -173,8 +177,8 @@ public static class ArrayExtensions
     {
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(predicate);
-        ArgumentOutOfRangeException.ThrowIfLessThan(start, 0);
-        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(start, source.Length);
+        IndexOutOfRangeException.ThrowIfLessThan(start, 0);
+        IndexOutOfRangeException.ThrowIfGreaterThanOrEqual(start, source.Length);
 
         for (int i = source.Length - 1; i >= start; i--) if (predicate(source[i])) return i;
         return -1;
@@ -233,8 +237,8 @@ public static class ArrayExtensions
     {
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(predicate);
-        ArgumentOutOfRangeException.ThrowIfLessThan(start, 0);
-        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(start, source.Length);
+        IndexOutOfRangeException.ThrowIfLessThan(start, 0);
+        IndexOutOfRangeException.ThrowIfGreaterThanOrEqual(start, source.Length);
 
         List<int> list = [];
         for (int i = start; i < source.Length; i++) if (predicate(source[i])) list.Add(i);
@@ -417,8 +421,8 @@ public static class ArrayExtensions
     public static T[] Insert<T>(this T[] source, int index, T value)
     {
         ArgumentNullException.ThrowIfNull(source);
-        ArgumentOutOfRangeException.ThrowIfLessThan(index, 0);
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(index, source.Length);
+        IndexOutOfRangeException.ThrowIfNegative(index);
+        IndexOutOfRangeException.ThrowIfGreaterThan(index, source.Length);
 
         var target = new T[source.Length + 1];
         Array.Copy(source, target, index);
@@ -440,8 +444,8 @@ public static class ArrayExtensions
     {
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(range);
-        ArgumentOutOfRangeException.ThrowIfLessThan(index, 0);
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(index, source.Length);
+        IndexOutOfRangeException.ThrowIfNegative(index);
+        IndexOutOfRangeException.ThrowIfGreaterThan(index, source.Length);
 
         IList<T> values = range switch
         {
@@ -455,7 +459,7 @@ public static class ArrayExtensions
         Array.Copy(source, target, index);
         for (int i = 0; i < values.Count; i++) target[index + i] = values[i];
         var dest = index + values.Count;
-        var len = values.Count - index;
+        var len = source.Length - index;
         Array.Copy(source, index, target, dest, len);
         return target;
     }
@@ -467,7 +471,19 @@ public static class ArrayExtensions
     /// <param name="source"></param>
     /// <param name="index"></param>
     /// <returns></returns>
-    public static T[] RemoveAt<T>(this T[] source, int index) => throw null;
+    public static T[] RemoveAt<T>(this T[] source, int index)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        IndexOutOfRangeException.ThrowIfNegative(index);
+        IndexOutOfRangeException.ThrowIfGreaterThanOrEqual(index, source.Length);
+
+        if (source.Length == 1) return [];
+
+        var target = new T[source.Length - 1];
+        Array.Copy(source, target, index);
+        Array.Copy(source, index + 1, target, index, source.Length - index - 1);
+        return target;
+    }
 
     /// <summary>
     /// Returns a new array where the requested number of original elements, starting at the given
@@ -478,7 +494,26 @@ public static class ArrayExtensions
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public static T[] RemoveRange<T>(this T[] source, int index, int count) => throw null;
+    public static T[] RemoveRange<T>(this T[] source, int index, int count)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        IndexOutOfRangeException.ThrowIfNegative(index);
+        ArgumentOutOfRangeException.ThrowIfNegative(count);
+
+        // Special case 'RemoveRange(0,0)' when source is empty...
+        if (index == 0 && count == 0) return (T[])source.Clone();
+
+        IndexOutOfRangeException.ThrowIfGreaterThanOrEqual(index, source.Length);        
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(index + count, source.Length);
+
+        if (count == 0) return (T[])source.Clone();
+        if (index == 0 && count == source.Length) return [];
+
+        var target = new T[source.Length - count];
+        Array.Copy(source, target, index);
+        Array.Copy(source, index + count, target, index, source.Length - index - count);
+        return target;
+    }
 
     /// <summary>
     /// Returns a new array where the first ocurrence of the given element has been removed.
@@ -487,7 +522,8 @@ public static class ArrayExtensions
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static T[] Remove<T>(this T[] source, T value) => throw null;
+    public static T[] Remove<T>(this T[] source, T value)
+        => source.Remove(x => EqualityComparer<T>.Default.Equals(x, value));
 
     /// <summary>
     /// Returns a new array where the last ocurrence of the given element has been removed.
@@ -496,7 +532,8 @@ public static class ArrayExtensions
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static T[] RemoveLast<T>(this T[] source, T value) => throw null;
+    public static T[] RemoveLast<T>(this T[] source, T value)
+        => source.RemoveLast(x => EqualityComparer<T>.Default.Equals(x, value));
 
     /// <summary>
     /// Returns a new array where all the ocurrences of the given element have been removed.
@@ -505,7 +542,8 @@ public static class ArrayExtensions
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static T[] RemoveAll<T>(this T[] source, T value) => throw null;
+    public static T[] RemoveAll<T>(this T[] source, T value)
+        => source.RemoveAll(x => EqualityComparer<T>.Default.Equals(x, value));
 
     /// <summary>
     /// Returns a new array where the first element that matches the given predicate has been
@@ -515,7 +553,14 @@ public static class ArrayExtensions
     /// <param name="source"></param>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public static T[] Remove<T>(this T[] source, Predicate<T> predicate) => throw null;
+    public static T[] Remove<T>(this T[] source, Predicate<T> predicate)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(predicate);
+
+        var index = source.Length == 0 ? -1 : source.IndexOf(predicate);
+        return index >= 0 ? source.RemoveAt(index) : (T[])source.Clone();
+    }
 
     /// <summary>
     /// Returns a new array where the last element that matches the given predicate has been
@@ -526,7 +571,14 @@ public static class ArrayExtensions
     /// <param name="predicate"></param>
     /// <returns></returns>
     /// <exception cref="System.NullReferenceException"></exception>
-    public static T[] RemoveLast<T>(this T[] source, Predicate<T> predicate) => throw null;
+    public static T[] RemoveLast<T>(this T[] source, Predicate<T> predicate)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(predicate);
+
+        var index = source.Length == 0 ? -1 : source.LastIndexOf(predicate);
+        return index >= 0 ? source.RemoveAt(index) : (T[])source.Clone();
+    }
 
     /// <summary>
     /// Returns a new array where all the elements that match the given predicate have been
@@ -536,5 +588,26 @@ public static class ArrayExtensions
     /// <param name="source"></param>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public static T[] RemoveAll<T>(this T[] source, Predicate<T> predicate) => throw null;
+    public static T[] RemoveAll<T>(this T[] source, Predicate<T> predicate)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(predicate);
+
+        // It worth for small arrays to precompute the size of the resulting one...
+        if (source.Length < 0)
+        {
+            var num = source.Count(x => predicate(x));
+            var target = new T[num];
+            for (int i = 0; i < source.Length; i++) if (!predicate(source[i])) target[i] = source[i];
+            return target;
+        }
+
+        // Otherwise...
+        else
+        {
+            List<T> list = [];
+            for (int i = 0; i < source.Length; i++) if (!predicate(source[i])) list.Add(source[i]);
+            return [.. list];
+        }
+    }
 }

@@ -1,7 +1,4 @@
-﻿using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-using System.Security.Cryptography.X509Certificates;
-
-namespace Yotei.Tools.Tests;
+﻿namespace Yotei.Tools.Tests;
 
 // ========================================================
 //[Enforced]
@@ -245,7 +242,6 @@ public static class Test_ArrayExtensions
         Assert.Equal(1, target[0].Value);
         Assert.Equal(2, target[1].Value);
 
-        source = [new(1), new(2)];
         items = [new(3), new(4)];
         target = source.AddRange(items);
         Assert.NotSame(items, target);
@@ -286,7 +282,6 @@ public static class Test_ArrayExtensions
         Assert.Equal(1, target[0].Value);
         Assert.Equal(2, target[1].Value);
 
-        source = [new(1), new(2)];
         items = [new(3), new(4)];
         target = source.AddRange(items);
         Assert.NotSame(source, target);
@@ -318,13 +313,12 @@ public static class Test_ArrayExtensions
         Assert.Equal(2, target[1].Value);
 
         source = [new(1), new(2)];
-        target = source.AddRange(Items(0,0));
+        target = source.AddRange(Items(0, 0));
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Length);
         Assert.Equal(1, target[0].Value);
         Assert.Equal(2, target[1].Value);
 
-        source = [new(1), new(2)];
         target = source.AddRange(Items(2, 3));
         Assert.NotSame(source, target);
         Assert.Equal(4, target.Length);
@@ -354,7 +348,6 @@ public static class Test_ArrayExtensions
         Assert.Equal(1, target[1].Value);
         Assert.Equal(2, target[2].Value);
 
-        source = [new(1), new(2)];
         target = source.Insert(2, new(3));
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Length);
@@ -362,11 +355,8 @@ public static class Test_ArrayExtensions
         Assert.Equal(2, target[1].Value);
         Assert.Equal(3, target[2].Value);
 
-        try { target = source.Insert(-1, new(99)); Assert.Fail(); }
-        catch (ArgumentOutOfRangeException) { }
-
-        try { target = source.Insert(3, new(99)); Assert.Fail(); }
-        catch (ArgumentOutOfRangeException) { }
+        try { target = source.Insert(-1, new(99)); Assert.Fail(); } catch (IndexOutOfRangeException) { }
+        try { target = source.Insert(3, new(99)); Assert.Fail(); } catch (IndexOutOfRangeException) { }
     }
 
     // ----------------------------------------------------
@@ -391,101 +381,283 @@ public static class Test_ArrayExtensions
         Assert.Equal(1, target[0].Value);
         Assert.Equal(2, target[1].Value);
 
-        //source = [new(1), new(2)];
-        //items = [];
-        //target = source.InsertRange(items);
-        //Assert.NotSame(source, target);
-        //Assert.NotSame(items, target);
-        //Assert.Equal(2, target.Length);
-        //Assert.Equal(1, target[0].Value);
-        //Assert.Equal(2, target[1].Value);
+        source = [new(1), new(2)];
+        items = [];
+        target = source.InsertRange(0, items);
+        Assert.NotSame(source, target);
+        Assert.NotSame(items, target);
+        Assert.Equal(2, target.Length);
+        Assert.Equal(1, target[0].Value);
+        Assert.Equal(2, target[1].Value);
 
-        //source = [new(1), new(2)];
-        //items = [new(3), new(4)];
-        //target = source.InsertRange(items);
-        //Assert.NotSame(items, target);
-        //Assert.NotSame(source, target);
-        //Assert.Equal(4, target.Length);
-        //Assert.Equal(1, target[0].Value);
-        //Assert.Equal(2, target[1].Value);
-        //Assert.Equal(3, target[2].Value);
-        //Assert.Equal(4, target[3].Value);
+        source = [new(1), new(2), new(3)];
+        items = [new(4), new(5), new(6)];
+        target = source.InsertRange(1, items);
+        Assert.NotSame(source, target);
+        Assert.NotSame(items, target);
+        Assert.Equal(6, target.Length);
+        Assert.Equal(1, target[0].Value);
+        Assert.Equal(4, target[1].Value);
+        Assert.Equal(5, target[2].Value);
+        Assert.Equal(6, target[3].Value);
+        Assert.Equal(2, target[4].Value);
+        Assert.Equal(3, target[5].Value);
+
+        target = source.InsertRange(0, items);
+        Assert.Equal(6, target.Length);
+        Assert.Equal(4, target[0].Value);
+        Assert.Equal(5, target[1].Value);
+        Assert.Equal(6, target[2].Value);
+        Assert.Equal(1, target[3].Value);
+        Assert.Equal(2, target[4].Value);
+        Assert.Equal(3, target[5].Value);
+
+        target = source.InsertRange(3, items);
+        Assert.Equal(6, target.Length);
+        Assert.Equal(1, target[0].Value);
+        Assert.Equal(2, target[1].Value);
+        Assert.Equal(3, target[2].Value);
+        Assert.Equal(4, target[3].Value);
+        Assert.Equal(5, target[4].Value);
+        Assert.Equal(6, target[5].Value);
+
+        try { target = source.InsertRange(-1, items); Assert.Fail(); } catch (IndexOutOfRangeException) { }
+        try { target = source.InsertRange(4, items); Assert.Fail(); } catch (IndexOutOfRangeException) { }
     }
 
     //[Enforced]
     [Fact]
     public static void Test_InsertRange_FromList()
     {
-        //var source = Array.Empty<SItem<int>>();
-        //var items = new List<SItem<int>>();
-        //var target = source.InsertRange(items);
-        //Assert.NotSame(source, target);
-        //Assert.NotSame(items, target);
-        //Assert.Empty(target);
+        var source = Array.Empty<SItem<int>>();
+        var items = new List<SItem<int>>();
+        var target = source.InsertRange(0, items);
+        Assert.NotSame(source, target);
+        Assert.NotSame(items, target);
+        Assert.Empty(target);
 
-        //source = [];
-        //items = [new(1), new(2)];
-        //target = source.InsertRange(items);
-        //Assert.NotSame(source, target);
-        //Assert.NotSame(items, target);
-        //Assert.Equal(2, target.Length);
-        //Assert.Equal(1, target[0].Value);
-        //Assert.Equal(2, target[1].Value);
+        source = [];
+        items = [new(1), new(2)];
+        target = source.InsertRange(0, items);
+        Assert.NotSame(source, target);
+        Assert.NotSame(items, target);
+        Assert.Equal(2, target.Length);
+        Assert.Equal(1, target[0].Value);
+        Assert.Equal(2, target[1].Value);
 
-        //source = [new(1), new(2)];
-        //items = [];
-        //target = source.InsertRange(items);
-        //Assert.NotSame(source, target);
-        //Assert.NotSame(items, target);
-        //Assert.Equal(2, target.Length);
-        //Assert.Equal(1, target[0].Value);
-        //Assert.Equal(2, target[1].Value);
+        source = [new(1), new(2)];
+        items = [];
+        target = source.InsertRange(0, items);
+        Assert.NotSame(source, target);
+        Assert.NotSame(items, target);
+        Assert.Equal(2, target.Length);
+        Assert.Equal(1, target[0].Value);
+        Assert.Equal(2, target[1].Value);
 
-        //source = [new(1), new(2)];
-        //items = [new(3), new(4)];
-        //target = source.InsertRange(items);
-        //Assert.NotSame(source, target);
-        //Assert.NotSame(items, target);
-        //Assert.Equal(4, target.Length);
-        //Assert.Equal(1, target[0].Value);
-        //Assert.Equal(2, target[1].Value);
-        //Assert.Equal(3, target[2].Value);
-        //Assert.Equal(4, target[3].Value);
+        source = [new(1), new(2), new(3)];
+        items = [new(4), new(5), new(6)];
+        target = source.InsertRange(1, items);
+        Assert.NotSame(source, target);
+        Assert.NotSame(items, target);
+        Assert.Equal(6, target.Length);
+        Assert.Equal(1, target[0].Value);
+        Assert.Equal(4, target[1].Value);
+        Assert.Equal(5, target[2].Value);
+        Assert.Equal(6, target[3].Value);
+        Assert.Equal(2, target[4].Value);
+        Assert.Equal(3, target[5].Value);
+
+        target = source.InsertRange(0, items);
+        Assert.Equal(6, target.Length);
+        Assert.Equal(4, target[0].Value);
+        Assert.Equal(5, target[1].Value);
+        Assert.Equal(6, target[2].Value);
+        Assert.Equal(1, target[3].Value);
+        Assert.Equal(2, target[4].Value);
+        Assert.Equal(3, target[5].Value);
+
+        target = source.InsertRange(3, items);
+        Assert.Equal(6, target.Length);
+        Assert.Equal(1, target[0].Value);
+        Assert.Equal(2, target[1].Value);
+        Assert.Equal(3, target[2].Value);
+        Assert.Equal(4, target[3].Value);
+        Assert.Equal(5, target[4].Value);
+        Assert.Equal(6, target[5].Value);
+
+        try { target = source.InsertRange(-1, items); Assert.Fail(); } catch (IndexOutOfRangeException) { }
+        try { target = source.InsertRange(4, items); Assert.Fail(); } catch (IndexOutOfRangeException) { }
     }
 
     //[Enforced]
     [Fact]
     public static void Test_InsertRange_FromOthers()
     {
-        //IEnumerable<SItem<int>> Items(int num, int ini)
-        //{ for (int i = 0; i < num; i++) yield return new(ini + i); }
+        IEnumerable<SItem<int>> Items(int num, int ini)
+        { for (int i = 0; i < num; i++) yield return new(ini + i); }
 
-        //var source = Array.Empty<SItem<int>>();
-        //var target = source.InsertRange(Items(0, 0));
-        //Assert.NotSame(source, target);
-        //Assert.Empty(target);
+        var source = Array.Empty<SItem<int>>();
+        var target = source.InsertRange(0, Items(0, 0));
+        Assert.NotSame(source, target);
+        Assert.Empty(target);
 
-        //source = [];
-        //target = source.InsertRange(Items(2, 1));
-        //Assert.NotSame(source, target);
-        //Assert.Equal(2, target.Length);
-        //Assert.Equal(1, target[0].Value);
-        //Assert.Equal(2, target[1].Value);
+        source = [];
+        target = source.InsertRange(0, Items(2, 1));
+        Assert.NotSame(source, target);
+        Assert.Equal(2, target.Length);
+        Assert.Equal(1, target[0].Value);
+        Assert.Equal(2, target[1].Value);
 
-        //source = [new(1), new(2)];
-        //target = source.InsertRange(Items(0, 0));
-        //Assert.NotSame(source, target);
-        //Assert.Equal(2, target.Length);
-        //Assert.Equal(1, target[0].Value);
-        //Assert.Equal(2, target[1].Value);
+        source = [new(1), new(2)];
+        target = source.InsertRange(0, Items(0, 0));
+        Assert.NotSame(source, target);
+        Assert.Equal(2, target.Length);
+        Assert.Equal(1, target[0].Value);
+        Assert.Equal(2, target[1].Value);
 
-        //source = [new(1), new(2)];
-        //target = source.InsertRange(Items(2, 3));
-        //Assert.NotSame(source, target);
-        //Assert.Equal(4, target.Length);
-        //Assert.Equal(1, target[0].Value);
-        //Assert.Equal(2, target[1].Value);
-        //Assert.Equal(3, target[2].Value);
-        //Assert.Equal(4, target[3].Value);
+        source = [new(1), new(2), new(3)];
+        target = source.InsertRange(1, Items(3, 4));
+        Assert.NotSame(source, target);
+        Assert.Equal(6, target.Length);
+        Assert.Equal(1, target[0].Value);
+        Assert.Equal(4, target[1].Value);
+        Assert.Equal(5, target[2].Value);
+        Assert.Equal(6, target[3].Value);
+        Assert.Equal(2, target[4].Value);
+        Assert.Equal(3, target[5].Value);
+
+        target = source.InsertRange(0, Items(3, 4));
+        Assert.Equal(6, target.Length);
+        Assert.Equal(4, target[0].Value);
+        Assert.Equal(5, target[1].Value);
+        Assert.Equal(6, target[2].Value);
+        Assert.Equal(1, target[3].Value);
+        Assert.Equal(2, target[4].Value);
+        Assert.Equal(3, target[5].Value);
+
+        target = source.InsertRange(3, Items(3, 4));
+        Assert.Equal(6, target.Length);
+        Assert.Equal(1, target[0].Value);
+        Assert.Equal(2, target[1].Value);
+        Assert.Equal(3, target[2].Value);
+        Assert.Equal(4, target[3].Value);
+        Assert.Equal(5, target[4].Value);
+        Assert.Equal(6, target[5].Value);
+
+        try { target = source.InsertRange(-1, Items(3, 4)); Assert.Fail(); } catch (IndexOutOfRangeException) { }
+        try { target = source.InsertRange(4, Items(3, 4)); Assert.Fail(); } catch (IndexOutOfRangeException) { }
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_RemoveAt()
+    {
+        var source = Array.Empty<SItem<int>>();
+        try { source.RemoveAt(0); Assert.Fail(); } catch (IndexOutOfRangeException) { }
+
+        source = [new(1)];
+        var target = source.RemoveAt(0);
+        Assert.Empty(target);
+
+        source = [new(1), new(2), new(3)];
+        target = source.RemoveAt(0);
+        Assert.Equal(2, target.Length);
+        Assert.Equal(2, target[0].Value);
+        Assert.Equal(3, target[1].Value);
+
+        target = source.RemoveAt(1);
+        Assert.Equal(2, target.Length);
+        Assert.Equal(1, target[0].Value);
+        Assert.Equal(3, target[1].Value);
+
+        target = source.RemoveAt(2);
+        Assert.Equal(2, target.Length);
+        Assert.Equal(1, target[0].Value);
+        Assert.Equal(2, target[1].Value);
+
+        try { source.RemoveAt(3); Assert.Fail(); } catch (IndexOutOfRangeException) { }
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_RemoveRange()
+    {
+        var source = Array.Empty<SItem<int>>();
+        var target = source.RemoveRange(0, 0);
+        Assert.NotSame(source, target);
+        Assert.Empty(target);
+
+        source = [new(1), new(2), new(3)];
+        target = source.RemoveRange(0, 0);
+        Assert.NotSame(source, target);
+        Assert.Equal(3, target.Length);
+        Assert.Equal(1, target[0].Value);
+        Assert.Equal(2, target[1].Value);
+        Assert.Equal(3, target[2].Value);
+
+        target = source.RemoveRange(0, 1);
+        Assert.NotSame(source, target);
+        Assert.Equal(2, target.Length);
+        Assert.Equal(2, target[0].Value);
+        Assert.Equal(3, target[1].Value);
+
+        target = source.RemoveRange(2, 1);
+        Assert.NotSame(source, target);
+        Assert.Equal(2, target.Length);
+        Assert.Equal(1, target[0].Value);
+        Assert.Equal(2, target[1].Value);
+
+        target = source.RemoveRange(0, 3);
+        Assert.Empty(target);
+
+        try { source.RemoveRange(-1, 1); Assert.Fail(); } catch (IndexOutOfRangeException) { }
+        try { source.RemoveRange(3, 0); Assert.Fail(); } catch (IndexOutOfRangeException) { }
+        try { source.RemoveRange(0, 4); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+        try { source.RemoveRange(0, -1); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Remove()
+    {
+        var source = Array.Empty<SItem<int>>();
+        var target = source.Remove(new SItem<int>(0));
+        Assert.NotSame(source, target);
+        Assert.Empty(target);
+
+        source = [new(1), new(2), new(3), new(2)];
+        target = source.Remove(new SItem<int>(0));
+        Assert.NotSame(source, target);
+        Assert.Equal(4, target.Length);
+        Assert.Equal(1, target[0].Value);
+        Assert.Equal(2, target[1].Value);
+        Assert.Equal(3, target[2].Value);
+        Assert.Equal(2, target[3].Value);
+
+        target = source.Remove(new SItem<int>(2));
+        Assert.NotSame(source, target);
+        Assert.Equal(3, target.Length);
+        Assert.Equal(1, target[0].Value);
+        Assert.Equal(3, target[1].Value);
+        Assert.Equal(2, target[2].Value);
+
+        target = source.RemoveLast(new SItem<int>(2));
+        Assert.NotSame(source, target);
+        Assert.Equal(3, target.Length);
+        Assert.Equal(1, target[0].Value);
+        Assert.Equal(2, target[1].Value);
+        Assert.Equal(3, target[2].Value);
+
+        target = source.RemoveAll(new SItem<int>(2));
+        Assert.NotSame(source, target);
+        Assert.Equal(2, target.Length);
+        Assert.Equal(1, target[0].Value);
+        Assert.Equal(3, target[1].Value);
     }
 }
