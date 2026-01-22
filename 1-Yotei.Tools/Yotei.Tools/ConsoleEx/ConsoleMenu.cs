@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography;
-
-namespace Yotei.Tools;
+﻿namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>
