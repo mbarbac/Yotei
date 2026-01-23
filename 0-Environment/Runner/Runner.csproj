@@ -19,6 +19,7 @@
 
 	<ItemGroup>
 	  <Folder Include="MenuTester\Code\" />
+	  <Folder Include="MenuArtifacts\" />
 	</ItemGroup>
 
 </Project>
