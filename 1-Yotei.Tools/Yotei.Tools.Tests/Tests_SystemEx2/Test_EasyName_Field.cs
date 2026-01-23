@@ -17,7 +17,7 @@ public static class Test_EasyName_Field
 
     //[Enforced]
     [Fact]
-    public static void Test0A_Standard_Nullability_Lost()
+    public static void Test0A_Standard_Nullability()
     {
         EasyNameOptions options;
         string name;
@@ -31,11 +31,11 @@ public static class Test_EasyName_Field
         name = item.EasyName(options); Assert.Equal("Name", name);
 
         options = DEFAULT with { MemberReturnTypeOptions = DEFAULT };
-        name = item.EasyName(options); Assert.Equal("String Name", name);
+        name = item.EasyName(options); Assert.Equal("String? Name", name);
 
         options = FULL;
         name = item.EasyName(options);
-        Assert.Equal($"System.String {NAMESPACE}.{TESTNAME}.Type0A.Name", name);
+        Assert.Equal($"System.String? {NAMESPACE}.{TESTNAME}.Type0A.Name", name);
     }
 
     // ----------------------------------------------------
@@ -127,7 +127,7 @@ public static class Test_EasyName_Field
             $"S? {NAMESPACE}.{TESTNAME}.Type1A<K?, T?>.Type1B<S?>.Name",
             name);
 
-        // Bound (return type nullability lost)...
+        // Bound...
         type = typeof(Type1A<byte?, int?>.Type1B<string?>);
         item = type.GetFields().First(); Assert.NotNull(item);
 
@@ -138,12 +138,12 @@ public static class Test_EasyName_Field
         name = item.EasyName(options); Assert.Equal("Name", name);
 
         options = DEFAULT with { MemberReturnTypeOptions = DEFAULT };
-        name = item.EasyName(options); Assert.Equal("String Name", name);
+        name = item.EasyName(options); Assert.Equal("String? Name", name);
 
         options = FULL;
         name = item.EasyName(options);
         Assert.Equal(
-            $"System.String {NAMESPACE}.{TESTNAME}." +
+            $"System.String? {NAMESPACE}.{TESTNAME}." +
             "Type1A<System.Nullable<System.Byte>, System.Nullable<System.Int32>>." +
             "Type1B<System.String>.Name",
             name);

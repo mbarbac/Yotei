@@ -408,8 +408,9 @@ public static partial class EasyNameExtensions
                         type.IsNullableWrapper())
                         break;
 
+                    if (source.ByNullabilityApi()) { sb.Append('?'); break; }
                     if (source.ByEasyNullableAttribute()) { sb.Append('?'); break; }
-
+                    if (source.ByEasyNullableAttribute()) { sb.Append('?'); break; }
                     break;
                 }
 
@@ -510,8 +511,9 @@ public static partial class EasyNameExtensions
                         type.IsNullableWrapper())
                         break;
 
+                    if (source.ByNullabilityApi()) { sb.Append('?'); break; }
                     if (source.ByEasyNullableAttribute()) { sb.Append('?'); break; }
-
+                    if (source.ByEasyNullableAttribute()) { sb.Append('?'); break; }
                     break;
                 }
 

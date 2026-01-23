@@ -110,12 +110,6 @@ public static partial class EasyNameExtensions
     /// <summary>
     /// Determines nullability by using the <see cref="EasyNullableAttribute"/> attribute.
     /// </summary>
-    static bool ByEasyNullableAttribute(this ConstructorInfo source)
-        => source.GetCustomAttributes<EasyNullableAttribute>().Any();
-
-    /// <summary>
-    /// Determines nullability by using the <see cref="EasyNullableAttribute"/> attribute.
-    /// </summary>
     static bool ByEasyNullableAttribute(this PropertyInfo source)
         => source.GetCustomAttributes<EasyNullableAttribute>().Any();
 

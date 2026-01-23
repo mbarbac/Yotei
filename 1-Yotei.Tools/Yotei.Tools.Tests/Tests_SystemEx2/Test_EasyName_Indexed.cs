@@ -17,7 +17,7 @@ public static class Test_EasyName_Indexed
 
     //[Enforced]
     [Fact]
-    public static void Test0A_Standard_NullabilityLostOnReturnType()
+    public static void Test0A_Standard_Nullability()
     {
         EasyNameOptions options;
         string name;
@@ -31,12 +31,12 @@ public static class Test_EasyName_Indexed
         name = item.EasyName(options); Assert.Equal("this[Int32?, in String?]", name);
 
         options = DEFAULT with { MemberReturnTypeOptions = DEFAULT };
-        name = item.EasyName(options); Assert.Equal("String this[Int32?, in String?]", name);
+        name = item.EasyName(options); Assert.Equal("String? this[Int32?, in String?]", name);
 
         options = FULL;
         name = item.EasyName(options);
         Assert.Equal(
-            $"System.String {NAMESPACE}.{TESTNAME}." +
+            $"System.String? {NAMESPACE}.{TESTNAME}." +
             "Type0A.Item[System.Nullable<System.Int32> one, in System.String? two]",
             name);
     }
