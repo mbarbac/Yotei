@@ -45,4 +45,8 @@
 		<PackageReference Include="Yotei.Tools" Version="0.7.0-v0001" />
 	</ItemGroup>
 
+	<PropertyGroup>
+		<DefineConstants>$(DefineConstants);DEBUG_ASYNC_LOCK</DefineConstants>
+	</PropertyGroup>
+
 </Project>

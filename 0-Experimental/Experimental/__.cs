@@ -1,3 +1,4 @@
-﻿namespace Yotei.Tools.AsyncLock;
+﻿namespace Experimental;
 
 // ========================================================
+public interface IFake { }

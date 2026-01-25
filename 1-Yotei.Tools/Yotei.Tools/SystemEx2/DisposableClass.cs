@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// Base record implementing <see cref="IAsyncDisposableEx"/>.
+/// Base class implementing <see cref="IAsyncDisposableEx"/>.
 /// </summary>
 public abstract class DisposableClass : IAsyncDisposableEx
 {

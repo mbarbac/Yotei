@@ -2,7 +2,6 @@
 
 	<PropertyGroup>
 		<Configurations>Debug;Release;Local</Configurations>
-		<OutputType>Exe</OutputType>
 		<TargetFramework>net10.0</TargetFramework>
 		<LangVersion>preview</LangVersion>
 		<ImplicitUsings>disable</ImplicitUsings>
@@ -12,10 +11,7 @@
 	<!--IDE0130: Namespace does not match folder structure-->
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\0-Experimental\Experimental.Tests\Experimental.Tests.csproj" />
 		<ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
-		<ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Tests\Yotei.Tools.Tests.csproj" />
-		<ProjectReference Include="..\..\1-Yotei.Tools.AsyncLock\Yotei.Tools.AsyncLock.Tests\Yotei.Tools.AsyncLock.Tests.csproj" />
 	</ItemGroup>
 
 </Project>

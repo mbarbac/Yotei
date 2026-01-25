@@ -29,7 +29,7 @@ public class MenuArtifacts : ConsoleMenuEntry
             WriteLineEx(true, Green, Program.FatSeparator);
             WriteLineEx(true, Green, Header());
             WriteLineEx(true);
-            position = menu.Run(position);
+            position = menu.Run(0);
         }
         while (position > 0);
     }

@@ -11,7 +11,7 @@ namespace Runner;
 internal class Program
 {
     public static readonly bool ToDebug = true;
-    public static readonly TimeSpan Timeout = TimeSpan.FromSeconds(5);
+    public static readonly TimeSpan Timeout = TimeSpan.FromSeconds(120);
     public static readonly string FatSeparator = new('*', 50);
     public static readonly string SlimSeparator = new('-', 30);
 
@@ -45,7 +45,7 @@ internal class Program
             WriteLineEx(true, Green, FatSeparator);
             WriteLineEx(true, Green, "Main Menu");
             WriteLineEx(true);
-            position = menu.Run(position);
+            position = menu.Run(0);
         }
         while (position > 0);
     }

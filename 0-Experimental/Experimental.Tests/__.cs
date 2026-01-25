@@ -1,4 +1,4 @@
-﻿namespace Yotei.Tools.AsyncLock.Tests;
+﻿namespace Experimental.Tests;
 
 // ========================================================
 //[Enforced]
@@ -10,5 +10,4 @@
 //    {
 //    }
 //}
-
 public interface IFake { }

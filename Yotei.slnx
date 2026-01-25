@@ -8,6 +8,14 @@
     <Project Path="0-Environment/Runner.Tests/Runner.Tests.csproj" Id="5aae3021-5504-4f31-bc28-a53f02cede83" />
     <Project Path="0-Environment/Runner/Runner.csproj" Id="105b0414-e228-4630-bccd-392b292a6da7" />
   </Folder>
+  <Folder Name="/0-Experimental/">
+    <Project Path="0-Experimental/Experimental.Tests/Experimental.Tests.csproj" Id="ff045585-87c4-40f8-a349-35725c11f68c">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
+    <Project Path="0-Experimental/Experimental/Experimental.csproj" Id="c040906a-d162-4f51-a187-aedeaab1a9a3">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
+  </Folder>
   <Folder Name="/1-Yotei.Tools.AsyncLock/">
     <Project Path="1-Yotei.Tools.AsyncLock/Yotei.Tools.AsyncLock.Tests/Yotei.Tools.AsyncLock.Tests.csproj" Id="137e9248-204d-4110-902f-b03e4be21e4f" />
     <Project Path="1-Yotei.Tools.AsyncLock/Yotei.Tools.AsyncLock/Yotei.Tools.AsyncLock.csproj" Id="2f61b58f-b41f-45b5-add0-9d44d0a5e15f" />
