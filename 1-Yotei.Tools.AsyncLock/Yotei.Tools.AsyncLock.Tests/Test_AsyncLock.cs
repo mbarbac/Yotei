@@ -319,7 +319,7 @@ public static class Test_AsyncLock
         WaitOrThrow([.. tasks]);
     }
 
-    [Enforced]
+    //[Enforced]
     [Fact]
     public static void Test_AsyncSync_Timeout()
     {
