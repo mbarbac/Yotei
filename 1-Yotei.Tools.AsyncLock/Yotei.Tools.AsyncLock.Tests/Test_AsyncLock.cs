@@ -4,7 +4,7 @@ using static System.ConsoleColor;
 namespace Yotei.Tools.AsyncLock.Tests;
 
 // ========================================================
-[Enforced]
+//[Enforced]
 public static class Test_AsyncLock
 {
     static readonly ConsoleColor ForeColor = Magenta;
