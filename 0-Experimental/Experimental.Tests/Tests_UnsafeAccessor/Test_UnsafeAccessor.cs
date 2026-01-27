@@ -1,4 +1,6 @@
-﻿namespace Experimental.Tests;
+﻿#pragma warning disable CS0414
+
+namespace Experimental.Tests;
 
 // Note:
 // The 'Name' parameter seems to be optional and, if not provided, defaults to the name of the
