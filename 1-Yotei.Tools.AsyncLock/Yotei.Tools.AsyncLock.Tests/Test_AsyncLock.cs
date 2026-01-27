@@ -7,6 +7,8 @@ namespace Yotei.Tools.AsyncLock.Tests;
 [Enforced]
 public static class Test_AsyncLock
 {
+    static readonly ConsoleColor ForeColor = Magenta;
+
     static void WaitOrThrow(Task[] tasks)
     {
         while (true)
@@ -51,7 +53,7 @@ public static class Test_AsyncLock
 
     static void Do_SyncSync(Info info, string id, int level, int timeout)
     {
-        WriteLineEx(true, $"Entering:'{id}' root:'{info}'");
+        WriteLineEx(true, ForeColor, $"Entering:'{id}' root:'{info}'");
 
         var span = TimeSpan.FromMilliseconds(timeout);
         try
@@ -124,7 +126,7 @@ public static class Test_AsyncLock
 
     static async Task Do_AsyncAsync(Info info, string id, int level, int timeout)
     {
-        WriteLineEx(true, $"Entering:'{id}' root:'{info}'");
+        WriteLineEx(true, ForeColor, $"Entering:'{id}' root:'{info}'");
 
         var span = TimeSpan.FromMilliseconds(timeout);
         try
@@ -197,7 +199,7 @@ public static class Test_AsyncLock
 
     static void Do_SyncAsync(Info info, string id, int level, int timeout)
     {
-        WriteLineEx(true, $"Entering:'{id}' root:'{info}'");
+        WriteLineEx(true, ForeColor, $"Entering:'{id}' root:'{info}'");
 
         var span = TimeSpan.FromMilliseconds(timeout);
         try
@@ -271,7 +273,7 @@ public static class Test_AsyncLock
 
     static async Task Do_AsyncSync(Info info, string id, int level, int timeout)
     {
-        WriteLineEx(true, $"Entering:'{id}' root:'{info}'");
+        WriteLineEx(true, ForeColor, $"Entering:'{id}' root:'{info}'");
 
         var span = TimeSpan.FromMilliseconds(timeout);
         try

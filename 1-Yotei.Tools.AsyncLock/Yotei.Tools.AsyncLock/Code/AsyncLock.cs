@@ -1,4 +1,6 @@
-﻿using static System.ConsoleColor;
+﻿#define HIDE_ASYNCHOLDER_CHANGES
+
+using static System.ConsoleColor;
 namespace Yotei.Tools.AsyncLock;
 
 // ========================================================
@@ -10,7 +12,17 @@ namespace Yotei.Tools.AsyncLock;
 /// </summary>
 public sealed partial class AsyncLock : DisposableClass
 {
-#if HIDE_ASYNCHOLDER_CHANGES
+    static readonly ConsoleColor CapturingColor = Yellow;
+    static readonly ConsoleColor CapturedColor = Yellow;
+    static readonly ConsoleColor IncreasingColor = Yellow;
+    static readonly ConsoleColor IncreasedColor = Yellow;
+
+    static readonly ConsoleColor DecreasingColor = Cyan;
+    static readonly ConsoleColor DecreasedColor = Cyan;
+    static readonly ConsoleColor ReleasingColor = Cyan;
+    static readonly ConsoleColor ReleasedColor = Cyan;
+
+#if !HIDE_ASYNCHOLDER_CHANGES
     static readonly AsyncLocal<ulong> AsyncHolder = new(args =>
     {
         var old = args.PreviousValue;
@@ -124,21 +136,21 @@ public sealed partial class AsyncLock : DisposableClass
                 {
                     if (AsyncId == 0)
                     {
-                        ToDebug(Yellow, $"{scope} Capturing...");
+                        ToDebug(CapturingColor, $"{scope} Capturing...");
                         ThreadId = Environment.CurrentManagedThreadId;
                         AsyncId = AsyncHolder.Value;
                         Count++;
 
-                        ToDebug(Yellow, $"{scope} Captured...");
+                        ToDebug(CapturedColor, $"{scope} Captured...");
                         return scope;
                     }
                     if (AsyncId == scope.OldAsync)
                     {
-                        ToDebug(Yellow, $"{scope} Increasing...");
+                        ToDebug(IncreasingColor, $"{scope} Increasing...");
                         AsyncId = AsyncHolder.Value;
                         Count++;
 
-                        ToDebug(Yellow, $"{scope} Increased...");
+                        ToDebug(IncreasedColor, $"{scope} Increased...");
                         return scope;
                     }
                 }
@@ -150,7 +162,11 @@ public sealed partial class AsyncLock : DisposableClass
                     var span = now - ini;
                     if (span > timeout) throw new TimeoutException(
                         "Timeout expired.")
-                        .WithData(ToString(), nameof(AsyncLock));
+                        .WithData(ToString(), nameof(AsyncLock))
+                        .WithData(ini)
+                        .WithData(now)
+                        .WithData(span)
+                        .WithData(timeout.TotalMilliseconds);
                 }
             }
             finally { if (taken) Semaphore.Release(); }
@@ -175,13 +191,26 @@ public sealed partial class AsyncLock : DisposableClass
                 taken = Semaphore.Wait(Infinite);
                 if (taken)
                 {
-                    ToDebug(Blue, $"{scope} Exiting...");
-                    Count--; if (Count < 0) Count = 0;
-                    ThreadId = Count == 0 ? 0 : scope.OldThread;
-                    AsyncId = Count == 0 ? 0 : scope.OldAsync;
+                    if (Count > 1)
+                    {
+                        ToDebug(DecreasingColor, $"{scope} Decreasing...");
+                        Count--;
+                        ThreadId = scope.OldThread;
+                        AsyncId = scope.OldAsync;
 
-                    ToDebug(Blue, $"{scope} Exited...");
-                    return;
+                        ToDebug(DecreasedColor, $"{scope} Decreased...");
+                        return;
+                    }
+                    else
+                    {
+                        ToDebug(ReleasingColor, $"{scope} Releasing...");
+                        Count = 0;
+                        ThreadId = 0;
+                        AsyncId = 0;
+
+                        ToDebug(ReleasedColor, $"{scope} Released...");
+                        return;
+                    }
                 }
             }
             finally { if (taken) Semaphore.Release(); }
@@ -266,21 +295,21 @@ public sealed partial class AsyncLock : DisposableClass
                 {
                     if (AsyncId == 0)
                     {
-                        ToDebug(Yellow, $"{scope} Capturing...");
+                        ToDebug(CapturingColor, $"{scope} Capturing...");
                         ThreadId = Environment.CurrentManagedThreadId;
                         AsyncId = AsyncHolder.Value;
                         Count++;
 
-                        ToDebug(Yellow, $"{scope} Captured...");
+                        ToDebug(CapturedColor, $"{scope} Captured...");
                         return scope;
                     }
                     if (AsyncId == scope.OldAsync)
                     {
-                        ToDebug(Yellow, $"{scope} Increasing...");
+                        ToDebug(IncreasingColor, $"{scope} Increasing...");
                         AsyncId = AsyncHolder.Value;
                         Count++;
 
-                        ToDebug(Yellow, $"{scope} Increased...");
+                        ToDebug(IncreasedColor, $"{scope} Increased...");
                         return scope;
                     }
                 }
@@ -321,13 +350,26 @@ public sealed partial class AsyncLock : DisposableClass
                 taken = await Semaphore.WaitAsync(Infinite).ConfigureAwait(false);
                 if (taken)
                 {
-                    ToDebug(Blue, $"{scope} Exiting...");
-                    Count--; if (Count < 0) Count = 0;
-                    ThreadId = Count == 0 ? 0 : scope.OldThread;
-                    AsyncId = Count == 0 ? 0 : scope.OldAsync;
+                    if (Count > 1)
+                    {
+                        ToDebug(DecreasingColor, $"{scope} Decreasing...");
+                        Count--;
+                        ThreadId = scope.OldThread;
+                        AsyncId = scope.OldAsync;
 
-                    ToDebug(Blue, $"{scope} Exited...");
-                    return;
+                        ToDebug(DecreasedColor, $"{scope} Decreased...");
+                        return;
+                    }
+                    else
+                    {
+                        ToDebug(ReleasingColor, $"{scope} Releasing...");
+                        Count = 0;
+                        ThreadId = 0;
+                        AsyncId = 0;
+
+                        ToDebug(ReleasedColor, $"{scope} Released...");
+                        return;
+                    }
                 }
             }
             finally { if (taken) Semaphore.Release(); }
@@ -337,28 +379,39 @@ public sealed partial class AsyncLock : DisposableClass
 
     // ----------------------------------------------------
 
+    static readonly Lock DebugSync = new();
+
     [Conditional("DEBUG_ASYNC_LOCK")]
     public static void ToDebug(string message)
     {
-        Debug.WriteLine(message);
-        Debug.Flush();
+        lock (DebugSync)
+        {
+            Debug.WriteLine(message);
+            Debug.Flush();
+        }
     }
 
     [Conditional("DEBUG_ASYNC_LOCK")]
     public static void ToDebug(ConsoleColor forecolor, string message)
     {
-        var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
-        ToDebug(message);
-        Console.ForegroundColor = oldfore;
+        lock (DebugSync)
+        {
+            var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
+            ToDebug(message);
+            Console.ForegroundColor = oldfore;
+        }
     }
 
     [Conditional("DEBUG_ASYNC_LOCK")]
     public static void ToDebug(ConsoleColor forecolor, ConsoleColor backcolor, string message)
     {
-        var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
-        var oldback = Console.BackgroundColor; Console.BackgroundColor = backcolor;
-        ToDebug(message);
-        Console.BackgroundColor = oldback;
-        Console.ForegroundColor = oldfore;
+        lock (DebugSync)
+        {
+            var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
+            var oldback = Console.BackgroundColor; Console.BackgroundColor = backcolor;
+            ToDebug(message);
+            Console.BackgroundColor = oldback;
+            Console.ForegroundColor = oldfore;
+        }
     }
 }
