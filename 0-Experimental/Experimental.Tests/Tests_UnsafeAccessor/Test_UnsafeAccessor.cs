@@ -1,5 +1,11 @@
 ﻿namespace Experimental.Tests;
 
+// Note:
+// The 'Name' parameter seems to be optional and, if not provided, defaults to the name of the
+// decorated method. So, it is possible to set-up a (static) surrogate class whose extern methods
+// have precissely the names we want to obtain. See below the example of the getter and setter of
+// the 'Name' property. This 'surrogate' is then just to make things easier.
+
 // ========================================================
 //[Enforced]
 public static class Test_UnsafeAccessor
@@ -125,18 +131,18 @@ public static class Test_UnsafeAccessor
     {
         var item = NewPersona("James", 007, 50);
         Assert.Equal("James", item.Name);
-        Assert.Equal("James", GetName(item));
+        Assert.Equal("James", get_Name(item));
 
-        SetName(item, "other");
+        set_Name(item, "other");
         Assert.Equal("other", item.Name);
-        Assert.Equal("other", GetName(item));
+        Assert.Equal("other", get_Name(item));
     }
 
-    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "get_Name")]
-    private static extern string GetName(Persona persona);
+    [UnsafeAccessor(UnsafeAccessorKind.Method/*, Name = "get_Name"*/)]
+    private static extern string get_Name(Persona persona);
 
-    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "set_Name")]
-    private static extern void SetName(Persona persona, string value);
+    [UnsafeAccessor(UnsafeAccessorKind.Method/*, Name = "set_Name"*/)]
+    private static extern void set_Name(Persona persona, string value);
 
     // ====================================================
 
