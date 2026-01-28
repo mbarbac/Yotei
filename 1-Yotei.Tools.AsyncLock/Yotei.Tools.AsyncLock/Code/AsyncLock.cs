@@ -381,6 +381,9 @@ public sealed partial class AsyncLock : DisposableClass
 
     static readonly Lock DebugSync = new();
 
+    /// <summary>
+    /// Invoked to print the given message in the debug environment.
+    /// </summary>
     [Conditional("DEBUG_ASYNC_LOCK")]
     public static void ToDebug(string message)
     {
@@ -391,6 +394,9 @@ public sealed partial class AsyncLock : DisposableClass
         }
     }
 
+    /// <summary>
+    /// Invoked to print the given message in the debug environment.
+    /// </summary>
     [Conditional("DEBUG_ASYNC_LOCK")]
     public static void ToDebug(ConsoleColor forecolor, string message)
     {
@@ -402,6 +408,9 @@ public sealed partial class AsyncLock : DisposableClass
         }
     }
 
+    /// <summary>
+    /// Invoked to print the given message in the debug environment.
+    /// </summary>
     [Conditional("DEBUG_ASYNC_LOCK")]
     public static void ToDebug(ConsoleColor forecolor, ConsoleColor backcolor, string message)
     {

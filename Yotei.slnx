@@ -9,16 +9,16 @@
     <Project Path="0-Environment/Runner/Runner.csproj" Id="105b0414-e228-4630-bccd-392b292a6da7" />
   </Folder>
   <Folder Name="/0-Experimental/">
-    <Project Path="0-Experimental/Experimental.Tests/Experimental.Tests.csproj" Id="ff045585-87c4-40f8-a349-35725c11f68c">
-      <BuildType Solution="Local|*" Project="Debug" />
-    </Project>
-    <Project Path="0-Experimental/Experimental/Experimental.csproj" Id="c040906a-d162-4f51-a187-aedeaab1a9a3">
-      <BuildType Solution="Local|*" Project="Debug" />
-    </Project>
+    <Project Path="0-Experimental/Experimental.Tests/Experimental.Tests.csproj" Id="ff045585-87c4-40f8-a349-35725c11f68c" />
+    <Project Path="0-Experimental/Experimental/Experimental.csproj" Id="c040906a-d162-4f51-a187-aedeaab1a9a3" />
   </Folder>
   <Folder Name="/1-Yotei.Tools.AsyncLock/">
     <Project Path="1-Yotei.Tools.AsyncLock/Yotei.Tools.AsyncLock.Tests/Yotei.Tools.AsyncLock.Tests.csproj" Id="137e9248-204d-4110-902f-b03e4be21e4f" />
     <Project Path="1-Yotei.Tools.AsyncLock/Yotei.Tools.AsyncLock/Yotei.Tools.AsyncLock.csproj" Id="2f61b58f-b41f-45b5-add0-9d44d0a5e15f" />
+  </Folder>
+  <Folder Name="/1-Yotei.Tools.DynamicLambda/">
+    <Project Path="1-Yotei.Tools.DynamicLambda/Yotei.Tools.DynamicLambda.Tests/Yotei.Tools.DynamicLambda.Tests.csproj" Id="c66a0a84-f059-4149-8942-e5d9e81da1e0" />
+    <Project Path="1-Yotei.Tools.DynamicLambda/Yotei.Tools.DynamicLambda/Yotei.Tools.DynamicLambda.csproj" Id="a2bc71d4-154d-44ee-83dd-88e7180e75e9" />
   </Folder>
   <Folder Name="/1-Yotei.Tools/">
     <Project Path="1-Yotei.Tools/Yotei.Tools.Tests/Yotei.Tools.Tests.csproj" Id="b6a1e072-9195-4e7f-961a-5f0d58fd3a5a" />

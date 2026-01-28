@@ -16,7 +16,7 @@
 	</ItemGroup>
 
 	<PropertyGroup>
-		<Description>Yotei AsyncLock Tools</Description>
+		<Description>Yotei Dynamic Lambda Parser</Description>
 		<Version>0.7.0-v0001</Version>
 		<Authors>mbarbac@hotmail.com</Authors>
 		<PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
@@ -46,7 +46,7 @@
 	</ItemGroup>
 
 	<PropertyGroup>
-		<!--<DefineConstants>$(DefineConstants);DEBUG_ASYNC_LOCK</DefineConstants>-->
+		<DefineConstants>$(DefineConstants);DEBUG_DYNAMIC_LAMBDA</DefineConstants>
 	</PropertyGroup>
 
 </Project>
