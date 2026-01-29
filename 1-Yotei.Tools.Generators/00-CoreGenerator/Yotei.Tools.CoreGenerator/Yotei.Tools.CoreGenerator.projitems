@@ -32,6 +32,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\Index.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\HashCode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\NullableAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx2\IsNullable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx2\NullableTypeSymbolExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\TypeSyntaxExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\TypeSymbolExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\SymbolExtensions.cs" />
@@ -39,6 +41,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\SyntaxListExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\AttributeDataExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\NameSyntaxExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\NamedTypeSymbolExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CharExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\ObjectExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\StringExtensions.cs" />
