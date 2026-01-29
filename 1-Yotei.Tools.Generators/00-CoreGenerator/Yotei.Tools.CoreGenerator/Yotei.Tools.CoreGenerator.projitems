@@ -37,7 +37,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\StringExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\ExceptionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\IEnumerableExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\StringSpanExtensions_String.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\TypeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\DebugExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\StringSpanExtensions_Char.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\__.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\CodeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
   </ItemGroup>

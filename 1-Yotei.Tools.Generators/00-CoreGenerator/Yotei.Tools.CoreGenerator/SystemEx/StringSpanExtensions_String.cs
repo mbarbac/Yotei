@@ -1,13 +1,12 @@
 ﻿using StringSpan = System.ReadOnlySpan<char>;
 
-namespace Yotei.Tools;
+namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
-public static partial class StringSpanExtensions
+internal static partial class StringSpanExtensions
 {
     // span.StartsWith(Span)
     // span.StartsWith(Span, StringComparison)
-    // span.StartsWith(Span, IEqualityComparer<char>) ==> IndexOf DOES NOT WORK!
 
     static bool StartsWith(StringSpan source, StringSpan value, Func<char, char, bool> predicate)
     {
@@ -56,7 +55,6 @@ public static partial class StringSpanExtensions
 
     // span.EndsWith(Span)
     // span.EndsWith(Span, StringComparison)
-    // span.EndsWith(Span, IEqualityComparer<char>) ==> LastIndexOf DOES NOT WORK!
 
     static bool EndsWith(StringSpan source, StringSpan value, Func<char, char, bool> predicate)
     {
@@ -105,7 +103,6 @@ public static partial class StringSpanExtensions
 
     // span.IndexOf(Span)
     // span.IndexOf(Span, StringComparison)
-    // span.IndexOf(Span, IEqualityComparer<char>) ==> DOES NOT WORK!
 
     static int IndexOf(StringSpan source, StringSpan value, Func<char, char, bool> predicate)
     {
@@ -166,8 +163,6 @@ public static partial class StringSpanExtensions
     // ----------------------------------------------------
 
     // span.LastIndexOf(Span)
-    // span.LastIndexOf(Span, StringComparison)
-    // span.LastIndexOf(Span, IEqualityComparer<char>) ==> DOES NOT WORK!
 
     static int LastIndexOf(StringSpan source, StringSpan value, Func<char, char, bool> predicate)
     {
@@ -224,6 +219,18 @@ public static partial class StringSpanExtensions
     public static int LastIndexOf(
         this StringSpan source, StringSpan value, IEqualityComparer<string> comparer)
         => LastIndexOf(source, value, (x, y) => x.Equals(y, comparer));
+
+    /// <summary>
+    /// Returns the index of the last ocurrence of the given value in the given source, or -1 if
+    /// it cannot be found.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static int LastIndexOf(
+        this StringSpan source, StringSpan value, StringComparison comparison)
+        => LastIndexOf(source, value, (x, y) => x.Equals(y, comparison));
 
     // ----------------------------------------------------
 
@@ -344,9 +351,11 @@ public static partial class StringSpanExtensions
 
     // ----------------------------------------------------
 
-    // span.IndexOfAny(SearchValues<string> values)
+    // TODO: StringSpan.IndexOfAny...
 
-    static int IndexOfAny(
+    // span.IndexOfAny(span)
+
+    /*static int IndexOfAny(
         StringSpan source, IEnumerable<StringSpan> values, Func<char, char, bool> predicate)
     {
         foreach (var value in values)
@@ -355,7 +364,7 @@ public static partial class StringSpanExtensions
             if (index >= 0) return index;
         }
         return -1;
-    }
+    }*/
 
     /// <summary>
     /// Returns the index of the first match of any of the given values, in order, in the given
@@ -364,9 +373,9 @@ public static partial class StringSpanExtensions
     /// <param name="source"></param>
     /// <param name="values"></param>
     /// <returns></returns>
-    public static int IndexOfAny(
+    /*public static int IndexOfAny(
         this StringSpan source, IEnumerable<StringSpan> values)
-        => IndexOfAny(source, values, static (x, y) => x == y);
+        => IndexOfAny(source, values, static (x, y) => x == y);*/
 
     /// <summary>
     /// Returns the index of the first match of any of the given values, in order, in the given
@@ -376,9 +385,9 @@ public static partial class StringSpanExtensions
     /// <param name="values"></param>
     /// <param name="ignoreCase"></param>
     /// <returns></returns>
-    public static int IndexOfAny(
+    /*public static int IndexOfAny(
         this StringSpan source, IEnumerable<StringSpan> values, bool ignoreCase)
-        => IndexOfAny(source, values, (x, y) => x.Equals(y, ignoreCase));
+        => IndexOfAny(source, values, (x, y) => x.Equals(y, ignoreCase));*/
 
     /// <summary>
     /// Returns the index of the first match of any of the given values, in order, in the given
@@ -388,9 +397,9 @@ public static partial class StringSpanExtensions
     /// <param name="values"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static int IndexOfAny(
+    /*public static int IndexOfAny(
         this StringSpan source, IEnumerable<StringSpan> values, IEqualityComparer<char> comparer)
-        => IndexOfAny(source, values, (x, y) => x.Equals(y, comparer));
+        => IndexOfAny(source, values, (x, y) => x.Equals(y, comparer));*/
 
     /// <summary>
     /// Returns the index of the first match of any of the given values, in order, in the given
@@ -400,9 +409,9 @@ public static partial class StringSpanExtensions
     /// <param name="values"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static int IndexOfAny(
+    /*public static int IndexOfAny(
         this StringSpan source, IEnumerable<StringSpan> values, IEqualityComparer<string> comparer)
-        => IndexOfAny(source, values, (x, y) => x.Equals(y, comparer));
+        => IndexOfAny(source, values, (x, y) => x.Equals(y, comparer));*/
 
     /// <summary>
     /// Returns the index of the first match of any of the given values, in order, in the given
@@ -412,17 +421,19 @@ public static partial class StringSpanExtensions
     /// <param name="values"></param>
     /// <param name="comparison"></param>
     /// <returns></returns>
-    public static int IndexOfAny(
+    /*public static int IndexOfAny(
         this StringSpan source, IEnumerable<StringSpan> values, StringComparison comparison)
-        => IndexOfAny(source, values, (x, y) => x.Equals(y, comparison));
+        => IndexOfAny(source, values, (x, y) => x.Equals(y, comparison));*/
 
     // ----------------------------------------------------
+
+    // TODO: StringSpan.ContainsAny...
 
     // span.ContainsAny(SearchValues<string> values)
 
-    static bool ContainsAny(
+    /*static bool ContainsAny(
         StringSpan source, IEnumerable<StringSpan> values, Func<char, char, bool> predicate)
-        => IndexOfAny(source, values, predicate) >= 0;
+        => IndexOfAny(source, values, predicate) >= 0;*/
 
     /// <summary>
     /// Returns the index of the first match of any of the given values, in order, in the given
@@ -431,9 +442,9 @@ public static partial class StringSpanExtensions
     /// <param name="source"></param>
     /// <param name="values"></param>
     /// <returns></returns>
-    public static bool ContainsAny(
+    /*public static bool ContainsAny(
         this StringSpan source, IEnumerable<StringSpan> values)
-        => ContainsAny(source, values, static (x, y) => x == y);
+        => ContainsAny(source, values, static (x, y) => x == y);*/
 
     /// <summary>
     /// Returns the index of the first match of any of the given values, in order, in the given
@@ -443,9 +454,9 @@ public static partial class StringSpanExtensions
     /// <param name="values"></param>
     /// <param name="ignoreCase"></param>
     /// <returns></returns>
-    public static bool ContainsAny(
+    /*public static bool ContainsAny(
         this StringSpan source, IEnumerable<StringSpan> values, bool ignoreCase)
-        => ContainsAny(source, values, (x, y) => x.Equals(y, ignoreCase));
+        => ContainsAny(source, values, (x, y) => x.Equals(y, ignoreCase));*/
 
     /// <summary>
     /// Returns the index of the first match of any of the given values, in order, in the given
@@ -455,9 +466,9 @@ public static partial class StringSpanExtensions
     /// <param name="values"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static bool ContainsAny(
+    /*public static bool ContainsAny(
         this StringSpan source, IEnumerable<StringSpan> values, IEqualityComparer<char> comparer)
-        => ContainsAny(source, values, (x, y) => x.Equals(y, comparer));
+        => ContainsAny(source, values, (x, y) => x.Equals(y, comparer));*/
 
     /// <summary>
     /// Returns the index of the first match of any of the given values, in order, in the given
@@ -467,9 +478,9 @@ public static partial class StringSpanExtensions
     /// <param name="values"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static bool ContainsAny(
+    /*public static bool ContainsAny(
         this StringSpan source, IEnumerable<StringSpan> values, IEqualityComparer<string> comparer)
-        => ContainsAny(source, values, (x, y) => x.Equals(y, comparer));
+        => ContainsAny(source, values, (x, y) => x.Equals(y, comparer));*/
 
     /// <summary>
     /// Returns the index of the first match of any of the given values, in order, in the given
@@ -479,13 +490,15 @@ public static partial class StringSpanExtensions
     /// <param name="values"></param>
     /// <param name="comparison"></param>
     /// <returns></returns>
-    public static bool ContainsAny(
+    /*public static bool ContainsAny(
         this StringSpan source, IEnumerable<StringSpan> values, StringComparison comparison)
-        => ContainsAny(source, values, (x, y) => x.Equals(y, comparison));
+        => ContainsAny(source, values, (x, y) => x.Equals(y, comparison));*/
 
     // ----------------------------------------------------
 
-    static int IndexOfAny(
+    // TODO: StringSpan.IndexOfAny...
+
+    /*static int IndexOfAny(
         StringSpan source, IEnumerable<string> values, Func<char, char, bool> predicate)
     {
         foreach (var value in values)
@@ -494,7 +507,7 @@ public static partial class StringSpanExtensions
             if (index >= 0) return index;
         }
         return -1;
-    }
+    }*/
 
     /// <summary>
     /// Returns the index of the first match of any of the given values, in order, in the given
@@ -503,9 +516,9 @@ public static partial class StringSpanExtensions
     /// <param name="source"></param>
     /// <param name="values"></param>
     /// <returns></returns>
-    public static int IndexOfAny(
+    /*public static int IndexOfAny(
         this StringSpan source, IEnumerable<string> values)
-        => IndexOfAny(source, values, static (x, y) => x == y);
+        => IndexOfAny(source, values, static (x, y) => x == y);*/
 
     /// <summary>
     /// Returns the index of the first match of any of the given values, in order, in the given
@@ -515,9 +528,9 @@ public static partial class StringSpanExtensions
     /// <param name="values"></param>
     /// <param name="ignoreCase"></param>
     /// <returns></returns>
-    public static int IndexOfAny(
+    /*public static int IndexOfAny(
         this StringSpan source, IEnumerable<string> values, bool ignoreCase)
-        => IndexOfAny(source, values, (x, y) => x.Equals(y, ignoreCase));
+        => IndexOfAny(source, values, (x, y) => x.Equals(y, ignoreCase));*/
 
     /// <summary>
     /// Returns the index of the first match of any of the given values, in order, in the given
@@ -527,9 +540,9 @@ public static partial class StringSpanExtensions
     /// <param name="values"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static int IndexOfAny(
+    /*public static int IndexOfAny(
         this StringSpan source, IEnumerable<string> values, IEqualityComparer<char> comparer)
-        => IndexOfAny(source, values, (x, y) => x.Equals(y, comparer));
+        => IndexOfAny(source, values, (x, y) => x.Equals(y, comparer));*/
 
     /// <summary>
     /// Returns the index of the first match of any of the given values, in order, in the given
@@ -539,9 +552,9 @@ public static partial class StringSpanExtensions
     /// <param name="values"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static int IndexOfAny(
+    /*public static int IndexOfAny(
         this StringSpan source, IEnumerable<string> values, IEqualityComparer<string> comparer)
-        => IndexOfAny(source, values, (x, y) => x.Equals(y, comparer));
+        => IndexOfAny(source, values, (x, y) => x.Equals(y, comparer));*/
 
     /// <summary>
     /// Returns the index of the first match of any of the given values, in order, in the given
@@ -551,15 +564,17 @@ public static partial class StringSpanExtensions
     /// <param name="values"></param>
     /// <param name="comparison"></param>
     /// <returns></returns>
-    public static int IndexOfAny(
+    /*public static int IndexOfAny(
         this StringSpan source, IEnumerable<string> values, StringComparison comparison)
-        => IndexOfAny(source, values, (x, y) => x.Equals(y, comparison));
+        => IndexOfAny(source, values, (x, y) => x.Equals(y, comparison));*/
 
     // ----------------------------------------------------
 
-    static bool ContainsAny(
+    // TODO: StringSpan.ContainsAny...
+
+    /*static bool ContainsAny(
         StringSpan source, IEnumerable<string> values, Func<char, char, bool> predicate)
-        => IndexOfAny(source, values, predicate) >= 0;
+        => IndexOfAny(source, values, predicate) >= 0;*/
 
     /// <summary>
     /// Returns the index of the first match of any of the given values, in order, in the given
@@ -568,9 +583,9 @@ public static partial class StringSpanExtensions
     /// <param name="source"></param>
     /// <param name="values"></param>
     /// <returns></returns>
-    public static bool ContainsAny(
+    /*public static bool ContainsAny(
         this StringSpan source, IEnumerable<string> values)
-        => ContainsAny(source, values, static (x, y) => x == y);
+        => ContainsAny(source, values, static (x, y) => x == y);*/
 
     /// <summary>
     /// Returns the index of the first match of any of the given values, in order, in the given
@@ -580,9 +595,9 @@ public static partial class StringSpanExtensions
     /// <param name="values"></param>
     /// <param name="ignoreCase"></param>
     /// <returns></returns>
-    public static bool ContainsAny(
+    /*public static bool ContainsAny(
         this StringSpan source, IEnumerable<string> values, bool ignoreCase)
-        => ContainsAny(source, values, (x, y) => x.Equals(y, ignoreCase));
+        => ContainsAny(source, values, (x, y) => x.Equals(y, ignoreCase));*/
 
     /// <summary>
     /// Returns the index of the first match of any of the given values, in order, in the given
@@ -592,9 +607,9 @@ public static partial class StringSpanExtensions
     /// <param name="values"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static bool ContainsAny(
+    /*public static bool ContainsAny(
         this StringSpan source, IEnumerable<string> values, IEqualityComparer<char> comparer)
-        => ContainsAny(source, values, (x, y) => x.Equals(y, comparer));
+        => ContainsAny(source, values, (x, y) => x.Equals(y, comparer));*/
 
     /// <summary>
     /// Returns the index of the first match of any of the given values, in order, in the given
@@ -604,9 +619,9 @@ public static partial class StringSpanExtensions
     /// <param name="values"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static bool ContainsAny(
+    /*public static bool ContainsAny(
         this StringSpan source, IEnumerable<string> values, IEqualityComparer<string> comparer)
-        => ContainsAny(source, values, (x, y) => x.Equals(y, comparer));
+        => ContainsAny(source, values, (x, y) => x.Equals(y, comparer));*/
 
     /// <summary>
     /// Returns the index of the first match of any of the given values, in order, in the given
@@ -616,9 +631,9 @@ public static partial class StringSpanExtensions
     /// <param name="values"></param>
     /// <param name="comparison"></param>
     /// <returns></returns>
-    public static bool ContainsAny(
+    /*public static bool ContainsAny(
         this StringSpan source, IEnumerable<string> values, StringComparison comparison)
-        => ContainsAny(source, values, (x, y) => x.Equals(y, comparison));
+        => ContainsAny(source, values, (x, y) => x.Equals(y, comparison));*/
 
     // ----------------------------------------------------
 
@@ -1122,7 +1137,7 @@ public static partial class StringSpanExtensions
         var index = LastIndexOf(source, value, predicate);
         if (index >= 0)
         {
-            for (int i = index + value.Length; i < source.Length; i++) 
+            for (int i = index + value.Length; i < source.Length; i++)
                 if (source[i] != ' ') return -1;
         }
         return index;

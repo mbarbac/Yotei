@@ -242,6 +242,7 @@ public static partial class StringSpanExtensions
     public static List<int> IndexesOf(
         this StringSpan source, char value, IEqualityComparer<string> comparer)
         => IndexesOf(source, value, (x, y) => x.Equals(y, comparer));
+
     /// <summary>
     /// Returns the indexes of all ocurrences of the given value in the given source.
     /// </summary>
