@@ -20,6 +20,12 @@
     <Project Path="1-Yotei.Tools.DynamicLambda/Yotei.Tools.DynamicLambda.Tests/Yotei.Tools.DynamicLambda.Tests.csproj" Id="c66a0a84-f059-4149-8942-e5d9e81da1e0" />
     <Project Path="1-Yotei.Tools.DynamicLambda/Yotei.Tools.DynamicLambda/Yotei.Tools.DynamicLambda.csproj" Id="a2bc71d4-154d-44ee-83dd-88e7180e75e9" />
   </Folder>
+  <Folder Name="/1-Yotei.Tools.Generators/" />
+  <Folder Name="/1-Yotei.Tools.Generators/00-CoreGenerator/">
+    <Project Path="1-Yotei.Tools.Generators/00-CoreGenerator/Yotei.Tools.CoreGenerator/Yotei.Tools.CoreGenerator.shproj" Id="8e49e07c-bdf7-4251-ac6a-8ab6eca330b1" />
+  </Folder>
+  <Folder Name="/1-Yotei.Tools.Generators/01-CloneGenerator/" />
+  <Folder Name="/1-Yotei.Tools.Generators/02-WithGenerator/" />
   <Folder Name="/1-Yotei.Tools/">
     <Project Path="1-Yotei.Tools/Yotei.Tools.Tests/Yotei.Tools.Tests.csproj" Id="b6a1e072-9195-4e7f-961a-5f0d58fd3a5a" />
     <Project Path="1-Yotei.Tools/Yotei.Tools/Yotei.Tools.csproj" Id="008529fe-c6f6-43ea-98d4-a963500bceef" />

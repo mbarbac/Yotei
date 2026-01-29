@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>8e49e07c-bdf7-4251-ac6a-8ab6eca330b1</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Yotei.Tools.CoreGenerator</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\DuplicateException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\UnExpectedException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\NotFoundException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\EmptyException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\AllowNullAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\BitOperations.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\CallerArgumentExpressionAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\CompilerFeatureRequiredAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\DoesNotReturnAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\SkipLocalsInitAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\SetsRequiredMemberAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\RequiredMemberAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\Range.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\NotNullWhenAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\NotNullAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\MaybeNullAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\IsExternalInit.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\Index.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\HashCode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
+  </ItemGroup>
+</Project>
