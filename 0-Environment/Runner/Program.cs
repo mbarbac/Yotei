@@ -11,7 +11,7 @@ namespace Runner;
 internal class Program
 {
     public static readonly bool ToDebug = true;
-    public static readonly TimeSpan Timeout = TimeSpan.FromSeconds(120);
+    public static readonly TimeSpan Timeout = TimeSpan.FromMinutes(10);
     public static readonly string FatSeparator = new('*', 50);
     public static readonly string SlimSeparator = new('-', 30);
 
@@ -35,7 +35,7 @@ internal class Program
 
         var menu = new ConsoleMenu { ToDebug = ToDebug, Timeout = Timeout }
         .Add(new("Exit"))
-        .Add(new MenuTester(breakOnError: true))
+        .Add(new MenuTestMode(breakOnError: true))
         .Add(new MenuArtifacts())
         .Add(new MenuPackages());
 

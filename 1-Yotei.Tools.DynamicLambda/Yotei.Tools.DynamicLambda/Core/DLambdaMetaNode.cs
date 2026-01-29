@@ -350,6 +350,7 @@ internal class DLambdaMetaNode : DynamicMetaObject
             var item = DLambdaParser.Instance.ToLambdaNode(arg);
             DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- Argument: {item.ToDebugString()}");
         }
+        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- Name: {binder.Name}");
 
         DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- Delegated...");
         var meta = DLambdaMetaMaster.BindInvokeMember(binder, args);

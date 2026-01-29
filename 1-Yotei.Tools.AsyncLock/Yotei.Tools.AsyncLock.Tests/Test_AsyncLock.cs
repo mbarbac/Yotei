@@ -8,7 +8,7 @@ namespace Yotei.Tools.AsyncLock.Tests;
 //[Enforced]
 public static class Test_AsyncLock
 {
-    static readonly ConsoleColor ForeColor = Magenta;
+    static readonly ConsoleColor ForeColor = White;
 
     static void WaitOrThrow(Task[] tasks)
     {

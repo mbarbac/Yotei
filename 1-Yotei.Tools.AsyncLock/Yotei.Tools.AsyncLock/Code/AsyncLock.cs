@@ -12,10 +12,10 @@ namespace Yotei.Tools.AsyncLock;
 /// </summary>
 public sealed partial class AsyncLock : DisposableClass
 {
-    static readonly ConsoleColor CapturingColor = Yellow;
-    static readonly ConsoleColor CapturedColor = Yellow;
-    static readonly ConsoleColor IncreasingColor = Yellow;
-    static readonly ConsoleColor IncreasedColor = Yellow;
+    static readonly ConsoleColor CapturingColor = DarkYellow;
+    static readonly ConsoleColor CapturedColor = DarkYellow;
+    static readonly ConsoleColor IncreasingColor = DarkYellow;
+    static readonly ConsoleColor IncreasedColor = DarkYellow;
 
     static readonly ConsoleColor DecreasingColor = Cyan;
     static readonly ConsoleColor DecreasedColor = Cyan;

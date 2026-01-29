@@ -5,6 +5,47 @@ using static System.ConsoleColor;
 namespace Runner;
 
 // ========================================================
+public class MenuTesterFiltered(bool breakOnError) : MenuTester(breakOnError)
+{
+    static string? AssemblyFilter = null;
+    static string? TypeFilter = null;
+    static string? MethodFilter = null;
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public override string Header() => "Execute Filtered Tests";
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public override void Execute()
+    {
+        Clear();
+        WriteLineEx(true);
+        WriteLineEx(true, Green, Program.FatSeparator);
+        WriteLineEx(true, Green, Header());
+
+        WriteLine();
+        WriteEx(true, Green, "Assembly filter: "); AssemblyFilter = EditLineEx(true, AssemblyFilter).NullWhenEmpty(true);
+        WriteEx(true, Green, "Type filter: ...."); TypeFilter = EditLineEx(true, TypeFilter).NullWhenEmpty(true);
+        WriteEx(true, Green, "Method filter: .."); MethodFilter = EditLineEx(true, MethodFilter).NullWhenEmpty(true);
+
+        if (AssemblyFilter != null || TypeFilter != null || MethodFilter != null)
+        {
+            Program.Includes.Clear();
+            Program.Excludes.Clear();
+
+            var item = new Request(AssemblyFilter, TypeFilter, MethodFilter);
+            Program.Includes.Add(item);
+        }
+
+        base.Execute();
+    }
+}
+
+// ========================================================
 public class MenuTester(bool breakOnError) : ConsoleMenuEntry
 {
     bool BreakOnError { get; } = breakOnError;
@@ -19,7 +60,7 @@ public class MenuTester(bool breakOnError) : ConsoleMenuEntry
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string Header() => "Execute Tests";
+    public override string Header() => "Execute All Tests";
 
     /// <summary>
     /// <inheritdoc/>
