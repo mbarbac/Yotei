@@ -1,0 +1,2 @@
+# Yotei Clone Generator
+Yotei

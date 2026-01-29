@@ -24,7 +24,14 @@
   <Folder Name="/1-Yotei.Tools.Generators/00-CoreGenerator/">
     <Project Path="1-Yotei.Tools.Generators/00-CoreGenerator/Yotei.Tools.CoreGenerator/Yotei.Tools.CoreGenerator.shproj" Id="8e49e07c-bdf7-4251-ac6a-8ab6eca330b1" />
   </Folder>
-  <Folder Name="/1-Yotei.Tools.Generators/01-CloneGenerator/" />
+  <Folder Name="/1-Yotei.Tools.Generators/01-CloneGenerator/">
+    <Project Path="1-Yotei.Tools.Generators/01-CloneGenerator/Yotei.Tools.CloneGenerator.Tests/Yotei.Tools.CloneGenerator.Tests.csproj" Id="06ab31d0-545b-479d-a80c-2fc13985a51d">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
+    <Project Path="1-Yotei.Tools.Generators/01-CloneGenerator/Yotei.Tools.CloneGenerator/Yotei.Tools.CloneGenerator.csproj" Id="17d4d5d6-7f17-41ae-8bfa-df01f76b1d3f">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
+  </Folder>
   <Folder Name="/1-Yotei.Tools.Generators/02-WithGenerator/" />
   <Folder Name="/1-Yotei.Tools/">
     <Project Path="1-Yotei.Tools/Yotei.Tools.Tests/Yotei.Tools.Tests.csproj" Id="b6a1e072-9195-4e7f-961a-5f0d58fd3a5a" />

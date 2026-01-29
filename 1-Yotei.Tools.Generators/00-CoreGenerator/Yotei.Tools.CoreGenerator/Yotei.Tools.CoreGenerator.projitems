@@ -28,6 +28,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\IsExternalInit.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\Index.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\HashCode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\CodeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
   </ItemGroup>
 </Project>
