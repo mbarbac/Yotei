@@ -41,8 +41,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\TypeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\DebugExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\StringSpanExtensions_Char.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\__.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\CodeBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\CodeBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\StringComparerExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
   </ItemGroup>
 </Project>

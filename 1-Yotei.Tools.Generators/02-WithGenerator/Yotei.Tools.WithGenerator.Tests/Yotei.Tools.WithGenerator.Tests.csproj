@@ -1,0 +1,60 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Configurations>Debug;Release;Local</Configurations>
+		<TargetFramework>net10.0</TargetFramework>
+		<LangVersion>preview</LangVersion>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<IsPackable>false</IsPackable>
+		<NoWarn>IDE0130</NoWarn>
+	</PropertyGroup>
+	<!--IDE0130: Namespace does not match folder structure-->
+
+	<ItemGroup>
+		<PackageReference Include="coverlet.collector" Version="6.0.4" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+		<PackageReference Include="xunit" Version="2.9.3" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<!-- DEBUG configuration -->
+	<ItemGroup Condition="'$(Configuration)'=='Debug'">
+    <ProjectReference Include="..\..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
+    <ProjectReference Include="..\Yotei.Tools.WithGenerator\Yotei.Tools.WithGenerator.csproj" />
+  </ItemGroup>
+
+	<!-- RELEASE configuration -->
+	<ItemGroup Condition="'$(Configuration)'=='Release'">
+		<PackageReference Include="Yotei.Tools" Version="0.7.0" />
+		<PackageReference Include="Yotei.Tools.WithGenerator" Version="0.7.0" />
+	</ItemGroup>
+
+	<!-- LOCAL configuration -->
+	<ItemGroup Condition="'$(Configuration)'=='Local'">
+		<PackageReference Include="Yotei.Tools" Version="0.7.0-v0001" />
+		<PackageReference Include="Yotei.Tools.WithGenerator" Version="0.7.0-v0001" />
+	</ItemGroup>
+
+	<!-- Emit generated files -->
+	<ItemGroup>
+		<Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
+	</ItemGroup>
+
+	<PropertyGroup>
+		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+		<CompilerGeneratedFilesOutputPath>Generated\$(TargetFramework)</CompilerGeneratedFilesOutputPath>
+	</PropertyGroup>
+
+	<!-- Clear generated files each compile or build (need to be at the end of the file)-->
+	<Target Name="CustomBeforeCompile" BeforeTargets="BeforeCompile">
+		<RemoveDir Directories="$(ProjectDir)\Generated\" />
+	</Target>
+	<Target Name="CustomBeforeBuild" BeforeTargets="BeforeBuild">
+		<RemoveDir Directories="$(ProjectDir)\Generated\" />
+	</Target>
+
+</Project>

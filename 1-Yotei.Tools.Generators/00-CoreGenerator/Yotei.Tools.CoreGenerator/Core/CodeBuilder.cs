@@ -58,8 +58,6 @@ internal class CodeBuilder
     /// <param name="args"></param>
     public void Append(string message, params object?[]? args)
     {
-        // HIGH: remove comment after span is included
-        /*
         message ??= string.Empty;
         args ??= [null];
         if (message.Length > 0 && args.Length > 0) message = string.Format(message, args);
@@ -81,7 +79,6 @@ internal class CodeBuilder
                 AtOrigin = item.EndsWith('\n');
             }
         }
-        */
     }
 
     /// <summary>
