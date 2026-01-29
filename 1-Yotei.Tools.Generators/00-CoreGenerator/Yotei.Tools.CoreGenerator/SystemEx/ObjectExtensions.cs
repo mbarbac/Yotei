@@ -1,7 +1,7 @@
-﻿namespace Yotei.Tools;
+﻿namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
-public static class ObjectExtensions
+internal static class ObjectExtensions
 {
     /// <summary>
     /// Throws an <see cref="ArgumentNullException"/> when the given source value is null.

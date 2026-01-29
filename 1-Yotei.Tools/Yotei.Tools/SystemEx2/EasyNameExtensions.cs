@@ -183,7 +183,7 @@ public static partial class EasyNameExtensions
             if (source.IsIn) prefix = "in ";
             else if (source.IsOut) prefix = "out ";
             else if (source.ParameterType.IsByRef) prefix = "ref ";
-            // TODO: falta 'ref readonly'...
+            // TODO: 'ref readonly'...
 
             if (prefix is not null) sb.Insert(0, prefix);
         }

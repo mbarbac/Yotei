@@ -9,6 +9,9 @@
     <Import_RootNamespace>Yotei.Tools.CoreGenerator</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\ArgumentExceptions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\ArgumentNullException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\IndexOutOfRangeException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\DuplicateException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\UnExpectedException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\NotFoundException.cs" />
@@ -28,6 +31,13 @@
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\IsExternalInit.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\Index.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\HashCode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\NullableAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CharExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\ObjectExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\StringExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\ExceptionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\IEnumerableExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\TypeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\CodeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
   </ItemGroup>
