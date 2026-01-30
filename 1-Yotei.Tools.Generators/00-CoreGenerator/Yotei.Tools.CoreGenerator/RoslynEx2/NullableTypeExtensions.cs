@@ -1,7 +1,7 @@
 ﻿namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
-internal static class NullableTypeSymbolExtensions
+internal static class NullableTypeExtensions
 {
     extension (INamedTypeSymbol symbol)
     {

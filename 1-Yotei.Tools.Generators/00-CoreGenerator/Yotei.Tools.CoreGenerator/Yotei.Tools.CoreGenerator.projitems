@@ -9,6 +9,11 @@
     <Import_RootNamespace>Yotei.Tools.CoreGenerator</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Candidates\ICandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Candidates\ErrorCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Candidates\__.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\CoreError.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\CoreGenerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\ArgumentExceptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\ArgumentNullException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\IndexOutOfRangeException.cs" />
@@ -33,7 +38,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\HashCode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\NullableAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx2\IsNullable.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx2\NullableTypeSymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx2\NullableTypeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\TypeSyntaxExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\TypeSymbolExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\SymbolExtensions.cs" />
