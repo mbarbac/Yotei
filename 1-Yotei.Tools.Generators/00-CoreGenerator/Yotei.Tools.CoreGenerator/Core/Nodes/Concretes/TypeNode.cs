@@ -140,4 +140,65 @@ internal class TypeNode : IChildNode
     /// <param name="context"></param>
     /// <param name="cb"></param>
     public virtual void Emit(SourceProductionContext context, CodeBuilder cb) => throw null;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to obtain the type's header, ie: 'partial {typename}'. Inheritors may override
+    /// this method to add a base list, as in ': TBase, IFace, ...'.
+    /// </summary>
+    protected virtual string GetHeader()
+    {
+        var rec = Symbol.IsRecord ? "record " : string.Empty;
+        string kind = Symbol.TypeKind switch
+        {
+            TypeKind.Class => "class",
+            TypeKind.Struct => "struct",
+            TypeKind.Interface => "interface",
+            _ => throw new ArgumentException("Type kind not supported.").WithData(Symbol.Name)
+        };
+
+        var options = new SymbolDisplayFormat(
+            globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.Omitted,
+            typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
+            genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters,
+            miscellaneousOptions: SymbolDisplayMiscellaneousOptions.UseSpecialTypes);
+
+        var name = Symbol.ToDisplayString(options);
+        return $"partial {rec}{kind} {name}";
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to emit the source code of this type, only (ie: not the source code of its child
+    /// elements).
+    /// </summary>
+    protected virtual void EmitCore(SourceProductionContext context, CodeBuilder cb) { }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to emit the source code of the child elements of this type.
+    /// </summary>
+    protected virtual void EmitChilds(SourceProductionContext context, CodeBuilder cb)
+    {
+        var nl = false;
+
+        foreach (var node in ChildFields)
+        {
+            if (nl) cb.AppendLine(); nl = true;
+            node.Emit(context, cb);
+        }
+        foreach (var node in ChildProperties)
+        {
+            if (nl) cb.AppendLine(); nl = true;
+            node.Emit(context, cb);
+        }
+        foreach (var node in ChildMethods)
+        {
+            if (nl) cb.AppendLine(); nl = true;
+            node.Emit(context, cb);
+        }
+    }
 }
