@@ -9,22 +9,7 @@
     <Import_RootNamespace>Yotei.Tools.CoreGenerator</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Candidates\Concretes\FieldCandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Candidates\Concretes\PropertyCandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Candidates\Concretes\MethodCandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Candidates\Concretes\TypeCandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Candidates\IValidCandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Candidates\ICandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Candidates\ErrorCandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\CoreError.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\CoreGenerator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Nodes\Concretes\PropertyNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Nodes\Concretes\MethodNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Nodes\Concretes\FieldNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Nodes\Concretes\TypeNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Nodes\FileNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Nodes\INode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Nodes\IChildNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\__.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\ArgumentExceptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\ArgumentNullException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\IndexOutOfRangeException.cs" />
@@ -58,7 +43,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\AttributeDataExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\NameSyntaxExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\NamedTypeSymbolExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\ChainExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CharExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\ObjectExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\StringExtensions.cs" />
@@ -68,7 +52,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\TypeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\DebugExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\StringSpanExtensions_Char.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\CodeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\StringComparerExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
   </ItemGroup>
