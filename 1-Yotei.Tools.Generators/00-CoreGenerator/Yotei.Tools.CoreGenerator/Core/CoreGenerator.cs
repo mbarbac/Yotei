@@ -14,6 +14,8 @@
 /// </summary>
 internal class CoreGenerator : IIncrementalGenerator
 {
+    static readonly SymbolEqualityComparer Comparer = SymbolEqualityComparer.Default;
+
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
@@ -32,10 +34,12 @@ internal class CoreGenerator : IIncrementalGenerator
             .Where(static x => x is not null)
             .Collect();
 
-        var combined = context.CompilationProvider.Combine(items);
+        // It seems that if we capture the compilation then we loose 'incremental' caching, so that
+        // even the smallest change will execute the generator from scratch again.
+        // var combined = context.CompilationProvider.Combine(items);
 
         // Registering source code emit actions...
-        context.RegisterSourceOutput(combined, EmitCode);
+        context.RegisterSourceOutput(/*combined*/ items, EmitCode);
     }
 
     // ----------------------------------------------------
@@ -399,15 +403,203 @@ internal class CoreGenerator : IIncrementalGenerator
     // ----------------------------------------------------
 
     /// <summary>
+    /// Invoked to create a new hierarchy node.
+    /// </summary>
+    /// <param name="candidate"></param>
+    /// <returns></returns>
+    protected virtual TypeNode CreateNode(TypeCandidate candidate)
+    {
+        var item = new TypeNode(candidate.Symbol);
+        if (candidate.Syntax != null) item.SyntaxNodes.Add(candidate.Syntax);
+        item.Attributes.AddRange(candidate.Attributes);
+        return item;
+    }
+
+    /// <summary>
+    /// Invoked to create a new hierarchy node.
+    /// <br/> This method DOES NOT add the newly created node to any parent collection.
+    /// </summary>
+    /// <param name="parent"></param>
+    /// <param name="candidate"></param>
+    /// <returns></returns>
+    protected virtual PropertyNode CreateNode(TypeNode parent, PropertyCandidate candidate)
+    {
+        var item = new PropertyNode(parent, candidate.Symbol);
+        if (candidate.Syntax != null) item.SyntaxNodes.Add(candidate.Syntax);
+        item.Attributes.AddRange(candidate.Attributes);
+        return item;
+    }
+
+    /// <summary>
+    /// Invoked to create a new hierarchy node.
+    /// <br/> This method DOES NOT add the newly created node to any parent collection.
+    /// </summary>
+    /// <param name="parent"></param>
+    /// <param name="candidate"></param>
+    /// <returns></returns>
+    protected virtual FieldNode CreateNode(TypeNode parent, FieldCandidate candidate)
+    {
+        var item = new FieldNode(parent, candidate.Symbol);
+        if (candidate.Syntax != null) item.SyntaxNodes.Add(candidate.Syntax);
+        item.Attributes.AddRange(candidate.Attributes);
+        return item;
+    }
+
+    /// <summary>
+    /// Invoked to create a new hierarchy node.
+    /// <br/> This method DOES NOT add the newly created node to any parent collection.
+    /// </summary>
+    /// <param name="parent"></param>
+    /// <param name="candidate"></param>
+    /// <returns></returns>
+    protected virtual MethodNode CreateNode(TypeNode parent, MethodCandidate candidate)
+    {
+        var item = new MethodNode(parent, candidate.Symbol);
+        if (candidate.Syntax != null) item.SyntaxNodes.Add(candidate.Syntax);
+        item.Attributes.AddRange(candidate.Attributes);
+        return item;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Invoked to generate the source code of the given collection of candidates. This method,
     /// by default, arranges this collection in a type-based hierarchy that is used to emit one
     /// file per each type and its child elements.
     /// </summary>
     /// <param name="context"></param>
-    /// <param name="source"></param>
-    protected virtual void EmitCode(
-        SourceProductionContext context, (Compilation, ImmutableArray<ICandidate>) source)
+    /// <param name="candidates"></param>
+    protected virtual void EmitCode(SourceProductionContext context, ImmutableArray<ICandidate> candidates)
     {
-        throw null;
+        List<TypeNode> types = [];
+
+        // Processing candidates...
+        foreach (var candidate in candidates)
+        {
+            context.CancellationToken.ThrowIfCancellationRequested();
+            switch (candidate)
+            {
+                case ErrorCandidate item: item.Diagnostic.Report(context); break;
+                case TypeCandidate item: CaptureHierarchy(types, item); break;
+                case PropertyCandidate item: CaptureHierarchy(types, item); break;
+                case FieldCandidate item: CaptureHierarchy(types, item); break;
+                case MethodCandidate item: CaptureHierarchy(types, item); break;
+            }
+        }
+
+        // Generating source code...
+        foreach (var type in types)
+        {
+            context.CancellationToken.ThrowIfCancellationRequested();
+
+            if (!type.Validate(context)) continue;
+            var cb = new CodeBuilder();
+            type.Emit(context, cb);
+
+            var code = cb.ToString();
+            var name = type.GetFileName() + ".g.cs";
+            context.AddSource(name, code);
+        }
+    }
+
+    /// <summary>
+    /// Invoked to capture in the hierarchy a node for the given candidate.
+    /// </summary>
+    /// <param name="types"></param>
+    /// <param name="candidate"></param>
+    protected virtual void CaptureHierarchy(List<TypeNode> types, TypeCandidate candidate)
+    {
+        var node = types.Find(x => Comparer.Equals(x.Symbol, candidate.Symbol));
+
+        // We can create a brand new node...
+        if (node is null)
+        {
+            node = CreateNode(candidate);
+            types.Add(node);
+        }
+        else // We have to substitute the holder-only node, or augment the existing one...
+        {
+            if (node.IsHolderOnly)
+            {
+                var type = CreateNode(candidate);
+                type.Augment(node);
+
+                types.Remove(node);
+                types.Add(type);
+            }
+            else node.Augment(candidate);
+        }
+    }
+
+    /// <summary>
+    /// Invoked to capture in the hierarchy a node for the given candidate.
+    /// </summary>
+    /// <param name="types"></param>
+    /// <param name="candidate"></param>
+    protected virtual void CaptureHierarchy(List<TypeNode> types, PropertyCandidate candidate)
+    {
+        var host = candidate.Symbol.ContainingType;
+        var type = types.Find(x => Comparer.Equals(x.Symbol, host));
+        if (type is null)
+        {
+            type = new TypeNode(host) { IsHolderOnly = true };
+            types.Add(type);
+        }
+
+        var node = type.ChildProperties.Find(x => Comparer.Equals(x.Symbol, candidate.Symbol));
+        if (node is null)
+        {
+            node = CreateNode(type, candidate);
+            type.ChildProperties.Add(node);
+        }
+        else node.Augment(candidate);
+    }
+
+    /// <summary>
+    /// Invoked to capture in the hierarchy a node for the given candidate.
+    /// </summary>
+    /// <param name="types"></param>
+    /// <param name="candidate"></param>
+    protected virtual void CaptureHierarchy(List<TypeNode> types, FieldCandidate candidate)
+    {
+        var host = candidate.Symbol.ContainingType;
+        var type = types.Find(x => Comparer.Equals(x.Symbol, host));
+        if (type is null)
+        {
+            type = new TypeNode(host) { IsHolderOnly = true };
+            types.Add(type);
+        }
+
+        var node = type.ChildFields.Find(x => Comparer.Equals(x.Symbol, candidate.Symbol));
+        if (node is null)
+        {
+            node = CreateNode(type, candidate);
+            type.ChildFields.Add(node);
+        }
+        else node.Augment(candidate);
+    }
+
+    /// <summary>
+    /// Invoked to capture in the hierarchy a node for the given candidate.
+    /// </summary>
+    /// <param name="types"></param>
+    /// <param name="candidate"></param>
+    protected virtual void CaptureHierarchy(List<TypeNode> types, MethodCandidate candidate)
+    {
+        var host = candidate.Symbol.ContainingType;
+        var type = types.Find(x => Comparer.Equals(x.Symbol, host));
+        if (type is null)
+        {
+            type = new TypeNode(host) { IsHolderOnly = true };
+            types.Add(type);
+        }
+
+        var node = type.ChildMethods.Find(x => Comparer.Equals(x.Symbol, candidate.Symbol));
+        if (node is null)
+        {
+            node = CreateNode(type, candidate);
+            type.ChildMethods.Add(node);
+        }
+        else node.Augment(candidate);
     }
 }
