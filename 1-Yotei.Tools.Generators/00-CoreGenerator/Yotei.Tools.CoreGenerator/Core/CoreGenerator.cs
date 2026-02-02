@@ -511,7 +511,7 @@ internal class CoreGenerator : IIncrementalGenerator
                 miscellaneousOptions: SymbolDisplayMiscellaneousOptions.UseSpecialTypes);
 
             var name = tpsymbol.ToDisplayString(options);
-            name = ReverseName(name);
+            name = ToReverseFileName(name);
 
             // Capturing the appropriate file...
             var file = files.Find(x => name == x.FileName);
@@ -609,10 +609,15 @@ internal class CoreGenerator : IIncrementalGenerator
     // ----------------------------------------------------
 
     /// <summary>
-    /// Reverses the given file name so that it can actually be used as such.
+    /// Takes the given type's display string, and reverses its first-level dot separated parts
+    /// to return a suitable file name.
     /// </summary>
-    static string ReverseName(string name)
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public virtual string ToReverseFileName(string name)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+
         List<int> dots = [];
         int depth = 0;
         for (int i = 0; i < name.Length; i++)

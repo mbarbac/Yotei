@@ -39,7 +39,7 @@ internal class FieldNode : IChildNode
     /// The collection of syntax nodes captured for instance. This Field can be an empty one
     /// if this information was not captured.
     /// </summary>
-    public List<FieldDeclarationSyntax> SyntaxNodes { get; } = [];
+    public List<BaseFieldDeclarationSyntax> SyntaxNodes { get; } = [];
 
     /// <summary>
     /// The collection of attributes by which this instance was found. This Field can be an empty

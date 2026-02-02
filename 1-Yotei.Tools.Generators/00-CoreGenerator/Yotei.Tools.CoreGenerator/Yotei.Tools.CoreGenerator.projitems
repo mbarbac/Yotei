@@ -58,6 +58,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\AttributeDataExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\NameSyntaxExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\NamedTypeSymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\ChainExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CharExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\ObjectExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\StringExtensions.cs" />

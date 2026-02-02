@@ -29,7 +29,7 @@ internal class FieldCandidate : IValidCandidate
     /// <summary>
     /// The syntax where this element was captured, or <see langword="null"/> if it was not captured.
     /// </summary>
-    public FieldDeclarationSyntax? Syntax { get; init => field = value.ThrowWhenNull(); }
+    public BaseFieldDeclarationSyntax? Syntax { get; init => field = value.ThrowWhenNull(); }
 
     /// <summary>
     /// The collection of attributes by which this candidate was identified,  at the location where
