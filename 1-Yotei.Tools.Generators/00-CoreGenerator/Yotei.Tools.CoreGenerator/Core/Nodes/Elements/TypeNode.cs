@@ -20,11 +20,36 @@ internal class TypeNode : INode
     public override string ToString() => $"Type: {Symbol.Name}";
 
     /// <summary>
-    /// Obtains the file name where the code of this type, and of its child elements, shall be
-    /// emitted.
+    /// Obtains the file name where the code of this type, and the code of its child elements,
+    /// shall be emitted.
     /// </summary>
     /// <returns></returns>
-    public virtual string GetFileName() => throw null;
+    public virtual string GetFileName()
+    {
+        var name = GetTypeFullDisplayName(Symbol);
+
+        List<int> dots = [];
+        int depth = 0;
+        for (int i = 0; i < name.Length; i++)
+        {
+            if (name[i] == '<') { depth++; continue; }
+            if (name[i] == '>') { depth--; continue; }
+            if (name[i] == '.' && depth == 0) dots.Add(i);
+        }
+
+        List<string> parts = [];
+        int last = 0;
+
+        foreach (var dot in dots)
+        {
+            parts.Add(name[last..dot]);
+            last = dot + 1;
+        }
+        parts.Add(name[last..]);
+
+        parts.Reverse();
+        return string.Join(".", parts);
+    }
 
     // ----------------------------------------------------
 
@@ -148,28 +173,49 @@ internal class TypeNode : INode
     // ----------------------------------------------------
 
     /// <summary>
-    /// <inheritdoc/>
+    /// <inheritdoc/> This method is not intended to be overriden.
     /// </summary>
     /// <param name="context"></param>
     /// <param name="cb"></param>
-    public void Emit(SourceProductionContext context, CodeBuilder cb) => throw null;
+    public void Emit(SourceProductionContext context, CodeBuilder cb)
+    {
+        var num = EmitPreType(cb);
+        var head = GetHeader();
+        cb.AppendLine(head);
+
+        cb.AppendLine("{");
+        cb.IndentLevel++;
+
+        var old = cb.Length; EmitCore(context, cb);
+        var len = cb.Length; if (old != len) cb.AppendLine();
+        EmitChilds(context, cb);
+
+        cb.IndentLevel--;
+        cb.AppendLine("}");
+
+        for (int i = 0; i < num; i++)
+        {
+            cb.IndentLevel--;
+            cb.AppendLine("}");
+        }
+    }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Invoked to obtain the appropriate header for the type of this instance, that typically is
-    /// 'partial {typename}'. Derived types can override this method to add a base list to it, as
-    /// in '... : TBase, IFace, ...'.
+    /// Invoked to obtain the header string of this type, which by default is 'partial {typename}'.
+    /// If overriden, inheritors must call this base method and then add a '... : TBase, IFace, ...'
+    /// base list as needed.
     /// </summary>
     /// <returns></returns>
-    protected virtual string GetHeader() => BuildHeader(Symbol);
+    protected virtual string GetHeader() => GetTypeHeader(Symbol);
 
     /// <summary>
-    /// Invoked to obtain the appropriate header for the given type, as in 'partial {typename}'.
+    /// Invoked to obtain the 'partial {typename}' header for the given type symbol.
     /// </summary>
     /// <param name="symbol"></param>
     /// <returns></returns>
-    public static string BuildHeader(INamedTypeSymbol symbol)
+    public static string GetTypeHeader(INamedTypeSymbol symbol)
     {
         var rec = symbol.IsRecord ? "record " : string.Empty;
         string kind = symbol.TypeKind switch
@@ -179,31 +225,42 @@ internal class TypeNode : INode
             TypeKind.Interface => "interface",
             _ => throw new ArgumentException("Type kind not supported.").WithData(symbol.Name)
         };
+        var name = GetTypeFullDisplayName(symbol);
+        return $"partial {rec}{kind} {name}";
+    }
 
+    /// <summary>
+    /// Returns the full display name of the given type symbol.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <returns></returns>
+    public static string GetTypeFullDisplayName(INamedTypeSymbol symbol)
+    {
         var options = new SymbolDisplayFormat(
             globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.Omitted,
             typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
             genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters,
             miscellaneousOptions: SymbolDisplayMiscellaneousOptions.UseSpecialTypes);
 
-        var name = symbol.ToDisplayString(options);
-        return $"partial {rec}{kind} {name}";
+        return symbol.ThrowWhenNull().ToDisplayString(options);
     }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Invoked to emit the source code of this type, only (ie: not the source code of its child
-    /// elements).
+    /// Invoked to emit the source code associated with this type, but not the one of its child
+    /// elements, if any.
     /// </summary>
+    /// <param name="context"></param>
+    /// <param name="cb"></param>
     protected virtual void EmitCore(SourceProductionContext context, CodeBuilder cb) { }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Invoked to emit the source code of the child elements of this type.
+    /// Invoked to emit the source code of the known childs of this type, if any.
     /// </summary>
-    protected virtual void EmitChilds(SourceProductionContext context, CodeBuilder cb)
+    void EmitChilds(SourceProductionContext context, CodeBuilder cb)
     {
         var nl = false;
 
@@ -222,5 +279,177 @@ internal class TypeNode : INode
             if (nl) cb.AppendLine(); nl = true;
             node.Emit(context, cb);
         }
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to emit the pre-type code. Returns the number of indentation levels it has opened
+    /// so that they can be closed afterwards.
+    /// </summary>
+    int EmitPreType(CodeBuilder cb)
+    {
+        cb.AppendLine("// <auto-generated>");
+        cb.AppendLine("#nullable enable");
+        cb.AppendLine();
+
+        return SyntaxNodes.Count > 0 ? EmitPreTypeFromSyntaxes(cb) : EmitPreTypeFromSymbol(cb);
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to emit the pre-type code when no syntaxes are available. In this case, we just
+    /// emit the compound namespace, with no pragmas or usings. Returns the number of indentation
+    /// levels it has opened so that they can be closed afterwards.
+    /// </summary>
+    int EmitPreTypeFromSymbol(CodeBuilder cb)
+    {
+        var nschain = Symbol.GetElementChain().Where(static x => x is INamespaceSymbol);
+        var first = true;
+        var sb = new StringBuilder(); foreach (var ns in nschain)
+        {
+            if (!first) sb.Append('.'); first = false;
+            sb.Append(ns.Name);
+        }
+
+        cb.AppendLine(sb.ToString());
+        cb.AppendLine("{");
+        cb.IndentLevel++;
+
+        return (1 + EmitTypeParents(cb));
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to emit the pre-type code when there are syntaxes are available so that we can
+    /// capture and emit the appropriate pragmas and usings. Returns the number of indentation
+    /// levels it has opened so that they can be closed afterwards.
+    /// </summary>
+    int EmitPreTypeFromSyntaxes(CodeBuilder cb)
+    {
+        // Emitting file-level pragmas and usings...
+        List<string> pragmas = [];
+        List<string> usings = [];
+        foreach (var syntax in SyntaxNodes)
+        {
+            var nschain = syntax.GetElementChain().Where(static x => x is BaseNamespaceDeclarationSyntax);
+            PopulateFileLevelPragmas(pragmas, nschain);
+            PopulateFileLevelUsings(usings, nschain);
+        }
+        if (pragmas.Count > 0) { foreach (var str in pragmas) cb.AppendLine(str); cb.AppendLine(); }
+        if (usings.Count > 0) { foreach (var str in usings) cb.AppendLine(str); cb.AppendLine(); }
+
+        // Emitting namespaces...
+        var num = 0;
+        foreach (var syntax in SyntaxNodes)
+        {
+            var nschain = syntax.GetElementChain().Where(static x => x is BaseNamespaceDeclarationSyntax);
+            foreach (var ns in nschain)
+            {
+                var nspace = (BaseNamespaceDeclarationSyntax)ns;
+                var name = nspace.Name.ToString();
+                cb.AppendLine(name);
+                cb.AppendLine("{");
+                cb.IndentLevel++;
+
+                EmitNamespaceUsings(nspace, cb);
+                num++;
+            }
+        }
+
+        return (num + EmitTypeParents(cb));
+    }
+
+    /// <summary>
+    /// Invoked to add the the collection the file-level pragmas from the given chain.
+    /// </summary>
+    void PopulateFileLevelPragmas(List<string> items, IEnumerable<SyntaxNode> nschain)
+    {
+        foreach (var ns in nschain)
+        {
+            if (ns.SyntaxTree.TryGetText(out var text))
+            {
+                foreach (var line in text.Lines)
+                {
+                    var str = line.ToString().Trim();
+                    if (str.StartsWith("#pragma") && !items.Contains(str)) items.Add(str);
+                    else if (str.StartsWith("namespace")) break;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Invoked to add the the collection the file-level usings from the given chain.
+    /// </summary>
+    void PopulateFileLevelUsings(List<string> items, IEnumerable<SyntaxNode> nschain)
+    {
+        foreach (var ns in nschain)
+        {
+            var comp = GetCompilation(ns);
+            if (comp is null) continue;
+
+            foreach (var item in comp.Usings)
+            {
+                var str = item.ToString().Trim();
+                if (!string.IsNullOrWhiteSpace(str) && !items.Contains(str)) items.Add(str);
+            }
+        }
+
+        // Gets the compilation unit syntax the given syntax node belongs to...
+        static CompilationUnitSyntax? GetCompilation(SyntaxNode node)
+        {
+            while (node is not null)
+            {
+                if (node is CompilationUnitSyntax comp) return comp;
+                node = node.Parent!;
+            }
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Invoked to emit the collection of namespace-level usings.
+    /// </summary>
+    void EmitNamespaceUsings(
+        BaseNamespaceDeclarationSyntax ns, CodeBuilder cb)
+    {
+        List<string> items = []; foreach (var item in ns.Usings)
+        {
+            var str = item.ToString().Trim();
+            if (!string.IsNullOrWhiteSpace(str) && !items.Contains(str)) items.Add(str);
+        }
+
+        if (items.Count > 0)
+        {
+            foreach (var str in items) cb.AppendLine(str);
+            cb.AppendLine();
+        }
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to emit the pre-type code for the parent types of this type. Returns the number of
+    /// indentation levels it has opened so that they can be closed afterwards.
+    /// </summary>
+    int EmitTypeParents(CodeBuilder cb)
+    {
+        var tpchain = Symbol.GetElementChain().Where(static x => x is INamedTypeSymbol).ToList();
+        tpchain = tpchain.GetRange(0, tpchain.Count - 1);
+
+        for (int i = 0; i < tpchain.Count; i++)
+        {
+            var type = (INamedTypeSymbol)tpchain[i];
+            var head = GetTypeHeader(type);
+
+            cb.AppendLine(head);
+            cb.AppendLine("{");
+            cb.IndentLevel++;
+        }
+
+        return tpchain.Count;
     }
 }
