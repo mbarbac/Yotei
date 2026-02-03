@@ -249,7 +249,7 @@ internal class TypeNode : INode
 
     /// <summary>
     /// Invoked to emit the source code associated with this type, but not the one of its child
-    /// elements, if any.
+    /// elements, if any. This method is invoked *BEFORE* emitting the child elements.
     /// </summary>
     /// <param name="context"></param>
     /// <param name="cb"></param>
@@ -313,7 +313,7 @@ internal class TypeNode : INode
             sb.Append(ns.Name);
         }
 
-        cb.AppendLine(sb.ToString());
+        cb.AppendLine("namespace " + sb.ToString());
         cb.AppendLine("{");
         cb.IndentLevel++;
 
@@ -350,7 +350,7 @@ internal class TypeNode : INode
             {
                 var nspace = (BaseNamespaceDeclarationSyntax)ns;
                 var name = nspace.Name.ToString();
-                cb.AppendLine(name);
+                cb.AppendLine("namespace " + name);
                 cb.AppendLine("{");
                 cb.IndentLevel++;
 

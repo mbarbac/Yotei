@@ -35,7 +35,7 @@
 	<PropertyGroup>
 		<!--If the following line is uncommented, public types may not be reachable-->
 		<!--<IncludeBuildOutput>false</IncludeBuildOutput>-->
-		<!--<DefineConstants>$(DefineConstants);DEBUG_WITH_GENERATOR </DefineConstants>-->
+		<DefineConstants>$(DefineConstants);DEBUG_WITH_GENERATOR </DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -351,8 +351,6 @@ internal static partial class StringSpanExtensions
 
     // ----------------------------------------------------
 
-    // TODO: StringSpan.IndexOfAny...
-
     // span.IndexOfAny(span)
 
     /*static int IndexOfAny(
@@ -427,8 +425,6 @@ internal static partial class StringSpanExtensions
 
     // ----------------------------------------------------
 
-    // TODO: StringSpan.ContainsAny...
-
     // span.ContainsAny(SearchValues<string> values)
 
     /*static bool ContainsAny(
@@ -495,8 +491,6 @@ internal static partial class StringSpanExtensions
         => ContainsAny(source, values, (x, y) => x.Equals(y, comparison));*/
 
     // ----------------------------------------------------
-
-    // TODO: StringSpan.IndexOfAny...
 
     /*static int IndexOfAny(
         StringSpan source, IEnumerable<string> values, Func<char, char, bool> predicate)
@@ -569,8 +563,6 @@ internal static partial class StringSpanExtensions
         => IndexOfAny(source, values, (x, y) => x.Equals(y, comparison));*/
 
     // ----------------------------------------------------
-
-    // TODO: StringSpan.ContainsAny...
 
     /*static bool ContainsAny(
         StringSpan source, IEnumerable<string> values, Func<char, char, bool> predicate)

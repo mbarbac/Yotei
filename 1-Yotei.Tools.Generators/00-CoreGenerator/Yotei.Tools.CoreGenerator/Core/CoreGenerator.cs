@@ -16,6 +16,11 @@ internal class CoreGenerator : IIncrementalGenerator
 {
     static readonly SymbolEqualityComparer Comparer = SymbolEqualityComparer.Default;
 
+    /* It seems that if we capture the 'Compilation' object then we'll loose the 'incremental'
+     * caching feature so that even the smallest change will execute the generator over and over
+     * again from scratch. What I don't understand is why then we can combine the predicate and
+     * capture steps with a 'context.CompilationProvider', why this can be used. */
+
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
@@ -30,15 +35,12 @@ internal class CoreGenerator : IIncrementalGenerator
 
         // Registering pipeline steps...
         var items = context.SyntaxProvider
-            .CreateSyntaxProvider(SyntaxKindDiscriminator, CaptureCandidate)
+            .CreateSyntaxProvider(SyntaxKindPredicate, CaptureCandidate)
             .Where(static x => x is not null)
             .Collect();
 
-        // It seems that if we capture the compilation then we loose 'incremental' caching, so that
-        // even the smallest change will execute the generator from scratch again.
-        // var combined = context.CompilationProvider.Combine(items);
-
         // Registering source code emit actions...
+        // var combined = context.CompilationProvider.Combine(items);
         context.RegisterSourceOutput(/*combined*/ items, EmitCode);
     }
 
@@ -75,12 +77,16 @@ internal class CoreGenerator : IIncrementalGenerator
                 namespace {{ns}}
                 {
                     /// <summary>
-                    /// <inheritdoc cref="Yotei.Tools.CoreGenerator.IsNullable{T}"/>
+                    /// Used to decorate types for which nullability information needs to be persisted
+                    /// when such is not done in metadata or in compiler generated attributes, or when
+                    /// the compiler does not allow nullable annotations.
                     /// </summary>
                     public class IsNullable<T> { }
                     
                     /// <summary>
-                    /// <inheritdoc cref="IsNullable{T}"/>
+                    /// Used to decorate types for which nullability information needs to be persisted
+                    /// when such is not done in metadata or in compiler generated attributes, or when
+                    /// the compiler does not allow nullable annotations.
                     /// </summary>
                     [AttributeUsage(AttributeTargets.All)]
                     public class IsNullableAttribute : Attribute { }
@@ -88,7 +94,7 @@ internal class CoreGenerator : IIncrementalGenerator
                 """;
 
             context.AddEmbeddedAttributeDefinition();
-            context.AddSource("IsNullable[T].g.cs", str);
+            context.AddSource(ns + '.' + "IsNullable[T].g.cs", str);
         }
     }
 
@@ -127,15 +133,15 @@ internal class CoreGenerator : IIncrementalGenerator
     /// <param name="node"></param>
     /// <param name="token"></param>
     /// <returns></returns>
-    protected virtual bool SyntaxKindDiscriminator(SyntaxNode node, CancellationToken token)
+    protected virtual bool SyntaxKindPredicate(SyntaxNode node, CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
 
         return
-            (node is TypeDeclarationSyntax && UseTypeKind) ||
-            (node is PropertyDeclarationSyntax && UsePropertyKind) ||
-            (node is FieldDeclarationSyntax && UseFieldKind) ||
-            (node is MethodDeclarationSyntax && UseMethodKind);
+            (node is BaseTypeDeclarationSyntax && UseTypeKind) ||
+            (node is BasePropertyDeclarationSyntax && UsePropertyKind) ||
+            (node is BaseFieldDeclarationSyntax && UseFieldKind) ||
+            (node is BaseMethodDeclarationSyntax && UseMethodKind);
     }
 
     // ----------------------------------------------------
