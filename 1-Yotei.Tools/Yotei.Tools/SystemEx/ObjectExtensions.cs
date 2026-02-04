@@ -13,7 +13,7 @@ public static class ObjectExtensions
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T ThrowWhenNull<T>(
-        [AllowNull] this T source,
+        [AllowNull, NotNull] this T source,
         [CallerArgumentExpression(nameof(source))] string? description = null)
     {
         if (string.IsNullOrWhiteSpace(description)) description = nameof(source);

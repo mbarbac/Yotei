@@ -9,22 +9,6 @@
     <Import_RootNamespace>Yotei.Tools.CoreGenerator</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Candidates\Elements\FieldCandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Candidates\Elements\MethodCandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Candidates\Elements\PropertyCandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Candidates\Elements\TypeCandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Candidates\ICandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Candidates\ErrorCandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\CoreError.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\CoreErrorExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\CoreGenerator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Nodes\Elements\FieldNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Nodes\Elements\MethodNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Nodes\Elements\PropertyNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Nodes\Elements\TypeNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\Nodes\INode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\CodeBuilder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Core\__.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\ArgumentExceptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\ArgumentNullException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\IndexOutOfRangeException.cs" />
@@ -48,17 +32,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\Index.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\HashCode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\NullableAttribute.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx2\IsNullable.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx2\NullableTypeExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx2\ChainExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\TypeSyntaxExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\TypeSymbolExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\SymbolExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\DiagnosticExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\SyntaxListExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\AttributeDataExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\NameSyntaxExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\NamedTypeSymbolExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CharExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\ObjectExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\StringExtensions.cs" />
