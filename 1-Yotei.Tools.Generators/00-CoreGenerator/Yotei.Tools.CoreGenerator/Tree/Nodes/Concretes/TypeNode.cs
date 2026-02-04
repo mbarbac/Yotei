@@ -42,7 +42,7 @@ internal class TypeNode : ITreeNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// Determines if this instance was created just to hold its child elements.
+    /// Determines if this instance was created only to hold its child elements.
     /// </summary>
     public bool IsChildsOnly { get; init; }
 
