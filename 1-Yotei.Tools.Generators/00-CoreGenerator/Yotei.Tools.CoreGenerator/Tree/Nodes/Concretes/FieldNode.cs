@@ -22,13 +22,21 @@ internal class FieldNode : ITreeNode
     // ----------------------------------------------------
 
     /// <summary>
+    /// The node representing the parent type of this instance in the source code generation tree,
+    /// or <see langword="null"/> if not yet captured into it. Its symbol might not neccesarily be
+    /// the containing type of this one.
+    /// </summary>
+    public TypeNode? ParentNode { get; set; }
+
+    /// <summary>
     /// The symbol this instance is associated with.
     /// </summary>
     public IFieldSymbol Symbol { get; }
 
     /// <summary>
     /// By default, the collection of syntax nodes where the associated symbol was found, or an
-    /// empty one. Its members are instances of the <see cref="FieldDeclarationSyntax"/> type.
+    /// empty one. Its members are by default instances of the <see cref="FieldDeclarationSyntax"/>
+    /// type.
     /// </summary>
     public List<FieldDeclarationSyntax> SyntaxNodes { get; } = [];
 
