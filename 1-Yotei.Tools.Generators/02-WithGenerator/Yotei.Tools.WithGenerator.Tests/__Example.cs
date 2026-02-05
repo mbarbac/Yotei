@@ -1,26 +1,14 @@
-﻿namespace Yotei.Tools.WithGenerator.Tests;
+﻿
 
-// ========================================================
-//[Enforced]
-public static partial class Test_Example
+namespace ns1.ns2
 {
-    public class TypeA<T>
+    namespace ns3.ns4
     {
-        public TypeA(string? name) => Name = name;
-        protected TypeA(TypeA<T> source) => Name = source.Name;
-        [With] public string? Name { get; init => field = value.NotNullNotEmpty(true); }
-    }
+        using Yotei.Tools.WithGenerator;
 
-    [InheritsWith]
-    public partial class TypeB<T> : TypeA<T>
-    {
-        public TypeB(string? name) : base(name) { }
-        protected TypeB(TypeB<T> source) : base(source) { }
-    }
+        public partial class Tp1<T> { }
 
-    //[Enforced]
-    [Fact]
-    public static void Test()
-    {
+        [InheritsWith]
+        public partial class Tp2<T> : Tp1<T?> { }
     }
 }

@@ -345,14 +345,7 @@ internal class TypeNode : ITreeNode
             _ => throw new ArgumentException("Type kind not supported.").WithData(symbol.Name)
         };
 
-        var goptions = new EasyNamedType()
-        { UseNamespace = true, UseSpecialNames = true, NullableStyle = NullableStyle.UseAnnotations };
-
-        var name = symbol.EasyName();
-
-
-
-        
+        var name = EasyType.Default.EasyName(symbol);
         return $"partial {rec}{kind} {name}";
     }
 

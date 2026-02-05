@@ -50,10 +50,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\DebugExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\StringSpanExtensions_Char.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\StringComparerExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyNamespace.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeEx\IsNullableAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeEx\IsNullable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeEx\ChainExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyNamedType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeEx\NullableStyle.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\EventNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\FieldNode.cs" />
