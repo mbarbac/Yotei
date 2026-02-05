@@ -45,7 +45,7 @@ internal class CodeBuilder
         get;
         set => field = value >= 0 ? value
             : throw new ArgumentException($"Invalid Indent Level: {value}");
-    } = 2;
+    } = 4;
 
     // ----------------------------------------------------
 

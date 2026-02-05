@@ -34,7 +34,7 @@
 
 	<PropertyGroup>
 		<!--If the following line is uncommented, public types may not be reachable-->
-		<!--<IncludeBuildOutput>false</IncludeBuildOutput>-->
+		<IncludeBuildOutput>false</IncludeBuildOutput>
 		<DefineConstants>$(DefineConstants);DEBUG_WITH_GENERATOR </DefineConstants>
 	</PropertyGroup>
 
@@ -47,10 +47,6 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
 		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Public\" />
 	</ItemGroup>
 
 </Project>

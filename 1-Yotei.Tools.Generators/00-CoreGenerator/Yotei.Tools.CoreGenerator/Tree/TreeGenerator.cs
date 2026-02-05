@@ -16,7 +16,7 @@
 /// value is used as that attribute's argument.
 /// </para>
 /// </summary>
-internal class TreeGenerator
+internal class TreeGenerator //: IIncrementalGenerator
 {
     static readonly SymbolEqualityComparer Comparer = SymbolEqualityComparer.Default;
 
@@ -536,7 +536,9 @@ internal class TreeGenerator
         parts.Add(name[last..]);
 
         parts.Reverse();
-        return string.Join(".", parts);
+        var str = string.Join(".", parts);
+        str = str.Replace('<', '[').Replace('>', ']');
+        return str;
     }
 
     // ----------------------------------------------------

@@ -17,6 +17,8 @@
 		<ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Tests\Yotei.Tools.Tests.csproj" />
 		<ProjectReference Include="..\..\1-Yotei.Tools.AsyncLock\Yotei.Tools.AsyncLock.Tests\Yotei.Tools.AsyncLock.Tests.csproj" />
 		<ProjectReference Include="..\..\1-Yotei.Tools.DynamicLambda\Yotei.Tools.DynamicLambda.Tests\Yotei.Tools.DynamicLambda.Tests.csproj" />
+		<ProjectReference Include="..\..\1-Yotei.Tools.Generators\01-CloneGenerator\Yotei.Tools.CloneGenerator.Tests\Yotei.Tools.CloneGenerator.Tests.csproj" />
+		<ProjectReference Include="..\..\1-Yotei.Tools.Generators\02-WithGenerator\Yotei.Tools.WithGenerator.Tests\Yotei.Tools.WithGenerator.Tests.csproj" />
 	</ItemGroup>
 
 </Project>
