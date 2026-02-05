@@ -344,7 +344,15 @@ internal class TypeNode : ITreeNode
             TypeKind.Interface => "interface",
             _ => throw new ArgumentException("Type kind not supported.").WithData(symbol.Name)
         };
-        var name = symbol.Name;
+
+        var goptions = new EasyNamedType()
+        { UseNamespace = true, UseSpecialNames = true, NullableStyle = NullableStyle.UseAnnotations };
+
+        var name = symbol.EasyName();
+
+
+
+        
         return $"partial {rec}{kind} {name}";
     }
 

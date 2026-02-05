@@ -16,7 +16,7 @@
 /// value is used as that attribute's argument.
 /// </para>
 /// </summary>
-internal class TreeGenerator //: IIncrementalGenerator
+internal class TreeGenerator // : IIncrementalGenerator
 {
     static readonly SymbolEqualityComparer Comparer = SymbolEqualityComparer.Default;
 

@@ -53,6 +53,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)TreeEx\IsNullableAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeEx\IsNullable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeEx\ChainExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyNamedType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\NullableStyle.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\EventNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\FieldNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\MethodNode.cs" />

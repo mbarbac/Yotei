@@ -1,0 +1,12 @@
+public SymbolDisplayFormat(
+    SymbolDisplayGlobalNamespaceStyle globalNamespaceStyle = default(SymbolDisplayGlobalNamespaceStyle),
+    SymbolDisplayTypeQualificationStyle typeQualificationStyle = default(SymbolDisplayTypeQualificationStyle),
+    SymbolDisplayGenericsOptions genericsOptions = default(SymbolDisplayGenericsOptions),
+    SymbolDisplayMemberOptions memberOptions = default(SymbolDisplayMemberOptions),
+    SymbolDisplayDelegateStyle delegateStyle = default(SymbolDisplayDelegateStyle),
+    SymbolDisplayExtensionMethodStyle extensionMethodStyle = default(SymbolDisplayExtensionMethodStyle),
+    SymbolDisplayParameterOptions parameterOptions = default(SymbolDisplayParameterOptions),
+    SymbolDisplayPropertyStyle propertyStyle = default(SymbolDisplayPropertyStyle),
+    SymbolDisplayLocalOptions localOptions = default(SymbolDisplayLocalOptions),
+    SymbolDisplayKindOptions kindOptions = default(SymbolDisplayKindOptions),
+    SymbolDisplayMiscellaneousOptions miscellaneousOptions = default(SymbolDisplayMiscellaneousOptions))
