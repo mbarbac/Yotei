@@ -96,7 +96,10 @@ public static class Test_AsyncLock
         var tasks = new List<Task>(); for (int i = 0; i < NUM; i++)
         {
             var str = $"{i + 1}";
-            var task = Task.Run(() => Do_SyncSync(info, str, 0, -1));
+            var task = Task.Run(
+                () => Do_SyncSync(info, str, 0, -1),
+                TestContext.Current.CancellationToken);
+
             tasks.Add(task);
         }
         WaitOrThrow([.. tasks]);
@@ -110,7 +113,10 @@ public static class Test_AsyncLock
         var tasks = new List<Task>(); for (int i = 0; i < NUM; i++)
         {
             var str = $"{i + 1}";
-            var task = Task.Run(() => Do_SyncSync(info, str, 0, TIMEOUT));
+            var task = Task.Run(
+                () => Do_SyncSync(info, str, 0, TIMEOUT),
+                TestContext.Current.CancellationToken);
+            
             tasks.Add(task);
         }
         WaitOrThrow([.. tasks]);
@@ -169,7 +175,10 @@ public static class Test_AsyncLock
         var tasks = new List<Task>(); for (int i = 0; i < NUM; i++)
         {
             var str = $"{i + 1}";
-            var task = Task.Run(async () => await Do_AsyncAsync(info, str, 0, -1));
+            var task = Task.Run(
+                async () => await Do_AsyncAsync(info, str, 0, -1),
+                TestContext.Current.CancellationToken);
+
             tasks.Add(task);
         }
         WaitOrThrow([.. tasks]);
@@ -183,7 +192,10 @@ public static class Test_AsyncLock
         var tasks = new List<Task>(); for (int i = 0; i < NUM; i++)
         {
             var str = $"{i + 1}";
-            var task = Task.Run(async () => await Do_AsyncAsync(info, str, 0, TIMEOUT));
+            var task = Task.Run(
+                async () => await Do_AsyncAsync(info, str, 0, TIMEOUT),
+                TestContext.Current.CancellationToken);
+
             tasks.Add(task);
         }
         WaitOrThrow([.. tasks]);
@@ -234,7 +246,7 @@ public static class Test_AsyncLock
             else throw;
         }
     }
-    
+
     //[Enforced]
     [Fact]
     public static void Test_SyncAsync()
@@ -243,7 +255,10 @@ public static class Test_AsyncLock
         var tasks = new List<Task>(); for (int i = 0; i < NUM; i++)
         {
             var str = $"{i + 1}";
-            var task = Task.Run(() => Do_SyncAsync(info, str, 0, -1));
+            var task = Task.Run(
+                () => Do_SyncAsync(info, str, 0, -1),
+                TestContext.Current.CancellationToken);
+
             tasks.Add(task);
         }
         WaitOrThrow([.. tasks]);
@@ -257,7 +272,10 @@ public static class Test_AsyncLock
         var tasks = new List<Task>(); for (int i = 0; i < NUM; i++)
         {
             var str = $"{i + 1}";
-            var task = Task.Run(() => Do_SyncAsync(info, str, 0, TIMEOUT));
+            var task = Task.Run(
+                () => Do_SyncAsync(info, str, 0, TIMEOUT),
+                TestContext.Current.CancellationToken);
+
             tasks.Add(task);
         }
         WaitOrThrow([.. tasks]);
@@ -316,7 +334,10 @@ public static class Test_AsyncLock
         var tasks = new List<Task>(); for (int i = 0; i < NUM; i++)
         {
             var str = $"{i + 1}";
-            var task = Task.Run(() => Do_AsyncSync(info, str, 0, -1));
+            var task = Task.Run(
+                () => Do_AsyncSync(info, str, 0, -1),
+                TestContext.Current.CancellationToken);
+
             tasks.Add(task);
         }
         WaitOrThrow([.. tasks]);
@@ -330,7 +351,10 @@ public static class Test_AsyncLock
         var tasks = new List<Task>(); for (int i = 0; i < NUM; i++)
         {
             var str = $"{i + 1}";
-            var task = Task.Run(() => Do_AsyncSync(info, str, 0, TIMEOUT));
+            var task = Task.Run(
+                () => Do_AsyncSync(info, str, 0, TIMEOUT),
+                TestContext.Current.CancellationToken);
+
             tasks.Add(task);
         }
         WaitOrThrow([.. tasks]);

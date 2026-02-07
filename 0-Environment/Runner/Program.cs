@@ -39,7 +39,7 @@ internal class Program
         .Add(new MenuArtifacts())
         .Add(new MenuPackages());
 
-        var position = 0; do
+        int position; do
         {
             WriteLineEx(true);
             WriteLineEx(true, Green, FatSeparator);

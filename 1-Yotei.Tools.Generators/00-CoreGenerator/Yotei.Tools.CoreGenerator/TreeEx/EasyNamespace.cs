@@ -4,40 +4,15 @@
 internal record EasyNamespace
 {
     /// <summary>
-    /// If <see langword="true"/>, include the containing namespaces in the display string.
+    /// If <see langword="true"/>, include the host namespaces in the display string.
     /// </summary>
-    public bool UseContainingNamespace { get; set; }
+    public bool UseHostNamespace { get; set; }
 
     /// <summary>
     /// If <see langword="true"/>, include the 'global' namespace in the display string. This
-    /// setting is used only if the '<see cref="UseContainingNamespace"/>' one is enabled.
+    /// setting is used only if '<see cref="UseHostNamespace"/>' is enabled.
     /// </summary>
     public bool UseGlobalNamespace { get; set; }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Gets a new empty instance.
-    /// </summary>
-    public static EasyNamespace Empty => new();
-
-    /// <summary>
-    /// Gets a new default instance:
-    /// <br/>- Use containing namespaces but not the global one.
-    /// </summary>
-    public static EasyNamespace Default => new()
-    {
-        UseContainingNamespace = true
-    };
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Returns a display string for the given element using this options.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <returns></returns>
-    public string EasyName(INamespaceSymbol source) => source.EasyName(this);
 }
 
 // ========================================================
@@ -67,7 +42,8 @@ internal static partial class EasyNameExtensions
                 ns.Name != null &&
                 ns.Name.Length > 0) names.Add(ns.Name);
 
-            if (!options.UseContainingNamespace) break;
+            if (names.Count > 0 && !options.UseHostNamespace) break;
+            node = node.ContainingSymbol;
         }
 
         names.Reverse();
