@@ -4,14 +4,14 @@
 internal record EasyMethod
 {
     /// <summary>
-    /// Include the modifiers of the member (ie: static readonly).
-    /// </summary>
-    public bool UseModifiers { get; set; }
-
-    /// <summary>
     /// Include the accessibility modifiers of the member (ie: public).
     /// </summary>
     public bool UseAccessibility { get; set; }
+
+    /// <summary>
+    /// Include the modifiers of the member (ie: static readonly).
+    /// </summary>
+    public bool UseModifiers { get; set; }
 
     /// <summary>
     /// If not null, the options to include the return type of the member. If null, it is ignored.
@@ -22,6 +22,11 @@ internal record EasyMethod
     /// If not null, the options to include the host type of the member. If null, it is ignored.
     /// </summary>
     public EasyType? HostTypeOptions { get; set; }
+
+    /// <summary>
+    /// If the method is a constructor, includes also its CLR name.
+    /// </summary>
+    public bool UseTechName { get; set; }
 
     /// <summary>
     /// If not null, the options to include the generic arguments of the member, if any. If null,
@@ -38,6 +43,33 @@ internal record EasyMethod
     /// If not null, the options to include the parameters of the member. If null, they are ignored.
     /// </summary>
     public EasyParameter? ParameterOptions { get; set; }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns a new instance with a set of default settings.
+    /// </summary>
+    public static EasyMethod Default => new()
+    {
+        GenericOptions = EasyType.Default,
+        UseBrackets = true,
+        ParameterOptions = EasyParameter.Default,
+    };
+
+    /// <summary>
+    /// Returns a new instance with full settings.
+    /// </summary>
+    public static EasyMethod Full => new()
+    {
+        UseAccessibility = true,
+        UseModifiers = true,
+        ReturnTypeOptions = EasyType.Full,
+        HostTypeOptions = EasyType.Full,
+        UseTechName = true,
+        GenericOptions = EasyType.Full,
+        UseBrackets = true,
+        ParameterOptions = EasyParameter.Full,
+    };
 }
 
 // ========================================================
@@ -58,6 +90,157 @@ internal static partial class EasyNameExtensions
     /// <returns></returns>
     public static string EasyName(this IMethodSymbol source, EasyMethod options)
     {
-        throw null;
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(options);
+
+        if (source.ContainingType is null) throw new ArgumentException(
+            $"Element containing type is null: {source.Name}")
+            .WithData(source);
+
+        var sb = new StringBuilder();
+
+        // Header...
+        switch (source.MethodKind)
+        {
+            case MethodKind.Constructor:
+            case MethodKind.StaticConstructor:
+                DoConstructor(sb, source, options);
+                break;
+
+            case MethodKind.Ordinary:
+                DoOrdinary(sb, source, options);
+                break;
+
+            default: throw new NotSupportedException($"Method kind not supported: {source.Name}");
+        }
+
+        // Generic arguments...
+        if (options.GenericOptions != null)
+        {
+            var args = source.TypeArguments;
+            if (args.Length > 0)
+            {
+                sb.Append('<'); for (int i = 0; i < args.Length; i++)
+                {
+                    var xoptions = options.GenericOptions with { GenericOptions = options.GenericOptions };
+                    var arg = args[i];
+                    var str = EasyName(arg, xoptions);
+                    if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
+                    sb.Append(str);
+                }
+                sb.Append('>');
+            }
+        }
+
+        // Parameters...
+        if (options.UseBrackets || options.ParameterOptions != null)
+        {
+            sb.Append('('); if (options.ParameterOptions != null)
+            {
+                var args = source.Parameters;
+                if (args.Length > 0)
+                {
+                    for (int i = 0; i < args.Length; i++)
+                    {
+                        var arg = args[i];
+                        var str = EasyName(arg, options.ParameterOptions);
+                        if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
+                        sb.Append(str);
+                    }
+                }
+            }
+            sb.Append(')');
+        }
+
+        // Finishing...
+        return sb.ToString();
+
+        /// <summary>
+        /// Invoked to add the declared accesibility, if requested.
+        /// </summary>
+        static void AddAccesibility(StringBuilder sb, IMethodSymbol source, EasyMethod options)
+        {
+            if (options.UseAccessibility)
+            {
+                var str = source.DeclaredAccessibility switch
+                {
+                    Accessibility.Public => "public",
+                    Accessibility.Protected => "protected",
+                    Accessibility.Private => "private",
+                    Accessibility.Internal => "internal",
+                    Accessibility.ProtectedOrInternal => "protected internal",
+                    Accessibility.ProtectedAndInternal => "private protected",
+                    _ => null
+                };
+                if (str != null) sb.Append(str).Append(' ');
+            }
+        }
+
+        /// <summary>
+        /// Invoked when the method is a constructor.
+        /// </summary>
+        static void DoConstructor(StringBuilder sb, IMethodSymbol source, EasyMethod options)
+        {
+            if (source.MethodKind is MethodKind.Constructor) AddAccesibility(sb, source, options);
+
+            // Modifiers...
+            if (options.UseModifiers && (
+                source.MethodKind == MethodKind.StaticConstructor || source.IsStatic))
+                sb.Append("static ");
+
+            // Name...
+            var xoptions = options.HostTypeOptions ?? options.ReturnTypeOptions ?? new();
+            xoptions = xoptions with { HideName = false };
+
+            var host = source.ContainingType;
+            var str = EasyName(host, xoptions);
+            sb.Append(str);
+            if (options.UseTechName) sb.Append(source.Name);
+        }
+
+        /// <summary>
+        /// Invoked when the method is regular one.
+        /// </summary>
+        static void DoOrdinary(StringBuilder sb, IMethodSymbol source, EasyMethod options)
+        {
+            // Header...
+            AddAccesibility(sb, source, options);
+
+            // Modifiers...
+            if (options.UseModifiers && options.ReturnTypeOptions != null)
+            {
+                if (source.IsSealed) sb.Append("sealed ");
+                if (source.IsStatic) sb.Append("static ");
+
+                var str = source.RefKind switch
+                {
+                    RefKind.Ref => "ref",
+                    RefKind.Out => "out",
+                    RefKind.In => "ref readonly",
+                    _ => null
+                };
+                if (str != null) sb.Append(str).Append(' ');
+            }
+
+            // Return type...
+            if (options.ReturnTypeOptions != null)
+            {
+                var xoptions = options.ReturnTypeOptions with { HideName = false };
+                var str = source.ReturnType.EasyName(xoptions);
+                sb.Append(str).Append(' ');
+            }
+
+            // Host type...
+            var host = source.ContainingType;
+            if (options.HostTypeOptions != null && host != null)
+            {
+                var xoptions = options.HostTypeOptions with { HideName = false };
+                var str = host.EasyName(xoptions);
+                sb.Append(str).Append('.');
+            }
+
+            // Name...
+            sb.Append(source.Name);
+        }
     }
 }

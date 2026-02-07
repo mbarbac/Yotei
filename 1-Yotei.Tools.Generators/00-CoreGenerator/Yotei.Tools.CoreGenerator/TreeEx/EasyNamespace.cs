@@ -13,6 +13,25 @@ internal record EasyNamespace
     /// '<see cref="UseHostNamespace"/>' one is enabled.
     /// </summary>
     public bool UseGlobalNamespace { get; set; }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns a new instance with a set of default settings.
+    /// </summary>
+    public static EasyNamespace Default => new()
+    {
+        UseHostNamespace = true,
+    };
+
+    /// <summary>
+    /// Returns a new instance with a full settings.
+    /// </summary>
+    public static EasyNamespace Full => new()
+    {
+        UseHostNamespace = true,
+        UseGlobalNamespace = true,
+    };
 }
 
 // ========================================================

@@ -31,6 +31,10 @@ internal class WithGenerator : TreeGenerator
     /// </summary>
     protected override bool UseFieldKind => true;
 
+    // DEBUG-ONLY...
+    protected override bool UseMethodKind => true;
+    protected override bool UseEventKind => true;
+
     // ----------------------------------------------------
 
     /// <summary>
@@ -38,21 +42,36 @@ internal class WithGenerator : TreeGenerator
     /// </summary>
     protected override List<Type> TypeAttributes { get; } = [
         typeof(InheritsWithAttribute),
-        typeof(InheritsWithAttribute<>),];
+        typeof(InheritsWithAttribute<>),
+        typeof(ExampleAttribute) // DEBUG-ONLY...
+    ];
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     protected override List<Type> PropertyAttributes { get; } = [
         typeof(WithAttribute),
-        typeof(WithAttribute<>),];
+        typeof(WithAttribute<>),
+        typeof(ExampleAttribute) // DEBUG-ONLY...
+    ];
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     protected override List<Type> FieldAttributes { get; } = [
         typeof(WithAttribute),
-        typeof(WithAttribute<>),];
+        typeof(WithAttribute<>),
+        typeof(ExampleAttribute) // DEBUG-ONLY...
+    ];
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    protected override List<Type> MethodAttributes { get; } = [
+        typeof(WithAttribute),
+        typeof(WithAttribute<>),
+        typeof(ExampleAttribute) // DEBUG-ONLY...
+    ];
 
     // ----------------------------------------------------
 

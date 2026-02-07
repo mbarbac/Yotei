@@ -48,6 +48,46 @@ internal record EasyType
     /// then they are ignored.
     /// </summary>
     public EasyType? GenericOptions { get; set; }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns a new instance with a set of default settings.
+    /// </summary>
+    public static EasyType Default => new()
+    {
+        NamespaceOptions = EasyNamespace.Default,
+        UseSpecialNames = true,
+        NullableStyle = NullableStyle.UseAnnotations,
+        GenericOptions = new()
+        {
+            NamespaceOptions = EasyNamespace.Default,
+            UseSpecialNames = true,
+            NullableStyle = NullableStyle.UseAnnotations,
+        }
+    };
+
+    /// <summary>
+    /// Returns a new instance with full settings.
+    /// <br/> The <see cref="HideName"/> and <see cref="RemoveAttributeSuffix"/> ones are not
+    /// enabled.
+    /// </summary>
+    public static EasyType Full => new()
+    {
+        UseVariance = true,
+        NamespaceOptions = EasyNamespace.Full,
+        UseHost = true,
+        UseSpecialNames = true,
+        NullableStyle = NullableStyle.KeepWrappers,
+        GenericOptions = new()
+        {
+            UseVariance = true,
+            NamespaceOptions = EasyNamespace.Full,
+            UseHost = true,
+            UseSpecialNames = true,
+            NullableStyle = NullableStyle.KeepWrappers,
+        }
+    };
 }
 
 // ========================================================

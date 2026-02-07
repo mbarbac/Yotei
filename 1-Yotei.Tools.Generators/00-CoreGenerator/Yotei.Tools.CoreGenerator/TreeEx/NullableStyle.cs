@@ -21,5 +21,5 @@ internal enum NullableStyle
     /// Expand the <see cref="Nullable{T}"/> and <see cref="IsNullable{T}"/> wrappers instead
     /// of using the nullability annotations.
     /// </summary>
-    UseWrappers,
+    KeepWrappers,
 }

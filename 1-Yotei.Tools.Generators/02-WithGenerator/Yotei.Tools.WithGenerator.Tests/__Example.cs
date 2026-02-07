@@ -6,13 +6,12 @@ namespace ns1.ns2
     {
         using Yotei.Tools.WithGenerator;
 
-        //[InheritsWith]
         public partial class Tp1<T> { }
 
-        [InheritsWith]
         public partial class Tp2<T> : Tp1<T>
         {
-            public T? Name { get; }
+            [Example]
+            public static ref readonly int Name(out int name) => throw null;
         }
     }
 }

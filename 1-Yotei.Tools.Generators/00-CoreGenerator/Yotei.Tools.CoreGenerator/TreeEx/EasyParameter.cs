@@ -29,11 +29,48 @@ internal record EasyParameter
     /// <see cref="UseName"/> one is also enabled.
     /// </summary>
     public bool UseDefaultValue { get; set; }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns a new instance with a set of default settings.
+    /// </summary>
+    public static EasyParameter Default => new()
+    {
+        UseModifiers = true,
+        TypeOptions = EasyType.Default,
+    };
+
+    /// <summary>
+    /// Returns a new instance with full settings.
+    /// </summary>
+    public static EasyParameter Full => new()
+    {
+        UseThis = true,
+        UseModifiers = true,
+        TypeOptions = EasyType.Full,
+        UseName = true,
+        UseDefaultValue = true,
+    };
 }
 
 // ========================================================
 internal static partial class EasyNameExtensions
 {
+    /// <summary>
+    /// Gets a new format instance suitable for EasyName purposes.
+    /// </summary>
+    static SymbolDisplayFormat ToDisplayFormat(EasyParameter options)
+    {
+        var pars = default(SymbolDisplayParameterOptions);
+        if (options.UseThis) pars |= SymbolDisplayParameterOptions.IncludeExtensionThis;
+        if (options.UseModifiers) pars |= SymbolDisplayParameterOptions.IncludeModifiers;
+
+        return new SymbolDisplayFormat();
+    }
+
+    // ----------------------------------------------------
+
     /// <summary>
     /// Returns a display string for the given element using default options.
     /// </summary>
@@ -49,6 +86,8 @@ internal static partial class EasyNameExtensions
     /// <returns></returns>
     public static string EasyName(this IParameterSymbol source, EasyParameter options)
     {
-        throw null;
+        var format = ToDisplayFormat(options);
+        var name = source.ToDisplayString(format);
+        return name;
     }
 }
