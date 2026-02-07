@@ -4,51 +4,48 @@
 internal record EasyType
 {
     /// <summary>
-    /// If <see langword="true"/>, include the '<see langword="in"/>' and '<see langword="out"/>'
-    /// keywords before the type in the display string. This setting is only used with variant
-    /// type parameters.
+    /// Include the 'in' and 'out'  keywords in the display string. This setting is only used
+    /// with variant type parameters.
     /// </summary>
     public bool UseVariance { get; set; }
 
     /// <summary>
-    /// If not <see langword="null"/> the options to use to include the type's namespace in the
-    /// display string. If <see langword="null"/>, then it is ignored. If this setting is enabled,
-    /// then the <see cref="UseHosts"/> one is also enabled implicitly.
+    /// If not null, then the options to include the type's namespace. If null, it is ignored.
+    /// If this setting is enabled, then the <see cref="UseHosts"/> one is also implicitly enabled.
     /// </summary>
     public EasyNamespace? NamespaceOptions { get; set; }
 
     /// <summary>
-    /// If <see langword="true"/>, include the type's host ones in the display string. 
+    /// Include the type's host ones in the display string. 
     /// </summary>
     public bool UseHost { get; set; }
 
     /// <summary>
-    /// If <see langword="true"/>, returns an empty string. This setting is mostly used with the
-    /// generic arguments to obtain an anonymous list of generics. If this setting is enabled then
-    /// it shortcuts all other settings.
+    /// If enabled, hides the type's name by returning an empty string. This setting is almost only
+    /// used to obtain an anonymous list of generic arguments. If this setting is enabled then it
+    /// shortcuts all other settings.
     /// </summary>
     public bool HideName { get; set; }
 
     /// <summary>
-    /// If <see langword="true"/>, use prefined keywords for suitable special types (eg: <c>int</c>
-    /// instead of <c>Int32</c>).
+    /// If enabled, include the prefined keywords for suitable special types (eg: <c>int</c> instead
+    /// of <c>Int32</c>).
     /// </summary>
     public bool UseSpecialNames { get; set; }
 
     /// <summary>
-    /// If <see langword="true"/>, removes the 'Attribute' suffix from the type's display string,
-    /// if possible.
+    /// If enabled removes the 'Attribute' suffix from the type's display string, when possible.
     /// </summary>
     public bool RemoveAttributeSuffix { get; set; }
 
     /// <summary>
-    /// The nullable style to use.
+    /// Specifies the nhe nullable style to use.
     /// </summary>
     public NullableStyle NullableStyle { get; set; }
 
     /// <summary>
-    /// If not <see langword="null"/> the options to use to include the list of generic arguments
-    /// of the type in the display string. If <see langword="null"/>, then they are ignored.
+    /// If not null, then the options to include the list of generic arguments of the type. If null,
+    /// then they are ignored.
     /// </summary>
     public EasyType? GenericOptions { get; set; }
 }

@@ -3,6 +3,25 @@
 // ========================================================
 internal record EasyField
 {
+    /// <summary>
+    /// Include the modifiers of the member (ie: static readonly).
+    /// </summary>
+    public bool UseModifiers { get; set; }
+
+    /// <summary>
+    /// Include the accessibility modifiers of the member (ie: public).
+    /// </summary>
+    public bool UseAccessibility { get; set; }
+
+    /// <summary>
+    /// If not null, the options to include the type of the property. If null, it is ignored.
+    /// </summary>
+    public EasyType? ReturnTypeOptions { get; set; }
+
+    /// <summary>
+    /// If not null, the options to include the host type of the member. If null, it is ignored.
+    /// </summary>
+    public EasyType? HostTypeOptions { get; set; }
 }
 
 // ========================================================

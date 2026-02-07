@@ -4,13 +4,13 @@
 internal record EasyNamespace
 {
     /// <summary>
-    /// If <see langword="true"/>, include the host namespaces in the display string.
+    /// Include the host namespaces in the display string.
     /// </summary>
     public bool UseHostNamespace { get; set; }
 
     /// <summary>
-    /// If <see langword="true"/>, include the 'global' namespace in the display string. This
-    /// setting is used only if '<see cref="UseHostNamespace"/>' is enabled.
+    /// Include the 'global' namespace in the display string. This setting is used only if the
+    /// '<see cref="UseHostNamespace"/>' one is enabled.
     /// </summary>
     public bool UseGlobalNamespace { get; set; }
 }

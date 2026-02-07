@@ -10,9 +10,9 @@ namespace ns1.ns2
         public partial class Tp1<T> { }
 
         [InheritsWith]
-        public partial class Tp2 : Tp1<Tp1<int?>>
+        public partial class Tp2<T> : Tp1<T>
         {
-            public string? Name { get; }
+            public T? Name { get; }
         }
     }
 }
