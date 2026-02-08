@@ -63,6 +63,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeEx\NullableStyle.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyParameter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyCommon.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\EventNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\FieldNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\MethodNode.cs" />

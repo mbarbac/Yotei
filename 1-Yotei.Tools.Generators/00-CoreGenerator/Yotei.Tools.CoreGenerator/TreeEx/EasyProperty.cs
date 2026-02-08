@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools.CoreGenerator;
+﻿using System.Reflection.Metadata.Ecma335;
+
+namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
 internal record EasyProperty
@@ -65,16 +67,7 @@ internal record EasyProperty
 
 // ========================================================
 internal static partial class EasyNameExtensions
-{/// <summary>
- /// Gets a new format instance suitable for EasyName purposes.
- /// </summary>
-    static SymbolDisplayFormat ToDisplayFormat(EasyProperty options)
-    {
-        return new SymbolDisplayFormat();
-    }
-
-    // ----------------------------------------------------
-
+{
     /// <summary>
     /// Returns a display string for the given element using default options.
     /// </summary>
@@ -90,6 +83,125 @@ internal static partial class EasyNameExtensions
     /// <returns></returns>
     public static string EasyName(this IPropertySymbol source, EasyProperty options)
     {
-        throw null;
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(options);
+
+        var sb = new StringBuilder();
+        var host = source.ContainingType;
+        var format = ToDisplayFormat(options);
+        var head = source.ToDisplayString(format);
+
+        return head;
     }
+
+    /*
+
+            // Modifiers...
+            if (options.UseModifiers && options.ReturnTypeOptions != null)
+            {
+                if (source.IsSealed) sb.Append("sealed ");
+                if (source.IsStatic) sb.Append("static ");
+
+                var str = source.RefKind switch
+                {
+                    RefKind.Ref => "ref",
+                    RefKind.Out => "out",
+                    RefKind.In => "ref readonly",
+                    _ => null
+                };
+                if (str != null) sb.Append(str).Append(' ');
+            }
+
+            // Return type...
+            if (options.ReturnTypeOptions != null)
+            {
+                var xoptions = options.ReturnTypeOptions with { HideName = false };
+                var str = source.ReturnType.EasyName(xoptions);
+                sb.Append(str).Append(' ');
+            }
+
+            // Host type...
+            var host = source.ContainingType;
+            if (options.HostTypeOptions != null && host != null)
+            {
+                var xoptions = options.HostTypeOptions with { HideName = false };
+                var str = host.EasyName(xoptions);
+                sb.Append(str).Append('.');
+            }
+
+            // Name...
+            sb.Append(source.Name);
+        }
+
+
+
+        // Generic arguments...
+        if (options.GenericOptions != null)
+        {
+            var args = source.TypeArguments;
+            if (args.Length > 0)
+            {
+                sb.Append('<'); for (int i = 0; i < args.Length; i++)
+                {
+                    var xoptions = options.GenericOptions with { GenericOptions = options.GenericOptions };
+                    var arg = args[i];
+                    var str = EasyName(arg, xoptions);
+                    if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
+                    sb.Append(str);
+                }
+                sb.Append('>');
+            }
+        }
+
+        // Parameters...
+        if (options.UseBrackets || options.ParameterOptions != null)
+        {
+            sb.Append('('); if (options.ParameterOptions != null)
+            {
+                var args = source.Parameters;
+                if (args.Length > 0)
+                {
+                    for (int i = 0; i < args.Length; i++)
+                    {
+                        var arg = args[i];
+                        var str = EasyName(arg, options.ParameterOptions);
+                        if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
+                        sb.Append(str);
+                    }
+                }
+            }
+            sb.Append(')');
+        }
+
+        // Finishing...
+        return sb.ToString();
+
+        /// <summary>
+        /// Invoked when the method is a constructor.
+        /// </summary>
+        static void DoConstructor(StringBuilder sb, IMethodSymbol source, EasyMethod options)
+        {
+            if (source.MethodKind is MethodKind.Constructor && // Regular constructor only!
+                options.UseAccessibility)
+            {
+                var temp = source.DeclaredAccessibility.ToAccesibilityString();
+                if (temp != null) sb.Append(temp).Append(' ');
+            }
+
+            // Modifiers...
+            if (options.UseModifiers && (
+                source.MethodKind == MethodKind.StaticConstructor || source.IsStatic))
+                sb.Append("static ");
+
+            // Name...
+            var xoptions = options.HostTypeOptions ?? options.ReturnTypeOptions ?? new();
+            xoptions = xoptions with { HideName = false };
+
+            var host = source.ContainingType;
+            var str = EasyName(host, xoptions);
+            sb.Append(str);
+            if (options.UseTechName) sb.Append(source.Name);
+        }
+     
+     */
 }

@@ -351,6 +351,10 @@ internal class TreeGenerator : IIncrementalGenerator
             var ats = FilterAttributes(atx, TypeAttributes, TypeAttributeNames);
             if (ats.Count == 0) break;
 
+            // DEBUG-ONLY...
+            var options = EasyProperty.Default;
+            var str = symbol.EasyName(options);
+
             var candidate = CreateNode(symbol, syntax, ats, model);
             return candidate;
         }
@@ -388,10 +392,6 @@ internal class TreeGenerator : IIncrementalGenerator
             var atx = FindSyntaxAttributes(symbol, syntax);
             var ats = FilterAttributes(atx, TypeAttributes, TypeAttributeNames);
             if (ats.Count == 0) break;
-
-            // DEBUG-ONLY...
-            var options = EasyMethod.Default;
-            var str = symbol.EasyName(options);
 
             var candidate = CreateNode(symbol, syntax, ats, model);
             return candidate;

@@ -52,20 +52,6 @@ internal record EasyParameter
 internal static partial class EasyNameExtensions
 {
     /// <summary>
-    /// Gets a new format instance suitable for EasyName purposes.
-    /// </summary>
-    static SymbolDisplayFormat ToDisplayFormat(EasyParameter options)
-    {
-        var pars = default(SymbolDisplayParameterOptions);
-        if (options.UseThis) pars |= SymbolDisplayParameterOptions.IncludeExtensionThis;
-        if (options.UseModifiers) pars |= SymbolDisplayParameterOptions.IncludeModifiers;
-
-        return new SymbolDisplayFormat();
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
     /// Returns a display string for the given element using default options.
     /// </summary>
     /// <param name="source"></param>

@@ -79,6 +79,23 @@ internal record EasyMethod
 internal static partial class EasyNameExtensions
 {
     /// <summary>
+    /// Obtains the string that correspond to the given accesibility value, or null if any.
+    /// </summary>
+    /// <param name="value"></param>
+    public static string? ToAccesibilityString(this Accessibility value) => value switch
+    {
+        Accessibility.Public => "public",
+        Accessibility.Protected => "protected",
+        Accessibility.Private => "private",
+        Accessibility.Internal => "internal",
+        Accessibility.ProtectedOrInternal => "protected internal",
+        Accessibility.ProtectedAndInternal => "private protected",
+        _ => null
+    };
+
+    // ---------------------------------------------------
+
+    /// <summary>
     /// Returns a display string for the given element using default options.
     /// </summary>
     /// <param name="source"></param>
@@ -95,10 +112,6 @@ internal static partial class EasyNameExtensions
     {
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(options);
-
-        if (source.ContainingType is null) throw new ArgumentException(
-            $"Element containing type is null: {source.Name}")
-            .WithData(source);
 
         var sb = new StringBuilder();
 
@@ -159,32 +172,16 @@ internal static partial class EasyNameExtensions
         return sb.ToString();
 
         /// <summary>
-        /// Invoked to add the declared accesibility, if requested.
-        /// </summary>
-        static void AddAccesibility(StringBuilder sb, IMethodSymbol source, EasyMethod options)
-        {
-            if (options.UseAccessibility)
-            {
-                var str = source.DeclaredAccessibility switch
-                {
-                    Accessibility.Public => "public",
-                    Accessibility.Protected => "protected",
-                    Accessibility.Private => "private",
-                    Accessibility.Internal => "internal",
-                    Accessibility.ProtectedOrInternal => "protected internal",
-                    Accessibility.ProtectedAndInternal => "private protected",
-                    _ => null
-                };
-                if (str != null) sb.Append(str).Append(' ');
-            }
-        }
-
-        /// <summary>
         /// Invoked when the method is a constructor.
         /// </summary>
         static void DoConstructor(StringBuilder sb, IMethodSymbol source, EasyMethod options)
         {
-            if (source.MethodKind is MethodKind.Constructor) AddAccesibility(sb, source, options);
+            if (source.MethodKind is MethodKind.Constructor && // Regular constructor only!
+                options.UseAccessibility)
+            {
+                var temp = source.DeclaredAccessibility.ToAccesibilityString();
+                if (temp != null) sb.Append(temp).Append(' ');
+            }
 
             // Modifiers...
             if (options.UseModifiers && (
@@ -207,7 +204,11 @@ internal static partial class EasyNameExtensions
         static void DoOrdinary(StringBuilder sb, IMethodSymbol source, EasyMethod options)
         {
             // Header...
-            AddAccesibility(sb, source, options);
+            if (options.UseAccessibility)
+            {
+                var temp = source.DeclaredAccessibility.ToAccesibilityString();
+                if (temp != null) sb.Append(temp).Append(' ');
+            }
 
             // Modifiers...
             if (options.UseModifiers && options.ReturnTypeOptions != null)
