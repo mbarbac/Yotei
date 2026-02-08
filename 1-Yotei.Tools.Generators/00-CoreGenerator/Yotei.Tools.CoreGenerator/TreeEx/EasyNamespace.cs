@@ -17,7 +17,7 @@ internal record EasyNamespace
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a new instance with a set of default settings.
+    /// Returns a new instance with a set of default code generation settings.
     /// </summary>
     public static EasyNamespace Default => new()
     {

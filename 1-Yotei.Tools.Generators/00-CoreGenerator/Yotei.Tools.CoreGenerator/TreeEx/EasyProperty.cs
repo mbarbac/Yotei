@@ -38,11 +38,13 @@ internal record EasyProperty
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a new instance with a set of default settings.
+    /// Returns a new instance with a set of default code generation settings.
     /// </summary>
     public static EasyProperty Default => new()
     {
-        HostTypeOptions = EasyType.Default,
+        UseAccessibility = true,
+        UseModifiers = true,
+        ReturnTypeOptions = EasyType.Default,
         UseBrackets = true,
         ParameterOptions = EasyParameter.Default,
     };

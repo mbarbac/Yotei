@@ -24,19 +24,14 @@ internal record EasyParameter
     /// </summary>
     public bool UseName { get; set; }
 
-    /// <summary>
-    /// Include the default value of the parameter, if any. This setting is only used it the
-    /// <see cref="UseName"/> one is also enabled.
-    /// </summary>
-    public bool UseDefaultValue { get; set; }
-
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a new instance with a set of default settings.
+    /// Returns a new instance with a set of default code generation settings.
     /// </summary>
     public static EasyParameter Default => new()
     {
+        UseThis = true,
         UseModifiers = true,
         TypeOptions = EasyType.Default,
     };
@@ -50,7 +45,6 @@ internal record EasyParameter
         UseModifiers = true,
         TypeOptions = EasyType.Full,
         UseName = true,
-        UseDefaultValue = true,
     };
 }
 
@@ -86,8 +80,58 @@ internal static partial class EasyNameExtensions
     /// <returns></returns>
     public static string EasyName(this IParameterSymbol source, EasyParameter options)
     {
-        var format = ToDisplayFormat(options);
-        var name = source.ToDisplayString(format);
-        return name;
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(options);
+
+        var sb = new StringBuilder();
+
+        // With parameter type...
+        if (options.TypeOptions != null)
+        {
+            var xoptions = options.TypeOptions with { HideName = false };
+            var str = source.Type.EasyName(xoptions);
+            sb.Append(str);
+
+            while (!str.EndsWith('?') &&
+                xoptions.NullableStyle == NullableStyle.UseAnnotations &&
+                !IsNullableWrapper(source.Type))
+            {
+                if (source.NullableAnnotation == NullableAnnotation.Annotated) { sb.Append('?'); break; }
+                if (source.GetAttributes().Any(x => x.AttributeClass?.Name == nameof(NullableAttribute))) { sb.Append('?'); break; }
+                if (source.GetAttributes().Any(x => x.AttributeClass?.Name == nameof(IsNullableAttribute))) { sb.Append('?'); break; }
+                break;
+            }
+        }
+
+        // With parameter name...
+        if (options.UseName)
+        {
+            if (sb.Length > 0) sb.Append(' ');
+            sb.Append(source.Name);
+        }
+
+        // Modifiers and alike...
+        if (sb.Length > 0)
+        {
+            if (options.UseModifiers)
+            {
+                var str = source.RefKind switch
+                {
+                    RefKind.In => "in ",
+                    RefKind.Out => "out ",
+                    RefKind.Ref => "ref ",
+                    RefKind.RefReadOnlyParameter => "ref readonly ",
+                    _ => null,
+                };
+                if (str != null) sb.Insert(0, str);
+
+                if (source.IsParams) sb.Insert(0, "params ");
+                if (source.ScopedKind == ScopedKind.ScopedValue) sb.Insert(0, "scoped ");
+            }
+            if (options.UseThis && source.IsThis) sb.Insert(0, "this ");
+        }
+
+        // Finishing...
+        return sb.ToString();
     }
 }

@@ -390,7 +390,7 @@ internal class TreeGenerator : IIncrementalGenerator
             if (ats.Count == 0) break;
 
             // DEBUG-ONLY...
-            var options = EasyMethod.Full;
+            var options = EasyMethod.Default;
             var str = symbol.EasyName(options);
 
             var candidate = CreateNode(symbol, syntax, ats, model);

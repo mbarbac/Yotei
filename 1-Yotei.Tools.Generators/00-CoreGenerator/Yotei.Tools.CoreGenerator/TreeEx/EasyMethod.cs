@@ -47,10 +47,13 @@ internal record EasyMethod
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a new instance with a set of default settings.
+    /// Returns a new instance with a set of default code generation settings.
     /// </summary>
     public static EasyMethod Default => new()
     {
+        UseAccessibility = true,
+        UseModifiers = true,
+        ReturnTypeOptions = EasyType.Default,
         GenericOptions = EasyType.Default,
         UseBrackets = true,
         ParameterOptions = EasyParameter.Default,

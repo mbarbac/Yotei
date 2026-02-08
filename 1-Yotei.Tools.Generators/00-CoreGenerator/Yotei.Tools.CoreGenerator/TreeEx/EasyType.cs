@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools.CoreGenerator;
+﻿using System.Data;
+
+namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
 internal record EasyType
@@ -52,7 +54,7 @@ internal record EasyType
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a new instance with a set of default settings.
+    /// Returns a new instance with a set of default code generation settings.
     /// </summary>
     public static EasyType Default => new()
     {
@@ -114,6 +116,30 @@ internal static partial class EasyNameExtensions
         source.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T ||
         source.OriginalDefinition.Name == nameof(IsNullable<>));
 
+    /// <summary>
+    /// Returns the special-type string that correspond to the given type, or null if any.
+    /// </summary>
+    static string? ToSpecialName(INamedTypeSymbol source) => source.SpecialType switch
+    {
+        SpecialType.System_Object => "object",
+        SpecialType.System_Void => "void",
+        SpecialType.System_Boolean => "bool",
+        SpecialType.System_Char => "char",
+        SpecialType.System_SByte => "sbyte",
+        SpecialType.System_Byte => "byte",
+        SpecialType.System_UInt16 => "ushort",
+        SpecialType.System_Int16 => "short",
+        SpecialType.System_UInt32 => "uint",
+        SpecialType.System_Int32 => "int",
+        SpecialType.System_UInt64 => "ulong",
+        SpecialType.System_Int64 => "long",
+        SpecialType.System_Decimal => "decimal",
+        SpecialType.System_Single => "float",
+        SpecialType.System_Double => "double",
+        SpecialType.System_String => "string",
+        _ => null,
+    };
+
     // ----------------------------------------------------
 
     /// <summary>
@@ -135,8 +161,10 @@ internal static partial class EasyNameExtensions
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(options);
 
-        // Shortcuts...
+        // Shortcut hide name...
         if (options.HideName) return string.Empty;
+
+        // Shortcut type kinds...
         switch (source)
         {
             case IErrorTypeSymbol: return "<error>";
@@ -145,9 +173,16 @@ internal static partial class EasyNameExtensions
             case IFunctionPointerTypeSymbol item: return EasyNameTypeFunctionPointer(item, options);
         }
 
+        // Shortcut special name...
+        var named = source as INamedTypeSymbol;
+        if (named != null && named.Arity == 0 && options.UseSpecialNames)
+        {
+            var str = ToSpecialName(named);
+            if (str != null) return str;
+        }
+
         // Processing...
         var sb = new StringBuilder();
-        var named = source as INamedTypeSymbol;
         var isgen = source.TypeKind == TypeKind.TypeParameter;
         var args = named is null ? [] : named.TypeArguments;
         var host = source.ContainingType;
