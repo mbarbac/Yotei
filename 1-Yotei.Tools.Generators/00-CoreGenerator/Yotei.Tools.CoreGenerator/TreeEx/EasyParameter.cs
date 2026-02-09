@@ -78,16 +78,13 @@ internal static partial class EasyNameExtensions
             var str = source.Type.EasyName(xoptions);
             sb.Append(str);
 
-            while (!str.EndsWith('?') &&
+            if (!str.EndsWith('?') &&
                 xoptions.NullableStyle == NullableStyle.UseAnnotations &&
-                !IsNullableWrapper(source.Type))
-            {
-                if (source.NullableAnnotation == NullableAnnotation.Annotated) { sb.Append('?'); break; }
-                if (source.GetAttributes().Any(x => x.AttributeClass?.Name == nameof(NullableAttribute))) { sb.Append('?'); break; }
-                if (source.GetAttributes().Any(x => x.AttributeClass?.Name == nameof(IsNullableAttribute))) { sb.Append('?'); break; }
-                break;
-            }
+                source.Type.IsNullableDecorated() &&
+                !source.Type.IsNullableWrapper())
+                sb.Append('?');
         }
+
 
         // With parameter name...
         if (options.UseName)

@@ -79,23 +79,6 @@ internal record EasyMethod
 internal static partial class EasyNameExtensions
 {
     /// <summary>
-    /// Obtains the string that correspond to the given accesibility value, or null if any.
-    /// </summary>
-    /// <param name="value"></param>
-    public static string? ToAccesibilityString(this Accessibility value) => value switch
-    {
-        Accessibility.Public => "public",
-        Accessibility.Protected => "protected",
-        Accessibility.Private => "private",
-        Accessibility.Internal => "internal",
-        Accessibility.ProtectedOrInternal => "protected internal",
-        Accessibility.ProtectedAndInternal => "private protected",
-        _ => null
-    };
-
-    // ---------------------------------------------------
-
-    /// <summary>
     /// Returns a display string for the given element using default options.
     /// </summary>
     /// <param name="source"></param>
@@ -215,6 +198,11 @@ internal static partial class EasyNameExtensions
             {
                 if (source.IsSealed) sb.Append("sealed ");
                 if (source.IsStatic) sb.Append("static ");
+                if (source.IsVirtual) sb.Append("virtual ");
+                if (source.IsOverride) sb.Append("override ");
+                if (source.IsAbstract) sb.Append("abstract ");
+                if (source.IsNew) sb.Append("new ");
+                if (source.IsPartialDefinition) sb.Append("partial ");
 
                 var str = source.RefKind switch
                 {

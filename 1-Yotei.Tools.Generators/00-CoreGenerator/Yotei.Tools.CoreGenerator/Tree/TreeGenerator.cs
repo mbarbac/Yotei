@@ -105,36 +105,6 @@ internal class TreeGenerator : IIncrementalGenerator
     // ----------------------------------------------------
 
     /// <summary>
-    /// Determines if supported type-alike nodes shall be considered as potential candidates.
-    /// <br/> The default value of this setting is <see langword="false"/>.
-    /// </summary>
-    protected virtual bool UseTypeKind => false;
-
-    /// <summary>
-    /// Determines if supported property-alike nodes shall be considered as potential candidates.
-    /// <br/> The default value of this setting is <see langword="false"/>.
-    /// </summary>
-    protected virtual bool UsePropertyKind => false;
-
-    /// <summary>
-    /// Determines if supported field-alike nodes shall be considered as potential candidates.
-    /// <br/> The default value of this setting is <see langword="false"/>.
-    /// </summary>
-    protected virtual bool UseFieldKind => false;
-
-    /// <summary>
-    /// Determines if supported method-alike nodes shall be considered as potential candidates.
-    /// <br/> The default value of this setting is <see langword="false"/>.
-    /// </summary>
-    protected virtual bool UseMethodKind => false;
-
-    /// <summary>
-    /// Determines if supported event-alike nodes shall be considered as potential candidates.
-    /// <br/> The default value of this setting is <see langword="false"/>.
-    /// </summary>
-    protected virtual bool UseEventKind => false;
-
-    /// <summary>
     /// Invoked to quickly determine if the given syntax node shall be consider as a potential
     /// candidate for source code generation, or not. By default this method filters out those
     /// elements whose syntax kind is not allowed.
@@ -146,21 +116,15 @@ internal class TreeGenerator : IIncrementalGenerator
     {
         token.ThrowIfCancellationRequested();
 
-        return
-            (UseTypeKind && node is EnumDeclarationSyntax) ||
-            (UseTypeKind && node is TypeDeclarationSyntax) ||
-            (UsePropertyKind && node is IndexerDeclarationSyntax) ||
-            (UsePropertyKind && node is PropertyDeclarationSyntax) ||
-            (UseFieldKind && node is FieldDeclarationSyntax) ||
-            (UseMethodKind && node is ConstructorDeclarationSyntax) ||
-            (UseMethodKind && node is DestructorDeclarationSyntax) ||
-            (UseMethodKind && node is MethodDeclarationSyntax) ||
-            (UseMethodKind && node is ConversionOperatorDeclarationSyntax) ||
-            (UseMethodKind && node is OperatorDeclarationSyntax) ||
-            (UseEventKind && node is EventDeclarationSyntax) ||
-            (UseEventKind && node is EventFieldDeclarationSyntax);
+        return node is
+            BaseTypeDeclarationSyntax or
+            BasePropertyDeclarationSyntax or
+            BaseFieldDeclarationSyntax or
+            BaseMethodDeclarationSyntax or
+            EventDeclarationSyntax or
+            EventFieldDeclarationSyntax; // Covered by: BaseFieldDeclarationSyntax
     }
-    
+
     // ----------------------------------------------------
 
     /// <summary>
@@ -219,6 +183,12 @@ internal class TreeGenerator : IIncrementalGenerator
     /// to identify decorated methods as source code generation candidates.
     /// </summary>
     protected virtual List<string> MethodAttributeNames { get; } = [];
+
+    /// <summary>
+    /// The collection of fully qualified attribute type names used by this generator, by default,
+    /// to identify decorated events as source code generation candidates.
+    /// </summary>
+    protected virtual List<string> EventAttributeNames { get; } = [];
 
     // ----------------------------------------------------
 
@@ -351,10 +321,6 @@ internal class TreeGenerator : IIncrementalGenerator
             var ats = FilterAttributes(atx, TypeAttributes, TypeAttributeNames);
             if (ats.Count == 0) break;
 
-            // DEBUG-ONLY...
-            var options = EasyProperty.Default;
-            var str = symbol.EasyName(options);
-
             var candidate = CreateNode(symbol, syntax, ats, model);
             return candidate;
         }
@@ -392,6 +358,11 @@ internal class TreeGenerator : IIncrementalGenerator
             var atx = FindSyntaxAttributes(symbol, syntax);
             var ats = FilterAttributes(atx, TypeAttributes, TypeAttributeNames);
             if (ats.Count == 0) break;
+
+            // DEBUG-ONLY...
+            var xoptions = EasyParameter.Default with { UseName = true };
+            var options = EasyMethod.Default with { ParameterOptions = xoptions };
+            var str = symbol.EasyName(options);
 
             var candidate = CreateNode(symbol, syntax, ats, model);
             return candidate;

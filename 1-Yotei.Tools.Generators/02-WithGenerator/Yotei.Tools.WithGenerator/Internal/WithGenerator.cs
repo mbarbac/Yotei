@@ -19,27 +19,6 @@ internal class WithGenerator : TreeGenerator
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    protected override bool UseTypeKind => true;
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    protected override bool UsePropertyKind => true;
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    protected override bool UseFieldKind => true;
-
-    // DEBUG-ONLY...
-    protected override bool UseMethodKind => true;
-    protected override bool UseEventKind => true;
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
     protected override List<Type> TypeAttributes { get; } = [
         typeof(InheritsWithAttribute),
         typeof(InheritsWithAttribute<>),

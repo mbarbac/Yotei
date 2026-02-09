@@ -26,6 +26,11 @@ internal record EasyProperty
     public EasyType? HostTypeOptions { get; set; }
 
     /// <summary>
+    /// If the property is an indexed one, use its CLR name instead of '<see langword="this"/>'.
+    /// </summary>
+    public bool UseTechName { get; set; }
+
+    /// <summary>
     /// If enabled, include member brackets, even if <see cref="ParameterOptions"/> is null. This
     /// setting is only used with indexed properties.
     /// </summary>
@@ -60,6 +65,7 @@ internal record EasyProperty
         UseModifiers = true,
         ReturnTypeOptions = EasyType.Full,
         HostTypeOptions = EasyType.Full,
+        UseTechName = true,
         UseBrackets = true,
         ParameterOptions = EasyParameter.Full,
     };
@@ -88,120 +94,74 @@ internal static partial class EasyNameExtensions
 
         var sb = new StringBuilder();
         var host = source.ContainingType;
-        var format = ToDisplayFormat(options);
-        var head = source.ToDisplayString(format);
 
-        return head;
-    }
-
-    /*
-
-            // Modifiers...
-            if (options.UseModifiers && options.ReturnTypeOptions != null)
-            {
-                if (source.IsSealed) sb.Append("sealed ");
-                if (source.IsStatic) sb.Append("static ");
-
-                var str = source.RefKind switch
-                {
-                    RefKind.Ref => "ref",
-                    RefKind.Out => "out",
-                    RefKind.In => "ref readonly",
-                    _ => null
-                };
-                if (str != null) sb.Append(str).Append(' ');
-            }
-
-            // Return type...
-            if (options.ReturnTypeOptions != null)
-            {
-                var xoptions = options.ReturnTypeOptions with { HideName = false };
-                var str = source.ReturnType.EasyName(xoptions);
-                sb.Append(str).Append(' ');
-            }
-
-            // Host type...
-            var host = source.ContainingType;
-            if (options.HostTypeOptions != null && host != null)
-            {
-                var xoptions = options.HostTypeOptions with { HideName = false };
-                var str = host.EasyName(xoptions);
-                sb.Append(str).Append('.');
-            }
-
-            // Name...
-            sb.Append(source.Name);
+        // Accessibility...
+        if (options.UseAccessibility)
+        {
+            var temp = source.DeclaredAccessibility.ToAccesibilityString();
+            if (temp != null) sb.Append(temp).Append(' ');
         }
 
-
-
-        // Generic arguments...
-        if (options.GenericOptions != null)
+        // Modifiers...
+        if (options.UseModifiers && options.ReturnTypeOptions != null)
         {
-            var args = source.TypeArguments;
-            if (args.Length > 0)
+            if (source.IsSealed) sb.Append("sealed ");
+            if (source.IsStatic) sb.Append("static ");
+            if (source.IsVirtual) sb.Append("virtual ");
+            if (source.IsOverride) sb.Append("override ");
+            if (source.IsAbstract) sb.Append("abstract ");
+            if (source.IsNew) sb.Append("new ");
+            if (source.IsPartialDefinition) sb.Append("partial ");
+
+            var str = source.RefKind switch
             {
-                sb.Append('<'); for (int i = 0; i < args.Length; i++)
+                RefKind.Ref => "ref",
+                RefKind.Out => "out",
+                RefKind.In => "ref readonly",
+                _ => null
+            };
+            if (str != null) sb.Append(str).Append(' ');
+        }
+
+        // Return type...
+        if (options.ReturnTypeOptions != null)
+        {
+            var xoptions = options.ReturnTypeOptions with { HideName = false };
+            var str = source.Type.EasyName(xoptions);
+            sb.Append(str).Append(' ');
+        }
+
+        // Host type...
+        if (options.HostTypeOptions != null && host != null)
+        {
+            var xoptions = options.HostTypeOptions with { HideName = false };
+            var str = host.EasyName(xoptions);
+            sb.Append(str).Append('.');
+        }
+
+        // Name...
+        var name = source.Name;
+        var args = source.Parameters;
+        if (args.Length > 0 && !options.UseTechName) name = "this";
+        sb.Append(name);
+
+        // Parameters...
+        if (args.Length > 0 && (options.UseBrackets || options.ParameterOptions != null))
+        {
+            sb.Append('['); if (options.ParameterOptions != null)
+            {
+                for (int i = 0; i < args.Length; i++)
                 {
-                    var xoptions = options.GenericOptions with { GenericOptions = options.GenericOptions };
                     var arg = args[i];
-                    var str = EasyName(arg, xoptions);
+                    var str = EasyName(arg, options.ParameterOptions);
                     if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
                     sb.Append(str);
                 }
-                sb.Append('>');
             }
-        }
-
-        // Parameters...
-        if (options.UseBrackets || options.ParameterOptions != null)
-        {
-            sb.Append('('); if (options.ParameterOptions != null)
-            {
-                var args = source.Parameters;
-                if (args.Length > 0)
-                {
-                    for (int i = 0; i < args.Length; i++)
-                    {
-                        var arg = args[i];
-                        var str = EasyName(arg, options.ParameterOptions);
-                        if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
-                        sb.Append(str);
-                    }
-                }
-            }
-            sb.Append(')');
+            sb.Append(']');
         }
 
         // Finishing...
         return sb.ToString();
-
-        /// <summary>
-        /// Invoked when the method is a constructor.
-        /// </summary>
-        static void DoConstructor(StringBuilder sb, IMethodSymbol source, EasyMethod options)
-        {
-            if (source.MethodKind is MethodKind.Constructor && // Regular constructor only!
-                options.UseAccessibility)
-            {
-                var temp = source.DeclaredAccessibility.ToAccesibilityString();
-                if (temp != null) sb.Append(temp).Append(' ');
-            }
-
-            // Modifiers...
-            if (options.UseModifiers && (
-                source.MethodKind == MethodKind.StaticConstructor || source.IsStatic))
-                sb.Append("static ");
-
-            // Name...
-            var xoptions = options.HostTypeOptions ?? options.ReturnTypeOptions ?? new();
-            xoptions = xoptions with { HideName = false };
-
-            var host = source.ContainingType;
-            var str = EasyName(host, xoptions);
-            sb.Append(str);
-            if (options.UseTechName) sb.Append(source.Name);
-        }
-     
-     */
+    }
 }

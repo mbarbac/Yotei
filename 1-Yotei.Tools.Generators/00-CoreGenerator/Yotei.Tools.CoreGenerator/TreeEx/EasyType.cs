@@ -142,7 +142,7 @@ internal static partial class EasyNameExtensions
         var named = source as INamedTypeSymbol;
         if (named != null && named.Arity == 0 && options.UseSpecialNames)
         {
-            var str = ToSpecialName(named);
+            var str = named.ToSpecialName();
             if (str != null) return str;
         }
 
@@ -153,7 +153,7 @@ internal static partial class EasyNameExtensions
         var host = source.ContainingType;
 
         // Shortcut nullable wrappers...
-        if (options.NullableStyle == NullableStyle.UseAnnotations && IsNullableWrapper(source))
+        if (options.NullableStyle == NullableStyle.UseAnnotations && source.IsNullableWrapper())
         {
             var arg = args[0];
             var str = EasyName(arg, options);
@@ -210,16 +210,10 @@ internal static partial class EasyNameExtensions
         }
 
         // Nullability...
-        while (!sb.EndsWith('?') && options.NullableStyle != NullableStyle.None)
-        {
-            if (source.NullableAnnotation == NullableAnnotation.Annotated)
-            { sb.Append('?'); break; }
-
-            if (source.GetAttributes().Any(x => x.AttributeClass?.Name == nameof(IsNullableAttribute)))
-            { sb.Append('?'); break; }
-
-            break;
-        }
+        if (!sb.EndsWith('?') &&
+            options.NullableStyle != NullableStyle.None &&
+            source.IsNullableDecorated())
+            sb.Append('?');
 
         // Finishing...
         return sb.ToString();
@@ -243,6 +237,8 @@ internal static partial class EasyNameExtensions
 
             if (source.GetAttributes().Any(x => x.AttributeClass?.Name == nameof(IsNullableAttribute)))
             { name += '?'; break; }
+
+            break;
         }
         return name;
     }
@@ -264,6 +260,8 @@ internal static partial class EasyNameExtensions
 
             if (source.GetAttributes().Any(x => x.AttributeClass?.Name == nameof(IsNullableAttribute)))
             { name += '?'; break; }
+
+            break;
         }
         name += '*';
         return name;

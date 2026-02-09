@@ -6,16 +6,47 @@ internal static partial class EasyNameExtensions
     /// <summary>
     /// Determines if the given type is a nullable wrapper or not.
     /// </summary>
-    static bool IsNullableWrapper(ITypeSymbol source) =>
+    public static bool IsNullableWrapper(this ITypeSymbol source) =>
         source is INamedTypeSymbol named &&
         named.Arity == 1 && (
         source.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T ||
         source.OriginalDefinition.Name == nameof(IsNullable<>));
 
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the given symbol is either decorated with a nullable annotation, or with
+    /// the <see cref="IsNullableAttribute"/>.
+    /// </summary>
+    public static bool IsNullableDecorated(this ISymbol source)
+    {
+        var annotated = source switch
+        {
+            ITypeSymbol item => item.NullableAnnotation == NullableAnnotation.Annotated,
+            IPropertySymbol item => item.NullableAnnotation == NullableAnnotation.Annotated,
+            IFieldSymbol item => item.NullableAnnotation == NullableAnnotation.Annotated,
+            IEventSymbol item => item.NullableAnnotation == NullableAnnotation.Annotated,
+            _ => false
+        };
+        if (annotated) return true;
+
+        if (source.GetAttributes().Any(
+            x => x.AttributeClass?.Name == nameof(NullableAttribute)))
+            return true;
+
+        if (source.GetAttributes().Any(
+            x => x.AttributeClass?.Name == nameof(IsNullableAttribute)))
+            return true;
+
+        return false;
+    }
+
+    // ----------------------------------------------------
+
     /// <summary>
     /// Returns the special-type string that correspond to the given type, or null if any.
     /// </summary>
-    static string? ToSpecialName(INamedTypeSymbol source) => source.SpecialType switch
+    public static string? ToSpecialName(this INamedTypeSymbol source) => source.SpecialType switch
     {
         SpecialType.System_Object => "object",
         SpecialType.System_Void => "void",
@@ -35,4 +66,22 @@ internal static partial class EasyNameExtensions
         SpecialType.System_String => "string",
         _ => null,
     };
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Obtains the string that correspond to the given accesibility value, or null if any.
+    /// </summary>
+    /// <param name="value"></param>
+    public static string? ToAccesibilityString(
+        this Accessibility value, bool usePrivate = false) => value switch
+        {
+            Accessibility.Public => "public",
+            Accessibility.Protected => "protected",
+            Accessibility.Private => usePrivate ? "private" : null,
+            Accessibility.Internal => "internal",
+            Accessibility.ProtectedOrInternal => "protected internal",
+            Accessibility.ProtectedAndInternal => "private protected",
+            _ => null
+        };
 }

@@ -90,5 +90,28 @@ internal static class SymbolExtensions
                 }
             }
         }
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Tries to determine if the symbol is decorated with the <see langword="new"/> keyword
+        /// by finding its declaring syntax references and in each finding the 'new' modifier.
+        /// <br/> If no syntax references were available, then it returns false.
+        /// </summary>
+        public bool IsNew
+        {
+            get
+            {
+                var syntaxes = symbol
+                    .DeclaringSyntaxReferences
+                    .Select(x => x.GetSyntax() as MethodDeclarationSyntax);
+
+                foreach (var syntax in syntaxes)
+                    if (syntax?.Modifiers.Any(x => x.IsKind(SyntaxKind.NewKeyword)) ?? false)
+                        return true;
+
+                return false;
+            }
+        }
     }
 }

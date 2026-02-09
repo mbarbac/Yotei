@@ -5,12 +5,11 @@ namespace ns1.ns2
     namespace ns3.ns4
     {
         using Yotei.Tools.WithGenerator;
-        
+
         public partial class Tp1<T>
         {
             [Example]
-            public ref readonly int Name => ref _Name;
-            int _Name;
+            void Name(params int?[]? ages) { }
         }
     }
 }
