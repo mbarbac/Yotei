@@ -56,7 +56,8 @@ internal static partial class EasyNameExtensions
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
-    public static string EasyName(this IParameterSymbol source) => source.EasyName(new());
+    public static string EasyName(
+        this IParameterSymbol source) => source.EasyName(EasyParameterSymbol.Default);
 
     /// <summary>
     /// Returns a display string for the given element using the given options.

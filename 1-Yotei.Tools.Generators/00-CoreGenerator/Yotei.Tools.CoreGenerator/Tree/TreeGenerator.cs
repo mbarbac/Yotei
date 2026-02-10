@@ -16,7 +16,7 @@
 /// value is used as that attribute's argument.
 /// </para>
 /// </summary>
-internal class TreeGenerator // : IIncrementalGenerator
+internal class TreeGenerator : IIncrementalGenerator
 {
     static readonly SymbolEqualityComparer Comparer = SymbolEqualityComparer.Default;
 
@@ -303,6 +303,11 @@ internal class TreeGenerator // : IIncrementalGenerator
             var atx = FindSyntaxAttributes(symbol, syntax);
             var ats = FilterAttributes(atx, TypeAttributes, TypeAttributeNames);
             if (ats.Count == 0) break;
+
+            // DEBUG-ONLY...
+            if (symbol.Name == "Tp1") { }
+            var at = ats[0];
+            var str = at.EasyName();
 
             var candidate = CreateNode(symbol, syntax, ats, model);
             return candidate;

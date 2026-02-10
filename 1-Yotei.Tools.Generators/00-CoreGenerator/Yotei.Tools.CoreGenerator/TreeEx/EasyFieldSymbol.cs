@@ -55,7 +55,8 @@ internal static partial class EasyNameExtensions
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
-    public static string EasyName(this IFieldSymbol source) => source.EasyName(new());
+    public static string EasyName(
+        this IFieldSymbol source) => source.EasyName(EasyFieldSymbol.Default);
 
     /// <summary>
     /// Returns a display string for the given element using the given options.
@@ -69,7 +70,7 @@ internal static partial class EasyNameExtensions
         ArgumentNullException.ThrowIfNull(options);
 
         var sb = new StringBuilder();
-        var host = source.ContainingType;
+        var host = source.ContainingType ?? throw new ArgumentException("Element's containing type is null.").WithData(source);
 
         // Accessibility...
         if (options.UseAccessibility)

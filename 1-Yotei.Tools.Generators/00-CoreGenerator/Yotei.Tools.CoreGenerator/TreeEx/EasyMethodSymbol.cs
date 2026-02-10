@@ -83,7 +83,8 @@ internal static partial class EasyNameExtensions
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
-    public static string EasyName(this IMethodSymbol source) => source.EasyName(new());
+    public static string EasyName(
+        this IMethodSymbol source) => source.EasyName(EasyMethodSymbol.Default);
 
     /// <summary>
     /// Returns a display string for the given element using the given options.
@@ -175,7 +176,7 @@ internal static partial class EasyNameExtensions
             var xoptions = options.HostTypeOptions ?? options.ReturnTypeOptions ?? new();
             xoptions = xoptions with { HideName = false };
 
-            var host = source.ContainingType;
+            var host = source.ContainingType ?? throw new ArgumentException("Element's containing type is null.").WithData(source);
             var str = EasyName(host, xoptions);
             sb.Append(str);
             if (options.UseTechName) sb.Append(source.Name);

@@ -6,11 +6,9 @@ namespace ns1.ns2
     {
         using Yotei.Tools.WithGenerator;
 
-        
-        public ref partial struct Tp1<T>
+        [InheritsWith<DateTime>()]
+        public partial class Tp1<T>
         {
-            [Example]
-            public volatile int Age;
         }
     }
 }

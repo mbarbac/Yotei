@@ -8,7 +8,7 @@
 /// </summary>
 /// <typeparam name="T"></typeparam>
 [AttributeUsage(
-    AttributeTargets.Property | AttributeTargets.Field,
+    AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface,
     Inherited = false,
     AllowMultiple = false)]
 public class InheritsWithAttribute<T> : Attribute

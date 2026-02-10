@@ -111,7 +111,8 @@ internal static partial class EasyNameExtensions
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
-    public static string EasyName(this ITypeSymbol source) => source.EasyName(new());
+    public static string EasyName(
+        this ITypeSymbol source) => source.EasyName(EasyTypeSymbol.Default);
 
     /// <summary>
     /// Returns a display string for the given element using the given options.
