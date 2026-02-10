@@ -19,10 +19,7 @@ internal record EasyNamespace
     /// <summary>
     /// Returns a new instance with a set of default code generation settings.
     /// </summary>
-    public static EasyNamespace Default => new()
-    {
-        UseHostNamespace = true,
-    };
+    public static EasyNamespace Default => new() { };
 
     /// <summary>
     /// Returns a new instance with a full settings.

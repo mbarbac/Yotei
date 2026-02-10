@@ -6,10 +6,11 @@ namespace ns1.ns2
     {
         using Yotei.Tools.WithGenerator;
 
-        public partial class Tp1<T>
+        
+        public ref partial struct Tp1<T>
         {
             [Example]
-            void Name(params int?[]? ages) { }
+            public volatile int Age;
         }
     }
 }

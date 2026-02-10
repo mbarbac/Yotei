@@ -56,7 +56,6 @@ internal record EasyType
     /// </summary>
     public static EasyType Default => new()
     {
-        NamespaceOptions = EasyNamespace.Default,
         UseSpecialNames = true,
         NullableStyle = NullableStyle.UseAnnotations,
         GenericOptions = new()

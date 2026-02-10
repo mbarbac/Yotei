@@ -359,11 +359,6 @@ internal class TreeGenerator : IIncrementalGenerator
             var ats = FilterAttributes(atx, TypeAttributes, TypeAttributeNames);
             if (ats.Count == 0) break;
 
-            // DEBUG-ONLY...
-            var xoptions = EasyParameter.Default with { UseName = true };
-            var options = EasyMethod.Default with { ParameterOptions = xoptions };
-            var str = symbol.EasyName(options);
-
             var candidate = CreateNode(symbol, syntax, ats, model);
             return candidate;
         }

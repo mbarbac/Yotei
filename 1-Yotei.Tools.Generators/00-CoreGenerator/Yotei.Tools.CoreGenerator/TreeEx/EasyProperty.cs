@@ -142,7 +142,7 @@ internal static partial class EasyNameExtensions
         // Name...
         var name = source.Name;
         var args = source.Parameters;
-        if (args.Length > 0 && !options.UseTechName) name = "this";
+        if (args.Length > 0) name = options.UseTechName ? source.MetadataName : "this";
         sb.Append(name);
 
         // Parameters...

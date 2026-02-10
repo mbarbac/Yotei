@@ -33,7 +33,6 @@ internal record EasyField
         UseAccessibility = true,
         UseModifiers = true,
         ReturnTypeOptions = EasyType.Default,
-        HostTypeOptions = EasyType.Default,
     };
 
     /// <summary>
@@ -50,16 +49,7 @@ internal record EasyField
 
 // ========================================================
 internal static partial class EasyNameExtensions
-{/// <summary>
- /// Gets a new format instance suitable for EasyName purposes.
- /// </summary>
-    static SymbolDisplayFormat ToDisplayFormat(EasyField options)
-    {
-        return new SymbolDisplayFormat();
-    }
-
-    // ----------------------------------------------------
-
+{
     /// <summary>
     /// Returns a display string for the given element using default options.
     /// </summary>
@@ -75,6 +65,56 @@ internal static partial class EasyNameExtensions
     /// <returns></returns>
     public static string EasyName(this IFieldSymbol source, EasyField options)
     {
-        throw null;
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(options);
+
+        var sb = new StringBuilder();
+        var host = source.ContainingType;
+
+        // Accessibility...
+        if (options.UseAccessibility)
+        {
+            var temp = source.DeclaredAccessibility.ToAccesibilityString();
+            if (temp != null) sb.Append(temp).Append(' ');
+        }
+
+        // Modifiers...
+        if (options.UseModifiers && options.ReturnTypeOptions != null)
+        {
+            if (source.IsSealed) sb.Append("sealed ");
+            if (source.IsStatic) sb.Append("static ");
+            if (source.IsNew) sb.Append("new ");
+            if (source.IsVolatile) sb.Append("volatile ");
+
+            var str = source.RefKind switch
+            {
+                RefKind.Ref => "ref",
+                RefKind.In => "ref readonly",
+                _ => null
+            };
+            if (str != null) sb.Append(str).Append(' ');
+        }
+
+        // Return type...
+        if (options.ReturnTypeOptions != null)
+        {
+            var xoptions = options.ReturnTypeOptions with { HideName = false };
+            var str = source.Type.EasyName(xoptions);
+            sb.Append(str).Append(' ');
+        }
+
+        // Host type...
+        if (options.HostTypeOptions != null && host != null)
+        {
+            var xoptions = options.HostTypeOptions with { HideName = false };
+            var str = host.EasyName(xoptions);
+            sb.Append(str).Append('.');
+        }
+
+        // Name...
+        sb.Append(source.Name);
+
+        // Finishing...
+        return sb.ToString();
     }
 }

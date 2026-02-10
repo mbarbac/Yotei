@@ -30,13 +30,9 @@ internal static partial class EasyNameExtensions
         };
         if (annotated) return true;
 
-        if (source.GetAttributes().Any(
-            x => x.AttributeClass?.Name == nameof(NullableAttribute)))
-            return true;
-
-        if (source.GetAttributes().Any(
-            x => x.AttributeClass?.Name == nameof(IsNullableAttribute)))
-            return true;
+        var ats = source.GetAttributes();
+        if (ats.Any(x => x.AttributeClass?.Name == nameof(NullableAttribute))) return true;
+        if (ats.Any(x => x.AttributeClass?.Name == nameof(IsNullableAttribute))) return true;
 
         return false;
     }
