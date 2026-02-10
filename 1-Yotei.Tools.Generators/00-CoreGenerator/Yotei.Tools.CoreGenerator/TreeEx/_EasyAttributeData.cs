@@ -1,7 +1,7 @@
 ﻿namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
-internal record EasyConstant
+internal record EasyAttributeData
 {
 }
 
@@ -13,7 +13,7 @@ internal static partial class EasyNameExtensions
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
-    public static string EasyName(this TypedConstant source) => source.EasyName(new());
+    public static string EasyName(this AttributeData source) => source.EasyName(new());
 
     /// <summary>
     /// Returns a display string for the given element using the given options.
@@ -21,7 +21,7 @@ internal static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this TypedConstant source, EasyConstant options)
+    public static string EasyName(this AttributeData source, EasyAttributeData options)
     {
         throw null;
     }

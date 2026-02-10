@@ -1,7 +1,7 @@
 ﻿namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
-internal record EasyMethod
+internal record EasyMethodSymbol
 {
     /// <summary>
     /// Include the accessibility modifiers of the member (ie: public).
@@ -16,12 +16,12 @@ internal record EasyMethod
     /// <summary>
     /// If not null, the options to include the return type of the member. If null, it is ignored.
     /// </summary>
-    public EasyType? ReturnTypeOptions { get; set; }
+    public EasyTypeSymbol? ReturnTypeOptions { get; set; }
 
     /// <summary>
     /// If not null, the options to include the host type of the member. If null, it is ignored.
     /// </summary>
-    public EasyType? HostTypeOptions { get; set; }
+    public EasyTypeSymbol? HostTypeOptions { get; set; }
 
     /// <summary>
     /// If the method is a constructor, includes also its CLR name.
@@ -32,7 +32,7 @@ internal record EasyMethod
     /// If not null, the options to include the generic arguments of the member, if any. If null,
     /// they are ignored.
     /// </summary>
-    public EasyType? GenericOptions { get; set; }
+    public EasyTypeSymbol? GenericOptions { get; set; }
 
     /// <summary>
     /// If enabled, include member brackets, even if <see cref="ParameterOptions"/> is null.
@@ -42,36 +42,36 @@ internal record EasyMethod
     /// <summary>
     /// If not null, the options to include the parameters of the member. If null, they are ignored.
     /// </summary>
-    public EasyParameter? ParameterOptions { get; set; }
+    public EasyParameterSymbol? ParameterOptions { get; set; }
 
     // ----------------------------------------------------
 
     /// <summary>
     /// Returns a new instance with a set of default code generation settings.
     /// </summary>
-    public static EasyMethod Default => new()
+    public static EasyMethodSymbol Default => new()
     {
         UseAccessibility = true,
         UseModifiers = true,
-        ReturnTypeOptions = EasyType.Default,
-        GenericOptions = EasyType.Default,
+        ReturnTypeOptions = EasyTypeSymbol.Default,
+        GenericOptions = EasyTypeSymbol.Default,
         UseBrackets = true,
-        ParameterOptions = EasyParameter.Default,
+        ParameterOptions = EasyParameterSymbol.Default,
     };
 
     /// <summary>
     /// Returns a new instance with full settings.
     /// </summary>
-    public static EasyMethod Full => new()
+    public static EasyMethodSymbol Full => new()
     {
         UseAccessibility = true,
         UseModifiers = true,
-        ReturnTypeOptions = EasyType.Full,
-        HostTypeOptions = EasyType.Full,
+        ReturnTypeOptions = EasyTypeSymbol.Full,
+        HostTypeOptions = EasyTypeSymbol.Full,
         UseTechName = true,
-        GenericOptions = EasyType.Full,
+        GenericOptions = EasyTypeSymbol.Full,
         UseBrackets = true,
-        ParameterOptions = EasyParameter.Full,
+        ParameterOptions = EasyParameterSymbol.Full,
     };
 }
 
@@ -91,7 +91,7 @@ internal static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this IMethodSymbol source, EasyMethod options)
+    public static string EasyName(this IMethodSymbol source, EasyMethodSymbol options)
     {
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(options);
@@ -157,7 +157,7 @@ internal static partial class EasyNameExtensions
         /// <summary>
         /// Invoked when the method is a constructor.
         /// </summary>
-        static void DoConstructor(StringBuilder sb, IMethodSymbol source, EasyMethod options)
+        static void DoConstructor(StringBuilder sb, IMethodSymbol source, EasyMethodSymbol options)
         {
             if (source.MethodKind is MethodKind.Constructor && // Regular constructor only!
                 options.UseAccessibility)
@@ -184,7 +184,7 @@ internal static partial class EasyNameExtensions
         /// <summary>
         /// Invoked when the method is regular one.
         /// </summary>
-        static void DoOrdinary(StringBuilder sb, IMethodSymbol source, EasyMethod options)
+        static void DoOrdinary(StringBuilder sb, IMethodSymbol source, EasyMethodSymbol options)
         {
             // Header...
             if (options.UseAccessibility)

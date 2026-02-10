@@ -1,7 +1,7 @@
 ﻿namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
-internal record EasyType
+internal record EasyTypeSymbol
 {
     /// <summary>
     /// Include the 'in' and 'out'  keywords in the display string. This setting is only used
@@ -13,7 +13,7 @@ internal record EasyType
     /// If not null, then the options to include the type's namespace. If null, it is ignored.
     /// If this setting is enabled, then the <see cref="UseHosts"/> one is also implicitly enabled.
     /// </summary>
-    public EasyNamespace? NamespaceOptions { get; set; }
+    public EasyNamespaceSymbol? NamespaceOptions { get; set; }
 
     /// <summary>
     /// Include the type's host ones in the display string. 
@@ -47,20 +47,20 @@ internal record EasyType
     /// If not null, then the options to include the list of generic arguments of the type. If null,
     /// then they are ignored.
     /// </summary>
-    public EasyType? GenericOptions { get; set; }
+    public EasyTypeSymbol? GenericOptions { get; set; }
 
     // ----------------------------------------------------
 
     /// <summary>
     /// Returns a new instance with a set of default code generation settings.
     /// </summary>
-    public static EasyType Default => new()
+    public static EasyTypeSymbol Default => new()
     {
         UseSpecialNames = true,
         NullableStyle = IsNullableStyle.UseAnnotations,
         GenericOptions = new()
         {
-            NamespaceOptions = EasyNamespace.Default,
+            NamespaceOptions = EasyNamespaceSymbol.Default,
             UseSpecialNames = true,
             NullableStyle = IsNullableStyle.UseAnnotations,
         }
@@ -71,17 +71,17 @@ internal record EasyType
     /// <br/> The <see cref="HideName"/> and <see cref="RemoveAttributeSuffix"/> ones are not
     /// enabled.
     /// </summary>
-    public static EasyType Full => new()
+    public static EasyTypeSymbol Full => new()
     {
         UseVariance = true,
-        NamespaceOptions = EasyNamespace.Full,
+        NamespaceOptions = EasyNamespaceSymbol.Full,
         UseHost = true,
         UseSpecialNames = true,
         NullableStyle = IsNullableStyle.KeepWrappers,
         GenericOptions = new()
         {
             UseVariance = true,
-            NamespaceOptions = EasyNamespace.Full,
+            NamespaceOptions = EasyNamespaceSymbol.Full,
             UseHost = true,
             UseSpecialNames = true,
             NullableStyle = IsNullableStyle.KeepWrappers,
@@ -95,7 +95,7 @@ internal static partial class EasyNameExtensions
     /// <summary>
     /// Gets a new format instance suitable for EasyName purposes.
     /// </summary>
-    static SymbolDisplayFormat ToDisplayFormat(EasyType options)
+    static SymbolDisplayFormat ToDisplayFormat(EasyTypeSymbol options)
     {
         var misc = default(SymbolDisplayMiscellaneousOptions);
         if (options.UseSpecialNames) misc |= SymbolDisplayMiscellaneousOptions.UseSpecialTypes;
@@ -119,8 +119,7 @@ internal static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    [SuppressMessage("", "IDE0019")]
-    public static string EasyName(this ITypeSymbol source, EasyType options)
+    public static string EasyName(this ITypeSymbol source, EasyTypeSymbol options)
     {
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(options);
@@ -223,7 +222,7 @@ internal static partial class EasyNameExtensions
     /// <summary>
     /// Invoked when the type represents an array (ie: string?[]?).
     /// </summary>
-    static string EasyNameTypeArray(IArrayTypeSymbol source, EasyType options)
+    static string EasyNameTypeArray(IArrayTypeSymbol source, EasyTypeSymbol options)
     {
         var type = source.ElementType;
         var name = EasyName(type, options);
@@ -247,7 +246,7 @@ internal static partial class EasyNameExtensions
     /// <summary>
     /// Invoked when the type represents a pointer (ie: int*).
     /// </summary>
-    static string EasyNameTypePointer(IPointerTypeSymbol source, EasyType options)
+    static string EasyNameTypePointer(IPointerTypeSymbol source, EasyTypeSymbol options)
     {
         var type = source.PointedAtType;
         var name = EasyName(type, options);
@@ -271,7 +270,7 @@ internal static partial class EasyNameExtensions
     /// <summary>
     /// Invoked when the type represents a function pointer (ie: delegate*<int, void>).
     /// </summary>
-    static string EasyNameTypeFunctionPointer(IFunctionPointerTypeSymbol source, EasyType options)
+    static string EasyNameTypeFunctionPointer(IFunctionPointerTypeSymbol source, EasyTypeSymbol options)
     {
         // LOW: implement EasyName for 'IFunctionPointerTypeSymbol' instances.
         throw new NotImplementedException("IFunctionPointerTypeSymbol types are not supported.");

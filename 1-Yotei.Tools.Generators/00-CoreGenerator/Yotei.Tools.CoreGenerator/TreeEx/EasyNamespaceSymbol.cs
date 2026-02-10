@@ -1,7 +1,7 @@
 ﻿namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
-internal record EasyNamespace
+internal record EasyNamespaceSymbol
 {
     /// <summary>
     /// Include the host namespaces in the display string.
@@ -19,12 +19,12 @@ internal record EasyNamespace
     /// <summary>
     /// Returns a new instance with a set of default code generation settings.
     /// </summary>
-    public static EasyNamespace Default => new() { };
+    public static EasyNamespaceSymbol Default => new() { };
 
     /// <summary>
     /// Returns a new instance with a full settings.
     /// </summary>
-    public static EasyNamespace Full => new()
+    public static EasyNamespaceSymbol Full => new()
     {
         UseHostNamespace = true,
         UseGlobalNamespace = true,
@@ -47,7 +47,7 @@ internal static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this INamespaceSymbol source, EasyNamespace options)
+    public static string EasyName(this INamespaceSymbol source, EasyNamespaceSymbol options)
     {
         List<string> names = [];
 

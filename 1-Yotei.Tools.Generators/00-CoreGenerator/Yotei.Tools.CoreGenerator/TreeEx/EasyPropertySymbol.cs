@@ -1,9 +1,7 @@
-﻿using System.Reflection.Metadata.Ecma335;
-
-namespace Yotei.Tools.CoreGenerator;
+﻿namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
-internal record EasyProperty
+internal record EasyPropertySymbol
 {
     /// <summary>
     /// Include the accessibility modifiers of the member (ie: public).
@@ -18,12 +16,12 @@ internal record EasyProperty
     /// <summary>
     /// If not null, the options to include the type of the property. If null, it is ignored.
     /// </summary>
-    public EasyType? ReturnTypeOptions { get; set; }
+    public EasyTypeSymbol? ReturnTypeOptions { get; set; }
 
     /// <summary>
     /// If not null, the options to include the host type of the member. If null, it is ignored.
     /// </summary>
-    public EasyType? HostTypeOptions { get; set; }
+    public EasyTypeSymbol? HostTypeOptions { get; set; }
 
     /// <summary>
     /// If the property is an indexed one, use its CLR name instead of '<see langword="this"/>'.
@@ -40,34 +38,34 @@ internal record EasyProperty
     /// If not null, the options to include the parameters of the member. This setting is only used
     /// with indexed properties. If null, they are ignored.
     /// </summary>
-    public EasyParameter? ParameterOptions { get; set; }
+    public EasyParameterSymbol? ParameterOptions { get; set; }
 
     // ----------------------------------------------------
 
     /// <summary>
     /// Returns a new instance with a set of default code generation settings.
     /// </summary>
-    public static EasyProperty Default => new()
+    public static EasyPropertySymbol Default => new()
     {
         UseAccessibility = true,
         UseModifiers = true,
-        ReturnTypeOptions = EasyType.Default,
+        ReturnTypeOptions = EasyTypeSymbol.Default,
         UseBrackets = true,
-        ParameterOptions = EasyParameter.Default,
+        ParameterOptions = EasyParameterSymbol.Default,
     };
 
     /// <summary>
     /// Returns a new instance with full settings.
     /// </summary>
-    public static EasyProperty Full => new()
+    public static EasyPropertySymbol Full => new()
     {
         UseAccessibility = true,
         UseModifiers = true,
-        ReturnTypeOptions = EasyType.Full,
-        HostTypeOptions = EasyType.Full,
+        ReturnTypeOptions = EasyTypeSymbol.Full,
+        HostTypeOptions = EasyTypeSymbol.Full,
         UseTechName = true,
         UseBrackets = true,
-        ParameterOptions = EasyParameter.Full,
+        ParameterOptions = EasyParameterSymbol.Full,
     };
 }
 
@@ -87,7 +85,7 @@ internal static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this IPropertySymbol source, EasyProperty options)
+    public static string EasyName(this IPropertySymbol source, EasyPropertySymbol options)
     {
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(options);

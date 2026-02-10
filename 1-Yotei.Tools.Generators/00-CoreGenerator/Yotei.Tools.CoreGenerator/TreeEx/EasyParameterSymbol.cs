@@ -1,7 +1,7 @@
 ﻿namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
-internal record EasyParameter
+internal record EasyParameterSymbol
 {
     /// <summary>
     /// Include the 'this' keyword before the first parameter of an extension method, in C#.
@@ -17,7 +17,7 @@ internal record EasyParameter
     /// <summary>
     /// If not null, the options to include the parameter's type. If null, it is ignored.
     /// </summary>
-    public EasyType? TypeOptions { get; set; }
+    public EasyTypeSymbol? TypeOptions { get; set; }
 
     /// <summary>
     /// Include the name of the parameter.
@@ -29,21 +29,21 @@ internal record EasyParameter
     /// <summary>
     /// Returns a new instance with a set of default code generation settings.
     /// </summary>
-    public static EasyParameter Default => new()
+    public static EasyParameterSymbol Default => new()
     {
         UseThis = true,
         UseModifiers = true,
-        TypeOptions = EasyType.Default,
+        TypeOptions = EasyTypeSymbol.Default,
     };
 
     /// <summary>
     /// Returns a new instance with full settings.
     /// </summary>
-    public static EasyParameter Full => new()
+    public static EasyParameterSymbol Full => new()
     {
         UseThis = true,
         UseModifiers = true,
-        TypeOptions = EasyType.Full,
+        TypeOptions = EasyTypeSymbol.Full,
         UseName = true,
     };
 }
@@ -64,7 +64,7 @@ internal static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this IParameterSymbol source, EasyParameter options)
+    public static string EasyName(this IParameterSymbol source, EasyParameterSymbol options)
     {
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(options);

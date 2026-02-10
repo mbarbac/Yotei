@@ -1,7 +1,7 @@
 ﻿namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
-internal record EasyField
+internal record EasyFieldSymbol
 {
     /// <summary>
     /// Include the accessibility modifiers of the member (ie: public).
@@ -16,34 +16,34 @@ internal record EasyField
     /// <summary>
     /// If not null, the options to include the type of the property. If null, it is ignored.
     /// </summary>
-    public EasyType? ReturnTypeOptions { get; set; }
+    public EasyTypeSymbol? ReturnTypeOptions { get; set; }
 
     /// <summary>
     /// If not null, the options to include the host type of the member. If null, it is ignored.
     /// </summary>
-    public EasyType? HostTypeOptions { get; set; }
+    public EasyTypeSymbol? HostTypeOptions { get; set; }
 
     // ----------------------------------------------------
 
     /// <summary>
     /// Returns a new instance with a set of default code generation settings.
     /// </summary>
-    public static EasyField Default => new()
+    public static EasyFieldSymbol Default => new()
     {
         UseAccessibility = true,
         UseModifiers = true,
-        ReturnTypeOptions = EasyType.Default,
+        ReturnTypeOptions = EasyTypeSymbol.Default,
     };
 
     /// <summary>
     /// Returns a new instance with full settings.
     /// </summary>
-    public static EasyField Full => new()
+    public static EasyFieldSymbol Full => new()
     {
         UseAccessibility = true,
         UseModifiers = true,
-        ReturnTypeOptions = EasyType.Full,
-        HostTypeOptions = EasyType.Full,
+        ReturnTypeOptions = EasyTypeSymbol.Full,
+        HostTypeOptions = EasyTypeSymbol.Full,
     };
 }
 
@@ -63,7 +63,7 @@ internal static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this IFieldSymbol source, EasyField options)
+    public static string EasyName(this IFieldSymbol source, EasyFieldSymbol options)
     {
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(options);
