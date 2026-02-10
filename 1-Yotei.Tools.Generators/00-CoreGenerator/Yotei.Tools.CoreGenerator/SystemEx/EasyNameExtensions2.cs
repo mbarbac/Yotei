@@ -1,7 +1,7 @@
-﻿namespace Yotei.Tools;
+﻿namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
-public static partial class EasyNameExtensions
+internal static partial class EasyNameExtensions
 {
     /// <summary>
     /// Ensures that the hide type name setting has the given value.
@@ -19,9 +19,9 @@ public static partial class EasyNameExtensions
     /// </summary>
     static bool IsGenericAlike(this Type source) =>
         (!source.IsGenericType && source.FullName == null) ||
-        source.IsGenericParameter ||
+        source.IsGenericParameter /*||
         source.IsGenericTypeParameter ||
-        source.IsGenericMethodParameter;
+        source.IsGenericMethodParameter*/;
 
     /// <summary>
     /// Determines if the type is a nullable wrapper, or not.
@@ -35,38 +35,38 @@ public static partial class EasyNameExtensions
     /// <summary>
     /// Determines nullability by using the nullability API.
     /// </summary>
-    static bool ByNullabilityApi(this ParameterInfo source)
-    {
+    static bool ByNullabilityApi(this ParameterInfo source) => false;
+    /*{
         var nic = new NullabilityInfoContext();
         var info = nic.Create(source);
         return
             info.ReadState == NullabilityState.Nullable ||
             info.WriteState == NullabilityState.Nullable;
-    }
+    }*/
 
     /// <summary>
     /// Determines nullability by using the nullability API.
     /// </summary>
-    static bool ByNullabilityApi(this PropertyInfo source)
-    {
+    static bool ByNullabilityApi(this PropertyInfo source) => false;
+    /*{
         var nic = new NullabilityInfoContext();
         var info = nic.Create(source);
         return
             info.ReadState == NullabilityState.Nullable ||
             info.WriteState == NullabilityState.Nullable;
-    }
+    }*/
 
     /// <summary>
     /// Determines nullability by using the nullability API.
     /// </summary>
-    static bool ByNullabilityApi(this FieldInfo source)
-    {
+    static bool ByNullabilityApi(this FieldInfo source) => false;
+    /*{
         var nic = new NullabilityInfoContext();
         var info = nic.Create(source);
         return
             info.ReadState == NullabilityState.Nullable ||
             info.WriteState == NullabilityState.Nullable;
-    }
+    }*/
 
     // ----------------------------------------------------
 

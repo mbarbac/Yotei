@@ -46,7 +46,7 @@ public static class Test_EasyName_Indexed
     public class Type0B
     {
         [IndexerName("MyItem")]
-        [EasyNullable]
+        [IsNullable]
         public string? this[int? one, in string? two] => default!;
     }
 
@@ -79,9 +79,9 @@ public static class Test_EasyName_Indexed
 
     // ----------------------------------------------------
 
-    public class Type1A<[EasyNullable] K, [EasyNullable] T>
+    public class Type1A<[IsNullable] K, [IsNullable] T>
     {
-        public class Type1B<[EasyNullable] S> { public K this[T one, S two] => default!; }
+        public class Type1B<[IsNullable] S> { public K this[T one, S two] => default!; }
     }
 
     //[Enforced]
@@ -133,7 +133,7 @@ public static class Test_EasyName_Indexed
             name);
 
         // Bound (wrapped nullability)...
-        type = typeof(Type1A<byte?, int?>.Type1B<EasyNullable<string>>);
+        type = typeof(Type1A<byte?, int?>.Type1B<IsNullable<string>>);
         item = type.GetProperties().First(); Assert.NotNull(item);
 
         options = EMPTY;
@@ -157,7 +157,7 @@ public static class Test_EasyName_Indexed
 
     // ----------------------------------------------------
 
-    public class Type2A<K, T> { public class Type2B<S> { [EasyNullable] public K? this[T? one, S? two] => default!; } }
+    public class Type2A<K, T> { public class Type2B<S> { [IsNullable] public K? this[T? one, S? two] => default!; } }
 
     //[Enforced]
     [Fact]

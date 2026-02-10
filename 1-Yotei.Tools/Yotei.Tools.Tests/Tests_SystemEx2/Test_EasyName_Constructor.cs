@@ -70,9 +70,9 @@ public static class Test_EasyName_Constructor
 
     // ----------------------------------------------------
 
-    public class Type1A<[EasyNullable] K, [EasyNullable] T>
+    public class Type1A<[IsNullable] K, [IsNullable] T>
     {
-        public class Type1B<[EasyNullable] S>
+        public class Type1B<[IsNullable] S>
         { public Type1B(ref K one, in T two, out S three) { three = default!; } }
     }
 

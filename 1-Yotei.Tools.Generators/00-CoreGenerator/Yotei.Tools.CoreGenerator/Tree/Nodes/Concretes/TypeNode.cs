@@ -348,12 +348,12 @@ internal class TypeNode : ITreeNode
         var name = symbol.EasyName(new()
         {
             UseSpecialNames = true,
-            NullableStyle = NullableStyle.UseAnnotations,
+            NullableStyle = IsNullableStyle.UseAnnotations,
             GenericOptions = new()
             {
                 NamespaceOptions = new() { UseHostNamespace = true },
                 UseSpecialNames = true,
-                NullableStyle = NullableStyle.UseAnnotations,
+                NullableStyle = IsNullableStyle.UseAnnotations,
             }
         });
         return $"partial {rec}{kind} {name}";

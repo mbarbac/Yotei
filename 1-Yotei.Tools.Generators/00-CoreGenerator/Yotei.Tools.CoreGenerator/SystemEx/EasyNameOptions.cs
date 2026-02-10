@@ -1,10 +1,10 @@
-﻿namespace Yotei.Tools;
+﻿namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
 /// <summary>
 /// Provides options for the 'EasyName' methods.
 /// </summary>
-public record EasyNameOptions
+internal record EasyNameOptions
 {
     /// <summary>
     /// Determines if the type variance modifiers shall be used or not.

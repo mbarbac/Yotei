@@ -128,7 +128,7 @@ public static class Test_SketchExtensions
     {
         SketchOptions options;
         string name;
-        var item = typeof(EasyNullable<string>);
+        var item = typeof(IsNullable<string>);
 
         options = EMPTY;
         name = item.Sketch(options); Assert.Equal("String", name);

@@ -40,7 +40,7 @@ public static class Test_EasyName_Field
 
     // ----------------------------------------------------
 
-    public class Type0B { [EasyNullable] public string? Name = default!; }
+    public class Type0B { [IsNullable] public string? Name = default!; }
 
     //[Enforced]
     [Fact]
@@ -67,7 +67,7 @@ public static class Test_EasyName_Field
 
     // ----------------------------------------------------
 
-    public class Type0C { public EasyNullable<string?> Name = default!; }
+    public class Type0C { public IsNullable<string?> Name = default!; }
 
     //[Enforced]
     [Fact]
@@ -96,9 +96,9 @@ public static class Test_EasyName_Field
 
     // ----------------------------------------------------
 
-    public class Type1A<[EasyNullable] K, [EasyNullable] T>
+    public class Type1A<[IsNullable] K, [IsNullable] T>
     {
-        public class Type1B<[EasyNullable] S> { public S Name = default!; }
+        public class Type1B<[IsNullable] S> { public S Name = default!; }
     }
 
     //[Enforced]
@@ -151,7 +151,7 @@ public static class Test_EasyName_Field
 
     // ----------------------------------------------------
 
-    public class Type2A<K, T> { public class Type2B<S> { [EasyNullable] public S? Name = default!; } }
+    public class Type2A<K, T> { public class Type2B<S> { [IsNullable] public S? Name = default!; } }
 
     //[Enforced]
     [Fact]

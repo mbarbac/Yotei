@@ -79,7 +79,7 @@ internal static partial class EasyNameExtensions
             sb.Append(str);
 
             if (!str.EndsWith('?') &&
-                xoptions.NullableStyle == NullableStyle.UseAnnotations &&
+                xoptions.NullableStyle == IsNullableStyle.UseAnnotations &&
                 source.Type.IsNullableDecorated() &&
                 !source.Type.IsNullableWrapper())
                 sb.Append('?');

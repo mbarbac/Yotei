@@ -76,7 +76,7 @@ public static class Test_EasyName_Type
         name = item.EasyName(options); Assert.Equal("System.String", name);
 
         // Explicit...
-        item = typeof(EasyNullable<string>);
+        item = typeof(IsNullable<string>);
 
         options = EMPTY;
         name = item.EasyName(options); Assert.Equal("String", name);
@@ -96,7 +96,7 @@ public static class Test_EasyName_Type
 
     // Using 'EasyNullable<T>' is not allowed in this context.
     // Using '[EasyNullable]' is ok because the type is a generic one.
-    public interface IFace1<[EasyNullable] T> { }
+    public interface IFace1<[IsNullable] T> { }
 
     //[Enforced]
     [Fact]
@@ -138,7 +138,7 @@ public static class Test_EasyName_Type
         Assert.Equal($"{NAMESPACE}.{TESTNAME}.IFace1<System.String>", name);
 
         // Bound (forced by wrapping, attribute not allowed with typeof)...
-        item = typeof(IFace1<EasyNullable<string>>);
+        item = typeof(IFace1<IsNullable<string>>);
 
         options = EMPTY;
         name = item.EasyName(options); Assert.Equal("IFace1", name);
@@ -158,7 +158,7 @@ public static class Test_EasyName_Type
 
     // ----------------------------------------------------
 
-    public interface IFace2A<[EasyNullable] T> { }
+    public interface IFace2A<[IsNullable] T> { }
     public interface IFace2B<T> : IFace2A<T> { }
 
     //[Enforced]
@@ -203,7 +203,7 @@ public static class Test_EasyName_Type
         Assert.Equal($"{NAMESPACE}.{TESTNAME}.IFace2A<System.String>", name);
 
         // Bound (forced nullability)...
-        type = typeof(IFace2B<EasyNullable<string>>);
+        type = typeof(IFace2B<IsNullable<string>>);
         item = type.GetInterfaces().First();
 
         options = EMPTY;
@@ -224,7 +224,7 @@ public static class Test_EasyName_Type
 
     // ----------------------------------------------------
 
-    public interface IFace2C<T> : IFace2A<EasyNullable<T>> { }
+    public interface IFace2C<T> : IFace2A<IsNullable<T>> { }
 
     //[Enforced]
     [Fact]
@@ -263,7 +263,7 @@ public static class Test_EasyName_Type
         options = DEFAULT;
         name = item.EasyName(options); Assert.Equal("IFace2A<String?>", name);
 
-        var xoptions = DEFAULT with { TypeNullableStyle = EasyNullableStyle.None };
+        var xoptions = DEFAULT with { TypeNullableStyle = IsNullableStyle.None };
         options = DEFAULT with { TypeGenericArgumentOptions = xoptions };
         name = item.EasyName(options); Assert.Equal("IFace2A<String>", name);
 
@@ -276,8 +276,8 @@ public static class Test_EasyName_Type
 
     // ----------------------------------------------------
 
-    public interface IFace3A<[EasyNullable] out T>
-    { public interface IFace3B<[EasyNullable] in K> { } }
+    public interface IFace3A<[IsNullable] out T>
+    { public interface IFace3B<[IsNullable] in K> { } }
 
     //[Enforced]
     [Fact]
@@ -322,7 +322,7 @@ public static class Test_EasyName_Type
             name);
 
         // Unbound (wrapped nullability enforced)...
-        item = typeof(IFace3A<int?>.IFace3B<EasyNullable<string?>>);
+        item = typeof(IFace3A<int?>.IFace3B<IsNullable<string?>>);
 
         options = EMPTY;
         name = item.EasyName(options); Assert.Equal("IFace3B", name);
@@ -344,7 +344,7 @@ public static class Test_EasyName_Type
     // ----------------------------------------------------
 
     public class Type4A<K, T>
-    { public class Type4B<R> { public class Type4C<[EasyNullable] S, [EasyNullable] V> { } } }
+    { public class Type4B<R> { public class Type4C<[IsNullable] S, [IsNullable] V> { } } }
 
     //[Enforced]
     [Fact]
@@ -390,7 +390,7 @@ public static class Test_EasyName_Type
             name);
 
         // Unbound (wrapped nullability enforced)...
-        item = typeof(Type4A<byte, short>.Type4B<int>.Type4C<long?, EasyNullable<string?>>);
+        item = typeof(Type4A<byte, short>.Type4B<int>.Type4C<long?, IsNullable<string?>>);
 
         options = EMPTY;
         name = item.EasyName(options); Assert.Equal("Type4C", name);

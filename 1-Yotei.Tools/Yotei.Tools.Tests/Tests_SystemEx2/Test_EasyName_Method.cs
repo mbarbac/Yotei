@@ -42,7 +42,7 @@ public static class Test_EasyName_Method
 
     // ----------------------------------------------------
 
-    public interface IFace0B { void Name([EasyNullable] ref string? one); }
+    public interface IFace0B { void Name([IsNullable] ref string? one); }
 
     //[Enforced]
     [Fact]
@@ -68,7 +68,7 @@ public static class Test_EasyName_Method
 
     // ----------------------------------------------------
 
-    public interface IFace0C { void Name(ref EasyNullable<string?> one); }
+    public interface IFace0C { void Name(ref IsNullable<string?> one); }
 
     //[Enforced]
     [Fact]
@@ -95,7 +95,7 @@ public static class Test_EasyName_Method
 
     // ----------------------------------------------------
 
-    public interface IFace1A<[EasyNullable] K, [EasyNullable] T>
+    public interface IFace1A<[IsNullable] K, [IsNullable] T>
     { public interface IFace1B<S> { K Name<R>(ref T? one, S? two); } }
 
     //[Enforced]

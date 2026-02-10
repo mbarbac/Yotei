@@ -4,7 +4,7 @@
 /// <summary>
 /// The options to use in display string with nullable elements.
 /// </summary>
-internal enum NullableStyle
+internal enum IsNullableStyle
 {
     /// <summary>
     /// Do not use any nullability information.

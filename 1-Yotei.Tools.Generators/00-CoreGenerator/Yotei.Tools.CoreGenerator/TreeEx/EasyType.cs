@@ -41,7 +41,7 @@ internal record EasyType
     /// <summary>
     /// Specifies the nhe nullable style to use.
     /// </summary>
-    public NullableStyle NullableStyle { get; set; }
+    public IsNullableStyle NullableStyle { get; set; }
 
     /// <summary>
     /// If not null, then the options to include the list of generic arguments of the type. If null,
@@ -57,12 +57,12 @@ internal record EasyType
     public static EasyType Default => new()
     {
         UseSpecialNames = true,
-        NullableStyle = NullableStyle.UseAnnotations,
+        NullableStyle = IsNullableStyle.UseAnnotations,
         GenericOptions = new()
         {
             NamespaceOptions = EasyNamespace.Default,
             UseSpecialNames = true,
-            NullableStyle = NullableStyle.UseAnnotations,
+            NullableStyle = IsNullableStyle.UseAnnotations,
         }
     };
 
@@ -77,14 +77,14 @@ internal record EasyType
         NamespaceOptions = EasyNamespace.Full,
         UseHost = true,
         UseSpecialNames = true,
-        NullableStyle = NullableStyle.KeepWrappers,
+        NullableStyle = IsNullableStyle.KeepWrappers,
         GenericOptions = new()
         {
             UseVariance = true,
             NamespaceOptions = EasyNamespace.Full,
             UseHost = true,
             UseSpecialNames = true,
-            NullableStyle = NullableStyle.KeepWrappers,
+            NullableStyle = IsNullableStyle.KeepWrappers,
         }
     };
 }
@@ -152,7 +152,7 @@ internal static partial class EasyNameExtensions
         var host = source.ContainingType;
 
         // Shortcut nullable wrappers...
-        if (options.NullableStyle == NullableStyle.UseAnnotations && source.IsNullableWrapper())
+        if (options.NullableStyle == IsNullableStyle.UseAnnotations && source.IsNullableWrapper())
         {
             var arg = args[0];
             var str = EasyName(arg, options);
@@ -210,7 +210,7 @@ internal static partial class EasyNameExtensions
 
         // Nullability...
         if (!sb.EndsWith('?') &&
-            options.NullableStyle != NullableStyle.None &&
+            options.NullableStyle != IsNullableStyle.None &&
             source.IsNullableDecorated())
             sb.Append('?');
 
@@ -229,7 +229,7 @@ internal static partial class EasyNameExtensions
         var name = EasyName(type, options);
         name = $"{name}[{new string(',', source.Rank - 1)}]";
 
-        while (!name.EndsWith('?') && options.NullableStyle != NullableStyle.None)
+        while (!name.EndsWith('?') && options.NullableStyle != IsNullableStyle.None)
         {
             if (source.NullableAnnotation == NullableAnnotation.Annotated)
             { name += '?'; break; }
@@ -252,7 +252,7 @@ internal static partial class EasyNameExtensions
         var type = source.PointedAtType;
         var name = EasyName(type, options);
 
-        while (!name.EndsWith('?') && options.NullableStyle != NullableStyle.None)
+        while (!name.EndsWith('?') && options.NullableStyle != IsNullableStyle.None)
         {
             if (source.NullableAnnotation == NullableAnnotation.Annotated)
             { name += '?'; break; }

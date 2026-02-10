@@ -1,7 +1,7 @@
-﻿namespace Yotei.Tools;
+﻿namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
-public static partial class EasyNameExtensions
+internal static partial class EasyNameExtensions
 {
     /// <summary>
     /// Obtains a C#-alike representation of the given element, using default options.
