@@ -40,6 +40,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\SyntaxListExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\TypeSymbolExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\TypeSyntaxExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\FieldExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\PropertyExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CharExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\EasyNameExtensions2.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\ObjectExtensions.cs" />
@@ -71,6 +73,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)TreeEx\NamedTypeSymbolExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeEx\TypeSymbolExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeEx\AccessibilityExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\Finder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\EventNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\FieldNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\MethodNode.cs" />
