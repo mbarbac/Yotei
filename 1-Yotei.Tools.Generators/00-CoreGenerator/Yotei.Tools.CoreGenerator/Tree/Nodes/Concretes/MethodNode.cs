@@ -42,6 +42,11 @@ internal class MethodNode : ITreeNode
     public TypeNode? ParentNode { get; set; }
 
     /// <summary>
+    /// The host (containing type) of this element.
+    /// </summary>
+    public INamedTypeSymbol Host => Symbol.ContainingType;
+
+    /// <summary>
     /// The symbol this instance is associated with.
     /// </summary>
     public IMethodSymbol Symbol { get; }

@@ -87,11 +87,13 @@ internal class TreeGenerator : IIncrementalGenerator
                     /// types, or when there is the need to specify it in those not-allowed contexts.
                     /// </para>
                     /// </summary>
+                    [Microsoft.CodeAnalysis.Embedded]
                     public class IsNullable<T> { }
                     
                     /// <summary>
                     /// <inheritdoc cref="IsNullable{T}"/>
                     /// </summary>
+                    [Microsoft.CodeAnalysis.Embedded]
                     [AttributeUsage(AttributeTargets.All)]
                     public class IsNullableAttribute : Attribute { }
                 }

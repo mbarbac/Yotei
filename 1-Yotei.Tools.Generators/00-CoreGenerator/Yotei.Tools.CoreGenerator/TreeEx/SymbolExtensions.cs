@@ -7,7 +7,7 @@ internal static partial class SymbolExtensions
     {
         /// <summary>
         /// Determines if the given symbol is either decorated with a nullable annotation, or with
-        /// the <see cref="IsNullableAttribute"/>.
+        /// the <see cref="NullableAttribute"/> or <see cref="IsNullableAttribute"/> attributes.
         /// </summary>
         public bool IsNullableDecorated()
         {

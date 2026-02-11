@@ -28,5 +28,25 @@ internal static partial class NamedTypeSymbolExtensions
             SpecialType.System_String => "string",
             _ => null,
         };
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// If this type is a nullable wrapper, returns the underlying type and sets the out
+        /// argument to <see langword="true"/>. Otherwise, returns the original type and sets
+        /// the out argument to <see langword="false"/>.
+        /// </summary>
+        /// <param name="nullable"></param>
+        /// <returns></returns>
+        public INamedTypeSymbol UnwrapNullable(out bool nullable)
+        {
+            if (source.IsNullableWrapper())
+            {
+                nullable = true;
+                return (INamedTypeSymbol)source.TypeArguments[0];
+            }
+            nullable = false;
+            return source;
+        }
     }
 }
