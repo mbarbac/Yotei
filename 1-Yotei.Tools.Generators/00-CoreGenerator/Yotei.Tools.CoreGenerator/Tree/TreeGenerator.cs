@@ -120,9 +120,9 @@ internal class TreeGenerator : IIncrementalGenerator
             BaseTypeDeclarationSyntax or
             BasePropertyDeclarationSyntax or
             BaseFieldDeclarationSyntax or
-            BaseMethodDeclarationSyntax or
+            BaseMethodDeclarationSyntax /*or
             EventDeclarationSyntax or
-            EventFieldDeclarationSyntax; // Covered by: BaseFieldDeclarationSyntax
+            EventFieldDeclarationSyntax*/;
     }
 
     // ----------------------------------------------------
@@ -152,11 +152,11 @@ internal class TreeGenerator : IIncrementalGenerator
     /// </summary>
     protected virtual List<Type> MethodAttributes { get; } = [];
 
-    /// <summary>
+    /*/// <summary>
     /// The collection of attribute types this generator uses, by default, to identify decorated
     /// events (field and regular ones) as source code generation elements.
     /// </summary>
-    protected virtual List<Type> EventAttributes { get; } = [];
+    protected virtual List<Type> EventAttributes { get; } = [];*/
 
     // ----------------------------------------------------
 
@@ -184,11 +184,11 @@ internal class TreeGenerator : IIncrementalGenerator
     /// </summary>
     protected virtual List<string> MethodAttributeNames { get; } = [];
 
-    /// <summary>
+    /*/// <summary>
     /// The collection of fully qualified attribute type names used by this generator, by default,
     /// to identify decorated events as source code generation candidates.
     /// </summary>
-    protected virtual List<string> EventAttributeNames { get; } = [];
+    protected virtual List<string> EventAttributeNames { get; } = [];*/
 
     // ----------------------------------------------------
 
@@ -256,7 +256,7 @@ internal class TreeGenerator : IIncrementalGenerator
         return item;
     }
 
-    /// <summary>
+    /*/// <summary>
     /// Invoked to create a detached node for source code generation purposes.
     /// <br/> The symtax must be among the supported ones.
     /// </summary>
@@ -270,7 +270,7 @@ internal class TreeGenerator : IIncrementalGenerator
         if (syntax != null) item.SyntaxNodes.Add(syntax);
         item.Attributes.AddRange(attributes);
         return item;
-    }
+    }*/
 
     // ----------------------------------------------------
 
@@ -303,11 +303,6 @@ internal class TreeGenerator : IIncrementalGenerator
             var atx = FindSyntaxAttributes(symbol, syntax);
             var ats = FilterAttributes(atx, TypeAttributes, TypeAttributeNames);
             if (ats.Count == 0) break;
-
-            // DEBUG-ONLY...
-            if (symbol.Name == "Tp1") { }
-            var at = ats[0];
-            var str = at.EasyName();
 
             var candidate = CreateNode(symbol, syntax, ats, model);
             return candidate;
@@ -369,7 +364,7 @@ internal class TreeGenerator : IIncrementalGenerator
         }
 
         // Events...
-        while (node is MemberDeclarationSyntax syntax)
+        /*while (node is MemberDeclarationSyntax syntax)
         {
             if (syntax is not EventDeclarationSyntax and not EventFieldDeclarationSyntax)
                 break;
@@ -383,7 +378,7 @@ internal class TreeGenerator : IIncrementalGenerator
 
             var candidate = CreateNode(symbol, syntax, ats, model);
             return candidate;
-        }
+        }*/
 
         // Finishing by ignoring the node...
         return null!;
@@ -459,7 +454,7 @@ internal class TreeGenerator : IIncrementalGenerator
                 case PropertyNode item: CaptureHierarchy(types, item); break;
                 case FieldNode item: CaptureHierarchy(types, item); break;
                 case MethodNode item: CaptureHierarchy(types, item); break;
-                case EventNode item: CaptureHierarchy(types, item); break;
+                //case EventNode item: CaptureHierarchy(types, item); break;
             }
         }
 
@@ -634,7 +629,7 @@ internal class TreeGenerator : IIncrementalGenerator
         }
     }
 
-    /// <summary>
+    /*/// <summary>
     /// Invoked to capture the given node into the source code generation hierarchy.
     /// </summary>
     /// <param name="types"></param>
@@ -661,5 +656,5 @@ internal class TreeGenerator : IIncrementalGenerator
         {
             item.Augment(node);
         }
-    }
+    }*/
 }

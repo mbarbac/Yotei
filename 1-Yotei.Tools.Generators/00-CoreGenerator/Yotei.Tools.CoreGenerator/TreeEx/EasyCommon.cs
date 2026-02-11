@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools.CoreGenerator;
+﻿using Microsoft.CodeAnalysis.FlowAnalysis;
+
+namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
 internal static partial class EasyNameExtensions
@@ -20,6 +22,7 @@ internal static partial class EasyNameExtensions
     /// </summary>
     public static bool IsNullableDecorated(this ISymbol source)
     {
+        // Using nullable annotations...
         var annotated = source switch
         {
             ITypeSymbol item => item.NullableAnnotation == NullableAnnotation.Annotated,
@@ -30,10 +33,26 @@ internal static partial class EasyNameExtensions
         };
         if (annotated) return true;
 
-        var ats = source.GetAttributes();
-        if (ats.Any(x => x.AttributeClass?.Name == nameof(NullableAttribute))) return true;
+        // Using custom metadata attribute...
+        var name = "System.Runtime.CompilerServices.NullableAttribute";
+        var ats = source.GetAttributes().Where(x => x.AttributeClass?.ToDisplayString() == name);
+        foreach (var at in ats)
+        {
+            var items = at.GetType().GetField("NullableFlags");
+            if (items != null)
+            {
+                var value = items.GetValue(at);
+
+                if ((value is byte b && b == 2) ||
+                    (value is byte[] bs && bs.Length > 0 && bs[0] == 2))
+                    return true;
+            }
+        }
+
+        // Using the wrapper workaround...
         if (ats.Any(x => x.AttributeClass?.Name == nameof(IsNullableAttribute))) return true;
 
+        // Not nullable...
         return false;
     }
 

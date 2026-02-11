@@ -99,7 +99,7 @@ internal static partial class EasyNameExtensions
         // Return type...
         if (options.ReturnTypeOptions != null)
         {
-            var xoptions = options.ReturnTypeOptions with { HideName = false };
+            var xoptions = options.ReturnTypeOptions.DisabledHideName();
             var str = source.Type.EasyName(xoptions);
             sb.Append(str).Append(' ');
         }
@@ -107,7 +107,7 @@ internal static partial class EasyNameExtensions
         // Host type...
         if (options.HostTypeOptions != null && host != null)
         {
-            var xoptions = options.HostTypeOptions with { HideName = false };
+            var xoptions = options.HostTypeOptions.DisabledHideName();
             var str = host.EasyName(xoptions);
             sb.Append(str).Append('.');
         }

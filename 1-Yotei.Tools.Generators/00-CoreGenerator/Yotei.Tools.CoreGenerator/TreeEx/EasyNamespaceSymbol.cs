@@ -19,7 +19,7 @@ internal record EasyNamespaceSymbol
     /// <summary>
     /// Returns a new instance with a set of default code generation settings.
     /// </summary>
-    public static EasyNamespaceSymbol Default => new() { };
+    public static EasyNamespaceSymbol Default => new();
 
     /// <summary>
     /// Returns a new instance with a full settings.

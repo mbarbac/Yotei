@@ -6,7 +6,7 @@ namespace ns1.ns2
     {
         using Yotei.Tools.WithGenerator;
 
-        [InheritsWith<DateTime>()]
+        [InheritsWith(ReturnType = typeof(DateTime?))]
         public partial class Tp1<T>
         {
         }

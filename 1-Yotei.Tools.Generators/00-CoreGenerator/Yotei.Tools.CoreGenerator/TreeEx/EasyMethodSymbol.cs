@@ -173,8 +173,9 @@ internal static partial class EasyNameExtensions
                 sb.Append("static ");
 
             // Name...
-            var xoptions = options.HostTypeOptions ?? options.ReturnTypeOptions ?? new();
-            xoptions = xoptions with { HideName = false };
+            var xoptions =
+                (options.HostTypeOptions ?? options.ReturnTypeOptions ?? new())
+                .DisabledHideName();
 
             var host = source.ContainingType ?? throw new ArgumentException("Element's containing type is null.").WithData(source);
             var str = EasyName(host, xoptions);
@@ -218,7 +219,7 @@ internal static partial class EasyNameExtensions
             // Return type...
             if (options.ReturnTypeOptions != null)
             {
-                var xoptions = options.ReturnTypeOptions with { HideName = false };
+                var xoptions = options.ReturnTypeOptions.DisabledHideName();
                 var str = source.ReturnType.EasyName(xoptions);
                 sb.Append(str).Append(' ');
             }
@@ -227,7 +228,7 @@ internal static partial class EasyNameExtensions
             var host = source.ContainingType;
             if (options.HostTypeOptions != null && host != null)
             {
-                var xoptions = options.HostTypeOptions with { HideName = false };
+                var xoptions = options.HostTypeOptions.DisabledHideName();
                 var str = host.EasyName(xoptions);
                 sb.Append(str).Append('.');
             }

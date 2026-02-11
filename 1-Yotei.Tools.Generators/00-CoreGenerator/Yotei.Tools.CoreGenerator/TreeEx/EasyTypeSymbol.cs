@@ -52,6 +52,15 @@ internal record EasyTypeSymbol
     // ----------------------------------------------------
 
     /// <summary>
+    /// Returns either this instance, or a new one were the <see cref="HideName"/> setting is
+    /// disabled.
+    /// </summary>
+    /// <returns></returns>
+    public EasyTypeSymbol DisabledHideName() => HideName ? this with { HideName = false } : this;
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Returns a new instance with a set of default code generation settings.
     /// </summary>
     public static EasyTypeSymbol Default => new()
@@ -184,7 +193,7 @@ internal static partial class EasyNameExtensions
         // Host types...
         if ((options.UseHost || options.NamespaceOptions != null) && host != null && !isgen)
         {
-            var xoptions = options with { HideName = false };
+            var xoptions = options.DisabledHideName();
             var str = EasyName(host, xoptions);
             if (str.Length > 0) sb.Append(str).Append('.');
         }

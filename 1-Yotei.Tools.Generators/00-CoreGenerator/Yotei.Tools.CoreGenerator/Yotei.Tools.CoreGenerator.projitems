@@ -54,7 +54,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\StringBuilderExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\EasyNameExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\EasyNameOptions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\_EasyEventSymbol.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyTypedConstant.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyAttributeData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyFieldSymbol.cs" />

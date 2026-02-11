@@ -7,7 +7,7 @@ internal record EasyAttributeData
     /// If not null, the options to include the attribute class. If null, then only its name is
     /// used.
     /// </summary>
-    public EasyTypeSymbol? ClassOptions { get; set; }
+    public EasyTypeSymbol? TypeOptions { get; set; }
 
     /// <summary>
     /// Ends the element's name with the 'Attribute' suffix.
@@ -21,7 +21,7 @@ internal record EasyAttributeData
     public EasyTypeSymbol? GenericOptions { get; set; }
 
     /// <summary>
-    /// If enabled, include parameter brackets, even if <see cref="ParameterOptions"/> is null.
+    /// If enabled, include parameter brackets, even if <see cref="ValueOptions"/> is null.
     /// </summary>
     public bool UseBrackets { get; set; }
 
@@ -29,7 +29,7 @@ internal record EasyAttributeData
     /// If not null, the options to include the parameters of the attribute, if any. If null,
     /// they are ignored.
     /// </summary>
-    public EasyTypedConstant? ParameterOptions { get; set; }
+    public EasyTypedConstant? ValueOptions { get; set; }
 
     // ----------------------------------------------------
 
@@ -39,7 +39,7 @@ internal record EasyAttributeData
     public static EasyAttributeData Default => new()
     {
         GenericOptions = EasyTypeSymbol.Default,
-        ParameterOptions = EasyTypedConstant.Default
+        ValueOptions = EasyTypedConstant.Default
     };
 
     /// <summary>
@@ -47,11 +47,11 @@ internal record EasyAttributeData
     /// </summary>
     public static EasyAttributeData Full => new()
     {
-        ClassOptions = EasyTypeSymbol.Full,
+        TypeOptions = EasyTypeSymbol.Full,
         UseAttributeSuffix = true,
         GenericOptions = EasyTypeSymbol.Full,
         UseBrackets = true,
-        ParameterOptions = EasyTypedConstant.Full,
+        ValueOptions = EasyTypedConstant.Full,
     };
 }
 
@@ -78,28 +78,28 @@ internal static partial class EasyNameExtensions
         ArgumentNullException.ThrowIfNull(options);
 
         var sb = new StringBuilder();
-        var host = source.AttributeClass ?? throw new ArgumentException("Attribute class is null.").WithData(source);
+        var type = source.AttributeClass ?? throw new ArgumentException("Attribute class is null.").WithData(source);
+        var name = type.Name;
 
-        // Ahora mismo, host.Name == "InheritsWithAttribute"
-        // Tema: conservar (si procede) su host y ns, y remover/añadir Attribute si procede.
-        // Luego, añadir generics
+        // Type options...
+        var xoptions = (options.TypeOptions ?? EasyTypeSymbol.Default).DisabledHideName();
+        var head = type.EasyName(xoptions);
 
-        // Name...
-        /*
-        var xoptions = options.ClassOptions ?? EasyTypeSymbol.Default;
-        if (xoptions.HideName) xoptions = xoptions with { HideName = false };
-        var name = host.EasyName(xoptions);
+        if (options.UseAttributeSuffix) { } // head already carries 'Attribute' if needed...
+        else
+        {
+            var temp = name.RemoveLast("Attribute").ToString();
+            if (!name.EndsWith("Attribute")) name += "Attribute";
+            head = head.Replace(name, temp);
+        }
 
-        if (options.UseAttributeSuffix && !name.EndsWith("Attribute")) name += "Attribute";
-        if (!options.UseAttributeSuffix && name.EndsWith("Attribute")) name = name.RemoveLast("Attribute").ToString(); ;
-        sb.Append(name);
-        */
+        sb.Append(head);
 
         // Parameters...
         var cons = source.ConstructorArguments;
         var named = source.NamedArguments;
 
-        if ((options.UseBrackets || options.ParameterOptions != null) &&
+        if ((options.UseBrackets || options.ValueOptions != null) &&
             (cons.Length > 0 || named.Length > 0))
         {
             var done = false;
@@ -108,7 +108,7 @@ internal static partial class EasyNameExtensions
             for (int i = 0; i < cons.Length; i++) // Only values...
             {
                 var arg = cons[i];
-                var str = arg.EasyName(options.ParameterOptions);
+                var str = arg.EasyName(options.ValueOptions);
                 if (done) sb.Append(str.Length > 0 ? ", " : ",");
                 sb.Append(str);
                 done = true;
@@ -118,7 +118,7 @@ internal static partial class EasyNameExtensions
             {
                 var temp = named[i].Key;
                 var arg = named[i].Value;
-                var str = arg.EasyName(options.ParameterOptions, temp);
+                var str = arg.EasyName(options.ValueOptions, temp);
                 if (done) sb.Append(str.Length > 0 ? ", " : ",");
                 sb.Append(str);
                 done = true;

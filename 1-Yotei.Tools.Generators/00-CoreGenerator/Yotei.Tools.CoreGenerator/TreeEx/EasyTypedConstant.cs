@@ -9,46 +9,40 @@ internal record EasyTypedConstant
     public bool UseName { get; set; }
 
     /// <summary>
-    /// If not null, the options to include the type of the typed constant, between brackets. If
-    /// null, it is ignored.
-    /// </summary>
-    public EasyTypeSymbol? ReturnTypeOptions { get; set; }
-
-    /// <summary>
-    /// If not null, the options to use with elements that are CLR ones.
+    /// If not null, the options to use with values that are CLR ones.
     /// If null, then default ones are used.
     /// </summary>
-    public EasyNameOptions? ClrValueOptions { get; set; }
+    public EasyNameOptions? ValueClrOptions { get; set; }
 
     /// <summary>
-    /// If not null, the options to use with elements that are type symbol ones.
+    /// If not null, the options to use with values that are type symbol ones.
     /// If null, then default ones are used.
     /// </summary>
-    public EasyTypeSymbol? TypeSymbolValueOptions { get; set; }
+    public EasyTypeSymbol? ValueTypeSymbolOptions { get; set; }
 
     /// <summary>
-    /// If not null, the options to use with elements that are property symbol ones.
+    /// If not null, the options to use with values that are property symbol ones.
     /// If null, then default ones are used.
     /// </summary>
-    public EasyPropertySymbol? PropertySymbolValueOptions { get; set; }
+    public EasyPropertySymbol? ValuePropertySymbolOptions { get; set; }
 
     /// <summary>
-    /// If not null, the options to use with elements that are field symbol ones.
+    /// If not null, the options to use with values that are field symbol ones.
     /// If null, then default ones are used.
     /// </summary>
-    public EasyFieldSymbol? FieldSymbolValueOptions { get; set; }
+    public EasyFieldSymbol? ValueFieldSymbolOptions { get; set; }
 
     /// <summary>
-    /// If not null, the options to use with elements that are method symbol ones.
+    /// If not null, the options to use with values that are method symbol ones.
     /// If null, then default ones are used.
     /// </summary>
-    public EasyMethodSymbol? MethodSymbolValueOptions { get; set; }
+    public EasyMethodSymbol? ValueMethodSymbolOptions { get; set; }
 
-    /// <summary>
-    /// If not null, the options to use with elements that are event symbol ones.
+    /*/// <summary>
+    /// If not null, the options to use with values that are event symbol ones.
     /// If null, then default ones are used.
     /// </summary>
-    public EasyEventSymbol? EventSymbolValueOptions { get; set; }
+    public EasyEventSymbol? ValueEventSymbolOptions { get; set; }*/
 
     // ----------------------------------------------------
 
@@ -57,13 +51,12 @@ internal record EasyTypedConstant
     /// </summary>
     public static EasyTypedConstant Default => new()
     {
-        ReturnTypeOptions = EasyTypeSymbol.Default,
-        ClrValueOptions = EasyNameOptions.Default,
-        TypeSymbolValueOptions = EasyTypeSymbol.Default,
-        PropertySymbolValueOptions = EasyPropertySymbol.Default,
-        FieldSymbolValueOptions = EasyFieldSymbol.Default,
-        MethodSymbolValueOptions = EasyMethodSymbol.Default,
-        EventSymbolValueOptions = EasyEventSymbol.Default,
+        ValueClrOptions = EasyNameOptions.Default,
+        ValueTypeSymbolOptions = EasyTypeSymbol.Default,
+        ValuePropertySymbolOptions = EasyPropertySymbol.Default,
+        ValueFieldSymbolOptions = EasyFieldSymbol.Default,
+        ValueMethodSymbolOptions = EasyMethodSymbol.Default,
+        //ValueEventSymbolOptions = EasyEventSymbol.Default,
     };
 
     /// <summary>
@@ -72,13 +65,12 @@ internal record EasyTypedConstant
     public static EasyTypedConstant Full => new()
     {
         UseName = true,
-        ReturnTypeOptions = EasyTypeSymbol.Full,
-        ClrValueOptions = EasyNameOptions.Full,
-        TypeSymbolValueOptions = EasyTypeSymbol.Full,
-        PropertySymbolValueOptions = EasyPropertySymbol.Full,
-        FieldSymbolValueOptions = EasyFieldSymbol.Full,
-        MethodSymbolValueOptions = EasyMethodSymbol.Full,
-        EventSymbolValueOptions = EasyEventSymbol.Full,
+        ValueClrOptions = EasyNameOptions.Full,
+        ValueTypeSymbolOptions = EasyTypeSymbol.Full,
+        ValuePropertySymbolOptions = EasyPropertySymbol.Full,
+        ValueFieldSymbolOptions = EasyFieldSymbol.Full,
+        ValueMethodSymbolOptions = EasyMethodSymbol.Full,
+        //ValueEventSymbolOptions = EasyEventSymbol.Full,
     };
 }
 
@@ -115,17 +107,7 @@ internal static partial class EasyNameExtensions
         if (source.Type is null) throw new ArgumentException("Element's type is null.").WithData(source);
 
         // Constant's name...
-        if (name != null && options.UseName) sb.Append(name).Append(": ");
-
-        // Constant's type...
-        if (options.ReturnTypeOptions != null && source.Type != null)
-        {
-            var xoptions = options.ReturnTypeOptions with { HideName = false };
-            var str = source.Type.EasyName(xoptions);
-            sb.Append('(').Append(str);
-            if (source.Kind == TypedConstantKind.Array && !str.EndsWith(']')) sb.Append("[]");
-            sb.Append(") ");
-        }
+        if (name != null && options.UseName) sb.Append(name).Append(" = ");
 
         // The actual value...
         if (source.IsNull) sb.Append("null");
@@ -158,16 +140,16 @@ internal static partial class EasyNameExtensions
     /// <returns></returns>
     static string TypedConstantValue(object? value, EasyTypedConstant options) => value switch
     {
-        Type item => item.EasyName(options.ClrValueOptions ?? EasyNameOptions.Default),
-        MethodInfo item => item.EasyName(options.ClrValueOptions ?? EasyNameOptions.Default),
-        PropertyInfo item => item.EasyName(options.ClrValueOptions ?? EasyNameOptions.Default),
-        FieldInfo item => item.EasyName(options.ClrValueOptions ?? EasyNameOptions.Default),
+        Type item => $"typeof({item.EasyName(options.ValueClrOptions ?? EasyNameOptions.Default)})",
+        MethodInfo item => item.EasyName(options.ValueClrOptions ?? EasyNameOptions.Default),
+        PropertyInfo item => item.EasyName(options.ValueClrOptions ?? EasyNameOptions.Default),
+        FieldInfo item => item.EasyName(options.ValueClrOptions ?? EasyNameOptions.Default),
 
-        ITypeSymbol item => item.EasyName(options.TypeSymbolValueOptions ?? EasyTypeSymbol.Default),
-        IPropertySymbol item => item.EasyName(options.PropertySymbolValueOptions ?? EasyPropertySymbol.Default),
-        IFieldSymbol item => item.EasyName(options.FieldSymbolValueOptions ?? EasyFieldSymbol.Default),
-        IMethodSymbol item => item.EasyName(options.MethodSymbolValueOptions ?? EasyMethodSymbol.Default),
-        IEventSymbol item => item.EasyName(options.EventSymbolValueOptions ?? EasyEventSymbol.Default),
+        ITypeSymbol item => $"typeof({item.EasyName(options.ValueTypeSymbolOptions ?? EasyTypeSymbol.Default)})",
+        IPropertySymbol item => item.EasyName(options.ValuePropertySymbolOptions ?? EasyPropertySymbol.Default),
+        IFieldSymbol item => item.EasyName(options.ValueFieldSymbolOptions ?? EasyFieldSymbol.Default),
+        IMethodSymbol item => item.EasyName(options.ValueMethodSymbolOptions ?? EasyMethodSymbol.Default),
+        //IEventSymbol item => item.EasyName(options.ValueEventSymbolOptions ?? EasyEventSymbol.Default),
 
         bool item => item ? "true" : "false",
         char item => item.ToString(),
