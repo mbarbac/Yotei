@@ -7,7 +7,7 @@
 [Generator(LanguageNames.CSharp)]
 internal class WithGenerator : TreeGenerator
 {
-#if DEBUG_WITH_GENERATOR
+#if DEBUG_WITH_GENERATOR_
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
@@ -22,7 +22,6 @@ internal class WithGenerator : TreeGenerator
     protected override List<Type> TypeAttributes { get; } = [
         typeof(InheritsWithAttribute),
         typeof(InheritsWithAttribute<>),
-        typeof(ExampleAttribute) // DEBUG-ONLY...
     ];
 
     /// <summary>
@@ -31,7 +30,6 @@ internal class WithGenerator : TreeGenerator
     protected override List<Type> PropertyAttributes { get; } = [
         typeof(WithAttribute),
         typeof(WithAttribute<>),
-        typeof(ExampleAttribute) // DEBUG-ONLY...
     ];
 
     /// <summary>
@@ -40,16 +38,6 @@ internal class WithGenerator : TreeGenerator
     protected override List<Type> FieldAttributes { get; } = [
         typeof(WithAttribute),
         typeof(WithAttribute<>),
-        typeof(ExampleAttribute) // DEBUG-ONLY...
-    ];
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    protected override List<Type> MethodAttributes { get; } = [
-        typeof(WithAttribute),
-        typeof(WithAttribute<>),
-        typeof(ExampleAttribute) // DEBUG-ONLY...
     ];
 
     // ----------------------------------------------------

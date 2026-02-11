@@ -94,22 +94,37 @@ internal static class SymbolExtensions
         // ------------------------------------------------
 
         /// <summary>
-        /// Tries to determine if the symbol is decorated with the <see langword="new"/> keyword
-        /// by finding its declaring syntax references and in each finding the 'new' modifier.
+        /// Tries to determine if the symbol is decorated with the <see langword="new"/> keyword by
+        /// finding its declaring syntax references and in each finding the 'new' modifier.
         /// <br/> If no syntax references were available, then it returns false.
         /// </summary>
         public bool IsNew
         {
             get
             {
-                var syntaxes = symbol
-                    .DeclaringSyntaxReferences
-                    .Select(x => x.GetSyntax() as MethodDeclarationSyntax);
-
-                foreach (var syntax in syntaxes)
-                    if (syntax?.Modifiers.Any(x => x.IsKind(SyntaxKind.NewKeyword)) ?? false)
-                        return true;
-
+                var nodes = symbol.GetSyntaxNodes();
+                foreach (var node in nodes)
+                {
+                    var item = node;
+                    
+                    // Motivation: the symbol obtained by the tree generator for a FieldEvent syntax
+                    // get transformed into a IEventSymbol, but then its declaration syntaxes are
+                    // VariableDeclarator ones...
+                    if (node is VariableDeclaratorSyntax vardec)
+                    {
+                        item = vardec.Parent;
+                        item = (item as VariableDeclarationSyntax)?.Parent;
+                    }
+                    switch (item)
+                    {
+                        case EventDeclarationSyntax temp: if (temp.Modifiers.Any(x => x.IsKind(SyntaxKind.NewKeyword))) return true; break;
+                        case EventFieldDeclarationSyntax temp: if (temp.Modifiers.Any(x => x.IsKind(SyntaxKind.NewKeyword))) return true; break;
+                        case BaseTypeDeclarationSyntax temp: if (temp.Modifiers.Any(x => x.IsKind(SyntaxKind.NewKeyword))) return true; break;
+                        case BasePropertyDeclarationSyntax temp: if (temp.Modifiers.Any(x => x.IsKind(SyntaxKind.NewKeyword))) return true; break;
+                        case BaseFieldDeclarationSyntax temp: if (temp.Modifiers.Any(x => x.IsKind(SyntaxKind.NewKeyword))) return true; break;
+                        case BaseMethodDeclarationSyntax temp: if (temp.Modifiers.Any(x => x.IsKind(SyntaxKind.NewKeyword))) return true; break;
+                    }
+                }
                 return false;
             }
         }

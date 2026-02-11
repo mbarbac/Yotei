@@ -38,11 +38,11 @@ internal record EasyTypedConstant
     /// </summary>
     public EasyMethodSymbol? ValueMethodSymbolOptions { get; set; }
 
-    /*/// <summary>
+    /// <summary>
     /// If not null, the options to use with values that are event symbol ones.
     /// If null, then default ones are used.
     /// </summary>
-    public EasyEventSymbol? ValueEventSymbolOptions { get; set; }*/
+    public EasyEventSymbol? ValueEventSymbolOptions { get; set; }
 
     // ----------------------------------------------------
 
@@ -56,7 +56,7 @@ internal record EasyTypedConstant
         ValuePropertySymbolOptions = EasyPropertySymbol.Default,
         ValueFieldSymbolOptions = EasyFieldSymbol.Default,
         ValueMethodSymbolOptions = EasyMethodSymbol.Default,
-        //ValueEventSymbolOptions = EasyEventSymbol.Default,
+        ValueEventSymbolOptions = EasyEventSymbol.Default,
     };
 
     /// <summary>
@@ -70,7 +70,7 @@ internal record EasyTypedConstant
         ValuePropertySymbolOptions = EasyPropertySymbol.Full,
         ValueFieldSymbolOptions = EasyFieldSymbol.Full,
         ValueMethodSymbolOptions = EasyMethodSymbol.Full,
-        //ValueEventSymbolOptions = EasyEventSymbol.Full,
+        ValueEventSymbolOptions = EasyEventSymbol.Full,
     };
 }
 
@@ -149,7 +149,7 @@ internal static partial class EasyNameExtensions
         IPropertySymbol item => item.EasyName(options.ValuePropertySymbolOptions ?? EasyPropertySymbol.Default),
         IFieldSymbol item => item.EasyName(options.ValueFieldSymbolOptions ?? EasyFieldSymbol.Default),
         IMethodSymbol item => item.EasyName(options.ValueMethodSymbolOptions ?? EasyMethodSymbol.Default),
-        //IEventSymbol item => item.EasyName(options.ValueEventSymbolOptions ?? EasyEventSymbol.Default),
+        IEventSymbol item => item.EasyName(options.ValueEventSymbolOptions ?? EasyEventSymbol.Default),
 
         bool item => item ? "true" : "false",
         char item => item.ToString(),

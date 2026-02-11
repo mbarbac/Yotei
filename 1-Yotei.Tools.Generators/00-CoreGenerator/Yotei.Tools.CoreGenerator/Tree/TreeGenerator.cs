@@ -120,9 +120,9 @@ internal class TreeGenerator : IIncrementalGenerator
             BaseTypeDeclarationSyntax or
             BasePropertyDeclarationSyntax or
             BaseFieldDeclarationSyntax or
-            BaseMethodDeclarationSyntax /*or
+            BaseMethodDeclarationSyntax or
             EventDeclarationSyntax or
-            EventFieldDeclarationSyntax*/;
+            EventFieldDeclarationSyntax;
     }
 
     // ----------------------------------------------------
@@ -152,11 +152,11 @@ internal class TreeGenerator : IIncrementalGenerator
     /// </summary>
     protected virtual List<Type> MethodAttributes { get; } = [];
 
-    /*/// <summary>
+    /// <summary>
     /// The collection of attribute types this generator uses, by default, to identify decorated
     /// events (field and regular ones) as source code generation elements.
     /// </summary>
-    protected virtual List<Type> EventAttributes { get; } = [];*/
+    protected virtual List<Type> EventAttributes { get; } = [];
 
     // ----------------------------------------------------
 
@@ -184,11 +184,11 @@ internal class TreeGenerator : IIncrementalGenerator
     /// </summary>
     protected virtual List<string> MethodAttributeNames { get; } = [];
 
-    /*/// <summary>
+    /// <summary>
     /// The collection of fully qualified attribute type names used by this generator, by default,
     /// to identify decorated events as source code generation candidates.
     /// </summary>
-    protected virtual List<string> EventAttributeNames { get; } = [];*/
+    protected virtual List<string> EventAttributeNames { get; } = [];
 
     // ----------------------------------------------------
 
@@ -256,7 +256,7 @@ internal class TreeGenerator : IIncrementalGenerator
         return item;
     }
 
-    /*/// <summary>
+    /// <summary>
     /// Invoked to create a detached node for source code generation purposes.
     /// <br/> The symtax must be among the supported ones.
     /// </summary>
@@ -270,7 +270,7 @@ internal class TreeGenerator : IIncrementalGenerator
         if (syntax != null) item.SyntaxNodes.Add(syntax);
         item.Attributes.AddRange(attributes);
         return item;
-    }*/
+    }
 
     // ----------------------------------------------------
 
@@ -324,7 +324,7 @@ internal class TreeGenerator : IIncrementalGenerator
             var candidate = CreateNode(symbol, syntax, ats, model);
             return candidate;
         }
-        
+
         // Fields...
         while (node is FieldDeclarationSyntax syntax)
         {
@@ -363,13 +363,10 @@ internal class TreeGenerator : IIncrementalGenerator
             return candidate;
         }
 
-        // Events...
-        /*while (node is MemberDeclarationSyntax syntax)
+        // Property-alike events...
+        while (node is EventDeclarationSyntax syntax)
         {
-            if (syntax is not EventDeclarationSyntax and not EventFieldDeclarationSyntax)
-                break;
-
-            var symbol = model.GetDeclaredSymbol(syntax, token) as IEventSymbol;
+            var symbol = model.GetDeclaredSymbol(syntax, token);
             if (symbol is null) break;
 
             var atx = FindSyntaxAttributes(symbol, syntax);
@@ -378,7 +375,26 @@ internal class TreeGenerator : IIncrementalGenerator
 
             var candidate = CreateNode(symbol, syntax, ats, model);
             return candidate;
-        }*/
+        }
+
+        // Field-alike events...
+        while (node is EventFieldDeclarationSyntax syntax)
+        {
+            var items = syntax.Declaration.Variables;
+            foreach (var item in items)
+            {
+                var symbol = model.GetDeclaredSymbol(item, token) as IEventSymbol;
+                if (symbol is null) break;
+
+                var atx = FindSyntaxAttributes(symbol, syntax);
+                var ats = FilterAttributes(atx, TypeAttributes, TypeAttributeNames);
+                if (ats.Count == 0) break;
+
+                var candidate = CreateNode(symbol, syntax, ats, model);
+                return candidate;
+            }
+            break;
+        }
 
         // Finishing by ignoring the node...
         return null!;
@@ -454,7 +470,7 @@ internal class TreeGenerator : IIncrementalGenerator
                 case PropertyNode item: CaptureHierarchy(types, item); break;
                 case FieldNode item: CaptureHierarchy(types, item); break;
                 case MethodNode item: CaptureHierarchy(types, item); break;
-                //case EventNode item: CaptureHierarchy(types, item); break;
+                case EventNode item: CaptureHierarchy(types, item); break;
             }
         }
 
@@ -559,7 +575,7 @@ internal class TreeGenerator : IIncrementalGenerator
         }
 
         var item = type.ChildProperties.Find(x => Comparer.Equals(x.Symbol, node.Symbol));
-        
+
         if (item is null) // Adding a new child...
         {
             type.ChildProperties.Add(node);
@@ -629,7 +645,7 @@ internal class TreeGenerator : IIncrementalGenerator
         }
     }
 
-    /*/// <summary>
+    /// <summary>
     /// Invoked to capture the given node into the source code generation hierarchy.
     /// </summary>
     /// <param name="types"></param>
@@ -656,5 +672,5 @@ internal class TreeGenerator : IIncrementalGenerator
         {
             item.Augment(node);
         }
-    }*/
+    }
 }
