@@ -1,21 +1,21 @@
 ﻿namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
-internal static class TypeSymbolExtensions
+internal static partial class TypeSymbolExtensions
 {
-    extension(ITypeSymbol symbol)
+    extension(ITypeSymbol source)
     {
         /// <summary>
         /// Determines if this type symbol is an interface, or not.
         /// </summary>
-        public bool IsInterface => symbol.TypeKind == TypeKind.Interface;
+        public bool IsInterface => source.TypeKind == TypeKind.Interface;
 
         // ------------------------------------------------
 
         /// <summary>
         /// Determines if this type symbol is a partial one, or not.
         /// </summary>
-        public bool IsPartial => symbol
+        public bool IsPartial => source
             .GetSyntaxNodes()
             .OfType<TypeDeclarationSyntax>()
             .Any(x => x.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword)));
@@ -31,7 +31,7 @@ internal static class TypeSymbolExtensions
             get
             {
                 INamedTypeSymbol? temp = null;
-                while ((temp = (temp ?? symbol).BaseType) != null)
+                while ((temp = (temp ?? source).BaseType) != null)
                     if (!temp.IsNamespace) yield return temp;
             }
         }
@@ -47,10 +47,10 @@ internal static class TypeSymbolExtensions
         public bool IsAssignableTo(ITypeSymbol target)
         {
             var comparer = SymbolEqualityComparer.Default;
-            if (comparer.Equals(symbol, target)) return true;
+            if (comparer.Equals(source, target)) return true;
 
-            if (symbol.AllBaseTypes.Any(x => comparer.Equals(x, target))) return true;
-            if (symbol.AllInterfaces.Any(x => comparer.Equals(x, target))) return true;
+            if (source.AllBaseTypes.Any(x => comparer.Equals(x, target))) return true;
+            if (source.AllInterfaces.Any(x => comparer.Equals(x, target))) return true;
             return false;
         }
 
@@ -63,16 +63,16 @@ internal static class TypeSymbolExtensions
         /// <returns></returns>
         public bool Match(Type type)
         {
-            ArgumentNullException.ThrowIfNull(symbol);
+            ArgumentNullException.ThrowIfNull(source);
             ArgumentNullException.ThrowIfNull(type);
 
             // Trivial cases...
-            if (symbol.IsNamespace) return false;
-            if (symbol.Kind == SymbolKind.TypeParameter) return true;
+            if (source.IsNamespace) return false;
+            if (source.Kind == SymbolKind.TypeParameter) return true;
             if (type.IsGenericParameter) return true;
 
             // Capturing...
-            var sargs = (symbol as INamedTypeSymbol)?.TypeArguments ?? [];
+            var sargs = (source as INamedTypeSymbol)?.TypeArguments ?? [];
             var targs = type.GenericTypeArguments.Length != 0
             ? type.GenericTypeArguments
             : type is System.Reflection.TypeInfo info ? info.GenericTypeParameters : [];
@@ -80,19 +80,19 @@ internal static class TypeSymbolExtensions
             if (sargs.Length != targs.Length) return false; // shortcut...
 
             // Names...
-            var sname = symbol.Name;
+            var sname = source.Name;
             var tname = type.Name;
             var index = tname.IndexOf('`');
             if (index >= 0) tname = tname[..index];
             if (sname != tname) return false;
 
             // Hierarchy...
-            var shost = symbol.ContainingType;
+            var shost = source.ContainingType;
             var thost = type.DeclaringType;
 
             if (shost is null && thost is null) // Namespaces...
             {
-                var sspace = symbol.ContainingNamespace?.ToString() ?? string.Empty;
+                var sspace = source.ContainingNamespace?.ToString() ?? string.Empty;
                 var tspace = type.Namespace ?? string.Empty;
                 if (sspace != tspace) return false;
             }
@@ -124,10 +124,10 @@ internal static class TypeSymbolExtensions
         /// <returns></returns>
         public bool MatchAny(IEnumerable<Type> types)
         {
-            ArgumentNullException.ThrowIfNull(symbol);
+            ArgumentNullException.ThrowIfNull(source);
             ArgumentNullException.ThrowIfNull(types);
 
-            return types.Any(x => symbol.Match(x));
+            return types.Any(x => source.Match(x));
         }
     }
 }

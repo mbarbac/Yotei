@@ -163,7 +163,7 @@ internal static partial class EasyNameExtensions
             if (source.MethodKind is MethodKind.Constructor && // Regular constructor only!
                 options.UseAccessibility)
             {
-                var temp = source.DeclaredAccessibility.ToAccesibilityString();
+                var temp = source.DeclaredAccessibility.ToAccessibilityString();
                 if (temp != null) sb.Append(temp).Append(' ');
             }
 
@@ -191,7 +191,7 @@ internal static partial class EasyNameExtensions
             // Header...
             if (options.UseAccessibility)
             {
-                var temp = source.DeclaredAccessibility.ToAccesibilityString();
+                var temp = source.DeclaredAccessibility.ToAccessibilityString();
                 if (temp != null) sb.Append(temp).Append(' ');
             }
 

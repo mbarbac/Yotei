@@ -1,9 +1,9 @@
 ﻿namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
-internal static class NamedTypeSymbolExtensions
+internal static partial class NamedTypeSymbolExtensions
 {
-    extension(INamedTypeSymbol symbol)
+    extension(INamedTypeSymbol source)
     {
         /// <summary>
         /// Tries to find a copy constructor declared in the given named type. By default this
@@ -15,16 +15,16 @@ internal static class NamedTypeSymbolExtensions
         /// <returns></returns>
         public IMethodSymbol? FindCopyConstructor(bool strict = true)
         {
-            var methods = symbol.GetMembers().OfType<IMethodSymbol>().Where(static x =>
+            var methods = source.GetMembers().OfType<IMethodSymbol>().Where(static x =>
                 x.MethodKind == MethodKind.Constructor &&
                 x.IsStatic == false &&
                 x.Parameters.Length == 1)
                 .ToDebugArray();
 
             var comparer = SymbolEqualityComparer.Default;
-            var method = methods.FirstOrDefault(x => comparer.Equals(symbol, x.Parameters[0].Type));
+            var method = methods.FirstOrDefault(x => comparer.Equals(source, x.Parameters[0].Type));
             if (method is null && !strict)
-                method = methods.FirstOrDefault(x => symbol.IsAssignableTo(x.Parameters[0].Type));
+                method = methods.FirstOrDefault(x => source.IsAssignableTo(x.Parameters[0].Type));
 
             return method;
         }

@@ -66,8 +66,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyTypeSymbol.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeEx\IsNullableStyle.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyParameterSymbol.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyCommon.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyEventSymbol.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\SymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\NamedTypeSymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\TypeSymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\AccessibilityExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\EventNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\FieldNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\MethodNode.cs" />

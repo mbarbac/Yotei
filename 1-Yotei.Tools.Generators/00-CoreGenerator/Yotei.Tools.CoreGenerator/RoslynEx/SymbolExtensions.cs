@@ -1,17 +1,17 @@
 ﻿namespace Yotei.Tools.CoreGenerator;
 
 // ========================================================
-internal static class SymbolExtensions
+internal static partial class SymbolExtensions
 {
-    extension(ISymbol symbol)
+    extension(ISymbol source)
     {
         /// <summary>
         /// Gets the symbol of the containing type or of the nearest enclosing namespace, or
         /// null if any.
         /// </summary>
         public ISymbol? ContainingTypeOrNamespace =>
-            (ISymbol?)symbol.ContainingType ??
-            (ISymbol?)symbol.ContainingNamespace;
+            (ISymbol?)source.ContainingType ??
+            (ISymbol?)source.ContainingNamespace;
 
         // ------------------------------------------------
 
@@ -21,8 +21,8 @@ internal static class SymbolExtensions
         /// declared.
         /// </summary>
         public Location? FirstLocation =>
-            symbol.Locations.FirstOrDefault() ??
-            symbol.GetSyntaxNodes().FirstOrDefault()?.GetLocation();
+            source.Locations.FirstOrDefault() ??
+            source.GetSyntaxNodes().FirstOrDefault()?.GetLocation();
 
         // ------------------------------------------------
 
@@ -32,7 +32,7 @@ internal static class SymbolExtensions
         /// an empty array.
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<SyntaxNode> GetSyntaxNodes() => symbol
+        public IEnumerable<SyntaxNode> GetSyntaxNodes() => source
             .DeclaringSyntaxReferences
             .Select(x => x.GetSyntax());
 
@@ -43,7 +43,7 @@ internal static class SymbolExtensions
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public bool HasAttributes(Type type) => symbol.GetAttributes(type).Any();
+        public bool HasAttributes(Type type) => source.GetAttributes(type).Any();
 
         /// <summary>
         /// Returns the collection of attributes that decorates the given symbol and whose class is
@@ -53,10 +53,10 @@ internal static class SymbolExtensions
         /// <returns></returns>
         public IEnumerable<AttributeData> GetAttributes(Type type)
         {
-            ArgumentNullException.ThrowIfNull(symbol);
+            ArgumentNullException.ThrowIfNull(source);
             ArgumentNullException.ThrowIfNull(type);
 
-            foreach (var at in symbol.GetAttributes())
+            foreach (var at in source.GetAttributes())
             {
                 if (at.AttributeClass is not null &&
                     at.AttributeClass.Match(type)) yield return at;
@@ -68,7 +68,7 @@ internal static class SymbolExtensions
         /// </summary>
         /// <param name="types"></param>
         /// <returns></returns>
-        public bool HasAttributes(IEnumerable<Type> types) => symbol.GetAttributes(types).Any();
+        public bool HasAttributes(IEnumerable<Type> types) => source.GetAttributes(types).Any();
 
         /// <summary>
         /// Returns the collection of attributes that decorates the given symbol and whose class is
@@ -78,10 +78,10 @@ internal static class SymbolExtensions
         /// <returns></returns>
         public IEnumerable<AttributeData> GetAttributes(IEnumerable<Type> types)
         {
-            ArgumentNullException.ThrowIfNull(symbol);
+            ArgumentNullException.ThrowIfNull(source);
             ArgumentNullException.ThrowIfNull(types);
 
-            foreach (var at in symbol.GetAttributes())
+            foreach (var at in source.GetAttributes())
             {
                 foreach (var type in types)
                 {
@@ -102,7 +102,7 @@ internal static class SymbolExtensions
         {
             get
             {
-                var nodes = symbol.GetSyntaxNodes();
+                var nodes = source.GetSyntaxNodes();
                 foreach (var node in nodes)
                 {
                     var item = node;

@@ -3,7 +3,7 @@
 // ========================================================
 internal static class NameSyntaxExtensions
 {
-    extension(NameSyntax syntax)
+    extension(NameSyntax source)
     {
         /// <summary>
         /// Returns a string with the short name of this name syntax. If it is an alias one, then
@@ -13,14 +13,14 @@ internal static class NameSyntaxExtensions
         /// <returns></returns>
         public string ShortName(bool alias = false)
         {
-            return syntax switch
+            return source switch
             {
                 SimpleNameSyntax item => item.Identifier.Text,
                 QualifiedNameSyntax item => ShortName(item.Right, alias),
                 AliasQualifiedNameSyntax item => ShortName(alias ? item.Alias : item.Name, false),
 
                 _ => throw new UnExpectedException(
-                    "Name syntax kind not recognized.").WithData(syntax)
+                    "Name syntax kind not recognized.").WithData(source)
             };
         }
 
@@ -32,14 +32,14 @@ internal static class NameSyntaxExtensions
         /// <returns></returns>
         public string LongName(bool alias = false)
         {
-            return syntax switch
+            return source switch
             {
                 SimpleNameSyntax item => item.Identifier.Text,
                 QualifiedNameSyntax item => item.ToString(),
                 AliasQualifiedNameSyntax item => LongName(alias ? item.Alias : item.Name, false),
 
                 _ => throw new UnExpectedException(
-                    "Name syntax kind not recognized.").WithData(syntax)
+                    "Name syntax kind not recognized.").WithData(source)
             };
         }
     }

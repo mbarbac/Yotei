@@ -3,7 +3,7 @@
 // ========================================================
 internal static class SyntaxListExtensions
 {
-    extension(SyntaxList<AttributeListSyntax> sources)
+    extension(SyntaxList<AttributeListSyntax> source)
     {
         /// <summary>
         /// Returns a flattened enumeration of the attributes that decorates each of the syntax
@@ -12,7 +12,7 @@ internal static class SyntaxListExtensions
         /// <returns></returns>
         public IEnumerable<AttributeSyntax> GetAttributes()
         {
-            return sources.SelectMany(static x => x.Attributes);
+            return source.SelectMany(static x => x.Attributes);
         }
     }
 }

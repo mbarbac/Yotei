@@ -97,7 +97,7 @@ internal static partial class EasyNameExtensions
         // Accessibility...
         if (options.UseAccessibility)
         {
-            var temp = source.DeclaredAccessibility.ToAccesibilityString();
+            var temp = source.DeclaredAccessibility.ToAccessibilityString();
             if (temp != null) sb.Append(temp).Append(' ');
         }
 
