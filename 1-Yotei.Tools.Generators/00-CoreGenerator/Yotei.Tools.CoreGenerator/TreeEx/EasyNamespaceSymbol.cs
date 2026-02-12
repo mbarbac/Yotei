@@ -6,25 +6,25 @@ internal record EasyNamespaceSymbol
     /// <summary>
     /// Include the host namespaces in the display string.
     /// </summary>
-    public bool UseHostNamespace { get; set; }
+    public bool UseHostNamespace { get; init; }
 
     /// <summary>
     /// Include the 'global' namespace in the display string. This setting is used only if the
     /// '<see cref="UseHostNamespace"/>' one is enabled.
     /// </summary>
-    public bool UseGlobalNamespace { get; set; }
+    public bool UseGlobalNamespace { get; init; }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a new instance with a set of default code generation settings.
+    /// A shared instance with default-alike settings.
     /// </summary>
-    public static EasyNamespaceSymbol Default => new();
+    public static EasyNamespaceSymbol Default { get; } = new();
 
     /// <summary>
-    /// Returns a new instance with a full settings.
+    /// A shared instance with full-alike settings.
     /// </summary>
-    public static EasyNamespaceSymbol Full => new()
+    public static EasyNamespaceSymbol Full { get; } = new()
     {
         UseHostNamespace = true,
         UseGlobalNamespace = true,

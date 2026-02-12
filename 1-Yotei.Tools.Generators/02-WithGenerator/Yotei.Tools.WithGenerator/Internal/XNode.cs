@@ -4,6 +4,41 @@
 internal static class XNode
 {
     /// <summary>
+    /// Builds the modifiers for hosts that are abstract types, or null if any.
+    /// </summary>
+    /// Base        Modifier
+    /// ---------------------------------------------------
+    /// interface   abstract
+    /// abstract    abstract override
+    /// regular     abstract new
+    /// virt        abstract override
+    public static string? HostAbstractModifiers(IMethodSymbol basemethod)
+    {
+        throw null;
+    }
+
+    /// <summary>
+    /// Builds the modifiers for hosts that are regular types, or null if any.
+    /// </summary>
+    /// Base        Derived     Sealed  Modifier
+    /// ---------------------------------------------------
+    /// regular     regular     no      new
+    /// regular     virt        no      new virtual
+    /// regular     regular     yes     new
+    /// regular     virt        yes     new
+    /// ---------------------------------------------------
+    /// virt        regular     no      new
+    /// virt        virt        no      override
+    /// virt        regular     yes     override
+    /// virt        virt        yes     override
+    public static string? HostRegularModifiers()
+    {
+        throw null;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Tries to find the 'UseVirtual' named argument on the given attribute.
     /// Is found, returns its value in the out argument.
     /// </summary>
@@ -85,6 +120,26 @@ internal static class XNode
     // ----------------------------------------------------
 
     /// <summary>
+    /// Determines if the given type has a member with the given name that is decorated with the
+    /// <see cref="WithAttribute"/> or with a <see cref="WithAttribute{T}"/> attribute and, if so,
+    /// returns that attribute in the out argument.
+    /// </summary>
+    public static bool FindWithAttribute(
+        INamedTypeSymbol type, string name, [NotNullWhen(true)] out AttributeData? value)
+    {
+        var props = type.GetMembers(name).OfType<IPropertySymbol>();
+        foreach (var prop in props) if (FindWithAttribute(prop, out value)) return true;
+
+        var fields = type.GetMembers(name).OfType<IFieldSymbol>();
+        foreach (var field in fields) if (FindWithAttribute(field, out value)) return true;
+
+        value = default!;
+        return false;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Determines if the given member is decorated with a <see cref="WithAttribute"/> or with
     /// a <see cref="WithAttribute{T}"/> attribute and, if so, returns the found one in the out
     /// argument.
@@ -100,6 +155,8 @@ internal static class XNode
 
         return false;
     }
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// Determines if the given member is decorated with a <see cref="WithAttribute"/> or with
@@ -117,7 +174,7 @@ internal static class XNode
 
         return false;
     }
-    
+
     // ----------------------------------------------------
 
     /// <summary>

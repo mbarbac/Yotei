@@ -45,7 +45,7 @@ internal class XPropertyNode : PropertyNode
     public override void Emit(SourceProductionContext context, CodeBuilder cb)
     {
         // Intercepting explicitly implemented...
-        if (FindMethodAt(Host) != null) return;
+        if (FindMethod(out _, Host)) return;
 
         // Capturing working data...
         if (!CaptureWorkingData(context)) return;
@@ -62,20 +62,40 @@ internal class XPropertyNode : PropertyNode
     /// </summary>
     bool CaptureWorkingData(SourceProductionContext context)
     {
+        MethodName = $"With{Symbol.Name}";
+        ArgumentName = $"v_{Symbol.Name}";
+        UseVirtual = true;
+        ReturnType = Host;
+        ReturnNullable = false;
+        ReturnOptions = EasyTypeSymbol.Default;
+
         // Just 1 attribute is needed and allowed...
         if (Attributes.Count == 0) { Symbol.ReportError(TreeError.NoAttributes, context); return false; }
         if (Attributes.Count > 1) { Symbol.ReportError(TreeError.TooManyAttributes, context); return false; }
 
-        // HIGH: here I am...
+        // Capturing...
+        var at = Attributes[0];
+        if (XNode.FindReturnType(at, out var type, out var nullable))
+        {
+            ReturnType = type;
+            ReturnNullable = nullable;
+
+            var same = SymbolEqualityComparer.Default.Equals(Host, type);
+            if (!same) ReturnOptions = EasyTypeSymbol.Full with
+            { NullableStyle = IsNullableStyle.None };
+        }
+        if (XNode.FindUseVirtual(at, out var virt)) UseVirtual = virt;
 
         // Finishing...
-        MethodName = $"With{Symbol.Name}";
-        ArgumentName = $"value_{Symbol.Name}";
         return true;
     }
 
-    string MethodName;
-    string ArgumentName;
+    string MethodName = default!;
+    string ArgumentName = default!;
+    bool UseVirtual = default;
+    INamedTypeSymbol ReturnType = default!;
+    bool ReturnNullable = default;
+    EasyTypeSymbol ReturnOptions = default!;
 
     // ----------------------------------------------------
 
@@ -84,7 +104,30 @@ internal class XPropertyNode : PropertyNode
     /// </summary>
     void EmitHostInterface(SourceProductionContext context, CodeBuilder cb)
     {
-        throw null;
+        var rtype = ReturnType.EasyName(ReturnOptions);
+        var rnull = ReturnNullable ? "?" : string.Empty;
+        var argtype = Symbol.Type.EasyName(EasyTypeSymbol.Full);
+        var modifiers = GetInterfaceModifiers();
+
+        XNode.EmitDocumentation(Symbol, cb);
+        cb.AppendLine($"{modifiers}{rtype}{rnull}");
+        cb.AppendLine($"{MethodName}({argtype} {ArgumentName})");
+    }
+
+    string? GetInterfaceModifiers()
+    {
+        var found = Finder.Find((type, out value) =>
+        {
+            if (FindMethod(out _, type) || XNode.FindWithAttribute(type, Symbol.Name, out _))
+            {
+                value = "new ";
+                return true;
+            }
+            value = default;
+            return false;
+        },
+        out string? value, null, Host.AllInterfaces);
+        return found ? value : null;
     }
 
     // ----------------------------------------------------
@@ -110,28 +153,73 @@ internal class XPropertyNode : PropertyNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// Determines if the given type has a property compatible with this element.
+    /// Tries to find a compatible member at the given type, if not null, and at the types of the
+    /// given arrays.
     /// </summary>
-    IPropertySymbol? FindMemberAt(INamedTypeSymbol type)
-        => type.GetMembers().OfType<IPropertySymbol>().FirstOrDefault(x =>
-        x.Name == Symbol.Name);
+    /// <param name="value"></param>
+    /// <param name="type"></param>
+    /// <param name="chains"></param>
+    /// <returns></returns>
+    bool FindMember(
+        [NotNullWhen(true)] out IPropertySymbol? value,
+        INamedTypeSymbol? type, params IEnumerable<INamedTypeSymbol>[] chains)
+    {
+        return Finder.Find((type, out value) =>
+        {
+            value = type.GetMembers().OfType<IPropertySymbol>().FirstOrDefault(x =>
+                x.Name == MethodName);
+
+            return value != null;
+        },
+        out value, type, chains);
+    }
 
     /// <summary>
-    /// Determines if the given type has a decorated property compatible with this element.
+    /// Tries to find a compatible decorated member at the given type, if not null, and at the types
+    /// of the given arrays.
     /// </summary>
-    IPropertySymbol? FindDecoratedMemberAt(INamedTypeSymbol type)
-        => type.GetMembers().OfType<IPropertySymbol>().FirstOrDefault(x =>
-        x.Name == Symbol.Name && (
-        x.HasAttributes(typeof(WithAttribute)) || x.HasAttributes(typeof(WithAttribute<>))));
+    /// <param name="value"></param>
+    /// <param name="type"></param>
+    /// <param name="chains"></param>
+    /// <returns></returns>
+    bool FindDecoratedMember(
+        [NotNullWhen(true)] out IPropertySymbol? value,
+        INamedTypeSymbol? type, params IEnumerable<INamedTypeSymbol>[] chains)
+    {
+        return Finder.Find((type, out value) =>
+        {
+            value = type.GetMembers().OfType<IPropertySymbol>().FirstOrDefault(x =>
+                x.Name == MethodName && (
+                x.HasAttributes(typeof(WithAttribute)) || x.HasAttributes(typeof(WithAttribute<>))));
+
+            return value != null;
+        },
+        out value, type, chains);
+    }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Determines if the given type has a method compatible with this element.
+    /// Tries to find a suitable method at the given type, if not null, and at the types of the
+    /// given arrays.
     /// </summary>
-    IMethodSymbol? FindMethodAt(INamedTypeSymbol type)
-        => type.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(x =>
-        x.Name == MethodName &&
-        x.Parameters.Length == 1 &&
-        Symbol.Type.IsAssignableTo(x.Parameters[0].Type));
+    /// <param name="value"></param>
+    /// <param name="type"></param>
+    /// <param name="chains"></param>
+    /// <returns></returns>
+    bool FindMethod(
+        [NotNullWhen(true)] out IMethodSymbol? value,
+        INamedTypeSymbol? type, params IEnumerable<INamedTypeSymbol>[] chains)
+    {
+        return Finder.Find((type, out value) =>
+        {
+            value = type.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(x =>
+                x.Name == MethodName &&
+                x.Parameters.Length == 1 &&
+                Symbol.Type.IsAssignableTo(x.Parameters[0].Type));
+
+            return value != null;
+        },
+        out value, type, chains);
+    }
 }

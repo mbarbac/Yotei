@@ -34,18 +34,18 @@ internal record EasyAttributeData
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a new instance with a set of default code generation settings.
+    /// A shared instance with default-alike settings.
     /// </summary>
-    public static EasyAttributeData Default => new()
+    public static EasyAttributeData Default { get; } = new()
     {
         GenericOptions = EasyTypeSymbol.Default,
         ValueOptions = EasyTypedConstant.Default
     };
 
     /// <summary>
-    /// Returns a new instance with full settings.
+    /// A shared instance with full-alike settings.
     /// </summary>
-    public static EasyAttributeData Full => new()
+    public static EasyAttributeData Full { get; } = new()
     {
         TypeOptions = EasyTypeSymbol.Full,
         UseAttributeSuffix = true,
@@ -82,7 +82,7 @@ internal static partial class EasyNameExtensions
         var name = type.Name;
 
         // Type options...
-        var xoptions = (options.TypeOptions ?? EasyTypeSymbol.Default).DisabledHideName();
+        var xoptions = (options.TypeOptions ?? EasyTypeSymbol.Default).WithNoHideName();
         var head = type.EasyName(xoptions);
 
         if (options.UseAttributeSuffix) { } // head already carries 'Attribute' if needed...

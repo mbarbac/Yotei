@@ -7,47 +7,47 @@ internal record EasyTypeSymbol
     /// Include the 'in' and 'out'  keywords in the display string. This setting is only used
     /// with variant type parameters.
     /// </summary>
-    public bool UseVariance { get; set; }
+    public bool UseVariance { get; init; }
 
     /// <summary>
     /// If not null, then the options to include the type's namespace. If null, it is ignored.
     /// If this setting is enabled, then the <see cref="UseHosts"/> one is also implicitly enabled.
     /// </summary>
-    public EasyNamespaceSymbol? NamespaceOptions { get; set; }
+    public EasyNamespaceSymbol? NamespaceOptions { get; init; }
 
     /// <summary>
     /// Include the type's host ones in the display string. 
     /// </summary>
-    public bool UseHost { get; set; }
+    public bool UseHost { get; init; }
 
     /// <summary>
     /// If enabled, hides the type's name by returning an empty string. This setting is almost only
     /// used to obtain an anonymous list of generic arguments. If this setting is enabled then it
     /// shortcuts all other settings.
     /// </summary>
-    public bool HideName { get; set; }
+    public bool HideName { get; init; }
 
     /// <summary>
     /// If enabled, include the prefined keywords for suitable special types (eg: <c>int</c> instead
     /// of <c>Int32</c>).
     /// </summary>
-    public bool UseSpecialNames { get; set; }
+    public bool UseSpecialNames { get; init; }
 
     /// <summary>
     /// If enabled removes the 'Attribute' suffix from the type's display string, when possible.
     /// </summary>
-    public bool RemoveAttributeSuffix { get; set; }
+    public bool RemoveAttributeSuffix { get; init; }
 
     /// <summary>
     /// Specifies the nhe nullable style to use.
     /// </summary>
-    public IsNullableStyle NullableStyle { get; set; }
+    public IsNullableStyle NullableStyle { get; init; }
 
     /// <summary>
     /// If not null, then the options to include the list of generic arguments of the type. If null,
     /// then they are ignored.
     /// </summary>
-    public EasyTypeSymbol? GenericOptions { get; set; }
+    public EasyTypeSymbol? GenericOptions { get; init; }
 
     // ----------------------------------------------------
 
@@ -56,45 +56,33 @@ internal record EasyTypeSymbol
     /// disabled.
     /// </summary>
     /// <returns></returns>
-    public EasyTypeSymbol DisabledHideName() => HideName ? this with { HideName = false } : this;
+    public EasyTypeSymbol WithNoHideName() => HideName ? this with { HideName = false } : this;
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a new instance with a set of default code generation settings.
+    /// A shared instance with default-alike settings.
     /// </summary>
-    public static EasyTypeSymbol Default => new()
+    public static EasyTypeSymbol Default { get; } = new()
     {
         UseSpecialNames = true,
+        RemoveAttributeSuffix = true,
         NullableStyle = IsNullableStyle.UseAnnotations,
-        GenericOptions = new()
-        {
-            NamespaceOptions = EasyNamespaceSymbol.Default,
-            UseSpecialNames = true,
-            NullableStyle = IsNullableStyle.UseAnnotations,
-        }
+        GenericOptions = Default,
     };
 
     /// <summary>
-    /// Returns a new instance with full settings.
-    /// <br/> The <see cref="HideName"/> and <see cref="RemoveAttributeSuffix"/> ones are not
-    /// enabled.
+    /// A shared instance with full-alike settings.
     /// </summary>
-    public static EasyTypeSymbol Full => new()
+    public static EasyTypeSymbol Full { get; } = new()
     {
         UseVariance = true,
         NamespaceOptions = EasyNamespaceSymbol.Full,
         UseHost = true,
         UseSpecialNames = true,
+        RemoveAttributeSuffix = false,
         NullableStyle = IsNullableStyle.KeepWrappers,
-        GenericOptions = new()
-        {
-            UseVariance = true,
-            NamespaceOptions = EasyNamespaceSymbol.Full,
-            UseHost = true,
-            UseSpecialNames = true,
-            NullableStyle = IsNullableStyle.KeepWrappers,
-        }
+        GenericOptions = Full,
     };
 }
 
@@ -193,7 +181,7 @@ internal static partial class EasyNameExtensions
         // Host types...
         if ((options.UseHost || options.NamespaceOptions != null) && host != null && !isgen)
         {
-            var xoptions = options.DisabledHideName();
+            var xoptions = options.WithNoHideName();
             var str = EasyName(host, xoptions);
             if (str.Length > 0) sb.Append(str).Append('.');
         }

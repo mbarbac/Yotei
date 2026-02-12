@@ -47,9 +47,9 @@ internal record EasyTypedConstant
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a new instance with a set of default code generation settings.
+    /// A shared instance with default-alike settings.
     /// </summary>
-    public static EasyTypedConstant Default => new()
+    public static EasyTypedConstant Default { get; } = new()
     {
         ValueClrOptions = EasyNameOptions.Default,
         ValueTypeSymbolOptions = EasyTypeSymbol.Default,
@@ -60,9 +60,9 @@ internal record EasyTypedConstant
     };
 
     /// <summary>
-    /// Returns a new instance with full settings.
+    /// A shared instance with full-alike settings.
     /// </summary>
-    public static EasyTypedConstant Full => new()
+    public static EasyTypedConstant Full { get; } = new()
     {
         UseName = true,
         ValueClrOptions = EasyNameOptions.Full,

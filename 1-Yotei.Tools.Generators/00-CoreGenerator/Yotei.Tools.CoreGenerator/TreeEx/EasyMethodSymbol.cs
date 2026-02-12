@@ -47,9 +47,9 @@ internal record EasyMethodSymbol
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a new instance with a set of default code generation settings.
+    /// A shared instance with default-alike settings.
     /// </summary>
-    public static EasyMethodSymbol Default => new()
+    public static EasyMethodSymbol Default { get; } = new()
     {
         UseAccessibility = true,
         UseModifiers = true,
@@ -60,9 +60,9 @@ internal record EasyMethodSymbol
     };
 
     /// <summary>
-    /// Returns a new instance with full settings.
+    /// A shared instance with full-alike settings.
     /// </summary>
-    public static EasyMethodSymbol Full => new()
+    public static EasyMethodSymbol Full { get; } = new()
     {
         UseAccessibility = true,
         UseModifiers = true,
@@ -175,7 +175,7 @@ internal static partial class EasyNameExtensions
             // Name...
             var xoptions =
                 (options.HostTypeOptions ?? options.ReturnTypeOptions ?? new())
-                .DisabledHideName();
+                .WithNoHideName();
 
             var host = source.ContainingType ?? throw new ArgumentException("Element's containing type is null.").WithData(source);
             var str = EasyName(host, xoptions);
@@ -219,7 +219,7 @@ internal static partial class EasyNameExtensions
             // Return type...
             if (options.ReturnTypeOptions != null)
             {
-                var xoptions = options.ReturnTypeOptions.DisabledHideName();
+                var xoptions = options.ReturnTypeOptions.WithNoHideName();
                 var str = source.ReturnType.EasyName(xoptions);
                 sb.Append(str).Append(' ');
             }
@@ -228,7 +228,7 @@ internal static partial class EasyNameExtensions
             var host = source.ContainingType;
             if (options.HostTypeOptions != null && host != null)
             {
-                var xoptions = options.HostTypeOptions.DisabledHideName();
+                var xoptions = options.HostTypeOptions.WithNoHideName();
                 var str = host.EasyName(xoptions);
                 sb.Append(str).Append('.');
             }

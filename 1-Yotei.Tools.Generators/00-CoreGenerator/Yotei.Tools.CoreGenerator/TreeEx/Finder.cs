@@ -19,10 +19,9 @@ internal static class Finder
     public delegate bool FindDelegate<T>(INamedTypeSymbol type, out T value);
 
     /// <summary>
-    /// Tries to obtain a value from the given type, and if not from the types in the given set of
-    /// types' arrays, in this order, using the given finder predicate. If found, the value is set
-    /// on the out argument and the method returns <see langword="true"/>. Otherwise, returns
-    /// <see langword="false"/> and sets the out argument to an arbitrary value.
+    /// Tries to obtain a <typeparamref name="T"/> value using the given predicate applied to the
+    /// given type (if not null), and to the types in the given set of type arrays, in that order.
+    /// If found, returns the found value in the out argument.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="predicate"></param>
@@ -33,43 +32,23 @@ internal static class Finder
     public static bool Find<T>(
         FindDelegate<T> predicate,
         out T value,
-        INamedTypeSymbol type,
-        params IEnumerable<INamedTypeSymbol>[] chains)
-    {
-        ArgumentNullException.ThrowIfNull(predicate);
-        ArgumentNullException.ThrowIfNull(type);
-        ArgumentNullException.ThrowIfNull(chains);
-
-        if (predicate(type, out value)) return true;
-        return Find(predicate, out value, chains);
-    }
-
-    /// <summary>
-    /// Tries to obtain a value from the types in the given set of types' arrays, in this order,
-    /// using the given finder predicate. If found, the value is set on the out argument and the
-    /// method returns <see langword="true"/>. Otherwise, returns <see langword="false"/> and sets
-    /// the out argument to an arbitrary value.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="predicate"></param>
-    /// <param name="value"></param>
-    /// <param name="chains"></param>
-    /// <returns></returns>
-    public static bool Find<T>(
-        FindDelegate<T> predicate,
-        out T value,
+        INamedTypeSymbol? type,
         params IEnumerable<INamedTypeSymbol>[] chains)
     {
         ArgumentNullException.ThrowIfNull(predicate);
         ArgumentNullException.ThrowIfNull(chains);
 
+        // The given type, if not null...
+        if (type != null && predicate(type, out value)) return true;
+
+        // The types of the given arrays, if any...
         foreach (var chain in chains)
         {
             ArgumentNullException.ThrowIfNull(chain);
-            foreach (var type in chain)
+            foreach (var item in chain)
             {
-                ArgumentNullException.ThrowIfNull(type);
-                if (predicate(type, out value)) return true;
+                ArgumentNullException.ThrowIfNull(item, "type");
+                if (predicate(item, out value)) return true;
             }
         }
 

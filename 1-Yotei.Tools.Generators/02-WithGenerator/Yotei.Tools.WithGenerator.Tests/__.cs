@@ -11,4 +11,5 @@
 //    }
 //}
 
-public interface IFake { }
+[InheritsWith]
+public partial interface IFake { }

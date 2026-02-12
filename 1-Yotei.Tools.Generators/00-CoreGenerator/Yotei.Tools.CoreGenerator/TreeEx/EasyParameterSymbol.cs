@@ -27,9 +27,9 @@ internal record EasyParameterSymbol
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a new instance with a set of default code generation settings.
+    /// A shared instance with default-alike settings.
     /// </summary>
-    public static EasyParameterSymbol Default => new()
+    public static EasyParameterSymbol Default { get; } = new()
     {
         UseThis = true,
         UseModifiers = true,
@@ -37,9 +37,9 @@ internal record EasyParameterSymbol
     };
 
     /// <summary>
-    /// Returns a new instance with full settings.
+    /// A shared instance with full-alike settings.
     /// </summary>
-    public static EasyParameterSymbol Full => new()
+    public static EasyParameterSymbol Full { get; } = new()
     {
         UseThis = true,
         UseModifiers = true,
@@ -75,7 +75,7 @@ internal static partial class EasyNameExtensions
         // With parameter type...
         if (options.TypeOptions != null)
         {
-            var xoptions = options.TypeOptions.DisabledHideName();
+            var xoptions = options.TypeOptions.WithNoHideName();
             var str = source.Type.EasyName(xoptions);
             sb.Append(str);
 

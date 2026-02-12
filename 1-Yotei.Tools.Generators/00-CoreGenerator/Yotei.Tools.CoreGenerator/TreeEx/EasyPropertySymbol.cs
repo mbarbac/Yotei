@@ -43,9 +43,9 @@ internal record EasyPropertySymbol
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a new instance with a set of default code generation settings.
+    /// A shared instance with default-alike settings.
     /// </summary>
-    public static EasyPropertySymbol Default => new()
+    public static EasyPropertySymbol Default { get; } = new()
     {
         UseAccessibility = true,
         UseModifiers = true,
@@ -55,9 +55,9 @@ internal record EasyPropertySymbol
     };
 
     /// <summary>
-    /// Returns a new instance with full settings.
+    /// A shared instance with full-alike settings.
     /// </summary>
-    public static EasyPropertySymbol Full => new()
+    public static EasyPropertySymbol Full { get; } = new()
     {
         UseAccessibility = true,
         UseModifiers = true,
@@ -125,7 +125,7 @@ internal static partial class EasyNameExtensions
         // Return type...
         if (options.ReturnTypeOptions != null)
         {
-            var xoptions = options.ReturnTypeOptions.DisabledHideName();
+            var xoptions = options.ReturnTypeOptions.WithNoHideName();
             var str = source.Type.EasyName(xoptions);
             sb.Append(str).Append(' ');
         }
@@ -133,7 +133,7 @@ internal static partial class EasyNameExtensions
         // Host type...
         if (options.HostTypeOptions != null && host != null)
         {
-            var xoptions = options.HostTypeOptions.DisabledHideName();
+            var xoptions = options.HostTypeOptions.WithNoHideName();
             var str = host.EasyName(xoptions);
             sb.Append(str).Append('.');
         }

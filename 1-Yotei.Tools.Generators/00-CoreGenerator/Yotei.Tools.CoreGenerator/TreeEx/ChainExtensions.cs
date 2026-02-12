@@ -27,6 +27,11 @@ internal static class ChainExtensions
         return list;
     }
 
+    /// <summary>
+    /// Used as a default criteria for <see cref="GetElementChain(ISymbol, Func{ISymbol, bool}?)"/>
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
     public static bool IsChainSymbolAllowed(ISymbol item) => item switch
     {
         INamespaceSymbol temp => !temp.IsGlobalNamespace,
@@ -37,6 +42,8 @@ internal static class ChainExtensions
         IEventSymbol => true,
         _ => false
     };
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// Gets the chain of elements up to the given one, included. The given predicate determines
@@ -62,6 +69,11 @@ internal static class ChainExtensions
         return list;
     }
 
+    /// <summary>
+    /// Used as a default criteria for <see cref="GetElementChain(SyntaxNode, Func{SyntaxNode, bool}?)"/>
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
     public static bool IsChainSyntaxAllowed(SyntaxNode item) => item switch
     {
         CompilationUnitSyntax => true,
