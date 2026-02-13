@@ -182,8 +182,11 @@ public static partial class EasyNameExtensions
             string? prefix = null;
             if (source.IsIn) prefix = "in ";
             else if (source.IsOut) prefix = "out ";
-            else if (source.ParameterType.IsByRef) prefix = "ref ";
-            // TODO: 'ref readonly'...
+            else if (source.ParameterType.IsByRef)
+            {
+                var ronly = source.GetCustomAttributes().Any(x => x.GetType().FullName == "System.Runtime.CompilerServices.IsReadOnlyAttribute");
+                prefix = ronly ? "ref readonly " : "ref ";
+            }
 
             if (prefix is not null) sb.Insert(0, prefix);
         }

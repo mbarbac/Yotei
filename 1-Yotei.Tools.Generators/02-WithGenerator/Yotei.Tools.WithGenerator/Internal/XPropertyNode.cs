@@ -71,12 +71,24 @@ internal class XPropertyNode : PropertyNode
         ReturnNullable = false;
         ReturnOptions = EasyTypeSymbol.Default;
 
-        // Just 1 attribute is needed and allowed...
-        if (Attributes.Count == 0) { Symbol.ReportError(TreeError.NoAttributes, context); return false; }
-        if (Attributes.Count > 1) { Symbol.ReportError(TreeError.TooManyAttributes, context); return false; }
+        // Finding the source attribute...
+        AttributeData at;
 
-        // Capturing...
-        var at = Attributes[0];
+        if (!IsInherited) // Captured per-se...
+        {
+            if (Attributes.Count == 0) { Symbol.ReportError(TreeError.NoAttributes, context); return false; }
+            if (Attributes.Count > 1) { Symbol.ReportError(TreeError.TooManyAttributes, context); return false; }
+            at = Attributes[0];
+        }
+        else // Captured by the host inheriting members...
+        {
+            var ats = Host.GetAttributes([typeof(InheritsWithAttribute), typeof(InheritsWithAttribute<>)]).ToList();
+            if (ats.Count == 0) { Host.ReportError(TreeError.NoAttributes, context); return false; }
+            if (ats.Count > 1) { Host.ReportError(TreeError.TooManyAttributes, context); return false; }
+            at = ats[0];
+        }
+
+        // Return type...
         if (XNode.FindReturnType(at, out var type, out var nullable))
         {
             ReturnType = type;
@@ -86,6 +98,8 @@ internal class XPropertyNode : PropertyNode
             if (!same) ReturnOptions = EasyTypeSymbol.Full with
             { NullableStyle = IsNullableStyle.None };
         }
+
+        // Use virtual...
         if (XNode.FindUseVirtual(at, out var virt)) UseVirtual = virt;
 
         // Finishing...
@@ -163,10 +177,7 @@ internal class XPropertyNode : PropertyNode
     /// abstract    abstract override
     /// regular     abstract new
     /// virt        abstract override
-    string? GetAbstractModifiers()
-    {
-        throw null;
-    }
+    string? GetAbstractModifiers() => null; // HIGH: GetAbstractModifiers
 
     // ----------------------------------------------------
 
@@ -224,10 +235,7 @@ internal class XPropertyNode : PropertyNode
     /// virt        virt        no      override
     /// virt        regular     yes     override
     /// virt        virt        yes     override
-    string? GetRegularModifiers()
-    {
-        throw null;
-    }
+    string? GetRegularModifiers() => null; // HIGH: GetRegularModifiers
 
     // ----------------------------------------------------
 
@@ -243,31 +251,15 @@ internal class XPropertyNode : PropertyNode
             var mtype = item.MemberType;
 
             var ifacename = iface.EasyName(EasyTypeSymbol.Full with { NullableStyle = IsNullableStyle.None });
-            var mtypename = mtype.EasyName(EasyTypeSymbol.Full);
             var nullable = ReturnNullable ? "?" : string.Empty;
-        }
-        /*
-         HIGH: I'M HERE...
-         
-         var type = Symbol.Type;
-        var found = iface.FindDecoratedMember(true, Symbol.Name, out var member, iface.AllInterfaces);
-        if (found) type = ((IPropertySymbol)member!).Type;
-        else
-        {
-            found = iface.FindMethod(true, Symbol.Name, (INamedTypeSymbol)Symbol.Type, out var method, iface.AllInterfaces);
-            if (found) type = method!.Parameters[0].Type;
-        }
-        var argtype = type.EasyName(EasyNameOptions.Full);
-        var nullable = ReturnNullable ? "?" : string.Empty;
-        var typename = iface.EasyName(EasyNameOptions.Full with { TypeUseNullable = false });
+            var mtypename = mtype.EasyName(EasyTypeSymbol.Full);
 
-        cb.AppendLine();
-        cb.AppendLine($"{typename}{nullable}");
-        cb.Append($"{typename}.{MethodName}({argtype} value)");
-        cb.AppendLine($" => {MethodName}(value);");
-        continue;
-
-         */
+            cb.AppendLine();
+            cb.AppendLine($"{ifacename}{nullable}");
+            cb.AppendLine($"{ifacename}.{MethodName}({mtypename} value)");
+            cb.AppendLine($"=> {MethodName}(value);");
+            cb.AppendLine($"");
+        }
     }
 
     /// <summary>

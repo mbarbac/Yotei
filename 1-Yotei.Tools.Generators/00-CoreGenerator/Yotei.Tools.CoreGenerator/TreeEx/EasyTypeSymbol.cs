@@ -207,7 +207,7 @@ internal static partial class EasyNameExtensions
             case IErrorTypeSymbol: return "<error>";
             case IArrayTypeSymbol item: return EasyNameTypeArray(item, options);
             case IPointerTypeSymbol item: return EasyNameTypePointer(item, options);
-            case IFunctionPointerTypeSymbol item: return EasyNameTypeFunctionPointer(item, options);
+            //case IFunctionPointerTypeSymbol item: return EasyNameTypeFunctionPointer(item, options);
         }
 
         // Shortcut special name...
@@ -341,12 +341,11 @@ internal static partial class EasyNameExtensions
 
     // ----------------------------------------------------
 
-    /// <summary>
+    /*/// <summary>
     /// Invoked when the type represents a function pointer (ie: delegate*<int, void>).
     /// </summary>
     static string EasyNameTypeFunctionPointer(IFunctionPointerTypeSymbol source, EasyTypeSymbol options)
     {
-        // LOW: implement EasyName for 'IFunctionPointerTypeSymbol' instances.
         throw new NotImplementedException("IFunctionPointerTypeSymbol types are not supported.");
-    }
+    }*/
 }
