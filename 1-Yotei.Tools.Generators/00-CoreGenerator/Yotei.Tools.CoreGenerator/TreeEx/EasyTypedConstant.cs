@@ -46,32 +46,46 @@ internal record EasyTypedConstant
 
     // ----------------------------------------------------
 
+    enum Mode { Empty, Default, Full };
+    EasyTypedConstant(Mode mode)
+    {
+        switch (mode)
+        {
+            case Mode.Full:
+                UseName = true;
+                ValueClrOptions = EasyNameOptions.Full;
+                ValueTypeSymbolOptions = EasyTypeSymbol.Full;
+                ValuePropertySymbolOptions = EasyPropertySymbol.Full;
+                ValueFieldSymbolOptions = EasyFieldSymbol.Full;
+                ValueMethodSymbolOptions = EasyMethodSymbol.Full;
+                ValueEventSymbolOptions = EasyEventSymbol.Full;
+                break;
+
+            case Mode.Default:
+                ValueClrOptions = EasyNameOptions.Default;
+                ValueTypeSymbolOptions = EasyTypeSymbol.Default;
+                ValuePropertySymbolOptions = EasyPropertySymbol.Default;
+                ValueFieldSymbolOptions = EasyFieldSymbol.Default;
+                ValueMethodSymbolOptions = EasyMethodSymbol.Default;
+                ValueEventSymbolOptions = EasyEventSymbol.Default;
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Initializes a new empty instance.
+    /// </summary>
+    public EasyTypedConstant() : this(Mode.Empty) { }
+
     /// <summary>
     /// A shared instance with default-alike settings.
     /// </summary>
-    public static EasyTypedConstant Default { get; } = new()
-    {
-        ValueClrOptions = EasyNameOptions.Default,
-        ValueTypeSymbolOptions = EasyTypeSymbol.Default,
-        ValuePropertySymbolOptions = EasyPropertySymbol.Default,
-        ValueFieldSymbolOptions = EasyFieldSymbol.Default,
-        ValueMethodSymbolOptions = EasyMethodSymbol.Default,
-        ValueEventSymbolOptions = EasyEventSymbol.Default,
-    };
+    public static EasyTypedConstant Default { get; } = new(Mode.Default);
 
     /// <summary>
     /// A shared instance with full-alike settings.
     /// </summary>
-    public static EasyTypedConstant Full { get; } = new()
-    {
-        UseName = true,
-        ValueClrOptions = EasyNameOptions.Full,
-        ValueTypeSymbolOptions = EasyTypeSymbol.Full,
-        ValuePropertySymbolOptions = EasyPropertySymbol.Full,
-        ValueFieldSymbolOptions = EasyFieldSymbol.Full,
-        ValueMethodSymbolOptions = EasyMethodSymbol.Full,
-        ValueEventSymbolOptions = EasyEventSymbol.Full,
-    };
+    public static EasyTypedConstant Full { get; } = new(Mode.Full);
 }
 
 // ========================================================

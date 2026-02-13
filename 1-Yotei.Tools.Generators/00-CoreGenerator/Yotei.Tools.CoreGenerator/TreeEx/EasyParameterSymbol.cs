@@ -26,26 +26,40 @@ internal record EasyParameterSymbol
 
     // ----------------------------------------------------
 
+    enum Mode { Empty, Default, Full };
+    EasyParameterSymbol(Mode mode)
+    {
+        switch (mode)
+        {
+            case Mode.Full:
+                UseThis = true;
+                UseModifiers = true;
+                TypeOptions = EasyTypeSymbol.Full;
+                UseName = true;
+                break;
+
+            case Mode.Default:
+                UseThis = true;
+                UseModifiers = true;
+                TypeOptions = EasyTypeSymbol.Default;
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Initializes a new empty instance.
+    /// </summary>
+    public EasyParameterSymbol() : this(Mode.Empty) { }
+
     /// <summary>
     /// A shared instance with default-alike settings.
     /// </summary>
-    public static EasyParameterSymbol Default { get; } = new()
-    {
-        UseThis = true,
-        UseModifiers = true,
-        TypeOptions = EasyTypeSymbol.Default,
-    };
+    public static EasyParameterSymbol Default { get; } = new(Mode.Default);
 
     /// <summary>
     /// A shared instance with full-alike settings.
     /// </summary>
-    public static EasyParameterSymbol Full { get; } = new()
-    {
-        UseThis = true,
-        UseModifiers = true,
-        TypeOptions = EasyTypeSymbol.Full,
-        UseName = true,
-    };
+    public static EasyParameterSymbol Full { get; } = new(Mode.Full);
 }
 
 // ========================================================

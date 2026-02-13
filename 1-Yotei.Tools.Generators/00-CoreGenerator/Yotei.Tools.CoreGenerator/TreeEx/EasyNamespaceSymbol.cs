@@ -16,19 +16,32 @@ internal record EasyNamespaceSymbol
 
     // ----------------------------------------------------
 
+    enum Mode { Empty, Default, Full };
+    EasyNamespaceSymbol(Mode mode)
+    {
+        switch (mode)
+        {
+            case Mode.Full:
+                UseHostNamespace = true;
+                UseGlobalNamespace = true;
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Initializes a new empty instance.
+    /// </summary>
+    public EasyNamespaceSymbol() : this(Mode.Empty) { }
+
     /// <summary>
     /// A shared instance with default-alike settings.
     /// </summary>
-    public static EasyNamespaceSymbol Default { get; } = new();
+    public static EasyNamespaceSymbol Default { get; } = new(Mode.Default);
 
     /// <summary>
     /// A shared instance with full-alike settings.
     /// </summary>
-    public static EasyNamespaceSymbol Full { get; } = new()
-    {
-        UseHostNamespace = true,
-        UseGlobalNamespace = true,
-    };
+    public static EasyNamespaceSymbol Full { get; } = new(Mode.Full);
 }
 
 // ========================================================

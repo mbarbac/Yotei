@@ -25,26 +25,40 @@ internal record EasyFieldSymbol
 
     // ----------------------------------------------------
 
+    enum Mode { Empty, Default, Full };
+    EasyFieldSymbol(Mode mode)
+    {
+        switch (mode)
+        {
+            case Mode.Full:
+                UseAccessibility = true;
+                UseModifiers = true;
+                ReturnTypeOptions = EasyTypeSymbol.Full;
+                HostTypeOptions = EasyTypeSymbol.Full;
+                break;
+
+            case Mode.Default:
+                UseAccessibility = true;
+                UseModifiers = true;
+                ReturnTypeOptions = EasyTypeSymbol.Default;
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Initializes a new empty instance.
+    /// </summary>
+    public EasyFieldSymbol() : this(Mode.Empty) { }
+
     /// <summary>
     /// A shared instance with default-alike settings.
     /// </summary>
-    public static EasyFieldSymbol Default { get; } = new()
-    {
-        UseAccessibility = true,
-        UseModifiers = true,
-        ReturnTypeOptions = EasyTypeSymbol.Default,
-    };
+    public static EasyFieldSymbol Default { get; } = new(Mode.Default);
 
     /// <summary>
     /// A shared instance with full-alike settings.
     /// </summary>
-    public static EasyFieldSymbol Full { get; } = new()
-    {
-        UseAccessibility = true,
-        UseModifiers = true,
-        ReturnTypeOptions = EasyTypeSymbol.Full,
-        HostTypeOptions = EasyTypeSymbol.Full,
-    };
+    public static EasyFieldSymbol Full { get; } = new(Mode.Full);
 }
 
 // ========================================================

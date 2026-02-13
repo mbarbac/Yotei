@@ -7,41 +7,97 @@ internal record EasyTypeSymbol
     /// Include the 'in' and 'out'  keywords in the display string. This setting is only used
     /// with variant type parameters.
     /// </summary>
-    public bool UseVariance { get; init; }
+    public bool UseVariance
+    {
+        get;
+        init
+        {
+            GenericOptions = GenericOptions is null ? null : GenericOptions with { };
+            field = value;
+        }
+    }
 
     /// <summary>
     /// If not null, then the options to include the type's namespace. If null, it is ignored.
     /// If this setting is enabled, then the <see cref="UseHosts"/> one is also implicitly enabled.
     /// </summary>
-    public EasyNamespaceSymbol? NamespaceOptions { get; init; }
+    public EasyNamespaceSymbol? NamespaceOptions
+    {
+        get;
+        init
+        {
+            GenericOptions = GenericOptions is null ? null : GenericOptions with { };
+            field = value;
+        }
+    }
 
     /// <summary>
     /// Include the type's host ones in the display string. 
     /// </summary>
-    public bool UseHost { get; init; }
+    public bool UseHost
+    {
+        get;
+        init
+        {
+            GenericOptions = GenericOptions is null ? null : GenericOptions with { };
+            field = value;
+        }
+    }
 
     /// <summary>
     /// If enabled, hides the type's name by returning an empty string. This setting is almost only
     /// used to obtain an anonymous list of generic arguments. If this setting is enabled then it
     /// shortcuts all other settings.
     /// </summary>
-    public bool HideName { get; init; }
+    public bool HideName
+    {
+        get;
+        init
+        {
+            GenericOptions = GenericOptions is null ? null : GenericOptions with { };
+            field = value;
+        }
+    }
 
     /// <summary>
     /// If enabled, include the prefined keywords for suitable special types (eg: <c>int</c> instead
     /// of <c>Int32</c>).
     /// </summary>
-    public bool UseSpecialNames { get; init; }
+    public bool UseSpecialNames
+    {
+        get;
+        init
+        {
+            GenericOptions = GenericOptions is null ? null : GenericOptions with { };
+            field = value;
+        }
+    }
 
     /// <summary>
     /// If enabled removes the 'Attribute' suffix from the type's display string, when possible.
     /// </summary>
-    public bool RemoveAttributeSuffix { get; init; }
+    public bool RemoveAttributeSuffix
+    {
+        get;
+        init
+        {
+            GenericOptions = GenericOptions is null ? null : GenericOptions with { };
+            field = value;
+        }
+    }
 
     /// <summary>
     /// Specifies the nhe nullable style to use.
     /// </summary>
-    public IsNullableStyle NullableStyle { get; init; }
+    public IsNullableStyle NullableStyle
+    {
+        get;
+        init
+        {
+            GenericOptions = GenericOptions is null ? null : GenericOptions with { };
+            field = value;
+        }
+    }
 
     /// <summary>
     /// If not null, then the options to include the list of generic arguments of the type. If null,
@@ -60,30 +116,50 @@ internal record EasyTypeSymbol
 
     // ----------------------------------------------------
 
+    enum Mode { Empty, Default, Full };
+    EasyTypeSymbol(Mode mode)
+    {
+        switch (mode)
+        {
+            case Mode.Full:
+                UseVariance = true;
+                NamespaceOptions = EasyNamespaceSymbol.Full;
+                UseHost = true;
+                UseSpecialNames = true;
+                RemoveAttributeSuffix = false;
+                NullableStyle = IsNullableStyle.KeepWrappers;
+                GenericOptions = this;
+                break;
+
+            case Mode.Default:
+                UseSpecialNames = true;
+                RemoveAttributeSuffix = true;
+                NullableStyle = IsNullableStyle.UseAnnotations;
+                GenericOptions = this;
+                break;
+
+            default:
+            case Mode.Empty:
+                UseSpecialNames = true;
+                RemoveAttributeSuffix = true;
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Initializes a new empty instance.
+    /// </summary>
+    public EasyTypeSymbol() : this(Mode.Empty) { }
+
     /// <summary>
     /// A shared instance with default-alike settings.
     /// </summary>
-    public static EasyTypeSymbol Default { get; } = new()
-    {
-        UseSpecialNames = true,
-        RemoveAttributeSuffix = true,
-        NullableStyle = IsNullableStyle.UseAnnotations,
-        GenericOptions = Default,
-    };
+    public static EasyTypeSymbol Default { get; } = new(Mode.Default);
 
     /// <summary>
     /// A shared instance with full-alike settings.
     /// </summary>
-    public static EasyTypeSymbol Full { get; } = new()
-    {
-        UseVariance = true,
-        NamespaceOptions = EasyNamespaceSymbol.Full,
-        UseHost = true,
-        UseSpecialNames = true,
-        RemoveAttributeSuffix = false,
-        NullableStyle = IsNullableStyle.KeepWrappers,
-        GenericOptions = Full,
-    };
+    public static EasyTypeSymbol Full { get; } = new(Mode.Full);
 }
 
 // ========================================================

@@ -46,33 +46,47 @@ internal record EasyMethodSymbol
 
     // ----------------------------------------------------
 
+    enum Mode { Empty, Default, Full };
+    EasyMethodSymbol(Mode mode)
+    {
+        switch (mode)
+        {
+            case Mode.Full:
+                UseAccessibility = true;
+                UseModifiers = true;
+                ReturnTypeOptions = EasyTypeSymbol.Full;
+                HostTypeOptions = EasyTypeSymbol.Full;
+                UseTechName = true;
+                GenericOptions = EasyTypeSymbol.Full;
+                UseBrackets = true;
+                ParameterOptions = EasyParameterSymbol.Full;
+                break;
+
+            case Mode.Default:
+                UseAccessibility = true;
+                UseModifiers = true;
+                ReturnTypeOptions = EasyTypeSymbol.Default;
+                GenericOptions = EasyTypeSymbol.Default;
+                UseBrackets = true;
+                ParameterOptions = EasyParameterSymbol.Default;
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Initializes a new empty instance.
+    /// </summary>
+    public EasyMethodSymbol() : this(Mode.Empty) { }
+
     /// <summary>
     /// A shared instance with default-alike settings.
     /// </summary>
-    public static EasyMethodSymbol Default { get; } = new()
-    {
-        UseAccessibility = true,
-        UseModifiers = true,
-        ReturnTypeOptions = EasyTypeSymbol.Default,
-        GenericOptions = EasyTypeSymbol.Default,
-        UseBrackets = true,
-        ParameterOptions = EasyParameterSymbol.Default,
-    };
+    public static EasyMethodSymbol Default { get; } = new(Mode.Default);
 
     /// <summary>
     /// A shared instance with full-alike settings.
     /// </summary>
-    public static EasyMethodSymbol Full { get; } = new()
-    {
-        UseAccessibility = true,
-        UseModifiers = true,
-        ReturnTypeOptions = EasyTypeSymbol.Full,
-        HostTypeOptions = EasyTypeSymbol.Full,
-        UseTechName = true,
-        GenericOptions = EasyTypeSymbol.Full,
-        UseBrackets = true,
-        ParameterOptions = EasyParameterSymbol.Full,
-    };
+    public static EasyMethodSymbol Full { get; } = new(Mode.Full);
 }
 
 // ========================================================

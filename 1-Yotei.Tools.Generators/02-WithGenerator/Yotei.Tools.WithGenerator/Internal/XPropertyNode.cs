@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools.WithGenerator;
+﻿using System.Net.Mail;
+
+namespace Yotei.Tools.WithGenerator;
 
 // ========================================================
 /// <summary>
@@ -111,14 +113,17 @@ internal class XPropertyNode : PropertyNode
 
         XNode.EmitDocumentation(Symbol, cb);
         cb.AppendLine($"{modifiers}{rtype}{rnull}");
-        cb.AppendLine($"{MethodName}({argtype} {ArgumentName})");
+        cb.AppendLine($"{MethodName}({argtype} {ArgumentName});");
     }
 
+    /// <summary>
+    /// Invoked to obtain the appropriate method modifiers.
+    /// </summary>
     string? GetInterfaceModifiers()
     {
         var found = Finder.Find((type, out value) =>
         {
-            if (FindMethod(out _, type) || XNode.FindWithAttribute(type, Symbol.Name, out _))
+            if (FindMethod(out _, type) || XNode.FindWithAttribute(out _, out _, Symbol.Name, type))
             {
                 value = "new ";
                 return true;
@@ -137,6 +142,29 @@ internal class XPropertyNode : PropertyNode
     /// </summary>
     void EmitHostAbstract(SourceProductionContext context, CodeBuilder cb)
     {
+        var rtype = ReturnType.EasyName(ReturnOptions);
+        var rnull = ReturnNullable ? "?" : string.Empty;
+        var argtype = Symbol.Type.EasyName(EasyTypeSymbol.Full);
+        var modifiers = GetAbstractModifiers();
+
+        XNode.EmitDocumentation(Symbol, cb);
+        cb.AppendLine($"{modifiers}{rtype}{rnull}");
+        cb.AppendLine($"{MethodName}({argtype} {ArgumentName});");
+
+        EmitExplicitInterfaces(context, cb);
+    }
+
+    /// <summary>
+    /// Invoked to obtain the appropriate method modifiers.
+    /// </summary>
+    /// Base        Modifier
+    /// ---------------------------------------------------
+    /// interface   abstract
+    /// abstract    abstract override
+    /// regular     abstract new
+    /// virt        abstract override
+    string? GetAbstractModifiers()
+    {
         throw null;
     }
 
@@ -147,7 +175,137 @@ internal class XPropertyNode : PropertyNode
     /// </summary>
     void EmitHostRegular(SourceProductionContext context, CodeBuilder cb)
     {
+        var ctor = Host.FindCopyConstructor(strict: false);
+        if (ctor == null)
+        {
+            Symbol.ReportError(TreeError.NoCopyConstructor, context);
+            Host.ReportError(TreeError.NoCopyConstructor, context);
+            return;
+        }
+
+        var rtype = ReturnType.EasyName(ReturnOptions);
+        var rnull = ReturnNullable ? "?" : string.Empty;
+        var argtype = Symbol.Type.EasyName(EasyTypeSymbol.Full);
+        var modifiers = GetRegularModifiers();
+
+        XNode.EmitDocumentation(Symbol, cb);
+        cb.AppendLine($"{modifiers}{rtype}{rnull}");
+        cb.AppendLine($"{MethodName}({argtype} {ArgumentName})");
+        cb.AppendLine("{");
+        cb.IndentLevel++;
+        {
+            var hostname = Host.EasyName();
+            cb.AppendLine($"var v_host = new {hostname}(this)");
+            cb.AppendLine("{");
+            cb.IndentLevel++;
+            {
+                cb.AppendLine($"{Symbol.Name} = {ArgumentName}");
+            }
+            cb.IndentLevel--;
+            cb.AppendLine("};");
+            cb.AppendLine("return v_host;");
+        }
+        cb.IndentLevel--;
+        cb.AppendLine("}");
+        EmitExplicitInterfaces(context, cb);
+    }
+
+    /// <summary>
+    /// Invoked to obtain the appropriate method modifiers.
+    /// </summary>
+    /// Base        Derived     Sealed  Modifier
+    /// ---------------------------------------------------
+    /// regular     regular     no      new
+    /// regular     virt        no      new virtual
+    /// regular     regular     yes     new
+    /// regular     virt        yes     new
+    /// ---------------------------------------------------
+    /// virt        regular     no      new
+    /// virt        virt        no      override
+    /// virt        regular     yes     override
+    /// virt        virt        yes     override
+    string? GetRegularModifiers()
+    {
         throw null;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to emit the interfaces that need explicit implementation, if any.
+    /// </summary>
+    void EmitExplicitInterfaces(SourceProductionContext context, CodeBuilder cb)
+    {
+        var ifaces = GetExplicitInterfaces();
+        foreach (var item in ifaces)
+        {
+            var iface = item.IFace;
+            var mtype = item.MemberType;
+
+            var ifacename = iface.EasyName(EasyTypeSymbol.Full with { NullableStyle = IsNullableStyle.None });
+            var mtypename = mtype.EasyName(EasyTypeSymbol.Full);
+            var nullable = ReturnNullable ? "?" : string.Empty;
+        }
+        /*
+         HIGH: I'M HERE...
+         
+         var type = Symbol.Type;
+        var found = iface.FindDecoratedMember(true, Symbol.Name, out var member, iface.AllInterfaces);
+        if (found) type = ((IPropertySymbol)member!).Type;
+        else
+        {
+            found = iface.FindMethod(true, Symbol.Name, (INamedTypeSymbol)Symbol.Type, out var method, iface.AllInterfaces);
+            if (found) type = method!.Parameters[0].Type;
+        }
+        var argtype = type.EasyName(EasyNameOptions.Full);
+        var nullable = ReturnNullable ? "?" : string.Empty;
+        var typename = iface.EasyName(EasyNameOptions.Full with { TypeUseNullable = false });
+
+        cb.AppendLine();
+        cb.AppendLine($"{typename}{nullable}");
+        cb.Append($"{typename}.{MethodName}({argtype} value)");
+        cb.AppendLine($" => {MethodName}(value);");
+        continue;
+
+         */
+    }
+
+    /// <summary>
+    /// Represents a explicit interface along with the type of the member at its level.
+    /// </summary>
+    record Explicit(INamedTypeSymbol IFace, INamedTypeSymbol MemberType);
+
+    /// <summary>
+    /// Obtains a list with the interfaces that need explicit implementation, along with the
+    /// actual type of the member.
+    /// </summary>
+    List<Explicit> GetExplicitInterfaces()
+    {
+        var comparer = SymbolEqualityComparer.Default;
+        List<Explicit> list = [];
+        foreach (var iface in Host.Interfaces) TryCaptureAt(iface);
+        return list;
+
+        bool TryCaptureAt(INamedTypeSymbol iface)
+        {
+            var found = false;
+            INamedTypeSymbol? membertype = null;
+
+            foreach (var child in iface.Interfaces)
+                if (TryCaptureAt(child)) { membertype = child; found = true; }
+
+            if (!found)
+                if (FindDecoratedMember(out var temp, iface))
+                { membertype = (INamedTypeSymbol)temp.Type; found = true; }
+
+            if (found)
+            {
+                var temp = list.Find(x => comparer.Equals(x.IFace, iface));
+                if (temp == null) list.Add(new(iface, membertype!));
+            }
+
+            return found;
+        }
     }
 
     // ----------------------------------------------------

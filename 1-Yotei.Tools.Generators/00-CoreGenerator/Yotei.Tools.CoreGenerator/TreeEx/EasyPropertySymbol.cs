@@ -42,31 +42,45 @@ internal record EasyPropertySymbol
 
     // ----------------------------------------------------
 
+    enum Mode { Empty, Default, Full };
+    EasyPropertySymbol(Mode mode)
+    {
+        switch (mode)
+        {
+            case Mode.Full:
+                UseAccessibility = true;
+                UseModifiers = true;
+                ReturnTypeOptions = EasyTypeSymbol.Full;
+                HostTypeOptions = EasyTypeSymbol.Full;
+                UseTechName = true;
+                UseBrackets = true;
+                ParameterOptions = EasyParameterSymbol.Full;
+                break;
+
+            case Mode.Default:
+                UseAccessibility = true;
+                UseModifiers = true;
+                ReturnTypeOptions = EasyTypeSymbol.Default;
+                UseBrackets = true;
+                ParameterOptions = EasyParameterSymbol.Default;
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Initializes a new empty instance.
+    /// </summary>
+    public EasyPropertySymbol() : this(Mode.Empty) { }
+
     /// <summary>
     /// A shared instance with default-alike settings.
     /// </summary>
-    public static EasyPropertySymbol Default { get; } = new()
-    {
-        UseAccessibility = true,
-        UseModifiers = true,
-        ReturnTypeOptions = EasyTypeSymbol.Default,
-        UseBrackets = true,
-        ParameterOptions = EasyParameterSymbol.Default,
-    };
+    public static EasyPropertySymbol Default { get; } = new(Mode.Default);
 
     /// <summary>
     /// A shared instance with full-alike settings.
     /// </summary>
-    public static EasyPropertySymbol Full { get; } = new()
-    {
-        UseAccessibility = true,
-        UseModifiers = true,
-        ReturnTypeOptions = EasyTypeSymbol.Full,
-        HostTypeOptions = EasyTypeSymbol.Full,
-        UseTechName = true,
-        UseBrackets = true,
-        ParameterOptions = EasyParameterSymbol.Full,
-    };
+    public static EasyPropertySymbol Full { get; } = new(Mode.Full);
 }
 
 // ========================================================

@@ -33,26 +33,40 @@ internal record EasyAttributeData
 
     // ----------------------------------------------------
 
+    enum Mode { Empty, Default, Full };
+    EasyAttributeData(Mode mode)
+    {
+        switch (mode)
+        {
+            case Mode.Full:
+                TypeOptions = EasyTypeSymbol.Full;
+                UseAttributeSuffix = true;
+                GenericOptions = EasyTypeSymbol.Full;
+                UseBrackets = true;
+                ValueOptions = EasyTypedConstant.Full;
+                break;
+
+            case Mode.Default:
+                GenericOptions = EasyTypeSymbol.Default;
+                ValueOptions = EasyTypedConstant.Default;
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Initializes a new empty instance.
+    /// </summary>
+    public EasyAttributeData() : this(Mode.Empty) { }
+
     /// <summary>
     /// A shared instance with default-alike settings.
     /// </summary>
-    public static EasyAttributeData Default { get; } = new()
-    {
-        GenericOptions = EasyTypeSymbol.Default,
-        ValueOptions = EasyTypedConstant.Default
-    };
+    public static EasyAttributeData Default { get; } = new(Mode.Default);
 
     /// <summary>
     /// A shared instance with full-alike settings.
     /// </summary>
-    public static EasyAttributeData Full { get; } = new()
-    {
-        TypeOptions = EasyTypeSymbol.Full,
-        UseAttributeSuffix = true,
-        GenericOptions = EasyTypeSymbol.Full,
-        UseBrackets = true,
-        ValueOptions = EasyTypedConstant.Full,
-    };
+    public static EasyAttributeData Full { get; } = new(Mode.Full);
 }
 
 // ========================================================
