@@ -7,7 +7,7 @@ internal static class XNode
     /// Tries to find the 'UseVirtual' named argument on the given attribute.
     /// Is found, returns its value in the out argument.
     /// </summary>
-    public static bool FindUseVirtual(AttributeData at, out bool value)
+    public static bool FindUseVirtualAt(AttributeData at, out bool value)
     {
         if (at.FindNamedArgument("UseVirtual", out var arg))
         {
@@ -21,14 +21,56 @@ internal static class XNode
         return false;
     }
 
+    /// <summary>
+    /// Tries to find value of the first 'UseVirtual' property that happens in attributes of the given
+    /// type, or types of the given chains, that correspond to a member with the given name.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="name"></param>
+    /// <param name="type"></param>
+    /// <param name="chains"></param>
+    /// <returns></returns>
+    public static bool FinderUseVirtual(
+        out bool value,
+        string name,
+        INamedTypeSymbol? type,
+        params IEnumerable<INamedTypeSymbol>[] chains)
+    {
+        var comparer = SymbolEqualityComparer.Default;
+
+        return Finder.Find((type, out value) =>
+        {
+            // Member attribute takes priority...
+            var member = type.GetMembers().FirstOrDefault(x => x.Name == name);
+            if (member != null)
+            {
+                var atmember = member.GetAttributes().FirstOrDefault(x =>
+                    x.AttributeClass != null &&
+                    x.AttributeClass.MatchAny(typeof(WithAttribute), typeof(WithAttribute<>)));
+
+                if (atmember != null && FindUseVirtualAt(atmember, out value)) return true;
+            }
+
+            // Otherwise, inherit attribute...
+            var athost = type.GetAttributes().FirstOrDefault(x =>
+                x.AttributeClass != null &&
+                x.AttributeClass.MatchAny(typeof(InheritsWithAttribute), typeof(InheritsWithAttribute<>)));
+
+            if (athost != null && FindUseVirtualAt(athost, out value)) return true;
+
+            value = default!;
+            return false;
+        },
+        out value, type, chains);
+    }
+
     // ----------------------------------------------------
 
     /// <summary>
     /// Tries to find either the 'ReturnType' named argument on the given attribute, or its unique
-    /// generic type, as appropriate.
-    /// Is found, returns its value in the out argument.
+    /// generic type, as appropriate. If found, returns its value in the out argument.
     /// </summary>
-    public static bool FindReturnType(
+    public static bool FindReturnTypeAt(
         AttributeData at, [NotNullWhen(true)] out INamedTypeSymbol? value, out bool nullable)
     {
         ArgumentNullException.ThrowIfNull(at.AttributeClass);
@@ -71,7 +113,7 @@ internal static class XNode
     /// <param name="type"></param>
     /// <param name="chains"></param>
     /// <returns></returns>
-    public static bool FindInheritsWithAttribute(
+    public static bool FinderInheritsWithAttribute(
         [NotNullWhen(true)] out AttributeData? value,
         INamedTypeSymbol? type,
         params IEnumerable<INamedTypeSymbol>[] chains)
@@ -102,7 +144,7 @@ internal static class XNode
     /// <param name="type"></param>
     /// <param name="chains"></param>
     /// <returns></returns>
-    public static bool FindWithAttribute(
+    public static bool FinderWithAttribute(
         [NotNullWhen(true)] out AttributeData? value, [NotNullWhen(true)] out ISymbol? symbol,
         string name,
         INamedTypeSymbol? type,
@@ -115,7 +157,7 @@ internal static class XNode
             var props = type.GetMembers(name).OfType<IPropertySymbol>();
             foreach (var prop in props)
             {
-                if (FindWithAttribute(prop, out var value))
+                if (FindWithAttributeAt(prop, out var value))
                 {
                     item.data = value;
                     item.member = prop;
@@ -126,7 +168,7 @@ internal static class XNode
             var fields = type.GetMembers(name).OfType<IFieldSymbol>();
             foreach (var field in fields)
             {
-                if (FindWithAttribute(field, out var value))
+                if (FindWithAttributeAt(field, out var value))
                 {
                     item.data = value;
                     item.member = field;
@@ -154,7 +196,7 @@ internal static class XNode
     /// <param name="member"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static bool FindWithAttribute(
+    public static bool FindWithAttributeAt(
         IPropertySymbol member, [NotNullWhen(true)] out AttributeData? value)
     {
         value = member.GetAttributes(typeof(WithAttribute)).FirstOrDefault();
@@ -171,7 +213,7 @@ internal static class XNode
     /// a <see cref="WithAttribute{T}"/> attribute and, if so, returns the found one in the out
     /// argument.
     /// </summary>
-    public static bool FindWithAttribute(
+    public static bool FindWithAttributeAt(
         IFieldSymbol member, [NotNullWhen(true)] out AttributeData? value)
     {
         value = member.GetAttributes(typeof(WithAttribute)).FirstOrDefault();
@@ -194,7 +236,7 @@ internal static class XNode
     /// A string with the 'GeneratedCode' attribute of the generator for documentation purposes.
     /// </summary>
     static string AttributeDoc => $$"""
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("{{nameof(WithGenerator)}}", "{{VersionDoc}}")]
+        [System.CodeDom.Compiler.GeneratedCodeAttribute("{{nameof(WithGenerator)}}", "{{VersionDoc}}")]
         """;
 
     /// <summary>
@@ -204,7 +246,7 @@ internal static class XNode
     /// <param name="cb"></param>
     public static void EmitDocumentation(ISymbol symbol, CodeBuilder cb) => cb.AppendLine($$"""
         /// <summary>
-        /// Emulates the 'with' keyword for the '{{symbol.Name}}' member.
+        /// Emulates the '<see langword="with"/>' keyword for the '{{symbol.Name}}' member.
         /// </summary>
         {{AttributeDoc}}
         """);

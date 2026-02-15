@@ -27,4 +27,5 @@ internal record TreeError(int Value, string Description)
     public static readonly TreeError NotWrittable = new(17, "Not writtable");
     public static readonly TreeError InvalidMethod = new(18, "Invalid method");
     public static readonly TreeError InvalidReturnType = new(19, "Invalid return type");
+    public static readonly TreeError NoParentNode = new(20, "No parent node");
 }

@@ -100,7 +100,9 @@ internal class TreeGenerator : IIncrementalGenerator
                 """;
 
             context.AddEmbeddedAttributeDefinition();
-            context.AddSource(ns + '.' + "IsNullable[T].g.cs", str);
+
+            var name = "Yotei.Tools.cs"; // ns + '.' + "IsNullable[T].g.cs";
+            context.AddSource(name, str);
         }
     }
 
@@ -319,8 +321,8 @@ internal class TreeGenerator : IIncrementalGenerator
             var symbol = model.GetDeclaredSymbol(syntax, token) as IPropertySymbol;
             if (symbol is null) break;
 
-            var atx = FindSyntaxAttributes(symbol, syntax);
-            var ats = FilterAttributes(atx, TypeAttributes, TypeAttributeNames);
+            var atx = FindSyntaxAttributes(symbol, syntax).ToDebugArray();
+            var ats = FilterAttributes(atx, PropertyAttributes, PropertyAttributeNames);
             if (ats.Count == 0) break;
 
             var candidate = CreateNode(symbol, syntax, ats, model);
@@ -337,7 +339,7 @@ internal class TreeGenerator : IIncrementalGenerator
                 if (symbol is null) break;
 
                 var atx = FindSyntaxAttributes(symbol, syntax);
-                var ats = FilterAttributes(atx, TypeAttributes, TypeAttributeNames);
+                var ats = FilterAttributes(atx, FieldAttributes, FieldAttributeNames);
                 if (ats.Count == 0) break;
 
                 var candidate = CreateNode(symbol, syntax, ats, model);
@@ -358,7 +360,7 @@ internal class TreeGenerator : IIncrementalGenerator
             if (symbol is null) break;
 
             var atx = FindSyntaxAttributes(symbol, syntax);
-            var ats = FilterAttributes(atx, TypeAttributes, TypeAttributeNames);
+            var ats = FilterAttributes(atx, MethodAttributes, MethodAttributeNames);
             if (ats.Count == 0) break;
 
             var candidate = CreateNode(symbol, syntax, ats, model);
@@ -372,7 +374,7 @@ internal class TreeGenerator : IIncrementalGenerator
             if (symbol is null) break;
 
             var atx = FindSyntaxAttributes(symbol, syntax);
-            var ats = FilterAttributes(atx, TypeAttributes, TypeAttributeNames);
+            var ats = FilterAttributes(atx, EventAttributes, EventAttributeNames);
             if (ats.Count == 0) break;
 
             var candidate = CreateNode(symbol, syntax, ats, model);
@@ -389,7 +391,7 @@ internal class TreeGenerator : IIncrementalGenerator
                 if (symbol is null) break;
 
                 var atx = FindSyntaxAttributes(symbol, syntax);
-                var ats = FilterAttributes(atx, TypeAttributes, TypeAttributeNames);
+                var ats = FilterAttributes(atx, EventAttributes, EventAttributeNames);
                 if (ats.Count == 0) break;
 
                 var candidate = CreateNode(symbol, syntax, ats, model);
@@ -416,7 +418,7 @@ internal class TreeGenerator : IIncrementalGenerator
         // By matching the found attributes against the given types...
         var list = attributes.Where(x =>
             x.AttributeClass != null &&
-            x.AttributeClass.MatchAny(types)).ToList();
+            x.AttributeClass.MatchAny([.. types])).ToList();
 
         // By matching the found attributes against the given names...
         foreach (var name in names)

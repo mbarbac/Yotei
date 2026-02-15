@@ -11,5 +11,12 @@
 //    }
 //}
 
-[InheritsWith]
-public partial interface IFake { }
+public class TFace1
+{
+    public TFace1 WithName() => this;
+}
+
+public class AType1 : TFace1
+{
+    public new TFace1 WithName() => this;
+}

@@ -1,4 +1,4 @@
-﻿using System.Net.Mail;
+﻿using System.Text.RegularExpressions;
 
 namespace Yotei.Tools.WithGenerator;
 
@@ -29,12 +29,14 @@ internal class XPropertyNode : PropertyNode
     /// <returns></returns>
     public override bool Validate(SourceProductionContext context)
     {
-        if (Host.IsRecord) { Symbol.ReportError(TreeError.RecordsNotSupported, context); return false; }
-        if (Symbol.IsIndexer) { Symbol.ReportError(TreeError.IndexerNotSupported, context); return false; }
-        if (!Symbol.HasGetter) { Symbol.ReportError(TreeError.NoGetter, context); return false; }
-        if (!Symbol.HasSetter && !Host.IsInterface) { Symbol.ReportError(TreeError.NoSetter, context); return false; }
+        var r = base.Validate(context);
+        var host = ParentNode!.Symbol;
 
-        return base.Validate(context);
+        if (host.IsRecord) { Symbol.ReportError(TreeError.RecordsNotSupported, context); r = false; }
+        if (Symbol.IsIndexer) { Symbol.ReportError(TreeError.IndexerNotSupported, context); r = false; }
+        if (!Symbol.HasGetter) { Symbol.ReportError(TreeError.NoGetter, context); r = false; }
+        if (!Symbol.HasSetter && !host.IsInterface) { Symbol.ReportError(TreeError.NoSetter, context); r = false; }
+        return r;
     }
 
     // ----------------------------------------------------
@@ -46,15 +48,17 @@ internal class XPropertyNode : PropertyNode
     /// <param name="cb"></param>
     public override void Emit(SourceProductionContext context, CodeBuilder cb)
     {
+        var host = ParentNode!.Symbol;
+
         // Intercepting explicitly implemented...
-        if (FindMethod(out _, Host)) return;
+        if (FindMethod(out _, host)) return;
 
         // Capturing working data...
         if (!CaptureWorkingData(context)) return;
 
         // Dispatching...
-        if (Host.IsInterface) EmitHostInterface(context, cb);
-        else if (Host.IsAbstract) EmitHostAbstract(context, cb);
+        if (host.IsInterface) EmitHostInterface(context, cb);
+        else if (host.IsAbstract) EmitHostAbstract(context, cb);
         else EmitHostRegular(context, cb);
     }
 
@@ -64,10 +68,11 @@ internal class XPropertyNode : PropertyNode
     /// </summary>
     bool CaptureWorkingData(SourceProductionContext context)
     {
+        var host = ParentNode!.Symbol;
+
         MethodName = $"With{Symbol.Name}";
         ArgumentName = $"v_{Symbol.Name}";
-        UseVirtual = true;
-        ReturnType = Host;
+        ReturnType = host;
         ReturnNullable = false;
         ReturnOptions = EasyTypeSymbol.Default;
 
@@ -82,25 +87,22 @@ internal class XPropertyNode : PropertyNode
         }
         else // Captured by the host inheriting members...
         {
-            var ats = Host.GetAttributes([typeof(InheritsWithAttribute), typeof(InheritsWithAttribute<>)]).ToList();
-            if (ats.Count == 0) { Host.ReportError(TreeError.NoAttributes, context); return false; }
-            if (ats.Count > 1) { Host.ReportError(TreeError.TooManyAttributes, context); return false; }
+            var ats = host.GetAttributes([typeof(InheritsWithAttribute), typeof(InheritsWithAttribute<>)]).ToList();
+            if (ats.Count == 0) { host.ReportError(TreeError.NoAttributes, context); return false; }
+            if (ats.Count > 1) { host.ReportError(TreeError.TooManyAttributes, context); return false; }
             at = ats[0];
         }
 
         // Return type...
-        if (XNode.FindReturnType(at, out var type, out var nullable))
+        if (XNode.FindReturnTypeAt(at, out var type, out var nullable))
         {
             ReturnType = type;
             ReturnNullable = nullable;
 
-            var same = SymbolEqualityComparer.Default.Equals(Host, type);
+            var same = SymbolEqualityComparer.Default.Equals(host, type);
             if (!same) ReturnOptions = EasyTypeSymbol.Full with
             { NullableStyle = IsNullableStyle.None };
         }
-
-        // Use virtual...
-        if (XNode.FindUseVirtual(at, out var virt)) UseVirtual = virt;
 
         // Finishing...
         return true;
@@ -108,7 +110,6 @@ internal class XPropertyNode : PropertyNode
 
     string MethodName = default!;
     string ArgumentName = default!;
-    bool UseVirtual = default;
     INamedTypeSymbol ReturnType = default!;
     bool ReturnNullable = default;
     EasyTypeSymbol ReturnOptions = default!;
@@ -135,9 +136,15 @@ internal class XPropertyNode : PropertyNode
     /// </summary>
     string? GetInterfaceModifiers()
     {
+        var host = ParentNode!.Symbol;
         var found = Finder.Find((type, out value) =>
         {
-            if (FindMethod(out _, type) || XNode.FindWithAttribute(out _, out _, Symbol.Name, type))
+            // Easy case:
+            // Because the host is an interface, it can only derive from another interface. So,
+            // when a base method exist, or when it shall exist because the member was decorated,
+            // then we just need to use 'new'.
+
+            if (FindMethod(out _, type) || XNode.FinderWithAttribute(out _, out _, Symbol.Name, type))
             {
                 value = "new ";
                 return true;
@@ -145,7 +152,7 @@ internal class XPropertyNode : PropertyNode
             value = default;
             return false;
         },
-        out string? value, null, Host.AllInterfaces);
+        out string? value, null, host.AllInterfaces);
         return found ? value : null;
     }
 
@@ -171,13 +178,64 @@ internal class XPropertyNode : PropertyNode
     /// <summary>
     /// Invoked to obtain the appropriate method modifiers.
     /// </summary>
-    /// Base        Modifier
-    /// ---------------------------------------------------
-    /// interface   abstract
-    /// abstract    abstract override
-    /// regular     abstract new
-    /// virt        abstract override
-    string? GetAbstractModifiers() => null; // HIGH: GetAbstractModifiers
+    [SuppressMessage("", "IDE0018")]
+    string? GetAbstractModifiers()
+    {
+        var host = ParentNode!.Symbol;
+        var found = false;
+        string? value = null;
+
+        // By base method:
+        // If found, both its accesibility and virtual-alike kind dictate what shall happen with
+        // the one to generate. Accessibility is replicated. If it was virtual-alike, then we
+        // just override; if not, we just use new.
+
+        found = Finder.Find((type, out value) =>
+        {
+            while (FindMethod(out var method, type))
+            {
+                var dec = method.DeclaredAccessibility; if (dec == Accessibility.Private) break;
+                var str = dec.ToAccessibilityString(); if (str == null) break;
+
+                if (type.IsInterface) { value = $"{str} abstract "; return true; }
+
+                var methodvirt = method.IsVirtual || method.IsAbstract || method.IsOverride;
+                value = methodvirt ? $"{str} abstract override " : $"{str} abstract new ";
+                return true;
+            }
+            // Try next...
+            value = null;
+            return false;
+        },
+        out value, null, host.AllBaseTypes, host.AllInterfaces);
+
+        // By requested member:
+        // If found we shall assume that a base method will be generated, although not yet. So,
+        // we apply the same logic as before but using hostvirt to undertand if the to-be base
+        // method is a virtual-alike one or not.
+
+        if (!XNode.FinderUseVirtual(
+            out var hostvirt,
+            Symbol.Name, host, host.AllBaseTypes, host.AllInterfaces)) hostvirt = true;
+
+        if (!found) found = Finder.Find((type, out value) =>
+        {
+            while (FindDecoratedMember(out var member, type))
+            {
+                if (type.IsInterface) { value = $"public abstract "; return true; }
+
+                value = hostvirt ? "public abstract override " : "public abstract new ";
+                return true;
+            }
+            // Try next...
+            value = null;
+            return false;
+        },
+        out value, null, host.AllBaseTypes, host.AllInterfaces);
+
+        // Finishing...
+        return found ? value : "public abstract ";
+    }
 
     // ----------------------------------------------------
 
@@ -186,11 +244,12 @@ internal class XPropertyNode : PropertyNode
     /// </summary>
     void EmitHostRegular(SourceProductionContext context, CodeBuilder cb)
     {
-        var ctor = Host.FindCopyConstructor(strict: false);
+        var host = ParentNode!.Symbol;
+        var ctor = host.FindCopyConstructor(strict: false);
         if (ctor == null)
         {
             Symbol.ReportError(TreeError.NoCopyConstructor, context);
-            Host.ReportError(TreeError.NoCopyConstructor, context);
+            host.ReportError(TreeError.NoCopyConstructor, context);
             return;
         }
 
@@ -205,7 +264,7 @@ internal class XPropertyNode : PropertyNode
         cb.AppendLine("{");
         cb.IndentLevel++;
         {
-            var hostname = Host.EasyName();
+            var hostname = host.EasyName();
             cb.AppendLine($"var v_host = new {hostname}(this)");
             cb.AppendLine("{");
             cb.IndentLevel++;
@@ -224,18 +283,73 @@ internal class XPropertyNode : PropertyNode
     /// <summary>
     /// Invoked to obtain the appropriate method modifiers.
     /// </summary>
-    /// Base        Derived     Sealed  Modifier
-    /// ---------------------------------------------------
-    /// regular     regular     no      new
-    /// regular     virt        no      new virtual
-    /// regular     regular     yes     new
-    /// regular     virt        yes     new
-    /// ---------------------------------------------------
-    /// virt        regular     no      new
-    /// virt        virt        no      override
-    /// virt        regular     yes     override
-    /// virt        virt        yes     override
-    string? GetRegularModifiers() => null; // HIGH: GetRegularModifiers
+    [SuppressMessage("", "IDE0018")]
+    string? GetRegularModifiers()
+    {
+        var host = ParentNode!.Symbol;
+        var found = false;
+        string? value = null;
+        var issealed = Symbol.IsSealed || host.IsSealed;
+
+        if (!XNode.FinderUseVirtual(
+            out var hostvirt, 
+            Symbol.Name, host, host.AllBaseTypes, host.AllInterfaces)) hostvirt = true;
+
+        // By base method:
+        // If found, its accesibility is replicated. But the virtual-alike kind of the one to be
+        // generated also depends on whether this host is sealed or not. If not virtual or sealed
+        // the we need to use new. Otherwise we can just override.
+
+        found = Finder.Find((type, out value) =>
+        {
+            while (FindMethod(out var method, type))
+            {
+                var dec = method.DeclaredAccessibility; if (dec == Accessibility.Private) break;
+                var str = dec.ToAccessibilityString(); if (str == null) break;
+
+                if (type.IsInterface)
+                {
+                    value = !hostvirt || issealed ? $"{str} " : $"{str} virtual ";
+                    return true;
+                }
+
+                var methodvirt = method.IsVirtual || method.IsAbstract || method.IsOverride;
+                value = !methodvirt || issealed ? $"{str} new " : $"{str} override ";
+                return true;
+            }
+            // Try next...
+            value = null;
+            return false;
+        },
+        out value, null, host.AllBaseTypes, host.AllInterfaces);
+
+        // By requested member:
+        // If found we shall assume that a base method will be generated, although not yet. So,
+        // we apply the same logic as before but using hostvirt to undertand if the to-be base
+        // method is a virtual-alike one or not.
+
+        if (!found) found = Finder.Find((type, out value) =>
+        {
+            while (FindDecoratedMember(out var member, type))
+            {
+                if (type.IsInterface)
+                {
+                    value = !hostvirt || issealed ? $"public " : $"public virtual ";
+                    return true;
+                }
+
+                value = !hostvirt || issealed ? $"public new " : $"public override ";
+                return true;
+            }
+            // Try next...
+            value = null;
+            return false;
+        },
+        out value, null, host.AllBaseTypes, host.AllInterfaces);
+
+        // Finishing...
+        return found ? value : (!hostvirt || issealed ? "public " :"public virtual ");
+    }
 
     // ----------------------------------------------------
 
@@ -273,9 +387,11 @@ internal class XPropertyNode : PropertyNode
     /// </summary>
     List<Explicit> GetExplicitInterfaces()
     {
+        var host = ParentNode!.Symbol;
         var comparer = SymbolEqualityComparer.Default;
         List<Explicit> list = [];
-        foreach (var iface in Host.Interfaces) TryCaptureAt(iface);
+
+        foreach (var iface in host.Interfaces) TryCaptureAt(iface);
         return list;
 
         bool TryCaptureAt(INamedTypeSymbol iface)
@@ -301,28 +417,6 @@ internal class XPropertyNode : PropertyNode
     }
 
     // ----------------------------------------------------
-
-    /// <summary>
-    /// Tries to find a compatible member at the given type, if not null, and at the types of the
-    /// given arrays.
-    /// </summary>
-    /// <param name="value"></param>
-    /// <param name="type"></param>
-    /// <param name="chains"></param>
-    /// <returns></returns>
-    bool FindMember(
-        [NotNullWhen(true)] out IPropertySymbol? value,
-        INamedTypeSymbol? type, params IEnumerable<INamedTypeSymbol>[] chains)
-    {
-        return Finder.Find((type, out value) =>
-        {
-            value = type.GetMembers().OfType<IPropertySymbol>().FirstOrDefault(x =>
-                x.Name == MethodName);
-
-            return value != null;
-        },
-        out value, type, chains);
-    }
 
     /// <summary>
     /// Tries to find a compatible decorated member at the given type, if not null, and at the types

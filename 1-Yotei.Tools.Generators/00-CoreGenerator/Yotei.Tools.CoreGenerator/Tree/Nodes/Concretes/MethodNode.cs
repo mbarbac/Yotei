@@ -42,11 +42,6 @@ internal class MethodNode : ITreeNode
     public TypeNode? ParentNode { get; set; }
 
     /// <summary>
-    /// The host (containing type) of this element.
-    /// </summary>
-    public INamedTypeSymbol Host => Symbol.ContainingType;
-
-    /// <summary>
     /// The symbol this instance is associated with.
     /// </summary>
     public IMethodSymbol Symbol { get; }
@@ -92,7 +87,12 @@ internal class MethodNode : ITreeNode
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
-    public virtual bool Validate(SourceProductionContext context) => true;
+    public virtual bool Validate(SourceProductionContext context)
+    {
+        var r = true;
+        if (ParentNode == null) { Symbol.ReportError(TreeError.NoParentNode, context); r = false; }
+        return r;
+    }
 
     // ----------------------------------------------------
 

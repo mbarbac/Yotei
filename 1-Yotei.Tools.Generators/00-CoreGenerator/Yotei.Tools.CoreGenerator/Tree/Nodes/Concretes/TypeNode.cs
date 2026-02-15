@@ -112,15 +112,17 @@ internal class TypeNode : ITreeNode
     /// <returns></returns>
     public virtual bool Validate(SourceProductionContext context)
     {
-        if (!Symbol.IsPartial) { Symbol.ReportError(TreeError.TypeNotPartial, context); return false; }
-        if (!IsSupportedKind()) { Symbol.ReportError(TreeError.KindNotSupported, context); return false; }
+        var r = true;
 
-        foreach (var node in ChildProperties) if (!node.Validate(context)) return false;
-        foreach (var node in ChildFields) if (!node.Validate(context)) return false;
-        foreach (var node in ChildMethods) if (!node.Validate(context)) return false;
-        foreach (var node in ChildEvents) if (!node.Validate(context)) return false;
+        if (!Symbol.IsPartial) { Symbol.ReportError(TreeError.TypeNotPartial, context); r = false; }
+        if (!IsSupportedKind()) { Symbol.ReportError(TreeError.KindNotSupported, context); r = false; }
 
-        return true;
+        foreach (var node in ChildProperties) if (!node.Validate(context)) r = false;
+        foreach (var node in ChildFields) if (!node.Validate(context)) r = false;
+        foreach (var node in ChildMethods) if (!node.Validate(context)) r = false;
+        foreach (var node in ChildEvents) if (!node.Validate(context)) r = false;
+
+        return r;
     }
 
     /// <summary>
