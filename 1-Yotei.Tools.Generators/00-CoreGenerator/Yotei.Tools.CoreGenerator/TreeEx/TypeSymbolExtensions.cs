@@ -6,7 +6,8 @@ internal static partial class TypeSymbolExtensions
     extension(ITypeSymbol source)
     {
         /// <summary>
-        /// Determines if the type is a nullable wrapper or not.
+        /// Determines if the type is a nullable wrapper or not (so it either is a value-type
+        /// <see cref="Nullable{}"/> instance, or a <see cref="IsNullable{T}"/> one).
         /// </summary>
         public bool IsNullableWrapper() =>
             source is INamedTypeSymbol named &&

@@ -51,7 +51,7 @@ internal class XPropertyNode : PropertyNode
         var host = ParentNode!.Symbol;
 
         // Intercepting explicitly implemented...
-        if (FindMethod(out _, host)) return;
+        if (FinderMethod(out _, host)) return;
 
         // Capturing working data...
         if (!CaptureWorkingData(context)) return;
@@ -144,7 +144,7 @@ internal class XPropertyNode : PropertyNode
             // when a base method exist, or when it shall exist because the member was decorated,
             // then we just need to use 'new'.
 
-            if (FindMethod(out _, type) || XNode.FinderWithAttribute(out _, out _, Symbol.Name, type))
+            if (FinderMethod(out _, type) || XNode.FinderWithAttribute(out _, out _, Symbol.Name, type))
             {
                 value = "new ";
                 return true;
@@ -192,7 +192,7 @@ internal class XPropertyNode : PropertyNode
 
         found = Finder.Find((type, out value) =>
         {
-            while (FindMethod(out var method, type))
+            while (FinderMethod(out var method, type))
             {
                 var dec = method.DeclaredAccessibility; if (dec == Accessibility.Private) break;
                 var str = dec.ToAccessibilityString(); if (str == null) break;
@@ -220,7 +220,7 @@ internal class XPropertyNode : PropertyNode
 
         if (!found) found = Finder.Find((type, out value) =>
         {
-            while (FindDecoratedMember(out var member, type))
+            while (FinderDecoratedMember(out var member, type))
             {
                 if (type.IsInterface) { value = $"public abstract "; return true; }
 
@@ -246,12 +246,7 @@ internal class XPropertyNode : PropertyNode
     {
         var host = ParentNode!.Symbol;
         var ctor = host.FindCopyConstructor(strict: false);
-        if (ctor == null)
-        {
-            Symbol.ReportError(TreeError.NoCopyConstructor, context);
-            host.ReportError(TreeError.NoCopyConstructor, context);
-            return;
-        }
+        if (ctor == null) { host.ReportError(TreeError.NoCopyConstructor, context); return; }
 
         var rtype = ReturnType.EasyName(ReturnOptions);
         var rnull = ReturnNullable ? "?" : string.Empty;
@@ -277,6 +272,7 @@ internal class XPropertyNode : PropertyNode
         }
         cb.IndentLevel--;
         cb.AppendLine("}");
+
         EmitExplicitInterfaces(context, cb);
     }
 
@@ -302,7 +298,7 @@ internal class XPropertyNode : PropertyNode
 
         found = Finder.Find((type, out value) =>
         {
-            while (FindMethod(out var method, type))
+            while (FinderMethod(out var method, type))
             {
                 var dec = method.DeclaredAccessibility; if (dec == Accessibility.Private) break;
                 var str = dec.ToAccessibilityString(); if (str == null) break;
@@ -330,7 +326,7 @@ internal class XPropertyNode : PropertyNode
 
         if (!found) found = Finder.Find((type, out value) =>
         {
-            while (FindDecoratedMember(out var member, type))
+            while (FinderDecoratedMember(out var member, type))
             {
                 if (type.IsInterface)
                 {
@@ -403,7 +399,7 @@ internal class XPropertyNode : PropertyNode
                 if (TryCaptureAt(child)) { membertype = child; found = true; }
 
             if (!found)
-                if (FindDecoratedMember(out var temp, iface))
+                if (FinderDecoratedMember(out var temp, iface))
                 { membertype = (INamedTypeSymbol)temp.Type; found = true; }
 
             if (found)
@@ -426,17 +422,24 @@ internal class XPropertyNode : PropertyNode
     /// <param name="type"></param>
     /// <param name="chains"></param>
     /// <returns></returns>
-    bool FindDecoratedMember(
+    bool FinderDecoratedMember(
         [NotNullWhen(true)] out IPropertySymbol? value,
         INamedTypeSymbol? type, params IEnumerable<INamedTypeSymbol>[] chains)
     {
         return Finder.Find((type, out value) =>
         {
-            value = type.GetMembers().OfType<IPropertySymbol>().FirstOrDefault(x =>
-                x.Name == MethodName && (
-                x.HasAttributes(typeof(WithAttribute)) || x.HasAttributes(typeof(WithAttribute<>))));
+            var member = type.GetMembers().OfType<IPropertySymbol>().FirstOrDefault(x =>
+                x.Name == Symbol.Name);
 
-            return value != null;
+            if (member != null)
+            {
+                var at = member.GetAttributes(typeof(WithAttribute), typeof(WithAttribute<>));
+                value = at == null ? null : member;
+                return at != null;
+            }
+
+            value = null;
+            return false;
         },
         out value, type, chains);
     }
@@ -451,7 +454,7 @@ internal class XPropertyNode : PropertyNode
     /// <param name="type"></param>
     /// <param name="chains"></param>
     /// <returns></returns>
-    bool FindMethod(
+    bool FinderMethod(
         [NotNullWhen(true)] out IMethodSymbol? value,
         INamedTypeSymbol? type, params IEnumerable<INamedTypeSymbol>[] chains)
     {

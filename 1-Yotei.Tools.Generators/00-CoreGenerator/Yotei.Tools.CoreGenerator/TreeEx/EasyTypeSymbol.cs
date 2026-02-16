@@ -116,14 +116,24 @@ internal record EasyTypeSymbol
 
     // ----------------------------------------------------
 
-    enum Mode { Empty, Default, Full };
+    enum Mode { Empty, Default, Full, FullAndGlobal };
     EasyTypeSymbol(Mode mode)
     {
         switch (mode)
         {
-            case Mode.Full:
+            case Mode.FullAndGlobal:
                 UseVariance = true;
                 NamespaceOptions = EasyNamespaceSymbol.Full;
+                UseHost = true;
+                UseSpecialNames = true;
+                RemoveAttributeSuffix = false;
+                NullableStyle = IsNullableStyle.KeepWrappers;
+                GenericOptions = this;
+                break;
+
+            case Mode.Full:
+                UseVariance = true;
+                NamespaceOptions = EasyNamespaceSymbol.Full with { UseGlobalNamespace = false };
                 UseHost = true;
                 UseSpecialNames = true;
                 RemoveAttributeSuffix = false;
@@ -160,6 +170,11 @@ internal record EasyTypeSymbol
     /// A shared instance with full-alike settings.
     /// </summary>
     public static EasyTypeSymbol Full { get; } = new(Mode.Full);
+
+    /// <summary>
+    /// A shared instance with full-alike settings.
+    /// </summary>
+    public static EasyTypeSymbol FullAndGlobal { get; } = new(Mode.FullAndGlobal);
 }
 
 // ========================================================
@@ -193,6 +208,7 @@ internal static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
+    [SuppressMessage("", "IDE0019")]
     public static string EasyName(this ITypeSymbol source, EasyTypeSymbol options)
     {
         ArgumentNullException.ThrowIfNull(source);
@@ -207,24 +223,23 @@ internal static partial class EasyNameExtensions
             case IErrorTypeSymbol: return "<error>";
             case IArrayTypeSymbol item: return EasyNameTypeArray(item, options);
             case IPointerTypeSymbol item: return EasyNameTypePointer(item, options);
-            //case IFunctionPointerTypeSymbol item: return EasyNameTypeFunctionPointer(item, options);
-        }
-
-        // Shortcut special name...
-        var named = source as INamedTypeSymbol;
-        if (named != null && named.Arity == 0 && options.UseSpecialNames)
-        {
-            var str = named.ToSpecialName();
-            if (str != null) return str;
+                //case IFunctionPointerTypeSymbol item: return EasyNameTypeFunctionPointer(item, options);
         }
 
         // Processing...
         var sb = new StringBuilder();
+        var named = source as INamedTypeSymbol;
+        if (named != null && named.Arity == 0 && options.UseSpecialNames)
+        {
+            var str = named.ToSpecialName();
+            if (str != null) { sb.Append(str); goto DECORATED; }
+        }
+
         var isgen = source.TypeKind == TypeKind.TypeParameter;
         var args = named is null ? [] : named.TypeArguments;
         var host = source.ContainingType;
 
-        // Shortcut nullable wrappers...
+        // Shortcut nullable wrappers not kept...
         if (options.NullableStyle == IsNullableStyle.UseAnnotations && source.IsNullableWrapper())
         {
             var arg = args[0];
@@ -281,11 +296,10 @@ internal static partial class EasyNameExtensions
             sb.Append('>');
         }
 
-        // Nullability...
-        if (!sb.EndsWith('?') &&
-            options.NullableStyle != IsNullableStyle.None &&
-            source.IsNullableDecorated())
-            sb.Append('?');
+        // Nullability (wrapped one already intercepted)...
+        DECORATED:
+        if (!sb.EndsWith('?') && options.NullableStyle != IsNullableStyle.None)
+        { if (source.IsNullableByAnnotationOrAttribute()) sb.Append('?'); }
 
         // Finishing...
         return sb.ToString();

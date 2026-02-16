@@ -95,7 +95,7 @@ internal static partial class EasyNameExtensions
 
             if (!str.EndsWith('?') &&
                 xoptions.NullableStyle == IsNullableStyle.UseAnnotations &&
-                source.Type.IsNullableDecorated() &&
+                source.Type.IsNullableByAnnotationOrAttribute() &&
                 !source.Type.IsNullableWrapper())
                 sb.Append('?');
         }

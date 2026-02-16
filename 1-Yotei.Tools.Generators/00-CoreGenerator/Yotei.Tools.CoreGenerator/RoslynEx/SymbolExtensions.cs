@@ -39,44 +39,12 @@ internal static partial class SymbolExtensions
         // ------------------------------------------------
 
         /// <summary>
-        /// Determines if this symbol has any attribute whose class is the given one.
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        public bool HasAttributes(Type type) => source.GetAttributes(type).Any();
-
-        /// <summary>
-        /// Returns the collection of attributes that decorates the given symbol and whose class is
-        /// the given one.
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        public IEnumerable<AttributeData> GetAttributes(Type type)
-        {
-            ArgumentNullException.ThrowIfNull(source);
-            ArgumentNullException.ThrowIfNull(type);
-
-            foreach (var at in source.GetAttributes())
-            {
-                if (at.AttributeClass is not null &&
-                    at.AttributeClass.Match(type)) yield return at;
-            }
-        }
-
-        /// <summary>
-        /// Determines if this symbol has any attribute whose class is among the given ones.
-        /// </summary>
-        /// <param name="types"></param>
-        /// <returns></returns>
-        public bool HasAttributes(IEnumerable<Type> types) => source.GetAttributes(types).Any();
-
-        /// <summary>
         /// Returns the collection of attributes that decorates the given symbol and whose class is
         /// any of the given ones.
         /// </summary>
         /// <param name="types"></param>
         /// <returns></returns>
-        public IEnumerable<AttributeData> GetAttributes(IEnumerable<Type> types)
+        public IEnumerable<AttributeData> GetAttributes(params Type[] types)
         {
             ArgumentNullException.ThrowIfNull(source);
             ArgumentNullException.ThrowIfNull(types);
@@ -85,8 +53,10 @@ internal static partial class SymbolExtensions
             {
                 foreach (var type in types)
                 {
-                    if (at.AttributeClass is not null &&
-                    at.AttributeClass.Match(type)) yield return at;
+                    ArgumentNullException.ThrowIfNull(type);
+
+                    if (at.AttributeClass != null &&
+                        at.AttributeClass.Match(type)) yield return at;
                 }
             }
         }

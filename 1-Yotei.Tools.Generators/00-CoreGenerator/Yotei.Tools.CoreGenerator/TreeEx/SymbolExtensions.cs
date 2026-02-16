@@ -6,10 +6,17 @@ internal static partial class SymbolExtensions
     extension(ISymbol source)
     {
         /// <summary>
-        /// Determines if the given symbol is either decorated with a nullable annotation, or with
-        /// the <see cref="NullableAttribute"/> or <see cref="IsNullableAttribute"/> attributes.
+        /// Determines if the given symbol is nullable one because it either has been denoted as
+        /// such with a '<see langword="?"/>' nullable annotation, or because it is decorared with
+        /// a <see cref="NullableAttribute"/> or a  <see cref="IsNullableAttribute"/> attribute.
+        /// <para>
+        /// This method does not take into consideration the case that the symbol is a nullable
+        /// wrapper type-alike one (such as value-type related <see cref="Nullable{T}"/> ones, or
+        /// the <see cref="IsNullable{T}"/> workaround). For these cases, you can check the type
+        /// using the <see cref="TypeSymbolExtensions.IsNullableWrapper(ITypeSymbol)"/> method.
+        /// </para>
         /// </summary>
-        public bool IsNullableDecorated()
+        public bool IsNullableByAnnotationOrAttribute()
         {
             // Using nullable annotations...
             var annotated = source switch
