@@ -186,10 +186,7 @@ internal class XPropertyNode : PropertyNode
         string? value = null;
 
         // By base method:
-        // If found, both its accesibility and virtual-alike kind dictate what shall happen with
-        // the one to generate. Accessibility is replicated. If it was virtual-alike, then we
-        // just override; if not, we just use new.
-
+        // If such exist, it dictates the modifiers of the one to be generated for this host.
         found = Finder.Find((type, out value) =>
         {
             while (FinderMethod(out var method, type))
@@ -210,21 +207,19 @@ internal class XPropertyNode : PropertyNode
         out value, null, host.AllBaseTypes, host.AllInterfaces);
 
         // By requested member:
-        // If found we shall assume that a base method will be generated, although not yet. So,
-        // we apply the same logic as before but using hostvirt to undertand if the to-be base
-        // method is a virtual-alike one or not.
-
-        if (!XNode.FinderUseVirtual(
-            out var hostvirt,
-            Symbol.Name, host, host.AllBaseTypes, host.AllInterfaces)) hostvirt = true;
-
+        // We shall assume a method is generated (maybe not yet), so it dictates the modifiers of
+        // the one to be generated for this host.
         if (!found) found = Finder.Find((type, out value) =>
         {
             while (FinderDecoratedMember(out var member, type))
             {
                 if (type.IsInterface) { value = $"public abstract "; return true; }
 
-                value = hostvirt ? "public abstract override " : "public abstract new ";
+                if (!XNode.FinderUseVirtual(
+                    out var membervirt,
+                    Symbol.Name, type, type.AllBaseTypes, type.AllInterfaces)) membervirt = true;
+
+                value = membervirt ? $"public abstract override " : $"public abstract new ";
                 return true;
             }
             // Try next...
@@ -288,14 +283,11 @@ internal class XPropertyNode : PropertyNode
         var issealed = Symbol.IsSealed || host.IsSealed;
 
         if (!XNode.FinderUseVirtual(
-            out var hostvirt, 
+            out var hostvirt,
             Symbol.Name, host, host.AllBaseTypes, host.AllInterfaces)) hostvirt = true;
 
         // By base method:
-        // If found, its accesibility is replicated. But the virtual-alike kind of the one to be
-        // generated also depends on whether this host is sealed or not. If not virtual or sealed
-        // the we need to use new. Otherwise we can just override.
-
+        // If such exist, it dictates the modifiers of the one to be generated for this host.
         found = Finder.Find((type, out value) =>
         {
             while (FinderMethod(out var method, type))
@@ -320,10 +312,8 @@ internal class XPropertyNode : PropertyNode
         out value, null, host.AllBaseTypes, host.AllInterfaces);
 
         // By requested member:
-        // If found we shall assume that a base method will be generated, although not yet. So,
-        // we apply the same logic as before but using hostvirt to undertand if the to-be base
-        // method is a virtual-alike one or not.
-
+        // We shall assume a method is generated (maybe not yet), so it dictates the modifiers of
+        // the one to be generated for this host.
         if (!found) found = Finder.Find((type, out value) =>
         {
             while (FinderDecoratedMember(out var member, type))
@@ -334,7 +324,11 @@ internal class XPropertyNode : PropertyNode
                     return true;
                 }
 
-                value = !hostvirt || issealed ? $"public new " : $"public override ";
+                if (!XNode.FinderUseVirtual(
+                    out var membervirt,
+                    Symbol.Name, type, type.AllBaseTypes, type.AllInterfaces)) membervirt = true;
+
+                value = membervirt ? $"public override " : $"public new ";
                 return true;
             }
             // Try next...
