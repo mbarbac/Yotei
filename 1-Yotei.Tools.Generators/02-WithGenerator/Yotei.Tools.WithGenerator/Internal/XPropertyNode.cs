@@ -94,9 +94,10 @@ internal class XPropertyNode : PropertyNode
         }
 
         // Return type...
-        if (XNode.FindReturnTypeAt(at, out var type, out var nullable))
+        if (XNode.FindReturnTypeAt(at, out var type, out var nullable) ||
+            XNode.FinderReturnType(out type, out nullable, Symbol.Name, host, host.AllBaseTypes, host.AllInterfaces))
         {
-            ReturnType = type;
+            ReturnType = type!;
             ReturnNullable = nullable;
 
             var same = SymbolEqualityComparer.Default.Equals(host, type);
@@ -171,6 +172,8 @@ internal class XPropertyNode : PropertyNode
         XNode.EmitDocumentation(Symbol, cb);
         cb.AppendLine($"{modifiers}{rtype}{rnull}");
         cb.AppendLine($"{MethodName}({argtype} {ArgumentName});");
+
+        if (ParentNode!.Symbol.Name == "AType4C") { } // DEBUG-ONLY
 
         EmitExplicitInterfaces(context, cb);
     }

@@ -498,6 +498,7 @@ internal class TreeGenerator : IIncrementalGenerator
     /// </summary>
     static string GetFileName(INamedTypeSymbol symbol)
     {
+        // First, we will dot-separate but not inside '<...>' portions...
         var options = new SymbolDisplayFormat(
             globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.Omitted,
             typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
@@ -505,7 +506,6 @@ internal class TreeGenerator : IIncrementalGenerator
             miscellaneousOptions: SymbolDisplayMiscellaneousOptions.UseSpecialTypes);
 
         var name = symbol.ThrowWhenNull().ToDisplayString(options);
-
         List<int> dots = [];
         int depth = 0;
         for (int i = 0; i < name.Length; i++)
@@ -515,28 +515,33 @@ internal class TreeGenerator : IIncrementalGenerator
             if (name[i] == '.' && depth == 0) dots.Add(i);
         }
 
+        // While capturing the parts, we substitute '<>' by '[]' (the <> are not valid file chars)...
         List<string> parts = [];
         int last = 0;
-
         foreach (var dot in dots)
         {
-            parts.Add(name[last..dot]);
+            parts.Add(name[last..dot].Replace('<', '[').Replace('>', ']'));
             last = dot + 1;
         }
-        parts.Add(name[last..]);
+        parts.Add(name[last..].Replace('<', '[').Replace('>', ']'));
 
-        var fname = parts[^1]; parts.RemoveAt(parts.Count - 1);
+#if !ORGANIZE_BY_LAST_PART
+        // We produce a file hierarchy were all but the last part is used as a folder...
+        if (parts.Count == 1) return parts[0];
+        else
+        {
+            var fname = parts[^1]; parts.RemoveAt(parts.Count - 1);
+            parts.Reverse();
+            var nspart = string.Join(".", parts);
+            var str = string.Join("/", nspart, fname);
+            return str;
+        }
+#else
+        // Finally, we reverse and return...
         parts.Reverse();
-        var nspart = string.Join(".", parts);
-
-        fname = fname.Replace('<', '[').Replace('>', ']');
-        nspart = nspart.Replace('<', '[').Replace('>', ']');
-        var str = string.Join("/", nspart, fname);
+        var str = string.Join(".", parts);
         return str;
-
-        //var str = string.Join(".", parts);
-        //str = str.Replace('<', '[').Replace('>', ']');
-        //return str;
+#endif
     }
 
     // ----------------------------------------------------

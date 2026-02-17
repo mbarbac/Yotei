@@ -90,9 +90,10 @@ internal class XFieldNode : FieldNode
         }
 
         // Return type...
-        if (XNode.FindReturnTypeAt(at, out var type, out var nullable))
+        if (XNode.FindReturnTypeAt(at, out var type, out var nullable) ||
+            XNode.FinderReturnType(out type, out nullable, Symbol.Name, host, host.AllBaseTypes, host.AllInterfaces))
         {
-            ReturnType = type;
+            ReturnType = type!;
             ReturnNullable = nullable;
 
             var same = SymbolEqualityComparer.Default.Equals(host, type);

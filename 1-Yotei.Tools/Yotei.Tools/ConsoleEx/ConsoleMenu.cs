@@ -190,6 +190,10 @@ public record ConsoleMenu : IEnumerable<ConsoleMenuEntry>
     /// <returns>The position of the selected entry, or -1 if any.</returns>
     public int Run(int position = 0)
     {
+        // What follows is a hack to prevent XUnit's test discovery to emit a 'handle is invalid'
+        // warning, which is very annoying...
+        if (Console.IsOutputRedirected) return -1;
+
         // Intercepting obvious cases...
         if (position < 0) ArgumentOutOfRangeException.ThrowIfNegative(position);
         if (Count == 0) return -1;

@@ -4,7 +4,7 @@
 //[Enforced]
 public static partial class Test_InterfaceHost
 {
-    // Default case
+    // Easy case
     partial interface IFace1 { [With] string? Name { get; } }
 
     //[Enforced]

@@ -36,8 +36,6 @@ internal static class XNode
         INamedTypeSymbol? type,
         params IEnumerable<INamedTypeSymbol>[] chains)
     {
-        var comparer = SymbolEqualityComparer.Default;
-
         return Finder.Find((type, out value) =>
         {
             // Member attribute takes priority...
@@ -58,6 +56,7 @@ internal static class XNode
 
             if (athost != null && FindUseVirtualAt(athost, out value)) return true;
 
+            // Try next...
             value = default!;
             return false;
         },
@@ -101,6 +100,55 @@ internal static class XNode
         nullable = false;
         return false;
     }
+
+    /// <summary>
+    /// Tries to find value of the first 'ReturnType' property that happens in attributes of the given
+    /// type, or types of the given chains, that correspond to a member with the given name.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="name"></param>
+    /// <param name="type"></param>
+    /// <param name="chains"></param>
+    /// <returns></returns>
+    public static bool FinderReturnType(
+        out INamedTypeSymbol? value, out bool nullable,
+        string name,
+        INamedTypeSymbol? type,
+        params IEnumerable<INamedTypeSymbol>[] chains)
+    {
+        var found = Finder.Find((type, out item) =>
+        {
+            // Member attribute takes priority...
+            var member = type.GetMembers().FirstOrDefault(x => x.Name == name);
+            if (member != null)
+            {
+                var atmember = member.GetAttributes().FirstOrDefault(x =>
+                    x.AttributeClass != null &&
+                    x.AttributeClass.MatchAny([typeof(WithAttribute), typeof(WithAttribute<>)]));
+
+                if (atmember != null && FindReturnTypeAt(atmember, out var mtype, out var mnullable))
+                { item = new(mtype, mnullable); return true; }
+            }
+
+            // Otherwise, inherit attribute...
+            var athost = type.GetAttributes().FirstOrDefault(x =>
+                x.AttributeClass != null &&
+                x.AttributeClass.MatchAny([typeof(InheritsWithAttribute), typeof(InheritsWithAttribute<>)]));
+
+            if (athost != null && FindReturnTypeAt(athost, out var htype, out var hnullable))
+            { item = new(htype, hnullable); return true; }
+
+            // Try next...
+            item = new(null, false);
+            return false;
+        },
+        out ReturnTypeFound item, type, chains);
+
+        value = found ? item.Type : null;
+        nullable = found ? item.Nullable : false;
+        return found;
+    }
+    record struct ReturnTypeFound(INamedTypeSymbol? Type, bool Nullable);
 
     // ----------------------------------------------------
 
