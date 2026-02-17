@@ -115,7 +115,7 @@ internal class XFieldNode : FieldNode
     /// <summary>
     /// Invoked when the host is an interface.
     /// </summary>
-    void EmitHostInterface(SourceProductionContext context, CodeBuilder cb)
+    void EmitHostInterface(SourceProductionContext _, CodeBuilder cb)
     {
         var rtype = ReturnType.EasyName(ReturnOptions);
         var rnull = ReturnNullable ? "?" : string.Empty;
@@ -157,7 +157,7 @@ internal class XFieldNode : FieldNode
     /// <summary>
     /// Invoked when the host is an abstract type.
     /// </summary>
-    void EmitHostAbstract(SourceProductionContext context, CodeBuilder cb)
+    void EmitHostAbstract(SourceProductionContext _, CodeBuilder cb)
     {
         var rtype = ReturnType.EasyName(ReturnOptions);
         var rnull = ReturnNullable ? "?" : string.Empty;
@@ -354,7 +354,7 @@ internal class XFieldNode : FieldNode
 
             if (member != null)
             {
-                var at = member.GetAttributes(typeof(WithAttribute), typeof(WithAttribute<>));
+                var at = member.GetAttributes([typeof(WithAttribute), typeof(WithAttribute<>)]);
                 value = at == null ? null : member;
                 return at != null;
             }

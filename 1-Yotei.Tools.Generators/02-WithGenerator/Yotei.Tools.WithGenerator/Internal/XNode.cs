@@ -46,7 +46,7 @@ internal static class XNode
             {
                 var atmember = member.GetAttributes().FirstOrDefault(x =>
                     x.AttributeClass != null &&
-                    x.AttributeClass.MatchAny(typeof(WithAttribute), typeof(WithAttribute<>)));
+                    x.AttributeClass.MatchAny([typeof(WithAttribute), typeof(WithAttribute<>)]));
 
                 if (atmember != null && FindUseVirtualAt(atmember, out value)) return true;
             }
@@ -54,7 +54,7 @@ internal static class XNode
             // Otherwise, inherit attribute...
             var athost = type.GetAttributes().FirstOrDefault(x =>
                 x.AttributeClass != null &&
-                x.AttributeClass.MatchAny(typeof(InheritsWithAttribute), typeof(InheritsWithAttribute<>)));
+                x.AttributeClass.MatchAny([typeof(InheritsWithAttribute), typeof(InheritsWithAttribute<>)]));
 
             if (athost != null && FindUseVirtualAt(athost, out value)) return true;
 
@@ -120,10 +120,10 @@ internal static class XNode
     {
         return Finder.Find((type, out value) =>
         {
-            value = type.GetAttributes(typeof(InheritsWithAttribute)).FirstOrDefault();
+            value = type.GetAttributes([typeof(InheritsWithAttribute)]).FirstOrDefault();
             if (value is not null) return true;
 
-            value = type.GetAttributes(typeof(InheritsWithAttribute<>)).FirstOrDefault();
+            value = type.GetAttributes([typeof(InheritsWithAttribute<>)]).FirstOrDefault();
             if (value is not null) return true;
 
             value = default;
@@ -199,10 +199,10 @@ internal static class XNode
     public static bool FindWithAttributeAt(
         IPropertySymbol member, [NotNullWhen(true)] out AttributeData? value)
     {
-        value = member.GetAttributes(typeof(WithAttribute)).FirstOrDefault();
+        value = member.GetAttributes([typeof(WithAttribute)]).FirstOrDefault();
         if (value is not null) return true;
 
-        value = member.GetAttributes(typeof(WithAttribute<>)).FirstOrDefault();
+        value = member.GetAttributes([typeof(WithAttribute<>)]).FirstOrDefault();
         if (value is not null) return true;
 
         return false;
@@ -216,10 +216,10 @@ internal static class XNode
     public static bool FindWithAttributeAt(
         IFieldSymbol member, [NotNullWhen(true)] out AttributeData? value)
     {
-        value = member.GetAttributes(typeof(WithAttribute)).FirstOrDefault();
+        value = member.GetAttributes([typeof(WithAttribute)]).FirstOrDefault();
         if (value is not null) return true;
 
-        value = member.GetAttributes(typeof(WithAttribute<>)).FirstOrDefault();
+        value = member.GetAttributes([typeof(WithAttribute<>)]).FirstOrDefault();
         if (value is not null) return true;
 
         return false;

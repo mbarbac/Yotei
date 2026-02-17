@@ -44,7 +44,7 @@ internal static partial class SymbolExtensions
         /// </summary>
         /// <param name="types"></param>
         /// <returns></returns>
-        public IEnumerable<AttributeData> GetAttributes(params Type[] types)
+        public IEnumerable<AttributeData> GetAttributes(IEnumerable<Type> types)
         {
             ArgumentNullException.ThrowIfNull(source);
             ArgumentNullException.ThrowIfNull(types);

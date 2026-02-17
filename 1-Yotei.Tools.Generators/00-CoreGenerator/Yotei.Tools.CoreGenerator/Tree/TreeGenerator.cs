@@ -525,10 +525,18 @@ internal class TreeGenerator : IIncrementalGenerator
         }
         parts.Add(name[last..]);
 
+        var fname = parts[^1]; parts.RemoveAt(parts.Count - 1);
         parts.Reverse();
-        var str = string.Join(".", parts);
-        str = str.Replace('<', '[').Replace('>', ']');
+        var nspart = string.Join(".", parts);
+
+        fname = fname.Replace('<', '[').Replace('>', ']');
+        nspart = nspart.Replace('<', '[').Replace('>', ']');
+        var str = string.Join("/", nspart, fname);
         return str;
+
+        //var str = string.Join(".", parts);
+        //str = str.Replace('<', '[').Replace('>', ']');
+        //return str;
     }
 
     // ----------------------------------------------------

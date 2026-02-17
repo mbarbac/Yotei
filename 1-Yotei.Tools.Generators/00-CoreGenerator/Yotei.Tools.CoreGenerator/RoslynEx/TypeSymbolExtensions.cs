@@ -122,7 +122,7 @@ internal static partial class TypeSymbolExtensions
         /// </summary>
         /// <param name="types"></param>
         /// <returns></returns>
-        public bool MatchAny(params Type[] types)
+        public bool MatchAny(IEnumerable<Type> types)
         {
             ArgumentNullException.ThrowIfNull(source);
             ArgumentNullException.ThrowIfNull(types);

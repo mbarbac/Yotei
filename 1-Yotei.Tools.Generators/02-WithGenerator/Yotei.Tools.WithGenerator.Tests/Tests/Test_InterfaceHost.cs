@@ -75,7 +75,7 @@ public static partial class Test_InterfaceHost
     {
         var type = typeof(IFace3C);
         var method = type.GetMethod("WithName")!;
-        
+
         // Note: using reflection we cannot verify if it is a nullable one (string?), so we can
         // only do so by visual inspection...
         Assert.Equal(typeof(string), method.ReturnType);
@@ -83,5 +83,38 @@ public static partial class Test_InterfaceHost
 
     // ----------------------------------------------------
 
-    // HIGH: inheritance cases
+    // Standard inheritance...
+    partial interface IFace4A { [With] string? Name { get; } }
+    [InheritsWith] partial interface IFace4B : IFace4A { }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_IFace4()
+    {
+        var type = typeof(IFace4B);
+        var method = type.GetMethod("WithName")!;
+        var pars = method.GetParameters();
+
+        Assert.True(method.IsAbstract);
+        Assert.True(method.IsVirtual);
+        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
+        Assert.Equal(typeof(IFace4B), method.ReturnType);
+        Assert.Single(pars);
+        Assert.Equal(typeof(string), pars[0].ParameterType);
+    }
+
+    // ----------------------------------------------------
+
+    // Inheritance with return type...
+    partial interface IFace5A { [With] string? Name { get; } }
+    [InheritsWith<IFace5A>] partial interface IFace5B : IFace5A { }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_IFace5()
+    {
+        var type = typeof(IFace5B);
+        var method = type.GetMethod("WithName")!;
+        Assert.Equal(typeof(IFace5A), method.ReturnType);
+    }
 }

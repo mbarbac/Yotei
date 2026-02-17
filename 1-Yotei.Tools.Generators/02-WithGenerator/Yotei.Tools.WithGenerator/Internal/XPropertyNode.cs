@@ -119,7 +119,7 @@ internal class XPropertyNode : PropertyNode
     /// <summary>
     /// Invoked when the host is an interface.
     /// </summary>
-    void EmitHostInterface(SourceProductionContext context, CodeBuilder cb)
+    void EmitHostInterface(SourceProductionContext _, CodeBuilder cb)
     {
         var rtype = ReturnType.EasyName(ReturnOptions);
         var rnull = ReturnNullable ? "?" : string.Empty;
@@ -346,7 +346,7 @@ internal class XPropertyNode : PropertyNode
     /// <summary>
     /// Invoked to emit the interfaces that need explicit implementation, if any.
     /// </summary>
-    void EmitExplicitInterfaces(SourceProductionContext context, CodeBuilder cb)
+    void EmitExplicitInterfaces(SourceProductionContext _, CodeBuilder cb)
     {
         var ifaces = GetExplicitInterfaces();
         foreach (var item in ifaces)
@@ -427,7 +427,7 @@ internal class XPropertyNode : PropertyNode
 
             if (member != null)
             {
-                var at = member.GetAttributes(typeof(WithAttribute), typeof(WithAttribute<>));
+                var at = member.GetAttributes([typeof(WithAttribute), typeof(WithAttribute<>)]);
                 value = at == null ? null : member;
                 return at != null;
             }
