@@ -493,10 +493,18 @@ internal class TreeGenerator : IIncrementalGenerator
         }
     }
 
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if emits all files in the same folder, or rather in a folder hierarchy that
+    /// uses all their dot-separated parts, except the last one, as the folder name.
+    /// </summary>
+    protected virtual bool FlatFileNames => false;
+
     /// <summary>
     /// Invoked to obtain a suitable file name for the given type.
     /// </summary>
-    static string GetFileName(INamedTypeSymbol symbol)
+    string GetFileName(INamedTypeSymbol symbol)
     {
         // First, we will dot-separate but not inside '<...>' portions...
         var options = new SymbolDisplayFormat(
@@ -525,23 +533,28 @@ internal class TreeGenerator : IIncrementalGenerator
         }
         parts.Add(name[last..].Replace('<', '[').Replace('>', ']'));
 
-#if !ORGANIZE_BY_LAST_PART
-        // We produce a file hierarchy were all but the last part is used as a folder...
-        if (parts.Count == 1) return parts[0];
-        else
+        // Organizing in a flat folder...
+        if (FlatFileNames)
         {
-            var fname = parts[^1]; parts.RemoveAt(parts.Count - 1);
+            // We just need to reverse and return...
             parts.Reverse();
-            var nspart = string.Join(".", parts);
-            var str = string.Join("/", nspart, fname);
+            var str = string.Join(".", parts);
             return str;
         }
-#else
-        // Finally, we reverse and return...
-        parts.Reverse();
-        var str = string.Join(".", parts);
-        return str;
-#endif
+
+        // Organizing in a structure using all but the last part as a folder...
+        else
+        {
+            if (parts.Count == 1) return parts[0];
+            else
+            {
+                var fname = parts[^1]; parts.RemoveAt(parts.Count - 1);
+                parts.Reverse();
+                var nspart = string.Join(".", parts);
+                var str = string.Join("/", nspart, fname);
+                return str;
+            }
+        }
     }
 
     // ----------------------------------------------------

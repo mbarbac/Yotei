@@ -262,8 +262,8 @@ internal static class XNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// Determines if the given member is decorated with a <see cref="WithAttribute"/> and, if so,
-    /// returns it in the out argument.
+    /// Determines if the given member is decorated with a <see cref="WithAttribute"/> attribute or
+    /// with a <see cref="WithAttribute{T}"/> one, and if so returns it in the out argument.
     /// </summary>
     public static bool HasWithAttribute<T>(
         this T member,
@@ -281,15 +281,21 @@ internal static class XNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// Determines if the given type is decorated with a <see cref="InheritsWithAttribute"/> and,
-    /// if so, returns it in the out argument.
+    /// Determines if the given type is decorated with a <see cref="InheritsWithAttribute"/> or
+    /// with a <see cref="InheritsWithAttribute{T}"/> attribute and, if so, returns it in the out
+    /// argument.
     /// </summary>
     public static bool HasInheritsWithAttribute(
         this INamedTypeSymbol type,
         [NotNullWhen(true)] out AttributeData? value)
     {
         value = type.GetAttributes([typeof(InheritsWithAttribute)]).FirstOrDefault();
-        return value != null;
+        if (value is not null) return true;
+
+        value = type.GetAttributes([typeof(InheritsWithAttribute<>)]).FirstOrDefault();
+        if (value is not null) return true;
+
+        return false;
     }
 
     // ----------------------------------------------------

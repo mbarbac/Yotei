@@ -146,7 +146,8 @@ internal class XPropertyNode : PropertyNode
         var host = ParentNode!.Symbol;
         var type = XNode.FindReturnType<IPropertySymbol>(
             Symbol.Name,
-            out var xtype, out var xnullable, out _, host, host.AllInterfaces) ? xtype : host;
+            out var xtype, out var xnullable, out _,
+            host, host.AllBaseTypes, host.AllInterfaces) ? xtype : host;
 
         var roptions = XNode.ReturnOptions(host, type);
         var rtype = type.EasyName(roptions);
@@ -185,12 +186,23 @@ internal class XPropertyNode : PropertyNode
                 return true;
             }
 
-            // Method requested...
+            // Member existing...
             if (XNode.FindDecoratedMember<IPropertySymbol>(Symbol.Name, out var member, out var at, type))
             {
                 if (type.IsInterface) { value = $"public abstract "; return true; }
 
                 var mvirt = at.HasUseVirtual(out var temp) ? temp : true;
+                value = mvirt ? $"public abstract override " : $"public abstract new ";
+                return true;
+            }
+
+            // Method requested...
+            if (type.HasInheritsWithAttribute(out at))
+            {
+                var mvirt = XNode.FindUseVirtual<IPropertySymbol>(
+                    Symbol.Name, out var temp, out _, out _, type, type.AllBaseTypes, type.AllInterfaces)
+                    ? temp : true;
+
                 value = mvirt ? $"public abstract override " : $"public abstract new ";
                 return true;
             }
@@ -218,7 +230,8 @@ internal class XPropertyNode : PropertyNode
 
         var type = XNode.FindReturnType<IPropertySymbol>(
             Symbol.Name,
-            out var xtype, out var xnullable, out _, host, host.AllInterfaces) ? xtype : host;
+            out var xtype, out var xnullable, out _,
+            host, host.AllBaseTypes, host.AllInterfaces) ? xtype : host;
 
         var roptions = XNode.ReturnOptions(host, type);
         var rtype = type.EasyName(roptions);
@@ -280,9 +293,9 @@ internal class XPropertyNode : PropertyNode
                 var mvirt = method.IsVirtual || method.IsAbstract || method.IsOverride;
                 value = hsealed || !mvirt ? $"{str} new " : $"{str} override ";
                 return true;
-    }
+            }
 
-            // Method requested...
+            // Member existing...
             if (XNode.FindDecoratedMember<IPropertySymbol>(Symbol.Name, out var member, out var at, type))
             {
                 if (type.IsInterface)
@@ -293,6 +306,17 @@ internal class XPropertyNode : PropertyNode
 
                 var mvirt = at.HasUseVirtual(out var temp) ? temp : true;
                 value = mvirt ? $"public override " : $"public new ";
+                return true;
+            }
+
+            // Method requested...
+            if (type.HasInheritsWithAttribute(out at))
+            {
+                var mvirt = XNode.FindUseVirtual<IPropertySymbol>(
+                    Symbol.Name, out var temp, out _, out _, type, type.AllBaseTypes, type.AllInterfaces)
+                    ? temp : true;
+
+                value = hsealed || !mvirt ? $"public new " : $"public override ";
                 return true;
             }
 
