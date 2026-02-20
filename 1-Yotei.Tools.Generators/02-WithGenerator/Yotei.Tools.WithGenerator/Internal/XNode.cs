@@ -47,6 +47,7 @@ internal static class XNode
         host = found ? info.Host : default;
         return found;
     }
+    
     record FindUseVirtualInfo<T>(bool Value, T? Member, INamedTypeSymbol? Host) where T : ISymbol;
 
     // ----------------------------------------------------
@@ -95,6 +96,7 @@ internal static class XNode
         host = found ? info.Host : default;
         return found;
     }
+    
     record FindReturnTypeInfo<T>(
         INamedTypeSymbol Value, bool Nullable, INamedTypeSymbol? Host)
         where T : ISymbol;

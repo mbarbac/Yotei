@@ -8,8 +8,11 @@ internal interface ITreeNode : INode
 {
     /// <summary>
     /// Invoked to validate this node, and its child ones, if any, before emitting any source code.
-    /// Returns <see langword="false"/> if it is not a valid one, and source code generation shall
-    /// be aborted. This method might not be called if a parent node is not valid.
+    /// Returns <see langword="false"/> if it is not a valid one so source code generation shall be
+    /// aborted.
+    /// <br/> Base methods must be called from overriding ones, unless they take full control.
+    /// <br/> In addition, derived methods might not be called if the parent node (if any) is not
+    /// a valid one itself.
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>

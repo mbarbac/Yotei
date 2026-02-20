@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis.Operations;
+using System.Reflection.Metadata;
 
 namespace Yotei.Tools.WithGenerator;
 
@@ -25,7 +26,6 @@ internal class XPropertyNode : PropertyNode
 
     readonly string MethodName = default!;
     readonly string ArgumentName = default!;
-    AttributeData? Attribute = default!;
 
     // ----------------------------------------------------
 
@@ -48,14 +48,12 @@ internal class XPropertyNode : PropertyNode
         {
             if (Attributes.Count == 0) { Symbol.ReportError(TreeError.NoAttributes, context); r = false; }
             if (Attributes.Count > 1) { Symbol.ReportError(TreeError.TooManyAttributes, context); r = false; }
-            Attribute = Attributes[0];
         }
         else // Captured because its host inherits members...
         {
             var ats = host.GetAttributes([typeof(InheritsWithAttribute), typeof(InheritsWithAttribute<>)]).ToList();
             if (Attributes.Count == 0) { host.ReportError(TreeError.NoAttributes, context); r = false; }
             if (ats.Count > 1) { host.ReportError(TreeError.TooManyAttributes, context); r = false; }
-            Attribute = ats[0];
         }
 
         return r;
@@ -167,13 +165,14 @@ internal class XPropertyNode : PropertyNode
     /// Invoked to obtain the appropriate method modifiers.
     /// <br/> If not null, ends with a space separator.
     /// </summary>
+    [SuppressMessage("", "IDE0075")]
     string? GetAbstractModifiers()
     {
         var host = ParentNode!.Symbol;
 
         var found = Finder.Find((type, out value) =>
         {
-            // Method in the base type...
+            // Method existing...
             while (XNode.FindMethod(MethodName, Symbol.Type, out var method, type))
             {
                 var dec = method.DeclaredAccessibility; if (dec == Accessibility.Private) break;
@@ -181,27 +180,28 @@ internal class XPropertyNode : PropertyNode
 
                 if (type.IsInterface) { value = $"{str} abstract "; return true; }
 
-                var methodvirt = method.IsVirtual || method.IsAbstract || method.IsOverride;
-                value = methodvirt ? $"{str} abstract override " : $"{str} abstract new ";
+                var mvirt = method.IsVirtual || method.IsAbstract || method.IsOverride;
+                value = !mvirt ? $"{str} abstract new " : $"{str} abstract override ";
                 return true;
             }
 
-            // Member requested in the base type...
+            // Method requested...
             if (XNode.FindDecoratedMember<IPropertySymbol>(Symbol.Name, out var member, out var at, type))
             {
                 if (type.IsInterface) { value = $"public abstract "; return true; }
 
-                var virt = at.HasUseVirtual(out var temp) && temp;
-                value = virt ? $"public abstract override " : $"public abstract new ";
+                var mvirt = at.HasUseVirtual(out var temp) ? temp : true;
+                value = mvirt ? $"public abstract override " : $"public abstract new ";
                 return true;
             }
 
             // Try next...
-            value = default;
+            value = null;
             return false;
         },
-        out string? value, null, host.AllInterfaces);
+        out string? value, null, host.AllBaseTypes, host.AllInterfaces);
 
+        // Returning default one if needed...
         return found ? value : "public abstract ";
     }
 
@@ -253,18 +253,19 @@ internal class XPropertyNode : PropertyNode
     /// Invoked to obtain the appropriate method modifiers.
     /// <br/> If not null, ends with a space separator.
     /// </summary>
+    [SuppressMessage("", "IDE0075")]
     string? GetRegularModifiers()
     {
         var host = ParentNode!.Symbol;
-        var issealed = Symbol.IsSealed || host.IsSealed;
-        var hostvirt = XNode.FindUseVirtual<IPropertySymbol>(
+        var hsealed = host.IsSealed || Symbol.IsSealed;
+        var hvirt = XNode.FindUseVirtual<IPropertySymbol>(
             Symbol.Name,
-            out var temp, out _, out _,
-            host, host.AllBaseTypes, host.AllInterfaces) || true; // Default value...
+            out var temp, out _, out _, host, host.AllBaseTypes, host.AllInterfaces)
+            ? temp : true;
 
         var found = Finder.Find((type, out value) =>
         {
-            // Method in the base type...
+            // Method existing...
             while (XNode.FindMethod(MethodName, Symbol.Type, out var method, type))
             {
                 var dec = method.DeclaredAccessibility; if (dec == Accessibility.Private) break;
@@ -272,38 +273,39 @@ internal class XPropertyNode : PropertyNode
 
                 if (type.IsInterface)
                 {
-                    value = issealed || !hostvirt ? $"{str} " : $"{str} virtual ";
+                    value = hsealed || !hvirt ? $"{str} " : $"{str} virtual ";
                     return true;
                 }
 
-                var methodvirt = method.IsVirtual || method.IsAbstract || method.IsOverride;
-                value = issealed || !methodvirt ? $"{str} new " : $"{str} override ";
+                var mvirt = method.IsVirtual || method.IsAbstract || method.IsOverride;
+                value = hsealed || !mvirt ? $"{str} new " : $"{str} override ";
                 return true;
-            }
+    }
 
-            // Member requested in the base type...
+            // Method requested...
             if (XNode.FindDecoratedMember<IPropertySymbol>(Symbol.Name, out var member, out var at, type))
             {
                 if (type.IsInterface)
                 {
-                    value = issealed || !hostvirt ? $"public " : $"public virtual ";
+                    value = hsealed || !hvirt ? $"public " : $"public virtual ";
                     return true;
                 }
 
-                var virt = at.HasUseVirtual(out var temp) && temp;
-                value = virt ? $"public override " : $"public new ";
+                var mvirt = at.HasUseVirtual(out var temp) ? temp : true;
+                value = mvirt ? $"public override " : $"public new ";
                 return true;
             }
 
             // Try next...
-            value = default;
+            value = null;
             return false;
         },
-        out string? value, null, host.AllInterfaces);
+        out string? value, null, host.AllBaseTypes, host.AllInterfaces);
 
+        // Returning default one if needed...
         return found
             ? value
-            : (issealed || !hostvirt) ? "public " : "public virtual ";
+            : (hsealed || !hvirt) ? "public " : "public virtual ";
     }
 
     // ----------------------------------------------------
@@ -316,6 +318,7 @@ internal class XPropertyNode : PropertyNode
     /// <summary>
     /// Invoked to emit the interfaces that need explicit implementation, if any.
     /// </summary>
+    [SuppressMessage("", "IDE0060")]
     void EmitExplicitInterfaces(SourceProductionContext context, CodeBuilder cb)
     {
         var items = GetExplicitInterfaces();
@@ -339,6 +342,58 @@ internal class XPropertyNode : PropertyNode
     /// <returns></returns>
     List<ExplicitInfo> GetExplicitInterfaces()
     {
-        throw null;
+        var host = ParentNode!.Symbol;
+        var comp = SymbolEqualityComparer.Default;
+        List<ExplicitInfo> list = [];
+
+        foreach (var iface in host.Interfaces) TryCapture(iface);
+        return list;
+
+        // Tries to capture the given interface...
+        void TryCapture(INamedTypeSymbol iface)
+        {
+            // Childs first...
+            foreach (var child in iface.Interfaces) TryCapture(child);
+
+            // If already captured, we're done...
+            var temp = list.Find(x => comp.Equals(x.IFace, iface));
+            if (temp != null) return;
+
+            // Method already defined in the interface...
+            if (XNode.FindMethod(MethodName, Symbol.Type, out var method, iface))
+            {
+                var rtype = ((INamedTypeSymbol)method.ReturnType).UnwrapNullable(out var rnull);
+                var mtype = method.Parameters[0].Type;
+                var item = new ExplicitInfo(rtype, rnull, iface, (INamedTypeSymbol)mtype);
+                list.Add(item);
+                return;
+            }
+
+            // Member in the interface...
+            if (XNode.FindDecoratedMember<IPropertySymbol>(Symbol.Name, out var member, out var at, iface))
+            {
+                var found = at.HasReturnType(out var rtype, out var rnull);
+                if (!found) { rtype = iface; rnull = false; }
+
+                var item = new ExplicitInfo(rtype!, rnull, iface, (INamedTypeSymbol)member.Type);
+                list.Add(item);
+                return;
+            }
+
+            // Iface requesting implementation...
+            if (iface.HasInheritsWithAttribute(out at))
+            {
+                var found = XNode.FindReturnType<IPropertySymbol>(
+                    Symbol.Name, out var rtype, out var rnull, out _, iface, iface.AllInterfaces);
+                if (!found) { rtype = iface; rnull = false; }
+
+                found = XNode.FindDecoratedMember(Symbol.Name, out member, out _, null, iface.AllInterfaces);
+                var mtype = found ? member!.Type : Symbol.Type;
+
+                var item = new ExplicitInfo(rtype!, rnull, iface, (INamedTypeSymbol)mtype);
+                list.Add(item);
+                return;
+            }
+        }
     }
 }
