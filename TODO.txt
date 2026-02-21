@@ -1,12 +1,8 @@
-public SymbolDisplayFormat(
-    SymbolDisplayGlobalNamespaceStyle globalNamespaceStyle = default(SymbolDisplayGlobalNamespaceStyle),
-    SymbolDisplayTypeQualificationStyle typeQualificationStyle = default(SymbolDisplayTypeQualificationStyle),
-    SymbolDisplayGenericsOptions genericsOptions = default(SymbolDisplayGenericsOptions),
-    SymbolDisplayMemberOptions memberOptions = default(SymbolDisplayMemberOptions),
-    SymbolDisplayDelegateStyle delegateStyle = default(SymbolDisplayDelegateStyle),
-    SymbolDisplayExtensionMethodStyle extensionMethodStyle = default(SymbolDisplayExtensionMethodStyle),
-    SymbolDisplayParameterOptions parameterOptions = default(SymbolDisplayParameterOptions),
-    SymbolDisplayPropertyStyle propertyStyle = default(SymbolDisplayPropertyStyle),
-    SymbolDisplayLocalOptions localOptions = default(SymbolDisplayLocalOptions),
-    SymbolDisplayKindOptions kindOptions = default(SymbolDisplayKindOptions),
-    SymbolDisplayMiscellaneousOptions miscellaneousOptions = default(SymbolDisplayMiscellaneousOptions))
+En WithGenerator:
+- Ser coherente con 'Find' and 'Has'
+	- 'Has' cuando hay que buscar SOLO en el item dado.
+	- 'Find' cuando hay que buscar de forma recursiva.
+
+- En las secciones 'requested':
+	Ademas de requested, el member HA DE EXISTIR en un tipo base. No vale con que solo aparezca
+	InheritsWith: no es suficiente.

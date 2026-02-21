@@ -1,20 +1,20 @@
-﻿namespace Yotei.Tools.WithGenerator;
+﻿namespace Yotei.Tools.CloneGenerator;
 
 // ========================================================
 /// <summary>
-/// <inheritdoc cref="InheritsWithAttribute"/>
+/// Decorates types for which a <see cref="ICloneable.Clone"/> method will be generated.
 /// <br/> The type of the generic argument is the return type of the generated methods.
+/// <br/> Regular types (not interface or abstract ones) must implement a copy constructor.
 /// <br/> Record types are not supported.
 /// </summary>
-/// <typeparam name="T"></typeparam>
 [AttributeUsage(
     AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface,
     Inherited = false,
     AllowMultiple = false)]
-public class InheritsWithAttribute<T> : Attribute
+public class CloneableAttribute<T> : Attribute
 {
     /// <summary>
-    /// Whether the generated methods are, by default, virtual ones or not. If not used, then the
+    /// Whether the generated method is, by default, a virtual one, or not. If not used, then the
     /// default value of this property is <see langword="true"/>.
     /// </summary>
     public bool UseVirtual { get; set; } = true;

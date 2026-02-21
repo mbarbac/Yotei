@@ -6,6 +6,7 @@
 /// will be redeclared (interfaces) or reimplemented (classes and structs).
 /// <br/> This attribute has no effect for decorated members declared at the this type's level.
 /// <br/> Regular types (not interface or abstract ones) must implement a copy constructor.
+/// <br/> Record types are not supported.
 /// </summary>
 [AttributeUsage(
     AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface,

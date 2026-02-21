@@ -3,8 +3,8 @@
 // ========================================================
 /// <summary>
 /// <inheritdoc cref="WithAttribute"/>
-/// <br/> The type of the generic argument of the attribute is the return type of the generated
-/// method.
+/// <br/> The type of the generic argument is the return type of the generated method.
+/// <br/> Record types are not supported.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 [AttributeUsage(

@@ -1,28 +1,17 @@
-﻿namespace Yotei.Tools.WithGenerator;
+﻿namespace Yotei.Tools.CloneGenerator;
 
 // ========================================================
 /// <summary>
 /// <inheritdoc/>
 /// </summary>
-internal class XPropertyNode : PropertyNode
+internal partial class XTypeNode : TypeNode
 {
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="symbol"></param>
-    public XPropertyNode(IPropertySymbol symbol) : base(symbol)
-    {
-        MethodName = $"With{Symbol.Name}";
-        ArgumentName = $"v_{Symbol.Name}";
-    }
-
-    /// <summary>
-    /// Determines if this instance is built for an inherited member, or not.
-    /// </summary>
-    public bool IsInherited { get; init; }
-
-    readonly string MethodName = default!;
-    readonly string ArgumentName = default!;
+    [SuppressMessage("", "IDE0290")]
+    public XTypeNode(INamedTypeSymbol symbol) : base(symbol) { }
 
     // ----------------------------------------------------
 
@@ -33,27 +22,11 @@ internal class XPropertyNode : PropertyNode
     /// <returns></returns>
     public override bool Validate(SourceProductionContext context)
     {
-        var r = base.Validate(context);
-        var host = ParentNode!.Symbol;
+        if (Symbol.IsRecord) { Symbol.ReportError(TreeError.RecordsNotSupported, context); return false; }
+        if (Attributes.Count == 0) { Symbol.ReportError(TreeError.NoAttributes, context); return false; }
+        if (Attributes.Count > 1) { Symbol.ReportError(TreeError.TooManyAttributes, context); return false; }
 
-        if (host.IsRecord) { Symbol.ReportError(TreeError.RecordsNotSupported, context); r = false; }
-        if (Symbol.IsIndexer) { Symbol.ReportError(TreeError.IndexerNotSupported, context); r = false; }
-        if (!Symbol.HasGetter) { Symbol.ReportError(TreeError.NoGetter, context); r = false; }
-        if (!Symbol.HasSetter && !host.IsInterface) { Symbol.ReportError(TreeError.NoSetter, context); r = false; }
-
-        if (!IsInherited) // Member captured per-se...
-        {
-            if (Attributes.Count == 0) { Symbol.ReportError(TreeError.NoAttributes, context); r = false; }
-            if (Attributes.Count > 1) { Symbol.ReportError(TreeError.TooManyAttributes, context); r = false; }
-        }
-        else // Captured because its host inherits members...
-        {
-            var ats = host.GetAttributes([typeof(InheritsWithAttribute), typeof(InheritsWithAttribute<>)]).ToList();
-            if (Attributes.Count == 0) { host.ReportError(TreeError.NoAttributes, context); r = false; }
-            if (ats.Count > 1) { host.ReportError(TreeError.TooManyAttributes, context); r = false; }
-        }
-
-        return r;
+        return base.Validate(context);
     }
 
     // ----------------------------------------------------
@@ -63,16 +36,14 @@ internal class XPropertyNode : PropertyNode
     /// </summary>
     /// <param name="context"></param>
     /// <param name="cb"></param>
-    public override void Emit(SourceProductionContext context, CodeBuilder cb)
+    protected override void EmitCore(SourceProductionContext context, CodeBuilder cb)
     {
-        var host = ParentNode!.Symbol;
-
-        // Intercepting explicitly implemented...
-        if (XNode.FindMethod(MethodName, Symbol.Type, out _, host)) return;
+        // Intercepting explicit implementation...
+        if (XNode.FindMethod(out _, Symbol)) return;
 
         // Dispatching...
-        if (host.IsInterface) EmitHostInterface(context, cb);
-        else if (host.IsAbstract) EmitHostAbstract(context, cb);
+        if (Symbol.IsInterface) EmitHostInterface(context, cb);
+        else if (Symbol.IsAbstract) EmitHostAbstract(context, cb);
         else EmitHostRegular(context, cb);
     }
 
@@ -81,23 +52,19 @@ internal class XPropertyNode : PropertyNode
     /// <summary>
     /// Invoked when the host is an interface.
     /// </summary>
-    [SuppressMessage("", "IDE0060")]
     void EmitHostInterface(SourceProductionContext context, CodeBuilder cb)
     {
-        var host = ParentNode!.Symbol;
-        var type = XNode.FindReturnType<IPropertySymbol>(
-            Symbol.Name,
-            out var xtype, out var xnullable, out _, host, host.AllInterfaces) ? xtype : host;
+        var type = XNode.FindReturnType(
+            out var xtype, out var xnullable, out _, Symbol, Symbol.AllInterfaces)
+            ? xtype : Symbol;
 
-        var roptions = XNode.ReturnOptions(host, type);
+        var roptions = XNode.ReturnOptions(Symbol, type);
         var rtype = type.EasyName(roptions);
         var rnull = xnullable ? "?" : string.Empty;
         var modifiers = GetInterfaceModifiers();
-        var argtype = Symbol.Type.EasyName(EasyTypeSymbol.Full);
 
         XNode.EmitDocumentation(Symbol, cb);
-        cb.AppendLine($"{modifiers}{rtype}{rnull}");
-        cb.AppendLine($"{MethodName}({argtype} {ArgumentName});");
+        cb.AppendLine($"{modifiers}{rtype}{rnull} Clone();");
     }
 
     /// <summary>
@@ -106,26 +73,28 @@ internal class XPropertyNode : PropertyNode
     /// </summary>
     string? GetInterfaceModifiers()
     {
+        throw null;
+    }
+
+    /*
+     string? GetInterfaceModifiers()
+    {
         var host = ParentNode!.Symbol;
+
         var found = Finder.Find((type, out value) =>
         {
-            // Method existing...
-            if (XNode.FindMethod(MethodName, Symbol.Type, out _, type))
-            {
-                value = "new ";
-                return true;
-            }
-
-            // Member existing...
+            // Member in the base type...
             if (XNode.FindDecoratedMember<IPropertySymbol>(Symbol.Name, out _, out var at, type))
             {
                 value = "new ";
                 return true;
             }
 
-            // Method requested...
-            if (type.HasInheritsWithAttribute(out at))
+            // Method in the base type...
+            if (XNode.FindMethod(MethodName, Symbol.Type, out _, type))
             {
+                value = "new ";
+                return true;
             }
 
             // Try next...
@@ -133,8 +102,10 @@ internal class XPropertyNode : PropertyNode
             return false;
         },
         out string? value, null, host.AllInterfaces);
+
         return found ? value : null;
     }
+     */
 
     // ----------------------------------------------------
 
@@ -143,21 +114,17 @@ internal class XPropertyNode : PropertyNode
     /// </summary>
     void EmitHostAbstract(SourceProductionContext context, CodeBuilder cb)
     {
-        var host = ParentNode!.Symbol;
-        var type = XNode.FindReturnType<IPropertySymbol>(
-            Symbol.Name,
-            out var xtype, out var xnullable, out _,
-            host, host.AllBaseTypes, host.AllInterfaces) ? xtype : host;
+        var type = XNode.FindReturnType(
+            out var xtype, out var xnullable, out _, Symbol, Symbol.AllInterfaces)
+            ? xtype : Symbol;
 
-        var roptions = XNode.ReturnOptions(host, type);
+        var roptions = XNode.ReturnOptions(Symbol, type);
         var rtype = type.EasyName(roptions);
         var rnull = xnullable ? "?" : string.Empty;
-        var modifiers = GetAbstractModifiers();
-        var argtype = Symbol.Type.EasyName(EasyTypeSymbol.Full);
+        var modifiers = GetInterfaceModifiers();
 
         XNode.EmitDocumentation(Symbol, cb);
-        cb.AppendLine($"{modifiers}{rtype}{rnull}");
-        cb.AppendLine($"{MethodName}({argtype} {ArgumentName});");
+        cb.AppendLine($"{modifiers}{rtype}{rnull} Clone();");
 
         EmitExplicitInterfaces(context, cb);
     }
@@ -166,7 +133,13 @@ internal class XPropertyNode : PropertyNode
     /// Invoked to obtain the appropriate method modifiers.
     /// <br/> If not null, ends with a space separator.
     /// </summary>
-    [SuppressMessage("", "IDE0075")]
+    string? GetAbstractModifiers()
+    {
+        throw null;
+    }
+
+    /*
+     [SuppressMessage("", "IDE0075")]
     string? GetAbstractModifiers()
     {
         var host = ParentNode!.Symbol;
@@ -216,44 +189,34 @@ internal class XPropertyNode : PropertyNode
         // Returning default one if needed...
         return found ? value : "public abstract ";
     }
+     */
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Invoked when the host is a regular type
+    /// Invoked when the host is a regular type.
     /// </summary>
     void EmitHostRegular(SourceProductionContext context, CodeBuilder cb)
     {
-        var host = ParentNode!.Symbol;
-        var ctor = host.FindCopyConstructor(strict: false);
-        if (ctor == null) { host.ReportError(TreeError.NoCopyConstructor, context); return; }
+        var ctor = Symbol.FindCopyConstructor(strict: false);
+        if (ctor == null) { Symbol.ReportError(TreeError.NoCopyConstructor, context); return; }
 
-        var type = XNode.FindReturnType<IPropertySymbol>(
-            Symbol.Name,
-            out var xtype, out var xnullable, out _,
-            host, host.AllBaseTypes, host.AllInterfaces) ? xtype : host;
+        var type = XNode.FindReturnType(
+            out var xtype, out var xnullable, out _, Symbol, Symbol.AllInterfaces)
+            ? xtype : Symbol;
 
-        var roptions = XNode.ReturnOptions(host, type);
+        var roptions = XNode.ReturnOptions(Symbol, type);
         var rtype = type.EasyName(roptions);
         var rnull = xnullable ? "?" : string.Empty;
-        var modifiers = GetRegularModifiers();
-        var argtype = Symbol.Type.EasyName(EasyTypeSymbol.Full);
+        var modifiers = GetInterfaceModifiers();
+        var hostname = Symbol.EasyName();
 
         XNode.EmitDocumentation(Symbol, cb);
-        cb.AppendLine($"{modifiers}{rtype}{rnull}");
-        cb.AppendLine($"{MethodName}({argtype} {ArgumentName})");
+        cb.AppendLine($"{modifiers}{rtype}{rnull} Clone()");
         cb.AppendLine("{");
         cb.IndentLevel++;
         {
-            var hostname = host.EasyName();
-            cb.AppendLine($"var v_host = new {hostname}(this)");
-            cb.AppendLine("{");
-            cb.IndentLevel++;
-            {
-                cb.AppendLine($"{Symbol.Name} = {ArgumentName}");
-            }
-            cb.IndentLevel--;
-            cb.AppendLine("};");
+            cb.AppendLine($"var v_host = new {hostname}(this);");
             cb.AppendLine("return v_host;");
         }
         cb.IndentLevel--;
@@ -266,7 +229,13 @@ internal class XPropertyNode : PropertyNode
     /// Invoked to obtain the appropriate method modifiers.
     /// <br/> If not null, ends with a space separator.
     /// </summary>
-    [SuppressMessage("", "IDE0075")]
+    string? GetRegularModifiers()
+    {
+        throw null;
+    }
+
+    /*
+     [SuppressMessage("", "IDE0075")]
     string? GetRegularModifiers()
     {
         var host = ParentNode!.Symbol;
@@ -331,18 +300,26 @@ internal class XPropertyNode : PropertyNode
             ? value
             : (hsealed || !hvirt) ? "public " : "public virtual ";
     }
+     */
 
     // ----------------------------------------------------
 
-    record ExplicitInfo(
+    /*
+     record ExplicitInfo(
         INamedTypeSymbol RType, bool RNullable,
         INamedTypeSymbol IFace,
         INamedTypeSymbol MType);
+     */
 
     /// <summary>
     /// Invoked to emit the interfaces that need explicit implementation, if any.
     /// </summary>
-    [SuppressMessage("", "IDE0060")]
+    void EmitExplicitInterfaces(SourceProductionContext context, CodeBuilder cb)
+    {
+    }
+
+    /*
+     [SuppressMessage("", "IDE0060")]
     void EmitExplicitInterfaces(SourceProductionContext context, CodeBuilder cb)
     {
         var items = GetExplicitInterfaces();
@@ -359,8 +336,10 @@ internal class XPropertyNode : PropertyNode
             cb.AppendLine($"=> {MethodName}(value);");
         }
     }
+     */
 
-    /// <summary>
+    /*
+     /// <summary>
     /// Obtains the list of interfaces that need explicit implementation.
     /// </summary>
     /// <returns></returns>
@@ -420,4 +399,5 @@ internal class XPropertyNode : PropertyNode
             }
         }
     }
+     */
 }

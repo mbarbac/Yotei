@@ -1,19 +1,16 @@
-﻿namespace Yotei.Tools.WithGenerator;
+﻿namespace Yotei.Tools.CloneGenerator;
 
 // ========================================================
 /// <summary>
-/// Decorates members of non-record types for which the '<see langword="with"/>' keyword is to be
-/// emulated by, in their host type, either declaring (interfaces) or emitting (classes and structs)
-/// appropriate '<see langword="With[Name](value)"/>' methods. Only properties and fields are
-/// acceptable as members.
+/// Decorates types for which a <see cref="ICloneable.Clone"/> method will be generated.
 /// <br/> Regular types (not interface or abstract ones) must implement a copy constructor.
 /// <br/> Record types are not supported.
 /// </summary>
 [AttributeUsage(
-    AttributeTargets.Property | AttributeTargets.Field,
+    AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface,
     Inherited = false,
     AllowMultiple = false)]
-public class WithAttribute : Attribute
+public class CloneableAttribute : Attribute
 {
     /// <summary>
     /// If not <see langword="null"/>, then the return type of the generated method. Otherwise,

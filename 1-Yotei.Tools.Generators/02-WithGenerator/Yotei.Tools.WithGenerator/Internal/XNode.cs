@@ -101,6 +101,8 @@ internal static class XNode
         INamedTypeSymbol Value, bool Nullable, INamedTypeSymbol? Host)
         where T : ISymbol;
 
+    // ----------------------------------------------------
+
     /// <summary>
     /// Returns the appropriate options to emit the return type, based upon whether it is the
     /// same as the given host one, or not.
