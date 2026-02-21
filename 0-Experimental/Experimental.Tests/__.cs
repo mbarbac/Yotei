@@ -1,64 +1,20 @@
 ﻿namespace Experimental.Tests;
-/*
+
 // ========================================================
 //[Enforced]
+[SuppressMessage("", "CA1822")]
+[SuppressMessage("", "IDE0060")]
 public static class Test_
 {
-    public record Options
-    {
-        public bool UseName
-        {
-            get;
-            init
-            {
-                HeadOptions = HeadOptions is null ? null : HeadOptions with { };
-                field = value;
-            }
-        }
-
-        public Options? HeadOptions { get; init; }
-
-        enum Mode { Empty, Default, Full };
-        Options(Mode mode)
-        {
-            switch (mode)
-            {
-                case Mode.Full:
-                    HeadOptions = this;
-                    break;
-            }
-        }
-
-        public Options() : this(Mode.Empty) { }
-        public static Options Full { get; } = new(Mode.Full);
-    }
-
-    // ----------------------------------------------------
+    public abstract class AType1 { public abstract void MyMethod(int age); }
+    public abstract class AType2 : AType1 { public override void MyMethod(int age) { } }
 
     //[Enforced]
     [Fact]
-    public static void Test_Empty()
+    public static void Test_AType()
     {
-        var source = new Options();
-        Assert.False(source.UseName);
-        Assert.Null(source.HeadOptions);
-
-        var target = source with { UseName = true };
-        Assert.True(target.UseName);
-        Assert.Same(source.HeadOptions, target.HeadOptions);
+        var type = typeof(AType2);
+        var method = type.GetMethod("MyMethod")!;
+        Assert.True(method.IsNewAlike);
     }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_Full()
-    {
-        var source = Options.Full;
-        Assert.False(source.UseName);
-        Assert.Same(source, source.HeadOptions);
-
-        var target = source with { UseName = true };
-        Assert.True(target.UseName);
-        Assert.NotNull(target.HeadOptions);
-        Assert.NotSame(source.HeadOptions, target.HeadOptions);
-    }
-}*/
+}

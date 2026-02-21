@@ -26,7 +26,7 @@ public static partial class Test_RegularHost
         pars = method.GetParameters();
         Assert.False(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
+        Assert.False(method.IsNewAlike);
         Assert.Equal(typeof(RType1A), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
@@ -35,7 +35,7 @@ public static partial class Test_RegularHost
         pars = method.GetParameters();
         Assert.False(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
+        Assert.False(method.IsNewAlike);
         Assert.Equal(typeof(RType1A), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(int), pars[0].ParameterType);
@@ -65,7 +65,7 @@ public static partial class Test_RegularHost
         pars = method.GetParameters();
         Assert.False(method.IsAbstract);
         Assert.False(method.IsVirtual);
-        Assert.False(method.Attributes.HasFlag(MethodAttributes.NewSlot));
+        Assert.False(method.IsNewAlike);
         Assert.Equal(typeof(RType1B), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
@@ -74,15 +74,95 @@ public static partial class Test_RegularHost
         pars = method.GetParameters();
         Assert.False(method.IsAbstract);
         Assert.False(method.IsVirtual);
-        Assert.False(method.Attributes.HasFlag(MethodAttributes.NewSlot));
+        Assert.False(method.IsNewAlike);
         Assert.Equal(typeof(RType1B), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(int), pars[0].ParameterType);
     }
 
-    /*
+    // ----------------------------------------------------
+
+    // Inhertis from interface...
+    partial interface IFace2A { [With] string? Name { get; }  }
+
+    [InheritsWith]
+    partial class RType2A : IFace2A
+    {
+        public RType2A() { }
+        protected RType2A(RType2A _) { }
+
+        public string? Name { get; set; } = default;
+        [With] public int Age = default;
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_RType2A()
+    {
+        MethodInfo? method;
+        ParameterInfo[] pars;
+        var type = typeof(RType2A);
+
+        method = type.GetMethod("WithName")!;
+        pars = method.GetParameters();
+        Assert.False(method.IsAbstract);
+        Assert.True(method.IsVirtual);
+        Assert.False(method.IsNewAlike);
+        Assert.Equal(typeof(RType2A), method.ReturnType);
+        Assert.Single(pars);
+        Assert.Equal(typeof(string), pars[0].ParameterType);
+
+        method = type.GetMethod("WithAge")!;
+        pars = method.GetParameters();
+        Assert.False(method.IsAbstract);
+        Assert.True(method.IsVirtual);
+        Assert.False(method.IsNewAlike);
+        Assert.Equal(typeof(RType2A), method.ReturnType);
+        Assert.Single(pars);
+        Assert.Equal(typeof(int), pars[0].ParameterType);
+    }
 
     // ----------------------------------------------------
+
+    // Inhertis from interface, with UseVirtual...
+    partial interface IFace2B { [With(UseVirtual = false)] string? Name { get; } }
+
+    [InheritsWith]
+    partial class RType2B : IFace2B
+    {
+        public RType2B() { }
+        protected RType2B(RType2B _) { }
+
+        public string? Name { get; set; } = default;
+        [With(UseVirtual = false)] public int Age = default;
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_RType2B()
+    {
+        MethodInfo? method;
+        ParameterInfo[] pars;
+        var type = typeof(RType2B);
+
+        method = type.GetMethod("WithName")!;
+        pars = method.GetParameters();
+        Assert.False(method.IsAbstract);
+        Assert.False(method.IsVirtual);
+        Assert.Equal(typeof(RType2B), method.ReturnType);
+        Assert.Single(pars);
+        Assert.Equal(typeof(string), pars[0].ParameterType);
+
+        method = type.GetMethod("WithAge")!;
+        pars = method.GetParameters();
+        Assert.False(method.IsAbstract);
+        Assert.False(method.IsVirtual);
+        Assert.Equal(typeof(RType2B), method.ReturnType);
+        Assert.Single(pars);
+        Assert.Equal(typeof(int), pars[0].ParameterType);
+    }
+
+    /*
 
     // Inherits from interface...
     partial interface IFace4A { [With] string? Name { get; } }
@@ -102,7 +182,6 @@ public static partial class Test_RegularHost
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
         Assert.Equal(typeof(AType4A), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
@@ -126,7 +205,6 @@ public static partial class Test_RegularHost
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
         Assert.Equal(typeof(AType4B), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
@@ -150,7 +228,6 @@ public static partial class Test_RegularHost
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
         Assert.Equal(typeof(DateTime?), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
@@ -183,7 +260,6 @@ public static partial class Test_RegularHost
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
         Assert.Equal(typeof(AType5B), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
@@ -192,7 +268,6 @@ public static partial class Test_RegularHost
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
         Assert.Equal(typeof(AType5B), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(int), pars[0].ParameterType);
@@ -224,7 +299,6 @@ public static partial class Test_RegularHost
         pars = method.GetParameters();
         Assert.False(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.False(method.Attributes.HasFlag(MethodAttributes.NewSlot));
         Assert.Equal(typeof(DateTime?), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
@@ -233,7 +307,6 @@ public static partial class Test_RegularHost
         pars = method.GetParameters();
         Assert.False(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.False(method.Attributes.HasFlag(MethodAttributes.NewSlot));
         Assert.Equal(typeof(DateTime?), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(int), pars[0].ParameterType);
@@ -262,7 +335,6 @@ public static partial class Test_RegularHost
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
         Assert.Equal(typeof(string), method.ReturnType); // Use visual inspection to validate '?'
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
@@ -271,7 +343,6 @@ public static partial class Test_RegularHost
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
         Assert.Equal(typeof(string), method.ReturnType); // Use visual inspection to validate '?'
         Assert.Single(pars);
         Assert.Equal(typeof(int), pars[0].ParameterType);
@@ -304,7 +375,6 @@ public static partial class Test_RegularHost
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
         Assert.Equal(typeof(DateTime?), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
@@ -313,7 +383,6 @@ public static partial class Test_RegularHost
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
         Assert.Equal(typeof(DateTime?), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(int), pars[0].ParameterType);

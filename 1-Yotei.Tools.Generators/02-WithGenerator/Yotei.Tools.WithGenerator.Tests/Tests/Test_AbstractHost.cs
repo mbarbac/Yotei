@@ -23,7 +23,7 @@ public static partial class Test_AbstractHost
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
+        Assert.False(method.IsNewAlike);
         Assert.Equal(typeof(AType1), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
@@ -32,7 +32,7 @@ public static partial class Test_AbstractHost
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
+        Assert.False(method.IsNewAlike);
         Assert.Equal(typeof(AType1), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(int), pars[0].ParameterType);
@@ -59,7 +59,7 @@ public static partial class Test_AbstractHost
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
+        Assert.False(method.IsNewAlike);
         Assert.Equal(typeof(AType2), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
@@ -68,7 +68,7 @@ public static partial class Test_AbstractHost
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
+        Assert.False(method.IsNewAlike);
         Assert.Equal(typeof(AType2), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(int), pars[0].ParameterType);
@@ -77,6 +77,8 @@ public static partial class Test_AbstractHost
     // ----------------------------------------------------
 
     // Enforcing return type, by argument..
+    // For TESTS PURPOSES ONLY! Production code must return a host-compatible type.
+
     abstract partial class AType3A
     {
         [With(ReturnType = typeof(DateTime?))] public string? Name { get; set; } = default;
@@ -95,7 +97,7 @@ public static partial class Test_AbstractHost
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
+        Assert.False(method.IsNewAlike);
         Assert.Equal(typeof(DateTime?), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
@@ -104,7 +106,7 @@ public static partial class Test_AbstractHost
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
+        Assert.False(method.IsNewAlike);
         Assert.Equal(typeof(DateTime?), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(int), pars[0].ParameterType);
@@ -113,6 +115,8 @@ public static partial class Test_AbstractHost
     // ----------------------------------------------------
 
     // Enforcing return type, by generic argument..
+    // For TESTS PURPOSES ONLY! Production code must return a host-compatible type.
+
     abstract partial class AType3B
     {
         [With<DateTime?>] public string? Name { get; set; } = default;
@@ -131,7 +135,7 @@ public static partial class Test_AbstractHost
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
+        Assert.False(method.IsNewAlike);
         Assert.Equal(typeof(DateTime?), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
@@ -140,7 +144,7 @@ public static partial class Test_AbstractHost
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
+        Assert.False(method.IsNewAlike);
         Assert.Equal(typeof(DateTime?), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(int), pars[0].ParameterType);
@@ -148,7 +152,9 @@ public static partial class Test_AbstractHost
 
     // ----------------------------------------------------
 
-    // Enforcing return type on nullable reference type..
+    // Enforcing return type on nullable reference type...
+    // For TESTS PURPOSES ONLY! Production code must return a host-compatible type.
+
     abstract partial class AType3C
     {
         [With<IsNullable<string>>] public string? Name { get; set; } = default;
@@ -167,7 +173,7 @@ public static partial class Test_AbstractHost
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
+        Assert.False(method.IsNewAlike);
         Assert.Equal(typeof(string), method.ReturnType); // Use visual inspection to validate '?'
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
@@ -176,7 +182,7 @@ public static partial class Test_AbstractHost
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
+        Assert.False(method.IsNewAlike);
         Assert.Equal(typeof(string), method.ReturnType); // Use visual inspection to validate '?'
         Assert.Single(pars);
         Assert.Equal(typeof(int), pars[0].ParameterType);
@@ -202,7 +208,7 @@ public static partial class Test_AbstractHost
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
+        Assert.False(method.IsNewAlike);
         Assert.Equal(typeof(AType4A), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
@@ -226,13 +232,15 @@ public static partial class Test_AbstractHost
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
+        Assert.False(method.IsNewAlike);
         Assert.Equal(typeof(AType4B), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
     }
 
     // Enforcing return type on base...
+    // For TESTS PURPOSES ONLY! Production code must return a host-compatible type.
+
     partial interface IFace4C { [With<DateTime?>] string? Name { get; } }
 
     [InheritsWith]
@@ -250,7 +258,7 @@ public static partial class Test_AbstractHost
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
+        Assert.False(method.IsNewAlike);
         Assert.Equal(typeof(DateTime?), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
@@ -283,7 +291,7 @@ public static partial class Test_AbstractHost
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
+        Assert.True(method.IsNewAlike);
         Assert.Equal(typeof(AType5B), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
@@ -292,7 +300,7 @@ public static partial class Test_AbstractHost
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
+        Assert.True(method.IsNewAlike);
         Assert.Equal(typeof(AType5B), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(int), pars[0].ParameterType);
@@ -301,6 +309,8 @@ public static partial class Test_AbstractHost
     // ----------------------------------------------------
 
     // Enforced return type on base...
+    // For TESTS PURPOSES ONLY! Production code must return a host-compatible type.
+
     partial interface IFace6A { [With<DateTime?>] string? Name { get; } }
 
     [InheritsWith]
@@ -325,7 +335,7 @@ public static partial class Test_AbstractHost
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.False(method.Attributes.HasFlag(MethodAttributes.NewSlot));
+        Assert.False(method.IsNewAlike);
         Assert.Equal(typeof(DateTime?), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
@@ -334,7 +344,7 @@ public static partial class Test_AbstractHost
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.False(method.Attributes.HasFlag(MethodAttributes.NewSlot));
+        Assert.False(method.IsNewAlike);
         Assert.Equal(typeof(DateTime?), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(int), pars[0].ParameterType);
@@ -369,7 +379,7 @@ public static partial class Test_AbstractHost
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
+        Assert.True(method.IsNewAlike); // because it hides the concrete base one...
         Assert.Equal(typeof(AType7A), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);

@@ -17,7 +17,7 @@ public static partial class Test_InterfaceHost
 
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
+        Assert.False(method.IsNewAlike);
         Assert.Equal(typeof(IFace1), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
@@ -38,7 +38,7 @@ public static partial class Test_InterfaceHost
 
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
+        Assert.False(method.IsNewAlike);
         Assert.Equal(typeof(IFace2), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
@@ -47,6 +47,8 @@ public static partial class Test_InterfaceHost
     // ----------------------------------------------------
 
     // Enforcing return type...
+    // For TESTS PURPOSES ONLY! Production code must return a host-compatible type.
+
     partial interface IFace3A { [With(ReturnType = typeof(DateTime))] string? Name { get; } }
     partial interface IFace3B { [With<DateTime?>] string? Name { get; } }
     partial interface IFace3C { [With<IsNullable<string>>] string? Name { get; } }
@@ -89,7 +91,7 @@ public static partial class Test_InterfaceHost
 
     //[Enforced]
     [Fact]
-    public static void Test_IFace4()
+    public static void Test_IFace4B()
     {
         var type = typeof(IFace4B);
         var method = type.GetMethod("WithName")!;
@@ -97,7 +99,7 @@ public static partial class Test_InterfaceHost
 
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.Attributes.HasFlag(MethodAttributes.NewSlot));
+        Assert.True(method.IsNewAlike);
         Assert.Equal(typeof(IFace4B), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
