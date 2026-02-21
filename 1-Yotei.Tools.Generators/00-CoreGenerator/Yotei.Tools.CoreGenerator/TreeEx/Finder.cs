@@ -10,7 +10,7 @@ internal static class Finder
     /// <summary>
     /// The signature of the delegate invoked to obtain a value from a give type. If found, it
     /// shall return <see langword="true"/> and the found value in the out argument. If not, it
-    /// returns <see langword="false"/> and set the out value to an arbitrary one.
+    /// returns <see langword="false"/> and sets the out value to an arbitrary one.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="type"></param>
@@ -19,8 +19,8 @@ internal static class Finder
     public delegate bool FindDelegate<T>(INamedTypeSymbol type, out T value);
 
     /// <summary>
-    /// Tries to obtain a <typeparamref name="T"/> value using the given predicate applied to the
-    /// given type (if not null), and to the types in the given set of type arrays, in that order.
+    /// Tries to obtain a <typeparamref name="T"/> value using the given predicate applied to
+    /// the given type (if not null), and to the types in the given type chains, in that order.
     /// If found, returns the found value in the out argument.
     /// </summary>
     /// <typeparam name="T"></typeparam>
@@ -30,8 +30,8 @@ internal static class Finder
     /// <param name="chains"></param>
     /// <returns></returns>
     public static bool Find<T>(
-        FindDelegate<T> predicate,
         out T value,
+        FindDelegate<T> predicate,
         INamedTypeSymbol? type,
         params IEnumerable<INamedTypeSymbol>[] chains)
     {

@@ -18,6 +18,16 @@ internal static class XNode
         INamedTypeSymbol? type,
         params IEnumerable<INamedTypeSymbol>[] chains) where T : ISymbol
     {
+        var found = Finder.Find(
+            out (bool Value, T? Member, INamedTypeSymbol? Host) info,
+            (type, out info) =>
+            {
+                info = new(default, default, default);
+                return false;
+            },
+            type, chains);
+
+        /*
         var found = Finder.Find((type, out info) =>
         {
             // Members take priority...
@@ -45,7 +55,7 @@ internal static class XNode
         value = found && info.Value;
         member = found ? info.Member : default;
         host = found ? info.Host : default;
-        return found;
+        return found;*/
     }
     
     record FindUseVirtualInfo<T>(bool Value, T? Member, INamedTypeSymbol? Host) where T : ISymbol;

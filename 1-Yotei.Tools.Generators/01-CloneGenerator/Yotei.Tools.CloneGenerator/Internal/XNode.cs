@@ -12,7 +12,7 @@ internal static class XNode
         INamedTypeSymbol? type,
         params IEnumerable<INamedTypeSymbol>[] chains)
     {
-        return Finder.Find((type, out value) =>
+        return Finder.Find(out value, (type, out value) =>
         {
             value = type.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(x =>
                 x.Name == "Clone" &&
@@ -21,7 +21,7 @@ internal static class XNode
 
             return value != null;
         },
-        out value, type, chains);
+        type, chains);
     }
 
     // ----------------------------------------------------
