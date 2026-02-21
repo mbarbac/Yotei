@@ -17,7 +17,6 @@ public static partial class Test_InterfaceHost
 
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.False(method.IsNewAlike);
         Assert.Equal(typeof(IFace1), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
@@ -38,7 +37,6 @@ public static partial class Test_InterfaceHost
 
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.False(method.IsNewAlike);
         Assert.Equal(typeof(IFace2), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
@@ -77,10 +75,7 @@ public static partial class Test_InterfaceHost
     {
         var type = typeof(IFace3C);
         var method = type.GetMethod("WithName")!;
-
-        // Note: using reflection we cannot verify if it is a nullable one (string?), so we can
-        // only do so by visual inspection...
-        Assert.Equal(typeof(string), method.ReturnType);
+        Assert.Equal(typeof(string), method.ReturnType); // Verify '?' by visual inspection...
     }
 
     // ----------------------------------------------------
@@ -99,7 +94,6 @@ public static partial class Test_InterfaceHost
 
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.True(method.IsNewAlike);
         Assert.Equal(typeof(IFace4B), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);

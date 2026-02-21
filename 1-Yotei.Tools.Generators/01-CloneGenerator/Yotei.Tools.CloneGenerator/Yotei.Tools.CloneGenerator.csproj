@@ -33,8 +33,6 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<!--If the following line is uncommented, public types may not be reachable-->
-		<!--<IncludeBuildOutput>false</IncludeBuildOutput>-->
 		<!--<DefineConstants>$(DefineConstants);DEBUG_CLONE_GENERATOR </DefineConstants>-->
 	</PropertyGroup>
 

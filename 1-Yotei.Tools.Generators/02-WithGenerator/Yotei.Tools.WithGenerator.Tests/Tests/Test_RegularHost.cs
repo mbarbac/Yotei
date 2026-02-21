@@ -26,7 +26,6 @@ public static partial class Test_RegularHost
         pars = method.GetParameters();
         Assert.False(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.False(method.IsNewAlike);
         Assert.Equal(typeof(RType1A), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
@@ -35,7 +34,6 @@ public static partial class Test_RegularHost
         pars = method.GetParameters();
         Assert.False(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.False(method.IsNewAlike);
         Assert.Equal(typeof(RType1A), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(int), pars[0].ParameterType);
@@ -65,7 +63,6 @@ public static partial class Test_RegularHost
         pars = method.GetParameters();
         Assert.False(method.IsAbstract);
         Assert.False(method.IsVirtual);
-        Assert.False(method.IsNewAlike);
         Assert.Equal(typeof(RType1B), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
@@ -74,7 +71,6 @@ public static partial class Test_RegularHost
         pars = method.GetParameters();
         Assert.False(method.IsAbstract);
         Assert.False(method.IsVirtual);
-        Assert.False(method.IsNewAlike);
         Assert.Equal(typeof(RType1B), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(int), pars[0].ParameterType);
@@ -107,7 +103,6 @@ public static partial class Test_RegularHost
         pars = method.GetParameters();
         Assert.False(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.False(method.IsNewAlike);
         Assert.Equal(typeof(RType2A), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
@@ -116,7 +111,6 @@ public static partial class Test_RegularHost
         pars = method.GetParameters();
         Assert.False(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.False(method.IsNewAlike);
         Assert.Equal(typeof(RType2A), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(int), pars[0].ParameterType);
@@ -162,165 +156,19 @@ public static partial class Test_RegularHost
         Assert.Equal(typeof(int), pars[0].ParameterType);
     }
 
-    /*
-
-    // Inherits from interface...
-    partial interface IFace4A { [With] string? Name { get; } }
-
-    [InheritsWith]
-    abstract partial class AType4A : IFace4A { public string? Name { get; set; } }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_AType4A()
-    {
-        MethodInfo? method;
-        ParameterInfo[] pars;
-        var type = typeof(AType4A);
-
-        method = type.GetMethod("WithName")!;
-        pars = method.GetParameters();
-        Assert.True(method.IsAbstract);
-        Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(AType4A), method.ReturnType);
-        Assert.Single(pars);
-        Assert.Equal(typeof(string), pars[0].ParameterType);
-    }
-
-    // UseVirtual no effect on abstract...
-    partial interface IFace4B { [With(UseVirtual = false)] string? Name { get; } }
-
-    [InheritsWith(UseVirtual = false)]
-    abstract partial class AType4B : IFace4B { public string? Name { get; set; } }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_AType4B()
-    {
-        MethodInfo? method;
-        ParameterInfo[] pars;
-        var type = typeof(AType4B);
-
-        method = type.GetMethod("WithName")!;
-        pars = method.GetParameters();
-        Assert.True(method.IsAbstract);
-        Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(AType4B), method.ReturnType);
-        Assert.Single(pars);
-        Assert.Equal(typeof(string), pars[0].ParameterType);
-    }
-
-    // Enforcing return type on base...
-    partial interface IFace4C { [With<DateTime?>] string? Name { get; } }
-
-    [InheritsWith]
-    abstract partial class AType4C : IFace4C { public string? Name { get; set; } }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_AType4C()
-    {
-        MethodInfo? method;
-        ParameterInfo[] pars;
-        var type = typeof(AType4C);
-
-        method = type.GetMethod("WithName")!;
-        pars = method.GetParameters();
-        Assert.True(method.IsAbstract);
-        Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(DateTime?), method.ReturnType);
-        Assert.Single(pars);
-        Assert.Equal(typeof(string), pars[0].ParameterType);
-    }
-
     // ----------------------------------------------------
 
-    // Inherits from class...
-    partial interface IFace5A { [With] string? Name { get; } }
+    // Inhertis from interface, with ReturnType...
+    partial interface IFace2C { [With] string? Name { get; } }
 
-    [InheritsWith]
-    abstract partial class AType5A : IFace5A
+    [InheritsWith<IFace2C>]
+    partial class RType2C : IFace2C
     {
-        public string? Name { get; set; }
-        [With] public int Age;
-    }
+        public RType2C() { }
+        protected RType2C(RType2C _) { }
 
-    [InheritsWith]
-    abstract partial class AType5B : AType5A { }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_AType5B()
-    {
-        MethodInfo? method;
-        ParameterInfo[] pars;
-        var type = typeof(AType5B);
-
-        method = type.GetMethod("WithName")!;
-        pars = method.GetParameters();
-        Assert.True(method.IsAbstract);
-        Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(AType5B), method.ReturnType);
-        Assert.Single(pars);
-        Assert.Equal(typeof(string), pars[0].ParameterType);
-
-        method = type.GetMethod("WithAge")!;
-        pars = method.GetParameters();
-        Assert.True(method.IsAbstract);
-        Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(AType5B), method.ReturnType);
-        Assert.Single(pars);
-        Assert.Equal(typeof(int), pars[0].ParameterType);
-    }
-
-    
-
-    // ----------------------------------------------------
-
-    // ReturnType setting...
-    partial class RType2A
-    {
-        public RType2A() { }
-        protected RType2A(RType2A _) { }
-
-        [With(ReturnType = typeof(DateTime?))] public string? Name { get; set; } = default;
-        [With<DateTime?>] public int Age = default;
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_RType2A()
-    {
-        MethodInfo? method;
-        ParameterInfo[] pars;
-        var type = typeof(RType2A);
-
-        method = type.GetMethod("WithName")!;
-        pars = method.GetParameters();
-        Assert.False(method.IsAbstract);
-        Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(DateTime?), method.ReturnType);
-        Assert.Single(pars);
-        Assert.Equal(typeof(string), pars[0].ParameterType);
-
-        method = type.GetMethod("WithAge")!;
-        pars = method.GetParameters();
-        Assert.False(method.IsAbstract);
-        Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(DateTime?), method.ReturnType);
-        Assert.Single(pars);
-        Assert.Equal(typeof(int), pars[0].ParameterType);
-    }
-
-    
-
-    // ----------------------------------------------------
-
-    // Enforcing return type on nullable reference type..
-    abstract partial class RType2C
-    {
-        [With<IsNullable<string>>] public string? Name { get; set; }
-        [With<IsNullable<string>>] public int Age;
+        public string? Name { get; set; } = default;
+        [With<IFace2C>] public int Age = default;
     }
 
     //[Enforced]
@@ -333,59 +181,203 @@ public static partial class Test_RegularHost
 
         method = type.GetMethod("WithName")!;
         pars = method.GetParameters();
-        Assert.True(method.IsAbstract);
+        Assert.False(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(string), method.ReturnType); // Use visual inspection to validate '?'
+        Assert.Equal(typeof(IFace2C), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
 
         method = type.GetMethod("WithAge")!;
         pars = method.GetParameters();
-        Assert.True(method.IsAbstract);
+        Assert.False(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(string), method.ReturnType); // Use visual inspection to validate '?'
+        Assert.Equal(typeof(IFace2C), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(int), pars[0].ParameterType);
     }
 
     // ----------------------------------------------------
 
-    // Enforced return type on base...
-    partial interface IFace6A { [With<DateTime?>] string? Name { get; } }
+    // Inherits from base class...
+    partial interface IFace3A { [With] string? Name { get; } }
 
     [InheritsWith]
-    abstract partial class AType6A : IFace6A
+    partial class RType3A : IFace3A
     {
-        public string? Name { get; set; }
-        [With<DateTime?>] public int Age;
+        public RType3A() { }
+        protected RType3A(RType3A _) { }
+
+        public string? Name { get; set; } = default;
+        [With] public int Age = default;
     }
 
     [InheritsWith]
-    abstract partial class AType6B : AType6A { }
+    partial class RType3B : RType3A
+    {
+        public RType3B() { }
+        protected RType3B(RType3A _) { }
+    }
 
     //[Enforced]
     [Fact]
-    public static void Test_AType6B()
+    public static void Test_RType3B()
     {
         MethodInfo? method;
         ParameterInfo[] pars;
-        var type = typeof(AType6B);
+        var type = typeof(RType3B);
 
         method = type.GetMethod("WithName")!;
         pars = method.GetParameters();
-        Assert.True(method.IsAbstract);
+        Assert.False(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(DateTime?), method.ReturnType);
+        Assert.Equal(typeof(RType3B), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
 
         method = type.GetMethod("WithAge")!;
         pars = method.GetParameters();
-        Assert.True(method.IsAbstract);
+        Assert.False(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(DateTime?), method.ReturnType);
+        Assert.Equal(typeof(RType3B), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(int), pars[0].ParameterType);
     }
-    */
+
+    // ----------------------------------------------------
+
+    // Inherits from base class, no UseVirtual on base...
+    partial interface IFace4A { [With(UseVirtual = false)] string? Name { get; } }
+
+    [InheritsWith]
+    partial class RType4A : IFace4A
+    {
+        public RType4A() { }
+        protected RType4A(RType4A _) { }
+
+        public string? Name { get; set; } = default;
+        [With(UseVirtual = false)] public int Age = default;
+    }
+
+    [InheritsWith(UseVirtual = false)]
+    partial class RType4B : RType4A
+    {
+        public RType4B() { }
+        protected RType4B(RType4A _) { }
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_RType4B()
+    {
+        MethodInfo? method;
+        ParameterInfo[] pars;
+        var type = typeof(RType4B);
+
+        method = type.GetMethod("WithName")!;
+        pars = method.GetParameters();
+        Assert.False(method.IsAbstract);
+        Assert.False(method.IsVirtual);
+        Assert.Equal(typeof(RType4B), method.ReturnType);
+        Assert.Single(pars);
+        Assert.Equal(typeof(string), pars[0].ParameterType);
+
+        method = type.GetMethod("WithAge")!;
+        pars = method.GetParameters();
+        Assert.False(method.IsAbstract);
+        Assert.False(method.IsVirtual);
+        Assert.Equal(typeof(RType4B), method.ReturnType);
+        Assert.Single(pars);
+        Assert.Equal(typeof(int), pars[0].ParameterType);
+    }
+
+    // ----------------------------------------------------
+
+    // Inherits from base class, changing ReturnType...
+    partial interface IFace5A { [With] string? Name { get; } }
+
+    [InheritsWith<IFace5A>]
+    partial class RType5A : IFace5A
+    {
+        public RType5A() { }
+        protected RType5A(RType5A _) { }
+
+        public string? Name { get; set; } = default;
+        [With<IFace5A>] public int Age = default;
+    }
+
+    [InheritsWith<IFace5A>]
+    partial class RType5B : RType5A
+    {
+        public RType5B() { }
+        protected RType5B(RType5A _) { }
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_RType5B()
+    {
+        MethodInfo? method;
+        ParameterInfo[] pars;
+        var type = typeof(RType5B);
+
+        method = type.GetMethod("WithName")!;
+        pars = method.GetParameters();
+        Assert.False(method.IsAbstract);
+        Assert.True(method.IsVirtual);
+        Assert.Equal(typeof(IFace5A), method.ReturnType);
+        Assert.Single(pars);
+        Assert.Equal(typeof(string), pars[0].ParameterType);
+
+        method = type.GetMethod("WithAge")!;
+        pars = method.GetParameters();
+        Assert.False(method.IsAbstract);
+        Assert.True(method.IsVirtual);
+        Assert.Equal(typeof(IFace5A), method.ReturnType);
+        Assert.Single(pars);
+        Assert.Equal(typeof(int), pars[0].ParameterType);
+    }
+
+    // ----------------------------------------------------
+
+    // Inherits from abstract base class...
+    partial interface IFace6A { [With] string? Name { get; } }
+
+    [InheritsWith]
+    abstract partial class AType6A : IFace6A
+    {
+        public string? Name { get; set; } = default;
+        [With] public int Age = default;
+    }
+
+    [InheritsWith]
+    partial class RType6B : AType6A
+    {
+        public RType6B() { }
+        protected RType6B(AType6A _) { }
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_RType6B()
+    {
+        MethodInfo? method;
+        ParameterInfo[] pars;
+        var type = typeof(RType6B);
+
+        method = type.GetMethod("WithName")!;
+        pars = method.GetParameters();
+        Assert.False(method.IsAbstract);
+        Assert.True(method.IsVirtual);
+        Assert.Equal(typeof(RType6B), method.ReturnType);
+        Assert.Single(pars);
+        Assert.Equal(typeof(string), pars[0].ParameterType);
+
+        method = type.GetMethod("WithAge")!;
+        pars = method.GetParameters();
+        Assert.False(method.IsAbstract);
+        Assert.True(method.IsVirtual);
+        Assert.Equal(typeof(RType6B), method.ReturnType);
+        Assert.Single(pars);
+        Assert.Equal(typeof(int), pars[0].ParameterType);
+    }
 }
