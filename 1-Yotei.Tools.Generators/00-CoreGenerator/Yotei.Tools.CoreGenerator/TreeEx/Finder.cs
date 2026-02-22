@@ -19,9 +19,9 @@ internal static class Finder
     public delegate bool FindDelegate<T>(INamedTypeSymbol type, out T value);
 
     /// <summary>
-    /// Tries to obtain a <typeparamref name="T"/> value using the given predicate applied to
-    /// the given type (if not null), and to the types in the given type chains, in that order.
-    /// If found, returns the found value in the out argument.
+    /// Tries to obtain a <typeparamref name="T"/> value using the given predicate on the given
+    /// type, if it is not null, and on the types of the given chains, in that order. If found,
+    /// returns the value in the out argument.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="predicate"></param>

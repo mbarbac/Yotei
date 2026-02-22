@@ -1,224 +1,53 @@
 ﻿namespace Yotei.Tools.WithGenerator;
 
 // ========================================================
+internal interface IXNode<T> where T : ISymbol
+{
+    public T Symbol { get; }
+}
+
+// ========================================================
 internal static class XNode
 {
     /// <summary>
-    /// Tries to find the value of the 'UseVirtual' setting at the given type, if it is not null,
-    /// or at the types in the given chains, in that order. Uses either the attribute found at a
-    /// decorated member, or the one decorating a suitable host. If found, returns its value in
-    /// the out argument along with in which member (or null if any) and host type that attribute
-    /// was found.
+    /// Determines if the given member is decorated with a <see cref="WithAttribute"/> or with a
+    /// <see cref="WithAttribute{T}"/> attribute and, if so, returns the first one found.
     /// </summary>
-    public static bool FindUseVirtual<T>(
-        string membername,
-        out bool value,
-        out T? member,
-        out INamedTypeSymbol? host,
-        INamedTypeSymbol? type,
-        params IEnumerable<INamedTypeSymbol>[] chains) where T : ISymbol
+    public static bool HasWithAttribute(
+        this ISymbol member, [NotNullWhen(true)] out AttributeData? at)
     {
-        var found = Finder.Find(
-            out (bool Value, T? Member, INamedTypeSymbol? Host) info,
-            (type, out info) =>
-            {
-                info = new(default, default, default);
-                return false;
-            },
-            type, chains);
+        ArgumentNullException.ThrowIfNull(member);
 
-        /*
-        var found = Finder.Find((type, out info) =>
-        {
-            // Members take priority...
-            if (FindDecoratedMember<T>(membername, out var member, out var attr, type) &&
-                attr.HasUseVirtual(out var value))
-            {
-                info = new(value, member, type);
-                return true;
-            }
-
-            // Otherwise at type's level...
-            if (type.HasInheritsWithAttribute(out var at) &&
-                at.HasUseVirtual(out value))
-            {
-                info = new(value, default, type);
-                return true;
-            }
-
-            // Try next...
-            info = null!;
-            return false;
-        },
-        out FindUseVirtualInfo<T> info, type, chains);
-
-        value = found && info.Value;
-        member = found ? info.Member : default;
-        host = found ? info.Host : default;
-        return found;*/
-    }
-    
-    record FindUseVirtualInfo<T>(bool Value, T? Member, INamedTypeSymbol? Host) where T : ISymbol;
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Tries to find the value of the 'ReturnType' setting at the given type, if it is not null,
-    /// or at the types in the given chains, in that order. Uses either the attribute found at a
-    /// decorated member, or the one decorating a suitable host. If found, returns its value in
-    /// the out argument along with in which member (or null if any) and host type that attribute
-    /// was found.
-    /// </summary>
-    public static bool FindReturnType<T>(
-        string membername,
-        [NotNullWhen(true)] out INamedTypeSymbol? value,
-        out bool nullable,
-        out INamedTypeSymbol? host,
-        INamedTypeSymbol? type,
-        params IEnumerable<INamedTypeSymbol>[] chains) where T : ISymbol
-    {
-        var found = Finder.Find((type, out info) =>
-        {
-            // Members take priority...
-            if (FindDecoratedMember<T>(membername, out var member, out var attr, type) &&
-                attr.HasReturnType(out var value, out var nullable))
-            {
-                info = new(value, nullable, type);
-                return true;
-            }
-
-            // Otherwise at type's level...
-            if (type.HasInheritsWithAttribute(out var at) &&
-                at.HasReturnType(out value, out nullable))
-            {
-                info = new(value, nullable, type);
-                return true;
-            }
-
-            // Try next...
-            info = null!;
-            return false;
-        },
-        out FindReturnTypeInfo<T> info, type, chains);
-
-        value = found ? info.Value : default;
-        nullable = found && info.Nullable;
-        host = found ? info.Host : default;
-        return found;
-    }
-    
-    record FindReturnTypeInfo<T>(
-        INamedTypeSymbol Value, bool Nullable, INamedTypeSymbol? Host)
-        where T : ISymbol;
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Returns the appropriate options to emit the return type, based upon whether it is the
-    /// same as the given host one, or not.
-    /// </summary>
-    public static EasyTypeSymbol ReturnOptions(INamedTypeSymbol hosttype, INamedTypeSymbol rtype)
-    {
-        return SymbolEqualityComparer.Default.Equals(hosttype, rtype)
-            ? EasyTypeSymbol.Default
-            : EasyTypeSymbol.Full with { NullableStyle = IsNullableStyle.None };
+        var ats = member.GetAttributes([typeof(WithAttribute), typeof(WithAttribute<>)]).ToArray();
+        at = ats.Length > 0 ? ats[0] : null;
+        return ats.Length > 0;
     }
 
-    // ----------------------------------------------------
-
     /// <summary>
-    /// Tries to find a property or field member with the given name in the given type, if it is
-    /// not null, or in the types in the given chains, in that order.
+    /// Determines if the given type is decorated with a <see cref="InheritsWithAttribute"/> or
+    /// with a <see cref="InheritsWithAttribute{T}"/> attribute and, if so, returns the first one
+    /// found.
     /// </summary>
-    public static bool FindMember<T>(
-        string membername,
-        [NotNullWhen(true)] out T? value,
-        INamedTypeSymbol? type,
-        params IEnumerable<INamedTypeSymbol>[] chains) where T : ISymbol
+    public static bool HasInheritsWithAttribute(
+        this INamedTypeSymbol type, [NotNullWhen(true)] out AttributeData? at)
     {
-        return Finder.Find((type, out value) =>
-        {
-            value = type.GetMembers().OfType<T>().FirstOrDefault(x => x.Name == membername);
-            return value != null;
-        },
-        out value, type, chains);
-    }
+        ArgumentNullException.ThrowIfNull(type);
 
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Tries to find a decorated property or field member with the given name in the given type,
-    /// if it is not null, or in the types in the given chains, in that order.
-    /// </summary>
-    public static bool FindDecoratedMember<T>(
-        string membername,
-        [NotNullWhen(true)] out T? value,
-        [NotNullWhen(true)] out AttributeData? attr,
-        INamedTypeSymbol? type,
-        params IEnumerable<INamedTypeSymbol>[] chains) where T : ISymbol
-    {
-        var found = Finder.Find((type, out info) =>
-        {
-            var member = type.GetMembers().OfType<T>().FirstOrDefault(x => x.Name == membername);
-            if (member != null)
-            {
-                var ats = member.GetAttributes([typeof(WithAttribute), typeof(WithAttribute<>)]).ToArray();
-                if (ats.Length == 1)
-                {
-                    info = new(member, ats[0]);
-                    return true;
-                }
-            }
-
-            info = null!;
-            return false;
-        },
-        out FindMemberInfo<T> info, type, chains);
-
-        value = found ? info.Member : default;
-        attr = found ? info.Attribute : default;
-        return found;
-    }
-    record FindMemberInfo<T>(T Member, AttributeData Attribute) where T : ISymbol;
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Tries to find a method with the given name and parameter type in the given type, if it is
-    /// not null, or in the types in the given chains, in that order.
-    /// </summary>
-    public static bool FindMethod(
-        string methodname,
-        ITypeSymbol paramtype,
-        [NotNullWhen(true)] out IMethodSymbol? value,
-        INamedTypeSymbol? type,
-        params IEnumerable<INamedTypeSymbol>[] chains)
-    {
-        methodname = methodname.NotNullNotEmpty(trim: true);
-        ArgumentNullException.ThrowIfNull(paramtype);
-
-        return Finder.Find((type, out value) =>
-        {
-            value = type.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(x =>
-                x.Name == methodname &&
-                x.Parameters.Length == 1 &&
-                paramtype.IsAssignableTo(x.Parameters[0].Type));
-
-            return value != null;
-        },
-        out value, type, chains);
+        var ats = type.GetAttributes([typeof(WithAttribute), typeof(WithAttribute<>)]).ToArray();
+        at = ats.Length > 0 ? ats[0] : null;
+        return ats.Length > 0;
     }
 
     // ----------------------------------------------------
 
     /// <summary>
     /// Determines if the given attribute carries a 'UseVirtual' value and, if so, returns it in
-    /// the out arguments.
+    /// the out argument.
     /// </summary>
-    public static bool HasUseVirtual(
-        this AttributeData at,
-        out bool value)
+    public static bool HasUseVirtual(this AttributeData at, out bool value)
     {
+        ArgumentNullException.ThrowIfNull(at);
+
         if (at.FindNamedArgument("UseVirtual", out var arg))
         {
             if (!arg.Value.IsNull && arg.Value.Value is bool temp)
@@ -231,15 +60,12 @@ internal static class XNode
         return false;
     }
 
-    // ----------------------------------------------------
-
     /// <summary>
     /// Determines if the given attribute carries a 'ReturnType' value and, if so, returns it and
-    /// whether it is a nullable one in the out arguments.
+    /// whether it is a nullable one or not the out arguments.
     /// </summary>
     public static bool HasReturnType(
-        this AttributeData at,
-        [NotNullWhen(true)] out INamedTypeSymbol? value, out bool nullable)
+        this AttributeData at, [NotNullWhen(true)] out INamedTypeSymbol? value, out bool nullable)
     {
         ArgumentNullException.ThrowIfNull(at);
         ArgumentNullException.ThrowIfNull(at.AttributeClass);
@@ -265,7 +91,7 @@ internal static class XNode
             }
         }
 
-        // Default...
+        // Not allowed arity or not found...
         value = null;
         nullable = false;
         return false;
@@ -274,63 +100,215 @@ internal static class XNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// Determines if the given member is decorated with a <see cref="WithAttribute"/> attribute or
-    /// with a <see cref="WithAttribute{T}"/> one, and if so returns it in the out argument.
+    /// Obtains the appropriate options to print this return type based upon if it is the same as
+    /// the given host one, or not.
     /// </summary>
-    public static bool HasWithAttribute<T>(
-        this T member,
-        [NotNullWhen(true)] out AttributeData? value) where T : ISymbol
+    public static EasyTypeSymbol ReturnOptions(this INamedTypeSymbol rtype, INamedTypeSymbol host)
     {
-        value = member.GetAttributes([typeof(WithAttribute)]).FirstOrDefault();
-        if (value is not null) return true;
-
-        value = member.GetAttributes([typeof(WithAttribute<>)]).FirstOrDefault();
-        if (value is not null) return true;
-
-        return false;
+        return SymbolEqualityComparer.Default.Equals(host, rtype)
+            ? EasyTypeSymbol.Default
+            : EasyTypeSymbol.Full with { NullableStyle = IsNullableStyle.None };
     }
 
-    // ----------------------------------------------------
+    // ====================================================
 
-    /// <summary>
-    /// Determines if the given type is decorated with a <see cref="InheritsWithAttribute"/> or
-    /// with a <see cref="InheritsWithAttribute{T}"/> attribute and, if so, returns it in the out
-    /// argument.
-    /// </summary>
-    public static bool HasInheritsWithAttribute(
-        this INamedTypeSymbol type,
-        [NotNullWhen(true)] out AttributeData? value)
+    extension<T>(IXNode<T> node) where T : ISymbol
     {
-        value = type.GetAttributes([typeof(InheritsWithAttribute)]).FirstOrDefault();
-        if (value is not null) return true;
+        public string SymbolName => node.Symbol.Name;
 
-        value = type.GetAttributes([typeof(InheritsWithAttribute<>)]).FirstOrDefault();
-        if (value is not null) return true;
+        public INamedTypeSymbol SymbolType => node.Symbol is IPropertySymbol prop
+            ? (INamedTypeSymbol)prop.Type
+            : (INamedTypeSymbol)((IFieldSymbol)node).Type;
 
-        return false;
-    }
+        public string MethodName => $"With{node.SymbolName}";
 
-    // ----------------------------------------------------
+        // ------------------------------------------------
 
-    /// <summary>
-    /// The version of the generator for documentation purposes.
-    /// </summary>
-    static string VersionDoc => Assembly.GetExecutingAssembly().GetName().Version.ToString();
-
-    /// <summary>
-    /// A string with the 'GeneratedCode' attribute of the generator for documentation purposes.
-    /// </summary>
-    static string AttributeDoc => $$"""
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("{{nameof(WithGenerator)}}", "{{VersionDoc}}")]
-        """;
-
-    /// <summary>
-    /// Emits documentation.
-    /// </summary>
-    public static void EmitDocumentation(ISymbol symbol, CodeBuilder cb) => cb.AppendLine($$"""
         /// <summary>
-        /// Emulates the '<see langword="with"/>' keyword for the '{{symbol.Name}}' member.
+        /// The version of the generator for documentation purposes.
         /// </summary>
-        {{AttributeDoc}}
-        """);
+        public string VersionDoc => Assembly.GetExecutingAssembly().GetName().Version.ToString();
+
+        /// <summary>
+        /// A string with the 'GeneratedCode' attribute of the generator for documentation purposes.
+        /// </summary>
+        public string AttributeDoc => $$"""
+            [System.CodeDom.Compiler.GeneratedCodeAttribute("{{nameof(WithGenerator)}}", "{{node.VersionDoc}}")]
+            """;
+
+        /// <summary>
+        /// Emits documentation.
+        /// </summary>
+        /// <param name="cb"></param>
+        public void EmitDocumentation(CodeBuilder cb) => cb.AppendLine($$"""
+            /// <summary>
+            /// Emulates the '<see langword="with"/>' keyword for the '{{node.SymbolName}}' member.
+            /// </summary>
+            {{node.AttributeDoc}}
+            """);
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Tries to find a suitable method in either the given type, if it is not null, or in any
+        /// type in the given chains, in that order. If found, returns it in the out argument.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="type"></param>
+        /// <param name="chains"></param>
+        /// <returns></returns>
+        public bool FindMethod(
+            [NotNullWhen(true)] out IMethodSymbol value,
+            INamedTypeSymbol? type, params IEnumerable<INamedTypeSymbol>[] chains)
+        {
+            var name = node.MethodName;
+            var argtype = node.SymbolType;
+
+            return Finder.Find(out value, (type, out value) =>
+            {
+                value = type.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(x =>
+                    x.Name == name &&
+                    x.Parameters.Length == 1 &&
+                    argtype.IsAssignableTo(x.Parameters[0].Type));
+
+                return value != null;
+            },
+            type, chains);
+        }
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Tries to find a decorate member in either the given type, if it is not null, or in any
+        /// type in the given chains, in that order. If found, returns it along with the first
+        /// found attribute in the out arguments.
+        /// </summary>
+        public bool FindMember(
+            [NotNullWhen(true)] out T? value, [NotNullWhen(true)] out AttributeData? at,
+            INamedTypeSymbol? type, params IEnumerable<INamedTypeSymbol>[] chains)
+        {
+            var name = node.SymbolName;
+
+            var found = Finder.Find(out (T? Member, AttributeData? Attribute) info, (type, out info) =>
+            {
+                var member = type.GetMembers().OfType<T>().FirstOrDefault(x => x.Name == name);
+                if (member != null &&
+                    member.HasWithAttribute(out var at))
+                {
+                    info = new(member, at);
+                    return true;
+                }
+
+                // Try next...
+                info = new();
+                return false;
+            },
+            type, chains);
+
+            value = found ? info.Member : default;
+            at = found ? info.Attribute : default;
+            return found;
+        }
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Tries to find the value of the 'UseVirtual' setting in either the given type, if it is
+        /// not null, or in any type in the given chains, in that order. If found, returns it in
+        /// the out argument, along with in which member it was found, if any, and/or in which
+        /// host type it was found.
+        /// </summary>
+        public bool FindUseVirtual(
+            out bool value, out T? member, out INamedTypeSymbol? host,
+            INamedTypeSymbol? type, params IEnumerable<INamedTypeSymbol>[] chains)
+        {
+            var found = Finder.Find(
+                out (bool Value, T? Member, INamedTypeSymbol? Host) info, (type, out info) =>
+            {
+                // Member found...
+                if (node.FindMember(out var member, out var at, type) &&
+                    at.HasUseVirtual(out var value))
+                {
+                    info = new(value, member, type);
+                    return true;
+                }
+
+                // Method found (interfaces not taken into consideration)...
+                if (!type.IsInterface &&
+                    node.FindMethod(out var method, type))
+                {
+                    value = method.IsVirtual || method.IsOverride || method.IsAbstract;
+                    info = new(value, default, type);
+                    return true;
+                }
+
+                // At type's level...
+                if (type.HasInheritsWithAttribute(out at) &&
+                    at.HasUseVirtual(out value))
+                {
+                    info = new(value, default, type);
+                    return true;
+                }
+
+                // Try next...
+                info = new();
+                return false;
+            },
+            type, chains);
+
+            value = found && info.Value;
+            member = found ? info.Member : default;
+            host = found ? info.Host : default;
+            return found;
+        }
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Tries to find the value of the 'UseVirtual' setting in either the given type, if it is
+        /// not null, or in any type in the given chains, in that order. If found, returns it and
+        /// whether it is a nullable one in the out arguments.
+        /// </summary>
+        public bool FindReturnType(
+            [NotNullWhen(true)] out INamedTypeSymbol? value, out bool nullable,
+            INamedTypeSymbol? type, params IEnumerable<INamedTypeSymbol>[] chains)
+        {
+            var found = Finder.Find(
+                out (INamedTypeSymbol? Value, bool Nullable) info, (type, out info) =>
+                {
+                    // Member found...
+                    if (node.FindMember(out var _, out var at, type) &&
+                        at.HasReturnType(out var value, out var nullable))
+                    {
+                        info = new(value, nullable);
+                        return true;
+                    }
+
+                    // Method found...
+                    if (node.FindMethod(out var method, type))
+                    {
+                        value = ((INamedTypeSymbol)method.ReturnType).UnwrapNullable(out nullable);
+                        info = new(value, nullable);
+                        return true;
+                    }
+
+                    // At type's level...
+                    if (type.HasInheritsWithAttribute(out at) &&
+                        at.HasReturnType(out value, out nullable))
+                    {
+                        info = new(value, nullable);
+                        return true;
+                    }
+
+                    // Try next...
+                    info = new();
+                    return false;
+                },
+                type, chains);
+
+            value = found ? info.Value : null;
+            nullable = found && info.Nullable;
+            return found;
+        }
+    }
 }
