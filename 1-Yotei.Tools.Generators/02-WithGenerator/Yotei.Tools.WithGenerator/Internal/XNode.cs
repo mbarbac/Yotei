@@ -233,7 +233,7 @@ internal static class XNode
                     return true;
                 }
 
-                // Method found (interfaces not taken into consideration)...
+                // Method found (not considering interfaces: virtual-alike by default)...
                 if (!type.IsInterface &&
                     node.FindMethod(out var method, type))
                 {
