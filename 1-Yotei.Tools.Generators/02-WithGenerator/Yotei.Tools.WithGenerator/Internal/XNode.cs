@@ -65,7 +65,8 @@ internal static class XNode
     /// whether it is a nullable one or not the out arguments.
     /// </summary>
     public static bool HasReturnType(
-        this AttributeData at, [NotNullWhen(true)] out INamedTypeSymbol? value, out bool nullable)
+        this AttributeData at,
+        [NotNullWhen(true)] out INamedTypeSymbol? value, out bool nullable)
     {
         ArgumentNullException.ThrowIfNull(at);
         ArgumentNullException.ThrowIfNull(at.AttributeClass);
@@ -159,7 +160,7 @@ internal static class XNode
         /// <returns></returns>
         public bool FindMethod(
             [NotNullWhen(true)] out IMethodSymbol value,
-            INamedTypeSymbol? type, params IEnumerable<INamedTypeSymbol>[] chains)
+            INamedTypeSymbol? type, IEnumerable<INamedTypeSymbol>[] chains)
         {
             var name = node.MethodName;
             var argtype = node.SymbolType;
@@ -185,7 +186,7 @@ internal static class XNode
         /// </summary>
         public bool FindMember(
             [NotNullWhen(true)] out T? value, [NotNullWhen(true)] out AttributeData? at,
-            INamedTypeSymbol? type, params IEnumerable<INamedTypeSymbol>[] chains)
+            INamedTypeSymbol? type, IEnumerable<INamedTypeSymbol>[] chains)
         {
             var name = node.SymbolName;
 
@@ -220,13 +221,13 @@ internal static class XNode
         /// </summary>
         public bool FindUseVirtual(
             out bool value, out T? member, out INamedTypeSymbol? host,
-            INamedTypeSymbol? type, params IEnumerable<INamedTypeSymbol>[] chains)
+            INamedTypeSymbol? type, IEnumerable<INamedTypeSymbol>[] chains)
         {
             var found = Finder.Find(
                 out (bool Value, T? Member, INamedTypeSymbol? Host) info, (type, out info) =>
             {
                 // Member found...
-                if (node.FindMember(out var member, out var at, type) &&
+                if (node.FindMember(out var member, out var at, type, []) &&
                     at.HasUseVirtual(out var value))
                 {
                     info = new(value, member, type);
@@ -235,7 +236,7 @@ internal static class XNode
 
                 // Method found (not considering interfaces: virtual-alike by default)...
                 if (!type.IsInterface &&
-                    node.FindMethod(out var method, type))
+                    node.FindMethod(out var method, type, []))
                 {
                     value = method.IsVirtual || method.IsOverride || method.IsAbstract;
                     info = new(value, default, type);
@@ -265,19 +266,19 @@ internal static class XNode
         // ------------------------------------------------
 
         /// <summary>
-        /// Tries to find the value of the 'UseVirtual' setting in either the given type, if it is
+        /// Tries to find the value of the 'ReturnType' setting in either the given type, if it is
         /// not null, or in any type in the given chains, in that order. If found, returns it and
         /// whether it is a nullable one in the out arguments.
         /// </summary>
         public bool FindReturnType(
             [NotNullWhen(true)] out INamedTypeSymbol? value, out bool nullable,
-            INamedTypeSymbol? type, params IEnumerable<INamedTypeSymbol>[] chains)
+            INamedTypeSymbol? type, IEnumerable<INamedTypeSymbol>[] chains)
         {
             var found = Finder.Find(
                 out (INamedTypeSymbol? Value, bool Nullable) info, (type, out info) =>
                 {
                     // Member found...
-                    if (node.FindMember(out var _, out var at, type) &&
+                    if (node.FindMember(out var _, out var at, type, []) &&
                         at.HasReturnType(out var value, out var nullable))
                     {
                         info = new(value, nullable);
@@ -285,7 +286,7 @@ internal static class XNode
                     }
 
                     // Method found...
-                    if (node.FindMethod(out var method, type))
+                    if (node.FindMethod(out var method, type, []))
                     {
                         value = ((INamedTypeSymbol)method.ReturnType).UnwrapNullable(out nullable);
                         info = new(value, nullable);

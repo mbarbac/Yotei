@@ -22,11 +22,13 @@ internal class XTypeNode : TypeNode
     /// <returns></returns>
     public override bool Validate(SourceProductionContext context)
     {
-        if (Symbol.IsRecord) { Symbol.ReportError(TreeError.RecordsNotSupported, context); return false; }
-        if (Attributes.Count == 0) { Symbol.ReportError(TreeError.NoAttributes, context); return false; }
-        if (Attributes.Count > 1) { Symbol.ReportError(TreeError.TooManyAttributes, context); return false; }
+        var r = base.Validate(context);
 
-        return base.Validate(context);
+        if (Symbol.IsRecord) { Symbol.ReportError(TreeError.RecordsNotSupported, context); r = false; }
+        if (Attributes.Count == 0) { Symbol.ReportError(TreeError.NoAttributes, context); r = false; }
+        if (Attributes.Count > 1) { Symbol.ReportError(TreeError.TooManyAttributes, context); r = false; }
+
+        return r;
     }
 
     // ----------------------------------------------------

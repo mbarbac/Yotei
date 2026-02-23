@@ -33,7 +33,7 @@ internal static class Finder
         out T value,
         FindDelegate<T> predicate,
         INamedTypeSymbol? type,
-        params IEnumerable<INamedTypeSymbol>[] chains)
+        IEnumerable<INamedTypeSymbol>[] chains)
     {
         ArgumentNullException.ThrowIfNull(predicate);
         ArgumentNullException.ThrowIfNull(chains);

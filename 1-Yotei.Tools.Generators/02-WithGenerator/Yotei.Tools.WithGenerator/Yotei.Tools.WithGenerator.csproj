@@ -6,8 +6,6 @@
 		<LangVersion>preview</LangVersion>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-		<IsRoslynComponent>true</IsRoslynComponent>
 		<NoWarn>IDE0130</NoWarn>
 	</PropertyGroup>
 	<!--IDE0130: Namespace does not match folder structure-->
@@ -33,6 +31,8 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
+		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+		<IsRoslynComponent>true</IsRoslynComponent>
 		<!--<DefineConstants>$(DefineConstants);DEBUG_WITH_GENERATOR </DefineConstants>-->
 	</PropertyGroup>
 

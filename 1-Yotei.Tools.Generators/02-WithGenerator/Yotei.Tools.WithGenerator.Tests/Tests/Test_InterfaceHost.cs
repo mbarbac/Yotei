@@ -20,7 +20,9 @@ public static partial class Test_InterfaceHost
         Assert.Equal(typeof(IFace1), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
-    }// ----------------------------------------------------
+    }
+    
+    // ----------------------------------------------------
 
     // UseVirtual has no effect on interfaces...
     partial interface IFace2 { [With(UseVirtual = false)] string? Name { get; } }

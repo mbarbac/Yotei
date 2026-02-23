@@ -57,7 +57,7 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
     public override void Emit(SourceProductionContext context, CodeBuilder cb)
     {
         // Intercepting explicitly implemented...
-        if (this.FindMethod(out _, Host)) return;
+        if (this.FindMethod(out _, Host, [])) return;
 
         // Dispatching...
         if (Host.IsInterface) EmitHostInterface(context, cb);
@@ -74,7 +74,7 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
     void EmitHostInterface(SourceProductionContext context, CodeBuilder cb)
     {
         var type = this.FindReturnType(
-            out var xtype, out var xnul, Host, Host.AllInterfaces)
+            out var xtype, out var xnul, Host, [Host.AllInterfaces])
             ? xtype : Host;
 
         var options = type.ReturnOptions(Host);
@@ -98,22 +98,22 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
             var found = Finder.Find(out string? value, (type, out value) =>
             {
                 // Member existing...
-                if (this.FindMember(out var member, out var at, type))
+                if (this.FindMember(out var member, out var at, type, []))
                 {
                     value = "new ";
                     return true;
                 }
 
                 // Method existing...
-                while (this.FindMethod(out var method, type))
+                if (this.FindMethod(out var method, type, []))
                 {
                     value = "new ";
                     return true;
                 }
 
                 // Requested...
-                if (type.HasInheritsWithAttribute(out at) &&
-                    this.FindMember(out _, out _, null, type.AllInterfaces))
+                if (type.HasInheritsWithAttribute(out _) &&
+                    this.FindMember(out _, out _, null, [type.AllInterfaces]))
                 {
                     value = "new ";
                     return true;
@@ -123,7 +123,7 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
                 value = null;
                 return false;
             },
-            null, Host.AllBaseTypes, Host.AllInterfaces);
+            null, [Host.AllInterfaces]);
 
             // Returning found or default value...
             return found ? value : "public abstract ";
@@ -139,7 +139,7 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
     void EmitHostAbstract(SourceProductionContext context, CodeBuilder cb)
     {
         var type = this.FindReturnType(
-            out var xtype, out var xnul, Host, Host.AllBaseTypes, Host.AllInterfaces)
+            out var xtype, out var xnul, Host, [Host.AllBaseTypes, Host.AllInterfaces])
             ? xtype : Host;
 
         var options = type.ReturnOptions(Host);
@@ -163,7 +163,7 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
             var found = Finder.Find(out string? value, (type, out value) =>
             {
                 // Member existing...
-                if (this.FindMember(out var member, out var at, type))
+                if (this.FindMember(out var member, out var at, type, []))
                 {
                     if (type.IsInterface) { value = $"public abstract "; return true; }
 
@@ -173,7 +173,7 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
                 }
 
                 // Method existing...
-                while (this.FindMethod(out var method, type))
+                while (this.FindMethod(out var method, type, []))
                 {
                     var dec = method.DeclaredAccessibility; if (dec == Accessibility.Private) break;
                     var str = dec.ToAccessibilityString(); if (str == null) break;
@@ -186,14 +186,17 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
                 }
 
                 // Requested...
-                if (type.HasInheritsWithAttribute(out at) &&
-                    this.FindMember(out _, out _, null, type.AllBaseTypes, type.AllInterfaces))
+                if (type.HasInheritsWithAttribute(out _) &&
+                    this.FindMember(out _, out _, null, [type.AllBaseTypes, type.AllInterfaces]))
                 {
                     var mvirt = this.FindUseVirtual(out var temp, out _, out _,
-                        type, type.AllBaseTypes, type.AllInterfaces)
+                        type, [type.AllBaseTypes, type.AllInterfaces])
                         ? temp : true;
 
-                    value = !mvirt ? $"public abstract new " : $"public abstract override ";
+                    value = type.IsInterface
+                        ? "public abstract "
+                        : (!mvirt ? $"public abstract new " : $"public abstract override ");
+
                     return true;
                 }
 
@@ -201,7 +204,7 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
                 value = null;
                 return false;
             },
-            null, Host.AllBaseTypes, Host.AllInterfaces);
+            null, [Host.AllBaseTypes, Host.AllInterfaces]);
 
             // Returning found or default value...
             return found ? value : "public abstract ";
@@ -219,7 +222,7 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
         if (ctor == null) { Host.ReportError(TreeError.NoCopyConstructor, context); return; }
 
         var type = this.FindReturnType(out var xtype, out var xnul,
-            Host, Host.AllBaseTypes, Host.AllInterfaces)
+            Host, [Host.AllBaseTypes, Host.AllInterfaces])
             ? xtype : Host;
 
         var options = type.ReturnOptions(Host);
@@ -257,14 +260,14 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
         {
             var hsealed = Host.IsSealed || Symbol.IsSealed;
             var hvirt = this.FindUseVirtual(out var temp, out _, out _,
-                Host, Host.AllBaseTypes, Host.AllInterfaces)
+                Host, [Host.AllBaseTypes, Host.AllInterfaces])
                 ? temp : true;
 
             // Using the host base types and interfaces, not the host itself...
             var found = Finder.Find(out string? value, (type, out value) =>
             {
                 // Member existing...
-                if (this.FindMember(out var member, out var at, type))
+                if (this.FindMember(out var member, out var at, type, []))
                 {
                     if (type.IsInterface)
                     {
@@ -278,7 +281,7 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
                 }
 
                 // Method existing...
-                while (this.FindMethod(out var method, type))
+                while (this.FindMethod(out var method, type, []))
                 {
                     var dec = method.DeclaredAccessibility; if (dec == Accessibility.Private) break;
                     var str = dec.ToAccessibilityString(); if (str == null) break;
@@ -295,14 +298,17 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
                 }
 
                 // Requested...
-                if (type.HasInheritsWithAttribute(out at) &&
-                    this.FindMember(out _, out _, null, type.AllBaseTypes, type.AllInterfaces))
+                if (type.HasInheritsWithAttribute(out _) &&
+                    this.FindMember(out _, out _, null, [type.AllBaseTypes, type.AllInterfaces]))
                 {
                     var mvirt = this.FindUseVirtual(out temp, out _, out _,
-                        type, type.AllBaseTypes, type.AllInterfaces)
+                        type, [type.AllBaseTypes, type.AllInterfaces])
                         ? temp : true;
 
-                    value = hsealed || !mvirt ? $"public new " : $"public override ";
+                    value = type.IsInterface
+                        ? "public virtual "
+                        : (hsealed || !mvirt ? $"public new " : $"public override ");
+
                     return true;
                 }
 
@@ -310,7 +316,7 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
                 value = null;
                 return false;
             },
-            null, Host.AllBaseTypes, Host.AllInterfaces);
+            null, [Host.AllBaseTypes, Host.AllInterfaces]);
 
             // Returning found or default value...
             return found ? value : ((hsealed || !hvirt) ? "public " : "public virtual ");
