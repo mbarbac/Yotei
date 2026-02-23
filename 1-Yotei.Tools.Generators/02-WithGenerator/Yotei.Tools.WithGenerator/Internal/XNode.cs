@@ -33,7 +33,7 @@ internal static class XNode
     {
         ArgumentNullException.ThrowIfNull(type);
 
-        var ats = type.GetAttributes([typeof(WithAttribute), typeof(WithAttribute<>)]).ToArray();
+        var ats = type.GetAttributes([typeof(InheritsWithAttribute), typeof(InheritsWithAttribute<>)]).ToArray();
         at = ats.Length > 0 ? ats[0] : null;
         return ats.Length > 0;
     }
@@ -118,7 +118,7 @@ internal static class XNode
 
         public INamedTypeSymbol SymbolType => node.Symbol is IPropertySymbol prop
             ? (INamedTypeSymbol)prop.Type
-            : (INamedTypeSymbol)((IFieldSymbol)node).Type;
+            : (INamedTypeSymbol)((IFieldSymbol)node.Symbol).Type;
 
         public string MethodName => $"With{node.SymbolName}";
 

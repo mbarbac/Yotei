@@ -74,15 +74,13 @@ internal class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
     [SuppressMessage("", "IDE0060")]
     void EmitHostInterface(SourceProductionContext context, CodeBuilder cb)
     {
-        if (Host.Name == "IFace1") { } // DEBUG-ONLY
-
-        var type = this.FindReturnType(
-            out var xtype, out var xnul, Host, Host.AllInterfaces)
+        var type = this.FindReturnType(out var xtype, out var xnull,
+            Host, Host.AllInterfaces)
             ? xtype : Host;
 
         var options = type.ReturnOptions(Host);
         var rtype = type.EasyName(options);
-        var rnull = xnul ? "?" : string.Empty;
+        var rnull = xnull ? "?" : string.Empty;
         var modifiers = GetInterfaceModifiers();
         var argtype = this.SymbolType.EasyName(EasyTypeSymbol.Full);
 
@@ -140,13 +138,13 @@ internal class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
     /// </summary>
     void EmitHostAbstract(SourceProductionContext context, CodeBuilder cb)
     {
-        var type = this.FindReturnType(
-            out var xtype, out var xnul, Host, Host.AllBaseTypes, Host.AllInterfaces)
+        var type = this.FindReturnType(out var xtype, out var xnull,
+            Host, Host.AllBaseTypes, Host.AllInterfaces)
             ? xtype : Host;
 
         var options = type.ReturnOptions(Host);
         var rtype = type.EasyName(options);
-        var rnull = xnul ? "?" : string.Empty;
+        var rnull = xnull ? "?" : string.Empty;
         var modifiers = GetAbstractModifiers();
         var argtype = this.SymbolType.EasyName(EasyTypeSymbol.Full);
 
@@ -222,13 +220,13 @@ internal class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
         var ctor = Host.FindCopyConstructor(strict: false);
         if (ctor == null) { Host.ReportError(TreeError.NoCopyConstructor, context); return; }
 
-        var type = this.FindReturnType(out var xtype, out var xnul,
+        var type = this.FindReturnType(out var xtype, out var xnull,
             Host, Host.AllBaseTypes, Host.AllInterfaces)
             ? xtype : Host;
 
         var options = type.ReturnOptions(Host);
         var rtype = type.EasyName(options);
-        var rnull = xnul ? "?" : string.Empty;
+        var rnull = xnull ? "?" : string.Empty;
         var modifiers = GetRegularModifiers();
         var argtype = this.SymbolType.EasyName(EasyTypeSymbol.Full);
 
