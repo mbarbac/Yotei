@@ -24,16 +24,16 @@ internal static class Finder
     /// returns the value in the out argument.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <param name="predicate"></param>
-    /// <param name="value"></param>
     /// <param name="type"></param>
     /// <param name="chains"></param>
+    /// <param name="value"></param>
+    /// <param name="predicate"></param>
     /// <returns></returns>
     public static bool Find<T>(
-        out T value,
-        FindDelegate<T> predicate,
         INamedTypeSymbol? type,
-        IEnumerable<INamedTypeSymbol>[] chains)
+        IEnumerable<INamedTypeSymbol>[] chains,
+        out T value,
+        FindDelegate<T> predicate)
     {
         ArgumentNullException.ThrowIfNull(predicate);
         ArgumentNullException.ThrowIfNull(chains);

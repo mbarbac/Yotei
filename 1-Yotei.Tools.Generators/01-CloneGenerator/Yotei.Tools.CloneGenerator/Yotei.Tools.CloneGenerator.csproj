@@ -33,7 +33,7 @@
 	<PropertyGroup>
 		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 		<IsRoslynComponent>true</IsRoslynComponent>
-		<DefineConstants>$(DefineConstants);DEBUG_CLONE_GENERATOR </DefineConstants>
+		<!--<DefineConstants>$(DefineConstants);DEBUG_CLONE_GENERATOR </DefineConstants>-->
 	</PropertyGroup>
 
 	<ItemGroup>
