@@ -5,7 +5,7 @@
 public static partial class Test_AbstractHost
 {
     // Easy case...
-    abstract partial class AType1
+    abstract partial class AType1A
     {
         [With] public string? Name { get; set; } = default;
         [With] public int Age = default;
@@ -13,17 +13,17 @@ public static partial class Test_AbstractHost
 
     //[Enforced]
     [Fact]
-    public static void Test_AType1()
+    public static void Test_AType1A()
     {
         MethodInfo? method;
         ParameterInfo[] pars;
-        var type = typeof(AType1);
+        var type = typeof(AType1A);
 
         method = type.GetMethod("WithName")!;
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(AType1), method.ReturnType);
+        Assert.Equal(typeof(AType1A), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
 
@@ -31,15 +31,13 @@ public static partial class Test_AbstractHost
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(AType1), method.ReturnType);
+        Assert.Equal(typeof(AType1A), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(int), pars[0].ParameterType);
     }
 
-    // ----------------------------------------------------
-
     // UseVirtual has no effect on abstract types...
-    abstract partial class AType2
+    abstract partial class AType1B
     {
         [With(UseVirtual = false)] public string? Name { get; set; } = default;
         [With(UseVirtual = false)] public int Age = default;
@@ -47,17 +45,17 @@ public static partial class Test_AbstractHost
 
     //[Enforced]
     [Fact]
-    public static void Test_AType2()
+    public static void Test_AType1B()
     {
         MethodInfo? method;
         ParameterInfo[] pars;
-        var type = typeof(AType2);
+        var type = typeof(AType1B);
 
         method = type.GetMethod("WithName")!;
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(AType2), method.ReturnType);
+        Assert.Equal(typeof(AType1B), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
 
@@ -65,17 +63,15 @@ public static partial class Test_AbstractHost
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(AType2), method.ReturnType);
+        Assert.Equal(typeof(AType1B), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(int), pars[0].ParameterType);
     }
 
-    // ----------------------------------------------------
-
     // Enforcing return type, by argument..
     // For TESTS PURPOSES ONLY! Production code must return a host-compatible type.
 
-    abstract partial class AType3A
+    abstract partial class AType1C
     {
         [With(ReturnType = typeof(DateTime?))] public string? Name { get; set; } = default;
         [With(ReturnType = typeof(DateTime?))] public int Age = default;
@@ -83,11 +79,11 @@ public static partial class Test_AbstractHost
 
     //[Enforced]
     [Fact]
-    public static void Test_AType3A()
+    public static void Test_AType1C()
     {
         MethodInfo? method;
         ParameterInfo[] pars;
-        var type = typeof(AType3A);
+        var type = typeof(AType1C);
 
         method = type.GetMethod("WithName")!;
         pars = method.GetParameters();
@@ -106,12 +102,10 @@ public static partial class Test_AbstractHost
         Assert.Equal(typeof(int), pars[0].ParameterType);
     }
 
-    // ----------------------------------------------------
-
     // Enforcing return type, by generic argument..
     // For TESTS PURPOSES ONLY! Production code must return a host-compatible type.
 
-    abstract partial class AType3B
+    abstract partial class AType1D
     {
         [With<DateTime?>] public string? Name { get; set; } = default;
         [With<DateTime?>] public int Age = default;
@@ -119,11 +113,11 @@ public static partial class Test_AbstractHost
 
     //[Enforced]
     [Fact]
-    public static void Test_AType3B()
+    public static void Test_AType1D()
     {
         MethodInfo? method;
         ParameterInfo[] pars;
-        var type = typeof(AType3B);
+        var type = typeof(AType1D);
 
         method = type.GetMethod("WithName")!;
         pars = method.GetParameters();
@@ -142,12 +136,10 @@ public static partial class Test_AbstractHost
         Assert.Equal(typeof(int), pars[0].ParameterType);
     }
 
-    // ----------------------------------------------------
-
     // Enforcing return type on nullable reference type...
     // For TESTS PURPOSES ONLY! Production code must return a host-compatible type.
 
-    abstract partial class AType3C
+    abstract partial class AType1E
     {
         [With<IsNullable<string>>] public string? Name { get; set; } = default;
         [With<IsNullable<string>>] public int Age = default;
@@ -155,11 +147,11 @@ public static partial class Test_AbstractHost
 
     //[Enforced]
     [Fact]
-    public static void Test_AType3C()
+    public static void Test_AType1E()
     {
         MethodInfo? method;
         ParameterInfo[] pars;
-        var type = typeof(AType3C);
+        var type = typeof(AType1E);
 
         method = type.GetMethod("WithName")!;
         pars = method.GetParameters();
@@ -181,70 +173,66 @@ public static partial class Test_AbstractHost
     // ----------------------------------------------------
 
     // Inherits from interface...
-    partial interface IFace4A { [With] string? Name { get; } }
+    partial interface IFace2A { [With] string? Name { get; } }
 
     [InheritsWith]
-    abstract partial class AType4A : IFace4A { public string? Name { get; set; } = default; }
+    abstract partial class AType2A : IFace2A { public string? Name { get; set; } = default; }
 
     //[Enforced]
     [Fact]
-    public static void Test_AType4A()
+    public static void Test_AType2A()
     {
         MethodInfo? method;
         ParameterInfo[] pars;
-        var type = typeof(AType4A);
+        var type = typeof(AType2A);
 
         method = type.GetMethod("WithName")!;
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(AType4A), method.ReturnType);
+        Assert.Equal(typeof(AType2A), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
     }
-
-    // ----------------------------------------------------
 
     // UseVirtual no effect on abstract inheritance...
-    partial interface IFace4B { [With(UseVirtual = false)] string? Name { get; } }
+    partial interface IFace2B { [With(UseVirtual = false)] string? Name { get; } }
 
     [InheritsWith(UseVirtual = false)]
-    abstract partial class AType4B : IFace4B { public string? Name { get; set; } = default; }
+    abstract partial class AType2B : IFace2B { public string? Name { get; set; } = default; }
 
     //[Enforced]
     [Fact]
-    public static void Test_AType4B()
+    public static void Test_AType2B()
     {
         MethodInfo? method;
         ParameterInfo[] pars;
-        var type = typeof(AType4B);
+        var type = typeof(AType2B);
 
         method = type.GetMethod("WithName")!;
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(AType4B), method.ReturnType);
+        Assert.Equal(typeof(AType2B), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
     }
-
-    // ----------------------------------------------------
 
     // Enforcing return type on base interface...
     // For TESTS PURPOSES ONLY! Production code must return a host-compatible type.
 
-    partial interface IFace4C { [With<DateTime?>] string? Name { get; } }
+    partial interface IFace2C { [With<DateTime?>] string? Name { get; } }
 
     [InheritsWith]
-    abstract partial class AType4C : IFace4C { public string? Name { get; set; } = default; }
+    abstract partial class AType2C : IFace2C { public string? Name { get; set; } = default; }
 
     //[Enforced]
     [Fact]
-    public static void Test_AType4C()
+    public static void Test_AType2C()
     {
         MethodInfo? method;
         ParameterInfo[] pars;
-        var type = typeof(AType4C);
+        var type = typeof(AType2C);
 
         method = type.GetMethod("WithName")!;
         pars = method.GetParameters();
@@ -258,31 +246,31 @@ public static partial class Test_AbstractHost
     // ----------------------------------------------------
 
     // Inherits from abstract class...
-    partial interface IFace5A { [With] string? Name { get; } }
+    partial interface IFace3A { [With] string? Name { get; } }
 
     [InheritsWith]
-    abstract partial class AType5A : IFace5A
+    abstract partial class AType3A : IFace3A
     {
         public string? Name { get; set; } = default;
         [With] public int Age = default;
     }
 
     [InheritsWith]
-    abstract partial class AType5B : AType5A { }
+    abstract partial class AType3B : AType3A { }
 
     //[Enforced]
     [Fact]
-    public static void Test_AType5B()
+    public static void Test_AType3B()
     {
         MethodInfo? method;
         ParameterInfo[] pars;
-        var type = typeof(AType5B);
+        var type = typeof(AType3B);
 
         method = type.GetMethod("WithName")!;
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(AType5B), method.ReturnType);
+        Assert.Equal(typeof(AType3B), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(string), pars[0].ParameterType);
 
@@ -290,31 +278,29 @@ public static partial class Test_AbstractHost
         pars = method.GetParameters();
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(AType5B), method.ReturnType);
+        Assert.Equal(typeof(AType3B), method.ReturnType);
         Assert.Single(pars);
         Assert.Equal(typeof(int), pars[0].ParameterType);
     }
 
-    // ----------------------------------------------------
-
     // Enforced return type on base abstract class...
     // For TESTS PURPOSES ONLY! Production code must return a host-compatible type.
 
-    partial interface IFace6A { [With<DateTime?>] string? Name { get; } }
+    partial interface IFace3C { [With<DateTime?>] string? Name { get; } }
 
     [InheritsWith]
-    abstract partial class AType6A : IFace6A
+    abstract partial class AType3C : IFace3C
     {
         public string? Name { get; set; } = default;
         [With<DateTime?>] public int Age = default;
     }
 
     [InheritsWith]
-    abstract partial class AType6B : AType6A { }
+    abstract partial class AType6B : AType3C { }
 
     //[Enforced]
     [Fact]
-    public static void Test_AType6B()
+    public static void Test_AType3C()
     {
         MethodInfo? method;
         ParameterInfo[] pars;
@@ -340,23 +326,23 @@ public static partial class Test_AbstractHost
     // ----------------------------------------------------
 
     // Inherit abstract from regular type...
-    partial interface IFace7A { [With] string? Name { get; } }
+    partial interface IFace4A { [With] string? Name { get; } }
 
     [InheritsWith]
-    public partial class RType7A : IFace7A
+    public partial class RType4A : IFace4A
     {
-        public RType7A() { }
-        protected RType7A(RType7A _) { }
+        public RType4A() { }
+        protected RType4A(RType4A _) { }
 
         public string? Name { get; set; } = default;
     }
 
     [InheritsWith]
-    public abstract partial class AType7A : RType7A { }
+    public abstract partial class AType7A : RType4A { }
 
     //[Enforced]
     [Fact]
-    public static void Test_AType7A()
+    public static void Test_AType4A()
     {
         MethodInfo? method;
         ParameterInfo[] pars;

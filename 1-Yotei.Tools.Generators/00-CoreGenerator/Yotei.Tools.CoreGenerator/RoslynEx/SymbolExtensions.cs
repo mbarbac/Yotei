@@ -49,7 +49,8 @@ internal static partial class SymbolExtensions
             ArgumentNullException.ThrowIfNull(source);
             ArgumentNullException.ThrowIfNull(types);
 
-            foreach (var at in source.GetAttributes())
+            var ats = source.GetAttributes();
+            foreach (var at in ats)
             {
                 foreach (var type in types)
                 {

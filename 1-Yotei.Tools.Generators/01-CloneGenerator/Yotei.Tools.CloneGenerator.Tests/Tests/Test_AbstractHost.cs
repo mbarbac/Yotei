@@ -5,71 +5,67 @@
 public static partial class Test_AbstractHost
 {
     // Easy case...
-    [Cloneable] abstract partial class AType1 { }
+    [Cloneable] abstract partial class AType1A { }
 
     //[Enforced]
     [Fact]
-    public static void Test_AType1()
+    public static void Test_AType1A()
     {
-        var type = typeof(AType1);
+        var type = typeof(AType1A);
         var method = type.GetMethod("Clone")!;
 
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(AType1), method.ReturnType);
+        Assert.Equal(typeof(AType1A), method.ReturnType);
         Assert.Empty(method.GetParameters());
     }
-
-    // ----------------------------------------------------
 
     // UseVirtual has no effect on abstract types...
-    [Cloneable(UseVirtual = false)] abstract partial class AType2 { }
+    [Cloneable(UseVirtual = false)] abstract partial class AType1B { }
 
     //[Enforced]
     [Fact]
-    public static void Test_AType2()
+    public static void Test_AType1B()
     {
-        var type = typeof(AType2);
+        var type = typeof(AType1B);
         var method = type.GetMethod("Clone")!;
 
         Assert.True(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(AType2), method.ReturnType);
+        Assert.Equal(typeof(AType1B), method.ReturnType);
         Assert.Empty(method.GetParameters());
     }
-
-    // ----------------------------------------------------
 
     // Enforcing return type, by argument..
     // For TESTS PURPOSES ONLY! Production code must return a host-compatible type.
 
-    [Cloneable(ReturnType = typeof(DateTime?))] abstract partial class AType3A { }
-    [Cloneable<DateTime?>] abstract partial class AType3B { }
-    [Cloneable<IsNullable<string>>] abstract partial class AType3C { }
+    [Cloneable(ReturnType = typeof(DateTime?))] abstract partial class AType1C { }
+    [Cloneable<DateTime?>] abstract partial class AType1D { }
+    [Cloneable<IsNullable<string>>] abstract partial class AType1E { }
 
     //[Enforced]
     [Fact]
-    public static void Test_AType3A()
+    public static void Test_AType1C()
     {
-        var type = typeof(AType3A);
+        var type = typeof(AType1C);
         var method = type.GetMethod("Clone")!;
         Assert.Equal(typeof(DateTime?), method.ReturnType);
     }
 
     //[Enforced]
     [Fact]
-    public static void Test_AType3B()
+    public static void Test_AType1D()
     {
-        var type = typeof(AType3B);
+        var type = typeof(AType1D);
         var method = type.GetMethod("Clone")!;
         Assert.Equal(typeof(DateTime?), method.ReturnType);
     }
 
     //[Enforced]
     [Fact]
-    public static void Test_AType3C()
+    public static void Test_AType1E()
     {
-        var type = typeof(AType3C);
+        var type = typeof(AType1E);
         var method = type.GetMethod("Clone")!;
         Assert.Equal(typeof(string), method.ReturnType); // Use visual inspection to validate '?'
     }
@@ -77,8 +73,143 @@ public static partial class Test_AbstractHost
     // ----------------------------------------------------
 
     // Inherits from interface...
-    [Cloneable] partial interface IFace4A { }
-    [Cloneable] abstract partial class AType4A : IFace4A { }
+    [Cloneable] partial interface IFace2A { }
+    [Cloneable] abstract partial class AType2A : IFace2A { }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_AType2A()
+    {
+        var type = typeof(AType2A);
+        var method = type.GetMethod("Clone")!;
+
+        Assert.True(method.IsAbstract);
+        Assert.True(method.IsVirtual);
+        Assert.Equal(typeof(AType2A), method.ReturnType);
+        Assert.Empty(method.GetParameters());
+    }
+
+    // Inherits from interface, UseVirtual has no effect on abstracts...
+    [Cloneable(UseVirtual = false)] partial interface IFace2B { }
+    [Cloneable(UseVirtual = false)] abstract partial class AType2B : IFace2B { }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_AType2B()
+    {
+        var type = typeof(AType2B);
+        var method = type.GetMethod("Clone")!;
+
+        Assert.True(method.IsAbstract);
+        Assert.True(method.IsVirtual);
+        Assert.Equal(typeof(AType2B), method.ReturnType);
+        Assert.Empty(method.GetParameters());
+    }
+
+    // Inherits from interface, enforcing return type...
+    // For TESTS PURPOSES ONLY! Production code must return a host-compatible type.
+    
+    [Cloneable<DateTime?>] partial interface IFace2C { }
+    [Cloneable] abstract partial class AType2C : IFace2C { }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_AType2C()
+    {
+        var type = typeof(AType2C);
+        var method = type.GetMethod("Clone")!;
+
+        Assert.True(method.IsAbstract);
+        Assert.True(method.IsVirtual);
+        Assert.Equal(typeof(DateTime?), method.ReturnType);
+        Assert.Empty(method.GetParameters());
+    }
+
+    // When implementing interfaces, we need to make sure the return types are coherent among
+    // base types and derives ones...
+
+    interface IFace2D1 { }
+    [Cloneable<IFace2D1>] partial interface IFace2D2 { }
+    [Cloneable<IFace2D2>] abstract partial class AType2D : IFace2D2 { }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_AType2D()
+    {
+        var type = typeof(AType2D);
+        var method = type.GetMethod("Clone")!;
+
+        Assert.True(method.IsAbstract);
+        Assert.True(method.IsVirtual);
+        Assert.Equal(typeof(IFace2D2), method.ReturnType);
+        Assert.Empty(method.GetParameters());
+    }
+
+    // ----------------------------------------------------
+
+    // Inherits from abstract...
+    [Cloneable] partial interface IFace3A { }
+    [Cloneable] abstract partial class AType3A : IFace3A { }
+    [Cloneable] abstract partial class AType3B : AType3A { }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_AType3B()
+    {
+        var type = typeof(AType3B);
+        var method = type.GetMethod("Clone")!;
+
+        Assert.True(method.IsAbstract);
+        Assert.True(method.IsVirtual);
+        Assert.Equal(typeof(AType3B), method.ReturnType);
+        Assert.Empty(method.GetParameters());
+    }
+
+    // Enforcing return type at base...
+    [Cloneable<IFace3A>] abstract partial class AType3C : IFace3A { }
+    [Cloneable] abstract partial class AType3D : AType3C { }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_AType3D()
+    {
+        var type = typeof(AType3D);
+        var method = type.GetMethod("Clone")!;
+
+        Assert.True(method.IsAbstract);
+        Assert.True(method.IsVirtual);
+        Assert.Equal(typeof(IFace3A), method.ReturnType);
+        Assert.Empty(method.GetParameters());
+    }
+    
+    // Enforcing return type at derived...
+    interface IFace3E : IFace3A { }
+    [Cloneable<IFace3A>] abstract partial class AType3E : IFace3E { }
+    [Cloneable<IFace3E>] abstract partial class AType3F : AType3E { }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_AType3F()
+    {
+        var type = typeof(AType3F);
+        var method = type.GetMethod("Clone")!;
+
+        Assert.True(method.IsAbstract);
+        Assert.True(method.IsVirtual);
+        Assert.Equal(typeof(IFace3E), method.ReturnType);
+        Assert.Empty(method.GetParameters());
+    }
+
+    // ----------------------------------------------------
+
+    // Inherit abstract from regular type...
+    [Cloneable]
+    partial class RType4A
+    {
+        public RType4A() { }
+        protected RType4A(RType4A _) { }
+    }
+    [Cloneable] abstract partial class AType4A : RType4A { }
 
     //[Enforced]
     [Fact]
@@ -92,155 +223,4 @@ public static partial class Test_AbstractHost
         Assert.Equal(typeof(AType4A), method.ReturnType);
         Assert.Empty(method.GetParameters());
     }
-
-    // ----------------------------------------------------
-
-    // Inherits from interface, UseVirtual has no effect on abstracts...
-    [Cloneable(UseVirtual = false)] partial interface IFace4B { }
-    [Cloneable(UseVirtual = false)] abstract partial class AType4B : IFace4B { }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_AType4B()
-    {
-        var type = typeof(AType4B);
-        var method = type.GetMethod("Clone")!;
-
-        Assert.True(method.IsAbstract);
-        Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(AType4B), method.ReturnType);
-        Assert.Empty(method.GetParameters());
-    }
-
-    // ----------------------------------------------------
-
-    // Inherits from interface, enforcing return type...
-    // For TESTS PURPOSES ONLY! Production code must return a host-compatible type.
-    
-    [Cloneable<DateTime?>] partial interface IFace4C { }
-    [Cloneable] abstract partial class AType4C : IFace4C { }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_AType4C()
-    {
-        var type = typeof(AType4C);
-        var method = type.GetMethod("Clone")!;
-
-        Assert.True(method.IsAbstract);
-        Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(DateTime?), method.ReturnType);
-        Assert.Empty(method.GetParameters());
-    }
-
-    // When implementing interfaces, we need to make sure the return types are coherent among
-    // base types and derives ones...
-
-    interface IFace4D1 { }
-    [Cloneable<IFace4D1>] partial interface IFace4D2 { }
-    [Cloneable<IFace4D2>] abstract partial class AType4D : IFace4D2 { }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_AType4D()
-    {
-        var type = typeof(AType4D);
-        var method = type.GetMethod("Clone")!;
-
-        Assert.True(method.IsAbstract);
-        Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(IFace4D2), method.ReturnType);
-        Assert.Empty(method.GetParameters());
-    }
-
-    // ----------------------------------------------------
-
-    // Inherits from abstract...
-    [Cloneable] partial interface IFace5 { }
-    [Cloneable] abstract partial class AType5A : IFace5 { }
-    [Cloneable] abstract partial class AType5B : AType5A { }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_AType5B()
-    {
-        var type = typeof(AType5B);
-        var method = type.GetMethod("Clone")!;
-
-        Assert.True(method.IsAbstract);
-        Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(AType5B), method.ReturnType);
-        Assert.Empty(method.GetParameters());
-    }
-
-    // Enforcing return type at base...
-    [Cloneable<IFace5>] abstract partial class AType5C : IFace5 { }
-    [Cloneable] abstract partial class AType5D : AType5C { }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_AType5D()
-    {
-        var type = typeof(AType5D);
-        var method = type.GetMethod("Clone")!;
-
-        Assert.True(method.IsAbstract);
-        Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(IFace5), method.ReturnType);
-        Assert.Empty(method.GetParameters());
-    }
-    
-    // Enforcing return type at derived...
-    interface IFace5B : IFace5 { }
-    [Cloneable<IFace5>] abstract partial class AType5E : IFace5B { }
-    [Cloneable<IFace5B>] abstract partial class AType5F : AType5E { }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_AType5F()
-    {
-        var type = typeof(AType5F);
-        var method = type.GetMethod("Clone")!;
-
-        Assert.True(method.IsAbstract);
-        Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(IFace5B), method.ReturnType);
-        Assert.Empty(method.GetParameters());
-    }
 }
-/*
-
-    // ----------------------------------------------------
-
-    // Inherit abstract from regular type...
-    partial interface IFace7A { [With] string? Name { get; } }
-
-    [InheritsWith]
-    public partial class RType7A : IFace7A
-    {
-        public RType7A() { }
-        protected RType7A(RType7A _) { }
-
-        public string? Name { get; set; } = default;
-    }
-
-    [InheritsWith]
-    public abstract partial class AType7A : RType7A { }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_AType7A()
-    {
-        MethodInfo? method;
-        ParameterInfo[] pars;
-        var type = typeof(AType7A);
-
-        method = type.GetMethod("WithName")!;
-        pars = method.GetParameters();
-        Assert.True(method.IsAbstract);
-        Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(AType7A), method.ReturnType);
-        Assert.Single(pars);
-        Assert.Equal(typeof(string), pars[0].ParameterType);
-    }
- */

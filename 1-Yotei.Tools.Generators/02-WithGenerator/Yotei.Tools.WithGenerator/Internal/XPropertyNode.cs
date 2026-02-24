@@ -305,13 +305,17 @@ internal class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
                 if (type.HasInheritsWithAttribute(out _) &&
                     this.FindMember(out _, out _, null, [type.AllBaseTypes, type.AllInterfaces]))
                 {
+                    if (type.IsInterface)
+                    {
+                        value = hsealed || !hvirt ? $"public " : $"public virtual ";
+                        return true;
+                    }
+
                     var mvirt = this.FindUseVirtual(out temp, out _, out _,
                         type, [type.AllBaseTypes, type.AllInterfaces])
                         ? temp : true;
 
-                    value = type.IsInterface
-                        ? "public virtual "
-                        : (hsealed || !mvirt ? $"public new " : $"public override ");
+                    value = (hsealed || !mvirt) ? $"public new " : $"public override ";
                     return true;
                 }
 

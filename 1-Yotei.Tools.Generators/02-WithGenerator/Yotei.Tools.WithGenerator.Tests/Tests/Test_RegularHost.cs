@@ -39,7 +39,6 @@ public static partial class Test_RegularHost
         Assert.Equal(typeof(int), pars[0].ParameterType);
     }
 
-    // ----------------------------------------------------
 
     // UseVirtual setting...
     partial class RType1B
@@ -116,8 +115,6 @@ public static partial class Test_RegularHost
         Assert.Equal(typeof(int), pars[0].ParameterType);
     }
 
-    // ----------------------------------------------------
-
     // Inhertis from interface, with UseVirtual...
     partial interface IFace2B { [With(UseVirtual = false)] string? Name { get; } }
 
@@ -188,8 +185,6 @@ public static partial class Test_RegularHost
         Assert.Single(pars);
         Assert.Equal(typeof(int), pars[0].ParameterType);
     }
-
-    // ----------------------------------------------------
 
     // Inhertis from interface, with ReturnType...
     partial interface IFace2D { [With] string? Name { get; } }

@@ -202,7 +202,7 @@ internal partial class XTypeNode : TypeNode, IXNode
             cb.AppendLine($"return host;");
         }
         cb.IndentLevel--;
-        cb.AppendLine("};");
+        cb.AppendLine("}");
 
         EmitExplicitInterfaces(context, cb);
 
@@ -213,6 +213,8 @@ internal partial class XTypeNode : TypeNode, IXNode
         [SuppressMessage("", "IDE0075")]
         string? GetRegularModifiers()
         {
+            if (Symbol.Name == "RType4C") { } // DEBUG-ONLY
+
             var hsealed = Symbol.IsSealed || Symbol.IsSealed;
             var hvirt = this.FindUseVirtual(out var temp, out _,
                 Symbol, [Symbol.AllBaseTypes, Symbol.AllInterfaces])
@@ -241,13 +243,16 @@ internal partial class XTypeNode : TypeNode, IXNode
                 // Requested...
                 if (type.HasCloneableAttribute(out _))
                 {
+                    if (type.IsInterface)
+                    {
+                        value = hsealed || !hvirt ? $"public " : $"public virtual ";
+                        return true;
+                    }
+
                     var mvirt = this.FindUseVirtual(out temp, out _,
-                        null, [type.AllBaseTypes, type.AllInterfaces]) ? temp : true;
+                        type, [type.AllBaseTypes, type.AllInterfaces]) ? temp : true;
 
-                    value = type.IsInterface
-                        ? "public virtual "
-                        : (hsealed || !mvirt ? $"public new " : $"public override ");
-
+                    value = (hsealed || !mvirt) ? $"public new " : $"public override ";
                     return true;
                 }
 
@@ -282,7 +287,8 @@ internal partial class XTypeNode : TypeNode, IXNode
 
             cb.AppendLine();
             cb.AppendLine($"{rtype}");
-            cb.AppendLine($"{iface}.Clone() => ({rtype})Clone();");
+            cb.AppendLine($"{iface}.Clone()");
+            cb.AppendLine($"=> ({rtype})Clone();");
         }
     }
 
@@ -292,8 +298,6 @@ internal partial class XTypeNode : TypeNode, IXNode
     /// <returns></returns>
     List<Explicit> GetExplicitInterfaces()
     {
-        if (Symbol.Name == "AType4D") { } // DEBUG-ONLY
-
         var comparer = SymbolEqualityComparer.Default;
         List<Explicit> list = [];
 
