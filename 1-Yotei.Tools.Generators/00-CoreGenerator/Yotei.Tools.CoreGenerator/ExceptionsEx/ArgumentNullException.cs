@@ -19,8 +19,7 @@ internal static class ArgumentNullExceptionExtensions
             [NotNull] T? value,
             [CallerArgumentExpression(nameof(value))] string? name = null)
         {
-            if (value == null)
-                throw new ArgumentNullException(name).WithData(value);
+            if (value == null) throw new ArgumentNullException(name).WithData(value);
         }
     }
 }

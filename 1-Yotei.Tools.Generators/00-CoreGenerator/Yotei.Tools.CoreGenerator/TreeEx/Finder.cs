@@ -30,8 +30,7 @@ internal static class Finder
     /// <param name="predicate"></param>
     /// <returns></returns>
     public static bool Find<T>(
-        INamedTypeSymbol? type,
-        IEnumerable<INamedTypeSymbol>[] chains,
+        INamedTypeSymbol? type, IEnumerable<INamedTypeSymbol>[] chains,
         out T value,
         FindDelegate<T> predicate)
     {

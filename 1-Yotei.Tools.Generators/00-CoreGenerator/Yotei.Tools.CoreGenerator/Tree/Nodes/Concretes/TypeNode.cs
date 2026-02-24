@@ -313,7 +313,7 @@ internal class TypeNode : ITreeNode
     /// Invoked to emit the parent types of this one, if any. Returns the number of indentation
     /// levels emitted so that they can be decreased afterwards.
     /// </summary>
-    int EmitTypeParents(SourceProductionContext context, CodeBuilder cb)
+    int EmitTypeParents(SourceProductionContext _, CodeBuilder cb)
     {
         var tpchain = Symbol.GetElementChain().Where(static x => x is INamedTypeSymbol).ToList();
         tpchain = tpchain.GetRange(0, tpchain.Count - 1);

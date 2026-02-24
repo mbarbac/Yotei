@@ -220,11 +220,17 @@ internal static partial class EasyNameExtensions
         // Shortcut type kinds...
         switch (source)
         {
-            case IErrorTypeSymbol: return "<error>";
             case IArrayTypeSymbol item: return EasyNameTypeArray(item, options);
             case IPointerTypeSymbol item: return EasyNameTypePointer(item, options);
-                //case IFunctionPointerTypeSymbol item: return EasyNameTypeFunctionPointer(item, options);
         }
+
+        // When using generic type arguments 'typeof(Whatever<>)' we get IErrorTypeSymbol instead
+        // of the generic argument. More often than not the use case is to print the '<T>', so
+        // as IError implements INamed, we just accept it and proceed.
+        // case IErrorTypeSymbol: return "<error>";
+
+        // I have no use case for this interface (yet...). So I won't maintain something not used.
+        // case IFunctionPointerTypeSymbol item: return EasyNameTypeFunctionPointer(item, options);
 
         // Processing...
         var sb = new StringBuilder();
@@ -352,14 +358,4 @@ internal static partial class EasyNameExtensions
         name += '*';
         return name;
     }
-
-    // ----------------------------------------------------
-
-    /*/// <summary>
-    /// Invoked when the type represents a function pointer (ie: delegate*<int, void>).
-    /// </summary>
-    static string EasyNameTypeFunctionPointer(IFunctionPointerTypeSymbol source, EasyTypeSymbol options)
-    {
-        throw new NotImplementedException("IFunctionPointerTypeSymbol types are not supported.");
-    }*/
 }
