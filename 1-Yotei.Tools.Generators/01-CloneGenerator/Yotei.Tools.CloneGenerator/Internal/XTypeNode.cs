@@ -73,8 +73,6 @@ internal partial class XTypeNode : TypeNode, IXNode
         this.EmitDocumentation(cb);
         cb.AppendLine($"{mods}{stype}{snull} Clone();");
 
-        EmitExplicitInterfaces(context, cb);
-
         /// <summary>
         /// Obtains the appropriate method modifiers, followed by a space separator, or null,
         /// </summary>
@@ -97,7 +95,7 @@ internal partial class XTypeNode : TypeNode, IXNode
                     }
 
                     // Requested...
-                    while (type.HasCloneableAttribute(out var xat))
+                    while (type.HasCloneableAttribute(out _))
                     {
                         value = $"new ";
                         return true;
@@ -136,6 +134,8 @@ internal partial class XTypeNode : TypeNode, IXNode
 
         /// <summary>
         /// Obtains the appropriate method modifiers, followed by a space separator, or null,
+        /// Notes:
+        /// - abstract new: only valid when the base class is concrete, not an abstract one
         /// </summary>
         string? GetModifiers()
         {
@@ -152,6 +152,7 @@ internal partial class XTypeNode : TypeNode, IXNode
                         var str = dec.ToAccessibilityString(); if (str == null) break;
 
                         if (type.IsInterface) { value = $"{str} abstract "; return true; }
+                        else if (type.IsAbstract) { value = $"{str} abstract override "; return true; }
                         else
                         {
                             var mvirt = method.IsVirtual || method.IsAbstract || method.IsOverride;
@@ -164,15 +165,16 @@ internal partial class XTypeNode : TypeNode, IXNode
                     }
 
                     // Requested...
-                    while (type.HasCloneableAttribute(out var xat))
+                    while (type.HasCloneableAttribute(out var at))
                     {
                         if (type.IsInterface) { value = $"public abstract "; return true; }
+                        if (type.IsAbstract) { value = $"public abstract override "; return true; }
                         else
                         {
                             // If appear in a base method, let's defer to it...
                             if (this.FindMethod(null, [type.AllBaseTypes], out _)) break;
 
-                            var mvirt = xat.HasUseVirtual(out var temp) ? temp : true;
+                            var mvirt = at.HasUseVirtual(out var temp) ? temp : true;
                             value = !mvirt
                                 ? $"public abstract new "
                                 : $"public abstract override ";
@@ -264,7 +266,7 @@ internal partial class XTypeNode : TypeNode, IXNode
                 }
 
                 // Requested...
-                while (type.HasCloneableAttribute(out var xat))
+                while (type.HasCloneableAttribute(out var at))
                 {
                     if (type.IsInterface)
                     {
@@ -276,7 +278,7 @@ internal partial class XTypeNode : TypeNode, IXNode
                         // If appear in a base method, let's defer to it...
                         if (this.FindMethod(null, [type.AllBaseTypes], out _)) break;
 
-                        var mvirt = xat.HasUseVirtual(out var temp) ? temp : true;
+                        var mvirt = at.HasUseVirtual(out var temp) ? temp : true;
                         value = mvirt
                             ? (!hvirt ? $"public new " : $"public override ")
                             : (!hvirt ? $"public new " : $"public new virtual ");

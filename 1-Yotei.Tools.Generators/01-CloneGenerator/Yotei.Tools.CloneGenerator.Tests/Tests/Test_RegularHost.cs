@@ -11,7 +11,7 @@ public static partial class Test_RegularHost
 
     //[Enforced]
     [Fact]
-    public static void Test_RType01()
+    public static void Test_RType00()
     {
         var type = typeof(RType00);
         var method = type.GetMethod("Clone")!;
@@ -29,7 +29,7 @@ public static partial class Test_RegularHost
 
     //[Enforced]
     [Fact]
-    public static void Test_RType02()
+    public static void Test_RType01()
     {
         var type = typeof(RType01);
         var method = type.GetMethod("Clone")!;
@@ -253,7 +253,7 @@ public static partial class Test_RegularHost
 
         Assert.False(method.IsAbstract);
         Assert.True(method.IsVirtual);
-        Assert.Equal(typeof(RType25B), method.ReturnType);
+        Assert.Equal(typeof(IFace25B), method.ReturnType);
         Assert.Empty(method.GetParameters());
     }
 
@@ -261,4 +261,17 @@ public static partial class Test_RegularHost
 
     [Cloneable] partial interface IFace30<T> { }
     [Cloneable(ReturnType = typeof(IFace30<>))] partial class RType30<T> : IFace30<T> { public RType30(RType30<T> _) { } }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_RType30()
+    {
+        var type = typeof(RType30<>);
+        var method = type.GetMethod("Clone")!;
+
+        Assert.False(method.IsAbstract);
+        Assert.True(method.IsVirtual);
+        Assert.Equal(typeof(IFace30<>).Name, method.ReturnType.Name); // Need to use names
+        Assert.Empty(method.GetParameters());
+    }
 }
