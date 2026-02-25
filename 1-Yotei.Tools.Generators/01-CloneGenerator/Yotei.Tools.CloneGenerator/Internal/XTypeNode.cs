@@ -231,8 +231,6 @@ internal partial class XTypeNode : TypeNode, IXNode
         /// </summary>
         string? GetModifiers()
         {
-            if (Symbol.Name == "RType22B") { } // DEBUG-ONLY
-
             var hasv = Attribute.HasUseVirtual(out var xvirt);
             var hvirt = hasv ? xvirt : true;
             var hsealed = Symbol.IsSealed;
