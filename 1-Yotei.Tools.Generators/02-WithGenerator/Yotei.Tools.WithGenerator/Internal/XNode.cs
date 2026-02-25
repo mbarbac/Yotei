@@ -1,9 +1,9 @@
-﻿namespace Yotei.Tools.CloneGenerator;
+﻿namespace Yotei.Tools.WithGenerator;
 
 // ========================================================
-internal interface IXNode
+internal interface IXNode<T> where T : ISymbol
 {
-    public INamedTypeSymbol Symbol { get; }
+    public T Symbol { get; }
 }
 
 // ========================================================
@@ -15,29 +15,60 @@ internal static class XNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// Determines if the given symbol is decorated with <see cref="CloneableAttribute"/> or with
-    /// <see cref="CloneableAttribute{T}"/> attributes. If so, returns them in the out argument.
+    /// Determines if the given symbol is decorated with <see cref="WithAttribute"/> or with
+    /// <see cref="WithAttribute{T}"/> attributes. If so, returns them in the out argument.
     /// </summary>
-    public static bool HasCloneableAttributes(
+    public static bool HasWithAttributes(
         this ISymbol type,
         out IEnumerable<AttributeData> ats)
     {
         ArgumentNullException.ThrowIfNull(type);
 
-        ats = type.GetAttributes([typeof(CloneableAttribute), typeof(CloneableAttribute<>)]);
+        ats = type.GetAttributes([typeof(WithAttribute), typeof(WithAttribute<>)]);
         return ats.Any();
     }
 
     /// <summary>
-    /// Determines if the given symbol is decorated with a <see cref="CloneableAttribute"/> or with
-    /// a <see cref="CloneableAttribute{T}"/> attribute. If so, returns the first found in the out
+    /// Determines if the given symbol is decorated with a a <see cref="WithAttribute"/> or with
+    /// a <see cref="WithAttribute{T}"/> attribute. If so, returns the first one found in the out
     /// argument.
     /// </summary>
-    public static bool HasCloneableAttribute(
+    public static bool HasWithAttribute(
         this ISymbol type,
         [NotNullWhen(true)] out AttributeData? at)
     {
-        var found = type.HasCloneableAttributes(out var ats);
+        var found = type.HasWithAttributes(out var ats);
+        at = found ? ats.First() : null;
+        return found;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the given symbol is decorated with <see cref="InheritsWithAttribute"/> or
+    /// with <see cref="InheritsWithAttribute{T}"/> attributes. If so, returns them in the out
+    /// argument.
+    /// </summary>
+    public static bool HasInheritsWithAttributes(
+        this ISymbol type,
+        out IEnumerable<AttributeData> ats)
+    {
+        ArgumentNullException.ThrowIfNull(type);
+
+        ats = type.GetAttributes([typeof(InheritsWithAttribute), typeof(InheritsWithAttribute<>)]);
+        return ats.Any();
+    }
+
+    /// <summary>
+    /// Determines if the given symbol is decorated with a <see cref="InheritsWithAttribute"/> or
+    /// with a <see cref="InheritsWithAttribute{T}"/> attribute. If so, returns the first one found
+    /// in the out argument.
+    /// </summary>
+    public static bool HasInheritsWithAttribute(
+        this ISymbol type,
+        [NotNullWhen(true)] out AttributeData? at)
+    {
+        var found = type.HasInheritsWithAttributes(out var ats);
         at = found ? ats.First() : null;
         return found;
     }
@@ -121,8 +152,18 @@ internal static class XNode
 
     // ====================================================
 
-    extension(IXNode node)
+    extension<T>(IXNode<T> node) where T : ISymbol
     {
+        public string SymbolName => node.Symbol.Name;
+
+        public INamedTypeSymbol SymbolType => node.Symbol is IPropertySymbol prop
+            ? (INamedTypeSymbol)prop.Type
+            : (INamedTypeSymbol)((IFieldSymbol)node.Symbol).Type;
+
+        public string MethodName => $"With{node.SymbolName}";
+
+        // ------------------------------------------------
+
         /// <summary>
         /// Gets the version of this generator for documentation purposes.
         /// </summary>
@@ -140,7 +181,7 @@ internal static class XNode
         /// </summary>
         public void EmitDocumentation(CodeBuilder cb) => cb.AppendLine($$"""
         /// <summary>
-        /// <inheritdoc cref="ICloneable.Clone"/>
+        /// Emulates the '<see langword="with"/>' keyword for the '{{node.SymbolName}}' member.
         /// </summary>
         {{node.AttributeDoc}}
         """);
@@ -155,15 +196,53 @@ internal static class XNode
             INamedTypeSymbol? type, IEnumerable<INamedTypeSymbol>[] chains,
             [NotNullWhen(true)] out IMethodSymbol? value)
         {
+            var name = node.SymbolName;
+            var argtype = node.SymbolType;
+
             return Finder.Find(type, chains, out value, (type, out value) =>
             {
                 value = type.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(x =>
-                    x.Name == "Clone" &&
-                    x.Parameters.Length == 0 &&
-                    x.ReturnsVoid == false);
+                    x.Name == name &&
+                    x.Parameters.Length == 1 &&
+                    argtype.IsAssignableTo(x.Parameters[0].Type));
 
                 return value != null;
             });
+        }
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Tries to find a decorated member in either the given type, if it is not null, or in any
+        /// type in the given chains, in that order. If found, returns it in and the first attribute
+        /// in the out arguments.
+        /// </summary>
+        public bool FindMember(
+            INamedTypeSymbol? type, IEnumerable<INamedTypeSymbol>[] chains,
+            [NotNullWhen(true)] out T? value,
+            [NotNullWhen(true)] out AttributeData? at)
+        {
+            var name = node.SymbolName;
+
+            var found = Finder.Find(type, chains,
+                out (T? Member, AttributeData Attribute) info,
+                (type, out info) =>
+            {
+                var member = type.GetMembers().OfType<T>().FirstOrDefault(x => x.Name == name);
+                if (member != null &&
+                    member.HasWithAttribute(out var at))
+                {
+                    info = new(member, at);
+                    return true;
+                }   
+
+                info = new();
+                return false;
+            });
+
+            value = found ? info.Member : default;
+            at = found ? info.Attribute : default;
+            return found;
         }
     }
 }
