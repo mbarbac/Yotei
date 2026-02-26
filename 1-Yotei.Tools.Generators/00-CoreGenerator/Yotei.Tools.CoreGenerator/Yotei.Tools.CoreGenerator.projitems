@@ -76,9 +76,17 @@
     <Compile Include="$(MSBuildThisFileDirectory)TreeEx\NamedTypeSymbolExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeEx\SymbolExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeEx\TypeSymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\EventNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\MethodNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\FieldNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\TypeNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\ErrorNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\ITreeNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\INode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\PropertyNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\TreeErrorExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\TreeGenerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\TreeError.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)Tree\" />
   </ItemGroup>
 </Project>
