@@ -11,11 +11,7 @@ internal class PropertyNode : ITreeNode
     /// </summary>
     /// <param name="symbol"></param>
     [SuppressMessage("", "IDE0290")]
-    public PropertyNode(TypeNode parent, IPropertySymbol symbol)
-    {
-        ParentNode = parent.ThrowWhenNull();
-        Symbol = symbol.ThrowWhenNull();
-    }
+    public PropertyNode(IPropertySymbol symbol) => Symbol = symbol.ThrowWhenNull();
 
     /// <summary>
     /// <inheritdoc/>
@@ -28,8 +24,8 @@ internal class PropertyNode : ITreeNode
     /// <summary>
     /// <inheritdoc cref="ITreeNode.ParentNode"/>
     /// </summary>
-    public TypeNode ParentNode { get; }
-    INode ITreeNode.ParentNode => ParentNode;
+    public TypeNode? ParentNode { get; set; }
+    INode? ITreeNode.ParentNode => ParentNode;
 
     /// <summary>
     /// <inheritdoc cref="ITreeNode.Symbol"/>

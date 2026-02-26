@@ -7,9 +7,10 @@
 internal interface ITreeNode : INode
 {
     /// <summary>
-    /// The node this one belongs to in the source code generation hierarchy.
+    /// The node this one belongs to in the source code generation hierarchy, or null if this
+    /// instance is a detached one.
     /// </summary>
-    INode ParentNode { get; }
+    INode? ParentNode { get; }
 
     /// <summary>
     /// The symbol this instance is associated with.

@@ -11,11 +11,7 @@ internal class EventNode : ITreeNode
     /// </summary>
     /// <param name="symbol"></param>
     [SuppressMessage("", "IDE0290")]
-    public EventNode(TypeNode parent, IEventSymbol symbol)
-    {
-        ParentNode = parent.ThrowWhenNull();
-        Symbol = symbol.ThrowWhenNull();
-    }
+    public EventNode(IEventSymbol symbol) => Symbol = symbol.ThrowWhenNull();
 
     /// <summary>
     /// <inheritdoc/>
@@ -28,8 +24,8 @@ internal class EventNode : ITreeNode
     /// <summary>
     /// <inheritdoc cref="ITreeNode.ParentNode"/>
     /// </summary>
-    public TypeNode ParentNode { get; }
-    INode ITreeNode.ParentNode => ParentNode;
+    public TypeNode? ParentNode { get; set; }
+    INode? ITreeNode.ParentNode => ParentNode;
 
     /// <summary>
     /// <inheritdoc cref="ITreeNode.Symbol"/>
@@ -38,11 +34,12 @@ internal class EventNode : ITreeNode
     ISymbol ITreeNode.Symbol => Symbol;
 
     /// <summary>
-    /// <inheritdoc cref="ITreeNode.SyntaxNodes"/>
+    /// <inheritdoc cref="ITreeNode.SyntaxNodes"/> Elements shall either be instances of
+    /// <see cref="EventDeclarationSyntax"/> or <see cref="EventFieldDeclarationSyntax"/>.
     /// </summary>
-    public List<BaseFieldDeclarationSyntax> SyntaxNodes { get; } = [];
+    public List<MemberDeclarationSyntax> SyntaxNodes { get; } = [];
     List<SyntaxNode> ITreeNode.SyntaxNodes
-        => (List<SyntaxNode>)SyntaxNodes.Cast<BaseFieldDeclarationSyntax>();
+        => (List<SyntaxNode>)SyntaxNodes.Cast<MemberDeclarationSyntax>();
 
     /// <summary>
     /// <inheritdoc/>

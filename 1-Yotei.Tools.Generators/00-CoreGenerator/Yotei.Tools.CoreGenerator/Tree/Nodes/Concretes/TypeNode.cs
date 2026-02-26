@@ -11,7 +11,7 @@ internal class TypeNode : ITreeNode
     /// </summary>
     /// <param name="symbol"></param>
     [SuppressMessage("", "IDE0290")]
-    public TypeNode(INamedTypeSymbol symbol) => Symbol = symbol;
+    public TypeNode(INamedTypeSymbol symbol) => Symbol = symbol.ThrowWhenNull();
 
     /// <summary>
     /// <inheritdoc/>
@@ -22,8 +22,7 @@ internal class TypeNode : ITreeNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// <inheritdoc/> This property returns <see langword="null"/> to indicate that type nodes
-    /// are the top-most ones in their hierarchy branches.
+    /// <inheritdoc/>
     /// </summary>
     INode ITreeNode.ParentNode => null!;
 
@@ -51,7 +50,7 @@ internal class TypeNode : ITreeNode
     /// Determines if this instance was created for the sole purpose of holding child elements,
     /// and not because it was identified as a source code generation element by itself.
     /// </summary>
-    public required bool ChildsOnly { get; init; }
+    public bool ChildsOnly { get; init; }
 
     /// <summary>
     /// The collection of child properties known to this instance.

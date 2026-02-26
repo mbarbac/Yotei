@@ -11,11 +11,7 @@ internal class FieldNode : ITreeNode
     /// </summary>
     /// <param name="symbol"></param>
     [SuppressMessage("", "IDE0290")]
-    public FieldNode(TypeNode parent, IFieldSymbol symbol)
-    {
-        ParentNode = parent.ThrowWhenNull();
-        Symbol = symbol.ThrowWhenNull();
-    }
+    public FieldNode(IFieldSymbol symbol) => Symbol = symbol.ThrowWhenNull();
 
     /// <summary>
     /// <inheritdoc/>
@@ -28,8 +24,8 @@ internal class FieldNode : ITreeNode
     /// <summary>
     /// <inheritdoc cref="ITreeNode.ParentNode"/>
     /// </summary>
-    public TypeNode ParentNode { get; }
-    INode ITreeNode.ParentNode => ParentNode;
+    public TypeNode? ParentNode { get; set; }
+    INode? ITreeNode.ParentNode => ParentNode;
 
     /// <summary>
     /// <inheritdoc cref="ITreeNode.Symbol"/>
