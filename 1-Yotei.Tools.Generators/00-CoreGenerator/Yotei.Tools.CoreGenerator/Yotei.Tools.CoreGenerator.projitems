@@ -57,36 +57,28 @@
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\EasyNameExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\EasyNameOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\VersionExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyTypedConstant.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyAttributeData.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyFieldSymbol.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyPropertySymbol.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyNamespaceSymbol.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyMethodSymbol.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\IsNullableAttribute.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\IsNullable[T].cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\ChainExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyTypeSymbol.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\IsNullableStyle.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyParameterSymbol.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyEventSymbol.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\SymbolExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\NamedTypeSymbolExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\TypeSymbolExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeEx\AccessibilityExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\Finder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\EventNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\FieldNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\MethodNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\PropertyNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\TypeNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\ErrorNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\ITreeNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\TreeErrorExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\TreeGenerator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\INode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\ChainExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeEx\CodeBuilder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tree\TreeError.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyAttributeData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyEventSymbol.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyFieldSymbol.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyMethodSymbol.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyNamespaceSymbol.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyParameterSymbol.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyPropertySymbol.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyTypedConstant.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\EasyTypeSymbol.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\Finder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\IsNullableAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\IsNullableStyle.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\IsNullable[T].cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\NamedTypeSymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\SymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\TypeSymbolExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Tree\" />
   </ItemGroup>
 </Project>

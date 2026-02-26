@@ -1,8 +1,3 @@
-En WithGenerator:
-- Ser coherente con 'Find' and 'Has'
-	- 'Has' cuando hay que buscar SOLO en el item dado.
-	- 'Find' cuando hay que buscar de forma recursiva.
-
-- En las secciones 'requested':
-	Ademas de requested, el member HA DE EXISTIR en un tipo base. No vale con que solo aparezca
-	InheritsWith: no es suficiente.
+Generators:
+- Eliminar 'Validate' => debe ser parte de 'Emit', para evitar inconsistencias. Así, cuando
+  vayamos a emitir algo, lo comprobamos sobre la marchar.
