@@ -127,7 +127,7 @@ internal class TypeNode : ITreeNode
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
-    protected virtual bool Validate(SourceProductionContext context)
+    protected virtual bool OnValidate(SourceProductionContext context)
     {
         var r = true;
         if (!Symbol.IsPartial) { Symbol.ReportError(TreeError.TypeNotPartial, context); r = false; }
@@ -154,7 +154,7 @@ internal class TypeNode : ITreeNode
     /// <param name="context"></param>
     /// <param name="cb"></param>
     /// <returns></returns>
-    protected virtual bool EmitCore(SourceProductionContext context, CodeBuilder cb) => true;
+    protected virtual bool OnEmitCore(SourceProductionContext context, CodeBuilder cb) => true;
 
     /// <summary>
     /// Invoked to emit the source code of the child elements carried by this node, if any. If
@@ -164,7 +164,7 @@ internal class TypeNode : ITreeNode
     /// <param name="context"></param>
     /// <param name="cb"></param>
     /// <returns></returns>
-    protected virtual bool EmitChilds(SourceProductionContext context, CodeBuilder cb)
+    protected virtual bool OnEmitChilds(SourceProductionContext context, CodeBuilder cb)
     {
         var r = true;
         var n = false;
@@ -214,11 +214,11 @@ internal class TypeNode : ITreeNode
         cb.IndentLevel++;
 
         var old = cb.Length;
-        var r = EmitCore(context, cb);
+        var r = OnEmitCore(context, cb);
         if (r)
         {
             var len = cb.Length; if (old != len) cb.AppendLine();
-            if (!EmitChilds(context, cb)) r = false;
+            if (!OnEmitChilds(context, cb)) r = false;
         }
 
         cb.IndentLevel--;

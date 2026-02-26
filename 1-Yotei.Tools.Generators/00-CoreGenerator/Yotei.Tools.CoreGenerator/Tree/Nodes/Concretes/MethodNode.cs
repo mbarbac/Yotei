@@ -84,7 +84,7 @@ internal class MethodNode : ITreeNode
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
-    protected virtual bool Validate(SourceProductionContext context)
+    protected virtual bool OnValidate(SourceProductionContext context)
     {
         var r = true;
         if (ParentNode == null) { Symbol.ReportError(TreeError.NoParentNode, context); r = false; }
@@ -98,7 +98,7 @@ internal class MethodNode : ITreeNode
     /// </summary>
     public bool Emit(SourceProductionContext context, CodeBuilder cb)
     {
-        var r = Validate(context) && OnEmit(context, cb);
+        var r = OnValidate(context) && OnEmit(context, cb);
         return r;
     }
 
