@@ -214,7 +214,7 @@ internal class TypeNode : ITreeNode
         cb.IndentLevel++;
 
         var old = cb.Length;
-        var r = OnEmitCore(context, cb);
+        var r = OnValidate(context) && OnEmitCore(context, cb);
         if (r)
         {
             var len = cb.Length; if (old != len) cb.AppendLine();

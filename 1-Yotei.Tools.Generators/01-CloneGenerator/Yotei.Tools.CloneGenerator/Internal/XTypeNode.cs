@@ -55,6 +55,7 @@ internal partial class XTypeNode : TypeNode, IXNode
     /// <summary>
     /// Invoked when the host is an interface.
     /// </summary>
+    [SuppressMessage("", "IDE0060")]
     bool EmitHostInterface(SourceProductionContext context, CodeBuilder cb)
     {
         var rtype = Symbol;
