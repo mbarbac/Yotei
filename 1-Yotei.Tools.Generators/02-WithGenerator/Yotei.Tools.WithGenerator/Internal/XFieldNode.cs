@@ -1,20 +1,26 @@
 ﻿#pragma warning disable IDE0075
 
-namespace Yotei.Tools.CloneGenerator;
+namespace Yotei.Tools.WithGenerator;
 
 // ========================================================
 /// <summary>
 /// <inheritdoc/>
 /// </summary>
-internal class XTypeNode : TypeNode, IXNode
+internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
 {
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="symbol"></param>
     [SuppressMessage("", "IDE0290")]
-    public XTypeNode(INamedTypeSymbol symbol) : base(symbol) { }
+    public XFieldNode(IFieldSymbol symbol) : base(symbol) { }
+
+    /// <summary>
+    /// Determines if this instance is built for an inherited member, or not.
+    /// </summary>
+    public bool IsInherited { get; init; }
     AttributeData Attribute = default!;
+    INamedTypeSymbol Host => ParentNode!.Symbol;
 
     // ----------------------------------------------------
 
@@ -25,11 +31,22 @@ internal class XTypeNode : TypeNode, IXNode
     {
         var r = base.OnValidate(context);
 
-        if (Symbol.IsRecord) { Symbol.ReportError(TreeError.RecordsNotSupported, context); r = false; }
+        if (Host.IsRecord) { Symbol.ReportError(TreeError.RecordsNotSupported, context); r = false; }
+        if (!Symbol.IsWrittable) { Symbol.ReportError(TreeError.NotWrittable, context); r = false; }
 
-        if (Attributes.Count == 0) { Symbol.ReportError(TreeError.NoAttributes, context); r = false; }
-        else if (Attributes.Count > 1) { Symbol.ReportError(TreeError.TooManyAttributes, context); r = false; }
-        else Attribute = Attributes[0];
+        if (IsInherited)
+        {
+            var ats = Host.GetAttributes([typeof(InheritsWithAttribute), typeof(InheritsWithAttribute<>)]).ToList();
+            if (ats.Count == 0) { Host.ReportError(TreeError.NoAttributes, context); r = false; }
+            else if (ats.Count > 1) { Host.ReportError(TreeError.TooManyAttributes, context); r = false; }
+            else Attribute = ats[0];
+        }
+        else
+        {
+            if (Attributes.Count == 0) { Symbol.ReportError(TreeError.NoAttributes, context); r = false; }
+            else if (Attributes.Count > 1) { Symbol.ReportError(TreeError.TooManyAttributes, context); r = false; }
+            else Attribute = Attributes[0];
+        }
 
         return r;
     }
@@ -39,14 +56,14 @@ internal class XTypeNode : TypeNode, IXNode
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    protected override bool OnEmitCore(SourceProductionContext context, CodeBuilder cb)
+    protected override bool OnEmit(SourceProductionContext context, CodeBuilder cb)
     {
         // Intercepting explicitly implemented...
-        if (this.FindMethod(Symbol, [], out _)) return true;
+        if (this.FindMethod(Host, [], out _)) return true;
 
         // Dispatching...
-        if (Symbol.IsInterface) return EmitHostInterface(context, cb);
-        else if (Symbol.IsAbstract) return EmitHostAbstract(context, cb);
+        if (Host.IsInterface) return EmitHostInterface(context, cb);
+        else if (Host.IsAbstract) return EmitHostAbstract(context, cb);
         else return EmitHostRegular(context, cb);
     }
 
@@ -58,17 +75,19 @@ internal class XTypeNode : TypeNode, IXNode
     [SuppressMessage("", "IDE0060")]
     bool EmitHostInterface(SourceProductionContext context, CodeBuilder cb)
     {
-        var rtype = Symbol;
+        var rtype = Host;
         var rnull = false;
         if (Attribute.HasReturnType(out var xtype, out var xnull)) { rtype = xtype; rnull = xnull; }
 
-        var options = rtype.ReturnOptions(Symbol);
+        var options = rtype.ReturnOptions(Host);
         var stype = rtype.EasyName(options);
         var snull = rnull ? "?" : string.Empty;
+        var sarg = this.SymbolType.EasyName(EasyTypeSymbol.Full);
         var mods = GetModifiers();
 
         this.EmitDocumentation(cb);
-        cb.AppendLine($"{mods}{stype}{snull} Clone();");
+        cb.AppendLine($"{mods}{stype}{snull}");
+        cb.AppendLine($"{this.MethodName}({sarg} value);");
 
         return true;
 
@@ -79,7 +98,7 @@ internal class XTypeNode : TypeNode, IXNode
         {
             // If appear in base types, modifiers must adapt...
             var found = Finder.Find(
-                null, [Symbol.AllInterfaces],
+                null, [Host.AllInterfaces],
                 out string? value,
                 (type, out value) =>
                 {
@@ -93,8 +112,15 @@ internal class XTypeNode : TypeNode, IXNode
                         return true;
                     }
 
+                    // Existing member...
+                    while (this.FindMember(type, [], out _, out _))
+                    {
+                        value = $"new ";
+                        return true;
+                    }
+
                     // Requested...
-                    while (type.HasCloneableAttribute(out _))
+                    while (type.HasInheritsWithAttribute(out _))
                     {
                         value = $"new ";
                         return true;
@@ -115,21 +141,23 @@ internal class XTypeNode : TypeNode, IXNode
     /// <summary>
     /// Invoked when the host is an interface.
     /// </summary>
+    [SuppressMessage("", "IDE0060")]
     bool EmitHostAbstract(SourceProductionContext context, CodeBuilder cb)
     {
-        var rtype = Symbol;
+        var rtype = Host;
         var rnull = false;
         if (Attribute.HasReturnType(out var xtype, out var xnull)) { rtype = xtype; rnull = xnull; }
 
-        var options = rtype.ReturnOptions(Symbol);
+        var options = rtype.ReturnOptions(Host);
         var stype = rtype.EasyName(options);
         var snull = rnull ? "?" : string.Empty;
+        var sarg = this.SymbolType.EasyName(EasyTypeSymbol.Full);
         var mods = GetModifiers();
 
         this.EmitDocumentation(cb);
-        cb.AppendLine($"{mods}{stype}{snull} Clone();");
+        cb.AppendLine($"{mods}{stype}{snull}");
+        cb.AppendLine($"{this.MethodName}({sarg} value);");
 
-        EmitExplicitInterfaces(context, cb);
         return true;
 
         /// <summary>
@@ -139,7 +167,7 @@ internal class XTypeNode : TypeNode, IXNode
         {
             // If appear in base types, modifiers must adapt...
             var found = Finder.Find(
-                null, [Symbol.AllBaseTypes, Symbol.AllInterfaces],
+                null, [Host.AllBaseTypes, Host.AllInterfaces],
                 out string? value,
                 (type, out value) =>
                 {
@@ -162,15 +190,28 @@ internal class XTypeNode : TypeNode, IXNode
                         }
                     }
 
+                    // Existing member...
+                    while (this.FindMember(type, [], out var member, out var at))
+                    {
+                        if (type.IsInterface) { value = $"public abstract "; return true; }
+
+                        var mvirt = at.HasUseVirtual(out var temp) ? temp : true;
+                        value = !mvirt
+                            ? $"public abstract new "
+                            : $"public abstract override ";
+                    }
+
                     // Requested...
-                    while (type.HasCloneableAttribute(out var at))
+                    while (type.HasInheritsWithAttribute(out var at))
                     {
                         if (type.IsInterface) { value = $"public abstract "; return true; }
                         if (type.IsAbstract) { value = $"public abstract override "; return true; }
                         else
                         {
                             // If appear in a base method, let's defer to it...
-                            if (this.FindMethod(null, [type.AllBaseTypes], out _)) break;
+                            if (this.FindMethod(null, [type.AllBaseTypes], out _) ||
+                                this.FindMember(null, [type.AllBaseTypes], out _, out _))
+                                break;
 
                             var mvirt = at.HasUseVirtual(out var temp) ? temp : true;
                             value = !mvirt
@@ -198,31 +239,39 @@ internal class XTypeNode : TypeNode, IXNode
     /// </summary>
     bool EmitHostRegular(SourceProductionContext context, CodeBuilder cb)
     {
-        var ctor = Symbol.FindCopyConstructor(strict: false);
-        if (ctor == null) { Symbol.ReportError(TreeError.NoCopyConstructor, context); return false; }
+        var ctor = Host.FindCopyConstructor(strict: false);
+        if (ctor == null) { Host.ReportError(TreeError.NoCopyConstructor, context); return false; }
 
-        var rtype = Symbol;
+        var rtype = Host;
         var rnull = false;
         if (Attribute.HasReturnType(out var xtype, out var xnull)) { rtype = xtype; rnull = xnull; }
 
-        var options = rtype.ReturnOptions(Symbol);
+        var options = rtype.ReturnOptions(Host);
         var stype = rtype.EasyName(options);
         var snull = rnull ? "?" : string.Empty;
+        var sarg = this.SymbolType.EasyName(EasyTypeSymbol.Full);
         var mods = GetModifiers();
 
         this.EmitDocumentation(cb);
-        cb.AppendLine($"{mods}{stype}{snull} Clone()");
+        cb.AppendLine($"{mods}{stype}{snull}");
+        cb.AppendLine($"{this.MethodName}({sarg} value)");
         cb.AppendLine("{");
         cb.IndentLevel++;
         {
-            var host = Symbol.EasyName();
-            cb.AppendLine($"var host = new {host}(this);");
+            var host = Host.EasyName();
+            cb.AppendLine($"var host = new {host}(this)");
+            cb.AppendLine("{");
+            cb.IndentLevel++;
+            {
+                cb.AppendLine($"{this.SymbolName} = value");
+            }
+            cb.IndentLevel--;
+            cb.AppendLine("};");
             cb.AppendLine($"return host;");
         }
         cb.IndentLevel--;
         cb.AppendLine("}");
 
-        EmitExplicitInterfaces(context, cb);
         return true;
 
         /// <summary>
@@ -232,11 +281,11 @@ internal class XTypeNode : TypeNode, IXNode
         {
             var hasv = Attribute.HasUseVirtual(out var xvirt);
             var hvirt = hasv ? xvirt : true;
-            var hsealed = Symbol.IsSealed;
+            var hsealed = Host.IsSealed || Symbol.IsSealed;
 
             // If appear in base types, modifiers must adapt...
             var found = Finder.Find(
-                null, [Symbol.AllBaseTypes, Symbol.AllInterfaces],
+                null, [Host.AllBaseTypes, Host.AllInterfaces],
                 out string? value,
                 (type, out value) =>
                 {
@@ -262,8 +311,25 @@ internal class XTypeNode : TypeNode, IXNode
                         }
                     }
 
+                    // Existing member...
+                    while (this.FindMember(type, [], out var member, out var at))
+                    {
+                        if (type.IsInterface)
+                        {
+                            value = hsealed || !hvirt ? $"public " : $"public virtual ";
+                            return true;
+                        }
+
+                        var mvirt = at.HasUseVirtual(out var temp) ? temp : true;
+                        value = mvirt
+                            ? (!hvirt ? $"public new " : $"public override ")
+                            : (!hvirt ? $"public new " : $"public new virtual ");
+
+                        return true;
+                    }
+
                     // Requested...
-                    while (type.HasCloneableAttribute(out var at))
+                    while (type.HasInheritsWithAttribute(out var at))
                     {
                         if (type.IsInterface)
                         {
@@ -273,7 +339,9 @@ internal class XTypeNode : TypeNode, IXNode
                         else
                         {
                             // If appear in a base method, let's defer to it...
-                            if (this.FindMethod(null, [type.AllBaseTypes], out _)) break;
+                            if (this.FindMethod(null, [type.AllBaseTypes], out _) ||
+                                this.FindMember(null, [type.AllBaseTypes], out _, out _))
+                                break;
 
                             var mvirt = at.HasUseVirtual(out var temp) ? temp : true;
                             value = mvirt
@@ -285,91 +353,13 @@ internal class XTypeNode : TypeNode, IXNode
                     }
 
                     // Try next...
-                    value = null;
+                    value = default;
                     return false;
                 });
 
+
             // Finishing...
             return found ? value : (hsealed || !hvirt ? "public " : "public virtual ");
-        }
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Invoked to emit the interfaces that need explicit implementation, if any.
-    /// </summary>
-    [SuppressMessage("", "IDE0060")]
-    void EmitExplicitInterfaces(SourceProductionContext context, CodeBuilder cb)
-    {
-        var items = GetExplicitInterfaces();
-        foreach (var item in items)
-        {
-            var iface = item.IFace.EasyName(EasyTypeSymbol.Full with { NullableStyle = IsNullableStyle.None });
-            
-            // ICloneable's special case...
-            var core = item.IFace.Name == "ICloneable";
-            var rtype = core ? "object" : item.RType.EasyName(EasyTypeSymbol.Full);
-            if (item.RNullable && !rtype.EndsWith('?')) rtype += '?';
-
-            cb.AppendLine();
-            cb.AppendLine($"{rtype}");
-            cb.AppendLine($"{iface}.Clone()");
-            cb.AppendLine($"=> ({rtype})Clone();");
-        }
-    }
-
-    // ----------------------------------------------------
-
-    record Explicit(INamedTypeSymbol IFace, INamedTypeSymbol RType, bool RNullable);
-
-    /// <summary>
-    /// Obtains the list of interfaces that need explicit implementation.
-    /// </summary>
-    /// <returns></returns>
-    List<Explicit> GetExplicitInterfaces()
-    {
-        var comparer = SymbolEqualityComparer.Default;
-        List<Explicit> list = [];
-
-        foreach (var iface in Symbol.Interfaces) TryCapture(iface);
-        return list;
-
-        // Tries to capture the given interface...
-        void TryCapture(INamedTypeSymbol iface)
-        {
-            // Childs first...
-            foreach (var child in iface.Interfaces) TryCapture(child);
-
-            // If already captured, we're done...
-            var temp = list.Find(x => comparer.Equals(x.IFace, iface));
-            if (temp != null) return;
-
-            // Special case: ICloneable..
-            if (iface.Name == "ICloneable")
-            {
-                var item = new Explicit(iface, null!, false); // 'null' will be intercepted later
-                list.Add(item);
-                return;
-            }
-
-            // Method existing...
-            if (this.FindMethod(iface, [], out var method))
-            {
-                var rtype = ((INamedTypeSymbol)method.ReturnType).UnwrapNullable(out var rnull);
-                var item = new Explicit(iface, rtype, rnull);
-                list.Add(item);
-                return;
-            }
-
-            // Requested...
-            if (iface.HasCloneableAttribute(out var at))
-            {
-                var rtype = at.HasReturnType(out var xtype, out var rnull) ? xtype : iface;
-                var item = new Explicit(iface, rtype, rnull);
-                list.Add(item);
-                return;
-            }
         }
     }
 }
