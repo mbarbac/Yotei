@@ -26,9 +26,13 @@ internal static partial class EasyNameExtensions
     /// <summary>
     /// Determines if the type is a nullable wrapper, or not.
     /// </summary>
-    static bool IsNullableWrapper(this Type source) =>
-        source.Name.StartsWith("Nullable`1") ||
-        source.Name.StartsWith("EasyNullable`1");
+    static bool IsNullableWrapper(this Type source)
+    {
+        if (source.GetGenericArguments().Length != 1) return false;
+        if (source.Name.StartsWith("Nullable`1")) return true;
+        if (source.Name.StartsWith("IsNullable`1")) return true;
+        return false;
+    }
 
     // ----------------------------------------------------
 
@@ -92,30 +96,30 @@ internal static partial class EasyNameExtensions
     /// <summary>
     /// Determines nullability by using the <see cref="IsNullableAttribute"/> attribute.
     /// </summary>
-    static bool ByEasyNullableAttribute(this Type source)
+    static bool ByIsNullableAttribute(this Type source)
         => source.GetCustomAttributes<IsNullableAttribute>().Any();
 
     /// <summary>
     /// Determines nullability by using the <see cref="IsNullableAttribute"/> attribute.
     /// </summary>
-    static bool ByEasyNullableAttribute(this ParameterInfo source)
+    static bool ByIsNullableAttribute(this ParameterInfo source)
         => source.GetCustomAttributes<IsNullableAttribute>().Any();
 
     /// <summary>
     /// Determines nullability by using the <see cref="IsNullableAttribute"/> attribute.
     /// </summary>
-    static bool ByEasyNullableAttribute(this MethodInfo source)
+    static bool ByIsNullableAttribute(this MethodInfo source)
         => source.GetCustomAttributes<IsNullableAttribute>().Any();
 
     /// <summary>
     /// Determines nullability by using the <see cref="IsNullableAttribute"/> attribute.
     /// </summary>
-    static bool ByEasyNullableAttribute(this PropertyInfo source)
+    static bool ByIsNullableAttribute(this PropertyInfo source)
         => source.GetCustomAttributes<IsNullableAttribute>().Any();
 
     /// <summary>
     /// Determines nullability by using the <see cref="IsNullableAttribute"/> attribute.
     /// </summary>
-    static bool ByEasyNullableAttribute(this FieldInfo source)
+    static bool ByIsNullableAttribute(this FieldInfo source)
         => source.GetCustomAttributes<IsNullableAttribute>().Any();
 }

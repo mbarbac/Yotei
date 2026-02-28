@@ -138,7 +138,7 @@ public static class Test_SketchExtensions
 
         options = FULL;
         name = item.Sketch(options);
-        Assert.Equal("Yotei.Tools.EasyNullable<System.String>", name);
+        Assert.Equal("Yotei.Tools.IsNullable<System.String>", name);
     }
 
     // ----------------------------------------------------

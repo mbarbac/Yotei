@@ -92,7 +92,7 @@ public static class Test_EasyName_Property
         options = FULL;
         name = item.EasyName(options);
         Assert.Equal(
-            $"Yotei.Tools.EasyNullable<System.String> {NAMESPACE}.{TESTNAME}.Type0C.Name",
+            $"Yotei.Tools.IsNullable<System.String> {NAMESPACE}.{TESTNAME}.Type0C.Name",
             name);
     }
 

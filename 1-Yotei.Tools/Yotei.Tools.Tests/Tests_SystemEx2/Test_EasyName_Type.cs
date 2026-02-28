@@ -89,13 +89,13 @@ public static class Test_EasyName_Type
 
         options = FULL;
         name = item.EasyName(options);
-        Assert.Equal("Yotei.Tools.EasyNullable<System.String>", name);
+        Assert.Equal("Yotei.Tools.IsNullable<System.String>", name);
     }
 
     // ----------------------------------------------------
 
-    // Using 'EasyNullable<T>' is not allowed in this context.
-    // Using '[EasyNullable]' is ok because the type is a generic one.
+    // Using 'IsNullable<T>' is not allowed in this context.
+    // Using '[IsNullable]' is ok because the type is a generic one.
     public interface IFace1<[IsNullable] T> { }
 
     //[Enforced]
@@ -152,7 +152,7 @@ public static class Test_EasyName_Type
         options = FULL;
         name = item.EasyName(options);
         Assert.Equal(
-            $"{NAMESPACE}.{TESTNAME}.IFace1<Yotei.Tools.EasyNullable<System.String>>",
+            $"{NAMESPACE}.{TESTNAME}.IFace1<Yotei.Tools.IsNullable<System.String>>",
             name);
     }
 
@@ -218,7 +218,7 @@ public static class Test_EasyName_Type
         options = FULL;
         name = item.EasyName(options);
         Assert.Equal(
-            $"{NAMESPACE}.{TESTNAME}.IFace2A<Yotei.Tools.EasyNullable<System.String>>",
+            $"{NAMESPACE}.{TESTNAME}.IFace2A<Yotei.Tools.IsNullable<System.String>>",
             name);
     }
 
@@ -248,7 +248,7 @@ public static class Test_EasyName_Type
 
         options = FULL;
         name = item.EasyName(options);
-        Assert.Equal($"{NAMESPACE}.{TESTNAME}.IFace2A<Yotei.Tools.EasyNullable<T>>", name);
+        Assert.Equal($"{NAMESPACE}.{TESTNAME}.IFace2A<Yotei.Tools.IsNullable<T>>", name);
 
         // Bound (wrapped nullability inherited, no need for annotation)...
         type = typeof(IFace2C<string>);
@@ -270,7 +270,7 @@ public static class Test_EasyName_Type
         options = FULL;
         name = item.EasyName(options);
         Assert.Equal(
-            $"{NAMESPACE}.{TESTNAME}.IFace2A<Yotei.Tools.EasyNullable<System.String>>",
+            $"{NAMESPACE}.{TESTNAME}.IFace2A<Yotei.Tools.IsNullable<System.String>>",
             name);
     }
 
@@ -337,7 +337,7 @@ public static class Test_EasyName_Type
         name = item.EasyName(options);
         Assert.Equal(
             $"{NAMESPACE}.{TESTNAME}." +
-            "IFace3A<System.Nullable<System.Int32>>.IFace3B<Yotei.Tools.EasyNullable<System.String>>",
+            "IFace3A<System.Nullable<System.Int32>>.IFace3B<Yotei.Tools.IsNullable<System.String>>",
             name);
     }
 
@@ -406,7 +406,7 @@ public static class Test_EasyName_Type
         Assert.Equal(
             $"{NAMESPACE}.{TESTNAME}.Type4A<System.Byte, System.Int16>." +
             "Type4B<System.Int32>." +
-            "Type4C<System.Nullable<System.Int64>, Yotei.Tools.EasyNullable<System.String>>",
+            "Type4C<System.Nullable<System.Int64>, Yotei.Tools.IsNullable<System.String>>",
             name);
     }
 }

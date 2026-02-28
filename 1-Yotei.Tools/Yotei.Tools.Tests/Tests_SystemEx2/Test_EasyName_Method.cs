@@ -89,7 +89,7 @@ public static class Test_EasyName_Method
         name = item.EasyName(options);
         Assert.Equal(
             $"System.Void {NAMESPACE}.{TESTNAME}.IFace0C." +
-            "Name(ref Yotei.Tools.EasyNullable<System.String> one)",
+            "Name(ref Yotei.Tools.IsNullable<System.String> one)",
             name);
     }
 

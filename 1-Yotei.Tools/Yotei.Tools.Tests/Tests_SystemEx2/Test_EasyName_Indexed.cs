@@ -50,7 +50,7 @@ public static class Test_EasyName_Indexed
         public string? this[int? one, in string? two] => default!;
     }
 
-    // Using '[EasyNullable]' on the property to make its return type nullable...
+    // Using '[IsNullable]' on the property to make its return type nullable...
     //[Enforced]
     [Fact]
     public static void Test0B_Custom_Indexer_Name()
@@ -150,8 +150,8 @@ public static class Test_EasyName_Indexed
         Assert.Equal(
             $"System.Nullable<System.Byte> {NAMESPACE}.{TESTNAME}." +
             "Type1A<System.Nullable<System.Byte>, System.Nullable<System.Int32>>." +
-            "Type1B<Yotei.Tools.EasyNullable<System.String>>." +
-            "Item[System.Nullable<System.Int32> one, Yotei.Tools.EasyNullable<System.String> two]",
+            "Type1B<Yotei.Tools.IsNullable<System.String>>." +
+            "Item[System.Nullable<System.Int32> one, Yotei.Tools.IsNullable<System.String> two]",
             name);
     }
 

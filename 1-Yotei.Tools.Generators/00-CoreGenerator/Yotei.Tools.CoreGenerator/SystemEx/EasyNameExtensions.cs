@@ -114,7 +114,7 @@ internal static partial class EasyNameExtensions
                 break;
 
             if (source.ByNullableAttribute()) { sb.Append('?'); break; }
-            if (source.ByEasyNullableAttribute()) { sb.Append('?'); break; }
+            if (source.ByIsNullableAttribute()) { sb.Append('?'); break; }
             break;
         }
 
@@ -164,7 +164,7 @@ internal static partial class EasyNameExtensions
 
                 if (source.ByNullabilityApi()) { sb.Append('?'); break; }
                 if (source.ByNullableAttribute()) { sb.Append('?'); break; }
-                if (source.ByEasyNullableAttribute()) { sb.Append('?'); break; }
+                if (source.ByIsNullableAttribute()) { sb.Append('?'); break; }
                 break;
             }
         }
@@ -238,7 +238,7 @@ internal static partial class EasyNameExtensions
                         type.IsNullableWrapper())
                         break;
 
-                    if (source.ByEasyNullableAttribute()) { sb.Append('?'); break; }
+                    if (source.ByIsNullableAttribute()) { sb.Append('?'); break; }
 
                     break;
                 }
@@ -412,8 +412,8 @@ internal static partial class EasyNameExtensions
                         break;
 
                     if (source.ByNullabilityApi()) { sb.Append('?'); break; }
-                    if (source.ByEasyNullableAttribute()) { sb.Append('?'); break; }
-                    if (source.ByEasyNullableAttribute()) { sb.Append('?'); break; }
+                    if (source.ByIsNullableAttribute()) { sb.Append('?'); break; }
+                    if (source.ByIsNullableAttribute()) { sb.Append('?'); break; }
                     break;
                 }
 
@@ -515,8 +515,8 @@ internal static partial class EasyNameExtensions
                         break;
 
                     if (source.ByNullabilityApi()) { sb.Append('?'); break; }
-                    if (source.ByEasyNullableAttribute()) { sb.Append('?'); break; }
-                    if (source.ByEasyNullableAttribute()) { sb.Append('?'); break; }
+                    if (source.ByIsNullableAttribute()) { sb.Append('?'); break; }
+                    if (source.ByIsNullableAttribute()) { sb.Append('?'); break; }
                     break;
                 }
 
