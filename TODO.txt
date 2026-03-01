@@ -1,3 +1,0 @@
-Generators:
-- Eliminar 'Validate' => debe ser parte de 'Emit', para evitar inconsistencias. Así, cuando
-  vayamos a emitir algo, lo comprobamos sobre la marchar.
