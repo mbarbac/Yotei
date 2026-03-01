@@ -156,9 +156,12 @@ internal static class XNode
     {
         public string SymbolName => node.Symbol.Name;
 
-        public INamedTypeSymbol SymbolType => node.Symbol is IPropertySymbol prop
-            ? (INamedTypeSymbol)prop.Type
-            : (INamedTypeSymbol)((IFieldSymbol)node.Symbol).Type;
+        public ITypeSymbol SymbolType => node.Symbol switch
+        {
+            IPropertySymbol item => item.Type,
+            IFieldSymbol item => item.Type,
+            _ => throw new UnExpectedException()
+        };
 
         public string MethodName => $"With{node.SymbolName}";
 

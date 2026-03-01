@@ -200,8 +200,10 @@ internal class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
 
                         var mvirt = at.HasUseVirtual(out var temp) ? temp : true;
                         value = !mvirt
-                            ? $"public abstract new "
+                            ? $"public abstract override "
                             : $"public abstract override ";
+
+                        return true;
                     }
 
                     // Requested...
@@ -396,7 +398,7 @@ internal class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
 
     record Explicit(
         INamedTypeSymbol IFace,
-        INamedTypeSymbol RType, bool RNullable, INamedTypeSymbol ArgType);
+        INamedTypeSymbol RType, bool RNullable, ITypeSymbol ArgType);
 
     /// <summary>
     /// Obtains the list of interfaces that need explicit implementation.
@@ -424,7 +426,7 @@ internal class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
             if (this.FindMethod(iface, [], out var method))
             {
                 var rtype = ((INamedTypeSymbol)method.ReturnType).UnwrapNullable(out var rnull);
-                var argtype = (INamedTypeSymbol)method.Parameters[0].Type;
+                var argtype = method.Parameters[0].Type;
                 var item = new Explicit(iface, rtype, rnull, argtype);
                 list.Add(item);
                 return;
@@ -434,7 +436,7 @@ internal class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
             if (this.FindMember(iface, [], out var member, out var at))
             {
                 var rtype = at.HasReturnType(out var xtype, out var rnull) ? xtype : iface;
-                var argtype = (INamedTypeSymbol)member.Type;
+                var argtype = member.Type;
                 var item = new Explicit(iface, rtype, rnull, argtype);
                 list.Add(item);
                 return;

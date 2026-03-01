@@ -144,6 +144,8 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
     [SuppressMessage("", "IDE0060")]
     bool EmitHostAbstract(SourceProductionContext context, CodeBuilder cb)
     {
+        if (Host.Name == "AType21B") { } // DEBUG-ONLY
+
         var rtype = Host;
         var rnull = false;
         if (Attribute.HasReturnType(out var xtype, out var xnull)) { rtype = xtype; rnull = xnull; }
@@ -197,8 +199,10 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
 
                         var mvirt = at.HasUseVirtual(out var temp) ? temp : true;
                         value = !mvirt
-                            ? $"public abstract new "
+                            ? $"public abstract override "
                             : $"public abstract override ";
+
+                        return true;
                     }
 
                     // Requested...
