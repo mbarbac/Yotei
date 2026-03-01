@@ -2,58 +2,56 @@
 
 // ========================================================
 /// <summary>
-/// Represents an immutable list-alike collection of elements with customizable behavior.
+/// Represents a list-alike collection of elements, identified by their respective keys, with
+/// customizable behavior.
 /// </summary>
+/// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>
-public interface IInvariantList<T> : IReadOnlyList<T>, IReadOnlyCollection<T>, ICollection
+public interface ICoreList<K, T>
+    : IList<T>, IReadOnlyList<T>, IList
+    , ICollection<T>, IReadOnlyCollection<T>, ICollection
 {
-    /// <summary>
-    /// Returns a new builder based upon the contents in this instance.
-    /// </summary>
-    /// <returns></returns>
-    ICoreList<T> ToBuilder();
-
     /// <summary>
     /// Get the number of elements in this collection.
     /// </summary>
     new int Count { get; }
 
     /// <summary>
-    /// Gets the element at the given index.
+    /// Gets or sets the element at the given index.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    new T this[int index] { get; }
+    new T this[int index] { get; set; }
 
     /// <summary>
-    /// Determines if this instance contains an ocurrence of the given value, or not.
+    /// Determines if this instance contains an ocurrence of the given key, or not.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    bool Contains(T value);
+    bool Contains(K key);
 
     /// <summary>
-    /// Returns the index of the first ocurrence of the given value, or -1 if it cannot be found
-    /// using the rules in this instance.
+    /// Returns the index of the first ocurrence of an element with the given key, or -1 if it
+    /// cannot be found using the rules in this instance.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    int IndexOf(T value);
+    int IndexOf(K key);
 
     /// <summary>
-    /// Returns the index of the last ocurrence of the given value, or -1 if it cannot be found
-    /// using the rules in this instance.
+    /// Returns the index of the last ocurrence of an element with the given key, or -1 if it
+    /// cannot be found using the rules in this instance.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    int LastIndexOf(T value);
+    int LastIndexOf(K key);
 
     /// <summary>
-    /// Returns the indexes of all ocurrences of the given value.
+    /// Returns the indexes of all the ocurrences of elements with the given key.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    List<int> IndexesOf(T value);
+    List<int> IndexesOf(K key);
 
     /// <summary>
     /// Determines if this instance contains a element that matches the given predicate, or not.
@@ -79,7 +77,7 @@ public interface IInvariantList<T> : IReadOnlyList<T>, IReadOnlyCollection<T>, I
     int LastIndexOf(Predicate<T> predicate);
 
     /// <summary>
-    /// Returns the index of all the values in this collection that match the given predicate.
+    /// Returns the index of all the values in this collection that matche the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
@@ -133,8 +131,6 @@ public interface IInvariantList<T> : IReadOnlyList<T>, IReadOnlyCollection<T>, I
     /// <returns></returns>
     List<T> ToList(int index, int count);
 
-    // ----------------------------------------------------
-
     /// <summary>
     /// Returns a copy of this instance with the requested number of elements starting from the
     /// given index.
@@ -142,121 +138,114 @@ public interface IInvariantList<T> : IReadOnlyList<T>, IReadOnlyCollection<T>, I
     /// <param name="index"></param>
     /// <param name="other"></param>
     /// <returns></returns>
-    IInvariantList<T> GetRange(int index, T other);
-
-    /// <summary>
-    /// Returns a copy of this instance where the element at the given index has been replaced
-    /// by the other given one.
-    /// </summary>
-    /// <param name="index"></param>
-    /// <param name="other"></param>
-    /// <returns></returns>
-    IInvariantList<T> SetItem(int index, T other);
+    ICoreList<K, T> GetRange(int index, T other);
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a copy of this instance where the given value has been added to it.
+    /// Adds the given value to this instance.
+    /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    IInvariantList<T> Add(T value);
+    new int Add(T value);
 
     /// <summary>
-    /// Returns a copy of this instance where the elements from the given range have been added
-    /// to it.
+    /// Adds the elements from the given range to this instance.
+    /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    IInvariantList<T> AddRange(IEnumerable<T> range);
+    int AddRange(IEnumerable<T> range);
 
     /// <summary>
-    /// Returns a copy of this instance where the given value has been inserted into it at the
-    /// given index.
+    /// Inserts the given value into this instance at the given index.
+    /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    IInvariantList<T> Insert(int index, T value);
+    new int Insert(int index, T value);
 
     /// <summary>
-    /// Returns a copy of this instance where the elements from the given range have been inserted
-    /// into it starting at the given index.
+    /// Inserts the elements from the given range into this instance, starting at the given index.
+    /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    IInvariantList<T> InsertRange(int index, IEnumerable<T> range);
+    int InsertRange(int index, IEnumerable<T> range);
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a copy of this instance where the element at the given index has been removed.
+    /// Removes from this instance the value at the given index.
+    /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveAt(int index);
+    new int RemoveAt(int index);
 
     /// <summary>
-    /// Returns a copy of this instance where the requested number of elements, starting at the
-    /// given index, have been removed.
+    /// Removes from this instance the requested number of elements, starting at the given index.
+    /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveRange(int index, int count);
+    int RemoveRange(int index, int count);
 
     /// <summary>
-    /// Returns a copy of this instance where the first ocurrence of the given element has been
-    /// removed, if any.
+    /// Removes from this instance the first element with the given key, if any.
+    /// <br/> Returns the number of changes made.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    IInvariantList<T> Remove(T value);
+    int Remove(K key);
 
     /// <summary>
-    /// Returns a copy of this instance where the last ocurrence of the given element has been
-    /// removed, if any.
+    /// Removes from this instance the last element with the given key, if any.
+    /// <br/> Returns the number of changes made.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveLast(T value);
+    int RemoveLast(K key);
 
     /// <summary>
-    /// Returns a copy of this instance where all the ocurrences of the given element have been
-    /// removed, if any.
+    /// Removes from this instance all the elements with the given key, if any.
+    /// <br/> Returns the number of changes made.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveAll(T value);
+    int RemoveAll(K key);
 
     /// <summary>
-    /// Returns a copy of this instance where the first element that matches the given predicate,
-    /// if any, has been removed.
-    /// </summary>
-    /// <param name="predicate"></param>
-    /// <returns></returns>
-    IInvariantList<T> Remove(Predicate<T> predicate);
-
-    /// <summary>
-    /// Returns a copy of this instance where the last element that matches the given predicate,
-    /// if any, has been removed.
+    /// Removes from this instance the first value that matches the given predicate, if any.
+    /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveLast(Predicate<T> predicate);
+    int Remove(Predicate<T> predicate);
 
     /// <summary>
-    /// Returns a copy of this instance where all the elements that matches the given predicate,
-    /// if any, have been removed.
+    /// Removes from this instance the last value that matches the given predicate, if any.
+    /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveAll(Predicate<T> predicate);
+    int RemoveLast(Predicate<T> predicate);
+
+    /// <summary>
+    /// Removes from this instance all the values that match the given predicate, if any.
+    /// <br/> Returns the number of changes made.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    int RemoveAll(Predicate<T> predicate);
 
     /// <summary>
     /// Returns an empty copy of this instance, but keeping all configurations.
     /// </summary>
     /// <returns></returns>
-    IInvariantList<T> Clear();
+    new int Clear();
 }

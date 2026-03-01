@@ -2,10 +2,12 @@
 
 // ========================================================
 /// <summary>
-/// Represents an immutable list-alike collection of elements with customizable behavior.
+/// Represents an immutable list-alike collection of elements, identified by their respective
+/// keys, with customizable behavior.
 /// </summary>
+/// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>
-public interface IInvariantList<T> : IReadOnlyList<T>, IReadOnlyCollection<T>, ICollection
+public interface IInvariantList<K, T> : IReadOnlyList<T>, IReadOnlyCollection<T>, ICollection
 {
     /// <summary>
     /// Returns a new builder based upon the contents in this instance.
@@ -26,34 +28,34 @@ public interface IInvariantList<T> : IReadOnlyList<T>, IReadOnlyCollection<T>, I
     new T this[int index] { get; }
 
     /// <summary>
-    /// Determines if this instance contains an ocurrence of the given value, or not.
+    /// Determines if this instance contains an element with the given key, or not.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    bool Contains(T value);
+    bool Contains(K key);
 
     /// <summary>
-    /// Returns the index of the first ocurrence of the given value, or -1 if it cannot be found
+    /// Returns the index of the first element with the given key, or -1 if it cannot be found
     /// using the rules in this instance.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    int IndexOf(T value);
+    int IndexOf(K key);
 
     /// <summary>
-    /// Returns the index of the last ocurrence of the given value, or -1 if it cannot be found
+    /// Returns the index of the last element with the given key, or -1 if it cannot be found
     /// using the rules in this instance.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    int LastIndexOf(T value);
+    int LastIndexOf(K key);
 
     /// <summary>
-    /// Returns the indexes of all ocurrences of the given value.
+    /// Returns the index of al the elements with the given key.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    List<int> IndexesOf(T value);
+    List<int> IndexesOf(K key);
 
     /// <summary>
     /// Determines if this instance contains a element that matches the given predicate, or not.
@@ -79,7 +81,7 @@ public interface IInvariantList<T> : IReadOnlyList<T>, IReadOnlyCollection<T>, I
     int LastIndexOf(Predicate<T> predicate);
 
     /// <summary>
-    /// Returns the index of all the values in this collection that match the given predicate.
+    /// Returns the index of all the values in this collection that matche the given predicate.
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
@@ -142,7 +144,7 @@ public interface IInvariantList<T> : IReadOnlyList<T>, IReadOnlyCollection<T>, I
     /// <param name="index"></param>
     /// <param name="other"></param>
     /// <returns></returns>
-    IInvariantList<T> GetRange(int index, T other);
+    IInvariantList<K, T> GetRange(int index, T other);
 
     /// <summary>
     /// Returns a copy of this instance where the element at the given index has been replaced
@@ -151,7 +153,7 @@ public interface IInvariantList<T> : IReadOnlyList<T>, IReadOnlyCollection<T>, I
     /// <param name="index"></param>
     /// <param name="other"></param>
     /// <returns></returns>
-    IInvariantList<T> SetItem(int index, T other);
+    IInvariantList<K, T> SetItem(int index, T other);
 
     // ----------------------------------------------------
 
@@ -160,7 +162,7 @@ public interface IInvariantList<T> : IReadOnlyList<T>, IReadOnlyCollection<T>, I
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    IInvariantList<T> Add(T value);
+    IInvariantList<K, T> Add(T value);
 
     /// <summary>
     /// Returns a copy of this instance where the elements from the given range have been added
@@ -168,7 +170,7 @@ public interface IInvariantList<T> : IReadOnlyList<T>, IReadOnlyCollection<T>, I
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    IInvariantList<T> AddRange(IEnumerable<T> range);
+    IInvariantList<K, T> AddRange(IEnumerable<T> range);
 
     /// <summary>
     /// Returns a copy of this instance where the given value has been inserted into it at the
@@ -177,7 +179,7 @@ public interface IInvariantList<T> : IReadOnlyList<T>, IReadOnlyCollection<T>, I
     /// <param name="index"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    IInvariantList<T> Insert(int index, T value);
+    IInvariantList<K, T> Insert(int index, T value);
 
     /// <summary>
     /// Returns a copy of this instance where the elements from the given range have been inserted
@@ -186,7 +188,7 @@ public interface IInvariantList<T> : IReadOnlyList<T>, IReadOnlyCollection<T>, I
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    IInvariantList<T> InsertRange(int index, IEnumerable<T> range);
+    IInvariantList<K, T> InsertRange(int index, IEnumerable<T> range);
 
     // ----------------------------------------------------
 
@@ -195,7 +197,7 @@ public interface IInvariantList<T> : IReadOnlyList<T>, IReadOnlyCollection<T>, I
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveAt(int index);
+    IInvariantList<K, T> RemoveAt(int index);
 
     /// <summary>
     /// Returns a copy of this instance where the requested number of elements, starting at the
@@ -204,31 +206,31 @@ public interface IInvariantList<T> : IReadOnlyList<T>, IReadOnlyCollection<T>, I
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveRange(int index, int count);
+    IInvariantList<K, T> RemoveRange(int index, int count);
 
     /// <summary>
-    /// Returns a copy of this instance where the first ocurrence of the given element has been
+    /// Returns a copy of this instance where the first element with the given key has been
     /// removed, if any.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    IInvariantList<T> Remove(T value);
+    IInvariantList<K, T> Remove(K key);
 
     /// <summary>
-    /// Returns a copy of this instance where the last ocurrence of the given element has been
+    /// Returns a copy of this instance where the last element with the given key has been
     /// removed, if any.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveLast(T value);
+    IInvariantList<K, T> RemoveLast(K key);
 
     /// <summary>
-    /// Returns a copy of this instance where all the ocurrences of the given element have been
+    /// Returns a copy of this instance where all the elements with the given key have been
     /// removed, if any.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveAll(T value);
+    IInvariantList<K, T> RemoveAll(K key);
 
     /// <summary>
     /// Returns a copy of this instance where the first element that matches the given predicate,
@@ -236,7 +238,7 @@ public interface IInvariantList<T> : IReadOnlyList<T>, IReadOnlyCollection<T>, I
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IInvariantList<T> Remove(Predicate<T> predicate);
+    IInvariantList<K, T> Remove(Predicate<T> predicate);
 
     /// <summary>
     /// Returns a copy of this instance where the last element that matches the given predicate,
@@ -244,7 +246,7 @@ public interface IInvariantList<T> : IReadOnlyList<T>, IReadOnlyCollection<T>, I
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveLast(Predicate<T> predicate);
+    IInvariantList<K, T> RemoveLast(Predicate<T> predicate);
 
     /// <summary>
     /// Returns a copy of this instance where all the elements that matches the given predicate,
@@ -252,11 +254,11 @@ public interface IInvariantList<T> : IReadOnlyList<T>, IReadOnlyCollection<T>, I
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveAll(Predicate<T> predicate);
+    IInvariantList<K, T> RemoveAll(Predicate<T> predicate);
 
     /// <summary>
     /// Returns an empty copy of this instance, but keeping all configurations.
     /// </summary>
     /// <returns></returns>
-    IInvariantList<T> Clear();
+    IInvariantList<K, T> Clear();
 }

@@ -81,6 +81,34 @@ public interface ICoreList<T>
     /// <returns></returns>
     List<int> IndexesOf(Predicate<T> predicate);
 
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Tries to find the first ocurrence of a value that matches the given predicate.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    bool Find(Predicate<T> predicate, out T value);
+
+    /// <summary>
+    /// Tries to find the last ocurrence of a value that matches the given predicate.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    bool FindLast(Predicate<T> predicate, out T value);
+
+    /// <summary>
+    /// Tries to find all the ocurrences of values that match the given predicate.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    bool FindAll(Predicate<T> predicate, out List<T> range);
+
+    // ----------------------------------------------------
+
     /// <summary>
     /// Returns an array with the elements in this collection.
     /// </summary>
