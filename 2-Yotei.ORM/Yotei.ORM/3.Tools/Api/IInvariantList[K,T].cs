@@ -13,7 +13,7 @@ public interface IInvariantList<K, T> : IReadOnlyList<T>, IReadOnlyCollection<T>
     /// Returns a new builder based upon the contents in this instance.
     /// </summary>
     /// <returns></returns>
-    ICoreList<T> ToBuilder();
+    ICoreList<K, T> ToBuilder();
 
     /// <summary>
     /// Get the number of elements in this collection.

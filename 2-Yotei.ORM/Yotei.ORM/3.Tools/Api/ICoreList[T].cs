@@ -242,7 +242,7 @@ public interface ICoreList<T>
     int RemoveAll(Predicate<T> predicate);
 
     /// <summary>
-    /// Returns an empty copy of this instance, but keeping all configurations.
+    /// Clears this instance, but keeps all its configurations.
     /// </summary>
     /// <returns></returns>
     new int Clear();
