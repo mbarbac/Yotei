@@ -7,7 +7,8 @@
 /// </summary>
 /// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>
-public interface ICoreList<K, T>
+[Cloneable]
+public partial interface ICoreList<K, T>
     : IList<T>, IReadOnlyList<T>, IList
     , ICollection<T>, IReadOnlyCollection<T>, ICollection
 {
@@ -132,15 +133,20 @@ public interface ICoreList<K, T>
     List<T> ToList(int index, int count);
 
     /// <summary>
-    /// Returns a copy of this instance with the requested number of elements starting from the
-    /// given index.
+    /// Trims the internal structures of this instance.
     /// </summary>
-    /// <param name="index"></param>
-    /// <param name="other"></param>
-    /// <returns></returns>
-    ICoreList<K, T> GetRange(int index, T other);
+    void Trim();
 
     // ----------------------------------------------------
+
+    /// <summary>
+    /// Replaces the existing value at the given index with the new given one.
+    /// <br/> Returns the number of changes made.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    int Replace(int index, T value);
 
     /// <summary>
     /// Adds the given value to this instance.

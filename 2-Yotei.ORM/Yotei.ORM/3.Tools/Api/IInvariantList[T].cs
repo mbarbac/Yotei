@@ -5,7 +5,8 @@
 /// Represents an immutable list-alike collection of elements with customizable behavior.
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public interface IInvariantList<T> : IReadOnlyList<T>, IReadOnlyCollection<T>, ICollection
+[Cloneable]
+public partial interface IInvariantList<T> : IReadOnlyList<T>, IReadOnlyCollection<T>, ICollection
 {
     /// <summary>
     /// Returns a new builder based upon the contents in this instance.
@@ -151,7 +152,7 @@ public interface IInvariantList<T> : IReadOnlyList<T>, IReadOnlyCollection<T>, I
     /// <param name="index"></param>
     /// <param name="other"></param>
     /// <returns></returns>
-    IInvariantList<T> SetItem(int index, T other);
+    IInvariantList<T> Replace(int index, T other);
 
     // ----------------------------------------------------
 

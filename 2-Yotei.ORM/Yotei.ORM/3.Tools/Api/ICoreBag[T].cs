@@ -5,7 +5,8 @@
 /// Represents a bag-alike collection of elements with customizable behavior.
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, ICollection
+[Cloneable]
+public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, ICollection
 {
     /// <summary>
     /// Get the number of elements in this collection.

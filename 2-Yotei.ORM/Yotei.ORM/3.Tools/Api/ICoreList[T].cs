@@ -5,7 +5,8 @@
 /// Represents a list-alike collection of elements with customizable behavior.
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public interface ICoreList<T>
+[Cloneable]
+public partial interface ICoreList<T>
     : IList<T>, IReadOnlyList<T>, IList
     , ICollection<T>, IReadOnlyCollection<T>, ICollection
 {
@@ -130,15 +131,20 @@ public interface ICoreList<T>
     List<T> ToList(int index, int count);
 
     /// <summary>
-    /// Returns a copy of this instance with the requested number of elements starting from the
-    /// given index.
+    /// Trims the internal structures of this instance.
     /// </summary>
-    /// <param name="index"></param>
-    /// <param name="other"></param>
-    /// <returns></returns>
-    ICoreList<T> GetRange(int index, T other);
+    void Trim();
 
     // ----------------------------------------------------
+
+    /// <summary>
+    /// Replaces the existing value at the given index with the new given one.
+    /// <br/> Returns the number of changes made.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    int Replace(int index, T item);
 
     /// <summary>
     /// Adds the given value to this instance.
