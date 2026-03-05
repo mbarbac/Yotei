@@ -57,6 +57,11 @@ public partial interface ICoreBag<T> : ICollection<T>, IReadOnlyCollection<T>, I
     /// <returns></returns>
     List<T> ToList();
 
+    /// <summary>
+    /// Trims the internal structures of this instance.
+    /// </summary>
+    void Trim();
+
     // ----------------------------------------------------
 
     /// <summary>
