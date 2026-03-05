@@ -142,9 +142,9 @@ public partial interface ICoreList<T>
     /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="index"></param>
-    /// <param name="item"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    int Replace(int index, T item);
+    int Replace(int index, T value);
 
     /// <summary>
     /// Adds the given value to this instance.
@@ -200,7 +200,8 @@ public partial interface ICoreList<T>
     int RemoveRange(int index, int count);
 
     /// <summary>
-    /// Removes from this instance the first ocurrence of the given value, if any.
+    /// Removes from this instance the first ocurrence of the given value, if any. If that value
+    /// is a enumerable one, and flattening is enabled, then its elements are removed instead.
     /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="value"></param>
@@ -208,7 +209,8 @@ public partial interface ICoreList<T>
     new int Remove(T value);
 
     /// <summary>
-    /// Removes from this instance the last ocurrence of the given value, if any.
+    /// Removes from this instance the last ocurrence of the given value, if any. If that value
+    /// is a enumerable one, and flattening is enabled, then its elements are removed instead.
     /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="value"></param>
@@ -216,7 +218,8 @@ public partial interface ICoreList<T>
     int RemoveLast(T value);
 
     /// <summary>
-    /// Removes from this instance all the ocurrences of the given value, if any.
+    /// Removes from this instance all the ocurrences of the given value, if any. If that value
+    /// is a enumerable one, and flattening is enabled, then its elements are removed instead.
     /// <br/> Returns the number of changes made.
     /// </summary>
     /// <param name="value"></param>

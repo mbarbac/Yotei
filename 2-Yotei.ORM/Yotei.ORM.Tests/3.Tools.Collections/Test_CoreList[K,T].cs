@@ -18,6 +18,7 @@ public static partial class Test_CoreList_KT
     readonly static Named xtwo = new("two");
     readonly static Named xthree = new("three");
     readonly static Named xfour = new("four");
+    readonly static Named xfive = new("five");
 
     // ----------------------------------------------------
 
@@ -31,6 +32,7 @@ public static partial class Test_CoreList_KT
         {
             AcceptDuplicates = source.AcceptDuplicates;
             IgnoreCase = source.IgnoreCase;
+            Flatten = source.Flatten;
             AddRange(source);
         }
 
@@ -39,14 +41,14 @@ public static partial class Test_CoreList_KT
             IElement value) => value == null || value is not Named named ? null! : named.Name;
         public override string ValidateKey(string key) => key.NotNullNotEmpty(trim: true);
         public override bool CompareKeys(string source, string target) => Comparer.Equals(source, target);
-        public override bool FlattenInput(IElement _) => true;
+        public override bool FlattenInput(IElement _) => Flatten;
         public override IEnumerable<IElement> FindDuplicates(string key) => base.FindDuplicates(key);
         public override bool IncludeDuplicate(IElement source, IElement target)
             => AcceptDuplicates
             ? true
             : throw new DuplicateException("Duplicates not allowed.").WithData(source).WithData(target);
 
-        public bool AcceptDuplicates
+        public bool Flatten // Used to test flatten or not scenarios...
         {
             get;
             set
@@ -61,7 +63,22 @@ public static partial class Test_CoreList_KT
         }
         = false;
 
-        public bool IgnoreCase
+        public bool AcceptDuplicates // Used to test duplicates accepted or not scenarios...
+        {
+            get;
+            set
+            {
+                if (field == value) return;
+                if (Count == 0) { field = value; return; }
+
+                var range = ToList(); Clear();
+                field = value;
+                AddRange(range);
+            }
+        }
+        = false;
+
+        public bool IgnoreCase // Used to test key equality scenarios...
         {
             get => Comparer.IgnoreCase;
             set
@@ -148,16 +165,16 @@ public static partial class Test_CoreList_KT
         Assert.NotSame(source, target);
         Assert.Empty(target);
 
-        source = new Chain([xone, xtwo, xthree]) { AcceptDuplicates = true, IgnoreCase = true };
+        source = new Chain([xone, xtwo]) { AcceptDuplicates = true, IgnoreCase = true, Flatten = true };
         target = source.Clone();
         Assert.NotSame(source, target);
-        Assert.Equal(3, target.Count);
+        Assert.Equal(2, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
         Assert.IsType<Chain>(target);
         Assert.True(((Chain)target).AcceptDuplicates);
         Assert.True(((Chain)target).IgnoreCase);
+        Assert.True(((Chain)target).Flatten);
     }
 
     // ----------------------------------------------------
@@ -176,6 +193,8 @@ public static partial class Test_CoreList_KT
         try { chain[-1] = xfour; Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
         try { chain[3] = xfour; Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
     }
+
+    // ----------------------------------------------------
 
     //[Enforced]
     [Fact]
@@ -219,11 +238,11 @@ public static partial class Test_CoreList_KT
 
     //[Enforced]
     [Fact]
-    public static void Test_Replace_Empty()
+    public static void Test_Replace_Empty_With_Flatten()
     {
-        var chain = new Chain([xone, xtwo, xthree]);
-        var done = chain.Replace(0, new Chain());
+        var chain = new Chain([xone, xtwo, xthree]) { Flatten = true };
 
+        var done = chain.Replace(0, new Chain());
         Assert.Equal(0, done);
         Assert.Equal(3, chain.Count);
         Assert.Same(xone, chain[0]);
@@ -233,12 +252,28 @@ public static partial class Test_CoreList_KT
 
     //[Enforced]
     [Fact]
-    public static void Test_Replace_Range()
-    {        
+    public static void Test_Replace_Empty_No_Flatten()
+    {
+        Chain other;
+        var chain = new Chain([xone, xtwo, xthree]) { Flatten = false };
+
+        var done = chain.Replace(0, new Chain());
+        Assert.Equal(1, done);
+        Assert.Equal(3, chain.Count);
+        other = Assert.IsType<Chain>(chain[0]);
+        Assert.Empty(other);
+        Assert.Same(xtwo, chain[1]);
+        Assert.Same(xthree, chain[2]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Replace_Range_With_Flatten()
+    {
         var xalpha = new Named("alpha");
         var xbeta = new Named("beta");
 
-        var chain = new Chain([xone, xtwo, xthree]);
+        var chain = new Chain([xone, xtwo, xthree]) { Flatten = true };
         var done = chain.Replace(0, new Chain([xalpha, xbeta]));
         Assert.Equal(2, done);
         Assert.Equal(4, chain.Count);
@@ -247,7 +282,7 @@ public static partial class Test_CoreList_KT
         Assert.Same(xtwo, chain[2]);
         Assert.Same(xthree, chain[3]);
 
-        chain = new Chain([xone, xtwo, xthree]);
+        chain = new Chain([xone, xtwo, xthree]) { Flatten = true };
         done = chain.Replace(1, new Chain([xalpha, xbeta]));
         Assert.Equal(2, done);
         Assert.Equal(4, chain.Count);
@@ -256,7 +291,7 @@ public static partial class Test_CoreList_KT
         Assert.Same(xbeta, chain[2]);
         Assert.Same(xthree, chain[3]);
 
-        chain = new Chain([xone, xtwo, xthree]);
+        chain = new Chain([xone, xtwo, xthree]) { Flatten = true };
         done = chain.Replace(2, new Chain([xalpha, xbeta]));
         Assert.Equal(2, done);
         Assert.Equal(4, chain.Count);
@@ -264,6 +299,25 @@ public static partial class Test_CoreList_KT
         Assert.Same(xtwo, chain[1]);
         Assert.Same(xalpha, chain[2]);
         Assert.Same(xbeta, chain[3]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Replace_Range_No_Flatten()
+    {
+        var xalpha = new Named("alpha");
+        var xbeta = new Named("beta");
+
+        var chain = new Chain([xone, xtwo, xthree]);
+        var done = chain.Replace(1, new Chain([xalpha, xbeta]));
+        Assert.Equal(1, done);
+        Assert.Equal(3, chain.Count);
+        Assert.Same(xone, chain[0]);
+        var other = Assert.IsType<Chain>(chain[1]);
+        Assert.Equal(2, other.Count);
+        Assert.Same(xalpha, other[0]);
+        Assert.Same(xbeta, other[1]);
+        Assert.Same(xthree, chain[2]);
     }
 
     // ----------------------------------------------------
@@ -351,53 +405,410 @@ public static partial class Test_CoreList_KT
 
     //[Enforced]
     [Fact]
-    public static void Test_Add() => throw null;
+    public static void Test_Add()
+    {
+        var chain = new Chain();
+        var done = chain.Add(xone);
+        Assert.Equal(1, done);
+        Assert.Single(chain);
+        Assert.Same(xone, chain[0]);
+
+        done = chain.Add(xtwo);
+        Assert.Equal(1, done);
+        Assert.Equal(2, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xtwo, chain[1]);
+
+        try { chain.Add(null!); Assert.Fail(); } catch (ArgumentNullException) { }
+        try { chain.Add(xone); Assert.Fail(); } catch (DuplicateException) { }
+
+        chain = new Chain([xone]) { IgnoreCase = true };
+        try { chain.Add(new Named("ONE")); Assert.Fail(); } catch (DuplicateException) { }
+
+        chain.AcceptDuplicates = true;
+        done = chain.Add(xone);
+        Assert.Equal(1, done);
+        Assert.Equal(2, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xone, chain[1]);
+
+        done = chain.Add(new Named("ONE"));
+        Assert.Equal(1, done);
+        Assert.Equal(3, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xone, chain[1]);
+        Assert.Equal("ONE", ((Named)chain[2]).Name);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Add_Nested_With_Flatten()
+    {
+        var chain = new Chain([xone, xtwo]) { Flatten = true };
+        var done = chain.Add(new Chain([xthree, xfour]));
+
+        Assert.Equal(2, done);
+        Assert.Equal(4, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xtwo, chain[1]);
+        Assert.Same(xthree, chain[2]);
+        Assert.Same(xfour, chain[3]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Add_Nested_No_Flatten()
+    {
+        Chain other;
+        var chain = new Chain([xone, xtwo]);
+        var done = chain.Add(new Chain([xthree, xfour]));
+
+        Assert.Equal(1, done);
+        Assert.Equal(3, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xtwo, chain[1]);
+        other = Assert.IsType<Chain>(chain[2]);
+        Assert.Equal(2, other.Count);
+        Assert.Same(xthree, other[0]);
+        Assert.Same(xfour, other[1]);
+    }
 
     // ----------------------------------------------------
 
     //[Enforced]
     [Fact]
-    public static void Test_AddRange() => throw null;
+    public static void Test_AddRange()
+    {
+        var chain = new Chain([xone, xtwo]);
+        var done = chain.AddRange([]);
+        Assert.Equal(0, done);
+
+        done = chain.AddRange([xthree, xfour]);
+        Assert.Equal(2, done);
+        Assert.Equal(4, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xtwo, chain[1]);
+        Assert.Same(xthree, chain[2]);
+        Assert.Same(xfour, chain[3]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_AddRange_Nested_With_Flatten()
+    {
+        var chain = new Chain([xone, xtwo]) { Flatten = true };
+        var done = chain.AddRange([xthree, new Chain([xfour, xfive])]);
+
+        Assert.Equal(3, done);
+        Assert.Equal(5, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xtwo, chain[1]);
+        Assert.Same(xthree, chain[2]);
+        Assert.Same(xfour, chain[3]);
+        Assert.Same(xfive, chain[4]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_AddRange_Nested_No_Flatten()
+    {
+        var chain = new Chain([xone, xtwo]);
+        var done = chain.AddRange([xthree, new Chain([xfour, xfive])]);
+
+        Assert.Equal(2, done);
+        Assert.Equal(4, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xtwo, chain[1]);
+        Assert.Same(xthree, chain[2]);
+        var other = Assert.IsType<Chain>(chain[3]);
+        Assert.Equal(2, other.Count);
+        Assert.Same(xfour, other[0]);
+        Assert.Same(xfive, other[1]);
+    }
 
     // ----------------------------------------------------
 
     //[Enforced]
     [Fact]
-    public static void Test_Insert() => throw null;
+    public static void Test_Insert()
+    {
+        var chain = new Chain();
+        var done = chain.Insert(0, xone);
+        Assert.Single(chain);
+        Assert.Same(xone, chain[0]);
+
+        done = chain.Insert(1, xtwo);
+        Assert.Equal(1, done);
+        Assert.Equal(2, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xtwo, chain[1]);
+
+        done = chain.Insert(0, xthree);
+        Assert.Equal(1, done);
+        Assert.Equal(3, chain.Count);
+        Assert.Same(xthree, chain[0]);
+        Assert.Same(xone, chain[1]);
+        Assert.Same(xtwo, chain[2]);
+
+        try { chain.Insert(0, null!); Assert.Fail(); } catch (ArgumentNullException) { }
+        try { chain.Insert(0, xone); Assert.Fail(); } catch (DuplicateException) { }
+        try { chain.Insert(-1, xfive); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+        try { chain.Insert(4, xfive); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+
+        chain.IgnoreCase = true;
+        try { chain.Insert(0, new Named("ONE")); Assert.Fail(); } catch (DuplicateException) { }
+
+        chain.AcceptDuplicates = true;
+        done = chain.Insert(3, xone);
+        Assert.Equal(1, done);
+        Assert.Equal(4, chain.Count);
+        Assert.Same(xthree, chain[0]);
+        Assert.Same(xone, chain[1]);
+        Assert.Same(xtwo, chain[2]);
+        Assert.Same(xone, chain[3]);
+
+        done = chain.Insert(0, new Named("ONE"));
+        Assert.Equal(1, done);
+        Assert.Equal(5, chain.Count);
+        Assert.Equal("ONE", ((Named)chain[0]).Name);
+        Assert.Same(xthree, chain[1]);
+        Assert.Same(xone, chain[2]);
+        Assert.Same(xtwo, chain[3]);
+        Assert.Same(xone, chain[4]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Insert_Nested_With_Flatten()
+    {
+        var chain = new Chain([xone, xtwo]) { Flatten = true };
+        var done = chain.Insert(2, new Chain([xthree, xfour]));
+
+        Assert.Equal(2, done);
+        Assert.Equal(4, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xtwo, chain[1]);
+        Assert.Same(xthree, chain[2]);
+        Assert.Same(xfour, chain[3]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Insert_Nested_No_Flatten()
+    {
+        Chain other;
+        var chain = new Chain([xone, xtwo]);
+        var done = chain.Insert(2, new Chain([xthree, xfour]));
+
+        Assert.Equal(1, done);
+        Assert.Equal(3, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xtwo, chain[1]);
+        other = Assert.IsType<Chain>(chain[2]);
+        Assert.Equal(2, other.Count);
+        Assert.Same(xthree, other[0]);
+        Assert.Same(xfour, other[1]);
+    }
 
     // ----------------------------------------------------
 
     //[Enforced]
     [Fact]
-    public static void Test_InsertRange() => throw null;
+    public static void Test_InsertRange()
+    {
+        var chain = new Chain([xone, xtwo]);
+        var done = chain.InsertRange(0, []);
+        Assert.Equal(0, done);
+
+        done = chain.InsertRange(2, [xthree, xfour]);
+        Assert.Equal(2, done);
+        Assert.Equal(4, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xtwo, chain[1]);
+        Assert.Same(xthree, chain[2]);
+        Assert.Same(xfour, chain[3]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_InsertRange_Nested_With_Flatten()
+    {
+        var chain = new Chain([xone, xtwo]) { Flatten = true };
+        var done = chain.InsertRange(1, [xthree, new Chain([xfour, xfive])]);
+
+        Assert.Equal(3, done);
+        Assert.Equal(5, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xthree, chain[1]);
+        Assert.Same(xfour, chain[2]);
+        Assert.Same(xfive, chain[3]);
+        Assert.Same(xtwo, chain[4]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_InsertRange_Nested_No_Flatten()
+    {
+        var chain = new Chain([xone, xtwo]);
+        var done = chain.InsertRange(1, [xthree, new Chain([xfour, xfive])]);
+
+        Assert.Equal(2, done);
+        Assert.Equal(4, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xthree, chain[1]);
+        var other = Assert.IsType<Chain>(chain[2]);
+        Assert.Equal(2, other.Count);
+        Assert.Same(xfour, other[0]);
+        Assert.Same(xfive, other[1]);
+        Assert.Same(xtwo, chain[3]);
+    }
 
     // ----------------------------------------------------
 
     //[Enforced]
     [Fact]
-    public static void Test_RemoveAt() => throw null;
+    public static void Test_RemoveAt()
+    {
+        var chain = new Chain([xone, xtwo, xthree]);
+        var done = chain.RemoveAt(0);
+
+        Assert.Equal(1, done);
+        Assert.Equal(2, chain.Count);
+        Assert.Same(xtwo, chain[0]);
+        Assert.Same(xthree, chain[1]);
+
+        try { chain.RemoveAt(-1); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+        try { chain.RemoveAt(2); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+    }
 
     // ----------------------------------------------------
 
     //[Enforced]
     [Fact]
-    public static void Test_RemoveRange() => throw null;
+    public static void Test_RemoveRange_Empty()
+    {
+        var chain = new Chain([xone, xtwo, xthree]);
+        var done = chain.RemoveRange(0, 0);
+
+        Assert.Equal(0, done);
+        Assert.Equal(3, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xtwo, chain[1]);
+        Assert.Same(xthree, chain[2]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_RemoveRange()
+    {
+        var chain = new Chain([xone, xtwo, xthree]);
+        var done = chain.RemoveRange(0, 1);
+        Assert.Equal(1, done);
+        Assert.Equal(2, chain.Count);
+        Assert.Same(xtwo, chain[0]);
+        Assert.Same(xthree, chain[1]);
+
+        chain = new Chain([xone, xtwo, xthree]);
+        done = chain.RemoveRange(1, 2);
+        Assert.Equal(2, done);
+        Assert.Single(chain);
+        Assert.Same(xone, chain[0]);
+
+        chain = new Chain([xone, xtwo, xthree]);
+        try { chain.RemoveRange(-1, 0); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+        try { chain.RemoveRange(3, 1); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+        try { chain.RemoveRange(0, 4); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+        try { chain.RemoveRange(1, 3); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+        try { chain.RemoveRange(2, 2); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+    }
 
     // ----------------------------------------------------
 
     //[Enforced]
     [Fact]
-    public static void Test_Remove_Key() => throw null;
+    public static void Test_Remove_Key()
+    {
+        var chain = new Chain() { AcceptDuplicates = true, IgnoreCase = true };
+        chain.AddRange([xone, xtwo, xone, xthree]);
+
+        var done = chain.Remove("any");
+        Assert.Equal(0, done);
+
+        done = chain.Remove("ONE");
+        Assert.Equal(1, done);
+        Assert.Equal(3, chain.Count);
+        Assert.Same(xtwo, chain[0]);
+        Assert.Same(xone, chain[1]);
+        Assert.Same(xthree, chain[2]);
+
+        chain = new Chain() { AcceptDuplicates = true, IgnoreCase = true };
+        chain.AddRange([xone, xtwo, xone, xthree]);
+        done = chain.RemoveLast("ONE");
+        Assert.Equal(1, done);
+        Assert.Equal(3, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xtwo, chain[1]);
+        Assert.Same(xthree, chain[2]);
+
+        chain = new Chain() { AcceptDuplicates = true, IgnoreCase = true };
+        chain.AddRange([xone, xtwo, xone, xthree]);
+        done = chain.RemoveAll("ONE");
+        Assert.Equal(2, done);
+        Assert.Equal(2, chain.Count);
+        Assert.Same(xtwo, chain[0]);
+        Assert.Same(xthree, chain[1]);
+    }
 
     // ----------------------------------------------------
 
     //[Enforced]
     [Fact]
-    public static void Test_Remove_Predicate() => throw null;
+    public static void Test_Remove_Predicate()
+    {
+        var chain = new Chain() { AcceptDuplicates = true, IgnoreCase = true };
+        chain.AddRange([xone, xtwo, xone, xthree]);
+
+        var done = chain.Remove(x => x is Named named && named.Name is null);
+        Assert.Equal(0, done);
+
+        done = chain.Remove(x => x is Named named && named.Name.Contains('n'));
+        Assert.Equal(1, done);
+        Assert.Equal(3, chain.Count);
+        Assert.Same(xtwo, chain[0]);
+        Assert.Same(xone, chain[1]);
+        Assert.Same(xthree, chain[2]);
+
+        chain = new Chain() { AcceptDuplicates = true, IgnoreCase = true };
+        chain.AddRange([xone, xtwo, xone, xthree]);
+        done = chain.RemoveLast(x => x is Named named && named.Name.Contains('n'));
+        Assert.Equal(1, done);
+        Assert.Equal(3, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xtwo, chain[1]);
+        Assert.Same(xthree, chain[2]);
+
+        chain = new Chain() { AcceptDuplicates = true, IgnoreCase = true };
+        chain.AddRange([xone, xtwo, xone, xthree]);
+        done = chain.RemoveAll(x => x is Named named && named.Name.Contains('n'));
+        Assert.Equal(2, done);
+        Assert.Equal(2, chain.Count);
+        Assert.Same(xtwo, chain[0]);
+        Assert.Same(xthree, chain[1]);
+    }
 
     // ----------------------------------------------------
 
     //[Enforced]
     [Fact]
-    public static void Test_Clear() => throw null;
+    public static void Test_Clear()
+    {
+        var chain = new Chain();
+        var done = chain.Clear();
+        Assert.Equal(0, done);
+
+        chain = new Chain([xone, xtwo, xthree]);
+        done = chain.Clear();
+        Assert.Equal(3, done);
+        Assert.Empty(chain);
+    }
 }
