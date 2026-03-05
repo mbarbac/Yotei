@@ -127,7 +127,7 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     /// <param name="source"></param>
     /// <param name="target"></param>
     /// <returns></returns>
-    public virtual bool IncludeDuplicate(T source, T target) => true;
+    public virtual bool IncludeDuplicated(T source, T target) => true;
 
     // ----------------------------------------------------
 
@@ -370,7 +370,7 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
 
         var key = GetKey(value = ValidateElement(value));
         var values = FindDuplicates(key);
-        foreach (var item in values) if (!IncludeDuplicate(item, value)) return 0;
+        foreach (var item in values) if (!IncludeDuplicated(item, value)) return 0;
 
         Items.Add(value);
         return 1;
@@ -403,7 +403,7 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
 
         var key = GetKey(value = ValidateElement(value));
         var values = FindDuplicates(key);
-        foreach (var item in values) if (!IncludeDuplicate(item, value)) return 0;
+        foreach (var item in values) if (!IncludeDuplicated(item, value)) return 0;
 
         Items.Insert(index, value);
         return 1;

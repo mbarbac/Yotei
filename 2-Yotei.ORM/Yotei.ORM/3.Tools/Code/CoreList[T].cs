@@ -112,7 +112,7 @@ public partial class CoreList<T> : ICoreList<T>
     /// <param name="source"></param>
     /// <param name="target"></param>
     /// <returns></returns>
-    public virtual bool IncludeDuplicate(T source, T target) => true;
+    public virtual bool IncludeDuplicated(T source, T target) => true;
 
     // ----------------------------------------------------
 
@@ -352,7 +352,7 @@ public partial class CoreList<T> : ICoreList<T>
         if (value is IEnumerable<T> range && FlattenInput(value)) return AddRange(range);
 
         var values = FindDuplicates(value = ValidateElement(value));
-        foreach (var item in values) if (!IncludeDuplicate(item, value)) return 0;
+        foreach (var item in values) if (!IncludeDuplicated(item, value)) return 0;
 
         Items.Add(value);
         return 1;
@@ -384,7 +384,7 @@ public partial class CoreList<T> : ICoreList<T>
         if (value is IEnumerable<T> range && FlattenInput(value)) return InsertRange(index, range);
 
         var values = FindDuplicates(value = ValidateElement(value));
-        foreach (var item in values) if (!IncludeDuplicate(item, value)) return 0;
+        foreach (var item in values) if (!IncludeDuplicated(item, value)) return 0;
 
         Items.Insert(index, value);
         return 1;
