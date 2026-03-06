@@ -5,7 +5,7 @@
 /// <inheritdoc/>
 /// </summary>
 /// <typeparam name="T"></typeparam>
-[DebuggerDisplay("{ToDebugString(3)}")]
+[DebuggerDisplay("{ToDebugString(4)}")]
 [Cloneable(ReturnType = typeof(ICoreBag<>))]
 public partial class CoreBag<T> : ICoreBag<T>
 {

@@ -63,7 +63,7 @@ public partial interface IInvariantBag<T> : IReadOnlyCollection<T>, ICollection
     /// Returns a copy of this instance where the given value has been added to it.
     /// </summary>
     /// <param name="value"></param>
-    /// <returns></returns>
+    /// <returns>This instance if no changes were made.</returns>
     IInvariantBag<T> Add(T value);
 
     /// <summary>
@@ -71,7 +71,7 @@ public partial interface IInvariantBag<T> : IReadOnlyCollection<T>, ICollection
     /// to it.
     /// </summary>
     /// <param name="range"></param>
-    /// <returns></returns>
+    /// <returns>This instance if no changes were made.</returns>
     IInvariantBag<T> AddRange(IEnumerable<T> range);
 
     // ----------------------------------------------------
@@ -81,7 +81,7 @@ public partial interface IInvariantBag<T> : IReadOnlyCollection<T>, ICollection
     /// if any.
     /// </summary>
     /// <param name="value"></param>
-    /// <returns></returns>
+    /// <returns>This instance if no changes were made.</returns>
     IInvariantBag<T> Remove(T value);
 
     /// <summary>
@@ -89,7 +89,7 @@ public partial interface IInvariantBag<T> : IReadOnlyCollection<T>, ICollection
     /// removed, if any.
     /// </summary>
     /// <param name="value"></param>
-    /// <returns></returns>
+    /// <returns>This instance if no changes were made.</returns>
     IInvariantBag<T> RemoveAll(T value);
 
     /// <summary>
@@ -97,7 +97,7 @@ public partial interface IInvariantBag<T> : IReadOnlyCollection<T>, ICollection
     /// any, has been removed.
     /// </summary>
     /// <param name="predicate"></param>
-    /// <returns></returns>
+    /// <returns>This instance if no changes were made.</returns>
     IInvariantBag<T> Remove(Predicate<T> predicate);
 
     /// <summary>
@@ -105,12 +105,12 @@ public partial interface IInvariantBag<T> : IReadOnlyCollection<T>, ICollection
     /// any, has been removed.
     /// </summary>
     /// <param name="predicate"></param>
-    /// <returns></returns>
+    /// <returns>This instance if no changes were made.</returns>
     IInvariantBag<T> RemoveAll(Predicate<T> predicate);
 
     /// <summary>
     /// Returns an empty copy of this instance, but keeping all configurations.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>This instance if no changes were made.</returns>
     IInvariantBag<T> Clear();
 }

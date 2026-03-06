@@ -23,7 +23,7 @@ public static partial class Test_CoreList_KT
 
     // ----------------------------------------------------
 
-    [DebuggerDisplay("{ToDebugString(3)}")]
+    [DebuggerDisplay("{ToDebugString(4)}")]
     [Cloneable(ReturnType = typeof(ICoreList<string, IElement>))]
     public partial class Chain : CoreList<string, IElement>, IElement
     {

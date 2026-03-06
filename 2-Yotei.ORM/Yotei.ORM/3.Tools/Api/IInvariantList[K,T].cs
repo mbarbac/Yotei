@@ -29,30 +29,30 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>, IReadOnlyColle
     new T this[int index] { get; }
 
     /// <summary>
-    /// Determines if this instance contains an element with the given key, or not.
+    /// Determines if this instance contains an ocurrence of the given key, or not.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
     bool Contains(K key);
 
     /// <summary>
-    /// Returns the index of the first element with the given key, or -1 if it cannot be found
-    /// using the rules in this instance.
+    /// Returns the index of the first ocurrence of an element with the given key, or -1 if it
+    /// cannot be found using the rules in this instance.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
     int IndexOf(K key);
 
     /// <summary>
-    /// Returns the index of the last element with the given key, or -1 if it cannot be found
-    /// using the rules in this instance.
+    /// Returns the index of the last ocurrence of an element with the given key, or -1 if it
+    /// cannot be found using the rules in this instance.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
     int LastIndexOf(K key);
 
     /// <summary>
-    /// Returns the index of al the elements with the given key.
+    /// Returns the indexes of all the ocurrences of elements with the given key.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
@@ -143,9 +143,9 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>, IReadOnlyColle
     /// given index.
     /// </summary>
     /// <param name="index"></param>
-    /// <param name="other"></param>
-    /// <returns></returns>
-    IInvariantList<K, T> GetRange(int index, T other);
+    /// <param name="count"></param>
+    /// <returns>This instance if no changes were made.</returns>
+    IInvariantList<K, T> GetRange(int index, int count);
 
     /// <summary>
     /// Returns a copy of this instance where the element at the given index has been replaced
@@ -153,7 +153,7 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>, IReadOnlyColle
     /// </summary>
     /// <param name="index"></param>
     /// <param name="other"></param>
-    /// <returns></returns>
+    /// <returns>This instance if no changes were made.</returns>
     IInvariantList<K, T> Replace(int index, T other);
 
     // ----------------------------------------------------
@@ -162,7 +162,7 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>, IReadOnlyColle
     /// Returns a copy of this instance where the given value has been added to it.
     /// </summary>
     /// <param name="value"></param>
-    /// <returns></returns>
+    /// <returns>This instance if no changes were made.</returns>
     IInvariantList<K, T> Add(T value);
 
     /// <summary>
@@ -170,7 +170,7 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>, IReadOnlyColle
     /// to it.
     /// </summary>
     /// <param name="range"></param>
-    /// <returns></returns>
+    /// <returns>This instance if no changes were made.</returns>
     IInvariantList<K, T> AddRange(IEnumerable<T> range);
 
     /// <summary>
@@ -179,7 +179,7 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>, IReadOnlyColle
     /// </summary>
     /// <param name="index"></param>
     /// <param name="value"></param>
-    /// <returns></returns>
+    /// <returns>This instance if no changes were made.</returns>
     IInvariantList<K, T> Insert(int index, T value);
 
     /// <summary>
@@ -188,7 +188,7 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>, IReadOnlyColle
     /// </summary>
     /// <param name="index"></param>
     /// <param name="range"></param>
-    /// <returns></returns>
+    /// <returns>This instance if no changes were made.</returns>
     IInvariantList<K, T> InsertRange(int index, IEnumerable<T> range);
 
     // ----------------------------------------------------
@@ -197,7 +197,7 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>, IReadOnlyColle
     /// Returns a copy of this instance where the element at the given index has been removed.
     /// </summary>
     /// <param name="index"></param>
-    /// <returns></returns>
+    /// <returns>This instance if no changes were made.</returns>
     IInvariantList<K, T> RemoveAt(int index);
 
     /// <summary>
@@ -206,7 +206,7 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>, IReadOnlyColle
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
-    /// <returns></returns>
+    /// <returns>This instance if no changes were made.</returns>
     IInvariantList<K, T> RemoveRange(int index, int count);
 
     /// <summary>
@@ -214,7 +214,7 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>, IReadOnlyColle
     /// removed, if any.
     /// </summary>
     /// <param name="key"></param>
-    /// <returns></returns>
+    /// <returns>This instance if no changes were made.</returns>
     IInvariantList<K, T> Remove(K key);
 
     /// <summary>
@@ -222,7 +222,7 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>, IReadOnlyColle
     /// removed, if any.
     /// </summary>
     /// <param name="key"></param>
-    /// <returns></returns>
+    /// <returns>This instance if no changes were made.</returns>
     IInvariantList<K, T> RemoveLast(K key);
 
     /// <summary>
@@ -230,7 +230,7 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>, IReadOnlyColle
     /// removed, if any.
     /// </summary>
     /// <param name="key"></param>
-    /// <returns></returns>
+    /// <returns>This instance if no changes were made.</returns>
     IInvariantList<K, T> RemoveAll(K key);
 
     /// <summary>
@@ -238,7 +238,7 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>, IReadOnlyColle
     /// if any, has been removed.
     /// </summary>
     /// <param name="predicate"></param>
-    /// <returns></returns>
+    /// <returns>This instance if no changes were made.</returns>
     IInvariantList<K, T> Remove(Predicate<T> predicate);
 
     /// <summary>
@@ -246,7 +246,7 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>, IReadOnlyColle
     /// if any, has been removed.
     /// </summary>
     /// <param name="predicate"></param>
-    /// <returns></returns>
+    /// <returns>This instance if no changes were made.</returns>
     IInvariantList<K, T> RemoveLast(Predicate<T> predicate);
 
     /// <summary>
@@ -254,12 +254,12 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>, IReadOnlyColle
     /// if any, have been removed.
     /// </summary>
     /// <param name="predicate"></param>
-    /// <returns></returns>
+    /// <returns>This instance if no changes were made.</returns>
     IInvariantList<K, T> RemoveAll(Predicate<T> predicate);
 
     /// <summary>
     /// Returns an empty copy of this instance, but keeping all configurations.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>This instance if no changes were made.</returns>
     IInvariantList<K, T> Clear();
 }

@@ -23,7 +23,7 @@ public static partial class Test_CoreBag_T
 
     // ----------------------------------------------------
 
-    [DebuggerDisplay("{ToDebugString(3)}")]
+    [DebuggerDisplay("{ToDebugString(4)}")]
     [Cloneable(ReturnType = typeof(ICoreBag<IElement>))]
     public partial class Chain : CoreBag<IElement>, IElement
     {

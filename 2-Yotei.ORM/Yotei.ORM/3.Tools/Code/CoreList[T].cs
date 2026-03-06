@@ -5,7 +5,7 @@
 /// <inheritdoc cref="ICoreList{T}"/>
 /// </summary>
 /// <typeparam name="T"></typeparam>
-[DebuggerDisplay("{ToDebugString(3)}")]
+[DebuggerDisplay("{ToDebugString(4)}")]
 [Cloneable(ReturnType = typeof(ICoreList<>))]
 public partial class CoreList<T> : ICoreList<T>
 {
