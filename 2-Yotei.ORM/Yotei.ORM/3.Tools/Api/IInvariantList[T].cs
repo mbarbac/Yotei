@@ -141,9 +141,9 @@ public partial interface IInvariantList<T> : IReadOnlyList<T>, IReadOnlyCollecti
     /// given index.
     /// </summary>
     /// <param name="index"></param>
-    /// <param name="other"></param>
+    /// <param name="count"></param>
     /// <returns>This instance if no changes were made.</returns>
-    IInvariantList<T> GetRange(int index, T other);
+    IInvariantList<T> GetRange(int index, int count);
 
     /// <summary>
     /// Returns a copy of this instance where the element at the given index has been replaced
