@@ -329,6 +329,10 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <returns></returns>
     public virtual IInvariantList<K, T> RemoveRange(int index, int count)
     {
+        ArgumentOutOfRangeException.ThrowIfNegative(index);
+        ArgumentOutOfRangeException.ThrowIfNegative(count);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(count, Count - index);
+
         if (count == 0) return this; // Requested to remove nothing!
 
         var clone = (InvariantList<K, T>)Clone();
