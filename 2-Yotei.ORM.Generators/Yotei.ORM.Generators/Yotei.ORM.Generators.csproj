@@ -16,7 +16,7 @@
 	</ItemGroup>
 
 	<PropertyGroup>
-		<Description>Yotei With Generator</Description>
+		<Description>Yotei ORM Generators</Description>
 		<Version>0.7.0-v0001</Version>
 		<Authors>mbarbac@hotmail.com</Authors>
 		<PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
@@ -33,14 +33,14 @@
 	<PropertyGroup>
 		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 		<IsRoslynComponent>true</IsRoslynComponent>
-		<!--<DefineConstants>$(DefineConstants);DEBUG_WITH_GENERATOR </DefineConstants>-->
+		<!--<DefineConstants>$(DefineConstants);DEBUG_YOTEI_GENERATORS</DefineConstants>-->
 	</PropertyGroup>
 
 	<ItemGroup>
 		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
 	</ItemGroup>
 
-	<Import Project="..\..\00-CoreGenerator\Yotei.Tools.CoreGenerator\Yotei.Tools.CoreGenerator.projitems"
+	<Import Project="..\..\1-Yotei.Tools.Generators\00-CoreGenerator\Yotei.Tools.CoreGenerator\Yotei.Tools.CoreGenerator.projitems"
 					Label="Shared" />
 
 	<ItemGroup>
