@@ -40,8 +40,7 @@
 		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
 	</ItemGroup>
 
-	<Import Project="..\..\1-Yotei.Tools.Generators\00-CoreGenerator\Yotei.Tools.CoreGenerator\Yotei.Tools.CoreGenerator.projitems"
-					Label="Shared" />
+	<Import Project="..\..\1-Yotei.Tools.Generators\00-CoreGenerator\Yotei.Tools.CoreGenerator\Yotei.Tools.CoreGenerator.projitems" Label="Shared" />
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />

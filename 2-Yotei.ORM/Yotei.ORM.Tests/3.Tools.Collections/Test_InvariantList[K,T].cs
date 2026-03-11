@@ -20,7 +20,7 @@ public static partial class Test_InvariantList_KT
 
     // ----------------------------------------------------
 
-    [DebuggerDisplay("{ToDebugString(3)}")]
+    [DebuggerDisplay("{ToDebugString(4)}")]
     [Cloneable]
     public partial class Builder : CoreList<string, IElement>, IElement
     {

@@ -9,6 +9,12 @@
 public partial interface IInvariantBag<T> : IReadOnlyCollection<T>, ICollection
 {
     /// <summary>
+    /// Returns a new builder based upon the contents in this instance.
+    /// </summary>
+    /// <returns></returns>
+    ICoreBag<T> ToBuilder();
+
+    /// <summary>
     /// Get the number of elements in this collection.
     /// </summary>
     new int Count { get; }

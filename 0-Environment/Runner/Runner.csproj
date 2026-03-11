@@ -21,6 +21,7 @@
 		<ProjectReference Include="..\..\1-Yotei.Tools.Generators\01-CloneGenerator\Yotei.Tools.CloneGenerator.Tests\Yotei.Tools.CloneGenerator.Tests.csproj" />
 		<ProjectReference Include="..\..\1-Yotei.Tools.Generators\02-WithGenerator\Yotei.Tools.WithGenerator.Tests\Yotei.Tools.WithGenerator.Tests.csproj" />
 		<ProjectReference Include="..\..\2-Yotei.ORM\Yotei.ORM.Tests\Yotei.ORM.Tests.csproj" />
+		<ProjectReference Include="..\..\2-Yotei.ORM.Generators\Yotei.ORM.Generators.Tests\Yotei.ORM.Generators.Tests.csproj" />
 	</ItemGroup>
 
 </Project>
