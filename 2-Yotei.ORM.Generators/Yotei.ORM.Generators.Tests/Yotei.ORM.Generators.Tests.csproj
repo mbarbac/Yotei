@@ -25,8 +25,7 @@
 	<ItemGroup Condition="'$(Configuration)'=='Debug'">
 	  <ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
 	  <ProjectReference Include="..\..\2-Yotei.ORM\Yotei.ORM\Yotei.ORM.csproj" />
-	  <ProjectReference Include="..\Yotei.ORM.Generators\Yotei.ORM.Generators.csproj"
-											OutputItemType="Analyzer" />
+	  <ProjectReference Include="..\Yotei.ORM.Generators\Yotei.ORM.Generators.csproj" OutputItemType="Analyzer" />
 	</ItemGroup>
 
 	<!-- RELEASE configuration -->

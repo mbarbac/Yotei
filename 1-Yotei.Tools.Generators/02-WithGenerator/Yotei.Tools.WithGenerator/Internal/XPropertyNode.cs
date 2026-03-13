@@ -29,29 +29,29 @@ internal class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
     /// </summary>
     protected override bool OnValidate(SourceProductionContext context)
     {
-        var r = base.OnValidate(context);
+        if (!base.OnValidate(context)) return false;
 
-        if (Host.IsRecord) { Symbol.ReportError(TreeError.RecordsNotSupported, context); r = false; }
-        if (Symbol.IsIndexer) { Symbol.ReportError(TreeError.IndexerNotSupported, context); r = false; }
-        if (!Symbol.HasGetter) { Symbol.ReportError(TreeError.NoGetter, context); r = false; }
+        if (Host.IsRecord) { Symbol.ReportError(TreeError.RecordsNotSupported, context); return false; }
+        if (Symbol.IsIndexer) { Symbol.ReportError(TreeError.IndexerNotSupported, context); return false; }
+        if (!Symbol.HasGetter) { Symbol.ReportError(TreeError.NoGetter, context); return false; }
         if (!Symbol.ContainingType.IsInterface &&
-            !Symbol.HasSetter) { Symbol.ReportError(TreeError.NoSetter, context); r = false; }
+            !Symbol.HasSetter) { Symbol.ReportError(TreeError.NoSetter, context); return false; }
 
         if (IsInherited)
         {
             var ats = Host.GetAttributes([typeof(InheritsWithAttribute), typeof(InheritsWithAttribute<>)]).ToList();
-            if (ats.Count == 0) { Host.ReportError(TreeError.NoAttributes, context); r = false; }
-            else if (ats.Count > 1) { Host.ReportError(TreeError.TooManyAttributes, context); r = false; }
+            if (ats.Count == 0) { Host.ReportError(TreeError.NoAttributes, context); return false; }
+            else if (ats.Count > 1) { Host.ReportError(TreeError.TooManyAttributes, context); return false; }
             else Attribute = ats[0];
         }
         else
         {
-            if (Attributes.Count == 0) { Symbol.ReportError(TreeError.NoAttributes, context); r = false; }
-            else if (Attributes.Count > 1) { Symbol.ReportError(TreeError.TooManyAttributes, context); r = false; }
+            if (Attributes.Count == 0) { Symbol.ReportError(TreeError.NoAttributes, context); return false; }
+            else if (Attributes.Count > 1) { Symbol.ReportError(TreeError.TooManyAttributes, context); return false; }
             else Attribute = Attributes[0];
         }
 
-        return r;
+        return true;
     }
 
     // ----------------------------------------------------

@@ -3,7 +3,7 @@
 // ========================================================
 /// <summary>
 /// Decorates classes for which either 'InvariantList[T]' or 'InvariantList[K, T]' will be used
-/// as their base one, and its methods (including clone) reimplemented.
+/// as their base one, and its methods (including 'Clone') reimplemented.
 /// <br/> The type of the generic arguments becomes the type of the keys and elements of the
 /// collection.
 /// <br/> Regular types (not interface or abstract ones) must implement a copy constructor.

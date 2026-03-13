@@ -152,9 +152,9 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>, IReadOnlyColle
     /// by the other given one.
     /// </summary>
     /// <param name="index"></param>
-    /// <param name="other"></param>
+    /// <param name="value"></param>
     /// <returns>This instance if no changes were made.</returns>
-    IInvariantList<K, T> Replace(int index, T other);
+    IInvariantList<K, T> Replace(int index, T value);
 
     // ----------------------------------------------------
 

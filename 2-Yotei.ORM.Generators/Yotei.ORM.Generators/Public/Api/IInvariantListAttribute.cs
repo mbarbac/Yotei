@@ -3,7 +3,7 @@
 // ========================================================
 /// <summary>
 /// Decorates interfaces for which either 'IInvariantList[T]' or 'IInvariantList[K, T]' will be
-/// used as a base one, and its methods (including clone) redeclared.
+/// used as a base one, and its methods (including 'Clone') redeclared.
 /// </summary>
 [AttributeUsage(AttributeTargets.Interface, Inherited = false, AllowMultiple = false)]
 public class IInvariantListAttribute : Attribute

@@ -23,15 +23,15 @@ internal class XTypeNode : TypeNode, IXNode
     /// </summary>
     protected override bool OnValidate(SourceProductionContext context)
     {
-        var r = base.OnValidate(context);
+        if (!base.OnValidate(context)) return false;
 
-        if (Symbol.IsRecord) { Symbol.ReportError(TreeError.RecordsNotSupported, context); r = false; }
+        if (Symbol.IsRecord) { Symbol.ReportError(TreeError.RecordsNotSupported, context); return false; }
 
-        if (Attributes.Count == 0) { Symbol.ReportError(TreeError.NoAttributes, context); r = false; }
-        else if (Attributes.Count > 1) { Symbol.ReportError(TreeError.TooManyAttributes, context); r = false; }
+        if (Attributes.Count == 0) { Symbol.ReportError(TreeError.NoAttributes, context); return false; }
+        else if (Attributes.Count > 1) { Symbol.ReportError(TreeError.TooManyAttributes, context); return false; }
         else Attribute = Attributes[0];
 
-        return r;
+        return true;
     }
 
     // ----------------------------------------------------

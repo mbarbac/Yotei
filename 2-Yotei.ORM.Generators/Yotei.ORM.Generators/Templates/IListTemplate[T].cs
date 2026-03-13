@@ -4,7 +4,7 @@
 internal interface IListTemplate<T>
 {
     IListTemplate<T> GetRange(int index, int count);
-    IListTemplate<T> Replace(int index, T other);
+    IListTemplate<T> Replace(int index, T value);
     IListTemplate<T> Add(T value);
     IListTemplate<T> AddRange(IEnumerable<T> range);
     IListTemplate<T> Insert(int index, T value);

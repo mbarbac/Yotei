@@ -7,7 +7,7 @@
 [Generator(LanguageNames.CSharp)]
 internal class InvariantGenerator : TreeGenerator
 {
-#if DEBUG_INVARIANT_GENERATOR_
+#if DEBUG_INVARIANT_GENERATOR
     /// <summary>
     /// <inheritdoc/>
     /// </summary>

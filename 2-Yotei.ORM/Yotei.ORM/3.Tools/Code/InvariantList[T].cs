@@ -5,6 +5,7 @@
 /// <inheritdoc cref="IInvariantList{T}"/>
 /// </summary>
 /// <typeparam name="T"></typeparam>
+/// Note: the generator needs 'T value' and 'K key'.
 [DebuggerDisplay("{ToDebugString(4)}")]
 [Cloneable(ReturnType = typeof(IInvariantList<>))]
 public abstract partial class InvariantList<T> : IInvariantList<T>
@@ -239,12 +240,12 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="index"></param>
-    /// <param name="other"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    public virtual IInvariantList<T> Replace(int index, T other)
+    public virtual IInvariantList<T> Replace(int index, T value)
     {
         var clone = (InvariantList<T>)Clone();
-        var num = clone.Items.Replace(index, other);
+        var num = clone.Items.Replace(index, value);
         return num > 0 ? clone : this;
     }
 

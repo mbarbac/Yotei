@@ -3,7 +3,7 @@
 // ========================================================
 /// <summary>
 /// Decorates interfaces for which 'IInvariantBag[T]' will be used as a base one, and its methods
-/// (including clone) redeclared.
+/// (including 'Clone') redeclared.
 /// </summary>
 [AttributeUsage(AttributeTargets.Interface, Inherited = false, AllowMultiple = false)]
 public class IInvariantBagAttribute : Attribute

@@ -29,26 +29,26 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
     /// </summary>
     protected override bool OnValidate(SourceProductionContext context)
     {
-        var r = base.OnValidate(context);
+        if (!base.OnValidate(context)) return false;
 
-        if (Host.IsRecord) { Symbol.ReportError(TreeError.RecordsNotSupported, context); r = false; }
-        if (!Symbol.IsWrittable) { Symbol.ReportError(TreeError.NotWrittable, context); r = false; }
+        if (Host.IsRecord) { Symbol.ReportError(TreeError.RecordsNotSupported, context); return false; }
+        if (!Symbol.IsWrittable) { Symbol.ReportError(TreeError.NotWrittable, context); return false; }
 
         if (IsInherited)
         {
             var ats = Host.GetAttributes([typeof(InheritsWithAttribute), typeof(InheritsWithAttribute<>)]).ToList();
-            if (ats.Count == 0) { Host.ReportError(TreeError.NoAttributes, context); r = false; }
-            else if (ats.Count > 1) { Host.ReportError(TreeError.TooManyAttributes, context); r = false; }
+            if (ats.Count == 0) { Host.ReportError(TreeError.NoAttributes, context); return false; }
+            else if (ats.Count > 1) { Host.ReportError(TreeError.TooManyAttributes, context); return false; }
             else Attribute = ats[0];
         }
         else
         {
-            if (Attributes.Count == 0) { Symbol.ReportError(TreeError.NoAttributes, context); r = false; }
-            else if (Attributes.Count > 1) { Symbol.ReportError(TreeError.TooManyAttributes, context); r = false; }
+            if (Attributes.Count == 0) { Symbol.ReportError(TreeError.NoAttributes, context); return false; }
+            else if (Attributes.Count > 1) { Symbol.ReportError(TreeError.TooManyAttributes, context); return false; }
             else Attribute = Attributes[0];
         }
 
-        return r;
+        return true;
     }
 
     // ----------------------------------------------------
@@ -144,8 +144,6 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
     [SuppressMessage("", "IDE0060")]
     bool EmitHostAbstract(SourceProductionContext context, CodeBuilder cb)
     {
-        if (Host.Name == "AType21B") { } // DEBUG-ONLY
-
         var rtype = Host;
         var rnull = false;
         if (Attribute.HasReturnType(out var xtype, out var xnull)) { rtype = xtype; rnull = xnull; }

@@ -80,6 +80,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\MethodNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\FieldNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\TypeNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\Concretes\TypeNodeEx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\ErrorNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\ITreeNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes\INode.cs" />

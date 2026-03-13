@@ -150,9 +150,9 @@ public partial interface IInvariantList<T> : IReadOnlyList<T>, IReadOnlyCollecti
     /// by the other given one.
     /// </summary>
     /// <param name="index"></param>
-    /// <param name="other"></param>
+    /// <param name="value"></param>
     /// <returns>This instance if no changes were made.</returns>
-    IInvariantList<T> Replace(int index, T other);
+    IInvariantList<T> Replace(int index, T value);
 
     // ----------------------------------------------------
 

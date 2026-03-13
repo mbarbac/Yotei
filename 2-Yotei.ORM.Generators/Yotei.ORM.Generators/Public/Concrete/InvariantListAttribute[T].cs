@@ -3,7 +3,7 @@
 // ========================================================
 /// <summary>
 /// Decorates classes for which 'InvariantList[T]' will be used as their base one, and its
-/// methods (including clone) reimplemented.
+/// methods (including 'Clone') reimplemented.
 /// <br/> Regular types (not interface or abstract ones) must implement a copy constructor.
 /// </summary>
 /// <typeparam name="T"></typeparam>

@@ -3,7 +3,7 @@
 // ========================================================
 /// <summary>
 /// Decorates interfaces for which 'IInvariantList[T]' will be used as a base one, and its
-/// methods (including clone) redeclared.
+/// methods (including 'Clone') redeclared.
 /// <br/> The type of the generic argument becomes the type of the elements of the collection.
 /// </summary>
 /// <typeparam name="T"></typeparam>

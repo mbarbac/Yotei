@@ -240,12 +240,12 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="index"></param>
-    /// <param name="other"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> Replace(int index, T other)
+    public virtual IInvariantList<K, T> Replace(int index, T value)
     {
         var clone = (InvariantList<K, T>)Clone();
-        var num = clone.Items.Replace(index, other);
+        var num = clone.Items.Replace(index, value);
         return num > 0 ? clone : this;
     }
 
