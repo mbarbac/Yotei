@@ -74,6 +74,7 @@ internal partial class XTypeNode : TypeNode
                 if (TTypeNullable && !TTypeName.EndsWith('?')) TTypeName += '?';
 
                 Bracket = $"<{TTypeName}>";
+                Arity = 1;
             }
 
             // For <K, T> attributes...
@@ -89,6 +90,7 @@ internal partial class XTypeNode : TypeNode
                 if (TTypeNullable && !TTypeName.EndsWith('?')) TTypeName += '?';
 
                 Bracket = $"<{KTypeName}, {TTypeName}>";
+                Arity = 2;
             }
 
             // Should not happen...
@@ -105,6 +107,7 @@ internal partial class XTypeNode : TypeNode
             if (TTypeNullable && !TTypeName.EndsWith('?')) TTypeName += '?';
 
             Bracket = $"<{TTypeName}>";
+            Arity = 1;
         }
 
         // For <K, T> attributes...
@@ -120,6 +123,7 @@ internal partial class XTypeNode : TypeNode
             if (TTypeNullable && !TTypeName.EndsWith('?')) TTypeName += '?';
 
             Bracket = $"<{KTypeName}, {TTypeName}>";
+            Arity = 2;
         }
 
         // Should not happen...
@@ -176,60 +180,55 @@ internal partial class XTypeNode : TypeNode
     /// <returns></returns>
     protected override bool OnEmitCore(SourceProductionContext context, CodeBuilder cb)
     {
+        // Emit 'Clone' if needed...
         EmitClone(cb);
+
+        // Find template and existing methods...
         var methods = Template.GetMembers().OfType<MethodInfo>().Where(x => x.DeclaringType == Template);
         var existing = Symbol.GetMembers().OfType<IMethodSymbol>().ToDebugArray();
 
-        // Grab explicit return type specification, if any...
+        // Get the appropriate return type...
         var rtype = Symbol.UnwrapNullable(out var rnull);
         if (HasReturnType(Attribute, out var xtype, out var xnull)) { rtype = xtype; rnull = xnull; }
 
-        // Iterating though template's methods...
+        // HIGH: use 'EasyName' to obtain return type, need to modify EasyName logic.
+
+        // Iterating through template method...
         foreach (var method in methods)
         {
-            // If implemented explicitly we're done...
+            // If implemented, we'done with this method...
             if (existing.Any(x => SameMethod(method, x))) continue;
 
             // Method header...
-            cb.AppendLine();
-            EmitDocumentation(method, cb);
+            // cb.AppendLine();
+            // EmitDocumentation(method, cb);
 
+            // Return type...
             var roptions = ReturnOptions(rtype, Symbol);
-            var rname = rtype.EasyName(roptions);
-            if (rnull && !rname.EndsWith('?')) rname += '?';
-
-            var xoptions = EasyNameOptions.Default with
-            {
-                MemberReturnTypeOptions = null,
-                MemberHostTypeOptions = null,
-                MemberGenericArgumentOptions = EasyNameOptions.Full,
-                MemberArgumentOptions = EasyNameOptions.Full,
-                ArgumentTypeOptions = EasyNameOptions.Full,
-                UseArgumentName = true,
-                UseArgumentModifiers = true,
-            };
-            var temp = method.EasyName(xoptions);
-            var name = $"{rname} {temp}";
-
-            if (name.Contains("K key")) name = name.Replace("K key", $"{KTypeName} key");
-            if (name.Contains("K? key")) name = name.Replace("K? key", $"{KTypeName} key");
-            if (name.Contains("T value")) name = name.Replace("T value", $"{TTypeName} value");
-            if (name.Contains("T? value")) name = name.Replace("T? value", $"{TTypeName} value");
-            name = name.Replace("<K", $"<{KTypeName}");
-            name = name.Replace("T>", $"{TTypeName}>");
-
-            // Host is interface...
-            if (Symbol.IsInterface)
-            {
-                cb.AppendLine($"new {name};");
-                continue;
-            }
-
-            // Otherwise...
         }
 
         // Finishing...
-        return true; // HIGH: OnEmitCore...
+        return true;
+    }
+
+    /// <summary>
+    /// Used to replace generic arguments with the appropriate ones.
+    /// </summary>
+    string ReplaceKT(string item)
+    {
+        if (KType != null && KType.Name != "K")
+        {
+            if (item.Contains("K key")) item = item.Replace("K key", $"{KTypeName} key");
+            if (item.Contains("K? key")) item = item.Replace("K? key", $"{KTypeName} key");
+            if (item.Contains("<K")) item = item.Replace("<K", $"<{KTypeName}");
+        }
+        if (TType != null && TType.Name != "T")
+        {
+            if (item.Contains("T value")) item = item.Replace("T value", $"{TTypeName} value");
+            if (item.Contains("T? value")) item = item.Replace("T? value", $"{TTypeName} value");
+            if (item.Contains("T>")) item = item.Replace("T>", $"{TTypeName}>");
+        }
+        return item;
     }
 
     // ----------------------------------------------------
