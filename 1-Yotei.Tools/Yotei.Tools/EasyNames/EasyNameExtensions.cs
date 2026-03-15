@@ -1,10 +1,11 @@
-﻿namespace Experimental;
+﻿namespace Yotei.Tools;
 
 // ========================================================
-public static partial class EasyNomenExtensions
+// Extensions for 'EasyName' purposes only.
+public static partial class EasyNameExtensions
 {
     /// <summary>
-    /// Determines if the type is a generic-alike one, for 'EasyName' purposes.
+    /// Determines if the type is a generic-alike one.
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
