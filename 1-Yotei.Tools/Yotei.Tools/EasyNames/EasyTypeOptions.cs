@@ -7,27 +7,27 @@
 public record EasyTypeOptions
 {
     /// <summary>
-    /// If enabled, then use the type's variance (the 'in' and 'out' keywords) in the display
-    /// string, if any is specified. Otherwise, it is ignored.
+    /// If enabled use the type's variance (the 'in' and 'out' keywords) in the display string,
+    /// if any is specified. Otherwise, it is ignored.
     /// </summary>
     public bool UseVariance { get; init; }
 
     /// <summary>
-    /// If not <see langword="null"/>, the options to use the type's namespace in the display
-    /// string. Otherwise, it is ignored.
+    /// If enabled use the type's namespace in the display string. Otherwise, it is ignored.
+    /// Enabling this option automatically enabled <see cref="UseHost"/>.
     /// </summary>
-    public EasyNamespaceOptions? NamespaceOptions { get; init; }
+    public bool UseNamespace { get; init; }
 
     /// <summary>
-    /// If enabled, then use the type hosts chain in the display string (with this options).
-    /// Otherwise, it is ignored.
+    /// If enabled use the type hosts chain in the display string (with this options). Otherwise,
+    /// it is ignored.
     /// </summary>
     public bool UseHost { get; init; }
 
     /// <summary>
-    /// If enabled, then inconditionally returns an empty string as the display string. This
-    /// setting is mostly used to obtain an anonymous list of generic arguments. If enabled,
-    /// it shortcuts all other settings.
+    /// If enabled inconditionally returns an empty string as the display string. This setting is
+    /// mostly used to obtain an anonymous list of generic arguments. When enabled it shortcuts
+    /// all other settings.
     /// </summary>
     public bool HideName { get; init; }
 
@@ -36,25 +36,24 @@ public record EasyTypeOptions
         : this;
 
     /// <summary>
-    /// If enabled, use in the display string the predefined keywords for known special types (eg:
+    /// If enabled use in the display string the predefined keywords for known special types (eg:
     /// <see langword="int"/> instead of <see langword="Int32"/>).
     /// </summary>
     public bool UseSpecialNames { get; init; }
 
     /// <summary>
-    /// If enabled, then remove the 'Attribute' suffix from the type's display string. Otherwise,
+    /// If enabled remove the 'Attribute' suffix from the type's display string. Otherwise,
     /// it is kept in the display string.
     /// </summary>
     public bool RemoveAttributeSuffix { get; init; }
 
     /// <summary>
-    /// If enabled, use the '?' nullable annotations, intercepting nullable wrappers if such is
-    /// needed. Otherwise, the wrappers themselves are used in the display string.
+    /// Determines the nullable style to use with nullable annotations, if any.
     /// </summary>
-    public bool UseNullableAnnotation { get; init; }
+    public IsNullableStyle NullableStyle { get; init; }
 
     /// <summary>
-    /// If not <see langword="null"/>, the options to use the type's generic arguments, if any.
+    /// If not <see langword="null"/> the options to use the type's generic arguments, if any.
     /// Otherwise, they are ignored.
     /// </summary>
     public EasyTypeOptions? GenericOptions { get; init; }
@@ -68,18 +67,19 @@ public record EasyTypeOptions
         {
             case Mode.Full:
                 UseVariance = true;
-                NamespaceOptions = EasyNamespaceOptions.Default; // No global
+                UseNamespace = true;
                 UseHost = true;
-                UseSpecialNames = true;
-                RemoveAttributeSuffix = true;
-                UseNullableAnnotation = true;
+                HideName = false;
+                UseSpecialNames = false;
+                RemoveAttributeSuffix = false;
+                NullableStyle = IsNullableStyle.KeepWrappers;
                 GenericOptions = this;
                 break;
 
             case Mode.Default:
                 UseSpecialNames = true;
                 RemoveAttributeSuffix = true;
-                UseNullableAnnotation = true;
+                NullableStyle = IsNullableStyle.UseAnnotations;
                 GenericOptions = this;
                 break;
         }
@@ -142,11 +142,15 @@ public static partial class EasyNameExtensions
         // Inconditional shortcut...
         if (options.HideName) return string.Empty;
 
-        // Shortcut nullable annotations...
-        if (options.UseNullableAnnotation && source.IsNullableWrapper())
+        // Shortcut nullable wrappers...
+        if (options.NullableStyle != IsNullableStyle.KeepWrappers &&
+            source.IsNullableWrapper())
         {
-            throw null;
-            // OJO con el juego de 'types[]'...
+            var type = source.GetGenericArguments()[0];
+            var str = type.EasyName(options);
+
+            if (str.Length > 0 && !str.EndsWith('?')) str += '?';
+            return str;
         }
 
         // Processing...
@@ -168,27 +172,8 @@ public static partial class EasyNameExtensions
             if ((variance & GenericParameterAttributes.Contravariant) != 0) sb.Append("in ");
         }
 
-        // Namespace...
-        if (options.NamespaceOptions != null)
-        {
-            var str = source.Namespace;
-            if (str != null && str.Length > 0)
-            {
-                if (options.NamespaceOptions.UseGlobalNamespace) str = $"global:{str}";
-                sb.Append(str).Append('.');
-            }
-        }
-
-        // Host...
-        if ((options.UseHost || options.NamespaceOptions != null) && host != null && !isgen)
-        {
-            var xoptions = options.WithNoHideName;
-            var str = host.EasyName(types, xoptions);
-            if (str.Length > 0) sb.Append(str).Append('.');
-        }
-
-        // Name...
-        string? name = null; if (options.UseSpecialNames) name = source switch
+        // Special names...
+        var xname = source switch
         {
             Type t when t == typeof(void) => "void",
             Type t when t == typeof(object) => "object",
@@ -208,6 +193,24 @@ public static partial class EasyNameExtensions
             Type t when t == typeof(decimal) => "decimal",
             _ => null
         };
+
+        // Namespace...
+        if (options.UseNamespace)
+        {
+            var str = source.Namespace;
+            if (str != null && str.Length > 0) sb.Append(str).Append('.');
+        }
+
+        // Host...
+        if ((options.UseHost || options.UseNamespace) && host != null && !isgen)
+        {
+            var xoptions = options.WithNoHideName;
+            var str = host.EasyName(types, xoptions);
+            if (str.Length > 0) sb.Append(str).Append('.');
+        }
+
+        // Names...
+        string name = options.UseSpecialNames ? xname! : null!;
         if (name == null)
         {
             name = source.Name;
@@ -231,6 +234,20 @@ public static partial class EasyNameExtensions
                 sb.Append(str);
             }
             sb.Append('>');
+        }
+
+        // Nullability...
+        switch (options.NullableStyle)
+        {
+            case IsNullableStyle.KeepWrappers when source.IsNullableWrapper():
+                break;
+
+            case IsNullableStyle.KeepWrappers:
+            case IsNullableStyle.UseAnnotations:
+                if (source.HasNullableEnabledAttribute() &&
+                    sb.Length > 0 && sb[^1] != '?')
+                    sb.Append('?');
+                break;
         }
 
         // Finishing...
