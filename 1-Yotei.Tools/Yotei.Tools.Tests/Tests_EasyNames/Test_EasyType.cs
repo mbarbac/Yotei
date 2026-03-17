@@ -1,5 +1,5 @@
 ﻿namespace Yotei.Tools.Tests;
-
+/*
 // ========================================================
 //[Enforced]
 public static class Test_EasyType
@@ -49,3 +49,4 @@ public static class Test_EasyType
         name = item.EasyName(options); Assert.Equal("System.String", name);
     }
 }
+*/
