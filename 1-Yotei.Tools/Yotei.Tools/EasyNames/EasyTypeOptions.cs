@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// Provides 'EasyName' capabilities for <see cref="Type"/> instances.
+/// Provides 'EasyName' capabilities for type instances.
 /// </summary>
 public record EasyTypeOptions
 {
@@ -132,12 +132,12 @@ public static partial class EasyNameExtensions
 
     // ----------------------------------------------------
 
-    static EasyTypeOptions WithHideNameDisabled(this EasyTypeOptions options) =>
+    static EasyTypeOptions HideNameDisabled(this EasyTypeOptions options) =>
         options.HideName
         ? options with { HideName = false }
         : options;
 
-    static EasyTypeOptions WithHideNameEnabled(this EasyTypeOptions options) =>
+    static EasyTypeOptions HideNameEnabled(this EasyTypeOptions options) =>
         options.HideName
         ? options
         : options with { HideName = true };
@@ -193,7 +193,7 @@ public static partial class EasyNameExtensions
             host != null && !isgen &&
             xname == null)
         {
-            var xoptions = options.WithHideNameDisabled();
+            var xoptions = options.HideNameDisabled();
             var str = host.EasyName(types, xoptions);
             if (str.Length > 0) sb.Append(str).Append('.');
         }
@@ -222,8 +222,8 @@ public static partial class EasyNameExtensions
             if (need > 0)
             {
                 var xoptions = options.GenericStyle == EasyGenericStyle.PlaceHolders
-                    ? options.WithHideNameEnabled()
-                    : options.WithHideNameDisabled();
+                    ? options.HideNameEnabled()
+                    : options.HideNameDisabled();
 
                 sb.Append('<'); for (int i = 0; i < need; i++)
                 {
@@ -249,7 +249,7 @@ public static partial class EasyNameExtensions
                 goto ENDNULLABLE;
             }   
         }
-        ENDNULLABLE: // Yes, yes, it's a sin, but simplifies...
+        ENDNULLABLE:;
 
         // Finishing...
         return sb.ToString();
