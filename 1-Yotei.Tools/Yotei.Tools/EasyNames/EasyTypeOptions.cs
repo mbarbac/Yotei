@@ -13,10 +13,9 @@ public record EasyTypeOptions
     public bool UseVariance { get; init; }
 
     /// <summary>
-    /// If enabled use the type's namespace in the display string. Otherwise, it is ignored.
-    /// Enabling this option automatically enables <see cref="UseHost"/>.
+    /// The style to use with the type's namespace.
     /// </summary>
-    public bool UseNamespace { get; init; }
+    public EasyNamespaceStyle NamespaceStyle { get; init; }
 
     /// <summary>
     /// If enabled use the type hosts chain in the display string (with this options). Otherwise,
@@ -62,22 +61,24 @@ public record EasyTypeOptions
         {
             case Mode.Full:
                 UseVariance = true;
-                UseNamespace = true;
+                NamespaceStyle = EasyNamespaceStyle.Standard;
                 UseHost = true;
                 UseSpecialNames = false;
                 RemoveAttributeSuffix = false;
                 NullableStyle = EasyNullableStyle.KeepWrappers;
-                GenericStyle = EasyGenericStyle.UseNames;
+                GenericStyle = EasyGenericStyle.UseEasyNames;
                 break;
 
             case Mode.Default:
+                NamespaceStyle = EasyNamespaceStyle.None;
                 UseSpecialNames = true;
                 RemoveAttributeSuffix = true;
                 NullableStyle = EasyNullableStyle.UseAnnotations;
-                GenericStyle = EasyGenericStyle.UseNames;
+                GenericStyle = EasyGenericStyle.UseEasyNames;
                 break;
 
             case Mode.Empty:
+                NamespaceStyle = EasyNamespaceStyle.None;
                 NullableStyle = EasyNullableStyle.None;
                 GenericStyle = EasyGenericStyle.None;
                 break;
@@ -132,12 +133,12 @@ public static partial class EasyNameExtensions
 
     // ----------------------------------------------------
 
-    static EasyTypeOptions HideNameDisabled(this EasyTypeOptions options) =>
+    static EasyTypeOptions NoHideName(this EasyTypeOptions options) =>
         options.HideName
         ? options with { HideName = false }
         : options;
 
-    static EasyTypeOptions HideNameEnabled(this EasyTypeOptions options) =>
+    static EasyTypeOptions YesHideName(this EasyTypeOptions options) =>
         options.HideName
         ? options
         : options with { HideName = true };
@@ -182,18 +183,24 @@ public static partial class EasyNameExtensions
         var xname = options.UseSpecialNames ? source.ToSpecialName() : null;
 
         // Namespace...
-        if (options.UseNamespace && host == null && xname == null)
+        if (options.NamespaceStyle != EasyNamespaceStyle.None &&
+            host == null &&
+            xname == null)
         {
             var str = source.Namespace;
-            if (str != null && str.Length > 0) sb.Append(str).Append('.');
+            if (str != null && str.Length > 0)
+            {
+                if (options.NamespaceStyle == EasyNamespaceStyle.UseGlobal) sb.Append("global:");
+                sb.Append(str).Append('.');
+            }
         }
 
         // Host...
-        if ((options.UseHost || options.UseNamespace) &&
+        if ((options.UseHost || options.NamespaceStyle != EasyNamespaceStyle.None) &&
             host != null && !isgen &&
             xname == null)
         {
-            var xoptions = options.HideNameDisabled();
+            var xoptions = options.NoHideName();
             var str = host.EasyName(types, xoptions);
             if (str.Length > 0) sb.Append(str).Append('.');
         }
@@ -222,8 +229,8 @@ public static partial class EasyNameExtensions
             if (need > 0)
             {
                 var xoptions = options.GenericStyle == EasyGenericStyle.PlaceHolders
-                    ? options.HideNameEnabled()
-                    : options.HideNameDisabled();
+                    ? options.YesHideName()
+                    : options.NoHideName();
 
                 sb.Append('<'); for (int i = 0; i < need; i++)
                 {

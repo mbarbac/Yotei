@@ -10,26 +10,31 @@ public static partial class EasyNameExtensions
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
-    internal static string? ToSpecialName(this Type source) => source switch
+    internal static string? ToSpecialName(this Type source)
     {
-        Type t when t == typeof(void) => "void",
-        Type t when t == typeof(object) => "object",
-        Type t when t == typeof(string) => "string",
-        Type t when t == typeof(bool) => "bool",
-        Type t when t == typeof(char) => "char",
-        Type t when t == typeof(byte) => "byte",
-        Type t when t == typeof(sbyte) => "sbyte",
-        Type t when t == typeof(short) => "short",
-        Type t when t == typeof(ushort) => "ushort",
-        Type t when t == typeof(int) => "int",
-        Type t when t == typeof(uint) => "uint",
-        Type t when t == typeof(long) => "long",
-        Type t when t == typeof(ulong) => "ulong",
-        Type t when t == typeof(float) => "float",
-        Type t when t == typeof(double) => "double",
-        Type t when t == typeof(decimal) => "decimal",
-        _ => null
-    };
+        if (source.IsByRef) source = source.GetElementType() ?? source;
+
+        return source switch
+        {
+            Type t when t == typeof(void) => "void",
+            Type t when t == typeof(object) => "object",
+            Type t when t == typeof(string) => "string",
+            Type t when t == typeof(bool) => "bool",
+            Type t when t == typeof(char) => "char",
+            Type t when t == typeof(byte) => "byte",
+            Type t when t == typeof(sbyte) => "sbyte",
+            Type t when t == typeof(short) => "short",
+            Type t when t == typeof(ushort) => "ushort",
+            Type t when t == typeof(int) => "int",
+            Type t when t == typeof(uint) => "uint",
+            Type t when t == typeof(long) => "long",
+            Type t when t == typeof(ulong) => "ulong",
+            Type t when t == typeof(float) => "float",
+            Type t when t == typeof(double) => "double",
+            Type t when t == typeof(decimal) => "decimal",
+            _ => null
+        };
+    }
 
     // ----------------------------------------------------
 

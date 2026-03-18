@@ -97,7 +97,7 @@ public static partial class EasyNameExtensions
         // Parameter type...
         if (options.TypeOptions != null)
         {
-            var xoptions = options.TypeOptions.HideNameDisabled();
+            var xoptions = options.TypeOptions.NoHideName();
             var str = source.ParameterType.EasyName(xoptions);
             sb.Append(str);
 
@@ -133,8 +133,8 @@ public static partial class EasyNameExtensions
             if (options.UseModifiers)
             {
                 if (source.IsIn) sb.Insert(0, "in ");
-                if (source.IsOut) sb.Insert(0, "out ");
-                if (source.ParameterType.IsByRef)
+                else if (source.IsOut) sb.Insert(0, "out ");
+                else if (source.ParameterType.IsByRef)
                 {
                     var attr = "System.Runtime.CompilerServices.IsReadOnlyAttribute";
                     var ronly = source.GetCustomAttributes().Any(x => x.GetType().FullName == attr);

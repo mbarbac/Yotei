@@ -20,5 +20,5 @@ public enum EasyGenericStyle
     /// <summary>
     /// Use the easy names of the generic arguments.
     /// </summary>
-    UseNames,
+    UseEasyNames,
 }

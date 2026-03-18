@@ -1,10 +1,10 @@
-﻿namespace Yotei.Tools.Tests;
+﻿namespace Yotei.Tools.Tests.EasyNames;
 
 // ========================================================
 //[Enforced]
 public static class Test_EasyType
 {
-    readonly static string NAMESPACE = "Yotei.Tools.Tests";
+    readonly static string NAMESPACE = "Yotei.Tools.Tests.EasyNames";
     readonly static string TESTHOST = "Test_EasyType";
 
     readonly static EasyTypeOptions EMPTY = EasyTypeOptions.Empty;
@@ -27,7 +27,7 @@ public static class Test_EasyType
         options = DEFAULT;
         name = item.EasyName(options); Assert.Equal("int", name);
 
-        options = DEFAULT with { UseNamespace = true };
+        options = DEFAULT with { NamespaceStyle = EasyNamespaceStyle.Standard };
         name = item.EasyName(options); Assert.Equal("int", name);
 
         options = FULL;
@@ -45,13 +45,13 @@ public static class Test_EasyType
         options = EMPTY;
         name = item.EasyName(options); Assert.Equal("Nullable", name);
 
-        options = EMPTY with { GenericStyle = EasyGenericStyle.UseNames };
+        options = EMPTY with { GenericStyle = EasyGenericStyle.UseEasyNames };
         name = item.EasyName(options); Assert.Equal("Nullable<Int32>", name);
 
         options = DEFAULT;
         name = item.EasyName(options); Assert.Equal("int?", name);
 
-        options = DEFAULT with { UseNamespace = true };
+        options = DEFAULT with { NamespaceStyle = EasyNamespaceStyle.Standard };
         name = item.EasyName(options); Assert.Equal("int?", name);
 
         options = DEFAULT with { NullableStyle = EasyNullableStyle.KeepWrappers };
@@ -77,7 +77,7 @@ public static class Test_EasyType
         options = DEFAULT;
         name = item.EasyName(options); Assert.Equal("string", name);
 
-        options = DEFAULT with { UseNamespace = true };
+        options = DEFAULT with { NamespaceStyle = EasyNamespaceStyle.Standard };
         name = item.EasyName(options); Assert.Equal("string", name);
 
         options = FULL;
@@ -102,7 +102,7 @@ public static class Test_EasyType
         name = item.EasyName(options); Assert.Equal("string?", name);
 
         // Used in a context not allowed by the compiler...
-        options = DEFAULT with { UseNamespace = true };
+        options = DEFAULT with { NamespaceStyle = EasyNamespaceStyle.Standard };
         name = item.EasyName(options); Assert.Equal("string?", name);
 
         options = DEFAULT with { NullableStyle = EasyNullableStyle.KeepWrappers };
@@ -139,7 +139,7 @@ public static class Test_EasyType
         options = DEFAULT with { NullableStyle = EasyNullableStyle.KeepWrappers };
         name = item.EasyName(options); Assert.Equal("IFace1A<T?>", name);
 
-        options = DEFAULT with { UseNamespace = true };
+        options = DEFAULT with { NamespaceStyle = EasyNamespaceStyle.Standard };
         name = item.EasyName(options); Assert.Equal($"{NAMESPACE}.{TESTHOST}.IFace1A<T?>", name);
     }
 
@@ -166,7 +166,7 @@ public static class Test_EasyType
         options = DEFAULT with { NullableStyle = EasyNullableStyle.KeepWrappers };
         name = item.EasyName(options); Assert.Equal("IFace1A<string>", name);
 
-        options = DEFAULT with { UseNamespace = true };
+        options = DEFAULT with { NamespaceStyle = EasyNamespaceStyle.Standard };
         name = item.EasyName(options); Assert.Equal($"{NAMESPACE}.{TESTHOST}.IFace1A<string>", name);
 
         options = FULL;
@@ -196,7 +196,7 @@ public static class Test_EasyType
         options = DEFAULT with { NullableStyle = EasyNullableStyle.KeepWrappers };
         name = item.EasyName(options); Assert.Equal("IFace1A<IsNullable<string>>", name);
 
-        options = DEFAULT with { UseNamespace = true };
+        options = DEFAULT with { NamespaceStyle = EasyNamespaceStyle.Standard };
         name = item.EasyName(options);
         Assert.Equal($"{NAMESPACE}.{TESTHOST}.IFace1A<string?>", name);
 
@@ -506,7 +506,7 @@ public static class Test_EasyType
         options = DEFAULT;
         name = item.EasyName(options); Assert.Equal("Attribute", name);
 
-        options = DEFAULT with { UseNamespace = true };
+        options = DEFAULT with { NamespaceStyle = EasyNamespaceStyle.Standard };
         name = item.EasyName(options); Assert.Equal("System.Attribute", name);
 
         options = FULL;
@@ -527,10 +527,36 @@ public static class Test_EasyType
         options = DEFAULT;
         name = item.EasyName(options); Assert.Equal("IsNullable", name);
 
-        options = DEFAULT with { UseNamespace = true };
+        options = DEFAULT with { NamespaceStyle = EasyNamespaceStyle.Standard };
         name = item.EasyName(options); Assert.Equal("Yotei.Tools.IsNullable", name);
 
         options = FULL;
         name = item.EasyName(options); Assert.Equal("Yotei.Tools.IsNullableAttribute", name);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Global_Namespace()
+    {
+        EasyTypeOptions options;
+        string name;
+        var item = typeof(IsNullableAttribute);
+
+        options = DEFAULT;
+        name = item.EasyName(options); Assert.Equal("IsNullable", name);
+
+        options = DEFAULT with { NamespaceStyle = EasyNamespaceStyle.UseGlobal };
+        name = item.EasyName(options);
+        Assert.Equal("global:Yotei.Tools.IsNullable", name);
+
+        options = FULL;
+        name = item.EasyName(options);
+        Assert.Equal("Yotei.Tools.IsNullableAttribute", name);
+
+        options = FULL with { NamespaceStyle = EasyNamespaceStyle.UseGlobal };
+        name = item.EasyName(options);
+        Assert.Equal("global:Yotei.Tools.IsNullableAttribute", name);
     }
 }
