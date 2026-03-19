@@ -184,7 +184,7 @@ public static partial class EasyNameExtensions
 
         // Namespace...
         if (options.NamespaceStyle != EasyNamespaceStyle.None &&
-            host == null &&
+            host == null && !isgen &&
             xname == null)
         {
             var str = source.Namespace;

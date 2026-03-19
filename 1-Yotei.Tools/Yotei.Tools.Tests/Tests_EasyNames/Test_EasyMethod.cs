@@ -219,9 +219,91 @@ public static class Test_EasyMethod
 
     // ----------------------------------------------------
 
-    // TODO: metodos con generics
-    // TODO: metodos en nested hosts
-    // TODO: metodos returning nullable
+    interface IFace1A<[IsNullable] K, [IsNullable] T>
+    { public interface IFace1B<S> { K? Name<R>(ref T? one, S? two); } }
 
-    // TODO: metodos que sean constructors.
+    //[Enforced]
+    [Fact]
+    public static void Test_Nested_Generics_Unbound_NullabilityOfParametersLost()
+    {
+        EasyMethodOptions options;
+        string name;
+        var type = typeof(IFace1A<,>.IFace1B<>);
+        var item = type.GetMethod("Name"); Assert.NotNull(item);
+
+        options = EMPTY;
+        name = item.EasyName(options); Assert.Equal("Name", name);
+
+        options = DEFAULT;
+        name = item.EasyName(options); Assert.Equal("Name<R>(ref T, S)", name);
+
+        options = DEFAULT with { ReturnTypeOptions = EasyTypeOptions.Default };
+        name = item.EasyName(options); Assert.Equal("K? Name<R>(ref T, S)", name);
+
+        options = FULL;
+        name = item.EasyName(options);
+        Assert.Equal(
+            $"K? {NAMESPACE}.{TESTHOST}." +
+            "IFace1A<K?, T?>.IFace1B<S>.Name<R>(ref T one, S two)",
+            name);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Nested_Generics_Bound_RefNullableNeedsWrapper()
+    {
+        EasyMethodOptions options;
+        string name;
+        var type = typeof(IFace1A<byte?, short?>.IFace1B<IsNullable<string?>>);
+        var item = type.GetMethod("Name"); Assert.NotNull(item);
+
+        options = EMPTY;
+        name = item.EasyName(options); Assert.Equal("Name", name);
+
+        options = DEFAULT;
+        name = item.EasyName(options); Assert.Equal("Name<R>(ref short?, string?)", name);
+
+        options = DEFAULT with { ReturnTypeOptions = EasyTypeOptions.Default };
+        name = item.EasyName(options); Assert.Equal("byte? Name<R>(ref short?, string?)", name);
+
+        options = FULL;
+        name = item.EasyName(options);
+        Assert.Equal(
+            $"System.Nullable<System.Byte> {NAMESPACE}.{TESTHOST}." +
+            "IFace1A<System.Nullable<System.Byte>, System.Nullable<System.Int16>>." +
+            "IFace1B<Yotei.Tools.IsNullable<System.String>>." +
+            "Name<R>(ref System.Nullable<System.Int16> one, Yotei.Tools.IsNullable<System.String> two)",
+            name);
+    }
+
+    // ----------------------------------------------------
+
+    interface IFace2A<[IsNullable] K, [IsNullable] T>
+    { public interface IFace2B<S> { K? Name<R>([IsNullable] ref T? one, [IsNullable] S? two); } }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Nested_Generics_Unbound_NullabilityOfParametersByAttribute()
+    {
+        EasyMethodOptions options;
+        string name;
+        var type = typeof(IFace2A<,>.IFace2B<>);
+        var item = type.GetMethod("Name"); Assert.NotNull(item);
+
+        options = EMPTY;
+        name = item.EasyName(options); Assert.Equal("Name", name);
+
+        options = DEFAULT;
+        name = item.EasyName(options); Assert.Equal("Name<R>(ref T?, S?)", name);
+
+        options = DEFAULT with { ReturnTypeOptions = EasyTypeOptions.Default };
+        name = item.EasyName(options); Assert.Equal("K? Name<R>(ref T?, S?)", name);
+
+        options = FULL;
+        name = item.EasyName(options);
+        Assert.Equal(
+            $"K? {NAMESPACE}.{TESTHOST}." +
+            "IFace2A<K?, T?>.IFace2B<S>.Name<R>(ref T? one, S? two)",
+            name);
+    }
 }

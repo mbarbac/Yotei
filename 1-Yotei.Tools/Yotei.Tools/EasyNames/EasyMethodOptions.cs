@@ -157,8 +157,8 @@ public static partial class EasyNameExtensions
         // Modifiers...
         if (options.UseModifiers)
         {
+            // if (source.IsPrivate) sb.Append("private ");
             if (source.IsPublic && !iface) sb.Append("public ");
-            if (source.IsPrivate) sb.Append("private ");
             if (source.IsFamily) sb.Append("protected ");
             if (source.IsAssembly) sb.Append("internal ");
             if (source.IsFamilyOrAssembly) sb.Append("protected internal ");
@@ -215,7 +215,9 @@ public static partial class EasyNameExtensions
         // Name...
         if (constructor != null)
         {
-            // HIGH: EasyMethod constructor name
+            var name = host?.EasyName(EasyTypeOptions.Empty);
+            sb.Append(name ?? "new");
+            if (options.UseTechName) sb.Append(source.Name); // already has a dot!
         }
         if (method != null) sb.Append(source.Name);
 
