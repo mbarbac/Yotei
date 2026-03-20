@@ -2,8 +2,6 @@
 #pragma warning disable IDE0044
 #pragma warning disable IDE0060
 
-using System.Security.Cryptography.X509Certificates;
-
 namespace Yotei.Tools.Tests.EasyNames;
 
 // ========================================================

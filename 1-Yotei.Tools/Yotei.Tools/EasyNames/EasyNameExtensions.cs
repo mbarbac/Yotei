@@ -12,9 +12,11 @@ public static partial class EasyNameExtensions
     /// <returns></returns>
     internal static string? ToSpecialName(this Type source)
     {
-        if (source.IsByRef) source = source.GetElementType() ?? source;
+        if (source.IsByRef) return Core(source.GetElementType() ?? source);
+        if (source.IsArray) return Core(source.GetElementType() ?? source) + "[]";
+        return Core(source);
 
-        return source switch
+        string? Core(Type source) => source switch
         {
             Type t when t == typeof(void) => "void",
             Type t when t == typeof(object) => "object",
