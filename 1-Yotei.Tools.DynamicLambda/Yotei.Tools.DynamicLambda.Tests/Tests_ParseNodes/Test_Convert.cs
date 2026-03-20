@@ -26,14 +26,14 @@ public static class Test_Convert
         node = DLambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
         item = Assert.IsType<DLambdaNodeConvert>(node);
-        Assert.Equal("((Int32) x)", node.ToString());
+        Assert.Equal("((int) x)", node.ToString());
 
         Debug.WriteLine("");
         func = x => (string)x;
         node = DLambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
         item = Assert.IsType<DLambdaNodeConvert>(node);
-        Assert.Equal("((String) x)", node.ToString());
+        Assert.Equal("((string) x)", node.ToString());
 
         Debug.WriteLine("");
         func = x => (Person)x;
@@ -58,7 +58,7 @@ public static class Test_Convert
         node = DLambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
         item = Assert.IsType<DLambdaNodeConvert>(node);
-        Assert.Equal("((Int32) x.Alpha)", node.ToString());
+        Assert.Equal("((int) x.Alpha)", node.ToString());
 
         Debug.WriteLine("");
         func = x => (Person)x.Alpha;
@@ -81,7 +81,7 @@ public static class Test_Convert
         node = DLambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
         item = Assert.IsType<DLambdaNodeSetter>(node);
-        Assert.Equal("(x.Beta = ((Int32) x.Alpha))", node.ToString());
+        Assert.Equal("(x.Beta = ((int) x.Alpha))", node.ToString());
 
         Debug.WriteLine("");
         func = x => x.Alpha = (Person)x.Alpha;
@@ -104,7 +104,7 @@ public static class Test_Convert
         node = DLambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
         item = Assert.IsType<DLambdaNodeIndexed>(node);
-        Assert.Equal("x[((Person) x.Alpha), ((String) x.Beta)]", node.ToString());
+        Assert.Equal("x[((Person) x.Alpha), ((string) x.Beta)]", node.ToString());
     }
 
     // ----------------------------------------------------
@@ -122,14 +122,14 @@ public static class Test_Convert
         node = DLambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
         item = Assert.IsType<DLambdaNodeIndexed>(node);
-        Assert.Equal("x[((Person) x.Alpha), (x.Alpha = ((String) x.Beta))]", node.ToString());
+        Assert.Equal("x[((Person) x.Alpha), (x.Alpha = ((string) x.Beta))]", node.ToString());
 
         Debug.WriteLine("");
         func = x => x[(Person)x.Alpha, x.Alpha = (float)x.Alpha];
         node = DLambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
         item = Assert.IsType<DLambdaNodeIndexed>(node);
-        Assert.Equal("x[((Person) x.Alpha), (x.Alpha = ((Single) x.Alpha))]", node.ToString());
+        Assert.Equal("x[((Person) x.Alpha), (x.Alpha = ((float) x.Alpha))]", node.ToString());
     }
 
     //[Enforced]
@@ -145,6 +145,6 @@ public static class Test_Convert
         node = DLambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
         item = Assert.IsType<DLambdaNodeSetter>(node);
-        Assert.Equal("(x.Alpha = x.Alpha('NULL', (x.Alpha = ((Int32) x.Alpha))))", node.ToString());
+        Assert.Equal("(x.Alpha = x.Alpha('NULL', (x.Alpha = ((int) x.Alpha))))", node.ToString());
     }
 }

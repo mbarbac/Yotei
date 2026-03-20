@@ -70,7 +70,7 @@ public static class Test_ManyArguments
         Debug.WriteLine($"> Result: {node}");
         item = Assert.IsType<DLambdaNodeSetter>(node);
         Assert.Equal(
-            "(x.Alpha[((Int32) y.Alpha[((DateTime) x.Alpha)])] = ((Int32) y.Alpha[((DateTime) x.Alpha)]))",
+            "(x.Alpha[((int) y.Alpha[((DateTime) x.Alpha)])] = ((int) y.Alpha[((DateTime) x.Alpha)]))",
             node.ToString());
     }
 }

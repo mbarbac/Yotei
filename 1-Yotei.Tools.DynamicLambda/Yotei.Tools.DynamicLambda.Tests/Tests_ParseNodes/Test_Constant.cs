@@ -81,13 +81,13 @@ public static class Test_Constant
         node = DLambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
         item = Assert.IsType<DLambdaNodeConvert>(node);
-        Assert.Equal("((String) x)", node.ToString());
+        Assert.Equal("((string) x)", node.ToString());
 
         Debug.WriteLine("");
         func = x => (int)x.Delta.Beta.Alpha;
         node = DLambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
         item = Assert.IsType<DLambdaNodeConvert>(node);
-        Assert.Equal("((Int32) x.Delta.Beta.Alpha)", node.ToString());
+        Assert.Equal("((int) x.Delta.Beta.Alpha)", node.ToString());
     }
 }

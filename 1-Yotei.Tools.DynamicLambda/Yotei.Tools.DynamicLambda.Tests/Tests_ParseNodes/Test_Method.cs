@@ -106,14 +106,14 @@ public static class Test_Method
         node = DLambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
         item = Assert.IsType<DLambdaNodeMethod>(node);
-        Assert.Equal("x.Alpha<Int32>(x.Beta)", node.ToString());
+        Assert.Equal("x.Alpha<int>(x.Beta)", node.ToString());
 
         Debug.WriteLine("");
         func = x => x.Alpha<int, string>(x.Beta);
         node = DLambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
         item = Assert.IsType<DLambdaNodeMethod>(node);
-        Assert.Equal("x.Alpha<Int32, String>(x.Beta)", node.ToString());
+        Assert.Equal("x.Alpha<int, string>(x.Beta)", node.ToString());
     }
 
     // ----------------------------------------------------
