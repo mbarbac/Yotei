@@ -110,6 +110,7 @@ public static partial class EasyNameExtensions
                     goto ENDNULLABLE;
 
                 if (source.HasNullableEnabledAttribute() ||
+                    source.IsNullableByApi() ||
                     source.ParameterType.HasNullableEnabledAttribute())
                 {
                     if (sb.Length > 0 && sb[^1] != '?') sb.Append('?');
@@ -136,10 +137,11 @@ public static partial class EasyNameExtensions
                 else if (source.IsOut) sb.Insert(0, "out ");
                 else if (source.ParameterType.IsByRef)
                 {
-                    var attr = "System.Runtime.CompilerServices.IsReadOnlyAttribute";
-                    var ronly = source.GetCustomAttributes().Any(x => x.GetType().FullName == attr);
-                    var prefix = ronly ? "ref readonly " : "ref ";
-                    sb.Insert(0, prefix);
+                    var ronly =
+                        source.HasReadOnlyAttribute() ||
+                        source.ParameterType.HasReadOnlyAttribute();
+
+                    sb.Insert(0, ronly ? "ref readonly " : "ref ");
                 }
                 if (source.IsDefined(typeof(ParamArrayAttribute), false)) sb.Insert(0, "params ");
             }

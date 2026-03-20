@@ -90,4 +90,67 @@ public static partial class EasyNameExtensions
 
         return false;
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines nullability using the standard API.
+    /// </summary>
+    internal static bool IsNullableByApi(this ParameterInfo source)
+    {
+        var nic = new NullabilityInfoContext();
+        var info = nic.Create(source);
+        return
+            info.ReadState == NullabilityState.Nullable ||
+            info.WriteState == NullabilityState.Nullable;
+    }
+
+    /// <summary>
+    /// Determines nullability using the standard API.
+    /// </summary>
+    internal static bool IsNullableByApi(this PropertyInfo source)
+    {
+        var nic = new NullabilityInfoContext();
+        var info = nic.Create(source);
+        return
+            info.ReadState == NullabilityState.Nullable ||
+            info.WriteState == NullabilityState.Nullable;
+    }
+
+    /// <summary>
+    /// Determines nullability using the standard API.
+    /// </summary>
+    internal static bool IsNullableByApi(this FieldInfo source)
+    {
+        var nic = new NullabilityInfoContext();
+        var info = nic.Create(source);
+        return
+            info.ReadState == NullabilityState.Nullable ||
+            info.WriteState == NullabilityState.Nullable;
+    }
+
+    /// <summary>
+    /// Determines nullability using the standard API.
+    /// </summary>
+    internal static bool IsNullableByApi(this EventInfo source)
+    {
+        var nic = new NullabilityInfoContext();
+        var info = nic.Create(source);
+        return
+            info.ReadState == NullabilityState.Nullable ||
+            info.WriteState == NullabilityState.Nullable;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the given element is decorated with a readonly attribute.
+    /// </summary>
+    internal static bool HasReadOnlyAttribute(this ICustomAttributeProvider info)
+    {
+        var temp = "System.Runtime.CompilerServices.IsReadOnlyAttribute";
+        return info
+            .GetCustomAttributes(false)
+            .Any(x => x.GetType().FullName == temp);
+    }
 }

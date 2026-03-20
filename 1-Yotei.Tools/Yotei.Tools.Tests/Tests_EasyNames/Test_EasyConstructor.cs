@@ -19,23 +19,24 @@ public static class Test_EasyConstructor
 
     //[Enforced]
     [Fact]
-    public static void Test_Standard_RefParameterNullabilityLost()
+    public static void Test_Standard()
     {
         EasyMethodOptions options;
         string name;
         var type = typeof(Type0A);
-        var item = type.GetConstructors().First(); Assert.NotNull(item);
+        var item = type.GetConstructors().Single();
 
         options = EMPTY;
         name = item.EasyName(options); Assert.Equal("Type0A", name);
 
         options = DEFAULT;
-        name = item.EasyName(options); Assert.Equal("Type0A(ref int?, out string)", name);
+        name = item.EasyName(options); Assert.Equal("Type0A(ref int?, out string?)", name);
 
         options = FULL;
         name = item.EasyName(options);
         Assert.Equal(
-            "public Type0A.ctor(ref System.Nullable<System.Int32> one, out System.String two)",
+            $"public {NAMESPACE}.{TESTHOST}." +
+            "Type0A.ctor(ref System.Nullable<System.Int32> one, out System.String? two)",
             name);
     }
 
@@ -51,7 +52,7 @@ public static class Test_EasyConstructor
         string name;
         var type = typeof(Type0B);
         var flags = BindingFlags.Instance | BindingFlags.NonPublic;
-        var item = type.GetConstructors(flags).First(); Assert.NotNull(item);
+        var item = type.GetConstructors(flags).Single();
 
         options = EMPTY;
         name = item.EasyName(options); Assert.Equal("Type0B", name);
@@ -62,7 +63,8 @@ public static class Test_EasyConstructor
         options = FULL;
         name = item.EasyName(options);
         Assert.Equal(
-            "internal Type0B.ctor(ref System.Nullable<System.Int32> one, out System.String? two)",
+            $"internal {NAMESPACE}.{TESTHOST}."+
+            "Type0B.ctor(ref System.Nullable<System.Int32> one, out System.String? two)",
             name);
     }
 
@@ -78,7 +80,7 @@ public static class Test_EasyConstructor
         string name;
         var type = typeof(Type0C);
         var flags = BindingFlags.Instance | BindingFlags.NonPublic;
-        var item = type.GetConstructors(flags).First(); Assert.NotNull(item);
+        var item = type.GetConstructors(flags).Single();
 
         options = EMPTY;
         name = item.EasyName(options); Assert.Equal("Type0C", name);
@@ -89,7 +91,7 @@ public static class Test_EasyConstructor
         options = FULL;
         name = item.EasyName(options);
         Assert.Equal(
-            "protected Type0C.ctor" +
+            $"protected {NAMESPACE}.{TESTHOST}.Type0C.ctor" +
             "(ref System.Nullable<System.Int32> one, out Yotei.Tools.IsNullable<System.String> two)",
             name);
     }
@@ -106,7 +108,7 @@ public static class Test_EasyConstructor
         string name;
         var type = typeof(Type0D);
         var flags = BindingFlags.Static | BindingFlags.NonPublic;
-        var item = type.GetConstructors(flags).First(); Assert.NotNull(item);
+        var item = type.GetConstructors(flags).Single();
 
         options = EMPTY;
         name = item.EasyName(options); Assert.Equal("Type0D", name);
@@ -115,6 +117,7 @@ public static class Test_EasyConstructor
         name = item.EasyName(options); Assert.Equal("Type0D()", name);
 
         options = FULL;
-        name = item.EasyName(options);Assert.Equal("static Type0D.cctor()", name);
+        name = item.EasyName(options);
+        Assert.Equal($"static {NAMESPACE}.{TESTHOST}.Type0D.cctor()", name);
     }
 }

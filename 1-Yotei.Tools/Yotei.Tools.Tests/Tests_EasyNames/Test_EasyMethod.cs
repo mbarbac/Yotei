@@ -224,7 +224,7 @@ public static class Test_EasyMethod
 
     //[Enforced]
     [Fact]
-    public static void Test_Nested_Generics_Unbound_NullabilityOfParametersLost()
+    public static void Test_Nested_Generics_Unbound()
     {
         EasyMethodOptions options;
         string name;
@@ -235,16 +235,16 @@ public static class Test_EasyMethod
         name = item.EasyName(options); Assert.Equal("Name", name);
 
         options = DEFAULT;
-        name = item.EasyName(options); Assert.Equal("Name<R>(ref T, S)", name);
+        name = item.EasyName(options); Assert.Equal("Name<R>(ref T?, S?)", name);
 
         options = DEFAULT with { ReturnTypeOptions = EasyTypeOptions.Default };
-        name = item.EasyName(options); Assert.Equal("K? Name<R>(ref T, S)", name);
+        name = item.EasyName(options); Assert.Equal("K? Name<R>(ref T?, S?)", name);
 
         options = FULL;
         name = item.EasyName(options);
         Assert.Equal(
             $"K? {NAMESPACE}.{TESTHOST}." +
-            "IFace1A<K?, T?>.IFace1B<S>.Name<R>(ref T one, S two)",
+            "IFace1A<K?, T?>.IFace1B<S>.Name<R>(ref T? one, S? two)",
             name);
     }
 
@@ -304,6 +304,66 @@ public static class Test_EasyMethod
         Assert.Equal(
             $"K? {NAMESPACE}.{TESTHOST}." +
             "IFace2A<K?, T?>.IFace2B<S>.Name<R>(ref T? one, S? two)",
+            name);
+    }
+
+    // ----------------------------------------------------
+
+    class Type3A { public int Name() => 0; }
+    class Type3B : Type3A { public new int Name() => 0; }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_NewMethod()
+    {
+        EasyMethodOptions options;
+        string name;
+        var type = typeof(Type3B);
+        var item = type.GetMethod("Name"); Assert.NotNull(item);
+
+        options = EMPTY;
+        name = item.EasyName(options); Assert.Equal("Name", name);
+
+        options = DEFAULT;
+        name = item.EasyName(options); Assert.Equal("Name()", name);
+
+        options = DEFAULT with { ReturnTypeOptions = EasyTypeOptions.Default };
+        name = item.EasyName(options); Assert.Equal("int Name()", name);
+
+        options = FULL;
+        name = item.EasyName(options);
+        Assert.Equal(
+            $"public new System.Int32 {NAMESPACE}.{TESTHOST}.Type3B.Name()",
+            name);
+    }
+
+    // ----------------------------------------------------
+
+    class Type4A { public virtual int Name() => 0; }
+    class Type4B : Type4A { public new int Name() => 0; }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_NewMethod_FromVirtual()
+    {
+        EasyMethodOptions options;
+        string name;
+        var type = typeof(Type4B);
+        var item = type.GetMethod("Name"); Assert.NotNull(item);
+
+        options = EMPTY;
+        name = item.EasyName(options); Assert.Equal("Name", name);
+
+        options = DEFAULT;
+        name = item.EasyName(options); Assert.Equal("Name()", name);
+
+        options = DEFAULT with { ReturnTypeOptions = EasyTypeOptions.Default };
+        name = item.EasyName(options); Assert.Equal("int Name()", name);
+
+        options = FULL;
+        name = item.EasyName(options);
+        Assert.Equal(
+            $"public new System.Int32 {NAMESPACE}.{TESTHOST}.Type4B.Name()",
             name);
     }
 }

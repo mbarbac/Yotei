@@ -7,6 +7,11 @@
 public record EasyMethodOptions
 {
     /// <summary>
+    /// If enabled use member accessibility modifiers.
+    /// </summary>
+    public bool UseAccessibility { get; init; }
+
+    /// <summary>
     /// If enabled use member modifiers.
     /// </summary>
     public bool UseModifiers { get; init; }
@@ -53,6 +58,7 @@ public record EasyMethodOptions
         switch (mode)
         {
             case Mode.Full:
+                UseAccessibility = true;
                 UseModifiers = true;
                 ReturnTypeOptions = EasyTypeOptions.Full;
                 HostTypeOptions = EasyTypeOptions.Full;
@@ -154,62 +160,93 @@ public static partial class EasyNameExtensions
         var host = source.DeclaringType;
         var iface = host != null && host.IsInterface;
 
-        // Modifiers...
-        if (options.UseModifiers)
+        // Accesibility (not using 'private' for simplicity)...
+        if (options.UseAccessibility)
         {
-            // if (source.IsPrivate) sb.Append("private ");
             if (source.IsPublic && !iface) sb.Append("public ");
             if (source.IsFamily) sb.Append("protected ");
             if (source.IsAssembly) sb.Append("internal ");
             if (source.IsFamilyOrAssembly) sb.Append("protected internal ");
             if (source.IsFamilyAndAssembly) sb.Append("private protected ");
-
-            if (source.IsStatic) sb.Append("static ");
-            if (!iface && source.IsAbstract) sb.Append("abstract ");
-            // if (IsSealed()) sb.Append("sealed ");
-
-            if (IsOverride()) sb.Append("override ");
-            else if (!iface && IsVirtual()) sb.Append("virtual ");
         }
 
-        //LOW: EasyName, 'sealed' modifier in methods from interfaces.
-        //I have not found a way to obtain this in a reliable way, ie: from interface...
-        //bool IsSealed() =>
-        //    (source.IsVirtual && source.IsFinal) ||
-        //    (source.Attributes & MethodAttributes.Final) != 0 ||
-        //    (iface && method != null && !method.IsVirtual);
+        // Modifiers...
+        if (options.UseModifiers)
+        {
+            if (IsNew()) sb.Append("new ");
+            if (source.IsStatic) sb.Append("static ");
+            if (!iface && source.IsAbstract) sb.Append("abstract ");
+            if (IsOverride()) sb.Append("override ");
+            else if (!iface && IsVirtual()) sb.Append("virtual ");
 
-        bool IsOverride() =>
-            method != null &&
-            method.IsVirtual &&
-            method.GetBaseDefinition().DeclaringType != source.DeclaringType;
+            // LOW: no reliable way to obtain 'sealed' modifier in EasyName(method).
+            //bool IsSealed() =>
+            //    (source.IsVirtual && source.IsFinal) ||
+            //    (source.Attributes & MethodAttributes.Final) != 0 ||
+            //    (iface && method != null && !method.IsVirtual);
 
-        bool IsVirtual() => source.IsVirtual && !source.IsFinal;
+            bool IsOverride() =>
+                method != null &&
+                method.IsVirtual &&
+                method.GetBaseDefinition().DeclaringType != source.DeclaringType;
+
+            bool IsVirtual() => source.IsVirtual && !source.IsFinal;
+
+            bool IsNew() => method != null && !method.IsVirtual && BaseMethod(host?.BaseType) != null;
+            MethodInfo? BaseMethod(Type? parent)
+            {
+                while (parent != null)
+                {
+                    var temp = parent.GetMethod(
+                        method.Name,
+                        BindingFlags.Public | BindingFlags.NonPublic |
+                        BindingFlags.Instance | BindingFlags.Static,
+                        null,
+                        [.. method.GetParameters().Select(p => p.ParameterType)],
+                        null);
+
+                    if (temp != null) return temp;
+                    parent = parent.BaseType;
+                }
+                return null;
+            }
+        }
 
         // Return type...
         if (method != null && options.ReturnTypeOptions != null)
         {
             if (options.UseModifiers && method.ReturnType.IsByRef)
             {
-                var name = "System.Runtime.CompilerServices.IsReadOnlyAttribute";
-                var attr = method.ReturnTypeCustomAttributes
-                    .GetCustomAttributes(false)
-                    .Any(x => x.GetType().FullName == name);
-
-                sb.Append(attr ? "ref readonly " : "ref ");
+                var ronly = method.ReturnTypeCustomAttributes.HasReadOnlyAttribute();
+                sb.Append(ronly ? "ref readonly " : "ref ");
             }
 
             var xoptions = options.ReturnTypeOptions.NoHideName();
             var str = method.ReturnType.EasyName(xoptions);
-            if (str.Length > 0) sb.Append(str).Append(' ');
+            
+            if (str.Length > 0 && str[^1] != '?' && source.HasNullableEnabledAttribute())
+            {
+                if (xoptions.NullableStyle == EasyNullableStyle.KeepWrappers &&
+                    method.ReturnType.IsNullableWrapper())
+                    goto ENDNULLABLE;
+
+                if (xoptions.NullableStyle != EasyNullableStyle.None) str += '?';
+            }
+
+            ENDNULLABLE:
+            sb.Append(str).Append(' ');
         }
 
         // Host type...
-        if (method != null && options.HostTypeOptions != null && host != null)
+        if (options.HostTypeOptions != null)
         {
-            var xoptions = options.HostTypeOptions.NoHideName();
-            var str = host.EasyName(xoptions);
-            if (str.Length > 0) sb.Append(str).Append('.');
+            var temp = method != null ? host : host?.DeclaringType;
+            if (temp != null)
+            {
+                var xoptions = options.HostTypeOptions.NoHideName();
+                var str = temp.EasyName(xoptions);
+                if (str.Length > 0) sb.Append(str).Append('.');
+            }
         }
 
         // Name...
