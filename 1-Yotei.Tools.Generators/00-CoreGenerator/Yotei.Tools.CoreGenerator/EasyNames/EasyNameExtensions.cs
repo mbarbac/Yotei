@@ -16,7 +16,7 @@ internal static partial class EasyNameExtensions
         if (source.IsArray) return Core(source.GetElementType() ?? source) + "[]";
         return Core(source);
 
-        string? Core(Type source) => source switch
+        static string? Core(Type source) => source switch
         {
             Type t when t == typeof(void) => "void",
             Type t when t == typeof(object) => "object",
@@ -45,11 +45,12 @@ internal static partial class EasyNameExtensions
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
-    internal static bool IsGenericAlike(this Type source) =>
-        (!source.IsGenericType && source.FullName == null) ||
-        source.IsGenericParameter ||
-        source.IsGenericTypeParameter ||
-        source.IsGenericMethodParameter;
+    internal static bool IsGenericAlike(this Type source)
+        => (!source.IsGenericType && source.FullName == null)
+        || source.IsGenericParameter
+        // || source.IsGenericTypeParameter
+        // || source.IsGenericMethodParameter;
+        ;
 
     // ----------------------------------------------------
 
@@ -96,52 +97,66 @@ internal static partial class EasyNameExtensions
     // ----------------------------------------------------
 
     /// <summary>
-    /// Determines nullability using the standard API.
+    /// Determines nullability emulating the standard API.
     /// </summary>
-    internal static bool IsNullableByApi(this ParameterInfo source)
+    internal static bool IsNullableByApi(this ICustomAttributeProvider source)
     {
-        var nic = new NullabilityInfoContext();
-        var info = nic.Create(source);
-        return
-            info.ReadState == NullabilityState.Nullable ||
-            info.WriteState == NullabilityState.Nullable;
+        var attr = source.GetCustomAttributes(typeof(NullableAttribute), false).FirstOrDefault();
+        if (attr != null)
+        {
+            var values = ((NullableAttribute)attr).NullableFlags;
+            if (values.Length > 0 && values[0] == 2) return true;
+        }
+        return false;
     }
 
     /// <summary>
     /// Determines nullability using the standard API.
     /// </summary>
-    internal static bool IsNullableByApi(this PropertyInfo source)
-    {
-        var nic = new NullabilityInfoContext();
-        var info = nic.Create(source);
-        return
-            info.ReadState == NullabilityState.Nullable ||
-            info.WriteState == NullabilityState.Nullable;
-    }
+    //internal static bool IsNullableByApi(this ParameterInfo source)
+    //{
+    //    var nic = new NullabilityInfoContext();
+    //    var info = nic.Create(source);
+    //    return
+    //        info.ReadState == NullabilityState.Nullable ||
+    //        info.WriteState == NullabilityState.Nullable;
+    //}
 
     /// <summary>
     /// Determines nullability using the standard API.
     /// </summary>
-    internal static bool IsNullableByApi(this FieldInfo source)
-    {
-        var nic = new NullabilityInfoContext();
-        var info = nic.Create(source);
-        return
-            info.ReadState == NullabilityState.Nullable ||
-            info.WriteState == NullabilityState.Nullable;
-    }
+    //internal static bool IsNullableByApi(this PropertyInfo source)
+    //{
+    //    var nic = new NullabilityInfoContext();
+    //    var info = nic.Create(source);
+    //    return
+    //        info.ReadState == NullabilityState.Nullable ||
+    //        info.WriteState == NullabilityState.Nullable;
+    //}
 
     /// <summary>
     /// Determines nullability using the standard API.
     /// </summary>
-    internal static bool IsNullableByApi(this EventInfo source)
-    {
-        var nic = new NullabilityInfoContext();
-        var info = nic.Create(source);
-        return
-            info.ReadState == NullabilityState.Nullable ||
-            info.WriteState == NullabilityState.Nullable;
-    }
+    //internal static bool IsNullableByApi(this FieldInfo source)
+    //{
+    //    var nic = new NullabilityInfoContext();
+    //    var info = nic.Create(source);
+    //    return
+    //        info.ReadState == NullabilityState.Nullable ||
+    //        info.WriteState == NullabilityState.Nullable;
+    //}
+
+    /// <summary>
+    /// Determines nullability using the standard API.
+    /// </summary>
+    //internal static bool IsNullableByApi(this EventInfo source)
+    //{
+    //    var nic = new NullabilityInfoContext();
+    //    var info = nic.Create(source);
+    //    return
+    //        info.ReadState == NullabilityState.Nullable ||
+    //        info.WriteState == NullabilityState.Nullable;
+    //}
 
     // ----------------------------------------------------
 

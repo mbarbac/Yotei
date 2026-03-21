@@ -20,8 +20,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)EasyNames\EasyTypeOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EasyNames\IsNullableAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EasyNames\IsNullable[T].cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)EasyNames\SketchExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)EasyNames\SketchOptions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EasyRoslyn\EasyTypeSymbol.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EasyRoslyn\EasyNameExtensions[Ex].cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\ArgumentExceptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\ArgumentNullException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\IndexOutOfRangeException.cs" />

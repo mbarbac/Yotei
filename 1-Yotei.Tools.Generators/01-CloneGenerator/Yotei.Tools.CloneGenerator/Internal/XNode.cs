@@ -1,4 +1,4 @@
-﻿namespace Yotei.Tools.CloneGenerator;
+﻿/*namespace Yotei.Tools.CloneGenerator;
 
 // ========================================================
 internal interface IXNode
@@ -166,4 +166,4 @@ internal static class XNode
             });
         }
     }
-}
+}*/

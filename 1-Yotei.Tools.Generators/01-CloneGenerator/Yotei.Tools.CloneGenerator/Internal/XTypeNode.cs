@@ -1,4 +1,4 @@
-﻿#pragma warning disable IDE0075
+﻿/*#pragma warning disable IDE0075
 
 namespace Yotei.Tools.CloneGenerator;
 
@@ -372,4 +372,4 @@ internal class XTypeNode : TypeNode, IXNode
             }
         }
     }
-}
+}*/

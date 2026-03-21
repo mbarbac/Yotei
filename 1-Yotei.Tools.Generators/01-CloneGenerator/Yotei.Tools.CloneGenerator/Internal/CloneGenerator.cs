@@ -1,4 +1,4 @@
-﻿namespace Yotei.Tools.CloneGenerator;
+﻿/*namespace Yotei.Tools.CloneGenerator;
 
 // ========================================================
 /// <summary>
@@ -35,4 +35,4 @@ internal class CloneGenerator : TreeGenerator
         item.Attributes.AddRange(attributes);
         return item;
     }
-}
+}*/

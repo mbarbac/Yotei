@@ -146,7 +146,7 @@ internal static partial class EasyNameExtensions
                 method.IsVirtual &&
                 method.GetBaseDefinition().DeclaringType != source.DeclaringType;
 
-            bool IsVirtual() => method.IsVirtual && !method.IsFinal;
+            bool IsVirtual() => method != null && method.IsVirtual && !method.IsFinal;
 
             bool IsNew() => method != null && !method.IsVirtual && BaseMethod(host?.BaseType) != null;
             MethodInfo? BaseMethod(Type? parent)

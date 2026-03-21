@@ -16,7 +16,7 @@ public static partial class EasyNameExtensions
         if (source.IsArray) return Core(source.GetElementType() ?? source) + "[]";
         return Core(source);
 
-        string? Core(Type source) => source switch
+        static string? Core(Type source) => source switch
         {
             Type t when t == typeof(void) => "void",
             Type t when t == typeof(object) => "object",
