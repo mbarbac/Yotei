@@ -255,8 +255,7 @@ internal static partial class EasyNameExtensions
         // Name...
         if (constructor != null)
         {
-            var name = host?.EasyName(EasyTypeOptions.Empty);
-            sb.Append(name ?? "new");
+            var name = host?.EasyName(EasyTypeOptions.Empty) ?? "new";
             if (options.UseTechName) sb.Append(source.Name); // already has a dot!
         }
         if (method != null) sb.Append(source.Name);

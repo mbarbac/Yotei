@@ -75,39 +75,30 @@ internal static partial class EasyNameExtensions
         }
 
         // Host type...
-        if (options.HostTypeOptions != null && (
+        if (options.HostTypeOptions != null && 
+            host != null && (
             source.MethodKind is not MethodKind.Constructor and not MethodKind.StaticConstructor))
         {
-            throw null;
-        }
-
-        /*
-
-        // Host type...
-        if (options.HostTypeOptions != null)
-        {
-            var temp = method != null ? host : host?.DeclaringType;
-            if (temp != null)
-            {
-                var xoptions = options.HostTypeOptions.NoHideName();
-                var str = temp.EasyName(xoptions);
-                if (str.Length > 0) sb.Append(str).Append('.');
-            }
+            var xoptions = options.HostTypeOptions.NoHideName();
+            var str = host.EasyName(xoptions);
+            if (str.Length > 0) sb.Append(str).Append('.');
         }
 
         // Name...
-        if (constructor != null)
+        if (source.MethodKind is MethodKind.Constructor or MethodKind.StaticConstructor)
         {
-            var name = host?.EasyName(EasyTypeOptions.Empty);
-            sb.Append(name ?? "new");
-            if (options.UseTechName) sb.Append(source.Name); // already has a dot!
+            var str = options.UseTechName
+                ? source.Name
+                : host?.EasyName(EasyTypeOptions.Empty) ?? "new";
+
+            sb.Append(str);
         }
-        if (method != null) sb.Append(source.Name);
+        else sb.Append(source.Name);
 
         // Generic arguments...
-        if (method != null && options.GenericOptions != null)
+        if (options.GenericOptions != null)
         {
-            var args = source.GetGenericArguments();
+            var args = source.TypeArguments;
             if (args.Length > 0)
             {
                 sb.Append('<'); for (int i = 0; i < args.Length; i++)
@@ -126,7 +117,7 @@ internal static partial class EasyNameExtensions
         {
             sb.Append('('); if (options.ParameterOptions != null)
             {
-                var args = source.GetParameters();
+                var args = source.Parameters;
                 for (int i = 0; i < args.Length; i++)
                 {
                     var arg = args[i];
@@ -137,7 +128,6 @@ internal static partial class EasyNameExtensions
             }
             sb.Append(')');
         }
-         */
         
         // Finishing...
         return sb.ToString();
