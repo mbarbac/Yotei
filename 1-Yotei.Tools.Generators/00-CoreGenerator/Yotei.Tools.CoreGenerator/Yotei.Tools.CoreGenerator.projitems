@@ -20,6 +20,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)EasyNames\EasyTypeOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EasyNames\IsNullableAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EasyNames\IsNullable[T].cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EasyRoslyn\EasyParameterSymbol.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EasyRoslyn\EasyTypeSymbol.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EasyRoslyn\EasyNameExtensions[Ex].cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\ArgumentExceptions.cs" />

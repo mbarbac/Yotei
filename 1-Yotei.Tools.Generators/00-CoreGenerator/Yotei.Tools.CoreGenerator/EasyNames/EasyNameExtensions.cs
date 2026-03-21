@@ -13,7 +13,14 @@ internal static partial class EasyNameExtensions
     internal static string? ToSpecialName(this Type source)
     {
         if (source.IsByRef) return Core(source.GetElementType() ?? source);
-        if (source.IsArray) return Core(source.GetElementType() ?? source) + "[]";
+        if (source.IsArray)
+        {
+            var str = Core(source.GetElementType() ?? source);
+            var rank = source.GetArrayRank();
+
+            str = $"{str}[{new string(',', rank - 1)}]";
+            return str;
+        }
         return Core(source);
 
         static string? Core(Type source) => source switch

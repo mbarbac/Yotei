@@ -244,19 +244,22 @@ internal static partial class EasyNameExtensions
         }
 
         // Nullable annotations...
-        if (options.NullableStyle != EasyNullableStyle.None)
+        while (options.NullableStyle != EasyNullableStyle.None &&
+            sb.Length > 0 &&
+            sb[^1] != '?')
         {
             if (options.NullableStyle == EasyNullableStyle.KeepWrappers &&
                 source.IsNullableWrapper())
-                goto ENDNULLABLE;
+                break;
 
             if (source.HasNullableEnabledAttribute())
             {
                 if (sb.Length > 0 && sb[^1] != '?') sb.Append('?');
-                goto ENDNULLABLE;
-            }   
+                break;
+            }
+
+            break;
         }
-        ENDNULLABLE:;
 
         // Finishing...
         return sb.ToString();

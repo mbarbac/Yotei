@@ -8,7 +8,8 @@ internal static partial class EasyNameExtensions
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
-    public static string EasyName(this ITypeSymbol source) => source.EasyName(EasyTypeOptions.Default);
+    public static string EasyName(
+        this ITypeSymbol source) => source.EasyName(EasyTypeOptions.Default);
 
     /// <summary>
     /// Obtains a c#-alike string representation of the given element, using the given options.
@@ -33,7 +34,7 @@ internal static partial class EasyNameExtensions
             // implements 'INamedTypeSymbol' we can just continue without custom processing,
             // case IErrorTypeSymbol:
 
-            // I have not yet a use case for this case, so I'm not going to maintain it for now.
+            // I have not a use case for this case yet, so I'm not going to maintain it for now.
             // case IFunctionPointerTypeSymbol:
 
             default: break;
@@ -46,121 +47,131 @@ internal static partial class EasyNameExtensions
         var args = named is null ? [] : named.TypeArguments;
         var host = source.ContainingType;
 
-        
-
-        // Finishing...
-        return sb.ToString();
-    }
-    /*
-
-        // Processing...
-        
-        var isgen = source.IsGenericAlike();
-        var host = source.DeclaringType;
-
         // Shortcut nullable wrappers...
         if (options.NullableStyle == EasyNullableStyle.UseAnnotations &&
             source.IsNullableWrapper())
         {
-            var arg = source.GetGenericArguments()[0];
+            var arg = args[0];
             var str = arg.EasyName(options);
             if (str.Length > 0 && !str.EndsWith('?')) str += '?';
             return str;
         }
 
         // Variance...
-        if (options.UseVariance && source.IsGenericParameter)
+        if (options.UseVariance && source is ITypeParameterSymbol par)
         {
-            var gpa = source.GenericParameterAttributes;
-            var variance = gpa & GenericParameterAttributes.VarianceMask;
-
-            if ((variance & GenericParameterAttributes.Covariant) != 0) sb.Append("out ");
-            if ((variance & GenericParameterAttributes.Contravariant) != 0) sb.Append("in ");
+            switch (par.Variance)
+            {
+                case VarianceKind.Out: sb.Append("out "); break;
+                case VarianceKind.In: sb.Append("in "); break;
+            }
         }
 
         // Special names...
-        var xname = options.UseSpecialNames ? source.ToSpecialName() : null;
+        if (named != null && named.Arity == 0 && options.UseSpecialNames)
+        {
+            var str = named.ToSpecialName();
+            if (str != null)
+            {
+                sb.Append(str);
+                goto TRYDECORATED; // yes, yes, I know..
+            }
+        }
 
         // Namespace...
-        if (options.NamespaceStyle != EasyNamespaceStyle.None &&
-            host == null && !isgen &&
-            xname == null)
+        if (options.NamespaceStyle != EasyNamespaceStyle.None && host == null && !isgen)
         {
-            var str = source.Namespace;
-            if (str != null && str.Length > 0)
+            var ns = source.ContainingNamespace;
+            if (ns != null)
             {
-                if (options.NamespaceStyle == EasyNamespaceStyle.UseGlobal) sb.Append("global:");
-                sb.Append(str).Append('.');
+                var str = EasyNamespace(ns, options);
+                if (str != null && str.Length > 0) sb.Append(str).Append('.');
             }
         }
 
         // Host...
         if ((options.UseHost || options.NamespaceStyle != EasyNamespaceStyle.None) &&
-            host != null && !isgen &&
-            xname == null)
+            host != null &&
+            !isgen)
         {
             var xoptions = options.NoHideName();
-            var str = host.EasyName(types, xoptions);
+            var str = host.EasyName(xoptions);
             if (str.Length > 0) sb.Append(str).Append('.');
         }
 
         // Name...
-        string? name = xname; if (name == null)
-        {
-            name = source.Name;
-            var index = name.IndexOf('`'); if (index >= 0) name = name[..index];
-            if (name.Length > 0 && name[^1] == '&') name = name[..^1];
+        var misc = default(SymbolDisplayMiscellaneousOptions);
+        if (options.UseSpecialNames) misc |= SymbolDisplayMiscellaneousOptions.UseSpecialTypes;
+        if (options.RemoveAttributeSuffix) misc |= SymbolDisplayMiscellaneousOptions.RemoveAttributeSuffix;
 
-            if (options.RemoveAttributeSuffix &&
-                name != "Attribute" &&
-                name.EndsWith("Attribute"))
-                name = name.RemoveLast("Attribute").ToString();
-        }
+        var format = new SymbolDisplayFormat(miscellaneousOptions: misc);
+        var name = source.ToDisplayString(format);
         sb.Append(name);
 
         // Generic arguments...
-        if (options.GenericStyle != EasyGenericStyle.None)
+        if (options.GenericStyle != EasyGenericStyle.None && args.Length > 0)
         {
-            var args = source.GetGenericArguments();
-            var used = host == null ? 0 : host.GetGenericArguments().Length;
-            var need = args.Length - used;
+            var xoptions = options.GenericStyle == EasyGenericStyle.PlaceHolders
+                ? options.YesHideName()
+                : options.NoHideName();
 
-            if (need > 0)
+            sb.Append('<'); for (int i = 0; i < args.Length; i++)
             {
-                var xoptions = options.GenericStyle == EasyGenericStyle.PlaceHolders
-                    ? options.YesHideName()
-                    : options.NoHideName();
-
-                sb.Append('<'); for (int i = 0; i < need; i++)
-                {
-                    var arg = types[used + i];
-                    var str = arg.EasyName(xoptions);
-                    if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
-                    sb.Append(str);
-                }
-                sb.Append('>');
+                var arg = args[i];
+                var str = arg.EasyName(xoptions);
+                if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
+                sb.Append(str);
             }
+            sb.Append('>');
         }
 
-        // Nullable annotations...
-        if (options.NullableStyle != EasyNullableStyle.None)
+        // Decorated nullable annotations...
+        TRYDECORATED:
+        while (options.NullableStyle != EasyNullableStyle.None &&
+            sb.Length > 0 &&
+            sb[^1] != '?')
         {
             if (options.NullableStyle == EasyNullableStyle.KeepWrappers &&
                 source.IsNullableWrapper())
-                goto ENDNULLABLE;
+                break;
 
-            if (source.HasNullableEnabledAttribute())
-            {
-                if (sb.Length > 0 && sb[^1] != '?') sb.Append('?');
-                goto ENDNULLABLE;
-            }   
+            if (source.IsNullableByAnnotationOrAttribute()) sb.Append('?');
+            break;
         }
-        ENDNULLABLE:;
 
         // Finishing...
         return sb.ToString();
     }
-     */
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked when the symbol is a namespace. Returns null if no namespace can be obtained.
+    /// </summary>
+    static string? EasyNamespace(INamespaceSymbol source, EasyTypeOptions options)
+    {
+        List<string> names = [];
+
+        ISymbol? node = source;
+        while (node != null)
+        {
+            if (node is INamespaceSymbol ns &&
+                ns.Name != null &&
+                ns.Name.Length > 0) names.Add(ns.Name);
+
+            node = node.ContainingSymbol;
+        }
+
+        if (names.Count == 0) return null;
+        else
+        {
+            names.Reverse();
+            var str = string.Join(".", names);
+
+            if (options.NamespaceStyle == EasyNamespaceStyle.UseGlobal) str = $"global::{str}";
+            return str;
+        }
+    }
 
     // ----------------------------------------------------
 
@@ -169,7 +180,24 @@ internal static partial class EasyNameExtensions
     /// </summary>
     static string EasyNameTypeArray(IArrayTypeSymbol source, EasyTypeOptions options)
     {
-        throw null;
+        var type = source.ElementType;
+        var name = EasyName(type, options);
+
+        name = $"{name}[{new string(',', source.Rank - 1)}]";
+
+        if (!name.EndsWith('?') &&
+            options.NullableStyle != EasyNullableStyle.None)
+        {
+            if (source.NullableAnnotation == NullableAnnotation.Annotated)
+                return name + '?';
+
+            if (source.GetAttributes().Any(x => x.AttributeClass?.Name
+                is (nameof(IsNullableAttribute))
+                or (nameof(NullableAttribute))))
+                return name + '?';
+        }
+
+        return name;
     }
 
     // ----------------------------------------------------
@@ -179,6 +207,21 @@ internal static partial class EasyNameExtensions
     /// </summary>
     static string EasyNameTypePointer(IPointerTypeSymbol source, EasyTypeOptions options)
     {
-        throw null;
+        var type = source.PointedAtType;
+        var name = EasyName(type, options);
+
+        if (!name.EndsWith('?') &&
+            options.NullableStyle != EasyNullableStyle.None)
+        {
+            if (source.NullableAnnotation == NullableAnnotation.Annotated)
+                return name + '?';
+
+            if (source.GetAttributes().Any(x => x.AttributeClass?.Name
+                is (nameof(IsNullableAttribute))
+                or (nameof(NullableAttribute))))
+                return name + '?';
+        }
+
+        return name;
     }
 }

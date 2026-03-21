@@ -101,23 +101,24 @@ internal static partial class EasyNameExtensions
             var str = source.ParameterType.EasyName(xoptions);
             sb.Append(str);
 
-            if (sb.Length > 0 && sb[^1] != '?' &&
+            while (sb.Length > 0 && sb[^1] != '?' &&
                 options.TypeOptions != null &&
                 options.TypeOptions.NullableStyle != EasyNullableStyle.None)
             {
                 if (options.TypeOptions.NullableStyle == EasyNullableStyle.KeepWrappers &&
                     source.ParameterType.IsNullableWrapper())
-                    goto ENDNULLABLE;
+                    break;
 
                 if (source.HasNullableEnabledAttribute() ||
                     source.IsNullableByApi() ||
                     source.ParameterType.HasNullableEnabledAttribute())
                 {
-                    if (sb.Length > 0 && sb[^1] != '?') sb.Append('?');
-                    goto ENDNULLABLE;
+                    sb.Append('?');
+                    break;
                 }
+
+                break;
             }
-            ENDNULLABLE:;
         }
 
         // Parameter name...
@@ -131,6 +132,7 @@ internal static partial class EasyNameExtensions
         if (sb.Length > 0)
         {
             if (options.UseThis && IsThisParameter(source)) sb.Insert(0, "this ");
+
             if (options.UseModifiers)
             {
                 if (source.IsIn) sb.Insert(0, "in ");
@@ -144,6 +146,7 @@ internal static partial class EasyNameExtensions
                     sb.Insert(0, ronly ? "ref readonly " : "ref ");
                 }
                 if (source.IsDefined(typeof(ParamArrayAttribute), false)) sb.Insert(0, "params ");
+                if (IsScoped(source)) sb.Insert(0, "scoped ");
             }
         }
 
@@ -158,6 +161,14 @@ internal static partial class EasyNameExtensions
                 method != null &&
                 method.IsDefined(typeof(ExtensionAttribute), false) &&
                 source.Position == 0;
+        }
+
+        // Determines if the parameter is a scoped one...
+        static bool IsScoped(ParameterInfo source)
+        {
+            return source.CustomAttributes.Any(x =>
+                x.AttributeType.Name.Contains("Scoped") &&
+                x.AttributeType.Namespace == "System.Runtime.CompilerServices");
         }
     }
 }
