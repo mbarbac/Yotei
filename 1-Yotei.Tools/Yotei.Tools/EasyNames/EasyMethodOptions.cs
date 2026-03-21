@@ -170,20 +170,22 @@ public static partial class EasyNameExtensions
             if (source.IsFamilyAndAssembly) sb.Append("private protected ");
         }
 
+        //bool IsSealed() =>
+        //    (source.IsVirtual && source.IsFinal) ||
+        //    (source.Attributes & MethodAttributes.Final) != 0 ||
+        //    (iface && method != null && !method.IsVirtual);
+
         // Modifiers...
         if (options.UseModifiers)
         {
+            // LOW: not found a reliable way to determine if 'sealed' was used...
+            // LOW: not found a way to determine if 'partial' was used...
+
             if (IsNew()) sb.Append("new ");
             if (source.IsStatic) sb.Append("static ");
             if (!iface && source.IsAbstract) sb.Append("abstract ");
             if (IsOverride()) sb.Append("override ");
             else if (!iface && IsVirtual()) sb.Append("virtual ");
-
-            // LOW: no reliable way to obtain 'sealed' modifier in EasyName(method).
-            //bool IsSealed() =>
-            //    (source.IsVirtual && source.IsFinal) ||
-            //    (source.Attributes & MethodAttributes.Final) != 0 ||
-            //    (iface && method != null && !method.IsVirtual);
 
             bool IsOverride() =>
                 method != null &&
@@ -224,16 +226,15 @@ public static partial class EasyNameExtensions
             var xoptions = options.ReturnTypeOptions.NoHideName();
             var str = method.ReturnType.EasyName(xoptions);
             
-            if (str.Length > 0 && str[^1] != '?' && source.HasNullableEnabledAttribute())
+            while (str.Length > 0 && str[^1] != '?' && source.HasNullableEnabledAttribute())
             {
                 if (xoptions.NullableStyle == EasyNullableStyle.KeepWrappers &&
                     method.ReturnType.IsNullableWrapper())
-                    goto ENDNULLABLE;
+                    break;
 
                 if (xoptions.NullableStyle != EasyNullableStyle.None) str += '?';
+                break;
             }
-
-            ENDNULLABLE:
             sb.Append(str).Append(' ');
         }
 

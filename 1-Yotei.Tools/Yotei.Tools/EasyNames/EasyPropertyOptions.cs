@@ -126,20 +126,22 @@ public static partial class EasyNameExtensions
             if (method.IsFamilyAndAssembly) sb.Append("private protected ");
         }
 
+        //bool IsSealed() =>
+        //    (source.IsVirtual && source.IsFinal) ||
+        //    (source.Attributes & MethodAttributes.Final) != 0 ||
+        //    (iface && method != null && !method.IsVirtual);
+
         // Modifiers...
         if (options.UseModifiers && method != null)
         {
+            // LOW: not found a reliable way to determine if 'sealed' was used...
+            // LOW: not found a way to determine if 'partial' was used...
+
             if (IsNew()) sb.Append("new ");
             if (method.IsStatic) sb.Append("static ");
             if (!iface && method.IsAbstract) sb.Append("abstract ");
             if (IsOverride()) sb.Append("override ");
             else if (!iface && IsVirtual()) sb.Append("virtual ");
-
-            // LOW: no reliable way to obtain 'sealed' modifier in EasyName(method).
-            //bool IsSealed() =>
-            //    (source.IsVirtual && source.IsFinal) ||
-            //    (source.Attributes & MethodAttributes.Final) != 0 ||
-            //    (iface && method != null && !method.IsVirtual);
 
             bool IsOverride() =>
                 method != null &&
@@ -187,18 +189,17 @@ public static partial class EasyNameExtensions
             var xoptions = options.MemberTypeOptions.NoHideName();
             var str = source.PropertyType.EasyName(xoptions);
             
-            if (str.Length > 0 &&
+            while (str.Length > 0 &&
                 str[^1] != '?' && (
                 source.HasNullableEnabledAttribute() || source.IsNullableByApi()))
             {
                 if (xoptions.NullableStyle == EasyNullableStyle.KeepWrappers &&
                     source.PropertyType.IsNullableWrapper())
-                    goto ENDNULLABLE;
+                    break;
 
                 if (xoptions.NullableStyle != EasyNullableStyle.None) str += '?';
+                break;
             }
-
-            ENDNULLABLE:
             sb.Append(str).Append(' ');
         }
 
