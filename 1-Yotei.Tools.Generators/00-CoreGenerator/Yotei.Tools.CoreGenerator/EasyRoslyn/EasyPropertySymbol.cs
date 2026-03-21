@@ -9,7 +9,7 @@ internal static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <returns></returns>
     public static string EasyName(
-        this IMethodSymbol source) => source.EasyName(EasyMethodOptions.Default);
+        this IPropertySymbol source) => source.EasyName(EasyPropertyOptions.Default);
 
     /// <summary>
     /// Obtains a c#-alike string representation of the given element, using the given options.
@@ -17,7 +17,7 @@ internal static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this IMethodSymbol source, EasyMethodOptions options)
+    public static string EasyName(this IPropertySymbol source, EasyPropertyOptions options)
     {
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(options);
@@ -27,7 +27,7 @@ internal static partial class EasyNameExtensions
         var iface = host != null && host.IsInterface;
         string? str;
 
-        // Accessibility...
+        // Accesibility (not using 'private' for simplicity)...
         if (options.UseAccessibility)
         {
             str = source.DeclaredAccessibility.ToAccessibilityString(iface);
@@ -41,15 +41,14 @@ internal static partial class EasyNameExtensions
             if (source.IsPartialDefinition) sb.Append("partial ");
             if (source.IsSealed) sb.Append("sealed ");
             if (source.IsStatic) sb.Append("static ");
-            
+
             if (!iface && source.IsAbstract) sb.Append("abstract ");
             if (source.IsOverride) sb.Append("override ");
             else if (source.IsVirtual) sb.Append("virtual ");
         }
 
-        // Return type...
-        if (options.ReturnTypeOptions != null && (            
-            source.MethodKind is not MethodKind.Constructor and not MethodKind.StaticConstructor))
+        // Member type...
+        if (options.MemberTypeOptions != null)
         {
             if (options.UseModifiers)
             {
@@ -63,13 +62,13 @@ internal static partial class EasyNameExtensions
                 if (str != null) sb.Append(str).Append(' ');
             }
 
-            var xoptions = options.ReturnTypeOptions.NoHideName();
-            str = source.ReturnType.EasyName(xoptions);
+            var xoptions = options.MemberTypeOptions.NoHideName();
+            str = source.Type.EasyName(xoptions);
 
             while (str.Length > 0 && str[^1] != '?' && source.IsNullableByAnnotationOrAttribute())
             {
                 if (xoptions.NullableStyle == EasyNullableStyle.KeepWrappers &&
-                    source.ReturnType.IsNullableWrapper())
+                    source.Type.IsNullableWrapper())
                     break;
 
                 if (xoptions.NullableStyle != EasyNullableStyle.None) str += '?';
@@ -79,9 +78,7 @@ internal static partial class EasyNameExtensions
         }
 
         // Host type...
-        if (options.HostTypeOptions != null && 
-            host != null && (
-            source.MethodKind is not MethodKind.Constructor and not MethodKind.StaticConstructor))
+        if (options.HostTypeOptions != null && host != null)
         {
             var xoptions = options.HostTypeOptions.NoHideName();
             str = host.EasyName(xoptions);
@@ -89,39 +86,16 @@ internal static partial class EasyNameExtensions
         }
 
         // Name...
-        if (source.MethodKind is MethodKind.Constructor or MethodKind.StaticConstructor)
-        {
-            str = options.UseTechName
-                ? source.Name
-                : host?.EasyName(EasyTypeOptions.Empty) ?? "new";
-
-            sb.Append(str);
-        }
-        else sb.Append(source.Name);
-
-        // Generic arguments...
-        if (options.GenericOptions != null)
-        {
-            var args = source.TypeArguments;
-            if (args.Length > 0)
-            {
-                sb.Append('<'); for (int i = 0; i < args.Length; i++)
-                {
-                    var arg = args[i];
-                    str = arg.EasyName(options.GenericOptions);
-                    if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
-                    sb.Append(str);
-                }
-                sb.Append('>');
-            }
-        }
+        var name = source.Name;
+        var args = source.Parameters;
+        if (args.Length > 0) name = options.UseTechName ? source.MetadataName : "this";
+        sb.Append(name);
 
         // Parameters...
-        if (options.UseBrackets || options.ParameterOptions != null)
+        if (args.Length > 0 && (options.UseBrackets || options.ParameterOptions != null))
         {
-            sb.Append('('); if (options.ParameterOptions != null)
+            sb.Append('['); if (options.ParameterOptions != null)
             {
-                var args = source.Parameters;
                 for (int i = 0; i < args.Length; i++)
                 {
                     var arg = args[i];
@@ -130,9 +104,9 @@ internal static partial class EasyNameExtensions
                     sb.Append(str);
                 }
             }
-            sb.Append(')');
+            sb.Append(']');
         }
-        
+
         // Finishing...
         return sb.ToString();
     }

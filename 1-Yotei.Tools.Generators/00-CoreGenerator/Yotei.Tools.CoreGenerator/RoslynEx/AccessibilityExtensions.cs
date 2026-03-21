@@ -7,19 +7,23 @@ internal static class AccessibilityExtensions
     {
         /// <summary>
         /// Obtains the string that correspond to the given accesibility value, or null if any.
-        /// If it is 'private', then null is returned unless explicitly requested.
+        /// Caller needs to specifiy whether the host element is an interface or not and, if the
+        /// accessibility is 'private', then null is returned unless explicitly requested.
         /// </summary>
         /// <param name="usePrivate"></param>
         /// <returns></returns>
-        public string? ToAccessibilityString(bool usePrivate = false) => source switch
+        public string? ToAccessibilityString(bool isInterface, bool usePrivate = false)
         {
-            Accessibility.Public => "public",
-            Accessibility.Protected => "protected",
-            Accessibility.Private => usePrivate ? "private" : null,
-            Accessibility.Internal => "internal",
-            Accessibility.ProtectedOrInternal => "protected internal",
-            Accessibility.ProtectedAndInternal => "private protected",
-            _ => null,
-        };
+            return source switch
+            {
+                Accessibility.Public when !isInterface => "public",
+                Accessibility.Private when usePrivate => "private",
+                Accessibility.Protected => "protected",
+                Accessibility.Internal => "internal",
+                Accessibility.ProtectedOrInternal => "protected internal",
+                Accessibility.ProtectedAndInternal => "private protected",
+                _ => null,
+            };
+        }
     }
 }

@@ -21,6 +21,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)EasyNames\IsNullableAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EasyNames\IsNullable[T].cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EasyRoslyn\EasyMethodSymbol.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EasyRoslyn\EasyFieldSymbol.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EasyRoslyn\EasyPropertySymbol.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EasyRoslyn\EasyParameterSymbol.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EasyRoslyn\EasyTypeSymbol.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EasyRoslyn\EasyNameExtensions[Ex].cs" />

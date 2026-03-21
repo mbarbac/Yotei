@@ -106,6 +106,7 @@ internal static partial class EasyNameExtensions
             if (source.IsLiteral) sb.Append("const ");
             else if (source.IsStatic) sb.Append("static ");
 
+            if (IsVolatile()) sb.Append("volatile ");
             if (source.IsInitOnly) sb.Append("readonly ");           
 
             bool IsNew() => BaseField(host?.BaseType) != null;
@@ -125,6 +126,10 @@ internal static partial class EasyNameExtensions
                 }
                 return null;
             }
+
+            bool IsVolatile() =>
+                source.GetRequiredCustomModifiers().Any(x => x == typeof(IsVolatile) ||
+                source.GetOptionalCustomModifiers().Any(x => x == typeof(IsVolatile)));
         }
 
         // Member type...
