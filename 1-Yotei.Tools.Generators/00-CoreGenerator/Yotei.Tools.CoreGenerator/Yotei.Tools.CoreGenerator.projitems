@@ -26,6 +26,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)EasyRoslyn\EasyParameterSymbol.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EasyRoslyn\EasyTypeSymbol.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EasyRoslyn\EasyNameExtensions[Ex].cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EasyRoslyn\EasyEventSymbol.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\ArgumentExceptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\ArgumentNullException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\IndexOutOfRangeException.cs" />
@@ -60,6 +61,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\FieldExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\PropertyExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\AccessibilityExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\SyntaxNodeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CharExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\DebugExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\ExceptionExtensions.cs" />
@@ -72,6 +74,21 @@
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\StringSpanExtensions_String.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\TypeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\VersionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\ChainExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\Finder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes.Api\INode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes.Code\PropertyNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes.Api\ITreeNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes.Code\TypeNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes.Code\MethodNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes.Code\FieldNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes.Code\EventNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes.Code\TypeNodeEx.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\TreeError.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeEx\CodeBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\TreeErrorExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\ErrorNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\TreeGenerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
   </ItemGroup>
 </Project>
