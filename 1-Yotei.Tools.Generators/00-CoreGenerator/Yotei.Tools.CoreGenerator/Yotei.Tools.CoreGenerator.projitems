@@ -89,6 +89,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Tree\TreeErrorExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\ErrorNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\TreeGenerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tree\TreeGeneratorEx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
   </ItemGroup>
 </Project>
