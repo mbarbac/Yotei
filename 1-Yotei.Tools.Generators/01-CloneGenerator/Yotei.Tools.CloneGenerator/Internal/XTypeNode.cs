@@ -1,6 +1,4 @@
-﻿/*#pragma warning disable IDE0075
-
-namespace Yotei.Tools.CloneGenerator;
+﻿namespace Yotei.Tools.CloneGenerator;
 
 // ========================================================
 /// <summary>
@@ -87,7 +85,7 @@ internal class XTypeNode : TypeNode, IXNode
                     while (this.FindMethod(type, [], out var method))
                     {
                         var dec = method.DeclaredAccessibility; if (dec == Accessibility.Private) break;
-                        var str = dec.ToAccessibilityString(); if (str == null) break;
+                        var str = dec.ToAccessibilityString(true); if (str == null) break;
 
                         value = dec == Accessibility.Public ? "new " : $"{str} new ";
                         return true;
@@ -135,6 +133,7 @@ internal class XTypeNode : TypeNode, IXNode
         /// <summary>
         /// Obtains the appropriate method modifiers, followed by a space separator, or null,
         /// </summary>
+        [SuppressMessage("", "IDE0075")]
         string? GetModifiers()
         {
             // If appear in base types, modifiers must adapt...
@@ -147,7 +146,7 @@ internal class XTypeNode : TypeNode, IXNode
                     while (this.FindMethod(type, [], out var method))
                     {
                         var dec = method.DeclaredAccessibility; if (dec == Accessibility.Private) break;
-                        var str = dec.ToAccessibilityString(); if (str == null) break;
+                        var str = dec.ToAccessibilityString(false); if (str == null) break;
 
                         if (type.IsInterface) { value = $"{str} abstract "; return true; }
                         else if (type.IsAbstract) { value = $"{str} abstract override "; return true; }
@@ -228,6 +227,7 @@ internal class XTypeNode : TypeNode, IXNode
         /// <summary>
         /// Obtains the appropriate method modifiers, followed by a space separator, or null,
         /// </summary>
+        [SuppressMessage("", "IDE0075")]
         string? GetModifiers()
         {
             var hasv = Attribute.HasUseVirtual(out var xvirt);
@@ -244,7 +244,7 @@ internal class XTypeNode : TypeNode, IXNode
                     while (this.FindMethod(type, [], out var method))
                     {
                         var dec = method.DeclaredAccessibility; if (dec == Accessibility.Private) break;
-                        var str = dec.ToAccessibilityString(); if (str == null) break;
+                        var str = dec.ToAccessibilityString(false); if (str == null) break;
 
                         if (type.IsInterface)
                         {
@@ -305,11 +305,12 @@ internal class XTypeNode : TypeNode, IXNode
         var items = GetExplicitInterfaces();
         foreach (var item in items)
         {
-            var iface = item.IFace.EasyName(EasyTypeSymbol.Full with { NullableStyle = IsNullableStyle.None });
-            
+            var iface = item.IFace.EasyName(EasyTypeOptions.Full with
+            { NullableStyle = EasyNullableStyle.None });
+
             // ICloneable's special case...
             var core = item.IFace.Name == "ICloneable";
-            var rtype = core ? "object" : item.RType.EasyName(EasyTypeSymbol.Full);
+            var rtype = core ? "object" : item.RType.EasyName(EasyTypeOptions.Full);
             if (item.RNullable && !rtype.EndsWith('?')) rtype += '?';
 
             cb.AppendLine();
@@ -372,4 +373,4 @@ internal class XTypeNode : TypeNode, IXNode
             }
         }
     }
-}*/
+}

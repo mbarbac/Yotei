@@ -216,7 +216,7 @@ internal static partial class EasyNameExtensions
         }
 
         // Return type...
-        if (method != null && options.ReturnTypeOptions != null)
+        if (options.ReturnTypeOptions != null && method != null)
         {
             if (options.UseModifiers && method.ReturnType.IsByRef)
             {
@@ -256,6 +256,7 @@ internal static partial class EasyNameExtensions
         if (constructor != null)
         {
             var name = host?.EasyName(EasyTypeOptions.Empty) ?? "new";
+            sb.Append(name);
             if (options.UseTechName) sb.Append(source.Name); // already has a dot!
         }
         if (method != null) sb.Append(source.Name);

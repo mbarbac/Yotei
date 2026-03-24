@@ -334,4 +334,40 @@ partial class TreeGenerator
             }
         }
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to generate the source code of the given collection of nodes.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="nodes"></param>
+    void EmitNodes(SourceProductionContext context, ImmutableArray<INode> nodes)
+    {
+        List<TypeNode> hierarchy = [];
+
+        // Capturing and reporting errors...
+        foreach (var node in nodes)
+        {
+            context.CancellationToken.ThrowIfCancellationRequested();
+
+            if (node is ErrorNode error) error.Diagnostic.Report(context);
+            else CaptureNode(context, hierarchy, node);
+        }
+
+        // Generating source code...
+        foreach (var type in hierarchy)
+        {
+            context.CancellationToken.ThrowIfCancellationRequested();
+
+            var cb = new CodeBuilder();
+            var done = type.Emit(context, cb);
+            if (done)
+            {
+                var code = cb.ToString();
+                var name = GetFileName(type.Symbol) + ".g.cs";
+                context.AddSource(name, code);
+            }
+        }
+    }
 }

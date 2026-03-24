@@ -1,4 +1,4 @@
-﻿/*namespace Yotei.Tools.CloneGenerator;
+﻿namespace Yotei.Tools.CloneGenerator;
 
 // ========================================================
 internal interface IXNode
@@ -112,11 +112,11 @@ internal static class XNode
     /// Gets the appropriate options to print the given return type, based upon whether it is the
     /// same as the given host one, or not.
     /// </summary>
-    public static EasyTypeSymbol ReturnOptions(this INamedTypeSymbol rtype, INamedTypeSymbol host)
+    public static EasyTypeOptions ReturnOptions(this INamedTypeSymbol rtype, INamedTypeSymbol host)
     {
         return SymbolEqualityComparer.Default.Equals(host, rtype)
-            ? EasyTypeSymbol.Default
-            : EasyTypeSymbol.Full with { NullableStyle = IsNullableStyle.None };
+            ? EasyTypeOptions.Default
+            : EasyTypeOptions.Full with { NullableStyle = EasyNullableStyle.None };
     }
 
     // ====================================================
@@ -132,18 +132,18 @@ internal static class XNode
         /// Obtains a string with the 'GeneratedCode' attribute for documentation purposes.
         /// </summary>
         public string AttributeDoc => $$"""
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("{{nameof(CloneGenerator)}}", "{{node.VersionDoc}}")]
-        """;
+            [System.CodeDom.Compiler.GeneratedCodeAttribute("{{nameof(CloneGenerator)}}", "{{node.VersionDoc}}")]
+            """;
 
         /// <summary>
         /// Emits documentation.
         /// </summary>
         public void EmitDocumentation(CodeBuilder cb) => cb.AppendLine($$"""
-        /// <summary>
-        /// <inheritdoc cref="ICloneable.Clone"/>
-        /// </summary>
-        {{node.AttributeDoc}}
-        """);
+            /// <summary>
+            /// <inheritdoc cref="ICloneable.Clone"/>
+            /// </summary>
+            /// {{node.AttributeDoc}}
+            """);
 
         // ------------------------------------------------
 
@@ -166,4 +166,4 @@ internal static class XNode
             });
         }
     }
-}*/
+}

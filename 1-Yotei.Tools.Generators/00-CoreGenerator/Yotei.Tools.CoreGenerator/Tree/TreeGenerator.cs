@@ -252,8 +252,11 @@ internal partial class TreeGenerator : IIncrementalGenerator
     /// Invoked to create a detached hierarchy element for source code generation purposes. This
     /// method can also return <see langword="null"/> to completely ignore the syntax node, or an
     /// error candidate instance to report an error conditions at code generation time.
-    /// <br/> Inheritors may overrride this method completely or invoke their base ones, as they
-    /// need.
+    /// <para>
+    /// This method works by using the context's semantic model to create detached nodes of the
+    /// appropriate types, using the 'CreateNode' virtual methods. Inheritors may override this
+    /// method completely, or invoke their base ones, as they need.
+    /// </para>
     /// </summary>
     /// <param name="context"></param>
     /// <param name="token"></param>
@@ -377,12 +380,29 @@ internal partial class TreeGenerator : IIncrementalGenerator
     // ----------------------------------------------------
 
     /// <summary>
-    /// Invoked to generate the source code of the given collection of nodes.
+    /// Invoked to capture the given node into the hierarchy of source code generation elements.
+    /// This hierarchy is represented by the given list of top-most type-alike nodes where the
+    /// given one will find out which one it will be added to, or the existing child node that
+    /// will be augmented with the given node's information.
+    /// <para>
+    /// All the well-known node types (for Types, Properties, Fields, Methods and Events) are
+    /// already treated by this base method. Inheritors may override it to treat their specific
+    /// node types, and then call their base methods to treat all the standard ones.
+    /// </para>
     /// </summary>
     /// <param name="context"></param>
-    /// <param name="nodes"></param>
-    protected virtual void EmitNodes(SourceProductionContext context, ImmutableArray<INode> nodes)
+    /// <param name="hierarchy"></param>
+    /// <param name="node"></param>
+    protected virtual void CaptureNode(
+        SourceProductionContext context, List<TypeNode> hierarchy, INode node)
     {
-        throw null;
+        switch (node)
+        {
+            case TypeNode item: OnCaptureHierarchy(hierarchy, item); break;
+            case PropertyNode item: OnCaptureHierarchy(hierarchy, item); break;
+            case FieldNode item: OnCaptureHierarchy(hierarchy, item); break;
+            case MethodNode item: OnCaptureHierarchy(hierarchy, item); break;
+            case EventNode item: OnCaptureHierarchy(hierarchy, item); break;
+        }
     }
 }
