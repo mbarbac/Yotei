@@ -82,7 +82,7 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
         var options = rtype.ReturnOptions(Host);
         var stype = rtype.EasyName(options);
         var snull = rnull ? "?" : string.Empty;
-        var sarg = this.SymbolType.EasyName(EasyTypeSymbol.Full);
+        var sarg = this.SymbolType.EasyName(EasyTypeOptions.Full);
         var mods = GetModifiers();
 
         this.EmitDocumentation(cb);
@@ -106,7 +106,7 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
                     while (this.FindMethod(type, [], out var method))
                     {
                         var dec = method.DeclaredAccessibility; if (dec == Accessibility.Private) break;
-                        var str = dec.ToAccessibilityString(); if (str == null) break;
+                        var str = dec.ToAccessibilityString(true); if (str == null) break;
 
                         value = dec == Accessibility.Public ? "new " : $"{str} new ";
                         return true;
@@ -151,7 +151,7 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
         var options = rtype.ReturnOptions(Host);
         var stype = rtype.EasyName(options);
         var snull = rnull ? "?" : string.Empty;
-        var sarg = this.SymbolType.EasyName(EasyTypeSymbol.Full);
+        var sarg = this.SymbolType.EasyName(EasyTypeOptions.Full);
         var mods = GetModifiers();
 
         this.EmitDocumentation(cb);
@@ -175,7 +175,7 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
                     while (this.FindMethod(type, [], out var method))
                     {
                         var dec = method.DeclaredAccessibility; if (dec == Accessibility.Private) break;
-                        var str = dec.ToAccessibilityString(); if (str == null) break;
+                        var str = dec.ToAccessibilityString(false); if (str == null) break;
 
                         if (type.IsInterface) { value = $"{str} abstract "; return true; }
                         else if (type.IsAbstract) { value = $"{str} abstract override "; return true; }
@@ -251,7 +251,7 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
         var options = rtype.ReturnOptions(Host);
         var stype = rtype.EasyName(options);
         var snull = rnull ? "?" : string.Empty;
-        var sarg = this.SymbolType.EasyName(EasyTypeSymbol.Full);
+        var sarg = this.SymbolType.EasyName(EasyTypeOptions.Full);
         var mods = GetModifiers();
 
         this.EmitDocumentation(cb);
@@ -295,7 +295,7 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
                     while (this.FindMethod(type, [], out var method))
                     {
                         var dec = method.DeclaredAccessibility; if (dec == Accessibility.Private) break;
-                        var str = dec.ToAccessibilityString(); if (str == null) break;
+                        var str = dec.ToAccessibilityString(false); if (str == null) break;
 
                         if (type.IsInterface)
                         {

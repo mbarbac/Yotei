@@ -11,6 +11,9 @@
   <Folder Name="/0-Experimental/">
     <Project Path="0-Experimental/Experimental.Tests/Experimental.Tests.csproj" Id="ff045585-87c4-40f8-a349-35725c11f68c" />
     <Project Path="0-Experimental/Experimental/Experimental.csproj" Id="c040906a-d162-4f51-a187-aedeaab1a9a3" />
+    <Project Path="0-Experimental/Yotei.Experimental20/Yotei.Experimental20.csproj" Id="2acd318c-5506-429a-9aea-0f6020090d6f">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
   </Folder>
   <Folder Name="/1-Yotei.Tools.AsyncLock/">
     <Project Path="1-Yotei.Tools.AsyncLock/Yotei.Tools.AsyncLock.Tests/Yotei.Tools.AsyncLock.Tests.csproj" Id="137e9248-204d-4110-902f-b03e4be21e4f" />
@@ -41,6 +44,7 @@
     </Project>
   </Folder>
   <Folder Name="/1-Yotei.Tools/">
+    <Project Path="1-Yotei.Tools/Yotei.Tools.Shared/Yotei.Tools.Shared.shproj" Id="a9179d2f-7146-4ff7-be2d-f02e61455b21" />
     <Project Path="1-Yotei.Tools/Yotei.Tools.Tests/Yotei.Tools.Tests.csproj" Id="b6a1e072-9195-4e7f-961a-5f0d58fd3a5a" />
     <Project Path="1-Yotei.Tools/Yotei.Tools/Yotei.Tools.csproj" Id="008529fe-c6f6-43ea-98d4-a963500bceef" />
   </Folder>

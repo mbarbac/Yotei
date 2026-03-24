@@ -143,11 +143,11 @@ internal static class XNode
     /// Gets the appropriate options to print the given return type, based upon whether it is the
     /// same as the given host one, or not.
     /// </summary>
-    public static EasyTypeSymbol ReturnOptions(this INamedTypeSymbol rtype, INamedTypeSymbol host)
+    public static EasyTypeOptions ReturnOptions(this INamedTypeSymbol rtype, INamedTypeSymbol host)
     {
         return SymbolEqualityComparer.Default.Equals(host, rtype)
-            ? EasyTypeSymbol.Default
-            : EasyTypeSymbol.Full with { NullableStyle = IsNullableStyle.None };
+            ? EasyTypeOptions.Default
+            : EasyTypeOptions.Full with { NullableStyle = EasyNullableStyle.None };
     }
 
     // ====================================================

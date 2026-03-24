@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Generators;
+﻿using System.Data;
+
+namespace Yotei.ORM.Generators;
 
 // ========================================================
 /// <summary>
@@ -70,7 +72,7 @@ internal partial class XTypeNode : TypeNode
                 Template = IsBag ? typeof(IBagTemplate<>) : typeof(IListTemplate<>);
                 TType = args[0].UnwrapNullable(out TTypeNullable);
 
-                TTypeName = TType.EasyName(EasyTypeSymbol.Full);
+                TTypeName = TType.EasyName(EasyTypeOptions.Full);
                 if (TTypeNullable && !TTypeName.EndsWith('?')) TTypeName += '?';
 
                 Bracket = $"<{TTypeName}>";
@@ -84,8 +86,8 @@ internal partial class XTypeNode : TypeNode
                 KType = args[0].UnwrapNullable(out KTypeNullable);
                 TType = args[1].UnwrapNullable(out TTypeNullable);
 
-                KTypeName = KType.EasyName(EasyTypeSymbol.Full);
-                TTypeName = KType.EasyName(EasyTypeSymbol.Full);
+                KTypeName = KType.EasyName(EasyTypeOptions.Full);
+                TTypeName = KType.EasyName(EasyTypeOptions.Full);
                 if (KTypeNullable && !KTypeName.EndsWith('?')) KTypeName += '?';
                 if (TTypeNullable && !TTypeName.EndsWith('?')) TTypeName += '?';
 
@@ -103,7 +105,7 @@ internal partial class XTypeNode : TypeNode
             Template = IsBag ? typeof(IBagTemplate<>) : typeof(IListTemplate<>);
             TType = ((INamedTypeSymbol)atc.TypeArguments[0]).UnwrapNullable(out TTypeNullable);
 
-            TTypeName = TType.EasyName(EasyTypeSymbol.Full);
+            TTypeName = TType.EasyName(EasyTypeOptions.Full);
             if (TTypeNullable && !TTypeName.EndsWith('?')) TTypeName += '?';
 
             Bracket = $"<{TTypeName}>";
@@ -117,8 +119,8 @@ internal partial class XTypeNode : TypeNode
             KType = ((INamedTypeSymbol)atc.TypeArguments[0]).UnwrapNullable(out KTypeNullable);
             TType = ((INamedTypeSymbol)atc.TypeArguments[1]).UnwrapNullable(out TTypeNullable);
 
-            KTypeName = KType.EasyName(EasyTypeSymbol.Full);
-            TTypeName = KType.EasyName(EasyTypeSymbol.Full);
+            KTypeName = KType.EasyName(EasyTypeOptions.Full);
+            TTypeName = KType.EasyName(EasyTypeOptions.Full);
             if (KTypeNullable && !KTypeName.EndsWith('?')) KTypeName += '?';
             if (TTypeNullable && !TTypeName.EndsWith('?')) TTypeName += '?';
 
@@ -191,7 +193,9 @@ internal partial class XTypeNode : TypeNode
         var rtype = Symbol.UnwrapNullable(out var rnull);
         if (HasReturnType(Attribute, out var xtype, out var xnull)) { rtype = xtype; rnull = xnull; }
 
-        // HIGH: use 'EasyName' to obtain return type, need to modify EasyName logic.
+        var options = ReturnOptions(rtype, Symbol);
+        var stype = rtype.EasyName(options);
+        var snull = rnull ? "?" : string.Empty;
 
         // Iterating through template method...
         foreach (var method in methods)

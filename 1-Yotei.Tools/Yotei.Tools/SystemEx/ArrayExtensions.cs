@@ -9,7 +9,7 @@
 // the result the original instance will remain intact.
 
 // ========================================================
-public static class ArrayExtensions
+public static class ArrayExtensions_Old
 {
     /// <summary>
     /// Returns a new array whose elements are either clones of the original ones, if recursive

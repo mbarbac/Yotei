@@ -110,11 +110,11 @@ partial class XTypeNode
     /// Gets the appropriate options to print the given return type, based upon whether it is the
     /// same as the given host one, or not.
     /// </summary>
-    static EasyTypeSymbol ReturnOptions(INamedTypeSymbol rtype, INamedTypeSymbol host)
+    static EasyTypeOptions ReturnOptions(INamedTypeSymbol rtype, INamedTypeSymbol host)
     {
         return SymbolEqualityComparer.Default.Equals(host, rtype)
-            ? EasyTypeSymbol.Default
-            : EasyTypeSymbol.Full with { NullableStyle = IsNullableStyle.None };
+            ? EasyTypeOptions.Default
+            : EasyTypeOptions.Full with { NullableStyle = EasyNullableStyle.None };
     }
 
     // ----------------------------------------------------
@@ -147,11 +147,10 @@ partial class XTypeNode
     /// Determines if the two given parameters are the same, for the sole purposes of this generator.
     /// We only consider their respective types and modifiers, not their names.
     /// </summary>
-    /// 
-    /// HIGH: In 'SameArgument()' also validate the 'out' modifier (and others?)
-    /// 
     bool SameArgument(ParameterInfo mpar, IParameterSymbol epar)
     {
+        // HIGH: In 'SameArgument()' also validate the 'out' modifier (and others?)
+
         var mtype = mpar.ParameterType;
         var etype = (INamedTypeSymbol)epar.Type;
 
