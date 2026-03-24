@@ -7,7 +7,7 @@ namespace Yotei.Tools;
 // ========================================================
 #if YOTEI_TOOLS_COREGENERATOR
 
-static class ArgumentNullExceptionExtensions
+internal static class ArgumentNullExceptionExtensions
 {
     extension(ArgumentNullException)
     {

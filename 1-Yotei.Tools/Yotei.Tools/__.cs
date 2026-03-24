@@ -1,6 +1,4 @@
-﻿using Yotei.Toos;
-
-namespace Yotei.Tools;
+﻿namespace Yotei.Tools;
 
 // ========================================================
 public class TypeFake

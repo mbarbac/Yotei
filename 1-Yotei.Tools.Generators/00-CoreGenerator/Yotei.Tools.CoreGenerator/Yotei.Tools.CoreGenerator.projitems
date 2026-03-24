@@ -42,13 +42,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CharExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\DebugExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\IEnumerableExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\ObjectExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\StringBuilderExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\StringComparerExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\StringExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\StringSpanExtensions_Char.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\StringSpanExtensions_String.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\TypeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\VersionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeEx\ChainExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeEx\Finder.cs" />

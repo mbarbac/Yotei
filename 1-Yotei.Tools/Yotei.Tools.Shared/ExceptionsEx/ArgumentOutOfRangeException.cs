@@ -7,12 +7,28 @@ namespace Yotei.Tools;
 // ========================================================
 #if YOTEI_TOOLS_COREGENERATOR
 
-internal static class IndexOutOfRangeExceptionExtensions
+internal static class ArgumentOutOfRangeExceptionExtensions
 {
-    extension(IndexOutOfRangeException)
+    extension(ArgumentOutOfRangeException)
     {
         /// <summary>
-        /// Throws a <see cref="IndexOutOfRangeException"/> if the given value is negative.
+        /// Throws a <see cref="ArgumentOutOfRangeException"/> if the given value is zero.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="name"></param>
+        public static void ThrowIfZero(
+            int value,
+            [CallerArgumentExpression(nameof(value))] string? name = null)
+        {
+            if (value == 0) throw new ArgumentOutOfRangeException(
+                "Value is zero.")
+                .WithData(value, name);
+        }
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Throws a <see cref="ArgumentOutOfRangeException"/> if the given value is negative.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="name"></param>
@@ -21,15 +37,15 @@ internal static class IndexOutOfRangeExceptionExtensions
             int value,
             [CallerArgumentExpression(nameof(value))] string? name = null)
         {
-            if (value < 0) throw new IndexOutOfRangeException(
-                "Index value is negative.")
+            if (value < 0) throw new ArgumentOutOfRangeException(
+                "Value is negative.")
                 .WithData(value, name);
         }
 
         // ------------------------------------------------
 
         /// <summary>
-        /// Throws a <see cref="IndexOutOfRangeException"/> if the given value is negative or
+        /// Throws a <see cref="ArgumentOutOfRangeException"/> if the given value is negative or
         /// cero.
         /// </summary>
         /// <param name="value"></param>
@@ -39,15 +55,15 @@ internal static class IndexOutOfRangeExceptionExtensions
             int value,
             [CallerArgumentExpression(nameof(value))] string? name = null)
         {
-            if (value <= 0) throw new IndexOutOfRangeException(
-                "Index value is negative or cero.")
+            if (value <= 0) throw new ArgumentOutOfRangeException(
+                "Value is negative or cero.")
                 .WithData(value, name);
         }
 
         // ------------------------------------------------
 
         /// <summary>
-        /// Throws a <see cref="IndexOutOfRangeException"/> if the given value is less than the
+        /// Throws a <see cref="ArgumentOutOfRangeException"/> if the given value is less than the
         /// other given one.
         /// </summary>
         /// <param name="value"></param>
@@ -58,8 +74,8 @@ internal static class IndexOutOfRangeExceptionExtensions
             int value, int other,
             [CallerArgumentExpression(nameof(value))] string? name = null)
         {
-            if (value < other) throw new IndexOutOfRangeException(
-                "Index value is less than the other given one.")
+            if (value < other) throw new ArgumentOutOfRangeException(
+                "Value is less than the other given one.")
                 .WithData(value, name)
                 .WithData(other);
         }
@@ -67,7 +83,7 @@ internal static class IndexOutOfRangeExceptionExtensions
         // ------------------------------------------------
 
         /// <summary>
-        /// Throws a <see cref="IndexOutOfRangeException"/> if the given value is less than or
+        /// Throws a <see cref="ArgumentOutOfRangeException"/> if the given value is less than or
         /// equal the other given one.
         /// </summary>
         /// <param name="value"></param>
@@ -78,8 +94,8 @@ internal static class IndexOutOfRangeExceptionExtensions
             int value, int other,
             [CallerArgumentExpression(nameof(value))] string? name = null)
         {
-            if (value <= other) throw new IndexOutOfRangeException(
-                "Index value is less than or equal to the other given one.")
+            if (value <= other) throw new ArgumentOutOfRangeException(
+                "Value is less than or equal to the other given one.")
                 .WithData(value, name)
                 .WithData(other);
         }
@@ -87,7 +103,7 @@ internal static class IndexOutOfRangeExceptionExtensions
         // ------------------------------------------------
 
         /// <summary>
-        /// Throws a <see cref="IndexOutOfRangeException"/> if the given value is equal the other
+        /// Throws a <see cref="ArgumentOutOfRangeException"/> if the given value is equal the other
         /// given one.
         /// </summary>
         /// <param name="value"></param>
@@ -98,8 +114,8 @@ internal static class IndexOutOfRangeExceptionExtensions
             int value, int other,
             [CallerArgumentExpression(nameof(value))] string? name = null)
         {
-            if (value == other) throw new IndexOutOfRangeException(
-                "Index value is equal to the other given one.")
+            if (value == other) throw new ArgumentOutOfRangeException(
+                "Value is equal to the other given one.")
                 .WithData(value, name)
                 .WithData(other);
         }
@@ -107,7 +123,7 @@ internal static class IndexOutOfRangeExceptionExtensions
         // ------------------------------------------------
 
         /// <summary>
-        /// Throws a <see cref="IndexOutOfRangeException"/> if the given value is not equal the
+        /// Throws a <see cref="ArgumentOutOfRangeException"/> if the given value is not equal the
         /// other given one.
         /// </summary>
         /// <param name="value"></param>
@@ -118,8 +134,8 @@ internal static class IndexOutOfRangeExceptionExtensions
             int value, int other,
             [CallerArgumentExpression(nameof(value))] string? name = null)
         {
-            if (value != other) throw new IndexOutOfRangeException(
-                "Index value is equal to the other given one.")
+            if (value != other) throw new ArgumentOutOfRangeException(
+                "Value is equal to the other given one.")
                 .WithData(value, name)
                 .WithData(other);
         }
@@ -127,7 +143,7 @@ internal static class IndexOutOfRangeExceptionExtensions
         // ------------------------------------------------
 
         /// <summary>
-        /// Throws a <see cref="IndexOutOfRangeException"/> if the given value is greather than
+        /// Throws a <see cref="ArgumentOutOfRangeException"/> if the given value is greather than
         /// the other given one.
         /// </summary>
         /// <param name="value"></param>
@@ -138,8 +154,8 @@ internal static class IndexOutOfRangeExceptionExtensions
             int value, int other,
             [CallerArgumentExpression(nameof(value))] string? name = null)
         {
-            if (value > other) throw new IndexOutOfRangeException(
-                "Index value is equal to the other given one.")
+            if (value > other) throw new ArgumentOutOfRangeException(
+                "Value is equal to the other given one.")
                 .WithData(value, name)
                 .WithData(other);
         }
@@ -147,7 +163,7 @@ internal static class IndexOutOfRangeExceptionExtensions
         // ------------------------------------------------
 
         /// <summary>
-        /// Throws a <see cref="IndexOutOfRangeException"/> if the given value is greather than
+        /// Throws a <see cref="ArgumentOutOfRangeException"/> if the given value is greather than
         /// or equal to the other given one.
         /// </summary>
         /// <param name="value"></param>
@@ -158,8 +174,8 @@ internal static class IndexOutOfRangeExceptionExtensions
             int value, int other,
             [CallerArgumentExpression(nameof(value))] string? name = null)
         {
-            if (value >= other) throw new IndexOutOfRangeException(
-                "Index value is equal to the other given one.")
+            if (value >= other) throw new ArgumentOutOfRangeException(
+                "Value is equal to the other given one.")
                 .WithData(value, name)
                 .WithData(other);
         }
