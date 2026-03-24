@@ -1,21 +1,30 @@
-﻿#if NSSHAREDTOOLS_YOTEI_TOOLS
-namespace Yotei.Tools;
-#elif NSSHAREDTOOLS_YOTEI_COREGENERATOR
+﻿#if YOTEI_TOOLS_COREGENERATOR
 namespace Yotei.Tools.CoreGenerator;
 #else
-namespace Yotei.Unknown;
+namespace Yotei.Tools;
 #endif
 
 // ========================================================
-#if !NET20
+#if YOTEI_TOOLS_COREGENERATOR
 
-#if NSSHAREDTOOLS_YOTEI_TOOLS
-public
-#else
-internal
-#endif
 static class ArgumentNullExceptionExtensions
 {
+    extension(ArgumentNullException)
+    {
+        /// <summary>
+        /// Throws a <see cref="ArgumentNullException"/> if the given value is null.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="name"></param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void ThrowIfNull<T>(
+            [NotNull] T? value,
+            [CallerArgumentExpression(nameof(value))] string? name = null)
+        {
+            if (value == null) throw new ArgumentNullException(name).WithData(value);
+        }
+    }
 }
 
 #endif

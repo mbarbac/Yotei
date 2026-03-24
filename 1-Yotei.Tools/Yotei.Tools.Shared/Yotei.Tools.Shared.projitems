@@ -9,8 +9,31 @@
     <Import_RootNamespace>Yotei.Tools.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\IndexOutOfRangeException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\ArgumentException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\ArgumentNullException.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\ArrayExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\DuplicateException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\EmptyException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\NotFoundException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\UnExpectedException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\AllowNullAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\BitOperations.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\CallerArgumentExpressionAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\CompilerFeatureRequiredAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\DoesNotReturnAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\HashCode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\Index.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\IsExternalInit.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\MaybeNullAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\NotNullAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\NotNullWhenAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\NullableAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\Range.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\RequiredMemberAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\SetsRequiredMemberAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Modernizer\SkipLocalsInitAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\_ArrayExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\ExceptionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
   </ItemGroup>
 </Project>

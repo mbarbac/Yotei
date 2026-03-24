@@ -1,14 +1,12 @@
-﻿#if NSSHAREDTOOLS_YOTEI_TOOLS
-namespace Yotei.Tools;
-#elif NSSHAREDTOOLS_YOTEI_COREGENERATOR
+﻿#if YOTEI_TOOLS_COREGENERATOR
 namespace Yotei.Tools.CoreGenerator;
 #else
-namespace Yotei.Unknown;
+namespace Yotei.Tools;
 #endif
 
 // ========================================================
-//#if NSSHAREDTOOLS_YOTEI_TOOLS
-//public
-//#else
+//#if YOTEI_TOOLS_COREGENERATOR
 //internal
+//#else
+//public
 //#endif

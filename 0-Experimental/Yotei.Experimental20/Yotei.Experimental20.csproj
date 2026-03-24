@@ -20,7 +20,7 @@
 
   <Import Project="..\..\1-Yotei.Tools\Yotei.Tools.Shared\Yotei.Tools.Shared.projitems" Label="Shared" />
 	<PropertyGroup>
-		<DefineConstants>$(DefineConstants);NSSHAREDTOOLS_YOTEI_COREGENERATOR</DefineConstants>
+		<DefineConstants>$(DefineConstants);YOTEI_TOOLS_COREGENERATOR</DefineConstants>
 	</PropertyGroup>
 	
 </Project>

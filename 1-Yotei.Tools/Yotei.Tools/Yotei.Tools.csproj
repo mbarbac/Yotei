@@ -31,8 +31,5 @@
 	</PropertyGroup>
 
 	<Import Project="..\Yotei.Tools.Shared\Yotei.Tools.Shared.projitems" Label="Shared" />
-	<PropertyGroup>
-		<DefineConstants>$(DefineConstants);NSSHAREDTOOLS_YOTEI_TOOLS</DefineConstants>
-	</PropertyGroup>
 
 </Project>
