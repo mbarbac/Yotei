@@ -1,10 +1,19 @@
-﻿namespace Yotei.Tools;
+﻿#if YOTEI_TOOLS_COREGENERATOR
+namespace Yotei.Tools.CoreGenerator;
+#else
+namespace Yotei.Tools;
+#endif
 
 // ========================================================
 /// <summary>
-/// Represents an attempt of using an object that can be considered as a duplicated one.
+/// Represents the ocurrence of a duplicated element when it was not supposed to happen.
 /// </summary>
-public class DuplicateException : Exception
+#if YOTEI_TOOLS_COREGENERATOR
+internal
+#else
+public
+#endif
+class DuplicateException : Exception
 {
     /// <summary>
     /// Initializes a new instance.

@@ -3,16 +3,15 @@
   <PropertyGroup>
     <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
     <HasSharedItems>true</HasSharedItems>
-    <SharedGUID>a9179d2f-7146-4ff7-be2d-f02e61455b21</SharedGUID>
+    <SharedGUID>dd6bd0d7-fbb9-40b3-98a2-68be445abd0c</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
     <Import_RootNamespace>Yotei.Tools.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\ArgumentOutOfRangeExceptionEx.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\IndexOutOfRangeExceptionEx.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\ArgumentExceptionEx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\ArgumentNullExceptionEx.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\ArgumentExceptionEx.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\ArgumentOutOfRangeExceptionEx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\DuplicateException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\EmptyException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\NotFoundException.cs" />
@@ -33,9 +32,13 @@
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\RequiredMemberAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\SetsRequiredMemberAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\SkipLocalsInitAttribute.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\_ExceptionExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\_ObjectExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\_TypeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\ArrayExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\ExceptionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CloneExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\TypeExtensions20.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\TypeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\CharExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\ObjectExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
   </ItemGroup>
 </Project>

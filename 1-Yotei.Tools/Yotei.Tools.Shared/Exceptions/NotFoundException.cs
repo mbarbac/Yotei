@@ -1,10 +1,19 @@
-﻿namespace Yotei.Tools;
+﻿#if YOTEI_TOOLS_COREGENERATOR
+namespace Yotei.Tools.CoreGenerator;
+#else
+namespace Yotei.Tools;
+#endif
 
 // ========================================================
 /// <summary>
 /// Represents a failed attempt of finding an object.
 /// </summary>
-public class NotFoundException : Exception
+#if YOTEI_TOOLS_COREGENERATOR
+internal
+#else
+public
+#endif
+class NotFoundException : Exception
 {
     /// <summary>
     /// Initializes a new instance.

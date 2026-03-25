@@ -3,4 +3,7 @@
 // ========================================================
 public class FakeType
 {
+    static void MyMethod()
+    {
+    }
 }

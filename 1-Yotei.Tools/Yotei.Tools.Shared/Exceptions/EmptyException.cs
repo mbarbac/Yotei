@@ -1,10 +1,19 @@
-﻿namespace Yotei.Tools;
+﻿#if YOTEI_TOOLS_COREGENERATOR
+namespace Yotei.Tools.CoreGenerator;
+#else
+namespace Yotei.Tools;
+#endif
 
 // ========================================================
 /// <summary>
-/// Represents an attempt of using an empty object when such is not allowed.
+/// Represents the ocurrence of an empty element when it was not supposed to happen.
 /// </summary>
-public class EmptyException : Exception
+#if YOTEI_TOOLS_COREGENERATOR
+internal
+#else
+public
+#endif
+class EmptyException : Exception
 {
     /// <summary>
     /// Initializes a new instance.

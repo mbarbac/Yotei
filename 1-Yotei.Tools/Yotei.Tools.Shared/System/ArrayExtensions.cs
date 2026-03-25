@@ -1,7 +1,16 @@
-﻿namespace Yotei.Tools;
+﻿#if YOTEI_TOOLS_COREGENERATOR
+namespace Yotei.Tools.CoreGenerator;
+#else
+namespace Yotei.Tools;
+#endif
 
 // ========================================================
-public static class ArrayExtensions
+#if YOTEI_TOOLS_COREGENERATOR
+internal
+#else
+public
+#endif
+static class ArrayExtensions
 {
     /// <summary>
     /// Returns a new array whose elements are either clones of the original ones, if recursive
@@ -328,7 +337,7 @@ public static class ArrayExtensions
         if (len < source.Length) return source.AsSpan(source.Length - len).ToArray();
 
         var target = new T[len];
-        Array.Fill(target, pad);
+        target.AsSpan().Fill(pad);
         Array.Copy(source, 0, target, len - source.Length, source.Length);
         return target;
     }
@@ -351,7 +360,7 @@ public static class ArrayExtensions
         if (len < source.Length) return source.AsSpan(0, len).ToArray();
 
         var target = new T[len];
-        Array.Fill(target, pad);
+        target.AsSpan().Fill(pad);
         Array.Copy(source, 0, target, 0, source.Length);
         return target;
     }

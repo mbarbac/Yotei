@@ -44,6 +44,7 @@
     </Project>
   </Folder>
   <Folder Name="/1-Yotei.Tools/">
+    <Project Path="1-Yotei.Tools/Yotei.Tools.Shared/Yotei.Tools.Shared.shproj" Id="dd6bd0d7-fbb9-40b3-98a2-68be445abd0c" />
     <Project Path="1-Yotei.Tools/Yotei.Tools.Tests/Yotei.Tools.Tests.csproj" Id="b6a1e072-9195-4e7f-961a-5f0d58fd3a5a" />
     <Project Path="1-Yotei.Tools/Yotei.Tools/Yotei.Tools.csproj" Id="008529fe-c6f6-43ea-98d4-a963500bceef" />
   </Folder>

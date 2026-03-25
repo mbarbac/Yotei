@@ -18,9 +18,12 @@
 		<DebugType>portable</DebugType>
 	</PropertyGroup>
 
-	<!--<Import Project="..\..\1-Yotei.Tools\Yotei.Tools.Shared\Yotei.Tools.Shared.projitems" Label="Shared" />
+	<Import Project="..\..\1-Yotei.Tools\Yotei.Tools.Shared\Yotei.Tools.Shared.projitems" Label="Shared" />
+	<ItemGroup>
+		<PackageReference Include="System.Memory" Version="4.6.3" /> <!--Needed for .NET Standard 2.0-->
+	</ItemGroup>
 	<PropertyGroup>
 		<DefineConstants>$(DefineConstants);YOTEI_TOOLS_COREGENERATOR</DefineConstants>
-	</PropertyGroup>-->
+	</PropertyGroup>
 
 </Project>
