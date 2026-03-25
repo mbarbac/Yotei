@@ -43,10 +43,13 @@
       <BuildType Solution="Local|*" Project="Debug" />
     </Project>
   </Folder>
-  <Folder Name="/1-Yotei.Tools/">
+  <Folder Name="/1-Yotei.Tools/" />
+  <Folder Name="/1-Yotei.Tools/Code/">
     <Project Path="1-Yotei.Tools/Yotei.Tools.Shared/Yotei.Tools.Shared.shproj" Id="dd6bd0d7-fbb9-40b3-98a2-68be445abd0c" />
-    <Project Path="1-Yotei.Tools/Yotei.Tools.Tests/Yotei.Tools.Tests.csproj" Id="b6a1e072-9195-4e7f-961a-5f0d58fd3a5a" />
     <Project Path="1-Yotei.Tools/Yotei.Tools/Yotei.Tools.csproj" Id="008529fe-c6f6-43ea-98d4-a963500bceef" />
+  </Folder>
+  <Folder Name="/1-Yotei.Tools/Tests/">
+    <Project Path="1-Yotei.Tools/Yotei.Tools.Tests/Yotei.Tools.Tests.csproj" Id="b6a1e072-9195-4e7f-961a-5f0d58fd3a5a" />
   </Folder>
   <Folder Name="/2-Yotei.ORM.Generators/">
     <Project Path="2-Yotei.ORM.Generators/Yotei.ORM.Generators.Tests/Yotei.ORM.Generators.Tests.csproj" Id="1a07fcf4-5c10-4986-814c-20f71aa8ddea">
