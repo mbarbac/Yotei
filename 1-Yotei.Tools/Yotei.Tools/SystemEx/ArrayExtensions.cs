@@ -107,8 +107,8 @@ public static class ArrayExtensions
     {
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(predicate);
-        IndexOutOfRangeException.ThrowIfLessThan(start, 0);
-        IndexOutOfRangeException.ThrowIfGreaterThanOrEqual(start, source.Length);
+        ArgumentOutOfRangeException.ThrowIfLessThan(start, 0);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(start, source.Length);
 
         for (int i = start; i < source.Length; i++) if (predicate(source[i])) return i;
         return -1;
@@ -169,8 +169,8 @@ public static class ArrayExtensions
     {
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(predicate);
-        IndexOutOfRangeException.ThrowIfLessThan(start, 0);
-        IndexOutOfRangeException.ThrowIfGreaterThanOrEqual(start, source.Length);
+        ArgumentOutOfRangeException.ThrowIfLessThan(start, 0);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(start, source.Length);
 
         for (int i = source.Length - 1; i >= start; i--) if (predicate(source[i])) return i;
         return -1;
@@ -229,8 +229,8 @@ public static class ArrayExtensions
     {
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(predicate);
-        IndexOutOfRangeException.ThrowIfLessThan(start, 0);
-        IndexOutOfRangeException.ThrowIfGreaterThanOrEqual(start, source.Length);
+        ArgumentOutOfRangeException.ThrowIfLessThan(start, 0);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(start, source.Length);
 
         List<int> list = [];
         for (int i = start; i < source.Length; i++) if (predicate(source[i])) list.Add(i);
@@ -413,8 +413,8 @@ public static class ArrayExtensions
     public static T[] Insert<T>(this T[] source, int index, T value)
     {
         ArgumentNullException.ThrowIfNull(source);
-        IndexOutOfRangeException.ThrowIfNegative(index);
-        IndexOutOfRangeException.ThrowIfGreaterThan(index, source.Length);
+        ArgumentOutOfRangeException.ThrowIfNegative(index);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(index, source.Length);
 
         var target = new T[source.Length + 1];
         Array.Copy(source, target, index);
@@ -436,8 +436,8 @@ public static class ArrayExtensions
     {
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(range);
-        IndexOutOfRangeException.ThrowIfNegative(index);
-        IndexOutOfRangeException.ThrowIfGreaterThan(index, source.Length);
+        ArgumentOutOfRangeException.ThrowIfNegative(index);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(index, source.Length);
 
         IList<T> values = range switch
         {
@@ -466,8 +466,8 @@ public static class ArrayExtensions
     public static T[] RemoveAt<T>(this T[] source, int index)
     {
         ArgumentNullException.ThrowIfNull(source);
-        IndexOutOfRangeException.ThrowIfNegative(index);
-        IndexOutOfRangeException.ThrowIfGreaterThanOrEqual(index, source.Length);
+        ArgumentOutOfRangeException.ThrowIfNegative(index);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, source.Length);
 
         if (source.Length == 1) return [];
 
@@ -489,13 +489,13 @@ public static class ArrayExtensions
     public static T[] RemoveRange<T>(this T[] source, int index, int count)
     {
         ArgumentNullException.ThrowIfNull(source);
-        IndexOutOfRangeException.ThrowIfNegative(index);
+        ArgumentOutOfRangeException.ThrowIfNegative(index);
         ArgumentOutOfRangeException.ThrowIfNegative(count);
 
         // Special case 'RemoveRange(0,0)' when source is empty...
         if (index == 0 && count == 0) return (T[])source.Clone();
 
-        IndexOutOfRangeException.ThrowIfGreaterThanOrEqual(index, source.Length);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, source.Length);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(index + count, source.Length);
 
         if (count == 0) return (T[])source.Clone();

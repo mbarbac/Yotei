@@ -30,6 +30,4 @@
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 	</PropertyGroup>
 
-	<Import Project="..\Yotei.Tools.Shared\Yotei.Tools.Shared.projitems" Label="Shared" />
-
 </Project>

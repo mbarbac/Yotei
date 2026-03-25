@@ -9,7 +9,7 @@
 		<NoWarn>IDE0130</NoWarn>
 	</PropertyGroup>
 	<!--IDE0130: Namespace does not match folder structure-->
-	
+
 	<PropertyGroup>
 		<IsPackable>true</IsPackable>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -18,9 +18,9 @@
 		<DebugType>portable</DebugType>
 	</PropertyGroup>
 
-  <Import Project="..\..\1-Yotei.Tools\Yotei.Tools.Shared\Yotei.Tools.Shared.projitems" Label="Shared" />
+	<!--<Import Project="..\..\1-Yotei.Tools\Yotei.Tools.Shared\Yotei.Tools.Shared.projitems" Label="Shared" />
 	<PropertyGroup>
 		<DefineConstants>$(DefineConstants);YOTEI_TOOLS_COREGENERATOR</DefineConstants>
-	</PropertyGroup>
-	
+	</PropertyGroup>-->
+
 </Project>
