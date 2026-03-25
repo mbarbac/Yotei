@@ -1,12 +1,21 @@
-﻿namespace Yotei.Tools.CoreGenerator;
+﻿#if YOTEI_TOOLS_COREGENERATOR
+namespace Yotei.Tools.CoreGenerator;
+#else
+namespace Yotei.Tools;
+#endif
 
 // ========================================================
-internal static class VersionExtensions
+#if YOTEI_TOOLS_COREGENERATOR
+internal
+#else
+public
+#endif
+static class VersionExtensions
 {
     extension(System.Version source)
     {
         /// <summary>
-        /// Gets a 'major.minor.revision' string representation.
+        /// Returns a 'major.minor.revision' string representation of the given version.
         /// </summary>
         /// <returns></returns>
         public string To3String()

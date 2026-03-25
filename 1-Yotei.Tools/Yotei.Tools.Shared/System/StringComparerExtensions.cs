@@ -1,7 +1,16 @@
-﻿namespace Yotei.Tools.CoreGenerator;
+﻿#if YOTEI_TOOLS_COREGENERATOR
+namespace Yotei.Tools.CoreGenerator;
+#else
+namespace Yotei.Tools;
+#endif
 
 // ========================================================
-internal static class StringComparerExtensions
+#if YOTEI_TOOLS_COREGENERATOR
+internal
+#else
+public
+#endif
+static class StringComparerExtensions
 {
     extension(StringComparer source)
     {

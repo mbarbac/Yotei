@@ -57,5 +57,19 @@ static class TypeExtensions
                 return false;
             }
         }
+
+        // ------------------------------------------------
+#if YOTEI_TOOLS_COREGENERATOR
+
+        /// <summary>
+        /// Determines whether the current type can be assigned to a variable to the given target
+        /// type.
+        /// </summary>
+        /// <param name="targetType"></param>
+        /// <returns></returns>
+        public bool IsAssignableTo(
+            [NotNullWhen(true)] Type? targetType) => targetType?.IsAssignableFrom(source) ?? false;
+
+#endif
     }
 }

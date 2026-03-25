@@ -1,9 +1,18 @@
-﻿namespace Yotei.Tools;
+﻿#if YOTEI_TOOLS_COREGENERATOR
+namespace Yotei.Tools.CoreGenerator;
+#else
+namespace Yotei.Tools;
+#endif
 
 // Note: cannot use extension block when 'CallerArgumentExpression' is used.
 
 // ========================================================
-public static class StringExtensions
+#if YOTEI_TOOLS_COREGENERATOR
+internal
+#else
+public
+#endif
+static class StringExtensions
 {
     /// <summary>
     /// Returns <see langword="null"/> if the source string is null, or if it is empty after trimmed,
@@ -15,9 +24,11 @@ public static class StringExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string? NullWhenEmpty(this string? source, bool trim) => trim switch
     {
-        true => string.IsNullOrWhiteSpace(source) ? null : source.Trim(),
+        true => string.IsNullOrWhiteSpace(source) ? null : (source?.Trim() ?? null),
         false => string.IsNullOrEmpty(source) ? null : source,
     };
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// Trims the source string, if requested, and then throws a <see cref="ArgumentNullException"/>
@@ -38,7 +49,7 @@ public static class StringExtensions
         ArgumentNullException.ThrowIfNull(source, description);
 
         source = source.NullWhenEmpty(trim);
-        if (source is null || source.Length == 0) throw new EmptyException(description);
+        if (source is null || source.Length == 0) throw new EmptyException(description!);
         return source;
     }
 
@@ -88,7 +99,10 @@ public static class StringExtensions
             if (span.Length > 0 &&
                 span[0] != head &&
                 span[^1] != tail)
-                return $"{head}{span}{tail}";
+            {
+                var temp = span.ToString();
+                return $"{head}{temp}{tail}";
+            }
 
             if (span.Length != source.Length) return span.ToString();
         }

@@ -35,10 +35,18 @@
     <Compile Include="$(MSBuildThisFileDirectory)System\ArrayExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\ExceptionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CloneExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)System\TypeExtensions20.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\TypeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\CharExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\ObjectExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\StringExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\StringComparerExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\IEnumerableExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\TimeSpanExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\DebugExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\VersionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)README.md" />
   </ItemGroup>
 </Project>
