@@ -9,10 +9,10 @@
     <Import_RootNamespace>Yotei.Tools.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\ArgumentOutOfRangeException.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\IndexOutOfRangeException.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\ArgumentException.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\ArgumentNullException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\ArgumentOutOfRangeExceptionEx.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\IndexOutOfRangeExceptionEx.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\ArgumentExceptionEx.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\ArgumentNullExceptionEx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\DuplicateException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\EmptyException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\NotFoundException.cs" />
@@ -33,12 +33,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\RequiredMemberAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\SetsRequiredMemberAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\SkipLocalsInitAttribute.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SystemEx2\_CloneExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\_ExceptionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\_ObjectExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\_ArrayExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\_TypeExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\__.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
   </ItemGroup>
 </Project>

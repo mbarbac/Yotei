@@ -1,16 +1,7 @@
-﻿#if YOTEI_TOOLS_COREGENERATOR
-namespace Yotei.Tools.CoreGenerator;
-#else
-namespace Yotei.Tools;
-#endif
+﻿namespace Yotei.Tools;
 
 // ========================================================
-#if YOTEI_TOOLS_COREGENERATOR
-internal
-#else
-public
-#endif
-static class ObjectExtensions
+public static class ObjectExtensions
 {
     /// <summary>
     /// Throws an <see cref="ArgumentNullException"/> when the given source value is null.

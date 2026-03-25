@@ -1,19 +1,10 @@
-﻿#if YOTEI_TOOLS_COREGENERATOR
-namespace Yotei.Tools.CoreGenerator;
-#else
-namespace Yotei.Tools;
-#endif
+﻿namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>
 /// Represents the ocurrence of a situation that was not suppose to happen.
 /// </summary>
-#if YOTEI_TOOLS_COREGENERATOR
-internal
-#else
-public
-#endif
-class UnExpectedException : Exception
+public class UnExpectedException : Exception
 {
     /// <summary>
     /// Initializes a new instance.

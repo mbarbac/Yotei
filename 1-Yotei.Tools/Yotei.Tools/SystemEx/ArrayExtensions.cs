@@ -1,16 +1,7 @@
-﻿#if !YOTEI_TOOLS_COREGENERATOR
-namespace Yotei.Tools.CoreGenerator;
-#else
-namespace Yotei.Tools;
-#endif
+﻿namespace Yotei.Tools;
 
 // ========================================================
-#if YOTEI_TOOLS_COREGENERATOR
-internal
-#else
-public
-#endif
-static class ArrayExtensions
+public static class ArrayExtensions
 {
     /// <summary>
     /// Returns a new array whose elements are either clones of the original ones, if recursive
