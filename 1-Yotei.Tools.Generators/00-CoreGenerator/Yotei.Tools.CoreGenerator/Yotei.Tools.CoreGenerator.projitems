@@ -40,8 +40,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\AccessibilityExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\SyntaxNodeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\StringBuilderExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\StringSpanExtensions_Char.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\StringSpanExtensions_String.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeEx\ChainExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeEx\Finder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tree\Nodes.Api\INode.cs" />

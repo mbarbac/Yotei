@@ -205,6 +205,8 @@ public static partial class EasyNameExtensions
             if (str.Length > 0) sb.Append(str).Append('.');
         }
 
+        /* HIGH: uncomment once Span extensions are done!
+         * 
         // Name...
         string? name = xname; if (name == null)
         {
@@ -218,6 +220,7 @@ public static partial class EasyNameExtensions
                 name = name.RemoveLast("Attribute").ToString();
         }
         sb.Append(name);
+        */
 
         // Generic arguments...
         if (options.GenericStyle != EasyGenericStyle.None)
