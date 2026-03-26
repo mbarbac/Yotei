@@ -6,17 +6,17 @@ public class MyFakeType
     public static void MyMethod()
     {
         var span = "hello".AsSpan();
-        
-        //span.ContainsAny(['c']);
-        //span.ContainsAny(['c'], false);
-        //span.ContainsAny(['c'], char.CharComparer());
-        //span.ContainsAny(['c'], StringComparer.Ordinal);
-        //span.ContainsAny(['c'], StringComparison.Ordinal);
 
-        //span.ContainsAny(["s"]);
-        //span.ContainsAny(["s"], false);
-        //span.ContainsAny(["s"], char.CharComparer());
-        //span.ContainsAny(["s"], StringComparer.Ordinal);
-        //span.ContainsAny(["s"], StringComparison.Ordinal);
+        span.Remove('c');
+        span.Remove('c', false);
+        span.Remove('c', char.CharComparer());
+        span.Remove('c', StringComparer.Ordinal);
+        span.Remove('c', StringComparison.Ordinal);
+
+        span.Remove("s");
+        span.Remove("s", false);
+        span.Remove("s", char.CharComparer());
+        span.Remove("s", StringComparer.Ordinal);
+        span.Remove("s", StringComparison.Ordinal);
     }
 }

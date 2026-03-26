@@ -500,4 +500,371 @@ static class StringSpanExtensions_OnChars
     public static bool ContainsAny(
         this StringSpan source, IEnumerable<char> values, StringComparison comparison)
         => ContainsAny(source, values, (x, y) => x.Equals(y, comparison));
+
+    // ----------------------------------------------------
+
+    static StringSpan Remove(
+        StringSpan source, char value, Func<char, char, bool> predicate, out bool removed)
+    {
+        removed = false;
+        if (source.Length == 0) return source;
+
+        var index = IndexOf(source, value, predicate);
+        if (index >= 0) source = source.Remove(index, 1);
+
+        removed = index >= 0;
+        return source;
+    }
+
+    /// <summary>
+    /// Removes from the given source the first ocurrence of the given value, if any.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static StringSpan Remove(
+        this StringSpan source, char value)
+        => Remove(source, value, static (x, y) => x == y, out _);
+
+    /// <summary>
+    /// Removes from the given source the first ocurrence of the given value, if any.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="ignoreCase"></param>
+    /// <returns></returns>
+    public static StringSpan Remove(
+        this StringSpan source, char value, bool ignoreCase)
+        => Remove(source, value, (x, y) => x.Equals(y, ignoreCase), out _);
+
+    /// <summary>
+    /// Removes from the given source the first ocurrence of the given value, if any.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static StringSpan Remove(
+        this StringSpan source, char value, IEqualityComparer<char> comparer)
+        => Remove(source, value, (x, y) => x.Equals(y, comparer), out _);
+
+    /// <summary>
+    /// Removes from the given source the first ocurrence of the given value, if any.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static StringSpan Remove(
+        this StringSpan source, char value, IEqualityComparer<string> comparer)
+        => Remove(source, value, (x, y) => x.Equals(y, comparer), out _);
+
+    /// <summary>
+    /// Removes from the given source the first ocurrence of the given value, if any.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static StringSpan Remove(
+        this StringSpan source, char value, StringComparison comparison)
+        => Remove(source, value, (x, y) => x.Equals(y, comparison), out _);
+
+    // ----------------------------------------------------
+
+    static StringSpan RemoveLast(
+        StringSpan source, char value, Func<char, char, bool> predicate, out bool removed)
+    {
+        removed = false;
+        if (source.Length == 0) return source;
+
+        var index = LastIndexOf(source, value, predicate);
+        if (index >= 0) source = source.Remove(index, 1);
+
+        removed = index >= 0;
+        return source;
+    }
+
+    /// <summary>
+    /// Removes from the given source the last ocurrence of the given value, if any.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static StringSpan RemoveLast(
+        this StringSpan source, char value)
+        => RemoveLast(source, value, static (x, y) => x == y, out _);
+
+    /// <summary>
+    /// Removes from the given source the last ocurrence of the given value, if any.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="ignoreCase"></param>
+    /// <returns></returns>
+    public static StringSpan RemoveLast(
+        this StringSpan source, char value, bool ignoreCase)
+        => RemoveLast(source, value, (x, y) => x.Equals(y, ignoreCase), out _);
+
+    /// <summary>
+    /// Removes from the given source the last ocurrence of the given value, if any.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static StringSpan RemoveLast(
+        this StringSpan source, char value, IEqualityComparer<char> comparer)
+        => RemoveLast(source, value, (x, y) => x.Equals(y, comparer), out _);
+
+    /// <summary>
+    /// Removes from the given source the last ocurrence of the given value, if any.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static StringSpan RemoveLast(
+        this StringSpan source, char value, IEqualityComparer<string> comparer)
+        => RemoveLast(source, value, (x, y) => x.Equals(y, comparer), out _);
+
+    /// <summary>
+    /// Removes from the given source the last ocurrence of the given value, if any.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static StringSpan RemoveLast(
+        this StringSpan source, char value, StringComparison comparison)
+        => RemoveLast(source, value, (x, y) => x.Equals(y, comparison), out _);
+
+    // ----------------------------------------------------
+
+    static StringSpan RemoveAll(
+        StringSpan source, char value, Func<char, char, bool> predicate, out bool removed)
+    {
+        removed = false;
+        if (source.Length == 0) return source;
+
+        while (true)
+        {
+            source = Remove(source, value, predicate, out var temp);
+            if (!temp) break;
+
+            removed = true;
+        }
+        return source;
+    }
+
+    /// <summary>
+    /// Removes from the given source all the ocurrences of the given value, if any.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static StringSpan RemoveAll(
+        this StringSpan source, char value)
+        => RemoveAll(source, value, static (x, y) => x == y, out _);
+
+    /// <summary>
+    /// Removes from the given source all the ocurrences of the given value, if any.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="ignoreCase"></param>
+    /// <returns></returns>
+    public static StringSpan RemoveAll(
+        this StringSpan source, char value, bool ignoreCase)
+        => RemoveAll(source, value, (x, y) => x.Equals(y, ignoreCase), out _);
+
+    /// <summary>
+    /// Removes from the given source all the ocurrences of the given value, if any.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static StringSpan RemoveAll(
+        this StringSpan source, char value, IEqualityComparer<char> comparer)
+        => RemoveAll(source, value, (x, y) => x.Equals(y, comparer), out _);
+
+    /// <summary>
+    /// Removes from the given source all the ocurrences of the given value, if any.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static StringSpan RemoveAll(
+        this StringSpan source, char value, IEqualityComparer<string> comparer)
+        => RemoveAll(source, value, (x, y) => x.Equals(y, comparer), out _);
+
+    /// <summary>
+    /// Removes from the given source all the ocurrences of the given value, if any.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static StringSpan RemoveAll(
+        this StringSpan source, char value, StringComparison comparison)
+        => RemoveAll(source, value, (x, y) => x.Equals(y, comparison), out _);
+
+
+
+
+
+
+
+
+
+
+    // ----------------------------------------------------
+
+    static int IndexOfSnipped(
+        StringSpan source, char value, Func<char, char, bool> predicate)
+    {
+        if (source.Length == 0) return -1;
+
+        var index = IndexOf(source, value, predicate);
+        if (index >= 0)
+        {
+            for (int i = 0; i < index; i++) if (source[i] != ' ') return -1;
+        }
+        return index;
+    }
+
+    /// <summary>
+    /// Determines if the source starts with the given value, discarding any heading spaces. If
+    /// so, returns the actual index of the first ocurrence of the value, or -1 otherwise.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static int IndexOfSnipped(
+        this StringSpan source, char value)
+        => IndexOfSnipped(source, value, static (x, y) => x == y);
+
+    /// <summary>
+    /// Determines if the source starts with the given value, discarding any heading spaces. If
+    /// so, returns the actual index of the first ocurrence of the value, or -1 otherwise.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="ignoreCase"></param>
+    /// <returns></returns>
+    public static int IndexOfSnipped(
+        this StringSpan source, char value, bool ignoreCase)
+        => IndexOfSnipped(source, value, (x, y) => x.Equals(y, ignoreCase));
+
+    /// <summary>
+    /// Determines if the source starts with the given value, discarding any heading spaces. If
+    /// so, returns the actual index of the first ocurrence of the value, or -1 otherwise.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int IndexOfSnipped(
+        this StringSpan source, char value, IEqualityComparer<char> comparer)
+        => IndexOfSnipped(source, value, (x, y) => x.Equals(y, comparer));
+
+    /// <summary>
+    /// Determines if the source starts with the given value, discarding any heading spaces. If
+    /// so, returns the actual index of the first ocurrence of the value, or -1 otherwise.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int IndexOfSnipped(
+        this StringSpan source, char value, IEqualityComparer<string> comparer)
+        => IndexOfSnipped(source, value, (x, y) => x.Equals(y, comparer));
+
+    /// <summary>
+    /// Determines if the source starts with the given value, discarding any heading spaces. If
+    /// so, returns the actual index of the first ocurrence of the value, or -1 otherwise.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static int IndexOfSnipped(
+        this StringSpan source, char value, StringComparison comparison)
+        => IndexOfSnipped(source, value, (x, y) => x.Equals(y, comparison));
+
+    // ----------------------------------------------------
+
+    static int LastIndexOfSnipped(
+        StringSpan source, char value, Func<char, char, bool> predicate)
+    {
+        if (source.Length == 0) return -1;
+
+        var index = LastIndexOf(source, value, predicate);
+        if (index >= 0)
+        {
+            for (int i = index + 1; i < source.Length; i++) if (source[i] != ' ') return -1;
+        }
+        return index;
+    }
+
+    /// <summary>
+    /// Determines if the source starts with the given value, discarding any heading spaces. If
+    /// so, returns the actual index of the last ocurrence of the value, or -1 otherwise.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static int LastIndexOfSnipped(
+        this StringSpan source, char value)
+        => LastIndexOfSnipped(source, value, static (x, y) => x == y);
+
+    /// <summary>
+    /// Determines if the source starts with the given value, discarding any heading spaces. If
+    /// so, returns the actual index of the last ocurrence of the value, or -1 otherwise.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="ignoreCase"></param>
+    /// <returns></returns>
+    public static int LastIndexOfSnipped(
+        this StringSpan source, char value, bool ignoreCase)
+        => LastIndexOfSnipped(source, value, (x, y) => x.Equals(y, ignoreCase));
+
+    /// <summary>
+    /// Determines if the source starts with the given value, discarding any heading spaces. If
+    /// so, returns the actual index of the last ocurrence of the value, or -1 otherwise.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int LastIndexOfSnipped(
+        this StringSpan source, char value, IEqualityComparer<char> comparer)
+        => LastIndexOfSnipped(source, value, (x, y) => x.Equals(y, comparer));
+
+    /// <summary>
+    /// Determines if the source starts with the given value, discarding any heading spaces. If
+    /// so, returns the actual index of the last ocurrence of the value, or -1 otherwise.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int LastIndexOfSnipped(
+        this StringSpan source, char value, IEqualityComparer<string> comparer)
+        => LastIndexOfSnipped(source, value, (x, y) => x.Equals(y, comparer));
+
+    /// <summary>
+    /// Determines if the source starts with the given value, discarding any heading spaces. If
+    /// so, returns the actual index of the last ocurrence of the value, or -1 otherwise.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static int LastIndexOfSnipped(
+        this StringSpan source, char value, StringComparison comparison)
+        => LastIndexOfSnipped(source, value, (x, y) => x.Equals(y, comparison));
 }
