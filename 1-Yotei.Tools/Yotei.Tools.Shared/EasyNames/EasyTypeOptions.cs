@@ -1,10 +1,19 @@
-﻿namespace Yotei.Tools;
+﻿#if YOTEI_TOOLS_COREGENERATOR
+namespace Yotei.Tools.CoreGenerator;
+#else
+namespace Yotei.Tools;
+#endif
 
 // ========================================================
 /// <summary>
 /// Provides 'EasyName' capabilities for type instances.
 /// </summary>
-public record EasyTypeOptions
+#if YOTEI_TOOLS_COREGENERATOR
+internal
+#else
+public
+#endif
+record EasyTypeOptions
 {
     /// <summary>
     /// If enabled use the type's variance (the 'in' and 'out' keywords) in the display string,
@@ -107,7 +116,12 @@ public record EasyTypeOptions
 }
 
 // ========================================================
-public static partial class EasyNameExtensions
+#if YOTEI_TOOLS_COREGENERATOR
+internal
+#else
+public
+# endif
+static partial class EasyNameExtensions
 {
     /// <summary>
     /// Obtains a c#-alike string representation of the given element, using default options.
@@ -254,7 +268,7 @@ public static partial class EasyNameExtensions
             {
                 if (sb.Length > 0 && sb[^1] != '?') sb.Append('?');
                 goto ENDNULLABLE;
-            }   
+            }
         }
         ENDNULLABLE:;
 

@@ -1,10 +1,19 @@
-﻿namespace Yotei.Tools;
+﻿#if YOTEI_TOOLS_COREGENERATOR
+namespace Yotei.Tools.CoreGenerator;
+#else
+namespace Yotei.Tools;
+#endif
 
 // ========================================================
 /// <summary>
 /// Provides 'EasyName' capabilities for property instances.
 /// </summary>
-public record EasyPropertyOptions
+#if YOTEI_TOOLS_COREGENERATOR
+internal
+#else
+public
+#endif
+record EasyPropertyOptions
 {
     /// <summary>
     /// If enabled use member accessibility modifiers.
@@ -90,7 +99,12 @@ public record EasyPropertyOptions
 }
 
 // ========================================================
-public static partial class EasyNameExtensions
+#if YOTEI_TOOLS_COREGENERATOR
+internal
+#else
+public
+#endif
+static partial class EasyNameExtensions
 {
     /// <summary>
     /// Obtains a c#-alike string representation of the given element, using default options.
@@ -188,7 +202,7 @@ public static partial class EasyNameExtensions
 
             var xoptions = options.MemberTypeOptions.NoHideName();
             var str = source.PropertyType.EasyName(xoptions);
-            
+
             while (str.Length > 0 &&
                 str[^1] != '?' && (
                 source.HasNullableEnabledAttribute() || source.IsNullableByApi()))

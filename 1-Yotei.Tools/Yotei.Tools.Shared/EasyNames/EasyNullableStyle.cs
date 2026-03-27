@@ -1,10 +1,16 @@
-﻿namespace Yotei.Tools;
+﻿#if YOTEI_TOOLS_COREGENERATOR
+namespace Yotei.Tools.CoreGenerator;
+#else
+namespace Yotei.Tools;
+#endif
 
 // ========================================================
-/// <summary>
-/// Determines the style to use with nullable annotations.
-/// </summary>
-public enum EasyNullableStyle
+#if YOTEI_TOOLS_COREGENERATOR
+internal
+#else
+public
+#endif
+enum EasyNullableStyle
 {
     /// <summary>
     /// Do not use nullable annotations at all.

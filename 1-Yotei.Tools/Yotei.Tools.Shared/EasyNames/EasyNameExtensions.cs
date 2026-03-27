@@ -1,12 +1,23 @@
-﻿namespace Yotei.Tools;
+﻿#if YOTEI_TOOLS_COREGENERATOR
+namespace Yotei.Tools.CoreGenerator;
+#else
+namespace Yotei.Tools;
+#endif
 
 // ========================================================
-// Extensions for 'EasyName' purposes only.
-public static partial class EasyNameExtensions
+/// <summary>
+/// Methods in this type are only intended as 'EasyName' helpers.
+/// </summary>
+#if YOTEI_TOOLS_COREGENERATOR
+internal
+#else
+public
+# endif
+static partial class EasyNameExtensions
 {
     /// <summary>
     /// Determines if the source name can be substituted by a known keyword and, if so, returns
-    /// it. If not, returns null;
+    /// it. If not, returns null.
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
@@ -51,6 +62,23 @@ public static partial class EasyNameExtensions
         source.IsGenericTypeParameter ||
         source.IsGenericMethodParameter;
 
+#if YOTEI_TOOLS_COREGENERATOR
+    extension(Type source)
+    {
+        /// <summary>
+        /// Determines if the type is a generic type parameter, or not.
+        /// </summary>
+        public bool IsGenericTypeParameter
+            => source.IsGenericParameter && source.DeclaringMethod == null;
+
+        /// <summary>
+        /// Determines if the type is a generic method parameter, or not.
+        /// </summary>
+        public bool IsGenericMethodParameter
+            => source.IsGenericParameter && source.DeclaringMethod != null;
+    }
+#endif
+
     // ----------------------------------------------------
 
     /// <summary>
@@ -94,6 +122,24 @@ public static partial class EasyNameExtensions
     }
 
     // ----------------------------------------------------
+
+#if YOTEI_TOOLS_COREGENERATOR
+
+    /// <summary>
+    /// Determines nullability emulating the standard API.
+    /// </summary>
+    internal static bool IsNullableByApi(this ICustomAttributeProvider source)
+    {
+        var attr = source.GetCustomAttributes(typeof(NullableAttribute), false).FirstOrDefault();
+        if (attr != null)
+        {
+            var values = ((NullableAttribute)attr).NullableFlags;
+            if (values.Length > 0 && values[0] == 2) return true;
+        }
+        return false;
+    }
+
+#else
 
     /// <summary>
     /// Determines nullability using the standard API.
@@ -142,6 +188,8 @@ public static partial class EasyNameExtensions
             info.ReadState == NullabilityState.Nullable ||
             info.WriteState == NullabilityState.Nullable;
     }
+
+#endif
 
     // ----------------------------------------------------
 

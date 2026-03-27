@@ -1,10 +1,16 @@
-﻿namespace Yotei.Tools;
+﻿#if YOTEI_TOOLS_COREGENERATOR
+namespace Yotei.Tools.CoreGenerator;
+#else
+namespace Yotei.Tools;
+#endif
 
 // ========================================================
-/// <summary>
-/// Determines the style to use with namespaces.
-/// </summary>
-public enum EasyNamespaceStyle
+#if YOTEI_TOOLS_COREGENERATOR
+internal
+#else
+public
+#endif
+enum EasyNamespaceStyle
 {
     /// <summary>
     /// Do not use namespaces.

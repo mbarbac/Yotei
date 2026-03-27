@@ -1,8 +1,12 @@
-﻿namespace Yotei.Tools;
+﻿#if YOTEI_TOOLS_COREGENERATOR
+namespace Yotei.Tools.CoreGenerator;
+#else
+namespace Yotei.Tools;
+#endif
 
 // ========================================================
 /// <summary>
-/// Used to decorate types for which nullability information shall be persisted.
+///  Used to decorate types for which nullability information shall be persisted.
 /// <para>
 /// Nullable annotations on reference types are just syntactic sugar, used by the compiler but not
 /// persisted in metadata or custom attributes. In addition, the compiler prevents using them in
@@ -21,4 +25,10 @@
 /// </para>
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public class IsNullable<T> { }
+#if YOTEI_TOOLS_COREGENERATOR
+internal
+#else
+public
+#endif
+class IsNullable<T>
+{ }

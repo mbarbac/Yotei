@@ -1,10 +1,19 @@
-﻿namespace Yotei.Tools;
+﻿#if YOTEI_TOOLS_COREGENERATOR
+namespace Yotei.Tools.CoreGenerator;
+#else
+namespace Yotei.Tools;
+#endif
 
 // ========================================================
 /// <summary>
 /// Provides 'EasyName' capabilities for argument instances.
 /// </summary>
-public record EasyParameterOptions
+#if YOTEI_TOOLS_COREGENERATOR
+internal
+#else
+public
+#endif
+record EasyParameterOptions
 {
     /// <summary>
     /// If enabled use the 'this' keyword before the first parameter of extension methods.
@@ -71,7 +80,12 @@ public record EasyParameterOptions
 }
 
 // ========================================================
-public static partial class EasyNameExtensions
+#if YOTEI_TOOLS_COREGENERATOR
+internal
+#else
+public
+#endif
+static partial class EasyNameExtensions
 {
     /// <summary>
     /// Obtains a c#-alike string representation of the given element, using default options.

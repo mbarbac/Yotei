@@ -1,10 +1,16 @@
-﻿namespace Yotei.Tools;
+﻿#if YOTEI_TOOLS_COREGENERATOR
+namespace Yotei.Tools.CoreGenerator;
+#else
+namespace Yotei.Tools;
+#endif
 
 // ========================================================
-/// <summary>
-/// Determines the style to use with generic arguments.
-/// </summary>
-public enum EasyGenericStyle
+#if YOTEI_TOOLS_COREGENERATOR
+internal
+#else
+public
+#endif
+enum EasyGenericStyle
 {
     /// <summary>
     /// Ignore generic arguments.

@@ -1,10 +1,19 @@
-﻿namespace Yotei.Tools;
+﻿#if YOTEI_TOOLS_COREGENERATOR
+namespace Yotei.Tools.CoreGenerator;
+#else
+namespace Yotei.Tools;
+#endif
 
 // ========================================================
 /// <summary>
 /// Provides 'EasyName' capabilities for method instances.
 /// </summary>
-public record EasyMethodOptions
+#if YOTEI_TOOLS_COREGENERATOR
+internal
+#else
+public
+#endif
+record EasyMethodOptions
 {
     /// <summary>
     /// If enabled use member accessibility modifiers.
@@ -98,7 +107,12 @@ public record EasyMethodOptions
 }
 
 // ========================================================
-public static partial class EasyNameExtensions
+#if YOTEI_TOOLS_COREGENERATOR
+internal
+#else
+public
+#endif
+static partial class EasyNameExtensions
 {
     /// <summary>
     /// Obtains a c#-alike string representation of the given element, using default options.
@@ -152,7 +166,7 @@ public static partial class EasyNameExtensions
     /// Factorizes common code.
     /// </summary>
     static string EasyMethod(this MethodBase source, EasyMethodOptions options)
-    {   
+    {
         var method = source as MethodInfo;
         var constructor = source as ConstructorInfo;
 
@@ -225,7 +239,7 @@ public static partial class EasyNameExtensions
 
             var xoptions = options.ReturnTypeOptions.NoHideName();
             var str = method.ReturnType.EasyName(xoptions);
-            
+
             while (str.Length > 0 && str[^1] != '?' && source.HasNullableEnabledAttribute())
             {
                 if (xoptions.NullableStyle == EasyNullableStyle.KeepWrappers &&

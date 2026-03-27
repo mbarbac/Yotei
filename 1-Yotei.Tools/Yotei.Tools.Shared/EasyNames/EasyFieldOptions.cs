@@ -1,10 +1,19 @@
-﻿namespace Yotei.Tools;
+﻿#if YOTEI_TOOLS_COREGENERATOR
+namespace Yotei.Tools.CoreGenerator;
+#else
+namespace Yotei.Tools;
+#endif
 
 // ========================================================
 /// <summary>
 /// Provides 'EasyName' capabilities for field instances.
 /// </summary>
-public record EasyFieldOptions
+#if YOTEI_TOOLS_COREGENERATOR
+internal
+#else
+public
+#endif
+record EasyFieldOptions
 {
     /// <summary>
     /// If enabled use member accessibility modifiers.
@@ -64,7 +73,12 @@ public record EasyFieldOptions
 }
 
 // ========================================================
-public static partial class EasyNameExtensions
+#if YOTEI_TOOLS_COREGENERATOR
+internal
+#else
+public
+#endif
+static partial class EasyNameExtensions
 {
     /// <summary>
     /// Obtains a c#-alike string representation of the given element, using default options.
@@ -107,7 +121,7 @@ public static partial class EasyNameExtensions
             else if (source.IsStatic) sb.Append("static ");
 
             if (IsVolatile()) sb.Append("volatile ");
-            if (source.IsInitOnly) sb.Append("readonly ");           
+            if (source.IsInitOnly) sb.Append("readonly ");
 
             bool IsNew() => BaseField(host?.BaseType) != null;
 
@@ -140,7 +154,7 @@ public static partial class EasyNameExtensions
                 var ronly =
                     source.HasReadOnlyAttribute() ||
                     source.FieldType.HasReadOnlyAttribute();
-                
+
                 sb.Append(ronly ? "ref readonly " : "ref ");
             }
 

@@ -730,7 +730,7 @@ static class StringSpanExtensions_OnStrings
 
     // ----------------------------------------------------
 
-    static int IndexOfSnipped(
+    static int SnippedIndex(
         StringSpan source, StringSpan value, Func<char, char, bool> predicate)
     {
         if (source.Length == 0 && value.Length == 0) return 0;
@@ -752,9 +752,9 @@ static class StringSpanExtensions_OnStrings
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static int IndexOfSnipped(
+    public static int SnippedIndex(
         this StringSpan source, StringSpan value)
-        => IndexOfSnipped(source, value, static (x, y) => x == y);
+        => SnippedIndex(source, value, static (x, y) => x == y);
 
     /// <summary>
     /// Determines if the source starts with the given value, discarding any heading spaces. If
@@ -764,9 +764,9 @@ static class StringSpanExtensions_OnStrings
     /// <param name="value"></param>
     /// <param name="ignoreCase"></param>
     /// <returns></returns>
-    public static int IndexOfSnipped(
+    public static int SnippedIndex(
         this StringSpan source, StringSpan value, bool ignoreCase)
-        => IndexOfSnipped(source, value, (x, y) => x.Equals(y, ignoreCase));
+        => SnippedIndex(source, value, (x, y) => x.Equals(y, ignoreCase));
 
     /// <summary>
     /// Determines if the source starts with the given value, discarding any heading spaces. If
@@ -776,9 +776,9 @@ static class StringSpanExtensions_OnStrings
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static int IndexOfSnipped(
+    public static int SnippedIndex(
         this StringSpan source, StringSpan value, IEqualityComparer<char> comparer)
-        => IndexOfSnipped(source, value, (x, y) => x.Equals(y, comparer));
+        => SnippedIndex(source, value, (x, y) => x.Equals(y, comparer));
 
     /// <summary>
     /// Determines if the source starts with the given value, discarding any heading spaces. If
@@ -788,9 +788,9 @@ static class StringSpanExtensions_OnStrings
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static int IndexOfSnipped(
+    public static int SnippedIndex(
         this StringSpan source, StringSpan value, IEqualityComparer<string> comparer)
-        => IndexOfSnipped(source, value, (x, y) => x.Equals(y, comparer));
+        => SnippedIndex(source, value, (x, y) => x.Equals(y, comparer));
 
     /// <summary>
     /// Determines if the source starts with the given value, discarding any heading spaces. If
@@ -800,13 +800,13 @@ static class StringSpanExtensions_OnStrings
     /// <param name="value"></param>
     /// <param name="comparison"></param>
     /// <returns></returns>
-    public static int IndexOfSnipped(
+    public static int SnippedIndex(
         this StringSpan source, StringSpan value, StringComparison comparison)
-        => IndexOfSnipped(source, value, (x, y) => x.Equals(y, comparison));
+        => SnippedIndex(source, value, (x, y) => x.Equals(y, comparison));
 
     // ----------------------------------------------------
 
-    static int LastIndexOfSnipped(
+    static int LastSnippedIndex(
         StringSpan source, StringSpan value, Func<char, char, bool> predicate)
     {
         if (source.Length == 0 && value.Length == 0) return 0;
@@ -831,9 +831,9 @@ static class StringSpanExtensions_OnStrings
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static int LastIndexOfSnipped(
+    public static int LastSnippedIndex(
         this StringSpan source, StringSpan value)
-        => LastIndexOfSnipped(source, value, static (x, y) => x == y);
+        => LastSnippedIndex(source, value, static (x, y) => x == y);
 
     /// <summary>
     /// Determines if the source starts with the given value, discarding any heading spaces. If
@@ -843,9 +843,9 @@ static class StringSpanExtensions_OnStrings
     /// <param name="value"></param>
     /// <param name="ignoreCase"></param>
     /// <returns></returns>
-    public static int LastIndexOfSnipped(
+    public static int LastSnippedIndex(
         this StringSpan source, StringSpan value, bool ignoreCase)
-        => LastIndexOfSnipped(source, value, (x, y) => x.Equals(y, ignoreCase));
+        => LastSnippedIndex(source, value, (x, y) => x.Equals(y, ignoreCase));
 
     /// <summary>
     /// Determines if the source starts with the given value, discarding any heading spaces. If
@@ -855,9 +855,9 @@ static class StringSpanExtensions_OnStrings
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static int LastIndexOfSnipped(
+    public static int LastSnippedIndex(
         this StringSpan source, StringSpan value, IEqualityComparer<char> comparer)
-        => LastIndexOfSnipped(source, value, (x, y) => x.Equals(y, comparer));
+        => LastSnippedIndex(source, value, (x, y) => x.Equals(y, comparer));
 
     /// <summary>
     /// Determines if the source starts with the given value, discarding any heading spaces. If
@@ -867,9 +867,9 @@ static class StringSpanExtensions_OnStrings
     /// <param name="value"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static int LastIndexOfSnipped(
+    public static int LastSnippedIndex(
         this StringSpan source, StringSpan value, IEqualityComparer<string> comparer)
-        => LastIndexOfSnipped(source, value, (x, y) => x.Equals(y, comparer));
+        => LastSnippedIndex(source, value, (x, y) => x.Equals(y, comparer));
 
     /// <summary>
     /// Determines if the source starts with the given value, discarding any heading spaces. If
@@ -879,7 +879,7 @@ static class StringSpanExtensions_OnStrings
     /// <param name="value"></param>
     /// <param name="comparison"></param>
     /// <returns></returns>
-    public static int LastIndexOfSnipped(
+    public static int LastSnippedIndex(
         this StringSpan source, StringSpan value, StringComparison comparison)
-        => LastIndexOfSnipped(source, value, (x, y) => x.Equals(y, comparison));
+        => LastSnippedIndex(source, value, (x, y) => x.Equals(y, comparison));
 }
