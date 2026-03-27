@@ -29,7 +29,7 @@ public static class Test_AsyncLock
 
     static readonly int NUM = 4;
     static readonly int DEEP = 3;
-    static readonly int WAIT = 200;
+    static readonly int WAIT = 100;
     static readonly int TIMEOUT = WAIT * (NUM + DEEP);
 
     class Info
