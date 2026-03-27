@@ -12,7 +12,7 @@ internal
 #else
 public
 #endif
-static class StringSpanExtensions_OnStrings
+static partial class StringSpanExtensions
 {
     static int IndexOf(StringSpan source, StringSpan value, Func<char, char, bool> predicate)
     {

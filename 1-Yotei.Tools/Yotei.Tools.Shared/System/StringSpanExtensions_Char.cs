@@ -12,7 +12,7 @@ internal
 #else
 public
 #endif
-static class StringSpanExtensions_OnChars
+static partial class StringSpanExtensions
 {
     static int IndexOf(StringSpan source, char value, Func<char, char, bool> predicate)
     {
@@ -23,7 +23,7 @@ static class StringSpanExtensions_OnChars
     }
 
     /// <summary>
-    ///  Returns the index of the first ocurrence of the given value in the given source, or -1 if
+    /// Returns the index of the first ocurrence of the given value in the given source, or -1 if
     /// it cannot be found.
     /// </summary>
     /// <param name="source"></param>
@@ -710,15 +710,6 @@ static class StringSpanExtensions_OnChars
     public static StringSpan RemoveAll(
         this StringSpan source, char value, StringComparison comparison)
         => RemoveAll(source, value, (x, y) => x.Equals(y, comparison), out _);
-
-
-
-
-
-
-
-
-
 
     // ----------------------------------------------------
 
