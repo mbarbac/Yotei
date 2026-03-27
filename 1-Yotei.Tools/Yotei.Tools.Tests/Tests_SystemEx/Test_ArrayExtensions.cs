@@ -355,8 +355,8 @@ public static class Test_ArrayExtensions
         Assert.Equal(2, target[1].Value);
         Assert.Equal(3, target[2].Value);
 
-        try { target = source.Insert(-1, new(99)); Assert.Fail(); } catch (IndexOutOfRangeException) { }
-        try { target = source.Insert(3, new(99)); Assert.Fail(); } catch (IndexOutOfRangeException) { }
+        try { target = source.Insert(-1, new(99)); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+        try { target = source.Insert(3, new(99)); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
     }
 
     // ----------------------------------------------------
@@ -421,8 +421,8 @@ public static class Test_ArrayExtensions
         Assert.Equal(5, target[4].Value);
         Assert.Equal(6, target[5].Value);
 
-        try { target = source.InsertRange(-1, items); Assert.Fail(); } catch (IndexOutOfRangeException) { }
-        try { target = source.InsertRange(4, items); Assert.Fail(); } catch (IndexOutOfRangeException) { }
+        try { target = source.InsertRange(-1, items); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+        try { target = source.InsertRange(4, items); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
     }
 
     //[Enforced]
@@ -485,8 +485,8 @@ public static class Test_ArrayExtensions
         Assert.Equal(5, target[4].Value);
         Assert.Equal(6, target[5].Value);
 
-        try { target = source.InsertRange(-1, items); Assert.Fail(); } catch (IndexOutOfRangeException) { }
-        try { target = source.InsertRange(4, items); Assert.Fail(); } catch (IndexOutOfRangeException) { }
+        try { target = source.InsertRange(-1, items); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+        try { target = source.InsertRange(4, items); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
     }
 
     //[Enforced]
@@ -544,8 +544,8 @@ public static class Test_ArrayExtensions
         Assert.Equal(5, target[4].Value);
         Assert.Equal(6, target[5].Value);
 
-        try { target = source.InsertRange(-1, Items(3, 4)); Assert.Fail(); } catch (IndexOutOfRangeException) { }
-        try { target = source.InsertRange(4, Items(3, 4)); Assert.Fail(); } catch (IndexOutOfRangeException) { }
+        try { target = source.InsertRange(-1, Items(3, 4)); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+        try { target = source.InsertRange(4, Items(3, 4)); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
     }
 
     // ----------------------------------------------------
@@ -555,7 +555,7 @@ public static class Test_ArrayExtensions
     public static void Test_RemoveAt()
     {
         var source = Array.Empty<SItem<int>>();
-        try { source.RemoveAt(0); Assert.Fail(); } catch (IndexOutOfRangeException) { }
+        try { source.RemoveAt(0); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
 
         source = [new(1)];
         var target = source.RemoveAt(0);
@@ -577,7 +577,7 @@ public static class Test_ArrayExtensions
         Assert.Equal(1, target[0].Value);
         Assert.Equal(2, target[1].Value);
 
-        try { source.RemoveAt(3); Assert.Fail(); } catch (IndexOutOfRangeException) { }
+        try { source.RemoveAt(3); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
     }
 
     // ----------------------------------------------------
@@ -614,8 +614,8 @@ public static class Test_ArrayExtensions
         target = source.RemoveRange(0, 3);
         Assert.Empty(target);
 
-        try { source.RemoveRange(-1, 1); Assert.Fail(); } catch (IndexOutOfRangeException) { }
-        try { source.RemoveRange(3, 0); Assert.Fail(); } catch (IndexOutOfRangeException) { }
+        try { source.RemoveRange(-1, 1); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+        try { source.RemoveRange(3, 0); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
         try { source.RemoveRange(0, 4); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
         try { source.RemoveRange(0, -1); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
     }
