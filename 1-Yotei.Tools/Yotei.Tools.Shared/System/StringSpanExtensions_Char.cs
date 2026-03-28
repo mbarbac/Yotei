@@ -506,6 +506,7 @@ static partial class StringSpanExtensions
     static StringSpan Remove(
         StringSpan source, char value, Func<char, char, bool> predicate, out bool removed)
     {
+#if !EXPERIMENTAL
         removed = false;
         if (source.Length == 0) return source;
 
@@ -514,6 +515,8 @@ static partial class StringSpanExtensions
 
         removed = index >= 0;
         return source;
+#else
+#endif
     }
 
     /// <summary>
@@ -575,6 +578,7 @@ static partial class StringSpanExtensions
     static StringSpan RemoveLast(
         StringSpan source, char value, Func<char, char, bool> predicate, out bool removed)
     {
+#if !EXPERIMENTAL
         removed = false;
         if (source.Length == 0) return source;
 
@@ -583,6 +587,8 @@ static partial class StringSpanExtensions
 
         removed = index >= 0;
         return source;
+#else
+#endif
     }
 
     /// <summary>
@@ -644,6 +650,7 @@ static partial class StringSpanExtensions
     static StringSpan RemoveAll(
         StringSpan source, char value, Func<char, char, bool> predicate, out bool removed)
     {
+#if !EXPERIMENTAL
         removed = false;
         if (source.Length == 0) return source;
 
@@ -655,6 +662,8 @@ static partial class StringSpanExtensions
             removed = true;
         }
         return source;
+#else
+#endif
     }
 
     /// <summary>

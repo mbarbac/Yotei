@@ -161,7 +161,7 @@ static partial class StringBuilderExtensions
         /// <returns></returns>
         public int LastIndexOf(
             StringSpan value, StringComparison comparison)
-            => IndexOf(source, value, (x, y) => x.Equals(y, comparison));
+            => LastIndexOf(source, value, (x, y) => x.Equals(y, comparison));
 
         // ------------------------------------------------
 
@@ -212,6 +212,16 @@ static partial class StringBuilderExtensions
         /// <returns></returns>
         public List<int> IndexesOf(
             StringSpan value, IEqualityComparer<char> comparer)
+            => IndexesOf(source, value, (x, y) => x.Equals(y, comparer));
+
+        /// <summary>
+        /// Returns the indexes of all ocurrences of the given value in the given source.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public List<int> IndexesOf(
+            StringSpan value, IEqualityComparer<string> comparer)
             => IndexesOf(source, value, (x, y) => x.Equals(y, comparer));
 
         /// <summary>
@@ -402,8 +412,8 @@ static partial class StringBuilderExtensions
         }
 
         /// <summary>
-        /// Removes from this instance the first ocurrence of the given value. Returns a reference
-        /// to the source instance.
+        /// Removes from this instance the first ocurrence of the given value.
+        /// Returns a reference to this source instance to enable fluent syntax chaining.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -411,8 +421,8 @@ static partial class StringBuilderExtensions
             StringSpan value) => Remove(source, value, static (x, y) => x == y);
 
         /// <summary>
-        /// Removes from this instance the first ocurrence of the given value. Returns a reference
-        /// to the source instance.
+        /// Removes from this instance the first ocurrence of the given value.
+        /// Returns a reference to this source instance to enable fluent syntax chaining.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="ignoreCase"></param>
@@ -422,8 +432,8 @@ static partial class StringBuilderExtensions
             => Remove(source, value, (x, y) => x.Equals(y, ignoreCase));
 
         /// <summary>
-        /// Removes from this instance the first ocurrence of the given value. Returns a reference
-        /// to the source instance.
+        /// Removes from this instance the first ocurrence of the given value.
+        /// Returns a reference to this source instance to enable fluent syntax chaining.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="comparer"></param>
@@ -433,8 +443,8 @@ static partial class StringBuilderExtensions
             => Remove(source, value, (x, y) => x.Equals(y, comparer));
 
         /// <summary>
-        /// Removes from this instance the first ocurrence of the given value. Returns a reference
-        /// to the source instance.
+        /// Removes from this instance the first ocurrence of the given value.
+        /// Returns a reference to this source instance to enable fluent syntax chaining.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="comparer"></param>
@@ -444,8 +454,8 @@ static partial class StringBuilderExtensions
             => Remove(source, value, (x, y) => x.Equals(y, comparer));
 
         /// <summary>
-        /// Removes from this instance the first ocurrence of the given value. Returns a reference
-        /// to the source instance.
+        /// Removes from this instance the first ocurrence of the given value.
+        /// Returns a reference to this source instance to enable fluent syntax chaining.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="comparison"></param>
@@ -464,8 +474,8 @@ static partial class StringBuilderExtensions
         }
 
         /// <summary>
-        /// Removes from this instance the last ocurrence of the given value. Returns a reference
-        /// to the source instance.
+        /// Removes from this instance the last ocurrence of the given value.
+        /// Returns a reference to this source instance to enable fluent syntax chaining.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -473,8 +483,8 @@ static partial class StringBuilderExtensions
             StringSpan value) => RemoveLast(source, value, static (x, y) => x == y);
 
         /// <summary>
-        /// Removes from this instance the last ocurrence of the given value. Returns a reference
-        /// to the source instance.
+        /// Removes from this instance the last ocurrence of the given value.
+        /// Returns a reference to this source instance to enable fluent syntax chaining.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="ignoreCase"></param>
@@ -484,8 +494,8 @@ static partial class StringBuilderExtensions
             => RemoveLast(source, value, (x, y) => x.Equals(y, ignoreCase));
 
         /// <summary>
-        /// Removes from this instance the last ocurrence of the given value. Returns a reference
-        /// to the source instance.
+        /// Removes from this instance the last ocurrence of the given value.
+        /// Returns a reference to this source instance to enable fluent syntax chaining.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="comparer"></param>
@@ -495,8 +505,8 @@ static partial class StringBuilderExtensions
             => RemoveLast(source, value, (x, y) => x.Equals(y, comparer));
 
         /// <summary>
-        /// Removes from this instance the last ocurrence of the given value. Returns a reference
-        /// to the source instance.
+        /// Removes from this instance the last ocurrence of the given value.
+        /// Returns a reference to this source instance to enable fluent syntax chaining.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="comparer"></param>
@@ -506,8 +516,8 @@ static partial class StringBuilderExtensions
             => RemoveLast(source, value, (x, y) => x.Equals(y, comparer));
 
         /// <summary>
-        /// Removes from this instance the last ocurrence of the given value. Returns a reference
-        /// to the source instance.
+        /// Removes from this instance the last ocurrence of the given value.
+        /// Returns a reference to this source instance to enable fluent syntax chaining.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="comparison"></param>
@@ -520,17 +530,16 @@ static partial class StringBuilderExtensions
 
         public StringBuilder RemoveAll(StringSpan value, Func<char, char, bool> predicate)
         {
-            while (true)
-            {
-                var target = source.Remove(value);
-                if (target.Equals(source, predicate)) break;
-            }
+            var indexes = IndexesOf(source, value, predicate);
+            indexes.Reverse();
+
+            foreach (var index in indexes) source.Remove(index, value.Length);
             return source;
         }
 
         /// <summary>
-        /// Remove from this instance all the ocurrences of the given value. Returns a reference
-        /// to the source instance.
+        /// Remove from this instance all the ocurrences of the given value.
+        /// Returns a reference to this source instance to enable fluent syntax chaining.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -538,8 +547,8 @@ static partial class StringBuilderExtensions
             StringSpan value) => RemoveAll(source, value, static (x, y) => x == y);
 
         /// <summary>
-        /// Remove from this instance all the ocurrences of the given value. Returns a reference
-        /// to the source instance.
+        /// Remove from this instance all the ocurrences of the given value.
+        /// Returns a reference to this source instance to enable fluent syntax chaining.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="ignoreCase"></param>
@@ -549,8 +558,8 @@ static partial class StringBuilderExtensions
             => RemoveAll(source, value, (x, y) => x.Equals(y, ignoreCase));
 
         /// <summary>
-        /// Remove from this instance all the ocurrences of the given value. Returns a reference
-        /// to the source instance.
+        /// Remove from this instance all the ocurrences of the given value.
+        /// Returns a reference to this source instance to enable fluent syntax chaining.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="comparer"></param>
@@ -560,8 +569,8 @@ static partial class StringBuilderExtensions
             => RemoveAll(source, value, (x, y) => x.Equals(y, comparer));
 
         /// <summary>
-        /// Remove from this instance all the ocurrences of the given value. Returns a reference
-        /// to the source instance.
+        /// Remove from this instance all the ocurrences of the given value.
+        /// Returns a reference to this source instance to enable fluent syntax chaining.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="comparer"></param>
@@ -571,8 +580,8 @@ static partial class StringBuilderExtensions
             => RemoveAll(source, value, (x, y) => x.Equals(y, comparer));
 
         /// <summary>
-        /// Remove from this instance all the ocurrences of the given value. Returns a reference
-        /// to the source instance.
+        /// Remove from this instance all the ocurrences of the given value.
+        /// Returns a reference to this source instance to enable fluent syntax chaining.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="comparison"></param>
