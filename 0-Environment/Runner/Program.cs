@@ -101,4 +101,77 @@ internal class Program
             catch (FileNotFoundException) { }
         }
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns a list with the projects found starting at the given root directory and its
+    /// child ones, provided that are not part of the exclusion branch.
+    /// </summary>
+    /// <param name="root"></param>
+    /// <param name="exclude"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    static internal List<Project> FindProjects(
+        string root,
+        string? exclude = null,
+        StringComparison comparison = StringComparison.OrdinalIgnoreCase)
+    {
+        root = root.NotNullNotEmpty(true);
+        exclude = exclude?.NotNullNotEmpty(true);
+
+        var list = new List<Project>();
+        Populate(root);
+        return list;
+
+        /// <summary>
+        /// Recursively populates the list of projects, starting at the given path.
+        /// </summary>
+        void Populate(string path)
+        {
+            if (path.Contains(".git", comparison)) return;
+            if (path.Contains(".vs", comparison)) return;
+            if (path.Contains("\\bin\\", comparison)) return;
+            if (path.Contains("\\obj\\", comparison)) return;
+            if (exclude is not null && path.StartsWith(exclude, comparison)) return;
+
+            var dir = new DirectoryInfo(path);
+            if (!dir.Exists) return;
+
+            var files = dir.GetFiles("*.csproj");
+            foreach (var file in files) list.Add(new(file.FullName));
+
+            var dirs = dir.GetDirectories();
+            foreach (var temp in dirs) Populate(temp.FullName);
+        }
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to capture the desired build mode, if any.
+    /// </summary>
+    /// <param name="mode"></param>
+    /// <returns></returns>
+    static internal bool CaptureBuildMode(ref BuildMode mode)
+    {
+        var position = mode switch
+        {
+            BuildMode.Debug => 1,
+            BuildMode.Local => 2,
+            BuildMode.Release => 3,
+            _ => 0,
+        };
+
+        position = new ConsoleMenu { ToDebug = ToDebug, Timeout = Timeout }
+        .Run(position);
+
+        switch (position)
+        {
+            case 1: mode = BuildMode.Debug; return true;
+            case 2: mode = BuildMode.Local; return true;
+            case 3: mode = BuildMode.Release; return true;
+        }
+        return false;
+    }
 }

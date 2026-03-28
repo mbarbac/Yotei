@@ -17,7 +17,7 @@
 
 	<PropertyGroup>
 		<Description>Yotei AsyncLock Tools</Description>
-		<Version>0.7.0-v0001</Version>
+		<Version>0.6.5-v0001</Version>
 		<Authors>mbarbac@hotmail.com</Authors>
 		<PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>

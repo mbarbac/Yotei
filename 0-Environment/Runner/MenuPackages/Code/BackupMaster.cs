@@ -1,4 +1,7 @@
-﻿namespace Runner;
+﻿using static Yotei.Tools.ConsoleExtensions;
+using static System.ConsoleColor;
+
+namespace Runner;
 
 // ========================================================
 /// <summary>
@@ -79,14 +82,14 @@ public class BackupMaster
     /// <returns></returns>
     public void Restore(bool display)
     {
-        if (display) Console.WriteLineEx(true);
+        if (display) WriteLineEx(true);
 
         foreach (var (project, lines) in Items)
         {
             if (display)
             {
-                Console.WriteEx(true, ConsoleColor.Cyan, "Restoring project: ");
-                Console.WriteLineEx(true, project.Name);
+                WriteEx(true, Cyan, "Restoring project: ");
+                WriteLineEx(true, project.Name);
             }
 
             project.FromLines(lines);
