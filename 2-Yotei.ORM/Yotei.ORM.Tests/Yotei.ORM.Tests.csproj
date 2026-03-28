@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<Configurations>Debug;Release;Local</Configurations>
@@ -34,7 +34,7 @@
 
 	<!-- RELEASE configuration -->
 	<ItemGroup Condition="'$(Configuration)'=='Release'">
-		<PackageReference Include="Yotei.Tools" Version="0.7.0" />
+		<PackageReference Include="Yotei.Tools" Version="0.6.5" />
 		<PackageReference Include="Yotei.Tools.AsyncLock" Version="0.7.0" />
 		<PackageReference Include="Yotei.Tools.DynamicLambda" Version="0.7.0" />
 		<PackageReference Include="Yotei.Tools.CloneGenerator" Version="0.7.0" />
@@ -44,7 +44,7 @@
 
 	<!-- LOCAL configuration -->
 	<ItemGroup Condition="'$(Configuration)'=='Local'">
-		<PackageReference Include="Yotei.Tools" Version="0.7.0-v0001" />
+		<PackageReference Include="Yotei.Tools" Version="0.6.5-v0001" />
 		<PackageReference Include="Yotei.Tools.AsyncLock" Version="0.7.0-v0001" />
 		<PackageReference Include="Yotei.Tools.DynamicLambda" Version="0.7.0-v0001" />
 		<PackageReference Include="Yotei.Tools.CloneGenerator" Version="0.7.0-v0001" />

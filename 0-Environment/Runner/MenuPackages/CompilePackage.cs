@@ -32,6 +32,8 @@ public class CompilePackage(Project project, BuildMode mode) : ConsoleMenuEntry
                 WriteLineEx(true, Green, "Reverting to previous state...");
 
                 backups.Restore(display: true);
+
+                WriteLineEx(true);
                 WriteEx(true, Green, "Press [Enter] to continue...");
                 Console.ReadLine();
             }
@@ -93,22 +95,34 @@ public class CompilePackage(Project project, BuildMode mode) : ConsoleMenuEntry
     /// </summary>
     bool OnExecuteLocal()
     {
-        if (Project.GetVersion(out var version))
+        SemanticVersion? version = null;
+        try
         {
-            if (version.PreRelease.IsEmpty)
+            if (Project.GetVersion(out version))
             {
-                version = version with { PreRelease = "v0001" };
-                project.UpdateVersion(version);
-                project.SaveContents();
+                if (version.PreRelease.IsEmpty)
+                {
+                    var temp = version with { PreRelease = "v0001" };
+                    Project.UpdateVersion(temp);
+                    Project.SaveContents();
+
+                    WriteLineEx(true);
+                    WriteEx(true, Green, "Using Version: "); WriteLineEx(true, temp);
+                }
             }
 
-            WriteLineEx(true);
-            WriteEx(true, Green, "Version: "); WriteLineEx(true, version);
+            if (!CompileProject(Project, Mode)) return false;
+            if (!PushPackage(Project, Mode)) return false;
+            return true;
         }
-
-        if (!CompileProject(Project, Mode)) return false;
-        if (!PushPackage(Project, Mode)) return false;
-        return true;
+        finally
+        {
+            if (version != null)
+            {
+                Project.UpdateVersion(version);
+                Project.SaveContents();
+            }
+        }
     }
 
     /// <summary>
@@ -116,22 +130,46 @@ public class CompilePackage(Project project, BuildMode mode) : ConsoleMenuEntry
     /// </summary>
     bool OnExecuteRelease()
     {
-        if (Project.GetVersion(out var version))
+        SemanticVersion? version = null;
+        try
         {
-            if (!version.PreRelease.IsEmpty)
+            if (Project.GetVersion(out version))
             {
-                version = version with { PreRelease = "" };
-                project.UpdateVersion(version);
-                project.SaveContents();
+                if (!version.PreRelease.IsEmpty)
+                {
+                    var temp = version with { PreRelease = "" };
+                    Project.UpdateVersion(temp);
+                    Project.SaveContents();
+
+                    WriteLineEx(true);
+                    WriteEx(true, Green, "Using Version: "); WriteLineEx(true, temp);
+                }
             }
 
-            WriteLineEx(true);
-            WriteEx(true, Green, "Version: "); WriteLineEx(true, version);
-        }
+            if (!CompileProject(Project, Mode)) return false;
 
-        if (!CompileProject(Project, Mode)) return false;
-        if (!PushPackage(Project, Mode)) return false;
-        return true;
+            WriteLineEx(true);
+            WriteLineEx(true, Green, Program.SlimSeparator);
+            WriteEx(true, Green, "Do you want to push the package?: ");
+            
+            var str = ReadLineEx(true)?.ToUpper();
+            switch (str)
+            {
+                case "Y":
+                case "YES":
+                    if (!PushPackage(Project, Mode)) return false;
+                    break;
+            }
+            return true;
+        }
+        finally
+        {
+            if (version != null)
+            {
+                Project.UpdateVersion(version);
+                Project.SaveContents();
+            }
+        }
     }
 
     // ----------------------------------------------------

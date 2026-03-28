@@ -70,7 +70,7 @@ public class MenuPackages : ConsoleMenuEntry
             WriteLineEx(true, Green, project.ToString());
             WriteLineEx(true);
 
-            position = menu.Run(position);
+            position = menu.Run(0);
         }
         while (position > 0);
     }

@@ -52,8 +52,10 @@ public class BackupMaster
     {
         ArgumentNullException.ThrowIfNull(project);
 
-        if (!Items.ContainsKey(project)) Items.Add(project, []);
-        return Items[project];
+        if (Items.TryGetValue(project, out var lines)) return lines;
+
+        Items.Add(project, lines = [.. project]);
+        return lines;
     }
 
     /// <summary>

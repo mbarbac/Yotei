@@ -83,8 +83,6 @@ public class Project : IEnumerable<ProjectLine>
 
     string? _FullName;
 
-    // ----------------------------------------------------
-
     /// <summary>
     /// Loads from disk the contents of this project file, clearing any previous ones (unless
     /// explicitly requested that not).
@@ -111,6 +109,25 @@ public class Project : IEnumerable<ProjectLine>
     readonly List<ProjectLine> Lines = [];
 
     /// <summary>
+    /// Gets a list with the current lines in this instance.
+    /// </summary>
+    /// <returns></returns>
+    public List<ProjectLine> ToList() => [.. Lines];
+
+    /// <summary>
+    /// Restores the contents of this file using the given range of lines, removing any previous
+    /// ones.
+    /// </summary>
+    /// <param name="items"></param>
+    public void FromLines(IEnumerable<ProjectLine> items)
+    {
+        items.ThrowWhenNull();
+
+        Clear();
+        AddRange(items);
+    }
+
+    /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
@@ -132,27 +149,6 @@ public class Project : IEnumerable<ProjectLine>
         get => Lines[index];
         set => Lines[index] = value.ThrowWhenNull();
     }
-
-    /// <summary>
-    /// Gets a list with the current lines in this instance.
-    /// </summary>
-    /// <returns></returns>
-    public List<ProjectLine> ToList() => [.. Lines];
-
-    /// <summary>
-    /// Restores the contents of this file using the given range of lines, removing any previous
-    /// ones.
-    /// </summary>
-    /// <param name="items"></param>
-    public void FromLines(IEnumerable<ProjectLine> items)
-    {
-        items.ThrowWhenNull();
-
-        Clear();
-        AddRange(items);
-    }
-
-    // ----------------------------------------------------
 
     /// <summary>
     /// Adds the given line to this instance, provided it is not duplicated.
