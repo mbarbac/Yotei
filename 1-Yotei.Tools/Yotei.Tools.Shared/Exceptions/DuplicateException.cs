@@ -1,4 +1,4 @@
-﻿#if YOTEI_TOOLS_COREGENERATOR
+﻿#if YOTEI_TOOLS_GENERATORS
 namespace Yotei.Tools.CoreGenerator;
 #else
 namespace Yotei.Tools;
@@ -8,7 +8,7 @@ namespace Yotei.Tools;
 /// <summary>
 /// Represents the ocurrence of a duplicated element when it was not supposed to happen.
 /// </summary>
-#if YOTEI_TOOLS_COREGENERATOR
+#if YOTEI_TOOLS_GENERATORS
 internal
 #else
 public

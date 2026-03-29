@@ -1,11 +1,11 @@
-﻿#if YOTEI_TOOLS_COREGENERATOR
+﻿#if YOTEI_TOOLS_GENERATORS
 namespace Yotei.Tools.CoreGenerator;
 #else
 namespace Yotei.Tools;
 #endif
 
 // ========================================================
-#if YOTEI_TOOLS_COREGENERATOR
+#if YOTEI_TOOLS_GENERATORS
 internal
 #else
 public
@@ -59,7 +59,7 @@ static class TypeExtensions
         }
 
         // ------------------------------------------------
-#if YOTEI_TOOLS_COREGENERATOR
+#if YOTEI_TOOLS_GENERATORS
 
         /// <summary>
         /// Determines whether the current type can be assigned to a variable to the given target

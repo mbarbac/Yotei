@@ -1,4 +1,4 @@
-﻿#if YOTEI_TOOLS_COREGENERATOR
+﻿#if YOTEI_TOOLS_GENERATORS
 namespace Yotei.Tools.CoreGenerator;
 #else
 namespace Yotei.Tools;
@@ -9,7 +9,7 @@ namespace Yotei.Tools;
 /// <inheritdoc cref="IsNullable{T}"/>
 /// </summary>
 [AttributeUsage(AttributeTargets.All)]
-#if YOTEI_TOOLS_COREGENERATOR
+#if YOTEI_TOOLS_GENERATORS
 internal
 #else
 public

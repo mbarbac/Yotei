@@ -1,4 +1,4 @@
-﻿#if YOTEI_TOOLS_COREGENERATOR
+﻿#if YOTEI_TOOLS_GENERATORS
 namespace Yotei.Tools.CoreGenerator;
 #else
 namespace Yotei.Tools;
@@ -8,7 +8,7 @@ namespace Yotei.Tools;
 /// <summary>
 /// Provides 'EasyName' capabilities for property instances.
 /// </summary>
-#if YOTEI_TOOLS_COREGENERATOR
+#if YOTEI_TOOLS_GENERATORS
 internal
 #else
 public
@@ -99,7 +99,7 @@ record EasyPropertyOptions
 }
 
 // ========================================================
-#if YOTEI_TOOLS_COREGENERATOR
+#if YOTEI_TOOLS_GENERATORS
 internal
 #else
 public

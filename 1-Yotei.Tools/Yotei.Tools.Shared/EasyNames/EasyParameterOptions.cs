@@ -1,4 +1,4 @@
-﻿#if YOTEI_TOOLS_COREGENERATOR
+﻿#if YOTEI_TOOLS_GENERATORS
 namespace Yotei.Tools.CoreGenerator;
 #else
 namespace Yotei.Tools;
@@ -8,7 +8,7 @@ namespace Yotei.Tools;
 /// <summary>
 /// Provides 'EasyName' capabilities for argument instances.
 /// </summary>
-#if YOTEI_TOOLS_COREGENERATOR
+#if YOTEI_TOOLS_GENERATORS
 internal
 #else
 public
@@ -80,7 +80,7 @@ record EasyParameterOptions
 }
 
 // ========================================================
-#if YOTEI_TOOLS_COREGENERATOR
+#if YOTEI_TOOLS_GENERATORS
 internal
 #else
 public

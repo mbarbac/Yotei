@@ -1,4 +1,4 @@
-﻿#if YOTEI_TOOLS_COREGENERATOR
+﻿#if YOTEI_TOOLS_GENERATORS
 
 namespace Yotei.Tools.CoreGenerator;
 

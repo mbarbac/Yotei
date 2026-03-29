@@ -1,4 +1,4 @@
-﻿#if YOTEI_TOOLS_COREGENERATOR
+﻿#if YOTEI_TOOLS_GENERATORS
 namespace Yotei.Tools.CoreGenerator;
 #else
 namespace Yotei.Tools;
@@ -8,7 +8,7 @@ namespace Yotei.Tools;
 /// <summary>
 /// Methods in this type are only intended as 'EasyName' helpers.
 /// </summary>
-#if YOTEI_TOOLS_COREGENERATOR
+#if YOTEI_TOOLS_GENERATORS
 internal
 #else
 public
@@ -62,7 +62,7 @@ static partial class EasyNameExtensions
         source.IsGenericTypeParameter ||
         source.IsGenericMethodParameter;
 
-#if YOTEI_TOOLS_COREGENERATOR
+#if YOTEI_TOOLS_GENERATORS
     extension(Type source)
     {
         /// <summary>
@@ -123,7 +123,7 @@ static partial class EasyNameExtensions
 
     // ----------------------------------------------------
 
-#if YOTEI_TOOLS_COREGENERATOR
+#if YOTEI_TOOLS_GENERATORS
 
     /// <summary>
     /// Determines nullability emulating the standard API.

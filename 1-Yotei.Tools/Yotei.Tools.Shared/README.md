@@ -4,11 +4,11 @@ Contains common tools code that can be used in .NET
 projects.
 
 For the later, the compilation symbol
-'YOTEI_TOOLS_COREGENERATOR'
+'YOTEI_TOOLS_GENERATORS'
 must be defined at the host project, and it must
 import the 'System.Memory' NuGet package.
 
-* YOTEI_TOOLS_COREGENERATOR: forces all elements to
+* YOTEI_TOOLS_GENERATORS: forces all elements to
 be internal ones, and in its speciic namespace, so
 that they can be used in generators with no name
 colisions and no external visibility.
