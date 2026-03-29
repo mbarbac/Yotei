@@ -1,6 +1,6 @@
 ﻿#if YOTEI_TOOLS_GENERATORS
 
-namespace Yotei.Tools.CoreGenerator;
+namespace Yotei.Tools.Generators;
 
 // ========================================================
 internal static class ArgumentNullExceptionExtensions

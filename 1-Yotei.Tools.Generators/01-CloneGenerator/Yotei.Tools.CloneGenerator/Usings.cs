@@ -21,4 +21,5 @@ global using Microsoft.CodeAnalysis.CSharp;
 global using Microsoft.CodeAnalysis.CSharp.Syntax;
 global using Microsoft.CodeAnalysis.Text;
 
+global using Yotei.Tools.Generators;
 global using Yotei.Tools.TreeGenerator;

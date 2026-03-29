@@ -9,6 +9,18 @@
     <Import_RootNamespace>Yotei.Tools.TreeGenerator</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\AccessibilityExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\AttributeDataExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\DiagnosticExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\FieldExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\NamedTypeSymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\NameSyntaxExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\PropertyExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\SymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\SyntaxListExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\SyntaxNodeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\TypeSymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\TypeSyntaxExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
   </ItemGroup>
   <ItemGroup>

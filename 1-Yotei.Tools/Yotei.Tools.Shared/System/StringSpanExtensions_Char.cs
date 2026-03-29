@@ -1,7 +1,7 @@
 ﻿using StringSpan = System.ReadOnlySpan<char>;
 
 #if YOTEI_TOOLS_GENERATORS
-namespace Yotei.Tools.CoreGenerator;
+namespace Yotei.Tools.Generators;
 #else
 namespace Yotei.Tools;
 #endif
