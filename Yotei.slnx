@@ -32,7 +32,14 @@
       <BuildType Solution="Local|*" Project="Debug" />
     </Project>
   </Folder>
-  <Folder Name="/1-Yotei.Tools.Generators/02-WithGenerator/" />
+  <Folder Name="/1-Yotei.Tools.Generators/02-WithGenerator/">
+    <Project Path="1-Yotei.Tools.Generators/02-WithGenerator/Yotei.Tools.WithGenerator.Tests/Yotei.Tools.WithGenerator.Tests.csproj" Id="3688196d-0e99-44a4-aad8-0cd497442948">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
+    <Project Path="1-Yotei.Tools.Generators/02-WithGenerator/Yotei.Tools.WithGenerator/Yotei.Tools.WithGenerator.csproj" Id="4d06431a-70da-429c-8345-c674d2de569e">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
+  </Folder>
   <Folder Name="/1-Yotei.Tools/" />
   <Folder Name="/1-Yotei.Tools/Code/">
     <Project Path="1-Yotei.Tools/Yotei.Tools.Shared/Yotei.Tools.Shared.shproj" Id="dd6bd0d7-fbb9-40b3-98a2-68be445abd0c" />

@@ -35,7 +35,16 @@ public class ClearDiskArtifacts : ConsoleMenuEntry
 
         WriteLineEx(true);
         WriteLineEx(true, Green, Program.SlimSeparator);
-        Execute(Root, Root, false);
+        
+        var num = Execute(Root, Root, false);
+        if (num != 0)
+        {
+            WriteLineEx(true);
+            WriteLineEx(true, Green, Program.SlimSeparator);
+            WriteEx(true, Green, "Elements deleted: "); WriteLineEx(true, num.ToString());
+            WriteLineEx(true);
+            WriteLineEx(true, Red, "You may want to clean artifacts again!");
+        }
     }
 
     // ----------------------------------------------------
@@ -43,12 +52,12 @@ public class ClearDiskArtifacts : ConsoleMenuEntry
     /// <summary>
     /// Executes on the given path.
     /// </summary>
-    static void Execute(string root, string path, bool delete)
+    static int Execute(string root, string path, bool delete)
     {
         var directory = new DirectoryInfo(path);
-        if (!directory.Exists) return;
-        if (path.EndsWith(".git", Comparison)) return;
-        if (path.EndsWith(".vs", Comparison)) return;
+        if (!directory.Exists) return 0;
+        if (path.EndsWith(".git", Comparison)) return 0;
+        if (path.EndsWith(".vs", Comparison)) return 0;
 
         var reduced = path.Remove(0, root.Length);
         if (reduced.Length > 0 && reduced[0] == '\\') reduced = reduced[1..];
@@ -56,6 +65,8 @@ public class ClearDiskArtifacts : ConsoleMenuEntry
         
         if (delete) WriteEx(true, DarkYellow, " -- DELETE");
         WriteLineEx(true);
+
+        var num = 0;
 
         // Child files...
         if (delete)
@@ -71,7 +82,7 @@ public class ClearDiskArtifacts : ConsoleMenuEntry
                 CursorLeft = 0; WriteEx(true, file.Name);
                 len = file.Name.Length;
 
-                try { file.Delete(); }
+                try { file.Delete(); num++; }
                 catch (Exception e)
                 {
                     WriteLineEx(true, Red, $" Delete: {e.Message}");
@@ -97,13 +108,13 @@ public class ClearDiskArtifacts : ConsoleMenuEntry
                 temp.EndsWith("\\generated", Comparison) ||
                 temp.EndsWith("\\testresults", Comparison);
 
-            Execute(root, temp, remove);
+            num += Execute(root, temp, remove);
         }
 
         // Delete this directory...
         if (delete)
         {
-            try { directory.Delete(); }
+            try { directory.Delete(); num++; }
             catch (Exception e)
             {
                 WriteEx(true, Red, $" Delete: ");
@@ -111,5 +122,8 @@ public class ClearDiskArtifacts : ConsoleMenuEntry
                 WriteLineEx(true, Red, $"Error: {e.Message}");
             }
         }
+
+        // Finishing...
+        return num;
     }
 }

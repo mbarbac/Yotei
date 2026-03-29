@@ -16,7 +16,7 @@
 	</ItemGroup>
 
 	<PropertyGroup>
-		<Description>Yotei Clone Generator</Description>
+		<Description>Yotei With Generator</Description>
 		<Version>0.6.5-v0001</Version>
 		<Authors>mbarbac@hotmail.com</Authors>
 		<PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
@@ -31,6 +31,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="bin\Debug\netstandard2.0\\Yotei.Tools.WithGenerator.dll" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
 	</ItemGroup>
 
@@ -38,7 +42,7 @@
 		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 		<IsRoslynComponent>true</IsRoslynComponent>
 		<DefineConstants>$(DefineConstants);YOTEI_TOOLS_GENERATORS</DefineConstants>
-		<!--<DefineConstants>$(DefineConstants);DEBUG_CLONE_GENERATOR </DefineConstants>-->
+		<!--<DefineConstants>$(DefineConstants);DEBUG_WITH_GENERATOR </DefineConstants>-->
 	</PropertyGroup>
 
 	<ItemGroup>
