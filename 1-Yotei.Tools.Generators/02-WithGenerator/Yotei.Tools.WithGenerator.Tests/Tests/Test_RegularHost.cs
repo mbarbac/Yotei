@@ -1,4 +1,8 @@
-﻿namespace Yotei.Tools.WithGenerator.Tests;
+﻿#pragma warning disable CS0649
+#pragma warning disable CS8618
+#pragma warning disable IDE0290
+
+namespace Yotei.Tools.WithGenerator.Tests;
 
 // ========================================================
 //[Enforced]
