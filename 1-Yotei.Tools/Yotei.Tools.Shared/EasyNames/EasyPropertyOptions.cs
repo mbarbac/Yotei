@@ -200,7 +200,7 @@ static partial class EasyNameExtensions
                 }
             }
 
-            var xoptions = options.MemberTypeOptions.NoHideName();
+            var xoptions = options.MemberTypeOptions.WithHideNameFalse();
             var str = source.PropertyType.EasyName(xoptions);
 
             while (str.Length > 0 &&
@@ -220,7 +220,7 @@ static partial class EasyNameExtensions
         // Host type...
         if (options.HostTypeOptions != null && host != null)
         {
-            var xoptions = options.HostTypeOptions.NoHideName();
+            var xoptions = options.HostTypeOptions.WithHideNameFalse();
             var str = host.EasyName(xoptions);
             if (str.Length > 0) sb.Append(str).Append('.');
         }

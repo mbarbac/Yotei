@@ -40,6 +40,26 @@ record EasyTypeOptions
     public bool HideName { get; init; }
 
     /// <summary>
+    /// Returns either a new instance with the 'HideName' setting set to false, or the current
+    /// instance if it was already false.
+    /// </summary>
+    /// <returns></returns>
+    public EasyTypeOptions WithHideNameFalse() =>
+        HideName
+        ? this with { HideName = false }
+        : this;
+
+    /// <summary>
+    /// Returns either a new instance with the 'HideName' setting set to true, or the current
+    /// instance if it was already true.
+    /// </summary>
+    /// <returns></returns>
+    public EasyTypeOptions WithHideNameTrue() =>
+        HideName
+        ? this
+        : this with { HideName = true };
+
+    /// <summary>
     /// If enabled use in the display string the predefined keywords for known special types (eg:
     /// <see langword="int"/> instead of <see langword="Int32"/>).
     /// </summary>
@@ -147,18 +167,6 @@ static partial class EasyNameExtensions
 
     // ----------------------------------------------------
 
-    static EasyTypeOptions NoHideName(this EasyTypeOptions options) =>
-        options.HideName
-        ? options with { HideName = false }
-        : options;
-
-    static EasyTypeOptions YesHideName(this EasyTypeOptions options) =>
-        options.HideName
-        ? options
-        : options with { HideName = true };
-
-    // ----------------------------------------------------
-
     /// <summary>
     /// Invoked once the details of the closed generic arguments of the original type have been
     /// obtained. Otherwise, these details will be lost after recursive calls.
@@ -214,7 +222,7 @@ static partial class EasyNameExtensions
             host != null && !isgen &&
             xname == null)
         {
-            var xoptions = options.NoHideName();
+            var xoptions = options.WithHideNameFalse();
             var str = host.EasyName(types, xoptions);
             if (str.Length > 0) sb.Append(str).Append('.');
         }
@@ -243,8 +251,8 @@ static partial class EasyNameExtensions
             if (need > 0)
             {
                 var xoptions = options.GenericStyle == EasyGenericStyle.PlaceHolders
-                    ? options.YesHideName()
-                    : options.NoHideName();
+                    ? options.WithHideNameTrue()
+                    : options.WithHideNameFalse();
 
                 sb.Append('<'); for (int i = 0; i < need; i++)
                 {

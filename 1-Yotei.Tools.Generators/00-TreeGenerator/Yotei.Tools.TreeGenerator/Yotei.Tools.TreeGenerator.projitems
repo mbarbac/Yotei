@@ -21,6 +21,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\SyntaxNodeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\TypeSymbolExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\TypeSyntaxExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\EasyTypeSymbol.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\RoslynNamesExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\EasyParameterSymbol.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\EasyMethodSymbol.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\EasyPropertySymbol.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\EasyFieldSymbol.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
   </ItemGroup>
   <ItemGroup>

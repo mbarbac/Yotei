@@ -237,7 +237,7 @@ static partial class EasyNameExtensions
                 sb.Append(ronly ? "ref readonly " : "ref ");
             }
 
-            var xoptions = options.ReturnTypeOptions.NoHideName();
+            var xoptions = options.ReturnTypeOptions.WithHideNameFalse();
             var str = method.ReturnType.EasyName(xoptions);
 
             while (str.Length > 0 && str[^1] != '?' && source.HasNullableEnabledAttribute())
@@ -258,7 +258,7 @@ static partial class EasyNameExtensions
             var temp = method != null ? host : host?.DeclaringType;
             if (temp != null)
             {
-                var xoptions = options.HostTypeOptions.NoHideName();
+                var xoptions = options.HostTypeOptions.WithHideNameFalse();
                 var str = temp.EasyName(xoptions);
                 if (str.Length > 0) sb.Append(str).Append('.');
             }

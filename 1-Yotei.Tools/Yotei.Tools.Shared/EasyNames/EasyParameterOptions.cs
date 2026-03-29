@@ -111,7 +111,7 @@ static partial class EasyNameExtensions
         // Parameter type...
         if (options.TypeOptions != null)
         {
-            var xoptions = options.TypeOptions.NoHideName();
+            var xoptions = options.TypeOptions.WithHideNameFalse();
             var str = source.ParameterType.EasyName(xoptions);
             sb.Append(str);
 
