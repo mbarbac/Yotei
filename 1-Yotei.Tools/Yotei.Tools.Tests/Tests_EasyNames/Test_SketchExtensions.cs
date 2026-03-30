@@ -153,12 +153,14 @@ public static class Test_SketchExtensions
         options = options with { FormatString = "0.00" };
         name = item.Sketch(options); Assert.Equal("1234.57", name);
 
-        options = DEFAULT with { HeadOptions = EasyTypeOptions.Default };
-        name = item.Sketch(options); Assert.Equal("(double) 1234,567", name);
-
         options = DEFAULT with { FormatProvider = CultureInfo.GetCultureInfo("es-ES") };
         name = item.Sketch(options); Assert.Equal("1234,567", name);
 
+        options = DEFAULT with { FormatProvider = CultureInfo.GetCultureInfo("es-ES") };
+        options = options with { HeadOptions = EasyTypeOptions.Default };
+        name = item.Sketch(options); Assert.Equal("(double) 1234,567", name);
+
+        options = DEFAULT with { FormatProvider = CultureInfo.GetCultureInfo("es-ES") };
         options = options with { FormatString = "0.00" };
         name = item.Sketch(options); Assert.Equal("1234,57", name);
 
@@ -180,12 +182,14 @@ public static class Test_SketchExtensions
         options = options with { FormatString = "0.00" };
         name = item.Sketch(options); Assert.Equal("1234.57", name);
 
-        options = DEFAULT with { HeadOptions = EasyTypeOptions.Default };
-        name = item.Sketch(options); Assert.Equal("(decimal) 1234,567", name);
-
         options = DEFAULT with { FormatProvider = CultureInfo.GetCultureInfo("es-ES") };
         name = item.Sketch(options); Assert.Equal("1234,567", name);
 
+        options = DEFAULT with { FormatProvider = CultureInfo.GetCultureInfo("es-ES") };
+        options = options with { HeadOptions = EasyTypeOptions.Default };
+        name = item.Sketch(options); Assert.Equal("(decimal) 1234,567", name);
+
+        options = DEFAULT with { FormatProvider = CultureInfo.GetCultureInfo("es-ES") };
         options = options with { FormatString = "0.00" };
         name = item.Sketch(options); Assert.Equal("1234,57", name);
 
@@ -204,11 +208,12 @@ public static class Test_SketchExtensions
         options = EMPTY with { FormatProvider = CultureInfo.InvariantCulture };
         name = item.Sketch(options); Assert.Equal("12/31/2000 00:00:00", name);
 
-        options = DEFAULT with { HeadOptions = EasyTypeOptions.Default };
-        name = item.Sketch(options); Assert.Equal($"(DateTime) 31/12/2000 0:00:00", name);
-
         options = DEFAULT with { FormatProvider = CultureInfo.GetCultureInfo("es-ES") };
         name = item.Sketch(options); Assert.Equal("31/12/2000 0:00:00", name);
+
+        options = DEFAULT with { FormatProvider = CultureInfo.GetCultureInfo("es-ES") };
+        options = options with { HeadOptions = EasyTypeOptions.Default };
+        name = item.Sketch(options); Assert.Equal($"(DateTime) 31/12/2000 0:00:00", name);
 
         options = FULL with { FormatProvider = CultureInfo.InvariantCulture };
         name = item.Sketch(options); Assert.Equal("(System.DateTime) 12/31/2000 00:00:00", name);
@@ -225,11 +230,12 @@ public static class Test_SketchExtensions
         options = EMPTY with { FormatProvider = CultureInfo.InvariantCulture };
         name = item.Sketch(options); Assert.Equal("12/31/2000", name);
 
-        options = DEFAULT with { HeadOptions = EasyTypeOptions.Default };
-        name = item.Sketch(options); Assert.Equal($"(DateOnly) 31/12/2000", name);
-
         options = DEFAULT with { FormatProvider = CultureInfo.GetCultureInfo("es-ES") };
         name = item.Sketch(options); Assert.Equal("31/12/2000", name);
+
+        options = DEFAULT with { FormatProvider = CultureInfo.GetCultureInfo("es-ES") };
+        options = options with { HeadOptions = EasyTypeOptions.Default };
+        name = item.Sketch(options); Assert.Equal($"(DateOnly) 31/12/2000", name);
 
         options = FULL with { FormatProvider = CultureInfo.InvariantCulture };
         name = item.Sketch(options); Assert.Equal("(System.DateOnly) 12/31/2000", name);
