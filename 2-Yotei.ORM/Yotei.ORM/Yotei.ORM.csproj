@@ -1,0 +1,77 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Configurations>Debug;Release;Local</Configurations>
+		<TargetFramework>net10.0</TargetFramework>
+		<LangVersion>preview</LangVersion>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<NoWarn>IDE0130</NoWarn>
+	</PropertyGroup>
+	<!--IDE0130: Namespace does not match folder structure-->
+
+	<ItemGroup>
+		<None Include="README.md" Pack="true" PackagePath="" />
+		<None Include="LICENSE" Pack="true" PackagePath="" />
+	</ItemGroup>
+
+	<PropertyGroup>
+		<Description>Yotei ORM</Description>
+		<Version>0.6.5-v0001</Version>
+		<Authors>mbarbac@hotmail.com</Authors>
+		<PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<IsPackable>true</IsPackable>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<DebugType>portable</DebugType>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+	</PropertyGroup>
+
+	<!-- DEBUG configuration -->
+	<ItemGroup Condition="'$(Configuration)'=='Debug'">
+		<ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
+		<ProjectReference Include="..\..\1-Yotei.Tools.AsyncLock\Yotei.Tools.AsyncLock\Yotei.Tools.AsyncLock.csproj" />
+		<ProjectReference Include="..\..\1-Yotei.Tools.DynamicLambda\Yotei.Tools.DynamicLambda\Yotei.Tools.DynamicLambda.csproj" />
+		<ProjectReference Include="..\..\1-Yotei.Tools.Generators\01-CloneGenerator\Yotei.Tools.CloneGenerator\Yotei.Tools.CloneGenerator.csproj" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\..\1-Yotei.Tools.Generators\02-WithGenerator\Yotei.Tools.WithGenerator\Yotei.Tools.WithGenerator.csproj" OutputItemType="Analyzer" />
+	</ItemGroup>
+
+	<!-- RELEASE configuration -->
+	<ItemGroup Condition="'$(Configuration)'=='Release'">
+		<PackageReference Include="Yotei.Tools" Version="0.6.5" />
+		<PackageReference Include="Yotei.Tools.AsyncLock" Version="0.7.0" />
+		<PackageReference Include="Yotei.Tools.DynamicLambda" Version="0.7.0" />
+		<PackageReference Include="Yotei.Tools.CloneGenerator" Version="0.7.0" />
+		<PackageReference Include="Yotei.Tools.WithGenerator" Version="0.7.0" />
+	</ItemGroup>
+
+	<!-- LOCAL configuration -->
+	<ItemGroup Condition="'$(Configuration)'=='Local'">
+		<PackageReference Include="Yotei.Tools" Version="0.6.5-v0001" />
+		<PackageReference Include="Yotei.Tools.AsyncLock" Version="0.7.0-v0001" />
+		<PackageReference Include="Yotei.Tools.DynamicLambda" Version="0.7.0-v0001" />
+		<PackageReference Include="Yotei.Tools.CloneGenerator" Version="0.7.0-v0001" />
+		<PackageReference Include="Yotei.Tools.WithGenerator" Version="0.7.0-v0001" />
+	</ItemGroup>
+
+	<!-- Emit generated files -->
+	<ItemGroup>
+		<Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
+	</ItemGroup>
+	<PropertyGroup>
+		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+		<CompilerGeneratedFilesOutputPath>Generated\$(TargetFramework)</CompilerGeneratedFilesOutputPath>
+	</PropertyGroup>
+
+	<!-- Clear generated files each compile or build (need to be at the end of the file)-->
+	<Target Name="CustomBeforeCompile" BeforeTargets="BeforeCompile">
+		<RemoveDir Directories="$(ProjectDir)\Generated\" />
+	</Target>
+	<Target Name="CustomBeforeBuild" BeforeTargets="BeforeBuild">
+		<RemoveDir Directories="$(ProjectDir)\Generated\" />
+	</Target>
+
+</Project>

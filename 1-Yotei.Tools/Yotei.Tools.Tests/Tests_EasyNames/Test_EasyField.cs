@@ -1,4 +1,5 @@
 ﻿#pragma warning disable CS0414
+#pragma warning disable CS9265
 #pragma warning disable IDE0044
 
 namespace Yotei.Tools.Tests.EasyNames;
