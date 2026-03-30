@@ -1,2 +1,2 @@
-# Yotei Tools
+# Yotei Tools Clone Generator
 Yotei
