@@ -284,7 +284,38 @@ partial class TreeGenerator
     /// </summary>
     string GetFileName(INamedTypeSymbol symbol)
     {
-        // First, we will dot-separate but not inside '<...>' portions...
+        var parts = GetFileNameParts(symbol);
+
+        // Organizing in a flat folder...
+        if (FlatFileNames)
+        {
+            parts.Reverse();
+            var str = string.Join(".", parts);
+            return str;
+        }
+
+        // Organizing in a structure using all but the last part as a folder...
+        else
+        {
+            if (parts.Count == 1) return parts[0];
+            else
+            {
+                var fname = parts[^1]; parts.RemoveAt(parts.Count - 1);
+                parts.Reverse();
+                var nspart = string.Join(".", parts);
+                var str = string.Join("/", nspart, fname);
+                return str;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets the file name parts corresponding to the given type.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <returns></returns>
+    List<string> GetFileNameParts(INamedTypeSymbol symbol)
+    {
         var options = new SymbolDisplayFormat(
             globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.Omitted,
             typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
@@ -311,28 +342,7 @@ partial class TreeGenerator
         }
         parts.Add(name[last..].Replace('<', '[').Replace('>', ']'));
 
-        // Organizing in a flat folder...
-        if (FlatFileNames)
-        {
-            // We just need to reverse and return...
-            parts.Reverse();
-            var str = string.Join(".", parts);
-            return str;
-        }
-
-        // Organizing in a structure using all but the last part as a folder...
-        else
-        {
-            if (parts.Count == 1) return parts[0];
-            else
-            {
-                var fname = parts[^1]; parts.RemoveAt(parts.Count - 1);
-                parts.Reverse();
-                var nspart = string.Join(".", parts);
-                var str = string.Join("/", nspart, fname);
-                return str;
-            }
-        }
+        return parts;
     }
 
     // ----------------------------------------------------

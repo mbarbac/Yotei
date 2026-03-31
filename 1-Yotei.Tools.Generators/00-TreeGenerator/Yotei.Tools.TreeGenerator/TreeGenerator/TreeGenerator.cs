@@ -31,7 +31,7 @@ internal partial class TreeGenerator : IIncrementalGenerator
     /// rather in a hierarchy of folder using all the dot-separated parts of their names (except
     /// the last one) as the folders' names.
     /// </summary>
-    protected virtual bool FlatFileNames => false;
+    protected virtual bool FlatFileNames => true;
 
     /// <summary>
     /// Invoked to register post-initialization actions such as reading external files, generating
@@ -55,13 +55,28 @@ internal partial class TreeGenerator : IIncrementalGenerator
     {
         token.ThrowIfCancellationRequested();
 
-        return node is
+        var known = node is
             BaseTypeDeclarationSyntax or
             BasePropertyDeclarationSyntax or
             BaseFieldDeclarationSyntax or
             BaseMethodDeclarationSyntax or
             EventDeclarationSyntax or
             EventFieldDeclarationSyntax;
+
+        if (!known) return false;
+
+        // While there is not a IHasAttributeList interface, we need to check concrete types...
+        switch (node)
+        {
+            case EnumMemberDeclarationSyntax item: return item.AttributeLists.Count > 0;
+            case MemberDeclarationSyntax item: return item.AttributeLists.Count > 0;
+            case ParameterSyntax item: return item.AttributeLists.Count > 0;
+            case TypeParameterSyntax item: return item.AttributeLists.Count > 0;
+            case AccessorDeclarationSyntax item: return item.AttributeLists.Count > 0;
+            case CompilationUnitSyntax item: return item.AttributeLists.Count > 0;
+        }
+
+        return false;
     }
 
     // ----------------------------------------------------
