@@ -9,17 +9,6 @@
     <Import_RootNamespace>Yotei.Tools.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)EasyNames\IsNullable[T].cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)EasyNames\IsNullableAttribute.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)EasyNames\EasyNameExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)EasyNames\EasyGenericStyle.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)EasyNames\EasyNullableStyle.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)EasyNames\EasyTypeOptions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)EasyNames\EasyParameterOptions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)EasyNames\EasyMethodOptions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)EasyNames\EasyNamespaceStyle.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)EasyNames\EasyPropertyOptions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)EasyNames\EasyFieldOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\ArgumentNullExceptionEx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\ArgumentExceptionEx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExceptionsEx\ArgumentOutOfRangeExceptionEx.cs" />

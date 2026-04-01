@@ -38,7 +38,7 @@
 		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 		<IsRoslynComponent>true</IsRoslynComponent>
 		<DefineConstants>$(DefineConstants);YOTEI_TOOLS_GENERATORS</DefineConstants>
-		<DefineConstants>$(DefineConstants);DEBUG_INVARIANT_GENERATOR </DefineConstants>
+		<!--<DefineConstants>$(DefineConstants);DEBUG_INVARIANT_GENERATOR </DefineConstants>-->
 	</PropertyGroup>
 
 	<ItemGroup>
