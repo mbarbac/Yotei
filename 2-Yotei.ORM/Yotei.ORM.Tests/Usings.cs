@@ -22,8 +22,8 @@ global using Yotei.Tools.Diagnostics;
 global using Yotei.Tools.CloneGenerator;
 global using Yotei.Tools.WithGenerator;
 
-global using Yotei.ORM;
-global using Yotei.ORM.Code;
 global using Yotei.ORM.Generators;
-global using Yotei.ORM.Tools;
-global using Yotei.ORM.Tools.Code;
+global using Yotei.ORM;
+//global using Yotei.ORM.Code;
+//global using Yotei.ORM.Tools;
+//global using Yotei.ORM.Tools.Code;
