@@ -4,7 +4,7 @@ namespace Yotei.ORM.Generators;
 // ========================================================
 partial class XTypeNode
 {
-    SymbolEqualityComparer Comparer = SymbolEqualityComparer.Default;
+    readonly SymbolEqualityComparer Comparer = SymbolEqualityComparer.Default;
 
     // ----------------------------------------------------
 

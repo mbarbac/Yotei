@@ -27,7 +27,6 @@ internal partial class XTypeNode : TypeNode
         KType = default!; KTypeName = default!; KTypeNullable = default;
         TType = default!; TTypeName = default!; TTypeNullable = default;
         Bracket = default!;
-        Namespace = default!;
         Template = default!;
     }
 
@@ -37,7 +36,6 @@ internal partial class XTypeNode : TypeNode
     INamedTypeSymbol KType; string KTypeName; bool KTypeNullable;
     INamedTypeSymbol TType; string TTypeName; bool TTypeNullable;
     string Bracket;
-    string Namespace;
     Type Template;
 
     // ----------------------------------------------------
@@ -62,10 +60,12 @@ internal partial class XTypeNode : TypeNode
         var atc = Attribute.AttributeClass!;
         IsBag = atc.Name.StartsWith(INVARIANTBAG) || atc.Name.StartsWith(IINVARIANTBAG);
 
+
         /// <summary>
         /// Attribute is not a generic one.
         /// </summary>
-        if (atc.Arity == 0)
+        Arity = atc.Arity;
+        if (Arity == 0)
         {
             var args = Attribute.ConstructorArguments
                 .Where(static x => !x.IsNull && x.Kind == TypedConstantKind.Type)
@@ -142,7 +142,6 @@ internal partial class XTypeNode : TypeNode
         else { Symbol.ReportError(TreeError.InvalidAttribute, context); return false; }
 
         // Finishing...
-        Namespace = Symbol.IsInterface ? NAMESPACEAPI : NAMESPACECODE;
         return true;
     }
 
@@ -195,9 +194,6 @@ internal partial class XTypeNode : TypeNode
     /// <returns></returns>
     protected override bool OnEmitCore(SourceProductionContext context, CodeBuilder cb)
     {
-        // Emit 'Clone' if needed...
-        if (!TryEmitClone(context, cb)) return false;
-
         // Get the appropriate return type...
         var rtype = Symbol.UnwrapNullable(out var rnull);
         if (HasReturnType(Attribute, out var xtype, out var xnull)) { rtype = xtype; rnull = xnull; }
@@ -205,6 +201,9 @@ internal partial class XTypeNode : TypeNode
         var options = ReturnOptions(rtype, Symbol);
         var stype = rtype.EasyName(options);
         var snull = rnull ? "?" : string.Empty;
+
+        // Emit 'Clone' if needed...
+        TryEmitClone(cb, stype, snull);
 
         // Used to emit the called methods...
         var moptions = new EasyMethodOptions
@@ -220,7 +219,7 @@ internal partial class XTypeNode : TypeNode
             ParameterOptions = new EasyParameterOptions
             {
                 UseModifiers = true,
-                TypeOptions = EasyTypeOptions.Full,
+                TypeOptions = EasyTypeOptions.Default with { NamespaceStyle = EasyNamespaceStyle.Standard },
                 UseName = true,
             },
         };
@@ -248,6 +247,8 @@ internal partial class XTypeNode : TypeNode
             // Host is an interface...
             if (Symbol.IsInterface)
             {
+                if (method.Name == "Remove") { } // DEBUG-ONLY
+
                 var name = method.EasyName(moptions);
                 name = ReplaceKT(name);
 
@@ -307,16 +308,11 @@ internal partial class XTypeNode : TypeNode
             // If no child, then try this interface itself...
             if (!found)
             {
-                if (Finder.Find(iface, [iface.AllInterfaces], out bool value, (type, out value) =>
-                {
-                    if (HasInvariantAttribute(type, out _)) { value = true; return true; }
-                    else { value = false; return false; }
-                }) &&
-                value) found = true;
+                if (HasInvariantAttribute(iface, out _)) found = true;
                 else
                 {
-                    var existing = iface.GetMembers().OfType<IMethodSymbol>().ToDebugArray();
-                    found = existing.Any(x => SameMethod(method, x));
+                    var items = iface.GetMembers().OfType<IMethodSymbol>().ToDebugArray();
+                    found = items.Any(x => SameMethod(method, x));
                 }
             }
 
@@ -348,6 +344,7 @@ internal partial class XTypeNode : TypeNode
             if (item.Contains("T value")) item = item.Replace("T value", $"{TTypeName} value");
             if (item.Contains("T? value")) item = item.Replace("T? value", $"{TTypeName} value");
             if (item.Contains("T>")) item = item.Replace("T>", $"{TTypeName}>");
+            if (item.Contains("T?>")) item = item.Replace("T?>", $"{TTypeName}?>");
         }
         return item;
     }
@@ -355,11 +352,112 @@ internal partial class XTypeNode : TypeNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// Invoked to emit 'Clone()' if needed. Returns true if no errors have been detected, or
-    /// false otherwise after having reported the appropriate diagnostic.
+    /// Invoked to emit 'Clone()' if needed.
     /// </summary>
-    bool TryEmitClone(SourceProductionContext context, CodeBuilder cb)
+    void TryEmitClone(CodeBuilder cb, string stype, string snull)
     {
-        throw null;
+        // If existing or requested, we're done...
+        if (HasClone(Symbol, out _, out _)) return;
+
+        // Documentation...
+        cb.AppendLine($"/// <inheritdoc cref=\"ICloneable.Clone\"/>");
+        cb.AppendLine($"{AttributeDoc}");
+
+        // Interface...
+        if (Symbol.IsInterface)
+        {
+            var name = Symbol.EasyName();
+            cb.AppendLine($"new {name} Clone();");
+            return;
+        }
+
+        // We know we're inheriting from a base class...
+        if (Symbol.IsAbstract)
+        {
+            cb.AppendLine($"public abstract override {stype}{snull} Clone();");
+        }
+        else
+        {
+            var host = Symbol.EasyName();
+
+            cb.AppendLine($"public override {stype}{snull} Clone()");
+            cb.AppendLine("{");
+            cb.IndentLevel++;
+            {
+                cb.AppendLine($"var v_host = new {host}(this);");
+                cb.AppendLine($"return v_host;");
+            }
+            cb.IndentLevel--;
+            cb.AppendLine("}");
+
+            foreach (var iface in GetCloneInterfaces())
+            {
+                cb.AppendLine();
+                cb.AppendLine(iface);
+                cb.AppendLine($"{iface}.Clone() => Clone();");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Determines if a 'Clone' method is carried by the given type, or if it has been requested.
+    /// Either case this method returns true, and in the first scenario returns the found method
+    /// in the out argument and, in the second one, the requesting attribute in its own out one.
+    /// If not found and not requested, returns false.
+    /// </summary>
+    /// 
+    static bool HasClone(INamedTypeSymbol type, out IMethodSymbol? method, out AttributeData? at)
+    {
+        method = type.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(static x =>
+            x.Name == "Clone" &&
+            x.Parameters.Length == 0 &&
+            x.ReturnsVoid == false);
+
+        at = type.GetAttributes().FirstOrDefault(static x =>
+            x.AttributeClass != null &&
+            x.AttributeClass.Name == "Cloneable");
+
+        return method is not null || at is not null;
+    }
+
+    /// <summary>
+    /// Returns a list with the clone-alike interface needing explicit implementation.
+    /// </summary>
+    List<string> GetCloneInterfaces()
+    {
+        List<INamedTypeSymbol> list = [];
+        foreach (var iface in Symbol.Interfaces) TryCapture(iface);
+
+        var items = list.Select(static x => x.EasyName(EasyTypeOptions.Full)).ToList();
+        return items;
+
+        /// <summary>
+        /// Tries to capture the given interface as an explicit one.
+        /// </summary>
+        bool TryCapture(INamedTypeSymbol iface)
+        {
+            var found = false;
+
+            // First, the iface child themselves...
+            foreach (var child in iface.Interfaces) if (TryCapture(child)) found = true;
+
+            // If no child, then try this interface itself...
+            if (!found)
+            {
+                found =
+                    HasInvariantAttribute(iface, out _) ||
+                    HasClone(iface, out _, out _);
+            }
+
+            // If found, add to the list...
+            if (found)
+            {
+                var temp = list.Find(x => Comparer.Equals(x, iface));
+                if (temp == null) list.Add(iface);
+            }
+
+            // Finishing...
+            return found;
+        }
     }
 }

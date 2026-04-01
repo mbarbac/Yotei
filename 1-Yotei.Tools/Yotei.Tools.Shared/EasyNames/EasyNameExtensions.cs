@@ -56,11 +56,20 @@ static partial class EasyNameExtensions
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
-    internal static bool IsGenericAlike(this Type source) =>
-        (!source.IsGenericType && source.FullName == null) ||
-        source.IsGenericParameter ||
-        source.IsGenericTypeParameter ||
-        source.IsGenericMethodParameter;
+    internal static bool IsGenericAlike(this Type source)
+    {
+        return
+            source.FullName == null ||
+            source.IsGenericType ||
+            source.IsGenericParameter ||
+            source.IsGenericTypeParameter ||
+            source.IsGenericMethodParameter;
+    }
+    /* NOTE: previously, the first condition was:
+     * (!source.IsGenericType && source.FullName == null),
+     * but it seems that some types with null FullName can be generic. So, I changed it to
+     * just (source.FullName == null).
+     */
 
 #if YOTEI_TOOLS_GENERATORS
     extension(Type source)

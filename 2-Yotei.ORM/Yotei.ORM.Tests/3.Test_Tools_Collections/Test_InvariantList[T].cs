@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Tests.Collections;
+﻿#pragma warning disable IDE0028, IDE0018
+
+namespace Yotei.ORM.Tests.Collections;
 
 // ========================================================
 //[Enforced]

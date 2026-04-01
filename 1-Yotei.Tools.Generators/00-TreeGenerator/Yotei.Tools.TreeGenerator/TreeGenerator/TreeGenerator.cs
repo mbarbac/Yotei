@@ -171,6 +171,8 @@ internal partial class TreeGenerator : IIncrementalGenerator
         IEnumerable<AttributeData> attributes,
         SemanticModel model)
     {
+        Debug.Assert(symbol is INamedTypeSymbol, "Symbol is not of type INamedTypeSymbol.");
+
         var item = new TypeNode(symbol);
         if (syntax != null) item.SyntaxNodes.Add(syntax);
         item.Attributes.AddRange(attributes);
@@ -192,6 +194,8 @@ internal partial class TreeGenerator : IIncrementalGenerator
         IEnumerable<AttributeData> attributes,
         SemanticModel model)
     {
+        Debug.Assert(symbol is IPropertySymbol, "Symbol is not of type IPropertySymbol.");
+
         var item = new PropertyNode(symbol);
         if (syntax != null) item.SyntaxNodes.Add(syntax);
         item.Attributes.AddRange(attributes);
@@ -213,6 +217,8 @@ internal partial class TreeGenerator : IIncrementalGenerator
         IEnumerable<AttributeData> attributes,
         SemanticModel model)
     {
+        Debug.Assert(symbol is IFieldSymbol, "Symbol is not of type IFieldSymbol.");
+
         var item = new FieldNode(symbol);
         if (syntax != null) item.SyntaxNodes.Add(syntax);
         item.Attributes.AddRange(attributes);
@@ -234,6 +240,8 @@ internal partial class TreeGenerator : IIncrementalGenerator
         IEnumerable<AttributeData> attributes,
         SemanticModel model)
     {
+        Debug.Assert(symbol is IMethodSymbol, "Symbol is not of type IMethodSymbol.");
+
         var item = new MethodNode(symbol);
         if (syntax != null) item.SyntaxNodes.Add(syntax);
         item.Attributes.AddRange(attributes);
@@ -255,6 +263,8 @@ internal partial class TreeGenerator : IIncrementalGenerator
         IEnumerable<AttributeData> attributes,
         SemanticModel model)
     {
+        Debug.Assert(symbol is IEventSymbol, "Symbol is not of type IEventSymbol.");
+
         var item = new EventNode(symbol);
         if (syntax != null) item.SyntaxNodes.Add(syntax);
         item.Attributes.AddRange(attributes);
@@ -291,6 +301,7 @@ internal partial class TreeGenerator : IIncrementalGenerator
 
             var symbol = model.GetDeclaredSymbol(syntax, token);
             if (symbol is null) break;
+            Debug.Assert(symbol is INamedTypeSymbol, "Symbol is not of type INamedTypeSymbol.");
 
             var atx = FindSyntaxAttributes(symbol, syntax);
             var ats = FilterAttributes(atx, TypeAttributes, TypeAttributeNames);
@@ -306,14 +317,15 @@ internal partial class TreeGenerator : IIncrementalGenerator
             if (syntax is not IndexerDeclarationSyntax and not PropertyDeclarationSyntax)
                 break;
 
-            var symbol = model.GetDeclaredSymbol(syntax, token) as IPropertySymbol;
+            var symbol = model.GetDeclaredSymbol(syntax, token);
             if (symbol is null) break;
+            Debug.Assert(symbol is IPropertySymbol, "Symbol is not of type IPropertySymbol.");
 
             var atx = FindSyntaxAttributes(symbol, syntax).ToDebugArray();
             var ats = FilterAttributes(atx, PropertyAttributes, PropertyAttributeNames);
             if (ats.Count == 0) break;
 
-            var candidate = CreateNode(symbol, syntax, ats, model);
+            var candidate = CreateNode((IPropertySymbol)symbol, syntax, ats, model);
             return candidate;
         }
 
@@ -323,14 +335,15 @@ internal partial class TreeGenerator : IIncrementalGenerator
             var items = syntax.Declaration.Variables;
             foreach (var item in items)
             {
-                var symbol = model.GetDeclaredSymbol(item, token) as IFieldSymbol; // item!
+                var symbol = model.GetDeclaredSymbol(item, token);
                 if (symbol is null) break;
+                Debug.Assert(symbol is IFieldSymbol, "Symbol is not of type IFieldSymbol.");
 
                 var atx = FindSyntaxAttributes(symbol, syntax);
                 var ats = FilterAttributes(atx, FieldAttributes, FieldAttributeNames);
                 if (ats.Count == 0) break;
 
-                var candidate = CreateNode(symbol, syntax, ats, model);
+                var candidate = CreateNode((IFieldSymbol)symbol, syntax, ats, model);
                 return candidate;
             }
             break;
@@ -346,6 +359,7 @@ internal partial class TreeGenerator : IIncrementalGenerator
 
             var symbol = model.GetDeclaredSymbol(syntax, token);
             if (symbol is null) break;
+            Debug.Assert(symbol is IMethodSymbol, "Symbol is not of type IMethodSymbol.");
 
             var atx = FindSyntaxAttributes(symbol, syntax);
             var ats = FilterAttributes(atx, MethodAttributes, MethodAttributeNames);
@@ -360,6 +374,7 @@ internal partial class TreeGenerator : IIncrementalGenerator
         {
             var symbol = model.GetDeclaredSymbol(syntax, token);
             if (symbol is null) break;
+            Debug.Assert(symbol is IEventSymbol, "Symbol is not of type IEventSymbol.");
 
             var atx = FindSyntaxAttributes(symbol, syntax);
             var ats = FilterAttributes(atx, EventAttributes, EventAttributeNames);
@@ -375,14 +390,15 @@ internal partial class TreeGenerator : IIncrementalGenerator
             var items = syntax.Declaration.Variables;
             foreach (var item in items)
             {
-                var symbol = model.GetDeclaredSymbol(item, token) as IEventSymbol;
+                var symbol = model.GetDeclaredSymbol(item, token);
                 if (symbol is null) break;
+                Debug.Assert(symbol is IEventSymbol, "Symbol is not of type IEventSymbol.");
 
                 var atx = FindSyntaxAttributes(symbol, syntax);
                 var ats = FilterAttributes(atx, EventAttributes, EventAttributeNames);
                 if (ats.Count == 0) break;
 
-                var candidate = CreateNode(symbol, syntax, ats, model);
+                var candidate = CreateNode((IEventSymbol)symbol, syntax, ats, model);
                 return candidate;
             }
             break;
