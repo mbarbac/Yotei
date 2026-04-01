@@ -9,41 +9,6 @@
     <Import_RootNamespace>Yotei.Tools.TreeGenerator</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\AccessibilityExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\AttributeDataExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\DiagnosticExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\FieldExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\NamedTypeSymbolExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\NameSyntaxExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\PropertyExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\SymbolExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\SyntaxListExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\SyntaxNodeExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\TypeSymbolExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\TypeSyntaxExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\EasyTypeSymbol.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\RoslynNamesExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\EasyParameterSymbol.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\EasyMethodSymbol.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\EasyPropertySymbol.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\EasyFieldSymbol.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\EasyEventOptions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Api\ITreeNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Api\INode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\ErrorNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\EventNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\FieldNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\MethodNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\PropertyNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\TypeNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\TypeNodeEx.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeError.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeErrorExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeGenerator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeGeneratorEx.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeMiscelanea\ChainExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeMiscelanea\CodeBuilder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeMiscelanea\Finder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
   </ItemGroup>
   <ItemGroup>

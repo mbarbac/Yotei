@@ -45,11 +45,6 @@
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
 		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
 	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="InvariantGenerator\Public\" />
-	  <Folder Include="InvariantGenerator\Templates\" />
-	</ItemGroup>
 	<Import Project="..\..\1-Yotei.Tools\Yotei.Tools.Shared\Yotei.Tools.Shared.projitems" Label="Shared" />
 	<Import Project="..\..\1-Yotei.Tools.Generators\00-TreeGenerator\Yotei.Tools.TreeGenerator\Yotei.Tools.TreeGenerator.projitems" Label="Shared" />
 
