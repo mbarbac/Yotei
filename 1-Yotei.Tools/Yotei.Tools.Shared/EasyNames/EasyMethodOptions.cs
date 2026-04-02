@@ -1,4 +1,6 @@
 ﻿#if YOTEI_TOOLS_GENERATORS
+using System.Reflection.Metadata.Ecma335;
+
 namespace Yotei.Tools.Generators;
 #else
 namespace Yotei.Tools;
@@ -194,10 +196,10 @@ static partial class EasyNameExtensions
 
             if (source.IsAbstract && !iface) sb.Append("abstract ");
             if (IsSealed()) sb.Append("sealed ");
-            if (IsNew()) sb.Append("new ");
 
             if (IsOverride()) sb.Append("override ");
-            else if (IsVirtual() && !iface) sb.Append("virtual ");
+            else if (IsVirtual() && !iface && !source.IsAbstract) sb.Append("virtual ");
+            else if (IsNew()) sb.Append("new ");
         }
 
         // Return type (regular methods only)...
@@ -327,27 +329,46 @@ static partial class EasyNameExtensions
         /// <summary>
         /// Determines if the given source method (not constructor) is a 'new' one.
         /// </summary>
-        bool IsNew() =>
-            method != null &&
-            !method.IsVirtual &&
-            FindBaseMethod(host?.BaseType) != null;
-
-        MethodInfo? FindBaseMethod(Type? parent)
+        bool IsNew()
         {
-            while (parent != null)
-            {
-                var temp = parent.GetMethod(
-                    method.Name,
-                    BindingFlags.Public | BindingFlags.NonPublic |
-                    BindingFlags.Instance | BindingFlags.Static,
-                    null,
-                    [.. method.GetParameters().Select(p => p.ParameterType)],
-                    null);
+            if (method == null) return false;
+            return iface
+                ? (method.IsVirtual && FindBaseMethod(host, true) != null)
+                : (!method.IsVirtual && FindBaseMethod(host) != null);
+        }
 
-                if (temp != null) return temp;
-                parent = parent.BaseType;
+        MethodInfo? FindBaseMethod(Type? host, bool ifaces = false)
+        {
+            if (host != null)
+            {
+                // First, the host's base types...
+                var parent = host.BaseType;
+                while (parent != null)
+                {
+                    var temp = FindMethodAt(parent);
+                    if (temp != null) return temp;
+                    parent = parent.BaseType;
+                }
+
+                // Then the host's interfaces, if requested...
+                if (ifaces)
+                {
+                    foreach (var iface in host.GetInterfaces())
+                    {
+                        var temp = FindMethodAt(iface);
+                        if (temp != null) return temp;
+                    }
+                }
             }
             return null;
+
+            MethodInfo? FindMethodAt(Type type) => type.GetMethod(
+                method.Name,
+                BindingFlags.Public | BindingFlags.NonPublic |
+                BindingFlags.Instance | BindingFlags.Static,
+                null,
+                [.. method.GetParameters().Select(p => p.ParameterType)],
+                null);
         }
     }
 }

@@ -242,8 +242,8 @@ public static class Test_EasyType
 
     // ----------------------------------------------------
 
-    interface IFace3A<[IsNullable] T> { }
-    interface IFace3B<T> : IFace3A<T> { }
+    interface IFace3a<[IsNullable] T> { }
+    interface IFace3b<T> : IFace3a<T> { }
 
     //[Enforced]
     [Fact]
@@ -251,18 +251,18 @@ public static class Test_EasyType
     {
         EasyTypeOptions options;
         string name;
-        var type = typeof(IFace3B<>);
-        var source = type.GetInterface("IFace3A`1")!;
+        var type = typeof(IFace3b<>);
+        var source = type.GetInterface("IFace3a`1")!;
 
         options = EMPTY;
-        name = source.EasyName(options); Assert.Equal("IFace3A", name);
+        name = source.EasyName(options); Assert.Equal("IFace3a", name);
 
         options = DEFAULT;
-        name = source.EasyName(options); Assert.Equal("IFace3A<T>", name);
+        name = source.EasyName(options); Assert.Equal("IFace3a<T>", name);
 
         options = FULL;
         name = source.EasyName(options);
-        Assert.Equal($"{PREFIX}.IFace3A<T>", name);
+        Assert.Equal($"{PREFIX}.IFace3a<T>", name);
     }
 
     //[Enforced]
@@ -271,18 +271,18 @@ public static class Test_EasyType
     {
         EasyTypeOptions options;
         string name;
-        var type = typeof(IFace3B<string?>);
-        var source = type.GetInterface("IFace3A`1")!;
+        var type = typeof(IFace3b<string?>);
+        var source = type.GetInterface("IFace3a`1")!;
 
         options = EMPTY;
-        name = source.EasyName(options); Assert.Equal("IFace3A", name);
+        name = source.EasyName(options); Assert.Equal("IFace3a", name);
 
         options = DEFAULT;
-        name = source.EasyName(options); Assert.Equal("IFace3A<string>", name);
+        name = source.EasyName(options); Assert.Equal("IFace3a<string>", name);
 
         options = FULL;
         name = source.EasyName(options);
-        Assert.Equal($"{PREFIX}.IFace3A<System.String>", name);
+        Assert.Equal($"{PREFIX}.IFace3a<System.String>", name);
     }
 
     //[Enforced]
@@ -291,23 +291,23 @@ public static class Test_EasyType
     {
         EasyTypeOptions options;
         string name;
-        var type = typeof(IFace3B<IsNullable<string>>);
-        var source = type.GetInterface("IFace3A`1")!;
+        var type = typeof(IFace3b<IsNullable<string>>);
+        var source = type.GetInterface("IFace3a`1")!;
 
         options = EMPTY;
-        name = source.EasyName(options); Assert.Equal("IFace3A", name);
+        name = source.EasyName(options); Assert.Equal("IFace3a", name);
 
         options = DEFAULT;
-        name = source.EasyName(options); Assert.Equal("IFace3A<string?>", name);
+        name = source.EasyName(options); Assert.Equal("IFace3a<string?>", name);
 
         options = FULL;
         name = source.EasyName(options);
-        Assert.Equal($"{PREFIX}.IFace3A<Yotei.Tools.IsNullable<System.String>>", name);
+        Assert.Equal($"{PREFIX}.IFace3a<Yotei.Tools.IsNullable<System.String>>", name);
     }
 
     // ----------------------------------------------------
 
-    interface IFace3C<T> : IFace3A<T?> { }
+    interface IFace3c<T> : IFace3a<T?> { }
 
     //[Enforced]
     [Fact]
@@ -315,18 +315,18 @@ public static class Test_EasyType
     {
         EasyTypeOptions options;
         string name;
-        var type = typeof(IFace3C<>);
-        var source = type.GetInterface("IFace3A`1")!;
+        var type = typeof(IFace3c<>);
+        var source = type.GetInterface("IFace3a`1")!;
 
         options = EMPTY;
-        name = source.EasyName(options); Assert.Equal("IFace3A", name);
+        name = source.EasyName(options); Assert.Equal("IFace3a", name);
 
         options = DEFAULT;
-        name = source.EasyName(options); Assert.Equal("IFace3A<T>", name);
+        name = source.EasyName(options); Assert.Equal("IFace3a<T>", name);
 
         options = FULL;
         name = source.EasyName(options);
-        Assert.Equal($"{PREFIX}.IFace3A<T>", name);
+        Assert.Equal($"{PREFIX}.IFace3a<T>", name);
     }
 
     //[Enforced]
@@ -335,18 +335,18 @@ public static class Test_EasyType
     {
         EasyTypeOptions options;
         string name;
-        var type = typeof(IFace3C<string?>);
-        var source = type.GetInterface("IFace3A`1")!;
+        var type = typeof(IFace3c<string?>);
+        var source = type.GetInterface("IFace3a`1")!;
 
         options = EMPTY;
-        name = source.EasyName(options); Assert.Equal("IFace3A", name);
+        name = source.EasyName(options); Assert.Equal("IFace3a", name);
 
         options = DEFAULT;
-        name = source.EasyName(options); Assert.Equal("IFace3A<string>", name);
+        name = source.EasyName(options); Assert.Equal("IFace3a<string>", name);
 
         options = FULL;
         name = source.EasyName(options);
-        Assert.Equal($"{PREFIX}.IFace3A<System.String>", name);
+        Assert.Equal($"{PREFIX}.IFace3a<System.String>", name);
     }
 
     //[Enforced]
@@ -355,23 +355,23 @@ public static class Test_EasyType
     {
         EasyTypeOptions options;
         string name;
-        var type = typeof(IFace3C<IsNullable<string>>);
-        var source = type.GetInterface("IFace3A`1")!;
+        var type = typeof(IFace3c<IsNullable<string>>);
+        var source = type.GetInterface("IFace3a`1")!;
 
         options = EMPTY;
-        name = source.EasyName(options); Assert.Equal("IFace3A", name);
+        name = source.EasyName(options); Assert.Equal("IFace3a", name);
 
         options = DEFAULT;
-        name = source.EasyName(options); Assert.Equal("IFace3A<string?>", name);
+        name = source.EasyName(options); Assert.Equal("IFace3a<string?>", name);
 
         options = FULL;
         name = source.EasyName(options);
-        Assert.Equal($"{PREFIX}.IFace3A<Yotei.Tools.IsNullable<System.String>>", name);
+        Assert.Equal($"{PREFIX}.IFace3a<Yotei.Tools.IsNullable<System.String>>", name);
     }
 
     // ----------------------------------------------------
 
-    interface IFace4C<T> : IFace3A<IsNullable<T>> { }
+    interface IFace4c<T> : IFace3a<IsNullable<T>> { }
 
     //[Enforced]
     [Fact]
@@ -379,18 +379,18 @@ public static class Test_EasyType
     {
         EasyTypeOptions options;
         string name;
-        var type = typeof(IFace4C<>);
-        var source = type.GetInterface("IFace3A`1")!;
+        var type = typeof(IFace4c<>);
+        var source = type.GetInterface("IFace3a`1")!;
 
         options = EMPTY;
-        name = source.EasyName(options); Assert.Equal("IFace3A", name);
+        name = source.EasyName(options); Assert.Equal("IFace3a", name);
 
         options = DEFAULT;
-        name = source.EasyName(options); Assert.Equal("IFace3A<T?>", name);
+        name = source.EasyName(options); Assert.Equal("IFace3a<T?>", name);
 
         options = FULL;
         name = source.EasyName(options);
-        Assert.Equal($"{PREFIX}.IFace3A<Yotei.Tools.IsNullable<T>>", name);
+        Assert.Equal($"{PREFIX}.IFace3a<Yotei.Tools.IsNullable<T>>", name);
     }
 
     //[Enforced]
@@ -399,23 +399,23 @@ public static class Test_EasyType
     {
         EasyTypeOptions options;
         string name;
-        var type = typeof(IFace4C<string?>);
-        var source = type.GetInterface("IFace3A`1")!;
+        var type = typeof(IFace4c<string?>);
+        var source = type.GetInterface("IFace3a`1")!;
 
         options = EMPTY;
-        name = source.EasyName(options); Assert.Equal("IFace3A", name);
+        name = source.EasyName(options); Assert.Equal("IFace3a", name);
 
         options = DEFAULT;
-        name = source.EasyName(options); Assert.Equal("IFace3A<string?>", name);
+        name = source.EasyName(options); Assert.Equal("IFace3a<string?>", name);
 
         options = FULL;
         name = source.EasyName(options);
-        Assert.Equal($"{PREFIX}.IFace3A<Yotei.Tools.IsNullable<System.String>>", name);
+        Assert.Equal($"{PREFIX}.IFace3a<Yotei.Tools.IsNullable<System.String>>", name);
     }
 
     // ----------------------------------------------------
 
-    interface IFace5A<K, T> { interface IFace5B<R> { interface IFace5C<S, V> { } } }
+    interface IFace5a<K, T> { interface IFace5b<R> { interface IFace5c<S, V> { } } }
 
     //[Enforced]
     [Fact]
@@ -423,24 +423,24 @@ public static class Test_EasyType
     {
         EasyTypeOptions options;
         string name;
-        var source = typeof(IFace5A<,>.IFace5B<>.IFace5C<,>);
+        var source = typeof(IFace5a<,>.IFace5b<>.IFace5c<,>);
 
         options = EMPTY;
-        name = source.EasyName(options); Assert.Equal("IFace5C", name);
+        name = source.EasyName(options); Assert.Equal("IFace5c", name);
 
         options = DEFAULT;
-        name = source.EasyName(options); Assert.Equal("IFace5C<S, V>", name);
+        name = source.EasyName(options); Assert.Equal("IFace5c<S, V>", name);
 
         options = DEFAULT with { GenericListStyle = EasyGenericListStyle.PlaceHolders };
-        name = source.EasyName(options); Assert.Equal("IFace5C<,>", name);
+        name = source.EasyName(options); Assert.Equal("IFace5c<,>", name);
 
         options = FULL;
         name = source.EasyName(options);
-        Assert.Equal($"{PREFIX}.IFace5A<K, T>.IFace5B<R>.IFace5C<S, V>", name);
+        Assert.Equal($"{PREFIX}.IFace5a<K, T>.IFace5b<R>.IFace5c<S, V>", name);
 
         options = FULL with { GenericListStyle = EasyGenericListStyle.PlaceHolders };
         name = source.EasyName(options);
-        Assert.Equal($"{PREFIX}.IFace5A<,>.IFace5B<>.IFace5C<,>", name);
+        Assert.Equal($"{PREFIX}.IFace5a<,>.IFace5b<>.IFace5c<,>", name);
     }
 
     //[Enforced]
@@ -449,29 +449,29 @@ public static class Test_EasyType
     {
         EasyTypeOptions options;
         string name;
-        var source = typeof(IFace5A<byte, short>.IFace5B<int>.IFace5C<long?, string?>);
+        var source = typeof(IFace5a<byte, short>.IFace5b<int>.IFace5c<long?, string?>);
 
         options = EMPTY;
-        name = source.EasyName(options); Assert.Equal("IFace5C", name);
+        name = source.EasyName(options); Assert.Equal("IFace5c", name);
 
         options = DEFAULT;
-        name = source.EasyName(options); Assert.Equal("IFace5C<long?, string>", name);
+        name = source.EasyName(options); Assert.Equal("IFace5c<long?, string>", name);
 
         options = DEFAULT with { GenericListStyle = EasyGenericListStyle.PlaceHolders };
-        name = source.EasyName(options); Assert.Equal("IFace5C<,>", name);
+        name = source.EasyName(options); Assert.Equal("IFace5c<,>", name);
 
         options = FULL;
         name = source.EasyName(options);
         Assert.Equal(
             $"{PREFIX}." +
-            "IFace5A<System.Byte, System.Int16>." +
-            "IFace5B<System.Int32>." +
-            "IFace5C<System.Nullable<System.Int64>, System.String>",
+            "IFace5a<System.Byte, System.Int16>." +
+            "IFace5b<System.Int32>." +
+            "IFace5c<System.Nullable<System.Int64>, System.String>",
             name);
 
         options = FULL with { GenericListStyle = EasyGenericListStyle.PlaceHolders };
         name = source.EasyName(options);
-        Assert.Equal($"{PREFIX}.IFace5A<,>.IFace5B<>.IFace5C<,>", name);
+        Assert.Equal($"{PREFIX}.IFace5a<,>.IFace5b<>.IFace5c<,>", name);
     }
 
     //[Enforced]
@@ -480,34 +480,34 @@ public static class Test_EasyType
     {
         EasyTypeOptions options;
         string name;
-        var source = typeof(IFace5A<byte, short>.IFace5B<int>.IFace5C<long?, IsNullable<string>>);
+        var source = typeof(IFace5a<byte, short>.IFace5b<int>.IFace5c<long?, IsNullable<string>>);
 
         options = EMPTY;
-        name = source.EasyName(options); Assert.Equal("IFace5C", name);
+        name = source.EasyName(options); Assert.Equal("IFace5c", name);
 
         options = DEFAULT;
-        name = source.EasyName(options); Assert.Equal("IFace5C<long?, string?>", name);
+        name = source.EasyName(options); Assert.Equal("IFace5c<long?, string?>", name);
 
         options = DEFAULT with { GenericListStyle = EasyGenericListStyle.PlaceHolders };
-        name = source.EasyName(options); Assert.Equal("IFace5C<,>", name);
+        name = source.EasyName(options); Assert.Equal("IFace5c<,>", name);
 
         options = FULL;
         name = source.EasyName(options);
         Assert.Equal(
             $"{PREFIX}." +
-            "IFace5A<System.Byte, System.Int16>." +
-            "IFace5B<System.Int32>." +
-            "IFace5C<System.Nullable<System.Int64>, Yotei.Tools.IsNullable<System.String>>",
+            "IFace5a<System.Byte, System.Int16>." +
+            "IFace5b<System.Int32>." +
+            "IFace5c<System.Nullable<System.Int64>, Yotei.Tools.IsNullable<System.String>>",
             name);
 
         options = FULL with { GenericListStyle = EasyGenericListStyle.PlaceHolders };
         name = source.EasyName(options);
-        Assert.Equal($"{PREFIX}.IFace5A<,>.IFace5B<>.IFace5C<,>", name);
+        Assert.Equal($"{PREFIX}.IFace5a<,>.IFace5b<>.IFace5c<,>", name);
     }
 
     // ----------------------------------------------------
 
-    interface IFace6A<K, T> { interface IFace6B<R> { interface IFace6C<[IsNullable] S, [IsNullable] V> { } } }
+    interface IFace6a<K, T> { interface IFace6b<R> { interface IFace6c<[IsNullable] S, [IsNullable] V> { } } }
 
     //[Enforced]
     [Fact]
@@ -515,24 +515,24 @@ public static class Test_EasyType
     {
         EasyTypeOptions options;
         string name;
-        var source = typeof(IFace6A<,>.IFace6B<>.IFace6C<,>);
+        var source = typeof(IFace6a<,>.IFace6b<>.IFace6c<,>);
 
         options = EMPTY;
-        name = source.EasyName(options); Assert.Equal("IFace6C", name);
+        name = source.EasyName(options); Assert.Equal("IFace6c", name);
 
         options = DEFAULT;
-        name = source.EasyName(options); Assert.Equal("IFace6C<S?, V?>", name);
+        name = source.EasyName(options); Assert.Equal("IFace6c<S?, V?>", name);
 
         options = DEFAULT with { GenericListStyle = EasyGenericListStyle.PlaceHolders };
-        name = source.EasyName(options); Assert.Equal("IFace6C<,>", name);
+        name = source.EasyName(options); Assert.Equal("IFace6c<,>", name);
 
         options = FULL;
         name = source.EasyName(options);
-        Assert.Equal($"{PREFIX}.IFace6A<K, T>.IFace6B<R>.IFace6C<S?, V?>", name);
+        Assert.Equal($"{PREFIX}.IFace6a<K, T>.IFace6b<R>.IFace6c<S?, V?>", name);
 
         options = FULL with { GenericListStyle = EasyGenericListStyle.PlaceHolders };
         name = source.EasyName(options);
-        Assert.Equal($"{PREFIX}.IFace6A<,>.IFace6B<>.IFace6C<,>", name);
+        Assert.Equal($"{PREFIX}.IFace6a<,>.IFace6b<>.IFace6c<,>", name);
     }
 
     //[Enforced]
@@ -541,29 +541,29 @@ public static class Test_EasyType
     {
         EasyTypeOptions options;
         string name;
-        var source = typeof(IFace6A<byte, short>.IFace6B<int>.IFace6C<long?, string?>);
+        var source = typeof(IFace6a<byte, short>.IFace6b<int>.IFace6c<long?, string?>);
 
         options = EMPTY;
-        name = source.EasyName(options); Assert.Equal("IFace6C", name);
+        name = source.EasyName(options); Assert.Equal("IFace6c", name);
 
         options = DEFAULT;
-        name = source.EasyName(options); Assert.Equal("IFace6C<long?, string>", name);
+        name = source.EasyName(options); Assert.Equal("IFace6c<long?, string>", name);
 
         options = DEFAULT with { GenericListStyle = EasyGenericListStyle.PlaceHolders };
-        name = source.EasyName(options); Assert.Equal("IFace6C<,>", name);
+        name = source.EasyName(options); Assert.Equal("IFace6c<,>", name);
 
         options = FULL;
         name = source.EasyName(options);
         Assert.Equal(
             $"{PREFIX}." +
-            "IFace6A<System.Byte, System.Int16>." +
-            "IFace6B<System.Int32>." +
-            "IFace6C<System.Nullable<System.Int64>, System.String>",
+            "IFace6a<System.Byte, System.Int16>." +
+            "IFace6b<System.Int32>." +
+            "IFace6c<System.Nullable<System.Int64>, System.String>",
             name);
 
         options = FULL with { GenericListStyle = EasyGenericListStyle.PlaceHolders };
         name = source.EasyName(options);
-        Assert.Equal($"{PREFIX}.IFace6A<,>.IFace6B<>.IFace6C<,>", name);
+        Assert.Equal($"{PREFIX}.IFace6a<,>.IFace6b<>.IFace6c<,>", name);
     }
 
     //[Enforced]
@@ -572,29 +572,29 @@ public static class Test_EasyType
     {
         EasyTypeOptions options;
         string name;
-        var source = typeof(IFace6A<byte, short>.IFace6B<int>.IFace6C<long?, IsNullable<string>>);
+        var source = typeof(IFace6a<byte, short>.IFace6b<int>.IFace6c<long?, IsNullable<string>>);
 
         options = EMPTY;
-        name = source.EasyName(options); Assert.Equal("IFace6C", name);
+        name = source.EasyName(options); Assert.Equal("IFace6c", name);
 
         options = DEFAULT;
-        name = source.EasyName(options); Assert.Equal("IFace6C<long?, string?>", name);
+        name = source.EasyName(options); Assert.Equal("IFace6c<long?, string?>", name);
 
         options = DEFAULT with { GenericListStyle = EasyGenericListStyle.PlaceHolders };
-        name = source.EasyName(options); Assert.Equal("IFace6C<,>", name);
+        name = source.EasyName(options); Assert.Equal("IFace6c<,>", name);
 
         options = FULL;
         name = source.EasyName(options);
         Assert.Equal(
             $"{PREFIX}." +
-            "IFace6A<System.Byte, System.Int16>." +
-            "IFace6B<System.Int32>." +
-            "IFace6C<System.Nullable<System.Int64>, Yotei.Tools.IsNullable<System.String>>",
+            "IFace6a<System.Byte, System.Int16>." +
+            "IFace6b<System.Int32>." +
+            "IFace6c<System.Nullable<System.Int64>, Yotei.Tools.IsNullable<System.String>>",
             name);
 
         options = FULL with { GenericListStyle = EasyGenericListStyle.PlaceHolders };
         name = source.EasyName(options);
-        Assert.Equal($"{PREFIX}.IFace6A<,>.IFace6B<>.IFace6C<,>", name);
+        Assert.Equal($"{PREFIX}.IFace6a<,>.IFace6b<>.IFace6c<,>", name);
     }
 
     // ----------------------------------------------------
