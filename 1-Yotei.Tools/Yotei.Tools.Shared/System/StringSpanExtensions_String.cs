@@ -269,15 +269,19 @@ static partial class StringSpanExtensions
 
     // ----------------------------------------------------
 
-    // LOW: Optimize StartsWith...
     static bool StartsWith(StringSpan source, StringSpan value, Func<char, char, bool> predicate)
     {
         if (source.Length == 0 && value.Length == 0) return true;
         if (source.Length == 0 || value.Length == 0) return false;
         if (value.Length > source.Length) return false;
 
-        var index = IndexOf(source, value, predicate);
-        return index == 0;
+        for (int i = 0; i < value.Length; i++)
+        {
+            var schar = source[i];
+            var vchar = value[i];
+            if (!predicate(schar, vchar)) return false;
+        }
+        return true;
     }
 
     /// <summary>
