@@ -58,16 +58,30 @@ static partial class EasyNameExtensions
         // Types such 'Predicate<T>' are not considered 'T'-alike ones...
         if (source.GetGenericArguments().Length > 0) return false;
 
-        return source.FullName == null
-            || source.IsGenericType
-            || source.IsGenericParameter
-            || source.IsGenericTypeDefinition
-#if NET5_0_OR_GREATER
-            || source.IsGenericTypeParameter
-            || source.IsGenericMethodParameter
-#endif
-        ;
+        return source.FullName == null ||
+            source.IsGenericType ||
+            source.IsGenericParameter ||
+            source.IsGenericTypeDefinition ||
+            source.IsGenericTypeParameter ||
+            source.IsGenericMethodParameter;
     }
+
+#if YOTEI_TOOLS_GENERATORS
+    extension(Type source)
+    {
+        /// <summary>
+        /// Determines if the type is a generic type parameter, or not.
+        /// </summary>
+        public bool IsGenericTypeParameter
+            => source.IsGenericParameter && source.DeclaringMethod == null;
+
+        /// <summary>
+        /// Determines if the type is a generic method parameter, or not.
+        /// </summary>
+        public bool IsGenericMethodParameter
+            => source.IsGenericParameter && source.DeclaringMethod != null;
+    }
+#endif
 
     // ----------------------------------------------------
 
@@ -92,29 +106,37 @@ static partial class EasyNameExtensions
         source.Name.StartsWith("IsNullable`1"));
 
     /// <summary>
-    /// Determines if the given type has been annotated as nullable. This method verifies if it
-    /// is decorated with a nullable-alike attribute, but not if if it a nullable wrapper.
+    /// Determines if the given attribute indicates that the decorated element is annotated.
     /// </summary>
-    /// <remarks>
-    /// When nullability is enabled, then generic 'T' arguments always appear as annotated, but
-    /// this is NOT consistent with what happens with plain reference types, that loose that
-    /// information. So, for consistency reasons, when the type is a 'T' one we'll request that
-    /// is either wrapped (which is not covered by this method), or decorated with the custom
-    /// <see cref="IsNullableAttribute"/> attribute, as expected for other reference types.
-    /// </remarks>
+    /// <param name="at"></param>
+    /// <returns></returns>
+    internal static bool IsNullableEnabled(this NullableAttribute at) =>
+        at.NullableFlags.Length > 0 &&
+        at.NullableFlags[0] == 2;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the given type has been annotated as nullable, by checking if it has been
+    /// decorated with a nullable-alike attribute (but not if it is a nullable wrapper: it must
+    /// be checked independently).
+    /// <para>
+    /// When nullability is enabled, the generic 'T' arguments always appear as annotated ones,
+    /// but this is NOT consistent with what happens with reference types (that they loose this
+    /// information). For consistency reasons, when the type is a 'T' one we will requeste that
+    /// is either wrapped (which is not checked by this method), or decorated with the custom
+    /// <see cref="IsNullableAttribute"/> attribute, as expected for reference types.
+    /// </para>
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
     internal static bool IsNullableAnnotated(this Type source)
     {
         if (source.FullName != null) // Preventing annotated generic 'T' types...
         {
             if (source.GetCustomAttributes(typeof(NullableAttribute), false)
-                .Any(x => IsEnabled((NullableAttribute)x)))
+                .Any(x => IsNullableEnabled((NullableAttribute)x)))
                 return true;
-
-            // Used to emulate the nullability API...
-            static bool IsEnabled(NullableAttribute? at) =>
-                at != null &&
-                at.NullableFlags.Length == 1 &&
-                at.NullableFlags[0] == 2;
         }
 
         if (source.GetCustomAttributes(typeof(IsNullableAttribute), false).Length != 0)
@@ -122,4 +144,108 @@ static partial class EasyNameExtensions
 
         return false;
     }
+
+    /// <summary>
+    /// Determines if the given method has been annotated as nullable, by checking if it has been
+    /// decorated with a nullable-alike attribute.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    internal static bool IsNullableAnnotated(this MethodBase source)
+    {
+        if (source.GetCustomAttributes(typeof(NullableAttribute), false)
+            .Any(x => IsNullableEnabled((NullableAttribute)x)))
+            return true;
+
+        if (source.GetCustomAttributes(typeof(IsNullableAttribute), false).Length != 0)
+            return true;
+
+        return false;
+    }
+
+    // ----------------------------------------------------
+
+#if YOTEI_TOOLS_GENERATORS
+
+    /// <summary>
+    /// Determines if the given element has been annotated as nullable, by checking if it has been
+    /// decorated with a nullable-alike attribute.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    internal static bool IsNullableAnnotated(this ICustomAttributeProvider source)
+    {
+        if (source.GetCustomAttributes(typeof(NullableAttribute), false)
+            .Any(x => IsNullableEnabled((NullableAttribute)x)))
+            return true;
+
+        if (source.GetCustomAttributes(typeof(IsNullableAttribute), false).Length != 0)
+            return true;
+
+        return false;
+    }
+
+#else
+
+    /// <summary>
+    /// Determines if the given element has been annotated as nullable, using the standard
+    /// nullability API.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    internal static bool IsNullableAnnotated(this ParameterInfo source)
+    {
+    var nic = new NullabilityInfoContext();
+        var info = nic.Create(source);
+        return
+            info.ReadState == NullabilityState.Nullable ||
+            info.WriteState == NullabilityState.Nullable;
+    }
+
+    /// <summary>
+    /// Determines if the given element has been annotated as nullable, using the standard
+    /// nullability API.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    internal static bool IsNullableAnnotated(this PropertyInfo source)
+    {
+    var nic = new NullabilityInfoContext();
+        var info = nic.Create(source);
+        return
+            info.ReadState == NullabilityState.Nullable ||
+            info.WriteState == NullabilityState.Nullable;
+    }
+
+    /// <summary>
+    /// Determines if the given element has been annotated as nullable, using the standard
+    /// nullability API.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    internal static bool IsNullableAnnotated(this FieldInfo source)
+    {
+    var nic = new NullabilityInfoContext();
+        var info = nic.Create(source);
+        return
+            info.ReadState == NullabilityState.Nullable ||
+            info.WriteState == NullabilityState.Nullable;
+    }
+
+    /// <summary>
+    /// Determines if the given element has been annotated as nullable, using the standard
+    /// nullability API.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    internal static bool IsNullableAnnotated(this EventInfo source)
+    {
+    var nic = new NullabilityInfoContext();
+        var info = nic.Create(source);
+        return
+            info.ReadState == NullabilityState.Nullable ||
+            info.WriteState == NullabilityState.Nullable;
+    }
+
+#endif
 }

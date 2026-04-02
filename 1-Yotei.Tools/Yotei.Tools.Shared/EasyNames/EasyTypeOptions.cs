@@ -24,6 +24,7 @@ record EasyTypeOptions
 
     /// <summary>
     /// The style to use to obtain namespace, if any, of the given type.
+    /// <br/> A not-empty value of this property implies <see cref="UseHost"/>.
     /// </summary>
     public EasyNamespaceStyle NamespaceStyle { get; init; } = EasyNamespaceStyle.None;
 
