@@ -1,6 +1,4 @@
 ﻿#if YOTEI_TOOLS_GENERATORS
-using System.Reflection.Metadata.Ecma335;
-
 namespace Yotei.Tools.Generators;
 #else
 namespace Yotei.Tools;
@@ -245,7 +243,11 @@ static partial class EasyNameExtensions
             {
                 var xoptions = options.HostTypeOptions;
                 var str = type.EasyName(xoptions);
-                if (str.Length > 0) sb.Append(str).Append('.');
+                if (str.Length > 0)
+                {
+                    sb.Append(str);
+                    if (method != null) sb.Append('.');
+                }
             }
         }
 
@@ -253,9 +255,11 @@ static partial class EasyNameExtensions
         if (method != null) sb.Append(source.Name);
         if (constructor != null)
         {
-            var str = host?.EasyName(EasyTypeOptions.Empty) ?? "new";
-            sb.Append(str);
-
+            if (options.HostTypeOptions == null) // Otherwise is already captured...
+            {
+                var str = host?.EasyName(EasyTypeOptions.Empty) ?? "new";
+                sb.Append(str);
+            }
             if (options.UseTechName)
             {
                 if (!source.Name.StartsWith('.')) sb.Append('.');

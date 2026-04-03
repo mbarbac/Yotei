@@ -15,6 +15,34 @@ public
 #endif
 record EasyEventOptions
 {
+    /// <summary>
+    /// If enabled, then use the member accessibility modifiers, if any. Otherwise, they are
+    /// ignored.
+    /// </summary>
+    public bool UseAccessibility { get; init; }
+
+    /// <summary>
+    /// If enabled and accesibility is used, then also use the 'private' modifier. In all other
+    /// cases, it is ignored.
+    /// </summary>
+    public bool UsePrivate { get; init; }
+
+    /// <summary>
+    /// If enabled, then use the element's modifiers, if possible. Otherwise, they are ignored.
+    /// </summary>
+    public bool UseModifiers { get; init; }
+
+    /// <summary>
+    /// If not null, then the options to use with the element's return type. Otherwise, it is
+    /// ignored.
+    /// </summary>
+    public EasyTypeOptions? MemberTypeOptions { get; init; }
+
+    /// <summary>
+    /// If not null, then the options to use with the element's host type. Otherwise, it is
+    /// ignored.
+    /// </summary>
+    public EasyTypeOptions? HostTypeOptions { get; init; }
 
     // ----------------------------------------------------
 
@@ -36,9 +64,17 @@ record EasyEventOptions
     /// <summary>
     /// A shared instance with full-alike settings.
     /// </summary>
-    public static EasyEventOptions Full { get; } = new();
+    public static EasyEventOptions Full { get; } = new()
+    {
+        UseAccessibility = true,
+        UsePrivate = true,
+        UseModifiers = true,
+        MemberTypeOptions = EasyTypeOptions.Full,
+        HostTypeOptions = EasyTypeOptions.Full,
+    };
 }
 
+/*
 // ========================================================
 #if YOTEI_TOOLS_GENERATORS
 internal
@@ -70,3 +106,4 @@ static partial class EasyNameExtensions
         throw null;
     }
 }
+*/

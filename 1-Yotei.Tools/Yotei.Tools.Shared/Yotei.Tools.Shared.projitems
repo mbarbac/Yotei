@@ -9,7 +9,7 @@
     <Import_RootNamespace>Yotei.Tools.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)EasyNames\EasyEventOptions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EasyNames\_EasyEventOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EasyNames\EasyFieldOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EasyNames\EasyPropertyOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EasyNames\EasyNamespaceStyle.cs" />
