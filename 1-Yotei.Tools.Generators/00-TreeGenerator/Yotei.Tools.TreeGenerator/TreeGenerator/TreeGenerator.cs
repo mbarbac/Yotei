@@ -8,7 +8,7 @@
  *   the project that when compiled will be debugged (ie: a test project).
  * - Mark the derived generator project as the startup one.
  * - In the play button, select the debug profile.
- * - Click F5 (run) to compile (yes, no F6).
+ * - Click F5 (run) to compile (F6 does nothing).
  */
 
 // ========================================================
