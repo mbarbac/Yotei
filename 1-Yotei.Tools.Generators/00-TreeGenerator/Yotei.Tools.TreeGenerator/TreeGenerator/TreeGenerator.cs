@@ -1,5 +1,16 @@
 ﻿namespace Yotei.Tools.Generators;
 
+/* To DEBUG:
+ * - Install the .NET Compiler SDK (in addition to Roslyn components).
+ * - Make sure the derived generator project is a Roslyn component:
+ *   <IsRoslynComponent>true</IsRoslynComponent>
+ * - In the derived generator project's properties, add a Roslyn debug profile, whose target is
+ *   the project that when compiled will be debugged (ie: a test project).
+ * - Mark the derived generator project as the startup one.
+ * - In the play button, select the debug profile.
+ * - Click F5 (run) to compile (yes, no F6).
+ */
+
 // ========================================================
 /// <summary>
 /// Represents a tree-oriented incremental source generator that, when capturing its relevant
@@ -13,4 +24,18 @@
 /// </summary>
 internal partial class TreeGenerator : IIncrementalGenerator
 {
+    /// <summary>
+    /// Determines if the <see cref="IsNullable{T}"/> and the <see cref="IsNullableAttribute"/>
+    /// types are emitted in the namespace of the derived generator.
+    /// </summary>
+    protected virtual bool EmitNullabilityHelpers => true;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to register post-initialization actions such as reading external files, generating
+    /// code for marker attributes, and so on.
+    /// </summary>
+    /// <param name="context"></param>
+    protected virtual void OnInitialize(IncrementalGeneratorPostInitializationContext context) { }
 }
