@@ -1,6 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+		<IsRoslynComponent>true</IsRoslynComponent>
+		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+		<CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)GeneratedFiles</CompilerGeneratedFilesOutputPath>
+		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 		<Configurations>Debug;Release;Local</Configurations>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<LangVersion>preview</LangVersion>
@@ -30,15 +34,9 @@
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 	</PropertyGroup>
 
-	<ItemGroup>
-		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-	</ItemGroup>
-
 	<PropertyGroup>
-		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-		<IsRoslynComponent>true</IsRoslynComponent>
 		<DefineConstants>$(DefineConstants);YOTEI_TOOLS_GENERATORS</DefineConstants>
-		<!--<DefineConstants>$(DefineConstants);DEBUG_CLONE_GENERATOR </DefineConstants>-->
+		<DefineConstants>$(DefineConstants);DEBUG_CLONE_GENERATOR </DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -48,23 +48,6 @@
   <Folder Name="/1-Yotei.Tools/Tests/">
     <Project Path="1-Yotei.Tools/Yotei.Tools.Tests/Yotei.Tools.Tests.csproj" Id="b6a1e072-9195-4e7f-961a-5f0d58fd3a5a" />
   </Folder>
-  <Folder Name="/2-Yotei.ORM.Entities/" />
-  <Folder Name="/2-Yotei.ORM.Generators/">
-    <Project Path="2-Yotei.ORM.Generators/Yotei.ORM.Generators.Tests/Yotei.ORM.Generators.Tests.csproj" Id="8824aab0-1ca9-41cd-b97d-e716bfc0f029">
-      <BuildType Solution="Local|*" Project="Debug" />
-    </Project>
-    <Project Path="2-Yotei.ORM.Generators/Yotei.ORM.Generators/Yotei.ORM.Generators.csproj" Id="44bb8e58-dbbf-4ad1-90cc-e33a11b1534c">
-      <BuildType Solution="Local|*" Project="Debug" />
-    </Project>
-  </Folder>
-  <Folder Name="/2-Yotei.ORM/">
-    <Project Path="2-Yotei.ORM/Yotei.ORM.Tests/Yotei.ORM.Tests.csproj" Id="f29c2671-cd4e-4732-965b-c22c828b0723">
-      <BuildType Solution="Local|*" Project="Debug" />
-    </Project>
-    <Project Path="2-Yotei.ORM/Yotei.ORM/Yotei.ORM.csproj" Id="f24422f9-071f-4fc9-a285-ae9e9d31fa41">
-      <BuildType Solution="Local|*" Project="Debug" />
-    </Project>
-  </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".gitignore" />
     <File Path="LICENSE" />
