@@ -20,6 +20,18 @@
     <Project Path="1-Yotei.Tools.DynamicLambda/Yotei.Tools.DynamicLambda.Tests/Yotei.Tools.DynamicLambda.Tests.csproj" Id="c66a0a84-f059-4149-8942-e5d9e81da1e0" />
     <Project Path="1-Yotei.Tools.DynamicLambda/Yotei.Tools.DynamicLambda/Yotei.Tools.DynamicLambda.csproj" Id="a2bc71d4-154d-44ee-83dd-88e7180e75e9" />
   </Folder>
+  <Folder Name="/1-Yotei.Tools.Generators/" />
+  <Folder Name="/1-Yotei.Tools.Generators/00-TreeGenerator/">
+    <Project Path="1-Yotei.Tools.Generators/00-TreeGenerator/Yotei.Tools.TreeGenerator/Yotei.Tools.TreeGenerator.shproj" Id="d5ccca8f-1da1-45e8-aa70-b6c0f2c794d7" />
+  </Folder>
+  <Folder Name="/1-Yotei.Tools.Generators/01-CloneGenerator/">
+    <Project Path="1-Yotei.Tools.Generators/01-CloneGenerator/Yotei.Tools.CloneGenerator.Tests/Yotei.Tools.CloneGenerator.Tests.csproj" Id="518c0a27-0141-4e0f-af33-9cba1a9fb991">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
+    <Project Path="1-Yotei.Tools.Generators/01-CloneGenerator/Yotei.Tools.CloneGenerator/Yotei.Tools.CloneGenerator.csproj">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
+  </Folder>
   <Folder Name="/1-Yotei.Tools/" />
   <Folder Name="/1-Yotei.Tools/Code/">
     <Project Path="1-Yotei.Tools/Yotei.Tools.Shared/Yotei.Tools.Shared.shproj" Id="dd6bd0d7-fbb9-40b3-98a2-68be445abd0c" />

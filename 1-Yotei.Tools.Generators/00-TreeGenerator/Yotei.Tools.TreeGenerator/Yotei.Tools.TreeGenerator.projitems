@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>d5ccca8f-1da1-45e8-aa70-b6c0f2c794d7</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Yotei.Tools.TreeGenerator</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeGenerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeGeneratorEx.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
+  </ItemGroup>
+</Project>
