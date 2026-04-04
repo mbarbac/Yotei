@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "Yotei.Tools.CloneGenerator": {
-      "commandName": "Project",
-      "nativeDebugging": false
-    }
-  }
-}
