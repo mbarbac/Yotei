@@ -14,7 +14,6 @@ internal class CloneGenerator : TreeGenerator
     protected override void OnInitialize(IncrementalGeneratorPostInitializationContext context)
     {
         var folder = !EmitFilesInFolders ? null : GetType().Namespace;
-
         DoMarker("CloneableAttribute.cs");
         DoMarker("CloneableAttribute[T].cs");
 
@@ -25,4 +24,11 @@ internal class CloneGenerator : TreeGenerator
             AddSourceContents(context, folder, name, source);
         }
     }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    protected override List<Type> TypeAttributes { get; } = [
+        typeof(CloneableAttribute),
+        typeof(CloneableAttribute<>),];
 }
