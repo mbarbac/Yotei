@@ -9,6 +9,8 @@
     <Import_RootNamespace>Yotei.Tools.TreeGenerator</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\Api\__.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\__.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeGenerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeGeneratorEx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />

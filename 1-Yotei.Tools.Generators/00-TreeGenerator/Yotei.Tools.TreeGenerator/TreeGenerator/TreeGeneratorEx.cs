@@ -38,7 +38,7 @@ partial class TreeGenerator
     /// </summary>
     void DoEmitNullabilityHelpers(IncrementalGeneratorPostInitializationContext context)
     {
-        string nspace = GetType().Namespace!;
+        var nspace = GetType().Namespace!;
         var source = $$"""
             using System;
             namespace {{nspace}};
@@ -75,31 +75,30 @@ partial class TreeGenerator
             public class IsNullableAttribute : Attribute { }
             """;
 
-        AddSourceContents(context, nspace, false, "IsNullable[T]", source);
+        AddSourceContents(context, !EmitFilesInFolders ? null : nspace, "IsNullable[T]", source);
     }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Reads the contents of a source file embedded in the generator's assembly resources, as for
-    /// instance marker attributes ones. The file name must match the resource name, including its
-    /// path if applicable. The namespace typically is the namespace of the current generator.
-    /// <br/> Use a '[EmbeddedResource Include="name.cs" /]' specification whithin an ItemGroup to
-    /// embed the given source file in the generator's project.
+    /// Reads the contents of a source file embedded in the generator's assembly resources (for
+    /// instance: marker attributes).
+    /// <br/> The resource name must match the one used in the project file (typically in an
+    /// '[EmbeddedResource Include="name.cs" /]' entry of an ItemGroup section).
     /// </summary>
-    /// <param name="context"></param>
-    /// <param name="nspace"></param>
-    /// <param name="fname"></param>
+    /// <param name="rname"></param>
     /// <returns></returns>
-    protected string ReadSourceContents(string nspace, string fname)
+    protected string ReadSourceContents(string rname)
     {
-        fname = fname.NotNullNotEmpty(trim: true);
-        nspace = nspace.ThrowWhenNull().Trim();
+        // For whatever reasons 'folder\name' must be specified as 'folder.name'...
+        rname = rname.NotNullNotEmpty(trim: true);
+        rname = rname.Replace('\\', '.');
 
-        var path = nspace.Length > 0 ? $"{nspace}.{fname}" : fname;
+        var nspace = GetType().Namespace;
+        var path = $"{nspace}.{rname}";
         var assembly = Assembly.GetExecutingAssembly();
         using var stream = assembly.GetManifestResourceStream(path)
-            ?? throw new NotFoundException($"Embedded file not found: {fname}");
+            ?? throw new NotFoundException($"Embedded file not found: {rname}");
 
         using var reader = new StreamReader(stream);
         var source = reader.ReadToEnd();
@@ -107,71 +106,67 @@ partial class TreeGenerator
     }
 
     /// <summary>
-    /// Adds the given source code to the compilation.
-    /// <br/> The name of the actual file to add if built from the given namespace and original
-    /// file, in reversed dot order, after having removed given extension, and adding the final
-    /// one (provided they are not null ones).
-    /// <br/> The given '<paramref name="fname"/>' must not contain invalid file characters (ie:
-    /// substitute angle brackets by their corresponding squared ones). Reversed dot order is then
-    /// obtained using the first-level dots not contained within squared brakets.
-    /// <br/> If '<paramref name="usefolder"/>' is requested, then the namespace part is used as
-    /// the folder where to place the emitted file.
+    /// Adds the given source contents to the compilation in a file whose actual name is built
+    /// from the given folder and name, in reversed dot order.
+    /// <br/> If the folder is not null, then is used to place the file in that folder, which is
+    /// not dot-reversed.
+    /// <br/> The name must not contain invalid file name characters (ie: angle brackets must be
+    /// replaced by their squared brackets counterparts). Then, it is dot-order reversed using the
+    /// first-level dots, provided they are not protected by squared brackets.
+    /// <br/> If not null, the <paramref name="removeExtension"/> extension is removed from the
+    /// original name. Similarly, if the <paramref name="addExtension"/> extension is not null,
+    /// is then added to the final name.
     /// </summary>
+    /// <param name="context"></param>
+    /// <param name="folder"></param>
+    /// <param name="fname"></param>
+    /// <param name="source"></param>
+    /// <param name="removeExtension"></param>
+    /// <param name="addExtension"></param>
+    /// <param name="comparison"></param>
     protected void AddSourceContents(
         IncrementalGeneratorPostInitializationContext context,
-        string nspace, bool usefolder,
-        string fname,
+        string? folder, string fname,
         string source,
-        string? removelast = "cs",
-        string? addlast = "g.cs",
+        string? removeExtension = "cs", string? addExtension = "g.cs",
         StringComparison comparison = StringComparison.OrdinalIgnoreCase)
     {
-        nspace = nspace.ThrowWhenNull().Trim();
+        folder = folder.NullWhenEmpty(trim: true);
         fname = fname.NotNullNotEmpty(trim: true);
         source = source.ThrowWhenNull();
-        removelast = removelast.NullWhenEmpty(trim: true);
-        addlast = addlast.NullWhenEmpty(trim: true);
 
-        if (removelast != null && !removelast.StartsWith('.'))
-            removelast = $".{removelast}";
+        removeExtension = removeExtension.NullWhenEmpty(trim: true);
+        if (removeExtension != null && !removeExtension.StartsWith('.'))
+            removeExtension = $".{removeExtension}";
 
-        if (removelast != null && fname.EndsWith(removelast, comparison))
-            fname = fname.RemoveLast(removelast, comparison).ToString();
+        addExtension = addExtension.NullWhenEmpty(trim: true);
+        if (addExtension != null && addExtension.StartsWith('.'))
+            addExtension = addExtension[1..].NullWhenEmpty(trim: true);
 
-        var name = GetFileName();
-        context.AddSource(name, source);
+        fname = GetFileName();
+        context.AddSource(fname, source);
 
         /// <summary>
-        /// Gets the actual file name where to emit the given source.
+        /// Gets the actual file name to use.
         /// </summary>
         string GetFileName()
         {
-            if (!usefolder || nspace.Length == 0) // Flat file names...
-            {
-                var name = nspace.Length > 0 ? $"{nspace}.{fname}" : fname;
-                var parts = GetDotParts(name);
-                parts.Reverse();
-                if (addlast != null) parts.Add(addlast);
+            if (removeExtension != null && fname.EndsWith(removeExtension, comparison))
+                fname = fname.RemoveLast(removeExtension, comparison).ToString();
 
-                name = string.Join(".", parts);
-                return name;
-            }
-            else // Use the namespace part as the folder...
-            {
-                var parts = GetDotParts(fname);
-                parts.Reverse();
-                if (addlast != null) parts.Add(addlast);
+            var parts = GetDotParts(fname);
+            parts.Reverse();
+            if (addExtension != null) parts.Add(addExtension);
 
-                var name = string.Join(".", parts);
-                name = $"{nspace}/{name}";
-                return name;
-            }
+            fname = string.Join(".", parts);
+            if (folder != null) fname = $"{folder}/{fname}";
+            return fname;
         }
 
         /// <summary>
-        /// Gets the list of first-level dot separated parts, protected by squared brackets.
+        /// Gets the list of first-level dot parts, as protected by squared brackets.
         /// </summary>
-        List<string> GetDotParts(string str)
+        static List<string> GetDotParts(string str)
         {
             List<int> dots = [];
             int depth = 0;

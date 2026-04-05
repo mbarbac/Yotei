@@ -13,9 +13,16 @@ internal class CloneGenerator : TreeGenerator
     /// <param name="context"></param>
     protected override void OnInitialize(IncrementalGeneratorPostInitializationContext context)
     {
-        var nspace = GetType().Namespace;
-        var fname = "CloneableAttribute.cs";
-        var source = ReadSourceContents(nspace, fname);
-        AddSourceContents(context, nspace, true, fname, source);
+        var folder = !EmitFilesInFolders ? null : GetType().Namespace;
+
+        DoMarker("CloneableAttribute.cs");
+        DoMarker("CloneableAttribute[T].cs");
+
+        // Emits the market attribute...
+        void DoMarker(string name)
+        {
+            var source = ReadSourceContents($"Public\\{name}");
+            AddSourceContents(context, folder, name, source);
+        }
     }
 }
