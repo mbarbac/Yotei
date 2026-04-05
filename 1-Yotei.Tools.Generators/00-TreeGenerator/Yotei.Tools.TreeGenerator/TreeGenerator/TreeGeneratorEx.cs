@@ -3,7 +3,13 @@
 // ========================================================
 partial class TreeGenerator
 {
-    public virtual void Initialize(IncrementalGeneratorInitializationContext context)
+    /// <summary>
+    /// <inheritdoc/>
+    /// This method is INFRASTRUCTURE only, and it is only intended to be invoked by the compiler.
+    /// Application code shall not invoke it.
+    /// </summary>
+    /// <param name="context"></param>
+    public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         // Registering post-initialization actions...
         context.RegisterPostInitializationOutput(DispatchInitialize);
@@ -32,10 +38,10 @@ partial class TreeGenerator
     /// </summary>
     void DoEmitNullabilityHelpers(IncrementalGeneratorPostInitializationContext context)
     {
-        var ns = GetType().Namespace!;
-        var str = $$"""
+        string nspace = GetType().Namespace!;
+        var source = $$"""
             using System;
-            namespace {{ns}};
+            namespace {{nspace}};
 
             /// <summary>
             /// Used to decorate types for which nullability information shall be persisted, typically
@@ -69,12 +75,123 @@ partial class TreeGenerator
             public class IsNullableAttribute : Attribute { }
             """;
 
-        var name = ns + ".IsNullable[T]";
-        var parts = name.Split('.').ToList();
-        parts.Reverse();
-        parts.Add(".g.cs");
-        name = string.Join(".", parts);
+        AddSourceContents(context, nspace, false, "IsNullable[T]", source);
+    }
 
-        context.AddSource(name, str);
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Reads the contents of a source file embedded in the generator's assembly resources, as for
+    /// instance marker attributes ones. The file name must match the resource name, including its
+    /// path if applicable. The namespace typically is the namespace of the current generator.
+    /// <br/> Use a '[EmbeddedResource Include="name.cs" /]' specification whithin an ItemGroup to
+    /// embed the given source file in the generator's project.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="nspace"></param>
+    /// <param name="fname"></param>
+    /// <returns></returns>
+    protected string ReadSourceContents(string nspace, string fname)
+    {
+        fname = fname.NotNullNotEmpty(trim: true);
+        nspace = nspace.ThrowWhenNull().Trim();
+
+        var path = nspace.Length > 0 ? $"{nspace}.{fname}" : fname;
+        var assembly = Assembly.GetExecutingAssembly();
+        using var stream = assembly.GetManifestResourceStream(path)
+            ?? throw new NotFoundException($"Embedded file not found: {fname}");
+
+        using var reader = new StreamReader(stream);
+        var source = reader.ReadToEnd();
+        return source;
+    }
+
+    /// <summary>
+    /// Adds the given source code to the compilation.
+    /// <br/> The name of the actual file to add if built from the given namespace and original
+    /// file, in reversed dot order, after having removed given extension, and adding the final
+    /// one (provided they are not null ones).
+    /// <br/> The given '<paramref name="fname"/>' must not contain invalid file characters (ie:
+    /// substitute angle brackets by their corresponding squared ones). Reversed dot order is then
+    /// obtained using the first-level dots not contained within squared brakets.
+    /// <br/> If '<paramref name="usefolder"/>' is requested, then the namespace part is used as
+    /// the folder where to place the emitted file.
+    /// </summary>
+    protected void AddSourceContents(
+        IncrementalGeneratorPostInitializationContext context,
+        string nspace, bool usefolder,
+        string fname,
+        string source,
+        string? removelast = "cs",
+        string? addlast = "g.cs",
+        StringComparison comparison = StringComparison.OrdinalIgnoreCase)
+    {
+        nspace = nspace.ThrowWhenNull().Trim();
+        fname = fname.NotNullNotEmpty(trim: true);
+        source = source.ThrowWhenNull();
+        removelast = removelast.NullWhenEmpty(trim: true);
+        addlast = addlast.NullWhenEmpty(trim: true);
+
+        if (removelast != null && !removelast.StartsWith('.'))
+            removelast = $".{removelast}";
+
+        if (removelast != null && fname.EndsWith(removelast, comparison))
+            fname = fname.RemoveLast(removelast, comparison).ToString();
+
+        var name = GetFileName();
+        context.AddSource(name, source);
+
+        /// <summary>
+        /// Gets the actual file name where to emit the given source.
+        /// </summary>
+        string GetFileName()
+        {
+            if (!usefolder || nspace.Length == 0) // Flat file names...
+            {
+                var name = nspace.Length > 0 ? $"{nspace}.{fname}" : fname;
+                var parts = GetDotParts(name);
+                parts.Reverse();
+                if (addlast != null) parts.Add(addlast);
+
+                name = string.Join(".", parts);
+                return name;
+            }
+            else // Use the namespace part as the folder...
+            {
+                var parts = GetDotParts(fname);
+                parts.Reverse();
+                if (addlast != null) parts.Add(addlast);
+
+                var name = string.Join(".", parts);
+                name = $"{nspace}/{name}";
+                return name;
+            }
+        }
+
+        /// <summary>
+        /// Gets the list of first-level dot separated parts, protected by squared brackets.
+        /// </summary>
+        List<string> GetDotParts(string str)
+        {
+            List<int> dots = [];
+            int depth = 0;
+            for (int i = 0; i < str.Length; i++)
+            {
+                if (str[i] == '[') { depth++; continue; }
+                if (str[i] == ']') { if (depth > 0) depth--; continue; }
+                if (str[i] == '.' && depth == 0) dots.Add(i);
+            }
+
+            List<string> parts = [];
+            int last = 0;
+            foreach (var dot in dots)
+            {
+                parts.Add(str[last..dot]);
+                last = dot + 1;
+            }
+            parts.Add(str[last..]);
+
+            return parts;
+        }
     }
 }
