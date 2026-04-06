@@ -14,9 +14,25 @@ partial class TreeGenerator
         // Registering post-initialization actions...
         context.RegisterPostInitializationOutput(DispatchInitialize);
 
-        // TODO - Initialize
-        return;
+        // Registering pipeline steps...
+        var items = context.SyntaxProvider
+            .CreateSyntaxProvider(FastPredicate, CaptureCandidate)
+            .Where(static x => x is not null)
+            .Collect();
+
+        // Registering source code emit actions...
+        context.RegisterSourceOutput(items, EmitCandidates);
     }
+
+    /* NOTE:
+     * As per my understanding of the documentation, if we capture the 'Compilation' object we
+     * will then loose the incremental nature of the generator (so that it says that the slightest
+     * change or user typing will drive a full source generation over and over again).
+     * What I cannot understand is why then it has been made possible:
+     *      var combined = context.CompilationProvider.Combine(items);
+     *      context.RegisterSourceOutput(combined, EmitNodes);
+     * (provided an appropriate signature for the EmitNodes method).
+     */
 
     // ----------------------------------------------------
 
@@ -188,5 +204,50 @@ partial class TreeGenerator
 
             return parts;
         }
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Obtains the collection of attributes that decorate the given syntax, and transform them
+    /// into the ones that decorate the given symbol.
+    /// <br/> For whatever reasons, <see cref="ISymbol.GetAttributes"/> does not return all the
+    /// attributes when the symbol is declared or defined in different places (as, for instance,
+    /// with partial types).
+    /// </summary>
+    static IEnumerable<AttributeData> FindSyntaxAttributes(
+        ISymbol symbol,
+        MemberDeclarationSyntax syntax)
+    {
+        var atsyntaxes = syntax.AttributeLists.SelectMany(static x => x.Attributes);
+        foreach (var atsyntax in atsyntaxes)
+        {
+            var atd = symbol.GetAttributes().FirstOrDefault(
+                x => x.ApplicationSyntaxReference?.GetSyntax() == atsyntax);
+
+            if (atd is not null) yield return atd;
+        }
+    }
+
+    /// <summary>
+    /// Filters the given collection of attributes by matching them with either any of the given
+    /// attribute classes, or with any of the given attribute full qualified names.
+    /// </summary>
+    /// 
+    static List<AttributeData> FilterAttributes(
+        IEnumerable<AttributeData> attributes,
+        List<Type> types,
+        List<string> names)
+    {
+        List<AttributeData> list = []; foreach (var at in attributes)
+        {
+            var cx = at.AttributeClass;
+            if (cx == null) continue;
+
+            if (!list.Contains(at) && (
+                cx.MatchAny([.. types]) || names.Any(x => x == cx.Name)))
+                list.Add(at);
+        }
+        return list;
     }
 }

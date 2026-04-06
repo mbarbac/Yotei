@@ -9,10 +9,17 @@
     <Import_RootNamespace>Yotei.Tools.TreeGenerator</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\Api\__.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\__.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeGenerator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeGeneratorEx.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\TypeSymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\Api\ICandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\ErrorCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\TypeCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\PropertyCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\FieldCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\MethodCandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Trees\TreeGenerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Trees\TreeGeneratorEx.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Trees\TreeError.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\__.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
   </ItemGroup>
 </Project>
