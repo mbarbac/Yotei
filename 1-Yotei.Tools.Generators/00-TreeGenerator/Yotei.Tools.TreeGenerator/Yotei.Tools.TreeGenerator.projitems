@@ -16,10 +16,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\PropertyCandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\FieldCandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\MethodCandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Trees\TreeGenerator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Trees\TreeGeneratorEx.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Trees\TreeError.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\__.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeGenerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeGeneratorEx.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeError.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\CodeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
   </ItemGroup>
 </Project>
