@@ -22,7 +22,7 @@
 /// as its argument.
 /// </para>
 /// </summary>
-internal partial class TreeGenerator : IIncrementalGenerator
+public partial class TreeGenerator : IIncrementalGenerator
 {
     /// <summary>
     /// Determines if the files emitted by this source generator are all them placed in the same
@@ -129,168 +129,15 @@ internal partial class TreeGenerator : IIncrementalGenerator
     // ----------------------------------------------------
 
     /// <summary>
-    /// Invoked to create a source code generation candidate of the appropriate type. Inheritors
-    /// may override this method to cache the specific information that may later need.
-    /// </summary>
-    /// <param name="symbol"></param>
-    /// <param name="syntax"></param>
-    /// <param name="attributes"></param>
-    /// <param name="mode"></param>
-    /// <returns></returns>
-    protected virtual TypeCandidate CreateCandidate(
-        INamedTypeSymbol symbol,
-        BaseTypeDeclarationSyntax syntax,
-        IEnumerable<AttributeData> attributes,
-        SemanticModel mode)
-    {
-        throw null;
-    }
-
-    /// <summary>
-    /// Invoked to create a source code generation candidate of the appropriate type. Inheritors
-    /// may override this method to cache the specific information that may later need.
-    /// </summary>
-    /// <param name="symbol"></param>
-    /// <param name="syntax"></param>
-    /// <param name="attributes"></param>
-    /// <param name="mode"></param>
-    /// <returns></returns>
-    protected virtual PropertyCandidate CreateCandidate(
-        IPropertySymbol symbol,
-        BasePropertyDeclarationSyntax syntax,
-        IEnumerable<AttributeData> attributes,
-        SemanticModel mode)
-    {
-        throw null;
-    }
-
-    /// <summary>
-    /// Invoked to create a source code generation candidate of the appropriate type. Inheritors
-    /// may override this method to cache the specific information that may later need.
-    /// </summary>
-    /// <param name="symbol"></param>
-    /// <param name="syntax"></param>
-    /// <param name="attributes"></param>
-    /// <param name="mode"></param>
-    /// <returns></returns>
-    protected virtual FieldCandidate CreateCandidate(
-        IFieldSymbol symbol,
-        BaseFieldDeclarationSyntax syntax,
-        IEnumerable<AttributeData> attributes,
-        SemanticModel mode)
-    {
-        throw null;
-    }
-
-    /// <summary>
-    /// Invoked to create a source code generation candidate of the appropriate type. Inheritors
-    /// may override this method to cache the specific information that may later need.
-    /// </summary>
-    /// <param name="symbol"></param>
-    /// <param name="syntax"></param>
-    /// <param name="attributes"></param>
-    /// <param name="mode"></param>
-    /// <returns></returns>
-    protected virtual MethodCandidate CreateCandidate(
-        IMethodSymbol symbol,
-        BaseMethodDeclarationSyntax syntax,
-        IEnumerable<AttributeData> attributes,
-        SemanticModel mode)
-    {
-        throw null;
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Invoked to capture and return the given syntax node as a souce code generation candidate,
-    /// or to return null to ignore it completely. In addition, error instances can be returned to
-    /// report a diagnostic at source code generation time.
-    /// <br/> Inheritors may override the associated 'CrateCandidate' methods, or override this
-    /// one to, for instance, support other syntax node kinds.
+    /// Invoked to capture and return the given syntax node as a souce code generation candidate.
+    /// This method may also return 'null' if the syntax node is to be ignored.
     /// </summary>
     /// <param name="context"></param>
     /// <param name="token"></param>
     /// <returns></returns>
-    [SuppressMessage("", "IDE0019")]
     protected virtual ICandidate CaptureCandidate(GeneratorSyntaxContext context, CancellationToken token)
     {
-        token.ThrowIfCancellationRequested();
-
-        var node = context.Node;
-        var model = context.SemanticModel;
-
-        // Type-alike syntax nodes...
-        while (node is BaseTypeDeclarationSyntax syntax && (
-            syntax is TypeDeclarationSyntax ||
-            syntax is EnumDeclarationSyntax))
-        {
-            var symbol = model.GetDeclaredSymbol(syntax, token);
-            if (symbol == null) break;
-
-            var atx = FindSyntaxAttributes(symbol, syntax).ToDebugArray();
-            var ats = FilterAttributes(atx, TypeAttributes, TypeAttributeNames);
-            if (ats.Count == 0) break;
-
-            var candidate = CreateCandidate(symbol, syntax, ats, model);
-            return candidate;
-        }
-
-        // Property-alike syntax nodes...
-        while (node is BasePropertyDeclarationSyntax syntax && (
-            syntax is PropertyDeclarationSyntax ||
-            syntax is IndexerDeclarationSyntax))
-        {
-            var symbol = model.GetDeclaredSymbol(syntax, token) as IPropertySymbol;
-            if (symbol == null) break;
-
-            var atx = FindSyntaxAttributes(symbol, syntax).ToDebugArray();
-            var ats = FilterAttributes(atx, PropertyAttributes, PropertyAttributeNames);
-            if (ats.Count == 0) break;
-
-            var candidate = CreateCandidate(symbol, syntax, ats, model);
-            return candidate;
-        }
-
-        // Field-alike syntax nodes...
-        while (node is BaseFieldDeclarationSyntax syntax)
-        {
-            var items = syntax.Declaration.Variables;
-            foreach (var item in items)
-            {
-                var symbol = model.GetDeclaredSymbol(item, token) as IFieldSymbol;
-                if (symbol == null) continue;
-
-                var atx = FindSyntaxAttributes(symbol, syntax).ToDebugArray();
-                var ats = FilterAttributes(atx, FieldAttributes, FieldAttributeNames);
-                if (ats.Count == 0) continue;
-
-                var candidate = CreateCandidate(symbol, syntax, ats, model);
-                return candidate;
-            }
-            break;
-        }
-
-        // Method-alike syntax nodes...
-        while (node is BaseMethodDeclarationSyntax syntax && (
-            syntax is MethodDeclarationSyntax ||
-            syntax is ConstructorDeclarationSyntax ||
-            syntax is DestructorDeclarationSyntax ||
-            syntax is OperatorDeclarationSyntax ||
-            syntax is ConversionOperatorDeclarationSyntax))
-        {
-            var symbol = model.GetDeclaredSymbol(syntax, token);
-            if (symbol == null) break;
-
-            var atx = FindSyntaxAttributes(symbol, syntax).ToDebugArray();
-            var ats = FilterAttributes(atx, MethodAttributes, MethodAttributeNames);
-            if (ats.Count == 0) break;
-
-            var candidate = CreateCandidate(symbol, syntax, ats, model);
-            return candidate;
-        }
-
-        // Finishing by ignoring the syntax node...
+        // HIGH: CaptureCandidate
         return null!;
     }
 
@@ -298,16 +145,13 @@ internal partial class TreeGenerator : IIncrementalGenerator
 
     /// <summary>
     /// Invoked to process the captured source code generation candidates.
-    /// <br/> This method, by default, organizes the candidates in a hierarchy based on the types
-    /// each one will logically belong to, and where each type will be emitted in its own file.
-    /// <br/> Inheritors may override it to take full control on how and what their associated
-    /// source code is emitted.
     /// </summary>
     /// <param name="context"></param>
     /// <param name="candidates"></param>
     protected virtual void EmitCandidates(
         SourceProductionContext context, ImmutableArray<ICandidate> candidates)
     {
-        throw null;
+        // HIGH: EmitCandidates
+        return;
     }
 }

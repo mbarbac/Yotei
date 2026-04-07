@@ -1,18 +1,9 @@
 ﻿using StringSpan = System.ReadOnlySpan<char>;
 
-#if YOTEI_TOOLS_GENERATORS
-namespace Yotei.Tools.Generators;
-#else
 namespace Yotei.Tools;
-#endif
 
 // ========================================================
-#if YOTEI_TOOLS_GENERATORS
-internal
-#else
-public
-#endif
-static partial class StringSpanExtensions
+public static partial class StringSpanExtensions
 {
     static int IndexOf(StringSpan source, StringSpan value, Func<char, char, bool> predicate)
     {
@@ -503,13 +494,7 @@ static partial class StringSpanExtensions
     /// <param name="source"></param>
     /// <param name="index"></param>
     /// <returns></returns>
-    public static StringSpan Remove(this StringSpan source, int index)
-    {
-#if !EXPERIMENTAL
-        return source[..index];
-#else
-#endif
-    }
+    public static StringSpan Remove(this StringSpan source, int index) => source[..index];
 
     /// <summary>
     /// Returns a new span where the specific number of characters, staring at the given index,
@@ -519,20 +504,14 @@ static partial class StringSpanExtensions
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public static StringSpan Remove(this StringSpan source, int index, int count)
-    {
-#if !EXPERIMENTAL
-        return source.ToString().Remove(index, count);
-#else
-#endif
-    }
+    public static StringSpan Remove(
+        this StringSpan source, int index, int count) => source.ToString().Remove(index, count);
 
     // ----------------------------------------------------
 
     static StringSpan Remove(
         StringSpan source, StringSpan value, Func<char, char, bool> predicate, out bool removed)
     {
-#if !EXPERIMENTAL
         removed = false;
         if (source.Length == 0) return source;
         if (value.Length == 0) return source;
@@ -543,8 +522,6 @@ static partial class StringSpanExtensions
 
         removed = index >= 0;
         return source;
-#else
-#endif
     }
 
     /// <summary>
@@ -606,7 +583,6 @@ static partial class StringSpanExtensions
     static StringSpan RemoveLast(
         StringSpan source, StringSpan value, Func<char, char, bool> predicate, out bool removed)
     {
-#if !EXPERIMENTAL
         removed = false;
         if (source.Length == 0) return source;
         if (value.Length == 0) return source;
@@ -617,8 +593,6 @@ static partial class StringSpanExtensions
 
         removed = index >= 0;
         return source;
-#else
-#endif
     }
 
     /// <summary>
@@ -680,7 +654,6 @@ static partial class StringSpanExtensions
     static StringSpan RemoveAll(
         StringSpan source, StringSpan value, Func<char, char, bool> predicate, out bool removed)
     {
-#if !EXPERIMENTAL
         removed = false;
         if (source.Length == 0) return source;
         if (value.Length == 0) return source;
@@ -694,8 +667,6 @@ static partial class StringSpanExtensions
             removed = true;
         }
         return source;
-#else
-#endif
     }
 
     /// <summary>

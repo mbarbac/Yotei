@@ -1,16 +1,7 @@
-﻿#if YOTEI_TOOLS_GENERATORS
-namespace Yotei.Tools.Generators;
-#else
-namespace Yotei.Tools;
-#endif
+﻿namespace Yotei.Tools;
 
 // ========================================================
-#if YOTEI_TOOLS_GENERATORS
-internal
-#else
-public
-#endif
-static class TimeSpanExtensions
+public static class TimeSpanExtensions
 {
     extension(TimeSpan source)
     {

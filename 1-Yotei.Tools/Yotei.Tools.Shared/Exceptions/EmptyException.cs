@@ -1,19 +1,10 @@
-﻿#if YOTEI_TOOLS_GENERATORS
-namespace Yotei.Tools.Generators;
-#else
-namespace Yotei.Tools;
-#endif
+﻿namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>
 /// Represents the ocurrence of an empty element when it was not supposed to happen.
 /// </summary>
-#if YOTEI_TOOLS_GENERATORS
-internal
-#else
-public
-#endif
-class EmptyException : Exception
+public class EmptyException : Exception
 {
     /// <summary>
     /// Initializes a new instance.

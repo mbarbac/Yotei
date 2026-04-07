@@ -1,19 +1,10 @@
-﻿#if YOTEI_TOOLS_GENERATORS
-namespace Yotei.Tools.Generators;
-#else
-namespace Yotei.Tools;
-#endif
+﻿namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>
 /// Describes how to include the generic type arguments in the display string.
 /// </summary>
-#if YOTEI_TOOLS_GENERATORS
-internal
-#else
-public
-#endif
-enum EasyGenericListStyle
+public enum EasyGenericListStyle
 {
     /// <summary>
     /// Ignore generic arguments.

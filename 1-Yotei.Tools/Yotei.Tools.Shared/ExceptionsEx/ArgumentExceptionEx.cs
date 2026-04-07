@@ -1,4 +1,4 @@
-﻿#if YOTEI_TOOLS_GENERATORS
+﻿#if NETSTANDARD2_0
 
 namespace Yotei.Tools.Generators;
 

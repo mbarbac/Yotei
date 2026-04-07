@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents a string builder for generated code.
 /// </summary>
-internal class CodeBuilder
+public class CodeBuilder
 {
     readonly StringBuilder Builder = new();
     bool AtOrigin = true;

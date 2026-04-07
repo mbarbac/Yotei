@@ -1,19 +1,10 @@
-﻿#if YOTEI_TOOLS_GENERATORS
-namespace Yotei.Tools.Generators;
-#else
-namespace Yotei.Tools;
-#endif
+﻿namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>
 /// Describes how to obtain the display string of a property element.
 /// </summary>
-#if YOTEI_TOOLS_GENERATORS
-internal
-#else
-public
-#endif
-record EasyPropertyOptions
+public record EasyPropertyOptions
 {
     /// <summary>
     /// If enabled, then use the member accessibility modifiers, if any. Otherwise, they are
@@ -99,12 +90,7 @@ record EasyPropertyOptions
 }
 
 // ========================================================
-#if YOTEI_TOOLS_GENERATORS
-internal
-#else
-public
-#endif
-static partial class EasyNameExtensions
+public static partial class EasyNameExtensions
 {
     /// <summary>
     /// Obtains a c#-alike string representation of the given element, using default options.

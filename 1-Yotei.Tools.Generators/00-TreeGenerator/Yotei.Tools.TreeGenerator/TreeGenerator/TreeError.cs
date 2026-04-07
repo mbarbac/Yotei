@@ -6,7 +6,7 @@
 /// </summary>
 /// <param name="Value"></param>
 /// <param name="Description"></param>
-internal record TreeError(int Value, string Description)
+public record TreeError(int Value, string Description)
 {
     public static readonly TreeError SyntaxNotSupported = new(1, "Syntax not supported");
     public static readonly TreeError SymbolNotFound = new(2, "Symbol not found");

@@ -11,11 +11,6 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\TypeSymbolExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\Api\ICandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\ErrorCandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\TypeCandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\PropertyCandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\FieldCandidate.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\MethodCandidate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeGenerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeGeneratorEx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeError.cs" />

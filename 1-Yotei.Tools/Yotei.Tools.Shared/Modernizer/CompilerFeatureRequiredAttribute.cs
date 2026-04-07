@@ -1,7 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#if YOTEI_TOOLS_GENERATORS
+#if NETSTANDARD2_0
 
 namespace System.Runtime.CompilerServices;
 

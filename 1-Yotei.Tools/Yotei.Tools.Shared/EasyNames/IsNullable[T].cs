@@ -1,8 +1,4 @@
-﻿#if YOTEI_TOOLS_GENERATORS
-namespace Yotei.Tools.Generators;
-#else
-namespace Yotei.Tools;
-#endif
+﻿namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>
@@ -26,10 +22,5 @@ namespace Yotei.Tools;
 /// </para>
 /// </summary>
 /// <typeparam name="T"></typeparam>
-#if YOTEI_TOOLS_GENERATORS
-internal
-#else
-public
-#endif
-class IsNullable<T>
+public class IsNullable<T>
 { }

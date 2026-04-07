@@ -1,16 +1,7 @@
-﻿#if YOTEI_TOOLS_GENERATORS
-namespace Yotei.Tools.Generators;
-#else
-namespace Yotei.Tools;
-#endif
+﻿namespace Yotei.Tools;
 
 // ========================================================
-#if YOTEI_TOOLS_GENERATORS
-internal
-#else
-public
-#endif
-static partial class EasyNameExtensions
+public static partial class EasyNameExtensions
 {
     private const string ATTRIBUTE = "Attribute";
     private const string READ_ONLY_ATTRIBUTE = "System.Runtime.CompilerServices.IsReadOnlyAttribute";
@@ -165,7 +156,7 @@ static partial class EasyNameExtensions
 
     // ----------------------------------------------------
 
-#if YOTEI_TOOLS_GENERATORS
+#if NETSTANDARD2_0
 
     /// <summary>
     /// Determines if the given element has been annotated as nullable, by checking if it has been
@@ -185,7 +176,7 @@ static partial class EasyNameExtensions
         return false;
     }
 
-#else
+#elif NET6_0_OR_GREATER
 
     /// <summary>
     /// Determines if the given element has been annotated as nullable, using the standard

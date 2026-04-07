@@ -1,18 +1,9 @@
 ﻿using StringSpan = System.ReadOnlySpan<char>;
 
-#if YOTEI_TOOLS_GENERATORS
-namespace Yotei.Tools.Generators;
-#else
 namespace Yotei.Tools;
-#endif
 
 // ========================================================
-#if YOTEI_TOOLS_GENERATORS
-internal
-#else
-public
-#endif
-static partial class StringSpanExtensions
+public static partial class StringSpanExtensions
 {
     static int IndexOf(StringSpan source, char value, Func<char, char, bool> predicate)
     {
@@ -34,7 +25,7 @@ static partial class StringSpanExtensions
         this StringSpan source, char value, bool ignoreCase)
         => IndexOf(source, value, (x, y) => x.Equals(y, ignoreCase));
 
-#if YOTEI_TOOLS_GENERATORS
+#if NETSTANDARD2_0
     /// <summary>
     ///  Returns the index of the first ocurrence of the given value in the given source, or -1 if
     /// it cannot be found.
@@ -197,7 +188,7 @@ static partial class StringSpanExtensions
 
     // ----------------------------------------------------
 
-#if YOTEI_TOOLS_GENERATORS
+#if NETSTANDARD2_0
     /// <summary>
     /// Determines if the source contains the given value, or not.
     /// </summary>
@@ -322,7 +313,7 @@ static partial class StringSpanExtensions
         return predicate(source[^1], value);
     }
 
-#if YOTEI_TOOLS_GENERATORS
+#if NETSTANDARD2_0
     /// <summary>
     /// Determines if this source ends with the given value, or not.
     /// </summary>
@@ -445,7 +436,7 @@ static partial class StringSpanExtensions
         StringSpan source, IEnumerable<char> values, Func<char, char, bool> predicate)
         => IndexOfAny(source, values, predicate) >= 0;
 
-#if YOTEI_TOOLS_GENERATORS
+#if NETSTANDARD2_0
     /// <summary>
     /// Determines if the source contains any of the given values, or not.
     /// </summary>
@@ -506,7 +497,6 @@ static partial class StringSpanExtensions
     static StringSpan Remove(
         StringSpan source, char value, Func<char, char, bool> predicate, out bool removed)
     {
-#if !EXPERIMENTAL
         removed = false;
         if (source.Length == 0) return source;
 
@@ -515,8 +505,6 @@ static partial class StringSpanExtensions
 
         removed = index >= 0;
         return source;
-#else
-#endif
     }
 
     /// <summary>
@@ -578,7 +566,6 @@ static partial class StringSpanExtensions
     static StringSpan RemoveLast(
         StringSpan source, char value, Func<char, char, bool> predicate, out bool removed)
     {
-#if !EXPERIMENTAL
         removed = false;
         if (source.Length == 0) return source;
 
@@ -587,8 +574,6 @@ static partial class StringSpanExtensions
 
         removed = index >= 0;
         return source;
-#else
-#endif
     }
 
     /// <summary>
@@ -650,7 +635,6 @@ static partial class StringSpanExtensions
     static StringSpan RemoveAll(
         StringSpan source, char value, Func<char, char, bool> predicate, out bool removed)
     {
-#if !EXPERIMENTAL
         removed = false;
         if (source.Length == 0) return source;
 
@@ -662,8 +646,6 @@ static partial class StringSpanExtensions
             removed = true;
         }
         return source;
-#else
-#endif
     }
 
     /// <summary>

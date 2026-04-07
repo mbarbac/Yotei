@@ -1,16 +1,7 @@
-﻿#if YOTEI_TOOLS_GENERATORS
-namespace Yotei.Tools.Generators;
-#else
-namespace Yotei.Tools;
-#endif
+﻿namespace Yotei.Tools;
 
 // ========================================================
-#if YOTEI_TOOLS_GENERATORS
-internal
-#else
-public
-#endif
-static class TypeExtensions
+public static class TypeExtensions
 {
     extension(Type source)
     {
@@ -59,8 +50,7 @@ static class TypeExtensions
         }
 
         // ------------------------------------------------
-#if YOTEI_TOOLS_GENERATORS
-
+#if NETSTANDARD2_0
         /// <summary>
         /// Determines whether the current type can be assigned to a variable to the given target
         /// type.
@@ -69,7 +59,6 @@ static class TypeExtensions
         /// <returns></returns>
         public bool IsAssignableTo(
             [NotNullWhen(true)] Type? targetType) => targetType?.IsAssignableFrom(source) ?? false;
-
 #endif
     }
 }

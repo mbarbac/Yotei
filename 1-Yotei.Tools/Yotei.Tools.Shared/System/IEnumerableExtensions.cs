@@ -1,16 +1,7 @@
-﻿#if YOTEI_TOOLS_GENERATORS
-namespace Yotei.Tools.Generators;
-#else
-namespace Yotei.Tools;
-#endif
+﻿namespace Yotei.Tools;
 
 // ========================================================
-#if YOTEI_TOOLS_GENERATORS
-internal
-#else
-public
-#endif
-static class IEnumerableExtensions
+public static class IEnumerableExtensions
 {
     /// <summary>
     /// Executes the given action for each element in the given enumeration.

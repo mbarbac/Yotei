@@ -1,19 +1,10 @@
-﻿#if YOTEI_TOOLS_GENERATORS
-namespace Yotei.Tools.Generators;
-#else
-namespace Yotei.Tools;
-#endif
+﻿namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>
 /// Describes how to obtain the display string of a parameter element.
 /// </summary>
-#if YOTEI_TOOLS_GENERATORS
-internal
-#else
-public
-#endif
-record EasyParameterOptions
+public record EasyParameterOptions
 {
     /// <summary>
     /// If enabled, then use the 'this' prefix before the first parameter of an extension method.
@@ -71,12 +62,7 @@ record EasyParameterOptions
 }
 
 // ========================================================
-#if YOTEI_TOOLS_GENERATORS
-internal
-#else
-public
-#endif
-static partial class EasyNameExtensions
+public static partial class EasyNameExtensions
 {
     /// <summary>
     /// Obtains a c#-alike string representation of the given element, using default options.

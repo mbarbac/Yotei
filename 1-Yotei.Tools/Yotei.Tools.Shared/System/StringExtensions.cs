@@ -1,18 +1,9 @@
-﻿#if YOTEI_TOOLS_GENERATORS
-namespace Yotei.Tools.Generators;
-#else
-namespace Yotei.Tools;
-#endif
+﻿namespace Yotei.Tools;
 
 // Note: cannot use extension block when 'CallerArgumentExpression' is used.
 
 // ========================================================
-#if YOTEI_TOOLS_GENERATORS
-internal
-#else
-public
-#endif
-static class StringExtensions
+public static class StringExtensions
 {
     /// <summary>
     /// Returns <see langword="null"/> if the source string is null, or if it is empty after trimmed,
