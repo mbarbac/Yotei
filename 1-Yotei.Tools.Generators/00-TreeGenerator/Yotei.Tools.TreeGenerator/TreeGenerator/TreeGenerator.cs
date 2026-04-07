@@ -135,7 +135,7 @@ public partial class TreeGenerator : IIncrementalGenerator
     /// <param name="context"></param>
     /// <param name="token"></param>
     /// <returns></returns>
-    protected virtual ICandidate CaptureCandidate(GeneratorSyntaxContext context, CancellationToken token)
+    protected virtual INode CaptureCandidate(GeneratorSyntaxContext context, CancellationToken token)
     {
         // HIGH: CaptureCandidate
         return null!;
@@ -149,7 +149,7 @@ public partial class TreeGenerator : IIncrementalGenerator
     /// <param name="context"></param>
     /// <param name="candidates"></param>
     protected virtual void EmitCandidates(
-        SourceProductionContext context, ImmutableArray<ICandidate> candidates)
+        SourceProductionContext context, ImmutableArray<INode> candidates)
     {
         // HIGH: EmitCandidates
         return;

@@ -10,11 +10,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\TypeSymbolExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Candidates\Api\ICandidate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Api\INode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeGenerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeGeneratorEx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeError.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\CodeBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeErrorExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
   </ItemGroup>
 </Project>
