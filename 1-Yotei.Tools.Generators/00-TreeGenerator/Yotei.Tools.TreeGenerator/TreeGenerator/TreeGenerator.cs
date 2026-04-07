@@ -111,7 +111,7 @@ public partial class TreeGenerator : IIncrementalGenerator
     /// <param name="token"></param>
     /// <returns></returns>
     [SuppressMessage("", "IDE0078")]
-    protected virtual bool FastPredicate(SyntaxNode node, CancellationToken token)
+    protected virtual bool FilterNode(SyntaxNode node, CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
 
@@ -135,7 +135,7 @@ public partial class TreeGenerator : IIncrementalGenerator
     /// <param name="context"></param>
     /// <param name="token"></param>
     /// <returns></returns>
-    protected virtual INode CaptureCandidate(GeneratorSyntaxContext context, CancellationToken token)
+    protected virtual INode CaptureNode(GeneratorSyntaxContext context, CancellationToken token)
     {
         // HIGH: CaptureCandidate
         return null!;
@@ -147,11 +147,26 @@ public partial class TreeGenerator : IIncrementalGenerator
     /// Invoked to process the captured source code generation candidates.
     /// </summary>
     /// <param name="context"></param>
-    /// <param name="candidates"></param>
-    protected virtual void EmitCandidates(
-        SourceProductionContext context, ImmutableArray<INode> candidates)
+    /// <param name="nodes"></param>
+    protected virtual void EmitNodes(
+        SourceProductionContext context, ImmutableArray<INode> nodes)
     {
-        // HIGH: EmitCandidates
+        foreach (var node in nodes)
+        {
+            context.CancellationToken.ThrowIfCancellationRequested();
+
+            // Reporting diagnostics and maybe aborting the node source code generation...
+            var abort = false;
+            foreach (var diag in node.Diagnostics)
+            {
+                diag.Report(context);
+                if (diag.IsWarningAsError || diag.Severity == DiagnosticSeverity.Error) abort = true;
+            }
+            if (abort) continue;
+        }
+
+
+        // HIGH: EmitNodes
         return;
     }
 }

@@ -10,19 +10,23 @@ public class CloneGenerator : TreeGenerator
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    protected override bool EmitFilesInFolders => true;
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     /// <param name="context"></param>
     protected override void OnInitialize(IncrementalGeneratorPostInitializationContext context)
     {
-        //var folder = !EmitFilesInFolders ? null : GetType().Namespace;
-        //DoMarker("CloneableAttribute.cs");
-        //DoMarker("CloneableAttribute[T].cs");
+        string rname;
+        var rfolder = "Public/";
+        var nspace = EmitFilesInFolders ? GetType().Namespace : null;
 
-        //// Emits the market attribute...
-        //void DoMarker(string name)
-        //{
-        //    var source = ReadSourceContents($"Public\\{name}");
-        //    AddSourceContents(context, folder, name, source);
-        //}
+        rname = "CloneableAttribute.cs";
+        AddResourceContents(context, $"{rfolder}{rname}", nspace, rname, EmitFilesInFolders);
+
+        rname = "CloneableAttribute[T].cs";
+        AddResourceContents(context, $"{rfolder}{rname}", nspace, rname, EmitFilesInFolders);
     }
 
     /// <summary>

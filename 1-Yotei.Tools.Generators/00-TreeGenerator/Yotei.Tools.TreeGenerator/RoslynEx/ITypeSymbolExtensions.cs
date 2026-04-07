@@ -1,11 +1,57 @@
 ﻿namespace Yotei.Tools.Generators;
 
 // ========================================================
-public static class TypeSymbolExtensions
+public static class ITypeSymbolExtensions
 {
     extension(ITypeSymbol source)
     {
+        /// <summary>
+        /// Determines if this type symbol is an interface, or not.
+        /// </summary>
+        public bool IsInterface => source.TypeKind == TypeKind.Interface;
+        
+        // ------------------------------------------------
 
+        /// <summary>
+        /// Determines if this type symbol is a partial one, or not.
+        /// </summary>
+        public bool IsPartial => source
+            .GetSyntaxNodes()
+            .OfType<BaseTypeDeclarationSyntax>()
+            .Any(x => x.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword)));
+        
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Obtains the collection of base types of this symbol, in reverse inheritance order.
+        /// </summary>
+        public IEnumerable<INamedTypeSymbol> AllBaseTypes
+        {
+            get
+            {
+                INamedTypeSymbol? temp = null;
+                while ((temp = (temp ?? source).BaseType) != null)
+                    if (!temp.IsNamespace) yield return temp;
+            }
+        }
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Determines if instances of this type can be assigned to instances of the given target
+        /// one, or not. This method uses both the inheritance and interfaces chains, recursively.
+        /// </summary>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        public bool IsAssignableTo(ITypeSymbol target)
+        {
+            var comparer = SymbolEqualityComparer.Default;
+            if (comparer.Equals(source, target)) return true;
+
+            if (source.AllBaseTypes.Any(x => comparer.Equals(x, target))) return true;
+            if (source.AllInterfaces.Any(x => comparer.Equals(x, target))) return true;
+            return false;
+        }
 
         // ------------------------------------------------
 
