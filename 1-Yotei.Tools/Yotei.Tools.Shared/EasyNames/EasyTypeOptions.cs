@@ -211,16 +211,15 @@ public static partial class EasyNameExtensions
         }
 
         // Nullable annotations...
-        while (options.NullableStyle != EasyNullableStyle.None)
+        while (options.NullableStyle != EasyNullableStyle.None &&
+            sb.Length > 0 &&
+            sb[^1] != '?')
         {
             if (options.NullableStyle == EasyNullableStyle.KeepWrappers &&
                 source.IsNullableWrapper())
                 break;
 
-            if (source.IsNullableAnnotated() &&
-                sb.Length > 0 &&
-                sb[^1] != '?') sb.Append('?');
-
+            if (source.IsNullableAnnotated()) sb.Append('?');
             break;
         }
 

@@ -14,7 +14,15 @@ public static partial class EasyNameExtensions
     internal static string? ToSpecialName(this Type source)
     {
         if (source.IsByRef) return Core(source.GetElementType() ?? source);
-        if (source.IsArray) return Core(source.GetElementType() ?? source) + "[]";
+        if (source.IsArray)
+        {
+            var type = source.GetElementType() ?? source;
+            var str = Core(type);
+            var rank = source.GetArrayRank();
+            str = $"{str}[{new string(',', rank - 1)}]";
+            return str;
+        }
+
         return Core(source);
 
         static string? Core(Type source) => source switch
@@ -57,7 +65,7 @@ public static partial class EasyNameExtensions
             source.IsGenericMethodParameter;
     }
 
-#if YOTEI_TOOLS_GENERATORS
+#if NETSTANDARD2_0
     extension(Type source)
     {
         /// <summary>
@@ -114,7 +122,7 @@ public static partial class EasyNameExtensions
     /// <para>
     /// When nullability is enabled, the generic 'T' arguments always appear as annotated ones,
     /// but this is NOT consistent with what happens with reference types (that they loose this
-    /// information). For consistency reasons, when the type is a 'T' one we will requeste that
+    /// information). For consistency reasons, when the type is a 'T' one we will request that
     /// is either wrapped (which is not checked by this method), or decorated with the custom
     /// <see cref="IsNullableAttribute"/> attribute, as expected for reference types.
     /// </para>

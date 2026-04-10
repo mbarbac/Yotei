@@ -59,5 +59,43 @@ public static class ISymbolExtensions
                 }
             }
         }
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Tries to determine if the symbol is decorated with a <see langword="new"/> keyword.
+        /// This property finds its declaring syntax references and the evaluates each of them
+        /// trying to find a 'new' modifier. If no declaring syntax references are available in
+        /// the source code, this property returns false.
+        /// </summary>
+        public bool IsNew
+        {
+            get
+            {
+                var nodes = source.GetSyntaxNodes();
+                foreach (var node in nodes)
+                {
+                    var item = node;
+
+                    // Motivation: the symbol obtained by the tree generator for a FieldEvent syntax
+                    // get transformed into a IEventSymbol, but then its declaration syntaxes are
+                    // VariableDeclarator ones...
+                    if (node is VariableDeclaratorSyntax vardec)
+                    {
+                        item = vardec.Parent;
+                        item = (item as VariableDeclarationSyntax)?.Parent;
+                    }
+
+                    switch (item)
+                    {
+                        case BaseTypeDeclarationSyntax temp: if (temp.Modifiers.Any(x => x.IsKind(SyntaxKind.NewKeyword))) return true; break;
+                        case BasePropertyDeclarationSyntax temp: if (temp.Modifiers.Any(x => x.IsKind(SyntaxKind.NewKeyword))) return true; break;
+                        case BaseFieldDeclarationSyntax temp: if (temp.Modifiers.Any(x => x.IsKind(SyntaxKind.NewKeyword))) return true; break;
+                        case BaseMethodDeclarationSyntax temp: if (temp.Modifiers.Any(x => x.IsKind(SyntaxKind.NewKeyword))) return true; break;
+                    }
+                }
+                return false;
+            }
+        }
     }
 }
