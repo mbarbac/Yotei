@@ -10,7 +10,7 @@ public class CloneGenerator : TreeGenerator
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    protected override bool EmitFilesInFolders => true;
+    protected override bool EmitFilesInFolders => false;
 
     /// <summary>
     /// <inheritdoc/>
@@ -20,7 +20,7 @@ public class CloneGenerator : TreeGenerator
     {
         string rname;
         var rfolder = "Public/";
-        var nspace = EmitFilesInFolders ? GetType().Namespace : null;
+        var nspace = GetType().Namespace;
 
         rname = "CloneableAttribute.cs";
         AddResourceContents(context, $"{rfolder}{rname}", nspace, rname, EmitFilesInFolders);
