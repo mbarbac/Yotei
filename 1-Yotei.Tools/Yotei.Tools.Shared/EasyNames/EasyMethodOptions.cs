@@ -173,11 +173,12 @@ public static partial class EasyNameExtensions
             if (source.IsFamilyAndAssembly) sb.Append("private protected ");
         }
 
+        // Keyword 'partial' is a compiler feature that dissapears once is used by the compiler,
+        // so it seems there is no way to understand if it is used or not by using reflection.
         // Modifiers...
         if (options.UseModifiers)
         {
             if (source.IsStatic) sb.Append("static ");
-
             if (source.IsAbstract && !iface) sb.Append("abstract ");
             if (IsSealed()) sb.Append("sealed ");
 

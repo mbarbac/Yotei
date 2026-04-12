@@ -26,6 +26,7 @@ public static partial class RoslynNamesExtensions
         var host = source.ContainingType;
         var iface = host != null && host.IsInterface;
         string? str;
+        bool constructor = source.MethodKind is MethodKind.Constructor or MethodKind.StaticConstructor;
 
         // Accessibility (not using 'private' for simplicity)...
         if (options.UseAccessibility)
@@ -37,47 +38,48 @@ public static partial class RoslynNamesExtensions
         // Modifiers...
         if (options.UseModifiers)
         {
+            if (source.IsNew) sb.Append("new ");
             if (source.IsStatic) sb.Append("static ");
-        }
-    }
-}
-/*
+            if (source.IsPartialDefinition) sb.Append("partial ");
+            if (source.IsSealed) sb.Append("sealed ");
 
-
-            if (source.IsAbstract && !iface) sb.Append("abstract ");
-            if (IsSealed()) sb.Append("sealed ");
-
-            if (IsOverride()) sb.Append("override ");
-            else if (IsVirtual() && !iface && !source.IsAbstract) sb.Append("virtual ");
-            else if (IsNew()) sb.Append("new ");
+            if (!iface && source.IsAbstract) sb.Append("abstract ");
+            if (source.IsOverride) sb.Append("override ");
+            else if (source.IsVirtual && !iface && !source.IsAbstract) sb.Append("virtual ");
         }
 
         // Return type (regular methods only)...
-        if (options.ReturnTypeOptions != null && method != null)
+        if (options.ReturnTypeOptions != null && !constructor)
         {
-            // 'ref'-alike return types...
-            if (options.UseModifiers && method.ReturnType.IsByRef)
+            // Return type modifiers...
+            if (options.UseModifiers)
             {
-                var ronly = method.ReturnTypeCustomAttributes.HasReadOnlyAttribute();
-                sb.Append(ronly ? "ref readonly " : "ref ");
+                str = source.RefKind switch
+                {
+                    RefKind.Ref => "ref",
+                    RefKind.Out => "out",
+                    RefKind.In => "ref readonly",
+                    _ => null
+                };
+                if (str != null) sb.Append(str).Append(' ');
             }
 
             // The type itself...
             var xoptions = options.ReturnTypeOptions;
-            var type = method.ReturnType;
-            var str = type.EasyName(xoptions);
+            var type = source.ReturnType;
+            str = type.EasyName(xoptions);
 
             // Nullability...
             while (xoptions.NullableStyle != EasyNullableStyle.None && str.Length > 0)
             {
                 if (xoptions.NullableStyle == EasyNullableStyle.KeepWrappers &&
-                    type.IsNullableWrapper())
+                   type.IsNullableWrapper())
                     break;
 
                 if (str.Length > 0 && str[^1] != '?')
                 {
-                    if (type.IsNullableAnnotated()) { str += '?'; break; }
-                    if (source.IsNullableAnnotated()) { str += '?'; break; }
+                    if (type.IsNullableAnnotatedOrAttribute()) { str += '?'; break; }
+                    if (source.IsNullableAnnotatedOrAttribute()) { str += '?'; break; }
                 }
 
                 break;
@@ -88,28 +90,20 @@ public static partial class RoslynNamesExtensions
         }
 
         // Host type...
-        if (options.HostTypeOptions != null)
+        if (options.HostTypeOptions != null &&
+            host != null)
         {
-            var type = method?.DeclaringType ?? constructor?.DeclaringType;
-            if (type != null)
-            {
-                var xoptions = options.HostTypeOptions;
-                var str = type.EasyName(xoptions);
-                if (str.Length > 0)
-                {
-                    sb.Append(str);
-                    if (method != null) sb.Append('.');
-                }
-            }
+            var xoptions = options.HostTypeOptions;
+            str = host.EasyName(xoptions);
+            if (str.Length > 0) sb.Append(str).Append('.');
         }
 
         // Name...
-        if (method != null) sb.Append(source.Name);
-        if (constructor != null)
+        if (constructor)
         {
             if (options.HostTypeOptions == null) // Otherwise is already captured...
             {
-                var str = host?.EasyName(EasyTypeOptions.Empty) ?? "new";
+                str = host?.EasyName(EasyTypeOptions.Empty) ?? "new";
                 sb.Append(str);
             }
             if (options.UseTechName)
@@ -118,18 +112,20 @@ public static partial class RoslynNamesExtensions
                 sb.Append(source.Name);
             }
         }
+        else sb.Append(source.Name);
 
         // Generic arguments (regular methods only)...
-        if (options.GenericArgumentOptions != null && method != null)
+        if (options.GenericArgumentOptions != null && !constructor)
         {
             var xoptions = options.GenericArgumentOptions;
-            var args = source.GetGenericArguments();
+            var args = source.TypeArguments;
+
             if (args.Length > 0)
             {
                 sb.Append('<'); for (int i = 0; i < args.Length; i++)
                 {
                     var arg = args[i];
-                    var str = xoptions.GenericListStyle == EasyGenericListStyle.PlaceHolders
+                    str = xoptions.GenericListStyle == EasyGenericListStyle.PlaceHolders
                         ? string.Empty
                         : arg.EasyName(xoptions);
 
@@ -140,17 +136,18 @@ public static partial class RoslynNamesExtensions
             }
         }
 
-        // Member parameters....
+        // Parameters...
         if (options.UseBrackets || options.ParameterOptions != null)
         {
             sb.Append('('); if (options.ParameterOptions != null)
             {
                 var xoptions = options.ParameterOptions;
-                var args = source.GetParameters();
+                var args = source.Parameters;
+
                 for (int i = 0; i < args.Length; i++)
                 {
                     var arg = args[i];
-                    var str = arg.EasyName(xoptions);
+                    str = arg.EasyName(xoptions);
 
                     if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
                     sb.Append(str);
@@ -161,70 +158,5 @@ public static partial class RoslynNamesExtensions
 
         // Finishing...
         return sb.ToString();
-
-        // ------------------------------------------------
-
-        /// <summary>
-        /// Determines if the given source is a 'virtual' one.
-        /// </summary>
-        bool IsVirtual() => source.IsVirtual && !source.IsFinal;
-
-        /// <summary>
-        /// Determines if the given source method (not constructor) is an 'sealed' one.
-        /// </summary>
-        bool IsSealed() => source.IsVirtual && source.IsFinal;
-
-        /// <summary>
-        /// Determines if the given source method (not constructor) is an 'override' one.
-        /// </summary>
-        bool IsOverride() =>
-            method != null &&
-            method.IsVirtual &&
-            method.GetBaseDefinition().DeclaringType != source.DeclaringType;
-
-        /// <summary>
-        /// Determines if the given source method (not constructor) is a 'new' one.
-        /// </summary>
-        bool IsNew()
-        {
-            if (method == null) return false;
-            return iface
-                ? (method.IsVirtual && FindBaseMethod(host, true) != null)
-                : (!method.IsVirtual && FindBaseMethod(host) != null);
-        }
-
-        MethodInfo? FindBaseMethod(Type? host, bool ifaces = false)
-        {
-            if (host != null)
-            {
-                // First, the host's base types...
-                var parent = host.BaseType;
-                while (parent != null)
-                {
-                    var temp = FindMethodAt(parent);
-                    if (temp != null) return temp;
-                    parent = parent.BaseType;
-                }
-
-                // Then the host's interfaces, if requested...
-                if (ifaces)
-                {
-                    foreach (var iface in host.GetInterfaces())
-                    {
-                        var temp = FindMethodAt(iface);
-                        if (temp != null) return temp;
-                    }
-                }
-            }
-            return null;
-
-            MethodInfo? FindMethodAt(Type type) => type.GetMethod(
-                method.Name,
-                BindingFlags.Public | BindingFlags.NonPublic |
-                BindingFlags.Instance | BindingFlags.Static,
-                null,
-                [.. method.GetParameters().Select(p => p.ParameterType)],
-                null);
-        }
     }
- */
+}
