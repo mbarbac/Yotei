@@ -10,3 +10,6 @@ public static class Test_
     {
     }
 }
+
+[Cloneable] public class Type1<T> { }
+[Cloneable] public class Type2 : Type1<string?> { }

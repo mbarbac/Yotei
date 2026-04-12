@@ -124,6 +124,15 @@ public static partial class EasyNameExtensions
         // Modifiers...
         if (sb.Length > 0)
         {
+            if (options.UseThis)
+            {
+                var method = source.Member as MethodInfo;
+                if (method != null &&
+                    method.IsDefined(typeof(ExtensionAttribute), false) &&
+                    source.Position == 0)
+                    sb.Insert(0, "this ");
+            }
+
             if (options.UseModifiers)
             {
                 if (source.IsIn) sb.Insert(0, "in ");
@@ -138,14 +147,11 @@ public static partial class EasyNameExtensions
                 }
 
                 if (source.IsDefined(typeof(ParamArrayAttribute), false)) sb.Insert(0, "params ");
-            }
-            if (options.UseThis)
-            {
-                var method = source.Member as MethodInfo;
-                if (method != null &&
-                    method.IsDefined(typeof(ExtensionAttribute), false) &&
-                    source.Position == 0)
-                    sb.Insert(0, "params ");
+
+                if (source
+                    .GetCustomAttributes()
+                    .Any(x => x.GetType().FullName == SCOPED_ATTRIBUTE))
+                    sb.Insert(0, "scoped ");
             }
         }
 

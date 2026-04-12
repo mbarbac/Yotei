@@ -5,6 +5,7 @@ public static partial class EasyNameExtensions
 {
     private const string ATTRIBUTE = "Attribute";
     private const string READ_ONLY_ATTRIBUTE = "System.Runtime.CompilerServices.IsReadOnlyAttribute";
+    private const string SCOPED_ATTRIBUTE = "System.Runtime.CompilerServices.ScopedRefAttribute";
 
     // ----------------------------------------------------
 

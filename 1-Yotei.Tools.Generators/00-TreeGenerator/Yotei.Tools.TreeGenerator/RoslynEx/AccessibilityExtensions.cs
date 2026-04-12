@@ -20,7 +20,7 @@ public static class AccessibilityExtensions
                 Accessibility.Private when usePrivate => "private",
                 Accessibility.Protected => "protected",
                 Accessibility.Internal => "internal",
-                Accessibility.ProtectedOrInternal => "protected internal",
+                Accessibility.ProtectedOrInternal => "internal protected",
                 Accessibility.ProtectedAndInternal => "private protected",
                 _ => null,
             };

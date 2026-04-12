@@ -135,9 +135,69 @@ public partial class TreeGenerator : IIncrementalGenerator
     /// <param name="context"></param>
     /// <param name="token"></param>
     /// <returns></returns>
+    [SuppressMessage("", "IDE0019")]
     protected virtual INode CaptureNode(GeneratorSyntaxContext context, CancellationToken token)
     {
-        // HIGH: CaptureCandidate
+        token.ThrowIfCancellationRequested();
+
+        // HIGH: CaptureCandidate...
+        var node = context.Node;
+        var model = context.SemanticModel;
+
+        // Type-alike nodes...
+        while (node is BaseTypeDeclarationSyntax syntax && (
+            syntax is TypeDeclarationSyntax ||
+            syntax is EnumDeclarationSyntax))
+        {
+            var symbol = model.GetDeclaredSymbol(syntax, token);
+            if (symbol == null) break;
+
+            break;
+        }
+
+        // Property-alike nodes...
+        while (node is BasePropertyDeclarationSyntax syntax && (
+            syntax is PropertyDeclarationSyntax ||
+            syntax is IndexerDeclarationSyntax ||
+            syntax is EventDeclarationSyntax))
+        {
+            var symbol = model.GetDeclaredSymbol(syntax, token) as IPropertySymbol;
+            if (symbol == null) break;
+
+            break;
+        }
+
+        // Field-alike nodes...
+        while (node is BaseFieldDeclarationSyntax syntax && (
+            syntax is FieldDeclarationSyntax ||
+            syntax is EventFieldDeclarationSyntax))
+        {
+            var items = syntax.Declaration.Variables;
+            foreach (var item in items)
+            {
+                var symbol = model.GetDeclaredSymbol(item, token) as IFieldSymbol;
+                if (symbol == null) continue;
+
+                break;
+            }
+            break;
+        }
+
+        // Method-alike nodes...
+        while (node is BaseMethodDeclarationSyntax syntax && (
+            syntax is MethodDeclarationSyntax ||
+            syntax is ConstructorDeclarationSyntax ||
+            syntax is DestructorDeclarationSyntax ||
+            syntax is OperatorDeclarationSyntax ||
+            syntax is ConversionOperatorDeclarationSyntax))
+        {
+            var symbol = model.GetDeclaredSymbol(syntax, token) as IPropertySymbol;
+            if (symbol == null) break;
+
+            break;
+        }
+
+        // Finishing ignoring the syntax node...
         return null!;
     }
 
