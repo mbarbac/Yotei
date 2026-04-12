@@ -25,7 +25,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\EasyTypeSymbol.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\EasyParameterSymbol.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\EasyMethodSymbol.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\_Fakes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Api\INode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeGenerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeGeneratorEx.cs" />
