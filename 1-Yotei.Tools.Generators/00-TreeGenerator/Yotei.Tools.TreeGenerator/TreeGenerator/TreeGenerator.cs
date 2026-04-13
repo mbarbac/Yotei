@@ -225,7 +225,6 @@ public partial class TreeGenerator : IIncrementalGenerator
             if (abort) continue;
         }
 
-
         // HIGH: EmitNodes
         return;
     }

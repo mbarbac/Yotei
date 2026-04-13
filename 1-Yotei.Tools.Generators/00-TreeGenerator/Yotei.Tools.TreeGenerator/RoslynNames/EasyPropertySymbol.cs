@@ -9,7 +9,7 @@ public static partial class RoslynNamesExtensions
     /// <param name="source"></param>
     /// <returns></returns>
     public static string EasyName(
-        this IMethodSymbol source) => source.EasyName(EasyMethodOptions.Default);
+        this IPropertySymbol source) => source.EasyName(EasyPropertyOptions.Default);
 
     /// <summary>
     /// Obtains a c#-alike string representation of the given element, using the given options.
@@ -17,7 +17,7 @@ public static partial class RoslynNamesExtensions
     /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this IMethodSymbol source, EasyMethodOptions options)
+    public static string EasyName(this IPropertySymbol source, EasyPropertyOptions options)
     {
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(options);
@@ -26,7 +26,6 @@ public static partial class RoslynNamesExtensions
         var host = source.ContainingType;
         var iface = host != null && host.IsInterface;
         string? str;
-        bool constructor = source.MethodKind is MethodKind.Constructor or MethodKind.StaticConstructor;
 
         // Accessibility (not using 'private' for simplicity)...
         if (options.UseAccessibility)
@@ -48,8 +47,8 @@ public static partial class RoslynNamesExtensions
             else if (source.IsVirtual && !iface && !source.IsAbstract) sb.Append("virtual ");
         }
 
-        // Return type (regular methods only)...
-        if (options.ReturnTypeOptions != null && !constructor)
+        // Return type...
+        if (options.MemberTypeOptions != null)
         {
             // Return type modifiers...
             if (options.UseModifiers)
@@ -65,8 +64,8 @@ public static partial class RoslynNamesExtensions
             }
 
             // The type itself...
-            var xoptions = options.ReturnTypeOptions;
-            var type = source.ReturnType;
+            var xoptions = options.MemberTypeOptions;
+            var type = source.Type;
             str = type.EasyName(xoptions);
 
             // Nullability...
@@ -98,50 +97,18 @@ public static partial class RoslynNamesExtensions
         }
 
         // Name...
-        if (constructor)
-        {
-            if (options.HostTypeOptions == null) // Otherwise is already captured...
-            {
-                str = host?.EasyName(EasyTypeOptions.Empty) ?? "new";
-                sb.Append(str);
-            }
-            if (options.UseTechName)
-            {
-                if (!source.Name.StartsWith('.')) sb.Append('.');
-                sb.Append(source.Name);
-            }
-        }
-        else sb.Append(source.Name);
-
-        // Generic arguments (regular methods only)...
-        if (options.GenericArgumentOptions != null && !constructor)
-        {
-            var xoptions = options.GenericArgumentOptions;
-            var args = source.TypeArguments;
-
-            if (args.Length > 0)
-            {
-                sb.Append('<'); for (int i = 0; i < args.Length; i++)
-                {
-                    var arg = args[i];
-                    str = xoptions.GenericListStyle == EasyGenericListStyle.PlaceHolders
-                        ? string.Empty
-                        : arg.EasyName(xoptions);
-
-                    if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
-                    sb.Append(str);
-                }
-                sb.Append('>');
-            }
-        }
+        var name = source.Name;
+        var args = source.Parameters;
+        if (args.Length > 0) name = options.UseTechName ? source.MetadataName : "this";
+        sb.Append(name);
 
         // Parameters...
-        if (options.UseBrackets || options.ParameterOptions != null)
+        if (args.Length > 0 && (
+            options.UseBrackets || options.ParameterOptions != null))
         {
-            sb.Append('('); if (options.ParameterOptions != null)
+            sb.Append('['); if (options.ParameterOptions != null)
             {
                 var xoptions = options.ParameterOptions;
-                var args = source.Parameters;
 
                 for (int i = 0; i < args.Length; i++)
                 {
@@ -152,7 +119,7 @@ public static partial class RoslynNamesExtensions
                     sb.Append(str);
                 }
             }
-            sb.Append(')');
+            sb.Append(']');
         }
 
         // Finishing...

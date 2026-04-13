@@ -10,9 +10,3 @@ public static class Test_
     {
     }
 }
-
-[Cloneable]
-public class MyType<T>
-{
-    protected ref string? MyMethod(string? name) => throw null!;
-}
