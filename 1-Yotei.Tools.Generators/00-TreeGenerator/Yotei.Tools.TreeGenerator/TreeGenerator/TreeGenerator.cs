@@ -211,6 +211,7 @@ public partial class TreeGenerator : IIncrementalGenerator
     protected virtual void EmitNodes(
         SourceProductionContext context, ImmutableArray<INode> nodes)
     {
+        // Main loop through captured nodes...
         foreach (var node in nodes)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
@@ -219,6 +220,7 @@ public partial class TreeGenerator : IIncrementalGenerator
             var abort = false;
             foreach (var diag in node.Diagnostics)
             {
+                if (diag is null) continue;
                 diag.Report(context);
                 if (diag.IsWarningAsError || diag.Severity == DiagnosticSeverity.Error) abort = true;
             }

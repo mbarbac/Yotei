@@ -1,44 +1,24 @@
-﻿using System.Xml.Schema;
-
-namespace Yotei.Tools.Generators;
+﻿namespace Yotei.Tools.Generators;
 
 // ========================================================
 /// <summary>
-/// Represents a captured type-alike source code generation node.
+/// Represents a namespace-alike node in a hierarchy.
 /// </summary>
-public class TypeNode : ITreeNode
+public sealed class NamespaceNode : INode
 {
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
     /// <param name="displayName"></param>
-    public TypeNode(INode parent, string displayName)
-    {
-        Parent = parent;
-        DisplayName = displayName;
-    }
+    public NamespaceNode(string displayName) => DisplayName = displayName;
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"Type: {DisplayName}";
+    public override string ToString() => $"Namespace: {DisplayName}";
 
     // ----------------------------------------------------
-
-    /// <summary>
-    /// The parent node this one belongs to in the hierarchy, that needs not to be the same as
-    /// the declaring element of this instance. This property accepts <see cref="FileNode"/>,
-    /// <see cref="NamespaceNode"/>, and host <see cref="TypeNode"/> ones.
-    /// </summary>
-    public INode Parent
-    {
-        get;
-        private set => field =
-            value is FileNode or NamespaceNode or TypeNode
-            ? value
-            : throw new ArgumentException("Invalid parent node.").WithData(value);
-    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -57,13 +37,13 @@ public class TypeNode : ITreeNode
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
-    public virtual bool Equals(INode other)
+    public bool Equals(INode other)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null) return false;
-        if (other is not TypeNode valid) return false;
+        if (other is not NamespaceNode valid) return false;
 
-        // TODO: TypeNode Equals...
+        // TODO: NamespaceNode Equals...
         if (!Diagnostics.SequenceEqual(valid.Diagnostics)) return false;
         if (DisplayName != valid.DisplayName) return false;
         return true;
@@ -78,7 +58,7 @@ public class TypeNode : ITreeNode
         int code = HashCode.Combine(Diagnostics);
         foreach (var item in Diagnostics) code = HashCode.Combine(code, item);
 
-        // TODO: TypeNode GetHashCode...
+        // TODO: NamespaceNode GetHashCode...
         code = HashCode.Combine(code, DisplayName);
         return code;
     }

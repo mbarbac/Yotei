@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents a captured source code generation node or an error condition.
 /// </summary>
-public interface INode
+public interface INode : IEquatable<INode>
 {
     /// <summary>
     /// Gets the collection of diagnostics collected for this node. If this collection contains
