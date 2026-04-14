@@ -2,12 +2,23 @@
 
 // ========================================================
 /// <summary>
-/// Represents a tree-oriented captured source code generation node.
+/// Represents a captured source code hierarchycal generation node.
 /// </summary>
 public interface ITreeNode : INode
 {
     /// <summary>
-    /// The c#-alike name of this element, which also serves as it unique identifier.
+    /// The collection of syntax nodes captured by the generator for this instance, if any.
     /// </summary>
-    string DisplayName { get; }
+    CustomList<BaseTypeDeclarationSyntax> SyntaxNodes { get; }
+
+    /// <summary>
+    /// The symbol represented by this instance.
+    /// </summary>
+    ISymbol Symbol { get; }
+
+    /// <summary>
+    /// The collection of attributes by which the element carried by this instance was found by
+    /// the generator, if any.
+    /// </summary>
+    CustomList<AttributeData> Attributes { get; }
 }

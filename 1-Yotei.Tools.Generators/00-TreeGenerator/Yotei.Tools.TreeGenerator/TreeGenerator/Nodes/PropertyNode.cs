@@ -7,44 +7,44 @@
 public class PropertyNode : ITreeNode
 {
     /// <summary>
-    /// Initializes a new instance.
-    /// </summary>
-    /// <param name="parent"></param>
-    /// <param name="displayName"></param>
-    public PropertyNode(TypeNode parent, string displayName)
-    {
-        Parent = parent;
-        DisplayName = displayName;
-    }
-
-    /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"Property: {DisplayName}";
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// The parent node this one belongs to in the hierarchy, that needs not to be the same as the
-    /// declaring element of this instance.
-    /// </summary>
-    public TypeNode Parent { get; private set => field = value.ThrowWhenNull(); }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    public string DisplayName { get; private set => field = value.NotNullNotEmpty(trim: true); }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    public List<Diagnostic> Diagnostics { get; } = [];
+    public override string ToString() => throw null;
 
     // ----------------------------------------------------
 
     /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    public CustomList<Diagnostic> Diagnostics { get; } = [];
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public INode? Parent { get; }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public CustomList<BaseTypeDeclarationSyntax> SyntaxNodes { get; } = [];
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public IPropertySymbol Symbol { get; }
+    ISymbol ITreeNode.Symbol => Symbol;
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public CustomList<AttributeData> Attributes { get; } = [];
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// Equality semantics are customized for generator caching purposes.
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
@@ -56,7 +56,6 @@ public class PropertyNode : ITreeNode
 
         // TODO: PropertyNode Equals...
         if (!Diagnostics.SequenceEqual(valid.Diagnostics)) return false;
-        if (DisplayName != valid.DisplayName) return false;
         return true;
     }
 
@@ -70,7 +69,6 @@ public class PropertyNode : ITreeNode
         foreach (var item in Diagnostics) code = HashCode.Combine(code, item);
 
         // TODO: PropertyNode GetHashCode...
-        code = HashCode.Combine(code, DisplayName);
         return code;
     }
 }

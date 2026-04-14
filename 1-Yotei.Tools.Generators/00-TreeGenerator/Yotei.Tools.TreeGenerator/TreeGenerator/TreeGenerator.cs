@@ -11,6 +11,13 @@
  * - Click F5 (run) to compile (F6 does nothing).
  */
 
+/* DESIGN NOTES:
+ * - Even if it is architecturally prepared to do so, for simplicity reasons this version does not
+ *   follow all the recommended rules. In particular, it does not only cache the string elements
+ *   to emit, but rather it takes a ISymbol-oriented approach. It is supposed that this invalidates
+ *   the generator's cache, but I have not hit (yet) performance problems with this approach.
+ */
+
 // ========================================================
 /// <summary>
 /// Represents a tree-oriented incremental source generator that, when capturing its relevant nodes
@@ -129,6 +136,80 @@ public partial class TreeGenerator : IIncrementalGenerator
     // ----------------------------------------------------
 
     /// <summary>
+    /// Invoked capture the given information into a new detached source generation node, meaning
+    /// it has not been inserted into the generator's source code generation hierarchy.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <param name="syntax"></param>
+    /// <param name="attributes"></param>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    protected virtual TypeNode CreateNode(
+        INamedTypeSymbol symbol,
+        BaseTypeDeclarationSyntax syntax,
+        IEnumerable<AttributeData> attributes,
+        SemanticModel model)
+    {
+        throw null;
+    }
+
+    /// <summary>
+    /// Invoked capture the given information into a new detached source generation node, meaning
+    /// it has not been inserted into the generator's source code generation hierarchy.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <param name="syntax"></param>
+    /// <param name="attributes"></param>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    protected virtual PropertyNode CreateNode(
+        IPropertySymbol symbol,
+        BasePropertyDeclarationSyntax syntax,
+        IEnumerable<AttributeData> attributes,
+        SemanticModel model)
+    {
+        throw null;
+    }
+
+    /// <summary>
+    /// Invoked capture the given information into a new detached source generation node, meaning
+    /// it has not been inserted into the generator's source code generation hierarchy.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <param name="syntax"></param>
+    /// <param name="attributes"></param>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    protected virtual FieldNode CreateNode(
+        IFieldSymbol symbol,
+        BaseFieldDeclarationSyntax syntax,
+        IEnumerable<AttributeData> attributes,
+        SemanticModel model)
+    {
+        throw null;
+    }
+
+    /// <summary>
+    /// Invoked capture the given information into a new detached source generation node, meaning
+    /// it has not been inserted into the generator's source code generation hierarchy.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <param name="syntax"></param>
+    /// <param name="attributes"></param>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    protected virtual MethodNode CreateNode(
+        IMethodSymbol symbol,
+        BaseMethodDeclarationSyntax syntax,
+        IEnumerable<AttributeData> attributes,
+        SemanticModel model)
+    {
+        throw null;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Invoked to capture and return the given syntax node as a souce code generation candidate.
     /// This method may also return 'null' if the syntax node is to be ignored.
     /// </summary>
@@ -140,9 +221,14 @@ public partial class TreeGenerator : IIncrementalGenerator
     {
         token.ThrowIfCancellationRequested();
 
-        // HIGH: CaptureCandidate...
         var node = context.Node;
         var model = context.SemanticModel;
+
+        // Prevents previously generated code to be processed twice...
+        var path = node.SyntaxTree.FilePath;
+        if (path.EndsWith(".g.cs", StringComparison.OrdinalIgnoreCase) ||
+            path.EndsWith(".generated.cs", StringComparison.OrdinalIgnoreCase))
+            return null!;
 
         // Type-alike nodes...
         while (node is BaseTypeDeclarationSyntax syntax && (
@@ -152,6 +238,7 @@ public partial class TreeGenerator : IIncrementalGenerator
             var symbol = model.GetDeclaredSymbol(syntax, token);
             if (symbol == null) break;
 
+            // TODO: Capture type-alike nodes...
             break;
         }
 
@@ -164,6 +251,7 @@ public partial class TreeGenerator : IIncrementalGenerator
             var symbol = model.GetDeclaredSymbol(syntax, token) as IPropertySymbol;
             if (symbol == null) break;
 
+            // TODO: Capture property-alike nodes...
             break;
         }
 
@@ -178,6 +266,7 @@ public partial class TreeGenerator : IIncrementalGenerator
                 var symbol = model.GetDeclaredSymbol(item, token) as IFieldSymbol;
                 if (symbol == null) continue;
 
+                // TODO: Capture field-alike nodes...
                 break;
             }
             break;
@@ -194,6 +283,7 @@ public partial class TreeGenerator : IIncrementalGenerator
             var symbol = model.GetDeclaredSymbol(syntax, token) as IPropertySymbol;
             if (symbol == null) break;
 
+            // TODO: Capture method-alike nodes...
             break;
         }
 
@@ -227,7 +317,7 @@ public partial class TreeGenerator : IIncrementalGenerator
             if (abort) continue;
         }
 
-        // HIGH: EmitNodes
+        // TODO: EmitNodes
         return;
     }
 }

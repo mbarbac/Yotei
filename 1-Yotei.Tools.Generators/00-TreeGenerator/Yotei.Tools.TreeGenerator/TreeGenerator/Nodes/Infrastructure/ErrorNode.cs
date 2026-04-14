@@ -33,15 +33,23 @@ public sealed class ErrorNode : INode
     /// <returns></returns>
     public override string ToString() => $"Count: {Diagnostics.Count}";
 
+    // ----------------------------------------------------
+
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public List<Diagnostic> Diagnostics { get; } = [];
+    public CustomList<Diagnostic> Diagnostics { get; } = [];
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public INode? Parent { get; }
 
     // ----------------------------------------------------
 
     /// <summary>
     /// <inheritdoc/>
+    /// Equality semantics are customized for generator caching purposes.
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>

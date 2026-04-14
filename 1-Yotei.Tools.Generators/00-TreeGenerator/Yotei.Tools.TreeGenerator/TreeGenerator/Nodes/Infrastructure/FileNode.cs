@@ -7,15 +7,24 @@
 /// </summary>
 public sealed class FileNode : INode
 {
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    public List<Diagnostic> Diagnostics { get; } = [];
 
     // ----------------------------------------------------
 
     /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    public CustomList<Diagnostic> Diagnostics { get; } = [];
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public INode? Parent { get; }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// Equality semantics are customized for generator caching purposes.
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>

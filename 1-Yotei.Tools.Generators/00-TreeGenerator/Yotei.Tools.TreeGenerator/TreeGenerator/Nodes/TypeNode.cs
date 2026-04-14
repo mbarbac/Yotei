@@ -1,6 +1,4 @@
-﻿using System.Xml.Schema;
-
-namespace Yotei.Tools.Generators;
+﻿namespace Yotei.Tools.Generators;
 
 // ========================================================
 /// <summary>
@@ -11,49 +9,49 @@ public class TypeNode : ITreeNode
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
-    /// <param name="displayName"></param>
-    public TypeNode(INode parent, string displayName)
-    {
-        Parent = parent;
-        DisplayName = displayName;
-    }
+    /// <param name="symbol"></param>
+    [SuppressMessage("", "IDE0290")]
+    public TypeNode(INamedTypeSymbol symbol) => Symbol = symbol;
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"Type: {DisplayName}";
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// The parent node this one belongs to in the hierarchy, that needs not to be the same as
-    /// the declaring element of this instance. This property accepts <see cref="FileNode"/>,
-    /// <see cref="NamespaceNode"/>, and host <see cref="TypeNode"/> ones.
-    /// </summary>
-    public INode Parent
-    {
-        get;
-        private set => field =
-            value is FileNode or NamespaceNode or TypeNode
-            ? value
-            : throw new ArgumentException("Invalid parent node.").WithData(value);
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    public string DisplayName { get; private set => field = value.NotNullNotEmpty(trim: true); }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    public List<Diagnostic> Diagnostics { get; } = [];
+    public override string ToString() => $"Type: {Symbol.Name}";
 
     // ----------------------------------------------------
 
     /// <summary>
     /// <inheritdoc/>
+    /// </summary>
+    public CustomList<Diagnostic> Diagnostics { get; } = [];
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public INode? Parent { get; }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public CustomList<BaseTypeDeclarationSyntax> SyntaxNodes { get; } = [];
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public INamedTypeSymbol Symbol { get; }
+    ISymbol ITreeNode.Symbol => Symbol;
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public CustomList<AttributeData> Attributes { get; } = [];
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// Equality semantics are customized for generator caching purposes.
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
@@ -65,7 +63,6 @@ public class TypeNode : ITreeNode
 
         // TODO: TypeNode Equals...
         if (!Diagnostics.SequenceEqual(valid.Diagnostics)) return false;
-        if (DisplayName != valid.DisplayName) return false;
         return true;
     }
 
@@ -79,7 +76,6 @@ public class TypeNode : ITreeNode
         foreach (var item in Diagnostics) code = HashCode.Combine(code, item);
 
         // TODO: TypeNode GetHashCode...
-        code = HashCode.Combine(code, DisplayName);
         return code;
     }
 }
