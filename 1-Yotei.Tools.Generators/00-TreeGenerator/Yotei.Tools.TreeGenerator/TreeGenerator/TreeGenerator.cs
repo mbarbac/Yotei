@@ -13,9 +13,9 @@
 
 /* DESIGN NOTES:
  * - Even if it is architecturally prepared to do so, for simplicity reasons this version does not
- *   follow all the recommended rules. In particular, it does not only cache the string elements
- *   to emit, but rather it takes a ISymbol-oriented approach. It is supposed that this invalidates
- *   the generator's cache, but I have not hit (yet) performance problems with this approach.
+ *   follow the recommended rule of only caching the string elements to emit later. For simplicity
+ *   reasons, it takes a ISymbol-oriented approach. It it is supposed that this invalidates the
+ *   generator's cache mechanism, but I have not (yet) hit any performance problems.
  */
 
 // ========================================================
@@ -136,8 +136,7 @@ public partial class TreeGenerator : IIncrementalGenerator
     // ----------------------------------------------------
 
     /// <summary>
-    /// Invoked capture the given information into a new detached source generation node, meaning
-    /// it has not been inserted into the generator's source code generation hierarchy.
+    /// Invoked to capture the relevant information into a new detached source generation node.
     /// </summary>
     /// <param name="symbol"></param>
     /// <param name="syntax"></param>
@@ -150,12 +149,14 @@ public partial class TreeGenerator : IIncrementalGenerator
         IEnumerable<AttributeData> attributes,
         SemanticModel model)
     {
-        throw null;
+        var item = new TypeNode(symbol);
+        item.SyntaxNodes.Add(syntax);
+        item.Attributes.AddRange(attributes);
+        return item;
     }
 
     /// <summary>
-    /// Invoked capture the given information into a new detached source generation node, meaning
-    /// it has not been inserted into the generator's source code generation hierarchy.
+    /// Invoked to capture the relevant information into a new detached source generation node.
     /// </summary>
     /// <param name="symbol"></param>
     /// <param name="syntax"></param>
@@ -168,12 +169,14 @@ public partial class TreeGenerator : IIncrementalGenerator
         IEnumerable<AttributeData> attributes,
         SemanticModel model)
     {
-        throw null;
+        var item = new PropertyNode(symbol);
+        item.SyntaxNodes.Add(syntax);
+        item.Attributes.AddRange(attributes);
+        return item;
     }
 
     /// <summary>
-    /// Invoked capture the given information into a new detached source generation node, meaning
-    /// it has not been inserted into the generator's source code generation hierarchy.
+    /// Invoked to capture the relevant information into a new detached source generation node.
     /// </summary>
     /// <param name="symbol"></param>
     /// <param name="syntax"></param>
@@ -186,12 +189,14 @@ public partial class TreeGenerator : IIncrementalGenerator
         IEnumerable<AttributeData> attributes,
         SemanticModel model)
     {
-        throw null;
+        var item = new FieldNode(symbol);
+        item.SyntaxNodes.Add(syntax);
+        item.Attributes.AddRange(attributes);
+        return item;
     }
 
     /// <summary>
-    /// Invoked capture the given information into a new detached source generation node, meaning
-    /// it has not been inserted into the generator's source code generation hierarchy.
+    /// Invoked to capture the relevant information into a new detached source generation node.
     /// </summary>
     /// <param name="symbol"></param>
     /// <param name="syntax"></param>
@@ -204,14 +209,17 @@ public partial class TreeGenerator : IIncrementalGenerator
         IEnumerable<AttributeData> attributes,
         SemanticModel model)
     {
-        throw null;
+        var item = new MethodNode(symbol);
+        item.SyntaxNodes.Add(syntax);
+        item.Attributes.AddRange(attributes);
+        return item;
     }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Invoked to capture and return the given syntax node as a souce code generation candidate.
-    /// This method may also return 'null' if the syntax node is to be ignored.
+    /// Invoked to capture and return the given syntax node as a souce code generation candidate,
+    /// an error one, or a <see langword="null"/> one if the syntax node is to be ignored.
     /// </summary>
     /// <param name="context"></param>
     /// <param name="token"></param>
@@ -238,8 +246,12 @@ public partial class TreeGenerator : IIncrementalGenerator
             var symbol = model.GetDeclaredSymbol(syntax, token);
             if (symbol == null) break;
 
-            // TODO: Capture type-alike nodes...
-            break;
+            var atx = FindSyntaxAttributes(symbol, syntax);
+            var ats = FilterAttributes(atx, TypeAttributes, TypeAttributeNames);
+            if (ats.Count == 0) break;
+
+            var temp = CreateNode(symbol, syntax, ats, model);
+            return temp;
         }
 
         // Property-alike nodes...
@@ -251,8 +263,12 @@ public partial class TreeGenerator : IIncrementalGenerator
             var symbol = model.GetDeclaredSymbol(syntax, token) as IPropertySymbol;
             if (symbol == null) break;
 
-            // TODO: Capture property-alike nodes...
-            break;
+            var atx = FindSyntaxAttributes(symbol, syntax);
+            var ats = FilterAttributes(atx, PropertyAttributes, PropertyAttributeNames);
+            if (ats.Count == 0) break;
+
+            var temp = CreateNode(symbol, syntax, ats, model);
+            return temp;
         }
 
         // Field-alike nodes...
@@ -266,8 +282,12 @@ public partial class TreeGenerator : IIncrementalGenerator
                 var symbol = model.GetDeclaredSymbol(item, token) as IFieldSymbol;
                 if (symbol == null) continue;
 
-                // TODO: Capture field-alike nodes...
-                break;
+                var atx = FindSyntaxAttributes(symbol, syntax);
+                var ats = FilterAttributes(atx, FieldAttributes, FieldAttributeNames);
+                if (ats.Count == 0) break;
+
+                var temp = CreateNode(symbol, syntax, ats, model);
+                return temp;
             }
             break;
         }
@@ -280,11 +300,15 @@ public partial class TreeGenerator : IIncrementalGenerator
             syntax is OperatorDeclarationSyntax ||
             syntax is ConversionOperatorDeclarationSyntax))
         {
-            var symbol = model.GetDeclaredSymbol(syntax, token) as IPropertySymbol;
+            var symbol = model.GetDeclaredSymbol(syntax, token) as IMethodSymbol;
             if (symbol == null) break;
 
-            // TODO: Capture method-alike nodes...
-            break;
+            var atx = FindSyntaxAttributes(symbol, syntax);
+            var ats = FilterAttributes(atx, MethodAttributes, MethodAttributeNames);
+            if (ats.Count == 0) break;
+
+            var temp = CreateNode(symbol, syntax, ats, model);
+            return temp;
         }
 
         // Finishing ignoring the syntax node...
@@ -301,23 +325,49 @@ public partial class TreeGenerator : IIncrementalGenerator
     protected virtual void EmitNodes(
         SourceProductionContext context, ImmutableArray<INode> nodes)
     {
-        // Main loop through captured nodes...
+        List<TypeNode> files = [];
+
+        // Reporting errors and creating the files-based hierarchy...
         foreach (var node in nodes)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
-            // Reporting diagnostics and maybe aborting the node source code generation...
-            var abort = false;
-            foreach (var diag in node.Diagnostics)
+            if (node is ErrorNode error)
             {
-                if (diag is null) continue;
-                diag.Report(context);
-                if (diag.IsWarningAsError || diag.Severity == DiagnosticSeverity.Error) abort = true;
+                foreach (var diag in error.Diagnostics) diag.Report(context);
             }
-            if (abort) continue;
+            else if (node is not null)
+            {
+                CaptureHierarchy(context, files, node);
+            }
         }
 
-        // TODO: EmitNodes
-        return;
+        // Emitting source code...
+        foreach (var type in files)
+        {
+            context.CancellationToken.ThrowIfCancellationRequested();
+
+            var cb = new CodeBuilder();
+            var done = type.Emit(context, cb);
+            if (done)
+            {
+                /* TODO: Emit source code of top-most files...
+                var code = cb.ToString();
+                var name = GetFileName(type.Symbol) + ".g.cs";
+                context.AddSource(name, code);
+                 */
+            }
+        }
+    }
+
+    /// <summary>
+    /// Invoked to capture the given node into the given hierarchy.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="files"></param>
+    /// <param name="node"></param>
+    protected virtual void CaptureHierarchy(
+        SourceProductionContext context, List<TypeNode> files, INode node)
+    {
     }
 }

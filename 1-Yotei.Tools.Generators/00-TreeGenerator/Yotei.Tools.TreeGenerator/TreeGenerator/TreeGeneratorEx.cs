@@ -245,4 +245,56 @@ partial class TreeGenerator
         if (reverse) parts.Reverse();
         return parts;
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Obtains the collection of attributes that decorate the given syntax. Motivation: for
+    /// whatever reasons <see cref="ISymbol.GetAttributes"/> does not return all the symbol's
+    /// attributes when it is defined in different places (ie: partial types). So we need a
+    /// way of capturing all of them from the syntax locations.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <param name="syntax"></param>
+    /// <returns></returns>
+    static IEnumerable<AttributeData> FindSyntaxAttributes(
+        ISymbol symbol,
+        MemberDeclarationSyntax syntax)
+    {
+        var atsyntaxes = syntax.AttributeLists.SelectMany(static x => x.Attributes);
+        foreach (var atsyntax in atsyntaxes)
+        {
+            var atd = symbol.GetAttributes().FirstOrDefault(
+                x => x.ApplicationSyntaxReference?.GetSyntax() == atsyntax);
+
+            if (atd is not null) yield return atd;
+        }
+    }
+
+    /// <summary>
+    /// Filters the given collection of attributes to return a new one containing only those
+    /// that match any of the given types, and those whose full class names match any of the
+    /// given ones.
+    /// </summary>
+    /// <param name="attributes"></param>
+    /// <param name="types"></param>
+    /// <param name="names"></param>
+    /// <returns></returns>
+    static List<AttributeData> FilterAttributes(
+        IEnumerable<AttributeData> attributes,
+        IEnumerable<Type> types,
+        IEnumerable<string> names)
+    {
+        var items = attributes.Where(x =>
+            x.AttributeClass != null &&
+            x.AttributeClass.MatchAny(types)).ToList();
+
+        foreach (var name in names)
+        {
+            var temps = attributes.Where(x => x.AttributeClass?.Name == name);
+            foreach (var temp in temps) if (!items.Contains(temp)) items.Add(temp);
+        }
+
+        return items;
+    }
 }

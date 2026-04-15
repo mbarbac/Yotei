@@ -10,7 +10,6 @@ public class FieldNode : ITreeNode
     /// Initializes a new instance.
     /// </summary>
     /// <param name="symbol"></param>
-    [SuppressMessage("", "IDE0290")]
     public FieldNode(IFieldSymbol symbol) => Symbol = symbol;
 
     /// <summary>
@@ -22,37 +21,34 @@ public class FieldNode : ITreeNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    public CustomList<Diagnostic> Diagnostics { get; } = [];
-
-    /// <summary>
-    /// <inheritdoc/>
+    /// <inheritdoc cref="ITreeNode.Parent"/>
+    /// Instances of this type only accept <see cref="TypeNode"/> parents.
     /// </summary>
     public TypeNode? Parent { get; set; }
-    INode? INode.Parent => Parent;
+    INode? ITreeNode.Parent => Parent;
 
     /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    public CustomList<BaseTypeDeclarationSyntax> SyntaxNodes { get; } = [];
-
-    /// <summary>
-    /// <inheritdoc/>
+    /// <inheritdoc cref="ITreeNode.Symbol"/>
     /// </summary>
     public IFieldSymbol Symbol { get; private set => field = value.ThrowWhenNull(); }
     ISymbol ITreeNode.Symbol => Symbol;
 
     /// <summary>
+    /// <inheritdoc cref="ITreeNode.SyntaxNodes"/>
+    /// </summary>
+    public List<BaseFieldDeclarationSyntax> SyntaxNodes { get; } = [];
+    List<SyntaxNode> ITreeNode.SyntaxNodes => (List<SyntaxNode>)SyntaxNodes.Cast<SyntaxNode>();
+
+    /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public CustomList<AttributeData> Attributes { get; } = [];
+    public List<AttributeData> Attributes { get; } = [];
 
     // ----------------------------------------------------
 
     /// <summary>
     /// <inheritdoc/>
-    /// Equality semantics are customized for generator caching purposes.
+    /// Equality semantics customized for generator caching purposes.
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
@@ -62,21 +58,73 @@ public class FieldNode : ITreeNode
         if (other is null) return false;
         if (other is not MethodNode valid) return false;
 
-        // TODO: FieldNode Equals...
-        if (!Diagnostics.SequenceEqual(valid.Diagnostics)) return false;
-        return true;
+        return SymbolEqualityComparer.Default.Equals(Symbol, valid.Symbol);
     }
 
     /// <summary>
     /// <inheritdoc/>
+    /// Equality semantics customized for generator caching purposes.
     /// </summary>
     /// <returns></returns>
-    public override int GetHashCode()
-    {
-        int code = HashCode.Combine(Diagnostics);
-        foreach (var item in Diagnostics) code = HashCode.Combine(code, item);
+    public override int GetHashCode() => SymbolEqualityComparer.Default.GetHashCode(Symbol);
 
-        // TODO: FieldNode GetHashCode...
-        return code;
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc cref="ITreeNode.Augment(ITreeNode)"/>
+    /// </summary>
+    /// <param name="node"></param>
+    public virtual void Augment(FieldNode node)
+    {
+        ArgumentNullException.ThrowIfNull(node);
+
+        foreach (var syntax in node.SyntaxNodes)
+            if (SyntaxNodes.Find(x => x.IsEquivalentTo(syntax)) == null)
+                SyntaxNodes.Add(syntax);
+
+        foreach (var at in node.Attributes)
+            if (Attributes.Find(x => x.EqualsTo(at)) == null)
+                Attributes.Add(at);
+    }
+    void ITreeNode.Augment(ITreeNode node) => Augment((FieldNode)node);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public bool Emit(SourceProductionContext context, CodeBuilder cb)
+    {
+        if (!OnValidate(context)) return false;
+        if (!OnEmit(context, cb)) return false;
+        return true;
+    }
+
+    /// <summary>
+    /// Invoked to validate this node at source code generation time. If this method returns
+    /// <see langword="false"/>, then source code generation is aborted.
+    /// <br/> Derived types MUST invoke their base methods first.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    protected virtual bool OnValidate(SourceProductionContext context)
+    {
+        var r = true;
+        if (Parent is null) { TreeError.NoParentNode.Create(Symbol).Report(context); r = false; }
+        return r;
+    }
+
+    /// <summary>
+    /// Invoked to emit the actual source code generated for this element. If this method returns
+    /// <see langword="false"/>, then source code generation is aborted.
+    /// <br/> Derived types MUST override this base method.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="cb"></param>
+    /// <returns></returns>
+    protected virtual bool OnEmit(SourceProductionContext context, CodeBuilder cb)
+    {
+        cb.AppendLine($"// {this}");
+        return true;
     }
 }

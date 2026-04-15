@@ -36,20 +36,15 @@ public sealed class ErrorNode : INode
     // ----------------------------------------------------
 
     /// <summary>
-    /// <inheritdoc/>
+    /// The collection of diagnostics collected by this node.
     /// </summary>
     public CustomList<Diagnostic> Diagnostics { get; } = [];
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    public INode? Parent { get; }
 
     // ----------------------------------------------------
 
     /// <summary>
     /// <inheritdoc/>
-    /// Equality semantics are customized for generator caching purposes.
+    /// Equality semantics customized for generator caching purposes.
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
@@ -65,6 +60,7 @@ public sealed class ErrorNode : INode
 
     /// <summary>
     /// <inheritdoc/>
+    /// Equality semantics customized for generator caching purposes.
     /// </summary>
     /// <returns></returns>
     public override int GetHashCode()
