@@ -7,10 +7,30 @@
 public class MethodNode : ITreeNode
 {
     /// <summary>
+    /// Initializes a new instance.
+    /// </summary>
+    /// <param name="symbol"></param>
+    [SuppressMessage("", "IDE0290")]
+    public MethodNode(IMethodSymbol symbol) => Symbol = symbol;
+
+    /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => throw null;
+    public override string ToString()
+    {
+        var sb = new StringBuilder();
+
+        sb.Append($"Method: {Symbol.Name}");
+        sb.Append('(');
+        for (int i = 0; i < Symbol.Parameters.Length; i++)
+        {
+            if (i > 0) sb.Append(", ");
+            sb.Append(Symbol.Parameters[i].Type.Name);
+        }
+        sb.Append(')');
+        return sb.ToString();
+    }
 
     // ----------------------------------------------------
 
@@ -22,7 +42,8 @@ public class MethodNode : ITreeNode
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public INode? Parent { get; }
+    public TypeNode? Parent { get; set; }
+    INode? INode.Parent => Parent;
 
     /// <summary>
     /// <inheritdoc/>
@@ -32,7 +53,7 @@ public class MethodNode : ITreeNode
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public IMethodSymbol Symbol { get; }
+    public IMethodSymbol Symbol { get; private set => field = value.ThrowWhenNull(); }
     ISymbol ITreeNode.Symbol => Symbol;
 
     /// <summary>

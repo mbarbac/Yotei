@@ -29,7 +29,21 @@ public class TypeNode : ITreeNode
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public INode? Parent { get; }
+    public INode? Parent
+    {
+        get;
+        set
+        {
+            if (value is not null
+                and not FileNode
+                and not NamespaceNode
+                and not TypeNode)
+                throw new ArgumentException(
+                    "Invalid parent node.").WithData(value);
+
+            field = value;
+        }
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -39,7 +53,7 @@ public class TypeNode : ITreeNode
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public INamedTypeSymbol Symbol { get; }
+    public INamedTypeSymbol Symbol { get; private set => field = value.ThrowWhenNull(); }
     ISymbol ITreeNode.Symbol => Symbol;
 
     /// <summary>

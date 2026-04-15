@@ -7,10 +7,17 @@
 public class FieldNode : ITreeNode
 {
     /// <summary>
+    /// Initializes a new instance.
+    /// </summary>
+    /// <param name="symbol"></param>
+    [SuppressMessage("", "IDE0290")]
+    public FieldNode(IFieldSymbol symbol) => Symbol = symbol;
+
+    /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => throw null;
+    public override string ToString() => $"Field: {Symbol.Name}";
 
     // ----------------------------------------------------
 
@@ -22,7 +29,8 @@ public class FieldNode : ITreeNode
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public INode? Parent { get; }
+    public TypeNode? Parent { get; set; }
+    INode? INode.Parent => Parent;
 
     /// <summary>
     /// <inheritdoc/>
@@ -32,7 +40,7 @@ public class FieldNode : ITreeNode
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public IFieldSymbol Symbol { get; }
+    public IFieldSymbol Symbol { get; private set => field = value.ThrowWhenNull(); }
     ISymbol ITreeNode.Symbol => Symbol;
 
     /// <summary>

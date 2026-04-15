@@ -23,7 +23,20 @@ public sealed class NamespaceNode : INode
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public INode? Parent { get; }
+    public INode? Parent
+    {
+        get;
+        set
+        {
+            if (value is not null
+                and not FileNode
+                and not NamespaceNode)
+                throw new ArgumentException(
+                    "Invalid parent node.").WithData(value);
+
+            field = value;
+        }
+    }
 
     // ----------------------------------------------------
 
