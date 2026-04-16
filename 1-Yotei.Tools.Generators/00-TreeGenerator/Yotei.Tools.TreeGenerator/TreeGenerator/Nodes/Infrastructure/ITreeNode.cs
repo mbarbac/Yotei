@@ -19,12 +19,16 @@ public interface ITreeNode : INode
     /// The collection of syntax nodes where the associated symbol was found, or an empty list
     /// if this information is not available.
     /// </summary>
+    /// Note: this list and its elements is typically not used for equality purposes, so being
+    /// generator cache friendly.
     List<SyntaxNode> SyntaxNodes { get; }
 
     /// <summary>
     /// The collection of attributes captured for the associated symbol, or an empty list if
     /// this information is not available.
     /// </summary>
+    /// Note: this list and its elements is typically not used for equality purposes, so being
+    /// generator cache friendly.
     List<AttributeData> Attributes { get; }
 
     // ----------------------------------------------------

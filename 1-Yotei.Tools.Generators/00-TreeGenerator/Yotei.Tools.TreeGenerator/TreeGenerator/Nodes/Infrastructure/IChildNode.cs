@@ -15,5 +15,7 @@ public interface IChildNode : ITreeNode
     /// is a detached one. If not null, then the parent node NEEDS NOT to represent the declaring
     /// element of the one carried by this instance: it is just a hierarchy artifact.
     /// </summary>
+    /// Note: this property is typically not used for equality purposes, so being generator cache
+    /// friendly.
     ITreeNode? Parent { get; set; }
 }

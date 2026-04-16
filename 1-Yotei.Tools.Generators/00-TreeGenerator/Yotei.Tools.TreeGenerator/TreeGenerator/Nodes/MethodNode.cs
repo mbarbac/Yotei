@@ -65,8 +65,18 @@ public class MethodNode : IChildNode
     /// <returns></returns>
     public virtual bool Equals(INode other)
     {
-        throw new NotImplementedException();
+        if (ReferenceEquals(this, other)) return true;
+        if (other is null) return false;
+        if (other is not MethodNode valid) return false;
+
+        return SymbolEqualityComparer.Default.Equals(Symbol, valid.Symbol);
     }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public override int GetHashCode() => SymbolEqualityComparer.Default.GetHashCode(Symbol);
 
     // ----------------------------------------------------
 
@@ -98,6 +108,8 @@ public class MethodNode : IChildNode
     /// <returns></returns>
     public bool Emit(SourceProductionContext context, CodeBuilder cb)
     {
+        context.CancellationToken.ThrowIfCancellationRequested();
+
         if (!OnValidate(context)) return false;
         if (!OnEmit(context, cb)) return false;
         return true;
@@ -114,7 +126,7 @@ public class MethodNode : IChildNode
     {
         var r = true;
 
-        if (Parent == null) { TreeError.NoParentNode.Create(Symbol).Report(context); r = false; }
+        if (Parent == null) { TreeError.NoParentNode.Report(Symbol, context); r = false; }
         return r;
     }
 
