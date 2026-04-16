@@ -27,22 +27,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\EasyMethodSymbol.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\EasyPropertySymbol.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\EasyFieldSymbol.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Api\ITreeNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Api\INode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Infrastructure\ErrorNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\TypeNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\PropertyNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\FieldNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\MethodNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\TypeNodeEx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeGenerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeTools\TreeError.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeTools\CodeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeTools\TreeErrorExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeGeneratorEx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Infrastructure\" />
   </ItemGroup>
 </Project>
