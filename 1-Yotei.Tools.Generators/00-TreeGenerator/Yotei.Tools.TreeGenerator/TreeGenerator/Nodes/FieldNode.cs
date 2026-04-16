@@ -1,0 +1,121 @@
+﻿namespace Yotei.Tools.Generators;
+
+// ========================================================
+/// <summary>
+/// Represents a field-alike source code generation node.
+/// </summary>
+public class FieldNode : IChildNode
+{
+    /// <summary>
+    /// Initializes a new instance.
+    /// </summary>
+    /// <param name="symbol"></param>
+    public FieldNode(IFieldSymbol symbol) => Symbol = symbol;
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public override string ToString() => $"Field: {Symbol.Name}";
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc cref="IChildNode.Parent"/>
+    /// </summary>
+    public TypeNode? Parent { get; set; }
+    ITreeNode? IChildNode.Parent { get => Parent; set => Parent = (TypeNode?)value; }
+
+    /// <summary>
+    /// <inheritdoc cref="ITreeNode.Symbol"/>
+    /// </summary>
+    public IFieldSymbol Symbol { get; private set => field = value.ThrowWhenNull(); }
+    ISymbol ITreeNode.Symbol => Symbol;
+
+    /// <summary>
+    /// <inheritdoc cref="ITreeNode.SyntaxNodes"/>
+    /// </summary>
+    public List<BaseFieldDeclarationSyntax> SyntaxNodes { get; } = [];
+    List<SyntaxNode> ITreeNode.SyntaxNodes => (List<SyntaxNode>)SyntaxNodes.Cast<SyntaxNode>();
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public List<AttributeData> Attributes { get; } = [];
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    public virtual bool Equals(INode other)
+    {
+        throw new NotImplementedException();
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc cref="ITreeNode.Augment(ITreeNode)"/>
+    /// </summary>
+    /// <param name="other"></param>
+    public virtual void Augment(FieldNode other)
+    {
+        foreach (var syntax in other.SyntaxNodes)
+            if (SyntaxNodes.Find(x => x.IsEquivalentTo(syntax)) == null)
+                SyntaxNodes.Add(syntax);
+
+        foreach (var at in other.Attributes)
+            if (Attributes.Find(x => x.EqualsTo(at)) == null)
+                Attributes.Add(at);
+    }
+    void ITreeNode.Augment(ITreeNode other) => Augment((FieldNode)other);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// Inheritors will customize behavior using the <see cref="OnValidate(SourceProductionContext)"/>
+    /// and <see cref="OnEmit(SourceProductionContext, CodeBuilder)"/> methods.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="cb"></param>
+    /// <returns></returns>
+    public bool Emit(SourceProductionContext context, CodeBuilder cb)
+    {
+        if (!OnValidate(context)) return false;
+        if (!OnEmit(context, cb)) return false;
+        return true;
+    }
+
+    /// <summary>
+    /// Invoked to validate this instance before emitting its source code. If this method returns
+    /// false, then the source code generation is aborted. Inheritors typically will invoke their
+    /// base methods first.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    protected virtual bool OnValidate(SourceProductionContext context)
+    {
+        var r = true;
+
+        if (Parent == null) { TreeError.NoParentNode.Create(Symbol).Report(context); r = false; }
+        return r;
+    }
+
+    /// <summary>
+    /// Invoked to emit the code generated for this instance in the given code builder. If this
+    /// method returns false, then the source code generation is aborted. Inheritors will typically
+    /// override their base methods as needed.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="cb"></param>
+    /// <returns></returns>
+    protected virtual bool OnEmit(SourceProductionContext context, CodeBuilder cb)
+    {
+        cb.AppendLine($"// {this}");
+        return true;
+    }
+}
