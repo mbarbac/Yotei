@@ -38,6 +38,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\TypeNodeEx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeGeneratorOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeGenerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeTools\TreeError.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeTools\CodeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeTools\TreeErrorExtensions.cs" />

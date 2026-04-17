@@ -10,3 +10,8 @@ public static class Test_
     {
     }
 }
+
+[Cloneable]
+public class MyType
+{
+}

@@ -28,14 +28,12 @@
 	<PropertyGroup>
 		<TreeGeneratorOptions_UseFileFolders>true</TreeGeneratorOptions_UseFileFolders>
 		<TreeGeneratorOptions_ReverseFileNames>true</TreeGeneratorOptions_ReverseFileNames>
-		<CloneGeneratorOptions_EmitEmbeddedAttribute>true</CloneGeneratorOptions_EmitEmbeddedAttribute>
-		<CloneGeneratorOptions_EmitNullabilityHelpers>true</CloneGeneratorOptions_EmitNullabilityHelpers>
+		<TreeGeneratorOptions_EmitNullabilityHelpers>true</TreeGeneratorOptions_EmitNullabilityHelpers>
 	</PropertyGroup>
 	<ItemGroup>
 		<CompilerVisibleProperty Include="TreeGeneratorOptions_UseFileFolders" />
 		<CompilerVisibleProperty Include="TreeGeneratorOptions_ReverseFileNames" />
-		<CompilerVisibleProperty Include="CloneGeneratorOptions_EmitEmbeddedAttribute" />
-		<CompilerVisibleProperty Include="CloneGeneratorOptions_EmitNullabilityHelpers" />
+		<CompilerVisibleProperty Include="TreeGeneratorOptions_EmitNullabilityHelpers" />
 	</ItemGroup>
 
 	<!-- DEBUG configuration -->
@@ -64,7 +62,8 @@
 		<CompilerGeneratedFilesOutputPath>Generated\$(TargetFramework)</CompilerGeneratedFilesOutputPath>
 	</PropertyGroup>
 	<ItemGroup>
-		<Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
+		<Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/**" />
+		<Compile Remove="$(CompilerGeneratedFilesOutputPath)/**" />
 	</ItemGroup>
 
 	<!-- Clear generated files each compile or build (need to be at the end of the file)-->

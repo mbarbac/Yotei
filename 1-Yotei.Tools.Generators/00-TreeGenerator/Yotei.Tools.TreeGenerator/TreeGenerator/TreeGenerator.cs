@@ -43,10 +43,15 @@ public partial class TreeGenerator : IIncrementalGenerator
     /// <summary>
     /// Invoked to register post-initialization actions, such as generating code for marker
     /// attributes, reading external files, and so forth.
+    /// <br/> By default, this method adds the the 'Microsoft.CodeAnalysis.Embedded' attribute.
+    /// <br/> Inheritors will typically invoke their base methods first.
     /// <para></para>
     /// </summary>
     /// <param name="context"></param>
-    protected virtual void OnInitialize(IncrementalGeneratorPostInitializationContext context) { }
+    protected virtual void OnInitialize(IncrementalGeneratorPostInitializationContext context)
+    {
+        context.AddEmbeddedAttributeDefinition();
+    }
 
     // ----------------------------------------------------
 
@@ -212,11 +217,150 @@ public partial class TreeGenerator : IIncrementalGenerator
     /// <param name="context"></param>
     /// <param name="token"></param>
     /// <returns></returns>
+    [SuppressMessage("", "IDE0019")]
     protected virtual INode CaptureNode(GeneratorSyntaxContext context, CancellationToken token)
     {
-        // HIGH: TreeGenerator.CaptureNode
+        token.ThrowIfCancellationRequested();
+
+        var node = context.Node;
+        var model = context.SemanticModel;
+
+        // Prevents previously generated code to be processed twice...
+        var path = node.SyntaxTree.FilePath;
+        if (path.EndsWith(".g.cs", StringComparison.OrdinalIgnoreCase) ||
+            path.EndsWith(".generated.cs", StringComparison.OrdinalIgnoreCase))
+            return null!;
+
+        // Type-alike nodes...
+        while (node is BaseTypeDeclarationSyntax syntax && (
+            syntax is TypeDeclarationSyntax ||
+            syntax is EnumDeclarationSyntax))
+        {
+            var symbol = model.GetDeclaredSymbol(syntax, token);
+            if (symbol == null) break;
+
+            var atx = FindSyntaxAttributes(symbol, syntax).ToDebugArray();
+            var ats = FilterAttributes(atx, TypeAttributes, TypeAttributeNames);
+            if (ats.Count == 0) break;
+
+            var temp = CreateNode(symbol, syntax, ats, model);
+            return temp;
+        }
+
+        // Property-alike nodes...
+        while (node is BasePropertyDeclarationSyntax syntax && (
+            syntax is PropertyDeclarationSyntax ||
+            syntax is IndexerDeclarationSyntax ||
+            syntax is EventDeclarationSyntax))
+        {
+            var symbol = model.GetDeclaredSymbol(syntax, token) as IPropertySymbol;
+            if (symbol == null) break;
+
+            var atx = FindSyntaxAttributes(symbol, syntax);
+            var ats = FilterAttributes(atx, PropertyAttributes, PropertyAttributeNames);
+            if (ats.Count == 0) break;
+
+            var temp = CreateNode(symbol, syntax, ats, model);
+            return temp;
+        }
+
+        // Field-alike nodes...
+        while (node is BaseFieldDeclarationSyntax syntax && (
+            syntax is FieldDeclarationSyntax ||
+            syntax is EventFieldDeclarationSyntax))
+        {
+            var items = syntax.Declaration.Variables;
+            foreach (var item in items)
+            {
+                var symbol = model.GetDeclaredSymbol(item, token) as IFieldSymbol;
+                if (symbol == null) continue;
+
+                var atx = FindSyntaxAttributes(symbol, syntax);
+                var ats = FilterAttributes(atx, FieldAttributes, FieldAttributeNames);
+                if (ats.Count == 0) break;
+
+                var temp = CreateNode(symbol, syntax, ats, model);
+                return temp;
+            }
+            break;
+        }
+
+        // Method-alike nodes...
+        while (node is BaseMethodDeclarationSyntax syntax && (
+            syntax is MethodDeclarationSyntax ||
+            syntax is ConstructorDeclarationSyntax ||
+            syntax is DestructorDeclarationSyntax ||
+            syntax is OperatorDeclarationSyntax ||
+            syntax is ConversionOperatorDeclarationSyntax))
+        {
+            var symbol = model.GetDeclaredSymbol(syntax, token) as IMethodSymbol;
+            if (symbol == null) break;
+
+            var atx = FindSyntaxAttributes(symbol, syntax);
+            var ats = FilterAttributes(atx, MethodAttributes, MethodAttributeNames);
+            if (ats.Count == 0) break;
+
+            var temp = CreateNode(symbol, syntax, ats, model);
+            return temp;
+        }
+
+        // Finishing ignoring the syntax node...
         return null!;
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to emit common files (as, for instance, marker attributes), when the options read
+    /// from the consuming project csproj file are needed.
+    /// <br/> Inheritors will typically invoke their base methods first.
+    /// </summary>
+    /// <param name="context"></param>
+    protected virtual void OnEmitContext(ref TreeContext context)
+    {
+        var usefolders = context.Options.UseFileFolders;
+        var reversenames = context.Options.ReverseFileNames;
+
+        if (context.Options.EmitNullabilityHelpers)
+        {
+            var code = GetNullabilityHelpers();
+            var name = "Yotei.Tools.NullabilityHelpers.cs";
+            name = NormalizeFileName(name, usefolders, reversenames);
+            context.Context.AddSource(name, code);
+        }
+    }
+
+    /// <summary>
+    /// Obtains the code for the nullability helpers, to be emitted under the namespace of this
+    /// generator.
+    /// </summary>
+    string GetNullabilityHelpers() => $$"""
+        namespace {{GetType().Namespace!}}
+        {
+            /// <summary>
+            /// Used to wrap types for which nullability information shall be persisted.
+            /// <para>
+            /// Nullable annotations on value types are always translated by the compiler into instances
+            /// of the <see cref="Nullable{T}"/> struct. By contrast, nullable annotations on reference
+            /// types are just syntactic sugar used by the compiler but, in general, either they are not
+            /// persisted in metadata or in custom attributes, or they are not allowed in certain contexts
+            /// (e.g., generic type arguments).
+            /// <br/> The <see cref="IsNullable{T}"/> and <see cref="IsNullableAttribute"/> types can be
+            /// used as workarounds when there is the need to persist nullability information for their
+            /// associated types, or when there is the need to specify it in those not-allowed contexts.
+            /// </para>
+            /// </summary>
+            [Microsoft.CodeAnalysis.Embedded]
+            public class IsNullable<T> { }
+            
+            /// <summary>
+            /// <inheritdoc cref="IsNullable{T}"/>
+            /// </summary>
+            [Microsoft.CodeAnalysis.Embedded]
+            [AttributeUsage(AttributeTargets.All)]
+            public class IsNullableAttribute : Attribute { }
+        }
+        """;
 
     // ----------------------------------------------------
 
@@ -232,7 +376,48 @@ public partial class TreeGenerator : IIncrementalGenerator
     protected virtual void EmitNodes(
         SourceProductionContext context, (ImmutableArray<INode>, TreeGeneratorOptions) source)
     {
-        // HIGH: TreeGenerator.EmitNodes
-        return;
+        var nodes = source.Item1;
+        var options = source.Item2;
+        var extended = new TreeContext(context, options);
+        var files = new List<TypeNode>();
+
+        // First, emit common code...
+        OnEmitContext(ref extended);
+
+        // Processing nodes...
+        foreach (var node in nodes)
+        {
+            context.CancellationToken.ThrowIfCancellationRequested();
+
+            if (node is ErrorNode error) error.Report(context);
+            else CaptureHierarchy(files, node, context);
+        }
+
+        // Generating source code...
+        foreach (var type in files)
+        {
+            context.CancellationToken.ThrowIfCancellationRequested();
+
+            var cb = new CodeBuilder();
+            var ok = type.Emit(ref extended, cb); if (ok)
+            {
+                var code = cb.ToString();
+                var name = type.GetFileName();
+                name = NormalizeFileName(name, options.UseFileFolders, options.ReverseFileNames);
+                context.AddSource(name, code);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Invoked to capture the given source code generation node into the hierarchy given by the
+    /// given collection of file-level types.
+    /// </summary>
+    /// <param name="files"></param>
+    /// <param name="node"></param>
+    /// <param name="context"></param>
+    protected virtual void CaptureHierarchy(
+        List<TypeNode> files, INode node, SourceProductionContext context)
+    {
     }
 }

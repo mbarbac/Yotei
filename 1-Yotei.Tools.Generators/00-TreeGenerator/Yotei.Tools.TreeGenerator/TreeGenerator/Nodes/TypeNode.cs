@@ -117,21 +117,40 @@ public partial class TypeNode : ITreeNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// <inheritdoc/> Inheritors can customize its behavior by overriding the
+    /// Invoked to obtain the straight not-normalized file name, using dot separated parts if
+    /// such is needed. Whether folders are used or the parts are reversed will be based upon
+    /// the configurations read from the consuming project's csproj file.
+    /// </summary>
+    /// <returns></returns>
+    public string GetFileName()
+    {
+        var options = new SymbolDisplayFormat(
+            globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.Omitted,
+            typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
+            genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters,
+            miscellaneousOptions: SymbolDisplayMiscellaneousOptions.UseSpecialTypes);
+
+        var name = Symbol.ToDisplayString(options);
+        return name;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/> Inheritors will customize behaviors by overriding the
     /// <see cref="GetBaseList()"/>, <see cref="OnValidate(SourceProductionContext)"/>,
-    /// <see cref="IsSupportedKind()"/>,
-    /// <see cref="OnEmitCore(SourceProductionContext, CodeBuilder)"/> and
-    /// <see cref="OnEmitChilds(SourceProductionContext, CodeBuilder)"/> methods.
+    /// <see cref="IsSupportedKind()"/>, <see cref="OnEmitChilds(ref TreeContext)"/> and
+    /// <see cref="OnEmitChilds(ref TreeContext)"/> methods.
     /// </summary>
     /// <param name="context"></param>
     /// <param name="cb"></param>
     /// <returns></returns>
-    public bool Emit(SourceProductionContext context, CodeBuilder cb)
+    public bool Emit(ref TreeContext context, CodeBuilder cb)
     {
-        context.CancellationToken.ThrowIfCancellationRequested();
+        context.Context.CancellationToken.ThrowIfCancellationRequested();
 
         // Parent elements, returning how many levels were opened...
-        var num = OnEmitParents(context, cb);
+        var num = OnEmitParents(ref context, cb);
 
         // This type...
         var head = GetTypeHeader(Symbol);
@@ -143,13 +162,13 @@ public partial class TypeNode : ITreeNode
         cb.IndentLevel++;
 
         var old = cb.Length;
-        var ret = OnEmitCore(context, cb);
+        var ret = OnEmitCore(ref context, cb);
         if (ret)
         {
             var len = cb.Length;
             if (len != old) cb.AppendLine();
 
-            if (!OnEmitChilds(context, cb)) ret = false;
+            if (!OnEmitChilds(ref context, cb)) ret = false;
         }
         cb.IndentLevel--;
         cb.AppendLine("}");
@@ -207,7 +226,7 @@ public partial class TypeNode : ITreeNode
     /// <param name="context"></param>
     /// <param name="cb"></param>
     /// <returns></returns>
-    protected virtual bool OnEmitCore(SourceProductionContext context, CodeBuilder cb) => true;
+    protected virtual bool OnEmitCore(ref TreeContext context, CodeBuilder cb) => true;
 
     /// <summary>
     /// Invoked to emit the source code of the child elements captured by this instance. If this
@@ -216,7 +235,7 @@ public partial class TypeNode : ITreeNode
     /// <param name="context"></param>
     /// <param name="cb"></param>
     /// <returns></returns>
-    protected virtual bool OnEmitChilds(SourceProductionContext context, CodeBuilder cb)
+    protected virtual bool OnEmitChilds(ref TreeContext context, CodeBuilder cb)
     {
         var r = true;
         var n = false;
@@ -224,19 +243,19 @@ public partial class TypeNode : ITreeNode
         foreach (var node in ChildProperties)
         {
             if (n) cb.AppendLine(); n = true;
-            if (!node.Emit(context, cb)) r = false;
+            if (!node.Emit(ref context, cb)) r = false;
         }
 
         foreach (var node in ChildFields)
         {
             if (n) cb.AppendLine(); n = true;
-            if (!node.Emit(context, cb)) r = false;
+            if (!node.Emit(ref context, cb)) r = false;
         }
 
         foreach (var node in ChildMethods)
         {
             if (n) cb.AppendLine(); n = true;
-            if (!node.Emit(context, cb)) r = false;
+            if (!node.Emit(ref context, cb)) r = false;
         }
 
         return r;

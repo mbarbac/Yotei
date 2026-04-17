@@ -44,11 +44,12 @@ public interface ITreeNode : INode
     // ----------------------------------------------------
 
     /// <summary>
-    /// Invoked to emit the source code of this node. If it returns <see langword="false"/>, then
-    /// its source code generation will be aborted.
+    /// Invoked to emit the source code of this node on the given code builder, using the given
+    /// extended context. If it returns <see langword="false"/>, then its source code generation
+    /// will be aborted.
     /// </summary>
     /// <param name="context"></param>
     /// <param name="cb"></param>
     /// <returns></returns>
-    bool Emit(SourceProductionContext context, CodeBuilder cb);
+    bool Emit(ref TreeContext context, CodeBuilder cb);
 }

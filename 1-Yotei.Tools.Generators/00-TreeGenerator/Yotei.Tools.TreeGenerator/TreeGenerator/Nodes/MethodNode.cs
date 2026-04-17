@@ -99,19 +99,19 @@ public class MethodNode : IChildNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// <inheritdoc/>
-    /// Inheritors will customize behavior using the <see cref="OnValidate(SourceProductionContext)"/>
-    /// and <see cref="OnEmit(SourceProductionContext, CodeBuilder)"/> methods.
+    /// <inheritdoc/> Inheritors will customize behaviors by overriding the
+    /// <see cref="OnValidate(SourceProductionContext)"/> and the
+    /// <see cref="OnEmit(ref TreeContext)"/> methods.
     /// </summary>
     /// <param name="context"></param>
     /// <param name="cb"></param>
     /// <returns></returns>
-    public bool Emit(SourceProductionContext context, CodeBuilder cb)
+    public bool Emit(ref TreeContext context, CodeBuilder cb)
     {
-        context.CancellationToken.ThrowIfCancellationRequested();
+        context.Context.CancellationToken.ThrowIfCancellationRequested();
 
-        if (!OnValidate(context)) return false;
-        if (!OnEmit(context, cb)) return false;
+        if (!OnValidate(context.Context)) return false;
+        if (!OnEmit(ref context, cb)) return false;
         return true;
     }
 
@@ -131,14 +131,14 @@ public class MethodNode : IChildNode
     }
 
     /// <summary>
-    /// Invoked to emit the code generated for this instance in the given code builder. If this
-    /// method returns false, then the source code generation is aborted. Inheritors will typically
-    /// override their base methods as needed.
+    /// Invoked to generate the source code associated with this instance. If this method returns
+    /// <see langword="false"/>, then its source code generation will be aborted. Inheritors will
+    /// typically override completely this method.
     /// </summary>
     /// <param name="context"></param>
     /// <param name="cb"></param>
     /// <returns></returns>
-    protected virtual bool OnEmit(SourceProductionContext context, CodeBuilder cb)
+    protected virtual bool OnEmit(ref TreeContext context, CodeBuilder cb)
     {
         cb.AppendLine($"// {this}");
         return true;

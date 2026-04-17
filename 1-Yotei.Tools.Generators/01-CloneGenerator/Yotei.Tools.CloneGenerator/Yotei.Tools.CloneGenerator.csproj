@@ -43,7 +43,7 @@
 	<Import Project="..\..\..\1-Yotei.Tools\Yotei.Tools.Shared\Yotei.Tools.Shared.projitems" Label="Shared" />
 	<Import Project="..\..\00-TreeGenerator\Yotei.Tools.TreeGenerator\Yotei.Tools.TreeGenerator.projitems" Label="Shared" />
 	
-	<!--Source code of marker attributes-->
+	<!--Generator resources-->
 	<ItemGroup>
 		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
 		<EmbeddedResource Include="Public\CloneableAttribute.cs" />

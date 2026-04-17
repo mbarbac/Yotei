@@ -20,7 +20,7 @@ partial class TreeGenerator
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         // Registering post-initialization actions...
-        context.RegisterPostInitializationOutput(PrepareOnInitialize);
+        context.RegisterPostInitializationOutput(OnInitialize);
 
         // Registering pipeline steps...
         var items = context.SyntaxProvider
@@ -38,16 +38,6 @@ partial class TreeGenerator
         // Registering source code emit actions...
         var combined = items.Combine(options);
         context.RegisterSourceOutput(combined, EmitNodes);
-    }
-
-    /// <summary>
-    /// Invoked to prepare post-initialization actions and elements.
-    /// </summary>
-    /// <param name="context"></param>
-    void PrepareOnInitialize(IncrementalGeneratorPostInitializationContext context)
-    {
-        // TODO...
-        OnInitialize(context);
     }
 
     // ----------------------------------------------------
@@ -131,17 +121,23 @@ partial class TreeGenerator
     // ----------------------------------------------------
 
     /// <summary>
-    /// Reads the contents of a source file embedded in the generator's assembly resources, as
-    /// for instance the source code of marker attributes. The resource name must be the one
-    /// in the generator project file (typically an '[EmbeddedResource Include="name.cs" /]' entry
-    /// of an ItemGroup section, with angle brackets)
+    /// Reads the contents of a source file (for instance: the source code of a market attribute)
+    /// embedded as a resource in the generator's assembly resources.
+    /// <br/>- The combination of the resource folder and name must be the one specified in the
+    /// generator project file (typically in an '[EmbeddedResource Include="name.cs" /]' entry of
+    /// an ItemGroup section, with angle brackets).
+    /// <br/>- In the project file, the name format is like 'rfolder/rname'. When passed to this
+    /// method, the resource folder shall be null or not ending with '/'.
     /// </summary>
     /// <param name="rname"></param>
     /// <returns></returns>
-    public string ReadResource(string rname)
+    protected string ReadResource(string? rfolder, string rname)
     {
-        // For whatever reasons 'folder\name' must be specified as 'folder.name'...
+        rfolder = rfolder.NullWhenEmpty(trim: true);
         rname = rname.NotNullNotEmpty(trim: true);
+
+        // For whatever reasons 'folder\name' must be specified as 'folder.name'...
+        if (rfolder != null) rname = $"{rfolder}.{rname}";
         rname = rname.Replace('\\', '.').Replace('/', '.');
 
         var nspace = GetType().Namespace;
@@ -153,5 +149,84 @@ partial class TreeGenerator
         using var reader = new StreamReader(stream);
         var source = reader.ReadToEnd();
         return source;
+    }
+
+    /// <summary>
+    /// Invoked to read a source file embedded as a resource in the generator's project file.
+    /// <br/>- The combination of the resource folder and name must be the one specified in the
+    /// generator project file (typically in an '[EmbeddedResource Include="name.cs" /]' entry of
+    /// an ItemGroup section, with angle brackets).
+    /// <br/>- In the project file, the name format is like 'rfolder/rname'. When passed to this
+    /// method, the resource folder shall be null or not ending with '/'.
+    /// <br/>- The namespace argument can be null but, if not, is added as a prefix to the given
+    /// resource name. Then the values of the <paramref name="useFolders"/> and the
+    /// <paramref name="reverseFileName"/> arguments are used to build the actual file name where
+    /// the code will be emitted.
+    /// </summary>
+    /// <param name="rfolder"></param>
+    /// <param name="rname"></param>
+    /// <param name="nspace"></param>
+    /// <param name="context"></param>
+    protected void ReadAndEmitResource(
+        string? rfolder, string rname, string? nspace,
+        bool useFolders, bool reverseFileName,
+        SourceProductionContext context)
+    {
+        var code = ReadResource(rfolder, rname);
+        var name = nspace == null ? rname : $"{nspace}.{rname}";
+
+        name = NormalizeFileName(name, useFolders, reverseFileName);
+        context.AddSource(name, code);
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Obtains the collection of attributes that decorate the given syntax. Motivation: for
+    /// whatever reasons <see cref="ISymbol.GetAttributes"/> does not return all the symbol's
+    /// attributes when it is defined in different places (ie: partial types). So we need a
+    /// way of capturing all of them from the syntax locations.
+    /// </summary>
+    static IEnumerable<AttributeData> FindSyntaxAttributes(
+        ISymbol symbol,
+        MemberDeclarationSyntax syntax)
+    {
+        var atsyntaxes = syntax.AttributeLists.SelectMany(static x => x.Attributes);
+        foreach (var atsyntax in atsyntaxes)
+        {
+            var atd = symbol.GetAttributes().FirstOrDefault(
+                x => x.ApplicationSyntaxReference?.GetSyntax() == atsyntax);
+
+            if (atd is not null) yield return atd;
+        }
+    }
+
+    /// <summary>
+    /// Filters the given collection of attributes to return a new one containing only those
+    /// that match any of the given types, and those whose full class names match any of the
+    /// given ones.
+    /// </summary>
+    /// <param name="attributes"></param>
+    /// <param name="types"></param>
+    /// <param name="names"></param>
+    /// <returns></returns>
+    static List<AttributeData> FilterAttributes(
+        IEnumerable<AttributeData> attributes,
+        IEnumerable<Type> types,
+        IEnumerable<string> names)
+    {
+        List<AttributeData> items = [];
+
+        foreach (var at in attributes)
+        {
+            if (at.AttributeClass is null) continue;
+            
+            var found = at.AttributeClass.MatchAny(types);
+            if (!found) found = names.Any(x => x == at.AttributeClass.Name);
+
+            if (found && !items.Contains(at)) items.Add(at);
+        }
+
+        return items;
     }
 }

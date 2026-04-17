@@ -73,8 +73,8 @@ public static class ITypeSymbolExtensions
             // Capturing...
             var sargs = (source as INamedTypeSymbol)?.TypeArguments ?? [];
             var targs = type.GenericTypeArguments.Length != 0
-            ? type.GenericTypeArguments
-            : type is System.Reflection.TypeInfo info ? info.GenericTypeParameters : [];
+                ? type.GenericTypeArguments
+                : type is System.Reflection.TypeInfo info ? info.GenericTypeParameters : [];
 
             if (sargs.Length != targs.Length) return false; // shortcut...
 
@@ -83,6 +83,9 @@ public static class ITypeSymbolExtensions
             var tname = type.Name;
             var index = tname.IndexOf('`');
             if (index >= 0) tname = tname[..index];
+
+            if (sname.EndsWith("Attribute")) sname = sname.RemoveLast("Attribute").ToString();
+            if (tname.EndsWith("Attribute")) tname = tname.RemoveLast("Attribute").ToString();
             if (sname != tname) return false;
 
             // Hierarchy...

@@ -36,6 +36,12 @@ public record TreeGeneratorOptions
     /// </summary>
     public bool ReverseFileNames { get; set; }
 
+    /// <summary>
+    /// Determines if the <see cref="IsNullable{T}"/> and the <see cref="IsNullableAttribute"/>
+    /// nullability helpers are added to the generated code.
+    /// </summary>
+    public bool EmitNullabilityHelpers { get; set; }
+
     // ----------------------------------------------------
 
     /// <summary>
