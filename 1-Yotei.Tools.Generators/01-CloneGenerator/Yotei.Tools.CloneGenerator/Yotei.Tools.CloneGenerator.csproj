@@ -42,12 +42,6 @@
 	</ItemGroup>
 	<Import Project="..\..\..\1-Yotei.Tools\Yotei.Tools.Shared\Yotei.Tools.Shared.projitems" Label="Shared" />
 	<Import Project="..\..\00-TreeGenerator\Yotei.Tools.TreeGenerator\Yotei.Tools.TreeGenerator.projitems" Label="Shared" />
-
-	<!--For proper import of 'Yotei.Tools'-->
-	<PropertyGroup>
-		<DefineConstants>$(DefineConstants);YOTEI_TOOLS_GENERATORS</DefineConstants>
-		
-	</PropertyGroup>
 	
 	<!--Source code of marker attributes-->
 	<ItemGroup>

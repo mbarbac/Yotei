@@ -24,6 +24,20 @@
 		</PackageReference>
 	</ItemGroup>
 
+	<!--Generator configuration options-->
+	<PropertyGroup>
+		<TreeGeneratorOptions_UseFileFolders>true</TreeGeneratorOptions_UseFileFolders>
+		<TreeGeneratorOptions_ReverseFileNames>true</TreeGeneratorOptions_ReverseFileNames>
+		<CloneGeneratorOptions_EmitEmbeddedAttribute>true</CloneGeneratorOptions_EmitEmbeddedAttribute>
+		<CloneGeneratorOptions_EmitNullabilityHelpers>true</CloneGeneratorOptions_EmitNullabilityHelpers>
+	</PropertyGroup>
+	<ItemGroup>
+		<CompilerVisibleProperty Include="TreeGeneratorOptions_UseFileFolders" />
+		<CompilerVisibleProperty Include="TreeGeneratorOptions_ReverseFileNames" />
+		<CompilerVisibleProperty Include="CloneGeneratorOptions_EmitEmbeddedAttribute" />
+		<CompilerVisibleProperty Include="CloneGeneratorOptions_EmitNullabilityHelpers" />
+	</ItemGroup>
+
 	<!-- DEBUG configuration -->
 	<ItemGroup Condition="'$(Configuration)'=='Debug'">
 	  <ProjectReference Include="..\..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />

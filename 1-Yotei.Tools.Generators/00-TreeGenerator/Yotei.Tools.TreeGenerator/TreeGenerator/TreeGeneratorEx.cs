@@ -28,8 +28,16 @@ partial class TreeGenerator
             .Where(static x => x is not null)
             .Collect();
 
+        var options = context.AnalyzerConfigOptionsProvider.Select((opts, _) =>
+        {
+            var item = CreateTreeOptions();
+            item.ReadElements(opts.GlobalOptions);
+            return item;
+        });
+
         // Registering source code emit actions...
-        context.RegisterSourceOutput(items, EmitNodes);
+        var combined = items.Combine(options);
+        context.RegisterSourceOutput(combined, EmitNodes);
     }
 
     /// <summary>

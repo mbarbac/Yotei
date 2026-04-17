@@ -33,17 +33,12 @@
 public partial class TreeGenerator : IIncrementalGenerator
 {
     /// <summary>
-    /// Determines if the '[Microsoft.CodeAnalysis.Embedded]' attribute is added to the generated
-    /// source code. This attribute is typically used to decorate marker attributes to prevent
-    /// duplicates.
+    /// Invoked to create a derived <see cref="TreeOptions"/> instance to hold the options used
+    /// by this generator, that will either have their default values or the ones read from the
+    /// consuming project's csproj file.
     /// </summary>
-    public virtual bool EmitEmbeddedAttribute => true;
-
-    /// <summary>
-    /// Determines if the <see cref="IsNullable{T}"/> and the <see cref="IsNullableAttribute"/>
-    /// nullability helpers are added to the generated code.
-    /// </summary>
-    public virtual bool EmitNullabilityHelpers => true;
+    /// <returns></returns>
+    protected virtual TreeGeneratorOptions CreateTreeOptions() => new();
 
     /// <summary>
     /// Invoked to register post-initialization actions, such as generating code for marker
@@ -219,7 +214,8 @@ public partial class TreeGenerator : IIncrementalGenerator
     /// <returns></returns>
     protected virtual INode CaptureNode(GeneratorSyntaxContext context, CancellationToken token)
     {
-        throw null;
+        // HIGH: TreeGenerator.CaptureNode
+        return null!;
     }
 
     // ----------------------------------------------------
@@ -227,12 +223,16 @@ public partial class TreeGenerator : IIncrementalGenerator
     /// <summary>
     /// Invoked to either generate the source code of the captured nodes, or to report the error
     /// conditions that may have been captured.
+    /// <br/> Inheritors' note: the second argument of this method is a tuple that carryies as its
+    /// left value the captured collection of nodes, and as its right one the options read from the
+    /// consuming project.
     /// </summary>
     /// <param name="context"></param>
-    /// <param name="nodes"></param>
+    /// <param name="source"></param>
     protected virtual void EmitNodes(
-        SourceProductionContext context, ImmutableArray<INode> nodes)
+        SourceProductionContext context, (ImmutableArray<INode>, TreeGeneratorOptions) source)
     {
-        throw null;
+        // HIGH: TreeGenerator.EmitNodes
+        return;
     }
 }
