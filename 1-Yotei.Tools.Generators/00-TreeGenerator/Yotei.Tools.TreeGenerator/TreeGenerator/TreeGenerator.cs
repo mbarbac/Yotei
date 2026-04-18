@@ -239,12 +239,22 @@ public partial class TreeGenerator : IIncrementalGenerator
             var symbol = model.GetDeclaredSymbol(syntax, token);
             if (symbol == null) break;
 
-            var atx = FindSyntaxAttributes(symbol, syntax).ToDebugArray();
-            var ats = FilterAttributes(atx, TypeAttributes, TypeAttributeNames);
-            if (ats.Count == 0) break;
+            if (symbol.Name == "MyType") { } // DEBUG-ONLY
 
-            var temp = CreateNode(symbol, syntax, ats, model);
-            return temp;
+            var atx = syntax.AttributeLists.SelectMany(x => x.Attributes).FirstOrDefault();
+            if (atx is null) break;
+            var type = model.GetTypeInfo(atx).Type;
+            var name = type.EasyName(EasyTypeOptions.Full);
+            
+            
+            //var atx = FindSyntaxAttributes(symbol, syntax);
+            //var ats = FilterAttributes(atx, TypeAttributes, TypeAttributeNames);
+            //if (ats.Count == 0) break;
+
+            //var temp = CreateNode(symbol, syntax, ats, model);
+            //return temp;
+
+            return null;
         }
 
         // Property-alike nodes...

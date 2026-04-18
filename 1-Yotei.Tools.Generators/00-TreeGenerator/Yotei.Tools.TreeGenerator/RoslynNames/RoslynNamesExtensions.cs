@@ -55,7 +55,7 @@ public static partial class RoslynNamesExtensions
     /// </summary>
     internal static bool IsGenericAlike(this ITypeSymbol source)
     {
-        return source.TypeKind == TypeKind.TypeParameter;
+        return source.TypeKind is TypeKind.TypeParameter;
     }
 
     // ----------------------------------------------------

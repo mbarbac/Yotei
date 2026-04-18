@@ -187,7 +187,7 @@ partial class TreeGenerator
     /// attributes when it is defined in different places (ie: partial types). So we need a
     /// way of capturing all of them from the syntax locations.
     /// </summary>
-    static IEnumerable<AttributeData> FindSyntaxAttributes(
+    /*static IEnumerable<AttributeData> FindSyntaxAttributes(
         ISymbol symbol,
         MemberDeclarationSyntax syntax)
     {
@@ -199,6 +199,21 @@ partial class TreeGenerator
 
             if (atd is not null) yield return atd;
         }
+    }*/
+    static List<AttributeData> FindSyntaxAttributes(
+        ISymbol symbol,
+        MemberDeclarationSyntax syntax)
+    {
+        var list = new List<AttributeData>();
+        var atsyntaxes = syntax.AttributeLists.SelectMany(static x => x.Attributes);
+        foreach (var atsyntax in atsyntaxes)
+        {
+            var atd = symbol.GetAttributes().FirstOrDefault(
+                x => x.ApplicationSyntaxReference?.GetSyntax() == atsyntax);
+
+            if (atd is not null && !list.Contains(atd)) list.Add(atd);
+        }
+        return list;
     }
 
     /// <summary>
@@ -229,4 +244,17 @@ partial class TreeGenerator
 
         return items;
     }
+    /*{
+        var items = attributes.Where(x =>
+            x.AttributeClass != null &&
+            x.AttributeClass.MatchAny(types)).ToList();
+
+        foreach (var name in names)
+        {
+            var temps = attributes.Where(x => x.AttributeClass?.Name == name);
+            foreach (var temp in temps) if (!items.Contains(temp)) items.Add(temp);
+        }
+
+        return items;
+    }*/
 }
