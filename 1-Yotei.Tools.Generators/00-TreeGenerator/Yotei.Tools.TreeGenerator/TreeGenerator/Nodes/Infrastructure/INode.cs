@@ -2,11 +2,9 @@
 
 // ========================================================
 /// <summary>
-/// Represents a source code generation node captured in the transform phase, including error
-/// conditions to be later reported at source code generation time.
-/// <para>
-/// Types that implement this interface shall implement their <see cref="IEquatable{T}"/>
-/// capabilities in a generator cache friendly manner.
-/// </para>
+/// Represents the result of transforming a potential syntax node candidate into either a tree
+/// oriented source code generator node, or into an error condition to be reported.
 /// </summary>
+/// NOTE: Types that implement this interface must implement their equatable capabilities in
+/// a incremental generator cache friendly manner.
 public interface INode : IEquatable<INode> { }

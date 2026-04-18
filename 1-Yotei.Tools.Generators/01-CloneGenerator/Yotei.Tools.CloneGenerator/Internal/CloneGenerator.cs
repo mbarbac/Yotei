@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools.CloneGenerator;
+﻿using System.ComponentModel.Design;
+
+namespace Yotei.Tools.CloneGenerator;
 
 // ========================================================
 /// <summary>
@@ -11,25 +13,13 @@ public class CloneGenerator : TreeGenerator
     /// <inheritdoc/>
     /// </summary>
     /// <param name="context"></param>
-    protected override void OnEmitContext(ref TreeContext context)
+    protected override void OnInitialize(IncrementalGeneratorPostInitializationContext context)
     {
         // Base method first...
-        base.OnEmitContext(ref context);
+        base.OnInitialize(context);
 
         // Marker attributes...
-        var usefolders = context.Options.UseFileFolders;
-        var reversenames = context.Options.ReverseFileNames;
-        var rfolder = "Public";
-        var nspace = GetType().Namespace;
-
-        ReadAndEmitResource(rfolder, "CloneableAttribute.cs", nspace, usefolders, reversenames, context.Context);
-        ReadAndEmitResource(rfolder, "CloneableAttribute[T].cs", nspace, usefolders, reversenames, context.Context);
+        AddInitializationResource(context, "Public.CloneableAttribute.cs", "Markers");
+        AddInitializationResource(context, "Public.CloneableAttribute[T].cs", "Markers");
     }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    protected override List<Type> TypeAttributes { get; } = [
-        typeof(CloneableAttribute),
-        typeof(CloneableAttribute<>),];
 }

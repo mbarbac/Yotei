@@ -1,10 +1,10 @@
 ﻿namespace Yotei.Tools.Generators;
 
-/* NOTE:
- * The configuration options a project want to use must appear in the CONSUMING project within
- * a 'PropertyGroup' section, and then right after, they must be made visible to the compiler
- * in an 'ItemGroup' section, as follows:
- * 
+/* NOTES:
+ * - The configuration options MUST appear in the CONSUMING project, within a 'PropertyGroup'
+ *   section, and then right after they MUST be made visible to the compiler in am 'ItemGroup'
+ *   section, as follows:
+ *      
  *      <PropertyGroup>
  *          <MySettingName>value</MySettingName>
  *      </PropertyGroup>
@@ -12,68 +12,35 @@
  *          <CompilerVisibleProperty Include="MySettingName" />
  *      </ItemGroup>
  * 
- * The setting name MUST NOT contain dots or special characters. The underscore character is
- * typically used to provide some structure - for instance, the name of the derived class does
- * preceed the setting name, as in: 'MyGenerator_MySettingName'.
+ * - The setting name MUST NOT contain dots or special characters; you can use the underscore
+ *   character as a separator if needed: 'MyGenerator_MySettingName'
  */
 
 // ========================================================
 /// <summary>
-/// Maintains options for the tree-oriented incremental source code generators.
+/// Maintains options for tree oriented incremental source code generators.
 /// </summary>
 public record TreeGeneratorOptions
 {
     /// <summary>
-    /// Determines if the names of the generated files shall be organized in folders, or rather
-    /// they shall be flat file names. When true, then the folder names are considered to be all
-    /// the first-level dot-separated name parts, except the last one.
-    /// </summary>
-    public bool UseFileFolders{ get; set; }
-
-    /// <summary>
-    /// Determines if the names of the generated files shall be reversed, or not. When true, then
-    /// their first-level dot-separated parts are reversed.
-    /// </summary>
-    public bool ReverseFileNames { get; set; }
-
-    /// <summary>
     /// Determines if the <see cref="IsNullable{T}"/> and the <see cref="IsNullableAttribute"/>
     /// nullability helpers are added to the generated code.
+    /// <br/> The default value of this property is <see langword="true"/>.
     /// </summary>
-    public bool EmitNullabilityHelpers { get; set; }
-
-    // ----------------------------------------------------
+    public bool EmitNullabilityHelpers { get; set; } = true;
 
     /// <summary>
-    /// Populates this instance with the values read from the csproj file.
-    /// <br/> The supported property types are: <see langword="bool"/>, <see langword="int"/>,
-    /// and <see langword="string"/>.
+    /// Determins if the names of the generated files shall be organized in folders, or rather
+    /// they shall be flat file names. When true, folder names are built as all the first-level
+    /// dot-separated parts, except the last one.
+    /// <br/> The default value of this property is <see langword="true"/>.
     /// </summary>
-    public void ReadElements(AnalyzerConfigOptions options)
-    {
-        var type = GetType();
-        var props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-        
-        foreach (var prop in props)
-        {
-            var name = $"build_property.{prop.DeclaringType.Name}_{prop.Name}";
-            if (options.TryGetValue(name, out string? value))
-            {
-                switch (prop.PropertyType)
-                {
-                    case Type t when t == typeof(bool):
-                        if (bool.TryParse(value, out var vbool)) prop.SetValue(this, vbool);
-                        break;
+    public bool UseFileFolders { get; set; } = true;
 
-                    case Type t when t == typeof(int):
-                        if (int.TryParse(value, out var vint)) prop.SetValue(this, vint);
-                        break;
-
-                    case Type t when t == typeof(string):
-                        if (value is not null) prop.SetValue(this, value);
-                        break;
-                }
-            }
-        }
-    }
+    /// <summary>
+    /// Determines if the names of the generated files shall be reversed, or not. When true, their
+    /// first-level dot-separated parts are reversed.
+    /// <br/> The default value of this property is <see langword="true"/>.
+    /// </summary>
+    public bool ReverseFileNames { get; set; } = true;
 }
