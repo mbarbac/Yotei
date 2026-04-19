@@ -95,6 +95,8 @@ public partial class TreeGenerator : IIncrementalGenerator
     /// source code generation candidate, or not. By default, this method validates that the node
     /// is among the recognized ones, and that the list of attribute types or attribute names for
     /// its kind is any not an empty one.
+    /// <br/> Inheritors can override this method to accept just their known elements, or adding
+    /// them to the base method's behavior.
     /// </summary>
     /// <param name="node"></param>
     /// <param name="token"></param>
@@ -202,6 +204,9 @@ public partial class TreeGenerator : IIncrementalGenerator
     /// a source code tree-oriented generator one. This method may also return error nodes that
     /// carry diagnostics to be reported, or <see langword="null"/> if the syntax node is to be
     /// completely ignored.
+    /// <br/> Inheritors may override the base method so that they process only the elements they
+    /// are interested at, or invoke the base method to match elements against the attributes or
+    /// names defined for their kind.
     /// </summary>
     /// <param name="context"></param>
     /// <param name="token"></param>
@@ -289,24 +294,5 @@ public partial class TreeGenerator : IIncrementalGenerator
 
         // Finishing...
         return null!;
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Invoked to both generate the source code of the captured nodes, and to report the error
-    /// conditions the error nodes may carry with them.
-    /// </summary>
-    /// <param name="gencontext"></param>
-    /// <param name="source"></param>
-    protected void EmitNodes(
-        SourceProductionContext gencontext,
-        (ImmutableArray<INode>, ImmutableArray<TreeOptions>) source)
-    {
-        var nodes = source.Item1;
-        var options = source.Item2.Length > 0 ? source.Item2[0] : new TreeOptions();
-
-        // TODO: EmitNodes
-        return;
     }
 }

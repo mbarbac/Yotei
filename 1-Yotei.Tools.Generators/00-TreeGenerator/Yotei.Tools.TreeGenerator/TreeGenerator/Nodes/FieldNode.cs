@@ -71,4 +71,72 @@ public partial class FieldNode : IChildNode
         foreach (var attr in Attributes) code = HashCode.Combine(code, attr);
         return code;
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="other"></param>
+    public virtual void Augment(FieldNode other)
+    {
+        foreach (var syntax in other.SyntaxNodes)
+            if (SyntaxNodes.Find(x => x.IsEquivalentTo(syntax)) == null)
+                SyntaxNodes.Add(syntax);
+
+        foreach (var at in other.Attributes)
+            if (Attributes.Find(x => x.EqualsTo(at)) == null)
+                Attributes.Add(at);
+    }
+    void ITreeNode.Augment(ITreeNode other) => Augment((FieldNode)other);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// <br/> This method is INFRASTRUCTURE and not intended for inheritors usage. Inheritors can
+    /// customize behavior by using the <see cref="OnValidate(SourceProductionContext)"/> and the
+    /// <see cref="OnEmit(ref TreeContext, CodeBuilder)"/> methods.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="cb"></param>
+    /// <returns></returns>
+    public bool Emit(ref TreeContext context, CodeBuilder cb)
+    {
+        context.Context.CancellationToken.ThrowIfCancellationRequested();
+
+        if (!OnValidate(context.Context)) return false;
+        if (!OnEmit(ref context, cb)) return false;
+        return true;
+    }
+
+    /// <summary>
+    /// Invoked to validate this instance before emitting its source code.
+    /// <br/> If this method returns <see langword="false"/>, then its code generation is aborted.
+    /// <br/> Inheritors will typically invoke their base method first.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    protected virtual bool OnValidate(SourceProductionContext context)
+    {
+        var r = true;
+
+        if (Parent == null) { TreeError.NoParentNode.Report(Symbol, context); r = false; }
+        return r;
+    }
+
+    /// <summary>
+    /// Invoked to generate the source code associated with this instance after it has been
+    /// validated.
+    /// <br/> If this method returns <see langword="false"/>, then its code generation is aborted.
+    /// <br/> Inheritors will typically completely override their base method.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="cb"></param>
+    /// <returns></returns>
+    protected virtual bool OnEmit(ref TreeContext context, CodeBuilder cb)
+    {
+        cb.AppendLine($"// {this}");
+        return true;
+    }
 }

@@ -1,18 +1,12 @@
-﻿using System.Collections.Specialized;
-
-namespace Yotei.Tools.Generators;
+﻿namespace Yotei.Tools.Generators;
 
 // ========================================================
 /// <summary>
 /// Maintains options read from the consuming project's tree configuration file.
 /// </summary>
-public class TreeOptions
+public class TreeOptions : IEquatable<TreeOptions>
 {
     readonly Dictionary<string, string> Items;
-
-    public const string EmitNullabilityHelpers = nameof(EmitNullabilityHelpers);
-    public const string GeneratedFilesInFolders = nameof(GeneratedFilesInFolders);
-    public const string ReverseGeneratedFileNames = nameof(ReverseGeneratedFileNames);
 
     /// <summary>
     /// Initializes a new instance with the given contents.
@@ -24,6 +18,33 @@ public class TreeOptions
         Items = new(StringComparer.OrdinalIgnoreCase);
         Parse(text);
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the <see cref="IsNullable{T}"/> and <see cref="IsNullableAttribute"/>
+    /// nullability helpers are to be emitted.
+    /// <br/> The default value of this property is <see cref="true"/>.
+    /// </summary>
+    public bool EmitNullabilityHelpers
+        => !TryGet<bool>(nameof(EmitNullabilityHelpers), out var temp) || temp;
+
+    /// <summary>
+    /// Determines if the generated files shall be emitted using all its first-level dot-separated
+    /// parts, but the last one, as the folder specification. If the value of this property is not
+    /// true, then flat file names are used instead.
+    /// <br/> The default value of this property is <see cref="false"/>.
+    /// </summary>
+    public bool GenerateFilesInFolders
+        => TryGet<bool>(nameof(GenerateFilesInFolders), out var temp) && temp;
+
+    /// <summary>
+    /// Determines if the first-level dot-separated parts of the names of the generated files
+    /// shall be reversed or not.
+    /// <br/> The default value of this property is <see cref="false"/>.
+    /// </summary>
+    public bool ReverseGeneratedFileNames
+        => TryGet<bool>(nameof(ReverseGeneratedFileNames), out var temp) && temp;
 
     // ----------------------------------------------------
 
@@ -60,6 +81,40 @@ public class TreeOptions
         }
         value = default!;
         return false;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    public bool Equals(TreeOptions other)
+    {
+        if (Items.Count != other.Items.Count) return false;
+
+        foreach (var key in Items.Keys)
+        {
+            if (!other.Items.TryGetValue(key, out var value)) return false;
+            if (Items[key] != value) return false;
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public override int GetHashCode()
+    {
+        int code = 0;
+        foreach (var kvp in Items)
+        {
+            code = HashCode.Combine(code, kvp.Key.ToLower());
+            code = HashCode.Combine(code, kvp.Value);
+        }
+        return code;
     }
 
     // ----------------------------------------------------

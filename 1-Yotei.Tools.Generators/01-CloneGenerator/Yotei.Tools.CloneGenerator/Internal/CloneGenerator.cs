@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.Design;
-
-namespace Yotei.Tools.CloneGenerator;
+﻿namespace Yotei.Tools.CloneGenerator;
 
 // ========================================================
 /// <summary>
