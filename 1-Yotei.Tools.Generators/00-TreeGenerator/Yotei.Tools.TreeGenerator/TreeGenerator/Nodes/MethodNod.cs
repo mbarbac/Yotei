@@ -67,7 +67,7 @@ public partial class MethodNode : IChildNode
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null) return false;
-        if (other is not ITreeNode valid) return false;
+        if (other is not MethodNode valid) return false;
 
         if (!SymbolEqualityComparer.Default.Equals(Symbol, valid.Symbol)) return false;
         if (!Attributes.SequenceEqual(valid.Attributes)) return false;

@@ -115,6 +115,7 @@ partial class TreeGenerator
     {
         name = name.NotNullNotEmpty(trim: true);
         name = name.Replace('<', '[').Replace('>', ']');
+        name = name.Replace('?', '_');
 
         var parts = FirstLevelDotParts(name);
 
@@ -132,6 +133,7 @@ partial class TreeGenerator
             if (reverseName) parts.Reverse();
             name = string.Join(".", parts);
             name += $"/{part}";
+            if (ext != null) name += ext;
             return name;
         }
 
@@ -252,14 +254,14 @@ partial class TreeGenerator
     {
         var nodes = source.Item1;
         var options = source.Item2.Length > 0 ? source.Item2[0] : new TreeOptions();
+        var usefolders = options.GenerateFilesInFolders;
+        var reversenames = options.ReverseGeneratedFileNames;
 
         // Nullability helpers...
         if (options.EmitNullabilityHelpers)
         {
             var name = NormalizeFileName(
-                "Yotei.Tools.NullabilityHelpers.cs",
-                options.GenerateFilesInFolders,
-                options.ReverseGeneratedFileNames);
+                "Yotei.Tools.NullabilityHelpers.cs", usefolders, reversenames);
 
             var code = $$"""
                 namespace {{GetType().Namespace!}}
@@ -293,11 +295,31 @@ partial class TreeGenerator
         }
 
         // Processing nodes...
+        var context = new TreeContext(gencontext, options);
+        var files = new List<TypeNode>();
 
+        foreach (var node in nodes)
+        {
+            gencontext.CancellationToken.ThrowIfCancellationRequested();
 
+            if (node is ErrorNode error) error.Report(gencontext);
+            else CaptureHierarchy(files, node, ref context);
+        }
 
+        // Generating source code...
+        foreach (var file in files)
+        {
+            gencontext.CancellationToken.ThrowIfCancellationRequested();
 
-        // TODO...
-        return;
+            var cb = new CodeBuilder();
+            var ok = file.Emit(ref context, cb);
+            if (ok)
+            {
+                var fname = file.FileName + ".cs";
+                var name = NormalizeFileName(fname, usefolders, reversenames);
+                var code = cb.ToString();
+                gencontext.AddSource(name, code);
+            }
+        }
     }
 }

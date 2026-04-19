@@ -10,7 +10,7 @@ namespace Yotei.Tools.CloneGenerator;
 [AttributeUsage(
     AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface,
     Inherited = false,
-    AllowMultiple = true)] // DEBUG-ONLY: change AllowMultiple to false when finished
+    AllowMultiple = false)]
 public class CloneableAttribute : Attribute
 {
     /// <summary>
@@ -26,9 +26,4 @@ public class CloneableAttribute : Attribute
     /// <br/> Derived types must maintain base compatibility.
     /// </summary>
     public bool UseVirtual { get; set; } = true;
-
-    /// <summary>
-    /// DEBUG-ONLY: remove when finished
-    /// </summary>
-    public bool Another { get; set; }
 }

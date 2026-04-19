@@ -50,7 +50,7 @@ public class TreeOptions : IEquatable<TreeOptions>
 
     /// <summary>
     /// Tries to obtain the value associated to the given case insensitive key, casted to the
-    /// given type.
+    /// given type. The only supported ones are 'bool', 'int' and 'string'.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="name"></param>
