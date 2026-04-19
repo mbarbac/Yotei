@@ -22,4 +22,11 @@ public class CloneGenerator : TreeGenerator
         AddInitializationResource(context, "Public.CloneableAttribute.cs", "Markers");
         AddInitializationResource(context, "Public.CloneableAttribute[T].cs", "Markers");
     }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    protected override List<Type> TypeAttributes { get; } = [
+        typeof(CloneableAttribute),
+        typeof(CloneableAttribute<>),];
 }

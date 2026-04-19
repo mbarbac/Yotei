@@ -11,7 +11,5 @@ public static class Test_
     }
 }
 
-//[Cloneable(UseVirtual = true)]
-//public class MyType
-//{
-//}
+[Cloneable(UseVirtual = true)]
+public partial class MyType { }

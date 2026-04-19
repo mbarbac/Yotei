@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools.Generators;
+﻿using System.ComponentModel;
+
+namespace Yotei.Tools.Generators;
 
 /* To DEBUG:
  * - Install the .NET Compiler SDK (in addition to Roslyn components).
@@ -29,7 +31,7 @@ public partial class TreeGenerator : IIncrementalGenerator
     /// Invoked to register post-initialization actions, such as reading external source files, or
     /// generating code for marker attributes, among others. By default, this base method adds the
     /// <see langword="Microsoft.CodeAnalysis.Embedded"/> attribute to the compilation.
-    /// <br/> Inheritors may want to invoke their base method first.
+    /// <br/> Inheritors will typically invoke their base method first.
     /// </summary>
     /// <param name="context"></param>
     protected virtual void OnInitialize(IncrementalGeneratorPostInitializationContext context)
@@ -39,10 +41,75 @@ public partial class TreeGenerator : IIncrementalGenerator
 
     // ----------------------------------------------------
 
+    /// <summary>
+    /// The collection of attribute types used to identify decorated type-alike elements.
+    /// </summary>
+    protected virtual List<Type> TypeAttributes { get; } = [];
+
+    /// <summary>
+    /// The collection of attribute types used to identify decorated property-alike elements.
+    /// </summary>
+    protected virtual List<Type> PropertyAttributes { get; } = [];
+
+    /// <summary>
+    /// The collection of attribute types used to identify decorated field-alike elements.
+    /// </summary>
+    protected virtual List<Type> FieldAttributes { get; } = [];
+
+    /// <summary>
+    /// The collection of attribute types used to identify decorated method-alike elements.
+    /// </summary>
+    protected virtual List<Type> MethodAttributes { get; } = [];
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// The collection of fully qualified attribute type names used to identify decorated type
+    /// -alike elements.
+    /// </summary>
+    protected virtual List<string> TypeAttributeNames { get; } = [];
+
+    /// <summary>
+    /// The collection of fully qualified attribute type names used to identify decorated property
+    /// -alike elements.
+    /// </summary>
+    protected virtual List<string> PropertyAttributeNames { get; } = [];
+
+    /// <summary>
+    /// The collection of fully qualified attribute type names used to identify decorated field
+    /// -alike elements.
+    /// </summary>
+    protected virtual List<string> FieldAttributeNames { get; } = [];
+
+    /// <summary>
+    /// The collection of fully qualified attribute type names used to identify decorated method
+    /// -alike elements.
+    /// </summary>
+    protected virtual List<string> MethodAttributeNames { get; } = [];
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to quickly determine if the given syntax node shall be considered as a potential
+    /// source code generation candidate, or not. By default, this method validates that the node
+    /// is among the recognized ones, and that the list of attribute types or attribute names for
+    /// its kind is any not an empty one.
+    /// </summary>
+    /// <param name="node"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
     protected virtual bool TreePredicate(SyntaxNode node, CancellationToken token)
     {
-        // TODO: FastPredicate
-        return false;
+        token.ThrowIfCancellationRequested();
+
+        return node switch
+        {
+            BaseTypeDeclarationSyntax => TypeAttributes.Count > 0 || TypeAttributeNames.Count > 0,
+            BasePropertyDeclarationSyntax => PropertyAttributes.Count > 0 || PropertyAttributeNames.Count > 0,
+            BaseFieldDeclarationSyntax => FieldAttributes.Count > 0 || FieldAttributeNames.Count > 0,
+            BaseMethodDeclarationSyntax => MethodAttributes.Count > 0 || MethodAttributeNames.Count > 0,
+            _ => false
+        };
     }
 
     // ----------------------------------------------------
@@ -58,7 +125,23 @@ public partial class TreeGenerator : IIncrementalGenerator
     /// <returns></returns>
     protected virtual INode CaptureNode(GeneratorSyntaxContext context, CancellationToken token)
     {
+        token.ThrowIfCancellationRequested();
+
+        var node = context.Node;
+        var model = context.SemanticModel;
+
         // TODO: CaptureNode
+        if (node is BaseTypeDeclarationSyntax syntax)
+        {
+            var symbol = model.GetDeclaredSymbol(syntax, token);
+            if (symbol == null) return null!;
+
+            var atx = FindSyntaxAttributes(symbol, syntax);
+            var ats = FilterAttributes(atx, TypeAttributes, TypeAttributeNames);
+            if (ats.Count == 0) return null!;
+        }
+
+        // Finishing...
         return null!;
     }
 

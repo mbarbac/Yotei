@@ -28,6 +28,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\EasyPropertySymbol.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\EasyFieldSymbol.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Infrastructure\INode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Infrastructure\ITreeNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Infrastructure\IChildNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Infrastructure\ErrorNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\__.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeGeneratorEx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeGenerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeGeneratorOptions.cs" />

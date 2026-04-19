@@ -13,7 +13,7 @@ namespace Yotei.Tools.CloneGenerator;
 [AttributeUsage(
     AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface,
     Inherited = false,
-    AllowMultiple = false)]
+     AllowMultiple = true)] // DEBUG-ONLY: change AllowMultiple to false when finished
 public class CloneableAttribute<T> : Attribute
 {
     /// <summary>
