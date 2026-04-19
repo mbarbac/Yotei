@@ -25,15 +25,8 @@
 	</ItemGroup>
 
 	<!--Generator configuration options-->
-	<PropertyGroup>
-		<TreeGeneratorOptions_UseFileFolders>true</TreeGeneratorOptions_UseFileFolders>
-		<TreeGeneratorOptions_ReverseFileNames>true</TreeGeneratorOptions_ReverseFileNames>
-		<TreeGeneratorOptions_EmitNullabilityHelpers>true</TreeGeneratorOptions_EmitNullabilityHelpers>
-	</PropertyGroup>
 	<ItemGroup>
-		<CompilerVisibleProperty Include="TreeGeneratorOptions_UseFileFolders" />
-		<CompilerVisibleProperty Include="TreeGeneratorOptions_ReverseFileNames" />
-		<CompilerVisibleProperty Include="TreeGeneratorOptions_EmitNullabilityHelpers" />
+		<AdditionalFiles Include="TreeGeneratorOptions.ini" />
 	</ItemGroup>
 
 	<!-- DEBUG configuration -->

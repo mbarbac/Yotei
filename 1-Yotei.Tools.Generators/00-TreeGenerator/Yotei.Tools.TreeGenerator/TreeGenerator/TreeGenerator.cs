@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Net.Http.Headers;
 
 namespace Yotei.Tools.Generators;
 
@@ -115,6 +116,88 @@ public partial class TreeGenerator : IIncrementalGenerator
     // ----------------------------------------------------
 
     /// <summary>
+    /// Invoked to capture the relevant information into a new detached source generation node.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <param name="syntax"></param>
+    /// <param name="attributes"></param>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    protected virtual TypeNode CreateNode(
+        INamedTypeSymbol symbol,
+        BaseTypeDeclarationSyntax syntax,
+        IEnumerable<AttributeData> attributes,
+        SemanticModel model)
+    {
+        var item = new TypeNode(symbol);
+        item.SyntaxNodes.Add(syntax);
+        item.Attributes.AddRange(attributes);
+        return item;
+    }
+
+    /// <summary>
+    /// Invoked to capture the relevant information into a new detached source generation node.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <param name="syntax"></param>
+    /// <param name="attributes"></param>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    protected virtual PropertyNode CreateNode(
+        IPropertySymbol symbol,
+        BasePropertyDeclarationSyntax syntax,
+        IEnumerable<AttributeData> attributes,
+        SemanticModel model)
+    {
+        var item = new PropertyNode(symbol);
+        item.SyntaxNodes.Add(syntax);
+        item.Attributes.AddRange(attributes);
+        return item;
+    }
+
+    /// <summary>
+    /// Invoked to capture the relevant information into a new detached source generation node.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <param name="syntax"></param>
+    /// <param name="attributes"></param>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    protected virtual FieldNode CreateNode(
+        IFieldSymbol symbol,
+        BaseFieldDeclarationSyntax syntax,
+        IEnumerable<AttributeData> attributes,
+        SemanticModel model)
+    {
+        var item = new FieldNode(symbol);
+        item.SyntaxNodes.Add(syntax);
+        item.Attributes.AddRange(attributes);
+        return item;
+    }
+
+    /// <summary>
+    /// Invoked to capture the relevant information into a new detached source generation node.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <param name="syntax"></param>
+    /// <param name="attributes"></param>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    protected virtual MethodNode CreateNode(
+        IMethodSymbol symbol,
+        BaseMethodDeclarationSyntax syntax,
+        IEnumerable<AttributeData> attributes,
+        SemanticModel model)
+    {
+        var item = new MethodNode(symbol);
+        item.SyntaxNodes.Add(syntax);
+        item.Attributes.AddRange(attributes);
+        return item;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Tries to transform the potential syntax node candidate carried by the given context into
     /// a source code tree-oriented generator one. This method may also return error nodes that
     /// carry diagnostics to be reported, or <see langword="null"/> if the syntax node is to be
@@ -123,6 +206,7 @@ public partial class TreeGenerator : IIncrementalGenerator
     /// <param name="context"></param>
     /// <param name="token"></param>
     /// <returns></returns>
+    [SuppressMessage("", "IDE0019")]
     protected virtual INode CaptureNode(GeneratorSyntaxContext context, CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
@@ -130,8 +214,10 @@ public partial class TreeGenerator : IIncrementalGenerator
         var node = context.Node;
         var model = context.SemanticModel;
 
-        // TODO: CaptureNode
-        if (node is BaseTypeDeclarationSyntax syntax)
+        // Type-alike nodes.
+        while (node is BaseTypeDeclarationSyntax syntax && (
+            syntax is TypeDeclarationSyntax ||
+            syntax is EnumDeclarationSyntax))
         {
             var symbol = model.GetDeclaredSymbol(syntax, token);
             if (symbol == null) return null!;
@@ -139,6 +225,66 @@ public partial class TreeGenerator : IIncrementalGenerator
             var atx = FindSyntaxAttributes(symbol, syntax);
             var ats = FilterAttributes(atx, TypeAttributes, TypeAttributeNames);
             if (ats.Count == 0) return null!;
+
+            var temp = CreateNode(symbol, syntax, ats, model);
+            return temp;
+        }
+
+        // Property-alike nodes.
+        while (node is BasePropertyDeclarationSyntax syntax && (
+            syntax is PropertyDeclarationSyntax ||
+            syntax is IndexerDeclarationSyntax ||
+            syntax is EventDeclarationSyntax))
+        {
+            var symbol = model.GetDeclaredSymbol(syntax, token) as IPropertySymbol;
+            if (symbol == null) return null!;
+
+            var atx = FindSyntaxAttributes(symbol, syntax);
+            var ats = FilterAttributes(atx, PropertyAttributes, PropertyAttributeNames);
+            if (ats.Count == 0) return null!;
+
+            var temp = CreateNode(symbol, syntax, ats, model);
+            return temp;
+        }
+
+        // Property-alike nodes.
+        while (node is BaseFieldDeclarationSyntax syntax && (
+            syntax is FieldDeclarationSyntax ||
+            syntax is EventFieldDeclarationSyntax))
+        {
+            var items = syntax.Declaration.Variables;
+            foreach (var item in items)
+            {
+                var symbol = model.GetDeclaredSymbol(item, token) as IFieldSymbol;
+                if (symbol == null) continue;
+
+                var atx = FindSyntaxAttributes(symbol, syntax);
+                var ats = FilterAttributes(atx, FieldAttributes, FieldAttributeNames);
+                if (ats.Count == 0) continue;
+
+                var temp = CreateNode(symbol, syntax, ats, model);
+                return temp;
+            }
+            return null!;
+        }
+
+        // Method-alike nodes.
+        while (node is BaseMethodDeclarationSyntax syntax && (
+            syntax is MethodDeclarationSyntax ||
+            syntax is ConstructorDeclarationSyntax ||
+            syntax is DestructorDeclarationSyntax ||
+            syntax is OperatorDeclarationSyntax ||
+            syntax is ConversionOperatorDeclarationSyntax))
+        {
+            var symbol = model.GetDeclaredSymbol(syntax, token);
+            if (symbol == null) return null!;
+
+            var atx = FindSyntaxAttributes(symbol, syntax);
+            var ats = FilterAttributes(atx, PropertyAttributes, PropertyAttributeNames);
+            if (ats.Count == 0) return null!;
+
+            var temp = CreateNode(symbol, syntax, ats, model);
+            return temp;
         }
 
         // Finishing...
@@ -151,12 +297,15 @@ public partial class TreeGenerator : IIncrementalGenerator
     /// Invoked to both generate the source code of the captured nodes, and to report the error
     /// conditions the error nodes may carry with them.
     /// </summary>
-    /// <param name="context"></param>
+    /// <param name="gencontext"></param>
     /// <param name="source"></param>
-    protected virtual void EmitNodes(
-        SourceProductionContext context,
-        ImmutableArray<INode> source)
+    protected void EmitNodes(
+        SourceProductionContext gencontext,
+        (ImmutableArray<INode>, ImmutableArray<TreeOptions>) source)
     {
+        var nodes = source.Item1;
+        var options = source.Item2.Length > 0 ? source.Item2[0] : new TreeOptions();
+
         // TODO: EmitNodes
         return;
     }

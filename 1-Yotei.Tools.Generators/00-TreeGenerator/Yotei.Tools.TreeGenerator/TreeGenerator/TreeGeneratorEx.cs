@@ -18,8 +18,14 @@ partial class TreeGenerator
             .Where(static x => x is not null)
             .Collect();
 
+        var options = context.AdditionalTextsProvider
+            .Where(x => x.Path.EndsWith("TreeGeneratorOptions.ini"))
+            .Select((x, token) => new TreeOptions(x.GetText(token)?.ToString()))
+            .Collect();
+
         // Registering source code emit actions...
-        context.RegisterSourceOutput(items, EmitNodes);
+        var combined = items.Combine(options);
+        context.RegisterSourceOutput(combined, EmitNodes);
     }
 
     // ----------------------------------------------------
