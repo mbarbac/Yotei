@@ -27,4 +27,29 @@ public class CloneGenerator : TreeGenerator
     protected override List<Type> TypeAttributes { get; } = [
         typeof(CloneableAttribute),
         typeof(CloneableAttribute<>),];
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Gets the version of this generator for documentation purposes.
+    /// </summary>
+    public static string DocVersion => Assembly.GetExecutingAssembly().GetName().Version.To3String();
+
+    /// <summary>
+    /// Gets the string that emits the attribute decoration, for documentation purposes.
+    /// </summary>
+    public static string DocAttribute => $$"""
+        [System.CodeDom.Compiler.GeneratedCodeAttribute("{{nameof(CloneGenerator)}}", "{{DocVersion}}")]
+        """;
+
+    /// <summary>
+    /// Emits appropriate documentation for the generated methods.
+    /// </summary>
+    /// <param name="cb"></param>
+    public static void EmitDocumentation(CodeBuilder cb) => cb.AppendLine($$"""
+            /// <summary>
+            /// <inheritdoc cref="ICloneable.Clone"/>
+            /// </summary>
+            /// {{DocAttribute}}
+            """);
 }
