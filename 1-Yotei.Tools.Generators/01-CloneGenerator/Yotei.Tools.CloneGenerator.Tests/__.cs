@@ -2,14 +2,14 @@
 
 // ========================================================
 //[Enforced]
-public static class Test_
+public static partial class Test_
 {
+    [Cloneable(UseVirtual = true)]
+    public partial class MyType { }
+
     //[Enforced]
     [Fact]
     public static void Test()
     {
     }
 }
-
-[Cloneable(UseVirtual = true)]
-public partial class MyType { }

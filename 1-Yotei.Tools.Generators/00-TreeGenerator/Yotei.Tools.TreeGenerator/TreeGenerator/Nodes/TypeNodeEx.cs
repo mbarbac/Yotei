@@ -179,26 +179,25 @@ partial class TypeNode
         if (pragmas.Count > 0) { foreach (var str in pragmas) cb.AppendLine(str); cb.AppendLine(); }
         if (usings.Count > 0) { foreach (var str in usings) cb.AppendLine(str); cb.AppendLine(); }
 
-        // Namespaces...
+        // Namespaces, for simplicity we pick the first one...
+        // LOW: process all namespaces in TypeNode.EmitParentsFromSyntaxNodes
         var num = 0;
-        foreach (var syntax in syntaxes)
+        var item = syntaxes.First();
+        var ichain = item.GetChain().Where(static x => x is BaseNamespaceDeclarationSyntax);
+        foreach (var ns in ichain)
         {
-            var nschain = syntax.GetChain().Where(static x => x is BaseNamespaceDeclarationSyntax);
-            foreach (var ns in nschain)
-            {
-                var name = ((BaseNamespaceDeclarationSyntax)ns).Name.ToString();
-                cb.AppendLine($"namespace {name}");
-                cb.AppendLine("{");
-                cb.IndentLevel++;
+            var name = ((BaseNamespaceDeclarationSyntax)ns).Name.ToString();
+            cb.AppendLine($"namespace {name}");
+            cb.AppendLine("{");
+            cb.IndentLevel++;
 
-                EmitNamespaceUsings((BaseNamespaceDeclarationSyntax)ns, cb);
-                num++;
-            }
+            EmitNamespaceUsings((BaseNamespaceDeclarationSyntax)ns, cb);
+            num++;
         }
 
         // Emitting parent types...
         num += EmitContainingTypes(symbol, cb);
-        return num + 1;
+        return num;
     }
 
     // ----------------------------------------------------
