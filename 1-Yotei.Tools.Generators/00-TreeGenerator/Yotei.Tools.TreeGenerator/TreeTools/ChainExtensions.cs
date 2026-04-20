@@ -5,7 +5,8 @@ public static class ChainExtensions
 {
     /// <summary>
     /// Gets the chain of symbols up to the given one, such as combined describes the declaring
-    /// elements. The given symbol is not included in the returned list.
+    /// elements.
+    /// <br/> The given symbol is NOT INCLUDED in the returned list.
     /// </summary>
     /// <param name="symbol"></param>
     /// <returns></returns>
@@ -33,7 +34,8 @@ public static class ChainExtensions
 
     /// <summary>
     /// Gets the chain of symbols up to the given one, such as combined describes the declaring
-    /// elements. The given syntax node is not included in the returned list.
+    /// elements.
+    /// <br/> The given syntax node is NOT INCLUDED in the returned list.
     /// </summary>
     /// <param name="syntax"></param>
     /// <returns></returns>
