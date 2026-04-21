@@ -59,16 +59,58 @@ public class XTypeNode : TypeNode
     /// <summary>
     /// Invoked when the host type is an interface.
     /// </summary>
-    bool EmitHostInterface(ref TreeContext context, CodeBuilder cb)
+    bool EmitHostInterface(ref TreeContext _, CodeBuilder cb)
     {
-        throw null;
+        var hasrtype = Attribute.HasReturnType(out var rtype, out var rnull);
+        if (!hasrtype) { rtype = Symbol; rnull = false; }
+
+        var options = rtype!.GetReturnOptions(Symbol);
+        var strtype = rtype!.EasyName(options);
+        var strnull = rnull ? "?" : string.Empty;
+        var mods = GetModifiers();
+
+        CloneGenerator.EmitDocumentation(cb);
+        cb.AppendLine($"{mods}{strtype}{strnull} Clone();");
+
+        return true;
 
         /// <summary>
         /// Obtains the appropriate modifiers (followed by an space separator), or null if any.
         /// </summary>
         string? GetModifiers()
         {
-            throw null;
+            if (!Attribute.HasUseVirtual(out var hvirt)) hvirt = true;
+            var hsealed = Symbol.IsSealed;
+
+            var found = Finder.Find(
+                [Symbol.AllBaseTypes, Symbol.AllInterfaces], out string? value,
+                (type, out value) =>
+                {
+                    // Existing method...
+                    while (Helpers.TryFindMethod(type, [], out var method))
+                    {
+                        // We need an explicit accessibility...
+                        var dec = method.DeclaredAccessibility; if (dec == Accessibility.Private) break;
+                        var str = dec.ToAccessibilityString(false); if (str == null) break;
+
+                        value = dec == Accessibility.Public ? "new " : $"{str} new ";
+                        return true;
+                    }
+
+                    // Method requested...
+                    while (type.HasCloneableAttribute(out var _, out var _))
+                    {
+                        value = $"new ";
+                        return true;
+                    }
+
+                    // Try next...
+                    value = null;
+                    return false;
+                });
+
+            // Finishing...
+            return found ? value : "public abstract ";
         }
     }
 
@@ -77,16 +119,77 @@ public class XTypeNode : TypeNode
     /// <summary>
     /// Invoked when the host type is an abstract type.
     /// </summary>
-    bool EmitHostAbstract(ref TreeContext context, CodeBuilder cb)
+    bool EmitHostAbstract(ref TreeContext _, CodeBuilder cb)
     {
-        throw null;
+        var hasrtype = Attribute.HasReturnType(out var rtype, out var rnull);
+        if (!hasrtype) { rtype = Symbol; rnull = false; }
+
+        var options = rtype!.GetReturnOptions(Symbol);
+        var strtype = rtype!.EasyName(options);
+        var strnull = rnull ? "?" : string.Empty;
+        var mods = GetModifiers();
+
+        CloneGenerator.EmitDocumentation(cb);
+        cb.AppendLine($"{mods}{strtype}{strnull} Clone();");
+
+        EmitExplicitInterfaces(cb);
+        return true;
 
         /// <summary>
         /// Obtains the appropriate modifiers (followed by an space separator), or null if any.
         /// </summary>
+        [SuppressMessage("", "IDE0075")]
         string? GetModifiers()
         {
-            throw null;
+            if (!Attribute.HasUseVirtual(out var hvirt)) hvirt = true;
+            var hsealed = Symbol.IsSealed;
+
+            var found = Finder.Find(
+                [Symbol.AllBaseTypes, Symbol.AllInterfaces], out string? value,
+                (type, out value) =>
+                {
+                    // Existing method...
+                    while (Helpers.TryFindMethod(type, [], out var method))
+                    {
+                        // We need an explicit accessibility...
+                        var dec = method.DeclaredAccessibility; if (dec == Accessibility.Private) break;
+                        var str = dec.ToAccessibilityString(false); if (str == null) break;
+
+                        if (type.IsInterface) { value = $"{str} abstract "; return true; }
+                        else if (type.IsAbstract) { value = $"{str} abstract override "; return true; }
+                        else
+                        {
+                            var mvirt = method.IsVirtual || method.IsAbstract || method.IsOverride;
+                            value = !mvirt ? $"{str} abstract new " : $"{str} abstract override ";
+                            return true;
+                        }
+                    }
+
+                    // Method requested...
+                    while (type.HasCloneableAttribute(out var at, out var _))
+                    {
+                        if (type.IsInterface) { value = "public abstract "; return true; }
+                        if (type.IsAbstract) { value = "public abstract override "; return true; }
+                        else
+                        {
+                            // If appears in a base method, defer to it...
+                            if (Helpers.TryFindMethod(null, [type.AllBaseTypes], out var _)) break;
+
+                            // Otherwise, use the attribute...
+                            var mvirt = at.HasUseVirtual(out var temp) ? temp : true;
+                            value = !mvirt ? "public abstract new " : "public abstract override ";
+
+                            return true;
+                        }
+                    }
+
+                    // Try next...
+                    value = null;
+                    return false;
+                });
+
+            // Finishing...
+            return found ? value : "public abstract ";
         }
     }
 
@@ -97,14 +200,98 @@ public class XTypeNode : TypeNode
     /// </summary>
     bool EmitHostRegular(ref TreeContext context, CodeBuilder cb)
     {
-        throw null;
+        var ctor = Symbol.FindCopyConstructor(strict: false);
+        if (ctor == null) { TreeError.NoCopyConstructor.Report(Symbol, context.Context); return false; }
+
+        var hasrtype = Attribute.HasReturnType(out var rtype, out var rnull);
+        if (!hasrtype) { rtype = Symbol; rnull = false; }
+
+        var options = rtype!.GetReturnOptions(Symbol);
+        var strtype = rtype!.EasyName(options);
+        var strnull = rnull ? "?" : string.Empty;
+        var mods = GetModifiers();
+
+        CloneGenerator.EmitDocumentation(cb);
+        cb.AppendLine($"{mods}{strtype}{strnull} Clone()");
+        cb.AppendLine("{");
+        cb.IndentLevel++;
+        {
+            var host = Symbol.EasyName();
+            cb.AppendLine($"var host = new {host}(this);");
+            cb.AppendLine($"return host;");
+        }
+        cb.IndentLevel--;
+        cb.AppendLine("}");
+
+        EmitExplicitInterfaces(cb);
+        return true;
 
         /// <summary>
         /// Obtains the appropriate modifiers (followed by an space separator), or null if any.
         /// </summary>
+        [SuppressMessage("", "IDE0075")]
         string? GetModifiers()
         {
-            throw null;
+            if (!Attribute.HasUseVirtual(out var hvirt)) hvirt = true;
+            var hsealed = Symbol.IsSealed;
+
+            var found = Finder.Find(
+                [Symbol.AllBaseTypes, Symbol.AllInterfaces], out string? value,
+                (type, out value) =>
+                {
+                    // Existing method...
+                    while (Helpers.TryFindMethod(type, [], out var method))
+                    {
+                        // We need an explicit accessibility...
+                        var dec = method.DeclaredAccessibility; if (dec == Accessibility.Private) break;
+                        var str = dec.ToAccessibilityString(false); if (str == null) break;
+
+                        if (type.IsInterface)
+                        {
+                            value = hsealed || !hvirt ? $"{str} " : $"{str} virtual ";
+                            return true;
+                        }
+                        else
+                        {
+                            var mvirt = method.IsVirtual || method.IsAbstract || method.IsOverride;
+                            value = mvirt
+                                ? (!hvirt ? $"{str} new " : $"{str} override ")
+                                : (!hvirt ? $"{str} new " : $"{str} new virtual ");
+
+                            return true;
+                        }
+                    }
+
+                    // Method requested...
+                    while (type.HasCloneableAttribute(out var at, out _))
+                    {
+                        if (type.IsInterface)
+                        {
+                            value = hsealed || !hvirt ? $"public " : $"public virtual ";
+                            return true;
+                        }
+                        else
+                        {
+                            // If appears in a base method, defer to it...
+                            if (Helpers.TryFindMethod(null, [type.AllBaseTypes], out _)) break;
+
+                            // Otherwise, use the attribute...
+                            var mvirt = at.HasUseVirtual(out var temp) ? temp : true;
+                            value = mvirt
+                                ? (!hvirt ? $"public new " : $"public override ")
+                                : (!hvirt ? $"public new " : $"public new virtual ");
+
+                            return true;
+                        }
+                    }
+
+                    // Try next...
+                    value = null;
+                    return false;
+                });
+
+            // Finishing...
+            return found ? value : (hsealed || !hvirt ? "public " : "public virtual ");
         }
     }
 
@@ -121,7 +308,7 @@ public class XTypeNode : TypeNode
         var items = GetExplicitInterfaces();
         foreach (var item in items)
         {
-            var iface = item.IFace.EasyName(options);            
+            var iface = item.IFace.EasyName(options);
             var core = item.IFace.Name == nameof(ICloneable); // Special 'ICloneable' case...
             var rtype = core ? "object" : item.RType.EasyName(EasyTypeOptions.Full);
             if (item.RNullable && !rtype.EndsWith('?')) rtype += '?';
