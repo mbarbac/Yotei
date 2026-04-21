@@ -81,7 +81,7 @@ public partial class TypeNode : ITreeNode
         if (!ChildMethods.SequenceEqual(valid.ChildMethods, new MyComparer<MethodNode>())) return false;
         return true;
     }
-    struct MyComparer<T> : IEqualityComparer<T> where T : ITreeNode
+    readonly struct MyComparer<T> : IEqualityComparer<T> where T : ITreeNode
     {
         readonly static SymbolEqualityComparer Comparer = SymbolEqualityComparer.Default;
         public readonly bool Equals(T x, T y) => Comparer.Equals(x.Symbol, y.Symbol);
@@ -137,15 +137,6 @@ public partial class TypeNode : ITreeNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// Invoked to obtain the base list (what follows the semicolon character) that shall be added
-    /// to the type header, or null if any.
-    /// </summary>
-    /// <returns></returns>
-    protected virtual string? GetBaseList() => null;
-
-    // ----------------------------------------------------
-
-    /// <summary>
     /// Invoked to validate this instance before emitting its source code.
     /// <br/> If this method returns <see langword="false"/>, then its code generation is aborted.
     /// <br/> Inheritors will typically invoke their base method first.
@@ -170,6 +161,15 @@ public partial class TypeNode : ITreeNode
         TypeKind.Class or
         TypeKind.Struct or
         TypeKind.Interface;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to obtain the base list (what follows the semicolon character) that shall be added
+    /// to the type header, or null if any.
+    /// </summary>
+    /// <returns></returns>
+    protected virtual string? GetBaseList() => null;
 
     // ----------------------------------------------------
 

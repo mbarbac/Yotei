@@ -41,6 +41,9 @@ partial class TypeNode
     {
         context.Context.CancellationToken.ThrowIfCancellationRequested();
 
+        // Validation...
+        if (!OnValidate(context.Context)) return false;
+
         // Parent elements, returning how many levels were opened...
         var num = OnEmitParents(ref context, cb);
 
