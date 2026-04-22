@@ -1,0 +1,53 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+		<CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
+		<IsRoslynComponent>true</IsRoslynComponent>
+		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+		<!--Standard properties-->
+		<Configurations>Debug;Release;Local</Configurations>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<LangVersion>preview</LangVersion>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<NoWarn>IDE0130</NoWarn>
+	</PropertyGroup>
+	<!--IDE0130: Namespace does not match folder structure-->
+
+	<ItemGroup>
+		<None Include="README.md" Pack="true" PackagePath="" />
+		<None Include="LICENSE" Pack="true" PackagePath="" />
+	</ItemGroup>
+
+	<PropertyGroup>
+		<Description>Yotei With Generator</Description>
+		<Version>0.6.5-v0001</Version>
+		<Authors>mbarbac@hotmail.com</Authors>
+		<PackageProjectUrl>https://github.com/mbarbac/Yotei</PackageProjectUrl>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<IsPackable>true</IsPackable>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<DebugType>portable</DebugType>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+	</PropertyGroup>
+
+	<!--Packages and imported shared projects-->
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.3.0" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="5.3.0" PrivateAssets="all" />
+	</ItemGroup>
+	<Import Project="..\..\..\1-Yotei.Tools\Yotei.Tools.Shared\Yotei.Tools.Shared.projitems" Label="Shared" />
+	<Import Project="..\..\00-TreeGenerator\Yotei.Tools.TreeGenerator\Yotei.Tools.TreeGenerator.projitems" Label="Shared" />
+
+	<!--Generator resources-->
+	<ItemGroup>
+		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+		<EmbeddedResource Include="Public\WithAttribute.cs" />
+		<EmbeddedResource Include="Public\InheritsWithAttribute.cs" />
+	</ItemGroup>
+
+</Project>

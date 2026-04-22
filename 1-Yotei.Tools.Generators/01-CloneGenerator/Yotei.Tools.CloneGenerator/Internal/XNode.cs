@@ -1,10 +1,16 @@
 ﻿namespace Yotei.Tools.CloneGenerator;
 
 // ========================================================
-public static class Helpers
+public interface IXNode
 {
-    public const string USEVIRTUAL = "UseVirtual";
-    public const string RETURNTYPE = "ReturnType";
+    INamedTypeSymbol Symbol { get; }
+}
+
+// ========================================================
+public static class XNode
+{
+    const string USEVIRTUAL = "UseVirtual";
+    const string RETURNTYPE = "ReturnType";
 
     // ----------------------------------------------------
 
@@ -99,7 +105,7 @@ public static class Helpers
             }
         }
 
-        // Non-generic attribute...
+        // Generic attribute...
         else if (at.AttributeClass.Arity == 1)
         {
             value = (INamedTypeSymbol)at.AttributeClass.TypeArguments[0];
@@ -136,8 +142,8 @@ public static class Helpers
     // ----------------------------------------------------
 
     /// <summary>
-    /// Tries to find a valid method in either the given host type, or in any of the types in the
-    /// given chains, in order. If found, returns it in the out argument.
+    /// Tries to find a valid method in either the given host type, if not null, or in any of the
+    /// types in the given chains, in order. If found, returns it in the out argument.
     /// </summary>
     /// <param name="type"></param>
     /// <param name="chains"></param>

@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Yotei.Tools.WithGenerator": {
+      "commandName": "Project"
+    },
+    "WithGenerator.Debug": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "..\\Yotei.Tools.WithGenerator.Tests\\Yotei.Tools.WithGenerator.Tests.csproj"
+    }
+  }
+}
