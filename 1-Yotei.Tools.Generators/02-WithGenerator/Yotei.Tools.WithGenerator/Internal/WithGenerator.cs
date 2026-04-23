@@ -105,6 +105,6 @@ public class WithGenerator : TreeGenerator
             /// <summary>
             /// Emulates the '<see langword="with"/>' keyword for the '{{name}}' member.
             /// </summary>
-            /// {{DocAttribute}}
+            {{DocAttribute}}
             """);
 }

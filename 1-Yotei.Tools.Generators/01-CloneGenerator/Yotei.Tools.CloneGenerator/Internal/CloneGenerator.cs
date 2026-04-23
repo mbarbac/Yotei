@@ -72,6 +72,6 @@ public class CloneGenerator : TreeGenerator
             /// <summary>
             /// <inheritdoc cref="ICloneable.Clone"/>
             /// </summary>
-            /// {{DocAttribute}}
+            {{DocAttribute}}
             """);
 }
