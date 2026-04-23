@@ -1,8 +1,3 @@
-PROBLEMA-1:
-- Estoy teniendo todo el rato unhandled exception en DevHub.exe
-- Parece que solo ocurre en debug-mode.
-- Rehacer código desde el principio para validar que esto es así y encontrar al culpable.
-
 PROBLEMA-2:
 - En IListTemplate<T>, método Remove(Predicate<T> predicate)
 - Me devuelve la parte del parametro como 'Predicate<?>' que obviamente no es correcto.

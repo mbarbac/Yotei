@@ -48,6 +48,12 @@
   <Folder Name="/1-Yotei.Tools/Tests/">
     <Project Path="1-Yotei.Tools/Yotei.Tools.Tests/Yotei.Tools.Tests.csproj" Id="b6a1e072-9195-4e7f-961a-5f0d58fd3a5a" />
   </Folder>
+  <Folder Name="/2-Yotei.ORM.Generators/" />
+  <Folder Name="/2-Yotei.ORM/">
+    <Project Path="2-Yotei.ORM/Yotei.ORM/Yotei.ORM.csproj" Id="a5900777-96df-466c-8203-a5683b94873d">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
+  </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".gitignore" />
     <File Path="LICENSE" />
