@@ -28,11 +28,6 @@
 		</PackageReference>
 	</ItemGroup>
 
-	<!--Generator configuration options-->
-	<ItemGroup>
-		<AdditionalFiles Include="TreeGeneratorOptions.ini" />
-	</ItemGroup>
-
 	<!-- DEBUG configuration -->
 	<ItemGroup Condition="'$(Configuration)'=='Debug'">
 	  <ProjectReference Include="..\..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
@@ -51,6 +46,11 @@
 		<PackageReference Include="Yotei.Tools.WithGenerator" Version="0.6.5-v0001" />
 	</ItemGroup>
 
+	<!--Generator configuration options-->
+	<ItemGroup>
+		<AdditionalFiles Include="TreeGeneratorOptions.ini" />
+	</ItemGroup>
+	
 	<!-- Emit generated files -->
 	<PropertyGroup>
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
