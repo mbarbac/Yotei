@@ -28,9 +28,9 @@ public partial interface ICoreBag<T> : ICollection<T>, ICollection
     bool Contains(Predicate<T> predicate);
 
     /// <summary>
-    /// Tries to find an element that matches the given predicate. If so, returns true and sets
-    /// the out argument to the arbitrary found one. Otherwise returns false and the out argument
-    /// is undetermined.
+    /// Tries to find an arbitrary element that matches the given predicate. If so, returns true
+    /// and sets the out argument to the arbitrary found one. Otherwise returns false and the out
+    /// argument is undetermined.
     /// </summary>
     /// <param name="predicate"></param>
     /// <param name="value"></param>
@@ -38,7 +38,7 @@ public partial interface ICoreBag<T> : ICollection<T>, ICollection
     bool Find(Predicate<T> predicate, out T value);
 
     /// <summary>
-    /// Tries to find all the element that match the given predicate. If so, returns true and sets
+    /// Tries to find all the elements that match the given predicate. If so, returns true and sets
     /// the out argument to a list with the found ones. Otherwise returns false and the out argument
     /// is undetermined.
     /// </summary>
