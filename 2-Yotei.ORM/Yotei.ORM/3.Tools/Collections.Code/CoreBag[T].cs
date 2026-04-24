@@ -59,22 +59,7 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// </summary>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual string ToDebugString(int count)
-    {
-        if (Count == 0) return "0:[]";
-        if (count == 0) return $"{Count}:[...]";
-
-        return Count <= count
-            ? $"{Count}:[{string.Join(", ", this.Select(ToDebugItem))}]"
-            : $"{Count}:[{string.Join(", ", this.Take(count).Select(ToDebugItem))}, ...]";
-    }
-
-    /// <summary>
-    /// Invoked to return a string representation of the given value, for debug purposes.
-    /// </summary>
-    /// <param name="value"></param>
-    /// <returns></returns>
-    protected virtual string ToDebugItem(T value) => value.Sketch();
+    public virtual string ToDebugString(int count) => Items.ToDebugString(count);
 
     // ----------------------------------------------------
 

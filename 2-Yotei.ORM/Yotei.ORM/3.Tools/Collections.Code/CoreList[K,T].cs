@@ -300,7 +300,7 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     public void Trim() => Items.TrimExcess();
 
     /// <summary>
-    /// <inheritdoc></inheritdoc>/>
+    /// <inheritdoc/>
     /// </summary>
     /// <param name="array"></param>
     /// <param name="index"></param>

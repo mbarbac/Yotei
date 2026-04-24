@@ -23,11 +23,11 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>, IReadOnlyColle
     new int Count { get; }
 
     /// <summary>
-    /// Gets or sets the element at the given index.
+    /// Gets the element at the given index.
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    new T this[int index] { get; set; }
+    new T this[int index] { get; }
 
     /// <summary>
     /// Determines if this collection contains an element with the given key.
@@ -176,9 +176,10 @@ public partial interface IInvariantList<K, T> : IReadOnlyList<T>, IReadOnlyColle
     /// Returns a copy of this instance where the given value has been inserted into it at the
     /// given index.
     /// </summary>
+    /// <param name="index"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    IInvariantList<K, T> Insert(T value);
+    IInvariantList<K, T> Insert(int index, T value);
 
     /// <summary>
     /// Returns a copy of this instance where the values from the given range have been inserted
