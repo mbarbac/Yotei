@@ -4,7 +4,7 @@ namespace Yotei.ORM.Tests;
 
 // ========================================================
 //[Enforced]
-public static partial class Test_CoreList_KT
+public static partial class Test_CoreList_T
 {
     public interface IElement { }
 
@@ -23,8 +23,8 @@ public static partial class Test_CoreList_KT
     // ----------------------------------------------------
 
     [DebuggerDisplay("{ToDebugString(3)}")]
-    [Cloneable(ReturnType = typeof(ICoreList<string, IElement>))]
-    public partial class Chain : CoreList<string, IElement>, IElement
+    [Cloneable(ReturnType = typeof(ICoreList<IElement>))]
+    public partial class Chain : CoreList<IElement>, IElement
     {
         public Chain() : base() => Comparer = new(this);
         public Chain(IEnumerable<IElement> range) : this() => AddRange(range);
@@ -36,11 +36,9 @@ public static partial class Test_CoreList_KT
         }
 
         public override IElement ValidateElement(IElement value) => value.ThrowWhenNull();
-        public override string GetKey(IElement value) => value is Named named ? named.Name : null!;
-        public override string ValidateKey(string key) => key.NotNullNotEmpty(trim: true);
-        public override bool CompareKeys(
-            string source, string target) => Comparer.Equals(source, target);
-        public override IEnumerable<IElement> FindDuplicates(string key) => base.FindDuplicates(key);
+        public override bool CompareElements(
+            IElement source, IElement target) => Comparer.Equals(source, target);
+        public override IEnumerable<IElement> FindDuplicates(IElement value) => base.FindDuplicates(value);
         public override bool AcceptDuplicated(
             IElement source, IElement other) => AllowDuplicates ? true : throw new DuplicateException().WithData(other);
 
@@ -73,10 +71,18 @@ public static partial class Test_CoreList_KT
         = false;
 
         readonly MyComparer Comparer;
-        readonly struct MyComparer(Chain master) : IEqualityComparer<string>
+        readonly struct MyComparer(Chain master) : IEqualityComparer<IElement>
         {
-            public bool Equals(string? x, string? y) => string.Compare(x, y, master.IgnoreCase) == 0;
-            public int GetHashCode(string? _) => throw new NotImplementedException();
+            public bool Equals(IElement? x, IElement? y) //=> string.Compare(x, y, master.IgnoreCase) == 0;
+            {
+                if (x is null && y is null) return true;
+                if (x is null || y is null) return false;
+
+                return x is Named xnamed && y is Named ynamed
+                    ? string.Compare(xnamed.Name, ynamed.Name, master.IgnoreCase) == 0
+                    : ReferenceEquals(x, y);
+            }
+            public int GetHashCode(IElement? _) => throw new NotImplementedException();
         }
     }
 
@@ -267,25 +273,16 @@ public static partial class Test_CoreList_KT
 
     //[Enforced]
     [Fact]
-    public static void Test_IndexOf_Key()
+    public static void Test_IndexOf_Value()
     {
         var chain = new Chain() { AllowDuplicates = true, IgnoreCase = true };
         chain.AddRange([xone, xtwo, xthree, xone]);
 
-        var index = chain.IndexOf("four"); Assert.Equal(-1, index);
+        var index = chain.IndexOf(xfour); Assert.Equal(-1, index);
 
-        index = chain.IndexOf("one"); Assert.Equal(0, index);
-        index = chain.IndexOf("ONE"); Assert.Equal(0, index);
-
-        index = chain.LastIndexOf("one"); Assert.Equal(3, index);
-        index = chain.LastIndexOf("ONE"); Assert.Equal(3, index);
-
-        var nums = chain.IndexesOf("one");
-        Assert.Equal(2, nums.Count);
-        Assert.Equal(0, nums[0]);
-        Assert.Equal(3, nums[1]);
-
-        nums = chain.IndexesOf("ONE");
+        index = chain.IndexOf(xone); Assert.Equal(0, index);
+        index = chain.LastIndexOf(xone); Assert.Equal(3, index);
+        var nums = chain.IndexesOf(xone);
         Assert.Equal(2, nums.Count);
         Assert.Equal(0, nums[0]);
         Assert.Equal(3, nums[1]);
@@ -598,37 +595,73 @@ public static partial class Test_CoreList_KT
 
     //[Enforced]
     [Fact]
-    public static void Test_Remove_Key()
+    public static void Test_Remove_Value()
     {
-        var chain = new Chain() { AllowDuplicates = true, IgnoreCase = true };
+        var chain = new Chain() { AllowDuplicates = true };
         chain.AddRange([xone, xtwo, xone, xthree]);
 
-        var done = chain.Remove("any");
+        var done = chain.Remove(xfour);
         Assert.Equal(0, done);
 
-        done = chain.Remove("ONE");
+        done = chain.Remove(xone);
         Assert.Equal(1, done);
         Assert.Equal(3, chain.Count);
         Assert.Same(xtwo, chain[0]);
         Assert.Same(xone, chain[1]);
         Assert.Same(xthree, chain[2]);
 
-        chain = new Chain() { AllowDuplicates = true, IgnoreCase = true };
+        chain = new Chain() { AllowDuplicates = true };
         chain.AddRange([xone, xtwo, xone, xthree]);
-        done = chain.RemoveLast("ONE");
+        done = chain.RemoveLast(xone);
         Assert.Equal(1, done);
         Assert.Equal(3, chain.Count);
         Assert.Same(xone, chain[0]);
         Assert.Same(xtwo, chain[1]);
         Assert.Same(xthree, chain[2]);
 
-        chain = new Chain() { AllowDuplicates = true, IgnoreCase = true };
+        chain = new Chain() { AllowDuplicates = true };
         chain.AddRange([xone, xtwo, xone, xthree]);
-        done = chain.RemoveAll("ONE");
+        done = chain.RemoveAll(xone);
         Assert.Equal(2, done);
         Assert.Equal(2, chain.Count);
         Assert.Same(xtwo, chain[0]);
         Assert.Same(xthree, chain[1]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Remove_Value_IgnoreCase()
+    {
+        var chain = new Chain() { AllowDuplicates = true, IgnoreCase = true };
+        chain.AddRange([xone, xtwo, xone, xthree]);
+
+        var done = chain.RemoveAll(new Named("ONE"));
+        Assert.Equal(2, done);
+        Assert.Equal(2, chain.Count);
+        Assert.Same(xtwo, chain[0]);
+        Assert.Same(xthree, chain[1]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Remove_Value_Nested()
+    {
+        var chain = new Chain() { AllowDuplicates = true, IgnoreCase = true };
+        chain.AddRange([xone, xtwo, xone, xthree]);
+
+        var done = chain.Remove(new Chain([xtwo, xone]));
+        Assert.Equal(2, done);
+        Assert.Equal(2, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xthree, chain[1]);
+
+        chain = new Chain() { AllowDuplicates = true, IgnoreCase = true };
+        chain.AddRange([xone, xtwo, xone, xthree]);
+
+        done = chain.RemoveAll(new Chain([xtwo, xone]));
+        Assert.Equal(3, done);
+        Assert.Single(chain);
+        Assert.Same(xthree, chain[0]);
     }
 
     // ----------------------------------------------------
