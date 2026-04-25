@@ -12,11 +12,11 @@
 	<!--IDE0130: Namespace does not match folder structure-->
 
 	<ItemGroup>
-		<PackageReference Include="coverlet.collector" Version="8.0.1">
+		<PackageReference Include="coverlet.collector" Version="10.0.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.4.0" />
 		<PackageReference Include="xunit.v3" Version="3.2.2" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
 			<PrivateAssets>all</PrivateAssets>
@@ -27,9 +27,7 @@
 	<!-- DEBUG configuration -->
 	<ItemGroup Condition="'$(Configuration)'=='Debug'">
 	  <ProjectReference Include="..\..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
-	  <ProjectReference Include="..\Yotei.Tools.CloneGenerator\Yotei.Tools.CloneGenerator.csproj"
-							  OutputItemType="Analyzer"
-							  ReferenceOutputAssembly="false" />
+	  <ProjectReference Include="..\Yotei.Tools.CloneGenerator\Yotei.Tools.CloneGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 	</ItemGroup>
 
 	<!-- RELEASE configuration -->
