@@ -1,6 +1,6 @@
 ﻿#pragma warning disable CS0436, IDE0028
 
-namespace Yotei.ORM.Tests;
+namespace Yotei.ORM.Tests.Tools.Collections;
 
 // ========================================================
 //[Enforced]

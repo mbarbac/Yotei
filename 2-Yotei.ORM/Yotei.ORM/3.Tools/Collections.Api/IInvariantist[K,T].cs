@@ -7,7 +7,7 @@
 /// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>
 [Cloneable]
-public partial interface IInvariantList<K, T> : IReadOnlyList<T>, IReadOnlyCollection<T>
+public partial interface IInvariantList<K, T> : IReadOnlyList<T>, IReadOnlyCollection<T>, ICollection
 {
     /// <summary>
     /// Returns a mutable builder based upon the contents of this instance.

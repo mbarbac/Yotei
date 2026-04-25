@@ -2,18 +2,17 @@
 
 // ========================================================
 /// <summary>
-/// <inheritdoc cref="IInvariantList{K, T}"/>
+/// <inheritdoc cref="IInvariantList{T}"/>
 /// </summary>
-/// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>
 [DebuggerDisplay("{ToDebugString(3)}")]
-[Cloneable(ReturnType = typeof(IInvariantList<,>))]
-public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
+[Cloneable(ReturnType = typeof(IInvariantList<>))]
+public abstract partial class InvariantList<T> : IInvariantList<T>
 {
     /// <summary>
     /// The underlying repository used by this instance.
     /// </summary>
-    protected abstract ICoreList<K, T> Items { get; }
+    protected abstract ICoreList<T> Items { get; }
 
     // ----------------------------------------------------
 
@@ -36,7 +35,7 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected InvariantList(InvariantList<K, T> source)
+    protected InvariantList(InvariantList<T> source)
     {
         Items.AddRange(source.ThrowWhenNull());
         Items.Trim();
@@ -83,7 +82,7 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual ICoreList<K, T> ToBuilder() => Items.Clone();
+    public virtual ICoreList<T> ToBuilder() => Items.Clone();
 
     /// <summary>
     /// <inheritdoc/>
@@ -100,30 +99,30 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    public bool Contains(K key) => Items.Contains(key);
+    public bool Contains(T value) => Items.Contains(value);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    public int IndexOf(K key) => Items.IndexOf(key);
+    public int IndexOf(T value) => Items.IndexOf(value);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    public int LastIndexOf(K key) => Items.LastIndexOf(key);
+    public int LastIndexOf(T value) => Items.LastIndexOf(value);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    public List<int> IndexesOf(K key) => Items.IndexesOf(key);
+    public List<int> IndexesOf(T value) => Items.IndexesOf(value);
 
     /// <summary>
     /// <inheritdoc/>
@@ -183,7 +182,7 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public T[] ToArray() => [.. Items];
+    public T[] ToArray() => [..Items];
 
     /// <summary>
     /// <inheritdoc/>
@@ -221,7 +220,7 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> GetRange(int index, int count)
+    public virtual IInvariantList<T> GetRange(int index, int count)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(index);
         ArgumentOutOfRangeException.ThrowIfNegative(count);
@@ -231,7 +230,7 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
         if (index == 0 && count == Count) return this;
 
         // Otherwise...
-        var clone = (InvariantList<K, T>)Clone();
+        var clone = (InvariantList<T>)Clone();
         clone.Items.Clear();
 
         if (count == 0) return Count == 0 ? this : clone;
@@ -249,9 +248,9 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <param name="index"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> Replace(int index, T value)
+    public virtual IInvariantList<T> Replace(int index, T value)
     {
-        var clone = (InvariantList<K, T>)Clone();
+        var clone = (InvariantList<T>)Clone();
         var num = clone.Items.Replace(index, value);
         return num > 0 ? clone : this;
     }
@@ -261,9 +260,9 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> Add(T value)
+    public virtual IInvariantList<T> Add(T value)
     {
-        var clone = (InvariantList<K, T>)Clone();
+        var clone = (InvariantList<T>)Clone();
         var num = clone.Items.Add(value);
         return num > 0 ? clone : this;
     }
@@ -273,9 +272,9 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> AddRange(IEnumerable<T> range)
+    public virtual IInvariantList<T> AddRange(IEnumerable<T> range)
     {
-        var clone = (InvariantList<K, T>)Clone();
+        var clone = (InvariantList<T>)Clone();
         var num = clone.Items.AddRange(range);
         return num > 0 ? clone : this;
     }
@@ -283,11 +282,12 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    /// <param name="index"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> Insert(int index, T value)
+    public virtual IInvariantList<T> Insert(int index, T value)
     {
-        var clone = (InvariantList<K, T>)Clone();
+        var clone = (InvariantList<T>)Clone();
         var num = clone.Items.Insert(index, value);
         return num > 0 ? clone : this;
     }
@@ -298,9 +298,9 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <param name="index"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> InsertRange(int index, IEnumerable<T> range)
+    public virtual IInvariantList<T> InsertRange(int index, IEnumerable<T> range)
     {
-        var clone = (InvariantList<K, T>)Clone();
+        var clone = (InvariantList<T>)Clone();
         var num = clone.Items.InsertRange(index, range);
         return num > 0 ? clone : this;
     }
@@ -310,9 +310,9 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> RemoveAt(int index)
+    public virtual IInvariantList<T> RemoveAt(int index)
     {
-        var clone = (InvariantList<K, T>)Clone();
+        var clone = (InvariantList<T>)Clone();
         var num = clone.Items.RemoveAt(index);
         return num > 0 ? clone : this;
     }
@@ -323,9 +323,9 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <param name="index"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> RemoveRange(int index, int count)
+    public virtual IInvariantList<T> RemoveRange(int index, int count)
     {
-        var clone = (InvariantList<K, T>)Clone();
+        var clone = (InvariantList<T>)Clone();
         var num = clone.Items.RemoveRange(index, count);
         return num > 0 ? clone : this;
     }
@@ -333,36 +333,36 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> Remove(K key)
+    public virtual IInvariantList<T> Remove(T value)
     {
-        var clone = (InvariantList<K, T>)Clone();
-        var num = clone.Items.Remove(key);
+        var clone = (InvariantList<T>)Clone();
+        var num = clone.Items.Remove(value);
         return num > 0 ? clone : this;
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> RemoveLast(K key)
+    public virtual IInvariantList<T> RemoveLast(T value)
     {
-        var clone = (InvariantList<K, T>)Clone();
-        var num = clone.Items.RemoveLast(key);
+        var clone = (InvariantList<T>)Clone();
+        var num = clone.Items.RemoveLast(value);
         return num > 0 ? clone : this;
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> RemoveAll(K key)
+    public virtual IInvariantList<T> RemoveAll(T value)
     {
-        var clone = (InvariantList<K, T>)Clone();
-        var num = clone.Items.RemoveAll(key);
+        var clone = (InvariantList<T>)Clone();
+        var num = clone.Items.RemoveAll(value);
         return num > 0 ? clone : this;
     }
 
@@ -371,9 +371,9 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> Remove(Predicate<T> predicate)
+    public virtual IInvariantList<T> Remove(Predicate<T> predicate)
     {
-        var clone = (InvariantList<K, T>)Clone();
+        var clone = (InvariantList<T>)Clone();
         var num = clone.Items.Remove(predicate);
         return num > 0 ? clone : this;
     }
@@ -383,9 +383,9 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> RemoveLast(Predicate<T> predicate)
+    public virtual IInvariantList<T> RemoveLast(Predicate<T> predicate)
     {
-        var clone = (InvariantList<K, T>)Clone();
+        var clone = (InvariantList<T>)Clone();
         var num = clone.Items.RemoveLast(predicate);
         return num > 0 ? clone : this;
     }
@@ -395,9 +395,9 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> RemoveAll(Predicate<T> predicate)
+    public virtual IInvariantList<T> RemoveAll(Predicate<T> predicate)
     {
-        var clone = (InvariantList<K, T>)Clone();
+        var clone = (InvariantList<T>)Clone();
         var num = clone.Items.RemoveAll(predicate);
         return num > 0 ? clone : this;
     }
@@ -406,9 +406,9 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual IInvariantList<K, T> Clear()
+    public virtual IInvariantList<T> Clear()
     {
-        var clone = (InvariantList<K, T>)Clone();
+        var clone = (InvariantList<T>)Clone();
         var num = clone.Items.Clear();
         return num > 0 ? clone : this;
     }

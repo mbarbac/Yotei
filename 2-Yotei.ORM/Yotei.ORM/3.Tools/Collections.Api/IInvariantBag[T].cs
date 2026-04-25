@@ -6,7 +6,7 @@
 /// </summary>
 /// <typeparam name="T"></typeparam>
 [Cloneable]
-public partial interface IInvariantBag<T> : IReadOnlyCollection<T>
+public partial interface IInvariantBag<T> : IReadOnlyCollection<T>, ICollection
 {
     /// <summary>
     /// Returns a mutable builder based upon the contents of this instance.
@@ -74,7 +74,7 @@ public partial interface IInvariantBag<T> : IReadOnlyCollection<T>
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    IInvariantList<T> Add(T value);
+    IInvariantBag<T> Add(T value);
 
     /// <summary>
     /// Returns a copy of this instance where the values from the given range have been added
@@ -82,7 +82,7 @@ public partial interface IInvariantBag<T> : IReadOnlyCollection<T>
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    IInvariantList<T> AddRange(IEnumerable<T> range);
+    IInvariantBag<T> AddRange(IEnumerable<T> range);
 
     /// <summary>
     /// Returns a copy of this instance where an arbitrary ocurrence of the given value, if any,
@@ -90,7 +90,7 @@ public partial interface IInvariantBag<T> : IReadOnlyCollection<T>
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    IInvariantList<T> Remove(T value);
+    IInvariantBag<T> Remove(T value);
 
     /// <summary>
     /// Returns a copy of this instance where all the ocurrences of the given value, if any,
@@ -98,7 +98,7 @@ public partial interface IInvariantBag<T> : IReadOnlyCollection<T>
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveAll(T value);
+    IInvariantBag<T> RemoveAll(T value);
 
     /// <summary>
     /// Returns a copy of this instance where an arbitrary ocurrence of an element that matches
@@ -106,7 +106,7 @@ public partial interface IInvariantBag<T> : IReadOnlyCollection<T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IInvariantList<T> Remove(Predicate<T> predicate);
+    IInvariantBag<T> Remove(Predicate<T> predicate);
 
     /// <summary>
     /// Returns a copy of this instance where all the ocurrences of elements that matches the
@@ -114,11 +114,11 @@ public partial interface IInvariantBag<T> : IReadOnlyCollection<T>
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    IInvariantList<T> RemoveAll(Predicate<T> predicate);
+    IInvariantBag<T> RemoveAll(Predicate<T> predicate);
 
     /// <summary>
     /// Returns a copy of this instance that has been cleared.
     /// </summary>
     /// <returns></returns>
-    IInvariantList<T> Clear();
+    IInvariantBag<T> Clear();
 }

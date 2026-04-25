@@ -1,10 +1,10 @@
-﻿#pragma warning disable CS0436, IDE0028
+﻿#pragma warning disable CS0436, IDE0028, IDE0018
 
 namespace Yotei.ORM.Tests.Tools.Collections;
 
 // ========================================================
 //[Enforced]
-public static partial class Test_InvariantList_KT
+public static partial class Test_InvariantList_T
 {
     public interface IElement { }
 
@@ -24,7 +24,7 @@ public static partial class Test_InvariantList_KT
 
     [DebuggerDisplay("{ToDebugString(3)}")]
     [Cloneable]
-    public partial class Builder : CoreList<string, IElement>
+    public partial class Builder : CoreList<IElement>
     {
         public Builder() : base() => Comparer = new(this);
         public Builder(IEnumerable<IElement> range) : this() => AddRange(range);
@@ -36,11 +36,9 @@ public static partial class Test_InvariantList_KT
         }
 
         public override IElement ValidateElement(IElement value) => value.ThrowWhenNull();
-        public override string GetKey(IElement value) => value is Named named ? named.Name : null!;
-        public override string ValidateKey(string key) => key.NotNullNotEmpty(trim: true);
-        public override bool CompareKeys(
-            string source, string target) => Comparer.Equals(source, target);
-        public override IEnumerable<IElement> FindDuplicates(string key) => base.FindDuplicates(key);
+        public override bool CompareElements(
+            IElement source, IElement target) => Comparer.Equals(source, target);
+        public override IEnumerable<IElement> FindDuplicates(IElement value) => base.FindDuplicates(value);
         public override bool AcceptDuplicated(
             IElement source, IElement other) => AllowDuplicates ? true : throw new DuplicateException().WithData(other);
 
@@ -73,18 +71,26 @@ public static partial class Test_InvariantList_KT
         = false;
 
         readonly MyComparer Comparer;
-        readonly struct MyComparer(Builder master) : IEqualityComparer<string>
+        readonly struct MyComparer(Builder master) : IEqualityComparer<IElement>
         {
-            public bool Equals(string? x, string? y) => string.Compare(x, y, master.IgnoreCase) == 0;
-            public int GetHashCode(string? _) => throw new NotImplementedException();
+            public bool Equals(IElement? x, IElement? y) //=> string.Compare(x, y, master.IgnoreCase) == 0;
+            {
+                if (x is null && y is null) return true;
+                if (x is null || y is null) return false;
+
+                return x is Named xnamed && y is Named ynamed
+                    ? string.Compare(xnamed.Name, ynamed.Name, master.IgnoreCase) == 0
+                    : ReferenceEquals(x, y);
+            }
+            public int GetHashCode(IElement? _) => throw new NotImplementedException();
         }
     }
 
     // ----------------------------------------------------
 
     [DebuggerDisplay("{ToDebugString(3)}")]
-    [Cloneable(ReturnType = typeof(InvariantList<string, IElement>))]
-    public partial class Chain : InvariantList<string, IElement>, IElement
+    [Cloneable(ReturnType = typeof(InvariantList<IElement>))]
+    public partial class Chain : InvariantList<IElement>, IElement
     {
         protected override Builder Items { get; }
 
@@ -268,25 +274,25 @@ public static partial class Test_InvariantList_KT
 
     //[Enforced]
     [Fact]
-    public static void Test_IndexOf_Key()
+    public static void Test_IndexOf_Value()
     {
         var source = new Chain() { AllowDuplicates = true, IgnoreCase = true };
         source = (Chain)source.AddRange([xone, xtwo, xthree, xone]);
 
-        var index = source.IndexOf("four"); Assert.Equal(-1, index);
+        var index = source.IndexOf(xfour); Assert.Equal(-1, index);
 
-        index = source.IndexOf("one"); Assert.Equal(0, index);
-        index = source.IndexOf("ONE"); Assert.Equal(0, index);
+        index = source.IndexOf(xone); Assert.Equal(0, index);
+        index = source.IndexOf(new Named("ONE")); Assert.Equal(0, index);
 
-        index = source.LastIndexOf("one"); Assert.Equal(3, index);
-        index = source.LastIndexOf("ONE"); Assert.Equal(3, index);
+        index = source.LastIndexOf(xone); Assert.Equal(3, index);
+        index = source.LastIndexOf(new Named("ONE")); Assert.Equal(3, index);
 
-        var nums = source.IndexesOf("one");
+        var nums = source.IndexesOf(xone);
         Assert.Equal(2, nums.Count);
         Assert.Equal(0, nums[0]);
         Assert.Equal(3, nums[1]);
 
-        nums = source.IndexesOf("ONE");
+        nums = source.IndexesOf(new Named("ONE"));
         Assert.Equal(2, nums.Count);
         Assert.Equal(0, nums[0]);
         Assert.Equal(3, nums[1]);
@@ -596,33 +602,66 @@ public static partial class Test_InvariantList_KT
 
     //[Enforced]
     [Fact]
-    public static void Test_Remove_Key()
+    public static void Test_Remove_Value()
     {
         var source = new Chain() { AllowDuplicates = true, IgnoreCase = true };
         source = (Chain)source.AddRange([xone, xtwo, xone, xthree]);
 
-        var target = source.Remove("any");
+        var target = source.Remove(xfour);
         Assert.Same(source, target);
 
-        target = source.Remove("ONE");
+        target = source.Remove(xone);
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.Same(xtwo, target[0]);
         Assert.Same(xone, target[1]);
         Assert.Same(xthree, target[2]);
 
-        target = source.RemoveLast("ONE");
+        target = source.RemoveLast(new Named("ONE"));
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
         Assert.Same(xthree, target[2]);
 
-        target = source.RemoveAll("ONE");
+        target = source.RemoveAll(new Named("ONE"));
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
         Assert.Same(xtwo, target[0]);
         Assert.Same(xthree, target[1]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Remove_Value_IgnoreCase()
+    {
+        var source = new Chain() { AllowDuplicates = true, IgnoreCase = true };
+        source = (Chain)source.AddRange([xone, xtwo, xone, xthree]);
+
+        var target = source.RemoveAll(new Named("ONE"));
+        Assert.NotSame(source, target);
+        Assert.Equal(2, target.Count);
+        Assert.Same(xtwo, target[0]);
+        Assert.Same(xthree, target[1]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Remove_Value_Nested()
+    {
+        var source = new Chain() { AllowDuplicates = true, IgnoreCase = true };
+        source = (Chain)source.AddRange([xone, xtwo, xone, xthree]);
+
+        var target = source.Remove(new Chain([xtwo, xone]));
+        Assert.NotSame(source, target);
+        Assert.Equal(2, target.Count);
+        Assert.Same(xone, target[0]);
+        Assert.Same(xthree, target[1]);
+
+        target = source.RemoveAll(new Chain([xtwo, xone]));
+        Assert.NotSame(source, target);
+        Assert.Single(target);
+        Assert.Same(xthree, target[0]);
     }
 
     // ----------------------------------------------------
