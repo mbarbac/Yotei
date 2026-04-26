@@ -1,4 +1,4 @@
-﻿namespace Yotei.ORM.Generators;
+﻿namespace Yotei.ORM.Generators.InvariantGenerator;
 
 // ========================================================
 /// <summary>
@@ -16,17 +16,17 @@ public class InvariantGenerator : TreeGenerator
         // Base method first...
         base.OnInitialize(context);
 
-        // Marker attributes...
-        AddInitializationResource(context, "InvariantGenerator/Public/Api/IInvariantBagAttribute.cs", "Markers");
-        AddInitializationResource(context, "InvariantGenerator/Public/Api/IInvariantBagAttribute[T].cs", "Markers");
-        AddInitializationResource(context, "InvariantGenerator/Public/Api/IInvariantListAttribute.cs", "Markers");
-        AddInitializationResource(context, "InvariantGenerator/Public/Api/IInvariantListAttribute[K,T].cs", "Markers");
-        AddInitializationResource(context, "InvariantGenerator/Public/Api/IInvariantListAttribute[T].cs", "Markers");
-        AddInitializationResource(context, "InvariantGenerator/Public/Code/InvariantBagAttribute.cs", "Markers");
-        AddInitializationResource(context, "InvariantGenerator/Public/Code/InvariantBagAttribute[T].cs", "Markers");
-        AddInitializationResource(context, "InvariantGenerator/Public/Code/InvariantListAttribute.cs", "Markers");
-        AddInitializationResource(context, "InvariantGenerator/Public/Code/InvariantListAttribute[K,T].cs", "Markers");
-        AddInitializationResource(context, "InvariantGenerator/Public/Code/InvariantListAttribute[T].cs", "Markers");
+        // Marker attributes (the 'InvariantGenerator' prefix is taken from the namespace)...
+        AddInitializationResource(context, "Public/Api/IInvariantBagAttribute.cs", "Markers");
+        AddInitializationResource(context, "Public/Api/IInvariantBagAttribute[T].cs", "Markers");
+        AddInitializationResource(context, "Public/Api/IInvariantListAttribute.cs", "Markers");
+        AddInitializationResource(context, "Public/Api/IInvariantListAttribute[K,T].cs", "Markers");
+        AddInitializationResource(context, "Public/Api/IInvariantListAttribute[T].cs", "Markers");
+        AddInitializationResource(context, "Public/Code/InvariantBagAttribute.cs", "Markers");
+        AddInitializationResource(context, "Public/Code/InvariantBagAttribute[T].cs", "Markers");
+        AddInitializationResource(context, "Public/Code/InvariantListAttribute.cs", "Markers");
+        AddInitializationResource(context, "Public/Code/InvariantListAttribute[K,T].cs", "Markers");
+        AddInitializationResource(context, "Public/Code/InvariantListAttribute[T].cs", "Markers");
     }
 
     /// <summary>
