@@ -1,18 +1,23 @@
-﻿namespace Yotei.ORM.Generators;
+﻿#nullable enable
+namespace Yotei.ORM.Generators;
 
 // ========================================================
 /// <summary>
-/// Decorates types where the 'InvariantList[T]' class will be used as its base one, and its
-/// methods reimplemented, including its 'Clone' capabilities.
-/// <br/> Includes the collection in the base list if needed.
-/// <br/> Regular types (not abstract ones) must implement a copy constructor.
-/// <br/> Records are not supported.
+/// Decorates types where the 'IInvariantList[K,T]' interface will be implemented, including its
+/// 'Clone' capabilities.
+/// <br/> Includes the interface in the base list if needed.
 /// <br/> Derived types must maintain base compatibility.
 /// </summary>
+/// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>
-[AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
-public class InvariantListAttribute<T> : Attribute
+[AttributeUsage(AttributeTargets.Interface, Inherited = false, AllowMultiple = false)]
+public class IInvariantListAttribute<K, T> : Attribute
 {
+    /// <summary>
+    /// The type of the keys the collection elements are associated with.
+    /// </summary>
+    public Type KType => typeof(K);
+
     /// <summary>
     /// The type of the collection's elements.
     /// </summary>

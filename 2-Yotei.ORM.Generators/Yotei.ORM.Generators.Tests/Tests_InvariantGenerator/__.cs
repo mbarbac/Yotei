@@ -1,4 +1,4 @@
-﻿namespace Yotei.ORM.Generators.Tests;
+﻿namespace Yotei.ORM.Generators.InvariantGenerator.Tests;
 
 // ========================================================
 //[Enforced]

@@ -1,20 +1,23 @@
-﻿namespace Yotei.ORM.Generators;
+﻿#nullable enable
+namespace Yotei.ORM.Generators;
 
 // ========================================================
 /// <summary>
-/// Decorates types where the 'IInvariantbag[T]' one will be implemented, including its 'Clone'
-/// capabilities.
-/// <br/> Includes the interface in the base list if needed.
+/// Decorates types where the 'InvariantBag[T]' one will be used as its base one, and its methods
+/// reimplemented, including the 'Clone' capabilities.
+/// <br/> Includes the collection in the base list if needed.
+/// <br/> Regular types (not abstract ones) must implement a copy constructor.
+/// <br/> Records are not supported.
 /// <br/> Derived types must maintain base compatibility.
 /// </summary>
-[AttributeUsage(AttributeTargets.Interface, Inherited = false, AllowMultiple = false)]
-public class IInvariantBagAttribute : Attribute
+[AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+public class InvariantBagAttribute : Attribute
 {
     /// <summary>
     /// Initializes a new instance to implement a '[T]' collection.
     /// </summary>
     /// <param name="ttype"></param>
-    public IInvariantBagAttribute(Type ttype) => TType = ttype.ThrowWhenNull();
+    public InvariantBagAttribute(Type ttype) => TType = ttype.ThrowWhenNull();
 
     // ----------------------------------------------------
 

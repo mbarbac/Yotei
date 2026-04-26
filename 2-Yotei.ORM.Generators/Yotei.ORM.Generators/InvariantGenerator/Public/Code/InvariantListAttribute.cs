@@ -1,4 +1,5 @@
-﻿namespace Yotei.ORM.Generators;
+﻿#nullable enable
+namespace Yotei.ORM.Generators;
 
 // ========================================================
 /// <summary>

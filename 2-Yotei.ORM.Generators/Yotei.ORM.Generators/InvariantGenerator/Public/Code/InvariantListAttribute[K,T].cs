@@ -1,18 +1,25 @@
-﻿namespace Yotei.ORM.Generators;
+﻿#nullable enable
+namespace Yotei.ORM.Generators;
 
 // ========================================================
 /// <summary>
-/// Decorates types where the 'InvariantBag[T]' class will be used as its base one, and its
+/// Decorates types where the 'InvariantList[K,T]' class will be used as its base one, and its
 /// methods reimplemented, including its 'Clone' capabilities.
 /// <br/> Includes the collection in the base list if needed.
 /// <br/> Regular types (not abstract ones) must implement a copy constructor.
 /// <br/> Records are not supported.
 /// <br/> Derived types must maintain base compatibility.
 /// </summary>
+/// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>
 [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
-public class InvariantBagAttribute<T> : Attribute
+public class InvariantListAttribute<K, T> : Attribute
 {
+    /// <summary>
+    /// The type of the keys the collection elements are associated with.
+    /// </summary>
+    public Type KType => typeof(K);
+
     /// <summary>
     /// The type of the collection's elements.
     /// </summary>

@@ -224,14 +224,13 @@ public partial class XTypeNode : TypeNode
         };
 
         // Iterating through the template methods...
-        var first = true;
         foreach (var method in methods)
         {
             // If already implemented, do the next method...
             if (existing.Any(x => SameMethod(method, x))) continue;
 
             // Method header...
-            if (!first) cb.AppendLine(); first = false;
+            cb.AppendLine();
             EmitDocumentation(method, cb);
 
             // Host is an interface...

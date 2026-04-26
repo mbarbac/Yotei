@@ -25,11 +25,15 @@ partial class XTypeNode
             : (IsBag ? INVARIANTBAG : INVARIANTLIST);
 
         var name = method.EasyName();
-        name = $"{headdoc}{Bracket}.{name}";
+        var bracket = Arity == 1 ? "<T>" : "<K, T>";
+
+        name = $"{headdoc}{bracket}.{name}";
         name = name.Replace('<', '{').Replace('>', '}');
         name = $"/// <inheritdoc cref=\"{name}\"/>";
 
+        cb.AppendLine("/// <summary>");
         cb.AppendLine(name);
+        cb.AppendLine("/// </summary>");
         cb.AppendLine($"{DocAttribute}");
     }
 
