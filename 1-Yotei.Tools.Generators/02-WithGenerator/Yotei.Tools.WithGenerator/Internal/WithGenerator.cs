@@ -17,8 +17,8 @@ public class WithGenerator : TreeGenerator
         base.OnInitialize(context);
 
         // Marker attributes...
-        AddInitializationResource(context, "Public.WithAttribute.cs", "Markers");
-        AddInitializationResource(context, "Public.InheritsWithAttribute.cs", "Markers");
+        AddInitializationResource(context, "Public/WithAttribute.cs", "Markers");
+        AddInitializationResource(context, "Public/InheritsWithAttribute.cs", "Markers");
     }
 
     /// <summary>

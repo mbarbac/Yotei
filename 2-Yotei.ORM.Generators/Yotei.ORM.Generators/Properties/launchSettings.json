@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Yotei.ORM.Generators": {
+      "commandName": "Project"
+    },
+    "ORMGenerators.Debug": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "..\\Yotei.ORM.Generators.Tests\\Yotei.ORM.Generators.Tests.csproj"
+    }
+  }
+}

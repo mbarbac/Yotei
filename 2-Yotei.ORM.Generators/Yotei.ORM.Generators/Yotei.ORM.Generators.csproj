@@ -46,8 +46,16 @@
 	<!--Generator resources-->
 	<ItemGroup>
 		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-		<!--<EmbeddedResource Include="Public\CloneableAttribute.cs" />-->
-		<!--<EmbeddedResource Include="Public\CloneableAttribute[T].cs" />-->
+		<EmbeddedResource Include="InvariantGenerator\Public\Api\IInvariantBagAttribute.cs" />
+		<EmbeddedResource Include="InvariantGenerator\Public\Api\IInvariantBagAttribute[T].cs" />
+		<EmbeddedResource Include="InvariantGenerator\Public\Api\IInvariantListAttribute.cs" />
+		<EmbeddedResource Include="InvariantGenerator\Public\Api\IInvariantListAttribute[K,T].cs" />
+		<EmbeddedResource Include="InvariantGenerator\Public\Api\IInvariantListAttribute[T].cs" />
+		<EmbeddedResource Include="InvariantGenerator\Public\Code\InvariantBagAttribute.cs" />
+		<EmbeddedResource Include="InvariantGenerator\Public\Code\InvariantBagAttribute[T].cs" />
+		<EmbeddedResource Include="InvariantGenerator\Public\Code\InvariantListAttribute.cs" />
+		<EmbeddedResource Include="InvariantGenerator\Public\Code\InvariantListAttribute[K,T].cs" />
+		<EmbeddedResource Include="InvariantGenerator\Public\Code\InvariantListAttribute[T].cs" />
 	</ItemGroup>
-	
+
 </Project>

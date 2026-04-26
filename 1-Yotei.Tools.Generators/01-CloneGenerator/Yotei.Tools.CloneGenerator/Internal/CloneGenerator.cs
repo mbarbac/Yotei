@@ -17,8 +17,8 @@ public class CloneGenerator : TreeGenerator
         base.OnInitialize(context);
 
         // Marker attributes...
-        AddInitializationResource(context, "Public.CloneableAttribute.cs", "Markers");
-        AddInitializationResource(context, "Public.CloneableAttribute[T].cs", "Markers");
+        AddInitializationResource(context, "Public/CloneableAttribute.cs", "Markers");
+        AddInitializationResource(context, "Public/CloneableAttribute[T].cs", "Markers");
     }
 
     /// <summary>

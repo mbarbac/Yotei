@@ -52,8 +52,7 @@ partial class TreeGenerator
     /// by the generator project.
     /// <br/> The resource file must be specified in the generator csproj as an embedded resource,
     /// within an 'ItemGroup' section (ie: '[EmbeddedResource Include="path.ext" /]', using angle
-    /// brackets instead of the squared ones). If the file path includes a folder in the generator
-    /// project, use a dot separator.
+    /// brackets instead of the squared ones).
     /// <br/> If the <paramref name="outfolder"/> is not <see langword="null"/>, then the out file
     /// will be emitted at that folder (do not end with '/', and use embedded dots if needed).
     /// Otherwise, at the root analyzer output one. In addition, the resource file name extension
@@ -68,6 +67,7 @@ partial class TreeGenerator
     {
         outfolder = outfolder.NullWhenEmpty(trim: true);
         rname = rname.NotNullNotEmpty(trim: true);
+        rname = rname.Replace('\\', '.').Replace('/', '.');
 
         // Reading the resource file...
         var type = GetType();
