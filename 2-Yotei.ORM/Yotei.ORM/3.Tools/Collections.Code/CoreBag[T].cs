@@ -17,7 +17,7 @@ public partial class CoreBag<T> : ICoreBag<T>
         public override T ValidateElement(T value) => Master.ValidateElement(value);
         public override bool CompareElements(T source, T target) => Master.CompareElements(source, target);
         public override IEnumerable<T> FindDuplicates(T value) => Master.FindDuplicates(value);
-        public override bool AcceptDuplicated(T source, T duplicate) => Master.AcceptDuplicated(source, duplicate);
+        public override bool? AllowDuplicates => Master.AllowDuplicates;
     }
 
     // ----------------------------------------------------
@@ -89,15 +89,12 @@ public partial class CoreBag<T> : ICoreBag<T>
         => FindAll(x => CompareElements(x, value), out var items) ? items : [];
 
     /// <summary>
-    /// Invoked to determine if the given element, which is considered to be a duplicate of the
-    /// given source one, can be included in this collection, or not. This method shall return
-    /// <see langword="true"/> to include the duplicated element, <see langword="false"/> to
-    /// ignore it, or throw an appropriate exception if duplicates are not allowed.
+    /// Determines how duplicated elements are included in this collection:
+    /// <br/>- <see langword="true"/>: the duplicated element is included in the collection.
+    /// <br/>- <see langword="false"/>: a duplicated exception is thrown.
+    /// <br/>- <see langword="null"/>: the duplicated element is ignored.
     /// </summary>
-    /// <param name="source"></param>
-    /// <param name="duplicate"></param>
-    /// <returns></returns>
-    public virtual bool AcceptDuplicated(T source, T duplicate) => true;
+    public virtual bool? AllowDuplicates { get; set; }
 
     // ----------------------------------------------------
 

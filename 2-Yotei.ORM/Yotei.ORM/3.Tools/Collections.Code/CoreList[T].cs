@@ -91,15 +91,12 @@ public partial class CoreList<T> : ICoreList<T>
         => FindAll(x => CompareElements(x, value), out var items) ? items : [];
 
     /// <summary>
-    /// Invoked to determine if the given element, which is considered to be a duplicate of the
-    /// given source one, can be included in this collection, or not. This method shall return
-    /// <see langword="true"/> to include the duplicated element, <see langword="false"/> to
-    /// ignore it, or throw an appropriate exception if duplicates are not allowed.
+    /// Determines how duplicated elements are included in this collection:
+    /// <br/>- <see langword="true"/>: the duplicated element is included in the collection.
+    /// <br/>- <see langword="false"/>: a duplicated exception is thrown.
+    /// <br/>- <see langword="null"/>: the duplicated element is ignored.
     /// </summary>
-    /// <param name="source"></param>
-    /// <param name="duplicate"></param>
-    /// <returns></returns>
-    public virtual bool AcceptDuplicated(T source, T duplicate) => true;
+    public virtual bool? AllowDuplicates { get; set; }
 
     // ----------------------------------------------------
 
@@ -349,8 +346,12 @@ public partial class CoreList<T> : ICoreList<T>
         if (value is IEnumerable<T> range) return AddRange(range);
 
         value = ValidateElement(value);
-        var values = FindDuplicates(value);
-        foreach (var item in values) if (!AcceptDuplicated(item, value)) return 0;
+        var values = FindDuplicates(value); if (values.Any())
+        {
+            if (!AllowDuplicates.HasValue) return 0;
+            if (!AllowDuplicates.Value)
+                throw new DuplicateException("Duplicates detected.").WithData(values);
+        }
 
         Items.Add(value);
         return 1;
@@ -382,8 +383,12 @@ public partial class CoreList<T> : ICoreList<T>
         if (value is IEnumerable<T> range) return InsertRange(index, range);
 
         value = ValidateElement(value);
-        var values = FindDuplicates(value);
-        foreach (var item in values) if (!AcceptDuplicated(item, value)) return 0;
+        var values = FindDuplicates(value); if (values.Any())
+        {
+            if (!AllowDuplicates.HasValue) return 0;
+            if (!AllowDuplicates.Value)
+                throw new DuplicateException("Duplicates detected.").WithData(values);
+        }
 
         Items.Insert(index, value);
         return 1;

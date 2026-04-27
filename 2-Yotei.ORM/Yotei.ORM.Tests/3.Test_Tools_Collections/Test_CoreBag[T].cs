@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS0436, IDE0028
+﻿#pragma warning disable CS0436, IDE0028, IDE0018
 
 namespace Yotei.ORM.Tests.Tools.Collections;
 
@@ -26,7 +26,11 @@ public static partial class Test_CoreBag_T
     [Cloneable(ReturnType = typeof(ICoreBag<IElement>))]
     public partial class Chain : CoreBag<IElement>, IElement
     {
-        public Chain() : base() => Comparer = new(this);
+        public Chain() : base()
+        {
+            AllowDuplicates = false;
+            IgnoreCase = false;
+        }
         public Chain(IEnumerable<IElement> range) : this() => AddRange(range);
         protected Chain(Chain source) : this()
         {
@@ -36,25 +40,22 @@ public static partial class Test_CoreBag_T
         }
 
         public override IElement ValidateElement(IElement value) => value.ThrowWhenNull();
-        public override bool CompareElements(
-            IElement source, IElement target) => Comparer.Equals(source, target);
-        public override IEnumerable<IElement> FindDuplicates(IElement value) => base.FindDuplicates(value);
-        public override bool AcceptDuplicated(
-            IElement source, IElement other) => AllowDuplicates ? true : throw new DuplicateException().WithData(other);
-
-        public bool AllowDuplicates
+        public override bool CompareElements(IElement source, IElement target)
         {
-            get;
-            set
-            {
-                if (field == value) return;
-                if (Count == 0) { field = value; return; }
+            if (source is null && target is null) return true;
+            if (source is null || target is null) return false;
 
-                var range = ToList(); Clear();
-                field = value; AddRange(range);
-            }
+            return source is Named snamed && target is Named tnamed
+                ? string.Compare(snamed.Name, tnamed.Name, IgnoreCase) == 0
+                : ReferenceEquals(source, target);
         }
-        = false;
+        public override IEnumerable<IElement> FindDuplicates(IElement value) => base.FindDuplicates(value);
+        
+        public override bool? AllowDuplicates
+        {
+            get => field = base.AllowDuplicates;
+            set => field = base.AllowDuplicates = value;
+        }
 
         public bool IgnoreCase
         {
@@ -67,22 +68,6 @@ public static partial class Test_CoreBag_T
                 var range = ToList(); Clear();
                 field = value; AddRange(range);
             }
-        }
-        = false;
-
-        readonly MyComparer Comparer;
-        readonly struct MyComparer(Chain master) : IEqualityComparer<IElement>
-        {
-            public bool Equals(IElement? x, IElement? y) //=> string.Compare(x, y, master.IgnoreCase) == 0;
-            {
-                if (x is null && y is null) return true;
-                if (x is null || y is null) return false;
-
-                return x is Named xnamed && y is Named ynamed
-                    ? string.Compare(xnamed.Name, ynamed.Name, master.IgnoreCase) == 0
-                    : ReferenceEquals(x, y);
-            }
-            public int GetHashCode(IElement? _) => throw new NotImplementedException();
         }
     }
 

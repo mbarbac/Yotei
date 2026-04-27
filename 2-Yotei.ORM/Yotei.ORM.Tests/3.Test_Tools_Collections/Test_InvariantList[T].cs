@@ -26,7 +26,11 @@ public static partial class Test_InvariantList_T
     [Cloneable]
     public partial class Builder : CoreList<IElement>
     {
-        public Builder() : base() => Comparer = new(this);
+        public Builder() : base()
+        {
+            AllowDuplicates = false;
+            IgnoreCase = false;
+        }
         public Builder(IEnumerable<IElement> range) : this() => AddRange(range);
         protected Builder(Builder source) : this()
         {
@@ -36,25 +40,22 @@ public static partial class Test_InvariantList_T
         }
 
         public override IElement ValidateElement(IElement value) => value.ThrowWhenNull();
-        public override bool CompareElements(
-            IElement source, IElement target) => Comparer.Equals(source, target);
-        public override IEnumerable<IElement> FindDuplicates(IElement value) => base.FindDuplicates(value);
-        public override bool AcceptDuplicated(
-            IElement source, IElement other) => AllowDuplicates ? true : throw new DuplicateException().WithData(other);
-
-        public bool AllowDuplicates
+        public override bool CompareElements(IElement source, IElement target)
         {
-            get;
-            set
-            {
-                if (field == value) return;
-                if (Count == 0) { field = value; return; }
+            if (source is null && target is null) return true;
+            if (source is null || target is null) return false;
 
-                var range = ToList(); Clear();
-                field = value; AddRange(range);
-            }
+            return source is Named snamed && target is Named tnamed
+                ? string.Compare(snamed.Name, tnamed.Name, IgnoreCase) == 0
+                : ReferenceEquals(source, target);
         }
-        = false;
+        public override IEnumerable<IElement> FindDuplicates(IElement value) => base.FindDuplicates(value);
+        
+        public override bool? AllowDuplicates
+        {
+            get => field = base.AllowDuplicates;
+            set => field = base.AllowDuplicates = value;
+        }
 
         public bool IgnoreCase
         {
@@ -67,22 +68,6 @@ public static partial class Test_InvariantList_T
                 var range = ToList(); Clear();
                 field = value; AddRange(range);
             }
-        }
-        = false;
-
-        readonly MyComparer Comparer;
-        readonly struct MyComparer(Builder master) : IEqualityComparer<IElement>
-        {
-            public bool Equals(IElement? x, IElement? y) //=> string.Compare(x, y, master.IgnoreCase) == 0;
-            {
-                if (x is null && y is null) return true;
-                if (x is null || y is null) return false;
-
-                return x is Named xnamed && y is Named ynamed
-                    ? string.Compare(xnamed.Name, ynamed.Name, master.IgnoreCase) == 0
-                    : ReferenceEquals(x, y);
-            }
-            public int GetHashCode(IElement? _) => throw new NotImplementedException();
         }
     }
 
@@ -98,7 +83,7 @@ public static partial class Test_InvariantList_T
         public Chain(IEnumerable<IElement> range) : this() => Items.AddRange(range);
         protected Chain(Chain source) => Items = source.ThrowWhenNull().Items.Clone();
 
-        public bool AllowDuplicates
+        public bool? AllowDuplicates
         {
             get => Items.AllowDuplicates;
             set => Items.AllowDuplicates = value; // Using 'set' instead of 'init' for test purposes...
