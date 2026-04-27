@@ -69,22 +69,6 @@ public static partial class Test_InvariantBag_T
                 field = value; AddRange(range);
             }
         }
-        = false;
-
-        readonly MyComparer Comparer;
-        readonly struct MyComparer(Builder master) : IEqualityComparer<IElement>
-        {
-            public bool Equals(IElement? x, IElement? y) //=> string.Compare(x, y, master.IgnoreCase) == 0;
-            {
-                if (x is null && y is null) return true;
-                if (x is null || y is null) return false;
-
-                return x is Named xnamed && y is Named ynamed
-                    ? string.Compare(xnamed.Name, ynamed.Name, master.IgnoreCase) == 0
-                    : ReferenceEquals(x, y);
-            }
-            public int GetHashCode(IElement? _) => throw new NotImplementedException();
-        }
     }
 
     // ----------------------------------------------------

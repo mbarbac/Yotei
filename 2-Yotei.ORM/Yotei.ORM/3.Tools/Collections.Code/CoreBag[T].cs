@@ -71,8 +71,8 @@ public partial class CoreBag<T> : ICoreBag<T>
     public virtual T ValidateElement(T value) => value;
 
     /// <summary>
-    /// Invoked to determine if the given keys, for the sole purposes of this collection, shall be
-    /// considered the same or not.
+    /// Invoked to determine if the given elements, for the sole purposes of this collection,
+    /// shall be considered the same or not.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="target"></param>
@@ -81,7 +81,7 @@ public partial class CoreBag<T> : ICoreBag<T>
         => EqualityComparer<T>.Default.Equals(source, target);
 
     /// <summary>
-    /// Invoked to obtain the elements in this collection whose keys are the same as the given one.
+    /// Invoked to obtain the duplicated elements in this collection.
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>

@@ -88,8 +88,8 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     public virtual K ValidateKey(K key) => key;
 
     /// <summary>
-    /// Invoked to determine if the given keys, for the sole purposes of this collection, shall be
-    /// considered the same or not.
+    /// Invoked to determine if the given keys, for the sole purposes of this collection, shall
+    /// be considered the same or not.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="target"></param>

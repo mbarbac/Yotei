@@ -10,7 +10,7 @@ namespace Yotei.ORM.Generators.InvariantGenerator.Tests;
 /// <inheritdoc cref="IInvariantList{T}"/>
 /// </summary>
 [IInvariantList<IItem>(ReturnType = typeof(IHost))]
-public partial interface IElementList_T : IInvariantList<IItem>
+public partial interface IElementList_T : IInvariantList<IItem>, IItem
 {
     /// <summary>
     /// <inheritdoc cref="IInvariantList{T}.ToBuilder"/>
@@ -22,4 +22,9 @@ public partial interface IElementList_T : IInvariantList<IItem>
     /// The engine this instance is associated with.
     /// </summary>
     IEngine Engine { get; }
+
+    /// <summary>
+    /// <inheritdoc cref="CoreList{T}.AllowDuplicates"/>
+    /// </summary>
+    public bool? AllowDuplicates { get; init; }
 }

@@ -3,6 +3,7 @@
 using IItem = Yotei.ORM.Generators.InvariantGenerator.Tests.IElement;
 using IHost = Yotei.ORM.Generators.InvariantGenerator.Tests.IElementList_T;
 using THost = Yotei.ORM.Generators.InvariantGenerator.Tests.ElementList_T;
+using Xunit.v3;
 
 namespace Yotei.ORM.Generators.InvariantGenerator.Tests;
 
@@ -37,8 +38,11 @@ public partial class ElementList_T : IHost
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected ElementList_T(THost source)
-        : this(source.ThrowWhenNull().Engine) => Items.AddRange(source);
+    protected ElementList_T(THost source) : this(source.ThrowWhenNull().Engine)
+    {
+        AllowDuplicates = source.AllowDuplicates;
+        Items.AddRange(source);
+    }
 
     // ------------------------------------------------
 
@@ -54,12 +58,77 @@ public partial class ElementList_T : IHost
     public IEngine Engine => Items.Engine;
 
     /// <summary>
-    /// Determines if this instance allow duplicated elements, or not.
+    /// <inheritdoc/>
     /// </summary>
-    [With(ReturnType = typeof(IHost))]
-    public bool AllowDuplicates
+    public bool? AllowDuplicates
     {
         get => ((Builder)Items).AllowDuplicates;
         init => ((Builder)Items).AllowDuplicates = value;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    public bool Equals(IItem? other)
+    {
+        if (ReferenceEquals(this, other)) return true;
+        if (other is null) return false;
+        if (other is not IHost valid) return false;
+
+        if (!Engine.EqualsEx(valid.Engine)) return false;
+        if (AllowDuplicates != valid.AllowDuplicates) return false;
+
+        if (Count != valid.Count) return false;
+        for (int i = 0; i < Count; i++)
+        {
+            var source = Items[i];
+            var target = valid[i];
+            var same = source is NamedElement snamed && target is NamedElement tnamed
+                ? snamed.Equals(tnamed, Engine.IgnoreCase)
+                : source.EqualsEx(target);
+
+            if (!same) return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    public override bool Equals(object? obj) => Equals(obj as IItem);
+
+    /// <summary>
+    /// Equality semantics.
+    /// </summary>
+    public static bool operator ==(THost? host, IItem? item)
+    {
+        if (host is null && item is null) return true;
+        if (host is null || item is null) return false;
+
+        return host.Equals(item);
+    }
+
+    /// <summary>
+    /// Inequality semantics.
+    /// </summary>
+    public static bool operator !=(THost? host, IItem? item) => !(host == item);
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public override int GetHashCode()
+    {
+        var code = Engine.GetHashCode();
+        code = HashCode.Combine(code, AllowDuplicates);
+        for (int i = 0; i < Count; i++) code = HashCode.Combine(code, Items[i]);
+        return code;
     }
 }

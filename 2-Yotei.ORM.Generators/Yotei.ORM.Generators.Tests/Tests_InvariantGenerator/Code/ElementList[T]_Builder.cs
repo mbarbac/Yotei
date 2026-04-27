@@ -20,7 +20,11 @@ partial class ElementList_T
         /// Initializes a new instance.
         /// </summary>
         /// <param name="engine"></param>
-        public Builder(IEngine engine) => Engine = engine.ThrowWhenNull();
+        public Builder(IEngine engine)
+        {
+            Engine = engine.ThrowWhenNull();
+            AllowDuplicates = false;
+        }
 
         /// <summary>
         /// Initializes a new instance with the elements of the given range.
@@ -73,8 +77,8 @@ partial class ElementList_T
         /// </summary>
         public override bool CompareElements(IItem source, IItem target)
         {
-            return source is NamedElement xnamed && target is NamedElement ynamed
-                ? string.Compare(xnamed.Name, ynamed.Name, Engine.IgnoreCase) == 0
+            return source is NamedElement snamed && target is NamedElement tnamed
+                ? string.Compare(snamed.Name, tnamed.Name, Engine.IgnoreCase) == 0
                 : source.EqualsEx(target);
         }
 
@@ -84,29 +88,5 @@ partial class ElementList_T
         public override IEnumerable<IItem> FindDuplicates(
             IItem value)
             => base.FindDuplicates(value);
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        public override bool AcceptDuplicated(IItem source, IItem duplicate)
-            => AllowDuplicates
-            ? true
-            : throw new DuplicateException("Duplicates not allowed.")
-            .WithData(source)
-            .WithData(duplicate);
-
-        // Used by the 'AcceptDuplicated' method, for debug purposes.
-        public bool AllowDuplicates
-        {
-            get;
-            set
-            {
-                if (field == value) return;
-                if (Count == 0) { field = value; return; }
-
-                var range = ToList(); Clear();
-                field = value; AddRange(range);
-            }
-        }
     }
 }
