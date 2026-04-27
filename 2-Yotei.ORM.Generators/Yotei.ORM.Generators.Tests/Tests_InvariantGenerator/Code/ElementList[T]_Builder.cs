@@ -38,14 +38,17 @@ partial class ElementList_T
             ArgumentNullException.ThrowIfNull(other);
 
             Engine = other.Engine;
+            AllowDuplicates = other.AllowDuplicates;
             AddRange(other);
         }
+
+        // ------------------------------------------------
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public IHost ToInstance() => throw null;
+        public IHost ToInstance() => Count == 0 ? new THost(Engine) : new THost(Engine, this);
 
         /// <summary>
         /// <inheritdoc/>
@@ -78,19 +81,32 @@ partial class ElementList_T
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public override IEnumerable<IItem> FindDuplicates(IItem value)
-        {
-            return base.FindDuplicates(value);
-        }
+        public override IEnumerable<IItem> FindDuplicates(
+            IItem value)
+            => base.FindDuplicates(value);
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         public override bool AcceptDuplicated(IItem source, IItem duplicate)
+            => AllowDuplicates
+            ? true
+            : throw new DuplicateException("Duplicates not allowed.")
+            .WithData(source)
+            .WithData(duplicate);
+
+        // Used by the 'AcceptDuplicated' method, for debug purposes.
+        public bool AllowDuplicates
         {
-            throw new DuplicateException("Duplicates not allowed.")
-                .WithData(source)
-                .WithData(duplicate);
+            get;
+            set
+            {
+                if (field == value) return;
+                if (Count == 0) { field = value; return; }
+
+                var range = ToList(); Clear();
+                field = value; AddRange(range);
+            }
         }
     }
 }
