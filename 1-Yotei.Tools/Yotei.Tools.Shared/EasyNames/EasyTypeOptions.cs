@@ -126,7 +126,7 @@ public static partial class EasyNameExtensions
         var sb = new StringBuilder();
         var isgen = source.IsGenericAlike();
         var host = source.DeclaringType;
-        var xname = options.UseSpecialNames ? source.ToSpecialName() : null;
+        var xname = source.ToSpecialName();
 
         // Intercepting nullable wrappers...
         if (options.NullableStyle == EasyNullableStyle.UseAnnotations &&
@@ -151,7 +151,7 @@ public static partial class EasyNameExtensions
         // Namespace...
         if (options.NamespaceStyle != EasyNamespaceStyle.None && !isgen &&
             host == null &&
-            xname == null)
+            (!options.UseSpecialNames || xname == null))
         {
             var str = source.Namespace;
             if (str != null && str.Length > 0)
@@ -164,7 +164,7 @@ public static partial class EasyNameExtensions
         // Host...
         if ((options.UseHost || options.NamespaceStyle != EasyNamespaceStyle.None) && !isgen &&
             host != null &&
-            xname == null)
+            (!options.UseSpecialNames || xname == null))
         {
             // Here is where we need to use the captured type arguments...
             var str = host.EasyName(types, options);
@@ -172,41 +172,43 @@ public static partial class EasyNameExtensions
         }
 
         // Name...
-        if (xname != null) sb.Append(xname);
+        if (options.UseSpecialNames && xname != null) sb.Append(xname);
         else
         {
-            var str = source.Name;
-            var index = str.IndexOf('`'); if (index >= 0) str = str[..index];
-            if (str.Length > 0 && str[^1] == '&') str = str[..^1];
+            var name = source.Name;
+            var index = name.IndexOf('`'); if (index >= 0) name = name[..index];
+            if (name.Length > 0 && name[^1] == '&') name = name[..^1];
 
             if (options.RemoveAttributeSuffix &&
-                str != ATTRIBUTE &&
-                str.EndsWith(ATTRIBUTE))
-                str = str.RemoveLast(ATTRIBUTE).ToString();
+                name != ATTRIBUTE &&
+                name.EndsWith(ATTRIBUTE))
+                name = name.RemoveLast(ATTRIBUTE).ToString();
 
-            sb.Append(str);
-        }
+            sb.Append(name);
 
-        // Generic arguments...
-        if (options.GenericListStyle != EasyGenericListStyle.None)
-        {
-            var args = source.GetGenericArguments();
-            var used = host == null ? 0 : host.GetGenericArguments().Length;
-            var need = args.Length - used;
-
-            if (need > 0)
+            // Generic arguments...
+            if (options.GenericListStyle != EasyGenericListStyle.None &&
+                xname == null)
+                // Using xname == null as a flag to prevent expanding Boolean? or similar
             {
-                sb.Append('<'); for (int i = 0; i < need; i++)
-                {
-                    var arg = types[used + i];
-                    var str = options.GenericListStyle == EasyGenericListStyle.PlaceHolders
-                        ? string.Empty
-                        : arg.EasyName(options);
+                var args = source.GetGenericArguments();
+                var used = host == null ? 0 : host.GetGenericArguments().Length;
+                var need = args.Length - used;
 
-                    if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
-                    sb.Append(str);
+                if (need > 0)
+                {
+                    sb.Append('<'); for (int i = 0; i < need; i++)
+                    {
+                        var arg = types[used + i];
+                        var str = options.GenericListStyle == EasyGenericListStyle.PlaceHolders
+                            ? string.Empty
+                            : arg.EasyName(options);
+
+                        if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
+                        sb.Append(str);
+                    }
+                    sb.Append('>');
                 }
-                sb.Append('>');
             }
         }
 
@@ -215,6 +217,13 @@ public static partial class EasyNameExtensions
             sb.Length > 0 &&
             sb[^1] != '?')
         {
+            if (options.UseSpecialNames && xname != null && (
+                source.IsNullableAnnotated()))
+            {
+                sb.Append('?');
+                break;
+            }
+
             if (options.NullableStyle == EasyNullableStyle.KeepWrappers &&
                 source.IsNullableWrapper())
                 break;

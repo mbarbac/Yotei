@@ -17,6 +17,7 @@ public static partial class RoslynNamesExtensions
     /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
+    [SuppressMessage("", "IDE0019")]
     public static string EasyName(this ITypeSymbol source, EasyTypeOptions options)
     {
         ArgumentNullException.ThrowIfNull(source);
@@ -39,7 +40,7 @@ public static partial class RoslynNamesExtensions
         var named = source as INamedTypeSymbol;
         var isgen = source.IsGenericAlike();
         var args = named is null ? [] : named.TypeArguments;
-        var xname = options.UseSpecialNames ? source.ToSpecialName() : null;
+        var xname = source.ToSpecialName();
         var host = source.ContainingType;
 
         // Intercepting nullable wrappers...
@@ -65,7 +66,7 @@ public static partial class RoslynNamesExtensions
         // Namespace...
         if (options.NamespaceStyle != EasyNamespaceStyle.None && !isgen &&
             host == null &&
-            xname == null)
+            (!options.UseSpecialNames || xname == null))
         {
             var ns = source.ContainingNamespace;
             if (ns != null)
@@ -78,14 +79,14 @@ public static partial class RoslynNamesExtensions
         // Host...
         if ((options.UseHost || options.NamespaceStyle != EasyNamespaceStyle.None) && !isgen &&
             host != null &&
-            xname == null)
+            (!options.UseSpecialNames || xname == null))
         {
             var str = host.EasyName(options);
             if (str.Length > 0) sb.Append(str).Append('.');
         }
 
         // Name...
-        if (xname != null) sb.Append(xname);
+        if (options.UseSpecialNames && xname != null) sb.Append(xname);
         else
         {
             var misc = default(SymbolDisplayMiscellaneousOptions);
@@ -95,22 +96,25 @@ public static partial class RoslynNamesExtensions
             var format = new SymbolDisplayFormat(miscellaneousOptions: misc);
             var name = source.ToDisplayString(format);
             sb.Append(name);
-        }
 
-        // Generic arguments...
-        if (options.GenericListStyle != EasyGenericListStyle.None && args.Length > 0)
-        {
-            sb.Append('<'); for (int i = 0; i < args.Length; i++)
+            // Generic arguments...
+            if (options.GenericListStyle != EasyGenericListStyle.None
+                && args.Length > 0
+                && xname == null)
+            // Using xname == null as a flag to prevent expanding Boolean? or similar
             {
-                var arg = args[i];
-                var str = options.GenericListStyle == EasyGenericListStyle.PlaceHolders
-                    ? string.Empty
-                    : arg.EasyName(options);
+                sb.Append('<'); for (int i = 0; i < args.Length; i++)
+                {
+                    var arg = args[i];
+                    var str = options.GenericListStyle == EasyGenericListStyle.PlaceHolders
+                        ? string.Empty
+                        : arg.EasyName(options);
 
-                if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
-                sb.Append(str);
+                    if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
+                    sb.Append(str);
+                }
+                sb.Append('>');
             }
-            sb.Append('>');
         }
 
         // Nullable annotations...
@@ -118,6 +122,13 @@ public static partial class RoslynNamesExtensions
             sb.Length > 0 &&
             sb[^1] != '?')
         {
+            if (options.UseSpecialNames && xname != null &&
+                source.IsNullableAnnotatedOrAttribute())
+            {
+                sb.Append('?');
+                break;
+            }
+
             if (options.NullableStyle == EasyNullableStyle.KeepWrappers &&
                 source.IsNullableWrapper())
                 break;

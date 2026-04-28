@@ -1,4 +1,6 @@
-﻿using IItem = Yotei.ORM.Generators.InvariantGenerator.Tests.IElement;
+﻿#pragma warning disable IDE0018
+
+using IItem = Yotei.ORM.Generators.InvariantGenerator.Tests.IElement;
 using TItem = Yotei.ORM.Generators.InvariantGenerator.Tests.NamedElement;
 using IHost = Yotei.ORM.Generators.InvariantGenerator.Tests.IElementList_T;
 using THost = Yotei.ORM.Generators.InvariantGenerator.Tests.ElementList_T;
@@ -149,7 +151,6 @@ public static partial class Test_ElementList_T
         var target = source.Replace(0, new THost(engine));
         Assert.Same(source, target);
     }
-}/*
 
     //[Enforced]
     [Fact]
@@ -158,9 +159,9 @@ public static partial class Test_ElementList_T
         var engine = new FakeEngine();
         var xalpha = new TItem("alpha");
         var xbeta = new TItem("beta");
-        var source = new THost(engine,[xone, xtwo, xthree]);
+        var source = new THost(engine, [xone, xtwo, xthree]);
 
-        var target = source.Replace(0, new THost(engine,[xalpha, xbeta]));
+        var target = source.Replace(0, new THost(engine, [xalpha, xbeta]));
         Assert.NotSame(source, target);
         Assert.Equal(4, target.Count);
         Assert.Same(xalpha, target[0]);
@@ -168,7 +169,7 @@ public static partial class Test_ElementList_T
         Assert.Same(xtwo, target[2]);
         Assert.Same(xthree, target[3]);
 
-        target = source.Replace(1, new THost(engine,[xalpha, xbeta]));
+        target = source.Replace(1, new THost(engine, [xalpha, xbeta]));
         Assert.NotSame(source, target);
         Assert.Equal(4, target.Count);
         Assert.Same(xone, target[0]);
@@ -176,7 +177,7 @@ public static partial class Test_ElementList_T
         Assert.Same(xbeta, target[2]);
         Assert.Same(xthree, target[3]);
 
-        target = source.Replace(2, new THost(engine,[xalpha, xbeta]));
+        target = source.Replace(2, new THost(engine, [xalpha, xbeta]));
         Assert.NotSame(source, target);
         Assert.Equal(4, target.Count);
         Assert.Same(xone, target[0]);
@@ -191,8 +192,8 @@ public static partial class Test_ElementList_T
     [Fact]
     public static void Test_IndexOf_Value()
     {
-        var engine = new FakeEngine();
-        var source = new THost(engine) { AllowDuplicates = true, IgnoreCase = true };
+        var engine = new FakeEngine() { IgnoreCase = true };
+        var source = new THost(engine) { AllowDuplicates = true };
         source = (THost)source.AddRange([xone, xtwo, xthree, xone]);
 
         var index = source.IndexOf(xfour); Assert.Equal(-1, index);
@@ -221,7 +222,7 @@ public static partial class Test_ElementList_T
     public static void Test_IndexOf_Predicate()
     {
         var engine = new FakeEngine();
-        var source = new THost(engine) { AllowDuplicates = true, IgnoreCase = true };
+        var source = new THost(engine) { AllowDuplicates = true };
         source = (THost)source.AddRange([xone, xtwo, xone, xthree]);
 
         var index = source.IndexOf(x => x is null); Assert.Equal(-1, index);
@@ -248,7 +249,7 @@ public static partial class Test_ElementList_T
         var engine = new FakeEngine();
         IElement item;
         List<IElement> range;
-        var source = new THost(engine) { AllowDuplicates = true, IgnoreCase = true };
+        var source = new THost(engine) { AllowDuplicates = true };
         source = (THost)source.AddRange([xone, xtwo, xone, xthree]);
 
         Assert.False(source.Find(x => x is null, out item));
@@ -282,7 +283,7 @@ public static partial class Test_ElementList_T
         Assert.Single(target);
         Assert.Same(xone, target[0]);
 
-        source = new THost(engine,[xone]);
+        source = new THost(engine, [xone]);
         target = source.Add(xtwo);
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
@@ -292,10 +293,11 @@ public static partial class Test_ElementList_T
         try { source.Add(null!); Assert.Fail(); } catch (ArgumentNullException) { }
         try { source.Add(xone); Assert.Fail(); } catch (DuplicateException) { }
 
-        source.IgnoreCase = true;
+        engine = new FakeEngine() { IgnoreCase = true };
+        source = new THost(engine, [xone]);
         try { source.Add(new TItem("ONE")); Assert.Fail(); } catch (DuplicateException) { }
 
-        source.AllowDuplicates = true;
+        source = (THost)source.WithAllowDuplicates(true);
         target = source.Add(xone);
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
@@ -308,6 +310,7 @@ public static partial class Test_ElementList_T
         Assert.Same(xone, target[0]);
         Assert.Equal("ONE", ((TItem)target[1]).Name);
     }
+}/*
 
     //[Enforced]
     [Fact]

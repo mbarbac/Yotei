@@ -84,7 +84,7 @@ public class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
         var strtype = rtype!.EasyName(options);
         var strnull = rnull ? "?" : string.Empty;
         var mods = GetModifiers();
-        var strarg = this.MemberType.EasyName(EasyTypeOptions.Full);
+        var strarg = this.MemberType.EasyName(EasyTypeOptions.Full with { UseSpecialNames = true });
 
         WithGenerator.EmitDocumentation(cb, this.MemberName);
         cb.AppendLine($"{mods}{strtype}{strnull}");
@@ -155,7 +155,7 @@ public class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
         var strtype = rtype!.EasyName(options);
         var strnull = rnull ? "?" : string.Empty;
         var mods = GetModifiers();
-        var strarg = this.MemberType.EasyName(EasyTypeOptions.Full);
+        var strarg = this.MemberType.EasyName(EasyTypeOptions.Full with { UseSpecialNames = true });
 
         WithGenerator.EmitDocumentation(cb, this.MemberName);
         cb.AppendLine($"{mods}{strtype}{strnull}");
@@ -259,7 +259,7 @@ public class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
         var strtype = rtype!.EasyName(options);
         var strnull = rnull ? "?" : string.Empty;
         var mods = GetModifiers();
-        var strarg = this.MemberType.EasyName(EasyTypeOptions.Full);
+        var strarg = this.MemberType.EasyName(EasyTypeOptions.Full with { UseSpecialNames = true });
 
         WithGenerator.EmitDocumentation(cb, this.MemberName);
         cb.AppendLine($"{mods}{strtype}{strnull}");

@@ -23,6 +23,12 @@ public static partial class EasyNameExtensions
             str = $"{str}[{new string(',', rank - 1)}]";
             return str;
         }
+        if (source.IsNullableWrapper())
+        {
+            var type = source.GetGenericArguments()[0];
+            var str = Core(type);
+            return str;
+        }
 
         return Core(source);
 

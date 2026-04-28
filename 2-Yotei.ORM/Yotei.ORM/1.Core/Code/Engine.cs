@@ -8,7 +8,7 @@
 [InheritsWith(ReturnType = typeof(IEngine))]
 public partial class Engine : IEngine
 {
-    public const bool IGNORECASE = true;
+    public const bool IGNORECASE = false; // Follows standard CLR behavior
     public const string NULLVALUELITERAL = "NULL";
     public const bool POSITIONALPARAMETERS = false;
     public const string PARAMETERPREFIX = "#";

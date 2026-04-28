@@ -23,7 +23,12 @@ public static partial class RoslynNamesExtensions
             str = $"{str}[{new string(',', array.Rank - 1)}]";
             return str;
         }
-
+        if (source.IsNullableWrapper())
+        {
+            var type = ((INamedTypeSymbol)source).TypeArguments[0];
+            var str = Core(type);
+            return str;
+        }
         return Core(source);
 
         static string? Core(ITypeSymbol source) => source.SpecialType switch

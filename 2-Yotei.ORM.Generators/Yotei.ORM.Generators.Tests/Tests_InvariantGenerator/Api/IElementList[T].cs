@@ -26,5 +26,5 @@ public partial interface IElementList_T : IInvariantList<IItem>, IItem
     /// <summary>
     /// <inheritdoc cref="CoreList{T}.AllowDuplicates"/>
     /// </summary>
-    public bool? AllowDuplicates { get; init; }
+    [With] public bool? AllowDuplicates { get; init; }
 }

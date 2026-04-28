@@ -12,6 +12,7 @@ namespace Yotei.ORM.Generators.InvariantGenerator.Tests;
 /// <inheritdoc cref="IHost"/>
 /// </summary>
 [DebuggerDisplay("{ToDebugString(3)}")]
+[InheritsWith(ReturnType = typeof(IHost))]
 [InvariantList<IItem>(ReturnType = typeof(IHost))]
 public partial class ElementList_T : IHost
 {
