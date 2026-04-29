@@ -9,17 +9,13 @@ static partial class EasyNameExtensions
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns the special name of the given type, if any, or null otherwise. The string is the
-    /// naked representation of that type, and the out arguments contain whether it is a reference
-    /// type and a nullable one.
+    /// Returns the special name of the given type, if any, or null otherwise. When not null, the
+    /// string is the naked representation of that type, without modifiers or nullable annotations.
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
-    public static string? ToSpecialName(this Type source, out bool isByRef, out bool isNullable)
+    public static string? ToSpecialName(this Type source)
     {
-        isByRef = source.IsByRef;
-        isNullable = source.IsNullableWrapper() || source.IsNullableAnnotated();
-
         // Intercepting special cases...
         if (source.IsByRef)
         {
@@ -29,16 +25,15 @@ static partial class EasyNameExtensions
         {
             var type = source.GetElementType() ?? source;
             var str = Core(type);
-            var rank = source.GetArrayRank();
-            str = $"{str}[{new string(',', rank - 1)}]";
-            return str;
+            
+            if (str != null)
+            {
+                var rank = source.GetArrayRank();
+                str = $"{str}[{new string(',', rank - 1)}]";
+                return str;
+            }
         }
-        if (source.IsNullableWrapper())
-        {
-            var type = source.GetGenericArguments()[0];
-            var str = Core(type);
-            return str;
-        }
+        if (source.IsNullableWrapper()) source = source.GetGenericArguments()[0];
 
         // Returning for the naked source type...
         return Core(source);
@@ -84,7 +79,7 @@ static partial class EasyNameExtensions
     /// <summary>
     /// Determines if the type is a generic 'T' one, for EasyName purposes only.
     /// </summary>
-    public static bool IsGenericAlike(this Type source)
+    internal static bool IsGenericAlike(this Type source)
     {
         // Types such 'Predicate<T>' are not considered 'T'-alike ones...
         if (source.GetGenericArguments().Length > 0) return false;
@@ -97,19 +92,19 @@ static partial class EasyNameExtensions
             source.IsGenericMethodParameter;
     }
 
-#if !NETSTANDARD2_0
+#if NETSTANDARD2_0
     extension(Type source)
     {
         /// <summary>
         /// Determines if the type is a generic type parameter, or not.
         /// </summary>
-        public bool IsGenericTypeParameter
+        internal bool IsGenericTypeParameter
             => source.IsGenericParameter && source.DeclaringMethod == null;
 
         /// <summary>
         /// Determines if the type is a generic method parameter, or not.
         /// </summary>
-        public bool IsGenericMethodParameter
+        internal bool IsGenericMethodParameter
             => source.IsGenericParameter && source.DeclaringMethod != null;
     }
 #endif

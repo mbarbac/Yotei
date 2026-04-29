@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools;
+﻿using System.Diagnostics.Tracing;
+
+namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>
@@ -6,13 +8,6 @@
 /// </summary>
 public record EasyTypeOptions
 {
-    /// <summary>
-    /// If enabled, the easy name produced will be an empty string, short-circuiting all other
-    /// options. This setting is only used when the given element is part of a generic list of
-    /// arguments.
-    /// </summary>
-    public bool HideName { get; init; }
-
     /// <summary>
     /// If enabled, then use the type's variance (the 'in' and 'out' keywords), if any.
     /// </summary>
@@ -46,11 +41,9 @@ public record EasyTypeOptions
     public EasyNullableStyle NullableStyle { get; init; }
 
     /// <summary>
-    /// If not null, then the options to use to obtain the C#-alike representation of the generic
-    /// arguments of the given type, if any. If null, then that list is ignored. To obtain just a
-    /// list of place holders, enable the <see cref="HideName"/> property of these options.
+    /// Describes how to include the generic type arguments, if any.
     /// </summary>
-    public EasyTypeOptions? GenericsOptions { get; init; }
+    public EasyGenericListStyle GenericListStyle { get; init; }
 
     // ----------------------------------------------------
 
@@ -80,39 +73,27 @@ public record EasyTypeOptions
     enum Mode { Empty, Default, Full };
     EasyTypeOptions(Mode mode)
     {
+        UseVariance = false;
+        NamespaceStyle = EasyNamespaceStyle.None;
+        UseHost = false;
+        UseSpecialNames = true;
+        RemoveAttributeSuffix = false;
+        NullableStyle = EasyNullableStyle.None;
+        GenericListStyle = EasyGenericListStyle.None;
+
         switch (mode)
         {
-            case Mode.Empty:
-                HideName = false;
-                UseVariance = false;
-                NamespaceStyle = EasyNamespaceStyle.None;
-                UseHost = false;
-                UseSpecialNames = true;
-                RemoveAttributeSuffix = true;
-                NullableStyle = EasyNullableStyle.None;
-                GenericsOptions = this;
-                break;
-
             case Mode.Default:
-                HideName = false;
-                UseVariance = false;
-                NamespaceStyle = EasyNamespaceStyle.None;
-                UseHost = false;
-                UseSpecialNames = true;
                 RemoveAttributeSuffix = true;
                 NullableStyle = EasyNullableStyle.UseAnnotations;
-                GenericsOptions = this;
+                GenericListStyle = EasyGenericListStyle.UseNames;
                 break;
 
             case Mode.Full:
-                HideName = false;
-                UseVariance = false;
                 NamespaceStyle = EasyNamespaceStyle.Default;
                 UseHost = true;
-                UseSpecialNames = true;
-                RemoveAttributeSuffix = false;
                 NullableStyle = EasyNullableStyle.KeepWrappers;
-                GenericsOptions = this;
+                GenericListStyle = EasyGenericListStyle.UseNames;
                 break;
         }
     }
@@ -156,10 +137,116 @@ public static partial class EasyNameExtensions
     /// <returns></returns>
     static string EasyName(this Type source, Type[] types, EasyTypeOptions options)
     {
+        // Intercepting wrappers...
+        if (source.IsNullableWrapper() &&
+            options.NullableStyle != EasyNullableStyle.KeepWrappers)
+        {
+            var arg = source.GetGenericArguments()[0];
+            var str = arg.EasyName(options);
+            if (str.Length > 0 && str[^1] != '?') str += '?';
+            return str;
+        }
+
+        // Capturing...
         var sb = new StringBuilder();
+        var isgen = source.IsGenericAlike();
+        var host = source.DeclaringType;
+        var xname = options.UseSpecialNames ? source.ToSpecialName() : null;
 
+        // Variance...
+        if (options.UseVariance && source.IsGenericParameter)
+        {
+            var gpa = source.GenericParameterAttributes;
+            var variance = gpa & GenericParameterAttributes.VarianceMask;
 
+            if ((variance & GenericParameterAttributes.Covariant) != 0) sb.Append("out ");
+            if ((variance & GenericParameterAttributes.Contravariant) != 0) sb.Append("in ");
+        }
 
-        throw null;
+        // Namespace...
+        if (options.NamespaceStyle != EasyNamespaceStyle.None &&
+            xname == null &&
+            host == null && !isgen)
+        {
+            var str = source.Namespace;
+            if (str != null && str.Length > 0)
+            {
+                if (options.NamespaceStyle == EasyNamespaceStyle.UseGlobal) sb.Append("global::");
+                sb.Append(str).Append('.');
+            }
+        }
+
+        // Host...
+        if ((options.UseHost || options.NamespaceStyle != EasyNamespaceStyle.None) &&
+            xname == null &&
+            host != null && !isgen)
+        {
+            var str = host.EasyName(types, options); // Using captured types...
+            if (str.Length > 0) sb.Append(str).Append('.');
+        }
+
+        // Name...
+        if (xname != null) sb.Append(xname);
+        else
+        {
+            var name = source.Name;
+            var index = name.IndexOf('`'); if (index >= 0) name = name[..index];
+            if (name.Length > 0 && name[^1] == '&') name = name[..^1];
+
+            if (options.RemoveAttributeSuffix &&
+                name != ATTRIBUTE &&
+                name.EndsWith(ATTRIBUTE))
+                name = name.RemoveLast(ATTRIBUTE).ToString();
+
+            sb.Append(name);
+        }
+
+        // Generic attributes...
+        if (xname == null && options.GenericListStyle != EasyGenericListStyle.None)
+        {
+            var args = source.GetGenericArguments();
+            var used = host == null ? 0 : host.GetGenericArguments().Length;
+            var need = args.Length - used;
+
+            if (need > 0)
+            {
+                sb.Append('<'); for (int i = 0; i < need; i++)
+                {
+                    var arg = types[used + i];
+                    var str = options.GenericListStyle == EasyGenericListStyle.PlaceHolders
+                        ? string.Empty
+                        : arg.EasyName(options);
+
+                    if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
+                    sb.Append(str);
+                }
+                sb.Append('>');
+            }
+        }
+
+        // Nullable annotations...
+        while (options.NullableStyle != EasyNullableStyle.None && sb.Length > 0 && sb[^1] != '?')
+        {
+            // Host source is a wrapped nullable...
+            if (source.IsNullableWrapper())
+            {
+                if (options.NullableStyle == EasyNullableStyle.KeepWrappers)
+                {
+                    if (xname != null) sb.Append('?');
+                    break;
+                }
+            }
+
+            // Standard case...
+            if (source.IsNullableAnnotated())
+            {
+                sb.Append('?'); break;
+            }
+
+            break;
+        }
+
+        // Finishing...
+        return sb.ToString();
     }
 }
