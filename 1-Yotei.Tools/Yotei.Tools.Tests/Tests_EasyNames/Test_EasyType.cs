@@ -613,4 +613,130 @@ public static class Test_EasyType
             "IFace4c<System.Nullable<System.Int64>, Yotei.Tools.IsNullable<System.String>>",
             name);
     }
+
+    // ----------------------------------------------------
+
+    interface IFace5a<K, T> { interface IFace5b<R> { interface IFace5c<[IsNullable] S, [IsNullable] V> { } } }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Nested_NullableAttribute_Unbound()
+    {
+        EasyTypeOptions options;
+        string name;
+        var source = typeof(IFace5a<,>.IFace5b<>.IFace5c<,>);
+
+        options = new EasyTypeOptions(EMPTY);
+        name = source.EasyName(options); Assert.Equal("IFace5c", name);
+
+        options = new EasyTypeOptions(DEFAULT);
+        name = source.EasyName(options); Assert.Equal("IFace5c<S?, V?>", name);
+
+        options.GenericListOptions = new EasyTypeOptions() { PlaceHolder = true };
+        name = source.EasyName(options); Assert.Equal("IFace5c<,>", name);
+
+        options = new EasyTypeOptions(FULL);
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.IFace5a<K, T>.IFace5b<R>.IFace5c<S?, V?>", name);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Nested_NullableAttribute_Bound_LostOnReferences()
+    {
+        EasyTypeOptions options;
+        string name;
+        var source = typeof(IFace5a<byte?, short?>.IFace5b<int?>.IFace5c<long?, string?>);
+
+        options = new EasyTypeOptions(EMPTY);
+        name = source.EasyName(options); Assert.Equal("IFace5c", name);
+
+        options = new EasyTypeOptions(DEFAULT);
+        name = source.EasyName(options); Assert.Equal("IFace5c<long?, string>", name);
+
+        options = new EasyTypeOptions(FULL);
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.IFace5a<byte?, short?>.IFace5b<int?>.IFace5c<long?, string>", name);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Nested_NullableAttribute_Bound_WrappedReferences()
+    {
+        EasyTypeOptions options;
+        string name;
+        var source = typeof(IFace5a<byte?, short?>.IFace5b<int?>.IFace5c<long?, IsNullable<string?>>);
+
+        options = new EasyTypeOptions(EMPTY);
+        name = source.EasyName(options); Assert.Equal("IFace5c", name);
+
+        options = new EasyTypeOptions(DEFAULT);
+        name = source.EasyName(options); Assert.Equal("IFace5c<long?, string?>", name);
+
+        options = new EasyTypeOptions(FULL);
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.IFace5a<byte?, short?>.IFace5b<int?>.IFace5c<long?, string?>", name);
+    }
+
+    // ----------------------------------------------------
+
+    // We don't remove the 'Attribute' suffix when the type is, itself, the 'Attribute' one...
+    //[Enforced]
+    [Fact]
+    public static void Test_Core_Attribute()
+    {
+        EasyTypeOptions options;
+        string name;
+        var source = typeof(Attribute);
+
+        options = new EasyTypeOptions(EMPTY);
+        name = source.EasyName(options); Assert.Equal("Attribute", name);
+
+        options = new EasyTypeOptions(DEFAULT);
+        name = source.EasyName(options); Assert.Equal("Attribute", name);
+
+        options = new EasyTypeOptions(FULL);
+        name = source.EasyName(options); Assert.Equal("System.Attribute", name);
+
+        options.RemoveAttributeSuffix = true;
+        name = source.EasyName(options); Assert.Equal("System.Attribute", name);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Custom_Attribute()
+    {
+        EasyTypeOptions options;
+        string name;
+        var source = typeof(IsNullableAttribute);
+
+        options = new EasyTypeOptions(EMPTY);
+        name = source.EasyName(options); Assert.Equal("IsNullableAttribute", name);
+
+        options = new EasyTypeOptions(DEFAULT);
+        name = source.EasyName(options); Assert.Equal("IsNullable", name);
+
+        options = new EasyTypeOptions(FULL);
+        name = source.EasyName(options);
+        Assert.Equal("Yotei.Tools.IsNullableAttribute", name);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Global_Namespace()
+    {
+        EasyTypeOptions options;
+        string name;
+        var source = typeof(IsNullableAttribute);
+
+        options = new EasyTypeOptions(DEFAULT) { NamespaceStyle = EasyNamespaceStyle.UseGlobal };
+        name = source.EasyName(options);
+        Assert.Equal("global::Yotei.Tools.IsNullable", name);
+
+        options = new EasyTypeOptions(FULL) { NamespaceStyle = EasyNamespaceStyle.UseGlobal };
+        name = source.EasyName(options);
+        Assert.Equal("global::Yotei.Tools.IsNullableAttribute", name);
+    }
 }
