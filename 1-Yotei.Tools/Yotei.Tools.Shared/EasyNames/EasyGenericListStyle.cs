@@ -4,7 +4,7 @@
 /// <summary>
 /// Describes how to obtain a C#-alike representation of list of generic types.
 /// </summary>
-public enum EasyGenericListStyle
+public enum EasyGenericListStyle_ZZ
 {
     /// <summary>
     /// Ignore the list og generic arguments.

@@ -6,46 +6,63 @@ namespace Yotei.Tools;
 /// <summary>
 /// Describes how to obtain a C#-alike representation of a given type-alike element.
 /// </summary>
-public record EasyTypeOptions
+public class EasyTypeOptions
 {
+    /// <summary>
+    /// If enabled, then the returned string will be an empty one to be used as a placeholder.
+    /// This setting is moslty used when the intent is to obtain an anonymous list of generic
+    /// type arguments
+    /// </summary>
+    public bool PlaceHolder { get; set; }
+
     /// <summary>
     /// If enabled, then use the type's variance (the 'in' and 'out' keywords), if any.
     /// </summary>
-    public bool UseVariance { get; init; }
+    public bool UseVariance { get; set; }
 
     /// <summary>
     /// The style to use to obtain the namespace, if any, of the given type.
     /// <br/> A not-empty value of this property implies <see cref="UseHost"/>.
     /// </summary>
-    public EasyNamespaceStyle NamespaceStyle { get; init; }
+    public EasyNamespaceStyle NamespaceStyle { get; set; }
 
     /// <summary>
     /// If enabled, then use the type's host, if any (unless it is a special type).
     /// </summary>
-    public bool UseHost { get; init; }
+    public bool UseHost { get; set; }
 
     /// <summary>
     /// If enabled, then use the type's special name, if possible.
     /// <br/> If enabled, it shortcircuit the other name-related options.
     /// </summary>
-    public bool UseSpecialNames { get; init; }
+    public bool UseSpecialNames { get; set; }
 
     /// <summary>
     /// If enabled, then remove the 'Attribute' suffix, if any.
     /// </summary>
-    public bool RemoveAttributeSuffix { get; init; }
+    public bool RemoveAttributeSuffix { get; set; }
 
     /// <summary>
     /// The style to use when the given type is a nullable one.
     /// </summary>
-    public EasyNullableStyle NullableStyle { get; init; }
+    public EasyNullableStyle NullableStyle { get; set; }
 
     /// <summary>
-    /// Describes how to include the generic type arguments, if any.
+    /// The options to use with the generic type arguments, if any. If null, then that list of
+    /// generic type arguments is ignored.
+    /// <br/> Otherwise, by default, it refers to its host instance to use the same settings.
+    /// <br/> To modify how the list is obtained set the value of this property to null, or to
+    /// a new instance with the desired settings. For instance, to obtain an anonymous list, the
+    /// new instace shall have its own <see cref="PlaceHolder"/> value set to true.
     /// </summary>
-    public EasyGenericListStyle GenericListStyle { get; init; }
+    public EasyTypeOptions? GenericListOptions { get; set; }
 
     // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines what options to use when creating a new instance.
+    /// </summary>
+    public enum Mode { Empty, Default, Full };
 
     /// <summary>
     /// Initializes a new empty instance.
@@ -53,47 +70,33 @@ public record EasyTypeOptions
     public EasyTypeOptions() : this(Mode.Empty) { }
 
     /// <summary>
-    /// A shared instance with empty-alike settings.
+    /// Initializes a new instance with values associated with the given mode.
     /// </summary>
-    public static EasyTypeOptions Empty { get; } = new(Mode.Empty);
-
-    /// <summary>
-    /// A shared instance with default-alike settings.
-    /// </summary>
-    public static EasyTypeOptions Default { get; } = new(Mode.Default);
-
-    /// <summary>
-    /// A shared instance with full-alike settings.
-    /// </summary>
-    public static EasyTypeOptions Full { get; } = new(Mode.Full);
-
-    /// <summary>
-    /// Options for the private constructor.
-    /// </summary>
-    enum Mode { Empty, Default, Full };
-    EasyTypeOptions(Mode mode)
+    /// <param name="mode"></param>
+    public EasyTypeOptions(Mode mode)
     {
+        PlaceHolder = false;
         UseVariance = false;
         NamespaceStyle = EasyNamespaceStyle.None;
         UseHost = false;
         UseSpecialNames = true;
         RemoveAttributeSuffix = false;
         NullableStyle = EasyNullableStyle.None;
-        GenericListStyle = EasyGenericListStyle.None;
+        GenericListOptions = null;
 
         switch (mode)
         {
             case Mode.Default:
                 RemoveAttributeSuffix = true;
                 NullableStyle = EasyNullableStyle.UseAnnotations;
-                GenericListStyle = EasyGenericListStyle.UseNames;
+                GenericListOptions = this;
                 break;
 
             case Mode.Full:
                 NamespaceStyle = EasyNamespaceStyle.Default;
                 UseHost = true;
                 NullableStyle = EasyNullableStyle.KeepWrappers;
-                GenericListStyle = EasyGenericListStyle.UseNames;
+                GenericListOptions = this;
                 break;
         }
     }
@@ -108,7 +111,7 @@ public static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <returns></returns>
     public static string EasyName(
-        this Type source) => source.EasyName(EasyTypeOptions.Default);
+        this Type source) => source.EasyName(new EasyTypeOptions());
 
     /// <summary>
     /// Obtains a C#-alike representation for a given type-alike element, using the given options.
@@ -137,6 +140,9 @@ public static partial class EasyNameExtensions
     /// <returns></returns>
     static string EasyName(this Type source, Type[] types, EasyTypeOptions options)
     {
+        // Intercepting placeholders...
+        if (options.PlaceHolder) return string.Empty;
+
         // Intercepting wrappers...
         if (source.IsNullableWrapper() &&
             options.NullableStyle != EasyNullableStyle.KeepWrappers)
@@ -202,7 +208,7 @@ public static partial class EasyNameExtensions
         }
 
         // Generic attributes...
-        if (xname == null && options.GenericListStyle != EasyGenericListStyle.None)
+        if (xname == null && options.GenericListOptions != null)
         {
             var args = source.GetGenericArguments();
             var used = host == null ? 0 : host.GetGenericArguments().Length;
@@ -213,9 +219,7 @@ public static partial class EasyNameExtensions
                 sb.Append('<'); for (int i = 0; i < need; i++)
                 {
                     var arg = types[used + i];
-                    var str = options.GenericListStyle == EasyGenericListStyle.PlaceHolders
-                        ? string.Empty
-                        : arg.EasyName(options);
+                    var str = arg.EasyName(options.GenericListOptions);
 
                     if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
                     sb.Append(str);
