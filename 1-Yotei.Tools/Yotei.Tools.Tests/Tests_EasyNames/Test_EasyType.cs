@@ -6,10 +6,6 @@ public static class Test_EasyType
 {
     const string PREFIX = "Yotei.Tools.Tests.EasyNames.Test_EasyType";
 
-    const EasyTypeOptions.Mode EMPTY = EasyTypeOptions.Mode.Empty;
-    const EasyTypeOptions.Mode DEFAULT = EasyTypeOptions.Mode.Default;
-    const EasyTypeOptions.Mode FULL = EasyTypeOptions.Mode.Full;
-
     // ----------------------------------------------------
 
     //[Enforced]
@@ -20,13 +16,13 @@ public static class Test_EasyType
         string name;
         var source = typeof(int);
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("int", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("int", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options); Assert.Equal("int", name);
 
         options.UseSpecialNames = false;
@@ -43,13 +39,13 @@ public static class Test_EasyType
         string name;
         var source = typeof(int?);
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("int", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("int?", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options); Assert.Equal("int?", name);
 
         options.UseSpecialNames = false;
@@ -66,13 +62,13 @@ public static class Test_EasyType
         string name;
         var source = typeof(DateTime);
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("DateTime", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("DateTime", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options); Assert.Equal("System.DateTime", name);
     }
 
@@ -85,13 +81,13 @@ public static class Test_EasyType
         string name;
         var source = typeof(DateTime?);
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("Nullable", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("DateTime?", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options);
         Assert.Equal("System.Nullable<System.DateTime>", name);
     }
@@ -106,13 +102,13 @@ public static class Test_EasyType
         string name;
         var source = typeof(string);
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("string", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("string", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options); Assert.Equal("string", name);
 
         options.UseSpecialNames = false;
@@ -131,13 +127,13 @@ public static class Test_EasyType
         //var source = typeof(string?); // CS8639: typeof cannot be use on nullable reference type
         var source = typeof(IsNullable<string>);
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("string", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("string?", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options); Assert.Equal("string?", name);
 
         options.UseSpecialNames = false;
@@ -161,17 +157,17 @@ public static class Test_EasyType
         string name;
         var source = typeof(IFace1<>);
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("IFace1", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("IFace1<T?>", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"{PREFIX}.IFace1<T?>", name);
 
-        options.GenericListOptions = new EasyTypeOptions(EMPTY) { UsePlaceHolder = true };
+        options.GenericListOptions = EasyTypeOptions.Empty with { UsePlaceHolder = true };
         name = source.EasyName(options);
         Assert.Equal($"{PREFIX}.IFace1<>", name);
 
@@ -188,13 +184,13 @@ public static class Test_EasyType
         string name;
         var source = typeof(IFace1<bool?>);
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("IFace1", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("IFace1<bool?>", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"{PREFIX}.IFace1<bool?>", name);
 
@@ -211,13 +207,13 @@ public static class Test_EasyType
         string name;
         var source = typeof(IFace1<string?>);
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("IFace1", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("IFace1<string>", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"{PREFIX}.IFace1<string>", name);
     }
@@ -230,13 +226,13 @@ public static class Test_EasyType
         string name;
         var source = typeof(IFace1<IsNullable<string>>);
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("IFace1", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("IFace1<string?>", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"{PREFIX}.IFace1<string?>", name);
 
@@ -260,13 +256,13 @@ public static class Test_EasyType
         var method = type.GetMethod("MyMethod")!;
         var source = method.GetParameters()[0].ParameterType;
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("Predicate", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("Predicate<T?>", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options); Assert.Equal("System.Predicate<T?>", name);
     }
 
@@ -280,13 +276,13 @@ public static class Test_EasyType
         var method = type.GetMethod("MyMethod")!;
         var source = method.GetParameters()[0].ParameterType;
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("Predicate", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("Predicate<bool?>", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options); Assert.Equal("System.Predicate<bool?>", name);
 
         options.UseSpecialNames = false;
@@ -307,13 +303,13 @@ public static class Test_EasyType
         var method = type.GetMethod("MyMethod")!;
         var source = method.GetParameters()[0].ParameterType;
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("Predicate", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("Predicate<string>", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options); Assert.Equal("System.Predicate<string>", name);
 
         options.UseSpecialNames = false;
@@ -334,13 +330,13 @@ public static class Test_EasyType
         var method = type.GetMethod("MyMethod")!;
         var source = method.GetParameters()[0].ParameterType;
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("Predicate", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("Predicate<string?>", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options); Assert.Equal("System.Predicate<string?>", name);
 
         options.UseSpecialNames = false;
@@ -364,13 +360,13 @@ public static class Test_EasyType
         var type = typeof(IFace3b<>);
         var source = type.GetInterface("IFace3a`1")!;
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("IFace3a", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("IFace3a<T>", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"{PREFIX}.IFace3a<T>", name);
     }
@@ -390,13 +386,13 @@ public static class Test_EasyType
         var type = typeof(IFace3c<>);
         var source = type.GetInterface("IFace3a`1")!;
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("IFace3a", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("IFace3a<T?>", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"{PREFIX}.IFace3a<T?>", name);
     }
@@ -410,13 +406,13 @@ public static class Test_EasyType
         var type = typeof(IFace3c<bool?>);
         var source = type.GetInterface("IFace3a`1")!;
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("IFace3a", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("IFace3a<bool?>", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"{PREFIX}.IFace3a<bool?>", name);
     }
@@ -430,13 +426,13 @@ public static class Test_EasyType
         var type = typeof(IFace3c<string?>);
         var source = type.GetInterface("IFace3a`1")!;
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("IFace3a", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("IFace3a<string>", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"{PREFIX}.IFace3a<string>", name);
     }
@@ -450,13 +446,13 @@ public static class Test_EasyType
         var type = typeof(IFace3c<IsNullable<string?>>);
         var source = type.GetInterface("IFace3a`1")!;
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("IFace3a", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("IFace3a<string?>", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"{PREFIX}.IFace3a<string?>", name);
     }
@@ -474,13 +470,13 @@ public static class Test_EasyType
         var type = typeof(IFace3d<>);
         var source = type.GetInterface("IFace3a`1")!;
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("IFace3a", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("IFace3a<T?>", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"{PREFIX}.IFace3a<Yotei.Tools.IsNullable<T>>", name);
     }
@@ -494,13 +490,13 @@ public static class Test_EasyType
         var type = typeof(IFace3d<bool?>);
         var source = type.GetInterface("IFace3a`1")!;
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("IFace3a", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("IFace3a<bool?>", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"{PREFIX}.IFace3a<Yotei.Tools.IsNullable<bool?>>", name);
     }
@@ -517,13 +513,13 @@ public static class Test_EasyType
         var type = typeof(IFace3d<string?>);
         var source = type.GetInterface("IFace3a`1")!;
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("IFace3a", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("IFace3a<string?>", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"{PREFIX}.IFace3a<string?>", name);
     }
@@ -540,16 +536,16 @@ public static class Test_EasyType
         string name;
         var source = typeof(IFace4a<,>.IFace4b<>.IFace4c<,>);
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("IFace4c", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("IFace4c<S, V>", name);
 
         options.GenericListOptions = new EasyTypeOptions() { UsePlaceHolder = true };
         name = source.EasyName(options); Assert.Equal("IFace4c<,>", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"{PREFIX}.IFace4a<K, T>.IFace4b<R>.IFace4c<S, V>", name);
 
@@ -566,13 +562,13 @@ public static class Test_EasyType
         string name;
         var source = typeof(IFace4a<byte?, short?>.IFace4b<int?>.IFace4c<long?, string?>);
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("IFace4c", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("IFace4c<long?, string>", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"{PREFIX}.IFace4a<byte?, short?>.IFace4b<int?>.IFace4c<long?, string>", name);
 
@@ -594,13 +590,13 @@ public static class Test_EasyType
         string name;
         var source = typeof(IFace4a<byte?, short?>.IFace4b<int?>.IFace4c<long?, IsNullable<string?>>);
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("IFace4c", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("IFace4c<long?, string?>", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"{PREFIX}.IFace4a<byte?, short?>.IFace4b<int?>.IFace4c<long?, string?>", name);
 
@@ -626,16 +622,16 @@ public static class Test_EasyType
         string name;
         var source = typeof(IFace5a<,>.IFace5b<>.IFace5c<,>);
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("IFace5c", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("IFace5c<S?, V?>", name);
 
         options.GenericListOptions = new EasyTypeOptions() { UsePlaceHolder = true };
         name = source.EasyName(options); Assert.Equal("IFace5c<,>", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"{PREFIX}.IFace5a<K, T>.IFace5b<R>.IFace5c<S?, V?>", name);
     }
@@ -648,13 +644,13 @@ public static class Test_EasyType
         string name;
         var source = typeof(IFace5a<byte?, short?>.IFace5b<int?>.IFace5c<long?, string?>);
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("IFace5c", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("IFace5c<long?, string>", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"{PREFIX}.IFace5a<byte?, short?>.IFace5b<int?>.IFace5c<long?, string>", name);
     }
@@ -667,13 +663,13 @@ public static class Test_EasyType
         string name;
         var source = typeof(IFace5a<byte?, short?>.IFace5b<int?>.IFace5c<long?, IsNullable<string?>>);
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("IFace5c", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("IFace5c<long?, string?>", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"{PREFIX}.IFace5a<byte?, short?>.IFace5b<int?>.IFace5c<long?, string?>", name);
     }
@@ -688,13 +684,13 @@ public static class Test_EasyType
         string name;
         var source = typeof(int?[]);
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("int[]", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("int?[]", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options); Assert.Equal("int?[]", name);
     }
 
@@ -706,13 +702,13 @@ public static class Test_EasyType
         string name;
         var source = typeof(string?[]);
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("string[]", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("string[]", name);
 
-        options = new EasyTypeOptions(FULL) { UseSpecialNames = false };
+        options = EasyTypeOptions.Full with { UseSpecialNames = false };
         name = source.EasyName(options); Assert.Equal("System.String[]", name);
     }
 
@@ -724,13 +720,14 @@ public static class Test_EasyType
         string name;
         var source = typeof(IsNullable<string?>[]);
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("string[]", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("string?[]", name);
 
-        options = new EasyTypeOptions(FULL) { UseSpecialNames = false };
+        options = EasyTypeOptions.Full with { UseSpecialNames = false };
+        options.GenericListOptions = options;
         name = source.EasyName(options);
         Assert.Equal("Yotei.Tools.IsNullable<System.String>[]", name);
     }
@@ -750,13 +747,14 @@ public static class Test_EasyType
         var method = type.GetMethod("MyMethod1")!;
         var source = method.GetParameters()[0].ParameterType;
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("int[]", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("int?[]", name);
 
-        options = new EasyTypeOptions(FULL) { UseSpecialNames = false };
+        options = EasyTypeOptions.Full with { UseSpecialNames = false };
+        options.GenericListOptions = options;
         name = source.EasyName(options); Assert.Equal("System.Nullable<System.Int32>[]", name);
     }
 
@@ -772,13 +770,14 @@ public static class Test_EasyType
         var method = type.GetMethod("MyMethod1")!;
         var source = method.GetParameters()[0].ParameterType;
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("IsNullable", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("int?[]?", name);
 
-        options = new EasyTypeOptions(FULL) { UseSpecialNames = false };
+        options = EasyTypeOptions.Full with { UseSpecialNames = false };
+        options.GenericListOptions = options;
         name = source.EasyName(options);
         Assert.Equal("Yotei.Tools.IsNullable<System.Nullable<System.Int32>[]>", name);
     }
@@ -794,13 +793,13 @@ public static class Test_EasyType
         string name;
         var source = typeof(Attribute);
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("Attribute", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("Attribute", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options); Assert.Equal("System.Attribute", name);
 
         options.RemoveAttributeSuffix = true;
@@ -815,13 +814,13 @@ public static class Test_EasyType
         string name;
         var source = typeof(IsNullableAttribute);
 
-        options = new EasyTypeOptions(EMPTY);
+        options = EasyTypeOptions.Empty;
         name = source.EasyName(options); Assert.Equal("IsNullableAttribute", name);
 
-        options = new EasyTypeOptions(DEFAULT);
+        options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("IsNullable", name);
 
-        options = new EasyTypeOptions(FULL);
+        options = EasyTypeOptions.Full;
         name = source.EasyName(options);
         Assert.Equal("Yotei.Tools.IsNullableAttribute", name);
     }
@@ -836,11 +835,11 @@ public static class Test_EasyType
         string name;
         var source = typeof(IsNullableAttribute);
 
-        options = new EasyTypeOptions(DEFAULT) { NamespaceStyle = EasyNamespaceStyle.UseGlobal };
+        options = EasyTypeOptions.Default with { NamespaceStyle = EasyNamespaceStyle.UseGlobal };
         name = source.EasyName(options);
         Assert.Equal("global::Yotei.Tools.IsNullable", name);
 
-        options = new EasyTypeOptions(FULL) { NamespaceStyle = EasyNamespaceStyle.UseGlobal };
+        options = EasyTypeOptions.Full with { NamespaceStyle = EasyNamespaceStyle.UseGlobal };
         name = source.EasyName(options);
         Assert.Equal("global::Yotei.Tools.IsNullableAttribute", name);
     }

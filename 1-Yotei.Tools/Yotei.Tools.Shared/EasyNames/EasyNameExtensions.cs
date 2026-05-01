@@ -19,27 +19,6 @@ static partial class EasyNameExtensions
     /// <returns></returns>
     public static string? ToSpecialName(this Type source)
     {
-        /* HIGH
-        // Intercepting special cases...
-        if (source.IsByRef)
-        {
-            return Core(source.GetElementType() ?? source);
-        }
-        if (source.IsArray || source.IsSZArray)
-        {
-            var type = source.GetElementType() ?? source;
-            var str = Core(type);
-            
-            if (str != null)
-            {
-                var rank = source.GetArrayRank();
-                str = $"{str}[{new string(',', rank - 1)}]";
-                return str;
-            }
-        }
-        if (source.IsNullableWrapper()) source = source.GetGenericArguments()[0];
-        */
-
         if (source.IsByRef) return Core(source.GetElementType() ?? source);
         if (source.IsArray) return Core(source.GetElementType() ?? source);
         if (source.IsNullableWrapper()) return Core(source.GetGenericArguments()[0]);

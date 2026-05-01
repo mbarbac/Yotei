@@ -4,7 +4,7 @@
 /// <summary>
 /// Describes how to obtain a C#-alike representation of a given type-alike element.
 /// </summary>
-public class EasyTypeOptions
+public record EasyTypeOptions
 {
     /// <summary>
     /// If enabled, then the returned string will be an empty one to be used as a placeholder.
@@ -66,6 +66,21 @@ public class EasyTypeOptions
     /// Initializes a new empty instance.
     /// </summary>
     public EasyTypeOptions() : this(Mode.Empty) { }
+
+    /// <summary>
+    /// Obtains a new empty-alike instance.
+    /// </summary>
+    public static EasyTypeOptions Empty => new(Mode.Empty);
+
+    /// <summary>
+    /// Obtains a new default-alike instance.
+    /// </summary>
+    public static EasyTypeOptions Default => new(Mode.Default);
+
+    /// <summary>
+    /// Obtains a new full-alike instance.
+    /// </summary>
+    public static EasyTypeOptions Full => new(Mode.Full);
 
     /// <summary>
     /// Initializes a new instance with values associated with the given mode.
@@ -240,16 +255,17 @@ public static partial class EasyNameExtensions
         }
 
         // Nullability...
-        if (options.NullableStyle != EasyNullableStyle.None &&
+        while (options.NullableStyle != EasyNullableStyle.None &&
             sb.Length > 0 &&
             sb[^1] != '?')
         {
             if (source.IsNullableWrapper()) // Special case...
             {
                 if (options.NullableStyle == EasyNullableStyle.KeepWrappers)
-                { if (xname != null) sb.Append('?'); }
+                { if (xname != null) { sb.Append('?'); break; } }
             }
-            else if (source.IsNullableAnnotated()) sb.Append('?');
+            if (source.IsNullableAnnotated()) { sb.Append('?'); break; }
+            break;
         }
 
         // Finishing...
