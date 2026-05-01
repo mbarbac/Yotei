@@ -11,7 +11,7 @@ public class EasyTypeOptions
     /// This setting is moslty used when the intent is to obtain an anonymous list of generic
     /// type arguments
     /// </summary>
-    public bool PlaceHolder { get; set; }
+    public bool UsePlaceHolder { get; set; }
 
     /// <summary>
     /// If enabled, then use the type's variance (the 'in' and 'out' keywords), if any.
@@ -51,7 +51,7 @@ public class EasyTypeOptions
     /// <br/> Otherwise, by default, it refers to its host instance to use the same settings.
     /// <br/> To modify how the list is obtained set the value of this property to null, or to
     /// a new instance with the desired settings. For instance, to obtain an anonymous list, the
-    /// new instace shall have its own <see cref="PlaceHolder"/> value set to true.
+    /// new instace shall have its own <see cref="UsePlaceHolder"/> value set to true.
     /// </summary>
     public EasyTypeOptions? GenericListOptions { get; set; }
 
@@ -73,7 +73,7 @@ public class EasyTypeOptions
     /// <param name="mode"></param>
     public EasyTypeOptions(Mode mode)
     {
-        PlaceHolder = false;
+        UsePlaceHolder = false;
         UseVariance = false;
         NamespaceStyle = EasyNamespaceStyle.None;
         UseHost = false;
@@ -139,25 +139,19 @@ public static partial class EasyNameExtensions
     static string EasyName(this Type source, Type[] types, EasyTypeOptions options)
     {
         // Intercepting placeholders...
-        if (options.PlaceHolder) return string.Empty;
+        if (options.UsePlaceHolder) return string.Empty;
 
-        // Intercepting arrays (needs to come first)...
+        // Intercepting arrays...
         if (source.IsArray)
         {
-            var type = source.GetElementType() ?? source;
-            var str = type.EasyName(options);
-
-            if (str != null)
+            var arg = source.GetElementType()!;
+            var str = arg.EasyName(options);
+            if (str.Length > 0)
             {
                 var rank = source.GetArrayRank();
                 str = $"{str}[{new string(',', rank - 1)}]";
-
-                if (type.IsNullableWrapper() &&
-                    options.NullableStyle == EasyNullableStyle.UseAnnotations)
-                    str += '?';
-
-                return str;
             }
+            return str;
         }
 
         // Intercepting wrappers...
@@ -224,9 +218,10 @@ public static partial class EasyNameExtensions
             sb.Append(name);
         }
 
-        // Generic attributes...
+        // Generic parameters...
         if (xname == null && options.GenericListOptions != null)
         {
+            var xoptions = options.GenericListOptions;
             var args = source.GetGenericArguments();
             var used = host == null ? 0 : host.GetGenericArguments().Length;
             var need = args.Length - used;
@@ -236,8 +231,7 @@ public static partial class EasyNameExtensions
                 sb.Append('<'); for (int i = 0; i < need; i++)
                 {
                     var arg = types[used + i];
-                    var str = arg.EasyName(options.GenericListOptions);
-
+                    var str = arg.EasyName(xoptions);
                     if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
                     sb.Append(str);
                 }
@@ -245,27 +239,17 @@ public static partial class EasyNameExtensions
             }
         }
 
-        // Nullable annotations...
-        NULLABILITY:
-        while (options.NullableStyle != EasyNullableStyle.None && sb.Length > 0 && sb[^1] != '?')
+        // Nullability...
+        if (options.NullableStyle != EasyNullableStyle.None &&
+            sb.Length > 0 &&
+            sb[^1] != '?')
         {
-            // Host source is a wrapped nullable...
-            if (source.IsNullableWrapper())
+            if (source.IsNullableWrapper()) // Special case...
             {
                 if (options.NullableStyle == EasyNullableStyle.KeepWrappers)
-                {
-                    if (xname != null) sb.Append('?');
-                    break;
-                }
+                { if (xname != null) sb.Append('?'); }
             }
-
-            // Standard case...
-            if (source.IsNullableAnnotated())
-            {
-                sb.Append('?'); break;
-            }
-
-            break;
+            else if (source.IsNullableAnnotated()) sb.Append('?');
         }
 
         // Finishing...
