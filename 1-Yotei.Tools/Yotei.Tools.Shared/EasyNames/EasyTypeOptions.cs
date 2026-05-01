@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.Tracing;
-
-namespace Yotei.Tools;
+﻿namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>
@@ -143,9 +141,28 @@ public static partial class EasyNameExtensions
         // Intercepting placeholders...
         if (options.PlaceHolder) return string.Empty;
 
+        // Intercepting arrays (needs to come first)...
+        if (source.IsArray)
+        {
+            var type = source.GetElementType() ?? source;
+            var str = type.EasyName(options);
+
+            if (str != null)
+            {
+                var rank = source.GetArrayRank();
+                str = $"{str}[{new string(',', rank - 1)}]";
+
+                if (type.IsNullableWrapper() &&
+                    options.NullableStyle == EasyNullableStyle.UseAnnotations)
+                    str += '?';
+
+                return str;
+            }
+        }
+
         // Intercepting wrappers...
         if (source.IsNullableWrapper() &&
-            options.NullableStyle != EasyNullableStyle.KeepWrappers)
+            options.NullableStyle == EasyNullableStyle.UseAnnotations)
         {
             var arg = source.GetGenericArguments()[0];
             var str = arg.EasyName(options);
@@ -229,6 +246,7 @@ public static partial class EasyNameExtensions
         }
 
         // Nullable annotations...
+        NULLABILITY:
         while (options.NullableStyle != EasyNullableStyle.None && sb.Length > 0 && sb[^1] != '?')
         {
             // Host source is a wrapped nullable...
