@@ -9,6 +9,7 @@
     <Import_RootNamespace>Yotei.Tools.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)EasyNames\EasyPropertyOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EasyNames\EasyNameExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EasyNames\EasyTypeOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EasyNames\IsNullableAttribute.cs" />

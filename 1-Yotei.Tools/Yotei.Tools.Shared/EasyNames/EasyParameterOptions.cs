@@ -31,10 +31,30 @@ public record EasyParameterOptions
 
     // ----------------------------------------------------
 
-    /// <summary>
-    /// Determines what options to use when creating a new instance.
-    /// </summary>
     public enum Mode { Empty, Default, Full };
+    EasyParameterOptions(Mode mode)
+    {
+        UseThis = false;
+        UseModifiers = false;
+        TypeOptions = null;
+        UseName = false;
+
+        switch (mode)
+        {
+            case Mode.Default:
+                UseThis = true;
+                UseModifiers = true;
+                TypeOptions = EasyTypeOptions.Default;
+                break;
+
+            case Mode.Full:
+                UseThis = true;
+                UseModifiers = true;
+                TypeOptions = EasyTypeOptions.Full;
+                UseName = true;
+                break;
+        }
+    }
 
     /// <summary>
     /// Initializes a new empty instance.
@@ -55,34 +75,6 @@ public record EasyParameterOptions
     /// Obtains a new full-alike instance.
     /// </summary>
     public static EasyParameterOptions Full => new(Mode.Full);
-
-    /// <summary>
-    /// Initializes a new instance with values associated with the given mode.
-    /// </summary>
-    /// <param name="mode"></param>
-    public EasyParameterOptions(Mode mode)
-    {
-        UseThis = false;
-        UseModifiers = false;
-        TypeOptions = null;
-        UseName = false;
-
-        switch (mode)
-        {
-            case Mode.Default:
-                UseThis = true;
-                UseModifiers = true;
-                TypeOptions = new EasyTypeOptions(EasyTypeOptions.Mode.Default);
-                break;
-
-            case Mode.Full:
-                UseThis = true;
-                UseModifiers = true;
-                TypeOptions = new EasyTypeOptions(EasyTypeOptions.Mode.Full);
-                UseName = true;
-                break;
-        }
-    }
 }
 
 

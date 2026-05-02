@@ -57,36 +57,8 @@ public record EasyTypeOptions
 
     // ----------------------------------------------------
 
-    /// <summary>
-    /// Determines what options to use when creating a new instance.
-    /// </summary>
     public enum Mode { Empty, Default, Full };
-
-    /// <summary>
-    /// Initializes a new empty instance.
-    /// </summary>
-    public EasyTypeOptions() : this(Mode.Empty) { }
-
-    /// <summary>
-    /// Obtains a new empty-alike instance.
-    /// </summary>
-    public static EasyTypeOptions Empty => new(Mode.Empty);
-
-    /// <summary>
-    /// Obtains a new default-alike instance.
-    /// </summary>
-    public static EasyTypeOptions Default => new(Mode.Default);
-
-    /// <summary>
-    /// Obtains a new full-alike instance.
-    /// </summary>
-    public static EasyTypeOptions Full => new(Mode.Full);
-
-    /// <summary>
-    /// Initializes a new instance with values associated with the given mode.
-    /// </summary>
-    /// <param name="mode"></param>
-    public EasyTypeOptions(Mode mode)
+    EasyTypeOptions(Mode mode)
     {
         UsePlaceHolder = false;
         UseVariance = false;
@@ -113,6 +85,26 @@ public record EasyTypeOptions
                 break;
         }
     }
+
+    /// <summary>
+    /// Initializes a new empty instance.
+    /// </summary>
+    public EasyTypeOptions() : this(Mode.Empty) { }
+
+    /// <summary>
+    /// Obtains a new empty-alike instance.
+    /// </summary>
+    public static EasyTypeOptions Empty => new(Mode.Empty);
+
+    /// <summary>
+    /// Obtains a new default-alike instance.
+    /// </summary>
+    public static EasyTypeOptions Default => new(Mode.Default);
+
+    /// <summary>
+    /// Obtains a new full-alike instance.
+    /// </summary>
+    public static EasyTypeOptions Full => new(Mode.Full);
 }
 
 // ========================================================
