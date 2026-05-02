@@ -212,27 +212,23 @@ public static partial class EasyNameExtensions
 
             if (str.Length > 0)
             {
-                // ref-alike return types...
+                // ref-alike return types (emitting on 'sb' on purpose)...
                 if (options.UseModifiers && type.IsByRef)
                 {
                     var ronly = method.ReturnTypeCustomAttributes.HasReadOnlyAttribute();
                     sb.Append(ronly ? "ref readonly " : "ref ");
                 }
 
-                // HIGH: Nullability...
-                //if (str[^1] != '?')
-                //{
-                //    if (type.IsNullableWrapper())
-                //    {
-                //        if (xoptions.NullableStyle != EasyNullableStyle.KeepWrappers)
-                //            str += '?';
-                //    }
-                //    else
-                //    {
-                //        if (type.IsNullableAnnotated()) str += '?';
-                //        else if (source.IsNullableAnnotated()) str += '?';
-                //    }
-                //}
+                // Nullability...
+                while (str[^1] != '?')
+                {
+                    if (type.IsCoreNullable() &&
+                        xoptions.NullableStyle == EasyNullableStyle.KeepWrappers) break;
+
+                    // Method instances are NOT sensible nullability API, but might be annotated...
+                    if (source.IsNullableAnnotated()) { str += '?'; break; }
+                    break;
+                }
 
                 // Adding...
                 sb.Append(str).Append(' ');

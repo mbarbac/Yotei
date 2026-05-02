@@ -13,8 +13,8 @@ public static class Test_EasyParameter
         EasyMethodOptions options = EasyMethodOptions.Empty;
         string name;
         var type = typeof(IFace1a);
-
         var source = type.GetMethod("Method1")!;
+
         options.ParameterOptions = EasyParameterOptions.Default;
         name = source.EasyName(options);
         Assert.Equal("Method1(params int?[]?)", name);
@@ -113,7 +113,7 @@ public static class Test_EasyParameter
 
         options.ParameterOptions = EasyParameterOptions.Full;
         name = source.EasyName(options);
-        Assert.Equal("Method(byte one, out System.Nullable<int>? two, in string? three)", name);
+        Assert.Equal("Method(byte one, out System.Nullable<int> two, in string? three)", name);
     }
 
     // ----------------------------------------------------
@@ -141,9 +141,9 @@ public static class Test_EasyParameter
         name = source.EasyName(options);
         Assert.Equal(
             "Method(" +
-            "ref System.Nullable<int>? one, " +
+            "ref System.Nullable<int> one, " +
             "ref string? two, " +
-            "ref readonly System.Nullable<long>? three)",
+            "ref readonly System.Nullable<long> three)",
             name);
     }
 
@@ -155,7 +155,7 @@ public static class Test_EasyParameter
     {
         EasyMethodOptions options = EasyMethodOptions.Empty;
         string name;
-        var type = typeof(TypeA);
+        var type = typeof(STypeA);
         var source = type.GetMethod("Method1")!;
 
         options.ParameterOptions = EasyParameterOptions.Empty;
@@ -177,7 +177,7 @@ public static class Test_EasyParameter
     {
         EasyMethodOptions options = EasyMethodOptions.Empty;
         string name;
-        var type = typeof(TypeA);
+        var type = typeof(STypeA);
         var source = type.GetMethod("Method2")!;
 
         options.ParameterOptions = EasyParameterOptions.Empty;
@@ -195,7 +195,7 @@ public static class Test_EasyParameter
 }
 
 // ========================================================
-public static class TypeA
+public static class STypeA
 {
     public static void Method1(this DateTime item) { }
     public static void Method2(DateTime item) { }

@@ -119,11 +119,25 @@ public static partial class EasyNameExtensions
             var type = source.ParameterType;
             var str = type.EasyName(xoptions);
 
-            // Parameter instances are sensible to the nullability API, which we can leverage
-            // to intercept reference types...
-            if (str.Length > 0 &&
-                str[^1] != '?' &&
-                source.IsNullableAnnotated()) str += '?';
+            // Nullability...
+            while (str.Length > 0 && str[^1] != '?')
+            {
+                // Case when CoreNullable, KeepWrappers, and params is nullable, then we need to
+                // add an extra annotation (ie: 'params int?[]? items').
+                if (type.IsCoreNullable() &&
+                    xoptions.NullableStyle == EasyNullableStyle.KeepWrappers &&
+                    source.IsDefined(typeof(ParamArrayAttribute), false) &&
+                    source.IsNullableAnnotated())
+                { str += '?'; break; }
+
+                // Other cases...
+                if (type.IsCoreNullable() &&
+                    xoptions.NullableStyle == EasyNullableStyle.KeepWrappers) break;
+
+                // Parameter instances are sensible to the nullability API...
+                if (source.IsNullableAnnotated()) { str += '?'; break; }
+                break;
+            }
 
             // Adding...
             sb.Append(str);

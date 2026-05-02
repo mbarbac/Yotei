@@ -98,7 +98,17 @@ static partial class EasyNameExtensions
     // ----------------------------------------------------
 
     /// <summary>
-    /// Determines if the given type is a nullable wrapper, or not.
+    /// Determines if the type is a CLR nullable one (<see cref="Nullable{T}"/>), or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static bool IsCoreNullable(this Type source) =>
+        source.GetGenericArguments().Length == 1 &&
+        source.Name.StartsWith("Nullable`1");
+
+    /// <summary>
+    /// Determines if the given type is a nullable wrapper (either a <see cref="Nullable{T}"/> or
+    /// a <see cref="IsNullable{T}"/> one), or not.
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
