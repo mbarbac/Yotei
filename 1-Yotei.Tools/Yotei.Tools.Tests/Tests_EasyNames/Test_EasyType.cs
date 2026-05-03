@@ -25,12 +25,10 @@ public static class Test_EasyType
         options = EasyTypeOptions.Full;
         name = source.EasyName(options); Assert.Equal("int", name);
 
-        options.UseSpecialNames = false;
+        options = EasyTypeOptions.FullNoSpecialNames;
         name = source.EasyName(options); Assert.Equal("System.Int32", name);
     }
 
-    // Annotated value types are well identified. When they are special ones, easy name methods
-    // give precedence to their special names, unless explicitly opted out.
     //[Enforced]
     [Fact]
     public static void Test_Special_ValueType_Annotated()
@@ -48,7 +46,7 @@ public static class Test_EasyType
         options = EasyTypeOptions.Full;
         name = source.EasyName(options); Assert.Equal("int?", name);
 
-        options.UseSpecialNames = false;
+        options = EasyTypeOptions.FullNoSpecialNames;
         name = source.EasyName(options); Assert.Equal("System.Nullable<System.Int32>", name);
     }
 
@@ -70,6 +68,9 @@ public static class Test_EasyType
 
         options = EasyTypeOptions.Full;
         name = source.EasyName(options); Assert.Equal("System.DateTime", name);
+
+        options = EasyTypeOptions.FullNoSpecialNames;
+        name = source.EasyName(options); Assert.Equal("System.DateTime", name);
     }
 
     // Annotated value types are well identified.
@@ -88,8 +89,10 @@ public static class Test_EasyType
         name = source.EasyName(options); Assert.Equal("DateTime?", name);
 
         options = EasyTypeOptions.Full;
-        name = source.EasyName(options);
-        Assert.Equal("System.Nullable<System.DateTime>", name);
+        name = source.EasyName(options); Assert.Equal("System.Nullable<System.DateTime>", name);
+
+        options = EasyTypeOptions.FullNoSpecialNames;
+        name = source.EasyName(options); Assert.Equal("System.Nullable<System.DateTime>", name);
     }
 
     // ----------------------------------------------------
@@ -111,7 +114,7 @@ public static class Test_EasyType
         options = EasyTypeOptions.Full;
         name = source.EasyName(options); Assert.Equal("string", name);
 
-        options.UseSpecialNames = false;
+        options = EasyTypeOptions.FullNoSpecialNames;
         name = source.EasyName(options); Assert.Equal("System.String", name);
     }
 
@@ -136,9 +139,8 @@ public static class Test_EasyType
         options = EasyTypeOptions.Full;
         name = source.EasyName(options); Assert.Equal("string?", name);
 
-        options.UseSpecialNames = false;
-        name = source.EasyName(options);
-        Assert.Equal("Yotei.Tools.IsNullable<System.String>", name);
+        options = EasyTypeOptions.FullNoSpecialNames;
+        name = source.EasyName(options); Assert.Equal("Yotei.Tools.IsNullable<System.String>", name);
     }
 
     // ----------------------------------------------------
@@ -194,7 +196,7 @@ public static class Test_EasyType
         name = source.EasyName(options);
         Assert.Equal($"{PREFIX}.IFace1<bool?>", name);
 
-        options.UseSpecialNames = false;
+        options = EasyTypeOptions.FullNoSpecialNames;
         name = source.EasyName(options);
         Assert.Equal($"{PREFIX}.IFace1<System.Nullable<System.Boolean>>", name);
     }
@@ -216,6 +218,10 @@ public static class Test_EasyType
         options = EasyTypeOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"{PREFIX}.IFace1<string>", name);
+
+        options = EasyTypeOptions.FullNoSpecialNames;
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.IFace1<System.String>", name);
     }
 
     //[Enforced]
@@ -236,7 +242,7 @@ public static class Test_EasyType
         name = source.EasyName(options);
         Assert.Equal($"{PREFIX}.IFace1<string?>", name);
 
-        options.UseSpecialNames = false;
+        options = EasyTypeOptions.FullNoSpecialNames;
         name = source.EasyName(options);
         Assert.Equal($"{PREFIX}.IFace1<Yotei.Tools.IsNullable<System.String>>", name);
     }
@@ -264,6 +270,9 @@ public static class Test_EasyType
 
         options = EasyTypeOptions.Full;
         name = source.EasyName(options); Assert.Equal("System.Predicate<T?>", name);
+
+        options = EasyTypeOptions.FullNoSpecialNames;
+        name = source.EasyName(options); Assert.Equal("System.Predicate<T?>", name);
     }
 
     //[Enforced]
@@ -283,9 +292,10 @@ public static class Test_EasyType
         name = source.EasyName(options); Assert.Equal("Predicate<bool?>", name);
 
         options = EasyTypeOptions.Full;
-        name = source.EasyName(options); Assert.Equal("System.Predicate<bool?>", name);
+        name = source.EasyName(options);
+        Assert.Equal("System.Predicate<bool?>", name);
 
-        options.UseSpecialNames = false;
+        options = EasyTypeOptions.FullNoSpecialNames;
         name = source.EasyName(options);
         Assert.Equal("System.Predicate<System.Nullable<System.Boolean>>", name);
     }
@@ -310,9 +320,10 @@ public static class Test_EasyType
         name = source.EasyName(options); Assert.Equal("Predicate<string>", name);
 
         options = EasyTypeOptions.Full;
-        name = source.EasyName(options); Assert.Equal("System.Predicate<string>", name);
+        name = source.EasyName(options);
+        Assert.Equal("System.Predicate<string>", name);
 
-        options.UseSpecialNames = false;
+        options = EasyTypeOptions.FullNoSpecialNames;
         name = source.EasyName(options);
         Assert.Equal("System.Predicate<System.String>", name);
     }
@@ -337,9 +348,10 @@ public static class Test_EasyType
         name = source.EasyName(options); Assert.Equal("Predicate<string?>", name);
 
         options = EasyTypeOptions.Full;
-        name = source.EasyName(options); Assert.Equal("System.Predicate<string?>", name);
+        name = source.EasyName(options);
+        Assert.Equal("System.Predicate<string?>", name);
 
-        options.UseSpecialNames = false;
+        options = EasyTypeOptions.FullNoSpecialNames;
         name = source.EasyName(options);
         Assert.Equal("System.Predicate<Yotei.Tools.IsNullable<System.String>>", name);
     }
@@ -369,6 +381,10 @@ public static class Test_EasyType
         options = EasyTypeOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"{PREFIX}.IFace3a<T>", name);
+
+        options = EasyTypeOptions.FullNoSpecialNames;
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.IFace3a<T>", name);
     }
 
     // ----------------------------------------------------
@@ -395,6 +411,10 @@ public static class Test_EasyType
         options = EasyTypeOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"{PREFIX}.IFace3a<T?>", name);
+
+        options = EasyTypeOptions.FullNoSpecialNames;
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.IFace3a<T?>", name);
     }
 
     //[Enforced]
@@ -410,11 +430,16 @@ public static class Test_EasyType
         name = source.EasyName(options); Assert.Equal("IFace3a", name);
 
         options = EasyTypeOptions.Default;
-        name = source.EasyName(options); Assert.Equal("IFace3a<bool?>", name);
+        name = source.EasyName(options);
+        Assert.Equal($"IFace3a<bool?>", name);
 
         options = EasyTypeOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"{PREFIX}.IFace3a<bool?>", name);
+
+        options = EasyTypeOptions.FullNoSpecialNames;
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.IFace3a<System.Nullable<System.Boolean>>", name);
     }
 
     //[Enforced]
@@ -435,6 +460,10 @@ public static class Test_EasyType
         options = EasyTypeOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"{PREFIX}.IFace3a<string>", name);
+
+        options = EasyTypeOptions.FullNoSpecialNames;
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.IFace3a<System.String>", name);
     }
 
     //[Enforced]
@@ -455,6 +484,10 @@ public static class Test_EasyType
         options = EasyTypeOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"{PREFIX}.IFace3a<string?>", name);
+
+        options = EasyTypeOptions.FullNoSpecialNames;
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.IFace3a<Yotei.Tools.IsNullable<System.String>>", name);
     }
 
     // ----------------------------------------------------
@@ -476,7 +509,15 @@ public static class Test_EasyType
         options = EasyTypeOptions.Default;
         name = source.EasyName(options); Assert.Equal("IFace3a<T?>", name);
 
+        options.NamespaceStyle = EasyNamespaceStyle.Default;
+        options.UseHost = true;
+        name = source.EasyName(options); Assert.Equal($"{PREFIX}.IFace3a<T?>", name);
+
         options = EasyTypeOptions.Full;
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.IFace3a<Yotei.Tools.IsNullable<T>>", name);
+
+        options = EasyTypeOptions.FullNoSpecialNames;
         name = source.EasyName(options);
         Assert.Equal($"{PREFIX}.IFace3a<Yotei.Tools.IsNullable<T>>", name);
     }
@@ -498,7 +539,15 @@ public static class Test_EasyType
 
         options = EasyTypeOptions.Full;
         name = source.EasyName(options);
-        Assert.Equal($"{PREFIX}.IFace3a<Yotei.Tools.IsNullable<bool?>>", name);
+        Assert.Equal(
+            $"{PREFIX}.IFace3a<Yotei.Tools.IsNullable<bool?>>",
+            name);
+
+        options = EasyTypeOptions.FullNoSpecialNames;
+        name = source.EasyName(options);
+        Assert.Equal(
+            $"{PREFIX}.IFace3a<Yotei.Tools.IsNullable<System.Nullable<System.Boolean>>>",
+            name);
     }
 
     // Because the T in the base list is wrapped, what is persisted is the wrapped type itself,
@@ -521,7 +570,9 @@ public static class Test_EasyType
 
         options = EasyTypeOptions.Full;
         name = source.EasyName(options);
-        Assert.Equal($"{PREFIX}.IFace3a<string?>", name);
+        Assert.Equal(
+            $"{PREFIX}.IFace3a<Yotei.Tools.IsNullable<System.String>>",
+            name);
     }
 
     // ----------------------------------------------------
@@ -570,10 +621,6 @@ public static class Test_EasyType
 
         options = EasyTypeOptions.Full;
         name = source.EasyName(options);
-        Assert.Equal($"{PREFIX}.IFace4a<byte?, short?>.IFace4b<int?>.IFace4c<long?, string>", name);
-
-        options.UseSpecialNames = false;
-        name = source.EasyName(options);
         Assert.Equal(
             $"{PREFIX}." +
             "IFace4a<System.Nullable<System.Byte>, System.Nullable<System.Int16>>." +
@@ -597,10 +644,6 @@ public static class Test_EasyType
         name = source.EasyName(options); Assert.Equal("IFace4c<long?, string?>", name);
 
         options = EasyTypeOptions.Full;
-        name = source.EasyName(options);
-        Assert.Equal($"{PREFIX}.IFace4a<byte?, short?>.IFace4b<int?>.IFace4c<long?, string?>", name);
-
-        options.UseSpecialNames = false;
         name = source.EasyName(options);
         Assert.Equal(
             $"{PREFIX}." +
@@ -652,7 +695,11 @@ public static class Test_EasyType
 
         options = EasyTypeOptions.Full;
         name = source.EasyName(options);
-        Assert.Equal($"{PREFIX}.IFace5a<byte?, short?>.IFace5b<int?>.IFace5c<long?, string>", name);
+        Assert.Equal(
+            $"{PREFIX}.IFace5a<System.Nullable<System.Byte>, System.Nullable<System.Int16>>." +
+            "IFace5b<System.Nullable<System.Int32>>." +
+            "IFace5c<System.Nullable<System.Int64>, System.String>",
+            name);
     }
 
     //[Enforced]
@@ -671,7 +718,12 @@ public static class Test_EasyType
 
         options = EasyTypeOptions.Full;
         name = source.EasyName(options);
-        Assert.Equal($"{PREFIX}.IFace5a<byte?, short?>.IFace5b<int?>.IFace5c<long?, string?>", name);
+        Assert.Equal(
+            $"{PREFIX}." +
+            "IFace5a<System.Nullable<System.Byte>, System.Nullable<System.Int16>>." +
+            "IFace5b<System.Nullable<System.Int32>>." +
+            "IFace5c<System.Nullable<System.Int64>, Yotei.Tools.IsNullable<System.String>>",
+            name);
     }
 
     // ----------------------------------------------------
@@ -691,7 +743,7 @@ public static class Test_EasyType
         name = source.EasyName(options); Assert.Equal("int?[]", name);
 
         options = EasyTypeOptions.Full;
-        name = source.EasyName(options); Assert.Equal("int?[]", name);
+        name = source.EasyName(options); Assert.Equal("System.Nullable<System.Int32>[]", name);
     }
 
     //[Enforced]

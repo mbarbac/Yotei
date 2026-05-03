@@ -57,7 +57,7 @@ public record EasyTypeOptions
 
     // ----------------------------------------------------
 
-    public enum Mode { Empty, Default, Full };
+    public enum Mode { Empty, Default, Full, FullNoSpecialNames };
     EasyTypeOptions(Mode mode)
     {
         UsePlaceHolder = false;
@@ -80,6 +80,15 @@ public record EasyTypeOptions
             case Mode.Full:
                 NamespaceStyle = EasyNamespaceStyle.Default;
                 UseHost = true;
+                UseSpecialNames = true;
+                NullableStyle = EasyNullableStyle.KeepWrappers;
+                GenericListOptions = this;
+                break;
+
+            case Mode.FullNoSpecialNames:
+                NamespaceStyle = EasyNamespaceStyle.Default;
+                UseHost = true;
+                UseSpecialNames = false;
                 NullableStyle = EasyNullableStyle.KeepWrappers;
                 GenericListOptions = this;
                 break;
@@ -105,6 +114,11 @@ public record EasyTypeOptions
     /// Obtains a new full-alike instance.
     /// </summary>
     public static EasyTypeOptions Full => new(Mode.Full);
+
+    /// <summary>
+    /// Obtains a new full-alike instance that DOES NOT use special names.
+    /// </summary>
+    public static EasyTypeOptions FullNoSpecialNames => new(Mode.FullNoSpecialNames);
 }
 
 // ========================================================
