@@ -1,5 +1,7 @@
 ﻿namespace Yotei.Tools.Tests.EasyNames;
 
+// TODO: Test with DefaultEx options...
+
 // ========================================================
 //[Enforced]
 public static class Test_EasyParameter
@@ -15,13 +17,19 @@ public static class Test_EasyParameter
         var type = typeof(IFace1a);
         var source = type.GetMethod("Method1")!;
 
+        options.ParameterOptions = EasyParameterOptions.Empty; // No arguments expected
+        name = source.EasyName(options);
+        Assert.Equal("Method1()", name);
+
         options.ParameterOptions = EasyParameterOptions.Default;
         name = source.EasyName(options);
         Assert.Equal("Method1(params int?[]?)", name);
 
+        options.ParameterOptions = EasyParameterOptions.DefaultEx;
+        name = source.EasyName(options);
+        Assert.Equal("Method1(params int?[]?)", name);
+
         options.ParameterOptions = EasyParameterOptions.Full;
-        options.ParameterOptions.TypeOptions!.UseSpecialNames = false;
-        options.ParameterOptions.TypeOptions.GenericListOptions = options.ParameterOptions.TypeOptions;
         name = source.EasyName(options);
         Assert.Equal("Method1(params System.Nullable<System.Int32>[]? items)", name);
     }
@@ -36,25 +44,44 @@ public static class Test_EasyParameter
 
     //[Enforced]
     [Fact]
-    public static void Test_Params_ReferenceType()
+    public static void Test_Params_ReferenceType_ElementNullabilityLost()
     {
         EasyMethodOptions options = EasyMethodOptions.Empty;
         string name;
         var type = typeof(IFace1b);
-
         var source = type.GetMethod("Method1")!;
-        options.ParameterOptions = EasyParameterOptions.Default;
-        name = source.EasyName(options);
-        Assert.Equal("Method1(params string[]?)", name); // Element nullability lost
 
-        source = type.GetMethod("Method2")!;
         options.ParameterOptions = EasyParameterOptions.Default;
         name = source.EasyName(options);
-        Assert.Equal("Method2(params string?[]?)", name); // Element nullability wrapped
+        Assert.Equal("Method1(params string[]?)", name);
+
+        options.ParameterOptions = EasyParameterOptions.DefaultEx;
+        name = source.EasyName(options);
+        Assert.Equal("Method1(params string[]?)", name);
 
         options.ParameterOptions = EasyParameterOptions.Full;
-        options.ParameterOptions.TypeOptions!.UseSpecialNames = false;
-        options.ParameterOptions.TypeOptions.GenericListOptions = options.ParameterOptions.TypeOptions;
+        name = source.EasyName(options);
+        Assert.Equal("Method1(params System.String[]? items)", name);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Params_ReferenceType_ElementNullabilityWrapped()
+    {
+        EasyMethodOptions options = EasyMethodOptions.Empty;
+        string name;
+        var type = typeof(IFace1b);
+        var source = type.GetMethod("Method2")!;
+
+        options.ParameterOptions = EasyParameterOptions.Default;
+        name = source.EasyName(options);
+        Assert.Equal("Method2(params string?[]?)", name);
+
+        options.ParameterOptions = EasyParameterOptions.DefaultEx;
+        name = source.EasyName(options);
+        Assert.Equal("Method2(params string?[]?)", name);
+
+        options.ParameterOptions = EasyParameterOptions.Full;
         name = source.EasyName(options);
         Assert.Equal("Method2(params Yotei.Tools.IsNullable<System.String>[]? items)", name);
     }
@@ -72,20 +99,15 @@ public static class Test_EasyParameter
         var type = typeof(IFace2);
         var source = type.GetMethod("Method")!;
 
-        options.ParameterOptions = EasyParameterOptions.Empty;
-        name = source.EasyName(options);
-        Assert.Equal("Method()", name);
-
         options.ParameterOptions = EasyParameterOptions.Default;
         name = source.EasyName(options);
         Assert.Equal("Method(scoped Span<int>)", name);
 
-        options.ParameterOptions = EasyParameterOptions.Full;
+        options.ParameterOptions = EasyParameterOptions.DefaultEx;
         name = source.EasyName(options);
-        Assert.Equal("Method(scoped System.Span<int> items)", name);
+        Assert.Equal("Method(scoped System.Span<int>)", name);
 
-        options.ParameterOptions.TypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false };
-        options.ParameterOptions.TypeOptions.GenericListOptions = options.ParameterOptions.TypeOptions;
+        options.ParameterOptions = EasyParameterOptions.Full;
         name = source.EasyName(options);
         Assert.Equal("Method(scoped System.Span<System.Int32> items)", name);
     }
@@ -111,9 +133,15 @@ public static class Test_EasyParameter
         name = source.EasyName(options);
         Assert.Equal("Method(byte, out int?, in string?)", name);
 
+        options.ParameterOptions = EasyParameterOptions.DefaultEx;
+        name = source.EasyName(options);
+        Assert.Equal("Method(byte, out int?, in string?)", name);
+
         options.ParameterOptions = EasyParameterOptions.Full;
         name = source.EasyName(options);
-        Assert.Equal("Method(byte one, out System.Nullable<int> two, in string? three)", name);
+        Assert.Equal(
+            "Method(System.Byte one, out System.Nullable<System.Int32> two, in System.String? three)",
+            name);
     }
 
     // ----------------------------------------------------
@@ -137,13 +165,15 @@ public static class Test_EasyParameter
         name = source.EasyName(options);
         Assert.Equal("Method(ref int?, ref string?, ref readonly long?)", name);
 
+        options.ParameterOptions = EasyParameterOptions.DefaultEx;
+        name = source.EasyName(options);
+        Assert.Equal("Method(ref int?, ref string?, ref readonly long?)", name);
+
         options.ParameterOptions = EasyParameterOptions.Full;
         name = source.EasyName(options);
         Assert.Equal(
-            "Method(" +
-            "ref System.Nullable<int> one, " +
-            "ref string? two, " +
-            "ref readonly System.Nullable<long> three)",
+            "Method(ref System.Nullable<System.Int32> one, ref System.String? two, " +
+            "ref readonly System.Nullable<System.Int64> three)",
             name);
     }
 
@@ -166,6 +196,10 @@ public static class Test_EasyParameter
         name = source.EasyName(options);
         Assert.Equal("Method1(this DateTime)", name);
 
+        options.ParameterOptions = EasyParameterOptions.DefaultEx;
+        name = source.EasyName(options);
+        Assert.Equal("Method1(this System.DateTime)", name);
+
         options.ParameterOptions = EasyParameterOptions.Full;
         name = source.EasyName(options);
         Assert.Equal("Method1(this System.DateTime item)", name);
@@ -187,6 +221,10 @@ public static class Test_EasyParameter
         options.ParameterOptions = EasyParameterOptions.Default;
         name = source.EasyName(options);
         Assert.Equal("Method2(DateTime)", name);
+
+        options.ParameterOptions = EasyParameterOptions.DefaultEx;
+        name = source.EasyName(options);
+        Assert.Equal("Method2(System.DateTime)", name);
 
         options.ParameterOptions = EasyParameterOptions.Full;
         name = source.EasyName(options);

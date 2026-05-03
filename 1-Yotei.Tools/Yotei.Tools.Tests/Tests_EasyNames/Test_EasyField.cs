@@ -29,15 +29,17 @@ public static class Test_EasyField
         options = EasyFieldOptions.Default;
         name = item.EasyName(options); Assert.Equal("Name", name);
 
-        options.MemberTypeOptions = EasyTypeOptions.Default;
+        options = EasyFieldOptions.DefaultEx;
         name = item.EasyName(options);
-        Assert.Equal("string? Name", name);
+        Assert.Equal($"{PREFIX}.RType0a.Name", name);
 
-        options = EasyFieldOptions.Full;
+        options.MemberTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
         name = item.EasyName(options);
         Assert.Equal($"public string? {PREFIX}.RType0a.Name", name);
 
-        options.MemberTypeOptions!.UseSpecialNames = false;
+        options = EasyFieldOptions.Full;
         name = item.EasyName(options);
         Assert.Equal($"public System.String? {PREFIX}.RType0a.Name", name);
     }
@@ -57,15 +59,17 @@ public static class Test_EasyField
         options = EasyFieldOptions.Default;
         name = item.EasyName(options); Assert.Equal("Name", name);
 
-        options.MemberTypeOptions = EasyTypeOptions.Default;
+        options = EasyFieldOptions.DefaultEx;
         name = item.EasyName(options);
-        Assert.Equal("string? Name", name);
+        Assert.Equal($"{PREFIX}.RType0b.Name", name);
 
-        options = EasyFieldOptions.Full;
+        options.MemberTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
         name = item.EasyName(options);
         Assert.Equal($"public string? {PREFIX}.RType0b.Name", name);
-        
-        options.MemberTypeOptions!.UseSpecialNames = false;
+
+        options = EasyFieldOptions.Full;
         name = item.EasyName(options);
         Assert.Equal($"public System.String? {PREFIX}.RType0b.Name", name);
     }
@@ -85,15 +89,17 @@ public static class Test_EasyField
         options = EasyFieldOptions.Default;
         name = item.EasyName(options); Assert.Equal("Name", name);
 
-        options.MemberTypeOptions = EasyTypeOptions.Default;
+        options = EasyFieldOptions.DefaultEx;
         name = item.EasyName(options);
-        Assert.Equal("string? Name", name);
+        Assert.Equal($"{PREFIX}.RType0c.Name", name);
+
+        options.MemberTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = item.EasyName(options);
+        Assert.Equal($"public string? {PREFIX}.RType0c.Name", name);
 
         options = EasyFieldOptions.Full;
-        name = item.EasyName(options);
-        Assert.Equal($"public string? {PREFIX}.RType0c.Name",name);
-
-        options.MemberTypeOptions!.UseSpecialNames = false;
         name = item.EasyName(options);
         Assert.Equal($"public Yotei.Tools.IsNullable<System.String> {PREFIX}.RType0c.Name", name);
     }
@@ -118,16 +124,17 @@ public static class Test_EasyField
         options = EasyFieldOptions.Default;
         name = item.EasyName(options); Assert.Equal("Name", name);
 
-        // Gets the nullable annotation from the attribute...
-        options.MemberTypeOptions = EasyTypeOptions.Default;
+        options = EasyFieldOptions.DefaultEx;
         name = item.EasyName(options);
-        Assert.Equal("S? Name", name);
+        Assert.Equal($"{PREFIX}.RType1a<K?, T?>.RType1b<S?>.Name", name);
 
-        options = EasyFieldOptions.Full;
+        options.MemberTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
         name = item.EasyName(options);
         Assert.Equal($"public S? {PREFIX}.RType1a<K?, T?>.RType1b<S?>.Name", name);
 
-        options.MemberTypeOptions!.UseSpecialNames = false;
+        options = EasyFieldOptions.Full;
         name = item.EasyName(options);
         Assert.Equal($"public S? {PREFIX}.RType1a<K?, T?>.RType1b<S?>.Name", name);
     }
@@ -147,20 +154,17 @@ public static class Test_EasyField
         options = EasyFieldOptions.Default;
         name = item.EasyName(options); Assert.Equal("Name", name);
 
-        // Gets the nullable annotation from the attribute...
-        options.MemberTypeOptions = EasyTypeOptions.Default;
+        options = EasyFieldOptions.DefaultEx;
         name = item.EasyName(options);
-        Assert.Equal("string? Name", name);
+        Assert.Equal($"{PREFIX}.RType1a<byte?, int?>.RType1b<string>.Name", name);
+
+        options.MemberTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = item.EasyName(options);
+        Assert.Equal($"public string? {PREFIX}.RType1a<byte?, int?>.RType1b<string>.Name", name);
 
         options = EasyFieldOptions.Full;
-        name = item.EasyName(options);
-        Assert.Equal(
-            $"public string? {PREFIX}.RType1a<byte?, int?>.RType1b<string>.Name",
-            name);
-
-        options.MemberTypeOptions!.UseSpecialNames = false;
-        options.HostTypeOptions!.UseSpecialNames = false;
-        options.HostTypeOptions.GenericListOptions = options.HostTypeOptions;
         name = item.EasyName(options);
         Assert.Equal(
             $"public System.String? {PREFIX}." +
@@ -183,9 +187,25 @@ public static class Test_EasyField
         var flags = BindingFlags.Static | BindingFlags.NonPublic;
         var item = type.GetFields(flags).Single();
 
-        options = EasyFieldOptions.Full;
+        options = EasyFieldOptions.Empty;
+        name = item.EasyName(options); Assert.Equal("Name", name);
+
+        options = EasyFieldOptions.Default;
+        name = item.EasyName(options); Assert.Equal("Name", name);
+
+        options = EasyFieldOptions.DefaultEx;
+        name = item.EasyName(options);
+        Assert.Equal($"{PREFIX}.RType2a.Name", name);
+
+        options.MemberTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
         name = item.EasyName(options);
         Assert.Equal($"static string? {PREFIX}.RType2a.Name", name);
+
+        options = EasyFieldOptions.Full;
+        name = item.EasyName(options);
+        Assert.Equal($"static System.String? {PREFIX}.RType2a.Name", name);
     }
 
     // ----------------------------------------------------
@@ -201,9 +221,25 @@ public static class Test_EasyField
         var type = typeof(RType2b);
         var item = type.GetFields().Single();
 
-        options = EasyFieldOptions.Full;
+        options = EasyFieldOptions.Empty;
+        name = item.EasyName(options); Assert.Equal("Name", name);
+
+        options = EasyFieldOptions.Default;
+        name = item.EasyName(options); Assert.Equal("Name", name);
+
+        options = EasyFieldOptions.DefaultEx;
+        name = item.EasyName(options);
+        Assert.Equal($"{PREFIX}.RType2b.Name", name);
+
+        options.MemberTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
         name = item.EasyName(options);
         Assert.Equal($"public const string? {PREFIX}.RType2b.Name", name);
+
+        options = EasyFieldOptions.Full;
+        name = item.EasyName(options);
+        Assert.Equal($"public const System.String? {PREFIX}.RType2b.Name", name);
     }
 
     // ----------------------------------------------------
@@ -219,14 +255,30 @@ public static class Test_EasyField
         var type = typeof(RType2c);
         var item = type.GetFields().Single();
 
-        options = EasyFieldOptions.Full;
+        options = EasyFieldOptions.Empty;
+        name = item.EasyName(options); Assert.Equal("Name", name);
+
+        options = EasyFieldOptions.Default;
+        name = item.EasyName(options); Assert.Equal("Name", name);
+
+        options = EasyFieldOptions.DefaultEx;
+        name = item.EasyName(options);
+        Assert.Equal($"{PREFIX}.RType2c.Name", name);
+
+        options.MemberTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
         name = item.EasyName(options);
         Assert.Equal($"public readonly string? {PREFIX}.RType2c.Name", name);
+
+        options = EasyFieldOptions.Full;
+        name = item.EasyName(options);
+        Assert.Equal($"public readonly System.String? {PREFIX}.RType2c.Name", name);
     }
 
     // ----------------------------------------------------
 
-    ref struct RType2d { public ref int Name; }
+    ref struct RType2d { public ref int? Name; }
 
     //[Enforced]
     [Fact]
@@ -237,14 +289,30 @@ public static class Test_EasyField
         var type = typeof(RType2d);
         var item = type.GetFields().Single();
 
+        options = EasyFieldOptions.Empty;
+        name = item.EasyName(options); Assert.Equal("Name", name);
+
+        options = EasyFieldOptions.Default;
+        name = item.EasyName(options); Assert.Equal("Name", name);
+
+        options = EasyFieldOptions.DefaultEx;
+        name = item.EasyName(options);
+        Assert.Equal($"{PREFIX}.RType2d.Name", name);
+
+        options.MemberTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = item.EasyName(options);
+        Assert.Equal($"public ref int? {PREFIX}.RType2d.Name", name);
+
         options = EasyFieldOptions.Full;
         name = item.EasyName(options);
-        Assert.Equal($"public ref int {PREFIX}.RType2d.Name", name);
+        Assert.Equal($"public ref System.Nullable<System.Int32> {PREFIX}.RType2d.Name", name);
     }
 
     // ----------------------------------------------------
 
-    ref struct RType2e { public ref readonly int Name; }
+    ref struct RType2e { public ref readonly int? Name; }
 
     //[Enforced]
     [Fact]
@@ -255,15 +323,33 @@ public static class Test_EasyField
         var type = typeof(RType2e);
         var item = type.GetFields().Single();
 
+        options = EasyFieldOptions.Empty;
+        name = item.EasyName(options); Assert.Equal("Name", name);
+
+        options = EasyFieldOptions.Default;
+        name = item.EasyName(options); Assert.Equal("Name", name);
+
+        options = EasyFieldOptions.DefaultEx;
+        name = item.EasyName(options);
+        Assert.Equal($"{PREFIX}.RType2e.Name", name);
+
+        options.MemberTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = item.EasyName(options);
+        Assert.Equal($"public ref readonly int? {PREFIX}.RType2e.Name", name);
+
         options = EasyFieldOptions.Full;
         name = item.EasyName(options);
-        Assert.Equal($"public ref readonly int {PREFIX}.RType2e.Name", name);
+        Assert.Equal(
+            $"public ref readonly System.Nullable<System.Int32> {PREFIX}.RType2e.Name",
+            name);
     }
 
     // ----------------------------------------------------
 
-    class RType3a { public int Name = 0; }
-    class RType3b : RType3a { public new int Name = 0; }
+    class RType3a { public int? Name = 0; }
+    class RType3b : RType3a { public new int? Name = 0; }
 
     //[Enforced]
     [Fact]
@@ -276,8 +362,26 @@ public static class Test_EasyField
         Assert.NotNull(item);
         Assert.True(item.DeclaringType == typeof(RType3b));
 
+        options = EasyFieldOptions.Empty;
+        name = item.EasyName(options); Assert.Equal("Name", name);
+
+        options = EasyFieldOptions.Default;
+        name = item.EasyName(options); Assert.Equal("Name", name);
+
+        options = EasyFieldOptions.DefaultEx;
+        name = item.EasyName(options);
+        Assert.Equal($"{PREFIX}.RType3b.Name", name);
+
+        options.MemberTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = item.EasyName(options);
+        Assert.Equal($"public new int? {PREFIX}.RType3b.Name", name);
+
         options = EasyFieldOptions.Full;
         name = item.EasyName(options);
-        Assert.Equal($"public new int {PREFIX}.RType3b.Name", name);
+        Assert.Equal(
+            $"public new System.Nullable<System.Int32> {PREFIX}.RType3b.Name",
+            name);
     }
 }

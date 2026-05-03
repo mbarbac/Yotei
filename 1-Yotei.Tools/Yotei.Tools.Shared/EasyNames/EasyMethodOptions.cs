@@ -54,7 +54,7 @@ public record EasyMethodOptions
 
     // ----------------------------------------------------
 
-    public enum Mode { Empty, Default, Full };
+    public enum Mode { Empty, Default, DefaultEx, Full };
     EasyMethodOptions(Mode mode)
     {
         UseAccessibility = false;
@@ -71,6 +71,12 @@ public record EasyMethodOptions
             case Mode.Default:
                 GenericListOptions = EasyTypeOptions.Default;
                 ParameterOptions = EasyParameterOptions.Default;
+                break;
+
+            case Mode.DefaultEx:
+                HostTypeOptions = EasyTypeOptions.DefaultEx;
+                GenericListOptions = EasyTypeOptions.DefaultEx;
+                ParameterOptions = EasyParameterOptions.DefaultEx;
                 break;
 
             case Mode.Full:
@@ -99,6 +105,11 @@ public record EasyMethodOptions
     /// Obtains a new default-alike instance.
     /// </summary>
     public static EasyMethodOptions Default => new(Mode.Default);
+
+    /// <summary>
+    /// Obtains a new default-alike instance whose type options are default extended ones.
+    /// </summary>
+    public static EasyMethodOptions DefaultEx => new(Mode.DefaultEx);
 
     /// <summary>
     /// Obtains a new full-alike instance.

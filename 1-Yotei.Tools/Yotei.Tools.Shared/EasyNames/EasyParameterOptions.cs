@@ -31,7 +31,7 @@ public record EasyParameterOptions
 
     // ----------------------------------------------------
 
-    public enum Mode { Empty, Default, Full };
+    public enum Mode { Empty, Default, DefaultEx, Full };
     EasyParameterOptions(Mode mode)
     {
         UseThis = false;
@@ -45,6 +45,12 @@ public record EasyParameterOptions
                 UseThis = true;
                 UseModifiers = true;
                 TypeOptions = EasyTypeOptions.Default;
+                break;
+
+            case Mode.DefaultEx:
+                UseThis = true;
+                UseModifiers = true;
+                TypeOptions = EasyTypeOptions.DefaultEx;
                 break;
 
             case Mode.Full:
@@ -70,6 +76,11 @@ public record EasyParameterOptions
     /// Obtains a new default-alike instance.
     /// </summary>
     public static EasyParameterOptions Default => new(Mode.Default);
+
+    /// <summary>
+    /// Obtains a new default-alike instance whose type options are default extended ones.
+    /// </summary>
+    public static EasyParameterOptions DefaultEx => new(Mode.DefaultEx);
 
     /// <summary>
     /// Obtains a new full-alike instance.

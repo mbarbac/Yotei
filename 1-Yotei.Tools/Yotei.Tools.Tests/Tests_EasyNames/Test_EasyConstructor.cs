@@ -24,29 +24,22 @@ public static class Test_EasyConstructor
         options = EasyMethodOptions.Empty;
         name = source.EasyName(options); Assert.Equal("RType1a", name);
 
-        options = EasyMethodOptions.Default with
-        {
-            UseAccessibility = true,
-            UseModifiers = true,
-            ReturnTypeOptions = EasyTypeOptions.Default
-        };
+        options = EasyMethodOptions.Default;
         name = source.EasyName(options);
-        Assert.Equal("public RType1a(ref int?)", name);
+        Assert.Equal("RType1a(ref int?)", name);
 
-        options.UseTechName = true;
+        options = EasyMethodOptions.DefaultEx;
         name = source.EasyName(options);
-        Assert.Equal("public RType1a.ctor(ref int?)", name);
+        Assert.Equal($"{PREFIX}.RType1a(ref int?)", name);
 
-        options = EasyMethodOptions.Full with
-        {
-            UseAccessibility = true,
-            UseModifiers = true,
-            ReturnTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false },
-            ParameterOptions = EasyParameterOptions.Full with
-            { TypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false } },
-        };
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
         name = source.EasyName(options);
-        Assert.Equal($"public {PREFIX}.RType1a.ctor(ref System.Nullable<int> one)", name);
+        Assert.Equal($"public {PREFIX}.RType1a(ref int?)", name);
+
+        options = EasyMethodOptions.Full;
+        name = source.EasyName(options);
+        Assert.Equal($"public {PREFIX}.RType1a.ctor(ref System.Nullable<System.Int32> one)", name);
     }
 
     // ----------------------------------------------------
@@ -66,29 +59,22 @@ public static class Test_EasyConstructor
         options = EasyMethodOptions.Empty;
         name = source.EasyName(options); Assert.Equal("RType1b", name);
 
-        options = EasyMethodOptions.Default with
-        {
-            UseAccessibility = true,
-            UseModifiers = true,
-            ReturnTypeOptions = EasyTypeOptions.Default
-        };
+        options = EasyMethodOptions.Default;
         name = source.EasyName(options);
-        Assert.Equal("internal RType1b(ref int?)", name);
+        Assert.Equal("RType1b(ref int?)", name);
 
-        options.UseTechName = true;
+        options = EasyMethodOptions.DefaultEx;
         name = source.EasyName(options);
-        Assert.Equal("internal RType1b.ctor(ref int?)", name);
+        Assert.Equal($"{PREFIX}.RType1b(ref int?)", name);
 
-        options = EasyMethodOptions.Full with
-        {
-            UseAccessibility = true,
-            UseModifiers = true,
-            ReturnTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false },
-            ParameterOptions = EasyParameterOptions.Full with
-            { TypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false } },
-        };
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
         name = source.EasyName(options);
-        Assert.Equal($"internal {PREFIX}.RType1b.ctor(ref System.Nullable<int> one)", name);
+        Assert.Equal($"internal {PREFIX}.RType1b(ref int?)", name);
+
+        options = EasyMethodOptions.Full;
+        name = source.EasyName(options);
+        Assert.Equal($"internal {PREFIX}.RType1b.ctor(ref System.Nullable<System.Int32> one)", name);
     }
 
     // ----------------------------------------------------
@@ -108,27 +94,20 @@ public static class Test_EasyConstructor
         options = EasyMethodOptions.Empty;
         name = source.EasyName(options); Assert.Equal("RType2", name);
 
-        options = EasyMethodOptions.Default with
-        {
-            UseAccessibility = true,
-            UseModifiers = true,
-            ReturnTypeOptions = EasyTypeOptions.Default
-        };
+        options = EasyMethodOptions.Default;
         name = source.EasyName(options);
-        Assert.Equal("static RType2()", name);
+        Assert.Equal("RType2()", name);
 
-        options.UseTechName = true;
+        options = EasyMethodOptions.DefaultEx;
         name = source.EasyName(options);
-        Assert.Equal("static RType2.cctor()", name);
+        Assert.Equal($"{PREFIX}.RType2()", name);
 
-        options = EasyMethodOptions.Full with
-        {
-            UseAccessibility = true,
-            UseModifiers = true,
-            ReturnTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false },
-            ParameterOptions = EasyParameterOptions.Full with
-            { TypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false } },
-        };
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = source.EasyName(options);
+        Assert.Equal($"static {PREFIX}.RType2()", name);
+
+        options = EasyMethodOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"static {PREFIX}.RType2.cctor()", name);
     }

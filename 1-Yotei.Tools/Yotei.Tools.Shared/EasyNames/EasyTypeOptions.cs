@@ -57,7 +57,7 @@ public record EasyTypeOptions
 
     // ----------------------------------------------------
 
-    public enum Mode { Empty, Default, Full, FullNoSpecialNames };
+    public enum Mode { Empty, Default, DefaultEx, Full };
     EasyTypeOptions(Mode mode)
     {
         UsePlaceHolder = false;
@@ -73,19 +73,21 @@ public record EasyTypeOptions
         {
             case Mode.Default:
                 RemoveAttributeSuffix = true;
+                UseSpecialNames = true;
+                NullableStyle = EasyNullableStyle.UseAnnotations;
+                GenericListOptions = this;
+                break;
+
+            case Mode.DefaultEx:
+                NamespaceStyle = EasyNamespaceStyle.Default;
+                UseHost = true;
+                RemoveAttributeSuffix = true;
+                UseSpecialNames = true;
                 NullableStyle = EasyNullableStyle.UseAnnotations;
                 GenericListOptions = this;
                 break;
 
             case Mode.Full:
-                NamespaceStyle = EasyNamespaceStyle.Default;
-                UseHost = true;
-                UseSpecialNames = true;
-                NullableStyle = EasyNullableStyle.KeepWrappers;
-                GenericListOptions = this;
-                break;
-
-            case Mode.FullNoSpecialNames:
                 NamespaceStyle = EasyNamespaceStyle.Default;
                 UseHost = true;
                 UseSpecialNames = false;
@@ -111,14 +113,14 @@ public record EasyTypeOptions
     public static EasyTypeOptions Default => new(Mode.Default);
 
     /// <summary>
+    /// Obtains a new default-alike instance that includes the namespace and host.
+    /// </summary>
+    public static EasyTypeOptions DefaultEx => new(Mode.DefaultEx);
+
+    /// <summary>
     /// Obtains a new full-alike instance.
     /// </summary>
     public static EasyTypeOptions Full => new(Mode.Full);
-
-    /// <summary>
-    /// Obtains a new full-alike instance that DOES NOT use special names.
-    /// </summary>
-    public static EasyTypeOptions FullNoSpecialNames => new(Mode.FullNoSpecialNames);
 }
 
 // ========================================================

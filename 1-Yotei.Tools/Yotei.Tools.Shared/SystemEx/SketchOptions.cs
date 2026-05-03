@@ -76,10 +76,9 @@ public record SketchOptions
     /// </summary>
     public bool UseStaticMembers { get; set; }
 
-
     // ----------------------------------------------------
 
-    public enum Mode { Empty, Default, Full };
+    public enum Mode { Empty, Default, DefaultEx, Full };
     SketchOptions(Mode mode)
     {
         TypeOptions = null;
@@ -105,6 +104,16 @@ public record SketchOptions
                 ParameterOptions = EasyParameterOptions.Default;
                 PropertyOptions = EasyPropertyOptions.Default;
                 FieldOptions = EasyFieldOptions.Default;
+                NullString = "NULL";
+                UseShape = true;
+                break;
+
+            case Mode.DefaultEx:
+                TypeOptions = EasyTypeOptions.DefaultEx;
+                MethodOptions = EasyMethodOptions.DefaultEx;
+                ParameterOptions = EasyParameterOptions.DefaultEx;
+                PropertyOptions = EasyPropertyOptions.DefaultEx;
+                FieldOptions = EasyFieldOptions.DefaultEx;
                 NullString = "NULL";
                 UseShape = true;
                 break;
@@ -139,6 +148,11 @@ public record SketchOptions
     /// Obtains a new default-alike instance.
     /// </summary>
     public static SketchOptions Default => new(Mode.Default);
+
+    /// <summary>
+    /// Obtains a new default-alike instance whose type options are default extended ones.
+    /// </summary>
+    public static SketchOptions DefaultEx => new(Mode.DefaultEx);
 
     /// <summary>
     /// Obtains a new full-alike instance.

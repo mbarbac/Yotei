@@ -29,35 +29,22 @@ public static class Test_EasyProperty
         options = EasyPropertyOptions.Default;
         name = item.EasyName(options); Assert.Equal("this[int?, in string?]", name);
 
-        options.MemberTypeOptions = EasyTypeOptions.Default;
+        options = EasyPropertyOptions.DefaultEx;
         name = item.EasyName(options);
-        Assert.Equal("string? this[int?, in string?]", name);
+        Assert.Equal($"{PREFIX}.RType0a.this[int?, in string?]", name);
+
+        options.MemberTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = item.EasyName(options);
+        Assert.Equal($"public string? {PREFIX}.RType0a.this[int?, in string?]", name);
 
         options = EasyPropertyOptions.Full;
-        name = item.EasyName(options);
-        Assert.Equal($"public string? {PREFIX}.RType0a.Item[int? one, in string? two]", name);
-
-        options = EasyPropertyOptions.Full with
-        {
-            UseAccessibility = true,
-            UseModifiers = true,
-            MemberTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false },
-            ParameterOptions = EasyParameterOptions.Full with
-            {
-                TypeOptions = EasyTypeOptions.Full with
-                {
-                    UseSpecialNames = false,
-                    GenericListOptions = EasyTypeOptions.Full with
-                    { UseSpecialNames = false }
-                }
-            },
-        };
         name = item.EasyName(options);
         Assert.Equal(
             $"public System.String? {PREFIX}." +
             "RType0a.Item[System.Nullable<System.Int32> one, in System.String? two]",
             name);
-
     }
 
     // ----------------------------------------------------
@@ -84,30 +71,17 @@ public static class Test_EasyProperty
         options = EasyPropertyOptions.Default;
         name = item.EasyName(options); Assert.Equal("this[int?, in string?]", name);
 
-        options.MemberTypeOptions = EasyTypeOptions.Default;
+        options = EasyPropertyOptions.DefaultEx;
         name = item.EasyName(options);
-        Assert.Equal("string? this[int?, in string?]", name);
+        Assert.Equal($"{PREFIX}.RType0b.this[int?, in string?]", name);
+
+        options.MemberTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = item.EasyName(options);
+        Assert.Equal($"public string? {PREFIX}.RType0b.this[int?, in string?]", name);
 
         options = EasyPropertyOptions.Full;
-        name = item.EasyName(options);
-        Assert.Equal($"public string? {PREFIX}.RType0b.MyItem[int? one, in string? two]", name);
-
-        options = EasyPropertyOptions.Full with
-        {
-            UseAccessibility = true,
-            UseModifiers = true,
-            UseTechName = true,
-            MemberTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false },
-            ParameterOptions = EasyParameterOptions.Full with
-            {
-                TypeOptions = EasyTypeOptions.Full with
-                {
-                    UseSpecialNames = false,
-                    GenericListOptions = EasyTypeOptions.Full with
-                    { UseSpecialNames = false }
-                }
-            },
-        };
         name = item.EasyName(options);
         Assert.Equal(
             $"public System.String? {PREFIX}." +
@@ -122,7 +96,7 @@ public static class Test_EasyProperty
 
     //[Enforced]
     [Fact]
-    public static void Test_Standar_NewOverNonVirtual()
+    public static void Test_Standar_New_Over_NonVirtual()
     {
         EasyPropertyOptions options;
         string name;
@@ -135,30 +109,17 @@ public static class Test_EasyProperty
         options = EasyPropertyOptions.Default;
         name = item.EasyName(options); Assert.Equal("Name", name);
 
-        options.MemberTypeOptions = EasyTypeOptions.Default;
+        options = EasyPropertyOptions.DefaultEx;
         name = item.EasyName(options);
-        Assert.Equal("int Name", name);
+        Assert.Equal($"{PREFIX}.RType1b.Name", name);
 
-        options = EasyPropertyOptions.Full;
+        options.MemberTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
         name = item.EasyName(options);
         Assert.Equal($"public new int {PREFIX}.RType1b.Name", name);
 
-        options = EasyPropertyOptions.Full with
-        {
-            UseAccessibility = true,
-            UseModifiers = true,
-            UseTechName = true,
-            MemberTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false },
-            ParameterOptions = EasyParameterOptions.Full with
-            {
-                TypeOptions = EasyTypeOptions.Full with
-                {
-                    UseSpecialNames = false,
-                    GenericListOptions = EasyTypeOptions.Full with
-                    { UseSpecialNames = false }
-                }
-            },
-        };
+        options = EasyPropertyOptions.Full;
         name = item.EasyName(options);
         Assert.Equal($"public new System.Int32 {PREFIX}.RType1b.Name", name);
     }
@@ -183,30 +144,17 @@ public static class Test_EasyProperty
         options = EasyPropertyOptions.Default;
         name = item.EasyName(options); Assert.Equal("Name", name);
 
-        options.MemberTypeOptions = EasyTypeOptions.Default;
+        options = EasyPropertyOptions.DefaultEx;
         name = item.EasyName(options);
-        Assert.Equal("int Name", name);
+        Assert.Equal($"{PREFIX}.RType2b.Name", name);
 
-        options = EasyPropertyOptions.Full;
+        options.MemberTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
         name = item.EasyName(options);
         Assert.Equal($"public new int {PREFIX}.RType2b.Name", name);
 
-        options = EasyPropertyOptions.Full with
-        {
-            UseAccessibility = true,
-            UseModifiers = true,
-            UseTechName = true,
-            MemberTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false },
-            ParameterOptions = EasyParameterOptions.Full with
-            {
-                TypeOptions = EasyTypeOptions.Full with
-                {
-                    UseSpecialNames = false,
-                    GenericListOptions = EasyTypeOptions.Full with
-                    { UseSpecialNames = false }
-                }
-            },
-        };
+        options = EasyPropertyOptions.Full;
         name = item.EasyName(options);
         Assert.Equal($"public new System.Int32 {PREFIX}.RType2b.Name", name);
     }
@@ -231,26 +179,17 @@ public static class Test_EasyProperty
         options = EasyPropertyOptions.Default;
         name = item.EasyName(options); Assert.Equal("Name", name);
 
-        options = EasyPropertyOptions.Full;
+        options = EasyPropertyOptions.DefaultEx;
+        name = item.EasyName(options);
+        Assert.Equal($"{PREFIX}.RType3b.Name", name);
+
+        options.MemberTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
         name = item.EasyName(options);
         Assert.Equal($"public override string? {PREFIX}.RType3b.Name", name);
 
-        options = EasyPropertyOptions.Full with
-        {
-            UseAccessibility = true,
-            UseModifiers = true,
-            UseTechName = true,
-            MemberTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false },
-            ParameterOptions = EasyParameterOptions.Full with
-            {
-                TypeOptions = EasyTypeOptions.Full with
-                {
-                    UseSpecialNames = false,
-                    GenericListOptions = EasyTypeOptions.Full with
-                    { UseSpecialNames = false }
-                }
-            },
-        };
+        options = EasyPropertyOptions.Full;
         name = item.EasyName(options);
         Assert.Equal($"public override System.String? {PREFIX}.RType3b.Name", name);
     }
@@ -275,32 +214,21 @@ public static class Test_EasyProperty
         options = EasyPropertyOptions.Default;
         name = item.EasyName(options); Assert.Equal("Name", name);
 
-        options.MemberTypeOptions = EasyTypeOptions.Default;
+        options = EasyPropertyOptions.DefaultEx;
         name = item.EasyName(options);
-        Assert.Equal("string? Name", name);
+        Assert.Equal($"{PREFIX}.RType4b.Name", name);
 
-        options = EasyPropertyOptions.Full;
+        options.MemberTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
         name = item.EasyName(options);
         Assert.Equal($"public override string? {PREFIX}.RType4b.Name", name);
 
-        options = EasyPropertyOptions.Full with
-        {
-            UseAccessibility = true,
-            UseModifiers = true,
-            UseTechName = true,
-            MemberTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false },
-            ParameterOptions = EasyParameterOptions.Full with
-            {
-                TypeOptions = EasyTypeOptions.Full with
-                {
-                    UseSpecialNames = false,
-                    GenericListOptions = EasyTypeOptions.Full with
-                    { UseSpecialNames = false }
-                }
-            },
-        };
+        options = EasyPropertyOptions.Full;
         name = item.EasyName(options);
-        Assert.Equal($"public override Yotei.Tools.IsNullable<string> {PREFIX}.RType4b.Name", name);
+        Assert.Equal(
+            $"public override Yotei.Tools.IsNullable<System.String> {PREFIX}.RType4b.Name",
+            name);
     }
 
     // ----------------------------------------------------
@@ -325,32 +253,23 @@ public static class Test_EasyProperty
         options = EasyPropertyOptions.Default;
         name = item.EasyName(options); Assert.Equal("this[T?, S?]", name);
 
-        options.MemberTypeOptions = EasyTypeOptions.Default;
+        options = EasyPropertyOptions.DefaultEx;
         name = item.EasyName(options);
-        Assert.Equal("K? this[T?, S?]", name);
+        Assert.Equal($"{PREFIX}.RType5a<K, T>.RType5b<S>.this[T?, S?]", name);
+
+        options.MemberTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = item.EasyName(options);
+        Assert.Equal(
+            $"public K? {PREFIX}.RType5a<K, T>.RType5b<S>.this[T?, S?]",
+            name);
 
         options = EasyPropertyOptions.Full;
         name = item.EasyName(options);
-        Assert.Equal($"public K? {PREFIX}.RType5a<K, T>.RType5b<S>.Item[T? one, S? two]", name);
-
-        options = EasyPropertyOptions.Full with
-        {
-            UseAccessibility = true,
-            UseModifiers = true,
-            UseTechName = true,
-            MemberTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false },
-            ParameterOptions = EasyParameterOptions.Full with
-            {
-                TypeOptions = EasyTypeOptions.Full with
-                {
-                    UseSpecialNames = false,
-                    GenericListOptions = EasyTypeOptions.Full with
-                    { UseSpecialNames = false }
-                }
-            },
-        };
-        name = item.EasyName(options);
-        Assert.Equal($"public K? {PREFIX}.RType5a<K, T>.RType5b<S>.Item[T? one, S? two]", name);
+        Assert.Equal(
+            $"public K? {PREFIX}.RType5a<K, T>.RType5b<S>.Item[T? one, S? two]",
+            name);
     }
 
     //[Enforced]
@@ -368,40 +287,24 @@ public static class Test_EasyProperty
         options = EasyPropertyOptions.Default;
         name = item.EasyName(options); Assert.Equal("this[int?, string?]", name);
 
-        options.MemberTypeOptions = EasyTypeOptions.Default;
+        options = EasyPropertyOptions.DefaultEx;
         name = item.EasyName(options);
-        Assert.Equal("byte? this[int?, string?]", name);
+        Assert.Equal($"{PREFIX}.RType5a<byte?, int?>.RType5b<string>.this[int?, string?]", name);
+
+        options.MemberTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = item.EasyName(options);
+        Assert.Equal(
+            $"public byte? {PREFIX}.RType5a<byte?, int?>.RType5b<string>.this[int?, string?]",
+            name);
 
         options = EasyPropertyOptions.Full;
         name = item.EasyName(options);
         Assert.Equal(
-            $"public byte? {PREFIX}.RType5a<byte?, int?>.RType5b<string>.Item[int? one, string? two]",
-            name);
-
-        options = EasyPropertyOptions.Full with
-        {
-            UseAccessibility = true,
-            UseModifiers = true,
-            UseTechName = true,
-            MemberTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false },
-            ParameterOptions = EasyParameterOptions.Full with
-            {
-                TypeOptions = EasyTypeOptions.Full with
-                {
-                    UseSpecialNames = false,
-                    GenericListOptions = EasyTypeOptions.Full with { UseSpecialNames = false }
-                }
-            },
-        };
-
-        // Here we can see the same problem again: the generic list uses special names, even if
-        // we set it. That's the problem of the internal cascade, that are not self-references
-        // to prevent infinite recursion.
-
-        name = item.EasyName(options);
-        Assert.Equal(
-            $"public System.Nullable<byte> {PREFIX}.RType5a<byte?, int?>." +
-            "RType5b<string>.Item[System.Nullable<System.Int32> one, System.String? two]",
+            $"public System.Nullable<System.Byte> {PREFIX}." +
+            "RType5a<System.Nullable<System.Byte>, System.Nullable<System.Int32>>." +
+            "RType5b<System.String>.Item[System.Nullable<System.Int32> one, System.String? two]",
             name);
     }
 }

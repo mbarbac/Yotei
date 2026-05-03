@@ -22,11 +22,14 @@ public static class Test_SketchExtensions
         options = SketchOptions.Default;
         name = item.Sketch(options); Assert.Equal("NULL", name);
 
-        options.HeadOptions = EasyTypeOptions.Default;
+        options = SketchOptions.DefaultEx;
+        name = item.Sketch(options); Assert.Equal("NULL", name);
+
+        options.HeadOptions = EasyTypeOptions.DefaultEx;
         name = item.Sketch(options); Assert.Equal("(string) NULL", name);
 
         options = SketchOptions.Full;
-        name = item.Sketch(options); Assert.Equal("(string) NULL", name);
+        name = item.Sketch(options); Assert.Equal("(System.String) NULL", name);
     }
 
     //[Enforced]
@@ -43,11 +46,14 @@ public static class Test_SketchExtensions
         options = SketchOptions.Default;
         name = item.Sketch(options); Assert.Equal("15", name);
 
-        options.HeadOptions = EasyTypeOptions.Default;
+        options = SketchOptions.DefaultEx;
+        name = item.Sketch(options); Assert.Equal("15", name);
+
+        options.HeadOptions = EasyTypeOptions.DefaultEx;
         name = item.Sketch(options); Assert.Equal("(byte) 15", name);
 
         options = SketchOptions.Full;
-        name = item.Sketch(options); Assert.Equal("(byte) 15", name);
+        name = item.Sketch(options); Assert.Equal("(System.Byte) 15", name);
     }
 
     //[Enforced]
@@ -64,11 +70,14 @@ public static class Test_SketchExtensions
         options = SketchOptions.Default;
         name = item.Sketch(options); Assert.Equal("Hello", name);
 
-        options.HeadOptions = EasyTypeOptions.Default;
+        options = SketchOptions.DefaultEx;
+        name = item.Sketch(options); Assert.Equal("Hello", name);
+
+        options.HeadOptions = EasyTypeOptions.DefaultEx;
         name = item.Sketch(options); Assert.Equal("(string) Hello", name);
 
         options = SketchOptions.Full;
-        name = item.Sketch(options); Assert.Equal("(string) Hello", name);
+        name = item.Sketch(options); Assert.Equal("(System.String) Hello", name);
     }
 
     //[Enforced]
@@ -86,8 +95,11 @@ public static class Test_SketchExtensions
         options = SketchOptions.Default;
         name = item.Sketch(options); Assert.Equal(result, name);
 
-        options.HeadOptions = EasyTypeOptions.Default;
-        name = item.Sketch(options); Assert.Equal($"(Guid) {result}", name);
+        options = SketchOptions.DefaultEx;
+        name = item.Sketch(options); Assert.Equal(result, name);
+
+        options.HeadOptions = EasyTypeOptions.DefaultEx;
+        name = item.Sketch(options); Assert.Equal($"(System.Guid) {result}", name);
 
         options = SketchOptions.Full;
         name = item.Sketch(options); Assert.Equal($"(System.Guid) {result}", name);
@@ -109,8 +121,14 @@ public static class Test_SketchExtensions
         options = SketchOptions.Default;
         name = item.Sketch(options); Assert.Equal("string", name);
 
-        options = SketchOptions.Full;
+        options = SketchOptions.DefaultEx;
         name = item.Sketch(options); Assert.Equal("string", name);
+
+        options.HeadOptions = EasyTypeOptions.DefaultEx;
+        name = item.Sketch(options); Assert.Equal("string", name);
+
+        options = SketchOptions.Full;
+        name = item.Sketch(options); Assert.Equal("System.String", name);
     }
 
     //[Enforced]
@@ -127,9 +145,15 @@ public static class Test_SketchExtensions
         options = SketchOptions.Default;
         name = item.Sketch(options); Assert.Equal("string?", name);
 
+        options = SketchOptions.DefaultEx;
+        name = item.Sketch(options); Assert.Equal("string?", name);
+
+        options.HeadOptions = EasyTypeOptions.DefaultEx;
+        name = item.Sketch(options); Assert.Equal("string?", name);
+
         options = SketchOptions.Full;
         name = item.Sketch(options);
-        Assert.Equal("string?", name);
+        Assert.Equal("Yotei.Tools.IsNullable<System.String>", name);
     }
 
     // ----------------------------------------------------
@@ -142,14 +166,10 @@ public static class Test_SketchExtensions
         string name;
         var item = 1234.567;
 
-        options = SketchOptions.Default with { FormatProvider = CultureInfo.InvariantCulture };
+        options = SketchOptions.Empty with { FormatProvider = CultureInfo.InvariantCulture };
         name = item.Sketch(options); Assert.Equal("1234.567", name);
 
-        options = SketchOptions.Default with
-        {
-            FormatString = "0.00",
-            FormatProvider = CultureInfo.InvariantCulture
-        };
+        options = options with { FormatString = "0.00" };
         name = item.Sketch(options); Assert.Equal("1234.57", name);
 
         options = SketchOptions.Default with { FormatProvider = CultureInfo.GetCultureInfo("es-ES") };
@@ -164,7 +184,7 @@ public static class Test_SketchExtensions
         name = item.Sketch(options); Assert.Equal("1234,57", name);
 
         options = SketchOptions.Full with { FormatProvider = CultureInfo.InvariantCulture };
-        name = item.Sketch(options); Assert.Equal("(double) 1234.567", name);
+        name = item.Sketch(options); Assert.Equal("(System.Double) 1234.567", name);
     }
 
     //[Enforced]
@@ -193,7 +213,7 @@ public static class Test_SketchExtensions
         name = item.Sketch(options); Assert.Equal("1234,57", name);
 
         options = SketchOptions.Full with { FormatProvider = CultureInfo.InvariantCulture };
-        name = item.Sketch(options); Assert.Equal("(decimal) 1234.567", name);
+        name = item.Sketch(options); Assert.Equal("(System.Decimal) 1234.567", name);
     }
 
     //[Enforced]
@@ -212,7 +232,7 @@ public static class Test_SketchExtensions
 
         options = SketchOptions.Default with { FormatProvider = CultureInfo.GetCultureInfo("es-ES") };
         options = options with { HeadOptions = EasyTypeOptions.Default };
-        name = item.Sketch(options); Assert.Equal($"(DateTime) 31/12/2000 0:00:00", name);
+        name = item.Sketch(options); Assert.Equal("(DateTime) 31/12/2000 0:00:00", name);
 
         options = SketchOptions.Full with { FormatProvider = CultureInfo.InvariantCulture };
         name = item.Sketch(options); Assert.Equal("(System.DateTime) 12/31/2000 00:00:00", name);
@@ -234,7 +254,7 @@ public static class Test_SketchExtensions
 
         options = SketchOptions.Default with { FormatProvider = CultureInfo.GetCultureInfo("es-ES") };
         options = options with { HeadOptions = EasyTypeOptions.Default };
-        name = item.Sketch(options); Assert.Equal($"(DateOnly) 31/12/2000", name);
+        name = item.Sketch(options); Assert.Equal("(DateOnly) 31/12/2000", name);
 
         options = SketchOptions.Full with { FormatProvider = CultureInfo.InvariantCulture };
         name = item.Sketch(options); Assert.Equal("(System.DateOnly) 12/31/2000", name);
@@ -258,8 +278,11 @@ public static class Test_SketchExtensions
         options = SketchOptions.Default;
         name = source.Sketch(options); Assert.Equal("One", name);
 
-        options.HeadOptions = EasyTypeOptions.Default;
-        name = source.Sketch(options); Assert.Equal("MyEnum.One", name);
+        options = SketchOptions.DefaultEx;
+        name = source.Sketch(options); Assert.Equal("One", name);
+
+        options.HeadOptions = EasyTypeOptions.DefaultEx;
+        name = source.Sketch(options); Assert.Equal($"{PREFIX}.MyEnum.One", name);
 
         options = SketchOptions.Full;
         name = source.Sketch(options); Assert.Equal($"{PREFIX}.MyEnum.One", name);
@@ -279,16 +302,19 @@ public static class Test_SketchExtensions
         options = SketchOptions.Default;
         name = source.Sketch(options); Assert.Equal("One | Two | Three", name);
 
-        options.HeadOptions = EasyTypeOptions.Default;
+        options = SketchOptions.DefaultEx;
+        name = source.Sketch(options); Assert.Equal("One | Two | Three", name);
+
+        options.HeadOptions = EasyTypeOptions.DefaultEx;
         name = source.Sketch(options);
-        Assert.Equal("MyEnum.One | MyEnum.Two | MyEnum.Three", name);
+        Assert.Equal(
+            $"{PREFIX}.MyEnum.One | {PREFIX}.MyEnum.Two | {PREFIX}.MyEnum.Three",
+            name);
 
         options = SketchOptions.Full;
         name = source.Sketch(options);
         Assert.Equal(
-            $"{PREFIX}.MyEnum.One | " +
-            $"{PREFIX}.MyEnum.Two | " +
-            $"{PREFIX}.MyEnum.Three",
+            $"{PREFIX}.MyEnum.One | {PREFIX}.MyEnum.Two | {PREFIX}.MyEnum.Three",
             name);
     }
 
@@ -308,11 +334,14 @@ public static class Test_SketchExtensions
         options = SketchOptions.Default;
         name = source.Sketch(options); Assert.Equal("[]", name);
 
-        options.HeadOptions = EasyTypeOptions.Default;
+        options = SketchOptions.DefaultEx;
+        name = source.Sketch(options); Assert.Equal("[]", name);
+        
+        options.HeadOptions = EasyTypeOptions.DefaultEx;
         name = source.Sketch(options); Assert.Equal("(char[]) []", name);
 
         options = SketchOptions.Full;
-        name = source.Sketch(options); Assert.Equal("(char[]) []", name);
+        name = source.Sketch(options); Assert.Equal("(System.Char[]) []", name);
     }
 
     //[Enforced]
@@ -329,13 +358,17 @@ public static class Test_SketchExtensions
         options = SketchOptions.Default;
         name = source.Sketch(options); Assert.Equal("[1, 2, 3]", name);
 
-        options.HeadOptions = EasyTypeOptions.Default;
-        name = source.Sketch(options);
-        Assert.Equal("(int[]) [(int) 1, (int) 2, (int) 3]", name);
+        options = SketchOptions.DefaultEx;
+        name = source.Sketch(options); Assert.Equal("[1, 2, 3]", name);
+
+        options.HeadOptions = EasyTypeOptions.DefaultEx;
+        name = source.Sketch(options); Assert.Equal("(int[]) [(int) 1, (int) 2, (int) 3]", name);
 
         options = SketchOptions.Full;
         name = source.Sketch(options);
-        Assert.Equal("(int[]) [(int) 1, (int) 2, (int) 3]", name);
+        Assert.Equal(
+            "(System.Int32[]) [(System.Int32) 1, (System.Int32) 2, (System.Int32) 3]",
+            name);
     }
 
     // ----------------------------------------------------
@@ -354,17 +387,21 @@ public static class Test_SketchExtensions
         options = SketchOptions.Default;
         name = source.Sketch(options); Assert.Equal("{James = 50, Maria = 25}", name);
 
-        options.HeadOptions = EasyTypeOptions.Default;
+        options = SketchOptions.DefaultEx;
+        name = source.Sketch(options); Assert.Equal("{James = 50, Maria = 25}", name);
+
+        options.HeadOptions = EasyTypeOptions.DefaultEx;
         name = source.Sketch(options);
         Assert.Equal(
-            "(Dictionary<string, int>) {(string) James = (int) 50, (string) Maria = (int) 25}",
+            "(System.Collections.Generic.Dictionary<string, int>) " +
+            "{(string) James = (int) 50, (string) Maria = (int) 25}",
             name);
 
         options = SketchOptions.Full;
         name = source.Sketch(options);
         Assert.Equal(
-            "(System.Collections.Generic.Dictionary<string, int>) " +
-            "{(string) James = (int) 50, (string) Maria = (int) 25}",
+            "(System.Collections.Generic.Dictionary<System.String, System.Int32>) " +
+            "{(System.String) James = (System.Int32) 50, (System.String) Maria = (System.Int32) 25}",
             name);
     }
 
@@ -382,15 +419,20 @@ public static class Test_SketchExtensions
         options = SketchOptions.Default;
         name = source.Sketch(options); Assert.Equal("[James, Maria]", name);
 
-        options.HeadOptions = EasyTypeOptions.Default;
+        options = SketchOptions.DefaultEx;
+        name = source.Sketch(options); Assert.Equal("[James, Maria]", name);
+
+        options.HeadOptions = EasyTypeOptions.DefaultEx;
         name = source.Sketch(options);
-        Assert.Equal("(List<string>) [(string) James, (string) Maria]", name);
+        Assert.Equal(
+            "(System.Collections.Generic.List<string>) [(string) James, (string) Maria]",
+            name);
 
         options = SketchOptions.Full;
         name = source.Sketch(options);
         Assert.Equal(
-            "(System.Collections.Generic.List<string>) " +
-            "[(string) James, (string) Maria]",
+            "(System.Collections.Generic.List<System.String>) " +
+            "[(System.String) James, (System.String) Maria]",
             name);
     }
 
@@ -423,16 +465,20 @@ public static class Test_SketchExtensions
         options = SketchOptions.Default;
         name = source.Sketch(options); Assert.Equal("{ this, Name = James }", name);
 
-        options.HeadOptions = EasyTypeOptions.Default;
+        options = SketchOptions.DefaultEx;
+        name = source.Sketch(options); Assert.Equal("{ this, Name = James }", name);
+
+        options.HeadOptions = EasyTypeOptions.DefaultEx;
         name = source.Sketch(options);
-        Assert.Equal("(AX) { this, Name = (string) James }", name);
+        Assert.Equal(
+            $"({PREFIX}.AX) {{ this, Name = (string) James }}",
+            name);
 
         options = SketchOptions.Full;
         name = source.Sketch(options);
         Assert.Equal(
             $"({PREFIX}.AX) " +
-            "{ this, " +
-            "Name = (string) James, Age = (int) 50, Org = (string) MI6 }",
+            "{ this, Name = (System.String) James, Age = (System.Int32) 50, Org = (System.String) MI6 }",
             name);
     }
 
@@ -463,8 +509,14 @@ public static class Test_SketchExtensions
         options = SketchOptions.Default;
         name = source.Sketch(options); Assert.Equal("<AY> & James & 50", name);
 
-        options.HeadOptions = EasyTypeOptions.Default;
-        name = source.Sketch(options); Assert.Equal("(AZ) <AY> & James & 50", name);
+        options = SketchOptions.DefaultEx;
+        name = source.Sketch(options); Assert.Equal("<AY> & James & 50", name);
+
+        options.HeadOptions = EasyTypeOptions.DefaultEx;
+        name = source.Sketch(options);
+        Assert.Equal(
+            $"({PREFIX}.AZ) <AY> & James & 50",
+            name);
 
         options = SketchOptions.Full;
         name = source.Sketch(options);
@@ -493,20 +545,23 @@ public static class Test_SketchExtensions
         options = SketchOptions.Default;
         name = source.Sketch(options); Assert.Equal("{ [Name, James], [Age, 50] }", name);
 
-        options.HeadOptions = EasyTypeOptions.Default;
+        options = SketchOptions.DefaultEx;
+        name = source.Sketch(options); Assert.Equal("{ [Name, James], [Age, 50] }", name);
+
+        options.HeadOptions = EasyTypeOptions.DefaultEx;
         name = source.Sketch(options);
         Assert.Equal(
-            "(ExpandoObject) { " +
-            "(KeyValuePair<string, object>) [Name, James], " +
-            "(KeyValuePair<string, object>) [Age, 50] }",
+            "(System.Dynamic.ExpandoObject) { " +
+            "(System.Collections.Generic.KeyValuePair<string, object>) [Name, James], " +
+            "(System.Collections.Generic.KeyValuePair<string, object>) [Age, 50] }",
             name);
 
         options = SketchOptions.Full;
         name = source.Sketch(options);
         Assert.Equal(
             "(System.Dynamic.ExpandoObject) { " +
-            "(System.Collections.Generic.KeyValuePair<string, object>) [Name, James], " +
-            "(System.Collections.Generic.KeyValuePair<string, object>) [Age, 50] }",
+            "(System.Collections.Generic.KeyValuePair<System.String, System.Object>) [Name, James], " +
+            "(System.Collections.Generic.KeyValuePair<System.String, System.Object>) [Age, 50] }",
             name);
     }
 
@@ -523,13 +578,20 @@ public static class Test_SketchExtensions
         options = SketchOptions.Empty;
         name = source.Sketch(options); Assert.Equal("{ Name = James, Age = 50 }", name);
 
-
         options = SketchOptions.Default;
         name = source.Sketch(options); Assert.Equal("{ Name = James, Age = 50 }", name);
 
-        options.HeadOptions = EasyTypeOptions.Default;
+        options = SketchOptions.DefaultEx;
+        name = source.Sketch(options); Assert.Equal("{ Name = James, Age = 50 }", name);
+
+        options.HeadOptions = EasyTypeOptions.DefaultEx;
         name = source.Sketch(options);
-        Assert.EndsWith("{ Name = James, Age = 50 }", name);
+        //Assert.Equal("(<>f__AnonymousType0<string, int>) { Name = James, Age = 50 }", name);
+        Assert.Contains("AnonymousType", name);
+
+        options = SketchOptions.Full;
+        name = source.Sketch(options);
+        //Assert.Equal("(<>f__AnonymousType0<System.String, System.Int32>) { Name = James, Age = 50 }", name);
         Assert.Contains("AnonymousType", name);
     }
 }

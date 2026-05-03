@@ -27,17 +27,21 @@ public static class Test_EasyMethod
         options = EasyMethodOptions.Default;
         name = source.EasyName(options); Assert.Equal("Method(int?)", name);
 
-        options = EasyMethodOptions.Default with { ReturnTypeOptions = EasyTypeOptions.Default };
-        name = source.EasyName(options); Assert.Equal("void Method(int?)", name);
+        options = EasyMethodOptions.DefaultEx;
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.IFace1.Method(int?)", name);
+
+        options.ReturnTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = source.EasyName(options);
+        Assert.Equal($"void {PREFIX}.IFace1.Method(int?)", name);
 
         options = EasyMethodOptions.Full;
         name = source.EasyName(options);
-        Assert.Equal($"void {PREFIX}.IFace1.Method(int? one)", name);
-
-        options = EasyMethodOptions.Full;
-        options.ParameterOptions!.TypeOptions!.UseSpecialNames = false;
-        name = source.EasyName(options);
-        Assert.Equal($"void {PREFIX}.IFace1.Method(System.Nullable<System.Int32> one)", name);
+        Assert.Equal(
+            $"System.Void {PREFIX}.IFace1.Method(System.Nullable<System.Int32> one)",
+            name);
     }
 
     // ----------------------------------------------------
@@ -59,12 +63,16 @@ public static class Test_EasyMethod
         options = EasyMethodOptions.Default;
         name = source.EasyName(options); Assert.Equal("Method(int)", name);
 
-        options = EasyMethodOptions.Default with { ReturnTypeOptions = EasyTypeOptions.Default };
-        name = source.EasyName(options); Assert.Equal("int? Method(int)", name);
+        options = EasyMethodOptions.DefaultEx;
+        name = source.EasyName(options); Assert.Equal($"{PREFIX}.IFace2.Method(int)", name);
+
+        options.ReturnTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = source.EasyName(options);
+        Assert.Equal($"int? {PREFIX}.IFace2.Method(int)", name);
 
         options = EasyMethodOptions.Full;
-        options.ReturnTypeOptions!.UseSpecialNames = false;
-        options.ParameterOptions!.TypeOptions!.UseSpecialNames = false;
         name = source.EasyName(options);
         Assert.Equal(
             $"System.Nullable<System.Int32> {PREFIX}.IFace2.Method(System.Int32 one)",
@@ -90,17 +98,23 @@ public static class Test_EasyMethod
         options = EasyMethodOptions.Default;
         name = source.EasyName(options); Assert.Equal("Method(int)", name);
 
-        options = EasyMethodOptions.Default with { ReturnTypeOptions = EasyTypeOptions.Default };
-        name = source.EasyName(options); Assert.Equal("string Method(int)", name);
+        options = EasyMethodOptions.DefaultEx;
+        name = source.EasyName(options); Assert.Equal($"{PREFIX}.IFace3a.Method(int)", name);
+
+        options.ReturnTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = source.EasyName(options);
+        Assert.Equal($"string {PREFIX}.IFace3a.Method(int)", name);
 
         options = EasyMethodOptions.Full;
-        options.ReturnTypeOptions!.UseSpecialNames = false;
-        options.ParameterOptions!.TypeOptions!.UseSpecialNames = false;
         name = source.EasyName(options);
         Assert.Equal(
             $"System.String {PREFIX}.IFace3a.Method(System.Int32 one)",
             name);
     }
+
+    // ----------------------------------------------------
 
     interface IFace3b { IsNullable<string?> Method(int one); }
 
@@ -119,17 +133,24 @@ public static class Test_EasyMethod
         options = EasyMethodOptions.Default;
         name = source.EasyName(options); Assert.Equal("Method(int)", name);
 
-        options = EasyMethodOptions.Default with { ReturnTypeOptions = EasyTypeOptions.Default };
-        name = source.EasyName(options); Assert.Equal("string? Method(int)", name);
+        options = EasyMethodOptions.DefaultEx;
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.IFace3b.Method(int)", name);
+
+        options.ReturnTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = source.EasyName(options);
+        Assert.Equal($"string? {PREFIX}.IFace3b.Method(int)", name);
 
         options = EasyMethodOptions.Full;
-        options.ReturnTypeOptions!.UseSpecialNames = false;
-        options.ParameterOptions!.TypeOptions!.UseSpecialNames = false;
         name = source.EasyName(options);
         Assert.Equal(
             $"Yotei.Tools.IsNullable<System.String> {PREFIX}.IFace3b.Method(System.Int32 one)",
             name);
     }
+
+    // ----------------------------------------------------
 
     interface IFace3c { [IsNullable] string? Method(int one); }
 
@@ -148,8 +169,15 @@ public static class Test_EasyMethod
         options = EasyMethodOptions.Default;
         name = source.EasyName(options); Assert.Equal("Method(int)", name);
 
-        options = EasyMethodOptions.Default with { ReturnTypeOptions = EasyTypeOptions.Default };
-        name = source.EasyName(options); Assert.Equal("string? Method(int)", name);
+        options = EasyMethodOptions.DefaultEx;
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.IFace3c.Method(int)", name);
+
+        options.ReturnTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = source.EasyName(options);
+        Assert.Equal($"string? {PREFIX}.IFace3c.Method(int)", name);
 
         options = EasyMethodOptions.Full;
         options.ReturnTypeOptions!.UseSpecialNames = false;
@@ -184,13 +212,17 @@ public static class Test_EasyMethod
         options = EasyMethodOptions.Default;
         name = source.EasyName(options); Assert.Equal("Method1(byte)", name);
 
-        options = EasyMethodOptions.Default with
-        { ReturnTypeOptions = EasyTypeOptions.Default, UseModifiers = true };
-        name = source.EasyName(options); Assert.Equal("static ref int? Method1(byte)", name);
+        options = EasyMethodOptions.DefaultEx;
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.IFace4a.Method1(byte)", name);
+
+        options.ReturnTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = source.EasyName(options);
+        Assert.Equal($"static ref int? {PREFIX}.IFace4a.Method1(byte)", name);
 
         options = EasyMethodOptions.Full;
-        options.ReturnTypeOptions!.UseSpecialNames = false;
-        options.ParameterOptions!.TypeOptions!.UseSpecialNames = false;
         name = source.EasyName(options);
         Assert.Equal(
             $"static ref System.Nullable<System.Int32> {PREFIX}.IFace4a.Method1(System.Byte one)",
@@ -212,18 +244,24 @@ public static class Test_EasyMethod
         options = EasyMethodOptions.Default;
         name = source.EasyName(options); Assert.Equal("Method2(byte)", name);
 
-        options = EasyMethodOptions.Default with
-        { ReturnTypeOptions = EasyTypeOptions.Default, UseModifiers = true };
-        name = source.EasyName(options); Assert.Equal("static ref readonly int? Method2(byte)", name);
+        options = EasyMethodOptions.DefaultEx;
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.IFace4a.Method2(byte)", name);
+
+        options.ReturnTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = source.EasyName(options);
+        Assert.Equal($"static ref readonly int? {PREFIX}.IFace4a.Method2(byte)", name);
 
         options = EasyMethodOptions.Full;
-        options.ReturnTypeOptions!.UseSpecialNames = false;
-        options.ParameterOptions!.TypeOptions!.UseSpecialNames = false;
         name = source.EasyName(options);
         Assert.Equal(
-            $"static ref readonly System.Nullable<System.Int32> {PREFIX}.IFace4a.Method2(System.Byte one)",
+            $"static ref readonly System.Nullable<System.Int32> " +
+            $"{PREFIX}.IFace4a.Method2(System.Byte one)",
             name);
     }
+
     // ----------------------------------------------------
 
     interface IFace4b
@@ -252,13 +290,16 @@ public static class Test_EasyMethod
         options = EasyMethodOptions.Default;
         name = source.EasyName(options); Assert.Equal("Method1a(byte)", name);
 
-        options = EasyMethodOptions.Default with
-        { ReturnTypeOptions = EasyTypeOptions.Default, UseModifiers = true };
-        name = source.EasyName(options); Assert.Equal("static ref string Method1a(byte)", name);
+        options = EasyMethodOptions.DefaultEx;
+        name = source.EasyName(options); Assert.Equal($"{PREFIX}.IFace4b.Method1a(byte)", name);
+
+        options.ReturnTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = source.EasyName(options);
+        Assert.Equal($"static ref string {PREFIX}.IFace4b.Method1a(byte)", name);
 
         options = EasyMethodOptions.Full;
-        options.ReturnTypeOptions!.UseSpecialNames = false;
-        options.ParameterOptions!.TypeOptions!.UseSpecialNames = false;
         name = source.EasyName(options);
         Assert.Equal(
             $"static ref System.String {PREFIX}.IFace4b.Method1a(System.Byte one)",
@@ -282,13 +323,17 @@ public static class Test_EasyMethod
         options = EasyMethodOptions.Default;
         name = source.EasyName(options); Assert.Equal("Method1b(byte)", name);
 
-        options = EasyMethodOptions.Default with
-        { ReturnTypeOptions = EasyTypeOptions.Default, UseModifiers = true };
-        name = source.EasyName(options); Assert.Equal("static ref string? Method1b(byte)", name);
+        options = EasyMethodOptions.DefaultEx;
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.IFace4b.Method1b(byte)", name);
+
+        options.ReturnTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = source.EasyName(options);
+        Assert.Equal($"static ref string? {PREFIX}.IFace4b.Method1b(byte)", name);
 
         options = EasyMethodOptions.Full;
-        options.ReturnTypeOptions!.UseSpecialNames = false;
-        options.ParameterOptions!.TypeOptions!.UseSpecialNames = false;
         name = source.EasyName(options);
         Assert.Equal(
             $"static ref System.String? {PREFIX}.IFace4b.Method1b(System.Byte one)",
@@ -310,14 +355,17 @@ public static class Test_EasyMethod
         options = EasyMethodOptions.Default;
         name = source.EasyName(options); Assert.Equal("Method2a(byte)", name);
 
-        options = EasyMethodOptions.Default with
-        { ReturnTypeOptions = EasyTypeOptions.Default, UseModifiers = true };
+        options = EasyMethodOptions.DefaultEx;
         name = source.EasyName(options);
-        Assert.Equal("static ref readonly string Method2a(byte)", name);
+        Assert.Equal($"{PREFIX}.IFace4b.Method2a(byte)", name);
+
+        options.ReturnTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = source.EasyName(options);
+        Assert.Equal($"static ref readonly string {PREFIX}.IFace4b.Method2a(byte)", name);
 
         options = EasyMethodOptions.Full;
-        options.ReturnTypeOptions!.UseSpecialNames = false;
-        options.ParameterOptions!.TypeOptions!.UseSpecialNames = false;
         name = source.EasyName(options);
         Assert.Equal(
             $"static ref readonly System.String {PREFIX}.IFace4b.Method2a(System.Byte one)",
@@ -341,14 +389,17 @@ public static class Test_EasyMethod
         options = EasyMethodOptions.Default;
         name = source.EasyName(options); Assert.Equal("Method2b(byte)", name);
 
-        options = EasyMethodOptions.Default with
-        { ReturnTypeOptions = EasyTypeOptions.Default, UseModifiers = true };
+        options = EasyMethodOptions.DefaultEx;
         name = source.EasyName(options);
-        Assert.Equal("static ref readonly string? Method2b(byte)", name);
+        Assert.Equal($"{PREFIX}.IFace4b.Method2b(byte)", name);
+
+        options.ReturnTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = source.EasyName(options);
+        Assert.Equal($"static ref readonly string? {PREFIX}.IFace4b.Method2b(byte)", name);
 
         options = EasyMethodOptions.Full;
-        options.ReturnTypeOptions!.UseSpecialNames = false;
-        options.ParameterOptions!.TypeOptions!.UseSpecialNames = false;
         name = source.EasyName(options);
         Assert.Equal(
             $"static ref readonly System.String? {PREFIX}.IFace4b.Method2b(System.Byte one)",
@@ -380,13 +431,20 @@ public static class Test_EasyMethod
         options = EasyMethodOptions.Empty;
         name = source.EasyName(options); Assert.Equal("Method", name);
 
-        options = EasyMethodOptions.Default with
-        { UseAccessibility = true, ReturnTypeOptions = EasyTypeOptions.Default };
-        name = source.EasyName(options); Assert.Equal("void Method(int)", name);
+        options = EasyMethodOptions.Default;
+        name = source.EasyName(options); Assert.Equal("Method(int)", name);
 
-        options = EasyMethodOptions.Full with
-        { UseAccessibility = true, ReturnTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false } };
-        options.ParameterOptions!.TypeOptions!.UseSpecialNames = false;
+        options = EasyMethodOptions.DefaultEx;
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.IFace5.Method(int)", name);
+
+        options.ReturnTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = source.EasyName(options);
+        Assert.Equal($"void {PREFIX}.IFace5.Method(int)", name);
+
+        options = EasyMethodOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"System.Void {PREFIX}.IFace5.Method(System.Int32 age)", name);
     }
@@ -403,14 +461,21 @@ public static class Test_EasyMethod
         options = EasyMethodOptions.Empty;
         name = source.EasyName(options); Assert.Equal("Method1", name);
 
-        options = EasyMethodOptions.Default with
-        { UseAccessibility = true, ReturnTypeOptions = EasyTypeOptions.Default };
+        options = EasyMethodOptions.Default;
         name = source.EasyName(options);
-        Assert.Equal("public void Method1(int)", name);
+        Assert.Equal("Method1(int)", name);
 
-        options = EasyMethodOptions.Full with
-        { UseAccessibility = true, ReturnTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false } };
-        options.ParameterOptions!.TypeOptions!.UseSpecialNames = false;
+        options = EasyMethodOptions.DefaultEx;
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.RType1.Method1(int)", name);
+
+        options.ReturnTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = source.EasyName(options);
+        Assert.Equal($"public void {PREFIX}.RType1.Method1(int)", name);
+
+        options = EasyMethodOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"public System.Void {PREFIX}.RType1.Method1(System.Int32 age)", name);
     }
@@ -427,14 +492,21 @@ public static class Test_EasyMethod
         options = EasyMethodOptions.Empty;
         name = source.EasyName(options); Assert.Equal("Method2", name);
 
-        options = EasyMethodOptions.Default with
-        { UseAccessibility = true, ReturnTypeOptions = EasyTypeOptions.Default };
+        options = EasyMethodOptions.Default;
         name = source.EasyName(options);
-        Assert.Equal("protected void Method2(int)", name);
+        Assert.Equal("Method2(int)", name);
 
-        options = EasyMethodOptions.Full with
-        { UseAccessibility = true, ReturnTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false } };
-        options.ParameterOptions!.TypeOptions!.UseSpecialNames = false;
+        options = EasyMethodOptions.DefaultEx;
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.RType1.Method2(int)", name);
+
+        options.ReturnTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = source.EasyName(options);
+        Assert.Equal($"protected void {PREFIX}.RType1.Method2(int)", name);
+
+        options = EasyMethodOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"protected System.Void {PREFIX}.RType1.Method2(System.Int32 age)", name);
     }
@@ -451,14 +523,21 @@ public static class Test_EasyMethod
         options = EasyMethodOptions.Empty;
         name = source.EasyName(options); Assert.Equal("Method3", name);
 
-        options = EasyMethodOptions.Default with
-        { UseAccessibility = true, ReturnTypeOptions = EasyTypeOptions.Default };
+        options = EasyMethodOptions.Default;
         name = source.EasyName(options);
-        Assert.Equal("void Method3(int)", name);
+        Assert.Equal("Method3(int)", name);
 
-        options = EasyMethodOptions.Full with
-        { UseAccessibility = true, ReturnTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false } };
-        options.ParameterOptions!.TypeOptions!.UseSpecialNames = false;
+        options = EasyMethodOptions.DefaultEx;
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.RType1.Method3(int)", name);
+
+        options.ReturnTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = source.EasyName(options);
+        Assert.Equal($"void {PREFIX}.RType1.Method3(int)", name);
+
+        options = EasyMethodOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"System.Void {PREFIX}.RType1.Method3(System.Int32 age)", name);
     }
@@ -475,14 +554,21 @@ public static class Test_EasyMethod
         options = EasyMethodOptions.Empty;
         name = source.EasyName(options); Assert.Equal("Method4", name);
 
-        options = EasyMethodOptions.Default with
-        { UseAccessibility = true, ReturnTypeOptions = EasyTypeOptions.Default };
+        options = EasyMethodOptions.Default;
         name = source.EasyName(options);
-        Assert.Equal("internal void Method4(int)", name);
+        Assert.Equal("Method4(int)", name);
 
-        options = EasyMethodOptions.Full with
-        { UseAccessibility = true, ReturnTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false } };
-        options.ParameterOptions!.TypeOptions!.UseSpecialNames = false;
+        options = EasyMethodOptions.DefaultEx;
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.RType1.Method4(int)", name);
+
+        options.ReturnTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = source.EasyName(options);
+        Assert.Equal($"internal void {PREFIX}.RType1.Method4(int)", name);
+
+        options = EasyMethodOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"internal System.Void {PREFIX}.RType1.Method4(System.Int32 age)", name);
     }
@@ -499,14 +585,21 @@ public static class Test_EasyMethod
         options = EasyMethodOptions.Empty;
         name = source.EasyName(options); Assert.Equal("Method5", name);
 
-        options = EasyMethodOptions.Default with
-        { UseAccessibility = true, ReturnTypeOptions = EasyTypeOptions.Default };
+        options = EasyMethodOptions.Default;
         name = source.EasyName(options);
-        Assert.Equal("internal protected void Method5(int)", name);
+        Assert.Equal("Method5(int)", name);
 
-        options = EasyMethodOptions.Full with
-        { UseAccessibility = true, ReturnTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false } };
-        options.ParameterOptions!.TypeOptions!.UseSpecialNames = false;
+        options = EasyMethodOptions.DefaultEx;
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.RType1.Method5(int)", name);
+
+        options.ReturnTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = source.EasyName(options);
+        Assert.Equal($"internal protected void {PREFIX}.RType1.Method5(int)", name);
+
+        options = EasyMethodOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"internal protected System.Void {PREFIX}.RType1.Method5(System.Int32 age)", name);
     }
@@ -523,14 +616,21 @@ public static class Test_EasyMethod
         options = EasyMethodOptions.Empty;
         name = source.EasyName(options); Assert.Equal("Method6", name);
 
-        options = EasyMethodOptions.Default with
-        { UseAccessibility = true, ReturnTypeOptions = EasyTypeOptions.Default };
+        options = EasyMethodOptions.Default;
         name = source.EasyName(options);
-        Assert.Equal("private protected void Method6(int)", name);
+        Assert.Equal("Method6(int)", name);
 
-        options = EasyMethodOptions.Full with
-        { UseAccessibility = true, ReturnTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false } };
-        options.ParameterOptions!.TypeOptions!.UseSpecialNames = false;
+        options = EasyMethodOptions.DefaultEx;
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.RType1.Method6(int)", name);
+
+        options.ReturnTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = source.EasyName(options);
+        Assert.Equal($"private protected void {PREFIX}.RType1.Method6(int)", name);
+
+        options = EasyMethodOptions.Full;
         name = source.EasyName(options);
         Assert.Equal($"private protected System.Void {PREFIX}.RType1.Method6(System.Int32 age)", name);
     }
@@ -561,22 +661,24 @@ public static class Test_EasyMethod
         options = EasyMethodOptions.Empty;
         name = source.EasyName(options); Assert.Equal("Method1", name);
 
-        options = EasyMethodOptions.Default with
-        { UseAccessibility = true, UseModifiers = true, ReturnTypeOptions = EasyTypeOptions.Default };
+        options = EasyMethodOptions.Default;
         name = source.EasyName(options);
-        Assert.Equal("public override void Method1(int?)", name);
+        Assert.Equal("Method1(int?)", name);
 
-        options = EasyMethodOptions.Full with
-        {
-            UseAccessibility = true,
-            UseModifiers = true,
-            ReturnTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false },
-            ParameterOptions = EasyParameterOptions.Full with
-            { TypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false } },
-        };
+        options = EasyMethodOptions.DefaultEx;
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.AType1b.Method1(int?)", name);
+
+        options.ReturnTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = source.EasyName(options);
+        Assert.Equal($"public override void {PREFIX}.AType1b.Method1(int?)", name);
+
+        options = EasyMethodOptions.Full;
         name = source.EasyName(options);
         Assert.Equal(
-            $"public override System.Void {PREFIX}.AType1b.Method1(System.Nullable<int> age)",
+            $"public override System.Void {PREFIX}.AType1b.Method1(System.Nullable<System.Int32> age)",
             name);
     }
 
@@ -592,22 +694,25 @@ public static class Test_EasyMethod
         options = EasyMethodOptions.Empty;
         name = source.EasyName(options); Assert.Equal("Method2", name);
 
-        options = EasyMethodOptions.Default with
-        { UseAccessibility = true, UseModifiers = true, ReturnTypeOptions = EasyTypeOptions.Default };
+        options = EasyMethodOptions.Default;
         name = source.EasyName(options);
-        Assert.Equal("public abstract override void Method2(int?)", name);
+        Assert.Equal("Method2(int?)", name);
 
-        options = EasyMethodOptions.Full with
-        {
-            UseAccessibility = true,
-            UseModifiers = true,
-            ReturnTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false },
-            ParameterOptions = EasyParameterOptions.Full with
-            { TypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false } },
-        };
+        options = EasyMethodOptions.DefaultEx;
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.AType1b.Method2(int?)", name);
+
+        options.ReturnTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = source.EasyName(options);
+        Assert.Equal($"public abstract override void {PREFIX}.AType1b.Method2(int?)", name);
+
+        options = EasyMethodOptions.Full;
         name = source.EasyName(options);
         Assert.Equal(
-            $"public abstract override System.Void {PREFIX}.AType1b.Method2(System.Nullable<int> age)",
+            $"public abstract override System.Void {PREFIX}." +
+            "AType1b.Method2(System.Nullable<System.Int32> age)",
             name);
     }
 
@@ -639,22 +744,24 @@ public static class Test_EasyMethod
         options = EasyMethodOptions.Empty;
         name = source.EasyName(options); Assert.Equal("Method1", name);
 
-        options = EasyMethodOptions.Default with
-        { UseAccessibility = true, UseModifiers = true, ReturnTypeOptions = EasyTypeOptions.Default };
+        options = EasyMethodOptions.Default;
         name = source.EasyName(options);
-        Assert.Equal("public new void Method1(int?)", name);
+        Assert.Equal("Method1(int?)", name);
 
-        options = EasyMethodOptions.Full with
-        {
-            UseAccessibility = true,
-            UseModifiers = true,
-            ReturnTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false },
-            ParameterOptions = EasyParameterOptions.Full with
-            { TypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false } },
-        };
+        options = EasyMethodOptions.DefaultEx;
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.RType2b.Method1(int?)", name);
+
+        options.ReturnTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = source.EasyName(options);
+        Assert.Equal($"public new void {PREFIX}.RType2b.Method1(int?)", name);
+
+        options = EasyMethodOptions.Full;
         name = source.EasyName(options);
         Assert.Equal(
-            $"public new System.Void {PREFIX}.RType2b.Method1(System.Nullable<int> age)",
+            $"public new System.Void {PREFIX}.RType2b.Method1(System.Nullable<System.Int32> age)",
             name);
     }
 
@@ -670,22 +777,24 @@ public static class Test_EasyMethod
         options = EasyMethodOptions.Empty;
         name = source.EasyName(options); Assert.Equal("Method2", name);
 
-        options = EasyMethodOptions.Default with
-        { UseAccessibility = true, UseModifiers = true, ReturnTypeOptions = EasyTypeOptions.Default };
+        options = EasyMethodOptions.Default;
         name = source.EasyName(options);
-        Assert.Equal("public override void Method2(int?)", name);
+        Assert.Equal("Method2(int?)", name);
 
-        options = EasyMethodOptions.Full with
-        {
-            UseAccessibility = true,
-            UseModifiers = true,
-            ReturnTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false },
-            ParameterOptions = EasyParameterOptions.Full with
-            { TypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false } },
-        };
+        options = EasyMethodOptions.DefaultEx;
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.RType2b.Method2(int?)", name);
+
+        options.ReturnTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = source.EasyName(options);
+        Assert.Equal($"public override void {PREFIX}.RType2b.Method2(int?)", name);
+
+        options = EasyMethodOptions.Full;
         name = source.EasyName(options);
         Assert.Equal(
-            $"public override System.Void {PREFIX}.RType2b.Method2(System.Nullable<int> age)",
+            $"public override System.Void {PREFIX}.RType2b.Method2(System.Nullable<System.Int32> age)",
             name);
     }
 
@@ -701,22 +810,25 @@ public static class Test_EasyMethod
         options = EasyMethodOptions.Empty;
         name = source.EasyName(options); Assert.Equal("Method3", name);
 
-        options = EasyMethodOptions.Default with
-        { UseAccessibility = true, UseModifiers = true, ReturnTypeOptions = EasyTypeOptions.Default };
+        options = EasyMethodOptions.Default;
         name = source.EasyName(options);
-        Assert.Equal("public sealed override void Method3(int?)", name);
+        Assert.Equal("Method3(int?)", name);
 
-        options = EasyMethodOptions.Full with
-        {
-            UseAccessibility = true,
-            UseModifiers = true,
-            ReturnTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false },
-            ParameterOptions = EasyParameterOptions.Full with
-            { TypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false } },
-        };
+        options = EasyMethodOptions.DefaultEx;
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.RType2b.Method3(int?)", name);
+
+        options.ReturnTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = source.EasyName(options);
+        Assert.Equal($"public sealed override void {PREFIX}.RType2b.Method3(int?)", name);
+
+        options = EasyMethodOptions.Full;
         name = source.EasyName(options);
         Assert.Equal(
-            $"public sealed override System.Void {PREFIX}.RType2b.Method3(System.Nullable<int> age)",
+            $"public sealed override System.Void {PREFIX}." +
+            "RType2b.Method3(System.Nullable<System.Int32> age)",
             name);
     }
 
@@ -744,19 +856,23 @@ public static class Test_EasyMethod
         options = EasyMethodOptions.Empty;
         name = source.EasyName(options); Assert.Equal("Method1", name);
 
-        options = EasyMethodOptions.Default with
-        { UseAccessibility = true, UseModifiers = true, ReturnTypeOptions = EasyTypeOptions.Default };
+        options = EasyMethodOptions.Default;
         name = source.EasyName(options);
-        Assert.Equal("public S Method1(ref T?, in S?)", name);
+        Assert.Equal("Method1(ref T?, in S?)", name);
 
-        options = EasyMethodOptions.Full with
-        {
-            UseAccessibility = true,
-            UseModifiers = true,
-            ReturnTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false },
-            ParameterOptions = EasyParameterOptions.Full with
-            { TypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false } },
-        };
+        options = EasyMethodOptions.DefaultEx;
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.RType3a<K?, T?>.RType3b<S>.Method1(ref T?, in S?)", name);
+
+        options.ReturnTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = source.EasyName(options);
+        Assert.Equal(
+            $"public S {PREFIX}.RType3a<K?, T?>.RType3b<S>.Method1(ref T?, in S?)",
+            name);
+
+        options = EasyMethodOptions.Full;
         name = source.EasyName(options);
         Assert.Equal(
             $"public S {PREFIX}.RType3a<K?, T?>.RType3b<S>.Method1(ref T? one, in S? two)",
@@ -775,19 +891,23 @@ public static class Test_EasyMethod
         options = EasyMethodOptions.Empty;
         name = source.EasyName(options); Assert.Equal("Method2", name);
 
-        options = EasyMethodOptions.Default with
-        { UseAccessibility = true, UseModifiers = true, ReturnTypeOptions = EasyTypeOptions.Default };
+        options = EasyMethodOptions.Default;
         name = source.EasyName(options);
-        Assert.Equal("public S? Method2(ref T?, in S?)", name);
+        Assert.Equal("Method2(ref T?, in S?)", name);
 
-        options = EasyMethodOptions.Full with
-        {
-            UseAccessibility = true,
-            UseModifiers = true,
-            ReturnTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false },
-            ParameterOptions = EasyParameterOptions.Full with
-            { TypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false } },
-        };
+        options = EasyMethodOptions.DefaultEx;
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.RType3a<K?, T?>.RType3b<S>.Method2(ref T?, in S?)", name);
+
+        options.ReturnTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = source.EasyName(options);
+        Assert.Equal(
+            $"public S? {PREFIX}.RType3a<K?, T?>.RType3b<S>.Method2(ref T?, in S?)",
+            name);
+
+        options = EasyMethodOptions.Full;
         name = source.EasyName(options);
         Assert.Equal(
             "public Yotei.Tools.IsNullable<S> " +
@@ -807,19 +927,23 @@ public static class Test_EasyMethod
         options = EasyMethodOptions.Empty;
         name = source.EasyName(options); Assert.Equal("Method3", name);
 
-        options = EasyMethodOptions.Default with
-        { UseAccessibility = true, UseModifiers = true, ReturnTypeOptions = EasyTypeOptions.Default };
+        options = EasyMethodOptions.Default;
         name = source.EasyName(options);
-        Assert.Equal("public S? Method3(ref T?, in S?)", name);
+        Assert.Equal("Method3(ref T?, in S?)", name);
 
-        options = EasyMethodOptions.Full with
-        {
-            UseAccessibility = true,
-            UseModifiers = true,
-            ReturnTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false },
-            ParameterOptions = EasyParameterOptions.Full with
-            { TypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false } },
-        };
+        options = EasyMethodOptions.DefaultEx;
+        name = source.EasyName(options);
+        Assert.Equal($"{PREFIX}.RType3a<K?, T?>.RType3b<S>.Method3(ref T?, in S?)", name);
+
+        options.ReturnTypeOptions = EasyTypeOptions.DefaultEx;
+        options.UseAccessibility = true;
+        options.UseModifiers = true;
+        name = source.EasyName(options);
+        Assert.Equal(
+            $"public S? {PREFIX}.RType3a<K?, T?>.RType3b<S>.Method3(ref T?, in S?)",
+            name);
+
+        options = EasyMethodOptions.Full;
         name = source.EasyName(options);
         Assert.Equal(
             "public S? " +

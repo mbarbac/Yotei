@@ -29,7 +29,7 @@ public record EasyFieldOptions
 
     // ----------------------------------------------------
 
-    public enum Mode { Empty, Default, Full };
+    public enum Mode { Empty, Default, DefaultEx, Full };
     EasyFieldOptions(Mode mode)
     {
         UseAccessibility = false;
@@ -39,6 +39,10 @@ public record EasyFieldOptions
 
         switch (mode)
         {
+            case Mode.DefaultEx:
+                HostTypeOptions = EasyTypeOptions.DefaultEx;
+                break;
+
             case Mode.Full:
                 UseAccessibility = true;
                 UseModifiers = true;
@@ -62,6 +66,11 @@ public record EasyFieldOptions
     /// Obtains a new default-alike instance.
     /// </summary>
     public static EasyFieldOptions Default => new(Mode.Default);
+
+    /// <summary>
+    /// Obtains a new default-alike instance whose type options are default extended ones.
+    /// </summary>
+    public static EasyFieldOptions DefaultEx => new(Mode.DefaultEx);
 
     /// <summary>
     /// Obtains a new full-alike instance.
