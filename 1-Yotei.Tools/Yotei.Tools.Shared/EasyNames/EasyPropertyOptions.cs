@@ -159,15 +159,18 @@ public static partial class EasyNameExtensions
             if (str.Length > 0)
             {
                 // ref-alike return types (emitting on 'sb' on purpose)...
-                if (method != null && method.ReturnType.IsByRef)
+                if (options.UseModifiers)
                 {
-                    var ronly = method.ReturnTypeCustomAttributes.HasReadOnlyAttribute();
-                    sb.Append(ronly ? "ref readonly " : "ref ");
-                }
-                else if (options.UseModifiers && type.IsByRef) // Fall-back
-                {
-                    var ronly = type.HasReadOnlyAttribute();
-                    sb.Append(ronly ? "ref readonly " : "ref ");
+                    if (method != null && method.ReturnType.IsByRef)
+                    {
+                        var ronly = method.ReturnTypeCustomAttributes.HasReadOnlyAttribute();
+                        sb.Append(ronly ? "ref readonly " : "ref ");
+                    }
+                    else if (options.UseModifiers && type.IsByRef) // Fall-back
+                    {
+                        var ronly = type.HasReadOnlyAttribute();
+                        sb.Append(ronly ? "ref readonly " : "ref ");
+                    }
                 }
 
                 // Nullability...
@@ -251,7 +254,6 @@ public static partial class EasyNameExtensions
                 ? (method.IsVirtual && FindBaseMethod(host, true) != null)
                 : (!method.IsVirtual && FindBaseMethod(host) != null);
         }
-
 
         MethodInfo? FindBaseMethod(Type? host, bool ifaces = false)
         {

@@ -43,9 +43,14 @@ public static class Test_EasyProperty
             UseModifiers = true,
             MemberTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false },
             ParameterOptions = EasyParameterOptions.Full with
-            { TypeOptions = EasyTypeOptions.Full with
-            { UseSpecialNames = false, GenericListOptions = EasyTypeOptions.Full with
-            { UseSpecialNames = false} } },
+            {
+                TypeOptions = EasyTypeOptions.Full with
+                {
+                    UseSpecialNames = false,
+                    GenericListOptions = EasyTypeOptions.Full with
+                    { UseSpecialNames = false }
+                }
+            },
         };
         name = item.EasyName(options);
         Assert.Equal(
@@ -94,9 +99,14 @@ public static class Test_EasyProperty
             UseTechName = true,
             MemberTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false },
             ParameterOptions = EasyParameterOptions.Full with
-            { TypeOptions = EasyTypeOptions.Full with
-            { UseSpecialNames = false, GenericListOptions = EasyTypeOptions.Full with
-            { UseSpecialNames = false } } },
+            {
+                TypeOptions = EasyTypeOptions.Full with
+                {
+                    UseSpecialNames = false,
+                    GenericListOptions = EasyTypeOptions.Full with
+                    { UseSpecialNames = false }
+                }
+            },
         };
         name = item.EasyName(options);
         Assert.Equal(
@@ -153,12 +163,10 @@ public static class Test_EasyProperty
         Assert.Equal($"public new System.Int32 {PREFIX}.RType1b.Name", name);
     }
 
-    /*
-
     // ----------------------------------------------------
 
-    class Type2a { public virtual int Name { get; set; } }
-    class Type2b : Type2a { public new int Name { get; set; } }
+    class RType2a { public virtual int Name { get; set; } }
+    class RType2b : RType2a { public new int Name { get; set; } }
 
     //[Enforced]
     [Fact]
@@ -166,7 +174,7 @@ public static class Test_EasyProperty
     {
         EasyPropertyOptions options;
         string name;
-        var type = typeof(Type2b);
+        var type = typeof(RType2b);
         var item = type.GetProperties().Single();
 
         options = EasyPropertyOptions.Empty;
@@ -175,19 +183,38 @@ public static class Test_EasyProperty
         options = EasyPropertyOptions.Default;
         name = item.EasyName(options); Assert.Equal("Name", name);
 
-        options = DEFAULT with { MemberTypeOptions = EasyTypeOptions.Default };
+        options.MemberTypeOptions = EasyTypeOptions.Default;
         name = item.EasyName(options);
         Assert.Equal("int Name", name);
 
         options = EasyPropertyOptions.Full;
         name = item.EasyName(options);
-        Assert.Equal($"public new System.Int32 {PREFIX}.Type2b.Name", name);
+        Assert.Equal($"public new int {PREFIX}.RType2b.Name", name);
+
+        options = EasyPropertyOptions.Full with
+        {
+            UseAccessibility = true,
+            UseModifiers = true,
+            UseTechName = true,
+            MemberTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false },
+            ParameterOptions = EasyParameterOptions.Full with
+            {
+                TypeOptions = EasyTypeOptions.Full with
+                {
+                    UseSpecialNames = false,
+                    GenericListOptions = EasyTypeOptions.Full with
+                    { UseSpecialNames = false }
+                }
+            },
+        };
+        name = item.EasyName(options);
+        Assert.Equal($"public new System.Int32 {PREFIX}.RType2b.Name", name);
     }
 
     // ----------------------------------------------------
 
-    class Type3a { [IsNullable] public virtual string? Name { get; set; } = default!; }
-    class Type3b : Type3a { [IsNullable] public override string? Name { get; set; } = default!; }
+    class RType3a { [IsNullable] public virtual string? Name { get; set; } = default!; }
+    class RType3b : RType3a { [IsNullable] public override string? Name { get; set; } = default!; }
 
     //[Enforced]
     [Fact]
@@ -195,7 +222,7 @@ public static class Test_EasyProperty
     {
         EasyPropertyOptions options;
         string name;
-        var type = typeof(Type3b);
+        var type = typeof(RType3b);
         var item = type.GetProperties().Single();
 
         options = EasyPropertyOptions.Empty;
@@ -204,19 +231,34 @@ public static class Test_EasyProperty
         options = EasyPropertyOptions.Default;
         name = item.EasyName(options); Assert.Equal("Name", name);
 
-        options = DEFAULT with { MemberTypeOptions = EasyTypeOptions.Default };
-        name = item.EasyName(options);
-        Assert.Equal("string? Name", name);
-
         options = EasyPropertyOptions.Full;
         name = item.EasyName(options);
-        Assert.Equal($"public override System.String? {PREFIX}.Type3b.Name", name);
+        Assert.Equal($"public override string? {PREFIX}.RType3b.Name", name);
+
+        options = EasyPropertyOptions.Full with
+        {
+            UseAccessibility = true,
+            UseModifiers = true,
+            UseTechName = true,
+            MemberTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false },
+            ParameterOptions = EasyParameterOptions.Full with
+            {
+                TypeOptions = EasyTypeOptions.Full with
+                {
+                    UseSpecialNames = false,
+                    GenericListOptions = EasyTypeOptions.Full with
+                    { UseSpecialNames = false }
+                }
+            },
+        };
+        name = item.EasyName(options);
+        Assert.Equal($"public override System.String? {PREFIX}.RType3b.Name", name);
     }
 
     // ----------------------------------------------------
 
-    class Type4a { public virtual IsNullable<string?> Name { get; set; } = default!; }
-    class Type4b : Type4a { public override IsNullable<string?> Name { get; set; } = default!; }
+    class RType4a { public virtual IsNullable<string?> Name { get; set; } = default!; }
+    class RType4b : RType4a { public override IsNullable<string?> Name { get; set; } = default!; }
 
     //[Enforced]
     [Fact]
@@ -224,7 +266,7 @@ public static class Test_EasyProperty
     {
         EasyPropertyOptions options;
         string name;
-        var type = typeof(Type4b);
+        var type = typeof(RType4b);
         var item = type.GetProperties().Single();
 
         options = EasyPropertyOptions.Empty;
@@ -233,22 +275,39 @@ public static class Test_EasyProperty
         options = EasyPropertyOptions.Default;
         name = item.EasyName(options); Assert.Equal("Name", name);
 
-        options = DEFAULT with { MemberTypeOptions = EasyTypeOptions.Default };
+        options.MemberTypeOptions = EasyTypeOptions.Default;
         name = item.EasyName(options);
         Assert.Equal("string? Name", name);
 
         options = EasyPropertyOptions.Full;
         name = item.EasyName(options);
-        Assert.Equal(
-            $"public override Yotei.Tools.IsNullable<System.String> {PREFIX}.Type4b.Name",
-            name);
+        Assert.Equal($"public override string? {PREFIX}.RType4b.Name", name);
+
+        options = EasyPropertyOptions.Full with
+        {
+            UseAccessibility = true,
+            UseModifiers = true,
+            UseTechName = true,
+            MemberTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false },
+            ParameterOptions = EasyParameterOptions.Full with
+            {
+                TypeOptions = EasyTypeOptions.Full with
+                {
+                    UseSpecialNames = false,
+                    GenericListOptions = EasyTypeOptions.Full with
+                    { UseSpecialNames = false }
+                }
+            },
+        };
+        name = item.EasyName(options);
+        Assert.Equal($"public override Yotei.Tools.IsNullable<string> {PREFIX}.RType4b.Name", name);
     }
 
     // ----------------------------------------------------
 
-    public class Type5a<K, T>
+    public class RType5a<K, T>
     {
-        public class Type5b<S> { [IsNullable] public K? this[T? one, S? two] => default!; }
+        public class RType5b<S> { [IsNullable] public K? this[T? one, S? two] => default!; }
     }
 
     //[Enforced]
@@ -257,7 +316,7 @@ public static class Test_EasyProperty
     {
         EasyPropertyOptions options;
         string name;
-        var type = typeof(Type5a<,>.Type5b<>);
+        var type = typeof(RType5a<,>.RType5b<>);
         var item = type.GetProperties().Single();
 
         options = EasyPropertyOptions.Empty;
@@ -266,15 +325,32 @@ public static class Test_EasyProperty
         options = EasyPropertyOptions.Default;
         name = item.EasyName(options); Assert.Equal("this[T?, S?]", name);
 
-        options = DEFAULT with { MemberTypeOptions = EasyTypeOptions.Default };
+        options.MemberTypeOptions = EasyTypeOptions.Default;
         name = item.EasyName(options);
         Assert.Equal("K? this[T?, S?]", name);
 
         options = EasyPropertyOptions.Full;
         name = item.EasyName(options);
-        Assert.Equal(
-            $"public K? {PREFIX}.Type5a<K, T>.Type5b<S>.Item[T? one, S? two]",
-            name);
+        Assert.Equal($"public K? {PREFIX}.RType5a<K, T>.RType5b<S>.Item[T? one, S? two]", name);
+
+        options = EasyPropertyOptions.Full with
+        {
+            UseAccessibility = true,
+            UseModifiers = true,
+            UseTechName = true,
+            MemberTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false },
+            ParameterOptions = EasyParameterOptions.Full with
+            {
+                TypeOptions = EasyTypeOptions.Full with
+                {
+                    UseSpecialNames = false,
+                    GenericListOptions = EasyTypeOptions.Full with
+                    { UseSpecialNames = false }
+                }
+            },
+        };
+        name = item.EasyName(options);
+        Assert.Equal($"public K? {PREFIX}.RType5a<K, T>.RType5b<S>.Item[T? one, S? two]", name);
     }
 
     //[Enforced]
@@ -283,7 +359,7 @@ public static class Test_EasyProperty
     {
         EasyPropertyOptions options;
         string name;
-        var type = typeof(Type5a<byte?, int?>.Type5b<string?>);
+        var type = typeof(RType5a<byte?, int?>.RType5b<string?>);
         var item = type.GetProperties().Single();
 
         options = EasyPropertyOptions.Empty;
@@ -292,18 +368,40 @@ public static class Test_EasyProperty
         options = EasyPropertyOptions.Default;
         name = item.EasyName(options); Assert.Equal("this[int?, string?]", name);
 
-        options = DEFAULT with { MemberTypeOptions = EasyTypeOptions.Default };
+        options.MemberTypeOptions = EasyTypeOptions.Default;
         name = item.EasyName(options);
         Assert.Equal("byte? this[int?, string?]", name);
 
         options = EasyPropertyOptions.Full;
         name = item.EasyName(options);
         Assert.Equal(
-            $"public System.Nullable<System.Byte> {PREFIX}." +
-            "Type5a<System.Nullable<System.Byte>, System.Nullable<System.Int32>>." +
-            "Type5b<System.String>.Item[System.Nullable<System.Int32> one, System.String? two]",
+            $"public byte? {PREFIX}.RType5a<byte?, int?>.RType5b<string>.Item[int? one, string? two]",
+            name);
+
+        options = EasyPropertyOptions.Full with
+        {
+            UseAccessibility = true,
+            UseModifiers = true,
+            UseTechName = true,
+            MemberTypeOptions = EasyTypeOptions.Full with { UseSpecialNames = false },
+            ParameterOptions = EasyParameterOptions.Full with
+            {
+                TypeOptions = EasyTypeOptions.Full with
+                {
+                    UseSpecialNames = false,
+                    GenericListOptions = EasyTypeOptions.Full with { UseSpecialNames = false }
+                }
+            },
+        };
+
+        // Here we can see the same problem again: the generic list uses special names, even if
+        // we set it. That's the problem of the internal cascade, that are not self-references
+        // to prevent infinite recursion.
+
+        name = item.EasyName(options);
+        Assert.Equal(
+            $"public System.Nullable<byte> {PREFIX}.RType5a<byte?, int?>." +
+            "RType5b<string>.Item[System.Nullable<System.Int32> one, System.String? two]",
             name);
     }
-     
-     */
 }

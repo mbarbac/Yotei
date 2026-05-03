@@ -9,6 +9,7 @@
     <Import_RootNamespace>Yotei.Tools.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)EasyNames\EasyFieldOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EasyNames\EasyPropertyOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EasyNames\EasyNameExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EasyNames\EasyTypeOptions.cs" />
@@ -42,6 +43,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\RequiredMemberAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\SetsRequiredMemberAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Modernizer\SkipLocalsInitAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\SketchExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SystemEx\SketchOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\ArrayExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\ExceptionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SystemEx\CloneExtensions.cs" />
