@@ -122,16 +122,18 @@ static partial class EasyNameExtensions
     /// </summary>
     /// <param name="at"></param>
     /// <returns></returns>
-    public static bool IsNullabilityEnabled(this NullableAttribute at) =>
+    /// Error CS0051: parameter 'NullableAttribute' is less accesible than method.
+    internal /*public*/ static bool IsNullabilityEnabled(this NullableAttribute at) =>
         at.NullableFlags.Length > 0 &&
         at.NullableFlags[0] == 2;
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Determines if the given type has been annotated as a nullable one, either because its
-    /// metadata carries a <see cref="NullableAttribute"/> attribute, or because it has been
-    /// decorated with the custom <see cref="IsNullableAttribute"/> one.
+    /// Determines if the given type has been annotated as a nullable one, because its metadata
+    /// carries a <see cref="NullableAttribute"/> attribute or a <see cref="IsNullableAttribute"/>
+    /// one.
+    /// <br/> Nullable wrappers are not identified by this method.
     /// <br/> Reference types may not carry the metadata attribute despite being marked as nullables.
     /// <br/> For coherence reasons, generic 'T'-alike types are treated as conventional reference ones.
     /// </summary>
@@ -158,13 +160,14 @@ static partial class EasyNameExtensions
     // ----------------------------------------------------
 
     /// <summary>
-    /// Determines if the given element has been annotated as a nullable one, either because its
-    /// metadata carries a <see cref="NullableAttribute"/> attribute, or because it has been
-    /// decorated with the custom <see cref="IsNullableAttribute"/> one.
+    /// Determines if the given type has been annotated as a nullable one, because its metadata
+    /// carries a <see cref="NullableAttribute"/> attribute or a <see cref="IsNullableAttribute"/>
+    /// one.
     /// <para>
     /// Valid elements are <see cref="Assembly"/>, <see cref="Module"/>, <see cref="MemberInfo"/>
     /// (including Type, MethodBase, PropertyInfo, FieldInfo and EventInfo),
     /// and <see cref="ParameterInfo"/>.
+    /// <br/> Nullable wrappers are not identified by this method.
     /// </para>
     /// </summary>
     /// <param name="source"></param>
@@ -184,10 +187,10 @@ static partial class EasyNameExtensions
 #if NET6_0_OR_GREATER
 
     /// <summary>
-    /// Determines if the given element has been annotated as a nullable one, firstly using the
-    /// standard nullability API, and if not, then either because its metadata carries a
-    /// <see cref="NullableAttribute"/> attribute, or because it has been decorated with the
-    /// custom <see cref="IsNullableAttribute"/> one.
+    /// Determines if the given element has been annotated as a nullable one, either using the
+    /// nullability API, or because  its metadata carries a <see cref="NullableAttribute"/>
+    /// attribute or a <see cref="IsNullableAttribute"/> one.
+    /// <br/> Nullable wrappers are not identified by this method.
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
@@ -203,10 +206,10 @@ static partial class EasyNameExtensions
     }
 
     /// <summary>
-    /// Determines if the given element has been annotated as a nullable one, firstly using the
-    /// standard nullability API, and if not, then either because its metadata carries a
-    /// <see cref="NullableAttribute"/> attribute, or because it has been decorated with the
-    /// custom <see cref="IsNullableAttribute"/> one.
+    /// Determines if the given element has been annotated as a nullable one, either using the
+    /// nullability API, or because  its metadata carries a <see cref="NullableAttribute"/>
+    /// attribute or a <see cref="IsNullableAttribute"/> one.
+    /// <br/> Nullable wrappers are not identified by this method.
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
@@ -222,10 +225,10 @@ static partial class EasyNameExtensions
     }
 
     /// <summary>
-    /// Determines if the given element has been annotated as a nullable one, firstly using the
-    /// standard nullability API, and if not, then either because its metadata carries a
-    /// <see cref="NullableAttribute"/> attribute, or because it has been decorated with the
-    /// custom <see cref="IsNullableAttribute"/> one.
+    /// Determines if the given element has been annotated as a nullable one, either using the
+    /// nullability API, or because  its metadata carries a <see cref="NullableAttribute"/>
+    /// attribute or a <see cref="IsNullableAttribute"/> one.
+    /// <br/> Nullable wrappers are not identified by this method.
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
@@ -241,10 +244,10 @@ static partial class EasyNameExtensions
     }
 
     /// <summary>
-    /// Determines if the given element has been annotated as a nullable one, firstly using the
-    /// standard nullability API, and if not, then either because its metadata carries a
-    /// <see cref="NullableAttribute"/> attribute, or because it has been decorated with the
-    /// custom <see cref="IsNullableAttribute"/> one.
+    /// Determines if the given element has been annotated as a nullable one, either using the
+    /// nullability API, or because  its metadata carries a <see cref="NullableAttribute"/>
+    /// attribute or a <see cref="IsNullableAttribute"/> one.
+    /// <br/> Nullable wrappers are not identified by this method.
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>

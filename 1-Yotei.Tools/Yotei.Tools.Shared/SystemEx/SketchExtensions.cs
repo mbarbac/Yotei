@@ -76,7 +76,7 @@ public static class SketchExtensions
         string GetEnum()
         {
             var str = InvokeToString()!;
-            var names = str.Split(", ", StringSplitOptions.None);
+            var names = str.Split([", "], StringSplitOptions.None);
 
             for (int i = 0; i < names.Length; i++) names[i] = TryDottedHead(names[i]);
             return string.Join(" | ", names);

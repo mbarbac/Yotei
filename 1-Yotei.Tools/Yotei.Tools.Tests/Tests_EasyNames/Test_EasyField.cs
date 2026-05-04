@@ -1,4 +1,4 @@
-﻿#pragma warning disable IDE0044
+﻿#pragma warning disable IDE0044, CS0414
 
 namespace Yotei.Tools.Tests.EasyNames;
 
@@ -175,6 +175,7 @@ public static class Test_EasyField
 
     // ----------------------------------------------------
 
+    
     class RType2a { static string? Name = default; }
 
     //[Enforced]

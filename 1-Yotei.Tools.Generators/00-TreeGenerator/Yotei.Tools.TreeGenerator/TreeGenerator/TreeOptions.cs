@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools.Generators;
+﻿#pragma warning disable IDE0028
+
+namespace Yotei.Tools.Generators;
 
 // ========================================================
 /// <summary>
@@ -9,44 +11,64 @@ public class TreeOptions : IEquatable<TreeOptions>
     readonly Dictionary<string, string> Items;
 
     /// <summary>
-    /// Initializes a new instance with the given contents.
+    /// Initializes a new empty instance.
+    /// </summary>
+    public TreeOptions() => Items = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Initializes a new instance with the 'name = value' elements obtained from parsing the
+    /// given text (potentially a multi-line one). If the givent text is null, then it is just
+    /// ignored.
     /// </summary>
     /// <param name="text"></param>
-    [SuppressMessage("", "IDE0028")]
-    public TreeOptions(string? text = null)
+    public TreeOptions(string? text) : this()
     {
-        Items = new(StringComparer.OrdinalIgnoreCase);
-        Parse(text);
+        if (!TryAdd(text, out var error) && error is not null) throw error;
     }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Determines if the <see cref="IsNullable{T}"/> and <see cref="IsNullableAttribute"/>
-    /// nullability helpers are to be emitted.
-    /// <br/> The default value of this property is <see cref="true"/>.
+    /// Tries to add to this instance the 'name = value' elements obtained from parsing the given
+    /// text, potentially a multi-line one. If that text is null, then it is just ignored and this
+    /// method returns false. Returns true if successfully parsed and its elements added to this
+    /// instance, or false an the error detected in the out argument.
     /// </summary>
-    public bool EmitNullabilityHelpers
-        => !TryGet<bool>(nameof(EmitNullabilityHelpers), out var temp) || temp;
+    /// <param name="text"></param>
+    /// <returns></returns>
+    public bool TryAdd(string? text, out Exception? error)
+    {
+        error = null;
+        if (text is null) return false;
 
-    /// <summary>
-    /// Determines if the generated files shall be emitted using all its first-level dot-separated
-    /// parts, but the last one, as the folder specification. If the value of this property is not
-    /// true, then flat file names are used instead.
-    /// <br/> The default value of this property is <see cref="false"/>.
-    /// </summary>
-    public bool GenerateFilesInFolders
-        => TryGet<bool>(nameof(GenerateFilesInFolders), out var temp) && temp;
+        string? line;
+        using var reader = new StringReader(text);
 
-    /// <summary>
-    /// Determines if the first-level dot-separated parts of the names of the generated files
-    /// shall be reversed or not.
-    /// <br/> The default value of this property is <see cref="false"/>.
-    /// </summary>
-    public bool ReverseGeneratedFileNames
-        => TryGet<bool>(nameof(ReverseGeneratedFileNames), out var temp) && temp;
+        while ((line = reader.ReadLine()) != null)
+        {
+            if (line.StartsWith("//")) continue;
+            if (string.IsNullOrWhiteSpace(line)) continue;
 
-    // ----------------------------------------------------
+            try
+            {
+                var index = line.IndexOf('=');
+                if (index < 0) throw new FormatException("No '=' found").WithData(line);
+
+                var key = line[..index].NullWhenEmpty(trim: true) ??
+                    throw new FormatException("No 'name' found").WithData(line);
+
+                var value = line[(index + 1)..].Trim();
+                Items[key] = value;
+            }
+            catch (Exception ex)
+            {
+                error = ex;
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     /// <summary>
     /// Tries to obtain the value associated to the given case insensitive key, casted to the
@@ -120,35 +142,27 @@ public class TreeOptions : IEquatable<TreeOptions>
     // ----------------------------------------------------
 
     /// <summary>
-    /// Parses the given contents capturing its name-value pairs.
+    /// Determines if the <see cref="IsNullable{T}"/> and <see cref="IsNullableAttribute"/>
+    /// nullability helpers are to be emitted.
+    /// <br/> The default value of this property is <see cref="true"/>.
     /// </summary>
-    /// <param name="text"></param>
-    void Parse(string? text)
-    {
-        if (text is null) return;
+    public bool EmitNullabilityHelpers
+        => !TryGet<bool>(nameof(EmitNullabilityHelpers), out var temp) || temp;
 
-        string? line;
-        int error = 0;
+    /// <summary>
+    /// Determines if the generated files shall be emitted using all its first-level dot-separated
+    /// parts, but the last one, as the folder specification. If the value of this property is not
+    /// true, then flat file names are used instead.
+    /// <br/> The default value of this property is <see cref="false"/>.
+    /// </summary>
+    public bool GenerateFilesInFolders
+        => TryGet<bool>(nameof(GenerateFilesInFolders), out var temp) && temp;
 
-        using var reader = new StringReader(text);
-        while ((line = reader.ReadLine()) != null)
-        {
-            if (line.StartsWith("//")) continue;
-            if (string.IsNullOrWhiteSpace(line)) continue;
-
-            try
-            {
-                var index = line.IndexOf('='); if (index < 0) throw new Exception();
-                var key = line[..index].NullWhenEmpty(trim: true) ?? throw new Exception();
-                var value = line[(index + 1)..].NullWhenEmpty(trim: true);
-
-                if (value != null) Items.Add(key, value);
-            }
-            catch
-            {
-                error++;
-                Items.Add($"Error#{error}", line);
-            }
-        }
-    }
+    /// <summary>
+    /// Determines if the first-level dot-separated parts of the names of the generated files
+    /// shall be reversed or not.
+    /// <br/> The default value of this property is <see cref="false"/>.
+    /// </summary>
+    public bool ReverseGeneratedFileNames
+        => TryGet<bool>(nameof(ReverseGeneratedFileNames), out var temp) && temp;
 }

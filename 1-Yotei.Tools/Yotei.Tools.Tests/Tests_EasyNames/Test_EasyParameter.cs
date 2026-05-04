@@ -1,6 +1,6 @@
-﻿namespace Yotei.Tools.Tests.EasyNames;
+﻿#pragma warning disable IDE0060
 
-// TODO: Test with DefaultEx options...
+namespace Yotei.Tools.Tests.EasyNames;
 
 // ========================================================
 //[Enforced]

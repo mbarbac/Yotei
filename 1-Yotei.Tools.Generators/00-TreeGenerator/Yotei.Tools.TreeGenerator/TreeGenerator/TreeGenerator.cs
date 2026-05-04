@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Net.Http.Headers;
+﻿#pragma warning disable IDE0019
 
 namespace Yotei.Tools.Generators;
 
@@ -29,15 +28,18 @@ namespace Yotei.Tools.Generators;
 public partial class TreeGenerator : IIncrementalGenerator
 {
     /// <summary>
+    /// The name of the consuming project configuration file. If its value is <see langword="null"/>
+    /// then no options are read.
+    /// </summary>
+    protected virtual string ConfigurationFileName { get; } = "TreeGeneratorOptions.ini";
+
+    /// <summary>
     /// Invoked to register post-initialization actions, such as reading external source files, or
-    /// generating code for marker attributes, among others. By default, this base method adds the
-    /// <see langword="Microsoft.CodeAnalysis.Embedded"/> attribute to the compilation.
+    /// generating code for marker attributes, among others.
     /// <br/> Inheritors will typically invoke their base method first.
     /// </summary>
     /// <param name="context"></param>
-    protected virtual void OnInitialize(
-        IncrementalGeneratorPostInitializationContext context)
-        => context.AddEmbeddedAttributeDefinition();
+    protected virtual void OnInitialize(IncrementalGeneratorPostInitializationContext context) { }
 
     // ----------------------------------------------------
 
@@ -91,11 +93,13 @@ public partial class TreeGenerator : IIncrementalGenerator
 
     /// <summary>
     /// Invoked to quickly determine if the given syntax node shall be considered as a potential
-    /// source code generation candidate, or not. By default, this method validates that the node
-    /// is among the recognized ones, and that the list of attribute types or attribute names for
-    /// its kind is any not an empty one.
-    /// <br/> Inheritors can override this method to accept just their known elements, or adding
-    /// them to the base method's behavior.
+    /// source code generation candidate, or not.
+    /// <para>
+    /// This method, by default, validates that the node kind is among the recognized ones for
+    /// which either a list of attribute types or a list of attributes' full qualified names, or
+    /// both, is provided. Inheritors may override this behavior to add other node kinds, or add
+    /// custom validation rules.
+    /// </para>
     /// </summary>
     /// <param name="node"></param>
     /// <param name="token"></param>
@@ -199,18 +203,19 @@ public partial class TreeGenerator : IIncrementalGenerator
     // ----------------------------------------------------
 
     /// <summary>
-    /// Tries to transform the potential syntax node candidate carried by the given context into
-    /// a source code tree-oriented generator one. This method may also return error nodes that
-    /// carry diagnostics to be reported, or <see langword="null"/> if the syntax node is to be
-    /// completely ignored.
-    /// <br/> Inheritors may override the base method so that they process only the elements they
-    /// are interested at, or invoke the base method to match elements against the attributes or
-    /// names defined for their kind.
+    /// Tries to capture the potential syntax node candidate by transforming it into a suitable
+    /// source code generation node. This method may return <see langword="null"/> to ignore that
+    /// node, or <see cref="ErrorNode"/> instances to hold errors to be reported at source code
+    /// generation time.
+    /// <para>
+    /// This method, by default, validates that the candidate syntax node has any attributes that
+    /// match the defined ones for its kind and, if so, creates an appropriate instance. Inheritors
+    /// may override this method as needed.
+    /// </para>
     /// </summary>
     /// <param name="context"></param>
     /// <param name="token"></param>
     /// <returns></returns>
-    [SuppressMessage("", "IDE0019")]
     protected virtual INode CaptureNode(GeneratorSyntaxContext context, CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
@@ -293,130 +298,5 @@ public partial class TreeGenerator : IIncrementalGenerator
 
         // Finishing...
         return null!;
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Invoked to capture the given node in the hierarchy represented by the given collection of
-    /// top-most files. Returns the actual node captured in the hierarchy (including eventually
-    /// existing ones that have been augmented), or null if any.
-    /// <br/> Inheritors may want to override the base method if they work with derived or new
-    /// nodes, eventually calling the base method first for known ones.
-    /// </summary>
-    /// <param name="files"></param>
-    /// <param name="node"></param>
-    /// <param name="context"></param>
-    protected virtual INode? CaptureHierarchy(
-        List<TypeNode> files, INode node, ref TreeContext context)
-    {
-        var comparer = SymbolEqualityComparer.Default;
-
-        // Type nodes...
-        if (node is TypeNode tnode)
-        {
-            var type = files.Find(x => comparer.Equals(x.Symbol, tnode.Symbol));
-
-            if (type is null) files.Add(tnode); // Adding the new type node...
-            else
-            {
-                if (type.ChildsOnly) // Substituting the childs-only existing one...
-                {
-                    tnode.Augment(type);
-                    files.Remove(type);
-                    files.Add(tnode);
-                    return tnode;
-                }
-                else // Or augmenting the existing one...
-                {
-                    type.Augment(tnode);
-                    return type;
-                }
-            }
-        }
-
-        // Property nodes...
-        if (node is PropertyNode pnode)
-        {
-            var host = pnode.Symbol.ContainingType;
-            var type = files.Find(x => comparer.Equals(x.Symbol, host));
-
-            if (type is null) // Creating a childs-only instance...
-            {
-                type = new TypeNode(host) { ChildsOnly = true };
-                files.Add(type);
-            }
-
-            var item = type.ChildProperties.Find(x => comparer.Equals(x.Symbol, pnode.Symbol));
-
-            if (item is null) // Adding a new child...
-            {
-                type.ChildProperties.Add(pnode);
-                pnode.Parent = type;
-                return pnode;
-            }
-            else // Or augmenting the existing one...
-            {
-                item.Augment(pnode);
-                return item;
-            }
-        }
-
-        // Field nodes...
-        if (node is FieldNode fnode)
-        {
-            var host = fnode.Symbol.ContainingType;
-            var type = files.Find(x => comparer.Equals(x.Symbol, host));
-
-            if (type is null) // Creating a childs-only instance...
-            {
-                type = new TypeNode(host) { ChildsOnly = true };
-                files.Add(type);
-            }
-
-            var item = type.ChildFields.Find(x => comparer.Equals(x.Symbol, fnode.Symbol));
-
-            if (item is null) // Adding a new child...
-            {
-                type.ChildFields.Add(fnode);
-                fnode.Parent = type;
-                return fnode;
-            }
-            else // Or augmenting the existing one...
-            {
-                item.Augment(fnode);
-                return item;
-            }
-        }
-
-        // Method nodes...
-        if (node is MethodNode mnode)
-        {
-            var host = mnode.Symbol.ContainingType;
-            var type = files.Find(x => comparer.Equals(x.Symbol, host));
-
-            if (type is null) // Creating a childs-only instance...
-            {
-                type = new TypeNode(host) { ChildsOnly = true };
-                files.Add(type);
-            }
-
-            var item = type.ChildMethods.Find(x => comparer.Equals(x.Symbol, mnode.Symbol));
-
-            if (item is null) // Adding a new child...
-            {
-                type.ChildMethods.Add(mnode);
-                mnode.Parent = type;
-                return mnode;
-            }
-            else // Or augmenting the existing one...
-            {
-                item.Augment(mnode);
-                return item;
-            }
-        }
-
-        // Ignoring...
-        return null;
     }
 }

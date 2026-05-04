@@ -1,36 +1,49 @@
-﻿using System.Reflection.Metadata;
-
-namespace Yotei.Tools.Generators;
+﻿namespace Yotei.Tools.Generators;
 
 // ========================================================
 public static partial class RoslynNamesExtensions
 {
     private const string ATTRIBUTE = "Attribute";
     private const string NULLABLE_ATTRIBUTE = "System.Runtime.CompilerServices.NullableAttribute";
+
+    /* HIGH: RoslynNameExtensions: Attribute constants
+    
     private const string READ_ONLY_ATTRIBUTE = "System.Runtime.CompilerServices.IsReadOnlyAttribute";
+    private const string SCOPED_ATTRIBUTE = "System.Runtime.CompilerServices.ScopedRefAttribute";
+    private const string REQUIRES_LOCATION = "System.Runtime.CompilerServices.RequiresLocationAttribute";
+    */
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns the special name of the given type, if any, or null otherwise.
+    /// If the type refers to an special one, then returns its special name without taking into
+    /// consideration if it is an array, a pointer, a by-ref type. or a nullable wrapper. If it
+    /// is not an special one, then returns null.
     /// </summary>
-    internal static string? ToSpecialName(this ITypeSymbol source)
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static string? ToSpecialName(this ITypeSymbol source)
     {
-        if (source is IArrayTypeSymbol array)
+        /* HIGH: RoslynNameExtensions: ToSpecialName cases
+        if (source.IsByRef) return Core(source.GetElementType() ?? source);
+        if (source.IsArray) return Core(source.GetElementType() ?? source);
+        if (source.IsNullableWrapper()) return Core(source.GetGenericArguments()[0]);
+        return Core(source);
+        
+         if (source is IArrayTypeSymbol array)
         {
             var type = array.ElementType;
             var str = Core(type);
             str = $"{str}[{new string(',', array.Rank - 1)}]";
             return str;
         }
-        if (source.IsNullableWrapper())
-        {
-            var type = ((INamedTypeSymbol)source).TypeArguments[0];
-            var str = Core(type);
-            return str;
-        }
+         */
+
+        if (source is IArrayTypeSymbol array) return Core(array.ElementType);
+        if (source.IsNullableWrapper()) return Core(((INamedTypeSymbol)source).TypeArguments[0]);
         return Core(source);
 
+        // Gets the actual special name for the naked source type...
         static string? Core(ITypeSymbol source) => source.SpecialType switch
         {
             SpecialType.System_Void => "void",
@@ -53,22 +66,52 @@ public static partial class RoslynNamesExtensions
         };
     }
 
+    /*
+
+    // ----------------------------------------------------
+
+    HIGH: RoslynNameExtensions: HasReadOnlyAttribute
+    /// <summary>
+    /// Determines if the given element is decorated with a readonly attribute that is carried
+    /// in its metadata.
+    /// </summary>
+    public static bool HasReadOnlyAttribute(this ICustomAttributeProvider info)
+    {
+        return info
+            .GetCustomAttributes(false)
+            .Any(x => x.GetType().FullName == READ_ONLY_ATTRIBUTE);
+    }
+    */
+
     // ----------------------------------------------------
 
     /// <summary>
     /// Determines if the type is a generic 'T' one, for EasyName purposes only.
     /// </summary>
-    internal static bool IsGenericAlike(this ITypeSymbol source)
-    {
-        return source.TypeKind is TypeKind.TypeParameter;
-    }
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static bool IsGenericAlike(
+        this ITypeSymbol source) => source.TypeKind is TypeKind.TypeParameter;
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Determines if the given type is a nullable wrapper, or not.
+    /// Determines if the type is a CLR nullable one (<see cref="Nullable{T}"/>), or not.
     /// </summary>
-    internal static bool IsNullableWrapper(this ITypeSymbol source) =>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static bool IsCoreNullable(this ITypeSymbol source) =>
+        source is INamedTypeSymbol named &&
+        named.Arity == 1 &&
+        source.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T;
+
+    /// <summary>
+    /// Determines if the given type is a nullable wrapper (either a <see cref="Nullable{T}"/> or
+    /// a <see cref="IsNullable{T}"/> one), or not.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static bool IsNullableWrapper(this ITypeSymbol source) =>
         source is INamedTypeSymbol named &&
         named.Arity == 1 && (
         source.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T ||
@@ -78,7 +121,10 @@ public static partial class RoslynNamesExtensions
     /// If the given type is a nullable wrapper, returns the underlying type and sets the out
     /// argument to true. Otherwise returns the original type and sets the out argument to false.
     /// </summary>
-    internal static INamedTypeSymbol UnwrapNullable(this INamedTypeSymbol source, out bool nullable)
+    /// <param name="source"></param>
+    /// <param name="nullable"></param>
+    /// <returns></returns>
+    public static INamedTypeSymbol UnwrapNullable(this INamedTypeSymbol source, out bool nullable)
     {
         if (source.IsNullableWrapper())
         {
@@ -90,34 +136,78 @@ public static partial class RoslynNamesExtensions
         return source;
     }
 
+    extension(AttributeData at)
+    {
+        // ----------------------------------------------------
+
+        /// <summary>
+        /// Returns if the given attribute is a 'NullableAttribute' one, or not, and if so, whether
+        /// nullability is enabled or not.
+        /// </summary>
+        /// <param name="at"></param>
+        /// <param name="enabled"></param>
+        /// <returns></returns>
+        public bool IsNullabilityEnabled(out bool enabled)
+        {
+            ArgumentNullException.ThrowIfNull(at);
+            enabled = false;
+
+            // Attribute is a 'NullableAttribute' one, we return 'true' despite it is enabled or not...
+            if (at.AttributeClass?.ToDisplayString() == NULLABLE_ATTRIBUTE)
+            {
+                if (at.ConstructorArguments.Length > 0)
+                {
+                    var arg = at.ConstructorArguments[0];
+
+                    if (arg.Kind is TypedConstantKind.Primitive or TypedConstantKind.Enum)
+                    { enabled = arg.Value is byte b && b == 2; }
+
+                    else if (arg.Kind == TypedConstantKind.Array && !arg.Values.IsDefaultOrEmpty)
+                    { enabled = arg.Values[0].Value is byte b && b == 2; }
+                }
+                return true;
+            }
+
+            /* HIGH: RoslynNameExtensions: IsNullabilityEnabled, old-reflection code...
+                var items = at.GetType().GetField("NullableFlags");
+                if (items != null)
+                {
+                    var value = items.GetValue(at);
+
+                    if ((value is byte b && b == 2) ||
+                        (value is byte[] bs && bs.Length > 0 && bs[0] == 2))
+                        return true;
+                }
+             */
+
+            // Attribute was not a 'NullableAttribute' one...
+            return false;
+        }
+    }
+
     // ----------------------------------------------------
 
     /// <summary>
-    /// Determines if the given symbol has been identified as a nullable one because either it has
-    /// been decorated with a '<see langword="?"/>' symbol, or because any nullable attribute (as
-    /// <see cref="NullableAttribute"/> or <see cref="IsNullableAttribute"/>) has been used.
-    /// <br/> This method DOES NOT take into consideration if the given symbol is a nullable wrapper
-    /// type-alike one.
+    /// Determines if the given symbol has been annotated as a nullable one, because nullability
+    /// annotations are used, or because its metadata carries a <see cref="NullableAttribute"/>
+    /// attribute or a <see cref="IsNullableAttribute"/> one.
+    /// <br/> Nullable wrappers are not identified by this method.
+    /// <br/> For consistency reasons, generic 'T'-alike are treated as conventional reference ones.
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
-    internal static bool IsNullableAnnotatedOrAttribute(this ISymbol source)
+    public static bool IsNullableAnnotated(this ISymbol source)
     {
-        /* TODO: Validate annotated nullability rules from regular EasyNames.
-         /// <para>
-         /// When nullability is enabled, the generic 'T' arguments always appear as annotated ones,
-         /// but this is NOT consistent with what happens with reference types (that they loose this
-         /// information). For consistency reasons, when the type is a 'T' one we will request that
-         /// is either wrapped (which is not checked by this method), or decorated with the custom
-         /// <see cref="IsNullableAttribute"/> attribute, as expected for reference types.
-         /// </para>
-         if (source.FullName != null) // Preventing annotated generic 'T' types...
-         {
-            if (source.GetCustomAttributes(typeof(NullableAttribute), false)
-                .Any(x => IsNullableEnabled((NullableAttribute)x)))
+        /* HIGH: RoslynNameExtensions: IsNullableAnnotated, T-alike types...
+        // All but T-alike types...
+        if (source is ITypeSymbol type && type.TypeKind == TypeKind.TypeParameter)
+        {
+            var atx = type.GetAttributes([typeof(NullableAttribute)]).ToArray();
+            if (atx.Length > 0 &&
+                atx.Any(x => x.IsNullabilityEnabled(out var enabled) &&
+                enabled))
                 return true;
-         }
-         */
+        }*/
 
         // By using nullable annotations...
         switch (source)
@@ -129,38 +219,13 @@ public static partial class RoslynNamesExtensions
             case IEventSymbol item when (item.NullableAnnotation == NullableAnnotation.Annotated): return true;
         }
 
-        // By using metadata attributes...
-        var ats = source.GetAttributes();
+        // By finding in metadata...
+        if (source.GetAttributes([typeof(IsNullableAttribute)]).Any()) return true;
 
-        foreach (var at in ats.Where(x => x.AttributeClass?.ToDisplayString() == NULLABLE_ATTRIBUTE))
-        {
-            var items = at.GetType().GetField("NullableFlags");
-            if (items != null)
-            {
-                var value = items.GetValue(at);
+        var ats = source.GetAttributes([typeof(NullableAttribute)]).ToArray();
+        if (ats.Any(x => x.IsNullabilityEnabled(out var enabled) && enabled)) return true;
 
-                if ((value is byte b && b == 2) ||
-                    (value is byte[] bs && bs.Length > 0 && bs[0] == 2))
-                    return true;
-            }
-        }
-
-        // By using custome attribute...
-        if (ats.Any(x => x.AttributeClass?.Name == nameof(IsNullableAttribute))) return true;
-
-        // Not nullable...
+        // No nullability found...
         return false;
     }
-
-    // ----------------------------------------------------
-    /* TODO: HasReadOnlyAttribute en Roslyn EasyNames
-    /// <summary>
-    /// Determines if the given element is decorated with a readonly attribute.
-    /// </summary>
-    internal static bool HasReadOnlyAttribute(this ICustomAttributeProvider info)
-    {
-        return info
-            .GetCustomAttributes(false)
-            .Any(x => x.GetType().FullName == READ_ONLY_ATTRIBUTE);
-    }*/
 }

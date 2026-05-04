@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
-
-namespace Yotei.Tools;
+﻿namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>

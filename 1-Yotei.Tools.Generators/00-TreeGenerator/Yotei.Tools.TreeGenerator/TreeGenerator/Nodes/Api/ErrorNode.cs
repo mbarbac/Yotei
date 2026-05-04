@@ -6,10 +6,9 @@
 /// that will be reported at source code generation time.
 /// </summary>
 public sealed class ErrorNode : INode
-{
-    /// <summary>
-    /// Initializes a new empty instance.
-    /// </summary>
+{    /// <summary>
+     /// Initializes a new empty instance.
+     /// </summary>
     public ErrorNode() { }
 
     /// <summary>
