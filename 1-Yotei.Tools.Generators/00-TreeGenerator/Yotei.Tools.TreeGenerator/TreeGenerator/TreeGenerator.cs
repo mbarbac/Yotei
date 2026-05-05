@@ -39,7 +39,66 @@ public partial class TreeGenerator : IIncrementalGenerator
     /// <br/> Inheritors will typically invoke their base method first.
     /// </summary>
     /// <param name="context"></param>
-    protected virtual void OnInitialize(IncrementalGeneratorPostInitializationContext context) { }
+    protected virtual void OnInitialize(
+        IncrementalGeneratorPostInitializationContext context)
+        => AddEmbeddedAttribute(context);
+
+    /// <summary>
+    /// Invoked to add the '[Microsoft.CodeAnalysis.EmbeddedAttribute]' attribute into the source
+    /// code compilation, which is used to decorate types (such as marker attributes) that shall
+    /// be embedded into an assembly, but not exposed publicly.
+    /// <br/> Inheritors may override this method to do nothing if the intent is to prevent this
+    /// attribute to be emitted.
+    /// </summary>
+    /// <param name="context"></param>
+    protected virtual void AddEmbeddedAttribute(
+        IncrementalGeneratorPostInitializationContext context)
+        => context.AddEmbeddedAttributeDefinition();
+
+    /// <summary>
+    /// Invoked to add the <see cref="IsNullableAttribute"/> and the <see cref="IsNullable{T}"/>
+    /// nullability helpers into the compilation, under the generator's namespace.
+    /// <br/> Inheritors may override this method to do nothing if the intent is to prevent this
+    /// helpers to be emitted.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="options"></param>
+    protected virtual void AddNullabilityHelpers(SourceProductionContext context, TreeOptions options)
+    {
+        var name = NormalizeFileName("Yotei.Tools.NullabilityHelpers.cs",
+            options.GenerateFilesInFolders,
+            options.ReverseGeneratedFileNames);
+
+        var code = $$"""
+            namespace {{GetType().Namespace!}}
+            {
+                /// <summary>
+                /// Used to wrap types for which nullability information shall be persisted.
+                /// <para>
+                /// Nullable annotations on value types are always translated by the compiler into instances
+                /// of the <see cref="Nullable{T}"/> struct. By contrast, nullable annotations on reference
+                /// types are just syntactic sugar used by the compiler but, in general, either they are not
+                /// persisted in metadata or in custom attributes, or they are not allowed in certain contexts
+                /// (e.g., generic type arguments).
+                /// <br/> The <see cref="IsNullable{T}"/> and <see cref="IsNullableAttribute"/> types can be
+                /// used as workarounds when there is the need to persist nullability information for their
+                /// associated types, or when there is the need to specify it in those not-allowed contexts.
+                /// </para>
+                /// </summary>
+                [Microsoft.CodeAnalysis.Embedded]
+                public class IsNullable<T> { }
+                
+                /// <summary>
+                /// <inheritdoc cref="IsNullable{T}"/>
+                /// </summary>
+                [Microsoft.CodeAnalysis.Embedded]
+                [AttributeUsage(AttributeTargets.All)]
+                public class IsNullableAttribute : Attribute { }
+            }
+            """;
+
+        context.AddSource(name, code);
+    }
 
     // ----------------------------------------------------
 

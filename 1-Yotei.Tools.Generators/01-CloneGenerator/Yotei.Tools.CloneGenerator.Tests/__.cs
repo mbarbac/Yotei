@@ -11,4 +11,5 @@
 //    }
 //}
 
+[Cloneable]
 public interface IFake { }

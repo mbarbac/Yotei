@@ -21,6 +21,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\IPropertySymbolExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\NameSyntaxExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\SyntaxListExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Complements\EmbeddedAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\EasyTypeSymbol.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\RoslynNamesExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\Nodes\Api\IChildNode.cs" />
@@ -46,5 +47,8 @@
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)LICENSE" />
     <None Include="$(MSBuildThisFileDirectory)README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Complements\" />
   </ItemGroup>
 </Project>
