@@ -11,5 +11,9 @@
 //    }
 //}
 
-[Cloneable]
-public interface IFake { }
+
+public interface IFake
+{
+    [Cloneable]
+    public string?[]? Name { get; }
+}

@@ -22,8 +22,15 @@ public class CloneGenerator : TreeGenerator
     {
         var node = base.CaptureNode(context, token);
 
-        if (node is TypeNode type && type.Symbol.Name == "IFake") // DEBUG-ONLY
+        if (node is PropertyNode xnode &&
+            xnode.Symbol.Name == "Name") // DEBUG-ONLY
         {
+            var source = xnode.Symbol.Type;
+            var options = EasyTypeOptions.DefaultEx;
+            var str = source.EasyName(options);
+
+            options = EasyTypeOptions.Full;
+            str = source.EasyName(options);
         }
         return node;
     }

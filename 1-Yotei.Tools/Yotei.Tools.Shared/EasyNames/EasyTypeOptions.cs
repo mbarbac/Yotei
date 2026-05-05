@@ -161,6 +161,12 @@ public static partial class EasyNameExtensions
     /// <returns></returns>
     static string EasyName(this Type source, Type[] types, EasyTypeOptions options)
     {
+        // Capturing...
+        var sb = new StringBuilder();
+        var isgen = source.IsGenericAlike();
+        var host = source.DeclaringType;
+        var xname = options.UseSpecialNames ? source.ToSpecialName() : null;
+
         // Intercepting placeholders...
         if (options.UsePlaceHolder) return string.Empty;
 
@@ -178,67 +184,100 @@ public static partial class EasyNameExtensions
         }
 
         // Intercepting wrappers...
-        if (source.IsNullableWrapper() &&
-            options.NullableStyle == EasyNullableStyle.UseAnnotations)
+        if (source.IsNullableWrapper())
         {
-            var arg = source.GetGenericArguments()[0];
-            var str = arg.EasyName(options);
-            if (str.Length > 0 && str[^1] != '?') str += '?';
-            return str;
+            if (options.NullableStyle == EasyNullableStyle.UseAnnotations)
+            {
+                var arg = source.GetGenericArguments()[0];
+                var str = arg.EasyName(options);
+                if (str.Length > 0 && str[^1] != '?') str += '?';
+                return str;
+            }
+            if (options.NullableStyle == EasyNullableStyle.KeepWrappers)
+            {
+                var arg = source.GetGenericArguments()[0];
+                var str = arg.EasyName(options);
+
+                TryAddVariance(sb, source, options);
+                TryAddNamespace(sb, source, options, xname, host, isgen);
+                TryAddHost(sb, host, types, options, xname, isgen);
+
+                TryAddName(sb, source, options, xname);
+                str = $"{sb}<{str}>";
+                return str;
+            }
         }
 
-        // Capturing...
-        var sb = new StringBuilder();
-        var isgen = source.IsGenericAlike();
-        var host = source.DeclaringType;
-        var xname = options.UseSpecialNames ? source.ToSpecialName() : null;
-
         // Variance...
-        if (options.UseVariance && source.IsGenericParameter)
+        TryAddVariance(sb, source, options);
+        static void TryAddVariance(
+            StringBuilder sb,
+            Type source, EasyTypeOptions options)
         {
-            var gpa = source.GenericParameterAttributes;
-            var variance = gpa & GenericParameterAttributes.VarianceMask;
+            if (options.UseVariance && source.IsGenericParameter)
+            {
+                var gpa = source.GenericParameterAttributes;
+                var variance = gpa & GenericParameterAttributes.VarianceMask;
 
-            if ((variance & GenericParameterAttributes.Covariant) != 0) sb.Append("out ");
-            if ((variance & GenericParameterAttributes.Contravariant) != 0) sb.Append("in ");
+                if ((variance & GenericParameterAttributes.Covariant) != 0) sb.Append("out ");
+                if ((variance & GenericParameterAttributes.Contravariant) != 0) sb.Append("in ");
+            }
         }
 
         // Namespace...
-        if (options.NamespaceStyle != EasyNamespaceStyle.None &&
-            xname == null &&
-            host == null && !isgen)
+        TryAddNamespace(sb, source, options, xname, host, isgen);
+        static void TryAddNamespace(
+            StringBuilder sb,
+            Type source, EasyTypeOptions options, string? xname, Type? host, bool isgen)
         {
-            var str = source.Namespace;
-            if (str != null && str.Length > 0)
+            if (options.NamespaceStyle != EasyNamespaceStyle.None &&
+                xname == null &&
+                host == null && !isgen)
             {
-                if (options.NamespaceStyle == EasyNamespaceStyle.UseGlobal) sb.Append("global::");
-                sb.Append(str).Append('.');
+                var str = source.Namespace;
+                if (str != null && str.Length > 0)
+                {
+                    if (options.NamespaceStyle == EasyNamespaceStyle.UseGlobal) sb.Append("global::");
+                    sb.Append(str).Append('.');
+                }
             }
         }
 
         // Host...
-        if ((options.UseHost || options.NamespaceStyle != EasyNamespaceStyle.None) &&
+        TryAddHost(sb, host, types, options, xname, isgen);
+        static void TryAddHost(
+            StringBuilder sb,
+            Type? host, Type[] types, EasyTypeOptions options, string? xname, bool isgen)
+        {
+            if ((options.UseHost || options.NamespaceStyle != EasyNamespaceStyle.None) &&
             xname == null &&
             host != null && !isgen)
-        {
-            var str = host.EasyName(types, options); // Using captured types...
-            if (str.Length > 0) sb.Append(str).Append('.');
+            {
+                var str = host.EasyName(types, options); // Using captured types...
+                if (str.Length > 0) sb.Append(str).Append('.');
+            }
         }
 
         // Name...
-        if (xname != null) sb.Append(xname);
-        else
+        TryAddName(sb, source, options, xname);
+        static void TryAddName(
+            StringBuilder sb,
+            Type source, EasyTypeOptions options, string? xname)
         {
-            var name = source.Name;
-            var index = name.IndexOf('`'); if (index >= 0) name = name[..index];
-            if (name.Length > 0 && name[^1] == '&') name = name[..^1];
+            if (xname != null) sb.Append(xname);
+            else
+            {
+                var name = source.Name;
+                var index = name.IndexOf('`'); if (index >= 0) name = name[..index];
+                if (name.Length > 0 && name[^1] == '&') name = name[..^1];
 
-            if (options.RemoveAttributeSuffix &&
-                name != ATTRIBUTE &&
-                name.EndsWith(ATTRIBUTE))
-                name = name.RemoveLast(ATTRIBUTE).ToString();
+                if (options.RemoveAttributeSuffix &&
+                    name != ATTRIBUTE &&
+                    name.EndsWith(ATTRIBUTE))
+                    name = name.RemoveLast(ATTRIBUTE).ToString();
 
-            sb.Append(name);
+                sb.Append(name);
+            }
         }
 
         // Generic parameters...
@@ -263,7 +302,7 @@ public static partial class EasyNameExtensions
         }
 
         // Nullability...
-        while (options.NullableStyle != EasyNullableStyle.None &&
+        /*while (options.NullableStyle != EasyNullableStyle.None &&
             sb.Length > 0 &&
             sb[^1] != '?')
         {
@@ -274,6 +313,22 @@ public static partial class EasyNameExtensions
             }
             if (source.IsNullableAnnotated()) { sb.Append('?'); break; }
             break;
+        }*/
+
+        TryAddNullability(sb, source, options, isgen);
+        static void TryAddNullability(
+            StringBuilder sb,
+            Type source, EasyTypeOptions options, bool isgen)
+        {
+            // HIGH: Que pasa cuando es un <T?>. Cuando está wrapped y cuando no.
+            // Es un especial case pq queremos que los <T> se comporten como referencias...
+
+            if (options.NullableStyle == EasyNullableStyle.UseAnnotations &&
+                sb.Length > 0 &&
+                sb[^1] != '?')
+            {
+                if (source.IsNullableAnnotated()) { sb.Append('?'); return; }
+            }
         }
 
         // Finishing...
