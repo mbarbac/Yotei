@@ -161,6 +161,227 @@ public static partial class EasyNameExtensions
     /// <returns></returns>
     static string EasyName(this Type source, Type[] types, EasyTypeOptions options)
     {
-        throw null;
+        // Shortcuts...
+        if (options.UsePlaceHolder) return string.Empty;
+        if (source.IsArray) return WhenArray(source, options);
+        if (source.IsPointer) return WhenPointer(source, options);
+        if (source.IsNullableWrapper()) return WhenWrapper(source, options);
+
+        // Standard case...
+        var sb = new StringBuilder();
+        var isgen = source.IsGenericAlike();
+        var host = source.DeclaringType;
+        var xname = options.UseSpecialNames ? source.ToSpecialName() : null;
+
+        AddVariance(sb, source, options);
+        AddNamespace(sb, source, options, xname, host, isgen);
+        AddHost(sb, host, options, xname, isgen, types);
+        AddName(sb, source, options, xname);
+        AddGenerics(sb, source, options, xname, host, types);
+        AddNullability(sb, source, options);
+        return sb.ToString();
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Invoked when the source is an array-like type.
+        /// </summary>
+        static string WhenArray(Type source, EasyTypeOptions options)
+        {
+            var arg = source.GetElementType()!;
+            var str = arg.EasyName(options);
+            if (str.Length == 0) return string.Empty;
+
+            var rank = source.GetArrayRank();
+            str = $"{str}[{new string(',', rank - 1)}]";
+
+            var sb = new StringBuilder();
+            AddVariance(sb, source, options);
+            sb.Append(str);
+            AddNullability(sb, source, options);
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Invoked when the source is an pointer-like type.
+        /// Note that pointers do not allow nullable annotations (such as 'int*?), but yes they
+        /// can point to a nullable type ('int?*').
+        /// </summary>
+        static string WhenPointer(Type source, EasyTypeOptions options)
+        {
+            var arg = source.GetElementType()!;
+            var str = arg.EasyName(options);
+            if (str.Length == 0) return string.Empty;
+
+            var sb = new StringBuilder();
+            AddVariance(sb, source, options);
+            sb.Append(str);
+            sb.Append('*');
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Invoked when the source is a nullable wrapper.
+        /// </summary>
+        static string WhenWrapper(Type source, EasyTypeOptions options)
+        {
+            if (options.NullableStyle == EasyNullableStyle.UseAnnotations)
+            {
+                var arg = source.GetGenericArguments()[0];
+                var str = arg.EasyName(options);
+                if (str.Length == 0) return string.Empty;
+
+                var sb = new StringBuilder();
+                AddVariance(sb, source, options); if (sb.Length > 0) sb.Append(' ');
+                sb.Append(str);
+                if (sb[^1] != '?') sb.Append('?');
+                AddNullability(sb, source, options);
+                return sb.ToString();
+            }
+            else if (options.NullableStyle == EasyNullableStyle.KeepWrappers)
+            {
+                var arg = source.GetGenericArguments()[0];
+                var str = arg.EasyName(options);
+                if (str.Length == 0) return string.Empty;
+
+                var sb = new StringBuilder();
+                AddVariance(sb, source, options);
+                var name = GetNullableWrapperName(source, options);
+                sb.Append($"{name}<{str}>");
+                AddNullability(sb, source, options);
+                return sb.ToString();
+            }
+            else return GetNullableWrapperName(source, options);
+        }
+
+        // Q&D way of obtaining the envelop's name...
+        static string GetNullableWrapperName(Type source, EasyTypeOptions options)
+        {
+            var expand = options.NamespaceStyle != EasyNamespaceStyle.None;
+            var global = options.NamespaceStyle == EasyNamespaceStyle.UseGlobal;
+
+            var name = source.IsCoreNullable()
+                ? (expand ? "System.Nullable" : "Nullable")
+                : (expand ? "Yotei.Tools.IsNullable" : "IsNullable");
+
+            if (global) name = $"global::{name}";
+            return name;
+        }
+
+        /// <summary>
+        /// Invoked to add the type's variance (the 'in' and 'out' keywords).
+        /// </summary>
+        static void AddVariance(StringBuilder sb, Type source, EasyTypeOptions options)
+        {
+            if (!options.UseVariance) return;
+            if (!source.IsGenericParameter) return;
+
+            var gpa = source.GenericParameterAttributes;
+            var variance = gpa & GenericParameterAttributes.VarianceMask;
+
+            if ((variance & GenericParameterAttributes.Covariant) != 0) sb.Append("out ");
+            if ((variance & GenericParameterAttributes.Contravariant) != 0) sb.Append("in ");
+        }
+
+        /// <summary>
+        /// Invoked to add the type's namespace.
+        /// </summary>
+        static void AddNamespace(
+            StringBuilder sb, Type source, EasyTypeOptions options,
+            string? xname,
+            Type? host,
+            bool isgen /*= false*/)
+        {
+            if (xname != null) return;
+            if (host != null) return;
+            if (isgen) return;
+            if (options.NamespaceStyle == EasyNamespaceStyle.None) return;
+
+            var str = source.Namespace;
+            if (str == null || str.Length == 0) return;
+
+            if (options.NamespaceStyle == EasyNamespaceStyle.UseGlobal) sb.Append("global::");
+            sb.Append(str).Append('.');
+        }
+
+        /// <summary>
+        /// Invoked to add the type's host.
+        /// </summary>
+        static void AddHost(
+            StringBuilder sb, Type? host, EasyTypeOptions options,
+            string? xname,
+            bool isgen,
+            Type[]? types)
+        {
+            if (xname != null) return;
+            if (host == null) return;
+            if (isgen) return;
+            if (!options.UseHost && options.NamespaceStyle == EasyNamespaceStyle.None) return;
+
+            var str = host.EasyName(types ?? [], options);
+            if (str.Length > 0) sb.Append(str).Append('.');
+        }
+
+        /// <summary>
+        /// Invoked to add the type's name.
+        /// </summary>
+        static void AddName(
+            StringBuilder sb, Type source, EasyTypeOptions options,
+            string? xname)
+        {
+            if (xname != null) { sb.Append(xname); return; }
+
+            var name = source.Name;
+            var index = name.IndexOf('`'); if (index >= 0) name = name[..index];
+            if (name.Length > 0 && name[^1] == '&') name = name[..^1];
+
+            if (options.RemoveAttributeSuffix &&
+                name != ATTRIBUTE &&
+                name.EndsWith(ATTRIBUTE))
+                name = name.RemoveLast(ATTRIBUTE).ToString();
+
+            sb.Append(name);
+        }
+
+        /// <summary>
+        /// Invoked to add the type's generic type arguments.
+        /// </summary>
+        static void AddGenerics(
+            StringBuilder sb, Type source, EasyTypeOptions options,
+            string? xname,
+            Type? host,
+            Type[] types)
+        {
+            if (xname != null) return;
+            if (options.GenericListOptions == null) return;
+
+            var xoptions = options.GenericListOptions;
+            var args = source.GetGenericArguments();
+            var used = host == null ? 0 : host.GetGenericArguments().Length;
+            var need = args.Length - used;
+
+            if (need > 0)
+            {
+                sb.Append('<'); for (int i = 0; i < need; i++)
+                {
+                    var arg = types[used + i];
+                    var str = arg.EasyName(xoptions);
+                    if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
+                    sb.Append(str);
+                }
+                sb.Append('>');
+            }
+        }
+
+        /// <summary>
+        /// Invoked as the last chance to add the type's nullability.
+        /// </summary>
+        static void AddNullability(StringBuilder sb, Type source, EasyTypeOptions options)
+        {
+            if (sb.Length == 0 || sb[^1] == '?') return;
+            if (options.NullableStyle != EasyNullableStyle.UseAnnotations) return;
+
+            if (source.IsNullableAnnotated()) { sb.Append('?'); return; }
+        }
     }
 }
