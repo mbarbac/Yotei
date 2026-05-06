@@ -6,6 +6,29 @@ public static class Test_EasyType
 {
     const string PREFIX = "Yotei.Tools.Tests.EasyNames.Test_EasyType";
 
+    interface IFake
+    {
+        int?[]? Method1();
+        string?[]? Method2();
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_()
+    {
+        EasyTypeOptions options;
+        string name;
+        var type = typeof(IFake);
+        var item = type.GetMethod("Method1")!;
+        var source = item.ReturnType;
+
+        options = EasyTypeOptions.DefaultEx;
+        name = source.EasyName(options); Assert.NotNull(name);
+
+        options = EasyTypeOptions.Full;
+        name = source.EasyName(options); Assert.NotNull(name);
+    }
+
     // ----------------------------------------------------
 
     //[Enforced]
