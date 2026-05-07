@@ -103,7 +103,7 @@ public static partial class EasyNameExtensions
         var sb = new StringBuilder();
         var host = source.DeclaringType;
 
-        // Accessibility ('private' not used)...
+        // Accessibility...
         if (options.UseAccessibility)
         {
             if (source.IsPublic) sb.Append("public ");
@@ -113,9 +113,10 @@ public static partial class EasyNameExtensions
             if (source.IsFamilyAndAssembly) sb.Append("private protected ");
         }
 
-        // NOTE: The 'partial' keyword is a compilation-time only feature, not persisted once the
-        // source code is compiled. It seems there is no way to obtain this information by only
-        // using reflection.
+        /* NOTE: 'partial' is a compilation-time only feature, not persisted once the source code
+         * is compiled. It seems there is no way to obtain this information using reflections. In
+         * any case, in this scenario, is not as bad as it sound.
+         */
 
         // Modifiers...
         if (options.UseModifiers)
@@ -129,46 +130,50 @@ public static partial class EasyNameExtensions
             if (source.IsInitOnly) sb.Append("readonly ");
         }
 
-        // Member type..
+        // Member type...
         if (options.MemberTypeOptions != null)
         {
             var xoptions = options.MemberTypeOptions;
-            var type = source.FieldType;
-            var str = type.EasyName(xoptions);
+            var arg = source.FieldType;
+            var str = arg.EasyName(xoptions);
 
             if (str.Length > 0)
             {
-                // ref-alike return types (emitting on 'sb' on purpose)...
-                if (options.UseModifiers && type.IsByRef)
-                {
-                    var ronly =
-                        source.HasReadOnlyAttribute() ||
-                        source.FieldType.HasReadOnlyAttribute();
-
-                    sb.Append(ronly ? "ref readonly " : "ref ");
-                }
-
                 // Nullability...
-                while (str[^1] != '?')
-                {
-                    if (type.IsCoreNullable() &&
-                        xoptions.NullableStyle == EasyNullableStyle.KeepWrappers) break;
+                var pointer = str.EndsWith('*');
+                if (pointer) str = str[..^1].NotNullNotEmpty(trim: false);
 
-                    // Field instances ARE sensible to nullability API, so use it...
+                while (str[^1] != '?' && xoptions.NullableStyle != EasyNullableStyle.None)
+                {
+                    if (xoptions.NullableStyle == EasyNullableStyle.KeepWrappers &&
+                        arg.IsNullableWrapper() &&
+                        !arg.IsArray && !arg.IsPointer) break;
+
+                    if (arg.IsNullableAnnotated()) { str += '?'; break; }
                     if (source.IsNullableAnnotated()) { str += '?'; break; }
                     break;
                 }
-
-                // Adding...
-                sb.Append(str).Append(' ');
+                if (pointer) str += '*'; // Don't forget to restore pointer!
             }
+
+            // Ref-alike types (using method first, arg as a fallback)...
+            if (options.UseModifiers && arg.IsByRef)
+            {
+                var ronly =
+                    source.HasReadOnlyAttribute() ||
+                    source.FieldType.HasReadOnlyAttribute();
+
+                sb.Append(ronly ? "ref readonly " : "ref ");
+            }
+
+            // Adding...
+            sb.Append(str).Append(' ');
         }
 
         // Host type...
         if (options.HostTypeOptions != null && host != null)
         {
-            var xoptions = options.HostTypeOptions;
-            var str = host.EasyName(xoptions);
+            var str = host.EasyName(options.HostTypeOptions);
             if (str.Length > 0) sb.Append(str).Append('.');
         }
 

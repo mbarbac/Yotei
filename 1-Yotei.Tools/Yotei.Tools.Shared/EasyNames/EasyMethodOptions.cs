@@ -169,7 +169,7 @@ public static partial class EasyNameExtensions
     // ----------------------------------------------------
 
     /// <summary>
-    /// Facorizes common code to obtain the C#-alike representation of the given element.
+    /// Factorizes common code to obtain the C#-alike representation of the given element.
     /// </summary>
     static string EasyMethodBase(this MethodBase source, EasyMethodOptions options)
     {
@@ -181,10 +181,31 @@ public static partial class EasyNameExtensions
         var iface = host != null && host.IsInterface;
 
         // Accessibility...
-        // TODO...
+        if (options.UseAccessibility)
+        {
+            if (source.IsPublic && !iface) sb.Append("public ");
+            if (source.IsFamily) sb.Append("protected ");
+            if (source.IsAssembly) sb.Append("internal ");
+            if (source.IsFamilyOrAssembly) sb.Append("internal protected ");
+            if (source.IsFamilyAndAssembly) sb.Append("private protected ");
+        }
+
+        /* NOTE: 'partial' is a compilation-time only feature, not persisted once the source code
+         * is compiled. It seems there is no way to obtain this information using reflections. In
+         * any case, in this scenario, is not as bad as it sound.
+         */
 
         // Modifiers...
-        // TODO...
+        if (options.UseModifiers)
+        {
+            if (source.IsStatic) sb.Append("static ");
+            if (source.IsAbstract && !iface) sb.Append("abstract ");
+            if (IsSealed()) sb.Append("sealed ");
+
+            if (IsOverride()) sb.Append("override ");
+            else if (IsVirtual() && !iface && !source.IsAbstract) sb.Append("virtual ");
+            else if (IsNew()) sb.Append("new ");
+        }
 
         // Return type...
         if (method != null && options.ReturnTypeOptions != null)
@@ -199,25 +220,24 @@ public static partial class EasyNameExtensions
                 var pointer = str.EndsWith('*');
                 if (pointer) str = str[..^1].NotNullNotEmpty(trim: false);
 
-                while (str[^1] != '?')
+                while (str[^1] != '?' && xoptions.NullableStyle != EasyNullableStyle.None)
                 {
-                    if (xoptions.NullableStyle == EasyNullableStyle.UseAnnotations)
-                    {
-                        if (arg.IsNullableAnnotated()) { str += '?'; break; }
-                        if (source.IsNullableAnnotated()) { str += '?'; break; }
-                    }
-                    if (xoptions.NullableStyle == EasyNullableStyle.KeepWrappers && (
-                        arg.IsArray || arg.IsPointer))
-                    {
-                        if (source.IsNullableAnnotated()) { str += '?'; break; }
-                        if (arg.IsNullableAnnotated()) { str += '?'; break; }
-                    }
+                    if (xoptions.NullableStyle == EasyNullableStyle.KeepWrappers &&
+                        arg.IsNullableWrapper() &&
+                        !arg.IsArray && !arg.IsPointer) break;
+
+                    if (arg.IsNullableAnnotated()) { str += '?'; break; }
+                    if (source.IsNullableAnnotated()) { str += '?'; break; }
                     break;
                 }
-                if (pointer) str += '*';
+                if (pointer) str += '*'; // Don't forget to restore pointer!
 
                 // Ref-alike types...
-                // TODO...
+                if (options.UseModifiers && arg.IsByRef)
+                {
+                    var ronly = method.ReturnTypeCustomAttributes.HasReadOnlyAttribute();
+                    sb.Append(ronly ? "ref readonly " : "ref ");
+                }
 
                 // Adding...
                 sb.Append(str).Append(' ');
@@ -225,14 +245,139 @@ public static partial class EasyNameExtensions
         }
 
         // Host type...
-        // TODO...
-        // Modify the options to prevent return type
+        if (options.HostTypeOptions != null)
+        {
+            host = method?.DeclaringType ?? constructor?.DeclaringType;
+            if (host != null)
+            {
+                var str = host.EasyName(options.HostTypeOptions);
+                if (str.Length > 0)
+                {
+                    sb.Append(str);
+                    if (method != null) sb.Append('.'); // Only for regular methods...
+                }
+            }
+        }
 
         // Name...
-        // TODO...
-        sb.Append(source.Name);
+        if (method != null) sb.Append(source.Name);
+        if (constructor != null)
+        {
+            if (options.HostTypeOptions == null) // Otherwise it has been already captured!
+            {
+                var str = host?.EasyName() ?? "new";
+                sb.Append(str);
+            }
+            if (options.UseTechName) // Adding the CLR name if requested
+            {
+                if (!source.Name.StartsWith('.')) sb.Append('.');
+                sb.Append(source.Name);
+            }
+        }
+
+        // Generic arguments (regular methods only)...
+        if (method != null && options.GenericListOptions != null)
+        {
+            var xoptions = options.GenericListOptions;
+            var args = source.GetGenericArguments();
+            if (args.Length > 0)
+            {
+                sb.Append('<'); for (int i = 0; i < args.Length; i++)
+                {
+                    var arg = args[i];
+                    var str = arg.EasyName(xoptions);
+                    if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
+                    sb.Append(str);
+                }
+                sb.Append('>');
+            }
+        }
+
+        // Parameters...
+        if (options.UseBrackets || options.ParameterOptions != null)
+        {
+            sb.Append('('); if (options.ParameterOptions != null)
+            {
+                var xoptions = options.ParameterOptions;
+                var args = source.GetParameters();
+
+                for (int i = 0; i < args.Length; i++)
+                {
+                    var arg = args[i];
+                    var str = arg.EasyName(xoptions);
+                    if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
+                    sb.Append(str);
+                }
+            }
+            sb.Append(')');
+        }
 
         // Finishing...
         return sb.ToString();
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Determines if the given source is a 'virtual' one.
+        /// </summary>
+        bool IsVirtual() => source.IsVirtual && !source.IsFinal;
+
+        /// <summary>
+        /// Determines if the given source method (not constructor) is an 'sealed' one.
+        /// </summary>
+        bool IsSealed() => source.IsVirtual && source.IsFinal;
+
+        /// <summary>
+        /// Determines if the given source method (not constructor) is an 'override' one.
+        /// </summary>
+        bool IsOverride() =>
+            method != null &&
+            method.IsVirtual &&
+            method.GetBaseDefinition().DeclaringType != source.DeclaringType;
+
+        /// <summary>
+        /// Determines if the given source method (not constructor) is a 'new' one.
+        /// </summary>
+        bool IsNew()
+        {
+            if (method == null) return false;
+            return iface
+                ? (method.IsVirtual && FindBaseMethod(host, true) != null)
+                : (!method.IsVirtual && FindBaseMethod(host) != null);
+        }
+
+        MethodInfo? FindBaseMethod(Type? host, bool ifaces = false)
+        {
+            if (host != null)
+            {
+                // First, the host's base types...
+                var parent = host.BaseType;
+                while (parent != null)
+                {
+                    var temp = FindMethodAt(parent);
+                    if (temp != null) return temp;
+                    parent = parent.BaseType;
+                }
+
+                // Then the host's interfaces, if requested...
+                if (ifaces)
+                {
+                    foreach (var iface in host.GetInterfaces())
+                    {
+                        var temp = FindMethodAt(iface);
+                        if (temp != null) return temp;
+                    }
+                }
+            }
+            return null;
+
+            MethodInfo? FindMethodAt(Type type) => type.GetMethod(
+                method.Name,
+                BindingFlags.Public | BindingFlags.NonPublic |
+                BindingFlags.Instance | BindingFlags.Static,
+                null,
+                [.. method.GetParameters().Select(p => p.ParameterType)],
+                null);
+        }
     }
 }

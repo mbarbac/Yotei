@@ -379,7 +379,10 @@ public static partial class EasyNameExtensions
         static void AddNullability(StringBuilder sb, Type source, EasyTypeOptions options)
         {
             if (sb.Length == 0 || sb[^1] == '?') return;
-            if (options.NullableStyle != EasyNullableStyle.UseAnnotations) return;
+            if (options.NullableStyle == EasyNullableStyle.None) return;
+
+            if (source.IsNullableWrapper() &&
+                options.NullableStyle == EasyNullableStyle.KeepWrappers) return;
 
             if (source.IsNullableAnnotated()) { sb.Append('?'); return; }
         }

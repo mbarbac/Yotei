@@ -133,7 +133,7 @@ public static partial class EasyNameExtensions
         var iface = host != null && host.IsInterface;
         var method = source.GetGetMethod() ?? source.GetSetMethod();
 
-        // Accessibility ('private' not used)...
+        // Accessibility...
         if (options.UseAccessibility && method != null)
         {
             if (method.IsPublic && !iface) sb.Append("public ");
@@ -143,12 +143,13 @@ public static partial class EasyNameExtensions
             if (method.IsFamilyAndAssembly) sb.Append("private protected ");
         }
 
-        // NOTE: The 'partial' keyword is a compilation-time only feature, not persisted once the
-        // source code is compiled. It seems there is no way to obtain this information by only
-        // using reflection.
+        /* NOTE: 'partial' is a compilation-time only feature, not persisted once the source code
+         * is compiled. It seems there is no way to obtain this information using reflections. In
+         * any case, in this scenario, is not as bad as it sound.
+         */
 
         // Modifiers...
-        if (options.UseModifiers && method != null)
+        if (method != null && options.UseModifiers)
         {
             if (method.IsStatic) sb.Append("static ");
             if (method.IsAbstract && !iface) sb.Append("abstract ");
@@ -159,51 +160,55 @@ public static partial class EasyNameExtensions
             else if (IsNew()) sb.Append("new ");
         }
 
-        // Member type..
-        if (options.MemberTypeOptions != null)
+        // Member type...
+        if (method != null && options.MemberTypeOptions != null)
         {
             var xoptions = options.MemberTypeOptions;
-            var type = source.PropertyType;
-            var str = type.EasyName(xoptions);
+            var arg = source.PropertyType;
+            var str = arg.EasyName(xoptions);
 
             if (str.Length > 0)
             {
-                // ref-alike return types (emitting on 'sb' on purpose)...
-                if (options.UseModifiers)
-                {
-                    if (method != null && method.ReturnType.IsByRef)
-                    {
-                        var ronly = method.ReturnTypeCustomAttributes.HasReadOnlyAttribute();
-                        sb.Append(ronly ? "ref readonly " : "ref ");
-                    }
-                    else if (options.UseModifiers && type.IsByRef) // Fall-back
-                    {
-                        var ronly = type.HasReadOnlyAttribute();
-                        sb.Append(ronly ? "ref readonly " : "ref ");
-                    }
-                }
-
                 // Nullability...
-                while (str[^1] != '?')
-                {
-                    if (type.IsCoreNullable() &&
-                        xoptions.NullableStyle == EasyNullableStyle.KeepWrappers) break;
+                var pointer = str.EndsWith('*');
+                if (pointer) str = str[..^1].NotNullNotEmpty(trim: false);
 
-                    // Property instances ARE sensible to nullability API, so use it...
+                while (str[^1] != '?' && xoptions.NullableStyle != EasyNullableStyle.None)
+                {
+                    if (xoptions.NullableStyle == EasyNullableStyle.KeepWrappers &&
+                        arg.IsNullableWrapper() &&
+                        !arg.IsArray && !arg.IsPointer) break;
+
+                    if (arg.IsNullableAnnotated()) { str += '?'; break; }
                     if (source.IsNullableAnnotated()) { str += '?'; break; }
                     break;
                 }
-
-                // Adding...
-                sb.Append(str).Append(' ');
+                if (pointer) str += '*'; // Don't forget to restore pointer!
             }
+
+            // Ref-alike types (using method first, arg as a fallback)...
+            if (options.UseModifiers)
+            {
+                if (method != null && method.ReturnType.IsByRef)
+                {
+                    var ronly = method.ReturnTypeCustomAttributes.HasReadOnlyAttribute();
+                    sb.Append(ronly ? "ref readonly " : "ref ");
+                }
+                else if (options.UseModifiers && arg.IsByRef)
+                {
+                    var ronly = arg.HasReadOnlyAttribute();
+                    sb.Append(ronly ? "ref readonly " : "ref ");
+                }
+            }
+
+            // Adding...
+            sb.Append(str).Append(' ');
         }
 
         // Host type...
         if (options.HostTypeOptions != null && host != null)
         {
-            var xoptions = options.HostTypeOptions;
-            var str = host.EasyName(xoptions);
+            var str = host.EasyName(options.HostTypeOptions);
             if (str.Length > 0) sb.Append(str).Append('.');
         }
 

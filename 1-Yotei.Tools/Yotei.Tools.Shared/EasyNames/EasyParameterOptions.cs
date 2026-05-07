@@ -88,7 +88,6 @@ public record EasyParameterOptions
     public static EasyParameterOptions Full => new(Mode.Full);
 }
 
-
 // ========================================================
 public static partial class EasyNameExtensions
 {
@@ -119,31 +118,30 @@ public static partial class EasyNameExtensions
         if (options.TypeOptions != null)
         {
             var xoptions = options.TypeOptions;
-            var type = source.ParameterType;
-            var str = type.EasyName(xoptions);
+            var arg = source.ParameterType;
+            var str = arg.EasyName(xoptions);
 
-            // Nullability...
-            while (str.Length > 0 && str[^1] != '?')
+            if (str.Length > 0)
             {
-                // Case when CoreNullable, KeepWrappers, and params is nullable, then we need to
-                // add an extra annotation (ie: 'params int?[]? items').
-                if (type.IsCoreNullable() &&
-                    xoptions.NullableStyle == EasyNullableStyle.KeepWrappers &&
-                    source.IsDefined(typeof(ParamArrayAttribute), false) &&
-                    source.IsNullableAnnotated())
-                { str += '?'; break; }
+                // Nullability...
+                var pointer = str.EndsWith('*');
+                if (pointer) str = str[..^1].NotNullNotEmpty(trim: false);
 
-                // Other cases...
-                if (type.IsCoreNullable() &&
-                    xoptions.NullableStyle == EasyNullableStyle.KeepWrappers) break;
+                while (str[^1] != '?' && xoptions.NullableStyle != EasyNullableStyle.None)
+                {
+                    if (xoptions.NullableStyle == EasyNullableStyle.KeepWrappers &&
+                        arg.IsNullableWrapper() &&
+                        !arg.IsArray && !arg.IsPointer) break;
 
-                // Parameter instances are sensible to the nullability API...
-                if (source.IsNullableAnnotated()) { str += '?'; break; }
-                break;
+                    if (arg.IsNullableAnnotated()) { str += '?'; break; }
+                    if (source.IsNullableAnnotated()) { str += '?'; break; }
+                    break;
+                }
+                if (pointer) str += '*'; // Don't forget to restore pointer!
+
+                // Adding...
+                sb.Append(str); // No additional space!
             }
-
-            // Adding...
-            sb.Append(str);
         }
 
         // Parameter name (only if requested)...
