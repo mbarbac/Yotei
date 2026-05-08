@@ -1,3 +1,8 @@
+ESTOY:
+- EasyNames, Probando tanto Type como TypeSymbol
+- Tema: public partial Type {...}: el modificador partial verificar que funciona.
+
+
 PROBLEMA-2:
 - En IListTemplate<T>, método Remove(Predicate<T> predicate)
 - Me devuelve la parte del parametro como 'Predicate<?>' que obviamente no es correcto.

@@ -280,6 +280,7 @@ public static partial class EasyNameExtensions
         {
             var xoptions = options.GenericListOptions;
             var args = source.GetGenericArguments();
+
             if (args.Length > 0)
             {
                 sb.Append('<'); for (int i = 0; i < args.Length; i++)

@@ -290,7 +290,7 @@ public static partial class EasyNameExtensions
             StringBuilder sb, Type source, EasyTypeOptions options,
             string? xname,
             Type? host,
-            bool isgen /*= false*/)
+            bool isgen)
         {
             if (xname != null) return;
             if (host != null) return;
@@ -337,8 +337,7 @@ public static partial class EasyNameExtensions
 
             if (options.RemoveAttributeSuffix &&
                 name != ATTRIBUTE &&
-                name.EndsWith(ATTRIBUTE))
-                name = name.RemoveLast(ATTRIBUTE).ToString();
+                name.EndsWith(ATTRIBUTE)) name = name.RemoveLast(ATTRIBUTE).ToString();
 
             sb.Append(name);
         }

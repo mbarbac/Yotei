@@ -22,16 +22,30 @@ public class CloneGenerator : TreeGenerator
     {
         var node = base.CaptureNode(context, token);
 
-        if (node is PropertyNode xnode &&
-            xnode.Symbol.Name == "Name") // DEBUG-ONLY
+        if (node is TypeNode tnode) // DEBUG-ONLY
         {
-            var source = xnode.Symbol.Type;
-            var options = EasyTypeOptions.DefaultEx;
-            var str = source.EasyName(options);
+            string str;
+            EasyTypeOptions options;
+            var source = tnode.Symbol;
 
-            options = EasyTypeOptions.Full;
-            str = source.EasyName(options);
+            options = EasyTypeOptions.Empty; str = source.EasyName(options); Debug.WriteLine(str);
+            options = EasyTypeOptions.Default; str = source.EasyName(options); Debug.WriteLine(str);
+            options = EasyTypeOptions.DefaultEx; str = source.EasyName(options); Debug.WriteLine(str);
+            options = EasyTypeOptions.Full; str = source.EasyName(options); Debug.WriteLine(str);
         }
+
+        if (node is MethodNode mnode) // DEBUG-ONLY
+        {
+            string str;
+            EasyMethodOptions options;
+            var source = mnode.Symbol;
+
+            options = EasyMethodOptions.Empty; str = source.EasyName(options); Debug.WriteLine(str);
+            options = EasyMethodOptions.Default; str = source.EasyName(options); Debug.WriteLine(str);
+            options = EasyMethodOptions.DefaultEx; str = source.EasyName(options); Debug.WriteLine(str);
+            options = EasyMethodOptions.Full; str = source.EasyName(options); Debug.WriteLine(str);
+        }
+
         return node;
     }
 }

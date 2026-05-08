@@ -1,6 +1,4 @@
-﻿using System.Reflection.Metadata;
-
-namespace Yotei.Tools.Generators;
+﻿namespace Yotei.Tools.Generators;
 
 // ========================================================
 public static partial class RoslynNamesExtensions
@@ -25,127 +23,238 @@ public static partial class RoslynNamesExtensions
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(options);
 
-        // Intercepting placeholders...
-        if (options.UsePlaceHolder) return string.Empty;
-
         /* NOTE: When a type has a generic argument as in 'typeof(Predicate<>)', the T-alike
          * element is, for whatever reasons, an 'IErrorTypeSymbol'. As it happens it implements
          * 'INamedTypeSymbol' we can simply ignore.
          */
 
-        // Intercepting special types...
-        switch (source)
-        {
-            case IArrayTypeSymbol item: return EasyNameTypeArray(item, options);
-            case IPointerTypeSymbol item: return EasyNameTypePointer(item, options);
-        }
+        // Shortcuts...
+        if (options.UsePlaceHolder) return string.Empty;
+        if (source is IArrayTypeSymbol array) return WhenArray(array, options);
+        if (source is IPointerTypeSymbol pointer) return WhenPointer(pointer, options);
+        if (source.IsNullableWrapper()) return WhenWrapper(source, options);
 
-        // Processing...
-        var sb = new StringBuilder();        
+        // Standard case...
+        var sb = new StringBuilder();
         var named = source as INamedTypeSymbol;
         var args = named is null ? [] : named.TypeArguments;
         var host = source.ContainingType;
         var isgen = source.IsGenericAlike();
         var xname = options.UseSpecialNames ? source.ToSpecialName() : null;
 
-        // Intercepting wrappers...
-        if (source.IsNullableWrapper())
+        AddVariance(sb, source, options);
+        AddNamespace(sb, source, options, xname, host, isgen);
+        AddHost(sb, host, options, xname, isgen);
+        AddName(sb, source, options, xname);
+        AddGenerics(sb, source, options, args, xname, host);
+        AddNullability(sb, source, options);
+        return sb.ToString();
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Invoked when the source is an array-like type.
+        /// </summary>
+        static string WhenArray(IArrayTypeSymbol source, EasyTypeOptions options)
         {
+            var arg = source.ElementType;
+            var str = arg.EasyName(options);
+            if (str.Length == 0) return string.Empty;
+
+            var rank = source.Rank;
+            str = $"{str}[{new string(',', rank - 1)}]";
+
+            var sb = new StringBuilder();
+            AddVariance(sb, source, options);
+            sb.Append(str);
+            AddNullability(sb, source, options);
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Invoked when the source is an pointer-like type.
+        /// Note that pointers do not allow nullable annotations (such as 'int*?), but yes they
+        /// can point to a nullable type ('int?*').
+        /// </summary>
+        static string WhenPointer(IPointerTypeSymbol source, EasyTypeOptions options)
+        {
+            var arg = source.PointedAtType;
+            var str = arg.EasyName(options);
+            if (str.Length == 0) return string.Empty;
+
+            var sb = new StringBuilder();
+            AddVariance(sb, source, options);
+            sb.Append(str);
+            sb.Append('*');
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Invoked when the source is a nullable wrapper.
+        /// </summary>
+        static string WhenWrapper(ITypeSymbol temp, EasyTypeOptions options)
+        {
+            var source = (INamedTypeSymbol)temp;
+            var args = source.TypeArguments;
+
             if (options.NullableStyle == EasyNullableStyle.UseAnnotations)
             {
                 var arg = args[0];
                 var str = arg.EasyName(options);
-                if (str.Length > 0 && str[^1] != '?') str += '?';
-                return str;
+                if (str.Length == 0) return string.Empty;
+
+                var sb = new StringBuilder();
+                AddVariance(sb, source, options); if (sb.Length > 0) sb.Append(' ');
+                sb.Append(str);
+                if (sb[^1] != '?') sb.Append('?');
+                AddNullability(sb, source, options);
+                return sb.ToString();
             }
-            if (options.NullableStyle == EasyNullableStyle.KeepWrappers)
+            else if (options.NullableStyle == EasyNullableStyle.KeepWrappers)
             {
                 var arg = args[0];
                 var str = arg.EasyName(options);
+                if (str.Length == 0) return string.Empty;
 
-                var xoptions = options with { GenericListOptions = null };
-                source = source.OriginalDefinition;
+                var sb = new StringBuilder();
+                AddVariance(sb, source, options);
+                var name = GetNullableWrapperName(source, options);
+                sb.Append($"{name}<{str}>");
+                AddNullability(sb, source, options);
+                return sb.ToString();
+            }
+            else return GetNullableWrapperName(source, options);
+        }
 
-                TryAddVariance(sb, source, options);
-                TryAddNamespace(sb, source, options, xname, host, isgen);
-                TryAddHost(sb, host, options, xname, isgen);
-                TryAddName(sb, source, options, xname);
-                str = $"{sb}<{str}>";
+        // Q&D way of obtaining the envelop's name...
+        static string GetNullableWrapperName(ITypeSymbol source, EasyTypeOptions options)
+        {
+            var expand = options.NamespaceStyle != EasyNamespaceStyle.None;
+            var global = options.NamespaceStyle == EasyNamespaceStyle.UseGlobal;
+
+            var name = source.IsCoreNullable()
+                ? (expand ? "System.Nullable" : "Nullable")
+                : (expand ? "Yotei.Tools.IsNullable" : "IsNullable");
+
+            if (global) name = $"global::{name}";
+            return name;
+        }
+
+        /// <summary>
+        /// Invoked to add the type's variance (the 'in' and 'out' keywords).
+        /// </summary>
+        static void AddVariance(StringBuilder sb, ITypeSymbol source, EasyTypeOptions options)
+        {
+            if (!options.UseVariance) return;
+            if (source is not ITypeParameterSymbol par) return;
+
+            switch (par.Variance)
+            {
+                case VarianceKind.Out: sb.Append("out "); break;
+                case VarianceKind.In: sb.Append("in "); break;
+            }
+        }
+
+        /// <summary>
+        /// Invoked to add the type's namespace.
+        /// </summary>
+        static void AddNamespace(
+            StringBuilder sb, ITypeSymbol source, EasyTypeOptions options,
+            string? xname,
+            INamedTypeSymbol? host,
+            bool isgen)
+        {
+            if (xname != null) return;
+            if (host != null) return;
+            if (isgen) return;
+            if (options.NamespaceStyle == EasyNamespaceStyle.None) return;
+
+            var ns = source.ContainingNamespace;
+            var str = ns == null ? null : ComputeNamespace(ns, options);
+            if (str == null || str.Length == 0) return;
+
+            if (options.NamespaceStyle == EasyNamespaceStyle.UseGlobal) sb.Append("global::");
+            sb.Append(str).Append('.');
+        }
+
+        // Computes the namespace using the given options (without 'global').
+        static string? ComputeNamespace(INamespaceSymbol source, EasyTypeOptions options)
+        {
+            var names = new List<string>();
+            var node = (ISymbol?)source;
+
+            while (node != null) // Using the node as the first one, even if its name may be null...
+            {
+                if (node is INamespaceSymbol ns &&
+                    ns.Name != null &&
+                    ns.Name.Length > 0) names.Add(ns.Name);
+
+                node = node.ContainingSymbol;
+            }
+
+            if (names.Count == 0) return null; // Return 'null' if no one was found.
+            else
+            {
+                names.Reverse();
+                var str = string.Join(".", names);
                 return str;
             }
         }
 
-        // Variance...
-        TryAddVariance(sb, source, options);
-        static void TryAddVariance(
-            StringBuilder sb,
-            ITypeSymbol source, EasyTypeOptions options)
+        /// <summary>
+        /// Invoked to add the type's host.
+        /// </summary>
+        static void AddHost(
+            StringBuilder sb, INamedTypeSymbol? host, EasyTypeOptions options,
+            string? xname,
+            bool isgen)
         {
-            if (options.UseVariance && source is ITypeParameterSymbol par)
-            {
-                switch (par.Variance)
-                {
-                    case VarianceKind.Out: sb.Append("out "); break;
-                    case VarianceKind.In: sb.Append("in "); break;
-                }
-            }
+            if (xname != null) return;
+            if (host == null) return;
+            if (isgen) return;
+            if (!options.UseHost && options.NamespaceStyle == EasyNamespaceStyle.None) return;
+
+            var str = host.EasyName(options);
+            if (str.Length > 0) sb.Append(str).Append('.');
         }
 
-        // Namespace...
-        TryAddNamespace(sb, source, options, xname, host, isgen);
-        static void TryAddNamespace(
-            StringBuilder sb,
-            ITypeSymbol source, EasyTypeOptions options, string? xname, ITypeSymbol host, bool isgen)
+        /// <summary>
+        /// Invoked to add the type's name.
+        /// It looks like that 'SymbolDisplayMiscellaneousOptions.RemoveAttributeSuffix' only
+        /// works under very restrictive circumstances, and not in the general case. So, we
+        /// cannot use it.
+        /// </summary>
+        static void AddName(
+            StringBuilder sb, ITypeSymbol source, EasyTypeOptions options,
+            string? xname)
         {
-            if (options.NamespaceStyle != EasyNamespaceStyle.None &&
-                xname == null &&
-                host == null && !isgen)
-            {
-                var ns = source.ContainingNamespace;
-                var str = ns == null ? null : EasyNamespace(ns, options);
-                if (str != null && str.Length > 0) sb.Append(str).Append('.');
-            }
+            if (xname != null) { sb.Append(xname); return; }
+
+            //var misc = default(SymbolDisplayMiscellaneousOptions);
+            //if (options.UseSpecialNames) misc |= SymbolDisplayMiscellaneousOptions.UseSpecialTypes;
+            //var format = new SymbolDisplayFormat(miscellaneousOptions: misc);
+            //var str = source.ToDisplayString(format);
+
+            var str = source.Name;
+            if (options.RemoveAttributeSuffix &&
+                str != ATTRIBUTE &&
+                str.EndsWith(ATTRIBUTE)) str = str.RemoveLast(ATTRIBUTE).ToString();
+
+            sb.Append(str);
         }
 
-        // Host...
-        TryAddHost(sb, host, options, xname, isgen);
-        static void TryAddHost(
-            StringBuilder sb,
-            ITypeSymbol host, EasyTypeOptions options, string? xname, bool isgen)
+        /// <summary>
+        /// Invoked to add the type's generic type arguments.
+        /// </summary>
+        static void AddGenerics(
+            StringBuilder sb, ITypeSymbol source, EasyTypeOptions options,
+            ImmutableArray<ITypeSymbol> args,
+            string? xname,
+            INamedTypeSymbol? host)
         {
-            if ((options.UseHost || options.NamespaceStyle != EasyNamespaceStyle.None) &&
-                xname == null &&
-                host != null && !isgen)
-            {
-                var str = host.EasyName(options);
-                if (str.Length > 0) sb.Append(str).Append('.');
-            }
-        }
-
-        // Name...
-        TryAddName(sb, source, options, xname);
-        static void TryAddName(
-            StringBuilder sb,
-            ITypeSymbol source, EasyTypeOptions options, string? xname)
-        {
-            if (xname != null) sb.Append(xname);
-            else
-            {
-                var misc = default(SymbolDisplayMiscellaneousOptions);
-                if (options.UseSpecialNames) misc |= SymbolDisplayMiscellaneousOptions.UseSpecialTypes;
-                if (options.RemoveAttributeSuffix) misc |= SymbolDisplayMiscellaneousOptions.RemoveAttributeSuffix;
-
-                var format = new SymbolDisplayFormat(miscellaneousOptions: misc);
-                var str = source.ToDisplayString(format);
-                sb.Append(str);
-            }
-        }
-
-        // Generic parameters...
-        while (xname == null && args.Length > 0 && options.GenericListOptions != null)
-        {
-            if (source.IsNullableWrapper() &&
-                options.NullableStyle == EasyNullableStyle.KeepWrappers) break;
+            if (args.Length == 0) return;
+            if (xname != null) return;
+            if (options.GenericListOptions == null) return;
 
             var xoptions = options.GenericListOptions;
             sb.Append('<'); for (int i = 0; i < args.Length; i++)
@@ -156,107 +265,20 @@ public static partial class RoslynNamesExtensions
                 sb.Append(str);
             }
             sb.Append('>');
-            break;
         }
 
-        // Nullability...
-        while (options.NullableStyle != EasyNullableStyle.None &&
-            sb.Length > 0 &&
-            sb[^1] != '?')
+        /// <summary>
+        /// Invoked as the last chance to add the type's nullability.
+        /// </summary>
+        static void AddNullability(StringBuilder sb, ITypeSymbol source, EasyTypeOptions options)
         {
-            if (source.IsNullableWrapper()) // Special case...
-            {
-                if (options.NullableStyle == EasyNullableStyle.KeepWrappers)
-                { if (xname != null) { sb.Append('?'); break; } }
-            }
+            if (sb.Length == 0 || sb[^1] == '?') return;
+            if (options.NullableStyle == EasyNullableStyle.None) return;
 
-            if (source.IsNullableAnnotated()) { sb.Append('?'); break; }
-            break;
+            if (source.IsNullableWrapper() &&
+                options.NullableStyle == EasyNullableStyle.KeepWrappers) return;
+
+            if (source.IsNullableAnnotated()) { sb.Append('?'); return; }
         }
-
-        // Finishing...
-        return sb.ToString();
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Invoked when the symbol is a namespace, may return null.
-    /// </summary>
-    static string? EasyNamespace(this INamespaceSymbol source, EasyTypeOptions options)
-    {
-        var names = new List<string>();
-        var node = (ISymbol?)source;
-
-        while (node != null) // Using the given one as the first element...
-        {
-            if (node is INamespaceSymbol ns &&
-                ns.Name != null &&
-                ns.Name.Length > 0) names.Add(ns.Name);
-
-            node = node.ContainingSymbol;
-        }
-
-        if (names.Count == 0) return null; // Return 'null' if no one was found.
-        else
-        {
-            names.Reverse();
-
-            var str = string.Join(".", names);
-            if (options.NamespaceStyle == EasyNamespaceStyle.UseGlobal) str = $"global::{str}";
-            return str;
-        }
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Invoked when the symbol is an array (ie: string?[]?).
-    /// </summary>
-    static string EasyNameTypeArray(this IArrayTypeSymbol source, EasyTypeOptions options)
-    {
-        var type = source.ElementType;
-        var name = EasyName(type, options);
-
-        name = $"{name}[{new string(',', source.Rank - 1)}]";
-
-        if (!name.EndsWith('?') &&
-            options.NullableStyle == EasyNullableStyle.UseAnnotations)
-        {
-            if (source.NullableAnnotation == NullableAnnotation.Annotated) return name + '?';
-
-            if (source.GetAttributes().Any(x =>
-                x.AttributeClass?.Name
-                is (nameof(IsNullableAttribute)
-                or (nameof(NullableAttribute))))) return name + '?';
-            
-        }
-        return name;
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Invoked when the symbol is a pointer (ie: int*).
-    /// </summary>
-    static string EasyNameTypePointer(this IPointerTypeSymbol source, EasyTypeOptions options)
-    {
-        var type = source.PointedAtType;
-        var name = EasyName(type, options);
-
-        if (!name.EndsWith('?') &&
-            options.NullableStyle == EasyNullableStyle.UseAnnotations)
-        {
-            if (source.NullableAnnotation == NullableAnnotation.Annotated) return name + '?';
-
-            if (source.GetAttributes().Any(x =>
-                x.AttributeClass?.Name
-                is (nameof(IsNullableAttribute)
-                or (nameof(NullableAttribute))))) return name + '?';
-
-        }
-
-        name += '*';
-        return name;
     }
 }

@@ -8,6 +8,7 @@
 		<Nullable>enable</Nullable>
 		<IsPackable>false</IsPackable>
 		<NoWarn>IDE0130</NoWarn>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 	<!--IDE0130: Namespace does not match folder structure-->
 

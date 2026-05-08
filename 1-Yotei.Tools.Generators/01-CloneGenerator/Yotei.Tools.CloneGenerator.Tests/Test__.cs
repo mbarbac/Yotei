@@ -11,9 +11,8 @@
 //    }
 //}
 
-
-public interface IFake
+[Cloneable]
+public partial class TFoo<T>
 {
-    [Cloneable]
-    public string?[]? Name { get; }
+    partial void Name();
 }
