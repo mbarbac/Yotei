@@ -19,6 +19,17 @@ public record EasyTypeOptions
     public bool UseVariance { get; set; }
 
     /// <summary>
+    /// If enabled, then use the accessibility modifiers, if any.
+    /// </summary>
+    public bool UseAccessibility { get; set; }
+
+    /// <summary>
+    /// If enabled, then use the method's modifiers (such as static, abstract, virtual, override,
+    /// new, and ref-alike ones). Otherwise, they are ignored.
+    /// </summary>
+    public bool UseModifiers { get; set; }
+
+    /// <summary>
     /// The style to use to obtain the namespace, if any, of the given type.
     /// <br/> A not-empty value of this property implies <see cref="UseHost"/>.
     /// </summary>
@@ -57,11 +68,13 @@ public record EasyTypeOptions
 
     // ----------------------------------------------------
 
-    public enum Mode { Empty, Default, DefaultEx, Full };
+    public enum Mode { Empty, Default, Full };
     EasyTypeOptions(Mode mode)
     {
         UsePlaceHolder = false;
         UseVariance = false;
+        UseAccessibility = false;
+        UseModifiers = false;
         NamespaceStyle = EasyNamespaceStyle.None;
         UseHost = false;
         UseSpecialNames = true;
@@ -71,16 +84,10 @@ public record EasyTypeOptions
 
         switch (mode)
         {
-            case Mode.Default:
-                RemoveAttributeSuffix = true;
-                UseSpecialNames = true;
-                NullableStyle = EasyNullableStyle.UseAnnotations;
-                GenericListOptions = this;
+            case Mode.Empty:
                 break;
 
-            case Mode.DefaultEx:
-                NamespaceStyle = EasyNamespaceStyle.Default;
-                UseHost = true;
+            case Mode.Default:
                 RemoveAttributeSuffix = true;
                 UseSpecialNames = true;
                 NullableStyle = EasyNullableStyle.UseAnnotations;

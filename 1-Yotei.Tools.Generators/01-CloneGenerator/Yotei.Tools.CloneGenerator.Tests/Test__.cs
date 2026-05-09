@@ -12,7 +12,4 @@
 //}
 
 [Cloneable]
-public partial class TFoo<T>
-{
-    partial void Name();
-}
+public partial class TFoo<T> { }
