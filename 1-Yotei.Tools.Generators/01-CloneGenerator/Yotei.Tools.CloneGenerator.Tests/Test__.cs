@@ -11,5 +11,7 @@
 //    }
 //}
 
-[Cloneable]
-public partial class TFoo<T> { }
+//[Cloneable]
+//public partial class TFoo<T> { }
+
+public interface IFake { }
