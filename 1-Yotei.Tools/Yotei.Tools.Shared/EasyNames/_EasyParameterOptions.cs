@@ -6,6 +6,28 @@
 /// </summary>
 public sealed record EasyParameterOptions
 {
+    /// <summary>
+    /// If enabled, and if the given parameter is the first one of an extension method, then use
+    /// the 'this' prefix.
+    /// </summary>
+    public bool UseThis { get; set; }
+
+    /// <summary>
+    /// If enabled, then use the parameter modifiers (such as: params, scoped, ref, in, out...)
+    /// if any.
+    /// </summary>
+    public bool UseModifiers { get; set; }
+
+    /// <summary>
+    /// If not null, then the options to use to obtain the easy name of the parameter's type.
+    /// If null, then the type is ignored.
+    /// </summary>
+    public EasyTypeOptions? TypeOptions { get; set; }
+
+    /// <summary>
+    /// If enabled, then use the parameter's name. Otherwise, it is ignored.
+    /// </summary>
+    public bool UseName { get; set; }
 
     // ----------------------------------------------------
 
@@ -13,12 +35,36 @@ public sealed record EasyParameterOptions
     public enum Mode { Empty, Default, Full };
     EasyParameterOptions(Mode mode)
     {
+        UseThis = false;
+        UseModifiers = false;
+        TypeOptions = null;
+        UseName = false;
+
         switch (mode)
         {
+            case Mode.Empty:
+                UseName = true;
+                break;
+
             case Mode.Default:
+                UseThis = true;
+                UseModifiers = true;
+                TypeOptions = EasyTypeOptions.Default.WithRecursive(
+                    useVariance: false,
+                    useAccessibility: false,
+                    useModifiers: false,
+                    useKind: false);
                 break;
 
             case Mode.Full:
+                UseThis = true;
+                UseModifiers = true;
+                TypeOptions = EasyTypeOptions.Full.WithRecursive(
+                    useVariance: false,
+                    useAccessibility: false,
+                    useModifiers: false,
+                    useKind: false);
+                UseName = true;
                 break;
         }
     }

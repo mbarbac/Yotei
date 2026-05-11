@@ -1,0 +1,141 @@
+﻿namespace Yotei.Tools.Tests.EasyNames;
+
+// ========================================================
+//[Enforced]
+public static class Test_EasyParameter
+{
+    interface IFace1a { void Method(params int?[]? items); }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Params_ValueType()
+    {
+        EasyParameterOptions options;
+        string name;
+        var type = typeof(IFace1a);
+        var method = type.GetMethod("Method")!;
+        var source = method.GetParameters()[0];
+
+        options = EasyParameterOptions.Empty;
+        name = source.EasyName(options); Assert.Equal("items", name);
+
+        options = EasyParameterOptions.Default;
+        name = source.EasyName(options); Assert.Equal("params int?[]?", name);
+
+        options.TypeOptions = options.TypeOptions! with { NamespaceStyle = EasyNamespaceStyle.Default };
+        name = source.EasyName(options); Assert.Equal("params int?[]?", name);
+
+        options = EasyParameterOptions.Full;
+        name = source.EasyName(options);
+        Assert.Equal("params System.Nullable<System.Int32>[]? items", name);
+    }
+
+    // ----------------------------------------------------
+
+    interface IFace1b
+    {
+        void Method1(params string?[]? items);
+        void Method2(params IsNullable<string?>[]? items);
+        void Method3([IsNullable] params string?[]? items);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Params_ReferenceType_ElementNullability_Lost()
+    {
+        EasyParameterOptions options;
+        string name;
+        var type = typeof(IFace1b);
+        var method = type.GetMethod("Method1")!;
+        var source = method.GetParameters()[0];
+
+        options = EasyParameterOptions.Empty;
+        name = source.EasyName(options); Assert.Equal("items", name);
+
+        options = EasyParameterOptions.Default;
+        name = source.EasyName(options); Assert.Equal("params string[]?", name);
+
+        options.TypeOptions = options.TypeOptions! with { NamespaceStyle = EasyNamespaceStyle.Default };
+        name = source.EasyName(options); Assert.Equal("params string[]?", name);
+
+        options = EasyParameterOptions.Full;
+        name = source.EasyName(options);
+        Assert.Equal("params System.String[]? items", name);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Params_ReferenceType_ElementNullabilityWrapped()
+    {
+        EasyParameterOptions options;
+        string name;
+        var type = typeof(IFace1b);
+        var method = type.GetMethod("Method2")!;
+        var source = method.GetParameters()[0];
+
+        options = EasyParameterOptions.Empty;
+        name = source.EasyName(options); Assert.Equal("items", name);
+
+        options = EasyParameterOptions.Default;
+        name = source.EasyName(options); Assert.Equal("params string?[]?", name);
+
+        options.TypeOptions = options.TypeOptions! with { NamespaceStyle = EasyNamespaceStyle.Default };
+        name = source.EasyName(options); Assert.Equal("params string?[]?", name);
+
+        options = EasyParameterOptions.Full;
+        name = source.EasyName(options);
+        Assert.Equal("params Yotei.Tools.IsNullable<System.String>[]? items", name);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Params_ReferenceType_ElementNullabilityDecorated_Lost()
+    {
+        EasyParameterOptions options;
+        string name;
+        var type = typeof(IFace1b);
+        var method = type.GetMethod("Method3")!;
+        var source = method.GetParameters()[0];
+
+        options = EasyParameterOptions.Empty;
+        name = source.EasyName(options); Assert.Equal("items", name);
+
+        options = EasyParameterOptions.Default;
+        name = source.EasyName(options); Assert.Equal("params string[]?", name);
+
+        options.TypeOptions = options.TypeOptions! with { NamespaceStyle = EasyNamespaceStyle.Default };
+        name = source.EasyName(options); Assert.Equal("params string[]?", name);
+
+        options = EasyParameterOptions.Full;
+        name = source.EasyName(options);
+        Assert.Equal("params System.String[]? items", name);
+    }
+
+    // ----------------------------------------------------
+
+    interface IFace2 { void Method(scoped Span<int> items); }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Scoped()
+    {
+        EasyParameterOptions options;
+        string name;
+        var type = typeof(IFace2);
+        var method = type.GetMethod("Method")!;
+        var source = method.GetParameters()[0];
+
+        options = EasyParameterOptions.Empty;
+        name = source.EasyName(options); Assert.Equal("items", name);
+
+        options = EasyParameterOptions.Default;
+        name = source.EasyName(options); Assert.Equal("scoped Span<int>", name);
+
+        options.TypeOptions = options.TypeOptions! with { NamespaceStyle = EasyNamespaceStyle.Default };
+        name = source.EasyName(options); Assert.Equal("scoped System.Span<int>", name);
+
+        options = EasyParameterOptions.Full;
+        name = source.EasyName(options);
+        Assert.Equal("scoped System.Span<System.Int32> items", name);
+    }
+}
