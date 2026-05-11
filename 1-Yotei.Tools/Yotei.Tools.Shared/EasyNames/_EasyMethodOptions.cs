@@ -1,0 +1,48 @@
+﻿namespace Yotei.Tools;
+
+// ========================================================
+/// <summary>
+/// Describes how to obtain a C#-alike representation of a given method-alike element.
+/// </summary>
+public sealed record EasyMethodOptions
+{
+
+    // ----------------------------------------------------
+
+    // Internal constructor
+    public enum Mode { Empty, Default, Full };
+    EasyMethodOptions(Mode mode)
+    {
+        switch (mode)
+        {
+            case Mode.Default:
+                break;
+
+            case Mode.Full:
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Initializes a new empty instance.
+    /// </summary>
+    public EasyMethodOptions() : this(Mode.Empty) { }
+
+    /// <summary>
+    /// Obtains a new instance with empty-alike values that obtains the bare minimum display
+    /// string.
+    /// </summary>
+    public static EasyMethodOptions Empty => new(Mode.Empty);
+
+    /// <summary>
+    /// Obtains a new instance with default-alike values that obtains the most common display
+    /// string, without any modifiers.
+    /// </summary>
+    public static EasyMethodOptions Default => new(Mode.Default);
+
+    /// <summary>
+    /// Obtains a new instance with full-alike values that obtains a full display string including
+    /// its modifiers and wrappers.
+    /// </summary>
+    public static EasyMethodOptions Full => new(Mode.Full);
+}

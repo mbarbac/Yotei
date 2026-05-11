@@ -22,5 +22,4 @@
 /// </para>
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public class IsNullable<T>
-{ }
+public sealed class IsNullable<T> { }

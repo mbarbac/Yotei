@@ -143,66 +143,60 @@ public sealed record EasyTypeOptions
 
     /// <summary>
     /// Obtains a new instance with full-alike values that obtains a full display string including
-    /// its kind and modifiers.
+    /// its kind, modifiers and wrappers.
     /// </summary>
     public static EasyTypeOptions Full => new(Mode.Full);
 
     // ----------------------------------------------------
 
-    // Copy constructor
-    public EasyTypeOptions(EasyTypeOptions source)
-    {
-        Id = Interlocked.Increment(ref LastId);
-        UsePlaceHolder = source.UsePlaceHolder;
-        UseVariance = source.UseVariance;
-        UseAccessibility = source.UseAccessibility;
-        UseModifiers = source.UseModifiers;
-        UseKind = source.UseKind;
-        NamespaceStyle = source.NamespaceStyle;
-        UseHost = source.UseHost;
-        UseSpecialNames = source.UseSpecialNames;
-        RemoveAttributeSuffix = source.RemoveAttributeSuffix;
-        NullableStyle = source.NullableStyle;
-        GenericListOptions =
-            source.GenericListOptions == null ? null :
-            ReferenceEquals(source, source.GenericListOptions) ? this :
-            new(source.GenericListOptions);
-    }
-
     /// <summary>
     /// Returns a new EasyTypeOptions instance whose prefix-related values have been updated with
-    /// the new given values, provided they are not null ones. If not changes are required, then
-    /// the original instance is returned. If recursive is enabled, then these updates are also
-    /// applied to any nested GenericListOptions, unless the nested option itself is null.
+    /// the new given values, provided they are not null ones. If no changes are required, then
+    /// the original instance is returned.
     /// </summary>
-    /// <param name="recursive"></param>
+    /// <param name="usePlaceHolder"></param>
     /// <param name="useVariance"></param>
     /// <param name="useAccessibility"></param>
     /// <param name="useModifiers"></param>
     /// <param name="useKind"></param>
+    /// <param name="namespaceStyle"></param>
+    /// <param name="useHost"></param>
+    /// <param name="useSpecialNames"></param>
+    /// <param name="removeAttributeSuffix"></param>
+    /// <param name="nullableStyle"></param>
     /// <returns></returns>
-    public EasyTypeOptions WithPrefixes(bool recursive,
-        bool? useVariance = false,
-        bool? useAccessibility = false,
-        bool? useModifiers = false,
-        bool? useKind = false)
+    public EasyTypeOptions WithRecursive(
+        bool? usePlaceHolder = null,
+        bool? useVariance = null,
+        bool? useAccessibility = null,
+        bool? useModifiers = null,
+        bool? useKind = null,
+        EasyNamespaceStyle? namespaceStyle = null,
+        bool? useHost = null,
+        bool? useSpecialNames = null,
+        bool? removeAttributeSuffix = null,
+        EasyNullableStyle? nullableStyle = null)
     {
         var options = TryChanges(
             this,
-            useVariance, useAccessibility, useModifiers, useKind);
+            usePlaceHolder, useVariance, useAccessibility, useModifiers, useKind,
+            namespaceStyle, useHost, useSpecialNames, removeAttributeSuffix, nullableStyle);
 
         var item = options;
-        while (recursive)
+        while (true)
         {
             if (item.GenericListOptions == null) break;
             if (ReferenceEquals(item, item.GenericListOptions)) break;
 
             var temp = TryChanges(
                 item.GenericListOptions,
-                useVariance, useAccessibility, useModifiers, useKind);
+                usePlaceHolder, useVariance, useAccessibility, useModifiers, useKind,
+                namespaceStyle, useHost, useSpecialNames, removeAttributeSuffix, nullableStyle);
 
-            if (ReferenceEquals(item.GenericListOptions, temp)) break;
+            var same = ReferenceEquals(temp, item.GenericListOptions);
+
             item.GenericListOptions = temp;
+            if (same) break;
             item = temp;
         }
 
@@ -214,26 +208,71 @@ public sealed record EasyTypeOptions
         /// otherwise.
         /// </summary>
         static EasyTypeOptions TryChanges(EasyTypeOptions options,
-            bool? useVariance = false,
-            bool? useAccessibility = false,
-            bool? useModifiers = false,
-            bool? useKind = false)
+            bool? usePlaceHolder = null,
+            bool? useVariance = null,
+            bool? useAccessibility = null,
+            bool? useModifiers = null,
+            bool? useKind = null,
+            EasyNamespaceStyle? namespaceStyle = null,
+            bool? useHost = null,
+            bool? useSpecialNames = null,
+            bool? removeAttributeSuffix = null,
+            EasyNullableStyle? nullableStyle = null)
         {
-            if ((useVariance.HasValue && options.UseVariance != useVariance.Value) ||
+            if ((usePlaceHolder.HasValue && options.UsePlaceHolder != usePlaceHolder.Value) ||
+                (useVariance.HasValue && options.UseVariance != useVariance.Value) ||
                 (useAccessibility.HasValue && options.UseAccessibility != useAccessibility.Value) ||
                 (useModifiers.HasValue && options.UseModifiers != useModifiers.Value) ||
-                (useKind.HasValue && options.UseKind != useKind.Value))
+                (useKind.HasValue && options.UseKind != useKind.Value) ||
+                (namespaceStyle.HasValue && options.NamespaceStyle != namespaceStyle.Value) ||
+                (useHost.HasValue && options.UseHost != useHost.Value) ||
+                (useSpecialNames.HasValue && options.UseSpecialNames != useSpecialNames.Value) ||
+                (removeAttributeSuffix.HasValue && options.RemoveAttributeSuffix != removeAttributeSuffix.Value) ||
+                (nullableStyle.HasValue && options.NullableStyle != nullableStyle.Value))
             {
-                var xoptions = new EasyTypeOptions(options);
+                var xoptions = NewInstance(options);
 
                 if (useVariance.HasValue) xoptions.UseVariance = useVariance.Value;
                 if (useAccessibility.HasValue) xoptions.UseAccessibility = useAccessibility.Value;
                 if (useModifiers.HasValue) xoptions.UseModifiers = useModifiers.Value;
                 if (useKind.HasValue) xoptions.UseKind = useKind.Value;
+                if (namespaceStyle.HasValue) xoptions.NamespaceStyle = namespaceStyle.Value;
+                if (useHost.HasValue) xoptions.UseHost = useHost.Value;
+                if (useSpecialNames.HasValue) xoptions.UseSpecialNames = useSpecialNames.Value;
+                if (removeAttributeSuffix.HasValue) xoptions.RemoveAttributeSuffix = removeAttributeSuffix.Value;
+                if (nullableStyle.HasValue) xoptions.NullableStyle = nullableStyle.Value;
+
                 return xoptions;
             }
 
             return options;
+        }
+
+        /// <summary>
+        /// Obtains a new instance copying all the source values except the 'Id'.
+        /// </summary>
+        static EasyTypeOptions NewInstance(EasyTypeOptions source)
+        {
+            var item = source with { };
+
+            item.Id = Interlocked.Increment(ref LastId);
+            item.UsePlaceHolder = source.UsePlaceHolder;
+            item.UseVariance = source.UseVariance;
+            item.UseAccessibility = source.UseAccessibility;
+            item.UseModifiers = source.UseModifiers;
+            item.UseKind = source.UseKind;
+            item.NamespaceStyle = source.NamespaceStyle;
+            item.UseHost = source.UseHost;
+            item.UseSpecialNames = source.UseSpecialNames;
+            item.RemoveAttributeSuffix = source.RemoveAttributeSuffix;
+            item.NullableStyle = source.NullableStyle;
+
+            item.GenericListOptions =
+                source.GenericListOptions == null ? null :
+                ReferenceEquals(source, source.GenericListOptions) ? item :
+                NewInstance(source.GenericListOptions);
+
+            return item;
         }
     }
 }

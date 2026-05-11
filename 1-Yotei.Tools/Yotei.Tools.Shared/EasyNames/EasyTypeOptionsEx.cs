@@ -4,14 +4,14 @@
 public static partial class EasyNameExtensions
 {
     /// <summary>
-    /// Obtains a C#-alike representation for a given type-alike element, using default options.
+    /// Obtains a C#-alike representation for a given element, using default options.
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
     public static string EasyName(this Type source) => source.EasyName(EasyTypeOptions.Default);
 
     /// <summary>
-    /// Obtains a C#-alike representation for a given type-alike element, using the given options.
+    /// Obtains a C#-alike representation for a given element, using the given options.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="options"></param>
@@ -67,7 +67,12 @@ public static partial class EasyNameExtensions
         /// </summary>
         static string WhenArray(Type source, EasyTypeOptions options)
         {
-            var xoptions = options.WithPrefixes(true, false, false, false, false);
+            var xoptions = options.WithRecursive(
+                useVariance: false,
+                useAccessibility: false,
+                useModifiers: false,
+                useKind: false);
+
             var arg = source.GetElementType()!;
             var str = arg.EasyName(xoptions);
             if (str.Length == 0) return string.Empty;
@@ -94,13 +99,15 @@ public static partial class EasyNameExtensions
         /// </summary>
         static string WhenPointer(Type source, EasyTypeOptions options)
         {
-            var xoptions = options.WithPrefixes(true, false, false, false, false);
+            var xoptions = options.WithRecursive(
+                useVariance: false,
+                useAccessibility: false,
+                useModifiers: false,
+                useKind: false);
+
             var arg = source.GetElementType()!;
             var str = arg.EasyName(xoptions);
             if (str.Length == 0) return string.Empty;
-
-            var rank = source.GetArrayRank();
-            str = $"{str}[{new string(',', rank - 1)}]";
 
             var sb = new StringBuilder();
             AddVariance(sb, source, options);
@@ -120,7 +127,12 @@ public static partial class EasyNameExtensions
         {
             if (options.NullableStyle == EasyNullableStyle.UseAnnotations)
             {
-                var xoptions = options.WithPrefixes(true, false, false, false, false);
+                var xoptions = options.WithRecursive(
+                    useVariance: false,
+                    useAccessibility: false,
+                    useModifiers: false,
+                    useKind: false);
+
                 var arg = source.GetGenericArguments()[0];
                 var str = arg.EasyName(xoptions);
                 if (str.Length == 0) return string.Empty;
@@ -139,7 +151,12 @@ public static partial class EasyNameExtensions
             }
             else if (options.NullableStyle == EasyNullableStyle.KeepWrappers)
             {
-                var xoptions = options.WithPrefixes(true, false, false, false, false);
+                var xoptions = options.WithRecursive(
+                    useVariance: false,
+                    useAccessibility: false,
+                    useModifiers: false,
+                    useKind: false);
+
                 var arg = source.GetGenericArguments()[0];
                 var str = arg.EasyName(xoptions);
                 if (str.Length == 0) return string.Empty;
@@ -217,12 +234,13 @@ public static partial class EasyNameExtensions
             if (!options.UseModifiers) return;
 
             if (source.IsAbstract && source.IsSealed) { sb.Append("static "); return; }
-            if (source.IsAbstract) { sb.Append("abstract "); return; }
+            if (source.IsAbstract && !source.IsInterface) { sb.Append("abstract "); return; }
             if (source.IsSealed && !source.IsValueType) { sb.Append("sealed "); return; }
         }
 
         /// <summary>
         /// Invoked to add the element's kind.
+        /// Supports: enum, interface, struct, record struct, class, record class, and delegate.
         /// </summary>
         static void AddKind(StringBuilder sb, Type source, EasyTypeOptions options)
         {
@@ -280,8 +298,7 @@ public static partial class EasyNameExtensions
                 xname != null ||
                 (!options.UseHost && options.NamespaceStyle == EasyNamespaceStyle.None)) return;
 
-            var xoptions = options.WithPrefixes(
-                recursive: true,
+            var xoptions = options.WithRecursive(
                 useVariance: false,
                 useAccessibility: false,
                 useModifiers: false,
@@ -322,8 +339,7 @@ public static partial class EasyNameExtensions
             if (xname != null ||
                 options.GenericListOptions == null) return;
 
-            var xoptions = options.GenericListOptions.WithPrefixes(
-                recursive: true,
+            var xoptions = options.GenericListOptions.WithRecursive(
                 useAccessibility: false,
                 useModifiers: false,
                 useKind: false);
