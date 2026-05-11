@@ -1,12 +1,10 @@
-﻿using System.Net;
-
-namespace Yotei.Tools;
+﻿namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>
 /// Describes how to obtain a C#-alike representation of a given type-alike element.
 /// </summary>
-public record EasyTypeOptions
+public sealed record EasyTypeOptions
 {
     /// <summary>
     /// If enabled, then the returned easy name will always be an empty one. This setting is
@@ -79,9 +77,19 @@ public record EasyTypeOptions
 
     // ----------------------------------------------------
 
+    static long LastId = 0;
+    long Id;
+
+    // Mostly for debug purposes
+    public override string ToString() => GenericListOptions == null
+        ? $"#{Id}"
+        : $"#{Id}({GenericListOptions.Id})";
+
+    // Internal constructor
     public enum Mode { Empty, Default, Full };
     EasyTypeOptions(Mode mode)
     {
+        Id = Interlocked.Increment(ref LastId);
         UsePlaceHolder = false;
         UseVariance = false;
         UseAccessibility = false;
@@ -138,56 +146,94 @@ public record EasyTypeOptions
     /// its kind and modifiers.
     /// </summary>
     public static EasyTypeOptions Full => new(Mode.Full);
-}
 
-// ========================================================
-public static partial class EasyNameExtensions
-{
+    // ----------------------------------------------------
+
+    // Copy constructor
+    public EasyTypeOptions(EasyTypeOptions source)
+    {
+        Id = Interlocked.Increment(ref LastId);
+        UsePlaceHolder = source.UsePlaceHolder;
+        UseVariance = source.UseVariance;
+        UseAccessibility = source.UseAccessibility;
+        UseModifiers = source.UseModifiers;
+        UseKind = source.UseKind;
+        NamespaceStyle = source.NamespaceStyle;
+        UseHost = source.UseHost;
+        UseSpecialNames = source.UseSpecialNames;
+        RemoveAttributeSuffix = source.RemoveAttributeSuffix;
+        NullableStyle = source.NullableStyle;
+        GenericListOptions =
+            source.GenericListOptions == null ? null :
+            ReferenceEquals(source, source.GenericListOptions) ? this :
+            new(source.GenericListOptions);
+    }
+
     /// <summary>
-    /// Returns a new EasyTypeOptions instance with updated prefix-related options, provided the
-    /// given values are not null ones. This method does not modify the original EasyTypeOptions
-    /// instance unless no changes are required. When recursive is true, the specified options are
-    /// also applied recursively to any nested GenericListOptions.
+    /// Returns a new EasyTypeOptions instance whose prefix-related values have been updated with
+    /// the new given values, provided they are not null ones. If not changes are required, then
+    /// the original instance is returned. If recursive is enabled, then these updates are also
+    /// applied to any nested GenericListOptions, unless the nested option itself is null.
     /// </summary>
-    /// <param name="options">The EasyTypeOptions instance to modify.</param>
-    /// <param name="recursive">true to apply the specified prefix options recursively to any nested generic list options; otherwise, false.</param>
-    /// <param name="useVariance">Specifies whether to enable or disable variance prefixes. If null, the current setting is retained.</param>
-    /// <param name="useAccessibility">Specifies whether to enable or disable accessibility prefixes. If null, the current setting is retained.</param>
-    /// <param name="useModifiers">Specifies whether to enable or disable modifier prefixes. If null, the current setting is retained.</param>
-    /// <param name="useKind">Specifies whether to enable or disable kind prefixes. If null, the current setting is retained.</param>
-    /// <returns>A new EasyTypeOptions instance with the specified prefix options applied. If no changes are made, returns the
-    /// original instance.</returns>
-    /// <exception cref="UnExpectedException">Thrown if an unexpected error occurs while creating a new EasyTypeOptions instance.</exception>
-    public static EasyTypeOptions WithPrefixes(this EasyTypeOptions options, bool recursive,
+    /// <param name="recursive"></param>
+    /// <param name="useVariance"></param>
+    /// <param name="useAccessibility"></param>
+    /// <param name="useModifiers"></param>
+    /// <param name="useKind"></param>
+    /// <returns></returns>
+    public EasyTypeOptions WithPrefixes(bool recursive,
         bool? useVariance = false,
         bool? useAccessibility = false,
         bool? useModifiers = false,
         bool? useKind = false)
     {
-        if ((!useVariance.HasValue || (options.UseVariance == useVariance.Value)) &&
-            (!useAccessibility.HasValue || (options.UseAccessibility == useAccessibility.Value)) &&
-            (!useModifiers.HasValue || (options.UseModifiers == useModifiers.Value)) &&
-            (!useKind.HasValue || (options.UseKind == useKind.Value)))
+        var options = TryChanges(
+            this,
+            useVariance, useAccessibility, useModifiers, useKind);
+
+        var item = options;
+        while (recursive)
+        {
+            if (item.GenericListOptions == null) break;
+            if (ReferenceEquals(item, item.GenericListOptions)) break;
+
+            var temp = TryChanges(
+                item.GenericListOptions,
+                useVariance, useAccessibility, useModifiers, useKind);
+
+            if (ReferenceEquals(item.GenericListOptions, temp)) break;
+            item.GenericListOptions = temp;
+            item = temp;
+        }
+
+        return options;
+
+        /// <summary>
+        /// Tries to apply the requested changes (if not null) to the given instance. Returns
+        /// a new modified instance if any changes have been applied, or the original instance
+        /// otherwise.
+        /// </summary>
+        static EasyTypeOptions TryChanges(EasyTypeOptions options,
+            bool? useVariance = false,
+            bool? useAccessibility = false,
+            bool? useModifiers = false,
+            bool? useKind = false)
+        {
+            if ((useVariance.HasValue && options.UseVariance != useVariance.Value) ||
+                (useAccessibility.HasValue && options.UseAccessibility != useAccessibility.Value) ||
+                (useModifiers.HasValue && options.UseModifiers != useModifiers.Value) ||
+                (useKind.HasValue && options.UseKind != useKind.Value))
+            {
+                var xoptions = new EasyTypeOptions(options);
+
+                if (useVariance.HasValue) xoptions.UseVariance = useVariance.Value;
+                if (useAccessibility.HasValue) xoptions.UseAccessibility = useAccessibility.Value;
+                if (useModifiers.HasValue) xoptions.UseModifiers = useModifiers.Value;
+                if (useKind.HasValue) xoptions.UseKind = useKind.Value;
+                return xoptions;
+            }
+
             return options;
-
-        var xoptions = options with { };
-        if (ReferenceEquals(options, xoptions)) throw new UnExpectedException();
-
-        if (useVariance.HasValue) xoptions.UseVariance = useVariance.Value;
-        if (useAccessibility.HasValue) xoptions.UseAccessibility= useAccessibility.Value;
-        if (useModifiers.HasValue) xoptions.UseModifiers= useModifiers.Value;
-        if (useKind.HasValue) xoptions.UseKind= useKind.Value;
-
-        if (recursive &&
-            options.GenericListOptions != null &&
-            !ReferenceEquals(options, options.GenericListOptions))
-            options.GenericListOptions = options.GenericListOptions.WithPrefixes(
-                recursive,
-                useVariance,
-                useAccessibility,
-                useModifiers,
-                useKind);
-
-        return xoptions;
+        }
     }
 }

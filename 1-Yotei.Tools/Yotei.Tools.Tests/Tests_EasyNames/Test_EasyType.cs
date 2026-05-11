@@ -4,19 +4,45 @@
 //[Enforced]
 public static class Test_EasyType
 {
-    public sealed class Pepito<T> { }
-    internal record SType<K, T> { }
+    const string PREFIX = "Yotei.Tools.Tests.EasyNames.Test_EasyType";
+
+    // ----------------------------------------------------
 
     //[Enforced]
     [Fact]
-    public static void Test()
+    public static void Test_Special_ValueType()
     {
         EasyTypeOptions options;
         string name;
-        var source = typeof(SType<int, Pepito<string>>);
+        var source = typeof(int);
 
-        options = EasyTypeOptions.Empty; name = source.EasyName(options); Assert.NotNull(name);
-        options = EasyTypeOptions.Default; name = source.EasyName(options); Assert.NotNull(name);
-        options = EasyTypeOptions.Full; name = source.EasyName(options); Assert.NotNull(name);
+        options = EasyTypeOptions.Empty;
+        name = source.EasyName(options); Assert.Equal("Int32", name);
+
+        options = EasyTypeOptions.Default;
+        name = source.EasyName(options); Assert.Equal("int", name);
+
+        options = EasyTypeOptions.Full;
+        name = source.EasyName(options);
+        Assert.Equal("public struct System.Int32", name);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Special_ValueType_Annotated()
+    {
+        EasyTypeOptions options;
+        string name;
+        var source = typeof(int?);
+
+        options = EasyTypeOptions.Empty;
+        name = source.EasyName(options); Assert.Equal("Nullable", name);
+
+        options = EasyTypeOptions.Default;
+        name = source.EasyName(options); Assert.Equal("int?", name);
+
+        options = EasyTypeOptions.Full;
+        name = source.EasyName(options);
+        Assert.Equal("public struct System.Nullable<System.Int32>", name);
     }
 }

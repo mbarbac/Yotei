@@ -67,8 +67,9 @@ public static partial class EasyNameExtensions
         /// </summary>
         static string WhenArray(Type source, EasyTypeOptions options)
         {
+            var xoptions = options.WithPrefixes(true, false, false, false, false);
             var arg = source.GetElementType()!;
-            var str = arg.EasyName(options);
+            var str = arg.EasyName(xoptions);
             if (str.Length == 0) return string.Empty;
 
             var rank = source.GetArrayRank();
@@ -79,7 +80,7 @@ public static partial class EasyNameExtensions
             AddAccessibility(sb, source, options);
             AddModifiers(sb, source, options);
             AddKind(sb, source, options);
-            if (sb.Length > 0) sb.Append(' ');
+            if (sb.Length > 0 && sb[^1] != ' ') sb.Append(' ');
 
             sb.Append(str);
             AddNullability(sb, source, options);
@@ -93,8 +94,9 @@ public static partial class EasyNameExtensions
         /// </summary>
         static string WhenPointer(Type source, EasyTypeOptions options)
         {
+            var xoptions = options.WithPrefixes(true, false, false, false, false);
             var arg = source.GetElementType()!;
-            var str = arg.EasyName(options);
+            var str = arg.EasyName(xoptions);
             if (str.Length == 0) return string.Empty;
 
             var rank = source.GetArrayRank();
@@ -105,7 +107,7 @@ public static partial class EasyNameExtensions
             AddAccessibility(sb, source, options);
             AddModifiers(sb, source, options);
             AddKind(sb, source, options);
-            if (sb.Length > 0) sb.Append(' ');
+            if (sb.Length > 0 && sb[^1] != ' ') sb.Append(' ');
 
             sb.Append(str).Append('*');
             return sb.ToString();
@@ -118,8 +120,9 @@ public static partial class EasyNameExtensions
         {
             if (options.NullableStyle == EasyNullableStyle.UseAnnotations)
             {
+                var xoptions = options.WithPrefixes(true, false, false, false, false);
                 var arg = source.GetGenericArguments()[0];
-                var str = arg.EasyName(options);
+                var str = arg.EasyName(xoptions);
                 if (str.Length == 0) return string.Empty;
 
                 var sb = new StringBuilder();
@@ -127,7 +130,7 @@ public static partial class EasyNameExtensions
                 AddAccessibility(sb, source, options);
                 AddModifiers(sb, source, options);
                 AddKind(sb, source, options);
-                if (sb.Length > 0) sb.Append(' ');
+                if (sb.Length > 0 && sb[^1] != ' ') sb.Append(' ');
 
                 sb.Append(str);
                 if (sb[^1] != '?') sb.Append('?');
@@ -136,8 +139,9 @@ public static partial class EasyNameExtensions
             }
             else if (options.NullableStyle == EasyNullableStyle.KeepWrappers)
             {
+                var xoptions = options.WithPrefixes(true, false, false, false, false);
                 var arg = source.GetGenericArguments()[0];
-                var str = arg.EasyName(options);
+                var str = arg.EasyName(xoptions);
                 if (str.Length == 0) return string.Empty;
 
                 var sb = new StringBuilder();
@@ -145,7 +149,7 @@ public static partial class EasyNameExtensions
                 AddAccessibility(sb, source, options);
                 AddModifiers(sb, source, options);
                 AddKind(sb, source, options);
-                if (sb.Length > 0) sb.Append(' ');
+                if (sb.Length > 0 && sb[^1] != ' ') sb.Append(' ');
 
                 var name = GetNullableWrapperName(source, options);
                 sb.Append($"{name}<{str}>");
