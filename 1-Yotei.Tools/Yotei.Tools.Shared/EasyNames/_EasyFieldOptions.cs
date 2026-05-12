@@ -36,13 +36,12 @@ public sealed record EasyFieldOptions
 
     /// <summary>
     /// Obtains a new instance with default-alike values that obtains the most common display
-    /// string, without any modifiers.
+    /// string.
     /// </summary>
     public static EasyFieldOptions Default => new(Mode.Default);
 
     /// <summary>
-    /// Obtains a new instance with full-alike values that obtains a full display string including
-    /// its modifiers and wrappers.
+    /// Obtains a new instance with full-alike values that obtains a full display string.
     /// </summary>
     public static EasyFieldOptions Full => new(Mode.Full);
 }

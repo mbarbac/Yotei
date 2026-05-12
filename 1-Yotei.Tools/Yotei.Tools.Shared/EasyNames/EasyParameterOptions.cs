@@ -49,21 +49,13 @@ public sealed record EasyParameterOptions
             case Mode.Default:
                 UseThis = true;
                 UseModifiers = true;
-                TypeOptions = EasyTypeOptions.Default.WithRecursive(
-                    useVariance: false,
-                    useAccessibility: false,
-                    useModifiers: false,
-                    useKind: false);
+                TypeOptions = EasyTypeOptions.Default;
                 break;
 
             case Mode.Full:
                 UseThis = true;
                 UseModifiers = true;
-                TypeOptions = EasyTypeOptions.Full.WithRecursive(
-                    useVariance: false,
-                    useAccessibility: false,
-                    useModifiers: false,
-                    useKind: false);
+                TypeOptions = EasyTypeOptions.Full;
                 UseName = true;
                 break;
         }
@@ -82,13 +74,12 @@ public sealed record EasyParameterOptions
 
     /// <summary>
     /// Obtains a new instance with default-alike values that obtains the most common display
-    /// string, without any modifiers.
+    /// string,.
     /// </summary>
     public static EasyParameterOptions Default => new(Mode.Default);
 
     /// <summary>
-    /// Obtains a new instance with full-alike values that obtains a full display string including
-    /// its modifiers and wrappers.
+    /// Obtains a new instance with full-alike values that obtains a full display string.
     /// </summary>
     public static EasyParameterOptions Full => new(Mode.Full);
 }

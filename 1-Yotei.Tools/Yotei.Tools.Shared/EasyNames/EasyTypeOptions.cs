@@ -4,6 +4,7 @@
 /// <summary>
 /// Describes how to obtain a C#-alike representation of a given type-alike element.
 /// </summary>
+[DebuggerDisplay("{ToDebugString()}")]
 public sealed record EasyTypeOptions
 {
     /// <summary>
@@ -77,15 +78,23 @@ public sealed record EasyTypeOptions
 
     // ----------------------------------------------------
 
+    /// <summary>
+    /// The id of this instance, for DEBUG purposes only.
+    /// </summary>
+    public long Id { get; private set; }
     static long LastId = 0;
-    long Id;
 
-    // Mostly for debug purposes
-    public override string ToString() => GenericListOptions == null
+    /// <summary>
+    /// Obtains a string representation of this instance for DEBUG purposes.
+    /// </summary>
+    /// <returns></returns>
+    public string ToDebugString() => GenericListOptions == null
         ? $"#{Id}"
         : $"#{Id}({GenericListOptions.Id})";
 
-    // Internal constructor
+    /// <summary>
+    /// Internal constructor section.
+    /// </summary>
     public enum Mode { Empty, Default, Full };
     EasyTypeOptions(Mode mode)
     {
@@ -137,22 +146,21 @@ public sealed record EasyTypeOptions
 
     /// <summary>
     /// Obtains a new instance with default-alike values that obtains the most common display
-    /// string, without any modifiers.
+    /// string.
     /// </summary>
     public static EasyTypeOptions Default => new(Mode.Default);
 
     /// <summary>
-    /// Obtains a new instance with full-alike values that obtains a full display string including
-    /// its kind, modifiers and wrappers.
+    /// Obtains a new instance with full-alike values that obtains a full display string.
     /// </summary>
     public static EasyTypeOptions Full => new(Mode.Full);
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a new EasyTypeOptions instance whose prefix-related values have been updated with
-    /// the new given values, provided they are not null ones. If no changes are required, then
-    /// the original instance is returned.
+    /// Returns a new instance where the given values (provided they are not null-ones) have been
+    /// recursively applied to this instance and to its <see cref="GenericListOptions"/> value, if
+    /// not null. If no changes are required, then the original instance is returned.
     /// </summary>
     /// <param name="usePlaceHolder"></param>
     /// <param name="useVariance"></param>
@@ -177,102 +185,81 @@ public sealed record EasyTypeOptions
         bool? removeAttributeSuffix = null,
         EasyNullableStyle? nullableStyle = null)
     {
-        var options = TryChanges(
-            this,
-            usePlaceHolder, useVariance, useAccessibility, useModifiers, useKind,
-            namespaceStyle, useHost, useSpecialNames, removeAttributeSuffix, nullableStyle);
+        var options = this;
+        var changed = false;
 
-        var item = options;
+        // Validating values on this instance...
+        if ((usePlaceHolder.HasValue && options.UsePlaceHolder != usePlaceHolder.Value) ||
+            (useVariance.HasValue && options.UseVariance != useVariance.Value) ||
+            (useAccessibility.HasValue && options.UseAccessibility != useAccessibility.Value) ||
+            (useModifiers.HasValue && options.UseModifiers != useModifiers.Value) ||
+            (useKind.HasValue && options.UseKind != useKind.Value) ||
+            (namespaceStyle.HasValue && options.NamespaceStyle != namespaceStyle.Value) ||
+            (useHost.HasValue && options.UseHost != useHost.Value) ||
+            (useSpecialNames.HasValue && options.UseSpecialNames != useSpecialNames.Value) ||
+            (removeAttributeSuffix.HasValue && options.RemoveAttributeSuffix != removeAttributeSuffix.Value) ||
+            (nullableStyle.HasValue && options.NullableStyle != nullableStyle.Value))
+        {
+            options = NewInstance(options);
+            changed = true;
+
+            if (usePlaceHolder.HasValue) options.UsePlaceHolder = usePlaceHolder.Value;
+            if (useVariance.HasValue) options.UseVariance = useVariance.Value;
+            if (useAccessibility.HasValue) options.UseAccessibility = useAccessibility.Value;
+            if (useModifiers.HasValue) options.UseModifiers = useModifiers.Value;
+            if (useKind.HasValue) options.UseKind = useKind.Value;
+            if (namespaceStyle.HasValue) options.NamespaceStyle = namespaceStyle.Value;
+            if (useHost.HasValue) options.UseHost = useHost.Value;
+            if (useSpecialNames.HasValue) options.UseSpecialNames = useSpecialNames.Value;
+            if (removeAttributeSuffix.HasValue) options.RemoveAttributeSuffix = removeAttributeSuffix.Value;
+            if (nullableStyle.HasValue) options.NullableStyle = nullableStyle.Value;
+        }
+
+        // Dealing with recursion...
         while (true)
         {
-            if (item.GenericListOptions == null) break;
-            if (ReferenceEquals(item, item.GenericListOptions)) break;
+            if (options.GenericListOptions == null) break;
+            if (ReferenceEquals(options, options.GenericListOptions)) break;
 
-            var temp = TryChanges(
-                item.GenericListOptions,
+            var temp = options.GenericListOptions.WithRecursive(
                 usePlaceHolder, useVariance, useAccessibility, useModifiers, useKind,
                 namespaceStyle, useHost, useSpecialNames, removeAttributeSuffix, nullableStyle);
 
-            var same = ReferenceEquals(temp, item.GenericListOptions);
-
-            item.GenericListOptions = temp;
-            if (same) break;
-            item = temp;
-        }
-
-        return options;
-
-        /// <summary>
-        /// Tries to apply the requested changes (if not null) to the given instance. Returns
-        /// a new modified instance if any changes have been applied, or the original instance
-        /// otherwise.
-        /// </summary>
-        static EasyTypeOptions TryChanges(EasyTypeOptions options,
-            bool? usePlaceHolder = null,
-            bool? useVariance = null,
-            bool? useAccessibility = null,
-            bool? useModifiers = null,
-            bool? useKind = null,
-            EasyNamespaceStyle? namespaceStyle = null,
-            bool? useHost = null,
-            bool? useSpecialNames = null,
-            bool? removeAttributeSuffix = null,
-            EasyNullableStyle? nullableStyle = null)
-        {
-            if ((usePlaceHolder.HasValue && options.UsePlaceHolder != usePlaceHolder.Value) ||
-                (useVariance.HasValue && options.UseVariance != useVariance.Value) ||
-                (useAccessibility.HasValue && options.UseAccessibility != useAccessibility.Value) ||
-                (useModifiers.HasValue && options.UseModifiers != useModifiers.Value) ||
-                (useKind.HasValue && options.UseKind != useKind.Value) ||
-                (namespaceStyle.HasValue && options.NamespaceStyle != namespaceStyle.Value) ||
-                (useHost.HasValue && options.UseHost != useHost.Value) ||
-                (useSpecialNames.HasValue && options.UseSpecialNames != useSpecialNames.Value) ||
-                (removeAttributeSuffix.HasValue && options.RemoveAttributeSuffix != removeAttributeSuffix.Value) ||
-                (nullableStyle.HasValue && options.NullableStyle != nullableStyle.Value))
+            if (!ReferenceEquals(temp, options.GenericListOptions))
             {
-                var xoptions = NewInstance(options);
-
-                if (useVariance.HasValue) xoptions.UseVariance = useVariance.Value;
-                if (useAccessibility.HasValue) xoptions.UseAccessibility = useAccessibility.Value;
-                if (useModifiers.HasValue) xoptions.UseModifiers = useModifiers.Value;
-                if (useKind.HasValue) xoptions.UseKind = useKind.Value;
-                if (namespaceStyle.HasValue) xoptions.NamespaceStyle = namespaceStyle.Value;
-                if (useHost.HasValue) xoptions.UseHost = useHost.Value;
-                if (useSpecialNames.HasValue) xoptions.UseSpecialNames = useSpecialNames.Value;
-                if (removeAttributeSuffix.HasValue) xoptions.RemoveAttributeSuffix = removeAttributeSuffix.Value;
-                if (nullableStyle.HasValue) xoptions.NullableStyle = nullableStyle.Value;
-
-                return xoptions;
+                if (!changed) options = NewInstance(options);
+                options.GenericListOptions = temp;
             }
 
-            return options;
+            break;
         }
 
-        /// <summary>
-        /// Obtains a new instance copying all the source values except the 'Id'.
-        /// </summary>
+        // Finishing...
+        return options;
+
+        // Obtains a new instance that is a copy of the source one, but with the Id increased.
         static EasyTypeOptions NewInstance(EasyTypeOptions source)
         {
-            var item = source with { };
+            var options = source with { };
 
-            item.Id = Interlocked.Increment(ref LastId);
-            item.UsePlaceHolder = source.UsePlaceHolder;
-            item.UseVariance = source.UseVariance;
-            item.UseAccessibility = source.UseAccessibility;
-            item.UseModifiers = source.UseModifiers;
-            item.UseKind = source.UseKind;
-            item.NamespaceStyle = source.NamespaceStyle;
-            item.UseHost = source.UseHost;
-            item.UseSpecialNames = source.UseSpecialNames;
-            item.RemoveAttributeSuffix = source.RemoveAttributeSuffix;
-            item.NullableStyle = source.NullableStyle;
+            options.Id = Interlocked.Increment(ref LastId);
+            options.UsePlaceHolder = source.UsePlaceHolder;
+            options.UseVariance = source.UseVariance;
+            options.UseAccessibility = source.UseAccessibility;
+            options.UseModifiers = source.UseModifiers;
+            options.UseKind = source.UseKind;
+            options.NamespaceStyle = source.NamespaceStyle;
+            options.UseHost = source.UseHost;
+            options.UseSpecialNames = source.UseSpecialNames;
+            options.RemoveAttributeSuffix = source.RemoveAttributeSuffix;
+            options.NullableStyle = source.NullableStyle;
 
-            item.GenericListOptions =
+            options.GenericListOptions =
                 source.GenericListOptions == null ? null :
-                ReferenceEquals(source, source.GenericListOptions) ? item :
+                ReferenceEquals(source, source.GenericListOptions) ? options :
                 NewInstance(source.GenericListOptions);
 
-            return item;
+            return options;
         }
     }
 }

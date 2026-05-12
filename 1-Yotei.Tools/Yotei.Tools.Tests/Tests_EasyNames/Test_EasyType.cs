@@ -17,6 +17,55 @@ public static class Test_EasyType
 
     //[Enforced]
     [Fact]
+    public static void Test_WithRecursive()
+    {
+        EasyTypeOptions source, target;
+
+        source = EasyTypeOptions.Empty; target = source.WithRecursive(); Assert.Same(source, target);
+        source = EasyTypeOptions.Default; target = source.WithRecursive(); Assert.Same(source, target);
+        source = EasyTypeOptions.Full; target = source.WithRecursive(); Assert.Same(source, target);
+
+        source = EasyTypeOptions.Empty;
+        target = source.WithRecursive(usePlaceHolder: true);
+        Assert.NotSame(source, target);
+        Assert.True(target.UsePlaceHolder);
+        Assert.Null(target.GenericListOptions);
+
+        source = EasyTypeOptions.Default;
+        target = source.WithRecursive(usePlaceHolder: true);
+        Assert.NotSame(source, target);
+        Assert.True(target.UsePlaceHolder);
+        Assert.NotSame(source.GenericListOptions, target.GenericListOptions);
+        Assert.Same(target, target.GenericListOptions);
+
+        source = EasyTypeOptions.Full;
+        target = source.WithRecursive(usePlaceHolder: true);
+        Assert.NotSame(source, target);
+        Assert.True(target.UsePlaceHolder);
+        Assert.NotSame(source.GenericListOptions, target.GenericListOptions);
+        Assert.Same(target, target.GenericListOptions);
+
+        source = EasyTypeOptions.Full with { GenericListOptions = EasyTypeOptions.Default };
+        target = source.WithRecursive(usePlaceHolder: true);
+        Assert.NotSame(source, target);
+        Assert.True(target.UsePlaceHolder);
+        Assert.NotSame(source.GenericListOptions, target.GenericListOptions);
+        Assert.NotSame(target, target.GenericListOptions);
+        Assert.True(target.GenericListOptions!.UsePlaceHolder);
+
+        source = target;
+        target = source.WithRecursive(usePlaceHolder: false);
+        Assert.NotSame(source, target);
+        Assert.False(target.UsePlaceHolder);
+        Assert.NotSame(source.GenericListOptions, target.GenericListOptions);
+        Assert.NotSame(target, target.GenericListOptions);
+        Assert.False(target.GenericListOptions!.UsePlaceHolder);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
     public static void Test_Special_ValueType()
     {
         EasyTypeOptions options;
