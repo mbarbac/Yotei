@@ -31,6 +31,29 @@ public sealed record EasyParameterOptions
 
     // ----------------------------------------------------
 
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public override string ToString()
+    {
+        var num = 0;
+        var sb = new StringBuilder();
+        sb.Append('{');
+        if (UseThis) Append(nameof(UseThis));
+        if (UseModifiers) Append(nameof(UseModifiers));
+        if (TypeOptions != null) Append($"TypeOptions:{TypeOptions.Id}");
+        if (UseName) Append(nameof(UseName));
+        sb.Append(" }");
+        return sb.ToString();
+
+        void Append(string value)
+        {
+            if (num != 0) sb.Append(", "); num++;
+            sb.Append(value);
+        }
+    }
+
     // Internal constructor
     public enum Mode { Empty, Default, Full };
     EasyParameterOptions(Mode mode)

@@ -4,7 +4,6 @@
 /// <summary>
 /// Describes how to obtain a C#-alike representation of a given type-alike element.
 /// </summary>
-[DebuggerDisplay("{ToDebugString()}")]
 public sealed record EasyTypeOptions
 {
     /// <summary>
@@ -85,12 +84,34 @@ public sealed record EasyTypeOptions
     static long LastId = 0;
 
     /// <summary>
-    /// Obtains a string representation of this instance for DEBUG purposes.
+    /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public string ToDebugString() => GenericListOptions == null
-        ? $"#{Id}"
-        : $"#{Id}({GenericListOptions.Id})";
+    public override string ToString()
+    {
+        var num = 0;
+        var sb = new StringBuilder();
+        sb.Append($"#{Id}:{{");
+        if (UsePlaceHolder) Append(nameof(UsePlaceHolder));
+        if (UseVariance) Append(nameof(UseVariance));
+        if (UseAccessibility) Append(nameof(UseAccessibility));
+        if (UseModifiers) Append(nameof(UseModifiers));
+        if (UseKind) Append(nameof(UseKind));
+        if (NamespaceStyle != EasyNamespaceStyle.None) Append(NamespaceStyle.ToString());
+        if (UseHost) Append(nameof(UseHost));
+        if (UseSpecialNames) Append(nameof(UseSpecialNames));
+        if (RemoveAttributeSuffix) Append(nameof(RemoveAttributeSuffix));
+        if (NullableStyle != EasyNullableStyle.None) Append(NullableStyle.ToString());
+        if (GenericListOptions != null) Append($"GenericOptions:{GenericListOptions.Id}");
+        sb.Append(" }");
+        return sb.ToString();
+
+        void Append(string value)
+        {
+            if (num != 0) sb.Append(", "); num++;
+            sb.Append(value);
+        }
+    }
 
     /// <summary>
     /// Internal constructor section.

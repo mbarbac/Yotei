@@ -55,6 +55,33 @@ public sealed record EasyMethodOptions
 
     // ----------------------------------------------------
 
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public override string ToString()
+    {
+        var num = 0;
+        var sb = new StringBuilder();
+        sb.Append('{');
+        if (UseAccessibility) Append(nameof(UseAccessibility));
+        if (UseModifiers) Append(nameof(UseModifiers));
+        if (ReturnTypeOptions != null) Append($"ReturnOptions:{ReturnTypeOptions.Id}");
+        if (HostTypeOptions != null) Append($"HostOptions:{HostTypeOptions.Id}");
+        if (UseTechName) Append(nameof(UseTechName));
+        if (GenericListOptions != null) Append($"GenericOptions:{GenericListOptions.Id}");
+        if (UseBrackets) Append(nameof(UseBrackets));
+        if (ParameterOptions != null) Append($"ParameterOptions:{ParameterOptions}");
+        sb.Append(" }");
+        return sb.ToString();
+
+        void Append(string value)
+        {
+            if (num != 0) sb.Append(", "); num++;
+            sb.Append(value);
+        }
+    }
+
     // Internal constructor
     public enum Mode { Empty, Default, Full };
     EasyMethodOptions(Mode mode)
@@ -71,7 +98,6 @@ public sealed record EasyMethodOptions
         switch (mode)
         {
             case Mode.Default:
-                HostTypeOptions = EasyTypeOptions.Default;
                 GenericListOptions = EasyTypeOptions.Default;
                 UseBrackets = true;
                 ParameterOptions = EasyParameterOptions.Default;
