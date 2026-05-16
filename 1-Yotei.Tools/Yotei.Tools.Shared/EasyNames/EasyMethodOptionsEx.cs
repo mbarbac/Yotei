@@ -72,9 +72,14 @@ public static partial class EasyNameExtensions
         var iface = host != null && host.IsInterface;
 
         // Accessibility...
-        if (options.UseAccessibility)
+        AddAccessibility();
+        void AddAccessibility()
         {
+            if (!options.UseAccessibility) return;
+            if (constructor != null && source.IsStatic) return;
+
             if (source.IsPublic && !iface) sb.Append("public ");
+            if (source.IsPrivate) sb.Append("private ");
             if (source.IsFamily) sb.Append("protected ");
             if (source.IsAssembly) sb.Append("internal ");
             if (source.IsFamilyOrAssembly) sb.Append("internal protected ");
@@ -82,8 +87,11 @@ public static partial class EasyNameExtensions
         }
 
         // Modifiers...
-        if (options.UseModifiers)
+        AddModifiers();
+        void AddModifiers()
         {
+            if (!options.UseModifiers) return;
+
             if (source.IsStatic) sb.Append("static ");
             if (source.IsAbstract && !iface) sb.Append("abstract ");
             if (IsSealed()) sb.Append("sealed ");
@@ -124,6 +132,13 @@ public static partial class EasyNameExtensions
                     break;
                 }
                 if (pointer) str += '*'; // Restoring pointer...
+
+                // Modifiers...
+                if (options.UseModifiers && arg.IsByRef)
+                {
+                    var ronly = method.ReturnTypeCustomAttributes.HasReadOnlyAttribute();
+                    sb.Append(ronly ? "ref readonly " : "ref ");
+                }
 
                 // Adding...
                 sb.Append(str).Append(' ');

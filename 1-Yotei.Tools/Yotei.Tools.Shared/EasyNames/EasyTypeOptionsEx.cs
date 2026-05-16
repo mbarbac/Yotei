@@ -222,7 +222,9 @@ public static partial class EasyNameExtensions
             if (!options.UseAccessibility) return;
 
             if (source.IsPublic) { sb.Append("public "); return; }
+
             if (source.IsNestedPublic) { sb.Append("public "); return; }
+            if (source.IsNestedPrivate) { sb.Append("private "); return; }
             if (source.IsNestedFamily) { sb.Append("protected "); return; }
             if (source.IsNestedFamORAssem) { sb.Append("protected internal "); return; }
             if (source.IsNestedFamANDAssem) { sb.Append("private protected "); return; }
