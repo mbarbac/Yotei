@@ -11,7 +11,7 @@ public static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <returns></returns>
     public static string EasyName(
-        this MethodInfo source) => source.EasyName(EasyMethodOptions.Default);
+        this PropertyInfo source) => source.EasyName(EasyPropertyOptions.Default);
 
     /// <summary>
     /// Obtains a C#-alike representation for a given element, using the given options.
@@ -21,69 +21,29 @@ public static partial class EasyNameExtensions
     /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this MethodInfo source, EasyMethodOptions options)
+    public static string EasyName(this PropertyInfo source, EasyPropertyOptions options)
     {
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(options);
-
-        return EasyMethodBase(source, options);
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Obtains a C#-alike representation for a given element, using default options.
-    /// <br/> This method is just a best-effort one because there are syntax elements the compiler
-    /// does not keep from the source code.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <returns></returns>
-    public static string EasyName(
-        this ConstructorInfo source) => source.EasyName(EasyMethodOptions.Default);
-
-    /// <summary>
-    /// Obtains a C#-alike representation for a given element, using the given options.
-    /// <br/> This method is just a best-effort one because there are syntax elements the compiler
-    /// does not keep from the source code.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="options"></param>
-    /// <returns></returns>
-    public static string EasyName(this ConstructorInfo source, EasyMethodOptions options)
-    {
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(options);
-
-        return EasyMethodBase(source, options);
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Common code for regular methods and constructor ones.
-    /// </summary>
-    static string EasyMethodBase(this MethodBase source, EasyMethodOptions options)
-    {
-        var method = source as MethodInfo;
-        var constructor = source as ConstructorInfo;
 
         var sb = new StringBuilder();
         var host = source.DeclaringType;
         var iface = host != null && host.IsInterface;
+        var method = source.GetMethod ?? source.SetMethod;
 
         // Accessibility...
         AddAccessibility();
         void AddAccessibility()
         {
             if (!options.UseAccessibility) return;
-            if (constructor != null && source.IsStatic) return;
+            if (method == null) return;
 
-            if (source.IsPublic && !iface) sb.Append("public ");
-            if (source.IsPrivate) sb.Append("private ");
-            if (source.IsFamily) sb.Append("protected ");
-            if (source.IsAssembly) sb.Append("internal ");
-            if (source.IsFamilyOrAssembly) sb.Append("internal protected ");
-            if (source.IsFamilyAndAssembly) sb.Append("private protected ");
+            if (method.IsPublic && !iface) sb.Append("public ");
+            if (method.IsPrivate) sb.Append("private ");
+            if (method.IsFamily) sb.Append("protected ");
+            if (method.IsAssembly) sb.Append("internal ");
+            if (method.IsFamilyOrAssembly) sb.Append("internal protected ");
+            if (method.IsFamilyAndAssembly) sb.Append("private protected ");
         }
 
         // Modifiers...
@@ -91,24 +51,25 @@ public static partial class EasyNameExtensions
         void AddModifiers()
         {
             if (!options.UseModifiers) return;
+            if (method == null) return;
 
-            if (source.IsStatic) sb.Append("static ");
-            if (source.IsAbstract && !iface) sb.Append("abstract ");
+            if (method.IsStatic) sb.Append("static ");
+            if (method.IsAbstract && !iface) sb.Append("abstract ");
             if (IsSealed()) sb.Append("sealed ");
 
             if (IsOverride()) sb.Append("override ");
-            else if (IsVirtual() && !iface && !source.IsAbstract) sb.Append("virtual ");
+            else if (IsVirtual() && !iface && !method.IsAbstract) sb.Append("virtual ");
             else if (IsNew()) sb.Append("new ");
         }
 
-        // Return type...
-        AddReturnType();
-        void AddReturnType()
+        // Member type...
+        AddMemberType();
+        void AddMemberType()
         {
-            if (options.ReturnTypeOptions == null) return;
+            if (options.MemberTypeOptions == null) return;
             if (method == null) return;
 
-            var xoptions = options.ReturnTypeOptions.WithRecursive(
+            var xoptions = options.MemberTypeOptions.WithRecursive(
                 useVariance: false,
                 useAccessibility: false,
                 useModifiers: false,
@@ -140,7 +101,10 @@ public static partial class EasyNameExtensions
                 // Modifiers...
                 if (options.UseModifiers && arg.IsByRef)
                 {
-                    var ronly = method.ReturnTypeCustomAttributes.HasReadOnlyAttribute();
+                    var ronly =
+                        method.ReturnTypeCustomAttributes.HasReadOnlyAttribute() ||
+                        arg.HasReadOnlyAttribute();
+
                     sb.Append(ronly ? "ref readonly " : "ref ");
                 }
 
@@ -162,65 +126,26 @@ public static partial class EasyNameExtensions
                 useModifiers: false,
                 useKind: false);
 
-            xoptions.NullableStyle = EasyNullableStyle.None; // No top-level nullable annotations...
+            // No top-level nullable annotations, but wrappers are ok...
+            if (xoptions.NullableStyle == EasyNullableStyle.UseAnnotations)
+                xoptions.NullableStyle = EasyNullableStyle.KeepWrappers;
 
             var str = host.EasyName(xoptions);
-            if (str.Length > 0)
-            {
-                sb.Append(str);
-                if (method != null) sb.Append('.'); // Only for regular methods...
-            }
+            if (str.Length > 0) sb.Append(str).Append('.');
         }
 
         // Name...
-        if (method != null) sb.Append(source.Name);
-        if (constructor != null)
-        {
-            if (options.HostTypeOptions == null) // Otherwise it has been already captured!
-            {
-                var str = host?.EasyName() ?? "new";
-                sb.Append(str);
-            }
-            if (options.UseTechName) // Adding the CLR name if requested
-            {
-                if (!source.Name.StartsWith('.')) sb.Append('.');
-                sb.Append(source.Name);
-            }
-        }
-
-        // Generic arguments (regular methods only)...
-        AddGenerics();
-        void AddGenerics()
-        {
-            if (options.GenericListOptions == null) return;
-            if (method == null) return;
-
-            var args = source.GetGenericArguments();
-            if (args.Length > 0)
-            {
-                var xoptions = options.GenericListOptions.WithRecursive(
-                    useAccessibility: false,
-                    useModifiers: false,
-                    useKind: false);
-
-                sb.Append('<'); for (int i = 0; i < args.Length; i++)
-                {
-                    var arg = args[i];
-                    var str = arg.EasyName(xoptions);
-                    if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
-                    sb.Append(str);
-                }
-                sb.Append('>');
-            }
-        }
+        var name = source.Name;
+        var args = source.GetIndexParameters();
+        if (args.Length > 0 && !options.UseTechName) name = "this";
+        sb.Append(name);
 
         // Parameters...
-        if (options.UseBrackets || options.ParameterOptions != null)
+        if (args.Length > 0 && (options.UseBrackets || options.ParameterOptions != null))
         {
-            sb.Append('('); if (options.ParameterOptions != null)
+            sb.Append('['); if (options.ParameterOptions != null)
             {
                 var xoptions = options.ParameterOptions;
-                var args = source.GetParameters();
 
                 for (int i = 0; i < args.Length; i++)
                 {
@@ -230,7 +155,7 @@ public static partial class EasyNameExtensions
                     sb.Append(str);
                 }
             }
-            sb.Append(')');
+            sb.Append(']');
         }
 
         // Finishing...
@@ -241,12 +166,12 @@ public static partial class EasyNameExtensions
         /// <summary>
         /// Determines if the given source is a 'virtual' one.
         /// </summary>
-        bool IsVirtual() => source.IsVirtual && !source.IsFinal;
+        bool IsVirtual() => method != null && method.IsVirtual && !method.IsFinal;
 
         /// <summary>
         /// Determines if the given source method (not constructor) is an 'sealed' one.
         /// </summary>
-        bool IsSealed() => source.IsVirtual && source.IsFinal;
+        bool IsSealed() => method != null && method.IsVirtual && method.IsFinal;
 
         /// <summary>
         /// Determines if the given source method (not constructor) is an 'override' one.
@@ -254,7 +179,7 @@ public static partial class EasyNameExtensions
         bool IsOverride() =>
             method != null &&
             method.IsVirtual &&
-            method.GetBaseDefinition().DeclaringType != source.DeclaringType;
+            method.GetBaseDefinition().DeclaringType != method.DeclaringType;
 
         /// <summary>
         /// Determines if the given source method (not constructor) is a 'new' one.

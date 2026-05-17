@@ -1,4 +1,4 @@
-﻿#pragma warning disable IDE0060
+﻿#pragma warning disable IDE0060, CA1822
 
 namespace Yotei.Tools.Tests.EasyNames;
 
@@ -257,7 +257,7 @@ public static class Test_EasyMethod
 
     // ----------------------------------------------------
 
-    interface RType4
+    interface IFace4
     {
         static string? RetValue;
 
@@ -273,7 +273,7 @@ public static class Test_EasyMethod
     {
         EasyMethodOptions options;
         string name;
-        var type = typeof(RType4);
+        var type = typeof(IFace4);
         var source = type.GetMethod("Method1a")!;
 
         options = EasyMethodOptions.Empty;
@@ -294,7 +294,7 @@ public static class Test_EasyMethod
         options = EasyMethodOptions.Full;
         name = source.EasyName(options);
         Assert.Equal(
-            $"static ref readonly System.String {PREFIX}.RType4.Method1a(System.Byte one)",
+            $"static ref readonly System.String {PREFIX}.IFace4.Method1a(System.Byte one)",
             name);
     }
 
@@ -304,7 +304,7 @@ public static class Test_EasyMethod
     {
         EasyMethodOptions options;
         string name;
-        var type = typeof(RType4);
+        var type = typeof(IFace4);
         var source = type.GetMethod("Method1b")!;
 
         options = EasyMethodOptions.Empty;
@@ -325,7 +325,7 @@ public static class Test_EasyMethod
         options = EasyMethodOptions.Full;
         name = source.EasyName(options);
         Assert.Equal(
-            $"static ref System.String? {PREFIX}.RType4.Method1b(System.Byte one)",
+            $"static ref System.String? {PREFIX}.IFace4.Method1b(System.Byte one)",
             name);
     }
 

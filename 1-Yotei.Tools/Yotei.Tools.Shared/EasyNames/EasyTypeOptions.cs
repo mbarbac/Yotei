@@ -10,56 +10,56 @@ public sealed record EasyTypeOptions
     /// If enabled, then the returned easy name will always be an empty one. This setting is
     /// moslty used when the intent is to obtain an anonymous list of generic type arguments.
     /// </summary>
-    public bool UsePlaceHolder { get; set; }
+    public bool UsePlaceHolder { get; set { IsCustom = true; field = value; } }
 
     /// <summary>
     /// If enabled, then use the type's variance (the 'in' and 'out' keywords), if any.
     /// </summary>
-    public bool UseVariance { get; set; }
+    public bool UseVariance { get; set { IsCustom = true; field = value; } }
 
     /// <summary>
     /// If enabled, then use the accessibility modifiers, if any.
     /// </summary>
-    public bool UseAccessibility { get; set; }
+    public bool UseAccessibility { get; set { IsCustom = true; field = value; } }
 
     /// <summary>
     /// If enabled, then use the element's modifiers (such as static, abstract, etc). Otherwise,
     /// they are ignored.
     /// </summary>
-    public bool UseModifiers { get; set; }
+    public bool UseModifiers { get; set { IsCustom = true; field = value; } }
 
     /// <summary>
     /// If enabled, then use the element's kind (such as class, record, struct, interface and
     /// enum).
     /// </summary>
-    public bool UseKind { get; set; }
+    public bool UseKind { get; set { IsCustom = true; field = value; } }
 
     /// <summary>
     /// The style to use to obtain the namespace, if any, of the given type.
     /// <br/> A not-empty value of this property implies <see cref="UseHost"/>.
     /// </summary>
-    public EasyNamespaceStyle NamespaceStyle { get; set; }
+    public EasyNamespaceStyle NamespaceStyle { get; set { IsCustom = true; field = value; } }
 
     /// <summary>
     /// If enabled, then use the type's host (unless the type it is an special one and the
     /// <see cref="UseSpecialNames"/> setting is enabled).
     /// </summary>
-    public bool UseHost { get; set; }
+    public bool UseHost { get; set { IsCustom = true; field = value; } }
 
     /// <summary>
     /// If enabled, then use the type's special name, if possible.
     /// </summary>
-    public bool UseSpecialNames { get; set; }
+    public bool UseSpecialNames { get; set { IsCustom = true; field = value; } }
 
     /// <summary>
     /// If enabled, then remove the 'Attribute' suffix, if any.
     /// </summary>
-    public bool RemoveAttributeSuffix { get; set; }
+    public bool RemoveAttributeSuffix { get; set { IsCustom = true; field = value; } }
 
     /// <summary>
     /// The style to use when the given type is a nullable one.
     /// </summary>
-    public EasyNullableStyle NullableStyle { get; set; }
+    public EasyNullableStyle NullableStyle { get; set { IsCustom = true; field = value; } }
 
     /// <summary>
     /// If not null, then the use these options to obtain the list of generic type arguments.
@@ -73,14 +73,20 @@ public sealed record EasyTypeOptions
     /// own host instance.
     /// </para>
     /// </summary>
-    public EasyTypeOptions? GenericListOptions { get; set; }
+    public EasyTypeOptions? GenericListOptions { get; set { IsCustom = true; field = value; } }
 
     // ----------------------------------------------------
 
     /// <summary>
     /// The id of this instance, for DEBUG purposes only.
     /// </summary>
-    public long Id { get; private set; }
+    public string Id => IsCustom
+        ? $"Custom({IdMode}#{IdLong})"
+        : $"{IdMode}#{IdLong}";
+
+    Mode IdMode = default;
+    long IdLong = default;
+    bool IsCustom = false;
     static long LastId = 0;
 
     /// <summary>
@@ -91,17 +97,17 @@ public sealed record EasyTypeOptions
     {
         var num = 0;
         var sb = new StringBuilder();
-        sb.Append($"#{Id}:{{");
+        sb.Append($"{Id}:{{");
         if (UsePlaceHolder) Append(nameof(UsePlaceHolder));
         if (UseVariance) Append(nameof(UseVariance));
         if (UseAccessibility) Append(nameof(UseAccessibility));
         if (UseModifiers) Append(nameof(UseModifiers));
         if (UseKind) Append(nameof(UseKind));
-        if (NamespaceStyle != EasyNamespaceStyle.None) Append(NamespaceStyle.ToString());
+        if (NamespaceStyle != EasyNamespaceStyle.None) Append($"Namespace:{NamespaceStyle}");
         if (UseHost) Append(nameof(UseHost));
         if (UseSpecialNames) Append(nameof(UseSpecialNames));
         if (RemoveAttributeSuffix) Append(nameof(RemoveAttributeSuffix));
-        if (NullableStyle != EasyNullableStyle.None) Append(NullableStyle.ToString());
+        if (NullableStyle != EasyNullableStyle.None) Append($"Nullable:{NullableStyle}");
         if (GenericListOptions != null) Append($"GenericOptions:{GenericListOptions.Id}");
         sb.Append(" }");
         return sb.ToString();
@@ -119,7 +125,9 @@ public sealed record EasyTypeOptions
     public enum Mode { Empty, Default, Full };
     EasyTypeOptions(Mode mode)
     {
-        Id = Interlocked.Increment(ref LastId);
+        IdMode = mode;
+        IdLong = Interlocked.Increment(ref LastId);
+
         UsePlaceHolder = false;
         UseVariance = false;
         UseAccessibility = false;
@@ -263,7 +271,9 @@ public sealed record EasyTypeOptions
         {
             var options = source with { };
 
-            options.Id = Interlocked.Increment(ref LastId);
+            options.IdMode = source.IdMode;
+            options.IdLong = Interlocked.Increment(ref LastId);
+
             options.UsePlaceHolder = source.UsePlaceHolder;
             options.UseVariance = source.UseVariance;
             options.UseAccessibility = source.UseAccessibility;

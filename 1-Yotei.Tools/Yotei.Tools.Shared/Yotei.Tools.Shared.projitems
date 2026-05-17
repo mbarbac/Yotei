@@ -10,11 +10,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)EasyNames\EasyMethodOptions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)EasyNames\_EasyFieldOptions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)EasyNames\_EasyFieldOptionsEx.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EasyNames\EasyFieldOptions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EasyNames\EasyFieldOptionsEx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EasyNames\EasyMethodOptionsEx.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)EasyNames\_EasyPropertyOptionsEx.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)EasyNames\_EasyPropertyOptions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EasyNames\EasyPropertyOptionsEx.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EasyNames\EasyPropertyOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EasyNames\EasyParameterOptionsEx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EasyNames\EasyTypeOptionsEx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EasyNames\IsNullableAttribute.cs" />
