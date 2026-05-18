@@ -7,7 +7,6 @@ public static partial class EasyNameExtensions
     private const string READ_ONLY_ATTRIBUTE = "System.Runtime.CompilerServices.IsReadOnlyAttribute";
     private const string SCOPED_ATTRIBUTE = "System.Runtime.CompilerServices.ScopedRefAttribute";
     private const string REQUIRES_LOCATION = "System.Runtime.CompilerServices.RequiresLocationAttribute";
-    private const string IN_ATTRIBUTE = "System.Runtime.InteropServices.InAttribute";
 
     // ----------------------------------------------------
 

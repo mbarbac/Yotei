@@ -15,11 +15,33 @@ public static class ITypeSymbolExtensions
         /// <summary>
         /// Determines if this type symbol is a partial one, or not.
         /// </summary>
-        public bool IsPartial => source
-            .GetSyntaxNodes()
-            .OfType<BaseTypeDeclarationSyntax>()
-            .Any(x => x.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword)));
-        
+        public bool IsPartial
+        {
+            get
+            {
+                // Fast way...
+                var syntaxes = source.DeclaringSyntaxReferences;
+                if (syntaxes.Length > 1) return true;
+
+                // Likely way...
+                if (source.GetSyntaxNodes()
+                    .OfType<BaseTypeDeclarationSyntax>()
+                    .Any(x => x.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword))))
+                    return true;
+
+                // Maybe redundant...
+                foreach (var syntax in syntaxes)
+                {
+                    var node = syntax.GetSyntax();
+                    if (node is TypeDeclarationSyntax dec &&
+                        dec.Modifiers.Any(SyntaxKind.PartialKeyword)) return true;
+                }
+
+                // Not found...
+                return false;
+            }
+        }
+
         // ------------------------------------------------
 
         /// <summary>

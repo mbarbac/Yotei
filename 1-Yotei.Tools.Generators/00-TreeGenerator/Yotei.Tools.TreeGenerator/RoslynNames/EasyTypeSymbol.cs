@@ -1,56 +1,39 @@
-﻿namespace Yotei.Tools;
+﻿namespace Yotei.Tools.Generators;
 
 // ========================================================
-public static partial class EasyNameExtensions
+public static partial class RoslynNamesExtensions
 {
     /// <summary>
     /// Obtains a C#-alike representation for a given element, using default options.
-    /// <br/> This method is just a best-effort one because there are syntax elements the compiler
-    /// does not keep from the source code.
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
-    public static string EasyName(this Type source) => source.EasyName(EasyTypeOptions.Default);
+    public static string EasyName(
+        this ITypeSymbol source) => source.EasyName(EasyTypeOptions.Default);
 
     /// <summary>
     /// Obtains a C#-alike representation for a given element, using the given options.
-    /// <br/> This method is just a best-effort one because there are syntax elements the compiler
-    /// does not keep from the source code.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static string EasyName(this Type source, EasyTypeOptions options)
+    public static string EasyName(this ITypeSymbol source, EasyTypeOptions options)
     {
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(options);
 
-        var types = source.GetGenericArguments();
-        return source.EasyName(types, options);
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Invoked when the details of the original closed/bounded generic arguments, if any, have
-    /// been captured. Otherwise, through recursion, those details are lost.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="types"></param>
-    /// <param name="options"></param>
-    /// <returns></returns>
-    static string EasyName(this Type source, Type[] types, EasyTypeOptions options)
-    {
         // Shortcuts...
         if (options.UsePlaceHolder) return string.Empty;
-        if (source.IsArray) return WhenArray(source, options);
-        if (source.IsPointer) return WhenPointer(source, options);
-        if (source.IsNullableWrapper()) return WhenWrapper(source, options);
+        if (source is IArrayTypeSymbol array) return WhenArray(array, options);
+        if (source is IPointerTypeSymbol pointer) return WhenPointer(pointer, options);
+        if (source.IsNullableWrapper) return WhenWrapper(source, options);
 
         // Standard case...
         var sb = new StringBuilder();
-        var isgen = source.IsGenericAlike();
-        var host = source.DeclaringType;
+        var named = source as INamedTypeSymbol;
+        var args = named is null ? [] : named.TypeArguments;
+        var isgen = source.IsGenericAlike;
+        var host = source.ContainingType;
         var xname = options.UseSpecialNames ? source.ToSpecialName() : null;
 
         AddVariance(sb, source, options);
@@ -58,9 +41,9 @@ public static partial class EasyNameExtensions
         AddModifiers(sb, source, options);
         AddKind(sb, source, options);
         AddNamespace(sb, source, options, host, isgen, xname);
-        AddHost(sb, options, host, isgen, xname, types);
+        AddHost(sb, options, host, isgen, xname);
         AddName(sb, source, options, xname);
-        AddGenerics(sb, source, options, host, xname, types);
+        AddGenerics(sb, source, options, host, xname, args);
         AddNullability(sb, source, options);
         return sb.ToString();
 
@@ -69,7 +52,7 @@ public static partial class EasyNameExtensions
         /// <summary>
         /// Invoked when the source is an array one.
         /// </summary>
-        static string WhenArray(Type source, EasyTypeOptions options)
+        static string WhenArray(IArrayTypeSymbol source, EasyTypeOptions options)
         {
             var xoptions = options.WithRecursive(
                 useVariance: false,
@@ -77,11 +60,11 @@ public static partial class EasyNameExtensions
                 useModifiers: false,
                 useKind: false);
 
-            var arg = source.GetElementType()!;
+            var arg = source.ElementType;
             var str = arg.EasyName(xoptions);
             if (str.Length == 0) return string.Empty;
 
-            var rank = source.GetArrayRank();
+            var rank = source.Rank;
             str = $"{str}[{new string(',', rank - 1)}]";
 
             var sb = new StringBuilder();
@@ -101,7 +84,7 @@ public static partial class EasyNameExtensions
         /// Note that pointers do not allow nullable annotations (such as 'int*?), but yes they
         /// can point to a nullable type ('int?*').
         /// </summary>
-        static string WhenPointer(Type source, EasyTypeOptions options)
+        static string WhenPointer(IPointerTypeSymbol source, EasyTypeOptions options)
         {
             var xoptions = options.WithRecursive(
                 useVariance: false,
@@ -109,7 +92,7 @@ public static partial class EasyNameExtensions
                 useModifiers: false,
                 useKind: false);
 
-            var arg = source.GetElementType()!;
+            var arg = source.PointedAtType;
             var str = arg.EasyName(xoptions);
             if (str.Length == 0) return string.Empty;
 
@@ -127,7 +110,7 @@ public static partial class EasyNameExtensions
         /// <summary>
         /// Invoked when the source is a nullable wrapper one.
         /// </summary>
-        static string WhenWrapper(Type source, EasyTypeOptions options)
+        static string WhenWrapper(ITypeSymbol source, EasyTypeOptions options)
         {
             if (options.NullableStyle == EasyNullableStyle.UseAnnotations)
             {
@@ -137,7 +120,7 @@ public static partial class EasyNameExtensions
                     useModifiers: false,
                     useKind: false);
 
-                var arg = source.GetGenericArguments()[0];
+                var arg = ((INamedTypeSymbol)source).TypeArguments[0];
                 var str = arg.EasyName(xoptions);
                 if (str.Length == 0) return string.Empty;
 
@@ -161,7 +144,7 @@ public static partial class EasyNameExtensions
                     useModifiers: false,
                     useKind: false);
 
-                var arg = source.GetGenericArguments()[0];
+                var arg = ((INamedTypeSymbol)source).TypeArguments[0];
                 var str = arg.EasyName(xoptions);
                 if (str.Length == 0) return string.Empty;
 
@@ -186,12 +169,12 @@ public static partial class EasyNameExtensions
         /// <summary>
         /// Q&D way of obtaining the envelop's name.
         /// </summary>
-        static string GetNullableWrapperName(Type source, EasyTypeOptions options)
+        static string GetNullableWrapperName(ITypeSymbol source, EasyTypeOptions options)
         {
             var expand = options.NamespaceStyle != EasyNamespaceStyle.None;
             var global = options.NamespaceStyle == EasyNamespaceStyle.UseGlobal;
 
-            var name = source.IsCoreNullable()
+            var name = source.IsCoreNullable
                 ? (expand ? "System.Nullable" : "Nullable")
                 : (expand ? "Yotei.Tools.IsNullable" : "IsNullable");
 
@@ -204,81 +187,88 @@ public static partial class EasyNameExtensions
         /// <summary>
         /// Invoked to add the element's variance.
         /// </summary>
-        static void AddVariance(StringBuilder sb, Type source, EasyTypeOptions options)
+        static void AddVariance(StringBuilder sb, ITypeSymbol source, EasyTypeOptions options)
         {
             if (!options.UseVariance) return;
-            if (!source.IsGenericParameter) return;
+            if (source is not ITypeParameterSymbol par) return;
 
-            var gpa = source.GenericParameterAttributes;
-            var variance = gpa & GenericParameterAttributes.VarianceMask;
-
-            if ((variance & GenericParameterAttributes.Covariant) != 0) sb.Append("out ");
-            if ((variance & GenericParameterAttributes.Contravariant) != 0) sb.Append("in ");
+            switch (par.Variance)
+            {
+                case VarianceKind.Out: sb.Append("out "); break;
+                case VarianceKind.In: sb.Append("in "); break;
+            }
         }
 
         /// <summary>
         /// Invoked to add the element's accessibility.
         /// </summary>
-        static void AddAccessibility(StringBuilder sb, Type source, EasyTypeOptions options)
+        static void AddAccessibility(StringBuilder sb, ITypeSymbol source, EasyTypeOptions options)
         {
             if (!options.UseAccessibility) return;
 
-            if (source.IsPublic) { sb.Append("public "); return; }
-
-            if (source.IsNestedPublic) { sb.Append("public "); return; }
-            if (source.IsNestedPrivate) { sb.Append("private "); return; }
-            if (source.IsNestedFamily) { sb.Append("protected "); return; }
-            if (source.IsNestedFamORAssem) { sb.Append("protected internal "); return; }
-            if (source.IsNestedFamANDAssem) { sb.Append("private protected "); return; }
-            if (source.IsNestedPrivate) { sb.Append("private "); return; }
-            if (source.IsNestedAssembly) { sb.Append("internal "); return; }
+            switch (source.DeclaredAccessibility)
+            {
+                case Accessibility.Public: sb.Append("public "); return;
+                case Accessibility.Protected: sb.Append("protected "); return;
+                case Accessibility.Internal: sb.Append("internal "); return;
+                case Accessibility.Private: sb.Append("private "); return;
+                case Accessibility.ProtectedOrInternal: sb.Append("protected internal "); return;
+                case Accessibility.ProtectedAndInternal: sb.Append("private protected "); return;
+            }
         }
 
         /// <summary>
         /// Invoked to add the element's modifiers.
         /// </summary>
-        static void AddModifiers(StringBuilder sb, Type source, EasyTypeOptions options)
+        static void AddModifiers(StringBuilder sb, ITypeSymbol source, EasyTypeOptions options)
         {
             if (!options.UseModifiers) return;
 
-            // This combinations are what the compiler uses...
-            if (source.IsAbstract && source.IsSealed) { sb.Append("static "); return; }
-            if (source.IsAbstract && !source.IsInterface) { sb.Append("abstract "); return; }
-            if (source.IsSealed && !source.IsValueType) { sb.Append("sealed "); return; }
+            if (source.IsStatic) { sb.Append("static "); return; } // Static evaluated first!
+
+            if (source.IsAbstract) { sb.Append("abstract "); return; }
+            if (source.IsSealed) { sb.Append("sealed "); return; }
         }
 
         /// <summary>
         /// Invoked to add the element's kind.
         /// Supports: enum, interface, struct, record struct, class, record class, and delegate.
         /// </summary>
-        static void AddKind(StringBuilder sb, Type source, EasyTypeOptions options)
+        static void AddKind(StringBuilder sb, ITypeSymbol source, EasyTypeOptions options)
         {
             if (!options.UseKind) return;
 
-            if (source.IsInterface) { sb.Append("interface "); return; }
-            if (source.IsEnum) { sb.Append("enum "); return; }
-            if (source.IsSubclassOf(typeof(MulticastDelegate))) { sb.Append("delegate "); return; }
+            var ini = sb.Length;
 
-            var flags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.NonPublic;
-            var method = source.GetMethod("PrintMembers", flags);
-            var record = method != null && method.GetParameters().FirstOrDefault()?.ParameterType == typeof(StringBuilder);
-            record = record || source.GetMethod("<Clone>$", flags) != null;
-            record = record || source.GetProperties(flags).Any(p => p.Name == "EqualityContract");
-
-            if (source.IsValueType) { sb.Append(record ? "record struct " : "struct "); return; }
-            if (source.IsClass)
+            // records first...
+            if (source.IsRecord)
             {
-                if (typeof(Delegate).IsAssignableFrom(source)) { sb.Append("Delegate "); return; }
-                sb.Append(record ? "record class " : "class ");
-                return;
+                sb.Append(source.TypeKind == TypeKind.Struct
+                    ? "record struct "
+                    : "record class ");
             }
+            else // Other kinds...
+            {
+                switch (source.TypeKind)
+                {
+                    case TypeKind.Class: sb.Append("class "); break;
+                    case TypeKind.Struct: sb.Append("struct "); break;
+                    case TypeKind.Interface: sb.Append("interface "); break;
+                    case TypeKind.Enum: sb.Append("enum "); return;
+                    case TypeKind.Delegate: sb.Append("delegate "); break;
+                }
+            }
+
+            // Intercepting partial keyword...
+            var end = sb.Length;
+            if (end > ini && source.IsPartial) sb.Insert(ini, "partial ");
         }
 
         /// <summary>
         /// Invoked to add the element's namespace.
         /// </summary>
-        static void AddNamespace(StringBuilder sb, Type source, EasyTypeOptions options,
-            Type? host,
+        static void AddNamespace(StringBuilder sb, ITypeSymbol source, EasyTypeOptions options,
+            INamedTypeSymbol? host,
             bool isgen,
             string? xname)
         {
@@ -287,21 +277,46 @@ public static partial class EasyNameExtensions
                 xname != null ||
                 options.NamespaceStyle == EasyNamespaceStyle.None) return;
 
-            var str = source.Namespace;
+            var ns = source.ContainingNamespace;
+            var str = ns == null ? null : Compute(ns, options);
             if (str == null || str.Length == 0) return;
 
             if (options.NamespaceStyle == EasyNamespaceStyle.UseGlobal) sb.Append("global::");
             sb.Append(str).Append('.');
+
+            /// <summary>
+            /// Invoked to compute the namespace, using the given options, not using 'global'
+            /// </summary>
+            static string? Compute(INamespaceSymbol source, EasyTypeOptions options)
+            {
+                var names = new List<string>();
+                var node = (ISymbol?)source;
+
+                while (node != null) // Using the node as the first one, even if its name may be null...
+                {
+                    if (node is INamespaceSymbol ns &&
+                        ns.Name != null &&
+                        ns.Name.Length > 0) names.Add(ns.Name);
+
+                    node = node.ContainingSymbol;
+                }
+
+                if (names.Count == 0) return null; // Return 'null' if no one was found.
+                else
+                {
+                    names.Reverse();
+                    var str = string.Join(".", names);
+                    return str;
+                }
+            }
         }
 
         /// <summary>
         /// Invoked to add the element's host.
-        /// Here we need to use the captured types instead of obtaining new ones.
         /// </summary>
-        static void AddHost(StringBuilder sb, EasyTypeOptions options, Type? host,
+        static void AddHost(StringBuilder sb, EasyTypeOptions options, INamedTypeSymbol? host,
             bool isgen,
-            string? xname,
-            Type[] types)
+            string? xname)
         {
             if (host == null ||
                 isgen ||
@@ -314,72 +329,62 @@ public static partial class EasyNameExtensions
                 useModifiers: false,
                 useKind: false);
 
-            var str = host.EasyName(types, xoptions);
+            var str = host.EasyName(xoptions);
             if (str.Length > 0) sb.Append(str).Append('.');
         }
+
 
         /// <summary>
         /// Invoked to add the element's name.
         /// </summary>
-        static void AddName(StringBuilder sb, Type source, EasyTypeOptions options,
+        static void AddName(StringBuilder sb, ITypeSymbol source, EasyTypeOptions options,
             string? xname)
         {
             if (xname != null) { sb.Append(xname); return; }
 
-            var name = source.Name;
-            var index = name.IndexOf('`'); if (index >= 0) name = name[..index];
-            if (name.Length > 0 && name[^1] == '&') name = name[..^1];
-
+            var str = source.Name;
             if (options.RemoveAttributeSuffix &&
-                name != ATTRIBUTE &&
-                name.EndsWith(ATTRIBUTE)) name = name.RemoveLast(ATTRIBUTE).ToString();
+                str != ATTRIBUTE &&
+                str.EndsWith(ATTRIBUTE)) str = str.RemoveLast(ATTRIBUTE).ToString();
 
-            sb.Append(name);
+            sb.Append(str);
         }
 
         /// <summary>
         /// Invoked to add the element's generic type arguments.
         /// Here we use the captured types as a convenience.
         /// </summary>
-        static void AddGenerics(StringBuilder sb, Type source, EasyTypeOptions options,
-            Type? host,
+        static void AddGenerics(StringBuilder sb, ITypeSymbol source, EasyTypeOptions options,
+            INamedTypeSymbol? host,
             string? xname,
-            Type[] types)
+            ImmutableArray<ITypeSymbol> args)
         {
-            if (xname != null ||
-                options.GenericListOptions == null) return;
+            if (xname != null || options.GenericListOptions == null) return;
+            if (args.Length == 0) return;
 
             var xoptions = options.GenericListOptions.WithRecursive(
                 useAccessibility: false,
                 useModifiers: false,
                 useKind: false);
 
-            var args = source.GetGenericArguments();
-            var used = host == null ? 0 : host.GetGenericArguments().Length;
-            var need = args.Length - used;
-
-            if (need > 0)
+            sb.Append('<'); for (int i = 0; i < args.Length; i++)
             {
-                sb.Append('<'); for (int i = 0; i < need; i++)
-                {
-                    var arg = types[used + i];
-                    var str = arg.EasyName(xoptions);
-                    if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
-                    sb.Append(str);
-                }
-                sb.Append('>');
+                var arg = args[i];
+                var str = arg.EasyName(xoptions);
+                if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
+                sb.Append(str);
             }
         }
 
         /// <summary>
         /// Invoked to add the element's nullability.
         /// </summary>
-        static void AddNullability(StringBuilder sb, Type source, EasyTypeOptions options)
+        static void AddNullability(StringBuilder sb, ITypeSymbol source, EasyTypeOptions options)
         {
             if (sb.Length == 0 || sb[^1] == '?') return;
             if (options.NullableStyle == EasyNullableStyle.None) return;
 
-            if (source.IsNullableWrapper() &&
+            if (source.IsNullableWrapper &&
                 options.NullableStyle == EasyNullableStyle.KeepWrappers) return;
 
             if (source.IsNullableAnnotated()) { sb.Append('?'); return; }

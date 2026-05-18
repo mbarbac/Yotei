@@ -22,6 +22,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\NameSyntaxExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\SyntaxListExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\EmbeddedAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\RoslynNamesExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\EasyTypeSymbol.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\__.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)__.cs" />
   </ItemGroup>
   <ItemGroup>
