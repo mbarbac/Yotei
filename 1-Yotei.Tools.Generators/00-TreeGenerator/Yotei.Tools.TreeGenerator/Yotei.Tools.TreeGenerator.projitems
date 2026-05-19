@@ -24,6 +24,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)RoslynEx\EmbeddedAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\RoslynNamesExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\EasyTypeSymbol.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\_EasyFieldSymbol.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\_EasyMethodSymbol.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\_EasyParameterSymbol.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RoslynNames\_EasyPropertySymbol.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeGeneratorEx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeGenerator\TreeContext.cs" />
