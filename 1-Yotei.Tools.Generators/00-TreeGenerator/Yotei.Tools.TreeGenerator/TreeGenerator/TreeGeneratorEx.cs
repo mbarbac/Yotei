@@ -32,44 +32,23 @@ partial class TreeGenerator
     // ----------------------------------------------------
 
     /// <summary>
-    /// Adds to the compilation the contents read from the given resource file.
-    /// <br/> This method is typically used to add marker attributes whose source code is written
-    /// in a resource file in the derived generator's project. Note that this addition must happen
-    /// at the post initialization phase or, otherwise, their atttribute classes are not properly
-    /// resolved.
-    /// <para>
-    /// The resource file MUST be specified in the derived generator's PROJECT FILE as an embedded
-    /// resource (ie: '[EmbeddedResource Include="path.ext" /]', using angle brackets instead of
-    /// squared ones used here for display purposes) whithin an 'ItemGroup' section. In addition,
-    /// if the '<paramref name="outfolder"/>' value is not <see langword="null"/>, then the file
-    /// will be emitted at that folder.
-    /// </para>
+    /// Adds to the compilation the contents read from the given resource file, by emitting
+    /// them into the consuming project using the given path.
     /// </summary>
-    /// NOTES:
-    /// I've found that marker attributes MUST be emitted at post-initialization time, and not at
-    /// code generation one. Otherwise, their attribute class is 'ErrorType', I guess because they
-    /// have not been properly resolved yet (actually, their namespace is 'global'). This makes
-    /// almost impossible to match them against any type or fully qualified name that may have
-    /// been specified.
-    /// On the flip side, at this post-initialization moment we have no access to any resource
-    /// in the consuming project, so options have not read yet. This prevents obtaining folder
-    /// conventions or any other settings. So, by convention, to prevent name conflicts, we'll
-    /// use the namespace of the derived generator as the prefix for the emitted files.
     /// <param name="context"></param>
     /// <param name="rname"></param>
-    /// <param name="outfolder"></param>
+    /// <param name="path"></param>
     public void AddLocalResource(
         IncrementalGeneratorPostInitializationContext context,
         string rname,
-        string? outfolder = null)
+        string path)
     {
-        if (outfolder is not null && outfolder.EndsWith('/')) outfolder = outfolder[..^1];
-        outfolder = outfolder.NullWhenEmpty(trim: true);
-
         rname = rname.NotNullNotEmpty(trim: true);
-        rname = rname.Replace('\\', '.').Replace('/', '.');
+        path = path.NotNullNotEmpty(trim: true);
 
         // Reading the resource file...
+        rname = rname.Replace('\\', '.').Replace('/', '.');
+
         var type = GetType();
         var asm = type.Assembly;
         var xname = $"{type.Namespace}.{rname}";
@@ -77,25 +56,9 @@ partial class TreeGenerator
         using var reader = new StreamReader(stream);
         var code = reader.ReadToEnd();
 
-        // Preparing output...
-        rname = rname.Replace('<', '[').Replace('>', ']');
-        var parts = FirstLevelDotParts(rname);
-
-        // We may have an extension...
-        var ext = parts.Count > 1 ? parts[^1] : null;
-        if (ext != null)
-        {
-            ext = $".g.{ext}";
-            parts.RemoveAt(parts.Count - 1);
-        }
-
-        // By convention, we just need the last part with the namespace prefix...
-        rname = $"{type.Namespace}.{parts[^1]}";
-        if (outfolder != null) rname = $"{outfolder}/{rname}";
-        if (ext != null) rname += ext;
-
         // Adding...
-        context.AddSource(rname, code);
+        path = path.Replace('\\', '/');
+        context.AddSource(path, code);
     }
 
     // ----------------------------------------------------
@@ -259,12 +222,11 @@ partial class TreeGenerator
     /// <param name="options"></param>
     void IncludeNullabilityHelpers(SourceProductionContext context, TreeOptions options)
     {
-        var name = NormalizeFileName("Yotei.Tools.NullabilityHelpers.cs",
-            options.ReverseGeneratedFileNames,
-            options.GenerateFilesInFolders);
-
+        var name = "Markers/NullabilityHelpers.cs";
         var nspace = GetType().Namespace ?? "Yotei.Tools";
         var code = $$"""
+            #nullable enable
+
             namespace {{nspace}}
             {
                 /// <summary>

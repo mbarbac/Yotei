@@ -374,6 +374,7 @@ public static partial class RoslynNamesExtensions
                 if (i > 0) sb.Append(str.Length > 0 ? ", " : ",");
                 sb.Append(str);
             }
+            sb.Append('>');
         }
 
         /// <summary>

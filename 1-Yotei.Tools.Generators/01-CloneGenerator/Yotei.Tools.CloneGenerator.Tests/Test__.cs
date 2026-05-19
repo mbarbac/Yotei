@@ -11,7 +11,13 @@
 //    }
 //}
 
-//[Cloneable]
-//public partial class TFoo<T> { }
+[Cloneable]
+public partial class TFoo<T>
+{
+    public void Method(Predicate<StringBuilder?> _) { }
+}
 
-public interface IFake { }
+//[Cloneable]
+//public partial class TBar<T> : TFoo<int?>
+//{
+//}
