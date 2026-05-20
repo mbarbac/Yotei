@@ -75,7 +75,7 @@ public static partial class EasyNameExtensions
         // Modifiers (only if sb is not empty...)
         if (sb.Length > 0)
         {
-            // This...
+            // Special case for 'this'...
             if (options.UseThis && source.Name != null)
             {
                 var method = source.Member as MethodBase;
@@ -86,7 +86,7 @@ public static partial class EasyNameExtensions
                     sb.Insert(0, "this ");
             }
 
-            // Modifiers...
+            // Other modifiers...
             if (options.UseModifiers)
             {
                 // Traditional 'in' modifier...

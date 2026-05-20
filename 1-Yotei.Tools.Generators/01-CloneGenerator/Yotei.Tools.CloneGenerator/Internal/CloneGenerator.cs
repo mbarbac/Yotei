@@ -46,11 +46,12 @@ public class CloneGenerator : TreeGenerator
             string str;
             var type = item.Symbol;
 
+            var source = type;
             //var source = type.BaseType!.TypeArguments[0];
-
-            var items = type.GetMembers().OfType<IMethodSymbol>();
-            var method = items.Single(x => x.MethodKind == MethodKind.Ordinary);
-            var source = method.Parameters.First().Type;
+            //var items = type.GetMembers().OfType<IMethodSymbol>();
+            //var method = items.Single(x => x.MethodKind == MethodKind.Ordinary);
+            //var source = method.Parameters.First().Type;
+            //var source = type.GetTypeMembers()[0];
 
             options = EasyTypeOptions.Empty; str = source.EasyName(options); Debug.WriteLine(str);
             options = EasyTypeOptions.Default; str = source.EasyName(options); Debug.WriteLine(str);

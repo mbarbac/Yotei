@@ -11,11 +11,17 @@
 //    }
 //}
 
-[Cloneable]
+//[Cloneable]
 public partial class TFoo<T>
 {
-    public void Method(Predicate<StringBuilder?> _) { }
+    //public void Method(int?* _) { }
+
+    [Cloneable]
+    internal enum TBar { One }
 }
+
+//[Cloneable]
+//public partial class TFooAttribute { }
 
 //[Cloneable]
 //public partial class TBar<T> : TFoo<int?>
