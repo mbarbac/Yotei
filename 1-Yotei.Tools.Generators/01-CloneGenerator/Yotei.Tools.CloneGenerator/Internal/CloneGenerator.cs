@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools.CloneGenerator;
+﻿#pragma warning disable IDE0059
+
+namespace Yotei.Tools.CloneGenerator;
 
 // ========================================================
 /// <summary>
@@ -40,7 +42,7 @@ public class CloneGenerator : TreeGenerator
     {
         var node = base.CaptureNode(context, token);
 
-        if (node is TypeNode item)
+        /*if (node is TypeNode item)
         {
             EasyTypeOptions options;
             string str;
@@ -53,9 +55,29 @@ public class CloneGenerator : TreeGenerator
             //var source = method.Parameters.First().Type;
             //var source = type.GetTypeMembers()[0];
 
-            options = EasyTypeOptions.Empty; str = source.EasyName(options); Debug.WriteLine(str);
-            options = EasyTypeOptions.Default; str = source.EasyName(options); Debug.WriteLine(str);
-            options = EasyTypeOptions.Full; str = source.EasyName(options); Debug.WriteLine(str);
+            options = EasyTypeOptions.Empty; str = source.EasyName(options);
+            options = EasyTypeOptions.Default; str = source.EasyName(options);
+            options = EasyTypeOptions.Full; str = source.EasyName(options);
+        }*/
+
+        if (node is MethodNode item)
+        {
+            /*EasyParameterOptions options;
+            string str;
+            var method = item.Symbol;
+            var source = method.Parameters[0]!;
+
+            options = EasyParameterOptions.Empty; str = source.EasyName(options);
+            options = EasyParameterOptions.Default; str = source.EasyName(options);
+            options = EasyParameterOptions.Full; str = source.EasyName(options);*/
+
+            EasyMethodOptions options;
+            string str;
+            var source = item.Symbol;
+
+            options = EasyMethodOptions.Empty; str = source.EasyName(options);
+            options = EasyMethodOptions.Default; str = source.EasyName(options);
+            options = EasyMethodOptions.Full; str = source.EasyName(options);
         }
 
         return node;

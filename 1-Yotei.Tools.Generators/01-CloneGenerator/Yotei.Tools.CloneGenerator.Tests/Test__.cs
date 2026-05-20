@@ -11,19 +11,8 @@
 //    }
 //}
 
-//[Cloneable]
-public partial class TFoo<T>
+public static partial class TFoo
 {
-    //public void Method(int?* _) { }
-
     [Cloneable]
-    internal enum TBar { One }
+    public static void Method(this int one) => throw null!; // 'this' NOT IDENTIFIED
 }
-
-//[Cloneable]
-//public partial class TFooAttribute { }
-
-//[Cloneable]
-//public partial class TBar<T> : TFoo<int?>
-//{
-//}
