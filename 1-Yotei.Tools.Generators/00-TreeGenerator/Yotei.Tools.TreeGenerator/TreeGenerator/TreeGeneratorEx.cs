@@ -220,7 +220,7 @@ partial class TreeGenerator
     /// </summary>
     /// <param name="context"></param>
     /// <param name="options"></param>
-    void IncludeNullabilityHelpers(SourceProductionContext context, TreeOptions options)
+    void IncludeNullabilityHelpers(SourceProductionContext context)
     {
         var name = "Markers/NullabilityHelpers.cs";
         var nspace = GetType().Namespace ?? "Yotei.Tools";
@@ -271,7 +271,7 @@ partial class TreeGenerator
         var options = source.Item2.Length > 0 ? source.Item2[0] : new TreeOptions();
 
         // Emits the nullability helpers...
-        if (AddNullabilityHelpers) IncludeNullabilityHelpers(context, options);
+        if (AddNullabilityHelpers) IncludeNullabilityHelpers(context);
 
         // Generating hierarchy and reporting captured errors...
         var treecontext = new TreeContext(context, options);

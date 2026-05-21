@@ -10,10 +10,3 @@
 //    {
 //    }
 //}
-
-public class TBar { public int Name; }
-public class TFoo<T> : TBar
-{
-    [Cloneable]
-    public new readonly T? Name;
-}
