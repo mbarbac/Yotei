@@ -60,17 +60,8 @@ public class CloneGenerator : TreeGenerator
             options = EasyTypeOptions.Full; str = source.EasyName(options);
         }*/
 
-        if (node is MethodNode item)
+        /*if (node is MethodNode item)
         {
-            /*EasyParameterOptions options;
-            string str;
-            var method = item.Symbol;
-            var source = method.Parameters[0]!;
-
-            options = EasyParameterOptions.Empty; str = source.EasyName(options);
-            options = EasyParameterOptions.Default; str = source.EasyName(options);
-            options = EasyParameterOptions.Full; str = source.EasyName(options);*/
-
             EasyMethodOptions options;
             string str;
             var source = item.Symbol;
@@ -78,6 +69,28 @@ public class CloneGenerator : TreeGenerator
             options = EasyMethodOptions.Empty; str = source.EasyName(options);
             options = EasyMethodOptions.Default; str = source.EasyName(options);
             options = EasyMethodOptions.Full; str = source.EasyName(options);
+        }*/
+
+        /*if (node is PropertyNode item)
+        {
+            EasyPropertyOptions options;
+            string str;
+            var source = item.Symbol;
+
+            options = EasyPropertyOptions.Empty; str = source.EasyName(options);
+            options = EasyPropertyOptions.Default; str = source.EasyName(options);
+            options = EasyPropertyOptions.Full; str = source.EasyName(options);
+        }*/
+
+        if (node is FieldNode item)
+        {
+            EasyFieldOptions options;
+            string str;
+            var source = item.Symbol;
+
+            //options = EasyFieldOptions.Empty; str = source.EasyName(options);
+            //options = EasyFieldOptions.Default; str = source.EasyName(options);
+            options = EasyFieldOptions.Full; str = source.EasyName(options);
         }
 
         return node;

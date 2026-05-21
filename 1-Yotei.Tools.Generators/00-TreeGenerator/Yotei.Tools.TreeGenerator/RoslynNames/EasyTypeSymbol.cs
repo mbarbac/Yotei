@@ -255,7 +255,7 @@ public static partial class RoslynNamesExtensions
                     case TypeKind.Struct: sb.Append("struct "); break;
                     case TypeKind.Interface: sb.Append("interface "); break;
                     case TypeKind.Enum: sb.Append("enum "); return;
-                    case TypeKind.Delegate: sb.Append("delegate "); break;
+                    case TypeKind.Delegate: sb.Append("Delegate "); break;
                 }
             }
 

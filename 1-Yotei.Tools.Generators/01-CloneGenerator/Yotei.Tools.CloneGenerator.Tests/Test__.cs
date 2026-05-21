@@ -11,8 +11,8 @@
 //    }
 //}
 
-public static partial class TFoo
+public partial class TFoo<T>
 {
     [Cloneable]
-    public static void Method(this int one) => throw null!; // 'this' NOT IDENTIFIED
+    public readonly T? Name = default!; // readonly not identified!
 }

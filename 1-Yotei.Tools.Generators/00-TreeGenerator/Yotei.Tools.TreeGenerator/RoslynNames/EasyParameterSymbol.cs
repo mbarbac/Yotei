@@ -1,4 +1,8 @@
-﻿namespace Yotei.Tools.Generators;
+﻿#pragma warning disable IDE0019
+
+using System.Runtime.ExceptionServices;
+
+namespace Yotei.Tools.Generators;
 
 // ========================================================
 public static partial class RoslynNamesExtensions
@@ -74,7 +78,22 @@ public static partial class RoslynNamesExtensions
         if (sb.Length > 0)
         {
             // Special case for 'this'...
-            if (options.UseThis && source.IsThis) sb.Insert(0, "this ");
+            if (options.UseThis)
+            {
+                var method = source.ContainingSymbol as IMethodSymbol;
+                if (method != null && method.IsExtensionMethod)
+                {
+                    // For whatever reasons 'IsThis' returns false when it shouldn't. But we can
+                    // use the fact that, if we have reached this point, we are dealing with an
+                    // extension method, and whether or not the source is its first argument...
+
+                    var isthis = source.IsThis || (
+                        method.Parameters.Length > 0 &&
+                        SymbolEqualityComparer.Default.Equals(method.Parameters[0], source));
+
+                    if (isthis) sb.Insert(0, "this ");
+                }
+            }
 
             // Other modifiers...
             if (options.UseModifiers)

@@ -257,7 +257,7 @@ public static partial class EasyNameExtensions
 
             if (source.IsInterface) { sb.Append("interface "); return; }
             if (source.IsEnum) { sb.Append("enum "); return; }
-            if (source.IsSubclassOf(typeof(MulticastDelegate))) { sb.Append("delegate "); return; }
+            if (source.IsSubclassOf(typeof(MulticastDelegate))) { sb.Append("Delegate "); return; }
 
             var flags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.NonPublic;
             var method = source.GetMethod("PrintMembers", flags);
