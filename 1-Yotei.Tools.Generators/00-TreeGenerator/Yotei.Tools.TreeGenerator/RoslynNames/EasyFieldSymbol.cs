@@ -87,13 +87,14 @@ public static partial class RoslynNamesExtensions
                 // Modifiers...
                 if (options.UseModifiers)
                 {
-                    switch (source.RefKind)
+                    var temp = source.RefKind switch
                     {
-                        case RefKind.Ref: sb.Append("ref "); break;
-                        case RefKind.Out: sb.Append("out "); break;
-                        case RefKind.In: sb.Append("ref readonly "); break;
-                    }
-                    ;
+                        RefKind.Ref => sb.Append("ref "),
+                        RefKind.Out => sb.Append("out "),
+                        RefKind.In => sb.Append("ref readonly "),
+                        _ => null
+                    };
+                    if (temp is null && source.IsReadOnly) sb.Append("readonly ");
                 }
 
                 // Adding...

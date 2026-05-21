@@ -11,8 +11,9 @@
 //    }
 //}
 
-public partial class TFoo<T>
+public class TBar { public int Name; }
+public class TFoo<T> : TBar
 {
     [Cloneable]
-    public readonly T? Name = default!; // readonly not identified!
+    public new readonly T? Name;
 }
