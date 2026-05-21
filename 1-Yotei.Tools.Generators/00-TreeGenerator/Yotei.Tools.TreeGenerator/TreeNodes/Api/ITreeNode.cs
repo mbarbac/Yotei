@@ -22,4 +22,26 @@ public interface ITreeNode : INode
     /// information is not available.
     /// </summary>
     List<AttributeData> Attributes { get; }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked while building the generation hierarchy to augment the information captured by
+    /// this instance with the one from the other given node. This method typically captures the
+    /// other syntaxes and attributes.
+    /// <br/> Inheritors may want to invoke their base method first.
+    /// </summary>
+    /// <param name="other"></param>
+    void Augment(ITreeNode other);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to emit the source code of this node using the given context and builder.
+    /// <br/> If this method returns false then the code generation of this instance is aborted.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="cb"></param>
+    /// <returns></returns>
+    bool Emit(in TreeContext context, CodeBuilder cb);
 }

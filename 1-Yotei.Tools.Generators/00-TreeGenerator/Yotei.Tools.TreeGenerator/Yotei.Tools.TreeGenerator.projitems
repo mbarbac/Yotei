@@ -36,7 +36,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)TreeNodes\Api\IChildNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeNodes\Api\ITreeNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeNodes\Api\ErrorNode.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TreeNodes\Code\_TypeNodeEx.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TreeNodes\Code\TypeNodeEx.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeNodes\Code\MethodNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeNodes\Code\PropertyNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TreeNodes\Code\FieldNode.cs" />

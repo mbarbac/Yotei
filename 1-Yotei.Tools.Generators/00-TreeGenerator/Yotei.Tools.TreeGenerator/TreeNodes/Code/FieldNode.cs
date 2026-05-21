@@ -71,4 +71,72 @@ public partial class FieldNode : IChildNode
         foreach (var attr in Attributes) code = HashCode.Combine(code, attr);
         return code;
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc cref="ITreeNode.Augment(ITreeNode)"/>
+    /// </summary>
+    /// <param name="other"></param>
+    public virtual void Augment(FieldNode other)
+    {
+        foreach (var syntax in other.SyntaxNodes)
+            if (SyntaxNodes.Find(x => x.IsEquivalentTo(syntax)) == null)
+                SyntaxNodes.Add(syntax);
+
+        foreach (var at in other.Attributes)
+            if (Attributes.Find(x => x.EqualsTo(at)) == null)
+                Attributes.Add(at);
+    }
+
+    void ITreeNode.Augment(ITreeNode other) => Augment((FieldNode)other);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// <br/> This method is INFRASTRUCTURE, not intended for inheritors usage. Behavior can be
+    /// customized using the <see cref="OnValidate(SourceProductionContext)"/> and the
+    /// <see cref="OnEmit(in TreeContext, CodeBuilder)"/> methods.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="cb"></param>
+    /// <returns></returns>
+    public bool Emit(in TreeContext context, CodeBuilder cb)
+    {
+        context.Context.CancellationToken.ThrowIfCancellationRequested();
+
+        if (!OnValidate(context.Context)) return false;
+        if (!OnEmit(in context, cb)) return false;
+        return true;
+    }
+
+    /// <summary>
+    /// Invoked to validate this instance.
+    /// <br/> Inheritors may want to invoke their base method first.
+    /// <br/> If this method returns false then the code generation of this instance is aborted.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    protected virtual bool OnValidate(SourceProductionContext context)
+    {
+        var r = true;
+
+        if (Parent == null) { TreeError.NoParentNode.Report(Symbol, context); r = false; }
+        if (!Symbol.ContainingType.IsPartial) { TreeError.TypeNotPartial.Report(Symbol, context); r = false; }
+        return r;
+    }
+
+    /// <summary>
+    /// Invoked to generate the source code of this instance.
+    /// <br/> If this method returns false then the code generation of this instance is aborted.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="cb"></param>
+    /// <returns></returns>
+    protected virtual bool OnEmit(in TreeContext context, CodeBuilder cb)
+    {
+        cb.AppendLine($"// {this}");
+        return true;
+    }
 }

@@ -314,4 +314,130 @@ public partial class TreeGenerator : IIncrementalGenerator
         // Finishing...
         return null!;
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to capture the given node, or its information, into the hierarchy repressented by
+    /// the given collection of top-most files (where a new one can be added if needed). Returns
+    /// the actual node captured, the one existing but augmented, or null if any.
+    /// <br/> Inheritors may want to override this method if they deal with new or derived nodes,
+    /// eventually calling their base method first as needed.
+    /// </summary>
+    /// <param name="files"></param>
+    /// <param name="node"></param>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    protected virtual INode? CaptureHierarchy(
+        List<TypeNode> files, INode node, in TreeContext context)
+    {
+        var comparer = SymbolEqualityComparer.Default;
+
+        // Type nodes...
+        if (node is TypeNode tnode)
+        {
+            var type = files.Find(x => comparer.Equals(x.Symbol, tnode.Symbol));
+
+            if (type is null) files.Add(tnode); // Adding the new type node...
+            else
+            {
+                if (type.ChildsOnly) // Substituting the childs-only existing one...
+                {
+                    tnode.Augment(type);
+                    files.Remove(type);
+                    files.Add(tnode);
+                    return tnode;
+                }
+                else // Or augmenting the existing one...
+                {
+                    type.Augment(tnode);
+                    return type;
+                }
+            }
+        }
+
+        // Property nodes...
+        if (node is PropertyNode pnode)
+        {
+            var host = pnode.Symbol.ContainingType;
+            var type = files.Find(x => comparer.Equals(x.Symbol, host));
+
+            if (type is null) // Creating a childs-only instance...
+            {
+                type = new TypeNode(host) { ChildsOnly = true };
+                files.Add(type);
+            }
+
+            var item = type.ChildProperties.Find(x => comparer.Equals(x.Symbol, pnode.Symbol));
+
+            if (item is null) // Adding a new child...
+            {
+                type.ChildProperties.Add(pnode);
+                pnode.Parent = type;
+                return pnode;
+            }
+            else // Or augmenting the existing one...
+            {
+                item.Augment(pnode);
+                return item;
+            }
+        }
+
+        // Field nodes...
+        if (node is FieldNode fnode)
+        {
+            var host = fnode.Symbol.ContainingType;
+            var type = files.Find(x => comparer.Equals(x.Symbol, host));
+
+            if (type is null) // Creating a childs-only instance...
+            {
+                type = new TypeNode(host) { ChildsOnly = true };
+                files.Add(type);
+            }
+
+            var item = type.ChildFields.Find(x => comparer.Equals(x.Symbol, fnode.Symbol));
+
+            if (item is null) // Adding a new child...
+            {
+                type.ChildFields.Add(fnode);
+                fnode.Parent = type;
+                return fnode;
+            }
+            else // Or augmenting the existing one...
+            {
+                item.Augment(fnode);
+                return item;
+            }
+        }
+
+        // Method nodes...
+        if (node is MethodNode mnode)
+        {
+            var host = mnode.Symbol.ContainingType;
+            var type = files.Find(x => comparer.Equals(x.Symbol, host));
+
+            if (type is null) // Creating a childs-only instance...
+            {
+                type = new TypeNode(host) { ChildsOnly = true };
+                files.Add(type);
+            }
+
+            var item = type.ChildMethods.Find(x => comparer.Equals(x.Symbol, mnode.Symbol));
+
+            if (item is null) // Adding a new child...
+            {
+                type.ChildMethods.Add(mnode);
+                mnode.Parent = type;
+                return mnode;
+            }
+            else // Or augmenting the existing one...
+            {
+                item.Augment(mnode);
+                return item;
+            }
+        }
+
+        // Ignoring...
+        return null;
+    }
 }

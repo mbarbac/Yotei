@@ -274,7 +274,34 @@ partial class TreeGenerator
         if (AddNullabilityHelpers) IncludeNullabilityHelpers(context, options);
 
         // Generating hierarchy and reporting captured errors...
+        var treecontext = new TreeContext(context, options);
+        var files = new List<TypeNode>();
+
+        foreach (var node in nodes)
+        {
+            context.CancellationToken.ThrowIfCancellationRequested();
+
+            if (node is ErrorNode error) error.Report(context);
+            else CaptureHierarchy(files, node, in treecontext);
+        }
 
         // Emitting source code...
+        var reverseparts = options.ReverseGeneratedFileNames;
+        var usefolder = options.GenerateFilesInFolders;
+
+        foreach (var file in files)
+        {
+            context.CancellationToken.ThrowIfCancellationRequested();
+
+            var cb = new CodeBuilder();
+            var ok = file.Emit(in treecontext, cb);
+            if (ok)
+            {
+                var fname = file.EasyFileName + ".cs";
+                var name = NormalizeFileName(fname, reverseparts, usefolder);
+                var code = cb.ToString();
+                context.AddSource(name, code);
+            }
+        }
     }
 }
