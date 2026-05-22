@@ -26,6 +26,15 @@ public interface ITreeNode : INode
     // ----------------------------------------------------
 
     /// <summary>
+    /// Used to capture, at creation time, the given information if such is needed.
+    /// </summary>
+    /// <param name="syntax"></param>
+    /// <param name="attributes"></param>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    ITreeNode With(SyntaxNode syntax, IEnumerable<AttributeData> attributes, SemanticModel model);
+
+    /// <summary>
     /// Invoked while building the generation hierarchy to augment the information captured by
     /// this instance with the one from the other given node. This method typically captures the
     /// other syntaxes and attributes.

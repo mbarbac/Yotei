@@ -135,84 +135,32 @@ public partial class TreeGenerator : IIncrementalGenerator
     // ----------------------------------------------------
 
     /// <summary>
-    /// Invoked to capture the relevant information into a new detached source generation node.
+    /// Invoked to create a new node of the appropriate type for this instance.
     /// </summary>
     /// <param name="symbol"></param>
-    /// <param name="syntax"></param>
-    /// <param name="attributes"></param>
-    /// <param name="model"></param>
     /// <returns></returns>
-    protected virtual TypeNode CreateNode(
-        INamedTypeSymbol symbol,
-        BaseTypeDeclarationSyntax syntax,
-        IEnumerable<AttributeData> attributes,
-        SemanticModel model)
-    {
-        var item = new TypeNode(symbol);
-        item.SyntaxNodes.Add(syntax);
-        item.Attributes.AddRange(attributes);
-        return item;
-    }
+    protected virtual TypeNode CreateNode(INamedTypeSymbol symbol) => new(symbol);
 
     /// <summary>
-    /// Invoked to capture the relevant information into a new detached source generation node.
+    /// Invoked to create a new node of the appropriate type for this instance.
     /// </summary>
     /// <param name="symbol"></param>
-    /// <param name="syntax"></param>
-    /// <param name="attributes"></param>
-    /// <param name="model"></param>
     /// <returns></returns>
-    protected virtual PropertyNode CreateNode(
-        IPropertySymbol symbol,
-        BasePropertyDeclarationSyntax syntax,
-        IEnumerable<AttributeData> attributes,
-        SemanticModel model)
-    {
-        var item = new PropertyNode(symbol);
-        item.SyntaxNodes.Add(syntax);
-        item.Attributes.AddRange(attributes);
-        return item;
-    }
+    protected virtual PropertyNode CreateNode(IPropertySymbol symbol) => new(symbol);
 
     /// <summary>
-    /// Invoked to capture the relevant information into a new detached source generation node.
+    /// Invoked to create a new node of the appropriate type for this instance.
     /// </summary>
     /// <param name="symbol"></param>
-    /// <param name="syntax"></param>
-    /// <param name="attributes"></param>
-    /// <param name="model"></param>
     /// <returns></returns>
-    protected virtual FieldNode CreateNode(
-        IFieldSymbol symbol,
-        BaseFieldDeclarationSyntax syntax,
-        IEnumerable<AttributeData> attributes,
-        SemanticModel model)
-    {
-        var item = new FieldNode(symbol);
-        item.SyntaxNodes.Add(syntax);
-        item.Attributes.AddRange(attributes);
-        return item;
-    }
+    protected virtual FieldNode CreateNode(IFieldSymbol symbol) => new(symbol);
 
     /// <summary>
-    /// Invoked to capture the relevant information into a new detached source generation node.
+    /// Invoked to create a new node of the appropriate type for this instance.
     /// </summary>
     /// <param name="symbol"></param>
-    /// <param name="syntax"></param>
-    /// <param name="attributes"></param>
-    /// <param name="model"></param>
     /// <returns></returns>
-    protected virtual MethodNode CreateNode(
-        IMethodSymbol symbol,
-        BaseMethodDeclarationSyntax syntax,
-        IEnumerable<AttributeData> attributes,
-        SemanticModel model)
-    {
-        var item = new MethodNode(symbol);
-        item.SyntaxNodes.Add(syntax);
-        item.Attributes.AddRange(attributes);
-        return item;
-    }
+    protected virtual MethodNode CreateNode(IMethodSymbol symbol) => new(symbol);
 
     // ----------------------------------------------------
 
@@ -250,7 +198,7 @@ public partial class TreeGenerator : IIncrementalGenerator
             var ats = FilterAttributes(atx, TypeAttributes, TypeAttributeNames);
             if (ats.Count == 0) return null!;
 
-            var temp = CreateNode(symbol, syntax, ats, model);
+            var temp = CreateNode(symbol).With(syntax, ats, model);
             return temp;
         }
 
@@ -267,7 +215,7 @@ public partial class TreeGenerator : IIncrementalGenerator
             var ats = FilterAttributes(atx, PropertyAttributes, PropertyAttributeNames);
             if (ats.Count == 0) return null!;
 
-            var temp = CreateNode(symbol, syntax, ats, model);
+            var temp = CreateNode(symbol).With(syntax, ats, model);
             return temp;
         }
 
@@ -286,7 +234,7 @@ public partial class TreeGenerator : IIncrementalGenerator
                 var ats = FilterAttributes(atx, FieldAttributes, FieldAttributeNames);
                 if (ats.Count == 0) continue;
 
-                var temp = CreateNode(symbol, syntax, ats, model);
+                var temp = CreateNode(symbol).With(syntax, ats, model);
                 return temp;
             }
             return null!;
@@ -307,7 +255,7 @@ public partial class TreeGenerator : IIncrementalGenerator
             var ats = FilterAttributes(atx, PropertyAttributes, PropertyAttributeNames);
             if (ats.Count == 0) return null!;
 
-            var temp = CreateNode(symbol, syntax, ats, model);
+            var temp = CreateNode(symbol).With(syntax, ats, model);
             return temp;
         }
 

@@ -88,6 +88,25 @@ public partial class MethodNode : IChildNode
     // ----------------------------------------------------
 
     /// <summary>
+    /// <inheritdoc cref="ITreeNode.With(SyntaxNode, IEnumerable{AttributeData}, SemanticModel)"/>
+    /// </summary>
+    /// <param name="syntax"></param>
+    /// <param name="attributes"></param>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    public virtual MethodNode With(
+        BaseMethodDeclarationSyntax syntax, IEnumerable<AttributeData> attributes, SemanticModel model)
+    {
+        SyntaxNodes.Add(syntax);
+        Attributes.AddRange(attributes);
+        return this;
+    }
+
+    ITreeNode ITreeNode.With(
+        SyntaxNode syntax, IEnumerable<AttributeData> attributes, SemanticModel model)
+        => With((BaseMethodDeclarationSyntax)syntax, attributes, model);
+
+    /// <summary>
     /// <inheritdoc cref="ITreeNode.Augment(ITreeNode)"/>
     /// </summary>
     /// <param name="other"></param>
