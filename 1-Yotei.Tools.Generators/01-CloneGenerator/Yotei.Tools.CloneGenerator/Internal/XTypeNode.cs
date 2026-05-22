@@ -111,7 +111,7 @@ public class XTypeNode : TypeNode, IXNode
                 });
 
             // Finishing...
-            return found ? value : "public abstract ";
+            return found ? value : null;
         }
     }
 
@@ -172,7 +172,7 @@ public class XTypeNode : TypeNode, IXNode
                         else
                         {
                             // If appears in a base method, defer to it...
-                            if (XNode.TryFindMethod(null, [type.AllBaseTypes], out _)) break;
+                            if (XNode.TryFindMethod(null, [type.AllBaseTypes], out var _)) break;
 
                             // Otherwise, use the first attribute...
                             var at = atts.First();
@@ -270,7 +270,7 @@ public class XTypeNode : TypeNode, IXNode
                         else
                         {
                             // If appears in a base method, defer to it...
-                            if (XNode.TryFindMethod(null, [type.AllBaseTypes], out _)) break;
+                            if (XNode.TryFindMethod(null, [type.AllBaseTypes], out var _)) break;
 
                             // Otherwise, use the first attribute...
                             var at = atts.First();
@@ -305,20 +305,35 @@ public class XTypeNode : TypeNode, IXNode
     /// </summary>
     void EmitExplicitInterfaces(CodeBuilder cb)
     {
-        var options = EasyTypeOptions.Default;
+        var hoptions = new EasyTypeOptions
+        {
+            UseSpecialNames = true,
+            NullableStyle = EasyNullableStyle.UseAnnotations,
+            GenericListOptions = EasyTypeOptions.Default.WithRecursive(
+                namespaceStyle: EasyNamespaceStyle.Default,
+                useHost: true,
+                useSpecialNames: true,
+                nullableStyle: EasyNullableStyle.UseAnnotations)
+        };
+
+        var roptions = EasyTypeOptions.Full.WithRecursive(
+            useVariance: false,
+            useAccessibility: false,
+            useModifiers: false,
+            useKind: false);
 
         var items = GetExplicitInterfaces();
         foreach (var item in items)
         {
-            var iface = item.IFace.EasyName(options);
+            var iface = item.IFace.EasyName(hoptions);
             var core = item.IFace.Name == nameof(ICloneable); // Special 'ICloneable' case...
-            var rtype = core ? "object" : item.RType.EasyName(EasyTypeOptions.Full);
+            var rtype = core ? "object" : item.RType.EasyName(roptions);
             if (item.RNullable && !rtype.EndsWith('?')) rtype += '?';
 
             cb.AppendLine();
             cb.AppendLine($"{rtype}");
-            cb.AppendLine($"{iface}.Clone()");
-            cb.AppendLine($"=> ({rtype})Clone();");
+            cb.AppendLine($"{iface}.Clone() => Clone();");
+            //cb.AppendLine($"=> ({rtype})Clone();");
         }
     }
 

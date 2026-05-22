@@ -139,9 +139,24 @@ public static class XNode
         this INamedTypeSymbol type,
         INamedTypeSymbol other)
     {
-        return SymbolEqualityComparer.Default.Equals(type, other)
-            ? EasyTypeOptions.Default
-            : EasyTypeOptions.Full with { NullableStyle = EasyNullableStyle.None };
+        var options = EasyTypeOptions.Default with
+        {
+            NullableStyle = EasyNullableStyle.None,
+            GenericListOptions = EasyTypeOptions.Default.WithRecursive(
+                namespaceStyle: EasyNamespaceStyle.Default,
+                useHost: true,
+                useSpecialNames: true,
+                nullableStyle: EasyNullableStyle.None)
+        };
+
+        var same = SymbolEqualityComparer.Default.Equals(type, other);
+        if (!same)
+        {
+            options.NamespaceStyle = EasyNamespaceStyle.Default;
+            options.UseHost = true;
+        }
+
+        return options;
     }
 
     // ----------------------------------------------------
