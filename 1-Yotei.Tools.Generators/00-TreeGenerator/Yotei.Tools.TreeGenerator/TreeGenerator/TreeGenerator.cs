@@ -39,21 +39,30 @@ public partial class TreeGenerator : IIncrementalGenerator
     /// <param name="context"></param>
     protected virtual void OnInitialize(IncrementalGeneratorPostInitializationContext context)
     {
-        if (AddEmbeddedAttribute) context.AddEmbeddedAttributeDefinition();
     }
 
     /// <summary>
-    /// If enabled, adds to the compilation the '[Microsoft.CodeAnalysis.EmbeddedAttribute]'
-    /// attribute, which is used to decorate types (such as marker attributes) that shall be
-    /// embedded into an assembly, but not exposed publicly.
+    /// Adds the contents of the given embedded resource file, in the generator project, to the
+    /// compilation, in the given path.
+    /// <para>
+    /// The resource file must be identified as an embedded resource in the generator's project
+    /// file by using a "[EmbeddedResource Include="folder\name.ext" /]" line in a 'ItemGroup'
+    /// section (square brackets must be substituted by their angle counterparts). The output
+    /// path follows the same 'folder\name.ext' convention.
+    /// </para>
+    /// <para>Best practice: add the resource files one by one, ex-novo, not copying them from
+    /// any source or template. Then, once created, identify them as an embedded resource in the
+    /// project file.</para>
     /// </summary>
-    protected virtual bool AddEmbeddedAttribute { get; } = true;
-
-    /// <summary>
-    /// If enabled, add to the compilation the <see cref="IsNullableAttribute"/> and the
-    /// <see cref="IsNullable{T}"/> helper types, under the derived generator's namespace.
-    /// </summary>
-    protected virtual bool AddNullabilityHelpers { get; } = true;
+    /// <param name="context"></param>
+    /// <param name="rname"></param>
+    /// <param name="path"></param>
+    protected void AddLocalResource(
+        IncrementalGeneratorPostInitializationContext context,
+        string rname,
+        string path)
+    {
+    }
 
     // ----------------------------------------------------
 
@@ -263,6 +272,55 @@ public partial class TreeGenerator : IIncrementalGenerator
         return null!;
     }
 
+    /// <summary>
+    /// Obtains the collection of attributes decorating the given syntax node, and transform them
+    /// into the ones decorating the given symbol.
+    /// <br/> Motivation: the <see cref="ISymbol.GetAttributes"/> method not always return all the
+    /// symbol's attributes, for instance when the symbol is defined in differente places (as for
+    /// instance in partial types).
+    /// </summary>
+    static List<AttributeData> FindSyntaxAttributes(
+        MemberDeclarationSyntax syntax,
+        ISymbol symbol)
+    {
+        var list = new List<AttributeData>();
+
+        var atsyntaxes = syntax.AttributeLists.SelectMany(static x => x.Attributes);
+        foreach (var atsyntax in atsyntaxes)
+        {
+            var atd = symbol.GetAttributes().FirstOrDefault(
+                x => x.ApplicationSyntaxReference?.GetSyntax() == atsyntax);
+
+            if (atd != null && !list.Contains(atd)) list.Add(atd);
+        }
+        return list;
+    }
+
+    /// <summary>
+    /// Filters the given collection of attributes by those whose attribute class match either any
+    /// of the given types, or ay of the given fully qualified names.
+    /// </summary>
+    static List<AttributeData> FilterAttributes(
+        IEnumerable<AttributeData> attributes,
+        List<Type> types,
+        List<string> names)
+    {
+        // Matching against the given regular types...
+        var list = attributes.Where(
+            x => x.AttributeClass?.MatchAny([.. types]) ?? false)
+            .ToList();
+
+        // Matching against the given fully qualified type names...
+        foreach (var name in names)
+        {
+            var items = attributes.Where(x => x.AttributeClass?.Name == name);
+            foreach (var item in items)
+                if (!list.Contains(item)) list.Add(item);
+        }
+
+        return list;
+    }
+
     // ----------------------------------------------------
 
     /// <summary>
@@ -274,7 +332,7 @@ public partial class TreeGenerator : IIncrementalGenerator
     /// </summary>
     /// <param name="files"></param>
     /// <param name="node"></param>
-    /// <param name="context"></param>
+    /// <param name="options"></param>
     /// <returns></returns>
     protected virtual INode? CaptureHierarchy(
         List<TypeNode> files, INode node, in TreeContext context)

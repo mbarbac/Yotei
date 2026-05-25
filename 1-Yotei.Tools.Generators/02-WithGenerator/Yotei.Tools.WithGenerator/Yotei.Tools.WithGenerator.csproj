@@ -46,6 +46,10 @@
 	<!--Generator resources-->
 	<ItemGroup>
 		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+		<EmbeddedResource Include="Public\WithAttribute.cs" />
+		<EmbeddedResource Include="Public\WithAttribute[T].cs" />
+		<EmbeddedResource Include="Public\InheritsWithAttribute.cs" />
+		<EmbeddedResource Include="Public\InheritsWithAttribute[T].cs" />
 	</ItemGroup>
 
 </Project>
