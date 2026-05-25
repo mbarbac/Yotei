@@ -46,9 +46,6 @@
 	<!--Generator resources-->
 	<ItemGroup>
 		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-		<EmbeddedResource Include="Public\CloneableAttribute.cs" />
-		<EmbeddedResource Include="Public\CloneableAttribute[T].cs" />
-		
 	</ItemGroup>
 
 </Project>
