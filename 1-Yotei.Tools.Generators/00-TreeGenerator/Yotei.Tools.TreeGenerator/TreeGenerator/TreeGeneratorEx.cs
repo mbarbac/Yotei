@@ -51,6 +51,10 @@ partial class TreeGenerator
 
         var type = GetType();
         var asm = type.Assembly;
+
+        // DEBUG-ONLY...
+        var names = asm.GetManifestResourceNames();
+
         var xname = $"{type.Namespace}.{rname}";
         using var stream = asm.GetManifestResourceStream(xname);
         using var reader = new StreamReader(stream);

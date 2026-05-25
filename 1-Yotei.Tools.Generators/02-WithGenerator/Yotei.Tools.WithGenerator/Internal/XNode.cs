@@ -1,9 +1,10 @@
-﻿namespace Yotei.Tools.CloneGenerator;
+﻿namespace Yotei.Tools.WithGenerator;
 
 // ========================================================
-public interface IXNode
+// T: IPropertySymbol or IFieldSymbol
+public interface IXNode<T> where T : ISymbol
 {
-    INamedTypeSymbol Symbol { get; }
+    public T Symbol { get; }
 }
 
 // ========================================================
@@ -11,6 +12,20 @@ public static class XNode
 {
     const string USEVIRTUAL = "UseVirtual";
     const string RETURNTYPE = "ReturnType";
+
+    extension<T>(IXNode<T> node) where T : ISymbol
+    {
+        public string MemberName => node.Symbol.Name;
+
+        public string MethodName => $"With{node.MemberName}";
+
+        public ITypeSymbol MemberType => node.Symbol switch
+        {
+            IPropertySymbol item => item.Type,
+            IFieldSymbol item => item.Type,
+            _ => throw new UnExpectedException()
+        };
+    }
 
     // ----------------------------------------------------
 
@@ -23,16 +38,17 @@ public static class XNode
     /// Gets the string that emits the attribute decoration, for documentation purposes.
     /// </summary>
     public static string DocAttribute => $$"""
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("{{nameof(CloneGenerator)}}", "{{DocVersion}}")]
+        [System.CodeDom.Compiler.GeneratedCodeAttribute("{{nameof(WithGenerator)}}", "{{DocVersion}}")]
         """;
 
     /// <summary>
     /// Emits appropriate documentation for the generated methods.
     /// </summary>
     /// <param name="cb"></param>
-    public static void EmitDocumentation(CodeBuilder cb) => cb.AppendLine($$"""
+    /// <param name="name"></param>
+    public static void EmitDocumentation(CodeBuilder cb, string name) => cb.AppendLine($$"""
             /// <summary>
-            /// <inheritdoc cref="ICloneable.Clone"/>
+            /// Emulates the '<see langword="with"/>' keyword for the '{{name}}' member.
             /// </summary>
             {{DocAttribute}}
             """);
@@ -40,26 +56,43 @@ public static class XNode
     // ----------------------------------------------------
 
     /// <summary>
-    /// Determines if the given symbol is decorated with a <see cref="CloneableAttribute"/>-alike
+    /// Determines if the given symbol is decorated with a <see cref="WithAttribute"/>-alike
     /// attribute, If so, returns the found ones in the out argument.
     /// </summary>
     /// <param name="symbol"></param>
     /// <param name="attributes"></param>
     /// <returns></returns>
-    public static bool HasCloneableAttribute(
+    public static bool HasWithAttribute(
         this ISymbol symbol,
         out IEnumerable<AttributeData> attributes)
     {
         ArgumentNullException.ThrowIfNull(symbol);
 
-        attributes = symbol.GetAttributes([typeof(CloneableAttribute), typeof(CloneableAttribute<>)]);
+        attributes = symbol.GetAttributes([typeof(WithAttribute), typeof(WithAttribute<>)]);
+        return attributes.Any();
+    }
+
+    /// <summary>
+    /// Determines if the given symbol is decorated with a <see cref="InheritsWithAttribute"/>-alike
+    /// attribute, If so, returns the found ones in the out argument.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <param name="attributes"></param>
+    /// <returns></returns>
+    public static bool HasInheritsWithAttribute(
+        this ISymbol symbol,
+        out IEnumerable<AttributeData> attributes)
+    {
+        ArgumentNullException.ThrowIfNull(symbol);
+
+        attributes = symbol.GetAttributes([typeof(InheritsWithAttribute), typeof(InheritsWithAttribute<>)]);
         return attributes.Any();
     }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// Tries to find the value of the <see cref="CloneableAttribute.UseVirtual"/> setting on the
+    /// Tries to find the value of the <see cref="WithAttribute.UseVirtual"/> setting on the
     /// given attribute. If so, returns it in the out argument.
     /// </summary>
     /// <param name="at"></param>
@@ -166,22 +199,52 @@ public static class XNode
     /// null, or in any of the types in the given chains, in order. If found, returns it in the out
     /// argument.
     /// </summary>
-    /// <param name="type"></param>
-    /// <param name="chains"></param>
-    /// <param name="value"></param>
-    /// <returns></returns>
     public static bool TryFindMethod(
+        string methodname, ITypeSymbol argtype,
         INamedTypeSymbol? type, IEnumerable<INamedTypeSymbol>[] chains,
         [NotNullWhen(true)] out IMethodSymbol? value)
     {
         return Finder.Find(type, chains, out value, (type, out value) =>
         {
             value = type.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(x =>
-                x.Name == "Clone" &&
-                x.Parameters.Length == 0 &&
-                x.ReturnsVoid == false);
+                x.Name == methodname &&
+                x.Parameters.Length == 1 &&
+                argtype.IsAssignableTo(x.Parameters[0].Type));
 
             return value != null;
         });
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Tries to find a decorated member with the given specifications in either the given host
+    /// type, if not null, or in any of the types in the given chains, in order. If found, returns
+    /// it in the out argument as well as the decorating attribute.
+    /// </summary>
+    public static bool TryFindMember<T>(
+        string membername,
+        INamedTypeSymbol? type, IEnumerable<INamedTypeSymbol>[] chains,
+        [NotNullWhen(true)] out T? value,
+        [NotNullWhen(true)] out AttributeData? at) where T : ISymbol
+    {
+        var found = Finder.Find(type, chains, out (T? Member, AttributeData Attr) info,
+            (type, out info) =>
+            {
+                var member = type.GetMembers().OfType<T>().FirstOrDefault(x => x.Name == membername);
+                if (member != null &&
+                member.HasWithAttribute(out var atts))
+                {
+                    info = new(member, atts.First());
+                    return true;
+                }
+
+                info = new();
+                return false;
+            });
+
+        value = found ? info.Member : default;
+        at = found ? info.Attr : default;
+        return found;
     }
 }
