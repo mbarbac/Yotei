@@ -159,7 +159,10 @@ public class XTypeNode : TypeNode, IXNode
                         else
                         {
                             var mvirt = method.IsVirtual || method.IsAbstract || method.IsOverride;
-                            value = !mvirt ? $"{str} abstract new " : $"{str} abstract override ";
+                            value = !mvirt
+                                ? $"{str} abstract new "
+                                : $"{str} abstract override ";
+
                             return true;
                         }
                     }
@@ -177,7 +180,10 @@ public class XTypeNode : TypeNode, IXNode
                             // Otherwise, use the first attribute...
                             var at = atts.First();
                             var mvirt = at.HasUseVirtual(out var temp) ? temp : true;
-                            value = !mvirt ? "public abstract new " : "public abstract override ";
+                            value = !mvirt
+                                ? "public abstract new "
+                                : "public abstract override ";
+
                             return true;
                         }
                     }
@@ -306,16 +312,11 @@ public class XTypeNode : TypeNode, IXNode
     /// <param name="cb"></param>
     void EmitExplicitInterfaces(CodeBuilder cb)
     {
-        var hoptions = new EasyTypeOptions
-        {
-            UseSpecialNames = true,
-            NullableStyle = EasyNullableStyle.UseAnnotations,
-            GenericListOptions = EasyTypeOptions.Default.WithRecursive(
-                namespaceStyle: EasyNamespaceStyle.Default,
-                useHost: true,
-                useSpecialNames: true,
-                nullableStyle: EasyNullableStyle.UseAnnotations)
-        };
+        var hoptions = EasyTypeOptions.Default.WithRecursive(
+            namespaceStyle: EasyNamespaceStyle.Default,
+            useHost: true,
+            useSpecialNames: true,
+            nullableStyle: EasyNullableStyle.UseAnnotations);
 
         var roptions = EasyTypeOptions.Full.WithRecursive(
             useVariance: false,

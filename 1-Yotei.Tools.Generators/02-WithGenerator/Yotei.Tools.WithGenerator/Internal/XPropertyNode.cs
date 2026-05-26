@@ -9,6 +9,13 @@ public class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
     AttributeData Attribute = default!;
     INamedTypeSymbol Host => Parent!.Symbol;
 
+    readonly EasyTypeOptions ArgOptions = EasyTypeOptions.Empty.WithRecursive(
+        useVariance: true,
+        namespaceStyle: EasyNamespaceStyle.Default,
+        useHost: true,
+        useSpecialNames: true,
+        nullableStyle: EasyNullableStyle.UseAnnotations);
+
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
@@ -86,7 +93,18 @@ public class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
     /// </summary>
     bool EmitHostInterface(in TreeContext _, CodeBuilder cb)
     {
-        throw null;
+        if (!Attribute.HasReturnType(out var rtype, out var rnull)) rtype = Host;
+        var options = rtype.GetReturnOptions(Host);
+        var stype = rtype.EasyName(options);
+        var snull = rnull ? "?" : string.Empty;
+        var mods = GetModifiers();
+        var sarg = this.MemberType.EasyName(ArgOptions);
+
+        XNode.EmitDocumentation(cb, this.MemberName);
+        cb.AppendLine($"{mods}{stype}{snull}");
+        cb.AppendLine($"{this.MethodName}({sarg} value);");
+
+        return true;
 
         /// <summary>
         /// Obtains the appropriate modifiers, with a space separator, or null if any.
@@ -94,7 +112,49 @@ public class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
         [SuppressMessage("", "IDE0075")]
         string? GetModifiers()
         {
-            throw null;
+            if (!Attribute.HasUseVirtual(out var hvirt)) hvirt = true;
+            var hsealed = Symbol.IsSealed;
+            var membername = this.MemberName;
+            var methodname = this.MethodName;
+            var argtype = this.MemberType;
+
+            // Finding in base chains...
+            var found = Finder.Find(
+                [Host.AllBaseTypes, Host.AllInterfaces], out string? value,
+                (type, out value) =>
+                {
+                    // Method exists in base type...
+                    while (XNode.TryFindMethod(methodname, argtype, type, [], out var method))
+                    {
+                        var dec = method.DeclaredAccessibility; if (dec == Accessibility.Private) break;
+                        var str = dec.ToAccessibilityString(false); if (str == null) break;
+
+                        value = dec == Accessibility.Public ? "new " : $"{str} new ";
+                        return true;
+                    }
+
+                    // Member exists in base type...
+                    while (XNode.TryFindMember<IPropertySymbol>(
+                        membername, type, [], out var member, out var at))
+                    {
+                        value = $"new ";
+                        return true;
+                    }
+
+                    // Method requested in base type...
+                    while (type.HasInheritsWithAttribute(out var atts))
+                    {
+                        value = $"new ";
+                        return true;
+                    }
+
+                    // Try next...
+                    value = null;
+                    return false;
+                });
+
+            // Finishing...
+            return found ? value : null;
         }
     }
 
@@ -105,7 +165,19 @@ public class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
     /// </summary>
     bool EmitHostAbstract(in TreeContext _, CodeBuilder cb)
     {
-        throw null;
+        if (!Attribute.HasReturnType(out var rtype, out var rnull)) rtype = Host;
+        var options = rtype.GetReturnOptions(Host);
+        var stype = rtype.EasyName(options);
+        var snull = rnull ? "?" : string.Empty;
+        var mods = GetModifiers();
+        var sarg = this.MemberType.EasyName(ArgOptions);
+
+        XNode.EmitDocumentation(cb, this.MemberName);
+        cb.AppendLine($"{mods}{stype}{snull}");
+        cb.AppendLine($"{this.MethodName}({sarg} value);");
+
+        EmitExplicitInterfaces(cb);
+        return true;
 
         /// <summary>
         /// Obtains the appropriate modifiers, with a space separator, or null if any.
@@ -113,7 +185,82 @@ public class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
         [SuppressMessage("", "IDE0075")]
         string? GetModifiers()
         {
-            throw null;
+            if (!Attribute.HasUseVirtual(out var hvirt)) hvirt = true;
+            var hsealed = Symbol.IsSealed;
+            var membername = this.MemberName;
+            var methodname = this.MethodName;
+            var argtype = this.MemberType;
+
+            // Finding in base chains...
+            var found = Finder.Find(
+                [Host.AllBaseTypes, Host.AllInterfaces], out string? value,
+                (type, out value) =>
+                {
+                    // Method exists in base type...
+                    while (XNode.TryFindMethod(methodname, argtype, type, [], out var method))
+                    {
+                        var dec = method.DeclaredAccessibility; if (dec == Accessibility.Private) break;
+                        var str = dec.ToAccessibilityString(false); if (str == null) break;
+
+                        if (type.IsInterface) { value = $"{str} abstract "; return true; }
+                        else if (type.IsAbstract) { value = $"{str} abstract override "; return true; }
+                        else
+                        {
+                            var mvirt = method.IsVirtual || method.IsAbstract || method.IsOverride;
+                            value = !mvirt
+                                ? $"{str} abstract new "
+                                : $"{str} abstract override ";
+                            
+                            return true;
+                        }
+                    }
+
+                    // Member exists in base type...
+                    while (XNode.TryFindMember<IPropertySymbol>(
+                        membername, type, [], out var member, out var at))
+                    {
+                        if (type.IsInterface) { value = $"public abstract "; return true; }
+                        else
+                        {
+                            var mvirt = at.HasUseVirtual(out var temp) ? temp : true;
+                            value = !mvirt
+                                ? "public abstract override " // do not use 'abstract new'
+                                : "public abstract override ";
+                            
+                            return true;
+                        }
+                    }
+
+                    // Method requested in base type...
+                    while (type.HasInheritsWithAttribute(out var atts))
+                    {
+                        if (type.IsInterface) { value = "public abstract "; return true; }
+                        if (type.IsAbstract) { value = "public abstract override "; return true; }
+                        else
+                        {
+                            // If appears in a base method, defer to it...
+                            if (XNode.TryFindMethod(
+                                methodname, argtype,
+                                null, [type.AllBaseTypes], out var _)) break;
+
+                            // Otherwise, use the first attribute...
+                            var at = atts.First();
+                            var mvirt = at.HasUseVirtual(out var temp) ? temp : true;
+                            value = !mvirt
+                                ? "public abstract new "
+                                : "public abstract override ";
+                            
+                            return true;
+                        }
+                    }
+
+                    // Try next...
+                    value = null;
+                    return false;
+                });
+
+            // Finishing...
+            return found ? value : "public abstract ";
         }
     }
 
@@ -122,9 +269,41 @@ public class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
     /// <summary>
     /// Invoked when the host type is a regular one.
     /// </summary>
-    bool EmitHostRegular(in TreeContext _, CodeBuilder cb)
+    bool EmitHostRegular(in TreeContext context, CodeBuilder cb)
     {
-        throw null;
+        var ctor = Host.FindCopyConstructor(strict: false);
+        if (ctor == null) { TreeError.NoCopyConstructor.Report(Symbol, context.Context); return false; }
+
+        if (!Attribute.HasReturnType(out var rtype, out var rnull)) rtype = Host;
+        var options = rtype.GetReturnOptions(Host);
+        var stype = rtype.EasyName(options);
+        var snull = rnull ? "?" : string.Empty;
+        var mods = GetModifiers();
+        var sarg = this.MemberType.EasyName(ArgOptions);
+
+        XNode.EmitDocumentation(cb, this.MemberName);
+        cb.AppendLine($"{mods}{stype}{snull}");
+        cb.AppendLine($"{this.MethodName}({sarg} value)");
+
+        cb.AppendLine("{");
+        cb.IndentLevel++;
+        {
+            var host = Host.EasyName();
+            cb.AppendLine($"var host = new {host}(this)");
+            cb.AppendLine("{");
+            cb.IndentLevel++;
+            {
+                cb.AppendLine($"{this.MemberName} = value");
+            }
+            cb.IndentLevel--;
+            cb.AppendLine("};");
+            cb.AppendLine($"return host;");
+        }
+        cb.IndentLevel--;
+        cb.AppendLine("}");
+
+        EmitExplicitInterfaces(cb);
+        return true;
 
         /// <summary>
         /// Obtains the appropriate modifiers, with a space separator, or null if any.
@@ -132,7 +311,92 @@ public class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
         [SuppressMessage("", "IDE0075")]
         string? GetModifiers()
         {
-            throw null;
+            if (!Attribute.HasUseVirtual(out var hvirt)) hvirt = true;
+            var hsealed = Symbol.IsSealed;
+            var membername = this.MemberName;
+            var methodname = this.MethodName;
+            var argtype = this.MemberType;
+
+            // Finding in base chains...
+            var found = Finder.Find(
+                [Host.AllBaseTypes, Host.AllInterfaces], out string? value,
+                (type, out value) =>
+                {
+                    // Method exists in base type...
+                    while (XNode.TryFindMethod(methodname, argtype, type, [], out var method))
+                    {
+                        var dec = method.DeclaredAccessibility; if (dec == Accessibility.Private) break;
+                        var str = dec.ToAccessibilityString(false); if (str == null) break;
+
+                        if (type.IsInterface)
+                        {
+                            value = hsealed || !hvirt ? $"{str} " : $"{str} virtual ";
+                            return true;
+                        }
+                        else
+                        {
+                            var mvirt = method.IsVirtual || method.IsAbstract || method.IsOverride;
+                            value = mvirt
+                                ? (!hvirt ? $"{str} new " : $"{str} override ")
+                                : (!hvirt ? $"{str} new " : $"{str} new virtual ");
+
+                            return true;
+                        }
+                    }
+
+                    // Member exists in base type...
+                    while (XNode.TryFindMember<IPropertySymbol>(
+                        membername, type, [], out var member, out var at))
+                    {
+                        if (type.IsInterface)
+                        {
+                            value = hsealed || !hvirt ? $"public " : $"public virtual ";
+                            return true;
+                        }
+                        else
+                        {
+                            var mvirt = at.HasUseVirtual(out var temp) ? temp : true;
+                            value = mvirt
+                                ? (!hvirt ? $"public new " : $"public override ")
+                                : (!hvirt ? $"public new " : $"public new virtual ");
+
+                            return true;
+                        }
+                    }
+
+                    // Method requested in base type...
+                    while (type.HasInheritsWithAttribute(out var atts))
+                    {
+                        if (type.IsInterface)
+                        {
+                            value = hsealed || !hvirt ? $"public " : $"public virtual ";
+                            return true;
+                        }
+                        else
+                        {
+                            // If appears in a base method, defer to it...
+                            if (XNode.TryFindMethod(
+                                methodname, argtype,
+                                null, [type.AllBaseTypes], out var _)) break;
+
+                            // Otherwise, use the first attribute...
+                            var at = atts.First();
+                            var mvirt = at.HasUseVirtual(out var temp) ? temp : true;
+                            value = mvirt
+                                ? (!hvirt ? $"public new " : $"public override ")
+                                : (!hvirt ? $"public new " : $"public new virtual ");
+
+                            return true;
+                        }
+                    }
+
+                    // Try next...
+                    value = null;
+                    return false;
+                });
+
+            // Finishing...
+            return found ? value : (hsealed || !hvirt ? "public " : "public virtual ");
         }
     }
 
@@ -151,16 +415,11 @@ public class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
     /// <param name="cb"></param>
     void EmitExplicitInterfaces(CodeBuilder cb)
     {
-        var hoptions = new EasyTypeOptions
-        {
-            UseSpecialNames = true,
-            NullableStyle = EasyNullableStyle.UseAnnotations,
-            GenericListOptions = EasyTypeOptions.Default.WithRecursive(
-                namespaceStyle: EasyNamespaceStyle.Default,
-                useHost: true,
-                useSpecialNames: true,
-                nullableStyle: EasyNullableStyle.UseAnnotations)
-        };
+        var hoptions = EasyTypeOptions.Default.WithRecursive(
+            namespaceStyle: EasyNamespaceStyle.Default,
+            useHost: true,
+            useSpecialNames: true,
+            nullableStyle: EasyNullableStyle.UseAnnotations);
 
         var roptions = EasyTypeOptions.Full.WithRecursive(
             useVariance: false,
@@ -176,7 +435,7 @@ public class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
             var iface = item.IFace.EasyName(hoptions);
             var rtype = item.RType.EasyName(roptions);
             if (item.RNullable && !rtype.EndsWith('?')) rtype += '?';
-            var atype = item.ArgType.EasyName(roptions);
+            var atype = item.ArgType.EasyName(ArgOptions);
 
             cb.AppendLine();
             cb.AppendLine($"{rtype}");

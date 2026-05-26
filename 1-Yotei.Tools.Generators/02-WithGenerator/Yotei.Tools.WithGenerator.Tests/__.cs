@@ -10,5 +10,3 @@
 //    {
 //    }
 //}
-
-public interface IFake { }
