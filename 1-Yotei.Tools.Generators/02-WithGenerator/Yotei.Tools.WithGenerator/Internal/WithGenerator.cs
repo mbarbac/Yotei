@@ -14,5 +14,9 @@ public class WithGenerator : TreeGenerator
     protected override void OnInitialize(IncrementalGeneratorPostInitializationContext context)
     {
         base.OnInitialize(context);
+        AddLocalResource(context, "Public/WithAttribute.cs", "Markers/WithAttribute.cs");
+        AddLocalResource(context, "Public/WithAttribute[T].cs", "Markers/WithAttribute[T].cs");
+        AddLocalResource(context, "Public/InheritsWithAttribute.cs", "Markers/InheritsWithAttribute.cs");
+        AddLocalResource(context, "Public/InheritsWithAttribute[T].cs", "Markers/InheritsWithAttribute[T].cs");
     }
 }

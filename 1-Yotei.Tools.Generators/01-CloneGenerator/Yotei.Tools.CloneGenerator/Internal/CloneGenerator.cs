@@ -14,6 +14,8 @@ public class CloneGenerator : TreeGenerator
     protected override void OnInitialize(IncrementalGeneratorPostInitializationContext context)
     {
         base.OnInitialize(context);
+        AddLocalResource(context, "Public/CloneableAttribute.cs", "Markers/CloneableAttribute.cs");
+        AddLocalResource(context, "Public/CloneableAttribute[T].cs", "Markers/CloneableAttribute[T].cs");
     }
 
     // ----------------------------------------------------

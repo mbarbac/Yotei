@@ -29,6 +29,20 @@ public partial class TreeGenerator : IIncrementalGenerator
     /// </summary>
     protected virtual string ConfigurationFileName { get; } = "TreeGeneratorOptions.ini";
 
+    /// <summary>
+    /// If enabled, adds to the compilation the '[Microsoft.CodeAnalysis.EmbeddedAttribute]'
+    /// attribute, which is used to decorate types (such as marker attributes) that shall be
+    /// embedded into an assembly, but not exposed publicly.
+    /// </summary>
+    protected virtual bool AddEmbeddedAttribute { get; } = true;
+
+    /// <summary>
+    /// If not null, then the path where to add to the compilation the <see cref="IsNullableAttribute"/>
+    /// and the <see cref="IsNullable{T}"/> helper types, under the derived generator's namespace.
+    /// If null, then they are ignored.
+    /// </summary>
+    protected virtual string? NullabilityHelpersPath { get; } = "Markers/NullabilityHelpers.cs";
+
     // ----------------------------------------------------
 
     /// <summary>
@@ -39,20 +53,67 @@ public partial class TreeGenerator : IIncrementalGenerator
     /// <param name="context"></param>
     protected virtual void OnInitialize(IncrementalGeneratorPostInitializationContext context)
     {
+        if (AddEmbeddedAttribute) context.AddEmbeddedAttributeDefinition();
+        if (NullabilityHelpersPath != null) AddNullabilityHelpers(context, NullabilityHelpersPath);
+    }
+
+    /// <summary>
+    /// Invoked to add the nullability helpers.
+    /// </summary>
+    void AddNullabilityHelpers(
+        IncrementalGeneratorPostInitializationContext context,
+        string path)
+    {
+        var nspace = GetType().Namespace ?? "Yotei.Tools";
+        var code = $$"""
+            #nullable enable
+
+            namespace {{nspace}}
+            {
+                /// <summary>
+                /// Used to wrap types for which nullability information shall be persisted.
+                /// <para>
+                /// Nullable annotations on value types are always translated by the compiler into instances
+                /// of the <see cref="Nullable{T}"/> struct. By contrast, nullable annotations on reference
+                /// types are just syntactic sugar used by the compiler but, in general, either they are not
+                /// persisted in metadata or in custom attributes, or they are not allowed in certain contexts
+                /// (e.g., generic type arguments).
+                /// <br/> The <see cref="IsNullable{T}"/> and <see cref="IsNullableAttribute"/> types can be
+                /// used as workarounds when there is the need to persist nullability information for their
+                /// associated types, or when there is the need to specify it in those not-allowed contexts.
+                /// </para>
+                /// </summary>
+                [Microsoft.CodeAnalysis.Embedded]
+                public class IsNullable<T> { }
+                
+                /// <summary>
+                /// <inheritdoc cref="IsNullable{T}"/>
+                /// </summary>
+                [Microsoft.CodeAnalysis.Embedded]
+                [AttributeUsage(AttributeTargets.All)]
+                public class IsNullableAttribute : Attribute { }
+            }
+            """;
+
+        path = path.NotNullNotEmpty(trim: true);
+        context.AddSource(path, code);
     }
 
     /// <summary>
     /// Adds the contents of the given embedded resource file, in the generator project, to the
-    /// compilation, in the given path.
+    /// compilation, in the given path, at post-initialization time.
+    /// <br/> This method is typically used to add marker attributes. If not added at this time,
+    /// their attribute classes are not properly resolved (ie: their namespace is the 'global'
+    /// one), and so they cannot be compared against the specified ones.
     /// <para>
     /// The resource file must be identified as an embedded resource in the generator's project
     /// file by using a "[EmbeddedResource Include="folder\name.ext" /]" line in a 'ItemGroup'
     /// section (square brackets must be substituted by their angle counterparts). The output
     /// path follows the same 'folder\name.ext' convention.
-    /// </para>
-    /// <para>Best practice: add the resource files one by one, ex-novo, not copying them from
+    /// <br/> Best practice: add the resource files one by one, ex-novo, not copying them from
     /// any source or template. Then, once created, identify them as an embedded resource in the
-    /// project file.</para>
+    /// project file.
+    /// </para>
     /// </summary>
     /// <param name="context"></param>
     /// <param name="rname"></param>
@@ -62,6 +123,24 @@ public partial class TreeGenerator : IIncrementalGenerator
         string rname,
         string path)
     {
+        rname = rname.NotNullNotEmpty(trim: true).Replace('\\', '.').Replace('/', '.');
+        var type = GetType();
+        var asm = type.Assembly;
+        var xname = $"{type.Namespace}.{rname}";
+        using var stream = asm.GetManifestResourceStream(xname);
+        if (stream == null)
+        {
+            var names = asm.GetManifestResourceNames();
+            throw new NotFoundException("Resource not found among the embedded ones.")
+                .WithData(xname, "name")
+                .WithData(names, "resources");
+        }
+
+        using var reader = new StreamReader(stream);
+        var code = reader.ReadToEnd();
+
+        path = path.NotNullNotEmpty(trim: true);
+        context.AddSource(path, code);
     }
 
     // ----------------------------------------------------
