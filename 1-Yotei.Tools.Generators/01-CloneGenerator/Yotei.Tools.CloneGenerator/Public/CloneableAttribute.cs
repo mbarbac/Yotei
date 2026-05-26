@@ -9,8 +9,7 @@ namespace Yotei.Tools.CloneGenerator;
 /// <br/> Records are not supported.
 /// </summary>
 [AttributeUsage(
-    AttributeTargets.All, // DEBUG-ONLY
-    //AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface,
+    AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface,
     Inherited = false,
     AllowMultiple = false)]
 public class CloneableAttribute : Attribute

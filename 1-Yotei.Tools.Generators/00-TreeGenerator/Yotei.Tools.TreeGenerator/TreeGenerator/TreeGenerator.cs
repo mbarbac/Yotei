@@ -41,7 +41,7 @@ public partial class TreeGenerator : IIncrementalGenerator
     /// and the <see cref="IsNullable{T}"/> helper types, under the derived generator's namespace.
     /// If null, then they are ignored.
     /// </summary>
-    protected virtual string? NullabilityHelpersPath { get; } = "Markers/NullabilityHelpers.cs";
+    protected virtual string? NullabilityHelpersPath { get; } = "NullabilityHelpers.cs";
 
     // ----------------------------------------------------
 
