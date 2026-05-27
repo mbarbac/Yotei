@@ -4,7 +4,7 @@
 /// <summary>
 /// <inheritdoc/>
 /// </summary>
-public class XTypeNode : TypeNode, IXNode
+internal class XTypeNode : TypeNode, IXNode
 {
     AttributeData Attribute;
 

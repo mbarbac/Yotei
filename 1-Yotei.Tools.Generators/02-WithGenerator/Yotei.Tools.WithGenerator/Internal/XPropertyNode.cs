@@ -4,7 +4,7 @@
 /// <summary>
 /// <inheritdoc/>
 /// </summary>
-public class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
+internal class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
 {
     AttributeData Attribute = default!;
     INamedTypeSymbol Host => Parent!.Symbol;

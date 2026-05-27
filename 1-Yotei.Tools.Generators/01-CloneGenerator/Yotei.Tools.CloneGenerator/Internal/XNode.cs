@@ -1,13 +1,13 @@
 ﻿namespace Yotei.Tools.CloneGenerator;
 
 // ========================================================
-public interface IXNode
+internal interface IXNode
 {
     INamedTypeSymbol Symbol { get; }
 }
 
 // ========================================================
-public static class XNode
+internal static class XNode
 {
     const string USEVIRTUAL = "UseVirtual";
     const string RETURNTYPE = "ReturnType";

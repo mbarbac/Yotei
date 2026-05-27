@@ -5,7 +5,7 @@
 /// <inheritdoc/>
 /// </summary>
 [Generator(LanguageNames.CSharp)]
-public class WithGenerator : TreeGenerator
+internal class WithGenerator : TreeGenerator
 {
     /// <summary>
     /// <inheritdoc/>

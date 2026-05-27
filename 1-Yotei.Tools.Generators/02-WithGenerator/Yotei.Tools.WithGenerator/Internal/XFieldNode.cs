@@ -4,7 +4,7 @@
 /// <summary>
 /// <inheritdoc/>
 /// </summary>
-public class XFieldNode : FieldNode, IXNode<IFieldSymbol>
+internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
 {
     AttributeData Attribute = default!;
     INamedTypeSymbol Host => Parent!.Symbol;

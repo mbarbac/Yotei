@@ -18,23 +18,34 @@ internal static class ITypeSymbolExtensions
         /// <returns></returns>
         public bool IsPartial()
         {
+            var locs = source.Locations;
+            foreach (var loc in locs)
+            {
+                if (!loc.IsInSource) continue;
+                var tree = loc.SourceTree;
+                if (tree is null) continue;
+                var root = tree.GetRoot();
+                var node = root.FindNode(loc.SourceSpan);
+                if (node is TypeDeclarationSyntax dec &&
+                    dec.Modifiers.Any(SyntaxKind.PartialKeyword)) return true;
+            }
+
             // Fast way...
             var syntaxes = source.DeclaringSyntaxReferences;
             if (syntaxes.Length > 1) return true;
 
-            // Likely way...
-            if (source.GetSyntaxNodes()
-                .OfType<BaseTypeDeclarationSyntax>()
-                .Any(x => x.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword))))
-                return true;
-
-            // Maybe redundant...
             foreach (var syntax in syntaxes)
             {
                 var node = syntax.GetSyntax();
                 if (node is TypeDeclarationSyntax dec &&
                     dec.Modifiers.Any(SyntaxKind.PartialKeyword)) return true;
             }
+
+            // Likely way...
+            var nodes = source.GetSyntaxNodes();
+            foreach (var node in nodes)
+                if (node is BaseTypeDeclarationSyntax dec &&
+                    dec.Modifiers.Any(SyntaxKind.PartialKeyword)) return true;            
 
             // Not found...
             return false;

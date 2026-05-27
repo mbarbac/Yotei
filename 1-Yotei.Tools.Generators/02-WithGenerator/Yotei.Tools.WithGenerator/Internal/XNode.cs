@@ -2,13 +2,13 @@
 
 // ========================================================
 // T: IPropertySymbol or IFieldSymbol
-public interface IXNode<T> where T : ISymbol
+internal interface IXNode<T> where T : ISymbol
 {
     public T Symbol { get; }
 }
 
 // ========================================================
-public static class XNode
+internal static class XNode
 {
     const string USEVIRTUAL = "UseVirtual";
     const string RETURNTYPE = "ReturnType";

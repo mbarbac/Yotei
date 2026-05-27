@@ -4,7 +4,7 @@
 /// <summary>
 /// <inheritdoc/>
 /// </summary>
-public class XTypeNode : TypeNode
+internal class XTypeNode : TypeNode
 {
     AttributeData Attribute = default!;
 
