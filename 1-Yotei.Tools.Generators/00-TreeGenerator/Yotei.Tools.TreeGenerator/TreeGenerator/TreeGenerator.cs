@@ -21,7 +21,7 @@
 /// - Mark the derived generator project as the startup one (not the test one!).
 /// - In the play button, select the debug profile.
 /// - Click F5 (run) to compile (F6 does nothing).
-public partial class TreeGenerator : IIncrementalGenerator
+internal partial class TreeGenerator : IIncrementalGenerator
 {
     /// <summary>
     /// The name of the consuming project configuration file. If its value is <see langword="null"/>

@@ -5,7 +5,7 @@
 /// Maintains a collection of key-value option pairs read from a generator project configuration
 /// file, where the keys are case insensitive, along with some standard entries as properties.
 /// </summary>
-public class TreeOptions : IEquatable<TreeOptions>
+internal class TreeOptions : IEquatable<TreeOptions>
 {
     readonly Dictionary<string, string> Items;
 

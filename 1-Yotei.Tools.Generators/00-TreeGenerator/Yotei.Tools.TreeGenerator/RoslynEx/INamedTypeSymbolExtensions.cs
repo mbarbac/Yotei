@@ -1,7 +1,7 @@
 ﻿namespace Yotei.Tools.Generators;
 
 // ========================================================
-public static class INamedTypeSymbolExtensions
+internal static class INamedTypeSymbolExtensions
 {
     extension(INamedTypeSymbol source)
     {

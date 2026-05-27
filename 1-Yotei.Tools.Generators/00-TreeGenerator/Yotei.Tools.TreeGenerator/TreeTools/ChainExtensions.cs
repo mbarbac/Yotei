@@ -1,7 +1,7 @@
 ﻿namespace Yotei.Tools.Generators;
 
 // ========================================================
-public static class ChainExtensions
+internal static class ChainExtensions
 {
     /// <summary>
     /// Gets the chain of symbols up to the given one, such as combined describes the declaring

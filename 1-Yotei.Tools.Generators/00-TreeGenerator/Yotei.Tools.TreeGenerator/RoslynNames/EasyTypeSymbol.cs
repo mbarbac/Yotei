@@ -1,7 +1,7 @@
 ﻿namespace Yotei.Tools.Generators;
 
 // ========================================================
-public static partial class RoslynNamesExtensions
+internal static partial class RoslynNamesExtensions
 {
     /// <summary>
     /// Obtains a C#-alike representation for a given type-alike element, using default options.
@@ -261,7 +261,7 @@ public static partial class RoslynNamesExtensions
 
             // Intercepting partial keyword...
             var end = sb.Length;
-            if (end > ini && source.IsPartial) sb.Insert(ini, "partial ");
+            if (end > ini && source.IsPartial()) sb.Insert(ini, "partial ");
         }
 
         /// <summary>

@@ -5,7 +5,7 @@ using System.Runtime.ExceptionServices;
 namespace Yotei.Tools.Generators;
 
 // ========================================================
-public static partial class RoslynNamesExtensions
+internal static partial class RoslynNamesExtensions
 {
     /// <summary>
     /// Obtains a C#-alike representation for a given parameter-alike element, using default

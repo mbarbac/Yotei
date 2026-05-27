@@ -1,7 +1,7 @@
 ﻿namespace Yotei.Tools.Generators;
 
 // ========================================================
-public static class ISymbolExtensions
+internal static class ISymbolExtensions
 {
     extension(ISymbol source)
     {

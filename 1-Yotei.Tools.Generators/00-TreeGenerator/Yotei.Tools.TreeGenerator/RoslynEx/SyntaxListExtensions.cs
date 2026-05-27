@@ -1,7 +1,7 @@
 ﻿namespace Yotei.Tools.Generators;
 
 // ========================================================
-public static class SyntaxListExtensions
+internal static class SyntaxListExtensions
 {
     extension(SyntaxList<AttributeListSyntax> source)
     {

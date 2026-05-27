@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents a captured tree-oriented source code generation node.
 /// </summary>
-public interface ITreeNode : INode
+internal interface ITreeNode : INode
 {
     /// <summary>
     /// The symbol represented by this instance.

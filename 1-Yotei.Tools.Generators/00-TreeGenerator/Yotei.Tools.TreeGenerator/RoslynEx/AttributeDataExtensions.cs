@@ -1,7 +1,7 @@
 ﻿namespace Yotei.Tools.Generators;
 
 // ========================================================
-public static class AttributeDataExtensions
+internal static class AttributeDataExtensions
 {
     extension(AttributeData source)
     {

@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents a field-alike source code generation node.
 /// </summary>
-public partial class FieldNode : IChildNode
+internal partial class FieldNode : IChildNode
 {
     /// <summary>
     /// Initializes a new instance.
@@ -143,9 +143,13 @@ public partial class FieldNode : IChildNode
 
         if (Parent == null) { TreeError.NoParentNode.Report(Symbol, context); r = false; }
 
-        if (!Symbol.ContainingType.IsPartial)
-        { TreeError.TypeNotPartial.Report(Symbol.ContainingType, context); r = false; }
-        
+        if (!Symbol.ContainingType.IsPartial())
+        {
+            var message = $"+, Member: '{Symbol.Name}'";
+            TreeError.TypeNotPartial.Report(Symbol.ContainingType, context, message: message);
+            r = false;
+        }
+
         return r;
     }
 

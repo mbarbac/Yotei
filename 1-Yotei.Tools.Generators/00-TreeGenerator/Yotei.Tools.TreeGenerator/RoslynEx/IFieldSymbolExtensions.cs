@@ -1,7 +1,7 @@
 ﻿namespace Yotei.Tools.Generators;
 
 // ========================================================
-public static class IFieldSymbolExtensions
+internal static class IFieldSymbolExtensions
 {
     extension(IFieldSymbol symbol)
     {

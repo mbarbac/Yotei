@@ -5,7 +5,7 @@
 /// Provides recursive tree-oriented find capabilities to obtain an arbitrary value from a given
 /// type and collection of types.
 /// </summary>
-public static class Finder
+internal static class Finder
 {
     /// <summary>
     /// The delegate invoked to obtain the requested value from the given type. Returns true if

@@ -5,7 +5,7 @@
 /// Represents a captured tree-oriented child source code generation node that, conceptually,
 /// belongs to a higher node in the generation hierarchy.
 /// </summary>
-public interface IChildNode : ITreeNode
+internal interface IChildNode : ITreeNode
 {
     /// <summary>
     /// The node this instance belongs to in the source code generation hierarchy, or null if it

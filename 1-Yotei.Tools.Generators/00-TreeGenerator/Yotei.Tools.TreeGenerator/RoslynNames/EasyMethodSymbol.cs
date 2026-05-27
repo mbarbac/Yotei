@@ -1,7 +1,7 @@
 ﻿namespace Yotei.Tools.Generators;
 
 // ========================================================
-public static partial class RoslynNamesExtensions
+internal static partial class RoslynNamesExtensions
 {
     /// <summary>
     /// Obtains a C#-alike representation for a given method-alike element, using default

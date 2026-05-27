@@ -1,7 +1,7 @@
 ﻿namespace Yotei.Tools.Generators;
 
 // ========================================================
-public static class DiagnosticExtensions
+internal static class DiagnosticExtensions
 {
     extension(Diagnostic source)
     {

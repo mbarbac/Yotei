@@ -8,4 +8,4 @@
 /// NOTE: Types that implement this interface must implement their equatable capabilities in an
 /// incremental generator friendly manner, which typically means to only cache the static info
 /// that mey later be needed (or values with custom equality capabilities).
-public interface INode : IEquatable<INode> { }
+internal interface INode : IEquatable<INode> { }

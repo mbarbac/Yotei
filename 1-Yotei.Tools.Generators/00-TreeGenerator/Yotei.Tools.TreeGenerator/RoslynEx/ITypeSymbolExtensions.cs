@@ -1,7 +1,7 @@
 ﻿namespace Yotei.Tools.Generators;
 
 // ========================================================
-public static class ITypeSymbolExtensions
+internal static class ITypeSymbolExtensions
 {
     extension(ITypeSymbol source)
     {
@@ -9,37 +9,35 @@ public static class ITypeSymbolExtensions
         /// Determines if this type symbol is an interface, or not.
         /// </summary>
         public bool IsInterface => source.TypeKind == TypeKind.Interface;
-        
+
         // ------------------------------------------------
 
         /// <summary>
         /// Determines if this type symbol is a partial one, or not.
         /// </summary>
-        public bool IsPartial
+        /// <returns></returns>
+        public bool IsPartial()
         {
-            get
+            // Fast way...
+            var syntaxes = source.DeclaringSyntaxReferences;
+            if (syntaxes.Length > 1) return true;
+
+            // Likely way...
+            if (source.GetSyntaxNodes()
+                .OfType<BaseTypeDeclarationSyntax>()
+                .Any(x => x.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword))))
+                return true;
+
+            // Maybe redundant...
+            foreach (var syntax in syntaxes)
             {
-                // Fast way...
-                var syntaxes = source.DeclaringSyntaxReferences;
-                if (syntaxes.Length > 1) return true;
-
-                // Likely way...
-                if (source.GetSyntaxNodes()
-                    .OfType<BaseTypeDeclarationSyntax>()
-                    .Any(x => x.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword))))
-                    return true;
-
-                // Maybe redundant...
-                foreach (var syntax in syntaxes)
-                {
-                    var node = syntax.GetSyntax();
-                    if (node is TypeDeclarationSyntax dec &&
-                        dec.Modifiers.Any(SyntaxKind.PartialKeyword)) return true;
-                }
-
-                // Not found...
-                return false;
+                var node = syntax.GetSyntax();
+                if (node is TypeDeclarationSyntax dec &&
+                    dec.Modifiers.Any(SyntaxKind.PartialKeyword)) return true;
             }
+
+            // Not found...
+            return false;
         }
 
         // ------------------------------------------------

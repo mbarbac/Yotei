@@ -6,7 +6,7 @@
 /// production context augmented with the options read from a consuming project configuration
 /// file.
 /// </summary>
-public readonly struct TreeContext
+internal readonly struct TreeContext
 {
     /// <summary>
     /// Initializes a new instance.

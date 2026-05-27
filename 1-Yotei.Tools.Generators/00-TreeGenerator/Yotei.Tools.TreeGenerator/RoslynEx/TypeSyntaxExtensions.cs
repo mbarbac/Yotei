@@ -1,7 +1,7 @@
 ﻿namespace Yotei.Tools.Generators;
 
 // ========================================================
-public static class TypeSyntaxExtensions
+internal static class TypeSyntaxExtensions
 {
     extension(BaseTypeDeclarationSyntax source)
     {

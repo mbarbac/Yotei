@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents a property-alike source code generation node.
 /// </summary>
-public partial class PropertyNode : IChildNode
+internal partial class PropertyNode : IChildNode
 {
     /// <summary>
     /// Initializes a new instance.
@@ -142,9 +142,15 @@ public partial class PropertyNode : IChildNode
         var r = true;
 
         if (Parent == null) { TreeError.NoParentNode.Report(Symbol, context); r = false; }
-        
-        if (!Symbol.ContainingType.IsPartial)
-        { TreeError.TypeNotPartial.Report(Symbol.ContainingType, context); r = false; }
+
+        if (!Symbol.ContainingType.IsPartial())
+        {
+            var temp = Symbol.ContainingType.IsPartial(); // DEBUG-ONLY
+
+            var message = $"+, Member: '{Symbol.Name}'";
+            TreeError.TypeNotPartial.Report(Symbol.ContainingType, context, message: message);
+            r = false;
+        }
 
         return r;
     }

@@ -5,7 +5,7 @@
 /// Represents an error node that produces no code but rather carries a collection of diagnostics
 /// that will be reported at source code generation time.
 /// </summary>
-public sealed class ErrorNode : INode
+internal sealed class ErrorNode : INode
 {    /// <summary>
      /// Initializes a new empty instance.
      /// </summary>

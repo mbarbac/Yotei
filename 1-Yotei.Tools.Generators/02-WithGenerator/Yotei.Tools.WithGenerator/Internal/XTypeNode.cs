@@ -24,8 +24,6 @@ public class XTypeNode : TypeNode
     /// <returns></returns>
     protected override bool OnValidate(SourceProductionContext context)
     {
-        if (Symbol.Name == "IEngine") { } // DEBUG-ONLY
-
         var r = base.OnValidate(context);
 
         // Records not supported...

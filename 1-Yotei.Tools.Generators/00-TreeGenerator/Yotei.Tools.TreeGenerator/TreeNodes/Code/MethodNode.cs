@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents a method-alike source code generation node.
 /// </summary>
-public partial class MethodNode : IChildNode
+internal partial class MethodNode : IChildNode
 {
     /// <summary>
     /// Initializes a new instance.
@@ -156,9 +156,13 @@ public partial class MethodNode : IChildNode
 
         if (Parent == null) { TreeError.NoParentNode.Report(Symbol, context); r = false; }
 
-        if (!Symbol.ContainingType.IsPartial)
-        { TreeError.TypeNotPartial.Report(Symbol.ContainingType, context); r = false; }
-        
+        if (!Symbol.ContainingType.IsPartial())
+        {
+            var message = $"+, Member: '{Symbol.Name}'";
+            TreeError.TypeNotPartial.Report(Symbol.ContainingType, context, message: message);
+            r = false;
+        }
+
         return r;
     }
 

@@ -1,7 +1,7 @@
 ﻿namespace Yotei.Tools.Generators;
 
 // ========================================================
-public static class AccessibilityExtensions
+internal static class AccessibilityExtensions
 {
     extension(Accessibility source)
     {

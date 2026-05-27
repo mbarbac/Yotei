@@ -1,7 +1,7 @@
 ﻿namespace Yotei.Tools.Generators;
 
 // ========================================================
-public static class IPropertySymbolExtensions
+internal static class IPropertySymbolExtensions
 {
     extension(IPropertySymbol symbol)
     {

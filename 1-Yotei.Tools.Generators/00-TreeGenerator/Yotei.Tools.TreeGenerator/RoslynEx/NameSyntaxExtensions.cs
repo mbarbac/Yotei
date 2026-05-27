@@ -1,7 +1,7 @@
 ﻿namespace Yotei.Tools.Generators;
 
 // ========================================================
-public static class NameSyntaxExtensions
+internal static class NameSyntaxExtensions
 {
     extension(NameSyntax source)
     {

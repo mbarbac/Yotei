@@ -1,7 +1,7 @@
 ﻿namespace Yotei.Tools.Generators;
 
 // ========================================================
-public static partial class RoslynNamesExtensions
+internal static partial class RoslynNamesExtensions
 {
     private const string ATTRIBUTE = "Attribute";
     private const string NULLABLE_ATTRIBUTE = "System.Runtime.CompilerServices.NullableAttribute";

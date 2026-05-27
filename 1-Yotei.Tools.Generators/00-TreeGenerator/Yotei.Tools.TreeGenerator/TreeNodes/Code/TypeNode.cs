@@ -4,7 +4,7 @@
 /// <summary>
 /// Represents a type-alike source code generation node.
 /// </summary>
-public partial class TypeNode : ITreeNode
+internal partial class TypeNode : ITreeNode
 {
     /// <summary>
     /// Initializes a new instance.
@@ -169,7 +169,7 @@ public partial class TypeNode : ITreeNode
     {
         var r = true;
 
-        if (!Symbol.IsPartial) { TreeError.TypeNotPartial.Report(Symbol, context); r = false; }
+        if (!Symbol.IsPartial()) { TreeError.TypeNotPartial.Report(Symbol, context); r = false; }
         if (!IsSupportedKind()) { TreeError.KindNotSupported.Report(Symbol, context); r = false; }
         return r;
     }

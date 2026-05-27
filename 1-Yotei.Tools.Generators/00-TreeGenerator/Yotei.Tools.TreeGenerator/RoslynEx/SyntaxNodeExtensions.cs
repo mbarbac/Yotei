@@ -1,7 +1,7 @@
 ﻿namespace Yotei.Tools.Generators;
 
 // ========================================================
-public static class SyntaxNodeExtensions
+internal static class SyntaxNodeExtensions
 {
     extension(SyntaxNode source)
     {

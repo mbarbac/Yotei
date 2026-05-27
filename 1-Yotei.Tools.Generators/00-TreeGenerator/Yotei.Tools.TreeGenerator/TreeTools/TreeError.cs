@@ -6,7 +6,7 @@
 /// </summary>
 /// <param name="Value"></param>
 /// <param name="Description"></param>
-public record TreeError(int Value, string Description)
+internal record TreeError(int Value, string Description)
 {
     public static readonly TreeError SyntaxNotSupported = new(1, "Syntax not supported");
     public static readonly TreeError SymbolNotFound = new(2, "Symbol not found");
@@ -31,7 +31,7 @@ public record TreeError(int Value, string Description)
 }
 
 // ========================================================
-public static class TreeErrorExtensions
+internal static class TreeErrorExtensions
 {
     /// <summary>
     /// Returns a diagnostic for the given error associated with the given syntax node. If no
@@ -49,7 +49,10 @@ public static class TreeErrorExtensions
         var id = $"Yotei{error.Value:D2}";
         var loc = syntax.GetLocation();
         var name = syntax.ToNodeName();
-        message ??= $"{error.Description}: {name}";
+
+        var str = $"{error.Description}: {name}";
+        if (message == null) message = str;
+        else if (message.StartsWith('+')) message = str + message[1..];
 
         return Diagnostic.Create(new DiagnosticDescriptor(
             id, error.Description, message, "Yotei",
@@ -94,7 +97,10 @@ public static class TreeErrorExtensions
     {
         var id = $"Yotei{error.Value:D2}";
         location ??= symbol.FirstLocation;
-        message ??= $"{error.Description}: {symbol.Name}";
+
+        var str = $"{error.Description}: {symbol.Name}";
+        if (message == null) message = str;
+        else if (message.StartsWith('+')) message = str + message[1..];
 
         return Diagnostic.Create(new DiagnosticDescriptor(
             id, error.Description, message, "Yotei",
