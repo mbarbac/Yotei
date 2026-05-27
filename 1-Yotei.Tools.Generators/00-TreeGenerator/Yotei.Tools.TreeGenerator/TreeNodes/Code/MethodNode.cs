@@ -155,7 +155,10 @@ public partial class MethodNode : IChildNode
         var r = true;
 
         if (Parent == null) { TreeError.NoParentNode.Report(Symbol, context); r = false; }
-        if (!Symbol.ContainingType.IsPartial) { TreeError.TypeNotPartial.Report(Symbol, context); r = false; }
+
+        if (!Symbol.ContainingType.IsPartial)
+        { TreeError.TypeNotPartial.Report(Symbol.ContainingType, context); r = false; }
+        
         return r;
     }
 

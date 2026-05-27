@@ -40,7 +40,7 @@ public class XFieldNode : FieldNode, IXNode<IFieldSymbol>
         var r = base.OnValidate(context);
 
         // Records not supported...
-        if (Host.IsRecord) { TreeError.RecordsNotSupported.Report(Symbol, context); r = false; }
+        if (Host.IsRecord) { TreeError.RecordsNotSupported.Report(Host, context); r = false; }
 
         // Member constrains...
         if (!Symbol.IsWrittable) { TreeError.NotWrittable.Report(Symbol, context); r = false; }
@@ -49,8 +49,8 @@ public class XFieldNode : FieldNode, IXNode<IFieldSymbol>
         if (Inherited)
         {
             var ats = Host.GetAttributes([typeof(InheritsWithAttribute)]).ToList();
-            if (ats.Count == 0) { TreeError.NoAttributes.Report(Symbol, context); r = false; }
-            else if (ats.Count > 1) { TreeError.TooManyAttributes.Report(Symbol, context); r = false; }
+            if (ats.Count == 0) { TreeError.NoAttributes.Report(Host, context); r = false; }
+            else if (ats.Count > 1) { TreeError.TooManyAttributes.Report(Host, context); r = false; }
             else Attribute = ats[0];
         }
         else
