@@ -139,17 +139,17 @@ internal partial class PropertyNode : IChildNode
     /// <returns></returns>
     protected virtual bool OnValidate(SourceProductionContext context)
     {
+        var warning = DiagnosticSeverity.Warning;
         var r = true;
 
         if (Parent == null) { TreeError.NoParentNode.Report(Symbol, context); r = false; }
 
-        if (!Symbol.ContainingType.IsPartial())
+        if (!Symbol.ContainingType.MaybePartial())
         {
-            var temp = Symbol.ContainingType.IsPartial(); // DEBUG-ONLY
-
-            var message = $"+, Member: '{Symbol.Name}'";
-            TreeError.TypeNotPartial.Report(Symbol.ContainingType, context, message: message);
-            r = false;
+            var locs = Symbol.ContainingType.Locations;
+            if (locs.Any(x => x.IsInSource))
+                TreeError.TypeNotPartial.Report( Symbol.ContainingType, context,
+                    message: $"+, Member: '{Symbol.Name}'", severity: warning);
         }
 
         return r;

@@ -26,8 +26,6 @@ public partial class Engine : IEngine
 
     // ----------------------------------------------------
 
-
-
     /// <summary>
     /// Initializes a new default instance.
     /// </summary>

@@ -24,10 +24,12 @@ internal class XTypeNode : TypeNode, IXNode
     /// <returns></returns>
     protected override bool OnValidate(SourceProductionContext context)
     {
+        var warning = DiagnosticSeverity.Warning;
         var r = base.OnValidate(context);
 
         // Records not supported...
-        if (Symbol.IsRecord) { TreeError.RecordsNotSupported.Report(Symbol, context); r = false; }
+        if (Symbol.IsRecord)
+            TreeError.RecordsNotSupported.Report(Symbol, context, severity: warning);
 
         // Finding the unique decorating attribute...
         if (Attributes.Count == 0) { TreeError.NoAttributes.Report(Symbol, context); r = false; }

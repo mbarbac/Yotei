@@ -37,13 +37,14 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
     /// <returns></returns>
     protected override bool OnValidate(SourceProductionContext context)
     {
+        var warnign = DiagnosticSeverity.Warning;
         var r = base.OnValidate(context);
 
         // Records not supported...
-        if (Host.IsRecord) { TreeError.RecordsNotSupported.Report(Host, context); r = false; }
+        if (Host.IsRecord) TreeError.RecordsNotSupported.Report(Host, context, severity: warnign);
 
         // Member constrains...
-        if (!Symbol.IsWrittable) { TreeError.NotWrittable.Report(Symbol, context); r = false; }
+        if (!Symbol.IsWrittable) TreeError.NotWrittable.Report(Symbol, context, severity: warnign);
 
         // Finding the unique decorating attribute...
         if (Inherited)

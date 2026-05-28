@@ -261,7 +261,7 @@ internal static partial class RoslynNamesExtensions
 
             // Intercepting partial keyword...
             var end = sb.Length;
-            if (end > ini && source.IsPartial()) sb.Insert(ini, "partial ");
+            if (end > ini && source.MaybePartial()) sb.Insert(ini, "partial ");
         }
 
         /// <summary>

@@ -167,11 +167,19 @@ internal partial class TypeNode : ITreeNode
     /// <returns></returns>
     protected virtual bool OnValidate(SourceProductionContext context)
     {
-        var r = true;
+        var warning = DiagnosticSeverity.Warning;
 
-        if (!Symbol.IsPartial()) { TreeError.TypeNotPartial.Report(Symbol, context); r = false; }
-        if (!IsSupportedKind()) { TreeError.KindNotSupported.Report(Symbol, context); r = false; }
-        return r;
+        if (!Symbol.MaybePartial())
+        {
+            var locs = Symbol.Locations;
+            if (locs.Any(x => x.IsInSource))
+                TreeError.TypeNotPartial.Report(
+                    Symbol, context, message: $"+, Member: '{Symbol.Name}'", severity: warning);
+        }
+        if (!IsSupportedKind())
+            TreeError.KindNotSupported.Report(Symbol, context, severity: warning);
+
+        return true;
     }
 
     /// <summary>

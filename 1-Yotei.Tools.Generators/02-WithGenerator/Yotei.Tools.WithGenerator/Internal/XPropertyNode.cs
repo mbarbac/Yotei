@@ -37,16 +37,18 @@ internal class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
     /// <returns></returns>
     protected override bool OnValidate(SourceProductionContext context)
     {
+        var warning = DiagnosticSeverity.Warning;
         var r = base.OnValidate(context);
 
         // Records not supported...
-        if (Host.IsRecord) { TreeError.RecordsNotSupported.Report(Symbol, context); r = false; }
+        if (Host.IsRecord)
+            TreeError.RecordsNotSupported.Report(Symbol, context, severity: warning);
 
         // Member constrains...
-        if (Symbol.IsIndexer) { TreeError.IndexerNotSupported.Report(Symbol, context); r = false; }
-        if (!Symbol.HasGetter) { TreeError.NoGetter.Report(Symbol, context); r = false; }
+        if (Symbol.IsIndexer) TreeError.IndexerNotSupported.Report(Symbol, context, severity: warning);
+        if (!Symbol.HasGetter) TreeError.NoGetter.Report(Symbol, context, severity: warning);
         if (!Symbol.HasSetter &&
-            !Symbol.ContainingType.IsInterface) { TreeError.NoSetter.Report(Symbol, context); r = false; }
+            !Symbol.ContainingType.IsInterface) TreeError.NoSetter.Report(Symbol, context, severity: warning);
 
         // Finding the unique decorating attribute...
         if (Inherited)

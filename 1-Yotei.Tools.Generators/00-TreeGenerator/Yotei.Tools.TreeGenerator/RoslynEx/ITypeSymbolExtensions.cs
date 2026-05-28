@@ -14,38 +14,32 @@ internal static class ITypeSymbolExtensions
 
         /// <summary>
         /// Determines if this type symbol is a partial one, or not.
+        /// <para>
+        /// This method DOES NOT WORK if the source symbol was obtained from metadata or if it was
+        /// implicitly declared because Roslyn APIs cannot obtain the syntax locations where the
+        /// symbol was originally declared, and metadata carries not 'partial' information.
+        /// </para>
         /// </summary>
         /// <returns></returns>
-        public bool IsPartial()
+        public bool MaybePartial()
         {
+            // Standard way...
+            var syntaxes = source.GetSyntaxNodes(); // Uses source.DeclaringSyntaxReferences...
+            if (syntaxes.Any(x =>
+                x is BaseTypeDeclarationSyntax type &&
+                type.Modifiers.Any(SyntaxKind.PartialKeyword))) return true;
+
+            // This may be redundant...
             var locs = source.Locations;
             foreach (var loc in locs)
             {
                 if (!loc.IsInSource) continue;
-                var tree = loc.SourceTree;
-                if (tree is null) continue;
+                var tree = loc.SourceTree; if (tree is null) continue;
                 var root = tree.GetRoot();
                 var node = root.FindNode(loc.SourceSpan);
-                if (node is TypeDeclarationSyntax dec &&
-                    dec.Modifiers.Any(SyntaxKind.PartialKeyword)) return true;
+                if (node is BaseTypeDeclarationSyntax type &&
+                    type.Modifiers.Any(SyntaxKind.PartialKeyword)) return true;
             }
-
-            // Fast way...
-            var syntaxes = source.DeclaringSyntaxReferences;
-            if (syntaxes.Length > 1) return true;
-
-            foreach (var syntax in syntaxes)
-            {
-                var node = syntax.GetSyntax();
-                if (node is TypeDeclarationSyntax dec &&
-                    dec.Modifiers.Any(SyntaxKind.PartialKeyword)) return true;
-            }
-
-            // Likely way...
-            var nodes = source.GetSyntaxNodes();
-            foreach (var node in nodes)
-                if (node is BaseTypeDeclarationSyntax dec &&
-                    dec.Modifiers.Any(SyntaxKind.PartialKeyword)) return true;            
 
             // Not found...
             return false;
