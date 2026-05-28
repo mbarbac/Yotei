@@ -41,7 +41,8 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
         var r = base.OnValidate(context);
 
         // Records not supported...
-        if (Host.IsRecord) TreeError.RecordsNotSupported.Report(Host, context, severity: warnign);
+        if (Host.IsRecord)
+        { TreeError.RecordsNotSupported.Report(Host, context); r = false; }
 
         // Member constrains...
         if (!Symbol.IsWrittable) TreeError.NotWrittable.Report(Symbol, context, severity: warnign);
@@ -193,8 +194,6 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
                 [Host.AllBaseTypes, Host.AllInterfaces], out string? value,
                 (type, out value) =>
                 {
-                    if (Host.Name == "AType22B") { } // DEBUG-ONLY
-
                     // Method exists in base type...
                     while (XNode.TryFindMethod(methodname, argtype, type, [], out var method))
                     {

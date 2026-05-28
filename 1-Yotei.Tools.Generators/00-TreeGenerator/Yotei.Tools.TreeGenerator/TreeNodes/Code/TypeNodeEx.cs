@@ -81,6 +81,9 @@ partial class TypeNode
 
     // ----------------------------------------------------
 
+    /// <summary>
+    /// Obtains the appropriate type header.
+    /// </summary>
     static string GetTypeHeader(INamedTypeSymbol symbol)
     {
         var rec = symbol.IsRecord ? "record " : string.Empty;

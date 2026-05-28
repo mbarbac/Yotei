@@ -168,6 +168,7 @@ internal partial class TypeNode : ITreeNode
     protected virtual bool OnValidate(SourceProductionContext context)
     {
         var warning = DiagnosticSeverity.Warning;
+        var r = true;
 
         if (!Symbol.MaybePartial())
         {
@@ -176,10 +177,10 @@ internal partial class TypeNode : ITreeNode
                 TreeError.TypeNotPartial.Report(
                     Symbol, context, message: $"+, Member: '{Symbol.Name}'", severity: warning);
         }
-        if (!IsSupportedKind())
-            TreeError.KindNotSupported.Report(Symbol, context, severity: warning);
 
-        return true;
+        if (!IsSupportedKind()) { TreeError.KindNotSupported.Report(Symbol, context); r = false; }
+
+        return r;
     }
 
     /// <summary>

@@ -42,7 +42,7 @@ internal class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
 
         // Records not supported...
         if (Host.IsRecord)
-            TreeError.RecordsNotSupported.Report(Symbol, context, severity: warning);
+        { TreeError.RecordsNotSupported.Report(Symbol, context); r = false; }
 
         // Member constrains...
         if (Symbol.IsIndexer) TreeError.IndexerNotSupported.Report(Symbol, context, severity: warning);

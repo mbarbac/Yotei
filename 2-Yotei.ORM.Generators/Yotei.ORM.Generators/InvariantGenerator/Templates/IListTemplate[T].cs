@@ -1,4 +1,4 @@
-﻿namespace Yotei.ORM.Generators;
+﻿namespace Yotei.ORM.InvariantGenerator;
 
 // ========================================================
 internal interface IListTemplate<T>
