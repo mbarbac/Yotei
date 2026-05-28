@@ -39,9 +39,15 @@ internal partial class TreeGenerator : IIncrementalGenerator
     /// <summary>
     /// If not null, then the path where to add to the compilation the <see cref="IsNullableAttribute"/>
     /// and the <see cref="IsNullable{T}"/> helper types, under the derived generator's namespace.
-    /// If null, then they are ignored.
+    /// If null, then they are ignored and not emitted.
     /// </summary>
     protected virtual string? NullabilityHelpersPath { get; } = "NullabilityHelpers.cs";
+
+    /// <summary>
+    /// If not null, then the namespace where the nullability helpers are to be emitted, if such is
+    /// enabled. If null (by default) the namespace will the generators' one.
+    /// </summary>
+    protected virtual string? NullabilityHelpersNamespace { get; } = null;
 
     // ----------------------------------------------------
 
@@ -64,7 +70,10 @@ internal partial class TreeGenerator : IIncrementalGenerator
         IncrementalGeneratorPostInitializationContext context,
         string path)
     {
-        var nspace = GetType().Namespace ?? "Yotei.Tools";
+        var nspace = NullabilityHelpersNamespace
+            ?? GetType().Namespace
+            ?? "Yotei.Tools";
+
         var code = $$"""
             #nullable enable
 
@@ -108,9 +117,12 @@ internal partial class TreeGenerator : IIncrementalGenerator
     /// <para>
     /// The resource file must be identified as an embedded resource in the generator's project
     /// file by using a "[EmbeddedResource Include="folder\name.ext" /]" line in a 'ItemGroup'
-    /// section (square brackets must be substituted by their angle counterparts). The output
-    /// path follows the same 'folder\name.ext' convention.
-    /// <br/> Best practice: add the resource files one by one, ex-novo, not copying them from
+    /// section (square brackets must be substituted by their angle counterparts).
+    /// <br/> In addition, its full name must be given as the 'rname' value.
+    /// <br/> The output path follows the same 'folder\name.ext' convention.
+    /// </para>
+    /// <para>
+    /// Best practice: add the resource files one by one, ex-novo, not copying them from
     /// any source or template. Then, once created, identify them as an embedded resource in the
     /// project file.
     /// </para>
@@ -126,13 +138,13 @@ internal partial class TreeGenerator : IIncrementalGenerator
         rname = rname.NotNullNotEmpty(trim: true).Replace('\\', '.').Replace('/', '.');
         var type = GetType();
         var asm = type.Assembly;
-        var xname = $"{type.Namespace}.{rname}";
-        using var stream = asm.GetManifestResourceStream(xname);
+        
+        using var stream = asm.GetManifestResourceStream(rname);
         if (stream == null)
         {
             var names = asm.GetManifestResourceNames();
             throw new NotFoundException("Resource not found among the embedded ones.")
-                .WithData(xname, "name")
+                .WithData(rname, "name")
                 .WithData(names, "resources");
         }
 

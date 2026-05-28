@@ -14,9 +14,14 @@ internal class CloneGenerator : TreeGenerator
     protected override void OnInitialize(IncrementalGeneratorPostInitializationContext context)
     {
         base.OnInitialize(context);
-        AddLocalResource(context, "Public/CloneableAttribute.cs", "Markers/CloneableAttribute.cs");
-        AddLocalResource(context, "Public/CloneableAttribute[T].cs", "Markers/CloneableAttribute[T].cs");
+        AddLocalResource(context, "Yotei.Tools.CloneGenerator/Public/CloneableAttribute.cs", "Markers/CloneableAttribute.cs");
+        AddLocalResource(context, "Yotei.Tools.CloneGenerator/Public/CloneableAttribute[T].cs", "Markers/CloneableAttribute[T].cs");
     }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    protected override string? NullabilityHelpersNamespace => "Yotei.Tools.CloneGenerator";
 
     // ----------------------------------------------------
 

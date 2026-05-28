@@ -14,11 +14,16 @@ internal class WithGenerator : TreeGenerator
     protected override void OnInitialize(IncrementalGeneratorPostInitializationContext context)
     {
         base.OnInitialize(context);
-        AddLocalResource(context, "Public/WithAttribute.cs", "Markers/WithAttribute.cs");
-        AddLocalResource(context, "Public/WithAttribute[T].cs", "Markers/WithAttribute[T].cs");
-        AddLocalResource(context, "Public/InheritsWithAttribute.cs", "Markers/InheritsWithAttribute.cs");
-        AddLocalResource(context, "Public/InheritsWithAttribute[T].cs", "Markers/InheritsWithAttribute[T].cs");
+        AddLocalResource(context, "Yotei.Tools.WithGenerator/Public/WithAttribute.cs", "Markers/WithAttribute.cs");
+        AddLocalResource(context, "Yotei.Tools.WithGenerator/Public/WithAttribute[T].cs", "Markers/WithAttribute[T].cs");
+        AddLocalResource(context, "Yotei.Tools.WithGenerator/Public/InheritsWithAttribute.cs", "Markers/InheritsWithAttribute.cs");
+        AddLocalResource(context, "Yotei.Tools.WithGenerator/Public/InheritsWithAttribute[T].cs", "Markers/InheritsWithAttribute[T].cs");
     }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    protected override string? NullabilityHelpersNamespace => "Yotei.Tools.WithGenerator";
 
     // ----------------------------------------------------
 

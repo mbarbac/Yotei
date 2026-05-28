@@ -46,6 +46,16 @@
 	<!--Generator resources-->
 	<ItemGroup>
 		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+		<EmbeddedResource Include="Public\IInvariantBagAttribute.cs" />
+		<EmbeddedResource Include="Public\IInvariantBagAttribute[T].cs" />
+		<EmbeddedResource Include="Public\IInvariantListAttribute.cs" />
+		<EmbeddedResource Include="Public\IInvariantListAttribute[K,T].cs" />
+		<EmbeddedResource Include="Public\IInvariantListAttribute[T].cs" />
+		<EmbeddedResource Include="Public\InvariantBagAttribute.cs" />
+		<EmbeddedResource Include="Public\InvariantBagAttribute[T].cs" />
+		<EmbeddedResource Include="Public\InvariantListAttribute.cs" />
+		<EmbeddedResource Include="Public\InvariantListAttribute[K,T].cs" />
+		<EmbeddedResource Include="Public\InvariantListAttribute[T].cs" />
 	</ItemGroup>
 
 </Project>
