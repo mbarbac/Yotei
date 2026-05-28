@@ -25,4 +25,4 @@ global using Yotei.Tools.WithGenerator;
 //global using Yotei.ORM.Generators.InvariantGenerator;
 global using Yotei.ORM;
 global using Yotei.ORM.Code;
-//global using Yotei.ORM.Tools;
+global using Yotei.ORM.Tools;
