@@ -7,7 +7,6 @@ partial class XTypeNode
 
     const string USEVIRTUAL = "UseVirtual";
     const string RETURNTYPE = "ReturnType";
-    const string EMITCLONE = "EmitClone";
 
     // ----------------------------------------------------
 
@@ -33,7 +32,9 @@ partial class XTypeNode
             : (IsBag ? INVARIANTBAG : INVARIANTLIST);
 
         var name = method.EasyName();
-        name = $"{headdoc}{Bracket}.{name}";
+        var bracket = Arity == 1 ? "<T>" : "<K, T>";
+
+        name = $"{headdoc}{bracket}.{name}";
         name = name.Replace('<', '{').Replace('>', '}');
         name = $"/// <inheritdoc cref=\"{name}\"/>";
 
@@ -67,36 +68,6 @@ partial class XTypeNode
             ]);
 
         return attributes.Any();
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Tries to find the value of the "EmitClone" setting on the given attribute. If so, returns
-    /// it in the out argument.
-    /// </summary>
-    /// <param name="at"></param>
-    /// <param name="value"></param>
-    /// <param name="nullable"></param>
-    /// <returns></returns>
-    static bool HasEmitClone(
-        AttributeData at,
-        [NotNullWhen(true)] out bool value)
-    {
-        ArgumentNullException.ThrowIfNull(at);
-        ArgumentNullException.ThrowIfNull(at.AttributeClass);
-
-        if (at.FindNamedArgument(EMITCLONE, out var arg))
-        {
-            if (!arg.Value.IsNull && arg.Value.Value is bool temp)
-            {
-                value = temp;
-                return true;
-            }
-        }
-
-        value = default;
-        return false;
     }
 
     // ----------------------------------------------------
@@ -143,11 +114,9 @@ partial class XTypeNode
     {
         var options = EasyTypeOptions.Default with
         {
-            NullableStyle = EasyNullableStyle.None,
             GenericListOptions = EasyTypeOptions.Default.WithRecursive(
                 namespaceStyle: EasyNamespaceStyle.Default,
                 useHost: true,
-                useSpecialNames: true,
                 nullableStyle: EasyNullableStyle.None)
         };
 

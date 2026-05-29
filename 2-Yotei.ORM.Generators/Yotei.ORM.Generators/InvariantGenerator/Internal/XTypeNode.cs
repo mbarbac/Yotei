@@ -60,6 +60,10 @@ internal partial class XTypeNode : TypeNode
         var atc = Attribute.AttributeClass!;
         IsBag = atc.Name.StartsWith(INVARIANTBAG) || atc.Name.StartsWith(IINVARIANTBAG);
 
+        var options = EasyTypeOptions.Default.WithRecursive(
+            namespaceStyle: EasyNamespaceStyle.Default,
+            useHost: true);
+
         // Case: attribute is NOT a generic one...
         if (atc.Arity == 0)
         {
@@ -74,7 +78,7 @@ internal partial class XTypeNode : TypeNode
                 Template = IsBag ? typeof(IBagTemplate<>) : typeof(IListTemplate<>);
                 TType = args[0].UnwrapNullable(out TTypeNullable);
 
-                TTypeName = TType.EasyName(EasyTypeOptions.Full);
+                TTypeName = TType.EasyName(options);
                 if (TTypeNullable && !TTypeName.EndsWith('?')) TTypeName += '?';
 
                 Bracket = $"<{TTypeName}>";
@@ -88,8 +92,8 @@ internal partial class XTypeNode : TypeNode
                 KType = args[0].UnwrapNullable(out KTypeNullable);
                 TType = args[1].UnwrapNullable(out TTypeNullable);
 
-                KTypeName = KType.EasyName(EasyTypeOptions.Full);
-                TTypeName = KType.EasyName(EasyTypeOptions.Full);
+                KTypeName = KType.EasyName(options);
+                TTypeName = KType.EasyName(options);
                 if (KTypeNullable && !KTypeName.EndsWith('?')) KTypeName += '?';
                 if (TTypeNullable && !TTypeName.EndsWith('?')) TTypeName += '?';
 
@@ -111,7 +115,7 @@ internal partial class XTypeNode : TypeNode
             Template = IsBag ? typeof(IBagTemplate<>) : typeof(IListTemplate<>);
             TType = ((INamedTypeSymbol)atc.TypeArguments[0]).UnwrapNullable(out TTypeNullable);
 
-            TTypeName = TType.EasyName(EasyTypeOptions.Full);
+            TTypeName = TType.EasyName(options);
             if (TTypeNullable && !TTypeName.EndsWith('?')) TTypeName += '?';
 
             Bracket = $"<{TTypeName}>";
@@ -125,8 +129,8 @@ internal partial class XTypeNode : TypeNode
             KType = ((INamedTypeSymbol)atc.TypeArguments[0]).UnwrapNullable(out KTypeNullable);
             TType = ((INamedTypeSymbol)atc.TypeArguments[1]).UnwrapNullable(out TTypeNullable);
 
-            KTypeName = KType.EasyName(EasyTypeOptions.Full);
-            TTypeName = KType.EasyName(EasyTypeOptions.Full);
+            KTypeName = KType.EasyName(options);
+            TTypeName = KType.EasyName(options);
             if (KTypeNullable && !KTypeName.EndsWith('?')) KTypeName += '?';
             if (TTypeNullable && !TTypeName.EndsWith('?')) TTypeName += '?';
 
@@ -167,7 +171,7 @@ internal partial class XTypeNode : TypeNode
                 type.Match(typeof(InvariantListAttribute)) ||
                 type.Match(typeof(InvariantListAttribute<>)) ||
                 type.Match(typeof(InvariantListAttribute<,>)) ||
-            
+
                 type.Match(typeof(IInvariantBagAttribute)) ||
                 type.Match(typeof(IInvariantBagAttribute<>)) ||
                 type.Match(typeof(IInvariantListAttribute)) ||
@@ -216,28 +220,26 @@ internal partial class XTypeNode : TypeNode
 
         // Options...
 
-        //var argoptions = EasyTypeOptions.Empty.WithRecursive(
-        //    useVariance: true,
-        //    namespaceStyle: EasyNamespaceStyle.Default,
-        //    useHost: true,
-        //    useSpecialNames: true,
-        //    nullableStyle: EasyNullableStyle.UseAnnotations);
+        var toptions = EasyTypeOptions.Default.WithRecursive(
+            namespaceStyle: EasyNamespaceStyle.Default,
+            useHost: true);
 
-        //var moptions = EasyMethodOptions.Empty with
-        //{
-        //    GenericListOptions = EasyTypeOptions.Full.WithRecursive(
-        //        useVariance: false,
-        //        useAccessibility: false,
-        //        useModifiers: false,
-        //        useKind: false),
+        var moptions = EasyMethodOptions.Empty with
+        {
+            UseAccessibility = true,
+            UseModifiers = true,
+            GenericListOptions = toptions,
+            UseBrackets = true,
+            ParameterOptions = EasyParameterOptions.Empty with
+            {
+                UseModifiers = true,
+                TypeOptions = toptions,
+                UseName = true
+            }
+        };
 
-        //    ParameterOptions = EasyParameterOptions.Empty with
-        //    {
-        //        UseModifiers = true,
-        //        TypeOptions = argoptions,
-        //        UseName = true
-        //    }
-        //};
+        var argoptions = moptions with
+        { ParameterOptions = EasyParameterOptions.Empty with { UseName = true } };
 
         // Finding in both template and existing methods...
         var methodinfos = Template.GetMembers().OfType<MethodInfo>().Where(x => x.DeclaringType == Template);
@@ -255,27 +257,33 @@ internal partial class XTypeNode : TypeNode
             // Interface...
             if (Symbol.IsInterface)
             {
-                //var name = method.EasyName(moptions);
-                //name = ReplaceKT(name);
+                var name = method.EasyName(moptions);
+                name = ReplaceKT(name);
 
-                //cb.AppendLine($"new {stype}{snull} {name};");
-                //continue;
+                cb.AppendLine($"new {stype}{snull} {name};");
+                continue;
             }
 
             // Other hosts...
             else
             {
-                //var mods = Symbol.IsAbstract ? "abstract override" : "override";
-                //var name = method.EasyName(moptions);
-                //name = ReplaceKT(name);
+                var mods = Symbol.IsAbstract ? "abstract override" : "override";
+                var name = method.EasyName(moptions);
+                name = ReplaceKT(name);
 
-                //var args = method.EasyName(argoptions);
-                //args = ReplaceKT(args);
+                var args = method.EasyName(argoptions);
+                args = ReplaceKT(args);
 
-                //cb.AppendLine($"public {mods} {stype}{snull} {name}");
-                //cb.AppendLine($"=> ({stype}{snull})base.{args};");
+                cb.AppendLine($"public {mods} {stype}{snull} {name}");
+                cb.AppendLine($"=> ({stype}{snull})base.{args};");
 
-                //EmitExplicitInterfaces(cb);
+                var ifaces = GetExplicitInterfaces(method);
+                foreach (var iface in ifaces)
+                {
+                    cb.AppendLine();
+                    cb.AppendLine(iface);
+                    cb.AppendLine($"{iface}.{name} => {args};");
+                }
             }
         }
 
@@ -293,11 +301,10 @@ internal partial class XTypeNode : TypeNode
     {
         var comparer = SymbolEqualityComparer.Default;
         List<INamedTypeSymbol> list = [];
-        var options = EasyTypeOptions.Full.WithRecursive(
-            useVariance: false,
-            useAccessibility: false,
-            useModifiers: false,
-            useKind: false);
+
+        var options = EasyTypeOptions.Default.WithRecursive(
+            namespaceStyle: EasyNamespaceStyle.Default,
+            useHost: true);
 
         foreach (var iface in Symbol.Interfaces) TryCapture(iface);
         var items = list.Select(x => x.EasyName(options)).ToList();
@@ -306,19 +313,22 @@ internal partial class XTypeNode : TypeNode
         /// <summary>
         /// Tries to capture the given interface for the given method.
         /// </summary>
-        bool TryCapture(INamedTypeSymbol iface)
+        void TryCapture(INamedTypeSymbol iface)
         {
             // Childs first...
             foreach (var child in iface.Interfaces) TryCapture(child);
 
             // If already captured, we're done...
             var temp = list.Find(x => comparer.Equals(x, iface));
-            if (temp is not null) return true;
+            if (temp != null) return;
 
-            // Finding the interface among the valid ones...
-            var temps = iface.GetMembers().OfType<IMethodSymbol>().ToDebugArray();
-            var found = temps.Any(x => SameMethod(method, x));
-            if (!found) return false;
+            // If no attribute and no method, we're done..
+            if (!HasInvariantAttribute(iface, out _) &&
+                !iface.GetMembers().OfType<IMethodSymbol>().Any(x => SameMethod(method, x)))
+                return;
+
+            // Adding to the list...
+            list.Add(iface);
         }
     }
 
@@ -326,6 +336,8 @@ internal partial class XTypeNode : TypeNode
 
     /// <summary>
     /// Used to replace the K and T generic argument types with the appropriate concrete ones.
+    /// NOTE: we use the facts that (1) we know the generic K and T argument names, and (2) we
+    /// know in what combinations they appear in the methods we are interested in.
     /// </summary>
     string ReplaceKT(string item)
     {
@@ -352,16 +364,118 @@ internal partial class XTypeNode : TypeNode
     /// </summary>
     void TryEmitClone(CodeBuilder cb, string stype, string snull)
     {
-        // First thing first, it must be explicitly requested...
-        var requested = HasEmitClone(Attribute, out var value) && value;
-        if (!requested) return;
-
         // If existing, or externally requested, we're done...
+        if (HasClone(Symbol, out _, out _)) return;
 
         // Documentation...
+        cb.AppendLine($"/// <inheritdoc cref=\"ICloneable.Clone\"/>");
+        cb.AppendLine($"{DocAttribute}");
 
         // Interface...
+        if (Symbol.IsInterface)
+        {
+            var name = Symbol.EasyName();
+            cb.AppendLine($"new {name} Clone();");
+            return;
+        }
 
-        // Regular host, we know we are inheriting from a base CLASS...
+        // Other hosts...
+        else
+        {
+            if (Symbol.IsAbstract) // Re-abstracting...
+            {
+                cb.AppendLine($"public abstract override {stype}{snull} Clone();");
+            }
+            else // Regular overriding...
+            {
+                var host = Symbol.EasyName();
+
+                cb.AppendLine($"public override {stype}{snull} Clone()");
+                cb.AppendLine("{");
+                cb.IndentLevel++;
+                {
+                    cb.AppendLine($"var v_host = new {host}(this);");
+                    cb.AppendLine($"return v_host;");
+                }
+                cb.IndentLevel--;
+                cb.AppendLine("}");
+            }
+
+            foreach (var iface in GetCloneInterfaces()) // Explicit interfaces...
+            {
+                cb.AppendLine();
+                cb.AppendLine(iface);
+                cb.AppendLine($"{iface}.Clone() => Clone();");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Determines if the given type carries a 'Clone()' method, or if that method has been
+    /// requested by virtue of an appropriate attribute. If so returns either the found method
+    /// or the found attribute in the out arguments.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="method"></param>
+    /// <param name="at"></param>
+    /// <returns></returns>
+    static bool HasClone(INamedTypeSymbol type, out IMethodSymbol? method, out AttributeData? at)
+    {
+        method = null;
+        at = null;
+
+        method = type.GetMembers().OfType<IMethodSymbol>().FirstOrDefault(static x =>
+            x.Name == "Clone" &&
+            x.Parameters.Length == 0 &&
+            x.ReturnsVoid == false);
+
+        if (method != null) return true;
+
+        at = type.GetAttributes().FirstOrDefault(static x =>
+            x.AttributeClass != null &&
+            x.AttributeClass.Name == "Cloneable");
+
+        if (at != null) return true;
+
+        return false;
+    }
+
+
+    /// <summary>
+    /// Returns a list with the clone-alike interfaces that need explicit implementation.
+    /// </summary>
+    /// <returns></returns>
+    List<string> GetCloneInterfaces()
+    {
+        var comparer = SymbolEqualityComparer.Default;
+        List<INamedTypeSymbol> list = [];
+
+        var options = EasyTypeOptions.Default.WithRecursive(
+            namespaceStyle: EasyNamespaceStyle.Default,
+            useHost: true);
+
+        foreach (var iface in Symbol.Interfaces) TryCapture(iface);
+        var items = list.Select(x => x.EasyName(options)).ToList();
+        return items;
+
+        /// <summary>
+        /// Tries to capture the given interface for the given method.
+        /// </summary>
+        void TryCapture(INamedTypeSymbol iface)
+        {
+            // Childs first...
+            foreach (var child in iface.Interfaces) TryCapture(child);
+
+            // If already captured, we're done...
+            var temp = list.Find(x => comparer.Equals(x, iface));
+            if (temp != null) return;
+
+            // If no clone method, we're done...
+            if (!HasClone(iface, out _, out _) &&
+                !HasInvariantAttribute(iface, out _)) return;
+
+            // Adding to the list...
+            list.Add(iface);
+        }
     }
 }

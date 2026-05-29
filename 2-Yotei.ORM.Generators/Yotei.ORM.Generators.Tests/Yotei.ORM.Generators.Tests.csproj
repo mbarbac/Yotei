@@ -7,9 +7,10 @@
 		<ImplicitUsings>disable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<IsPackable>false</IsPackable>
-		<NoWarn>IDE0130</NoWarn>
+		<NoWarn>IDE0130;CS0436</NoWarn>
 	</PropertyGroup>
 	<!--IDE0130: Namespace does not match folder structure-->
+	<!--CS0436: Conflicting imported types-->
 
 	<ItemGroup>
 		<PackageReference Include="coverlet.collector" Version="10.0.0">

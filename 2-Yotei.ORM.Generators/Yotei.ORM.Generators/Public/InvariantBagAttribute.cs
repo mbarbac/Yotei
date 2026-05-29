@@ -29,11 +29,4 @@ public class InvariantBagAttribute : Attribute
     /// <br/> Derived types must maintain base compatibility.
     /// </summary>
     public Type? ReturnType { get; set; } = null;
-
-    /// <summary>
-    /// If <see langword="true"/>, emits the appropiate version of the inherited 'Clone' method.
-    /// <br/> The default value of this property is <see langword="false"/>, which means that the
-    /// application code takes care of this.
-    /// </summary>
-    public bool EmitClone { get; set; }
 }

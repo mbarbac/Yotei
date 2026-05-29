@@ -174,11 +174,9 @@ internal static class XNode
     {
         var options = EasyTypeOptions.Default with
         {
-            NullableStyle = EasyNullableStyle.None,
             GenericListOptions = EasyTypeOptions.Default.WithRecursive(
                 namespaceStyle: EasyNamespaceStyle.Default,
                 useHost: true,
-                useSpecialNames: true,
                 nullableStyle: EasyNullableStyle.None)
         };
 

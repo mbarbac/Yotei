@@ -96,7 +96,18 @@ public partial class CoreList<T> : ICoreList<T>
     /// <br/>- <see langword="false"/>: a duplicated exception is thrown.
     /// <br/>- <see langword="null"/>: the duplicated element is ignored.
     /// </summary>
-    public virtual bool? AllowDuplicates { get; set; }
+    public virtual bool? AllowDuplicates
+    {
+        get;
+        set
+        {
+            if (field == value) return;
+            if (Count == 0) { field = value; return; }
+
+            var range = ToList(); Clear();
+            field = value; AddRange(range);
+        }
+    }
 
     // ----------------------------------------------------
 
