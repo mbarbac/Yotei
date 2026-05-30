@@ -63,9 +63,6 @@
 		<Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/**" />
 		<Compile Remove="$(CompilerGeneratedFilesOutputPath)/**" />
 	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="Tests_Tools.Collections\" />
-	</ItemGroup>
 
 	<!-- Clear generated files each compile or build (need to be at the end of the file)-->
 	<Target Name="CustomBeforeCompile" BeforeTargets="BeforeCompile">

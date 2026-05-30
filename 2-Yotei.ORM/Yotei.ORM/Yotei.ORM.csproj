@@ -75,7 +75,7 @@
 		<Compile Remove="$(CompilerGeneratedFilesOutputPath)/**" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Folder Include="Tools\Collections.Api\" />
+	  <Folder Include="Tools\Api\" />
 	</ItemGroup>
 
 	<!-- Clear generated files each compile or build (need to be at the end of the file)-->

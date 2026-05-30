@@ -28,4 +28,4 @@ global using Yotei.ORM.Code;
 global using Yotei.ORM.Tools;
 
 global using Yotei.ORM.Generators.Tests;
-global using Yotei.ORM.InvariantGenerator.Tests;
+//global using Yotei.ORM.InvariantGenerator.Tests;
