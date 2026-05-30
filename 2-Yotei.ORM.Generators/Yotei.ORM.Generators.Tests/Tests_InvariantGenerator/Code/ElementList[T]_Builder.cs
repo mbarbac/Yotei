@@ -100,6 +100,11 @@ partial class ElementList_T
         /// <br/>- <see langword="false"/>: a duplicated exception is thrown.
         /// <br/>- <see langword="null"/>: the duplicated element is ignored.
         /// </summary>
-        public override bool? AllowDuplicates { get => false; set { } }
+        public override bool? AllowDuplicates
+        {
+            get => base.AllowDuplicates;
+            set => base.AllowDuplicates = value;
+        }
+        = false;
     }
 }
