@@ -1,0 +1,717 @@
+﻿#pragma warning disable CS0436, IDE0028, IDE0018
+
+namespace Yotei.ORM.Tests.Tools.Collections;
+
+// ========================================================
+//[Enforced]
+public static partial class Test_CoreList_T
+{
+    public interface IElement { }
+
+    public class Named(string name) : IElement
+    {
+        public string Name { get; set; } = name;
+        public override string ToString() => Name ?? "-";
+    }
+
+    readonly static Named xone = new("one");
+    readonly static Named xtwo = new("two");
+    readonly static Named xthree = new("three");
+    readonly static Named xfour = new("four");
+    readonly static Named xfive = new("five");
+
+    // ----------------------------------------------------
+
+    [DebuggerDisplay("{ToDebugString(3)}")]
+    [Cloneable(ReturnType = typeof(ICoreList<IElement>))]
+    public partial class Chain : CoreList<IElement>, IElement
+    {
+        public Chain() : base()
+        {
+            AcceptDuplicates = false;
+            IgnoreCase = false;
+        }
+        public Chain(IEnumerable<IElement> range) : this() => AddRange(range);
+        protected Chain(Chain source) : this()
+        {
+            AcceptDuplicates = source.AcceptDuplicates;
+            IgnoreCase = source.IgnoreCase;
+            AddRange(source);
+        }
+
+        public override IElement ValidateElement(IElement value) => value.ThrowWhenNull();
+        public override bool CompareElements(IElement source, IElement target)
+        {
+            if (source is null && target is null) return true;
+            if (source is null || target is null) return false;
+
+            return source is Named snamed && target is Named tnamed
+                ? string.Compare(snamed.Name, tnamed.Name, IgnoreCase) == 0
+                : ReferenceEquals(source, target);
+        }
+        public override IEnumerable<IElement> FindDuplicates(IElement value) => base.FindDuplicates(value);
+
+        public override bool AllowDuplicate(IElement value, IEnumerable<IElement> _)
+        {
+            if (AcceptDuplicates) return true;
+            throw new DuplicateException("Duplicated value").WithData(value);
+        }
+
+        public bool AcceptDuplicates
+        {
+            get;
+            set
+            {
+                if (field == value) return;
+                if (Count == 0) { field = value; return; }
+
+                var range = ToList(); Clear();
+                field = value; AddRange(range);
+            }
+        }
+
+        public bool IgnoreCase
+        {
+            get;
+            set
+            {
+                if (field == value) return;
+                if (Count == 0) { field = value; return; }
+
+                var range = ToList(); Clear();
+                field = value; AddRange(range);
+            }
+        }
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Create_Empty()
+    {
+        var chain = new Chain();
+        Assert.Empty(chain);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Create_Range()
+    {
+        var chain = new Chain([]);
+        Assert.Empty(chain);
+
+        chain = new Chain([xone, xtwo, xthree]);
+        Assert.Equal(3, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xtwo, chain[1]);
+        Assert.Same(xthree, chain[2]);
+
+        chain = new Chain([xone, new Named("ONE")]);
+        Assert.Equal(2, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Equal("ONE", ((Named)chain[1]).Name);
+
+        try { _ = new Chain(null!); Assert.Fail(); } catch (ArgumentNullException) { }
+        try { _ = new Chain([xone, null!]); Assert.Fail(); } catch (ArgumentNullException) { }
+        try { _ = new Chain([xone, xone]); Assert.Fail(); } catch (DuplicateException) { }
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Create_Range_With_Duplicates()
+    {
+        var chain = new Chain() { AcceptDuplicates = true };
+        chain.AddRange([xone, xone]);
+        Assert.Equal(2, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xone, chain[1]);
+
+        chain = new Chain() { IgnoreCase = true };
+        try { chain.AddRange([xone, new Named("ONE")]); Assert.Fail(); } catch (DuplicateException) { }
+
+        chain = new Chain() { IgnoreCase = true, AcceptDuplicates = true };
+        chain.AddRange([xone, new Named("ONE")]);
+        Assert.Equal(2, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Equal("ONE", ((Named)chain[1]).Name);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Clone()
+    {
+        var source = new Chain();
+        var target = source.Clone();
+        Assert.NotSame(source, target);
+        Assert.Empty(target);
+
+        source = new Chain([xone, xtwo]) { AcceptDuplicates = true, IgnoreCase = true };
+        target = source.Clone();
+        Assert.NotSame(source, target);
+        Assert.Equal(2, target.Count);
+        Assert.Same(xone, target[0]);
+        Assert.Same(xtwo, target[1]);
+        Assert.IsType<Chain>(target);
+        Assert.True(((Chain)target).AcceptDuplicates);
+        Assert.True(((Chain)target).IgnoreCase);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Setter()
+    {
+        var chain = new Chain([xone, xtwo, xthree]);
+        chain[0] = xfour;
+        Assert.Equal(3, chain.Count);
+        Assert.Same(xfour, chain[0]);
+        Assert.Same(xtwo, chain[1]);
+        Assert.Same(xthree, chain[2]);
+
+        try { chain[-1] = xfour; Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+        try { chain[3] = xfour; Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Replace()
+    {
+        var chain = new Chain([xone, xtwo, xthree]);
+        var done = chain.Replace(0, xone);
+        Assert.Equal(0, done);
+
+        done = chain.Replace(0, new Named("ONE"));
+        Assert.Equal(1, done);
+        Assert.Equal(3, chain.Count);
+        Assert.Equal("ONE", ((Named)chain[0]).Name);
+        Assert.Same(xtwo, chain[1]);
+        Assert.Same(xthree, chain[2]);
+
+        var xother = new Named("other");
+        try { chain.Replace(-1, xother); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+        try { chain.Replace(3, xother); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Replace_Same()
+    {
+        var chain = new Chain([xone, xtwo, xthree]) { IgnoreCase = true };
+        var done = chain.Replace(0, xone);
+        Assert.Equal(0, done);
+
+        done = chain.Replace(0, new Named("ONE"));
+        Assert.Equal(0, done);
+
+        done = chain.Replace(1, xtwo); Assert.Equal(0, done);
+        try { chain.Replace(1, xone); Assert.Fail(); } catch (DuplicateException) { }
+
+        chain = new Chain() { IgnoreCase = true, AcceptDuplicates = true };
+        chain.AddRange([xone, xtwo, xthree]);
+        done = chain.Replace(1, xtwo); Assert.Equal(0, done);
+        done = chain.Replace(1, new Named("TWO")); Assert.Equal(0, done);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Replace_Empty_Nested()
+    {
+        var chain = new Chain([xone, xtwo, xthree]);
+
+        var done = chain.Replace(0, new Chain());
+        Assert.Equal(0, done);
+        Assert.Equal(3, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xtwo, chain[1]);
+        Assert.Same(xthree, chain[2]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Replace_Range_Nested()
+    {
+        var xalpha = new Named("alpha");
+        var xbeta = new Named("beta");
+
+        var chain = new Chain([xone, xtwo, xthree]);
+        var done = chain.Replace(0, new Chain([xalpha, xbeta]));
+        Assert.Equal(2, done);
+        Assert.Equal(4, chain.Count);
+        Assert.Same(xalpha, chain[0]);
+        Assert.Same(xbeta, chain[1]);
+        Assert.Same(xtwo, chain[2]);
+        Assert.Same(xthree, chain[3]);
+
+        chain = new Chain([xone, xtwo, xthree]);
+        done = chain.Replace(1, new Chain([xalpha, xbeta]));
+        Assert.Equal(2, done);
+        Assert.Equal(4, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xalpha, chain[1]);
+        Assert.Same(xbeta, chain[2]);
+        Assert.Same(xthree, chain[3]);
+
+        chain = new Chain([xone, xtwo, xthree]);
+        done = chain.Replace(2, new Chain([xalpha, xbeta]));
+        Assert.Equal(2, done);
+        Assert.Equal(4, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xtwo, chain[1]);
+        Assert.Same(xalpha, chain[2]);
+        Assert.Same(xbeta, chain[3]);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_IndexOf_Value()
+    {
+        var chain = new Chain() { AcceptDuplicates = true, IgnoreCase = true };
+        chain.AddRange([xone, xtwo, xthree, xone]);
+
+        var index = chain.IndexOf(xfour); Assert.Equal(-1, index);
+
+        index = chain.IndexOf(xone); Assert.Equal(0, index);
+        index = chain.LastIndexOf(xone); Assert.Equal(3, index);
+        var nums = chain.IndexesOf(xone);
+        Assert.Equal(2, nums.Count);
+        Assert.Equal(0, nums[0]);
+        Assert.Equal(3, nums[1]);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_IndexOf_Predicate()
+    {
+        var chain = new Chain() { AcceptDuplicates = true, IgnoreCase = true };
+        chain.AddRange([xone, xtwo, xone, xthree]);
+
+        var index = chain.IndexOf(x => x is null); Assert.Equal(-1, index);
+
+        index = chain.IndexOf(x => x is Named named && named.Name.Contains('n'));
+        Assert.Equal(0, index);
+
+        index = chain.LastIndexOf(x => x is Named named && named.Name.Contains('n'));
+        Assert.Equal(2, index);
+
+        var nums = chain.IndexesOf(x => x is Named named && named.Name.Contains('e'));
+        Assert.Equal(3, nums.Count);
+        Assert.Equal(0, nums[0]);
+        Assert.Equal(2, nums[1]);
+        Assert.Equal(3, nums[2]);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Find()
+    {
+        IElement item;
+        List<IElement> range;
+        var chain = new Chain() { AcceptDuplicates = true, IgnoreCase = true };
+        chain.AddRange([xone, xtwo, xone, xthree]);
+
+        Assert.False(chain.Find(x => x is null, out item));
+        Assert.Null(item);
+
+        Assert.True(chain.Find(x => x is Named named && named.Name.Contains('e'), out item));
+        Assert.NotNull(item);
+        Assert.Same(xone, item);
+
+        Assert.True(chain.FindLast(x => x is Named named && named.Name.Contains('e'), out item));
+        Assert.NotNull(item);
+        Assert.Same(xthree, item);
+
+        Assert.True(chain.FindAll(x => x is Named named && named.Name.Contains('e'), out range));
+        Assert.Equal(3, range.Count);
+        Assert.Same(xone, range[0]);
+        Assert.Same(xone, range[1]);
+        Assert.Same(xthree, range[2]);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Add()
+    {
+        var chain = new Chain();
+        var done = chain.Add(xone);
+        Assert.Equal(1, done);
+        Assert.Single(chain);
+        Assert.Same(xone, chain[0]);
+
+        done = chain.Add(xtwo);
+        Assert.Equal(1, done);
+        Assert.Equal(2, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xtwo, chain[1]);
+
+        try { chain.Add(null!); Assert.Fail(); } catch (ArgumentNullException) { }
+        try { chain.Add(xone); Assert.Fail(); } catch (DuplicateException) { }
+
+        chain = new Chain([xone]) { IgnoreCase = true };
+        try { chain.Add(new Named("ONE")); Assert.Fail(); } catch (DuplicateException) { }
+
+        chain.AcceptDuplicates = true;
+        done = chain.Add(xone);
+        Assert.Equal(1, done);
+        Assert.Equal(2, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xone, chain[1]);
+
+        done = chain.Add(new Named("ONE"));
+        Assert.Equal(1, done);
+        Assert.Equal(3, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xone, chain[1]);
+        Assert.Equal("ONE", ((Named)chain[2]).Name);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Add_Nested()
+    {
+        var chain = new Chain([xone, xtwo]);
+        var done = chain.Add(new Chain([xthree, xfour]));
+
+        Assert.Equal(2, done);
+        Assert.Equal(4, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xtwo, chain[1]);
+        Assert.Same(xthree, chain[2]);
+        Assert.Same(xfour, chain[3]);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_AddRange()
+    {
+        var chain = new Chain([xone, xtwo]);
+        var done = chain.AddRange([]);
+        Assert.Equal(0, done);
+
+        done = chain.AddRange([xthree, xfour]);
+        Assert.Equal(2, done);
+        Assert.Equal(4, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xtwo, chain[1]);
+        Assert.Same(xthree, chain[2]);
+        Assert.Same(xfour, chain[3]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_AddRange_Nested()
+    {
+        var chain = new Chain([xone, xtwo]);
+        var done = chain.AddRange([xthree, new Chain([xfour, xfive])]);
+
+        Assert.Equal(3, done);
+        Assert.Equal(5, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xtwo, chain[1]);
+        Assert.Same(xthree, chain[2]);
+        Assert.Same(xfour, chain[3]);
+        Assert.Same(xfive, chain[4]);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Insert()
+    {
+        var chain = new Chain();
+        var done = chain.Insert(0, xone);
+        Assert.Equal(1, done);
+        Assert.Single(chain);
+        Assert.Same(xone, chain[0]);
+
+        done = chain.Insert(1, xtwo);
+        Assert.Equal(1, done);
+        Assert.Equal(2, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xtwo, chain[1]);
+
+        done = chain.Insert(0, xthree);
+        Assert.Equal(1, done);
+        Assert.Equal(3, chain.Count);
+        Assert.Same(xthree, chain[0]);
+        Assert.Same(xone, chain[1]);
+        Assert.Same(xtwo, chain[2]);
+
+        try { chain.Insert(0, null!); Assert.Fail(); } catch (ArgumentNullException) { }
+        try { chain.Insert(0, xone); Assert.Fail(); } catch (DuplicateException) { }
+        try { chain.Insert(-1, xfive); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+        try { chain.Insert(4, xfive); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+
+        chain.IgnoreCase = true;
+        try { chain.Insert(0, new Named("ONE")); Assert.Fail(); } catch (DuplicateException) { }
+
+        chain.AcceptDuplicates = true;
+        done = chain.Insert(3, xone);
+        Assert.Equal(1, done);
+        Assert.Equal(4, chain.Count);
+        Assert.Same(xthree, chain[0]);
+        Assert.Same(xone, chain[1]);
+        Assert.Same(xtwo, chain[2]);
+        Assert.Same(xone, chain[3]);
+
+        done = chain.Insert(0, new Named("ONE"));
+        Assert.Equal(1, done);
+        Assert.Equal(5, chain.Count);
+        Assert.Equal("ONE", ((Named)chain[0]).Name);
+        Assert.Same(xthree, chain[1]);
+        Assert.Same(xone, chain[2]);
+        Assert.Same(xtwo, chain[3]);
+        Assert.Same(xone, chain[4]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Insert_Nested()
+    {
+        var chain = new Chain([xone, xtwo]);
+        var done = chain.Insert(2, new Chain([xthree, xfour]));
+
+        Assert.Equal(2, done);
+        Assert.Equal(4, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xtwo, chain[1]);
+        Assert.Same(xthree, chain[2]);
+        Assert.Same(xfour, chain[3]);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_InsertRange()
+    {
+        var chain = new Chain([xone, xtwo]);
+        var done = chain.InsertRange(0, []);
+        Assert.Equal(0, done);
+
+        done = chain.InsertRange(2, [xthree, xfour]);
+        Assert.Equal(2, done);
+        Assert.Equal(4, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xtwo, chain[1]);
+        Assert.Same(xthree, chain[2]);
+        Assert.Same(xfour, chain[3]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_InsertRange_Nested()
+    {
+        var chain = new Chain([xone, xtwo]);
+        var done = chain.InsertRange(1, [xthree, new Chain([xfour, xfive])]);
+
+        Assert.Equal(3, done);
+        Assert.Equal(5, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xthree, chain[1]);
+        Assert.Same(xfour, chain[2]);
+        Assert.Same(xfive, chain[3]);
+        Assert.Same(xtwo, chain[4]);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_RemoveAt()
+    {
+        var chain = new Chain([xone, xtwo, xthree]);
+        var done = chain.RemoveAt(0);
+
+        Assert.Equal(1, done);
+        Assert.Equal(2, chain.Count);
+        Assert.Same(xtwo, chain[0]);
+        Assert.Same(xthree, chain[1]);
+
+        try { chain.RemoveAt(-1); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+        try { chain.RemoveAt(2); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_RemoveRange_Empty()
+    {
+        var chain = new Chain([xone, xtwo, xthree]);
+        var done = chain.RemoveRange(0, 0);
+
+        Assert.Equal(0, done);
+        Assert.Equal(3, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xtwo, chain[1]);
+        Assert.Same(xthree, chain[2]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_RemoveRange()
+    {
+        var chain = new Chain([xone, xtwo, xthree]);
+        var done = chain.RemoveRange(0, 1);
+        Assert.Equal(1, done);
+        Assert.Equal(2, chain.Count);
+        Assert.Same(xtwo, chain[0]);
+        Assert.Same(xthree, chain[1]);
+
+        chain = new Chain([xone, xtwo, xthree]);
+        done = chain.RemoveRange(1, 2);
+        Assert.Equal(2, done);
+        Assert.Single(chain);
+        Assert.Same(xone, chain[0]);
+
+        chain = new Chain([xone, xtwo, xthree]);
+        try { chain.RemoveRange(-1, 0); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+        try { chain.RemoveRange(3, 1); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+        try { chain.RemoveRange(0, 4); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+        try { chain.RemoveRange(1, 3); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+        try { chain.RemoveRange(2, 2); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Remove_Value()
+    {
+        var chain = new Chain() { AcceptDuplicates = true };
+        chain.AddRange([xone, xtwo, xone, xthree]);
+
+        var done = chain.Remove(xfour);
+        Assert.Equal(0, done);
+
+        done = chain.Remove(xone);
+        Assert.Equal(1, done);
+        Assert.Equal(3, chain.Count);
+        Assert.Same(xtwo, chain[0]);
+        Assert.Same(xone, chain[1]);
+        Assert.Same(xthree, chain[2]);
+
+        chain = new Chain() { AcceptDuplicates = true };
+        chain.AddRange([xone, xtwo, xone, xthree]);
+        done = chain.RemoveLast(xone);
+        Assert.Equal(1, done);
+        Assert.Equal(3, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xtwo, chain[1]);
+        Assert.Same(xthree, chain[2]);
+
+        chain = new Chain() { AcceptDuplicates = true };
+        chain.AddRange([xone, xtwo, xone, xthree]);
+        done = chain.RemoveAll(xone);
+        Assert.Equal(2, done);
+        Assert.Equal(2, chain.Count);
+        Assert.Same(xtwo, chain[0]);
+        Assert.Same(xthree, chain[1]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Remove_Value_IgnoreCase()
+    {
+        var chain = new Chain() { AcceptDuplicates = true, IgnoreCase = true };
+        chain.AddRange([xone, xtwo, xone, xthree]);
+
+        var done = chain.RemoveAll(new Named("ONE"));
+        Assert.Equal(2, done);
+        Assert.Equal(2, chain.Count);
+        Assert.Same(xtwo, chain[0]);
+        Assert.Same(xthree, chain[1]);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Remove_Value_Nested()
+    {
+        var chain = new Chain() { AcceptDuplicates = true, IgnoreCase = true };
+        chain.AddRange([xone, xtwo, xone, xthree]);
+
+        var done = chain.Remove(new Chain([xtwo, xone]));
+        Assert.Equal(2, done);
+        Assert.Equal(2, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xthree, chain[1]);
+
+        chain = new Chain() { AcceptDuplicates = true, IgnoreCase = true };
+        chain.AddRange([xone, xtwo, xone, xthree]);
+
+        done = chain.RemoveAll(new Chain([xtwo, xone]));
+        Assert.Equal(3, done);
+        Assert.Single(chain);
+        Assert.Same(xthree, chain[0]);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Remove_Predicate()
+    {
+        var chain = new Chain() { AcceptDuplicates = true, IgnoreCase = true };
+        chain.AddRange([xone, xtwo, xone, xthree]);
+
+        var done = chain.Remove(x => x is Named named && named.Name is null);
+        Assert.Equal(0, done);
+
+        done = chain.Remove(x => x is Named named && named.Name.Contains('n'));
+        Assert.Equal(1, done);
+        Assert.Equal(3, chain.Count);
+        Assert.Same(xtwo, chain[0]);
+        Assert.Same(xone, chain[1]);
+        Assert.Same(xthree, chain[2]);
+
+        chain = new Chain() { AcceptDuplicates = true, IgnoreCase = true };
+        chain.AddRange([xone, xtwo, xone, xthree]);
+        done = chain.RemoveLast(x => x is Named named && named.Name.Contains('n'));
+        Assert.Equal(1, done);
+        Assert.Equal(3, chain.Count);
+        Assert.Same(xone, chain[0]);
+        Assert.Same(xtwo, chain[1]);
+        Assert.Same(xthree, chain[2]);
+
+        chain = new Chain() { AcceptDuplicates = true, IgnoreCase = true };
+        chain.AddRange([xone, xtwo, xone, xthree]);
+        done = chain.RemoveAll(x => x is Named named && named.Name.Contains('n'));
+        Assert.Equal(2, done);
+        Assert.Equal(2, chain.Count);
+        Assert.Same(xtwo, chain[0]);
+        Assert.Same(xthree, chain[1]);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Clear()
+    {
+        var chain = new Chain();
+        var done = chain.Clear();
+        Assert.Equal(0, done);
+
+        chain = new Chain([xone, xtwo, xthree]);
+        done = chain.Clear();
+        Assert.Equal(3, done);
+        Assert.Empty(chain);
+    }
+}

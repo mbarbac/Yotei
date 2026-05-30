@@ -91,23 +91,16 @@ public partial class CoreList<T> : ICoreList<T>
         => FindAll(x => CompareElements(x, value), out var items) ? items : [];
 
     /// <summary>
-    /// Determines how duplicated elements are included in this collection:
-    /// <br/>- <see langword="true"/>: the duplicated element is included in the collection.
-    /// <br/>- <see langword="false"/>: a duplicated exception is thrown.
-    /// <br/>- <see langword="null"/>: the duplicated element is ignored.
+    /// Determines if the given value, which has been identified as a duplicate of existing ones,
+    /// can be included in the collection or not. This method shall:
+    /// <br/>- return <see langword="true"/> to include the duplicated element,
+    /// <br/>- return <see langword="false"/> to not include it in the collection,
+    /// <br/>- throw an appropriate exception if duplicates are not allowed.
     /// </summary>
-    public virtual bool? AllowDuplicates
-    {
-        get;
-        set
-        {
-            if (field == value) return;
-            if (Count == 0) { field = value; return; }
-
-            var range = ToList(); Clear();
-            field = value; AddRange(range);
-        }
-    }
+    /// <param name="value"></param>
+    /// <param name="existing"></param>
+    /// <returns></returns>
+    public virtual bool AllowDuplicate(T value, IEnumerable<T> existing) => true;
 
     // ----------------------------------------------------
 
@@ -357,12 +350,8 @@ public partial class CoreList<T> : ICoreList<T>
         if (value is IEnumerable<T> range) return AddRange(range);
 
         value = ValidateElement(value);
-        var values = FindDuplicates(value); if (values.Any())
-        {
-            if (!AllowDuplicates.HasValue) return 0;
-            if (!AllowDuplicates.Value)
-                throw new DuplicateException("Duplicates detected.").WithData(values);
-        }
+        var dups = FindDuplicates(value);
+        if (dups.Any() && !AllowDuplicate(value, dups)) return 0;
 
         Items.Add(value);
         return 1;
@@ -394,12 +383,8 @@ public partial class CoreList<T> : ICoreList<T>
         if (value is IEnumerable<T> range) return InsertRange(index, range);
 
         value = ValidateElement(value);
-        var values = FindDuplicates(value); if (values.Any())
-        {
-            if (!AllowDuplicates.HasValue) return 0;
-            if (!AllowDuplicates.Value)
-                throw new DuplicateException("Duplicates detected.").WithData(values);
-        }
+        var dups = FindDuplicates(value);
+        if (dups.Any() && !AllowDuplicate(value, dups)) return 0;
 
         Items.Insert(index, value);
         return 1;

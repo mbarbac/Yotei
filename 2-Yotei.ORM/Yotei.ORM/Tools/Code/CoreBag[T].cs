@@ -17,7 +17,8 @@ public partial class CoreBag<T> : ICoreBag<T>
         public override T ValidateElement(T value) => Master.ValidateElement(value);
         public override bool CompareElements(T source, T target) => Master.CompareElements(source, target);
         public override IEnumerable<T> FindDuplicates(T value) => Master.FindDuplicates(value);
-        public override bool? AllowDuplicates => Master.AllowDuplicates;
+        public override bool AllowDuplicate(
+            T value, IEnumerable<T> existing) => Master.AllowDuplicate(value, existing);
     }
 
     // ----------------------------------------------------
@@ -89,23 +90,16 @@ public partial class CoreBag<T> : ICoreBag<T>
         => FindAll(x => CompareElements(x, value), out var items) ? items : [];
 
     /// <summary>
-    /// Determines how duplicated elements are included in this collection:
-    /// <br/>- <see langword="true"/>: the duplicated element is included in the collection.
-    /// <br/>- <see langword="false"/>: a duplicated exception is thrown.
-    /// <br/>- <see langword="null"/>: the duplicated element is ignored.
+    /// Determines if the given value, which has been identified as a duplicate of existing ones,
+    /// can be included in the collection or not. This method shall:
+    /// <br/>- return <see langword="true"/> to include the duplicated element,
+    /// <br/>- return <see langword="false"/> to not include it in the collection,
+    /// <br/>- throw an appropriate exception if duplicates are not allowed.
     /// </summary>
-    public virtual bool? AllowDuplicates
-    {
-        get;
-        set
-        {
-            if (field == value) return;
-            if (Count == 0) { field = value; return; }
-
-            var range = ToList(); Clear();
-            field = value; AddRange(range);
-        }
-    }
+    /// <param name="value"></param>
+    /// <param name="existing"></param>
+    /// <returns></returns>
+    public virtual bool AllowDuplicate(T value, IEnumerable<T> existing) => true;
 
     // ----------------------------------------------------
 
