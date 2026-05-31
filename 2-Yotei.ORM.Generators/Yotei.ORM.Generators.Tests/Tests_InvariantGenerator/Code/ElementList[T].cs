@@ -33,7 +33,11 @@ public partial class ElementList_T : IHost
     /// Copy constructor.
     /// </summary>
     /// <param name="other"></param>
-    protected ElementList_T(THost other) : this(other.Engine) => Items.AddRange(other);
+    protected ElementList_T(THost other) : this(other.Engine)
+    {
+        Items.AcceptDuplicates = other.AcceptDuplicates;
+        Items.AddRange(other);
+    }
 
     // ----------------------------------------------------
 
@@ -47,6 +51,12 @@ public partial class ElementList_T : IHost
     /// The engine this instance is associated with.
     /// </summary>
     public IEngine Engine => Items.Engine;
+
+    public bool AcceptDuplicates // For debug purposes...
+    {
+        get => Items.AcceptDuplicates;
+        set => Items.AcceptDuplicates = value;
+    }
 
     // ----------------------------------------------------
 

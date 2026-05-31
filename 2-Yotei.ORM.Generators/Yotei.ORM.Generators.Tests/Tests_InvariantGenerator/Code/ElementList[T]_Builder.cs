@@ -42,7 +42,12 @@ partial class ElementList_T
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public IHost ToInstance() => Count == 0 ? new THost(Engine) : new THost(Engine, this);
+        public IHost ToInstance()
+        {
+            var host = new THost(Engine) { AcceptDuplicates = AcceptDuplicates };
+            if (Count > 0) host.AddRange(this);
+            return host;
+        }
 
         /// <summary>
         /// <inheritdoc/>
