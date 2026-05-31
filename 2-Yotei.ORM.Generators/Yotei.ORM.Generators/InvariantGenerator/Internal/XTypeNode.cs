@@ -93,7 +93,7 @@ internal partial class XTypeNode : TypeNode
                 TType = args[1].UnwrapNullable(out TTypeNullable);
 
                 KTypeName = KType.EasyName(options);
-                TTypeName = KType.EasyName(options);
+                TTypeName = TType.EasyName(options);
                 if (KTypeNullable && !KTypeName.EndsWith('?')) KTypeName += '?';
                 if (TTypeNullable && !TTypeName.EndsWith('?')) TTypeName += '?';
 
@@ -130,7 +130,7 @@ internal partial class XTypeNode : TypeNode
             TType = ((INamedTypeSymbol)atc.TypeArguments[1]).UnwrapNullable(out TTypeNullable);
 
             KTypeName = KType.EasyName(options);
-            TTypeName = KType.EasyName(options);
+            TTypeName = TType.EasyName(options);
             if (KTypeNullable && !KTypeName.EndsWith('?')) KTypeName += '?';
             if (TTypeNullable && !TTypeName.EndsWith('?')) TTypeName += '?';
 

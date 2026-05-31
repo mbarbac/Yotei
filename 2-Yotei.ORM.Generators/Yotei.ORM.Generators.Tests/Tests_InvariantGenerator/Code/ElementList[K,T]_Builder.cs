@@ -1,10 +1,11 @@
-﻿using IItem = Yotei.ORM.InvariantGenerator.Tests.IElement;
-using IHost = Yotei.ORM.InvariantGenerator.Tests.IElementList_T;
-using THost = Yotei.ORM.InvariantGenerator.Tests.ElementList_T;
+﻿using TKey = string;
+using IItem = Yotei.ORM.InvariantGenerator.Tests.IElement;
+using IHost = Yotei.ORM.InvariantGenerator.Tests.IElementList_KT;
+using THost = Yotei.ORM.InvariantGenerator.Tests.ElementList_KT;
 
 namespace Yotei.ORM.InvariantGenerator.Tests;
 
-partial class ElementList_T
+partial class ElementList_KT
 {
     // ====================================================
     /// <summary>
@@ -12,7 +13,7 @@ partial class ElementList_T
     /// </summary>
     [DebuggerDisplay("{ToDebugString(3)}")]
     [Cloneable]
-    public partial class Builder : CoreList<IItem>, IHost.IBuilder
+    public partial class Builder : CoreList<TKey, IItem>, IHost.IBuilder
     {
         /// <summary>
         /// Initializes a new empty instance.
@@ -62,13 +63,23 @@ partial class ElementList_T
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public override IItem ValidateElement(IItem value)
-        {
-            ArgumentNullException.ThrowIfNull(value);
+        public override IItem ValidateElement(IItem value) => value.ThrowWhenNull();
 
-            if (value is NamedElement named) named.Name.NotNullNotEmpty(trim: true);
-            return value;
-        }
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public override TKey GetKey(IItem item) => item is NamedElement named
+            ? named.Name
+            : throw new ArgumentException("Element is not a named one.").WithData(item);
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public override TKey ValidateKey(TKey key) => key.NotNullNotEmpty(true);
 
         /// <summary>
         /// <inheritdoc/>
@@ -76,21 +87,16 @@ partial class ElementList_T
         /// <param name="source"></param>
         /// <param name="target"></param>
         /// <returns></returns>
-        public override bool CompareElements(IItem source, IItem target)
+        public override bool CompareKeys(TKey source, TKey target)
         {
             var comparer = new MyComparer(Engine.IgnoreCase);
             return comparer.Equals(source, target);
         }
 
-        readonly struct MyComparer(bool IgnoreCase) : IEqualityComparer<IItem>
+        readonly struct MyComparer(bool IgnoreCase) : IEqualityComparer<TKey>
         {
-            public bool Equals(IItem? x, IItem? y)
-            {
-                return x is NamedElement xname && y is NamedElement ynamed
-                    ? string.Compare(xname.Name, ynamed.Name, IgnoreCase) == 0
-                    : ReferenceEquals(x, y);
-            }
-            public int GetHashCode(IItem _) => throw new UnExpectedException();
+            public bool Equals(TKey? x, TKey? y) => string.Compare(x, y, IgnoreCase) == 0;
+            public int GetHashCode(TKey _) => throw new UnExpectedException();
         }
 
         /// <summary>
@@ -98,7 +104,7 @@ partial class ElementList_T
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public override IEnumerable<IItem> FindDuplicates(IItem value) => base.FindDuplicates(value);
+        public override IEnumerable<IItem> FindDuplicates(TKey key) => base.FindDuplicates(key);
 
         /// <summary>
         /// <inheritdoc/>

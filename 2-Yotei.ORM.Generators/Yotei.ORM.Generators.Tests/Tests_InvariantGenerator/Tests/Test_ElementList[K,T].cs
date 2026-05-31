@@ -1,11 +1,11 @@
 ﻿using Named = Yotei.ORM.InvariantGenerator.Tests.NamedElement;
-using Chain = Yotei.ORM.InvariantGenerator.Tests.ElementList_T;
+using Chain = Yotei.ORM.InvariantGenerator.Tests.ElementList_KT;
 
 namespace Yotei.ORM.InvariantGenerator.Tests;
 
 // ========================================================
 //[Enforced]
-public static partial class Test_ElementList_T
+public static partial class Test_ElementList_KT
 {
     readonly static Named xone = new("one");
     readonly static Named xtwo = new("two");
@@ -110,20 +110,20 @@ public static partial class Test_ElementList_T
         var source = new Chain(engine) { AcceptDuplicates = true };
         source = (Chain)source.AddRange([xone, xtwo, xthree, xone]);
 
-        var index = source.IndexOf(xfour); Assert.Equal(-1, index);
+        var index = source.IndexOf("FOUR"); Assert.Equal(-1, index);
 
-        index = source.IndexOf(xone); Assert.Equal(0, index);
-        index = source.IndexOf(new Named("ONE")); Assert.Equal(0, index);
+        index = source.IndexOf("one"); Assert.Equal(0, index);
+        index = source.IndexOf("ONE"); Assert.Equal(0, index);
 
-        index = source.LastIndexOf(xone); Assert.Equal(3, index);
-        index = source.LastIndexOf(new Named("ONE")); Assert.Equal(3, index);
+        index = source.LastIndexOf("one"); Assert.Equal(3, index);
+        index = source.LastIndexOf("ONE"); Assert.Equal(3, index);
 
-        var nums = source.IndexesOf(xone);
+        var nums = source.IndexesOf("one");
         Assert.Equal(2, nums.Count);
         Assert.Equal(0, nums[0]);
         Assert.Equal(3, nums[1]);
 
-        nums = source.IndexesOf(new Named("ONE"));
+        nums = source.IndexesOf("ONE");
         Assert.Equal(2, nums.Count);
         Assert.Equal(0, nums[0]);
         Assert.Equal(3, nums[1]);
@@ -564,30 +564,30 @@ public static partial class Test_ElementList_T
 
     //[Enforced]
     [Fact]
-    public static void Test_Remove_Value()
+    public static void Test_Remove_Key()
     {
         var engine = new FakeEngine() { IgnoreCase = true };
         var source = new Chain(engine) { AcceptDuplicates = true };
         source = (Chain)source.AddRange([xone, xtwo, xone, xthree]);
 
-        var target = source.Remove(xfour);
+        var target = source.Remove("four");
         Assert.Same(source, target);
 
-        target = source.Remove(xone);
+        target = source.Remove("one");
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.Same(xtwo, target[0]);
         Assert.Same(xone, target[1]);
         Assert.Same(xthree, target[2]);
 
-        target = source.RemoveLast(new Named("ONE"));
+        target = source.RemoveLast("ONE");
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
         Assert.Same(xthree, target[2]);
 
-        target = source.RemoveAll(new Named("ONE"));
+        target = source.RemoveAll("ONE");
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
         Assert.Same(xtwo, target[0]);
@@ -602,7 +602,7 @@ public static partial class Test_ElementList_T
         var source = new Chain(engine) { AcceptDuplicates = true };
         source = (Chain)source.AddRange([xone, xtwo, xone, xthree]);
 
-        var target = source.RemoveAll(new Named("ONE"));
+        var target = source.RemoveAll("ONE");
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
         Assert.Same(xtwo, target[0]);
@@ -610,24 +610,10 @@ public static partial class Test_ElementList_T
     }
 
     //[Enforced]
-    [Fact]
-    public static void Test_Remove_Value_Nested()
-    {
-        var engine = new FakeEngine() { IgnoreCase = true };
-        var source = new Chain(engine) { AcceptDuplicates = true };
-        source = (Chain)source.AddRange([xone, xtwo, xone, xthree]);
-
-        var target = source.Remove(new Chain(engine, [xtwo, xone]));
-        Assert.NotSame(source, target);
-        Assert.Equal(2, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xthree, target[1]);
-
-        target = source.RemoveAll(new Chain(engine, [xtwo, xone]));
-        Assert.NotSame(source, target);
-        Assert.Single(target);
-        Assert.Same(xthree, target[0]);
-    }
+    //[Fact]
+    //public static void Test_Remove_Value_Nested()
+    // By default this capability is not supported: the remvoe methods take a 'key' argument, so
+    // there is no default way of specifying a collection of elements to remove.
 
     // ----------------------------------------------------
 

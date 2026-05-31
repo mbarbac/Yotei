@@ -1,0 +1,120 @@
+﻿using TKey = string;
+using IItem = Yotei.ORM.InvariantGenerator.Tests.IElement;
+using IHost = Yotei.ORM.InvariantGenerator.Tests.IElementList_KT;
+using THost = Yotei.ORM.InvariantGenerator.Tests.ElementList_KT;
+
+namespace Yotei.ORM.InvariantGenerator.Tests;
+
+// ========================================================
+/// <summary>
+/// <inheritdoc cref="IInvariantList{K, T}"/>
+/// </summary>
+[DebuggerDisplay("{ToDebugString(3)}")]
+[InvariantList<TKey, IItem>(ReturnType = typeof(IHost))]
+public partial class ElementList_KT : IHost
+{
+    protected override Builder Items { get; }
+
+    /// <summary>
+    /// Initializes a new empty instance.
+    /// </summary>
+    /// <param name="engine"></param>
+    [SuppressMessage("", "IDE0290")]
+    public ElementList_KT(IEngine engine) => Items = new(engine);
+
+    /// <summary>
+    /// Initializes a new instance with the elements of the given range.
+    /// </summary>
+    /// <param name="engine"></param>
+    /// <param name="range"></param>
+    public ElementList_KT(
+        IEngine engine, IEnumerable<IItem> range) : this(engine) => Items.AddRange(range);
+
+    /// <summary>
+    /// Copy constructor.
+    /// </summary>
+    /// <param name="other"></param>
+    protected ElementList_KT(THost other) : this(other.Engine)
+    {
+        Items.AcceptDuplicates = other.AcceptDuplicates;
+        Items.AddRange(other);
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc cref="IInvariantList{T}.ToBuilder"/>
+    /// </summary>
+    /// <returns></returns>
+    public override IHost.IBuilder ToBuilder() => Items.Clone();
+
+    /// <summary>
+    /// The engine this instance is associated with.
+    /// </summary>
+    public IEngine Engine => Items.Engine;
+
+    public bool AcceptDuplicates // For debug purposes...
+    {
+        get => Items.AcceptDuplicates;
+        set => Items.AcceptDuplicates = value;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    public bool Equals(IItem? other)
+    {
+        if (ReferenceEquals(this, other)) return true;
+        if (other is null) return false;
+        if (other is not IHost valid) return false;
+
+        if (!Engine.Equals(valid.Engine)) return false;
+        if (Count != valid.Count) return false;
+
+        for (int i = 0; i < Count; i++)
+        {
+            var item = this[i];
+            var temp = valid[i];
+            var same = item is NamedElement xitem && temp is NamedElement xtemp
+                ? xitem.Equals(xtemp, Engine.IgnoreCase)
+                : item.Equals(temp);
+
+            if (!same) return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    public override bool Equals(object? obj) => Equals(obj as IItem);
+
+    public static bool operator ==(THost? host, IHost? item)
+    {
+        if (host is null && item is null) return true;
+        if (host is null || item is null) return false;
+
+        return host.Equals(item);
+    }
+
+    public static bool operator !=(THost? host, IHost? item) => !(host == item);
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public override int GetHashCode()
+    {
+        var code = Engine.GetHashCode();
+        code = HashCode.Combine(code, Count);
+        for (int i = 0; i < Count; i++) code = HashCode.Combine(code, this[i]);
+        return code;
+    }
+}
