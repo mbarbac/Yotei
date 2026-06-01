@@ -1,17 +1,16 @@
-﻿using TKey = string;
-using IItem = Yotei.ORM.InvariantGenerator.Tests.IElement;
-using IHost = Yotei.ORM.InvariantGenerator.Tests.IElementList_KT;
-using THost = Yotei.ORM.InvariantGenerator.Tests.ElementList_KT;
+﻿using IItem = Yotei.ORM.InvariantGenerator.Tests.IElement;
+using IHost = Yotei.ORM.InvariantGenerator.Tests.IElementBag_T;
+using THost = Yotei.ORM.InvariantGenerator.Tests.ElementBag_T;
 
 namespace Yotei.ORM.InvariantGenerator.Tests;
 
 // ========================================================
 /// <summary>
-/// <inheritdoc cref="IInvariantList{K, T}"/>
+/// <inheritdoc cref="InvariantBag{T}"/>
 /// </summary>
 [DebuggerDisplay("{ToDebugString(3)}")]
-[InvariantList<TKey, IItem>(ReturnType = typeof(IHost))]
-public partial class ElementList_KT : IHost
+[InvariantBag<IItem>(ReturnType = typeof(IHost))]
+public partial class ElementBag_T : IHost
 {
     protected override Builder Items { get; }
 
@@ -20,21 +19,21 @@ public partial class ElementList_KT : IHost
     /// </summary>
     /// <param name="engine"></param>
     [SuppressMessage("", "IDE0290")]
-    public ElementList_KT(IEngine engine) => Items = new(engine);
+    public ElementBag_T(IEngine engine) => Items = new(engine);
 
     /// <summary>
     /// Initializes a new instance with the elements of the given range.
     /// </summary>
     /// <param name="engine"></param>
     /// <param name="range"></param>
-    public ElementList_KT(
+    public ElementBag_T(
         IEngine engine, IEnumerable<IItem> range) : this(engine) => Items.AddRange(range);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="other"></param>
-    protected ElementList_KT(THost other) : this(other.Engine)
+    protected ElementBag_T(THost other) : this(other.Engine)
     {
         Items.AcceptDuplicates = other.AcceptDuplicates;
         Items.AddRange(other);
@@ -43,13 +42,13 @@ public partial class ElementList_KT : IHost
     // ----------------------------------------------------
 
     /// <summary>
-    /// <inheritdoc cref="IInvariantList{K, T}.ToBuilder"/>
+    /// <inheritdoc cref="IInvariantBag{T}.ToBuilder"/>
     /// </summary>
     /// <returns></returns>
     public override IHost.IBuilder ToBuilder() => Items.Clone();
 
     /// <summary>
-    /// The engine this instance is associated with.
+    /// <inheritdoc/>
     /// </summary>
     public IEngine Engine => Items.Engine;
 
@@ -75,13 +74,13 @@ public partial class ElementList_KT : IHost
         if (!Engine.Equals(valid.Engine)) return false;
         if (Count != valid.Count) return false;
 
-        for (int i = 0; i < Count; i++)
+        foreach (var item in this)
         {
-            var item = this[i];
-            var temp = valid[i];
-            var same = item is NamedElement xitem && temp is NamedElement xtemp
+            var same = valid.Find(temp =>
+                item is NamedElement xitem && temp is NamedElement xtemp
                 ? xitem.Equals(xtemp, Engine.IgnoreCase)
-                : item.EqualsEx(temp);
+                : item.EqualsEx(temp),
+                out var value);
 
             if (!same) return false;
         }
@@ -114,7 +113,7 @@ public partial class ElementList_KT : IHost
     {
         var code = Engine.GetHashCode();
         code = HashCode.Combine(code, Count);
-        for (int i = 0; i < Count; i++) code = HashCode.Combine(code, this[i]);
+        foreach (var item in this) code = HashCode.Combine(code, item);
         return code;
     }
 }

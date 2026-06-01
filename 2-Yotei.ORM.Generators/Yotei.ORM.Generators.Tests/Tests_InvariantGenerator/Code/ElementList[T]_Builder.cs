@@ -39,7 +39,7 @@ partial class ElementList_T
         }
 
         /// <summary>
-        /// <inheritdoc/>
+        /// <inheritdoc cref="IHost.IBuilder.ToInstance"/>
         /// </summary>
         /// <returns></returns>
         public THost ToInstance()

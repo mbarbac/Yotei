@@ -80,7 +80,7 @@ public partial class ElementList_T : IHost
             var temp = valid[i];
             var same = item is NamedElement xitem && temp is NamedElement xtemp
                 ? xitem.Equals(xtemp, Engine.IgnoreCase)
-                : item.Equals(temp);
+                : item.EqualsEx(temp);
 
             if (!same) return false;
         }

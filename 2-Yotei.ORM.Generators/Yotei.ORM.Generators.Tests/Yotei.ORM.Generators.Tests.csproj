@@ -66,18 +66,6 @@
 		<Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/**" />
 		<Compile Remove="$(CompilerGeneratedFilesOutputPath)/**" />
 	</ItemGroup>
-	<ItemGroup>
-	  <Compile Remove="Tests_InvariantGenerator\Api\IElementList[K,T].cs" />
-	  <Compile Remove="Tests_InvariantGenerator\Api\IElementList[K,T]_IBuilder.cs" />
-	  <Compile Remove="Tests_InvariantGenerator\Api\IElementList[T].cs" />
-	  <Compile Remove="Tests_InvariantGenerator\Api\IElementList[T]_IBuilder.cs" />
-	  <Compile Remove="Tests_InvariantGenerator\Code\ElementList[K,T].cs" />
-	  <Compile Remove="Tests_InvariantGenerator\Code\ElementList[K,T]_Builder.cs" />
-	  <Compile Remove="Tests_InvariantGenerator\Code\ElementList[T].cs" />
-	  <Compile Remove="Tests_InvariantGenerator\Code\ElementList[T]_Builder.cs" />
-	  <Compile Remove="Tests_InvariantGenerator\Tests\Test_ElementList[K,T].cs" />
-	  <Compile Remove="Tests_InvariantGenerator\Tests\Test_ElementList[T].cs" />
-	</ItemGroup>
 
 	<!-- Clear generated files each compile or build (need to be at the end of the file)-->
 	<Target Name="CustomBeforeCompile" BeforeTargets="BeforeCompile">

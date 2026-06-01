@@ -37,10 +37,10 @@ internal class InvariantGenerator : TreeGenerator
     /// <inheritdoc/>
     /// </summary>
     protected override List<Type> TypeAttributes { get; } = [
-        typeof(IInvariantBagAttribute), typeof(IInvariantBagAttribute),
+        typeof(IInvariantBagAttribute), typeof(IInvariantBagAttribute<>),
         typeof(IInvariantListAttribute),
         typeof(IInvariantListAttribute<>), typeof(IInvariantListAttribute<,>),
-        typeof(InvariantBagAttribute), typeof(InvariantBagAttribute),
+        typeof(InvariantBagAttribute), typeof(InvariantBagAttribute<>),
         typeof(InvariantListAttribute),
         typeof(InvariantListAttribute<>), typeof(InvariantListAttribute<,>)];
 
