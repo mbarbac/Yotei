@@ -27,7 +27,7 @@ internal class Program
     /// <summary>
     /// Program entry point.
     /// </summary>
-    static void Main_()
+    static void Main()
     {
         Trace.Listeners.EnsureConsoleListener();
         Debug.IndentSize = 2;
