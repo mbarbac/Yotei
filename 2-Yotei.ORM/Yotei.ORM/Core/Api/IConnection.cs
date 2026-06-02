@@ -56,4 +56,42 @@ public partial interface IConnection : IAsyncDisposableEx
     /// <br/> If the connection was already closed, then this method is ignored.
     /// </summary>
     ValueTask CloseAsync();
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// If not <see langword="null"/>, then the current active transaction associated with this
+    /// instance.
+    /// </summary>
+    ITransaction? Transaction { get; }
+
+    /// <summary>
+    /// Creates and starts a default transaction associated to this instance, that becomes its
+    /// current one.
+    /// <br/> This method throws an exception if there is already an active transaction.
+    /// </summary>
+    /// <returns></returns>
+    ITransaction StartTransaction();
+
+    /// <summary>
+    /// Creates and starts a default transaction associated to this instance, that becomes its
+    /// current one. This method throws an exception if there is already an active transaction.
+    /// </summary>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    ValueTask<ITransaction> StartTransactionAsync(CancellationToken token = default);
+
+    /// <summary>
+    /// Invoked by the given transaction when it has been committed or aborted.
+    /// </summary>
+    /// <param name="transaction"></param>
+    internal void EndTransaction(ITransaction transaction);
+
+    /// <summary>
+    /// Invoked by the given transaction when it has been committed or aborted.
+    /// </summary>
+    /// <param name="transaction"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    internal ValueTask EndTransactionAsync(ITransaction transaction, CancellationToken token = default);
 }

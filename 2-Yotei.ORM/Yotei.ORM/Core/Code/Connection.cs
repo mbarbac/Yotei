@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Code;
+﻿using System.Runtime.InteropServices.Marshalling;
+
+namespace Yotei.ORM.Code;
 
 // ========================================================
 /// <summary>
@@ -42,7 +44,14 @@ public abstract partial class Connection : DisposableClass, IConnection
     {
         if (IsDisposed || !disposing) return;
 
+        try
+        {
+            if (IsTransactionActive && ReferenceEquals(this, _Transaction!.Attached))
+                _Transaction.Abort();
+        }
+        catch { }
         try { if (IsOpen) Close(); } catch { }
+        try { _Semaphore.Dispose(); } catch { }
     }
 
     /// <summary>
@@ -54,7 +63,14 @@ public abstract partial class Connection : DisposableClass, IConnection
     {
         if (IsDisposed || !disposing) return;
 
+        try
+        {
+            if (IsTransactionActive && ReferenceEquals(this, _Transaction!.Attached))
+                await _Transaction.AbortAsync();
+        }
+        catch { }
         try { if (IsOpen) await CloseAsync().ConfigureAwait(false); } catch { }
+        try { _Semaphore.Dispose(); } catch { }
     }
 
     /// <summary>
@@ -106,7 +122,7 @@ public abstract partial class Connection : DisposableClass, IConnection
         while (num >= 0)
         {
             ThrowIfDisposed();
-            ThrowIfDisposing();
+            ThrowOnDisposing();
 
             if (IsOpen) return;
             num--;
@@ -134,7 +150,7 @@ public abstract partial class Connection : DisposableClass, IConnection
         while (num >= 0)
         {
             ThrowIfDisposed();
-            ThrowIfDisposing();
+            ThrowOnDisposing();
 
             if (IsOpen) return;
             num--;
@@ -197,4 +213,156 @@ public abstract partial class Connection : DisposableClass, IConnection
     /// </summary>
     /// <returns></returns>
     protected abstract ValueTask OnCloseAsync();
+
+    // ----------------------------------------------------
+
+    readonly SemaphoreSlim _Semaphore = new(1, 1);
+    ITransaction? _Transaction = null;
+
+    bool IsTransactionActive => _Transaction != null &&
+        !_Transaction.IsDisposed &&
+        !_Transaction.OnDisposing;
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public ITransaction? Transaction
+    {
+        // If the current one is disposed then return null.
+        get
+        {
+            if (IsDisposed || OnDisposing) return null;
+
+            _Semaphore.Wait();
+            try
+            {
+                if (_Transaction != null)
+                {
+                    if (_Transaction.IsDisposed || _Transaction.OnDisposing)
+                    {
+                        _Transaction = null;
+                        return null;
+                    }
+                }
+
+                return _Transaction;
+            }
+            finally { _Semaphore.Release(); }
+        }
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public virtual ITransaction StartTransaction()
+    {
+        ThrowIfDisposed();
+        ThrowOnDisposing();
+
+        _Semaphore.Wait();
+        try
+        {
+            if (IsTransactionActive) throw new InvalidOperationException(
+                "This instance already carries an active transaction.")
+                .WithData(this);
+
+            bool opened = IsOpen;
+            if (!opened) Open();
+
+            _Transaction = OnStartTransaction();
+            _Transaction.Attached = this;
+            if (!opened) _Transaction.HasOpenedConnection = true;
+            return _Transaction;
+        }
+        finally { _Semaphore.Release(); }
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    public virtual async ValueTask<ITransaction> StartTransactionAsync(CancellationToken token = default)
+    {
+        ThrowIfDisposed();
+        ThrowOnDisposing();
+
+        await _Semaphore.WaitAsync(token).ConfigureAwait(false);
+        try
+        {
+            if (IsTransactionActive) throw new InvalidOperationException(
+                "This instance already carries an active transaction.")
+                .WithData(this);
+
+            bool opened = IsOpen;
+            if (!opened) await OpenAsync(token).ConfigureAwait(false);
+
+            _Transaction = await OnStartTransactionAsync(token).ConfigureAwait(false);
+            _Transaction.Attached = this;
+            if (!opened) _Transaction.HasOpenedConnection = true;
+            return _Transaction;
+        }
+        finally { _Semaphore.Release(); }
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="transaction"></param>
+    void IConnection.EndTransaction(ITransaction transaction)
+    {
+        if (IsDisposed || OnDisposing) return;
+        if (!ReferenceEquals(this, transaction.Attached)) return;
+
+        _Semaphore.Wait();
+        try
+        {
+            if (IsOpen && transaction.HasOpenedConnection) Close();
+
+            transaction.HasOpenedConnection = false;
+            transaction.Attached = null;
+            _Transaction = null;
+        }
+        finally { _Semaphore.Release(); }
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="transaction"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    async ValueTask IConnection.EndTransactionAsync(ITransaction transaction, CancellationToken token)
+    {
+        if (IsDisposed || OnDisposing) return;
+        if (!ReferenceEquals(this, transaction.Attached)) return;
+
+        await _Semaphore.WaitAsync(token).ConfigureAwait(false);
+        try
+        {
+            if (IsOpen && transaction.HasOpenedConnection) await CloseAsync().ConfigureAwait(false);
+
+            transaction.HasOpenedConnection = false;
+            transaction.Attached = null;
+            _Transaction = null;
+        }
+        finally { _Semaphore.Release(); }
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to start and return an underlying transaction.
+    /// </summary>
+    /// <returns></returns>
+    protected abstract ITransaction OnStartTransaction();
+
+    /// <summary>
+    /// Invoked to start and return an underlying transaction.
+    /// </summary>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    protected abstract ValueTask<ITransaction> OnStartTransactionAsync(
+        CancellationToken token = default);
 }

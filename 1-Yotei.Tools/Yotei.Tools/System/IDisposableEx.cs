@@ -26,5 +26,5 @@ public interface IDisposableEx : IDisposable
     /// <summary>
     /// Throws an exception if this instance is being disposed at this very moment.
     /// </summary>
-    void ThrowIfDisposing();
+    void ThrowOnDisposing();
 }

@@ -29,7 +29,7 @@ public abstract class DisposableClass : IAsyncDisposableEx
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public void ThrowIfDisposing()
+    public void ThrowOnDisposing()
     {
         if (IsDisposed) throw new InvalidOperationException(
             "This object is being disposed.")

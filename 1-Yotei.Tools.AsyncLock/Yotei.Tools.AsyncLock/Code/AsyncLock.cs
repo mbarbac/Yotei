@@ -125,7 +125,7 @@ public sealed partial class AsyncLock : DisposableClass
         while (true)
         {
             ThrowIfDisposed();
-            ThrowIfDisposing();
+            ThrowOnDisposing();
 
             var taken = false;
             try
@@ -283,7 +283,7 @@ public sealed partial class AsyncLock : DisposableClass
         while (true)
         {
             ThrowIfDisposed();
-            ThrowIfDisposing();
+            ThrowOnDisposing();
             token.ThrowIfCancellationRequested();
 
             var taken = false;
