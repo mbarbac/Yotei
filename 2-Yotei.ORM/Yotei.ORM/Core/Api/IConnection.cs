@@ -3,7 +3,6 @@
 // ========================================================
 /// <summary>
 /// Represents a connection with an underlying database.
-/// <br/> Instances of this type are not intended to be shared by multiple threads.
 /// </summary>
 [Cloneable]
 public partial interface IConnection : IAsyncDisposableEx
