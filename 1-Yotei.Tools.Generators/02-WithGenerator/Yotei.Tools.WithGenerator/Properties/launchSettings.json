@@ -5,7 +5,7 @@
     },
     "WithGenerator.Debug": {
       "commandName": "DebugRoslynComponent",
-      "targetProject": "..\\..\\..\\2-Yotei.ORM\\Yotei.ORM.Tests\\Yotei.ORM.Tests.csproj"
+      "targetProject": "..\\..\\..\\3-Yotei.ORM.Relational\\Yotei.ORM.Relational\\Yotei.ORM.Relational.csproj"
     }
   }
 }

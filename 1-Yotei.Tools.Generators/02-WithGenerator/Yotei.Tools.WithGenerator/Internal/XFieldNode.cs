@@ -141,11 +141,11 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
                     }
 
                     // Method requested in base type...
-                    while (type.HasInheritsWithAttribute(out var atts))
+                    /*while (type.HasInheritsWithAttribute(out var atts))
                     {
                         value = $"new ";
                         return true;
-                    }
+                    }*/
 
                     // Try next...
                     value = null;
@@ -230,7 +230,7 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
                     }
 
                     // Method requested in base type...
-                    while (type.HasInheritsWithAttribute(out var atts))
+                    /*while (type.HasInheritsWithAttribute(out var atts))
                     {
                         if (type.IsInterface) { value = "public abstract "; return true; }
                         if (type.IsAbstract) { value = "public abstract override "; return true; }
@@ -250,7 +250,7 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
 
                             return true;
                         }
-                    }
+                    }*/
 
                     // Try next...
                     value = null;
@@ -362,7 +362,7 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
                     }
 
                     // Method requested in base type...
-                    while (type.HasInheritsWithAttribute(out var atts))
+                    /*while (type.HasInheritsWithAttribute(out var atts))
                     {
                         if (type.IsInterface)
                         {
@@ -385,7 +385,7 @@ internal class XFieldNode : FieldNode, IXNode<IFieldSymbol>
 
                             return true;
                         }
-                    }
+                    }*/
 
                     // Try next...
                     value = null;

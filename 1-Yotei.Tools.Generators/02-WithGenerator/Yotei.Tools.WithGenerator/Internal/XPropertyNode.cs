@@ -144,11 +144,11 @@ internal class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
                     }
 
                     // Method requested in base type...
-                    while (type.HasInheritsWithAttribute(out var atts))
+                    /*while (type.HasInheritsWithAttribute(out var atts))
                     {
                         value = $"new ";
                         return true;
-                    }
+                    }*/
 
                     // Try next...
                     value = null;
@@ -234,7 +234,7 @@ internal class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
                     }
 
                     // Method requested in base type...
-                    while (type.HasInheritsWithAttribute(out var atts))
+                    /*while (type.HasInheritsWithAttribute(out var atts))
                     {
                         if (type.IsInterface) { value = "public abstract "; return true; }
                         if (type.IsAbstract) { value = "public abstract override "; return true; }
@@ -254,7 +254,7 @@ internal class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
                             
                             return true;
                         }
-                    }
+                    }*/
 
                     // Try next...
                     value = null;
@@ -367,7 +367,7 @@ internal class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
                     }
 
                     // Method requested in base type...
-                    while (type.HasInheritsWithAttribute(out var atts))
+                    /*while (type.HasInheritsWithAttribute(out var atts))
                     {
                         if (type.IsInterface)
                         {
@@ -390,7 +390,7 @@ internal class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
 
                             return true;
                         }
-                    }
+                    }*/
 
                     // Try next...
                     value = null;
