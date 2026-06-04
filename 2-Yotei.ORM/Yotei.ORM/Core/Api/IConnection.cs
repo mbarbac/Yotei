@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Yotei.ORM;
 
 // ========================================================
 /// <summary>
@@ -11,4 +13,57 @@ public partial interface IConnection : IAsyncDisposableEx
     /// The descriptor of the database engine this instance connects to.
     /// </summary>
     IEngine Engine { get; }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if this instance is active (connected) or not.
+    /// </summary>
+    bool IsOpen { get; }
+
+    /// <summary>
+    /// Opens the connection with the underlying database.
+    /// <br/> If the connection was already opened, then this method is ignored.
+    /// </summary>
+    void Open();
+
+    /// <summary>
+    /// Opens the connection with the underlying database.
+    /// <br/> If the connection was already opened, then this method is ignored.
+    /// </summary>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    ValueTask OpenAsync(CancellationToken token = default);
+
+    /// <summary>
+    /// Closes the connection with the underlying database.
+    /// <br/> If the connection was already closed, then this method is ignored.
+    /// </summary>
+    void Close();
+
+    /// <summary>
+    /// Closes the connection with the underlying database.
+    /// <br/> If the connection was already closed, then this method is ignored.
+    /// </summary>
+    ValueTask CloseAsync();
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// The database transaction this instance is associated with, or null if any.
+    /// </summary>
+    ITransaction? Transaction { get; internal set; }
+
+    /// <summary>
+    /// Starts the active database transaction associated with this instance.
+    /// </summary>
+    /// <returns></returns>
+    ITransaction StartTransaction();
+
+    /// <summary>
+    /// Starts the active database transaction associated with this instance.
+    /// </summary>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    ValueTask<ITransaction> StartTransactionAsync(CancellationToken token = default);
 }

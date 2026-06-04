@@ -16,4 +16,9 @@ public interface ITransaction : ORM.ITransaction
     /// <br/> This property is provided for informational purposes only.
     /// </summary>
     DbTransaction DbTransaction { get; }
+
+    /// <summary>
+    /// The transaction locking behavior used by this instance.
+    /// </summary>
+    IsolationLevel IsolationLevel { get; }
 }
