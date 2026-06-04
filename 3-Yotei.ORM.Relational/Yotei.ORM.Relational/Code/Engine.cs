@@ -12,24 +12,24 @@ public partial class Engine : ORM.Code.Engine, IEngine
     /// Initializes a new instance.
     /// </summary>
     /// <param name="factory"></param>
-    public Engine(DbProviderFactory factory) => Factory = factory.ThrowWhenNull();
+    public Engine(DbProviderFactory factory) => DbFactory = factory.ThrowWhenNull();
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="source"></param>
-    protected Engine(Engine source) : base(source) => Factory = source.Factory;
+    protected Engine(Engine source) : base(source) => DbFactory = source.DbFactory;
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"Relational.Engine[{Factory.GetType().Name}]";
+    public override string ToString() => $"Relational.Engine[{DbFactory.GetType().Name}]";
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public DbProviderFactory Factory { get; init; }
+    public DbProviderFactory DbFactory { get; init; }
 
     // ----------------------------------------------------
 
@@ -42,7 +42,7 @@ public partial class Engine : ORM.Code.Engine, IEngine
     {
         return
             base.Equals(other) &&
-            Factory.GetType() == other.Factory.GetType();
+            DbFactory.GetType() == other.DbFactory.GetType();
     }
 
     /// <summary>
@@ -66,7 +66,7 @@ public partial class Engine : ORM.Code.Engine, IEngine
     public override int GetHashCode()
     {
         var code = base.GetHashCode();
-        code = HashCode.Combine(code, Factory);
+        code = HashCode.Combine(code, DbFactory);
         return code;
     }
 }
