@@ -100,11 +100,11 @@ internal class XTypeNode : TypeNode, IXNode
                     }
 
                     // Method requested in base type (interface!)...
-                    /*while (type.HasCloneableAttribute(out var _))
+                    while (type.HasCloneableAttribute(out var _))
                     {
                         value = $"new ";
                         return true;
-                    }*/
+                    }
 
                     // Try next...
                     value = null;
@@ -169,7 +169,7 @@ internal class XTypeNode : TypeNode, IXNode
                     }
 
                     // Method requested in base type...
-                    /*while (type.HasCloneableAttribute(out var atts))
+                    while (type.HasCloneableAttribute(out var atts))
                     {
                         if (type.IsInterface) { value = "public abstract "; return true; }
                         if (type.IsAbstract) { value = "public abstract override "; return true; }
@@ -187,7 +187,7 @@ internal class XTypeNode : TypeNode, IXNode
 
                             return true;
                         }
-                    }*/
+                    }
 
                     // Try next...
                     value = null;
@@ -267,7 +267,7 @@ internal class XTypeNode : TypeNode, IXNode
                     }
 
                     // Method requested in base type...
-                    /*while (type.HasCloneableAttribute(out var atts))
+                    while (type.HasCloneableAttribute(out var atts))
                     {
                         if (type.IsInterface)
                         {
@@ -288,7 +288,7 @@ internal class XTypeNode : TypeNode, IXNode
 
                             return true;
                         }
-                    }*/
+                    }
 
                     // Try next...
                     value = null;

@@ -144,11 +144,16 @@ internal class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
                     }
 
                     // Method requested in base type...
-                    /*while (type.HasInheritsWithAttribute(out var atts))
+                    while (type.HasInheritsWithAttribute(out var atts))
                     {
+                        if (!XNode.TryFindMember<IPropertySymbol>( // It must be inherited
+                            membername, type,
+                            [type.AllInterfaces], out var _, out var _))
+                            break;
+
                         value = $"new ";
                         return true;
-                    }*/
+                    }
 
                     // Try next...
                     value = null;
@@ -234,8 +239,13 @@ internal class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
                     }
 
                     // Method requested in base type...
-                    /*while (type.HasInheritsWithAttribute(out var atts))
+                    while (type.HasInheritsWithAttribute(out var atts))
                     {
+                        if (!XNode.TryFindMember<IPropertySymbol>( // It must be inherited
+                            membername, type,
+                            [type.AllBaseTypes, type.AllInterfaces], out var _, out var _))
+                            break;
+
                         if (type.IsInterface) { value = "public abstract "; return true; }
                         if (type.IsAbstract) { value = "public abstract override "; return true; }
                         else
@@ -254,7 +264,7 @@ internal class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
                             
                             return true;
                         }
-                    }*/
+                    }
 
                     // Try next...
                     value = null;
@@ -367,8 +377,13 @@ internal class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
                     }
 
                     // Method requested in base type...
-                    /*while (type.HasInheritsWithAttribute(out var atts))
+                    while (type.HasInheritsWithAttribute(out var atts))
                     {
+                        if (!XNode.TryFindMember<IPropertySymbol>( // It must be inherited
+                            membername, type, 
+                            [type.AllBaseTypes, type.AllInterfaces], out var _, out var _))
+                            break;
+
                         if (type.IsInterface)
                         {
                             value = hsealed || !hvirt ? $"public " : $"public virtual ";
@@ -390,7 +405,7 @@ internal class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
 
                             return true;
                         }
-                    }*/
+                    }
 
                     // Try next...
                     value = null;
