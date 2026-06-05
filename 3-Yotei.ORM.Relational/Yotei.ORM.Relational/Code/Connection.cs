@@ -20,9 +20,11 @@ public partial class Connection : ORM.Code.Connection, IConnection
     /// Copy constructor.
     /// </summary>
     /// <param name="other"></param>
-    protected Connection(Connection other)
-        : base(other)
-        => ConnectionString = other.ConnectionString;
+    protected Connection(Connection other) : base(other)
+    {
+        ConnectionString = other.ConnectionString;
+        IsolationLevel = other.IsolationLevel;
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -49,20 +51,20 @@ public partial class Connection : ORM.Code.Connection, IConnection
             value != null &&
             value is string str) return str;
 
-        var cnstr = builder.ConnectionString;
-        var index = cnstr.IndexOf(part, StringComparison.OrdinalIgnoreCase);
+        str = builder.ConnectionString;
+        var index = str.IndexOf(part, StringComparison.OrdinalIgnoreCase);
         if (index >= 0)
         {
-            // TODO: eliminar '='...
+            var span = str.AsSpan(index)[part.Length..];            
+            index = span.IndexOf('=');
+            if (index >= 0) span = span[(index + 1)..];
 
-            var span = cnstr.AsSpan(index)[part.Length..];
             index = span.IndexOf(';');
+            str = index >= 0
+                ? span[..index].ToString().NullWhenEmpty(trim: true)!
+                : span.ToString().NullWhenEmpty(trim: true)!;
 
-            cnstr = index >= 0
-                ? span[..index].ToString().NullWhenEmpty(trim: true)
-                : span.ToString().NullWhenEmpty(trim: true);
-
-            return cnstr;
+            return str;
         }
 
         return null;
@@ -202,10 +204,12 @@ public partial class Connection : ORM.Code.Connection, IConnection
 
     // ----------------------------------------------------
 
+    public const IsolationLevel ISOLATIONLEVEL = IsolationLevel.Serializable;
+
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public IsolationLevel IsolationLevel { get; set; } = IsolationLevel.Serializable;
+    public IsolationLevel IsolationLevel { get; set; } = ISOLATIONLEVEL;
 
     /// <summary>
     /// <inheritdoc/>

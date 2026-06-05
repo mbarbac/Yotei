@@ -17,6 +17,7 @@ global using System.Runtime.InteropServices;
 global using System.Text;
 global using System.Threading;
 global using System.Threading.Tasks;
+global using Microsoft.Data.SqlClient;
 
 global using Xunit;
 global using Yotei.Tools;
@@ -28,3 +29,6 @@ global using Yotei.ORM.InvariantGenerator;
 global using Yotei.ORM;
 global using Yotei.ORM.Code;
 global using Yotei.ORM.Tools;
+global using Yotei.ORM.Relational;
+global using Yotei.ORM.Relational.Code;
+global using Yotei.ORM.Relational.TestDB;
