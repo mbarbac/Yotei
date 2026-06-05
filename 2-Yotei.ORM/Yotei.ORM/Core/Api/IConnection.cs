@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Yotei.ORM;
+﻿namespace Yotei.ORM;
 
 // ========================================================
 /// <summary>
@@ -13,6 +11,22 @@ public partial interface IConnection : IAsyncDisposableEx
     /// The descriptor of the database engine this instance connects to.
     /// </summary>
     IEngine Engine { get; }
+
+    /// <summary>
+    /// The number of times this instance tries to recover from transient connection errors.
+    /// </summary>
+    int Retries { get; set; }
+
+    /// <summary>
+    /// The period of time that this instance waits before attempting to recover from transient
+    /// connection errors
+    /// </summary>
+    TimeSpan RetryInterval { get; set; }
+
+    /// <summary>
+    /// The period of time this instance waits to obtain an internal lock.
+    /// </summary>
+    TimeSpan LockInterval { get; set; }
 
     // ----------------------------------------------------
 

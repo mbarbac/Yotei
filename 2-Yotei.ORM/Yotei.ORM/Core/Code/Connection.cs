@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Code;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Yotei.ORM.Code;
 
 // ========================================================
 /// <summary>
@@ -7,14 +9,22 @@
 [Cloneable(ReturnType = typeof(IConnection))]
 public abstract partial class Connection : DisposableClass, IConnection
 {
+    public const int RETRIES = 3;
+    public const int RETRYINTERVALMS = 250;
+    public const int LOCKINTERVALSECS = 15;
+
+    // ----------------------------------------------------
+    // We need to use two semaphores because tx-open may call cn-open, and we want not to wait
+    // on the same semaphore!
+
+    readonly SemaphoreSlim ConnectionSemaphore = new(1, 1);
+    readonly SemaphoreSlim TransactionSemaphore = new(1, 1);
+
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
     /// <param name="engine"></param>
-    public Connection(IEngine engine)
-    {
-        Engine = engine.ThrowWhenNull();
-    }
+    public Connection(IEngine engine) => Engine = engine.ThrowWhenNull();
 
     /// <summary>
     /// Copy constructor.
@@ -23,7 +33,10 @@ public abstract partial class Connection : DisposableClass, IConnection
     protected Connection(Connection other)
     {
         ArgumentNullException.ThrowIfNull(other);
+
         Engine = other.Engine;
+        Retries = other.Retries;
+        RetryInterval = other.RetryInterval;
     }
 
     /// <summary>
@@ -33,8 +46,11 @@ public abstract partial class Connection : DisposableClass, IConnection
     protected override void OnDispose(bool disposing)
     {
         if (IsDisposed || !disposing) return;
+
         try { Transaction?.Abort(); } catch { }
         try { if (IsOpen) Close(); } catch { }
+        try { TransactionSemaphore.Dispose(); } catch { }
+        try { ConnectionSemaphore.Dispose(); } catch { }
     }
 
     /// <summary>
@@ -45,8 +61,11 @@ public abstract partial class Connection : DisposableClass, IConnection
     protected override async ValueTask OnDisposeAsync(bool disposing)
     {
         if (IsDisposed || !disposing) return;
+
         try { if (Transaction != null) await Transaction.AbortAsync().ConfigureAwait(false); } catch { }
         try { if (IsOpen) await CloseAsync().ConfigureAwait(false); } catch { }
+        try { TransactionSemaphore.Dispose(); } catch { }
+        try { ConnectionSemaphore.Dispose(); } catch { }
     }
 
     /// <summary>
@@ -62,6 +81,50 @@ public abstract partial class Connection : DisposableClass, IConnection
     /// </summary>
     public IEngine Engine { get; }
 
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public int Retries
+    {
+        get;
+        set => field = value >= 0 ? value :
+            throw new ArgumentException("Number of retries must be cero or greater.")
+            .WithData(value);
+    }
+    = RETRIES;
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public TimeSpan RetryInterval
+    {
+        get;
+        set => field = value.Ticks >= 0 ? value :
+            throw new ArgumentException("Retry interval must be cero or greater.")
+            .WithData(value);
+    }
+    = TimeSpan.FromMilliseconds(RETRYINTERVALMS);
+
+    /// <summary>
+    /// The period of time this instance waits to obtain an internal lock.
+    /// </summary>
+    public TimeSpan LockInterval
+    {
+        get;
+        set => field = value.Ticks is -1 or >= 0 ? value
+            : throw new ArgumentException("Invalid lock interval.").WithData(value);
+    }
+    = TimeSpan.FromSeconds(LOCKINTERVALSECS);
+
+    // ----------------------------------------------------
+
+    static int RandomizeMS(TimeSpan span)
+    {
+        var rnd = new Random(DateTime.Now.Millisecond);
+        var num = rnd.Next(5, 25);
+        return span.Milliseconds + num;
+    }
+
     // ----------------------------------------------------
 
     /// <summary>
@@ -72,24 +135,138 @@ public abstract partial class Connection : DisposableClass, IConnection
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public abstract void Open();
+    public void Open()
+    {
+        Exception? exception = null;
+        var num = Retries;
+
+        while (num >= 0)
+        {
+            exception = null;
+
+            ThrowIfDisposed();
+            ThrowOnDisposing();
+
+            var done = ConnectionSemaphore.Wait(LockInterval);
+            if (done)
+            {
+                try
+                {
+                    if (!IsOpen) OnOpen();
+                    return;
+                }
+                catch (Exception ex) { exception = ex; }
+                finally { ConnectionSemaphore.Release(); }
+            }
+
+            num--; if (num >= 0)
+            {
+                var ms = RandomizeMS(RetryInterval);
+                Thread.Sleep(ms);
+            }
+        }
+        throw exception ?? new TimeoutException("Cannot open this connection.").WithData(this);
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="token"></param>
     /// <returns></returns>
-    public abstract ValueTask OpenAsync(CancellationToken token = default);
+    public async ValueTask OpenAsync(CancellationToken token = default)
+    {
+        Exception? exception = null;
+        var num = Retries;
+
+        while (num >= 0)
+        {
+            exception = null;
+
+            ThrowIfDisposed();
+            ThrowOnDisposing();
+
+            var done = await ConnectionSemaphore.WaitAsync(LockInterval, token).ConfigureAwait(false);
+            if (done)
+            {
+                try
+                {
+                    if (!IsOpen) await OnOpenAsync(token).ConfigureAwait(false);
+                    return;
+                }
+                catch (Exception ex) { exception = ex; }
+                finally { ConnectionSemaphore.Release(); }
+            }
+
+            num--; if (num >= 0)
+            {
+                var ms = RandomizeMS(RetryInterval);
+                await Task.Delay(ms, token).ConfigureAwait(false);
+            }
+        }
+        throw exception ?? new TimeoutException("Cannot open this connection.").WithData(this);
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public abstract void Close();
+    public void Close()
+    {
+        if (IsDisposed) return;
+
+        var done = ConnectionSemaphore.Wait(LockInterval);
+        if (done)
+        {
+            try
+            {
+                if (IsOpen) OnClose();
+                return;
+            }
+            finally { ConnectionSemaphore.Release(); }
+        }
+        throw new TimeoutException("Cannot close this connection.").WithData(this);
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public abstract ValueTask CloseAsync();
+    public async ValueTask CloseAsync()
+    {
+        if (IsDisposed) return;
+
+        var done = await ConnectionSemaphore.WaitAsync(LockInterval).ConfigureAwait(false);
+        if (done)
+        {
+            try
+            {
+                if (IsOpen) await OnCloseAsync().ConfigureAwait(false);
+                return;
+            }
+            finally { ConnectionSemaphore.Release(); }
+        }
+        throw new TimeoutException("Cannot close this connection.").WithData(this);
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to open (connect) this instance.
+    /// </summary>
+    protected abstract void OnOpen();
+
+    /// <summary>
+    /// Invoked to open (connect) this instance.
+    /// </summary>
+    protected abstract ValueTask OnOpenAsync(CancellationToken token);
+
+    /// <summary>
+    /// Invoked to close this instance.
+    /// </summary>
+    protected abstract void OnClose();
+
+    /// <summary>
+    /// Invoked to close this instance.
+    /// </summary>
+    protected abstract ValueTask OnCloseAsync();
 
     // ----------------------------------------------------
 
@@ -111,13 +288,25 @@ public abstract partial class Connection : DisposableClass, IConnection
     /// <returns></returns>
     public virtual ITransaction StartTransaction()
     {
-        if (Transaction != null) throw new InvalidOperationException(
-            "This connection already has an active database transaction associated to it.")
-            .WithData(this);
+        ThrowIfDisposed();
+        ThrowOnDisposing();
 
-        Transaction = CreateTransaction();
-        Transaction.Start();
-        return Transaction;
+        var done = TransactionSemaphore.Wait(LockInterval);
+        if (done)
+        {
+            try
+            {
+                if (Transaction != null) throw new InvalidOperationException(
+                    "This connection already has an active database transaction associated to it.")
+                    .WithData(this);
+
+                Transaction = CreateTransaction();
+                Transaction.Start();
+                return Transaction;
+            }
+            finally { TransactionSemaphore.Release(); }
+        }
+        throw new TimeoutException("Cannot start a database transaction.").WithData(this);
     }
 
     /// <summary>
@@ -127,12 +316,24 @@ public abstract partial class Connection : DisposableClass, IConnection
     /// <returns></returns>
     public virtual async ValueTask<ITransaction> StartTransactionAsync(CancellationToken token = default)
     {
-        if (Transaction != null) throw new InvalidOperationException(
-            "This connection already has an active database transaction associated to it.")
-            .WithData(this);
+        ThrowIfDisposed();
+        ThrowOnDisposing();
 
-        Transaction = CreateTransaction();
-        await Transaction.StartAsync(token).ConfigureAwait(false);
-        return Transaction;
+        var done = await TransactionSemaphore.WaitAsync(LockInterval, token).ConfigureAwait(false);
+        if (done)
+        {
+            try
+            {
+                if (Transaction != null) throw new InvalidOperationException(
+                    "This connection already has an active database transaction associated to it.")
+                    .WithData(this);
+
+                Transaction = CreateTransaction();
+                await Transaction.StartAsync(token).ConfigureAwait(false);
+                return Transaction;
+            }
+            finally { TransactionSemaphore.Release(); }
+        }
+        throw new TimeoutException("Cannot start a database transaction.").WithData(this);
     }
 }

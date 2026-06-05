@@ -12,7 +12,7 @@ public partial class Engine : ORM.Code.Engine, IEngine
     /// Initializes a new instance.
     /// </summary>
     /// <param name="factory"></param>
-    public Engine(DbProviderFactory factory) => DbFactory = factory.ThrowWhenNull();
+    public Engine(DbProviderFactory factory) => DbFactory = factory;
 
     /// <summary>
     /// Copy constructor.
@@ -29,7 +29,7 @@ public partial class Engine : ORM.Code.Engine, IEngine
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public DbProviderFactory DbFactory { get; init; }
+    public DbProviderFactory DbFactory { get; init => field = value.ThrowWhenNull(); }
 
     // ----------------------------------------------------
 
