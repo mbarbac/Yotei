@@ -26,7 +26,7 @@ public partial interface IConnection : IAsyncDisposableEx
     /// <summary>
     /// The period of time this instance waits to obtain an internal lock.
     /// </summary>
-    TimeSpan LockInterval { get; set; }
+    TimeSpan LockTimeout { get; set; }
 
     // ----------------------------------------------------
 

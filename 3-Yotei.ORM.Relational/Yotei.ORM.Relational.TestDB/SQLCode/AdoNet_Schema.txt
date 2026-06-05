@@ -1,0 +1,120 @@
+﻿    ========================================
+    Schema:
+
+    Row: 0
++   - ColumnName: State
+    - ColumnOrdinal: 0
+    - ColumnSize: 2
+    - NumericPrecision: 255
+    - NumericScale: 255
+*   - IsUnique: False
+*   - IsKey: True
+    - BaseServerName: NULL
+    - BaseCatalogName: NULL
+*   - BaseColumnName: State
+*   - BaseSchemaName: NULL
+*   - BaseTableName: Plates
+    - DataType: String
+    - AllowDBNull: False
+    - ProviderType: 22
+    - IsAliased: False
+    - IsExpression: False
+*   - IsIdentity: False
+*   - IsAutoIncrement: False
+*   - IsRowVersion: False
+    - IsHidden: False
+    - IsLong: False
+*   - IsReadOnly: False
+    - ProviderSpecificDataType: SqlString
+    - DataTypeName: varchar
+    - XmlSchemaCollectionDatabase: NULL
+    - XmlSchemaCollectionOwningSchema: NULL
+    - XmlSchemaCollectionName: NULL
+    - UdtAssemblyQualifiedName: NULL
+    - NonVersionedProviderType: 22
+    - IsColumnSet: False
+
+    Row: 1
+    - ColumnName: PlateNum
+    - ColumnOrdinal: 1
+    - ColumnSize: 10
+    - NumericPrecision: 255
+    - NumericScale: 255
+    - IsUnique: False
+    - IsKey: True
+    - BaseServerName: NULL
+    - BaseCatalogName: NULL
+    - BaseColumnName: PlateNum
+    - BaseSchemaName: NULL
+    - BaseTableName: Plates
+    - DataType: String
+    - AllowDBNull: False
+    - ProviderType: 22
+    - IsAliased: False
+    - IsExpression: False
+    - IsIdentity: False
+    - IsAutoIncrement: False
+    - IsRowVersion: False
+    - IsHidden: False
+    - IsLong: False
+    - IsReadOnly: False
+    - ProviderSpecificDataType: SqlString
+    - DataTypeName: varchar
+    - XmlSchemaCollectionDatabase: NULL
+    - XmlSchemaCollectionOwningSchema: NULL
+    - XmlSchemaCollectionName: NULL
+    - UdtAssemblyQualifiedName: NULL
+    - NonVersionedProviderType: 22
+    - IsColumnSet: False
+
+    Row: 2
+    - ColumnName: Authority
+    - ColumnOrdinal: 2
+    - ColumnSize: 5
+    - NumericPrecision: 255
+    - NumericScale: 255
+    - IsUnique: False
+    - IsKey: False
+    - BaseServerName: NULL
+    - BaseCatalogName: NULL
+    - BaseColumnName: Authority
+    - BaseSchemaName: NULL
+    - BaseTableName: Plates
+    - DataType: String
+    - AllowDBNull: False
+    - ProviderType: 22
+    - IsAliased: False
+    - IsExpression: False
+    - IsIdentity: False
+    - IsAutoIncrement: False
+    - IsRowVersion: False
+    - IsHidden: False
+    - IsLong: False
+    - IsReadOnly: False
+    - ProviderSpecificDataType: SqlString
+    - DataTypeName: varchar
+    - XmlSchemaCollectionDatabase: NULL
+    - XmlSchemaCollectionOwningSchema: NULL
+    - XmlSchemaCollectionName: NULL
+    - UdtAssemblyQualifiedName: NULL
+    - NonVersionedProviderType: 22
+    - IsColumnSet: False
+
+    ========================================
+    Contents:
+
+    00: SP
+    01: AB001
+    02: SPgov
+
+    00: SP
+    01: AB002
+    02: SPgov
+
+    00: UK
+    01: AB001
+    02: UKgov
+
+    00: UK
+    01: AB002
+    02: UKgov

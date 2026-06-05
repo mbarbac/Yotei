@@ -11,7 +11,7 @@ public abstract partial class Connection : DisposableClass, IConnection
 {
     public const int RETRIES = 3;
     public const int RETRYINTERVALMS = 250;
-    public const int LOCKINTERVALSECS = 15;
+    public const int LOCKTIMEOUTSECS = 15;
 
     // ----------------------------------------------------
     // We need to use two semaphores because tx-open may call cn-open, and we want not to wait
@@ -37,6 +37,7 @@ public abstract partial class Connection : DisposableClass, IConnection
         Engine = other.Engine;
         Retries = other.Retries;
         RetryInterval = other.RetryInterval;
+        LockTimeout = other.LockTimeout;
     }
 
     /// <summary>
@@ -106,15 +107,15 @@ public abstract partial class Connection : DisposableClass, IConnection
     = TimeSpan.FromMilliseconds(RETRYINTERVALMS);
 
     /// <summary>
-    /// The period of time this instance waits to obtain an internal lock.
+    /// <inheritdoc/>
     /// </summary>
-    public TimeSpan LockInterval
+    public TimeSpan LockTimeout
     {
         get;
         set => field = value.Ticks is -1 or >= 0 ? value
-            : throw new ArgumentException("Invalid lock interval.").WithData(value);
+            : throw new ArgumentException("Invalid lock timeout interval.").WithData(value);
     }
-    = TimeSpan.FromSeconds(LOCKINTERVALSECS);
+    = TimeSpan.FromSeconds(LOCKTIMEOUTSECS);
 
     // ----------------------------------------------------
 
@@ -147,7 +148,7 @@ public abstract partial class Connection : DisposableClass, IConnection
             ThrowIfDisposed();
             ThrowOnDisposing();
 
-            var done = ConnectionSemaphore.Wait(LockInterval);
+            var done = ConnectionSemaphore.Wait(LockTimeout);
             if (done)
             {
                 try
@@ -165,7 +166,8 @@ public abstract partial class Connection : DisposableClass, IConnection
                 Thread.Sleep(ms);
             }
         }
-        throw exception ?? new TimeoutException("Cannot open this connection.").WithData(this);
+        throw exception ?? new TimeoutException(
+            "Timeout expired while opening this connection.").WithData(this);
     }
 
     /// <summary>
@@ -185,7 +187,7 @@ public abstract partial class Connection : DisposableClass, IConnection
             ThrowIfDisposed();
             ThrowOnDisposing();
 
-            var done = await ConnectionSemaphore.WaitAsync(LockInterval, token).ConfigureAwait(false);
+            var done = await ConnectionSemaphore.WaitAsync(LockTimeout, token).ConfigureAwait(false);
             if (done)
             {
                 try
@@ -203,7 +205,8 @@ public abstract partial class Connection : DisposableClass, IConnection
                 await Task.Delay(ms, token).ConfigureAwait(false);
             }
         }
-        throw exception ?? new TimeoutException("Cannot open this connection.").WithData(this);
+        throw exception ?? new TimeoutException(
+            "Timeout expired while opening this connection.").WithData(this);
     }
 
     /// <summary>
@@ -213,7 +216,7 @@ public abstract partial class Connection : DisposableClass, IConnection
     {
         if (IsDisposed) return;
 
-        var done = ConnectionSemaphore.Wait(LockInterval);
+        var done = ConnectionSemaphore.Wait(LockTimeout);
         if (done)
         {
             try
@@ -223,7 +226,7 @@ public abstract partial class Connection : DisposableClass, IConnection
             }
             finally { ConnectionSemaphore.Release(); }
         }
-        throw new TimeoutException("Cannot close this connection.").WithData(this);
+        throw new TimeoutException("Timeout expired while closing this connection.").WithData(this);
     }
 
     /// <summary>
@@ -233,7 +236,7 @@ public abstract partial class Connection : DisposableClass, IConnection
     {
         if (IsDisposed) return;
 
-        var done = await ConnectionSemaphore.WaitAsync(LockInterval).ConfigureAwait(false);
+        var done = await ConnectionSemaphore.WaitAsync(LockTimeout).ConfigureAwait(false);
         if (done)
         {
             try
@@ -243,7 +246,7 @@ public abstract partial class Connection : DisposableClass, IConnection
             }
             finally { ConnectionSemaphore.Release(); }
         }
-        throw new TimeoutException("Cannot close this connection.").WithData(this);
+        throw new TimeoutException("Timeout expired while closing this connection.").WithData(this);
     }
 
     // ----------------------------------------------------
@@ -291,7 +294,7 @@ public abstract partial class Connection : DisposableClass, IConnection
         ThrowIfDisposed();
         ThrowOnDisposing();
 
-        var done = TransactionSemaphore.Wait(LockInterval);
+        var done = TransactionSemaphore.Wait(LockTimeout);
         if (done)
         {
             try
@@ -306,7 +309,8 @@ public abstract partial class Connection : DisposableClass, IConnection
             }
             finally { TransactionSemaphore.Release(); }
         }
-        throw new TimeoutException("Cannot start a database transaction.").WithData(this);
+        throw new TimeoutException(
+            "Timeout expired while starting a database transaction.").WithData(this);
     }
 
     /// <summary>
@@ -319,7 +323,7 @@ public abstract partial class Connection : DisposableClass, IConnection
         ThrowIfDisposed();
         ThrowOnDisposing();
 
-        var done = await TransactionSemaphore.WaitAsync(LockInterval, token).ConfigureAwait(false);
+        var done = await TransactionSemaphore.WaitAsync(LockTimeout, token).ConfigureAwait(false);
         if (done)
         {
             try
@@ -334,6 +338,7 @@ public abstract partial class Connection : DisposableClass, IConnection
             }
             finally { TransactionSemaphore.Release(); }
         }
-        throw new TimeoutException("Cannot start a database transaction.").WithData(this);
+        throw new TimeoutException(
+            "Timeout expired while starting a database transaction.").WithData(this);
     }
 }
