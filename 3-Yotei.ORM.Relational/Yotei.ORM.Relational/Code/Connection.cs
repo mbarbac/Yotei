@@ -145,6 +145,7 @@ public partial class Connection : ORM.Code.Connection, IConnection
             DbConnection = Engine.DbFactory.CreateConnection() ??
                 throw new UnExpectedException("Cannot create a physical connection.").WithData(this);
 
+            DbConnection.ConnectionString = ConnectionString;
             DbConnection.Open();
         }
         catch
