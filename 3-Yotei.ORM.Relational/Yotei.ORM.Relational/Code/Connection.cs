@@ -55,7 +55,7 @@ public partial class Connection : ORM.Code.Connection, IConnection
         var index = str.IndexOf(part, StringComparison.OrdinalIgnoreCase);
         if (index >= 0)
         {
-            var span = str.AsSpan(index)[part.Length..];            
+            var span = str.AsSpan(index)[part.Length..];
             index = span.IndexOf('=');
             if (index >= 0) span = span[(index + 1)..];
 

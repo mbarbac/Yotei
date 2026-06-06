@@ -20,8 +20,8 @@ public static partial class Test_Connection
         using var cn = new Code.Connection(engine);
 
         Assert.Equal(ORM.Code.Connection.RETRIES, cn.Retries);
-        Assert.Equal(ORM.Code.Connection.RETRYINTERVALMS, cn.RetryInterval.TotalMilliseconds);
-        Assert.Equal(ORM.Code.Connection.LOCKTIMEOUTSECS, cn.LockTimeout.TotalSeconds);
+        Assert.Equal(ORM.Code.Connection.RETRYINTERVAL_MS, cn.RetryInterval.TotalMilliseconds);
+        Assert.Equal(ORM.Code.Connection.LOCKTIMEOUT_SECS, cn.LockTimeout.TotalSeconds);
         Assert.False(cn.IsOpen);
         Assert.Null(cn.Transaction);
         Assert.Equal(Code.Connection.ISOLATIONLEVEL, cn.IsolationLevel);

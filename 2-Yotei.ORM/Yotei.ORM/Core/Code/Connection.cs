@@ -8,13 +8,11 @@
 public abstract partial class Connection : DisposableClass, IConnection
 {
     public const int RETRIES = 3;
-    public const int RETRYINTERVALMS = 250;
-    public const int LOCKTIMEOUTSECS = 15;
+    public const int RETRYINTERVAL_MS = 250;
+    public const int LOCKTIMEOUT_SECS = 15;
 
-    // ----------------------------------------------------
     // We need to use two semaphores because tx-open may call cn-open, and we want not to wait
     // on the same semaphore!
-
     readonly SemaphoreSlim ConnectionSemaphore = new(1, 1);
     readonly SemaphoreSlim TransactionSemaphore = new(1, 1);
 
@@ -102,7 +100,7 @@ public abstract partial class Connection : DisposableClass, IConnection
             throw new ArgumentException("Retry interval must be cero or greater.")
             .WithData(value);
     }
-    = TimeSpan.FromMilliseconds(RETRYINTERVALMS);
+    = TimeSpan.FromMilliseconds(RETRYINTERVAL_MS);
 
     /// <summary>
     /// <inheritdoc/>
@@ -113,7 +111,7 @@ public abstract partial class Connection : DisposableClass, IConnection
         set => field = value.Ticks is -1 or >= 0 ? value
             : throw new ArgumentException("Invalid lock timeout interval.").WithData(value);
     }
-    = TimeSpan.FromSeconds(LOCKTIMEOUTSECS);
+    = TimeSpan.FromSeconds(LOCKTIMEOUT_SECS);
 
     // ----------------------------------------------------
 
