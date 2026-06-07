@@ -3,7 +3,6 @@ using IItem = Yotei.ORM.InvariantGenerator.Tests.IElement;
 using IHost = Yotei.ORM.InvariantGenerator.Tests.IElementList_KT;
 
 namespace Yotei.ORM.InvariantGenerator.Tests;
-
 partial interface IElementList_KT
 {
     // ====================================================

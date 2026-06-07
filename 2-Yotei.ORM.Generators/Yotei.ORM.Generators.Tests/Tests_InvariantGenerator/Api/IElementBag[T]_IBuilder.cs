@@ -2,7 +2,6 @@
 using IHost = Yotei.ORM.InvariantGenerator.Tests.IElementBag_T;
 
 namespace Yotei.ORM.InvariantGenerator.Tests;
-
 partial interface IElementBag_T
 {
     // ====================================================
