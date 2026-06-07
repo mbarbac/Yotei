@@ -9,7 +9,7 @@ internal class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
     AttributeData Attribute = default!;
     INamedTypeSymbol Host => Parent!.Symbol;
 
-    readonly EasyTypeOptions ArgOptions = EasyTypeOptions.Empty.WithRecursive(
+    readonly EasyTypeOptions ArgOptions = EasyTypeOptions.Default.WithRecursive(
         useVariance: true,
         namespaceStyle: EasyNamespaceStyle.Default,
         useHost: true,

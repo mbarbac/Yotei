@@ -64,6 +64,13 @@ public partial interface IConnection : IAsyncDisposableEx
     // ----------------------------------------------------
 
     /// <summary>
+    /// Provides access to the records-oriented capabilities of this instance.
+    /// </summary>
+    IRecordsGate Records { get; }
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// The database transaction this instance is associated with, or null if any.
     /// </summary>
     ITransaction? Transaction { get; internal set; }

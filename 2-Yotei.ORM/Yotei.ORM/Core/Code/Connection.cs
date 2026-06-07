@@ -272,6 +272,19 @@ public abstract partial class Connection : DisposableClass, IConnection
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    public IRecordsGate Records { get => field ??= CreateRecordsGate(); }
+
+    /// <summary>
+    /// Invoked to create the <see cref="IRecordsGate"/> instance associated with this instance.
+    /// </summary>
+    /// <returns></returns>
+    protected virtual IRecordsGate CreateRecordsGate() => new RecordsGate(this);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public ITransaction? Transaction { get; private set; }
     ITransaction? IConnection.Transaction { get => Transaction; set => Transaction = value; }
 

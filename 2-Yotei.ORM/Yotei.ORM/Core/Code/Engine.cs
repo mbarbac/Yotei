@@ -24,6 +24,14 @@ public partial class Engine : IEngine
         return value;
     }
 
+    static void ValidateTags(ImmutableArray<string> values)
+    {
+        foreach (var value in values)
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ArgumentException("A tag name is null, empty, or white spaces only.")
+                .WithData(value);
+    }
+
     // ----------------------------------------------------
 
     /// <summary>
@@ -158,4 +166,26 @@ public partial class Engine : IEngine
     /// <inheritdoc/>
     /// </summary>
     public char RightTerminator { get; init => field = ValidateTerminator(value); }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public bool IgnoreTagsCase { get; init; }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public ImmutableArray<string> IsPrimaryKeyTags { get; set { ValidateTags(value); field = value; } }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public ImmutableArray<string> IsUniqueValuedTags { get; set { ValidateTags(value); field = value; } }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public ImmutableArray<string> IsReadOnlyTags { get; set { ValidateTags(value); field = value; } }
 }
