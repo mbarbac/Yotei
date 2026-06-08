@@ -19,6 +19,12 @@ public partial interface IMetadataTag : IEnumerable<string>, IEquatable<IMetadat
     /// the new default one, provided that it belongs to this collection. If not, an exception is
     /// thrown.
     /// </summary>
+    /// <remarks>
+    /// To some extend it can be said that the setter breaks the immutability of this instance.
+    /// But, for all practical purposes, having a different default tag name shall not break any
+    /// search logic that uses all possible names in this tags collection, so we accept that the
+    /// setter modifies the default one.
+    /// </remarks>
     string Default { get; set; }
 
     /// <summary>
@@ -62,7 +68,7 @@ public partial interface IMetadataTag : IEnumerable<string>, IEquatable<IMetadat
 
     /// <summary>
     /// Returns a copy of this instance where the original name has been replaced by the new
-    /// given one.
+    /// given one. If no changes were made returns the original instance.
     /// </summary>
     /// <param name="oldname"></param>
     /// <param name="newname"></param>
@@ -70,7 +76,8 @@ public partial interface IMetadataTag : IEnumerable<string>, IEquatable<IMetadat
     IMetadataTag Replace(string oldname, string newname);
 
     /// <summary>
-    /// Returns a copy of this instance where the given name has been added to it.
+    /// Returns a copy of this instance where the given name has been added to it.  If no changes
+    /// were made returns the original instance.
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
@@ -78,6 +85,7 @@ public partial interface IMetadataTag : IEnumerable<string>, IEquatable<IMetadat
 
     /// <summary>
     /// Returns a copy of this instance where the names of the given range have been added to it.
+    ///  If no changes were made returns the original instance.
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
@@ -85,7 +93,8 @@ public partial interface IMetadataTag : IEnumerable<string>, IEquatable<IMetadat
 
     /// <summary>
     /// Returns a copy of this instance where the given name has been removed from it, provided it
-    /// is not the only remaining one. If so, an exception is thrown.
+    /// is not the only remaining one. If so, an exception is thrown. If no changes were made returns
+    /// the original instance.
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
@@ -93,7 +102,7 @@ public partial interface IMetadataTag : IEnumerable<string>, IEquatable<IMetadat
 
     /// <summary>
     /// Returns a copy of this instance where all the names have been removed except the default
-    /// one.
+    /// one. If no changes were made returns the original instance.
     /// </summary>
     /// <returns></returns>
     IMetadataTag Clear();

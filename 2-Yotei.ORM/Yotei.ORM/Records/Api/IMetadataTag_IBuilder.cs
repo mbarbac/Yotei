@@ -14,7 +14,9 @@ partial interface IMetadataTag
         bool IgnoreCase { get; }
 
         /// <summary>
-        /// <inheritdoc cref="IMetadataTag.Default"/>
+        /// An arbitrary default name of this collection of tags. The setter sets the given value as
+        /// the new default one, provided that it belongs to this collection. If not, an exception is
+        /// thrown.
         /// </summary>
         string Default { get; set; }
 
