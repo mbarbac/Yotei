@@ -39,7 +39,7 @@ partial interface IIdentifier
         string? this[int index, bool useTerminators] { get; }
 
         /// <summary>
-        /// <inheritdoc cref="GetParts(bool)"/>
+        /// <inheritdoc cref="IIdentifier.Enumerate(bool)"/>
         /// </summary>
         /// <param name="useTerminators"></param>
         /// <returns></returns>
@@ -171,8 +171,9 @@ partial interface IIdentifier
         /// <br/> Returns the number of changes made.
         /// </summary>
         /// <param name="index"></param>
+        /// <param name="reduce"></param>
         /// <returns></returns>
-        int RemoveAt(int index);
+        int RemoveAt(int index, bool reduce = true);
 
         /// <summary>
         /// Removes from this instance the given number of parts starting from the given index.
@@ -180,32 +181,36 @@ partial interface IIdentifier
         /// </summary>
         /// <param name="index"></param>
         /// <param name="count"></param>
+        /// <param name="reduce"></param>
         /// <returns></returns>
-        int RemoveRange(int index, int count);
+        int RemoveRange(int index, int count, bool reduce = true);
 
         /// <summary>
         /// Removes from this collection the first ocurrence of the given part.
         /// <br/> Returns the number of changes made.
         /// </summary>
         /// <param name="part"></param>
+        /// <param name="reduce"></param>
         /// <returns></returns>
-        int Remove(string? part);
+        int Remove(string? part, bool reduce = true);
 
         /// <summary>
         /// Removes from this collection the last ocurrence of the given part.
         /// <br/> Returns the number of changes made.
         /// </summary>
         /// <param name="part"></param>
+        /// <param name="reduce"></param>
         /// <returns></returns>
-        int RemoveLast(string? part);
+        int RemoveLast(string? part, bool reduce = true);
 
         /// <summary>
         /// Removes from this collection all the ocurrences of the given part.
         /// <br/> Returns the number of changes made.
         /// </summary>
         /// <param name="part"></param>
+        /// <param name="reduce"></param>
         /// <returns></returns>
-        int RemoveAll(string? part);
+        int RemoveAll(string? part, bool reduce = true);
 
         /// <summary>
         /// Removes from this collection the first ocurrence of a part that matches the given
@@ -213,8 +218,9 @@ partial interface IIdentifier
         /// <br/> Returns the number of changes made.
         /// </summary>
         /// <param name="predicate"></param>
+        /// <param name="reduce"></param>
         /// <returns></returns>
-        int Remove(Predicate<string?> predicate);
+        int Remove(Predicate<string?> predicate, bool reduce = true);
 
         /// <summary>
         /// Removes from this collection the last ocurrence of a part that matches the given
@@ -222,16 +228,18 @@ partial interface IIdentifier
         /// <br/> Returns the number of changes made.
         /// </summary>
         /// <param name="predicate"></param>
+        /// <param name="reduce"></param>
         /// <returns></returns>
-        int RemoveLast(Predicate<string?> predicate);
+        int RemoveLast(Predicate<string?> predicate, bool reduce = true);
 
         /// <summary>
         /// Removes from this collection all the ocurrences of parts that match the given predicate.
         /// <br/> Returns the number of changes made.
         /// </summary>
         /// <param name="predicate"></param>
+        /// <param name="reduce"></param>
         /// <returns></returns>
-        int RemoveAll(Predicate<string?> predicate);
+        int RemoveAll(Predicate<string?> predicate, bool reduce = true);
 
         /// <summary>
         /// Clears this collection.

@@ -7,8 +7,11 @@ namespace Yotei.Tools.AsyncLock;
 /// <summary>
 /// Provides code execution protection capabilities for synchronous, asynchronous, reentrant and
 /// mixed scenarios. Entering a lock obtains a scope that, when disposed, either releases the lock
-/// or decreases its reentrancy count. A thread or asynchronous context holding a lock can access
-/// it recursively, but must exit the lock the same number of times to fully release it.
+/// it is associated with, or decreases its reentrancy count. A thread or asynchronous context
+/// holding a lock can access it recursively, but must exit the lock the same number of times to
+/// fully release it.
+/// <br/> Instances of this type are in-process alike locks, not distributed ones, and so they
+/// don't provide protection across processes or hosts.
 /// </summary>
 public sealed partial class AsyncLock : DisposableClass
 {
