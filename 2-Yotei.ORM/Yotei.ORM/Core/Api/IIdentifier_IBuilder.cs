@@ -43,7 +43,12 @@ partial interface IIdentifier
         /// </summary>
         /// <param name="useTerminators"></param>
         /// <returns></returns>
-        IEnumerable<string?> GetParts(bool useTerminators);
+        IEnumerable<string?> Enumerate(bool useTerminators);
+
+        /// <summary>
+        /// Reduces this instance by removing its null heading parts.
+        /// </summary>
+        void Reduce();
 
         // ----------------------------------------------------
 
@@ -117,24 +122,27 @@ partial interface IIdentifier
         /// </summary>
         /// <param name="index"></param>
         /// <param name="value"></param>
+        /// <param name="reduce"></param>
         /// <returns></returns>
-        int Replace(int index, string? value);
+        int Replace(int index, string? value, bool reduce = true);
 
         /// <summary>
         /// Adds to this instance the parts obtained from the given value.
         /// <br/> Returns the number of changes made.
         /// </summary>
         /// <param name="value"></param>
+        /// <param name="reduce"></param>
         /// <returns></returns>
-        int Add(string? value);
+        int Add(string? value, bool reduce = true);
 
         /// <summary>
         /// Adds to this instance the parts obtained from the given range of values.
         /// <br/> Returns the number of changes made.
         /// </summary>
         /// <param name="range"></param>
+        /// <param name="reduce"></param>
         /// <returns></returns>
-        int AddRange(IEnumerable<string?> range);
+        int AddRange(IEnumerable<string?> range, bool reduce = true);
 
         /// <summary>
         /// Inserts into this instance the parts obtained from the given value, starting at the
@@ -143,8 +151,9 @@ partial interface IIdentifier
         /// </summary>
         /// <param name="index"></param>
         /// <param name="value"></param>
+        /// <param name="reduce"></param>
         /// <returns></returns>
-        int Insert(int index, string? value);
+        int Insert(int index, string? value, bool reduce = true);
 
         /// <summary>
         /// Adds to this instance the parts obtained from the given range of values, starting at
@@ -153,8 +162,9 @@ partial interface IIdentifier
         /// </summary>
         /// <param name="index"></param>
         /// <param name="range"></param>
+        /// <param name="reduce"></param>
         /// <returns></returns>
-        int InsertRange(int index, IEnumerable<string?> range);
+        int InsertRange(int index, IEnumerable<string?> range, bool reduce = true);
 
         /// <summary>
         /// Removes from this instance the part at the given index.

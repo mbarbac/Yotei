@@ -49,7 +49,7 @@ public partial interface IIdentifier : IEquatable<IIdentifier>
     /// </summary>
     /// <param name="useTerminators"></param>
     /// <returns></returns>
-    IEnumerable<string?> GetParts(bool useTerminators);
+    IEnumerable<string?> Enumerate(bool useTerminators);
 
     // ----------------------------------------------------
 

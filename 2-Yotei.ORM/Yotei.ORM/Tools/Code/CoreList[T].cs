@@ -188,7 +188,7 @@ public partial class CoreList<T> : ICoreList<T>
     public int IndexOf(Predicate<T> predicate)
     {
         ArgumentNullException.ThrowIfNull(predicate);
-        return Items.FindIndex(predicate.ThrowWhenNull());
+        return Items.FindIndex(predicate);
     }
 
     /// <summary>
@@ -199,7 +199,7 @@ public partial class CoreList<T> : ICoreList<T>
     public int LastIndexOf(Predicate<T> predicate)
     {
         ArgumentNullException.ThrowIfNull(predicate);
-        return Items.FindLastIndex(predicate.ThrowWhenNull());
+        return Items.FindLastIndex(predicate);
     }
 
     /// <summary>
