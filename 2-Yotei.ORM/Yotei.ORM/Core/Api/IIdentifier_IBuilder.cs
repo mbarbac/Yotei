@@ -9,6 +9,13 @@ partial interface IIdentifier
     public partial interface IBuilder
     {
         /// <summary>
+        /// <inheritdoc cref="IIdentifier.ToStringEx(bool, bool)"/>
+        /// </summary>
+        /// <param name="reduce"></param>
+        /// <returns></returns>
+        string ToStringEx(bool reduce = true, bool wrap = true);
+
+        /// <summary>
         /// <inheritdoc cref="IIdentifier.Engine"/>
         /// </summary>
         IEngine Engine { get; }
@@ -43,12 +50,7 @@ partial interface IIdentifier
         /// </summary>
         /// <param name="useTerminators"></param>
         /// <returns></returns>
-        IEnumerable<string?> Enumerate(bool useTerminators);
-
-        /// <summary>
-        /// Reduces this instance by removing its null heading parts.
-        /// </summary>
-        void Reduce();
+        IEnumerable<string?> Enumerate(bool useTerminators = false);
 
         // ----------------------------------------------------
 
@@ -109,6 +111,12 @@ partial interface IIdentifier
         List<int> IndexesOf(Predicate<string?> predicate);
 
         // ----------------------------------------------------
+
+        /// <summary>
+        /// Reduces this instance by removing its null heading parts.
+        /// <br/> Returns whether changes have been made or not.
+        /// </summary>
+        bool Reduce();
 
         /// <summary>
         /// Returns a new identifier based upon the contents of this instance.

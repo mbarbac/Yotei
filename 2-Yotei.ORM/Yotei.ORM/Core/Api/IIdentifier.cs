@@ -9,14 +9,25 @@
 public partial interface IIdentifier : IEquatable<IIdentifier>
 {
     /// <summary>
+    /// Returns a string representation of this instance using or not its null head parts, and
+    /// wrapping or not the remaining parts with the engine terminators, as requested.
+    /// </summary>
+    /// <param name="reduce"></param>
+    /// <returns></returns>
+    string ToStringEx(bool reduce = true, bool wrap = true);
+
+    /// <summary>
     /// The engine this instance is associated with.
     /// </summary>
     IEngine Engine { get; }
 
     /// <summary>
-    /// The actual value carried by this instance, which can be <see langword="null"/> if it
-    /// represents an empty or missed identifier. If the engine uses identifier terminators,
-    /// then each part is wrapped with the appropriate ones.
+    /// The actual value carried by this instance, or <see langword="null"/> if it represents an
+    /// empty or missed identifier. The null or empty head parts, if any, are removed, and then
+    /// each part is wrapped with the appropriate terminators.
+    /// <br/> The <see cref="ToStringEx(bool, bool)"/> method can be used to obtain a custom
+    /// representation, removing or not the head parts, and wrapping or not the remaining ones,
+    /// as needed.
     /// </summary>
     string? Value { get; }
 
@@ -45,11 +56,12 @@ public partial interface IIdentifier : IEquatable<IIdentifier>
     /// <summary>
     /// Obtains the collection of parts in this identifier, or an empty one if it represents an
     /// empty or missed one. If the associated engine uses identifier terminators, and they are
-    /// requested, then each part (provided is not null) is wrapped with the appropriate ones.
+    /// requested, then each part (provided it is not a null one) is wrapped with the appropriate
+    /// ones.
     /// </summary>
     /// <param name="useTerminators"></param>
     /// <returns></returns>
-    IEnumerable<string?> Enumerate(bool useTerminators);
+    IEnumerable<string?> Enumerate(bool useTerminators = false);
 
     // ----------------------------------------------------
 
@@ -125,6 +137,14 @@ public partial interface IIdentifier : IEquatable<IIdentifier>
     /// </summary>
     /// <returns></returns>
     IBuilder ToBuilder();
+
+    /// <summary>
+    /// Returns a copy of this instance reduced to a simpler from by removing its null heading
+    /// parts, if any.
+    /// <br/> Return this instance if no changes were made.
+    /// </summary>
+    /// <returns></returns>
+    IIdentifier Reduce();
 
     /// <summary>
     /// Returns a copy of this instance where the part at the given index was replaced by the parts

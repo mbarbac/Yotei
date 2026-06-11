@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Code;
+﻿using System.Xml.Schema;
+
+namespace Yotei.ORM.Code;
 
 partial class Identifier
 {
@@ -26,8 +28,13 @@ partial class Identifier
         /// </summary>
         /// <param name="engine"></param>
         /// <param name="range"></param>
+        /// <param name="reduce"></param>
         public Builder(
-            IEngine engine, IEnumerable<string?> range) : this(engine) => AddRange(range);
+            IEngine engine, IEnumerable<string?> range, bool reduce = true) : this(engine)
+        {
+            AddRange(range, reduce);
+            if (reduce) Reduce();
+        }
 
         /// <summary>
         /// Copy constructor.
@@ -42,10 +49,27 @@ partial class Identifier
         }
 
         /// <summary>
-        /// <inheritdoc/>
+        /// <inheritdoc cref="Identifier.ToString"/>
         /// </summary>
         /// <returns></returns>
-        public override string ToString() => Value ?? string.Empty;
+        public override string ToString() => ToStringEx();
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="reduce"></param>
+        /// <param name="wrap"></param>
+        /// <returns></returns>
+        public string ToStringEx(bool reduce = true, bool wrap = true)
+        {
+            var items = reduce && Items.Any(static x => x == null)
+                ? Items.SkipWhile(x => x == null)
+                : Items;
+
+            return items.Any()
+                ? string.Join('.', items.Select(x => Wrap(x, wrap)))
+                : string.Empty;
+        }
 
         // ----------------------------------------------------
 
@@ -80,9 +104,8 @@ partial class Identifier
         {
             get
             {
-                return Items.Count == 0 || Items.All(static x => x == null)
-                    ? null
-                    : string.Join('.', Items.Select(x => Wrap(x, true)));
+                var str = ToStringEx();
+                return string.IsNullOrEmpty(str) ? null : str;
             }
             set
             {
@@ -116,21 +139,9 @@ partial class Identifier
         /// </summary>
         /// <param name="useTerminators"></param>
         /// <returns></returns>
-        public IEnumerable<string?> Enumerate(bool useTerminators)
+        public IEnumerable<string?> Enumerate(bool useTerminators = false)
         {
             foreach (var item in Items) yield return Wrap(item, useTerminators);
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        public void Reduce()
-        {
-            while (Items.Count > 0)
-            {
-                if (Items[0] == null) Items.RemoveAt(0);
-                else break;
-            }
         }
 
         // ----------------------------------------------------
@@ -213,6 +224,20 @@ partial class Identifier
         }
 
         // ----------------------------------------------------
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public bool Reduce()
+        {
+            var done = false;
+            while (Items.Count > 0)
+            {
+                if (Items[0] == null) { Items.RemoveAt(0); done = true; }
+                else break;
+            }
+            return done;
+        }
 
         /// <summary>
         /// <inheritdoc/>
