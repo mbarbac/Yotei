@@ -25,9 +25,11 @@ public partial interface IIdentifier : IEquatable<IIdentifier>
     /// The actual value carried by this instance, or <see langword="null"/> if it represents an
     /// empty or missed identifier. The null or empty head parts, if any, are removed, and then
     /// each part is wrapped with the appropriate terminators.
-    /// <br/> The <see cref="ToStringEx(bool, bool)"/> method can be used to obtain a custom
+    /// <para>
+    /// The <see cref="ToStringEx(bool, bool)"/> method can be used to obtain a custom string
     /// representation, removing or not the head parts, and wrapping or not the remaining ones,
     /// as needed.
+    /// </para>
     /// </summary>
     string? Value { get; }
 
@@ -123,8 +125,8 @@ public partial interface IIdentifier : IEquatable<IIdentifier>
 
     /// <summary>
     /// Determines if this instance matches the given specifications or not. Specifications take
-    /// the form of a dot-separated parts' string, where any empty or null part is considered an
-    /// implicit match. Comparison is performed per each part right-to-left.
+    /// the form of a string with dot-separated parts, where any empty or null one is considered an
+    /// implicit match. Comparison is performed for each part, from right to left.
     /// </summary>
     /// <param name="specs"></param>
     /// <returns></returns>
@@ -153,8 +155,9 @@ public partial interface IIdentifier : IEquatable<IIdentifier>
     /// </summary>
     /// <param name="index"></param>
     /// <param name="value"></param>
+    /// <param name="reduce"></param>
     /// <returns></returns>
-    IIdentifier Replace(int index, string? value);
+    IIdentifier Replace(int index, string? value, bool reduce = true);
 
     /// <summary>
     /// Returns a copy of this instance where the parts obtained from the given value were added
@@ -162,8 +165,9 @@ public partial interface IIdentifier : IEquatable<IIdentifier>
     /// <br/> Return this instance if no changes were made.
     /// </summary>
     /// <param name="value"></param>
+    /// <param name="reduce"></param>
     /// <returns></returns>
-    IIdentifier Add(string? value);
+    IIdentifier Add(string? value, bool reduce = true);
 
     /// <summary>
     /// Returns a copy of this instance where the parts obtained from the given range of values
@@ -171,8 +175,9 @@ public partial interface IIdentifier : IEquatable<IIdentifier>
     /// <br/> Return this instance if no changes were made.
     /// </summary>
     /// <param name="range"></param>
+    /// <param name="reduce"></param>
     /// <returns></returns>
-    IIdentifier AddRange(IEnumerable<string?> range);
+    IIdentifier AddRange(IEnumerable<string?> range, bool reduce = true);
 
     /// <summary>
     /// Returns a copy of this instance where the parts obtained from the given value were inserted
@@ -181,8 +186,9 @@ public partial interface IIdentifier : IEquatable<IIdentifier>
     /// </summary>
     /// <param name="index"></param>
     /// <param name="value"></param>
+    /// <param name="reduce"></param>
     /// <returns></returns>
-    IIdentifier Insert(int index, string? value);
+    IIdentifier Insert(int index, string? value, bool reduce = true);
 
     /// <summary>
     /// Returns a copy of this instance where the parts obtained from the given range of values
@@ -191,16 +197,18 @@ public partial interface IIdentifier : IEquatable<IIdentifier>
     /// </summary>
     /// <param name="index"></param>
     /// <param name="range"></param>
+    /// <param name="reduce"></param>
     /// <returns></returns>
-    IIdentifier InsertRange(int index, IEnumerable<string?> range);
+    IIdentifier InsertRange(int index, IEnumerable<string?> range, bool reduce = true);
 
     /// <summary>
     /// Returns a copy of this instance where the part at the given index was removed.
     /// <br/> Return this instance if no changes were made.
     /// </summary>
     /// <param name="index"></param>
+    /// <param name="reduce"></param>
     /// <returns></returns>
-    IIdentifier RemoveAt(int index);
+    IIdentifier RemoveAt(int index, bool reduce = true);
 
     /// <summary>
     /// Returns a copy of this instance where the given number of parts, starting at the given
@@ -209,32 +217,36 @@ public partial interface IIdentifier : IEquatable<IIdentifier>
     /// </summary>
     /// <param name="index"></param>
     /// <param name="count"></param>
+    /// <param name="reduce"></param>
     /// <returns></returns>
-    IIdentifier RemoveRange(int index, int count);
+    IIdentifier RemoveRange(int index, int count, bool reduce = true);
 
     /// <summary>
     /// Returns a copy of this instance where the first ocurrence of given part was removed.
     /// <br/> Return this instance if no changes were made.
     /// </summary>
     /// <param name="part"></param>
+    /// <param name="reduce"></param>
     /// <returns></returns>
-    IIdentifier Remove(string? part);
+    IIdentifier Remove(string? part, bool reduce = true);
 
     /// <summary>
     /// Returns a copy of this instance where the last ocurrence of given part was removed.
     /// <br/> Return this instance if no changes were made.
     /// </summary>
     /// <param name="part"></param>
+    /// <param name="reduce"></param>
     /// <returns></returns>
-    IIdentifier RemoveLast(string? part);
+    IIdentifier RemoveLast(string? part, bool reduce = true);
 
     /// <summary>
     /// Returns a copy of this instance where all the ocurrences of given part were removed.
     /// <br/> Return this instance if no changes were made.
     /// </summary>
     /// <param name="part"></param>
+    /// <param name="reduce"></param>
     /// <returns></returns>
-    IIdentifier RemoveAll(string? part);
+    IIdentifier RemoveAll(string? part, bool reduce = true);
 
     /// <summary>
     /// Returns a copy of this instance where the first part that matches the given predicate
@@ -242,8 +254,9 @@ public partial interface IIdentifier : IEquatable<IIdentifier>
     /// <br/> Return this instance if no changes were made.
     /// </summary>
     /// <param name="predicate"></param>
+    /// <param name="reduce"></param>
     /// <returns></returns>
-    IIdentifier Remove(Predicate<string?> predicate);
+    IIdentifier Remove(Predicate<string?> predicate, bool reduce = true);
 
     /// <summary>
     /// Returns a copy of this instance where the last part that matches the given predicate
@@ -251,8 +264,9 @@ public partial interface IIdentifier : IEquatable<IIdentifier>
     /// <br/> Return this instance if no changes were made.
     /// </summary>
     /// <param name="predicate"></param>
+    /// <param name="reduce"></param>
     /// <returns></returns>
-    IIdentifier RemoveLast(Predicate<string?> predicate);
+    IIdentifier RemoveLast(Predicate<string?> predicate, bool reduce = true);
 
     /// <summary>
     /// Returns a copy of this instance where all the parts that match the given predicate were
@@ -260,8 +274,9 @@ public partial interface IIdentifier : IEquatable<IIdentifier>
     /// <br/> Return this instance if no changes were made.
     /// </summary>
     /// <param name="predicate"></param>
+    /// <param name="reduce"></param>
     /// <returns></returns>
-    IIdentifier RemoveAll(Predicate<string?> predicate);
+    IIdentifier RemoveAll(Predicate<string?> predicate, bool reduce = true);
 
     /// <summary>
     /// Returns a copy of this instance where all its parts were removed.

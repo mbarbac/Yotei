@@ -77,7 +77,7 @@ public static partial class Test_Identifier_MultiPart
         IIdentifier item;
         IEngine engine = new FakeEngine();
 
-        item = new Identifier(engine, [" [ ] . [ ] "], reduce: false);
+        item = new Identifier(engine, " [ ] . [ ] ", reduce: false);
         Assert.Equal(2, item.Count);
         Assert.Null(item.Value);
         Assert.Equal(".", item.ToStringEx(reduce: false));
@@ -111,7 +111,7 @@ public static partial class Test_Identifier_MultiPart
         IIdentifier item;
         IEngine engine = new FakeEngine() { LeftTerminator = '-', RightTerminator = '-' };
 
-        item = new Identifier(engine, [" - - . - - "], reduce: false);
+        item = new Identifier(engine, " - - . - - ", reduce: false);
         Assert.Equal(2, item.Count);
         Assert.Null(item.Value);
         Assert.Equal(".", item.ToStringEx(reduce: false));
@@ -159,7 +159,7 @@ public static partial class Test_Identifier_MultiPart
         IIdentifier item;
         IEngine engine = new FakeEngine();
 
-        item = new Identifier(engine, [" aa . bb "]);
+        item = new Identifier(engine, " aa . bb ");
         Assert.Equal(2, item.Count);
         Assert.Equal("[aa].[bb]", item.Value);
         Assert.Equal("[aa].[bb]", item.ToStringEx(reduce: false));
@@ -287,7 +287,7 @@ public static partial class Test_Identifier_MultiPart
         IIdentifier item;
         IEngine engine = new FakeEngine() { LeftTerminator = '-', RightTerminator = '-' };
 
-        item = new Identifier(engine, [" - aa - . - bb - "]);
+        item = new Identifier(engine, " - aa - . - bb - ");
         Assert.Equal(2, item.Count);
         Assert.Equal("-aa-.-bb-", item.Value);
         Assert.Equal("-aa-.-bb-", item.ToStringEx(reduce: false));

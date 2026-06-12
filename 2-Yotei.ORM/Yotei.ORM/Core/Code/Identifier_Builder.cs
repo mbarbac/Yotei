@@ -24,6 +24,15 @@ partial class Identifier
         }
 
         /// <summary>
+        /// Initializes a new instance with the parts obtained from the given value.
+        /// </summary>
+        /// <param name="engine"></param>
+        /// <param name="value"></param>
+        /// <param name="reduce"></param>
+        public Builder(IEngine engine, string? value, bool reduce = true) : this(engine)
+            => Add(value, reduce);
+
+        /// <summary>
         /// Initializes a new instance with the parts obtained from the given range of values.
         /// </summary>
         /// <param name="engine"></param>
@@ -31,10 +40,7 @@ partial class Identifier
         /// <param name="reduce"></param>
         public Builder(
             IEngine engine, IEnumerable<string?> range, bool reduce = true) : this(engine)
-        {
-            AddRange(range, reduce);
-            if (reduce) Reduce();
-        }
+            => AddRange(range, reduce);
 
         /// <summary>
         /// Copy constructor.
@@ -104,7 +110,7 @@ partial class Identifier
         {
             get
             {
-                var str = ToStringEx();
+                var str = ToStringEx(reduce: true, wrap: true);
                 return string.IsNullOrEmpty(str) ? null : str;
             }
             set
@@ -243,11 +249,9 @@ partial class Identifier
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public virtual IIdentifier ToInstance()
-        {
-            Reduce();
-            return Count == 0 ? new Identifier(Engine) : new Identifier(Engine, Items);
-        }
+        public virtual IIdentifier ToInstance() => Count == 0
+            ? new Identifier(Engine)
+            : new Identifier(Engine, Items, reduce: false);
 
         /// <summary>
         /// <inheritdoc/>
@@ -259,26 +263,34 @@ partial class Identifier
         public virtual int Replace(int index, string? value, bool reduce = true)
         {
             var parts = Split(Engine, value, reduce);
-            if (parts.Count <= 1)
-            {
-                var part = parts.Count == 0 ? null : parts[0];
+            var done = 0;
 
-                Items[index] = part;
-                if (reduce) Reduce();
-                return 1;
-            }
-            else
+            if (parts.Count == 0) // we've got a null or empty value
             {
-                var num = 0;
+                if (Items[index] != null) { Items[index] = null; done = 1; }
+                if (reduce && Reduce()) done = 1;
+                return done;
+            }
+            else if (parts.Count == 1) // no need to resize the collection...
+            {
+                if (string.Compare(parts[0], Items[index], Engine.IgnoreCase) != 0)
+                {
+                    Items[index] = parts[0];
+                    done = 1;
+                }
+                if (reduce && Reduce()) done = 1;
+                return done;
+            }
+            else // we remove the original one and insert the new parts...
+            {
                 Items.RemoveAt(index); foreach (var part in parts)
                 {
                     Items.Insert(index, part);
-                    num++;
+                    done++;
                     index++;
                 }
-
                 if (reduce) Reduce();
-                return num;
+                return done;
             }
         }
 
@@ -507,8 +519,8 @@ partial class Identifier
             ArgumentNullException.ThrowIfNull(predicate);
 
             var index = Items.FindLastIndex(predicate);
-            return index< 0 ? 0 : RemoveAt(index, reduce);
-    }
+            return index < 0 ? 0 : RemoveAt(index, reduce);
+        }
 
         /// <summary>
         /// <inheritdoc/>
