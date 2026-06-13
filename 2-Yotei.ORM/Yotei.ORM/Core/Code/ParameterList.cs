@@ -1,17 +1,17 @@
-﻿using TKey = string;
-using IItem = Yotei.ORM.InvariantGenerator.Tests.IElement;
-using IHost = Yotei.ORM.InvariantGenerator.Tests.IElementList_KT;
-using THost = Yotei.ORM.InvariantGenerator.Tests.ElementList_KT;
+﻿using IHost = Yotei.ORM.IParameterList;
+using THost = Yotei.ORM.Code.ParameterList;
+using IItem = Yotei.ORM.IParameter;
+using TKey = string;
 
-namespace Yotei.ORM.InvariantGenerator.Tests;
+namespace Yotei.ORM.Code;
 
 // ========================================================
 /// <summary>
-/// <inheritdoc cref="IInvariantList{K, T}"/>
+/// <inheritdoc cref="IHost"/>
 /// </summary>
 [DebuggerDisplay("{ToDebugString(3)}")]
 [InvariantList<TKey, IItem>(ReturnType = typeof(IHost))]
-public partial class ElementList_KT : IHost
+public partial class ParameterList : IHost
 {
     protected override Builder Items { get; }
 
@@ -20,44 +20,22 @@ public partial class ElementList_KT : IHost
     /// </summary>
     /// <param name="engine"></param>
     [SuppressMessage("", "IDE0290")]
-    public ElementList_KT(IEngine engine) => Items = new(engine);
+    public ParameterList(IEngine engine) => Items = new(engine);
 
     /// <summary>
     /// Initializes a new instance with the elements of the given range.
     /// </summary>
     /// <param name="engine"></param>
     /// <param name="range"></param>
-    public ElementList_KT(
+    public ParameterList(
         IEngine engine, IEnumerable<IItem> range) : this(engine) => Items.AddRange(range);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="other"></param>
-    protected ElementList_KT(THost other) : this(other.Engine)
-    {
-        Items.AcceptDuplicates = other.AcceptDuplicates;
-        Items.AddRange(other);
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// <inheritdoc cref="IInvariantList{K, T}.ToBuilder"/>
-    /// </summary>
-    /// <returns></returns>
-    public override IHost.IBuilder ToBuilder() => Items.Clone();
-
-    /// <summary>
-    /// The engine this instance is associated with.
-    /// </summary>
-    public IEngine Engine => Items.Engine;
-
-    public bool AcceptDuplicates // For debug purposes...
-    {
-        get => Items.AcceptDuplicates;
-        set => Items.AcceptDuplicates = value;
-    }
+    protected ParameterList(
+        ParameterList other) : this(other.ThrowWhenNull().Engine) => Items.AddRange(other);
 
     // ----------------------------------------------------
 
@@ -66,23 +44,19 @@ public partial class ElementList_KT : IHost
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
-    public bool Equals(IItem? other)
+    public bool Equals(IHost? other)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null) return false;
-        if (other is not IHost valid) return false;
 
-        if (!Engine.Equals(valid.Engine)) return false;
-        if (Count != valid.Count) return false;
+        if (!Engine.Equals(other.Engine)) return false;
+        if (Count != other.Count) return false;
 
         for (int i = 0; i < Count; i++)
         {
             var item = this[i];
-            var temp = valid[i];
-            var same = item is NamedElement xitem && temp is NamedElement xtemp
-                ? xitem.Equals(xtemp, Engine.IgnoreCase)
-                : item.EqualsEx(temp);
-
+            var temp = other[i];
+            var same = item.Equals(temp, Engine.IgnoreCase);
             if (!same) return false;
         }
 
@@ -117,5 +91,47 @@ public partial class ElementList_KT : IHost
         code = HashCode.Combine(code, Count);
         for (int i = 0; i < Count; i++) code = HashCode.Combine(code, this[i]);
         return code;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public override IHost.IBuilder ToBuilder() => Items.Clone();
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public IEngine Engine => Items.Engine;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    public virtual IHost AddNew(object? value, out IItem item)
+    {
+        var builder = ToBuilder();
+        var done = builder.AddNew(value, out item);
+        return done > 0 ? builder.ToInstance() : this;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="value"></param>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    public virtual IHost InsertNew(int index, object? value, out IItem item)
+    {
+        var builder = ToBuilder();
+        var done = builder.InsertNew(index, value, out item);
+        return done > 0 ? builder.ToInstance() : this;
     }
 }

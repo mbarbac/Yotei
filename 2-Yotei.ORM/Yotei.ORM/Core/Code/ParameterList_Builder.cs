@@ -1,11 +1,11 @@
-﻿using TKey = string;
-using IItem = Yotei.ORM.InvariantGenerator.Tests.IElement;
-using IHost = Yotei.ORM.InvariantGenerator.Tests.IElementList_KT;
-using THost = Yotei.ORM.InvariantGenerator.Tests.ElementList_KT;
+﻿using IHost = Yotei.ORM.IParameterList;
+using THost = Yotei.ORM.Code.ParameterList;
+using IItem = Yotei.ORM.IParameter;
+using TKey = string;
 
-namespace Yotei.ORM.InvariantGenerator.Tests;
+namespace Yotei.ORM.Code;
 
-partial class ElementList_KT
+partial class ParameterList
 {
     // ====================================================
     /// <summary>
@@ -43,12 +43,7 @@ partial class ElementList_KT
         /// <inheritdoc cref="IHost.IBuilder.ToInstance"/>
         /// </summary>
         /// <returns></returns>
-        public THost ToInstance()
-        {
-            var host = new THost(Engine) { AcceptDuplicates = AcceptDuplicates };
-            if (Count > 0) host.AddRange(this);
-            return host;
-        }
+        public THost ToInstance() => Count == 0 ? new(Engine) : new(Engine, this);
         IHost IHost.IBuilder.ToInstance() => ToInstance();
 
         /// <summary>
@@ -70,9 +65,7 @@ partial class ElementList_KT
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public override TKey GetKey(IItem item) => item is NamedElement named
-            ? named.Name
-            : throw new ArgumentException("Element is not a named one.").WithData(item);
+        public override TKey GetKey(IItem item) => item.ThrowWhenNull().Name;
 
         /// <summary>
         /// <inheritdoc/>
@@ -92,7 +85,6 @@ partial class ElementList_KT
             var comparer = new MyComparer(Engine.IgnoreCase);
             return comparer.Equals(source, target);
         }
-
         readonly struct MyComparer(bool IgnoreCase) : IEqualityComparer<TKey>
         {
             public bool Equals(TKey? x, TKey? y) => string.Compare(x, y, IgnoreCase) == 0;
@@ -109,27 +101,52 @@ partial class ElementList_KT
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        /// <param name="value"></param>
+        /// <param name="_"></param>
         /// <param name="_"></param>
         /// <returns></returns>
-        public override bool AllowDuplicate(IItem value, IEnumerable<IItem> _)
+        public override bool AllowDuplicate(IItem _, IEnumerable<IItem> __) => true;
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <returns></returns>
+        public string NextName()
         {
-            if (AcceptDuplicates) return true;
-            throw new DuplicateException("Duplicated value").WithData(value);
+            for (int i = Count; i < int.MaxValue; i++)
+            {
+                var name = $"{Engine.ParameterPrefix}{i}";
+                var index = IndexOf(name);
+                if (index < 0) return name;
+            }
+
+            throw new UnExpectedException("Range of integers exahusted.");
         }
 
-        // For debug purposes...
-        public bool AcceptDuplicates
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public virtual int AddNew(object? value, out IItem item)
         {
-            get;
-            set
-            {
-                if (field == value) return;
-                if (Count == 0) { field = value; return; }
+            item = new Parameter(NextName(), value);
+            return Add(item);
+        }
 
-                var range = ToList(); Clear();
-                field = value; AddRange(range);
-            }
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="value"></param>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public virtual int InsertNew(int index, object? value, out IItem item)
+        {
+            item = new Parameter(NextName(), value);
+            return Insert(index, item);
         }
     }
 }
