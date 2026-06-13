@@ -102,9 +102,27 @@ partial class ParameterList
         /// <inheritdoc/>
         /// </summary>
         /// <param name="_"></param>
-        /// <param name="_"></param>
+        /// <param name="__"></param>
         /// <returns></returns>
-        public override bool AllowDuplicate(IItem _) => true;
+        public override bool AllowDuplicate(IItem value, IEnumerable<IItem> existing)
+        {
+            foreach (var item in existing)
+                if (!ReferenceEquals(value, item)) throw new DuplicateException(
+                    "Value is not the same as an existing member.")
+                    .WithData(value)
+                    .WithData(item);
+
+            return true;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        public override bool SameElements(
+            IItem source, IItem target) => ReferenceEquals(source, target);
 
         // ------------------------------------------------
 

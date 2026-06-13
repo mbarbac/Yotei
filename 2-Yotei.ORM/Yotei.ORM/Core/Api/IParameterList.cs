@@ -6,6 +6,7 @@ namespace Yotei.ORM;
 // ========================================================
 /// <summary>
 /// Represents the ordered collection of parameters in a command.
+/// <br/> Duplicated elements are accepted but only if they are the same object.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
 [IInvariantList<TKey, IItem>]

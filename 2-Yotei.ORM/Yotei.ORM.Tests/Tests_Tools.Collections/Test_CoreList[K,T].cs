@@ -46,7 +46,7 @@ public static partial class Test_CoreList_KT
             string source, string target) => string.Compare(source, target, IgnoreCase) == 0;
         public override IEnumerable<IElement> FindDuplicates(string key) => base.FindDuplicates(key);
 
-        public override bool AllowDuplicate(IElement value)
+        public override bool AllowDuplicate(IElement value, IEnumerable<IElement> _)
         {
             if (AcceptDuplicates) return true;
             throw new DuplicateException("Duplicated value").WithData(value);

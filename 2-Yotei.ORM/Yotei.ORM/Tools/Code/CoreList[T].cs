@@ -98,8 +98,9 @@ public partial class CoreList<T> : ICoreList<T>
     /// <br/>- throw an appropriate exception if duplicates are not allowed.
     /// </summary>
     /// <param name="value"></param>
+    /// <param name="existing"></param>
     /// <returns></returns>
-    public virtual bool AllowDuplicate(T value) => true;
+    public virtual bool AllowDuplicate(T value, IEnumerable<T> existing) => true;
 
     // ----------------------------------------------------
 
@@ -350,7 +351,7 @@ public partial class CoreList<T> : ICoreList<T>
 
         value = ValidateElement(value);
         var dups = FindDuplicates(value);
-        if (dups.Any() && !AllowDuplicate(value)) return 0;
+        if (dups.Any() && !AllowDuplicate(value, dups)) return 0;
 
         Items.Add(value);
         return 1;
@@ -383,7 +384,7 @@ public partial class CoreList<T> : ICoreList<T>
 
         value = ValidateElement(value);
         var dups = FindDuplicates(value);
-        if (dups.Any() && !AllowDuplicate(value)) return 0;
+        if (dups.Any() && !AllowDuplicate(value, dups)) return 0;
 
         Items.Insert(index, value);
         return 1;

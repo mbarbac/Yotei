@@ -112,7 +112,7 @@ partial class ElementList_KT
         /// <param name="value"></param>
         /// <param name="_"></param>
         /// <returns></returns>
-        public override bool AllowDuplicate(IItem value)
+        public override bool AllowDuplicate(IItem value, IEnumerable<IItem> _)
         {
             if (AcceptDuplicates) return true;
             throw new DuplicateException("Duplicated value").WithData(value);
@@ -131,5 +131,13 @@ partial class ElementList_KT
                 field = value; AddRange(range);
             }
         }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        public override bool SameElements(IItem source, IItem target) => base.SameElements(source, target);
     }
 }

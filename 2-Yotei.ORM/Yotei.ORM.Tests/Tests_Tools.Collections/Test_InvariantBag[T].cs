@@ -51,7 +51,7 @@ public static partial class Test_InvariantBag_T
         }
         public override IEnumerable<IElement> FindDuplicates(IElement value) => base.FindDuplicates(value);
 
-        public override bool AllowDuplicate(IElement value)
+        public override bool AllowDuplicate(IElement value, IEnumerable<IElement> _)
         {
             if (AcceptDuplicates) return true;
             throw new DuplicateException("Duplicated value").WithData(value);
