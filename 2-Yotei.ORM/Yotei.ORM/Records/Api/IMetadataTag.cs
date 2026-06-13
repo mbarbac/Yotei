@@ -20,10 +20,9 @@ public partial interface IMetadataTag : IEnumerable<string>, IEquatable<IMetadat
     /// thrown.
     /// </summary>
     /// <remarks>
-    /// To some extend it can be said that the setter breaks the immutability of this instance.
-    /// But, for all practical purposes, having a different default tag name shall not break any
-    /// search logic that uses all possible names in this tags collection, so we accept that the
-    /// setter modifies the default one.
+    /// It could be argued that the setter breaks the immutability of this type but, for almost
+    /// all practical purposes, having a different default tag name shall not break any search
+    /// logic, which is the primary reason of having this type.
     /// </remarks>
     string Default { get; set; }
 
