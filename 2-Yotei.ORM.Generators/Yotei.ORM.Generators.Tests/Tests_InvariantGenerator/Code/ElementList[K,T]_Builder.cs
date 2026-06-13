@@ -112,7 +112,7 @@ partial class ElementList_KT
         /// <param name="value"></param>
         /// <param name="_"></param>
         /// <returns></returns>
-        public override bool AllowDuplicate(IItem value, IEnumerable<IItem> _)
+        public override bool AllowDuplicate(IItem value)
         {
             if (AcceptDuplicates) return true;
             throw new DuplicateException("Duplicated value").WithData(value);

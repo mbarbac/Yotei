@@ -105,7 +105,7 @@ partial class ElementBag_T
         /// <param name="value"></param>
         /// <param name="_"></param>
         /// <returns></returns>
-        public override bool AllowDuplicate(IElement value, IEnumerable<IElement> _)
+        public override bool AllowDuplicate(IElement value)
         {
             if (AcceptDuplicates) return true;
             throw new DuplicateException("Duplicated value").WithData(value);

@@ -17,8 +17,7 @@ public partial class CoreBag<T> : ICoreBag<T>
         public override T ValidateElement(T value) => Master.ValidateElement(value);
         public override bool CompareElements(T source, T target) => Master.CompareElements(source, target);
         public override IEnumerable<T> FindDuplicates(T value) => Master.FindDuplicates(value);
-        public override bool AllowDuplicate(
-            T value, IEnumerable<T> existing) => Master.AllowDuplicate(value, existing);
+        public override bool AllowDuplicate(T value) => Master.AllowDuplicate(value);
     }
 
     // ----------------------------------------------------
@@ -97,9 +96,8 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// <br/>- throw an appropriate exception if duplicates are not allowed.
     /// </summary>
     /// <param name="value"></param>
-    /// <param name="existing"></param>
     /// <returns></returns>
-    public virtual bool AllowDuplicate(T value, IEnumerable<T> existing) => true;
+    public virtual bool AllowDuplicate(T value) => true;
 
     // ----------------------------------------------------
 

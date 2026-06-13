@@ -104,7 +104,7 @@ partial class ParameterList
         /// <param name="_"></param>
         /// <param name="_"></param>
         /// <returns></returns>
-        public override bool AllowDuplicate(IItem _, IEnumerable<IItem> __) => true;
+        public override bool AllowDuplicate(IItem _) => true;
 
         // ------------------------------------------------
 
