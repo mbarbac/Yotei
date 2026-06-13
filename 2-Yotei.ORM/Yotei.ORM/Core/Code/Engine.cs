@@ -17,6 +17,8 @@ public partial class Engine : IEngine
     public const char LEFTTERMINATOR = '[';
     public const char RIGHTTERMINATOR = ']';
 
+    public const bool IGNORETAGSCASE = false; // To follow standard CLR behavior
+
     static char ValidateTerminator(char value)
     {
         if (value <= ' ') throw new ArgumentException("Invalid terminator.").WithData(value);
@@ -47,6 +49,7 @@ public partial class Engine : IEngine
         UseTerminators = USETERMINATORS;
         LeftTerminator = LEFTTERMINATOR;
         RightTerminator = RIGHTTERMINATOR;
+        KnownTags = new KnownTags(IGNORETAGSCASE);
     }
 
     /// <summary>
@@ -65,6 +68,7 @@ public partial class Engine : IEngine
         UseTerminators = source.UseTerminators;
         LeftTerminator = source.LeftTerminator;
         RightTerminator = source.RightTerminator;
+        KnownTags = source.KnownTags;
     }
 
     /// <summary>
@@ -91,7 +95,8 @@ public partial class Engine : IEngine
             NativePaging == other.NativePaging &&
             UseTerminators == other.UseTerminators &&
             LeftTerminator == other.LeftTerminator &&
-            RightTerminator == other.RightTerminator;
+            RightTerminator == other.RightTerminator &&
+            KnownTags.Equals(other.KnownTags);
     }
 
     /// <summary>
@@ -116,6 +121,7 @@ public partial class Engine : IEngine
         code = HashCode.Combine(code, UseTerminators);
         code = HashCode.Combine(code, LeftTerminator);
         code = HashCode.Combine(code, RightTerminator);
+        code = HashCode.Combine(code, KnownTags);
         return code;
     }
 
@@ -167,25 +173,8 @@ public partial class Engine : IEngine
     /// </summary>
     public char RightTerminator { get; init => field = ValidateTerminator(value); }
 
-    // ----------------------------------------------------
-
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public bool IgnoreTagsCase { get; init; }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    public ImmutableArray<string> IsPrimaryKeyTags { get; set { ValidateTags(value); field = value; } }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    public ImmutableArray<string> IsUniqueValuedTags { get; set { ValidateTags(value); field = value; } }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    public ImmutableArray<string> IsReadOnlyTags { get; set { ValidateTags(value); field = value; } }
+    public IKnownTags KnownTags { get; init => field = value.ThrowWhenNull(); }
 }

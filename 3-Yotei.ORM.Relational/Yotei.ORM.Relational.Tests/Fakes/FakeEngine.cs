@@ -15,6 +15,7 @@ public partial class FakeEngine : ORM.Relational.Code.Engine
         UseTerminators = true;
         LeftTerminator = '[';
         RightTerminator = ']';
+        KnownTags = new FakeKnownTags();
     }
 
     protected FakeEngine(FakeEngine source) : base(source) { }

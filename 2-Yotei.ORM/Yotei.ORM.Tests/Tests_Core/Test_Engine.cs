@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Tests;
+﻿#pragma warning disable CA1859
+
+namespace Yotei.ORM.Tests;
 
 // ========================================================
 //[Enforced]
@@ -9,6 +11,7 @@ public static class Test_Engine
     public static void Test_Create()
     {
         IEngine engine = new FakeEngine();
+        Assert.Equal("FakeEngine", engine.ToString());
 
         Assert.Equal(Code.Engine.IGNORECASE, engine.IgnoreCase);
         Assert.Equal(Code.Engine.NULLVALUELITERAL, engine.NullValueLiteral);
@@ -19,7 +22,11 @@ public static class Test_Engine
         Assert.Equal(Code.Engine.LEFTTERMINATOR, engine.LeftTerminator);
         Assert.Equal(Code.Engine.RIGHTTERMINATOR, engine.RightTerminator);
 
-        Assert.Equal("FakeEngine", engine.ToString());
+        Assert.Equal(Engine.IGNORETAGSCASE, engine.KnownTags.IgnoreCase);
+        Assert.Equal(3, engine.KnownTags.IdentifierTags!.Value.Length);
+        Assert.NotNull(engine.KnownTags.PrimaryKeyTag);
+        Assert.NotNull(engine.KnownTags.UniqueValuedTag);
+        Assert.NotNull(engine.KnownTags.ReadOnlyTag);
     }
 
     //[Enforced]
@@ -84,5 +91,19 @@ public static class Test_Engine
         target = source.WithRightTerminator('x');
         Assert.NotSame(source, target);
         Assert.Equal('x', target.RightTerminator);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_With_Tags()
+    {
+        var source = new FakeEngine();
+        var target = source.WithKnownTags(new KnownTags(true));
+
+        Assert.True(target.KnownTags.IgnoreCase);
+        Assert.Null(target.KnownTags.IdentifierTags);
+        Assert.Null(target.KnownTags.PrimaryKeyTag);
+        Assert.Null(target.KnownTags.UniqueValuedTag);
+        Assert.Null(target.KnownTags.ReadOnlyTag);
     }
 }

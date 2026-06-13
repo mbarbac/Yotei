@@ -5,7 +5,7 @@
 [InheritsWith(ReturnType = typeof(IEngine))]
 public partial class FakeEngine : Engine
 {
-    public FakeEngine() : base() { }
+    public FakeEngine() : base() => KnownTags = new FakeKnownTags(IGNORETAGSCASE);
     protected FakeEngine(FakeEngine source) : base(source) { }
     public override string ToString() => "FakeEngine";
 }

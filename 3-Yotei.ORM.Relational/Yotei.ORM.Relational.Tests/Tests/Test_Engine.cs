@@ -19,6 +19,14 @@ public static partial class Test_Engine
         Assert.True(engine.UseTerminators);
         Assert.Equal('[', engine.LeftTerminator);
         Assert.Equal(']', engine.RightTerminator);
+
+        Assert.True(engine.KnownTags.IgnoreCase);
+        Assert.Equal("BaseSchemaName", engine.KnownTags.IdentifierTags!.Value[0].Default);
+        Assert.Equal("BaseTableName", engine.KnownTags.IdentifierTags!.Value[1].Default);
+        Assert.Equal("BaseColumnName", engine.KnownTags.IdentifierTags!.Value[2].Default);
+        Assert.Equal("IsKey", engine.KnownTags.PrimaryKeyTag!.Default);
+        Assert.Equal("IsUnique", engine.KnownTags.UniqueValuedTag!.Default);
+        Assert.Equal("IsReadOnly", engine.KnownTags.ReadOnlyTag!.Default);
     }
 
     //[Enforced]
@@ -47,5 +55,6 @@ public static partial class Test_Engine
         Assert.Equal(source.UseTerminators, target.UseTerminators);
         Assert.Equal(source.LeftTerminator, target.LeftTerminator);
         Assert.Equal(source.RightTerminator, target.RightTerminator);
+        Assert.Equal(source.KnownTags, target.KnownTags);
     }
 }
