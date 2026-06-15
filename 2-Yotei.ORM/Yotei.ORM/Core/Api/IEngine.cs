@@ -58,5 +58,5 @@ public partial interface IEngine : IEquatable<IEngine>
     /// <summary>
     /// This instance's collection of well-known metadata tags.
     /// </summary>
-    [With] IKnownTags KnownTags { get; }
+    //[With] IKnownTags KnownTags { get; }
 }
