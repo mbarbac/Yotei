@@ -101,8 +101,8 @@ partial class ParameterList
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        /// <param name="_"></param>
-        /// <param name="__"></param>
+        /// <param name="value"></param>
+        /// <param name="existing"></param>
         /// <returns></returns>
         public override bool AllowDuplicate(IItem value, IEnumerable<IItem> existing)
         {
@@ -121,8 +121,7 @@ partial class ParameterList
         /// <param name="source"></param>
         /// <param name="target"></param>
         /// <returns></returns>
-        public override bool SameElements(
-            IItem source, IItem target) => ReferenceEquals(source, target);
+        public override bool SameElements(IItem source, IItem target) => ReferenceEquals(source, target);
 
         // ------------------------------------------------
 
