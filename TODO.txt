@@ -1,4 +1,0 @@
-ESTOY:
-	Rehaciendo toda la parte de tasg
-	En particular, añadiendo IdentiferTags para poder luego simplificar su uso.
-	Luego tendre que, uno a uno, rehacer las clases que lo usaban.

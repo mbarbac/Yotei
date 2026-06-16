@@ -49,7 +49,7 @@ public partial class Engine : IEngine
         UseTerminators = USETERMINATORS;
         LeftTerminator = LEFTTERMINATOR;
         RightTerminator = RIGHTTERMINATOR;
-        //KnownTags = new KnownTags(IGNORETAGSCASE);
+        KnownTags = new KnownTags(IGNORETAGSCASE);
     }
 
     /// <summary>
@@ -68,7 +68,7 @@ public partial class Engine : IEngine
         UseTerminators = source.UseTerminators;
         LeftTerminator = source.LeftTerminator;
         RightTerminator = source.RightTerminator;
-        //KnownTags = source.KnownTags;
+        KnownTags = source.KnownTags;
     }
 
     /// <summary>
@@ -95,9 +95,8 @@ public partial class Engine : IEngine
             NativePaging == other.NativePaging &&
             UseTerminators == other.UseTerminators &&
             LeftTerminator == other.LeftTerminator &&
-            RightTerminator == other.RightTerminator // &&
-            //KnownTags.Equals(other.KnownTags);
-            ;
+            RightTerminator == other.RightTerminator &&
+            KnownTags.Equals(other.KnownTags);
     }
 
     /// <summary>
@@ -122,7 +121,7 @@ public partial class Engine : IEngine
         code = HashCode.Combine(code, UseTerminators);
         code = HashCode.Combine(code, LeftTerminator);
         code = HashCode.Combine(code, RightTerminator);
-        //code = HashCode.Combine(code, KnownTags);
+        code = HashCode.Combine(code, KnownTags);
         return code;
     }
 
@@ -177,5 +176,5 @@ public partial class Engine : IEngine
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    //public IKnownTags KnownTags { get; init => field = value.ThrowWhenNull(); }
+    public IKnownTags KnownTags { get; init => field = value.ThrowWhenNull(); }
 }
