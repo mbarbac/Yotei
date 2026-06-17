@@ -4,9 +4,9 @@
 /// <summary>
 /// <inheritdoc cref="IMetadataEntry"/>
 /// </summary>
-[Cloneable(ReturnType = typeof(IMetadataEntry))]
-[InheritsWith(ReturnType = typeof(IMetadataEntry))]
-public partial class MetadataEntry : IMetadataEntry
+[Cloneable(ReturnType = typeof(IMetadataEntry), UseVirtual = false)]
+[InheritsWith(ReturnType = typeof(IMetadataEntry), UseVirtual = false)]
+public sealed partial class MetadataEntry : IMetadataEntry
 {
     /// <summary>
     /// Initializes a new instance.
@@ -23,7 +23,7 @@ public partial class MetadataEntry : IMetadataEntry
     /// Copy constructor.
     /// </summary>
     /// <param name="other"></param>
-    protected MetadataEntry(MetadataEntry other)
+    MetadataEntry(MetadataEntry other)
     {
         ArgumentNullException.ThrowIfNull(other);
 
@@ -43,7 +43,7 @@ public partial class MetadataEntry : IMetadataEntry
     /// <param name="other"></param>
     /// <param name="ignoreNameCase"></param>
     /// <returns></returns>
-    public virtual bool Equals(IMetadataEntry? other, bool ignoreNameCase)
+    public bool Equals(IMetadataEntry? other, bool ignoreNameCase)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null) return false;
@@ -58,7 +58,7 @@ public partial class MetadataEntry : IMetadataEntry
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
-    public virtual bool Equals(IMetadataEntry? other) => Equals(other, false);
+    public bool Equals(IMetadataEntry? other) => Equals(other, false);
 
     /// <summary>
     /// <inheritdoc/>

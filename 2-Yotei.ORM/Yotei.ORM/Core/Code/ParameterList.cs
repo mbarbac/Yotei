@@ -44,7 +44,7 @@ public partial class ParameterList : IHost
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
-    public bool Equals(IHost? other)
+    public virtual bool Equals(IHost? other)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null) return false;

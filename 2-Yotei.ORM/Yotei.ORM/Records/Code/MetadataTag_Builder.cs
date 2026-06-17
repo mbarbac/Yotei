@@ -6,8 +6,8 @@ partial class MetadataTag
     /// <inheritdoc cref="IMetadataTag.IBuilder"/>
     /// </summary>
     [DebuggerDisplay("{ToDebugString(3)}")]
-    [Cloneable(ReturnType = typeof(IMetadataTag.IBuilder))]
-    public partial class Builder : IMetadataTag.IBuilder
+    [Cloneable]
+    public sealed partial class Builder : IMetadataTag.IBuilder
     {
         readonly List<string> Items;
 
@@ -40,7 +40,7 @@ partial class MetadataTag
         /// Copy constructor.
         /// </summary>
         /// <param name="other"></param>
-        protected Builder(Builder other)
+        Builder(Builder other)
         {
             IgnoreCase = other.IgnoreCase;
             Items = [.. other];
@@ -64,7 +64,7 @@ partial class MetadataTag
         /// </summary>
         /// <param name="count"></param>
         /// <returns></returns>
-        public virtual string ToDebugString(int count) => Count < count
+        public string ToDebugString(int count) => Count < count
             ? $"'{string.Join(", ", Items)}'"
             : $"'{string.Join(", ", Items.Take(count))}, ...'";
 
@@ -145,7 +145,7 @@ partial class MetadataTag
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public virtual IMetadataTag ToInstance() => Count == 1
+        public IMetadataTag ToInstance() => Count == 1
             ? new MetadataTag(IgnoreCase, Default)
             : new MetadataTag(IgnoreCase, this);
 
@@ -155,7 +155,7 @@ partial class MetadataTag
         /// <param name="oldname"></param>
         /// <param name="newname"></param>
         /// <returns></returns>
-        public virtual bool Replace(string oldname, string newname)
+        public bool Replace(string oldname, string newname)
         {
             oldname = Validate(oldname);
             newname = Validate(newname);
@@ -177,7 +177,7 @@ partial class MetadataTag
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public virtual bool Add(string name)
+        public bool Add(string name)
         {
             var index = IndexOf(name = Validate(name));
             if (index >= 0) throw new DuplicateException("Tag name is duplicated.").WithData(name);
@@ -191,7 +191,7 @@ partial class MetadataTag
         /// </summary>
         /// <param name="range"></param>
         /// <returns></returns>
-        public virtual bool AddRange(IEnumerable<string> range)
+        public bool AddRange(IEnumerable<string> range)
         {
             ArgumentNullException.ThrowIfNull(range);
 
@@ -204,7 +204,7 @@ partial class MetadataTag
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public virtual bool Remove(string name)
+        public bool Remove(string name)
         {
             var index = IndexOf(Validate(name));
             if (index >= 0)
@@ -224,7 +224,7 @@ partial class MetadataTag
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public virtual bool Clear()
+        public bool Clear()
         {
             if (Count <= 1) return false;
 

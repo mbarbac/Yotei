@@ -181,7 +181,7 @@ public partial class KnownTags : IKnownTags
                     .WithData(tag)
                     .WithData(this);
 
-                if (ContainsAny(tag)) throw new DuplicateException(
+                if (Contains(tag)) throw new DuplicateException(
                     "This instance already carries a name from the given tag.")
                     .WithData(value)
                     .WithData(this);
@@ -207,7 +207,7 @@ public partial class KnownTags : IKnownTags
                 .WithData(this);
 
             field = null;
-            if (ContainsAny(value)) throw new DuplicateException(
+            if (Contains(value)) throw new DuplicateException(
                 "This instance already carries a name from the given tag.")
                 .WithData(value)
                 .WithData(this);
@@ -233,7 +233,7 @@ public partial class KnownTags : IKnownTags
                 .WithData(this);
 
             field = null;
-            if (ContainsAny(value)) throw new DuplicateException(
+            if (Contains(value)) throw new DuplicateException(
                 "This instance already carries a name from the given tag.")
                 .WithData(value)
                 .WithData(this);
@@ -259,7 +259,7 @@ public partial class KnownTags : IKnownTags
                 .WithData(this);
 
             field = null;
-            if (ContainsAny(value)) throw new DuplicateException(
+            if (Contains(value)) throw new DuplicateException(
                 "This instance already carries a name from the given tag.")
                 .WithData(value)
                 .WithData(this);
@@ -273,33 +273,16 @@ public partial class KnownTags : IKnownTags
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public virtual IEnumerable<string> Names
-    {
-        get
-        {
-            if (IdentifierTags != null)
-                foreach (var tag in IdentifierTags)
-                    foreach (var name in tag) yield return name;
-
-            if (PrimaryKeyTag != null) foreach (var name in PrimaryKeyTag) yield return name;
-            if (UniqueValuedTag != null) foreach (var name in UniqueValuedTag) yield return name;
-            if (ReadOnlyTag != null) foreach (var name in ReadOnlyTag) yield return name;
-        }
-    }
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    public virtual bool Contains(string name) => Find(name) != null;
+    public bool Contains(string name) => Find(name) != null;
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="names"></param>
     /// <returns></returns>
-    public virtual bool ContainsAny(IEnumerable<string> names)
+    public bool Contains(IEnumerable<string> names)
     {
         ArgumentNullException.ThrowIfNull(names);
 
@@ -312,7 +295,7 @@ public partial class KnownTags : IKnownTags
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    public virtual IMetadataTag? Find(string name)
+    public IMetadataTag? Find(string name)
     {
         name = name.NotNullNotEmpty(trim: true);
 
@@ -327,5 +310,39 @@ public partial class KnownTags : IKnownTags
         if (ReadOnlyTag?.Contains(name) ?? false) return ReadOnlyTag;
 
         return null;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="names"></param>
+    /// <returns></returns>
+    public List<IMetadataTag> Find(IEnumerable<string> names)
+    {
+        ArgumentNullException.ThrowIfNull(names);
+
+        List<IMetadataTag> items = []; foreach (var name in names)
+        {
+            var item = Find(name);
+            if (item != null && !items.Contains(item)) items.Add(item);
+        }
+        return items;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public IEnumerable<string> Names
+    {
+        get
+        {
+            if (IdentifierTags != null)
+                foreach (var tag in IdentifierTags)
+                    foreach (var name in tag) yield return name;
+
+            if (PrimaryKeyTag != null) foreach (var name in PrimaryKeyTag) yield return name;
+            if (UniqueValuedTag != null) foreach (var name in UniqueValuedTag) yield return name;
+            if (ReadOnlyTag != null) foreach (var name in ReadOnlyTag) yield return name;
+        }
     }
 }

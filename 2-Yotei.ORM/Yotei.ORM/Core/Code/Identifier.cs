@@ -4,10 +4,13 @@
 /// <summary>
 /// <inheritdoc cref="IIdentifier"/>
 /// </summary>
-[Cloneable(ReturnType = typeof(IIdentifier))]
-public partial class Identifier : IIdentifier
+/// <remarks>
+/// This type is not intended to be inherited.
+/// </remarks>
+[Cloneable(ReturnType = typeof(IIdentifier), UseVirtual = false)]
+public sealed partial class Identifier : IIdentifier
 {
-    protected IIdentifier.IBuilder Items;
+    readonly IIdentifier.IBuilder Items;
 
     /// <summary>
     /// Initializes a new empty instance.
@@ -38,7 +41,7 @@ public partial class Identifier : IIdentifier
     /// Copy constructor.
     /// </summary>
     /// <param name="other"></param>
-    protected Identifier(Identifier other) => Items = other.ThrowWhenNull().Items.Clone();
+    Identifier(Identifier other) => Items = other.ThrowWhenNull().Items.Clone();
 
     /// <summary>
     /// <inheritdoc/> This method returns a reduced string by removing the null heading parts,
@@ -53,7 +56,7 @@ public partial class Identifier : IIdentifier
     /// <param name="reduce"></param>
     /// <param name="wrap"></param>
     /// <returns></returns>
-    public virtual string ToStringEx(
+    public string ToStringEx(
         bool reduce = true, bool wrap = true) => Items.ToStringEx(reduce, wrap);
 
     // ----------------------------------------------------
@@ -63,7 +66,7 @@ public partial class Identifier : IIdentifier
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
-    public virtual bool Equals(IIdentifier? other)
+    public bool Equals(IIdentifier? other)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null) return false;
@@ -251,13 +254,13 @@ public partial class Identifier : IIdentifier
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual IIdentifier.IBuilder ToBuilder() => Items.Clone();
+    public IIdentifier.IBuilder ToBuilder() => Items.Clone();
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual IIdentifier Reduce()
+    public IIdentifier Reduce()
     {
         var cloned = (Builder)Items.Clone();
         var done = cloned.Reduce();
@@ -271,7 +274,7 @@ public partial class Identifier : IIdentifier
     /// <param name="value"></param>
     /// <param name="reduce"></param>
     /// <returns></returns>
-    public virtual IIdentifier Replace(int index, string? value, bool reduce = true)
+    public IIdentifier Replace(int index, string? value, bool reduce = true)
     {
         var cloned = (Builder)Items.Clone();
         var num = cloned.Replace(index, value, reduce);
@@ -284,7 +287,7 @@ public partial class Identifier : IIdentifier
     /// <param name="value"></param>
     /// <param name="reduce"></param>
     /// <returns></returns>
-    public virtual IIdentifier Add(string? value, bool reduce = true)
+    public IIdentifier Add(string? value, bool reduce = true)
     {
         var cloned = (Builder)Items.Clone();
         var num = cloned.Add(value, reduce);
@@ -297,7 +300,7 @@ public partial class Identifier : IIdentifier
     /// <param name="range"></param>
     /// , bool reduce = true
     /// <returns></returns>
-    public virtual IIdentifier AddRange(IEnumerable<string?> range, bool reduce = true)
+    public IIdentifier AddRange(IEnumerable<string?> range, bool reduce = true)
     {
         var cloned = (Builder)Items.Clone();
         var num = cloned.AddRange(range, reduce);
@@ -311,7 +314,7 @@ public partial class Identifier : IIdentifier
     /// <param name="value"></param>
     /// <param name="reduce"></param>
     /// <returns></returns>
-    public virtual IIdentifier Insert(int index, string? value, bool reduce = true)
+    public IIdentifier Insert(int index, string? value, bool reduce = true)
     {
         var cloned = (Builder)Items.Clone();
         var num = cloned.Insert(index, value, reduce);
@@ -325,7 +328,7 @@ public partial class Identifier : IIdentifier
     /// <param name="range"></param>
     /// <param name="reduce"></param>
     /// <returns></returns>
-    public virtual IIdentifier InsertRange(int index, IEnumerable<string?> range, bool reduce = true)
+    public IIdentifier InsertRange(int index, IEnumerable<string?> range, bool reduce = true)
     {
         var cloned = (Builder)Items.Clone();
         var num = cloned.InsertRange(index, range, reduce);
@@ -338,7 +341,7 @@ public partial class Identifier : IIdentifier
     /// <param name="index"></param>
     /// <param name="reduce"></param>
     /// <returns></returns>
-    public virtual IIdentifier RemoveAt(int index, bool reduce = true)
+    public IIdentifier RemoveAt(int index, bool reduce = true)
     {
         var cloned = (Builder)Items.Clone();
         var num = cloned.RemoveAt(index, reduce);
@@ -352,7 +355,7 @@ public partial class Identifier : IIdentifier
     /// <param name="count"></param>
     /// <param name="reduce"></param>
     /// <returns></returns>
-    public virtual IIdentifier RemoveRange(int index, int count, bool reduce = true)
+    public IIdentifier RemoveRange(int index, int count, bool reduce = true)
     {
         var cloned = (Builder)Items.Clone();
         var num = cloned.RemoveRange(index, count, reduce);
@@ -365,7 +368,7 @@ public partial class Identifier : IIdentifier
     /// <param name="part"></param>
     /// <param name="reduce"></param>
     /// <returns></returns>
-    public virtual IIdentifier Remove(string? part, bool reduce = true)
+    public IIdentifier Remove(string? part, bool reduce = true)
     {
         var cloned = (Builder)Items.Clone();
         var num = cloned.Remove(part, reduce);
@@ -378,7 +381,7 @@ public partial class Identifier : IIdentifier
     /// <param name="part"></param>
     /// <param name="reduce"></param>
     /// <returns></returns>
-    public virtual IIdentifier RemoveLast(string? part, bool reduce = true)
+    public IIdentifier RemoveLast(string? part, bool reduce = true)
     {
         var cloned = (Builder)Items.Clone();
         var num = cloned.RemoveLast(part, reduce);
@@ -391,7 +394,7 @@ public partial class Identifier : IIdentifier
     /// <param name="part"></param>
     /// <param name="reduce"></param>
     /// <returns></returns>
-    public virtual IIdentifier RemoveAll(string? part, bool reduce = true)
+    public IIdentifier RemoveAll(string? part, bool reduce = true)
     {
         var cloned = (Builder)Items.Clone();
         var num = cloned.RemoveAll(part, reduce);
@@ -404,7 +407,7 @@ public partial class Identifier : IIdentifier
     /// <param name="predicate"></param>
     /// <param name="reduce"></param>
     /// <returns></returns>
-    public virtual IIdentifier Remove(Predicate<string?> predicate, bool reduce = true)
+    public IIdentifier Remove(Predicate<string?> predicate, bool reduce = true)
     {
         var cloned = (Builder)Items.Clone();
         var num = cloned.Remove(predicate, reduce);
@@ -417,7 +420,7 @@ public partial class Identifier : IIdentifier
     /// <param name="predicate"></param>
     /// <param name="reduce"></param>
     /// <returns></returns>
-    public virtual IIdentifier RemoveLast(Predicate<string?> predicate, bool reduce = true)
+    public IIdentifier RemoveLast(Predicate<string?> predicate, bool reduce = true)
     {
         var cloned = (Builder)Items.Clone();
         var num = cloned.RemoveLast(predicate, reduce);
@@ -430,7 +433,7 @@ public partial class Identifier : IIdentifier
     /// <param name="predicate"></param>
     /// <param name="reduce"></param>
     /// <returns></returns>
-    public virtual IIdentifier RemoveAll(Predicate<string?> predicate, bool reduce = true)
+    public IIdentifier RemoveAll(Predicate<string?> predicate, bool reduce = true)
     {
         var cloned = (Builder)Items.Clone();
         var num = cloned.RemoveAll(predicate, reduce);
@@ -441,7 +444,7 @@ public partial class Identifier : IIdentifier
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual IIdentifier Clear()
+    public IIdentifier Clear()
     {
         var cloned = (Builder)Items.Clone();
         var num = cloned.Clear();

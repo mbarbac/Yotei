@@ -43,7 +43,7 @@ partial class ParameterList
         /// <inheritdoc cref="IHost.IBuilder.ToInstance"/>
         /// </summary>
         /// <returns></returns>
-        public THost ToInstance() => Count == 0 ? new(Engine) : new(Engine, this);
+        public virtual THost ToInstance() => Count == 0 ? new(Engine) : new(Engine, this);
         IHost IHost.IBuilder.ToInstance() => ToInstance();
 
         /// <summary>

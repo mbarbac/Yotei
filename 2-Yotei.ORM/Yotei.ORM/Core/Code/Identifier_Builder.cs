@@ -1,7 +1,4 @@
-﻿using System.Xml.Schema;
-
-namespace Yotei.ORM.Code;
-
+﻿namespace Yotei.ORM.Code;
 partial class Identifier
 {
     // ====================================================
@@ -9,7 +6,7 @@ partial class Identifier
     /// <inheritdoc cref="IIdentifier.IBuilder"/>
     /// </summary>
     [Cloneable]
-    public partial class Builder : IIdentifier.IBuilder
+    public sealed partial class Builder : IIdentifier.IBuilder
     {
         readonly List<string?> Items;
 
@@ -46,7 +43,7 @@ partial class Identifier
         /// Copy constructor.
         /// </summary>
         /// <param name="other"></param>
-        protected Builder(Builder other)
+        Builder(Builder other)
         {
             other.ThrowWhenNull();
 
@@ -249,7 +246,7 @@ partial class Identifier
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public virtual IIdentifier ToInstance() => Count == 0
+        public IIdentifier ToInstance() => Count == 0
             ? new Identifier(Engine)
             : new Identifier(Engine, Items, reduce: false);
 
@@ -260,7 +257,7 @@ partial class Identifier
         /// <param name="value"></param>
         /// <param name="reduce"></param>
         /// <returns></returns>
-        public virtual int Replace(int index, string? value, bool reduce = true)
+        public int Replace(int index, string? value, bool reduce = true)
         {
             var parts = Split(Engine, value, reduce);
             var done = 0;
@@ -300,7 +297,7 @@ partial class Identifier
         /// <param name="value"></param>
         /// <param name="reduce"></param>
         /// <returns></returns>
-        public virtual int Add(string? value, bool reduce = true)
+        public int Add(string? value, bool reduce = true)
         {
             var parts = Split(Engine, value, reduce);
             if (parts.Count <= 1)
@@ -335,7 +332,7 @@ partial class Identifier
         /// <param name="range"></param>
         /// <param name="reduce"></param>
         /// <returns></returns>
-        public virtual int AddRange(IEnumerable<string?> range, bool reduce = true)
+        public int AddRange(IEnumerable<string?> range, bool reduce = true)
         {
             ArgumentNullException.ThrowIfNull(range);
 
@@ -362,7 +359,7 @@ partial class Identifier
         /// <param name="value"></param>
         /// <param name="reduce"></param>
         /// <returns></returns>
-        public virtual int Insert(int index, string? value, bool reduce = true)
+        public int Insert(int index, string? value, bool reduce = true)
         {
             var parts = Split(Engine, value, reduce);
             if (parts.Count <= 1)
@@ -400,7 +397,7 @@ partial class Identifier
         /// <param name="range"></param>
         /// <param name="reduce"></param>
         /// <returns></returns>
-        public virtual int InsertRange(int index, IEnumerable<string?> range, bool reduce = true)
+        public int InsertRange(int index, IEnumerable<string?> range, bool reduce = true)
         {
             ArgumentNullException.ThrowIfNull(range);
 
@@ -428,7 +425,7 @@ partial class Identifier
         /// <param name="index"></param>
         /// <param name="reduce"></param>
         /// <returns></returns>
-        public virtual int RemoveAt(int index, bool reduce = true)
+        public int RemoveAt(int index, bool reduce = true)
         {
             Items.RemoveAt(index);
             if (reduce) Reduce();
@@ -442,7 +439,7 @@ partial class Identifier
         /// <param name="count"></param>
         /// <param name="reduce"></param>
         /// <returns></returns>
-        public virtual int RemoveRange(int index, int count, bool reduce = true)
+        public int RemoveRange(int index, int count, bool reduce = true)
         {
             ArgumentOutOfRangeException.ThrowIfNegative(index);
             ArgumentOutOfRangeException.ThrowIfNegative(count);
@@ -464,7 +461,7 @@ partial class Identifier
         /// <param name="part"></param>
         /// <param name="reduce"></param>
         /// <returns></returns>
-        public virtual int Remove(string? part, bool reduce = true)
+        public int Remove(string? part, bool reduce = true)
         {
             part = UnWrap(part);
             return Remove(x => string.Compare(x, part, Engine.IgnoreCase) == 0);
@@ -476,7 +473,7 @@ partial class Identifier
         /// <param name="part"></param>
         /// <param name="reduce"></param>
         /// <returns></returns>
-        public virtual int RemoveLast(string? part, bool reduce = true)
+        public int RemoveLast(string? part, bool reduce = true)
         {
             part = UnWrap(part);
             return RemoveLast(x => string.Compare(x, part, Engine.IgnoreCase) == 0);
@@ -488,7 +485,7 @@ partial class Identifier
         /// <param name="part"></param>
         /// <param name="reduce"></param>
         /// <returns></returns>
-        public virtual int RemoveAll(string? part, bool reduce = true)
+        public int RemoveAll(string? part, bool reduce = true)
         {
             part = UnWrap(part);
             return RemoveAll(x => string.Compare(x, part, Engine.IgnoreCase) == 0);
@@ -500,7 +497,7 @@ partial class Identifier
         /// <param name="predicate"></param>
         /// <param name="reduce"></param>
         /// <returns></returns>
-        public virtual int Remove(Predicate<string?> predicate, bool reduce = true)
+        public int Remove(Predicate<string?> predicate, bool reduce = true)
         {
             ArgumentNullException.ThrowIfNull(predicate);
 
@@ -514,7 +511,7 @@ partial class Identifier
         /// <param name="predicate"></param>
         /// <param name="reduce"></param>
         /// <returns></returns>
-        public virtual int RemoveLast(Predicate<string?> predicate, bool reduce = true)
+        public int RemoveLast(Predicate<string?> predicate, bool reduce = true)
         {
             ArgumentNullException.ThrowIfNull(predicate);
 
@@ -528,7 +525,7 @@ partial class Identifier
         /// <param name="predicate"></param>
         /// <param name="reduce"></param>
         /// <returns></returns>
-        public virtual int RemoveAll(Predicate<string?> predicate, bool reduce = true)
+        public int RemoveAll(Predicate<string?> predicate, bool reduce = true)
         {
             ArgumentNullException.ThrowIfNull(predicate);
 
@@ -546,7 +543,7 @@ partial class Identifier
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public virtual int Clear()
+        public int Clear()
         {
             var num = Items.Count; if (num > 0) Items.Clear();
             return num;

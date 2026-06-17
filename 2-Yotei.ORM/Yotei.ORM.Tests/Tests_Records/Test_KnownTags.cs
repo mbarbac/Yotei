@@ -196,14 +196,14 @@ public static partial class Test_KnownTags
     public static void Test_ContainsAny()
     {
         var source = new FakeKnownTags();
-        Assert.False(source.ContainsAny(["one", "two"]));
+        Assert.False(source.Contains(["one", "two"]));
 
-        Assert.True(source.ContainsAny(["one", "two", "SchemaTag3"]));
-        Assert.True(source.ContainsAny(["one", "two", "TableTag2"]));
-        Assert.True(source.ContainsAny(["one", "two", "ColumnTag"]));
-        Assert.True(source.ContainsAny(["one", "two", "PrimaryKeyTag3"]));
-        Assert.True(source.ContainsAny(["one", "two", "UniqueValuedTag2"]));
-        Assert.True(source.ContainsAny(["one", "two", "ReadOnlyTag"]));
+        Assert.True(source.Contains(["one", "two", "SchemaTag3"]));
+        Assert.True(source.Contains(["one", "two", "TableTag2"]));
+        Assert.True(source.Contains(["one", "two", "ColumnTag"]));
+        Assert.True(source.Contains(["one", "two", "PrimaryKeyTag3"]));
+        Assert.True(source.Contains(["one", "two", "UniqueValuedTag2"]));
+        Assert.True(source.Contains(["one", "two", "ReadOnlyTag"]));
     }
 
     //[Enforced]

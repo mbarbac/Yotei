@@ -42,11 +42,6 @@ public partial interface IKnownTags : IEnumerable<IMetadataTag>, IEquatable<IKno
     // ----------------------------------------------------
 
     /// <summary>
-    /// Enumerates the actual collection of names in this instance.
-    /// </summary>
-    IEnumerable<string> Names { get; }
-
-    /// <summary>
     /// Determines if this instance contains the given name in any of its tags.
     /// </summary>
     /// <param name="name"></param>
@@ -58,12 +53,24 @@ public partial interface IKnownTags : IEnumerable<IMetadataTag>, IEquatable<IKno
     /// </summary>
     /// <param name="names"></param>
     /// <returns></returns>
-    bool ContainsAny(IEnumerable<string> names);
+    bool Contains(IEnumerable<string> names);
 
     /// <summary>
-    /// Returns the tag that contains the given name, or null if any.
+    /// Returns the unique tag that contains the given name, or null if any.
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
     IMetadataTag? Find(string name);
+
+    /// <summary>
+    /// Returns the collection of tags that contains any of the given names.
+    /// </summary>
+    /// <param name="names"></param>
+    /// <returns></returns>
+    List<IMetadataTag> Find(IEnumerable<string> names);
+
+    /// <summary>
+    /// Enumerates the actual collection of names in this instance.
+    /// </summary>
+    IEnumerable<string> Names { get; }
 }

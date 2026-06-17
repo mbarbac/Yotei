@@ -4,8 +4,8 @@
 /// <summary>
 /// <inheritdoc cref="IMetadataTag"/>
 /// </summary>
-[Cloneable(ReturnType = typeof(IMetadataTag))]
-public partial class MetadataTag : IMetadataTag
+[Cloneable(ReturnType = typeof(IMetadataTag), UseVirtual = false)]
+public sealed partial class MetadataTag : IMetadataTag
 {
     readonly Builder Items;
 
@@ -27,7 +27,7 @@ public partial class MetadataTag : IMetadataTag
     /// Copy constructor.
     /// </summary>
     /// <param name="other"></param>
-    protected MetadataTag(MetadataTag other)
+    MetadataTag(MetadataTag other)
     {
         ArgumentNullException.ThrowIfNull(other);
         Items = new(other.IgnoreCase, other);
@@ -53,7 +53,7 @@ public partial class MetadataTag : IMetadataTag
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
-    public virtual bool Equals(IMetadataTag? other)
+    public bool Equals(IMetadataTag? other)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null) return false;
@@ -154,7 +154,7 @@ public partial class MetadataTag : IMetadataTag
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual IMetadataTag.IBuilder ToBuilder() => Items.Clone();
+    public IMetadataTag.IBuilder ToBuilder() => Items.Clone();
 
     /// <summary>
     /// <inheritdoc/>
@@ -162,7 +162,7 @@ public partial class MetadataTag : IMetadataTag
     /// <param name="oldname"></param>
     /// <param name="newname"></param>
     /// <returns></returns>
-    public virtual IMetadataTag Replace(string oldname, string newname)
+    public IMetadataTag Replace(string oldname, string newname)
     {
         var builder = ToBuilder();
         var done = builder.Replace(oldname, newname);
@@ -174,7 +174,7 @@ public partial class MetadataTag : IMetadataTag
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    public virtual IMetadataTag Add(string name)
+    public IMetadataTag Add(string name)
     {
         var builder = ToBuilder();
         var done = builder.Add(name);
@@ -186,7 +186,7 @@ public partial class MetadataTag : IMetadataTag
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public virtual IMetadataTag AddRange(IEnumerable<string> range)
+    public IMetadataTag AddRange(IEnumerable<string> range)
     {
         var builder = ToBuilder();
         var done = builder.AddRange(range);
@@ -198,7 +198,7 @@ public partial class MetadataTag : IMetadataTag
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    public virtual IMetadataTag Remove(string name)
+    public IMetadataTag Remove(string name)
     {
         var builder = ToBuilder();
         var done = builder.Remove(name);
@@ -209,7 +209,7 @@ public partial class MetadataTag : IMetadataTag
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual IMetadataTag Clear()
+    public IMetadataTag Clear()
     {
         var builder = ToBuilder();
         var done = builder.Clear();
