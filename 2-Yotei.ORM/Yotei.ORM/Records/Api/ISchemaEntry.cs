@@ -4,51 +4,55 @@
 /// <summary>
 /// Represents the metadata associated with a given schema element (the equivalent of a column
 /// in a relational world).
-/// <br/> Instances of this type are intended to be immutable ones.
+/// <br/> Instances of this type provide a set of well-known properties whose values might not
+/// apperar in the metadata collection, either because the underlying database engine does not
+/// support them, or because they have not been explicitly set yet.
+/// <br/> Instance of this type are intended to be immutable ones.
 /// </summary>
+[Cloneable]
 public partial interface ISchemaEntry : IEnumerable<IMetadataEntry>, IEquatable<ISchemaEntry>
 {
+    /// <summary>
+    /// The identifier by which the associated schema element (column) is knowm, or null if this
+    /// property has not been set explicitly or through associated well-known metadata.
+    /// </summary>
+    [With] IIdentifier? Identifier { get; init; }
+
+    /// <summary>
+    /// Whether the associated schema element (column) is a primary key one, or part of a primary
+    /// key group, or null if this property has not been set explicitly or through associated
+    /// well-known metadata. Only one primary key group is supported per schema.
+    /// </summary>
+    [With] bool? IsPrimaryKey { get; init; }
+
+    /// <summary>
+    /// Whether the associated schema element (column) is a unique valued one, or part of a unique
+    /// valued group, or null if this property has not been set explicitly or through associated
+    /// well-known metadata. Only one unique valued group is supported per schema.
+    /// </summary>
+    [With] bool? IsUniqueValued { get; init; }
+
+    /// <summary>
+    /// Whether the associated schema element (column) is a read only one, or null if this property
+    /// has not been set explicitly or through associated well-known metadata.
+    /// </summary>
+    [With] bool? IsReadOnly { get; init; }
+
+    // ----------------------------------------------------
+
     /// <summary>
     /// The engine this instance is associated with.
     /// </summary>
     IEngine Engine { get; }
 
     /// <summary>
-    /// The identifier by which the associated schema element (column) is known. The default value
-    /// of this property is an empty identifier.
-    /// </summary>
-    [With] IIdentifier Identifier { get; }
-
-    /// <summary>
-    /// Whether the associated schema element (column) is a primary key one, or part of a primary
-    /// key group. Only one group per schema is supported. The default value of this property is
-    /// false.
-    /// </summary>
-    [With] bool IsPrimaryKey { get; }
-
-    /// <summary>
-    /// Whether the associated schema element (column) is a unique valued one, or part of a unique
-    /// valued group. Only one group per schema is supported. The default value of this property is
-    /// false.
-    /// </summary>
-    [With] bool IsUniqueValued { get; }
-
-    /// <summary>
-    /// Whether the associated schema element (column) is a read only one. The default value of this
-    /// property is false.
-    /// </summary>
-    [With] bool IsReadOnly { get; }
-
-    // ------------------------------------------------
-
-    /// <summary>
-    /// Gets the number of elements in this collection.
+    /// Gets the actual number of metadata entries kept by this instance.
     /// </summary>
     int Count { get; }
 
     /// <summary>
-    /// Gets the metadata value of the entry associated with the given name. Throws an exception if
-    /// if that entry does not exist.
+    /// Gets the value kept by the metadata entry associated with the given name, or throws an
+    /// exception if that entry is not found.
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
@@ -89,7 +93,7 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataEntry>, IEquatable<
     /// <param name="predicate"></param>
     /// <returns></returns>
     List<IMetadataEntry> Find(Predicate<IMetadataEntry> predicate);
-
+    
     // ------------------------------------------------
 
     /// <summary>
@@ -99,28 +103,30 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataEntry>, IEquatable<
     IBuilder ToBuilder();
 
     /// <summary>
-    /// Adds to this instance the given metadata entry.
+    /// Returns a copy of this instance with the given metadata entry added to it.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
     ISchemaEntry Add(IMetadataEntry item);
 
     /// <summary>
-    /// Adds to this instance the entries of the given range.
+    /// Returns a copy of this instance with the entries of the given range added to it.
     /// </summary>
     /// <param name="entry"></param>
     /// <returns></returns>
     ISchemaEntry AddRange(IEnumerable<IMetadataEntry> range);
 
     /// <summary>
-    /// Removes from this instance the metadata entry associated with the given name, if any.
+    /// Returns a copy of this instance where the entry associated with the given name removed,
+    /// if any.
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
     ISchemaEntry Remove(string name);
 
     /// <summary>
-    /// Clears this instance.
+    /// Returns a copy of this instance with all its entries removed and its standard properties
+    /// reset to their default values.
     /// </summary>
     /// <returns></returns>
     ISchemaEntry Clear();

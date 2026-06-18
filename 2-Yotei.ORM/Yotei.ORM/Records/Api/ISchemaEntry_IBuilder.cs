@@ -1,4 +1,5 @@
 ﻿namespace Yotei.ORM.Records;
+
 partial interface ISchemaEntry
 {
     // ====================================================
@@ -9,31 +10,31 @@ partial interface ISchemaEntry
     public partial interface IBuilder : IEnumerable<IMetadataEntry>
     {
         /// <summary>
-        /// <inheritdoc cref="ISchemaEntry.Engine"/>
-        /// </summary>
-        IEngine Engine { get; }
-
-        /// <summary>
         /// <inheritdoc cref="ISchemaEntry.Identifier"/>
         /// </summary>
-        IIdentifier Identifier { get; set; }
+        IIdentifier? Identifier { get; set; }
 
         /// <summary>
         /// <inheritdoc cref="ISchemaEntry.IsPrimaryKey"/>
         /// </summary>
-        bool IsPrimaryKey { get; set; }
+        bool? IsPrimaryKey { get; set; }
 
         /// <summary>
         /// <inheritdoc cref="ISchemaEntry.IsUniqueValued"/>
         /// </summary>
-        bool IsUniqueValued { get; set; }
+        bool? IsUniqueValued { get; set; }
 
         /// <summary>
         /// <inheritdoc cref="ISchemaEntry.IsReadOnly"/>
         /// </summary>
-        bool IsReadOnly { get; set; }
+        bool? IsReadOnly { get; set; }
 
-        // ------------------------------------------------
+        // ----------------------------------------------------
+
+        /// <summary>
+        /// <inheritdoc cref="ISchemaEntry.Engine"/>
+        /// </summary>
+        IEngine Engine { get; }
 
         /// <summary>
         /// <inheritdoc cref="ISchemaEntry.Count"/>
@@ -41,9 +42,8 @@ partial interface ISchemaEntry
         int Count { get; }
 
         /// <summary>
-        /// Gets or sets the metadata value of the entry associated with the given name. The getter
-        /// throws an exception if that entry does not exist yet. The setter creates an ad-hoc one
-        /// in that scenario.
+        /// <inheritdoc cref="ISchemaEntry.this[string]"/> The setter creates an ad-hoc entry
+        /// if such is needed.
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
@@ -93,30 +93,28 @@ partial interface ISchemaEntry
         ISchemaEntry ToInstance();
 
         /// <summary>
-        /// Returns a copy of this instance where the given metadata entry has been added to it.
+        /// Adds to this instance the given metadata entry.
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
         bool Add(IMetadataEntry item);
 
         /// <summary>
-        /// Returns a copy of this instance where metadata entries from the given range have been
-        /// added to it.
+        /// Adds to this instance the entries of the given range.
         /// </summary>
         /// <param name="entry"></param>
         /// <returns></returns>
         bool AddRange(IEnumerable<IMetadataEntry> range);
 
         /// <summary>
-        /// Returns a copy of this instance where the metadata entry associated with the given
-        /// name has been removed, if any.
+        /// Removes from this instance the entry associated with the given name, if any.
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
         bool Remove(string name);
 
         /// <summary>
-        /// Returns a cleared copy of this instance.
+        /// Clears this instance.
         /// </summary>
         /// <returns></returns>
         bool Clear();
